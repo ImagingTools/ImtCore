@@ -28,19 +28,13 @@ DocumentViewBase {
 		: false
 	readonly property bool __isReadOnly: !container.isNewTenant && !container.isOwner
 
-	// Members list model used by the Repeater in Members page
-	property var __membersListModel: []
-
-	function __rebuildMembersListModel() {
-		container.__membersListModel = container.__buildMembersModel()
-	}
-
+	// Trigger UI updates when members/invitations data changes
 	onPendingMembersChanged: {
-		container.__rebuildMembersListModel()
+		// UI is directly bound to pendingMembers array
 	}
 
 	onPendingInvitationsChanged: {
-		container.__rebuildMembersListModel()
+		// UI is directly bound to pendingInvitations array
 	}
 
 	function updateGui(){
@@ -99,7 +93,6 @@ DocumentViewBase {
 			}
 		}
 		container.pendingMembers = members
-		container.__rebuildMembersListModel()
 	}
 
 	function __loadInvitationsFromModel() {
@@ -165,34 +158,6 @@ DocumentViewBase {
 
 	function __displayNameOrId(name, id) {
 		return name ? name : id
-	}
-
-	function __buildMembersModel() {
-		var result = []
-		var members = container.pendingMembers
-		for (var i = 0; i < members.length; i++) {
-			var userId = members[i].id
-			var userName = members[i].name || userId
-			result.push({ userId: userId, userName: userName, isPending: false })
-		}
-		// Merge pending invitations into the same list
-		var invitations = container.pendingInvitations
-		for (var j = 0; j < invitations.length; j++) {
-			var inv = invitations[j]
-			var isExpired = container.__isInvitationExpired(inv.expiresAt)
-			result.push({
-				userId: inv.userId,
-				userName: inv.userName,
-				isPending: true,
-				invitationId: inv.id,
-				status: isExpired ? "Expired" : inv.status,
-				isExpired: isExpired,
-				invitedByName: inv.invitedByName || inv.invitedByUserId || "",
-				createdAt: inv.createdAt || "",
-				expiresAt: inv.expiresAt || ""
-			})
-		}
-		return result
 	}
 
 	function __formatInvitationInfo(invitedByName, expiresAt) {
@@ -366,22 +331,27 @@ DocumentViewBase {
 
 		Item {
 			id: membersPage
-			
+
 			function __removeMemberById(userId) {
-				var arr = membersSelector.items.slice()
+				var arr = container.pendingMembers.slice()
 				for (var i = 0; i < arr.length; i++) {
 					if (arr[i].id === userId) {
 						arr.splice(i, 1)
 						break
 					}
 				}
-				membersSelector.__resolvingNames = true
-				membersSelector.items = arr
-				membersSelector.__resolvingNames = false
 				container.pendingMembers = arr
 				container.__membersModifiedLocally = true
 				container.doUpdateModel()
 			}
+
+			// --- Confirmation state properties ---
+			property string __confirmRemoveUserId: ""
+			property string __confirmRemoveUserName: ""
+			property string __confirmTransferUserId: ""
+			property string __confirmTransferUserName: ""
+			property string __confirmRevokeInvitationId: ""
+			property string __confirmRevokeUserName: ""
 
 			CustomScrollbar {
 				id: membersScrollbar
@@ -414,223 +384,796 @@ DocumentViewBase {
 					width: Style.sizeHintXXL
 					spacing: Style.marginXL
 
-					ItemSelectElementView {
-						id: membersSelector
+					// ===== Header Area =====
+					Row {
+						id: membersHeader
 						width: parent.width
-						items: container.pendingMembers
-						label: qsTr("Members")
-						addButtonText: qsTr("Create invitation")
-						filterPlaceholder: qsTr("Type or choose a user")
-						collectionId: "Users"
-						emptyText: qsTr("No members")
-						showCount: true
-						editable: container.isOwner
-						nonRemovableIds: container.tenantData && container.tenantData.m_ownerId ? [container.tenantData.m_ownerId] : []
+						spacing: Style.marginM
 
-						onItemRemoved: {
-							container.pendingMembers = membersSelector.items.slice()
-							container.__membersModifiedLocally = true
-							container.doUpdateModel()
-						}
+						Column {
+							anchors.verticalCenter: parent.verticalCenter
+							spacing: Style.marginXS
 
-						onSelectionChanged: {
-							container.__inviteSelectedUsers(selectedItems)
-							membersSelector.items = container.pendingMembers.slice()
-						}
-
-						onPopupClosed: {
-							if (container.__membersModifiedLocally) {
-								container.doUpdateModel()
-								container.__membersModifiedLocally = false
+							BaseText {
+								text: qsTr("Members")
+								font.pixelSize: Style.fontSizeXL
+								font.bold: true
+								color: Style.textColor
 							}
-							membersSelector.items = container.pendingMembers.slice()
+
+							BaseText {
+								text: {
+									var totalMembers = container.pendingMembers.length
+									var totalInvites = container.pendingInvitations.length
+									var parts = []
+									parts.push(qsTr("%1 member(s)").arg(totalMembers))
+									if (totalInvites > 0)
+										parts.push(qsTr("%1 pending invite(s)").arg(totalInvites))
+									return parts.join(" · ")
+								}
+								font.pixelSize: Style.fontSizeS
+								color: Style.inactiveTextColor
+							}
 						}
 
-						bottomComp: Component {
-							Column {
-								width: parent.width
-								spacing: Style.spacingXS
+						Item {
+							Layout.fillWidth: true
+							width: parent.width
+								- parent.children[0].width
+								- (inviteMemberBtn.visible ? inviteMemberBtn.width : 0)
+								- (leaveWorkspaceBtn.visible ? leaveWorkspaceBtn.width : 0)
+								- parent.spacing * 2
+							height: 1
+						}
 
-								Text {
-									visible: membersSelector.items.length === 0 && container.pendingInvitations.length === 0
-									width: parent.width
-									text: membersSelector.emptyText
-									font.pixelSize: Style.fontSizeM
-									color: Style.inactiveTextColor
-									wrapMode: Text.WordWrap
+						Button {
+							id: inviteMemberBtn
+							visible: container.isOwner
+							anchors.verticalCenter: parent.verticalCenter
+							text: qsTr("Invite Member")
+							tooltipText: qsTr("Invite a new member to this workspace")
+							onClicked: {
+								ModalDialogManager.openDialog(inviteMemberDialogComp, {})
+							}
+						}
+
+						Button {
+							id: leaveWorkspaceBtn
+							visible: !container.isOwner && container.tenantData && container.tenantData.m_currentUserId
+							anchors.verticalCenter: parent.verticalCenter
+							text: qsTr("Leave Workspace")
+							tooltipText: qsTr("Leave this workspace")
+							onClicked: {
+								ModalDialogManager.showConfirmationDialog(
+									qsTr("Leave Workspace"),
+									qsTr("Are you sure you want to leave this workspace? You will lose access to all workspace resources."),
+									function(result) {
+										if (result === true)
+											membersPage.__removeMemberById(container.tenantData.m_currentUserId)
+									}
+								)
+							}
+						}
+					}
+
+					// ===== Active Members Section =====
+					Column {
+						id: activeMembersSection
+						width: parent.width
+						spacing: Style.marginS
+
+						BaseText {
+							text: qsTr("Active Members")
+							font.pixelSize: Style.fontSizeL
+							font.bold: true
+							color: Style.textColor
+						}
+
+						// Empty state
+						BaseText {
+							visible: container.pendingMembers.length === 0
+							text: qsTr("No members found")
+							font.pixelSize: Style.fontSizeM
+							color: Style.inactiveTextColor
+							topPadding: Style.marginM
+							bottomPadding: Style.marginM
+						}
+
+						Repeater {
+							model: container.pendingMembers
+
+							delegate: Rectangle {
+								id: activeMemberDelegate
+								width: activeMembersSection.width
+								height: activeMemberRow.implicitHeight + Style.marginM * 2
+								radius: Style.radiusS
+								color: activeMemberMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
+
+								readonly property bool isMemberOwner: container.tenantData && modelData.id === container.tenantData.m_ownerId
+								readonly property bool isCurrentUser: container.tenantData && container.tenantData.m_currentUserId && modelData.id === container.tenantData.m_currentUserId
+
+								MouseArea {
+									id: activeMemberMouseArea
+									anchors.fill: parent
+									hoverEnabled: true
+									acceptedButtons: Qt.NoButton
 								}
 
-								Repeater {
-									model: container.__membersListModel
+								Row {
+									id: activeMemberRow
+									anchors.left: parent.left
+									anchors.right: parent.right
+									anchors.verticalCenter: parent.verticalCenter
+									anchors.margins: Style.marginM
+									spacing: Style.marginM
 
-									delegate: Rectangle {
-										id: memberDelegate
-										width: parent.width
-										height: memberDelegateColumn.implicitHeight + Style.marginS * 2
-										radius: Style.radiusS
-										color: memberDelegateMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
-										border.color: memberDelegate.isPending ? Style.borderColor : "transparent"
-										border.width: memberDelegate.isPending ? 1 : 0
+									// Avatar placeholder
+									Rectangle {
+										id: activeMemberAvatar
+										width: Style.iconSizeL
+										height: Style.iconSizeL
+										radius: width / 2
+										anchors.verticalCenter: parent.verticalCenter
+										color: activeMemberDelegate.isMemberOwner ? Style.selectedColor : Style.borderColor
 
-										readonly property bool isOwner: container.tenantData && modelData.userId === container.tenantData.m_ownerId
-										readonly property bool isPending: modelData.isPending === true
-										readonly property bool isCurrentUser: container.tenantData && container.tenantData.m_currentUserId && modelData.userId === container.tenantData.m_currentUserId
-
-										MouseArea {
-											id: memberDelegateMouseArea
-											anchors.fill: parent
-											hoverEnabled: true
-											acceptedButtons: Qt.NoButton
+										BaseText {
+											anchors.centerIn: parent
+											text: {
+												var name = modelData.name || modelData.id || ""
+												return name.length > 0 ? name.charAt(0).toUpperCase() : "?"
+											}
+											font.pixelSize: Style.fontSizeM
+											font.bold: true
+											color: Style.textColor
 										}
 
-										Column {
-											id: memberDelegateColumn
-											anchors.left: parent.left
+										// Crown icon for owner
+										BaseText {
+											visible: activeMemberDelegate.isMemberOwner
+											anchors.top: parent.top
 											anchors.right: parent.right
-											anchors.verticalCenter: parent.verticalCenter
-											anchors.margins: Style.marginS
-											spacing: Style.marginXS
+											anchors.topMargin: -Style.marginXS
+											anchors.rightMargin: -Style.marginXS
+											text: "♛"
+											font.pixelSize: Style.fontSizeS
+											color: "#E3A008"
+										}
+									}
 
-											Row {
-												width: parent.width
-												spacing: Style.marginM
+									// User info column
+									Column {
+										anchors.verticalCenter: parent.verticalCenter
+										spacing: 2
+										width: parent.width
+											- activeMemberAvatar.width
+											- activeMemberStatusBadge.width
+											- activeMemberActions.width
+											- parent.spacing * 3
 
-												BaseText {
-													anchors.verticalCenter: parent.verticalCenter
-													text: modelData.userName
-													elide: Text.ElideRight
-													width: parent.width
-														- (ownerBadge.visible ? ownerBadge.width + parent.spacing : 0)
-														- (pendingBadge.visible ? pendingBadge.width + parent.spacing : 0)
-														- (chipRemoveBtn.visible ? chipRemoveBtn.width + parent.spacing : 0)
-														- (leaveBtn.visible ? leaveBtn.width + parent.spacing : 0)
-														- (transferOwnerBtn.visible ? transferOwnerBtn.width + parent.spacing : 0)
-													color: memberDelegate.isPending ? Style.inactiveTextColor : Style.textColor
-													font.bold: memberDelegate.isOwner
-												}
+										Row {
+											spacing: Style.marginS
 
-												// Owner badge
-												Rectangle {
-													id: ownerBadge
-													visible: !memberDelegate.isPending && memberDelegate.isOwner
-													anchors.verticalCenter: parent.verticalCenter
-													width: ownerBadgeText.implicitWidth + Style.marginM
-													height: ownerBadgeText.implicitHeight + Style.marginXS
-													radius: Style.radiusS
-													color: Style.selectedColor
-
-													BaseText {
-														id: ownerBadgeText
-														anchors.centerIn: parent
-														text: qsTr("Owner")
-														font.pixelSize: Style.fontSizeS
-														color: Style.textColor
-													}
-												}
-
-												// Pending status badge
-												Rectangle {
-													id: pendingBadge
-													visible: memberDelegate.isPending
-													anchors.verticalCenter: parent.verticalCenter
-													width: pendingBadgeText.implicitWidth + Style.marginM
-													height: pendingBadgeText.implicitHeight + Style.marginXS
-													radius: Style.radiusS
-													color: modelData.isExpired ? "#FFDCE0" : "#FFF3CD"
-
-													BaseText {
-														id: pendingBadgeText
-														anchors.centerIn: parent
-														text: modelData.isExpired ? qsTr("Expired") : qsTr("Invited")
-														font.pixelSize: Style.fontSizeS
-														color: modelData.isExpired ? "#DA3633" : "#856404"
-													}
-												}
-
-												ToolButton {
-													id: chipRemoveBtn
-													visible: !memberDelegate.isPending && membersSelector.editable && membersSelector.nonRemovableIds.indexOf(modelData.userId) < 0
-													anchors.verticalCenter: parent.verticalCenter
-													tooltipText: qsTr("Remove member")
-													iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
-													decorator: Component {
-														ToolButtonDecorator {
-															color: "transparent"
-															icon.width: Style.iconSizeXS
-														}
-													}
-													onClicked: {
-														membersPage.__removeMemberById(modelData.userId)
-													}
-												}
-
-												Button {
-													id: leaveBtn
-													visible: !memberDelegate.isPending && memberDelegate.isCurrentUser && !memberDelegate.isOwner && !chipRemoveBtn.visible
-													anchors.verticalCenter: parent.verticalCenter
-													text: qsTr("Leave")
-													tooltipText: qsTr("Leave this organization")
-													onClicked: {
-														membersPage.__removeMemberById(modelData.userId)
-													}
-												}
-
-												ToolButton {
-													id: transferOwnerBtn
-													visible: container.isOwner && !memberDelegate.isOwner && !memberDelegate.isPending
-													anchors.verticalCenter: parent.verticalCenter
-													tooltipText: qsTr("Transfer ownership")
-													iconSource: Style.getIconPath("Icons/Switch", Icon.State.On, Icon.Mode.Normal)
-													decorator: Component {
-														ToolButtonDecorator {
-															color: "transparent"
-															icon.width: Style.iconSizeXS
-														}
-													}
-													onClicked: {
-														container.__transferOwnershipTo(modelData.userId, modelData.userName)
-													}
-												}
+											BaseText {
+												text: modelData.name || modelData.id || ""
+												font.bold: activeMemberDelegate.isMemberOwner
+												font.pixelSize: Style.fontSizeM
+												color: Style.textColor
+												elide: Text.ElideRight
 											}
 
-											// Second row for pending invitations: expiry info + revoke/resend
-											Row {
-												visible: memberDelegate.isPending
-												width: parent.width
-												spacing: Style.marginM
+											// "You" indicator
+											Rectangle {
+												visible: activeMemberDelegate.isCurrentUser
+												anchors.verticalCenter: parent.verticalCenter
+												width: youText.implicitWidth + Style.marginS
+												height: youText.implicitHeight + 2
+												radius: Style.radiusS
+												color: "#E8F0FE"
 
 												BaseText {
-													width: parent.width - (revokeBtn.visible ? revokeBtn.width + parent.spacing : 0) - (resendBtn.visible ? resendBtn.width + parent.spacing : 0)
-													text: container.__formatInvitationInfo(modelData.invitedByName, modelData.expiresAt)
-													color: modelData.isExpired ? "#DA3633" : Style.inactiveTextColor
-													font.pixelSize: Style.fontSizeS
-													elide: Text.ElideRight
-												}
-
-												Button {
-													id: resendBtn
-													visible: container.isOwner
-													text: qsTr("Resend")
-													tooltipText: qsTr("Resend invitation")
-													onClicked: {
-														container.resendInvitationInput.m_invitationId = modelData.invitationId
-														container.resendInvitationSender.send(container.resendInvitationInput)
-													}
-												}
-
-												Button {
-													id: revokeBtn
-													visible: container.isOwner
-													text: qsTr("Revoke")
-													tooltipText: qsTr("Revoke invitation")
-													onClicked: {
-														container.revokeInvitationInput.m_invitationId = modelData.invitationId
-														container.revokeInvitationSender.send(container.revokeInvitationInput)
-														container.__removePendingInvitation(modelData.invitationId)
-													}
+													id: youText
+													anchors.centerIn: parent
+													text: qsTr("You")
+													font.pixelSize: Style.fontSizeXS
+													color: "#1967D2"
 												}
 											}
 										}
+
+										BaseText {
+											text: modelData.id || ""
+											font.pixelSize: Style.fontSizeS
+											color: Style.inactiveTextColor
+											elide: Text.ElideRight
+											width: parent.width
+										}
+									}
+
+									// Status / Role badge
+									Column {
+										id: activeMemberStatusBadge
+										anchors.verticalCenter: parent.verticalCenter
+										spacing: 2
+
+										Rectangle {
+											width: roleBadgeText.implicitWidth + Style.marginM
+											height: roleBadgeText.implicitHeight + Style.marginXS
+											radius: Style.radiusS
+											color: activeMemberDelegate.isMemberOwner ? "#FEF3C7" : Style.baseColor
+											border.color: activeMemberDelegate.isMemberOwner ? "#F59E0B" : Style.borderColor
+											border.width: 1
+
+											BaseText {
+												id: roleBadgeText
+												anchors.centerIn: parent
+												text: activeMemberDelegate.isMemberOwner ? qsTr("Owner") : qsTr("Member")
+												font.pixelSize: Style.fontSizeXS
+												color: activeMemberDelegate.isMemberOwner ? "#92400E" : Style.textColor
+											}
+										}
+
+										Rectangle {
+											width: activeStatusText.implicitWidth + Style.marginS
+											height: activeStatusText.implicitHeight + 2
+											radius: Style.radiusS
+											color: "#DCFCE7"
+
+											BaseText {
+												id: activeStatusText
+												anchors.centerIn: parent
+												text: qsTr("Active")
+												font.pixelSize: Style.fontSizeXS
+												color: "#166534"
+											}
+										}
+									}
+
+									// Actions column (fixed width to prevent jumping)
+									Item {
+										id: activeMemberActions
+										width: Style.iconSizeL
+										height: parent.height
+										anchors.verticalCenter: parent.verticalCenter
+
+										ToolButton {
+											id: memberActionsBtn
+											visible: {
+												if (container.isOwner) {
+													// Owner can act on everyone except remove self
+													return true
+												}
+												// Regular member can only leave (self)
+												return activeMemberDelegate.isCurrentUser
+											}
+											anchors.centerIn: parent
+											tooltipText: qsTr("Actions")
+											iconSource: Style.getIconPath("Icons/More", Icon.State.On, Icon.Mode.Normal)
+											decorator: Component {
+												ToolButtonDecorator {
+													color: "transparent"
+													icon.width: Style.iconSizeXS
+												}
+											}
+											onClicked: {
+												var menuItems = []
+												if (container.isOwner) {
+													if (activeMemberDelegate.isMemberOwner) {
+														// Owner → Self: only Transfer Ownership
+														menuItems.push({ text: qsTr("Transfer Ownership"), action: "transfer" })
+													} else {
+														// Owner → Regular Member
+														menuItems.push({ text: qsTr("Remove Member"), action: "remove" })
+														menuItems.push({ text: qsTr("Transfer Ownership"), action: "transfer" })
+													}
+												} else {
+													if (activeMemberDelegate.isCurrentUser && !activeMemberDelegate.isMemberOwner) {
+														menuItems.push({ text: qsTr("Leave Workspace"), action: "leave" })
+													}
+												}
+												membersPage.__showActionsMenu(menuItems, modelData.id, modelData.name || modelData.id)
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+
+					// ===== Pending Invitations Section =====
+					Column {
+						id: pendingInvitationsSection
+						width: parent.width
+						spacing: Style.marginS
+						visible: container.isOwner || container.pendingInvitations.length > 0
+
+						BaseText {
+							text: qsTr("Pending Invitations")
+							font.pixelSize: Style.fontSizeL
+							font.bold: true
+							color: Style.textColor
+							topPadding: Style.marginL
+						}
+
+						// Empty state
+						BaseText {
+							visible: container.pendingInvitations.length === 0
+							text: qsTr("No pending invitations")
+							font.pixelSize: Style.fontSizeM
+							color: Style.inactiveTextColor
+							topPadding: Style.marginM
+							bottomPadding: Style.marginM
+						}
+
+						Repeater {
+							model: container.pendingInvitations
+
+							delegate: Rectangle {
+								id: inviteDelegate
+								width: pendingInvitationsSection.width
+								height: inviteRow.implicitHeight + Style.marginM * 2
+								radius: Style.radiusS
+								color: inviteMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
+								border.color: Style.borderColor
+								border.width: 1
+								opacity: 0.85
+
+								readonly property bool isExpired: container.__isInvitationExpired(modelData.expiresAt)
+								readonly property string effectiveStatus: {
+									if (inviteDelegate.isExpired) return "Expired"
+									if (modelData.status === "revoked" || modelData.status === "Revoked") return "Revoked"
+									return "Pending"
+								}
+
+								MouseArea {
+									id: inviteMouseArea
+									anchors.fill: parent
+									hoverEnabled: true
+									acceptedButtons: Qt.NoButton
+								}
+
+								Row {
+									id: inviteRow
+									anchors.left: parent.left
+									anchors.right: parent.right
+									anchors.verticalCenter: parent.verticalCenter
+									anchors.margins: Style.marginM
+									spacing: Style.marginM
+
+									// Mail/invitation avatar placeholder (dashed)
+									Rectangle {
+										width: Style.iconSizeL
+										height: Style.iconSizeL
+										radius: width / 2
+										anchors.verticalCenter: parent.verticalCenter
+										color: "transparent"
+										border.color: Style.inactiveTextColor
+										border.width: 1
+
+										BaseText {
+											anchors.centerIn: parent
+											text: "✉"
+											font.pixelSize: Style.fontSizeM
+											color: Style.inactiveTextColor
+										}
+									}
+
+									// Invite info column
+									Column {
+										anchors.verticalCenter: parent.verticalCenter
+										spacing: 2
+										width: parent.width
+											- Style.iconSizeL
+											- inviteStatusBadge.width
+											- inviteActions.width
+											- parent.spacing * 3
+
+										BaseText {
+											text: modelData.userName || modelData.userId || ""
+											font.pixelSize: Style.fontSizeM
+											color: Style.inactiveTextColor
+											elide: Text.ElideRight
+											width: parent.width
+										}
+
+										BaseText {
+											text: container.__formatInvitationInfo(modelData.invitedByName || modelData.invitedByUserId || "", modelData.expiresAt || "")
+											font.pixelSize: Style.fontSizeS
+											color: inviteDelegate.isExpired ? "#DA3633" : Style.inactiveTextColor
+											elide: Text.ElideRight
+											width: parent.width
+										}
+									}
+
+									// Status badge
+									Item {
+										id: inviteStatusBadge
+										width: inviteStatusRect.width
+										height: inviteStatusRect.height
+										anchors.verticalCenter: parent.verticalCenter
+
+										Rectangle {
+											id: inviteStatusRect
+											width: inviteStatusText.implicitWidth + Style.marginM
+											height: inviteStatusText.implicitHeight + Style.marginXS
+											radius: Style.radiusS
+											color: {
+												if (inviteDelegate.effectiveStatus === "Expired") return "#FFDCE0"
+												if (inviteDelegate.effectiveStatus === "Revoked") return "#F3E8FF"
+												return "#FFF3CD"
+											}
+
+											BaseText {
+												id: inviteStatusText
+												anchors.centerIn: parent
+												text: {
+													if (inviteDelegate.effectiveStatus === "Expired") return qsTr("Expired")
+													if (inviteDelegate.effectiveStatus === "Revoked") return qsTr("Revoked")
+													return qsTr("Pending")
+												}
+												font.pixelSize: Style.fontSizeXS
+												color: {
+													if (inviteDelegate.effectiveStatus === "Expired") return "#DA3633"
+													if (inviteDelegate.effectiveStatus === "Revoked") return "#7C3AED"
+													return "#856404"
+												}
+											}
+										}
+									}
+
+									// Actions column (fixed width)
+									Item {
+										id: inviteActions
+										width: Style.iconSizeL
+										height: parent.height
+										anchors.verticalCenter: parent.verticalCenter
+
+										ToolButton {
+											visible: container.isOwner && inviteDelegate.effectiveStatus === "Pending"
+											anchors.centerIn: parent
+											tooltipText: qsTr("Actions")
+											iconSource: Style.getIconPath("Icons/More", Icon.State.On, Icon.Mode.Normal)
+											decorator: Component {
+												ToolButtonDecorator {
+													color: "transparent"
+													icon.width: Style.iconSizeXS
+												}
+											}
+											onClicked: {
+												var menuItems = [
+													{ text: qsTr("Resend Invitation"), action: "resend" },
+													{ text: qsTr("Revoke Invitation"), action: "revoke" }
+												]
+												membersPage.__showInviteActionsMenu(menuItems, modelData.id, modelData.userName || modelData.userId || "")
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			// --- Actions Menu handling ---
+			function __showActionsMenu(menuItems, userId, userName) {
+				if (menuItems.length === 0)
+					return
+
+				// Single action: execute directly with confirmation
+				if (menuItems.length === 1) {
+					membersPage.__executeAction(menuItems[0].action, userId, userName)
+					return
+				}
+
+				// Multiple actions: show context menu via ModalDialogManager
+				var actions = []
+				for (var i = 0; i < menuItems.length; i++) {
+					actions.push(menuItems[i])
+				}
+				membersPage.__pendingMenuUserId = userId
+				membersPage.__pendingMenuUserName = userName
+				membersPage.__pendingMenuActions = actions
+				ModalDialogManager.openDialog(actionsPopupMenuComp, {
+					"menuActions": actions,
+					"targetUserId": userId,
+					"targetUserName": userName
+				})
+			}
+
+			property string __pendingMenuUserId: ""
+			property string __pendingMenuUserName: ""
+			property var __pendingMenuActions: []
+
+			function __showInviteActionsMenu(menuItems, invitationId, userName) {
+				if (menuItems.length === 1) {
+					membersPage.__executeInviteAction(menuItems[0].action, invitationId, userName)
+					return
+				}
+				membersPage.__pendingMenuUserId = invitationId
+				membersPage.__pendingMenuUserName = userName
+				ModalDialogManager.openDialog(inviteActionsPopupMenuComp, {
+					"menuActions": menuItems,
+					"targetInvitationId": invitationId,
+					"targetUserName": userName
+				})
+			}
+
+			function __executeAction(action, userId, userName) {
+				if (action === "remove") {
+					membersPage.__confirmRemoveUserId = userId
+					membersPage.__confirmRemoveUserName = userName
+					ModalDialogManager.showConfirmationDialog(
+						qsTr("Remove Member"),
+						qsTr("Are you sure you want to remove %1? They will lose access to this workspace.").arg(userName),
+						function(result) {
+							if (result === true)
+								membersPage.__removeMemberById(membersPage.__confirmRemoveUserId)
+						}
+					)
+				} else if (action === "transfer") {
+					membersPage.__confirmTransferUserId = userId
+					membersPage.__confirmTransferUserName = userName
+					ModalDialogManager.showConfirmationDialog(
+						qsTr("Transfer Ownership"),
+						qsTr("Are you sure you want to transfer ownership to %1? You will become a regular member and %1 will become the new owner.").arg(userName),
+						function(result) {
+							if (result === true)
+								container.__transferOwnershipTo(membersPage.__confirmTransferUserId, membersPage.__confirmTransferUserName)
+						}
+					)
+				} else if (action === "leave") {
+					ModalDialogManager.showConfirmationDialog(
+						qsTr("Leave Workspace"),
+						qsTr("Are you sure you want to leave this workspace? You will lose access to all workspace resources."),
+						function(result) {
+							if (result === true && container.tenantData)
+								membersPage.__removeMemberById(container.tenantData.m_currentUserId)
+						}
+					)
+				}
+			}
+
+			function __executeInviteAction(action, invitationId, userName) {
+				if (action === "resend") {
+					container.resendInvitationInput.m_invitationId = invitationId
+					container.resendInvitationSender.send(container.resendInvitationInput)
+				} else if (action === "revoke") {
+					membersPage.__confirmRevokeInvitationId = invitationId
+					membersPage.__confirmRevokeUserName = userName
+					ModalDialogManager.showConfirmationDialog(
+						qsTr("Revoke Invitation"),
+						qsTr("Are you sure you want to revoke the invitation for %1? They will no longer be able to join this workspace.").arg(userName),
+						function(result) {
+							if (result === true) {
+								container.revokeInvitationInput.m_invitationId = membersPage.__confirmRevokeInvitationId
+								container.revokeInvitationSender.send(container.revokeInvitationInput)
+								container.__removePendingInvitation(membersPage.__confirmRevokeInvitationId)
+							}
+						}
+					)
+				}
+			}
+
+			// --- Actions popup menu component for members ---
+			Component {
+				id: actionsPopupMenuComp
+
+				Item {
+					id: actionsPopup
+					anchors.fill: parent
+
+					property var menuActions: []
+					property string targetUserId: ""
+					property string targetUserName: ""
+
+					signal finished(int buttonId)
+
+					MouseArea {
+						anchors.fill: parent
+						onClicked: actionsPopup.finished(Enums.cancel)
+					}
+
+					Rectangle {
+						anchors.centerIn: parent
+						width: Style.sizeHintXS
+						height: actionsMenuColumn.implicitHeight + Style.marginM * 2
+						radius: Style.radiusM
+						color: Style.baseColor
+						border.color: Style.borderColor
+						border.width: 1
+
+						Column {
+							id: actionsMenuColumn
+							anchors.fill: parent
+							anchors.margins: Style.marginS
+
+							Repeater {
+								model: actionsPopup.menuActions
+
+								delegate: Rectangle {
+									width: parent.width
+									height: Style.buttonHeightM
+									radius: Style.radiusS
+									color: actionItemMouse.containsMouse ? Style.buttonHoverColor : "transparent"
+
+									MouseArea {
+										id: actionItemMouse
+										anchors.fill: parent
+										hoverEnabled: true
+										onClicked: {
+											actionsPopup.finished(Enums.yes)
+											membersPage.__executeAction(modelData.action, actionsPopup.targetUserId, actionsPopup.targetUserName)
+										}
+									}
+
+									BaseText {
+										anchors.verticalCenter: parent.verticalCenter
+										anchors.left: parent.left
+										anchors.leftMargin: Style.marginM
+										text: modelData.text
+										font.pixelSize: Style.fontSizeM
+										color: modelData.action === "remove" ? "#DA3633" : Style.textColor
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			// --- Actions popup menu component for invites ---
+			Component {
+				id: inviteActionsPopupMenuComp
+
+				Item {
+					id: inviteActionsPopup
+					anchors.fill: parent
+
+					property var menuActions: []
+					property string targetInvitationId: ""
+					property string targetUserName: ""
+
+					signal finished(int buttonId)
+
+					MouseArea {
+						anchors.fill: parent
+						onClicked: inviteActionsPopup.finished(Enums.cancel)
+					}
+
+					Rectangle {
+						anchors.centerIn: parent
+						width: Style.sizeHintXS
+						height: inviteActionsMenuColumn.implicitHeight + Style.marginM * 2
+						radius: Style.radiusM
+						color: Style.baseColor
+						border.color: Style.borderColor
+						border.width: 1
+
+						Column {
+							id: inviteActionsMenuColumn
+							anchors.fill: parent
+							anchors.margins: Style.marginS
+
+							Repeater {
+								model: inviteActionsPopup.menuActions
+
+								delegate: Rectangle {
+									width: parent.width
+									height: Style.buttonHeightM
+									radius: Style.radiusS
+									color: inviteActionItemMouse.containsMouse ? Style.buttonHoverColor : "transparent"
+
+									MouseArea {
+										id: inviteActionItemMouse
+										anchors.fill: parent
+										hoverEnabled: true
+										onClicked: {
+											inviteActionsPopup.finished(Enums.yes)
+											membersPage.__executeInviteAction(modelData.action, inviteActionsPopup.targetInvitationId, inviteActionsPopup.targetUserName)
+										}
+									}
+
+									BaseText {
+										anchors.verticalCenter: parent.verticalCenter
+										anchors.left: parent.left
+										anchors.leftMargin: Style.marginM
+										text: modelData.text
+										font.pixelSize: Style.fontSizeM
+										color: modelData.action === "revoke" ? "#DA3633" : Style.textColor
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			// --- Invite Member Dialog ---
+			Component {
+				id: inviteMemberDialogComp
+
+				Item {
+					id: inviteMemberDialog
+					anchors.fill: parent
+
+					signal finished(int buttonId)
+
+					MouseArea {
+						anchors.fill: parent
+						onClicked: inviteMemberDialog.finished(Enums.cancel)
+					}
+
+					Rectangle {
+						anchors.centerIn: parent
+						width: Style.sizeHintL
+						height: inviteDialogColumn.implicitHeight + Style.marginXL * 2
+						radius: Style.radiusM
+						color: Style.baseColor
+						border.color: Style.borderColor
+						border.width: 1
+
+						Column {
+							id: inviteDialogColumn
+							anchors.left: parent.left
+							anchors.right: parent.right
+							anchors.top: parent.top
+							anchors.margins: Style.marginXL
+							spacing: Style.marginL
+
+							BaseText {
+								text: qsTr("Invite Member")
+								font.pixelSize: Style.fontSizeXL
+								font.bold: true
+								color: Style.textColor
+							}
+
+							BaseText {
+								text: qsTr("Enter the email or login of the user you want to invite:")
+								font.pixelSize: Style.fontSizeM
+								color: Style.inactiveTextColor
+								wrapMode: Text.WordWrap
+								width: parent.width
+							}
+
+							TextInput {
+								id: inviteEmailInput
+								width: parent.width
+								font.pixelSize: Style.fontSizeM
+								color: Style.textColor
+
+								Rectangle {
+									anchors.fill: parent
+									anchors.margins: -Style.marginS
+									z: -1
+									radius: Style.radiusS
+									color: "transparent"
+									border.color: Style.borderColor
+									border.width: 1
+								}
+
+								Keys.onReturnPressed: {
+									if (inviteEmailInput.text.trim() !== "") {
+										container.__inviteSelectedUsers([{id: inviteEmailInput.text.trim()}])
+										inviteMemberDialog.finished(Enums.yes)
+									}
+								}
+							}
+
+							Row {
+								spacing: Style.marginM
+								anchors.right: parent.right
+
+								Button {
+									text: qsTr("Cancel")
+									onClicked: inviteMemberDialog.finished(Enums.cancel)
+								}
+
+								Button {
+									text: qsTr("Send Invitation")
+									enabled: inviteEmailInput.text.trim() !== ""
+									onClicked: {
+										container.__inviteSelectedUsers([{id: inviteEmailInput.text.trim()}])
+										inviteMemberDialog.finished(Enums.yes)
 									}
 								}
 							}
