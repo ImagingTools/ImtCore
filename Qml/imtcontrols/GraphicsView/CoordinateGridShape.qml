@@ -40,6 +40,11 @@ BoundingBox {
 	property int labelPrecision : 0;
 	property real lableXOriginMargin: 0
 
+	property var xMinLabelValue
+	property var xMaxLabelValue
+	property var yMinLabelValue
+	property var yMaxLabelValue
+
 	property CanvasMatrix labelMatrix: CanvasMatrix{};
 
 	property real xScale: 1
@@ -379,6 +384,12 @@ BoundingBox {
 				if(str == ""){
 					continue
 				}
+				if(gridShape.yMinLabelValue !==undefined && Number(str) < gridShape.yMinLabelValue){
+					continue
+				}
+				if(gridShape.yMaxLabelValue !==undefined && Number(str) > gridShape.yMaxLabelValue){
+					continue
+				}
 				ctx.beginPath()
 
 				let textLength = ctx.measureText(str).width
@@ -398,6 +409,12 @@ BoundingBox {
 
 				let str = gridShape.getLabelY(String(getLogicalMajorLineY(Number(firstHorizLineY -i * Math.round(stepY/gridShape.yScale) - gridShape.axesOrigin.y).toFixed(gridShape.labelPrecision))))
 				if(str == ""){
+					continue
+				}
+				if(gridShape.yMinLabelValue !==undefined && Number(str) < gridShape.yMinLabelValue){
+					continue
+				}
+				if(gridShape.yMaxLabelValue !==undefined && Number(str) > gridShape.yMaxLabelValue){
 					continue
 				}
 
@@ -431,6 +448,12 @@ BoundingBox {
 				if(str == ""){
 					continue
 				}
+				if(gridShape.xMinLabelValue !==undefined && Number(str) < gridShape.xMinLabelValue){
+					continue
+				}
+				if(gridShape.xMaxLabelValue !==undefined && Number(str) > gridShape.xMaxLabelValue){
+					continue
+				}
 
 				ctx.beginPath()
 
@@ -453,6 +476,13 @@ BoundingBox {
 				if(str == ""){
 					continue
 				}
+				if(gridShape.xMinLabelValue !==undefined && Number(str) < gridShape.xMinLabelValue){
+					continue
+				}
+				if(gridShape.xMaxLabelValue !==undefined && Number(str) > gridShape.xMaxLabelValue){
+					continue
+				}
+
 
 				ctx.beginPath()
 
