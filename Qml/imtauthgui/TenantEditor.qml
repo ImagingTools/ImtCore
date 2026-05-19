@@ -511,10 +511,7 @@ DocumentViewBase {
 
 										BaseText {
 											anchors.centerIn: parent
-											text: {
-												var name = modelData.name || modelData.id || ""
-												return name.length > 0 ? name.charAt(0).toUpperCase() : "?"
-											}
+											text: (modelData.name || modelData.id) ? (modelData.name || modelData.id).charAt(0).toUpperCase() : "?"
 											font.pixelSize: Style.fontSizeM
 											font.bold: true
 											color: Style.textColor
@@ -630,14 +627,7 @@ DocumentViewBase {
 
 										ToolButton {
 											id: memberActionsBtn
-											visible: {
-												if (container.isOwner) {
-													// Owner can act on everyone except remove self
-													return true
-												}
-												// Regular member can only leave (self)
-												return activeMemberDelegate.isCurrentUser
-											}
+											visible: container.isOwner || activeMemberDelegate.isCurrentUser
 											anchors.centerIn: parent
 											tooltipText: qsTr("Actions")
 											iconSource: Style.getIconPath("Icons/More", Icon.State.On, Icon.Mode.Normal)
