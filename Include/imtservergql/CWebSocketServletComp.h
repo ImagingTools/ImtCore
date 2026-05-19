@@ -60,10 +60,6 @@ private:
 	I_REF(imtauth::IJwtSessionController, m_jwtSessionControllerCompPtr);
 	I_REF(imtauth::IPersonalAccessTokenManager, m_patManagerCompPtr);
 
-	typedef QMap<QByteArray, imtgql::IGqlSubscriberController*> SubscriberControllersMap;
-
-	SubscriberControllersMap m_subscriberControllersMap;
-	mutable QMutex m_subscriberControllersMapMutex;
 	mutable QList<QFuture<void>> m_registerSubscriptionFutures;
 	mutable QMutex m_registerSubscriptionFuturesMutex;
 };

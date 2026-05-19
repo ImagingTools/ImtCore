@@ -33,18 +33,20 @@ bool CSlaveSubscriberControllerComp::RegisterSubscription(
 		imtgql::IGqlSubscriberController* publisherPtr = m_subscriberControllerListCompPtr[index];
 		if (publisherPtr != nullptr){
 			if (publisherPtr->IsRequestSupported(gqlRequest)){
-				QReadLocker readLocker(&m_lock);
-				if (!m_publisherMap.contains(subscriptionId)){
-					readLocker.unlock();
-					if (publisherPtr->RegisterSubscription(subscriptionId, gqlRequest, networkRequest, errorMessage)){
-						QWriteLocker writeLocker(&m_lock);
-						m_publisherMap[subscriptionId] = publisherPtr;
+				{
+					QReadLocker readLocker(&m_lock);
+					if (m_publisherMap.contains(subscriptionId)){
+						qWarning("Subscription already registered");
 
 						return true;
 					}
 				}
-				else{
-					qWarning("Subscription already registered");
+				if (publisherPtr->RegisterSubscription(subscriptionId, gqlRequest, networkRequest, errorMessage)){
+					QWriteLocker writeLocker(&m_lock);
+					// Re-check under write lock to prevent duplicate registration (TOCTOU)
+					if (!m_publisherMap.contains(subscriptionId)){
+						m_publisherMap[subscriptionId] = publisherPtr;
+					}
 
 					return true;
 				}
@@ -58,21 +60,27 @@ bool CSlaveSubscriberControllerComp::RegisterSubscription(
 
 bool CSlaveSubscriberControllerComp::UnregisterSubscription(const QByteArray& subscriptionId)
 {
-	QReadLocker readLocker(&m_lock);
-	if (m_publisherMap.contains(subscriptionId)){
-		imtgql::IGqlSubscriberController* publisherPtr = m_publisherMap[subscriptionId];
-		readLocker.unlock();
-		Q_ASSERT(publisherPtr != nullptr);
-
-		bool res = publisherPtr->UnregisterSubscription(subscriptionId);
-		if(res){
-			QWriteLocker writeLocker(&m_lock);
-			m_publisherMap.remove(subscriptionId);
+	imtgql::IGqlSubscriberController* publisherPtr = nullptr;
+	{
+		QReadLocker readLocker(&m_lock);
+		auto it = m_publisherMap.constFind(subscriptionId);
+		if (it != m_publisherMap.constEnd()){
+			publisherPtr = it.value();
 		}
-		return res;
 	}
 
-	return false;
+	if (publisherPtr == nullptr){
+		return false;
+	}
+
+	Q_ASSERT(publisherPtr != nullptr);
+
+	bool res = publisherPtr->UnregisterSubscription(subscriptionId);
+	if (res){
+		QWriteLocker writeLocker(&m_lock);
+		m_publisherMap.remove(subscriptionId);
+	}
+	return res;
 }
 
 
