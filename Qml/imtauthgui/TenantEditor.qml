@@ -11,6 +11,8 @@ import imtguigql 1.0
 import imtauthTenantsSdl 1.0
 import imtauthTenantMembershipsSdl 1.0
 import imtbaseImtCollectionSdl 1.0
+import imtauthRolesSdl 1.0
+import imtauthGroupsSdl 1.0
 
 DocumentViewBase {
 	id: container
@@ -48,6 +50,20 @@ DocumentViewBase {
 				return entry.m_role || "Member"
 		}
 		return "Member"
+	}
+
+	function createRoleData() {
+		var comp = Qt.createComponent("qrc:/imtauthRolesSdl/RoleData.qml")
+		if (comp.status === Component.Ready)
+			return comp.createObject(container)
+		return null
+	}
+
+	function createGroupData() {
+		var comp = Qt.createComponent("qrc:/imtauthGroupsSdl/GroupData.qml")
+		if (comp.status === Component.Ready)
+			return comp.createObject(container)
+		return null
 	}
 
 
@@ -1148,127 +1164,22 @@ DocumentViewBase {
 				id: rolesListView
 
 				Item {
-					// Page header with title + description + Create button
-					Item {
-						id: rolesPageTitleRow
-						anchors.top: parent.top
-						anchors.topMargin: Style.marginM
-						anchors.left: parent.left
-						anchors.leftMargin: Style.marginXL
-						anchors.right: parent.right
-						anchors.rightMargin: Style.marginXL
-						height: rolesPageTitleCol.implicitHeight
-
-						Column {
-							id: rolesPageTitleCol
-							anchors.left: parent.left
-							anchors.verticalCenter: parent.verticalCenter
-							spacing: Style.marginXS
-
-							BaseText {
-								id: rolesTitleText
-								text: qsTr("Roles")
-								font.pixelSize: Style.fontSizeL
-								font.bold: true
-								color: Style.textColor
-							}
-
-							BaseText {
-								text: qsTr("Manage tenant roles and assign permissions to team members.")
-								font.pixelSize: Style.fontSizeS
-								color: Style.inactiveTextColor
-							}
-						}
-
-						Text {
-							visible: container.canManageMembers
-							anchors.right: parent.right
-							anchors.verticalCenter: rolesTitleText.verticalCenter
-							text: "+ " + qsTr("Create Role")
-							font.pixelSize: Style.fontSizeM
-							font.bold: true
-							color: Style.linkColor
-
-							MouseArea {
-								anchors.fill: parent
-								hoverEnabled: true
-								cursorShape: Qt.PointingHandCursor
-								onClicked: {
-									rolesStackViewHeader.addHeader("create_role", qsTr("Create New Role"))
-									rolesStackView.addPage(roleEditorView)
-									rolesStackView.next()
-								}
-							}
-						}
-					}
-
-					// Environment Roles (horizontal)
-					Column {
-						id: envRolesSection
-						anchors.top: rolesPageTitleRow.bottom
-						anchors.topMargin: Style.marginM
-						anchors.left: parent.left
-						anchors.leftMargin: Style.marginXL
-						anchors.right: parent.right
-						anchors.rightMargin: Style.marginXL
-						spacing: Style.marginS
-
-						BaseText {
-							text: qsTr("Environment Roles")
-							font.pixelSize: Style.fontSizeM
-							color: Style.textColor
-						}
-
-						Flow {
-							width: parent.width
-							spacing: Style.marginL
-
-							Repeater {
-								model: ListModel {
-									ListElement { name: "Creator"; icon: "Icons/Crown" }
-									ListElement { name: "Owner"; icon: "Icons/Key" }
-									ListElement { name: "Admin"; icon: "Icons/AdminPanel" }
-									ListElement { name: "Member"; icon: "Icons/User" }
-								}
-								delegate: Row {
-									spacing: Style.marginXS
-
-									Image {
-										width: Style.iconSizeS
-										height: Style.iconSizeS
-										anchors.verticalCenter: parent.verticalCenter
-										source: Style.icon(model.icon)
-										sourceSize: Qt.size(Style.iconSizeS, Style.iconSizeS)
-									}
-
-									BaseText {
-										anchors.verticalCenter: parent.verticalCenter
-										text: model.name
-										font.pixelSize: Style.fontSizeS
-										color: Style.textColor
-									}
-								}
-							}
-						}
-
-						Rectangle {
-							width: parent.width
-							height: 1
-							color: Style.borderColor
-						}
-					}
-
-					// Roles collection list (using reusable component)
 					TenantCollectionListView {
-						anchors.top: envRolesSection.bottom
-						anchors.topMargin: Style.marginM
+						anchors.top: parent.top
 						anchors.left: parent.left
 						anchors.right: parent.right
 						anchors.bottom: parent.bottom
 						collectionId: "Roles"
 						filterPlaceholder: qsTr("Filter roles...")
 						emptyMessage: qsTr("No roles created yet.")
+						createButtonText: qsTr("Create Role")
 						canManage: container.canManageMembers
+
+						onCreateRequested: {
+							rolesStackViewHeader.addHeader("create_role", qsTr("Create New Role"))
+							rolesStackView.addPage(roleEditorView)
+							rolesStackView.next()
+						}
 
 						onEditRequested: {
 							rolesPage.__editRoleId = itemId
@@ -1305,53 +1216,44 @@ DocumentViewBase {
 				id: roleEditorView
 
 				Item {
-					Column {
-						anchors.top: parent.top
-						anchors.topMargin: Style.marginXL
+					RoleView {
+						id: createRoleView
+						anchors.fill: parent
+						commandsPanelVisible: false
+
+						Component.onCompleted: {
+							createRoleView.model = container.createRoleData()
+							createRoleView.updateGui()
+						}
+					}
+
+					Row {
+						anchors.bottom: parent.bottom
+						anchors.bottomMargin: Style.marginXL
 						anchors.left: parent.left
 						anchors.leftMargin: Style.marginXL
-						anchors.right: parent.right
-						anchors.rightMargin: Style.marginXL
-						spacing: Style.marginXL
+						spacing: Style.marginM
 
-						GroupElementView {
-							width: parent.width
-
-							TextInputElementView {
-								id: roleNameInput
-								name: qsTr("Role Name")
-								placeHolderText: qsTr("Enter the role name")
-							}
-
-							TextInputElementView {
-								id: roleDescInput
-								name: qsTr("Description")
-								placeHolderText: qsTr("Describe what this role can do")
+						Button {
+							text: qsTr("Create")
+							onClicked: {
+								createRoleView.updateModel()
+								var roleData = createRoleView.model
+								container.insertRoleInput.m_collectionId = "Roles"
+								container.insertRoleInput.m_typeId = "Role"
+								container.insertRoleInput.m_name = roleData ? roleData.m_name : ""
+								container.insertRoleInput.m_description = roleData ? roleData.m_description : ""
+								container.insertRoleSender.send(container.insertRoleInput)
+								rolesStackViewHeader.popHeader()
+								rolesStackView.previous()
 							}
 						}
 
-						Row {
-							spacing: Style.marginM
-
-							Button {
-								text: qsTr("Create")
-								onClicked: {
-									container.insertRoleInput.m_collectionId = "Roles"
-									container.insertRoleInput.m_typeId = "Role"
-									container.insertRoleInput.m_name = roleNameInput.text
-									container.insertRoleInput.m_description = roleDescInput.text
-									container.insertRoleSender.send(container.insertRoleInput)
-									rolesStackViewHeader.popHeader()
-									rolesStackView.previous()
-								}
-							}
-
-							Button {
-								text: qsTr("Cancel")
-								onClicked: {
-									rolesStackViewHeader.popHeader()
-									rolesStackView.previous()
-								}
+						Button {
+							text: qsTr("Cancel")
+							onClicked: {
+								rolesStackViewHeader.popHeader()
+								rolesStackView.previous()
 							}
 						}
 					}
@@ -1363,57 +1265,52 @@ DocumentViewBase {
 				id: roleEditView
 
 				Item {
-					Column {
-						anchors.top: parent.top
-						anchors.topMargin: Style.marginXL
+					RoleView {
+						id: editRoleView
+						anchors.fill: parent
+						commandsPanelVisible: false
+
+						Component.onCompleted: {
+							var roleData = container.createRoleData()
+							if (roleData) {
+								roleData.m_id = rolesPage.__editRoleId
+								roleData.m_name = rolesPage.__editRoleName
+								roleData.m_description = rolesPage.__editRoleDescription
+							}
+							editRoleView.model = roleData
+							editRoleView.updateGui()
+						}
+					}
+
+					Row {
+						anchors.bottom: parent.bottom
+						anchors.bottomMargin: Style.marginXL
 						anchors.left: parent.left
 						anchors.leftMargin: Style.marginXL
-						anchors.right: parent.right
-						anchors.rightMargin: Style.marginXL
-						spacing: Style.marginXL
+						spacing: Style.marginM
 
-						GroupElementView {
-							width: parent.width
-
-							TextInputElementView {
-								id: editRoleNameInput
-								name: qsTr("Role Name")
-								placeHolderText: qsTr("Enter the role name")
-								text: rolesPage.__editRoleName
-							}
-
-							TextInputElementView {
-								id: editRoleDescInput
-								name: qsTr("Description")
-								placeHolderText: qsTr("Describe what this role can do")
-								text: rolesPage.__editRoleDescription
+						Button {
+							text: qsTr("Save")
+							onClicked: {
+								editRoleView.updateModel()
+								var roleData = editRoleView.model
+								container.setRoleDataInput.m_collectionId = "Roles"
+								container.setRoleDataInput.m_objectId = rolesPage.__editRoleId
+								container.setRoleDataInput.m_objectData = JSON.stringify({
+									name: roleData ? roleData.m_name : "",
+									description: roleData ? roleData.m_description : ""
+								})
+								container.setRoleDataSender.send(container.setRoleDataInput)
+								rolesStackViewHeader.popHeader()
+								rolesStackView.previous()
 							}
 						}
 
-						Row {
-							spacing: Style.marginM
-
-							Button {
-								text: qsTr("Save")
-								onClicked: {
-									container.setRoleDataInput.m_collectionId = "Roles"
-									container.setRoleDataInput.m_objectId = rolesPage.__editRoleId
-									container.setRoleDataInput.m_objectData = JSON.stringify({
-										name: editRoleNameInput.text,
-										description: editRoleDescInput.text
-									})
-									container.setRoleDataSender.send(container.setRoleDataInput)
-									rolesStackViewHeader.popHeader()
-									rolesStackView.previous()
-								}
-							}
-
-							Button {
-								text: qsTr("Cancel")
-								onClicked: {
-									rolesStackViewHeader.popHeader()
-									rolesStackView.previous()
-								}
+						Button {
+							text: qsTr("Cancel")
+							onClicked: {
+								rolesStackViewHeader.popHeader()
+								rolesStackView.previous()
 							}
 						}
 					}
@@ -1469,70 +1366,22 @@ DocumentViewBase {
 				id: groupsListView
 
 				Item {
-					// Page header with title + description + Create button
-					Item {
-						id: groupsPageTitleRow
-						anchors.top: parent.top
-						anchors.topMargin: Style.marginM
-						anchors.left: parent.left
-						anchors.leftMargin: Style.marginXL
-						anchors.right: parent.right
-						anchors.rightMargin: Style.marginXL
-						height: groupsPageTitleCol.implicitHeight
-
-						Column {
-							id: groupsPageTitleCol
-							anchors.left: parent.left
-							anchors.verticalCenter: parent.verticalCenter
-							spacing: Style.marginXS
-
-							BaseText {
-								id: groupsTitleText
-								text: qsTr("Groups")
-								font.pixelSize: Style.fontSizeL
-								font.bold: true
-								color: Style.textColor
-							}
-
-							BaseText {
-								text: qsTr("Organize members into groups for easier permission management.")
-								font.pixelSize: Style.fontSizeS
-								color: Style.inactiveTextColor
-							}
-						}
-
-						Text {
-							visible: container.canManageMembers
-							anchors.right: parent.right
-							anchors.verticalCenter: groupsTitleText.verticalCenter
-							text: "+ " + qsTr("Create Group")
-							font.pixelSize: Style.fontSizeM
-							font.bold: true
-							color: Style.linkColor
-
-							MouseArea {
-								anchors.fill: parent
-								hoverEnabled: true
-								cursorShape: Qt.PointingHandCursor
-								onClicked: {
-									groupsStackViewHeader.addHeader("create_group", qsTr("Create New Group"))
-									groupsStackView.addPage(groupEditorView)
-									groupsStackView.next()
-								}
-							}
-						}
-					}
-
 					TenantCollectionListView {
-						anchors.top: groupsPageTitleRow.bottom
-						anchors.topMargin: Style.marginM
+						anchors.top: parent.top
 						anchors.left: parent.left
 						anchors.right: parent.right
 						anchors.bottom: parent.bottom
 						collectionId: "Groups"
 						filterPlaceholder: qsTr("Filter groups...")
 						emptyMessage: qsTr("No groups created yet.")
+						createButtonText: qsTr("Create Group")
 						canManage: container.canManageMembers
+
+						onCreateRequested: {
+							groupsStackViewHeader.addHeader("create_group", qsTr("Create New Group"))
+							groupsStackView.addPage(groupEditorView)
+							groupsStackView.next()
+						}
 
 						onEditRequested:{
 							groupsPage.__editGroupId = itemId
@@ -1565,53 +1414,44 @@ DocumentViewBase {
 				id: groupEditorView
 
 				Item {
-					Column {
-						anchors.top: parent.top
-						anchors.topMargin: Style.marginXL
+					UserGroupView {
+						id: createGroupView
+						anchors.fill: parent
+						commandsPanelVisible: false
+
+						Component.onCompleted: {
+							createGroupView.model = container.createGroupData()
+							createGroupView.updateGui()
+						}
+					}
+
+					Row {
+						anchors.bottom: parent.bottom
+						anchors.bottomMargin: Style.marginXL
 						anchors.left: parent.left
 						anchors.leftMargin: Style.marginXL
-						anchors.right: parent.right
-						anchors.rightMargin: Style.marginXL
-						spacing: Style.marginXL
+						spacing: Style.marginM
 
-						GroupElementView {
-							width: parent.width
-
-							TextInputElementView {
-								id: groupNameInput
-								name: qsTr("Group Name")
-								placeHolderText: qsTr("Enter the group name")
-							}
-
-							TextInputElementView {
-								id: groupDescInput
-								name: qsTr("Description")
-								placeHolderText: qsTr("Describe this group's purpose")
+						Button {
+							text: qsTr("Create")
+							onClicked: {
+								createGroupView.updateModel()
+								var groupData = createGroupView.model
+								container.insertGroupInput.m_collectionId = "Groups"
+								container.insertGroupInput.m_typeId = "Group"
+								container.insertGroupInput.m_name = groupData ? groupData.m_name : ""
+								container.insertGroupInput.m_description = groupData ? groupData.m_description : ""
+								container.insertGroupSender.send(container.insertGroupInput)
+								groupsStackViewHeader.popHeader()
+								groupsStackView.previous()
 							}
 						}
 
-						Row {
-							spacing: Style.marginM
-
-							Button {
-								text: qsTr("Create")
-								onClicked: {
-									container.insertGroupInput.m_collectionId = "Groups"
-									container.insertGroupInput.m_typeId = "Group"
-									container.insertGroupInput.m_name = groupNameInput.text
-									container.insertGroupInput.m_description = groupDescInput.text
-									container.insertGroupSender.send(container.insertGroupInput)
-									groupsStackViewHeader.popHeader()
-									groupsStackView.previous()
-								}
-							}
-
-							Button {
-								text: qsTr("Cancel")
-								onClicked: {
-									groupsStackViewHeader.popHeader()
-									groupsStackView.previous()
-								}
+						Button {
+							text: qsTr("Cancel")
+							onClicked: {
+								groupsStackViewHeader.popHeader()
+								groupsStackView.previous()
 							}
 						}
 					}
@@ -1623,57 +1463,52 @@ DocumentViewBase {
 				id: groupEditView
 
 				Item {
-					Column {
-						anchors.top: parent.top
-						anchors.topMargin: Style.marginXL
+					UserGroupView {
+						id: editGroupView
+						anchors.fill: parent
+						commandsPanelVisible: false
+
+						Component.onCompleted: {
+							var groupData = container.createGroupData()
+							if (groupData) {
+								groupData.m_id = groupsPage.__editGroupId
+								groupData.m_name = groupsPage.__editGroupName
+								groupData.m_description = groupsPage.__editGroupDescription
+							}
+							editGroupView.model = groupData
+							editGroupView.updateGui()
+						}
+					}
+
+					Row {
+						anchors.bottom: parent.bottom
+						anchors.bottomMargin: Style.marginXL
 						anchors.left: parent.left
 						anchors.leftMargin: Style.marginXL
-						anchors.right: parent.right
-						anchors.rightMargin: Style.marginXL
-						spacing: Style.marginXL
+						spacing: Style.marginM
 
-						GroupElementView {
-							width: parent.width
-
-							TextInputElementView {
-								id: editGroupNameInput
-								name: qsTr("Group Name")
-								placeHolderText: qsTr("Enter the group name")
-								text: groupsPage.__editGroupName
-							}
-
-							TextInputElementView {
-								id: editGroupDescInput
-								name: qsTr("Description")
-								placeHolderText: qsTr("Describe this group's purpose")
-								text: groupsPage.__editGroupDescription
+						Button {
+							text: qsTr("Save")
+							onClicked: {
+								editGroupView.updateModel()
+								var groupData = editGroupView.model
+								container.setGroupDataInput.m_collectionId = "Groups"
+								container.setGroupDataInput.m_objectId = groupsPage.__editGroupId
+								container.setGroupDataInput.m_objectData = JSON.stringify({
+									name: groupData ? groupData.m_name : "",
+									description: groupData ? groupData.m_description : ""
+								})
+								container.setGroupDataSender.send(container.setGroupDataInput)
+								groupsStackViewHeader.popHeader()
+								groupsStackView.previous()
 							}
 						}
 
-						Row {
-							spacing: Style.marginM
-
-							Button {
-								text: qsTr("Save")
-								onClicked: {
-									container.setGroupDataInput.m_collectionId = "Groups"
-									container.setGroupDataInput.m_objectId = groupsPage.__editGroupId
-									container.setGroupDataInput.m_objectData = JSON.stringify({
-										name: editGroupNameInput.text,
-										description: editGroupDescInput.text
-									})
-									container.setGroupDataSender.send(container.setGroupDataInput)
-									groupsStackViewHeader.popHeader()
-									groupsStackView.previous()
-								}
-							}
-
-							Button {
-								text: qsTr("Cancel")
-								onClicked: {
-									groupsStackViewHeader.popHeader()
-									groupsStackView.previous()
-								}
+						Button {
+							text: qsTr("Cancel")
+							onClicked: {
+								groupsStackViewHeader.popHeader()
+								groupsStackView.previous()
 							}
 						}
 					}
@@ -1920,8 +1755,8 @@ DocumentViewBase {
 					width: permissionsTreeFlickable.width
 					showHeader: true
 					columns: [
-						{ name: "name", title: qsTr("Permission"), display: "text", tree: true, width: 300 },
-						{ name: "description", title: qsTr("Description"), display: "description", tree: false, width: 400 }
+						{ name: "name", title: qsTr("Permission"), display: "text", tree: true },
+						{ name: "description", title: qsTr("Description"), display: "description", tree: false }
 					]
 
 					onCheckedItemsChanged: container.doUpdateModel()

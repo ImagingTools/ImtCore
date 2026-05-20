@@ -126,7 +126,9 @@ Item {
 				onClicked: {
 					if (mouse.button === Qt.RightButton && root.canManage)
 						itemMenu.popup()
-					else if (mouse.button === Qt.LeftButton && root.canManage)
+				}
+				onDoubleClicked: {
+					if (root.canManage)
 						root.editRequested(modelData.id, modelData.title || modelData.id || "", modelData.description || "")
 				}
 			}
@@ -163,6 +165,7 @@ Item {
 					BaseText {
 						text: modelData.title || modelData.id || ""
 						font.pixelSize: Style.fontSizeM
+						font.bold: true
 						color: Style.textColor
 					}
 
