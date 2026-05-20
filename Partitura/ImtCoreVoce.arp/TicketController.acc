@@ -125,17 +125,17 @@
                     <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Tickets"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DocumentServiceEventHandlers" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>TicketCollectionDocumentService</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
                     <AttributeInfo Id="DocumentNameProviders" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>TicketDocumentNameProvider</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentServiceEventHandlers" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>TicketCollectionDocumentService</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -255,7 +255,6 @@
                                 <Value>TicketCollectionDocumentService</Value>
                                 <Value>CollectionDocumentService</Value>
                                 <Value>EditorCommandsController</Value>
-                                <Value>UserFilterableSelectController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -612,18 +611,6 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="UserFilterableSelectController" PackageId="ImtServerGqlPck" ComponentId="FilterableSelectController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Users"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="UserCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

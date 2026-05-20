@@ -25,6 +25,8 @@ public:
 	virtual void SetTenantDescription(const QString& description) override;
 	virtual QByteArray GetOwnerId() const override;
 	virtual void SetOwnerId(const QByteArray& ownerId) override;
+	virtual QByteArray GetCreatorId() const override;
+	virtual void SetCreatorId(const QByteArray& creatorId) override;
 	virtual bool IsActive() const override;
 	virtual void SetActive(bool isActive) override;
 	virtual QString GetCreatedAt() const override;
@@ -51,6 +53,7 @@ protected:
 	QString m_name;
 	QString m_description;
 	QByteArray m_ownerId;
+	QByteArray m_creatorId;
 	bool m_isActive;
 	QString m_createdAt;
 	QString m_updatedAt;

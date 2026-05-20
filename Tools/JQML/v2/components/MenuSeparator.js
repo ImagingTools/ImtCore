@@ -2,6 +2,8 @@ const { Item } = require('./Item')
 const { QString, QBool, QReal, QVar, QColor } = require('../utils/properties')
 
 class MenuSeparator extends Item {
+    $isSeparator = true
+
     static defaultProperties = {
         contentItem: { type: QVar },
         padding: { type: QReal, value: 2, changed: '$paddingChanged' },

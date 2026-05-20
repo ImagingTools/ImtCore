@@ -95,6 +95,11 @@ I_EXPORT_COMPONENT(
 			"Remote commands controller",
 			"Remote Commands Controller");
 
+I_EXPORT_COMPONENT(
+			RemoteFilterableSelectController,
+			"Remote filterable select controller",
+			"Remote Filterable Select Controller");
+
 
 } // namespace ImtClientGqlPck
 

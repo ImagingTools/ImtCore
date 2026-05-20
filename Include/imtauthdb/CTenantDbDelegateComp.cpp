@@ -71,6 +71,9 @@ istd::IChangeableUniquePtr CTenantDbDelegateComp::CreateObjectFromRecord(
 	if (record.contains("OwnerId")){
 		tenantPtr->SetOwnerId(record.value("OwnerId").toByteArray());
 	}
+	if (record.contains("CreatorId")){
+		tenantPtr->SetCreatorId(record.value("CreatorId").toByteArray());
+	}
 	if (record.contains("IsActive")){
 		tenantPtr->SetActive(record.value("IsActive").toBool());
 	}
@@ -118,17 +121,19 @@ CTenantDbDelegateComp::NewObjectQuery CTenantDbDelegateComp::CreateNewObjectQuer
 	QString name = imtdb::EscapeSql(tenantPtr != nullptr ? tenantPtr->GetTenantName() : objectName);
 	QString description = imtdb::EscapeSql(tenantPtr != nullptr ? tenantPtr->GetTenantDescription() : objectDescription);
 	QString ownerId = imtdb::EscapeSql(tenantPtr != nullptr ? QString::fromUtf8(tenantPtr->GetOwnerId()) : QString());
+	QString creatorId = imtdb::EscapeSql(tenantPtr != nullptr ? QString::fromUtf8(tenantPtr->GetCreatorId()) : QString());
 	bool isActive = tenantPtr != nullptr ? tenantPtr->IsActive() : true;
 	QString now = imtdb::UtcNow();
 
 	result.query = QString(
-		"INSERT INTO \"%1\" (\"Id\", \"Name\", \"Description\", \"OwnerId\", \"IsActive\", \"CreatedAt\", \"UpdatedAt\") "
-		"VALUES ('%2', '%3', '%4', '%5', %6, '%7', '%8');")
+		"INSERT INTO \"%1\" (\"Id\", \"Name\", \"Description\", \"OwnerId\", \"CreatorId\", \"IsActive\", \"CreatedAt\", \"UpdatedAt\") "
+		"VALUES ('%2', '%3', '%4', '%5', '%6', %7, '%8', '%9');")
 		.arg(*m_tableNameAttrPtr,
 			 id,
 			 name,
 			 description,
 			 ownerId,
+			 creatorId,
 			 isActive ? "true" : "false",
 			 now,
 			 now).toUtf8();
@@ -165,13 +170,15 @@ QByteArray CTenantDbDelegateComp::CreateUpdateObjectQuery(
 		"\"Name\"='%2', "
 		"\"Description\"='%3', "
 		"\"OwnerId\"='%4', "
-		"\"IsActive\"=%5, "
-		"\"UpdatedAt\"='%6' "
-		"WHERE \"Id\"='%7';")
+		"\"CreatorId\"='%5', "
+		"\"IsActive\"=%6, "
+		"\"UpdatedAt\"='%7' "
+		"WHERE \"Id\"='%8';")
 		.arg(*m_tableNameAttrPtr,
 			 imtdb::EscapeSql(tenantPtr->GetTenantName()),
 			 imtdb::EscapeSql(tenantPtr->GetTenantDescription()),
 			 imtdb::EscapeSql(QString::fromUtf8(tenantPtr->GetOwnerId())),
+			 imtdb::EscapeSql(QString::fromUtf8(tenantPtr->GetCreatorId())),
 			 tenantPtr->IsActive() ? "true" : "false",
 			 now,
 			 escapedId).toUtf8()
@@ -317,6 +324,7 @@ QString CTenantDbDelegateComp::GetTenantRelationScopeSubquery(const QByteArray& 
 	return QString(
 		"SELECT *, "
 		"CASE "
+		"WHEN \"CreatorId\"='%1' THEN 'Creator' "
 		"WHEN \"OwnerId\"='%1' THEN 'Owner' "
 		"WHEN \"Id\" IN (SELECT \"TenantId\" FROM \"TenantMemberships\" WHERE \"UserId\"='%1' AND \"IsActive\"=true) THEN 'Member' "
 		"WHEN \"Id\" IN (SELECT \"TenantId\"::uuid FROM \"TenantInvitations\" WHERE \"UserId\"='%1' AND \"Status\"=%2) THEN 'Invited' "

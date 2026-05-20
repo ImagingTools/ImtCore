@@ -120,6 +120,11 @@ class Text extends Item {
 
     }
 
+    $paddingChanged(){
+        super.$paddingChanged()
+        this.applyMetrics()
+    }
+
     $widthChanged(){
         super.$widthChanged()
         if(!this.getProperty('width').auto) this.applyMetrics()

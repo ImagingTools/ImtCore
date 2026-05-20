@@ -176,7 +176,10 @@ QByteArray CTenantInvitationManagerComp::AcceptInvitation(const QByteArray& invi
 		return QByteArray();
 	}
 
-	QByteArray membershipId = m_membershipManagerCompPtr->AddMembership(invitationPtr->GetUserId(), invitationPtr->GetTenantId(), invitationPtr->GetRoleId());
+	QByteArray membershipId = m_membershipManagerCompPtr->AddMembership(
+		invitationPtr->GetUserId(),
+		invitationPtr->GetTenantId(),
+		invitationPtr->GetRoleId().isEmpty() ? QByteArrayLiteral("Member") : invitationPtr->GetRoleId());
 	if (membershipId.isEmpty()){
 		return QByteArray();
 	}

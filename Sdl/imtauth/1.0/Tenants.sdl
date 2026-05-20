@@ -66,6 +66,7 @@ type TenantData {
 	name: String
 	description: String
 	ownerId: ID
+	creatorId: ID
 	isActive: Boolean
 	createdAt: String
 	updatedAt: String
@@ -151,6 +152,15 @@ type SetTenantActivePayload {
 type GetTenantIdsPayload {
 	tenantIds: [ID]
 	errorMessage: String
+}
+
+# --- Tenant Environment Roles ---
+
+enum TenantEnvironmentRole {
+	Creator
+	Owner
+	Admin
+	Member
 }
 
 # --- Tenant Relationships ---

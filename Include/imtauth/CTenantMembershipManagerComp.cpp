@@ -161,7 +161,7 @@ QByteArray CTenantMembershipManagerComp::AddMembership(const QByteArray& userId,
 	membershipPtr->SetMembershipId(membershipId);
 	membershipPtr->SetUserId(userId);
 	membershipPtr->SetTenantId(tenantId);
-	membershipPtr->SetRoleId(roleId);
+	membershipPtr->SetRoleId(roleId);  // Backward-compatible: parses string to enum
 	membershipPtr->SetActive(true);
 	membershipPtr->SetJoinedAt(now);
 
@@ -272,7 +272,9 @@ bool CTenantMembershipManagerComp::HasMinimumRole(const QByteArray& userId, cons
 		return true;
 	}
 
-	return membershipPtr->GetRoleId() == minimumRoleId;
+	// Compare using enum hierarchy (higher value = higher privilege)
+	TenantEnvironmentRole requiredRole = TenantEnvironmentRoleFromString(QString::fromUtf8(minimumRoleId));
+	return membershipPtr->GetEnvironmentRole() >= requiredRole;
 }
 
 
