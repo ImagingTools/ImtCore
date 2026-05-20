@@ -12,10 +12,8 @@ Item {
 	property string collectionId: ""
 	property string filterPlaceholder: qsTr("Filter...")
 	property string emptyMessage: qsTr("No items found.")
-	property string createButtonText: ""
 	property bool canManage: false
 
-	signal createRequested()
 	signal editRequested(string itemId, string itemName, string itemDescription)
 	signal deleteRequested(string itemId, string itemName)
 
@@ -43,35 +41,6 @@ Item {
 		anchors.right: parent.right
 		anchors.rightMargin: Style.marginXL
 		spacing: Style.marginM
-
-		Row {
-			width: parent.width
-			spacing: Style.marginM
-
-			Item {
-				width: parent.width
-					- (createBtn.visible ? createBtn.width : 0)
-					- parent.spacing
-				height: 1
-			}
-
-			Text {
-				id: createBtn
-				visible: root.canManage && root.createButtonText.length > 0
-				anchors.verticalCenter: parent.verticalCenter
-				text: "+ " + root.createButtonText
-				font.pixelSize: Style.fontSizeM
-				font.bold: true
-				color: Style.linkColor
-
-				MouseArea {
-					anchors.fill: parent
-					hoverEnabled: true
-					cursorShape: Qt.PointingHandCursor
-					onClicked: root.createRequested()
-				}
-			}
-		}
 
 		SearchTextInput {
 			id: filterInput

@@ -1133,7 +1133,7 @@ DocumentViewBase {
 				id: rolesStackViewHeader
 				anchors.top: parent.top
 				anchors.left: parent.left
-				anchors.right: parent.right
+				anchors.right: rolesCreateBtn.visible ? rolesCreateBtn.left : parent.right
 				height: Style.controlHeightL
 				initialItemTitleVisible: true
 
@@ -1144,6 +1144,31 @@ DocumentViewBase {
 
 				Component.onCompleted: {
 					rolesStackViewHeader.addHeader("roles_list", qsTr("Roles"))
+				}
+			}
+
+			Text {
+				id: rolesCreateBtn
+				visible: container.canManageMembers && rolesStackView.currentIndex === 0
+				anchors.right: parent.right
+				anchors.rightMargin: Style.marginXL
+				anchors.verticalCenter: rolesStackViewHeader.verticalCenter
+				text: "+ " + qsTr("Create Role")
+				font.pixelSize: Style.fontSizeM
+				font.bold: true
+				color: Style.linkColor
+
+				MouseArea {
+					anchors.fill: parent
+					hoverEnabled: true
+					cursorShape: Qt.PointingHandCursor
+					onClicked: {
+						while (rolesStackView.count > 1)
+							rolesStackView.removePage(rolesStackView.count - 1)
+						rolesStackViewHeader.addHeader("create_role", qsTr("Create New Role"))
+						rolesStackView.addPage(roleEditorView)
+						rolesStackView.next()
+					}
 				}
 			}
 
@@ -1174,7 +1199,6 @@ DocumentViewBase {
 				}
 			}
 
-			// --- Roles List View ---
 			Component {
 				id: rolesListView
 
@@ -1187,17 +1211,7 @@ DocumentViewBase {
 						collectionId: "Roles"
 						filterPlaceholder: qsTr("Filter roles...")
 						emptyMessage: qsTr("No roles created yet.")
-						createButtonText: qsTr("Create Role")
 						canManage: container.canManageMembers
-
-						onCreateRequested: {
-							// Remove stale pages before adding new one
-							while (rolesStackView.count > 1)
-								rolesStackView.removePage(rolesStackView.count - 1)
-							rolesStackViewHeader.addHeader("create_role", qsTr("Create New Role"))
-							rolesStackView.addPage(roleEditorView)
-							rolesStackView.next()
-						}
 
 						onEditRequested: {
 							rolesPage.__editRoleId = itemId
@@ -1206,9 +1220,13 @@ DocumentViewBase {
 							// Remove stale pages before adding new one
 							while (rolesStackView.count > 1)
 								rolesStackView.removePage(rolesStackView.count - 1)
-							rolesStackViewHeader.addHeader("edit_role", qsTr("Edit Role"))
+							rolesStackViewHeader.addHeader("edit_role", itemName || qsTr("Edit Role"))
 							rolesStackView.addPage(roleEditView)
 							rolesStackView.next()
+							// Fetch object data from server
+							container.getRoleDataInput.m_collectionId = "Roles"
+							container.getRoleDataInput.m_objectId = itemId
+							container.getRoleDataSender.send(container.getRoleDataInput)
 						}
 
 						onDeleteRequested: {
@@ -1301,6 +1319,22 @@ DocumentViewBase {
 							editRoleView.model = roleData
 							editRoleView.updateGui()
 						}
+
+						Connections {
+							target: container
+							function on__receivedRoleDataChanged() {
+								if (container.__receivedRoleData && rolesPage.__editRoleId) {
+									var roleData = container.createRoleData()
+									if (roleData) {
+										roleData.m_id = rolesPage.__editRoleId
+										roleData.m_name = container.__receivedRoleData.name || rolesPage.__editRoleName
+										roleData.m_description = container.__receivedRoleData.description || rolesPage.__editRoleDescription
+									}
+									editRoleView.model = roleData
+									editRoleView.updateGui()
+								}
+							}
+						}
 					}
 
 					Row {
@@ -1352,7 +1386,7 @@ DocumentViewBase {
 				id: groupsStackViewHeader
 				anchors.top: parent.top
 				anchors.left: parent.left
-				anchors.right: parent.right
+				anchors.right: groupsCreateBtn.visible ? groupsCreateBtn.left : parent.right
 				height: Style.controlHeightL
 				initialItemTitleVisible: true
 
@@ -1363,6 +1397,31 @@ DocumentViewBase {
 
 				Component.onCompleted: {
 					groupsStackViewHeader.addHeader("groups_list", qsTr("Groups"))
+				}
+			}
+
+			Text {
+				id: groupsCreateBtn
+				visible: container.canManageMembers && groupsStackView.currentIndex === 0
+				anchors.right: parent.right
+				anchors.rightMargin: Style.marginXL
+				anchors.verticalCenter: groupsStackViewHeader.verticalCenter
+				text: "+ " + qsTr("Create Group")
+				font.pixelSize: Style.fontSizeM
+				font.bold: true
+				color: Style.linkColor
+
+				MouseArea {
+					anchors.fill: parent
+					hoverEnabled: true
+					cursorShape: Qt.PointingHandCursor
+					onClicked: {
+						while (groupsStackView.count > 1)
+							groupsStackView.removePage(groupsStackView.count - 1)
+						groupsStackViewHeader.addHeader("create_group", qsTr("Create New Group"))
+						groupsStackView.addPage(groupEditorView)
+						groupsStackView.next()
+					}
 				}
 			}
 
@@ -1410,17 +1469,7 @@ DocumentViewBase {
 						collectionId: "Groups"
 						filterPlaceholder: qsTr("Filter groups...")
 						emptyMessage: qsTr("No groups created yet.")
-						createButtonText: qsTr("Create Group")
 						canManage: container.canManageMembers
-
-						onCreateRequested: {
-							// Remove stale pages before adding new one
-							while (groupsStackView.count > 1)
-								groupsStackView.removePage(groupsStackView.count - 1)
-							groupsStackViewHeader.addHeader("create_group", qsTr("Create New Group"))
-							groupsStackView.addPage(groupEditorView)
-							groupsStackView.next()
-						}
 
 						onEditRequested:{
 							groupsPage.__editGroupId = itemId
@@ -1429,9 +1478,13 @@ DocumentViewBase {
 							// Remove stale pages before adding new one
 							while (groupsStackView.count > 1)
 								groupsStackView.removePage(groupsStackView.count - 1)
-							groupsStackViewHeader.addHeader("edit_group", qsTr("Edit Group"))
+							groupsStackViewHeader.addHeader("edit_group", itemName || qsTr("Edit Group"))
 							groupsStackView.addPage(groupEditView)
 							groupsStackView.next()
+							// Fetch object data from server
+							container.getGroupDataInput.m_collectionId = "Groups"
+							container.getGroupDataInput.m_objectId = itemId
+							container.getGroupDataSender.send(container.getGroupDataInput)
 						}
 
 						onDeleteRequested: {
@@ -1519,6 +1572,22 @@ DocumentViewBase {
 							}
 							editGroupView.model = groupData
 							editGroupView.updateGui()
+						}
+
+						Connections {
+							target: container
+							function on__receivedGroupDataChanged() {
+								if (container.__receivedGroupData && groupsPage.__editGroupId) {
+									var groupData = container.createGroupData()
+									if (groupData) {
+										groupData.m_id = groupsPage.__editGroupId
+										groupData.m_name = container.__receivedGroupData.name || groupsPage.__editGroupName
+										groupData.m_description = container.__receivedGroupData.description || groupsPage.__editGroupDescription
+									}
+									editGroupView.model = groupData
+									editGroupView.updateGui()
+								}
+							}
 						}
 					}
 
@@ -1969,4 +2038,58 @@ DocumentViewBase {
 			}
 		}
 	}
+
+	// --- Roles: GetObjectData via ImtCollection.sdl ---
+	property GetObjectDataInput getRoleDataInput: GetObjectDataInput {}
+	property GqlSdlRequestSender getRoleDataSender: GqlSdlRequestSender {
+		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_getObjectData
+
+		sdlObjectComp: Component {
+			GetObjectDataPayload {
+				onFinished: {
+					container.onRoleDataReceived(m_objectData)
+				}
+			}
+		}
+	}
+
+	function onRoleDataReceived(objectDataJson) {
+		if (!objectDataJson)
+			return
+		try {
+			var data = JSON.parse(objectDataJson)
+			container.__receivedRoleData = data
+		} catch (e) {
+			console.warn("Failed to parse role object data:", e)
+		}
+	}
+
+	property var __receivedRoleData: null
+
+	// --- Groups: GetObjectData via ImtCollection.sdl ---
+	property GetObjectDataInput getGroupDataInput: GetObjectDataInput {}
+	property GqlSdlRequestSender getGroupDataSender: GqlSdlRequestSender {
+		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_getObjectData
+
+		sdlObjectComp: Component {
+			GetObjectDataPayload {
+				onFinished: {
+					container.onGroupDataReceived(m_objectData)
+				}
+			}
+		}
+	}
+
+	function onGroupDataReceived(objectDataJson) {
+		if (!objectDataJson)
+			return
+		try {
+			var data = JSON.parse(objectDataJson)
+			container.__receivedGroupData = data
+		} catch (e) {
+			console.warn("Failed to parse group object data:", e)
+		}
+	}
+
+	property var __receivedGroupData: null
 }
