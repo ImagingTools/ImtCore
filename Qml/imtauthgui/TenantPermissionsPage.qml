@@ -205,12 +205,6 @@ ViewBase {
 			placeHolderText: qsTr("Filter permissions...")
 			onTextChanged: tenantPermissionsTreeView.filterText = text
 		}
-
-		Rectangle {
-			width: parent.width
-			height: 1
-			color: Style.borderColor
-		}
 	}
 
 	CustomScrollbar {
