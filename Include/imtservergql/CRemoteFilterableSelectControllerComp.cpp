@@ -2,10 +2,6 @@
 #include <imtservergql/CRemoteFilterableSelectControllerComp.h>
 
 
-// ImtCore includes
-#include <imtgql/CGqlRequest.h>
-
-
 namespace imtservergql
 {
 
@@ -21,9 +17,9 @@ bool CRemoteFilterableSelectControllerComp::IsRequestSupported(const imtgql::CGq
 			return false;
 		}
 
-		if (m_collectionIdAttrPtr.IsValid() && *m_collectionIdAttrPtr != ""){
+		if (m_collectionIdsAttrPtr.IsValid()){
 			QByteArray collectionId = inputParamPtr->GetParamArgumentValue("collectionId").toByteArray();
-			return *m_collectionIdAttrPtr == collectionId;
+			return m_collectionIdsAttrPtr.FindValue(collectionId) != -1;
 		}
 	}
 
@@ -43,3 +39,5 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CRemoteFilterableSele
 
 
 } // namespace imtservergql
+
+
