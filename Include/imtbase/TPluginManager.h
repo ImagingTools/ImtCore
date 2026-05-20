@@ -184,7 +184,7 @@ bool TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::LoadPlugi
 #endif
 			m_logger.SendInfoMessage(0, QString("Load: '%1'").arg(pluginPath.canonicalFilePath()));
 
-			QString pluginName;
+			QString pluginName = pluginPath.completeBaseName();
 			QByteArray instanceTypeId;
 			istd::IInformationProvider::InformationCategory category;
 			QString statusMessage;
@@ -207,33 +207,30 @@ bool TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::LoadPlugi
 							if (InitializePlugin(pluginInfo.pluginPtr)){
 								m_plugins.push_back(pluginInfo);
 
+								m_logger.SendInfoMessage(0, QString("Plug-in loaded: '%1'").arg(pluginPath.canonicalFilePath()));
+
 								category = istd::IInformationProvider::IC_INFO;
 								statusMessage = QObject::tr("Plug-in loaded");
 							}
 							else{
-								m_logger.SendInfoMessage(0, QString("Plug-in initialization failed for: '%1'").arg(pluginPath.canonicalFilePath()));
+								m_logger.SendErrorMessage(0, QString("Plug-in initialization failed for: '%1'").arg(pluginPath.canonicalFilePath()));
 
 								category = istd::IInformationProvider::IC_ERROR;
 								statusMessage = QObject::tr("Plug-in initialization failed");
 							}
 						}
 						else{
+							m_logger.SendWarningMessage(0, QString("Plug-in unsupported type-ID: '%1'").arg(pluginPath.canonicalFilePath()));
+
 							category = istd::IInformationProvider::IC_WARNING;
 							statusMessage = QObject::tr("Plug-in unsupported type-ID");
 						}
 					}
 					else{
+						m_logger.SendErrorMessage(0, QString("Plug-in instance creation failed: '%1'").arg(pluginPath.canonicalFilePath()));
+
 						category = istd::IInformationProvider::IC_ERROR;
 						statusMessage = QObject::tr("Plug-in instance creation failed");
-					}
-
-					if (m_pluginStatusMonitorPtr != nullptr){
-						m_pluginStatusMonitorPtr->OnPluginStatusChanged(
-									pluginPath.canonicalFilePath(),
-									pluginName,
-									pluginTypeId,
-									category,
-									statusMessage);
 					}
 				}
 				else{
@@ -248,6 +245,15 @@ bool TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::LoadPlugi
 
 				category = istd::IInformationProvider::IC_ERROR;
 				statusMessage = QObject::tr("%1").arg(library.errorString());
+			}
+
+			if (m_pluginStatusMonitorPtr != nullptr){
+				m_pluginStatusMonitorPtr->OnPluginStatusChanged(
+							pluginPath.canonicalFilePath(),
+							pluginName,
+							pluginTypeId,
+							category,
+							statusMessage);
 			}
 		}
 
