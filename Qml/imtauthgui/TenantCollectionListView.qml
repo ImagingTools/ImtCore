@@ -2,6 +2,7 @@
 import QtQuick 2.12
 import QtQuick.Controls
 import imtgui 1.0
+import Acf 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
 
@@ -122,7 +123,7 @@ Item {
 				hoverEnabled: true
 				cursorShape: Qt.PointingHandCursor
 				acceptedButtons: Qt.LeftButton | Qt.RightButton
-				onClicked: function(mouse) {
+				onClicked: {
 					if (mouse.button === Qt.RightButton && root.canManage)
 						itemMenu.popup()
 					else if (mouse.button === Qt.LeftButton && root.canManage)

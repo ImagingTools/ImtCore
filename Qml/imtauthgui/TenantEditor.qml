@@ -1207,7 +1207,6 @@ DocumentViewBase {
 							width: parent.width
 							height: 1
 							color: Style.borderColor
-							topMargin: Style.marginM
 						}
 					}
 
@@ -1230,7 +1229,7 @@ DocumentViewBase {
 							rolesStackView.next()
 						}
 
-						onEditRequested: function(itemId, itemName, itemDescription) {
+						onEditRequested: {
 							rolesPage.__editRoleId = itemId
 							rolesPage.__editRoleName = itemName
 							rolesPage.__editRoleDescription = itemDescription
@@ -1239,7 +1238,7 @@ DocumentViewBase {
 							rolesStackView.next()
 						}
 
-						onDeleteRequested: function(itemId, itemName) {
+						onDeleteRequested: {
 							ModalDialogManager.showConfirmationDialog(
 								qsTr("Delete Role"),
 								qsTr("Are you sure you want to delete the role \"%1\"? This action cannot be undone.").arg(itemName),
@@ -1443,7 +1442,7 @@ DocumentViewBase {
 							groupsStackView.next()
 						}
 
-						onEditRequested: function(itemId, itemName, itemDescription) {
+						onEditRequested:{
 							groupsPage.__editGroupId = itemId
 							groupsPage.__editGroupName = itemName
 							groupsPage.__editGroupDescription = itemDescription
@@ -1452,7 +1451,7 @@ DocumentViewBase {
 							groupsStackView.next()
 						}
 
-						onDeleteRequested: function(itemId, itemName) {
+						onDeleteRequested: {
 							ModalDialogManager.showConfirmationDialog(
 								qsTr("Delete Group"),
 								qsTr("Are you sure you want to delete the group \"%1\"? This action cannot be undone.").arg(itemName),
