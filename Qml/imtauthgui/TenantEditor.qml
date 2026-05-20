@@ -1863,7 +1863,7 @@ DocumentViewBase {
 			id: permissionsPage
 
 			function updateGui() {
-				if (!container.tenantData || !tenantPermissionsTreeView.treeView)
+				if (!container.tenantData)
 					return
 
 				// Build tree directly from server model (no intermediate TreeItemModel)
@@ -1886,7 +1886,7 @@ DocumentViewBase {
 						return (children && (children.count || 0) > 0) ? children : null
 					}
 				)
-				tenantPermissionsTreeView.treeView.model = nodes
+				tenantPermissionsTreeView.model = nodes
 
 				// Restore checked state from selected permissions (leaf nodes only)
 				var selectedPermissionsIds = []
@@ -1898,9 +1898,9 @@ DocumentViewBase {
 					}
 				}
 
-				tenantPermissionsTreeView.treeView.uncheckAll()
+				tenantPermissionsTreeView.uncheckAll()
 
-				var allNodesList = tenantPermissionsTreeView.treeView.allNodes()
+				var allNodesList = tenantPermissionsTreeView.allNodes()
 				for (var i = 0; i < allNodesList.length; i++) {
 					var nodeObj = allNodesList[i]
 					var nodeChildren = nodeObj.children || []
@@ -1909,7 +1909,7 @@ DocumentViewBase {
 						var id = nodeData.FeatureId
 
 						if (selectedPermissionsIds.includes(id)) {
-							tenantPermissionsTreeView.treeView.checkItem(nodeObj.key)
+							tenantPermissionsTreeView.checkItem(nodeObj.key)
 						}
 					}
 				}
@@ -1919,7 +1919,7 @@ DocumentViewBase {
 				if (!container.tenantData)
 					return
 				var selectedPermissionIds = []
-				var checkedNodes = tenantPermissionsTreeView.treeView.getCheckedNodes()
+				var checkedNodes = tenantPermissionsTreeView.getCheckedNodes()
 				for (var j = 0; j < checkedNodes.length; j++) {
 					var nodeObj = checkedNodes[j]
 					var nodeChildren = nodeObj.children || []
@@ -1993,10 +1993,7 @@ DocumentViewBase {
 							anchors.fill: parent
 							hoverEnabled: true
 							cursorShape: Qt.PointingHandCursor
-							onClicked: {
-								if (tenantPermissionsTreeView.treeView)
-									tenantPermissionsTreeView.treeView.expandAll()
-							}
+							onClicked: tenantPermissionsTreeView.expandAll()
 						}
 					}
 
@@ -2011,10 +2008,7 @@ DocumentViewBase {
 							anchors.fill: parent
 							hoverEnabled: true
 							cursorShape: Qt.PointingHandCursor
-							onClicked: {
-								if (tenantPermissionsTreeView.treeView)
-									tenantPermissionsTreeView.treeView.collapseAll()
-							}
+							onClicked: tenantPermissionsTreeView.collapseAll()
 						}
 					}
 				}
@@ -2027,7 +2021,7 @@ DocumentViewBase {
 			}
 
 			// Scrollable tree area
-			TreeViewElementView {
+			BasicTreeView {
 				id: tenantPermissionsTreeView
 				anchors.top: permissionsHeader.bottom
 				anchors.topMargin: Style.marginM
@@ -2037,16 +2031,9 @@ DocumentViewBase {
 				anchors.leftMargin: Style.marginXL
 				anchors.right: parent.right
 				anchors.rightMargin: Style.marginXL
-				border.width: 0
-				radius: 0
+				showHeader: false
 
-				Connections {
-					target: tenantPermissionsTreeView.treeView
-
-					function onCheckedItemsChanged() {
-						container.doUpdateModel()
-					}
-				}
+				onCheckedItemsChanged: container.doUpdateModel()
 			}
 		}
 	}
