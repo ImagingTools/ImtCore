@@ -712,7 +712,7 @@ DocumentViewBase {
 												var menuItems = []
 												if (container.canManageMembers) {
 													if (!activeMemberDelegate.isMemberOwner && !activeMemberDelegate.isMemberCreator) {
-														menuItems.push({ text: qsTr("Change Role"), action: "changeRole" })
+														menuItems.push({ text: qsTr("Change Environment Role"), action: "changeRole" })
 														menuItems.push({ text: qsTr("Remove Member"), action: "remove" })
 													}
 													if (container.isOwner && !activeMemberDelegate.isMemberOwner) {
@@ -995,7 +995,7 @@ DocumentViewBase {
 				font.family: Style.fontFamily
 
 				MenuItem {
-					text: qsTr("Change Role")
+					text: qsTr("Change Environment Role")
 					visible: container.canManageMembers && !membersPage.__pendingMenuIsOwner
 					height: visible ? implicitHeight : 0
 					onTriggered: roleAssignMenu.popup()
@@ -1020,23 +1020,32 @@ DocumentViewBase {
 				}
 			}
 
-			// --- Role assignment menu (shown from Change Role action) ---
+			// --- Environment Role assignment menu (shown from Change Role action) ---
 			Menu {
 				id: roleAssignMenu
-				title: qsTr("Assign Role")
+				title: qsTr("Assign Environment Role")
 				font.pixelSize: Style.fontSizeM
 				font.family: Style.fontFamily
 
 				MenuItem {
 					text: qsTr("Admin")
 					onTriggered: {
-						// TODO: call server to change role to Admin for membersPage.__pendingMenuUserId
+						// TODO: call server to change environment role to Admin for membersPage.__pendingMenuUserId
 					}
 				}
 				MenuItem {
 					text: qsTr("Member")
 					onTriggered: {
-						// TODO: call server to change role to Member for membersPage.__pendingMenuUserId
+						// TODO: call server to change environment role to Member for membersPage.__pendingMenuUserId
+					}
+				}
+
+				MenuSeparator {}
+
+				MenuItem {
+					text: qsTr("Assign Global Role...")
+					onTriggered: {
+						// TODO: open global role picker for membersPage.__pendingMenuUserId
 					}
 				}
 			}
@@ -1140,7 +1149,7 @@ DocumentViewBase {
 								}
 
 								BaseText {
-									text: qsTr("Define custom roles for your workspace members.")
+									text: qsTr("Manage environment and global roles for workspace members.")
 									font.pixelSize: Style.fontSizeS
 									color: Style.inactiveTextColor
 								}
@@ -1149,16 +1158,16 @@ DocumentViewBase {
 							Item {
 								width: parent.width
 									- parent.children[0].width
-									- (createRoleBtn.visible ? createRoleBtn.width : 0)
+									- (createGlobalRoleBtn.visible ? createGlobalRoleBtn.width : 0)
 									- parent.spacing * 2
 								height: 1
 							}
 
 							Text {
-								id: createRoleBtn
+								id: createGlobalRoleBtn
 								visible: container.canManageMembers
 								anchors.verticalCenter: parent.verticalCenter
-								text: "+ " + qsTr("Create Role")
+								text: "+ " + qsTr("Create Global Role")
 								font.pixelSize: Style.fontSizeM
 								font.bold: true
 								color: Style.linkColor
@@ -1217,42 +1226,58 @@ DocumentViewBase {
 							width: rolesListContent.width
 							spacing: 0
 
-							// Built-in roles
+							// --- Section: Tenant Environment Roles ---
+							BaseText {
+								text: qsTr("Tenant Environment Roles")
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								color: Style.textColor
+								topPadding: Style.marginM
+								bottomPadding: Style.marginXS
+							}
+
+							BaseText {
+								text: qsTr("These roles control access within this tenant editor only.")
+								font.pixelSize: Style.fontSizeS
+								color: Style.inactiveTextColor
+								bottomPadding: Style.marginM
+								width: parent.width
+							}
+
 							Repeater {
 								model: {
-									var allRoles = [
-										{ name: "Creator", description: qsTr("Full control including Permissions. Permanently assigned to tenant creator."), builtIn: true },
-										{ name: "Owner", description: qsTr("Superuser within the tenant. Can manage all aspects except Permissions."), builtIn: true },
-										{ name: "Admin", description: qsTr("Can invite/remove members and manage roles and groups."), builtIn: true },
-										{ name: "Member", description: qsTr("Default role after accepting invitation. Read-only access."), builtIn: true }
+									var envRoles = [
+										{ name: "Creator", description: qsTr("Full control including Permissions. Permanently assigned to tenant creator."), builtIn: true, scope: "environment" },
+										{ name: "Owner", description: qsTr("Superuser within the tenant. Can manage all aspects except Permissions."), builtIn: true, scope: "environment" },
+										{ name: "Admin", description: qsTr("Can invite/remove members and manage roles and groups."), builtIn: true, scope: "environment" },
+										{ name: "Member", description: qsTr("Default role after accepting invitation. Read-only access."), builtIn: true, scope: "environment" }
 									]
 									if (!rolesFilter.text)
-										return allRoles
+										return envRoles
 									var filter = rolesFilter.text.toLowerCase()
-									return allRoles.filter(function(r) { return r.name.toLowerCase().indexOf(filter) >= 0 || r.description.toLowerCase().indexOf(filter) >= 0 })
+									return envRoles.filter(function(r) { return r.name.toLowerCase().indexOf(filter) >= 0 || r.description.toLowerCase().indexOf(filter) >= 0 })
 								}
 
 								delegate: Rectangle {
 									width: rolesListColumn.width
-									height: roleItemRow.implicitHeight + Style.marginM * 2
-									color: roleItemMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
+									height: envRoleItemRow.implicitHeight + Style.marginM * 2
+									color: envRoleItemMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
 
 									MouseArea {
-										id: roleItemMouseArea
+										id: envRoleItemMouseArea
 										anchors.fill: parent
 										hoverEnabled: true
 										acceptedButtons: Qt.NoButton
 									}
 
 									Row {
-										id: roleItemRow
+										id: envRoleItemRow
 										anchors.left: parent.left
 										anchors.right: parent.right
 										anchors.verticalCenter: parent.verticalCenter
 										anchors.margins: Style.marginM
 										spacing: Style.marginM
 
-										// Role icon
 										Rectangle {
 											width: Style.iconSizeL
 											height: Style.iconSizeL
@@ -1269,11 +1294,10 @@ DocumentViewBase {
 											}
 										}
 
-										// Role info
 										Column {
 											anchors.verticalCenter: parent.verticalCenter
 											spacing: Style.marginXS
-											width: parent.width - Style.iconSizeL - builtInBadge.width - parent.spacing * 2
+											width: parent.width - Style.iconSizeL - envBuiltInBadge.width - parent.spacing * 2
 
 											BaseText {
 												text: modelData.name
@@ -1291,27 +1315,24 @@ DocumentViewBase {
 											}
 										}
 
-										// Built-in badge
 										Rectangle {
-											id: builtInBadge
-											visible: modelData.builtIn === true
+											id: envBuiltInBadge
 											anchors.verticalCenter: parent.verticalCenter
-											width: builtInText.implicitWidth + Style.marginM
-											height: builtInText.implicitHeight + Style.marginXS
+											width: envBuiltInText.implicitWidth + Style.marginM
+											height: envBuiltInText.implicitHeight + Style.marginXS
 											radius: Style.radiusS
 											color: Style.backgroundColor2
 
 											BaseText {
-												id: builtInText
+												id: envBuiltInText
 												anchors.centerIn: parent
-												text: qsTr("Built-in")
+												text: qsTr("Environment")
 												font.pixelSize: Style.fontSizeXS
 												color: Style.inactiveTextColor
 											}
 										}
 									}
 
-									// Separator
 									Rectangle {
 										anchors.bottom: parent.bottom
 										width: parent.width
@@ -1321,12 +1342,149 @@ DocumentViewBase {
 									}
 								}
 							}
+
+							// --- Separator between sections ---
+							Rectangle {
+								width: parent.width
+								height: 1
+								color: Style.borderColor
+							}
+
+							Item { width: 1; height: Style.marginXL }
+
+							// --- Section: Global Roles ---
+							BaseText {
+								text: qsTr("Global Roles")
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								color: Style.textColor
+								bottomPadding: Style.marginXS
+							}
+
+							BaseText {
+								text: qsTr("These roles define user capabilities across the entire product.")
+								font.pixelSize: Style.fontSizeS
+								color: Style.inactiveTextColor
+								bottomPadding: Style.marginM
+								width: parent.width
+							}
+
+							// Global roles — loaded from server (placeholder for data provider)
+							Repeater {
+								id: globalRolesRepeater
+								model: {
+									// TODO: replace with data from GQL (loaded like FilterableSelectPopup)
+									var globalRoles = [
+										{ name: "SuperAdmin", description: qsTr("Full product-level administrative access."), builtIn: false, scope: "global" },
+										{ name: "User", description: qsTr("Standard product access for regular users."), builtIn: false, scope: "global" }
+									]
+									if (!rolesFilter.text)
+										return globalRoles
+									var filter = rolesFilter.text.toLowerCase()
+									return globalRoles.filter(function(r) { return r.name.toLowerCase().indexOf(filter) >= 0 || r.description.toLowerCase().indexOf(filter) >= 0 })
+								}
+
+								delegate: Rectangle {
+									width: rolesListColumn.width
+									height: globalRoleItemRow.implicitHeight + Style.marginM * 2
+									color: globalRoleItemMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
+
+									MouseArea {
+										id: globalRoleItemMouseArea
+										anchors.fill: parent
+										hoverEnabled: true
+										acceptedButtons: Qt.NoButton
+									}
+
+									Row {
+										id: globalRoleItemRow
+										anchors.left: parent.left
+										anchors.right: parent.right
+										anchors.verticalCenter: parent.verticalCenter
+										anchors.margins: Style.marginM
+										spacing: Style.marginM
+
+										Rectangle {
+											width: Style.iconSizeL
+											height: Style.iconSizeL
+											radius: Style.radiusS
+											anchors.verticalCenter: parent.verticalCenter
+											color: Style.linkColor
+
+											BaseText {
+												anchors.centerIn: parent
+												text: modelData.name.charAt(0)
+												font.pixelSize: Style.fontSizeM
+												font.bold: true
+												color: Style.secondColor
+											}
+										}
+
+										Column {
+											anchors.verticalCenter: parent.verticalCenter
+											spacing: Style.marginXS
+											width: parent.width - Style.iconSizeL - globalBadge.width - parent.spacing * 2
+
+											BaseText {
+												text: modelData.name
+												font.pixelSize: Style.fontSizeM
+												font.bold: true
+												color: Style.textColor
+											}
+
+											BaseText {
+												text: modelData.description
+												font.pixelSize: Style.fontSizeS
+												color: Style.inactiveTextColor
+												elide: Text.ElideRight
+												width: parent.width
+											}
+										}
+
+										Rectangle {
+											id: globalBadge
+											anchors.verticalCenter: parent.verticalCenter
+											width: globalBadgeText.implicitWidth + Style.marginM
+											height: globalBadgeText.implicitHeight + Style.marginXS
+											radius: Style.radiusS
+											color: Style.selectedColor
+
+											BaseText {
+												id: globalBadgeText
+												anchors.centerIn: parent
+												text: qsTr("Global")
+												font.pixelSize: Style.fontSizeXS
+												color: Style.secondColor
+											}
+										}
+									}
+
+									Rectangle {
+										anchors.bottom: parent.bottom
+										width: parent.width
+										height: 1
+										color: Style.borderColor
+										opacity: 0.5
+									}
+								}
+							}
+
+							// Empty state for global roles if none
+							BaseText {
+								visible: globalRolesRepeater.count === 0
+								text: qsTr("No global roles found.")
+								font.pixelSize: Style.fontSizeM
+								color: Style.inactiveTextColor
+								topPadding: Style.marginM
+								width: parent.width
+								horizontalAlignment: Text.AlignHCenter
+							}
 						}
 					}
 				}
 			}
 
-			// --- Role Editor View (pushed on stack) ---
+			// --- Role Editor View (pushed on stack) — for creating Global Roles ---
 			Component {
 				id: roleEditorView
 
@@ -1358,7 +1516,7 @@ DocumentViewBase {
 
 						BaseText {
 							anchors.verticalCenter: parent.verticalCenter
-							text: qsTr("Create Role")
+							text: qsTr("Create Global Role")
 							font.pixelSize: Style.fontSizeXL
 							font.bold: true
 							color: Style.textColor
@@ -1397,7 +1555,7 @@ DocumentViewBase {
 							Button {
 								text: qsTr("Create")
 								onClicked: {
-									// TODO: save role via GQL
+									// TODO: save global role via GQL
 									rolesStackView.pop()
 								}
 							}
