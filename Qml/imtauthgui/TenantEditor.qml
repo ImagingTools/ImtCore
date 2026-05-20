@@ -299,6 +299,31 @@ DocumentViewBase {
 					width: Style.sizeHintXXL
 					spacing: Style.marginXL
 
+					// Header (matches Members page style)
+					Column {
+						width: parent.width
+						spacing: Style.marginXS
+
+						BaseText {
+							text: qsTr("General")
+							font.pixelSize: Style.fontSizeXL
+							font.bold: true
+							color: Style.textColor
+						}
+
+						BaseText {
+							text: qsTr("Basic workspace settings and configuration.")
+							font.pixelSize: Style.fontSizeS
+							color: Style.inactiveTextColor
+						}
+					}
+
+					Rectangle {
+						width: parent.width
+						height: 1
+						color: Style.borderColor
+					}
+
 					GroupElementView {
 						id: generalGroup
 						width: parent.width
@@ -687,6 +712,7 @@ DocumentViewBase {
 												var menuItems = []
 												if (container.canManageMembers) {
 													if (!activeMemberDelegate.isMemberOwner && !activeMemberDelegate.isMemberCreator) {
+														menuItems.push({ text: qsTr("Change Role"), action: "changeRole" })
 														menuItems.push({ text: qsTr("Remove Member"), action: "remove" })
 													}
 													if (container.isOwner && !activeMemberDelegate.isMemberOwner) {
@@ -711,7 +737,7 @@ DocumentViewBase {
 						width: parent.width
 						height: 1
 						color: Style.borderColor
-						visible: container.canManageMembers || container.pendingInvitations.length > 0
+						visible: container.canManageMembers || (container.pendingInvitations && container.pendingInvitations.length > 0)
 					}
 
 					// ===== Pending Invitations Section =====
@@ -719,7 +745,7 @@ DocumentViewBase {
 						id: pendingInvitationsSection
 						width: parent.width
 						spacing: Style.marginS
-						visible: container.canManageMembers || container.pendingInvitations.length > 0
+						visible: container.canManageMembers || (container.pendingInvitations && container.pendingInvitations.length > 0)
 
 						BaseText {
 							text: qsTr("Pending Invitations")
@@ -730,7 +756,7 @@ DocumentViewBase {
 
 						// Empty state
 						BaseText {
-							visible: container.pendingInvitations.length === 0
+							visible: !container.pendingInvitations || container.pendingInvitations.length === 0
 							text: qsTr("No pending invitations")
 							font.pixelSize: Style.fontSizeM
 							color: Style.inactiveTextColor
@@ -914,6 +940,10 @@ DocumentViewBase {
 								membersPage.__removeMemberById(membersPage.__confirmRemoveUserId)
 						}
 					)
+				} else if (action === "changeRole") {
+					membersPage.__pendingMenuUserId = userId
+					membersPage.__pendingMenuUserName = userName
+					roleAssignMenu.popup()
 				} else if (action === "transfer") {
 					membersPage.__confirmTransferUserId = userId
 					membersPage.__confirmTransferUserName = userName
@@ -965,6 +995,12 @@ DocumentViewBase {
 				font.family: Style.fontFamily
 
 				MenuItem {
+					text: qsTr("Change Role")
+					visible: container.canManageMembers && !membersPage.__pendingMenuIsOwner
+					height: visible ? implicitHeight : 0
+					onTriggered: roleAssignMenu.popup()
+				}
+				MenuItem {
 					text: qsTr("Remove Member")
 					visible: container.canManageMembers && !membersPage.__pendingMenuIsOwner
 					height: visible ? implicitHeight : 0
@@ -981,6 +1017,27 @@ DocumentViewBase {
 					visible: !container.canManageMembers && membersPage.__pendingMenuIsCurrentUser
 					height: visible ? implicitHeight : 0
 					onTriggered: membersPage.__executeAction("leave", membersPage.__pendingMenuUserId, membersPage.__pendingMenuUserName)
+				}
+			}
+
+			// --- Role assignment menu (shown from Change Role action) ---
+			Menu {
+				id: roleAssignMenu
+				title: qsTr("Assign Role")
+				font.pixelSize: Style.fontSizeM
+				font.family: Style.fontFamily
+
+				MenuItem {
+					text: qsTr("Admin")
+					onTriggered: {
+						// TODO: call server to change role to Admin for membersPage.__pendingMenuUserId
+					}
+				}
+				MenuItem {
+					text: qsTr("Member")
+					onTriggered: {
+						// TODO: call server to change role to Member for membersPage.__pendingMenuUserId
+					}
 				}
 			}
 
@@ -1045,133 +1102,309 @@ DocumentViewBase {
 		Item {
 			id: rolesPage
 
-			CustomScrollbar {
-				id: rolesScrollbar
-				z: parent.z + 1
-				anchors.right: parent.right
-				anchors.top: rolesFlickable.top
-				anchors.bottom: rolesFlickable.bottom
-				secondSize: Style.marginM
-				targetItem: rolesFlickable
+			StackView {
+				id: rolesStackView
+				anchors.fill: parent
+				initialItem: rolesListView
 			}
 
-			Flickable {
-				id: rolesFlickable
-				anchors.top: parent.top
-				anchors.topMargin: Style.marginXL
-				anchors.bottom: parent.bottom
-				anchors.left: parent.left
-				anchors.leftMargin: Style.marginXL
-				anchors.right: rolesScrollbar.left
-				anchors.rightMargin: Style.marginXL
-				contentWidth: rolesColumn.width
-				contentHeight: rolesColumn.height + 2 * Style.marginXL
+			// --- Roles List View ---
+			Component {
+				id: rolesListView
 
-				boundsBehavior: Flickable.StopAtBounds
-				clip: true
-
-				Column {
-					id: rolesColumn
-					width: Style.sizeHintXXL
-					spacing: Style.marginXL
-
-					Row {
-						width: parent.width
+				Item {
+					// Header (fixed)
+					Column {
+						id: rolesListHeader
+						anchors.top: parent.top
+						anchors.topMargin: Style.marginXL
+						anchors.left: parent.left
+						anchors.leftMargin: Style.marginXL
+						anchors.right: parent.right
+						anchors.rightMargin: Style.marginXL
 						spacing: Style.marginM
 
-						BaseText {
-							text: qsTr("Roles")
-							font.pixelSize: Style.fontSizeXL
-							font.bold: true
-							color: Style.textColor
-							anchors.verticalCenter: parent.verticalCenter
+						Row {
+							width: parent.width
+							spacing: Style.marginM
+
+							Column {
+								anchors.verticalCenter: parent.verticalCenter
+								spacing: Style.marginXS
+
+								BaseText {
+									text: qsTr("Roles")
+									font.pixelSize: Style.fontSizeXL
+									font.bold: true
+									color: Style.textColor
+								}
+
+								BaseText {
+									text: qsTr("Define custom roles for your workspace members.")
+									font.pixelSize: Style.fontSizeS
+									color: Style.inactiveTextColor
+								}
+							}
+
+							Item {
+								width: parent.width
+									- parent.children[0].width
+									- (createRoleBtn.visible ? createRoleBtn.width : 0)
+									- parent.spacing * 2
+								height: 1
+							}
+
+							Text {
+								id: createRoleBtn
+								visible: container.canManageMembers
+								anchors.verticalCenter: parent.verticalCenter
+								text: "+ " + qsTr("Create Role")
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								color: Style.linkColor
+
+								MouseArea {
+									anchors.fill: parent
+									hoverEnabled: true
+									cursorShape: Qt.PointingHandCursor
+									onClicked: rolesStackView.push(roleEditorView)
+								}
+							}
 						}
 
-						Item { width: parent.width - parent.children[0].width - addRoleBtn.width - parent.spacing * 2; height: 1 }
+						// Filter
+						SearchTextInput {
+							id: rolesFilter
+							width: parent.width
+							placeholderText: qsTr("Filter roles...")
+						}
+
+						Rectangle {
+							width: parent.width
+							height: 1
+							color: Style.borderColor
+						}
+					}
+
+					// Scrollable roles list
+					CustomScrollbar {
+						id: rolesListScrollbar
+						z: parent.z + 1
+						anchors.right: parent.right
+						anchors.top: rolesListContent.top
+						anchors.bottom: rolesListContent.bottom
+						secondSize: Style.marginM
+						targetItem: rolesListContent
+					}
+
+					Flickable {
+						id: rolesListContent
+						anchors.top: rolesListHeader.bottom
+						anchors.topMargin: Style.marginM
+						anchors.bottom: parent.bottom
+						anchors.bottomMargin: Style.marginXL
+						anchors.left: parent.left
+						anchors.leftMargin: Style.marginXL
+						anchors.right: rolesListScrollbar.left
+						anchors.rightMargin: Style.marginXL
+						contentWidth: rolesListColumn.width
+						contentHeight: rolesListColumn.height
+						boundsBehavior: Flickable.StopAtBounds
+						clip: true
+
+						Column {
+							id: rolesListColumn
+							width: rolesListContent.width
+							spacing: 0
+
+							// Built-in roles
+							Repeater {
+								model: {
+									var allRoles = [
+										{ name: "Creator", description: qsTr("Full control including Permissions. Permanently assigned to tenant creator."), builtIn: true },
+										{ name: "Owner", description: qsTr("Superuser within the tenant. Can manage all aspects except Permissions."), builtIn: true },
+										{ name: "Admin", description: qsTr("Can invite/remove members and manage roles and groups."), builtIn: true },
+										{ name: "Member", description: qsTr("Default role after accepting invitation. Read-only access."), builtIn: true }
+									]
+									if (!rolesFilter.text)
+										return allRoles
+									var filter = rolesFilter.text.toLowerCase()
+									return allRoles.filter(function(r) { return r.name.toLowerCase().indexOf(filter) >= 0 || r.description.toLowerCase().indexOf(filter) >= 0 })
+								}
+
+								delegate: Rectangle {
+									width: rolesListColumn.width
+									height: roleItemRow.implicitHeight + Style.marginM * 2
+									color: roleItemMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
+
+									MouseArea {
+										id: roleItemMouseArea
+										anchors.fill: parent
+										hoverEnabled: true
+										acceptedButtons: Qt.NoButton
+									}
+
+									Row {
+										id: roleItemRow
+										anchors.left: parent.left
+										anchors.right: parent.right
+										anchors.verticalCenter: parent.verticalCenter
+										anchors.margins: Style.marginM
+										spacing: Style.marginM
+
+										// Role icon
+										Rectangle {
+											width: Style.iconSizeL
+											height: Style.iconSizeL
+											radius: Style.radiusS
+											anchors.verticalCenter: parent.verticalCenter
+											color: Style.selectedColor
+
+											BaseText {
+												anchors.centerIn: parent
+												text: modelData.name.charAt(0)
+												font.pixelSize: Style.fontSizeM
+												font.bold: true
+												color: Style.secondColor
+											}
+										}
+
+										// Role info
+										Column {
+											anchors.verticalCenter: parent.verticalCenter
+											spacing: Style.marginXS
+											width: parent.width - Style.iconSizeL - builtInBadge.width - parent.spacing * 2
+
+											BaseText {
+												text: modelData.name
+												font.pixelSize: Style.fontSizeM
+												font.bold: true
+												color: Style.textColor
+											}
+
+											BaseText {
+												text: modelData.description
+												font.pixelSize: Style.fontSizeS
+												color: Style.inactiveTextColor
+												elide: Text.ElideRight
+												width: parent.width
+											}
+										}
+
+										// Built-in badge
+										Rectangle {
+											id: builtInBadge
+											visible: modelData.builtIn === true
+											anchors.verticalCenter: parent.verticalCenter
+											width: builtInText.implicitWidth + Style.marginM
+											height: builtInText.implicitHeight + Style.marginXS
+											radius: Style.radiusS
+											color: Style.backgroundColor2
+
+											BaseText {
+												id: builtInText
+												anchors.centerIn: parent
+												text: qsTr("Built-in")
+												font.pixelSize: Style.fontSizeXS
+												color: Style.inactiveTextColor
+											}
+										}
+									}
+
+									// Separator
+									Rectangle {
+										anchors.bottom: parent.bottom
+										width: parent.width
+										height: 1
+										color: Style.borderColor
+										opacity: 0.5
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			// --- Role Editor View (pushed on stack) ---
+			Component {
+				id: roleEditorView
+
+				Item {
+					// Header with back button
+					Row {
+						id: roleEditorHeader
+						anchors.top: parent.top
+						anchors.topMargin: Style.marginXL
+						anchors.left: parent.left
+						anchors.leftMargin: Style.marginXL
+						anchors.right: parent.right
+						anchors.rightMargin: Style.marginXL
+						spacing: Style.marginM
 
 						Text {
-							id: addRoleBtn
-							visible: container.canManageMembers
 							anchors.verticalCenter: parent.verticalCenter
-							text: "+ " + qsTr("Add Role")
+							text: "← " + qsTr("Back")
 							font.pixelSize: Style.fontSizeM
-							font.bold: true
 							color: Style.linkColor
 
 							MouseArea {
 								anchors.fill: parent
 								hoverEnabled: true
 								cursorShape: Qt.PointingHandCursor
-								onClicked: {
-									// TODO: implement Add Role dialog
-								}
+								onClicked: rolesStackView.pop()
 							}
 						}
-					}
-
-					BaseText {
-						text: qsTr("Define custom roles for your workspace members. Roles control access to workspace features and resources.")
-						font.pixelSize: Style.fontSizeM
-						color: Style.inactiveTextColor
-						wrapMode: Text.WordWrap
-						width: parent.width
-					}
-
-					Rectangle {
-						width: parent.width
-						height: 1
-						color: Style.borderColor
-					}
-
-					// Built-in roles display
-					Column {
-						width: parent.width
-						spacing: Style.marginS
 
 						BaseText {
-							text: qsTr("Built-in Roles")
-							font.pixelSize: Style.fontSizeL
+							anchors.verticalCenter: parent.verticalCenter
+							text: qsTr("Create Role")
+							font.pixelSize: Style.fontSizeXL
 							font.bold: true
 							color: Style.textColor
 						}
+					}
 
-						Repeater {
-							model: [
-								{ name: "Creator", description: qsTr("Full control including Permissions. Permanently assigned to tenant creator.") },
-								{ name: "Owner", description: qsTr("Superuser within the tenant. Can manage all aspects except Permissions.") },
-								{ name: "Admin", description: qsTr("Can invite/remove members and manage roles and groups.") },
-								{ name: "Member", description: qsTr("Default role after accepting invitation. Read-only access.") }
-							]
+					// Editor content
+					Column {
+						anchors.top: roleEditorHeader.bottom
+						anchors.topMargin: Style.marginXL
+						anchors.left: parent.left
+						anchors.leftMargin: Style.marginXL
+						anchors.right: parent.right
+						anchors.rightMargin: Style.marginXL
+						spacing: Style.marginXL
 
-							delegate: Rectangle {
-								width: parent.width
-								height: roleInfoCol.implicitHeight + Style.marginM * 2
-								radius: Style.radiusS
-								color: "transparent"
+						GroupElementView {
+							width: parent.width
 
-								Column {
-									id: roleInfoCol
-									anchors.left: parent.left
-									anchors.right: parent.right
-									anchors.verticalCenter: parent.verticalCenter
-									anchors.margins: Style.marginM
-									spacing: Style.marginXS
+							TextInputElementView {
+								id: roleNameInput
+								name: qsTr("Role Name")
+								placeHolderText: qsTr("Enter the role name")
+							}
 
-									BaseText {
-										text: modelData.name
-										font.pixelSize: Style.fontSizeM
-										font.bold: true
-										color: Style.textColor
-									}
+							TextInputElementView {
+								id: roleDescInput
+								name: qsTr("Description")
+								placeHolderText: qsTr("Describe what this role can do")
+							}
+						}
 
-									BaseText {
-										text: modelData.description
-										font.pixelSize: Style.fontSizeS
-										color: Style.inactiveTextColor
-										wrapMode: Text.WordWrap
-										width: parent.width
-									}
+						Row {
+							spacing: Style.marginM
+
+							Button {
+								text: qsTr("Create")
+								onClicked: {
+									// TODO: save role via GQL
+									rolesStackView.pop()
 								}
+							}
+
+							Button {
+								text: qsTr("Cancel")
+								onClicked: rolesStackView.pop()
 							}
 						}
 					}
@@ -1187,91 +1420,195 @@ DocumentViewBase {
 		Item {
 			id: groupsPage
 
-			CustomScrollbar {
-				id: groupsScrollbar
-				z: parent.z + 1
-				anchors.right: parent.right
-				anchors.top: groupsFlickable.top
-				anchors.bottom: groupsFlickable.bottom
-				secondSize: Style.marginM
-				targetItem: groupsFlickable
+			StackView {
+				id: groupsStackView
+				anchors.fill: parent
+				initialItem: groupsListView
 			}
 
-			Flickable {
-				id: groupsFlickable
-				anchors.top: parent.top
-				anchors.topMargin: Style.marginXL
-				anchors.bottom: parent.bottom
-				anchors.left: parent.left
-				anchors.leftMargin: Style.marginXL
-				anchors.right: groupsScrollbar.left
-				anchors.rightMargin: Style.marginXL
-				contentWidth: groupsColumn.width
-				contentHeight: groupsColumn.height + 2 * Style.marginXL
+			// --- Groups List View ---
+			Component {
+				id: groupsListView
 
-				boundsBehavior: Flickable.StopAtBounds
-				clip: true
-
-				Column {
-					id: groupsColumn
-					width: Style.sizeHintXXL
-					spacing: Style.marginXL
-
-					Row {
-						width: parent.width
+				Item {
+					// Header (fixed)
+					Column {
+						id: groupsListHeader
+						anchors.top: parent.top
+						anchors.topMargin: Style.marginXL
+						anchors.left: parent.left
+						anchors.leftMargin: Style.marginXL
+						anchors.right: parent.right
+						anchors.rightMargin: Style.marginXL
 						spacing: Style.marginM
 
-						BaseText {
-							text: qsTr("Groups")
-							font.pixelSize: Style.fontSizeXL
-							font.bold: true
-							color: Style.textColor
-							anchors.verticalCenter: parent.verticalCenter
+						Row {
+							width: parent.width
+							spacing: Style.marginM
+
+							Column {
+								anchors.verticalCenter: parent.verticalCenter
+								spacing: Style.marginXS
+
+								BaseText {
+									text: qsTr("Groups")
+									font.pixelSize: Style.fontSizeXL
+									font.bold: true
+									color: Style.textColor
+								}
+
+								BaseText {
+									text: qsTr("Organize members into groups for easier permission management.")
+									font.pixelSize: Style.fontSizeS
+									color: Style.inactiveTextColor
+								}
+							}
+
+							Item {
+								width: parent.width
+									- parent.children[0].width
+									- (createGroupBtn.visible ? createGroupBtn.width : 0)
+									- parent.spacing * 2
+								height: 1
+							}
+
+							Text {
+								id: createGroupBtn
+								visible: container.canManageMembers
+								anchors.verticalCenter: parent.verticalCenter
+								text: "+ " + qsTr("Create Group")
+								font.pixelSize: Style.fontSizeM
+								font.bold: true
+								color: Style.linkColor
+
+								MouseArea {
+									anchors.fill: parent
+									hoverEnabled: true
+									cursorShape: Qt.PointingHandCursor
+									onClicked: groupsStackView.push(groupEditorView)
+								}
+							}
 						}
 
-						Item { width: parent.width - parent.children[0].width - addGroupBtn.width - parent.spacing * 2; height: 1 }
+						// Filter
+						SearchTextInput {
+							id: groupsFilter
+							width: parent.width
+							placeholderText: qsTr("Filter groups...")
+						}
+
+						Rectangle {
+							width: parent.width
+							height: 1
+							color: Style.borderColor
+						}
+					}
+
+					// Empty state or list
+					Item {
+						anchors.top: groupsListHeader.bottom
+						anchors.topMargin: Style.marginM
+						anchors.bottom: parent.bottom
+						anchors.bottomMargin: Style.marginXL
+						anchors.left: parent.left
+						anchors.leftMargin: Style.marginXL
+						anchors.right: parent.right
+						anchors.rightMargin: Style.marginXL
+
+						BaseText {
+							anchors.centerIn: parent
+							text: qsTr("No groups created yet. Create a group to organize members.")
+							font.pixelSize: Style.fontSizeM
+							color: Style.inactiveTextColor
+							wrapMode: Text.WordWrap
+							width: parent.width
+							horizontalAlignment: Text.AlignHCenter
+						}
+					}
+				}
+			}
+
+			// --- Group Editor View (pushed on stack) ---
+			Component {
+				id: groupEditorView
+
+				Item {
+					// Header with back button
+					Row {
+						id: groupEditorHeader
+						anchors.top: parent.top
+						anchors.topMargin: Style.marginXL
+						anchors.left: parent.left
+						anchors.leftMargin: Style.marginXL
+						anchors.right: parent.right
+						anchors.rightMargin: Style.marginXL
+						spacing: Style.marginM
 
 						Text {
-							id: addGroupBtn
-							visible: container.canManageMembers
 							anchors.verticalCenter: parent.verticalCenter
-							text: "+ " + qsTr("Create Group")
+							text: "← " + qsTr("Back")
 							font.pixelSize: Style.fontSizeM
-							font.bold: true
 							color: Style.linkColor
 
 							MouseArea {
 								anchors.fill: parent
 								hoverEnabled: true
 								cursorShape: Qt.PointingHandCursor
-								onClicked: {
-									// TODO: implement Create Group dialog
-								}
+								onClicked: groupsStackView.pop()
 							}
+						}
+
+						BaseText {
+							anchors.verticalCenter: parent.verticalCenter
+							text: qsTr("Create Group")
+							font.pixelSize: Style.fontSizeXL
+							font.bold: true
+							color: Style.textColor
 						}
 					}
 
-					BaseText {
-						text: qsTr("Organize members into groups for easier permission management. Groups can be assigned roles and permissions collectively.")
-						font.pixelSize: Style.fontSizeM
-						color: Style.inactiveTextColor
-						wrapMode: Text.WordWrap
-						width: parent.width
-					}
+					// Editor content
+					Column {
+						anchors.top: groupEditorHeader.bottom
+						anchors.topMargin: Style.marginXL
+						anchors.left: parent.left
+						anchors.leftMargin: Style.marginXL
+						anchors.right: parent.right
+						anchors.rightMargin: Style.marginXL
+						spacing: Style.marginXL
 
-					Rectangle {
-						width: parent.width
-						height: 1
-						color: Style.borderColor
-					}
+						GroupElementView {
+							width: parent.width
 
-					// Empty state
-					BaseText {
-						text: qsTr("No groups created yet")
-						font.pixelSize: Style.fontSizeM
-						color: Style.inactiveTextColor
-						topPadding: Style.marginM
-						bottomPadding: Style.marginM
+							TextInputElementView {
+								id: groupNameInput
+								name: qsTr("Group Name")
+								placeHolderText: qsTr("Enter the group name")
+							}
+
+							TextInputElementView {
+								id: groupDescInput
+								name: qsTr("Description")
+								placeHolderText: qsTr("Describe this group's purpose")
+							}
+						}
+
+						Row {
+							spacing: Style.marginM
+
+							Button {
+								text: qsTr("Create")
+								onClicked: {
+									// TODO: save group via GQL
+									groupsStackView.pop()
+								}
+							}
+
+							Button {
+								text: qsTr("Cancel")
+								onClicked: groupsStackView.pop()
+							}
+						}
 					}
 				}
 			}
@@ -1363,52 +1700,109 @@ DocumentViewBase {
 				}
 			}
 
-			CustomScrollbar {
-				id: permissionsScrollbar
-				z: parent.z + 1
-				anchors.right: parent.right
-				anchors.top: permissionsFlickable.top
-				anchors.bottom: permissionsFlickable.bottom
-				secondSize: Style.marginM
-				targetItem: permissionsFlickable
-			}
-
-			Flickable {
-				id: permissionsFlickable
+			// Fixed header area
+			Column {
+				id: permissionsHeader
 				anchors.top: parent.top
 				anchors.topMargin: Style.marginXL
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginXL
+				anchors.right: parent.right
+				anchors.rightMargin: Style.marginXL
+				spacing: Style.marginM
+
+				Row {
+					width: parent.width
+					spacing: Style.marginM
+
+					Column {
+						anchors.verticalCenter: parent.verticalCenter
+						spacing: Style.marginXS
+
+						BaseText {
+							text: qsTr("Permissions")
+							font.pixelSize: Style.fontSizeXL
+							font.bold: true
+							color: Style.textColor
+						}
+
+						BaseText {
+							text: qsTr("Select which product features are available for this tenant.")
+							font.pixelSize: Style.fontSizeS
+							color: Style.inactiveTextColor
+						}
+					}
+
+					Item {
+						width: parent.width
+							- parent.children[0].width
+							- permExpandBtn.width
+							- permCollapseBtn.width
+							- parent.spacing * 3
+						height: 1
+					}
+
+					Text {
+						id: permExpandBtn
+						anchors.verticalCenter: parent.verticalCenter
+						text: qsTr("Expand All")
+						font.pixelSize: Style.fontSizeM
+						color: Style.linkColor
+
+						MouseArea {
+							anchors.fill: parent
+							hoverEnabled: true
+							cursorShape: Qt.PointingHandCursor
+							onClicked: {
+								if (tenantPermissionsTreeView.treeView)
+									tenantPermissionsTreeView.treeView.expandAll()
+							}
+						}
+					}
+
+					Text {
+						id: permCollapseBtn
+						anchors.verticalCenter: parent.verticalCenter
+						text: qsTr("Collapse All")
+						font.pixelSize: Style.fontSizeM
+						color: Style.linkColor
+
+						MouseArea {
+							anchors.fill: parent
+							hoverEnabled: true
+							cursorShape: Qt.PointingHandCursor
+							onClicked: {
+								if (tenantPermissionsTreeView.treeView)
+									tenantPermissionsTreeView.treeView.collapseAll()
+							}
+						}
+					}
+				}
+
+				Rectangle {
+					width: parent.width
+					height: 1
+					color: Style.borderColor
+				}
+			}
+
+			// Scrollable tree area
+			TreeViewElementView {
+				id: tenantPermissionsTreeView
+				anchors.top: permissionsHeader.bottom
+				anchors.topMargin: Style.marginM
 				anchors.bottom: parent.bottom
 				anchors.bottomMargin: Style.marginXL
 				anchors.left: parent.left
 				anchors.leftMargin: Style.marginXL
-				anchors.right: permissionsScrollbar.left
+				anchors.right: parent.right
 				anchors.rightMargin: Style.marginXL
-				contentWidth: permissionsColumn.width
-				contentHeight: permissionsColumn.height + 2 * Style.marginXL
 
-				boundsBehavior: Flickable.StopAtBounds
-				clip: true
+				Connections {
+					target: tenantPermissionsTreeView.treeView
 
-				Column {
-					id: permissionsColumn
-					width: Style.sizeHintXXL
-					spacing: Style.marginXL
-
-					GroupElementView {
-						id: permissionsGroup
-						width: parent.width
-
-						TreeViewElementView {
-							id: tenantPermissionsTreeView
-
-							Connections {
-								target: tenantPermissionsTreeView.treeView
-
-								function onCheckedItemsChanged() {
-									container.doUpdateModel()
-								}
-							}
-						}
+					function onCheckedItemsChanged() {
+						container.doUpdateModel()
 					}
 				}
 			}
