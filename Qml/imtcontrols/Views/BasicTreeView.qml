@@ -28,7 +28,7 @@ Item {
     property int rowHeight: 28
     property int indentation: 18
     property int cacheBuffer: 4000
-    property int headerHeight: 28
+    property int headerHeight: 36
 
     property bool showHeader: true
     property bool multiSelect: false
@@ -53,7 +53,7 @@ Item {
     property string normalTextColor: Style.textColor
     property string selectedTextColor: Style.textSelectedColor
     property string disabledTextColor: Style.inactiveTextColor
-    property string headerBackgroundColor: Style.backgroundColor
+    property string headerBackgroundColor: Style.borderColor
     property string gridLineColor: Style.borderColor2
 
     property var currentIndex: null
@@ -90,7 +90,7 @@ Item {
     property int __editingColumn: -1
     property var __editingOriginalValue: null
 
-    height: (root.showHeader ? root.headerHeight : 0) + visibleModel.count * root.rowHeight
+    height: (root.showHeader ? root.headerHeight + 1 : 0) + visibleModel.count * root.rowHeight
 
     Timer {
         id: filterDebounceTimer
@@ -163,14 +163,20 @@ Item {
             }
         }
 
+        Rectangle {
+            width: parent.width
+            height: root.showHeader ? 1 : 0
+            visible: root.showHeader
+            color: root.gridLineColor
+        }
+
         ListView {
             id: listView
 
             width: parent.width
-            height: parent.height - headerRow.height
+            height: parent.height - headerRow.height - (root.showHeader ? 1 : 0)
 
             clip: true
-            reuseItems: true
             cacheBuffer: root.cacheBuffer
             boundsBehavior: Flickable.StopAtBounds
             focus: true
