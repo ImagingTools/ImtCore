@@ -632,4 +632,4 @@ ComboBox {
 - **[Modul-Referenz](QML_Module_Reference.md)** — Alle Komponenten im Detail
 - **[JQML Guide](QML_JQML_Guide.md)** — Web-Deployment mit JQML
 - **[Komponenten-Tutorials](QML_Component_Tutorials.md)** — Praktische Patterns
-- **[ImtControlsGallery](../Impl/ImtControlsGallery/)** — Demo-Applikation mit allen Komponenten
+- **[ImtControlsGallery](../../Impl/ImtControlsGallery/)** — Demo-Applikation mit allen Komponenten

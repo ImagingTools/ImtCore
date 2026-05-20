@@ -133,7 +133,7 @@ Mesh-Primitives: `"#Cube"`, `"#Sphere"`, `"#Cylinder"`, `"#Cone"`, `"#Plane"`, `
 
 glTF-Dateien (`.glb`/`.gltf`) werden asynchron über `GLTFLoader` geladen.
 
-➡️ Details: [Tools/JQML/v2/README-3D.md](../Tools/JQML/v2/README-3D.md)
+➡️ Details: [Tools/JQML/v2/README-3D.md](../../Tools/JQML/v2/README-3D.md)
 
 ### Neue Komponente zu JQML v2 hinzufügen
 
@@ -380,8 +380,8 @@ JQML v3 erzeugt Source Maps (`.js.map`), die Browser-DevTools erlauben, direkt i
 
 ## Weiterführende Dokumentation
 
-- **[Tools/JQML/v2/README-3D.md](../Tools/JQML/v2/README-3D.md)** — JQML2 3D-Dokumentation
-- **[Tools/JQML/v3/compiler/README.md](../Tools/JQML/v3/compiler/README.md)** — JQML v3 Compiler-Architektur
+- **[Tools/JQML/v2/README-3D.md](../../Tools/JQML/v2/README-3D.md)** — JQML2 3D-Dokumentation
+- **[Tools/JQML/v3/compiler/README.md](../../Tools/JQML/v3/compiler/README.md)** — JQML v3 Compiler-Architektur
 - **[QML Documentation Index](QML_Documentation_Index.md)** — Dokumentationsübersicht
 - **[QML Module Reference](QML_Module_Reference.md)** — Alle QML-Komponenten
 - **[QML Getting Started](QML_Getting_Started.md)** — Einstiegstutorial

@@ -42,7 +42,7 @@ GraphQL-based API layer for client-server communication.
 ### 6. User Interface
 Qt/QML-based user interface components and frameworks.
 - **16 libraries**: Core UI (imtgui, imtwidgets, imtstyle, imtqml, imtqml2d, imtstylecontrolsqml, imtdesign) + Domain-specific GUI libraries
-- **Documentation**: [Include/README.md - User Interface](Include/README.md#user-interface-16-libraries-total-7-core--9-domain-specific), [QML & JQML Documentation](Docs/QML_Documentation_Index.md)
+- **Documentation**: [Include/README.md - User Interface](Include/README.md#user-interface-16-libraries-total-7-core--9-domain-specific), [QML & JQML Documentation](Docs/Qml/QML_Documentation_Index.md)
 
 ### 7. 3D & Visualization
 2D/3D rendering, visualization, and hypermedia content.
@@ -106,14 +106,14 @@ Complete documentation for SDL schema development in ImtCore, with special focus
 
 Complete documentation for QML UI development and JQML web compilation in ImtCore.
 
-**[📚 QML Documentation Index](Docs/QML_Documentation_Index.md)** - Complete overview and learning paths
+**[📚 QML Documentation Index](Docs/Qml/QML_Documentation_Index.md)** - Complete overview and learning paths
 
 #### Quick Links:
 
-- **[Getting Started](Docs/QML_Getting_Started.md)** ⭐ **START HERE** - Introduction to QML development with ImtCore
-- **[Module Reference](Docs/QML_Module_Reference.md)** - Detailed reference for all QML modules (~300 components)
-- **[JQML Guide](Docs/QML_JQML_Guide.md)** - JQML versions (v1/v2/v3), web compilation, cross-platform development
-- **[Component Tutorials](Docs/QML_Component_Tutorials.md)** - 10 practical tutorials for common UI patterns
+- **[Getting Started](Docs/Qml/QML_Getting_Started.md)** ⭐ **START HERE** - Introduction to QML development with ImtCore
+- **[Module Reference](Docs/Qml/QML_Module_Reference.md)** - Detailed reference for all QML modules (~300 components)
+- **[JQML Guide](Docs/Qml/QML_JQML_Guide.md)** - JQML versions (v1/v2/v3), web compilation, cross-platform development
+- **[Component Tutorials](Docs/Qml/QML_Component_Tutorials.md)** - 10 practical tutorials for common UI patterns
 
 **Modules**: imtcontrols (~160 components) · imtgui (~90) · imtguigql (~35) · 8 domain-specific modules
 **JQML**: v1 (PureQML) · v2 (JQML2 + 3D/Three.js) · v3 (JQ compiler with source maps)

@@ -125,7 +125,7 @@ ApplicationMain {
 
 ## 🔗 Weiterführende Links
 
-- [Include/README.md — User Interface](../Include/README.md#user-interface-16-libraries-total-7-core--9-domain-specific) — C++ Backend-Bibliotheken
-- [Tools/JQML/v2/README-3D.md](../Tools/JQML/v2/README-3D.md) — JQML2 3D-Dokumentation
-- [Tools/JQML/v3/compiler/README.md](../Tools/JQML/v3/compiler/README.md) — JQML v3 Compiler-Architektur
-- [Docs/Tutorials](Tutorials/) — Bestehende Tutorials und Demos
+- [Include/README.md — User Interface](../../Include/README.md#user-interface-16-libraries-total-7-core--9-domain-specific) — C++ Backend-Bibliotheken
+- [Tools/JQML/v2/README-3D.md](../../Tools/JQML/v2/README-3D.md) — JQML2 3D-Dokumentation
+- [Tools/JQML/v3/compiler/README.md](../../Tools/JQML/v3/compiler/README.md) — JQML v3 Compiler-Architektur
+- [Docs/Tutorials](../Tutorials/) — Bestehende Tutorials und Demos

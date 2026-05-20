@@ -824,4 +824,4 @@ Item {
 - **[Getting Started](QML_Getting_Started.md)** — Einstieg
 - **[Modul-Referenz](QML_Module_Reference.md)** — Alle Komponenten
 - **[JQML Guide](QML_JQML_Guide.md)** — Web-Kompilierung
-- **[ImtControlsGallery](../Impl/ImtControlsGallery/)** — Demo-Applikation
+- **[ImtControlsGallery](../../Impl/ImtControlsGallery/)** — Demo-Applikation
