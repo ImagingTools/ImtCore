@@ -253,7 +253,7 @@ sdl::imtauth::Users::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 		}
 	}
 
-	QByteArray objectId = m_userCollectionCompPtr->InsertNewObject("User", "", "", userInfoPtr.GetPtr(), userId);
+	QByteArray objectId = m_userCollectionCompPtr->InsertNewObject("User", userInfoPtr->GetName(), "", userInfoPtr.GetPtr(), userId);
 	if (objectId.isEmpty()){
 		errorMessage = QString("Unable to register user. Error: Insert object to collection failed");
 		SendWarningMessage(0, errorMessage, "CUserControllerComp");
@@ -556,7 +556,7 @@ sdl::imtauth::Users::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperu
 	imtauth::IUserInfo::SystemInfo systemInfo;
 	superuserInfoPtr->AddToSystem(systemInfo);
 
-	QByteArray result = m_userCollectionCompPtr->InsertNewObject("User", "", "", superuserInfoPtr.GetPtr(), objectId);
+	QByteArray result = m_userCollectionCompPtr->InsertNewObject("User", "superuser", "System administrator", superuserInfoPtr.GetPtr(), objectId);
 	if (result.isEmpty()){
 		response.message = QString("Unable to insert superuser to user collection");
 		return retVal;

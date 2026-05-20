@@ -7,7 +7,13 @@
 #include <windows.h>
 #include <LMaccess.h>
 #include <Lmapibuf.h>
+#include <sddl.h>
+#include <ActiveDS.h>
+#include <Adshlp.h>
 #pragma comment(lib, "netapi32.lib")
+#pragma comment(lib, "advapi32.lib")
+#pragma comment(lib, "activeds.lib")
+#pragma comment(lib, "adsiid.lib")
 #endif
 
 // ACF includes
@@ -30,6 +36,148 @@ namespace imtauth
 CLdapUserCollectionControllerComp::CLdapUserCollectionControllerComp()
 	:m_checkLdapUsersThreadThread(*this)
 {
+}
+
+
+// public static methods
+
+QByteArray CLdapUserCollectionControllerComp::GetSidForUser(const QByteArray& username)
+{
+	QByteArray result;
+
+#ifdef Q_OS_WIN
+	// When username is in DOMAIN\Email format (e.g. "DOMAIN\user@email.com"),
+	// LookupAccountNameW does not support "DOMAIN\UPN" notation.
+	// In that case, use the email/UPN part directly, which already contains domain information.
+	QByteArray lookupName = username;
+	int backslashPos = username.indexOf('\\');
+	if (backslashPos >= 0){
+		QByteArray userPart = username.mid(backslashPos + 1);
+		if (userPart.contains('@')){
+			lookupName = userPart;
+		}
+	}
+
+	DWORD sidSize = 0;
+	DWORD domainNameSize = 0;
+	SID_NAME_USE sidNameUse;
+
+	LookupAccountNameW(NULL, qUtf16Printable(lookupName), NULL, &sidSize, NULL, &domainNameSize, &sidNameUse);
+	if (GetLastError() != ERROR_INSUFFICIENT_BUFFER || sidSize == 0){
+		return result;
+	}
+
+	QByteArray sidBuffer(sidSize, 0);
+	QByteArray domainBuffer(domainNameSize * sizeof(wchar_t), 0);
+	PSID sidPtr = reinterpret_cast<PSID>(sidBuffer.data());
+	LPWSTR domainNamePtr = reinterpret_cast<LPWSTR>(domainBuffer.data());
+
+	if (LookupAccountNameW(NULL, qUtf16Printable(lookupName), sidPtr, &sidSize, domainNamePtr, &domainNameSize, &sidNameUse)){
+		LPWSTR sidStringPtr = NULL;
+		if (ConvertSidToStringSidW(sidPtr, &sidStringPtr)){
+			result = QString::fromWCharArray(sidStringPtr).toUtf8();
+			LocalFree(sidStringPtr);
+		}
+	}
+#else
+	Q_UNUSED(username)
+#endif
+
+	return result;
+}
+
+
+QString CLdapUserCollectionControllerComp::GetEmailForUser(const QByteArray& username)
+{
+	QString result;
+
+#ifdef Q_OS_WIN
+	// Extract sAMAccountName from DOMAIN\username format
+	QByteArray samName = username;
+	int backslashPos = username.indexOf('\\');
+	if (backslashPos >= 0){
+		samName = username.mid(backslashPos + 1);
+	}
+
+	// If user part is in UPN format (user@domain), extract just the username
+	int atPos = samName.indexOf('@');
+	if (atPos >= 0){
+		samName = samName.left(atPos);
+	}
+
+	if (samName.isEmpty()){
+		return result;
+	}
+
+	// Use ADSI to query the mail attribute from Active Directory
+	HRESULT hrCom = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+	bool shouldUninit = SUCCEEDED(hrCom);
+
+	if (shouldUninit || hrCom == RPC_E_CHANGED_MODE){
+		IADs* rootDsePtr = nullptr;
+		HRESULT hr = ADsGetObject(L"LDAP://rootDSE", IID_IADs, (void**)&rootDsePtr);
+		if (SUCCEEDED(hr)){
+			BSTR propName = SysAllocString(L"defaultNamingContext");
+			VARIANT var;
+			VariantInit(&var);
+			hr = rootDsePtr->Get(propName, &var);
+			SysFreeString(propName);
+
+			if (SUCCEEDED(hr) && var.vt == VT_BSTR){
+				QString searchPath = QString("LDAP://%1").arg(QString::fromWCharArray(var.bstrVal));
+				VariantClear(&var);
+
+				IDirectorySearch* searchPtr = nullptr;
+				hr = ADsGetObject(reinterpret_cast<LPCWSTR>(searchPath.utf16()), IID_IDirectorySearch, (void**)&searchPtr);
+				if (SUCCEEDED(hr)){
+					// Escape special LDAP filter characters in sAMAccountName
+					QString escapedSamName = QString::fromUtf8(samName);
+					escapedSamName.replace(QLatin1String("\\"), QLatin1String("\\5c"));
+					escapedSamName.replace(QLatin1String("*"), QLatin1String("\\2a"));
+					escapedSamName.replace(QLatin1String("("), QLatin1String("\\28"));
+					escapedSamName.replace(QLatin1String(")"), QLatin1String("\\29"));
+					escapedSamName.replace(QLatin1Char('\0'), QLatin1String("\\00"));
+					escapedSamName.replace(QLatin1String("/"), QLatin1String("\\2f"));
+
+					QString filter = QString("(&(objectClass=user)(sAMAccountName=%1))").arg(escapedSamName);
+					std::wstring filterW = filter.toStdWString();
+					WCHAR mailAttrName[] = L"mail";
+					LPWSTR searchAttrs[] = { mailAttrName };
+					ADS_SEARCH_HANDLE searchHandle = nullptr;
+
+					hr = searchPtr->ExecuteSearch(filterW.data(), searchAttrs, 1, &searchHandle);
+					if (SUCCEEDED(hr)){
+						if (searchPtr->GetNextRow(searchHandle) == S_OK){
+							ADS_SEARCH_COLUMN column;
+							hr = searchPtr->GetColumn(searchHandle, mailAttrName, &column);
+							if (SUCCEEDED(hr)){
+								if (column.pADsValues != nullptr && column.dwNumValues > 0
+									&& column.dwADsType == ADSTYPE_CASE_IGNORE_STRING){
+									result = QString::fromWCharArray(column.pADsValues->CaseIgnoreString);
+								}
+								searchPtr->FreeColumn(&column);
+							}
+						}
+						searchPtr->CloseSearchHandle(searchHandle);
+					}
+					searchPtr->Release();
+				}
+			}
+			else{
+				VariantClear(&var);
+			}
+			rootDsePtr->Release();
+		}
+	}
+
+	if (shouldUninit){
+		CoUninitialize();
+	}
+#else
+	Q_UNUSED(username)
+#endif
+
+	return result;
 }
 
 
@@ -123,6 +271,9 @@ const imtauth::IUserInfo* CLdapUserCollectionControllerComp::CheckLdapUsersThrea
 		QByteArray password = QString::fromWCharArray(userInfo3BufPtr->usri3_password).toUtf8();
 		userInfoPtr->SetPasswordHash(password);
 
+		QByteArray sid = CLdapUserCollectionControllerComp::GetSidForUser(userName);
+		userInfoPtr->SetSid(sid);
+
 		QString name = QString::fromWCharArray(userInfo3BufPtr->usri3_full_name);
 		if (!name.isEmpty()){
 			userInfoPtr->SetName(name);
@@ -133,6 +284,11 @@ const imtauth::IUserInfo* CLdapUserCollectionControllerComp::CheckLdapUsersThrea
 
 		QString description = QString::fromWCharArray(userInfo3BufPtr->usri3_comment);
 		userInfoPtr->SetDescription(description);
+
+		QString email = CLdapUserCollectionControllerComp::GetEmailForUser(userId);
+		if (!email.isEmpty()){
+			userInfoPtr->SetMail(email);
+		}
 
 		NetApiBufferFree(userInfo3BufPtr);
 
