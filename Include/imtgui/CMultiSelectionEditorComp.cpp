@@ -65,7 +65,7 @@ void CMultiSelectionEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 	while (!m_checkBoxMap.isEmpty()){
 		QPointer<QCheckBox> optionCheckPtr = m_checkBoxMap.take(m_checkBoxMap.firstKey());
 		if (!optionCheckPtr.isNull()){
-			disconnect(optionCheckPtr, &QCheckBox::stateChanged, this, &CMultiSelectionEditorComp::OnCheckBoxStateChanged);
+			disconnect(optionCheckPtr, &QCheckBox::checkStateChanged, this, &CMultiSelectionEditorComp::OnCheckBoxStateChanged);
 		}
 	}
 	
@@ -89,7 +89,7 @@ void CMultiSelectionEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 			Q_ASSERT(!m_checkBoxMap.contains(optionId));
 
 			m_checkBoxMap.insert(optionId, optionCheckPtr);
-			connect(optionCheckPtr, &QCheckBox::stateChanged, this, &CMultiSelectionEditorComp::OnCheckBoxStateChanged);
+			connect(optionCheckPtr, &QCheckBox::checkStateChanged, this, &CMultiSelectionEditorComp::OnCheckBoxStateChanged);
 
 			layoutPtr->addWidget(optionCheckPtr);
 		}

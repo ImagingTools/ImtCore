@@ -24,6 +24,7 @@
 namespace imtdb
 {
 
+
 class CDatabaseEngineAttr: public ilog::CLoggerComponentBase
 {
 public:
@@ -40,6 +41,7 @@ class CDatabaseEngineComp:
 			virtual public IDatabaseServerConnectionChecker
 {
 	Q_OBJECT
+
 public:
 	typedef CDatabaseEngineAttr BaseClass;
 
@@ -173,6 +175,7 @@ private:
 
 	mutable std::mutex m_connectedThreadsMutex;
 	mutable std::set<quintptr> m_connectedThreads;
+	mutable bool m_shuttingDown = false;
 };
 
 

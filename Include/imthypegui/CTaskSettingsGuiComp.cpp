@@ -26,8 +26,10 @@ CTaskSettingsGuiComp::CTaskSettingsGuiComp()
 {
 #if QT_VERSION > 0x060000
 	m_taskNameValidator.setRegularExpression(QRegularExpression("^[^\\\\/:\\*\\?\"\\<\\>\\|\\+]+$"));
+	m_triggerIdValidator.setRegularExpression(QRegularExpression("^[0-9]{1,1}$"));
 #else
 	m_taskNameValidator.setRegExp(QRegExp("^[^\\\\/:\\*\\?\"\\<\\>\\|\\+]+$"));
+	m_triggerIdValidator.setRegExp(QRegExp("^[0-9]{0,1}$"));		// camera can have up to 10 images, i.e. trigger id 0-9
 #endif
 }
 
@@ -77,9 +79,17 @@ void CTaskSettingsGuiComp::UpdateModel() const
 
 		if (taskSettingsPtr->GetTaskInputs() == nullptr){
 			taskSettingsPtr->SetTaskInputId(InputIdEdit->text().toUtf8());
+			taskSettingsPtr->SetTaskInputSubId(QByteArray());
 		}
 		else {
-			taskSettingsPtr->SetTaskInputId(InputSelector->currentText().toUtf8());
+			taskSettingsPtr->SetTaskInputId(InputSelector->currentData().toByteArray());
+			QByteArray subId = TriggerSelector->text().toUtf8();
+			if (subId.isEmpty()){
+				taskSettingsPtr->SetTaskInputSubId(QByteArray::number(0));
+			}
+			else{
+				taskSettingsPtr->SetTaskInputSubId(subId);
+			}
 		}
 	}
 }
@@ -89,6 +99,8 @@ void CTaskSettingsGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*chang
 {
 	imthype::ITaskSettings* taskSettingsPtr = GetObservedObject();
 	if (taskSettingsPtr != nullptr){
+		const bool showAcqSubId = m_showAcquisitionSubIdSettingAttrPtr.IsValid() ? *m_showAcquisitionSubIdSettingAttrPtr : false;
+
 		TaskNameEdit->setText(taskSettingsPtr->GetTaskName());
 		TaskDescriptionEdit->setText(taskSettingsPtr->GetTaskDescription());
 		ActiveCheck->setChecked(taskSettingsPtr->GetTaskEnabled());
@@ -107,8 +119,19 @@ void CTaskSettingsGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*chang
 		InputSelector->blockSignals(false);
 
 		if (oldIndex != InputSelector->currentIndex()){
-			taskSettingsPtr->SetTaskInputId(InputSelector->currentText().toUtf8());
+			taskSettingsPtr->SetTaskInputId(InputSelector->currentData().toByteArray());
 		}
+
+		int oldTriggerId = TriggerSelector->text().toInt();
+		TriggerSelector->blockSignals(true);
+		TriggerSelector->setText(taskSettingsPtr->GetTaskInputSubId());
+		
+		TriggerSelector->blockSignals(false);
+		if (oldTriggerId != TriggerSelector->text().toInt()){
+			taskSettingsPtr->SetTaskInputSubId(TriggerSelector->text().toUtf8());
+		}
+		TriggerSelector->setVisible(showAcqSubId);
+		TriggerLabel->setVisible(showAcqSubId);
 	}
 }
 
@@ -120,6 +143,7 @@ void CTaskSettingsGuiComp::OnGuiCreated()
 	BaseClass::OnGuiCreated();
 
 	TaskNameEdit->setValidator(&m_taskNameValidator);
+	TriggerSelector->setValidator(&m_triggerIdValidator);
 
 	ShowAcquisitionManagerButton->setVisible(m_taskInputManagerGuiCompPtr.IsValid() && m_taskInputManagerObserverCompPtr.IsValid());
 }
@@ -141,7 +165,13 @@ void CTaskSettingsGuiComp::OnTryClose(bool* ignoredPtr)
 		int pos;
 		QString name = TaskNameEdit->text().trimmed();
 		if (m_taskNameValidator.validate(name, pos) != QValidator::Acceptable){
-			QMessageBox::critical(nullptr, tr("Error"), tr("The task name contains some not allowed characters"));
+			QMessageBox::critical(NULL, tr("Error"), tr("The task name contains some not allowed characters"));
+
+			*ignoredPtr = true;
+		}
+		QString trigger = TriggerSelector->text().trimmed();
+		if (m_triggerIdValidator.validate(trigger, pos) != QValidator::Acceptable) {
+			QMessageBox::critical(NULL, tr("Error"), tr("Acq-SubId must be a number"));
 
 			*ignoredPtr = true;
 		}
@@ -179,9 +209,22 @@ void CTaskSettingsGuiComp::on_InputIdEdit_editingFinished()
 }
 
 
+void CTaskSettingsGuiComp::on_TriggerSelector_editingFinished()
+{
+	DoUpdateModel();
+}
+
+
 void CTaskSettingsGuiComp::on_InputSelector_currentTextChanged(const QString& /*text*/)
 {
 	DoUpdateModel();
+
+	// If Reset was chosen -> reset current index
+	if (InputSelector->currentData().isNull()) {
+		InputSelector->blockSignals(true);
+		InputSelector->setCurrentIndex(-1);
+		InputSelector->blockSignals(false);
+	}
 }
 
 
@@ -203,12 +246,22 @@ void CTaskSettingsGuiComp::OnInputsChanged(const istd::IChangeable::ChangeSet& /
 {
 	InputSelector->blockSignals(true);
 	InputSelector->clear();
+	TriggerSelector->clear();
+	TriggerSelector->setVisible(false);
 
 	imtbase::IObjectCollection::Ids inputIds = inputsCollectionPtr->GetElementIds();
+	if (!inputIds.isEmpty()){
+		TriggerSelector->setVisible(true);
+	}
+
 	for (int i = 0; i < inputIds.count(); ++i){
 		QByteArray inputId = inputsCollectionPtr->GetElementInfo(inputIds[i], imtbase::ICollectionInfo::EIT_NAME).toString().toUtf8();
 		InputSelector->addItem(inputId, inputId);
 	}
+
+	// add Reset item to the input selector to allow resetting the input selection (i.e. setting no input)
+	if (InputSelector->count())
+		InputSelector->addItem(QObject::tr("Reset..."));
 
 	InputSelector->blockSignals(false);
 
@@ -232,7 +285,7 @@ void CTaskSettingsGuiComp::ShowInputsManager()
 					if ((const_cast<imod::IModel*>(modelPtr))->AttachObserver(m_taskInputManagerObserverCompPtr.GetPtr())){
 						iqtgui::CGuiComponentDialog dialog(m_taskInputManagerGuiCompPtr.GetPtr(), QDialogButtonBox::Close, false, GetWidget());
 						dialog.SetDialogGeometry(0.5);
-						dialog.setWindowTitle(tr("Task Input Manager"));
+						dialog.setWindowTitle(tr("Acquisition Manager"));
 
 						dialog.exec();
 

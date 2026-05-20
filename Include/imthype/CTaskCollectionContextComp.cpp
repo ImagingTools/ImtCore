@@ -66,6 +66,28 @@ void CTaskCollectionContextComp::SetTaskInputId(const QByteArray& taskInputId)
 }
 
 
+QByteArray CTaskCollectionContextComp::GetTaskInputSubId() const
+{
+	QMutexLocker lock(&m_dataMutex);
+
+	return m_taskInputSubId;
+}
+
+
+void CTaskCollectionContextComp::SetTaskInputSubId(const QByteArray& taskInputSubId)
+{
+	QMutexLocker lock(&m_dataMutex);
+
+	if (m_taskInputSubId != taskInputSubId) {
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_taskInputSubId = taskInputSubId;
+
+		lock.unlock();
+	}
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CTaskCollectionContextComp::Serialize(iser::IArchive & archive)
@@ -80,6 +102,11 @@ bool CTaskCollectionContextComp::Serialize(iser::IArchive & archive)
 	retVal = retVal && archive.BeginTag(taskInputIdTag);
 	retVal = retVal && archive.Process(m_taskInputId);
 	retVal = retVal && archive.EndTag(taskInputIdTag);
+
+	static iser::CArchiveTag taskInputSubIdTag("TaskInputSubId", "ID of the task input", iser::CArchiveTag::TT_LEAF);
+	/*retVal = retVal && */archive.BeginTag(taskInputSubIdTag);
+	/*retVal = retVal && */archive.Process(m_taskInputSubId);
+	/*retVal = retVal && */archive.EndTag(taskInputSubIdTag);
 
 	static iser::CArchiveTag taskIdTag("TaskId", "ID of the task in the collection", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(taskIdTag);
