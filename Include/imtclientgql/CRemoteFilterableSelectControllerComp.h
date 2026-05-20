@@ -6,16 +6,16 @@
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/FilterableSelect.h>
 
 
-namespace imtservergql
+namespace imtclientgql
 {
 
 
 class CRemoteFilterableSelectControllerComp:
-		public imtclientgql::TClientRequestManagerCompWrap<
+		public TClientRequestManagerCompWrap<
 						sdl::imtbase::FilterableSelect::CGraphQlHandlerCompBase>
 {
 public:
-	typedef imtclientgql::TClientRequestManagerCompWrap<sdl::imtbase::FilterableSelect::CGraphQlHandlerCompBase> BaseClass;
+	typedef TClientRequestManagerCompWrap<sdl::imtbase::FilterableSelect::CGraphQlHandlerCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CRemoteFilterableSelectControllerComp);
 		I_ASSIGN_MULTI_0(m_collectionIdsAttrPtr, "CollectionIds", "Collection ID to match incoming requests", true);
@@ -36,4 +36,4 @@ private:
 };
 
 
-} // namespace imtservergql
+} // namespace imtclientgql
