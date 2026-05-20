@@ -1409,7 +1409,7 @@ DocumentViewBase {
 										Column {
 											anchors.verticalCenter: parent.verticalCenter
 											spacing: Style.marginXS
-											width: parent.width - parent.spacing
+											width: parent.width
 
 											BaseText {
 												text: modelData.title || modelData.id || ""
@@ -1732,7 +1732,7 @@ DocumentViewBase {
 										Column {
 											anchors.verticalCenter: parent.verticalCenter
 											spacing: Style.marginXS
-											width: parent.width - parent.spacing
+											width: parent.width
 
 											BaseText {
 												text: modelData.title || modelData.id || ""
