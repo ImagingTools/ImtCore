@@ -1181,7 +1181,7 @@ DocumentViewBase {
 								id: createGlobalRoleBtn
 								visible: container.canManageMembers
 								anchors.verticalCenter: parent.verticalCenter
-								text: "+ " + qsTr("Create Global Role")
+								text: "+ " + qsTr("Create Role")
 								font.pixelSize: Style.fontSizeM
 								font.bold: true
 								color: Style.linkColor
@@ -1191,7 +1191,7 @@ DocumentViewBase {
 									hoverEnabled: true
 									cursorShape: Qt.PointingHandCursor
 									onClicked: {
-										rolesStackViewHeader.addHeader("create_role", qsTr("Create Global Role"))
+										rolesStackViewHeader.addHeader("create_role", qsTr("Create New Role"))
 										rolesStackView.addPage(roleEditorView)
 										rolesStackView.next()
 									}
@@ -1203,7 +1203,7 @@ DocumentViewBase {
 						SearchTextInput {
 							id: rolesFilter
 							width: parent.width
-							placeholderText: qsTr("Filter roles...")
+							placeHolderText: qsTr("Filter roles...")
 						}
 
 						Rectangle {
@@ -1646,7 +1646,7 @@ DocumentViewBase {
 									hoverEnabled: true
 									cursorShape: Qt.PointingHandCursor
 									onClicked: {
-										groupsStackViewHeader.addHeader("create_group", qsTr("Create Group"))
+										groupsStackViewHeader.addHeader("create_group", qsTr("Create New Group"))
 										groupsStackView.addPage(groupEditorView)
 										groupsStackView.next()
 									}
@@ -1658,7 +1658,7 @@ DocumentViewBase {
 						SearchTextInput {
 							id: groupsFilter
 							width: parent.width
-							placeholderText: qsTr("Filter groups...")
+							placeHolderText: qsTr("Filter groups...")
 						}
 
 						Rectangle {
