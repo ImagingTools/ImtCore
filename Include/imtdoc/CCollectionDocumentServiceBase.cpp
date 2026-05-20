@@ -695,14 +695,7 @@ IDocumentService::OperationStatus CCollectionDocumentServiceBase::CloseDocument(
 }
 
 
-} // namespace imtdoc
-
-
 // reimplemented (imtdoc::CDocumentServiceBase)
-
-namespace imtdoc
-{
-
 
 QString CCollectionDocumentServiceBase::GetDefaultDocumentName(const WorkingDocument& document) const
 {
