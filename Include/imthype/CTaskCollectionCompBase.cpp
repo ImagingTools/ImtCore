@@ -24,36 +24,6 @@ static QByteArray s_taskInputId = "CTaskCollectionCompBase::TaskInputId";
 static QByteArray s_taskInputSubId = "CTaskCollectionCompBase::TaskInputSubId";
 
 
-// helper methods of ITaskCollection
-
-int ITaskCollection::AssignNextNumberedTaskId(ITaskCollection& collection, const QByteArray& taskId)
-{
-	int lastUserId = 0;
-
-	imtbase::IObjectCollection::Ids ids = collection.GetElementIds();
-	for (imtbase::IObjectCollection::Id id : ids) {
-		QByteArray userId = collection.GetUserTaskId(id);
-
-		bool isOk = false;
-		int convertedUserId = userId.toInt(&isOk);
-
-		if (isOk) {
-			if (convertedUserId > lastUserId) {
-				lastUserId = convertedUserId;
-			}
-		}
-	}
-
-	if (lastUserId >= 0) {
-		collection.SetUserTaskId(taskId, QByteArray(QString::number(lastUserId + 1).toUtf8()));
-		return lastUserId + 1;
-	}
-
-	// failed by some reason
-	return -1;
-}
-
-
 // public methods
 
 CTaskCollectionCompBase::CTaskCollectionCompBase()
