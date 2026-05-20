@@ -167,7 +167,7 @@ imtauthdb.depends = imtbase imtauth imtgql
 
 SUBDIRS += imtauthgql
 imtauthgql.file = ../../Include/imtauthgql/QMake/imtauthgql.pro
-imtauthgql.depends = imtauthsdl imtgql imtauth imtbase
+imtauthgql.depends = imtauthsdl imtgql
 
 SUBDIRS += imtcrypt
 imtcrypt.file = ../../Include/imtcrypt/QMake/imtcrypt.pro
@@ -217,7 +217,7 @@ imtlic.file = ../../Include/imtlic/QMake/imtlic.pro
 
 SUBDIRS += imtlicgql
 imtlicgql.file = ../../Include/imtlicgql/QMake/imtlicgql.pro
-imtlicgql.depends = imtlic imtlicsdl imtguigql imtgui imtwidgets imtauth
+imtlicgql.depends = imtlic imtlicsdl imtguigql imtgui imtauth
 
 SUBDIRS += imtgql
 imtgql.file = ../../Include/imtgql/QMake/imtgql.pro
@@ -397,11 +397,11 @@ ImtLicensePck.depends = imtbase imtgql imtlic
 
 SUBDIRS += ImtLicenseGqlPck
 ImtLicenseGqlPck.file = ../../Impl/ImtLicenseGqlPck/QMake/ImtLicenseGqlPck.pro
-ImtLicenseGqlPck.depends = imtlicgql imtlicgui imtguigql imtgui imtwidgets imtauth imtdb imtservergql imtserverapp imtgql imtcol
+ImtLicenseGqlPck.depends = imtlicgql imtlicgui imtguigql imtgui imtauth imtdb imtservergql imtserverapp
 
 SUBDIRS += ImtLicenseGuiPck
 ImtLicenseGuiPck.file = ../../Impl/ImtLicenseGuiPck/QMake/ImtLicenseGuiPck.pro
-ImtLicenseGuiPck.depends = imtbase imtlic imtlicgui imtgui imtloggui imtwidgets imtcrypt imtstyle
+ImtLicenseGuiPck.depends = imtbase imtlic imtlicgui imtgui imtloggui imtcrypt
 
 SUBDIRS += ImtCryptPck
 ImtCryptPck.file = ../../Impl/ImtCryptPck/QMake/ImtCryptPck.pro
@@ -500,11 +500,11 @@ ImtAuthDbPck.depends = imtauthdb imtdb imtbase imtauth imtcol
 
 SUBDIRS += ImtAuthGqlPck
 ImtAuthGqlPck.file = ../../Impl/ImtAuthGqlPck/QMake/ImtAuthGqlPck.pro
-ImtAuthGqlPck.depends = imtauthgql imtqml imtlic imtguigql imtservergql imtserverapp imtclientgql imtgql imtdb imtcol imtdoc imtmail
+ImtAuthGqlPck.depends = imtauthgql imtqml imtlic imtguigql imtservergql imtserverapp imtclientgql imtdb imtdoc imtmail
 
 SUBDIRS += ImtClientGqlPck
 ImtClientGqlPck.file = ../../Impl/ImtClientGqlPck/QMake/ImtClientGqlPck.pro
-ImtClientGqlPck.depends = imtclientgql imtbasesdl imtservergql imtserverapp imtgql imtrest imtcom
+ImtClientGqlPck.depends = imtclientgql imtbasesdl imtservergql imtserverapp imtrest imtcom
 
 SUBDIRS += ImtHttpPck
 ImtHttpPck.file = ../../Impl/ImtHttpPck/QMake/ImtHttpPck.pro
@@ -524,7 +524,7 @@ ImtServerAppPck.depends = imtserverapp imtgql
 
 SUBDIRS += EagleView
 EagleView.file = ../../Impl/EagleView/QMake/EagleView.pro
-EagleView.depends = imt3dgui imtgui imtstyle imt3d imt3dview
+EagleView.depends = imt3dgui imtgui imt3d imt3dview
 
 SUBDIRS += Imt3dDemo
 Imt3dDemo.file = ../../Impl/Imt3dDemo/QMake/Imt3dDemo.pro
@@ -540,7 +540,7 @@ ImtHypeDbPck.depends = imthypedb imtbase imtdb imthype
 
 SUBDIRS += ImtHypeGuiPck
 ImtHypeGuiPck.file = ../../Impl/ImtHypeGuiPck/QMake/ImtHypeGuiPck.pro
-ImtHypeGuiPck.depends = imthypegui imthype imtwidgets imtgui imtstyle imtbase
+ImtHypeGuiPck.depends = imthypegui imthype imtwidgets imtgui
 
 SUBDIRS += ImtChatPck
 ImtChatPck.file = ../../Impl/ImtChatPck/QMake/ImtChatPck.pro
@@ -560,15 +560,15 @@ ImtDeskDbPck.depends = imtdeskdb imtdb imtdesk imtbase imtcol
 
 SUBDIRS += ImtChatGqlPck
 ImtChatGqlPck.file = ../../Impl/ImtChatGqlPck/QMake/ImtChatGqlPck.pro
-ImtChatGqlPck.depends = imtchatgql imtdb imtchat imtchatsdl imtservergql imtserverapp imtgql imtcol imtbasesdl imtbase
+ImtChatGqlPck.depends = imtchatgql imtdb imtchat imtchatsdl imtservergql imtserverapp
 
 SUBDIRS += ImtDeskGqlPck
 ImtDeskGqlPck.file = ../../Impl/ImtDeskGqlPck/QMake/ImtDeskGqlPck.pro
-ImtDeskGqlPck.depends = imtdeskgql imtdb imtdesk imtdesksdl imtservergql imtserverapp imtgql imtcol imtdoc imtbasesdl imtbase
+ImtDeskGqlPck.depends = imtdeskgql imtdb imtdesk imtdesksdl imtservergql imtserverapp imtdoc
 
 SUBDIRS += ImtGeoPck
 ImtGeoPck.file = ../../Impl/ImtGeoPck/QMake/ImtGeoPck.pro
-ImtGeoPck.depends = imtgeo imtguigql imtservergql imtcol imtgql imtserverapp imtdb
+ImtGeoPck.depends = imtgeo imtguigql imtservergql imtserverapp imtdb
 
 SUBDIRS += ImtEjPck
 ImtEjPck.file = ../../Impl/ImtEjPck/QMake/ImtEjPck.pro
