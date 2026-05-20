@@ -610,11 +610,7 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateSortQuery(const imtbase::IComplex
 
 QString CSqlDatabaseObjectDelegateCompBase::EncodeTextArgument(const QString& argument) const
 {
-	QString retVal = argument;
-
-	retVal.replace("'", "''");
-
-	return retVal;
+	return SqlEncode(argument);
 }
 
 

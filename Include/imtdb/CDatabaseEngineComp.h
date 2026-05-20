@@ -18,11 +18,13 @@
 #include <imtdb/IMigrationController.h>
 
 // std includes
+#include <atomic>
 #include <set>
 
 
 namespace imtdb
 {
+
 
 class CDatabaseEngineAttr: public ilog::CLoggerComponentBase
 {
@@ -40,6 +42,7 @@ class CDatabaseEngineComp:
 			virtual public IDatabaseServerConnectionChecker
 {
 	Q_OBJECT
+
 public:
 	typedef CDatabaseEngineAttr BaseClass;
 
@@ -173,6 +176,7 @@ private:
 
 	mutable std::mutex m_connectedThreadsMutex;
 	mutable std::set<quintptr> m_connectedThreads;
+	mutable std::atomic<bool> m_shuttingDown{false};
 };
 
 

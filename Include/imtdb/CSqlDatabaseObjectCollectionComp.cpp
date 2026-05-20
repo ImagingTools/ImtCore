@@ -15,6 +15,7 @@
 #include <imtbase/IRevisionController.h>
 #include <imtbase/CParamsSetJoiner.h>
 #include <imtdb/CSqlDatabaseObjectCollectionIterator.h>
+#include <imtdb/imtdb.h>
 
 
 namespace imtdb
@@ -638,20 +639,9 @@ imtbase::IObjectCollectionIterator* CSqlDatabaseObjectCollectionComp::CreateObje
 		return nullptr;
 	}
 
-	int totalCount = 0;
-	if (sqlQuery.first()){
-		const QSqlRecord firstRecord = sqlQuery.record();
-		const int fieldIndex = firstRecord.indexOf("TotalCount");
-		if (fieldIndex >= 0){
-			totalCount = firstRecord.value(fieldIndex).toInt();
-		}
-		sqlQuery.seek(-1);
-	}
-
 	return new CSqlDatabaseObjectCollectionIterator(
 				sqlQuery,
-				m_objectDelegateCompPtr.GetPtr(),
-				totalCount);
+				m_objectDelegateCompPtr.GetPtr());
 }
 
 
@@ -732,7 +722,8 @@ bool CSqlDatabaseObjectCollectionComp::SetElementName(const Id& elementId, const
 		return false;
 	}
 
-	QByteArray query = m_objectDelegateCompPtr->CreateRenameObjectQuery(*this, elementId, name, nullptr);
+	QString escapedName = imtdb::SqlEncode(name);
+	QByteArray query = m_objectDelegateCompPtr->CreateRenameObjectQuery(*this, elementId, escapedName, nullptr);
 	if (query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 
@@ -766,8 +757,16 @@ bool CSqlDatabaseObjectCollectionComp::SetElementDescription(const Id& elementId
 
 		return false;
 	}
+	QString escapedDescription = imtdb::SqlEncode(description);
+	if (escapedDescription.length() > *m_maxLengthCommentAttrPtr){
+		escapedDescription = escapedDescription.left(*m_maxLengthCommentAttrPtr);
+		// Ensure we don't split an escaped quote pair ('')
+		while (escapedDescription.endsWith(QLatin1Char('\'')) && escapedDescription.count(QLatin1Char('\'')) % 2 != 0){
+			escapedDescription.chop(1);
+		}
+	}
 
-QByteArray query = m_objectDelegateCompPtr->CreateDescriptionObjectQuery(*this, elementId, description, nullptr);
+	QByteArray query = m_objectDelegateCompPtr->CreateDescriptionObjectQuery(*this, elementId, escapedDescription, nullptr);
 	if (query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 

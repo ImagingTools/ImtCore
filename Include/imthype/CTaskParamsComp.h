@@ -27,7 +27,6 @@ public:
 	// reimplemented (iprm::IParamsSet)
 	virtual Ids GetParamIds(bool editableOnly = false) const override;
 	virtual const iser::ISerializable* GetParameter(const QByteArray& id) const override;
-	virtual const iprm::IParamsInfoProvider* GetParamsInfoProvider() const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)
@@ -59,8 +58,16 @@ private:
 		virtual QByteArray GetId() const override;
 	};
 
+	class TaskInputSubIdParam : public TaskIdParam
+	{
+	public:
+		// reimplemented (iprm::IIdParam)
+		virtual QByteArray GetId() const override;
+	};
+
 	imod::TModelWrap<TaskIdParam> m_taskIdParam;
 	imod::TModelWrap<TaskInputIdParam> m_taskInputIdParam;
+	imod::TModelWrap<TaskInputSubIdParam> m_taskInputSubIdParam;
 private:
 	I_REF(ITaskCollectionContext, m_collectionContextCompPtr);
 };

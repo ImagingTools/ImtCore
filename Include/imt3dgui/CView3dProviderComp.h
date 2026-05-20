@@ -33,11 +33,11 @@ public:
 		I_ASSIGN(m_showSceneDecorationsCommandsAttrPtr, "ShowSceneDecorationsCommands", "Show grid/axis/ruler commands", true, true);
 		I_ASSIGN(m_showViewpointCommandsAttrPtr, "ShowViewpointCommands", "Show view point commands", true, true);
 		I_ASSIGN(m_showViewModeCommandsAttrPtr, "ShowViewModeCommands", "Show view mode commands", true, true);
-		I_ASSIGN(m_showZoomInCommandAttrPtr, "ShowShowZoomInCommand", "Enable command for zoom-in", true, false);
-		I_ASSIGN(m_showZoomOutCommandAttrPtr, "ShowShowZoomOutCommand", "Enable command for zoom-out", true, false);
-		I_ASSIGN(m_showShowGridCommandAttrPtr, "ShowShowGridCommand", "Enable command for show/hide grid", true, false);
-		I_ASSIGN(m_showShowAxisCommandAttrPtr, "ShowShowAxisCommands", "Enable command for show/hide axis", true, false);
-		I_ASSIGN(m_showShowRulerCommandAttrPtr, "ShowShowRulerCommands", "Enable command for show/hide ruler", true, false);
+		I_ASSIGN(m_showZoomInCommandAttrPtr, "ShowZoomInCommand", "Enable command for zoom-in", true, false);
+		I_ASSIGN(m_showZoomOutCommandAttrPtr, "ShowZoomOutCommand", "Enable command for zoom-out", true, false);
+		I_ASSIGN(m_showShowGridCommandAttrPtr, "ShowGridCommand", "Enable command for show/hide grid", true, false);
+		I_ASSIGN(m_showShowAxisCommandAttrPtr, "ShowAxisCommands", "Enable command for show/hide axis", true, false);
+		I_ASSIGN(m_showShowRulerCommandAttrPtr, "ShowRulerCommands", "Enable command for show/hide ruler", true, false);
 	I_END_COMPONENT
 
 protected:
