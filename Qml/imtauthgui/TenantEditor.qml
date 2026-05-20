@@ -1148,328 +1148,123 @@ DocumentViewBase {
 				id: rolesListView
 
 				Item {
-					FilterableSelectGqlDataProvider {
-						id: rolesDataProvider
-						collectionId: "Roles"
-						pageSize: 50
-					}
-
-					Component.onCompleted: {
-						rolesDataProvider.fetch("")
-					}
-
-					// Header (fixed)
+					// Environment Roles (vertical list above filter)
 					Column {
-						id: rolesListHeader
+						id: envRolesSection
 						anchors.top: parent.top
 						anchors.topMargin: Style.marginM
 						anchors.left: parent.left
 						anchors.leftMargin: Style.marginXL
 						anchors.right: parent.right
 						anchors.rightMargin: Style.marginXL
-						spacing: Style.marginM
+						spacing: 0
 
-						Row {
-							width: parent.width
-							spacing: Style.marginM
-
-							BaseText {
-								anchors.verticalCenter: parent.verticalCenter
-								text: qsTr("Manage roles for workspace members.")
-								font.pixelSize: Style.fontSizeS
-								color: Style.inactiveTextColor
-							}
-
-							Item {
-								width: parent.width
-									- parent.children[0].width
-									- (createGlobalRoleBtn.visible ? createGlobalRoleBtn.width : 0)
-									- parent.spacing * 2
-								height: 1
-							}
-
-							Text {
-								id: createGlobalRoleBtn
-								visible: container.canManageMembers
-								anchors.verticalCenter: parent.verticalCenter
-								text: "+ " + qsTr("Create Role")
-								font.pixelSize: Style.fontSizeM
-								font.bold: true
-								color: Style.linkColor
-
-								MouseArea {
-									anchors.fill: parent
-									hoverEnabled: true
-									cursorShape: Qt.PointingHandCursor
-									onClicked: {
-										rolesStackViewHeader.addHeader("create_role", qsTr("Create New Role"))
-										rolesStackView.addPage(roleEditorView)
-										rolesStackView.next()
-									}
-								}
-							}
+						BaseText {
+							text: qsTr("Environment Roles")
+							font.pixelSize: Style.fontSizeM
+							color: Style.textColor
+							bottomPadding: Style.marginS
 						}
 
-						// Filter
-						SearchTextInput {
-							id: rolesFilter
-							width: parent.width
-							placeHolderText: qsTr("Filter roles...")
-							onTextChanged: rolesDataProvider.fetch(text)
+						Repeater {
+							model: ListModel {
+								ListElement { name: "Creator"; desc: "Full control + Permissions. Permanent."; icon: "Icons/Crown" }
+								ListElement { name: "Owner"; desc: "Superuser. All except Permissions."; icon: "Icons/Key" }
+								ListElement { name: "Admin"; desc: "Manage members, roles, groups."; icon: "Icons/AdminPanel" }
+								ListElement { name: "Member"; desc: "Read-only. Default on invite accept."; icon: "Icons/User" }
+							}
+
+							delegate: Row {
+								width: envRolesSection.width
+								height: Style.iconSizeM + Style.marginS
+								spacing: Style.marginS
+
+								Image {
+									width: Style.iconSizeM
+									height: Style.iconSizeM
+									anchors.verticalCenter: parent.verticalCenter
+									source: Style.icon(model.icon)
+									sourceSize: Qt.size(Style.iconSizeM, Style.iconSizeM)
+								}
+
+								BaseText {
+									anchors.verticalCenter: parent.verticalCenter
+									text: model.name
+									font.pixelSize: Style.fontSizeS
+									color: Style.textColor
+								}
+
+								BaseText {
+									anchors.verticalCenter: parent.verticalCenter
+									text: "— " + model.desc
+									font.pixelSize: Style.fontSizeS
+									color: Style.inactiveTextColor
+								}
+							}
 						}
 
 						Rectangle {
 							width: parent.width
 							height: 1
 							color: Style.borderColor
+							topMargin: Style.marginM
 						}
 					}
 
-					// Scrollable roles list
-					CustomScrollbar {
-						id: rolesListScrollbar
-						z: parent.z + 1
-						anchors.right: parent.right
-						anchors.top: rolesListContent.top
-						anchors.bottom: rolesListContent.bottom
-						secondSize: Style.marginM
-						targetItem: rolesListContent
-					}
-
-					Flickable {
-						id: rolesListContent
-						anchors.top: rolesListHeader.bottom
+					// Roles collection list (using reusable component)
+					TenantCollectionListView {
+						anchors.top: envRolesSection.bottom
 						anchors.topMargin: Style.marginM
-						anchors.bottom: parent.bottom
-						anchors.bottomMargin: Style.marginXL
 						anchors.left: parent.left
-						anchors.leftMargin: Style.marginXL
-						anchors.right: rolesListScrollbar.left
-						anchors.rightMargin: Style.marginXL
-						contentWidth: rolesListColumn.width
-						contentHeight: rolesListColumn.height
-						boundsBehavior: Flickable.StopAtBounds
-						clip: true
+						anchors.right: parent.right
+						anchors.bottom: parent.bottom
+						collectionId: "Roles"
+						filterPlaceholder: qsTr("Filter roles...")
+						emptyMessage: qsTr("No roles created yet.")
+						createButtonText: qsTr("Create Role")
+						canManage: container.canManageMembers
 
-						Column {
-							id: rolesListColumn
-							width: rolesListContent.width
-							spacing: 0
+						onCreateRequested: {
+							rolesStackViewHeader.addHeader("create_role", qsTr("Create New Role"))
+							rolesStackView.addPage(roleEditorView)
+							rolesStackView.next()
+						}
 
-							// --- Section: Tenant Environment Roles ---
-							BaseText {
-								text: qsTr("Environment Roles")
-								font.pixelSize: Style.fontSizeM
-								font.bold: true
-								color: Style.textColor
-								topPadding: Style.marginM
-								bottomPadding: Style.marginM
-							}
+						onEditRequested: function(itemId, itemName, itemDescription) {
+							rolesPage.__editRoleId = itemId
+							rolesPage.__editRoleName = itemName
+							rolesPage.__editRoleDescription = itemDescription
+							rolesStackViewHeader.addHeader("edit_role", qsTr("Edit Role"))
+							rolesStackView.addPage(roleEditView)
+							rolesStackView.next()
+						}
 
-							Repeater {
-								model: ListModel {
-									id: envRolesModel
-									ListElement { name: "Creator"; desc: "Full control + Permissions. Permanent."; icon: "Icons/Crown" }
-									ListElement { name: "Owner"; desc: "Superuser. All except Permissions."; icon: "Icons/Key" }
-									ListElement { name: "Admin"; desc: "Manage members, roles, groups."; icon: "Icons/AdminPanel" }
-									ListElement { name: "Member"; desc: "Read-only. Default on invite accept."; icon: "Icons/User" }
-								}
-
-								delegate: Rectangle {
-									width: rolesListColumn.width
-									height: envRoleItemRow.implicitHeight + Style.marginM * 2
-									color: envRoleItemMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
-
-									MouseArea {
-										id: envRoleItemMouseArea
-										anchors.fill: parent
-										hoverEnabled: true
-										acceptedButtons: Qt.NoButton
-									}
-
-									Row {
-										id: envRoleItemRow
-										anchors.left: parent.left
-										anchors.right: parent.right
-										anchors.verticalCenter: parent.verticalCenter
-										anchors.margins: Style.marginM
-										spacing: Style.marginM
-
-										Image {
-											width: Style.iconSizeL
-											height: Style.iconSizeL
-											anchors.verticalCenter: parent.verticalCenter
-											source: Style.icon(model.icon)
-											sourceSize: Qt.size(Style.iconSizeL, Style.iconSizeL)
-										}
-
-										Column {
-											anchors.verticalCenter: parent.verticalCenter
-											spacing: Style.marginXS
-											width: parent.width - Style.iconSizeL - parent.spacing * 2
-
-											BaseText {
-												text: model.name
-												font.pixelSize: Style.fontSizeM
-												font.bold: true
-												color: Style.textColor
-											}
-
-											BaseText {
-												text: model.desc
-												font.pixelSize: Style.fontSizeS
-												color: Style.inactiveTextColor
-												elide: Text.ElideRight
-												width: parent.width
-											}
-										}
-									}
-
-									Rectangle {
-										anchors.bottom: parent.bottom
-										width: parent.width
-										height: 1
-										color: Style.borderColor
-										opacity: 0.5
+						onDeleteRequested: function(itemId, itemName) {
+							ModalDialogManager.showConfirmationDialog(
+								qsTr("Delete Role"),
+								qsTr("Are you sure you want to delete the role \"%1\"? This action cannot be undone.").arg(itemName),
+								function(result) {
+									if (result === true) {
+										container.removeRoleInput.m_collectionId = "Roles"
+										container.removeRoleInput.m_elementIds = [itemId]
+										container.removeRoleSender.send(container.removeRoleInput)
 									}
 								}
-							}
-
-							// --- Separator between sections ---
-							Rectangle {
-								width: parent.width
-								height: 1
-								color: Style.borderColor
-							}
-
-							Item { width: 1; height: Style.marginXL }
-
-							// --- Section: Roles (from server via FilterableSelectGqlDataProvider) ---
-							BaseText {
-								text: qsTr("Roles")
-								font.pixelSize: Style.fontSizeM
-								font.bold: true
-								color: Style.textColor
-								bottomPadding: Style.marginM
-							}
-
-							Repeater {
-								id: globalRolesRepeater
-								model: rolesDataProvider.items
-
-								delegate: Rectangle {
-									width: rolesListColumn.width
-									height: globalRoleItemRow.implicitHeight + Style.marginM * 2
-									color: globalRoleItemMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
-
-									MouseArea {
-										id: globalRoleItemMouseArea
-										anchors.fill: parent
-										hoverEnabled: true
-										cursorShape: Qt.PointingHandCursor
-										acceptedButtons: Qt.RightButton
-										onClicked: {
-											if (container.canManageMembers)
-												roleItemMenu.popup()
-										}
-									}
-
-									Menu {
-										id: roleItemMenu
-
-										MenuItem {
-											text: qsTr("Delete")
-											enabled: container.canManageMembers
-											onTriggered: {
-												var roleId = modelData.id
-												var roleName = modelData.title || modelData.id || ""
-												ModalDialogManager.showConfirmationDialog(
-													qsTr("Delete Role"),
-													qsTr("Are you sure you want to delete the role \"%1\"? This action cannot be undone.").arg(roleName),
-													function(result) {
-														if (result === true) {
-															container.removeRoleInput.m_collectionId = "Roles"
-															container.removeRoleInput.m_elementIds = [roleId]
-															container.removeRoleSender.send(container.removeRoleInput)
-														}
-													}
-												)
-											}
-										}
-									}
-
-									Row {
-										id: globalRoleItemRow
-										anchors.left: parent.left
-										anchors.right: parent.right
-										anchors.verticalCenter: parent.verticalCenter
-										anchors.margins: Style.marginM
-										spacing: Style.marginM
-
-										Column {
-											anchors.verticalCenter: parent.verticalCenter
-											spacing: Style.marginXS
-											width: parent.width
-
-											BaseText {
-												text: modelData.title || modelData.id || ""
-												font.pixelSize: Style.fontSizeM
-												font.bold: true
-												color: Style.textColor
-											}
-
-											BaseText {
-												text: modelData.description || ""
-												font.pixelSize: Style.fontSizeS
-												color: Style.inactiveTextColor
-												elide: Text.ElideRight
-												width: parent.width
-											}
-										}
-									}
-
-									Rectangle {
-										anchors.bottom: parent.bottom
-										width: parent.width
-										height: 1
-										color: Style.borderColor
-										opacity: 0.5
-									}
-								}
-							}
-
-							// Empty state for roles
-							BaseText {
-								visible: globalRolesRepeater.count === 0 && !rolesDataProvider.isInitialLoading
-								text: qsTr("No roles created yet.")
-								font.pixelSize: Style.fontSizeM
-								color: Style.inactiveTextColor
-								topPadding: Style.marginM
-								width: parent.width
-								horizontalAlignment: Text.AlignHCenter
-							}
-
-							// Loading state
-							BaseText {
-								visible: rolesDataProvider.isInitialLoading
-								text: qsTr("Loading roles...")
-								font.pixelSize: Style.fontSizeM
-								color: Style.inactiveTextColor
-								topPadding: Style.marginM
-								width: parent.width
-								horizontalAlignment: Text.AlignHCenter
-							}
+							)
 						}
 					}
 				}
 			}
+
+			property string __editRoleId: ""
+			property string __editRoleName: ""
+			property string __editRoleDescription: ""
 
 			// --- Role Editor View (pushed on stack) — for creating Roles ---
 			Component {
 				id: roleEditorView
 
 				Item {
-					// Editor content
 					Column {
 						anchors.top: parent.top
 						anchors.topMargin: Style.marginXL
@@ -1506,6 +1301,68 @@ DocumentViewBase {
 									container.insertRoleInput.m_name = roleNameInput.text
 									container.insertRoleInput.m_description = roleDescInput.text
 									container.insertRoleSender.send(container.insertRoleInput)
+									rolesStackViewHeader.popHeader()
+									rolesStackView.previous()
+								}
+							}
+
+							Button {
+								text: qsTr("Cancel")
+								onClicked: {
+									rolesStackViewHeader.popHeader()
+									rolesStackView.previous()
+								}
+							}
+						}
+					}
+				}
+			}
+
+			// --- Role Edit View (pushed on stack) — for editing existing Roles ---
+			Component {
+				id: roleEditView
+
+				Item {
+					Column {
+						anchors.top: parent.top
+						anchors.topMargin: Style.marginXL
+						anchors.left: parent.left
+						anchors.leftMargin: Style.marginXL
+						anchors.right: parent.right
+						anchors.rightMargin: Style.marginXL
+						spacing: Style.marginXL
+
+						GroupElementView {
+							width: parent.width
+
+							TextInputElementView {
+								id: editRoleNameInput
+								name: qsTr("Role Name")
+								placeHolderText: qsTr("Enter the role name")
+								text: rolesPage.__editRoleName
+							}
+
+							TextInputElementView {
+								id: editRoleDescInput
+								name: qsTr("Description")
+								placeHolderText: qsTr("Describe what this role can do")
+								text: rolesPage.__editRoleDescription
+							}
+						}
+
+						Row {
+							spacing: Style.marginM
+
+							Button {
+								text: qsTr("Save")
+								onClicked: {
+									container.setRoleDataInput.m_collectionId = "Roles"
+									container.setRoleDataInput.m_objectId = rolesPage.__editRoleId
+									container.setRoleDataInput.m_objectData = JSON.stringify({
+										name: editRoleNameInput.text,
+										description: editRoleDescInput.text
+									})
+									container.setRoleDataSender.send(container.setRoleDataInput)
 									rolesStackViewHeader.popHeader()
 									rolesStackView.previous()
 								}
@@ -1563,236 +1420,60 @@ DocumentViewBase {
 				}
 			}
 
+			property string __editGroupId: ""
+			property string __editGroupName: ""
+			property string __editGroupDescription: ""
+
 			// --- Groups List View ---
 			Component {
 				id: groupsListView
 
 				Item {
-					FilterableSelectGqlDataProvider {
-						id: groupsDataProvider
+					TenantCollectionListView {
+						anchors.fill: parent
 						collectionId: "Groups"
-						pageSize: 50
-					}
+						filterPlaceholder: qsTr("Filter groups...")
+						emptyMessage: qsTr("No groups created yet.")
+						createButtonText: qsTr("Create Group")
+						canManage: container.canManageMembers
 
-					Component.onCompleted: {
-						groupsDataProvider.fetch("")
-					}
+						onCreateRequested: {
+							groupsStackViewHeader.addHeader("create_group", qsTr("Create New Group"))
+							groupsStackView.addPage(groupEditorView)
+							groupsStackView.next()
+						}
 
-					// Header (fixed)
-					Column {
-						id: groupsListHeader
-						anchors.top: parent.top
-						anchors.topMargin: Style.marginM
-						anchors.left: parent.left
-						anchors.leftMargin: Style.marginXL
-						anchors.right: parent.right
-						anchors.rightMargin: Style.marginXL
-						spacing: Style.marginM
+						onEditRequested: function(itemId, itemName, itemDescription) {
+							groupsPage.__editGroupId = itemId
+							groupsPage.__editGroupName = itemName
+							groupsPage.__editGroupDescription = itemDescription
+							groupsStackViewHeader.addHeader("edit_group", qsTr("Edit Group"))
+							groupsStackView.addPage(groupEditView)
+							groupsStackView.next()
+						}
 
-						Row {
-							width: parent.width
-							spacing: Style.marginM
-
-							BaseText {
-								anchors.verticalCenter: parent.verticalCenter
-								text: qsTr("Organize members into groups.")
-								font.pixelSize: Style.fontSizeS
-								color: Style.inactiveTextColor
-							}
-
-							Item {
-								width: parent.width
-									- parent.children[0].width
-									- (createGroupBtn.visible ? createGroupBtn.width : 0)
-									- parent.spacing * 2
-								height: 1
-							}
-
-							Text {
-								id: createGroupBtn
-								visible: container.canManageMembers
-								anchors.verticalCenter: parent.verticalCenter
-								text: "+ " + qsTr("Create Group")
-								font.pixelSize: Style.fontSizeM
-								font.bold: true
-								color: Style.linkColor
-
-								MouseArea {
-									anchors.fill: parent
-									hoverEnabled: true
-									cursorShape: Qt.PointingHandCursor
-									onClicked: {
-										groupsStackViewHeader.addHeader("create_group", qsTr("Create New Group"))
-										groupsStackView.addPage(groupEditorView)
-										groupsStackView.next()
+						onDeleteRequested: function(itemId, itemName) {
+							ModalDialogManager.showConfirmationDialog(
+								qsTr("Delete Group"),
+								qsTr("Are you sure you want to delete the group \"%1\"? This action cannot be undone.").arg(itemName),
+								function(result) {
+									if (result === true) {
+										container.removeGroupInput.m_collectionId = "Groups"
+										container.removeGroupInput.m_elementIds = [itemId]
+										container.removeGroupSender.send(container.removeGroupInput)
 									}
 								}
-							}
-						}
-
-						// Filter
-						SearchTextInput {
-							id: groupsFilter
-							width: parent.width
-							placeHolderText: qsTr("Filter groups...")
-							onTextChanged: groupsDataProvider.fetch(text)
-						}
-
-						Rectangle {
-							width: parent.width
-							height: 1
-							color: Style.borderColor
-						}
-					}
-
-					// Groups list content
-					CustomScrollbar {
-						id: groupsListScrollbar
-						z: parent.z + 1
-						anchors.right: parent.right
-						anchors.top: groupsListContent.top
-						anchors.bottom: groupsListContent.bottom
-						secondSize: Style.marginM
-						targetItem: groupsListContent
-					}
-
-					Flickable {
-						id: groupsListContent
-						anchors.top: groupsListHeader.bottom
-						anchors.topMargin: Style.marginM
-						anchors.bottom: parent.bottom
-						anchors.bottomMargin: Style.marginXL
-						anchors.left: parent.left
-						anchors.leftMargin: Style.marginXL
-						anchors.right: groupsListScrollbar.left
-						anchors.rightMargin: Style.marginXL
-						contentWidth: groupsListColumn.width
-						contentHeight: groupsListColumn.height
-						boundsBehavior: Flickable.StopAtBounds
-						clip: true
-
-						Column {
-							id: groupsListColumn
-							width: groupsListContent.width
-							spacing: 0
-
-							Repeater {
-								id: groupsRepeater
-								model: groupsDataProvider.items
-
-								delegate: Rectangle {
-									width: groupsListColumn.width
-									height: groupItemRow.implicitHeight + Style.marginM * 2
-									color: groupItemMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
-
-									MouseArea {
-										id: groupItemMouseArea
-										anchors.fill: parent
-										hoverEnabled: true
-										cursorShape: Qt.PointingHandCursor
-										acceptedButtons: Qt.RightButton
-										onClicked: {
-											if (container.canManageMembers)
-												groupItemMenu.popup()
-										}
-									}
-
-									Menu {
-										id: groupItemMenu
-
-										MenuItem {
-											text: qsTr("Delete")
-											enabled: container.canManageMembers
-											onTriggered: {
-												var groupId = modelData.id
-												var groupName = modelData.title || modelData.id || ""
-												ModalDialogManager.showConfirmationDialog(
-													qsTr("Delete Group"),
-													qsTr("Are you sure you want to delete the group \"%1\"? This action cannot be undone.").arg(groupName),
-													function(result) {
-														if (result === true) {
-															container.removeGroupInput.m_collectionId = "Groups"
-															container.removeGroupInput.m_elementIds = [groupId]
-															container.removeGroupSender.send(container.removeGroupInput)
-														}
-													}
-												)
-											}
-										}
-									}
-
-									Row {
-										id: groupItemRow
-										anchors.left: parent.left
-										anchors.right: parent.right
-										anchors.verticalCenter: parent.verticalCenter
-										anchors.margins: Style.marginM
-										spacing: Style.marginM
-
-										Column {
-											anchors.verticalCenter: parent.verticalCenter
-											spacing: Style.marginXS
-											width: parent.width
-
-											BaseText {
-												text: modelData.title || modelData.id || ""
-												font.pixelSize: Style.fontSizeM
-												font.bold: true
-												color: Style.textColor
-											}
-
-											BaseText {
-												text: modelData.description || ""
-												font.pixelSize: Style.fontSizeS
-												color: Style.inactiveTextColor
-												elide: Text.ElideRight
-												width: parent.width
-											}
-										}
-									}
-
-									Rectangle {
-										anchors.bottom: parent.bottom
-										width: parent.width
-										height: 1
-										color: Style.borderColor
-										opacity: 0.5
-									}
-								}
-							}
-
-							// Empty state
-							BaseText {
-								visible: groupsRepeater.count === 0 && !groupsDataProvider.isInitialLoading
-								text: qsTr("No groups created yet.")
-								font.pixelSize: Style.fontSizeM
-								color: Style.inactiveTextColor
-								topPadding: Style.marginM
-								width: parent.width
-								horizontalAlignment: Text.AlignHCenter
-							}
-
-							// Loading state
-							BaseText {
-								visible: groupsDataProvider.isInitialLoading
-								text: qsTr("Loading groups...")
-								font.pixelSize: Style.fontSizeM
-								color: Style.inactiveTextColor
-								topPadding: Style.marginM
-								width: parent.width
-								horizontalAlignment: Text.AlignHCenter
-							}
+							)
 						}
 					}
 				}
 			}
 
-			// --- Group Editor View (pushed on stack) ---
+			// --- Group Editor View (pushed on stack) — for creating ---
 			Component {
 				id: groupEditorView
 
 				Item {
-					// Editor content
 					Column {
 						anchors.top: parent.top
 						anchors.topMargin: Style.marginXL
@@ -1845,6 +1526,68 @@ DocumentViewBase {
 					}
 				}
 			}
+
+			// --- Group Edit View (pushed on stack) — for editing existing ---
+			Component {
+				id: groupEditView
+
+				Item {
+					Column {
+						anchors.top: parent.top
+						anchors.topMargin: Style.marginXL
+						anchors.left: parent.left
+						anchors.leftMargin: Style.marginXL
+						anchors.right: parent.right
+						anchors.rightMargin: Style.marginXL
+						spacing: Style.marginXL
+
+						GroupElementView {
+							width: parent.width
+
+							TextInputElementView {
+								id: editGroupNameInput
+								name: qsTr("Group Name")
+								placeHolderText: qsTr("Enter the group name")
+								text: groupsPage.__editGroupName
+							}
+
+							TextInputElementView {
+								id: editGroupDescInput
+								name: qsTr("Description")
+								placeHolderText: qsTr("Describe this group's purpose")
+								text: groupsPage.__editGroupDescription
+							}
+						}
+
+						Row {
+							spacing: Style.marginM
+
+							Button {
+								text: qsTr("Save")
+								onClicked: {
+									container.setGroupDataInput.m_collectionId = "Groups"
+									container.setGroupDataInput.m_objectId = groupsPage.__editGroupId
+									container.setGroupDataInput.m_objectData = JSON.stringify({
+										name: editGroupNameInput.text,
+										description: editGroupDescInput.text
+									})
+									container.setGroupDataSender.send(container.setGroupDataInput)
+									groupsStackViewHeader.popHeader()
+									groupsStackView.previous()
+								}
+							}
+
+							Button {
+								text: qsTr("Cancel")
+								onClicked: {
+									groupsStackViewHeader.popHeader()
+									groupsStackView.previous()
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -1868,6 +1611,7 @@ DocumentViewBase {
 						return {
 							key: perm ? (perm.m_id || "") : "",
 							text: perm ? (perm.m_name || "") : "",
+							description: perm ? (perm.m_description || "") : "",
 							checkable: true,
 							expanded: true,
 							data: { FeatureId: perm ? (perm.m_id || "") : "" }
@@ -2083,7 +1827,11 @@ DocumentViewBase {
 				BasicTreeView {
 					id: tenantPermissionsTreeView
 					width: permissionsTreeFlickable.width
-					showHeader: false
+					showHeader: true
+					columns: [
+						{ name: "name", title: qsTr("Permission"), display: "text", tree: true, width: 300 },
+						{ name: "description", title: qsTr("Description"), display: "description", tree: false, width: 400 }
+					]
 
 					onCheckedItemsChanged: container.doUpdateModel()
 				}
@@ -2228,6 +1976,36 @@ DocumentViewBase {
 			RemoveElementsPayload {
 				onFinished: {
 					// Group removed successfully
+				}
+			}
+		}
+	}
+
+	// --- Roles: Edit via ImtCollection.sdl (SetObjectData) ---
+	property SetObjectDataInput setRoleDataInput: SetObjectDataInput {}
+	property GqlSdlRequestSender setRoleDataSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_setObjectData
+
+		sdlObjectComp: Component {
+			SetObjectDataPayload {
+				onFinished: {
+					// Role updated successfully
+				}
+			}
+		}
+	}
+
+	// --- Groups: Edit via ImtCollection.sdl (SetObjectData) ---
+	property SetObjectDataInput setGroupDataInput: SetObjectDataInput {}
+	property GqlSdlRequestSender setGroupDataSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_setObjectData
+
+		sdlObjectComp: Component {
+			SetObjectDataPayload {
+				onFinished: {
+					// Group updated successfully
 				}
 			}
 		}
