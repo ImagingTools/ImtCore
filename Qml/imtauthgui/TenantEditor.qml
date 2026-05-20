@@ -107,7 +107,9 @@ DocumentViewBase {
 			multiPageView.currentIndex = 0
 		}
 
-		Component.onCompleted: multiPageView.updatePages()
+		Component.onCompleted: {
+			multiPageView.updatePages()
+		}
 	}
 
 	// Re-build pages when role / ownership state flips.

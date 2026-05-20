@@ -17,7 +17,7 @@ ViewBase {
 	id: generalPage
 
 	commandsPanelVisible: false
-
+	contentColor: Style.baseColor
 	// Backward-compat accessor: pages reference tenantData; ViewBase exposes it as `model`.
 	readonly property var tenantData: generalPage.model
 	property var stateManager: null

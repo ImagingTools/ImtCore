@@ -18,7 +18,7 @@ ViewBase {
 	id: permissionsPage
 
 	commandsPanelVisible: false
-
+	contentColor: Style.baseColor
 	readonly property var tenantData: permissionsPage.model
 
 	function updateGui() {

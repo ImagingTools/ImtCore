@@ -21,7 +21,7 @@ ViewBase {
 	id: rolesPage
 
 	commandsPanelVisible: false
-
+	contentColor: Style.baseColor
 	readonly property var tenantData: rolesPage.model
 	property var stateManager: null
 	property var apiClient: null

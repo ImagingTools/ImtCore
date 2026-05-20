@@ -22,7 +22,7 @@ ViewBase {
 	id: membersPage
 
 	commandsPanelVisible: false
-
+	contentColor: Style.baseColor
 	readonly property var tenantData: membersPage.model
 	property var stateManager: null
 	property var apiClient: null

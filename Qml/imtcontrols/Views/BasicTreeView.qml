@@ -28,7 +28,7 @@ Item {
     property int rowHeight: 28
     property int indentation: 18
     property int cacheBuffer: 4000
-    property int headerHeight: 36
+    property int headerHeight: 30
 
     property bool showHeader: true
     property bool multiSelect: false
@@ -53,7 +53,7 @@ Item {
     property string normalTextColor: Style.textColor
     property string selectedTextColor: Style.textSelectedColor
     property string disabledTextColor: Style.inactiveTextColor
-    property string headerBackgroundColor: Style.borderColor
+    property string headerBackgroundColor: Style.alternateBaseColor
     property string gridLineColor: Style.borderColor2
 
     property var currentIndex: null
@@ -141,8 +141,8 @@ Item {
 
                     Text {
                         anchors.fill: parent
-                        anchors.leftMargin: 8
-                        anchors.rightMargin: 8
+                        anchors.leftMargin: Style.marginM
+                        anchors.rightMargin: Style.marginM
 
                         text: root.columnTitle(parent.column)
                         color: root.normalTextColor
@@ -161,13 +161,6 @@ Item {
                     }
                 }
             }
-        }
-
-        Rectangle {
-            width: parent.width
-            height: root.showHeader ? 1 : 0
-            visible: root.showHeader
-            color: root.gridLineColor
         }
 
         ListView {
