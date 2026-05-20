@@ -41,6 +41,8 @@ Item {
 
     property var flickable: null
 
+    readonly property var contentListView: listView
+
     property string filterText: ""
     property string filterRole: "text"
 
@@ -751,8 +753,8 @@ Item {
 
     function columnWidth(column) {
         if (columns.length <= 1)
-            return listView.width
-        return listView.width / columns.length
+            return root.width
+        return root.width / columns.length
     }
     function isTreeColumn(column, columnIndex) { return column && column.tree === true ? true : columnIndex === 0 && columns.length === 0 }
     function isColumnEditable(column) { return column && column.editable === true }

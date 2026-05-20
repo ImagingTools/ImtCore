@@ -1147,9 +1147,24 @@ DocumentViewBase {
 				}
 			}
 
+			BaseText {
+				id: rolesDescription
+				anchors.top: rolesStackViewHeader.bottom
+				anchors.topMargin: Style.marginS
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginXL
+				anchors.right: parent.right
+				anchors.rightMargin: Style.marginXL
+				visible: rolesStackView.currentIndex === 0
+				text: qsTr("Manage tenant roles and assign permissions to team members.")
+				font.pixelSize: Style.fontSizeS
+				color: Style.inactiveTextColor
+			}
+
 			StackView {
 				id: rolesStackView
-				anchors.top: rolesStackViewHeader.bottom
+				anchors.top: rolesDescription.visible ? rolesDescription.bottom : rolesStackViewHeader.bottom
+				anchors.topMargin: Style.marginS
 				anchors.left: parent.left
 				anchors.right: parent.right
 				anchors.bottom: parent.bottom
@@ -1176,6 +1191,9 @@ DocumentViewBase {
 						canManage: container.canManageMembers
 
 						onCreateRequested: {
+							// Remove stale pages before adding new one
+							while (rolesStackView.count > 1)
+								rolesStackView.removePage(rolesStackView.count - 1)
 							rolesStackViewHeader.addHeader("create_role", qsTr("Create New Role"))
 							rolesStackView.addPage(roleEditorView)
 							rolesStackView.next()
@@ -1185,6 +1203,9 @@ DocumentViewBase {
 							rolesPage.__editRoleId = itemId
 							rolesPage.__editRoleName = itemName
 							rolesPage.__editRoleDescription = itemDescription
+							// Remove stale pages before adding new one
+							while (rolesStackView.count > 1)
+								rolesStackView.removePage(rolesStackView.count - 1)
 							rolesStackViewHeader.addHeader("edit_role", qsTr("Edit Role"))
 							rolesStackView.addPage(roleEditView)
 							rolesStackView.next()
@@ -1345,9 +1366,24 @@ DocumentViewBase {
 				}
 			}
 
+			BaseText {
+				id: groupsDescription
+				anchors.top: groupsStackViewHeader.bottom
+				anchors.topMargin: Style.marginS
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginXL
+				anchors.right: parent.right
+				anchors.rightMargin: Style.marginXL
+				visible: groupsStackView.currentIndex === 0
+				text: qsTr("Organize members into groups for easier permission management.")
+				font.pixelSize: Style.fontSizeS
+				color: Style.inactiveTextColor
+			}
+
 			StackView {
 				id: groupsStackView
-				anchors.top: groupsStackViewHeader.bottom
+				anchors.top: groupsDescription.visible ? groupsDescription.bottom : groupsStackViewHeader.bottom
+				anchors.topMargin: Style.marginS
 				anchors.left: parent.left
 				anchors.right: parent.right
 				anchors.bottom: parent.bottom
@@ -1378,6 +1414,9 @@ DocumentViewBase {
 						canManage: container.canManageMembers
 
 						onCreateRequested: {
+							// Remove stale pages before adding new one
+							while (groupsStackView.count > 1)
+								groupsStackView.removePage(groupsStackView.count - 1)
 							groupsStackViewHeader.addHeader("create_group", qsTr("Create New Group"))
 							groupsStackView.addPage(groupEditorView)
 							groupsStackView.next()
@@ -1387,6 +1426,9 @@ DocumentViewBase {
 							groupsPage.__editGroupId = itemId
 							groupsPage.__editGroupName = itemName
 							groupsPage.__editGroupDescription = itemDescription
+							// Remove stale pages before adding new one
+							while (groupsStackView.count > 1)
+								groupsStackView.removePage(groupsStackView.count - 1)
 							groupsStackViewHeader.addHeader("edit_group", qsTr("Edit Group"))
 							groupsStackView.addPage(groupEditView)
 							groupsStackView.next()
@@ -1723,20 +1765,20 @@ DocumentViewBase {
 				}
 			}
 
-			// CustomScrollbar for the tree
+			// CustomScrollbar for the tree content (targets internal ListView)
 			CustomScrollbar {
 				id: permissionsScrollbar
 				z: parent.z + 1
 				anchors.right: parent.right
-				anchors.top: permissionsTreeFlickable.top
-				anchors.bottom: permissionsTreeFlickable.bottom
+				anchors.top: tenantPermissionsTreeView.top
+				anchors.bottom: tenantPermissionsTreeView.bottom
 				secondSize: Style.marginM
-				targetItem: permissionsTreeFlickable
+				targetItem: tenantPermissionsTreeView.contentListView
 			}
 
-			// Scrollable tree area
-			Flickable {
-				id: permissionsTreeFlickable
+			// Tree view (header stays fixed, internal ListView scrolls)
+			BasicTreeView {
+				id: tenantPermissionsTreeView
 				anchors.top: permissionsHeader.bottom
 				anchors.topMargin: Style.marginM
 				anchors.bottom: parent.bottom
@@ -1745,22 +1787,13 @@ DocumentViewBase {
 				anchors.leftMargin: Style.marginXL
 				anchors.right: permissionsScrollbar.left
 				anchors.rightMargin: Style.marginXL
-				contentWidth: tenantPermissionsTreeView.width
-				contentHeight: tenantPermissionsTreeView.height
-				boundsBehavior: Flickable.StopAtBounds
-				clip: true
+				showHeader: true
+				columns: [
+					{ name: "name", title: qsTr("Permission"), display: "text", tree: true },
+					{ name: "description", title: qsTr("Description"), display: "description", tree: false }
+				]
 
-				BasicTreeView {
-					id: tenantPermissionsTreeView
-					width: permissionsTreeFlickable.width
-					showHeader: true
-					columns: [
-						{ name: "name", title: qsTr("Permission"), display: "text", tree: true },
-						{ name: "description", title: qsTr("Description"), display: "description", tree: false }
-					]
-
-					onCheckedItemsChanged: container.doUpdateModel()
-				}
+				onCheckedItemsChanged: container.doUpdateModel()
 			}
 		}
 	}
