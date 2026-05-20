@@ -184,7 +184,7 @@ DecoratorBase {
             anchors.rightMargin: Style.marginM;
 
             width: buttonsDialog.width;
-			height: buttonsDialog.height + 2* Style.marginXL//buttonsDialog.anchors.bottomMargin;
+			height: buttonsDialog.height + 2*Style.marginL
 
             DialogButtons {
                 id: buttonsDialog;
