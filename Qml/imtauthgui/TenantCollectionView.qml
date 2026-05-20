@@ -406,6 +406,7 @@ RemoteCollectionView {
 
 				TenantEditor {
 					id: tenantEditor
+					apiClient: tenantEditorApiClient
 					commandsControllerComp: Component {
 						GqlBasedCommandsController {
 							typeId: "Tenant"
@@ -418,6 +419,13 @@ RemoteCollectionView {
 								tenantEditor.representationController.updateRepresentationFromDocument()
 							}
 						}
+					}
+
+					// Concrete GQL transport injected from this view (imtguigql is
+					// already a dependency here); TenantEditor itself stays
+					// transport-agnostic.
+					GqlBasedTenantMembershipApiClient {
+						id: tenantEditorApiClient
 					}
 				}
 			}

@@ -6,7 +6,6 @@ import imtgui 1.0
 import imtcontrols 1.0
 import imtcolgui 1.0
 import imtdocgui 1.0
-import imtguigql 1.0
 import imtauthTenantsSdl 1.0
 import imtauthRolesSdl 1.0
 import imtauthGroupsSdl 1.0
@@ -16,14 +15,16 @@ import imtauthGroupsSdl 1.0
  *
  * Thin orchestrator that composes:
  *   - TenantEditorStateManager   — local UI state + pure logic
- *   - GqlBasedTenantMembershipApiClient — concrete GQL transport
+ *   - an injected `apiClient` (abstract TenantMembershipApiClient) — transport
  *   - the page components (General / Members / Roles / Groups / Permissions)
+ *
+ * The editor itself does NOT depend on any concrete transport (no GQL/SDL transport
+ * imports). The concrete client (e.g. GqlBasedTenantMembershipApiClient from
+ * imtguigql) is supplied by the embedding view (e.g. TenantCollectionView).
  *
  * SDL imports here are limited to:
  *   - imtauthTenantsSdl (TenantData type of the model)
  *   - imtauthRolesSdl / imtauthGroupsSdl (data factories for new role/group editors)
- *
- * All membership / roles / groups transport calls are delegated to the api client.
  */
 DocumentViewBase {
 	id: container
@@ -33,15 +34,17 @@ DocumentViewBase {
 
 	property TenantData tenantData: model
 
+	/**
+	 * Injected transport implementing the TenantMembershipApiClient contract.
+	 * Must be set by the embedding view before the editor becomes active.
+	 */
+	property var apiClient: null
+
 	// --- Composition root ---
 	TenantEditorStateManager {
 		id: stateManager
 		tenantData: container.tenantData
-		apiClient: apiClient
-	}
-
-	GqlBasedTenantMembershipApiClient {
-		id: apiClient
+		apiClient: container.apiClient
 	}
 
 	// --- Convenience: data factories the pages cannot create themselves
@@ -130,7 +133,7 @@ DocumentViewBase {
 
 	// --- Refresh the document when the server confirms membership changes ---
 	Connections {
-		target: apiClient
+		target: container.apiClient
 		function onInvitationCreated() {
 			if (container.representationController)
 				container.representationController.updateRepresentationFromDocument()
@@ -192,7 +195,7 @@ DocumentViewBase {
 		TenantMembersPage {
 			model: container.tenantData
 			stateManager: stateManager
-			apiClient: apiClient
+			apiClient: container.apiClient
 		}
 	}
 
@@ -202,7 +205,7 @@ DocumentViewBase {
 		TenantRolesPage {
 			model: container.tenantData
 			stateManager: stateManager
-			apiClient: apiClient
+			apiClient: container.apiClient
 			roleDataFactory: container.createRoleData
 		}
 	}
@@ -213,7 +216,7 @@ DocumentViewBase {
 		TenantGroupsPage {
 			model: container.tenantData
 			stateManager: stateManager
-			apiClient: apiClient
+			apiClient: container.apiClient
 			groupDataFactory: container.createGroupData
 		}
 	}
