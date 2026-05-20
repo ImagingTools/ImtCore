@@ -149,7 +149,12 @@ Item {
                     iconSource: spinBox.icon;
                     rotation: 180
                     enabled: !spinBox.editable ? false : !spinBox.baseElement ? true : spinBox.baseElement.value < spinBox.baseElement.to
-                    onClicked: {
+					decorator: Component{IconButtonDecorator{
+							icon.width: upButton.width - 2
+							icon.height: upButton.height -2
+						}}
+
+					onClicked: {
                         if (spinBox.baseElement){
                             spinBox.baseElement.increase();
                         }
@@ -163,8 +168,13 @@ Item {
                     height: buttonsBlock.height/2 + mainRec.border.width/2;
                     
                     iconSource: spinBox.icon;
+
                     enabled: !spinBox.editable ? false : !spinBox.baseElement ? true : spinBox.baseElement.value > spinBox.baseElement.from
-                    
+					decorator: Component{IconButtonDecorator{
+							icon.width: downButton.width - 2
+							icon.height: downButton.height -2
+						}}
+
                     onClicked: {
                         if (spinBox.baseElement){
                             spinBox.baseElement.decrease();
