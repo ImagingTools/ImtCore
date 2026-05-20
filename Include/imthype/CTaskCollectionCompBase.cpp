@@ -803,7 +803,10 @@ bool CTaskCollectionCompBase::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.Process(task.inputId);
 		retVal = retVal && archive.EndTag(inputIdTag);
 
-		retVal &= archive.ProcessTagIfExists(inputSubIdTag, task.inputSubId);
+		if (archive.BeginTag(inputSubIdTag)){
+			retVal = retVal && archive.Process(task.inputSubId);
+			retVal = retVal && archive.EndTag(inputSubIdTag);
+		}
 
 		retVal = retVal && archive.BeginTag(userDefinedTaskIdTag);
 		retVal = retVal && archive.Process(task.userDefinedTaskId);
@@ -873,9 +876,8 @@ bool CTaskCollectionCompBase::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.EndTag(tasksTag);
 
 	iser::ISerializable* taskInputsSerializablePtr = dynamic_cast<iser::ISerializable*>(m_taskInputsCompPtr.GetPtr());
-	if (taskInputsSerializablePtr != nullptr) {
-		if (archive.CanProcessTag(taskInputsTag)) {
-			retVal = retVal && archive.BeginTag(taskInputsTag);
+	if (taskInputsSerializablePtr != nullptr){
+		if (archive.BeginTag(taskInputsTag)){
 			retVal = retVal && taskInputsSerializablePtr->Serialize(archive);
 			retVal = retVal && archive.EndTag(taskInputsTag);
 		}
