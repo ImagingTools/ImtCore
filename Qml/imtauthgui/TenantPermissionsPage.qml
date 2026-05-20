@@ -11,14 +11,15 @@ import imtcontrols 1.0
  * Permissions tab of the TenantEditor — tree of product permissions and the
  * selected permissions for this tenant.
  *
- * No SDL imports: the tenantData model is provided by the orchestrator.
+ * No SDL imports: the tenantData model is provided by the orchestrator via the
+ * inherited ViewBase `model` property; updates go through doUpdateGui/doUpdateModel.
  */
-Item {
+ViewBase {
 	id: permissionsPage
 
-	property var tenantData: null
+	commandsPanelVisible: false
 
-	signal modelEditRequested()
+	readonly property var tenantData: permissionsPage.model
 
 	function updateGui() {
 		if (!permissionsPage.tenantData)
@@ -238,6 +239,6 @@ Item {
 			{ name: "description", title: qsTr("Description"), display: "description", tree: false }
 		]
 
-		onCheckedItemsChanged: permissionsPage.modelEditRequested()
+		onCheckedItemsChanged: permissionsPage.doUpdateModel()
 	}
 }

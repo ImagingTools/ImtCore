@@ -11,15 +11,28 @@ import imtauthgui 1.0
  * TenantGroupsPage
  *
  * Groups tab — list / create / edit / delete tenant groups via the abstract apiClient.
+ *
+ * Inherits ViewBase so its `model` (tenantData) is wired in from the orchestrator
+ * and updates can flow through the protected doUpdateGui / doUpdateModel wrappers.
  */
-Item {
+ViewBase {
 	id: groupsPage
 
-	property var tenantData: null
+	commandsPanelVisible: false
+
+	readonly property var tenantData: groupsPage.model
 	property var stateManager: null
 	property var apiClient: null
 
 	property var groupDataFactory: null
+
+	function updateGui() {
+		// Groups list/edit UI is bound to apiClient/stateManager directly.
+	}
+
+	function updateModel() {
+		// Groups mutations are pushed via apiClient; nothing to write back here.
+	}
 
 	property string __editGroupId: ""
 	property string __editGroupName: ""

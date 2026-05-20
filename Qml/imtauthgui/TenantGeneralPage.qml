@@ -2,20 +2,25 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
+import imtgui 1.0
 import imtcontrols 1.0
 
 /**
  * TenantGeneralPage
  *
  * General tab of the TenantEditor — basic workspace settings.
+ *
+ * Inherits ViewBase so that updates flow through the protected
+ * doUpdateGui / doUpdateModel wrappers (re-entrance guard).
  */
-Item {
+ViewBase {
 	id: generalPage
 
-	property var tenantData: null
-	property var stateManager: null
+	commandsPanelVisible: false
 
-	signal modelEditRequested()
+	// Backward-compat accessor: pages reference tenantData; ViewBase exposes it as `model`.
+	readonly property var tenantData: generalPage.model
+	property var stateManager: null
 
 	function updateGui() {
 		if (!generalPage.tenantData) return
@@ -104,7 +109,7 @@ Item {
 					onEditingFinished: {
 						let oldText = generalPage.tenantData ? generalPage.tenantData.m_name : ""
 						if (oldText !== nameInput.text)
-							generalPage.modelEditRequested()
+							generalPage.doUpdateModel()
 					}
 
 					KeyNavigation.tab: descriptionInput
@@ -120,7 +125,7 @@ Item {
 					onEditingFinished: {
 						let oldText = generalPage.tenantData ? generalPage.tenantData.m_description : ""
 						if (oldText !== descriptionInput.text)
-							generalPage.modelEditRequested()
+							generalPage.doUpdateModel()
 					}
 
 					KeyNavigation.tab: isActiveInput
@@ -132,7 +137,7 @@ Item {
 					name: qsTr("Active")
 					readOnly: generalPage.__readOnly
 
-					onCheckedChanged: generalPage.modelEditRequested()
+					onCheckedChanged: generalPage.doUpdateModel()
 				}
 			}
 		}

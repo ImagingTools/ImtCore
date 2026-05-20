@@ -13,16 +13,29 @@ import imtauthgui 1.0
  * Roles tab — list / create / edit / delete tenant roles via the abstract apiClient.
  * The orchestrator provides a factory for role data objects since this page can't
  * import the SDL module.
+ *
+ * Inherits ViewBase so its `model` (tenantData) is wired in from the orchestrator
+ * and updates can flow through the protected doUpdateGui / doUpdateModel wrappers.
  */
-Item {
+ViewBase {
 	id: rolesPage
 
-	property var tenantData: null
+	commandsPanelVisible: false
+
+	readonly property var tenantData: rolesPage.model
 	property var stateManager: null
 	property var apiClient: null
 
 	// Factory injected by the orchestrator that returns a RoleData instance.
 	property var roleDataFactory: null
+
+	function updateGui() {
+		// Roles list/edit UI is bound to apiClient/stateManager directly.
+	}
+
+	function updateModel() {
+		// Roles mutations are pushed via apiClient; nothing to write back here.
+	}
 
 	property string __editRoleId: ""
 	property string __editRoleName: ""

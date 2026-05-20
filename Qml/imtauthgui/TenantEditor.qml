@@ -65,21 +65,21 @@ DocumentViewBase {
 		stateManager.loadInvitationsFromModel()
 		var generalPage = multiPageView.getPageByIndex(0)
 		if (generalPage)
-			generalPage.updateGui()
+			generalPage.doUpdateGui()
 		var permissionsPage = multiPageView.getPageById("Permissions")
 		if (permissionsPage)
-			permissionsPage.updateGui()
+			permissionsPage.doUpdateGui()
 	}
 
 	function updateModel() {
 		var generalPage = multiPageView.getPageByIndex(0)
 		if (generalPage)
-			generalPage.updateModel()
+			generalPage.doUpdateModel()
 		if (container.tenantData) {
 			stateManager.syncMembersToModel()
 			var permissionsPage = multiPageView.getPageById("Permissions")
 			if (permissionsPage)
-				permissionsPage.updateModel()
+				permissionsPage.doUpdateModel()
 		}
 	}
 
@@ -181,9 +181,8 @@ DocumentViewBase {
 		id: generalPageComp
 
 		TenantGeneralPage {
-			tenantData: container.tenantData
+			model: container.tenantData
 			stateManager: stateManager
-			onModelEditRequested: container.doUpdateModel()
 		}
 	}
 
@@ -191,10 +190,9 @@ DocumentViewBase {
 		id: membersPageComp
 
 		TenantMembersPage {
-			tenantData: container.tenantData
+			model: container.tenantData
 			stateManager: stateManager
 			apiClient: apiClient
-			onModelEditRequested: container.doUpdateModel()
 		}
 	}
 
@@ -202,7 +200,7 @@ DocumentViewBase {
 		id: rolesPageComp
 
 		TenantRolesPage {
-			tenantData: container.tenantData
+			model: container.tenantData
 			stateManager: stateManager
 			apiClient: apiClient
 			roleDataFactory: container.createRoleData
@@ -213,7 +211,7 @@ DocumentViewBase {
 		id: groupsPageComp
 
 		TenantGroupsPage {
-			tenantData: container.tenantData
+			model: container.tenantData
 			stateManager: stateManager
 			apiClient: apiClient
 			groupDataFactory: container.createGroupData
@@ -224,8 +222,7 @@ DocumentViewBase {
 		id: permissionsPageComp
 
 		TenantPermissionsPage {
-			tenantData: container.tenantData
-			onModelEditRequested: container.doUpdateModel()
+			model: container.tenantData
 		}
 	}
 }

@@ -15,16 +15,17 @@ import imtauthgui 1.0
  * and exposes invite / leave / actions menus.
  *
  * Talks to the server exclusively through `apiClient` (abstract contract).
- * Holds no SDL imports.
+ * Holds no SDL imports. Inherits ViewBase so model updates are protected by
+ * doUpdateGui / doUpdateModel.
  */
-Item {
+ViewBase {
 	id: membersPage
 
-	property var tenantData: null
+	commandsPanelVisible: false
+
+	readonly property var tenantData: membersPage.model
 	property var stateManager: null
 	property var apiClient: null
-
-	signal modelEditRequested()
 
 	function updateGui() {
 		// UI is bound directly to stateManager.pendingMembers / pendingInvitations.
@@ -51,7 +52,7 @@ Item {
 	function __removeMemberById(userId) {
 		if (!membersPage.stateManager) return
 		membersPage.stateManager.removeMemberById(userId)
-		membersPage.modelEditRequested()
+		membersPage.doUpdateModel()
 	}
 
 	function __transferOwnershipTo(newOwnerId) {
@@ -482,7 +483,7 @@ Item {
 
 			Component.onDestruction: {
 				if (membersPage.stateManager && membersPage.stateManager.__membersModifiedLocally) {
-					membersPage.modelEditRequested()
+					membersPage.doUpdateModel()
 					membersPage.stateManager.__membersModifiedLocally = false
 				}
 			}
