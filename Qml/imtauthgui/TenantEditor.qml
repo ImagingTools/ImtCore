@@ -1147,6 +1147,14 @@ DocumentViewBase {
 				id: rolesListView
 
 				Item {
+					FilterableSelectGqlDataProvider {
+						id: rolesDataProvider
+						collectionId: "Roles"
+						pageSize: 50
+					}
+
+					Component.onCompleted: rolesDataProvider.fetch("")
+
 					// Header (fixed)
 					Column {
 						id: rolesListHeader
@@ -1164,7 +1172,7 @@ DocumentViewBase {
 
 							BaseText {
 								anchors.verticalCenter: parent.verticalCenter
-								text: qsTr("Manage environment and global roles for workspace members.")
+								text: qsTr("Manage roles for workspace members.")
 								font.pixelSize: Style.fontSizeS
 								color: Style.inactiveTextColor
 							}
@@ -1204,6 +1212,7 @@ DocumentViewBase {
 							id: rolesFilter
 							width: parent.width
 							placeHolderText: qsTr("Filter roles...")
+							onTextChanged: rolesDataProvider.fetch(text)
 						}
 
 						Rectangle {
@@ -1246,34 +1255,21 @@ DocumentViewBase {
 
 							// --- Section: Tenant Environment Roles ---
 							BaseText {
-								text: qsTr("Tenant Environment Roles")
+								text: qsTr("Environment Roles")
 								font.pixelSize: Style.fontSizeM
 								font.bold: true
 								color: Style.textColor
 								topPadding: Style.marginM
-								bottomPadding: Style.marginXS
-							}
-
-							BaseText {
-								text: qsTr("These roles control access within this tenant editor only.")
-								font.pixelSize: Style.fontSizeS
-								color: Style.inactiveTextColor
 								bottomPadding: Style.marginM
-								width: parent.width
 							}
 
 							Repeater {
-								model: {
-									var envRoles = [
-										{ name: "Creator", description: qsTr("Full control including Permissions. Permanently assigned to tenant creator."), builtIn: true, scope: "environment" },
-										{ name: "Owner", description: qsTr("Superuser within the tenant. Can manage all aspects except Permissions."), builtIn: true, scope: "environment" },
-										{ name: "Admin", description: qsTr("Can invite/remove members and manage roles and groups."), builtIn: true, scope: "environment" },
-										{ name: "Member", description: qsTr("Default role after accepting invitation. Read-only access."), builtIn: true, scope: "environment" }
-									]
-									if (!rolesFilter.text)
-										return envRoles
-									var filter = rolesFilter.text.toLowerCase()
-									return envRoles.filter(function(r) { return r.name.toLowerCase().indexOf(filter) >= 0 || r.description.toLowerCase().indexOf(filter) >= 0 })
+								model: ListModel {
+									id: envRolesModel
+									ListElement { name: "Creator"; desc: "Full control + Permissions. Permanent." }
+									ListElement { name: "Owner"; desc: "Superuser. All except Permissions." }
+									ListElement { name: "Admin"; desc: "Manage members, roles, groups." }
+									ListElement { name: "Member"; desc: "Read-only. Default on invite accept." }
 								}
 
 								delegate: Rectangle {
@@ -1305,7 +1301,7 @@ DocumentViewBase {
 
 											BaseText {
 												anchors.centerIn: parent
-												text: modelData.name.charAt(0)
+												text: model.name.charAt(0)
 												font.pixelSize: Style.fontSizeM
 												font.bold: true
 												color: Style.secondColor
@@ -1318,14 +1314,14 @@ DocumentViewBase {
 											width: parent.width - Style.iconSizeL - envBuiltInBadge.width - parent.spacing * 2
 
 											BaseText {
-												text: modelData.name
+												text: model.name
 												font.pixelSize: Style.fontSizeM
 												font.bold: true
 												color: Style.textColor
 											}
 
 											BaseText {
-												text: modelData.description
+												text: model.desc
 												font.pixelSize: Style.fontSizeS
 												color: Style.inactiveTextColor
 												elide: Text.ElideRight
@@ -1370,37 +1366,18 @@ DocumentViewBase {
 
 							Item { width: 1; height: Style.marginXL }
 
-							// --- Section: Global Roles ---
+							// --- Section: Global Roles (from server via FilterableSelectGqlDataProvider) ---
 							BaseText {
 								text: qsTr("Global Roles")
 								font.pixelSize: Style.fontSizeM
 								font.bold: true
 								color: Style.textColor
-								bottomPadding: Style.marginXS
-							}
-
-							BaseText {
-								text: qsTr("These roles define user capabilities across the entire product.")
-								font.pixelSize: Style.fontSizeS
-								color: Style.inactiveTextColor
 								bottomPadding: Style.marginM
-								width: parent.width
 							}
 
-							// Global roles — loaded from server (placeholder for data provider)
 							Repeater {
 								id: globalRolesRepeater
-								model: {
-									// TODO: replace with data from GQL (loaded like FilterableSelectPopup)
-									var globalRoles = [
-										{ name: "SuperAdmin", description: qsTr("Full product-level administrative access."), builtIn: false, scope: "global" },
-										{ name: "User", description: qsTr("Standard product access for regular users."), builtIn: false, scope: "global" }
-									]
-									if (!rolesFilter.text)
-										return globalRoles
-									var filter = rolesFilter.text.toLowerCase()
-									return globalRoles.filter(function(r) { return r.name.toLowerCase().indexOf(filter) >= 0 || r.description.toLowerCase().indexOf(filter) >= 0 })
-								}
+								model: rolesDataProvider.items
 
 								delegate: Rectangle {
 									width: rolesListColumn.width
@@ -1431,7 +1408,7 @@ DocumentViewBase {
 
 											BaseText {
 												anchors.centerIn: parent
-												text: modelData.name.charAt(0)
+												text: modelData.title ? modelData.title.charAt(0) : "R"
 												font.pixelSize: Style.fontSizeM
 												font.bold: true
 												color: Style.secondColor
@@ -1444,14 +1421,14 @@ DocumentViewBase {
 											width: parent.width - Style.iconSizeL - globalBadge.width - parent.spacing * 2
 
 											BaseText {
-												text: modelData.name
+												text: modelData.title || modelData.id || ""
 												font.pixelSize: Style.fontSizeM
 												font.bold: true
 												color: Style.textColor
 											}
 
 											BaseText {
-												text: modelData.description
+												text: modelData.description || ""
 												font.pixelSize: Style.fontSizeS
 												color: Style.inactiveTextColor
 												elide: Text.ElideRight
@@ -1487,10 +1464,21 @@ DocumentViewBase {
 								}
 							}
 
-							// Empty state for global roles if none
+							// Empty state for global roles
 							BaseText {
-								visible: globalRolesRepeater.count === 0
+								visible: globalRolesRepeater.count === 0 && !rolesDataProvider.isInitialLoading
 								text: qsTr("No global roles found.")
+								font.pixelSize: Style.fontSizeM
+								color: Style.inactiveTextColor
+								topPadding: Style.marginM
+								width: parent.width
+								horizontalAlignment: Text.AlignHCenter
+							}
+
+							// Loading state
+							BaseText {
+								visible: rolesDataProvider.isInitialLoading
+								text: qsTr("Loading roles...")
 								font.pixelSize: Style.fontSizeM
 								color: Style.inactiveTextColor
 								topPadding: Style.marginM
@@ -1502,7 +1490,7 @@ DocumentViewBase {
 				}
 			}
 
-			// --- Role Editor View (pushed on stack) — for creating Global Roles ---
+			// --- Role Editor View (pushed on stack) — for creating Roles ---
 			Component {
 				id: roleEditorView
 
@@ -1539,7 +1527,7 @@ DocumentViewBase {
 							Button {
 								text: qsTr("Create")
 								onClicked: {
-									// TODO: save global role via GQL
+									// TODO: send RoleAdd mutation via GQL (Roles.sdl)
 									rolesStackViewHeader.popHeader()
 									rolesStackView.previous()
 								}
@@ -1602,6 +1590,14 @@ DocumentViewBase {
 				id: groupsListView
 
 				Item {
+					FilterableSelectGqlDataProvider {
+						id: groupsDataProvider
+						collectionId: "Groups"
+						pageSize: 50
+					}
+
+					Component.onCompleted: groupsDataProvider.fetch("")
+
 					// Header (fixed)
 					Column {
 						id: groupsListHeader
@@ -1619,7 +1615,7 @@ DocumentViewBase {
 
 							BaseText {
 								anchors.verticalCenter: parent.verticalCenter
-								text: qsTr("Organize members into groups for easier permission management.")
+								text: qsTr("Organize members into groups.")
 								font.pixelSize: Style.fontSizeS
 								color: Style.inactiveTextColor
 							}
@@ -1659,6 +1655,7 @@ DocumentViewBase {
 							id: groupsFilter
 							width: parent.width
 							placeHolderText: qsTr("Filter groups...")
+							onTextChanged: groupsDataProvider.fetch(text)
 						}
 
 						Rectangle {
@@ -1668,25 +1665,130 @@ DocumentViewBase {
 						}
 					}
 
-					// Empty state or list
-					Item {
+					// Groups list content
+					CustomScrollbar {
+						id: groupsListScrollbar
+						z: parent.z + 1
+						anchors.right: parent.right
+						anchors.top: groupsListContent.top
+						anchors.bottom: groupsListContent.bottom
+						secondSize: Style.marginM
+						targetItem: groupsListContent
+					}
+
+					Flickable {
+						id: groupsListContent
 						anchors.top: groupsListHeader.bottom
 						anchors.topMargin: Style.marginM
 						anchors.bottom: parent.bottom
 						anchors.bottomMargin: Style.marginXL
 						anchors.left: parent.left
 						anchors.leftMargin: Style.marginXL
-						anchors.right: parent.right
+						anchors.right: groupsListScrollbar.left
 						anchors.rightMargin: Style.marginXL
+						contentWidth: groupsListColumn.width
+						contentHeight: groupsListColumn.height
+						boundsBehavior: Flickable.StopAtBounds
+						clip: true
 
-						BaseText {
-							anchors.centerIn: parent
-							text: qsTr("No groups created yet. Create a group to organize members.")
-							font.pixelSize: Style.fontSizeM
-							color: Style.inactiveTextColor
-							wrapMode: Text.WordWrap
-							width: parent.width
-							horizontalAlignment: Text.AlignHCenter
+						Column {
+							id: groupsListColumn
+							width: groupsListContent.width
+							spacing: 0
+
+							Repeater {
+								id: groupsRepeater
+								model: groupsDataProvider.items
+
+								delegate: Rectangle {
+									width: groupsListColumn.width
+									height: groupItemRow.implicitHeight + Style.marginM * 2
+									color: groupItemMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
+
+									MouseArea {
+										id: groupItemMouseArea
+										anchors.fill: parent
+										hoverEnabled: true
+										acceptedButtons: Qt.NoButton
+									}
+
+									Row {
+										id: groupItemRow
+										anchors.left: parent.left
+										anchors.right: parent.right
+										anchors.verticalCenter: parent.verticalCenter
+										anchors.margins: Style.marginM
+										spacing: Style.marginM
+
+										Rectangle {
+											width: Style.iconSizeL
+											height: Style.iconSizeL
+											radius: Style.radiusS
+											anchors.verticalCenter: parent.verticalCenter
+											color: Style.selectedColor
+
+											BaseText {
+												anchors.centerIn: parent
+												text: modelData.title ? modelData.title.charAt(0) : "G"
+												font.pixelSize: Style.fontSizeM
+												font.bold: true
+												color: Style.secondColor
+											}
+										}
+
+										Column {
+											anchors.verticalCenter: parent.verticalCenter
+											spacing: Style.marginXS
+											width: parent.width - Style.iconSizeL - parent.spacing
+
+											BaseText {
+												text: modelData.title || modelData.id || ""
+												font.pixelSize: Style.fontSizeM
+												font.bold: true
+												color: Style.textColor
+											}
+
+											BaseText {
+												text: modelData.description || ""
+												font.pixelSize: Style.fontSizeS
+												color: Style.inactiveTextColor
+												elide: Text.ElideRight
+												width: parent.width
+											}
+										}
+									}
+
+									Rectangle {
+										anchors.bottom: parent.bottom
+										width: parent.width
+										height: 1
+										color: Style.borderColor
+										opacity: 0.5
+									}
+								}
+							}
+
+							// Empty state
+							BaseText {
+								visible: groupsRepeater.count === 0 && !groupsDataProvider.isInitialLoading
+								text: qsTr("No groups created yet.")
+								font.pixelSize: Style.fontSizeM
+								color: Style.inactiveTextColor
+								topPadding: Style.marginM
+								width: parent.width
+								horizontalAlignment: Text.AlignHCenter
+							}
+
+							// Loading state
+							BaseText {
+								visible: groupsDataProvider.isInitialLoading
+								text: qsTr("Loading groups...")
+								font.pixelSize: Style.fontSizeM
+								color: Style.inactiveTextColor
+								topPadding: Style.marginM
+								width: parent.width
+								horizontalAlignment: Text.AlignHCenter
+							}
 						}
 					}
 				}
@@ -1729,7 +1831,7 @@ DocumentViewBase {
 							Button {
 								text: qsTr("Create")
 								onClicked: {
-									// TODO: save group via GQL
+									// TODO: send GroupAdd mutation via GQL (Groups.sdl)
 									groupsStackViewHeader.popHeader()
 									groupsStackView.previous()
 								}
