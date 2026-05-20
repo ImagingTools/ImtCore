@@ -54,6 +54,8 @@ public:
 	virtual OperationStatus CloseDocument(const QByteArray& userId, const QByteArray& documentId) override;
 
 protected:
+	// Returns the collection used for document storage.
+	// Virtual to allow subclasses (e.g. test doubles) to supply a different collection.
 	virtual imtbase::IObjectCollection* GetCollection() const;
 
 	// reimplemented (imtdoc::CDocumentServiceBase)

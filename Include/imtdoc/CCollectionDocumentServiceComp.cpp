@@ -697,6 +697,18 @@ IDocumentService::OperationStatus CCollectionDocumentServiceComp::CloseDocument(
 
 // reimplemented (imtdoc::CDocumentServiceBase)
 
+imtbase::IObjectCollection* CCollectionDocumentServiceComp::GetCollection() const
+{
+	return m_collectionCompPtr.IsValid() ? m_collectionCompPtr.GetPtr() : nullptr;
+}
+
+
+bool CCollectionDocumentServiceComp::IsSingleCopyMode() const
+{
+	return m_isSingleCopyModeAttrPtr.IsValid() && *m_isSingleCopyModeAttrPtr;
+}
+
+
 QString CCollectionDocumentServiceComp::GetDefaultDocumentName(const WorkingDocument& document) const
 {
 	const imtdoc::IDocumentNameProvider* nameProviderPtr = GetDocumentNameProvider(document.typeId);
