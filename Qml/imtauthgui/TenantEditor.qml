@@ -1111,10 +1111,35 @@ DocumentViewBase {
 		Item {
 			id: rolesPage
 
+			// Header with breadcrumb navigation
+			StackViewHeader {
+				id: rolesStackViewHeader
+				anchors.top: parent.top
+				anchors.left: parent.left
+				anchors.right: parent.right
+				height: Style.controlHeightL
+				initialItemTitleVisible: true
+
+				onCloseClicked: {
+					rolesStackView.previous()
+					rolesStackViewHeader.popHeader()
+				}
+
+				Component.onCompleted: {
+					rolesStackViewHeader.addHeader("roles_list", qsTr("Roles"))
+				}
+			}
+
 			StackView {
 				id: rolesStackView
-				anchors.fill: parent
-				initialItem: rolesListView
+				anchors.top: rolesStackViewHeader.bottom
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.bottom: parent.bottom
+
+				Component.onCompleted: {
+					rolesStackView.addPage(rolesListView)
+				}
 			}
 
 			// --- Roles List View ---
@@ -1126,7 +1151,7 @@ DocumentViewBase {
 					Column {
 						id: rolesListHeader
 						anchors.top: parent.top
-						anchors.topMargin: Style.marginXL
+						anchors.topMargin: Style.marginM
 						anchors.left: parent.left
 						anchors.leftMargin: Style.marginXL
 						anchors.right: parent.right
@@ -1137,22 +1162,11 @@ DocumentViewBase {
 							width: parent.width
 							spacing: Style.marginM
 
-							Column {
+							BaseText {
 								anchors.verticalCenter: parent.verticalCenter
-								spacing: Style.marginXS
-
-								BaseText {
-									text: qsTr("Roles")
-									font.pixelSize: Style.fontSizeXL
-									font.bold: true
-									color: Style.textColor
-								}
-
-								BaseText {
-									text: qsTr("Manage environment and global roles for workspace members.")
-									font.pixelSize: Style.fontSizeS
-									color: Style.inactiveTextColor
-								}
+								text: qsTr("Manage environment and global roles for workspace members.")
+								font.pixelSize: Style.fontSizeS
+								color: Style.inactiveTextColor
 							}
 
 							Item {
@@ -1176,7 +1190,11 @@ DocumentViewBase {
 									anchors.fill: parent
 									hoverEnabled: true
 									cursorShape: Qt.PointingHandCursor
-									onClicked: rolesStackView.push(roleEditorView)
+									onClicked: {
+										rolesStackViewHeader.addHeader("create_role", qsTr("Create Global Role"))
+										rolesStackView.addPage(roleEditorView)
+										rolesStackView.next()
+									}
 								}
 							}
 						}
@@ -1489,43 +1507,9 @@ DocumentViewBase {
 				id: roleEditorView
 
 				Item {
-					// Header with back button
-					Row {
-						id: roleEditorHeader
-						anchors.top: parent.top
-						anchors.topMargin: Style.marginXL
-						anchors.left: parent.left
-						anchors.leftMargin: Style.marginXL
-						anchors.right: parent.right
-						anchors.rightMargin: Style.marginXL
-						spacing: Style.marginM
-
-						Text {
-							anchors.verticalCenter: parent.verticalCenter
-							text: "← " + qsTr("Back")
-							font.pixelSize: Style.fontSizeM
-							color: Style.linkColor
-
-							MouseArea {
-								anchors.fill: parent
-								hoverEnabled: true
-								cursorShape: Qt.PointingHandCursor
-								onClicked: rolesStackView.pop()
-							}
-						}
-
-						BaseText {
-							anchors.verticalCenter: parent.verticalCenter
-							text: qsTr("Create Global Role")
-							font.pixelSize: Style.fontSizeXL
-							font.bold: true
-							color: Style.textColor
-						}
-					}
-
 					// Editor content
 					Column {
-						anchors.top: roleEditorHeader.bottom
+						anchors.top: parent.top
 						anchors.topMargin: Style.marginXL
 						anchors.left: parent.left
 						anchors.leftMargin: Style.marginXL
@@ -1556,13 +1540,17 @@ DocumentViewBase {
 								text: qsTr("Create")
 								onClicked: {
 									// TODO: save global role via GQL
-									rolesStackView.pop()
+									rolesStackViewHeader.popHeader()
+									rolesStackView.previous()
 								}
 							}
 
 							Button {
 								text: qsTr("Cancel")
-								onClicked: rolesStackView.pop()
+								onClicked: {
+									rolesStackViewHeader.popHeader()
+									rolesStackView.previous()
+								}
 							}
 						}
 					}
@@ -1578,10 +1566,35 @@ DocumentViewBase {
 		Item {
 			id: groupsPage
 
+			// Header with breadcrumb navigation
+			StackViewHeader {
+				id: groupsStackViewHeader
+				anchors.top: parent.top
+				anchors.left: parent.left
+				anchors.right: parent.right
+				height: Style.controlHeightL
+				initialItemTitleVisible: true
+
+				onCloseClicked: {
+					groupsStackView.previous()
+					groupsStackViewHeader.popHeader()
+				}
+
+				Component.onCompleted: {
+					groupsStackViewHeader.addHeader("groups_list", qsTr("Groups"))
+				}
+			}
+
 			StackView {
 				id: groupsStackView
-				anchors.fill: parent
-				initialItem: groupsListView
+				anchors.top: groupsStackViewHeader.bottom
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.bottom: parent.bottom
+
+				Component.onCompleted: {
+					groupsStackView.addPage(groupsListView)
+				}
 			}
 
 			// --- Groups List View ---
@@ -1593,7 +1606,7 @@ DocumentViewBase {
 					Column {
 						id: groupsListHeader
 						anchors.top: parent.top
-						anchors.topMargin: Style.marginXL
+						anchors.topMargin: Style.marginM
 						anchors.left: parent.left
 						anchors.leftMargin: Style.marginXL
 						anchors.right: parent.right
@@ -1604,22 +1617,11 @@ DocumentViewBase {
 							width: parent.width
 							spacing: Style.marginM
 
-							Column {
+							BaseText {
 								anchors.verticalCenter: parent.verticalCenter
-								spacing: Style.marginXS
-
-								BaseText {
-									text: qsTr("Groups")
-									font.pixelSize: Style.fontSizeXL
-									font.bold: true
-									color: Style.textColor
-								}
-
-								BaseText {
-									text: qsTr("Organize members into groups for easier permission management.")
-									font.pixelSize: Style.fontSizeS
-									color: Style.inactiveTextColor
-								}
+								text: qsTr("Organize members into groups for easier permission management.")
+								font.pixelSize: Style.fontSizeS
+								color: Style.inactiveTextColor
 							}
 
 							Item {
@@ -1643,7 +1645,11 @@ DocumentViewBase {
 									anchors.fill: parent
 									hoverEnabled: true
 									cursorShape: Qt.PointingHandCursor
-									onClicked: groupsStackView.push(groupEditorView)
+									onClicked: {
+										groupsStackViewHeader.addHeader("create_group", qsTr("Create Group"))
+										groupsStackView.addPage(groupEditorView)
+										groupsStackView.next()
+									}
 								}
 							}
 						}
@@ -1691,43 +1697,9 @@ DocumentViewBase {
 				id: groupEditorView
 
 				Item {
-					// Header with back button
-					Row {
-						id: groupEditorHeader
-						anchors.top: parent.top
-						anchors.topMargin: Style.marginXL
-						anchors.left: parent.left
-						anchors.leftMargin: Style.marginXL
-						anchors.right: parent.right
-						anchors.rightMargin: Style.marginXL
-						spacing: Style.marginM
-
-						Text {
-							anchors.verticalCenter: parent.verticalCenter
-							text: "← " + qsTr("Back")
-							font.pixelSize: Style.fontSizeM
-							color: Style.linkColor
-
-							MouseArea {
-								anchors.fill: parent
-								hoverEnabled: true
-								cursorShape: Qt.PointingHandCursor
-								onClicked: groupsStackView.pop()
-							}
-						}
-
-						BaseText {
-							anchors.verticalCenter: parent.verticalCenter
-							text: qsTr("Create Group")
-							font.pixelSize: Style.fontSizeXL
-							font.bold: true
-							color: Style.textColor
-						}
-					}
-
 					// Editor content
 					Column {
-						anchors.top: groupEditorHeader.bottom
+						anchors.top: parent.top
 						anchors.topMargin: Style.marginXL
 						anchors.left: parent.left
 						anchors.leftMargin: Style.marginXL
@@ -1758,13 +1730,17 @@ DocumentViewBase {
 								text: qsTr("Create")
 								onClicked: {
 									// TODO: save group via GQL
-									groupsStackView.pop()
+									groupsStackViewHeader.popHeader()
+									groupsStackView.previous()
 								}
 							}
 
 							Button {
 								text: qsTr("Cancel")
-								onClicked: groupsStackView.pop()
+								onClicked: {
+									groupsStackViewHeader.popHeader()
+									groupsStackView.previous()
+								}
 							}
 						}
 					}
@@ -1955,6 +1931,8 @@ DocumentViewBase {
 				anchors.leftMargin: Style.marginXL
 				anchors.right: parent.right
 				anchors.rightMargin: Style.marginXL
+				border.width: 0
+				radius: 0
 
 				Connections {
 					target: tenantPermissionsTreeView.treeView
