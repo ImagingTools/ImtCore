@@ -4,18 +4,16 @@
 
 // ImtCore includes
 #include <imtdoc/CCollectionDocumentServiceBase.h>
-#include <imtdoc/CDocumentServiceCompBase.h>
 
 
 namespace imtdoc
 {
 
 
-class CCollectionDocumentServiceComp: public CDocumentServiceCompBase, public CCollectionDocumentServiceBase
+class CCollectionDocumentServiceComp: public CCollectionDocumentServiceBase
 {
 public:
-	typedef CDocumentServiceCompBase BaseClass;
-	typedef CCollectionDocumentServiceBase BaseClass2;
+	typedef CCollectionDocumentServiceBase BaseClass;
 
 	I_BEGIN_COMPONENT(CCollectionDocumentServiceComp)
 		I_REGISTER_INTERFACE(imtdoc::IDocumentService)
