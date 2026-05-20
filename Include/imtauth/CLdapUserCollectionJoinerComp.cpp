@@ -101,11 +101,40 @@ void CLdapUserCollectionJoinerComp::OnUpdate(
 
 	// Remove missing LDAP users from internal collection
 	for (const QByteArray& userUuid : storedLdapUserIds){
-		QByteArray login = GetLoginByUserUuid(userUuid);
-		if (!actualLdapUserIds.contains(login)){
-			imtbase::ICollectionInfo::Ids elementIds;
-			elementIds << userUuid;
-			m_userCollectionCompPtr->RemoveElements(elementIds);
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_userCollectionCompPtr->GetObjectData(userUuid, dataPtr)){
+			const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
+			if (userInfoPtr != nullptr){
+				QByteArray sid = userInfoPtr->GetSid();
+				if (!sid.isEmpty()){
+					// Check by SID: look for matching SID in LDAP collection
+					bool found = false;
+					for (const QByteArray& ldapUserId : actualLdapUserIds){
+						imtbase::IObjectCollection::DataPtr ldapDataPtr;
+						if (m_ldapUserCollectionCompPtr->GetObjectData(ldapUserId, ldapDataPtr)){
+							const imtauth::IUserInfo* ldapUserInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(ldapDataPtr.GetPtr());
+							if (ldapUserInfoPtr != nullptr && ldapUserInfoPtr->GetSid() == sid){
+								found = true;
+								break;
+							}
+						}
+					}
+					if (!found){
+						imtbase::ICollectionInfo::Ids elementIds;
+						elementIds << userUuid;
+						m_userCollectionCompPtr->RemoveElements(elementIds);
+					}
+				}
+				else{
+					// Fallback to login name comparison for users without SID
+					QByteArray login = userInfoPtr->GetId();
+					if (!actualLdapUserIds.contains(login)){
+						imtbase::ICollectionInfo::Ids elementIds;
+						elementIds << userUuid;
+						m_userCollectionCompPtr->RemoveElements(elementIds);
+					}
+				}
+			}
 		}
 	}
 }
