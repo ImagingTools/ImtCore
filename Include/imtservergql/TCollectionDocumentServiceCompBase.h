@@ -10,7 +10,7 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtgql/CGqlRequest.h>
-#include <imtdoc/CCollectionDocumentServiceBase.h>
+#include <imtdoc/CDocumentServiceBase.h>
 #include <imtbasesdl/SDL/1.0/CPP/DocumentService.h>
 #include <imtbasesdl/SDL/1.0/CPP/UndoManager.h>
 
@@ -24,11 +24,11 @@ namespace UM = sdl::imtbase::UndoManager;
 
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
-class TCollectionDocumentServiceCompBase : public Base, public imtdoc::CCollectionDocumentServiceBase
+class TCollectionDocumentServiceCompBase : public Base, virtual public imtdoc::CDocumentServiceBase
 {
 public:
 	typedef Base BaseClass;
-	typedef imtdoc::CCollectionDocumentServiceBase BaseClass2;
+	typedef imtdoc::CDocumentServiceBase BaseClass2;
 	typedef ColorCollectionDocumentServiceDefs Defs;
 
 	I_BEGIN_BASE_COMPONENT(TCollectionDocumentServiceCompBase)
@@ -81,12 +81,12 @@ protected:
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
 
-	imtdoc::CCollectionDocumentServiceBase* GetNonConstThis() const;
+	imtdoc::IDocumentService* GetNonConstThis() const;
 	int GetObjectFactoryIndex(const QByteArray& typeId) const;
 	QByteArray GetUserId(const ::imtgql::CGqlRequest& gqlRequest) const;
 
-	// reimplemented (imtdoc::CCollectionDocumentServiceBase)
-	virtual imtbase::IObjectCollection* GetCollection() const override;
+	// reimplemented (imtdoc::CDocumentServiceBase)
+	virtual imtbase::IObjectCollection* GetCollection() const;
 	virtual istd::IChangeableSharedPtr CreateObject(const QByteArray& typeId) const override;
 	virtual idoc::IUndoManagerSharedPtr CreateUndoManager() const override;
 
@@ -120,11 +120,11 @@ inline void TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServ
 // protected methods
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
-inline imtdoc::CCollectionDocumentServiceBase* TCollectionDocumentServiceCompBase<
+inline imtdoc::IDocumentService* TCollectionDocumentServiceCompBase<
 	Base,
 	ColorCollectionDocumentServiceDefs>::GetNonConstThis() const
 {
-	return const_cast<imtdoc::CCollectionDocumentServiceBase*>(dynamic_cast<const imtdoc::CCollectionDocumentServiceBase*>(this));
+	return const_cast<imtdoc::IDocumentService*>(dynamic_cast<const imtdoc::IDocumentService*>(this));
 }
 
 
@@ -159,7 +159,7 @@ inline QByteArray TCollectionDocumentServiceCompBase<Base, ColorCollectionDocume
 }
 
 
-// reimplemented (imtdoc::CCollectionDocumentServiceBase)
+// reimplemented (imtdoc::CDocumentServiceBase)
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
 inline imtbase::IObjectCollection* TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::

@@ -16,7 +16,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <imtdoc/CCollectionDocumentServiceBase.h>
+#include <imtdoc/CCollectionDocumentServiceComp.h>
 #include <imtdoc/IDocumentServiceEventHandler.h>
 
 
@@ -498,7 +498,7 @@ private:
 	Concrete subclass of CCollectionDocumentService for testing.
 	Provides mock implementations for the pure virtual methods.
 */
-class CTestableDocumentService: public imtdoc::CCollectionDocumentServiceBase
+class CTestableDocumentService: public imtdoc::CCollectionDocumentServiceComp
 {
 public:
 	CTestableDocumentService()
@@ -534,7 +534,7 @@ public:
 	using imtdoc::CDocumentServiceBase::m_sharedDocuments;
 
 protected:
-	// reimplemented (CCollectionDocumentServiceBase)
+	// reimplemented (CCollectionDocumentServiceComp)
 	virtual imtbase::IObjectCollection* GetCollection() const override
 	{
 		return m_collectionPtr;
