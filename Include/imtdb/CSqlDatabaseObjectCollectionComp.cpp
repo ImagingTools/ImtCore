@@ -758,12 +758,14 @@ bool CSqlDatabaseObjectCollectionComp::SetElementDescription(const Id& elementId
 		return false;
 	}
 	QString escapedDescription = imtdb::SqlEncode(description);
-	escapedDescription = escapedDescription.left(*m_maxLengthCommentAttrPtr);
-	if (escapedDescription.count(QLatin1Char('\'')) % 2 != 0){
-		escapedDescription = escapedDescription.left(*m_maxLengthCommentAttrPtr - 1);
+	if (escapedDescription.length() > *m_maxLengthCommentAttrPtr){
+		escapedDescription = escapedDescription.left(*m_maxLengthCommentAttrPtr);
+		// Ensure we don't split an escaped quote pair ('')
+		while (escapedDescription.endsWith(QLatin1Char('\'')) && escapedDescription.count(QLatin1Char('\'')) % 2 != 0){
+			escapedDescription.chop(1);
+		}
 	}
 
-	
 	QByteArray query = m_objectDelegateCompPtr->CreateDescriptionObjectQuery(*this, elementId, escapedDescription, nullptr);
 	if (query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");

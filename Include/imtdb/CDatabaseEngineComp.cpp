@@ -650,9 +650,9 @@ QString CDatabaseEngineComp::GetDatabasePath() const
 		QString databaseFilePath = m_dbFilePathCompPtr->GetPath();
 
 		SendInfoMessageOnce(0, QObject::tr("Use database file: %1").arg(databaseFilePath));
-	}
 
-	return m_dbFilePathCompPtr->GetPath();
+		return databaseFilePath;
+	}
 }
 
 

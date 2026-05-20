@@ -440,9 +440,12 @@ int CSqlDatabaseDocumentDelegateLegacyComp::BackupRevision(
 				.toUtf8();
 
 	QString escapedComment = SqlEncode(userComment);
-	escapedComment = escapedComment.left(*m_maxLengthRevisionCommentAttrPtr);
-	if (escapedComment.count(QLatin1Char('\'')) % 2 != 0){
-		escapedComment = escapedComment.left(*m_maxLengthRevisionCommentAttrPtr - 1);
+	if (escapedComment.length() > *m_maxLengthRevisionCommentAttrPtr){
+		escapedComment = escapedComment.left(*m_maxLengthRevisionCommentAttrPtr);
+		// Ensure we don't split an escaped quote pair ('')
+		while (escapedComment.endsWith(QLatin1Char('\'')) && escapedComment.count(QLatin1Char('\'')) % 2 != 0){
+			escapedComment.chop(1);
+		}
 	}
 	QByteArray updateCommentQuery = QString("UPDATE \"%1\" SET \"Comment\" = '%2' WHERE \"%3\" in (%4)")
 				.arg(qPrintable(*m_revisionsTableNameAttrPtr))

@@ -432,7 +432,7 @@ void CTaskManagerGuiComp::OnRenameTask()
 		int count = 1;
 		for (const QByteArray& taskId : selectedIds) {
 			objectPtr->SetElementName(taskId, newName);
-			newName = baseName + " " + QString::number(count++); 
+			newName = baseName + " " + QString::number(count++);
 		}
 	}
 }

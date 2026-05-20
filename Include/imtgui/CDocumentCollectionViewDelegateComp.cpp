@@ -371,9 +371,11 @@ QString CDocumentCollectionViewDelegateComp::CommentDocumentChanges(int /*revisi
 	lineEdit->setMaxLength(*m_maxLengthRevisionCommentAttrPtr);
 
 	int ret = inputDiag.exec();
-	QString comment = inputDiag.textValue();
+	if (ret != QDialog::Accepted){
+		return QString();
+	}
 
-	return comment;
+	return inputDiag.textValue();
 }
 
 

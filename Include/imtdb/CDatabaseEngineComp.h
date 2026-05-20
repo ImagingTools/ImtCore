@@ -18,6 +18,7 @@
 #include <imtdb/IMigrationController.h>
 
 // std includes
+#include <atomic>
 #include <set>
 
 
@@ -175,7 +176,7 @@ private:
 
 	mutable std::mutex m_connectedThreadsMutex;
 	mutable std::set<quintptr> m_connectedThreads;
-	mutable bool m_shuttingDown = false;
+	mutable std::atomic<bool> m_shuttingDown{false};
 };
 
 

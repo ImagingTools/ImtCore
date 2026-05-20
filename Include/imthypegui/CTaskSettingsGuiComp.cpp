@@ -165,13 +165,13 @@ void CTaskSettingsGuiComp::OnTryClose(bool* ignoredPtr)
 		int pos;
 		QString name = TaskNameEdit->text().trimmed();
 		if (m_taskNameValidator.validate(name, pos) != QValidator::Acceptable){
-			QMessageBox::critical(NULL, tr("Error"), tr("The task name contains some not allowed characters"));
+			QMessageBox::critical(nullptr, tr("Error"), tr("The task name contains some not allowed characters"));
 
 			*ignoredPtr = true;
 		}
 		QString trigger = TriggerSelector->text().trimmed();
 		if (m_triggerIdValidator.validate(trigger, pos) != QValidator::Acceptable) {
-			QMessageBox::critical(NULL, tr("Error"), tr("Acq-SubId must be a number"));
+			QMessageBox::critical(nullptr, tr("Error"), tr("Acq-SubId must be a number"));
 
 			*ignoredPtr = true;
 		}

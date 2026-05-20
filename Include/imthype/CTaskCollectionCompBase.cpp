@@ -387,7 +387,7 @@ bool CTaskCollectionCompBase::RemoveElements(const Ids& objectIds, const imtbase
 			++iter;
 		}
 	}
-	
+
 	return true;
 }
 
@@ -1041,12 +1041,10 @@ void CTaskCollectionCompBase::OnTaskInputsUpdated(const istd::IChangeable::Chang
 		if (var.canConvert<imtbase::IChangeablePtr>()) {
 			imthype::CTaskCollectionUpdateEvent* eventPtr = dynamic_cast<imthype::CTaskCollectionUpdateEvent*>(var.value<imtbase::IChangeablePtr>().GetPtr());
 			if (eventPtr != nullptr) {
-				if (eventPtr != nullptr) {
-					imtbase::IObjectCollection::Ids ids = GetElementIds();
-					for (const QByteArray& id : ids) {
-						if (GetTaskInputSubId(id) == eventPtr->GetOldValue().toByteArray()) {
-							SetTaskInputSubId(id, eventPtr->GetNewValue().toByteArray());
-						}
+				imtbase::IObjectCollection::Ids ids = GetElementIds();
+				for (const QByteArray& id : ids) {
+					if (GetTaskInputSubId(id) == eventPtr->GetOldValue().toByteArray()) {
+						SetTaskInputSubId(id, eventPtr->GetNewValue().toByteArray());
 					}
 				}
 			}
