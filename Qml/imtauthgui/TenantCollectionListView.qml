@@ -114,7 +114,7 @@ Item {
 
 		delegate: Rectangle {
 			width: listViewArea.width
-			height: itemRow.implicitHeight + Style.marginM * 2
+			height: Style.controlHeightL
 			color: itemMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
 
 			MouseArea {

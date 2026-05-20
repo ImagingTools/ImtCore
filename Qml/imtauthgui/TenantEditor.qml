@@ -1148,57 +1148,105 @@ DocumentViewBase {
 				id: rolesListView
 
 				Item {
-					// Environment Roles (vertical list above filter)
-					Column {
-						id: envRolesSection
+					// Page header with title + description + Create button
+					Item {
+						id: rolesPageTitleRow
 						anchors.top: parent.top
 						anchors.topMargin: Style.marginM
 						anchors.left: parent.left
 						anchors.leftMargin: Style.marginXL
 						anchors.right: parent.right
 						anchors.rightMargin: Style.marginXL
-						spacing: 0
+						height: rolesPageTitleCol.implicitHeight
+
+						Column {
+							id: rolesPageTitleCol
+							anchors.left: parent.left
+							anchors.verticalCenter: parent.verticalCenter
+							spacing: Style.marginXS
+
+							BaseText {
+								id: rolesTitleText
+								text: qsTr("Roles")
+								font.pixelSize: Style.fontSizeL
+								font.bold: true
+								color: Style.textColor
+							}
+
+							BaseText {
+								text: qsTr("Manage tenant roles and assign permissions to team members.")
+								font.pixelSize: Style.fontSizeS
+								color: Style.inactiveTextColor
+							}
+						}
+
+						Text {
+							visible: container.canManageMembers
+							anchors.right: parent.right
+							anchors.verticalCenter: rolesTitleText.verticalCenter
+							text: "+ " + qsTr("Create Role")
+							font.pixelSize: Style.fontSizeM
+							font.bold: true
+							color: Style.linkColor
+
+							MouseArea {
+								anchors.fill: parent
+								hoverEnabled: true
+								cursorShape: Qt.PointingHandCursor
+								onClicked: {
+									rolesStackViewHeader.addHeader("create_role", qsTr("Create New Role"))
+									rolesStackView.addPage(roleEditorView)
+									rolesStackView.next()
+								}
+							}
+						}
+					}
+
+					// Environment Roles (horizontal)
+					Column {
+						id: envRolesSection
+						anchors.top: rolesPageTitleRow.bottom
+						anchors.topMargin: Style.marginM
+						anchors.left: parent.left
+						anchors.leftMargin: Style.marginXL
+						anchors.right: parent.right
+						anchors.rightMargin: Style.marginXL
+						spacing: Style.marginS
 
 						BaseText {
 							text: qsTr("Environment Roles")
 							font.pixelSize: Style.fontSizeM
 							color: Style.textColor
-							bottomPadding: Style.marginS
 						}
 
-						Repeater {
-							model: ListModel {
-								ListElement { name: "Creator"; desc: "Full control + Permissions. Permanent."; icon: "Icons/Crown" }
-								ListElement { name: "Owner"; desc: "Superuser. All except Permissions."; icon: "Icons/Key" }
-								ListElement { name: "Admin"; desc: "Manage members, roles, groups."; icon: "Icons/AdminPanel" }
-								ListElement { name: "Member"; desc: "Read-only. Default on invite accept."; icon: "Icons/User" }
-							}
+						Flow {
+							width: parent.width
+							spacing: Style.marginL
 
-							delegate: Row {
-								width: envRolesSection.width
-								height: Style.iconSizeM + Style.marginS
-								spacing: Style.marginS
-
-								Image {
-									width: Style.iconSizeM
-									height: Style.iconSizeM
-									anchors.verticalCenter: parent.verticalCenter
-									source: Style.icon(model.icon)
-									sourceSize: Qt.size(Style.iconSizeM, Style.iconSizeM)
+							Repeater {
+								model: ListModel {
+									ListElement { name: "Creator"; icon: "Icons/Crown" }
+									ListElement { name: "Owner"; icon: "Icons/Key" }
+									ListElement { name: "Admin"; icon: "Icons/AdminPanel" }
+									ListElement { name: "Member"; icon: "Icons/User" }
 								}
+								delegate: Row {
+									spacing: Style.marginXS
 
-								BaseText {
-									anchors.verticalCenter: parent.verticalCenter
-									text: model.name
-									font.pixelSize: Style.fontSizeS
-									color: Style.textColor
-								}
+									Image {
+										width: Style.iconSizeS
+										height: Style.iconSizeS
+										anchors.verticalCenter: parent.verticalCenter
+										source: Style.icon(model.icon)
+										sourceSize: Qt.size(Style.iconSizeS, Style.iconSizeS)
+									}
 
-								BaseText {
-									anchors.verticalCenter: parent.verticalCenter
-									text: "— " + model.desc
-									font.pixelSize: Style.fontSizeS
-									color: Style.inactiveTextColor
+									BaseText {
+										anchors.verticalCenter: parent.verticalCenter
+										text: model.name
+										font.pixelSize: Style.fontSizeS
+										color: Style.textColor
+									}
 								}
 							}
 						}
@@ -1220,14 +1268,7 @@ DocumentViewBase {
 						collectionId: "Roles"
 						filterPlaceholder: qsTr("Filter roles...")
 						emptyMessage: qsTr("No roles created yet.")
-						createButtonText: qsTr("Create Role")
 						canManage: container.canManageMembers
-
-						onCreateRequested: {
-							rolesStackViewHeader.addHeader("create_role", qsTr("Create New Role"))
-							rolesStackView.addPage(roleEditorView)
-							rolesStackView.next()
-						}
 
 						onEditRequested: {
 							rolesPage.__editRoleId = itemId
@@ -1428,19 +1469,70 @@ DocumentViewBase {
 				id: groupsListView
 
 				Item {
+					// Page header with title + description + Create button
+					Item {
+						id: groupsPageTitleRow
+						anchors.top: parent.top
+						anchors.topMargin: Style.marginM
+						anchors.left: parent.left
+						anchors.leftMargin: Style.marginXL
+						anchors.right: parent.right
+						anchors.rightMargin: Style.marginXL
+						height: groupsPageTitleCol.implicitHeight
+
+						Column {
+							id: groupsPageTitleCol
+							anchors.left: parent.left
+							anchors.verticalCenter: parent.verticalCenter
+							spacing: Style.marginXS
+
+							BaseText {
+								id: groupsTitleText
+								text: qsTr("Groups")
+								font.pixelSize: Style.fontSizeL
+								font.bold: true
+								color: Style.textColor
+							}
+
+							BaseText {
+								text: qsTr("Organize members into groups for easier permission management.")
+								font.pixelSize: Style.fontSizeS
+								color: Style.inactiveTextColor
+							}
+						}
+
+						Text {
+							visible: container.canManageMembers
+							anchors.right: parent.right
+							anchors.verticalCenter: groupsTitleText.verticalCenter
+							text: "+ " + qsTr("Create Group")
+							font.pixelSize: Style.fontSizeM
+							font.bold: true
+							color: Style.linkColor
+
+							MouseArea {
+								anchors.fill: parent
+								hoverEnabled: true
+								cursorShape: Qt.PointingHandCursor
+								onClicked: {
+									groupsStackViewHeader.addHeader("create_group", qsTr("Create New Group"))
+									groupsStackView.addPage(groupEditorView)
+									groupsStackView.next()
+								}
+							}
+						}
+					}
+
 					TenantCollectionListView {
-						anchors.fill: parent
+						anchors.top: groupsPageTitleRow.bottom
+						anchors.topMargin: Style.marginM
+						anchors.left: parent.left
+						anchors.right: parent.right
+						anchors.bottom: parent.bottom
 						collectionId: "Groups"
 						filterPlaceholder: qsTr("Filter groups...")
 						emptyMessage: qsTr("No groups created yet.")
-						createButtonText: qsTr("Create Group")
 						canManage: container.canManageMembers
-
-						onCreateRequested: {
-							groupsStackViewHeader.addHeader("create_group", qsTr("Create New Group"))
-							groupsStackView.addPage(groupEditorView)
-							groupsStackView.next()
-						}
 
 						onEditRequested:{
 							groupsPage.__editGroupId = itemId
