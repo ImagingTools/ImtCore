@@ -1153,7 +1153,9 @@ DocumentViewBase {
 						pageSize: 50
 					}
 
-					Component.onCompleted: rolesDataProvider.fetch("")
+					Component.onCompleted: {
+						rolesDataProvider.fetch("")
+					}
 
 					// Header (fixed)
 					Column {
@@ -1596,7 +1598,9 @@ DocumentViewBase {
 						pageSize: 50
 					}
 
-					Component.onCompleted: groupsDataProvider.fetch("")
+					Component.onCompleted: {
+						groupsDataProvider.fetch("")
+					}
 
 					// Header (fixed)
 					Column {
