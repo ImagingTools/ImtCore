@@ -44,6 +44,11 @@ QtObject {
 	signal groupUpdated(string groupId)
 	signal groupDataReceived(var data)
 
+	signal userCreated()
+	signal userRemoved(string userId)
+	signal userUpdated(string userId)
+	signal userDataReceived(var data)
+
 	signal requestFailed(string message)
 
 	// =========================================================================
@@ -201,6 +206,56 @@ QtObject {
 		}
 	}
 
+	// --- Users (ImtCollection.sdl) ---
+	property InsertNewObjectInput __insertUserInput: InsertNewObjectInput {}
+	property GqlSdlRequestSender __insertUserSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_insertNewObject
+
+		sdlObjectComp: Component {
+			InsertNewObjectPayload {
+				onFinished: { root.userCreated() }
+			}
+		}
+	}
+
+	property RemoveElementsInput __removeUserInput: RemoveElementsInput {}
+	property string __pendingRemoveUserId: ""
+	property GqlSdlRequestSender __removeUserSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_removeElements
+
+		sdlObjectComp: Component {
+			RemoveElementsPayload {
+				onFinished: { root.userRemoved(root.__pendingRemoveUserId) }
+			}
+		}
+	}
+
+	property SetObjectDataInput __setUserDataInput: SetObjectDataInput {}
+	property string __pendingSetUserId: ""
+	property GqlSdlRequestSender __setUserDataSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_setObjectData
+
+		sdlObjectComp: Component {
+			SetObjectDataPayload {
+				onFinished: { root.userUpdated(root.__pendingSetUserId) }
+			}
+		}
+	}
+
+	property GetObjectDataInput __getUserDataInput: GetObjectDataInput {}
+	property GqlSdlRequestSender __getUserDataSender: GqlSdlRequestSender {
+		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_getObjectData
+
+		sdlObjectComp: Component {
+			GetObjectDataPayload {
+				onFinished: { root.__handleUserDataReceived(m_objectData) }
+			}
+		}
+	}
+
 	// =========================================================================
 	// Public methods (override the abstract stubs)
 	// =========================================================================
@@ -305,6 +360,38 @@ QtObject {
 		root.__getGroupDataSender.send(root.__getGroupDataInput)
 	}
 
+	function insertUser(name, description) {
+		root.__insertUserInput.m_collectionId = "Users"
+		root.__insertUserInput.m_typeId = "User"
+		root.__insertUserInput.m_name = name || ""
+		root.__insertUserInput.m_description = description || ""
+		root.__insertUserSender.send(root.__insertUserInput)
+	}
+
+	function removeUser(userId) {
+		root.__pendingRemoveUserId = userId || ""
+		root.__removeUserInput.m_collectionId = "Users"
+		root.__removeUserInput.m_elementIds = [userId]
+		root.__removeUserSender.send(root.__removeUserInput)
+	}
+
+	function setUserData(userId, name, description) {
+		root.__pendingSetUserId = userId || ""
+		root.__setUserDataInput.m_collectionId = "Users"
+		root.__setUserDataInput.m_objectId = userId || ""
+		root.__setUserDataInput.m_objectData = JSON.stringify({
+			name: name || "",
+			description: description || ""
+		})
+		root.__setUserDataSender.send(root.__setUserDataInput)
+	}
+
+	function getUserData(userId) {
+		root.__getUserDataInput.m_collectionId = "Users"
+		root.__getUserDataInput.m_objectId = userId || ""
+		root.__getUserDataSender.send(root.__getUserDataInput)
+	}
+
 	// --- Internal parse helpers ---
 	function __handleRoleDataReceived(objectDataJson) {
 		if (!objectDataJson)
@@ -325,6 +412,17 @@ QtObject {
 			root.groupDataReceived(data)
 		} catch (e) {
 			console.warn("Failed to parse group object data:", e)
+		}
+	}
+
+	function __handleUserDataReceived(objectDataJson) {
+		if (!objectDataJson)
+			return
+		try {
+			var data = JSON.parse(objectDataJson)
+			root.userDataReceived(data)
+		} catch (e) {
+			console.warn("Failed to parse user object data:", e)
 		}
 	}
 }

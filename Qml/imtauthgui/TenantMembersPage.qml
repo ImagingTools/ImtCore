@@ -11,12 +11,13 @@ import imtauthgui 1.0
 /**
  * TenantMembersPage
  *
- * Members tab of the TenantEditor — lists active members and pending invitations,
- * and exposes invite / leave / actions menus.
+ * Members tab of the TenantEditor — displays tenant users via TenantCollectionListView
+ * with StackView navigation. Opens UserView for create/edit.
+ * Also provides Create Invitation to invite external users not yet in the tenant.
  *
- * Talks to the server exclusively through `apiClient` (abstract contract).
- * Holds no SDL imports. Inherits ViewBase so model updates are protected by
- * doUpdateGui / doUpdateModel.
+ * Users created within the tenant automatically become members with "Member" role.
+ *
+ * Inherits ViewBase so model updates are protected by doUpdateGui / doUpdateModel.
  */
 ViewBase {
 	id: membersPage
@@ -27,433 +28,299 @@ ViewBase {
 	property var stateManager: null
 	property var apiClient: null
 
+	// Factory injected by the orchestrator that returns a UserData instance.
+	property var userDataFactory: null
+
 	function updateGui() {
-		// UI is bound directly to stateManager.pendingMembers / pendingInvitations.
+		// UI is bound directly to stateManager / TenantCollectionListView.
 	}
 
 	function updateModel() {
 		// Members are synced from the state manager in the orchestrator.
 	}
 
-	// --- Confirmation state ---
-	property string __confirmRemoveUserId: ""
-	property string __confirmRemoveUserName: ""
-	property string __confirmTransferUserId: ""
-	property string __confirmTransferUserName: ""
-	property string __confirmRevokeInvitationId: ""
-	property string __confirmRevokeUserName: ""
+	property string __editUserId: ""
+	property string __editUserName: ""
+	property string __editUserDescription: ""
 
-	// --- Pending menu target ---
-	property string __pendingMenuUserId: ""
-	property string __pendingMenuUserName: ""
-	property bool __pendingMenuIsOwner: false
-	property bool __pendingMenuIsCurrentUser: false
+	readonly property bool __canManage: membersPage.stateManager ? membersPage.stateManager.canManageMembers : false
 
-	function __removeMemberById(userId) {
-		if (!membersPage.stateManager) return
-		membersPage.stateManager.removeMemberById(userId)
-		membersPage.doUpdateModel()
-	}
-
-	function __transferOwnershipTo(newOwnerId) {
-		if (!membersPage.apiClient || !membersPage.tenantData) return
-		membersPage.apiClient.transferOwnership(membersPage.tenantData.m_id || "", newOwnerId)
-	}
-
-	function __showActionsMenu(menuItems, userId, userName, isOwnerTarget, isCurrentUserTarget) {
-		if (menuItems.length === 0)
-			return
-		if (menuItems.length === 1) {
-			membersPage.__executeAction(menuItems[0].action, userId, userName)
-			return
+	Connections {
+		target: membersPage.apiClient
+		function onUserDataReceived(data) {
+			if (membersPage.stateManager)
+				membersPage.stateManager.receivedUserData = data
 		}
-		membersPage.__pendingMenuUserId = userId
-		membersPage.__pendingMenuUserName = userName
-		membersPage.__pendingMenuIsOwner = isOwnerTarget
-		membersPage.__pendingMenuIsCurrentUser = isCurrentUserTarget
-		memberActionsMenu.popup()
-	}
-
-	function __showInviteActionsMenu(menuItems, invitationId, userName) {
-		if (menuItems.length === 1) {
-			membersPage.__executeInviteAction(menuItems[0].action, invitationId, userName)
-			return
-		}
-		membersPage.__pendingMenuUserId = invitationId
-		membersPage.__pendingMenuUserName = userName
-		inviteActionsMenu.popup()
-	}
-
-	function __executeAction(action, userId, userName) {
-		if (action === "remove") {
-			membersPage.__confirmRemoveUserId = userId
-			membersPage.__confirmRemoveUserName = userName
-			ModalDialogManager.showConfirmationDialog(
-				qsTr("Remove Member"),
-				qsTr("Are you sure you want to remove %1? They will lose access to this workspace.").arg(userName),
-				function(result) {
-					if (result === true)
-						membersPage.__removeMemberById(membersPage.__confirmRemoveUserId)
-				}
-			)
-		} else if (action === "changeRole") {
-			membersPage.__pendingMenuUserId = userId
-			membersPage.__pendingMenuUserName = userName
-			roleAssignMenu.popup()
-		} else if (action === "transfer") {
-			membersPage.__confirmTransferUserId = userId
-			membersPage.__confirmTransferUserName = userName
-			ModalDialogManager.showConfirmationDialog(
-				qsTr("Transfer Ownership"),
-				qsTr("Are you sure you want to transfer ownership to %1? You will become a regular member and %1 will become the new owner.").arg(userName),
-				function(result) {
-					if (result === true)
-						membersPage.__transferOwnershipTo(membersPage.__confirmTransferUserId)
-				}
-			)
-		} else if (action === "leave") {
-			ModalDialogManager.showConfirmationDialog(
-				qsTr("Leave Workspace"),
-				qsTr("Are you sure you want to leave this workspace? You will lose access to all workspace resources."),
-				function(result) {
-					if (result === true && membersPage.tenantData)
-						membersPage.__removeMemberById(membersPage.tenantData.m_currentUserId)
-				}
-			)
+		function onUserCreated() {
+			// User created within our tenant -> auto-becomes member with role Member
+			if (membersPage.stateManager && membersPage.tenantData) {
+				membersPage.stateManager.loadMembersFromModel()
+			}
 		}
 	}
 
-	function __executeInviteAction(action, invitationId, userName) {
-		if (!membersPage.apiClient)
-			return
-		if (action === "resend") {
-			membersPage.apiClient.resendInvitation(invitationId)
-		} else if (action === "revoke") {
-			membersPage.__confirmRevokeInvitationId = invitationId
-			membersPage.__confirmRevokeUserName = userName
-			ModalDialogManager.showConfirmationDialog(
-				qsTr("Revoke Invitation"),
-				qsTr("Are you sure you want to revoke the invitation for %1? They will no longer be able to join this workspace.").arg(userName),
-				function(result) {
-					if (result === true) {
-						membersPage.apiClient.revokeInvitation(membersPage.__confirmRevokeInvitationId)
-						if (membersPage.stateManager)
-							membersPage.stateManager.removePendingInvitation(membersPage.__confirmRevokeInvitationId)
-					}
-				}
-			)
-		}
-	}
-
-	CustomScrollbar {
-		id: membersScrollbar
-		z: parent.z + 1
-		anchors.right: parent.right
-		anchors.top: membersFlickable.top
-		anchors.bottom: membersFlickable.bottom
-		secondSize: Style.marginM
-		targetItem: membersFlickable
-	}
-
-	Flickable {
-		id: membersFlickable
+	StackViewHeader {
+		id: membersStackViewHeader
 		anchors.top: parent.top
-		anchors.topMargin: Style.marginXL
-		anchors.bottom: parent.bottom
-		anchors.bottomMargin: Style.marginXL
+		anchors.left: parent.left
+		anchors.right: membersHeaderButtons.left
+		height: Style.controlHeightL
+		initialItemTitleVisible: true
+
+		onCloseClicked: {
+			membersStackView.previous()
+			membersStackViewHeader.popHeader()
+		}
+
+		Component.onCompleted: {
+			membersStackViewHeader.addHeader("members_list", qsTr("Members"))
+		}
+	}
+
+	Row {
+		id: membersHeaderButtons
+		visible: membersPage.__canManage && membersStackView.currentIndex === 0
+		anchors.right: parent.right
+		anchors.rightMargin: Style.marginXL
+		anchors.verticalCenter: membersStackViewHeader.verticalCenter
+		spacing: Style.marginL
+
+		Text {
+			id: createUserBtn
+			text: "+ " + qsTr("Create User")
+			font.pixelSize: Style.fontSizeM
+			font.bold: true
+			color: Style.linkColor
+
+			MouseArea {
+				anchors.fill: parent
+				hoverEnabled: true
+				cursorShape: Qt.PointingHandCursor
+				onClicked: {
+					while (membersStackView.count > 1)
+						membersStackView.removePage(membersStackView.count - 1)
+					membersStackViewHeader.addHeader("create_user", qsTr("Create New User"))
+					membersStackView.addPage(userEditorView)
+					membersStackView.next()
+				}
+			}
+		}
+
+		Text {
+			id: inviteMemberBtn
+			text: "+ " + qsTr("Create Invitation")
+			font.pixelSize: Style.fontSizeM
+			font.bold: true
+			color: Style.linkColor
+
+			MouseArea {
+				anchors.fill: parent
+				hoverEnabled: true
+				cursorShape: Qt.PointingHandCursor
+				onClicked: {
+					var ids = []
+					var members = membersPage.stateManager ? membersPage.stateManager.pendingMembers : []
+					for (var i = 0; i < members.length; i++)
+						ids.push(members[i].id)
+					var point = inviteMemberBtn.mapToItem(null, 0, inviteMemberBtn.height)
+					ModalDialogManager.openDialog(membersSelectPopupComp, {
+						"x": point.x,
+						"y": point.y,
+						"preselectedIds": ids
+					})
+				}
+			}
+		}
+	}
+
+	BaseText {
+		id: membersDescription
+		anchors.top: membersStackViewHeader.bottom
+		anchors.topMargin: Style.marginS
 		anchors.left: parent.left
 		anchors.leftMargin: Style.marginXL
-		anchors.right: membersScrollbar.left
+		anchors.right: parent.right
 		anchors.rightMargin: Style.marginXL
-		contentWidth: membersColumn.width
-		contentHeight: membersColumn.height + 2 * Style.marginXL
+		visible: membersStackView.currentIndex === 0
+		text: qsTr("Manage tenant members. Users created here automatically become members.")
+		font.pixelSize: Style.fontSizeS
+		color: Style.inactiveTextColor
+	}
 
-		boundsBehavior: Flickable.StopAtBounds
-		clip: true
+	StackView {
+		id: membersStackView
+		anchors.top: membersDescription.visible ? membersDescription.bottom : membersStackViewHeader.bottom
+		anchors.topMargin: Style.marginS
+		anchors.left: parent.left
+		anchors.right: parent.right
+		anchors.bottom: parent.bottom
 
-		Column {
-			id: membersColumn
-			width: Style.sizeHintXXL
-			spacing: Style.marginXL
+		Component.onCompleted: {
+			membersStackView.addPage(membersListView)
+		}
+	}
 
-			// ===== Header =====
+	Component {
+		id: membersListView
+
+		Item {
+			TenantCollectionListView {
+				anchors.top: parent.top
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.bottom: parent.bottom
+				collectionId: "Users"
+				filterPlaceholder: qsTr("Filter members...")
+				emptyMessage: qsTr("No members found.")
+				canManage: membersPage.__canManage
+
+				onEditRequested: {
+					membersPage.__editUserId = itemId
+					membersPage.__editUserName = itemName
+					membersPage.__editUserDescription = itemDescription
+					while (membersStackView.count > 1)
+						membersStackView.removePage(membersStackView.count - 1)
+					membersStackViewHeader.addHeader("edit_user", itemName || qsTr("Edit User"))
+					membersStackView.addPage(userEditView)
+					membersStackView.next()
+					if (membersPage.apiClient)
+						membersPage.apiClient.getUserData(itemId)
+				}
+
+				onDeleteRequested: {
+					ModalDialogManager.showConfirmationDialog(
+						qsTr("Remove Member"),
+						qsTr("Are you sure you want to remove \"%1\"? They will lose access to this workspace.").arg(itemName),
+						function(result) {
+							if (result === true && membersPage.apiClient)
+								membersPage.apiClient.removeUser(itemId)
+						}
+					)
+				}
+			}
+		}
+	}
+
+	Component {
+		id: userEditorView
+
+		Item {
+			UserView {
+				id: createUserView
+				anchors.fill: parent
+				commandsPanelVisible: false
+
+				Component.onCompleted: {
+					createUserView.model = membersPage.userDataFactory ? membersPage.userDataFactory() : null
+					createUserView.updateGui()
+				}
+			}
+
 			Row {
-				id: membersHeader
-				width: parent.width
+				anchors.bottom: parent.bottom
+				anchors.bottomMargin: Style.marginXL
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginXL
 				spacing: Style.marginM
 
-				Column {
-					anchors.verticalCenter: parent.verticalCenter
-					spacing: Style.marginXS
-
-					BaseText {
-						text: qsTr("Members")
-						font.pixelSize: Style.fontSizeXL
-						font.bold: true
-						color: Style.textColor
-					}
-
-					BaseText {
-						text: {
-							var members = membersPage.stateManager ? membersPage.stateManager.pendingMembers : []
-							var invs = membersPage.stateManager ? membersPage.stateManager.pendingInvitations : []
-							return invs.length > 0
-								? qsTr("%1 member(s) · %2 pending invite(s)").arg(members.length).arg(invs.length)
-								: qsTr("%1 member(s)").arg(members.length)
-						}
-						font.pixelSize: Style.fontSizeS
-						color: Style.inactiveTextColor
-					}
-				}
-
-				Item {
-					width: parent.width
-						- parent.children[0].width
-						- (inviteMemberBtn.visible ? inviteMemberBtn.width : 0)
-						- (leaveWorkspaceBtn.visible ? leaveWorkspaceBtn.width : 0)
-						- parent.spacing * 2
-					height: 1
-				}
-
-				Text {
-					id: inviteMemberBtn
-					visible: membersPage.stateManager ? membersPage.stateManager.canManageMembers : false
-					anchors.verticalCenter: parent.verticalCenter
-					text: "+ " + qsTr("Create invitation")
-					font.pixelSize: Style.fontSizeM
-					font.bold: true
-					color: Style.linkColor
-
-					MouseArea {
-						anchors.fill: parent
-						hoverEnabled: true
-						cursorShape: Qt.PointingHandCursor
-						onClicked: {
-							var ids = []
-							var members = membersPage.stateManager ? membersPage.stateManager.pendingMembers : []
-							for (var i = 0; i < members.length; i++)
-								ids.push(members[i].id)
-							var point = inviteMemberBtn.mapToItem(null, 0, inviteMemberBtn.height)
-							ModalDialogManager.openDialog(membersSelectPopupComp, {
-								"x": point.x,
-								"y": point.y,
-								"preselectedIds": ids
-							})
-						}
+				Button {
+					text: qsTr("Create")
+					onClicked: {
+						createUserView.updateModel()
+						var userData = createUserView.model
+						if (membersPage.apiClient)
+							membersPage.apiClient.insertUser(
+								userData ? userData.m_name : "",
+								userData ? userData.m_description : "")
+						membersStackViewHeader.popHeader()
+						membersStackView.previous()
 					}
 				}
 
 				Button {
-					id: leaveWorkspaceBtn
-					visible: membersPage.stateManager
-						&& !membersPage.stateManager.isOwner
-						&& !membersPage.stateManager.isCreator
-						&& membersPage.tenantData
-						&& membersPage.tenantData.m_currentUserId
-					anchors.verticalCenter: parent.verticalCenter
-					text: qsTr("Leave Workspace")
-					tooltipText: qsTr("Leave this workspace")
+					text: qsTr("Cancel")
 					onClicked: {
-						ModalDialogManager.showConfirmationDialog(
-							qsTr("Leave Workspace"),
-							qsTr("Are you sure you want to leave this workspace? You will lose access to all workspace resources."),
-							function(result) {
-								if (result === true)
-									membersPage.__removeMemberById(membersPage.tenantData.m_currentUserId)
+						membersStackViewHeader.popHeader()
+						membersStackView.previous()
+					}
+				}
+			}
+		}
+	}
+
+	Component {
+		id: userEditView
+
+		Item {
+			UserView {
+				id: editUserView
+				anchors.fill: parent
+				commandsPanelVisible: false
+
+				Component.onCompleted: {
+					var userData = membersPage.userDataFactory ? membersPage.userDataFactory() : null
+					if (userData) {
+						userData.m_id = membersPage.__editUserId
+						userData.m_name = membersPage.__editUserName
+						userData.m_description = membersPage.__editUserDescription
+					}
+					editUserView.model = userData
+					editUserView.updateGui()
+				}
+
+				Connections {
+					target: membersPage.stateManager
+					function onReceivedUserDataChanged() {
+						if (membersPage.stateManager
+								&& membersPage.stateManager.receivedUserData
+								&& membersPage.__editUserId) {
+							var userData = membersPage.userDataFactory ? membersPage.userDataFactory() : null
+							if (userData) {
+								userData.m_id = membersPage.__editUserId
+								userData.m_name = membersPage.stateManager.receivedUserData.name || membersPage.__editUserName
+								userData.m_description = membersPage.stateManager.receivedUserData.description || membersPage.__editUserDescription
 							}
-						)
+							editUserView.model = userData
+							editUserView.updateGui()
+						}
 					}
 				}
 			}
 
-			// ===== Active Members =====
-			Column {
-				id: activeMembersSection
-				width: parent.width
-				spacing: Style.marginS
+			Row {
+				anchors.bottom: parent.bottom
+				anchors.bottomMargin: Style.marginXL
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginXL
+				spacing: Style.marginM
 
-				BaseText {
-					text: qsTr("Active Members")
-					font.pixelSize: Style.fontSizeL
-					font.bold: true
-					color: Style.textColor
-				}
-
-				BaseText {
-					visible: !membersPage.stateManager || membersPage.stateManager.pendingMembers.length === 0
-					text: qsTr("No members found")
-					font.pixelSize: Style.fontSizeM
-					color: Style.inactiveTextColor
-					topPadding: Style.marginM
-					bottomPadding: Style.marginM
-				}
-
-				Repeater {
-					model: membersPage.stateManager ? membersPage.stateManager.pendingMembers : []
-
-					delegate: TenantMemberDelegate {
-						width: activeMembersSection.width
-						kind: "member"
-						memberData: modelData
-						tenantData: membersPage.tenantData
-						stateManager: membersPage.stateManager
-						canManageMembers: membersPage.stateManager ? membersPage.stateManager.canManageMembers : false
-						isOwner: membersPage.stateManager ? membersPage.stateManager.isOwner : false
-
-						onMemberActionsRequested: membersPage.__showActionsMenu(menuItems, userId, userName, isOwnerTarget, isCurrentUserTarget)
+				Button {
+					text: qsTr("Save")
+					onClicked: {
+						editUserView.updateModel()
+						var userData = editUserView.model
+						if (membersPage.apiClient)
+							membersPage.apiClient.setUserData(
+								membersPage.__editUserId,
+								userData ? userData.m_name : "",
+								userData ? userData.m_description : "")
+						membersStackViewHeader.popHeader()
+						membersStackView.previous()
 					}
 				}
-			}
 
-			// ===== Separator =====
-			Rectangle {
-				width: parent.width
-				height: 1
-				color: Style.borderColor
-				visible: membersPage.stateManager
-					&& (membersPage.stateManager.canManageMembers
-						|| (membersPage.stateManager.pendingInvitations
-							&& membersPage.stateManager.pendingInvitations.length > 0))
-			}
-
-			// ===== Pending Invitations =====
-			Column {
-				id: pendingInvitationsSection
-				width: parent.width
-				spacing: Style.marginS
-				visible: membersPage.stateManager
-					&& (membersPage.stateManager.canManageMembers
-						|| (membersPage.stateManager.pendingInvitations
-							&& membersPage.stateManager.pendingInvitations.length > 0))
-
-				BaseText {
-					text: qsTr("Pending Invitations")
-					font.pixelSize: Style.fontSizeL
-					font.bold: true
-					color: Style.textColor
-				}
-
-				BaseText {
-					visible: !membersPage.stateManager
-						|| !membersPage.stateManager.pendingInvitations
-						|| membersPage.stateManager.pendingInvitations.length === 0
-					text: qsTr("No pending invitations")
-					font.pixelSize: Style.fontSizeM
-					color: Style.inactiveTextColor
-					topPadding: Style.marginM
-					bottomPadding: Style.marginM
-				}
-
-				Repeater {
-					model: membersPage.stateManager ? membersPage.stateManager.pendingInvitations : []
-
-					delegate: TenantMemberDelegate {
-						width: pendingInvitationsSection.width
-						kind: "invitation"
-						memberData: modelData
-						tenantData: membersPage.tenantData
-						stateManager: membersPage.stateManager
-						canManageMembers: membersPage.stateManager ? membersPage.stateManager.canManageMembers : false
-						isOwner: membersPage.stateManager ? membersPage.stateManager.isOwner : false
-
-						onInviteActionsRequested: membersPage.__showInviteActionsMenu(menuItems, invitationId, userName)
+				Button {
+					text: qsTr("Cancel")
+					onClicked: {
+						membersStackViewHeader.popHeader()
+						membersStackView.previous()
 					}
 				}
 			}
 		}
 	}
 
-	// ===== Menus =====
-	Menu {
-		id: memberActionsMenu
-		font.pixelSize: Style.fontSizeM
-		font.family: Style.fontFamily
-
-		MenuItem {
-			text: qsTr("Change Environment Role")
-			visible: membersPage.stateManager
-				&& membersPage.stateManager.canManageMembers
-				&& !membersPage.__pendingMenuIsOwner
-			height: visible ? implicitHeight : 0
-			onTriggered: roleAssignMenu.popup()
-		}
-		MenuItem {
-			text: qsTr("Remove Member")
-			visible: membersPage.stateManager
-				&& membersPage.stateManager.canManageMembers
-				&& !membersPage.__pendingMenuIsOwner
-			height: visible ? implicitHeight : 0
-			onTriggered: membersPage.__executeAction("remove", membersPage.__pendingMenuUserId, membersPage.__pendingMenuUserName)
-		}
-		MenuItem {
-			text: qsTr("Transfer Ownership")
-			visible: membersPage.stateManager && membersPage.stateManager.isOwner
-			height: visible ? implicitHeight : 0
-			onTriggered: membersPage.__executeAction("transfer", membersPage.__pendingMenuUserId, membersPage.__pendingMenuUserName)
-		}
-		MenuItem {
-			text: qsTr("Leave Workspace")
-			visible: membersPage.stateManager
-				&& !membersPage.stateManager.canManageMembers
-				&& membersPage.__pendingMenuIsCurrentUser
-			height: visible ? implicitHeight : 0
-			onTriggered: membersPage.__executeAction("leave", membersPage.__pendingMenuUserId, membersPage.__pendingMenuUserName)
-		}
-	}
-
-	Menu {
-		id: roleAssignMenu
-		title: qsTr("Assign Environment Role")
-		font.pixelSize: Style.fontSizeM
-		font.family: Style.fontFamily
-
-		MenuItem {
-			text: qsTr("Admin")
-			onTriggered: {
-				if (membersPage.apiClient && membersPage.tenantData)
-					membersPage.apiClient.setMemberRole(
-						membersPage.tenantData.m_id || "",
-						membersPage.__pendingMenuUserId,
-						"Admin")
-			}
-		}
-		MenuItem {
-			text: qsTr("Member")
-			onTriggered: {
-				if (membersPage.apiClient && membersPage.tenantData)
-					membersPage.apiClient.setMemberRole(
-						membersPage.tenantData.m_id || "",
-						membersPage.__pendingMenuUserId,
-						"Member")
-			}
-		}
-
-		MenuSeparator {}
-
-		MenuItem {
-			text: qsTr("Assign Global Role...")
-			onTriggered: {
-				// TODO: open global role picker for membersPage.__pendingMenuUserId
-			}
-		}
-	}
-
-	Menu {
-		id: inviteActionsMenu
-		font.pixelSize: Style.fontSizeM
-		font.family: Style.fontFamily
-
-		MenuItem {
-			text: qsTr("Resend Invitation")
-			onTriggered: membersPage.__executeInviteAction("resend", membersPage.__pendingMenuUserId, membersPage.__pendingMenuUserName)
-		}
-		MenuItem {
-			text: qsTr("Revoke Invitation")
-			onTriggered: membersPage.__executeInviteAction("revoke", membersPage.__pendingMenuUserId, membersPage.__pendingMenuUserName)
-		}
-	}
-
-	// ===== Invite-user popup =====
+	// ===== Invite-user popup (invites external users not in this tenant) =====
 	Component {
 		id: membersSelectPopupComp
 
@@ -466,7 +333,7 @@ ViewBase {
 			itemWidth: 280
 			showCheckBox: true
 			showSelectedGroup: true
-			filterPlaceholder: qsTr("Type or choose a user")
+			filterPlaceholder: qsTr("Type or choose a user to invite")
 
 			onSelectionChanged: {
 				var arr = []

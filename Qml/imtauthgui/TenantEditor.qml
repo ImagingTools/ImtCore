@@ -9,6 +9,7 @@ import imtdocgui 1.0
 import imtauthTenantsSdl 1.0
 import imtauthRolesSdl 1.0
 import imtauthGroupsSdl 1.0
+import imtauthUsersSdl 1.0
 
 /**
  * TenantEditor
@@ -24,7 +25,7 @@ import imtauthGroupsSdl 1.0
  *
  * SDL imports here are limited to:
  *   - imtauthTenantsSdl (TenantData type of the model)
- *   - imtauthRolesSdl / imtauthGroupsSdl (data factories for new role/group editors)
+ *   - imtauthRolesSdl / imtauthGroupsSdl / imtauthUsersSdl (data factories for editors)
  */
 DocumentViewBase {
 	id: container
@@ -58,6 +59,13 @@ DocumentViewBase {
 
 	function createGroupData() {
 		var comp = Qt.createComponent("qrc:/imtauthGroupsSdl/GroupData.qml")
+		if (comp.status === Component.Ready)
+			return comp.createObject(container)
+		return null
+	}
+
+	function createUserData() {
+		var comp = Qt.createComponent("qrc:/imtauthUsersSdl/UserData.qml")
 		if (comp.status === Component.Ready)
 			return comp.createObject(container)
 		return null
@@ -198,6 +206,7 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager
 			apiClient: container.apiClient
+			userDataFactory: container.createUserData
 		}
 	}
 

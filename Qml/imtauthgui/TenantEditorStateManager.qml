@@ -26,9 +26,10 @@ QtObject {
 	// from overwriting the local change on the next document refresh.
 	property bool __membersModifiedLocally: false
 
-	// Last received role/group data payloads (populated via apiClient signals).
+	// Last received role/group/user data payloads (populated via apiClient signals).
 	property var receivedRoleData: null
 	property var receivedGroupData: null
+	property var receivedUserData: null
 
 	// --- Computed role / permission flags ---
 	readonly property bool isNewTenant: stateManager.tenantData

@@ -38,6 +38,12 @@ QtObject {
 	signal groupUpdated(string groupId)
 	signal groupDataReceived(var data)
 
+	// --- Users (tenant members) ---
+	signal userCreated()
+	signal userRemoved(string userId)
+	signal userUpdated(string userId)
+	signal userDataReceived(var data)
+
 	// --- Generic error ---
 	signal requestFailed(string message)
 
@@ -59,4 +65,9 @@ QtObject {
 	function removeGroup(groupId) {}
 	function setGroupData(groupId, name, description) {}
 	function getGroupData(groupId) {}
+
+	function insertUser(name, description) {}
+	function removeUser(userId) {}
+	function setUserData(userId, name, description) {}
+	function getUserData(userId) {}
 }
