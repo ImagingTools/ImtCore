@@ -10,6 +10,7 @@ import imtdocgui 1.0
 import imtguigql 1.0
 import imtauthTenantsSdl 1.0
 import imtauthTenantMembershipsSdl 1.0
+import imtbaseImtCollectionSdl 1.0
 
 DocumentViewBase {
 	id: container
@@ -1268,10 +1269,10 @@ DocumentViewBase {
 							Repeater {
 								model: ListModel {
 									id: envRolesModel
-									ListElement { name: "Creator"; desc: "Full control + Permissions. Permanent." }
-									ListElement { name: "Owner"; desc: "Superuser. All except Permissions." }
-									ListElement { name: "Admin"; desc: "Manage members, roles, groups." }
-									ListElement { name: "Member"; desc: "Read-only. Default on invite accept." }
+									ListElement { name: "Creator"; desc: "Full control + Permissions. Permanent."; icon: "Icons/Crown" }
+									ListElement { name: "Owner"; desc: "Superuser. All except Permissions."; icon: "Icons/Key" }
+									ListElement { name: "Admin"; desc: "Manage members, roles, groups."; icon: "Icons/AdminPanel" }
+									ListElement { name: "Member"; desc: "Read-only. Default on invite accept."; icon: "Icons/User" }
 								}
 
 								delegate: Rectangle {
@@ -1294,26 +1295,18 @@ DocumentViewBase {
 										anchors.margins: Style.marginM
 										spacing: Style.marginM
 
-										Rectangle {
+										Image {
 											width: Style.iconSizeL
 											height: Style.iconSizeL
-											radius: Style.radiusS
 											anchors.verticalCenter: parent.verticalCenter
-											color: Style.selectedColor
-
-											BaseText {
-												anchors.centerIn: parent
-												text: model.name.charAt(0)
-												font.pixelSize: Style.fontSizeM
-												font.bold: true
-												color: Style.secondColor
-											}
+											source: Style.icon(model.icon)
+											sourceSize: Qt.size(Style.iconSizeL, Style.iconSizeL)
 										}
 
 										Column {
 											anchors.verticalCenter: parent.verticalCenter
 											spacing: Style.marginXS
-											width: parent.width - Style.iconSizeL - envBuiltInBadge.width - parent.spacing * 2
+											width: parent.width - Style.iconSizeL - parent.spacing * 2
 
 											BaseText {
 												text: model.name
@@ -1328,23 +1321,6 @@ DocumentViewBase {
 												color: Style.inactiveTextColor
 												elide: Text.ElideRight
 												width: parent.width
-											}
-										}
-
-										Rectangle {
-											id: envBuiltInBadge
-											anchors.verticalCenter: parent.verticalCenter
-											width: envBuiltInText.implicitWidth + Style.marginM
-											height: envBuiltInText.implicitHeight + Style.marginXS
-											radius: Style.radiusS
-											color: Style.backgroundColor2
-
-											BaseText {
-												id: envBuiltInText
-												anchors.centerIn: parent
-												text: qsTr("Environment")
-												font.pixelSize: Style.fontSizeXS
-												color: Style.inactiveTextColor
 											}
 										}
 									}
@@ -1368,9 +1344,9 @@ DocumentViewBase {
 
 							Item { width: 1; height: Style.marginXL }
 
-							// --- Section: Global Roles (from server via FilterableSelectGqlDataProvider) ---
+							// --- Section: Roles (from server via FilterableSelectGqlDataProvider) ---
 							BaseText {
-								text: qsTr("Global Roles")
+								text: qsTr("Roles")
 								font.pixelSize: Style.fontSizeM
 								font.bold: true
 								color: Style.textColor
@@ -1390,7 +1366,36 @@ DocumentViewBase {
 										id: globalRoleItemMouseArea
 										anchors.fill: parent
 										hoverEnabled: true
-										acceptedButtons: Qt.NoButton
+										cursorShape: Qt.PointingHandCursor
+										acceptedButtons: Qt.RightButton
+										onClicked: {
+											if (container.canManageMembers)
+												roleItemMenu.popup()
+										}
+									}
+
+									Menu {
+										id: roleItemMenu
+
+										MenuItem {
+											text: qsTr("Delete")
+											enabled: container.canManageMembers
+											onTriggered: {
+												var roleId = modelData.id
+												var roleName = modelData.title || modelData.id || ""
+												ModalDialogManager.showConfirmationDialog(
+													qsTr("Delete Role"),
+													qsTr("Are you sure you want to delete the role \"%1\"? This action cannot be undone.").arg(roleName),
+													function(result) {
+														if (result === true) {
+															container.removeRoleInput.m_collectionId = "Roles"
+															container.removeRoleInput.m_elementIds = [roleId]
+															container.removeRoleSender.send(container.removeRoleInput)
+														}
+													}
+												)
+											}
+										}
 									}
 
 									Row {
@@ -1401,26 +1406,10 @@ DocumentViewBase {
 										anchors.margins: Style.marginM
 										spacing: Style.marginM
 
-										Rectangle {
-											width: Style.iconSizeL
-											height: Style.iconSizeL
-											radius: Style.radiusS
-											anchors.verticalCenter: parent.verticalCenter
-											color: Style.linkColor
-
-											BaseText {
-												anchors.centerIn: parent
-												text: modelData.title ? modelData.title.charAt(0) : "R"
-												font.pixelSize: Style.fontSizeM
-												font.bold: true
-												color: Style.secondColor
-											}
-										}
-
 										Column {
 											anchors.verticalCenter: parent.verticalCenter
 											spacing: Style.marginXS
-											width: parent.width - Style.iconSizeL - globalBadge.width - parent.spacing * 2
+											width: parent.width - parent.spacing
 
 											BaseText {
 												text: modelData.title || modelData.id || ""
@@ -1437,23 +1426,6 @@ DocumentViewBase {
 												width: parent.width
 											}
 										}
-
-										Rectangle {
-											id: globalBadge
-											anchors.verticalCenter: parent.verticalCenter
-											width: globalBadgeText.implicitWidth + Style.marginM
-											height: globalBadgeText.implicitHeight + Style.marginXS
-											radius: Style.radiusS
-											color: Style.selectedColor
-
-											BaseText {
-												id: globalBadgeText
-												anchors.centerIn: parent
-												text: qsTr("Global")
-												font.pixelSize: Style.fontSizeXS
-												color: Style.secondColor
-											}
-										}
 									}
 
 									Rectangle {
@@ -1466,10 +1438,10 @@ DocumentViewBase {
 								}
 							}
 
-							// Empty state for global roles
+							// Empty state for roles
 							BaseText {
 								visible: globalRolesRepeater.count === 0 && !rolesDataProvider.isInitialLoading
-								text: qsTr("No global roles found.")
+								text: qsTr("No roles created yet.")
 								font.pixelSize: Style.fontSizeM
 								color: Style.inactiveTextColor
 								topPadding: Style.marginM
@@ -1529,7 +1501,11 @@ DocumentViewBase {
 							Button {
 								text: qsTr("Create")
 								onClicked: {
-									// TODO: send RoleAdd mutation via GQL (Roles.sdl)
+									container.insertRoleInput.m_collectionId = "Roles"
+									container.insertRoleInput.m_typeId = "Role"
+									container.insertRoleInput.m_name = roleNameInput.text
+									container.insertRoleInput.m_description = roleDescInput.text
+									container.insertRoleSender.send(container.insertRoleInput)
 									rolesStackViewHeader.popHeader()
 									rolesStackView.previous()
 								}
@@ -1713,7 +1689,36 @@ DocumentViewBase {
 										id: groupItemMouseArea
 										anchors.fill: parent
 										hoverEnabled: true
-										acceptedButtons: Qt.NoButton
+										cursorShape: Qt.PointingHandCursor
+										acceptedButtons: Qt.RightButton
+										onClicked: {
+											if (container.canManageMembers)
+												groupItemMenu.popup()
+										}
+									}
+
+									Menu {
+										id: groupItemMenu
+
+										MenuItem {
+											text: qsTr("Delete")
+											enabled: container.canManageMembers
+											onTriggered: {
+												var groupId = modelData.id
+												var groupName = modelData.title || modelData.id || ""
+												ModalDialogManager.showConfirmationDialog(
+													qsTr("Delete Group"),
+													qsTr("Are you sure you want to delete the group \"%1\"? This action cannot be undone.").arg(groupName),
+													function(result) {
+														if (result === true) {
+															container.removeGroupInput.m_collectionId = "Groups"
+															container.removeGroupInput.m_elementIds = [groupId]
+															container.removeGroupSender.send(container.removeGroupInput)
+														}
+													}
+												)
+											}
+										}
 									}
 
 									Row {
@@ -1724,26 +1729,10 @@ DocumentViewBase {
 										anchors.margins: Style.marginM
 										spacing: Style.marginM
 
-										Rectangle {
-											width: Style.iconSizeL
-											height: Style.iconSizeL
-											radius: Style.radiusS
-											anchors.verticalCenter: parent.verticalCenter
-											color: Style.selectedColor
-
-											BaseText {
-												anchors.centerIn: parent
-												text: modelData.title ? modelData.title.charAt(0) : "G"
-												font.pixelSize: Style.fontSizeM
-												font.bold: true
-												color: Style.secondColor
-											}
-										}
-
 										Column {
 											anchors.verticalCenter: parent.verticalCenter
 											spacing: Style.marginXS
-											width: parent.width - Style.iconSizeL - parent.spacing
+											width: parent.width - parent.spacing
 
 											BaseText {
 												text: modelData.title || modelData.id || ""
@@ -1835,7 +1824,11 @@ DocumentViewBase {
 							Button {
 								text: qsTr("Create")
 								onClicked: {
-									// TODO: send GroupAdd mutation via GQL (Groups.sdl)
+									container.insertGroupInput.m_collectionId = "Groups"
+									container.insertGroupInput.m_typeId = "Group"
+									container.insertGroupInput.m_name = groupNameInput.text
+									container.insertGroupInput.m_description = groupDescInput.text
+									container.insertGroupSender.send(container.insertGroupInput)
 									groupsStackViewHeader.popHeader()
 									groupsStackView.previous()
 								}
@@ -1976,10 +1969,42 @@ DocumentViewBase {
 					Item {
 						width: parent.width
 							- parent.children[0].width
+							- permCheckAllBtn.width
+							- permUncheckAllBtn.width
 							- permExpandBtn.width
 							- permCollapseBtn.width
-							- parent.spacing * 3
+							- parent.spacing * 5
 						height: 1
+					}
+
+					Text {
+						id: permCheckAllBtn
+						anchors.verticalCenter: parent.verticalCenter
+						text: qsTr("Check All")
+						font.pixelSize: Style.fontSizeM
+						color: Style.linkColor
+
+						MouseArea {
+							anchors.fill: parent
+							hoverEnabled: true
+							cursorShape: Qt.PointingHandCursor
+							onClicked: tenantPermissionsTreeView.checkAll()
+						}
+					}
+
+					Text {
+						id: permUncheckAllBtn
+						anchors.verticalCenter: parent.verticalCenter
+						text: qsTr("Uncheck All")
+						font.pixelSize: Style.fontSizeM
+						color: Style.linkColor
+
+						MouseArea {
+							anchors.fill: parent
+							hoverEnabled: true
+							cursorShape: Qt.PointingHandCursor
+							onClicked: tenantPermissionsTreeView.uncheckAll()
+						}
 					}
 
 					Text {
@@ -2013,6 +2038,14 @@ DocumentViewBase {
 					}
 				}
 
+				// Text filter for permissions tree
+				SearchTextInput {
+					id: permissionsFilterInput
+					width: parent.width
+					placeHolderText: qsTr("Filter permissions...")
+					onTextChanged: tenantPermissionsTreeView.filterText = text
+				}
+
 				Rectangle {
 					width: parent.width
 					height: 1
@@ -2020,20 +2053,40 @@ DocumentViewBase {
 				}
 			}
 
+			// CustomScrollbar for the tree
+			CustomScrollbar {
+				id: permissionsScrollbar
+				z: parent.z + 1
+				anchors.right: parent.right
+				anchors.top: permissionsTreeFlickable.top
+				anchors.bottom: permissionsTreeFlickable.bottom
+				secondSize: Style.marginM
+				targetItem: permissionsTreeFlickable
+			}
+
 			// Scrollable tree area
-			BasicTreeView {
-				id: tenantPermissionsTreeView
+			Flickable {
+				id: permissionsTreeFlickable
 				anchors.top: permissionsHeader.bottom
 				anchors.topMargin: Style.marginM
 				anchors.bottom: parent.bottom
 				anchors.bottomMargin: Style.marginXL
 				anchors.left: parent.left
 				anchors.leftMargin: Style.marginXL
-				anchors.right: parent.right
+				anchors.right: permissionsScrollbar.left
 				anchors.rightMargin: Style.marginXL
-				showHeader: false
+				contentWidth: tenantPermissionsTreeView.width
+				contentHeight: tenantPermissionsTreeView.height
+				boundsBehavior: Flickable.StopAtBounds
+				clip: true
 
-				onCheckedItemsChanged: container.doUpdateModel()
+				BasicTreeView {
+					id: tenantPermissionsTreeView
+					width: permissionsTreeFlickable.width
+					showHeader: false
+
+					onCheckedItemsChanged: container.doUpdateModel()
+				}
 			}
 		}
 	}
@@ -2117,6 +2170,64 @@ DocumentViewBase {
 						ModalDialogManager.showInfoDialog(m_errorMessage)
 					else if (container.representationController)
 						container.representationController.updateRepresentationFromDocument()
+				}
+			}
+		}
+	}
+
+	// --- Roles: Add/Remove via ImtCollection.sdl ---
+	property InsertNewObjectInput insertRoleInput: InsertNewObjectInput {}
+	property GqlSdlRequestSender insertRoleSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_insertNewObject
+
+		sdlObjectComp: Component {
+			InsertNewObjectPayload {
+				onFinished: {
+					// Role created successfully
+				}
+			}
+		}
+	}
+
+	property RemoveElementsInput removeRoleInput: RemoveElementsInput {}
+	property GqlSdlRequestSender removeRoleSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_removeElements
+
+		sdlObjectComp: Component {
+			RemoveElementsPayload {
+				onFinished: {
+					// Role removed successfully
+				}
+			}
+		}
+	}
+
+	// --- Groups: Add/Remove via ImtCollection.sdl ---
+	property InsertNewObjectInput insertGroupInput: InsertNewObjectInput {}
+	property GqlSdlRequestSender insertGroupSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_insertNewObject
+
+		sdlObjectComp: Component {
+			InsertNewObjectPayload {
+				onFinished: {
+					// Group created successfully
+				}
+			}
+		}
+	}
+
+	property RemoveElementsInput removeGroupInput: RemoveElementsInput {}
+	property GqlSdlRequestSender removeGroupSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_removeElements
+
+		sdlObjectComp: Component {
+			RemoveElementsPayload {
+				onFinished: {
+					// Group removed successfully
 				}
 			}
 		}
