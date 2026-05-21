@@ -5,44 +5,6 @@
 // ACF includes
 #include <icomp/export.h>
 
-// ImtCore includes
-#include <imtservergql/CHttpGraphQLServletComp.h>
-#include <imtservergql/CGqlDemultiplexerComp.h>
-#include <imtservergql/CGqlRepresentationDataControllerComp.h>
-#include <imtservergql/CUserSettingsControllerComp.h>
-#include <imtservergql/CGqlRepresentationJoinerComp.h>
-#include <imtservergql/CApplicationInfoControllerComp.h>
-#include <imtservergql/CSerializableObjectCollectionControllerComp.h>
-#include <imtservergql/CGqlContextControllerComp.h>
-#include <imtservergql/CObjectProviderComp.h>
-#include <imtservergql/CWebSocketServletComp.h>
-#include <imtservergql/CCollectionObjectProviderComp.h>
-#include <imtservergql/COperationContextControllerComp.h>
-#include <imtservergql/CObjectCollectionChangeNotifierComp.h>
-#include <imtservergql/CModelChangeNotifierComp.h>
-#include <imtservergql/CModelPublisherComp.h>
-#include <imtservergql/CStructureSubscriberControllerComp.h>
-#include <imtservergql/CBroadcastMessageConsumerControllerComp.h>
-#include <imtservergql/CBroadcastMessageConsumerSubscriberComp.h>
-#include <imtservergql/CSlaveSubscriberControllerComp.h>
-#include <imtservergql/CGqlSearchControllerComp.h>
-#include <imtservergql/CTableViewParamControllerComp.h>
-#include <imtservergql/CConnectionStatusSubscriberControllerComp.h>
-#include <imtservergql/CHeadersDataProviderComp.h>
-#include <imtservergql/CDocumentRevisionControllerComp.h>
-#include <imtservergql/CCommandsControllerComp.h>
-#include <imtservergql/CSettingsControllerComp.h>
-#include <imtservergql/CProgressManagerPublisherComp.h>
-#include <imtservergql/CGqlCollectionImportControllerComp.h>
-#include <imtservergql/CCollectionImportControllerComp.h>
-#include <imtservergql/CCollectionImportJobParamsFillerComp.h>
-#include <imtservergql/CCollectionDocumentServiceControllerComp.h>
-#include <imtservergql/CCollectionDocumentServicePublisherComp.h>
-#include <imtservergql/CPublisherSubscriberBridgeComp.h>
-#include <imtservergql/CGqlContextCreatorComp.h>
-#include <imtservergql/CFilterableSelectControllerComp.h>
-#include <imtservergql/CUserGroupParamsSetJoinerComp.h>
-
 
 namespace ImtServerGqlPck
 {

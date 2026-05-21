@@ -5,53 +5,6 @@
 // ACF includes
 #include <icomp/export.h>
 
-// ImtCore includes
-#include <imtauthgql/CAuthorizationControllerComp.h>
-#include <imtauthgql/CRoleCollectionControllerComp.h>
-#include <imtauthgql/CUserCollectionControllerComp.h>
-#include <imtauthgql/CUserControllerComp.h>
-#include <imtauthgql/CUserGroupCollectionControllerComp.h>
-#include <imtauthgql/CAuthorizationOptionsControllerComp.h>
-#include <imtauthgql/CSessionControllerComp.h>
-#include <imtauthgql/CClientRequestRemoteSuperuserProviderComp.h>
-#include <imtauthgql/CRemoteSuperuserControllerComp.h>
-#include <imtauthgql/CRemotePermissionCheckerComp.h>
-#include <imtauthgql/CSessionModelObserverComp.h>
-#include <imtauthgql/CSessionModelSubscriberControllerComp.h>
-#include <imtauthgql/CLdapAuthorizationControllerComp.h>
-#include <imtauthgql/CUserSerializableCollectionControllerComp.h>
-#include <imtauthgql/CUserSettingsControllerComp.h>
-#include <imtauthgql/CProfileControllerComp.h>
-#include <imtauthgql/CRoleRemoteCollectionControllerComp.h>
-#include <imtauthgql/CRemoteJwtSessionControllerComp.h>
-#include <imtauthgql/CGqlJwtSessionControllerComp.h>
-#include <imtauthgql/CRoleMetaInfoDelegateComp.h>
-#include <imtauthgql/CUserMetaInfoDelegateComp.h>
-#include <imtauthgql/CGroupMetaInfoDelegateComp.h>
-#include <imtauthgql/CRemoteUserControllerComp.h>
-#include <imtauthgql/CRemoteAuthorizationControllerComp.h>
-#include <imtauthgql/CUserActionCollectionControllerComp.h>
-#include <imtauthgql/CUserActionMetaInfoDelegateComp.h>
-#include <imtauthgql/CClientRequestRoleManagerComp.h>
-#include <imtauthgql/CClientRequestUserManagerComp.h>
-#include <imtauthgql/CClientRequestGroupManagerComp.h>
-#include <imtauthgql/CClientRequestUserInfoProviderComp.h>
-#include <imtauthgql/CClientRequestRoleInfoProviderComp.h>
-#include <imtauthgql/CClientRequestGroupInfoProviderComp.h>
-#include <imtauthgql/CTokenBasedPermissionsProviderComp.h>
-#include <imtauthgql/CPersonalAccessTokenControllerComp.h>
-#include <imtauthgql/CTenantCollectionControllerComp.h>
-#include <imtauthgql/CTenantMetaInfoDelegateComp.h>
-#include <imtauthgql/CTenantCollectionDocumentServiceComp.h>
-#include <imtauthgql/CRemoteProfileControllerComp.h>
-#include <imtauthgql/CJwtSessionControllerProxyComp.h>
-#include <imtauthgql/CRemoteTenantControllerComp.h>
-#include <imtauthgql/CRemoteTenantMembershipManagerControllerComp.h>
-#include <imtauthgql/CTenantManagerControllerComp.h>
-#include <imtauthgql/CTenantMembershipManagerControllerComp.h>
-#include <imtauthgql/CTenantMembershipPublisherComp.h>
-#include <imtauthgql/CRemoteTenantCollectionDocumentServiceControllerComp.h>
-
 
 namespace ImtAuthGqlPck
 {

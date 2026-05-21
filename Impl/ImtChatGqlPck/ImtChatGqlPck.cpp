@@ -5,10 +5,6 @@
 // ACF includes
 #include <icomp/export.h>
 
-// ImtCore includes
-#include <imtchatgql/CConversationCollectionControllerComp.h>
-#include <imtchatgql/CConversationCollectionDocumentServiceComp.h>
-
 
 namespace ImtChatGqlPck
 {

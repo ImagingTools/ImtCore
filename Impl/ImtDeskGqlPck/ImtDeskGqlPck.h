@@ -2,15 +2,12 @@
 #pragma once
 
 
-// forward declarations
-namespace imtdeskgql
-{
-class CTicketCollectionControllerComp;
-class CTicketCollectionDocumentServiceComp;
-class CEntityContextTicketsControllerComp;
-class CTicketMessageNotifierComp;
-class CTicketAssigneeNotifierComp;
-} // namespace imtdeskgql
+// ImtCore includes
+#include <imtdeskgql/CTicketCollectionControllerComp.h>
+#include <imtdeskgql/CTicketCollectionDocumentServiceComp.h>
+#include <imtdeskgql/CEntityContextTicketsControllerComp.h>
+#include <imtdeskgql/CTicketMessageNotifierComp.h>
+#include <imtdeskgql/CTicketAssigneeNotifierComp.h>
 
 
 /**

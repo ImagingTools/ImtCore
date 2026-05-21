@@ -5,23 +5,6 @@
 // ACF includes
 #include <icomp/export.h>
 
-// ImtCore includes
-#include <imtclientgql/CApiClientComp.h>
-#include <imtclientgql/CGqlClientEngineComp.h>
-#include <imtclientgql/CGqlObjectCollectionDelegateComp.h>
-#include <imtclientgql/CGqlRemoteRepresentationControllerCompBase.h>
-#include <imtclientgql/CGqlRemoteRepresentationControllerComp.h>
-#include <imtclientgql/CSubscriptionManagerComp.h>
-#include <imtclientgql/CWebSocketClientComp.h>
-#include <imtclientgql/CModelSubscriberComp.h>
-#include <imtclientgql/CGqlHierarchicalStructureDelegateComp.h>
-#include <imtclientgql/CRemoteDocumentRevisionControllerComp.h>
-#include <imtclientgql/CRemoteObjectCollectionControllerComp.h>
-#include <imtclientgql/CObjectCollectionSubscriberComp.h>
-#include <imtclientgql/CRemoteCollectionDocumentServiceControllerComp.h>
-#include <imtclientgql/CRemoteCommandsControllerComp.h>
-#include <imtclientgql/CRemoteFilterableSelectControllerComp.h>
-
 
 namespace ImtClientGqlPck
 {

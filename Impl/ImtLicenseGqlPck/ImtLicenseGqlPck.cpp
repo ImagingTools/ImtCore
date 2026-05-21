@@ -5,23 +5,6 @@
 // ACF includes
 #include <icomp/export.h>
 
-// ImtCore includes
-#include <imtlicgql/CProductCollectionControllerComp.h>
-#include <imtlicgql/CProductControllerComp.h>
-#include <imtlicgql/CLicenseControllerComp.h>
-#include <imtlicgql/CLicenseCollectionControllerComp.h>
-#include <imtlicgql/CAccountControllerComp.h>
-#include <imtlicgql/CProductPermissionsControllerComp.h>
-#include <imtlicgql/CFeatureControllerComp.h>
-#include <imtlicgql/CFeatureCollectionControllerComp.h>
-#include <imtlicgql/CFeatureDependenciesProviderComp.h>
-#include <imtlicgql/CProductInfoProviderComp.h>
-#include <imtlicgql/CPermissionsProviderComp.h>
-#include <imtlicgql/CFeatureMetaInfoDelegateComp.h>
-#include <imtlicgql/CProductMetaInfoDelegateComp.h>
-#include <imtlicgql/CLicenseMetaInfoDelegateComp.h>
-#include <imtlicgql/CProductInfoFileGeneratorComp.h>
-
 
 namespace ImtLicenseGqlPck
 {

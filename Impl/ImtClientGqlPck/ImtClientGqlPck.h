@@ -6,30 +6,25 @@
 #include <icomp/TModelCompWrap.h>
 #include <icomp/TMakeComponentWrap.h>
 
-// ImtCore includes (full includes required for TModelCompWrap template instantiation)
+// ImtCore includes
+#include <imtclientgql/CApiClientComp.h>
+#include <imtclientgql/CGqlClientEngineComp.h>
 #include <imtclientgql/CGqlObjectCollectionComp.h>
+#include <imtclientgql/CGqlObjectCollectionDelegateComp.h>
+#include <imtclientgql/CGqlRemoteRepresentationControllerCompBase.h>
+#include <imtclientgql/CGqlRemoteRepresentationControllerComp.h>
+#include <imtclientgql/CSubscriptionManagerComp.h>
+#include <imtclientgql/CWebSocketClientComp.h>
+#include <imtclientgql/CModelSubscriberComp.h>
+#include <imtclientgql/CGqlHierarchicalStructureDelegateComp.h>
+#include <imtclientgql/CGqlObjectCollectionDelegateComp.h>
 #include <imtclientgql/CConnectionStatusSubscriberComp.h>
-
-
-// forward declarations
-namespace imtclientgql
-{
-class CApiClientComp;
-class CGqlClientEngineComp;
-class CGqlObjectCollectionDelegateComp;
-class CGqlRemoteRepresentationControllerCompBase;
-class CGqlRemoteRepresentationControllerComp;
-class CSubscriptionManagerComp;
-class CWebSocketClientComp;
-class CModelSubscriberComp;
-class CGqlHierarchicalStructureDelegateComp;
-class CRemoteDocumentRevisionControllerComp;
-class CRemoteObjectCollectionControllerComp;
-class CObjectCollectionSubscriberComp;
-class CRemoteCollectionDocumentServiceControllerComp;
-class CRemoteCommandsControllerComp;
-class CRemoteFilterableSelectControllerComp;
-} // namespace imtclientgql
+#include <imtclientgql/CRemoteDocumentRevisionControllerComp.h>
+#include <imtclientgql/CRemoteObjectCollectionControllerComp.h>
+#include <imtclientgql/CObjectCollectionSubscriberComp.h>
+#include <imtclientgql/CRemoteCollectionDocumentServiceControllerComp.h>
+#include <imtclientgql/CRemoteCommandsControllerComp.h>
+#include <imtclientgql/CRemoteFilterableSelectControllerComp.h>
 
 
 /**

@@ -5,13 +5,6 @@
 // ACF includes
 #include <icomp/export.h>
 
-// ImtCore includes
-#include <imtdeskgql/CTicketCollectionControllerComp.h>
-#include <imtdeskgql/CTicketCollectionDocumentServiceComp.h>
-#include <imtdeskgql/CEntityContextTicketsControllerComp.h>
-#include <imtdeskgql/CTicketMessageNotifierComp.h>
-#include <imtdeskgql/CTicketAssigneeNotifierComp.h>
-
 
 namespace ImtDeskGqlPck
 {
