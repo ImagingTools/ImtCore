@@ -44,7 +44,8 @@ rolesPage.stateManager.receivedRoleData = data
 StackViewHeader {
 id: rolesStackViewHeader
 anchors.top: parent.top
-anchors.horizontalCenter: parent.horizontalCenter
+anchors.left: parent.left
+anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 width: Math.min(parent.width - Style.marginXL * 2, 1000)
 height: Style.controlHeightL
 initialItemTitleVisible: true
@@ -125,7 +126,8 @@ onTextChanged: rolesDataProvider.fetch(text)
 TenantTableContainer {
 anchors.top: rolesFilterInput.bottom
 anchors.topMargin: Style.marginM
-anchors.bottom: parent.bottom
+height: Math.min(rolesTableHeader.height + rolesListView2.contentHeight + 2,
+parent.height - rolesFilterInput.height - rolesFilterInput.anchors.topMargin - Style.marginM)
 
 IdSelectionManager {
 id: rolesSelectionManager
@@ -155,7 +157,7 @@ checkState: rolesSelectionManager.selectedIds.length === 0
 ? Qt.Checked : Qt.PartiallyChecked)
 
 onSelectAllToggled: {
-if (rolesSelectionManager.selectedIds.length === rolesListView2.count) {
+if (checkState === Qt.Checked) {
 rolesSelectionManager.clear()
 } else {
 var allIds = []
@@ -198,12 +200,6 @@ id: roleMouseArea
 anchors.fill: parent
 hoverEnabled: true
 cursorShape: Qt.PointingHandCursor
-onClicked: {
-if (mouse.modifiers & Qt.ControlModifier)
-rolesSelectionManager.toggleSelect(roleDelegateRoot.itemId)
-else
-rolesSelectionManager.singleSelect(roleDelegateRoot.itemId)
-}
 onDoubleClicked: {
 if (rolesPage.__canManage)
 rolesPage.__openEditRole(roleDelegateRoot.itemId, roleDelegateRoot.itemTitle, roleDelegateRoot.itemDescription)
@@ -265,11 +261,13 @@ radius: Style.controlHeightM / 2
 color: roleMoreButtonMA.containsMouse ? Style.buttonHoverColor : "transparent"
 visible: rolesPage.__canManage && (roleMouseArea.containsMouse || roleDelegateRoot.isSelected || roleMoreButtonMA.containsMouse)
 
-BaseText {
+Text {
 anchors.centerIn: parent
 text: "\u2026"
 font.pixelSize: Style.fontSizeL
 color: Style.textColor
+horizontalAlignment: Text.AlignHCenter
+verticalAlignment: Text.AlignVCenter
 }
 
 MouseArea {
@@ -308,8 +306,6 @@ Rectangle {
 anchors.bottom: parent.bottom
 anchors.left: parent.left
 anchors.right: parent.right
-anchors.leftMargin: Style.marginM
-anchors.rightMargin: Style.marginM
 height: 1
 color: Style.borderColor
 opacity: 0.5
@@ -350,7 +346,8 @@ id: createRoleView
 anchors.top: parent.top
 anchors.bottom: editorButtonsCreate.top
 anchors.bottomMargin: Style.marginM
-anchors.horizontalCenter: parent.horizontalCenter
+anchors.left: parent.left
+anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 width: Math.min(parent.width - Style.marginXL * 2, 1000)
 commandsPanelVisible: false
 
@@ -364,7 +361,8 @@ Row {
 id: editorButtonsCreate
 anchors.bottom: parent.bottom
 anchors.bottomMargin: Style.marginXL
-anchors.horizontalCenter: parent.horizontalCenter
+anchors.left: parent.left
+anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 width: Math.min(parent.width - Style.marginXL * 2, 1000)
 spacing: Style.marginM
 
@@ -402,7 +400,8 @@ id: editRoleView
 anchors.top: parent.top
 anchors.bottom: editorButtonsEdit.top
 anchors.bottomMargin: Style.marginM
-anchors.horizontalCenter: parent.horizontalCenter
+anchors.left: parent.left
+anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 width: Math.min(parent.width - Style.marginXL * 2, 1000)
 commandsPanelVisible: false
 
@@ -440,7 +439,8 @@ Row {
 id: editorButtonsEdit
 anchors.bottom: parent.bottom
 anchors.bottomMargin: Style.marginXL
-anchors.horizontalCenter: parent.horizontalCenter
+anchors.left: parent.left
+anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 width: Math.min(parent.width - Style.marginXL * 2, 1000)
 spacing: Style.marginM
 

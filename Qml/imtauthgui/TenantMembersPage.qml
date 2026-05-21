@@ -49,7 +49,8 @@ membersPage.stateManager.loadMembersFromModel()
 StackViewHeader {
 id: membersStackViewHeader
 anchors.top: parent.top
-anchors.horizontalCenter: parent.horizontalCenter
+anchors.left: parent.left
+anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 width: Math.min(parent.width - Style.marginXL * 2, 1000)
 height: Style.controlHeightL
 initialItemTitleVisible: true
@@ -150,8 +151,9 @@ id: membersListView
 Item {
 TenantTableContainer {
 anchors.top: parent.top
-anchors.bottom: parent.bottom
 anchors.topMargin: Style.marginM
+height: Math.min(membersTableHeader.height + membersColumn.height + 2,
+parent.height - Style.marginM)
 
 IdSelectionManager {
 id: membersSelectionManager
@@ -171,8 +173,7 @@ checkState: membersSelectionManager.selectedIds.length === 0
 ? Qt.Checked : Qt.PartiallyChecked)
 
 onSelectAllToggled: {
-var totalItems = membersListViewContent.count + invitationsListView.count
-if (membersSelectionManager.selectedIds.length === totalItems) {
+if (checkState === Qt.Checked) {
 membersSelectionManager.clear()
 } else {
 var allIds = []
@@ -353,7 +354,8 @@ id: createUserView
 anchors.top: parent.top
 anchors.bottom: userEditorButtons.top
 anchors.bottomMargin: Style.marginM
-anchors.horizontalCenter: parent.horizontalCenter
+anchors.left: parent.left
+anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 width: Math.min(parent.width - Style.marginXL * 2, 1000)
 commandsPanelVisible: false
 
@@ -367,7 +369,8 @@ Row {
 id: userEditorButtons
 anchors.bottom: parent.bottom
 anchors.bottomMargin: Style.marginXL
-anchors.horizontalCenter: parent.horizontalCenter
+anchors.left: parent.left
+anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 width: Math.min(parent.width - Style.marginXL * 2, 1000)
 spacing: Style.marginM
 

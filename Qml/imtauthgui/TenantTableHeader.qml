@@ -23,7 +23,7 @@ Item {
 
 	signal selectAllToggled()
 
-	height: Style.controlHeightL
+	height: Style.controlHeightL + Style.marginM
 	width: parent.width
 
 	Rectangle {

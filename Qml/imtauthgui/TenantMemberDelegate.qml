@@ -276,4 +276,14 @@ Rectangle {
 			}
 		}
 	}
+
+	// Bottom separator line
+	Rectangle {
+		anchors.bottom: parent.bottom
+		anchors.left: parent.left
+		anchors.right: parent.right
+		height: 1
+		color: Style.borderColor
+		opacity: 0.5
+	}
 }

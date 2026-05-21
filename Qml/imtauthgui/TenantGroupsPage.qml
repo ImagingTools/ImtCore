@@ -44,7 +44,8 @@ groupsPage.stateManager.receivedGroupData = data
 StackViewHeader {
 id: groupsStackViewHeader
 anchors.top: parent.top
-anchors.horizontalCenter: parent.horizontalCenter
+anchors.left: parent.left
+anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 width: Math.min(parent.width - Style.marginXL * 2, 1000)
 height: Style.controlHeightL
 initialItemTitleVisible: true
@@ -125,7 +126,8 @@ onTextChanged: groupsDataProvider.fetch(text)
 TenantTableContainer {
 anchors.top: groupsFilterInput.bottom
 anchors.topMargin: Style.marginM
-anchors.bottom: parent.bottom
+height: Math.min(groupsTableHeader.height + groupsListView2.contentHeight + 2,
+parent.height - groupsFilterInput.height - groupsFilterInput.anchors.topMargin - Style.marginM)
 
 IdSelectionManager {
 id: groupsSelectionManager
@@ -155,7 +157,7 @@ checkState: groupsSelectionManager.selectedIds.length === 0
 ? Qt.Checked : Qt.PartiallyChecked)
 
 onSelectAllToggled: {
-if (groupsSelectionManager.selectedIds.length === groupsListView2.count) {
+if (checkState === Qt.Checked) {
 groupsSelectionManager.clear()
 } else {
 var allIds = []
@@ -198,12 +200,6 @@ id: groupMouseArea
 anchors.fill: parent
 hoverEnabled: true
 cursorShape: Qt.PointingHandCursor
-onClicked: {
-if (mouse.modifiers & Qt.ControlModifier)
-groupsSelectionManager.toggleSelect(groupDelegateRoot.itemId)
-else
-groupsSelectionManager.singleSelect(groupDelegateRoot.itemId)
-}
 onDoubleClicked: {
 if (groupsPage.__canManage)
 groupsPage.__openEditGroup(groupDelegateRoot.itemId, groupDelegateRoot.itemTitle, groupDelegateRoot.itemDescription)
@@ -265,11 +261,13 @@ radius: Style.controlHeightM / 2
 color: groupMoreButtonMA.containsMouse ? Style.buttonHoverColor : "transparent"
 visible: groupsPage.__canManage && (groupMouseArea.containsMouse || groupDelegateRoot.isSelected || groupMoreButtonMA.containsMouse)
 
-BaseText {
+Text {
 anchors.centerIn: parent
 text: "\u2026"
 font.pixelSize: Style.fontSizeL
 color: Style.textColor
+horizontalAlignment: Text.AlignHCenter
+verticalAlignment: Text.AlignVCenter
 }
 
 MouseArea {
@@ -308,8 +306,6 @@ Rectangle {
 anchors.bottom: parent.bottom
 anchors.left: parent.left
 anchors.right: parent.right
-anchors.leftMargin: Style.marginM
-anchors.rightMargin: Style.marginM
 height: 1
 color: Style.borderColor
 opacity: 0.5
@@ -350,7 +346,8 @@ id: createGroupView
 anchors.top: parent.top
 anchors.bottom: groupEditorButtonsCreate.top
 anchors.bottomMargin: Style.marginM
-anchors.horizontalCenter: parent.horizontalCenter
+anchors.left: parent.left
+anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 width: Math.min(parent.width - Style.marginXL * 2, 1000)
 commandsPanelVisible: false
 
@@ -364,7 +361,8 @@ Row {
 id: groupEditorButtonsCreate
 anchors.bottom: parent.bottom
 anchors.bottomMargin: Style.marginXL
-anchors.horizontalCenter: parent.horizontalCenter
+anchors.left: parent.left
+anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 width: Math.min(parent.width - Style.marginXL * 2, 1000)
 spacing: Style.marginM
 
@@ -402,7 +400,8 @@ id: editGroupView
 anchors.top: parent.top
 anchors.bottom: groupEditorButtonsEdit.top
 anchors.bottomMargin: Style.marginM
-anchors.horizontalCenter: parent.horizontalCenter
+anchors.left: parent.left
+anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 width: Math.min(parent.width - Style.marginXL * 2, 1000)
 commandsPanelVisible: false
 
@@ -440,7 +439,8 @@ Row {
 id: groupEditorButtonsEdit
 anchors.bottom: parent.bottom
 anchors.bottomMargin: Style.marginXL
-anchors.horizontalCenter: parent.horizontalCenter
+anchors.left: parent.left
+anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 width: Math.min(parent.width - Style.marginXL * 2, 1000)
 spacing: Style.marginM
 
