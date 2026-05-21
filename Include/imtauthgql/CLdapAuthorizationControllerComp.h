@@ -40,6 +40,7 @@ protected:
 				bool isDefault,
 				bool isGuest) const;
 	virtual istd::TUniqueInterfacePtr<imtauth::IUserInfo> CreateUserInfoFromLdapUser(const QByteArray& ldapUserId) const;
+	QByteArray GetUserObjectIdBySid(const QByteArray& sid) const;
 
 	// reimplemented (CAuthorizationControllerComp)
 	virtual sdl::imtauth::Authorization::CAuthorizationPayload OnAuthorization(

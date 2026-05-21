@@ -176,7 +176,9 @@ Item {
 
 		function onOpenedDocumentListReceiveFailed(message){
 			globalLoading.stop()
-			ModalDialogManager.showErrorDialog(message)
+			if(message !==""){
+				ModalDialogManager.showErrorDialog(message)
+			}
 		}
 
 		function onDocumentGuiUpdated(documentId, representation){
@@ -198,7 +200,9 @@ Item {
 		}
 
 		function onUpdateRepresentationFailed(documentId, message){
-			ModalDialogManager.showErrorDialog(message)
+			if(message !==""){
+				ModalDialogManager.showErrorDialog(message)
+			}
 			if (!workspaceView.documentManager.documentIsLoading(documentId)){
 				workspaceView.stopLoading(documentId)
 			}
@@ -249,7 +253,9 @@ Item {
 
 		function onOpenDocumentFailed(documentId, message){
 			workspaceView.stopLoading(documentId)
-			ModalDialogManager.showErrorDialog(message)
+			if(message !==""){
+				ModalDialogManager.showErrorDialog(message)
+			}
 		}
 
 		// Close document signals
@@ -264,7 +270,9 @@ Item {
 
 		function onCloseDocumentFailed(documentId, message){
 			workspaceView.stopLoading(documentId)
-			ModalDialogManager.showErrorDialog(message)
+			if(message !==""){
+				ModalDialogManager.showErrorDialog(message)
+			}
 			onDocumentClosed(documentId)
 		}
 
@@ -279,7 +287,9 @@ Item {
 
 		function onSaveDocumentFailed(documentId, message){
 			workspaceView.stopLoading(documentId)
-			ModalDialogManager.showErrorDialog(message)
+			if(message !==""){
+				ModalDialogManager.showErrorDialog(message)
+			}
 		}
 
 		// Create document signals
@@ -287,7 +297,9 @@ Item {
 		}
 
 		function onCreateDocumentFailed(documentTypeId, message){
-			ModalDialogManager.showErrorDialog(message)
+			if(message !==""){
+				ModalDialogManager.showErrorDialog(message)
+			}
 		}
 
 		function onDocumentCreated(documentId, documentTypeId){
@@ -309,7 +321,9 @@ Item {
 
 		function onUndoInfoReceiveFailed(documentId, message){
 			workspaceView.stopLoading(documentId)
-			ModalDialogManager.showErrorDialog(message)
+			if(message !==""){
+				ModalDialogManager.showErrorDialog(message)
+			}
 		}
 
 		// Undo signals
@@ -323,7 +337,9 @@ Item {
 
 		function onUndoFailed(documentId, message){
 			workspaceView.stopLoading(documentId)
-			ModalDialogManager.showErrorDialog(message)
+			if(message !==""){
+				ModalDialogManager.showErrorDialog(message)
+			}
 		}
 
 		// Redo signals
@@ -337,7 +353,9 @@ Item {
 
 		function onRedoFailed(documentId, message){
 			workspaceView.stopLoading(documentId)
-			ModalDialogManager.showErrorDialog(message)
+			if(message !==""){
+				ModalDialogManager.showErrorDialog(message)
+			}
 		}
 
 		function onTryCloseDirtyDocument(documentId, callback){
