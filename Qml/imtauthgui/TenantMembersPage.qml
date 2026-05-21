@@ -4,6 +4,7 @@ import QtQuick.Controls
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
+import imtcolgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
 import imtauthgui 1.0
@@ -337,7 +338,7 @@ ViewBase {
 
 			onSelectionChanged: {
 				var arr = []
-				for (var i = 0; i < selectedIds.length; i++) {
+				for (var i = 0; i < selectedIds.lesngth; i++) {
 					var selId = selectedIds[i]
 					var selName = dataProvider ? dataProvider.getSelectedItemText(selId) : ""
 					if (!selName)
