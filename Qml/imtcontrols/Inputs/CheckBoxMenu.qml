@@ -142,18 +142,15 @@ FocusScope{
     Component {
         id: popupMenu;
 
-        Item{
+		PopupView{
             id: popupMenuContainer;
 
 			width: checkBoxMenu.width;
 			height: Math.min(checkBoxMenu.menuHeight, listView.y + listView.contentHeight + Style.marginM);
 
-            property Item root: null;
             property Item rootItem: null;
-            property bool hiddenBackground: true;
             property TreeItemModel dataModel: TreeItemModel{};
             signal setCheckedSignal();
-
 
 			onDataModelChanged: {
                 if(dataModel.getItemsCount()){
