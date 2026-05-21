@@ -35,7 +35,7 @@ public:
 	/**
 		Lifecycle state of the request.
 	*/
-	enum State
+	enum RequestState
 	{
 		S_PENDING = 0,	//!< Request is in flight, no terminal callback yet.
 		S_COMPLETED,	//!< Response received successfully.
@@ -46,7 +46,7 @@ public:
 	/**
 		Returns the current state of the request. Safe to call from any thread.
 	*/
-	virtual State GetState() const = 0;
+	virtual RequestState GetState() const = 0;
 
 	/**
 		Requests cancellation of the in-flight request.

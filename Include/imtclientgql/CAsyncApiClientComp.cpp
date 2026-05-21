@@ -48,7 +48,7 @@ public:
 
 	// reimplemented (IAsyncGqlRequestToken)
 
-	virtual State GetState() const override
+	virtual RequestState GetState() const override
 	{
 		QMutexLocker lock(&m_mutex);
 		return m_state;
@@ -144,7 +144,7 @@ public:
 	}
 
 private:
-	void MarkTerminal(State newState)
+	void MarkTerminal(RequestState newState)
 	{
 		QList<QEventLoop*> waitersSnapshot;
 		{
@@ -163,7 +163,7 @@ private:
 	}
 
 	mutable QMutex m_mutex;
-	State m_state;
+	RequestState m_state;
 	std::function<void()> m_cancelCb;
 	QList<QEventLoop*> m_waiters;
 };
@@ -199,7 +199,7 @@ IAsyncGqlRequestTokenPtr CAsyncApiClientComp::SendRequest(
 	IAsyncGqlRequestTokenPtr tokenPtr;
 	tokenPtr.SetPtr(tokenImplPtr);
 
-	auto failFast = [tokenImplPtr, handlerPtr](IAsyncGqlResponseHandler::ErrorCategory category, const QString& message) {
+	auto FailFast = [tokenImplPtr, handlerPtr](IAsyncGqlResponseHandler::ErrorCategory category, const QString& message) {
 		if (handlerPtr != nullptr){
 			handlerPtr->OnError(category, message);
 		}
@@ -207,33 +207,33 @@ IAsyncGqlRequestTokenPtr CAsyncApiClientComp::SendRequest(
 	};
 
 	if (!requestPtr.IsValid()){
-		failFast(IAsyncGqlResponseHandler::EC_INVALID_REQUEST, "Invalid request");
+		FailFast(IAsyncGqlResponseHandler::EC_INVALID_REQUEST, "Invalid request");
 		return tokenPtr;
 	}
 
 	if (!m_protocolEngineCompPtr.IsValid()){
 		SendErrorMessage(0, "Protocol engine is not available", "Async API Client");
-		failFast(IAsyncGqlResponseHandler::EC_INTERNAL, "Protocol engine is not available");
+		FailFast(IAsyncGqlResponseHandler::EC_INTERNAL, "Protocol engine is not available");
 		return tokenPtr;
 	}
 
 	if (m_networkManagerPtr == nullptr){
 		SendErrorMessage(0, "Network access manager is not initialized", "Async API Client");
-		failFast(IAsyncGqlResponseHandler::EC_INTERNAL, "Network access manager is not initialized");
+		FailFast(IAsyncGqlResponseHandler::EC_INTERNAL, "Network access manager is not initialized");
 		return tokenPtr;
 	}
 
 	imtgql::IGqlRequest::RequestType requestType = requestPtr->GetRequestType();
 	if ((requestType != imtgql::IGqlRequest::RT_QUERY) && (requestType != imtgql::IGqlRequest::RT_MUTATION)){
 		SendErrorMessage(0, "Invalid request type", "Async API Client");
-		failFast(IAsyncGqlResponseHandler::EC_INVALID_REQUEST, "Invalid request type");
+		FailFast(IAsyncGqlResponseHandler::EC_INVALID_REQUEST, "Invalid request type");
 		return tokenPtr;
 	}
 
 	QNetworkRequest* networkRequestPtr = m_protocolEngineCompPtr->CreateNetworkRequest(*requestPtr, urlParamPtr);
 	if (networkRequestPtr == nullptr){
 		SendErrorMessage(0, "Failed to create network request", "Async API Client");
-		failFast(IAsyncGqlResponseHandler::EC_INTERNAL, "Failed to create network request");
+		FailFast(IAsyncGqlResponseHandler::EC_INTERNAL, "Failed to create network request");
 		return tokenPtr;
 	}
 
@@ -245,7 +245,7 @@ IAsyncGqlRequestTokenPtr CAsyncApiClientComp::SendRequest(
 
 	if (replyPtr == nullptr){
 		SendErrorMessage(0, QString("Null reply for request-ID ") + uuid, "Async API Client");
-		failFast(IAsyncGqlResponseHandler::EC_NETWORK, "Failed to start network request");
+		FailFast(IAsyncGqlResponseHandler::EC_NETWORK, "Failed to start network request");
 		return tokenPtr;
 	}
 
@@ -276,7 +276,7 @@ IAsyncGqlRequestTokenPtr CAsyncApiClientComp::SendRequest(
 	// Keep the token alive until the finalizer runs, regardless of the caller.
 	auto tokenKeepAlive = tokenPtr;
 
-	auto finalize = [this, replyPtr, requestPtr, handlerPtr, tokenKeepAlive, tokenImplPtr, timeoutTimerPtr, timedOutFlagPtr, uuid]() {
+	auto Finalize = [this, replyPtr, requestPtr, handlerPtr, tokenKeepAlive, tokenImplPtr, timeoutTimerPtr, timedOutFlagPtr, uuid]() {
 		if (tokenImplPtr->GetState() != IAsyncGqlRequestToken::S_PENDING){
 			// Already finalized (defensive: should not happen, finished fires once).
 			replyPtr->deleteLater();
@@ -331,7 +331,7 @@ IAsyncGqlRequestTokenPtr CAsyncApiClientComp::SendRequest(
 		replyPtr->deleteLater();
 	};
 
-	QObject::connect(replyPtr, &QNetworkReply::finished, this, finalize);
+	QObject::connect(replyPtr, &QNetworkReply::finished, this, Finalize);
 
 	if (timeoutTimerPtr != nullptr){
 		QObject::connect(timeoutTimerPtr, &QTimer::timeout, replyPtr, [replyPtr, timedOutFlagPtr]() {
