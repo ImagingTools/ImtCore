@@ -6,22 +6,26 @@
 #include <icomp/TMakeComponentWrap.h>
 #include <icomp/TModelCompWrap.h>
 
-// ImtCore includes
-#include <imtlicgql/CProductCollectionControllerComp.h>
-#include <imtlicgql/CProductControllerComp.h>
-#include <imtlicgql/CLicenseControllerComp.h>
-#include <imtlicgql/CLicenseCollectionControllerComp.h>
-#include <imtlicgql/CAccountControllerComp.h>
-#include <imtlicgql/CProductPermissionsControllerComp.h>
-#include <imtlicgql/CFeatureControllerComp.h>
-#include <imtlicgql/CFeatureCollectionControllerComp.h>
-#include <imtlicgql/CFeatureDependenciesProviderComp.h>
-#include <imtlicgql/CProductInfoProviderComp.h>
-#include <imtlicgql/CPermissionsProviderComp.h>
-#include <imtlicgql/CFeatureMetaInfoDelegateComp.h>
-#include <imtlicgql/CProductMetaInfoDelegateComp.h>
-#include <imtlicgql/CLicenseMetaInfoDelegateComp.h>
-#include <imtlicgql/CProductInfoFileGeneratorComp.h>
+
+// forward declarations
+namespace imtlicgql
+{
+class CProductCollectionControllerComp;
+class CProductControllerComp;
+class CLicenseControllerComp;
+class CLicenseCollectionControllerComp;
+class CAccountControllerComp;
+class CProductPermissionsControllerComp;
+class CFeatureControllerComp;
+class CFeatureCollectionControllerComp;
+class CFeatureDependenciesProviderComp;
+class CProductInfoProviderComp;
+class CPermissionsProviderComp;
+class CFeatureMetaInfoDelegateComp;
+class CProductMetaInfoDelegateComp;
+class CLicenseMetaInfoDelegateComp;
+class CProductInfoFileGeneratorComp;
+} // namespace imtlicgql
 
 
 /**

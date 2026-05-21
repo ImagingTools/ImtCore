@@ -2,9 +2,12 @@
 #pragma once
 
 
-// ImtCore includes
-#include <imtchatgql/CConversationCollectionControllerComp.h>
-#include <imtchatgql/CConversationCollectionDocumentServiceComp.h>
+// forward declarations
+namespace imtchatgql
+{
+class CConversationCollectionControllerComp;
+class CConversationCollectionDocumentServiceComp;
+} // namespace imtchatgql
 
 
 /**

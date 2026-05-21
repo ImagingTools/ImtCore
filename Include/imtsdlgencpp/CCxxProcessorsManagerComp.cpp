@@ -130,8 +130,10 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 		QStringList cumulatedFiles;
 		const QString sourceFilePath = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsCompPtr, *m_argumentParserCompPtr)[imtsdl::ISdlProcessArgumentsParser::s_sourceFileType];
 		const QString headerFilePath = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsCompPtr, *m_argumentParserCompPtr)[imtsdl::ISdlProcessArgumentsParser::s_headerFileType];
+		const QString fwdFilePath = headerFilePath.chopped(2) + QStringLiteral("_fwd.h");
 		cumulatedFiles << sourceFilePath;
 		cumulatedFiles << headerFilePath;
+		cumulatedFiles << fwdFilePath;
 
 		PrintFiles(std::cout, cumulatedFiles, m_argumentParserCompPtr->GetGeneratorType());
 		PrintFiles(m_argumentParserCompPtr->GetDepFilePath(), cumulatedFiles, *m_dependentSchemaListCompPtr);
@@ -257,6 +259,13 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 
 			return TS_INVALID;
 		}
+	}
+
+	// generate forward declaration file
+	if (!GenerateForwardDeclarationFile(paramsPtr)){
+		SendErrorMessage(0, "Unable to generate forward declaration file");
+
+		return TS_INVALID;
 	}
 
 	return TS_OK;
@@ -649,6 +658,121 @@ bool CCxxProcessorsManagerComp::ProcessRequests(const EntryFileMap& headerFiles,
 			}
 		}
 	}
+
+	return true;
+}
+
+
+bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IParamsSet* /*paramsPtr*/) const
+{
+	imtsdl::ISdlProcessArgumentsParser::CppGenerationMode mode = m_argumentParserCompPtr->GetCppGenerationMode();
+	if (mode == imtsdl::ISdlProcessArgumentsParser::CGM_IMPLEMENTATION_ONLY){
+		return true;
+	}
+
+	// calculate fwd file path (same as header but with _fwd suffix)
+	const QString headerFilePath = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsCompPtr, *m_argumentParserCompPtr)[imtsdl::ISdlProcessArgumentsParser::s_headerFileType];
+	const QString fwdFilePath = headerFilePath.chopped(2) + QStringLiteral("_fwd.h"); // replace ".h" with "_fwd.h"
+
+	FilePtr fwdFilePtr = CreateFile(fwdFilePath);
+	if (!fwdFilePtr){
+		return false;
+	}
+
+	QTextStream stream(fwdFilePtr.get());
+
+	// write pragma once
+	stream << QStringLiteral("#pragma once");
+	FeedStream(stream, 3, false);
+
+	// begin namespace
+	const QString sdlNamespace = GetNamespaceFromSchemaParams(*m_schemaParamsCompPtr);
+	stream << QStringLiteral("namespace ");
+	stream << sdlNamespace;
+	FeedStream(stream, 1, false);
+	stream << '{';
+	FeedStream(stream, 2, false);
+
+	// forward declare all types
+	if (m_sdlTypeListCompPtr.IsValid()){
+		const imtsdl::SdlTypeList typeList = m_sdlTypeListCompPtr->GetSdlTypes(true);
+		if (!typeList.isEmpty()){
+			stream << QStringLiteral("// type forward declarations");
+			FeedStream(stream, 1, false);
+			for (const imtsdl::CSdlType& sdlType: typeList){
+				stream << QStringLiteral("class C") << sdlType.GetName() << ';';
+				FeedStream(stream, 1, false);
+			}
+			FeedStream(stream, 1, false);
+		}
+	}
+
+	// forward declare all unions
+	if (m_sdlUnionListCompPtr.IsValid()){
+		const imtsdl::SdlUnionList unionList = m_sdlUnionListCompPtr->GetUnions(true);
+		if (!unionList.isEmpty()){
+			stream << QStringLiteral("// union forward declarations");
+			FeedStream(stream, 1, false);
+			for (const imtsdl::CSdlUnion& sdlUnion: unionList){
+				stream << QStringLiteral("class ") << sdlUnion.GetName() << ';';
+				FeedStream(stream, 1, false);
+				stream << QStringLiteral("class C") << sdlUnion.GetName() << QStringLiteral("Object;");
+				FeedStream(stream, 1, false);
+				stream << QStringLiteral("class C") << sdlUnion.GetName() << QStringLiteral("ObjectList;");
+				FeedStream(stream, 1, false);
+			}
+			FeedStream(stream, 1, false);
+		}
+	}
+
+	// forward declare controller base classes
+	bool hasRequests = false;
+	if (m_requestsProviderListCompPtr.IsValid()){
+		const imtsdl::SdlRequestList requestsList = m_requestsProviderListCompPtr->GetRequests(true);
+		if (!requestsList.isEmpty()){
+			hasRequests = true;
+			stream << QStringLiteral("// request forward declarations");
+			FeedStream(stream, 1, false);
+			for (const imtsdl::CSdlRequest& request: requestsList){
+				stream << QStringLiteral("class C") << request.GetName() << QStringLiteral("GqlRequest;");
+				FeedStream(stream, 1, false);
+			}
+			FeedStream(stream, 1, false);
+		}
+	}
+
+	// forward declare handler base classes
+	bool hasDocumentTypes = false;
+	if (m_sdlDocumentTypeListCompPtr.IsValid()){
+		const imtsdl::SdlDocumentTypeList documentTypesList = m_sdlDocumentTypeListCompPtr->GetDocumentTypes(true);
+		hasDocumentTypes = !documentTypesList.isEmpty();
+	}
+
+	if (hasRequests || hasDocumentTypes){
+		stream << QStringLiteral("// generated base class forward declarations");
+		FeedStream(stream, 1, false);
+
+		if (hasRequests){
+			stream << QStringLiteral("class CGraphQlHandlerCompBase;");
+			FeedStream(stream, 1, false);
+		}
+
+		if (m_sdlDocumentTypeListCompPtr.IsValid()){
+			const imtsdl::SdlDocumentTypeList documentTypesList = m_sdlDocumentTypeListCompPtr->GetDocumentTypes(true);
+			for (const imtsdl::CSdlDocumentType& documentType: documentTypesList){
+				stream << QStringLiteral("class C") << documentType.GetName() << QStringLiteral("CollectionControllerCompBase;");
+				FeedStream(stream, 1, false);
+			}
+		}
+	}
+
+	FeedStream(stream, 1, false);
+
+	// end namespace
+	stream << '}';
+	stream << QStringLiteral(" // namespace ");
+	stream << sdlNamespace;
+	FeedStream(stream, 1, false);
 
 	return true;
 }

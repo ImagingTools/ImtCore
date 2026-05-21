@@ -7,43 +7,47 @@
 #include <icomp/TModelCompWrap.h>
 #include <icomp/TMakeComponentWrap.h>
 
-// ImtCore includes
-#include <imtservergql/CHttpGraphQLServletComp.h>
-#include <imtservergql/CGqlDemultiplexerComp.h>
-#include <imtservergql/CGqlRepresentationDataControllerComp.h>
-#include <imtservergql/CUserSettingsControllerComp.h>
-#include <imtservergql/CGqlRepresentationJoinerComp.h>
-#include <imtservergql/CApplicationInfoControllerComp.h>
-#include <imtservergql/CSerializableObjectCollectionControllerComp.h>
-#include <imtservergql/CGqlContextControllerComp.h>
-#include <imtservergql/CObjectProviderComp.h>
-#include <imtservergql/CWebSocketServletComp.h>
-#include <imtservergql/CCollectionObjectProviderComp.h>
-#include <imtservergql/COperationContextControllerComp.h>
-#include <imtservergql/CObjectCollectionChangeNotifierComp.h>
-#include <imtservergql/CModelChangeNotifierComp.h>
-#include <imtservergql/CModelPublisherComp.h>
-#include <imtservergql/CStructureSubscriberControllerComp.h>
-#include <imtservergql/CBroadcastMessageConsumerControllerComp.h>
-#include <imtservergql/CBroadcastMessageConsumerSubscriberComp.h>
-#include <imtservergql/CSlaveSubscriberControllerComp.h>
-#include <imtservergql/CGqlSearchControllerComp.h>
-#include <imtservergql/CTableViewParamControllerComp.h>
-#include <imtservergql/CConnectionStatusSubscriberControllerComp.h>
-#include <imtservergql/CHeadersDataProviderComp.h>
-#include <imtservergql/CDocumentRevisionControllerComp.h>
-#include <imtservergql/CCommandsControllerComp.h>
-#include <imtservergql/CSettingsControllerComp.h>
-#include <imtservergql/CProgressManagerPublisherComp.h>
-#include <imtservergql/CGqlCollectionImportControllerComp.h>
-#include <imtservergql/CCollectionImportControllerComp.h>
-#include <imtservergql/CCollectionImportJobParamsFillerComp.h>
-#include <imtservergql/CCollectionDocumentServiceControllerComp.h>
-#include <imtservergql/CCollectionDocumentServicePublisherComp.h>
-#include <imtservergql/CPublisherSubscriberBridgeComp.h>
-#include <imtservergql/CGqlContextCreatorComp.h>
-#include <imtservergql/CFilterableSelectControllerComp.h>
-#include <imtservergql/CUserGroupParamsSetJoinerComp.h>
+
+// forward declarations
+namespace imtservergql
+{
+class CHttpGraphQLServletComp;
+class CGqlDemultiplexerComp;
+class CGqlRepresentationDataControllerComp;
+class CUserSettingsControllerComp;
+class CGqlRepresentationJoinerComp;
+class CApplicationInfoControllerComp;
+class CSerializableObjectCollectionControllerComp;
+class CGqlContextControllerComp;
+class CObjectProviderComp;
+class CWebSocketServletComp;
+class CCollectionObjectProviderComp;
+class COperationContextControllerComp;
+class CObjectCollectionChangeNotifierComp;
+class CModelChangeNotifierComp;
+class CModelPublisherComp;
+class CStructureSubscriberControllerComp;
+class CBroadcastMessageConsumerControllerComp;
+class CBroadcastMessageConsumerSubscriberComp;
+class CSlaveSubscriberControllerComp;
+class CGqlSearchControllerComp;
+class CTableViewParamControllerComp;
+class CConnectionStatusSubscriberControllerComp;
+class CHeadersDataProviderComp;
+class CDocumentRevisionControllerComp;
+class CCommandsControllerComp;
+class CSettingsControllerComp;
+class CProgressManagerPublisherComp;
+class CGqlCollectionImportControllerComp;
+class CCollectionImportControllerComp;
+class CCollectionImportJobParamsFillerComp;
+class CCollectionDocumentServiceControllerComp;
+class CCollectionDocumentServicePublisherComp;
+class CPublisherSubscriberBridgeComp;
+class CGqlContextCreatorComp;
+class CFilterableSelectControllerComp;
+class CUserGroupParamsSetJoinerComp;
+} // namespace imtservergql
 
 
 /**
