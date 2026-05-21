@@ -15,7 +15,7 @@ import imtauthUsersSdl 1.0
  * TenantEditor
  *
  * Thin orchestrator that composes:
- *   - TenantEditorStateManager   — local UI state + pure logic
+ *   - TenantEditorStateManager  — local UI state + pure logic
  *   - an injected `apiClient` (abstract TenantMembershipApiClient) — transport
  *   - the page components (General / Members / Roles / Groups / Permissions)
  *
@@ -43,7 +43,7 @@ DocumentViewBase {
 
 	// --- Composition root ---
 	TenantEditorStateManager {
-		id: stateManager
+		id: stateManager_
 		tenantData: container.tenantData
 		apiClient: container.apiClient
 	}
@@ -72,8 +72,8 @@ DocumentViewBase {
 	}
 
 	function updateGui() {
-		stateManager.loadMembersFromModel()
-		stateManager.loadInvitationsFromModel()
+		stateManager_.loadMembersFromModel()
+		stateManager_.loadInvitationsFromModel()
 		var generalPage = multiPageView.getPageByIndex(0)
 		if (generalPage)
 			generalPage.doUpdateGui()
@@ -87,7 +87,7 @@ DocumentViewBase {
 		if (generalPage)
 			generalPage.doUpdateModel()
 		if (container.tenantData) {
-			stateManager.syncMembersToModel()
+			stateManager_.syncMembersToModel()
 			var permissionsPage = multiPageView.getPageById("Permissions")
 			if (permissionsPage)
 				permissionsPage.doUpdateModel()
@@ -102,13 +102,13 @@ DocumentViewBase {
 		function updatePages() {
 			multiPageView.clear()
 			multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
-			if (!stateManager.isNewTenant) {
+			if (!stateManager_.isNewTenant) {
 				multiPageView.addPage("Members", qsTr("Members"), membersPageComp, "Icons/MultipleUser")
-				if (stateManager.canManageMembers) {
+				if (stateManager_.canManageMembers) {
 					multiPageView.addPage("Roles", qsTr("Roles"), rolesPageComp, "Icons/Role")
 					multiPageView.addPage("Groups", qsTr("Groups"), groupsPageComp, "Icons/MultipleUser")
 				}
-				if (stateManager.isCreator) {
+				if (stateManager_.isCreator) {
 					multiPageView.addPage("Permissions", qsTr("Permissions"), permissionsPageComp, "Icons/Role")
 				}
 			}
@@ -122,22 +122,22 @@ DocumentViewBase {
 
 	// Re-build pages when role / ownership state flips.
 	Connections {
-		target: stateManager
+		target: stateManager_
 		function onIsNewTenantChanged() {
 			multiPageView.updatePages()
-			if (!stateManager.isNewTenant) {
-				stateManager.loadMembersFromModel()
-				stateManager.loadInvitationsFromModel()
+			if (!stateManager_.isNewTenant) {
+				stateManager_.loadMembersFromModel()
+				stateManager_.loadInvitationsFromModel()
 			}
 		}
 		function onIsOwnerChanged() {
-			if (!stateManager.isNewTenant) multiPageView.updatePages()
+			if (!stateManager_.isNewTenant) multiPageView.updatePages()
 		}
 		function onIsCreatorChanged() {
-			if (!stateManager.isNewTenant) multiPageView.updatePages()
+			if (!stateManager_.isNewTenant) multiPageView.updatePages()
 		}
 		function onCanManageMembersChanged() {
-			if (!stateManager.isNewTenant) multiPageView.updatePages()
+			if (!stateManager_.isNewTenant) multiPageView.updatePages()
 		}
 	}
 
@@ -159,7 +159,7 @@ DocumentViewBase {
 		id: membershipSubscription
 
 		onInvitationAccepted: {
-			if (!container.tenantData || stateManager.isNewTenant)
+			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (notification.tenantId === container.tenantData.m_id) {
 				if (container.representationController)
@@ -168,17 +168,17 @@ DocumentViewBase {
 		}
 
 		onInvitationRejected: {
-			if (!container.tenantData || stateManager.isNewTenant)
+			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (notification.tenantId === container.tenantData.m_id) {
-				stateManager.removePendingInvitation(notification.membershipId)
+				stateManager_.removePendingInvitation(notification.membershipId)
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
 		}
 
 		onOwnershipTransferred: {
-			if (!container.tenantData || stateManager.isNewTenant)
+			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (notification.tenantId === container.tenantData.m_id) {
 				if (container.representationController)
@@ -195,7 +195,7 @@ DocumentViewBase {
 
 		TenantGeneralPage {
 			model: container.tenantData
-			stateManager: stateManager
+			stateManager: stateManager_
 		}
 	}
 
@@ -204,7 +204,7 @@ DocumentViewBase {
 
 		TenantMembersPage {
 			model: container.tenantData
-			stateManager: stateManager
+			stateManager: stateManager_
 			apiClient: container.apiClient
 			userDataFactory: container.createUserData
 		}
@@ -215,7 +215,7 @@ DocumentViewBase {
 
 		TenantRolesPage {
 			model: container.tenantData
-			stateManager: stateManager
+			stateManager: stateManager_
 			apiClient: container.apiClient
 			roleDataFactory: container.createRoleData
 		}
@@ -226,7 +226,7 @@ DocumentViewBase {
 
 		TenantGroupsPage {
 			model: container.tenantData
-			stateManager: stateManager
+			stateManager: stateManager_
 			apiClient: container.apiClient
 			groupDataFactory: container.createGroupData
 		}
