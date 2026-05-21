@@ -416,8 +416,8 @@ Item {
                                 text: visible ? cellRoot.displayText : ""
                                 color: root.normalTextColor
                                 selectByMouse: true
-                                selectedTextColor: "#FFFFFF"
-                                selectionColor: Style.accentColor
+                                selectedTextColor: Style.selectedColor
+                                selectionColor: Style.imaginToolsAccentColor
                                 clip: true
 
                                 onVisibleChanged: {
