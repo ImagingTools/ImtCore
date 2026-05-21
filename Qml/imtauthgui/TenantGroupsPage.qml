@@ -5,276 +5,471 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
+import imtguigql 1.0
 import imtauthgui 1.0
 
 /**
  * TenantGroupsPage
  *
- * Groups tab — list / create / edit / delete tenant groups via the abstract apiClient.
- *
- * Inherits ViewBase so its `model` (tenantData) is wired in from the orchestrator
- * and updates can flow through the protected doUpdateGui / doUpdateModel wrappers.
+ * Groups tab — list / create / edit / delete tenant groups.
+ * Table is fixed at 800px width, centered, with gray rounded border and checkbox selection.
  */
 ViewBase {
-	id: groupsPage
+id: groupsPage
 
-	commandsPanelVisible: false
-	contentColor: Style.baseColor
-	readonly property var tenantData: groupsPage.model
-	property var stateManager: null
-	property var apiClient: null
+commandsPanelVisible: false
+contentColor: Style.baseColor
+readonly property var tenantData: groupsPage.model
+property var stateManager: null
+property var apiClient: null
+property var groupDataFactory: null
 
-	property var groupDataFactory: null
+function updateGui() {}
+function updateModel() {}
 
-	function updateGui() {
-		// Groups list/edit UI is bound to apiClient/stateManager directly.
-	}
+property string __editGroupId: ""
+property string __editGroupName: ""
+property string __editGroupDescription: ""
 
-	function updateModel() {
-		// Groups mutations are pushed via apiClient; nothing to write back here.
-	}
+readonly property bool __canManage: groupsPage.stateManager ? groupsPage.stateManager.canManageMembers : false
 
-	property string __editGroupId: ""
-	property string __editGroupName: ""
-	property string __editGroupDescription: ""
+Connections {
+target: groupsPage.apiClient
+function onGroupDataReceived(data) {
+if (groupsPage.stateManager)
+groupsPage.stateManager.receivedGroupData = data
+}
+}
 
-	readonly property bool __canManage: groupsPage.stateManager ? groupsPage.stateManager.canManageMembers : false
+StackViewHeader {
+id: groupsStackViewHeader
+anchors.top: parent.top
+anchors.left: parent.left
+anchors.right: groupsCreateBtn.visible ? groupsCreateBtn.left : parent.right
+height: Style.controlHeightL
+initialItemTitleVisible: true
 
-	Connections {
-		target: groupsPage.apiClient
-		function onGroupDataReceived(data) {
-			if (groupsPage.stateManager)
-				groupsPage.stateManager.receivedGroupData = data
-		}
-	}
+onCloseClicked: {
+groupsStackView.previous()
+groupsStackViewHeader.popHeader()
+}
 
-	StackViewHeader {
-		id: groupsStackViewHeader
-		anchors.top: parent.top
-		anchors.left: parent.left
-		anchors.right: groupsCreateBtn.visible ? groupsCreateBtn.left : parent.right
-		height: Style.controlHeightL
-		initialItemTitleVisible: true
+Component.onCompleted: {
+groupsStackViewHeader.addHeader("groups_list", qsTr("Groups"))
+}
+}
 
-		onCloseClicked: {
-			groupsStackView.previous()
-			groupsStackViewHeader.popHeader()
-		}
+Text {
+id: groupsCreateBtn
+visible: groupsPage.__canManage && groupsStackView.currentIndex === 0
+anchors.right: parent.right
+anchors.rightMargin: Style.marginXL
+anchors.verticalCenter: groupsStackViewHeader.verticalCenter
+text: "+ " + qsTr("Create Group")
+font.pixelSize: Style.fontSizeM
+font.bold: true
+color: Style.linkColor
 
-		Component.onCompleted: {
-			groupsStackViewHeader.addHeader("groups_list", qsTr("Groups"))
-		}
-	}
+MouseArea {
+anchors.fill: parent
+hoverEnabled: true
+cursorShape: Qt.PointingHandCursor
+onClicked: {
+while (groupsStackView.count > 1)
+groupsStackView.removePage(groupsStackView.count - 1)
+groupsStackViewHeader.addHeader("create_group", qsTr("Create New Group"))
+groupsStackView.addPage(groupEditorView)
+groupsStackView.next()
+}
+}
+}
 
-	Text {
-		id: groupsCreateBtn
-		visible: groupsPage.__canManage && groupsStackView.currentIndex === 0
-		anchors.right: parent.right
-		anchors.rightMargin: Style.marginXL
-		anchors.verticalCenter: groupsStackViewHeader.verticalCenter
-		text: "+ " + qsTr("Create Group")
-		font.pixelSize: Style.fontSizeM
-		font.bold: true
-		color: Style.linkColor
+BaseText {
+id: groupsDescription
+anchors.top: groupsStackViewHeader.bottom
+anchors.topMargin: Style.marginS
+anchors.left: parent.left
+anchors.leftMargin: Style.marginXL
+anchors.right: parent.right
+anchors.rightMargin: Style.marginXL
+visible: groupsStackView.currentIndex === 0
+text: qsTr("Organize members into groups for easier permission management.")
+font.pixelSize: Style.fontSizeS
+color: Style.inactiveTextColor
+}
 
-		MouseArea {
-			anchors.fill: parent
-			hoverEnabled: true
-			cursorShape: Qt.PointingHandCursor
-			onClicked: {
-				while (groupsStackView.count > 1)
-					groupsStackView.removePage(groupsStackView.count - 1)
-				groupsStackViewHeader.addHeader("create_group", qsTr("Create New Group"))
-				groupsStackView.addPage(groupEditorView)
-				groupsStackView.next()
-			}
-		}
-	}
+StackView {
+id: groupsStackView
+anchors.top: groupsDescription.visible ? groupsDescription.bottom : groupsStackViewHeader.bottom
+anchors.topMargin: Style.marginS
+anchors.left: parent.left
+anchors.right: parent.right
+anchors.bottom: parent.bottom
 
-	BaseText {
-		id: groupsDescription
-		anchors.top: groupsStackViewHeader.bottom
-		anchors.topMargin: Style.marginS
-		anchors.left: parent.left
-		anchors.leftMargin: Style.marginXL
-		anchors.right: parent.right
-		anchors.rightMargin: Style.marginXL
-		visible: groupsStackView.currentIndex === 0
-		text: qsTr("Organize members into groups for easier permission management.")
-		font.pixelSize: Style.fontSizeS
-		color: Style.inactiveTextColor
-	}
+Component.onCompleted: {
+groupsStackView.addPage(groupsListView)
+}
+}
 
-	StackView {
-		id: groupsStackView
-		anchors.top: groupsDescription.visible ? groupsDescription.bottom : groupsStackViewHeader.bottom
-		anchors.topMargin: Style.marginS
-		anchors.left: parent.left
-		anchors.right: parent.right
-		anchors.bottom: parent.bottom
+Component {
+id: groupsListView
 
-		Component.onCompleted: {
-			groupsStackView.addPage(groupsListView)
-		}
-	}
+Item {
+TenantTableContainer {
+anchors.top: parent.top
+anchors.bottom: parent.bottom
+anchors.topMargin: Style.marginM
 
-	Component {
-		id: groupsListView
+IdSelectionManager {
+id: groupsSelectionManager
+multiSelect: true
+}
 
-		Item {
-			TenantCollectionListView {
-				anchors.top: parent.top
-				anchors.left: parent.left
-				anchors.right: parent.right
-				anchors.bottom: parent.bottom
-				collectionId: "Groups"
-				filterPlaceholder: qsTr("Filter groups...")
-				emptyMessage: qsTr("No groups created yet.")
-				canManage: groupsPage.__canManage
+FilterableSelectGqlDataProvider {
+id: groupsDataProvider
+collectionId: "Groups"
+pageSize: 50
+}
 
-				onEditRequested: {
-					groupsPage.__editGroupId = itemId
-					groupsPage.__editGroupName = itemName
-					groupsPage.__editGroupDescription = itemDescription
-					while (groupsStackView.count > 1)
-						groupsStackView.removePage(groupsStackView.count - 1)
-					groupsStackViewHeader.addHeader("edit_group", itemName || qsTr("Edit Group"))
-					groupsStackView.addPage(groupEditView)
-					groupsStackView.next()
-					if (groupsPage.apiClient)
-						groupsPage.apiClient.getGroupData(itemId)
-				}
+Component.onCompleted: {
+groupsDataProvider.fetch("")
+}
 
-				onDeleteRequested: {
-					ModalDialogManager.showConfirmationDialog(
-						qsTr("Delete Group"),
-						qsTr("Are you sure you want to delete the group \"%1\"? This action cannot be undone.").arg(itemName),
-						function(result) {
-							if (result === true && groupsPage.apiClient)
-								groupsPage.apiClient.removeGroup(itemId)
-						}
-					)
-				}
-			}
-		}
-	}
+TenantTableHeader {
+id: groupsTableHeader
+anchors.top: parent.top
+anchors.left: parent.left
+anchors.right: parent.right
+selectedCount: groupsSelectionManager.selectedIds.length
+totalCount: groupsListView2.count
+checkState: groupsSelectionManager.selectedIds.length === 0
+? Qt.Unchecked
+: (groupsSelectionManager.selectedIds.length === groupsListView2.count
+? Qt.Checked : Qt.PartiallyChecked)
 
-	Component {
-		id: groupEditorView
+onSelectAllToggled: {
+if (groupsSelectionManager.selectedIds.length === groupsListView2.count) {
+groupsSelectionManager.clear()
+} else {
+var allIds = []
+var items = groupsDataProvider.items
+for (var i = 0; i < items.length; i++) {
+if (items[i] && items[i].id)
+allIds.push(items[i].id)
+}
+groupsSelectionManager.selectMultiple(allIds)
+}
+}
+}
 
-		Item {
-			UserGroupView {
-				id: createGroupView
-				anchors.fill: parent
-				commandsPanelVisible: false
+SearchTextInput {
+id: groupsFilterInput
+anchors.top: groupsTableHeader.bottom
+anchors.left: parent.left
+anchors.right: parent.right
+anchors.leftMargin: Style.marginM
+anchors.rightMargin: Style.marginM
+anchors.topMargin: Style.marginS
+placeHolderText: qsTr("Filter groups...")
+onTextChanged: groupsDataProvider.fetch(text)
+}
 
-				Component.onCompleted: {
-					createGroupView.model = groupsPage.groupDataFactory ? groupsPage.groupDataFactory() : null
-					createGroupView.updateGui()
-				}
-			}
+Rectangle {
+id: groupsSeparator
+anchors.top: groupsFilterInput.bottom
+anchors.topMargin: Style.marginS
+anchors.left: parent.left
+anchors.right: parent.right
+height: 1
+color: Style.borderColor
+}
 
-			Row {
-				anchors.bottom: parent.bottom
-				anchors.bottomMargin: Style.marginXL
-				anchors.left: parent.left
-				anchors.leftMargin: Style.marginXL
-				spacing: Style.marginM
+ListView {
+id: groupsListView2
+anchors.top: groupsSeparator.bottom
+anchors.left: parent.left
+anchors.right: parent.right
+anchors.bottom: parent.bottom
+anchors.bottomMargin: Style.marginS
+clip: true
+boundsBehavior: Flickable.StopAtBounds
+model: groupsDataProvider.items
 
-				Button {
-					text: qsTr("Create")
-					onClicked: {
-						createGroupView.updateModel()
-						var groupData = createGroupView.model
-						if (groupsPage.apiClient)
-							groupsPage.apiClient.insertGroup(
-								groupData ? groupData.m_name : "",
-								groupData ? groupData.m_description : "")
-						groupsStackViewHeader.popHeader()
-						groupsStackView.previous()
-					}
-				}
+delegate: Rectangle {
+id: groupDelegateRoot
+width: groupsListView2.width
+height: Style.controlHeightL + Style.marginS
 
-				Button {
-					text: qsTr("Cancel")
-					onClicked: {
-						groupsStackViewHeader.popHeader()
-						groupsStackView.previous()
-					}
-				}
-			}
-		}
-	}
+property string itemId: modelData.id || ""
+property string itemTitle: modelData.title || modelData.id || ""
+property string itemDescription: modelData.description || ""
+property bool isSelected: groupsSelectionManager.isSelected(itemId)
 
-	Component {
-		id: groupEditView
+color: isSelected ? Style.selectedColor
+: groupMouseArea.containsMouse ? Style.buttonHoverColor
+: "transparent"
 
-		Item {
-			UserGroupView {
-				id: editGroupView
-				anchors.fill: parent
-				commandsPanelVisible: false
+MouseArea {
+id: groupMouseArea
+anchors.fill: parent
+hoverEnabled: true
+cursorShape: Qt.PointingHandCursor
+onClicked: {
+if (mouse.modifiers & Qt.ControlModifier)
+groupsSelectionManager.toggleSelect(groupDelegateRoot.itemId)
+else
+groupsSelectionManager.singleSelect(groupDelegateRoot.itemId)
+}
+onDoubleClicked: {
+if (groupsPage.__canManage)
+groupsPage.__openEditGroup(groupDelegateRoot.itemId, groupDelegateRoot.itemTitle, groupDelegateRoot.itemDescription)
+}
+}
 
-				Component.onCompleted: {
-					var groupData = groupsPage.groupDataFactory ? groupsPage.groupDataFactory() : null
-					if (groupData) {
-						groupData.m_id = groupsPage.__editGroupId
-						groupData.m_name = groupsPage.__editGroupName
-						groupData.m_description = groupsPage.__editGroupDescription
-					}
-					editGroupView.model = groupData
-					editGroupView.updateGui()
-				}
+Row {
+anchors.left: parent.left
+anchors.right: groupMoreButton.left
+anchors.verticalCenter: parent.verticalCenter
+anchors.leftMargin: Style.marginM
+anchors.rightMargin: Style.marginM
+spacing: Style.marginM
 
-				Connections {
-					target: groupsPage.stateManager
-					function onReceivedGroupDataChanged() {
-						if (groupsPage.stateManager
-								&& groupsPage.stateManager.receivedGroupData
-								&& groupsPage.__editGroupId) {
-							var groupData = groupsPage.groupDataFactory ? groupsPage.groupDataFactory() : null
-							if (groupData) {
-								groupData.m_id = groupsPage.__editGroupId
-								groupData.m_name = groupsPage.stateManager.receivedGroupData.name || groupsPage.__editGroupName
-								groupData.m_description = groupsPage.stateManager.receivedGroupData.description || groupsPage.__editGroupDescription
-							}
-							editGroupView.model = groupData
-							editGroupView.updateGui()
-						}
-					}
-				}
-			}
+CheckBox {
+anchors.verticalCenter: parent.verticalCenter
+height: Style.itemSizeS
+width: Style.itemSizeS
+checkState: groupDelegateRoot.isSelected ? Qt.Checked : Qt.Unchecked
+onCheckStateChanged: {
+var shouldBeSelected = (checkState === Qt.Checked)
+var currentlySelected = groupsSelectionManager.isSelected(groupDelegateRoot.itemId)
+if (shouldBeSelected !== currentlySelected)
+groupsSelectionManager.toggleSelect(groupDelegateRoot.itemId)
+}
+}
 
-			Row {
-				anchors.bottom: parent.bottom
-				anchors.bottomMargin: Style.marginXL
-				anchors.left: parent.left
-				anchors.leftMargin: Style.marginXL
-				spacing: Style.marginM
+Column {
+anchors.verticalCenter: parent.verticalCenter
+spacing: Style.marginXS
+width: parent.width - Style.itemSizeS - parent.spacing
 
-				Button {
-					text: qsTr("Save")
-					onClicked: {
-						editGroupView.updateModel()
-						var groupData = editGroupView.model
-						if (groupsPage.apiClient)
-							groupsPage.apiClient.setGroupData(
-								groupsPage.__editGroupId,
-								groupData ? groupData.m_name : "",
-								groupData ? groupData.m_description : "")
-						groupsStackViewHeader.popHeader()
-						groupsStackView.previous()
-					}
-				}
+BaseText {
+text: groupDelegateRoot.itemTitle
+font.pixelSize: Style.fontSizeM
+font.bold: true
+color: Style.textColor
+}
 
-				Button {
-					text: qsTr("Cancel")
-					onClicked: {
-						groupsStackViewHeader.popHeader()
-						groupsStackView.previous()
-					}
-				}
-			}
-		}
-	}
+BaseText {
+visible: groupDelegateRoot.itemDescription !== ""
+text: groupDelegateRoot.itemDescription
+font.pixelSize: Style.fontSizeS
+color: Style.inactiveTextColor
+elide: Text.ElideRight
+width: parent.width
+}
+}
+}
+
+Rectangle {
+id: groupMoreButton
+anchors.right: parent.right
+anchors.rightMargin: Style.marginM
+anchors.verticalCenter: parent.verticalCenter
+width: Style.controlHeightM
+height: Style.controlHeightM
+radius: Style.controlHeightM / 2
+color: groupMoreButtonMA.containsMouse ? Style.buttonHoverColor : "transparent"
+visible: groupsPage.__canManage && (groupMouseArea.containsMouse || groupDelegateRoot.isSelected || groupMoreButtonMA.containsMouse)
+
+BaseText {
+anchors.centerIn: parent
+text: "\u2026"
+font.pixelSize: Style.fontSizeL
+color: Style.textColor
+}
+
+MouseArea {
+id: groupMoreButtonMA
+anchors.fill: parent
+hoverEnabled: true
+cursorShape: Qt.PointingHandCursor
+onClicked: groupItemMenu.popup()
+}
+}
+
+Menu {
+id: groupItemMenu
+MenuItem {
+text: qsTr("Edit")
+enabled: groupsPage.__canManage
+onTriggered: groupsPage.__openEditGroup(groupDelegateRoot.itemId, groupDelegateRoot.itemTitle, groupDelegateRoot.itemDescription)
+}
+MenuItem {
+text: qsTr("Delete")
+enabled: groupsPage.__canManage
+onTriggered: {
+ModalDialogManager.showConfirmationDialog(
+qsTr("Delete Group"),
+qsTr("Are you sure you want to delete the group \"%1\"? This action cannot be undone.").arg(groupDelegateRoot.itemTitle),
+function(result) {
+if (result === true && groupsPage.apiClient)
+groupsPage.apiClient.removeGroup(groupDelegateRoot.itemId)
+}
+)
+}
+}
+}
+
+Rectangle {
+anchors.bottom: parent.bottom
+width: parent.width
+height: 1
+color: Style.borderColor
+opacity: 0.5
+}
+}
+
+BaseText {
+visible: groupsListView2.count === 0
+anchors.centerIn: parent
+text: qsTr("No groups created yet.")
+font.pixelSize: Style.fontSizeM
+color: Style.inactiveTextColor
+}
+}
+}
+}
+}
+
+function __openEditGroup(itemId, itemName, itemDescription) {
+groupsPage.__editGroupId = itemId
+groupsPage.__editGroupName = itemName
+groupsPage.__editGroupDescription = itemDescription
+while (groupsStackView.count > 1)
+groupsStackView.removePage(groupsStackView.count - 1)
+groupsStackViewHeader.addHeader("edit_group", itemName || qsTr("Edit Group"))
+groupsStackView.addPage(groupEditView)
+groupsStackView.next()
+if (groupsPage.apiClient)
+groupsPage.apiClient.getGroupData(itemId)
+}
+
+Component {
+id: groupEditorView
+
+Item {
+UserGroupView {
+id: createGroupView
+anchors.fill: parent
+commandsPanelVisible: false
+
+Component.onCompleted: {
+createGroupView.model = groupsPage.groupDataFactory ? groupsPage.groupDataFactory() : null
+createGroupView.updateGui()
+}
+}
+
+Row {
+anchors.bottom: parent.bottom
+anchors.bottomMargin: Style.marginXL
+anchors.left: parent.left
+anchors.leftMargin: Style.marginXL
+spacing: Style.marginM
+
+Button {
+text: qsTr("Create")
+onClicked: {
+createGroupView.updateModel()
+var groupData = createGroupView.model
+if (groupsPage.apiClient)
+groupsPage.apiClient.insertGroup(
+groupData ? groupData.m_name : "",
+groupData ? groupData.m_description : "")
+groupsStackViewHeader.popHeader()
+groupsStackView.previous()
+}
+}
+
+Button {
+text: qsTr("Cancel")
+onClicked: {
+groupsStackViewHeader.popHeader()
+groupsStackView.previous()
+}
+}
+}
+}
+}
+
+Component {
+id: groupEditView
+
+Item {
+UserGroupView {
+id: editGroupView
+anchors.fill: parent
+commandsPanelVisible: false
+
+Component.onCompleted: {
+var groupData = groupsPage.groupDataFactory ? groupsPage.groupDataFactory() : null
+if (groupData) {
+groupData.m_id = groupsPage.__editGroupId
+groupData.m_name = groupsPage.__editGroupName
+groupData.m_description = groupsPage.__editGroupDescription
+}
+editGroupView.model = groupData
+editGroupView.updateGui()
+}
+
+Connections {
+target: groupsPage.stateManager
+function onReceivedGroupDataChanged() {
+if (groupsPage.stateManager
+&& groupsPage.stateManager.receivedGroupData
+&& groupsPage.__editGroupId) {
+var groupData = groupsPage.groupDataFactory ? groupsPage.groupDataFactory() : null
+if (groupData) {
+groupData.m_id = groupsPage.__editGroupId
+groupData.m_name = groupsPage.stateManager.receivedGroupData.name || groupsPage.__editGroupName
+groupData.m_description = groupsPage.stateManager.receivedGroupData.description || groupsPage.__editGroupDescription
+}
+editGroupView.model = groupData
+editGroupView.updateGui()
+}
+}
+}
+}
+
+Row {
+anchors.bottom: parent.bottom
+anchors.bottomMargin: Style.marginXL
+anchors.left: parent.left
+anchors.leftMargin: Style.marginXL
+spacing: Style.marginM
+
+Button {
+text: qsTr("Save")
+onClicked: {
+editGroupView.updateModel()
+var groupData = editGroupView.model
+if (groupsPage.apiClient)
+groupsPage.apiClient.setGroupData(
+groupsPage.__editGroupId,
+groupData ? groupData.m_name : "",
+groupData ? groupData.m_description : "")
+groupsStackViewHeader.popHeader()
+groupsStackView.previous()
+}
+}
+
+Button {
+text: qsTr("Cancel")
+onClicked: {
+groupsStackViewHeader.popHeader()
+groupsStackView.previous()
+}
+}
+}
+}
+}
 }

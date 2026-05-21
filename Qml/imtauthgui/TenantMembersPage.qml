@@ -12,349 +12,423 @@ import imtauthgui 1.0
 /**
  * TenantMembersPage
  *
- * Members tab of the TenantEditor — displays tenant users via TenantCollectionListView
- * with StackView navigation. Opens UserView for create/edit.
- * Also provides Create Invitation to invite external users not yet in the tenant.
- *
- * Users created within the tenant automatically become members with "Member" role.
- *
- * Inherits ViewBase so model updates are protected by doUpdateGui / doUpdateModel.
+ * Members tab — displays active members and invited/pending users in a centered
+ * 800px table with gray rounded border, checkbox selection and avatars.
  */
 ViewBase {
-	id: membersPage
+id: membersPage
 
-	commandsPanelVisible: false
-	contentColor: Style.baseColor
-	readonly property var tenantData: membersPage.model
-	property var stateManager: null
-	property var apiClient: null
+commandsPanelVisible: false
+contentColor: Style.baseColor
+readonly property var tenantData: membersPage.model
+property var stateManager: null
+property var apiClient: null
+property var userDataFactory: null
 
-	// Factory injected by the orchestrator that returns a UserData instance.
-	property var userDataFactory: null
+function updateGui() {}
+function updateModel() {}
 
-	function updateGui() {
-		// UI is bound directly to stateManager / TenantCollectionListView.
-	}
+property string __editUserId: ""
+property string __editUserName: ""
+property string __editUserDescription: ""
 
-	function updateModel() {
-		// Members are synced from the state manager in the orchestrator.
-	}
+readonly property bool __canManage: membersPage.stateManager ? membersPage.stateManager.canManageMembers : false
 
-	property string __editUserId: ""
-	property string __editUserName: ""
-	property string __editUserDescription: ""
+Connections {
+target: membersPage.apiClient
+function onUserDataReceived(data) {
+if (membersPage.stateManager)
+membersPage.stateManager.receivedUserData = data
+}
+function onUserCreated() {
+if (membersPage.stateManager && membersPage.tenantData)
+membersPage.stateManager.loadMembersFromModel()
+}
+}
 
-	readonly property bool __canManage: membersPage.stateManager ? membersPage.stateManager.canManageMembers : false
+StackViewHeader {
+id: membersStackViewHeader
+anchors.top: parent.top
+anchors.left: parent.left
+anchors.right: membersHeaderButtons.left
+height: Style.controlHeightL
+initialItemTitleVisible: true
 
-	Connections {
-		target: membersPage.apiClient
-		function onUserDataReceived(data) {
-			if (membersPage.stateManager)
-				membersPage.stateManager.receivedUserData = data
-		}
-		function onUserCreated() {
-			// User created within our tenant -> auto-becomes member with role Member
-			if (membersPage.stateManager && membersPage.tenantData) {
-				membersPage.stateManager.loadMembersFromModel()
-			}
-		}
-	}
+onCloseClicked: {
+membersStackView.previous()
+membersStackViewHeader.popHeader()
+}
 
-	StackViewHeader {
-		id: membersStackViewHeader
-		anchors.top: parent.top
-		anchors.left: parent.left
-		anchors.right: membersHeaderButtons.left
-		height: Style.controlHeightL
-		initialItemTitleVisible: true
+Component.onCompleted: {
+membersStackViewHeader.addHeader("members_list", qsTr("Members"))
+}
+}
 
-		onCloseClicked: {
-			membersStackView.previous()
-			membersStackViewHeader.popHeader()
-		}
+Row {
+id: membersHeaderButtons
+visible: membersPage.__canManage && membersStackView.currentIndex === 0
+anchors.right: parent.right
+anchors.rightMargin: Style.marginXL
+anchors.verticalCenter: membersStackViewHeader.verticalCenter
+spacing: Style.marginL
 
-		Component.onCompleted: {
-			membersStackViewHeader.addHeader("members_list", qsTr("Members"))
-		}
-	}
+Text {
+id: createUserBtn
+text: "+ " + qsTr("Create User")
+font.pixelSize: Style.fontSizeM
+font.bold: true
+color: Style.linkColor
 
-	Row {
-		id: membersHeaderButtons
-		visible: membersPage.__canManage && membersStackView.currentIndex === 0
-		anchors.right: parent.right
-		anchors.rightMargin: Style.marginXL
-		anchors.verticalCenter: membersStackViewHeader.verticalCenter
-		spacing: Style.marginL
+MouseArea {
+anchors.fill: parent
+hoverEnabled: true
+cursorShape: Qt.PointingHandCursor
+onClicked: {
+while (membersStackView.count > 1)
+membersStackView.removePage(membersStackView.count - 1)
+membersStackViewHeader.addHeader("create_user", qsTr("Create New User"))
+membersStackView.addPage(userEditorView)
+membersStackView.next()
+}
+}
+}
 
-		Text {
-			id: createUserBtn
-			text: "+ " + qsTr("Create User")
-			font.pixelSize: Style.fontSizeM
-			font.bold: true
-			color: Style.linkColor
+Text {
+id: inviteMemberBtn
+text: "+ " + qsTr("Create Invitation")
+font.pixelSize: Style.fontSizeM
+font.bold: true
+color: Style.linkColor
 
-			MouseArea {
-				anchors.fill: parent
-				hoverEnabled: true
-				cursorShape: Qt.PointingHandCursor
-				onClicked: {
-					while (membersStackView.count > 1)
-						membersStackView.removePage(membersStackView.count - 1)
-					membersStackViewHeader.addHeader("create_user", qsTr("Create New User"))
-					membersStackView.addPage(userEditorView)
-					membersStackView.next()
-				}
-			}
-		}
+MouseArea {
+anchors.fill: parent
+hoverEnabled: true
+cursorShape: Qt.PointingHandCursor
+onClicked: {
+var ids = []
+var members = membersPage.stateManager ? membersPage.stateManager.pendingMembers : []
+for (var i = 0; i < members.length; i++)
+ids.push(members[i].id)
+var point = inviteMemberBtn.mapToItem(null, 0, inviteMemberBtn.height)
+ModalDialogManager.openDialog(membersSelectPopupComp, {
+"x": point.x,
+"y": point.y,
+"preselectedIds": ids
+})
+}
+}
+}
+}
 
-		Text {
-			id: inviteMemberBtn
-			text: "+ " + qsTr("Create Invitation")
-			font.pixelSize: Style.fontSizeM
-			font.bold: true
-			color: Style.linkColor
+BaseText {
+id: membersDescription
+anchors.top: membersStackViewHeader.bottom
+anchors.topMargin: Style.marginS
+anchors.left: parent.left
+anchors.leftMargin: Style.marginXL
+anchors.right: parent.right
+anchors.rightMargin: Style.marginXL
+visible: membersStackView.currentIndex === 0
+text: qsTr("Manage tenant members. Users created here automatically become members.")
+font.pixelSize: Style.fontSizeS
+color: Style.inactiveTextColor
+}
 
-			MouseArea {
-				anchors.fill: parent
-				hoverEnabled: true
-				cursorShape: Qt.PointingHandCursor
-				onClicked: {
-					var ids = []
-					var members = membersPage.stateManager ? membersPage.stateManager.pendingMembers : []
-					for (var i = 0; i < members.length; i++)
-						ids.push(members[i].id)
-					var point = inviteMemberBtn.mapToItem(null, 0, inviteMemberBtn.height)
-					ModalDialogManager.openDialog(membersSelectPopupComp, {
-						"x": point.x,
-						"y": point.y,
-						"preselectedIds": ids
-					})
-				}
-			}
-		}
-	}
+StackView {
+id: membersStackView
+anchors.top: membersDescription.visible ? membersDescription.bottom : membersStackViewHeader.bottom
+anchors.topMargin: Style.marginS
+anchors.left: parent.left
+anchors.right: parent.right
+anchors.bottom: parent.bottom
 
-	BaseText {
-		id: membersDescription
-		anchors.top: membersStackViewHeader.bottom
-		anchors.topMargin: Style.marginS
-		anchors.left: parent.left
-		anchors.leftMargin: Style.marginXL
-		anchors.right: parent.right
-		anchors.rightMargin: Style.marginXL
-		visible: membersStackView.currentIndex === 0
-		text: qsTr("Manage tenant members. Users created here automatically become members.")
-		font.pixelSize: Style.fontSizeS
-		color: Style.inactiveTextColor
-	}
+Component.onCompleted: {
+membersStackView.addPage(membersListView)
+}
+}
 
-	StackView {
-		id: membersStackView
-		anchors.top: membersDescription.visible ? membersDescription.bottom : membersStackViewHeader.bottom
-		anchors.topMargin: Style.marginS
-		anchors.left: parent.left
-		anchors.right: parent.right
-		anchors.bottom: parent.bottom
+Component {
+id: membersListView
 
-		Component.onCompleted: {
-			membersStackView.addPage(membersListView)
-		}
-	}
+Item {
+TenantTableContainer {
+anchors.top: parent.top
+anchors.bottom: parent.bottom
+anchors.topMargin: Style.marginM
 
-	Component {
-		id: membersListView
+IdSelectionManager {
+id: membersSelectionManager
+multiSelect: true
+}
 
-		Item {
-			TenantCollectionListView {
-				anchors.top: parent.top
-				anchors.left: parent.left
-				anchors.right: parent.right
-				anchors.bottom: parent.bottom
-				collectionId: "Users"
-				filterPlaceholder: qsTr("Filter members...")
-				emptyMessage: qsTr("No members found.")
-				canManage: membersPage.__canManage
+TenantTableHeader {
+id: membersTableHeader
+anchors.top: parent.top
+anchors.left: parent.left
+anchors.right: parent.right
+selectedCount: membersSelectionManager.selectedIds.length
+totalCount: membersListViewContent.count + invitationsListView.count
+checkState: membersSelectionManager.selectedIds.length === 0
+? Qt.Unchecked
+: (membersSelectionManager.selectedIds.length === (membersListViewContent.count + invitationsListView.count)
+? Qt.Checked : Qt.PartiallyChecked)
 
-				onEditRequested: {
-					membersPage.__editUserId = itemId
-					membersPage.__editUserName = itemName
-					membersPage.__editUserDescription = itemDescription
-					while (membersStackView.count > 1)
-						membersStackView.removePage(membersStackView.count - 1)
-					membersStackViewHeader.addHeader("edit_user", itemName || qsTr("Edit User"))
-					membersStackView.addPage(userEditView)
-					membersStackView.next()
-					if (membersPage.apiClient)
-						membersPage.apiClient.getUserData(itemId)
-				}
+onSelectAllToggled: {
+var totalItems = membersListViewContent.count + invitationsListView.count
+if (membersSelectionManager.selectedIds.length === totalItems) {
+membersSelectionManager.clear()
+} else {
+var allIds = []
+var members = membersPage.stateManager ? membersPage.stateManager.pendingMembers : []
+for (var i = 0; i < members.length; i++)
+allIds.push(members[i].id)
+var invitations = membersPage.stateManager ? membersPage.stateManager.pendingInvitations : []
+for (var j = 0; j < invitations.length; j++)
+allIds.push("inv_" + invitations[j].id)
+membersSelectionManager.selectMultiple(allIds)
+}
+}
+}
 
-				onDeleteRequested: {
-					ModalDialogManager.showConfirmationDialog(
-						qsTr("Remove Member"),
-						qsTr("Are you sure you want to remove \"%1\"? They will lose access to this workspace.").arg(itemName),
-						function(result) {
-							if (result === true && membersPage.apiClient)
-								membersPage.apiClient.removeUser(itemId)
-						}
-					)
-				}
-			}
-		}
-	}
+Flickable {
+id: membersFlickable
+anchors.top: membersTableHeader.bottom
+anchors.left: parent.left
+anchors.right: parent.right
+anchors.bottom: parent.bottom
+anchors.bottomMargin: Style.marginS
+clip: true
+contentHeight: membersColumn.height
+boundsBehavior: Flickable.StopAtBounds
 
-	Component {
-		id: userEditorView
+Column {
+id: membersColumn
+width: parent.width
 
-		Item {
-			UserView {
-				id: createUserView
-				anchors.fill: parent
-				commandsPanelVisible: false
+// ---- Active Members ----
+Repeater {
+id: membersListViewContent
+model: membersPage.stateManager ? membersPage.stateManager.pendingMembers : []
 
-				Component.onCompleted: {
-					createUserView.model = membersPage.userDataFactory ? membersPage.userDataFactory() : null
-					createUserView.updateGui()
-				}
-			}
+delegate: TenantMemberDelegate {
+width: membersColumn.width
+kind: "member"
+memberData: modelData
+tenantData: membersPage.tenantData
+stateManager: membersPage.stateManager
+canManageMembers: membersPage.__canManage
+isOwner: membersPage.stateManager ? membersPage.stateManager.isOwner : false
 
-			Row {
-				anchors.bottom: parent.bottom
-				anchors.bottomMargin: Style.marginXL
-				anchors.left: parent.left
-				anchors.leftMargin: Style.marginXL
-				spacing: Style.marginM
+onMemberActionsRequested: {
+memberActionMenu.menuItems = menuItems
+memberActionMenu.targetUserId = userId
+memberActionMenu.targetUserName = userName
+memberActionMenu.popup()
+}
+}
+}
 
-				Button {
-					text: qsTr("Create")
-					onClicked: {
-						createUserView.updateModel()
-						var userData = createUserView.model
-						if (membersPage.apiClient)
-							membersPage.apiClient.insertUser(
-								userData ? userData.m_name : "",
-								userData ? userData.m_description : "")
-						membersStackViewHeader.popHeader()
-						membersStackView.previous()
-					}
-				}
+// ---- Invited Users Section ----
+Rectangle {
+visible: invitationsListView.count > 0
+width: membersColumn.width
+height: invitedHeader.implicitHeight + Style.marginM * 2
+color: Style.backgroundColor2
 
-				Button {
-					text: qsTr("Cancel")
-					onClicked: {
-						membersStackViewHeader.popHeader()
-						membersStackView.previous()
-					}
-				}
-			}
-		}
-	}
+BaseText {
+id: invitedHeader
+anchors.left: parent.left
+anchors.leftMargin: Style.marginM
+anchors.verticalCenter: parent.verticalCenter
+text: qsTr("Invited (%1)").arg(invitationsListView.count)
+font.pixelSize: Style.fontSizeS
+font.bold: true
+color: Style.inactiveTextColor
+}
+}
 
-	Component {
-		id: userEditView
+Repeater {
+id: invitationsListView
+model: membersPage.stateManager ? membersPage.stateManager.pendingInvitations : []
 
-		Item {
-			UserView {
-				id: editUserView
-				anchors.fill: parent
-				commandsPanelVisible: false
+delegate: TenantMemberDelegate {
+width: membersColumn.width
+kind: "invitation"
+memberData: modelData
+tenantData: membersPage.tenantData
+stateManager: membersPage.stateManager
+canManageMembers: membersPage.__canManage
+isOwner: membersPage.stateManager ? membersPage.stateManager.isOwner : false
 
-				Component.onCompleted: {
-					var userData = membersPage.userDataFactory ? membersPage.userDataFactory() : null
-					if (userData) {
-						userData.m_id = membersPage.__editUserId
-						userData.m_name = membersPage.__editUserName
-						userData.m_description = membersPage.__editUserDescription
-					}
-					editUserView.model = userData
-					editUserView.updateGui()
-				}
+onInviteActionsRequested: {
+inviteActionMenu.menuItems = menuItems
+inviteActionMenu.targetInvitationId = invitationId
+inviteActionMenu.targetUserName = userName
+inviteActionMenu.popup()
+}
+}
+}
 
-				Connections {
-					target: membersPage.stateManager
-					function onReceivedUserDataChanged() {
-						if (membersPage.stateManager
-								&& membersPage.stateManager.receivedUserData
-								&& membersPage.__editUserId) {
-							var userData = membersPage.userDataFactory ? membersPage.userDataFactory() : null
-							if (userData) {
-								userData.m_id = membersPage.__editUserId
-								userData.m_name = membersPage.stateManager.receivedUserData.name || membersPage.__editUserName
-								userData.m_description = membersPage.stateManager.receivedUserData.description || membersPage.__editUserDescription
-							}
-							editUserView.model = userData
-							editUserView.updateGui()
-						}
-					}
-				}
-			}
+// Empty state
+Item {
+visible: membersListViewContent.count === 0 && invitationsListView.count === 0
+width: membersColumn.width
+height: Style.controlHeightL * 3
 
-			Row {
-				anchors.bottom: parent.bottom
-				anchors.bottomMargin: Style.marginXL
-				anchors.left: parent.left
-				anchors.leftMargin: Style.marginXL
-				spacing: Style.marginM
+BaseText {
+anchors.centerIn: parent
+text: qsTr("No members found.")
+font.pixelSize: Style.fontSizeM
+color: Style.inactiveTextColor
+}
+}
+}
+}
 
-				Button {
-					text: qsTr("Save")
-					onClicked: {
-						editUserView.updateModel()
-						var userData = editUserView.model
-						if (membersPage.apiClient)
-							membersPage.apiClient.setUserData(
-								membersPage.__editUserId,
-								userData ? userData.m_name : "",
-								userData ? userData.m_description : "")
-						membersStackViewHeader.popHeader()
-						membersStackView.previous()
-					}
-				}
+// Member actions context menu
+Menu {
+id: memberActionMenu
+property var menuItems: []
+property string targetUserId: ""
+property string targetUserName: ""
 
-				Button {
-					text: qsTr("Cancel")
-					onClicked: {
-						membersStackViewHeader.popHeader()
-						membersStackView.previous()
-					}
-				}
-			}
-		}
-	}
+Instantiator {
+model: memberActionMenu.menuItems
+delegate: MenuItem {
+text: modelData.text || ""
+onTriggered: {
+var action = modelData.action
+if (action === "remove" && membersPage.apiClient) {
+ModalDialogManager.showConfirmationDialog(
+qsTr("Remove Member"),
+qsTr("Are you sure you want to remove \"%1\"?").arg(memberActionMenu.targetUserName),
+function(result) {
+if (result === true)
+membersPage.apiClient.removeUser(memberActionMenu.targetUserId)
+}
+)
+} else if (action === "changeRole" && membersPage.apiClient) {
+membersPage.apiClient.changeMemberRole(memberActionMenu.targetUserId)
+} else if (action === "transfer" && membersPage.apiClient) {
+membersPage.apiClient.transferOwnership(memberActionMenu.targetUserId)
+} else if (action === "leave" && membersPage.apiClient) {
+membersPage.apiClient.removeUser(memberActionMenu.targetUserId)
+}
+}
+}
+onObjectAdded: memberActionMenu.insertItem(index, object)
+onObjectRemoved: memberActionMenu.removeItem(object)
+}
+}
 
-	// ===== Invite-user popup (invites external users not in this tenant) =====
-	Component {
-		id: membersSelectPopupComp
+// Invitation actions context menu
+Menu {
+id: inviteActionMenu
+property var menuItems: []
+property string targetInvitationId: ""
+property string targetUserName: ""
 
-		FilterableSelectPopup {
-			dataProvider: FilterableSelectGqlDataProvider {
-				collectionId: "Users"
-				multiSelect: true
-			}
+Instantiator {
+model: inviteActionMenu.menuItems
+delegate: MenuItem {
+text: modelData.text || ""
+onTriggered: {
+var action = modelData.action
+if (action === "resend" && membersPage.apiClient)
+membersPage.apiClient.resendInvitation(inviteActionMenu.targetInvitationId)
+else if (action === "revoke" && membersPage.apiClient)
+membersPage.apiClient.revokeInvitation(inviteActionMenu.targetInvitationId)
+}
+}
+onObjectAdded: inviteActionMenu.insertItem(index, object)
+onObjectRemoved: inviteActionMenu.removeItem(object)
+}
+}
+}
+}
+}
 
-			itemWidth: 280
-			showCheckBox: true
-			showSelectedGroup: true
-			filterPlaceholder: qsTr("Type or choose a user to invite")
+Component {
+id: userEditorView
 
-			onSelectionChanged: {
-				var arr = []
-				for (var i = 0; i < selectedIds.lesngth; i++) {
-					var selId = selectedIds[i]
-					var selName = dataProvider ? dataProvider.getSelectedItemText(selId) : ""
-					if (!selName)
-						selName = selId
-					arr.push({id: selId, name: selName})
-				}
-				if (membersPage.stateManager)
-					membersPage.stateManager.inviteSelectedUsers(arr)
-			}
+Item {
+UserView {
+id: createUserView
+anchors.fill: parent
+commandsPanelVisible: false
 
-			Component.onDestruction: {
-				if (membersPage.stateManager && membersPage.stateManager.__membersModifiedLocally) {
-					membersPage.doUpdateModel()
-					membersPage.stateManager.__membersModifiedLocally = false
-				}
-			}
-		}
-	}
+Component.onCompleted: {
+createUserView.model = membersPage.userDataFactory ? membersPage.userDataFactory() : null
+createUserView.updateGui()
+}
+}
+
+Row {
+anchors.bottom: parent.bottom
+anchors.bottomMargin: Style.marginXL
+anchors.left: parent.left
+anchors.leftMargin: Style.marginXL
+spacing: Style.marginM
+
+Button {
+text: qsTr("Create")
+onClicked: {
+createUserView.updateModel()
+var userData = createUserView.model
+if (membersPage.apiClient)
+membersPage.apiClient.insertUser(
+userData ? userData.m_name : "",
+userData ? userData.m_description : "")
+membersStackViewHeader.popHeader()
+membersStackView.previous()
+}
+}
+
+Button {
+text: qsTr("Cancel")
+onClicked: {
+membersStackViewHeader.popHeader()
+membersStackView.previous()
+}
+}
+}
+}
+}
+
+// ===== Invite-user popup =====
+Component {
+id: membersSelectPopupComp
+
+FilterableSelectPopup {
+dataProvider: FilterableSelectGqlDataProvider {
+collectionId: "Users"
+multiSelect: true
+}
+
+itemWidth: 280
+showCheckBox: true
+showSelectedGroup: true
+filterPlaceholder: qsTr("Type or choose a user to invite")
+
+onSelectionChanged: {
+var arr = []
+for (var i = 0; i < selectedIds.length; i++) {
+var selId = selectedIds[i]
+var selName = dataProvider ? dataProvider.getSelectedItemText(selId) : ""
+if (!selName)
+selName = selId
+arr.push({id: selId, name: selName})
+}
+if (membersPage.stateManager)
+membersPage.stateManager.inviteSelectedUsers(arr)
+}
+
+Component.onDestruction: {
+if (membersPage.stateManager && membersPage.stateManager.__membersModifiedLocally) {
+membersPage.doUpdateModel()
+membersPage.stateManager.__membersModifiedLocally = false
+}
+}
+}
+}
 }

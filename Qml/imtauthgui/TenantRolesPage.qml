@@ -5,279 +5,471 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
+import imtguigql 1.0
 import imtauthgui 1.0
 
 /**
  * TenantRolesPage
  *
  * Roles tab — list / create / edit / delete tenant roles via the abstract apiClient.
- * The orchestrator provides a factory for role data objects since this page can't
- * import the SDL module.
- *
- * Inherits ViewBase so its `model` (tenantData) is wired in from the orchestrator
- * and updates can flow through the protected doUpdateGui / doUpdateModel wrappers.
+ * Table is fixed at 800px width, centered, with gray rounded border and checkbox selection.
  */
 ViewBase {
-	id: rolesPage
+id: rolesPage
 
-	commandsPanelVisible: false
-	contentColor: Style.baseColor
-	readonly property var tenantData: rolesPage.model
-	property var stateManager: null
-	property var apiClient: null
+commandsPanelVisible: false
+contentColor: Style.baseColor
+readonly property var tenantData: rolesPage.model
+property var stateManager: null
+property var apiClient: null
+property var roleDataFactory: null
 
-	// Factory injected by the orchestrator that returns a RoleData instance.
-	property var roleDataFactory: null
+function updateGui() {}
+function updateModel() {}
 
-	function updateGui() {
-		// Roles list/edit UI is bound to apiClient/stateManager directly.
-	}
+property string __editRoleId: ""
+property string __editRoleName: ""
+property string __editRoleDescription: ""
 
-	function updateModel() {
-		// Roles mutations are pushed via apiClient; nothing to write back here.
-	}
+readonly property bool __canManage: rolesPage.stateManager ? rolesPage.stateManager.canManageMembers : false
 
-	property string __editRoleId: ""
-	property string __editRoleName: ""
-	property string __editRoleDescription: ""
+Connections {
+target: rolesPage.apiClient
+function onRoleDataReceived(data) {
+if (rolesPage.stateManager)
+rolesPage.stateManager.receivedRoleData = data
+}
+}
 
-	readonly property bool __canManage: rolesPage.stateManager ? rolesPage.stateManager.canManageMembers : false
+StackViewHeader {
+id: rolesStackViewHeader
+anchors.top: parent.top
+anchors.left: parent.left
+anchors.right: rolesCreateBtn.visible ? rolesCreateBtn.left : parent.right
+height: Style.controlHeightL
+initialItemTitleVisible: true
 
-	Connections {
-		target: rolesPage.apiClient
-		function onRoleDataReceived(data) {
-			if (rolesPage.stateManager)
-				rolesPage.stateManager.receivedRoleData = data
-		}
-	}
+onCloseClicked: {
+rolesStackView.previous()
+rolesStackViewHeader.popHeader()
+}
 
-	StackViewHeader {
-		id: rolesStackViewHeader
-		anchors.top: parent.top
-		anchors.left: parent.left
-		anchors.right: rolesCreateBtn.visible ? rolesCreateBtn.left : parent.right
-		height: Style.controlHeightL
-		initialItemTitleVisible: true
+Component.onCompleted: {
+rolesStackViewHeader.addHeader("roles_list", qsTr("Roles"))
+}
+}
 
-		onCloseClicked: {
-			rolesStackView.previous()
-			rolesStackViewHeader.popHeader()
-		}
+Text {
+id: rolesCreateBtn
+visible: rolesPage.__canManage && rolesStackView.currentIndex === 0
+anchors.right: parent.right
+anchors.rightMargin: Style.marginXL
+anchors.verticalCenter: rolesStackViewHeader.verticalCenter
+text: "+ " + qsTr("Create Role")
+font.pixelSize: Style.fontSizeM
+font.bold: true
+color: Style.linkColor
 
-		Component.onCompleted: {
-			rolesStackViewHeader.addHeader("roles_list", qsTr("Roles"))
-		}
-	}
+MouseArea {
+anchors.fill: parent
+hoverEnabled: true
+cursorShape: Qt.PointingHandCursor
+onClicked: {
+while (rolesStackView.count > 1)
+rolesStackView.removePage(rolesStackView.count - 1)
+rolesStackViewHeader.addHeader("create_role", qsTr("Create New Role"))
+rolesStackView.addPage(roleEditorView)
+rolesStackView.next()
+}
+}
+}
 
-	Text {
-		id: rolesCreateBtn
-		visible: rolesPage.__canManage && rolesStackView.currentIndex === 0
-		anchors.right: parent.right
-		anchors.rightMargin: Style.marginXL
-		anchors.verticalCenter: rolesStackViewHeader.verticalCenter
-		text: "+ " + qsTr("Create Role")
-		font.pixelSize: Style.fontSizeM
-		font.bold: true
-		color: Style.linkColor
+BaseText {
+id: rolesDescription
+anchors.top: rolesStackViewHeader.bottom
+anchors.topMargin: Style.marginS
+anchors.left: parent.left
+anchors.leftMargin: Style.marginXL
+anchors.right: parent.right
+anchors.rightMargin: Style.marginXL
+visible: rolesStackView.currentIndex === 0
+text: qsTr("Manage tenant roles and assign permissions to team members.")
+font.pixelSize: Style.fontSizeS
+color: Style.inactiveTextColor
+}
 
-		MouseArea {
-			anchors.fill: parent
-			hoverEnabled: true
-			cursorShape: Qt.PointingHandCursor
-			onClicked: {
-				while (rolesStackView.count > 1)
-					rolesStackView.removePage(rolesStackView.count - 1)
-				rolesStackViewHeader.addHeader("create_role", qsTr("Create New Role"))
-				rolesStackView.addPage(roleEditorView)
-				rolesStackView.next()
-			}
-		}
-	}
+StackView {
+id: rolesStackView
+anchors.top: rolesDescription.visible ? rolesDescription.bottom : rolesStackViewHeader.bottom
+anchors.topMargin: Style.marginS
+anchors.left: parent.left
+anchors.right: parent.right
+anchors.bottom: parent.bottom
 
-	BaseText {
-		id: rolesDescription
-		anchors.top: rolesStackViewHeader.bottom
-		anchors.topMargin: Style.marginS
-		anchors.left: parent.left
-		anchors.leftMargin: Style.marginXL
-		anchors.right: parent.right
-		anchors.rightMargin: Style.marginXL
-		visible: rolesStackView.currentIndex === 0
-		text: qsTr("Manage tenant roles and assign permissions to team members.")
-		font.pixelSize: Style.fontSizeS
-		color: Style.inactiveTextColor
-	}
+Component.onCompleted: {
+rolesStackView.addPage(rolesListView)
+}
+}
 
-	StackView {
-		id: rolesStackView
-		anchors.top: rolesDescription.visible ? rolesDescription.bottom : rolesStackViewHeader.bottom
-		anchors.topMargin: Style.marginS
-		anchors.left: parent.left
-		anchors.right: parent.right
-		anchors.bottom: parent.bottom
+Component {
+id: rolesListView
 
-		Component.onCompleted: {
-			rolesStackView.addPage(rolesListView)
-		}
-	}
+Item {
+TenantTableContainer {
+anchors.top: parent.top
+anchors.bottom: parent.bottom
+anchors.topMargin: Style.marginM
 
-	Component {
-		id: rolesListView
+IdSelectionManager {
+id: rolesSelectionManager
+multiSelect: true
+}
 
-		Item {
-			TenantCollectionListView {
-				anchors.top: parent.top
-				anchors.left: parent.left
-				anchors.right: parent.right
-				anchors.bottom: parent.bottom
-				collectionId: "Roles"
-				filterPlaceholder: qsTr("Filter roles...")
-				emptyMessage: qsTr("No roles created yet.")
-				canManage: rolesPage.__canManage
+FilterableSelectGqlDataProvider {
+id: rolesDataProvider
+collectionId: "Roles"
+pageSize: 50
+}
 
-				onEditRequested: {
-					rolesPage.__editRoleId = itemId
-					rolesPage.__editRoleName = itemName
-					rolesPage.__editRoleDescription = itemDescription
-					while (rolesStackView.count > 1)
-						rolesStackView.removePage(rolesStackView.count - 1)
-					rolesStackViewHeader.addHeader("edit_role", itemName || qsTr("Edit Role"))
-					rolesStackView.addPage(roleEditView)
-					rolesStackView.next()
-					if (rolesPage.apiClient)
-						rolesPage.apiClient.getRoleData(itemId)
-				}
+Component.onCompleted: {
+rolesDataProvider.fetch("")
+}
 
-				onDeleteRequested: {
-					ModalDialogManager.showConfirmationDialog(
-						qsTr("Delete Role"),
-						qsTr("Are you sure you want to delete the role \"%1\"? This action cannot be undone.").arg(itemName),
-						function(result) {
-							if (result === true && rolesPage.apiClient)
-								rolesPage.apiClient.removeRole(itemId)
-						}
-					)
-				}
-			}
-		}
-	}
+TenantTableHeader {
+id: rolesTableHeader
+anchors.top: parent.top
+anchors.left: parent.left
+anchors.right: parent.right
+selectedCount: rolesSelectionManager.selectedIds.length
+totalCount: rolesListView2.count
+checkState: rolesSelectionManager.selectedIds.length === 0
+? Qt.Unchecked
+: (rolesSelectionManager.selectedIds.length === rolesListView2.count
+? Qt.Checked : Qt.PartiallyChecked)
 
-	Component {
-		id: roleEditorView
+onSelectAllToggled: {
+if (rolesSelectionManager.selectedIds.length === rolesListView2.count) {
+rolesSelectionManager.clear()
+} else {
+var allIds = []
+var items = rolesDataProvider.items
+for (var i = 0; i < items.length; i++) {
+if (items[i] && items[i].id)
+allIds.push(items[i].id)
+}
+rolesSelectionManager.selectMultiple(allIds)
+}
+}
+}
 
-		Item {
-			RoleView {
-				id: createRoleView
-				anchors.fill: parent
-				commandsPanelVisible: false
+SearchTextInput {
+id: rolesFilterInput
+anchors.top: rolesTableHeader.bottom
+anchors.left: parent.left
+anchors.right: parent.right
+anchors.leftMargin: Style.marginM
+anchors.rightMargin: Style.marginM
+anchors.topMargin: Style.marginS
+placeHolderText: qsTr("Filter roles...")
+onTextChanged: rolesDataProvider.fetch(text)
+}
 
-				Component.onCompleted: {
-					createRoleView.model = rolesPage.roleDataFactory ? rolesPage.roleDataFactory() : null
-					createRoleView.updateGui()
-				}
-			}
+Rectangle {
+id: rolesSeparator
+anchors.top: rolesFilterInput.bottom
+anchors.topMargin: Style.marginS
+anchors.left: parent.left
+anchors.right: parent.right
+height: 1
+color: Style.borderColor
+}
 
-			Row {
-				anchors.bottom: parent.bottom
-				anchors.bottomMargin: Style.marginXL
-				anchors.left: parent.left
-				anchors.leftMargin: Style.marginXL
-				spacing: Style.marginM
+ListView {
+id: rolesListView2
+anchors.top: rolesSeparator.bottom
+anchors.left: parent.left
+anchors.right: parent.right
+anchors.bottom: parent.bottom
+anchors.bottomMargin: Style.marginS
+clip: true
+boundsBehavior: Flickable.StopAtBounds
+model: rolesDataProvider.items
 
-				Button {
-					text: qsTr("Create")
-					onClicked: {
-						createRoleView.updateModel()
-						var roleData = createRoleView.model
-						if (rolesPage.apiClient)
-							rolesPage.apiClient.insertRole(
-								roleData ? roleData.m_name : "",
-								roleData ? roleData.m_description : "")
-						rolesStackViewHeader.popHeader()
-						rolesStackView.previous()
-					}
-				}
+delegate: Rectangle {
+id: roleDelegateRoot
+width: rolesListView2.width
+height: Style.controlHeightL + Style.marginS
 
-				Button {
-					text: qsTr("Cancel")
-					onClicked: {
-						rolesStackViewHeader.popHeader()
-						rolesStackView.previous()
-					}
-				}
-			}
-		}
-	}
+property string itemId: modelData.id || ""
+property string itemTitle: modelData.title || modelData.id || ""
+property string itemDescription: modelData.description || ""
+property bool isSelected: rolesSelectionManager.isSelected(itemId)
 
-	Component {
-		id: roleEditView
+color: isSelected ? Style.selectedColor
+: roleMouseArea.containsMouse ? Style.buttonHoverColor
+: "transparent"
 
-		Item {
-			RoleView {
-				id: editRoleView
-				anchors.fill: parent
-				commandsPanelVisible: false
+MouseArea {
+id: roleMouseArea
+anchors.fill: parent
+hoverEnabled: true
+cursorShape: Qt.PointingHandCursor
+onClicked: {
+if (mouse.modifiers & Qt.ControlModifier)
+rolesSelectionManager.toggleSelect(roleDelegateRoot.itemId)
+else
+rolesSelectionManager.singleSelect(roleDelegateRoot.itemId)
+}
+onDoubleClicked: {
+if (rolesPage.__canManage)
+rolesPage.__openEditRole(roleDelegateRoot.itemId, roleDelegateRoot.itemTitle, roleDelegateRoot.itemDescription)
+}
+}
 
-				Component.onCompleted: {
-					var roleData = rolesPage.roleDataFactory ? rolesPage.roleDataFactory() : null
-					if (roleData) {
-						roleData.m_id = rolesPage.__editRoleId
-						roleData.m_name = rolesPage.__editRoleName
-						roleData.m_description = rolesPage.__editRoleDescription
-					}
-					editRoleView.model = roleData
-					editRoleView.updateGui()
-				}
+Row {
+anchors.left: parent.left
+anchors.right: roleMoreButton.left
+anchors.verticalCenter: parent.verticalCenter
+anchors.leftMargin: Style.marginM
+anchors.rightMargin: Style.marginM
+spacing: Style.marginM
 
-				Connections {
-					target: rolesPage.stateManager
-					function onReceivedRoleDataChanged() {
-						if (rolesPage.stateManager
-								&& rolesPage.stateManager.receivedRoleData
-								&& rolesPage.__editRoleId) {
-							var roleData = rolesPage.roleDataFactory ? rolesPage.roleDataFactory() : null
-							if (roleData) {
-								roleData.m_id = rolesPage.__editRoleId
-								roleData.m_name = rolesPage.stateManager.receivedRoleData.name || rolesPage.__editRoleName
-								roleData.m_description = rolesPage.stateManager.receivedRoleData.description || rolesPage.__editRoleDescription
-							}
-							editRoleView.model = roleData
-							editRoleView.updateGui()
-						}
-					}
-				}
-			}
+CheckBox {
+anchors.verticalCenter: parent.verticalCenter
+height: Style.itemSizeS
+width: Style.itemSizeS
+checkState: roleDelegateRoot.isSelected ? Qt.Checked : Qt.Unchecked
+onCheckStateChanged: {
+var shouldBeSelected = (checkState === Qt.Checked)
+var currentlySelected = rolesSelectionManager.isSelected(roleDelegateRoot.itemId)
+if (shouldBeSelected !== currentlySelected)
+rolesSelectionManager.toggleSelect(roleDelegateRoot.itemId)
+}
+}
 
-			Row {
-				anchors.bottom: parent.bottom
-				anchors.bottomMargin: Style.marginXL
-				anchors.left: parent.left
-				anchors.leftMargin: Style.marginXL
-				spacing: Style.marginM
+Column {
+anchors.verticalCenter: parent.verticalCenter
+spacing: Style.marginXS
+width: parent.width - Style.itemSizeS - parent.spacing
 
-				Button {
-					text: qsTr("Save")
-					onClicked: {
-						editRoleView.updateModel()
-						var roleData = editRoleView.model
-						if (rolesPage.apiClient)
-							rolesPage.apiClient.setRoleData(
-								rolesPage.__editRoleId,
-								roleData ? roleData.m_name : "",
-								roleData ? roleData.m_description : "")
-						rolesStackViewHeader.popHeader()
-						rolesStackView.previous()
-					}
-				}
+BaseText {
+text: roleDelegateRoot.itemTitle
+font.pixelSize: Style.fontSizeM
+font.bold: true
+color: Style.textColor
+}
 
-				Button {
-					text: qsTr("Cancel")
-					onClicked: {
-						rolesStackViewHeader.popHeader()
-						rolesStackView.previous()
-					}
-				}
-			}
-		}
-	}
+BaseText {
+visible: roleDelegateRoot.itemDescription !== ""
+text: roleDelegateRoot.itemDescription
+font.pixelSize: Style.fontSizeS
+color: Style.inactiveTextColor
+elide: Text.ElideRight
+width: parent.width
+}
+}
+}
+
+Rectangle {
+id: roleMoreButton
+anchors.right: parent.right
+anchors.rightMargin: Style.marginM
+anchors.verticalCenter: parent.verticalCenter
+width: Style.controlHeightM
+height: Style.controlHeightM
+radius: Style.controlHeightM / 2
+color: roleMoreButtonMA.containsMouse ? Style.buttonHoverColor : "transparent"
+visible: rolesPage.__canManage && (roleMouseArea.containsMouse || roleDelegateRoot.isSelected || roleMoreButtonMA.containsMouse)
+
+BaseText {
+anchors.centerIn: parent
+text: "\u2026"
+font.pixelSize: Style.fontSizeL
+color: Style.textColor
+}
+
+MouseArea {
+id: roleMoreButtonMA
+anchors.fill: parent
+hoverEnabled: true
+cursorShape: Qt.PointingHandCursor
+onClicked: roleItemMenu.popup()
+}
+}
+
+Menu {
+id: roleItemMenu
+MenuItem {
+text: qsTr("Edit")
+enabled: rolesPage.__canManage
+onTriggered: rolesPage.__openEditRole(roleDelegateRoot.itemId, roleDelegateRoot.itemTitle, roleDelegateRoot.itemDescription)
+}
+MenuItem {
+text: qsTr("Delete")
+enabled: rolesPage.__canManage
+onTriggered: {
+ModalDialogManager.showConfirmationDialog(
+qsTr("Delete Role"),
+qsTr("Are you sure you want to delete the role \"%1\"? This action cannot be undone.").arg(roleDelegateRoot.itemTitle),
+function(result) {
+if (result === true && rolesPage.apiClient)
+rolesPage.apiClient.removeRole(roleDelegateRoot.itemId)
+}
+)
+}
+}
+}
+
+Rectangle {
+anchors.bottom: parent.bottom
+width: parent.width
+height: 1
+color: Style.borderColor
+opacity: 0.5
+}
+}
+
+BaseText {
+visible: rolesListView2.count === 0
+anchors.centerIn: parent
+text: qsTr("No roles created yet.")
+font.pixelSize: Style.fontSizeM
+color: Style.inactiveTextColor
+}
+}
+}
+}
+}
+
+function __openEditRole(itemId, itemName, itemDescription) {
+rolesPage.__editRoleId = itemId
+rolesPage.__editRoleName = itemName
+rolesPage.__editRoleDescription = itemDescription
+while (rolesStackView.count > 1)
+rolesStackView.removePage(rolesStackView.count - 1)
+rolesStackViewHeader.addHeader("edit_role", itemName || qsTr("Edit Role"))
+rolesStackView.addPage(roleEditView)
+rolesStackView.next()
+if (rolesPage.apiClient)
+rolesPage.apiClient.getRoleData(itemId)
+}
+
+Component {
+id: roleEditorView
+
+Item {
+RoleView {
+id: createRoleView
+anchors.fill: parent
+commandsPanelVisible: false
+
+Component.onCompleted: {
+createRoleView.model = rolesPage.roleDataFactory ? rolesPage.roleDataFactory() : null
+createRoleView.updateGui()
+}
+}
+
+Row {
+anchors.bottom: parent.bottom
+anchors.bottomMargin: Style.marginXL
+anchors.left: parent.left
+anchors.leftMargin: Style.marginXL
+spacing: Style.marginM
+
+Button {
+text: qsTr("Create")
+onClicked: {
+createRoleView.updateModel()
+var roleData = createRoleView.model
+if (rolesPage.apiClient)
+rolesPage.apiClient.insertRole(
+roleData ? roleData.m_name : "",
+roleData ? roleData.m_description : "")
+rolesStackViewHeader.popHeader()
+rolesStackView.previous()
+}
+}
+
+Button {
+text: qsTr("Cancel")
+onClicked: {
+rolesStackViewHeader.popHeader()
+rolesStackView.previous()
+}
+}
+}
+}
+}
+
+Component {
+id: roleEditView
+
+Item {
+RoleView {
+id: editRoleView
+anchors.fill: parent
+commandsPanelVisible: false
+
+Component.onCompleted: {
+var roleData = rolesPage.roleDataFactory ? rolesPage.roleDataFactory() : null
+if (roleData) {
+roleData.m_id = rolesPage.__editRoleId
+roleData.m_name = rolesPage.__editRoleName
+roleData.m_description = rolesPage.__editRoleDescription
+}
+editRoleView.model = roleData
+editRoleView.updateGui()
+}
+
+Connections {
+target: rolesPage.stateManager
+function onReceivedRoleDataChanged() {
+if (rolesPage.stateManager
+&& rolesPage.stateManager.receivedRoleData
+&& rolesPage.__editRoleId) {
+var roleData = rolesPage.roleDataFactory ? rolesPage.roleDataFactory() : null
+if (roleData) {
+roleData.m_id = rolesPage.__editRoleId
+roleData.m_name = rolesPage.stateManager.receivedRoleData.name || rolesPage.__editRoleName
+roleData.m_description = rolesPage.stateManager.receivedRoleData.description || rolesPage.__editRoleDescription
+}
+editRoleView.model = roleData
+editRoleView.updateGui()
+}
+}
+}
+}
+
+Row {
+anchors.bottom: parent.bottom
+anchors.bottomMargin: Style.marginXL
+anchors.left: parent.left
+anchors.leftMargin: Style.marginXL
+spacing: Style.marginM
+
+Button {
+text: qsTr("Save")
+onClicked: {
+editRoleView.updateModel()
+var roleData = editRoleView.model
+if (rolesPage.apiClient)
+rolesPage.apiClient.setRoleData(
+rolesPage.__editRoleId,
+roleData ? roleData.m_name : "",
+roleData ? roleData.m_description : "")
+rolesStackViewHeader.popHeader()
+rolesStackView.previous()
+}
+}
+
+Button {
+text: qsTr("Cancel")
+onClicked: {
+rolesStackViewHeader.popHeader()
+rolesStackView.previous()
+}
+}
+}
+}
+}
 }
