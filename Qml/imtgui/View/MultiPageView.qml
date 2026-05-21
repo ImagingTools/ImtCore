@@ -13,16 +13,9 @@ Item {
     property int currentIndex: -1
 
     property int mainMargin: Style.marginM;
-	property int panelWidth: Style.sizeHintXXXS;
+    property int panelWidth: Style.sizeHintXXXS;
 
     signal pageLoaded(int index, var pageItem, string pageId);
-
-    Component{
-        id: emptyDecorator;
-        Item{
-            property Item rootItem: null;
-        }
-    }
 
     function clear(){
         pagesModel.clear();
@@ -68,8 +61,9 @@ Item {
         return -1;
     }
 
+    // --- Left sidebar ---
     Item {
-        id: mainPanelBackground;
+        id: sidebarPanel;
 
         anchors.top: parent.top;
         anchors.left: parent.left;
@@ -79,68 +73,71 @@ Item {
 
         width: root.panelWidth;
 
-        Loader{
-            id: mainPanelBackgroundDecoratorLoader;
-
-            sourceComponent: Style.backGroundDecorator !==undefined ? Style.backGroundDecorator: emptyDecorator;
-            onLoaded: {
-                if(mainPanelBackgroundDecoratorLoader.item){
-                    mainPanelBackgroundDecoratorLoader.item.rootItem = mainPanelBackground;
-                }
-            }
-        }
-
-        Item{
-            id: columnContainer;
-            width: parent.width;
-            height: mainPanel.height + 2*mainPanel.anchors.topMargin;
-
-            Loader{
-                id: mainPanelFrameLoader;
-
-                anchors.fill: parent;
-
-                sourceComponent: Style.frame !==undefined ? Style.frame: emptyDecorator;
-
-                onLoaded: {
-                    if(mainPanelFrameLoader.item){
-                    }
-                }
-            }
-        }
-
         Column {
-            id: mainPanel;
+            id: sidebarColumn;
 
             anchors.top: parent.top;
             anchors.left: parent.left;
             anchors.right: parent.right;
-            anchors.topMargin: root.mainMargin;
+            anchors.topMargin: Style.marginS;
 
-            spacing: Style.marginM;
+            spacing: Style.spacingXS;
 
-            ListView {
-                id: mainPanelRepeater;
-
-                width: parent.width;
-                height: contentHeight;
-
+            Repeater {
                 model: root.pagesModel;
 
-                spacing: Style.marginM;
+                delegate: Rectangle {
+                    id: navItem;
 
-                boundsBehavior: Flickable.StopAtBounds;
+                    width: sidebarColumn.width;
+                    height: Style.controlHeightM;
+                    radius: Style.marginS;
+                    color: root.currentIndex === model.index
+                        ? Style.selectedColor
+                        : navMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
 
-                delegate: ItemDelegate {
-                    objectName: model.id
-                    text: model.name;
-                    iconSource: model.icon ? "../../../" + Style.getIconPath(model.icon, Icon.State.On, Icon.Mode.Normal) : ""
-                    highlighted: root.currentIndex === model.index;
+                    Row {
+                        anchors.fill: parent;
+                        anchors.leftMargin: Style.marginM;
+                        anchors.rightMargin: Style.marginM;
+                        spacing: Style.marginS;
 
-                    onClicked: {
-                        root.currentIndex = model.index;
+                        Image {
+                            visible: model.icon
+                            anchors.verticalCenter: parent.verticalCenter;
+                            width: Style.iconSizeS;
+                            height: Style.iconSizeS;
+                            source: model.icon ? 
+                                        root.currentIndex === model.index ? "qrc:/" + Style.getIconPath(model.icon, Icon.State.On, Icon.Mode.Selected) : "qrc:/" + Style.getIconPath(model.icon, Icon.State.On, Icon.Mode.Normal) :
+                                        ""
+                            sourceSize.width: width
+                            sourceSize.height: height
+                        }
+
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter;
+                            text: model.name;
+                            font.family: Style.fontFamily;
+                            font.pixelSize: Style.fontSizeM;
+                            font.bold: root.currentIndex === model.index;
+                            color: root.currentIndex === model.index ? Style.textSelectedColor : Style.textColor;
+                            elide: Text.ElideRight;
+                            width: parent.width - parent.anchors.leftMargin - parent.anchors.rightMargin - (model.icon ? Style.iconSizeS + parent.spacing : 0);
+                        }
                     }
-                    
+
+                    MouseArea {
+                        id: navMouseArea;
+
+                        anchors.fill: parent;
+                        hoverEnabled: true;
+                        cursorShape: Qt.PointingHandCursor;
+
+                        onClicked: {
+                            root.currentIndex = model.index;
+                        }
+                    }
+
                     Component.onCompleted: {
                         if (model.index === 0){
                             root.currentIndex = 0
@@ -151,18 +148,32 @@ Item {
         }
     }
 
+    // --- Vertical separator ---
+    Rectangle {
+        id: separator;
+
+        anchors.top: parent.top;
+        anchors.bottom: parent.bottom;
+        anchors.left: sidebarPanel.right;
+        anchors.topMargin: root.mainMargin;
+        anchors.bottomMargin: root.mainMargin;
+        anchors.leftMargin: root.mainMargin;
+
+        width: 1;
+        color: Style.borderColor;
+    }
+
+    // --- Content area ---
     Item {
         id: bodyAdministration;
 
-        anchors.left: mainPanelBackground.right;
+        anchors.left: separator.right;
         anchors.top: parent.top;
         anchors.bottom: parent.bottom;
         anchors.right: parent.right;
         anchors.topMargin: root.mainMargin;
         anchors.leftMargin: root.mainMargin;
         anchors.rightMargin: root.mainMargin;
-
-        z: 5;
 
         Repeater {
             id: bodyRepeater;
@@ -180,7 +191,7 @@ Item {
 
                 visible: root.currentIndex === model.index;
 
-				onLoaded: {
+                onLoaded: {
                     root.pageLoaded(model.index, item, model.id);
                 }
 

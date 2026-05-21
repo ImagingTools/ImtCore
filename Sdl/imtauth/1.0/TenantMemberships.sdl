@@ -13,13 +13,6 @@ import {
 
 # --- TenantMembership ---
 
-enum TenantMemberRole {
-	Owner
-	Admin
-	Member
-	Guest
-}
-
 enum TenantInvitationStatus {
 	Pending
 	Accepted
@@ -33,7 +26,7 @@ type TenantMembershipItemData {
 	typeId: ID!
 	userId: ID!
 	tenantId: ID!
-	role: TenantMemberRole!
+	role: ID!
 	isActive: Boolean
 	joinedAt: String
 	updatedAt: String
@@ -43,7 +36,7 @@ type TenantMembershipData {
 	id: ID
 	userId: ID
 	tenantId: ID
-	role: TenantMemberRole
+	role: ID
 	isActive: Boolean
 	joinedAt: String
 	updatedAt: String
@@ -54,7 +47,7 @@ type TenantInvitationData {
 	userId: ID
 	tenantId: ID
 	tenantName: String
-	role: TenantMemberRole
+	role: ID
 	status: TenantInvitationStatus
 	invitedByUserId: ID
 	createdAt: String
@@ -119,7 +112,7 @@ type IsMemberPayload {
 input HasMinimumRoleInput {
 	userId: ID!
 	tenantId: ID!
-	minimumRole: TenantMemberRole!
+	minimumRole: ID!
 }
 
 type HasMinimumRolePayload {
@@ -151,7 +144,7 @@ type GetMyTenantInvitationsPayload {
 input AddMembershipInput {
 	userId: ID!
 	tenantId: ID!
-	role: TenantMemberRole!
+	role: ID!
 }
 
 type AddMembershipPayload {
@@ -162,7 +155,7 @@ type AddMembershipPayload {
 input CreateTenantInvitationInput {
 	userId: ID!
 	tenantId: ID!
-	role: TenantMemberRole
+	role: ID
 }
 
 type CreateTenantInvitationPayload {
@@ -218,10 +211,20 @@ type RemoveMembershipPayload {
 
 input UpdateMembershipRoleInput {
 	membershipId: ID!
-	role: TenantMemberRole!
+	role: ID!
 }
 
 type UpdateMembershipRolePayload {
+	success: Boolean
+	errorMessage: String
+}
+
+input TransferTenantOwnershipInput {
+	tenantId: ID!
+	newOwnerId: ID!
+}
+
+type TransferTenantOwnershipPayload {
 	success: Boolean
 	errorMessage: String
 }
@@ -246,6 +249,7 @@ type Mutation {
 	ResendTenantInvitation (input: ResendTenantInvitationInput): ResendTenantInvitationPayload!
 	RemoveMembership (input: RemoveMembershipInput): RemoveMembershipPayload!
 	UpdateMembershipRole (input: UpdateMembershipRoleInput): UpdateMembershipRolePayload!
+	TransferTenantOwnership (input: TransferTenantOwnershipInput): TransferTenantOwnershipPayload!
 }
 
 # --- Subscriptions ---
@@ -254,6 +258,7 @@ enum EMembershipNotificationType {
 	InvitationReceived
 	InvitationAccepted
 	InvitationRejected
+	OwnershipTransferred
 }
 
 type MembershipNotification {
@@ -262,7 +267,7 @@ type MembershipNotification {
 	userId: ID!
 	tenantId: ID!
 	tenantName: String
-	role: TenantMemberRole
+	role: ID
 }
 
 input MembershipSubscriptionInput {

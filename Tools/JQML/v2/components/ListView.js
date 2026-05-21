@@ -3,6 +3,7 @@ const { Flickable } = require('./Flickable')
 const { QVar, QReal, QBool, QAutoGeometry } = require('../utils/properties')
 const { ListModel } = require('./ListModel')
 const { PropertyAnimation } = require('./PropertyAnimation')
+const { DelegateChooser } = require('./DelegateChooser')
 
 
 
@@ -30,23 +31,42 @@ class ListView extends Flickable {
         orientation: { type: QReal, value: ListView.Vertical, changed: '$orientationChanged' },
         spacing: { type: QReal, value: 0, changed: '$spacingChanged' },
         currentIndex: { type: QReal, value: -1, changed: '$currentIndexChanged' },
-        currentItem: { type: QReal, value: undefined },
+        currentItem: { type: QVar, value: undefined },
         snapMode: { type: QReal, value: ListView.NoSnap, changed: '$snapModeChanged' },
         cacheBuffer: { type: QReal, value: 320, changed: '$cacheBufferChanged' },
         count: { type: QReal, value: 0 },
         contentWidth: { type: QAutoGeometry, value: 0, changed: '$contentWidthChanged' },
         contentHeight: { type: QAutoGeometry, value: 0, changed: '$contentHeightChanged' },
         reuseItems: { type: QBool, value: false },
+        highlight: { type: QVar, changed: '$highlightChanged' },
+        highlightFollowsCurrentItem: { type: QBool, value: true },
+        highlightMoveDuration: { type: QReal, value: 150 },
+        header: { type: QVar, changed: '$headerChanged' },
+        footer: { type: QVar, changed: '$footerChanged' },
+        headerItem: { type: QVar, value: null },
+        footerItem: { type: QVar, value: null },
+        keyNavigationEnabled: { type: QBool, value: true },
+        displayMarginBeginning: { type: QReal, value: 0 },
+        displayMarginEnd: { type: QReal, value: 0 },
+        highlightRangeMode: { type: QReal, value: 0 },
+        preferredHighlightBegin: { type: QReal, value: 0 },
+        preferredHighlightEnd: { type: QReal, value: 0 },
+        section: { type: QVar },
+        add: { type: QVar },
+        remove: { type: QVar },
+        displaced: { type: QVar },
+        addDisplaced: { type: QVar },
+        removeDisplaced: { type: QVar },
+        moveDisplaced: { type: QVar },
+        populate: { type: QVar },
     }
-
-    // static defaultSignals = {
-    //     pooled: { params: [] },
-	// 	reused: { params: [] },
-    // }
 
     constructor(parent,exCtx,exModel){
         super(parent,exCtx,exModel)
         this.$exCtx = exCtx
+
+        // Qt ListView clips by default
+        this.getProperty('clip').reset(true)
 
         this.middleWidth = 0
         this.middleHeight = 0
@@ -58,6 +78,41 @@ class ListView extends Flickable {
         this.$animation = new PropertyAnimation()
         this.$animation.target = this
         // this.$animation.duration = 600
+
+        // Keyboard navigation
+        if (this.$dom){
+            this.$dom.setAttribute('tabindex', '0')
+            this.$dom.style.outline = 'none'
+            this.$dom.addEventListener('keydown', (e) => {
+                if (!this.getPropertyValue('keyNavigationEnabled')) return
+                let orientation = this.getPropertyValue('orientation')
+                let handled = false
+                if (orientation === ListView.Vertical){
+                    if (e.key === 'ArrowDown'){
+                        this.incrementCurrentIndex()
+                        handled = true
+                    } else if (e.key === 'ArrowUp'){
+                        this.decrementCurrentIndex()
+                        handled = true
+                    }
+                } else {
+                    if (e.key === 'ArrowRight'){
+                        this.incrementCurrentIndex()
+                        handled = true
+                    } else if (e.key === 'ArrowLeft'){
+                        this.decrementCurrentIndex()
+                        handled = true
+                    }
+                }
+                if (handled){
+                    e.preventDefault()
+                    e.stopPropagation()
+                    // Ensure current item is visible
+                    let idx = this.getPropertyValue('currentIndex')
+                    if (idx >= 0) this.positionViewAtIndex(idx, ListView.Contain)
+                }
+            })
+        }
     }
 
     $complete(){
@@ -87,6 +142,31 @@ class ListView extends Flickable {
 
         return index >= 0 && index < length ? this.$items[index] : undefined
     }
+
+    // Convert content coordinates to model index (-1 if no delegate at that position)
+    indexAt(x, y){
+        for (let i = 0; i < this.$items.length; i++){
+            let item = this.$items[i]
+            if (!item) continue
+            if (this.getPropertyValue('orientation') === ListView.Horizontal){
+                let ix = item.getPropertyValue('x')
+                let iw = item.getPropertyValue('width')
+                if (x >= ix && x < ix + iw) return i
+            } else {
+                let iy = item.getPropertyValue('y')
+                let ih = item.getPropertyValue('height')
+                if (y >= iy && y < iy + ih) return i
+            }
+        }
+        return -1
+    }
+
+    // Force immediate layout update (Qt API)
+    forceLayout(){
+        this.$updateView()
+        this.$updateGeometry()
+    }
+
     positionViewAtBeginning(){
         this.positionViewAtIndex(0, ListView.Beginning)
     }
@@ -249,6 +329,11 @@ class ListView extends Flickable {
         }
     }
 
+    $isModelTransacting(){
+        let model = this.getPropertyValue('model')
+        return model && global.TransactionController && global.TransactionController.level > 0 && global.TransactionController.objects.has(model)
+    }
+
     $transaction(sender, changeset){
         if(changeset && sender === this.getPropertyValue('model')){
             let model = this.getPropertyValue('model')
@@ -280,6 +365,14 @@ class ListView extends Flickable {
                                 this.$createElement(i, info)
                             }
                         }
+                        // Update index statements for shifted items
+                        for(let i = bottomRight; i < this.$items.length; i++){
+                            if(this.$items[i]){
+                                let newIndex = i
+                                this.$items[i].getStatement('index').setCompute(()=>{return newIndex})
+                                this.$items[i].getStatement('index').update()
+                            }
+                        }
                         for(let i = bottomRight; i < this.$items.length; i++){
                             let info = this.$getItemInfo(i)
                             if(!info.inner && info.exist){
@@ -294,33 +387,55 @@ class ListView extends Flickable {
                         }
                     } else if(roles === 'remove'){
                         let removed = this.$items.splice(leftTop, bottomRight - leftTop)
-    
-                        if(this.$items[leftTop] && removed.length){
-                            this.$items[leftTop].getProperty('x').reset(removed[0].getPropertyValue('x'))
-                            this.$items[leftTop].getProperty('y').reset(removed[0].getPropertyValue('y'))
+
+                        let firstRemoved = removed.find(item => item !== undefined)
+                        if(this.$items[leftTop] && firstRemoved){
+                            this.$items[leftTop].getProperty('x').reset(firstRemoved.getPropertyValue('x'))
+                            this.$items[leftTop].getProperty('y').reset(firstRemoved.getPropertyValue('y'))
                         }
     
                         for(let item of removed){
                             this.$toCache(item)
-                        } 
+                        }
+
+                        // Update index statements for shifted items
+                        for(let i = leftTop; i < this.$items.length; i++){
+                            if(this.$items[i]){
+                                let newIndex = i
+                                this.$items[i].getStatement('index').setCompute(()=>{return newIndex})
+                                this.$items[i].getStatement('index').update()
+                            }
+                        }
                     }
                 }
                 if(roles === 'move'){
+                    let data = model.getPropertyValue('data')
                     for(let i = leftTop; i < bottomRight; i++){
-                        let from = i
-                        let to = this.$items[i].index
-        
-                        let fromItem = this.$items[from]
-                        let toItem = this.$items[to]
-        
-                        let toModel = this.getPropertyValue('model').getPropertyValue('data')[from]
-                        let fromModel = this.getPropertyValue('model').getPropertyValue('data')[to]
-        
-                        fromItem.model_ = toModel
-                        if(fromItem.model instanceof QModelData) fromItem.model = toModel
-                        toItem.model_ = fromModel
-                        if(toItem.model instanceof QModelData) toItem.model = fromModel
+                        let item = this.$items[i]
+                        if(item && data[i]){
+                            item.getStatement('model').reset(data[i])
+                            item.getStatement('model_').reset(data[i])
+                            let newIndex = i
+                            item.getStatement('index').setCompute(()=>{return newIndex})
+                            item.getStatement('index').update()
+                        }
                     }
+                }
+                if(roles === 'update'){
+                    let data = model.getPropertyValue('data')
+                    for(let i = leftTop; i < bottomRight; i++){
+                        let item = this.$items[i]
+                        if(item && data[i]){
+                            item.getStatement('model').reset(data[i])
+                            item.getStatement('model_').reset(data[i])
+                        }
+                    }
+                }
+                if(roles === 'reset'){
+                    for(let i = 0; i < this.$items.length; i++){
+                        if(this.$items[i]) this.$toCache(this.$items[i])
+                    }
+                    this.$items = []
                 }
             }
 
@@ -393,6 +508,18 @@ class ListView extends Flickable {
 
     $delegateChanged(){
         this.$clear(true)
+
+        let model = this.getPropertyValue('model')
+        let length = 0
+        if(model instanceof ListModel){
+            length = model.getPropertyValue('count')
+        } else if(Array.isArray(model)){
+            length = model.length
+        } else if(typeof model === 'number'){
+            length = model
+        }
+        this.getProperty('count').value = length
+
         this.$updateView()
     }
 
@@ -411,10 +538,21 @@ class ListView extends Flickable {
     }
 
     $updateView(){
-        if(!this.getPropertyValue('delegate') || this.getPropertyValue('model') === undefined || this.getPropertyValue('model') === null) return
+        if(this.$inUpdateView) {
+            this.$pendingUpdateView = true
+            return
+        }
+        this.$inUpdateView = true
+        this.$pendingUpdateView = false
+
+        if(!this.getPropertyValue('delegate') || this.getPropertyValue('model') === undefined || this.getPropertyValue('model') === null) {
+            this.$inUpdateView = false
+            return
+        }
 
         if(!this.$ready && !this.$properties.model.$isReset){
             this.$needUpdate = true
+            this.$inUpdateView = false
             return
         }
         
@@ -427,20 +565,27 @@ class ListView extends Flickable {
         } else if(typeof model === 'number'){
             length = model
         } else {
+            this.$inUpdateView = false
             return
         }
 
         if(length === 0) {
+            this.$inUpdateView = false
             return
         }
 
-        let firstIndex = 0
-        let lastIndex = 0
+        let firstIndex = -1
+        let lastIndex = -1
         
         for(let i = 0; i < length; i++){
-            if(this.$items[i] && !this.$items[i-1] && !firstIndex) firstIndex = i
-            if(this.$items[i] && !this.$items[i+1] && !lastIndex) lastIndex = i
+            if(this.$items[i]){
+                if(firstIndex < 0) firstIndex = i
+                lastIndex = i
+            }
         }
+
+        if(firstIndex < 0) firstIndex = 0
+        if(lastIndex < 0) lastIndex = 0
 
         let _firstIndex = -1
         let _lastIndex = -1
@@ -504,6 +649,9 @@ class ListView extends Flickable {
                 }
             }
 
+            if(approximateMiddleIndex >= length) approximateMiddleIndex = length - 1
+            if(approximateMiddleIndex < 0) approximateMiddleIndex = 0
+
             for(let i = approximateMiddleIndex; i >= 0; i--){
                 let info = this.$getItemInfo(i)
                 if(info.inner){
@@ -527,14 +675,38 @@ class ListView extends Flickable {
             }
 
         }
+
+        this.$inUpdateView = false
+        if(this.$pendingUpdateView) {
+            this.$pendingUpdateView = false
+            this.$updateView()
+        }
     }
 
     $updateGeometry(){
         if(!this.$items.length) {
+            // Preserve middleHeight/middleWidth for subsequent $updateView calculations.
+            // But reset contentHeight/contentWidth and origin to 0 for empty model.
+            if(this.getPropertyValue('orientation') === ListView.Horizontal){
+                let contentWidthProperty = this.getProperty('contentWidth')
+                if(contentWidthProperty.value != 0){
+                    contentWidthProperty.value = 0
+                    contentWidthProperty.getNotify()()
+                }
+                this.getStatement('originX').reset(0)
+            } else {
+                let contentHeightProperty = this.getProperty('contentHeight')
+                if(contentHeightProperty.value != 0){
+                    contentHeightProperty.value = 0
+                    contentHeightProperty.getNotify()()
+                }
+                this.getStatement('originY').reset(0)
+            }
             return
         }
 
         let model = this.getPropertyValue('model')
+        let length = 0
         if(model instanceof ListModel){     
             length = model.getPropertyValue('count')
         } else if(Array.isArray(model)){
@@ -701,15 +873,134 @@ class ListView extends Flickable {
     $widthChanged(){
         super.$widthChanged()
 
+        if(this.$isModelTransacting()) return
         this.$updateView()
     }
     $heightChanged(){
         super.$heightChanged()
 
+        if(this.$isModelTransacting()) return
         this.$updateView()
     }
     $cacheBufferChanged(){
         this.$updateView()
+    }
+
+    $currentIndexChanged(){
+        let idx = this.getPropertyValue('currentIndex')
+        let item = (idx >= 0 && idx < this.$items.length) ? this.$items[idx] : undefined
+        this.getProperty('currentItem').reset(item || undefined)
+        // Update ListView.isCurrentItem attached property on delegates
+        this.$updateIsCurrentItem()
+        // Move highlight to follow current item
+        if (this.getPropertyValue('highlightFollowsCurrentItem')){
+            this.$updateHighlightPosition()
+        }
+    }
+
+    $updateIsCurrentItem(){
+        let curIdx = this.getPropertyValue('currentIndex')
+        for (let i = 0; i < this.$items.length; i++){
+            let item = this.$items[i]
+            if (item && item.getStatement){
+                let st = item.getStatement('ListView.isCurrentItem')
+                if (st) st.reset(i === curIdx)
+            }
+        }
+    }
+
+    $highlightChanged(){
+        // Recreate highlight item when delegate changes
+        if (this.$highlightItem){
+            this.$highlightItem.destroy()
+            this.$highlightItem = null
+        }
+        this.$createHighlightItem()
+    }
+
+    $createHighlightItem(){
+        let highlightDelegate = this.getPropertyValue('highlight')
+        if (!highlightDelegate) return
+        let ctx = new ContextController(highlightDelegate.$exCtx, this.$exCtx)
+        let createObject = highlightDelegate.createObject
+        let cls = highlightDelegate.constructor
+        let contentItem = this.getProperty('contentItem').get()
+        this.$highlightItem = createObject ? createObject(contentItem, ctx, {}, false) : new cls(contentItem, ctx, {})
+        this.$highlightItem.$complete()
+        // Position behind delegates (z-order)
+        if (this.$highlightItem.$dom && contentItem.$dom){
+            contentItem.$dom.insertBefore(this.$highlightItem.$dom, contentItem.$dom.firstChild)
+        }
+        this.$updateHighlightPosition()
+    }
+
+    $updateHighlightPosition(){
+        if (!this.$highlightItem) return
+        let idx = this.getPropertyValue('currentIndex')
+        let item = (idx >= 0 && idx < this.$items.length) ? this.$items[idx] : null
+        if (!item){
+            this.$highlightItem.getProperty('visible').reset(false)
+            return
+        }
+        this.$highlightItem.getProperty('visible').reset(true)
+        this.$highlightItem.getProperty('x').reset(item.getPropertyValue('x'))
+        this.$highlightItem.getProperty('y').reset(item.getPropertyValue('y'))
+        this.$highlightItem.getProperty('width').reset(item.getPropertyValue('width'))
+        this.$highlightItem.getProperty('height').reset(item.getPropertyValue('height'))
+    }
+
+    $headerChanged(){
+        if (this.$headerInstance){
+            this.$headerInstance.destroy()
+            this.$headerInstance = null
+        }
+        let headerDelegate = this.getPropertyValue('header')
+        if (!headerDelegate) return
+        let ctx = new ContextController(headerDelegate.$exCtx, this.$exCtx)
+        let createObject = headerDelegate.createObject
+        let cls = headerDelegate.constructor
+        let contentItem = this.getProperty('contentItem').get()
+        this.$headerInstance = createObject ? createObject(contentItem, ctx, {}, false) : new cls(contentItem, ctx, {})
+        this.$headerInstance.$complete()
+        this.getProperty('headerItem').reset(this.$headerInstance)
+        // Header is placed before list content — shift content down/right
+        this.$updateView()
+    }
+
+    $footerChanged(){
+        if (this.$footerInstance){
+            this.$footerInstance.destroy()
+            this.$footerInstance = null
+        }
+        let footerDelegate = this.getPropertyValue('footer')
+        if (!footerDelegate) return
+        let ctx = new ContextController(footerDelegate.$exCtx, this.$exCtx)
+        let createObject = footerDelegate.createObject
+        let cls = footerDelegate.constructor
+        let contentItem = this.getProperty('contentItem').get()
+        this.$footerInstance = createObject ? createObject(contentItem, ctx, {}, false) : new cls(contentItem, ctx, {})
+        this.$footerInstance.$complete()
+        this.getProperty('footerItem').reset(this.$footerInstance)
+        this.$updateView()
+    }
+
+    $snapModeChanged(){
+        // Snap mode change doesn't need immediate action; handled in $moveEnd
+    }
+
+    incrementCurrentIndex(){
+        let count = this.getPropertyValue('count')
+        let idx = this.getPropertyValue('currentIndex')
+        if (idx < count - 1){
+            this.getProperty('currentIndex').reset(idx + 1)
+        }
+    }
+
+    decrementCurrentIndex(){
+        let idx = this.getPropertyValue('currentIndex')
+        if (idx > 0){
+            this.getProperty('currentIndex').reset(idx - 1)
+        }
     }
 
     $getItemInfo(index){
@@ -802,12 +1093,23 @@ class ListView extends Flickable {
     $toCache(item){
         if(!item) return
 
+        // If this was the currentItem, invalidate it
+        if (this.getPropertyValue('currentItem') === item){
+            this.getProperty('currentItem').reset(undefined)
+        }
+
         if(this.getPropertyValue('reuseItems')){
             if(item instanceof Item) {
                 this.getPropertyValue('contentItem').$dom.removeChild(item.$dom)
             }
 
             this.$cache.push(item)
+
+            // Clear attached property — delegate no longer represents any index
+            if (item.getStatement){
+                let st = item.getStatement('ListView.isCurrentItem')
+                if (st) st.reset(false)
+            }
 
             if(item.$signals['ListView.pooled']) item.$signals['ListView.pooled']()
         } else {
@@ -870,10 +1172,12 @@ class ListView extends Flickable {
             if(exModel){
                 if('$modelData' in exModel){
                     obj.getStatement('modelData_').reset(exModel['$modelData'])
+                    if(obj.getStatement('modelData')) obj.getStatement('modelData').reset(exModel['$modelData'])
                 } else {
                     let keys = Object.keys(exModel)
                     if(keys.length === 1){
                         obj.getStatement('modelData_').reset(exModel[keys[0]])
+                        if(obj.getStatement('modelData')) obj.getStatement('modelData').reset(exModel[keys[0]])
                     }
                 }
 
@@ -883,11 +1187,45 @@ class ListView extends Flickable {
                 obj.getStatement('index').update()
             }
 
+            // Update ListView attached properties on reuse
+            if (obj.getStatement){
+                let curIdx = this.getPropertyValue('currentIndex')
+                let st = obj.getStatement('ListView.isCurrentItem')
+                if (st) st.reset(index === curIdx)
+                let vst = obj.getStatement('ListView.view')
+                if (vst) vst.reset(this)
+            }
+
             if(obj.$signals['ListView.reused']) obj.$signals['ListView.reused']()
+
+            if(obj instanceof Item) {
+                if(obj.getPropertyValue('width') <= 0 || obj.getPropertyValue('height') <= 0) {
+                    obj.setStyle({ visibility: 'hidden' })
+                } else {
+                    obj.setStyle({ visibility: 'visible' })
+                }
+            }
         } else {
-            let ctx = new ContextController(this.getProperty('delegate').get().$exCtx, this.$exCtx)
-            let createObject = this.getProperty('delegate').get().createObject
-            let cls = this.getProperty('delegate').get().constructor
+            let delegateValue = this.getProperty('delegate').get()
+
+            // Resolve DelegateChooser: pick per-item delegate based on model data
+            if(delegateValue instanceof DelegateChooser){
+                let exModel = null
+                if(Array.isArray(this.getPropertyValue('model'))){
+                    let val = this.getPropertyValue('model')[index]
+                    exModel = (typeof val === 'object' && val !== null) ? val : { '$modelData': val, index: index }
+                } else if(typeof this.getPropertyValue('model') === 'number'){
+                    exModel = { index: index }
+                } else {
+                    exModel = this.getPropertyValue('model').getPropertyValue('data')[index]
+                }
+                delegateValue = delegateValue.$chooseDelegate(index, -1, exModel)
+                if(!delegateValue) return false
+            }
+
+            let ctx = new ContextController(delegateValue.$exCtx, this.$exCtx)
+            let createObject = delegateValue.createObject
+            let cls = delegateValue.constructor
             
             if(Array.isArray(this.getPropertyValue('model'))){
                 obj = createObject ? createObject(this.getProperty('contentItem').get(),ctx, {'$modelData': this.getPropertyValue('model')[index], index: index}, false) : new cls(this.getProperty('contentItem').get(),ctx, {'$modelData': this.getPropertyValue('model')[index], index: index})
@@ -975,6 +1313,18 @@ class ListView extends Flickable {
 
             obj.getProperty('x').reset(info.x)
             obj.getProperty('y').reset(info.y)
+        }
+
+        // Set ListView attached properties on delegate
+        if (obj.getStatement){
+            let curIdx = this.getPropertyValue('currentIndex')
+            let itemIndex = this.$items.indexOf(obj)
+            if (obj.getStatement('ListView.isCurrentItem')){
+                obj.getStatement('ListView.isCurrentItem').reset(itemIndex === curIdx)
+            }
+            if (obj.getStatement('ListView.view')){
+                obj.getStatement('ListView.view').reset(this)
+            }
         }
    
         obj.$complete()
@@ -1068,6 +1418,9 @@ class ListView extends Flickable {
     destroy(){
         this.$disconnectModel()
         this.$clear(true)
+        if (this.$highlightItem){ this.$highlightItem.destroy(); this.$highlightItem = null }
+        if (this.$headerInstance){ this.$headerInstance.destroy(); this.$headerInstance = null }
+        if (this.$footerInstance){ this.$footerInstance.destroy(); this.$footerInstance = null }
         
         super.destroy()
     }

@@ -100,6 +100,18 @@ CObjectCollectionViewDelegate::~CObjectCollectionViewDelegate()
 }
 
 
+void CObjectCollectionViewDelegate::SetMaxLengthComment(int maxLength)
+{
+	m_maxLengthComment = maxLength;
+}
+
+
+void CObjectCollectionViewDelegate::SetLengthRevisionComment(int maxLength)
+{
+	m_maxLengthRevisionComment = maxLength;
+}
+
+
 // reimplemented (ICollectionViewDelegate)
 
 bool CObjectCollectionViewDelegate::InitializeDelegate(
@@ -206,7 +218,7 @@ void CObjectCollectionViewDelegate::UpdateItemSelection(
 
 	m_insertCommand.setEnabled(isAddEnabled);
 	m_duplicateCommand.setEnabled(isAddEnabled && !selectedItems.isEmpty());
-	m_removeCommand.setEnabled(isRemoveEnabled);
+	m_removeCommand.setEnabled(isRemoveEnabled && m_hasRemoveRight);
 
 	m_selectedItemIds = selectedItems;
 	m_selectedTypeId = selectedTypeId;
@@ -936,8 +948,10 @@ void CObjectCollectionViewDelegate::OnExport()
 
 			std::unique_ptr<ibase::IProgressLogger> progressLoggerPtr = exportProgress.StartProgressLogger(true);
 
-			for (int i = 0; i < m_selectedItemIds.count(); ++i){
-				QByteArray objectId = m_selectedItemIds[i];
+			const imtbase::ICollectionInfo::Ids exportItemIds = m_selectedItemIds;
+
+			for (int i = 0; i < exportItemIds.count(); ++i){
+				QByteArray objectId = exportItemIds[i];
 
 				QString exportFilePath = targetFolder + "/" + ComposeExportFilePath("", GetExportFileName(*m_collectionPtr, objectId));
 				if (fileExt.isEmpty()){
@@ -958,8 +972,12 @@ void CObjectCollectionViewDelegate::OnExport()
 					exportFilePath += "." + fileExt;
 				}
 
+				if (!ExportObject(objectId, exportFilePath)){
+//					QMessageBox::critical(m_parentGuiPtr ? m_parentGuiPtr->GetWidget() : nullptr, tr("Collection"), tr("Document could not be exported"));
+				}
+
 				if (progressLoggerPtr != nullptr){
-					progressLoggerPtr->OnProgress(double(i + 1) / m_selectedItemIds.size());
+					progressLoggerPtr->OnProgress(double(i + 1) / exportItemIds.size());
 					if (progressLoggerPtr->IsCanceled()){
 						break;
 					}
@@ -1049,10 +1067,18 @@ void CObjectCollectionViewDelegate::OnEditDescription(bool /*checked*/)
 		if (!itemId.isEmpty() && (m_collectionPtr != nullptr) && (m_parentGuiPtr != nullptr)){
 			QString description = m_collectionPtr->GetElementInfo(itemId, imtbase::IObjectCollectionInfo::EIT_DESCRIPTION).toString();
 
-			bool ok = false;
-			QString newDescription = QInputDialog::getText(m_parentGuiPtr->GetWidget(), tr("Description"), tr("Enter object description"), QLineEdit::Normal, description, &ok);
-			if (ok){
-				m_collectionPtr->SetElementDescription(itemId, newDescription);
+			QInputDialog inputDiag(m_parentGuiPtr->GetWidget());
+			inputDiag.setWindowTitle(tr("Description"));
+			inputDiag.setLabelText(tr("Enter object description"));
+			inputDiag.setInputMode(QInputDialog::TextInput);
+			inputDiag.setTextValue(description);
+		
+			QLineEdit* lineEdit = inputDiag.findChild<QLineEdit*>();
+			lineEdit->setMaxLength(m_maxLengthComment);
+
+			int ret = inputDiag.exec();
+			if (ret == QDialog::DialogCode::Accepted){
+				m_collectionPtr->SetElementDescription(itemId, inputDiag.textValue());
 			}
 		}
 	}

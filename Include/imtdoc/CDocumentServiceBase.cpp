@@ -634,17 +634,21 @@ bool CDocumentServiceBase::ValidateInputParams(const QByteArray& userId, const Q
 }
 
 
-int CDocumentServiceBase::GetUndoManagerNextModelId(const QByteArray& userId)
+int CDocumentServiceBase::GetUndoManagerNextModelId(const QByteArray& /*userId*/)
 {
 	QSet<int> ids;
 
-	if (!m_userDocuments.contains(userId)){
-		return -1;
+	// Collect model IDs from ALL users' documents to avoid collisions
+	// in single-copy mode where m_undoManagerObserver is shared globally.
+	for (auto userIt = m_userDocuments.constBegin(); userIt != m_userDocuments.constEnd(); ++userIt){
+		for (auto docIt = userIt.value().constBegin(); docIt != userIt.value().constEnd(); ++docIt){
+			ids += docIt.value().undoManagerModelId;
+		}
 	}
 
-	WorkingDocumentList& documents = m_userDocuments[userId];
-	for (const QByteArray& documentId : documents.keys()){
-		ids += m_userDocuments[userId][documentId].undoManagerModelId;
+	// Also include model IDs from shared documents
+	for (auto it = m_sharedDocuments.constBegin(); it != m_sharedDocuments.constEnd(); ++it){
+		ids += it.value().undoManagerModelId;
 	}
 
 	int retVal = 0;

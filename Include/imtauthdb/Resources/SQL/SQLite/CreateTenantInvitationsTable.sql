@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS "TenantInvitations" (
 	"Id" TEXT PRIMARY KEY,
 	"UserId" TEXT NOT NULL,
 	"TenantId" TEXT NOT NULL,
-	"Role" INTEGER NOT NULL,
+	"Role" TEXT NOT NULL,
 	"Status" INTEGER NOT NULL,
 	"InvitedByUserId" TEXT NOT NULL,
 	"CreatedAt" TEXT NOT NULL,

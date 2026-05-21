@@ -58,7 +58,7 @@ class QProperty {
     get(){
         if(!this.completed){
             this.update()
-        }   
+        }
         return this.value
     }
 

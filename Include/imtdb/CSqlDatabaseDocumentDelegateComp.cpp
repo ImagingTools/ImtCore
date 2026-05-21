@@ -796,7 +796,7 @@ bool CSqlDatabaseDocumentDelegateComp::ClearDependentMetaInfo(const MetaFieldCle
 
 	QStringList quotedIds;
 	for (const QByteArray& id : metaInfo.objectIds) {
-		QString escapedId = QString(id).replace("'", "''");
+		QString escapedId = SqlEncode(QString(id));
 		quotedIds << QString("'%1'").arg(escapedId);
 	}
 
@@ -1555,8 +1555,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(
 	const QByteArray driverId = m_databaseEngineCompPtr->GetDatabaseDriverId().toUpper();
 	const bool isSQLite = (driverId == "QSQLITE");
 
-	QString escapedTextFilter = textFilter;
-	escapedTextFilter.replace("'", "''");
+	QString escapedTextFilter = SqlEncode(textFilter);
 
 	const QString likePattern = QString("%%1%").arg(escapedTextFilter);
 

@@ -57,6 +57,8 @@ public:
 		I_ASSIGN(m_useCompressorAttrPtr, "UseCompressor", "If enable, use ZIP-compression for import/export of objects", true, true);
 		I_ASSIGN(m_editCommandLabelAttrPtr, "EditCommandLabel", "Label of the edit command", true, "Edit");
 		I_ASSIGN(m_editCommandDescriptionAttrPtr, "EditCommandDescription", "Description of the edit command", true, "Edit existing object");
+		I_ASSIGN(m_maxLengthRevisionCommentAttrPtr, "MaxLengthRevisionComment", "Maximum length of the revision comment when saving document", true, 1000);
+		I_ASSIGN(m_maxLengthCommentAttrPtr, "MaxLengthComment", "Maximum length of the document comment", true, 1000);
 	I_END_COMPONENT;
 
 	CDocumentCollectionViewDelegateComp();
@@ -177,6 +179,8 @@ protected:
 	*/
 	I_REF(idoc::IDocumentManager, m_documentManagerCompPtr);
 	I_REF(imod::IModel, m_documentManagerModelCompPtr);
+	I_ATTR(int, m_maxLengthRevisionCommentAttrPtr);
+	I_ATTR(int, m_maxLengthCommentAttrPtr);
 
 private:
 	/**

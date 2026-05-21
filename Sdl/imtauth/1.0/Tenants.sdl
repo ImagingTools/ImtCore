@@ -42,9 +42,11 @@ type TenantMemberRoleEntry {
 	role: String!
 }
 
-type TenantRoleOption {
-	id: String!
+type TenantPermissionOption {
+	id: ID!
 	name: String!
+	description: String
+	children: [TenantPermissionOption]
 }
 
 type TenantInvitationEntry {
@@ -64,6 +66,7 @@ type TenantData {
 	name: String
 	description: String
 	ownerId: ID
+	creatorId: ID
 	isActive: Boolean
 	createdAt: String
 	updatedAt: String
@@ -71,7 +74,8 @@ type TenantData {
 	members: [TenantMemberEntry]
 	memberRoles: [TenantMemberRoleEntry]
 	pendingInvitations: [TenantInvitationEntry]
-	availableRoles: [TenantRoleOption]
+	tenantPermissions: [ID]
+	allProductPermissions: [TenantPermissionOption]
 }
 
 input GetTenantListInput {
@@ -127,6 +131,7 @@ input UpdateTenantInput {
 	ownerId: ID
 	members: [TenantMemberEntryInput]
 	memberRoles: [MemberRoleEntryInput]
+	tenantPermissions: [ID]
 }
 
 type UpdateTenantPayload {
@@ -147,6 +152,15 @@ type SetTenantActivePayload {
 type GetTenantIdsPayload {
 	tenantIds: [ID]
 	errorMessage: String
+}
+
+# --- Tenant Environment Roles ---
+
+enum TenantEnvironmentRole {
+	Creator
+	Owner
+	Admin
+	Member
 }
 
 # --- Tenant Relationships ---

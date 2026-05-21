@@ -36,5 +36,6 @@
 	<file alias="imtguigql/RemoteCollectionViewDialog.qml">RemoteCollectionViewDialog.qml</file>
 	<file alias="imtguigql/SelectableCollectionEditor.qml">SelectableCollectionEditor.qml</file>
 	<file alias="imtguigql/FilterableSelectGqlDataProvider.qml">FilterableSelectGqlDataProvider.qml</file>
+	<file alias="imtguigql/GqlBasedTenantMembershipApiClient.qml">GqlBasedTenantMembershipApiClient.qml</file>
     </qresource>
 </RCC>

@@ -73,7 +73,6 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 	profileData.name = QString(userInfoPtr->GetName());
 	profileData.email = QString(userInfoPtr->GetMail());
 	profileData.username = QString(userInfoPtr->GetId());
-	profileData.organizations = CreateOrganizationList(objectId);
 
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
@@ -145,6 +144,29 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 }
 
 
+sdl::imtauth::Profile::CGetUserOrganizationsPayload CProfileControllerComp::OnGetUserOrganizations(
+			const sdl::imtauth::Profile::CGetUserOrganizationsGqlRequest& getUserOrganizationsRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
+{
+	sdl::imtauth::Profile::CGetUserOrganizationsPayload response;
+	response.Version_1_0.emplace();
+
+	sdl::imtauth::Profile::GetUserOrganizationsRequestArguments arguments = getUserOrganizationsRequest.GetRequestedArguments();
+
+	QByteArray userId;
+	if (arguments.input.Version_1_0.has_value() && arguments.input.Version_1_0->id){
+		userId = *arguments.input.Version_1_0->id;
+	}
+
+	if (!userId.isEmpty()){
+		response.Version_1_0->organizations = CreateOrganizationList(userId);
+	}
+
+	return response;
+}
+
+
 imtsdl::TElementList<sdl::imtauth::Profile::CProfileTenantInfo::V1_0> CProfileControllerComp::CreateOrganizationList(
 			const QByteArray& userId) const
 {
@@ -195,7 +217,7 @@ imtsdl::TElementList<sdl::imtauth::Profile::CProfileTenantInfo::V1_0> CProfileCo
 			organizationInfo.role = QStringLiteral("Owner");
 		}
 		else{
-			organizationInfo.role = TenantMembershipRoleToString(membershipPtr->GetRole());
+			organizationInfo.role = TenantMembershipRoleToString(membershipPtr->GetRoleId());
 		}
 
 		organizationList << organizationInfo;
@@ -205,18 +227,9 @@ imtsdl::TElementList<sdl::imtauth::Profile::CProfileTenantInfo::V1_0> CProfileCo
 }
 
 
-QString CProfileControllerComp::TenantMembershipRoleToString(imtauth::ITenantMembership::TenantMemberRole role) const
+QString CProfileControllerComp::TenantMembershipRoleToString(const QByteArray& roleId) const
 {
-	switch (role){
-		case imtauth::ITenantMembership::TMR_ADMIN:
-			return QStringLiteral("Admin");
-		case imtauth::ITenantMembership::TMR_MEMBER:
-			return QStringLiteral("Member");
-		case imtauth::ITenantMembership::TMR_GUEST:
-			return QStringLiteral("Guest");
-		default:
-			return QStringLiteral("Unknown");
-	}
+	return QString::fromUtf8(roleId);
 }
 
 

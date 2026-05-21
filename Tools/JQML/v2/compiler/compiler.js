@@ -1089,7 +1089,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
         if(tempInstruction.className === 'Loader'){
             isLoader = true
         }
-        if(tempInstruction.className === 'Loader' || tempInstruction.className === 'Repeater' || tempInstruction.className === 'ListView' || tempInstruction.className === 'GridView'){
+        if(tempInstruction.className === 'Loader' || tempInstruction.className === 'Repeater' || tempInstruction.className === 'ListView' || tempInstruction.className === 'GridView' || tempInstruction.className === 'Instantiator'){
             special = true
         }
         tempInstruction = tempInstruction.extends ? tempInstruction.extends.instructions : null
@@ -1107,7 +1107,6 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
 
     let updateAnchors = false
     let updateFont = false
-    let updateIcon = false
     // let updateList = []
     // let updatePrimaryList = []
 
@@ -1133,7 +1132,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
         }
 
         let pathName = property.name.split('.')
-        if(pathName[0] !== 'anchors' && pathName[0] !== 'font' && pathName[0] !== 'icon') continue
+        if(pathName[0] !== 'anchors' && pathName[0] !== 'font') continue
 
         for(let i = 0; i < pathName.length; i++){
             pathName[i] = `getStatement('${pathName[i]}')`
@@ -1215,10 +1214,6 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
             }
             if(!updateFont && property.name.split('.')[0] === 'font'){
                 updateFont = true
-                updatePrimaryList.push(`${currentInstructions.name}.${pathName[0]}.update()`)
-            }
-            if(!updateIcon && property.name.split('.')[0] === 'icon'){
-                updateIcon = true
                 updatePrimaryList.push(`${currentInstructions.name}.${pathName[0]}.update()`)
             }
             
@@ -1375,7 +1370,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
             } else {
                 if(property.val.className !== 'Component'){  
                     // TEMP !!!
-                    if((property.name === 'delegate' && (currentInstructions.className === 'MapItemView'|| currentInstructions.className === 'ListView'|| currentInstructions.className === 'GridView' || currentInstructions.className === 'Repeater')) || (property.name === 'sourceComponent' && currentInstructions.className === 'Loader')){
+                    if((property.name === 'delegate' && (currentInstructions.className === 'MapItemView'|| currentInstructions.className === 'ListView'|| currentInstructions.className === 'GridView' || currentInstructions.className === 'Repeater' || currentInstructions.className === 'Instantiator')) || (property.name === 'sourceComponent' && currentInstructions.className === 'Loader')){
                         code.push(`${currentInstructions.name}.$temp = new Component(${currentInstructions.name}, inCtx)`)
 
                         code.push(`${currentInstructions.name}.$temp.createObject=function(currParent,exCtx1=inCtx,exModel,forceUpdate=true,exCtx2=inCtx){`)

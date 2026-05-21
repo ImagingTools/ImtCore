@@ -30,6 +30,31 @@ RemoteCollectionView {
 		registerFieldFilterDelegate("tenantRelationFilter", tenantRelationDelegateFilterComp)
 	}
 
+	// --- Subscription for real-time invitation notifications ---
+	TenantMembershipSubscriptionClient {
+		id: collectionMembershipSubscription
+
+		onInvitationReceived: {
+			// New invitation received -> refresh the collection to show it
+			container.doUpdateGui()
+		}
+
+		onInvitationAccepted:{
+			// Invitation accepted -> refresh to update relation scope
+			container.doUpdateGui()
+		}
+
+		onInvitationRejected:{
+			// Invitation rejected -> refresh to update relation scope
+			container.doUpdateGui()
+		}
+
+		onOwnershipTransferred: {
+			// Ownership transferred -> refresh to update owner column
+			container.doUpdateGui()
+		}
+	}
+
 	onHeadersChanged: {
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_membersCount, membersCountCellDelegateComp)
 		table.setColumnContentById(TenantItemDataTypeMetaInfo.s_ownerId, ownerIdCellDelegateComp)
@@ -140,7 +165,7 @@ RemoteCollectionView {
 				closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
 				background: Rectangle {
-					color: Style.panelColor
+					color: Style.baseColor
 					border.color: Style.borderColor
 					border.width: 1
 					radius: Style.radiusM
@@ -381,6 +406,7 @@ RemoteCollectionView {
 
 				TenantEditor {
 					id: tenantEditor
+					apiClient: tenantEditorApiClient
 					commandsControllerComp: Component {
 						GqlBasedCommandsController {
 							typeId: "Tenant"
@@ -393,6 +419,13 @@ RemoteCollectionView {
 								tenantEditor.representationController.updateRepresentationFromDocument()
 							}
 						}
+					}
+
+					// Concrete GQL transport injected from this view (imtguigql is
+					// already a dependency here); TenantEditor itself stays
+					// transport-agnostic.
+					GqlBasedTenantMembershipApiClient {
+						id: tenantEditorApiClient
 					}
 				}
 			}

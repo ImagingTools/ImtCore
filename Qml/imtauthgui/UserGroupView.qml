@@ -11,7 +11,7 @@ import imtbaseComplexCollectionFilterSdl 1.0
 
 ViewBase {
 	id: container;
-
+	contentColor: Style.baseColor
 	property GroupData groupData: model;
 	property string productId;
 

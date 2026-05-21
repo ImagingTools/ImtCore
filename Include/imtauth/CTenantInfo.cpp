@@ -6,6 +6,7 @@
 #include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
+#include <iser/CPrimitiveTypesSerializer.h>
 
 
 namespace imtauth
@@ -82,6 +83,22 @@ void CTenantInfo::SetOwnerId(const QByteArray& ownerId)
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_ownerId = ownerId;
+	}
+}
+
+
+QByteArray CTenantInfo::GetCreatorId() const
+{
+	return m_creatorId;
+}
+
+
+void CTenantInfo::SetCreatorId(const QByteArray& creatorId)
+{
+	if (m_creatorId != creatorId){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_creatorId = creatorId;
 	}
 }
 
@@ -174,6 +191,22 @@ bool CTenantInfo::RemoveRelationship(const QByteArray& relationshipId)
 }
 
 
+QByteArrayList CTenantInfo::GetTenantPermissions() const
+{
+	return m_tenantPermissions;
+}
+
+
+void CTenantInfo::SetTenantPermissions(const QByteArrayList& permissions)
+{
+	if (m_tenantPermissions != permissions){
+		istd::CChangeNotifier notifier(this);
+
+		m_tenantPermissions = permissions;
+	}
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CTenantInfo::Serialize(iser::IArchive& archive)
@@ -201,6 +234,11 @@ bool CTenantInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.BeginTag(ownerIdTag);
 	retVal = retVal && archive.Process(m_ownerId);
 	retVal = retVal && archive.EndTag(ownerIdTag);
+
+	iser::CArchiveTag creatorIdTag("CreatorId", "Creator ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(creatorIdTag);
+	retVal = retVal && archive.Process(m_creatorId);
+	retVal = retVal && archive.EndTag(creatorIdTag);
 
 	iser::CArchiveTag isActiveTag("IsActive", "Is active", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(isActiveTag);
@@ -267,6 +305,8 @@ bool CTenantInfo::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.EndTag(relationshipsTag);
 	}
 
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_tenantPermissions, "TenantPermissions", "TenantPermission");
+
 	return retVal;
 }
 
@@ -283,10 +323,12 @@ bool CTenantInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/
 		m_name = sourcePtr->m_name;
 		m_description = sourcePtr->m_description;
 		m_ownerId = sourcePtr->m_ownerId;
+		m_creatorId = sourcePtr->m_creatorId;
 		m_isActive = sourcePtr->m_isActive;
 		m_createdAt = sourcePtr->m_createdAt;
 		m_updatedAt = sourcePtr->m_updatedAt;
 		m_relationships = sourcePtr->m_relationships;
+		m_tenantPermissions = sourcePtr->m_tenantPermissions;
 
 		return true;
 	}
@@ -314,10 +356,12 @@ bool CTenantInfo::ResetData(CompatibilityMode /*mode*/)
 	m_name.clear();
 	m_description.clear();
 	m_ownerId.clear();
+	m_creatorId.clear();
 	m_isActive = true;
 	m_createdAt.clear();
 	m_updatedAt.clear();
 	m_relationships.clear();
+	m_tenantPermissions.clear();
 
 	return true;
 }

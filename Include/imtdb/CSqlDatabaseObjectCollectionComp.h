@@ -49,6 +49,7 @@ public:
 		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Meta-info creator", false, "MetaInfoCreator");
 		I_ASSIGN(m_databaseAccessSettingsCompPtr, "DatabaseAccessSettings", "Database access settings", false, "DatabaseAccessSettings");
 		I_ASSIGN(m_collectionDataControllerCompPtr, "CollectionDataController", "Data export/import controller for the collection", false, "DataController");
+		I_ASSIGN(m_maxLengthCommentAttrPtr, "MaxLengthComment", "Maximum length of the document comment", true, 1000);
 	I_END_COMPONENT;
 
 	CSqlDatabaseObjectCollectionComp();
@@ -152,6 +153,7 @@ private:
 	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
 	I_REF(imtdb::IDatabaseLoginSettings, m_databaseAccessSettingsCompPtr);
 	I_REF(imtbase::ICollectionDataController, m_collectionDataControllerCompPtr);
+	I_ATTR(int, m_maxLengthCommentAttrPtr);
 
 	imtbase::TModelUpdateBinder<imtdb::IDatabaseLoginSettings, CSqlDatabaseObjectCollectionComp> m_databaseAccessObserver;
 

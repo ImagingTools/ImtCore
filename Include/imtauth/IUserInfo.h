@@ -25,6 +25,7 @@ public:
 		MIT_SYSTEM_ID,
 		MIT_SYSTEM_NAME,
 		MIT_PASSWORD_HASH,
+		MIT_SID
 	};
 
 	struct SystemInfo
@@ -55,6 +56,16 @@ public:
 		Set password hash of the user.
 	*/
 	virtual void SetPasswordHash(const QByteArray& passwordHash) = 0;
+
+	/**
+		Get Windows SID of the user.
+	*/
+	virtual QByteArray GetSid() const = 0;
+
+	/**
+		Set Windows SID of the user.
+	*/
+	virtual void SetSid(const QByteArray& sid) = 0;
 
 	/**
 		Get e-mail of the user.

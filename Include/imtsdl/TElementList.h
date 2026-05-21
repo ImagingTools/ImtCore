@@ -57,10 +57,8 @@ inline void TElementList<T>::FromList(const QList<T>& source)
 {
 	this->clear();
 
-	for (const istd::TSharedNullable<T>& element: source){
-		if (element){
-			this->append(*element);
-		}
+	for (const T& element: source){
+		this->append(istd::TSharedNullable<T>(element));
 	}
 }
 

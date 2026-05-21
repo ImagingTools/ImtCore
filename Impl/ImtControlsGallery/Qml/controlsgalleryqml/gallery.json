@@ -1,0 +1,8 @@
+{
+    "includes": [
+        "${IMTCOREDIR}/Qml/web/imtcore.json",
+        "${IMTCOREDIR}/Impl/ImtControlsGallery/AuxInclude/${TARGETNAME}/GeneratedFiles/controlsgallerysdl/SDL/1.0/QML/generation_info.json"
+    ],
+    "dirs": [
+    ]
+}

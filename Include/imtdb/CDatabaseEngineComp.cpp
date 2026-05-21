@@ -418,6 +418,8 @@ QSqlDatabase CDatabaseEngineComp::InitDatabase(const QByteArray& databaseDriverT
 
 void CDatabaseEngineComp::OnComponentCreated()
 {
+	m_shuttingDown = false;
+
 	BaseClass::OnComponentCreated();
 
 	if (m_databaseAccessSettingsCompPtr.IsValid()){
@@ -431,6 +433,8 @@ void CDatabaseEngineComp::OnComponentCreated()
 
 void CDatabaseEngineComp::OnComponentDestroyed()
 {
+	m_shuttingDown = true;
+
 	m_databaseAccessObserver.UnregisterAllObjects();
 
 	BaseClass::OnComponentDestroyed();
@@ -632,14 +636,23 @@ QString CDatabaseEngineComp::GetDatabasePath() const
 	if (m_databaseAccessSettingsCompPtr.IsValid()){
 		return m_databaseAccessSettingsCompPtr->GetDatabasePath();
 	}
+	else{
+		SendInfoMessageOnce(0, QObject::tr("Database settings were not set. Use default database configuration"));
+
+	}
 
 	if (!m_dbFilePathCompPtr.IsValid()){
 		SendErrorMessage(0, QObject::tr("Database file path incorrect"));
 
 		return QString();
 	}
+	else{
+		QString databaseFilePath = m_dbFilePathCompPtr->GetPath();
 
-	return m_dbFilePathCompPtr->GetPath();
+		SendInfoMessageOnce(0, QObject::tr("Use database file: %1").arg(databaseFilePath));
+
+		return databaseFilePath;
+	}
 }
 
 
@@ -792,6 +805,10 @@ bool CDatabaseEngineComp::ExecuteTransaction(const QByteArray& sqlQuery) const
 
 void CDatabaseEngineComp::OnThreadFinished()
 {
+	if (m_shuttingDown){
+		return;
+	}
+
 	QString connectionName = GetConnectionName();
 
 	QSqlDatabase::removeDatabase(connectionName);
