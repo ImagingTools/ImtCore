@@ -128,13 +128,16 @@ Item {
 					anchors.verticalCenter: content.verticalCenter;
 					font.pixelSize: Style.fontSizeXXL;
 					font.family: Style.fontFamily;
-					color: Style.titleColor;
+					font.underline: model.index < headersModel.count - 1 && headerItemMA.containsMouse
+					color: model.index < headersModel.count - 1 && headerItemMA.containsMouse ? Style.linkColor : Style.titleColor;
 					text: model.name;
 				}
 			}
 
 			MouseArea {
+				id: headerItemMA
 				anchors.fill: parent;
+				hoverEnabled: true
 				cursorShape: model.index < headersModel.count - 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
 				onClicked: {
 					if (model.index < headersModel.count - 1) {

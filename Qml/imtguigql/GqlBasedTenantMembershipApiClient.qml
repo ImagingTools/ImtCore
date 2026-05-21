@@ -286,14 +286,20 @@ QtObject {
 	}
 
 	function setMemberRole(tenantId, userId, role) {
-		// Not yet wired to a GQL endpoint server-side; emit signal so UI can react if needed.
-		root.memberRoleChanged(userId, role)
+		// First we need to find the membership to get its ID
+		root.__pendingChangeRoleUserId = userId
+		root.__pendingChangeRoleNewRole = role
+		root.__findMembershipForRoleInput.m_userId = userId
+		root.__findMembershipForRoleInput.m_tenantId = tenantId
+		root.__findMembershipForRoleSender.send(root.__findMembershipForRoleInput)
 	}
 
 	function removeMember(tenantId, userId) {
-		// Local removal is handled in the state manager; this hook exists for future
-		// server-side membership removal endpoints.
-		root.memberRemoved(userId)
+		// First find the membership to get its ID, then remove it
+		root.__pendingRemoveMemberUserId = userId
+		root.__findMembershipForRemoveInput.m_userId = userId
+		root.__findMembershipForRemoveInput.m_tenantId = tenantId
+		root.__findMembershipForRemoveSender.send(root.__findMembershipForRemoveInput)
 	}
 
 	function insertRole(name, description) {
@@ -393,6 +399,89 @@ QtObject {
 	}
 
 	// --- Internal parse helpers ---
+
+	// --- Membership operations (FindMembership → RemoveMembership / UpdateMembershipRole) ---
+	property string __pendingRemoveMemberUserId: ""
+	property string __pendingChangeRoleUserId: ""
+	property string __pendingChangeRoleNewRole: ""
+
+	property FindMembershipInput __findMembershipForRemoveInput: FindMembershipInput {}
+	property GqlSdlRequestSender __findMembershipForRemoveSender: GqlSdlRequestSender {
+		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_findMembership
+
+		sdlObjectComp: Component {
+			FindMembershipPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else if (m_membership && m_membership.m_id) {
+						root.__removeMembershipInput.m_membershipId = m_membership.m_id
+						root.__removeMembershipSender.send(root.__removeMembershipInput)
+					}
+				}
+			}
+		}
+	}
+
+	property FindMembershipInput __findMembershipForRoleInput: FindMembershipInput {}
+	property GqlSdlRequestSender __findMembershipForRoleSender: GqlSdlRequestSender {
+		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_findMembership
+
+		sdlObjectComp: Component {
+			FindMembershipPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else if (m_membership && m_membership.m_id) {
+						root.__updateMembershipRoleInput.m_membershipId = m_membership.m_id
+						root.__updateMembershipRoleInput.m_role = root.__pendingChangeRoleNewRole
+						root.__updateMembershipRoleSender.send(root.__updateMembershipRoleInput)
+					}
+				}
+			}
+		}
+	}
+
+	property RemoveMembershipInput __removeMembershipInput: RemoveMembershipInput {}
+	property GqlSdlRequestSender __removeMembershipSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_removeMembership
+
+		sdlObjectComp: Component {
+			RemoveMembershipPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.memberRemoved(root.__pendingRemoveMemberUserId)
+					}
+				}
+			}
+		}
+	}
+
+	property UpdateMembershipRoleInput __updateMembershipRoleInput: UpdateMembershipRoleInput {}
+	property GqlSdlRequestSender __updateMembershipRoleSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_updateMembershipRole
+
+		sdlObjectComp: Component {
+			UpdateMembershipRolePayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.memberRoleChanged(root.__pendingChangeRoleUserId, root.__pendingChangeRoleNewRole)
+					}
+				}
+			}
+		}
+	}
+
 	function __handleRoleDataReceived(objectDataJson) {
 		if (!objectDataJson)
 			return

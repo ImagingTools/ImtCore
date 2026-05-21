@@ -170,7 +170,7 @@ ViewBase {
 		width: Math.min(parent.width - Style.marginXL * 2, 1000)
 		visible: rolesStackView.currentIndex === 0
 		text: qsTr("Manage tenant roles and assign permissions to team members.")
-		font.pixelSize: Style.fontSizeS
+		font.pixelSize: Style.fontSizeM
 		color: Style.inactiveTextColor
 	}
 	
@@ -281,9 +281,25 @@ ViewBase {
 					}
 				}
 				
+				Item {
+					id: rolesEmptyState
+					visible: rolesDataProvider.items.length === 0
+					anchors.top: rolesTableHeader.bottom
+					anchors.left: parent.left
+					anchors.right: parent.right
+					height: visible ? Style.controlHeightL + Style.marginL : 0
+					
+					BaseText {
+						anchors.centerIn: parent
+						text: qsTr("No roles found.")
+						font.pixelSize: Style.fontSizeM
+						color: Style.inactiveTextColor
+					}
+				}
+				
 				ListView {
 					id: rolesListView2
-					anchors.top: rolesTableHeader.bottom
+					anchors.top: rolesEmptyState.visible ? rolesEmptyState.bottom : rolesTableHeader.bottom
 					anchors.left: parent.left
 					anchors.right: parent.right
 					anchors.bottom: parent.bottom
@@ -422,13 +438,6 @@ ViewBase {
 						}
 					}
 					
-					BaseText {
-						visible: rolesListView2.count === 0
-						anchors.centerIn: parent
-						text: qsTr("No roles found.")
-						font.pixelSize: Style.fontSizeM
-						color: Style.inactiveTextColor
-					}
 				}
 				
 				CustomScrollbar {
@@ -445,7 +454,10 @@ ViewBase {
 	function __saveCurrentEditor() {
 		var page = rolesStackView.currentPage()
 		if (!page) return
-		var editorView = page.children[0]
+		// Editor is nested: page > Item wrapper > RoleView
+		var wrapper = page.children[0]
+		if (!wrapper) return
+		var editorView = wrapper.children[0]
 		if (!editorView || !editorView.updateModel) return
 		editorView.updateModel()
 		var roleData = editorView.model
@@ -463,6 +475,9 @@ ViewBase {
 		}
 		rolesStackViewHeader.popHeader()
 		rolesStackView.previous()
+		// Remove editor pages to clean up
+		while (rolesStackView.count > 1)
+			rolesStackView.removePage(rolesStackView.count - 1)
 	}
 	
 	function __openEditRole(itemId, itemName, itemDescription) {
@@ -483,18 +498,21 @@ ViewBase {
 		id: roleEditorView
 		
 		Item {
-			RoleView {
-				id: createRoleView
+			Item {
 				anchors.top: parent.top
 				anchors.bottom: parent.bottom
 				anchors.left: parent.left
 				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
-				commandsPanelVisible: false
 				
-				Component.onCompleted: {
-					createRoleView.model = rolesPage.roleDataFactory ? rolesPage.roleDataFactory() : null
-					createRoleView.updateGui()
+				RoleView {
+					id: createRoleView
+					commandsPanelVisible: false
+					
+					Component.onCompleted: {
+						createRoleView.model = rolesPage.roleDataFactory ? rolesPage.roleDataFactory() : null
+						createRoleView.updateGui()
+					}
 				}
 			}
 		}
@@ -504,40 +522,43 @@ ViewBase {
 		id: roleEditView
 		
 		Item {
-			RoleView {
-				id: editRoleView
+			Item {
 				anchors.top: parent.top
 				anchors.bottom: parent.bottom
 				anchors.left: parent.left
 				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
-				commandsPanelVisible: false
 				
-				Component.onCompleted: {
-					var roleData = rolesPage.roleDataFactory ? rolesPage.roleDataFactory() : null
-					if (roleData) {
-						roleData.m_id = rolesPage.__editRoleId
-						roleData.m_name = rolesPage.__editRoleName
-						roleData.m_description = rolesPage.__editRoleDescription
+				RoleView {
+					id: editRoleView
+					commandsPanelVisible: false
+					
+					Component.onCompleted: {
+						var roleData = rolesPage.roleDataFactory ? rolesPage.roleDataFactory() : null
+						if (roleData) {
+							roleData.m_id = rolesPage.__editRoleId
+							roleData.m_name = rolesPage.__editRoleName
+							roleData.m_description = rolesPage.__editRoleDescription
+						}
+						editRoleView.model = roleData
+						editRoleView.updateGui()
 					}
-					editRoleView.model = roleData
-					editRoleView.updateGui()
-				}
-				
-				Connections {
-					target: rolesPage.stateManager
-					function onReceivedRoleDataChanged() {
-						if (rolesPage.stateManager
-								&& rolesPage.stateManager.receivedRoleData
-								&& rolesPage.__editRoleId) {
-							var roleData = rolesPage.roleDataFactory ? rolesPage.roleDataFactory() : null
-							if (roleData) {
-								roleData.m_id = rolesPage.__editRoleId
-								roleData.m_name = rolesPage.stateManager.receivedRoleData.name || rolesPage.__editRoleName
-								roleData.m_description = rolesPage.stateManager.receivedRoleData.description || rolesPage.__editRoleDescription
+					
+					Connections {
+						target: rolesPage.stateManager
+						function onReceivedRoleDataChanged() {
+							if (rolesPage.stateManager
+									&& rolesPage.stateManager.receivedRoleData
+									&& rolesPage.__editRoleId) {
+								var roleData = rolesPage.roleDataFactory ? rolesPage.roleDataFactory() : null
+								if (roleData) {
+									roleData.m_id = rolesPage.__editRoleId
+									roleData.m_name = rolesPage.stateManager.receivedRoleData.name || rolesPage.__editRoleName
+									roleData.m_description = rolesPage.stateManager.receivedRoleData.description || rolesPage.__editRoleDescription
+								}
+								editRoleView.model = roleData
+								editRoleView.updateGui()
 							}
-							editRoleView.model = roleData
-							editRoleView.updateGui()
 						}
 					}
 				}

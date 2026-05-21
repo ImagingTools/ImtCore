@@ -46,6 +46,15 @@ ViewBase {
 			if (membersPage.stateManager && membersPage.tenantData)
 				membersPage.stateManager.loadMembersFromModel()
 		}
+		function onMemberRemoved(userId) {
+			if (membersPage.stateManager)
+				membersPage.stateManager.removeMemberById(userId)
+		}
+		function onMemberRoleChanged(userId, role) {
+			// Refresh data from server after role change
+			if (membersPage.representationController)
+				membersPage.representationController.updateRepresentationFromDocument()
+		}
 	}
 	
 	StackViewHeader {
@@ -101,16 +110,42 @@ ViewBase {
 								function(result) {
 									if (result === Enums.yes && membersPage.apiClient) {
 										var ids = membersPage.__selectionManager.selectedIds.slice()
+										var tenantId = membersPage.tenantData ? membersPage.tenantData.m_id : ""
 										for (var i = 0; i < ids.length; i++) {
 											if (ids[i].indexOf("inv_") === 0)
 												membersPage.apiClient.revokeInvitation(ids[i].substring(4))
 											else
-												membersPage.apiClient.removeUser(ids[i])
+												membersPage.apiClient.removeMember(tenantId, ids[i])
 										}
 										membersPage.__selectionManager.clear()
 									}
 								}
 								)
+				}
+			}
+		}
+		
+		Text {
+			text: qsTr("Edit")
+			font.pixelSize: Style.fontSizeM
+			font.bold: true
+			color: membersPage.__selectionManager && membersPage.__selectionManager.selectedIds.length === 1 && membersPage.__selectionManager.selectedIds[0].indexOf("inv_") !== 0 ? Style.linkColor : Style.inactiveTextColor
+			opacity: membersPage.__selectionManager && membersPage.__selectionManager.selectedIds.length === 1 && membersPage.__selectionManager.selectedIds[0].indexOf("inv_") !== 0 ? 1.0 : 0.5
+			
+			MouseArea {
+				anchors.fill: parent
+				hoverEnabled: true
+				cursorShape: membersPage.__selectionManager && membersPage.__selectionManager.selectedIds.length === 1 && membersPage.__selectionManager.selectedIds[0].indexOf("inv_") !== 0 ? Qt.PointingHandCursor : Qt.ArrowCursor
+				enabled: membersPage.__selectionManager && membersPage.__selectionManager.selectedIds.length === 1 && membersPage.__selectionManager.selectedIds[0].indexOf("inv_") !== 0
+				onClicked: {
+					var selId = membersPage.__selectionManager.selectedIds[0]
+					var members = membersPage.stateManager ? membersPage.stateManager.pendingMembers : []
+					for (var i = 0; i < members.length; i++) {
+						if (members[i].id === selId) {
+							membersPage.__openEditMember(selId, members[i].name || selId)
+							break
+						}
+					}
 				}
 			}
 		}
@@ -171,7 +206,7 @@ ViewBase {
 		width: Math.min(parent.width - Style.marginXL * 2, 1000)
 		visible: membersStackView.currentIndex === 0
 		text: qsTr("Manage tenant members. Users created here automatically become members.")
-		font.pixelSize: Style.fontSizeS
+		font.pixelSize: Style.fontSizeM
 		color: Style.inactiveTextColor
 	}
 	
@@ -293,6 +328,11 @@ ViewBase {
 									memberActionMenu.targetUserName = userName
 									memberActionMenu.popup()
 								}
+								
+								onMemberEditRequested: {
+									if (membersPage.__canManage)
+										membersPage.__openEditMember(userId, userName)
+								}
 							}
 						}
 						
@@ -381,16 +421,26 @@ ViewBase {
 												qsTr("Remove Member"),
 												qsTr("Are you sure you want to remove \"%1\"?").arg(memberActionMenu.targetUserName),
 												function(result) {
-													if (result === Enums.yes)
-														membersPage.apiClient.removeUser(memberActionMenu.targetUserId)
+													if (result === Enums.yes) {
+														var tenantId = membersPage.tenantData ? membersPage.tenantData.m_id : ""
+														membersPage.apiClient.removeMember(tenantId, memberActionMenu.targetUserId)
+													}
 												}
 												)
 								} else if (action === "changeRole" && membersPage.apiClient) {
-									membersPage.apiClient.changeMemberRole(memberActionMenu.targetUserId)
+									var tenantId = membersPage.tenantData ? membersPage.tenantData.m_id : ""
+									// Show role selection dialog
+									ModalDialogManager.openDialog(roleSelectDialogComp, {
+										"targetUserId": memberActionMenu.targetUserId,
+										"targetUserName": memberActionMenu.targetUserName,
+										"tenantId": tenantId
+									})
 								} else if (action === "transfer" && membersPage.apiClient) {
-									membersPage.apiClient.transferOwnership(memberActionMenu.targetUserId)
+									var tid = membersPage.tenantData ? membersPage.tenantData.m_id : ""
+									membersPage.apiClient.transferOwnership(tid, memberActionMenu.targetUserId)
 								} else if (action === "leave" && membersPage.apiClient) {
-									membersPage.apiClient.removeUser(memberActionMenu.targetUserId)
+									var ltid = membersPage.tenantData ? membersPage.tenantData.m_id : ""
+									membersPage.apiClient.removeMember(ltid, memberActionMenu.targetUserId)
 								}
 							}
 						}
@@ -421,42 +471,6 @@ ViewBase {
 						onObjectAdded: inviteActionMenu.insertItem(index, object)
 						onObjectRemoved: inviteActionMenu.removeItem(object)
 					}
-				}
-			}
-		}
-	}
-	
-	function __saveCurrentEditor() {
-		var page = membersStackView.currentPage()
-		if (!page) return
-		var editorView = page.children[0]
-		if (!editorView || !editorView.updateModel) return
-		editorView.updateModel()
-		var userData = editorView.model
-		if (membersPage.apiClient)
-			membersPage.apiClient.insertUser(
-						userData ? userData.m_name : "",
-						userData ? userData.m_description : "")
-		membersStackViewHeader.popHeader()
-		membersStackView.previous()
-	}
-	
-	Component {
-		id: userEditorView
-		
-		Item {
-			UserView {
-				id: createUserView
-				anchors.top: parent.top
-				anchors.bottom: parent.bottom
-				anchors.left: parent.left
-				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
-				width: Math.min(parent.width - Style.marginXL * 2, 1000)
-				commandsPanelVisible: false
-				
-				Component.onCompleted: {
-					createUserView.model = membersPage.userDataFactory ? membersPage.userDataFactory() : null
-					createUserView.updateGui()
 				}
 			}
 		}
@@ -494,6 +508,170 @@ ViewBase {
 				if (membersPage.stateManager && membersPage.stateManager.__membersModifiedLocally) {
 					membersPage.doUpdateModel()
 					membersPage.stateManager.__membersModifiedLocally = false
+				}
+			}
+		}
+	}
+	
+	// ===== Edit member =====
+	property string __editMemberId: ""
+	property string __editMemberName: ""
+	property bool __isCreatingUser: true
+	
+	function __openEditMember(userId, userName) {
+		membersPage.__editMemberId = userId
+		membersPage.__editMemberName = userName
+		membersPage.__isCreatingUser = false
+		while (membersStackView.count > 1)
+			membersStackView.removePage(membersStackView.count - 1)
+		membersStackViewHeader.addHeader("edit_member", userName || qsTr("Edit Member"))
+		membersStackView.addPage(userEditView)
+		membersStackView.next()
+		if (membersPage.apiClient)
+			membersPage.apiClient.getUserData(userId)
+	}
+	
+	function __saveCurrentEditor() {
+		var page = membersStackView.currentPage()
+		if (!page) return
+		var editorView = page.children[0]
+		if (!editorView || !editorView.updateModel) return
+		editorView.updateModel()
+		var userData = editorView.model
+		if (membersPage.__isCreatingUser) {
+			if (membersPage.apiClient)
+				membersPage.apiClient.insertUser(
+							userData ? userData.m_name : "",
+							userData ? userData.m_description : "")
+		} else {
+			if (membersPage.apiClient)
+				membersPage.apiClient.setUserData(
+							membersPage.__editMemberId,
+							userData ? userData.m_name : "",
+							userData ? userData.m_description : "")
+		}
+		membersStackViewHeader.popHeader()
+		membersStackView.previous()
+	}
+	
+	Component {
+		id: userEditorView
+		
+		Item {
+			UserView {
+				id: createUserView
+				anchors.top: parent.top
+				anchors.bottom: parent.bottom
+				anchors.left: parent.left
+				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
+				width: Math.min(parent.width - Style.marginXL * 2, 1000)
+				commandsPanelVisible: false
+				
+				Component.onCompleted: {
+					membersPage.__isCreatingUser = true
+					createUserView.model = membersPage.userDataFactory ? membersPage.userDataFactory() : null
+					createUserView.updateGui()
+				}
+			}
+		}
+	}
+	
+	Component {
+		id: userEditView
+		
+		Item {
+			UserView {
+				id: editUserView
+				anchors.top: parent.top
+				anchors.bottom: parent.bottom
+				anchors.left: parent.left
+				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
+				width: Math.min(parent.width - Style.marginXL * 2, 1000)
+				commandsPanelVisible: false
+				
+				Component.onCompleted: {
+					var userData = membersPage.userDataFactory ? membersPage.userDataFactory() : null
+					if (userData) {
+						userData.m_id = membersPage.__editMemberId
+						userData.m_name = membersPage.__editMemberName
+					}
+					editUserView.model = userData
+					editUserView.updateGui()
+				}
+				
+				Connections {
+					target: membersPage.stateManager
+					function onReceivedUserDataChanged() {
+						if (membersPage.stateManager
+								&& membersPage.stateManager.receivedUserData
+								&& membersPage.__editMemberId) {
+							var userData = membersPage.userDataFactory ? membersPage.userDataFactory() : null
+							if (userData) {
+								userData.m_id = membersPage.__editMemberId
+								userData.m_name = membersPage.stateManager.receivedUserData.name || membersPage.__editMemberName
+								userData.m_description = membersPage.stateManager.receivedUserData.description || ""
+							}
+							editUserView.model = userData
+							editUserView.updateGui()
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	// ===== Role selection dialog for Change Environment Role =====
+	Component {
+		id: roleSelectDialogComp
+		
+		ModalDialog {
+			id: roleSelectDialog
+			property string targetUserId: ""
+			property string targetUserName: ""
+			property string tenantId: ""
+			
+			title: qsTr("Change Environment Role for \"%1\"").arg(targetUserName)
+			width: 300
+			height: roleSelectColumn.height + Style.marginXL * 2
+			
+			Column {
+				id: roleSelectColumn
+				anchors.centerIn: parent
+				spacing: Style.marginM
+				width: parent.width - Style.marginXL * 2
+				
+				Repeater {
+					model: ["Member", "Admin"]
+					delegate: Rectangle {
+						width: roleSelectColumn.width
+						height: Style.controlHeightL
+						radius: Style.radiusM
+						color: roleOptionMA.containsMouse ? Style.buttonHoverColor : Style.baseColor
+						border.color: Style.borderColor
+						border.width: 1
+						
+						BaseText {
+							anchors.centerIn: parent
+							text: modelData
+							font.pixelSize: Style.fontSizeM
+						}
+						
+						MouseArea {
+							id: roleOptionMA
+							anchors.fill: parent
+							hoverEnabled: true
+							cursorShape: Qt.PointingHandCursor
+							onClicked: {
+								if (membersPage.apiClient) {
+									membersPage.apiClient.setMemberRole(
+										roleSelectDialog.tenantId,
+										roleSelectDialog.targetUserId,
+										modelData)
+								}
+								roleSelectDialog.close()
+							}
+						}
+					}
 				}
 			}
 		}

@@ -169,7 +169,7 @@ ViewBase {
 		width: Math.min(parent.width - Style.marginXL * 2, 1000)
 		visible: groupsStackView.currentIndex === 0
 		text: qsTr("Organize members into groups for easier permission management.")
-		font.pixelSize: Style.fontSizeS
+		font.pixelSize: Style.fontSizeM
 		color: Style.inactiveTextColor
 	}
 	
@@ -279,9 +279,25 @@ ViewBase {
 					}
 				}
 				
+				Item {
+					id: groupsEmptyState
+					visible: groupsDataProvider.items.length === 0
+					anchors.top: groupsTableHeader.bottom
+					anchors.left: parent.left
+					anchors.right: parent.right
+					height: visible ? Style.controlHeightL + Style.marginL : 0
+					
+					BaseText {
+						anchors.centerIn: parent
+						text: qsTr("No groups found.")
+						font.pixelSize: Style.fontSizeM
+						color: Style.inactiveTextColor
+					}
+				}
+				
 				ListView {
 					id: groupsListView2
-					anchors.top: groupsTableHeader.bottom
+					anchors.top: groupsEmptyState.visible ? groupsEmptyState.bottom : groupsTableHeader.bottom
 					anchors.left: parent.left
 					anchors.right: parent.right
 					anchors.bottom: parent.bottom
@@ -420,13 +436,6 @@ ViewBase {
 						}
 					}
 					
-					BaseText {
-						visible: groupsListView2.count === 0
-						anchors.centerIn: parent
-						text: qsTr("No groups found.")
-						font.pixelSize: Style.fontSizeM
-						color: Style.inactiveTextColor
-					}
 				}
 				
 				CustomScrollbar {
@@ -461,6 +470,8 @@ ViewBase {
 		}
 		groupsStackViewHeader.popHeader()
 		groupsStackView.previous()
+		while (groupsStackView.count > 1)
+			groupsStackView.removePage(groupsStackView.count - 1)
 	}
 	
 	function __openEditGroup(itemId, itemName, itemDescription) {

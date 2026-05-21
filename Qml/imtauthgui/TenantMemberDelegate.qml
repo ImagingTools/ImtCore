@@ -34,6 +34,7 @@ Rectangle {
 	signal memberActionsRequested(var menuItems, string userId, string userName,
 	                              bool isOwnerTarget, bool isCurrentUserTarget)
 	signal inviteActionsRequested(var menuItems, string invitationId, string userName)
+	signal memberEditRequested(string userId, string userName)
 
 	readonly property bool isMember: row.kind === "member"
 
@@ -72,7 +73,12 @@ Rectangle {
 		id: rowMouseArea
 		anchors.fill: parent
 		hoverEnabled: true
-		acceptedButtons: Qt.NoButton
+		acceptedButtons: Qt.LeftButton
+		onDoubleClicked: {
+			if (row.isMember && row.canManageMembers) {
+				row.memberEditRequested(row.memberData.id, row.memberData.name || row.memberData.id || "")
+			}
+		}
 	}
 
 	Row {
@@ -148,6 +154,7 @@ Rectangle {
 			anchors.verticalCenter: parent.verticalCenter
 			spacing: 2
 			width: parent.width
+				- (row.showCheckBox ? Style.itemSizeS + parent.spacing : 0)
 				- avatar.width
 				- badgesItem.width
 				- actionsItem.width
