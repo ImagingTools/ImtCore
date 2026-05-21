@@ -15,6 +15,7 @@ iprm::IParamsSet::Ids CTaskParamsComp::GetParamIds(bool editableOnly) const
 	if (!editableOnly){
 		retVal += "TaskId";
 		retVal += "TaskInputId";
+		retVal += "TaskInputSubId";
 	}
 
 	return retVal;
@@ -36,13 +37,11 @@ const iser::ISerializable* CTaskParamsComp::GetParameter(const QByteArray& id) c
 		return &m_taskInputIdParam;
 	}
 
+	if (id == "TaskInputSubId") {
+		return &m_taskInputSubIdParam;
+	}
+
 	return nullptr;
-}
-
-
-const iprm::IParamsInfoProvider* CTaskParamsComp::GetParamsInfoProvider() const
-{
-	return BaseClass::GetParamsInfoProvider();
 }
 
 
@@ -56,6 +55,7 @@ void CTaskParamsComp::OnComponentCreated()
 
 	m_taskIdParam.SetCollectionContext(m_collectionContextCompPtr.GetPtr());
 	m_taskInputIdParam.SetCollectionContext(m_collectionContextCompPtr.GetPtr());
+	m_taskInputSubIdParam.SetCollectionContext(m_collectionContextCompPtr.GetPtr());
 }
 
 
@@ -107,6 +107,20 @@ QByteArray CTaskParamsComp::TaskInputIdParam::GetId() const
 {
 	if (m_contextPtr != nullptr){
 		return m_contextPtr->GetTaskInputId();
+	}
+
+	return QByteArray();
+}
+
+
+// public methods of the embedded class TaskInputSubIdParam
+
+// reimplemented (iprm::IIdParam)
+
+QByteArray CTaskParamsComp::TaskInputSubIdParam::GetId() const
+{
+	if (m_contextPtr != nullptr) {
+		return m_contextPtr->GetTaskInputSubId();
 	}
 
 	return QByteArray();

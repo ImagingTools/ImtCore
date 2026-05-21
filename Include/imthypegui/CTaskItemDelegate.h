@@ -5,6 +5,9 @@
 // Qt includes
 #include <QtWidgets/QItemDelegate>
 
+// ACF includes
+#include <iqtgui/TMakeIconProviderCompWrap.h>
+
 
 namespace imthypegui
 {
@@ -27,16 +30,25 @@ public:
 		DR_TASK_PROCESSING_STATE,
 		DR_TASK_PROCESSING_STATE_ICON,
 		DR_TASK_ENABLED,
-		DR_LAST = DR_TASK_ENABLED
+		DR_TASK_SELECTED,
+		DR_LAST = DR_TASK_SELECTED
 	};
 
 	CTaskItemDelegate(QObject* parent = nullptr);
+
+	void SetSelectableItems(bool on = true) { m_selectableItems = on; }
+
+	// Returns the checkbox hit rect for a given item rect (in viewport coordinates)
+	static QRect GetCheckboxRect(const QRect& itemRect);
 
 protected:
 	// reimplemented (QItemDelegate)
 	virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 	virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 	virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+
+protected:
+	bool m_selectableItems = true;
 };
 
 
@@ -46,6 +58,9 @@ public:
 	typedef CTaskItemDelegate BaseClass;
 
 	CMicroTaskItemDelegate(QObject* parent = nullptr);
+
+	// Returns the checkbox hit rect for a given item rect (in viewport coordinates)
+	static QRect GetCheckboxRect(const QRect& itemRect);
 
 protected:
 	// reimplemented (QItemDelegate)

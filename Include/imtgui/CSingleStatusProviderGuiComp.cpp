@@ -29,17 +29,19 @@ void CSingleStatusProviderGuiComp::UpdateGui(const istd::IChangeable::ChangeSet&
 	const istd::IInformationProvider* informationProviderPtr = GetObjectPtr();
 	Q_ASSERT(informationProviderPtr != nullptr);
 
-	QIcon icon = GetStatusIcon(informationProviderPtr->GetInformationCategory());
+	auto status = informationProviderPtr ? informationProviderPtr->GetInformationCategory() : istd::IInformationProvider::IC_NONE;
+
+	QIcon icon = GetStatusIcon(status);
 	IconLabel->setPixmap(icon.pixmap(QSize(16, 16)));
 
-	if (m_showStatusAttrPtr.IsValid() && *m_showStatusAttrPtr){
+	if (m_showStatusAttrPtr.IsValid() && *m_showStatusAttrPtr && (informationProviderPtr != nullptr)){
 		SourceLabel->setText(informationProviderPtr->GetInformationSource());
 	}
 	else{
 		SourceLabel->hide();
 	}
 
-	if (m_showDescriptionAttrPtr.IsValid() && *m_showDescriptionAttrPtr){
+	if (m_showDescriptionAttrPtr.IsValid() && *m_showDescriptionAttrPtr && (informationProviderPtr != nullptr)){
 		DescriptionLabel->setText(informationProviderPtr->GetInformationDescription());
 	}
 	else{

@@ -362,13 +362,20 @@ bool CDocumentCollectionViewDelegateComp::RenameObjectOnSave() const
 
 QString CDocumentCollectionViewDelegateComp::CommentDocumentChanges(int /*revision*/) const
 {
-	QString comment = QInputDialog::getText(
-		nullptr,
-		tr("Comment your changes"),
-		tr("Please enter comment for your changes"),
-		QLineEdit::Normal);
+	QInputDialog inputDiag;
+	inputDiag.setWindowTitle(tr("Comment your changes"));
+	inputDiag.setLabelText(tr("Please enter comment for your changes"));
+	inputDiag.setInputMode(QInputDialog::TextInput);
 
-	return comment;
+	QLineEdit* lineEdit = inputDiag.findChild<QLineEdit*>();
+	lineEdit->setMaxLength(*m_maxLengthRevisionCommentAttrPtr);
+
+	int ret = inputDiag.exec();
+	if (ret != QDialog::Accepted){
+		return QString();
+	}
+
+	return inputDiag.textValue();
 }
 
 
@@ -479,6 +486,9 @@ void CDocumentCollectionViewDelegateComp::OnDesignSchemaChanged(const QByteArray
 void CDocumentCollectionViewDelegateComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
+
+	BaseClass2::SetMaxLengthComment(*m_maxLengthCommentAttrPtr);
+	BaseClass2::SetLengthRevisionComment(*m_maxLengthRevisionCommentAttrPtr);
 
 	SetupSummaryInformation();
 

@@ -28,16 +28,16 @@ public:
 		I_ASSIGN_TO(m_taskObserversFactCompPtr, m_taskEditorsFactCompPtr, true);
 		I_ASSIGN_MULTI_0(m_editorTypeIdsAttrPtr, "TaskEditorTypeIds", "List of type IDs for corresponding task editors", true);
 		I_ASSIGN(m_showAllExecuteButtonAttrPtr, "ShowAllExecute", "Show all execute button in the tool bar", true, true);
+		I_ASSIGN(m_taskInputManagerGuiCompPtr, "TaskInputEditor", "Editor of task inputs", false, "TaskInputEditor");
+		I_ASSIGN_TO(m_taskInputManagerObserverCompPtr, m_taskInputManagerGuiCompPtr, true);
+		I_ASSIGN(m_triggerTableGuiCompPtr, "TriggerTableEditor", "Editor of trigger table", false, "");
+		I_ASSIGN(m_showTriggerTableAttrPtr, "ShowTriggerTableCommand", "Show trigger table", true, false);
 	I_END_COMPONENT;
 
 	CTaskManagerGuiComp();
 
 protected Q_SLOTS:
 	void OnToggleTaskList(bool toggled);
-	void OnTestAll();
-	void OnAddTask();
-	void OnDeleteTask();
-	void OnDuplicateTask();
 	void OnAddMenuOptionClicked(QAction* action);
 	void OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 	void OnMicroSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
@@ -45,9 +45,16 @@ protected Q_SLOTS:
 	void on_MicroTaskList_doubleClicked(const QModelIndex& index);
 	void OnItemContextMenu(const QPoint& position);
 	void OnMicroItemContextMenu(const QPoint& position);
+	void OnTestAll();
+	void OnAddTask();
+	void OnDeleteTask();
+	void OnDuplicateTask();
 	void OnToggleTask();
 	void OnRenameTask();
 	void OnShowInputsManager();
+	void OnShowTriggerTable();
+	void OnToggleTaskSelection();
+	void OnSelectAllTasks();
 
 protected:
 	// reimplemented (TTaskCollectionEditorCompBase)
@@ -59,9 +66,16 @@ protected:
 	virtual void OnGuiDestroyed() override;
 	virtual void OnGuiRetranslate() override;
 	virtual void OnGuiDesignChanged() override;
+	virtual void OnGuiShown() override;
+	virtual void OnGuiHidden() override;
+
+	// reimplemented (QObject)
+	virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
 private:
 	void ShowContextMenu(const QPoint& position, QListView& list);
+	bool HandleListKeyPress(QListView* listView, QKeyEvent* keyEvent);
+	imtbase::ICollectionInfo::Ids GetSelectedTaskIds() const;
 
 private:
 	I_ATTR(bool, m_autoAssignUserIdAttrPtr);
@@ -70,6 +84,11 @@ private:
 	I_MULTIFACT(iqtgui::IGuiObject, m_taskEditorsFactCompPtr);
 	I_MULTIFACT(imod::IObserver, m_taskObserversFactCompPtr);
 	I_MULTIATTR(QByteArray, m_editorTypeIdsAttrPtr);
+	I_REF(iqtgui::IGuiObject, m_taskInputManagerGuiCompPtr);
+	I_REF(imod::IObserver, m_taskInputManagerObserverCompPtr);
+
+	I_REF(iqtgui::IGuiObject, m_triggerTableGuiCompPtr);
+	I_ATTR(bool, m_showTriggerTableAttrPtr);
 };
 
 

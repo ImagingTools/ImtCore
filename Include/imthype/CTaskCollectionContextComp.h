@@ -35,6 +35,8 @@ public:
 	virtual void SetTaskId(const QByteArray& taskId) override;
 	virtual QByteArray GetTaskInputId() const override;
 	virtual void SetTaskInputId(const QByteArray& inputId) override;
+	virtual QByteArray GetTaskInputSubId() const override;
+	virtual void SetTaskInputSubId(const QByteArray& inputId) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -48,6 +50,7 @@ private:
 
 	QByteArray m_taskId;
 	QByteArray m_taskInputId;
+	QByteArray m_taskInputSubId;
 };
 
 

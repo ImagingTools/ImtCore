@@ -13,6 +13,22 @@ namespace imtdoc
 {
 
 
+/**
+	\ingroup imtdoc
+	\brief ACF component that fans out document lifecycle events to multiple handlers.
+
+	\c CDocumentServiceEventHandlerDemultiplexerComp implements
+	\c IDocumentServiceEventHandler and forwards every \c ProcessEvent call
+	to all handlers in the \c "DocumentServiceEventHandlers" multi-reference
+	list.
+
+	Use this component when multiple independent consumers (e.g.\ a QML bridge
+	and a server-side audit logger) need to receive the same document events
+	from a single \c IDocumentService.  The demultiplexer is registered once
+	with the service and routes events to all of its children.
+
+	\c ProcessEvent returns the logical OR of all child handler return values.
+*/
 class CDocumentServiceEventHandlerDemultiplexerComp: public ilog::CLoggerComponentBase, virtual public imtdoc::IDocumentServiceEventHandler
 {
 public:

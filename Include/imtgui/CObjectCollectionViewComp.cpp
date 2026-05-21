@@ -1558,7 +1558,7 @@ void CObjectCollectionViewComp::TableModel::UpdateFromData(const imtbase::IObjec
 			m_parent.m_pageSelection.SetSelectedOptionIndex(pageCount > 0 ? 0 : -1);
 		}
 		else{
-			m_parent.m_pageSelection.SetSelectedOptionIndex(pageCount > lastSelectedPageIndex ? lastSelectedPageIndex : -1);
+			m_parent.m_pageSelection.SetSelectedOptionIndex(pageCount > lastSelectedPageIndex ? lastSelectedPageIndex : pageCount - 1);
 		}
 
 		if (m_totalRowCount > 0){
@@ -1643,6 +1643,11 @@ void CObjectCollectionViewComp::TableModel::RemoveItem(const imtbase::IObjectCol
 			m_metaInfoMap.remove(objectId);
 
 			endRemoveRows();
+
+			if (m_isPageMode){
+				int pageCount = m_totalRowCount / m_batchSize + (((m_totalRowCount % m_batchSize) != 0) ? 1 : 0);
+				m_parent.m_pageSelection.SetPageCount(pageCount);
+			}
 
 			break;
 		}

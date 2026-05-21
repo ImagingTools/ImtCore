@@ -579,7 +579,11 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CTicketCollect
 	// manually via the Undo/Redo/Save commands panel in the editor.
 	// For existing tickets (number > 0), save immediately after each change.
 	if (ticketPtr->GetNumber() > 0){
-		m_documentManagerCompPtr->SaveDocument(userLogin, documentId);
+		imtdoc::IDocumentService::TaskParams saveParams;
+		saveParams.userId = userLogin;
+		saveParams.documentId = documentId;
+		QByteArray saveTaskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, saveParams);
+		m_documentManagerCompPtr->WaitForTaskFinished(saveTaskId);
 	}
 
 	response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::Success;
@@ -629,7 +633,12 @@ bool CTicketCollectionDocumentServiceComp::ProcessEvent(imtdoc::CEventBase* even
 				}
 	
 				m_documentManagerCompPtr->SetDocumentData(userId, documentId, *documentPtr);
-				m_documentManagerCompPtr->SaveDocument(userId, documentId);
+
+				imtdoc::IDocumentService::TaskParams saveParams;
+				saveParams.userId = userId;
+				saveParams.documentId = documentId;
+				QByteArray saveTaskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, saveParams);
+				m_documentManagerCompPtr->WaitForTaskFinished(saveTaskId);
 			}
 		}
 	}
