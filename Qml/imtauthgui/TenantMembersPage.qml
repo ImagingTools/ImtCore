@@ -193,7 +193,6 @@ anchors.top: membersTableHeader.bottom
 anchors.left: parent.left
 anchors.right: parent.right
 anchors.bottom: parent.bottom
-anchors.bottomMargin: Style.marginS
 clip: true
 contentHeight: membersColumn.height
 boundsBehavior: Flickable.StopAtBounds
@@ -351,7 +350,11 @@ id: userEditorView
 Item {
 UserView {
 id: createUserView
-anchors.fill: parent
+anchors.top: parent.top
+anchors.bottom: userEditorButtons.top
+anchors.bottomMargin: Style.marginM
+anchors.horizontalCenter: parent.horizontalCenter
+width: Math.min(parent.width - Style.marginXL * 2, 1000)
 commandsPanelVisible: false
 
 Component.onCompleted: {
@@ -361,10 +364,11 @@ createUserView.updateGui()
 }
 
 Row {
+id: userEditorButtons
 anchors.bottom: parent.bottom
 anchors.bottomMargin: Style.marginXL
-anchors.left: parent.left
-anchors.leftMargin: Style.marginXL
+anchors.horizontalCenter: parent.horizontalCenter
+width: Math.min(parent.width - Style.marginXL * 2, 1000)
 spacing: Style.marginM
 
 Button {

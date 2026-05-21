@@ -112,10 +112,20 @@ Component {
 id: groupsListView
 
 Item {
-TenantTableContainer {
+SearchTextInput {
+id: groupsFilterInput
 anchors.top: parent.top
-anchors.bottom: parent.bottom
 anchors.topMargin: Style.marginM
+anchors.horizontalCenter: parent.horizontalCenter
+width: Math.min(parent.width - Style.marginXL * 2, 1000)
+placeHolderText: qsTr("Filter groups...")
+onTextChanged: groupsDataProvider.fetch(text)
+}
+
+TenantTableContainer {
+anchors.top: groupsFilterInput.bottom
+anchors.topMargin: Style.marginM
+anchors.bottom: parent.bottom
 
 IdSelectionManager {
 id: groupsSelectionManager
@@ -159,35 +169,12 @@ groupsSelectionManager.selectMultiple(allIds)
 }
 }
 
-SearchTextInput {
-id: groupsFilterInput
+ListView {
+id: groupsListView2
 anchors.top: groupsTableHeader.bottom
 anchors.left: parent.left
 anchors.right: parent.right
-anchors.leftMargin: Style.marginM
-anchors.rightMargin: Style.marginM
-anchors.topMargin: Style.marginS
-placeHolderText: qsTr("Filter groups...")
-onTextChanged: groupsDataProvider.fetch(text)
-}
-
-Rectangle {
-id: groupsSeparator
-anchors.top: groupsFilterInput.bottom
-anchors.topMargin: Style.marginS
-anchors.left: parent.left
-anchors.right: parent.right
-height: 1
-color: Style.borderColor
-}
-
-ListView {
-id: groupsListView2
-anchors.top: groupsSeparator.bottom
-anchors.left: parent.left
-anchors.right: parent.right
 anchors.bottom: parent.bottom
-anchors.bottomMargin: Style.marginS
 clip: true
 boundsBehavior: Flickable.StopAtBounds
 model: groupsDataProvider.items
@@ -195,7 +182,7 @@ model: groupsDataProvider.items
 delegate: Rectangle {
 id: groupDelegateRoot
 width: groupsListView2.width
-height: Style.controlHeightL + Style.marginS
+height: Style.controlHeightL + Style.marginL
 
 property string itemId: modelData.id || ""
 property string itemTitle: modelData.title || modelData.id || ""
@@ -251,7 +238,7 @@ width: parent.width - Style.itemSizeS - parent.spacing
 
 BaseText {
 text: groupDelegateRoot.itemTitle
-font.pixelSize: Style.fontSizeM
+font.pixelSize: Style.fontSizeL
 font.bold: true
 color: Style.textColor
 }
@@ -259,7 +246,7 @@ color: Style.textColor
 BaseText {
 visible: groupDelegateRoot.itemDescription !== ""
 text: groupDelegateRoot.itemDescription
-font.pixelSize: Style.fontSizeS
+font.pixelSize: Style.fontSizeM
 color: Style.inactiveTextColor
 elide: Text.ElideRight
 width: parent.width
@@ -319,7 +306,10 @@ groupsPage.apiClient.removeGroup(groupDelegateRoot.itemId)
 
 Rectangle {
 anchors.bottom: parent.bottom
-width: parent.width
+anchors.left: parent.left
+anchors.right: parent.right
+anchors.leftMargin: Style.marginM
+anchors.rightMargin: Style.marginM
 height: 1
 color: Style.borderColor
 opacity: 0.5
@@ -357,7 +347,11 @@ id: groupEditorView
 Item {
 UserGroupView {
 id: createGroupView
-anchors.fill: parent
+anchors.top: parent.top
+anchors.bottom: groupEditorButtonsCreate.top
+anchors.bottomMargin: Style.marginM
+anchors.horizontalCenter: parent.horizontalCenter
+width: Math.min(parent.width - Style.marginXL * 2, 1000)
 commandsPanelVisible: false
 
 Component.onCompleted: {
@@ -367,10 +361,11 @@ createGroupView.updateGui()
 }
 
 Row {
+id: groupEditorButtonsCreate
 anchors.bottom: parent.bottom
 anchors.bottomMargin: Style.marginXL
-anchors.left: parent.left
-anchors.leftMargin: Style.marginXL
+anchors.horizontalCenter: parent.horizontalCenter
+width: Math.min(parent.width - Style.marginXL * 2, 1000)
 spacing: Style.marginM
 
 Button {
@@ -404,7 +399,11 @@ id: groupEditView
 Item {
 UserGroupView {
 id: editGroupView
-anchors.fill: parent
+anchors.top: parent.top
+anchors.bottom: groupEditorButtonsEdit.top
+anchors.bottomMargin: Style.marginM
+anchors.horizontalCenter: parent.horizontalCenter
+width: Math.min(parent.width - Style.marginXL * 2, 1000)
 commandsPanelVisible: false
 
 Component.onCompleted: {
@@ -438,10 +437,11 @@ editGroupView.updateGui()
 }
 
 Row {
+id: groupEditorButtonsEdit
 anchors.bottom: parent.bottom
 anchors.bottomMargin: Style.marginXL
-anchors.left: parent.left
-anchors.leftMargin: Style.marginXL
+anchors.horizontalCenter: parent.horizontalCenter
+width: Math.min(parent.width - Style.marginXL * 2, 1000)
 spacing: Style.marginM
 
 Button {

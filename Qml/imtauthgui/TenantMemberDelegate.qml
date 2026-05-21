@@ -58,8 +58,8 @@ Rectangle {
 		? "Expired"
 		: row.isRevoked ? "Revoked" : "Pending"
 
-	height: contentRow.implicitHeight + Style.marginM * 2
-	radius: Style.radiusS
+	height: contentRow.implicitHeight + Style.marginL * 2
+	radius: 0
 	color: rowMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
 
 	MouseArea {
@@ -140,7 +140,7 @@ Rectangle {
 						? (row.memberData.name || row.memberData.id || "")
 						: (row.memberData.userName || row.memberData.userId || "")
 					font.bold: row.isMember && (row.isMemberOwner || row.isMemberCreator)
-					font.pixelSize: Style.fontSizeM
+					font.pixelSize: Style.fontSizeL
 					color: Style.textColor
 					elide: Text.ElideRight
 				}

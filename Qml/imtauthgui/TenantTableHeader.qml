@@ -9,6 +9,10 @@ import imtcontrols 1.0
  * - A CheckBox for select all / deselect all
  * - Display of selected count
  * - Slot for future filter controls
+ *
+ * Sits inside TenantTableContainer so the container's border provides
+ * the outer rounded frame. Header draws its own background (flat)
+ * and a bottom separator.
  */
 Item {
 	id: tableHeader
@@ -25,16 +29,6 @@ Item {
 	Rectangle {
 		anchors.fill: parent
 		color: Style.backgroundColor2
-		radius: Style.radiusM
-
-		// Only round top corners
-		Rectangle {
-			anchors.left: parent.left
-			anchors.right: parent.right
-			anchors.bottom: parent.bottom
-			height: parent.radius
-			color: parent.color
-		}
 	}
 
 	Row {

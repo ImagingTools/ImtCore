@@ -112,10 +112,20 @@ Component {
 id: rolesListView
 
 Item {
-TenantTableContainer {
+SearchTextInput {
+id: rolesFilterInput
 anchors.top: parent.top
-anchors.bottom: parent.bottom
 anchors.topMargin: Style.marginM
+anchors.horizontalCenter: parent.horizontalCenter
+width: Math.min(parent.width - Style.marginXL * 2, 1000)
+placeHolderText: qsTr("Filter roles...")
+onTextChanged: rolesDataProvider.fetch(text)
+}
+
+TenantTableContainer {
+anchors.top: rolesFilterInput.bottom
+anchors.topMargin: Style.marginM
+anchors.bottom: parent.bottom
 
 IdSelectionManager {
 id: rolesSelectionManager
@@ -159,35 +169,12 @@ rolesSelectionManager.selectMultiple(allIds)
 }
 }
 
-SearchTextInput {
-id: rolesFilterInput
+ListView {
+id: rolesListView2
 anchors.top: rolesTableHeader.bottom
 anchors.left: parent.left
 anchors.right: parent.right
-anchors.leftMargin: Style.marginM
-anchors.rightMargin: Style.marginM
-anchors.topMargin: Style.marginS
-placeHolderText: qsTr("Filter roles...")
-onTextChanged: rolesDataProvider.fetch(text)
-}
-
-Rectangle {
-id: rolesSeparator
-anchors.top: rolesFilterInput.bottom
-anchors.topMargin: Style.marginS
-anchors.left: parent.left
-anchors.right: parent.right
-height: 1
-color: Style.borderColor
-}
-
-ListView {
-id: rolesListView2
-anchors.top: rolesSeparator.bottom
-anchors.left: parent.left
-anchors.right: parent.right
 anchors.bottom: parent.bottom
-anchors.bottomMargin: Style.marginS
 clip: true
 boundsBehavior: Flickable.StopAtBounds
 model: rolesDataProvider.items
@@ -195,7 +182,7 @@ model: rolesDataProvider.items
 delegate: Rectangle {
 id: roleDelegateRoot
 width: rolesListView2.width
-height: Style.controlHeightL + Style.marginS
+height: Style.controlHeightL + Style.marginL
 
 property string itemId: modelData.id || ""
 property string itemTitle: modelData.title || modelData.id || ""
@@ -251,7 +238,7 @@ width: parent.width - Style.itemSizeS - parent.spacing
 
 BaseText {
 text: roleDelegateRoot.itemTitle
-font.pixelSize: Style.fontSizeM
+font.pixelSize: Style.fontSizeL
 font.bold: true
 color: Style.textColor
 }
@@ -259,7 +246,7 @@ color: Style.textColor
 BaseText {
 visible: roleDelegateRoot.itemDescription !== ""
 text: roleDelegateRoot.itemDescription
-font.pixelSize: Style.fontSizeS
+font.pixelSize: Style.fontSizeM
 color: Style.inactiveTextColor
 elide: Text.ElideRight
 width: parent.width
@@ -319,7 +306,10 @@ rolesPage.apiClient.removeRole(roleDelegateRoot.itemId)
 
 Rectangle {
 anchors.bottom: parent.bottom
-width: parent.width
+anchors.left: parent.left
+anchors.right: parent.right
+anchors.leftMargin: Style.marginM
+anchors.rightMargin: Style.marginM
 height: 1
 color: Style.borderColor
 opacity: 0.5
@@ -357,7 +347,11 @@ id: roleEditorView
 Item {
 RoleView {
 id: createRoleView
-anchors.fill: parent
+anchors.top: parent.top
+anchors.bottom: editorButtonsCreate.top
+anchors.bottomMargin: Style.marginM
+anchors.horizontalCenter: parent.horizontalCenter
+width: Math.min(parent.width - Style.marginXL * 2, 1000)
 commandsPanelVisible: false
 
 Component.onCompleted: {
@@ -367,10 +361,11 @@ createRoleView.updateGui()
 }
 
 Row {
+id: editorButtonsCreate
 anchors.bottom: parent.bottom
 anchors.bottomMargin: Style.marginXL
-anchors.left: parent.left
-anchors.leftMargin: Style.marginXL
+anchors.horizontalCenter: parent.horizontalCenter
+width: Math.min(parent.width - Style.marginXL * 2, 1000)
 spacing: Style.marginM
 
 Button {
@@ -404,7 +399,11 @@ id: roleEditView
 Item {
 RoleView {
 id: editRoleView
-anchors.fill: parent
+anchors.top: parent.top
+anchors.bottom: editorButtonsEdit.top
+anchors.bottomMargin: Style.marginM
+anchors.horizontalCenter: parent.horizontalCenter
+width: Math.min(parent.width - Style.marginXL * 2, 1000)
 commandsPanelVisible: false
 
 Component.onCompleted: {
@@ -438,10 +437,11 @@ editRoleView.updateGui()
 }
 
 Row {
+id: editorButtonsEdit
 anchors.bottom: parent.bottom
 anchors.bottomMargin: Style.marginXL
-anchors.left: parent.left
-anchors.leftMargin: Style.marginXL
+anchors.horizontalCenter: parent.horizontalCenter
+width: Math.min(parent.width - Style.marginXL * 2, 1000)
 spacing: Style.marginM
 
 Button {
