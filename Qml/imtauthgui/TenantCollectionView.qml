@@ -426,6 +426,7 @@ RemoteCollectionView {
 					// transport-agnostic.
 					GqlBasedTenantMembershipApiClient {
 						id: tenantEditorApiClient
+						productId: AuthorizationController.productId
 					}
 				}
 			}

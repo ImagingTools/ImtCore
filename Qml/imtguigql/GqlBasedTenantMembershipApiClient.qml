@@ -309,14 +309,18 @@ QtObject {
 		root.__findMembershipForRemoveSender.send(root.__findMembershipForRemoveInput)
 	}
 
-	function insertRole(name, description, roleData) {
-		root.__roleAddInput.m_id = ""
+	function insertRole(roleId, roleData) {
+		if (!roleData){
+			return
+		}
+
+		root.__roleAddInput.m_id = roleId
 		root.__roleAddInput.m_typeId = "Role"
 		root.__roleAddInput.m_productId = root.productId
-		root.__roleAddInput.m_name = name || ""
-		root.__roleAddInput.m_description = description || ""
-		if (roleData)
-			root.__roleAddInput.m_item = roleData
+		root.__roleAddInput.m_name = roleData.m_name
+		root.__roleAddInput.m_description = roleData.m_description
+		root.__roleAddInput.m_item = roleData
+
 		root.__roleAddSender.send(root.__roleAddInput)
 	}
 
@@ -327,15 +331,19 @@ QtObject {
 		root.__removeRoleSender.send(root.__removeRoleInput)
 	}
 
-	function setRoleData(roleId, name, description, roleData) {
-		root.__pendingSetRoleId = roleId || ""
+	function setRoleData(roleId, roleData) {
+		if (!roleData){
+			return
+		}
+
+		root.__pendingSetRoleId = roleId
 		root.__roleUpdateInput.m_id = roleId || ""
 		root.__roleUpdateInput.m_typeId = "Role"
 		root.__roleUpdateInput.m_productId = root.productId
-		root.__roleUpdateInput.m_name = name || ""
-		root.__roleUpdateInput.m_description = description || ""
-		if (roleData)
-			root.__roleUpdateInput.m_item = roleData
+		root.__roleUpdateInput.m_name = roleData.m_name
+		root.__roleUpdateInput.m_description = roleData.m_description || ""
+		root.__roleUpdateInput.m_item = roleData
+
 		root.__roleUpdateSender.send(root.__roleUpdateInput)
 	}
 

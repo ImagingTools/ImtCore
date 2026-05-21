@@ -463,15 +463,14 @@ ViewBase {
 		var roleData = editorView.model
 		if (rolesPage.__isCreating) {
 			if (rolesPage.apiClient)
-				rolesPage.apiClient.insertRole(
-							roleData ? roleData.m_name : "",
-							roleData ? roleData.m_description : "")
+				rolesPage.apiClient.insertRole("", roleData)
 		} else {
 			if (rolesPage.apiClient)
 				rolesPage.apiClient.setRoleData(
 							rolesPage.__editRoleId,
 							roleData ? roleData.m_name : "",
-							roleData ? roleData.m_description : "")
+							roleData ? roleData.m_description : "",
+							roleData)
 		}
 		rolesStackViewHeader.popHeader()
 		rolesStackView.previous()
