@@ -3,7 +3,7 @@
 
 
 // ACF includes
-#include <istd/TSharedInterfacePtr.h>
+#include <istd/TInterfacePtr.h>
 
 
 namespace imtclientgql
