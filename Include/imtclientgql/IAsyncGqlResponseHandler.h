@@ -17,7 +17,7 @@ namespace imtclientgql
 	Callback sink for the async GraphQL client (\c IAsyncGqlClient).
 
 	Instances are owned by the caller and must remain alive at least until the
-	related \c IAsyncGqlRequestToken transitions out of the \c S_PENDING state.
+	related \c IAsyncGqlRequestToken transitions out of the \c RS_PENDING state.
 
 	The handler is invoked exactly once per request — either through
 	\c OnResponseReceived (success) or through \c OnError (any failure,

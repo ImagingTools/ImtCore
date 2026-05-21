@@ -26,7 +26,7 @@ namespace imtclientgql
 	to block until the response arrives.
 
 	The handler is owned by the caller. It must remain alive until the token
-	leaves the \c IAsyncGqlRequestToken::S_PENDING state (see the
+	leaves the \c IAsyncGqlRequestToken::RS_PENDING state (see the
 	"Threading & cancellation contract" notes on \c IAsyncGqlRequestToken).
 */
 class IAsyncGqlClient: virtual public istd::IPolymorphic
@@ -45,7 +45,7 @@ public:
 		\param urlParamPtr	Optional URL parameters passed to the protocol engine.
 		\return A token tracking the in-flight request. The token is always
 		        valid; on synchronous validation failure it is returned in a
-		        terminal state (\c S_FAILED) and the handler — if any —
+		        terminal state (\c RS_FAILED) and the handler — if any —
 		        is invoked synchronously before \c SendRequest returns.
 	*/
 	virtual IAsyncGqlRequestTokenPtr SendRequest(

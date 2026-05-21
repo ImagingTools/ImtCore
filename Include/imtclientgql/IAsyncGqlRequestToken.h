@@ -21,11 +21,11 @@ namespace imtclientgql
 
 	Threading / cancellation contract:
 	- \c Cancel is safe to call from any thread; it transitions the token
-	  to \c S_CANCELLED and triggers exactly one final call to the related
+	  to \c RS_CANCELLED and triggers exactly one final call to the related
 	  \c IAsyncGqlResponseHandler::OnError with \c EC_CANCELLED.
 	- \c Wait blocks the calling thread by processing its local event loop
 	  (so Qt signals / timers continue to fire) until the token leaves the
-	  \c S_PENDING state or the timeout elapses.
+	  \c RS_PENDING state or the timeout elapses.
 	- \c Wait returning \c false (timeout) does NOT cancel the request;
 	  the caller may follow up with \c Cancel and a second \c Wait.
 */
@@ -40,22 +40,22 @@ public:
 		/**
 			Request is in flight, no terminal callback yet.
 		*/
-		S_PENDING = 0,
+		RS_PENDING = 0,
 
 		/**
 			Response received successfully.
 		*/
-		S_COMPLETED,
+		RS_COMPLETED,
 
 		/**
 			Request was cancelled via \c Cancel.
 		*/
-		S_CANCELLED,
+		RS_CANCELLED,
 
 		/**
 			Request failed (network error, timeout, internal error, ...).
 		*/
-		S_FAILED
+		RS_FAILED
 	};
 
 	/**
@@ -67,13 +67,13 @@ public:
 		Requests cancellation of the in-flight request.
 		If the request is already in a terminal state this is a no-op.
 		Otherwise the related response handler is invoked exactly once
-		with \c EC_CANCELLED before the state transitions to \c S_CANCELLED.
+		with \c EC_CANCELLED before the state transitions to \c RS_CANCELLED.
 	*/
 	virtual void Cancel() = 0;
 
 	/**
 		Blocks the calling thread until the request leaves the
-		\c S_PENDING state or the optional timeout elapses.
+		\c RS_PENDING state or the optional timeout elapses.
 
 		While waiting, the local Qt event loop continues to process events,
 		matching the existing synchronous \c CRequestSender behavior.

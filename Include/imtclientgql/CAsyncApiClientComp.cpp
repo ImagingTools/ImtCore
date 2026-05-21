@@ -42,7 +42,7 @@ class CAsyncGqlRequestTokenImpl: virtual public IAsyncGqlRequestToken
 {
 public:
 	CAsyncGqlRequestTokenImpl():
-		m_state(S_PENDING)
+		m_state(RS_PENDING)
 	{
 	}
 
@@ -59,7 +59,7 @@ public:
 		std::function<void()> cancelCb;
 		{
 			QMutexLocker lock(&m_mutex);
-			if (m_state != S_PENDING){
+			if (m_state != RS_PENDING){
 				return;
 			}
 			cancelCb = m_cancelCb;
@@ -67,14 +67,14 @@ public:
 
 		if (cancelCb){
 			// The cancel callback aborts the network reply; the resulting
-			// "finished" signal will drive the final transition to S_CANCELLED.
+			// "finished" signal will drive the final transition to RS_CANCELLED.
 			cancelCb();
 		}
 		else{
 			// No callback wired (e.g. synchronous validation failure before
 			// the network request was issued): finalize directly so waiters
 			// are released and the contract is honoured.
-			MarkTerminal(S_CANCELLED);
+			MarkTerminal(RS_CANCELLED);
 		}
 	}
 
@@ -83,7 +83,7 @@ public:
 		QEventLoop loop;
 		{
 			QMutexLocker lock(&m_mutex);
-			if (m_state != S_PENDING){
+			if (m_state != RS_PENDING){
 				return true;
 			}
 			m_waiters.append(&loop);
@@ -130,17 +130,17 @@ public:
 
 	void MarkCompleted()
 	{
-		MarkTerminal(S_COMPLETED);
+		MarkTerminal(RS_COMPLETED);
 	}
 
 	void MarkCancelled()
 	{
-		MarkTerminal(S_CANCELLED);
+		MarkTerminal(RS_CANCELLED);
 	}
 
 	void MarkFailed()
 	{
-		MarkTerminal(S_FAILED);
+		MarkTerminal(RS_FAILED);
 	}
 
 private:
@@ -149,7 +149,7 @@ private:
 		QList<QEventLoop*> waitersSnapshot;
 		{
 			QMutexLocker lock(&m_mutex);
-			if (m_state != S_PENDING){
+			if (m_state != RS_PENDING){
 				return;
 			}
 			m_state = newState;
@@ -277,7 +277,7 @@ IAsyncGqlRequestTokenPtr CAsyncApiClientComp::SendRequest(
 	auto tokenKeepAlive = tokenPtr;
 
 	auto Finalize = [this, replyPtr, requestPtr, handlerPtr, tokenKeepAlive, tokenImplPtr, timeoutTimerPtr, timedOutFlagPtr, uuid]() {
-		if (tokenImplPtr->GetState() != IAsyncGqlRequestToken::S_PENDING){
+		if (tokenImplPtr->GetState() != IAsyncGqlRequestToken::RS_PENDING){
 			// Already finalized (defensive: should not happen, finished fires once).
 			replyPtr->deleteLater();
 			return;
