@@ -340,7 +340,7 @@ ViewBase {
 						function __computeFilteredMembers() {
 							var filter = membersColumn.__filterText.toLowerCase()
 							var members = membersPage.stateManager ? membersPage.stateManager.pendingMembers : []
-							if (!filter || filter === "")
+							if (!filter)
 								return members
 							var result = []
 							for (var i = 0; i < members.length; i++) {
@@ -355,7 +355,7 @@ ViewBase {
 						function __computeFilteredInvitations() {
 							var filter = membersColumn.__filterText.toLowerCase()
 							var invitations = membersPage.stateManager ? membersPage.stateManager.pendingInvitations : []
-							if (!filter || filter === "")
+							if (!filter)
 								return invitations
 							var result = []
 							for (var i = 0; i < invitations.length; i++) {

@@ -524,7 +524,7 @@ QtObject {
 			return
 		var data = {
 			name: userData.m_name || "",
-			description: userData.m_username || "",
+			description: userData.m_email || "",
 			username: userData.m_username || "",
 			email: userData.m_email || "",
 			productId: userData.m_productId || "",
