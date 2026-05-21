@@ -30,6 +30,7 @@ function updateModel() {}
 property string __editRoleId: ""
 property string __editRoleName: ""
 property string __editRoleDescription: ""
+property bool __isCreating: false
 
 readonly property bool __canManage: rolesPage.stateManager ? rolesPage.stateManager.canManageMembers : false
 
@@ -58,6 +59,14 @@ rolesStackView.previous()
 rolesStackViewHeader.popHeader()
 }
 
+onHeaderItemClicked: {
+// Navigate back to the clicked breadcrumb level
+while (rolesStackView.currentIndex > index) {
+rolesStackView.previous()
+rolesStackViewHeader.popHeader()
+}
+}
+
 Component.onCompleted: {
 rolesStackViewHeader.addHeader("roles_list", qsTr("Roles"))
 }
@@ -80,6 +89,7 @@ cursorShape: Qt.PointingHandCursor
 onClicked: {
 while (rolesStackView.count > 1)
 rolesStackView.removePage(rolesStackView.count - 1)
+rolesPage.__isCreating = true
 rolesStackViewHeader.addHeader("create_role", qsTr("Create New Role"))
 rolesStackView.addPage(roleEditorView)
 rolesStackView.next()
@@ -140,7 +150,7 @@ ModalDialogManager.showConfirmationDialog(
 qsTr("Delete Roles"),
 qsTr("Are you sure you want to delete %1 selected role(s)? This action cannot be undone.").arg(count),
 function(result) {
-if (result === true && rolesPage.apiClient) {
+if (result === Enums.yes && rolesPage.apiClient) {
 var ids = rolesPage.__selectionManager.selectedIds.slice()
 for (var i = 0; i < ids.length; i++)
 rolesPage.apiClient.removeRole(ids[i])
@@ -162,6 +172,24 @@ visible: rolesStackView.currentIndex === 0
 text: qsTr("Manage tenant roles and assign permissions to team members.")
 font.pixelSize: Style.fontSizeS
 color: Style.inactiveTextColor
+}
+
+Text {
+id: rolesSaveBtn
+visible: rolesPage.__canManage && rolesStackView.currentIndex > 0
+anchors.right: rolesStackViewHeader.right
+anchors.verticalCenter: rolesStackViewHeader.verticalCenter
+text: qsTr("Save")
+font.pixelSize: Style.fontSizeM
+font.bold: true
+color: Style.linkColor
+
+MouseArea {
+anchors.fill: parent
+hoverEnabled: true
+cursorShape: Qt.PointingHandCursor
+onClicked: rolesPage.__saveCurrentEditor()
+}
 }
 
 StackView {
@@ -188,7 +216,10 @@ anchors.topMargin: Style.marginM
 anchors.horizontalCenter: parent.horizontalCenter
 width: Math.min(parent.width - Style.marginXL * 2, 1000)
 placeHolderText: qsTr("Filter roles...")
-onTextChanged: rolesDataProvider.fetch(text)
+onTextChanged: {
+rolesSelectionManager.clear()
+rolesDataProvider.fetch(text)
+}
 }
 
 TenantTableContainer {
@@ -366,7 +397,7 @@ ModalDialogManager.showConfirmationDialog(
 qsTr("Delete Role"),
 qsTr("Are you sure you want to delete the role \"%1\"? This action cannot be undone.").arg(roleDelegateRoot.itemTitle),
 function(result) {
-if (result === true && rolesPage.apiClient)
+if (result === Enums.yes && rolesPage.apiClient)
 rolesPage.apiClient.removeRole(roleDelegateRoot.itemId)
 }
 )
@@ -387,19 +418,51 @@ opacity: 0.5
 BaseText {
 visible: rolesListView2.count === 0
 anchors.centerIn: parent
-text: qsTr("No roles created yet.")
+text: qsTr("No roles found.")
 font.pixelSize: Style.fontSizeM
 color: Style.inactiveTextColor
 }
 }
+
+CustomScrollbar {
+anchors.right: parent.right
+anchors.top: rolesTableHeader.bottom
+anchors.bottom: parent.bottom
+targetItem: rolesListView2
+secondSize: 8
 }
 }
+}
+}
+
+function __saveCurrentEditor() {
+var page = rolesStackView.currentPage()
+if (!page) return
+var editorView = page.children[0]
+if (!editorView || !editorView.updateModel) return
+editorView.updateModel()
+var roleData = editorView.model
+if (rolesPage.__isCreating) {
+if (rolesPage.apiClient)
+rolesPage.apiClient.insertRole(
+roleData ? roleData.m_name : "",
+roleData ? roleData.m_description : "")
+} else {
+if (rolesPage.apiClient)
+rolesPage.apiClient.setRoleData(
+rolesPage.__editRoleId,
+roleData ? roleData.m_name : "",
+roleData ? roleData.m_description : "")
+}
+rolesStackViewHeader.popHeader()
+rolesStackView.previous()
 }
 
 function __openEditRole(itemId, itemName, itemDescription) {
 rolesPage.__editRoleId = itemId
 rolesPage.__editRoleName = itemName
 rolesPage.__editRoleDescription = itemDescription
+rolesPage.__isCreating = false
 while (rolesStackView.count > 1)
 rolesStackView.removePage(rolesStackView.count - 1)
 rolesStackViewHeader.addHeader("edit_role", itemName || qsTr("Edit Role"))
@@ -416,8 +479,7 @@ Item {
 RoleView {
 id: createRoleView
 anchors.top: parent.top
-anchors.bottom: editorButtonsCreate.top
-anchors.bottomMargin: Style.marginM
+anchors.bottom: parent.bottom
 anchors.left: parent.left
 anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 width: Math.min(parent.width - Style.marginXL * 2, 1000)
@@ -426,38 +488,6 @@ commandsPanelVisible: false
 Component.onCompleted: {
 createRoleView.model = rolesPage.roleDataFactory ? rolesPage.roleDataFactory() : null
 createRoleView.updateGui()
-}
-}
-
-Row {
-id: editorButtonsCreate
-anchors.bottom: parent.bottom
-anchors.bottomMargin: Style.marginXL
-anchors.left: parent.left
-anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
-width: Math.min(parent.width - Style.marginXL * 2, 1000)
-spacing: Style.marginM
-
-Button {
-text: qsTr("Create")
-onClicked: {
-createRoleView.updateModel()
-var roleData = createRoleView.model
-if (rolesPage.apiClient)
-rolesPage.apiClient.insertRole(
-roleData ? roleData.m_name : "",
-roleData ? roleData.m_description : "")
-rolesStackViewHeader.popHeader()
-rolesStackView.previous()
-}
-}
-
-Button {
-text: qsTr("Cancel")
-onClicked: {
-rolesStackViewHeader.popHeader()
-rolesStackView.previous()
-}
 }
 }
 }
@@ -470,8 +500,7 @@ Item {
 RoleView {
 id: editRoleView
 anchors.top: parent.top
-anchors.bottom: editorButtonsEdit.top
-anchors.bottomMargin: Style.marginM
+anchors.bottom: parent.bottom
 anchors.left: parent.left
 anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 width: Math.min(parent.width - Style.marginXL * 2, 1000)
@@ -503,39 +532,6 @@ roleData.m_description = rolesPage.stateManager.receivedRoleData.description || 
 editRoleView.model = roleData
 editRoleView.updateGui()
 }
-}
-}
-}
-
-Row {
-id: editorButtonsEdit
-anchors.bottom: parent.bottom
-anchors.bottomMargin: Style.marginXL
-anchors.left: parent.left
-anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
-width: Math.min(parent.width - Style.marginXL * 2, 1000)
-spacing: Style.marginM
-
-Button {
-text: qsTr("Save")
-onClicked: {
-editRoleView.updateModel()
-var roleData = editRoleView.model
-if (rolesPage.apiClient)
-rolesPage.apiClient.setRoleData(
-rolesPage.__editRoleId,
-roleData ? roleData.m_name : "",
-roleData ? roleData.m_description : "")
-rolesStackViewHeader.popHeader()
-rolesStackView.previous()
-}
-}
-
-Button {
-text: qsTr("Cancel")
-onClicked: {
-rolesStackViewHeader.popHeader()
-rolesStackView.previous()
 }
 }
 }

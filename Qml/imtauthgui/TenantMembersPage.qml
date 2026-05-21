@@ -62,6 +62,13 @@ membersStackView.previous()
 membersStackViewHeader.popHeader()
 }
 
+onHeaderItemClicked: {
+while (membersStackView.currentIndex > index) {
+membersStackView.previous()
+membersStackViewHeader.popHeader()
+}
+}
+
 Component.onCompleted: {
 membersStackViewHeader.addHeader("members_list", qsTr("Members"))
 }
@@ -92,7 +99,7 @@ ModalDialogManager.showConfirmationDialog(
 qsTr("Remove Members"),
 qsTr("Are you sure you want to remove %1 selected member(s)?").arg(count),
 function(result) {
-if (result === true && membersPage.apiClient) {
+if (result === Enums.yes && membersPage.apiClient) {
 var ids = membersPage.__selectionManager.selectedIds.slice()
 for (var i = 0; i < ids.length; i++) {
 if (ids[i].indexOf("inv_") === 0)
@@ -166,6 +173,24 @@ visible: membersStackView.currentIndex === 0
 text: qsTr("Manage tenant members. Users created here automatically become members.")
 font.pixelSize: Style.fontSizeS
 color: Style.inactiveTextColor
+}
+
+Text {
+id: membersSaveBtn
+visible: membersPage.__canManage && membersStackView.currentIndex > 0
+anchors.right: membersStackViewHeader.right
+anchors.verticalCenter: membersStackViewHeader.verticalCenter
+text: qsTr("Save")
+font.pixelSize: Style.fontSizeM
+font.bold: true
+color: Style.linkColor
+
+MouseArea {
+anchors.fill: parent
+hoverEnabled: true
+cursorShape: Qt.PointingHandCursor
+onClicked: membersPage.__saveCurrentEditor()
+}
 }
 
 StackView {
@@ -253,6 +278,8 @@ tenantData: membersPage.tenantData
 stateManager: membersPage.stateManager
 canManageMembers: membersPage.__canManage
 isOwner: membersPage.stateManager ? membersPage.stateManager.isOwner : false
+selectionManager: membersSelectionManager
+showCheckBox: true
 
 onMemberActionsRequested: {
 memberActionMenu.menuItems = menuItems
@@ -294,6 +321,8 @@ tenantData: membersPage.tenantData
 stateManager: membersPage.stateManager
 canManageMembers: membersPage.__canManage
 isOwner: membersPage.stateManager ? membersPage.stateManager.isOwner : false
+selectionManager: membersSelectionManager
+showCheckBox: true
 
 onInviteActionsRequested: {
 inviteActionMenu.menuItems = menuItems
@@ -320,6 +349,14 @@ color: Style.inactiveTextColor
 }
 }
 
+CustomScrollbar {
+anchors.right: parent.right
+anchors.top: membersTableHeader.bottom
+anchors.bottom: parent.bottom
+targetItem: membersFlickable
+secondSize: 8
+}
+
 // Member actions context menu
 Menu {
 id: memberActionMenu
@@ -338,7 +375,7 @@ ModalDialogManager.showConfirmationDialog(
 qsTr("Remove Member"),
 qsTr("Are you sure you want to remove \"%1\"?").arg(memberActionMenu.targetUserName),
 function(result) {
-if (result === true)
+if (result === Enums.yes)
 membersPage.apiClient.removeUser(memberActionMenu.targetUserId)
 }
 )
@@ -383,6 +420,21 @@ onObjectRemoved: inviteActionMenu.removeItem(object)
 }
 }
 
+function __saveCurrentEditor() {
+var page = membersStackView.currentPage()
+if (!page) return
+var editorView = page.children[0]
+if (!editorView || !editorView.updateModel) return
+editorView.updateModel()
+var userData = editorView.model
+if (membersPage.apiClient)
+membersPage.apiClient.insertUser(
+userData ? userData.m_name : "",
+userData ? userData.m_description : "")
+membersStackViewHeader.popHeader()
+membersStackView.previous()
+}
+
 Component {
 id: userEditorView
 
@@ -390,8 +442,7 @@ Item {
 UserView {
 id: createUserView
 anchors.top: parent.top
-anchors.bottom: userEditorButtons.top
-anchors.bottomMargin: Style.marginM
+anchors.bottom: parent.bottom
 anchors.left: parent.left
 anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 width: Math.min(parent.width - Style.marginXL * 2, 1000)
@@ -400,38 +451,6 @@ commandsPanelVisible: false
 Component.onCompleted: {
 createUserView.model = membersPage.userDataFactory ? membersPage.userDataFactory() : null
 createUserView.updateGui()
-}
-}
-
-Row {
-id: userEditorButtons
-anchors.bottom: parent.bottom
-anchors.bottomMargin: Style.marginXL
-anchors.left: parent.left
-anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
-width: Math.min(parent.width - Style.marginXL * 2, 1000)
-spacing: Style.marginM
-
-Button {
-text: qsTr("Create")
-onClicked: {
-createUserView.updateModel()
-var userData = createUserView.model
-if (membersPage.apiClient)
-membersPage.apiClient.insertUser(
-userData ? userData.m_name : "",
-userData ? userData.m_description : "")
-membersStackViewHeader.popHeader()
-membersStackView.previous()
-}
-}
-
-Button {
-text: qsTr("Cancel")
-onClicked: {
-membersStackViewHeader.popHeader()
-membersStackView.previous()
-}
 }
 }
 }

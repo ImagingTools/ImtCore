@@ -316,8 +316,8 @@ QtObject {
 		root.__setRoleDataInput.m_collectionId = "Roles"
 		root.__setRoleDataInput.m_objectId = roleId || ""
 		root.__setRoleDataInput.m_objectData = JSON.stringify({
-			name: name || "",
-			description: description || ""
+			RoleName: name || "",
+			RoleDescription: description || ""
 		})
 		root.__setRoleDataSender.send(root.__setRoleDataInput)
 	}
@@ -348,8 +348,8 @@ QtObject {
 		root.__setGroupDataInput.m_collectionId = "Groups"
 		root.__setGroupDataInput.m_objectId = groupId || ""
 		root.__setGroupDataInput.m_objectData = JSON.stringify({
-			name: name || "",
-			description: description || ""
+			Name: name || "",
+			Description: description || ""
 		})
 		root.__setGroupDataSender.send(root.__setGroupDataInput)
 	}
@@ -380,8 +380,8 @@ QtObject {
 		root.__setUserDataInput.m_collectionId = "Users"
 		root.__setUserDataInput.m_objectId = userId || ""
 		root.__setUserDataInput.m_objectData = JSON.stringify({
-			name: name || "",
-			description: description || ""
+			Name: name || "",
+			Description: description || ""
 		})
 		root.__setUserDataSender.send(root.__setUserDataInput)
 	}

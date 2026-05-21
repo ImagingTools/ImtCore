@@ -30,6 +30,7 @@ function updateModel() {}
 property string __editGroupId: ""
 property string __editGroupName: ""
 property string __editGroupDescription: ""
+property bool __isCreating: false
 
 readonly property bool __canManage: groupsPage.stateManager ? groupsPage.stateManager.canManageMembers : false
 
@@ -58,6 +59,13 @@ groupsStackView.previous()
 groupsStackViewHeader.popHeader()
 }
 
+onHeaderItemClicked: {
+while (groupsStackView.currentIndex > index) {
+groupsStackView.previous()
+groupsStackViewHeader.popHeader()
+}
+}
+
 Component.onCompleted: {
 groupsStackViewHeader.addHeader("groups_list", qsTr("Groups"))
 }
@@ -80,6 +88,7 @@ cursorShape: Qt.PointingHandCursor
 onClicked: {
 while (groupsStackView.count > 1)
 groupsStackView.removePage(groupsStackView.count - 1)
+groupsPage.__isCreating = true
 groupsStackViewHeader.addHeader("create_group", qsTr("Create New Group"))
 groupsStackView.addPage(groupEditorView)
 groupsStackView.next()
@@ -140,7 +149,7 @@ ModalDialogManager.showConfirmationDialog(
 qsTr("Delete Groups"),
 qsTr("Are you sure you want to delete %1 selected group(s)? This action cannot be undone.").arg(count),
 function(result) {
-if (result === true && groupsPage.apiClient) {
+if (result === Enums.yes && groupsPage.apiClient) {
 var ids = groupsPage.__selectionManager.selectedIds.slice()
 for (var i = 0; i < ids.length; i++)
 groupsPage.apiClient.removeGroup(ids[i])
@@ -162,6 +171,24 @@ visible: groupsStackView.currentIndex === 0
 text: qsTr("Organize members into groups for easier permission management.")
 font.pixelSize: Style.fontSizeS
 color: Style.inactiveTextColor
+}
+
+Text {
+id: groupsSaveBtn
+visible: groupsPage.__canManage && groupsStackView.currentIndex > 0
+anchors.right: groupsStackViewHeader.right
+anchors.verticalCenter: groupsStackViewHeader.verticalCenter
+text: qsTr("Save")
+font.pixelSize: Style.fontSizeM
+font.bold: true
+color: Style.linkColor
+
+MouseArea {
+anchors.fill: parent
+hoverEnabled: true
+cursorShape: Qt.PointingHandCursor
+onClicked: groupsPage.__saveCurrentEditor()
+}
 }
 
 StackView {
@@ -188,7 +215,10 @@ anchors.topMargin: Style.marginM
 anchors.horizontalCenter: parent.horizontalCenter
 width: Math.min(parent.width - Style.marginXL * 2, 1000)
 placeHolderText: qsTr("Filter groups...")
-onTextChanged: groupsDataProvider.fetch(text)
+onTextChanged: {
+groupsSelectionManager.clear()
+groupsDataProvider.fetch(text)
+}
 }
 
 TenantTableContainer {
@@ -366,7 +396,7 @@ ModalDialogManager.showConfirmationDialog(
 qsTr("Delete Group"),
 qsTr("Are you sure you want to delete the group \"%1\"? This action cannot be undone.").arg(groupDelegateRoot.itemTitle),
 function(result) {
-if (result === true && groupsPage.apiClient)
+if (result === Enums.yes && groupsPage.apiClient)
 groupsPage.apiClient.removeGroup(groupDelegateRoot.itemId)
 }
 )
@@ -387,19 +417,51 @@ opacity: 0.5
 BaseText {
 visible: groupsListView2.count === 0
 anchors.centerIn: parent
-text: qsTr("No groups created yet.")
+text: qsTr("No groups found.")
 font.pixelSize: Style.fontSizeM
 color: Style.inactiveTextColor
 }
 }
+
+CustomScrollbar {
+anchors.right: parent.right
+anchors.top: groupsTableHeader.bottom
+anchors.bottom: parent.bottom
+targetItem: groupsListView2
+secondSize: 8
 }
 }
+}
+}
+
+function __saveCurrentEditor() {
+var page = groupsStackView.currentPage()
+if (!page) return
+var editorView = page.children[0]
+if (!editorView || !editorView.updateModel) return
+editorView.updateModel()
+var groupData = editorView.model
+if (groupsPage.__isCreating) {
+if (groupsPage.apiClient)
+groupsPage.apiClient.insertGroup(
+groupData ? groupData.m_name : "",
+groupData ? groupData.m_description : "")
+} else {
+if (groupsPage.apiClient)
+groupsPage.apiClient.setGroupData(
+groupsPage.__editGroupId,
+groupData ? groupData.m_name : "",
+groupData ? groupData.m_description : "")
+}
+groupsStackViewHeader.popHeader()
+groupsStackView.previous()
 }
 
 function __openEditGroup(itemId, itemName, itemDescription) {
 groupsPage.__editGroupId = itemId
 groupsPage.__editGroupName = itemName
 groupsPage.__editGroupDescription = itemDescription
+groupsPage.__isCreating = false
 while (groupsStackView.count > 1)
 groupsStackView.removePage(groupsStackView.count - 1)
 groupsStackViewHeader.addHeader("edit_group", itemName || qsTr("Edit Group"))
@@ -416,8 +478,7 @@ Item {
 UserGroupView {
 id: createGroupView
 anchors.top: parent.top
-anchors.bottom: groupEditorButtonsCreate.top
-anchors.bottomMargin: Style.marginM
+anchors.bottom: parent.bottom
 anchors.left: parent.left
 anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 width: Math.min(parent.width - Style.marginXL * 2, 1000)
@@ -426,38 +487,6 @@ commandsPanelVisible: false
 Component.onCompleted: {
 createGroupView.model = groupsPage.groupDataFactory ? groupsPage.groupDataFactory() : null
 createGroupView.updateGui()
-}
-}
-
-Row {
-id: groupEditorButtonsCreate
-anchors.bottom: parent.bottom
-anchors.bottomMargin: Style.marginXL
-anchors.left: parent.left
-anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
-width: Math.min(parent.width - Style.marginXL * 2, 1000)
-spacing: Style.marginM
-
-Button {
-text: qsTr("Create")
-onClicked: {
-createGroupView.updateModel()
-var groupData = createGroupView.model
-if (groupsPage.apiClient)
-groupsPage.apiClient.insertGroup(
-groupData ? groupData.m_name : "",
-groupData ? groupData.m_description : "")
-groupsStackViewHeader.popHeader()
-groupsStackView.previous()
-}
-}
-
-Button {
-text: qsTr("Cancel")
-onClicked: {
-groupsStackViewHeader.popHeader()
-groupsStackView.previous()
-}
 }
 }
 }
@@ -470,8 +499,7 @@ Item {
 UserGroupView {
 id: editGroupView
 anchors.top: parent.top
-anchors.bottom: groupEditorButtonsEdit.top
-anchors.bottomMargin: Style.marginM
+anchors.bottom: parent.bottom
 anchors.left: parent.left
 anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 width: Math.min(parent.width - Style.marginXL * 2, 1000)
@@ -503,39 +531,6 @@ groupData.m_description = groupsPage.stateManager.receivedGroupData.description 
 editGroupView.model = groupData
 editGroupView.updateGui()
 }
-}
-}
-}
-
-Row {
-id: groupEditorButtonsEdit
-anchors.bottom: parent.bottom
-anchors.bottomMargin: Style.marginXL
-anchors.left: parent.left
-anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
-width: Math.min(parent.width - Style.marginXL * 2, 1000)
-spacing: Style.marginM
-
-Button {
-text: qsTr("Save")
-onClicked: {
-editGroupView.updateModel()
-var groupData = editGroupView.model
-if (groupsPage.apiClient)
-groupsPage.apiClient.setGroupData(
-groupsPage.__editGroupId,
-groupData ? groupData.m_name : "",
-groupData ? groupData.m_description : "")
-groupsStackViewHeader.popHeader()
-groupsStackView.previous()
-}
-}
-
-Button {
-text: qsTr("Cancel")
-onClicked: {
-groupsStackViewHeader.popHeader()
-groupsStackView.previous()
 }
 }
 }

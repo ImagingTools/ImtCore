@@ -9,6 +9,7 @@ Item {
     property bool initialItemTitleVisible: true
 
     signal closeClicked()
+    signal headerItemClicked(int index, string headerId)
 
     ListModel {
         id: headersModel
@@ -135,7 +136,12 @@ Item {
 
 			MouseArea {
 				anchors.fill: parent;
-				onClicked: {}
+				cursorShape: model.index < headersModel.count - 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
+				onClicked: {
+					if (model.index < headersModel.count - 1) {
+						root.headerItemClicked(model.index, headersModel.get(model.index).id)
+					}
+				}
 			}
 		}
 	}

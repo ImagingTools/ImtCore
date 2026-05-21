@@ -27,6 +27,8 @@ Rectangle {
 	property var stateManager: null
 	property bool canManageMembers: false
 	property bool isOwner: false
+	property var selectionManager: null
+	property bool showCheckBox: false
 
 	// --- Outputs (action requests) ---
 	signal memberActionsRequested(var menuItems, string userId, string userName,
@@ -58,9 +60,13 @@ Rectangle {
 		? "Expired"
 		: row.isRevoked ? "Revoked" : "Pending"
 
+	readonly property string selectionId: row.isMember ? (row.memberData.id || "") : ("inv_" + (row.memberData.id || ""))
+	readonly property bool isSelected: row.selectionManager ? row.selectionManager.isSelected(row.selectionId) : false
+
 	height: contentRow.implicitHeight + Style.marginL * 2
 	radius: 0
-	color: rowMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
+	color: row.isSelected ? Style.selectedColor
+		: rowMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
 
 	MouseArea {
 		id: rowMouseArea
@@ -76,6 +82,22 @@ Rectangle {
 		anchors.verticalCenter: parent.verticalCenter
 		anchors.margins: Style.marginM
 		spacing: Style.marginM
+
+		// ----- CheckBox -----
+		CheckBox {
+			visible: row.showCheckBox
+			anchors.verticalCenter: parent.verticalCenter
+			height: Style.itemSizeS
+			width: visible ? Style.itemSizeS : 0
+			checkState: row.isSelected ? Qt.Checked : Qt.Unchecked
+			onCheckStateChanged: {
+				if (!row.selectionManager) return
+				var shouldBeSelected = (checkState === Qt.Checked)
+				var currentlySelected = row.selectionManager.isSelected(row.selectionId)
+				if (shouldBeSelected !== currentlySelected)
+					row.selectionManager.toggleSelect(row.selectionId)
+			}
+		}
 
 		// ----- Avatar -----
 		Rectangle {
@@ -245,19 +267,19 @@ Rectangle {
 				onClicked: {
 					if (row.isMember) {
 						var menuItems = []
-						if (row.canManageMembers) {
+						if (row.canManageMembers && !row.isCurrentUser) {
 							if (!row.isMemberOwner && !row.isMemberCreator) {
 								menuItems.push({ text: qsTr("Change Environment Role"), action: "changeRole" })
 								menuItems.push({ text: qsTr("Remove Member"), action: "remove" })
 							}
-							if (row.isOwner && !row.isMemberOwner) {
+							if (row.isOwner && !row.isMemberOwner && !row.isMemberCreator) {
 								menuItems.push({ text: qsTr("Transfer Ownership"), action: "transfer" })
 							}
-						} else {
-							if (row.isCurrentUser && !row.isMemberOwner) {
-								menuItems.push({ text: qsTr("Leave Workspace"), action: "leave" })
-							}
 						}
+						if (row.isCurrentUser && !row.isMemberCreator) {
+							menuItems.push({ text: qsTr("Leave Workspace"), action: "leave" })
+						}
+						if (menuItems.length === 0) return
 						row.memberActionsRequested(menuItems,
 							row.memberData.id,
 							row.memberData.name || row.memberData.id,
