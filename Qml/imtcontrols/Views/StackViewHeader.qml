@@ -89,7 +89,6 @@ Item {
 		anchors.verticalCenter: parent.verticalCenter
         anchors.top: parent.top;
         anchors.left: buttonPanel.right;
-        anchors.leftMargin: Style.marginM;
 		anchors.right: parent.right;
 		height: visible ? Style.controlHeightL : 0;
 		orientation: ListView.Horizontal;
