@@ -8,6 +8,8 @@
 
 // ImtCore includes
 #include <imtclientgql/CApiClientComp.h>
+#include <imtclientgql/CAsyncApiClientComp.h>
+#include <imtclientgql/CGqlClientSyncAdapterComp.h>
 #include <imtclientgql/CGqlClientEngineComp.h>
 #include <imtclientgql/CGqlObjectCollectionComp.h>
 #include <imtclientgql/CGqlObjectCollectionDelegateComp.h>
@@ -35,6 +37,8 @@ namespace ImtClientGqlPck
 
 
 typedef imtclientgql::CApiClientComp ApiClient;
+typedef imtclientgql::CAsyncApiClientComp AsyncApiClient;
+typedef imtclientgql::CGqlClientSyncAdapterComp GqlClientSyncAdapter;
 typedef imtclientgql::CGqlClientEngineComp GraphQLClientEngine;
 typedef imtclientgql::CGqlObjectCollectionDelegateComp GqlObjectCollectionDelegate;
 typedef icomp::TModelCompWrap<imtclientgql::CGqlObjectCollectionComp> GqlObjectCollection;

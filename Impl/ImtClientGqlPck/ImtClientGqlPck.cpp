@@ -21,6 +21,16 @@ I_EXPORT_COMPONENT(
 			"GraphQL API Client");
 
 I_EXPORT_COMPONENT(
+			AsyncApiClient,
+			"Asynchronous GraphQL API client",
+			"Async GraphQL API Client");
+
+I_EXPORT_COMPONENT(
+			GqlClientSyncAdapter,
+			"Synchronous IGqlClient adapter on top of an IAsyncGqlClient",
+			"GraphQL Client Sync Adapter");
+
+I_EXPORT_COMPONENT(
 			GraphQLClientEngine,
 			"GraphQLClientEngine",
 			"GraphQL Client Engine");
