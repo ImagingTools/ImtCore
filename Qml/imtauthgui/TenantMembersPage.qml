@@ -245,11 +245,23 @@ ViewBase {
 		id: membersListView
 		
 		Item {
-			TenantTableContainer {
+			SearchTextInput {
+				id: membersFilterInput
 				anchors.top: parent.top
 				anchors.topMargin: Style.marginM
+				anchors.horizontalCenter: parent.horizontalCenter
+				width: Math.min(parent.width - Style.marginXL * 2, 1000)
+				placeHolderText: qsTr("Filter members...")
+				onTextChanged: {
+					membersSelectionManager.clear()
+				}
+			}
+			
+			TenantTableContainer {
+				anchors.top: membersFilterInput.bottom
+				anchors.topMargin: Style.marginM
 				height: Math.min(membersTableHeader.height + membersColumn.height + 2,
-								 parent.height - Style.marginM - Style.marginL)
+								 parent.height - membersFilterInput.height - membersFilterInput.anchors.topMargin - Style.marginM - Style.marginL)
 				
 				IdSelectionManager {
 					id: membersSelectionManager
@@ -281,10 +293,10 @@ ViewBase {
 							membersSelectionManager.clear()
 						} else {
 							var allIds = []
-							var members = membersPage.stateManager ? membersPage.stateManager.pendingMembers : []
+							var members = membersColumn.filteredMembers
 							for (var i = 0; i < members.length; i++)
 								allIds.push(members[i].id)
-							var invitations = membersPage.stateManager ? membersPage.stateManager.pendingInvitations : []
+							var invitations = membersColumn.filteredInvitations
 							for (var j = 0; j < invitations.length; j++)
 								allIds.push("inv_" + invitations[j].id)
 							membersSelectionManager.selectMultiple(allIds)
@@ -306,10 +318,120 @@ ViewBase {
 						id: membersColumn
 						width: parent.width
 						
-						// ---- Active Members ----
+						property string __filterText: membersFilterInput.text
+						property var filteredMembers: membersColumn.__computeFilteredMembers()
+						property var filteredInvitations: membersColumn.__computeFilteredInvitations()
+						
+						on__filterTextChanged: {
+							membersColumn.filteredMembers = membersColumn.__computeFilteredMembers()
+							membersColumn.filteredInvitations = membersColumn.__computeFilteredInvitations()
+						}
+						
+						Connections {
+							target: membersPage.stateManager
+							function onPendingMembersChanged() {
+								membersColumn.filteredMembers = membersColumn.__computeFilteredMembers()
+							}
+							function onPendingInvitationsChanged() {
+								membersColumn.filteredInvitations = membersColumn.__computeFilteredInvitations()
+							}
+						}
+						
+						function __computeFilteredMembers() {
+							var filter = membersColumn.__filterText.toLowerCase()
+							var members = membersPage.stateManager ? membersPage.stateManager.pendingMembers : []
+							if (!filter || filter === "")
+								return members
+							var result = []
+							for (var i = 0; i < members.length; i++) {
+								var name = (members[i].name || "").toLowerCase()
+								var id = (members[i].id || "").toLowerCase()
+								if (name.indexOf(filter) >= 0 || id.indexOf(filter) >= 0)
+									result.push(members[i])
+							}
+							return result
+						}
+						
+						function __computeFilteredInvitations() {
+							var filter = membersColumn.__filterText.toLowerCase()
+							var invitations = membersPage.stateManager ? membersPage.stateManager.pendingInvitations : []
+							if (!filter || filter === "")
+								return invitations
+							var result = []
+							for (var i = 0; i < invitations.length; i++) {
+								var name = (invitations[i].name || "").toLowerCase()
+								var id = (invitations[i].id || "").toLowerCase()
+								if (name.indexOf(filter) >= 0 || id.indexOf(filter) >= 0)
+									result.push(invitations[i])
+							}
+							return result
+						}
+						
+						// ---- Invited Users Section (shown above active members) ----
+						Rectangle {
+							visible: invitationsListView.count > 0
+							width: membersColumn.width
+							height: invitedHeader.implicitHeight + Style.marginM * 2
+							color: Style.backgroundColor2
+							
+							BaseText {
+								id: invitedHeader
+								anchors.left: parent.left
+								anchors.leftMargin: Style.marginM
+								anchors.verticalCenter: parent.verticalCenter
+								text: qsTr("Invited (%1)").arg(invitationsListView.count)
+								font.pixelSize: Style.fontSizeS
+								font.bold: true
+								color: Style.inactiveTextColor
+							}
+						}
+						
+						Repeater {
+							id: invitationsListView
+							model: membersColumn.filteredInvitations
+							
+							delegate: TenantMemberDelegate {
+								width: membersColumn.width
+								kind: "invitation"
+								memberData: modelData
+								tenantData: membersPage.tenantData
+								stateManager: membersPage.stateManager
+								canManageMembers: membersPage.__canManage
+								isOwner: membersPage.stateManager ? membersPage.stateManager.isOwner : false
+								selectionManager: membersSelectionManager
+								showCheckBox: true
+								
+								onInviteActionsRequested: {
+									inviteActionMenu.menuItems = menuItems
+									inviteActionMenu.targetInvitationId = invitationId
+									inviteActionMenu.targetUserName = userName
+									inviteActionMenu.popup()
+								}
+							}
+						}
+						
+						// ---- Active Members Section ----
+						Rectangle {
+							visible: membersListViewContent.count > 0
+							width: membersColumn.width
+							height: membersHeader.implicitHeight + Style.marginM * 2
+							color: Style.backgroundColor2
+							
+							BaseText {
+								id: membersHeader
+								anchors.left: parent.left
+								anchors.leftMargin: Style.marginM
+								anchors.verticalCenter: parent.verticalCenter
+								text: qsTr("Members (%1)").arg(membersListViewContent.count)
+								font.pixelSize: Style.fontSizeS
+								font.bold: true
+								color: Style.inactiveTextColor
+							}
+						}
+						
 						Repeater {
 							id: membersListViewContent
-							model: membersPage.stateManager ? membersPage.stateManager.pendingMembers : []
+							model: membersColumn.filteredMembers
 							
 							delegate: TenantMemberDelegate {
 								width: membersColumn.width
@@ -332,49 +454,6 @@ ViewBase {
 								onMemberEditRequested: {
 									if (membersPage.__canManage)
 										membersPage.__openEditMember(userId, userName)
-								}
-							}
-						}
-						
-						// ---- Invited Users Section ----
-						Rectangle {
-							visible: invitationsListView.count > 0
-							width: membersColumn.width
-							height: invitedHeader.implicitHeight + Style.marginM * 2
-							color: Style.backgroundColor2
-							
-							BaseText {
-								id: invitedHeader
-								anchors.left: parent.left
-								anchors.leftMargin: Style.marginM
-								anchors.verticalCenter: parent.verticalCenter
-								text: qsTr("Invited (%1)").arg(invitationsListView.count)
-								font.pixelSize: Style.fontSizeS
-								font.bold: true
-								color: Style.inactiveTextColor
-							}
-						}
-						
-						Repeater {
-							id: invitationsListView
-							model: membersPage.stateManager ? membersPage.stateManager.pendingInvitations : []
-							
-							delegate: TenantMemberDelegate {
-								width: membersColumn.width
-								kind: "invitation"
-								memberData: modelData
-								tenantData: membersPage.tenantData
-								stateManager: membersPage.stateManager
-								canManageMembers: membersPage.__canManage
-								isOwner: membersPage.stateManager ? membersPage.stateManager.isOwner : false
-								selectionManager: membersSelectionManager
-								showCheckBox: true
-								
-								onInviteActionsRequested: {
-									inviteActionMenu.menuItems = menuItems
-									inviteActionMenu.targetInvitationId = invitationId
-									inviteActionMenu.targetUserName = userName
-									inviteActionMenu.popup()
 								}
 							}
 						}

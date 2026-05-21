@@ -8,12 +8,13 @@ import imtauthTenantMembershipsSdl 1.0
 import imtbaseImtCollectionSdl 1.0
 import imtauthRolesSdl 1.0
 import imtauthGroupsSdl 1.0
+import imtauthUsersSdl 1.0
 
 /**
  * GqlBasedTenantMembershipApiClient
  *
  * GQL/SDL implementation of the abstract TenantMembershipApiClient contract.
- * This is the ONLY place that imports the membership / roles / groups SDL modules
+ * This is the ONLY place that imports the membership / roles / groups / users SDL modules
  * and that owns GqlSdlRequestSender instances for these operations.
  *
  * Pages depend only on the abstract contract; the orchestrator (TenantEditor)
@@ -21,6 +22,12 @@ import imtauthGroupsSdl 1.0
  */
 QtObject {
 	id: root
+
+	// =========================================================================
+	// Configuration
+	// =========================================================================
+
+	property string productId: ""
 
 	// =========================================================================
 	// Abstract contract (must mirror TenantMembershipApiClient.qml)
@@ -106,14 +113,14 @@ QtObject {
 		}
 	}
 
-	// --- Roles (ImtCollection.sdl) ---
-	property InsertNewObjectInput __insertRoleInput: InsertNewObjectInput {}
-	property GqlSdlRequestSender __insertRoleSender: GqlSdlRequestSender {
+	// --- Roles (Roles.sdl: RoleItem / RoleAdd / RoleUpdate) ---
+	property RoleDataInput __roleAddInput: RoleDataInput {}
+	property GqlSdlRequestSender __roleAddSender: GqlSdlRequestSender {
 		requestType: 1
-		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_insertNewObject
+		gqlCommandId: ImtauthRolesSdlCommandIds.s_roleAdd
 
 		sdlObjectComp: Component {
-			InsertNewObjectPayload {
+			AddedNotificationPayload {
 				onFinished: { root.roleCreated() }
 			}
 		}
@@ -132,38 +139,38 @@ QtObject {
 		}
 	}
 
-	property SetObjectDataInput __setRoleDataInput: SetObjectDataInput {}
+	property RoleDataInput __roleUpdateInput: RoleDataInput {}
 	property string __pendingSetRoleId: ""
-	property GqlSdlRequestSender __setRoleDataSender: GqlSdlRequestSender {
+	property GqlSdlRequestSender __roleUpdateSender: GqlSdlRequestSender {
 		requestType: 1
-		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_setObjectData
+		gqlCommandId: ImtauthRolesSdlCommandIds.s_roleUpdate
 
 		sdlObjectComp: Component {
-			SetObjectDataPayload {
+			UpdatedNotificationPayload {
 				onFinished: { root.roleUpdated(root.__pendingSetRoleId) }
 			}
 		}
 	}
 
-	property GetObjectDataInput __getRoleDataInput: GetObjectDataInput {}
-	property GqlSdlRequestSender __getRoleDataSender: GqlSdlRequestSender {
-		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_getObjectData
+	property RoleItemInput __roleItemInput: RoleItemInput {}
+	property GqlSdlRequestSender __roleItemSender: GqlSdlRequestSender {
+		gqlCommandId: ImtauthRolesSdlCommandIds.s_roleItem
 
 		sdlObjectComp: Component {
-			GetObjectDataPayload {
-				onFinished: { root.__handleRoleDataReceived(m_objectData) }
+			RoleData {
+				onFinished: { root.__handleRoleDataReceived(this) }
 			}
 		}
 	}
 
-	// --- Groups (ImtCollection.sdl) ---
-	property InsertNewObjectInput __insertGroupInput: InsertNewObjectInput {}
-	property GqlSdlRequestSender __insertGroupSender: GqlSdlRequestSender {
+	// --- Groups (Groups.sdl: GroupItem / GroupAdd / GroupUpdate) ---
+	property GroupDataInput __groupAddInput: GroupDataInput {}
+	property GqlSdlRequestSender __groupAddSender: GqlSdlRequestSender {
 		requestType: 1
-		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_insertNewObject
+		gqlCommandId: ImtauthGroupsSdlCommandIds.s_groupAdd
 
 		sdlObjectComp: Component {
-			InsertNewObjectPayload {
+			AddedNotificationPayload {
 				onFinished: { root.groupCreated() }
 			}
 		}
@@ -182,38 +189,38 @@ QtObject {
 		}
 	}
 
-	property SetObjectDataInput __setGroupDataInput: SetObjectDataInput {}
+	property GroupDataInput __groupUpdateInput: GroupDataInput {}
 	property string __pendingSetGroupId: ""
-	property GqlSdlRequestSender __setGroupDataSender: GqlSdlRequestSender {
+	property GqlSdlRequestSender __groupUpdateSender: GqlSdlRequestSender {
 		requestType: 1
-		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_setObjectData
+		gqlCommandId: ImtauthGroupsSdlCommandIds.s_groupUpdate
 
 		sdlObjectComp: Component {
-			SetObjectDataPayload {
+			UpdatedNotificationPayload {
 				onFinished: { root.groupUpdated(root.__pendingSetGroupId) }
 			}
 		}
 	}
 
-	property GetObjectDataInput __getGroupDataInput: GetObjectDataInput {}
-	property GqlSdlRequestSender __getGroupDataSender: GqlSdlRequestSender {
-		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_getObjectData
+	property GroupItemInput __groupItemInput: GroupItemInput {}
+	property GqlSdlRequestSender __groupItemSender: GqlSdlRequestSender {
+		gqlCommandId: ImtauthGroupsSdlCommandIds.s_groupItem
 
 		sdlObjectComp: Component {
-			GetObjectDataPayload {
-				onFinished: { root.__handleGroupDataReceived(m_objectData) }
+			GroupData {
+				onFinished: { root.__handleGroupDataReceived(this) }
 			}
 		}
 	}
 
-	// --- Users (ImtCollection.sdl) ---
-	property InsertNewObjectInput __insertUserInput: InsertNewObjectInput {}
-	property GqlSdlRequestSender __insertUserSender: GqlSdlRequestSender {
+	// --- Users (Users.sdl: UserItem / UserAdd / UserUpdate) ---
+	property UserDataInput __userAddInput: UserDataInput {}
+	property GqlSdlRequestSender __userAddSender: GqlSdlRequestSender {
 		requestType: 1
-		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_insertNewObject
+		gqlCommandId: ImtauthUsersSdlCommandIds.s_userAdd
 
 		sdlObjectComp: Component {
-			InsertNewObjectPayload {
+			AddedNotificationPayload {
 				onFinished: { root.userCreated() }
 			}
 		}
@@ -232,26 +239,26 @@ QtObject {
 		}
 	}
 
-	property SetObjectDataInput __setUserDataInput: SetObjectDataInput {}
+	property UserDataInput __userUpdateInput: UserDataInput {}
 	property string __pendingSetUserId: ""
-	property GqlSdlRequestSender __setUserDataSender: GqlSdlRequestSender {
+	property GqlSdlRequestSender __userUpdateSender: GqlSdlRequestSender {
 		requestType: 1
-		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_setObjectData
+		gqlCommandId: ImtauthUsersSdlCommandIds.s_userUpdate
 
 		sdlObjectComp: Component {
-			SetObjectDataPayload {
+			UpdatedNotificationPayload {
 				onFinished: { root.userUpdated(root.__pendingSetUserId) }
 			}
 		}
 	}
 
-	property GetObjectDataInput __getUserDataInput: GetObjectDataInput {}
-	property GqlSdlRequestSender __getUserDataSender: GqlSdlRequestSender {
-		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_getObjectData
+	property UserItemInput __userItemInput: UserItemInput {}
+	property GqlSdlRequestSender __userItemSender: GqlSdlRequestSender {
+		gqlCommandId: ImtauthUsersSdlCommandIds.s_userItem
 
 		sdlObjectComp: Component {
-			GetObjectDataPayload {
-				onFinished: { root.__handleUserDataReceived(m_objectData) }
+			UserData {
+				onFinished: { root.__handleUserDataReceived(this) }
 			}
 		}
 	}
@@ -303,11 +310,12 @@ QtObject {
 	}
 
 	function insertRole(name, description) {
-		root.__insertRoleInput.m_collectionId = "Roles"
-		root.__insertRoleInput.m_typeId = "Role"
-		root.__insertRoleInput.m_name = name || ""
-		root.__insertRoleInput.m_description = description || ""
-		root.__insertRoleSender.send(root.__insertRoleInput)
+		root.__roleAddInput.m_id = ""
+		root.__roleAddInput.m_typeId = "Role"
+		root.__roleAddInput.m_productId = root.productId
+		root.__roleAddInput.m_name = name || ""
+		root.__roleAddInput.m_description = description || ""
+		root.__roleAddSender.send(root.__roleAddInput)
 	}
 
 	function removeRole(roleId) {
@@ -319,27 +327,27 @@ QtObject {
 
 	function setRoleData(roleId, name, description) {
 		root.__pendingSetRoleId = roleId || ""
-		root.__setRoleDataInput.m_collectionId = "Roles"
-		root.__setRoleDataInput.m_objectId = roleId || ""
-		root.__setRoleDataInput.m_objectData = JSON.stringify({
-			RoleName: name || "",
-			RoleDescription: description || ""
-		})
-		root.__setRoleDataSender.send(root.__setRoleDataInput)
+		root.__roleUpdateInput.m_id = roleId || ""
+		root.__roleUpdateInput.m_typeId = "Role"
+		root.__roleUpdateInput.m_productId = root.productId
+		root.__roleUpdateInput.m_name = name || ""
+		root.__roleUpdateInput.m_description = description || ""
+		root.__roleUpdateSender.send(root.__roleUpdateInput)
 	}
 
 	function getRoleData(roleId) {
-		root.__getRoleDataInput.m_collectionId = "Roles"
-		root.__getRoleDataInput.m_objectId = roleId || ""
-		root.__getRoleDataSender.send(root.__getRoleDataInput)
+		root.__roleItemInput.m_id = roleId || ""
+		root.__roleItemInput.m_productId = root.productId
+		root.__roleItemSender.send(root.__roleItemInput)
 	}
 
 	function insertGroup(name, description) {
-		root.__insertGroupInput.m_collectionId = "Groups"
-		root.__insertGroupInput.m_typeId = "Group"
-		root.__insertGroupInput.m_name = name || ""
-		root.__insertGroupInput.m_description = description || ""
-		root.__insertGroupSender.send(root.__insertGroupInput)
+		root.__groupAddInput.m_id = ""
+		root.__groupAddInput.m_typeId = "Group"
+		root.__groupAddInput.m_productId = root.productId
+		root.__groupAddInput.m_name = name || ""
+		root.__groupAddInput.m_description = description || ""
+		root.__groupAddSender.send(root.__groupAddInput)
 	}
 
 	function removeGroup(groupId) {
@@ -351,27 +359,27 @@ QtObject {
 
 	function setGroupData(groupId, name, description) {
 		root.__pendingSetGroupId = groupId || ""
-		root.__setGroupDataInput.m_collectionId = "Groups"
-		root.__setGroupDataInput.m_objectId = groupId || ""
-		root.__setGroupDataInput.m_objectData = JSON.stringify({
-			Name: name || "",
-			Description: description || ""
-		})
-		root.__setGroupDataSender.send(root.__setGroupDataInput)
+		root.__groupUpdateInput.m_id = groupId || ""
+		root.__groupUpdateInput.m_typeId = "Group"
+		root.__groupUpdateInput.m_productId = root.productId
+		root.__groupUpdateInput.m_name = name || ""
+		root.__groupUpdateInput.m_description = description || ""
+		root.__groupUpdateSender.send(root.__groupUpdateInput)
 	}
 
 	function getGroupData(groupId) {
-		root.__getGroupDataInput.m_collectionId = "Groups"
-		root.__getGroupDataInput.m_objectId = groupId || ""
-		root.__getGroupDataSender.send(root.__getGroupDataInput)
+		root.__groupItemInput.m_id = groupId || ""
+		root.__groupItemInput.m_productId = root.productId
+		root.__groupItemSender.send(root.__groupItemInput)
 	}
 
 	function insertUser(name, description) {
-		root.__insertUserInput.m_collectionId = "Users"
-		root.__insertUserInput.m_typeId = "User"
-		root.__insertUserInput.m_name = name || ""
-		root.__insertUserInput.m_description = description || ""
-		root.__insertUserSender.send(root.__insertUserInput)
+		root.__userAddInput.m_id = ""
+		root.__userAddInput.m_typeId = "User"
+		root.__userAddInput.m_productId = root.productId
+		root.__userAddInput.m_name = name || ""
+		root.__userAddInput.m_description = description || ""
+		root.__userAddSender.send(root.__userAddInput)
 	}
 
 	function removeUser(userId) {
@@ -383,19 +391,18 @@ QtObject {
 
 	function setUserData(userId, name, description) {
 		root.__pendingSetUserId = userId || ""
-		root.__setUserDataInput.m_collectionId = "Users"
-		root.__setUserDataInput.m_objectId = userId || ""
-		root.__setUserDataInput.m_objectData = JSON.stringify({
-			Name: name || "",
-			Description: description || ""
-		})
-		root.__setUserDataSender.send(root.__setUserDataInput)
+		root.__userUpdateInput.m_id = userId || ""
+		root.__userUpdateInput.m_typeId = "User"
+		root.__userUpdateInput.m_productId = root.productId
+		root.__userUpdateInput.m_name = name || ""
+		root.__userUpdateInput.m_description = description || ""
+		root.__userUpdateSender.send(root.__userUpdateInput)
 	}
 
 	function getUserData(userId) {
-		root.__getUserDataInput.m_collectionId = "Users"
-		root.__getUserDataInput.m_objectId = userId || ""
-		root.__getUserDataSender.send(root.__getUserDataInput)
+		root.__userItemInput.m_id = userId || ""
+		root.__userItemInput.m_productId = root.productId
+		root.__userItemSender.send(root.__userItemInput)
 	}
 
 	// --- Internal parse helpers ---
@@ -482,36 +489,49 @@ QtObject {
 		}
 	}
 
-	function __handleRoleDataReceived(objectDataJson) {
-		if (!objectDataJson)
+	function __handleRoleDataReceived(roleData) {
+		if (!roleData)
 			return
-		try {
-			var data = JSON.parse(objectDataJson)
-			root.roleDataReceived(data)
-		} catch (e) {
-			console.warn("Failed to parse role object data:", e)
+		var data = {
+			name: roleData.m_name || "",
+			description: roleData.m_description || "",
+			roleId: roleData.m_roleId || "",
+			productId: roleData.m_productId || "",
+			parentRoles: roleData.m_parentRoles || [],
+			permissions: roleData.m_permissions || "",
+			isDefault: roleData.m_isDefault || false,
+			isGuest: roleData.m_isGuest || false
 		}
+		root.roleDataReceived(data)
 	}
 
-	function __handleGroupDataReceived(objectDataJson) {
-		if (!objectDataJson)
+	function __handleGroupDataReceived(groupData) {
+		if (!groupData)
 			return
-		try {
-			var data = JSON.parse(objectDataJson)
-			root.groupDataReceived(data)
-		} catch (e) {
-			console.warn("Failed to parse group object data:", e)
+		var data = {
+			name: groupData.m_name || "",
+			description: groupData.m_description || "",
+			productId: groupData.m_productId || "",
+			roles: groupData.m_roles || [],
+			users: groupData.m_users || [],
+			parentGroups: groupData.m_parentGroups || []
 		}
+		root.groupDataReceived(data)
 	}
 
-	function __handleUserDataReceived(objectDataJson) {
-		if (!objectDataJson)
+	function __handleUserDataReceived(userData) {
+		if (!userData)
 			return
-		try {
-			var data = JSON.parse(objectDataJson)
-			root.userDataReceived(data)
-		} catch (e) {
-			console.warn("Failed to parse user object data:", e)
+		var data = {
+			name: userData.m_name || "",
+			description: userData.m_username || "",
+			username: userData.m_username || "",
+			email: userData.m_email || "",
+			productId: userData.m_productId || "",
+			groups: userData.m_groups || [],
+			roles: userData.m_roles || [],
+			permissions: userData.m_permissions || []
 		}
+		root.userDataReceived(data)
 	}
 }
