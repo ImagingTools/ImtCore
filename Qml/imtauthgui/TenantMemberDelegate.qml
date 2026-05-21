@@ -146,6 +146,8 @@ Rectangle {
 				width: Style.fontSizeS
 				height: Style.fontSizeS
 				source: "qrc:/" + Style.getIconPath("Icons/Crown", Icon.State.On, Icon.Mode.Normal)
+				sourceSize.width: width
+				sourceSize.height: height
 			}
 		}
 
