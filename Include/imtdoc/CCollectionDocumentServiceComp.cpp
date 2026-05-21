@@ -7,7 +7,7 @@ namespace imtdoc
 
 // protected methods
 
-// reimplemented (imtdoc::CCollectionDocumentServiceBase)
+// reimplemented (imtdoc::TCollectionDocumentServiceWrap)
 
 imtbase::IObjectCollection* CCollectionDocumentServiceComp::GetCollection() const
 {

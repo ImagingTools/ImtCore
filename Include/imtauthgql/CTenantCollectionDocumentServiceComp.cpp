@@ -358,7 +358,11 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CTenantCollect
 	// For new tenants do NOT auto-save — user will save manually.
 	// For existing tenants, save immediately after each change (like tickets).
 	if (!tenantId.isEmpty()){
-		m_documentManagerCompPtr->SaveDocument(userLogin, documentId);
+		imtdoc::IDocumentService::TaskParams saveParams;
+		saveParams.userId = userLogin;
+		saveParams.documentId = documentId;
+		QByteArray saveTaskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, saveParams);
+		m_documentManagerCompPtr->WaitForTaskFinished(saveTaskId);
 	}
 
 	response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::Success;
@@ -389,7 +393,12 @@ bool CTenantCollectionDocumentServiceComp::ProcessEvent(imtdoc::CEventBase* even
 				documentTicketPtr->SetTenantId(objectId);
 
 				m_documentManagerCompPtr->SetDocumentData(userId, documentId, *documentPtr);
-				m_documentManagerCompPtr->SaveDocument(userId, documentId);
+
+				imtdoc::IDocumentService::TaskParams saveParams;
+				saveParams.userId = userId;
+				saveParams.documentId = documentId;
+				QByteArray saveTaskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, saveParams);
+				m_documentManagerCompPtr->WaitForTaskFinished(saveTaskId);
 
 				// Auto-create OWNER membership for the tenant creator
 				QByteArray ownerId = documentTicketPtr->GetOwnerId();
