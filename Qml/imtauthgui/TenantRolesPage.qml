@@ -466,11 +466,7 @@ ViewBase {
 				rolesPage.apiClient.insertRole("", roleData)
 		} else {
 			if (rolesPage.apiClient)
-				rolesPage.apiClient.setRoleData(
-							rolesPage.__editRoleId,
-							roleData ? roleData.m_name : "",
-							roleData ? roleData.m_description : "",
-							roleData)
+				rolesPage.apiClient.setRoleData(rolesPage.__editRoleId, roleData)
 		}
 		rolesStackViewHeader.popHeader()
 		rolesStackView.previous()
