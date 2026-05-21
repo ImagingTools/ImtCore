@@ -126,11 +126,14 @@ inline void TCollectionDocumentServiceWrap<Base>::DoCreateNewDocument(
 	if (!params.proposedSourceDocumentId.isEmpty()){
 		// Find the document that was just created — it will be the most
 		// recently added entry for this user.
-		const WorkingDocumentList& docs = this->m_userDocuments[params.userId];
-		for (auto it = docs.constBegin(); it != docs.constEnd(); ++it){
-			if (it.value().typeId == params.documentTypeId && it.value().isLoading){
-				m_proposedSourceDocumentIds[it.key()] = params.proposedSourceDocumentId;
-				break;
+		auto userDocsIt = this->m_userDocuments.constFind(params.userId);
+		if (userDocsIt != this->m_userDocuments.constEnd()){
+			const WorkingDocumentList& docs = userDocsIt.value();
+			for (auto it = docs.constBegin(); it != docs.constEnd(); ++it){
+				if (it.value().typeId == params.documentTypeId && it.value().isLoading){
+					m_proposedSourceDocumentIds[it.key()] = params.proposedSourceDocumentId;
+					break;
+				}
 			}
 		}
 	}
@@ -389,55 +392,58 @@ inline void TCollectionDocumentServiceWrap<Base>::DoOpenDocument(
 		}
 
 		UserDocumentPairList docsToNotify;
+		TaskResult taskResult{IDocumentService::OS_FAILED, documentId, QString()};
+		bool taskSucceeded = false;
 
 		{
 			QMutexLocker locker(&this->m_mutex);
 
 			if (singleCopyMode){
-				if (!this->m_sharedDocuments.contains(objectId)){
-					return;
-				}
+				if (this->m_sharedDocuments.contains(objectId)){
+					SharedDocumentData& shared = this->m_sharedDocuments[objectId];
+					if (shared.objectPtr.IsValid() && shared.isLoading){
+						shared.isLoading = false;
 
-				SharedDocumentData& shared = this->m_sharedDocuments[objectId];
-				if (!shared.objectPtr.IsValid() || !shared.isLoading){
-					return;
-				}
+						bool observersInitialized = false;
+						UserDocumentPairList docs = this->FindDocumentsByObjectId(objectId);
+						for (const UserDocumentPair& pair : docs){
+							WorkingDocument* dp = this->FindDocument(pair.first, pair.second);
+							if (dp != nullptr && dp->isLoading){
+								if (!observersInitialized){
+									this->InitializeDocumentObservers(*dp, pair.first);
+									shared.undoManagerModelId = dp->undoManagerModelId;
+									observersInitialized = true;
+								}
 
-				shared.isLoading = false;
-
-				bool observersInitialized = false;
-				UserDocumentPairList docs = this->FindDocumentsByObjectId(objectId);
-				for (const UserDocumentPair& pair : docs){
-					WorkingDocument* dp = this->FindDocument(pair.first, pair.second);
-					if (dp != nullptr && dp->isLoading){
-						if (!observersInitialized){
-							this->InitializeDocumentObservers(*dp, pair.first);
-							shared.undoManagerModelId = dp->undoManagerModelId;
-							observersInitialized = true;
+								docsToNotify.append(pair);
+							}
 						}
 
-						docsToNotify.append(pair);
+						taskSucceeded = true;
 					}
 				}
 			}
 			else {
 				WorkingDocument* docPtr = this->FindDocument(userId, documentId);
 
-				if (docPtr == nullptr || !docPtr->objectPtr.IsValid() || !docPtr->isLoading){
-					return;
+				if (docPtr != nullptr && docPtr->objectPtr.IsValid() && docPtr->isLoading){
+					this->InitializeDocumentObservers(*docPtr, userId);
+					docsToNotify.append(qMakePair(userId, documentId));
+					taskSucceeded = true;
 				}
-
-				this->InitializeDocumentObservers(*docPtr, userId);
-				docsToNotify.append(qMakePair(userId, documentId));
 			}
 		}
 
-		// OnDocumentDataLoaded sets isLoading=false
-		for (const UserDocumentPair& pair : docsToNotify){
-			this->OnDocumentDataLoaded(pair.first, pair.second);
+		if (taskSucceeded){
+			// OnDocumentDataLoaded sets isLoading=false
+			for (const UserDocumentPair& pair : docsToNotify){
+				this->OnDocumentDataLoaded(pair.first, pair.second);
+			}
+
+			taskResult = TaskResult{IDocumentService::OS_OK, documentId, QString()};
 		}
 
-		this->CompleteTask(taskId, TaskResult{IDocumentService::OS_OK, documentId, QString()});
+		this->CompleteTask(taskId, taskResult);
 	});
 
 	QObject::connect(worker, &QObject::destroyed, thread, &QThread::quit, Qt::DirectConnection);

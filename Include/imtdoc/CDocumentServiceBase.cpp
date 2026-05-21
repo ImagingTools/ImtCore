@@ -936,6 +936,7 @@ bool CDocumentServiceBase::ValidateDocumentData(
 
 QList<imtdoc::IDocumentServiceEventHandler*> CDocumentServiceBase::GetDocumentServiceEventHandlers() const
 {
+	QMutexLocker locker(&m_mutex);
 	return m_registeredEventHandlers;
 }
 
