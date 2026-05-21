@@ -43,9 +43,20 @@ public:
 		m_errorMessage = message;
 	}
 
-	IAsyncGqlClient::GqlResponsePtr ResponsePtr() const { return m_responsePtr; }
-	ErrorCategory Error() const { return m_errorCategory; }
-	const QString& ErrorMessage() const { return m_errorMessage; }
+	IAsyncGqlClient::GqlResponsePtr ResponsePtr() const
+	{
+		return m_responsePtr;
+	}
+
+	ErrorCategory Error() const
+	{
+		return m_errorCategory;
+	}
+
+	const QString& ErrorMessage() const
+	{
+		return m_errorMessage;
+	}
 
 private:
 	IAsyncGqlClient::GqlResponsePtr m_responsePtr;
