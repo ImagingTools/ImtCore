@@ -34,6 +34,8 @@ property string __editUserDescription: ""
 
 readonly property bool __canManage: membersPage.stateManager ? membersPage.stateManager.canManageMembers : false
 
+property var __selectionManager: null
+
 Connections {
 target: membersPage.apiClient
 function onUserDataReceived(data) {
@@ -71,6 +73,40 @@ visible: membersPage.__canManage && membersStackView.currentIndex === 0
 anchors.right: membersStackViewHeader.right
 anchors.verticalCenter: membersStackViewHeader.verticalCenter
 spacing: Style.marginL
+
+Text {
+text: qsTr("Remove")
+font.pixelSize: Style.fontSizeM
+font.bold: true
+color: membersPage.__selectionManager && membersPage.__selectionManager.selectedIds.length > 0 ? Style.errorColor : Style.inactiveTextColor
+opacity: membersPage.__selectionManager && membersPage.__selectionManager.selectedIds.length > 0 ? 1.0 : 0.5
+
+MouseArea {
+anchors.fill: parent
+hoverEnabled: true
+cursorShape: membersPage.__selectionManager && membersPage.__selectionManager.selectedIds.length > 0 ? Qt.PointingHandCursor : Qt.ArrowCursor
+enabled: membersPage.__selectionManager && membersPage.__selectionManager.selectedIds.length > 0
+onClicked: {
+var count = membersPage.__selectionManager.selectedIds.length
+ModalDialogManager.showConfirmationDialog(
+qsTr("Remove Members"),
+qsTr("Are you sure you want to remove %1 selected member(s)?").arg(count),
+function(result) {
+if (result === true && membersPage.apiClient) {
+var ids = membersPage.__selectionManager.selectedIds.slice()
+for (var i = 0; i < ids.length; i++) {
+if (ids[i].indexOf("inv_") === 0)
+membersPage.apiClient.revokeInvitation(ids[i].substring(4))
+else
+membersPage.apiClient.removeUser(ids[i])
+}
+membersPage.__selectionManager.clear()
+}
+}
+)
+}
+}
+}
 
 Text {
 id: createUserBtn
@@ -153,11 +189,13 @@ TenantTableContainer {
 anchors.top: parent.top
 anchors.topMargin: Style.marginM
 height: Math.min(membersTableHeader.height + membersColumn.height + 2,
-parent.height - Style.marginM)
+parent.height - Style.marginM - Style.marginL)
 
 IdSelectionManager {
 id: membersSelectionManager
 multiSelect: true
+Component.onCompleted: membersPage.__selectionManager = membersSelectionManager
+Component.onDestruction: membersPage.__selectionManager = null
 }
 
 TenantTableHeader {

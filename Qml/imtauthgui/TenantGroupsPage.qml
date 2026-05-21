@@ -33,6 +33,9 @@ property string __editGroupDescription: ""
 
 readonly property bool __canManage: groupsPage.stateManager ? groupsPage.stateManager.canManageMembers : false
 
+property var __selectionManager: null
+property var __dataProvider: null
+
 Connections {
 target: groupsPage.apiClient
 function onGroupDataReceived(data) {
@@ -84,6 +87,71 @@ groupsStackView.next()
 }
 }
 
+Text {
+id: groupsEditBtn
+visible: groupsPage.__canManage && groupsStackView.currentIndex === 0
+anchors.right: groupsCreateBtn.left
+anchors.rightMargin: Style.marginL
+anchors.verticalCenter: groupsStackViewHeader.verticalCenter
+text: qsTr("Edit")
+font.pixelSize: Style.fontSizeM
+font.bold: true
+color: groupsPage.__selectionManager && groupsPage.__selectionManager.selectedIds.length === 1 ? Style.linkColor : Style.inactiveTextColor
+opacity: groupsPage.__selectionManager && groupsPage.__selectionManager.selectedIds.length === 1 ? 1.0 : 0.5
+
+MouseArea {
+anchors.fill: parent
+hoverEnabled: true
+cursorShape: groupsPage.__selectionManager && groupsPage.__selectionManager.selectedIds.length === 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
+enabled: groupsPage.__selectionManager && groupsPage.__selectionManager.selectedIds.length === 1
+onClicked: {
+var selId = groupsPage.__selectionManager.selectedIds[0]
+var items = groupsPage.__dataProvider ? groupsPage.__dataProvider.items : []
+for (var i = 0; i < items.length; i++) {
+if (items[i] && items[i].id === selId) {
+groupsPage.__openEditGroup(selId, items[i].title || items[i].id || "", items[i].description || "")
+break
+}
+}
+}
+}
+}
+
+Text {
+id: groupsRemoveBtn
+visible: groupsPage.__canManage && groupsStackView.currentIndex === 0
+anchors.right: groupsEditBtn.left
+anchors.rightMargin: Style.marginL
+anchors.verticalCenter: groupsStackViewHeader.verticalCenter
+text: qsTr("Remove")
+font.pixelSize: Style.fontSizeM
+font.bold: true
+color: groupsPage.__selectionManager && groupsPage.__selectionManager.selectedIds.length > 0 ? Style.errorColor : Style.inactiveTextColor
+opacity: groupsPage.__selectionManager && groupsPage.__selectionManager.selectedIds.length > 0 ? 1.0 : 0.5
+
+MouseArea {
+anchors.fill: parent
+hoverEnabled: true
+cursorShape: groupsPage.__selectionManager && groupsPage.__selectionManager.selectedIds.length > 0 ? Qt.PointingHandCursor : Qt.ArrowCursor
+enabled: groupsPage.__selectionManager && groupsPage.__selectionManager.selectedIds.length > 0
+onClicked: {
+var count = groupsPage.__selectionManager.selectedIds.length
+ModalDialogManager.showConfirmationDialog(
+qsTr("Delete Groups"),
+qsTr("Are you sure you want to delete %1 selected group(s)? This action cannot be undone.").arg(count),
+function(result) {
+if (result === true && groupsPage.apiClient) {
+var ids = groupsPage.__selectionManager.selectedIds.slice()
+for (var i = 0; i < ids.length; i++)
+groupsPage.apiClient.removeGroup(ids[i])
+groupsPage.__selectionManager.clear()
+}
+}
+)
+}
+}
+}
+
 BaseText {
 id: groupsDescription
 anchors.top: groupsStackViewHeader.bottom
@@ -127,17 +195,21 @@ TenantTableContainer {
 anchors.top: groupsFilterInput.bottom
 anchors.topMargin: Style.marginM
 height: Math.min(groupsTableHeader.height + groupsListView2.contentHeight + 2,
-parent.height - groupsFilterInput.height - groupsFilterInput.anchors.topMargin - Style.marginM)
+parent.height - groupsFilterInput.height - groupsFilterInput.anchors.topMargin - Style.marginM - Style.marginL)
 
 IdSelectionManager {
 id: groupsSelectionManager
 multiSelect: true
+Component.onCompleted: groupsPage.__selectionManager = groupsSelectionManager
+Component.onDestruction: groupsPage.__selectionManager = null
 }
 
 FilterableSelectGqlDataProvider {
 id: groupsDataProvider
 collectionId: "Groups"
 pageSize: 50
+Component.onCompleted: groupsPage.__dataProvider = groupsDataProvider
+Component.onDestruction: groupsPage.__dataProvider = null
 }
 
 Component.onCompleted: {

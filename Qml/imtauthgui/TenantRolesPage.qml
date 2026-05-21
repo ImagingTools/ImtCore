@@ -33,6 +33,9 @@ property string __editRoleDescription: ""
 
 readonly property bool __canManage: rolesPage.stateManager ? rolesPage.stateManager.canManageMembers : false
 
+property var __selectionManager: null
+property var __dataProvider: null
+
 Connections {
 target: rolesPage.apiClient
 function onRoleDataReceived(data) {
@@ -84,6 +87,71 @@ rolesStackView.next()
 }
 }
 
+Text {
+id: rolesEditBtn
+visible: rolesPage.__canManage && rolesStackView.currentIndex === 0
+anchors.right: rolesCreateBtn.left
+anchors.rightMargin: Style.marginL
+anchors.verticalCenter: rolesStackViewHeader.verticalCenter
+text: qsTr("Edit")
+font.pixelSize: Style.fontSizeM
+font.bold: true
+color: rolesPage.__selectionManager && rolesPage.__selectionManager.selectedIds.length === 1 ? Style.linkColor : Style.inactiveTextColor
+opacity: rolesPage.__selectionManager && rolesPage.__selectionManager.selectedIds.length === 1 ? 1.0 : 0.5
+
+MouseArea {
+anchors.fill: parent
+hoverEnabled: true
+cursorShape: rolesPage.__selectionManager && rolesPage.__selectionManager.selectedIds.length === 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
+enabled: rolesPage.__selectionManager && rolesPage.__selectionManager.selectedIds.length === 1
+onClicked: {
+var selId = rolesPage.__selectionManager.selectedIds[0]
+var items = rolesPage.__dataProvider ? rolesPage.__dataProvider.items : []
+for (var i = 0; i < items.length; i++) {
+if (items[i] && items[i].id === selId) {
+rolesPage.__openEditRole(selId, items[i].title || items[i].id || "", items[i].description || "")
+break
+}
+}
+}
+}
+}
+
+Text {
+id: rolesRemoveBtn
+visible: rolesPage.__canManage && rolesStackView.currentIndex === 0
+anchors.right: rolesEditBtn.left
+anchors.rightMargin: Style.marginL
+anchors.verticalCenter: rolesStackViewHeader.verticalCenter
+text: qsTr("Remove")
+font.pixelSize: Style.fontSizeM
+font.bold: true
+color: rolesPage.__selectionManager && rolesPage.__selectionManager.selectedIds.length > 0 ? Style.errorColor : Style.inactiveTextColor
+opacity: rolesPage.__selectionManager && rolesPage.__selectionManager.selectedIds.length > 0 ? 1.0 : 0.5
+
+MouseArea {
+anchors.fill: parent
+hoverEnabled: true
+cursorShape: rolesPage.__selectionManager && rolesPage.__selectionManager.selectedIds.length > 0 ? Qt.PointingHandCursor : Qt.ArrowCursor
+enabled: rolesPage.__selectionManager && rolesPage.__selectionManager.selectedIds.length > 0
+onClicked: {
+var count = rolesPage.__selectionManager.selectedIds.length
+ModalDialogManager.showConfirmationDialog(
+qsTr("Delete Roles"),
+qsTr("Are you sure you want to delete %1 selected role(s)? This action cannot be undone.").arg(count),
+function(result) {
+if (result === true && rolesPage.apiClient) {
+var ids = rolesPage.__selectionManager.selectedIds.slice()
+for (var i = 0; i < ids.length; i++)
+rolesPage.apiClient.removeRole(ids[i])
+rolesPage.__selectionManager.clear()
+}
+}
+)
+}
+}
+}
+
 BaseText {
 id: rolesDescription
 anchors.top: rolesStackViewHeader.bottom
@@ -127,17 +195,21 @@ TenantTableContainer {
 anchors.top: rolesFilterInput.bottom
 anchors.topMargin: Style.marginM
 height: Math.min(rolesTableHeader.height + rolesListView2.contentHeight + 2,
-parent.height - rolesFilterInput.height - rolesFilterInput.anchors.topMargin - Style.marginM)
+parent.height - rolesFilterInput.height - rolesFilterInput.anchors.topMargin - Style.marginM - Style.marginL)
 
 IdSelectionManager {
 id: rolesSelectionManager
 multiSelect: true
+Component.onCompleted: rolesPage.__selectionManager = rolesSelectionManager
+Component.onDestruction: rolesPage.__selectionManager = null
 }
 
 FilterableSelectGqlDataProvider {
 id: rolesDataProvider
 collectionId: "Roles"
 pageSize: 50
+Component.onCompleted: rolesPage.__dataProvider = rolesDataProvider
+Component.onDestruction: rolesPage.__dataProvider = null
 }
 
 Component.onCompleted: {
