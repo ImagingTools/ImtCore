@@ -10,6 +10,7 @@
 #include <QtCore/QModelIndex>
 
 // ACF includes
+#include <istd/IInformationProvider.h>
 #include <iqtgui/iqtgui.h>
 
 
@@ -39,26 +40,28 @@ void CTaskItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opt
 {
 	painter->setRenderHint(QPainter::Antialiasing);
 	painter->setRenderHint(QPainter::TextAntialiasing);
-	
+
+	QPalette palette = qApp->palette();
+	QFont font = qApp->font();
+
 	// Setup fonts
-	QFont taskTextFont;
-	taskTextFont.setPointSize(11);
+	QFont taskTextFont = option.font;
+	taskTextFont.setPointSize(option.font.pointSize() + 2);
 	taskTextFont.setBold(false);
 	QFontMetrics taskTextFontMetrics(taskTextFont);
 
-	QFont typeTextFont;
-	typeTextFont.setPointSize(8);
+	QFont typeTextFont = option.font;
+	//typeTextFont.setPointSize(8);
 	typeTextFont.setBold(true);
 	QFontMetrics typeTextFontMetrics(typeTextFont);
 
 	// Setup icon size
 	int iconSize = taskTextFontMetrics.height() + typeTextFontMetrics.height();
 
-	int rowIndex = option.index.row();
-	int topPadding = (rowIndex == 0) ? 0 : 9;
-	int bottomPadding = (rowIndex == 0) ? 9 : 0;
-
-	QPalette palette = qApp->palette();
+	const int rowIndex = option.index.row();
+	const int topPadding = (rowIndex == 0) ? 0 : 9;
+	const int bottomPadding = (rowIndex == 0) ? 9 : 0;
+	const int textPadding = 4;
 
 	// Draw background, border and header
 	QColor backgroundColor(palette.color(QPalette::Base));
@@ -71,17 +74,59 @@ void CTaskItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opt
 	painter->drawRoundedRect(mainRect, 2, 2);
 	painter->restore();
 
-	const int textPadding = 4;
 	QRect headerRect(mainRect.left(), mainRect.top(), mainRect.width(), iconSize + 2 * textPadding);
 	painter->fillRect(headerRect, headerColor);
+
+	// Get task selected state
+	int taskTextRectRight = mainRect.right() - textPadding;
+
+	if (m_selectableItems)
+	{
+		bool isTaskSelected = index.data(DR_TASK_SELECTED).toBool();
+
+		// Draw checkbox for selection state
+		int checkboxSize = 16;
+		int checkboxPadding = 4;
+		QRect checkboxRect(mainRect.right() - checkboxSize - checkboxPadding,
+			mainRect.top() + (headerRect.height() - checkboxSize) / 2,
+			checkboxSize,
+			checkboxSize);
+
+		// Draw checkbox background
+		painter->save();
+		QColor checkboxBgColor = palette.color(QPalette::Base);
+		painter->setBrush(checkboxBgColor);
+		painter->setPen(QPen(palette.color(QPalette::Dark), 1));
+		painter->drawRoundedRect(checkboxRect, 2, 2);
+
+		// Draw checkmark if selected
+		if (isTaskSelected)
+		{
+			painter->setPen(QPen(palette.color(QPalette::Highlight), 2));
+			painter->setRenderHint(QPainter::Antialiasing, true);
+
+			// Draw checkmark symbol
+			QPoint checkmarkStart(checkboxRect.left() + 3, checkboxRect.top() + checkboxRect.height() / 2);
+			QPoint checkmarkMiddle(checkboxRect.left() + checkboxRect.width() / 2 - 1, checkboxRect.bottom() - 3);
+			QPoint checkmarkEnd(checkboxRect.right() - 3, checkboxRect.top() + 3);
+
+			painter->drawLine(checkmarkStart, checkmarkMiddle);
+			painter->drawLine(checkmarkMiddle, checkmarkEnd);
+		}
+		painter->restore();
+
+		taskTextRectRight = checkboxRect.left() - textPadding;
+	}
+
+	// Adjust task text rect to account for checkbox
+	int taskTextRectLeft = mainRect.left() + 2 * textPadding + iconSize;
 
 	// Draw task name:
 	QColor taskTextColor = option.state & QStyle::State_Selected ? palette.color(QPalette::HighlightedText) : palette.color(QPalette::Text);
 	painter->setPen(taskTextColor);
 	painter->setFont(taskTextFont);
 
-	int taskTextRectLeft = mainRect.left() + 2 * textPadding + iconSize;
-	QRect taskTextRect(taskTextRectLeft, mainRect.top() + textPadding, mainRect.right() - taskTextRectLeft, taskTextFontMetrics.height());
+	QRect taskTextRect(taskTextRectLeft, mainRect.top() + textPadding, taskTextRectRight - taskTextRectLeft, taskTextFontMetrics.height());
 	QString taskText = index.data(DR_TASK_NAME).toString();
 
 	taskText = taskTextFontMetrics.elidedText(taskText, Qt::ElideRight, taskTextRect.width() - textPadding);
@@ -107,7 +152,7 @@ void CTaskItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opt
 		typeText += " | " + inputId;
 	}
 
-	QRect typeTextRect(taskTextRectLeft, mainRect.top() + textPadding + taskTextFontMetrics.height(), mainRect.right() - taskTextRectLeft, typeTextFontMetrics.height());
+	QRect typeTextRect(taskTextRectLeft, mainRect.top() + textPadding + taskTextFontMetrics.height(), taskTextRectRight - taskTextRectLeft, typeTextFontMetrics.height());
 	typeText = typeTextFontMetrics.elidedText(typeText, Qt::ElideRight, typeTextRect.width() - textPadding);
 	painter->drawText(
 					typeTextRect,
@@ -126,10 +171,15 @@ void CTaskItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opt
 
 	// Draw thumbnail
 	QImage thmubnailImage = index.data(DR_TASK_PREVIEW_OBJECT).value<QImage>();
-	QRect thumbRect(mainRect.left() + 1, headerRect.bottom() + 1, mainRect.width() - 2, mainRect.height() -1 - headerRect.height());
+	QRect thumbRect(mainRect.left() + 1, headerRect.bottom() + 1, 
+		mainRect.width() - 2, 
+		mainRect.height() - headerRect.height() - 1);
 	
-	double sourceAspectRatio = 1.0 * thmubnailImage.width() / thmubnailImage.height();
-	double destinationAspectRatio = 1.0 * thumbRect.width() / thumbRect.height();
+	double sourceAspectRatio = thmubnailImage.height() > 1.0 ? 
+		1.0 * thmubnailImage.width() / thmubnailImage.height() : 1.0;
+
+	double destinationAspectRatio = thumbRect.height() > 1.0 ? 
+		1.0 * thumbRect.width() / thumbRect.height() : 1.0;
 
 	int originalWidth = thumbRect.width();
 	int originalHeight = thumbRect.height();
@@ -192,6 +242,20 @@ QWidget* CTaskItemDelegate::createEditor(QWidget* /*parent*/, const QStyleOption
 	return nullptr;
 }
 
+// static
+QRect CTaskItemDelegate::GetCheckboxRect(const QRect& itemRect)
+{
+	const int checkboxSize = 16;
+	const int checkboxPadding = 8;
+
+	const int offsetY = 10;
+
+	return QRect(
+		itemRect.right() - checkboxSize - checkboxPadding * 2,
+		itemRect.top() + offsetY,
+		checkboxSize + checkboxPadding * 2,
+		checkboxSize + checkboxPadding * 2);
+}
 
 // Micro UI
 
@@ -205,6 +269,7 @@ void CMicroTaskItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
 {
 	bool isTaskSelected = option.state & QStyle::State_Selected;
 	bool isTaskEnabled = index.data(DR_TASK_ENABLED).toBool();
+	bool isTaskChecked = index.data(DR_TASK_SELECTED).toBool();
 
 	QPalette palette = qApp->palette();
 	
@@ -225,26 +290,53 @@ void CMicroTaskItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
 	painter->setPen(QPen(palette.color(isTaskSelected ? QPalette::Highlight : QPalette::Shadow), isTaskSelected ? 2 : 1));
 	painter->drawRect(mainRect);
 
+	// Draw checkbox for selection state
+	const int checkboxSize = 12;
+	const int checkboxPadding = 2;
+	QRect checkboxRect(mainRect.right() - checkboxSize - checkboxPadding, 
+	                   mainRect.top() + checkboxPadding, 
+	                   checkboxSize, 
+	                   checkboxSize);
+
+	// Draw checkbox background
+	QColor checkboxBgColor = palette.color(QPalette::Base);
+	painter->setBrush(checkboxBgColor);
+	painter->setPen(QPen(palette.color(QPalette::Dark), 1));
+	painter->drawRoundedRect(checkboxRect, 1, 1);
+
+	// Draw checkmark if checked
+	if (isTaskChecked)
+	{
+		painter->setPen(QPen(palette.color(QPalette::Highlight), 2));
+		painter->setRenderHint(QPainter::Antialiasing, true);
+		
+		// Draw checkmark symbol (scaled down for smaller size)
+		QPoint checkmarkStart(checkboxRect.left() + 2, checkboxRect.top() + checkboxRect.height() / 2);
+		QPoint checkmarkMiddle(checkboxRect.left() + checkboxRect.width() / 2 - 1, checkboxRect.bottom() - 2);
+		QPoint checkmarkEnd(checkboxRect.right() - 2, checkboxRect.top() + 2);
+		
+		painter->drawLine(checkmarkStart, checkmarkMiddle);
+		painter->drawLine(checkmarkMiddle, checkmarkEnd);
+	}
 
 	// Draw icon
+	const int icon_size = 26;
 	QPixmap stateIcon = index.data(DR_TASK_PROCESSING_STATE_ICON).value<QPixmap>()
-		.scaledToHeight(28, Qt::SmoothTransformation);
-	stateIcon = QIcon(stateIcon).pixmap(28, 28, isTaskEnabled ? QIcon::Normal : QIcon::Disabled);
+		.scaledToHeight(icon_size, Qt::SmoothTransformation);
+	stateIcon = QIcon(stateIcon).pixmap(icon_size, icon_size, isTaskEnabled ? QIcon::Normal : QIcon::Disabled);
 
-	QRect iconRect(mainRect.left() + 2, mainRect.top() + 2, 28, 28);
+	QRect iconRect(mainRect.left() + 2, mainRect.top() + 2, icon_size, icon_size);
 	painter->drawPixmap(iconRect, stateIcon);
 
-
-	// Draw text
+	// Draw text (adjusted to avoid checkbox)
 	painter->setPen(palette.color(isTaskEnabled ? QPalette::Text : QPalette::Light));
 
 	QString taskText = index.data(DR_TASK_NAME).toString();
-	QRect textRect = mainRect.adjusted(4, 36, -4, -2);
+	// Adjust text rect to leave space for checkbox
+	QRect textRect = mainRect.adjusted(4, 36, -(checkboxSize + checkboxPadding + 2), -2);
 
 	QFont smallFont;
 	smallFont.setPointSize(8);
-	//smallFont.setBold(isTaskSelected);
-	//smallFont.setItalic(!isTaskEnabled);
 	painter->setFont(smallFont);
 
 	QTextOption to;
@@ -252,6 +344,21 @@ void CMicroTaskItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
 	painter->drawText(textRect, taskText, to);
 
 	painter->restore();
+}
+
+// static
+QRect CMicroTaskItemDelegate::GetCheckboxRect(const QRect& itemRect)
+{
+	const int checkboxSize = 12;
+	const int checkboxPadding = 2;
+
+	const QRect mainRect = itemRect.adjusted(1, 1, -2, -2);
+
+	return QRect(
+		mainRect.right() - checkboxSize - checkboxPadding,
+		mainRect.top() + checkboxPadding,
+		checkboxSize,
+		checkboxSize);
 }
 
 

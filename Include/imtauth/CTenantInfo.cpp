@@ -87,6 +87,22 @@ void CTenantInfo::SetOwnerId(const QByteArray& ownerId)
 }
 
 
+QByteArray CTenantInfo::GetCreatorId() const
+{
+	return m_creatorId;
+}
+
+
+void CTenantInfo::SetCreatorId(const QByteArray& creatorId)
+{
+	if (m_creatorId != creatorId){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_creatorId = creatorId;
+	}
+}
+
+
 bool CTenantInfo::IsActive() const
 {
 	return m_isActive;
@@ -219,6 +235,11 @@ bool CTenantInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_ownerId);
 	retVal = retVal && archive.EndTag(ownerIdTag);
 
+	iser::CArchiveTag creatorIdTag("CreatorId", "Creator ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(creatorIdTag);
+	retVal = retVal && archive.Process(m_creatorId);
+	retVal = retVal && archive.EndTag(creatorIdTag);
+
 	iser::CArchiveTag isActiveTag("IsActive", "Is active", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(isActiveTag);
 	retVal = retVal && archive.Process(m_isActive);
@@ -302,6 +323,7 @@ bool CTenantInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/
 		m_name = sourcePtr->m_name;
 		m_description = sourcePtr->m_description;
 		m_ownerId = sourcePtr->m_ownerId;
+		m_creatorId = sourcePtr->m_creatorId;
 		m_isActive = sourcePtr->m_isActive;
 		m_createdAt = sourcePtr->m_createdAt;
 		m_updatedAt = sourcePtr->m_updatedAt;
@@ -334,6 +356,7 @@ bool CTenantInfo::ResetData(CompatibilityMode /*mode*/)
 	m_name.clear();
 	m_description.clear();
 	m_ownerId.clear();
+	m_creatorId.clear();
 	m_isActive = true;
 	m_createdAt.clear();
 	m_updatedAt.clear();

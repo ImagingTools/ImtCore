@@ -79,6 +79,55 @@ class Menu extends Popup {
                 this.$clampToViewport()
             }
         }
+
+        // Keyboard navigation handler
+        this.$onKeyDown = (e) => {
+            if (!this.getPropertyValue('visible')) return
+
+            switch (e.key){
+                case 'ArrowDown':
+                    e.preventDefault()
+                    e.stopPropagation()
+                    this.$navigateNext()
+                    break
+                case 'ArrowUp':
+                    e.preventDefault()
+                    e.stopPropagation()
+                    this.$navigatePrev()
+                    break
+                case 'ArrowRight':
+                    e.preventDefault()
+                    e.stopPropagation()
+                    this.$openCurrentSubmenu()
+                    break
+                case 'ArrowLeft':
+                    e.preventDefault()
+                    e.stopPropagation()
+                    this.$closeToParent()
+                    break
+                case 'Enter':
+                case 'Return':
+                    e.preventDefault()
+                    e.stopPropagation()
+                    this.$triggerCurrent()
+                    break
+                case 'Escape':
+                    e.preventDefault()
+                    e.stopPropagation()
+                    this.close()
+                    break
+                default:
+                    // Mnemonic: check if pressed key matches an & mnemonic in items
+                    this.$handleMnemonic(e)
+                    break
+            }
+        }
+
+        // Reference to the active submenu (only one at a time)
+        this.$activeSubmenu = null
+
+        // Parent menu reference (set by parent when submenu is added)
+        this.$parentMenu = null
     }
 
     // Check if a DOM target is inside any child submenu's content box
@@ -191,8 +240,9 @@ class Menu extends Popup {
             textSpan.textContent = submenu.getPropertyValue('title') || ''
         })
 
-        // Hover: highlight + open submenu
+        // Hover: highlight + open submenu with delay (Qt ~225ms)
         let hideTimer = null
+        let showTimer = null
 
         let scheduleHide = () => {
             if (hideTimer) clearTimeout(hideTimer)
@@ -203,6 +253,7 @@ class Menu extends Popup {
                 let onSubmenu = submenu.$contentBox && submenu.$contentBox.matches(':hover')
                 if (!onTrigger && !onSubmenu){
                     submenu.close()
+                    if (this.$activeSubmenu === submenu) this.$activeSubmenu = null
                 } else {
                     scheduleHide()
                 }
@@ -213,13 +264,23 @@ class Menu extends Popup {
             if (hideTimer){ clearTimeout(hideTimer); hideTimer = null }
         }
 
+        let cancelShow = () => {
+            if (showTimer){ clearTimeout(showTimer); showTimer = null }
+        }
+
         trigger.addEventListener('mouseenter', () => {
             cancelHide()
             trigger.style.backgroundColor = '#e8e8e8'
-            this.$openSubmenu(submenu, trigger)
+            // Delay submenu opening (~225ms) to avoid accidental opening
+            cancelShow()
+            showTimer = setTimeout(() => {
+                showTimer = null
+                this.$openSubmenu(submenu, trigger)
+            }, 225)
         })
         trigger.addEventListener('mouseleave', () => {
             trigger.style.backgroundColor = 'transparent'
+            cancelShow()
             scheduleHide()
         })
 
@@ -253,6 +314,15 @@ class Menu extends Popup {
 
     $openSubmenu(submenu, triggerEl){
         if (submenu.getPropertyValue('opened')) return
+
+        // Close any previously active submenu first
+        if (this.$activeSubmenu && this.$activeSubmenu !== submenu && this.$activeSubmenu.getPropertyValue('opened')){
+            this.$activeSubmenu.close()
+        }
+        this.$activeSubmenu = submenu
+
+        // Set parent reference for keyboard navigation (Left arrow closes submenu)
+        submenu.$parentMenu = this
 
         // Lazily attach contentBox mouse listeners (contentBox didn't exist at trigger creation)
         if (triggerEl.$attachContentBoxListeners) triggerEl.$attachContentBoxListeners()
@@ -304,6 +374,120 @@ class Menu extends Popup {
         }
     }
 
+    // ── Keyboard navigation helpers ─────────────────────────────
+
+    // Get navigable items (skip separators, disabled items, and hidden items)
+    $getNavigableItems(){
+        let result = []
+        for (let item of this.$contentItems){
+            // Submenu triggers are plain DOM objects with $submenu reference — navigable
+            if (item.$submenu){
+                result.push(item)
+                continue
+            }
+            // Skip non-QML objects (shouldn't happen, but guard)
+            if (!item.getProperty) continue
+            // Skip MenuSeparator
+            if (item.$isSeparator) continue
+            let enabledProp = item.getProperty('enabled')
+            if (enabledProp && !enabledProp.get()) continue
+            let visProp = item.getProperty('visible')
+            if (visProp && !visProp.get()) continue
+            result.push(item)
+        }
+        return result
+    }
+
+    $navigateNext(){
+        let navigable = this.$getNavigableItems()
+        if (navigable.length === 0) return
+        let curIdx = this.getPropertyValue('currentIndex')
+        let curItem = curIdx >= 0 ? this.$contentItems[curIdx] : null
+        let navIdx = navigable.indexOf(curItem)
+        let nextIdx = (navIdx + 1) % navigable.length
+        let newItem = navigable[nextIdx]
+        let newContentIdx = this.$contentItems.indexOf(newItem)
+        this.getProperty('currentIndex').reset(newContentIdx)
+    }
+
+    $navigatePrev(){
+        let navigable = this.$getNavigableItems()
+        if (navigable.length === 0) return
+        let curIdx = this.getPropertyValue('currentIndex')
+        let curItem = curIdx >= 0 ? this.$contentItems[curIdx] : null
+        let navIdx = navigable.indexOf(curItem)
+        let nextIdx = navIdx <= 0 ? navigable.length - 1 : navIdx - 1
+        let newItem = navigable[nextIdx]
+        let newContentIdx = this.$contentItems.indexOf(newItem)
+        this.getProperty('currentIndex').reset(newContentIdx)
+    }
+
+    $openCurrentSubmenu(){
+        let curIdx = this.getPropertyValue('currentIndex')
+        if (curIdx < 0 || curIdx >= this.$contentItems.length) return
+        let item = this.$contentItems[curIdx]
+        // Check if item is a submenu trigger
+        if (item.$submenu){
+            this.$openSubmenu(item.$submenu, item.$dom || item)
+            // Focus the submenu and highlight first item
+            item.$submenu.getProperty('currentIndex').reset(-1)
+            item.$submenu.$navigateNext()
+        }
+    }
+
+    $closeToParent(){
+        // If this is a submenu, close it and return focus to parent
+        if (this.$parentMenu){
+            this.close()
+            // Parent menu regains keyboard focus
+            if (this.$parentMenu.$contentBox){
+                this.$parentMenu.$contentBox.focus()
+            }
+        }
+    }
+
+    $triggerCurrent(){
+        let curIdx = this.getPropertyValue('currentIndex')
+        if (curIdx < 0 || curIdx >= this.$contentItems.length) return
+        let item = this.$contentItems[curIdx]
+        // If it's a submenu trigger, open it
+        if (item.$submenu){
+            this.$openCurrentSubmenu()
+            return
+        }
+        // Simulate click on the MenuItem
+        if (item.getDom){
+            item.getDom().click()
+        }
+    }
+
+    $handleMnemonic(e){
+        // Mnemonic activation: single character key press (with or without Alt)
+        let key = e.key.length === 1 ? e.key.toLowerCase() : null
+        if (!key) return
+        for (let item of this.$contentItems){
+            if (!item.getPropertyValue) continue
+            let text = item.getPropertyValue('text') || ''
+            let ampIdx = text.indexOf('&')
+            if (ampIdx >= 0 && ampIdx < text.length - 1){
+                let mnemonic = text[ampIdx + 1].toLowerCase()
+                if (mnemonic === key){
+                    let idx = this.$contentItems.indexOf(item)
+                    this.getProperty('currentIndex').reset(idx)
+                    // If submenu, open; otherwise trigger
+                    if (item.$submenu){
+                        this.$openCurrentSubmenu()
+                    } else if (item.getDom){
+                        item.getDom().click()
+                    }
+                    e.preventDefault()
+                    e.stopPropagation()
+                    return
+                }
+            }
+        }
+    }
+
     $trackHighlight(child){
         if (!child.getProperty) return
         let hlProp = child.getProperty('highlighted')
@@ -321,6 +505,24 @@ class Menu extends Popup {
 
     $updateCount(){
         this.getProperty('count').reset(this.$contentItems.length)
+        // Update checkmark column reservation: if any item is checkable, all reserve space
+        this.$updateCheckColumnReservation()
+    }
+
+    // If any MenuItem in the menu has checkable=true, all items reserve the checkmark column
+    $updateCheckColumnReservation(){
+        let hasCheckable = false
+        for (let item of this.$contentItems){
+            if (item.getPropertyValue && item.getPropertyValue('checkable')){
+                hasCheckable = true
+                break
+            }
+        }
+        for (let item of this.$contentItems){
+            if (item.$setCheckColumnReserved){
+                item.$setCheckColumnReserved(hasCheckable)
+            }
+        }
     }
 
     // ── Qt Methods: item access ─────────────────────────────────
@@ -501,16 +703,40 @@ class Menu extends Popup {
 
     open(){
         if (this.getPropertyValue('opened')) return
+        // Save focused element for restoration on close
+        this.$previousFocus = document.activeElement
         this.getSignal('aboutToShow')()
         this.getProperty('visible').reset(true)
         this.getProperty('opened').reset(true)
+        // Attach keyboard listener and focus the content box
+        if (this.$contentBox){
+            this.$contentBox.setAttribute('tabindex', '-1')
+            this.$contentBox.style.outline = 'none'
+            this.$contentBox.addEventListener('keydown', this.$onKeyDown)
+            requestAnimationFrame(() => {
+                if (this.$contentBox && this.getPropertyValue('opened')){
+                    this.$contentBox.focus()
+                }
+            })
+        }
     }
 
     close(){
         if (!this.getPropertyValue('opened')) return
         this.getSignal('aboutToHide')()
+        // Remove keyboard listener
+        if (this.$contentBox){
+            this.$contentBox.removeEventListener('keydown', this.$onKeyDown)
+        }
         this.getProperty('visible').reset(false)
         this.getProperty('opened').reset(false)
+        // Reset currentIndex
+        this.getProperty('currentIndex').reset(-1)
+        // Close active submenu
+        if (this.$activeSubmenu && this.$activeSubmenu.getPropertyValue('opened')){
+            this.$activeSubmenu.close()
+        }
+        this.$activeSubmenu = null
         // Close sub-menus (triggers have $submenu reference)
         for (let item of this.$contentItems){
             if (item.$submenu && item.$submenu.getPropertyValue('opened')){
@@ -523,6 +749,11 @@ class Menu extends Popup {
             if (child instanceof Menu && child.getPropertyValue('opened')){
                 child.close()
             }
+        }
+        // Restore focus
+        if (this.$previousFocus && this.$previousFocus.focus){
+            this.$previousFocus.focus()
+            this.$previousFocus = null
         }
     }
 
@@ -633,6 +864,9 @@ class Menu extends Popup {
             let item = this.$contentItems[i]
             if (item.getProperty && item.getProperty('highlighted')){
                 item.getProperty('highlighted').reset(i === curIdx)
+            } else if (item.$dom){
+                // Submenu trigger (plain DOM element)
+                item.$dom.style.backgroundColor = (i === curIdx) ? '#e8e8e8' : 'transparent'
             }
         }
     }
@@ -651,6 +885,9 @@ class Menu extends Popup {
     }
 
     destroy(){
+        if (this.$contentBox){
+            this.$contentBox.removeEventListener('keydown', this.$onKeyDown)
+        }
         window.removeEventListener('resize', this.$onResize)
         this.$contentItems = []
         super.destroy()

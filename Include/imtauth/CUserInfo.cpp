@@ -38,6 +38,22 @@ void CUserInfo::SetPasswordHash(const QByteArray& passwordHash)
 }
 
 
+QByteArray CUserInfo::GetSid() const
+{
+	return m_sid;
+}
+
+
+void CUserInfo::SetSid(const QByteArray& sid)
+{
+	if (m_sid != sid){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_sid = sid;
+	}
+}
+
+
 QString CUserInfo::GetMail() const
 {
 	return m_mail;
@@ -253,6 +269,13 @@ bool CUserInfo::Serialize(iser::IArchive &archive)
 		}
 	}
 
+	if (imtCoreVersion >= 20583){
+		iser::CArchiveTag sidTag("Sid", "Windows SID", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(sidTag);
+		retVal = retVal && archive.Process(m_sid);
+		retVal = retVal && archive.EndTag(sidTag);
+	}
+
 	return retVal;
 }
 
@@ -268,6 +291,7 @@ bool CUserInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 		BaseClass::CopyFrom(object);
 
 		m_passwordHash = sourcePtr->m_passwordHash;
+		m_sid = sourcePtr->m_sid;
 		m_mail = sourcePtr->m_mail;
 		m_groupIds = sourcePtr->m_groupIds;
 		m_systemInfos = sourcePtr->m_systemInfos;
@@ -286,6 +310,7 @@ bool CUserInfo::IsEqual(const IChangeable& object) const
 	const CUserInfo* sourcePtr = dynamic_cast<const CUserInfo*>(&object);
 	if (retVal && sourcePtr != nullptr){
 		retVal = retVal && m_passwordHash == sourcePtr->m_passwordHash;
+		retVal = retVal && m_sid == sourcePtr->m_sid;
 		retVal = retVal && m_mail == sourcePtr->m_mail;
 		retVal = retVal && m_groupIds == sourcePtr->m_groupIds;
 		retVal = retVal && m_lastConnection == sourcePtr->m_lastConnection;
@@ -317,6 +342,7 @@ bool CUserInfo::ResetData(CompatibilityMode mode)
 
 	m_mail.clear();
 	m_passwordHash.clear();
+	m_sid.clear();
 	m_groupIds.clear();
 
 	return true;

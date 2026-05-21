@@ -28,7 +28,7 @@ Item {
     property int rowHeight: 28
     property int indentation: 18
     property int cacheBuffer: 4000
-    property int headerHeight: 28
+    property int headerHeight: 30
 
     property bool showHeader: true
     property bool multiSelect: false
@@ -41,6 +41,8 @@ Item {
 
     property var flickable: null
 
+    readonly property var contentListView: listView
+
     property string filterText: ""
     property string filterRole: "text"
 
@@ -51,7 +53,7 @@ Item {
     property string normalTextColor: Style.textColor
     property string selectedTextColor: Style.textSelectedColor
     property string disabledTextColor: Style.inactiveTextColor
-    property string headerBackgroundColor: Style.backgroundColor
+    property string headerBackgroundColor: Style.alternateBaseColor
     property string gridLineColor: Style.borderColor2
 
     property var currentIndex: null
@@ -88,7 +90,7 @@ Item {
     property int __editingColumn: -1
     property var __editingOriginalValue: null
 
-    height: (root.showHeader ? root.headerHeight : 0) + visibleModel.count * root.rowHeight
+    height: (root.showHeader ? root.headerHeight + 1 : 0) + visibleModel.count * root.rowHeight
 
     Timer {
         id: filterDebounceTimer
@@ -139,8 +141,8 @@ Item {
 
                     Text {
                         anchors.fill: parent
-                        anchors.leftMargin: 8
-                        anchors.rightMargin: 8
+                        anchors.leftMargin: Style.marginM
+                        anchors.rightMargin: Style.marginM
 
                         text: root.columnTitle(parent.column)
                         color: root.normalTextColor
@@ -165,10 +167,9 @@ Item {
             id: listView
 
             width: parent.width
-            height: parent.height - headerRow.height
+            height: parent.height - headerRow.height - (root.showHeader ? 1 : 0)
 
             clip: true
-            reuseItems: true
             cacheBuffer: root.cacheBuffer
             boundsBehavior: Flickable.StopAtBounds
             focus: true
@@ -751,8 +752,8 @@ Item {
 
     function columnWidth(column) {
         if (columns.length <= 1)
-            return listView.width
-        return column && column.width !== undefined && column.width !== null ? column.width : 120
+            return root.width
+        return root.width / columns.length
     }
     function isTreeColumn(column, columnIndex) { return column && column.tree === true ? true : columnIndex === 0 && columns.length === 0 }
     function isColumnEditable(column) { return column && column.editable === true }

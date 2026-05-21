@@ -46,10 +46,7 @@
         </size>
        </property>
        <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
+        <enum>QFrame::Shape::NoFrame</enum>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <property name="spacing">
@@ -113,7 +110,7 @@
               </size>
              </property>
              <property name="popupMode">
-              <enum>QToolButton::MenuButtonPopup</enum>
+              <enum>QToolButton::ToolButtonPopupMode::DelayedPopup</enum>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -180,6 +177,15 @@
            </item>
            <item>
             <widget class="QToolButton" name="ShowInputManagerButton">
+             <property name="minimumSize">
+              <size>
+               <width>32</width>
+               <height>32</height>
+              </size>
+             </property>
+             <property name="toolTip">
+              <string>Show acquisition manager</string>
+             </property>
              <property name="text">
               <string>Inputs...</string>
              </property>
@@ -195,17 +201,29 @@
             </widget>
            </item>
            <item>
-            <spacer name="horizontalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
+            <widget class="QToolButton" name="ShowTriggerTableButton">
+             <property name="minimumSize">
               <size>
-               <width>40</width>
+               <width>32</width>
+               <height>32</height>
+              </size>
+             </property>
+             <property name="toolTip">
+              <string>Show trigger table</string>
+             </property>
+             <property name="text">
+              <string>Triggers...</string>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>20</width>
                <height>20</height>
               </size>
              </property>
-            </spacer>
+             <property name="autoRaise">
+              <bool>true</bool>
+             </property>
+            </widget>
            </item>
            <item>
             <widget class="QToolButton" name="HideListButton">
@@ -271,13 +289,13 @@
         <item>
          <widget class="QListView" name="TaskList">
           <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
+           <enum>QFrame::Shape::NoFrame</enum>
           </property>
           <property name="verticalScrollBarPolicy">
-           <enum>Qt::ScrollBarAsNeeded</enum>
+           <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
           </property>
           <property name="horizontalScrollBarPolicy">
-           <enum>Qt::ScrollBarAlwaysOff</enum>
+           <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
           </property>
           <property name="iconSize">
            <size>
@@ -286,7 +304,20 @@
            </size>
           </property>
           <property name="verticalScrollMode">
-           <enum>QAbstractItemView::ScrollPerPixel</enum>
+           <enum>QAbstractItemView::ScrollMode::ScrollPerItem</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="InspectionCount">
+          <property name="text">
+           <string>Total Inspections:</string>
+          </property>
+          <property name="margin">
+           <number>4</number>
+          </property>
+          <property name="textInteractionFlags">
+           <set>Qt::TextInteractionFlag::NoTextInteraction</set>
           </property>
          </widget>
         </item>
@@ -308,10 +339,7 @@
         </size>
        </property>
        <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Sunken</enum>
+        <enum>QFrame::Shape::NoFrame</enum>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <property name="spacing">
@@ -360,7 +388,7 @@
            </size>
           </property>
           <property name="popupMode">
-           <enum>QToolButton::MenuButtonPopup</enum>
+           <enum>QToolButton::ToolButtonPopupMode::MenuButtonPopup</enum>
           </property>
           <property name="autoRaise">
            <bool>true</bool>
@@ -376,10 +404,10 @@
            </size>
           </property>
           <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
+           <enum>QFrame::Shape::NoFrame</enum>
           </property>
           <property name="horizontalScrollBarPolicy">
-           <enum>Qt::ScrollBarAlwaysOff</enum>
+           <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
           </property>
           <property name="iconSize">
            <size>
@@ -388,7 +416,7 @@
            </size>
           </property>
           <property name="verticalScrollMode">
-           <enum>QAbstractItemView::ScrollPerPixel</enum>
+           <enum>QAbstractItemView::ScrollMode::ScrollPerItem</enum>
           </property>
           <property name="uniformItemSizes">
            <bool>true</bool>
@@ -398,9 +426,6 @@
           </property>
           <property name="selectionRectVisible">
            <bool>true</bool>
-          </property>
-          <property name="itemAlignment">
-           <set>Qt::AlignTop</set>
           </property>
          </widget>
         </item>
@@ -416,10 +441,7 @@
         </sizepolicy>
        </property>
        <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
+        <enum>QFrame::Shape::NoFrame</enum>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
         <property name="spacing">

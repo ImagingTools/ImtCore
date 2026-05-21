@@ -13,6 +13,7 @@ ViewBase {
 	id: container;
 	
 	anchors.fill: parent;
+	contentColor: Style.baseColor
 	
 	property TreeItemModel permissionsModel: TreeItemModel {};
 	onPermissionsModelChanged: permissionsGroup.buildPermissionsModel()
