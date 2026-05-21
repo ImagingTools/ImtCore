@@ -37,24 +37,47 @@ public:
 	*/
 	enum ErrorCategory
 	{
-		EC_NONE = 0,			//!< Reserved, never reported through \c OnError.
-		EC_NETWORK,				//!< Network / transport failure (e.g. \c QNetworkReply error).
-		EC_TIMEOUT,				//!< Request did not complete within the configured timeout.
-		EC_CANCELLED,			//!< Request was cancelled via \c IAsyncGqlRequestToken::Cancel.
-		EC_INVALID_REQUEST,		//!< Request could not be sent (invalid request, unsupported type, ...).
-		EC_INTERNAL				//!< Internal error (e.g. protocol engine missing / failed to create network request).
+		/**
+			Reserved, never reported through \c OnError.
+		*/
+		EC_NONE = 0,
+
+		/**
+			Network / transport failure (e.g. \c QNetworkReply error).
+		*/
+		EC_NETWORK,
+
+		/**
+			Request did not complete within the configured timeout.
+		*/
+		EC_TIMEOUT,
+
+		/**
+			Request was cancelled via \c IAsyncGqlRequestToken::Cancel.
+		*/
+		EC_CANCELLED,
+
+		/**
+			Request could not be sent (invalid request, unsupported type, ...).
+		*/
+		EC_INVALID_REQUEST,
+
+		/**
+			Internal error (e.g. protocol engine missing / failed to create network request).
+		*/
+		EC_INTERNAL
 	};
 
 	/**
 		Invoked when a response for the request has been received successfully.
-		\param responsePtr The parsed GraphQL response. Always valid.
+		\param responsePtr	The parsed GraphQL response. Always valid.
 	*/
 	virtual void OnResponseReceived(GqlResponsePtr responsePtr) = 0;
 
 	/**
 		Invoked when the request failed, timed out or was cancelled.
-		\param category Error category describing the reason of the failure.
-		\param message Human-readable error message (may be empty).
+		\param category	Error category describing the reason of the failure.
+		\param message	Human-readable error message (may be empty).
 	*/
 	virtual void OnError(ErrorCategory category, const QString& message) = 0;
 };

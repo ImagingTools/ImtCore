@@ -37,10 +37,25 @@ public:
 	*/
 	enum RequestState
 	{
-		S_PENDING = 0,	//!< Request is in flight, no terminal callback yet.
-		S_COMPLETED,	//!< Response received successfully.
-		S_CANCELLED,	//!< Request was cancelled via \c Cancel.
-		S_FAILED		//!< Request failed (network error, timeout, internal error, ...).
+		/**
+			Request is in flight, no terminal callback yet.
+		*/
+		S_PENDING = 0,
+
+		/**
+			Response received successfully.
+		*/
+		S_COMPLETED,
+
+		/**
+			Request was cancelled via \c Cancel.
+		*/
+		S_CANCELLED,
+
+		/**
+			Request failed (network error, timeout, internal error, ...).
+		*/
+		S_FAILED
 	};
 
 	/**
@@ -63,7 +78,7 @@ public:
 		While waiting, the local Qt event loop continues to process events,
 		matching the existing synchronous \c CRequestSender behavior.
 
-		\param timeoutMs Maximum wait in milliseconds. \c -1 means wait forever.
+		\param timeoutMs	Maximum wait in milliseconds. \c -1 means wait forever.
 		\return \c true if the request reached a terminal state,
 		        \c false if the wait timed out.
 	*/

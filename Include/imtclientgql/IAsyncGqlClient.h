@@ -38,11 +38,11 @@ public:
 	/**
 		Dispatch a request to the server asynchronously.
 
-		\param requestPtr The GraphQL request to send.
-		\param handlerPtr Callback sink invoked when the response (or an error)
-		                  is available. May be \c nullptr for fire-and-forget
-		                  call sites that only inspect the returned token.
-		\param urlParamPtr Optional URL parameters passed to the protocol engine.
+		\param requestPtr	The GraphQL request to send.
+		\param handlerPtr	Callback sink invoked when the response (or an error)
+		                    is available. May be \c nullptr for fire-and-forget
+		                    call sites that only inspect the returned token.
+		\param urlParamPtr	Optional URL parameters passed to the protocol engine.
 		\return A token tracking the in-flight request. The token is always
 		        valid; on synchronous validation failure it is returned in a
 		        terminal state (\c S_FAILED) and the handler — if any —
