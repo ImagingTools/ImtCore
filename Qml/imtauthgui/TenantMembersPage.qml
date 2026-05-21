@@ -624,7 +624,7 @@ ViewBase {
 	Component {
 		id: roleSelectDialogComp
 		
-		ModalDialog {
+		Dialog {
 			id: roleSelectDialog
 			property string targetUserId: ""
 			property string targetUserName: ""
