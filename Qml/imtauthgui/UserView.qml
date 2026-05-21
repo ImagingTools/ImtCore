@@ -12,6 +12,7 @@ ViewBase {
 	id: container;
 	
 	anchors.fill: parent;
+	contentColor: Style.baseColor
 
 	property UserData userData: model;
 	property string productId;
