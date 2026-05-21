@@ -38,6 +38,7 @@ Item {
 	}
 
 	Row {
+		id: headerRow
 		anchors.left: parent.left
 		anchors.leftMargin: Style.marginM
 		anchors.verticalCenter: parent.verticalCenter
@@ -50,11 +51,7 @@ Item {
 			tristate: true
 			height: Style.itemSizeS
 			width: Style.itemSizeS
-
-			onCheckStateChanged: {
-				if (checkState !== tableHeader.checkState)
-					tableHeader.selectAllToggled()
-			}
+			isActive: false
 		}
 
 		BaseText {
@@ -65,6 +62,15 @@ Item {
 			font.pixelSize: Style.fontSizeS
 			color: Style.inactiveTextColor
 		}
+	}
+
+	MouseArea {
+		anchors.left: headerRow.left
+		anchors.top: headerRow.top
+		anchors.bottom: headerRow.bottom
+		width: selectAllCheckBox.width + Style.marginM
+		cursorShape: Qt.PointingHandCursor
+		onClicked: tableHeader.selectAllToggled()
 	}
 
 	// Bottom separator

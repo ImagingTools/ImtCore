@@ -49,8 +49,8 @@ membersPage.stateManager.loadMembersFromModel()
 StackViewHeader {
 id: membersStackViewHeader
 anchors.top: parent.top
-anchors.left: parent.left
-anchors.right: membersHeaderButtons.left
+anchors.horizontalCenter: parent.horizontalCenter
+width: Math.min(parent.width - Style.marginXL * 2, 1000)
 height: Style.controlHeightL
 initialItemTitleVisible: true
 
@@ -67,8 +67,7 @@ membersStackViewHeader.addHeader("members_list", qsTr("Members"))
 Row {
 id: membersHeaderButtons
 visible: membersPage.__canManage && membersStackView.currentIndex === 0
-anchors.right: parent.right
-anchors.rightMargin: Style.marginXL
+anchors.right: membersStackViewHeader.right
 anchors.verticalCenter: membersStackViewHeader.verticalCenter
 spacing: Style.marginL
 
@@ -124,10 +123,8 @@ BaseText {
 id: membersDescription
 anchors.top: membersStackViewHeader.bottom
 anchors.topMargin: Style.marginS
-anchors.left: parent.left
-anchors.leftMargin: Style.marginXL
-anchors.right: parent.right
-anchors.rightMargin: Style.marginXL
+anchors.horizontalCenter: parent.horizontalCenter
+width: Math.min(parent.width - Style.marginXL * 2, 1000)
 visible: membersStackView.currentIndex === 0
 text: qsTr("Manage tenant members. Users created here automatically become members.")
 font.pixelSize: Style.fontSizeS

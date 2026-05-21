@@ -44,8 +44,8 @@ rolesPage.stateManager.receivedRoleData = data
 StackViewHeader {
 id: rolesStackViewHeader
 anchors.top: parent.top
-anchors.left: parent.left
-anchors.right: rolesCreateBtn.visible ? rolesCreateBtn.left : parent.right
+anchors.horizontalCenter: parent.horizontalCenter
+width: Math.min(parent.width - Style.marginXL * 2, 1000)
 height: Style.controlHeightL
 initialItemTitleVisible: true
 
@@ -62,8 +62,7 @@ rolesStackViewHeader.addHeader("roles_list", qsTr("Roles"))
 Text {
 id: rolesCreateBtn
 visible: rolesPage.__canManage && rolesStackView.currentIndex === 0
-anchors.right: parent.right
-anchors.rightMargin: Style.marginXL
+anchors.right: rolesStackViewHeader.right
 anchors.verticalCenter: rolesStackViewHeader.verticalCenter
 text: "+ " + qsTr("Create Role")
 font.pixelSize: Style.fontSizeM
@@ -88,10 +87,8 @@ BaseText {
 id: rolesDescription
 anchors.top: rolesStackViewHeader.bottom
 anchors.topMargin: Style.marginS
-anchors.left: parent.left
-anchors.leftMargin: Style.marginXL
-anchors.right: parent.right
-anchors.rightMargin: Style.marginXL
+anchors.horizontalCenter: parent.horizontalCenter
+width: Math.min(parent.width - Style.marginXL * 2, 1000)
 visible: rolesStackView.currentIndex === 0
 text: qsTr("Manage tenant roles and assign permissions to team members.")
 font.pixelSize: Style.fontSizeS

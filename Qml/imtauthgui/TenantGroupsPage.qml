@@ -44,8 +44,8 @@ groupsPage.stateManager.receivedGroupData = data
 StackViewHeader {
 id: groupsStackViewHeader
 anchors.top: parent.top
-anchors.left: parent.left
-anchors.right: groupsCreateBtn.visible ? groupsCreateBtn.left : parent.right
+anchors.horizontalCenter: parent.horizontalCenter
+width: Math.min(parent.width - Style.marginXL * 2, 1000)
 height: Style.controlHeightL
 initialItemTitleVisible: true
 
@@ -62,8 +62,7 @@ groupsStackViewHeader.addHeader("groups_list", qsTr("Groups"))
 Text {
 id: groupsCreateBtn
 visible: groupsPage.__canManage && groupsStackView.currentIndex === 0
-anchors.right: parent.right
-anchors.rightMargin: Style.marginXL
+anchors.right: groupsStackViewHeader.right
 anchors.verticalCenter: groupsStackViewHeader.verticalCenter
 text: "+ " + qsTr("Create Group")
 font.pixelSize: Style.fontSizeM
@@ -88,10 +87,8 @@ BaseText {
 id: groupsDescription
 anchors.top: groupsStackViewHeader.bottom
 anchors.topMargin: Style.marginS
-anchors.left: parent.left
-anchors.leftMargin: Style.marginXL
-anchors.right: parent.right
-anchors.rightMargin: Style.marginXL
+anchors.horizontalCenter: parent.horizontalCenter
+width: Math.min(parent.width - Style.marginXL * 2, 1000)
 visible: groupsStackView.currentIndex === 0
 text: qsTr("Organize members into groups for easier permission management.")
 font.pixelSize: Style.fontSizeS

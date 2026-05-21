@@ -15,7 +15,7 @@ import imtcontrols 1.0
 Item {
 	id: tableContainer
 
-	property int maxTableWidth: 800
+	property int maxTableWidth: 1000
 	default property alias contentItem: innerContent.data
 
 	anchors.horizontalCenter: parent.horizontalCenter
