@@ -287,7 +287,7 @@ void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const T
 		CompleteTask(taskId, TaskResult{OS_OK, documentId, QString()});
 	});
 
-	QObject::connect(worker, &QObject::destroyed, thread, &QThread::quit);
+	QObject::connect(worker, &QObject::destroyed, thread, &QThread::quit, Qt::DirectConnection);
 	QObject::connect(thread, &QThread::finished, thread, &QObject::deleteLater);
 
 	thread->start();
