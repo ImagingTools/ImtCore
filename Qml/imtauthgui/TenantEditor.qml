@@ -41,6 +41,12 @@ DocumentViewBase {
 	 */
 	property var apiClient: null
 
+	/**
+	 * Exposed so that TenantCollectionView can bind commandsPanelVisible: isNewTenant.
+	 * After save, m_id is populated → isNewTenant becomes false → panel hides.
+	 */
+	readonly property bool isNewTenant: stateManager_.isNewTenant
+
 	// --- Composition root ---
 	TenantEditorStateManager {
 		id: stateManager_
