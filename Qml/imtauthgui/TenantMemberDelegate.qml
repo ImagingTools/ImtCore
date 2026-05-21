@@ -276,7 +276,7 @@ Rectangle {
 								menuItems.push({ text: qsTr("Transfer Ownership"), action: "transfer" })
 							}
 						}
-						if (row.isCurrentUser && !row.isMemberCreator) {
+						if (row.isCurrentUser && !row.isMemberOwner && !row.isMemberCreator) {
 							menuItems.push({ text: qsTr("Leave Workspace"), action: "leave" })
 						}
 						if (menuItems.length === 0) return
