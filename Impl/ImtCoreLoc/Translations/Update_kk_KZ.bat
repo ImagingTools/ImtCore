@@ -1,0 +1,1 @@
+%QTDIR%\bin\lupdate.exe ..\..\..\Include ..\..\..\Qml ..\..\..\AuxInclude -target-language kk_KZ -ts ImtCore_kk_KZ.ts -recursive -locations relative
