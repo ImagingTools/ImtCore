@@ -61,6 +61,9 @@ public:
 	CObjectCollectionViewDelegate();
 	~CObjectCollectionViewDelegate();
 
+	void SetMaxLengthComment(int maxLength);
+	void SetLengthRevisionComment(int maxLength);
+
 	// reimplemented (ICollectionViewDelegate)
 	virtual bool InitializeDelegate(
 				imtbase::IObjectCollection* collectionPtr,
@@ -177,12 +180,18 @@ protected:
 	imtbase::ICollectionInfo::Ids m_selectedItemIds;
 	QByteArray m_selectedTypeId;
 
+	bool m_hasRemoveRight = true;
+
 	imtbase::CCollectionInfo m_summaryInformationTypes;
 	QMap<QByteArray, HeaderInfo> m_summaryInformationHeaders;
 
 	imod::TModelWrap<VisualStatus> m_visualStatus;
 
 	QString m_exportFilePath;
+
+private:
+	int m_maxLengthComment = 1000;
+	int m_maxLengthRevisionComment = 1000;
 };
 
 
