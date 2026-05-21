@@ -322,6 +322,7 @@
         <Component ExportedId="CachedGroupCollection" ComponentId="PumaClientEngine/CachedGroupCollection"/>
         <Component ExportedId="CachedRoleCollection" ComponentId="PumaClientEngine/CachedRoleCollection"/>
         <Component ExportedId="CachedUserCollection" ComponentId="PumaClientEngine/CachedUserCollection"/>
+        <Component ExportedId="ConnectionSubscriber" ComponentId="PumaClientEngine/ConnectionSubscriber"/>
         <Component ExportedId="DatabaseEngine" ComponentId="DatabaseEngine"/>
         <Component ExportedId="FeatureContainer" ComponentId="IdentifiableProductInfo"/>
         <Component ExportedId="GroupRemoteRepository" ComponentId="PumaClientEngine/GroupRemoteRepository"/>
