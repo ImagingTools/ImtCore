@@ -1,92 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ru_RU">
+<TS version="2.1" language="sv_SE">
 <context>
     <name>AddressEditor</name>
     <message>
         <location filename="../../../Qml/imtgeogui/AddressEditor.qml" line="+13"/>
         <source>Country</source>
-        <translation>Страна</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Region</source>
-        <translation>Регион</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Area</source>
-        <translation>Область</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>City</source>
-        <translation>Город</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Settlement</source>
-        <translation>Населённый пункт</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>District</source>
-        <translation>Район</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Street</source>
-        <translation>Улица</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Building</source>
-        <translation>Здание</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Apartment</source>
-        <translation>Квартира</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Section</source>
-        <translation>Участок</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>SNT</source>
-        <translation>СНТ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Alley</source>
-        <translation>Аллея</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Other</source>
-        <translation>Другое</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+31"/>
         <source>Select type</source>
-        <translation>Выберите тип</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Name</source>
-        <translation>Название</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Latitude</source>
-        <translation>Широта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Longitude</source>
-        <translation>Долгота</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -94,7 +94,7 @@
     <message>
         <location filename="../../../Qml/imtgeogui/AddressTreeView.qml" line="+184"/>
         <source>Address</source>
-        <translation>Адрес</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -102,7 +102,7 @@
     <message>
         <location filename="../../../Qml/imtauthgui/AdministrationUi.qml" line="+12"/>
         <source>Administration</source>
-        <translation>Администрирование</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -111,19 +111,19 @@
         <location filename="../../../Qml/imtauthgui/AdministrationView.qml" line="+44"/>
         <location line="+99"/>
         <source>Roles</source>
-        <translation>Роли</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-94"/>
         <location line="+102"/>
         <source>Users</source>
-        <translation>Пользователи</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-97"/>
         <location line="+105"/>
         <source>Groups</source>
-        <translation>Группы</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -131,881 +131,93 @@
     <message>
         <location filename="../../../Qml/imtgui/Application/ApplicationMain.qml" line="+84"/>
         <source>Try connecting to authorization server ...</source>
-        <translation>Попытка подключения к серверу авторизации...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+4"/>
+        <source>Authorization server connection error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Try connecting to </source>
-        <translation>Попытка подключения к </translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Server connection error</source>
-        <translation>Ошибка соединения с сервером</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+246"/>
         <source>Assigned to you</source>
-        <translation>Назначено вам</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Click to open →</source>
-        <translation>Нажмите, чтобы открыть →</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+153"/>
         <source>Network</source>
-        <translation>Сеть</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>General</source>
-        <translation>Общее</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>About</source>
-        <translation>О продукте</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>PAT Tokens</source>
-        <translation>PAT-токены</translation>
-    </message>
-    <message>
-        <location line="-437"/>
-        <source>Authorization server connection error</source>
-        <translation>Сервер авторизации недоступен</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>Attribute</name>
     <message>
-        <source>Client (CommandLine)</source>
-        <translation type="vanished">Клиент (командная строка)</translation>
-    </message>
-    <message>
-        <source>Design token generator</source>
-        <translation type="vanished">Генератор дизайн-токенов</translation>
-    </message>
-    <message>
-        <source>Imaging tools</source>
-        <translation type="vanished">Инструменты для изображений</translation>
-    </message>
-    <message>
-        <source>Client</source>
-        <translation type="vanished">Клиент</translation>
-    </message>
-    <message>
-        <source>Server</source>
-        <translation type="vanished">Сервер</translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation type="vanished">Настройки</translation>
-    </message>
-    <message>
-        <source>Preference File</source>
-        <translation type="vanished">Файл настроек</translation>
-    </message>
-    <message>
-        <source>Light</source>
-        <translation type="vanished">Светлая</translation>
-    </message>
-    <message>
-        <source>Dark</source>
-        <translation type="vanished">Темная</translation>
-    </message>
-    <message>
-        <source>General</source>
-        <translation type="vanished">Основное</translation>
-    </message>
-    <message>
-        <source>Language</source>
-        <translation type="vanished">Язык</translation>
-    </message>
-    <message>
-        <source>Design Schema</source>
-        <translation type="vanished">Дизайн схема</translation>
-    </message>
-    <message>
-        <source>Network</source>
-        <translation type="vanished">Сеть</translation>
-    </message>
-    <message>
-        <source>Preferences</source>
-        <translation type="vanished">Настройки</translation>
-    </message>
-    <message>
-        <source>Instance Mask</source>
-        <translation type="vanished">Маска экземпляра</translation>
-    </message>
-    <message>
-        <source>Database Settings</source>
-        <translation type="vanished">Настройки базы данных</translation>
-    </message>
-    <message>
-        <source>Revision</source>
-        <translation type="vanished">Ревизия</translation>
-    </message>
-    <message>
-        <source>New Role</source>
-        <translation type="vanished">Новая роль</translation>
-    </message>
-    <message>
-        <source>New Group</source>
-        <translation type="vanished">Новая группа</translation>
-    </message>
-    <message>
-        <source>System Name</source>
-        <translation type="vanished">Название системы</translation>
-    </message>
-    <message>
-        <source>New User</source>
-        <translation type="vanished">Новый пользователь</translation>
-    </message>
-    <message>
-        <source>Search</source>
-        <translation type="vanished">Поиск</translation>
-    </message>
-    <message>
-        <source>Admin</source>
-        <translation type="vanished">Админ</translation>
-    </message>
-    <message>
-        <source>Alias</source>
-        <translation type="vanished">Псевдоним</translation>
-    </message>
-    <message>
-        <source>Algorithm</source>
-        <translation type="vanished">Алгоритм</translation>
-    </message>
-    <message>
-        <source>Encoding Format</source>
-        <translation type="vanished">Формат кодирования</translation>
-    </message>
-    <message>
-        <source>Type</source>
-        <translation type="vanished">Тип</translation>
-    </message>
-    <message>
-        <source>Password</source>
-        <translation type="vanished">Пароль</translation>
-    </message>
-    <message>
-        <source>File Path</source>
-        <translation type="vanished">Путь к файлу</translation>
-    </message>
-    <message>
-        <source>Key Files</source>
-        <translation type="vanished">Файлы ключей</translation>
-    </message>
-    <message>
-        <source>Remove All</source>
-        <translation type="vanished">Удалить все</translation>
-    </message>
-    <message>
-        <source>Restore All</source>
-        <translation type="vanished">Восстановить все</translation>
-    </message>
-    <message>
-        <source>Duplicate</source>
-        <translation type="vanished">Дублировать</translation>
-    </message>
-    <message>
-        <source>Restore</source>
-        <translation type="vanished">Восстановить</translation>
-    </message>
-    <message>
-        <source>Certificate Files</source>
-        <translation type="vanished">Файлы сертификатов</translation>
-    </message>
-    <message>
-        <source>Enable SSL</source>
-        <translation type="vanished">Включить SSL</translation>
-    </message>
-    <message>
-        <source>Local Certificate</source>
-        <translation type="vanished">Локальный сертификат</translation>
-    </message>
-    <message>
-        <source>CA Certificate</source>
-        <translation type="vanished">Сертификат ЦС</translation>
-    </message>
-    <message>
-        <source>Private Key</source>
-        <translation type="vanished">Закрытый ключ</translation>
-    </message>
-    <message>
-        <source>Verification Mode</source>
-        <translation type="vanished">Режим проверки</translation>
-    </message>
-    <message>
-        <source>Protocol</source>
-        <translation type="vanished">Протокол</translation>
-    </message>
-    <message>
-        <source>LDAP</source>
-        <translation type="vanished">LDAP</translation>
-    </message>
-    <message>
-        <source>Full Screen</source>
-        <translation type="vanished">Полный экран</translation>
-    </message>
-    <message>
-        <source>History</source>
-        <translation type="vanished">История</translation>
-    </message>
-    <message>
-        <source>Role</source>
-        <translation type="vanished">Роль</translation>
-    </message>
-    <message>
-        <source>Session</source>
-        <translation type="vanished">Сессия</translation>
-    </message>
-    <message>
-        <source>User Connection</source>
-        <translation type="vanished">Подключение пользователя</translation>
-    </message>
-    <message>
-        <source>Group</source>
-        <translation type="vanished">Группа</translation>
-    </message>
-    <message>
-        <source>User</source>
-        <translation type="vanished">Пользователь</translation>
-    </message>
-    <message>
-        <source>Server Address</source>
-        <translation type="vanished">Адрес сервера</translation>
-    </message>
-    <message>
-        <source>Port</source>
-        <translation type="vanished">Порт</translation>
-    </message>
-    <message>
-        <source>Activate it if you want your server to work using SSL</source>
-        <translation type="vanished">Активируйте, если хотите, чтобы сервер работал по SSL</translation>
-    </message>
-    <message>
-        <source>Local Cert</source>
-        <translation type="vanished">Локальный сертификат</translation>
-    </message>
-    <message>
-        <source>SSL Protocol</source>
-        <translation type="vanished">SSL-протокол</translation>
-    </message>
-    <message>
-        <source>Verify Mode</source>
-        <translation type="vanished">Режим проверки</translation>
-    </message>
-    <message>
-        <source>Ca Cert</source>
-        <translation type="vanished">Сертификат ЦС</translation>
-    </message>
-    <message>
-        <source>SSL Configuration</source>
-        <translation type="vanished">Настройки SSL</translation>
-    </message>
-    <message>
-        <source>Key Type</source>
-        <translation type="vanished">Тип ключа</translation>
-    </message>
-    <message>
-        <source>Select the file with your private key</source>
-        <translation type="vanished">Выберите файл с вашим закрытым ключом</translation>
-    </message>
-    <message>
-        <source>Message Info</source>
-        <translation type="vanished">Информация о сообщении</translation>
-    </message>
-    <message>
-        <source>User Settings</source>
-        <translation type="vanished">Настройки пользователя</translation>
-    </message>
-    <message>
-        <source>English</source>
-        <translation type="vanished">Английский</translation>
-    </message>
-    <message>
-        <source>German</source>
-        <translation type="vanished">Немецкий</translation>
-    </message>
-    <message>
-        <source>Russian</source>
-        <translation type="vanished">Русский</translation>
-    </message>
-    <message>
-        <source>Server Connection Interface</source>
-        <translation type="vanished">Интерфейс подключения к серверу</translation>
-    </message>
-    <message>
-        <source>Last Message</source>
-        <translation type="vanished">Последнее сообщение</translation>
-    </message>
-    <message>
-        <source>Unread</source>
-        <translation type="vanished">Непрочитанные</translation>
-    </message>
-    <message>
-        <source>Participants</source>
-        <translation type="vanished">Участники</translation>
-    </message>
-    <message>
-        <source>Last Updated</source>
-        <translation type="vanished">Последнее обновление</translation>
-    </message>
-    <message>
-        <source>Import</source>
-        <translation type="vanished">Импорт</translation>
-    </message>
-    <message>
-        <source>Export</source>
-        <translation type="vanished">Экспорт</translation>
-    </message>
-    <message>
-        <source>Title</source>
-        <translation type="vanished">Заголовок</translation>
-    </message>
-    <message>
-        <source>Status</source>
-        <translation type="vanished">Статус</translation>
-    </message>
-    <message>
-        <source>Priority</source>
-        <translation type="vanished">Приоритет</translation>
-    </message>
-    <message>
-        <source>Assignees</source>
-        <translation type="vanished">Исполнители</translation>
-    </message>
-    <message>
-        <source>Created</source>
-        <translation type="vanished">Создано</translation>
-    </message>
-    <message>
-        <source>Conversations</source>
-        <translation type="vanished">Беседы</translation>
-    </message>
-    <message>
-        <source>Tickets</source>
-        <translation type="vanished">Заявки</translation>
-    </message>
-    <message>
-        <source>Conversation</source>
-        <translation type="vanished">Беседа</translation>
-    </message>
-    <message>
-        <source>Ticket</source>
-        <translation type="vanished">Заявка</translation>
-    </message>
-    <message>
-        <source>Tenant Name</source>
-        <translation type="vanished">Название тенанта</translation>
-    </message>
-    <message>
-        <source>Members Count</source>
-        <translation type="vanished">Количество участников</translation>
-    </message>
-    <message>
-        <source>Active</source>
-        <translation type="vanished">Активный</translation>
-    </message>
-    <message>
-        <source>Updated</source>
-        <translation type="vanished">Обновлено</translation>
-    </message>
-    <message>
-        <source>New Organization</source>
-        <translation type="vanished">Новая организация</translation>
-    </message>
-    <message>
-        <source>Owner</source>
-        <translation type="vanished">Владелец</translation>
-    </message>
-    <message>
-        <source>New Tenant</source>
-        <translation type="vanished">Новый тенант</translation>
-    </message>
-    <message>
-        <source>Support</source>
-        <translation type="vanished">Поддержка</translation>
-    </message>
-    <message>
-        <source>Attachment</source>
-        <translation type="vanished">Вложение</translation>
-    </message>
-    <message>
-        <source>Search radius</source>
-        <translation type="vanished">Радиус поиска</translation>
-    </message>
-    <message>
-        <source>Minimum angle</source>
-        <translation type="vanished">Минимальный угол</translation>
-    </message>
-    <message>
-        <source>Maximum angle</source>
-        <translation type="vanished">Максимальный угол</translation>
-    </message>
-    <message>
-        <source>Maximum surface angle</source>
-        <translation type="vanished">Максимальный угол поверхности</translation>
-    </message>
-    <message>
-        <source>Maximum nearest neighbors</source>
-        <translation type="vanished">Максимальное количество соседних точек</translation>
-    </message>
-    <message>
-        <source>Design</source>
-        <translation type="vanished">Дизайн</translation>
-    </message>
-    <message>
-        <source>commodity</source>
-        <translation type="vanished">товар</translation>
-    </message>
-    <message>
-        <source>excise</source>
-        <translation type="vanished">акциз</translation>
-    </message>
-    <message>
-        <source>job</source>
-        <translation type="vanished">работа</translation>
-    </message>
-    <message>
-        <source>service</source>
-        <translation type="vanished">услуга</translation>
-    </message>
-    <message>
-        <source>gamblingBet</source>
-        <translation type="vanished">ставка</translation>
-    </message>
-    <message>
-        <source>gamblingPrize</source>
-        <translation type="vanished">выигрыш</translation>
-    </message>
-    <message>
-        <source>lottery</source>
-        <translation type="vanished">лотерея</translation>
-    </message>
-    <message>
-        <source>lotteryPrize</source>
-        <translation type="vanished">лотерейный выигрыш</translation>
-    </message>
-    <message>
-        <source>intellectualActivity</source>
-        <translation type="vanished">интеллектуальная деятельность</translation>
-    </message>
-    <message>
-        <source>payment</source>
-        <translation type="vanished">оплата</translation>
-    </message>
-    <message>
-        <source>agentCommission</source>
-        <translation type="vanished">агентское вознаграждение</translation>
-    </message>
-    <message>
-        <source>pay</source>
-        <translation type="vanished">выплата</translation>
-    </message>
-    <message>
-        <source>another</source>
-        <translation type="vanished">прочее</translation>
-    </message>
-    <message>
-        <source>proprietaryLaw</source>
-        <translation type="vanished">имущественное право</translation>
-    </message>
-    <message>
-        <source>nonOperatingIncome</source>
-        <translation type="vanished">внереализационный доход</translation>
-    </message>
-    <message>
-        <source>otherContributions</source>
-        <translation type="vanished">прочие взносы</translation>
-    </message>
-    <message>
-        <source>merchantTax</source>
-        <translation type="vanished">торговый сбор</translation>
-    </message>
-    <message>
-        <source>resortFee</source>
-        <translation type="vanished">курортный сбор</translation>
-    </message>
-    <message>
-        <source>deposit</source>
-        <translation type="vanished">залог</translation>
-    </message>
-    <message>
-        <source>consumption</source>
-        <translation type="vanished">расход</translation>
-    </message>
-    <message>
-        <source>soleProprietorCPIContributions</source>
-        <translation type="vanished">взносы ИП на ОПС</translation>
-    </message>
-    <message>
-        <source>cpiContributions</source>
-        <translation type="vanished">взносы на ОПС</translation>
-    </message>
-    <message>
-        <source>soleProprietorCMIContributions</source>
-        <translation type="vanished">взносы ИП на ОМС</translation>
-    </message>
-    <message>
-        <source>cmiContributions</source>
-        <translation type="vanished">взносы на ОМС</translation>
-    </message>
-    <message>
-        <source>csiContributions</source>
-        <translation type="vanished">взносы на ОСС</translation>
-    </message>
-    <message>
-        <source>casinoPayment</source>
-        <translation type="vanished">оплата казино</translation>
-    </message>
-    <message>
-        <source>fundsIssuance</source>
-        <translation type="vanished">выдача средств</translation>
-    </message>
-    <message>
-        <source>exciseWithoutMarking</source>
-        <translation type="vanished">подакцизный товар без маркировки</translation>
-    </message>
-    <message>
-        <source>exciseWithMarking</source>
-        <translation type="vanished">подакцизный товар с маркировкой</translation>
-    </message>
-    <message>
-        <source>commodityWithoutMarking</source>
-        <translation type="vanished">товар без маркировки</translation>
-    </message>
-    <message>
-        <source>commodityWithMarking</source>
-        <translation type="vanished">товар с маркировкой</translation>
-    </message>
-    <message>
-        <source>piece</source>
-        <translation type="vanished">штука</translation>
-    </message>
-    <message>
-        <source>gram</source>
-        <translation type="vanished">грамм</translation>
-    </message>
-    <message>
-        <source>kilogram</source>
-        <translation type="vanished">килограмм</translation>
-    </message>
-    <message>
-        <source>ton</source>
-        <translation type="vanished">тонна</translation>
-    </message>
-    <message>
-        <source>centimeter</source>
-        <translation type="vanished">сантиметр</translation>
-    </message>
-    <message>
-        <source>decimeter</source>
-        <translation type="vanished">дециметр</translation>
-    </message>
-    <message>
-        <source>meter</source>
-        <translation type="vanished">метр</translation>
-    </message>
-    <message>
-        <source>squareCentimeter</source>
-        <translation type="vanished">кв. сантиметр</translation>
-    </message>
-    <message>
-        <source>squareDecimeter</source>
-        <translation type="vanished">кв. дециметр</translation>
-    </message>
-    <message>
-        <source>squareMeter</source>
-        <translation type="vanished">кв. метр</translation>
-    </message>
-    <message>
-        <source>milliliter</source>
-        <translation type="vanished">миллилитр</translation>
-    </message>
-    <message>
-        <source>liter</source>
-        <translation type="vanished">литр</translation>
-    </message>
-    <message>
-        <source>cubicMeter</source>
-        <translation type="vanished">куб. метр</translation>
-    </message>
-    <message>
-        <source>kilowattHour</source>
-        <translation type="vanished">киловатт·час</translation>
-    </message>
-    <message>
-        <source>gkal</source>
-        <translation type="vanished">Гкал</translation>
-    </message>
-    <message>
-        <source>day</source>
-        <translation type="vanished">день</translation>
-    </message>
-    <message>
-        <source>hour</source>
-        <translation type="vanished">час</translation>
-    </message>
-    <message>
-        <source>minute</source>
-        <translation type="vanished">минута</translation>
-    </message>
-    <message>
-        <source>second</source>
-        <translation type="vanished">секунда</translation>
-    </message>
-    <message>
-        <source>kilobyte</source>
-        <translation type="vanished">килобайт</translation>
-    </message>
-    <message>
-        <source>megabyte</source>
-        <translation type="vanished">мегабайт</translation>
-    </message>
-    <message>
-        <source>gigabyte</source>
-        <translation type="vanished">гигабайт</translation>
-    </message>
-    <message>
-        <source>terabyte</source>
-        <translation type="vanished">терабайт</translation>
-    </message>
-    <message>
-        <source>otherUnits</source>
-        <translation type="vanished">другие единицы</translation>
-    </message>
-    <message>
-        <source>Workspace</source>
-        <translation type="vanished">Рабочее пространство</translation>
-    </message>
-    <message>
-        <source>fullPrepayment</source>
-        <translation type="vanished">полная предоплата</translation>
-    </message>
-    <message>
-        <source>prepayment</source>
-        <translation type="vanished">предоплата</translation>
-    </message>
-    <message>
-        <source>advance</source>
-        <translation type="vanished">аванс</translation>
-    </message>
-    <message>
-        <source>fullPayment</source>
-        <translation type="vanished">полный расчёт</translation>
-    </message>
-    <message>
-        <source>partialPayment</source>
-        <translation type="vanished">частичный расчёт</translation>
-    </message>
-    <message>
-        <source>credit</source>
-        <translation type="vanished">кредит</translation>
-    </message>
-    <message>
-        <source>creditPayment</source>
-        <translation type="vanished">оплата кредита</translation>
-    </message>
-    <message>
-        <source>cash</source>
-        <translation type="vanished">наличные</translation>
-    </message>
-    <message>
-        <source>electronically</source>
-        <translation type="vanished">электронно</translation>
-    </message>
-    <message>
-        <source>prepaid</source>
-        <translation type="vanished">предоплачено</translation>
-    </message>
-    <message>
-        <source>other</source>
-        <translation type="vanished">прочее</translation>
-    </message>
-    <message>
-        <source>Sell</source>
-        <translation type="vanished">Продажа</translation>
-    </message>
-    <message>
-        <source>Buy</source>
-        <translation type="vanished">Покупка</translation>
-    </message>
-    <message>
-        <source>SellReturn</source>
-        <translation type="vanished">Возврат продажи</translation>
-    </message>
-    <message>
-        <source>BuyReturn</source>
-        <translation type="vanished">Возврат покупки</translation>
-    </message>
-    <message>
-        <source>Receipt</source>
-        <translation type="vanished">Чек</translation>
-    </message>
-    <message>
-        <source>New sensor</source>
-        <translation type="vanished">Новый сенсор</translation>
-    </message>
-    <message>
-        <source>Personal Access Token</source>
-        <translation type="vanished">Персональный токен доступа</translation>
-    </message>
-    <message>
-        <source>Action</source>
-        <translation type="vanished">Действие</translation>
-    </message>
-    <message>
-        <source>Target</source>
-        <translation type="vanished">Цель</translation>
-    </message>
-    <message>
-        <source>Timestamp</source>
-        <translation type="vanished">Отметка времени</translation>
-    </message>
-    <message>
-        <source>Open</source>
-        <translation type="vanished">Открыть</translation>
-    </message>
-    <message>
-        <source>New Customer</source>
-        <translation type="vanished">Новый заказчик</translation>
-    </message>
-    <message>
-        <source>User Action</source>
-        <translation type="vanished">Действие пользователя</translation>
-    </message>
-    <message>
-        <source>Roles</source>
-        <translation type="vanished">Роли</translation>
-    </message>
-    <message>
-        <source>Users</source>
-        <translation type="vanished">Пользователи</translation>
-    </message>
-    <message>
-        <source>Role Name</source>
-        <translation type="vanished">Название роли</translation>
-    </message>
-    <message>
-        <source>Edit</source>
-        <translation type="vanished">Редактировать</translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation type="vanished">Удалить</translation>
-    </message>
-    <message>
-        <source>New</source>
-        <translation type="vanished">Новый</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="vanished">Закрыть</translation>
-    </message>
-    <message>
-        <source>Undo</source>
-        <translation type="vanished">Отменить</translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation type="vanished">Сохранить</translation>
-    </message>
-    <message>
-        <source>Redo</source>
-        <translation type="vanished">Восстановить</translation>
-    </message>
-    <message>
         <location filename="../../../Include/imtauth/CRoleChangeGeneratorComp.cpp" line="+59"/>
         <source>Role-ID</source>
-        <translation>Идентификатор роли</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Last Connection</source>
-        <translation type="vanished">Последнее подключение</translation>
-    </message>
-    <message>
-        <source>Group Name</source>
-        <translation type="vanished">Название группы</translation>
-    </message>
-    <message>
-        <location line="+14"/>
-        <location filename="../../../Include/imtauth/CUserChangeGeneratorComp.cpp" line="+94"/>
-        <location filename="../../../Include/imtauth/CUserGroupChangeGeneratorComp.cpp" line="+115"/>
-        <source>Description</source>
-        <translation>Описание</translation>
-    </message>
-    <message>
-        <location line="-7"/>
-        <location filename="../../../Include/imtauth/CUserGroupChangeGeneratorComp.cpp" line="-7"/>
+        <location line="+7"/>
+        <location filename="../../../Include/imtauth/CUserGroupChangeGeneratorComp.cpp" line="+108"/>
         <source>Name</source>
-        <translation>Название</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Email</source>
-        <translation type="vanished">Почтовый адрес</translation>
-    </message>
-    <message>
-        <source>Groups</source>
-        <translation type="vanished">Группы</translation>
-    </message>
-    <message>
-        <source>Text file</source>
-        <translation type="vanished">Текстовый файл</translation>
-    </message>
-    <message>
-        <source>Edit License</source>
-        <translation type="vanished">Редактировать лицензию</translation>
-    </message>
-    <message>
-        <source>Report</source>
-        <translation type="vanished">Отчет</translation>
-    </message>
-    <message>
-        <source>Report Files</source>
-        <translation type="vanished">Файлы отчетов</translation>
-    </message>
-    <message>
-        <source>SDL Generator version</source>
-        <translation type="vanished">Версия генератора SDL</translation>
-    </message>
-    <message>
-        <source>SDL code generator</source>
-        <translation type="vanished">Генератор кода SDL</translation>
-    </message>
-    <message>
-        <source>SDL Code generator</source>
-        <translation type="vanished">Генератор кода SDL</translation>
-    </message>
-    <message>
-        <source>OAS Code generator</source>
-        <translation type="vanished">Генератор кода OAS</translation>
+        <location line="+7"/>
+        <location filename="../../../Include/imtauth/CUserChangeGeneratorComp.cpp" line="+94"/>
+        <location filename="../../../Include/imtauth/CUserGroupChangeGeneratorComp.cpp" line="+7"/>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../Include/imtauth/CUserChangeGeneratorComp.cpp" line="-14"/>
         <source>User-ID</source>
-        <translation>ID пользователя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Username</source>
-        <translation>Логин</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Mail</source>
-        <translation>Почта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../Include/imtauth/CUserGroupChangeGeneratorComp.cpp" line="-7"/>
+        <location filename="../../../Include/imtauth/CUserGroupChangeGeneratorComp.cpp" line="-14"/>
         <source>Group-ID</source>
-        <translation>ID Группы</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1013,73 +225,73 @@
     <message>
         <location filename="../../../Qml/imtauthgui/AuthorizationController.qml" line="+351"/>
         <source>The user has been successfully registered</source>
-        <translation>Пользователь успешно зарегистрирован</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Password changed successfully</source>
-        <translation>Пароль успешно изменен</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>AuthorizationPage</name>
     <message>
-        <location filename="../../../Qml/imtauthgui/AuthorizationPage.qml" line="+152"/>
-        <source>Welcome</source>
-        <translation>Добро пожаловать</translation>
-    </message>
-    <message>
-        <location line="-105"/>
+        <location filename="../../../Qml/imtauthgui/AuthorizationPage.qml" line="+47"/>
         <location line="+147"/>
         <location line="+260"/>
         <source>Login</source>
-        <translation>Логин</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-242"/>
+        <location line="-302"/>
+        <source>Welcome to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Welcome</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+60"/>
         <source>Enter the login</source>
-        <translation>Введите логин</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+35"/>
         <source>Password</source>
-        <translation>Пароль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Enter the password</source>
-        <translation>Введите пароль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+71"/>
         <source>Password recovery</source>
-        <translation>Восстановить пароль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+35"/>
         <source>Remember me</source>
-        <translation>Запомнить меня</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+20"/>
         <location line="+93"/>
         <source>Register</source>
-        <translation>Зарегистрироваться</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-9"/>
         <source>User Registration</source>
-        <translation>Регистрация пользователя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Close</source>
-        <translation>Закрыть</translation>
-    </message>
-    <message>
-        <location line="-333"/>
-        <source>Welcome to</source>
-        <translation>Добро пожаловать в</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1087,62 +299,62 @@
     <message>
         <location filename="../../../Include/imtauthgui/CAccountInfoEditorComp.ui" line="+14"/>
         <source>Edit Account Information</source>
-        <translation>Редактирование информации об аккаунте</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+112"/>
         <source>Load...</source>
-        <translation>Загрузить...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+108"/>
         <source>Account Type</source>
-        <translation>Тип аккаунта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Account Name</source>
-        <translation>Название аккаунта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Account Description</source>
-        <translation>Описание аккаунта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Company Address</source>
-        <translation>Адрес компании</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Country</source>
-        <translation>Страна</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>City</source>
-        <translation>Город</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Postal Code</source>
-        <translation>Почтовый индекс</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Street</source>
-        <translation>Улица</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Account Owner</source>
-        <translation>Владелец аккаунта</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1150,27 +362,27 @@
     <message>
         <location filename="../../../Include/imtauthgui/CAddressEditorComp.ui" line="+14"/>
         <source>Edit Addresses</source>
-        <translation>Редактировать адреса</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Country</source>
-        <translation>Страна</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+18"/>
         <source>City</source>
-        <translation>Город</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Postal code</source>
-        <translation>Почтовый индекс</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Street</source>
-        <translation>Улица</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1186,43 +398,43 @@
     <message>
         <location filename="../../../Include/imtservergql/CCollectionImportControllerComp.cpp" line="+74"/>
         <source>Unable to initialize progress manager</source>
-        <translation>Не удалось инициализировать менеджер прогресса</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Unable to create temporary fileInfo for upload</source>
-        <translation>Не удалось создать временный файл для загрузки</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+22"/>
         <location line="+216"/>
         <source>Collection import cancelled</source>
-        <translation>Импорт коллекции отменён</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-212"/>
         <source>Collection import session not found</source>
-        <translation>Сессия импорта коллекции не найдена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+92"/>
         <source>Import files to the collection</source>
-        <translation>Импорт файлов в коллекцию</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Uploading files to the server</source>
-        <translation>Загрузка файлов на сервер</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Processing files on the server</source>
-        <translation>Обработка файлов на сервере</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+122"/>
         <source>An error occurred during collection import</source>
-        <translation>Произошла ошибка при импорте коллекции</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1230,7 +442,7 @@
     <message>
         <location filename="../../../Include/imtgui/CCompositeObjectViewComp.ui" line="+14"/>
         <source>Main Window</source>
-        <translation>Главное окно</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1238,72 +450,72 @@
     <message>
         <location filename="../../../Include/imtauthgui/CContactInfoEditorComp.ui" line="+14"/>
         <source>Edit Contact Information</source>
-        <translation>Редактирование контактной информации</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>E-Mail</source>
-        <translation>Электронная почта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Birthday</source>
-        <translation>Дата рождения</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Gender</source>
-        <translation>Пол</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
         <source>First Name</source>
-        <translation>Имя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Last Name</source>
-        <translation>Фамилия</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Nickname</source>
-        <translation>Псевдоним</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Addresses</source>
-        <translation>Адреса</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Add</source>
-        <translation>Добавить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+45"/>
         <source>Country</source>
-        <translation>Страна</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>City</source>
-        <translation>Город</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Postal Code</source>
-        <translation>Почтовый индекс</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Street</source>
-        <translation>Улица</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1311,12 +523,12 @@
     <message>
         <location filename="../../../Include/imtgui/CCustomLayoutSettings.ui" line="+14"/>
         <source>Dialog</source>
-        <translation>Диалог</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Fixed Layouts</source>
-        <translation>Фиксированные макеты</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+20"/>
@@ -1331,12 +543,12 @@
         <location line="+44"/>
         <location line="+44"/>
         <source>All Layouts</source>
-        <translation>Все макеты</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-422"/>
         <source>Border Enabled</source>
-        <translation>Граница включена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+34"/>
@@ -1346,7 +558,7 @@
     <message>
         <location line="+13"/>
         <source>Border Color</source>
-        <translation>Цвет границы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+37"/>
@@ -1361,7 +573,7 @@
     <message>
         <location line="-301"/>
         <source>Min Width</source>
-        <translation>Мин. ширина</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+37"/>
@@ -1372,37 +584,37 @@
     <message>
         <location line="-81"/>
         <source>Max Width</source>
-        <translation>Макс. ширина</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+44"/>
         <source>Min Height</source>
-        <translation>Мин. высота</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+44"/>
         <source>Max Height</source>
-        <translation>Макс. высота</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+44"/>
         <source>Left Margin</source>
-        <translation>Левый отступ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+44"/>
         <source>Right Margin</source>
-        <translation>Правый отступ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+44"/>
         <source>Top Margin</source>
-        <translation>Верхний отступ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+44"/>
         <source>Bottom Margin</source>
-        <translation>Нижний отступ</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1428,13 +640,13 @@
     <message>
         <location line="-7"/>
         <source>Set Icon</source>
-        <translation>Установить иконку</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+29"/>
         <location line="+18"/>
         <source>No Name</source>
-        <translation>Без имени</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1447,37 +659,37 @@
     <message>
         <location line="+8"/>
         <source>Host</source>
-        <translation>Хост</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Port</source>
-        <translation>Порт</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Database Name</source>
-        <translation>Название базы данных</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>User</source>
-        <translation>Пользователь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Password</source>
-        <translation>Пароль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Use SSL</source>
-        <translation>Использовать SSL</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+36"/>
         <source>Test Connection</source>
-        <translation>Проверить соединение</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1485,12 +697,12 @@
     <message>
         <location filename="../../../Include/imtstyle/CDesignTokenBasedResourceProviderComp.cpp" line="+242"/>
         <source>Light</source>
-        <translation>Светлая</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Dark</source>
-        <translation>Тёмная</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1498,27 +710,27 @@
     <message>
         <location filename="../../../Include/imtdev/CDeviceDataFilePersistenceComp.cpp" line="+48"/>
         <source>Wrong data object type</source>
-        <translation>Неверный тип объекта данных</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Wrong data object type. Serialization is not supported</source>
-        <translation>Неверный тип объекта данных. Сериализация не поддерживается</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Reading of the device data failed</source>
-        <translation>Не удалось прочитать данные устройства</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Reading of the device data during deserialization failed</source>
-        <translation>Не удалось прочитать данные устройства при десериализации</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Reading of the device meta-data failed</source>
-        <translation>Не удалось прочитать метаданные устройства</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1550,17 +762,17 @@
     <message>
         <location filename="../../../Include/imtlicgui/CFeatureInfoEditorGuiComp.ui" line="+14"/>
         <source>Feature Information</source>
-        <translation>Информация о функции</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Feature Name</source>
-        <translation>Название</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Feature-ID</source>
-        <translation>Идентификатор</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1568,18 +780,18 @@
     <message>
         <location filename="../../../Include/imtrepo/CFileRepositoryComp.cpp" line="+209"/>
         <source>File could not be inserted into the repository</source>
-        <translation>Не удалось добавить файл в репозиторий</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+109"/>
         <source>Initial value could not be set</source>
-        <translation>Не удалось установить начальное значение</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <location line="+183"/>
         <source>Temp folder could not be created</source>
-        <translation>Не удалось создать временную папку</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1588,19 +800,19 @@
         <location filename="../../../Include/imtservergql/CGqlCollectionImportControllerComp.cpp" line="+22"/>
         <location line="+28"/>
         <source>Collection import controller unavailable</source>
-        <translation>Контроллер импорта коллекции недоступен</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../Include/imtservergql/CGqlCollectionImportControllerComp.h" line="+82"/>
-        <source>Invalid file info in the request</source>
-        <translation>Неверная информация о файле в запросе</translation>
-    </message>
-    <message>
-        <location filename="../../../Include/imtservergql/CGqlCollectionImportControllerComp.cpp" line="+15"/>
-        <location filename="../../../Include/imtservergql/CGqlCollectionImportControllerComp.h" line="+9"/>
+        <location line="+15"/>
+        <location filename="../../../Include/imtservergql/CGqlCollectionImportControllerComp.h" line="+91"/>
         <location line="+4"/>
         <source>Invalid import request</source>
-        <translation>Недействительный запрос импорта</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imtservergql/CGqlCollectionImportControllerComp.h" line="-13"/>
+        <source>Invalid file info in the request</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1608,17 +820,17 @@
     <message>
         <location filename="../../../Include/imtlicgui/CLicenseInfoEditorGuiComp.ui" line="+14"/>
         <source>Edit License</source>
-        <translation>Редактировать лицензию</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+18"/>
         <source>License Name</source>
-        <translation>Название лицензии</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
         <source>License-ID</source>
-        <translation>Идентификатор лицензии</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1647,22 +859,22 @@
     <message>
         <location line="+44"/>
         <source>Deselect All</source>
-        <translation>Снять выделение со всех</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Select All</source>
-        <translation>Выделить все</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Invert</source>
-        <translation>Инвертировать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Exclusive</source>
-        <translation>Эксклюзивный</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1670,22 +882,22 @@
     <message>
         <location filename="../../../Include/imtbase/CObjectCollectionMetaInfo.cpp" line="+33"/>
         <source>Added</source>
-        <translation>Добавлено</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Revision</source>
-        <translation>Ревизия</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Time when the object was added to the collection</source>
-        <translation>Время добавления объекта в коллекцию</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Item revision</source>
-        <translation>Ревизия элемента</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1701,32 +913,32 @@
     <message>
         <location filename="../../../Include/imtgui/CObjectCollectionRevisionDialog.ui" line="+14"/>
         <source>Select revision</source>
-        <translation>Выбрать ревизию</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+25"/>
         <source>Revision</source>
-        <translation>Ревизия</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Backup time</source>
-        <translation>Время резервной копии</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>User</source>
-        <translation>Пользователь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>SW Version</source>
-        <translation>Версия ПО</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Comment</source>
-        <translation>Комментарий</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1744,17 +956,17 @@
     <message>
         <location line="+105"/>
         <source>Enter some text to filter the item list</source>
-        <translation>Введите текст для фильтрации</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Close</source>
-        <translation>Закрыть</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+157"/>
         <source>Info</source>
-        <translation>Информация</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+43"/>
@@ -1803,42 +1015,42 @@
     <message>
         <location filename="../../../Include/imtauthgui/CPersonalAccessTokenManagerGuiComp.ui" line="+14"/>
         <source>Personal Access Token Manager</source>
-        <translation>Менеджер персональных токенов доступа</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+21"/>
         <source>User: &lt;not set&gt;</source>
-        <translation>Пользователь: &lt;не задан&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+29"/>
         <source>Personal Access Tokens</source>
-        <translation>Персональные токены доступа</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Create</source>
-        <translation>Создать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Revoke</source>
-        <translation>Отозвать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Delete</source>
-        <translation>Удалить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Refresh</source>
-        <translation>Обновить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+25"/>
         <source>Token Details</source>
-        <translation>Детали токена</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1851,27 +1063,27 @@
     <message>
         <location line="+25"/>
         <source>TimeStamp</source>
-        <translation>Отметка времени</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Status</source>
-        <translation>Статус</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Name</source>
-        <translation>Название</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Path</source>
-        <translation>Путь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1887,61 +1099,61 @@
         <location line="+474"/>
         <location line="+20"/>
         <source>Anchor</source>
-        <translation>Привязка</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-449"/>
         <source>Standart popup</source>
-        <translation>Стандартное всплывающее окно</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+15"/>
         <location line="+124"/>
         <source>Info</source>
-        <translation>Информация</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-111"/>
         <location line="+121"/>
         <source>Warning</source>
-        <translation>Предупреждение</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-108"/>
         <location line="+115"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-102"/>
         <location line="+109"/>
         <source>Critical</source>
-        <translation>Критическая ошибка</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-78"/>
         <source>Extended popup</source>
-        <translation>Расширенное всплывающее окно</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+38"/>
         <source>Category</source>
-        <translation>Категория</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>None</source>
-        <translation>Нет</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+47"/>
         <source>Timeout</source>
-        <translation>Тайм-аут</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Require user action</source>
-        <translation>Требуется действие пользователя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
@@ -1966,27 +1178,27 @@
     <message>
         <location line="+53"/>
         <source>Message</source>
-        <translation>Сообщение</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Widget without close control</source>
-        <translation>Виджет без кнопки закрытия</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Widget with close control</source>
-        <translation>Виджет с кнопкой закрытия</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+39"/>
         <source>Allow closing on mouse click</source>
-        <translation>Разрешить закрытие по клику мыши</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+55"/>
         <source>Use area provider</source>
-        <translation>Использовать провайдер области</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1994,37 +1206,37 @@
     <message>
         <location filename="../../../Include/imtlicgui/CProductInstanceInfoEditorComp.ui" line="+14"/>
         <source>Edit Product Instance</source>
-        <translation>Редактировать экземпляр продукта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Instance-ID</source>
-        <translation>ID экземпляра</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Customer</source>
-        <translation>Клиент</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Product</source>
-        <translation>Продукт</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Licenses</source>
-        <translation>Лицензии</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+16"/>
         <source>License</source>
-        <translation>Лицензия</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Expiration</source>
-        <translation>Срок действия</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2032,53 +1244,53 @@
     <message>
         <location filename="../../../Include/imtlicgui/CProductInstanceInfoViewComp.ui" line="+14"/>
         <source>Edit Product Instance</source>
-        <translation>Редактировать экземпляр продукта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+27"/>
         <location line="+178"/>
         <source>License</source>
-        <translation>Лицензия</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-164"/>
         <source>Create Transaction Code...</source>
-        <translation>Создать транзакционный код...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Load License...</source>
-        <translation>Загрузить лицензию...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+32"/>
         <source>Instance-ID</source>
-        <translation>ID экземпляра</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Customer</source>
-        <translation>Клиент</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Product</source>
-        <translation>Продукт</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Features</source>
-        <translation>Функции</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+31"/>
         <source>Feature</source>
-        <translation>Функция</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Valid</source>
-        <translation>Действителен</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2091,7 +1303,7 @@
     <message>
         <location line="+68"/>
         <source>Some work in progress...</source>
-        <translation>Идёт обработка...</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2105,52 +1317,52 @@
         <location line="+89"/>
         <location line="+346"/>
         <source>Password</source>
-        <translation>Пароль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-339"/>
         <source>User</source>
-        <translation>Пользователь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Remember me</source>
-        <translation>Запомнить меня</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+29"/>
         <source>Login</source>
-        <translation>Логин</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+29"/>
         <source>Please enter your credentials to log in.</source>
-        <translation>Введите ваши учётные данные для входа.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+163"/>
         <source>OK</source>
-        <translation>ОК</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+74"/>
         <source>Please, enter the password for system administrator</source>
-        <translation>Пожалуйста, введите пароль системного администратора</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+50"/>
         <source>Confirm Password</source>
-        <translation>Подтвердите пароль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+55"/>
         <source>No connection to the server</source>
-        <translation>Нет соединения с сервером</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+38"/>
         <source>Refresh</source>
-        <translation>Обновить</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2158,7 +1370,7 @@
     <message>
         <location filename="../../../Include/imtreportgui/CReportDocumentViewComp.ui" line="+14"/>
         <source>Report</source>
-        <translation>Отчёт</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2166,27 +1378,27 @@
     <message>
         <location filename="../../../Include/imtauthgui/CServerConnectionEditorComp.ui" line="+14"/>
         <source>Edit Addresses</source>
-        <translation>Редактировать адреса</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Host</source>
-        <translation>Хост</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+18"/>
         <source>HTTP Port</source>
-        <translation>Порт HTTP</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Websocket Port</source>
-        <translation>Порт WebSocket</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+18"/>
         <source>gRPC Port</source>
-        <translation>Порт gRPC</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2207,12 +1419,12 @@
     <message>
         <location line="+96"/>
         <source>Preferences</source>
-        <translation>Настройки</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+39"/>
         <source>Logout</source>
-        <translation>Выход из системы</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2220,33 +1432,33 @@
     <message>
         <location filename="../../../Include/imtgui/CStandardDocumentViewDecorator.ui" line="+120"/>
         <source>New</source>
-        <translation>Новый</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Open</source>
-        <translation>Открыть</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+17"/>
         <location line="+17"/>
         <source>Save</source>
-        <translation>Сохранить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+36"/>
         <source>Undo</source>
-        <translation>Отменить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Redo</source>
-        <translation>Восстановить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+79"/>
         <source>Close</source>
-        <translation>Закрыть</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2257,50 +1469,50 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+156"/>
-        <location line="+234"/>
-        <source>Password</source>
-        <translation>Пароль</translation>
-    </message>
-    <message>
-        <location line="-294"/>
+        <location line="+96"/>
         <source>User</source>
-        <translation>Пользователь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Remember me</source>
-        <translation>Запомнить меня</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+95"/>
-        <source>Login</source>
-        <translation>Логин</translation>
-    </message>
-    <message>
-        <location line="-65"/>
+        <location line="+30"/>
         <source>Please enter your credentials to log in.</source>
-        <translation>Введите ваши учётные данные для входа.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+153"/>
+        <location line="+23"/>
+        <location line="+234"/>
+        <source>Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-192"/>
+        <source>Login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+88"/>
         <source>OK</source>
-        <translation>ОК</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+74"/>
         <source>Please, enter the password for system administrator</source>
-        <translation>Пожалуйста, введите пароль системного администратора</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+50"/>
         <source>Confirm Password</source>
-        <translation>Подтвердите пароль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+42"/>
         <source>No connection to the server</source>
-        <translation>Нет соединения с сервером</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2308,82 +1520,82 @@
     <message>
         <location filename="../../../Include/imthypegui/CTaskManagerGuiComp.ui" line="+100"/>
         <source>Add</source>
-        <translation>Добавить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+29"/>
         <source>Duplicate current inspection</source>
-        <translation>Дублировать текущую инспекцию</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Duplicate</source>
-        <translation>Дублировать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Remove current inspection</source>
-        <translation>Удалить текущую инспекцию</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Show acquisition manager</source>
-        <translation>Показать менеджер захвата</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Inputs...</source>
-        <translation>Входные данные...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Show trigger table</source>
-        <translation>Показать таблицу триггеров</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Triggers...</source>
-        <translation>Триггеры...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Hide inspections list</source>
-        <translation>Скрыть список инспекций</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Hide</source>
-        <translation>Скрыть</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Run all inspections</source>
-        <translation>Запустить все инспекции</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Test Product</source>
-        <translation>Тестовый продукт</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+45"/>
         <source>Total Inspections:</source>
-        <translation>Всего инспекций:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+61"/>
         <source>Show inspections list</source>
-        <translation>Показать список инспекций</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Show</source>
-        <translation>Показать</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2391,37 +1603,37 @@
     <message>
         <location filename="../../../Include/imthypegui/CTaskSettingsDialog.ui" line="+14"/>
         <source>Task Settings</source>
-        <translation>Настройки задачи</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Active</source>
-        <translation>Активный</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Task Name</source>
-        <translation>Название задачи</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>User-ID</source>
-        <translation>ID пользователя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Input-ID</source>
-        <translation>ID входных данных</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+29"/>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+34"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2429,42 +1641,42 @@
     <message>
         <location filename="../../../Include/imthypegui/CTaskSettingsGuiComp.ui" line="+14"/>
         <source>Task Settings</source>
-        <translation>Настройки задачи</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+117"/>
-        <source>Active</source>
-        <translation>Активный</translation>
-    </message>
-    <message>
-        <location line="-13"/>
-        <source>Task Name</source>
-        <translation>Название задачи</translation>
-    </message>
-    <message>
-        <location line="-86"/>
+        <location line="+18"/>
         <source>User-ID</source>
-        <translation>ID пользователя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+109"/>
+        <location line="+7"/>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+32"/>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+47"/>
+        <source>Task Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
         <source>InputSub-ID</source>
-        <translation>Вх. суб-ID</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Input-ID</source>
-        <translation>ID входных данных</translation>
-    </message>
-    <message>
-        <location line="-77"/>
-        <source>Edit</source>
-        <translation>Редактировать</translation>
-    </message>
-    <message>
-        <location line="-32"/>
-        <source>Description</source>
-        <translation>Описание</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2472,7 +1684,7 @@
     <message>
         <location filename="../../../Include/imtgui/CThumbnailDecoratorGuiComp.ui" line="+14"/>
         <source>Main Window</source>
-        <translation>Главное окно</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+104"/>
@@ -2484,32 +1696,32 @@
     <message>
         <location line="+35"/>
         <source>Welcome</source>
-        <translation>Добро пожаловать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+93"/>
         <source>Commands</source>
-        <translation>Команды</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Log out</source>
-        <translation>Выйти из системы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Dashboard</source>
-        <translation>Панель управления</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+90"/>
         <source>Quit</source>
-        <translation>Выйти</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+203"/>
         <source>Close</source>
-        <translation>Закрыть</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2522,62 +1734,62 @@
     <message>
         <location line="+13"/>
         <source>Total Period</source>
-        <translation>Весь период</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Last Hour</source>
-        <translation>Последний час</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Last 4 Hours</source>
-        <translation>Последние 4 часа</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Last 8 Hours</source>
-        <translation>Последние 8 часов</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Last Day</source>
-        <translation>Последний день</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Last Week</source>
-        <translation>Последняя неделя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Last Month</source>
-        <translation>Последний месяц</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Last Quarter</source>
-        <translation>Последний квартал</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Last Year</source>
-        <translation>Последний год</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>User-Defined</source>
-        <translation>Пользовательский</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+41"/>
         <source>From</source>
-        <translation>От</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+16"/>
         <source>To</source>
-        <translation>До</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2585,207 +1797,207 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/Calendar.qml" line="+70"/>
         <source>January</source>
-        <translation>Январь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>February</source>
-        <translation>Февраль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>March</source>
-        <translation>Март</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>April</source>
-        <translation>Апрель</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>May</source>
-        <translation>Май</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>June</source>
-        <translation>Июнь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>July</source>
-        <translation>Июль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>August</source>
-        <translation>Август</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>September</source>
-        <translation>Сентябрь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>October</source>
-        <translation>Октябрь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>November</source>
-        <translation>Ноябрь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>December</source>
-        <translation>Декабрь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Январь</source>
-        <translation>Январь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Февраль</source>
-        <translation>Февраль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Март</source>
-        <translation>Март</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Апрель</source>
-        <translation>Апрель</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Май</source>
-        <translation>Май</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Июнь</source>
-        <translation>Июнь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Июль</source>
-        <translation>Июль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Август</source>
-        <translation>Август</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Сентябрь</source>
-        <translation>Сентябрь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Октябрь</source>
-        <translation>Октябрь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Ноябрь</source>
-        <translation>Ноябрь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Декабрь</source>
-        <translation>Декабрь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Пн</source>
-        <translation>Пн</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Вт</source>
-        <translation>Вт</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Ср</source>
-        <translation>Ср</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Чт</source>
-        <translation>Чт</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Пт</source>
-        <translation>Пт</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Сб</source>
-        <translation>Сб</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Вс</source>
-        <translation>Вс</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Mo</source>
-        <translation>Пн</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Tu</source>
-        <translation>Вт</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>We</source>
-        <translation>Ср</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Th</source>
-        <translation>Чт</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Fr</source>
-        <translation>Пт</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Sa</source>
-        <translation>Сб</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Su</source>
-        <translation>Вс</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Ok</source>
-        <translation>ОК</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Today</source>
-        <translation>Сегодня</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2793,62 +2005,62 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/CalendarFunctions.qml" line="+10"/>
         <source>January</source>
-        <translation>Январь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>February</source>
-        <translation>Февраль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>March</source>
-        <translation>Март</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>April</source>
-        <translation>Апрель</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>May</source>
-        <translation>Май</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>June</source>
-        <translation>Июнь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>July</source>
-        <translation>Июль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>August</source>
-        <translation>Август</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>September</source>
-        <translation>Сентябрь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>October</source>
-        <translation>Октябрь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>November</source>
-        <translation>Ноябрь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>December</source>
-        <translation>Декабрь</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2856,37 +2068,37 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/CalendarView.qml" line="+40"/>
         <source>Mo</source>
-        <translation>Пн</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Tu</source>
-        <translation>Вт</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>We</source>
-        <translation>Ср</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Th</source>
-        <translation>Чт</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Fr</source>
-        <translation>Пт</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Sa</source>
-        <translation>Сб</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Su</source>
-        <translation>Вс</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2894,12 +2106,12 @@
     <message>
         <location filename="../../../Qml/imtauthgui/ChangePasswordDialog.qml" line="+15"/>
         <source>Save</source>
-        <translation>Сохранить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2907,12 +2119,12 @@
     <message>
         <location filename="../../../Qml/imtchatgui/ChatPanel.qml" line="+37"/>
         <source>Chats</source>
-        <translation>Чаты</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+37"/>
         <source>Search conversations...</source>
-        <translation>Поиск бесед...</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2920,7 +2132,7 @@
     <message>
         <location filename="../../../Qml/imtchatgui/ChatSearchBar.qml" line="+15"/>
         <source>Search...</source>
-        <translation>Поиск...</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2929,7 +2141,7 @@
         <location filename="../../../Qml/imtcontrols/Inputs/CheckBoxMenu.qml" line="+301"/>
         <location line="+171"/>
         <source>All</source>
-        <translation>Все</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2937,7 +2149,7 @@
     <message>
         <location filename="../../../Qml/imtgui/View/ClearableComboBoxElementView.qml" line="+75"/>
         <source>Clear</source>
-        <translation>Очистить</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2945,12 +2157,12 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Views/CollapsibleRectangle.qml" line="+35"/>
         <source>Collapse</source>
-        <translation>Свернуть</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Expand</source>
-        <translation>Развернуть</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2958,32 +2170,32 @@
     <message>
         <location filename="../../../Qml/imtcolgui/CollectionStructure.qml" line="+190"/>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Rename</source>
-        <translation>Переименовать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Set Description</source>
-        <translation>Установить описание</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+333"/>
         <source>This table has been modified from another computer</source>
-        <translation>Эта таблица была изменена на другом компьютере</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Update</source>
-        <translation>Обновить</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2991,42 +2203,42 @@
     <message>
         <location filename="../../../Qml/imtcolgui/CollectionStructureCommandsDelegateBase.qml" line="+47"/>
         <source>Deleting a selected element</source>
-        <translation>Удаление  выбранного  элемента</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Remove selected item from the collection ?</source>
-        <translation>Удалить выбранный элемент из коллекции ?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+134"/>
         <source>Please enter the name of the new node</source>
-        <translation>Введите название для узла</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Please enter the name of the document:</source>
-        <translation>Введите название документа:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Please enter the description of the document:</source>
-        <translation>Введите описание документа:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+75"/>
         <source>Rename document</source>
-        <translation>Переименование документа</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
         <source>New node</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Set description</source>
-        <translation>Установить описание</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3034,7 +2246,7 @@
     <message>
         <location filename="../../../Qml/imtcolgui/CollectionStructureCommandsObserver.qml" line="+27"/>
         <source>Open</source>
-        <translation>Открыть</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3042,7 +2254,7 @@
     <message>
         <location filename="../../../Qml/imtcolgui/CollectionView.qml" line="+529"/>
         <source>Please select an item for showing additional informations</source>
-        <translation>Выберите элемент чтобы увидеть дополнительную информацию</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3050,132 +2262,132 @@
     <message>
         <location filename="../../../Qml/imtcolgui/CollectionViewCommandsDelegateBase.qml" line="+19"/>
         <source>Deleting a selected element</source>
-        <translation>Удаление  выбранного  элемента</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Remove selected item from the collection ?</source>
-        <translation>Удалить выбранный элемент из коллекции ?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+103"/>
         <source>The object has been successfully imported</source>
-        <translation>Объект был успешно импортирован</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+107"/>
         <source>Duplicate</source>
-        <translation>Дублировать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+104"/>
-        <source>Restore all items with the current filter ?</source>
-        <translation>Восстановить все элементы с текущим фильтром?</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Restore all data from this collection ?</source>
-        <translation>Восстановить все данные из этой коллекции?</translation>
-    </message>
-    <message>
-        <location line="+51"/>
-        <source>Import file</source>
-        <translation>Импорт файла</translation>
-    </message>
-    <message>
-        <location line="+104"/>
-        <source>Save file</source>
-        <translation>Сохранить файл</translation>
-    </message>
-    <message>
-        <location line="+65"/>
-        <source>Delete all items with the current filter ?</source>
-        <translation>Удалить все элементы с текущим фильтром?</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Delete all data from this collection ?</source>
-        <translation>Удалить все данные из этой коллекции?</translation>
-    </message>
-    <message>
-        <location line="+12"/>
-        <source>Please enter the name of the document:</source>
-        <translation>Введите название документа:</translation>
-    </message>
-    <message>
-        <location line="+15"/>
-        <source>Please enter the description of the document:</source>
-        <translation>Введите описание документа:</translation>
-    </message>
-    <message>
-        <location line="+73"/>
-        <source>Restoring an objects</source>
-        <translation>Восстановление объектов</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Restore the selected objects ?</source>
-        <translation>Восстановить выбранные объекты?</translation>
-    </message>
-    <message>
-        <location line="+22"/>
-        <source>Enter the description</source>
-        <translation>Введите описание</translation>
-    </message>
-    <message>
-        <location line="+22"/>
-        <source>Duplicate Name</source>
-        <translation>Название дубликата</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Enter the duplicate name</source>
-        <translation>Введите название дубликата</translation>
-    </message>
-    <message>
-        <location line="+20"/>
-        <source>Rename document</source>
-        <translation>Переименование документа</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Enter the name</source>
-        <translation>Введите название</translation>
-    </message>
-    <message>
-        <location line="+42"/>
-        <source>Deleting elements</source>
-        <translation>Удаление элементов</translation>
-    </message>
-    <message>
-        <location line="+27"/>
-        <source>Restoring elements</source>
-        <translation>Восстановление элементов</translation>
-    </message>
-    <message>
-        <location line="-114"/>
-        <source>Set description</source>
-        <translation>Установить описание</translation>
-    </message>
-    <message>
-        <location line="-444"/>
+        <location line="+8"/>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Rename</source>
-        <translation>Переименовать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Set Description</source>
-        <translation>Установить описание</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+71"/>
+        <source>Restore all items with the current filter ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Restore all data from this collection ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+51"/>
+        <source>Import file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+104"/>
+        <source>Save file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+65"/>
+        <source>Delete all items with the current filter ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Delete all data from this collection ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Please enter the name of the document:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Please enter the description of the document:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+73"/>
+        <source>Restoring an objects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Restore the selected objects ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Set description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Enter the description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>Duplicate Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Enter the duplicate name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Rename document</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Enter the name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+42"/>
+        <source>Deleting elements</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+27"/>
+        <source>Restoring elements</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3183,12 +2395,12 @@
     <message>
         <location filename="../../../Qml/imtgui/View/ComboBoxAddressElementView.qml" line="+13"/>
         <source>Please select an item</source>
-        <translation>Пожалуйста выберите объект</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+68"/>
         <source>Address</source>
-        <translation>Адрес</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3196,7 +2408,7 @@
     <message>
         <location filename="../../../Qml/imtgui/View/ComboBoxElementView.qml" line="+12"/>
         <source>Please select an item</source>
-        <translation>Пожалуйста выберите объект</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3204,7 +2416,7 @@
     <message>
         <location filename="../../../Qml/imtgui/View/ComboBoxGqlElementView.qml" line="+13"/>
         <source>Please select an item</source>
-        <translation>Пожалуйста выберите объект</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3212,7 +2424,7 @@
     <message>
         <location filename="../../../Qml/imtgui/View/ComboBoxGqlLegacyElementView.qml" line="+13"/>
         <source>Please select an item</source>
-        <translation>Пожалуйста выберите объект</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3220,22 +2432,22 @@
     <message>
         <location filename="../../../Qml/imtgui/Application/Configurator.qml" line="+88"/>
         <source>Apply</source>
-        <translation>Применить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Close</source>
-        <translation>Закрыть</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Save all changes ?</source>
-        <translation>Сохранить все изменения ?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3266,7 +2478,7 @@
     <message>
         <location filename="../../ImtControlsGallery/Qml/controlsgalleryqml/ContactInfoEditor.qml" line="+100"/>
         <source>First Name</source>
-        <translation type="unfinished">Имя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
@@ -3276,7 +2488,7 @@
     <message>
         <location line="+17"/>
         <source>Last Name</source>
-        <translation type="unfinished">Фамилия</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
@@ -3286,7 +2498,7 @@
     <message>
         <location line="+11"/>
         <source>Gender</source>
-        <translation type="unfinished">Пол</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3294,7 +2506,7 @@
     <message>
         <location filename="../../../Qml/imtchatgui/ConversationCollectionView.qml" line="+30"/>
         <source>Conversation</source>
-        <translation>Беседа</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3302,52 +2514,52 @@
     <message>
         <location filename="../../../Qml/imtchatgui/ConversationCreateDialog.qml" line="+50"/>
         <source>New Conversation</source>
-        <translation>Новая беседа</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Name *</source>
-        <translation>Название *</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Conversation name</source>
-        <translation>Название беседы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Type</source>
-        <translation>Тип</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Direct (1:1)</source>
-        <translation>Личная (1:1)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Group</source>
-        <translation>Группа</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Channel</source>
-        <translation>Канал</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Support</source>
-        <translation>Поддержка</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Create</source>
-        <translation>Создать</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3355,27 +2567,27 @@
     <message>
         <location filename="../../../Qml/imtchatgui/ConversationEditor.qml" line="+95"/>
         <source>Name</source>
-        <translation>Название</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the conversation name</source>
-        <translation>Введите название беседы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Conversation Type</source>
-        <translation>Тип беседы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+30"/>
         <source>Metadata</source>
-        <translation>Метаданные</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Additional metadata (JSON)</source>
-        <translation>Дополнительные метаданные (JSON)</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3383,7 +2595,7 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/CriticalErrorDialog.qml" line="+11"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3391,102 +2603,102 @@
     <message>
         <location filename="../../../Qml/imtgui/Params/DatabaseAccessSettingsEditor.qml" line="+22"/>
         <source>Database restore was successful</source>
-        <translation>База данных успешно восстановлена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Error when trying to restore the database</source>
-        <translation>Ошибка при попытки восстановить базу данных</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Error when trying to create a database backup</source>
-        <translation>Ошибка при попытки создать резервную копию</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Select backup file</source>
-        <translation>Выберите файл для восстановления</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Save file</source>
-        <translation>Сохранить файл</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+39"/>
         <source>Database name</source>
-        <translation>Название базы данных</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Host</source>
-        <translation>Хост</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Password</source>
-        <translation>Пароль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Port</source>
-        <translation>Порт</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Username</source>
-        <translation>Логин</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Test database connection</source>
-        <translation>Тест соединения</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Test</source>
-        <translation>Тест</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+17"/>
         <source>There is no connection to the database</source>
-        <translation>Нет соединения с базой данных</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Test connection successfully</source>
-        <translation>Соединение успешно</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Backup Information</source>
-        <translation>Информация о резервной копии</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Backup data</source>
-        <translation>Резервная копия</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Before performing the operation, check the connection to the server</source>
-        <translation>Перед выполнением операции проверьте подключение к серверу</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Backup</source>
-        <translation>Резервная копия</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Restore data from backup</source>
-        <translation>Восстановление данных из резервной копии</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Restore</source>
-        <translation>Восстановить</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3494,62 +2706,62 @@
     <message>
         <location filename="../../../Qml/imtgui/Application/DatabaseBackupController.qml" line="+22"/>
         <source>Backup Information</source>
-        <translation>Информация о резервной копии</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Backup data</source>
-        <translation>Резервная копия</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Before performing the operation, check the connection to the server</source>
-        <translation>Перед выполнением операции проверьте подключение к серверу</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Backup</source>
-        <translation>Резервная копия</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Restore data from backup</source>
-        <translation>Восстановление данных из резервной копии</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Restore</source>
-        <translation>Восстановить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Restore successful</source>
-        <translation>Восстановлени</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Database restore was successful</source>
-        <translation>База данных успешно восстановлена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Error when trying to restore the database</source>
-        <translation>Ошибка при попытки восстановить базу данных</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Error when trying to create a database backup</source>
-        <translation>Ошибка при попытки создать резервную копию</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Select backup file</source>
-        <translation>Выберите файл для восстановления</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Save file</source>
-        <translation>Сохранить файл</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3557,22 +2769,22 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/DateInput.qml" line="+35"/>
         <source>Wrong date format!</source>
-        <translation>Неверный формат даты!</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Invalid month value!</source>
-        <translation>Неверное значение месяца!</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Invalid day value!</source>
-        <translation>Неверное значение дня!</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+230"/>
         <source>Date:</source>
-        <translation>Дата:</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3580,62 +2792,62 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/DatePicker.qml" line="+28"/>
         <source>January</source>
-        <translation>Январь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>February</source>
-        <translation>Февраль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>March</source>
-        <translation>Март</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>April</source>
-        <translation>Апрель</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>May</source>
-        <translation>Май</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>June</source>
-        <translation>Июнь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>July</source>
-        <translation>Июль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>August</source>
-        <translation>Август</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>September</source>
-        <translation>Сентябрь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>October</source>
-        <translation>Октябрь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>November</source>
-        <translation>Ноябрь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>December</source>
-        <translation>Декабрь</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3643,13 +2855,13 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Base/Decorators.qml" line="+1309"/>
         <source>Progress:</source>
-        <translation>Прогресс:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+80"/>
         <location line="+1"/>
         <source>Completed</source>
-        <translation>Завершено</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3657,27 +2869,27 @@
     <message>
         <location filename="../../ImtControlsGallery/Qml/controlsgalleryqml/DialogsRepresentaitonPage.qml" line="+208"/>
         <source>Yes</source>
-        <translation type="unfinished">Да</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>No</source>
-        <translation type="unfinished">Нет</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+50"/>
         <source>Close</source>
-        <translation type="unfinished">Закрыть</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+78"/>
         <source>Ok</source>
-        <translation type="unfinished">ОК</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation type="unfinished">Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3685,22 +2897,22 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocCollectionViewDelegate.qml" line="+201"/>
         <source>Select Document Type</source>
-        <translation>Выберите тип документа</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
         <source>OK</source>
-        <translation>ОК</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+53"/>
         <source>Please select a document type</source>
-        <translation>Пожалуйста, выберите тип документа</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3708,7 +2920,7 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocumentHistoryDialog.qml" line="+12"/>
         <source>OK</source>
-        <translation>ОК</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3716,7 +2928,7 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocumentHistoryPanel.qml" line="+79"/>
         <source>History</source>
-        <translation>История</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3724,17 +2936,17 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocumentHistoryView.qml" line="+123"/>
         <source>Revision</source>
-        <translation>Ревизия</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Active</source>
-        <translation>Активный</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+51"/>
         <source>There is no history for this document</source>
-        <translation>Нет истории для этого документа</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3742,67 +2954,67 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocumentRevisionDialog.qml" line="+12"/>
         <source>Revision Manager</source>
-        <translation>Менеджер ревизий</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Set this revision</source>
-        <translation>Установить эту ревизию</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Delete revision</source>
-        <translation>Удалить ревизию</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Close</source>
-        <translation>Закрыть</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+64"/>
         <source>The document revision has been successfully delete</source>
-        <translation>Ревизия документа успешно удалена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+25"/>
         <source>The document revision has been successfully set</source>
-        <translation>Ревизия документа успешно установлена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Remove revision</source>
-        <translation>Удалить ревизию</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Delete the selected revision ?</source>
-        <translation>Удалить выбранную ревизию?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+117"/>
         <source>User</source>
-        <translation>Пользователь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Revision</source>
-        <translation>Ревизия</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Active</source>
-        <translation>Активный</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Time</source>
-        <translation>Время</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3810,18 +3022,18 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocumentService.qml" line="+9"/>
         <source>&lt;no name&gt;</source>
-        <translation>&lt;без имени&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+286"/>
         <source>Unable to get a model for document. Error: Document data controller is invalid</source>
-        <translation>Не удалось получить модель для документа. Ошибка: контроллер данных документа недействителен</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+363"/>
         <location line="+54"/>
         <source>Internal error</source>
-        <translation>Внутренняя ошибка</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3829,7 +3041,7 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocumentServiceBase.qml" line="+117"/>
         <source>&lt;no name&gt;</source>
-        <translation>&lt;без имени&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3837,7 +3049,7 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocumentWorkspaceCommandsDelegate.qml" line="+12"/>
         <source>Document history</source>
-        <translation>История документа</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3845,22 +3057,22 @@
     <message>
         <location filename="../../../Qml/imtgui/View/DoubleInputElementView.qml" line="+27"/>
         <source>Please enter a value ranging from</source>
-        <translation>Введите значение с</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>to</source>
-        <translation>по</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Please enter a value less than or equal to</source>
-        <translation>Введите значение, меньшее или равное</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Please enter a value greater than or equal to</source>
-        <translation>Введите значение, большее или равное</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3868,62 +3080,62 @@
     <message>
         <location filename="../../../Qml/imtdeskgui/EntityContextTicketsDialog.qml" line="+16"/>
         <source>Entity Tickets</source>
-        <translation>Заявки сущности</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Close</source>
-        <translation>Закрыть</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Ticket successfully created</source>
-        <translation>Заявка успешно создана</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+33"/>
         <source>Create ticket for this entity</source>
-        <translation>Создать заявку для этой сущности</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Title</source>
-        <translation>Заголовок</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Enter ticket title...</source>
-        <translation>Введите заголовок заявки...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+46"/>
         <source>Describe the issue...</source>
-        <translation>Опишите проблему...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Create Ticket</source>
-        <translation>Создать заявку</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+59"/>
         <source>Linked Tickets</source>
-        <translation>Связанные заявки</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+137"/>
         <source>No tickets linked to this entity</source>
-        <translation>Нет заявок, связанных с этой сущностью</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Loading tickets...</source>
-        <translation>Загрузка заявок...</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3931,7 +3143,7 @@
     <message>
         <location filename="../../../Qml/imtchatgui/EntitySearchPopup.qml" line="+117"/>
         <source>No results for &quot;%1&quot;</source>
-        <translation>Нет результатов для &quot;%1&quot;</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3939,13 +3151,13 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/ErrorDialog.qml" line="+11"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <location line="+10"/>
         <source>OK</source>
-        <translation>ОК</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3953,7 +3165,7 @@
     <message>
         <location filename="../../../Qml/imtlicgui/FeatureCollectionView.qml" line="+77"/>
         <source>Feature Name</source>
-        <translation>Название</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3962,59 +3174,59 @@
         <location filename="../../../Qml/imtlicgui/FeatureEditor.qml" line="+166"/>
         <location line="+376"/>
         <source>Feature Name</source>
-        <translation>Название</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-368"/>
         <source>Enter the feature name</source>
-        <translation>Введите название</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+16"/>
         <location line="+356"/>
         <source>Feature-ID</source>
-        <translation>Идентификатор</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-348"/>
         <source>Enter the feature ID</source>
-        <translation>Введите идентификатор</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+8"/>
+        <source>Enter the description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
         <source>Is Optional</source>
-        <translation>Необязательный</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+323"/>
-        <source>Feature Description</source>
-        <translation>Описание</translation>
-    </message>
-    <message>
-        <location line="-308"/>
+        <location line="+15"/>
         <location line="+316"/>
         <source>Is Permission</source>
-        <translation>Право</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-341"/>
-        <source>Enter the description</source>
-        <translation>Введите описание</translation>
-    </message>
-    <message>
-        <location line="+203"/>
+        <location line="-138"/>
         <source>Dependencies</source>
-        <translation>Зависимости</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+134"/>
+        <location line="+130"/>
+        <source>Feature Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Optional</source>
-        <translation>Опционально</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4022,22 +3234,22 @@
     <message>
         <location filename="../../../Qml/imtlicgui/FeaturesDialog.qml" line="+11"/>
         <source>Select features</source>
-        <translation>Выберите фичи</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Add</source>
-        <translation>Добавить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+53"/>
         <source>Feature Name</source>
-        <translation>Название</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4045,7 +3257,7 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/FileExportDialog.qml" line="+11"/>
         <source>Save file</source>
-        <translation>Сохранить файл</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4053,7 +3265,7 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/FileImportDialog.qml" line="+10"/>
         <source>Import file</source>
-        <translation>Импорт файла</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4061,17 +3273,17 @@
     <message>
         <location filename="../../../Qml/imtgui/View/FilePickerElementView.qml" line="+12"/>
         <source>Browse...</source>
-        <translation>Обзор...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Select a file</source>
-        <translation>Выбрать файл</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+25"/>
         <source>Nothing is selected</source>
-        <translation>Ничего не выбрано</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4079,27 +3291,27 @@
     <message>
         <location filename="../../../Qml/imtgui/Panels/FilterPanelDecorator.qml" line="+217"/>
         <source>Document State</source>
-        <translation>Состояние документа</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Active</source>
-        <translation>Активный</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Disabled</source>
-        <translation>Отключено</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+30"/>
         <source>Creation Date</source>
-        <translation>Дата создания</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+48"/>
         <source>Reset all filters</source>
-        <translation>Сбросить все фильтры</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4107,7 +3319,7 @@
     <message>
         <location filename="../../../Qml/imtgui/View/FilterableComboBoxElementView.qml" line="+86"/>
         <source>Clear</source>
-        <translation>Очистить</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4115,12 +3327,12 @@
     <message>
         <location filename="../../../Qml/imtguigql/FilterableSelectGqlDataProvider.qml" line="+82"/>
         <source>Failed to load items</source>
-        <translation>Не удалось загрузить элементы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
         <source>No collection selected</source>
-        <translation>Коллекция не выбрана</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4128,33 +3340,33 @@
     <message>
         <location filename="../../../Qml/imtcolgui/FilterableSelectPopup.qml" line="+70"/>
         <source>Filter...</source>
-        <translation>Фильтр...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+395"/>
         <source>Selected</source>
-        <translation>Выбрано</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Clear all</source>
-        <translation>Очистить все</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+169"/>
         <source>No items found</source>
-        <translation>Элементы не найдены</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+19"/>
         <location line="+1"/>
         <source>Error loading items</source>
-        <translation>Ошибка загрузки элементов</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+98"/>
         <source>Loading more...</source>
-        <translation>Загрузка...</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4162,7 +3374,7 @@
     <message>
         <location filename="../../../Include/imtwidgets/CToolButton.ui" line="+14"/>
         <source>Tool Button</source>
-        <translation>Кнопка инструмента</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+33"/>
@@ -4172,7 +3384,7 @@
     <message>
         <location line="+35"/>
         <source>Add New Wizard</source>
-        <translation>Добавить новый мастер</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4180,27 +3392,27 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Views/Gallery.qml" line="+86"/>
         <source>Gallery</source>
-        <translation>Галерея</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+293"/>
         <source>Delete photo</source>
-        <translation>Удалить фото</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Are you sure you want to delete the photo?</source>
-        <translation>Вы уверены, что хотите удалить фото?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Ok</source>
-        <translation>ОК</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4211,7 +3423,7 @@
         <location line="+34"/>
         <location line="+37"/>
         <source>Invalid user-ID</source>
-        <translation>Неверный ID пользователя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-104"/>
@@ -4219,38 +3431,38 @@
         <location line="+34"/>
         <location line="+37"/>
         <source>Invalid document-ID</source>
-        <translation>Неверный ID документа</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-104"/>
         <source>Document data is invalid</source>
-        <translation>Данные документа недействительны</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Save document failed</source>
-        <translation>Не удалось сохранить документ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+33"/>
         <source>Close document failed</source>
-        <translation>Не удалось закрыть документ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+34"/>
         <source>Undo failed</source>
-        <translation>Не удалось отменить действие</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+37"/>
         <source>Invalid step count</source>
-        <translation>Неверное количество шагов</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-3"/>
         <source>Redo failed</source>
-        <translation>Не удалось повторить действие</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4258,7 +3470,7 @@
     <message>
         <location filename="../../../Qml/imtguigql/GqlBasedDataModelController.qml" line="+104"/>
         <source>Network error</source>
-        <translation>Ошибка сети</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4266,7 +3478,7 @@
     <message>
         <location filename="../../../Qml/imtguigql/GqlBasedDataModelProvider.qml" line="+105"/>
         <source>Network error</source>
-        <translation>Ошибка сети</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4274,7 +3486,7 @@
     <message>
         <location filename="../../../Qml/imtguigql/GqlSdlRequestSender.qml" line="+156"/>
         <source>Network error</source>
-        <translation>Ошибка сети</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4282,47 +3494,47 @@
     <message>
         <location filename="../../../Qml/imtcontrols/GraphicsView/GraphicsView.qml" line="+1336"/>
         <source>Selection mode</source>
-        <translation>Режим выделения</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Edit mode</source>
-        <translation>Режим редактирования</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Edit points mode</source>
-        <translation>Режим редактирования точек</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Add points mode</source>
-        <translation>Режим добавления точек</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Delete points mode</source>
-        <translation>Режим удаления точек</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+111"/>
         <source>Zoom in</source>
-        <translation>Увеличить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Zoom out</source>
-        <translation>Уменьшить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Reset view</source>
-        <translation>Сбросить вид</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Fit to view</source>
-        <translation>По размеру окна</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4348,27 +3560,27 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/InputActions.qml" line="+37"/>
         <source>Cut</source>
-        <translation>Вырезать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Copy</source>
-        <translation>Скопировать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Paste</source>
-        <translation>Вставить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Select All</source>
-        <translation>Выделить все</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4377,13 +3589,13 @@
         <location filename="../../../Qml/imtcontrols/Dialogs/InputDialog.qml" line="+20"/>
         <location line="+17"/>
         <source>OK</source>
-        <translation>ОК</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-16"/>
         <location line="+17"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4391,22 +3603,22 @@
     <message>
         <location filename="../../../Qml/imtauthgui/ItemSelectElementView.qml" line="+18"/>
         <source>Items</source>
-        <translation>Элементы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Add item</source>
-        <translation>Добавить элемент</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Type or choose an item</source>
-        <translation>Введите или выберите элемент</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>No items</source>
-        <translation>Нет элементов</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4415,53 +3627,53 @@
         <location filename="../../../Qml/imtlicgui/LicenseEditor.qml" line="+237"/>
         <location line="+226"/>
         <source>License Name</source>
-        <translation>Название лицензии</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-217"/>
         <source>Enter the license name</source>
-        <translation>Введите название лицензии</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+21"/>
         <location line="+201"/>
         <source>License-ID</source>
-        <translation>Идентификатор лицензии</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-192"/>
         <source>Enter the license ID</source>
-        <translation>Введите идентификатор лицензии</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Enter the license description</source>
-        <translation>Введите описание лицензии</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Product</source>
-        <translation>Продукт</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+44"/>
         <source>Features</source>
-        <translation>Свойства</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+48"/>
         <source>Dependencies</source>
-        <translation>Зависимости</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+67"/>
         <source>Feature Name</source>
-        <translation>Название</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4469,7 +3681,7 @@
     <message>
         <location filename="../../../Qml/imtgui/View/LogView.qml" line="+31"/>
         <source>Log</source>
-        <translation>Лог</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4477,22 +3689,22 @@
     <message>
         <location filename="../../../Qml/imtgui/View/MacAddressElementView.qml" line="+10"/>
         <source>MAC-Address</source>
-        <translation>МАК Адрес</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter MAC-Address</source>
-        <translation>Введите МАК Адрес</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+54"/>
         <source>MAC Address must be in the format XX:XX:XX:XX:XX:XX</source>
-        <translation>МАК Адрес  должен быть в формате XX:XX:XX:XX:XX:XX</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Only the symbols &lt;a-f&gt; and &lt;0 - 9&gt; may be included</source>
-        <translation>Только символы &lt;a-f&gt; и &lt;0 - 9&gt; могут быть использованы</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4500,27 +3712,27 @@
     <message>
         <location filename="../../../Qml/imtcolgui/MessageCollectionFilterDecorator.qml" line="+113"/>
         <source>Info</source>
-        <translation>Информация</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Warning</source>
-        <translation>Предупреждение</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Critical</source>
-        <translation>Критичная ошибка</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Verbose</source>
-        <translation>Подробный</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4528,7 +3740,7 @@
     <message>
         <location filename="../../../Qml/imtcolgui/MessageCollectionView.qml" line="+121"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4536,19 +3748,19 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/MessageDialog.qml" line="+11"/>
         <source>Message</source>
-        <translation>Сообщение</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <location line="+11"/>
         <source>Yes</source>
-        <translation>Да</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-10"/>
         <location line="+11"/>
         <source>No</source>
-        <translation>Нет</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4556,7 +3768,7 @@
     <message>
         <location filename="../../../Qml/imtchatgui/MessageInput.qml" line="+72"/>
         <source>Write a message... (@ to mention, # for reference)</source>
-        <translation>Написать сообщение... (@ для упоминания, # для ссылки)</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4564,7 +3776,7 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/MessagePopup.qml" line="+9"/>
         <source>Message</source>
-        <translation>Сообщение</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4572,78 +3784,78 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/ModalDialogManager.qml" line="+165"/>
         <source>Information</source>
-        <translation>Информация</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Warning</source>
-        <translation>Предупреждение</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Critical</source>
-        <translation>Критичная ошибка</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>MultiDocWorkspaceView</name>
     <message>
-        <location filename="../../../Qml/imtdocgui/MultiDocWorkspaceView.qml" line="+173"/>
+        <location filename="../../../Qml/imtdocgui/MultiDocWorkspaceView.qml" line="+172"/>
+        <source>Save document</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Save all changes ?</source>
-        <translation>Сохранить все изменения ?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+81"/>
         <source>Close document</source>
-        <translation>Закрыть документ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Close all documents</source>
-        <translation>Закрыть все документы</translation>
-    </message>
-    <message>
-        <location line="-83"/>
-        <source>Save document</source>
-        <translation>Сохранение документа</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>MultiDocumentCollectionView</name>
     <message>
-        <location filename="../../../Qml/imtdocgui/MultiDocumentCollectionView.qml" line="+112"/>
-        <source>Document Name</source>
-        <translation>Название документа</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Enter the document name</source>
-        <translation>Введите название документа</translation>
-    </message>
-    <message>
-        <location line="-9"/>
+        <location filename="../../../Qml/imtdocgui/MultiDocumentCollectionView.qml" line="+104"/>
         <source>Save document</source>
-        <translation>Сохранение документа</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Save all changes ?</source>
-        <translation>Сохранить все изменения ?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+310"/>
+        <location line="+7"/>
+        <source>Document Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Enter the document name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+302"/>
         <source>Close document</source>
-        <translation>Закрыть документ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Close all documents</source>
-        <translation>Закрыть все документы</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4664,12 +3876,12 @@
     <message>
         <location filename="../../../Qml/imtlicgui/PackageCollectionViewCommandsDelegate.qml" line="+10"/>
         <source>Deleting a feature</source>
-        <translation>Удаление фичи</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Delete the selected feature ?</source>
-        <translation>Удалить выбранную фичу ?</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4677,25 +3889,25 @@
     <message>
         <location filename="../../../Qml/imtlicgui/PackageViewItemDelegate.qml" line="+152"/>
         <source>Feature-ID already exists (In this or another package)</source>
-        <translation>Feature-ID уже сущесвует (В этом либо в другом  пакете)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>It is impossible to rename the feature, please remove all dependencies</source>
-        <translation>Переименование невозможно, удалите все зависимости</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>PageAboutProvider</name>
     <message>
-        <location filename="../../../Qml/imtgui/Settings/PageAboutProvider.qml" line="+37"/>
-        <source>Server Log</source>
-        <translation>Серверный лог</translation>
+        <location filename="../../../Qml/imtgui/Settings/PageAboutProvider.qml" line="+36"/>
+        <source>Server Version</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-1"/>
-        <source>Server Version</source>
-        <translation>Версия сервера</translation>
+        <location line="+1"/>
+        <source>Server Log</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4703,7 +3915,7 @@
     <message>
         <location filename="../../../Qml/imtgui/View/Pagination.qml" line="+193"/>
         <source>Per page: </source>
-        <translation>На страницу: </translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4711,33 +3923,33 @@
     <message>
         <location filename="../../../Qml/imtauthgui/PasswordInput.qml" line="+43"/>
         <source>Passwords don&apos;t match</source>
-        <translation>Пароли не совпадают</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Current password</source>
-        <translation>Текущий пароль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Enter the current password</source>
-        <translation>Введите текущий пароль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+20"/>
         <source>New password</source>
-        <translation>Новый пароль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Enter the new password</source>
-        <translation>Введите новый пароль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
         <location line="+2"/>
         <source>Confirm password</source>
-        <translation>Подтвердите пароль</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4745,103 +3957,103 @@
     <message>
         <location filename="../../../Qml/imtauthgui/PasswordRecoveryDialog.qml" line="+15"/>
         <source>Password Recovery</source>
-        <translation>Восстановление пароля</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+27"/>
         <location line="+40"/>
         <source>Check the email</source>
-        <translation>Проверить почту</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-35"/>
         <source>Yes</source>
-        <translation>Да</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Check the code</source>
-        <translation>Проверить код</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Change password</source>
-        <translation>Изменить пароль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Check the email you entered</source>
-        <translation>Проверьте введённый адрес электронной почты</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+41"/>
         <source>Enter the email</source>
-        <translation>Введите электронную почту</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Email</source>
-        <translation>Электронная почта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the email address that was specified on your account, a code will be sent to it</source>
-        <translation>Введите адрес электронной почты, указанный при регистрации, на него будет отправлен код</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Please enter the valid email</source>
-        <translation>Пожалуйста, введите корректный адрес электронной почты</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+37"/>
         <source>Enter the code</source>
-        <translation>Введите код</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Code</source>
-        <translation>Код</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Please enter the code sent to your email</source>
-        <translation>Пожалуйста, введите код, отправленный на вашу электронную почту</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Send the code again</source>
-        <translation>Отправить код повторно</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Send</source>
-        <translation>Отправить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>The new code can be obtained via</source>
-        <translation>Новый код можно получить через</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+47"/>
         <source>Username</source>
-        <translation>Логин</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>For this email this account has been found, is that you?</source>
-        <translation>Для этого адреса электронной почты найден аккаунт, это вы?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+142"/>
         <source>Password changed successfully</source>
-        <translation>Пароль успешно изменен</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4849,112 +4061,112 @@
     <message>
         <location filename="../../../Qml/imtgui/Params/PatTokenParamEditor.qml" line="+138"/>
         <source>Token Created Successfully</source>
-        <translation>Токен успешно создан</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+6"/>
         <source>OK</source>
-        <translation>ОК</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Please copy and save the token:</source>
-        <translation>Пожалуйста, скопируйте и сохраните токен:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+23"/>
         <source>The token is copied</source>
-        <translation>Токен скопирован</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Copy the token</source>
-        <translation>Скопировать токен</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+28"/>
         <source>New Token</source>
-        <translation>Новый токен</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+62"/>
         <source>No Expiration</source>
-        <translation>Без срока действия</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Delete Token</source>
-        <translation>Удалить токен</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Revoke Token</source>
-        <translation>Отозвать токен</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Revoked</source>
-        <translation>Отозван</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Are you sure you want to delete this token?</source>
-        <translation>Вы уверены, что хотите удалить этот токен?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Any applications or scripts using this token will no longer be able to access the API. You cannot undo this action.</source>
-        <translation>Все приложения или скрипты, использующие этот токен, больше не смогут получить доступ к API. Это действие нельзя отменить.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Add PAT Token</source>
-        <translation>Добавить PAT-токен</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Add</source>
-        <translation>Добавить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Token Name</source>
-        <translation>Название токена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>A descriptive name for this token</source>
-        <translation>Описательное название для этого токена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Please enter the token name</source>
-        <translation>Пожалуйста, введите название токена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Optional description for this token</source>
-        <translation>Необязательное описание для этого токена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Expiration</source>
-        <translation>Срок действия</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>The token will expire on the selected date</source>
-        <translation>Токен истечёт в выбранную дату</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4962,12 +4174,12 @@
     <message>
         <location filename="../../../Qml/imtgui/Settings/PatTokenSettingsController.qml" line="+14"/>
         <source>PAT Tokens</source>
-        <translation>PAT-токены</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Personal Access Tokens for API authentication</source>
-        <translation>Персональные токены доступа для аутентификации API</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4975,7 +4187,7 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/PopupDecoratorGql.qml" line="+310"/>
         <source>No data</source>
-        <translation>Нет данных</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4983,23 +4195,23 @@
     <message>
         <location filename="../../../Qml/imtgui/Settings/PreferenceDialog.qml" line="+12"/>
         <source>Preferences</source>
-        <translation>Настройки</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+29"/>
         <source>Apply</source>
-        <translation>Применить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+6"/>
         <source>Close</source>
-        <translation>Закрыть</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5007,32 +4219,32 @@
     <message>
         <location filename="../../../Qml/imtlicgui/ProductCollectionViewCommandsDelegate.qml" line="+15"/>
         <source>Deleting a product</source>
-        <translation>Удаление продукта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Delete the selected product ?</source>
-        <translation>Удалить выбранный продукт ?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Select product</source>
-        <translation>Выберите продукт</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+46"/>
         <source>Feature overwriting</source>
-        <translation>Перезапись свойств</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Overwrite features ?</source>
-        <translation>Перезаписать свойства ?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Please enter the name of the document:</source>
-        <translation>Введите название документа:</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5040,32 +4252,32 @@
     <message>
         <location filename="../../../Qml/imtlicgui/ProductView.qml" line="+50"/>
         <source>Feature Name</source>
-        <translation>Название</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Feature-ID</source>
-        <translation>Идентификатор</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+147"/>
         <source>Product Name</source>
-        <translation>Название продукта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Enter the product name</source>
-        <translation>Введите название продукта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Category</source>
-        <translation>Категория</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5073,73 +4285,73 @@
     <message>
         <location filename="../../../Qml/imtauthgui/ProfileView.qml" line="+124"/>
         <source>General</source>
-        <translation>Основное</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Username</source>
-        <translation>Логин</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <location line="+137"/>
         <source>Name</source>
-        <translation>Название</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-136"/>
         <source>Enter the name</source>
-        <translation>Введите название</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Email Address</source>
-        <translation>Email</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Enter the email</source>
-        <translation>Введите email</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Save</source>
-        <translation>Сохранить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Change password</source>
-        <translation>Сменить пароль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Change</source>
-        <translation>Изменить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Change Password</source>
-        <translation>Сменить пароль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Roles</source>
-        <translation>Роли</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Groups</source>
-        <translation>Группы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Permissions</source>
-        <translation>Права</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+31"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5147,7 +4359,7 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Views/ProgressBar.qml" line="+22"/>
         <source>Progress:</source>
-        <translation>Прогресс:</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5155,34 +4367,34 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/ProgressDialogManager.qml" line="+11"/>
         <source>Progress manager</source>
-        <translation>Менеджер прогресса</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Total progress</source>
-        <translation>Общий прогресс</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+45"/>
         <source>Ok</source>
-        <translation>ОК</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+32"/>
         <location line="+4"/>
         <location line="+116"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-47"/>
         <source>Subtasks</source>
-        <translation>Подзадачи</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+82"/>
         <source>Cancelling</source>
-        <translation>Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5190,57 +4402,57 @@
     <message>
         <location filename="../../../Include/imtauth/CAccountInfoMetaInfo.cpp" line="+17"/>
         <source>Account Type</source>
-        <translation>Тип аккаунта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Account Name</source>
-        <translation>Название аккаунта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../Include/imtlic/CProductMetaInfoCreatorComp.cpp" line="+61"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>E-Mail</source>
-        <translation>Электронная почта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../Include/imtauth/CContactInfoMetaInfoCreatorComp.cpp" line="+62"/>
         <source>Birthday</source>
-        <translation>Дата рождения</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../Include/imtauth/CContactInfoMetaInfoCreatorComp.cpp" line="+2"/>
         <source>First Name</source>
-        <translation>Имя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../Include/imtauth/CContactInfoMetaInfoCreatorComp.cpp" line="+2"/>
         <source>Last Name</source>
-        <translation>Фамилия</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../Include/imtauth/CContactInfoMetaInfoCreatorComp.cpp" line="+2"/>
         <source>Nickname</source>
-        <translation>Псевдоним</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../Include/imtauth/CAccountInfoMetaInfoCreatorComp.cpp" line="+43"/>
         <source>Private</source>
-        <translation>Личный</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Company</source>
-        <translation>Компания</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
@@ -5248,42 +4460,146 @@
         <location line="+3"/>
         <location line="+1"/>
         <source>Unknown</source>
-        <translation>Неизвестный</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../Include/imtauth/CAddressMetaInfoCreatorComp.cpp" line="+55"/>
         <source>City</source>
-        <translation>Город</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Country</source>
-        <translation>Страна</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Postal Code</source>
-        <translation>Почтовый индекс</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Street</source>
-        <translation>Улица</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../Include/imtauth/CContactInfoMetaInfoCreatorComp.cpp" line="-10"/>
         <source>EMail</source>
-        <translation>Электронная почта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Gender</source>
-        <translation>Пол</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imtauth/CSessionMetaInfoCreatorComp.cpp" line="+54"/>
+        <source>Token</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>User-ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Tenant-ID</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../Include/imtauth/CUserInfoMetaInfo.cpp" line="+17"/>
         <source>Email</source>
-        <translation>Электронная почта</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imtbase/CCollectionDataControllerComp.cpp" line="+74"/>
+        <source>Import from %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imtbase/CSystemStatusComp.cpp" line="+185"/>
+        <source>The %1 server cannot be connected at %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imtbase/TPluginManager.h" line="+213"/>
+        <source>Plug-in loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Plug-in initialization failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Plug-in unsupported type-ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Plug-in instance creation failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Plug-in entry point was not found: &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imtcol/imtcol.h" line="+190"/>
+        <source>Invalid document</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Version 1.0 of the GQL request arguments is missing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imtdb/CDatabaseEngineComp.cpp" line="+276"/>
+        <location line="+254"/>
+        <source>Maintenance database name was not set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+110"/>
+        <source>Database settings were not set. Use default database configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Database file path incorrect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Use database file: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imtdb/CObjectCollectionMigrationControllerComp.cpp" line="+57"/>
+        <source>Collection table creation script &apos;%1&apos;could not be loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+35"/>
+        <source>
+	| Table could not be created
+	| Error: %1
+	| Query: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imtdb/CSqlDatabaseDocumentDelegateLegacyComp.cpp" line="+156"/>
+        <source>Initial revision</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../Include/imtgeo/CAddressCollectionControllerComp.cpp" line="+59"/>
@@ -5294,222 +4610,251 @@
         <location filename="../../../Include/imtlicgql/CLicenseControllerComp.cpp" line="+163"/>
         <location filename="../../../Include/imtservergql/CObjectMetaInfoCollectionControllerComp.cpp" line="+30"/>
         <source>Internal error</source>
-        <translation>Внутренняя ошибка</translation>
-    </message>
-    <message>
-        <location filename="../../../Include/imtbase/CCollectionDataControllerComp.cpp" line="+74"/>
-        <source>Import from %1</source>
-        <translation>Импортировано из %1</translation>
-    </message>
-    <message>
-        <location filename="../../../Include/imtbase/TPluginManager.h" line="+213"/>
-        <source>Plug-in loaded</source>
-        <translation>Плагин загружен</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Plug-in initialization failed</source>
-        <translation>Не удалось инициализировать плагин</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Plug-in unsupported type-ID</source>
-        <translation>Неподдерживаемый ID типа плагина</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Plug-in instance creation failed</source>
-        <translation>Не удалось создать экземпляр плагина</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Plug-in entry point was not found: &apos;%1&apos;</source>
-        <translation>Точка входа плагина не найдена: &apos;%1&apos;</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../Include/imtgeo/CAddressControllerComp.cpp" line="-129"/>
         <source>Can not insert object: %1</source>
-        <translation>Не удалось вставить объект: %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Can not create Address: %1</source>
-        <translation>Не удалось создать адрес: %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+71"/>
         <source>Can not create address: %1</source>
-        <translation>Не удалось создать адрес: %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+46"/>
         <source>Can not update object: %1</source>
-        <translation>Не удалось обновить объект: %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Can not create object for update: %1</source>
-        <translation>Не удалось создать объект для обновления: %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../Include/imtgui/TStandardDocumentViewDecorator.h" line="+366"/>
         <source>&amp;New</source>
-        <translation>&amp;Новый</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>New</source>
-        <translation>Новый</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Create new document</source>
-        <translation>Создать новый документ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Open...</source>
-        <translation>&amp;Открыть...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Open...</source>
-        <translation>Открыть...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Open an existing document</source>
-        <translation>Открыть существующий документ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Undo</source>
-        <translation>&amp;Отменить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Undo</source>
-        <translation>Отменить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Undo last document changes</source>
-        <translation>Отменить последние изменения в документе</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Redo</source>
-        <translation>&amp;Восстановить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Redo</source>
-        <translation>Восстановить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Redo last document changes</source>
-        <translation>Повторить последние изменения в документе</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Close</source>
-        <translation>&amp;Закрыть</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Close</source>
-        <translation>Закрыть</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Close the document</source>
-        <translation>Закрыть документ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Save</source>
-        <translation>&amp;Сохранить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Save</source>
-        <translation>Сохранить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Save the document changes</source>
-        <translation>Сохранить изменения в документе</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Save As</source>
-        <translation>Сохранить как</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Save the document as...</source>
-        <translation>Сохранить документ как...</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imthypegui/CTaskItemDelegate.cpp" line="+228"/>
+        <source>Not active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imthypegui/CTaskManagerGuiComp.cpp" line="+423"/>
+        <location filename="../../../Include/imthypegui/TTaskCollectionEditorCompBase.h" line="+525"/>
+        <source>Enter new task name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <location filename="../../../Include/imthypegui/TTaskCollectionEditorCompBase.h" line="+0"/>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imthypegui/CTaskSettingsGuiComp.cpp" line="+264"/>
+        <source>Reset...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imthypegui/TTaskCollectionEditorCompBase.h" line="-217"/>
+        <source>Task Manager</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Task could not be created!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+87"/>
+        <source>Task Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Task could not be duplicated!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+170"/>
+        <location filename="../../../Include/imtlicgui/CFeatureDependencyEditorBase.cpp" line="+339"/>
+        <location line="+27"/>
+        <source>Warning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Task name already exist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Wrong task name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Empty task name cannot be used</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../Include/imtimg/CBitmapMetaInfo.cpp" line="+17"/>
         <source>Device</source>
-        <translation>Устройство</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Width</source>
-        <translation>Ширина</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Height</source>
-        <translation>Высота</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Depth</source>
-        <translation>Глубина</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Format</source>
-        <translation>Формат</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Color Space</source>
-        <translation>Цветовое пространство</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Color Space Type</source>
-        <translation>Тип цветового пространства</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Pixel Depth</source>
-        <translation>Глубина пикселя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../Include/imtimg/CBitmapMetaInfoCreatorComp.cpp" line="-28"/>
         <source> bits</source>
-        <translation> бит</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Grayscale</source>
-        <translation>Оттенки серого</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Monochromatic</source>
-        <translation>Монохромный</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
@@ -5529,181 +4874,183 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../../../Include/imtlic/CFeatureMetaInfoCreatorComp.cpp" line="+56"/>
+        <source>Feature-ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Feature Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Feature Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Is Optional</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Is Permission</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imtlic/CLicenseMetaInfoCreatorComp.cpp" line="+55"/>
+        <source>License-ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>License Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>License Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location filename="../../../Include/imtlic/CProductMetaInfoCreatorComp.cpp" line="-4"/>
+        <source>Product-ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../../Include/imtlic/CProductInstanceMetaInfo.cpp" line="+18"/>
         <location filename="../../../Include/imtlic/CProductLicensingInfoMetaInfoCreatorComp.cpp" line="+67"/>
         <source>Licenses</source>
-        <translation>Лицензии</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Instance-ID</source>
-        <translation>ID экземпляра</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../Include/imtlic/CProductLicensingMetaInfo.cpp" line="+19"/>
         <source>Category-ID</source>
-        <translation>ID категории</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../Include/imtlic/CProductInstanceMetaInfoCreatorComp.cpp" line="+51"/>
         <source>Unlimited</source>
-        <translation>Неограниченный</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source> (Valid until: %1)</source>
-        <translation> (Действительно до: %1)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../Include/imtlic/CProductLicensingMetaInfo.cpp" line="-2"/>
         <source>Product</source>
-        <translation>Продукт</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../Include/imtlicgui/CFeatureDependencyEditorBase.cpp" line="+161"/>
+        <location filename="../../../Include/imtlic/CProductMetaInfoCreatorComp.cpp" line="-2"/>
+        <source>Product Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imtlicgui/CFeatureDependencyEditorBase.cpp" line="-205"/>
         <source>Unsaved Features</source>
-        <translation>Несохранённые функции</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Missing features</source>
-        <translation>Отсутствующие функции</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>ID: %1</source>
-        <translation>ID: %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../Include/imthypegui/TTaskCollectionEditorCompBase.h" line="+308"/>
-        <source>Task Manager</source>
-        <translation>Менеджер задач</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Task could not be created!</source>
-        <translation>Не удалось создать задачу!</translation>
-    </message>
-    <message>
-        <location line="+87"/>
-        <source>Task Error</source>
-        <translation>Ошибка задачи</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Task could not be duplicated!</source>
-        <translation>Не удалось дублировать задачу!</translation>
-    </message>
-    <message>
-        <location filename="../../../Include/imthypegui/CTaskManagerGuiComp.cpp" line="+423"/>
-        <location filename="../../../Include/imthypegui/TTaskCollectionEditorCompBase.h" line="+130"/>
-        <source>Enter new task name</source>
-        <translation>Введите новое название задачи</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <location filename="../../../Include/imthypegui/TTaskCollectionEditorCompBase.h" line="+0"/>
-        <source>Name</source>
-        <translation>Название</translation>
-    </message>
-    <message>
-        <location filename="../../../Include/imthypegui/TTaskCollectionEditorCompBase.h" line="+40"/>
-        <location filename="../../../Include/imtlicgui/CFeatureDependencyEditorBase.cpp" line="+157"/>
-        <location line="+27"/>
-        <source>Warning</source>
-        <translation>Предупреждение</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Task name already exist</source>
-        <translation>Задача с таким названием уже существует</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Wrong task name</source>
-        <translation>Неверное название задачи</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Empty task name cannot be used</source>
-        <translation>Название задачи не может быть пустым</translation>
-    </message>
-    <message>
-        <location filename="../../../Include/imtlicgui/CFeatureDependencyEditorBase.cpp" line="-26"/>
+        <location line="+158"/>
         <location line="+27"/>
         <source>Feature with ID &apos;%1&apos; depends on feature with ID &apos;%2&apos;</source>
-        <translation>Функция с ID &apos;%1&apos; зависит от функции с ID &apos;%2&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../Include/imtloggui/CEventGroupLabelItem.cpp" line="+22"/>
         <source>Noname</source>
-        <translation>Без имени</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../Include/imtloggui/CEventItemBase.cpp" line="+66"/>
         <source>UNKNOWN</source>
-        <translation>НЕИЗВЕСТНО</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>OK</source>
-        <translation>ОК</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>WARNING</source>
-        <translation>ПРЕДУПРЕЖДЕНИЕ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>ERROR</source>
-        <translation>ОШИБКА</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>CRITICAL</source>
-        <translation>КРИТИЧЕСКАЯ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+30"/>
         <source>Timestamp</source>
-        <translation>Отметка времени</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Source</source>
-        <translation>Источник</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Message</source>
-        <translation>Сообщение</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Status</source>
-        <translation>Статус</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../Include/imtloggui/CLoginEventItem.cpp" line="+52"/>
         <source>Login</source>
-        <translation>Логин</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Logout</source>
-        <translation>Выход из системы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Action</source>
-        <translation>Действие</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>User name</source>
-        <translation>Имя пользователя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../Include/imtloggui/CProductionQualityItem.cpp" line="+106"/>
@@ -5711,10 +5058,7 @@
 Warnings: %2
 Noks: %3
 Errors: %4</source>
-        <translation>Успешно: %1
-Предупреждения: %2
-Ошибок: %3
-Критических ошибок: %4</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
@@ -5722,101 +5066,98 @@ Errors: %4</source>
 Warnings: 0
 Noks: 0
 Errors: 0</source>
-        <translation>Успешно: 0
-Предупреждения: 0
-Ошибок: 0
-Критических ошибок: 0</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+367"/>
         <source>Oks</source>
-        <translation>Успешно</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Warnings</source>
-        <translation>Предупреждения</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Noks</source>
-        <translation>Ошибок</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Errors</source>
-        <translation>Критических ошибок</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../Include/imtqml/CQuickApplicationCompBase.cpp" line="+137"/>
         <source>ACF application</source>
-        <translation>Приложение ACF</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../Include/imtreport/CInspectionReportBuilderComp.cpp" line="+97"/>
         <source>Gap</source>
-        <translation>Зазор</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Narrow</source>
-        <translation>Узкий</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Wide</source>
-        <translation>Широкий</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Beyond area</source>
-        <translation>За пределами области</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+135"/>
         <source>Inspection</source>
-        <translation>Инспекция</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+46"/>
         <source>Region</source>
-        <translation>Регион</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-45"/>
         <location line="+46"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-45"/>
         <location line="+46"/>
         <source>Length</source>
-        <translation>Длина</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-45"/>
         <location line="+46"/>
         <source>Value mm</source>
-        <translation>Значение мм</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-45"/>
         <location line="+46"/>
         <source>Tolerance mm</source>
-        <translation>Допуск мм</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-45"/>
         <location line="+46"/>
         <source>Diff</source>
-        <translation>Разница</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../Include/imtrest/CHttpHtmlFolderBasedServletComp.cpp" line="+92"/>
         <source>Directory</source>
-        <translation>Директория</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
@@ -5841,172 +5182,27 @@ Errors: 0</source>
     <message>
         <location line="+2"/>
         <source>File</source>
-        <translation>Файл</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Parent direcotry</source>
-        <translation>Родительская директория</translation>
-    </message>
-    <message>
-        <location filename="../../../Include/imttest/CTestMetaInfo.cpp" line="+19"/>
-        <source>Test Id</source>
-        <translation>ID теста</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Test Name</source>
-        <translation>Название теста</translation>
-    </message>
-    <message>
-        <location filename="../../../Include/imtbase/CSystemStatusComp.cpp" line="+185"/>
-        <source>The %1 server cannot be connected at %2.</source>
-        <translation>Не удалось подключиться к серверу %1 по адресу %2.</translation>
-    </message>
-    <message>
-        <location filename="../../../Include/imtauth/CSessionMetaInfoCreatorComp.cpp" line="+54"/>
-        <source>Token</source>
-        <translation>Токен</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>User-ID</source>
-        <translation>ID пользователя</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Tenant-ID</source>
-        <translation>ID тенанта</translation>
-    </message>
-    <message>
-        <location filename="../../../Include/imtdb/CSqlDatabaseDocumentDelegateLegacyComp.cpp" line="+156"/>
-        <source>Initial revision</source>
-        <translation>Начальная ревизия</translation>
-    </message>
-    <message>
-        <location filename="../../../Include/imthypegui/CTaskItemDelegate.cpp" line="+228"/>
-        <source>Not active</source>
-        <translation>Неактивный</translation>
-    </message>
-    <message>
-        <location filename="../../../Include/imtlic/CFeatureMetaInfoCreatorComp.cpp" line="+56"/>
-        <source>Feature-ID</source>
-        <translation>Идентификатор</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Feature Name</source>
-        <translation>Название</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Feature Description</source>
-        <translation>Описание</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Is Optional</source>
-        <translation>Необязательный</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Is Permission</source>
-        <translation>Право</translation>
-    </message>
-    <message>
-        <location filename="../../../Include/imtlic/CLicenseMetaInfoCreatorComp.cpp" line="+55"/>
-        <source>License-ID</source>
-        <translation>Идентификатор лицензии</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>License Name</source>
-        <translation>Название лицензии</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>License Description</source>
-        <translation>Описание лицензии</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <location filename="../../../Include/imtlic/CProductMetaInfoCreatorComp.cpp" line="-4"/>
-        <source>Product-ID</source>
-        <translation>ID продукта</translation>
-    </message>
-    <message>
-        <location filename="../../../Include/imtlic/CProductMetaInfoCreatorComp.cpp" line="-2"/>
-        <source>Product Name</source>
-        <translation>Название продукта</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Category</source>
-        <translation>Категория</translation>
-    </message>
-    <message>
-        <location filename="../../../Include/imtcol/imtcol.h" line="+190"/>
-        <source>Invalid document</source>
-        <translation>Недействительный документ</translation>
-    </message>
-    <message>
-        <location line="+15"/>
-        <source>Version 1.0 of the GQL request arguments is missing</source>
-        <translation>Отсутствует версия 1.0 аргументов запроса GQL</translation>
-    </message>
-    <message>
-        <location filename="../../../Include/imtdb/CDatabaseEngineComp.cpp" line="+276"/>
-        <location line="+254"/>
-        <source>Maintenance database name was not set</source>
-        <translation>Название служебной базы данных не задано</translation>
-    </message>
-    <message>
-        <location line="+110"/>
-        <source>Database settings were not set. Use default database configuration</source>
-        <translation>Настройки базы данных не заданы. Используется конфигурация по умолчанию</translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Database file path incorrect</source>
-        <translation>Неверный путь к файлу базы данных</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Use database file: %1</source>
-        <translation>Использовать файл базы данных: %1</translation>
-    </message>
-    <message>
-        <location filename="../../../Include/imtdb/CObjectCollectionMigrationControllerComp.cpp" line="+57"/>
-        <source>Collection table creation script &apos;%1&apos;could not be loaded</source>
-        <translation>Не удалось загрузить скрипт создания таблицы коллекции &apos;%1&apos;</translation>
-    </message>
-    <message>
-        <location line="+35"/>
-        <source>
-	| Table could not be created
-	| Error: %1
-	| Query: %2</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../Include/imthypegui/CTaskSettingsGuiComp.cpp" line="+264"/>
-        <source>Reset...</source>
-        <translation>Сброс...</translation>
     </message>
     <message>
         <location filename="../../../Include/imtrest/CSdlJsonServletBaseComp.h" line="+63"/>
         <source>The request is not a valid json object</source>
-        <translation>Запрос не является корректным объектом JSON</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+16"/>
         <source>The request does not match the scheme</source>
-        <translation>Запрос не соответствует схеме</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Unable to convert reply to json</source>
-        <translation>Не удалось преобразовать ответ в JSON</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../Include/imtstyle/CDesignTokenBasedResourceProviderComp.cpp" line="-145"/>
@@ -6019,7 +5215,17 @@ Errors: 0</source>
         <location line="+9"/>
         <location line="+8"/>
         <source>Palette file parsing error</source>
-        <translation>Ошибка разбора файла палитры</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imttest/CTestMetaInfo.cpp" line="+19"/>
+        <source>Test Id</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Test Name</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6027,12 +5233,12 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtguigql/RemoteCollectionView.qml" line="+161"/>
         <source>This table has been modified from another computer</source>
-        <translation>Эта таблица была изменена на другом компьютере</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Update</source>
-        <translation>Обновить</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6040,12 +5246,12 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtauthgui/RoleCollectionViewCommandsDelegate.qml" line="+12"/>
         <source>Deleting a role</source>
-        <translation>Удаление роли</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Delete the selected role ?</source>
-        <translation>Удалить выбранную роль ?</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6053,47 +5259,47 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtauthgui/RoleView.qml" line="+101"/>
         <source>General</source>
-        <translation>Общее</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Role Name</source>
-        <translation>Название роли</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the role name</source>
-        <translation>Введите название</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Role-ID</source>
-        <translation>Идентификатор роли</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the description</source>
-        <translation>Введите описание</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Parent Roles</source>
-        <translation>Родительские роли</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Adding Parent Role</source>
-        <translation>Добавить родительскую роль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+47"/>
         <source>Permissions</source>
-        <translation>Права</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6101,27 +5307,27 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtgui/Params/SchedulerParamEditor.qml" line="+34"/>
         <source>Start Time</source>
-        <translation>Время старта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+37"/>
         <source>Backup Interval</source>
-        <translation>Интервал резервного копирования</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+54"/>
         <source>Day</source>
-        <translation>День</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Week</source>
-        <translation>Неделя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Month</source>
-        <translation>Месяц</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6129,7 +5335,7 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtgui/View/SearchAddressComp.qml" line="+21"/>
         <source>Address</source>
-        <translation>Адрес</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6137,7 +5343,7 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtgui/View/SearchCompLegacy.qml" line="+731"/>
         <source>Search</source>
-        <translation>Поиск</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6145,12 +5351,12 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtgui/View/SearchResultsView.qml" line="+67"/>
         <source>No results</source>
-        <translation>Нет результатов</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+122"/>
         <source>Go to the content</source>
-        <translation>Перейти к содержимому</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6158,7 +5364,7 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/SearchTextInput.qml" line="+12"/>
         <source>Enter text for search</source>
-        <translation>Введите текст для поиска</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6166,33 +5372,33 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtguigql/SelectableCollectionEditor.qml" line="+71"/>
         <source>New</source>
-        <translation>Новый</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+15"/>
         <location line="+151"/>
         <source>Add</source>
-        <translation>Добавить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-132"/>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+39"/>
         <source>Selected Elements</source>
-        <translation>Выбранные элементы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>New Elements</source>
-        <translation>Новые элементы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+93"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6200,22 +5406,22 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtgui/View/ServerConnectionParamElementView.qml" line="+45"/>
         <source>Server Host</source>
-        <translation>Хост сервера</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Http Port</source>
-        <translation>Порт HTTP</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Web Socket Port</source>
-        <translation>Порт WebSocket</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Secure Connection</source>
-        <translation>Защищённое соединение</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6223,17 +5429,17 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtgui/Settings/ServerLogProvider.qml" line="+18"/>
         <source>Server Log</source>
-        <translation>Серверный лог</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Download</source>
-        <translation>Скачать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Save file</source>
-        <translation>Сохранение файла</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6241,22 +5447,22 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtdocgui/SingleDocumentCollectionView.qml" line="+290"/>
         <source>Save document</source>
-        <translation>Сохранение документа</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Save all changes ?</source>
-        <translation>Сохранить все изменения ?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Document Name</source>
-        <translation>Название документа</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the document name</source>
-        <translation>Введите название документа</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6264,12 +5470,12 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtdocgui/SingleDocumentWorkspaceView.qml" line="+134"/>
         <source>Save document</source>
-        <translation>Сохранение документа</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Save all changes ?</source>
-        <translation>Сохранить все изменения ?</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6285,123 +5491,123 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtgeogui/StructureAddressView.qml" line="+23"/>
         <source>Country</source>
-        <translation>Страна</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Region</source>
-        <translation>Регион</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Area</source>
-        <translation>Район</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>City</source>
-        <translation>Город</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Settlement</source>
-        <translation>Населённый пункт</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>District</source>
-        <translation>Район</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Street</source>
-        <translation>Улица</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Building</source>
-        <translation>Здание</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Apartment</source>
-        <translation>Квартира</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Section</source>
-        <translation>Участок</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>SNT</source>
-        <translation>СНТ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Alley</source>
-        <translation>Переулок</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <location line="+92"/>
         <source>Other</source>
-        <translation>Другое</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+34"/>
         <source>Save</source>
-        <translation>Сохранить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Close</source>
-        <translation>Закрыть</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+356"/>
         <source>Add</source>
-        <translation>Добавить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Delete</source>
-        <translation>Удалить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Clear</source>
-        <translation>Очистить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+62"/>
         <source>Remove address</source>
-        <translation>Удалить адрес</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Do you want remove the address?</source>
-        <translation>Вы хотите удалить адрес?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+61"/>
         <source>Coordinates:</source>
-        <translation>Координаты:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Latitude: </source>
-        <translation>Широта: </translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Longitude: </source>
-        <translation>Долгота: </translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6409,12 +5615,12 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtauthgui/SuperuserPasswordPage.qml" line="+67"/>
         <source>Please fill in the information for the system administrator</source>
-        <translation>Пожалуйста, заполните информацию для системного администратора</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+30"/>
         <source>OK</source>
-        <translation>ОК</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6422,46 +5628,18 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtgui/TDocumentWorkspaceGuiCompBase.h" line="+318"/>
         <source>Close document</source>
-        <translation>Закрыть документ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Do you want to save your changes made in document
 %1</source>
-        <translation>Вы хотите сохранить изменения в документе
-%1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+125"/>
         <source>Document could not be opened</source>
-        <translation>Не удалось открыть документ</translation>
-    </message>
-</context>
-<context>
-    <name>TTaskCollectionEditorCompBase</name>
-    <message>
-        <source>Error</source>
-        <translation type="vanished">Ошибка</translation>
-    </message>
-    <message>
-        <source>The task name contains some not allowed characters</source>
-        <translation type="vanished">Название задачи содержит недопустимые символы</translation>
-    </message>
-    <message>
-        <source>Task name: </source>
-        <translation type="vanished">Название задачи: </translation>
-    </message>
-    <message>
-        <source>
-User-ID: </source>
-        <translation type="vanished">
-ID пользователя: </translation>
-    </message>
-    <message>
-        <source>
-Input-ID: </source>
-        <translation type="vanished">
-ID входных данных: </translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6469,37 +5647,37 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtcontrols/Views/TableHeaderParamComp.qml" line="+12"/>
         <source>Table configuration</source>
-        <translation>Конфигурация таблицы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+96"/>
         <source>Select at least one column</source>
-        <translation>Выберите хотя бы одну колонку</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+120"/>
         <source>Available Columns</source>
-        <translation>Доступные колонки</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Apply</source>
-        <translation>Применить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Confirm reset headers</source>
-        <translation>Подтверждение сброса</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Reset header settings to default ?</source>
-        <translation>Сбросить настройки заголовков на стандартные ?</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6564,7 +5742,7 @@ ID входных данных: </translation>
     <message>
         <location line="+4"/>
         <source>Date</source>
-        <translation type="unfinished">Дата</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
@@ -6577,27 +5755,27 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/TenantCollectionListView.qml" line="+13"/>
         <source>Filter...</source>
-        <translation>Фильтр...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>No items found.</source>
-        <translation>Ничего не найдено.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+145"/>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Delete</source>
-        <translation>Удалить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+89"/>
         <source>Loading...</source>
-        <translation>Загрузка...</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6605,64 +5783,64 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/TenantCollectionView.qml" line="+180"/>
         <source>Invited by: %1</source>
-        <translation>Приглашён: %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Unknown</source>
-        <translation>Неизвестный</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Accept</source>
-        <translation>Принять</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Reject</source>
-        <translation>Отклонить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+82"/>
         <location line="+37"/>
         <source>Active</source>
-        <translation>Активный</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-37"/>
         <location line="+38"/>
         <source>Inactive</source>
-        <translation>Неактивный</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-6"/>
         <source>Status</source>
-        <translation>Статус</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
         <source>My tenants</source>
-        <translation>Мои тенанты</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>I am owner</source>
-        <translation>Я владелец</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>I am member</source>
-        <translation>Я участник</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>I am invited</source>
-        <translation>Я приглашён</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+43"/>
         <source>Tenant</source>
-        <translation>Тенант</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6670,27 +5848,27 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/TenantEditor.qml" line="+104"/>
         <source>General</source>
-        <translation>Общее</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Members</source>
-        <translation>Участники</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Roles</source>
-        <translation>Роли</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Groups</source>
-        <translation>Группы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Permissions</source>
-        <translation>Права</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6698,12 +5876,12 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/TenantEditorStateManager.qml" line="+87"/>
         <source>by %1</source>
-        <translation>от %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>expires %1</source>
-        <translation>истекает %1</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6711,37 +5889,37 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/TenantGeneralPage.qml" line="+80"/>
         <source>General</source>
-        <translation>Общее</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Basic workspace settings and configuration.</source>
-        <translation>Основные настройки и конфигурация рабочего пространства.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Tenant Name</source>
-        <translation>Название тенанта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the tenant name</source>
-        <translation>Введите название тенанта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the description</source>
-        <translation>Введите описание</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Active</source>
-        <translation>Активный</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6749,63 +5927,63 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/TenantGroupsPage.qml" line="+65"/>
         <source>Groups</source>
-        <translation>Группы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Create Group</source>
-        <translation>Создать группу</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Create New Group</source>
-        <translation>Создать новую группу</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Organize members into groups for easier permission management.</source>
-        <translation>Объединяйте участников в группы для удобного управления правами.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Filter groups...</source>
-        <translation>Фильтр групп...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>No groups created yet.</source>
-        <translation>Группы ещё не созданы.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Edit Group</source>
-        <translation>Редактировать группу</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Delete Group</source>
-        <translation>Удалить группу</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Are you sure you want to delete the group &quot;%1&quot;? This action cannot be undone.</source>
-        <translation>Вы уверены, что хотите удалить группу &quot;%1&quot;? Это действие нельзя отменить.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+34"/>
         <source>Create</source>
-        <translation>Создать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
         <location line="+72"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-15"/>
         <source>Save</source>
-        <translation>Сохранить</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6813,62 +5991,62 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/TenantMemberDelegate.qml" line="+159"/>
         <source>You</source>
-        <translation>Вы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+42"/>
         <source>Active</source>
-        <translation>Активный</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Expired</source>
-        <translation>Истёк</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Revoked</source>
-        <translation>Отозван</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Pending</source>
-        <translation>Ожидание</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Actions</source>
-        <translation>Действия</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Change Environment Role</source>
-        <translation>Изменить роль в окружении</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Remove Member</source>
-        <translation>Удалить участника</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Transfer Ownership</source>
-        <translation>Передать владение</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Leave Workspace</source>
-        <translation>Покинуть рабочее пространство</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Resend Invitation</source>
-        <translation>Повторно отправить приглашение</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Revoke Invitation</source>
-        <translation>Отозвать приглашение</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6876,73 +6054,73 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/TenantMembersPage.qml" line="+76"/>
         <source>Members</source>
-        <translation>Участники</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Create User</source>
-        <translation>Создать пользователя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Create New User</source>
-        <translation>Создать нового пользователя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Create Invitation</source>
-        <translation>Создать приглашение</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+34"/>
         <source>Manage tenant members. Users created here automatically become members.</source>
-        <translation>Управление участниками тенанта. Созданные здесь пользователи автоматически становятся участниками.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Filter members...</source>
-        <translation>Фильтр участников...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>No members found.</source>
-        <translation>Участники не найдены.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Edit User</source>
-        <translation>Редактировать пользователя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Remove Member</source>
-        <translation>Удалить участника</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Are you sure you want to remove &quot;%1&quot;? They will lose access to this workspace.</source>
-        <translation>Вы уверены, что хотите удалить &quot;%1&quot;? Пользователь потеряет доступ к этому рабочему пространству.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+34"/>
         <source>Create</source>
-        <translation>Создать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
         <location line="+72"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-15"/>
         <source>Save</source>
-        <translation>Сохранить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+38"/>
         <source>Type or choose a user to invite</source>
-        <translation>Введите или выберите пользователя для приглашения</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6950,47 +6128,47 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/TenantPermissionsPage.qml" line="+117"/>
         <source>Permissions</source>
-        <translation>Права</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Select which product features are available for this tenant.</source>
-        <translation>Выберите, какие возможности продукта доступны для этого тенанта.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Check All</source>
-        <translation>Выбрать все</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Uncheck All</source>
-        <translation>Снять все</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Expand All</source>
-        <translation>Развернуть все</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Collapse All</source>
-        <translation>Свернуть все</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Filter permissions...</source>
-        <translation>Фильтр прав...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Permission</source>
-        <translation>Разрешение</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6998,63 +6176,63 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/TenantRolesPage.qml" line="+68"/>
         <source>Roles</source>
-        <translation>Роли</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Create Role</source>
-        <translation>Создать роль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Create New Role</source>
-        <translation>Создать новую роль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Manage tenant roles and assign permissions to team members.</source>
-        <translation>Управление ролями тенанта и назначение прав участникам.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Filter roles...</source>
-        <translation>Фильтр ролей...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>No roles created yet.</source>
-        <translation>Роли ещё не созданы.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Edit Role</source>
-        <translation>Редактировать роль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Delete Role</source>
-        <translation>Удалить роль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Are you sure you want to delete the role &quot;%1&quot;? This action cannot be undone.</source>
-        <translation>Вы уверены, что хотите удалить роль &quot;%1&quot;? Это действие нельзя отменить.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+34"/>
         <source>Create</source>
-        <translation>Создать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
         <location line="+72"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-15"/>
         <source>Save</source>
-        <translation>Сохранить</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7062,7 +6240,7 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtgui/View/TextInputElementView.qml" line="+22"/>
         <source>Enter the correct value</source>
-        <translation>Введите корректное значение</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7070,47 +6248,47 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtdeskgui/TicketBadge.qml" line="+28"/>
         <source>Open</source>
-        <translation>Открыть</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Closed</source>
-        <translation>Закрыто</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Low</source>
-        <translation>Низкий</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Medium</source>
-        <translation>Средний</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>High</source>
-        <translation>Высокий</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Critical</source>
-        <translation>Критический</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Completed</source>
-        <translation>Завершено</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Not planned</source>
-        <translation>Не запланировано</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Reopened</source>
-        <translation>Переоткрыто</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7118,62 +6296,62 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtdeskgui/TicketCollectionView.qml" line="+117"/>
         <source>Status</source>
-        <translation>Статус</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Open</source>
-        <translation>Открыть</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Closed</source>
-        <translation>Закрыто</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Priority</source>
-        <translation>Приоритет</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Low</source>
-        <translation>Низкий</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Medium</source>
-        <translation>Средний</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>High</source>
-        <translation>Высокий</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Critical</source>
-        <translation>Критический</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Assigned to me</source>
-        <translation>Назначено мне</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Without assignees</source>
-        <translation>Без исполнителей</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Reported by me</source>
-        <translation>Создано мной</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Ticket</source>
-        <translation>Заявка</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7181,47 +6359,47 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtdeskgui/TicketCreateDialog.qml" line="+56"/>
         <source>New Issue</source>
-        <translation>Новая задача</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Title *</source>
-        <translation>Заголовок *</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Brief summary of the issue</source>
-        <translation>Краткое описание проблемы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+45"/>
         <source>Add a description...</source>
-        <translation>Добавить описание...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+33"/>
         <source>Type</source>
-        <translation>Тип</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Priority</source>
-        <translation>Приоритет</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Submit new issue</source>
-        <translation>Отправить новую задачу</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7229,22 +6407,22 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtdeskgui/TicketEditor.qml" line="+154"/>
         <source>Copied to clipboard</source>
-        <translation>Скопировано в буфер обмена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Ticket Comments Export</source>
-        <translation>Экспорт комментариев заявки</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Ticket #</source>
-        <translation>Заявка #</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>No comments</source>
-        <translation>Нет комментариев</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
@@ -7252,235 +6430,235 @@ ID входных данных: </translation>
         <location line="+1926"/>
         <location line="+250"/>
         <source>Unknown</source>
-        <translation>Неизвестный</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-2185"/>
         <location line="+2"/>
         <source>Message</source>
-        <translation>Сообщение</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Attachment</source>
-        <translation>Вложение</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <location line="+2123"/>
         <source>file</source>
-        <translation>файл</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-1825"/>
         <source>You have been removed from the assignees of this ticket. The view is now read-only.</source>
-        <translation>Вы были удалены из исполнителей этой заявки. Просмотр теперь только для чтения.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+306"/>
         <source>New Ticket</source>
-        <translation>Новая заявка</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+83"/>
         <source>Title</source>
-        <translation>Заголовок</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Enter ticket title...</source>
-        <translation>Введите заголовок заявки...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+93"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+78"/>
         <source>Describe the issue...</source>
-        <translation>Опишите проблему...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+58"/>
         <source>Properties</source>
-        <translation>Свойства</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Type</source>
-        <translation>Тип</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Priority</source>
-        <translation>Приоритет</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Status</source>
-        <translation>Статус</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+36"/>
         <source>Assignees</source>
-        <translation>Исполнители</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+31"/>
         <source>Add assignee</source>
-        <translation>Добавить исполнителя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+87"/>
         <source>No assignees</source>
-        <translation>Нет исполнителей</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Type or choose a user</source>
-        <translation>Введите или выберите пользователя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+56"/>
         <source>Context</source>
-        <translation>Контекст</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+31"/>
         <source>Add context</source>
-        <translation>Добавить контекст</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+92"/>
         <source>No linked entities</source>
-        <translation>Нет связанных сущностей</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+115"/>
         <source>Search entities...</source>
-        <translation>Поиск сущностей...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+92"/>
         <source>Lock issue</source>
-        <translation>Заблокировать задачу</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Lock Reason</source>
-        <translation>Причина блокировки</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Reason for locking</source>
-        <translation>Причина блокировки</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+68"/>
         <source>Comments</source>
-        <translation>Комментарии</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+72"/>
         <source>Chat export copied</source>
-        <translation>Экспорт чата скопирован</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+207"/>
         <source>You</source>
-        <translation>Вы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+16"/>
         <source>edited</source>
-        <translation>изменено</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+139"/>
         <source>Save</source>
-        <translation>Сохранить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+67"/>
         <source>Reply</source>
-        <translation>Ответить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Copy</source>
-        <translation>Скопировать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Message copied</source>
-        <translation>Сообщение скопировано</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Delete</source>
-        <translation>Удалить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+30"/>
         <source>No comments yet</source>
-        <translation>Комментариев пока нет</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Be the first to leave a comment.</source>
-        <translation>Будьте первым, кто оставит комментарий.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+142"/>
         <source>attachment</source>
-        <translation>вложение</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+56"/>
         <location line="+100"/>
         <source>Uploading...</source>
-        <translation>Загрузка...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-38"/>
         <source>Write a comment...</source>
-        <translation>Написать комментарий...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+38"/>
         <source>Send</source>
-        <translation>Отправить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+32"/>
         <source>Attach image</source>
-        <translation>Прикрепить изображение</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Image files</source>
-        <translation>Файлы изображений</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+51"/>
         <source>This conversation has been locked. Only collaborators can comment.</source>
-        <translation>Эта беседа заблокирована. Только участники могут комментировать.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>You have read-only access to this ticket. Only the reporter, assignees, and administrators can edit.</source>
-        <translation>У вас доступ только для чтения к этой заявке. Редактировать могут только автор, исполнители и администраторы.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7488,22 +6666,22 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtdeskgui/TicketListPanel.qml" line="+38"/>
         <source>Tickets</source>
-        <translation>Заявки</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+39"/>
         <source>All</source>
-        <translation>Все</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Open</source>
-        <translation>Открыть</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Closed</source>
-        <translation>Закрыто</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7511,92 +6689,92 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtdeskgui/TicketView.qml" line="+108"/>
         <source>Locked: %1</source>
-        <translation>Заблокировано: %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>This ticket is locked</source>
-        <translation>Эта заявка заблокирована</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+49"/>
         <source>(No description provided)</source>
-        <translation>(Описание не указано)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Type:</source>
-        <translation>Тип:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Reporter:</source>
-        <translation>Автор:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Assignees:</source>
-        <translation>Исполнители:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>No one assigned</source>
-        <translation>Никто не назначен</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Created:</source>
-        <translation>Создано:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Closed:</source>
-        <translation>Закрыто:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+50"/>
         <source>Close as completed</source>
-        <translation>Закрыть как выполненное</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+25"/>
         <source>Close as not planned</source>
-        <translation>Закрыть как незапланированное</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Reopen ticket</source>
-        <translation>Переоткрыть заявку</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+25"/>
         <source>Open Chat</source>
-        <translation>Открыть чат</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Access Request</source>
-        <translation>Запрос доступа</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Support Request</source>
-        <translation>Запрос поддержки</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Feature Request</source>
-        <translation>Запрос функции</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Bug Report</source>
-        <translation>Отчёт об ошибке</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Unknown</source>
-        <translation>Неизвестный</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7604,37 +6782,37 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtgui/Panels/TimeFilterDelegate.qml" line="+9"/>
         <source>Date</source>
-        <translation>Дата</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+105"/>
         <source>Last 7 Days</source>
-        <translation>Последние 7 дней</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>This Month</source>
-        <translation>Текущий месяц</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Last Month</source>
-        <translation>Прошлый месяц</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>This Year</source>
-        <translation>Текущий год</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Last Year</source>
-        <translation>Прошлый год</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Custom</source>
-        <translation>Произвольный</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7642,52 +6820,52 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtgui/View/TimeFilterParamView.qml" line="+119"/>
         <source>Last 7 Days</source>
-        <translation>Последние 7 дней</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>This Month</source>
-        <translation>Текущий месяц</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Last Month</source>
-        <translation>Прошлый месяц</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>This Year</source>
-        <translation>Текущий год</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Last Year</source>
-        <translation>Прошлый год</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+76"/>
         <source>From</source>
-        <translation>От</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Select a date</source>
-        <translation>Выберите дату</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+25"/>
         <source>To</source>
-        <translation>До</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Apply</source>
-        <translation>Применить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Clear</source>
-        <translation>Очистить</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7695,12 +6873,12 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/TimeInput.qml" line="+154"/>
         <source>Time:</source>
-        <translation>Время:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+87"/>
         <source>Wrong time format!</source>
-        <translation>Неверный формат времени!</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7708,17 +6886,17 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/TimeIntervalPicker.qml" line="+127"/>
         <source>Days</source>
-        <translation>Дни</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Hours</source>
-        <translation>Часы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Minutes</source>
-        <translation>Минуты</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7726,12 +6904,12 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/TimePicker.qml" line="+97"/>
         <source>Hours</source>
-        <translation>Часы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Minutes</source>
-        <translation>Минуты</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7739,27 +6917,27 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtgui/View/TreeViewElementView.qml" line="+26"/>
         <source>Filter...</source>
-        <translation>Фильтр...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Expand All</source>
-        <translation>Развернуть все</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Collapse All</source>
-        <translation>Свернуть все</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Check All</source>
-        <translation>Выбрать все</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Uncheck All</source>
-        <translation>Снять все</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7767,12 +6945,12 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtchatgui/TypingIndicator.qml" line="+34"/>
         <source>is typing</source>
-        <translation>печатает</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>typing</source>
-        <translation>печатает</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7780,27 +6958,27 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/UserActionCollectionView.qml" line="+37"/>
         <source>Action</source>
-        <translation>Действие</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Create</source>
-        <translation>Создать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Update</source>
-        <translation>Обновить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Delete</source>
-        <translation>Удалить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Users</source>
-        <translation>Пользователи</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7808,57 +6986,57 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/UserCollectionView.qml" line="+60"/>
         <source>System Info</source>
-        <translation>Система</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Internal</source>
-        <translation>Внутренняя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>LDAP</source>
-        <translation>LDAP</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+67"/>
         <source>View roles</source>
-        <translation>Посмотреть роли</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>has been assigned</source>
-        <translation>были назначены</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>roles:</source>
-        <translation>ролей:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>No roles</source>
-        <translation>Нет ролей</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+54"/>
         <source>View groups</source>
-        <translation>Посмотреть группы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>is included into</source>
-        <translation>состоит в</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>groups</source>
-        <translation>группах</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>No groups</source>
-        <translation>Нет групп</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7866,89 +7044,89 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/UserGeneralEditor.qml" line="+50"/>
         <source>Username</source>
-        <translation>Логин</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the username</source>
-        <translation>Введите логин</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Please enter the username</source>
-        <translation>Введите логин</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Name</source>
-        <translation>Имя пользователя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the name</source>
-        <translation>Введите имя пользователя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Please enter the name</source>
-        <translation>Пожалуйста, введите имя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Email Address</source>
-        <translation>Email</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Enter the email</source>
-        <translation>Введите электронную почту</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Please enter the email</source>
-        <translation>Пожалуйста, введите электронную почту</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+18"/>
         <location line="+11"/>
         <source>Passwords don&apos;t match</source>
-        <translation>Пароли не совпадают</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+36"/>
         <source>Password</source>
-        <translation>Пароль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the password</source>
-        <translation>Введите пароль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
         <location line="+2"/>
         <source>Confirm password</source>
-        <translation>Подтвердите пароль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Please enter the password</source>
-        <translation>Пожалуйста, введите пароль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Change password</source>
-        <translation>Изменить пароль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Change</source>
-        <translation>Изменить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Change Password</source>
-        <translation>Изменить пароль</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7956,57 +7134,57 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/UserGroupView.qml" line="+106"/>
         <source>General</source>
-        <translation>Основное</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Group Name</source>
-        <translation>Название группы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the name</source>
-        <translation>Введите название</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the description</source>
-        <translation>Введите описание</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Parent Groups</source>
-        <translation>Родительские группы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Adding Parent Group</source>
-        <translation>Добавление родительской группы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+42"/>
         <source>Users</source>
-        <translation>Пользователи</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Adding Users</source>
-        <translation>Добавление пользователей</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+25"/>
-        <source>Adding Roles</source>
-        <translation>Добавление ролей</translation>
-    </message>
-    <message>
-        <location line="-1"/>
+        <location line="+24"/>
         <source>Roles</source>
-        <translation>Роли</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Adding Roles</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8015,22 +7193,22 @@ ID входных данных: </translation>
         <location filename="../../../Qml/imtauthgui/UserPanel.qml" line="+158"/>
         <location line="+65"/>
         <source>Profile</source>
-        <translation>Профиль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-56"/>
         <source>Organization</source>
-        <translation>Организация</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+27"/>
         <source>No organization</source>
-        <translation>Нет организации</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Logout</source>
-        <translation>Выход из системы</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8038,39 +7216,39 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/UserView.qml" line="+189"/>
         <source>General</source>
-        <translation>Основное</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+21"/>
         <source>System Information</source>
-        <translation>Информация о системе</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+22"/>
         <source>System Name</source>
-        <translation>Название системы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+80"/>
         <location line="+12"/>
         <source>Roles</source>
-        <translation>Роли</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Adding Role</source>
-        <translation>Добавление роли</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+31"/>
-        <source>Adding Group</source>
-        <translation>Добавление группы</translation>
-    </message>
-    <message>
-        <location line="-13"/>
+        <location line="+18"/>
         <location line="+12"/>
         <source>Groups</source>
-        <translation>Группы</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Adding Group</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8078,315 +7256,315 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imt3dgui/CView3dProviderComp.cpp" line="+737"/>
         <source>Zoom in</source>
-        <translation>Увеличить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Zoom out</source>
-        <translation>Уменьшить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Show Grid</source>
-        <translation>Показать сетку</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Grid</source>
-        <translation>Сетка</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Show Axis</source>
-        <translation>Показать оси</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Axis</source>
-        <translation>Оси</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Show Ruler</source>
-        <translation>Показать линейку</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Ruler</source>
-        <translation>Линейка</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Reset View</source>
-        <translation>Сбросить вид</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Reset</source>
-        <translation>Сбросить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Right View</source>
-        <translation>Вид справа</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Right</source>
-        <translation>Справа</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Front View</source>
-        <translation>Вид спереди</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Front</source>
-        <translation>Спереди</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Top View</source>
-        <translation>Вид сверху</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Top</source>
-        <translation>Сверху</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Left View</source>
-        <translation>Вид слева</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Left</source>
-        <translation>Слева</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Bottom View</source>
-        <translation>Вид снизу</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Bottom</source>
-        <translation>Снизу</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Back View</source>
-        <translation>Вид сзади</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Back</source>
-        <translation>Сзади</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Select Point</source>
-        <translation>Выбрать точку</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set Point Selection Mode</source>
-        <translation>Включить режим выбора точек</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Select Box</source>
-        <translation>Выбрать прямоугольник</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set Box Selection Mode</source>
-        <translation>Включить режим выбора прямоугольником</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Select Circle</source>
-        <translation>Выбрать круг</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set Circle Selection Mode</source>
-        <translation>Включить режим выбора окружностью</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Clear Selection</source>
-        <translation>Снять выделение</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Clear</source>
-        <translation>Очистить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Select all</source>
-        <translation>Выделить все</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Invert Selection</source>
-        <translation>Инвертировать выделение</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Invert</source>
-        <translation>Инвертировать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Delete Selection</source>
-        <translation>Удалить выделенное</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Delete</source>
-        <translation>Удалить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Free Rotation</source>
-        <translation>Свободное вращение</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set Free Rotation Mode</source>
-        <translation>Включить режим свободного вращения</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Rotation around X-Axis</source>
-        <translation>Вращение вокруг оси X</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>X-Rotation</source>
-        <translation>Вращение X</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set Rotation around X-Axis Mode</source>
-        <translation>Включить вращение вокруг оси X</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Rotation around Y-Axis</source>
-        <translation>Вращение вокруг оси Y</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Y-Rotation</source>
-        <translation>Вращение Y</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set Rotation around Y-Axis Mode</source>
-        <translation>Включить вращение вокруг оси Y</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Rotation around Z-Axis</source>
-        <translation>Вращение вокруг оси Z</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Z-Rotation</source>
-        <translation>Вращение Z</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set Rotation around Z-Axis Mode</source>
-        <translation>Включить вращение вокруг оси Z</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>View</source>
-        <translation>Вид</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>View Mode</source>
-        <translation>Режим просмотра</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set View Mode</source>
-        <translation>Включить режим просмотра</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Selection</source>
-        <translation>Выделение</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Selection Mode</source>
-        <translation>Режим выделения</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set Selection Mode</source>
-        <translation>Включить режим выделения</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Orthogonal View Mode</source>
-        <translation>Ортогональный режим просмотра</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Orthogonal</source>
-        <translation>Ортогональный</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Select orthogonal view mode</source>
-        <translation>Выбрать ортогональный режим просмотра</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Perspective View Mode</source>
-        <translation>Перспективный режим просмотра</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Perspective</source>
-        <translation>Перспективный</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Select perspective view mode</source>
-        <translation>Выбрать перспективный режим просмотра</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>imtauth::CRoleChangeGeneratorComp</name>
     <message>
-        <location filename="../../../Include/imtauth/CRoleChangeGeneratorComp.cpp" line="+55"/>
+        <location filename="../../../Include/imtauth/CRoleChangeGeneratorComp.cpp" line="+48"/>
         <source>Added parent role &apos;%1&apos;</source>
-        <translation>Добавлена родительская роль &apos;%1&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed parent role &apos;%1&apos;</source>
-        <translation>Удалена родительская роль &apos;%1&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Added permission &apos;%1&apos;</source>
-        <translation>Добавлено право &apos;%1&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed permission &apos;%1&apos;</source>
-        <translation>Удалено право &apos;%1&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8394,37 +7572,37 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtauth/CUserChangeGeneratorComp.cpp" line="+75"/>
         <source>Added to group &apos;%1&apos;</source>
-        <translation>Добавлен в группу &apos;%1&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed from group &apos;%1&apos;</source>
-        <translation>Удален из группы &apos;%1&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Added role &apos;%1&apos;</source>
-        <translation>Добавлена роль &apos;%1&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed role &apos;%1&apos;</source>
-        <translation>Удалена роль &apos;%1&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Added to product &apos;%1&apos;</source>
-        <translation>Добавлен в продукт &apos;%1&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed from product &apos;%1&apos;</source>
-        <translation>Удален из продукта &apos;%1&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Password changed</source>
-        <translation>Пароль изменён</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8432,42 +7610,42 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtauth/CUserGroupChangeGeneratorComp.cpp" line="+106"/>
         <source>Added parent group &apos;%1&apos;</source>
-        <translation>Добавлена родительская группа &apos;%1&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed parent group &apos;%1&apos;</source>
-        <translation>Удалена родительская группа &apos;%1&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed user &apos;%1&apos;</source>
-        <translation>Удален пользователь &apos;%1&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Added user &apos;%1&apos;</source>
-        <translation>Добавлен пользователь &apos;%1&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Added role &apos;%1&apos;</source>
-        <translation>Добавлена роль &apos;%1&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed role &apos;%1&apos;</source>
-        <translation>Удалена роль &apos;%1&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Added to product &apos;%1&apos;</source>
-        <translation>Добавлен в продукт &apos;%1&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed from product &apos;%1&apos;</source>
-        <translation>Удален из продукта &apos;%1&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8475,35 +7653,35 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtauthgql/CRoleCollectionControllerComp.cpp" line="+168"/>
         <source>Roles</source>
-        <translation>Роли</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+36"/>
         <source>Unable to get a role info</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>imtauthgql::CUserCollectionControllerComp</name>
     <message>
-        <location filename="../../../Include/imtauthgql/CUserCollectionControllerComp.cpp" line="+402"/>
-        <source>Internal</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="-356"/>
+        <location filename="../../../Include/imtauthgql/CUserCollectionControllerComp.cpp" line="+46"/>
         <source>Username can&apos;t be empty!</source>
-        <translation>Логин не может быть пустым!</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+29"/>
         <source>Username already exists</source>
-        <translation>Пользователь с таким логином уже существует</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+136"/>
         <source>Users</source>
-        <translation>Пользователи</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+191"/>
+        <source>Internal</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8511,7 +7689,7 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtauthgql/CUserGroupCollectionControllerComp.cpp" line="+136"/>
         <source>Groups</source>
-        <translation>Группы</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8519,12 +7697,12 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtauthgql/CUserRepresentationController.cpp" line="+43"/>
         <source>Username can&apos;t be empty!</source>
-        <translation>Логин не может быть пустым!</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Username already exists</source>
-        <translation>Пользователь с таким логином уже существует</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8532,37 +7710,37 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtauthgui/CAccountInfoEditorComp.cpp" line="+147"/>
         <source>Personal</source>
-        <translation>Личный</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Company</source>
-        <translation>Компания</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Load...</source>
-        <translation>Загрузить...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+261"/>
-        <source>All known file types (%1)</source>
-        <translation>Все известные типы файлов (%1)</translation>
-    </message>
-    <message>
-        <location line="-3"/>
+        <location line="+258"/>
         <source>All file types (%1)</source>
-        <translation>Все типы файлов (%1)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+3"/>
+        <source>All known file types (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>Select picture file</source>
-        <translation>Выбрать файл изображения</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8570,22 +7748,22 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtauthgui/CAccountInfoViewDelegateComp.cpp" line="+76"/>
         <source>Account Name</source>
-        <translation>Название аккаунта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>E-Mail</source>
-        <translation>Электронная почта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Account Type</source>
-        <translation>Тип аккаунта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Account Description</source>
-        <translation>Описание аккаунта</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8593,17 +7771,17 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtauthgui/CContactInfoEditorComp.cpp" line="+27"/>
         <source>Diverse</source>
-        <translation>Другой</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Female</source>
-        <translation>Женский</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Male</source>
-        <translation>Мужской</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8611,27 +7789,27 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtauthgui/CContactInfoViewDelegateComp.cpp" line="+83"/>
         <source>E-Mail</source>
-        <translation>Электронная почта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Birthday</source>
-        <translation>Дата рождения</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>First Name</source>
-        <translation>Имя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Last Name</source>
-        <translation>Фамилия</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Nickname</source>
-        <translation>Псевдоним</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8639,37 +7817,37 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtauthgui/CRemoteStandardLoginGuiComp.cpp" line="+225"/>
         <source>Login failed</source>
-        <translation>Ошибка входа</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+40"/>
         <source>Please enter a non-empty password</source>
-        <translation>Пожалуйста, введите непустой пароль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+24"/>
         <source>User Management</source>
-        <translation>Управление пользователями</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Password for the super user could not be set</source>
-        <translation>Не удалось установить пароль для суперпользователя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+25"/>
         <source>No connection to the server</source>
-        <translation>Нет соединения с сервером</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+42"/>
         <source>No connection to the authorization server</source>
-        <translation>Нет соединения с сервером авторизации</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+30"/>
         <source>Password doesn&apos;t match</source>
-        <translation>Пароли не совпадают</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8677,27 +7855,27 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtauthgui/CStandardLoginGuiComp.cpp" line="+214"/>
         <source>Login failed</source>
-        <translation>Ошибка входа</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+33"/>
         <source>Please enter a non-empty password</source>
-        <translation>Пожалуйста, введите непустой пароль</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+24"/>
         <source>User Management</source>
-        <translation>Управление пользователями</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Password for the super user could not be set</source>
-        <translation>Не удалось установить пароль для суперпользователя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+62"/>
         <source>Password doesn&apos;t match</source>
-        <translation>Пароли не совпадают</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8705,22 +7883,22 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtbase/CDocumentChangeGeneratorCompBase.cpp" line="+121"/>
         <source>Created the document</source>
-        <translation>Создан документ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+6"/>
         <source>&apos;%1&apos; changed from &apos;%2&apos; to &apos;%3&apos;</source>
-        <translation>&apos;%1&apos; изменено с &apos;%2&apos; на &apos;%3&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&apos;%1&apos; was set to &apos;%2&apos;</source>
-        <translation>&apos;%1&apos; установлено на &apos;%2&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&apos;%1&apos; was cleared</source>
-        <translation>&apos;%1&apos; очищено</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8729,7 +7907,7 @@ ID входных данных: </translation>
         <location filename="../../../Include/imtbase/CSystemStatusComp.cpp" line="-140"/>
         <location line="+64"/>
         <source>Try connect to: &apos;%1&apos; ...</source>
-        <translation>Попытка подключения к: &apos;%1&apos; ...</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8737,21 +7915,19 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imthypegui/TTaskCollectionEditorCompBase.h" line="+313"/>
         <source>Task name: </source>
-        <translation type="unfinished">Название задачи: </translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>
 User-ID: </source>
-        <translation type="unfinished">
-ID пользователя: </translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>
 Input-ID: </source>
-        <translation type="unfinished">
-ID входных данных: </translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8759,17 +7935,17 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtdb/CSqlDatabaseObjectDelegateCompBase.cpp" line="+668"/>
         <source>Collection table auto-creation failed; see previous errors. Component initialization was stopped</source>
-        <translation>Автосоздание таблицы коллекции не удалось; см. предыдущие ошибки. Инициализация компонента остановлена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Table creation script path is empty</source>
-        <translation>Путь к скрипту создания таблицы не задан</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Collection table creation script &apos;%1&apos; could not be loaded</source>
-        <translation>Не удалось загрузить скрипт создания таблицы коллекции &apos;%1&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+27"/>
@@ -8785,7 +7961,7 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtdbgui/CDatabaseLoginSettingsEditorComp.cpp" line="+144"/>
         <source>Database connection test was successful</source>
-        <translation>Тест подключения к базе данных выполнен успешно</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8793,27 +7969,27 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtddl/CConstVarCreatorProcessorCompBase.cpp" line="+59"/>
         <source>Template directory path is invalid</source>
-        <translation>Неверный путь к директории шаблонов</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Cpp directory path is invalid</source>
-        <translation>Неверный путь к директории C++</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Qml directory path is invalid</source>
-        <translation>Неверный путь к директории QML</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+32"/>
         <source>The module name is invalid</source>
-        <translation>Неверное название модуля</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>The template dir path is invalid</source>
-        <translation>Неверный путь к директории шаблонов</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8821,12 +7997,12 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtgeo/CAddressControllerComp.cpp" line="-248"/>
         <source>Unable to get an address info</source>
-        <translation>Не удалось получить информацию об адресе</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+141"/>
         <source>Unable to get an address info!</source>
-        <translation>Не удалось получить информацию об адресе!</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8834,7 +8010,7 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtgui/CHierarchicalLayoutWidget.cpp" line="+172"/>
         <source>Empty</source>
-        <translation>Пусто</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8842,73 +8018,73 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtgui/CDocumentCollectionViewDelegateComp.cpp" line="+80"/>
         <source>Collection Manager</source>
-        <translation>Менеджер коллекций</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>The file could not be created</source>
-        <translation>Не удалось создать файл</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+43"/>
         <source>Imported from %1</source>
-        <translation>Импортировано из %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>File &apos;%1&apos; could not be imported</source>
-        <translation>Не удалось импортировать файл &apos;%1&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+6"/>
         <source>File &apos;%1&apos; could not be imported. Failed to load the file contents</source>
-        <translation>Не удалось импортировать файл &apos;%1&apos;. Не удалось загрузить содержимое файла</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+23"/>
         <source>File &quot;%1&quot; could not be exported</source>
-        <translation>Не удалось экспортировать файл &quot;%1&quot;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+21"/>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
         <source>Remove selected item(s) from the database</source>
-        <translation>Удалить выбранный(е) элемент(ы) из базы данных</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Item &quot;%1&quot; is currently being edited and cannot be deleted</source>
-        <translation>Элемент &quot;%1&quot; в данный момент редактируется и не может быть удалён</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+127"/>
         <source>Loading document...</source>
-        <translation>Загрузка документа...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+228"/>
-        <location line="+17"/>
-        <source>Item &quot;%1&quot; could not be opened</source>
-        <translation>Не удалось открыть элемент &quot;%1&quot;</translation>
-    </message>
-    <message>
-        <location line="-392"/>
-        <source>Remove</source>
-        <translation>Удалить</translation>
-    </message>
-    <message>
-        <location line="+551"/>
-        <source>Initial Revision</source>
-        <translation>Начальная ревизия</translation>
-    </message>
-    <message>
-        <location line="-363"/>
+        <location line="+41"/>
         <source>Comment your changes</source>
-        <translation>Прокомментируйте изменения</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Please enter comment for your changes</source>
-        <translation>Пожалуйста, введите комментарий к изменениям</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+186"/>
+        <location line="+17"/>
+        <source>Item &quot;%1&quot; could not be opened</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+159"/>
+        <source>Initial Revision</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8916,7 +8092,7 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtgui/CLayoutManagerGuiComp.cpp" line="+256"/>
         <source>Edit Mode</source>
-        <translation>Режим редактирования</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
@@ -8926,7 +8102,7 @@ ID входных данных: </translation>
     <message>
         <location line="+1"/>
         <source>Clear All</source>
-        <translation>Очистить все</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
@@ -8936,57 +8112,57 @@ ID входных данных: </translation>
     <message>
         <location line="+1"/>
         <source>Import</source>
-        <translation>Импорт</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Export</source>
-        <translation>Экспорт</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+99"/>
         <source>Do you want clear all layout items?</source>
-        <translation>Вы хотите очистить все элементы макета?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Import Layout</source>
-        <translation>Импортировать макет</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Import Layout...</source>
-        <translation>Импортировать макет...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Layout could not be imported</source>
-        <translation>Не удалось импортировать макет</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Export Layout</source>
-        <translation>Экспортировать макет</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Export Layout...</source>
-        <translation>Экспортировать макет...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Layout could not be exported</source>
-        <translation>Не удалось экспортировать макет</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+42"/>
         <source>Open Image</source>
-        <translation>Открыть изображение</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Image Files (*.png *.jpg *.bmp *.ico *.svg)</source>
-        <translation>Файлы изображений (*.png *.jpg *.bmp *.ico *.svg)</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8994,33 +8170,33 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtgui/CMultiDocumentWorkspaceGuiComp.cpp" line="+55"/>
         <source>Document Name</source>
-        <translation>Название документа</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Please enter the name of the document:</source>
-        <translation>Введите название документа:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <location line="+6"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-6"/>
         <source>The document name contains some not allowed characters</source>
-        <translation>Название документа содержит недопустимые символы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+6"/>
         <source>The document name cannot be empty!</source>
-        <translation>Название документа не может быть пустым!</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+51"/>
         <source>File could not be saved!</source>
-        <translation>Не удалось сохранить файл!</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9029,7 +8205,7 @@ ID входных данных: </translation>
         <location filename="../../../Include/imtgui/CMultiDocumentWorkspaceGuiCompBase.cpp" line="+130"/>
         <location line="+534"/>
         <source>&lt;no name&gt;</source>
-        <translation>&lt;без имени&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-525"/>
@@ -9039,12 +8215,12 @@ ID входных данных: </translation>
     <message>
         <location line="+230"/>
         <source>Tab %1</source>
-        <translation>Вкладка %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+183"/>
         <source>Document could not be opened</source>
-        <translation>Не удалось открыть документ</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9052,7 +8228,7 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtgui/CObjectCollectionRevisionDialog.cpp" line="+34"/>
         <source>Restore</source>
-        <translation>Восстановить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+28"/>
@@ -9061,27 +8237,27 @@ ID входных данных: </translation>
         <location line="+1"/>
         <location line="+1"/>
         <source>Revision package not found</source>
-        <translation>Пакет ревизий не найден</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+40"/>
         <source>Export</source>
-        <translation>Экспорт</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Export File</source>
-        <translation>Экспорт файла</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Collection</source>
-        <translation>Коллекция</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Document could not be exported</source>
-        <translation>Не удалось экспортировать документ</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9089,179 +8265,179 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtgui/CObjectCollectionViewDelegate.cpp" line="+77"/>
         <source>&amp;Edit</source>
-        <translation>&amp;Редактировать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+1"/>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <location line="+165"/>
         <location line="+550"/>
         <source>New</source>
-        <translation>Новый</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-716"/>
-        <source>Edit</source>
-        <translation>Редактировать</translation>
-    </message>
-    <message>
-        <location line="+2"/>
+        <location line="-714"/>
         <location line="+715"/>
         <source>Duplicate</source>
-        <translation>Дублировать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-714"/>
         <location line="+213"/>
         <location line="+502"/>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-714"/>
         <location line="+715"/>
         <source>Import</source>
-        <translation>Импорт</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-714"/>
         <location line="+715"/>
         <location line="+147"/>
         <source>Export</source>
-        <translation>Экспорт</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-861"/>
         <location line="+715"/>
         <source>Restore</source>
-        <translation>Восстановить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-259"/>
-        <source>Name</source>
-        <translation>Название</translation>
-    </message>
-    <message>
-        <location line="-195"/>
-        <location line="+3"/>
-        <source>Error</source>
-        <translation>Ошибка</translation>
-    </message>
-    <message>
-        <location line="-54"/>
+        <location line="-505"/>
         <source>Remove selected item(s)</source>
-        <translation>Удалить выбранный(е) элемент(ы)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+35"/>
         <source>Rename</source>
-        <translation>Переименовать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Enter new name</source>
-        <translation>Введите новое название</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+16"/>
+        <location line="+3"/>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-3"/>
         <source>The name could not be set</source>
-        <translation>Не удалось задать название</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>The name contains some not allowed characters</source>
-        <translation>Название содержит недопустимые символы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+120"/>
         <source>Edit Description...</source>
-        <translation>Редактировать описание...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Rename...</source>
-        <translation>Переименовать...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+70"/>
+        <location line="+67"/>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>Type</source>
-        <translation>Тип</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+525"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-522"/>
         <source>Added</source>
-        <translation>Добавлено</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Last Modified</source>
-        <translation>Последнее изменение</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+191"/>
         <location line="+31"/>
         <source>Compressed item folder (*.zip)</source>
-        <translation>Сжатая папка (*.zip)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-26"/>
         <source>All known documents (%1)</source>
-        <translation>Все известные документы (%1)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+46"/>
         <source>Insert</source>
-        <translation>Вставить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Insert new document into the collection</source>
-        <translation>Добавить новый документ в коллекцию</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Duplicate selected objects</source>
-        <translation>Дублировать выбранные объекты</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Remove selected item(s) from the collection</source>
-        <translation>Удалить выбранный(е) элемент(ы) из коллекции</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Import from File...</source>
-        <translation>Импортировать из файла...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Import existing file into the collection</source>
-        <translation>Импортировать файл в коллекцию</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Export to File...</source>
-        <translation>Экспортировать в файл...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Export data from the collection to file(s)</source>
-        <translation>Экспортировать данные из коллекции в файл(ы)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Restore revision...</source>
-        <translation>Восстановить ревизию...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Restore data from backup</source>
-        <translation>Восстановление данных из резервной копии</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+22"/>
@@ -9269,53 +8445,53 @@ ID входных данных: </translation>
         <location line="+24"/>
         <location line="+38"/>
         <source>Collection</source>
-        <translation>Коллекция</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-110"/>
         <location line="+48"/>
         <source>New document could not be created</source>
-        <translation>Не удалось создать новый документ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-22"/>
         <source>Initial Revision</source>
-        <translation>Начальная ревизия</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+33"/>
         <source>Import File</source>
-        <translation>Импорт файла</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Document &apos;%1&apos; could not be imported</source>
-        <translation>Не удалось импортировать документ &apos;%1&apos;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Importing into collection</source>
-        <translation>Импорт в коллекцию</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Export File</source>
-        <translation>Экспорт файла</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Document could not be exported</source>
-        <translation>Не удалось экспортировать документ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Select Targetn Folder</source>
-        <translation>Выбрать целевую папку</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+135"/>
         <source>Enter object description</source>
-        <translation>Введите описание объекта</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9323,27 +8499,27 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtgui/CPluginStatusMonitorViewDelegateComp.cpp" line="+253"/>
         <source>Name</source>
-        <translation>Название</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Path</source>
-        <translation>Путь</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Loaded at</source>
-        <translation>Загружен в</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Message</source>
-        <translation>Сообщение</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Type</source>
-        <translation>Тип</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9351,18 +8527,18 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtgui/CSingleDocumentWorkspaceGuiComp.cpp" line="+198"/>
         <source>Open File</source>
-        <translation>Открыть файл</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Selected file could not be loaded</source>
-        <translation>Не удалось загрузить выбранный файл</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
         <location line="+14"/>
         <source>File could not be saved!</source>
-        <translation>Не удалось сохранить файл!</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9372,13 +8548,13 @@ ID входных данных: </translation>
         <location line="+103"/>
         <location line="+10"/>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-10"/>
         <location line="+10"/>
         <source>Edit existing object</source>
-        <translation>Редактировать существующий объект</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9387,23 +8563,23 @@ ID входных данных: </translation>
         <location filename="../../../Include/imtgui/CThumbnailDecoratorGuiComp.cpp" line="+438"/>
         <location line="+314"/>
         <source>Login</source>
-        <translation>Логин</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-280"/>
         <source>Quit</source>
-        <translation>Выйти</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Do you really want to quit?</source>
-        <translation>Вы действительно хотите выйти?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+416"/>
         <location line="+154"/>
         <source>&lt;unnamed&gt;</source>
-        <translation>&lt;без имени&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9411,12 +8587,12 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imthypegui/TTaskCollectionEditorCompBase.h" line="-348"/>
         <source>Error</source>
-        <translation type="unfinished">Ошибка</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>The task name contains some not allowed characters</source>
-        <translation type="unfinished">Название задачи содержит недопустимые символы</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9424,32 +8600,32 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imthypegui/CTaskInputCollectionViewDelegateComp.cpp" line="+107"/>
         <source>Acquisition-ID</source>
-        <translation>ID приобретения</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+74"/>
         <source>Enter new object name</source>
-        <translation>Введите новое название объекта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Name</source>
-        <translation>Название</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Incorrect object name. Object name must be a number between 0 and 255</source>
-        <translation>Неверное название объекта. Название должно быть числом от 0 до 255</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9457,164 +8633,164 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imthypegui/CTaskManagerGuiComp.cpp" line="-300"/>
         <source>Disable</source>
-        <translation>Отключить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Enable</source>
-        <translation>Включить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Rename</source>
-        <translation>Переименовать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+516"/>
         <source>Duplicate</source>
-        <translation>Дублировать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-515"/>
         <source>Delete</source>
-        <translation>Удалить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Acquisition Manager...</source>
-        <translation>Менеджер захвата...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Trigger Table...</source>
-        <translation>Таблица триггеров...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Settings...</source>
-        <translation>Настройки...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+137"/>
         <source>Task Error</source>
-        <translation>Ошибка задачи</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Task &apos;%1&apos; could not be duplicated!</source>
-        <translation>Не удалось дублировать задачу &apos;%1&apos;!</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+166"/>
         <location line="+196"/>
         <source>Acquisition Manager</source>
-        <translation>Менеджер захвата</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-162"/>
         <source>Trigger-Inspection Mapping</source>
-        <translation>Связь триггеров и инспекций</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+43"/>
         <source>Total Inspections: %1</source>
-        <translation>Всего инспекций: %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+114"/>
         <source>&amp;Show Task List</source>
-        <translation>&amp;Показать список задач</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Show Tasks</source>
-        <translation>Показать задачи</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Show task list</source>
-        <translation>Показать список задач</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Execute All Tasks</source>
-        <translation>&amp;Выполнить все задачи</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Execute</source>
-        <translation>Выполнить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Execute all tasks</source>
-        <translation>Выполнить все задачи</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Add Task</source>
-        <translation>&amp;Добавить задачу</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Add</source>
-        <translation>Добавить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Add a new task</source>
-        <translation>Добавить новую задачу</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Remove Task</source>
-        <translation>&amp;Удалить задачу</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Remove current task</source>
-        <translation>Удалить текущую задачу</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Duplicate Task</source>
-        <translation>&amp;Дублировать задачу</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Duplicate current task</source>
-        <translation>Дублировать текущую задачу</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Show Acquisition &amp;Manager</source>
-        <translation>Показать менеджер захвата</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Show editor of the task inputs</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Show &amp;Trigger Table</source>
-        <translation>Показать таблицу триггеров</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Trigger Table</source>
-        <translation>Таблица триггеров</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Show editor of the triggers</source>
-        <translation>Показать редактор триггеров</translation>
-    </message>
-    <message>
-        <location line="-1"/>
-        <source>Show editor of the task inputs</source>
-        <translation>Показать редактор входных данных задачи</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9623,22 +8799,22 @@ ID входных данных: </translation>
         <location filename="../../../Include/imthypegui/CTaskSettingsGuiComp.cpp" line="-96"/>
         <location line="+6"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-6"/>
         <source>The task name contains some not allowed characters</source>
-        <translation>Название задачи содержит недопустимые символы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Acq-SubId must be a number</source>
-        <translation>Acq-SubId должен быть числом</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+114"/>
         <source>Acquisition Manager</source>
-        <translation>Менеджер захвата</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9646,75 +8822,75 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtlic/CLicenseControllerComp.cpp" line="+52"/>
         <source>Backup of the existing license failed. Import canceled</source>
-        <translation>Не удалось создать резервную копию лицензии. Импорт отменён</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+28"/>
         <source>License file could not be imported</source>
-        <translation>Не удалось импортировать файл лицензии</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Restore of the last license failed</source>
-        <translation>Не удалось восстановить последнюю лицензию</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>License file could not be copied to the target location</source>
-        <translation>Не удалось скопировать файл лицензии в целевое место</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+15"/>
         <source>No license path component was set. Please check component configuration</source>
-        <translation>Компонент пути к лицензии не задан. Проверьте конфигурацию компонента</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+6"/>
         <location line="+39"/>
         <source>No product instance persistence component was set. Please check component configuration</source>
-        <translation>Компонент хранения экземпляра продукта не задан. Проверьте конфигурацию компонента</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-33"/>
         <location line="+39"/>
         <source>No encrypted instance persistence component was set. Please check component configuration</source>
-        <translation>Компонент хранения зашифрованного экземпляра не задан. Проверьте конфигурацию компонента</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-32"/>
         <source>License file path is empty. Please check component configuration</source>
-        <translation>Путь к файлу лицензии пуст. Проверьте конфигурацию компонента</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+38"/>
         <source>License file path is empty, nothing to check</source>
-        <translation>Путь к файлу лицензии пуст, нечего проверять</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Checking license fingerprint</source>
-        <translation>Проверка отпечатка лицензии</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <location line="+204"/>
         <source>License Controller</source>
-        <translation>Контроллер лицензий</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-90"/>
         <source>License fingerprint could not be updated</source>
-        <translation>Не удалось обновить отпечаток лицензии</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>License was successfully loaded</source>
-        <translation>Лицензия успешно загружена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+87"/>
         <source>License key was changed. Checking license fingerprint</source>
-        <translation>Ключ лицензии изменён. Проверка отпечатка лицензии</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9722,17 +8898,17 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtlicgql/CAccountControllerComp.cpp" line="+119"/>
         <source>Unable to get an account info!</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Account name can&apos;t be empty</source>
-        <translation>Название аккаунта не можеь быть пустым</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Account Name already exists</source>
-        <translation>Аккаунт с таким названием уже существует</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9740,22 +8916,22 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtlicgql/CFeatureControllerComp.cpp" line="+33"/>
         <source>Internal error.</source>
-        <translation>Внутренняя ошибка.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Unable to create object. GQL input params is invalid.</source>
-        <translation>Не удалось создать объект. Параметры GQL недействительны.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Unable to create object from empty json.</source>
-        <translation>Не удалось создать объект из пустого JSON.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+52"/>
         <source>Unable to get object. GQL input params is invalid.</source>
-        <translation>Не удалось получить объект. Параметры GQL недействительны.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9763,27 +8939,27 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtlicgql/CLicenseControllerComp.cpp" line="-136"/>
         <source>Internal error.</source>
-        <translation>Внутренняя ошибка.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Unable to create object. GQL input params is invalid.</source>
-        <translation>Не удалось создать объект. Параметры GQL недействительны.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Unable to create object from empty json.</source>
-        <translation>Не удалось создать объект из пустого JSON.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+25"/>
         <source>Unable to create license with an empty License-ID.</source>
-        <translation>Не удалось создать лицензию с пустым ID лицензии.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+98"/>
         <source>Unable to get object. GQL input params is invalid.</source>
-        <translation>Не удалось получить объект. Параметры GQL недействительны.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9791,12 +8967,12 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtlicgql/CProductCollectionControllerComp.cpp" line="+400"/>
         <source>Product Name cannot be empty</source>
-        <translation>Название продукта не может быть пустым</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+38"/>
         <source>Product Name is empty</source>
-        <translation>Название продукта пустое</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9804,22 +8980,22 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtlicgui/CFeatureCollectionViewDelegateComp.cpp" line="+48"/>
         <source>Wrong object type</source>
-        <translation>Неверный тип объекта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+29"/>
         <source>Feature Name</source>
-        <translation>Название</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Feature-ID</source>
-        <translation>Идентификатор</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9827,37 +9003,32 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtlicgui/CLicenseManagerViewDelegateComp.cpp" line="+42"/>
         <source>New License</source>
-        <translation>Новая лицензия</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+116"/>
         <source>License Name</source>
-        <translation>Название лицензии</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>License-ID</source>
-        <translation>Идентификатор лицензии</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>imtlicgui::CProductInstanceInfoEditorComp</name>
     <message>
-        <location filename="../../../Include/imtlicgui/CProductInstanceInfoEditorComp.cpp" line="+162"/>
-        <source></source>
-        <translation></translation>
-    </message>
-    <message>
-        <location line="+4"/>
+        <location filename="../../../Include/imtlicgui/CProductInstanceInfoEditorComp.cpp" line="+166"/>
         <location line="+17"/>
         <location line="+182"/>
         <source>Unlimited</source>
-        <translation>Неограниченный</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9865,59 +9036,59 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtlicgui/CProductInstanceInfoViewComp.cpp" line="+157"/>
         <source>Unlimited</source>
-        <translation>Неограниченный</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+61"/>
         <source>All known file types (%1)</source>
-        <translation>Все известные типы файлов (%1)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <source>All file types (%1)</source>
-        <translation>Все типы файлов (%1)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Create Transaction Code</source>
-        <translation>Создать транзакционный код</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>License Request Manager</source>
-        <translation>Менеджер запросов лицензий</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>License request file could not be saved</source>
-        <translation>Не удалось сохранить файл запроса лицензии</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Select license file to be imported</source>
-        <translation>Выберите файл лицензии для импорта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>License files (*.lic)</source>
-        <translation>Файлы лицензий (*.lic)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <location line="+6"/>
         <location line="+3"/>
         <source>License Manager</source>
-        <translation>Менеджер лицензий</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-9"/>
         <source>License file successfully imported</source>
-        <translation>Файл лицензии успешно импортирован</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
         <source>License could not be imported</source>
-        <translation>Не удалось импортировать лицензию</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9926,22 +9097,22 @@ ID входных данных: </translation>
         <location filename="../../../Include/imtlicgui/CProductInstanceInfoViewDelegateComp.cpp" line="+21"/>
         <location line="+97"/>
         <source>Create License File</source>
-        <translation>Создать файл лицензии</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-30"/>
         <source>Instance-ID</source>
-        <translation>ID экземпляра</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Customer</source>
-        <translation>Клиент</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Export existing product installation license to file</source>
-        <translation>Экспортировать существующую лицензию установки продукта в файл</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9949,17 +9120,17 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtlog/CEventHistoryControllerComp.cpp" line="+169"/>
         <source>Log folder not specified. Event history disabled</source>
-        <translation>Папка журнала не указана. История событий отключена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Unable access log folder. Event history disabled</source>
-        <translation>Нет доступа к папке журнала. История событий отключена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Unavailable version info provider. Event history disabled</source>
-        <translation>Провайдер информации о версии недоступен. История событий отключена</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9967,7 +9138,7 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtlog/CMessagesController.cpp" line="+341"/>
         <source>Cannot create temporary folder. Event container skipped</source>
-        <translation>Не удалось создать временную папку. Контейнер событий пропущен</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9975,12 +9146,12 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtlog/CMessagesReader.cpp" line="+226"/>
         <source>No compressor component. Load history container failed</source>
-        <translation>Компонент сжатия отсутствует. Не удалось загрузить контейнер истории</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Cannot create temporary folder. Load history container failed</source>
-        <translation>Не удалось создать временную папку. Не удалось загрузить контейнер истории</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9993,7 +9164,7 @@ ID входных данных: </translation>
         <location line="+1"/>
         <location line="+1"/>
         <source>%1 Events</source>
-        <translation>%1 событий</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10001,67 +9172,67 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtloggui/CEventViewComp.cpp" line="+328"/>
         <source>First event</source>
-        <translation>Первое событие</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>First</source>
-        <translation>Первый</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Move to first event</source>
-        <translation>Перейти к первому событию</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Previous event</source>
-        <translation>Предыдущее событие</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Previous</source>
-        <translation>Предыдущий</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Move to previous event</source>
-        <translation>Перейти к предыдущему событию</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Next event</source>
-        <translation>Следующее событие</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Next</source>
-        <translation>Следующий</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Move to next event</source>
-        <translation>Перейти к следующему событию</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Last event</source>
-        <translation>Последнее событие</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Last</source>
-        <translation>Последний</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Move to last event</source>
-        <translation>Перейти к последнему событию</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Zoom in</source>
-        <translation>Увеличить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
@@ -10071,7 +9242,7 @@ ID входных данных: </translation>
     <message>
         <location line="+1"/>
         <source>Zoom out</source>
-        <translation>Уменьшить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
@@ -10081,7 +9252,7 @@ ID входных данных: </translation>
     <message>
         <location line="+1"/>
         <source>Zoom reset</source>
-        <translation>Сбросить масштаб</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
@@ -10094,12 +9265,12 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtqml/CDocumentServiceController.cpp" line="+370"/>
         <source>&lt;no name&gt;</source>
-        <translation>&lt;без имени&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+301"/>
         <source>Save document failed</source>
-        <translation>Не удалось сохранить документ</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10107,12 +9278,12 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtrepo/CFileCollectionComp.cpp" line="+704"/>
         <source>File could not be inserted into the repository</source>
-        <translation>Не удалось добавить файл в репозиторий</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+326"/>
         <source>Revision number updated to %1</source>
-        <translation>Номер ревизии обновлён до %1</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10120,13 +9291,13 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtrepo/CFileCollectionCompBase.cpp" line="+260"/>
         <source>File could not be inserted into the repository</source>
-        <translation>Не удалось добавить файл в репозиторий</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+191"/>
         <location line="+145"/>
         <source>Temp folder could not be created</source>
-        <translation>Не удалось создать временную папку</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10136,52 +9307,52 @@ ID входных данных: </translation>
         <location line="+5"/>
         <location line="+4"/>
         <source>Report document</source>
-        <translation>Документ отчёта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+49"/>
         <source>Export to PDF...</source>
-        <translation>Экспортировать в PDF...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>PDF...</source>
-        <translation>PDF...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Export current report to PDF file</source>
-        <translation>Экспортировать текущий отчёт в файл PDF</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Export to TIFF...</source>
-        <translation>Экспортировать в TIFF...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TIFF...</source>
-        <translation>TIFF...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Export current report to TIFF file</source>
-        <translation>Экспортировать текущий отчёт в файл TIFF</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Show/Hide Grid</source>
-        <translation>Показать/скрыть сетку</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Grid</source>
-        <translation>Сетка</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set grid visible/unvisible</source>
-        <translation>Показать/скрыть сетку</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10189,7 +9360,7 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtservergql/CGqlSearchControllerComp.cpp" line="+62"/>
         <source>Unnamed result</source>
-        <translation>Безымянный результат</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10197,13 +9368,13 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtservergql/CLegacyObjectCollectionControllerCompBase.cpp" line="+338"/>
         <source>Internal error</source>
-        <translation>Внутренняя ошибка</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+670"/>
         <location line="+120"/>
         <source>Unable to import the object. GQL input params is invalid.</source>
-        <translation>Не удалось импортировать объект. Параметры GQL недействительны.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10211,14 +9382,14 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtservergql/CObjectCollectionControllerCompBase.cpp" line="+1818"/>
         <source>Internal error</source>
-        <translation>Внутренняя ошибка</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+465"/>
         <location line="+25"/>
         <location line="+123"/>
         <source>Unable to import the object. GQL input params is invalid.</source>
-        <translation>Не удалось импортировать объект. Параметры GQL недействительны.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -10226,7 +9397,7 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtservergql/CStructureControllerCompBase.cpp" line="+300"/>
         <source>Internal error</source>
-        <translation>Внутренняя ошибка</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
