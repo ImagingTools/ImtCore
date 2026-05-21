@@ -466,7 +466,7 @@ ViewBase {
 						Item {
 							visible: membersListViewContent.count === 0 && invitationsListView.count === 0
 							width: membersColumn.width
-							height: Style.controlHeightL * 3
+							height: Style.controlHeightL + Style.marginL
 							
 							BaseText {
 								anchors.centerIn: parent
@@ -684,11 +684,15 @@ ViewBase {
 						if (membersPage.stateManager
 								&& membersPage.stateManager.receivedUserData
 								&& membersPage.__editMemberId) {
+							var received = membersPage.stateManager.receivedUserData
 							var userData = membersPage.userDataFactory ? membersPage.userDataFactory() : null
 							if (userData) {
 								userData.m_id = membersPage.__editMemberId
-								userData.m_name = membersPage.stateManager.receivedUserData.name || membersPage.__editMemberName
-								userData.m_description = membersPage.stateManager.receivedUserData.description || ""
+								userData.m_name = received.name || membersPage.__editMemberName
+								userData.m_username = received.username || ""
+								userData.m_email = received.email || ""
+								userData.m_roles = received.roles || []
+								userData.m_groups = received.groups || []
 							}
 							editUserView.model = userData
 							editUserView.updateGui()

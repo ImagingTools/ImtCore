@@ -152,7 +152,7 @@ ViewBase {
 				function updateGui(){
 					nameInput.text = container.groupData.m_name;
 					descriptionInput.text = container.groupData.m_description;
-					var ids = container.groupData.m_parentGroups.slice()
+					var ids = container.groupData.m_parentGroups ? container.groupData.m_parentGroups.slice() : []
 					var arr = []
 					for (var i = 0; i < ids.length; i++)
 						arr.push({id: ids[i], name: ids[i]})
@@ -186,7 +186,7 @@ ViewBase {
 				}
 				
 				function updateGui(){
-					var ids = container.groupData.m_users.slice()
+					var ids = container.groupData.m_users ? container.groupData.m_users.slice() : []
 					var arr = []
 					for (var i = 0; i < ids.length; i++)
 						arr.push({id: ids[i], name: ids[i]})
@@ -218,7 +218,7 @@ ViewBase {
 				}
 
 				function updateGui(){
-					var ids = container.groupData.m_roles.slice()
+					var ids = container.groupData.m_roles ? container.groupData.m_roles.slice() : []
 					var arr = []
 					for (var i = 0; i < ids.length; i++)
 						arr.push({id: ids[i], name: ids[i]})

@@ -331,7 +331,7 @@ ViewBase {
 				}
 
 				function updateGui(){
-					var ids = container.userData.m_roles.slice()
+					var ids = container.userData.m_roles ? container.userData.m_roles.slice() : []
 					var arr = []
 					for (var i = 0; i < ids.length; i++)
 						arr.push({id: ids[i], name: ids[i]})
@@ -370,7 +370,7 @@ ViewBase {
 				}
 
 				function updateGui(){
-					var ids = container.userData.m_groups.slice()
+					var ids = container.userData.m_groups ? container.userData.m_groups.slice() : []
 					var arr = []
 					for (var i = 0; i < ids.length; i++)
 						arr.push({id: ids[i], name: ids[i]})

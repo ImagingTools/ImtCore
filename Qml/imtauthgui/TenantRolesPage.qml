@@ -545,11 +545,17 @@ ViewBase {
 							if (rolesPage.stateManager
 									&& rolesPage.stateManager.receivedRoleData
 									&& rolesPage.__editRoleId) {
+								var received = rolesPage.stateManager.receivedRoleData
 								var roleData = rolesPage.roleDataFactory ? rolesPage.roleDataFactory() : null
 								if (roleData) {
 									roleData.m_id = rolesPage.__editRoleId
-									roleData.m_name = rolesPage.stateManager.receivedRoleData.name || rolesPage.__editRoleName
-									roleData.m_description = rolesPage.stateManager.receivedRoleData.description || rolesPage.__editRoleDescription
+									roleData.m_name = received.name || rolesPage.__editRoleName
+									roleData.m_roleId = received.roleId || ""
+									roleData.m_description = received.description || rolesPage.__editRoleDescription
+									roleData.m_parentRoles = received.parentRoles || []
+									roleData.m_permissions = received.permissions || ""
+									roleData.m_isDefault = received.isDefault || false
+									roleData.m_isGuest = received.isGuest || false
 								}
 								editRoleView.model = roleData
 								editRoleView.updateGui()

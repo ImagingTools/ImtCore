@@ -42,6 +42,19 @@ Item {
 		pageSize: 50
 	}
 
+	SubscriptionClient {
+		id: subscriptionClient
+		gqlCommandId: root.collectionId !== "" ? "On" + root.collectionId + "CollectionChanged" : ""
+
+		function getHeaders(){
+			return {}
+		}
+
+		onMessageReceived: {
+			dataProvider.fetch(filterInput.text)
+		}
+	}
+
 	Component.onCompleted: {
 		dataProvider.fetch("")
 	}
@@ -99,6 +112,19 @@ Item {
 		model: dataProvider.items
 		clip: true
 		boundsBehavior: Flickable.StopAtBounds
+
+		header: Item {
+			width: listViewArea.width
+			height: listViewArea.count === 0 && !dataProvider.isInitialLoading ? Style.controlHeightL + Style.marginL : 0
+			visible: height > 0
+
+			BaseText {
+				anchors.centerIn: parent
+				text: root.emptyMessage
+				font.pixelSize: Style.fontSizeM
+				color: Style.inactiveTextColor
+			}
+		}
 
 		delegate: Rectangle {
 			id: delegateRoot
@@ -239,23 +265,5 @@ Item {
 				opacity: 0.5
 			}
 		}
-
-		// Empty state
-		BaseText {
-			visible: listViewArea.count === 0 && !dataProvider.isInitialLoading
-			anchors.centerIn: parent
-			text: root.emptyMessage
-			font.pixelSize: Style.fontSizeM
-			color: Style.inactiveTextColor
-		}
-
-		// Loading state
-		BaseText {
-			visible: dataProvider.isInitialLoading
-			anchors.centerIn: parent
-			text: qsTr("Loading...")
-			font.pixelSize: Style.fontSizeM
-			color: Style.inactiveTextColor
 		}
 	}
-}

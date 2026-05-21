@@ -535,11 +535,15 @@ ViewBase {
 						if (groupsPage.stateManager
 								&& groupsPage.stateManager.receivedGroupData
 								&& groupsPage.__editGroupId) {
+							var received = groupsPage.stateManager.receivedGroupData
 							var groupData = groupsPage.groupDataFactory ? groupsPage.groupDataFactory() : null
 							if (groupData) {
 								groupData.m_id = groupsPage.__editGroupId
-								groupData.m_name = groupsPage.stateManager.receivedGroupData.name || groupsPage.__editGroupName
-								groupData.m_description = groupsPage.stateManager.receivedGroupData.description || groupsPage.__editGroupDescription
+								groupData.m_name = received.name || groupsPage.__editGroupName
+								groupData.m_description = received.description || groupsPage.__editGroupDescription
+								groupData.m_parentGroups = received.parentGroups || []
+								groupData.m_users = received.users || []
+								groupData.m_roles = received.roles || []
 							}
 							editGroupView.model = groupData
 							editGroupView.updateGui()

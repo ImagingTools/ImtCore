@@ -165,7 +165,7 @@ ViewBase {
 					roleIdInput.text = container.roleData.m_roleId;
 					roleNameInput.text = container.roleData.m_name;
 					descriptionInput.text = container.roleData.m_description;
-					var ids = container.roleData.m_parentRoles.slice()
+						var ids = container.roleData.m_parentRoles ? container.roleData.m_parentRoles.slice() : []
 					var arr = []
 					for (var i = 0; i < ids.length; i++)
 						arr.push({id: ids[i], name: ids[i]})
