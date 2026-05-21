@@ -458,15 +458,11 @@ ViewBase {
 		var groupData = editorView.model
 		if (groupsPage.__isCreating) {
 			if (groupsPage.apiClient)
-				groupsPage.apiClient.insertGroup(
-							groupData ? groupData.m_name : "",
-							groupData ? groupData.m_description : "")
+				groupsPage.apiClient.insertGroup("", groupData)
 		} else {
 			if (groupsPage.apiClient)
 				groupsPage.apiClient.setGroupData(
-							groupsPage.__editGroupId,
-							groupData ? groupData.m_name : "",
-							groupData ? groupData.m_description : "")
+							groupsPage.__editGroupId, groupData)
 		}
 		groupsStackViewHeader.popHeader()
 		groupsStackView.previous()

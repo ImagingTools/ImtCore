@@ -50,6 +50,10 @@ ViewBase {
 			if (membersPage.stateManager)
 				membersPage.stateManager.removeMemberById(userId)
 		}
+		function onInvitationRevoked(invitationId) {
+			if (membersPage.stateManager)
+				membersPage.stateManager.removePendingInvitation(invitationId)
+		}
 		function onMemberRoleChanged(userId, role) {
 			// Refresh data from server after role change
 			if (membersPage.representationController)
@@ -619,15 +623,11 @@ ViewBase {
 		var userData = editorView.model
 		if (membersPage.__isCreatingUser) {
 			if (membersPage.apiClient)
-				membersPage.apiClient.insertUser(
-							userData ? userData.m_name : "",
-							userData ? userData.m_description : "")
+				membersPage.apiClient.insertUser("", userData)
 		} else {
 			if (membersPage.apiClient)
 				membersPage.apiClient.setUserData(
-							membersPage.__editMemberId,
-							userData ? userData.m_name : "",
-							userData ? userData.m_description : "")
+							membersPage.__editMemberId, userData)
 		}
 		membersStackViewHeader.popHeader()
 		membersStackView.previous()

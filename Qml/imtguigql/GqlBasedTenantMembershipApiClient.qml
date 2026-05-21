@@ -353,14 +353,18 @@ QtObject {
 		root.__roleItemSender.send(root.__roleItemInput)
 	}
 
-	function insertGroup(name, description, groupData) {
-		root.__groupAddInput.m_id = ""
+	function insertGroup(groupId, groupData) {
+		if (!groupData){
+			return
+		}
+
+		root.__groupAddInput.m_id = groupId
 		root.__groupAddInput.m_typeId = "Group"
 		root.__groupAddInput.m_productId = root.productId
-		root.__groupAddInput.m_name = name || ""
-		root.__groupAddInput.m_description = description || ""
-		if (groupData)
-			root.__groupAddInput.m_item = groupData
+		root.__groupAddInput.m_name = groupData.m_name
+		root.__groupAddInput.m_description = groupData.m_description
+		root.__groupAddInput.m_item = groupData
+
 		root.__groupAddSender.send(root.__groupAddInput)
 	}
 
@@ -371,15 +375,19 @@ QtObject {
 		root.__removeGroupSender.send(root.__removeGroupInput)
 	}
 
-	function setGroupData(groupId, name, description, groupData) {
-		root.__pendingSetGroupId = groupId || ""
+	function setGroupData(groupId, groupData) {
+		if (!groupData){
+			return
+		}
+
+		root.__pendingSetGroupId = groupId
 		root.__groupUpdateInput.m_id = groupId || ""
 		root.__groupUpdateInput.m_typeId = "Group"
 		root.__groupUpdateInput.m_productId = root.productId
-		root.__groupUpdateInput.m_name = name || ""
-		root.__groupUpdateInput.m_description = description || ""
-		if (groupData)
-			root.__groupUpdateInput.m_item = groupData
+		root.__groupUpdateInput.m_name = groupData.m_name
+		root.__groupUpdateInput.m_description = groupData.m_description || ""
+		root.__groupUpdateInput.m_item = groupData
+
 		root.__groupUpdateSender.send(root.__groupUpdateInput)
 	}
 
@@ -389,14 +397,18 @@ QtObject {
 		root.__groupItemSender.send(root.__groupItemInput)
 	}
 
-	function insertUser(name, description, userData) {
-		root.__userAddInput.m_id = ""
+	function insertUser(userId, userData) {
+		if (!userData){
+			return
+		}
+
+		root.__userAddInput.m_id = userId
 		root.__userAddInput.m_typeId = "User"
 		root.__userAddInput.m_productId = root.productId
-		root.__userAddInput.m_name = name || ""
-		root.__userAddInput.m_description = description || ""
-		if (userData)
-			root.__userAddInput.m_item = userData
+		root.__userAddInput.m_name = userData.m_name
+		root.__userAddInput.m_description = userData.m_description
+		root.__userAddInput.m_item = userData
+
 		root.__userAddSender.send(root.__userAddInput)
 	}
 
@@ -407,15 +419,19 @@ QtObject {
 		root.__removeUserSender.send(root.__removeUserInput)
 	}
 
-	function setUserData(userId, name, description, userData) {
-		root.__pendingSetUserId = userId || ""
+	function setUserData(userId, userData) {
+		if (!userData){
+			return
+		}
+
+		root.__pendingSetUserId = userId
 		root.__userUpdateInput.m_id = userId || ""
 		root.__userUpdateInput.m_typeId = "User"
 		root.__userUpdateInput.m_productId = root.productId
-		root.__userUpdateInput.m_name = name || ""
-		root.__userUpdateInput.m_description = description || ""
-		if (userData)
-			root.__userUpdateInput.m_item = userData
+		root.__userUpdateInput.m_name = userData.m_name
+		root.__userUpdateInput.m_description = userData.m_description || ""
+		root.__userUpdateInput.m_item = userData
+
 		root.__userUpdateSender.send(root.__userUpdateInput)
 	}
 

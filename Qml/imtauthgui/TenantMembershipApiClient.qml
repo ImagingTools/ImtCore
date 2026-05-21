@@ -56,18 +56,18 @@ QtObject {
 	function setMemberRole(tenantId, userId, role) {}
 	function removeMember(tenantId, userId) {}
 
-	function insertRole(name, description, roleData) {}
+	function insertRole(roleId, roleData) {}
 	function removeRole(roleId) {}
-	function setRoleData(roleId, name, description, roleData) {}
+	function setRoleData(roleId, roleData) {}
 	function getRoleData(roleId) {}
 
-	function insertGroup(name, description, groupData) {}
+	function insertGroup(groupId, groupData) {}
 	function removeGroup(groupId) {}
-	function setGroupData(groupId, name, description, groupData) {}
+	function setGroupData(groupId, groupData) {}
 	function getGroupData(groupId) {}
 
-	function insertUser(name, description, userData) {}
+	function insertUser(userId, userData) {}
 	function removeUser(userId) {}
-	function setUserData(userId, name, description, userData) {}
+	function setUserData(userId, userData) {}
 	function getUserData(userId) {}
 }
