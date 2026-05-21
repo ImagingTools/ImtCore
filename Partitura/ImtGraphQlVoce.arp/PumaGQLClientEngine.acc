@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6397" Description="ACF"/>
+            <Version Id="0" Number="6388" Description="ACF"/>
             <Version Id="1" Number="2392" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395267" Description="Qt Framework"/>
+            <Version Id="1023" Number="395266" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -441,6 +441,7 @@
                                             <Value>RoleRemoteCollectionController</Value>
                                             <Value>RemoteCollectionController</Value>
                                             <Value>RemoteRepresentationController</Value>
+                                            <Value>RemoteFilterableSelectController</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -529,6 +530,33 @@
                                             <Value>Groups</Value>
                                         </Values>
                                     </Data>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="RemoteFilterableSelectController" PackageId="ImtClientGqlPck" ComponentId="RemoteFilterableSelectController">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="CollectionIds" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>Roles</Value>
+                                            <Value>Users</Value>
+                                            <Value>Groups</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                    <Data IsEnabled="false"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
@@ -645,6 +673,7 @@
         <Component ExportedId="CachedGroupCollection" ComponentId="RemoteRepositories/CachedGroupCollection"/>
         <Component ExportedId="CachedRoleCollection" ComponentId="RemoteRepositories/CachedRoleCollection"/>
         <Component ExportedId="CachedUserCollection" ComponentId="RemoteRepositories/CachedUserCollection"/>
+        <Component ExportedId="ConnectionSubscriber" ComponentId="ConnectionSubscriber"/>
         <Component ExportedId="GroupRemoteRepository" ComponentId="RemoteRepositories/GroupRemoteRepository"/>
         <Component ExportedId="RemoteTenantController" ComponentId="RemoteTenantController/RemoteTenantController"/>
         <Component ExportedId="RoleRemoteRepository" ComponentId="RemoteRepositories/RoleRemoteRepository"/>
