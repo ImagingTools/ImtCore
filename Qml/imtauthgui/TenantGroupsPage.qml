@@ -22,7 +22,6 @@ ViewBase {
 	readonly property var tenantData: groupsPage.model
 	property var stateManager: null
 	property var apiClient: null
-	property var groupDataFactory: null
 	
 	function updateGui() {}
 	function updateModel() {}
@@ -42,6 +41,18 @@ ViewBase {
 		function onGroupDataReceived(data) {
 			if (groupsPage.stateManager)
 				groupsPage.stateManager.receivedGroupData = data
+		}
+		function onGroupCreated() {
+			if (groupsPage.__dataProvider)
+				groupsPage.__dataProvider.fetch("")
+		}
+		function onGroupUpdated(groupId) {
+			if (groupsPage.__dataProvider)
+				groupsPage.__dataProvider.fetch("")
+		}
+		function onGroupRemoved(groupId) {
+			if (groupsPage.__dataProvider)
+				groupsPage.__dataProvider.fetch("")
 		}
 	}
 	
@@ -224,7 +235,7 @@ ViewBase {
 			TenantTableContainer {
 				anchors.top: groupsFilterInput.bottom
 				anchors.topMargin: Style.marginM
-				height: Math.min(groupsTableHeader.height + groupsListView2.contentHeight + 2,
+				height: Math.min(groupsTableHeader.height + groupsEmptyState.height + groupsListView2.contentHeight + 2,
 								 parent.height - groupsFilterInput.height - groupsFilterInput.anchors.topMargin - Style.marginM - Style.marginL)
 				
 				IdSelectionManager {
@@ -500,7 +511,7 @@ ViewBase {
 				productId: groupsPage.apiClient ? groupsPage.apiClient.tenantId : ""
 				
 				Component.onCompleted: {
-					createGroupView.model = groupsPage.groupDataFactory ? groupsPage.groupDataFactory() : null
+					createGroupView.model = groupsPage.apiClient ? groupsPage.apiClient.createGroupData() : null
 					createGroupView.updateGui()
 				}
 			}
@@ -522,7 +533,7 @@ ViewBase {
 				productId: groupsPage.apiClient ? groupsPage.apiClient.tenantId : ""
 				
 				Component.onCompleted: {
-					var groupData = groupsPage.groupDataFactory ? groupsPage.groupDataFactory() : null
+					var groupData = groupsPage.apiClient ? groupsPage.apiClient.createGroupData() : null
 					if (groupData) {
 						groupData.m_id = groupsPage.__editGroupId
 						groupData.m_name = groupsPage.__editGroupName
@@ -539,7 +550,7 @@ ViewBase {
 								&& groupsPage.stateManager.receivedGroupData
 								&& groupsPage.__editGroupId) {
 							var received = groupsPage.stateManager.receivedGroupData
-							var groupData = groupsPage.groupDataFactory ? groupsPage.groupDataFactory() : null
+							var groupData = groupsPage.apiClient ? groupsPage.apiClient.createGroupData() : null
 							if (groupData) {
 								groupData.m_id = groupsPage.__editGroupId
 								groupData.m_name = received.name || groupsPage.__editGroupName

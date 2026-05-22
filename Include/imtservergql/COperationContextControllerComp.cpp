@@ -5,11 +5,66 @@
 // ImtCore includes
 #include <imtbase/COperationContext.h>
 #include <imtauth/CUserInfo.h>
+#include <imtgql/CGqlRequest.h>
 #include <imtgql/IGqlRequestProvider.h>
 
 
 namespace imtservergql
 {
+
+
+namespace
+{
+
+
+QByteArray GetInputArgument(const imtgql::IGqlRequest& gqlRequest, const QByteArray& argumentId)
+{
+	const imtgql::CGqlRequest* concreteRequestPtr = dynamic_cast<const imtgql::CGqlRequest*>(&gqlRequest);
+	if (concreteRequestPtr == nullptr){
+		return QByteArray();
+	}
+
+	const imtgql::CGqlParamObject* inputParamPtr = concreteRequestPtr->GetParamObject("input");
+	if (inputParamPtr == nullptr || !inputParamPtr->ContainsParam(argumentId)){
+		return QByteArray();
+	}
+
+	return inputParamPtr->GetParamArgumentValue(argumentId).toByteArray();
+}
+
+
+bool IsTenantScopedProductCommand(const QByteArray& commandId)
+{
+	return commandId == QByteArrayLiteral("RoleAdd")
+			|| commandId == QByteArrayLiteral("RoleUpdate")
+			|| commandId == QByteArrayLiteral("GroupAdd")
+			|| commandId == QByteArrayLiteral("GroupUpdate")
+			|| commandId == QByteArrayLiteral("UserAdd")
+			|| commandId == QByteArrayLiteral("UserUpdate");
+}
+
+
+QByteArray GetOperationTenantId(
+			const imtgql::IGqlRequest& gqlRequest,
+			const imtgql::IGqlContext& requestContext)
+{
+	QByteArray tenantId = GetInputArgument(gqlRequest, "tenantId");
+	if (!tenantId.isEmpty()){
+		return tenantId;
+	}
+
+	if (IsTenantScopedProductCommand(gqlRequest.GetCommandId())){
+		tenantId = GetInputArgument(gqlRequest, "productId");
+		if (!tenantId.isEmpty()){
+			return tenantId;
+		}
+	}
+
+	return requestContext.GetTenantId();
+}
+
+
+} // namespace
 
 
 // protected methods
@@ -57,7 +112,7 @@ imtbase::IOperationContext* COperationContextControllerComp::CreateOperationCont
 
 	operationContextPtr->SetOperationOwnerId(objectInfo);
 
-	QByteArray tenantId = requestContextPtr->GetTenantId();
+	QByteArray tenantId = GetOperationTenantId(*gqlRequestPtr, *requestContextPtr);
 	operationContextPtr->SetTenantId(tenantId);
 
 	if (m_documentChangeGeneratorCompPtr.IsValid()){
@@ -74,5 +129,4 @@ imtbase::IOperationContext* COperationContextControllerComp::CreateOperationCont
 
 
 } // namespace imtservergql
-
 

@@ -23,7 +23,6 @@ ViewBase {
 	readonly property var tenantData: membersPage.model
 	property var stateManager: null
 	property var apiClient: null
-	property var userDataFactory: null
 	
 	function updateGui() {}
 	function updateModel() {}
@@ -43,8 +42,8 @@ ViewBase {
 				membersPage.stateManager.receivedUserData = data
 		}
 		function onUserCreated() {
-			if (membersPage.stateManager && membersPage.tenantData)
-				membersPage.stateManager.loadMembersFromModel()
+			if (membersPage.representationController)
+				membersPage.representationController.updateRepresentationFromDocument()
 		}
 		function onMemberRemoved(userId) {
 			if (membersPage.stateManager)
@@ -697,7 +696,7 @@ ViewBase {
 				
 				Component.onCompleted: {
 					membersPage.__isCreatingUser = true
-					createUserView.model = membersPage.userDataFactory ? membersPage.userDataFactory() : null
+					createUserView.model = membersPage.apiClient ? membersPage.apiClient.createUserData() : null
 					createUserView.updateGui()
 				}
 			}
@@ -719,7 +718,7 @@ ViewBase {
 				productId: membersPage.apiClient ? membersPage.apiClient.tenantId : ""
 				
 				Component.onCompleted: {
-					var userData = membersPage.userDataFactory ? membersPage.userDataFactory() : null
+					var userData = membersPage.apiClient ? membersPage.apiClient.createUserData() : null
 					if (userData) {
 						userData.m_id = membersPage.__editMemberId
 						userData.m_name = membersPage.__editMemberName
@@ -735,7 +734,7 @@ ViewBase {
 								&& membersPage.stateManager.receivedUserData
 								&& membersPage.__editMemberId) {
 							var received = membersPage.stateManager.receivedUserData
-							var userData = membersPage.userDataFactory ? membersPage.userDataFactory() : null
+							var userData = membersPage.apiClient ? membersPage.apiClient.createUserData() : null
 							if (userData) {
 								userData.m_id = membersPage.__editMemberId
 								userData.m_name = received.name || membersPage.__editMemberName

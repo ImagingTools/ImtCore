@@ -29,6 +29,10 @@ QtObject {
 
 	property string tenantId: ""
 
+	property Component __roleDataComp: Component { RoleData {} }
+	property Component __groupDataComp: Component { GroupData {} }
+	property Component __userDataComp: Component { UserData {} }
+
 	// =========================================================================
 	// Abstract contract (must mirror TenantMembershipApiClient.qml)
 	// =========================================================================
@@ -249,13 +253,42 @@ QtObject {
 
 	// --- Users (Users.sdl: UserItem / UserAdd / UserUpdate) ---
 	property UserDataInput __userAddInput: UserDataInput {}
+	property string __pendingAddedUserId: ""
 	property GqlSdlRequestSender __userAddSender: GqlSdlRequestSender {
 		requestType: 1
 		gqlCommandId: ImtauthUsersSdlCommandIds.s_userAdd
 
 		sdlObjectComp: Component {
 			AddedNotificationPayload {
-				onFinished: { root.userCreated() }
+				onFinished: {
+					root.__pendingAddedUserId = m_id || ""
+					if (root.tenantId !== "" && root.__pendingAddedUserId !== "") {
+						root.__addMembershipInput.m_userId = root.__pendingAddedUserId
+						root.__addMembershipInput.m_tenantId = root.tenantId
+						root.__addMembershipInput.m_role = "Member"
+						root.__addMembershipSender.send(root.__addMembershipInput)
+					} else {
+						root.userCreated()
+					}
+				}
+			}
+		}
+	}
+
+	property AddMembershipInput __addMembershipInput: AddMembershipInput {}
+	property GqlSdlRequestSender __addMembershipSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_addMembership
+
+		sdlObjectComp: Component {
+			AddMembershipPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					}
+					root.userCreated()
+				}
 			}
 		}
 	}
@@ -343,11 +376,16 @@ QtObject {
 		root.__findMembershipForRemoveSender.send(root.__findMembershipForRemoveInput)
 	}
 
+	function createRoleData() {
+		return root.__roleDataComp.createObject(root, {"m_productId": root.tenantId})
+	}
+
 	function insertRole(roleId, roleData) {
 		if (!roleData){
 			return
 		}
 
+		roleData.m_productId = root.tenantId
 		root.__roleAddInput.m_id = roleId
 		root.__roleAddInput.m_typeId = "Role"
 		root.__roleAddInput.m_productId = root.tenantId
@@ -370,6 +408,7 @@ QtObject {
 			return
 		}
 
+		roleData.m_productId = root.tenantId
 		root.__pendingSetRoleId = roleId
 		root.__roleUpdateInput.m_id = roleId || ""
 		root.__roleUpdateInput.m_typeId = "Role"
@@ -387,11 +426,16 @@ QtObject {
 		root.__roleItemSender.send(root.__roleItemInput)
 	}
 
+	function createGroupData() {
+		return root.__groupDataComp.createObject(root, {"m_productId": root.tenantId})
+	}
+
 	function insertGroup(groupId, groupData) {
 		if (!groupData){
 			return
 		}
 
+		groupData.m_productId = root.tenantId
 		root.__groupAddInput.m_id = groupId
 		root.__groupAddInput.m_typeId = "Group"
 		root.__groupAddInput.m_productId = root.tenantId
@@ -414,6 +458,7 @@ QtObject {
 			return
 		}
 
+		groupData.m_productId = root.tenantId
 		root.__pendingSetGroupId = groupId
 		root.__groupUpdateInput.m_id = groupId || ""
 		root.__groupUpdateInput.m_typeId = "Group"
@@ -431,11 +476,16 @@ QtObject {
 		root.__groupItemSender.send(root.__groupItemInput)
 	}
 
+	function createUserData() {
+		return root.__userDataComp.createObject(root, {"m_productId": root.tenantId})
+	}
+
 	function insertUser(userId, userData) {
 		if (!userData){
 			return
 		}
 
+		userData.m_productId = root.tenantId
 		root.__userAddInput.m_id = userId
 		root.__userAddInput.m_typeId = "User"
 		root.__userAddInput.m_productId = root.tenantId
@@ -458,6 +508,7 @@ QtObject {
 			return
 		}
 
+		userData.m_productId = root.tenantId
 		root.__pendingSetUserId = userId
 		root.__userUpdateInput.m_id = userId || ""
 		root.__userUpdateInput.m_typeId = "User"

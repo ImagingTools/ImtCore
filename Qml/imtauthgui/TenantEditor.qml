@@ -7,9 +7,6 @@ import imtcontrols 1.0
 import imtcolgui 1.0
 import imtdocgui 1.0
 import imtauthTenantsSdl 1.0
-import imtauthRolesSdl 1.0
-import imtauthGroupsSdl 1.0
-import imtauthUsersSdl 1.0
 
 /**
  * TenantEditor
@@ -23,9 +20,7 @@ import imtauthUsersSdl 1.0
  * imports). The concrete client (e.g. GqlBasedTenantMembershipApiClient from
  * imtguigql) is supplied by the embedding view (e.g. TenantCollectionView).
  *
- * SDL imports here are limited to:
- *   - imtauthTenantsSdl (TenantData type of the model)
- *   - imtauthRolesSdl / imtauthGroupsSdl / imtauthUsersSdl (data factories for editors)
+ * SDL imports here are limited to imtauthTenantsSdl (TenantData type of the model).
  */
 DocumentViewBase {
 	id: container
@@ -55,29 +50,6 @@ DocumentViewBase {
 		id: stateManager_
 		tenantData: container.tenantData
 		apiClient: container.apiClient
-	}
-
-	// --- Convenience: data factories the pages cannot create themselves
-	// (they can't import the SDL modules).
-	function createRoleData() {
-		var comp = Qt.createComponent("qrc:/imtauthRolesSdl/RoleData.qml")
-		if (comp.status === Component.Ready)
-			return comp.createObject(container)
-		return null
-	}
-
-	function createGroupData() {
-		var comp = Qt.createComponent("qrc:/imtauthGroupsSdl/GroupData.qml")
-		if (comp.status === Component.Ready)
-			return comp.createObject(container)
-		return null
-	}
-
-	function createUserData() {
-		var comp = Qt.createComponent("qrc:/imtauthUsersSdl/UserData.qml")
-		if (comp.status === Component.Ready)
-			return comp.createObject(container)
-		return null
 	}
 
 	function updateGui() {
@@ -221,7 +193,6 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
-			userDataFactory: container.createUserData
 		}
 	}
 
@@ -232,7 +203,6 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
-			roleDataFactory: container.createRoleData
 		}
 	}
 
@@ -243,7 +213,6 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
-			groupDataFactory: container.createGroupData
 		}
 	}
 
