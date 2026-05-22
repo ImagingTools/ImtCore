@@ -6,6 +6,7 @@
 #include <ifile/IFilePersistence.h>
 
 // ImtCore includes
+#include <imtauth/ITenantFilterParam.h>
 #include <imtbase/IComplexCollectionFilter.h>
 #include <imtbase/IRevisionController.h>
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
@@ -159,7 +160,7 @@ protected:
 	virtual QString CreateTenantBindingTableName() const;
 	virtual QByteArray CreateTenantBindingTableInitializationQuery() const;
 	virtual void EnsureTenantBindingTableExists() const;
-	virtual QString CreateTenantBindingFilterQuery(const QByteArray& tenantId) const;
+	virtual QString CreateTenantBindingFilterQuery(const QByteArray& tenantId, imtauth::TenantFilterMode filterMode = imtauth::TFM_INCLUDE) const;
 	virtual QByteArray CreateTenantBindingInsertQuery(const QByteArray& tenantId, const QByteArray& entityId, const imtbase::IOperationContext* operationContextPtr) const;
 
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)

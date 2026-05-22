@@ -221,6 +221,11 @@ I_EXPORT_COMPONENT(
 			"Tenant Collection Document Service Controller");
 
 I_EXPORT_COMPONENT(
+			TenantExclusionParamsSetJoiner,
+			"Params set joiner that applies tenant filter in Exclude mode",
+			"Tenant Exclusion Params Set Joiner");
+
+I_EXPORT_COMPONENT(
 			RemoteTenantController,
 			"Remote tenant controller",
 			"Remote Tenant Controller");
