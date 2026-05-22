@@ -131,7 +131,7 @@ Item {
 
 		header: Item {
 			width: listViewArea.width
-			height: (listViewArea.count === 0 || dataProvider.isInitialLoading) ? Style.controlHeightL + Style.marginL : 0
+			height: listViewArea.count === 0 ? Style.controlHeightL + Style.marginL : 0
 			visible: height > 0
 
 			BaseText {
