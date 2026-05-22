@@ -241,12 +241,24 @@ Item {
 		}
 
 		// Empty state
-		BaseText {
+		Rectangle {
 			visible: listViewArea.count === 0 && !dataProvider.isInitialLoading
-			anchors.centerIn: parent
-			text: root.emptyMessage
-			font.pixelSize: Style.fontSizeM
-			color: Style.inactiveTextColor
+			anchors.left: parent.left
+			anchors.right: parent.right
+			anchors.top: parent.top
+			anchors.margins: Style.marginM
+			height: Style.controlHeightL + Style.marginL
+			color: "transparent"
+			border.color: Style.borderColor
+			border.width: 1
+			radius: Style.radiusM
+
+			BaseText {
+				anchors.centerIn: parent
+				text: root.emptyMessage
+				font.pixelSize: Style.fontSizeM
+				color: Style.inactiveTextColor
+			}
 		}
 
 		// Loading state

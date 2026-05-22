@@ -109,7 +109,7 @@
                         <Data IsEnabled="true" Value="1"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="New"/>
+                        <Data IsEnabled="true" Value="Switch"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Description" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Switch to this organization"/>

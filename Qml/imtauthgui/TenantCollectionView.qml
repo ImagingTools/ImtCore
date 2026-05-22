@@ -403,9 +403,16 @@ RemoteCollectionView {
 
 			function updateStateCustomCommands(selection, commandsController, elementsModel){
 				let isEnabled = selection.length === 1;
+				let canEdit = false;
+				if (isEnabled && elementsModel) {
+					// Edit is only allowed if the selected tenant matches the current authorized tenant
+					var tenantId = elementsModel.getData("id", selection[0]);
+					canEdit = tenantId && tenantId === AuthorizationController.currentTenantId;
+				}
 				if(commandsController){
 					commandsController.setCommandIsEnabled("Switch", isEnabled);
 					commandsController.setCommandIsEnabled("Leave", isEnabled);
+					commandsController.setCommandIsEnabled("Edit", canEdit);
 				}
 			}
 

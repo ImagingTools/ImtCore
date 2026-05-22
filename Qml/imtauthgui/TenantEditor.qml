@@ -7,9 +7,6 @@ import imtcontrols 1.0
 import imtcolgui 1.0
 import imtdocgui 1.0
 import imtauthTenantsSdl 1.0
-import imtauthRolesSdl 1.0
-import imtauthGroupsSdl 1.0
-import imtauthUsersSdl 1.0
 
 /**
  * TenantEditor
@@ -25,7 +22,8 @@ import imtauthUsersSdl 1.0
  *
  * SDL imports here are limited to:
  *   - imtauthTenantsSdl (TenantData type of the model)
- *   - imtauthRolesSdl / imtauthGroupsSdl / imtauthUsersSdl (data factories for editors)
+ *
+ * Data factories (RoleData/GroupData/UserData) are delegated to the injected apiClient.
  */
 DocumentViewBase {
 	id: container
@@ -54,26 +52,23 @@ DocumentViewBase {
 		apiClient: container.apiClient
 	}
 
-	// --- Convenience: data factories the pages cannot create themselves
-	// (they can't import the SDL modules).
+	// --- Convenience: data factories delegated to apiClient
+	// (which already imports the SDL modules).
 	function createRoleData() {
-		var comp = Qt.createComponent("qrc:/imtauthRolesSdl/RoleData.qml")
-		if (comp.status === Component.Ready)
-			return comp.createObject(container)
+		if (container.apiClient && container.apiClient.createRoleData)
+			return container.apiClient.createRoleData()
 		return null
 	}
 
 	function createGroupData() {
-		var comp = Qt.createComponent("qrc:/imtauthGroupsSdl/GroupData.qml")
-		if (comp.status === Component.Ready)
-			return comp.createObject(container)
+		if (container.apiClient && container.apiClient.createGroupData)
+			return container.apiClient.createGroupData()
 		return null
 	}
 
 	function createUserData() {
-		var comp = Qt.createComponent("qrc:/imtauthUsersSdl/UserData.qml")
-		if (comp.status === Component.Ready)
-			return comp.createObject(container)
+		if (container.apiClient && container.apiClient.createUserData)
+			return container.apiClient.createUserData()
 		return null
 	}
 

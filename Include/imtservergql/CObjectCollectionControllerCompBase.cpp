@@ -2925,7 +2925,6 @@ imtauth::CTenantFilterParam* CObjectCollectionControllerCompBase::CreateTenantFi
 
 	imtauth::CTenantFilterParam* tenantFilterPtr = new imtauth::CTenantFilterParam();
 	tenantFilterPtr->SetTenantId(gqlContextPtr->GetTenantId());
-	tenantFilterPtr->SetOwnerId(gqlContextPtr->GetUserId());
 
 	return tenantFilterPtr;
 }
