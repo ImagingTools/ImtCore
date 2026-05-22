@@ -15,9 +15,8 @@ Rectangle {
 	width: contentWidth;
 	color: Style.baseColor;
 
-	property bool opened: false;
+	property bool opened: true;
 	property int contentWidth: Style.sizeHintL;
-	property int collapsedWidth: Style.buttonHeightS + 2 * Style.marginXL;
 	property alias contentHeight: historyView.contentHeight;
 	property string documentId: "";
 	property alias collectionId: historyView.collectionId;
@@ -25,9 +24,6 @@ Rectangle {
 
 	Component.onCompleted: {
 		historyPanel.visible = PermissionsController.checkPermission("ViewRevisions");
-		if (!historyPanel.opened){
-			historyPanel.width = historyPanel.collapsedWidth;
-		}
 	}
 
 	Connections {
@@ -51,12 +47,12 @@ Rectangle {
 
 	onOpenedChanged: {
 		if (opened){
-			animation.from = historyPanel.collapsedWidth;
+			animation.from = 0;
 			animation.to = contentWidth;
 		}
 		else{
 			animation.from = contentWidth;
-			animation.to = historyPanel.collapsedWidth;
+			animation.to = 0;
 		}
 
 		animation.start();

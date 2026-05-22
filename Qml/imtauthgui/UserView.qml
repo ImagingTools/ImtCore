@@ -319,31 +319,22 @@ ViewBase {
 				
 				width: parent.width;
 
-				ItemSelectElementView {
+				SelectableCollectionEditor {
 					id: roleSelectableCollectionEditor
 					collectionId: "Roles"
-						productId: container.productId
-						label: qsTr("Roles")
-						addButtonText: qsTr("Add Role")
-						showCount: true
-						onSelectionChanged: {
-							container.doUpdateModel()
-						}
+					targetTitle: qsTr("Roles")
+					sourceTitle: qsTr("Adding Role")
+					onSelectionChanged: {
+						container.doUpdateModel()
 					}
+				}
 
 				function updateGui(){
-					var ids = container.userData.m_roles ? container.userData.m_roles.slice() : []
-					var arr = []
-					for (var i = 0; i < ids.length; i++)
-						arr.push({id: ids[i], name: ids[i]})
-					roleSelectableCollectionEditor.items = arr
+					roleSelectableCollectionEditor.selectedIds = container.userData.m_roles.slice()
 				}
 				
 				function updateModel(){
-					var arr = []
-					for (var i = 0; i < roleSelectableCollectionEditor.items.length; i++)
-						arr.push(roleSelectableCollectionEditor.items[i].id)
-					container.userData.m_roles = arr
+					container.userData.m_roles = roleSelectableCollectionEditor.selectedIds.slice()
 				}
 			}
 			
@@ -359,31 +350,22 @@ ViewBase {
 				
 				width: parent.width;
 
-				ItemSelectElementView {
+				SelectableCollectionEditor {
 					id: groupSelectableCollectionEditor
 					collectionId: "Groups"
-						productId: container.productId
-						label: qsTr("Groups")
-						addButtonText: qsTr("Add Group")
-						showCount: true
-						onSelectionChanged: {
-							container.doUpdateModel()
-						}
+					targetTitle: qsTr("Groups")
+					sourceTitle: qsTr("Adding Group")
+					onSelectionChanged: {
+						container.doUpdateModel()
 					}
+				}
 
 				function updateGui(){
-					var ids = container.userData.m_groups ? container.userData.m_groups.slice() : []
-					var arr = []
-					for (var i = 0; i < ids.length; i++)
-						arr.push({id: ids[i], name: ids[i]})
-					groupSelectableCollectionEditor.items = arr
+					groupSelectableCollectionEditor.selectedIds = container.userData.m_groups.slice()
 				}
 				
 				function updateModel(){
-					var arr = []
-					for (var i = 0; i < groupSelectableCollectionEditor.items.length; i++)
-						arr.push(groupSelectableCollectionEditor.items[i].id)
-					container.userData.m_groups = arr
+					container.userData.m_groups = groupSelectableCollectionEditor.selectedIds.slice()
 				}
 			}
 		}

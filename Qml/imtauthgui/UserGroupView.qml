@@ -6,6 +6,8 @@ import imtguigql 1.0
 import imtcontrols 1.0
 import imtauthGroupsSdl 1.0
 import imtdocgui 1.0
+import imtbaseImtBaseTypesSdl 1.0
+import imtbaseComplexCollectionFilterSdl 1.0
 
 ViewBase {
 	id: container;
@@ -138,35 +140,41 @@ ViewBase {
 					KeyNavigation.backtab: nameInput;
 				}
 				
-				ItemSelectElementView {
+				SelectableCollectionEditor {
 					id: groupSelectableCollectionEditor
 					collectionId: "Groups"
-						productId: container.productId
-						label: qsTr("Parent Groups")
-						addButtonText: qsTr("Add Parent Group")
-						showCount: true
-						onSelectionChanged: {
-							container.doUpdateModel()
+					targetTitle: qsTr("Parent Groups")
+					sourceTitle: qsTr("Adding Parent Group")
+					onSelectionChanged: {
+						container.doUpdateModel()
+					}
+					
+					Component {
+						id: fieldFilterComp
+						FieldFilter {
+							m_fieldId: "DocumentId"
+							m_filterValueType: "String"
+							m_filterValue: !container.groupData ? "" : container.groupData.m_id
+							m_filterOperations: ["Not", "Equal"]
 						}
 					}
+					
+					function setSourceAdditionalFilters(collection){
+						let fieldFilter = fieldFilterComp.createObject(collection.collectionFilter)
+						collection.collectionFilter.addFieldFilter(fieldFilter)
+					}
+				}
 
 				function updateGui(){
 					nameInput.text = container.groupData.m_name;
 					descriptionInput.text = container.groupData.m_description;
-					var ids = container.groupData.m_parentGroups ? container.groupData.m_parentGroups.slice() : []
-					var arr = []
-					for (var i = 0; i < ids.length; i++)
-						arr.push({id: ids[i], name: ids[i]})
-					groupSelectableCollectionEditor.items = arr
+					groupSelectableCollectionEditor.selectedIds = container.groupData.m_parentGroups.slice()
 				}
 				
 				function updateModel(){
 					container.groupData.m_description = descriptionInput.text;
 					container.groupData.m_name = nameInput.text;
-					var arr = []
-					for (var i = 0; i < groupSelectableCollectionEditor.items.length; i++)
-						arr.push(groupSelectableCollectionEditor.items[i].id)
-					container.groupData.m_parentGroups = arr
+					container.groupData.m_parentGroups = groupSelectableCollectionEditor.selectedIds.slice()
 				}
 			}
 			
@@ -175,31 +183,23 @@ ViewBase {
 				
 				width: parent.width;
 				
-				ItemSelectElementView {
+				SelectableCollectionEditor {
 					id: userSelectableCollectionEditor
 					collectionId: "Users"
-						productId: container.productId
-						label: qsTr("Users")
-						addButtonText: qsTr("Add User")
-						showCount: true
-						onSelectionChanged: {
-							container.doUpdateModel()
-						}
+					targetTitle: qsTr("Users")
+					sourceTitle: qsTr("Adding Users")
+					targetRequestedFields: ["id", "name"]
+					onSelectionChanged: {
+						container.doUpdateModel()
 					}
+				}
 				
 				function updateGui(){
-					var ids = container.groupData.m_users ? container.groupData.m_users.slice() : []
-					var arr = []
-					for (var i = 0; i < ids.length; i++)
-						arr.push({id: ids[i], name: ids[i]})
-					userSelectableCollectionEditor.items = arr
+					userSelectableCollectionEditor.selectedIds = container.groupData.m_users.slice()
 				}
 				
 				function updateModel(){
-					var arr = []
-					for (var i = 0; i < userSelectableCollectionEditor.items.length; i++)
-						arr.push(userSelectableCollectionEditor.items[i].id)
-					container.groupData.m_users = arr
+					container.groupData.m_users = userSelectableCollectionEditor.selectedIds.slice()
 				}
 			}
 
@@ -208,31 +208,23 @@ ViewBase {
 				
 				width: parent.width;
 				
-				ItemSelectElementView {
+				SelectableCollectionEditor {
 					id: roleSelectableCollectionEditor
 					collectionId: "Roles"
-						productId: container.productId
-						label: qsTr("Roles")
-						addButtonText: qsTr("Add Role")
-						showCount: true
-						onSelectionChanged: {
-							container.doUpdateModel()
-						}
+					targetTitle: qsTr("Roles")
+					sourceTitle: qsTr("Adding Roles")
+					targetRequestedFields: ["roleName", "description"]
+					onSelectionChanged: {
+						container.doUpdateModel()
 					}
+				}
 
 				function updateGui(){
-					var ids = container.groupData.m_roles ? container.groupData.m_roles.slice() : []
-					var arr = []
-					for (var i = 0; i < ids.length; i++)
-						arr.push({id: ids[i], name: ids[i]})
-					roleSelectableCollectionEditor.items = arr
+					roleSelectableCollectionEditor.selectedIds = container.groupData.m_roles.slice()
 				}
 				
 				function updateModel(){
-					var arr = []
-					for (var i = 0; i < roleSelectableCollectionEditor.items.length; i++)
-						arr.push(roleSelectableCollectionEditor.items[i].id)
-					container.groupData.m_roles = arr
+					container.groupData.m_roles = roleSelectableCollectionEditor.selectedIds.slice()
 				}
 			}
 		}

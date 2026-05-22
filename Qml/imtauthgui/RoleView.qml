@@ -6,6 +6,8 @@ import imtcontrols 1.0
 import imtauthRolesSdl 1.0
 import imtdocgui 1.0
 import imtguigql 1.0
+import imtbaseComplexCollectionFilterSdl 1.0
+import imtbaseImtBaseTypesSdl 1.0
 
 ViewBase {
 	id: container;
@@ -150,37 +152,51 @@ ViewBase {
 					KeyNavigation.backtab: roleIdInput;
 				}
 				
-				ItemSelectElementView {
+				SelectableCollectionEditor {
 					id: roleSelectableCollectionEditor
 					collectionId: "Roles"
-						productId: container.productId
-						label: qsTr("Parent Roles")
-						addButtonText: qsTr("Add Parent Role")
-						showCount: true
-						onSelectionChanged: {
-							container.doUpdateModel()
+					targetTitle: qsTr("Parent Roles")
+					sourceTitle: qsTr("Adding Parent Role")
+					onSelectionChanged: {
+						container.doUpdateModel()
+					}
+					
+					Component {
+						id: fieldFilterComp
+						FieldFilter {
+							m_fieldId: "DocumentId"
+							m_filterValueType: "String"
+							m_filterValue: !container.roleData ? "" : container.roleData.m_id
+							m_filterOperations: ["Not", "Equal"]
 						}
 					}
+
+					IdParam {
+						id: idParameter
+						m_id: !container.roleData ? "" : container.roleData.m_id
+					}
+
+					function setSourceAdditionalFilters(collection){
+						let fieldFilter = fieldFilterComp.createObject(collection.collectionFilter)
+						collection.collectionFilter.addFieldFilter(fieldFilter)
+
+						collection.registerFilter("ParentListFilter", idParameter)
+						collection.setFilterIsEnabled("ParentListFilter", true)
+					}
+				}
 
 				function updateGui(){
 					roleIdInput.text = container.roleData.m_roleId;
 					roleNameInput.text = container.roleData.m_name;
 					descriptionInput.text = container.roleData.m_description;
-					var ids = container.roleData.m_parentRoles ? container.roleData.m_parentRoles.slice() : []
-					var arr = []
-					for (var i = 0; i < ids.length; i++)
-						arr.push({id: ids[i], name: ids[i]})
-					roleSelectableCollectionEditor.items = arr
+					roleSelectableCollectionEditor.selectedIds = container.roleData.m_parentRoles.slice()
 				}
 				
 				function updateModel(){
 					container.roleData.m_roleId = roleIdInput.text;
 					container.roleData.m_name = roleNameInput.text;
 					container.roleData.m_description = descriptionInput.text;
-					var arr = []
-					for (var i = 0; i < roleSelectableCollectionEditor.items.length; i++)
-						arr.push(roleSelectableCollectionEditor.items[i].id)
-					container.roleData.m_parentRoles = arr
+					container.roleData.m_parentRoles = roleSelectableCollectionEditor.selectedIds.slice()
 				}
 			}
 			

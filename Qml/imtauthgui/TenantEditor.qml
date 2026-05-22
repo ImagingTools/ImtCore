@@ -7,6 +7,9 @@ import imtcontrols 1.0
 import imtcolgui 1.0
 import imtdocgui 1.0
 import imtauthTenantsSdl 1.0
+import imtauthRolesSdl 1.0
+import imtauthGroupsSdl 1.0
+import imtauthUsersSdl 1.0
 
 /**
  * TenantEditor
@@ -20,16 +23,15 @@ import imtauthTenantsSdl 1.0
  * imports). The concrete client (e.g. GqlBasedTenantMembershipApiClient from
  * imtguigql) is supplied by the embedding view (e.g. TenantCollectionView).
  *
- * SDL imports here are limited to imtauthTenantsSdl (TenantData type of the model).
+ * SDL imports here are limited to:
+ *   - imtauthTenantsSdl (TenantData type of the model)
+ *   - imtauthRolesSdl / imtauthGroupsSdl / imtauthUsersSdl (data factories for editors)
  */
 DocumentViewBase {
 	id: container
 
 	anchors.fill: parent
 	contentColor: Style.baseColor
-
-	// GitHub-like typography applied locally within TenantEditor scope
-	// font.family: "Segoe UI, Helvetica, Arial, sans-serif"
 
 	property TenantData tenantData: model
 
@@ -50,6 +52,29 @@ DocumentViewBase {
 		id: stateManager_
 		tenantData: container.tenantData
 		apiClient: container.apiClient
+	}
+
+	// --- Convenience: data factories the pages cannot create themselves
+	// (they can't import the SDL modules).
+	function createRoleData() {
+		var comp = Qt.createComponent("qrc:/imtauthRolesSdl/RoleData.qml")
+		if (comp.status === Component.Ready)
+			return comp.createObject(container)
+		return null
+	}
+
+	function createGroupData() {
+		var comp = Qt.createComponent("qrc:/imtauthGroupsSdl/GroupData.qml")
+		if (comp.status === Component.Ready)
+			return comp.createObject(container)
+		return null
+	}
+
+	function createUserData() {
+		var comp = Qt.createComponent("qrc:/imtauthUsersSdl/UserData.qml")
+		if (comp.status === Component.Ready)
+			return comp.createObject(container)
+		return null
 	}
 
 	function updateGui() {
@@ -126,48 +151,42 @@ DocumentViewBase {
 	Connections {
 		target: container.apiClient
 		function onInvitationCreated() {
-			PopupManager.addSuccessMessage(qsTr("Invitation created successfully"), true)
 			if (container.representationController)
 				container.representationController.updateRepresentationFromDocument()
 		}
 		function onOwnershipTransferred() {
-			PopupManager.addSuccessMessage(qsTr("Ownership transferred successfully"), true)
 			if (container.representationController)
 				container.representationController.updateRepresentationFromDocument()
 		}
-		function onRoleCreated() {
-			PopupManager.addSuccessMessage(qsTr("Role created successfully"), true)
-		}
-		function onGroupCreated() {
-			PopupManager.addSuccessMessage(qsTr("Group created successfully"), true)
-		}
-		function onUserCreated() {
-			PopupManager.addSuccessMessage(qsTr("User created successfully"), true)
-		}
-		function onSubscriptionInvitationAccepted(notification) {
+	}
+
+	// --- Subscription: real-time membership notifications ---
+	TenantMembershipSubscriptionClient {
+		id: membershipSubscription
+
+		onInvitationAccepted: {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (notification.tenantId === container.tenantData.m_id) {
-				PopupManager.addSuccessMessage(qsTr("Invitation accepted"), true)
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
 		}
-		function onSubscriptionInvitationRejected(notification) {
+
+		onInvitationRejected: {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (notification.tenantId === container.tenantData.m_id) {
-				PopupManager.addInfoMessage(qsTr("Invitation rejected"), true)
 				stateManager_.removePendingInvitation(notification.membershipId)
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
 		}
-		function onSubscriptionOwnershipTransferred(notification) {
+
+		onOwnershipTransferred: {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (notification.tenantId === container.tenantData.m_id) {
-				PopupManager.addInfoMessage(qsTr("Ownership transferred"), true)
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
@@ -193,6 +212,7 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
+			userDataFactory: container.createUserData
 		}
 	}
 
@@ -203,6 +223,7 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
+			roleDataFactory: container.createRoleData
 		}
 	}
 
@@ -213,6 +234,7 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
+			groupDataFactory: container.createGroupData
 		}
 	}
 

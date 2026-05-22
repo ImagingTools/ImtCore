@@ -47,11 +47,6 @@ QtObject {
 	// --- Generic error ---
 	signal requestFailed(string message)
 
-	// --- Real-time membership subscription notifications ---
-	signal subscriptionInvitationAccepted(var notification)
-	signal subscriptionInvitationRejected(var notification)
-	signal subscriptionOwnershipTransferred(var notification)
-
 	// --- Stub methods (overridden by concrete implementations) ---
 	function createInvitation(tenantId, userId, role) {}
 	function revokeInvitation(invitationId) {}
@@ -61,21 +56,18 @@ QtObject {
 	function setMemberRole(tenantId, userId, role) {}
 	function removeMember(tenantId, userId) {}
 
-	function createRoleData() {}
-	function insertRole(roleId, roleData) {}
+	function insertRole(name, description) {}
 	function removeRole(roleId) {}
-	function setRoleData(roleId, roleData) {}
+	function setRoleData(roleId, name, description) {}
 	function getRoleData(roleId) {}
 
-	function createGroupData() {}
-	function insertGroup(groupId, groupData) {}
+	function insertGroup(name, description) {}
 	function removeGroup(groupId) {}
-	function setGroupData(groupId, groupData) {}
+	function setGroupData(groupId, name, description) {}
 	function getGroupData(groupId) {}
 
-	function createUserData() {}
-	function insertUser(userId, userData) {}
+	function insertUser(name, description) {}
 	function removeUser(userId) {}
-	function setUserData(userId, userData) {}
+	function setUserData(userId, name, description) {}
 	function getUserData(userId) {}
 }

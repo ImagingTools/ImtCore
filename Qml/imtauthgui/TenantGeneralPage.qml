@@ -39,7 +39,7 @@ ViewBase {
 	}
 
 	readonly property bool __readOnly: !(generalPage.stateManager
-		&& (generalPage.stateManager.isCreator || generalPage.stateManager.isOwner || generalPage.stateManager.isNewTenant))
+		&& (generalPage.stateManager.isOwner || generalPage.stateManager.isNewTenant))
 
 	CustomScrollbar {
 		id: generalScrollbar
