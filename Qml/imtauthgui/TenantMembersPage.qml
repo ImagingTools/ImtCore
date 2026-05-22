@@ -608,7 +608,7 @@ ViewBase {
 		FilterableSelectPopup {
 			dataProvider: FilterableSelectGqlDataProvider {
 				collectionId: "Users"
-				productId: membersPage.apiClient ? membersPage.apiClient.productId : ""
+				tenantId: membersPage.apiClient ? membersPage.apiClient.productId : ""
 				multiSelect: true
 			}
 			

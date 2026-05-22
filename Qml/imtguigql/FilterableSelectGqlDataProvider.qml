@@ -25,7 +25,7 @@ import imtbaseFilterableSelectSdl 1.0
 FilterableSelectDataProvider {
 	id: root
 
-	property string productId: ""
+	property string tenantId: ""
 
 	function getHeaders(){
 		return {}
@@ -101,11 +101,11 @@ FilterableSelectDataProvider {
 
 		getSelectableItemsInput.m_collectionId = root.collectionId
 
-		// Pass productId for tenant-scoped filtering
-		if (root.productId && root.productId !== "")
-			getSelectableItemsInput.m_productId = root.productId
+		// Pass tenantId for tenant-scoped filtering
+		if (root.tenantId && root.tenantId !== "")
+			getSelectableItemsInput.m_tenantId = root.tenantId
 		else
-			getSelectableItemsInput.m_productId = null
+			getSelectableItemsInput.m_tenantId = null
 
 		// Pass selected IDs as excludeIds for server-side filtering
 		var selectedIds = root.getSelectedIds()

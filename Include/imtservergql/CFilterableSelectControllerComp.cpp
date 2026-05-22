@@ -71,16 +71,16 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 	int count = -1;
 	iprm::CParamsSet filterParams;
 
-	// Extract productId from input or request headers for tenant-scoped filtering
-	QByteArray productId;
-	if (arguments.input.Version_1_0->productId){
-		productId = (*arguments.input.Version_1_0->productId).toUtf8();
+	// Extract tenantId from input or request headers for tenant-scoped filtering
+	QByteArray tenantId;
+	if (arguments.input.Version_1_0->tenantId){
+		tenantId = (*arguments.input.Version_1_0->tenantId).toUtf8();
 	}
-	if (productId.isEmpty()){
-		productId = gqlRequest.GetHeader("productid");
+	if (tenantId.isEmpty()){
+		tenantId = gqlRequest.GetHeader("tenantid");
 	}
-	if (!productId.isEmpty()){
-		filterParams.SetParameter("ProductId", productId);
+	if (!tenantId.isEmpty()){
+		filterParams.SetParameter("TenantId", tenantId);
 	}
 
 	// Exclude selected IDs: create CDocumentIdFilter with CT_NOT_IN

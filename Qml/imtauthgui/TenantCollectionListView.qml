@@ -40,7 +40,7 @@ Item {
 	FilterableSelectGqlDataProvider {
 		id: dataProvider
 		collectionId: root.collectionId
-		productId: root.productId
+		tenantId: root.productId
 		pageSize: 50
 	}
 

@@ -30,6 +30,39 @@ RemoteCollectionView {
 		registerFieldFilterDelegate("tenantRelationFilter", tenantRelationDelegateFilterComp)
 	}
 
+	onCommandActivated: function(commandId) {
+		if (commandId === "Switch") {
+			let indexes = table.getSelectedIndexes()
+			if (indexes.length === 1) {
+				let tenantId = table.elements.getData("id", indexes[0])
+				container.switchToTenant(tenantId)
+			}
+		} else if (commandId === "Leave") {
+			let indexes = table.getSelectedIndexes()
+			if (indexes.length === 1) {
+				let tenantId = table.elements.getData("id", indexes[0])
+				let tenantName = table.elements.getData("name", indexes[0])
+				ModalDialogManager.openDialog(leaveConfirmDialogComp, {"tenantId": tenantId, "tenantName": tenantName || tenantId})
+			}
+		}
+	}
+
+	Component {
+		id: leaveConfirmDialogComp
+		MessageDialog {
+			property string tenantId: ""
+			property string tenantName: ""
+			width: Style.sizeHintM
+			title: qsTr("Leave organization")
+			message: qsTr("Are you sure you want to leave \"%1\"?").arg(tenantName)
+			onFinished: {
+				if (buttonId == Enums.yes) {
+					container.leaveTenant(tenantId)
+				}
+			}
+		}
+	}
+
 	// --- Subscription for real-time invitation notifications ---
 	TenantMembershipSubscriptionClient {
 		id: collectionMembershipSubscription
@@ -392,13 +425,129 @@ RemoteCollectionView {
 		}
 	}
 
+	// --- Switch to organization ---
+	function switchToTenant(tenantId) {
+		if (tenantId && tenantId !== AuthorizationController.currentTenantId) {
+			AuthorizationController.selectTenant(tenantId)
+		}
+	}
+
+	// --- Leave organization ---
+	function leaveTenant(tenantId) {
+		if (!tenantId) return
+		__leaveTenantId = tenantId
+		__findMembershipForLeaveInput.m_userId = AuthorizationController.userTokenProvider.userId
+		__findMembershipForLeaveInput.m_tenantId = tenantId
+		__findMembershipForLeaveSender.send(__findMembershipForLeaveInput)
+	}
+
+	property string __leaveTenantId: ""
+
+	property FindMembershipInput __findMembershipForLeaveInput: FindMembershipInput {}
+	property GqlSdlRequestSender __findMembershipForLeaveSender: GqlSdlRequestSender {
+		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_findMembership
+
+		sdlObjectComp: Component {
+			FindMembershipPayload {
+				onFinished: {
+					if (m_membership && m_membership.m_id && m_membership.m_id !== "") {
+						container.__removeMembershipForLeaveInput.m_membershipId = m_membership.m_id
+						container.__removeMembershipForLeaveSender.send(container.__removeMembershipForLeaveInput)
+					} else if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+					}
+				}
+			}
+		}
+
+		function onError(message, type) {
+			ModalDialogManager.showInfoDialog(message)
+		}
+	}
+
+	property RemoveMembershipInput __removeMembershipForLeaveInput: RemoveMembershipInput {}
+	property GqlSdlRequestSender __removeMembershipForLeaveSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_removeMembership
+
+		sdlObjectComp: Component {
+			RemoveMembershipPayload {
+				onFinished: {
+					if (m_success) {
+						// If we left the currently selected tenant, deselect it
+						if (container.__leaveTenantId === AuthorizationController.currentTenantId) {
+							AuthorizationController.selectTenant("")
+						}
+						container.doUpdateGui()
+					} else if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+					}
+				}
+			}
+		}
+
+		function onError(message, type) {
+			ModalDialogManager.showInfoDialog(message)
+		}
+	}
+
 	commandsDelegateComp: Component {
 		DocCollectionViewDelegate {
+			id: tenantCommandsDelegate
 			collectionView: container
 
 			Component.onCompleted: {
 				registerDocumentType("Tenant", qsTr("Tenant"))
 				addDocumentView("Tenant", "TenantEditor", tenantEditorComp, tenantDataControllerFactory)
+			}
+
+			// Only allow Edit when selected tenant matches current authorized tenant
+			function updateStateCustomCommands(selection, commandsController, elementsModel) {
+				if (commandsController && selection.length === 1) {
+					let tenantId = elementsModel.getData("id", selection[0])
+					let isCurrent = (tenantId === AuthorizationController.currentTenantId)
+					commandsController.setCommandIsEnabled("Edit", isCurrent)
+				}
+			}
+
+			// Add Switch and Leave items to context menu
+			function setupContextMenu() {
+				let commandsController = collectionView.commandsController
+				if (!commandsController) return
+
+				contextMenuModel.clear()
+
+				if (commandsController.commandExists("Edit")) {
+					let idx = contextMenuModel.insertNewItem()
+					contextMenuModel.setData("id", "Edit", idx)
+					contextMenuModel.setData("name", qsTr("Edit"), idx)
+					contextMenuModel.setData("icon", "Icons/Edit", idx)
+				}
+
+				// Always show Switch to — availability is determined at click time
+				{
+					let idx = contextMenuModel.insertNewItem()
+					contextMenuModel.setData("id", "Switch", idx)
+					contextMenuModel.setData("name", qsTr("Switch to"), idx)
+					contextMenuModel.setData("icon", "", idx)
+				}
+
+				// Always show Leave — availability is determined at click time
+				{
+					let idx = contextMenuModel.insertNewItem()
+					contextMenuModel.setData("id", "Leave", idx)
+					contextMenuModel.setData("name", qsTr("Leave"), idx)
+					contextMenuModel.setData("icon", "", idx)
+				}
+
+				if (commandsController.commandExists("Remove")) {
+					let idx = contextMenuModel.insertNewItem()
+					contextMenuModel.setData("id", "Remove", idx)
+					contextMenuModel.setData("name", qsTr("Remove"), idx)
+					contextMenuModel.setData("icon", "Icons/Delete", idx)
+				}
+
+				contextMenuModel.refresh()
 			}
 
 			Component {
@@ -426,7 +575,7 @@ RemoteCollectionView {
 					// transport-agnostic.
 					GqlBasedTenantMembershipApiClient {
 						id: tenantEditorApiClient
-						productId: AuthorizationController.productId
+						productId: AuthorizationController.currentTenantId
 					}
 				}
 			}

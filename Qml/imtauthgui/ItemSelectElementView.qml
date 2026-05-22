@@ -50,7 +50,7 @@ ElementView {
 	FilterableSelectGqlDataProvider {
 		id: nameResolver
 		collectionId: itemSelectElementView.collectionId
-		productId: itemSelectElementView.productId
+		tenantId: itemSelectElementView.productId
 		multiSelect: true
 		pageSize: 100
 
@@ -224,7 +224,7 @@ ElementView {
 		FilterableSelectPopup {
 			dataProvider: FilterableSelectGqlDataProvider {
 				collectionId: itemSelectElementView ? itemSelectElementView.collectionId : ""
-				productId: itemSelectElementView ? itemSelectElementView.productId : ""
+				tenantId: itemSelectElementView ? itemSelectElementView.productId : ""
 				multiSelect: true
 			}
 

@@ -238,7 +238,7 @@ ViewBase {
 				FilterableSelectGqlDataProvider {
 					id: rolesDataProvider
 					collectionId: "Roles"
-					productId: rolesPage.apiClient ? rolesPage.apiClient.productId : ""
+					tenantId: rolesPage.apiClient ? rolesPage.apiClient.productId : ""
 					pageSize: 50
 					Component.onCompleted: {
 						rolesPage.__dataProvider = rolesDataProvider
