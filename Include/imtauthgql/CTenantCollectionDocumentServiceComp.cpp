@@ -93,12 +93,12 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentServiceComp::OnGetTe
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
 		QByteArray currentTenantId = gqlContextPtr->GetTenantId();
-		if (!currentTenantId.isEmpty() && currentTenantId != tenantId){
-			errorMessage = QStringLiteral("Access denied: you must switch to this organization before editing it");
-			return sdl::imtauth::Tenants::CTenantData();
-		}
 		if (currentTenantId.isEmpty()){
 			errorMessage = QStringLiteral("Access denied: no organization selected. Please switch to this organization first");
+			return sdl::imtauth::Tenants::CTenantData();
+		}
+		if (currentTenantId != tenantId){
+			errorMessage = QStringLiteral("Access denied: you must switch to this organization before editing it");
 			return sdl::imtauth::Tenants::CTenantData();
 		}
 	}

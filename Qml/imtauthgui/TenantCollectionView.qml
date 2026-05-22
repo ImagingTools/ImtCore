@@ -406,8 +406,8 @@ RemoteCollectionView {
 				let canEdit = false;
 				if (isEnabled && elementsModel) {
 					// Edit is only allowed if the selected tenant matches the current authorized tenant
-					var tenantId = elementsModel.getData("id", selection[0]);
-					canEdit = tenantId && tenantId === AuthorizationController.currentTenantId;
+					var selectedTenantId = elementsModel.getData("id", selection[0]);
+					canEdit = selectedTenantId && selectedTenantId === AuthorizationController.currentTenantId;
 				}
 				if(commandsController){
 					commandsController.setCommandIsEnabled("Switch", isEnabled);
