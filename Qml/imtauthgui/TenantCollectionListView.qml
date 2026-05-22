@@ -23,7 +23,7 @@ Item {
 	property var menuCommands: []
 
 	// Expose selection manager for external access
-	readonly property alias selection: selectionManager
+	readonly property alias selectionManager: selectionManager
 
 	signal editRequested(string itemId, string itemName, string itemDescription)
 	signal deleteRequested(string itemId, string itemName)
@@ -110,7 +110,7 @@ Item {
 			property string itemDescription: modelData.description || ""
 			property bool isSelected: selectionManager.isSelected(itemId)
 
-			color: isSelected ? Style.selectionColor
+			color: isSelected ? Style.selectedColor
 				 : itemMouseArea.containsMouse ? Style.buttonHoverColor
 				 : "transparent"
 

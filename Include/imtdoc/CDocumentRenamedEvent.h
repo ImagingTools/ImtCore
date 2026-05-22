@@ -10,17 +10,26 @@ namespace imtdoc
 {
 
 
+/**
+	\ingroup imtdoc
+	\brief Event fired when the display name of a document has been changed.
+
+	Produced by \c TCollectionDocumentServiceWrap::SetDocumentName.  In
+	single-copy mode the event is fired once per user session that shares the
+	same underlying object, so multiple handlers may observe the same name
+	change in sequence.
+*/
 class CDocumentRenamedEvent : public CEventBase
 {
 public:
 	CDocumentRenamedEvent() = delete;
 	CDocumentRenamedEvent(
-		const QByteArray& userId,
-		const QByteArray& documentId,
-		const QByteArray& documentTypeId,
-		const QString& documentName,
-		const QUrl& documentUrl,
-		bool isDirty);
+				const QByteArray& userId,
+				const QByteArray& documentId,
+				const QByteArray& documentTypeId,
+				const QString& documentName,
+				const QUrl& documentUrl,
+				bool isDirty);
 
 	// reimplemented (CEventBase)
 	virtual QByteArray Type() const override;

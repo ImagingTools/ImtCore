@@ -57,16 +57,18 @@ QtObject {
 	}
 
 	function deselect(ids){
+		let arr = selectedIds.slice()
 		let wasChanges = false
 		for (let i = 0; i < ids.length; ++i){
-			let index = selectedIds.indexOf(ids[i])
+			let index = arr.indexOf(ids[i])
 			if (index >= 0){
 				wasChanges = true
-				selectedIds.splice(index, 1)
+				arr.splice(index, 1)
 			}
 		}
 
 		if (wasChanges){
+			selectedIds = arr
 			selectionChanged(selectedIds)
 		}
 	}
@@ -80,13 +82,15 @@ QtObject {
 		\param id The ID of the item to toggle.
 	*/
 	function toggleSelect(id){
-		let index = selectedIds.indexOf(id)
+		let arr = selectedIds.slice()
+		let index = arr.indexOf(id)
 		if (index === -1){
-			selectedIds.push(id)
+			arr.push(id)
 		} 
 		else{
-			selectedIds.splice(index, 1)
+			arr.splice(index, 1)
 		}
+		selectedIds = arr
 		focusedId = id
 		firstSelectedId = id
 		selectionChanged(selectedIds)

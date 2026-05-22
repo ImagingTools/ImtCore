@@ -1,57 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ru_RU">
+<TS version="2.1" language="kk_KZ">
 <context>
     <name>AddressEditor</name>
     <message>
         <location filename="../../../Qml/imtgeogui/AddressEditor.qml" line="+13"/>
         <source>Country</source>
-        <translation>Страна</translation>
+        <translation>Ел</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Region</source>
-        <translation>Регион</translation>
+        <translation>Аймақ</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Area</source>
-        <translation>Область</translation>
+        <translation>Облыс</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>City</source>
-        <translation>Город</translation>
+        <translation>Қала</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Settlement</source>
-        <translation>Населённый пункт</translation>
+        <translation>Елді мекен</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>District</source>
-        <translation>Район</translation>
+        <translation>Аудан</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Street</source>
-        <translation>Улица</translation>
+        <translation>Көше</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Building</source>
-        <translation>Здание</translation>
+        <translation>Ғимарат</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Apartment</source>
-        <translation>Квартира</translation>
+        <translation>Пәтер</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Section</source>
-        <translation>Участок</translation>
+        <translation>Бөлім</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -66,27 +66,27 @@
     <message>
         <location line="+0"/>
         <source>Other</source>
-        <translation>Другое</translation>
+        <translation>Басқа</translation>
     </message>
     <message>
         <location line="+31"/>
         <source>Select type</source>
-        <translation>Выберите тип</translation>
+        <translation>Түрін таңдаңыз</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Name</source>
-        <translation>Название</translation>
+        <translation>Атауы</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Latitude</source>
-        <translation>Широта</translation>
+        <translation>Ендік</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Longitude</source>
-        <translation>Долгота</translation>
+        <translation>Бойлық</translation>
     </message>
 </context>
 <context>
@@ -94,7 +94,7 @@
     <message>
         <location filename="../../../Qml/imtgeogui/AddressTreeView.qml" line="+184"/>
         <source>Address</source>
-        <translation>Адрес</translation>
+        <translation>Мекенжай</translation>
     </message>
 </context>
 <context>
@@ -102,7 +102,7 @@
     <message>
         <location filename="../../../Qml/imtauthgui/AdministrationUi.qml" line="+12"/>
         <source>Administration</source>
-        <translation>Администрирование</translation>
+        <translation>Әкімшілік</translation>
     </message>
 </context>
 <context>
@@ -112,21 +112,21 @@
         <location line="+99"/>
         <location line="+0"/>
         <source>Roles</source>
-        <translation>Роли</translation>
+        <translation>Рөлдер</translation>
     </message>
     <message>
         <location line="-94"/>
         <location line="+102"/>
         <location line="+0"/>
         <source>Users</source>
-        <translation>Пользователи</translation>
+        <translation>Пайдаланушылар</translation>
     </message>
     <message>
         <location line="-97"/>
         <location line="+105"/>
         <location line="+0"/>
         <source>Groups</source>
-        <translation>Группы</translation>
+        <translation>Топтар</translation>
     </message>
 </context>
 <context>
@@ -134,677 +134,677 @@
     <message>
         <location filename="../../../Qml/imtgui/Application/ApplicationMain.qml" line="+84"/>
         <source>Try connecting to authorization server ...</source>
-        <translation>Попытка подключения к серверу авторизации...</translation>
+        <translation>Авторизация серверіне қосылу әрекеті...</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Try connecting to </source>
-        <translation>Попытка подключения к </translation>
+        <translation>Қосылу әрекеті: </translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Server connection error</source>
-        <translation>Ошибка соединения с сервером</translation>
+        <translation>Сервер қосылу қатесі</translation>
     </message>
     <message>
         <location line="+246"/>
         <source>Assigned to you</source>
-        <translation>Назначено вам</translation>
+        <translation>Сізге тағайындалды</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Click to open →</source>
-        <translation>Нажмите, чтобы открыть →</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+153"/>
         <source>Network</source>
-        <translation>Сеть</translation>
+        <translation>Желі</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>General</source>
-        <translation>Общее</translation>
+        <translation>Жалпы</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>About</source>
-        <translation>О продукте</translation>
+        <translation>Өнім туралы</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>PAT Tokens</source>
-        <translation>PAT-токены</translation>
+        <translation>PAT-токендер</translation>
     </message>
     <message>
         <location line="-437"/>
         <source>Authorization server connection error</source>
-        <translation>Сервер авторизации недоступен</translation>
+        <translation>Авторизация сервері қолжетімсіз</translation>
     </message>
 </context>
 <context>
     <name>Attribute</name>
     <message>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DdlCodeCreator/CDdlCodeCreator.cpp" line="+33"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+41"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+36"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+37"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DdlCodeCreator/CDdlCodeCreator.cpp" line="+37"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+39"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+38"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+45"/>
         <source>Client (CommandLine)</source>
-        <translation>Клиент (командная строка)</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-6"/>
-        <source>. Imaging tools</source>
-        <translation type="unfinished"></translation>
+        <translation>Клиент (командалық жол)</translation>
     </message>
     <message>
         <location line="+4"/>
-        <location line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <source>. Imaging tools</source>
+        <translation>. Imaging tools</translation>
+    </message>
+    <message>
+        <location line="-6"/>
+        <location line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-8"/>
         <location line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-4"/>
         <source>Design token generator</source>
-        <translation>Генератор дизайн-токенов</translation>
+        <translation>Дизайн токен генераторы</translation>
     </message>
     <message>
-        <location line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
+        <location line="-6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
         <source>Imaging tools</source>
-        <translation>Инструменты для изображений</translation>
+        <translation>Imaging tools</translation>
     </message>
     <message>
-        <location line="+826"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+592"/>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+229"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+732"/>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+548"/>
+        <location line="+640"/>
         <location line="+10"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+526"/>
+        <location line="+8"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+203"/>
+        <location line="+8"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+20"/>
+        <location line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+590"/>
+        <location line="+6"/>
         <source>Client</source>
         <translation>Клиент</translation>
     </message>
     <message>
-        <location line="-822"/>
+        <location line="+4"/>
+        <location line="+14"/>
+        <location line="+102"/>
+        <location line="+14"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-144"/>
+        <location line="+60"/>
+        <location line="+10"/>
+        <location line="+78"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-158"/>
         <location line="+60"/>
         <location line="+12"/>
-        <location line="+754"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-148"/>
-        <location line="+14"/>
-        <location line="+72"/>
-        <location line="+66"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
-        <location line="+12"/>
-        <location line="+80"/>
-        <location line="+72"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-728"/>
-        <location line="+732"/>
-        <location line="+22"/>
-        <location line="+16"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-114"/>
-        <location line="+6"/>
-        <location line="+80"/>
-        <location line="+32"/>
+        <location line="+90"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
+        <location line="+682"/>
+        <location line="+10"/>
+        <location line="+76"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-144"/>
+        <location line="+60"/>
+        <location line="+10"/>
+        <location line="+78"/>
         <source>Server</source>
         <translation>Сервер</translation>
     </message>
     <message>
-        <location line="-504"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+220"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-214"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-510"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+158"/>
+        <location line="-762"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+76"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+24"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-548"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+88"/>
         <source>AddressElements</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+494"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-234"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+40"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+464"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-168"/>
+        <location line="+622"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-86"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-32"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-234"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-102"/>
         <source>. xxxx &lt;my company&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-800"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-36"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+116"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-696"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-8"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-122"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-138"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+796"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-122"/>
         <source>(C) 2018 ImagingTools GmbH. All rights reserved.</source>
-        <translation type="unfinished"></translation>
+        <translation>(C) 2018 ImagingTools GmbH. Барлық құқықтар қорғалған.</translation>
     </message>
     <message>
-        <location line="+32"/>
-        <location line="+374"/>
-        <location line="+398"/>
+        <location line="-568"/>
+        <location line="+532"/>
+        <location line="+68"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+30"/>
+        <location line="+94"/>
+        <location line="+102"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+32"/>
+        <location line="+108"/>
+        <location line="+10"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-802"/>
         <location line="+12"/>
-        <location line="+248"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-134"/>
-        <location line="+22"/>
-        <location line="+158"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+254"/>
-        <location line="+444"/>
-        <location line="+16"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-114"/>
-        <location line="+124"/>
-        <location line="+278"/>
+        <location line="+250"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+34"/>
+        <location line="+94"/>
+        <location line="+118"/>
         <source>Settings</source>
-        <translation>Настройки</translation>
+        <translation>Параметрлер</translation>
     </message>
     <message>
-        <location line="-798"/>
+        <location line="-394"/>
+        <location line="+368"/>
         <location line="+32"/>
-        <location line="+12"/>
-        <location line="+442"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-412"/>
+        <location line="+54"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-280"/>
+        <location line="+58"/>
+        <location line="+32"/>
+        <location line="+10"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-144"/>
+        <location line="+32"/>
+        <location line="+10"/>
+        <location line="+316"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+420"/>
         <location line="+12"/>
         <location line="+10"/>
         <location line="+104"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-146"/>
-        <location line="+120"/>
-        <location line="+32"/>
-        <location line="+458"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-708"/>
-        <location line="+674"/>
-        <location line="+40"/>
-        <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-750"/>
-        <location line="+322"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-282"/>
+        <location line="+44"/>
         <location line="+32"/>
         <location line="+12"/>
         <source>Preference File</source>
-        <translation>Файл настроек</translation>
+        <translation>Параметрлер файлы</translation>
     </message>
     <message>
-        <location line="-484"/>
-        <location line="+328"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location line="+288"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-488"/>
-        <location line="+78"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-720"/>
-        <location line="+246"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-40"/>
-        <location line="+420"/>
+        <location line="-722"/>
+        <location line="+638"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-34"/>
+        <location line="+274"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-356"/>
+        <location line="+740"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-544"/>
+        <location line="+552"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-34"/>
+        <location line="+230"/>
         <source>Light</source>
-        <translation>Светлая</translation>
+        <translation>Жарық</translation>
     </message>
     <message>
-        <location line="-326"/>
-        <location line="+328"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-286"/>
-        <location line="+288"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-76"/>
-        <location line="+78"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-244"/>
-        <location line="+246"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-418"/>
-        <location line="+420"/>
+        <location line="-636"/>
+        <location line="+638"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-272"/>
+        <location line="+274"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-738"/>
+        <location line="+740"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-550"/>
+        <location line="+552"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-228"/>
+        <location line="+230"/>
         <source>Dark</source>
-        <translation>Темная</translation>
+        <translation>Қараңғы</translation>
     </message>
     <message>
-        <location line="-314"/>
-        <location line="+478"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-416"/>
-        <location line="+138"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-66"/>
-        <location line="+480"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-238"/>
-        <location line="+670"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-742"/>
-        <location line="+332"/>
+        <location line="-366"/>
+        <location line="+376"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-340"/>
+        <location line="+72"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-728"/>
+        <location line="+352"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-130"/>
+        <location line="+136"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-280"/>
+        <location line="+54"/>
         <source>General</source>
-        <translation>Основное</translation>
+        <translation>Жалпы</translation>
     </message>
     <message>
-        <location line="-480"/>
-        <location line="+426"/>
-        <location line="+52"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-474"/>
-        <location line="+344"/>
-        <location line="+132"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-482"/>
-        <location line="+154"/>
+        <location line="-378"/>
+        <location line="+382"/>
+        <location line="+56"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-68"/>
+        <location line="+66"/>
+        <location line="+158"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-350"/>
+        <location line="+348"/>
         <location line="+332"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-668"/>
-        <location line="+324"/>
-        <location line="+342"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-368"/>
-        <location line="+34"/>
-        <location line="+336"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-476"/>
+        <location line="+338"/>
+        <location line="+136"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-50"/>
+        <location line="+48"/>
+        <location line="+158"/>
         <source>Language</source>
-        <translation>Язык</translation>
+        <translation>Тіл</translation>
     </message>
     <message>
-        <location line="-96"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+272"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-656"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-436"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+412"/>
+        <location line="-646"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+48"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-552"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-562"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+64"/>
         <source>http://localhost:7778</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-384"/>
-        <location line="+424"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-746"/>
+        <location line="+588"/>
+        <location line="+56"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-202"/>
+        <location line="+156"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-132"/>
+        <location line="+680"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+90"/>
         <location line="+476"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+174"/>
-        <location line="+152"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-228"/>
-        <location line="+324"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-786"/>
-        <location line="+370"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-218"/>
+        <location line="+158"/>
         <source>Design Schema</source>
-        <translation>Дизайн схема</translation>
+        <translation>Дизайн схемасы</translation>
     </message>
     <message>
-        <location line="-418"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-150"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+360"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
+        <location line="-52"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-154"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-674"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-156"/>
         <source>DocumentInfo</source>
-        <translation type="unfinished"></translation>
+        <translation>Құжат ақпараты</translation>
     </message>
     <message>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-832"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
         <source>Network</source>
-        <translation>Сеть</translation>
+        <translation>Желі</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="-382"/>
         <location line="+2"/>
-        <location line="+452"/>
+        <location line="+434"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-144"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-74"/>
         <location line="+2"/>
-        <location line="+8"/>
+        <location line="+82"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+12"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+10"/>
         <location line="+2"/>
-        <location line="+456"/>
+        <location line="+324"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-30"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+694"/>
         <location line="+2"/>
-        <location line="+38"/>
+        <location line="+4"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-336"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-66"/>
         <location line="+2"/>
-        <location line="+346"/>
+        <location line="+74"/>
         <location line="+2"/>
         <source>Preferences</source>
-        <translation>Настройки</translation>
+        <translation>Параметрлер</translation>
     </message>
     <message>
-        <location line="-448"/>
+        <location line="+6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-616"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-318"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+8"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
         <source>^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+12"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+12"/>
         <source>Instance Mask</source>
-        <translation>Маска экземпляра</translation>
+        <translation>Экземпляр маскасы</translation>
     </message>
     <message>
-        <location line="-6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
+        <location line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6"/>
         <source>Database Settings</source>
-        <translation>Настройки базы данных</translation>
+        <translation>Деректер қоры параметрлері</translation>
     </message>
     <message>
-        <location line="+66"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+64"/>
+        <location line="+60"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+66"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+64"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+60"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+62"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+58"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+64"/>
         <source>ImtCore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+346"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-120"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+514"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-148"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-462"/>
+        <location line="-550"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-198"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+218"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-120"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-184"/>
         <source>STL</source>
-        <translation type="unfinished"></translation>
+        <translation>STL</translation>
     </message>
     <message>
-        <location line="-316"/>
+        <location line="-194"/>
+        <location line="+50"/>
         <location line="+78"/>
         <location line="+18"/>
-        <location line="+146"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+308"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-310"/>
+        <location line="+18"/>
+        <location line="+602"/>
+        <location line="+136"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-182"/>
+        <location line="+32"/>
+        <location line="+124"/>
+        <location line="+18"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-526"/>
         <location line="+78"/>
         <location line="+18"/>
         <location line="+20"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-736"/>
-        <location line="+78"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-34"/>
         <location line="+18"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-558"/>
-        <location line="+104"/>
-        <location line="+18"/>
-        <location line="+24"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+538"/>
-        <location line="+124"/>
-        <location line="+22"/>
-        <location line="+102"/>
+        <location line="+312"/>
+        <location line="+138"/>
         <source>Revision</source>
-        <translation>Ревизия</translation>
+        <translation>Нұсқа</translation>
     </message>
     <message>
-        <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+10"/>
+        <location line="-132"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-122"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-160"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+14"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-128"/>
         <source>qrc:/qml/imtcolgui/CollectionWorkspacePageView.qml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-252"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-128"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-118"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-154"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-256"/>
+        <location line="+34"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+124"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+20"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-128"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+126"/>
         <source>New Role</source>
-        <translation>Новая роль</translation>
+        <translation>Жаңа рөл</translation>
     </message>
     <message>
         <location line="+78"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+78"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+78"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+104"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+124"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-756"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+124"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+78"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-468"/>
         <source>New Group</source>
-        <translation>Новая группа</translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+12"/>
-        <source>System Name</source>
-        <translation>Название системы</translation>
+        <translation>Жаңа топ</translation>
     </message>
     <message>
         <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+10"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+8"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+10"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+8"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+10"/>
-        <source>New User</source>
-        <translation>Новый пользователь</translation>
+        <source>System Name</source>
+        <translation>Жүйе атауы</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-182"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-154"/>
+        <location line="+8"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+10"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+10"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+10"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+8"/>
+        <source>New User</source>
+        <translation>Жаңа пайдаланушы</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+678"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-72"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-182"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-98"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+392"/>
         <source>qrc:/qml/imtguigql/GqlCollectionDocManagerPageView.qml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+22"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+8"/>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+20"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+14"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+26"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+20"/>
         <source>qrc:/qml/imtgui/View/SearchPage.qml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-2"/>
+        <location line="+6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
         <source>Icons/Search</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
+        <location line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
         <source>qrc:/qml/imtdocgui/SearchPageSingleDocumentView.qml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
+        <location line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
         <source>Search</source>
-        <translation>Поиск</translation>
+        <translation>Іздеу</translation>
     </message>
     <message>
         <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+14"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-8"/>
         <source>qrc:/qml/imtauthgui/AdministrationView.qml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
+        <location line="-4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Admin</source>
-        <translation>Админ</translation>
+        <translation>Әкімші</translation>
     </message>
     <message>
-        <location line="-136"/>
-        <location line="+664"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-24"/>
+        <location line="-126"/>
+        <location line="+508"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-176"/>
+        <location line="+164"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-290"/>
+        <location line="+360"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-20"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-16"/>
-        <location line="+302"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-8"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-260"/>
-        <location line="+176"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-184"/>
+        <location line="+164"/>
         <source>Alias</source>
-        <translation>Псевдоним</translation>
+        <translation>Бүркеншік ат</translation>
     </message>
     <message>
-        <location line="-662"/>
+        <location line="-506"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-300"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>/// \file $(FilePath)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+190"/>
-        <location line="+58"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-570"/>
-        <location line="+636"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+392"/>
-        <location line="+74"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+98"/>
-        <location line="+174"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+192"/>
-        <location line="+50"/>
+        <location line="-90"/>
+        <location line="+46"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-106"/>
+        <location line="+72"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+400"/>
+        <location line="+44"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+70"/>
+        <location line="+182"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-106"/>
+        <location line="+80"/>
         <source>Algorithm</source>
         <translation>Алгоритм</translation>
     </message>
     <message>
-        <location line="-56"/>
-        <location line="+48"/>
+        <location line="-44"/>
+        <location line="+40"/>
+        <location line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-70"/>
+        <location line="+72"/>
         <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-646"/>
-        <location line="+4"/>
-        <location line="+644"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-72"/>
-        <location line="+60"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-172"/>
-        <location line="+160"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-42"/>
         <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-48"/>
-        <location line="+42"/>
-        <location line="+2"/>
+        <location line="+36"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-180"/>
+        <location line="+182"/>
+        <location line="+10"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-78"/>
+        <location line="+74"/>
+        <location line="+6"/>
         <source>Encoding Format</source>
-        <translation>Формат кодирования</translation>
+        <translation>Кодтау форматы</translation>
     </message>
     <message>
-        <location line="-56"/>
-        <location line="+104"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-606"/>
-        <location line="+608"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
-        <location line="+100"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-166"/>
-        <location line="+196"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-776"/>
-        <location line="+734"/>
-        <source>Type</source>
-        <translation>Тип</translation>
-    </message>
-    <message>
-        <location line="-102"/>
-        <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-682"/>
-        <location line="+684"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-98"/>
-        <location line="+30"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-194"/>
-        <location line="+128"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
-        <location line="+8"/>
-        <source>Password</source>
-        <translation>Пароль</translation>
-    </message>
-    <message>
-        <location line="-10"/>
-        <location line="+48"/>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-654"/>
-        <location line="+8"/>
-        <location line="+648"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-28"/>
-        <location line="+52"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-126"/>
-        <location line="+152"/>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6"/>
+        <location line="-44"/>
+        <location line="+704"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-114"/>
         <location line="+34"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-92"/>
+        <location line="+94"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-190"/>
+        <location line="+222"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-112"/>
+        <location line="+34"/>
+        <source>Type</source>
+        <translation>Түрі</translation>
+    </message>
+    <message>
+        <location line="-702"/>
         <location line="+14"/>
-        <source>File Path</source>
-        <translation>Путь к файлу</translation>
-    </message>
-    <message>
-        <location line="-52"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-58"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-156"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-58"/>
+        <location line="+44"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-76"/>
+        <location line="+78"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-220"/>
+        <location line="+154"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
+        <location line="+46"/>
+        <source>Password</source>
+        <translation>Құпия сөз</translation>
+    </message>
+    <message>
+        <location line="-12"/>
+        <location line="+32"/>
+        <location line="+12"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-42"/>
+        <location line="+70"/>
+        <location line="+8"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
+        <location line="+8"/>
+        <location line="+40"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-152"/>
+        <location line="+180"/>
+        <location line="+8"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-44"/>
+        <location line="+70"/>
+        <location line="+8"/>
+        <source>File Path</source>
+        <translation>Файл жолы</translation>
+    </message>
+    <message>
+        <location line="-54"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-88"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-198"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-88"/>
         <source>Key Files</source>
-        <translation>Файлы ключей</translation>
+        <translation>Кілт файлдары</translation>
     </message>
     <message>
-        <location line="-256"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-216"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-164"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+616"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-294"/>
+        <location line="+756"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-134"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-708"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+626"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-130"/>
         <source>Remove All</source>
-        <translation>Удалить все</translation>
+        <translation>Барлығын жою</translation>
     </message>
     <message>
-        <location line="-6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-10"/>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+14"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-8"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
         <source>Restore All</source>
-        <translation>Восстановить все</translation>
+        <translation>Барлығын қалпына келтіру</translation>
     </message>
     <message>
         <location line="-8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
         <source>Duplicate</source>
-        <translation>Дублировать</translation>
+        <translation>Көшірме</translation>
     </message>
     <message>
-        <location line="+16"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
+        <location line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+10"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-10"/>
         <source>Restore</source>
-        <translation>Восстановить</translation>
+        <translation>Қалпына келтіру</translation>
     </message>
     <message>
-        <location line="+230"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+194"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+132"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-634"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+282"/>
+        <location line="-768"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+110"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+686"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-626"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+118"/>
         <source>Certificate Files</source>
-        <translation>Файлы сертификатов</translation>
+        <translation>Сертификат файлдары</translation>
     </message>
     <message>
         <location line="+2"/>
-        <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-646"/>
-        <location line="+648"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location line="+66"/>
+        <location line="+46"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location line="+80"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-42"/>
+        <location line="+44"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location line="+158"/>
+        <location line="+184"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
-        <location line="+54"/>
+        <location line="+80"/>
         <source>Enable SSL</source>
-        <translation>Включить SSL</translation>
+        <translation>SSL қосу</translation>
     </message>
     <message>
-        <location line="-46"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-64"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-156"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-52"/>
+        <location line="-44"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-78"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-182"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-78"/>
         <source>Local Certificate</source>
-        <translation>Локальный сертификат</translation>
+        <translation>Жергілікті сертификат</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -813,30 +813,30 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>CA Certificate</source>
-        <translation>Сертификат ЦС</translation>
+        <translation>CA сертификаты</translation>
     </message>
     <message>
         <location line="+2"/>
-        <location line="+58"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-636"/>
-        <location line="+638"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location line="+72"/>
+        <location line="+52"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location line="+90"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-38"/>
+        <location line="+40"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location line="+170"/>
+        <location line="+198"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
-        <location line="+60"/>
+        <location line="+98"/>
         <source>Private Key</source>
-        <translation>Закрытый ключ</translation>
+        <translation>Жеке кілт</translation>
     </message>
     <message>
-        <location line="-56"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-70"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-168"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-58"/>
+        <location line="-50"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-88"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-196"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-96"/>
         <source>Verification Mode</source>
-        <translation>Режим проверки</translation>
+        <translation>Тексеру режимі</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -845,69 +845,69 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Protocol</source>
-        <translation>Протокол</translation>
+        <translation>Хаттама</translation>
     </message>
     <message>
-        <location line="+92"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-624"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+84"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+184"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-748"/>
+        <location line="+690"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-48"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-106"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+208"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-48"/>
         <source>LDAP</source>
         <translation>LDAP</translation>
     </message>
     <message>
-        <location line="-428"/>
+        <location line="-80"/>
+        <location line="+4"/>
+        <location line="+14"/>
+        <location line="+14"/>
+        <location line="+88"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-164"/>
         <location line="+16"/>
         <location line="+44"/>
-        <location line="+762"/>
+        <location line="+84"/>
         <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+384"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-684"/>
+        <location line="+12"/>
+        <location line="+48"/>
+        <location line="+98"/>
+        <location line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-302"/>
+        <location line="+4"/>
+        <location line="+682"/>
         <location line="+86"/>
+        <location line="+18"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-164"/>
         <location line="+16"/>
-        <location line="+46"/>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-266"/>
-        <location line="+4"/>
-        <location line="+92"/>
-        <location line="+14"/>
-        <location line="+58"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-340"/>
-        <location line="+24"/>
-        <location line="+704"/>
-        <location line="+4"/>
-        <location line="+22"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+424"/>
-        <location line="+86"/>
-        <location line="+14"/>
-        <location line="+14"/>
+        <location line="+44"/>
+        <location line="+84"/>
         <location line="+4"/>
         <source>ImagingTools</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-814"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-52"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-56"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-726"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-14"/>
+        <location line="-84"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-134"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-146"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-130"/>
         <source>Full Screen</source>
-        <translation>Полный экран</translation>
+        <translation>Толық экран</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+16"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+20"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+28"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-140"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+10"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+20"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
         <source>PageViewParam</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+16"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+16"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+16"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+708"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+22"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-818"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+26"/>
         <source>qrc:/qml/imtdocgui/MultiDocWorkspacePageView.qml</source>
         <translation type="unfinished"></translation>
@@ -922,293 +922,266 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-120"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-138"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+26"/>
+        <location line="+68"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+26"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+26"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+714"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+26"/>
         <source>qrc:/qml/imtdocgui/SingleDocumentWorkspacePageView.qml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+24"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+32"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+24"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+30"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+30"/>
+        <location line="+34"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+34"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+30"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+42"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+42"/>
         <source>Icons/History</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
         <source>History</source>
-        <translation>История</translation>
+        <translation>Тарих</translation>
     </message>
     <message>
-        <location line="+52"/>
-        <location line="+12"/>
-        <location line="+26"/>
-        <location line="+104"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+156"/>
-        <location line="+46"/>
+        <location line="-680"/>
         <location line="+12"/>
         <location line="+28"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-222"/>
+        <location line="+100"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+244"/>
         <location line="+20"/>
         <location line="+12"/>
         <location line="+28"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-702"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+88"/>
+        <location line="+12"/>
+        <location line="+26"/>
+        <location line="+72"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-682"/>
+        <location line="+18"/>
+        <location line="+38"/>
+        <location line="+28"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-250"/>
+        <location line="+490"/>
         <location line="+16"/>
         <location line="+12"/>
-        <location line="+52"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+96"/>
-        <location line="+12"/>
-        <location line="+28"/>
-        <location line="+46"/>
         <source>Role</source>
-        <translation>Роль</translation>
+        <translation>Рөл</translation>
     </message>
     <message>
-        <location line="-110"/>
-        <location line="+108"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-88"/>
-        <location line="+80"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-62"/>
+        <location line="-108"/>
+        <location line="+106"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-62"/>
         <location line="+54"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-82"/>
-        <location line="+76"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-54"/>
-        <location line="+58"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-78"/>
+        <location line="+80"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-86"/>
+        <location line="+78"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-526"/>
+        <location line="+494"/>
         <source>Session</source>
         <translation>Сессия</translation>
     </message>
     <message>
-        <location line="-114"/>
+        <location line="-112"/>
         <location line="+52"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-788"/>
+        <location line="+782"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-86"/>
         <location line="+52"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-6"/>
         <location line="+52"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-32"/>
-        <location line="+78"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-64"/>
-        <location line="+98"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-788"/>
+        <location line="+340"/>
         <source>User Connection</source>
-        <translation>Подключение пользователя</translation>
+        <translation>Пайдаланушы қосылысы</translation>
     </message>
     <message>
         <location line="-50"/>
         <location line="+52"/>
-        <location line="+58"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-120"/>
+        <location line="+56"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-780"/>
+        <location line="+738"/>
+        <location line="+44"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-50"/>
+        <location line="+86"/>
+        <location line="+12"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-120"/>
         <location line="+70"/>
         <location line="+52"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-96"/>
-        <location line="+46"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-50"/>
         <location line="+52"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-124"/>
-        <location line="+48"/>
-        <location line="+78"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-96"/>
-        <location line="+64"/>
-        <location line="+34"/>
+        <location line="+444"/>
         <source>Group</source>
-        <translation>Группа</translation>
+        <translation>Топ</translation>
     </message>
     <message>
-        <location line="-108"/>
+        <location line="-106"/>
         <location line="+60"/>
-        <location line="+46"/>
-        <location line="+154"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-698"/>
-        <location line="+574"/>
-        <location line="+74"/>
-        <location line="+60"/>
+        <location line="+52"/>
+        <location line="+468"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-772"/>
+        <location line="+554"/>
+        <location line="+172"/>
+        <location line="+48"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-96"/>
-        <location line="+46"/>
-        <location line="+60"/>
-        <location line="+352"/>
+        <location line="+78"/>
+        <location line="+28"/>
+        <location line="+372"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-128"/>
-        <location line="+52"/>
-        <location line="+86"/>
-        <location line="+128"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-672"/>
-        <location line="+576"/>
-        <location line="+58"/>
-        <location line="+52"/>
+        <location line="+78"/>
+        <location line="+60"/>
+        <location line="+126"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-494"/>
+        <location line="+60"/>
+        <location line="+266"/>
+        <location line="+172"/>
         <source>User</source>
-        <translation>Пользователь</translation>
+        <translation>Пайдаланушы</translation>
     </message>
     <message>
-        <location line="-84"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-774"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-70"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-68"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+62"/>
+        <location line="-688"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-134"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+22"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-86"/>
         <source>SMTP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-4"/>
-        <source>Server Address</source>
-        <translation>Адрес сервера</translation>
+        <translation>SMTP</translation>
     </message>
     <message>
         <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
+        <source>Server Address</source>
+        <translation>Сервер мекенжайы</translation>
+    </message>
+    <message>
+        <location line="-8"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Port</source>
         <translation>Порт</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+16"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+10"/>
+        <location line="+10"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+8"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>465</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
-        <source>qqmbxszuzxnylorx</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
-        <source>kucherenkord@gmail.com</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location line="+10"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+12"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+8"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
-        <source>smtp.gmail.com</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+12"/>
         <source>Activate it if you want your server to work using SSL</source>
-        <translation>Активируйте, если хотите, чтобы сервер работал по SSL</translation>
-    </message>
-    <message>
-        <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
-        <source>Local Cert</source>
-        <translation>Локальный сертификат</translation>
+        <translation>Серверіңіздің SSL арқылы жұмыс істеуін қаласаңыз, белсендіріңіз</translation>
     </message>
     <message>
         <location line="-8"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-4"/>
-        <source>SSL Protocol</source>
-        <translation>SSL-протокол</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
-        <source>Verify Mode</source>
-        <translation>Режим проверки</translation>
-    </message>
-    <message>
-        <location line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6"/>
-        <source>Ca Cert</source>
-        <translation>Сертификат ЦС</translation>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
+        <source>Local Cert</source>
+        <translation>Жергілікті сертификат</translation>
     </message>
     <message>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
-        <source>SSL Configuration</source>
-        <translation>Настройки SSL</translation>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-12"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+8"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
+        <source>SSL Protocol</source>
+        <translation>SSL хаттамасы</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+20"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+18"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+18"/>
-        <source>Key Type</source>
-        <translation>Тип ключа</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
+        <location line="+10"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
-        <source>Select the file with your private key</source>
-        <translation>Выберите файл с вашим закрытым ключом</translation>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-12"/>
+        <source>Verify Mode</source>
+        <translation>Тексеру режимі</translation>
     </message>
     <message>
-        <location line="-70"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+772"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-300"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-66"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-102"/>
-        <source>Message Info</source>
-        <translation>Информация о сообщении</translation>
-    </message>
-    <message>
-        <location line="-304"/>
-        <location line="+442"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-730"/>
-        <location line="+460"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+172"/>
-        <location line="+174"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-230"/>
-        <location line="+340"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-672"/>
-        <location line="+352"/>
-        <source>User Settings</source>
-        <translation>Настройки пользователя</translation>
-    </message>
-    <message>
-        <location line="-434"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-166"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-330"/>
+        <location line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-8"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+10"/>
+        <source>Ca Cert</source>
+        <translation>CA сертификаты</translation>
+    </message>
+    <message>
+        <location line="-6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+10"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-4"/>
+        <source>SSL Configuration</source>
+        <translation>SSL конфигурациясы</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+16"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+14"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+20"/>
+        <source>Key Type</source>
+        <translation>Кілт түрі</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-4"/>
+        <source>Select the file with your private key</source>
+        <translation>Жеке кілт файлын таңдаңыз</translation>
+    </message>
+    <message>
+        <location line="-72"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-68"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-568"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-56"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
+        <source>Message Info</source>
+        <translation>Хабарлама ақпараты</translation>
+    </message>
+    <message>
+        <location line="+662"/>
+        <location line="+72"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-208"/>
+        <location line="+178"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-168"/>
+        <location line="+698"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+104"/>
+        <location line="+460"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-220"/>
+        <location line="+176"/>
+        <source>User Settings</source>
+        <translation>Пайдаланушы параметрлері</translation>
+    </message>
+    <message>
+        <location line="-64"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-174"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-688"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-170"/>
         <source>English</source>
-        <translation>Английский</translation>
+        <translation>Ағылшын</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1217,7 +1190,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>German</source>
-        <translation>Немецкий</translation>
+        <translation>Неміс</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1226,52 +1199,52 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Russian</source>
-        <translation>Русский</translation>
+        <translation>Орыс</translation>
     </message>
     <message>
         <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+692"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+12"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+16"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+10"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-816"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+14"/>
         <source>Server Connection Interface</source>
-        <translation>Интерфейс подключения к серверу</translation>
+        <translation>Сервер қосылу интерфейсі</translation>
     </message>
     <message>
-        <location line="+436"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-176"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+440"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-56"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-372"/>
+        <location line="-418"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-106"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+310"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+658"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-92"/>
         <source>OBJ</source>
-        <translation type="unfinished"></translation>
+        <translation>OBJ</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>X</source>
-        <translation type="unfinished"></translation>
+        <translation>X</translation>
     </message>
     <message>
-        <location line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-4"/>
+        <location line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Z</source>
-        <translation type="unfinished"></translation>
+        <translation>Z</translation>
     </message>
     <message>
-        <location line="-478"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+132"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-496"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-678"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+472"/>
+        <location line="+376"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+62"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-354"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+134"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+50"/>
         <source>Last Message</source>
-        <translation>Последнее сообщение</translation>
+        <translation>Соңғы хабарлама</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1280,7 +1253,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Unread</source>
-        <translation>Непрочитанные</translation>
+        <translation>Оқылмаған</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1289,7 +1262,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Participants</source>
-        <translation>Участники</translation>
+        <translation>Қатысушылар</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1298,42 +1271,42 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Last Updated</source>
-        <translation>Последнее обновление</translation>
+        <translation>Соңғы жаңарту</translation>
     </message>
     <message>
-        <location line="+70"/>
+        <location line="-388"/>
+        <location line="+498"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+80"/>
+        <location line="+276"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+68"/>
         <location line="+232"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-72"/>
-        <location line="+196"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-274"/>
-        <location line="+192"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+94"/>
-        <location line="+684"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-62"/>
-        <location line="+206"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-710"/>
+        <location line="+644"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+82"/>
+        <location line="+270"/>
         <source>Import</source>
-        <translation>Импорт</translation>
+        <translation>Импорттау</translation>
     </message>
     <message>
-        <location line="-230"/>
-        <location line="+232"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-198"/>
-        <location line="+192"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-194"/>
-        <location line="+202"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-690"/>
-        <location line="+684"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-222"/>
-        <location line="+220"/>
+        <location line="-502"/>
+        <location line="+518"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-272"/>
+        <location line="+264"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-230"/>
+        <location line="+228"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-646"/>
+        <location line="+634"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-274"/>
+        <location line="+276"/>
         <source>Export</source>
-        <translation>Экспорт</translation>
+        <translation>Экспорттау</translation>
     </message>
     <message>
-        <location line="-194"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-154"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+32"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+32"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-178"/>
+        <location line="+26"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-238"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-188"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+42"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-244"/>
         <source>#</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1344,7 +1317,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Title</source>
-        <translation>Заголовок</translation>
+        <translation>Тақырып</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1353,7 +1326,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Status</source>
-        <translation>Статус</translation>
+        <translation>Күйі</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1362,7 +1335,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Priority</source>
-        <translation>Приоритет</translation>
+        <translation>Басымдық</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1371,111 +1344,111 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Assignees</source>
-        <translation>Исполнители</translation>
+        <translation>Орындаушылар</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location line="+68"/>
-        <location line="+28"/>
+        <location line="-654"/>
+        <location line="+26"/>
+        <location line="+630"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location line="+228"/>
+        <location line="+288"/>
         <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-182"/>
-        <location line="+26"/>
-        <location line="+158"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-640"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location line="+106"/>
         <location line="+28"/>
-        <location line="+614"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
-        <location line="+116"/>
-        <location line="+72"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-604"/>
+        <location line="+26"/>
+        <location line="+580"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-256"/>
+        <location line="+26"/>
+        <location line="+232"/>
         <source>Created</source>
-        <translation>Создано</translation>
+        <translation>Жасалған</translation>
     </message>
     <message>
-        <location line="-92"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-162"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+40"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-810"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-136"/>
+        <location line="-716"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-136"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-288"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-740"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+182"/>
         <source>Icons/Conversation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
         <source>Conversations</source>
-        <translation>Беседы</translation>
+        <translation>Әңгімелер</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
+        <location line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
         <source>Icons/Ticket</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
         <source>Tickets</source>
-        <translation>Заявки</translation>
+        <translation>Өтінімдер</translation>
     </message>
     <message>
+        <location line="-100"/>
         <location line="+2"/>
-        <location line="+164"/>
+        <location line="+106"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-74"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+8"/>
+        <location line="+76"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+796"/>
+        <location line="+2"/>
+        <location line="+28"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+10"/>
         <location line="+200"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-74"/>
+        <location line="+2"/>
         <location line="+80"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
-        <location line="+232"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
-        <location line="+176"/>
-        <location line="+2"/>
         <source>Conversation</source>
-        <translation>Беседа</translation>
+        <translation>Әңгіме</translation>
     </message>
     <message>
-        <location line="-164"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-204"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-84"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-236"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-180"/>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-204"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Ticket</source>
-        <translation>Заявка</translation>
+        <translation>Өтінім</translation>
     </message>
     <message>
         <location line="+24"/>
         <location line="+2"/>
         <location line="+34"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+100"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+70"/>
         <location line="+2"/>
         <location line="+34"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-264"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-600"/>
         <location line="+2"/>
         <location line="+34"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+106"/>
-        <location line="+2"/>
-        <location line="+60"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+26"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+100"/>
         <location line="+2"/>
         <location line="+34"/>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-764"/>
+        <location line="+2"/>
+        <location line="+322"/>
         <location line="+2"/>
         <source>TenantInvitation</source>
         <translation type="unfinished"></translation>
@@ -1493,13 +1466,13 @@
         <location line="+2"/>
         <location line="+34"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
-        <location line="+2"/>
-        <location line="+60"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-34"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-34"/>
         <location line="+2"/>
         <location line="+34"/>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-322"/>
+        <location line="+2"/>
+        <location line="+322"/>
         <location line="+2"/>
         <source>TenantMembership</source>
         <translation type="unfinished"></translation>
@@ -1517,90 +1490,90 @@
         <location line="+2"/>
         <location line="+34"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-60"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-34"/>
         <location line="+2"/>
-        <location line="+60"/>
+        <location line="+34"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-34"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-322"/>
         <location line="+2"/>
-        <location line="+80"/>
+        <location line="+322"/>
         <location line="+2"/>
         <source>Tenant</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-26"/>
-        <location line="+28"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-24"/>
-        <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-24"/>
-        <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-26"/>
-        <location line="+28"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-70"/>
-        <location line="+72"/>
-        <source>Tenant Name</source>
-        <translation>Название тенанта</translation>
-    </message>
-    <message>
-        <location line="-22"/>
-        <location line="+28"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-20"/>
-        <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-20"/>
-        <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-22"/>
-        <location line="+28"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-66"/>
-        <location line="+72"/>
-        <source>Members Count</source>
-        <translation>Количество участников</translation>
-    </message>
-    <message>
-        <location line="-26"/>
-        <location line="+28"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-24"/>
-        <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-24"/>
-        <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-26"/>
-        <location line="+28"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-70"/>
-        <location line="+72"/>
-        <source>Active</source>
-        <translation>Активный</translation>
+        <translation>Тенант</translation>
     </message>
     <message>
         <location line="-24"/>
+        <location line="+26"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-24"/>
+        <location line="+26"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-26"/>
         <location line="+28"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-22"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-24"/>
+        <location line="+26"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-24"/>
+        <location line="+26"/>
+        <source>Tenant Name</source>
+        <translation>Тенант атауы</translation>
+    </message>
+    <message>
+        <location line="-20"/>
+        <location line="+26"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-20"/>
         <location line="+26"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-22"/>
-        <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-24"/>
         <location line="+28"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-68"/>
-        <location line="+72"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-20"/>
+        <location line="+26"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-20"/>
+        <location line="+26"/>
+        <source>Members Count</source>
+        <translation>Мүшелер саны</translation>
+    </message>
+    <message>
+        <location line="-24"/>
+        <location line="+26"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-24"/>
+        <location line="+26"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-26"/>
+        <location line="+28"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-24"/>
+        <location line="+26"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-24"/>
+        <location line="+26"/>
+        <source>Active</source>
+        <translation>Белсенді</translation>
+    </message>
+    <message>
+        <location line="-22"/>
+        <location line="+26"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-22"/>
+        <location line="+26"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-24"/>
+        <location line="+28"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-22"/>
+        <location line="+26"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-22"/>
+        <location line="+26"/>
         <source>Updated</source>
-        <translation>Обновлено</translation>
+        <translation>Жаңартылған</translation>
     </message>
     <message>
-        <location line="-26"/>
+        <location line="-40"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-40"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-40"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-26"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-86"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-26"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-40"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-40"/>
         <source>New Organization</source>
-        <translation>Новая организация</translation>
+        <translation>Жаңа ұйым</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+32"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+32"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+32"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+18"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+78"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+18"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+32"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+32"/>
         <source>Owner</source>
-        <translation>Владелец</translation>
+        <translation>Иесі</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1609,48 +1582,48 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+10"/>
         <source>New Tenant</source>
-        <translation>Новый тенант</translation>
+        <translation>Жаңа тенант</translation>
     </message>
     <message>
-        <location line="+54"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-142"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-112"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-132"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-40"/>
+        <location line="+50"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-100"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+30"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-140"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+432"/>
         <source>Icons/SupportDesk</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-4"/>
         <source>qrc:/qml/imtdeskgui/TicketCollectionView.qml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
+        <location line="-4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Support</source>
-        <translation>Поддержка</translation>
+        <translation>Қолдау</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="-252"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+172"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-118"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+384"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+470"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+168"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+176"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+78"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-108"/>
         <location line="+2"/>
         <source>Attachment</source>
-        <translation>Вложение</translation>
+        <translation>Тіркеме</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1667,32 +1640,32 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+180"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-406"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+392"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+432"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-690"/>
+        <location line="+284"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-294"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-418"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+428"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-274"/>
         <source>Y</source>
-        <translation type="unfinished"></translation>
+        <translation>Y</translation>
     </message>
     <message>
-        <location line="+4"/>
         <location line="+2"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+4"/>
         <location line="+2"/>
         <location line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
         <location line="+2"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location line="+2"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <location line="+2"/>
         <location line="+2"/>
         <source>rad</source>
-        <translation type="unfinished"></translation>
+        <translation>рад</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1701,7 +1674,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Search radius</source>
-        <translation>Радиус поиска</translation>
+        <translation>Іздеу радиусы</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1710,7 +1683,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Mu</source>
-        <translation type="unfinished"></translation>
+        <translation>Му</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1719,7 +1692,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Minimum angle</source>
-        <translation>Минимальный угол</translation>
+        <translation>Ең кіші бұрыш</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1728,7 +1701,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Maximum angle</source>
-        <translation>Максимальный угол</translation>
+        <translation>Ең үлкен бұрыш</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1737,7 +1710,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Maximum surface angle</source>
-        <translation>Максимальный угол поверхности</translation>
+        <translation>Бет бұрышының максимумы</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1746,30 +1719,30 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Maximum nearest neighbors</source>
-        <translation>Максимальное количество соседних точек</translation>
+        <translation>Ең жақын көршілердің максимумы</translation>
     </message>
     <message>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
+        <location line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+8"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+10"/>
         <source>Design</source>
         <translation>Дизайн</translation>
     </message>
     <message>
-        <location line="+34"/>
+        <location line="+148"/>
         <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-214"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-292"/>
         <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-228"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+130"/>
         <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-212"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-208"/>
         <location line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+24"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-418"/>
         <location line="+62"/>
         <source>commodity</source>
-        <translation>товар</translation>
+        <translation>тауар</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1797,7 +1770,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>job</source>
-        <translation>работа</translation>
+        <translation>жұмыс</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1811,7 +1784,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>service</source>
-        <translation>услуга</translation>
+        <translation>қызмет</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1839,7 +1812,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>gamblingPrize</source>
-        <translation>выигрыш</translation>
+        <translation>ұтыс</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1867,7 +1840,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>lotteryPrize</source>
-        <translation>лотерейный выигрыш</translation>
+        <translation>лотерея ұтысы</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1881,7 +1854,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>intellectualActivity</source>
-        <translation>интеллектуальная деятельность</translation>
+        <translation>зияткерлік қызмет</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1895,7 +1868,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>payment</source>
-        <translation>оплата</translation>
+        <translation>төлем</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1909,7 +1882,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>agentCommission</source>
-        <translation>агентское вознаграждение</translation>
+        <translation>агенттік сыйақы</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1923,7 +1896,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>pay</source>
-        <translation>выплата</translation>
+        <translation>төлем шығыс</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1937,7 +1910,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>another</source>
-        <translation>прочее</translation>
+        <translation>басқа</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1951,7 +1924,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>proprietaryLaw</source>
-        <translation>имущественное право</translation>
+        <translation>мүліктік құқық</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1965,7 +1938,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>nonOperatingIncome</source>
-        <translation>внереализационный доход</translation>
+        <translation>операциялық емес кіріс</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1979,7 +1952,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>otherContributions</source>
-        <translation>прочие взносы</translation>
+        <translation>басқа жарналар</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -1993,7 +1966,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>merchantTax</source>
-        <translation>торговый сбор</translation>
+        <translation>сауда алымы</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -2007,7 +1980,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>resortFee</source>
-        <translation>курортный сбор</translation>
+        <translation>курорт алымы</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -2021,7 +1994,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>deposit</source>
-        <translation>залог</translation>
+        <translation>кепілдік</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -2035,7 +2008,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>consumption</source>
-        <translation>расход</translation>
+        <translation>шығыс</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -2049,7 +2022,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>soleProprietorCPIContributions</source>
-        <translation>взносы ИП на ОПС</translation>
+        <translation>ЖК МЗС жарналары</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -2063,7 +2036,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>cpiContributions</source>
-        <translation>взносы на ОПС</translation>
+        <translation>МЗС жарналары</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -2077,7 +2050,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>soleProprietorCMIContributions</source>
-        <translation>взносы ИП на ОМС</translation>
+        <translation>ЖК МӘС жарналары</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -2091,7 +2064,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>cmiContributions</source>
-        <translation>взносы на ОМС</translation>
+        <translation>МӘС жарналары</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -2105,7 +2078,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>csiContributions</source>
-        <translation>взносы на ОСС</translation>
+        <translation>ӘСС жарналары</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -2119,7 +2092,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>casinoPayment</source>
-        <translation>оплата казино</translation>
+        <translation>казино төлемі</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -2133,7 +2106,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>fundsIssuance</source>
-        <translation>выдача средств</translation>
+        <translation>қаражат беру</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -2147,7 +2120,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>exciseWithoutMarking</source>
-        <translation>подакцизный товар без маркировки</translation>
+        <translation>таңбасыз акцизді тауар</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -2161,7 +2134,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>exciseWithMarking</source>
-        <translation>подакцизный товар с маркировкой</translation>
+        <translation>таңбалы акцизді тауар</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -2175,7 +2148,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>commodityWithoutMarking</source>
-        <translation>товар без маркировки</translation>
+        <translation>таңбасыз тауар</translation>
     </message>
     <message>
         <location line="-60"/>
@@ -2189,21 +2162,21 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-60"/>
         <location line="+62"/>
         <source>commodityWithMarking</source>
-        <translation>товар с маркировкой</translation>
+        <translation>таңбалы тауар</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="-246"/>
         <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-246"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
         <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-218"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-246"/>
         <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-246"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-218"/>
         <location line="+48"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+30"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <location line="+48"/>
         <source>piece</source>
-        <translation>штука</translation>
+        <translation>дана</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -2301,7 +2274,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>squareCentimeter</source>
-        <translation>кв. сантиметр</translation>
+        <translation>шаршы сантиметр</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -2315,7 +2288,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>squareDecimeter</source>
-        <translation>кв. дециметр</translation>
+        <translation>шаршы дециметр</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -2329,7 +2302,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>squareMeter</source>
-        <translation>кв. метр</translation>
+        <translation>шаршы метр</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -2371,7 +2344,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>cubicMeter</source>
-        <translation>куб. метр</translation>
+        <translation>текше метр</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -2385,7 +2358,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>kilowattHour</source>
-        <translation>киловатт·час</translation>
+        <translation>киловатт·сағат</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -2413,7 +2386,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>day</source>
-        <translation>день</translation>
+        <translation>күн</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -2427,7 +2400,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>hour</source>
-        <translation>час</translation>
+        <translation>сағат</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -2441,7 +2414,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>minute</source>
-        <translation>минута</translation>
+        <translation>минут</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -2455,7 +2428,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>second</source>
-        <translation>секунда</translation>
+        <translation>секунд</translation>
     </message>
     <message>
         <location line="-46"/>
@@ -2525,57 +2498,57 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-46"/>
         <location line="+48"/>
         <source>otherUnits</source>
-        <translation>другие единицы</translation>
+        <translation>басқа бірліктер</translation>
     </message>
     <message>
-        <location line="-486"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+448"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-594"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-402"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+308"/>
+        <location line="-182"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+440"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-206"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-412"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+556"/>
         <source>Icons/AdminPanel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+18"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-18"/>
+        <location line="+14"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-14"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-16"/>
         <source>qrc:/qml/imtauthgui/UserActionCollectionView.qml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
+        <location line="-4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Workspace</source>
-        <translation>Рабочее пространство</translation>
+        <translation>Жұмыс кеңістігі</translation>
     </message>
     <message>
-        <location line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Icons/Dashboard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+246"/>
+        <location line="+172"/>
         <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-452"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-680"/>
         <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+726"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+202"/>
         <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+384"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+302"/>
         <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-416"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-542"/>
         <location line="+14"/>
         <source>fullPrepayment</source>
-        <translation>полная предоплата</translation>
+        <translation>толық алдын ала төлем</translation>
     </message>
     <message>
         <location line="-12"/>
@@ -2589,7 +2562,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-12"/>
         <location line="+14"/>
         <source>prepayment</source>
-        <translation>предоплата</translation>
+        <translation>алдын ала төлем</translation>
     </message>
     <message>
         <location line="-12"/>
@@ -2617,7 +2590,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-12"/>
         <location line="+14"/>
         <source>fullPayment</source>
-        <translation>полный расчёт</translation>
+        <translation>толық есеп айырысу</translation>
     </message>
     <message>
         <location line="-12"/>
@@ -2631,59 +2604,59 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-12"/>
         <location line="+14"/>
         <source>partialPayment</source>
-        <translation>частичный расчёт</translation>
+        <translation>ішінара есеп айырысу</translation>
     </message>
     <message>
         <location line="-12"/>
         <location line="+14"/>
-        <location line="+230"/>
+        <location line="+134"/>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-12"/>
         <location line="+14"/>
-        <location line="+134"/>
+        <location line="+230"/>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-12"/>
         <location line="+14"/>
-        <location line="+10"/>
+        <location line="+134"/>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-12"/>
         <location line="+14"/>
-        <location line="+134"/>
+        <location line="+230"/>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-12"/>
         <location line="+14"/>
-        <location line="+106"/>
+        <location line="+10"/>
         <location line="+10"/>
         <source>credit</source>
         <translation>кредит</translation>
     </message>
     <message>
-        <location line="-252"/>
+        <location line="-156"/>
         <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-156"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-252"/>
         <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-32"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-156"/>
         <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-156"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-252"/>
         <location line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-128"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-32"/>
         <location line="+14"/>
         <source>creditPayment</source>
-        <translation>оплата кредита</translation>
+        <translation>кредит төлемі</translation>
     </message>
     <message>
-        <location line="+222"/>
+        <location line="+126"/>
         <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+126"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+222"/>
         <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+126"/>
         <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+126"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+222"/>
         <location line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+98"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <location line="+10"/>
         <source>cash</source>
-        <translation>наличные</translation>
+        <translation>қолма-қол</translation>
     </message>
     <message>
         <location line="-8"/>
@@ -2697,7 +2670,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-8"/>
         <location line="+10"/>
         <source>electronically</source>
-        <translation>электронно</translation>
+        <translation>электронды</translation>
     </message>
     <message>
         <location line="-8"/>
@@ -2711,7 +2684,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-8"/>
         <location line="+10"/>
         <source>prepaid</source>
-        <translation>предоплачено</translation>
+        <translation>алдын ала төленген</translation>
     </message>
     <message>
         <location line="-6"/>
@@ -2725,7 +2698,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6"/>
         <location line="+10"/>
         <source>other</source>
-        <translation>прочее</translation>
+        <translation>басқа</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2739,7 +2712,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <location line="+8"/>
         <source>Sell</source>
-        <translation>Продажа</translation>
+        <translation>Сату</translation>
     </message>
     <message>
         <location line="-6"/>
@@ -2753,7 +2726,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6"/>
         <location line="+8"/>
         <source>Buy</source>
-        <translation>Покупка</translation>
+        <translation>Сатып алу</translation>
     </message>
     <message>
         <location line="-6"/>
@@ -2767,7 +2740,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6"/>
         <location line="+8"/>
         <source>SellReturn</source>
-        <translation>Возврат продажи</translation>
+        <translation>Сату қайтарымы</translation>
     </message>
     <message>
         <location line="-6"/>
@@ -2781,7 +2754,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6"/>
         <location line="+8"/>
         <source>BuyReturn</source>
-        <translation>Возврат покупки</translation>
+        <translation>Сатып алу қайтарымы</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2798,36 +2771,36 @@
         <translation>Чек</translation>
     </message>
     <message>
-        <location line="-812"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+146"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-502"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-668"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+130"/>
+        <location line="+30"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+62"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-684"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+144"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+140"/>
         <source>New sensor</source>
-        <translation>Новый сенсор</translation>
+        <translation>Жаңа сенсор</translation>
     </message>
     <message>
-        <location line="+438"/>
+        <location line="+68"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-466"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+170"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+182"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+694"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+348"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-464"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-504"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+172"/>
         <location line="+2"/>
         <source>Personal Access Token</source>
-        <translation>Персональный токен доступа</translation>
+        <translation>Жеке қатынау токені</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+12"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+8"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+8"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+12"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+12"/>
         <source>Action</source>
-        <translation>Действие</translation>
+        <translation>Әрекет</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -2836,7 +2809,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+8"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+8"/>
         <source>Target</source>
-        <translation>Цель</translation>
+        <translation>Мақсат</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2845,352 +2818,352 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Timestamp</source>
-        <translation>Отметка времени</translation>
+        <translation>Уақыт белгісі</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
+        <location line="-12"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-14"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-12"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-12"/>
         <source>Open</source>
-        <translation>Открыть</translation>
+        <translation>Ашу</translation>
     </message>
     <message>
         <location line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
         <source>New Customer</source>
-        <translation>Новый заказчик</translation>
+        <translation>Жаңа тұтынушы</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+16"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
+        <location line="+16"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+14"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+16"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+16"/>
         <source>User Action</source>
-        <translation>Действие пользователя</translation>
+        <translation>Пайдаланушы әрекеті</translation>
     </message>
     <message>
-        <location line="-382"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+368"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-278"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+392"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+410"/>
+        <location line="+20"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-116"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-640"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+364"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-118"/>
         <source>:/qml/imtgui/Settings/SettingsTextInput.qml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
+        <location line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-6"/>
         <source>:/qml/imtgui/Settings/DatabaseInput.qml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+84"/>
-        <location line="+100"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+218"/>
-        <location line="+126"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-168"/>
-        <location line="+100"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-654"/>
-        <location line="+126"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+128"/>
-        <location line="+152"/>
+        <location line="-646"/>
+        <location line="+102"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-432"/>
+        <location line="+732"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+124"/>
+        <location line="+146"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-624"/>
+        <location line="+128"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-142"/>
+        <location line="+446"/>
         <source>Roles</source>
-        <translation>Роли</translation>
+        <translation>Рөлдер</translation>
     </message>
     <message>
-        <location line="-102"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-128"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-102"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-128"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-150"/>
+        <location line="-100"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-148"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-126"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
         <source>Users</source>
-        <translation>Пользователи</translation>
+        <translation>Пайдаланушылар</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+32"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
-        <source>Role Name</source>
-        <translation>Название роли</translation>
-    </message>
-    <message>
-        <location line="-160"/>
-        <location line="+94"/>
-        <location line="+226"/>
-        <location line="+92"/>
-        <location line="+62"/>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-312"/>
-        <location line="+6"/>
-        <location line="+80"/>
-        <location line="+52"/>
-        <location line="+136"/>
-        <location line="+164"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-10"/>
-        <location line="+124"/>
-        <location line="+22"/>
-        <location line="+6"/>
-        <location line="+38"/>
-        <location line="+58"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-118"/>
-        <location line="+110"/>
-        <location line="+162"/>
-        <location line="+400"/>
-        <location line="+6"/>
-        <location line="+112"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-488"/>
-        <location line="+6"/>
-        <location line="+362"/>
-        <location line="+56"/>
-        <location line="+164"/>
-        <location line="+150"/>
-        <source>Edit</source>
-        <translation>Редактировать</translation>
-    </message>
-    <message>
-        <location line="-482"/>
-        <location line="+94"/>
-        <location line="+230"/>
-        <location line="+88"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-354"/>
-        <location line="+52"/>
-        <location line="+134"/>
-        <location line="+166"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-250"/>
-        <location line="+122"/>
-        <location line="+66"/>
-        <location line="+60"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-794"/>
-        <location line="+110"/>
-        <location line="+160"/>
-        <location line="+514"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-360"/>
-        <location line="+50"/>
-        <location line="+154"/>
-        <location line="+162"/>
-        <source>Remove</source>
-        <translation>Удалить</translation>
-    </message>
-    <message>
-        <location line="-322"/>
-        <location line="+226"/>
-        <location line="+92"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-348"/>
-        <location line="+188"/>
-        <location line="+164"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-244"/>
-        <location line="+124"/>
-        <location line="+74"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-676"/>
-        <location line="+164"/>
-        <location line="+516"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-374"/>
-        <location line="+210"/>
-        <location line="+160"/>
-        <source>New</source>
-        <translation>Новый</translation>
-    </message>
-    <message>
-        <location line="-304"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-344"/>
+        <location line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+30"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-354"/>
-        <source>Close</source>
-        <translation>Закрыть</translation>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
+        <source>Role Name</source>
+        <translation>Рөл атауы</translation>
     </message>
     <message>
-        <location line="+16"/>
-        <location line="+300"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+16"/>
-        <location line="+332"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-76"/>
-        <location line="+92"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-538"/>
-        <location line="+522"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+16"/>
-        <location line="+348"/>
-        <source>Undo</source>
-        <translation>Отменить</translation>
-    </message>
-    <message>
-        <location line="-304"/>
+        <location line="-36"/>
+        <location line="+180"/>
+        <location line="+52"/>
+        <location line="+6"/>
+        <location line="+322"/>
+        <location line="+138"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-396"/>
+        <location line="+6"/>
         <location line="+8"/>
-        <location line="+294"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-344"/>
-        <location line="+4"/>
-        <location line="+338"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-94"/>
-        <location line="+86"/>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-524"/>
-        <location line="+520"/>
-        <location line="+16"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-356"/>
-        <location line="+4"/>
-        <location line="+350"/>
-        <source>Save</source>
-        <translation>Сохранить</translation>
-    </message>
-    <message>
-        <location line="+418"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-308"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+24"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+24"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-326"/>
-        <source>(C) 2020 ImagingTools GmbH. All rights reserved.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-724"/>
-        <location line="+304"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-18"/>
-        <location line="+330"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-110"/>
+        <location line="+88"/>
+        <location line="+166"/>
+        <location line="+118"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-200"/>
         <location line="+94"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-556"/>
-        <location line="+528"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-40"/>
-        <location line="+364"/>
-        <source>Redo</source>
-        <translation>Восстановить</translation>
+        <location line="+52"/>
+        <location line="+6"/>
+        <location line="+26"/>
+        <location line="+140"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-40"/>
+        <location line="+164"/>
+        <location line="+396"/>
+        <location line="+6"/>
+        <location line="+76"/>
+        <location line="+56"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-438"/>
+        <location line="+6"/>
+        <location line="+54"/>
+        <location line="+98"/>
+        <location line="+152"/>
+        <location line="+114"/>
+        <source>Edit</source>
+        <translation>Өңдеу</translation>
     </message>
     <message>
-        <location line="-306"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-332"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
+        <location line="-702"/>
+        <location line="+188"/>
+        <location line="+372"/>
+        <location line="+132"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-368"/>
+        <location line="+88"/>
+        <location line="+166"/>
+        <location line="+110"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-316"/>
+        <location line="+94"/>
+        <location line="+84"/>
+        <location line="+140"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-696"/>
+        <location line="+166"/>
+        <location line="+484"/>
+        <location line="+50"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-366"/>
+        <location line="+90"/>
+        <location line="+158"/>
+        <location line="+124"/>
+        <source>Remove</source>
+        <translation>Жою</translation>
+    </message>
+    <message>
+        <location line="-690"/>
+        <location line="+180"/>
+        <location line="+518"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-278"/>
+        <location line="+166"/>
+        <location line="+114"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-230"/>
+        <location line="+86"/>
+        <location line="+146"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-704"/>
+        <location line="+168"/>
+        <location line="+478"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-288"/>
+        <location line="+162"/>
+        <location line="+118"/>
+        <source>New</source>
+        <translation>Жаңа</translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-262"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-220"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+12"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-258"/>
+        <source>Close</source>
+        <translation>Жабу</translation>
+    </message>
+    <message>
+        <location line="-712"/>
+        <location line="+704"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+4"/>
+        <location line="+150"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+20"/>
+        <location line="+64"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-486"/>
+        <location line="+490"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+12"/>
+        <location line="+140"/>
+        <source>Undo</source>
+        <translation>Болдырмау</translation>
+    </message>
+    <message>
+        <location line="-708"/>
+        <location line="+700"/>
+        <location line="+20"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-142"/>
+        <location line="+4"/>
+        <location line="+140"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-72"/>
+        <location line="+4"/>
+        <location line="+66"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-486"/>
+        <location line="+494"/>
+        <location line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-156"/>
+        <location line="+12"/>
+        <location line="+142"/>
+        <source>Save</source>
+        <translation>Сақтау</translation>
+    </message>
+    <message>
+        <location line="-168"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-266"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-188"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+22"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-262"/>
+        <source>(C) 2020 ImagingTools GmbH. All rights reserved.</source>
+        <translation>(C) 2020 ImagingTools GmbH. Барлық құқықтар қорғалған.</translation>
+    </message>
+    <message>
+        <location line="-550"/>
+        <location line="+702"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+106"/>
+        <location line="+156"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+110"/>
+        <location line="+76"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-522"/>
+        <location line="+492"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+116"/>
+        <location line="+144"/>
+        <source>Redo</source>
+        <translation>Қайтару</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-154"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-74"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-362"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-142"/>
         <source>Icons/Redo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location line="-4"/>
+        <location line="+20"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+16"/>
         <location line="+4"/>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-16"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+8"/>
         <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-12"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
         <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-12"/>
-        <location line="+16"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+12"/>
-        <location line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-8"/>
+        <location line="+12"/>
         <source>Icons/Save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-20"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-8"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-12"/>
+        <location line="-4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-16"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-16"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-16"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-8"/>
         <source>Icons/Close</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../Include/imtauth/CRoleChangeGeneratorComp.cpp" line="+59"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DdlCodeCreator/CDdlCodeCreator.cpp" line="+62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+220"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-192"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-696"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+102"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DdlCodeCreator/CDdlCodeCreator.cpp" line="-682"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+274"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+98"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-616"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+274"/>
         <source>Role-ID</source>
-        <translation>Идентификатор роли</translation>
+        <translation>Рөл идентификаторы</translation>
     </message>
     <message>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DdlCodeCreator/CDdlCodeCreator.cpp" line="+98"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+98"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+98"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+124"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+148"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-736"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+144"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+98"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-448"/>
         <source>Last Connection</source>
-        <translation>Последнее подключение</translation>
+        <translation>Соңғы қосылу</translation>
     </message>
     <message>
-        <location line="-144"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-302"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+110"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+556"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-234"/>
+        <location line="+576"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+466"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-222"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+522"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+186"/>
         <source>Icons/Undo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+124"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+282"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-130"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-576"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+210"/>
+        <location line="-596"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-486"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+202"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-542"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-206"/>
         <source>Group Name</source>
-        <translation>Название группы</translation>
+        <translation>Топ атауы</translation>
     </message>
     <message>
         <location filename="../../../Include/imtauth/CRoleChangeGeneratorComp.cpp" line="+14"/>
         <location filename="../../../Include/imtauth/CUserChangeGeneratorComp.cpp" line="+94"/>
         <location filename="../../../Include/imtauth/CUserGroupChangeGeneratorComp.cpp" line="+115"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DdlCodeCreator/CDdlCodeCreator.cpp" line="-76"/>
+        <location line="+32"/>
+        <location line="+26"/>
+        <location line="+20"/>
+        <location line="+524"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location line="+558"/>
+        <location line="+198"/>
+        <location line="+32"/>
+        <location line="+26"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-122"/>
         <location line="+30"/>
         <location line="+28"/>
-        <location line="+20"/>
-        <location line="+204"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-702"/>
-        <location line="+626"/>
+        <location line="+66"/>
+        <location line="+376"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-76"/>
         <location line="+32"/>
         <location line="+26"/>
         <location line="+20"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-76"/>
-        <location line="+32"/>
+        <location line="+130"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-44"/>
         <location line="+26"/>
         <location line="+20"/>
-        <location line="+356"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-102"/>
-        <location line="+56"/>
-        <location line="+28"/>
-        <location line="+20"/>
-        <location line="+132"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-676"/>
-        <location line="+554"/>
-        <location line="+32"/>
-        <location line="+72"/>
-        <location line="+20"/>
+        <location line="+270"/>
+        <location line="+198"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation>Сипаттама</translation>
     </message>
     <message>
         <location line="-7"/>
         <location filename="../../../Include/imtauth/CUserGroupChangeGeneratorComp.cpp" line="-7"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DdlCodeCreator/CDdlCodeCreator.cpp" line="-440"/>
-        <location line="+244"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-248"/>
-        <location line="+256"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-348"/>
-        <location line="+162"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-352"/>
-        <location line="+228"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-182"/>
-        <location line="+194"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DdlCodeCreator/CDdlCodeCreator.cpp" line="-516"/>
+        <location line="+440"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-806"/>
+        <location line="+372"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-696"/>
+        <location line="+328"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-122"/>
+        <location line="+578"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-460"/>
+        <location line="+84"/>
         <source>Name</source>
-        <translation>Название</translation>
+        <translation>Атауы</translation>
     </message>
     <message>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DdlCodeCreator/CDdlCodeCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-160"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DdlCodeCreator/CDdlCodeCreator.cpp" line="-438"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-370"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-576"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-82"/>
         <source>Email</source>
-        <translation>Почтовый адрес</translation>
+        <translation>Электрондық пошта</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -3199,22 +3172,22 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+6"/>
         <source>Groups</source>
-        <translation>Группы</translation>
+        <translation>Топтар</translation>
     </message>
     <message>
-        <location line="+210"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-414"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+32"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+426"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-640"/>
+        <location line="+94"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+336"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-204"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+420"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+8"/>
         <source>Text file</source>
-        <translation>Текстовый файл</translation>
+        <translation>Мәтіндік файл</translation>
     </message>
     <message>
-        <location line="+2"/>
         <location line="+2"/>
         <location line="+4"/>
         <location line="+2"/>
+        <location line="+4"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
         <location line="+4"/>
         <location line="+2"/>
@@ -3223,48 +3196,48 @@
         <location line="+2"/>
         <location line="+4"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+4"/>
         <location line="+2"/>
         <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
-        <location line="+4"/>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
         <location line="+2"/>
         <location line="+4"/>
+        <location line="+2"/>
         <source>Edit License</source>
-        <translation>Редактировать лицензию</translation>
+        <translation>Лицензияны өңдеу</translation>
     </message>
     <message>
-        <location line="+332"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+204"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+104"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-624"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+292"/>
+        <location line="+292"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+164"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-160"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-628"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+204"/>
         <source>Report</source>
-        <translation>Отчет</translation>
+        <translation>Есеп</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>Report Files</source>
-        <translation>Файлы отчетов</translation>
+        <translation>Есеп файлдары</translation>
     </message>
     <message>
-        <location line="-386"/>
+        <location line="+88"/>
         <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-548"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+4"/>
         <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+172"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+696"/>
         <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+280"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+288"/>
         <location line="+12"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-384"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+4"/>
         <location line="+12"/>
         <source>NO_USER_MANAGEMENT</source>
-        <translation type="unfinished"></translation>
+        <translation>Пайдаланушыларды басқарусыз</translation>
     </message>
     <message>
         <location line="-10"/>
@@ -3278,7 +3251,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-10"/>
         <location line="+12"/>
         <source>OPTIONAL_USER_MANAGEMENT</source>
-        <translation type="unfinished"></translation>
+        <translation>Қосымша пайдаланушы басқару</translation>
     </message>
     <message>
         <location line="-10"/>
@@ -3292,58 +3265,58 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-10"/>
         <location line="+12"/>
         <source>STRONG_USER_MANAGEMENT</source>
-        <translation type="unfinished"></translation>
+        <translation>Қатаң пайдаланушы басқару</translation>
     </message>
     <message>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-18"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="-632"/>
         <source>SDL Generator version</source>
-        <translation>Версия генератора SDL</translation>
+        <translation>SDL генератор нұсқасы</translation>
     </message>
     <message>
-        <location line="-6"/>
+        <location line="+6"/>
         <source>SDL code generator</source>
-        <translation>Генератор кода SDL</translation>
+        <translation>SDL код генераторы</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="-4"/>
         <source>SDL Code generator</source>
-        <translation>Генератор кода SDL</translation>
+        <translation>SDL код генераторы</translation>
     </message>
     <message>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-360"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="-340"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+2"/>
         <source>? Imaging tools</source>
-        <translation type="unfinished"></translation>
+        <translation>? Imaging tools</translation>
     </message>
     <message>
-        <location line="-6"/>
+        <location line="+8"/>
         <source>OAS Code generator</source>
-        <translation>Генератор кода OAS</translation>
+        <translation>OAS код генераторы</translation>
     </message>
     <message>
         <location filename="../../../Include/imtauth/CUserChangeGeneratorComp.cpp" line="-14"/>
         <source>User-ID</source>
-        <translation>ID пользователя</translation>
+        <translation>Пайдаланушы ID</translation>
     </message>
     <message>
         <location line="+7"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DdlCodeCreator/CDdlCodeCreator.cpp" line="-84"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-58"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-62"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+310"/>
-        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+772"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DdlCodeCreator/CDdlCodeCreator.cpp" line="-680"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+88"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+30"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/OasCodeGeneratorExe/COasCodeGeneratorExe.cpp" line="+274"/>
+        <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/SdlCodeGenerator/CSdlCodeGenerator.cpp" line="+720"/>
         <source>Username</source>
-        <translation>Логин</translation>
+        <translation>Пайдаланушы аты</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Mail</source>
-        <translation>Почта</translation>
+        <translation>Пошта</translation>
     </message>
     <message>
         <location filename="../../../Include/imtauth/CUserGroupChangeGeneratorComp.cpp" line="-7"/>
         <source>Group-ID</source>
-        <translation>ID Группы</translation>
+        <translation>Топ ID</translation>
     </message>
 </context>
 <context>
@@ -3351,12 +3324,12 @@
     <message>
         <location filename="../../../Qml/imtauthgui/AuthorizationController.qml" line="+351"/>
         <source>The user has been successfully registered</source>
-        <translation>Пользователь успешно зарегистрирован</translation>
+        <translation>Пайдаланушы сәтті тіркелді</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Password changed successfully</source>
-        <translation>Пароль успешно изменен</translation>
+        <translation>Құпия сөз сәтті өзгертілді</translation>
     </message>
 </context>
 <context>
@@ -3364,7 +3337,7 @@
     <message>
         <location filename="../../../Qml/imtauthgui/AuthorizationPage.qml" line="+152"/>
         <source>Welcome</source>
-        <translation>Добро пожаловать</translation>
+        <translation>Қош келдіңіз</translation>
     </message>
     <message>
         <location line="-105"/>
@@ -3373,54 +3346,54 @@
         <location line="-260"/>
         <location line="+260"/>
         <source>Login</source>
-        <translation>Логин</translation>
+        <translation>Кіру</translation>
     </message>
     <message>
         <location line="-242"/>
         <source>Enter the login</source>
-        <translation>Введите логин</translation>
+        <translation>Логинді енгізіңіз</translation>
     </message>
     <message>
         <location line="+35"/>
         <source>Password</source>
-        <translation>Пароль</translation>
+        <translation>Құпия сөз</translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Enter the password</source>
-        <translation>Введите пароль</translation>
+        <translation>Құпия сөзді енгізіңіз</translation>
     </message>
     <message>
         <location line="+71"/>
         <source>Password recovery</source>
-        <translation>Восстановить пароль</translation>
+        <translation>Құпия сөзді қалпына келтіру</translation>
     </message>
     <message>
         <location line="+35"/>
         <source>Remember me</source>
-        <translation>Запомнить меня</translation>
+        <translation>Мені есте сақтау</translation>
     </message>
     <message>
         <location line="+20"/>
         <location line="+93"/>
         <location line="+0"/>
         <source>Register</source>
-        <translation>Зарегистрироваться</translation>
+        <translation>Тіркелу</translation>
     </message>
     <message>
         <location line="-9"/>
         <source>User Registration</source>
-        <translation>Регистрация пользователя</translation>
+        <translation>Пайдаланушы тіркеуі</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Close</source>
-        <translation>Закрыть</translation>
+        <translation>Жабу</translation>
     </message>
     <message>
         <location line="-333"/>
         <source>Welcome to</source>
-        <translation>Добро пожаловать в</translation>
+        <translation>Қош келдіңіз</translation>
     </message>
 </context>
 <context>
@@ -3429,73 +3402,73 @@
         <location filename="../../../Include/imtauthgui/CAccountInfoEditorComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+332"/>
         <source>Edit Account Information</source>
-        <translation>Редактирование информации об аккаунте</translation>
+        <translation>Тіркелгі ақпаратын өңдеу</translation>
     </message>
     <message>
         <location line="+112"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Load...</source>
-        <translation>Загрузить...</translation>
+        <translation>Жүктеу...</translation>
     </message>
     <message>
         <location line="+23"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation>Жою</translation>
     </message>
     <message>
         <location line="+108"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Account Type</source>
-        <translation>Тип аккаунта</translation>
+        <translation>Тіркелгі түрі</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Account Name</source>
-        <translation>Название аккаунта</translation>
+        <translation>Тіркелгі атауы</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Account Description</source>
-        <translation>Описание аккаунта</translation>
+        <translation>Тіркелгі сипаттамасы</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Company Address</source>
-        <translation>Адрес компании</translation>
+        <translation>Компания мекенжайы</translation>
     </message>
     <message>
         <location line="+6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Country</source>
-        <translation>Страна</translation>
+        <translation>Ел</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>City</source>
-        <translation>Город</translation>
+        <translation>Қала</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Postal Code</source>
-        <translation>Почтовый индекс</translation>
+        <translation>Пошта индексі</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Street</source>
-        <translation>Улица</translation>
+        <translation>Көше</translation>
     </message>
     <message>
         <location line="+13"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAccountInfoEditorComp.h" line="+1"/>
         <source>Account Owner</source>
-        <translation>Владелец аккаунта</translation>
+        <translation>Тіркелгі иесі</translation>
     </message>
 </context>
 <context>
@@ -3504,31 +3477,31 @@
         <location filename="../../../Include/imtauthgui/CAddressEditorComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAddressEditorComp.h" line="+113"/>
         <source>Edit Addresses</source>
-        <translation>Редактировать адреса</translation>
+        <translation>Мекенжайларды өңдеу</translation>
     </message>
     <message>
         <location line="+27"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAddressEditorComp.h" line="+1"/>
         <source>Country</source>
-        <translation>Страна</translation>
+        <translation>Ел</translation>
     </message>
     <message>
         <location line="+18"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAddressEditorComp.h" line="+1"/>
         <source>City</source>
-        <translation>Город</translation>
+        <translation>Қала</translation>
     </message>
     <message>
         <location line="+18"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAddressEditorComp.h" line="+1"/>
         <source>Postal code</source>
-        <translation>Почтовый индекс</translation>
+        <translation>Пошта индексі</translation>
     </message>
     <message>
         <location line="+18"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CAddressEditorComp.h" line="+1"/>
         <source>Street</source>
-        <translation>Улица</translation>
+        <translation>Көше</translation>
     </message>
 </context>
 <context>
@@ -3545,43 +3518,43 @@
     <message>
         <location filename="../../../Include/imtservergql/CCollectionImportControllerComp.cpp" line="+74"/>
         <source>Unable to initialize progress manager</source>
-        <translation>Не удалось инициализировать менеджер прогресса</translation>
+        <translation>Прогресс менеджерін инициализациялау мүмкін болмады</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Unable to create temporary fileInfo for upload</source>
-        <translation>Не удалось создать временный файл для загрузки</translation>
+        <translation>Жүктеу үшін уақытша файл жасау мүмкін болмады</translation>
     </message>
     <message>
         <location line="+22"/>
         <location line="+216"/>
         <source>Collection import cancelled</source>
-        <translation>Импорт коллекции отменён</translation>
+        <translation>Жинақ импорты тоқтатылды</translation>
     </message>
     <message>
         <location line="-212"/>
         <source>Collection import session not found</source>
-        <translation>Сессия импорта коллекции не найдена</translation>
+        <translation>Жинақ импорт сессиясы табылмады</translation>
     </message>
     <message>
         <location line="+92"/>
         <source>Import files to the collection</source>
-        <translation>Импорт файлов в коллекцию</translation>
+        <translation>Файлдарды жинаққа импорттау</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Uploading files to the server</source>
-        <translation>Загрузка файлов на сервер</translation>
+        <translation>Файлдарды серверге жүктеу</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Processing files on the server</source>
-        <translation>Обработка файлов на сервере</translation>
+        <translation>Файлдарды серверде өңдеу</translation>
     </message>
     <message>
         <location line="+122"/>
         <source>An error occurred during collection import</source>
-        <translation>Произошла ошибка при импорте коллекции</translation>
+        <translation>Жинақ импорты кезінде қате орын алды</translation>
     </message>
 </context>
 <context>
@@ -3590,7 +3563,7 @@
         <location filename="../../../Include/imtgui/CCompositeObjectViewComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCompositeObjectViewComp.h" line="+50"/>
         <source>Main Window</source>
-        <translation>Главное окно</translation>
+        <translation>Негізгі терезе</translation>
     </message>
 </context>
 <context>
@@ -3599,85 +3572,85 @@
         <location filename="../../../Include/imtauthgui/CContactInfoEditorComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+204"/>
         <source>Edit Contact Information</source>
-        <translation>Редактирование контактной информации</translation>
+        <translation>Байланыс ақпаратын өңдеу</translation>
     </message>
     <message>
         <location line="+9"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>E-Mail</source>
-        <translation>Электронная почта</translation>
+        <translation>Электрондық пошта</translation>
     </message>
     <message>
         <location line="+12"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>Birthday</source>
-        <translation>Дата рождения</translation>
+        <translation>Туған күні</translation>
     </message>
     <message>
         <location line="+12"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>Gender</source>
-        <translation>Пол</translation>
+        <translation>Жынысы</translation>
     </message>
     <message>
         <location line="+12"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>First Name</source>
-        <translation>Имя</translation>
+        <translation>Аты</translation>
     </message>
     <message>
         <location line="+12"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>Last Name</source>
-        <translation>Фамилия</translation>
+        <translation>Тегі</translation>
     </message>
     <message>
         <location line="+12"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>Nickname</source>
-        <translation>Псевдоним</translation>
+        <translation>Лақап ат</translation>
     </message>
     <message>
         <location line="+12"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>Addresses</source>
-        <translation>Адреса</translation>
+        <translation>Мекенжайлар</translation>
     </message>
     <message>
         <location line="+8"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>Add</source>
-        <translation>Добавить</translation>
+        <translation>Қосу</translation>
     </message>
     <message>
         <location line="+17"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+1"/>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation>Жою</translation>
     </message>
     <message>
         <location line="+45"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="+5"/>
         <source>Country</source>
-        <translation>Страна</translation>
+        <translation>Ел</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="-1"/>
         <source>City</source>
-        <translation>Город</translation>
+        <translation>Қала</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="-1"/>
         <source>Postal Code</source>
-        <translation>Почтовый индекс</translation>
+        <translation>Пошта индексі</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CContactInfoEditorComp.h" line="-1"/>
         <source>Street</source>
-        <translation>Улица</translation>
+        <translation>Көше</translation>
     </message>
 </context>
 <context>
@@ -3692,7 +3665,7 @@
         <location line="+8"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+1"/>
         <source>Fixed Layouts</source>
-        <translation>Фиксированные макеты</translation>
+        <translation>Бекітілген орналасулар</translation>
     </message>
     <message>
         <location line="+20"/>
@@ -3718,13 +3691,13 @@
         <location line="+3"/>
         <location line="+3"/>
         <source>All Layouts</source>
-        <translation>Все макеты</translation>
+        <translation>Барлық орналасулар</translation>
     </message>
     <message>
         <location line="-422"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="-28"/>
         <source>Border Enabled</source>
-        <translation>Граница включена</translation>
+        <translation>Шекара қосылған</translation>
     </message>
     <message>
         <location line="+34"/>
@@ -3736,7 +3709,7 @@
         <location line="+13"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+1"/>
         <source>Border Color</source>
-        <translation>Цвет границы</translation>
+        <translation>Шекара түсі</translation>
     </message>
     <message>
         <location line="+37"/>
@@ -3758,7 +3731,7 @@
         <location line="-301"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="-20"/>
         <source>Min Width</source>
-        <translation>Мин. ширина</translation>
+        <translation>Мин. ені</translation>
     </message>
     <message>
         <location line="+37"/>
@@ -3772,43 +3745,43 @@
         <location line="-81"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="-5"/>
         <source>Max Width</source>
-        <translation>Макс. ширина</translation>
+        <translation>Макс. ені</translation>
     </message>
     <message>
         <location line="+44"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
         <source>Min Height</source>
-        <translation>Мин. высота</translation>
+        <translation>Мин. биіктігі</translation>
     </message>
     <message>
         <location line="+44"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
         <source>Max Height</source>
-        <translation>Макс. высота</translation>
+        <translation>Макс. биіктігі</translation>
     </message>
     <message>
         <location line="+44"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
         <source>Left Margin</source>
-        <translation>Левый отступ</translation>
+        <translation>Сол жақ шегініс</translation>
     </message>
     <message>
         <location line="+44"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
         <source>Right Margin</source>
-        <translation>Правый отступ</translation>
+        <translation>Оң жақ шегініс</translation>
     </message>
     <message>
         <location line="+44"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
         <source>Top Margin</source>
-        <translation>Верхний отступ</translation>
+        <translation>Жоғарғы шегініс</translation>
     </message>
     <message>
         <location line="+44"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutSettings.h" line="+3"/>
         <source>Bottom Margin</source>
-        <translation>Нижний отступ</translation>
+        <translation>Төменгі шегініс</translation>
     </message>
 </context>
 <context>
@@ -3845,7 +3818,7 @@
         <location line="-7"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutWidgetForm.h" line="-1"/>
         <source>Set Icon</source>
-        <translation>Установить иконку</translation>
+        <translation>Белгішені орнату</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -3853,7 +3826,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CCustomLayoutWidgetForm.h" line="+2"/>
         <location line="+1"/>
         <source>No Name</source>
-        <translation>Без имени</translation>
+        <translation>Атаусыз</translation>
     </message>
 </context>
 <context>
@@ -3880,31 +3853,31 @@
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>Database Name</source>
-        <translation>Название базы данных</translation>
+        <translation>Деректер қоры атауы</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>User</source>
-        <translation>Пользователь</translation>
+        <translation>Пайдаланушы</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>Password</source>
-        <translation>Пароль</translation>
+        <translation>Құпия сөз</translation>
     </message>
     <message>
         <location line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>Use SSL</source>
-        <translation>Использовать SSL</translation>
+        <translation>SSL пайдалану</translation>
     </message>
     <message>
         <location line="+36"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>Test Connection</source>
-        <translation>Проверить соединение</translation>
+        <translation>Қосылысты тексеру</translation>
     </message>
 </context>
 <context>
@@ -3912,12 +3885,12 @@
     <message>
         <location filename="../../../Include/imtstyle/CDesignTokenBasedResourceProviderComp.cpp" line="+242"/>
         <source>Light</source>
-        <translation>Светлая</translation>
+        <translation>Жарық</translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Dark</source>
-        <translation>Тёмная</translation>
+        <translation>Қараңғы</translation>
     </message>
 </context>
 <context>
@@ -3925,27 +3898,27 @@
     <message>
         <location filename="../../../Include/imtdev/CDeviceDataFilePersistenceComp.cpp" line="+48"/>
         <source>Wrong data object type</source>
-        <translation>Неверный тип объекта данных</translation>
+        <translation>Деректер нысаны түрі қате</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Wrong data object type. Serialization is not supported</source>
-        <translation>Неверный тип объекта данных. Сериализация не поддерживается</translation>
+        <translation>Деректер нысаны түрі қате. Сериалдау қолдау көрсетілмейді</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Reading of the device data failed</source>
-        <translation>Не удалось прочитать данные устройства</translation>
+        <translation>Құрылғы деректерін оқу сәтсіз аяқталды</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Reading of the device data during deserialization failed</source>
-        <translation>Не удалось прочитать данные устройства при десериализации</translation>
+        <translation>Десериалдау кезінде құрылғы деректерін оқу сәтсіз аяқталды</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Reading of the device meta-data failed</source>
-        <translation>Не удалось прочитать метаданные устройства</translation>
+        <translation>Құрылғы метадеректерін оқу сәтсіз аяқталды</translation>
     </message>
 </context>
 <context>
@@ -3963,7 +3936,7 @@
         <location filename="../../../Include/imtloggui/CEventStatisticsViewComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtloggui/ui_CEventStatisticsViewComp.h" line="+55"/>
         <source>ScrollArea</source>
-        <translation type="unfinished"></translation>
+        <translation>Айналдыру аймағы</translation>
     </message>
 </context>
 <context>
@@ -3981,19 +3954,19 @@
         <location filename="../../../Include/imtlicgui/CFeatureInfoEditorGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CFeatureInfoEditorGuiComp.h" line="+73"/>
         <source>Feature Information</source>
-        <translation>Информация о функции</translation>
+        <translation>Мүмкіндік ақпараты</translation>
     </message>
     <message>
         <location line="+9"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CFeatureInfoEditorGuiComp.h" line="+1"/>
         <source>Feature Name</source>
-        <translation>Название</translation>
+        <translation>Мүмкіндік атауы</translation>
     </message>
     <message>
         <location line="+12"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CFeatureInfoEditorGuiComp.h" line="+1"/>
         <source>Feature-ID</source>
-        <translation>Идентификатор</translation>
+        <translation>Мүмкіндік ID</translation>
     </message>
 </context>
 <context>
@@ -4001,18 +3974,18 @@
     <message>
         <location filename="../../../Include/imtrepo/CFileRepositoryComp.cpp" line="+209"/>
         <source>File could not be inserted into the repository</source>
-        <translation>Не удалось добавить файл в репозиторий</translation>
+        <translation>Файлды репозиторийге қосу мүмкін болмады</translation>
     </message>
     <message>
         <location line="+109"/>
         <source>Initial value could not be set</source>
-        <translation>Не удалось установить начальное значение</translation>
+        <translation>Бастапқы мәнді орнату мүмкін болмады</translation>
     </message>
     <message>
         <location line="+10"/>
         <location line="+183"/>
         <source>Temp folder could not be created</source>
-        <translation>Не удалось создать временную папку</translation>
+        <translation>Уақытша қалтаны жасау мүмкін болмады</translation>
     </message>
 </context>
 <context>
@@ -4021,19 +3994,19 @@
         <location filename="../../../Include/imtservergql/CGqlCollectionImportControllerComp.cpp" line="+22"/>
         <location line="+28"/>
         <source>Collection import controller unavailable</source>
-        <translation>Контроллер импорта коллекции недоступен</translation>
+        <translation>Жинақ импорт контроллері қолжетімсіз</translation>
     </message>
     <message>
         <location filename="../../../Include/imtservergql/CGqlCollectionImportControllerComp.h" line="+82"/>
         <source>Invalid file info in the request</source>
-        <translation>Неверная информация о файле в запросе</translation>
+        <translation>Сұрауда жарамсыз файл ақпараты</translation>
     </message>
     <message>
         <location filename="../../../Include/imtservergql/CGqlCollectionImportControllerComp.cpp" line="+15"/>
         <location filename="../../../Include/imtservergql/CGqlCollectionImportControllerComp.h" line="+9"/>
         <location line="+4"/>
         <source>Invalid import request</source>
-        <translation>Недействительный запрос импорта</translation>
+        <translation>Жарамсыз импорт сұрауы</translation>
     </message>
 </context>
 <context>
@@ -4042,19 +4015,19 @@
         <location filename="../../../Include/imtlicgui/CLicenseInfoEditorGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CLicenseInfoEditorGuiComp.h" line="+73"/>
         <source>Edit License</source>
-        <translation>Редактировать лицензию</translation>
+        <translation>Лицензияны өңдеу</translation>
     </message>
     <message>
         <location line="+18"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CLicenseInfoEditorGuiComp.h" line="+1"/>
         <source>License Name</source>
-        <translation>Название лицензии</translation>
+        <translation>Лицензия атауы</translation>
     </message>
     <message>
         <location line="+12"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CLicenseInfoEditorGuiComp.h" line="+1"/>
         <source>License-ID</source>
-        <translation>Идентификатор лицензии</translation>
+        <translation>Лицензия ID</translation>
     </message>
 </context>
 <context>
@@ -4087,25 +4060,25 @@
         <location line="+44"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CMultiSelectionEditorComp.h" line="+1"/>
         <source>Deselect All</source>
-        <translation>Снять выделение со всех</translation>
+        <translation>Барлығын алып тастау</translation>
     </message>
     <message>
         <location line="+7"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CMultiSelectionEditorComp.h" line="+1"/>
         <source>Select All</source>
-        <translation>Выделить все</translation>
+        <translation>Барлығын таңдау</translation>
     </message>
     <message>
         <location line="+7"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CMultiSelectionEditorComp.h" line="+1"/>
         <source>Invert</source>
-        <translation>Инвертировать</translation>
+        <translation>Ауыстыру</translation>
     </message>
     <message>
         <location line="+20"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CMultiSelectionEditorComp.h" line="+1"/>
         <source>Exclusive</source>
-        <translation>Эксклюзивный</translation>
+        <translation>Эксклюзивті</translation>
     </message>
 </context>
 <context>
@@ -4113,22 +4086,22 @@
     <message>
         <location filename="../../../Include/imtbase/CObjectCollectionMetaInfo.cpp" line="+33"/>
         <source>Added</source>
-        <translation>Добавлено</translation>
+        <translation>Қосылған</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Revision</source>
-        <translation>Ревизия</translation>
+        <translation>Нұсқа</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Time when the object was added to the collection</source>
-        <translation>Время добавления объекта в коллекцию</translation>
+        <translation>Нысан жинаққа қосылған уақыт</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Item revision</source>
-        <translation>Ревизия элемента</translation>
+        <translation>Элемент нұсқасы</translation>
     </message>
 </context>
 <context>
@@ -4146,37 +4119,37 @@
         <location filename="../../../Include/imtgui/CObjectCollectionRevisionDialog.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionRevisionDialog.h" line="+78"/>
         <source>Select revision</source>
-        <translation>Выбрать ревизию</translation>
+        <translation>Нұсқаны таңдау</translation>
     </message>
     <message>
         <location line="+25"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionRevisionDialog.h" line="+2"/>
         <source>Revision</source>
-        <translation>Ревизия</translation>
+        <translation>Нұсқа</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionRevisionDialog.h" line="+2"/>
         <source>Backup time</source>
-        <translation>Время резервной копии</translation>
+        <translation>Сақтық көшірме уақыты</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionRevisionDialog.h" line="+2"/>
         <source>User</source>
-        <translation>Пользователь</translation>
+        <translation>Пайдаланушы</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionRevisionDialog.h" line="+2"/>
         <source>SW Version</source>
-        <translation>Версия ПО</translation>
+        <translation>БЖ нұсқасы</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionRevisionDialog.h" line="+2"/>
         <source>Comment</source>
-        <translation>Комментарий</translation>
+        <translation>Пікір</translation>
     </message>
 </context>
 <context>
@@ -4197,19 +4170,19 @@
         <location line="+105"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+1"/>
         <source>Enter some text to filter the item list</source>
-        <translation>Введите текст для фильтрации</translation>
+        <translation>Сүзу үшін мәтін енгізіңіз</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+1"/>
         <source>Close</source>
-        <translation>Закрыть</translation>
+        <translation>Жабу</translation>
     </message>
     <message>
         <location line="+157"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h" line="+1"/>
         <source>Info</source>
-        <translation>Информация</translation>
+        <translation>Ақпарат</translation>
     </message>
     <message>
         <location line="+43"/>
@@ -4266,49 +4239,49 @@
         <location filename="../../../Include/imtauthgui/CPersonalAccessTokenManagerGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h" line="+135"/>
         <source>Personal Access Token Manager</source>
-        <translation>Менеджер персональных токенов доступа</translation>
+        <translation>Жеке қатынау токен менеджері</translation>
     </message>
     <message>
         <location line="+21"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h" line="+1"/>
         <source>User: &lt;not set&gt;</source>
-        <translation>Пользователь: &lt;не задан&gt;</translation>
+        <translation>Пайдаланушы: &lt;орнатылмаған&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h" line="+1"/>
         <source>Personal Access Tokens</source>
-        <translation>Персональные токены доступа</translation>
+        <translation>Жеке қатынау токендері</translation>
     </message>
     <message>
         <location line="+19"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h" line="+1"/>
         <source>Create</source>
-        <translation>Создать</translation>
+        <translation>Жасау</translation>
     </message>
     <message>
         <location line="+7"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h" line="+1"/>
         <source>Revoke</source>
-        <translation>Отозвать</translation>
+        <translation>Қайтарып алу</translation>
     </message>
     <message>
         <location line="+7"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h" line="+1"/>
         <source>Delete</source>
-        <translation>Удалить</translation>
+        <translation>Жою</translation>
     </message>
     <message>
         <location line="+7"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h" line="+1"/>
         <source>Refresh</source>
-        <translation>Обновить</translation>
+        <translation>Жаңарту</translation>
     </message>
     <message>
         <location line="+25"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CPersonalAccessTokenManagerGuiComp.h" line="+1"/>
         <source>Token Details</source>
-        <translation>Детали токена</translation>
+        <translation>Токен мәліметтері</translation>
     </message>
 </context>
 <context>
@@ -4323,31 +4296,31 @@
         <location line="+25"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPluginStatusViewerComp.h" line="+2"/>
         <source>TimeStamp</source>
-        <translation>Отметка времени</translation>
+        <translation>Уақыт белгісі</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPluginStatusViewerComp.h" line="+2"/>
         <source>Status</source>
-        <translation>Статус</translation>
+        <translation>Күйі</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPluginStatusViewerComp.h" line="+2"/>
         <source>Name</source>
-        <translation>Название</translation>
+        <translation>Атауы</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPluginStatusViewerComp.h" line="+2"/>
         <source>Path</source>
-        <translation>Путь</translation>
+        <translation>Жол</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPluginStatusViewerComp.h" line="+2"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation>Қате</translation>
     </message>
 </context>
 <context>
@@ -4368,13 +4341,13 @@
         <location line="+24"/>
         <location line="+1"/>
         <source>Anchor</source>
-        <translation>Привязка</translation>
+        <translation>Бекіту</translation>
     </message>
     <message>
         <location line="-449"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="-24"/>
         <source>Standart popup</source>
-        <translation>Стандартное всплывающее окно</translation>
+        <translation>Стандартты қалқыма терезе</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -4382,7 +4355,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <location line="+7"/>
         <source>Info</source>
-        <translation>Информация</translation>
+        <translation>Ақпарат</translation>
     </message>
     <message>
         <location line="-111"/>
@@ -4390,7 +4363,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="-6"/>
         <location line="+7"/>
         <source>Warning</source>
-        <translation>Предупреждение</translation>
+        <translation>Ескерту</translation>
     </message>
     <message>
         <location line="-108"/>
@@ -4398,7 +4371,7 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="-6"/>
         <location line="+7"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation>Қате</translation>
     </message>
     <message>
         <location line="-102"/>
@@ -4406,37 +4379,37 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="-6"/>
         <location line="+7"/>
         <source>Critical</source>
-        <translation>Критическая ошибка</translation>
+        <translation>Сыни</translation>
     </message>
     <message>
         <location line="-78"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="-6"/>
         <source>Extended popup</source>
-        <translation>Расширенное всплывающее окно</translation>
+        <translation>Кеңейтілген қалқыма терезе</translation>
     </message>
     <message>
         <location line="+38"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>Category</source>
-        <translation>Категория</translation>
+        <translation>Санат</translation>
     </message>
     <message>
         <location line="+9"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>None</source>
-        <translation>Нет</translation>
+        <translation>Жоқ</translation>
     </message>
     <message>
         <location line="+47"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+5"/>
         <source>Timeout</source>
-        <translation>Тайм-аут</translation>
+        <translation>Уақыт шектеуі</translation>
     </message>
     <message>
         <location line="+9"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>Require user action</source>
-        <translation>Требуется действие пользователя</translation>
+        <translation>Пайдаланушы әрекеті қажет</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -4466,31 +4439,31 @@
         <location line="+53"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>Message</source>
-        <translation>Сообщение</translation>
+        <translation>Хабарлама</translation>
     </message>
     <message>
         <location line="+13"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>Widget without close control</source>
-        <translation>Виджет без кнопки закрытия</translation>
+        <translation>Жабу басқаруынсыз виджет</translation>
     </message>
     <message>
         <location line="+13"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>Widget with close control</source>
-        <translation>Виджет с кнопкой закрытия</translation>
+        <translation>Жабу басқаруымен виджет</translation>
     </message>
     <message>
         <location line="+39"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>Allow closing on mouse click</source>
-        <translation>Разрешить закрытие по клику мыши</translation>
+        <translation>Тінтуір басу арқылы жабуға рұқсат беру</translation>
     </message>
     <message>
         <location line="+55"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CPopupTestGuiComp.h" line="+1"/>
         <source>Use area provider</source>
-        <translation>Использовать провайдер области</translation>
+        <translation>Аймақ жеткізушісін пайдалану</translation>
     </message>
 </context>
 <context>
@@ -4499,31 +4472,31 @@
         <location filename="../../../Include/imtlicgui/CProductInstanceInfoEditorComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoEditorComp.h" line="+120"/>
         <source>Edit Product Instance</source>
-        <translation>Редактировать экземпляр продукта</translation>
+        <translation>Өнім экземплярын өңдеу</translation>
     </message>
     <message>
         <location line="+15"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoEditorComp.h" line="+1"/>
         <source>Instance-ID</source>
-        <translation>ID экземпляра</translation>
+        <translation>Экземпляр ID</translation>
     </message>
     <message>
         <location line="+18"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoEditorComp.h" line="+1"/>
         <source>Customer</source>
-        <translation>Клиент</translation>
+        <translation>Тұтынушы</translation>
     </message>
     <message>
         <location line="+18"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoEditorComp.h" line="+1"/>
         <source>Product</source>
-        <translation>Продукт</translation>
+        <translation>Өнім</translation>
     </message>
     <message>
         <location line="+24"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoEditorComp.h" line="+1"/>
         <source>Licenses</source>
-        <translation>Лицензии</translation>
+        <translation>Лицензиялар</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -4535,7 +4508,7 @@
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoEditorComp.h" line="-1"/>
         <source>Expiration</source>
-        <translation>Срок действия</translation>
+        <translation>Мерзімі</translation>
     </message>
 </context>
 <context>
@@ -4544,7 +4517,7 @@
         <location filename="../../../Include/imtlicgui/CProductInstanceInfoViewComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoViewComp.h" line="+184"/>
         <source>Edit Product Instance</source>
-        <translation>Редактировать экземпляр продукта</translation>
+        <translation>Өнім экземплярын өңдеу</translation>
     </message>
     <message>
         <location line="+27"/>
@@ -4558,49 +4531,49 @@
         <location line="-164"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoViewComp.h" line="-10"/>
         <source>Create Transaction Code...</source>
-        <translation>Создать транзакционный код...</translation>
+        <translation>Транзакция кодын жасау...</translation>
     </message>
     <message>
         <location line="+24"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoViewComp.h" line="+2"/>
         <source>Load License...</source>
-        <translation>Загрузить лицензию...</translation>
+        <translation>Лицензияны жүктеу...</translation>
     </message>
     <message>
         <location line="+32"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoViewComp.h" line="+2"/>
         <source>Instance-ID</source>
-        <translation>ID экземпляра</translation>
+        <translation>Экземпляр ID</translation>
     </message>
     <message>
         <location line="+22"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoViewComp.h" line="+1"/>
         <source>Customer</source>
-        <translation>Клиент</translation>
+        <translation>Тұтынушы</translation>
     </message>
     <message>
         <location line="+22"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoViewComp.h" line="+1"/>
         <source>Product</source>
-        <translation>Продукт</translation>
+        <translation>Өнім</translation>
     </message>
     <message>
         <location line="+28"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoViewComp.h" line="+1"/>
         <source>Features</source>
-        <translation>Функции</translation>
+        <translation>Мүмкіндіктер</translation>
     </message>
     <message>
         <location line="+31"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoViewComp.h" line="+4"/>
         <source>Feature</source>
-        <translation>Функция</translation>
+        <translation>Мүмкіндік</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtlicgui/ui_CProductInstanceInfoViewComp.h" line="-2"/>
         <source>Valid</source>
-        <translation>Действителен</translation>
+        <translation>Жарамды</translation>
     </message>
 </context>
 <context>
@@ -4615,7 +4588,7 @@
         <location line="+68"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CProgressDialog.h" line="+2"/>
         <source>Some work in progress...</source>
-        <translation>Идёт обработка...</translation>
+        <translation>Өңдеу жүргізілуде...</translation>
     </message>
 </context>
 <context>
@@ -4632,61 +4605,61 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
         <location line="+9"/>
         <source>Password</source>
-        <translation>Пароль</translation>
+        <translation>Құпия сөз</translation>
     </message>
     <message>
         <location line="-339"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="-8"/>
         <source>User</source>
-        <translation>Пользователь</translation>
+        <translation>Пайдаланушы</translation>
     </message>
     <message>
         <location line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
         <source>Remember me</source>
-        <translation>Запомнить меня</translation>
+        <translation>Мені есте сақтау</translation>
     </message>
     <message>
         <location line="+29"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+2"/>
         <source>Login</source>
-        <translation>Логин</translation>
+        <translation>Кіру</translation>
     </message>
     <message>
         <location line="+29"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
         <source>Please enter your credentials to log in.</source>
-        <translation>Введите ваши учётные данные для входа.</translation>
+        <translation>Жүйеге кіру үшін тіркелгі деректеріңізді енгізіңіз.</translation>
     </message>
     <message>
         <location line="+163"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+2"/>
         <source>OK</source>
-        <translation>ОК</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location line="+74"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
         <source>Please, enter the password for system administrator</source>
-        <translation>Пожалуйста, введите пароль системного администратора</translation>
+        <translation>Жүйе әкімшісінің құпия сөзін енгізіңіз</translation>
     </message>
     <message>
         <location line="+50"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+2"/>
         <source>Confirm Password</source>
-        <translation>Подтвердите пароль</translation>
+        <translation>Құпия сөзді растаңыз</translation>
     </message>
     <message>
         <location line="+55"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
         <source>No connection to the server</source>
-        <translation>Нет соединения с сервером</translation>
+        <translation>Серверге қосылу жоқ</translation>
     </message>
     <message>
         <location line="+38"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
         <source>Refresh</source>
-        <translation>Обновить</translation>
+        <translation>Жаңарту</translation>
     </message>
 </context>
 <context>
@@ -4695,7 +4668,7 @@
         <location filename="../../../Include/imtreportgui/CReportDocumentViewComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtreportgui/ui_CReportDocumentViewComp.h" line="+51"/>
         <source>Report</source>
-        <translation>Отчёт</translation>
+        <translation>Есеп</translation>
     </message>
 </context>
 <context>
@@ -4704,7 +4677,7 @@
         <location filename="../../../Include/imtauthgui/CServerConnectionEditorComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CServerConnectionEditorComp.h" line="+114"/>
         <source>Edit Addresses</source>
-        <translation>Редактировать адреса</translation>
+        <translation>Мекенжайларды өңдеу</translation>
     </message>
     <message>
         <location line="+27"/>
@@ -4716,19 +4689,19 @@
         <location line="+18"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CServerConnectionEditorComp.h" line="+1"/>
         <source>HTTP Port</source>
-        <translation>Порт HTTP</translation>
+        <translation>HTTP порты</translation>
     </message>
     <message>
         <location line="+22"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CServerConnectionEditorComp.h" line="+1"/>
         <source>Websocket Port</source>
-        <translation>Порт WebSocket</translation>
+        <translation>WebSocket порты</translation>
     </message>
     <message>
         <location line="+18"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CServerConnectionEditorComp.h" line="+1"/>
         <source>gRPC Port</source>
-        <translation>Порт gRPC</translation>
+        <translation>gRPC порты</translation>
     </message>
 </context>
 <context>
@@ -4752,13 +4725,13 @@
         <location line="+96"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardAccountMenuComp.h" line="+3"/>
         <source>Preferences</source>
-        <translation>Настройки</translation>
+        <translation>Параметрлер</translation>
     </message>
     <message>
         <location line="+39"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardAccountMenuComp.h" line="+2"/>
         <source>Logout</source>
-        <translation>Выход из системы</translation>
+        <translation>Жүйеден шығу</translation>
     </message>
 </context>
 <context>
@@ -4767,13 +4740,13 @@
         <location filename="../../../Include/imtgui/CStandardDocumentViewDecorator.ui" line="+120"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+223"/>
         <source>New</source>
-        <translation>Новый</translation>
+        <translation>Жаңа</translation>
     </message>
     <message>
         <location line="+17"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+1"/>
         <source>Open</source>
-        <translation>Открыть</translation>
+        <translation>Ашу</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -4781,25 +4754,25 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+1"/>
         <location line="+1"/>
         <source>Save</source>
-        <translation>Сохранить</translation>
+        <translation>Сақтау</translation>
     </message>
     <message>
         <location line="+36"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+1"/>
         <source>Undo</source>
-        <translation>Отменить</translation>
+        <translation>Болдырмау</translation>
     </message>
     <message>
         <location line="+26"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+1"/>
         <source>Redo</source>
-        <translation>Восстановить</translation>
+        <translation>Қайтару</translation>
     </message>
     <message>
         <location line="+79"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CStandardDocumentViewDecorator.h" line="+1"/>
         <source>Close</source>
-        <translation>Закрыть</translation>
+        <translation>Жабу</translation>
     </message>
 </context>
 <context>
@@ -4816,55 +4789,55 @@
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+4"/>
         <location line="+6"/>
         <source>Password</source>
-        <translation>Пароль</translation>
+        <translation>Құпия сөз</translation>
     </message>
     <message>
         <location line="-294"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="-9"/>
         <source>User</source>
-        <translation>Пользователь</translation>
+        <translation>Пайдаланушы</translation>
     </message>
     <message>
         <location line="+7"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+1"/>
         <source>Remember me</source>
-        <translation>Запомнить меня</translation>
+        <translation>Мені есте сақтау</translation>
     </message>
     <message>
         <location line="+95"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+4"/>
         <source>Login</source>
-        <translation>Логин</translation>
+        <translation>Кіру</translation>
     </message>
     <message>
         <location line="-65"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="-3"/>
         <source>Please enter your credentials to log in.</source>
-        <translation>Введите ваши учётные данные для входа.</translation>
+        <translation>Жүйеге кіру үшін тіркелгі деректеріңізді енгізіңіз.</translation>
     </message>
     <message>
         <location line="+153"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+5"/>
         <source>OK</source>
-        <translation>ОК</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location line="+74"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+1"/>
         <source>Please, enter the password for system administrator</source>
-        <translation>Пожалуйста, введите пароль системного администратора</translation>
+        <translation>Жүйе әкімшісінің құпия сөзін енгізіңіз</translation>
     </message>
     <message>
         <location line="+50"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+2"/>
         <source>Confirm Password</source>
-        <translation>Подтвердите пароль</translation>
+        <translation>Құпия сөзді растаңыз</translation>
     </message>
     <message>
         <location line="+42"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+1"/>
         <source>No connection to the server</source>
-        <translation>Нет соединения с сервером</translation>
+        <translation>Серверге қосылу жоқ</translation>
     </message>
 </context>
 <context>
@@ -4873,97 +4846,97 @@
         <location filename="../../../Include/imthypegui/CTaskManagerGuiComp.ui" line="+100"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+251"/>
         <source>Add</source>
-        <translation>Добавить</translation>
+        <translation>Қосу</translation>
     </message>
     <message>
         <location line="+29"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Duplicate current inspection</source>
-        <translation>Дублировать текущую инспекцию</translation>
+        <translation>Ағымдағы тексеруді көшіру</translation>
     </message>
     <message>
         <location line="+3"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Duplicate</source>
-        <translation>Дублировать</translation>
+        <translation>Көшірме</translation>
     </message>
     <message>
         <location line="+26"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Remove current inspection</source>
-        <translation>Удалить текущую инспекцию</translation>
+        <translation>Ағымдағы тексеруді жою</translation>
     </message>
     <message>
         <location line="+3"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation>Жою</translation>
     </message>
     <message>
         <location line="+26"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Show acquisition manager</source>
-        <translation>Показать менеджер захвата</translation>
+        <translation>Алу менеджерін көрсету</translation>
     </message>
     <message>
         <location line="+3"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Inputs...</source>
-        <translation>Входные данные...</translation>
+        <translation>Кірістер...</translation>
     </message>
     <message>
         <location line="+22"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Show trigger table</source>
-        <translation>Показать таблицу триггеров</translation>
+        <translation>Триггерлер кестесін көрсету</translation>
     </message>
     <message>
         <location line="+3"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Triggers...</source>
-        <translation>Триггеры...</translation>
+        <translation>Триггерлер...</translation>
     </message>
     <message>
         <location line="+22"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Hide inspections list</source>
-        <translation>Скрыть список инспекций</translation>
+        <translation>Тексерулер тізімін жасыру</translation>
     </message>
     <message>
         <location line="+3"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Hide</source>
-        <translation>Скрыть</translation>
+        <translation>Жасыру</translation>
     </message>
     <message>
         <location line="+26"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Run all inspections</source>
-        <translation>Запустить все инспекции</translation>
+        <translation>Барлық тексерулерді іске қосу</translation>
     </message>
     <message>
         <location line="+3"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Test Product</source>
-        <translation>Тестовый продукт</translation>
+        <translation>Өнімді тексеру</translation>
     </message>
     <message>
         <location line="+45"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+1"/>
         <source>Total Inspections:</source>
-        <translation>Всего инспекций:</translation>
+        <translation>Барлық тексерулер:</translation>
     </message>
     <message>
         <location line="+61"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Show inspections list</source>
-        <translation>Показать список инспекций</translation>
+        <translation>Тексерулер тізімін көрсету</translation>
     </message>
     <message>
         <location line="+3"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h" line="+2"/>
         <source>Show</source>
-        <translation>Показать</translation>
+        <translation>Көрсету</translation>
     </message>
 </context>
 <context>
@@ -4972,43 +4945,43 @@
         <location filename="../../../Include/imthypegui/CTaskSettingsDialog.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsDialog.h" line="+159"/>
         <source>Task Settings</source>
-        <translation>Настройки задачи</translation>
+        <translation>Тапсырма параметрлері</translation>
     </message>
     <message>
         <location line="+6"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsDialog.h" line="+1"/>
         <source>Active</source>
-        <translation>Активный</translation>
+        <translation>Белсенді</translation>
     </message>
     <message>
         <location line="+7"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsDialog.h" line="+1"/>
         <source>Task Name</source>
-        <translation>Название задачи</translation>
+        <translation>Тапсырма атауы</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsDialog.h" line="+1"/>
         <source>User-ID</source>
-        <translation>ID пользователя</translation>
+        <translation>Пайдаланушы ID</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsDialog.h" line="+1"/>
         <source>Input-ID</source>
-        <translation>ID входных данных</translation>
+        <translation>Кіріс ID</translation>
     </message>
     <message>
         <location line="+29"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsDialog.h" line="+1"/>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation>Өңдеу</translation>
     </message>
     <message>
         <location line="+34"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsDialog.h" line="+1"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation>Сипаттама</translation>
     </message>
 </context>
 <context>
@@ -5017,49 +4990,49 @@
         <location filename="../../../Include/imthypegui/CTaskSettingsGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsGuiComp.h" line="+166"/>
         <source>Task Settings</source>
-        <translation>Настройки задачи</translation>
+        <translation>Тапсырма параметрлері</translation>
     </message>
     <message>
         <location line="+117"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsGuiComp.h" line="+5"/>
         <source>Active</source>
-        <translation>Активный</translation>
+        <translation>Белсенді</translation>
     </message>
     <message>
         <location line="-13"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsGuiComp.h" line="-1"/>
         <source>Task Name</source>
-        <translation>Название задачи</translation>
+        <translation>Тапсырма атауы</translation>
     </message>
     <message>
         <location line="-86"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsGuiComp.h" line="-3"/>
         <source>User-ID</source>
-        <translation>ID пользователя</translation>
+        <translation>Пайдаланушы ID</translation>
     </message>
     <message>
         <location line="+109"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsGuiComp.h" line="+8"/>
         <source>InputSub-ID</source>
-        <translation>Вх. суб-ID</translation>
+        <translation>Кіріс суб-ID</translation>
     </message>
     <message>
         <location line="+7"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsGuiComp.h" line="+1"/>
         <source>Input-ID</source>
-        <translation>ID входных данных</translation>
+        <translation>Кіріс ID</translation>
     </message>
     <message>
         <location line="-77"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsGuiComp.h" line="-7"/>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation>Өңдеу</translation>
     </message>
     <message>
         <location line="-32"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imthypegui/ui_CTaskSettingsGuiComp.h" line="-1"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation>Сипаттама</translation>
     </message>
 </context>
 <context>
@@ -5068,7 +5041,7 @@
         <location filename="../../../Include/imtgui/CThumbnailDecoratorGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+529"/>
         <source>Main Window</source>
-        <translation>Главное окно</translation>
+        <translation>Негізгі терезе</translation>
     </message>
     <message>
         <location line="+104"/>
@@ -5084,37 +5057,37 @@
         <location line="+35"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Welcome</source>
-        <translation>Добро пожаловать</translation>
+        <translation>Қош келдіңіз</translation>
     </message>
     <message>
         <location line="+93"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Commands</source>
-        <translation>Команды</translation>
+        <translation>Командалар</translation>
     </message>
     <message>
         <location line="+27"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Log out</source>
-        <translation>Выйти из системы</translation>
+        <translation>Жүйеден шығу</translation>
     </message>
     <message>
         <location line="+19"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
         <source>Dashboard</source>
-        <translation>Панель управления</translation>
+        <translation>Бақылау тақтасы</translation>
     </message>
     <message>
         <location line="+90"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+2"/>
         <source>Quit</source>
-        <translation>Выйти</translation>
+        <translation>Шығу</translation>
     </message>
     <message>
         <location line="+203"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
         <source>Close</source>
-        <translation>Закрыть</translation>
+        <translation>Жабу</translation>
     </message>
 </context>
 <context>
@@ -5129,73 +5102,73 @@
         <location line="+13"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Total Period</source>
-        <translation>Весь период</translation>
+        <translation>Жалпы кезең</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Last Hour</source>
-        <translation>Последний час</translation>
+        <translation>Соңғы сағат</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Last 4 Hours</source>
-        <translation>Последние 4 часа</translation>
+        <translation>Соңғы 4 сағат</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Last 8 Hours</source>
-        <translation>Последние 8 часов</translation>
+        <translation>Соңғы 8 сағат</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Last Day</source>
-        <translation>Последний день</translation>
+        <translation>Соңғы күн</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Last Week</source>
-        <translation>Последняя неделя</translation>
+        <translation>Соңғы апта</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Last Month</source>
-        <translation>Последний месяц</translation>
+        <translation>Соңғы ай</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Last Quarter</source>
-        <translation>Последний квартал</translation>
+        <translation>Соңғы тоқсан</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>Last Year</source>
-        <translation>Последний год</translation>
+        <translation>Соңғы жыл</translation>
     </message>
     <message>
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>User-Defined</source>
-        <translation>Пользовательский</translation>
+        <translation>Пайдаланушы анықтаған</translation>
     </message>
     <message>
         <location line="+41"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+2"/>
         <source>From</source>
-        <translation>От</translation>
+        <translation>Бастап</translation>
     </message>
     <message>
         <location line="+16"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtgui/ui_CTimeFilterParamEditorComp.h" line="+1"/>
         <source>To</source>
-        <translation>До</translation>
+        <translation>Дейін</translation>
     </message>
 </context>
 <context>
@@ -5203,132 +5176,132 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/Calendar.qml" line="+70"/>
         <source>January</source>
-        <translation>Январь</translation>
+        <translation>Қаңтар</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>February</source>
-        <translation>Февраль</translation>
+        <translation>Ақпан</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>March</source>
-        <translation>Март</translation>
+        <translation>Наурыз</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>April</source>
-        <translation>Апрель</translation>
+        <translation>Сәуір</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>May</source>
-        <translation>Май</translation>
+        <translation>Мамыр</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>June</source>
-        <translation>Июнь</translation>
+        <translation>Маусым</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>July</source>
-        <translation>Июль</translation>
+        <translation>Шілде</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>August</source>
-        <translation>Август</translation>
+        <translation>Тамыз</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>September</source>
-        <translation>Сентябрь</translation>
+        <translation>Қыркүйек</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>October</source>
-        <translation>Октябрь</translation>
+        <translation>Қазан</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>November</source>
-        <translation>Ноябрь</translation>
+        <translation>Қараша</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>December</source>
-        <translation>Декабрь</translation>
+        <translation>Желтоқсан</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Январь</source>
-        <translation>Январь</translation>
+        <translation>Қаңтар</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Февраль</source>
-        <translation>Февраль</translation>
+        <translation>Ақпан</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Март</source>
-        <translation>Март</translation>
+        <translation>Наурыз</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Апрель</source>
-        <translation>Апрель</translation>
+        <translation>Сәуір</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Май</source>
-        <translation>Май</translation>
+        <translation>Мамыр</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Июнь</source>
-        <translation>Июнь</translation>
+        <translation>Маусым</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Июль</source>
-        <translation>Июль</translation>
+        <translation>Шілде</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Август</source>
-        <translation>Август</translation>
+        <translation>Тамыз</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Сентябрь</source>
-        <translation>Сентябрь</translation>
+        <translation>Қыркүйек</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Октябрь</source>
-        <translation>Октябрь</translation>
+        <translation>Қазан</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Ноябрь</source>
-        <translation>Ноябрь</translation>
+        <translation>Қараша</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Декабрь</source>
-        <translation>Декабрь</translation>
+        <translation>Желтоқсан</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Пн</source>
-        <translation>Пн</translation>
+        <translation>Дс</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Вт</source>
-        <translation>Вт</translation>
+        <translation>Сс</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -5338,12 +5311,12 @@
     <message>
         <location line="+1"/>
         <source>Чт</source>
-        <translation>Чт</translation>
+        <translation>Бс</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Пт</source>
-        <translation>Пт</translation>
+        <translation>Жм</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -5353,17 +5326,17 @@
     <message>
         <location line="+1"/>
         <source>Вс</source>
-        <translation>Вс</translation>
+        <translation>Жс</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Mo</source>
-        <translation>Пн</translation>
+        <translation>Дс</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Tu</source>
-        <translation>Вт</translation>
+        <translation>Сс</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -5373,12 +5346,12 @@
     <message>
         <location line="+1"/>
         <source>Th</source>
-        <translation>Чт</translation>
+        <translation>Бс</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Fr</source>
-        <translation>Пт</translation>
+        <translation>Жм</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -5388,22 +5361,22 @@
     <message>
         <location line="+1"/>
         <source>Su</source>
-        <translation>Вс</translation>
+        <translation>Жс</translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Ok</source>
-        <translation>ОК</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation>Болдырмау</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Today</source>
-        <translation>Сегодня</translation>
+        <translation>Бүгін</translation>
     </message>
 </context>
 <context>
@@ -5411,62 +5384,62 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/CalendarFunctions.qml" line="+10"/>
         <source>January</source>
-        <translation>Январь</translation>
+        <translation>Қаңтар</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>February</source>
-        <translation>Февраль</translation>
+        <translation>Ақпан</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>March</source>
-        <translation>Март</translation>
+        <translation>Наурыз</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>April</source>
-        <translation>Апрель</translation>
+        <translation>Сәуір</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>May</source>
-        <translation>Май</translation>
+        <translation>Мамыр</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>June</source>
-        <translation>Июнь</translation>
+        <translation>Маусым</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>July</source>
-        <translation>Июль</translation>
+        <translation>Шілде</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>August</source>
-        <translation>Август</translation>
+        <translation>Тамыз</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>September</source>
-        <translation>Сентябрь</translation>
+        <translation>Қыркүйек</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>October</source>
-        <translation>Октябрь</translation>
+        <translation>Қазан</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>November</source>
-        <translation>Ноябрь</translation>
+        <translation>Қараша</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>December</source>
-        <translation>Декабрь</translation>
+        <translation>Желтоқсан</translation>
     </message>
 </context>
 <context>
@@ -5474,12 +5447,12 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/CalendarView.qml" line="+40"/>
         <source>Mo</source>
-        <translation>Пн</translation>
+        <translation>Дс</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Tu</source>
-        <translation>Вт</translation>
+        <translation>Сс</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -5489,12 +5462,12 @@
     <message>
         <location line="+1"/>
         <source>Th</source>
-        <translation>Чт</translation>
+        <translation>Бс</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Fr</source>
-        <translation>Пт</translation>
+        <translation>Жм</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -5504,7 +5477,7 @@
     <message>
         <location line="+1"/>
         <source>Su</source>
-        <translation>Вс</translation>
+        <translation>Жс</translation>
     </message>
 </context>
 <context>
@@ -5512,12 +5485,12 @@
     <message>
         <location filename="../../../Qml/imtauthgui/ChangePasswordDialog.qml" line="+15"/>
         <source>Save</source>
-        <translation>Сохранить</translation>
+        <translation>Сақтау</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation>Болдырмау</translation>
     </message>
 </context>
 <context>
@@ -5525,12 +5498,12 @@
     <message>
         <location filename="../../../Qml/imtchatgui/ChatPanel.qml" line="+37"/>
         <source>Chats</source>
-        <translation>Чаты</translation>
+        <translation>Чаттар</translation>
     </message>
     <message>
         <location line="+37"/>
         <source>Search conversations...</source>
-        <translation>Поиск бесед...</translation>
+        <translation>Әңгімелерді іздеу...</translation>
     </message>
 </context>
 <context>
@@ -5538,7 +5511,7 @@
     <message>
         <location filename="../../../Qml/imtchatgui/ChatSearchBar.qml" line="+15"/>
         <source>Search...</source>
-        <translation>Поиск...</translation>
+        <translation>Іздеу...</translation>
     </message>
 </context>
 <context>
@@ -5548,7 +5521,7 @@
         <location line="+171"/>
         <location line="+0"/>
         <source>All</source>
-        <translation>Все</translation>
+        <translation>Барлығы</translation>
     </message>
 </context>
 <context>
@@ -5556,7 +5529,7 @@
     <message>
         <location filename="../../../Qml/imtgui/View/ClearableComboBoxElementView.qml" line="+75"/>
         <source>Clear</source>
-        <translation>Очистить</translation>
+        <translation>Тазалау</translation>
     </message>
 </context>
 <context>
@@ -5564,12 +5537,12 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Views/CollapsibleRectangle.qml" line="+35"/>
         <source>Collapse</source>
-        <translation>Свернуть</translation>
+        <translation>Жию</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Expand</source>
-        <translation>Развернуть</translation>
+        <translation>Жаю</translation>
     </message>
 </context>
 <context>
@@ -5577,32 +5550,32 @@
     <message>
         <location filename="../../../Qml/imtcolgui/CollectionStructure.qml" line="+190"/>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation>Өңдеу</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation>Жою</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Rename</source>
-        <translation>Переименовать</translation>
+        <translation>Атын өзгерту</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Set Description</source>
-        <translation>Установить описание</translation>
+        <translation>Сипаттаманы орнату</translation>
     </message>
     <message>
         <location line="+333"/>
         <source>This table has been modified from another computer</source>
-        <translation>Эта таблица была изменена на другом компьютере</translation>
+        <translation>Бұл кесте басқа компьютерден өзгертілді</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Update</source>
-        <translation>Обновить</translation>
+        <translation>Жаңарту</translation>
     </message>
 </context>
 <context>
@@ -5610,42 +5583,42 @@
     <message>
         <location filename="../../../Qml/imtcolgui/CollectionStructureCommandsDelegateBase.qml" line="+47"/>
         <source>Deleting a selected element</source>
-        <translation>Удаление  выбранного  элемента</translation>
+        <translation>Таңдалған элементті жою</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Remove selected item from the collection ?</source>
-        <translation>Удалить выбранный элемент из коллекции ?</translation>
+        <translation>Таңдалған элементті жинақтан жоясыз ба?</translation>
     </message>
     <message>
         <location line="+134"/>
         <source>Please enter the name of the new node</source>
-        <translation>Введите название для узла</translation>
+        <translation>Жаңа түйіннің атауын енгізіңіз</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Please enter the name of the document:</source>
-        <translation>Введите название документа:</translation>
+        <translation>Құжат атауын енгізіңіз:</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Please enter the description of the document:</source>
-        <translation>Введите описание документа:</translation>
+        <translation>Құжат сипаттамасын енгізіңіз:</translation>
     </message>
     <message>
         <location line="+75"/>
         <source>Rename document</source>
-        <translation>Переименование документа</translation>
+        <translation>Құжаттың атын өзгерту</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>New node</source>
-        <translation></translation>
+        <translation>Жаңа түйін</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Set description</source>
-        <translation>Установить описание</translation>
+        <translation>Сипаттаманы орнату</translation>
     </message>
 </context>
 <context>
@@ -5653,7 +5626,7 @@
     <message>
         <location filename="../../../Qml/imtcolgui/CollectionStructureCommandsObserver.qml" line="+27"/>
         <source>Open</source>
-        <translation>Открыть</translation>
+        <translation>Ашу</translation>
     </message>
 </context>
 <context>
@@ -5661,7 +5634,7 @@
     <message>
         <location filename="../../../Qml/imtcolgui/CollectionView.qml" line="+529"/>
         <source>Please select an item for showing additional informations</source>
-        <translation>Выберите элемент чтобы увидеть дополнительную информацию</translation>
+        <translation>Қосымша ақпаратты көрсету үшін элементті таңдаңыз</translation>
     </message>
 </context>
 <context>
@@ -5669,132 +5642,132 @@
     <message>
         <location filename="../../../Qml/imtcolgui/CollectionViewCommandsDelegateBase.qml" line="+19"/>
         <source>Deleting a selected element</source>
-        <translation>Удаление  выбранного  элемента</translation>
+        <translation>Таңдалған элементті жою</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Remove selected item from the collection ?</source>
-        <translation>Удалить выбранный элемент из коллекции ?</translation>
+        <translation>Таңдалған элементті жинақтан жоясыз ба?</translation>
     </message>
     <message>
         <location line="+103"/>
         <source>The object has been successfully imported</source>
-        <translation>Объект был успешно импортирован</translation>
+        <translation>Нысан сәтті импортталды</translation>
     </message>
     <message>
         <location line="+107"/>
         <source>Duplicate</source>
-        <translation>Дублировать</translation>
+        <translation>Көшірме</translation>
     </message>
     <message>
         <location line="+104"/>
         <source>Restore all items with the current filter ?</source>
-        <translation>Восстановить все элементы с текущим фильтром?</translation>
+        <translation>Ағымдағы сүзгімен барлық элементтерді қалпына келтіресіз бе?</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Restore all data from this collection ?</source>
-        <translation>Восстановить все данные из этой коллекции?</translation>
+        <translation>Осы жинақтан барлық деректерді қалпына келтіресіз бе?</translation>
     </message>
     <message>
         <location line="+51"/>
         <source>Import file</source>
-        <translation>Импорт файла</translation>
+        <translation>Файлды импорттау</translation>
     </message>
     <message>
         <location line="+104"/>
         <source>Save file</source>
-        <translation>Сохранить файл</translation>
+        <translation>Файлды сақтау</translation>
     </message>
     <message>
         <location line="+65"/>
         <source>Delete all items with the current filter ?</source>
-        <translation>Удалить все элементы с текущим фильтром?</translation>
+        <translation>Ағымдағы сүзгімен барлық элементтерді жоясыз ба?</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Delete all data from this collection ?</source>
-        <translation>Удалить все данные из этой коллекции?</translation>
+        <translation>Осы жинақтан барлық деректерді жоясыз ба?</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Please enter the name of the document:</source>
-        <translation>Введите название документа:</translation>
+        <translation>Құжат атауын енгізіңіз:</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Please enter the description of the document:</source>
-        <translation>Введите описание документа:</translation>
+        <translation>Құжат сипаттамасын енгізіңіз:</translation>
     </message>
     <message>
         <location line="+73"/>
         <source>Restoring an objects</source>
-        <translation>Восстановление объектов</translation>
+        <translation>Нысандарды қалпына келтіру</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Restore the selected objects ?</source>
-        <translation>Восстановить выбранные объекты?</translation>
+        <translation>Таңдалған нысандарды қалпына келтіресіз бе?</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Enter the description</source>
-        <translation>Введите описание</translation>
+        <translation>Сипаттаманы енгізіңіз</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Duplicate Name</source>
-        <translation>Название дубликата</translation>
+        <translation>Көшірме атауы</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the duplicate name</source>
-        <translation>Введите название дубликата</translation>
+        <translation>Көшірме атауын енгізіңіз</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Rename document</source>
-        <translation>Переименование документа</translation>
+        <translation>Құжаттың атын өзгерту</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the name</source>
-        <translation>Введите название</translation>
+        <translation>Атауын енгізіңіз</translation>
     </message>
     <message>
         <location line="+42"/>
         <source>Deleting elements</source>
-        <translation>Удаление элементов</translation>
+        <translation>Элементтерді жою</translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Restoring elements</source>
-        <translation>Восстановление элементов</translation>
+        <translation>Элементтерді қалпына келтіру</translation>
     </message>
     <message>
         <location line="-114"/>
         <source>Set description</source>
-        <translation>Установить описание</translation>
+        <translation>Сипаттаманы орнату</translation>
     </message>
     <message>
         <location line="-444"/>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation>Өңдеу</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation>Жою</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Rename</source>
-        <translation>Переименовать</translation>
+        <translation>Атын өзгерту</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Set Description</source>
-        <translation>Установить описание</translation>
+        <translation>Сипаттаманы орнату</translation>
     </message>
 </context>
 <context>
@@ -5802,12 +5775,12 @@
     <message>
         <location filename="../../../Qml/imtgui/View/ComboBoxAddressElementView.qml" line="+13"/>
         <source>Please select an item</source>
-        <translation>Пожалуйста выберите объект</translation>
+        <translation>Элементті таңдаңыз</translation>
     </message>
     <message>
         <location line="+68"/>
         <source>Address</source>
-        <translation>Адрес</translation>
+        <translation>Мекенжай</translation>
     </message>
 </context>
 <context>
@@ -5815,7 +5788,7 @@
     <message>
         <location filename="../../../Qml/imtgui/View/ComboBoxElementView.qml" line="+12"/>
         <source>Please select an item</source>
-        <translation>Пожалуйста выберите объект</translation>
+        <translation>Элементті таңдаңыз</translation>
     </message>
 </context>
 <context>
@@ -5823,7 +5796,7 @@
     <message>
         <location filename="../../../Qml/imtgui/View/ComboBoxGqlElementView.qml" line="+13"/>
         <source>Please select an item</source>
-        <translation>Пожалуйста выберите объект</translation>
+        <translation>Элементті таңдаңыз</translation>
     </message>
 </context>
 <context>
@@ -5831,7 +5804,7 @@
     <message>
         <location filename="../../../Qml/imtgui/View/ComboBoxGqlLegacyElementView.qml" line="+13"/>
         <source>Please select an item</source>
-        <translation>Пожалуйста выберите объект</translation>
+        <translation>Элементті таңдаңыз</translation>
     </message>
 </context>
 <context>
@@ -5839,22 +5812,22 @@
     <message>
         <location filename="../../../Qml/imtgui/Application/Configurator.qml" line="+88"/>
         <source>Apply</source>
-        <translation>Применить</translation>
+        <translation>Қолдану</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Close</source>
-        <translation>Закрыть</translation>
+        <translation>Жабу</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Save all changes ?</source>
-        <translation>Сохранить все изменения ?</translation>
+        <translation>Барлық өзгерістерді сақтайсыз ба?</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation>Болдырмау</translation>
     </message>
 </context>
 <context>
@@ -5862,7 +5835,7 @@
     <message>
         <location filename="../../../Qml/imtchatgui/ConversationCollectionView.qml" line="+30"/>
         <source>Conversation</source>
-        <translation>Беседа</translation>
+        <translation>Әңгіме</translation>
     </message>
 </context>
 <context>
@@ -5870,52 +5843,52 @@
     <message>
         <location filename="../../../Qml/imtchatgui/ConversationCreateDialog.qml" line="+50"/>
         <source>New Conversation</source>
-        <translation>Новая беседа</translation>
+        <translation>Жаңа әңгіме</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Name *</source>
-        <translation>Название *</translation>
+        <translation>Атауы *</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Conversation name</source>
-        <translation>Название беседы</translation>
+        <translation>Әңгіме атауы</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Type</source>
-        <translation>Тип</translation>
+        <translation>Түрі</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Direct (1:1)</source>
-        <translation>Личная (1:1)</translation>
+        <translation>Тікелей (1:1)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Group</source>
-        <translation>Группа</translation>
+        <translation>Топ</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Channel</source>
-        <translation>Канал</translation>
+        <translation>Арна</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Support</source>
-        <translation>Поддержка</translation>
+        <translation>Қолдау</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation>Болдырмау</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Create</source>
-        <translation>Создать</translation>
+        <translation>Жасау</translation>
     </message>
 </context>
 <context>
@@ -5923,27 +5896,27 @@
     <message>
         <location filename="../../../Qml/imtchatgui/ConversationEditor.qml" line="+95"/>
         <source>Name</source>
-        <translation>Название</translation>
+        <translation>Атауы</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the conversation name</source>
-        <translation>Введите название беседы</translation>
+        <translation>Әңгіме атауын енгізіңіз</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Conversation Type</source>
-        <translation>Тип беседы</translation>
+        <translation>Әңгіме түрі</translation>
     </message>
     <message>
         <location line="+30"/>
         <source>Metadata</source>
-        <translation>Метаданные</translation>
+        <translation>Метадеректер</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Additional metadata (JSON)</source>
-        <translation>Дополнительные метаданные (JSON)</translation>
+        <translation>Қосымша метадеректер (JSON)</translation>
     </message>
 </context>
 <context>
@@ -5951,7 +5924,7 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/CriticalErrorDialog.qml" line="+11"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation>Қате</translation>
     </message>
 </context>
 <context>
@@ -5959,32 +5932,32 @@
     <message>
         <location filename="../../../Qml/imtgui/Params/DatabaseAccessSettingsEditor.qml" line="+22"/>
         <source>Database restore was successful</source>
-        <translation>База данных успешно восстановлена</translation>
+        <translation>Деректер қоры сәтті қалпына келтірілді</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Error when trying to restore the database</source>
-        <translation>Ошибка при попытки восстановить базу данных</translation>
+        <translation>Деректер қорын қалпына келтіру кезінде қате</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Error when trying to create a database backup</source>
-        <translation>Ошибка при попытки создать резервную копию</translation>
+        <translation>Деректер қорының сақтық көшірмесін жасау кезінде қате</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Select backup file</source>
-        <translation>Выберите файл для восстановления</translation>
+        <translation>Сақтық көшірме файлын таңдаңыз</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Save file</source>
-        <translation>Сохранить файл</translation>
+        <translation>Файлды сақтау</translation>
     </message>
     <message>
         <location line="+39"/>
         <source>Database name</source>
-        <translation>Название базы данных</translation>
+        <translation>Деректер қоры атауы</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -5994,7 +5967,7 @@
     <message>
         <location line="+10"/>
         <source>Password</source>
-        <translation>Пароль</translation>
+        <translation>Құпия сөз</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -6004,57 +5977,57 @@
     <message>
         <location line="+9"/>
         <source>Username</source>
-        <translation>Логин</translation>
+        <translation>Пайдаланушы аты</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Test database connection</source>
-        <translation>Тест соединения</translation>
+        <translation>Деректер қоры қосылысын тексеру</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Test</source>
-        <translation>Тест</translation>
+        <translation>Тексеру</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>There is no connection to the database</source>
-        <translation>Нет соединения с базой данных</translation>
+        <translation>Деректер қорына қосылу жоқ</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Test connection successfully</source>
-        <translation>Соединение успешно</translation>
+        <translation>Қосылыс сәтті тексерілді</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Backup Information</source>
-        <translation>Информация о резервной копии</translation>
+        <translation>Сақтық көшірме ақпараты</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Backup data</source>
-        <translation>Резервная копия</translation>
+        <translation>Деректерді сақтау</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Before performing the operation, check the connection to the server</source>
-        <translation>Перед выполнением операции проверьте подключение к серверу</translation>
+        <translation>Операцияны орындамас бұрын серверге қосылуды тексеріңіз</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Backup</source>
-        <translation>Резервная копия</translation>
+        <translation>Сақтық көшірме</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Restore data from backup</source>
-        <translation>Восстановление данных из резервной копии</translation>
+        <translation>Сақтық көшірмеден деректерді қалпына келтіру</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Restore</source>
-        <translation>Восстановить</translation>
+        <translation>Қалпына келтіру</translation>
     </message>
 </context>
 <context>
@@ -6062,62 +6035,62 @@
     <message>
         <location filename="../../../Qml/imtgui/Application/DatabaseBackupController.qml" line="+22"/>
         <source>Backup Information</source>
-        <translation>Информация о резервной копии</translation>
+        <translation>Сақтық көшірме ақпараты</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Backup data</source>
-        <translation>Резервная копия</translation>
+        <translation>Деректерді сақтау</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Before performing the operation, check the connection to the server</source>
-        <translation>Перед выполнением операции проверьте подключение к серверу</translation>
+        <translation>Операцияны орындамас бұрын серверге қосылуды тексеріңіз</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Backup</source>
-        <translation>Резервная копия</translation>
+        <translation>Сақтық көшірме</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Restore data from backup</source>
-        <translation>Восстановление данных из резервной копии</translation>
+        <translation>Сақтық көшірмеден деректерді қалпына келтіру</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Restore</source>
-        <translation>Восстановить</translation>
+        <translation>Қалпына келтіру</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Restore successful</source>
-        <translation>Восстановлени</translation>
+        <translation>Қалпына келтіру сәтті</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Database restore was successful</source>
-        <translation>База данных успешно восстановлена</translation>
+        <translation>Деректер қоры сәтті қалпына келтірілді</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Error when trying to restore the database</source>
-        <translation>Ошибка при попытки восстановить базу данных</translation>
+        <translation>Деректер қорын қалпына келтіру кезінде қате</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Error when trying to create a database backup</source>
-        <translation>Ошибка при попытки создать резервную копию</translation>
+        <translation>Деректер қорының сақтық көшірмесін жасау кезінде қате</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Select backup file</source>
-        <translation>Выберите файл для восстановления</translation>
+        <translation>Сақтық көшірме файлын таңдаңыз</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Save file</source>
-        <translation>Сохранить файл</translation>
+        <translation>Файлды сақтау</translation>
     </message>
 </context>
 <context>
@@ -6125,22 +6098,22 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/DateInput.qml" line="+35"/>
         <source>Wrong date format!</source>
-        <translation>Неверный формат даты!</translation>
+        <translation>Қате күн форматы!</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Invalid month value!</source>
-        <translation>Неверное значение месяца!</translation>
+        <translation>Жарамсыз ай мәні!</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Invalid day value!</source>
-        <translation>Неверное значение дня!</translation>
+        <translation>Жарамсыз күн мәні!</translation>
     </message>
     <message>
         <location line="+230"/>
         <source>Date:</source>
-        <translation>Дата:</translation>
+        <translation>Күні:</translation>
     </message>
 </context>
 <context>
@@ -6148,62 +6121,62 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/DatePicker.qml" line="+28"/>
         <source>January</source>
-        <translation>Январь</translation>
+        <translation>Қаңтар</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>February</source>
-        <translation>Февраль</translation>
+        <translation>Ақпан</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>March</source>
-        <translation>Март</translation>
+        <translation>Наурыз</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>April</source>
-        <translation>Апрель</translation>
+        <translation>Сәуір</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>May</source>
-        <translation>Май</translation>
+        <translation>Мамыр</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>June</source>
-        <translation>Июнь</translation>
+        <translation>Маусым</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>July</source>
-        <translation>Июль</translation>
+        <translation>Шілде</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>August</source>
-        <translation>Август</translation>
+        <translation>Тамыз</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>September</source>
-        <translation>Сентябрь</translation>
+        <translation>Қыркүйек</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>October</source>
-        <translation>Октябрь</translation>
+        <translation>Қазан</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>November</source>
-        <translation>Ноябрь</translation>
+        <translation>Қараша</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>December</source>
-        <translation>Декабрь</translation>
+        <translation>Желтоқсан</translation>
     </message>
 </context>
 <context>
@@ -6218,7 +6191,7 @@
         <location line="+1"/>
         <location line="+0"/>
         <source>Completed</source>
-        <translation>Завершено</translation>
+        <translation>Аяқталды</translation>
     </message>
 </context>
 <context>
@@ -6226,22 +6199,22 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocCollectionViewDelegate.qml" line="+201"/>
         <source>Select Document Type</source>
-        <translation>Выберите тип документа</translation>
+        <translation>Құжат түрін таңдаңыз</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>OK</source>
-        <translation>ОК</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation>Болдырмау</translation>
     </message>
     <message>
         <location line="+53"/>
         <source>Please select a document type</source>
-        <translation>Пожалуйста, выберите тип документа</translation>
+        <translation>Құжат түрін таңдаңыз</translation>
     </message>
 </context>
 <context>
@@ -6249,7 +6222,7 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocumentHistoryDialog.qml" line="+12"/>
         <source>OK</source>
-        <translation>ОК</translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -6257,7 +6230,7 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocumentHistoryPanel.qml" line="+79"/>
         <source>History</source>
-        <translation>История</translation>
+        <translation>Тарих</translation>
     </message>
 </context>
 <context>
@@ -6265,17 +6238,17 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocumentHistoryView.qml" line="+123"/>
         <source>Revision</source>
-        <translation>Ревизия</translation>
+        <translation>Нұсқа</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Active</source>
-        <translation>Активный</translation>
+        <translation>Белсенді</translation>
     </message>
     <message>
         <location line="+51"/>
         <source>There is no history for this document</source>
-        <translation>Нет истории для этого документа</translation>
+        <translation>Бұл құжаттың тарихы жоқ</translation>
     </message>
 </context>
 <context>
@@ -6283,67 +6256,67 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocumentRevisionDialog.qml" line="+12"/>
         <source>Revision Manager</source>
-        <translation>Менеджер ревизий</translation>
+        <translation>Нұсқалар менеджері</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Set this revision</source>
-        <translation>Установить эту ревизию</translation>
+        <translation>Осы нұсқаны орнату</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Delete revision</source>
-        <translation>Удалить ревизию</translation>
+        <translation>Нұсқаны жою</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Close</source>
-        <translation>Закрыть</translation>
+        <translation>Жабу</translation>
     </message>
     <message>
         <location line="+64"/>
         <source>The document revision has been successfully delete</source>
-        <translation>Ревизия документа успешно удалена</translation>
+        <translation>Құжат нұсқасы сәтті жойылды</translation>
     </message>
     <message>
         <location line="+25"/>
         <source>The document revision has been successfully set</source>
-        <translation>Ревизия документа успешно установлена</translation>
+        <translation>Құжат нұсқасы сәтті орнатылды</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Remove revision</source>
-        <translation>Удалить ревизию</translation>
+        <translation>Нұсқаны жою</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Delete the selected revision ?</source>
-        <translation>Удалить выбранную ревизию?</translation>
+        <translation>Таңдалған нұсқаны жоясыз ба?</translation>
     </message>
     <message>
         <location line="+117"/>
         <source>User</source>
-        <translation>Пользователь</translation>
+        <translation>Пайдаланушы</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Revision</source>
-        <translation>Ревизия</translation>
+        <translation>Нұсқа</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Active</source>
-        <translation>Активный</translation>
+        <translation>Белсенді</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Time</source>
-        <translation>Время</translation>
+        <translation>Уақыт</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation>Сипаттама</translation>
     </message>
 </context>
 <context>
@@ -6351,19 +6324,19 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocumentService.qml" line="+9"/>
         <source>&lt;no name&gt;</source>
-        <translation>&lt;без имени&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+286"/>
         <source>Unable to get a model for document. Error: Document data controller is invalid</source>
-        <translation>Не удалось получить модель для документа. Ошибка: контроллер данных документа недействителен</translation>
+        <translation>Құжат моделін алу мүмкін емес. Қате: Құжат деректер контроллері жарамсыз</translation>
     </message>
     <message>
         <location line="+363"/>
         <location line="+54"/>
         <location line="+0"/>
         <source>Internal error</source>
-        <translation>Внутренняя ошибка</translation>
+        <translation>Ішкі қате</translation>
     </message>
 </context>
 <context>
@@ -6371,7 +6344,7 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocumentServiceBase.qml" line="+117"/>
         <source>&lt;no name&gt;</source>
-        <translation>&lt;без имени&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6379,7 +6352,7 @@
     <message>
         <location filename="../../../Qml/imtdocgui/DocumentWorkspaceCommandsDelegate.qml" line="+12"/>
         <source>Document history</source>
-        <translation>История документа</translation>
+        <translation>Құжат тарихы</translation>
     </message>
 </context>
 <context>
@@ -6387,22 +6360,22 @@
     <message>
         <location filename="../../../Qml/imtgui/View/DoubleInputElementView.qml" line="+27"/>
         <source>Please enter a value ranging from</source>
-        <translation>Введите значение с</translation>
+        <translation>Мәнді мына аралықта енгізіңіз</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>to</source>
-        <translation>по</translation>
+        <translation>дейін</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Please enter a value less than or equal to</source>
-        <translation>Введите значение, меньшее или равное</translation>
+        <translation>Мәнді мынадан кіші немесе тең енгізіңіз</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Please enter a value greater than or equal to</source>
-        <translation>Введите значение, большее или равное</translation>
+        <translation>Мәнді мынадан үлкен немесе тең енгізіңіз</translation>
     </message>
 </context>
 <context>
@@ -6410,62 +6383,62 @@
     <message>
         <location filename="../../../Qml/imtdeskgui/EntityContextTicketsDialog.qml" line="+16"/>
         <source>Entity Tickets</source>
-        <translation>Заявки сущности</translation>
+        <translation>Нысан өтінімдері</translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Close</source>
-        <translation>Закрыть</translation>
+        <translation>Жабу</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Ticket successfully created</source>
-        <translation>Заявка успешно создана</translation>
+        <translation>Өтінім сәтті жасалды</translation>
     </message>
     <message>
         <location line="+33"/>
         <source>Create ticket for this entity</source>
-        <translation>Создать заявку для этой сущности</translation>
+        <translation>Осы нысан үшін өтінім жасау</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Title</source>
-        <translation>Заголовок</translation>
+        <translation>Тақырып</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Enter ticket title...</source>
-        <translation>Введите заголовок заявки...</translation>
+        <translation>Өтінім тақырыбын енгізіңіз...</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation>Сипаттама</translation>
     </message>
     <message>
         <location line="+46"/>
         <source>Describe the issue...</source>
-        <translation>Опишите проблему...</translation>
+        <translation>Мәселені сипаттаңыз...</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Create Ticket</source>
-        <translation>Создать заявку</translation>
+        <translation>Өтінім жасау</translation>
     </message>
     <message>
         <location line="+59"/>
         <source>Linked Tickets</source>
-        <translation>Связанные заявки</translation>
+        <translation>Байланыстырылған өтінімдер</translation>
     </message>
     <message>
         <location line="+137"/>
         <source>No tickets linked to this entity</source>
-        <translation>Нет заявок, связанных с этой сущностью</translation>
+        <translation>Осы нысанға байланыстырылған өтінімдер жоқ</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Loading tickets...</source>
-        <translation>Загрузка заявок...</translation>
+        <translation>Өтінімдер жүктелуде...</translation>
     </message>
 </context>
 <context>
@@ -6473,7 +6446,7 @@
     <message>
         <location filename="../../../Qml/imtchatgui/EntitySearchPopup.qml" line="+117"/>
         <source>No results for &quot;%1&quot;</source>
-        <translation>Нет результатов для &quot;%1&quot;</translation>
+        <translation>&quot;%1&quot; бойынша нәтижелер жоқ</translation>
     </message>
 </context>
 <context>
@@ -6481,14 +6454,14 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/ErrorDialog.qml" line="+11"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation>Қате</translation>
     </message>
     <message>
         <location line="+8"/>
         <location line="+10"/>
         <location line="+0"/>
         <source>OK</source>
-        <translation>ОК</translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -6496,7 +6469,7 @@
     <message>
         <location filename="../../../Qml/imtlicgui/FeatureCollectionView.qml" line="+77"/>
         <source>Feature Name</source>
-        <translation>Название</translation>
+        <translation>Мүмкіндік атауы</translation>
     </message>
 </context>
 <context>
@@ -6506,61 +6479,61 @@
         <location line="+376"/>
         <location line="+0"/>
         <source>Feature Name</source>
-        <translation>Название</translation>
+        <translation>Мүмкіндік атауы</translation>
     </message>
     <message>
         <location line="-368"/>
         <source>Enter the feature name</source>
-        <translation>Введите название</translation>
+        <translation>Мүмкіндік атауын енгізіңіз</translation>
     </message>
     <message>
         <location line="+16"/>
         <location line="+356"/>
         <location line="+0"/>
         <source>Feature-ID</source>
-        <translation>Идентификатор</translation>
+        <translation>Мүмкіндік ID</translation>
     </message>
     <message>
         <location line="-348"/>
         <source>Enter the feature ID</source>
-        <translation>Введите идентификатор</translation>
+        <translation>Мүмкіндік ID енгізіңіз</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation>Сипаттама</translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Is Optional</source>
-        <translation>Необязательный</translation>
+        <translation>Міндетті емес</translation>
     </message>
     <message>
         <location line="+323"/>
         <source>Feature Description</source>
-        <translation>Описание</translation>
+        <translation>Мүмкіндік сипаттамасы</translation>
     </message>
     <message>
         <location line="-308"/>
         <location line="+316"/>
         <location line="+0"/>
         <source>Is Permission</source>
-        <translation>Право</translation>
+        <translation>Рұқсат</translation>
     </message>
     <message>
         <location line="-341"/>
         <source>Enter the description</source>
-        <translation>Введите описание</translation>
+        <translation>Сипаттаманы енгізіңіз</translation>
     </message>
     <message>
         <location line="+203"/>
         <source>Dependencies</source>
-        <translation>Зависимости</translation>
+        <translation>Тәуелділіктер</translation>
     </message>
     <message>
         <location line="+134"/>
         <source>Optional</source>
-        <translation>Опционально</translation>
+        <translation>Міндетті емес</translation>
     </message>
 </context>
 <context>
@@ -6568,22 +6541,22 @@
     <message>
         <location filename="../../../Qml/imtlicgui/FeaturesDialog.qml" line="+11"/>
         <source>Select features</source>
-        <translation>Выберите фичи</translation>
+        <translation>Мүмкіндіктерді таңдау</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Add</source>
-        <translation>Добавить</translation>
+        <translation>Қосу</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation>Болдырмау</translation>
     </message>
     <message>
         <location line="+53"/>
         <source>Feature Name</source>
-        <translation>Название</translation>
+        <translation>Мүмкіндік атауы</translation>
     </message>
 </context>
 <context>
@@ -6591,7 +6564,7 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/FileExportDialog.qml" line="+11"/>
         <source>Save file</source>
-        <translation>Сохранить файл</translation>
+        <translation>Файлды сақтау</translation>
     </message>
 </context>
 <context>
@@ -6599,7 +6572,7 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/FileImportDialog.qml" line="+10"/>
         <source>Import file</source>
-        <translation>Импорт файла</translation>
+        <translation>Файлды импорттау</translation>
     </message>
 </context>
 <context>
@@ -6607,17 +6580,17 @@
     <message>
         <location filename="../../../Qml/imtgui/View/FilePickerElementView.qml" line="+12"/>
         <source>Browse...</source>
-        <translation>Обзор...</translation>
+        <translation>Шолу...</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Select a file</source>
-        <translation>Выбрать файл</translation>
+        <translation>Файлды таңдаңыз</translation>
     </message>
     <message>
         <location line="+25"/>
         <source>Nothing is selected</source>
-        <translation>Ничего не выбрано</translation>
+        <translation>Ештеңе таңдалмаған</translation>
     </message>
 </context>
 <context>
@@ -6625,27 +6598,27 @@
     <message>
         <location filename="../../../Qml/imtgui/Panels/FilterPanelDecorator.qml" line="+217"/>
         <source>Document State</source>
-        <translation>Состояние документа</translation>
+        <translation>Құжат күйі</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Active</source>
-        <translation>Активный</translation>
+        <translation>Белсенді</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Disabled</source>
-        <translation>Отключено</translation>
+        <translation>Өшірілген</translation>
     </message>
     <message>
         <location line="+30"/>
         <source>Creation Date</source>
-        <translation>Дата создания</translation>
+        <translation>Жасалған күні</translation>
     </message>
     <message>
         <location line="+48"/>
         <source>Reset all filters</source>
-        <translation>Сбросить все фильтры</translation>
+        <translation>Барлық сүзгілерді қалпына келтіру</translation>
     </message>
 </context>
 <context>
@@ -6653,7 +6626,7 @@
     <message>
         <location filename="../../../Qml/imtgui/View/FilterableComboBoxElementView.qml" line="+86"/>
         <source>Clear</source>
-        <translation>Очистить</translation>
+        <translation>Тазалау</translation>
     </message>
 </context>
 <context>
@@ -6661,12 +6634,12 @@
     <message>
         <location filename="../../../Qml/imtguigql/FilterableSelectGqlDataProvider.qml" line="+82"/>
         <source>Failed to load items</source>
-        <translation>Не удалось загрузить элементы</translation>
+        <translation>Элементтерді жүктеу мүмкін болмады</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>No collection selected</source>
-        <translation>Коллекция не выбрана</translation>
+        <translation>Жинақ таңдалмаған</translation>
     </message>
 </context>
 <context>
@@ -6674,34 +6647,34 @@
     <message>
         <location filename="../../../Qml/imtcolgui/FilterableSelectPopup.qml" line="+70"/>
         <source>Filter...</source>
-        <translation>Фильтр...</translation>
+        <translation>Сүзгі...</translation>
     </message>
     <message>
         <location line="+395"/>
         <source>Selected</source>
-        <translation>Выбрано</translation>
+        <translation>Таңдалған</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Clear all</source>
-        <translation>Очистить все</translation>
+        <translation>Барлығын тазалау</translation>
     </message>
     <message>
         <location line="+169"/>
         <source>No items found</source>
-        <translation>Элементы не найдены</translation>
+        <translation>Элементтер табылмады</translation>
     </message>
     <message>
         <location line="+19"/>
         <location line="+1"/>
         <location line="+0"/>
         <source>Error loading items</source>
-        <translation>Ошибка загрузки элементов</translation>
+        <translation>Элементтерді жүктеу қатесі</translation>
     </message>
     <message>
         <location line="+98"/>
         <source>Loading more...</source>
-        <translation>Загрузка...</translation>
+        <translation>Жүктелуде...</translation>
     </message>
 </context>
 <context>
@@ -6710,7 +6683,7 @@
         <location filename="../../../Include/imtwidgets/CToolButton.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtwidgets/ui_CToolButton.h" line="+88"/>
         <source>Tool Button</source>
-        <translation>Кнопка инструмента</translation>
+        <translation>Құрал батырмасы</translation>
     </message>
     <message>
         <location line="+33"/>
@@ -6722,7 +6695,7 @@
         <location line="+35"/>
         <location filename="../../../AuxInclude/Qt6_VC17_x64/GeneratedFiles/imtwidgets/ui_CToolButton.h" line="+1"/>
         <source>Add New Wizard</source>
-        <translation>Добавить новый мастер</translation>
+        <translation>Жаңа шебер қосу</translation>
     </message>
 </context>
 <context>
@@ -6735,22 +6708,22 @@
     <message>
         <location line="+293"/>
         <source>Delete photo</source>
-        <translation>Удалить фото</translation>
+        <translation>Суретті жою</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Are you sure you want to delete the photo?</source>
-        <translation>Вы уверены, что хотите удалить фото?</translation>
+        <translation>Суретті жойғыңыз келетініне сенімдісіз бе?</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Ok</source>
-        <translation>ОК</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation>Болдырмау</translation>
     </message>
 </context>
 <context>
@@ -6764,7 +6737,7 @@
         <location line="+34"/>
         <location line="+37"/>
         <source>Invalid user-ID</source>
-        <translation>Неверный ID пользователя</translation>
+        <translation>Жарамсыз пайдаланушы ID</translation>
     </message>
     <message>
         <location line="-104"/>
@@ -6775,39 +6748,39 @@
         <location line="+34"/>
         <location line="+37"/>
         <source>Invalid document-ID</source>
-        <translation>Неверный ID документа</translation>
+        <translation>Жарамсыз құжат ID</translation>
     </message>
     <message>
         <location line="-104"/>
         <source>Document data is invalid</source>
-        <translation>Данные документа недействительны</translation>
+        <translation>Құжат деректері жарамсыз</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Save document failed</source>
-        <translation>Не удалось сохранить документ</translation>
+        <translation>Құжатты сақтау сәтсіз</translation>
     </message>
     <message>
         <location line="+33"/>
         <source>Close document failed</source>
-        <translation>Не удалось закрыть документ</translation>
+        <translation>Құжатты жабу сәтсіз</translation>
     </message>
     <message>
         <location line="+34"/>
         <source>Undo failed</source>
-        <translation>Не удалось отменить действие</translation>
+        <translation>Болдырмау сәтсіз</translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+37"/>
         <location line="+0"/>
         <source>Invalid step count</source>
-        <translation>Неверное количество шагов</translation>
+        <translation>Жарамсыз қадам саны</translation>
     </message>
     <message>
         <location line="-3"/>
         <source>Redo failed</source>
-        <translation>Не удалось повторить действие</translation>
+        <translation>Қайтару сәтсіз</translation>
     </message>
 </context>
 <context>
@@ -6815,7 +6788,7 @@
     <message>
         <location filename="../../../Qml/imtguigql/GqlBasedDataModelController.qml" line="+104"/>
         <source>Network error</source>
-        <translation>Ошибка сети</translation>
+        <translation>Желі қатесі</translation>
     </message>
 </context>
 <context>
@@ -6823,7 +6796,7 @@
     <message>
         <location filename="../../../Qml/imtguigql/GqlBasedDataModelProvider.qml" line="+105"/>
         <source>Network error</source>
-        <translation>Ошибка сети</translation>
+        <translation>Желі қатесі</translation>
     </message>
 </context>
 <context>
@@ -6831,7 +6804,7 @@
     <message>
         <location filename="../../../Qml/imtguigql/GqlSdlRequestSender.qml" line="+156"/>
         <source>Network error</source>
-        <translation>Ошибка сети</translation>
+        <translation>Желі қатесі</translation>
     </message>
 </context>
 <context>
@@ -6839,47 +6812,47 @@
     <message>
         <location filename="../../../Qml/imtcontrols/GraphicsView/GraphicsView.qml" line="+1336"/>
         <source>Selection mode</source>
-        <translation>Режим выделения</translation>
+        <translation>Таңдау режимі</translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Edit mode</source>
-        <translation>Режим редактирования</translation>
+        <translation>Өңдеу режимі</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Edit points mode</source>
-        <translation>Режим редактирования точек</translation>
+        <translation>Нүктелерді өңдеу режимі</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Add points mode</source>
-        <translation>Режим добавления точек</translation>
+        <translation>Нүктелер қосу режимі</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Delete points mode</source>
-        <translation>Режим удаления точек</translation>
+        <translation>Нүктелерді жою режимі</translation>
     </message>
     <message>
         <location line="+111"/>
         <source>Zoom in</source>
-        <translation>Увеличить</translation>
+        <translation>Үлкейту</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Zoom out</source>
-        <translation>Уменьшить</translation>
+        <translation>Кішірейту</translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Reset view</source>
-        <translation>Сбросить вид</translation>
+        <translation>Көріністі қалпына келтіру</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Fit to view</source>
-        <translation>По размеру окна</translation>
+        <translation>Көрініске сыйғызу</translation>
     </message>
 </context>
 <context>
@@ -6887,27 +6860,27 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/InputActions.qml" line="+37"/>
         <source>Cut</source>
-        <translation>Вырезать</translation>
+        <translation>Қию</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Copy</source>
-        <translation>Скопировать</translation>
+        <translation>Көшіру</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Paste</source>
-        <translation>Вставить</translation>
+        <translation>Қою</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation>Жою</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Select All</source>
-        <translation>Выделить все</translation>
+        <translation>Барлығын таңдау</translation>
     </message>
 </context>
 <context>
@@ -6917,14 +6890,14 @@
         <location line="+17"/>
         <location line="+0"/>
         <source>OK</source>
-        <translation>ОК</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location line="-16"/>
         <location line="+17"/>
         <location line="+0"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation>Болдырмау</translation>
     </message>
 </context>
 <context>
@@ -6932,22 +6905,22 @@
     <message>
         <location filename="../../../Qml/imtauthgui/ItemSelectElementView.qml" line="+18"/>
         <source>Items</source>
-        <translation>Элементы</translation>
+        <translation>Элементтер</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Add item</source>
-        <translation>Добавить элемент</translation>
+        <translation>Элемент қосу</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Type or choose an item</source>
-        <translation>Введите или выберите элемент</translation>
+        <translation>Элементті теріңіз немесе таңдаңыз</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>No items</source>
-        <translation>Нет элементов</translation>
+        <translation>Элементтер жоқ</translation>
     </message>
 </context>
 <context>
@@ -6957,54 +6930,54 @@
         <location line="+226"/>
         <location line="+0"/>
         <source>License Name</source>
-        <translation>Название лицензии</translation>
+        <translation>Лицензия атауы</translation>
     </message>
     <message>
         <location line="-217"/>
         <source>Enter the license name</source>
-        <translation>Введите название лицензии</translation>
+        <translation>Лицензия атауын енгізіңіз</translation>
     </message>
     <message>
         <location line="+21"/>
         <location line="+201"/>
         <location line="+0"/>
         <source>License-ID</source>
-        <translation>Идентификатор лицензии</translation>
+        <translation>Лицензия ID</translation>
     </message>
     <message>
         <location line="-192"/>
         <source>Enter the license ID</source>
-        <translation>Введите идентификатор лицензии</translation>
+        <translation>Лицензия ID енгізіңіз</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation>Сипаттама</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Enter the license description</source>
-        <translation>Введите описание лицензии</translation>
+        <translation>Лицензия сипаттамасын енгізіңіз</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Product</source>
-        <translation>Продукт</translation>
+        <translation>Өнім</translation>
     </message>
     <message>
         <location line="+44"/>
         <source>Features</source>
-        <translation>Свойства</translation>
+        <translation>Мүмкіндіктер</translation>
     </message>
     <message>
         <location line="+48"/>
         <source>Dependencies</source>
-        <translation>Зависимости</translation>
+        <translation>Тәуелділіктер</translation>
     </message>
     <message>
         <location line="+67"/>
         <source>Feature Name</source>
-        <translation>Название</translation>
+        <translation>Мүмкіндік атауы</translation>
     </message>
 </context>
 <context>
@@ -7012,7 +6985,7 @@
     <message>
         <location filename="../../../Qml/imtgui/View/LogView.qml" line="+31"/>
         <source>Log</source>
-        <translation>Лог</translation>
+        <translation>Журнал</translation>
     </message>
 </context>
 <context>
@@ -7020,22 +6993,22 @@
     <message>
         <location filename="../../../Qml/imtgui/View/MacAddressElementView.qml" line="+10"/>
         <source>MAC-Address</source>
-        <translation>МАК Адрес</translation>
+        <translation>MAC-мекенжай</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter MAC-Address</source>
-        <translation>Введите МАК Адрес</translation>
+        <translation>MAC-мекенжайды енгізіңіз</translation>
     </message>
     <message>
         <location line="+54"/>
         <source>MAC Address must be in the format XX:XX:XX:XX:XX:XX</source>
-        <translation>МАК Адрес  должен быть в формате XX:XX:XX:XX:XX:XX</translation>
+        <translation>MAC мекенжай XX:XX:XX:XX:XX:XX форматында болуы керек</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Only the symbols &lt;a-f&gt; and &lt;0 - 9&gt; may be included</source>
-        <translation>Только символы &lt;a-f&gt; и &lt;0 - 9&gt; могут быть использованы</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7043,27 +7016,27 @@
     <message>
         <location filename="../../../Qml/imtcolgui/MessageCollectionFilterDecorator.qml" line="+113"/>
         <source>Info</source>
-        <translation>Информация</translation>
+        <translation>Ақпарат</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Warning</source>
-        <translation>Предупреждение</translation>
+        <translation>Ескерту</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation>Қате</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Critical</source>
-        <translation>Критичная ошибка</translation>
+        <translation>Сыни</translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Verbose</source>
-        <translation>Подробный</translation>
+        <translation>Толық</translation>
     </message>
 </context>
 <context>
@@ -7071,7 +7044,7 @@
     <message>
         <location filename="../../../Qml/imtcolgui/MessageCollectionView.qml" line="+121"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation>Болдырмау</translation>
     </message>
 </context>
 <context>
@@ -7079,21 +7052,21 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/MessageDialog.qml" line="+11"/>
         <source>Message</source>
-        <translation>Сообщение</translation>
+        <translation>Хабарлама</translation>
     </message>
     <message>
         <location line="+8"/>
         <location line="+11"/>
         <location line="+0"/>
         <source>Yes</source>
-        <translation>Да</translation>
+        <translation>Иә</translation>
     </message>
     <message>
         <location line="-10"/>
         <location line="+11"/>
         <location line="+0"/>
         <source>No</source>
-        <translation>Нет</translation>
+        <translation>Жоқ</translation>
     </message>
 </context>
 <context>
@@ -7101,7 +7074,7 @@
     <message>
         <location filename="../../../Qml/imtchatgui/MessageInput.qml" line="+72"/>
         <source>Write a message... (@ to mention, # for reference)</source>
-        <translation>Написать сообщение... (@ для упоминания, # для ссылки)</translation>
+        <translation>Хабарлама жазу... (@ атау үшін, # сілтеме үшін)</translation>
     </message>
 </context>
 <context>
@@ -7109,7 +7082,7 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/MessagePopup.qml" line="+9"/>
         <source>Message</source>
-        <translation>Сообщение</translation>
+        <translation>Хабарлама</translation>
     </message>
 </context>
 <context>
@@ -7117,22 +7090,22 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/ModalDialogManager.qml" line="+165"/>
         <source>Information</source>
-        <translation>Информация</translation>
+        <translation>Ақпарат</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Warning</source>
-        <translation>Предупреждение</translation>
+        <translation>Ескерту</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Critical</source>
-        <translation>Критичная ошибка</translation>
+        <translation>Сыни</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation>Болдырмау</translation>
     </message>
 </context>
 <context>
@@ -7140,22 +7113,22 @@
     <message>
         <location filename="../../../Qml/imtdocgui/MultiDocWorkspaceView.qml" line="+173"/>
         <source>Save all changes ?</source>
-        <translation>Сохранить все изменения ?</translation>
+        <translation>Барлық өзгерістерді сақтайсыз ба?</translation>
     </message>
     <message>
         <location line="+81"/>
         <source>Close document</source>
-        <translation>Закрыть документ</translation>
+        <translation>Құжатты жабу</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Close all documents</source>
-        <translation>Закрыть все документы</translation>
+        <translation>Барлық құжаттарды жабу</translation>
     </message>
     <message>
         <location line="-83"/>
         <source>Save document</source>
-        <translation>Сохранение документа</translation>
+        <translation>Құжатты сақтау</translation>
     </message>
 </context>
 <context>
@@ -7163,32 +7136,32 @@
     <message>
         <location filename="../../../Qml/imtdocgui/MultiDocumentCollectionView.qml" line="+112"/>
         <source>Document Name</source>
-        <translation>Название документа</translation>
+        <translation>Құжат атауы</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the document name</source>
-        <translation>Введите название документа</translation>
+        <translation>Құжат атауын енгізіңіз</translation>
     </message>
     <message>
         <location line="-9"/>
         <source>Save document</source>
-        <translation>Сохранение документа</translation>
+        <translation>Құжатты сақтау</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Save all changes ?</source>
-        <translation>Сохранить все изменения ?</translation>
+        <translation>Барлық өзгерістерді сақтайсыз ба?</translation>
     </message>
     <message>
         <location line="+310"/>
         <source>Close document</source>
-        <translation>Закрыть документ</translation>
+        <translation>Құжатты жабу</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Close all documents</source>
-        <translation>Закрыть все документы</translation>
+        <translation>Барлық құжаттарды жабу</translation>
     </message>
 </context>
 <context>
@@ -7211,12 +7184,12 @@
     <message>
         <location filename="../../../Qml/imtlicgui/PackageCollectionViewCommandsDelegate.qml" line="+10"/>
         <source>Deleting a feature</source>
-        <translation>Удаление фичи</translation>
+        <translation>Мүмкіндікті жою</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Delete the selected feature ?</source>
-        <translation>Удалить выбранную фичу ?</translation>
+        <translation>Таңдалған мүмкіндікті жоясыз ба?</translation>
     </message>
 </context>
 <context>
@@ -7224,12 +7197,12 @@
     <message>
         <location filename="../../../Qml/imtlicgui/PackageViewItemDelegate.qml" line="+152"/>
         <source>Feature-ID already exists (In this or another package)</source>
-        <translation>Feature-ID уже сущесвует (В этом либо в другом  пакете)</translation>
+        <translation>Мүмкіндік ID бұрыннан бар (осы немесе басқа пакетте)</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>It is impossible to rename the feature, please remove all dependencies</source>
-        <translation>Переименование невозможно, удалите все зависимости</translation>
+        <translation>Мүмкіндіктің атын өзгерту мүмкін емес, барлық тәуелділіктерді жойыңыз</translation>
     </message>
 </context>
 <context>
@@ -7237,12 +7210,12 @@
     <message>
         <location filename="../../../Qml/imtgui/Settings/PageAboutProvider.qml" line="+37"/>
         <source>Server Log</source>
-        <translation>Серверный лог</translation>
+        <translation>Сервер журналы</translation>
     </message>
     <message>
         <location line="-1"/>
         <source>Server Version</source>
-        <translation>Версия сервера</translation>
+        <translation>Сервер нұсқасы</translation>
     </message>
 </context>
 <context>
@@ -7250,7 +7223,7 @@
     <message>
         <location filename="../../../Qml/imtgui/View/Pagination.qml" line="+193"/>
         <source>Per page: </source>
-        <translation>На страницу: </translation>
+        <translation>Бетте: </translation>
     </message>
 </context>
 <context>
@@ -7258,34 +7231,34 @@
     <message>
         <location filename="../../../Qml/imtauthgui/PasswordInput.qml" line="+43"/>
         <source>Passwords don&apos;t match</source>
-        <translation>Пароли не совпадают</translation>
+        <translation>Құпия сөздер сәйкес келмейді</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Current password</source>
-        <translation>Текущий пароль</translation>
+        <translation>Ағымдағы құпия сөз</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Enter the current password</source>
-        <translation>Введите текущий пароль</translation>
+        <translation>Ағымдағы құпия сөзді енгізіңіз</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>New password</source>
-        <translation>Новый пароль</translation>
+        <translation>Жаңа құпия сөз</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Enter the new password</source>
-        <translation>Введите новый пароль</translation>
+        <translation>Жаңа құпия сөзді енгізіңіз</translation>
     </message>
     <message>
         <location line="+11"/>
         <location line="+2"/>
         <location line="+0"/>
         <source>Confirm password</source>
-        <translation>Подтвердите пароль</translation>
+        <translation>Құпия сөзді растаңыз</translation>
     </message>
 </context>
 <context>
@@ -7293,64 +7266,64 @@
     <message>
         <location filename="../../../Qml/imtauthgui/PasswordRecoveryDialog.qml" line="+15"/>
         <source>Password Recovery</source>
-        <translation>Восстановление пароля</translation>
+        <translation>Құпия сөзді қалпына келтіру</translation>
     </message>
     <message>
         <location line="+27"/>
         <location line="+40"/>
         <location line="+0"/>
         <source>Check the email</source>
-        <translation>Проверить почту</translation>
+        <translation>Электрондық поштаны тексеріңіз</translation>
     </message>
     <message>
         <location line="-35"/>
         <source>Yes</source>
-        <translation>Да</translation>
+        <translation>Иә</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Check the code</source>
-        <translation>Проверить код</translation>
+        <translation>Кодты тексеріңіз</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Change password</source>
-        <translation>Изменить пароль</translation>
+        <translation>Құпия сөзді өзгерту</translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation>Болдырмау</translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Check the email you entered</source>
-        <translation>Проверьте введённый адрес электронной почты</translation>
+        <translation>Енгізілген электрондық поштаны тексеріңіз</translation>
     </message>
     <message>
         <location line="+41"/>
         <source>Enter the email</source>
-        <translation>Введите электронную почту</translation>
+        <translation>Электрондық поштаны енгізіңіз</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Email</source>
-        <translation>Электронная почта</translation>
+        <translation>Электрондық пошта</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the email address that was specified on your account, a code will be sent to it</source>
-        <translation>Введите адрес электронной почты, указанный при регистрации, на него будет отправлен код</translation>
+        <translation>Тіркелгіңізде көрсетілген электрондық поштаны енгізіңіз, оған код жіберіледі</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Please enter the valid email</source>
-        <translation>Пожалуйста, введите корректный адрес электронной почты</translation>
+        <translation>Жарамды электрондық поштаны енгізіңіз</translation>
     </message>
     <message>
         <location line="+37"/>
         <source>Enter the code</source>
-        <translation>Введите код</translation>
+        <translation>Кодты енгізіңіз</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -7360,37 +7333,37 @@
     <message>
         <location line="+1"/>
         <source>Please enter the code sent to your email</source>
-        <translation>Пожалуйста, введите код, отправленный на вашу электронную почту</translation>
+        <translation>Электрондық поштаңызға жіберілген кодты енгізіңіз</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Send the code again</source>
-        <translation>Отправить код повторно</translation>
+        <translation>Кодты қайта жіберу</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Send</source>
-        <translation>Отправить</translation>
+        <translation>Жіберу</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>The new code can be obtained via</source>
-        <translation>Новый код можно получить через</translation>
+        <translation>Жаңа кодты алуға болады</translation>
     </message>
     <message>
         <location line="+47"/>
         <source>Username</source>
-        <translation>Логин</translation>
+        <translation>Пайдаланушы аты</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>For this email this account has been found, is that you?</source>
-        <translation>Для этого адреса электронной почты найден аккаунт, это вы?</translation>
+        <translation>Осы электрондық пошта бойынша тіркелгі табылды, бұл сіз бе?</translation>
     </message>
     <message>
         <location line="+142"/>
         <source>Password changed successfully</source>
-        <translation>Пароль успешно изменен</translation>
+        <translation>Құпия сөз сәтті өзгертілді</translation>
     </message>
 </context>
 <context>
@@ -7398,112 +7371,112 @@
     <message>
         <location filename="../../../Qml/imtgui/Params/PatTokenParamEditor.qml" line="+138"/>
         <source>Token Created Successfully</source>
-        <translation>Токен успешно создан</translation>
+        <translation>Токен сәтті жасалды</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>OK</source>
-        <translation>ОК</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Please copy and save the token:</source>
-        <translation>Пожалуйста, скопируйте и сохраните токен:</translation>
+        <translation>Токенді көшіріп сақтаңыз:</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>The token is copied</source>
-        <translation>Токен скопирован</translation>
+        <translation>Токен көшірілді</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Copy the token</source>
-        <translation>Скопировать токен</translation>
+        <translation>Токенді көшіру</translation>
     </message>
     <message>
         <location line="+28"/>
         <source>New Token</source>
-        <translation>Новый токен</translation>
+        <translation>Жаңа токен</translation>
     </message>
     <message>
         <location line="+62"/>
         <source>No Expiration</source>
-        <translation>Без срока действия</translation>
+        <translation>Мерзімсіз</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Delete Token</source>
-        <translation>Удалить токен</translation>
+        <translation>Токенді жою</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Revoke Token</source>
-        <translation>Отозвать токен</translation>
+        <translation>Токенді қайтарып алу</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Revoked</source>
-        <translation>Отозван</translation>
+        <translation>Қайтарып алынған</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Are you sure you want to delete this token?</source>
-        <translation>Вы уверены, что хотите удалить этот токен?</translation>
+        <translation>Бұл токенді жойғыңыз келетініне сенімдісіз бе?</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Any applications or scripts using this token will no longer be able to access the API. You cannot undo this action.</source>
-        <translation>Все приложения или скрипты, использующие этот токен, больше не смогут получить доступ к API. Это действие нельзя отменить.</translation>
+        <translation>Осы токенді пайдаланатын кез келген қолданба немесе скрипт API-ге қатынай алмайды. Бұл әрекетті қайтару мүмкін емес.</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Add PAT Token</source>
-        <translation>Добавить PAT-токен</translation>
+        <translation>PAT токенін қосу</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Add</source>
-        <translation>Добавить</translation>
+        <translation>Қосу</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation>Болдырмау</translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Token Name</source>
-        <translation>Название токена</translation>
+        <translation>Токен атауы</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>A descriptive name for this token</source>
-        <translation>Описательное название для этого токена</translation>
+        <translation>Осы токен үшін сипаттамалық атау</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Please enter the token name</source>
-        <translation>Пожалуйста, введите название токена</translation>
+        <translation>Токен атауын енгізіңіз</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation>Сипаттама</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Optional description for this token</source>
-        <translation>Необязательное описание для этого токена</translation>
+        <translation>Осы токен үшін қосымша сипаттама</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Expiration</source>
-        <translation>Срок действия</translation>
+        <translation>Мерзімі</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>The token will expire on the selected date</source>
-        <translation>Токен истечёт в выбранную дату</translation>
+        <translation>Токеннің мерзімі таңдалған күні аяқталады</translation>
     </message>
 </context>
 <context>
@@ -7511,12 +7484,12 @@
     <message>
         <location filename="../../../Qml/imtgui/Settings/PatTokenSettingsController.qml" line="+14"/>
         <source>PAT Tokens</source>
-        <translation>PAT-токены</translation>
+        <translation>PAT-токендер</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Personal Access Tokens for API authentication</source>
-        <translation>Персональные токены доступа для аутентификации API</translation>
+        <translation>API аутентификациясы үшін жеке қатынау токендері</translation>
     </message>
 </context>
 <context>
@@ -7524,7 +7497,7 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/PopupDecoratorGql.qml" line="+310"/>
         <source>No data</source>
-        <translation>Нет данных</translation>
+        <translation>Деректер жоқ</translation>
     </message>
 </context>
 <context>
@@ -7532,24 +7505,24 @@
     <message>
         <location filename="../../../Qml/imtgui/Settings/PreferenceDialog.qml" line="+12"/>
         <source>Preferences</source>
-        <translation>Настройки</translation>
+        <translation>Параметрлер</translation>
     </message>
     <message>
         <location line="+29"/>
         <source>Apply</source>
-        <translation>Применить</translation>
+        <translation>Қолдану</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+6"/>
         <location line="+0"/>
         <source>Close</source>
-        <translation>Закрыть</translation>
+        <translation>Жабу</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation>Болдырмау</translation>
     </message>
 </context>
 <context>
@@ -7557,32 +7530,32 @@
     <message>
         <location filename="../../../Qml/imtlicgui/ProductCollectionViewCommandsDelegate.qml" line="+15"/>
         <source>Deleting a product</source>
-        <translation>Удаление продукта</translation>
+        <translation>Өнімді жою</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Delete the selected product ?</source>
-        <translation>Удалить выбранный продукт ?</translation>
+        <translation>Таңдалған өнімді жоясыз ба?</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Select product</source>
-        <translation>Выберите продукт</translation>
+        <translation>Өнімді таңдау</translation>
     </message>
     <message>
         <location line="+46"/>
         <source>Feature overwriting</source>
-        <translation>Перезапись свойств</translation>
+        <translation>Мүмкіндіктерді қайта жазу</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Overwrite features ?</source>
-        <translation>Перезаписать свойства ?</translation>
+        <translation>Мүмкіндіктерді қайта жазасыз ба?</translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Please enter the name of the document:</source>
-        <translation>Введите название документа:</translation>
+        <translation>Құжат атауын енгізіңіз:</translation>
     </message>
 </context>
 <context>
@@ -7590,32 +7563,32 @@
     <message>
         <location filename="../../../Qml/imtlicgui/ProductView.qml" line="+50"/>
         <source>Feature Name</source>
-        <translation>Название</translation>
+        <translation>Мүмкіндік атауы</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Feature-ID</source>
-        <translation>Идентификатор</translation>
+        <translation>Мүмкіндік ID</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation>Сипаттама</translation>
     </message>
     <message>
         <location line="+147"/>
         <source>Product Name</source>
-        <translation>Название продукта</translation>
+        <translation>Өнім атауы</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Enter the product name</source>
-        <translation>Введите название продукта</translation>
+        <translation>Өнім атауын енгізіңіз</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Category</source>
-        <translation>Категория</translation>
+        <translation>Санат</translation>
     </message>
 </context>
 <context>
@@ -7623,74 +7596,74 @@
     <message>
         <location filename="../../../Qml/imtauthgui/ProfileView.qml" line="+124"/>
         <source>General</source>
-        <translation>Основное</translation>
+        <translation>Жалпы</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Username</source>
-        <translation>Логин</translation>
+        <translation>Пайдаланушы аты</translation>
     </message>
     <message>
         <location line="+10"/>
         <location line="+137"/>
         <location line="+0"/>
         <source>Name</source>
-        <translation>Название</translation>
+        <translation>Атауы</translation>
     </message>
     <message>
         <location line="-136"/>
         <source>Enter the name</source>
-        <translation>Введите название</translation>
+        <translation>Атауын енгізіңіз</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Email Address</source>
-        <translation>Email</translation>
+        <translation>Электрондық пошта мекенжайы</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Enter the email</source>
-        <translation>Введите email</translation>
+        <translation>Электрондық поштаны енгізіңіз</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Save</source>
-        <translation>Сохранить</translation>
+        <translation>Сақтау</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Change password</source>
-        <translation>Сменить пароль</translation>
+        <translation>Құпия сөзді өзгерту</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Change</source>
-        <translation>Изменить</translation>
+        <translation>Өзгерту</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Change Password</source>
-        <translation>Сменить пароль</translation>
+        <translation>Құпия сөзді өзгерту</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Roles</source>
-        <translation>Роли</translation>
+        <translation>Рөлдер</translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Groups</source>
-        <translation>Группы</translation>
+        <translation>Топтар</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Permissions</source>
-        <translation>Права</translation>
+        <translation>Рұқсаттар</translation>
     </message>
     <message>
         <location line="+31"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation>Сипаттама</translation>
     </message>
 </context>
 <context>
@@ -7706,17 +7679,17 @@
     <message>
         <location filename="../../../Qml/imtcontrols/Dialogs/ProgressDialogManager.qml" line="+11"/>
         <source>Progress manager</source>
-        <translation>Менеджер прогресса</translation>
+        <translation>Прогресс менеджері</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Total progress</source>
-        <translation>Общий прогресс</translation>
+        <translation>Жалпы прогресс</translation>
     </message>
     <message>
         <location line="+45"/>
         <source>Ok</source>
-        <translation>ОК</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location line="+32"/>
@@ -7725,17 +7698,17 @@
         <location line="-116"/>
         <location line="+116"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation>Болдырмау</translation>
     </message>
     <message>
         <location line="-47"/>
         <source>Subtasks</source>
-        <translation>Подзадачи</translation>
+        <translation>Ішкі тапсырмалар</translation>
     </message>
     <message>
         <location line="+82"/>
         <source>Cancelling</source>
-        <translation>Отмена</translation>
+        <translation>Болдырмау</translation>
     </message>
 </context>
 <context>
@@ -7743,52 +7716,52 @@
     <message>
         <location filename="../../../Include/imtauth/CAccountInfoMetaInfo.cpp" line="+17"/>
         <source>Account Type</source>
-        <translation>Тип аккаунта</translation>
+        <translation>Тіркелгі түрі</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Account Name</source>
-        <translation>Название аккаунта</translation>
+        <translation>Тіркелгі атауы</translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../Include/imtlic/CProductMetaInfoCreatorComp.cpp" line="+61"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation>Сипаттама</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>E-Mail</source>
-        <translation>Электронная почта</translation>
+        <translation>Электрондық пошта</translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../Include/imtauth/CContactInfoMetaInfoCreatorComp.cpp" line="+62"/>
         <source>Birthday</source>
-        <translation>Дата рождения</translation>
+        <translation>Туған күні</translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../Include/imtauth/CContactInfoMetaInfoCreatorComp.cpp" line="+2"/>
         <source>First Name</source>
-        <translation>Имя</translation>
+        <translation>Аты</translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../Include/imtauth/CContactInfoMetaInfoCreatorComp.cpp" line="+2"/>
         <source>Last Name</source>
-        <translation>Фамилия</translation>
+        <translation>Тегі</translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../Include/imtauth/CContactInfoMetaInfoCreatorComp.cpp" line="+2"/>
         <source>Nickname</source>
-        <translation>Псевдоним</translation>
+        <translation>Лақап ат</translation>
     </message>
     <message>
         <location filename="../../../Include/imtauth/CAccountInfoMetaInfoCreatorComp.cpp" line="+43"/>
         <source>Private</source>
-        <translation>Личный</translation>
+        <translation>Жеке</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -7801,42 +7774,42 @@
         <location line="+3"/>
         <location line="+1"/>
         <source>Unknown</source>
-        <translation>Неизвестный</translation>
+        <translation>Белгісіз</translation>
     </message>
     <message>
         <location filename="../../../Include/imtauth/CAddressMetaInfoCreatorComp.cpp" line="+55"/>
         <source>City</source>
-        <translation>Город</translation>
+        <translation>Қала</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Country</source>
-        <translation>Страна</translation>
+        <translation>Ел</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Postal Code</source>
-        <translation>Почтовый индекс</translation>
+        <translation>Пошта индексі</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Street</source>
-        <translation>Улица</translation>
+        <translation>Көше</translation>
     </message>
     <message>
         <location filename="../../../Include/imtauth/CContactInfoMetaInfoCreatorComp.cpp" line="-10"/>
         <source>EMail</source>
-        <translation>Электронная почта</translation>
+        <translation>Электрондық пошта</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Gender</source>
-        <translation>Пол</translation>
+        <translation>Жынысы</translation>
     </message>
     <message>
         <location filename="../../../Include/imtauth/CUserInfoMetaInfo.cpp" line="+17"/>
         <source>Email</source>
-        <translation>Электронная почта</translation>
+        <translation>Электрондық пошта</translation>
     </message>
     <message>
         <location filename="../../../Include/imtgeo/CAddressCollectionControllerComp.cpp" line="+59"/>
@@ -7847,37 +7820,37 @@
         <location filename="../../../Include/imtlicgql/CLicenseControllerComp.cpp" line="+163"/>
         <location filename="../../../Include/imtservergql/CObjectMetaInfoCollectionControllerComp.cpp" line="+30"/>
         <source>Internal error</source>
-        <translation>Внутренняя ошибка</translation>
+        <translation>Ішкі қате</translation>
     </message>
     <message>
         <location filename="../../../Include/imtbase/CCollectionDataControllerComp.cpp" line="+74"/>
         <source>Import from %1</source>
-        <translation>Импортировано из %1</translation>
+        <translation>%1 ішінен импорттау</translation>
     </message>
     <message>
         <location filename="../../../Include/imtbase/TPluginManager.h" line="+213"/>
         <source>Plug-in loaded</source>
-        <translation>Плагин загружен</translation>
+        <translation>Плагин жүктелді</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Plug-in initialization failed</source>
-        <translation>Не удалось инициализировать плагин</translation>
+        <translation>Плагин инициализациясы сәтсіз</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Plug-in unsupported type-ID</source>
-        <translation>Неподдерживаемый ID типа плагина</translation>
+        <translation>Плагин қолдау көрсетілмейтін түр-ID</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Plug-in instance creation failed</source>
-        <translation>Не удалось создать экземпляр плагина</translation>
+        <translation>Плагин экземплярын жасау сәтсіз</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Plug-in entry point was not found: &apos;%1&apos;</source>
-        <translation>Точка входа плагина не найдена: &apos;%1&apos;</translation>
+        <translation>Плагин кіру нүктесі табылмады: &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -7887,148 +7860,148 @@
     <message>
         <location filename="../../../Include/imtgeo/CAddressControllerComp.cpp" line="-129"/>
         <source>Can not insert object: %1</source>
-        <translation>Не удалось вставить объект: %1</translation>
+        <translation>Нысанды қою мүмкін емес: %1</translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Can not create Address: %1</source>
-        <translation>Не удалось создать адрес: %1</translation>
+        <translation>Мекенжай жасау мүмкін емес: %1</translation>
     </message>
     <message>
         <location line="+71"/>
         <source>Can not create address: %1</source>
-        <translation>Не удалось создать адрес: %1</translation>
+        <translation>Мекенжай жасау мүмкін емес: %1</translation>
     </message>
     <message>
         <location line="+46"/>
         <source>Can not update object: %1</source>
-        <translation>Не удалось обновить объект: %1</translation>
+        <translation>Нысанды жаңарту мүмкін емес: %1</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Can not create object for update: %1</source>
-        <translation>Не удалось создать объект для обновления: %1</translation>
+        <translation>Жаңарту үшін нысан жасау мүмкін емес: %1</translation>
     </message>
     <message>
         <location filename="../../../Include/imtgui/TStandardDocumentViewDecorator.h" line="+366"/>
         <source>&amp;New</source>
-        <translation>&amp;Новый</translation>
+        <translation>&amp;Жаңа</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>New</source>
-        <translation>Новый</translation>
+        <translation>Жаңа</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Create new document</source>
-        <translation>Создать новый документ</translation>
+        <translation>Жаңа құжат жасау</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Open...</source>
-        <translation>&amp;Открыть...</translation>
+        <translation>&amp;Ашу...</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Open...</source>
-        <translation>Открыть...</translation>
+        <translation>Ашу...</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Open an existing document</source>
-        <translation>Открыть существующий документ</translation>
+        <translation>Бар құжатты ашу</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Undo</source>
-        <translation>&amp;Отменить</translation>
+        <translation>&amp;Болдырмау</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Undo</source>
-        <translation>Отменить</translation>
+        <translation>Болдырмау</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Undo last document changes</source>
-        <translation>Отменить последние изменения в документе</translation>
+        <translation>Құжаттың соңғы өзгерістерін болдырмау</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Redo</source>
-        <translation>&amp;Восстановить</translation>
+        <translation>&amp;Қайтару</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Redo</source>
-        <translation>Восстановить</translation>
+        <translation>Қайтару</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Redo last document changes</source>
-        <translation>Повторить последние изменения в документе</translation>
+        <translation>Құжаттың соңғы өзгерістерін қайтару</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Close</source>
-        <translation>&amp;Закрыть</translation>
+        <translation>&amp;Жабу</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Close</source>
-        <translation>Закрыть</translation>
+        <translation>Жабу</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Close the document</source>
-        <translation>Закрыть документ</translation>
+        <translation>Құжатты жабу</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Save</source>
-        <translation>&amp;Сохранить</translation>
+        <translation>&amp;Сақтау</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Save</source>
-        <translation>Сохранить</translation>
+        <translation>Сақтау</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Save the document changes</source>
-        <translation>Сохранить изменения в документе</translation>
+        <translation>Құжат өзгерістерін сақтау</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <source>Save As</source>
-        <translation>Сохранить как</translation>
+        <translation>Басқаша сақтау</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Save the document as...</source>
-        <translation>Сохранить документ как...</translation>
+        <translation>Құжатты басқаша сақтау...</translation>
     </message>
     <message>
         <location filename="../../../Include/imtimg/CBitmapMetaInfo.cpp" line="+17"/>
         <source>Device</source>
-        <translation>Устройство</translation>
+        <translation>Құрылғы</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Width</source>
-        <translation>Ширина</translation>
+        <translation>Ені</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Height</source>
-        <translation>Высота</translation>
+        <translation>Биіктігі</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Depth</source>
-        <translation>Глубина</translation>
+        <translation>Тереңдігі</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -8038,32 +8011,32 @@
     <message>
         <location line="+2"/>
         <source>Color Space</source>
-        <translation>Цветовое пространство</translation>
+        <translation>Түс кеңістігі</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Color Space Type</source>
-        <translation>Тип цветового пространства</translation>
+        <translation>Түс кеңістігі түрі</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Pixel Depth</source>
-        <translation>Глубина пикселя</translation>
+        <translation>Пиксел тереңдігі</translation>
     </message>
     <message>
         <location filename="../../../Include/imtimg/CBitmapMetaInfoCreatorComp.cpp" line="-28"/>
         <source> bits</source>
-        <translation> бит</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Grayscale</source>
-        <translation>Оттенки серого</translation>
+        <translation>Сұр реңк</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Monochromatic</source>
-        <translation>Монохромный</translation>
+        <translation>Монохроматикалық</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -8086,43 +8059,43 @@
         <location filename="../../../Include/imtlic/CProductInstanceMetaInfo.cpp" line="+18"/>
         <location filename="../../../Include/imtlic/CProductLicensingInfoMetaInfoCreatorComp.cpp" line="+67"/>
         <source>Licenses</source>
-        <translation>Лицензии</translation>
+        <translation>Лицензиялар</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Instance-ID</source>
-        <translation>ID экземпляра</translation>
+        <translation>Экземпляр ID</translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../Include/imtlic/CProductLicensingMetaInfo.cpp" line="+19"/>
         <source>Category-ID</source>
-        <translation>ID категории</translation>
+        <translation>Санат ID</translation>
     </message>
     <message>
         <location filename="../../../Include/imtlic/CProductInstanceMetaInfoCreatorComp.cpp" line="+51"/>
         <source>Unlimited</source>
-        <translation>Неограниченный</translation>
+        <translation>Шексіз</translation>
     </message>
     <message>
         <location line="+5"/>
         <source> (Valid until: %1)</source>
-        <translation> (Действительно до: %1)</translation>
+        <translation> (Жарамды: %1 дейін)</translation>
     </message>
     <message>
         <location filename="../../../Include/imtlic/CProductLicensingMetaInfo.cpp" line="-2"/>
         <source>Product</source>
-        <translation>Продукт</translation>
+        <translation>Өнім</translation>
     </message>
     <message>
         <location filename="../../../Include/imtlicgui/CFeatureDependencyEditorBase.cpp" line="+161"/>
         <source>Unsaved Features</source>
-        <translation>Несохранённые функции</translation>
+        <translation>Сақталмаған мүмкіндіктер</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Missing features</source>
-        <translation>Отсутствующие функции</translation>
+        <translation>Жоқ мүмкіндіктер</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -8132,132 +8105,132 @@
     <message>
         <location filename="../../../Include/imthypegui/TTaskCollectionEditorCompBase.h" line="+308"/>
         <source>Task Manager</source>
-        <translation>Менеджер задач</translation>
+        <translation>Тапсырмалар менеджері</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Task could not be created!</source>
-        <translation>Не удалось создать задачу!</translation>
+        <translation>Тапсырманы жасау мүмкін болмады!</translation>
     </message>
     <message>
         <location line="+87"/>
         <source>Task Error</source>
-        <translation>Ошибка задачи</translation>
+        <translation>Тапсырма қатесі</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Task could not be duplicated!</source>
-        <translation>Не удалось дублировать задачу!</translation>
+        <translation>Тапсырманы көшіру мүмкін болмады!</translation>
     </message>
     <message>
         <location filename="../../../Include/imthypegui/CTaskManagerGuiComp.cpp" line="+423"/>
         <location filename="../../../Include/imthypegui/TTaskCollectionEditorCompBase.h" line="+130"/>
         <source>Enter new task name</source>
-        <translation>Введите новое название задачи</translation>
+        <translation>Жаңа тапсырма атауын енгізіңіз</translation>
     </message>
     <message>
         <location line="+0"/>
         <location filename="../../../Include/imthypegui/TTaskCollectionEditorCompBase.h" line="+0"/>
         <source>Name</source>
-        <translation>Название</translation>
+        <translation>Атауы</translation>
     </message>
     <message>
         <location filename="../../../Include/imthypegui/TTaskCollectionEditorCompBase.h" line="+40"/>
         <location filename="../../../Include/imtlicgui/CFeatureDependencyEditorBase.cpp" line="+157"/>
         <location line="+27"/>
         <source>Warning</source>
-        <translation>Предупреждение</translation>
+        <translation>Ескерту</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Task name already exist</source>
-        <translation>Задача с таким названием уже существует</translation>
+        <translation>Тапсырма атауы бұрыннан бар</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Wrong task name</source>
-        <translation>Неверное название задачи</translation>
+        <translation>Қате тапсырма атауы</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Empty task name cannot be used</source>
-        <translation>Название задачи не может быть пустым</translation>
+        <translation>Бос тапсырма атауын пайдалану мүмкін емес</translation>
     </message>
     <message>
         <location filename="../../../Include/imtlicgui/CFeatureDependencyEditorBase.cpp" line="-26"/>
         <location line="+27"/>
         <source>Feature with ID &apos;%1&apos; depends on feature with ID &apos;%2&apos;</source>
-        <translation>Функция с ID &apos;%1&apos; зависит от функции с ID &apos;%2&apos;</translation>
+        <translation>&apos;%1&apos; ID мүмкіндігі &apos;%2&apos; ID мүмкіндігіне тәуелді</translation>
     </message>
     <message>
         <location filename="../../../Include/imtloggui/CEventGroupLabelItem.cpp" line="+22"/>
         <source>Noname</source>
-        <translation>Без имени</translation>
+        <translation>Атаусыз</translation>
     </message>
     <message>
         <location filename="../../../Include/imtloggui/CEventItemBase.cpp" line="+66"/>
         <source>UNKNOWN</source>
-        <translation>НЕИЗВЕСТНО</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>OK</source>
-        <translation>ОК</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>WARNING</source>
-        <translation>ПРЕДУПРЕЖДЕНИЕ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>ERROR</source>
-        <translation>ОШИБКА</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>CRITICAL</source>
-        <translation>КРИТИЧЕСКАЯ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+30"/>
         <source>Timestamp</source>
-        <translation>Отметка времени</translation>
+        <translation>Уақыт белгісі</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Source</source>
-        <translation>Источник</translation>
+        <translation>Дереккөз</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Message</source>
-        <translation>Сообщение</translation>
+        <translation>Хабарлама</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Status</source>
-        <translation>Статус</translation>
+        <translation>Күйі</translation>
     </message>
     <message>
         <location filename="../../../Include/imtloggui/CLoginEventItem.cpp" line="+52"/>
         <source>Login</source>
-        <translation>Логин</translation>
+        <translation>Кіру</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Logout</source>
-        <translation>Выход из системы</translation>
+        <translation>Жүйеден шығу</translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Action</source>
-        <translation>Действие</translation>
+        <translation>Әрекет</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>User name</source>
-        <translation>Имя пользователя</translation>
+        <translation>Пайдаланушы аты</translation>
     </message>
     <message>
         <location filename="../../../Include/imtloggui/CProductionQualityItem.cpp" line="+106"/>
@@ -8265,10 +8238,7 @@
 Warnings: %2
 Noks: %3
 Errors: %4</source>
-        <translation>Успешно: %1
-Предупреждения: %2
-Ошибок: %3
-Критических ошибок: %4</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
@@ -8276,121 +8246,118 @@ Errors: %4</source>
 Warnings: 0
 Noks: 0
 Errors: 0</source>
-        <translation>Успешно: 0
-Предупреждения: 0
-Ошибок: 0
-Критических ошибок: 0</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+367"/>
         <source>Oks</source>
-        <translation>Успешно</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Warnings</source>
-        <translation>Предупреждения</translation>
+        <translation>Ескертулер</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Noks</source>
-        <translation>Ошибок</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Errors</source>
-        <translation>Критических ошибок</translation>
+        <translation>Қателер</translation>
     </message>
     <message>
         <location filename="../../../Include/imtqml/CQuickApplicationCompBase.cpp" line="+137"/>
         <source>ACF application</source>
-        <translation>Приложение ACF</translation>
+        <translation>ACF қолданбасы</translation>
     </message>
     <message>
         <location filename="../../../Include/imtreport/CInspectionReportBuilderComp.cpp" line="+97"/>
         <source>Gap</source>
-        <translation>Зазор</translation>
+        <translation>Аралық</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Narrow</source>
-        <translation>Узкий</translation>
+        <translation>Тар</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Wide</source>
-        <translation>Широкий</translation>
+        <translation>Кең</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Beyond area</source>
-        <translation>За пределами области</translation>
+        <translation>Аймақтан тыс</translation>
     </message>
     <message>
         <location line="+135"/>
         <source>Inspection</source>
-        <translation>Инспекция</translation>
+        <translation>Тексеру</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+46"/>
         <source>Region</source>
-        <translation>Регион</translation>
+        <translation>Аймақ</translation>
     </message>
     <message>
         <location line="-45"/>
         <location line="+46"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation>Қате</translation>
     </message>
     <message>
         <location line="-45"/>
         <location line="+46"/>
         <source>Length</source>
-        <translation>Длина</translation>
+        <translation>Ұзындық</translation>
     </message>
     <message>
         <location line="-45"/>
         <location line="+46"/>
         <source>Value mm</source>
-        <translation>Значение мм</translation>
+        <translation>Мәні мм</translation>
     </message>
     <message>
         <location line="-45"/>
         <location line="+46"/>
         <source>Tolerance mm</source>
-        <translation>Допуск мм</translation>
+        <translation>Рұқсат мм</translation>
     </message>
     <message>
         <location line="-45"/>
         <location line="+46"/>
         <source>Diff</source>
-        <translation>Разница</translation>
+        <translation>Айырмашылық</translation>
     </message>
     <message>
         <location filename="../../../Include/imtrest/CHttpHtmlFolderBasedServletComp.cpp" line="+92"/>
         <source>Directory</source>
-        <translation>Директория</translation>
+        <translation>Каталог</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>GB</source>
-        <translation type="unfinished"></translation>
+        <translation>ГБ</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>MB</source>
-        <translation type="unfinished"></translation>
+        <translation>МБ</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>KB</source>
-        <translation type="unfinished"></translation>
+        <translation>КБ</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>B</source>
-        <translation type="unfinished"></translation>
+        <translation>Б</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -8400,22 +8367,22 @@ Errors: 0</source>
     <message>
         <location line="+13"/>
         <source>Parent direcotry</source>
-        <translation>Родительская директория</translation>
+        <translation>Ата-аналық каталог</translation>
     </message>
     <message>
         <location filename="../../../Include/imttest/CTestMetaInfo.cpp" line="+19"/>
         <source>Test Id</source>
-        <translation>ID теста</translation>
+        <translation>Тексеру ID</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Test Name</source>
-        <translation>Название теста</translation>
+        <translation>Тексеру атауы</translation>
     </message>
     <message>
         <location filename="../../../Include/imtbase/CSystemStatusComp.cpp" line="+185"/>
         <source>The %1 server cannot be connected at %2.</source>
-        <translation>Не удалось подключиться к серверу %1 по адресу %2.</translation>
+        <translation>%1 серверіне %2 мекенжайында қосылу мүмкін емес.</translation>
     </message>
     <message>
         <location filename="../../../Include/imtauth/CSessionMetaInfoCreatorComp.cpp" line="+54"/>
@@ -8425,114 +8392,114 @@ Errors: 0</source>
     <message>
         <location line="+2"/>
         <source>User-ID</source>
-        <translation>ID пользователя</translation>
+        <translation>Пайдаланушы ID</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Tenant-ID</source>
-        <translation>ID тенанта</translation>
+        <translation>Тенант ID</translation>
     </message>
     <message>
         <location filename="../../../Include/imtdb/CSqlDatabaseDocumentDelegateLegacyComp.cpp" line="+156"/>
         <source>Initial revision</source>
-        <translation>Начальная ревизия</translation>
+        <translation>Бастапқы нұсқа</translation>
     </message>
     <message>
         <location filename="../../../Include/imthypegui/CTaskItemDelegate.cpp" line="+228"/>
         <source>Not active</source>
-        <translation>Неактивный</translation>
+        <translation>Белсенді емес</translation>
     </message>
     <message>
         <location filename="../../../Include/imtlic/CFeatureMetaInfoCreatorComp.cpp" line="+56"/>
         <source>Feature-ID</source>
-        <translation>Идентификатор</translation>
+        <translation>Мүмкіндік ID</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Feature Name</source>
-        <translation>Название</translation>
+        <translation>Мүмкіндік атауы</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Feature Description</source>
-        <translation>Описание</translation>
+        <translation>Мүмкіндік сипаттамасы</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Is Optional</source>
-        <translation>Необязательный</translation>
+        <translation>Міндетті емес</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Is Permission</source>
-        <translation>Право</translation>
+        <translation>Рұқсат</translation>
     </message>
     <message>
         <location filename="../../../Include/imtlic/CLicenseMetaInfoCreatorComp.cpp" line="+55"/>
         <source>License-ID</source>
-        <translation>Идентификатор лицензии</translation>
+        <translation>Лицензия ID</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>License Name</source>
-        <translation>Название лицензии</translation>
+        <translation>Лицензия атауы</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>License Description</source>
-        <translation>Описание лицензии</translation>
+        <translation>Лицензия сипаттамасы</translation>
     </message>
     <message>
         <location line="+2"/>
         <location filename="../../../Include/imtlic/CProductMetaInfoCreatorComp.cpp" line="-4"/>
         <source>Product-ID</source>
-        <translation>ID продукта</translation>
+        <translation>Өнім ID</translation>
     </message>
     <message>
         <location filename="../../../Include/imtlic/CProductMetaInfoCreatorComp.cpp" line="-2"/>
         <source>Product Name</source>
-        <translation>Название продукта</translation>
+        <translation>Өнім атауы</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Category</source>
-        <translation>Категория</translation>
+        <translation>Санат</translation>
     </message>
     <message>
         <location filename="../../../Include/imtcol/imtcol.h" line="+190"/>
         <source>Invalid document</source>
-        <translation>Недействительный документ</translation>
+        <translation>Жарамсыз құжат</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Version 1.0 of the GQL request arguments is missing</source>
-        <translation>Отсутствует версия 1.0 аргументов запроса GQL</translation>
+        <translation>GQL сұрау аргументтерінің 1.0 нұсқасы жоқ</translation>
     </message>
     <message>
         <location filename="../../../Include/imtdb/CDatabaseEngineComp.cpp" line="+276"/>
         <location line="+254"/>
         <source>Maintenance database name was not set</source>
-        <translation>Название служебной базы данных не задано</translation>
+        <translation>Қызмет көрсету деректер қоры атауы орнатылмаған</translation>
     </message>
     <message>
         <location line="+110"/>
         <source>Database settings were not set. Use default database configuration</source>
-        <translation>Настройки базы данных не заданы. Используется конфигурация по умолчанию</translation>
+        <translation>Деректер қоры параметрлері орнатылмаған. Әдепкі конфигурация пайдаланылады</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Database file path incorrect</source>
-        <translation>Неверный путь к файлу базы данных</translation>
+        <translation>Деректер қоры файлының жолы дұрыс емес</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Use database file: %1</source>
-        <translation>Использовать файл базы данных: %1</translation>
+        <translation>Деректер қоры файлын пайдалану: %1</translation>
     </message>
     <message>
         <location filename="../../../Include/imtdb/CObjectCollectionMigrationControllerComp.cpp" line="+57"/>
         <source>Collection table creation script &apos;%1&apos;could not be loaded</source>
-        <translation>Не удалось загрузить скрипт создания таблицы коллекции &apos;%1&apos;</translation>
+        <translation>Жинақ кестесін жасау скрипті &apos;%1&apos; жүктелмеді</translation>
     </message>
     <message>
         <location line="+35"/>
@@ -8545,22 +8512,22 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imthypegui/CTaskSettingsGuiComp.cpp" line="+264"/>
         <source>Reset...</source>
-        <translation>Сброс...</translation>
+        <translation>Қалпына келтіру...</translation>
     </message>
     <message>
         <location filename="../../../Include/imtrest/CSdlJsonServletBaseComp.h" line="+63"/>
         <source>The request is not a valid json object</source>
-        <translation>Запрос не является корректным объектом JSON</translation>
+        <translation>Сұрау жарамды JSON нысаны емес</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>The request does not match the scheme</source>
-        <translation>Запрос не соответствует схеме</translation>
+        <translation>Сұрау схемаға сәйкес келмейді</translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Unable to convert reply to json</source>
-        <translation>Не удалось преобразовать ответ в JSON</translation>
+        <translation>Жауапты JSON-ға түрлендіру мүмкін болмады</translation>
     </message>
     <message>
         <location filename="../../../Include/imtstyle/CDesignTokenBasedResourceProviderComp.cpp" line="-145"/>
@@ -8573,7 +8540,7 @@ Errors: 0</source>
         <location line="+9"/>
         <location line="+8"/>
         <source>Palette file parsing error</source>
-        <translation>Ошибка разбора файла палитры</translation>
+        <translation>Палитра файлын талдау қатесі</translation>
     </message>
 </context>
 <context>
@@ -8581,12 +8548,12 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtguigql/RemoteCollectionView.qml" line="+161"/>
         <source>This table has been modified from another computer</source>
-        <translation>Эта таблица была изменена на другом компьютере</translation>
+        <translation>Бұл кесте басқа компьютерден өзгертілді</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Update</source>
-        <translation>Обновить</translation>
+        <translation>Жаңарту</translation>
     </message>
 </context>
 <context>
@@ -8594,12 +8561,12 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtauthgui/RoleCollectionViewCommandsDelegate.qml" line="+12"/>
         <source>Deleting a role</source>
-        <translation>Удаление роли</translation>
+        <translation>Рөлді жою</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Delete the selected role ?</source>
-        <translation>Удалить выбранную роль ?</translation>
+        <translation>Таңдалған рөлді жоясыз ба?</translation>
     </message>
 </context>
 <context>
@@ -8607,47 +8574,47 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtauthgui/RoleView.qml" line="+101"/>
         <source>General</source>
-        <translation>Общее</translation>
+        <translation>Жалпы</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Role Name</source>
-        <translation>Название роли</translation>
+        <translation>Рөл атауы</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the role name</source>
-        <translation>Введите название</translation>
+        <translation>Рөл атауын енгізіңіз</translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Role-ID</source>
-        <translation>Идентификатор роли</translation>
+        <translation>Рөл идентификаторы</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation>Сипаттама</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the description</source>
-        <translation>Введите описание</translation>
+        <translation>Сипаттаманы енгізіңіз</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Parent Roles</source>
-        <translation>Родительские роли</translation>
+        <translation>Ата-аналық рөлдер</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Adding Parent Role</source>
-        <translation>Добавить родительскую роль</translation>
+        <translation>Ата-аналық рөлді қосу</translation>
     </message>
     <message>
         <location line="+47"/>
         <source>Permissions</source>
-        <translation>Права</translation>
+        <translation>Рұқсаттар</translation>
     </message>
 </context>
 <context>
@@ -8655,27 +8622,27 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtgui/Params/SchedulerParamEditor.qml" line="+34"/>
         <source>Start Time</source>
-        <translation>Время старта</translation>
+        <translation>Басталу уақыты</translation>
     </message>
     <message>
         <location line="+37"/>
         <source>Backup Interval</source>
-        <translation>Интервал резервного копирования</translation>
+        <translation>Сақтық көшірме аралығы</translation>
     </message>
     <message>
         <location line="+54"/>
         <source>Day</source>
-        <translation>День</translation>
+        <translation>Күн</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Week</source>
-        <translation>Неделя</translation>
+        <translation>Апта</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Month</source>
-        <translation>Месяц</translation>
+        <translation>Ай</translation>
     </message>
 </context>
 <context>
@@ -8683,7 +8650,7 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtgui/View/SearchAddressComp.qml" line="+21"/>
         <source>Address</source>
-        <translation>Адрес</translation>
+        <translation>Мекенжай</translation>
     </message>
 </context>
 <context>
@@ -8691,7 +8658,7 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtgui/View/SearchCompLegacy.qml" line="+731"/>
         <source>Search</source>
-        <translation>Поиск</translation>
+        <translation>Іздеу</translation>
     </message>
 </context>
 <context>
@@ -8699,12 +8666,12 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtgui/View/SearchResultsView.qml" line="+67"/>
         <source>No results</source>
-        <translation>Нет результатов</translation>
+        <translation>Нәтижелер жоқ</translation>
     </message>
     <message>
         <location line="+122"/>
         <source>Go to the content</source>
-        <translation>Перейти к содержимому</translation>
+        <translation>Мазмұнға өту</translation>
     </message>
 </context>
 <context>
@@ -8712,7 +8679,7 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/SearchTextInput.qml" line="+12"/>
         <source>Enter text for search</source>
-        <translation>Введите текст для поиска</translation>
+        <translation>Іздеу үшін мәтін енгізіңіз</translation>
     </message>
 </context>
 <context>
@@ -8720,34 +8687,34 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtguigql/SelectableCollectionEditor.qml" line="+71"/>
         <source>New</source>
-        <translation>Новый</translation>
+        <translation>Жаңа</translation>
     </message>
     <message>
         <location line="+15"/>
         <location line="+151"/>
         <location line="+0"/>
         <source>Add</source>
-        <translation>Добавить</translation>
+        <translation>Қосу</translation>
     </message>
     <message>
         <location line="-132"/>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation>Жою</translation>
     </message>
     <message>
         <location line="+39"/>
         <source>Selected Elements</source>
-        <translation>Выбранные элементы</translation>
+        <translation>Таңдалған элементтер</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>New Elements</source>
-        <translation>Новые элементы</translation>
+        <translation>Жаңа элементтер</translation>
     </message>
     <message>
         <location line="+93"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation>Болдырмау</translation>
     </message>
 </context>
 <context>
@@ -8755,22 +8722,22 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtgui/View/ServerConnectionParamElementView.qml" line="+45"/>
         <source>Server Host</source>
-        <translation>Хост сервера</translation>
+        <translation>Сервер хосты</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Http Port</source>
-        <translation>Порт HTTP</translation>
+        <translation>HTTP порты</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Web Socket Port</source>
-        <translation>Порт WebSocket</translation>
+        <translation>WebSocket порты</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Secure Connection</source>
-        <translation>Защищённое соединение</translation>
+        <translation>Қауіпсіз қосылыс</translation>
     </message>
 </context>
 <context>
@@ -8778,17 +8745,17 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtgui/Settings/ServerLogProvider.qml" line="+18"/>
         <source>Server Log</source>
-        <translation>Серверный лог</translation>
+        <translation>Сервер журналы</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Download</source>
-        <translation>Скачать</translation>
+        <translation>Жүктеп алу</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Save file</source>
-        <translation>Сохранение файла</translation>
+        <translation>Файлды сақтау</translation>
     </message>
 </context>
 <context>
@@ -8796,22 +8763,22 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtdocgui/SingleDocumentCollectionView.qml" line="+290"/>
         <source>Save document</source>
-        <translation>Сохранение документа</translation>
+        <translation>Құжатты сақтау</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Save all changes ?</source>
-        <translation>Сохранить все изменения ?</translation>
+        <translation>Барлық өзгерістерді сақтайсыз ба?</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Document Name</source>
-        <translation>Название документа</translation>
+        <translation>Құжат атауы</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the document name</source>
-        <translation>Введите название документа</translation>
+        <translation>Құжат атауын енгізіңіз</translation>
     </message>
 </context>
 <context>
@@ -8819,12 +8786,12 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtdocgui/SingleDocumentWorkspaceView.qml" line="+134"/>
         <source>Save document</source>
-        <translation>Сохранение документа</translation>
+        <translation>Құжатты сақтау</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Save all changes ?</source>
-        <translation>Сохранить все изменения ?</translation>
+        <translation>Барлық өзгерістерді сақтайсыз ба?</translation>
     </message>
 </context>
 <context>
@@ -8841,52 +8808,52 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtgeogui/StructureAddressView.qml" line="+23"/>
         <source>Country</source>
-        <translation>Страна</translation>
+        <translation>Ел</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Region</source>
-        <translation>Регион</translation>
+        <translation>Аймақ</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Area</source>
-        <translation>Район</translation>
+        <translation>Облыс</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>City</source>
-        <translation>Город</translation>
+        <translation>Қала</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Settlement</source>
-        <translation>Населённый пункт</translation>
+        <translation>Елді мекен</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>District</source>
-        <translation>Район</translation>
+        <translation>Аудан</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Street</source>
-        <translation>Улица</translation>
+        <translation>Көше</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Building</source>
-        <translation>Здание</translation>
+        <translation>Ғимарат</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Apartment</source>
-        <translation>Квартира</translation>
+        <translation>Пәтер</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Section</source>
-        <translation>Участок</translation>
+        <translation>Бөлім</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -8896,69 +8863,69 @@ Errors: 0</source>
     <message>
         <location line="+0"/>
         <source>Alley</source>
-        <translation>Переулок</translation>
+        <translation>Аллея</translation>
     </message>
     <message>
         <location line="+0"/>
         <location line="+92"/>
         <location line="+0"/>
         <source>Other</source>
-        <translation>Другое</translation>
+        <translation>Басқа</translation>
     </message>
     <message>
         <location line="+34"/>
         <source>Save</source>
-        <translation>Сохранить</translation>
+        <translation>Сақтау</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Close</source>
-        <translation>Закрыть</translation>
+        <translation>Жабу</translation>
     </message>
     <message>
         <location line="+356"/>
         <source>Add</source>
-        <translation>Добавить</translation>
+        <translation>Қосу</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation>Өңдеу</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Delete</source>
-        <translation>Удалить</translation>
+        <translation>Жою</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Clear</source>
-        <translation>Очистить</translation>
+        <translation>Тазалау</translation>
     </message>
     <message>
         <location line="+62"/>
         <source>Remove address</source>
-        <translation>Удалить адрес</translation>
+        <translation>Мекенжайды жою</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Do you want remove the address?</source>
-        <translation>Вы хотите удалить адрес?</translation>
+        <translation>Мекенжайды жойғыңыз келе ме?</translation>
     </message>
     <message>
         <location line="+61"/>
         <source>Coordinates:</source>
-        <translation>Координаты:</translation>
+        <translation>Координаталар:</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Latitude: </source>
-        <translation>Широта: </translation>
+        <translation>Ендік: </translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Longitude: </source>
-        <translation>Долгота: </translation>
+        <translation>Бойлық: </translation>
     </message>
 </context>
 <context>
@@ -8966,12 +8933,12 @@ Errors: 0</source>
     <message>
         <location filename="../../../Qml/imtauthgui/SuperuserPasswordPage.qml" line="+67"/>
         <source>Please fill in the information for the system administrator</source>
-        <translation>Пожалуйста, заполните информацию для системного администратора</translation>
+        <translation>Жүйе әкімшісі ақпаратын толтырыңыз</translation>
     </message>
     <message>
         <location line="+30"/>
         <source>OK</source>
-        <translation>ОК</translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -8979,19 +8946,18 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtgui/TDocumentWorkspaceGuiCompBase.h" line="+318"/>
         <source>Close document</source>
-        <translation>Закрыть документ</translation>
+        <translation>Құжатты жабу</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Do you want to save your changes made in document
 %1</source>
-        <translation>Вы хотите сохранить изменения в документе
-%1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+125"/>
         <source>Document could not be opened</source>
-        <translation>Не удалось открыть документ</translation>
+        <translation>Құжатты ашу мүмкін болмады</translation>
     </message>
 </context>
 <context>
@@ -8999,31 +8965,29 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imthypegui/TTaskCollectionEditorCompBase.h" line="-33"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation>Қате</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>The task name contains some not allowed characters</source>
-        <translation>Название задачи содержит недопустимые символы</translation>
+        <translation>Тапсырма атауында рұқсат етілмеген таңбалар бар</translation>
     </message>
     <message>
         <location line="+346"/>
         <source>Task name: </source>
-        <translation>Название задачи: </translation>
+        <translation>Тапсырма атауы: </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>
 User-ID: </source>
-        <translation>
-ID пользователя: </translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>
 Input-ID: </source>
-        <translation>
-ID входных данных: </translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -9031,37 +8995,37 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtcontrols/Views/TableHeaderParamComp.qml" line="+12"/>
         <source>Table configuration</source>
-        <translation>Конфигурация таблицы</translation>
+        <translation>Кесте конфигурациясы</translation>
     </message>
     <message>
         <location line="+96"/>
         <source>Select at least one column</source>
-        <translation>Выберите хотя бы одну колонку</translation>
+        <translation>Кем дегенде бір бағанды таңдаңыз</translation>
     </message>
     <message>
         <location line="+120"/>
         <source>Available Columns</source>
-        <translation>Доступные колонки</translation>
+        <translation>Қолжетімді бағандар</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Apply</source>
-        <translation>Применить</translation>
+        <translation>Қолдану</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation>Болдырмау</translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Confirm reset headers</source>
-        <translation>Подтверждение сброса</translation>
+        <translation>Тақырыптарды қалпына келтіруді растаңыз</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Reset header settings to default ?</source>
-        <translation>Сбросить настройки заголовков на стандартные ?</translation>
+        <translation>Тақырып параметрлерін әдепкіге қалпына келтіресіз бе?</translation>
     </message>
 </context>
 <context>
@@ -9069,27 +9033,27 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/TenantCollectionListView.qml" line="+13"/>
         <source>Filter...</source>
-        <translation>Фильтр...</translation>
+        <translation>Сүзгі...</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>No items found.</source>
-        <translation>Ничего не найдено.</translation>
+        <translation>Ештеңе табылмады.</translation>
     </message>
     <message>
         <location line="+145"/>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation>Өңдеу</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Delete</source>
-        <translation>Удалить</translation>
+        <translation>Жою</translation>
     </message>
     <message>
         <location line="+89"/>
         <source>Loading...</source>
-        <translation>Загрузка...</translation>
+        <translation>Жүктелуде...</translation>
     </message>
 </context>
 <context>
@@ -9097,61 +9061,61 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/TenantCollectionView.qml" line="+180"/>
         <source>Invited by: %1</source>
-        <translation>Приглашён: %1</translation>
+        <translation>Шақырған: %1</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Unknown</source>
-        <translation>Неизвестный</translation>
+        <translation>Белгісіз</translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Accept</source>
-        <translation>Принять</translation>
+        <translation>Қабылдау</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Reject</source>
-        <translation>Отклонить</translation>
+        <translation>Қабылдамау</translation>
     </message>
     <message>
         <location line="+82"/>
         <location line="+37"/>
         <location line="+0"/>
         <source>Active</source>
-        <translation>Активный</translation>
+        <translation>Белсенді</translation>
     </message>
     <message>
         <location line="-37"/>
         <location line="+38"/>
         <location line="+0"/>
         <source>Inactive</source>
-        <translation>Неактивный</translation>
+        <translation>Белсенді емес</translation>
     </message>
     <message>
         <location line="-6"/>
         <source>Status</source>
-        <translation>Статус</translation>
+        <translation>Күйі</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>My tenants</source>
-        <translation>Мои тенанты</translation>
+        <translation>Менің тенанттарым</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>I am owner</source>
-        <translation>Я владелец</translation>
+        <translation>Мен иесімін</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>I am member</source>
-        <translation>Я участник</translation>
+        <translation>Мен мүшемін</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>I am invited</source>
-        <translation>Я приглашён</translation>
+        <translation>Мен шақырылдым</translation>
     </message>
     <message>
         <location line="+43"/>
@@ -9164,27 +9128,27 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/TenantEditor.qml" line="+104"/>
         <source>General</source>
-        <translation>Общее</translation>
+        <translation>Жалпы</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Members</source>
-        <translation>Участники</translation>
+        <translation>Мүшелер</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Roles</source>
-        <translation>Роли</translation>
+        <translation>Рөлдер</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Groups</source>
-        <translation>Группы</translation>
+        <translation>Топтар</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Permissions</source>
-        <translation>Права</translation>
+        <translation>Рұқсаттар</translation>
     </message>
 </context>
 <context>
@@ -9192,12 +9156,12 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/TenantEditorStateManager.qml" line="+87"/>
         <source>by %1</source>
-        <translation>от %1</translation>
+        <translation>%1 тарапынан</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>expires %1</source>
-        <translation>истекает %1</translation>
+        <translation>мерзімі %1</translation>
     </message>
 </context>
 <context>
@@ -9205,37 +9169,37 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/TenantGeneralPage.qml" line="+80"/>
         <source>General</source>
-        <translation>Общее</translation>
+        <translation>Жалпы</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Basic workspace settings and configuration.</source>
-        <translation>Основные настройки и конфигурация рабочего пространства.</translation>
+        <translation>Жұмыс кеңістігінің негізгі параметрлері мен конфигурациясы.</translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Tenant Name</source>
-        <translation>Название тенанта</translation>
+        <translation>Тенант атауы</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the tenant name</source>
-        <translation>Введите название тенанта</translation>
+        <translation>Тенант атауын енгізіңіз</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation>Сипаттама</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the description</source>
-        <translation>Введите описание</translation>
+        <translation>Сипаттаманы енгізіңіз</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Active</source>
-        <translation>Активный</translation>
+        <translation>Белсенді</translation>
     </message>
 </context>
 <context>
@@ -9243,64 +9207,64 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/TenantGroupsPage.qml" line="+65"/>
         <source>Groups</source>
-        <translation>Группы</translation>
+        <translation>Топтар</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Create Group</source>
-        <translation>Создать группу</translation>
+        <translation>Топ жасау</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Create New Group</source>
-        <translation>Создать новую группу</translation>
+        <translation>Жаңа топ жасау</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Organize members into groups for easier permission management.</source>
-        <translation>Объединяйте участников в группы для удобного управления правами.</translation>
+        <translation>Рұқсаттарды оңай басқару үшін мүшелерді топтарға біріктіріңіз.</translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Filter groups...</source>
-        <translation>Фильтр групп...</translation>
+        <translation>Топтарды сүзу...</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>No groups created yet.</source>
-        <translation>Группы ещё не созданы.</translation>
+        <translation>Топтар әлі жасалмаған.</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Edit Group</source>
-        <translation>Редактировать группу</translation>
+        <translation>Топты өңдеу</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Delete Group</source>
-        <translation>Удалить группу</translation>
+        <translation>Топты жою</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Are you sure you want to delete the group &quot;%1&quot;? This action cannot be undone.</source>
-        <translation>Вы уверены, что хотите удалить группу &quot;%1&quot;? Это действие нельзя отменить.</translation>
+        <translation>Сіз &quot;%1&quot; тобын жойғыңыз келетініне сенімдісіз бе? Бұл әрекетті қайтару мүмкін емес.</translation>
     </message>
     <message>
         <location line="+34"/>
         <source>Create</source>
-        <translation>Создать</translation>
+        <translation>Жасау</translation>
     </message>
     <message>
         <location line="+14"/>
         <location line="+72"/>
         <location line="+0"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation>Болдырмау</translation>
     </message>
     <message>
         <location line="-15"/>
         <source>Save</source>
-        <translation>Сохранить</translation>
+        <translation>Сақтау</translation>
     </message>
 </context>
 <context>
@@ -9308,62 +9272,62 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/TenantMemberDelegate.qml" line="+159"/>
         <source>You</source>
-        <translation>Вы</translation>
+        <translation>Сіз</translation>
     </message>
     <message>
         <location line="+42"/>
         <source>Active</source>
-        <translation>Активный</translation>
+        <translation>Белсенді</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Expired</source>
-        <translation>Истёк</translation>
+        <translation>Мерзімі өткен</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Revoked</source>
-        <translation>Отозван</translation>
+        <translation>Қайтарып алынған</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Pending</source>
-        <translation>Ожидание</translation>
+        <translation>Күтілуде</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Actions</source>
-        <translation>Действия</translation>
+        <translation>Әрекеттер</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Change Environment Role</source>
-        <translation>Изменить роль в окружении</translation>
+        <translation>Орта рөлін өзгерту</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Remove Member</source>
-        <translation>Удалить участника</translation>
+        <translation>Мүшені жою</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Transfer Ownership</source>
-        <translation>Передать владение</translation>
+        <translation>Иелікті беру</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Leave Workspace</source>
-        <translation>Покинуть рабочее пространство</translation>
+        <translation>Жұмыс кеңістігінен шығу</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Resend Invitation</source>
-        <translation>Повторно отправить приглашение</translation>
+        <translation>Шақыруды қайта жіберу</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Revoke Invitation</source>
-        <translation>Отозвать приглашение</translation>
+        <translation>Шақыруды қайтарып алу</translation>
     </message>
 </context>
 <context>
@@ -9371,74 +9335,74 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/TenantMembersPage.qml" line="+76"/>
         <source>Members</source>
-        <translation>Участники</translation>
+        <translation>Мүшелер</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Create User</source>
-        <translation>Создать пользователя</translation>
+        <translation>Пайдаланушы жасау</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Create New User</source>
-        <translation>Создать нового пользователя</translation>
+        <translation>Жаңа пайдаланушы жасау</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Create Invitation</source>
-        <translation>Создать приглашение</translation>
+        <translation>Шақыру жасау</translation>
     </message>
     <message>
         <location line="+34"/>
         <source>Manage tenant members. Users created here automatically become members.</source>
-        <translation>Управление участниками тенанта. Созданные здесь пользователи автоматически становятся участниками.</translation>
+        <translation>Тенант мүшелерін басқару. Мұнда жасалған пайдаланушылар автоматты түрде мүше болады.</translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Filter members...</source>
-        <translation>Фильтр участников...</translation>
+        <translation>Мүшелерді сүзу...</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>No members found.</source>
-        <translation>Участники не найдены.</translation>
+        <translation>Мүшелер табылмады.</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Edit User</source>
-        <translation>Редактировать пользователя</translation>
+        <translation>Пайдаланушыны өңдеу</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Remove Member</source>
-        <translation>Удалить участника</translation>
+        <translation>Мүшені жою</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Are you sure you want to remove &quot;%1&quot;? They will lose access to this workspace.</source>
-        <translation>Вы уверены, что хотите удалить &quot;%1&quot;? Пользователь потеряет доступ к этому рабочему пространству.</translation>
+        <translation>Сіз &quot;%1&quot; жойғыңыз келетініне сенімдісіз бе? Пайдаланушы осы жұмыс кеңістігіне қатынауын жоғалтады.</translation>
     </message>
     <message>
         <location line="+34"/>
         <source>Create</source>
-        <translation>Создать</translation>
+        <translation>Жасау</translation>
     </message>
     <message>
         <location line="+14"/>
         <location line="+72"/>
         <location line="+0"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation>Болдырмау</translation>
     </message>
     <message>
         <location line="-15"/>
         <source>Save</source>
-        <translation>Сохранить</translation>
+        <translation>Сақтау</translation>
     </message>
     <message>
         <location line="+38"/>
         <source>Type or choose a user to invite</source>
-        <translation>Введите или выберите пользователя для приглашения</translation>
+        <translation>Шақыру үшін пайдаланушыны теріңіз немесе таңдаңыз</translation>
     </message>
 </context>
 <context>
@@ -9446,47 +9410,47 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/TenantPermissionsPage.qml" line="+117"/>
         <source>Permissions</source>
-        <translation>Права</translation>
+        <translation>Рұқсаттар</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Select which product features are available for this tenant.</source>
-        <translation>Выберите, какие возможности продукта доступны для этого тенанта.</translation>
+        <translation>Осы тенант үшін қандай өнім мүмкіндіктері қолжетімді екенін таңдаңыз.</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Check All</source>
-        <translation>Выбрать все</translation>
+        <translation>Барлығын белгілеу</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Uncheck All</source>
-        <translation>Снять все</translation>
+        <translation>Барлығын алу</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Expand All</source>
-        <translation>Развернуть все</translation>
+        <translation>Барлығын жаю</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Collapse All</source>
-        <translation>Свернуть все</translation>
+        <translation>Барлығын жию</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Filter permissions...</source>
-        <translation>Фильтр прав...</translation>
+        <translation>Рұқсаттарды сүзу...</translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Permission</source>
-        <translation>Разрешение</translation>
+        <translation>Рұқсат</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation>Сипаттама</translation>
     </message>
 </context>
 <context>
@@ -9494,64 +9458,64 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/TenantRolesPage.qml" line="+68"/>
         <source>Roles</source>
-        <translation>Роли</translation>
+        <translation>Рөлдер</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Create Role</source>
-        <translation>Создать роль</translation>
+        <translation>Рөл жасау</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Create New Role</source>
-        <translation>Создать новую роль</translation>
+        <translation>Жаңа рөл жасау</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Manage tenant roles and assign permissions to team members.</source>
-        <translation>Управление ролями тенанта и назначение прав участникам.</translation>
+        <translation>Тенант рөлдерін басқару және мүшелерге рұқсаттар тағайындау.</translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Filter roles...</source>
-        <translation>Фильтр ролей...</translation>
+        <translation>Рөлдерді сүзу...</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>No roles created yet.</source>
-        <translation>Роли ещё не созданы.</translation>
+        <translation>Рөлдер әлі жасалмаған.</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Edit Role</source>
-        <translation>Редактировать роль</translation>
+        <translation>Рөлді өңдеу</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Delete Role</source>
-        <translation>Удалить роль</translation>
+        <translation>Рөлді жою</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Are you sure you want to delete the role &quot;%1&quot;? This action cannot be undone.</source>
-        <translation>Вы уверены, что хотите удалить роль &quot;%1&quot;? Это действие нельзя отменить.</translation>
+        <translation>Сіз &quot;%1&quot; рөлін жойғыңыз келетініне сенімдісіз бе? Бұл әрекетті қайтару мүмкін емес.</translation>
     </message>
     <message>
         <location line="+34"/>
         <source>Create</source>
-        <translation>Создать</translation>
+        <translation>Жасау</translation>
     </message>
     <message>
         <location line="+14"/>
         <location line="+72"/>
         <location line="+0"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation>Болдырмау</translation>
     </message>
     <message>
         <location line="-15"/>
         <source>Save</source>
-        <translation>Сохранить</translation>
+        <translation>Сақтау</translation>
     </message>
 </context>
 <context>
@@ -9559,7 +9523,7 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtgui/View/TextInputElementView.qml" line="+22"/>
         <source>Enter the correct value</source>
-        <translation>Введите корректное значение</translation>
+        <translation>Дұрыс мәнді енгізіңіз</translation>
     </message>
 </context>
 <context>
@@ -9567,47 +9531,47 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtdeskgui/TicketBadge.qml" line="+28"/>
         <source>Open</source>
-        <translation>Открыть</translation>
+        <translation>Ашу</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Closed</source>
-        <translation>Закрыто</translation>
+        <translation>Жабық</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Low</source>
-        <translation>Низкий</translation>
+        <translation>Төмен</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Medium</source>
-        <translation>Средний</translation>
+        <translation>Орташа</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>High</source>
-        <translation>Высокий</translation>
+        <translation>Жоғары</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Critical</source>
-        <translation>Критический</translation>
+        <translation>Сыни</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Completed</source>
-        <translation>Завершено</translation>
+        <translation>Аяқталды</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Not planned</source>
-        <translation>Не запланировано</translation>
+        <translation>Жоспарланбаған</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Reopened</source>
-        <translation>Переоткрыто</translation>
+        <translation>Қайта ашылған</translation>
     </message>
 </context>
 <context>
@@ -9615,62 +9579,62 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtdeskgui/TicketCollectionView.qml" line="+117"/>
         <source>Status</source>
-        <translation>Статус</translation>
+        <translation>Күйі</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Open</source>
-        <translation>Открыть</translation>
+        <translation>Ашу</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Closed</source>
-        <translation>Закрыто</translation>
+        <translation>Жабық</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Priority</source>
-        <translation>Приоритет</translation>
+        <translation>Басымдық</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Low</source>
-        <translation>Низкий</translation>
+        <translation>Төмен</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Medium</source>
-        <translation>Средний</translation>
+        <translation>Орташа</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>High</source>
-        <translation>Высокий</translation>
+        <translation>Жоғары</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Critical</source>
-        <translation>Критический</translation>
+        <translation>Сыни</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Assigned to me</source>
-        <translation>Назначено мне</translation>
+        <translation>Маған тағайындалған</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Without assignees</source>
-        <translation>Без исполнителей</translation>
+        <translation>Орындаушыларсыз</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Reported by me</source>
-        <translation>Создано мной</translation>
+        <translation>Мен жасаған</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Ticket</source>
-        <translation>Заявка</translation>
+        <translation>Өтінім</translation>
     </message>
 </context>
 <context>
@@ -9678,47 +9642,47 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtdeskgui/TicketCreateDialog.qml" line="+56"/>
         <source>New Issue</source>
-        <translation>Новая задача</translation>
+        <translation>Жаңа мәселе</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Title *</source>
-        <translation>Заголовок *</translation>
+        <translation>Тақырып *</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Brief summary of the issue</source>
-        <translation>Краткое описание проблемы</translation>
+        <translation>Мәселенің қысқаша сипаттамасы</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation>Сипаттама</translation>
     </message>
     <message>
         <location line="+45"/>
         <source>Add a description...</source>
-        <translation>Добавить описание...</translation>
+        <translation>Сипаттама қосу...</translation>
     </message>
     <message>
         <location line="+33"/>
         <source>Type</source>
-        <translation>Тип</translation>
+        <translation>Түрі</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Priority</source>
-        <translation>Приоритет</translation>
+        <translation>Басымдық</translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation>Болдырмау</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Submit new issue</source>
-        <translation>Отправить новую задачу</translation>
+        <translation>Жаңа мәселені жіберу</translation>
     </message>
 </context>
 <context>
@@ -9726,22 +9690,22 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtdeskgui/TicketEditor.qml" line="+154"/>
         <source>Copied to clipboard</source>
-        <translation>Скопировано в буфер обмена</translation>
+        <translation>Буферге көшірілді</translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Ticket Comments Export</source>
-        <translation>Экспорт комментариев заявки</translation>
+        <translation>Өтінім пікірлерін экспорттау</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Ticket #</source>
-        <translation>Заявка #</translation>
+        <translation>Өтінім #</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>No comments</source>
-        <translation>Нет комментариев</translation>
+        <translation>Пікірлер жоқ</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -9752,19 +9716,19 @@ ID входных данных: </translation>
         <location line="+1926"/>
         <location line="+250"/>
         <source>Unknown</source>
-        <translation>Неизвестный</translation>
+        <translation>Белгісіз</translation>
     </message>
     <message>
         <location line="-2185"/>
         <location line="+2"/>
         <location line="+0"/>
         <source>Message</source>
-        <translation>Сообщение</translation>
+        <translation>Хабарлама</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Attachment</source>
-        <translation>Вложение</translation>
+        <translation>Тіркеме</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -9776,72 +9740,72 @@ ID входных данных: </translation>
     <message>
         <location line="-1825"/>
         <source>You have been removed from the assignees of this ticket. The view is now read-only.</source>
-        <translation>Вы были удалены из исполнителей этой заявки. Просмотр теперь только для чтения.</translation>
+        <translation>Сіз осы өтінімнің орындаушылары тізімінен жойылдыңыз. Көрініс тек оқу үшін.</translation>
     </message>
     <message>
         <location line="+306"/>
         <source>New Ticket</source>
-        <translation>Новая заявка</translation>
+        <translation>Жаңа өтінім</translation>
     </message>
     <message>
         <location line="+83"/>
         <source>Title</source>
-        <translation>Заголовок</translation>
+        <translation>Тақырып</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Enter ticket title...</source>
-        <translation>Введите заголовок заявки...</translation>
+        <translation>Өтінім тақырыбын енгізіңіз...</translation>
     </message>
     <message>
         <location line="+93"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation>Сипаттама</translation>
     </message>
     <message>
         <location line="+78"/>
         <source>Describe the issue...</source>
-        <translation>Опишите проблему...</translation>
+        <translation>Мәселені сипаттаңыз...</translation>
     </message>
     <message>
         <location line="+58"/>
         <source>Properties</source>
-        <translation>Свойства</translation>
+        <translation>Сипаттар</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Type</source>
-        <translation>Тип</translation>
+        <translation>Түрі</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Priority</source>
-        <translation>Приоритет</translation>
+        <translation>Басымдық</translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Status</source>
-        <translation>Статус</translation>
+        <translation>Күйі</translation>
     </message>
     <message>
         <location line="+36"/>
         <source>Assignees</source>
-        <translation>Исполнители</translation>
+        <translation>Орындаушылар</translation>
     </message>
     <message>
         <location line="+31"/>
         <source>Add assignee</source>
-        <translation>Добавить исполнителя</translation>
+        <translation>Орындаушы қосу</translation>
     </message>
     <message>
         <location line="+87"/>
         <source>No assignees</source>
-        <translation>Нет исполнителей</translation>
+        <translation>Орындаушылар жоқ</translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Type or choose a user</source>
-        <translation>Введите или выберите пользователя</translation>
+        <translation>Пайдаланушыны теріңіз немесе таңдаңыз</translation>
     </message>
     <message>
         <location line="+56"/>
@@ -9851,139 +9815,139 @@ ID входных данных: </translation>
     <message>
         <location line="+31"/>
         <source>Add context</source>
-        <translation>Добавить контекст</translation>
+        <translation>Контекст қосу</translation>
     </message>
     <message>
         <location line="+92"/>
         <source>No linked entities</source>
-        <translation>Нет связанных сущностей</translation>
+        <translation>Байланыстырылған нысандар жоқ</translation>
     </message>
     <message>
         <location line="+115"/>
         <source>Search entities...</source>
-        <translation>Поиск сущностей...</translation>
+        <translation>Нысандарды іздеу...</translation>
     </message>
     <message>
         <location line="+92"/>
         <source>Lock issue</source>
-        <translation>Заблокировать задачу</translation>
+        <translation>Мәселені құлыптау</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Lock Reason</source>
-        <translation>Причина блокировки</translation>
+        <translation>Құлыптау себебі</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Reason for locking</source>
-        <translation>Причина блокировки</translation>
+        <translation>Құлыптау себебі</translation>
     </message>
     <message>
         <location line="+68"/>
         <source>Comments</source>
-        <translation>Комментарии</translation>
+        <translation>Пікірлер</translation>
     </message>
     <message>
         <location line="+72"/>
         <source>Chat export copied</source>
-        <translation>Экспорт чата скопирован</translation>
+        <translation>Чат экспорты көшірілді</translation>
     </message>
     <message>
         <location line="+207"/>
         <source>You</source>
-        <translation>Вы</translation>
+        <translation>Сіз</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>edited</source>
-        <translation>изменено</translation>
+        <translation>өңделген</translation>
     </message>
     <message>
         <location line="+139"/>
         <source>Save</source>
-        <translation>Сохранить</translation>
+        <translation>Сақтау</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Cancel</source>
-        <translation>Отмена</translation>
+        <translation>Болдырмау</translation>
     </message>
     <message>
         <location line="+67"/>
         <source>Reply</source>
-        <translation>Ответить</translation>
+        <translation>Жауап беру</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Copy</source>
-        <translation>Скопировать</translation>
+        <translation>Көшіру</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Message copied</source>
-        <translation>Сообщение скопировано</translation>
+        <translation>Хабарлама көшірілді</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation>Өңдеу</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Delete</source>
-        <translation>Удалить</translation>
+        <translation>Жою</translation>
     </message>
     <message>
         <location line="+30"/>
         <source>No comments yet</source>
-        <translation>Комментариев пока нет</translation>
+        <translation>Пікірлер әлі жоқ</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Be the first to leave a comment.</source>
-        <translation>Будьте первым, кто оставит комментарий.</translation>
+        <translation>Бірінші болып пікір қалдырыңыз.</translation>
     </message>
     <message>
         <location line="+142"/>
         <source>attachment</source>
-        <translation>вложение</translation>
+        <translation>тіркеме</translation>
     </message>
     <message>
         <location line="+56"/>
         <location line="+100"/>
         <location line="+0"/>
         <source>Uploading...</source>
-        <translation>Загрузка...</translation>
+        <translation>Жүктелуде...</translation>
     </message>
     <message>
         <location line="-38"/>
         <source>Write a comment...</source>
-        <translation>Написать комментарий...</translation>
+        <translation>Пікір жазу...</translation>
     </message>
     <message>
         <location line="+38"/>
         <source>Send</source>
-        <translation>Отправить</translation>
+        <translation>Жіберу</translation>
     </message>
     <message>
         <location line="+32"/>
         <source>Attach image</source>
-        <translation>Прикрепить изображение</translation>
+        <translation>Сурет тіркеу</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Image files</source>
-        <translation>Файлы изображений</translation>
+        <translation>Сурет файлдары</translation>
     </message>
     <message>
         <location line="+51"/>
         <source>This conversation has been locked. Only collaborators can comment.</source>
-        <translation>Эта беседа заблокирована. Только участники могут комментировать.</translation>
+        <translation>Бұл әңгіме құлыпталған. Тек қатысушылар пікір қалдыра алады.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>You have read-only access to this ticket. Only the reporter, assignees, and administrators can edit.</source>
-        <translation>У вас доступ только для чтения к этой заявке. Редактировать могут только автор, исполнители и администраторы.</translation>
+        <translation>Сіздің бұл өтінімге тек оқу қатынауыңыз бар. Тек автор, орындаушылар және әкімшілер өңдей алады.</translation>
     </message>
 </context>
 <context>
@@ -9991,22 +9955,22 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtdeskgui/TicketListPanel.qml" line="+38"/>
         <source>Tickets</source>
-        <translation>Заявки</translation>
+        <translation>Өтінімдер</translation>
     </message>
     <message>
         <location line="+39"/>
         <source>All</source>
-        <translation>Все</translation>
+        <translation>Барлығы</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Open</source>
-        <translation>Открыть</translation>
+        <translation>Ашу</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Closed</source>
-        <translation>Закрыто</translation>
+        <translation>Жабық</translation>
     </message>
 </context>
 <context>
@@ -10014,22 +9978,22 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtdeskgui/TicketView.qml" line="+108"/>
         <source>Locked: %1</source>
-        <translation>Заблокировано: %1</translation>
+        <translation>Құлыпталған: %1</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>This ticket is locked</source>
-        <translation>Эта заявка заблокирована</translation>
+        <translation>Бұл өтінім құлыпталған</translation>
     </message>
     <message>
         <location line="+49"/>
         <source>(No description provided)</source>
-        <translation>(Описание не указано)</translation>
+        <translation>(Сипаттама берілмеген)</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Type:</source>
-        <translation>Тип:</translation>
+        <translation>Түрі:</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -10039,67 +10003,67 @@ ID входных данных: </translation>
     <message>
         <location line="+10"/>
         <source>Assignees:</source>
-        <translation>Исполнители:</translation>
+        <translation>Орындаушылар:</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>No one assigned</source>
-        <translation>Никто не назначен</translation>
+        <translation>Ешкім тағайындалмаған</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Created:</source>
-        <translation>Создано:</translation>
+        <translation>Жасалған:</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Closed:</source>
-        <translation>Закрыто:</translation>
+        <translation>Жабылған:</translation>
     </message>
     <message>
         <location line="+50"/>
         <source>Close as completed</source>
-        <translation>Закрыть как выполненное</translation>
+        <translation>Аяқталған ретінде жабу</translation>
     </message>
     <message>
         <location line="+25"/>
         <source>Close as not planned</source>
-        <translation>Закрыть как незапланированное</translation>
+        <translation>Жоспарланбаған ретінде жабу</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Reopen ticket</source>
-        <translation>Переоткрыть заявку</translation>
+        <translation>Өтінімді қайта ашу</translation>
     </message>
     <message>
         <location line="+25"/>
         <source>Open Chat</source>
-        <translation>Открыть чат</translation>
+        <translation>Чатты ашу</translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Access Request</source>
-        <translation>Запрос доступа</translation>
+        <translation>Қатынау сұранысы</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Support Request</source>
-        <translation>Запрос поддержки</translation>
+        <translation>Қолдау сұранысы</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Feature Request</source>
-        <translation>Запрос функции</translation>
+        <translation>Функция сұранысы</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Bug Report</source>
-        <translation>Отчёт об ошибке</translation>
+        <translation>Қате туралы есеп</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Unknown</source>
-        <translation>Неизвестный</translation>
+        <translation>Белгісіз</translation>
     </message>
 </context>
 <context>
@@ -10107,37 +10071,37 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtgui/Panels/TimeFilterDelegate.qml" line="+9"/>
         <source>Date</source>
-        <translation>Дата</translation>
+        <translation>Күні</translation>
     </message>
     <message>
         <location line="+105"/>
         <source>Last 7 Days</source>
-        <translation>Последние 7 дней</translation>
+        <translation>Соңғы 7 күн</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>This Month</source>
-        <translation>Текущий месяц</translation>
+        <translation>Осы ай</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Last Month</source>
-        <translation>Прошлый месяц</translation>
+        <translation>Соңғы ай</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>This Year</source>
-        <translation>Текущий год</translation>
+        <translation>Осы жыл</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Last Year</source>
-        <translation>Прошлый год</translation>
+        <translation>Соңғы жыл</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Custom</source>
-        <translation>Произвольный</translation>
+        <translation>Арнайы</translation>
     </message>
 </context>
 <context>
@@ -10145,52 +10109,52 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtgui/View/TimeFilterParamView.qml" line="+119"/>
         <source>Last 7 Days</source>
-        <translation>Последние 7 дней</translation>
+        <translation>Соңғы 7 күн</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>This Month</source>
-        <translation>Текущий месяц</translation>
+        <translation>Осы ай</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Last Month</source>
-        <translation>Прошлый месяц</translation>
+        <translation>Соңғы ай</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>This Year</source>
-        <translation>Текущий год</translation>
+        <translation>Осы жыл</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Last Year</source>
-        <translation>Прошлый год</translation>
+        <translation>Соңғы жыл</translation>
     </message>
     <message>
         <location line="+76"/>
         <source>From</source>
-        <translation>От</translation>
+        <translation>Бастап</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Select a date</source>
-        <translation>Выберите дату</translation>
+        <translation>Күнді таңдаңыз</translation>
     </message>
     <message>
         <location line="+25"/>
         <source>To</source>
-        <translation>До</translation>
+        <translation>Дейін</translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Apply</source>
-        <translation>Применить</translation>
+        <translation>Қолдану</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Clear</source>
-        <translation>Очистить</translation>
+        <translation>Тазалау</translation>
     </message>
 </context>
 <context>
@@ -10198,12 +10162,12 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/TimeInput.qml" line="+154"/>
         <source>Time:</source>
-        <translation>Время:</translation>
+        <translation>Уақыт:</translation>
     </message>
     <message>
         <location line="+87"/>
         <source>Wrong time format!</source>
-        <translation>Неверный формат времени!</translation>
+        <translation>Қате уақыт форматы!</translation>
     </message>
 </context>
 <context>
@@ -10211,17 +10175,17 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/TimeIntervalPicker.qml" line="+127"/>
         <source>Days</source>
-        <translation>Дни</translation>
+        <translation>Күндер</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Hours</source>
-        <translation>Часы</translation>
+        <translation>Сағаттар</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Minutes</source>
-        <translation>Минуты</translation>
+        <translation>Минуттар</translation>
     </message>
 </context>
 <context>
@@ -10229,12 +10193,12 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtcontrols/Inputs/TimePicker.qml" line="+97"/>
         <source>Hours</source>
-        <translation>Часы</translation>
+        <translation>Сағаттар</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Minutes</source>
-        <translation>Минуты</translation>
+        <translation>Минуттар</translation>
     </message>
 </context>
 <context>
@@ -10242,27 +10206,27 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtgui/View/TreeViewElementView.qml" line="+26"/>
         <source>Filter...</source>
-        <translation>Фильтр...</translation>
+        <translation>Сүзгі...</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Expand All</source>
-        <translation>Развернуть все</translation>
+        <translation>Барлығын жаю</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Collapse All</source>
-        <translation>Свернуть все</translation>
+        <translation>Барлығын жию</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Check All</source>
-        <translation>Выбрать все</translation>
+        <translation>Барлығын белгілеу</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Uncheck All</source>
-        <translation>Снять все</translation>
+        <translation>Барлығын алу</translation>
     </message>
 </context>
 <context>
@@ -10270,12 +10234,12 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtchatgui/TypingIndicator.qml" line="+34"/>
         <source>is typing</source>
-        <translation>печатает</translation>
+        <translation>теруде</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>typing</source>
-        <translation>печатает</translation>
+        <translation>теруде</translation>
     </message>
 </context>
 <context>
@@ -10283,27 +10247,27 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/UserActionCollectionView.qml" line="+37"/>
         <source>Action</source>
-        <translation>Действие</translation>
+        <translation>Әрекет</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Create</source>
-        <translation>Создать</translation>
+        <translation>Жасау</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Update</source>
-        <translation>Обновить</translation>
+        <translation>Жаңарту</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Delete</source>
-        <translation>Удалить</translation>
+        <translation>Жою</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Users</source>
-        <translation>Пользователи</translation>
+        <translation>Пайдаланушылар</translation>
     </message>
 </context>
 <context>
@@ -10311,12 +10275,12 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/UserCollectionView.qml" line="+60"/>
         <source>System Info</source>
-        <translation>Система</translation>
+        <translation>Жүйе ақпараты</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Internal</source>
-        <translation>Внутренняя</translation>
+        <translation>Ішкі</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -10326,42 +10290,42 @@ ID входных данных: </translation>
     <message>
         <location line="+67"/>
         <source>View roles</source>
-        <translation>Посмотреть роли</translation>
+        <translation>Рөлдерді көру</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>has been assigned</source>
-        <translation>были назначены</translation>
+        <translation>тағайындалды</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>roles:</source>
-        <translation>ролей:</translation>
+        <translation>рөлдер:</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>No roles</source>
-        <translation>Нет ролей</translation>
+        <translation>Рөлдер жоқ</translation>
     </message>
     <message>
         <location line="+54"/>
         <source>View groups</source>
-        <translation>Посмотреть группы</translation>
+        <translation>Топтарды көру</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>is included into</source>
-        <translation>состоит в</translation>
+        <translation>мына топқа қосылған</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>groups</source>
-        <translation>группах</translation>
+        <translation>топтар</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>No groups</source>
-        <translation>Нет групп</translation>
+        <translation>Топтар жоқ</translation>
     </message>
 </context>
 <context>
@@ -10369,91 +10333,91 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/UserGeneralEditor.qml" line="+50"/>
         <source>Username</source>
-        <translation>Логин</translation>
+        <translation>Пайдаланушы аты</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the username</source>
-        <translation>Введите логин</translation>
+        <translation>Пайдаланушы атын енгізіңіз</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Please enter the username</source>
-        <translation>Введите логин</translation>
+        <translation>Пайдаланушы атын енгізіңіз</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Name</source>
-        <translation>Имя пользователя</translation>
+        <translation>Атауы</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the name</source>
-        <translation>Введите имя пользователя</translation>
+        <translation>Атауын енгізіңіз</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Please enter the name</source>
-        <translation>Пожалуйста, введите имя</translation>
+        <translation>Атауын енгізіңіз</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Email Address</source>
-        <translation>Email</translation>
+        <translation>Электрондық пошта мекенжайы</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Enter the email</source>
-        <translation>Введите электронную почту</translation>
+        <translation>Электрондық поштаны енгізіңіз</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Please enter the email</source>
-        <translation>Пожалуйста, введите электронную почту</translation>
+        <translation>Электрондық поштаны енгізіңіз</translation>
     </message>
     <message>
         <location line="+18"/>
         <location line="+11"/>
         <location line="+0"/>
         <source>Passwords don&apos;t match</source>
-        <translation>Пароли не совпадают</translation>
+        <translation>Құпия сөздер сәйкес келмейді</translation>
     </message>
     <message>
         <location line="+36"/>
         <source>Password</source>
-        <translation>Пароль</translation>
+        <translation>Құпия сөз</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the password</source>
-        <translation>Введите пароль</translation>
+        <translation>Құпия сөзді енгізіңіз</translation>
     </message>
     <message>
         <location line="+14"/>
         <location line="+2"/>
         <location line="+0"/>
         <source>Confirm password</source>
-        <translation>Подтвердите пароль</translation>
+        <translation>Құпия сөзді растаңыз</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Please enter the password</source>
-        <translation>Пожалуйста, введите пароль</translation>
+        <translation>Құпия сөзді енгізіңіз</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Change password</source>
-        <translation>Изменить пароль</translation>
+        <translation>Құпия сөзді өзгерту</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Change</source>
-        <translation>Изменить</translation>
+        <translation>Өзгерту</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Change Password</source>
-        <translation>Изменить пароль</translation>
+        <translation>Құпия сөзді өзгерту</translation>
     </message>
 </context>
 <context>
@@ -10461,57 +10425,57 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/UserGroupView.qml" line="+106"/>
         <source>General</source>
-        <translation>Основное</translation>
+        <translation>Жалпы</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Group Name</source>
-        <translation>Название группы</translation>
+        <translation>Топ атауы</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the name</source>
-        <translation>Введите название</translation>
+        <translation>Атауын енгізіңіз</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation>Сипаттама</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Enter the description</source>
-        <translation>Введите описание</translation>
+        <translation>Сипаттаманы енгізіңіз</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Parent Groups</source>
-        <translation>Родительские группы</translation>
+        <translation>Ата-аналық топтар</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Adding Parent Group</source>
-        <translation>Добавление родительской группы</translation>
+        <translation>Ата-аналық топ қосу</translation>
     </message>
     <message>
         <location line="+42"/>
         <source>Users</source>
-        <translation>Пользователи</translation>
+        <translation>Пайдаланушылар</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Adding Users</source>
-        <translation>Добавление пользователей</translation>
+        <translation>Пайдаланушыларды қосу</translation>
     </message>
     <message>
         <location line="+25"/>
         <source>Adding Roles</source>
-        <translation>Добавление ролей</translation>
+        <translation>Рөлдерді қосу</translation>
     </message>
     <message>
         <location line="-1"/>
         <source>Roles</source>
-        <translation>Роли</translation>
+        <translation>Рөлдер</translation>
     </message>
 </context>
 <context>
@@ -10526,17 +10490,17 @@ ID входных данных: </translation>
     <message>
         <location line="-56"/>
         <source>Organization</source>
-        <translation>Организация</translation>
+        <translation>Ұйым</translation>
     </message>
     <message>
         <location line="+27"/>
         <source>No organization</source>
-        <translation>Нет организации</translation>
+        <translation>Ұйым жоқ</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Logout</source>
-        <translation>Выход из системы</translation>
+        <translation>Жүйеден шығу</translation>
     </message>
 </context>
 <context>
@@ -10544,41 +10508,41 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Qml/imtauthgui/UserView.qml" line="+189"/>
         <source>General</source>
-        <translation>Основное</translation>
+        <translation>Жалпы</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>System Information</source>
-        <translation>Информация о системе</translation>
+        <translation>Жүйе ақпараты</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>System Name</source>
-        <translation>Название системы</translation>
+        <translation>Жүйе атауы</translation>
     </message>
     <message>
         <location line="+80"/>
         <location line="+12"/>
         <location line="+0"/>
         <source>Roles</source>
-        <translation>Роли</translation>
+        <translation>Рөлдер</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Adding Role</source>
-        <translation>Добавление роли</translation>
+        <translation>Рөл қосу</translation>
     </message>
     <message>
         <location line="+31"/>
         <source>Adding Group</source>
-        <translation>Добавление группы</translation>
+        <translation>Топ қосу</translation>
     </message>
     <message>
         <location line="-13"/>
         <location line="+12"/>
         <location line="+0"/>
         <source>Groups</source>
-        <translation>Группы</translation>
+        <translation>Топтар</translation>
     </message>
 </context>
 <context>
@@ -10588,313 +10552,313 @@ ID входных данных: </translation>
         <location line="+0"/>
         <location line="+0"/>
         <source>Zoom in</source>
-        <translation>Увеличить</translation>
+        <translation>Үлкейту</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <location line="+0"/>
         <source>Zoom out</source>
-        <translation>Уменьшить</translation>
+        <translation>Кішірейту</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <source>Show Grid</source>
-        <translation>Показать сетку</translation>
+        <translation>Торды көрсету</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Grid</source>
-        <translation>Сетка</translation>
+        <translation>Тор</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <source>Show Axis</source>
-        <translation>Показать оси</translation>
+        <translation>Осін көрсету</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Axis</source>
-        <translation>Оси</translation>
+        <translation>Ось</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <source>Show Ruler</source>
-        <translation>Показать линейку</translation>
+        <translation>Сызғышты көрсету</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Ruler</source>
-        <translation>Линейка</translation>
+        <translation>Сызғыш</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <source>Reset View</source>
-        <translation>Сбросить вид</translation>
+        <translation>Көріністі қалпына келтіру</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Reset</source>
-        <translation>Сбросить</translation>
+        <translation>Қалпына келтіру</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <source>Right View</source>
-        <translation>Вид справа</translation>
+        <translation>Оң жақ көрініс</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Right</source>
-        <translation>Справа</translation>
+        <translation>Оң жақ</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <source>Front View</source>
-        <translation>Вид спереди</translation>
+        <translation>Алдыңғы көрініс</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Front</source>
-        <translation>Спереди</translation>
+        <translation>Алдыңғы</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <source>Top View</source>
-        <translation>Вид сверху</translation>
+        <translation>Жоғарғы көрініс</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Top</source>
-        <translation>Сверху</translation>
+        <translation>Жоғарғы</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <source>Left View</source>
-        <translation>Вид слева</translation>
+        <translation>Сол жақ көрініс</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Left</source>
-        <translation>Слева</translation>
+        <translation>Сол жақ</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <source>Bottom View</source>
-        <translation>Вид снизу</translation>
+        <translation>Төменгі көрініс</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Bottom</source>
-        <translation>Снизу</translation>
+        <translation>Төменгі</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <source>Back View</source>
-        <translation>Вид сзади</translation>
+        <translation>Артқы көрініс</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Back</source>
-        <translation>Сзади</translation>
+        <translation>Артқы</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <source>Select Point</source>
-        <translation>Выбрать точку</translation>
+        <translation>Нүктені таңдау</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set Point Selection Mode</source>
-        <translation>Включить режим выбора точек</translation>
+        <translation>Нүкте таңдау режимін орнату</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <source>Select Box</source>
-        <translation>Выбрать прямоугольник</translation>
+        <translation>Тіктөртбұрышты таңдау</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set Box Selection Mode</source>
-        <translation>Включить режим выбора прямоугольником</translation>
+        <translation>Тіктөртбұрыш таңдау режимін орнату</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <source>Select Circle</source>
-        <translation>Выбрать круг</translation>
+        <translation>Шеңберді таңдау</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set Circle Selection Mode</source>
-        <translation>Включить режим выбора окружностью</translation>
+        <translation>Шеңбер таңдау режимін орнату</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <source>Clear Selection</source>
-        <translation>Снять выделение</translation>
+        <translation>Таңдауды тазалау</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Clear</source>
-        <translation>Очистить</translation>
+        <translation>Тазалау</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <location line="+0"/>
         <source>Select all</source>
-        <translation>Выделить все</translation>
+        <translation>Барлығын таңдау</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <source>Invert Selection</source>
-        <translation>Инвертировать выделение</translation>
+        <translation>Таңдауды ауыстыру</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Invert</source>
-        <translation>Инвертировать</translation>
+        <translation>Ауыстыру</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <source>Delete Selection</source>
-        <translation>Удалить выделенное</translation>
+        <translation>Таңдауды жою</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Delete</source>
-        <translation>Удалить</translation>
+        <translation>Жою</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <source>Free Rotation</source>
-        <translation>Свободное вращение</translation>
+        <translation>Еркін бұру</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set Free Rotation Mode</source>
-        <translation>Включить режим свободного вращения</translation>
+        <translation>Еркін бұру режимін орнату</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Rotation around X-Axis</source>
-        <translation>Вращение вокруг оси X</translation>
+        <translation>X осі бойынша бұру</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>X-Rotation</source>
-        <translation>Вращение X</translation>
+        <translation>X-бұру</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set Rotation around X-Axis Mode</source>
-        <translation>Включить вращение вокруг оси X</translation>
+        <translation>X осі бойынша бұру режимін орнату</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Rotation around Y-Axis</source>
-        <translation>Вращение вокруг оси Y</translation>
+        <translation>Y осі бойынша бұру</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Y-Rotation</source>
-        <translation>Вращение Y</translation>
+        <translation>Y-бұру</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set Rotation around Y-Axis Mode</source>
-        <translation>Включить вращение вокруг оси Y</translation>
+        <translation>Y осі бойынша бұру режимін орнату</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Rotation around Z-Axis</source>
-        <translation>Вращение вокруг оси Z</translation>
+        <translation>Z осі бойынша бұру</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Z-Rotation</source>
-        <translation>Вращение Z</translation>
+        <translation>Z-бұру</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set Rotation around Z-Axis Mode</source>
-        <translation>Включить вращение вокруг оси Z</translation>
+        <translation>Z осі бойынша бұру режимін орнату</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>View</source>
-        <translation>Вид</translation>
+        <translation>Көрініс</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>View Mode</source>
-        <translation>Режим просмотра</translation>
+        <translation>Көрініс режимі</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set View Mode</source>
-        <translation>Включить режим просмотра</translation>
+        <translation>Көрініс режимін орнату</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Selection</source>
-        <translation>Выделение</translation>
+        <translation>Таңдау</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Selection Mode</source>
-        <translation>Режим выделения</translation>
+        <translation>Таңдау режимі</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set Selection Mode</source>
-        <translation>Включить режим выделения</translation>
+        <translation>Таңдау режимін орнату</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Orthogonal View Mode</source>
-        <translation>Ортогональный режим просмотра</translation>
+        <translation>Ортогональді көрініс режимі</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Orthogonal</source>
-        <translation>Ортогональный</translation>
+        <translation>Ортогональді</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Select orthogonal view mode</source>
-        <translation>Выбрать ортогональный режим просмотра</translation>
+        <translation>Ортогональді көрініс режимін таңдау</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Perspective View Mode</source>
-        <translation>Перспективный режим просмотра</translation>
+        <translation>Перспектива көрініс режимі</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Perspective</source>
-        <translation>Перспективный</translation>
+        <translation>Перспектива</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Select perspective view mode</source>
-        <translation>Выбрать перспективный режим просмотра</translation>
+        <translation>Перспектива көрініс режимін таңдау</translation>
     </message>
 </context>
 <context>
@@ -10902,22 +10866,22 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtauth/CRoleChangeGeneratorComp.cpp" line="+55"/>
         <source>Added parent role &apos;%1&apos;</source>
-        <translation>Добавлена родительская роль &apos;%1&apos;</translation>
+        <translation>Ата-аналық рөл қосылды: &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed parent role &apos;%1&apos;</source>
-        <translation>Удалена родительская роль &apos;%1&apos;</translation>
+        <translation>Ата-аналық рөл жойылды: &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Added permission &apos;%1&apos;</source>
-        <translation>Добавлено право &apos;%1&apos;</translation>
+        <translation>Рұқсат қосылды: &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed permission &apos;%1&apos;</source>
-        <translation>Удалено право &apos;%1&apos;</translation>
+        <translation>Рұқсат жойылды: &apos;%1&apos;</translation>
     </message>
 </context>
 <context>
@@ -10925,37 +10889,37 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtauth/CUserChangeGeneratorComp.cpp" line="+75"/>
         <source>Added to group &apos;%1&apos;</source>
-        <translation>Добавлен в группу &apos;%1&apos;</translation>
+        <translation>Топқа қосылды: &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed from group &apos;%1&apos;</source>
-        <translation>Удален из группы &apos;%1&apos;</translation>
+        <translation>Топтан жойылды: &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Added role &apos;%1&apos;</source>
-        <translation>Добавлена роль &apos;%1&apos;</translation>
+        <translation>Рөл қосылды: &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed role &apos;%1&apos;</source>
-        <translation>Удалена роль &apos;%1&apos;</translation>
+        <translation>Рөл жойылды: &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Added to product &apos;%1&apos;</source>
-        <translation>Добавлен в продукт &apos;%1&apos;</translation>
+        <translation>Өнімге қосылды: &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed from product &apos;%1&apos;</source>
-        <translation>Удален из продукта &apos;%1&apos;</translation>
+        <translation>Өнімнен жойылды: &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Password changed</source>
-        <translation>Пароль изменён</translation>
+        <translation>Құпия сөз өзгертілді</translation>
     </message>
 </context>
 <context>
@@ -10963,42 +10927,42 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtauth/CUserGroupChangeGeneratorComp.cpp" line="+106"/>
         <source>Added parent group &apos;%1&apos;</source>
-        <translation>Добавлена родительская группа &apos;%1&apos;</translation>
+        <translation>Ата-аналық топ қосылды: &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed parent group &apos;%1&apos;</source>
-        <translation>Удалена родительская группа &apos;%1&apos;</translation>
+        <translation>Ата-аналық топ жойылды: &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed user &apos;%1&apos;</source>
-        <translation>Удален пользователь &apos;%1&apos;</translation>
+        <translation>Пайдаланушы жойылды: &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Added user &apos;%1&apos;</source>
-        <translation>Добавлен пользователь &apos;%1&apos;</translation>
+        <translation>Пайдаланушы қосылды: &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Added role &apos;%1&apos;</source>
-        <translation>Добавлена роль &apos;%1&apos;</translation>
+        <translation>Рөл қосылды: &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed role &apos;%1&apos;</source>
-        <translation>Удалена роль &apos;%1&apos;</translation>
+        <translation>Рөл жойылды: &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Added to product &apos;%1&apos;</source>
-        <translation>Добавлен в продукт &apos;%1&apos;</translation>
+        <translation>Өнімге қосылды: &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Removed from product &apos;%1&apos;</source>
-        <translation>Удален из продукта &apos;%1&apos;</translation>
+        <translation>Өнімнен жойылды: &apos;%1&apos;</translation>
     </message>
 </context>
 <context>
@@ -11006,12 +10970,12 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtauthgql/CRoleCollectionControllerComp.cpp" line="+168"/>
         <source>Roles</source>
-        <translation>Роли</translation>
+        <translation>Рөлдер</translation>
     </message>
     <message>
         <location line="+36"/>
         <source>Unable to get a role info</source>
-        <translation></translation>
+        <translation>Рөл ақпаратын алу мүмкін емес</translation>
     </message>
 </context>
 <context>
@@ -11019,22 +10983,22 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtauthgql/CUserCollectionControllerComp.cpp" line="+402"/>
         <source>Internal</source>
-        <translation></translation>
+        <translation>Ішкі</translation>
     </message>
     <message>
         <location line="-356"/>
         <source>Username can&apos;t be empty!</source>
-        <translation>Логин не может быть пустым!</translation>
+        <translation>Пайдаланушы аты бос болуы мүмкін емес!</translation>
     </message>
     <message>
         <location line="+29"/>
         <source>Username already exists</source>
-        <translation>Пользователь с таким логином уже существует</translation>
+        <translation>Пайдаланушы аты бұрыннан бар</translation>
     </message>
     <message>
         <location line="+136"/>
         <source>Users</source>
-        <translation>Пользователи</translation>
+        <translation>Пайдаланушылар</translation>
     </message>
 </context>
 <context>
@@ -11042,7 +11006,7 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtauthgql/CUserGroupCollectionControllerComp.cpp" line="+136"/>
         <source>Groups</source>
-        <translation>Группы</translation>
+        <translation>Топтар</translation>
     </message>
 </context>
 <context>
@@ -11050,12 +11014,12 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtauthgql/CUserRepresentationController.cpp" line="+43"/>
         <source>Username can&apos;t be empty!</source>
-        <translation>Логин не может быть пустым!</translation>
+        <translation>Пайдаланушы аты бос болуы мүмкін емес!</translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Username already exists</source>
-        <translation>Пользователь с таким логином уже существует</translation>
+        <translation>Пайдаланушы аты бұрыннан бар</translation>
     </message>
 </context>
 <context>
@@ -11063,7 +11027,7 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtauthgui/CAccountInfoEditorComp.cpp" line="+147"/>
         <source>Personal</source>
-        <translation>Личный</translation>
+        <translation>Жеке</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -11073,27 +11037,27 @@ ID входных данных: </translation>
     <message>
         <location line="+5"/>
         <source>Load...</source>
-        <translation>Загрузить...</translation>
+        <translation>Жүктеу...</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation>Жою</translation>
     </message>
     <message>
         <location line="+261"/>
         <source>All known file types (%1)</source>
-        <translation>Все известные типы файлов (%1)</translation>
+        <translation>Барлық белгілі файл түрлері (%1)</translation>
     </message>
     <message>
         <location line="-3"/>
         <source>All file types (%1)</source>
-        <translation>Все типы файлов (%1)</translation>
+        <translation>Барлық файл түрлері (%1)</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Select picture file</source>
-        <translation>Выбрать файл изображения</translation>
+        <translation>Сурет файлын таңдаңыз</translation>
     </message>
 </context>
 <context>
@@ -11101,22 +11065,22 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtauthgui/CAccountInfoViewDelegateComp.cpp" line="+76"/>
         <source>Account Name</source>
-        <translation>Название аккаунта</translation>
+        <translation>Тіркелгі атауы</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>E-Mail</source>
-        <translation>Электронная почта</translation>
+        <translation>Электрондық пошта</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Account Type</source>
-        <translation>Тип аккаунта</translation>
+        <translation>Тіркелгі түрі</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Account Description</source>
-        <translation>Описание аккаунта</translation>
+        <translation>Тіркелгі сипаттамасы</translation>
     </message>
 </context>
 <context>
@@ -11124,17 +11088,17 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtauthgui/CContactInfoEditorComp.cpp" line="+27"/>
         <source>Diverse</source>
-        <translation>Другой</translation>
+        <translation>Басқа</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Female</source>
-        <translation>Женский</translation>
+        <translation>Әйел</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Male</source>
-        <translation>Мужской</translation>
+        <translation>Ер</translation>
     </message>
 </context>
 <context>
@@ -11142,27 +11106,27 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtauthgui/CContactInfoViewDelegateComp.cpp" line="+83"/>
         <source>E-Mail</source>
-        <translation>Электронная почта</translation>
+        <translation>Электрондық пошта</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Birthday</source>
-        <translation>Дата рождения</translation>
+        <translation>Туған күні</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>First Name</source>
-        <translation>Имя</translation>
+        <translation>Аты</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Last Name</source>
-        <translation>Фамилия</translation>
+        <translation>Тегі</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Nickname</source>
-        <translation>Псевдоним</translation>
+        <translation>Лақап ат</translation>
     </message>
 </context>
 <context>
@@ -11170,37 +11134,37 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtauthgui/CRemoteStandardLoginGuiComp.cpp" line="+225"/>
         <source>Login failed</source>
-        <translation>Ошибка входа</translation>
+        <translation>Кіру сәтсіз</translation>
     </message>
     <message>
         <location line="+40"/>
         <source>Please enter a non-empty password</source>
-        <translation>Пожалуйста, введите непустой пароль</translation>
+        <translation>Бос емес құпия сөзді енгізіңіз</translation>
     </message>
     <message>
         <location line="+24"/>
         <source>User Management</source>
-        <translation>Управление пользователями</translation>
+        <translation>Пайдаланушыларды басқару</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Password for the super user could not be set</source>
-        <translation>Не удалось установить пароль для суперпользователя</translation>
+        <translation>Суперпайдаланушы құпия сөзін орнату мүмкін болмады</translation>
     </message>
     <message>
         <location line="+25"/>
         <source>No connection to the server</source>
-        <translation>Нет соединения с сервером</translation>
+        <translation>Серверге қосылу жоқ</translation>
     </message>
     <message>
         <location line="+42"/>
         <source>No connection to the authorization server</source>
-        <translation>Нет соединения с сервером авторизации</translation>
+        <translation>Авторизация серверіне қосылу жоқ</translation>
     </message>
     <message>
         <location line="+30"/>
         <source>Password doesn&apos;t match</source>
-        <translation>Пароли не совпадают</translation>
+        <translation>Құпия сөз сәйкес келмейді</translation>
     </message>
 </context>
 <context>
@@ -11208,27 +11172,27 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtauthgui/CStandardLoginGuiComp.cpp" line="+214"/>
         <source>Login failed</source>
-        <translation>Ошибка входа</translation>
+        <translation>Кіру сәтсіз</translation>
     </message>
     <message>
         <location line="+33"/>
         <source>Please enter a non-empty password</source>
-        <translation>Пожалуйста, введите непустой пароль</translation>
+        <translation>Бос емес құпия сөзді енгізіңіз</translation>
     </message>
     <message>
         <location line="+24"/>
         <source>User Management</source>
-        <translation>Управление пользователями</translation>
+        <translation>Пайдаланушыларды басқару</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Password for the super user could not be set</source>
-        <translation>Не удалось установить пароль для суперпользователя</translation>
+        <translation>Суперпайдаланушы құпия сөзін орнату мүмкін болмады</translation>
     </message>
     <message>
         <location line="+62"/>
         <source>Password doesn&apos;t match</source>
-        <translation>Пароли не совпадают</translation>
+        <translation>Құпия сөз сәйкес келмейді</translation>
     </message>
 </context>
 <context>
@@ -11236,22 +11200,22 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtbase/CDocumentChangeGeneratorCompBase.cpp" line="+121"/>
         <source>Created the document</source>
-        <translation>Создан документ</translation>
+        <translation>Құжат жасалды</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>&apos;%1&apos; changed from &apos;%2&apos; to &apos;%3&apos;</source>
-        <translation>&apos;%1&apos; изменено с &apos;%2&apos; на &apos;%3&apos;</translation>
+        <translation>&apos;%1&apos; &apos;%2&apos; мәнінен &apos;%3&apos; мәніне өзгертілді</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&apos;%1&apos; was set to &apos;%2&apos;</source>
-        <translation>&apos;%1&apos; установлено на &apos;%2&apos;</translation>
+        <translation>&apos;%1&apos; мәні &apos;%2&apos; болып орнатылды</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&apos;%1&apos; was cleared</source>
-        <translation>&apos;%1&apos; очищено</translation>
+        <translation>&apos;%1&apos; тазаланды</translation>
     </message>
 </context>
 <context>
@@ -11260,7 +11224,7 @@ ID входных данных: </translation>
         <location filename="../../../Include/imtbase/CSystemStatusComp.cpp" line="-140"/>
         <location line="+64"/>
         <source>Try connect to: &apos;%1&apos; ...</source>
-        <translation>Попытка подключения к: &apos;%1&apos; ...</translation>
+        <translation>Қосылу әрекеті: &apos;%1&apos; ...</translation>
     </message>
 </context>
 <context>
@@ -11268,17 +11232,17 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtdb/CSqlDatabaseObjectDelegateCompBase.cpp" line="+668"/>
         <source>Collection table auto-creation failed; see previous errors. Component initialization was stopped</source>
-        <translation>Автосоздание таблицы коллекции не удалось; см. предыдущие ошибки. Инициализация компонента остановлена</translation>
+        <translation>Жинақ кестесін автоматты жасау сәтсіз; алдыңғы қателерді қараңыз. Компонент инициализациясы тоқтатылды</translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Table creation script path is empty</source>
-        <translation>Путь к скрипту создания таблицы не задан</translation>
+        <translation>Кесте жасау скрипт жолы бос</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Collection table creation script &apos;%1&apos; could not be loaded</source>
-        <translation>Не удалось загрузить скрипт создания таблицы коллекции &apos;%1&apos;</translation>
+        <translation>Жинақ кестесін жасау скрипті &apos;%1&apos; жүктелмеді</translation>
     </message>
     <message>
         <location line="+27"/>
@@ -11294,7 +11258,7 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtdbgui/CDatabaseLoginSettingsEditorComp.cpp" line="+144"/>
         <source>Database connection test was successful</source>
-        <translation>Тест подключения к базе данных выполнен успешно</translation>
+        <translation>Деректер қоры қосылысын тексеру сәтті</translation>
     </message>
 </context>
 <context>
@@ -11302,27 +11266,27 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtddl/CConstVarCreatorProcessorCompBase.cpp" line="+59"/>
         <source>Template directory path is invalid</source>
-        <translation>Неверный путь к директории шаблонов</translation>
+        <translation>Үлгілер каталогының жолы жарамсыз</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Cpp directory path is invalid</source>
-        <translation>Неверный путь к директории C++</translation>
+        <translation>Cpp каталогының жолы жарамсыз</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Qml directory path is invalid</source>
-        <translation>Неверный путь к директории QML</translation>
+        <translation>Qml каталогының жолы жарамсыз</translation>
     </message>
     <message>
         <location line="+32"/>
         <source>The module name is invalid</source>
-        <translation>Неверное название модуля</translation>
+        <translation>Модуль атауы жарамсыз</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>The template dir path is invalid</source>
-        <translation>Неверный путь к директории шаблонов</translation>
+        <translation>Үлгілер каталогының жолы жарамсыз</translation>
     </message>
 </context>
 <context>
@@ -11330,12 +11294,12 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtgeo/CAddressControllerComp.cpp" line="-248"/>
         <source>Unable to get an address info</source>
-        <translation>Не удалось получить информацию об адресе</translation>
+        <translation>Мекенжай ақпаратын алу мүмкін емес</translation>
     </message>
     <message>
         <location line="+141"/>
         <source>Unable to get an address info!</source>
-        <translation>Не удалось получить информацию об адресе!</translation>
+        <translation>Мекенжай ақпаратын алу мүмкін емес!</translation>
     </message>
 </context>
 <context>
@@ -11343,7 +11307,7 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtgui/CHierarchicalLayoutWidget.cpp" line="+172"/>
         <source>Empty</source>
-        <translation>Пусто</translation>
+        <translation>Бос</translation>
     </message>
 </context>
 <context>
@@ -11351,73 +11315,73 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtgui/CDocumentCollectionViewDelegateComp.cpp" line="+80"/>
         <source>Collection Manager</source>
-        <translation>Менеджер коллекций</translation>
+        <translation>Жинақ менеджері</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>The file could not be created</source>
-        <translation>Не удалось создать файл</translation>
+        <translation>Файлды жасау мүмкін болмады</translation>
     </message>
     <message>
         <location line="+43"/>
         <source>Imported from %1</source>
-        <translation>Импортировано из %1</translation>
+        <translation>%1 ішінен импортталды</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>File &apos;%1&apos; could not be imported</source>
-        <translation>Не удалось импортировать файл &apos;%1&apos;</translation>
+        <translation>&apos;%1&apos; файлын импорттау мүмкін болмады</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>File &apos;%1&apos; could not be imported. Failed to load the file contents</source>
-        <translation>Не удалось импортировать файл &apos;%1&apos;. Не удалось загрузить содержимое файла</translation>
+        <translation>&apos;%1&apos; файлын импорттау мүмкін болмады. Файл мазмұнын жүктеу сәтсіз</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>File &quot;%1&quot; could not be exported</source>
-        <translation>Не удалось экспортировать файл &quot;%1&quot;</translation>
+        <translation>&quot;%1&quot; файлын экспорттау мүмкін болмады</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Remove selected item(s) from the database</source>
-        <translation>Удалить выбранный(е) элемент(ы) из базы данных</translation>
+        <translation>Таңдалған элементтерді деректер қорынан жою</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Item &quot;%1&quot; is currently being edited and cannot be deleted</source>
-        <translation>Элемент &quot;%1&quot; в данный момент редактируется и не может быть удалён</translation>
+        <translation>&quot;%1&quot; элементі қазір өңделуде және жою мүмкін емес</translation>
     </message>
     <message>
         <location line="+127"/>
         <source>Loading document...</source>
-        <translation>Загрузка документа...</translation>
+        <translation>Құжат жүктелуде...</translation>
     </message>
     <message>
         <location line="+228"/>
         <location line="+17"/>
         <source>Item &quot;%1&quot; could not be opened</source>
-        <translation>Не удалось открыть элемент &quot;%1&quot;</translation>
+        <translation>&quot;%1&quot; элементін ашу мүмкін болмады</translation>
     </message>
     <message>
         <location line="-392"/>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation>Жою</translation>
     </message>
     <message>
         <location line="+551"/>
         <source>Initial Revision</source>
-        <translation>Начальная ревизия</translation>
+        <translation>Бастапқы нұсқа</translation>
     </message>
     <message>
         <location line="-363"/>
         <source>Comment your changes</source>
-        <translation>Прокомментируйте изменения</translation>
+        <translation>Өзгерістерге пікір қалдырыңыз</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Please enter comment for your changes</source>
-        <translation>Пожалуйста, введите комментарий к изменениям</translation>
+        <translation>Өзгерістеріңіз үшін пікір енгізіңіз</translation>
     </message>
 </context>
 <context>
@@ -11426,82 +11390,82 @@ ID входных данных: </translation>
         <location filename="../../../Include/imtgui/CLayoutManagerGuiComp.cpp" line="+256"/>
         <location line="+0"/>
         <source>Edit Mode</source>
-        <translation>Режим редактирования</translation>
+        <translation>Өңдеу режимі</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>EditMode</source>
-        <translation type="unfinished"></translation>
+        <translation>Өңдеу режимі</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <source>Clear All</source>
-        <translation>Очистить все</translation>
+        <translation>Барлығын тазалау</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>ClearAll</source>
-        <translation type="unfinished"></translation>
+        <translation>Барлығын тазалау</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <location line="+0"/>
         <source>Import</source>
-        <translation>Импорт</translation>
+        <translation>Импорттау</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <location line="+0"/>
         <source>Export</source>
-        <translation>Экспорт</translation>
+        <translation>Экспорттау</translation>
     </message>
     <message>
         <location line="+99"/>
         <source>Do you want clear all layout items?</source>
-        <translation>Вы хотите очистить все элементы макета?</translation>
+        <translation>Барлық орналасу элементтерін тазалағыңыз келе ме?</translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Import Layout</source>
-        <translation>Импортировать макет</translation>
+        <translation>Орналасуды импорттау</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Import Layout...</source>
-        <translation>Импортировать макет...</translation>
+        <translation>Орналасуды импорттау...</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Layout could not be imported</source>
-        <translation>Не удалось импортировать макет</translation>
+        <translation>Орналасуды импорттау мүмкін болмады</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Export Layout</source>
-        <translation>Экспортировать макет</translation>
+        <translation>Орналасуды экспорттау</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Export Layout...</source>
-        <translation>Экспортировать макет...</translation>
+        <translation>Орналасуды экспорттау...</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Layout could not be exported</source>
-        <translation>Не удалось экспортировать макет</translation>
+        <translation>Орналасуды экспорттау мүмкін болмады</translation>
     </message>
     <message>
         <location line="+42"/>
         <source>Open Image</source>
-        <translation>Открыть изображение</translation>
+        <translation>Суретті ашу</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Image Files (*.png *.jpg *.bmp *.ico *.svg)</source>
-        <translation>Файлы изображений (*.png *.jpg *.bmp *.ico *.svg)</translation>
+        <translation>Сурет файлдары (*.png *.jpg *.bmp *.ico *.svg)</translation>
     </message>
 </context>
 <context>
@@ -11509,33 +11473,33 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtgui/CMultiDocumentWorkspaceGuiComp.cpp" line="+55"/>
         <source>Document Name</source>
-        <translation>Название документа</translation>
+        <translation>Құжат атауы</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Please enter the name of the document:</source>
-        <translation>Введите название документа:</translation>
+        <translation>Құжат атауын енгізіңіз:</translation>
     </message>
     <message>
         <location line="+9"/>
         <location line="+6"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation>Қате</translation>
     </message>
     <message>
         <location line="-6"/>
         <source>The document name contains some not allowed characters</source>
-        <translation>Название документа содержит недопустимые символы</translation>
+        <translation>Құжат атауында рұқсат етілмеген таңбалар бар</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>The document name cannot be empty!</source>
-        <translation>Название документа не может быть пустым!</translation>
+        <translation>Құжат атауы бос болуы мүмкін емес!</translation>
     </message>
     <message>
         <location line="+51"/>
         <source>File could not be saved!</source>
-        <translation>Не удалось сохранить файл!</translation>
+        <translation>Файлды сақтау мүмкін болмады!</translation>
     </message>
 </context>
 <context>
@@ -11544,7 +11508,7 @@ ID входных данных: </translation>
         <location filename="../../../Include/imtgui/CMultiDocumentWorkspaceGuiCompBase.cpp" line="+130"/>
         <location line="+534"/>
         <source>&lt;no name&gt;</source>
-        <translation>&lt;без имени&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-525"/>
@@ -11554,12 +11518,12 @@ ID входных данных: </translation>
     <message>
         <location line="+230"/>
         <source>Tab %1</source>
-        <translation>Вкладка %1</translation>
+        <translation>Қойынды %1</translation>
     </message>
     <message>
         <location line="+183"/>
         <source>Document could not be opened</source>
-        <translation>Не удалось открыть документ</translation>
+        <translation>Құжатты ашу мүмкін болмады</translation>
     </message>
 </context>
 <context>
@@ -11567,7 +11531,7 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtgui/CObjectCollectionRevisionDialog.cpp" line="+34"/>
         <source>Restore</source>
-        <translation>Восстановить</translation>
+        <translation>Қалпына келтіру</translation>
     </message>
     <message>
         <location line="+28"/>
@@ -11576,27 +11540,27 @@ ID входных данных: </translation>
         <location line="+1"/>
         <location line="+1"/>
         <source>Revision package not found</source>
-        <translation>Пакет ревизий не найден</translation>
+        <translation>Нұсқа пакеті табылмады</translation>
     </message>
     <message>
         <location line="+40"/>
         <source>Export</source>
-        <translation>Экспорт</translation>
+        <translation>Экспорттау</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Export File</source>
-        <translation>Экспорт файла</translation>
+        <translation>Файлды экспорттау</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Collection</source>
-        <translation>Коллекция</translation>
+        <translation>Жинақ</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Document could not be exported</source>
-        <translation>Не удалось экспортировать документ</translation>
+        <translation>Құжатты экспорттау мүмкін болмады</translation>
     </message>
 </context>
 <context>
@@ -11604,26 +11568,26 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtgui/CObjectCollectionViewDelegate.cpp" line="+77"/>
         <source>&amp;Edit</source>
-        <translation>&amp;Редактировать</translation>
+        <translation>&amp;Өңдеу</translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+165"/>
         <location line="+550"/>
         <source>New</source>
-        <translation>Новый</translation>
+        <translation>Жаңа</translation>
     </message>
     <message>
         <location line="-716"/>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation>Өңдеу</translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+715"/>
         <location line="+0"/>
         <source>Duplicate</source>
-        <translation>Дублировать</translation>
+        <translation>Көшірме</translation>
     </message>
     <message>
         <location line="-714"/>
@@ -11631,13 +11595,13 @@ ID входных данных: </translation>
         <location line="+502"/>
         <location line="+0"/>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation>Жою</translation>
     </message>
     <message>
         <location line="-714"/>
         <location line="+715"/>
         <source>Import</source>
-        <translation>Импорт</translation>
+        <translation>Импорттау</translation>
     </message>
     <message>
         <location line="-714"/>
@@ -11645,141 +11609,141 @@ ID входных данных: </translation>
         <location line="+147"/>
         <location line="+0"/>
         <source>Export</source>
-        <translation>Экспорт</translation>
+        <translation>Экспорттау</translation>
     </message>
     <message>
         <location line="-861"/>
         <location line="+715"/>
         <source>Restore</source>
-        <translation>Восстановить</translation>
+        <translation>Қалпына келтіру</translation>
     </message>
     <message>
         <location line="-259"/>
         <source>Name</source>
-        <translation>Название</translation>
+        <translation>Атауы</translation>
     </message>
     <message>
         <location line="-195"/>
         <location line="+3"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation>Қате</translation>
     </message>
     <message>
         <location line="-54"/>
         <source>Remove selected item(s)</source>
-        <translation>Удалить выбранный(е) элемент(ы)</translation>
+        <translation>Таңдалған элементтерді жою</translation>
     </message>
     <message>
         <location line="+35"/>
         <source>Rename</source>
-        <translation>Переименовать</translation>
+        <translation>Атын өзгерту</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Enter new name</source>
-        <translation>Введите новое название</translation>
+        <translation>Жаңа атауды енгізіңіз</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>The name could not be set</source>
-        <translation>Не удалось задать название</translation>
+        <translation>Атауды орнату мүмкін болмады</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>The name contains some not allowed characters</source>
-        <translation>Название содержит недопустимые символы</translation>
+        <translation>Атау рұқсат етілмеген таңбаларды қамтиды</translation>
     </message>
     <message>
         <location line="+120"/>
         <source>Edit Description...</source>
-        <translation>Редактировать описание...</translation>
+        <translation>Сипаттаманы өңдеу...</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Rename...</source>
-        <translation>Переименовать...</translation>
+        <translation>Атын өзгерту...</translation>
     </message>
     <message>
         <location line="+70"/>
         <source>Type</source>
-        <translation>Тип</translation>
+        <translation>Түрі</translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+525"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation>Сипаттама</translation>
     </message>
     <message>
         <location line="-522"/>
         <source>Added</source>
-        <translation>Добавлено</translation>
+        <translation>Қосылған</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Last Modified</source>
-        <translation>Последнее изменение</translation>
+        <translation>Соңғы өзгертілген</translation>
     </message>
     <message>
         <location line="+191"/>
         <location line="+31"/>
         <source>Compressed item folder (*.zip)</source>
-        <translation>Сжатая папка (*.zip)</translation>
+        <translation>Сығылған элемент қалтасы (*.zip)</translation>
     </message>
     <message>
         <location line="-26"/>
         <source>All known documents (%1)</source>
-        <translation>Все известные документы (%1)</translation>
+        <translation>Барлық белгілі құжаттар (%1)</translation>
     </message>
     <message>
         <location line="+46"/>
         <source>Insert</source>
-        <translation>Вставить</translation>
+        <translation>Қою</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Insert new document into the collection</source>
-        <translation>Добавить новый документ в коллекцию</translation>
+        <translation>Жинаққа жаңа құжат қою</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Duplicate selected objects</source>
-        <translation>Дублировать выбранные объекты</translation>
+        <translation>Таңдалған нысандарды көшіру</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Remove selected item(s) from the collection</source>
-        <translation>Удалить выбранный(е) элемент(ы) из коллекции</translation>
+        <translation>Таңдалған элементтерді жинақтан жою</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Import from File...</source>
-        <translation>Импортировать из файла...</translation>
+        <translation>Файлдан импорттау...</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Import existing file into the collection</source>
-        <translation>Импортировать файл в коллекцию</translation>
+        <translation>Бар файлды жинаққа импорттау</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Export to File...</source>
-        <translation>Экспортировать в файл...</translation>
+        <translation>Файлға экспорттау...</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Export data from the collection to file(s)</source>
-        <translation>Экспортировать данные из коллекции в файл(ы)</translation>
+        <translation>Жинақтан деректерді файлға экспорттау</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Restore revision...</source>
-        <translation>Восстановить ревизию...</translation>
+        <translation>Нұсқаны қалпына келтіру...</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Restore data from backup</source>
-        <translation>Восстановление данных из резервной копии</translation>
+        <translation>Сақтық көшірмеден деректерді қалпына келтіру</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -11787,53 +11751,53 @@ ID входных данных: </translation>
         <location line="+24"/>
         <location line="+38"/>
         <source>Collection</source>
-        <translation>Коллекция</translation>
+        <translation>Жинақ</translation>
     </message>
     <message>
         <location line="-110"/>
         <location line="+48"/>
         <source>New document could not be created</source>
-        <translation>Не удалось создать новый документ</translation>
+        <translation>Жаңа құжат жасау мүмкін болмады</translation>
     </message>
     <message>
         <location line="-22"/>
         <source>Initial Revision</source>
-        <translation>Начальная ревизия</translation>
+        <translation>Бастапқы нұсқа</translation>
     </message>
     <message>
         <location line="+33"/>
         <source>Import File</source>
-        <translation>Импорт файла</translation>
+        <translation>Файлды импорттау</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Document &apos;%1&apos; could not be imported</source>
-        <translation>Не удалось импортировать документ &apos;%1&apos;</translation>
+        <translation>&apos;%1&apos; құжатын импорттау мүмкін болмады</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Importing into collection</source>
-        <translation>Импорт в коллекцию</translation>
+        <translation>Жинаққа импорттау</translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Export File</source>
-        <translation>Экспорт файла</translation>
+        <translation>Файлды экспорттау</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Document could not be exported</source>
-        <translation>Не удалось экспортировать документ</translation>
+        <translation>Құжатты экспорттау мүмкін болмады</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Select Targetn Folder</source>
-        <translation>Выбрать целевую папку</translation>
+        <translation>Мақсатты қалтаны таңдаңыз</translation>
     </message>
     <message>
         <location line="+135"/>
         <source>Enter object description</source>
-        <translation>Введите описание объекта</translation>
+        <translation>Нысан сипаттамасын енгізіңіз</translation>
     </message>
 </context>
 <context>
@@ -11841,27 +11805,27 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtgui/CPluginStatusMonitorViewDelegateComp.cpp" line="+253"/>
         <source>Name</source>
-        <translation>Название</translation>
+        <translation>Атауы</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Path</source>
-        <translation>Путь</translation>
+        <translation>Жол</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Loaded at</source>
-        <translation>Загружен в</translation>
+        <translation>Жүктелген</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Message</source>
-        <translation>Сообщение</translation>
+        <translation>Хабарлама</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Type</source>
-        <translation>Тип</translation>
+        <translation>Түрі</translation>
     </message>
 </context>
 <context>
@@ -11869,18 +11833,18 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtgui/CSingleDocumentWorkspaceGuiComp.cpp" line="+198"/>
         <source>Open File</source>
-        <translation>Открыть файл</translation>
+        <translation>Файлды ашу</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Selected file could not be loaded</source>
-        <translation>Не удалось загрузить выбранный файл</translation>
+        <translation>Таңдалған файлды жүктеу мүмкін болмады</translation>
     </message>
     <message>
         <location line="+14"/>
         <location line="+14"/>
         <source>File could not be saved!</source>
-        <translation>Не удалось сохранить файл!</translation>
+        <translation>Файлды сақтау мүмкін болмады!</translation>
     </message>
 </context>
 <context>
@@ -11892,13 +11856,13 @@ ID входных данных: </translation>
         <location line="+10"/>
         <location line="+0"/>
         <source>Edit</source>
-        <translation>Редактировать</translation>
+        <translation>Өңдеу</translation>
     </message>
     <message>
         <location line="-10"/>
         <location line="+10"/>
         <source>Edit existing object</source>
-        <translation>Редактировать существующий объект</translation>
+        <translation>Бар нысанды өңдеу</translation>
     </message>
 </context>
 <context>
@@ -11907,23 +11871,23 @@ ID входных данных: </translation>
         <location filename="../../../Include/imtgui/CThumbnailDecoratorGuiComp.cpp" line="+438"/>
         <location line="+314"/>
         <source>Login</source>
-        <translation>Логин</translation>
+        <translation>Кіру</translation>
     </message>
     <message>
         <location line="-280"/>
         <source>Quit</source>
-        <translation>Выйти</translation>
+        <translation>Шығу</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Do you really want to quit?</source>
-        <translation>Вы действительно хотите выйти?</translation>
+        <translation>Сіз шынымен шыққыңыз келе ме?</translation>
     </message>
     <message>
         <location line="+416"/>
         <location line="+154"/>
         <source>&lt;unnamed&gt;</source>
-        <translation>&lt;без имени&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -11931,32 +11895,32 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imthypegui/CTaskInputCollectionViewDelegateComp.cpp" line="+107"/>
         <source>Acquisition-ID</source>
-        <translation>ID приобретения</translation>
+        <translation>Алу ID</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation>Сипаттама</translation>
     </message>
     <message>
         <location line="+74"/>
         <source>Enter new object name</source>
-        <translation>Введите новое название объекта</translation>
+        <translation>Жаңа нысан атауын енгізіңіз</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Name</source>
-        <translation>Название</translation>
+        <translation>Атауы</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation>Қате</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Incorrect object name. Object name must be a number between 0 and 255</source>
-        <translation>Неверное название объекта. Название должно быть числом от 0 до 255</translation>
+        <translation>Қате нысан атауы. Нысан атауы 0-ден 255-ке дейін сан болуы керек</translation>
     </message>
 </context>
 <context>
@@ -11964,164 +11928,164 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imthypegui/CTaskManagerGuiComp.cpp" line="-300"/>
         <source>Disable</source>
-        <translation>Отключить</translation>
+        <translation>Өшіру</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Enable</source>
-        <translation>Включить</translation>
+        <translation>Қосу</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Rename</source>
-        <translation>Переименовать</translation>
+        <translation>Атын өзгерту</translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+516"/>
         <source>Duplicate</source>
-        <translation>Дублировать</translation>
+        <translation>Көшірме</translation>
     </message>
     <message>
         <location line="-515"/>
         <source>Delete</source>
-        <translation>Удалить</translation>
+        <translation>Жою</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Acquisition Manager...</source>
-        <translation>Менеджер захвата...</translation>
+        <translation>Алу менеджері...</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Trigger Table...</source>
-        <translation>Таблица триггеров...</translation>
+        <translation>Триггерлер кестесі...</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Settings...</source>
-        <translation>Настройки...</translation>
+        <translation>Параметрлер...</translation>
     </message>
     <message>
         <location line="+137"/>
         <source>Task Error</source>
-        <translation>Ошибка задачи</translation>
+        <translation>Тапсырма қатесі</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Task &apos;%1&apos; could not be duplicated!</source>
-        <translation>Не удалось дублировать задачу &apos;%1&apos;!</translation>
+        <translation>&apos;%1&apos; тапсырмасын көшіру мүмкін болмады!</translation>
     </message>
     <message>
         <location line="+166"/>
         <location line="+196"/>
         <source>Acquisition Manager</source>
-        <translation>Менеджер захвата</translation>
+        <translation>Алу менеджері</translation>
     </message>
     <message>
         <location line="-162"/>
         <source>Trigger-Inspection Mapping</source>
-        <translation>Связь триггеров и инспекций</translation>
+        <translation>Триггер-тексеру байланысы</translation>
     </message>
     <message>
         <location line="+43"/>
         <source>Total Inspections: %1</source>
-        <translation>Всего инспекций: %1</translation>
+        <translation>Барлық тексерулер: %1</translation>
     </message>
     <message>
         <location line="+114"/>
         <source>&amp;Show Task List</source>
-        <translation>&amp;Показать список задач</translation>
+        <translation>&amp;Тапсырмалар тізімін көрсету</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Show Tasks</source>
-        <translation>Показать задачи</translation>
+        <translation>Тапсырмаларды көрсету</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Show task list</source>
-        <translation>Показать список задач</translation>
+        <translation>Тапсырмалар тізімін көрсету</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Execute All Tasks</source>
-        <translation>&amp;Выполнить все задачи</translation>
+        <translation>&amp;Барлық тапсырмаларды орындау</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Execute</source>
-        <translation>Выполнить</translation>
+        <translation>Орындау</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Execute all tasks</source>
-        <translation>Выполнить все задачи</translation>
+        <translation>Барлық тапсырмаларды орындау</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Add Task</source>
-        <translation>&amp;Добавить задачу</translation>
+        <translation>&amp;Тапсырма қосу</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Add</source>
-        <translation>Добавить</translation>
+        <translation>Қосу</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Add a new task</source>
-        <translation>Добавить новую задачу</translation>
+        <translation>Жаңа тапсырма қосу</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Remove Task</source>
-        <translation>&amp;Удалить задачу</translation>
+        <translation>&amp;Тапсырманы жою</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Remove</source>
-        <translation>Удалить</translation>
+        <translation>Жою</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Remove current task</source>
-        <translation>Удалить текущую задачу</translation>
+        <translation>Ағымдағы тапсырманы жою</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&amp;Duplicate Task</source>
-        <translation>&amp;Дублировать задачу</translation>
+        <translation>&amp;Тапсырманы көшіру</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Duplicate current task</source>
-        <translation>Дублировать текущую задачу</translation>
+        <translation>Ағымдағы тапсырманы көшіру</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Show Acquisition &amp;Manager</source>
-        <translation>Показать менеджер захвата</translation>
+        <translation>Алу &amp;менеджерін көрсету</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Show &amp;Trigger Table</source>
-        <translation>Показать таблицу триггеров</translation>
+        <translation>&amp;Триггерлер кестесін көрсету</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Trigger Table</source>
-        <translation>Таблица триггеров</translation>
+        <translation>Триггерлер кестесі</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Show editor of the triggers</source>
-        <translation>Показать редактор триггеров</translation>
+        <translation>Триггерлер редакторын көрсету</translation>
     </message>
     <message>
         <location line="-1"/>
         <source>Show editor of the task inputs</source>
-        <translation>Показать редактор входных данных задачи</translation>
+        <translation>Тапсырма кірістерінің редакторын көрсету</translation>
     </message>
 </context>
 <context>
@@ -12130,22 +12094,22 @@ ID входных данных: </translation>
         <location filename="../../../Include/imthypegui/CTaskSettingsGuiComp.cpp" line="-96"/>
         <location line="+6"/>
         <source>Error</source>
-        <translation>Ошибка</translation>
+        <translation>Қате</translation>
     </message>
     <message>
         <location line="-6"/>
         <source>The task name contains some not allowed characters</source>
-        <translation>Название задачи содержит недопустимые символы</translation>
+        <translation>Тапсырма атауында рұқсат етілмеген таңбалар бар</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Acq-SubId must be a number</source>
-        <translation>Acq-SubId должен быть числом</translation>
+        <translation>Acq-SubId сан болуы керек</translation>
     </message>
     <message>
         <location line="+114"/>
         <source>Acquisition Manager</source>
-        <translation>Менеджер захвата</translation>
+        <translation>Алу менеджері</translation>
     </message>
 </context>
 <context>
@@ -12153,75 +12117,75 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtlic/CLicenseControllerComp.cpp" line="+52"/>
         <source>Backup of the existing license failed. Import canceled</source>
-        <translation>Не удалось создать резервную копию лицензии. Импорт отменён</translation>
+        <translation>Бар лицензияның сақтық көшірмесі сәтсіз. Импорт тоқтатылды</translation>
     </message>
     <message>
         <location line="+28"/>
         <source>License file could not be imported</source>
-        <translation>Не удалось импортировать файл лицензии</translation>
+        <translation>Лицензия файлын импорттау мүмкін болмады</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>Restore of the last license failed</source>
-        <translation>Не удалось восстановить последнюю лицензию</translation>
+        <translation>Соңғы лицензияны қалпына келтіру сәтсіз</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>License file could not be copied to the target location</source>
-        <translation>Не удалось скопировать файл лицензии в целевое место</translation>
+        <translation>Лицензия файлын мақсатты орынға көшіру мүмкін болмады</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>No license path component was set. Please check component configuration</source>
-        <translation>Компонент пути к лицензии не задан. Проверьте конфигурацию компонента</translation>
+        <translation>Лицензия жолы компоненті орнатылмаған. Компонент конфигурациясын тексеріңіз</translation>
     </message>
     <message>
         <location line="+6"/>
         <location line="+39"/>
         <source>No product instance persistence component was set. Please check component configuration</source>
-        <translation>Компонент хранения экземпляра продукта не задан. Проверьте конфигурацию компонента</translation>
+        <translation>Өнім экземплярының тұрақтылық компоненті орнатылмаған. Компонент конфигурациясын тексеріңіз</translation>
     </message>
     <message>
         <location line="-33"/>
         <location line="+39"/>
         <source>No encrypted instance persistence component was set. Please check component configuration</source>
-        <translation>Компонент хранения зашифрованного экземпляра не задан. Проверьте конфигурацию компонента</translation>
+        <translation>Шифрланған экземпляр тұрақтылық компоненті орнатылмаған. Компонент конфигурациясын тексеріңіз</translation>
     </message>
     <message>
         <location line="-32"/>
         <source>License file path is empty. Please check component configuration</source>
-        <translation>Путь к файлу лицензии пуст. Проверьте конфигурацию компонента</translation>
+        <translation>Лицензия файл жолы бос. Компонент конфигурациясын тексеріңіз</translation>
     </message>
     <message>
         <location line="+38"/>
         <source>License file path is empty, nothing to check</source>
-        <translation>Путь к файлу лицензии пуст, нечего проверять</translation>
+        <translation>Лицензия файл жолы бос, тексеретін ештеңе жоқ</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Checking license fingerprint</source>
-        <translation>Проверка отпечатка лицензии</translation>
+        <translation>Лицензия баспасын тексеру</translation>
     </message>
     <message>
         <location line="+0"/>
         <location line="+204"/>
         <source>License Controller</source>
-        <translation>Контроллер лицензий</translation>
+        <translation>Лицензия контроллері</translation>
     </message>
     <message>
         <location line="-90"/>
         <source>License fingerprint could not be updated</source>
-        <translation>Не удалось обновить отпечаток лицензии</translation>
+        <translation>Лицензия баспасын жаңарту мүмкін болмады</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>License was successfully loaded</source>
-        <translation>Лицензия успешно загружена</translation>
+        <translation>Лицензия сәтті жүктелді</translation>
     </message>
     <message>
         <location line="+87"/>
         <source>License key was changed. Checking license fingerprint</source>
-        <translation>Ключ лицензии изменён. Проверка отпечатка лицензии</translation>
+        <translation>Лицензия кілті өзгертілді. Лицензия баспасын тексеру</translation>
     </message>
 </context>
 <context>
@@ -12229,17 +12193,17 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtlicgql/CAccountControllerComp.cpp" line="+119"/>
         <source>Unable to get an account info!</source>
-        <translation></translation>
+        <translation>Тіркелгі ақпаратын алу мүмкін емес!</translation>
     </message>
     <message>
         <location line="+19"/>
         <source>Account name can&apos;t be empty</source>
-        <translation>Название аккаунта не можеь быть пустым</translation>
+        <translation>Тіркелгі атауы бос болуы мүмкін емес</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Account Name already exists</source>
-        <translation>Аккаунт с таким названием уже существует</translation>
+        <translation>Тіркелгі атауы бұрыннан бар</translation>
     </message>
 </context>
 <context>
@@ -12247,22 +12211,22 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtlicgql/CFeatureControllerComp.cpp" line="+33"/>
         <source>Internal error.</source>
-        <translation>Внутренняя ошибка.</translation>
+        <translation>Ішкі қате.</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Unable to create object. GQL input params is invalid.</source>
-        <translation>Не удалось создать объект. Параметры GQL недействительны.</translation>
+        <translation>Нысан жасау мүмкін емес. GQL кіріс параметрлері жарамсыз.</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Unable to create object from empty json.</source>
-        <translation>Не удалось создать объект из пустого JSON.</translation>
+        <translation>Бос JSON-нан нысан жасау мүмкін емес.</translation>
     </message>
     <message>
         <location line="+52"/>
         <source>Unable to get object. GQL input params is invalid.</source>
-        <translation>Не удалось получить объект. Параметры GQL недействительны.</translation>
+        <translation>Нысанды алу мүмкін емес. GQL кіріс параметрлері жарамсыз.</translation>
     </message>
 </context>
 <context>
@@ -12270,27 +12234,27 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtlicgql/CLicenseControllerComp.cpp" line="-136"/>
         <source>Internal error.</source>
-        <translation>Внутренняя ошибка.</translation>
+        <translation>Ішкі қате.</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Unable to create object. GQL input params is invalid.</source>
-        <translation>Не удалось создать объект. Параметры GQL недействительны.</translation>
+        <translation>Нысан жасау мүмкін емес. GQL кіріс параметрлері жарамсыз.</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Unable to create object from empty json.</source>
-        <translation>Не удалось создать объект из пустого JSON.</translation>
+        <translation>Бос JSON-нан нысан жасау мүмкін емес.</translation>
     </message>
     <message>
         <location line="+25"/>
         <source>Unable to create license with an empty License-ID.</source>
-        <translation>Не удалось создать лицензию с пустым ID лицензии.</translation>
+        <translation>Бос лицензия ID-мен лицензия жасау мүмкін емес.</translation>
     </message>
     <message>
         <location line="+98"/>
         <source>Unable to get object. GQL input params is invalid.</source>
-        <translation>Не удалось получить объект. Параметры GQL недействительны.</translation>
+        <translation>Нысанды алу мүмкін емес. GQL кіріс параметрлері жарамсыз.</translation>
     </message>
 </context>
 <context>
@@ -12298,12 +12262,12 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtlicgql/CProductCollectionControllerComp.cpp" line="+400"/>
         <source>Product Name cannot be empty</source>
-        <translation>Название продукта не может быть пустым</translation>
+        <translation>Өнім атауы бос болуы мүмкін емес</translation>
     </message>
     <message>
         <location line="+38"/>
         <source>Product Name is empty</source>
-        <translation>Название продукта пустое</translation>
+        <translation>Өнім атауы бос</translation>
     </message>
 </context>
 <context>
@@ -12311,22 +12275,22 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtlicgui/CFeatureCollectionViewDelegateComp.cpp" line="+48"/>
         <source>Wrong object type</source>
-        <translation>Неверный тип объекта</translation>
+        <translation>Қате нысан түрі</translation>
     </message>
     <message>
         <location line="+29"/>
         <source>Feature Name</source>
-        <translation>Название</translation>
+        <translation>Мүмкіндік атауы</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Feature-ID</source>
-        <translation>Идентификатор</translation>
+        <translation>Мүмкіндік ID</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation>Сипаттама</translation>
     </message>
 </context>
 <context>
@@ -12334,22 +12298,22 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtlicgui/CLicenseManagerViewDelegateComp.cpp" line="+42"/>
         <source>New License</source>
-        <translation>Новая лицензия</translation>
+        <translation>Жаңа лицензия</translation>
     </message>
     <message>
         <location line="+116"/>
         <source>License Name</source>
-        <translation>Название лицензии</translation>
+        <translation>Лицензия атауы</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>License-ID</source>
-        <translation>Идентификатор лицензии</translation>
+        <translation>Лицензия ID</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Description</source>
-        <translation>Описание</translation>
+        <translation>Сипаттама</translation>
     </message>
 </context>
 <context>
@@ -12364,7 +12328,7 @@ ID входных данных: </translation>
         <location line="+17"/>
         <location line="+182"/>
         <source>Unlimited</source>
-        <translation>Неограниченный</translation>
+        <translation>Шексіз</translation>
     </message>
 </context>
 <context>
@@ -12372,59 +12336,59 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtlicgui/CProductInstanceInfoViewComp.cpp" line="+157"/>
         <source>Unlimited</source>
-        <translation>Неограниченный</translation>
+        <translation>Шексіз</translation>
     </message>
     <message>
         <location line="+61"/>
         <source>All known file types (%1)</source>
-        <translation>Все известные типы файлов (%1)</translation>
+        <translation>Барлық белгілі файл түрлері (%1)</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>All file types (%1)</source>
-        <translation>Все типы файлов (%1)</translation>
+        <translation>Барлық файл түрлері (%1)</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Create Transaction Code</source>
-        <translation>Создать транзакционный код</translation>
+        <translation>Транзакция кодын жасау</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>License Request Manager</source>
-        <translation>Менеджер запросов лицензий</translation>
+        <translation>Лицензия сұрау менеджері</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>License request file could not be saved</source>
-        <translation>Не удалось сохранить файл запроса лицензии</translation>
+        <translation>Лицензия сұрау файлын сақтау мүмкін болмады</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Select license file to be imported</source>
-        <translation>Выберите файл лицензии для импорта</translation>
+        <translation>Импорттайтын лицензия файлын таңдаңыз</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>License files (*.lic)</source>
-        <translation>Файлы лицензий (*.lic)</translation>
+        <translation>Лицензия файлдары (*.lic)</translation>
     </message>
     <message>
         <location line="+4"/>
         <location line="+6"/>
         <location line="+3"/>
         <source>License Manager</source>
-        <translation>Менеджер лицензий</translation>
+        <translation>Лицензия менеджері</translation>
     </message>
     <message>
         <location line="-9"/>
         <source>License file successfully imported</source>
-        <translation>Файл лицензии успешно импортирован</translation>
+        <translation>Лицензия файлы сәтті импортталды</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>License could not be imported</source>
-        <translation>Не удалось импортировать лицензию</translation>
+        <translation>Лицензияны импорттау мүмкін болмады</translation>
     </message>
 </context>
 <context>
@@ -12434,22 +12398,22 @@ ID входных данных: </translation>
         <location line="+97"/>
         <location line="+0"/>
         <source>Create License File</source>
-        <translation>Создать файл лицензии</translation>
+        <translation>Лицензия файлын жасау</translation>
     </message>
     <message>
         <location line="-30"/>
         <source>Instance-ID</source>
-        <translation>ID экземпляра</translation>
+        <translation>Экземпляр ID</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Customer</source>
-        <translation>Клиент</translation>
+        <translation>Тұтынушы</translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Export existing product installation license to file</source>
-        <translation>Экспортировать существующую лицензию установки продукта в файл</translation>
+        <translation>Бар өнім орнату лицензиясын файлға экспорттау</translation>
     </message>
 </context>
 <context>
@@ -12457,17 +12421,17 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtlog/CEventHistoryControllerComp.cpp" line="+169"/>
         <source>Log folder not specified. Event history disabled</source>
-        <translation>Папка журнала не указана. История событий отключена</translation>
+        <translation>Журнал қалтасы көрсетілмеген. Оқиға тарихы өшірілген</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Unable access log folder. Event history disabled</source>
-        <translation>Нет доступа к папке журнала. История событий отключена</translation>
+        <translation>Журнал қалтасына қатынау мүмкін емес. Оқиға тарихы өшірілген</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Unavailable version info provider. Event history disabled</source>
-        <translation>Провайдер информации о версии недоступен. История событий отключена</translation>
+        <translation>Нұсқа ақпарат жеткізушісі қолжетімсіз. Оқиға тарихы өшірілген</translation>
     </message>
 </context>
 <context>
@@ -12475,7 +12439,7 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtlog/CMessagesController.cpp" line="+341"/>
         <source>Cannot create temporary folder. Event container skipped</source>
-        <translation>Не удалось создать временную папку. Контейнер событий пропущен</translation>
+        <translation>Уақытша қалтаны жасау мүмкін емес. Оқиға контейнері өткізілді</translation>
     </message>
 </context>
 <context>
@@ -12483,12 +12447,12 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtlog/CMessagesReader.cpp" line="+226"/>
         <source>No compressor component. Load history container failed</source>
-        <translation>Компонент сжатия отсутствует. Не удалось загрузить контейнер истории</translation>
+        <translation>Сығу компоненті жоқ. Тарих контейнерін жүктеу сәтсіз</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Cannot create temporary folder. Load history container failed</source>
-        <translation>Не удалось создать временную папку. Не удалось загрузить контейнер истории</translation>
+        <translation>Уақытша қалтаны жасау мүмкін емес. Тарих контейнерін жүктеу сәтсіз</translation>
     </message>
 </context>
 <context>
@@ -12501,7 +12465,7 @@ ID входных данных: </translation>
         <location line="+1"/>
         <location line="+1"/>
         <source>%1 Events</source>
-        <translation>%1 событий</translation>
+        <translation>%1 оқиға</translation>
     </message>
 </context>
 <context>
@@ -12509,95 +12473,95 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtloggui/CEventViewComp.cpp" line="+328"/>
         <source>First event</source>
-        <translation>Первое событие</translation>
+        <translation>Бірінші оқиға</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>First</source>
-        <translation>Первый</translation>
+        <translation>Бірінші</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Move to first event</source>
-        <translation>Перейти к первому событию</translation>
+        <translation>Бірінші оқиғаға өту</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Previous event</source>
-        <translation>Предыдущее событие</translation>
+        <translation>Алдыңғы оқиға</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Previous</source>
-        <translation>Предыдущий</translation>
+        <translation>Алдыңғы</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Move to previous event</source>
-        <translation>Перейти к предыдущему событию</translation>
+        <translation>Алдыңғы оқиғаға өту</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Next event</source>
-        <translation>Следующее событие</translation>
+        <translation>Келесі оқиға</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Next</source>
-        <translation>Следующий</translation>
+        <translation>Келесі</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Move to next event</source>
-        <translation>Перейти к следующему событию</translation>
+        <translation>Келесі оқиғаға өту</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Last event</source>
-        <translation>Последнее событие</translation>
+        <translation>Соңғы оқиға</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Last</source>
-        <translation>Последний</translation>
+        <translation>Соңғы</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Move to last event</source>
-        <translation>Перейти к последнему событию</translation>
+        <translation>Соңғы оқиғаға өту</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <source>Zoom in</source>
-        <translation>Увеличить</translation>
+        <translation>Үлкейту</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>ZoomIn</source>
-        <translation type="unfinished"></translation>
+        <translation>Үлкейту</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <source>Zoom out</source>
-        <translation>Уменьшить</translation>
+        <translation>Кішірейту</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>ZoomOut</source>
-        <translation type="unfinished"></translation>
+        <translation>Кішірейту</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+0"/>
         <source>Zoom reset</source>
-        <translation>Сбросить масштаб</translation>
+        <translation>Масштабты қалпына келтіру</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>ZoomReset</source>
-        <translation type="unfinished"></translation>
+        <translation>Масштаб қалпына келтіру</translation>
     </message>
 </context>
 <context>
@@ -12605,12 +12569,12 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtqml/CDocumentServiceController.cpp" line="+370"/>
         <source>&lt;no name&gt;</source>
-        <translation>&lt;без имени&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+301"/>
         <source>Save document failed</source>
-        <translation>Не удалось сохранить документ</translation>
+        <translation>Құжатты сақтау сәтсіз</translation>
     </message>
 </context>
 <context>
@@ -12618,12 +12582,12 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtrepo/CFileCollectionComp.cpp" line="+704"/>
         <source>File could not be inserted into the repository</source>
-        <translation>Не удалось добавить файл в репозиторий</translation>
+        <translation>Файлды репозиторийге қосу мүмкін болмады</translation>
     </message>
     <message>
         <location line="+326"/>
         <source>Revision number updated to %1</source>
-        <translation>Номер ревизии обновлён до %1</translation>
+        <translation>Нұсқа нөмірі %1-ге жаңартылды</translation>
     </message>
 </context>
 <context>
@@ -12631,13 +12595,13 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtrepo/CFileCollectionCompBase.cpp" line="+260"/>
         <source>File could not be inserted into the repository</source>
-        <translation>Не удалось добавить файл в репозиторий</translation>
+        <translation>Файлды репозиторийге қосу мүмкін болмады</translation>
     </message>
     <message>
         <location line="+191"/>
         <location line="+145"/>
         <source>Temp folder could not be created</source>
-        <translation>Не удалось создать временную папку</translation>
+        <translation>Уақытша қалтаны жасау мүмкін болмады</translation>
     </message>
 </context>
 <context>
@@ -12647,12 +12611,12 @@ ID входных данных: </translation>
         <location line="+5"/>
         <location line="+4"/>
         <source>Report document</source>
-        <translation>Документ отчёта</translation>
+        <translation>Есеп құжаты</translation>
     </message>
     <message>
         <location line="+49"/>
         <source>Export to PDF...</source>
-        <translation>Экспортировать в PDF...</translation>
+        <translation>PDF-ке экспорттау...</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -12662,12 +12626,12 @@ ID входных данных: </translation>
     <message>
         <location line="+0"/>
         <source>Export current report to PDF file</source>
-        <translation>Экспортировать текущий отчёт в файл PDF</translation>
+        <translation>Ағымдағы есепті PDF файлына экспорттау</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Export to TIFF...</source>
-        <translation>Экспортировать в TIFF...</translation>
+        <translation>TIFF-ке экспорттау...</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -12677,22 +12641,22 @@ ID входных данных: </translation>
     <message>
         <location line="+0"/>
         <source>Export current report to TIFF file</source>
-        <translation>Экспортировать текущий отчёт в файл TIFF</translation>
+        <translation>Ағымдағы есепті TIFF файлына экспорттау</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Show/Hide Grid</source>
-        <translation>Показать/скрыть сетку</translation>
+        <translation>Торды көрсету/жасыру</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Grid</source>
-        <translation>Сетка</translation>
+        <translation>Тор</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Set grid visible/unvisible</source>
-        <translation>Показать/скрыть сетку</translation>
+        <translation>Тордың көрінуін орнату</translation>
     </message>
 </context>
 <context>
@@ -12700,7 +12664,7 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtservergql/CGqlSearchControllerComp.cpp" line="+62"/>
         <source>Unnamed result</source>
-        <translation>Безымянный результат</translation>
+        <translation>Атаусыз нәтиже</translation>
     </message>
 </context>
 <context>
@@ -12708,13 +12672,13 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtservergql/CLegacyObjectCollectionControllerCompBase.cpp" line="+338"/>
         <source>Internal error</source>
-        <translation>Внутренняя ошибка</translation>
+        <translation>Ішкі қате</translation>
     </message>
     <message>
         <location line="+670"/>
         <location line="+120"/>
         <source>Unable to import the object. GQL input params is invalid.</source>
-        <translation>Не удалось импортировать объект. Параметры GQL недействительны.</translation>
+        <translation>Нысанды импорттау мүмкін емес. GQL кіріс параметрлері жарамсыз.</translation>
     </message>
 </context>
 <context>
@@ -12722,14 +12686,14 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtservergql/CObjectCollectionControllerCompBase.cpp" line="+1818"/>
         <source>Internal error</source>
-        <translation>Внутренняя ошибка</translation>
+        <translation>Ішкі қате</translation>
     </message>
     <message>
         <location line="+465"/>
         <location line="+25"/>
         <location line="+123"/>
         <source>Unable to import the object. GQL input params is invalid.</source>
-        <translation>Не удалось импортировать объект. Параметры GQL недействительны.</translation>
+        <translation>Нысанды импорттау мүмкін емес. GQL кіріс параметрлері жарамсыз.</translation>
     </message>
 </context>
 <context>
@@ -12737,7 +12701,7 @@ ID входных данных: </translation>
     <message>
         <location filename="../../../Include/imtservergql/CStructureControllerCompBase.cpp" line="+300"/>
         <source>Internal error</source>
-        <translation>Внутренняя ошибка</translation>
+        <translation>Ішкі қате</translation>
     </message>
 </context>
 </TS>

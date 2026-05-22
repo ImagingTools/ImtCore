@@ -34,8 +34,8 @@ StyleComponents {
 	//Font properties
 	property string mainFontSource: "../../../Fonts/Ubuntu-Light.ttf";
 	property string boldFontSource: "../../../Fonts/Ubuntu-Medium.ttf";
-	property string fontFamily: mainFont.name !== "" ? mainFont.name : "Verdana";
-	property string fontFamilyBold: boldFont.name !== "" ? boldFont.name : "Verdana";
+	property string fontFamily: "Verdana";
+	property string fontFamilyBold: "Verdana";
 
 	property alias mainFontLoader: mainFont;
 	property alias boldFontLoader: boldFont;
