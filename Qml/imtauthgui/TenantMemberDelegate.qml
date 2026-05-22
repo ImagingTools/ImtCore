@@ -279,7 +279,7 @@ Rectangle {
 						if (row.canManageMembers && !row.isCurrentUser) {
 							if (!row.isMemberOwner && !row.isMemberCreator) {
 								menuItems.push({ text: qsTr("Change Environment Role"), action: "changeRole" })
-								menuItems.push({ text: qsTr("Remove Member"), action: "remove" })
+								menuItems.push({ text: qsTr("Exclude from Tenant"), action: "remove" })
 							}
 							if (row.isOwner && !row.isMemberOwner && !row.isMemberCreator) {
 								menuItems.push({ text: qsTr("Transfer Ownership"), action: "transfer" })

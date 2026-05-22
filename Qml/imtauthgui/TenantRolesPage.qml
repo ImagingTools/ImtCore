@@ -503,6 +503,7 @@ ViewBase {
 				RoleView {
 					id: createRoleView
 					commandsPanelVisible: false
+					productId: rolesPage.apiClient ? rolesPage.apiClient.productId : ""
 					
 					Component.onCompleted: {
 						createRoleView.model = rolesPage.roleDataFactory ? rolesPage.roleDataFactory() : null
@@ -527,6 +528,7 @@ ViewBase {
 				RoleView {
 					id: editRoleView
 					commandsPanelVisible: false
+					productId: rolesPage.apiClient ? rolesPage.apiClient.productId : ""
 					
 					Component.onCompleted: {
 						var roleData = rolesPage.roleDataFactory ? rolesPage.roleDataFactory() : null

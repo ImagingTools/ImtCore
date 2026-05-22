@@ -496,6 +496,7 @@ ViewBase {
 				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
 				commandsPanelVisible: false
+				productId: groupsPage.apiClient ? groupsPage.apiClient.productId : ""
 				
 				Component.onCompleted: {
 					createGroupView.model = groupsPage.groupDataFactory ? groupsPage.groupDataFactory() : null
@@ -517,6 +518,7 @@ ViewBase {
 				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
 				commandsPanelVisible: false
+				productId: groupsPage.apiClient ? groupsPage.apiClient.productId : ""
 				
 				Component.onCompleted: {
 					var groupData = groupsPage.groupDataFactory ? groupsPage.groupDataFactory() : null

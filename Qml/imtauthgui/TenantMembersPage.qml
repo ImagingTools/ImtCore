@@ -95,7 +95,7 @@ ViewBase {
 		spacing: Style.marginL
 		
 		Text {
-			text: qsTr("Remove")
+			text: qsTr("Exclude")
 			font.pixelSize: Style.fontSizeM
 			font.bold: true
 			color: membersPage.__selectionManager && membersPage.__selectionManager.selectedIds.length > 0 ? Style.errorColor : Style.inactiveTextColor
@@ -109,8 +109,8 @@ ViewBase {
 				onClicked: {
 					var count = membersPage.__selectionManager.selectedIds.length
 					ModalDialogManager.showConfirmationDialog(
-								qsTr("Remove Members"),
-								qsTr("Are you sure you want to remove %1 selected member(s)?").arg(count),
+								qsTr("Exclude Members"),
+								qsTr("Are you sure you want to exclude %1 selected member(s) from this tenant?").arg(count),
 								function(result) {
 									if (result === Enums.yes && membersPage.apiClient) {
 										var ids = membersPage.__selectionManager.selectedIds.slice()
@@ -501,8 +501,8 @@ ViewBase {
 								var action = modelData.action
 								if (action === "remove" && membersPage.apiClient) {
 									ModalDialogManager.showConfirmationDialog(
-												qsTr("Remove Member"),
-												qsTr("Are you sure you want to remove \"%1\"?").arg(memberActionMenu.targetUserName),
+												qsTr("Exclude Member"),
+												qsTr("Are you sure you want to exclude \"%1\" from this tenant?").arg(memberActionMenu.targetUserName),
 												function(result) {
 													if (result === Enums.yes) {
 														var tenantId = membersPage.tenantData ? membersPage.tenantData.m_id : ""
@@ -645,6 +645,7 @@ ViewBase {
 				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
 				commandsPanelVisible: false
+				productId: membersPage.apiClient ? membersPage.apiClient.productId : ""
 				
 				Component.onCompleted: {
 					membersPage.__isCreatingUser = true
@@ -667,6 +668,7 @@ ViewBase {
 				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
 				commandsPanelVisible: false
+				productId: membersPage.apiClient ? membersPage.apiClient.productId : ""
 				
 				Component.onCompleted: {
 					var userData = membersPage.userDataFactory ? membersPage.userDataFactory() : null
