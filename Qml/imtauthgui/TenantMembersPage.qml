@@ -508,7 +508,6 @@ ViewBase {
 					Menu {
 						id: changeRoleSubmenu
 						title: qsTr("Change Environment Role")
-						enabled: memberActionMenu.showChangeRole
 						visible: memberActionMenu.showChangeRole
 						height: visible ? implicitHeight : 0
 						

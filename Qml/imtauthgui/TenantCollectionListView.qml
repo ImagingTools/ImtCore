@@ -56,14 +56,15 @@ Item {
 		}
 	}
 
-	onCollectionIdChanged: {
+	function __updateSubscription() {
 		if (root.collectionId !== "")
 			subscriptionClient.gqlCommandId = "On" + root.collectionId + "CollectionChanged"
 	}
 
+	onCollectionIdChanged: __updateSubscription()
+
 	Component.onCompleted: {
-		if (root.collectionId !== "")
-			subscriptionClient.gqlCommandId = "On" + root.collectionId + "CollectionChanged"
+		__updateSubscription()
 		dataProvider.fetch("")
 	}
 
