@@ -501,6 +501,14 @@ RemoteCollectionView {
 				addDocumentView("Tenant", "TenantEditor", tenantEditorComp, tenantDataControllerFactory)
 			}
 
+			function updateStateCustomCommands(selection, commandsController, elementsModel){
+				let isEnabled = selection.length === 1;
+				if(commandsController){
+					commandsController.setCommandIsEnabled("Switch", isEnabled);
+					commandsController.setCommandIsEnabled("Leave", isEnabled);
+				}
+			}
+
 			Component {
 				id: tenantEditorComp
 

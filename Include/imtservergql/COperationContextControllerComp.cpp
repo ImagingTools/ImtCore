@@ -58,7 +58,7 @@ imtbase::IOperationContext* COperationContextControllerComp::CreateOperationCont
 
 	operationContextPtr->SetOperationOwnerId(objectInfo);
 
-	QByteArray tenantId = operationContextPtr->GetTenantId();
+	QByteArray tenantId = requestContextPtr->GetTenantId();
 	operationContextPtr->SetTenantId(tenantId);
 
 	if (m_documentChangeGeneratorCompPtr.IsValid()){
