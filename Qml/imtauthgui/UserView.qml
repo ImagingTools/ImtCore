@@ -12,6 +12,7 @@ ViewBase {
 	id: container;
 	
 	anchors.fill: parent;
+	contentColor: Style.baseColor
 
 	property UserData userData: model;
 	property string productId;
@@ -114,23 +115,6 @@ ViewBase {
 			}
 		}
 	}
-
-	function openContextTicketsDialog(){
-		if (!container.hasValidUserId){
-			return
-		}
-
-		ModalDialogManager.openDialog(contextTicketsDialogComp, {
-											entityType: "Users",
-											entityId: container.userData.m_id,
-											entityDisplayName: container.contextEntityDisplayName
-										})
-	}
-
-	Component {
-		id: contextTicketsDialogComp
-		EntityContextTicketsDialog {}
-	}
 	
 	DocumentHistoryPanel {
 		id: historyPanel;
@@ -206,21 +190,6 @@ ViewBase {
 				title: qsTr("General");
 			}
 
-			Row {
-				width: parent.width
-				spacing: Style.marginS
-
-				Button {
-					width: Style.buttonWidthXL
-					height: Style.controlHeightM
-					text: qsTr("Related tickets")
-					enabled: container.hasValidUserId
-					onClicked: {
-						container.openContextTicketsDialog()
-					}
-				}
-			}
-			
 			UserGeneralEditor {
 				id: userGeneralEditor;
 				width: parent.width;

@@ -46,8 +46,6 @@ public:
 	I_BEGIN_COMPONENT(CTicketAssigneeNotifierComp);
 		I_ASSIGN(m_ticketCollectionCompPtr, "TicketCollection", "Ticket collection to observe for assignee changes", true, "TicketCollection");
 		I_ASSIGN_TO(m_ticketCollectionModelCompPtr, m_ticketCollectionCompPtr, true);
-		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection (to resolve display names)", false, "UserCollection");
-		I_ASSIGN(m_userGroupInfoProviderCompPtr, "UserGroupInfoProvider", "User group info provider (used by permission helpers)", false, "UserGroupInfoProvider");
 		I_ASSIGN(m_commandIdAttrPtr, "CommandId", "Subscription command-ID this notifier responds to", false, "OnTicketAssigneeChanged");
 	I_END_COMPONENT;
 
@@ -65,8 +63,6 @@ protected:
 protected:
 	I_REF(imtbase::IObjectCollection, m_ticketCollectionCompPtr);
 	I_REF(imod::IModel, m_ticketCollectionModelCompPtr);
-	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
-	I_REF(imtauth::IUserGroupInfoProvider, m_userGroupInfoProviderCompPtr);
 	I_ATTR(QByteArray, m_commandIdAttrPtr);
 
 private:

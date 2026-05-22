@@ -1,12 +1,12 @@
 module imtdocgui
 
-singleton MainDocumentManager 1.0 MainDocumentManager.qml
+singleton MainDocumentService 1.0 MainDocumentService.qml
 DocumentWorkspaceCommandsDelegate 1.0 DocumentWorkspaceCommandsDelegate.qml
 MultiDocWorkspacePageView 1.0 MultiDocWorkspacePageView.qml
 MultiDocWorkspaceView 1.0 MultiDocWorkspaceView.qml
 SingleDocumentWorkspaceView 1.0 SingleDocumentWorkspaceView.qml
 UndoRedoManager 1.0 UndoRedoManager.qml
-DocumentManager 1.0 DocumentManager.qml
+DocumentService 1.0 DocumentService.qml
 DocumentHistoryDialog 1.0 DocumentHistoryDialog.qml
 DocumentHistoryView 1.0 DocumentHistoryView.qml
 DocumentDataController 1.0 DocumentDataController.qml
@@ -19,8 +19,9 @@ DocumentHistoryPanel 1.0 DocumentHistoryPanel.qml
 DocumentView 1.0 DocumentView.qml
 DocumentViewBase 1.0 DocumentViewBase.qml
 CommandsProvider 1.0 CommandsProvider.qml
-DocumentManagerBase 1.0 DocumentManagerBase.qml
+DocumentServiceBase 1.0 DocumentServiceBase.qml
 MultiDocumentCollectionView 1.0 MultiDocumentCollectionView.qml
+SingleDocumentCollectionView 1.0 SingleDocumentCollectionView.qml
 DocumentDecorator 1.0 DocumentDecorator.qml
 DocCollectionViewDelegate 1.0 DocCollectionViewDelegate.qml
 DocumentRepresentationController 1.0 DocumentRepresentationController.qml

@@ -24,7 +24,8 @@ public:
 	enum MetaInfoTypes
 	{
 		MIT_TOKEN = idoc::IDocumentMetaInfo::MIT_USER + 1,
-		MIT_USER_ID
+		MIT_USER_ID,
+		MIT_TENANT_ID
 	};
 
 	/**
@@ -46,6 +47,16 @@ public:
 		Set user info of the session.
 	*/
 	virtual void SetUserId(const QByteArray& userId) = 0;
+
+	/**
+		Get tenant-ID of the session.
+	*/
+	virtual QByteArray GetTenantId() const = 0;
+
+	/**
+		Set tenant-ID of the session.
+	*/
+	virtual void SetTenantId(const QByteArray& tenantId) = 0;
 
 	/**
 		Get session creation date.

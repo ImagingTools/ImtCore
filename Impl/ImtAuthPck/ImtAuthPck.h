@@ -50,6 +50,14 @@
 #include <imtauth/CPersonalAccessTokenManagerComp.h>
 #include <imtauth/CPersonalAccessTokenMetaInfoCreatorComp.h>
 #include <imtauth/CUserRecentActionComp.h>
+#include <imtauth/CTenantInfoComp.h>
+#include <imtauth/CTenantMetaInfoCreatorComp.h>
+#include <imtauth/CTenantManagerComp.h>
+#include <imtauth/CTenantMembershipComp.h>
+#include <imtauth/CTenantMembershipManagerComp.h>
+#include <imtauth/CTenantInvitationComp.h>
+#include <imtauth/CTenantInvitationManagerComp.h>
+#include <imtauth/CTenantDocumentNameProviderComp.h>
 
 
 namespace ImtAuthPck
@@ -139,8 +147,15 @@ typedef icomp::TModelCompWrap<
 typedef imtauth::CPersonalAccessTokenManagerComp PersonalAccessTokenManager;
 typedef imtauth::CPersonalAccessTokenMetaInfoCreatorComp PersonalAccessTokenMetaInfoCreator;
 typedef icomp::TModelCompWrap<imtauth::CUserRecentActionComp> UserRecentAction;
+typedef icomp::TModelCompWrap<imtauth::CTenantInfoComp> TenantInfo;
+typedef imtauth::CTenantMetaInfoCreatorComp TenantMetaInfoCreator;
+typedef imtauth::CTenantManagerComp TenantManager;
+typedef icomp::TModelCompWrap<imtauth::CTenantMembershipComp> TenantMembershipInfo;
+typedef icomp::TModelCompWrap<imtauth::CTenantMembershipManagerComp> TenantMembershipManager;
+typedef icomp::TModelCompWrap<imtauth::CTenantInvitationComp> TenantInvitationInfo;
+typedef icomp::TModelCompWrap<imtauth::CTenantInvitationManagerComp> TenantInvitationManager;
+typedef imtauth::CTenantDocumentNameProviderComp TenantDocumentNameProvider;
 
 
 } // namespace ImtAuthPck
-
 

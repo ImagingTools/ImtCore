@@ -33,10 +33,11 @@ public:
 protected:
 	// reimplemented (imt3dgui::CShape3dBase)
 	virtual void UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet) override;
-	virtual void DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctions& functions) override;
+	virtual imt3dview::PrimitiveType GetPrimitiveType() const override;
+	virtual void FillMaterial(imt3dview::Material& material) const override;
 
 	// reimplemented (imt3dview::IDrawable)
-	virtual void Draw(QPainter& painter) override;
+	virtual void DrawOverlay(QPainter& painter) override;
 
 	// reimplemented (imt3dgui::IShape3d)
 	virtual QVector3D GetColor() const override;

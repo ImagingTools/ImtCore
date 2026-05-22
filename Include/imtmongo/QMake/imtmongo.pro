@@ -1,4 +1,4 @@
-TARGET = imtdb
+TARGET = imtmongo
 
 QT += sql
 

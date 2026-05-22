@@ -8,6 +8,8 @@
 
 // ImtCore includes
 #include <imtclientgql/CApiClientComp.h>
+#include <imtclientgql/CAsyncApiClientComp.h>
+#include <imtclientgql/CGqlClientSyncAdapterComp.h>
 #include <imtclientgql/CGqlClientEngineComp.h>
 #include <imtclientgql/CGqlObjectCollectionComp.h>
 #include <imtclientgql/CGqlObjectCollectionDelegateComp.h>
@@ -22,7 +24,9 @@
 #include <imtclientgql/CRemoteDocumentRevisionControllerComp.h>
 #include <imtclientgql/CRemoteObjectCollectionControllerComp.h>
 #include <imtclientgql/CObjectCollectionSubscriberComp.h>
+#include <imtclientgql/CRemoteCollectionDocumentServiceControllerComp.h>
 #include <imtclientgql/CRemoteCommandsControllerComp.h>
+#include <imtclientgql/CRemoteFilterableSelectControllerComp.h>
 
 
 /**
@@ -33,6 +37,8 @@ namespace ImtClientGqlPck
 
 
 typedef imtclientgql::CApiClientComp ApiClient;
+typedef imtclientgql::CAsyncApiClientComp AsyncApiClient;
+typedef imtclientgql::CGqlClientSyncAdapterComp GqlClientSyncAdapter;
 typedef imtclientgql::CGqlClientEngineComp GraphQLClientEngine;
 typedef imtclientgql::CGqlObjectCollectionDelegateComp GqlObjectCollectionDelegate;
 typedef icomp::TModelCompWrap<imtclientgql::CGqlObjectCollectionComp> GqlObjectCollection;
@@ -45,10 +51,11 @@ typedef imtclientgql::CGqlHierarchicalStructureDelegateComp GqlHierarchicalStruc
 typedef icomp::TModelCompWrap<imtclientgql::CConnectionStatusSubscriberComp> ConnectionStatusSubscriber;
 typedef imtclientgql::CRemoteDocumentRevisionControllerComp RemoteDocumentRevisionController;
 typedef imtclientgql::CRemoteObjectCollectionControllerComp RemoteObjectCollectionController;
+typedef imtclientgql::CRemoteCollectionDocumentServiceControllerComp RemoteCollectionDocumentServiceController;
 typedef imtclientgql::CObjectCollectionSubscriberComp ObjectCollectionSubscriber;
 typedef imtclientgql::CRemoteCommandsControllerComp RemoteCommandsController;
+typedef imtclientgql::CRemoteFilterableSelectControllerComp RemoteFilterableSelectController;
 
 
 } // namespace ImtClientGqlPck
-
 

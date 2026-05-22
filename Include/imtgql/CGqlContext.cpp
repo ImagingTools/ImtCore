@@ -121,6 +121,22 @@ void CGqlContext::SetUserId(const QByteArray& userId)
 }
 
 
+QByteArray CGqlContext::GetTenantId() const
+{
+	return m_tenantId;
+}
+
+
+void CGqlContext::SetTenantId(const QByteArray& tenantId)
+{
+	if (m_tenantId != tenantId){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_tenantId = tenantId;
+	}
+}
+
+
 const imtauth::IUserInfo* CGqlContext::GetUserInfo() const
 {
 	return m_userInfoPtr.GetPtr();
@@ -197,6 +213,11 @@ bool CGqlContext::Serialize(iser::IArchive &archive)
 	retVal = retVal && archive.Process(m_userId);
 	retVal = retVal && archive.EndTag(userIdTag);
 
+	iser::CArchiveTag tenantIdTag("TenantId", "Tenant-ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(tenantIdTag);
+	retVal = retVal && archive.Process(m_tenantId);
+	retVal = retVal && archive.EndTag(tenantIdTag);
+
 	if (m_userInfoPtr.IsValid()){
 		iser::CArchiveTag contactTag("UserInfo", "User info", iser::CArchiveTag::TT_GROUP);
 		retVal = retVal && archive.BeginTag(contactTag);
@@ -227,6 +248,7 @@ bool CGqlContext::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/
 		m_token = sourcePtr->m_token;
 		m_scopes = sourcePtr->m_scopes;
 		m_userId = sourcePtr->m_userId;
+		m_tenantId = sourcePtr->m_tenantId;
 		m_productId = sourcePtr->m_productId;
 		m_headers = sourcePtr->m_headers;
 
@@ -260,6 +282,7 @@ bool CGqlContext::ResetData(CompatibilityMode /*mode*/)
 	m_token.clear();
 	m_scopes.clear();
 	m_userId.clear();
+	m_tenantId.clear();
 	m_headers.clear();
 	m_userInfoPtr.Reset();
 

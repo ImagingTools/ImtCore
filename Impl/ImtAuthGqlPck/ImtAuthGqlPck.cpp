@@ -200,6 +200,62 @@ I_EXPORT_COMPONENT(
 			"Client request personal access token manager",
 			"Client Request Personal Access Token Manager");
 
+I_EXPORT_COMPONENT(
+			TenantCollectionController,
+			"Tenant collection controller",
+			"Tenant Collection Controller");
+
+I_EXPORT_COMPONENT(
+			TenantMetaInfoDelegate,
+			"Tenant meta info delegate",
+			"Tenant Meta Info Delegate");
+
+I_EXPORT_COMPONENT(
+			TenantCollectionDocumentService,
+			"Tenant collection document manager",
+			"Tenant Collection Document Manager");
+
+I_EXPORT_COMPONENT(
+			RemoteTenantController,
+			"Remote tenant controller",
+			"Remote Tenant Controller");
+
+I_EXPORT_COMPONENT(
+			RemoteTenantMembershipManagerController,
+			"Remote tenant membership manager controller",
+			"Remote Tenant Membership Manager Controller");
+
+I_EXPORT_COMPONENT(
+			RemoteProfileController,
+			"Remote profile controller",
+			"Remote Profile Controller");
+
+I_EXPORT_COMPONENT(
+			JwtSessionControllerProxy,
+			"JWT session controller proxy",
+			"JWT Session Controller Proxy");
+
+I_EXPORT_COMPONENT(
+			TenantManagerController,
+			"Tenant manager controller",
+			"Tenant Manager Controller");
+
+
+I_EXPORT_COMPONENT(
+			TenantMembershipManagerController,
+			"GraphQL handler for tenant membership queries and mutations",
+			"Tenant Membership Manager Controller");
+
+I_EXPORT_COMPONENT(
+			TenantMembershipPublisher,
+			"Publisher for tenant membership invitation/response notifications via WebSocket",
+			"Tenant Membership Publisher");
+
+I_EXPORT_COMPONENT(
+			RemoteTenantCollectionDocumentService,
+			"Remote tenant collection document service with product permissions enrichment",
+			"Remote Tenant Collection Document Service");
+
 
 } // namespace ImtAuthGqlPck
 

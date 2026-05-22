@@ -1,60 +1,36 @@
-TARGET = EagleView
+project(EagleView LANGUAGES CXX)
 
-include($(ACFDIR)/Config/QMake/ApplicationConfig.pri)
-include($(ACFDIR)/Config/QMake/QtBaseConfig.pri)
-include($$PWD/../../../Config/QMake/ImtCore.pri)
+set(ARXC_CONFIG "${PROJECT_SOURCE_DIR}/../../../Config/ImtCore.awc")
+set(ARXC_FILES "${PROJECT_SOURCE_DIR}/../EagleView.acc")
+set(ARXC_OUTDIR "${AUX_INCLUDE_DIR}")
 
-INCLUDEPATH += $(IMTCOREDIR)/Include
-INCLUDEPATH += $(IMTCOREDIR)/Impl
-INCLUDEPATH +=  $$AUXINCLUDEDIR
+if(WIN32)
+	set(ACF_CONVERT_FILES "${PROJECT_SOURCE_DIR}/../VC/EagleView.rc.xtracf")
+	set(ACF_CONVERT_REGISTRY "${PROJECT_SOURCE_DIR}/../VC/FileSubstitCopyApp.acc")
+	set(ACF_CONVERT_CONFIG "${PROJECT_SOURCE_DIR}/../../../Config/BaseOnly.awc")
+endif()
 
-RESOURCES += $$_PRO_FILE_PWD_/../*.qrc
+include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
+include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
+include(${ACFDIR}/Config/CMake/AcfQt.cmake)
+include(${ACFDIR}/Config/CMake/AcfStd.cmake)
+include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
+include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
+include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
-LIBS += -L../../../Lib/$$COMPILER_DIR -limeas -liproc -liqtmeas -lAcfSlnLoc -lAcfLoc
-LIBS += -L../../../Lib/$$COMPILER_DIR -limtgui -limt3d -limt3dview -limt3dgui
+target_link_libraries(${PROJECT_NAME} imtbase imtdesign imtgui imtstyle imt3d imt3dview imt3dgui)
+target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Xml)
 
-HEADERS =
+if(QT_VERSION_MAJOR GREATER 4)
+	target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::PrintSupport)
+endif()
 
-QT += xml
+if(QT_VERSION_MAJOR GREATER 5)
+	target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::OpenGLWidgets)
+endif()
 
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += printsupport
-
-# Set OS-specific build options:
-win32-msvc*{
-	QMAKE_CXXFLAGS += /wd4264
-
-	# copying all Qt DLLs to destination directory
-	greaterThan(QT_MAJOR_VERSION, 4): QMAKE_POST_LINK = set path=$(QTDIR)\bin;%path% && $(QTDIR)\bin\windeployqt $$DESTDIR
-}
-
-!macx-ios*{
-	mac{
-	#	ICON += $$PWD/../Mac/EagleView.icns
-	#	QMAKE_INFO_PLIST = $$PWD/../Mac/Info.plist
-	}
-}
-
-# Set configuration of custom builds:
-# ARX Compiler:
-ARXC_CONFIG = $$PWD/../../../Config/ImtCore.awc
-ARXC_FILES += $$PWD/../EagleView.acc
-ARXC_OUTDIR = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET
-
-# Conversion of resource templates:
-win*{
-	# File transformation
-	ACF_CONVERT_FILES = $$PWD/../VC/EagleView.rc.xtracf
-	ACF_CONVERT_OUTDIR = $$AUXINCLUDEPATH/GeneratedFiles/$$TARGET
-	ACF_CONVERT_REGISTRY =  $$PWD/../VC/FileSubstitCopyApp.acc
-	ACF_CONVERT_CONFIG = $$PWD/../../../Config/BaseOnly.awc
-
-	#RC_FILE = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET/EagleView.rc
-	#RC_INCLUDEPATH = $$_PRO_FILE_PWD_
-}
-
-include($(ACFDIR)/Config/QMake/AcfQt.pri)
-include($(ACFDIR)/Config/QMake/AcfStd.pri)
-include($(ACFDIR)/Config/QMake/CustomBuild.pri)
-
+if(WIN32)
+	set(listFiles \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
+	windeploy(${PROJECT_NAME} "" "${listFiles}")
+endif()
 

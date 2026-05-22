@@ -13,8 +13,10 @@ ViewBase {
 	id: container;
 	
 	anchors.fill: parent;
+	contentColor: Style.baseColor
 	
 	property TreeItemModel permissionsModel: TreeItemModel {};
+	onPermissionsModelChanged: permissionsGroup.buildPermissionsModel()
 	
 	property string productId: "";
 	
@@ -220,6 +222,32 @@ ViewBase {
 						permissionsGroup.treeView.tristate = true;
 					}
 					
+					function buildPermissionsModel() {
+						if (!container.permissionsModel)
+							return;
+						
+						var nodes = TreeModelBuilder.fromTreeItemModel(
+							container.permissionsModel,
+							function(wrapper, index) {
+								return {
+									key: wrapper.data("FeatureId", ""),
+									text: wrapper.data("FeatureName", ""),
+									checkable: true,
+									expanded: true,
+									data: {
+										FeatureId: wrapper.data("FeatureId", ""),
+										FeatureName: wrapper.data("FeatureName", "")
+									}
+								};
+							},
+							function(wrapper, index) {
+								return wrapper.childModel("ChildModel");
+							}
+						);
+						
+						permissionsGroup.treeView.model = nodes;
+					}
+					
 					function updateGui(){
 						let selectedPermissionsIds = [];
 						let selectedPermissions = container.roleData.m_permissions;
@@ -231,32 +259,31 @@ ViewBase {
 						
 						permissionsGroup.treeView.uncheckAll();
 						
-						let itemsList = permissionsGroup.treeView.getItemsDataAsList();
-						for (let i = 0; i < itemsList.length; i++){
-							let delegateItem = itemsList[i];
-							if (!delegateItem.hasChild){
-								let itemData = delegateItem.getItemData();
-								let id = itemData.FeatureId;
+						let allNodesList = permissionsGroup.treeView.allNodes();
+						for (let i = 0; i < allNodesList.length; i++){
+							let nodeIdx = allNodesList[i];
+							let nodeChildren = nodeIdx.item && nodeIdx.item.children ? nodeIdx.item.children : [];
+							if (nodeChildren.length === 0){
+								let nodeData = nodeIdx.data || {};
+								let id = nodeData.FeatureId;
 								
 								if (selectedPermissionsIds.includes(id)){
-									delegateItem.isOpened = true;
-									permissionsGroup.treeView.checkItem(delegateItem);
-								}
-								else{
-									delegateItem.isOpened = false;
+									permissionsGroup.treeView.checkItem(nodeIdx.key);
 								}
 							}
 						}
 					}
 					
 					function updateModel(){
-						let selectedPermissionIds = []
-						let itemsList = permissionsGroup.treeView.getCheckedItems();
-						for (let delegate of itemsList){
-							if (!delegate.hasChild){
-								let itemData = delegate.getItemData();
-								let id = itemData.FeatureId;
-								selectedPermissionIds.push(id)
+						let selectedPermissionIds = [];
+						let checkedNodes = permissionsGroup.treeView.getCheckedNodes();
+						for (let j = 0; j < checkedNodes.length; j++){
+							let nodeIdx = checkedNodes[j];
+							let nodeChildren = nodeIdx.item && nodeIdx.item.children ? nodeIdx.item.children : [];
+							if (nodeChildren.length === 0){
+								let nodeData = nodeIdx.data || {};
+								let id = nodeData.FeatureId;
+								selectedPermissionIds.push(id);
 							}
 						}
 						
@@ -270,27 +297,6 @@ ViewBase {
 						
 						function onCheckedItemsChanged(){
 							container.doUpdateModel();
-						}
-					}
-					
-					TreeItemModel {
-						id: permissionHeaders;
-						
-						function updateHeaders(){
-							permissionHeaders.clear();
-							
-							let index = permissionHeaders.insertNewItem();
-							permissionHeaders.setData("id", "FeatureName", index)
-							permissionHeaders.setData("name", qsTr("Permission"), index)
-							
-							permissionHeaders.refresh();
-							
-							permissionsGroup.treeView.columnModel = permissionHeaders;
-							permissionsGroup.treeView.rowModel = container.permissionsModel;
-						}
-						
-						Component.onCompleted: {
-							updateHeaders();
 						}
 					}
 				}

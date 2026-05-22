@@ -1,0 +1,70 @@
+module imt3dgui
+
+View3D 1.0 View3D.qml
+Node3D 1.0 Node3D.qml
+Model 1.0 Model.qml
+
+PerspectiveCamera 1.0 PerspectiveCamera.qml
+OrthographicCamera 1.0 OrthographicCamera.qml
+FrustumCamera 1.0 FrustumCamera.qml
+CustomCamera 1.0 CustomCamera.qml
+
+DirectionalLight 1.0 DirectionalLight.qml
+PointLight 1.0 PointLight.qml
+SpotLight 1.0 SpotLight.qml
+AmbientLight 1.0 AmbientLight.qml
+
+PrincipledMaterial 1.0 PrincipledMaterial.qml
+DefaultMaterial 1.0 DefaultMaterial.qml
+SpecularGlossyMaterial 1.0 SpecularGlossyMaterial.qml
+CustomMaterial 1.0 CustomMaterial.qml
+
+Texture 1.0 Texture.qml
+CubeMapTexture 1.0 CubeMapTexture.qml
+ProceduralTexture 1.0 ProceduralTexture.qml
+
+SceneEnvironment 1.0 SceneEnvironment.qml
+ExtendedSceneEnvironment 1.0 ExtendedSceneEnvironment.qml
+
+Geometry 1.0 Geometry.qml
+GridGeometry 1.0 GridGeometry.qml
+HeightFieldGeometry 1.0 HeightFieldGeometry.qml
+
+Instancing 1.0 Instancing.qml
+InstanceList 1.0 InstanceList.qml
+InstanceListEntry 1.0 InstanceListEntry.qml
+InstanceRange 1.0 InstanceRange.qml
+InstanceModel 1.0 InstanceModel.qml
+
+Skeleton 1.0 Skeleton.qml
+Joint 1.0 Joint.qml
+MorphTarget 1.0 MorphTarget.qml
+
+PickResult 1.0 PickResult.qml
+Loader3D 1.0 Loader3D.qml
+Repeater3D 1.0 Repeater3D.qml
+
+ParticleSystem3D 1.0 ParticleSystem3D.qml
+SpriteParticle3D 1.0 SpriteParticle3D.qml
+ModelParticle3D 1.0 ModelParticle3D.qml
+ParticleEmitter3D 1.0 ParticleEmitter3D.qml
+Attractor3D 1.0 Attractor3D.qml
+Wander3D 1.0 Wander3D.qml
+Gravity3D 1.0 Gravity3D.qml
+
+Effect 1.0 Effect.qml
+Buffer 1.0 Buffer.qml
+Pass 1.0 Pass.qml
+Shader 1.0 Shader.qml
+Command 1.0 Command.qml
+
+WasdController 1.0 WasdController.qml
+AxisHelper 1.0 AxisHelper.qml
+DebugView 1.0 DebugView.qml
+
+
+Fog 1.0 Fog.qml
+ReflectionProbe 1.0 ReflectionProbe.qml
+RenderStats 1.0 RenderStats.qml
+Render3D 1.0 Render3D.qml
+Scene3DView 1.0 Scene3DView.qml

@@ -21,7 +21,7 @@ I_EXPORT_COMPONENT(
 			"Ticket Collection Controller");
 
 I_EXPORT_COMPONENT(
-			TicketCollectionDocumentManager,
+			TicketCollectionDocumentService,
 			"Ticket collection document manager",
 			"Ticket Collection Document Manager");
 

@@ -47,6 +47,7 @@
                                 <Value>PersonalAccessTokenController</Value>
                                 <Value>DeskController</Value>
                                 <Value>PumaClientEngine</Value>
+                                <Value>PermissionsController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -125,6 +126,27 @@
         <Element Id="IdentifiableProductInfo" PackageId="ImtLicensePck" ComponentId="IdentifiableProductInfo">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="PermissionsController" PackageId="ImtGraphQlVoce" ComponentId="PermissionsController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="FeatureContainer" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="IdentifiableProductInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PumaClientEngine/RemoteTenantController"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="PersonalAccessTokenController" PackageId="ImtAuthVoce" ComponentId="PersonalAccessTokenController">
@@ -300,6 +322,7 @@
         <Component ExportedId="CachedGroupCollection" ComponentId="PumaClientEngine/CachedGroupCollection"/>
         <Component ExportedId="CachedRoleCollection" ComponentId="PumaClientEngine/CachedRoleCollection"/>
         <Component ExportedId="CachedUserCollection" ComponentId="PumaClientEngine/CachedUserCollection"/>
+        <Component ExportedId="ConnectionSubscriber" ComponentId="PumaClientEngine/ConnectionSubscriber"/>
         <Component ExportedId="DatabaseEngine" ComponentId="DatabaseEngine"/>
         <Component ExportedId="FeatureContainer" ComponentId="IdentifiableProductInfo"/>
         <Component ExportedId="GroupRemoteRepository" ComponentId="PumaClientEngine/GroupRemoteRepository"/>

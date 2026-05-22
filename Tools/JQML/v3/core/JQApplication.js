@@ -5,6 +5,7 @@ const TextController = require('./TextController')
 const MemoryController = require('./MemoryController')
 
 module.exports = {
+    rootPath: '',
     root: null,
 
     init: function(){ 
@@ -15,6 +16,7 @@ module.exports = {
             Qt: require('../Qt/Qt'),
             QtQml: require('../QtQml/QtQml'),
             QtQuick: require('../QtQuick/QtQuick'),
+            QtTest: require('../QtTest/QtTest'),
             Qt5Compat: require('../Qt5Compat/Qt5Compat'),
             QtWebSockets: require('../QtWebSockets/QtWebSockets'),
             QtPositioning: require('../QtPositioning/QtPositioning'),

@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 #endif
 	Q_INIT_RESOURCE(controlsgalleryqml);
 	Q_INIT_RESOURCE(controlsgalleryContactInfosSdl);
-	Q_INIT_RESOURCE(controlsgalleryContactInfoCollectionDocumentManagerSdl);
+	Q_INIT_RESOURCE(controlsgalleryContactInfoCollectionDocumentServiceSdl);
 	Q_INIT_RESOURCE(imtguivars);
 
 #ifdef Q_OS_WIN

@@ -46,9 +46,9 @@ I_EXPORT_COMPONENT(
 			"GraphQL QML Bridge ApiClient" IM_AUTHOR("Sergey Zastrovnyh"));
 
 I_EXPORT_COMPONENT(
-			DocumentManagerBridge,
-			"In-process implementation of imtqml::IDocumentManagerBridge - forwards every CDocumentManagerController request directly to an injected imtdoc::IDocumentManager. Resolved through icomp; not exposed to QML.",
-			"In-Process QML Bridge DocumentManager DataController");
+			DocumentServiceBridge,
+			"In-process implementation of imtqml::IDocumentServiceBridge - forwards every CDocumentServiceController request directly to an injected imtdoc::IDocumentService. Resolved through icomp; not exposed to QML.",
+			"In-Process QML Bridge DocumentService DataController");
 
 I_EXPORT_COMPONENT(
 			DataModelBridge,

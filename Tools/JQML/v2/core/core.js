@@ -1,3 +1,15 @@
+// QML String.arg() — replaces the lowest %N placeholder with the given value
+String.prototype.arg = function(val) {
+    var s = this.toString()
+    for (var i = 1; i <= 99; i++) {
+        var ph = '%' + i
+        if (s.indexOf(ph) >= 0) {
+            return s.replace(ph, val != null ? String(val) : '')
+        }
+    }
+    return s
+}
+
 RegExp.prototype.toPartialMatchRegex = function() {
     "use strict";
     
@@ -326,6 +338,7 @@ global.JQModules = {
             JSONListModel: __components.JSONListModel,
             GqlModel: __components.GqlModel,
             TreeItemModel: __components.TreeItemModel,
+            Instantiator: __components.Instantiator,
         },
         point: __properties.QPoint,
         date: __properties.QVar,
@@ -358,6 +371,21 @@ global.JQModules = {
         DoubleValidator: __components.DoubleValidator,
         TextInput: __components.TextInput,
         TextEdit: __components.TextEdit,
+    },
+    QtQuick_Controls: {
+        Action: __components.Action,
+        Menu: __components.Menu,
+        MenuItem: __components.MenuItem,
+        MenuSeparator: __components.MenuSeparator,
+        MenuBar: __components.MenuBar,
+        MenuBarItem: __components.MenuBarItem,
+        Popup: __components.Popup,
+        Overlay: __components.Overlay,
+        ToolTip: __components.ToolTip,
+        Drawer: __components.Drawer,
+    },
+    QtQuick_Layouts: {
+        ColumnLayout: __components.ColumnLayout,
     },
     Qt5Compat: {
         GraphicalEffects: {

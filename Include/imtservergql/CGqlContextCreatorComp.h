@@ -52,6 +52,7 @@ private:
 	struct TokenCacheEntry
 	{
 		QByteArray userId;
+		QByteArray tenantId;
 		QByteArray tokenId;
 		QByteArrayList scopes;
 		bool isPat = false;
@@ -63,6 +64,7 @@ private:
 	bool ResolveUserId(
 				const QByteArray& token,
 				QByteArray& userId,
+				QByteArray& tenantId,
 				QByteArrayList& scopes,
 				bool& isPat,
 				QString& errorMessage,
@@ -70,6 +72,7 @@ private:
 	TokenCacheLookupResult TryGetCachedToken(
 				const QByteArray& token,
 				QByteArray& userId,
+				QByteArray& tenantId,
 				QByteArrayList& scopes,
 				bool& isPat,
 				QString& errorMessage,
@@ -77,6 +80,7 @@ private:
 	void StoreCachedToken(
 				const QByteArray& token,
 				const QByteArray& userId,
+				const QByteArray& tenantId,
 				const QByteArray& tokenId,
 				const QByteArrayList& scopes,
 				bool isPat,

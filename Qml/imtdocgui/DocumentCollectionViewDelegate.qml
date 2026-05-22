@@ -10,7 +10,7 @@ import imtbaseDocumentRevisionSdl 1.0
 CollectionViewCommandsDelegateBase {
 	id: collectionViewCommandsDelegateBase;
 
-	property DocumentManager documentManager: null;
+	property DocumentService documentManager: null;
 
 	/*deprecated*/property string documentTypeId;
 	/*deprecated*/property string viewTypeId;
@@ -26,15 +26,15 @@ CollectionViewCommandsDelegateBase {
 	property bool isSingleDocumentMode: false
 
 	Component.onCompleted: {
-		updateDocumentManager()
+		updateDocumentService()
 	}
 
 	onDocumentManagerIdChanged: {
-		updateDocumentManager()
+		updateDocumentService()
 	}
 	
-	function updateDocumentManager(){
-		let documentManager = MainDocumentManager.getDocumentManager(documentManagerId);
+	function updateDocumentService(){
+		let documentManager = MainDocumentService.getDocumentService(documentManagerId);
 		if (documentManager){
 			collectionViewCommandsDelegateBase.documentManager = documentManager;
 			registerDocumentViews()

@@ -152,6 +152,36 @@ QString SqlEncode(const QString& sqlQuery);
 QString GetSqlResourcePath(const IDatabaseEngine& databaseEngine, const QString& fileName);
 
 
+/**
+ * @brief Returns the current UTC date-time as an ISO 8601 string with milliseconds.
+ *
+ * Commonly used in SQL delegates to generate timestamps for CreatedAt/UpdatedAt columns.
+ *
+ * @return Current UTC timestamp in Qt::ISODateWithMs format (e.g. "2025-01-15T12:30:45.123Z").
+ */
+QString UtcNow();
+
+
+/**
+ * @brief Escapes single quotes in a string for safe use in SQL literals.
+ *
+ * Doubles single-quote characters to prevent SQL syntax errors. Unlike SqlEncode(),
+ * this function does not touch semicolons, making it suitable for escaping user-provided
+ * values that will be wrapped in single quotes in SQL statements.
+ *
+ * @param value The string to escape.
+ * @return The escaped string with single quotes doubled.
+ *
+ * Example:
+ * @code{.cpp}
+ * QString name = "O'Reilly";
+ * QString sql = QString("INSERT INTO t(name) VALUES('%1')").arg(imtdb::EscapeSql(name));
+ * // sql = "INSERT INTO t(name) VALUES('O''Reilly')"
+ * @endcode
+ */
+QString EscapeSql(const QString& value);
+
+
 } // namespace imtdb
 
 

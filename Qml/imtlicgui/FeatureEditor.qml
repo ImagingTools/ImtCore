@@ -268,34 +268,34 @@ ViewBase {
 			anchors.left: parent.left;
 			anchors.bottom: parent.bottom;
 			width: parent.width;
-			readOnly: false;
-			rowDelegate: Component { PackageViewItemDelegate {
-					root: tableView_;
+			// readOnly: false;
+			// rowDelegate: Component { PackageViewItemDelegate {
+			// 		root: tableView_;
 					
-					function canRename(id){
-						return true;
-					}
+			// 		function canRename(id){
+			// 			return true;
+			// 		}
 					
-					function featureIsValid(featureId, featureName){
-						if (featureEditor.featureData.m_featureId === featureId){
-							return false;
-						}
+			// 		function featureIsValid(featureId, featureName){
+			// 			if (featureEditor.featureData.m_featureId === featureId){
+			// 				return false;
+			// 			}
 						
-						let delegates = tableView_.getItemsDataAsList();
-						for (let delegate of delegates){
-							if (delegate.itemData.m_featureId === featureId){
-								return false;
-							}
-						}
+			// 			let delegates = tableView_.getItemsDataAsList();
+			// 			for (let delegate of delegates){
+			// 				if (delegate.itemData.m_featureId === featureId){
+			// 					return false;
+			// 				}
+			// 			}
 						
-						return true;
-					}
-				} }
+			// 			return true;
+			// 		}
+			// 	} }
 			
-			Component.onCompleted: {
-				let ok = PermissionsController.checkPermission("ChangeFeature");
-				tableView_.readOnly = !ok;
-			}
+			// Component.onCompleted: {
+			// 	let ok = PermissionsController.checkPermission("ChangeFeature");
+			// 	tableView_.readOnly = !ok;
+			// }
 			
 			onSelectionChanged: {
 				let featureId = "";
@@ -392,7 +392,7 @@ ViewBase {
 			anchors.left: parent.left;
 			clip: true;
 			tristate: true;
-			contentVisible: false;
+			// contentVisible: false;
 			
 			property bool delegateUpdatingBlock: false;
 			
@@ -431,54 +431,54 @@ ViewBase {
 				featureEditor.updateTreeViewGui();
 			}
 			
-			rowDelegate: Component {TreeViewItemDelegateBase {
-					id: delegate;
-					root: featureDependenciesView;
-					childModelKey: FeatureItemTypeMetaInfo.s_subFeatures;
-					onCheckStateChanged: {
-						let selectedIndex =  null;
-						if (tableView_.tableSelection.items.length > 0){
-							selectedIndex = tableView_.tableSelection.items[0];
-						}
+			// rowDelegate: Component {TreeViewItemDelegateBase {
+			// 		id: delegate;
+			// 		root: featureDependenciesView;
+			// 		childModelKey: FeatureItemTypeMetaInfo.s_subFeatures;
+			// 		onCheckStateChanged: {
+			// 			let selectedIndex =  null;
+			// 			if (tableView_.tableSelection.items.length > 0){
+			// 				selectedIndex = tableView_.tableSelection.items[0];
+			// 			}
 
-						if (selectedIndex != null){
-							if (!featureDependenciesView.delegateUpdatingBlock){
-								if (delegate.itemData.featureId !== ""){
-									let featureId = delegate.itemData.featureId;
-									let state = delegate.checkState;
+			// 			if (selectedIndex != null){
+			// 				if (!featureDependenciesView.delegateUpdatingBlock){
+			// 					if (delegate.itemData.featureId !== ""){
+			// 						let featureId = delegate.itemData.featureId;
+			// 						let state = delegate.checkState;
 									
-									let selectedId = selectedIndex.itemData.m_featureId;
-									let dependencies = selectedIndex.itemData.m_dependencies;
+			// 						let selectedId = selectedIndex.itemData.m_featureId;
+			// 						let dependencies = selectedIndex.itemData.m_dependencies;
 									
-									let dependencyList = []
-									if (dependencies != ""){
-										dependencyList = dependencies.split(';')
-									}
+			// 						let dependencyList = []
+			// 						if (dependencies != ""){
+			// 							dependencyList = dependencies.split(';')
+			// 						}
 									
-									if (state == Qt.Checked){
-										if (!dependencyList.includes(featureId)){
-											dependencyList.push(featureId);
-										}
-									}
-									else{
-										let pos = dependencyList.indexOf(featureId);
-										if (pos >= 0){
-											dependencyList.splice(pos, 1)
-										}
-									}
+			// 						if (state == Qt.Checked){
+			// 							if (!dependencyList.includes(featureId)){
+			// 								dependencyList.push(featureId);
+			// 							}
+			// 						}
+			// 						else{
+			// 							let pos = dependencyList.indexOf(featureId);
+			// 							if (pos >= 0){
+			// 								dependencyList.splice(pos, 1)
+			// 							}
+			// 						}
 									
-									if (dependencyList.length > 0){
-										selectedIndex.itemData.m_dependencies = dependencyList.join(';')
-									}
-									else{
-										selectedIndex.itemData.m_dependencies = "";
-									}
-								}
-							}
-						}
-					}
-				}
-			}
+			// 						if (dependencyList.length > 0){
+			// 							selectedIndex.itemData.m_dependencies = dependencyList.join(';')
+			// 						}
+			// 						else{
+			// 							selectedIndex.itemData.m_dependencies = "";
+			// 						}
+			// 					}
+			// 				}
+			// 			}
+			// 		}
+			// 	}
+			// }
 			
 			function findParentFeatureDependencies(featureId, retVal){
 				let itemsDataList = featureDependenciesView.getItemsDataAsList();

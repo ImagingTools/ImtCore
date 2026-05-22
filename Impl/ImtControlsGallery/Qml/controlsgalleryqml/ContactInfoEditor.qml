@@ -8,8 +8,8 @@ import imtauthgui 1.0
 import imtdocgui 1.0
 import imtcolgui 1.0
 import controlsgalleryContactInfosSdl 1.0
-import controlsgalleryContactInfoCollectionDocumentManagerSdl 1.0
-import imtbaseCollectionDocumentManagerSdl 1.0
+import controlsgalleryContactInfoCollectionDocumentServiceSdl 1.0
+import imtbaseCollectionDocumentServiceSdl 1.0
 import imtbaseUndoManagerSdl 1.0
 
 ViewBase {

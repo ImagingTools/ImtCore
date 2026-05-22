@@ -13,7 +13,7 @@
 #include <imtqml/CObserverQmlComp.h>
 #include <imtqml/CClientUserContextComp.h>
 #include <imtqml/CDataModelBridgeDemultiplexer.h>
-#include <imtqml/CDocumentManagerBridge.h>
+#include <imtqml/CDocumentServiceBridge.h>
 #include <imtqml/CGqlClientBridge.h>
 #include <imtqml/CPageGuiElementModelComp.h>
 #include <imtqml/CCommandsObserverQmlComp.h>
@@ -36,7 +36,7 @@ typedef imtqml::CGuiQuickWrapComp GuiQuickWrap;
 typedef imtqml::CObserverQmlComp ObserverQml;
 typedef imtqml::CClientUserContextComp ClientUserContext;
 typedef imtqml::CGqlClientBridge GqlClientBridge;
-typedef imtqml::CDocumentManagerBridge DocumentManagerBridge;
+typedef imtqml::CDocumentServiceBridge DocumentServiceBridge;
 typedef imtqml::CDataModelBridgeDemultiplexer DataModelBridge;
 typedef imtqml::CPageGuiElementModelComp PageGuiElementModel;
 typedef icomp::TModelCompWrap<imtqml::CCommandsObserverQmlComp> CommandsObserverQml;

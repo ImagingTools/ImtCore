@@ -199,42 +199,6 @@ QByteArray CConversationDbDelegateComp::CreateDescriptionObjectQuery(
 }
 
 
-void CConversationDbDelegateComp::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-
-	if (!m_databaseEngineCompPtr.IsValid()){
-		return;
-	}
-
-	const QString tableName = GetTableName();
-	if (TableExists(tableName)){
-		return;
-	}
-
-	QFile scriptFile(imtdb::GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateConversationsTable.sql")));
-	if (!scriptFile.open(QFile::ReadOnly)){
-		SendErrorMessage(0, QString("Conversations table creation script '%1' could not be loaded").arg(scriptFile.fileName()));
-		return;
-	}
-
-	QByteArray query = scriptFile.readAll();
-	scriptFile.close();
-	query.replace("${TableScheme}", "public");
-
-	QSqlError sqlError;
-	m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
-
-	if (sqlError.type() != QSqlError::NoError){
-		qCritical() << __FILE__ << __LINE__
-					<< "\n\t| Conversations table could not be created"
-					<< "\n\t| Error:" << sqlError
-					<< "\n\t| Query:" << query;
-		SendErrorMessage(0, QString("Conversations table could not be created: %1").arg(sqlError.text()));
-	}
-}
-
-
 idoc::MetaInfoPtr CConversationDbDelegateComp::CreateObjectMetaInfo(const QByteArray& typeId) const
 {
 	return BaseClass::CreateObjectMetaInfo(typeId);

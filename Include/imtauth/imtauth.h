@@ -19,6 +19,10 @@ namespace imtauth
 
 inline QString GetUserName(const imtbase::IObjectCollection& userCollection, const QByteArray& userId)
 {
+	if (userId.isEmpty()){
+		return QString();
+	}
+
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (userCollection.GetObjectData(userId, dataPtr)){
 		const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());

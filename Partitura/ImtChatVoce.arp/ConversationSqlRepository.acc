@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6379" Description="ACF"/>
+            <Version Id="0" Number="6390" Description="ACF"/>
             <Version Id="1" Number="2306" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
@@ -18,8 +18,14 @@
         <Element Id="ConversationDatabaseDelegate" PackageId="ImtChatDbPck" ComponentId="ConversationDbDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AutoCreateTable" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ConversationFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="Conversation"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CreateTableScriptPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value=":/SQL/Postgres/CreateConversationsTable.sql"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>

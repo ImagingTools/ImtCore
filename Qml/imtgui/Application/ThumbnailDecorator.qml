@@ -60,7 +60,7 @@ Rectangle {
 		menuPanel.clearModels();
 		pagesManager.clearModels();
 		
-		MainDocumentManager.clear();
+		MainDocumentService.clear();
 	}
 	
 	function fillPreferenceParamsSet(){
@@ -75,9 +75,9 @@ Rectangle {
 	}
 	
 	Connections {
-		target: MainDocumentManager;
+		target: MainDocumentService;
 		
-		function onTryRegisterDocumentManager(typeId, callback){
+		function onTryRegisterDocumentService(typeId, callback){
 			let pageIndex = -1;
 			for (let i = 0; i < menuPanel.model.getItemsCount(); i++){
 				let pageId = menuPanel.model.getData("id", i);
@@ -107,12 +107,12 @@ Rectangle {
 		color: !pagesManager.pageModel.getItemsCount() ? "transparent" : Style.colorMenuPanel !==undefined ? Style.colorMenuPanel : Style.imagingToolsGradient1;
 		
 		Component.onCompleted: {
-			MainDocumentManager.documentOpened.connect(onDocumentOpened);
+			MainDocumentService.documentOpened.connect(onDocumentOpened);
 			Events.subscribeEvent("GlobalSearchActivated", seacrhActivated)
 		}
 		
 		Component.onDestruction: {
-			MainDocumentManager.documentOpened.disconnect(onDocumentOpened);
+			MainDocumentService.documentOpened.disconnect(onDocumentOpened);
 			Events.unSubscribeEvent("GlobalSearchActivated", seacrhActivated)
 		}
 		

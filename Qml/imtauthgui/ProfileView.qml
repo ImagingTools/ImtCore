@@ -4,6 +4,7 @@ import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtguigql 1.0
 import imtcontrols 1.0
+import imtauthgui 1.0
 import imtauthProfileSdl 1.0
 
 ViewBase {
@@ -32,14 +33,15 @@ ViewBase {
 		mailInput.text = profileData.m_email;
 		
 		permissionsTable.table.elements = profileData.m_permissions;
-		rolesTable.table.elements = profileData.m_roles
-		groupsTable.table.elements = profileData.m_groups
+		rolesTable.table.elements = profileData.m_roles;
+		groupsTable.table.elements = profileData.m_groups;
 	}
 	
 	function updateModel(){
 		profileData.m_name = nameInput.text
 		profileData.m_email = mailInput.text
 	}
+	
 	
 	GqlSdlRequestSender {
 		id: getProfileRequest;

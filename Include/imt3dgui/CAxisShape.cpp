@@ -100,7 +100,7 @@ void CAxisShape::SetAxisLabel(AxisType axis, const QString& label)
 
 // protected methods
 
-// reimplement (imt3dgui::CShape3dBase)
+// reimplemented (imt3dgui::CShape3dBase)
 
 void CAxisShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet & /*changeSet*/)
 {
@@ -130,19 +130,22 @@ void CAxisShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet & /*chan
 }
 
 
-void CAxisShape::DrawShapeGl(QOpenGLShaderProgram& /*program*/, QOpenGLFunctions& functions)
+imt3dview::PrimitiveType CAxisShape::GetPrimitiveType() const
 {
-	double lineWidth = m_axisConfigs[AT_X].lineWidth;
-
-	functions.glLineWidth(lineWidth);
-
-	functions.glDrawElements(GL_LINES, m_indices.count(), GL_UNSIGNED_INT, 0);
+	return imt3dview::PT_LINES;
 }
 
 
-// reimplement (imt3dgui::IDrawable)
+void CAxisShape::FillMaterial(imt3dview::Material& material) const
+{
+	BaseClass::FillMaterial(material);
+	material.lineWidth = static_cast<float>(m_axisConfigs.value(AT_X).lineWidth);
+}
 
-void CAxisShape::Draw(QPainter& painter)
+
+// reimplemented (imt3dgui::IDrawable)
+
+void CAxisShape::DrawOverlay(QPainter& painter)
 {
 	if (!IsVisible()){
 		return;
@@ -150,7 +153,38 @@ void CAxisShape::Draw(QPainter& painter)
 
 	painter.save();
 
+	painter.setRenderHint(QPainter::Antialiasing, true);
 	painter.setRenderHint(QPainter::TextAntialiasing, true);
+
+#ifdef Q_OS_MACOS
+	{
+		const QVector3D xStart3d(m_axisConfigs[AT_X].axisLength * m_axisConfigs[AT_X].axisRange.GetMinValue(), 0.0, 0.0);
+		const QVector3D xEnd3d(m_axisConfigs[AT_X].axisLength * m_axisConfigs[AT_X].axisRange.GetMaxValue(), 0.0, 0.0);
+		const QVector3D yStart3d(0.0, m_axisConfigs[AT_Y].axisLength * m_axisConfigs[AT_Y].axisRange.GetMinValue(), 0.0);
+		const QVector3D yEnd3d(0.0, m_axisConfigs[AT_Y].axisLength * m_axisConfigs[AT_Y].axisRange.GetMaxValue(), 0.0);
+		const QVector3D zStart3d(0.0, 0.0, m_axisConfigs[AT_Z].axisLength * m_axisConfigs[AT_Z].axisRange.GetMinValue());
+		const QVector3D zEnd3d(0.0, 0.0, m_axisConfigs[AT_Z].axisLength * m_axisConfigs[AT_Z].axisRange.GetMaxValue());
+
+		QPen pen;
+		pen.setCapStyle(Qt::RoundCap);
+
+		pen.setColor(QColor::fromRgbF(1.0, 0.0, 0.0));
+		pen.setWidthF(m_axisConfigs[AT_X].lineWidth);
+		painter.setPen(pen);
+		painter.drawLine(ModelToWindow(xStart3d), ModelToWindow(xEnd3d));
+
+		pen.setColor(QColor::fromRgbF(0.0, 1.0, 0.0));
+		pen.setWidthF(m_axisConfigs[AT_Y].lineWidth);
+		painter.setPen(pen);
+		painter.drawLine(ModelToWindow(yStart3d), ModelToWindow(yEnd3d));
+
+		pen.setColor(QColor::fromRgbF(0.0, 0.0, 1.0));
+		pen.setWidthF(m_axisConfigs[AT_Z].lineWidth);
+		painter.setPen(pen);
+		painter.drawLine(ModelToWindow(zStart3d), ModelToWindow(zEnd3d));
+	}
+#endif
+
 	painter.setPen(Qt::darkGray);
 	QFont font = GetAxeLabelFont();
 	painter.setFont(font);

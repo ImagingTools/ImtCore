@@ -5,8 +5,10 @@
 #include <cmath>
 
 // Qt includes
+#include <QtCore/QDebug>
 #include <QtCore/QElapsedTimer>
 #include <QtGui/QMouseEvent>
+#include <QtGui/QOpenGLExtraFunctions>
 
 // ImtCore includes
 #include <imt3dgui/ISceneEventHandler.h>
@@ -43,7 +45,6 @@ COpenGLWidget::COpenGLWidget(QWidget* parentPtr)
 	m_viewMode(ViewMode::VM_VIEW),
 	m_selectionMode(SelectionMode::SM_POINT),
 	m_rotationMode(RotationMode::RTM_FREE),
-	m_programPtr(new QOpenGLShaderProgram(this)),
 	m_cameraPtr(nullptr)
 {
 	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
@@ -63,6 +64,8 @@ COpenGLWidget::COpenGLWidget(QWidget* parentPtr)
 COpenGLWidget::~COpenGLWidget()
 {
 	makeCurrent();
+	m_scene.OnAttachBackend(nullptr);
+	m_backend.Shutdown();
 	doneCurrent();
 }
 
@@ -316,34 +319,35 @@ void COpenGLWidget::initializeGL()
 {
 	initializeOpenGLFunctions();
 
+	// create and bind VAO to avoid "vao not bound" error on MacOS
+	glGenVertexArrays(1, &m_vao);
+	glBindVertexArray(m_vao);
+
 	glClearColor(m_backgroundColor.redF(), m_backgroundColor.greenF(), m_backgroundColor.blueF(), 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_PROGRAM_POINT_SIZE);
 
-	if (!m_programPtr->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/Shaders/vshader.glsl")){
-		qDebug() << "Vertex shader could not be loaded";
-		return;
-	}
-
-	if (!m_programPtr->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/Shaders/fshader.glsl")){
-		qDebug() << "Fragment shader could not be loaded";
-		return;
-	}
-
-	if (!m_programPtr->link()){
-		qDebug() << "Failed to link shader program: " << m_programPtr->log();
+	m_backend.SetContext(QOpenGLWidget::context());
+	if (!m_backend.Initialize()){
+		qDebug() << "COpenGLWidget: render backend failed to initialize";
 		return;
 	}
 
 	m_scene.SetCamera(m_cameraPtr);
 	m_scene.SetViewPort(rect());
 	m_scene.SetProjection(GetProjectionMatrix());
-	m_scene.SetContext(QOpenGLWidget::context());
+	m_scene.OnAttachBackend(&m_backend);
 }
 
 
-void COpenGLWidget::resizeGL(int /*w*/, int /*h*/)
+void COpenGLWidget::resizeGL(int w, int h)
 {
+	// Get the physical pixel ratio (e.g., 2.0 on Retina Macs)
+	qreal ratio = devicePixelRatio();
+
+	// Set the OpenGL viewport to PHYSICAL pixels, not logical pixels
+	glViewport(0, 0, static_cast<GLsizei>(w * ratio), static_cast<GLsizei>(h * ratio));
+
 	m_scene.SetViewPort(rect());
 
 	m_scene.SetProjection(GetProjectionMatrix());
@@ -419,7 +423,7 @@ void COpenGLWidget::mouseMoveEvent(QMouseEvent* e)
 
 void COpenGLWidget::closeEvent(QCloseEvent* eventPtr)
 {
-	m_scene.SetContext(nullptr);
+	m_scene.OnAttachBackend(nullptr);
 
 	QOpenGLWidget::closeEvent(eventPtr);
 }
@@ -514,21 +518,11 @@ void COpenGLWidget::OnCameraPositionAnimation(const QVariant& value)
 
 void COpenGLWidget::PaintGl()
 {
-	if (!m_programPtr->isLinked() || !QOpenGLWidget::context()){
-		return;
-	}
+	imt3dview::SceneState sceneState = BuildSceneState();
 
-	m_programPtr->bind();
-
-	glClearColor(m_backgroundColor.redF(), m_backgroundColor.greenF(), m_backgroundColor.blueF(), 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	SetGlFlags();
-	SetGlUniformValues();
-
-	m_scene.DrawGl(*m_programPtr);
-
-	m_programPtr->release();
+	m_backend.BeginFrame(sceneState);
+	m_scene.Render(m_backend);
+	m_backend.EndFrame();
 }
 
 
@@ -536,7 +530,7 @@ void COpenGLWidget::Paint(QPainter& painter)
 {
 	glDisable(GL_DEPTH_TEST);
 
-	m_scene.Draw(painter);
+	m_scene.DrawOverlay(painter);
 
 	PaintSelection(painter);
 }
@@ -659,53 +653,34 @@ void COpenGLWidget::MouseMoveSelection(QMouseEvent& e)
 }
 
 
-void COpenGLWidget::SetGlFlags()
+imt3dview::SceneState COpenGLWidget::BuildSceneState() const
 {
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
+	imt3dview::SceneState state;
 
-	if (m_renderHints & RH_ANTIALIASING){
-		glEnable(GL_LINE_SMOOTH);
-		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-		glEnable(GL_POINT_SMOOTH);
-		glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
-	}
-	else{
-		glDisable(GL_LINE_SMOOTH);
-		glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
-		glDisable(GL_POINT_SMOOTH);
-		glHint(GL_POINT_SMOOTH_HINT, GL_DONT_CARE);
-	}
-
-	if (m_renderHints & RH_BLEND){
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	}
-	else{
-		glDisable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ZERO);
-	}
-
-	if (m_renderHints & RH_CULLFACE){
-		glCullFace(GL_BACK);
-		glFrontFace(GL_CCW);
-	}
-	else{
-		glDisable(GL_CULL_FACE);
-	}
-}
-
-
-void COpenGLWidget::SetGlUniformValues()
-{
 	if (m_cameraPtr){
-		m_programPtr->setUniformValue("viewPosition", m_cameraPtr->GetPosition());
-		m_programPtr->setUniformValue("viewMatrix", m_cameraPtr->GetViewMatrix());
+		state.cameraPosition = m_cameraPtr->GetPosition();
+		state.viewMatrix = m_cameraPtr->GetViewMatrix();
 	}
 
-	m_programPtr->setUniformValue("projectionMatrix", GetProjectionMatrix());
-	m_programPtr->setUniformValue("lightPosition", s_lightPosition);
-	m_programPtr->setUniformValue("lightColor", s_lightColor);
+	state.projectionMatrix = GetProjectionMatrix();
+	state.viewport = rect();
+	state.lightPosition = s_lightPosition;
+	state.lightColor = s_lightColor;
+	state.clearColor = m_backgroundColor;
+
+	int hints = imt3dview::SceneState::RH_NONE;
+	if (m_renderHints & RH_ANTIALIASING){
+		hints |= imt3dview::SceneState::RH_ANTIALIASING;
+	}
+	if (m_renderHints & RH_CULLFACE){
+		hints |= imt3dview::SceneState::RH_CULLFACE;
+	}
+	if (m_renderHints & RH_BLEND){
+		hints |= imt3dview::SceneState::RH_BLEND;
+	}
+	state.renderHints = hints;
+
+	return state;
 }
 
 

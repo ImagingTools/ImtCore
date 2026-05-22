@@ -21,6 +21,16 @@ I_EXPORT_COMPONENT(
 			"GraphQL API Client");
 
 I_EXPORT_COMPONENT(
+			AsyncApiClient,
+			"Asynchronous GraphQL API client",
+			"Async GraphQL API Client");
+
+I_EXPORT_COMPONENT(
+			GqlClientSyncAdapter,
+			"Synchronous IGqlClient adapter on top of an IAsyncGqlClient",
+			"GraphQL Client Sync Adapter");
+
+I_EXPORT_COMPONENT(
 			GraphQLClientEngine,
 			"GraphQLClientEngine",
 			"GraphQL Client Engine");
@@ -81,6 +91,11 @@ I_EXPORT_COMPONENT(
 			"Remote Object Collection Controller");
 
 I_EXPORT_COMPONENT(
+			RemoteCollectionDocumentServiceController,
+			"Remote collection document manager controller",
+			"Remote Collection Document Manager Controller");
+
+I_EXPORT_COMPONENT(
 			ObjectCollectionSubscriber,
 			"Object collection subscriber",
 			"Object Collection Subscriber");
@@ -90,7 +105,11 @@ I_EXPORT_COMPONENT(
 			"Remote commands controller",
 			"Remote Commands Controller");
 
+I_EXPORT_COMPONENT(
+			RemoteFilterableSelectController,
+			"Remote filterable select controller",
+			"Remote Filterable Select Controller");
+
 
 } // namespace ImtClientGqlPck
-
 

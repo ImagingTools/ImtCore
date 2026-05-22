@@ -22,6 +22,7 @@ TableViewParamController 1.0 TableViewParamController.qml
 GqlRequestSender 1.0 GqlRequestSender.qml
 WebSocketConnectionChecker 1.0 WebSocketConnectionChecker.qml
 GqlSdlRequestSender 1.0 GqlSdlRequestSender.qml
+GqlBasedTenantMembershipApiClient 1.0 GqlBasedTenantMembershipApiClient.qml
 XmlHttpRequestProxy 1.0 XmlHttpRequestProxy.qml
 GqlBasedCommandsController 1.0 GqlBasedCommandsController.qml
 GqlBasedCollectionDataController 1.0 GqlBasedCollectionDataController.qml
@@ -29,8 +30,9 @@ GqlBasedObjectVisualStatusProvider 1.0 GqlBasedObjectVisualStatusProvider.qml
 GqlBasedDataModelController 1.0 GqlBasedDataModelController.qml
 GqlBasedDataModelProvider 1.0 GqlBasedDataModelProvider.qml
 GqlBasedOptionManager 1.0 GqlBasedOptionManager.qml
-GqlBasedCollectionDocumentManager 1.0 GqlBasedCollectionDocumentManager.qml
+GqlBasedCollectionDocumentService 1.0 GqlBasedCollectionDocumentService.qml
 GqlCollectionDocManagerPageView 1.0 GqlCollectionDocManagerPageView.qml
+GqlSingleDocCollectionPageView 1.0 GqlSingleDocCollectionPageView.qml
 RemoteCollectionViewDialog 1.0 RemoteCollectionViewDialog.qml
 SelectableCollectionEditor 1.0 SelectableCollectionEditor.qml
 FilterableSelectGqlDataProvider 1.0 FilterableSelectGqlDataProvider.qml

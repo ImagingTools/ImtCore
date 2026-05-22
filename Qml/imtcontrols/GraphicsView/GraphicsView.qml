@@ -414,7 +414,8 @@ Rectangle {
 
 		if(onlyOneLayer){
 			let clipRect = layer.clipRect;
-			if(clipRect.width == 0 && clipRect.height == 0){
+			let clipRectBackup = layer.clipRectBackup;
+			if(clipRectBackup.width == 0 && clipRectBackup.height == 0){
 				clipRect.width = canvas.width
 				clipRect.height = canvas.height
 			}
@@ -448,7 +449,8 @@ Rectangle {
 			if(!onlyOneLayer){
 				let layerCurr = shape.layer;
 				let clipRectCurr = layerCurr.clipRect;
-				if(clipRectCurr.width == 0 && clipRectCurr.height == 0){
+				let clipRectCurrBackup = layerCurr.clipRectBackup;
+				if(clipRectCurrBackup.width == 0 && clipRectCurrBackup.height == 0){
 					clipRectCurr.width = canvas.width
 					clipRectCurr.height = canvas.height
 				}

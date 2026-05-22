@@ -18,6 +18,9 @@ public:
 	I_BEGIN_COMPONENT(CUsersSessionsDatabaseDelegateComp)
 	I_END_COMPONENT
 
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 	virtual QByteArray GetSelectionQuery(
 				const QByteArray& objectId = QByteArray(),

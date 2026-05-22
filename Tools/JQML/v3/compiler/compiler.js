@@ -55,6 +55,7 @@ function compile(options){
     const Qt = require('../Qt/Qt')
     const QtQml = require('../QtQml/QtQml')
     const QtQuick = require('../QtQuick/QtQuick')
+    const QtTest = require('../QtTest/QtTest')
     const Qt5Compat = require('../Qt5Compat/Qt5Compat')
     const QtWebSockets = require('../QtWebSockets/QtWebSockets')
     const QtPositioning = require('../QtPositioning/QtPositioning')
@@ -72,24 +73,28 @@ function compile(options){
         return result
     }
 
-    function includeFiles(sourceFile) {
+    function includeFiles(sourceFile, baseDirPath = configDirPath) {
         if (sourceFile.includes)
             for (let filePath of sourceFile.includes) {
-                let file = JSON.parse(envFill(fs.readFileSync(filePath, { encoding: 'utf8', flag: 'r' })))
-                includeFiles(file)
+                let absoluteConfigPath = path.resolve(baseDirPath, filePath)
+                let includeConfigDirPath = path.dirname(absoluteConfigPath)
+                let file = JSON.parse(envFill(fs.readFileSync(absoluteConfigPath, { encoding: 'utf8', flag: 'r' })))
+                includeFiles(file, includeConfigDirPath)
                 for (let dirPath of file.dirs) {
-                    sourceFile.dirs.unshift(dirPath)
+                    let absoluteDirPath = path.resolve(includeConfigDirPath, dirPath)
+                    sourceFile.dirs.unshift(absoluteDirPath)
                 }
             }
     }
 
     const config = JSON.parse(envFill(fs.readFileSync(configFilePath, { encoding: 'utf8', flag: 'r' })))
-    includeFiles(config)
+    includeFiles(config, configDirPath)
 
     const BaseModules = {
         Qt,
         QtQml,
         QtQuick,
+        QtTest,
         Qt5Compat,
         QtWebSockets,
         QtPositioning,
@@ -223,6 +228,7 @@ function compile(options){
                 this.assignProperties.push({
                     name: meta[2],
                     value: new Instruction(null, '', meta[4][1][1], meta[4][1][3], meta[4][1][2], this.qmlFile, meta[4][1].info, this),
+                    fromDefinition: true,
                 })
             } else {
                 let defaultValue = type.getDefaultValue()
@@ -234,12 +240,14 @@ function compile(options){
                             this.assignProperties.push({
                                 name: meta[2],
                                 value: meta[4],
+                                fromDefinition: true,
                             })
                         }
                     } catch {
                         this.assignProperties.push({
                             name: meta[2],
                             value: meta[4],
+                            fromDefinition: true,
                         })
                     }
                 }
@@ -411,6 +419,7 @@ function compile(options){
                 if (name === obj.name) return {
                     source: `${thisKey}.${name}`,
                     type: typeInfo.type,
+                    modifiers: obj.modifiers,
                 }
             }
             for (let obj of this.defineSignals) {
@@ -438,6 +447,7 @@ function compile(options){
                         return {
                             source: `${thisKey}.${name}`,
                             type: typeInfo.type.meta[name].typeTarget ? typeInfo.type.meta[name].typeTarget : typeInfo.type.meta[name].type,
+                            modifiers: typeInfo.type.meta[name].modifiers,
                         }
                     } else if (name in obj) {
                         return {
@@ -1208,6 +1218,11 @@ function compile(options){
                     console.log(`${this.qmlFile.fileName}:${assignProperty.value.info.line + 1}:${assignProperty.value.info.col - assignProperty.name.length - 1}: warning: ${assignProperty.name} is not founded`)
                 }
 
+                let assignNames = assignProperty.name.split('.')
+                if (path && assignNames.length === 1 && path.modifiers && path.modifiers.readonly && !assignProperty.fromDefinition) {
+                    throw new Error(`${this.qmlFile.fileName}:${assignProperty.value.info.line + 1}:${assignProperty.value.info.col - assignProperty.name.length - 1}: error: Cannot assign to read-only property "${assignProperty.name}"`)
+                }
+
                 if (assignProperty.value instanceof Instruction) {
                     if (!path) {
                         throw `${this.qmlFile.fileName}:${assignProperty.value.info.line + 1}:${assignProperty.value.info.col - assignProperty.name.length - 1}: error: ${assignProperty.name} is not founded`
@@ -1353,13 +1368,14 @@ function compile(options){
                             aliasCode.add('\n')
                         } else {
                             // lazyCode.add(`'${assignProperty.name}': function(){return ${stat.value}},`)
+                            let isReturn = stat.value.toString().indexOf('return ') >= 0
                             if(names.length > 1){
-                                lazyCode.add(`${this.name}['${names[0]}'].__properties['${names[1]}']=function(){return ${stat.value}}`)
+                                lazyCode.add(`${this.name}['${names[0]}'].__properties['${names[1]}']=function(){${isReturn ? '' : 'return '}${stat.value}}`)
                                 lazyCode.add('\n')
                                 lazyCode.add(`${this.name}.__properties['${names[0]}']='JQGroup'`)
                                 lazyCode.add('\n')
                             } else {
-                                lazyCode.add(`${this.name}.__properties['${assignProperty.name}']=function(){return ${stat.value}}`)
+                                lazyCode.add(`${this.name}.__properties['${assignProperty.name}']=function(){${isReturn ? '' : 'return '}${stat.value}}`)
                                 lazyCode.add('\n')
                             }
                             
@@ -1777,9 +1793,11 @@ function compile(options){
 
             if (this.singleton) {
                 if (this.moduleName) {
-                    code.add(`JQModules.${this.moduleName}.${this.instruction.className} = (class extends ${typeInfo.path} {\n`)
+                    code.add(`Object.defineProperty(JQModules.${this.moduleName},'${this.instruction.className}',{get:()=>{
+                        if(!JQModules.${this.moduleName}.__${this.instruction.className}) JQModules.${this.moduleName}.__${this.instruction.className} = (class extends ${typeInfo.path} {\n`)
                 } else {
-                    code.add(`const ${this.instruction.className} = (class extends ${typeInfo.path} {\n`)
+                    code.add(`Object.defineProperty(window,'${this.instruction.className}',{get:()=>{
+                        if(!window.__${this.instruction.className}) window.__${this.instruction.className} = (class extends ${typeInfo.path} {\n`)
                 }
 
                 code.add(`static singleton = true\n`)
@@ -1854,8 +1872,13 @@ function compile(options){
 
             code.add('\n')
 
+
             if (this.singleton) {
-                code.add(`}).create()`)
+                if (this.moduleName) {
+                    code.add(`}).create()\nreturn JQModules.${this.moduleName}.__${this.instruction.className}}})`)
+                } else {
+                    code.add(`}).create()\nreturn window.__${this.instruction.className}}})`)
+                }
             } else {
                 code.add(`}`)
             }
@@ -2000,7 +2023,7 @@ function compile(options){
     for (let moduleName in JQModules) {
         if (!BaseModules[moduleName]) {
             console.log(`    > ${moduleName} (${counter[moduleName] + ' files'})`)
-            fullCode.add(`JQModules.${moduleName}={},`)
+            fullCode.add(`JQModules.${moduleName}={};`)
         }
     }
 
@@ -2097,7 +2120,15 @@ function compile(options){
 
     if(options.mode === 'js'){
         if (options.entry) {
-            fullCode.add(`window.addEventListener('load', ()=>{console.time('build');JQApplication.rootPath='${options.root}';${options.entry.split(/[\/\\]+/g).pop().replace('.qml', '')}.create(JQApplication.root);console.timeEnd('build')})`)
+            fullCode.add(`window.addEventListener('load', ()=>{
+                console.time('build');
+                if(location.pathname.indexOf('${options.root}')>=0){
+                    JQApplication.rootPath = location.origin + location.pathname.slice(0, location.pathname.indexOf('${options.root}') + '${options.root}'.length)
+                } else {
+                    JQApplication.rootPath = '${options.root}'
+                }
+                ${options.entry.split(/[\/\\]+/g).pop().replace('.qml', '')}.create(JQApplication.root);
+                console.timeEnd('build')})`)
         }
 
         if (options.output) {

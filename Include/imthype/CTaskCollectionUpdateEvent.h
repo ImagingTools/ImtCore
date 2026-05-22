@@ -17,6 +17,7 @@ public:
 	{
 		UT_USER_TASK_ID = 0,
 		UT_TASK_INPUT,
+		UT_TASK_INPUT_SUB
 	};
 
 	CTaskCollectionUpdateEvent();

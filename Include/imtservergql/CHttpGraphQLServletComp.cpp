@@ -113,6 +113,12 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 			return GenerateError(StatusCode::SC_INTERNAL_SERVER_ERROR, QStringLiteral("Request context is invalid"), request);
 		}
 
+		// Set tenant ID from JWT token
+		if (m_jwtSessionControllerCompPtr.IsValid() && !accessToken.startsWith("pat_")){
+			QByteArray tenantId = m_jwtSessionControllerCompPtr->GetTenantFromJwt(accessToken);
+			gqlContextPtr->SetTenantId(tenantId);
+		}
+
 		m_lastRequest.SetGqlContext(std::move(gqlContextPtr));
 	}
 	else{

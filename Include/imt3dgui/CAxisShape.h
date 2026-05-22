@@ -35,12 +35,13 @@ public:
 	void SetAxisLabel(AxisType axis, const QString& label);
 
 protected:
-	// reimplement (imt3dgui::CShape3dBase)
+	// reimplemented (imt3dgui::CShape3dBase)
 	virtual void UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet) override;
-	virtual void DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctions& functions) override;
+	virtual imt3dview::PrimitiveType GetPrimitiveType() const override;
+	virtual void FillMaterial(imt3dview::Material& material) const override;
 
-	// reimplement (imt3dgui::IDrawable)
-	virtual void Draw(QPainter& painter) override;
+	// reimplemented (imt3dgui::IDrawable)
+	virtual void DrawOverlay(QPainter& painter) override;
 
 private:
 	QFont GetAxeLabelFont() const;

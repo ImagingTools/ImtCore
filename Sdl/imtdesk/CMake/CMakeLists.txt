@@ -6,7 +6,7 @@ include(${IMTCOREDIR}/Config/CMake/ImtCoreSdlCustomConfig.cmake)
 
 add_custom_target(${PROJECT_NAME}-SDL-related-files SOURCES
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/ImtDesk.sdl
-			${CMAKE_CURRENT_LIST_DIR}/../1.0/TicketCollectionDocumentManager.sdl
+			${CMAKE_CURRENT_LIST_DIR}/../1.0/TicketCollectionDocumentService.sdl
 			)
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
@@ -14,5 +14,5 @@ ImtCoreCustomConfigureSdlCppQml(CXX QML
 			VERSION		"1.0")
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
-			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/TicketCollectionDocumentManager.sdl"
+			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/TicketCollectionDocumentService.sdl"
 			VERSION		"1.0")

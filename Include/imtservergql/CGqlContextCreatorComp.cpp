@@ -60,12 +60,13 @@ imtgql::IGqlContextUniquePtr CGqlContextCreatorComp::CreateGqlContext(
 	const QByteArray token = headers.value(imtbase::s_authenticationTokenHeaderId);
 	const QByteArray productId = headers.value(imtbase::s_productIdHeaderId);
 	QByteArray resolvedUserId;
+	QByteArray tenantId;
 	QByteArrayList scopes;
 	bool isPat = false;
 	if (!token.isEmpty()){
 		imtgql::IGqlContextCreator::ContextCreationStatus authStatus = imtgql::IGqlContextCreator::CCS_OK;
 		QString authErrorMessage;
-		if (!ResolveUserId(token, resolvedUserId, scopes, isPat, authErrorMessage, authStatus)){
+		if (!ResolveUserId(token, resolvedUserId, tenantId, scopes, isPat, authErrorMessage, authStatus)){
 			SetError(error, authStatus, authErrorMessage);
 			return nullptr;
 		}
@@ -81,6 +82,7 @@ imtgql::IGqlContextUniquePtr CGqlContextCreatorComp::CreateGqlContext(
 	}
 
 	gqlContextPtr->SetUserId(resolvedUserId);
+	gqlContextPtr->SetTenantId(tenantId);
 	gqlContextPtr->SetToken(token);
 	gqlContextPtr->SetHeaders(headers);
 	gqlContextPtr->SetProductId(productId);
@@ -142,12 +144,13 @@ imtgql::IGqlContextUniquePtr CGqlContextCreatorComp::CreateGqlContext(
 bool CGqlContextCreatorComp::ResolveUserId(
 			const QByteArray& token,
 			QByteArray& userId,
+			QByteArray& tenantId,
 			QByteArrayList& scopes,
 			bool& isPat,
 			QString& errorMessage,
 			imtgql::IGqlContextCreator::ContextCreationStatus& status) const
 {
-	TokenCacheLookupResult lookupResult = TryGetCachedToken(token, userId, scopes, isPat, errorMessage, status);
+	TokenCacheLookupResult lookupResult = TryGetCachedToken(token, userId, tenantId, scopes, isPat, errorMessage, status);
 	if (lookupResult == TCLR_VALID){
 		status = imtgql::IGqlContextCreator::CCS_OK;
 		return true;
@@ -157,6 +160,7 @@ bool CGqlContextCreatorComp::ResolveUserId(
 	}
 
 	if (IsPatToken(token)){
+		tenantId.clear();
 		QByteArray tokenId;
 		bool isTokenValid = false;
 		isPat = true;
@@ -180,11 +184,11 @@ bool CGqlContextCreatorComp::ResolveUserId(
 		}
 
 		if (!isTokenValid){
-			StoreCachedToken(token, QByteArray(), QByteArray(), QByteArrayList(), true, false, status, s_negativeTokenCacheTtlMs);
+			StoreCachedToken(token, QByteArray(), QByteArray(), QByteArray(), QByteArrayList(), true, false, status, s_negativeTokenCacheTtlMs);
 			return false;
 		}
 
-		StoreCachedToken(token, userId, tokenId, scopes, true, true, imtgql::IGqlContextCreator::CCS_OK, s_tokenCacheTtlMs);
+		StoreCachedToken(token, userId, tenantId, tokenId, scopes, true, true, imtgql::IGqlContextCreator::CCS_OK, s_tokenCacheTtlMs);
 		return true;
 	}
 
@@ -202,23 +206,24 @@ bool CGqlContextCreatorComp::ResolveUserId(
 		state = m_jwtSessionControllerCompPtr->ValidateJwt(token);
 		if (state == JwtState::JS_OK){
 			userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
+			tenantId = m_jwtSessionControllerCompPtr->GetTenantFromJwt(token);
 		}
 	}
 
 	if (state == JwtState::JS_EXPIRED){
 		errorMessage = QStringLiteral("JWT token expired.");
 		status = imtgql::IGqlContextCreator::CCS_UNAUTHORIZED;
-		StoreCachedToken(token, QByteArray(), QByteArray(), QByteArrayList(), false, false, status, s_negativeTokenCacheTtlMs);
+		StoreCachedToken(token, QByteArray(), QByteArray(), QByteArray(), QByteArrayList(), false, false, status, s_negativeTokenCacheTtlMs);
 		return false;
 	}
 	if (state != JwtState::JS_OK){
 		errorMessage = QStringLiteral("Invalid JWT token.");
 		status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
-		StoreCachedToken(token, QByteArray(), QByteArray(), QByteArrayList(), false, false, status, s_negativeTokenCacheTtlMs);
+		StoreCachedToken(token, QByteArray(), QByteArray(), QByteArray(), QByteArrayList(), false, false, status, s_negativeTokenCacheTtlMs);
 		return false;
 	}
 
-	StoreCachedToken(token, userId, QByteArray(), QByteArrayList(), false, true, imtgql::IGqlContextCreator::CCS_OK, s_tokenCacheTtlMs);
+	StoreCachedToken(token, userId, tenantId, QByteArray(), QByteArrayList(), false, true, imtgql::IGqlContextCreator::CCS_OK, s_tokenCacheTtlMs);
 	return true;
 }
 
@@ -226,6 +231,7 @@ bool CGqlContextCreatorComp::ResolveUserId(
 CGqlContextCreatorComp::TokenCacheLookupResult CGqlContextCreatorComp::TryGetCachedToken(
 			const QByteArray& token,
 			QByteArray& userId,
+			QByteArray& tenantId,
 			QByteArrayList& scopes,
 			bool& isPat,
 			QString& errorMessage,
@@ -253,6 +259,7 @@ CGqlContextCreatorComp::TokenCacheLookupResult CGqlContextCreatorComp::TryGetCac
 	}
 
 	userId = iter->userId;
+	tenantId = iter->tenantId;
 	scopes = iter->scopes;
 	isPat = iter->isPat;
 	return TCLR_VALID;
@@ -262,6 +269,7 @@ CGqlContextCreatorComp::TokenCacheLookupResult CGqlContextCreatorComp::TryGetCac
 void CGqlContextCreatorComp::StoreCachedToken(
 			const QByteArray& token,
 			const QByteArray& userId,
+			const QByteArray& tenantId,
 			const QByteArray& tokenId,
 			const QByteArrayList& scopes,
 			bool isPat,
@@ -271,6 +279,7 @@ void CGqlContextCreatorComp::StoreCachedToken(
 {
 	TokenCacheEntry entry;
 	entry.userId = userId;
+	entry.tenantId = tenantId;
 	entry.tokenId = tokenId;
 	entry.scopes = scopes;
 	entry.isPat = isPat;

@@ -170,7 +170,7 @@ class Text extends Item {
     }
 
     SLOT_visibleChanged(oldValue, newValue){
-        super.SLOT_visibleChanged()
+        super.SLOT_visibleChanged(oldValue, newValue)
 
         JQApplication.updateLater(this)
     }

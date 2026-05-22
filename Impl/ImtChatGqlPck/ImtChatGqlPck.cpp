@@ -21,7 +21,7 @@ I_EXPORT_COMPONENT(
 			"Conversation Collection Controller");
 
 I_EXPORT_COMPONENT(
-			ConversationCollectionDocumentManager,
+			ConversationCollectionDocumentService,
 			"Conversation collection document manager",
 			"Conversation Collection Document Manager");
 

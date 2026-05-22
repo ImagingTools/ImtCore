@@ -1,0 +1,8 @@
+{
+    "includes": [],
+    "dirs": [
+        "${IMTCOREDIR}/Include/imtstylecontrolsqml/Qml/Acf",
+        "${IMTCOREDIR}/Qml/imtguigql",
+        "${IMTCOREDIR}/Qml/imtcontrols"
+    ]
+}
