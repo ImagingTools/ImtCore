@@ -71,6 +71,18 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 	int count = -1;
 	iprm::CParamsSet filterParams;
 
+	// Extract productId from input or request headers for tenant-scoped filtering
+	QByteArray productId;
+	if (arguments.input.Version_1_0->productId){
+		productId = (*arguments.input.Version_1_0->productId).toUtf8();
+	}
+	if (productId.isEmpty()){
+		productId = gqlRequest.GetHeader("productid");
+	}
+	if (!productId.isEmpty()){
+		filterParams.SetParameter("ProductId", productId);
+	}
+
 	// Exclude selected IDs: create CDocumentIdFilter with CT_NOT_IN
 	if (arguments.input.Version_1_0->excludeIds && !arguments.input.Version_1_0->excludeIds->empty()){
 		const auto& excludeIdsList = *arguments.input.Version_1_0->excludeIds;

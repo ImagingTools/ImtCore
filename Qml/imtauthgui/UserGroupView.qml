@@ -33,6 +33,7 @@ ViewBase {
 	
 	DocumentHistoryPanel {
 		id: historyPanel;
+		visible: false;
 		documentId: container.groupData ? container.groupData.m_id : "";
 		collectionId: "Groups";
 		editorFlickable: flickable;
@@ -141,13 +142,14 @@ ViewBase {
 				ItemSelectElementView {
 					id: groupSelectableCollectionEditor
 					collectionId: "Groups"
-					label: qsTr("Parent Groups")
-					addButtonText: qsTr("Add Parent Group")
-					showCount: true
-					onSelectionChanged: {
-						container.doUpdateModel()
+						productId: container.productId
+						label: qsTr("Parent Groups")
+						addButtonText: qsTr("Add Parent Group")
+						showCount: true
+						onSelectionChanged: {
+							container.doUpdateModel()
+						}
 					}
-				}
 
 				function updateGui(){
 					nameInput.text = container.groupData.m_name;
@@ -177,13 +179,14 @@ ViewBase {
 				ItemSelectElementView {
 					id: userSelectableCollectionEditor
 					collectionId: "Users"
-					label: qsTr("Users")
-					addButtonText: qsTr("Add User")
-					showCount: true
-					onSelectionChanged: {
-						container.doUpdateModel()
+						productId: container.productId
+						label: qsTr("Users")
+						addButtonText: qsTr("Add User")
+						showCount: true
+						onSelectionChanged: {
+							container.doUpdateModel()
+						}
 					}
-				}
 				
 				function updateGui(){
 					var ids = container.groupData.m_users ? container.groupData.m_users.slice() : []
@@ -209,13 +212,14 @@ ViewBase {
 				ItemSelectElementView {
 					id: roleSelectableCollectionEditor
 					collectionId: "Roles"
-					label: qsTr("Roles")
-					addButtonText: qsTr("Add Role")
-					showCount: true
-					onSelectionChanged: {
-						container.doUpdateModel()
+						productId: container.productId
+						label: qsTr("Roles")
+						addButtonText: qsTr("Add Role")
+						showCount: true
+						onSelectionChanged: {
+							container.doUpdateModel()
+						}
 					}
-				}
 
 				function updateGui(){
 					var ids = container.groupData.m_roles ? container.groupData.m_roles.slice() : []

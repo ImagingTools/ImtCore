@@ -39,6 +39,7 @@ ViewBase {
 
 	DocumentHistoryPanel {
 		id: historyPanel;
+		visible: false;
 		documentId: container.roleData ? container.roleData.m_id : "";
 		collectionId: "Roles";
 		editorFlickable: flickable;
@@ -153,13 +154,14 @@ ViewBase {
 				ItemSelectElementView {
 					id: roleSelectableCollectionEditor
 					collectionId: "Roles"
-					label: qsTr("Parent Roles")
-					addButtonText: qsTr("Add Parent Role")
-					showCount: true
-					onSelectionChanged: {
-						container.doUpdateModel()
+						productId: container.productId
+						label: qsTr("Parent Roles")
+						addButtonText: qsTr("Add Parent Role")
+						showCount: true
+						onSelectionChanged: {
+							container.doUpdateModel()
+						}
 					}
-				}
 
 				function updateGui(){
 					roleIdInput.text = container.roleData.m_roleId;

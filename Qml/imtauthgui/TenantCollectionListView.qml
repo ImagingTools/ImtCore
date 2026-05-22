@@ -10,6 +10,7 @@ Item {
 	id: root
 
 	property string collectionId: ""
+	property string productId: ""
 	property string filterPlaceholder: qsTr("Filter...")
 	property string emptyMessage: qsTr("No items found.")
 	property bool canManage: false
@@ -39,12 +40,12 @@ Item {
 	FilterableSelectGqlDataProvider {
 		id: dataProvider
 		collectionId: root.collectionId
+		productId: root.productId
 		pageSize: 50
 	}
 
 	SubscriptionClient {
 		id: subscriptionClient
-		gqlCommandId: root.collectionId !== "" ? "On" + root.collectionId + "CollectionChanged" : ""
 
 		function getHeaders(){
 			return {}
@@ -55,7 +56,14 @@ Item {
 		}
 	}
 
+	onCollectionIdChanged: {
+		if (root.collectionId !== "")
+			subscriptionClient.gqlCommandId = "On" + root.collectionId + "CollectionChanged"
+	}
+
 	Component.onCompleted: {
+		if (root.collectionId !== "")
+			subscriptionClient.gqlCommandId = "On" + root.collectionId + "CollectionChanged"
 		dataProvider.fetch("")
 	}
 

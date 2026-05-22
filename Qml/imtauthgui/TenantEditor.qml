@@ -151,42 +151,48 @@ DocumentViewBase {
 	Connections {
 		target: container.apiClient
 		function onInvitationCreated() {
+			PopupManager.addSuccessMessage(qsTr("Invitation created successfully"), true)
 			if (container.representationController)
 				container.representationController.updateRepresentationFromDocument()
 		}
 		function onOwnershipTransferred() {
+			PopupManager.addSuccessMessage(qsTr("Ownership transferred successfully"), true)
 			if (container.representationController)
 				container.representationController.updateRepresentationFromDocument()
 		}
-	}
-
-	// --- Subscription: real-time membership notifications ---
-	TenantMembershipSubscriptionClient {
-		id: membershipSubscription
-
-		onInvitationAccepted: {
+		function onRoleCreated() {
+			PopupManager.addSuccessMessage(qsTr("Role created successfully"), true)
+		}
+		function onGroupCreated() {
+			PopupManager.addSuccessMessage(qsTr("Group created successfully"), true)
+		}
+		function onUserCreated() {
+			PopupManager.addSuccessMessage(qsTr("User created successfully"), true)
+		}
+		function onSubscriptionInvitationAccepted(notification) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (notification.tenantId === container.tenantData.m_id) {
+				PopupManager.addSuccessMessage(qsTr("Invitation accepted"), true)
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
 		}
-
-		onInvitationRejected: {
+		function onSubscriptionInvitationRejected(notification) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (notification.tenantId === container.tenantData.m_id) {
+				PopupManager.addInfoMessage(qsTr("Invitation rejected"), true)
 				stateManager_.removePendingInvitation(notification.membershipId)
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
 		}
-
-		onOwnershipTransferred: {
+		function onSubscriptionOwnershipTransferred(notification) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (notification.tenantId === container.tenantData.m_id) {
+				PopupManager.addInfoMessage(qsTr("Ownership transferred"), true)
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}

@@ -259,10 +259,13 @@ Rectangle {
 			height: parent.height
 			anchors.verticalCenter: parent.verticalCenter
 
+			readonly property bool __hasActions: row.isMember
+				? ((row.canManageMembers && !row.isCurrentUser && !row.isMemberOwner && !row.isMemberCreator)
+				   || (row.isCurrentUser && !row.isMemberOwner && !row.isMemberCreator))
+				: (row.canManageMembers && row.effectiveStatus === "Pending")
+
 			ToolButton {
-				visible: row.isMember
-					? (row.canManageMembers || row.isCurrentUser)
-					: (row.canManageMembers && row.effectiveStatus === "Pending")
+				visible: actionsItem.__hasActions
 				anchors.centerIn: parent
 				tooltipText: qsTr("Actions")
 				iconSource: "qrc:/" + Style.getIconPath("Icons/More", Icon.State.On, Icon.Mode.Normal)

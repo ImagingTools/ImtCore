@@ -243,6 +243,7 @@ ViewBase {
 				FilterableSelectGqlDataProvider {
 					id: groupsDataProvider
 					collectionId: "Groups"
+					productId: groupsPage.apiClient ? groupsPage.apiClient.productId : ""
 					pageSize: 50
 					Component.onCompleted: groupsPage.__dataProvider = groupsDataProvider
 					Component.onDestruction: groupsPage.__dataProvider = null

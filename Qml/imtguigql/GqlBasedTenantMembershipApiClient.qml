@@ -58,6 +58,40 @@ QtObject {
 
 	signal requestFailed(string message)
 
+	// --- Real-time membership subscription notifications ---
+	signal subscriptionInvitationAccepted(var notification)
+	signal subscriptionInvitationRejected(var notification)
+	signal subscriptionOwnershipTransferred(var notification)
+
+	// --- Subscription client for membership notifications ---
+	property SubscriptionClient __membershipSubscription: SubscriptionClient {
+		gqlCommandId: "OnMembershipNotification"
+
+		function getHeaders() { return {} }
+
+		onMessageReceived: {
+			if (!data) return
+			var notificationType = ""
+			if (data.containsKey("notificationType"))
+				notificationType = data.getData("notificationType")
+
+			var notification = {
+				"membershipId": data.containsKey("membershipId") ? data.getData("membershipId") : "",
+				"userId": data.containsKey("userId") ? data.getData("userId") : "",
+				"tenantId": data.containsKey("tenantId") ? data.getData("tenantId") : "",
+				"tenantName": data.containsKey("tenantName") ? data.getData("tenantName") : "",
+				"role": data.containsKey("role") ? data.getData("role") : ""
+			}
+
+			if (notificationType === "InvitationAccepted" || notificationType === 1)
+				root.subscriptionInvitationAccepted(notification)
+			else if (notificationType === "InvitationRejected" || notificationType === 2)
+				root.subscriptionInvitationRejected(notification)
+			else if (notificationType === "OwnershipTransferred" || notificationType === 3)
+				root.subscriptionOwnershipTransferred(notification)
+		}
+	}
+
 	// =========================================================================
 	// GQL implementation
 	// =========================================================================

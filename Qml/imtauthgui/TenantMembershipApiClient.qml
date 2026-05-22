@@ -47,6 +47,11 @@ QtObject {
 	// --- Generic error ---
 	signal requestFailed(string message)
 
+	// --- Real-time membership subscription notifications ---
+	signal subscriptionInvitationAccepted(var notification)
+	signal subscriptionInvitationRejected(var notification)
+	signal subscriptionOwnershipTransferred(var notification)
+
 	// --- Stub methods (overridden by concrete implementations) ---
 	function createInvitation(tenantId, userId, role) {}
 	function revokeInvitation(invitationId) {}

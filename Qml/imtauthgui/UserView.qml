@@ -118,6 +118,7 @@ ViewBase {
 	
 	DocumentHistoryPanel {
 		id: historyPanel;
+		visible: false;
 		documentId: container.userData ? container.userData.m_id : "";
 		collectionId: "Users";
 		editorFlickable: flickable;
@@ -322,13 +323,14 @@ ViewBase {
 				ItemSelectElementView {
 					id: roleSelectableCollectionEditor
 					collectionId: "Roles"
-					label: qsTr("Roles")
-					addButtonText: qsTr("Add Role")
-					showCount: true
-					onSelectionChanged: {
-						container.doUpdateModel()
+						productId: container.productId
+						label: qsTr("Roles")
+						addButtonText: qsTr("Add Role")
+						showCount: true
+						onSelectionChanged: {
+							container.doUpdateModel()
+						}
 					}
-				}
 
 				function updateGui(){
 					var ids = container.userData.m_roles ? container.userData.m_roles.slice() : []
@@ -361,13 +363,14 @@ ViewBase {
 				ItemSelectElementView {
 					id: groupSelectableCollectionEditor
 					collectionId: "Groups"
-					label: qsTr("Groups")
-					addButtonText: qsTr("Add Group")
-					showCount: true
-					onSelectionChanged: {
-						container.doUpdateModel()
+						productId: container.productId
+						label: qsTr("Groups")
+						addButtonText: qsTr("Add Group")
+						showCount: true
+						onSelectionChanged: {
+							container.doUpdateModel()
+						}
 					}
-				}
 
 				function updateGui(){
 					var ids = container.userData.m_groups ? container.userData.m_groups.slice() : []

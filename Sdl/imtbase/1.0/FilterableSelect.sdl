@@ -24,6 +24,7 @@ type SelectableItemData {
 
 input GetSelectableItemsInput {
 	collectionId: ID!
+	productId: ID
 	viewParams: CollectionViewParams
 	excludeIds: [ID]
 }

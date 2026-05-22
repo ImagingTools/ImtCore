@@ -449,9 +449,18 @@ ViewBase {
 								showCheckBox: true
 								
 								onMemberActionsRequested: {
-									memberActionMenu.menuItems = menuItems
 									memberActionMenu.targetUserId = userId
 									memberActionMenu.targetUserName = userName
+									memberActionMenu.showChangeRole = false
+									memberActionMenu.showExclude = false
+									memberActionMenu.showTransfer = false
+									memberActionMenu.showLeave = false
+									for (var i = 0; i < menuItems.length; i++) {
+										if (menuItems[i].action === "changeRole") memberActionMenu.showChangeRole = true
+										else if (menuItems[i].action === "remove") memberActionMenu.showExclude = true
+										else if (menuItems[i].action === "transfer") memberActionMenu.showTransfer = true
+										else if (menuItems[i].action === "leave") memberActionMenu.showLeave = true
+									}
 									memberActionMenu.popup()
 								}
 								
@@ -489,46 +498,80 @@ ViewBase {
 				// Member actions context menu
 				Menu {
 					id: memberActionMenu
-					property var menuItems: []
 					property string targetUserId: ""
 					property string targetUserName: ""
+					property bool showChangeRole: false
+					property bool showExclude: false
+					property bool showTransfer: false
+					property bool showLeave: false
 					
-					Instantiator {
-						model: memberActionMenu.menuItems
-						delegate: MenuItem {
-							text: modelData.text || ""
+					Menu {
+						id: changeRoleSubmenu
+						title: qsTr("Change Environment Role")
+						enabled: memberActionMenu.showChangeRole
+						visible: memberActionMenu.showChangeRole
+						height: visible ? implicitHeight : 0
+						
+						MenuItem {
+							text: qsTr("Member")
 							onTriggered: {
-								var action = modelData.action
-								if (action === "remove" && membersPage.apiClient) {
-									ModalDialogManager.showConfirmationDialog(
-												qsTr("Exclude Member"),
-												qsTr("Are you sure you want to exclude \"%1\" from this tenant?").arg(memberActionMenu.targetUserName),
-												function(result) {
-													if (result === Enums.yes) {
-														var tenantId = membersPage.tenantData ? membersPage.tenantData.m_id : ""
-														membersPage.apiClient.removeMember(tenantId, memberActionMenu.targetUserId)
-													}
-												}
-												)
-								} else if (action === "changeRole" && membersPage.apiClient) {
+								if (membersPage.apiClient) {
 									var tenantId = membersPage.tenantData ? membersPage.tenantData.m_id : ""
-									// Show role selection dialog
-									ModalDialogManager.openDialog(roleSelectDialogComp, {
-										"targetUserId": memberActionMenu.targetUserId,
-										"targetUserName": memberActionMenu.targetUserName,
-										"tenantId": tenantId
-									})
-								} else if (action === "transfer" && membersPage.apiClient) {
-									var tid = membersPage.tenantData ? membersPage.tenantData.m_id : ""
-									membersPage.apiClient.transferOwnership(tid, memberActionMenu.targetUserId)
-								} else if (action === "leave" && membersPage.apiClient) {
-									var ltid = membersPage.tenantData ? membersPage.tenantData.m_id : ""
-									membersPage.apiClient.removeMember(ltid, memberActionMenu.targetUserId)
+									membersPage.apiClient.setMemberRole(tenantId, memberActionMenu.targetUserId, "Member")
 								}
 							}
 						}
-						onObjectAdded: memberActionMenu.insertItem(index, object)
-						onObjectRemoved: memberActionMenu.removeItem(object)
+						MenuItem {
+							text: qsTr("Admin")
+							onTriggered: {
+								if (membersPage.apiClient) {
+									var tenantId = membersPage.tenantData ? membersPage.tenantData.m_id : ""
+									membersPage.apiClient.setMemberRole(tenantId, memberActionMenu.targetUserId, "Admin")
+								}
+							}
+						}
+					}
+					
+					MenuItem {
+						text: qsTr("Exclude from Tenant")
+						visible: memberActionMenu.showExclude
+						height: visible ? implicitHeight : 0
+						onTriggered: {
+							ModalDialogManager.showConfirmationDialog(
+								qsTr("Exclude Member"),
+								qsTr("Are you sure you want to exclude \"%1\" from this tenant?").arg(memberActionMenu.targetUserName),
+								function(result) {
+									if (result === Enums.yes && membersPage.apiClient) {
+										var tenantId = membersPage.tenantData ? membersPage.tenantData.m_id : ""
+										membersPage.apiClient.removeMember(tenantId, memberActionMenu.targetUserId)
+									}
+								}
+							)
+						}
+					}
+					
+					MenuItem {
+						text: qsTr("Transfer Ownership")
+						visible: memberActionMenu.showTransfer
+						height: visible ? implicitHeight : 0
+						onTriggered: {
+							if (membersPage.apiClient) {
+								var tid = membersPage.tenantData ? membersPage.tenantData.m_id : ""
+								membersPage.apiClient.transferOwnership(tid, memberActionMenu.targetUserId)
+							}
+						}
+					}
+					
+					MenuItem {
+						text: qsTr("Leave Workspace")
+						visible: memberActionMenu.showLeave
+						height: visible ? implicitHeight : 0
+						onTriggered: {
+							if (membersPage.apiClient) {
+								var ltid = membersPage.tenantData ? membersPage.tenantData.m_id : ""
+								membersPage.apiClient.removeMember(ltid, memberActionMenu.targetUserId)
+							}
+						}
 					}
 				}
 				
@@ -566,6 +609,7 @@ ViewBase {
 		FilterableSelectPopup {
 			dataProvider: FilterableSelectGqlDataProvider {
 				collectionId: "Users"
+				productId: membersPage.apiClient ? membersPage.apiClient.productId : ""
 				multiSelect: true
 			}
 			
@@ -698,63 +742,6 @@ ViewBase {
 							}
 							editUserView.model = userData
 							editUserView.updateGui()
-						}
-					}
-				}
-			}
-		}
-	}
-	
-	// ===== Role selection dialog for Change Environment Role =====
-	Component {
-		id: roleSelectDialogComp
-		
-		Dialog {
-			id: roleSelectDialog
-			property string targetUserId: ""
-			property string targetUserName: ""
-			property string tenantId: ""
-			
-			title: qsTr("Change Environment Role for \"%1\"").arg(targetUserName)
-			width: 300
-			height: roleSelectColumn.height + Style.marginXL * 2
-			
-			Column {
-				id: roleSelectColumn
-				anchors.centerIn: parent
-				spacing: Style.marginM
-				width: parent.width - Style.marginXL * 2
-				
-				Repeater {
-					model: ["Member", "Admin"]
-					delegate: Rectangle {
-						width: roleSelectColumn.width
-						height: Style.controlHeightL
-						radius: Style.radiusM
-						color: roleOptionMA.containsMouse ? Style.buttonHoverColor : Style.baseColor
-						border.color: Style.borderColor
-						border.width: 1
-						
-						BaseText {
-							anchors.centerIn: parent
-							text: modelData
-							font.pixelSize: Style.fontSizeM
-						}
-						
-						MouseArea {
-							id: roleOptionMA
-							anchors.fill: parent
-							hoverEnabled: true
-							cursorShape: Qt.PointingHandCursor
-							onClicked: {
-								if (membersPage.apiClient) {
-									membersPage.apiClient.setMemberRole(
-										roleSelectDialog.tenantId,
-										roleSelectDialog.targetUserId,
-										modelData)
-								}
-								roleSelectDialog.close()
-							}
 						}
 					}
 				}
