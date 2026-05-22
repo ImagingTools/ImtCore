@@ -281,13 +281,17 @@ ViewBase {
 					}
 				}
 				
-				Item {
+				Rectangle {
 					id: rolesEmptyState
 					visible: rolesDataProvider.items.length === 0
 					anchors.top: rolesTableHeader.bottom
 					anchors.left: parent.left
 					anchors.right: parent.right
 					height: visible ? Style.controlHeightL + Style.marginL : 0
+					color: "transparent"
+					border.color: Style.borderColor
+					border.width: 1
+					radius: Style.radiusM
 					
 					BaseText {
 						anchors.centerIn: parent
