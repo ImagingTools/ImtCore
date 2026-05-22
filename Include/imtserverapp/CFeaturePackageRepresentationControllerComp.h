@@ -7,7 +7,7 @@
 #include <imtlic/CFeatureInfo.h>
 
 
-namespace imtauth
+namespace imtserverapp
 {
 
 
@@ -33,5 +33,5 @@ protected:
 };
 
 
-} // namespace imtauth
+} // namespace imtserverapp
 

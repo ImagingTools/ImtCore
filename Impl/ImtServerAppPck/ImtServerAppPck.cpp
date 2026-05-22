@@ -155,6 +155,26 @@ I_EXPORT_COMPONENT(
 			"Params representation controller",
 			"Params Representation Controller");
 
+I_EXPORT_COMPONENT(
+			PageGuiElementModel,
+			"Page based model",
+			"Page Based Model");
+
+I_EXPORT_COMPONENT(
+			ObserverQml,
+			"Observer QuickObject",
+			"Observer qml quickobject");
+
+I_EXPORT_COMPONENT(
+			FeaturePackageRepresentationController,
+			"Controller for feature package representation",
+			"FeaturePackage Package Features Controller Representation");
+
+I_EXPORT_COMPONENT(
+			GqlObjectCollectionDelegate,
+			"GraphQl based delegate for object collection",
+			"GraphQl Gql Object Collection Delegate");
+
 
 } // namespace ImtServerAppPck
 

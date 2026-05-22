@@ -6,7 +6,7 @@
 #include <iprm/TParamsPtr.h>
 
 // ImtCore includes
-#include <imtqml/IPageGuiElementModel.h>
+#include <imtserverapp/IPageGuiElementModel.h>
 #include <imtbase/ITableViewParam.h>
 
 // Qt includes

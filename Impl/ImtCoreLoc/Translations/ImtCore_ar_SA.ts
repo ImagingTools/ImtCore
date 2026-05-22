@@ -5395,7 +5395,7 @@
     </message>
     <message>
         <location line="+25"/>
-        <location filename="../../../Include/imtclientgql/CGqlObjectCollectionDelegateComp.cpp" line="+581"/>
+        <location filename="../../../Include/imtserverapp/CGqlObjectCollectionDelegateComp.cpp" line="+581"/>
         <location filename="../../../Include/imtgql/CSerializableObjectCollectionControllerComp.cpp" line="+33"/>
         <location line="+26"/>
         <location line="+155"/>
@@ -5514,7 +5514,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../Include/imtclientgql/CGqlObjectCollectionDelegateComp.cpp" line="-7"/>
+        <location filename="../../../Include/imtserverapp/CGqlObjectCollectionDelegateComp.cpp" line="-7"/>
         <location filename="../../../Include/imtgql/CSerializableObjectCollectionControllerComp.cpp" line="-159"/>
         <location line="+26"/>
         <source>Object data metainfo is not Serializable</source>

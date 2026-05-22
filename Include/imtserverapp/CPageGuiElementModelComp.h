@@ -6,26 +6,26 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtqml/IPageGuiElementModel.h>
+#include <imtserverapp/IPageGuiElementModel.h>
 #include <imtserverapp/CGuiElementModelComp.h>
 
 
-namespace imtqml
+namespace imtserverapp
 {
 
 
-class CPageGuiElementModelComp: virtual public imtqml::IPageGuiElementModel, public imtserverapp::CGuiElementModelComp
+class CPageGuiElementModelComp: virtual public imtserverapp::IPageGuiElementModel, public imtserverapp::CGuiElementModelComp
 {
 public:
 	typedef imtserverapp::CGuiElementModelComp BaseClass;
 
 	I_BEGIN_COMPONENT(CPageGuiElementModelComp);
-		I_REGISTER_INTERFACE(imtqml::IPageGuiElementModel);
+		I_REGISTER_INTERFACE(imtserverapp::IPageGuiElementModel);
 		I_ASSIGN(m_pageSourceItemAttrPtr, "PageQmlItem", "Path to the QML file item describing this page", false, "PageQmlItem");
 		I_ASSIGN(m_startSourceItemAttrPtr, "StartQmlItem", "Path to the QML file start on this page", false, "StartQmlItem");
 	I_END_COMPONENT;
 
-	// reimplemented (imtqml::IPageElementContainer)
+	// reimplemented (imtserverapp::IPageGuiElementModel)
 	virtual QString GetStartSourceItem() const override;
 	virtual QString GetPageQmlItemFilePath() const override;
 
@@ -35,6 +35,6 @@ protected:
 };
 
 
-} // namespace imtqml
+} // namespace imtserverapp
 
 

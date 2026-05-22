@@ -7,7 +7,7 @@
 #include <imtservice/CUrlConnectionParam.h>
 
 
-namespace imtservice
+namespace imtserverapp
 {
 
 
@@ -27,5 +27,5 @@ public:
 };
 
 
-} // namespace imtservice
+} // namespace imtserverapp
 

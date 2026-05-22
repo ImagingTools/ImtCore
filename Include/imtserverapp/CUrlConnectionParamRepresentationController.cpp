@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtservice/CUrlConnectionParamRepresentationController.h>
+#include <imtserverapp/CUrlConnectionParamRepresentationController.h>
 
 // Qt includes
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
 
 
-namespace imtservice
+namespace imtserverapp
 {
 
 
@@ -18,7 +18,7 @@ QByteArray CUrlConnectionParamRepresentationController::GetModelId() const
 
 bool CUrlConnectionParamRepresentationController::IsModelSupported(const istd::IChangeable& dataModel) const
 {
-	const CUrlConnectionParam* urlConnectionParamPtr = dynamic_cast<const CUrlConnectionParam*>(&dataModel);
+	const imtservice::imtservice::CUrlConnectionParam* urlConnectionParamPtr = dynamic_cast<const imtservice::imtservice::CUrlConnectionParam*>(&dataModel);
 
 	return urlConnectionParamPtr != nullptr;
 }
@@ -33,7 +33,7 @@ bool CUrlConnectionParamRepresentationController::GetRepresentationFromDataModel
 		return false;
 	}
 
-	const CUrlConnectionParam* urlConnectionParamPtr = dynamic_cast<const CUrlConnectionParam*>(&dataModel);
+	const imtservice::imtservice::CUrlConnectionParam* urlConnectionParamPtr = dynamic_cast<const imtservice::imtservice::CUrlConnectionParam*>(&dataModel);
 	if (urlConnectionParamPtr == nullptr){
 		return false;
 	}
@@ -87,8 +87,8 @@ bool CUrlConnectionParamRepresentationController::GetRepresentationFromDataModel
 	}
 
 	QJsonArray externPortsArray;
-	QList<IServiceConnectionParam::IncomingConnectionParam> incomingConnections = urlConnectionParamPtr->GetIncomingConnections();
-	for (const IServiceConnectionParam::IncomingConnectionParam& incomingConnection : incomingConnections){
+	QList<imtservice::IServiceConnectionParam::IncomingConnectionParam> incomingConnections = urlConnectionParamPtr->GetIncomingConnections();
+	for (const imtservice::IServiceConnectionParam::IncomingConnectionParam& incomingConnection : incomingConnections){
 		QJsonObject itemObj;
 		itemObj.insert(QStringLiteral("Id"), QString::fromUtf8(incomingConnection.GetObjectUuid()));
 		externPortsArray.append(itemObj);
@@ -107,12 +107,12 @@ bool CUrlConnectionParamRepresentationController::GetDataModelFromRepresentation
 		return false;
 	}
 
-	CUrlConnectionParam* urlConnectionParamPtr = dynamic_cast<CUrlConnectionParam*>(&dataModel);
+	imtservice::CUrlConnectionParam* urlConnectionParamPtr = dynamic_cast<imtservice::CUrlConnectionParam*>(&dataModel);
 	if (urlConnectionParamPtr == nullptr){
 		return false;
 	}
 
-	urlConnectionParamPtr->SetConnectionType(IServiceConnectionInfo::CT_INPUT);
+	urlConnectionParamPtr->SetConnectionType(imtservice::IServiceConnectionInfo::CT_INPUT);
 
 	if (representation.contains(QStringLiteral("Host"))){
 		urlConnectionParamPtr->SetHost(representation.value(QStringLiteral("Host")).toString());
@@ -130,7 +130,7 @@ bool CUrlConnectionParamRepresentationController::GetDataModelFromRepresentation
 		QJsonArray externPortsArray = representation.value(QStringLiteral("ExternPorts")).toArray();
 		for (const QJsonValue& value : externPortsArray){
 			QJsonObject itemObj = value.toObject();
-			IServiceConnectionParam::IncomingConnectionParam incomingConnection;
+			imtservice::IServiceConnectionParam::IncomingConnectionParam incomingConnection;
 
 			if (itemObj.contains(QStringLiteral("Id"))){
 				incomingConnection.SetObjectUuid(itemObj.value(QStringLiteral("Id")).toVariant().toByteArray());
@@ -144,4 +144,4 @@ bool CUrlConnectionParamRepresentationController::GetDataModelFromRepresentation
 }
 
 
-} // namespace imtservice
+} // namespace imtserverapp

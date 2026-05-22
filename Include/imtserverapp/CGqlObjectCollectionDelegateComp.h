@@ -21,19 +21,19 @@
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 
 
-namespace imtclientgql
+namespace imtserverapp
 {
 
 
 class CGqlObjectCollectionDelegateComp:
 			public ilog::CLoggerComponentBase,
-			virtual public IGqlObjectCollectionDelegate
+			virtual public imtclientgql::IGqlObjectCollectionDelegate
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGqlObjectCollectionDelegateComp);
-		I_REGISTER_INTERFACE(IGqlObjectCollectionDelegate);
+		I_REGISTER_INTERFACE(imtclientgql::IGqlObjectCollectionDelegate);
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection-ID", false, "");
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", false, "VersionInfo");
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", false, "ObjectCollection");
@@ -138,6 +138,6 @@ private:
 };
 
 
-} // namespace imtclientgql
+} // namespace imtserverapp
 
 

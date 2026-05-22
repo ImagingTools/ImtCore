@@ -35,6 +35,10 @@
 #include <imtserverapp/CCollectionImportParamRepresentationControllerComp.h>
 #include <imtserverapp/CIdParamRepresentationControllerComp.h>
 #include <imtserverapp/CParamsRepresentationControllerComp.h>
+#include <imtserverapp/CPageGuiElementModelComp.h>
+#include <imtserverapp/CObserverQmlComp.h>
+#include <imtserverapp/CFeaturePackageRepresentationControllerComp.h>
+#include <imtserverapp/CGqlObjectCollectionDelegateComp.h>
 
 
 /**
@@ -72,6 +76,10 @@ typedef imtserverapp::CCollectionImportParamRepresentationControllerComp Collect
 typedef imtbase::TComponentFactoryComp<imtserverapp::IJsonRepresentationController> RepresentationControllerFactory;
 typedef imtserverapp::CIdParamRepresentationControllerComp IdParamRepresentationController;
 typedef imtserverapp::CParamsRepresentationControllerComp ParamsRepresentationController;
+typedef imtserverapp::CPageGuiElementModelComp PageGuiElementModel;
+typedef imtserverapp::CObserverQmlComp ObserverQml;
+typedef imtserverapp::CFeaturePackageRepresentationControllerComp FeaturePackageRepresentationController;
+typedef imtserverapp::CGqlObjectCollectionDelegateComp GqlObjectCollectionDelegate;
 
 
 } // namespace ImtServerAppPck
