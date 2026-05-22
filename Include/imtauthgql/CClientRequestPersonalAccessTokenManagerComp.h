@@ -4,7 +4,7 @@
 
 // ImtCore includes
 #include <imtauth/IPersonalAccessTokenManager.h>
-#include <imtauthgql/CClientRequestManagerCompBase.h>
+#include <imtauthgql/CAsyncClientRequestManagerCompBase.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/PersonalAccessTokens.h>
 
 
@@ -13,11 +13,11 @@ namespace imtauthgql
 
 
 class CClientRequestPersonalAccessTokenManagerComp:
-			public imtauthgql::CClientRequestManagerCompBase,
+			public imtauthgql::CAsyncClientRequestManagerCompBase,
 			virtual public imtauth::IPersonalAccessTokenManager
 {
 public:
-	typedef imtauthgql::CClientRequestManagerCompBase BaseClass;
+	typedef imtauthgql::CAsyncClientRequestManagerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CClientRequestPersonalAccessTokenManagerComp)
 		I_REGISTER_INTERFACE(iser::ISerializable);

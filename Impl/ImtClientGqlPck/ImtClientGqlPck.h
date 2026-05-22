@@ -9,6 +9,7 @@
 // ImtCore includes
 #include <imtclientgql/CApiClientComp.h>
 #include <imtclientgql/CAsyncApiClientComp.h>
+#include <imtclientgql/TAsyncClientRequestManagerCompWrap.h>
 #include <imtclientgql/CGqlClientSyncAdapterComp.h>
 #include <imtclientgql/CGqlClientEngineComp.h>
 #include <imtclientgql/CGqlObjectCollectionComp.h>

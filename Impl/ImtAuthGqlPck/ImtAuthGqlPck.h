@@ -43,6 +43,7 @@
 #include <imtauthgql/CClientRequestGroupInfoProviderComp.h>
 #include <imtauthgql/CTokenBasedPermissionsProviderComp.h>
 #include <imtauthgql/CPersonalAccessTokenControllerComp.h>
+#include <imtauthgql/CAsyncClientRequestManagerCompBase.h>
 #include <imtauthgql/CClientRequestPersonalAccessTokenManagerComp.h>
 #include <imtauthgql/CTenantCollectionControllerComp.h>
 #include <imtauthgql/CTenantMetaInfoDelegateComp.h>
