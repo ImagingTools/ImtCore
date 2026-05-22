@@ -38,6 +38,7 @@
 #include <imtserverapp/CPageGuiElementModelComp.h>
 #include <imtserverapp/CObserverQmlComp.h>
 #include <imtserverapp/CFeaturePackageRepresentationControllerComp.h>
+#include <imtserverapp/CSystemStatusComp.h>
 #include <imtserverapp/CGqlObjectCollectionDelegateComp.h>
 
 
@@ -80,6 +81,7 @@ typedef imtserverapp::CPageGuiElementModelComp PageGuiElementModel;
 typedef imtserverapp::CObserverQmlComp ObserverQml;
 typedef imtserverapp::CFeaturePackageRepresentationControllerComp FeaturePackageRepresentationController;
 typedef imtserverapp::CGqlObjectCollectionDelegateComp GqlObjectCollectionDelegate;
+typedef icomp::TModelCompWrap<imtserverapp::CSystemStatusComp> SystemStatus;
 
 
 } // namespace ImtServerAppPck

@@ -175,6 +175,11 @@ I_EXPORT_COMPONENT(
 			"GraphQl based delegate for object collection",
 			"GraphQl Gql Object Collection Delegate");
 
+I_EXPORT_COMPONENT(
+			SystemStatus,
+			"System status",
+			"System Status");
+
 
 } // namespace ImtServerAppPck
 

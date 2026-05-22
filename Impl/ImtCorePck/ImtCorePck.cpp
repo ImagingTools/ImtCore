@@ -171,11 +171,6 @@ I_EXPORT_COMPONENT(
 			"Selection SelectionParam Adapter");
 
 I_EXPORT_COMPONENT(
-			SystemStatus,
-			"System status",
-			"System Status");
-
-I_EXPORT_COMPONENT(
 			SelectionIdBinder,
 			"Combined list of selected ids",
 			"Selection Param Id Ids Bind");
