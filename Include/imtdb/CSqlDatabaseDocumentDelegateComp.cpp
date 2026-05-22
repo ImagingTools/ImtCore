@@ -1192,6 +1192,31 @@ QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingFilterQuery(const Q
 }
 
 
+QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingExclusionFilterQuery(const QByteArray& tenantId) const
+{
+	const QString bindingsTableName = CreateTenantBindingTableName();
+	const QString escapedEntityType = SqlEncode(QString::fromUtf8(GetTableName()));
+	const QByteArray databaseDriverId = m_databaseEngineCompPtr.IsValid() ? m_databaseEngineCompPtr->GetDatabaseDriverId() : QByteArray();
+	const bool isSqlite = databaseDriverId.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
+	const QString entityIdExpression = isSqlite
+			? QString("root.\"%1\"").arg(qPrintable(s_documentIdColumn))
+			: QString("root.\"%1\"::text").arg(qPrintable(s_documentIdColumn));
+
+	QString bindingsLookup = QString(
+				"SELECT 1 FROM %1 tenantBindings "
+				"WHERE tenantBindings.\"EntityType\" = '%2' "
+				"AND tenantBindings.\"EntityId\" = %3 "
+				"AND tenantBindings.\"TenantId\" = '%4'")
+			.arg(
+					bindingsTableName,
+					escapedEntityType,
+					entityIdExpression,
+					SqlEncode(QString::fromUtf8(tenantId)));
+
+	return QString("NOT EXISTS (%1)").arg(bindingsLookup);
+}
+
+
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingInsertQuery(
 			const QByteArray& tenantId,
 			const QByteArray& entityId,
@@ -1460,6 +1485,19 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 		}
 	}
 
+	QString tenantExclusionFilterQuery;
+	if (paramIds.contains("TenantExclusionFilter")){
+		iprm::TParamsPtr<imtauth::ITenantFilterParam> tenantExclusionFilterPtr(&filterParams, "TenantExclusionFilter");
+		if (tenantExclusionFilterPtr.IsValid()){
+			EnsureTenantBindingTableExists();
+
+			QByteArray excludeTenantId = tenantExclusionFilterPtr->GetTenantId();
+			if (!excludeTenantId.isEmpty()){
+				tenantExclusionFilterQuery = CreateTenantBindingExclusionFilterQuery(excludeTenantId);
+			}
+		}
+	}
+
 	QString additionalFilters = CreateAdditionalFiltersQuery(filterParams);
 
 	if (!tenantFilterQuery.isEmpty()){
@@ -1468,6 +1506,14 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 		}
 
 		filterQuery += "(" + tenantFilterQuery + ")";
+	}
+
+	if (!tenantExclusionFilterQuery.isEmpty()){
+		if (!filterQuery.isEmpty()){
+			filterQuery += " AND ";
+		}
+
+		filterQuery += "(" + tenantExclusionFilterQuery + ")";
 	}
 
 	if (!objectTypeIdQuery.isEmpty()){
