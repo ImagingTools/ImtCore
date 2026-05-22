@@ -322,11 +322,11 @@ ViewBase {
 						id: membersColumn
 						width: parent.width
 						
-						property string __filterText: membersFilterInput.text
+						property string filterText: membersFilterInput.text
 						property var filteredMembers: membersColumn.__computeFilteredMembers()
 						property var filteredInvitations: membersColumn.__computeFilteredInvitations()
 						
-						on__filterTextChanged: {
+						onFilterTextChanged: {
 							membersColumn.filteredMembers = membersColumn.__computeFilteredMembers()
 							membersColumn.filteredInvitations = membersColumn.__computeFilteredInvitations()
 						}
@@ -342,7 +342,7 @@ ViewBase {
 						}
 						
 						function __computeFilteredMembers() {
-							var filter = membersColumn.__filterText.toLowerCase()
+							var filter = membersColumn.filterText.toLowerCase()
 							var members = membersPage.stateManager ? membersPage.stateManager.pendingMembers : []
 							if (!filter)
 								return members
@@ -357,7 +357,7 @@ ViewBase {
 						}
 						
 						function __computeFilteredInvitations() {
-							var filter = membersColumn.__filterText.toLowerCase()
+							var filter = membersColumn.filterText.toLowerCase()
 							var invitations = membersPage.stateManager ? membersPage.stateManager.pendingInvitations : []
 							if (!filter)
 								return invitations

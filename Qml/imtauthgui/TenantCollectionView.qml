@@ -30,7 +30,7 @@ RemoteCollectionView {
 		registerFieldFilterDelegate("tenantRelationFilter", tenantRelationDelegateFilterComp)
 	}
 
-	onCommandActivated: function(commandId) {
+	onCommandActivated: {
 		if (commandId === "Switch") {
 			let indexes = table.getSelectedIndexes()
 			if (indexes.length === 1) {
@@ -499,55 +499,6 @@ RemoteCollectionView {
 			Component.onCompleted: {
 				registerDocumentType("Tenant", qsTr("Tenant"))
 				addDocumentView("Tenant", "TenantEditor", tenantEditorComp, tenantDataControllerFactory)
-			}
-
-			// Only allow Edit when selected tenant matches current authorized tenant
-			function updateStateCustomCommands(selection, commandsController, elementsModel) {
-				if (commandsController && selection.length === 1) {
-					let tenantId = elementsModel.getData("id", selection[0])
-					let isCurrent = (tenantId === AuthorizationController.currentTenantId)
-					commandsController.setCommandIsEnabled("Edit", isCurrent)
-				}
-			}
-
-			// Add Switch and Leave items to context menu
-			function setupContextMenu() {
-				let commandsController = collectionView.commandsController
-				if (!commandsController) return
-
-				contextMenuModel.clear()
-
-				if (commandsController.commandExists("Edit")) {
-					let idx = contextMenuModel.insertNewItem()
-					contextMenuModel.setData("id", "Edit", idx)
-					contextMenuModel.setData("name", qsTr("Edit"), idx)
-					contextMenuModel.setData("icon", "Icons/Edit", idx)
-				}
-
-				// Always show Switch to — availability is determined at click time
-				{
-					let idx = contextMenuModel.insertNewItem()
-					contextMenuModel.setData("id", "Switch", idx)
-					contextMenuModel.setData("name", qsTr("Switch to"), idx)
-					contextMenuModel.setData("icon", "", idx)
-				}
-
-				// Always show Leave — availability is determined at click time
-				{
-					let idx = contextMenuModel.insertNewItem()
-					contextMenuModel.setData("id", "Leave", idx)
-					contextMenuModel.setData("name", qsTr("Leave"), idx)
-					contextMenuModel.setData("icon", "", idx)
-				}
-
-				if (commandsController.commandExists("Remove")) {
-					let idx = contextMenuModel.insertNewItem()
-					contextMenuModel.setData("id", "Remove", idx)
-					contextMenuModel.setData("name", qsTr("Remove"), idx)
-					contextMenuModel.setData("icon", "Icons/Delete", idx)
-				}
-
-				contextMenuModel.refresh()
 			}
 
 			Component {
