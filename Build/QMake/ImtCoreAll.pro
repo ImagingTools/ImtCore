@@ -221,7 +221,7 @@ imtlicgql.depends = imtlic imtlicsdl imtguigql imtgui imtauth
 
 SUBDIRS += imtgql
 imtgql.file = ../../Include/imtgql/QMake/imtgql.pro
-imtgql.depends = imtauth imtcom imtrest imtbase imtappsdl
+imtgql.depends = imtauth imtrest imtbase imtappsdl
 
 SUBDIRS += imtservergql
 imtservergql.file = ../../Include/imtservergql/QMake/imtservergql.pro
