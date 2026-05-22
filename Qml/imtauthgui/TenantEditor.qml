@@ -29,7 +29,7 @@ DocumentViewBase {
 	contentColor: Style.baseColor
 
 	// GitHub-like typography applied locally within TenantEditor scope
-	font.family: "Segoe UI, Helvetica, Arial, sans-serif"
+	// font.family: "Segoe UI, Helvetica, Arial, sans-serif"
 
 	property TenantData tenantData: model
 
