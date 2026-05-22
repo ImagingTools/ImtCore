@@ -33,7 +33,6 @@ ViewBase {
 	
 	DocumentHistoryPanel {
 		id: historyPanel;
-		visible: false;
 		documentId: container.groupData ? container.groupData.m_id : "";
 		collectionId: "Groups";
 		editorFlickable: flickable;

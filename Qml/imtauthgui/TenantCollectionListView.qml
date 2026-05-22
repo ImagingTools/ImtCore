@@ -87,7 +87,14 @@ Item {
 			id: filterInput
 			width: parent.width
 			placeHolderText: root.filterPlaceholder
-			onTextChanged: dataProvider.fetch(text)
+			onTextChanged: filterDebounce.restart()
+		}
+
+		Timer {
+			id: filterDebounce
+			interval: 250
+			repeat: false
+			onTriggered: dataProvider.fetch(filterInput.text)
 		}
 
 		Rectangle {
@@ -124,12 +131,12 @@ Item {
 
 		header: Item {
 			width: listViewArea.width
-			height: listViewArea.count === 0 && !dataProvider.isInitialLoading ? Style.controlHeightL + Style.marginL : 0
+			height: (listViewArea.count === 0 || dataProvider.isInitialLoading) ? Style.controlHeightL + Style.marginL : 0
 			visible: height > 0
 
 			BaseText {
 				anchors.centerIn: parent
-				text: root.emptyMessage
+				text: dataProvider.isInitialLoading ? qsTr("Loading...") : root.emptyMessage
 				font.pixelSize: Style.fontSizeM
 				color: Style.inactiveTextColor
 			}

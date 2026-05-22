@@ -344,14 +344,19 @@ ViewBase {
 						function __computeFilteredMembers() {
 							var filter = membersColumn.filterText.toLowerCase()
 							var members = membersPage.stateManager ? membersPage.stateManager.pendingMembers : []
-							if (!filter)
-								return members
+							var creatorId = (membersPage.tenantData && membersPage.tenantData.m_creatorId) ? membersPage.tenantData.m_creatorId : ""
 							var result = []
 							for (var i = 0; i < members.length; i++) {
-								var name = (members[i].name || "").toLowerCase()
-								var id = (members[i].id || "").toLowerCase()
-								if (name.indexOf(filter) >= 0 || id.indexOf(filter) >= 0)
-									result.push(members[i])
+								// Skip Creator — only Owner is shown as a member
+								if (creatorId && members[i].id === creatorId)
+									continue
+								if (filter){
+									var name = (members[i].name || "").toLowerCase()
+									var id = (members[i].id || "").toLowerCase()
+									if (name.indexOf(filter) < 0 && id.indexOf(filter) < 0)
+										continue
+								}
+								result.push(members[i])
 							}
 							return result
 						}

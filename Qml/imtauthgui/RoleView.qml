@@ -39,7 +39,6 @@ ViewBase {
 
 	DocumentHistoryPanel {
 		id: historyPanel;
-		visible: false;
 		documentId: container.roleData ? container.roleData.m_id : "";
 		collectionId: "Roles";
 		editorFlickable: flickable;

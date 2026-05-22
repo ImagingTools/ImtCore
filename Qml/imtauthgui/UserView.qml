@@ -118,7 +118,6 @@ ViewBase {
 	
 	DocumentHistoryPanel {
 		id: historyPanel;
-		visible: false;
 		documentId: container.userData ? container.userData.m_id : "";
 		collectionId: "Users";
 		editorFlickable: flickable;
