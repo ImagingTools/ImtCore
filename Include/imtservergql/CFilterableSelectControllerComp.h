@@ -22,7 +22,6 @@ public:
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection ID to match incoming requests", true, "");
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection providing selectable items", true, "ObjectCollection");
 		I_ASSIGN_MULTI_0(m_filterFillersCompPtr, "ParamsSetJoiners", "Optional params set joiners for injecting additional filters", false);
-		I_ASSIGN(m_tenantFilterEnabledAttrPtr, "TenantFilterEnabled", "Enable tenant filter param injection from GQL context", false, false);
 	I_END_COMPONENT;
 
 	// reimplemented (imtgql::IGqlRequestHandler)
@@ -42,7 +41,6 @@ private:
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 	I_MULTIREF(IParamsSetJoiner, m_filterFillersCompPtr);
-	I_ATTR(bool, m_tenantFilterEnabledAttrPtr);
 };
 
 

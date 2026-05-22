@@ -15,8 +15,6 @@
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtcol/CDocumentIdFilter.h>
 #include <imtgql/CGqlRequest.h>
-#include <imtgql/IGqlContext.h>
-#include <imtauth/CTenantFilterParam.h>
 
 
 namespace imtservergql
@@ -88,20 +86,6 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 			documentIdFilterPtr->SetConditionType(imtcol::IDocumentIdFilter::CT_NOT_IN);
 			documentIdFilterPtr->SetDocumentIds(documentIds);
 			filterParams.SetEditableParameter("DocumentIdFilter", documentIdFilterPtr, true);
-		}
-	}
-
-	// Apply tenant filter from GQL context (analogous to CObjectCollectionControllerCompBase)
-	bool tenantFilterEnabled = m_tenantFilterEnabledAttrPtr.IsValid() ? *m_tenantFilterEnabledAttrPtr : false;
-	if (tenantFilterEnabled){
-		const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-		if (gqlContextPtr != nullptr){
-			QByteArray tenantId = gqlContextPtr->GetTenantId();
-			if (!tenantId.isEmpty()){
-				imtauth::CTenantFilterParam* tenantFilterPtr = new imtauth::CTenantFilterParam();
-				tenantFilterPtr->SetTenantId(tenantId);
-				filterParams.SetEditableParameter("TenantFilter", tenantFilterPtr, true);
-			}
 		}
 	}
 

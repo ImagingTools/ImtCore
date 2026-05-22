@@ -279,17 +279,13 @@ ViewBase {
 					}
 				}
 				
-				Rectangle {
+				Item {
 					id: groupsEmptyState
 					visible: groupsDataProvider.items.length === 0
 					anchors.top: groupsTableHeader.bottom
 					anchors.left: parent.left
 					anchors.right: parent.right
 					height: visible ? Style.controlHeightL + Style.marginL : 0
-					color: "transparent"
-					border.color: Style.borderColor
-					border.width: 1
-					radius: Style.radiusM
 					
 					BaseText {
 						anchors.centerIn: parent

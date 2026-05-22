@@ -8,7 +8,6 @@ import imtauthTenantMembershipsSdl 1.0
 import imtbaseImtCollectionSdl 1.0
 import imtauthRolesSdl 1.0
 import imtauthGroupsSdl 1.0
-import imtauthUsersSdl 1.0
 
 /**
  * GqlBasedTenantMembershipApiClient
@@ -397,23 +396,6 @@ QtObject {
 		root.__getUserDataInput.m_collectionId = "Users"
 		root.__getUserDataInput.m_objectId = userId || ""
 		root.__getUserDataSender.send(root.__getUserDataInput)
-	}
-
-	// --- Data factories (create SDL typed objects via Component) ---
-	property Component __roleDataComp: Component { RoleData {} }
-	property Component __groupDataComp: Component { GroupData {} }
-	property Component __userDataComp: Component { UserData {} }
-
-	function createRoleData() {
-		return root.__roleDataComp.createObject(root)
-	}
-
-	function createGroupData() {
-		return root.__groupDataComp.createObject(root)
-	}
-
-	function createUserData() {
-		return root.__userDataComp.createObject(root)
 	}
 
 	// --- Internal parse helpers ---

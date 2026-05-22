@@ -380,14 +380,10 @@ ViewBase {
 						}
 						
 						// Empty state
-						Rectangle {
+						Item {
 							visible: membersListViewContent.count === 0 && invitationsListView.count === 0
 							width: membersColumn.width
-							height: Style.controlHeightL + Style.marginL
-							color: "transparent"
-							border.color: Style.borderColor
-							border.width: 1
-							radius: Style.radiusM
+							height: Style.controlHeightL * 3
 							
 							BaseText {
 								anchors.centerIn: parent
