@@ -279,6 +279,7 @@ Item {
 				height: 1
 				color: Style.borderColor
 				opacity: 0.5
+				visible: index !== listViewArea.count - 1
 			}
 		}
 		}
