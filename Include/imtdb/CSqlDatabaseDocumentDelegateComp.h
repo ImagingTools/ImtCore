@@ -160,7 +160,6 @@ protected:
 	virtual QByteArray CreateTenantBindingTableInitializationQuery() const;
 	virtual void EnsureTenantBindingTableExists() const;
 	virtual QString CreateTenantBindingFilterQuery(const QByteArray& tenantId) const;
-	virtual QString CreateTenantBindingExclusionFilterQuery(const QByteArray& tenantId) const;
 	virtual QByteArray CreateTenantBindingInsertQuery(const QByteArray& tenantId, const QByteArray& entityId, const imtbase::IOperationContext* operationContextPtr) const;
 
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
