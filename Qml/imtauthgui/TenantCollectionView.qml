@@ -30,39 +30,6 @@ RemoteCollectionView {
 		registerFieldFilterDelegate("tenantRelationFilter", tenantRelationDelegateFilterComp)
 	}
 
-	onCommandActivated: {
-		if (commandId === "Switch") {
-			let indexes = table.getSelectedIndexes()
-			if (indexes.length === 1) {
-				let tenantId = table.elements.getData("id", indexes[0])
-				container.switchToTenant(tenantId)
-			}
-		} else if (commandId === "Leave") {
-			let indexes = table.getSelectedIndexes()
-			if (indexes.length === 1) {
-				let tenantId = table.elements.getData("id", indexes[0])
-				let tenantName = table.elements.getData("name", indexes[0])
-				ModalDialogManager.openDialog(leaveConfirmDialogComp, {"tenantId": tenantId, "tenantName": tenantName || tenantId})
-			}
-		}
-	}
-
-	Component {
-		id: leaveConfirmDialogComp
-		MessageDialog {
-			property string tenantId: ""
-			property string tenantName: ""
-			width: Style.sizeHintM
-			title: qsTr("Leave organization")
-			message: qsTr("Are you sure you want to leave \"%1\"?").arg(tenantName)
-			onFinished: {
-				if (buttonId == Enums.yes) {
-					container.leaveTenant(tenantId)
-				}
-			}
-		}
-	}
-
 	// --- Subscription for real-time invitation notifications ---
 	TenantMembershipSubscriptionClient {
 		id: collectionMembershipSubscription
@@ -425,75 +392,8 @@ RemoteCollectionView {
 		}
 	}
 
-	// --- Switch to organization ---
-	function switchToTenant(tenantId) {
-		if (tenantId && tenantId !== AuthorizationController.currentTenantId) {
-			AuthorizationController.selectTenant(tenantId)
-		}
-	}
-
-	// --- Leave organization ---
-	function leaveTenant(tenantId) {
-		if (!tenantId) return
-		__leaveTenantId = tenantId
-		__findMembershipForLeaveInput.m_userId = AuthorizationController.userTokenProvider.userId
-		__findMembershipForLeaveInput.m_tenantId = tenantId
-		__findMembershipForLeaveSender.send(__findMembershipForLeaveInput)
-	}
-
-	property string __leaveTenantId: ""
-
-	property FindMembershipInput __findMembershipForLeaveInput: FindMembershipInput {}
-	property GqlSdlRequestSender __findMembershipForLeaveSender: GqlSdlRequestSender {
-		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_findMembership
-
-		sdlObjectComp: Component {
-			FindMembershipPayload {
-				onFinished: {
-					if (m_membership && m_membership.m_id && m_membership.m_id !== "") {
-						container.__removeMembershipForLeaveInput.m_membershipId = m_membership.m_id
-						container.__removeMembershipForLeaveSender.send(container.__removeMembershipForLeaveInput)
-					} else if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
-					}
-				}
-			}
-		}
-
-		function onError(message, type) {
-			ModalDialogManager.showInfoDialog(message)
-		}
-	}
-
-	property RemoveMembershipInput __removeMembershipForLeaveInput: RemoveMembershipInput {}
-	property GqlSdlRequestSender __removeMembershipForLeaveSender: GqlSdlRequestSender {
-		requestType: 1
-		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_removeMembership
-
-		sdlObjectComp: Component {
-			RemoveMembershipPayload {
-				onFinished: {
-					if (m_success) {
-						// If we left the currently selected tenant, deselect it
-						if (container.__leaveTenantId === AuthorizationController.currentTenantId) {
-							AuthorizationController.selectTenant("")
-						}
-						container.doUpdateGui()
-					} else if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
-					}
-				}
-			}
-		}
-
-		function onError(message, type) {
-			ModalDialogManager.showInfoDialog(message)
-		}
-	}
-
 	commandsDelegateComp: Component {
 		DocCollectionViewDelegate {
-			id: tenantCommandsDelegate
 			collectionView: container
 
 			Component.onCompleted: {
@@ -524,12 +424,8 @@ RemoteCollectionView {
 					// Concrete GQL transport injected from this view (imtguigql is
 					// already a dependency here); TenantEditor itself stays
 					// transport-agnostic.
-					// tenantId is sourced from the tenant being edited (not from the
-					// currently authorized tenant) so that GetSelectableItems queries
-					// (Roles/Groups/Users) are filtered for the correct tenant scope.
 					GqlBasedTenantMembershipApiClient {
 						id: tenantEditorApiClient
-						tenantId: tenantEditor.tenantData ? tenantEditor.tenantData.m_id : ""
 					}
 				}
 			}

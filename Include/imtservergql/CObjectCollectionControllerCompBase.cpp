@@ -45,7 +45,6 @@
 #include <imtcol/CComplexCollectionFilterRepresentationController.h>
 #include <imtcol/CDocumentCollectionFilterRepresentationController.h>
 #include <imtcol/CDocumentCollectionFilter.h>
-#include <imtauthgql/imtauthgql.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentCollectionFilter.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
@@ -2919,7 +2918,16 @@ imtauth::CTenantFilterParam* CObjectCollectionControllerCompBase::CreateTenantFi
 		return nullptr;
 	}
 
-	return imtauthgql::CreateTenantFilterParam(gqlRequest);
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr == nullptr){
+		return nullptr;
+	}
+
+	imtauth::CTenantFilterParam* tenantFilterPtr = new imtauth::CTenantFilterParam();
+	tenantFilterPtr->SetTenantId(gqlContextPtr->GetTenantId());
+	tenantFilterPtr->SetOwnerId(gqlContextPtr->GetUserId());
+
+	return tenantFilterPtr;
 }
 
 

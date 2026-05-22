@@ -22,6 +22,7 @@ ViewBase {
 	readonly property var tenantData: rolesPage.model
 	property var stateManager: null
 	property var apiClient: null
+	property var roleDataFactory: null
 	
 	function updateGui() {}
 	function updateModel() {}
@@ -41,18 +42,6 @@ ViewBase {
 		function onRoleDataReceived(data) {
 			if (rolesPage.stateManager)
 				rolesPage.stateManager.receivedRoleData = data
-		}
-		function onRoleCreated() {
-			if (rolesPage.__dataProvider)
-				rolesPage.__dataProvider.fetch("")
-		}
-		function onRoleUpdated(roleId) {
-			if (rolesPage.__dataProvider)
-				rolesPage.__dataProvider.fetch("")
-		}
-		function onRoleRemoved(roleId) {
-			if (rolesPage.__dataProvider)
-				rolesPage.__dataProvider.fetch("")
 		}
 	}
 	
@@ -236,7 +225,7 @@ ViewBase {
 			TenantTableContainer {
 				anchors.top: rolesFilterInput.bottom
 				anchors.topMargin: Style.marginM
-				height: Math.min(rolesTableHeader.height + rolesEmptyState.height + rolesListView2.contentHeight + 2,
+				height: Math.min(rolesTableHeader.height + rolesListView2.contentHeight + 2,
 								 parent.height - rolesFilterInput.height - rolesFilterInput.anchors.topMargin - Style.marginM - Style.marginL)
 				
 				IdSelectionManager {
@@ -249,7 +238,6 @@ ViewBase {
 				FilterableSelectGqlDataProvider {
 					id: rolesDataProvider
 					collectionId: "Roles"
-					tenantId: rolesPage.apiClient ? rolesPage.apiClient.tenantId : ""
 					pageSize: 50
 					Component.onCompleted: {
 						rolesPage.__dataProvider = rolesDataProvider
@@ -475,10 +463,15 @@ ViewBase {
 		var roleData = editorView.model
 		if (rolesPage.__isCreating) {
 			if (rolesPage.apiClient)
-				rolesPage.apiClient.insertRole("", roleData)
+				rolesPage.apiClient.insertRole(
+							roleData ? roleData.m_name : "",
+							roleData ? roleData.m_description : "")
 		} else {
 			if (rolesPage.apiClient)
-				rolesPage.apiClient.setRoleData(rolesPage.__editRoleId, roleData)
+				rolesPage.apiClient.setRoleData(
+							rolesPage.__editRoleId,
+							roleData ? roleData.m_name : "",
+							roleData ? roleData.m_description : "")
 		}
 		rolesStackViewHeader.popHeader()
 		rolesStackView.previous()
@@ -515,10 +508,9 @@ ViewBase {
 				RoleView {
 					id: createRoleView
 					commandsPanelVisible: false
-					productId: rolesPage.apiClient ? rolesPage.apiClient.tenantId : ""
 					
 					Component.onCompleted: {
-						createRoleView.model = rolesPage.apiClient ? rolesPage.apiClient.createRoleData() : null
+						createRoleView.model = rolesPage.roleDataFactory ? rolesPage.roleDataFactory() : null
 						createRoleView.updateGui()
 					}
 				}
@@ -540,10 +532,9 @@ ViewBase {
 				RoleView {
 					id: editRoleView
 					commandsPanelVisible: false
-					productId: rolesPage.apiClient ? rolesPage.apiClient.tenantId : ""
 					
 					Component.onCompleted: {
-						var roleData = rolesPage.apiClient ? rolesPage.apiClient.createRoleData() : null
+						var roleData = rolesPage.roleDataFactory ? rolesPage.roleDataFactory() : null
 						if (roleData) {
 							roleData.m_id = rolesPage.__editRoleId
 							roleData.m_name = rolesPage.__editRoleName
@@ -559,17 +550,11 @@ ViewBase {
 							if (rolesPage.stateManager
 									&& rolesPage.stateManager.receivedRoleData
 									&& rolesPage.__editRoleId) {
-								var received = rolesPage.stateManager.receivedRoleData
-								var roleData = rolesPage.apiClient ? rolesPage.apiClient.createRoleData() : null
+								var roleData = rolesPage.roleDataFactory ? rolesPage.roleDataFactory() : null
 								if (roleData) {
 									roleData.m_id = rolesPage.__editRoleId
-									roleData.m_name = received.name || rolesPage.__editRoleName
-									roleData.m_roleId = received.roleId || ""
-									roleData.m_description = received.description || rolesPage.__editRoleDescription
-									roleData.m_parentRoles = received.parentRoles || []
-									roleData.m_permissions = received.permissions || ""
-									roleData.m_isDefault = received.isDefault || false
-									roleData.m_isGuest = received.isGuest || false
+									roleData.m_name = rolesPage.stateManager.receivedRoleData.name || rolesPage.__editRoleName
+									roleData.m_description = rolesPage.stateManager.receivedRoleData.description || rolesPage.__editRoleDescription
 								}
 								editRoleView.model = roleData
 								editRoleView.updateGui()

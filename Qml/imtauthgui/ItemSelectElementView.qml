@@ -22,8 +22,6 @@ ElementView {
 	property string filterPlaceholder: qsTr("Type or choose an item")
 	// CollectionId for the data provider
 	property string collectionId: ""
-	// ProductId for tenant-scoped filtering
-	property string productId: ""
 	// Text shown when no items selected
 	property string emptyText: qsTr("No items")
 	// Whether to show selected count next to the label
@@ -50,7 +48,6 @@ ElementView {
 	FilterableSelectGqlDataProvider {
 		id: nameResolver
 		collectionId: itemSelectElementView.collectionId
-		tenantId: itemSelectElementView.productId
 		multiSelect: true
 		pageSize: 100
 
@@ -224,7 +221,6 @@ ElementView {
 		FilterableSelectPopup {
 			dataProvider: FilterableSelectGqlDataProvider {
 				collectionId: itemSelectElementView ? itemSelectElementView.collectionId : ""
-				tenantId: itemSelectElementView ? itemSelectElementView.productId : ""
 				multiSelect: true
 			}
 

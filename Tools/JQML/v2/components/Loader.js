@@ -8,7 +8,6 @@ class Loader extends Item {
     static Error = 3
 
     static defaultProperties = {
-        active: { type: QBool, value: true, changed: '$activeChanged' },
         status: { type: QReal, value: Loader.Null },
         progress: { type: QReal, value: 0 },
         asynchronous: { type: QBool, value: false },
@@ -41,23 +40,7 @@ class Loader extends Item {
         if(this.$signals['Component.completed']) this.$signals['Component.completed']()
     }
 
-    $activeChanged(){
-        if(this.getPropertyValue('active')){
-            if(this.getPropertyValue('sourceComponent')){
-                this.$sourceComponentChanged()
-            } else if(this.getPropertyValue('source')){
-                this.$sourceChanged()
-            }
-        } else {
-            if(this.getPropertyValue('item') && this.getPropertyValue('item') !== this) this.getPropertyValue('item').destroy()
-            this.getStatement('item').reset(undefined)
-            this.getStatement('status').reset(Loader.Null)
-        }
-    }
-
     $sourceComponentChanged(){
-        if(!this.getPropertyValue('active')) return
-
         // if(this.$widthAuto && this.getProperty('width').compute) this.$widthAuto = false
         // if(this.$heightAuto && this.getProperty('height').compute) this.$heightAuto = false
         // if(!this.$completed) {
@@ -157,8 +140,6 @@ class Loader extends Item {
     }
 
     $sourceChanged(){
-        if(!this.getPropertyValue('active')) return
-
         // if(!this.$completed) {
         //     this.$lazy = this.getProperty('source').getNotify()
         //     return
