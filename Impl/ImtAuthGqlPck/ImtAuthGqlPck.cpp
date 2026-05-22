@@ -216,6 +216,11 @@ I_EXPORT_COMPONENT(
 			"Tenant Collection Document Manager");
 
 I_EXPORT_COMPONENT(
+			TenantCollectionDocumentServiceController,
+			"Tenant collection document service controller with tenant access checks",
+			"Tenant Collection Document Service Controller");
+
+I_EXPORT_COMPONENT(
 			RemoteTenantController,
 			"Remote tenant controller",
 			"Remote Tenant Controller");
