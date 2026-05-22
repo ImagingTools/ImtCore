@@ -14,7 +14,7 @@ namespace imtserverapp
 class CUrlConnectionParamRepresentationController: public imtserverapp::IRepresentationController
 {
 public:
-	// reimplemented (imtrest::IRepresentationController)
+	// reimplemented (imtserverapp::IRepresentationController)
 	virtual QByteArray GetModelId() const override;
 	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;
 	virtual bool GetRepresentationFromDataModel(

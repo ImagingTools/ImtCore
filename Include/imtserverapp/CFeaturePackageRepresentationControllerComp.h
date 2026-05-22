@@ -23,7 +23,7 @@ protected:
 	// reimplemented (imtserverapp::CObjectRepresentationControllerCompBase)
 	virtual bool GetRepresentationFromValue(const istd::IChangeable& dataModel, QJsonObject& representation, const iprm::IParamsSet* paramsPtr = nullptr) const override;
 
-	// reimplemented (imtrest::IRepresentationController)
+	// reimplemented (imtserverapp::IRepresentationController)
 	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;
 	virtual bool GetDataModelFromRepresentation(const QJsonObject& representation, istd::IChangeable& dataModel) const override;
 	virtual bool GetRepresentationFromDataModel(const istd::IChangeable& dataModel, QJsonObject& representation, const iprm::IParamsSet* paramsPtr = nullptr) const override;
