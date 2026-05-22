@@ -4,10 +4,10 @@
 
 // ImtCore includes
 #include <imtbase/TBasePluginComponentImpl.h>
-#include <imtbase/IParamsSetPlugin.h>
+#include <imtserverapp/IParamsSetPlugin.h>
 
 
-namespace imtbase
+namespace imtserverapp
 {
 
 
@@ -15,14 +15,14 @@ namespace imtbase
 	Generic implementation of task plugin.
 */
 template <class ComponentClass>
-class TParamsSetPluginComponentImpl: public TBasePluginComponentImpl<ComponentClass, IParamsSetPlugin>
+class TParamsSetPluginComponentImpl: public imtbase::TBasePluginComponentImpl<ComponentClass, IParamsSetPlugin>
 {
 public:
-	typedef TBasePluginComponentImpl<ComponentClass, IParamsSetPlugin> BaseClass;
+	typedef imtbase::TBasePluginComponentImpl<ComponentClass, IParamsSetPlugin> BaseClass;
 
 	TParamsSetPluginComponentImpl(const QString& pluginName, const QByteArray& typeId);
 
-	// reimplemented (imtbase::IParamsSetPlugin)
+	// reimplemented (imtserverapp::IParamsSetPlugin)
 	virtual const IParamsSetPlugin::IParamsSetFactory* GetParamsSetFactory() const override;
 	virtual const IParamsSetPlugin::IRepresentationControllerFactory* GetRepresentationControllerFactory() const override;
 };
@@ -36,7 +36,7 @@ TParamsSetPluginComponentImpl<ComponentClass>::TParamsSetPluginComponentImpl(con
 }
 
 
-// reimplemented (imtbase::IParamsSetPlugin)
+// reimplemented (imtserverapp::IParamsSetPlugin)
 
 template <class ComponentClass>
 const IParamsSetPlugin::IParamsSetFactory* TParamsSetPluginComponentImpl<ComponentClass>::GetParamsSetFactory() const
@@ -52,6 +52,6 @@ const IParamsSetPlugin::IRepresentationControllerFactory* TParamsSetPluginCompon
 }
 
 
-} // namespace imtbase
+} // namespace imtserverapp
 
 
