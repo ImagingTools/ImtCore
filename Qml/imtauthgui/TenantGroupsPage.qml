@@ -243,7 +243,7 @@ ViewBase {
 				FilterableSelectGqlDataProvider {
 					id: groupsDataProvider
 					collectionId: "Groups"
-					tenantId: groupsPage.apiClient ? groupsPage.apiClient.productId : ""
+					tenantId: groupsPage.apiClient ? groupsPage.apiClient.tenantId : ""
 					pageSize: 50
 					Component.onCompleted: groupsPage.__dataProvider = groupsDataProvider
 					Component.onDestruction: groupsPage.__dataProvider = null
@@ -497,7 +497,7 @@ ViewBase {
 				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
 				commandsPanelVisible: false
-				productId: groupsPage.apiClient ? groupsPage.apiClient.productId : ""
+				productId: groupsPage.apiClient ? groupsPage.apiClient.tenantId : ""
 				
 				Component.onCompleted: {
 					createGroupView.model = groupsPage.groupDataFactory ? groupsPage.groupDataFactory() : null
@@ -519,7 +519,7 @@ ViewBase {
 				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
 				commandsPanelVisible: false
-				productId: groupsPage.apiClient ? groupsPage.apiClient.productId : ""
+				productId: groupsPage.apiClient ? groupsPage.apiClient.tenantId : ""
 				
 				Component.onCompleted: {
 					var groupData = groupsPage.groupDataFactory ? groupsPage.groupDataFactory() : null

@@ -613,7 +613,7 @@ ViewBase {
 		FilterableSelectPopup {
 			dataProvider: FilterableSelectGqlDataProvider {
 				collectionId: "Users"
-				tenantId: membersPage.apiClient ? membersPage.apiClient.productId : ""
+				tenantId: membersPage.apiClient ? membersPage.apiClient.tenantId : ""
 				multiSelect: true
 			}
 			
@@ -693,7 +693,7 @@ ViewBase {
 				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
 				commandsPanelVisible: false
-				productId: membersPage.apiClient ? membersPage.apiClient.productId : ""
+				productId: membersPage.apiClient ? membersPage.apiClient.tenantId : ""
 				
 				Component.onCompleted: {
 					membersPage.__isCreatingUser = true
@@ -716,7 +716,7 @@ ViewBase {
 				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
 				commandsPanelVisible: false
-				productId: membersPage.apiClient ? membersPage.apiClient.productId : ""
+				productId: membersPage.apiClient ? membersPage.apiClient.tenantId : ""
 				
 				Component.onCompleted: {
 					var userData = membersPage.userDataFactory ? membersPage.userDataFactory() : null

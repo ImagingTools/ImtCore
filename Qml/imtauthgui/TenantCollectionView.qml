@@ -524,12 +524,12 @@ RemoteCollectionView {
 					// Concrete GQL transport injected from this view (imtguigql is
 					// already a dependency here); TenantEditor itself stays
 					// transport-agnostic.
-					// productId is sourced from the tenant being edited (not from the
+					// tenantId is sourced from the tenant being edited (not from the
 					// currently authorized tenant) so that GetSelectableItems queries
 					// (Roles/Groups/Users) are filtered for the correct tenant scope.
 					GqlBasedTenantMembershipApiClient {
 						id: tenantEditorApiClient
-						productId: tenantEditor.tenantData ? tenantEditor.tenantData.m_id : ""
+						tenantId: tenantEditor.tenantData ? tenantEditor.tenantData.m_id : ""
 					}
 				}
 			}

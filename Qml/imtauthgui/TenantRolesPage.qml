@@ -238,7 +238,7 @@ ViewBase {
 				FilterableSelectGqlDataProvider {
 					id: rolesDataProvider
 					collectionId: "Roles"
-					tenantId: rolesPage.apiClient ? rolesPage.apiClient.productId : ""
+					tenantId: rolesPage.apiClient ? rolesPage.apiClient.tenantId : ""
 					pageSize: 50
 					Component.onCompleted: {
 						rolesPage.__dataProvider = rolesDataProvider
@@ -504,7 +504,7 @@ ViewBase {
 				RoleView {
 					id: createRoleView
 					commandsPanelVisible: false
-					productId: rolesPage.apiClient ? rolesPage.apiClient.productId : ""
+					productId: rolesPage.apiClient ? rolesPage.apiClient.tenantId : ""
 					
 					Component.onCompleted: {
 						createRoleView.model = rolesPage.roleDataFactory ? rolesPage.roleDataFactory() : null
@@ -529,7 +529,7 @@ ViewBase {
 				RoleView {
 					id: editRoleView
 					commandsPanelVisible: false
-					productId: rolesPage.apiClient ? rolesPage.apiClient.productId : ""
+					productId: rolesPage.apiClient ? rolesPage.apiClient.tenantId : ""
 					
 					Component.onCompleted: {
 						var roleData = rolesPage.roleDataFactory ? rolesPage.roleDataFactory() : null

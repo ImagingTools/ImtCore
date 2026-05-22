@@ -10,7 +10,7 @@ Item {
 	id: root
 
 	property string collectionId: ""
-	property string productId: ""
+	property string tenantId: ""
 	property string filterPlaceholder: qsTr("Filter...")
 	property string emptyMessage: qsTr("No items found.")
 	property bool canManage: false
@@ -40,7 +40,7 @@ Item {
 	FilterableSelectGqlDataProvider {
 		id: dataProvider
 		collectionId: root.collectionId
-		tenantId: root.productId
+		tenantId: root.tenantId
 		pageSize: 50
 	}
 

@@ -27,7 +27,7 @@ QtObject {
 	// Configuration
 	// =========================================================================
 
-	property string productId: ""
+	property string tenantId: ""
 
 	// =========================================================================
 	// Abstract contract (must mirror TenantMembershipApiClient.qml)
@@ -350,7 +350,7 @@ QtObject {
 
 		root.__roleAddInput.m_id = roleId
 		root.__roleAddInput.m_typeId = "Role"
-		root.__roleAddInput.m_productId = root.productId
+		root.__roleAddInput.m_productId = root.tenantId
 		root.__roleAddInput.m_name = roleData.m_name
 		root.__roleAddInput.m_description = roleData.m_description
 		root.__roleAddInput.m_item = roleData
@@ -373,7 +373,7 @@ QtObject {
 		root.__pendingSetRoleId = roleId
 		root.__roleUpdateInput.m_id = roleId || ""
 		root.__roleUpdateInput.m_typeId = "Role"
-		root.__roleUpdateInput.m_productId = root.productId
+		root.__roleUpdateInput.m_productId = root.tenantId
 		root.__roleUpdateInput.m_name = roleData.m_name
 		root.__roleUpdateInput.m_description = roleData.m_description || ""
 		root.__roleUpdateInput.m_item = roleData
@@ -383,7 +383,7 @@ QtObject {
 
 	function getRoleData(roleId) {
 		root.__roleItemInput.m_id = roleId || ""
-		root.__roleItemInput.m_productId = root.productId
+		root.__roleItemInput.m_productId = root.tenantId
 		root.__roleItemSender.send(root.__roleItemInput)
 	}
 
@@ -394,7 +394,7 @@ QtObject {
 
 		root.__groupAddInput.m_id = groupId
 		root.__groupAddInput.m_typeId = "Group"
-		root.__groupAddInput.m_productId = root.productId
+		root.__groupAddInput.m_productId = root.tenantId
 		root.__groupAddInput.m_name = groupData.m_name
 		root.__groupAddInput.m_description = groupData.m_description
 		root.__groupAddInput.m_item = groupData
@@ -417,7 +417,7 @@ QtObject {
 		root.__pendingSetGroupId = groupId
 		root.__groupUpdateInput.m_id = groupId || ""
 		root.__groupUpdateInput.m_typeId = "Group"
-		root.__groupUpdateInput.m_productId = root.productId
+		root.__groupUpdateInput.m_productId = root.tenantId
 		root.__groupUpdateInput.m_name = groupData.m_name
 		root.__groupUpdateInput.m_description = groupData.m_description || ""
 		root.__groupUpdateInput.m_item = groupData
@@ -427,7 +427,7 @@ QtObject {
 
 	function getGroupData(groupId) {
 		root.__groupItemInput.m_id = groupId || ""
-		root.__groupItemInput.m_productId = root.productId
+		root.__groupItemInput.m_productId = root.tenantId
 		root.__groupItemSender.send(root.__groupItemInput)
 	}
 
@@ -438,7 +438,7 @@ QtObject {
 
 		root.__userAddInput.m_id = userId
 		root.__userAddInput.m_typeId = "User"
-		root.__userAddInput.m_productId = root.productId
+		root.__userAddInput.m_productId = root.tenantId
 		root.__userAddInput.m_name = userData.m_name
 		root.__userAddInput.m_description = userData.m_description
 		root.__userAddInput.m_item = userData
@@ -461,7 +461,7 @@ QtObject {
 		root.__pendingSetUserId = userId
 		root.__userUpdateInput.m_id = userId || ""
 		root.__userUpdateInput.m_typeId = "User"
-		root.__userUpdateInput.m_productId = root.productId
+		root.__userUpdateInput.m_productId = root.tenantId
 		root.__userUpdateInput.m_name = userData.m_name
 		root.__userUpdateInput.m_description = userData.m_description || ""
 		root.__userUpdateInput.m_item = userData
@@ -471,7 +471,7 @@ QtObject {
 
 	function getUserData(userId) {
 		root.__userItemInput.m_id = userId || ""
-		root.__userItemInput.m_productId = root.productId
+		root.__userItemInput.m_productId = root.tenantId
 		root.__userItemSender.send(root.__userItemInput)
 	}
 
