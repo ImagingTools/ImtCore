@@ -20,16 +20,16 @@ import imtauthTenantsSdl 1.0
  * imports). The concrete client (e.g. GqlBasedTenantMembershipApiClient from
  * imtguigql) is supplied by the embedding view (e.g. TenantCollectionView).
  *
- * SDL imports here are limited to:
- *   - imtauthTenantsSdl (TenantData type of the model)
- *
- * Data factories (RoleData/GroupData/UserData) are delegated to the injected apiClient.
+ * SDL imports here are limited to imtauthTenantsSdl (TenantData type of the model).
  */
 DocumentViewBase {
 	id: container
 
 	anchors.fill: parent
 	contentColor: Style.baseColor
+
+	// GitHub-like typography applied locally within TenantEditor scope
+	// font.family: "Segoe UI, Helvetica, Arial, sans-serif"
 
 	property TenantData tenantData: model
 
@@ -50,26 +50,6 @@ DocumentViewBase {
 		id: stateManager_
 		tenantData: container.tenantData
 		apiClient: container.apiClient
-	}
-
-	// --- Convenience: data factories delegated to apiClient
-	// (which already imports the SDL modules).
-	function createRoleData() {
-		if (container.apiClient && container.apiClient.createRoleData)
-			return container.apiClient.createRoleData()
-		return null
-	}
-
-	function createGroupData() {
-		if (container.apiClient && container.apiClient.createGroupData)
-			return container.apiClient.createGroupData()
-		return null
-	}
-
-	function createUserData() {
-		if (container.apiClient && container.apiClient.createUserData)
-			return container.apiClient.createUserData()
-		return null
 	}
 
 	function updateGui() {
@@ -146,42 +126,48 @@ DocumentViewBase {
 	Connections {
 		target: container.apiClient
 		function onInvitationCreated() {
+			PopupManager.addSuccessMessage(qsTr("Invitation created successfully"), true)
 			if (container.representationController)
 				container.representationController.updateRepresentationFromDocument()
 		}
 		function onOwnershipTransferred() {
+			PopupManager.addSuccessMessage(qsTr("Ownership transferred successfully"), true)
 			if (container.representationController)
 				container.representationController.updateRepresentationFromDocument()
 		}
-	}
-
-	// --- Subscription: real-time membership notifications ---
-	TenantMembershipSubscriptionClient {
-		id: membershipSubscription
-
-		onInvitationAccepted: {
+		function onRoleCreated() {
+			PopupManager.addSuccessMessage(qsTr("Role created successfully"), true)
+		}
+		function onGroupCreated() {
+			PopupManager.addSuccessMessage(qsTr("Group created successfully"), true)
+		}
+		function onUserCreated() {
+			PopupManager.addSuccessMessage(qsTr("User created successfully"), true)
+		}
+		function onSubscriptionInvitationAccepted(notification) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (notification.tenantId === container.tenantData.m_id) {
+				PopupManager.addSuccessMessage(qsTr("Invitation accepted"), true)
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
 		}
-
-		onInvitationRejected: {
+		function onSubscriptionInvitationRejected(notification) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (notification.tenantId === container.tenantData.m_id) {
+				PopupManager.addInfoMessage(qsTr("Invitation rejected"), true)
 				stateManager_.removePendingInvitation(notification.membershipId)
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
 		}
-
-		onOwnershipTransferred: {
+		function onSubscriptionOwnershipTransferred(notification) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (notification.tenantId === container.tenantData.m_id) {
+				PopupManager.addInfoMessage(qsTr("Ownership transferred"), true)
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
@@ -207,7 +193,6 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
-			userDataFactory: container.createUserData
 		}
 	}
 
@@ -218,7 +203,6 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
-			roleDataFactory: container.createRoleData
 		}
 	}
 
@@ -229,7 +213,6 @@ DocumentViewBase {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
-			groupDataFactory: container.createGroupData
 		}
 	}
 

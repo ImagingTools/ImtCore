@@ -95,7 +95,7 @@ ViewBase {
 	}
 
 	// Centered fixed-width container
-	property int maxTableWidth: 800
+	property int maxTableWidth: 1000
 
 	Item {
 		id: centeredContainer

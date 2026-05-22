@@ -22,7 +22,6 @@ ViewBase {
 	readonly property var tenantData: groupsPage.model
 	property var stateManager: null
 	property var apiClient: null
-	property var groupDataFactory: null
 	
 	function updateGui() {}
 	function updateModel() {}
@@ -42,6 +41,18 @@ ViewBase {
 		function onGroupDataReceived(data) {
 			if (groupsPage.stateManager)
 				groupsPage.stateManager.receivedGroupData = data
+		}
+		function onGroupCreated() {
+			if (groupsPage.__dataProvider)
+				groupsPage.__dataProvider.fetch("")
+		}
+		function onGroupUpdated(groupId) {
+			if (groupsPage.__dataProvider)
+				groupsPage.__dataProvider.fetch("")
+		}
+		function onGroupRemoved(groupId) {
+			if (groupsPage.__dataProvider)
+				groupsPage.__dataProvider.fetch("")
 		}
 	}
 	
@@ -224,7 +235,7 @@ ViewBase {
 			TenantTableContainer {
 				anchors.top: groupsFilterInput.bottom
 				anchors.topMargin: Style.marginM
-				height: Math.min(groupsTableHeader.height + groupsListView2.contentHeight + 2,
+				height: Math.min(groupsTableHeader.height + groupsEmptyState.height + groupsListView2.contentHeight + 2,
 								 parent.height - groupsFilterInput.height - groupsFilterInput.anchors.topMargin - Style.marginM - Style.marginL)
 				
 				IdSelectionManager {
@@ -243,6 +254,7 @@ ViewBase {
 				FilterableSelectGqlDataProvider {
 					id: groupsDataProvider
 					collectionId: "Groups"
+					tenantId: groupsPage.apiClient ? groupsPage.apiClient.tenantId : ""
 					pageSize: 50
 					Component.onCompleted: groupsPage.__dataProvider = groupsDataProvider
 					Component.onDestruction: groupsPage.__dataProvider = null
@@ -279,17 +291,13 @@ ViewBase {
 					}
 				}
 				
-				Rectangle {
+				Item {
 					id: groupsEmptyState
 					visible: groupsDataProvider.items.length === 0
 					anchors.top: groupsTableHeader.bottom
 					anchors.left: parent.left
 					anchors.right: parent.right
 					height: visible ? Style.controlHeightL + Style.marginL : 0
-					color: "transparent"
-					border.color: Style.borderColor
-					border.width: 1
-					radius: Style.radiusM
 					
 					BaseText {
 						anchors.centerIn: parent
@@ -462,15 +470,11 @@ ViewBase {
 		var groupData = editorView.model
 		if (groupsPage.__isCreating) {
 			if (groupsPage.apiClient)
-				groupsPage.apiClient.insertGroup(
-							groupData ? groupData.m_name : "",
-							groupData ? groupData.m_description : "")
+				groupsPage.apiClient.insertGroup("", groupData)
 		} else {
 			if (groupsPage.apiClient)
 				groupsPage.apiClient.setGroupData(
-							groupsPage.__editGroupId,
-							groupData ? groupData.m_name : "",
-							groupData ? groupData.m_description : "")
+							groupsPage.__editGroupId, groupData)
 		}
 		groupsStackViewHeader.popHeader()
 		groupsStackView.previous()
@@ -504,9 +508,10 @@ ViewBase {
 				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
 				commandsPanelVisible: false
+				productId: groupsPage.apiClient ? groupsPage.apiClient.tenantId : ""
 				
 				Component.onCompleted: {
-					createGroupView.model = groupsPage.groupDataFactory ? groupsPage.groupDataFactory() : null
+					createGroupView.model = groupsPage.apiClient ? groupsPage.apiClient.createGroupData() : null
 					createGroupView.updateGui()
 				}
 			}
@@ -525,9 +530,10 @@ ViewBase {
 				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
 				commandsPanelVisible: false
+				productId: groupsPage.apiClient ? groupsPage.apiClient.tenantId : ""
 				
 				Component.onCompleted: {
-					var groupData = groupsPage.groupDataFactory ? groupsPage.groupDataFactory() : null
+					var groupData = groupsPage.apiClient ? groupsPage.apiClient.createGroupData() : null
 					if (groupData) {
 						groupData.m_id = groupsPage.__editGroupId
 						groupData.m_name = groupsPage.__editGroupName
@@ -543,11 +549,15 @@ ViewBase {
 						if (groupsPage.stateManager
 								&& groupsPage.stateManager.receivedGroupData
 								&& groupsPage.__editGroupId) {
-							var groupData = groupsPage.groupDataFactory ? groupsPage.groupDataFactory() : null
+							var received = groupsPage.stateManager.receivedGroupData
+							var groupData = groupsPage.apiClient ? groupsPage.apiClient.createGroupData() : null
 							if (groupData) {
 								groupData.m_id = groupsPage.__editGroupId
-								groupData.m_name = groupsPage.stateManager.receivedGroupData.name || groupsPage.__editGroupName
-								groupData.m_description = groupsPage.stateManager.receivedGroupData.description || groupsPage.__editGroupDescription
+								groupData.m_name = received.name || groupsPage.__editGroupName
+								groupData.m_description = received.description || groupsPage.__editGroupDescription
+								groupData.m_parentGroups = received.parentGroups || []
+								groupData.m_users = received.users || []
+								groupData.m_roles = received.roles || []
 							}
 							editGroupView.model = groupData
 							editGroupView.updateGui()

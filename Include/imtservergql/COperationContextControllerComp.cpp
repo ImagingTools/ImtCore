@@ -5,6 +5,7 @@
 // ImtCore includes
 #include <imtbase/COperationContext.h>
 #include <imtauth/CUserInfo.h>
+#include <imtgql/CGqlRequest.h>
 #include <imtgql/IGqlRequestProvider.h>
 
 
@@ -57,7 +58,7 @@ imtbase::IOperationContext* COperationContextControllerComp::CreateOperationCont
 
 	operationContextPtr->SetOperationOwnerId(objectInfo);
 
-	QByteArray tenantId = requestContextPtr->GetTenantId();
+	QByteArray tenantId = operationContextPtr->GetTenantId();
 	operationContextPtr->SetTenantId(tenantId);
 
 	if (m_documentChangeGeneratorCompPtr.IsValid()){
@@ -74,5 +75,4 @@ imtbase::IOperationContext* COperationContextControllerComp::CreateOperationCont
 
 
 } // namespace imtservergql
-
 

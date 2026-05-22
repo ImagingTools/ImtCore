@@ -15,8 +15,7 @@
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtcol/CDocumentIdFilter.h>
 #include <imtgql/CGqlRequest.h>
-#include <imtgql/IGqlContext.h>
-#include <imtauth/CTenantFilterParam.h>
+#include <imtauthgql/imtauthgql.h>
 
 
 namespace imtservergql
@@ -73,6 +72,20 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 	int count = -1;
 	iprm::CParamsSet filterParams;
 
+	// Prefer tenant selected in the request input; fall back to the authenticated GQL context.
+	QByteArray tenantId;
+	if (arguments.input.Version_1_0->tenantId){
+		tenantId = *arguments.input.Version_1_0->tenantId;
+	}
+
+	imtauth::CTenantFilterParam* tenantFilterPtr = imtauthgql::CreateTenantFilterParam(tenantId);
+	if (tenantFilterPtr == nullptr){
+		tenantFilterPtr = imtauthgql::CreateTenantFilterParam(gqlRequest);
+	}
+	if (tenantFilterPtr != nullptr){
+		filterParams.SetEditableParameter("TenantFilter", tenantFilterPtr, true);
+	}
+
 	// Exclude selected IDs: create CDocumentIdFilter with CT_NOT_IN
 	if (arguments.input.Version_1_0->excludeIds && !arguments.input.Version_1_0->excludeIds->empty()){
 		const auto& excludeIdsList = *arguments.input.Version_1_0->excludeIds;
@@ -88,20 +101,6 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 			documentIdFilterPtr->SetConditionType(imtcol::IDocumentIdFilter::CT_NOT_IN);
 			documentIdFilterPtr->SetDocumentIds(documentIds);
 			filterParams.SetEditableParameter("DocumentIdFilter", documentIdFilterPtr, true);
-		}
-	}
-
-	// Apply tenant filter from GQL context (analogous to CObjectCollectionControllerCompBase)
-	bool tenantFilterEnabled = m_tenantFilterEnabledAttrPtr.IsValid() ? *m_tenantFilterEnabledAttrPtr : false;
-	if (tenantFilterEnabled){
-		const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-		if (gqlContextPtr != nullptr){
-			QByteArray tenantId = gqlContextPtr->GetTenantId();
-			if (!tenantId.isEmpty()){
-				imtauth::CTenantFilterParam* tenantFilterPtr = new imtauth::CTenantFilterParam();
-				tenantFilterPtr->SetTenantId(tenantId);
-				filterParams.SetEditableParameter("TenantFilter", tenantFilterPtr, true);
-			}
 		}
 	}
 
@@ -179,5 +178,4 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 
 
 }
-
 
