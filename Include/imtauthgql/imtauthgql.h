@@ -606,6 +606,24 @@ namespace imtauthgql
 
 
 /**
+	Create an optional tenant filter param from a tenant id.
+	Returns nullptr when no tenant id is available.
+	The returned pointer is owned by the caller (ParamsSet takes ownership via SetEditableParameter).
+*/
+inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const QByteArray& tenantId)
+{
+	if (tenantId.isEmpty()){
+		return nullptr;
+	}
+
+	imtauth::CTenantFilterParam* tenantFilterPtr = new imtauth::CTenantFilterParam();
+	tenantFilterPtr->SetTenantId(tenantId);
+
+	return tenantFilterPtr;
+}
+
+
+/**
 	Create an optional tenant filter param from the GQL request context.
 	Returns nullptr when no tenant context is available.
 	The returned pointer is owned by the caller (ParamsSet takes ownership via SetEditableParameter).
@@ -617,16 +635,7 @@ inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRe
 		return nullptr;
 	}
 
-	QByteArray tenantId = gqlContextPtr->GetTenantId();
-	if (tenantId.isEmpty()){
-		return nullptr;
-	}
-
-	imtauth::CTenantFilterParam* tenantFilterPtr = new imtauth::CTenantFilterParam();
-	tenantFilterPtr->SetTenantId(tenantId);
-	tenantFilterPtr->SetOwnerId(gqlContextPtr->GetUserId());
-
-	return tenantFilterPtr;
+	return CreateTenantFilterParam(gqlContextPtr->GetTenantId());
 }
 
 
