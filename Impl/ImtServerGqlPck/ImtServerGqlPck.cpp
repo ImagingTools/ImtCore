@@ -181,9 +181,9 @@ I_EXPORT_COMPONENT(
 			"Publisher Subscriber Bridge");
 
 I_EXPORT_COMPONENT(
-			GqlContextCreator,
-			"GraphQL context creator",
-			"GraphQL GQL Context Creator");
+			AuthenticationManager,
+			"Authentication manager",
+			"Authentication Manager GraphQL Context Creator");
 
 I_EXPORT_COMPONENT(
 			FilterableSelectController,

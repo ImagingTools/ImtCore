@@ -24,7 +24,7 @@ public:
 	I_BEGIN_COMPONENT(CHttpGraphQLServletComp);
 		I_REGISTER_INTERFACE(imtgql::IGqlRequestProvider);
 		I_ASSIGN_MULTI_0(m_gqlRequestHandlerCompPtr, "GqlRequestHandler", "Handler for GraphQL-request", true);
-		I_ASSIGN(m_gqlContextCreatorCompPtr, "GqlContextCreator", "GraphQL-related context creator", false, "GqlContextCreator");
+		I_ASSIGN(m_gqlContextCreatorCompPtr, "GqlContextCreator", "GraphQL-related context creator", false, "AuthenticationManager");
 	I_END_COMPONENT;
 
 protected:

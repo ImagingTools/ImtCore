@@ -22,7 +22,7 @@ public:
 
 	I_BEGIN_COMPONENT(CGqlContextControllerComp);
 		I_REGISTER_INTERFACE(imtgql::IGqlContextController);
-		I_ASSIGN(m_gqlContextCreatorCompPtr, "GqlContextCreator", "GraphQL-related context creator", false, "GqlContextCreator");
+		I_ASSIGN(m_gqlContextCreatorCompPtr, "GqlContextCreator", "GraphQL-related context creator", false, "AuthenticationManager");
 	I_END_COMPONENT;
 
 	// reimplemented (imtgql::IGqlContextController)

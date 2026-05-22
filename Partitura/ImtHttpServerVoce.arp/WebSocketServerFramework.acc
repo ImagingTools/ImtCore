@@ -15,13 +15,13 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="GqlContextCreator" PackageId="ImtServerGqlPck" ComponentId="GqlContextCreator">
+        <Element Id="AuthenticationManager" PackageId="ImtServerGqlPck" ComponentId="AuthenticationManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="GqlContextFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="GqlContext"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="JwtSessionController" Type="Reference" ExportId="JwtSessionController">
+                    <AttributeInfo Id="SlaveJwtSessionController" Type="Reference" ExportId="JwtSessionController">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -139,7 +139,7 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="GqlContextCreator" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="GqlContextCreator"/>
+                        <Data IsEnabled="true" Value="AuthenticationManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="GqlSubscriberControllers" Type="Reference[]" ExportId="GqlSubscriberControllers">
                         <Data IsEnabled="false"/>
@@ -180,6 +180,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
+        <Interface InterfaceId="imtauth::IJwtSessionController" ComponentId="AuthenticationManager"/>
         <Interface InterfaceId="imod::IModel" ComponentId="WebSocketServer"/>
         <Interface InterfaceId="imtclientgql::IGqlClient" ComponentId="SubscriptionManager"/>
         <Interface InterfaceId="imtclientgql::IGqlSubscriptionManager" ComponentId="SubscriptionManager"/>

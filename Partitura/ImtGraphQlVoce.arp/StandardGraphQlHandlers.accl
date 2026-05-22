@@ -14,7 +14,7 @@
         <Element ComponentName="ExternalHttpRequestHandler" X="450" Y="475" Note=""/>
         <Element ComponentName="FileAccess" X="1050" Y="550" Note=""/>
         <Element ComponentName="GqlContext" X="150" Y="250" Note=""/>
-        <Element ComponentName="GqlContextCreator" X="150" Y="350" Note=""/>
+        <Element ComponentName="AuthenticationManager" X="150" Y="350" Note=""/>
         <Element ComponentName="GraphQlRoot" X="150" Y="525" Note="Handler/Servlet for all GraphQL requests"/>
         <Element ComponentName="HttpRedirect" X="325" Y="125" Note="HTTP redirect component used for web applications"/>
         <Element ComponentName="HttpRootHandler" X="600" Y="375" Note=""/>

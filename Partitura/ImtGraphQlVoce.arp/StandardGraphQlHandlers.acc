@@ -93,13 +93,13 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="GqlContextCreator" PackageId="ImtServerGqlPck" ComponentId="GqlContextCreator">
+        <Element Id="AuthenticationManager" PackageId="ImtServerGqlPck" ComponentId="AuthenticationManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="GqlContextFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="GqlContext"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="JwtSessionController" Type="Reference" ExportId="JwtSessionController">
+                    <AttributeInfo Id="SlaveJwtSessionController" Type="Reference" ExportId="JwtSessionController">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -136,7 +136,7 @@
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
                     <AttributeInfo Id="GqlContextCreator" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="GqlContextCreator"/>
+                        <Data IsEnabled="true" Value="AuthenticationManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="GqlRequestHandler" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
@@ -341,6 +341,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
+        <Interface InterfaceId="imtauth::IJwtSessionController" ComponentId="AuthenticationManager"/>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="SlaveGraphQLDemultiplexer"/>
         <Interface InterfaceId="imtgql::IGqlRequestProvider" ComponentId="GraphQlRoot"/>
         <Interface InterfaceId="imtrest::IRequestServlet" ComponentId="HttpRootHandler"/>
