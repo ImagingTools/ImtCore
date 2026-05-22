@@ -18,7 +18,7 @@ QByteArray CUrlConnectionParamRepresentationController::GetModelId() const
 
 bool CUrlConnectionParamRepresentationController::IsModelSupported(const istd::IChangeable& dataModel) const
 {
-	const imtservice::imtservice::CUrlConnectionParam* urlConnectionParamPtr = dynamic_cast<const imtservice::imtservice::CUrlConnectionParam*>(&dataModel);
+	const imtservice::CUrlConnectionParam* urlConnectionParamPtr = dynamic_cast<const imtservice::CUrlConnectionParam*>(&dataModel);
 
 	return urlConnectionParamPtr != nullptr;
 }
@@ -33,7 +33,7 @@ bool CUrlConnectionParamRepresentationController::GetRepresentationFromDataModel
 		return false;
 	}
 
-	const imtservice::imtservice::CUrlConnectionParam* urlConnectionParamPtr = dynamic_cast<const imtservice::imtservice::CUrlConnectionParam*>(&dataModel);
+	const imtservice::CUrlConnectionParam* urlConnectionParamPtr = dynamic_cast<const imtservice::CUrlConnectionParam*>(&dataModel);
 	if (urlConnectionParamPtr == nullptr){
 		return false;
 	}
