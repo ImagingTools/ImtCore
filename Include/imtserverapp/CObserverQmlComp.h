@@ -11,7 +11,7 @@
 #include <imtqml/IQuickObject.h>
 
 
-namespace imtqml
+namespace imtserverapp
 {
 
 
@@ -41,6 +41,6 @@ private:
 };
 
 
-} // namespace imtqml
+} // namespace imtserverapp
 
 

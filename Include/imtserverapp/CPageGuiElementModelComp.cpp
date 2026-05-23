@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtqml/CPageGuiElementModelComp.h>
+#include <imtserverapp/CPageGuiElementModelComp.h>
 
 
-namespace imtqml
+namespace imtserverapp
 {
 
 
 // public methods
 
-// reimplemented (imtqml::IPageElementContainer)
+// reimplemented (imtserverapp::IPageGuiElementModel)
 
 QString CPageGuiElementModelComp::GetStartSourceItem() const
 {
@@ -30,6 +30,6 @@ QString CPageGuiElementModelComp::GetPageQmlItemFilePath() const
 }
 
 
-} // namespace imtqml
+} // namespace imtserverapp
 
 
