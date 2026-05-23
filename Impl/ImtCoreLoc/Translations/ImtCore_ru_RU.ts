@@ -8413,7 +8413,7 @@ Errors: 0</source>
         <translation>Название теста</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtbase/CSystemStatusComp.cpp" line="+185"/>
+        <location filename="../../../Include/imtserverapp/CSystemStatusComp.cpp" line="+185"/>
         <source>The %1 server cannot be connected at %2.</source>
         <translation>Не удалось подключиться к серверу %1 по адресу %2.</translation>
     </message>
@@ -11257,7 +11257,7 @@ ID входных данных: </translation>
 <context>
     <name>imtbase::CSystemStatusComp</name>
     <message>
-        <location filename="../../../Include/imtbase/CSystemStatusComp.cpp" line="-140"/>
+        <location filename="../../../Include/imtserverapp/CSystemStatusComp.cpp" line="-140"/>
         <location line="+64"/>
         <source>Try connect to: &apos;%1&apos; ...</source>
         <translation>Попытка подключения к: &apos;%1&apos; ...</translation>

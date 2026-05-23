@@ -7,10 +7,10 @@
 
 // ImtCore includes
 #include <imtbase/IPluginInfo.h>
-#include <imtrest/IRepresentationController.h>
+#include <imtserverapp/IRepresentationController.h>
 
 
-namespace imtbase
+namespace imtserverapp
 {
 
 
@@ -21,7 +21,7 @@ class IParamsSetPlugin: virtual public imtbase::IPluginInfo
 {
 public:
 	typedef istd::TIFactory<iprm::IParamsSet> IParamsSetFactory;
-	typedef istd::TIFactory<imtrest::IRepresentationController> IRepresentationControllerFactory;
+	typedef istd::TIFactory<imtserverapp::IRepresentationController> IRepresentationControllerFactory;
 
 	/**
 		Get access to the task factory.
@@ -31,6 +31,6 @@ public:
 };
 
 
-} // namespace imtbase
+} // namespace imtserverapp
 
 

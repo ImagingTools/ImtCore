@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtauth/CFeaturePackageRepresentationControllerComp.h>
+#include <imtserverapp/CFeaturePackageRepresentationControllerComp.h>
 
 // Qt includes
 #include <QtCore/QJsonArray>
@@ -10,7 +10,7 @@
 #include <imtlic/CFeatureContainer.h>
 
 
-namespace imtauth
+namespace imtserverapp
 {
 
 
@@ -118,4 +118,4 @@ bool CFeaturePackageRepresentationControllerComp::CreateRepresentationModelFromF
 }
 
 
-} // namespace imtauth
+} // namespace imtserverapp

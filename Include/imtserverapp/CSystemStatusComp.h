@@ -12,27 +12,27 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtbase/ISystemStatus.h>
+#include <imtserverapp/ISystemStatus.h>
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtbase/IUrlParam.h>
 #include <imtcom/IConnectionStatusProvider.h>
 #include <imtdb/IDatabaseServerConnectionChecker.h>
 
 
-namespace imtbase
+namespace imtserverapp
 {
 
 
 class CSystemStatusComp:
 			public QObject,
 			public ilog::CLoggerComponentBase,
-			virtual public imtbase::ISystemStatus
+			virtual public imtserverapp::ISystemStatus
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSystemStatusComp);
-		I_REGISTER_INTERFACE(imtbase::ISystemStatus);
+		I_REGISTER_INTERFACE(imtserverapp::ISystemStatus);
 		I_ASSIGN(m_connectionStatusProviderCompPtr, "ConnectionStatusProvider", "Server connection status provider", false, "ConnectionStatusProvider");
 		I_ASSIGN(m_dbServerConnectionCheckerCompPtr, "DatabaseServerConnectionChecker", "Database server connection status provider", false, "DatabaseServerConnectionChecker");
 		I_ASSIGN(m_slaveSystemStatusCompPtr, "SlaveSystemStatus", "Slave system status", false, "SlaveSystemStatus");
@@ -77,7 +77,7 @@ private:
 private:
 	I_REF(imtcom::IConnectionStatusProvider, m_connectionStatusProviderCompPtr);
 	I_REF(imtdb::IDatabaseServerConnectionChecker, m_dbServerConnectionCheckerCompPtr);
-	I_REF(imtbase::ISystemStatus, m_slaveSystemStatusCompPtr);
+	I_REF(imtserverapp::ISystemStatus, m_slaveSystemStatusCompPtr);
 	I_ATTR(int, m_checkIntervalAttrPtr);
 	I_ATTR(bool, m_checkDbStatusAttrPtr);
 	I_ATTR(QByteArray, m_serverNameAttrPtr);
@@ -85,6 +85,6 @@ private:
 };
 
 
-} // namespace imtbase
+} // namespace imtserverapp
 
 

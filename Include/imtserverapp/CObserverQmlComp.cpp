@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtqml/CObserverQmlComp.h>
+#include <imtserverapp/CObserverQmlComp.h>
 
 
 // ImtCore includes
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Settings.h>
 
 
-namespace imtqml
+namespace imtserverapp
 {
 
 
@@ -76,6 +76,6 @@ void CObserverQmlComp::OnSettingsChanged(QString jsonData)
 }
 
 
-} // namespace imtqml
+} // namespace imtserverapp
 
 

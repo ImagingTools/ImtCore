@@ -58,7 +58,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SystemStatus" PackageId="ImtCorePck" ComponentId="SystemStatus">
+        <Element Id="SystemStatus" PackageId="ImtServerAppPck" ComponentId="SystemStatus">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CheckDatabaseStatus" Type="Boolean" ExportId="CheckDatabaseStatus">
@@ -92,7 +92,7 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imod::IModel" ComponentId="SystemStatus"/>
-        <Interface InterfaceId="imtbase::ISystemStatus" ComponentId="SystemStatus"/>
+        <Interface InterfaceId="imtserverapp::ISystemStatus" ComponentId="SystemStatus"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="SystemStatus"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="SystemStatus"/>
     </ExportedInterfaces>

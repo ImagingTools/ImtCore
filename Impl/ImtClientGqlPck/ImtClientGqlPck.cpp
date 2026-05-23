@@ -36,11 +36,6 @@ I_EXPORT_COMPONENT(
 			"GraphQL Client Engine");
 
 I_EXPORT_COMPONENT(
-			GqlObjectCollectionDelegate,
-			"GraphQl based delegate for object collection",
-			"GraphQl Gql Object Collection Delegate");
-
-I_EXPORT_COMPONENT(
 			GqlObjectCollection,
 			"GraphQl based object collection",
 			"GraphQl Gql Object Collection");
