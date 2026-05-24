@@ -240,6 +240,8 @@ class TextEdit extends Item {
 
         this.contentWidth = textMetrics.width
         this.contentHeight = textMetrics.height
+        this.paintedWidth = textMetrics.width
+        this.paintedHeight = textMetrics.height
 
         // Geometry.setAuto(this.__self, 'height', textMetrics.height, this.__self.constructor.meta.height)
         this.height = textMetrics.height
@@ -365,6 +367,7 @@ class TextEdit extends Item {
         selection.addRange(range)
         this.selectionStart = start
         this.selectionEnd = end
+        this.selectedText = this.text.substring(start, end)
     }
     selectAll(){
         this.select(0, this.text.length)
