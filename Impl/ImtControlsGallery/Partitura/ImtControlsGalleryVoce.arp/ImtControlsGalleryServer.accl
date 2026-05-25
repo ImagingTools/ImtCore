@@ -12,18 +12,21 @@
         <Element ComponentName="ControlsGalleryHandlers" X="725" Y="150" Note=""/>
         <Element ComponentName="ControlsGallerySettings" X="225" Y="525" Note=""/>
         <Element ComponentName="DatabaseEngine" X="150" Y="175" Note=""/>
+        <Element ComponentName="GqlContext" X="1075" Y="275" Note=""/>
         <Element ComponentName="HttpServerFramework" X="725" Y="375" Note=""/>
         <Element ComponentName="ImtCoreLocalization" X="1025" Y="600" Note=""/>
         <Element ComponentName="Migrations" X="425" Y="175" Note=""/>
         <Element ComponentName="ProductInfo" X="1075" Y="50" Note=""/>
         <Element ComponentName="Repositories" X="1050" Y="375" Note=""/>
+        <Element ComponentName="SimpleGqlContextCreator" X="850" Y="275" Note=""/>
         <Element ComponentName="Subscribers" X="650" Y="600" Note=""/>
         <Element ComponentName="WebSocketServerFramework" X="400" Y="375" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="Repositories">
+        <EmbededRegistry Id="Migrations">
             <PositionMap>
-                <Element ComponentName="ContactInfoSqlRepository" X="575" Y="225" Note=""/>
+                <Element ComponentName="CompositeMigrationController" X="550" Y="125" Note=""/>
+                <Element ComponentName="ObjectCollectionMigrationController" X="575" Y="425" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
@@ -37,10 +40,9 @@
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
-        <EmbededRegistry Id="Migrations">
+        <EmbededRegistry Id="Repositories">
             <PositionMap>
-                <Element ComponentName="CompositeMigrationController" X="550" Y="125" Note=""/>
-                <Element ComponentName="ObjectCollectionMigrationController" X="575" Y="425" Note=""/>
+                <Element ComponentName="ContactInfoSqlRepository" X="575" Y="225" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

@@ -10,10 +10,8 @@
     <PositionMap>
         <Element ComponentName="ApplicationHandlers" X="575" Y="175" Note=""/>
         <Element ComponentName="ContactInfoController" X="825" Y="375" Note=""/>
-        <Element ComponentName="GqlContext" X="200" Y="50" Note=""/>
         <Element ComponentName="Pages" X="575" Y="375" Note=""/>
         <Element ComponentName="ParamsSetTestController" X="300" Y="375" Note=""/>
-        <Element ComponentName="SimpleGqlContextCreator" X="200" Y="175" Note=""/>
         <Element ComponentName="SlaveControllers" X="950" Y="175" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
