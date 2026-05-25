@@ -225,25 +225,11 @@ class TextInput extends Item {
     }
 
     __updateGeometry(){
-        // let text = this.text
-        // if(text){
-        //     if(text[text.length-1] === '\n') text += '.'
-        // } else {
-        //     text = '.'
-        // }
-
-        // let textMetrics = JQApplication.TextController.measureText(text, this.font, this.__getObject('width').__auto ? 0 : this.width, this.wrapMode, 0)
-        
-        // // let textMetrics = this.__impl.getBoundingClientRect()
-
-        // this.__getObject('width').__setAuto(this.__impl.scrollWidth)
-        // this.__getObject('height').__setAuto(this.__impl.scrollHeight)
-
-        // this.contentWidth = textMetrics.width
-        // this.contentHeight = textMetrics.height
-        // this.paintedWidth = textMetrics.width
-        // this.paintedHeight = textMetrics.height
-        
+        if(this.__impl){
+            let textMetrics = JQApplication.TextController.measureTextFast(this.text, this.font)
+            this.contentWidth = textMetrics.width
+            this.contentHeight = textMetrics.height
+        }
     }
 
     __checkValidator(){
@@ -467,6 +453,7 @@ class TextInput extends Item {
         selection.addRange(range)
         this.selectionStart = start
         this.selectionEnd = end
+        this.selectedText = this.text.substring(start, end)
     }
     selectAll(){
         this.select(0, this.text.length)

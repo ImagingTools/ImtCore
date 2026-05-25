@@ -301,10 +301,14 @@ class Item extends QtObject {
         for(let child of this.children){
             if(tree.indexOf(child) < 0){
                 child.focus = false
-                
             }
 
-            child.__setFocusTree(tree)
+            // Don't recurse into FocusScopes — they manage their own children's
+            // internal focus state. In Qt, items inside a FocusScope don't fire
+            // focusChanged when the scope loses focus.
+            if(!(child instanceof JQModules.QtQuick.FocusScope)){
+                child.__setFocusTree(tree)
+            }
         }
     }
 
@@ -362,10 +366,10 @@ class Item extends QtObject {
         })
         JQApplication.updateLater(this.parent)
         Geometry.setAuto(this.__self, 'AWidth', newValue, this.__self.constructor.meta.AWidth)
+        this.__updateSiblingAnchors()
     }
 
     SLOT_heightChanged(oldValue, newValue){
-
         this.__checkVisibility()
         this.__setDOMStyle({
             height: newValue > 0 ? newValue + 'px' : '0px',
@@ -373,6 +377,47 @@ class Item extends QtObject {
         })
         JQApplication.updateLater(this.parent)
         Geometry.setAuto(this.__self, 'AHeight', newValue, this.__self.constructor.meta.AHeight)
+        this.__updateSiblingAnchors()
+    }
+
+    __updateSiblingAnchors(){
+        if(!this.parent) return
+        for(const sibling of this.parent.children){
+            if(sibling === this) continue
+            const s = sibling.__self || sibling
+            if(typeof s.AY === 'function'){
+                const val = s.AY()
+                if(s.AY__prevent){
+                    if(s.y !== val) s.__proxy.y = val
+                } else {
+                    Real.set(s, 'y', val, s.constructor.meta.y)
+                }
+            }
+            if(typeof s.AX === 'function'){
+                const val = s.AX()
+                if(s.AX__prevent){
+                    if(s.x !== val) s.__proxy.x = val
+                } else {
+                    Real.set(s, 'x', val, s.constructor.meta.x)
+                }
+            }
+            if(typeof s.AHeight === 'function'){
+                const val = s.AHeight()
+                if(s.AHeight__prevent){
+                    if(s.height !== val) s.__proxy.height = val
+                } else {
+                    Real.set(s, 'height', val, s.constructor.meta.height)
+                }
+            }
+            if(typeof s.AWidth === 'function'){
+                const val = s.AWidth()
+                if(s.AWidth__prevent){
+                    if(s.width !== val) s.__proxy.width = val
+                } else {
+                    Real.set(s, 'width', val, s.constructor.meta.width)
+                }
+            }
+        }
     }
 
     SLOT_AXChanged(oldValue, newValue){

@@ -146,7 +146,14 @@ function compile(options){
             this.targetContext = targetContext
 
             for (let m of meta) {
-                if (m) this[m[0]](m)
+                if (m) {
+                    if(typeof this[m[0]] === 'function'){
+                        this[m[0]](m)
+                    } else {
+                        
+                    }
+                    
+                }
             }
         }
 
@@ -676,16 +683,19 @@ function compile(options){
                     }
                     case 'var': {
                         let name = tree[1][0][0]
-                        let local = []
-                        if (stat.local.length) {
-                            local = stat.local[stat.local.length - 1]
-                            local.push(name)
-                        } else {
-                            local.push(name)
-                            stat.local.push(local)
+                        let alreadyDeclared = stat.local.some(l => l.indexOf(name) >= 0)
+                        if (!alreadyDeclared) {
+                            let local = []
+                            if (stat.local.length) {
+                                local = stat.local[stat.local.length - 1]
+                                local.push(name)
+                            } else {
+                                local.push(name)
+                                stat.local.push(local)
+                            }
                         }
 
-                        stat.value.add(`var ${name}`)
+                        stat.value.add(alreadyDeclared ? name : `var ${name}`)
                         if (tree[1][0][1]) {
                             stat.value.add(`=`)
                             this.prepare(tree[1][0][1], stat)
@@ -856,6 +866,7 @@ function compile(options){
 
                         stat.value.add(')')
                         stat.value.add(`{let __self=this;let [${Array.from(ids).join(',')}] = [${Array.from(context).join(',')}];try{JQApplication.beginUpdate();`)
+                        for (let id of ids) { local.push(id) }
                         stat.local.push(local)
                         this.prepare(tree[3], stat)
                         let index = stat.local.indexOf(local)
@@ -1200,10 +1211,10 @@ function compile(options){
 
         checkDefineProperty(name){
             for(let defineProperty of this.defineProperties){
-                if(name === defineProperty.name) return true
+                if(name === defineProperty.name) return defineProperty
             }
 
-            return false
+            return undefined
         }
 
         getProperties() {
@@ -1387,9 +1398,16 @@ function compile(options){
                             code.add(`${this.name}['${names[0]}'].__updateProperties()`)
                             code.add('\n')
                         } else {
-                            if(this.checkDefineProperty(assignProperty.name)){
-                                classCode.add(`${this.name}.${assignProperty.name}=${stat.value}`)
-                                classCode.add('\n')
+                            let defineProperty = this.checkDefineProperty(assignProperty.name)
+                            if(defineProperty){
+                                if(defineProperty.modifiers && defineProperty.modifiers.readonly){
+                                    classCode.add(`${this.name}.${assignProperty.name}=()=>{return ${stat.value}}`)
+                                    classCode.add('\n')
+                                } else {
+                                    classCode.add(`${this.name}.${assignProperty.name}=${stat.value}`)
+                                    classCode.add('\n')
+                                }
+                                
                             } else {
                                 // lazyCode.add(`${this.name}.__properties['${assignProperty.name}']=${stat.value}`)
                                 lazyCode.add(`${this.name}.${assignProperty.name}=${stat.value}`)
