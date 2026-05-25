@@ -36,6 +36,9 @@ public:
 		I_ASSIGN(m_gqlContextFactCompPtr, "GqlContextFactory", "GraphQL context factory", false, "GqlContextFactory");
 		I_ASSIGN(m_slaveJwtSessionControllerCompPtr, "SlaveJwtSessionController", "Slave JWT session controller for delegation", false, "JwtSessionController");
 		I_ASSIGN(m_patManagerCompPtr, "PersonalAccessTokenManager", "Personal Access Token manager", false, "PersonalAccessTokenManager");
+		I_ASSIGN(m_patPrefixAttrPtr, "PatPrefix", "Personal Access Token prefix", false, "imt_pat_");
+		I_ASSIGN(m_maxTokenCacheSizeAttrPtr, "MaxTokenCacheSize", "Maximum number of cached tokens", false, 10000);
+		I_ASSIGN(m_tokenCacheTtlAttrPtr, "TokenCacheLifetime", "Token cache lifetime (in secs)", false, 5 * 60);
 	I_END_COMPONENT;
 
 	// reimplemented (imtgql::IGqlContextCreator)
@@ -100,6 +103,9 @@ private:
 	I_FACT(imtgql::IGqlContext, m_gqlContextFactCompPtr);
 	I_REF(imtauth::IJwtSessionController, m_slaveJwtSessionControllerCompPtr);
 	I_REF(imtauth::IPersonalAccessTokenManager, m_patManagerCompPtr);
+	I_ATTR(QByteArray, m_patPrefixAttrPtr);
+	I_ATTR(int, m_maxTokenCacheSizeAttrPtr);
+	I_ATTR(int, m_tokenCacheTtlAttrPtr);
 
 	// TODO: Remove this mutex if the ACF component factory (I_FACT) is confirmed thread-safe.
 	// Currently serializes all context creation which may become a bottleneck under load.

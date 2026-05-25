@@ -186,6 +186,11 @@ I_EXPORT_COMPONENT(
 			"Authentication Manager GraphQL Context Creator");
 
 I_EXPORT_COMPONENT(
+			SimpleGqlContextCreator,
+			"Simple GraphQL context creator",
+			"Simple GraphQL Context Creator");
+
+I_EXPORT_COMPONENT(
 			FilterableSelectController,
 			"Filterable select items controller",
 			"Filterable Select Controller");

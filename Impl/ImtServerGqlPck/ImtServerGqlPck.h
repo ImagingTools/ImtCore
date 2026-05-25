@@ -42,6 +42,7 @@
 #include <imtservergql/CCollectionDocumentServicePublisherComp.h>
 #include <imtservergql/CPublisherSubscriberBridgeComp.h>
 #include <imtservergql/CAuthenticationManagerComp.h>
+#include <imtservergql/CSimpleGqlContextCreatorComp.h>
 #include <imtservergql/CFilterableSelectControllerComp.h>
 #include <imtservergql/CUserGroupParamsSetJoinerComp.h>
 
@@ -87,6 +88,7 @@ typedef imtservergql::CCollectionDocumentServiceControllerComp CollectionDocumen
 typedef imtservergql::CCollectionDocumentServicePublisherComp CollectionDocumentServicePublisher;
 typedef imtservergql::CPublisherSubscriberBridgeComp PublisherSubscriberBridge;
 typedef imtservergql::CAuthenticationManagerComp AuthenticationManager;
+typedef imtservergql::CSimpleGqlContextCreatorComp SimpleGqlContextCreator;
 typedef imtservergql::CFilterableSelectControllerComp FilterableSelectController;
 typedef imtservergql::CUserGroupParamsSetJoinerComp UserGroupParamsSetJoiner;
 

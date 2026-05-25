@@ -21,23 +21,6 @@ namespace imtservergql
 {
 
 
-namespace
-{
-
-// Support both the current PAT prefix and the older prefix accepted by legacy callers.
-constexpr const char* s_deprecatedPatPrefix = "pat_";
-constexpr const char* s_patPrefix = "imt_pat_";
-constexpr int s_deprecatedPatPrefixLength = 4;
-constexpr int s_patPrefixLength = 8;
-constexpr int s_maxTokenCacheSize = 10000;
-// Keep the token cache short-lived: it avoids bursts of remote validation calls
-// while limiting stale authorization data for both JWT and PAT tokens. Revocation
-// becomes visible after the TTL unless the component is recreated earlier.
-constexpr qint64 s_tokenCacheTtlMs = 5 * 60 * 1000;
-
-} // namespace
-
-
 // public methods
 
 // reimplemented (imtgql::IGqlContextCreator)
@@ -424,11 +407,13 @@ void CAuthenticationManagerComp::StoreCachedToken(
 	entry.scopes = scopes;
 	entry.isPat = isPat;
 	const qint64 now = QDateTime::currentMSecsSinceEpoch();
-	entry.expiresAt = now + s_tokenCacheTtlMs;
+	const qint64 tokenCacheTtlMs = static_cast<qint64>(*m_tokenCacheTtlAttrPtr) * 1000;
+	entry.expiresAt = now + tokenCacheTtlMs;
 
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
 	m_tokenCache.insert(token, entry);
-	if (m_tokenCache.size() <= s_maxTokenCacheSize){
+	const int maxTokenCacheSize = *m_maxTokenCacheSizeAttrPtr;
+	if (m_tokenCache.size() <= maxTokenCacheSize){
 		return;
 	}
 
@@ -441,7 +426,7 @@ void CAuthenticationManagerComp::StoreCachedToken(
 		}
 	}
 
-	if (m_tokenCache.size() > s_maxTokenCacheSize){
+	if (m_tokenCache.size() > maxTokenCacheSize){
 		m_tokenCache.clear();
 	}
 }
@@ -463,8 +448,8 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContextInstance()
 
 bool CAuthenticationManagerComp::IsPatToken(const QByteArray& token) const
 {
-	return (token.size() > s_deprecatedPatPrefixLength && token.startsWith(s_deprecatedPatPrefix))
-			|| (token.size() > s_patPrefixLength && token.startsWith(s_patPrefix));
+	const QByteArray& patPrefix = *m_patPrefixAttrPtr;
+	return !patPrefix.isEmpty() && token.size() > patPrefix.size() && token.startsWith(patPrefix);
 }
 
 
