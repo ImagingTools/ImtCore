@@ -23,7 +23,7 @@ public:
 
 	I_BEGIN_COMPONENT(CTableViewParamControllerComp);
 		I_ASSIGN(m_tableViewParamRepresentationControllerCompPtr, "TableViewParamRepresentationController", "Table view param representation controller", true, "TableViewParamRepresentationController");
-		I_ASSIGN(m_userSettingsCollectionCompPtr, "UserSettingsCollection", "User settings collection", false, "UserSettingsCollection");
+		I_ASSIGN(m_userSettingsCollectionCompPtr, "UserSettingsCollection", "User settings collection", true, "UserSettingsCollection");
 		I_ASSIGN(m_pageViewParamsKeyAttrPtr, "PageViewParamsKey", "Key of the page view params", true, "PageViewParams");
 		I_ASSIGN(m_paramSetFactCompPtr, "ParamSetFactory", "Param set factory", true, "ParamSetFact");
 		I_ASSIGN(m_userSettingsFactCompPtr, "UserSettingsFactory", "User settings factory", true, "UserSettingsFactory");
