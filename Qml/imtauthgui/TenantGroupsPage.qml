@@ -184,17 +184,27 @@ ViewBase {
 		color: Style.inactiveTextColor
 	}
 	
-	Text {
+	Rectangle {
 		id: groupsSaveBtn
 		visible: groupsPage.__canManage && groupsStackView.currentIndex > 0
 		anchors.right: groupsStackViewHeader.right
 		anchors.verticalCenter: groupsStackViewHeader.verticalCenter
-		text: qsTr("Save")
-		font.pixelSize: Style.fontSizeM
-		font.bold: true
-		color: Style.linkColor
+		width: groupsSaveBtnText.implicitWidth + Style.marginL * 2
+		height: Style.controlHeightS
+		radius: Style.radiusM
+		color: groupsSaveBtnMA.containsMouse ? Qt.darker(Style.linkColor, 1.1) : Style.linkColor
+		
+		Text {
+			id: groupsSaveBtnText
+			anchors.centerIn: parent
+			text: qsTr("Save")
+			font.pixelSize: Style.fontSizeM
+			font.bold: true
+			color: "white"
+		}
 		
 		MouseArea {
+			id: groupsSaveBtnMA
 			anchors.fill: parent
 			hoverEnabled: true
 			cursorShape: Qt.PointingHandCursor

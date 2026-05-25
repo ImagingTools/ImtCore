@@ -54,9 +54,11 @@ ViewBase {
 				membersPage.stateManager.removePendingInvitation(invitationId)
 		}
 		function onMemberRoleChanged(userId, role) {
-			// Refresh data from server after role change
-			if (membersPage.representationController)
-				membersPage.representationController.updateRepresentationFromDocument()
+			// Update stateManager in-memory so the UI reflects immediately
+			if (membersPage.stateManager)
+				membersPage.stateManager.setUserRole(userId, role)
+			ModalDialogManager.showInfoDialog(
+				qsTr("Environment role for \"%1\" changed to %2").arg(memberActionMenu.targetUserName).arg(role))
 		}
 	}
 	
@@ -213,17 +215,27 @@ ViewBase {
 		color: Style.inactiveTextColor
 	}
 	
-	Text {
+	Rectangle {
 		id: membersSaveBtn
 		visible: membersPage.__canManage && membersStackView.currentIndex > 0
 		anchors.right: membersStackViewHeader.right
 		anchors.verticalCenter: membersStackViewHeader.verticalCenter
-		text: qsTr("Save")
-		font.pixelSize: Style.fontSizeM
-		font.bold: true
-		color: Style.linkColor
+		width: membersSaveBtnText.implicitWidth + Style.marginL * 2
+		height: Style.controlHeightS
+		radius: Style.radiusM
+		color: membersSaveBtnMA.containsMouse ? Qt.darker(Style.linkColor, 1.1) : Style.linkColor
+		
+		Text {
+			id: membersSaveBtnText
+			anchors.centerIn: parent
+			text: qsTr("Save")
+			font.pixelSize: Style.fontSizeM
+			font.bold: true
+			color: "white"
+		}
 		
 		MouseArea {
+			id: membersSaveBtnMA
 			anchors.fill: parent
 			hoverEnabled: true
 			cursorShape: Qt.PointingHandCursor
@@ -455,6 +467,8 @@ ViewBase {
 								onMemberActionsRequested: {
 									memberActionMenu.targetUserId = userId
 									memberActionMenu.targetUserName = userName
+									memberActionMenu.targetCurrentRole = membersPage.stateManager
+										? membersPage.stateManager.getUserRole(userId) : "Member"
 									memberActionMenu.showChangeRole = false
 									memberActionMenu.showExclude = false
 									memberActionMenu.showTransfer = false
@@ -504,6 +518,7 @@ ViewBase {
 					id: memberActionMenu
 					property string targetUserId: ""
 					property string targetUserName: ""
+					property string targetCurrentRole: ""
 					property bool showChangeRole: false
 					property bool showExclude: false
 					property bool showTransfer: false
@@ -517,6 +532,8 @@ ViewBase {
 						
 						MenuItem {
 							text: qsTr("Member")
+							checkable: true
+							checked: memberActionMenu.targetCurrentRole === "Member"
 							onTriggered: {
 								if (membersPage.apiClient) {
 									var tenantId = membersPage.tenantData ? membersPage.tenantData.m_id : ""
@@ -526,6 +543,8 @@ ViewBase {
 						}
 						MenuItem {
 							text: qsTr("Admin")
+							checkable: true
+							checked: memberActionMenu.targetCurrentRole === "Admin"
 							onTriggered: {
 								if (membersPage.apiClient) {
 									var tenantId = membersPage.tenantData ? membersPage.tenantData.m_id : ""

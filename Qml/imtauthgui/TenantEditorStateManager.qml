@@ -70,6 +70,22 @@ QtObject {
 		return "Member"
 	}
 
+	function setUserRole(userId, role) {
+		if (!stateManager.tenantData || !userId)
+			return
+		var roles = stateManager.tenantData.m_memberRoles
+		if (!roles) return
+		var count = roles.count || roles.length || 0
+		for (var i = 0; i < count; i++) {
+			var entry = roles.get ? roles.get(i).item : roles[i]
+			if (entry && entry.m_userId === userId) {
+				entry.m_role = role
+				stateManager.pendingMembersChanged()
+				return
+			}
+		}
+	}
+
 	function formatDateTime(value) {
 		if (!value)
 			return ""

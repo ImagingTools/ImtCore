@@ -190,17 +190,27 @@ ViewBase {
 		color: Style.inactiveTextColor
 	}
 	
-	Text {
+	Rectangle {
 		id: rolesSaveBtn
 		visible: rolesPage.__canManage && rolesStackView.currentIndex > 0
 		anchors.right: rolesStackViewHeader.right
 		anchors.verticalCenter: rolesStackViewHeader.verticalCenter
-		text: qsTr("Save")
-		font.pixelSize: Style.fontSizeM
-		font.bold: true
-		color: Style.linkColor
+		width: rolesSaveBtnText.implicitWidth + Style.marginL * 2
+		height: Style.controlHeightS
+		radius: Style.radiusM
+		color: rolesSaveBtnMA.containsMouse ? Qt.darker(Style.linkColor, 1.1) : Style.linkColor
+		
+		Text {
+			id: rolesSaveBtnText
+			anchors.centerIn: parent
+			text: qsTr("Save")
+			font.pixelSize: Style.fontSizeM
+			font.bold: true
+			color: "white"
+		}
 		
 		MouseArea {
+			id: rolesSaveBtnMA
 			anchors.fill: parent
 			hoverEnabled: true
 			cursorShape: Qt.PointingHandCursor
