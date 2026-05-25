@@ -2690,26 +2690,6 @@ private:
 };
 
 
-class CGraphQlHandlerCompBase: public ::imtservergql::CPermissibleGqlRequestHandlerComp
-{
-
-public:
-	typedef ::imtservergql::CPermissibleGqlRequestHandlerComp BaseClass;
-
-	I_BEGIN_BASE_COMPONENT(CGraphQlHandlerCompBase)
-	I_END_COMPONENT
-
-	// reimplemented (::imtservergql::CPermissibleGqlRequestHandlerComp)
-	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
-	virtual QJsonObject CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-
-protected:
-	// abstract methods
-	virtual CProductOverview OnGetLastProductionResults(const CGetLastProductionResultsGqlRequest& getLastProductionResultsRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
-	virtual CCDMResult OnGetLastProductionResultsCDM(const CGetLastProductionResultsCDMGqlRequest& getLastProductionResultsCDMRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
-};
-
-
 
 
 #ifdef QT_QML_LIB

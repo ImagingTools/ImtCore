@@ -1,6 +1,9 @@
 #pragma once
 
 
+#include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
+
+
 namespace sdl::modsdl::PrinterBase
 {
 
@@ -24,7 +27,24 @@ class CMixedUnionObjectList;
 // request forward declarations
 class CGetPrintersGqlRequest;
 
-// generated base class forward declarations
-class CGraphQlHandlerCompBase;
+class CGraphQlHandlerCompBase: public ::imtservergql::CPermissibleGqlRequestHandlerComp
+{
+
+public:
+	typedef ::imtservergql::CPermissibleGqlRequestHandlerComp BaseClass;
+
+	I_BEGIN_BASE_COMPONENT(CGraphQlHandlerCompBase)
+	I_END_COMPONENT
+
+	// reimplemented (::imtservergql::CPermissibleGqlRequestHandlerComp)
+	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
+	virtual QJsonObject CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+
+protected:
+	// abstract methods
+	virtual CPrinterList OnGetPrinters(const CGetPrintersGqlRequest& getPrintersRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
+};
+
+
 
 } // namespace sdl::modsdl::PrinterBase

@@ -216,13 +216,12 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 	if (m_autoProcessorCompListPtr.IsValid()){
 		const int processorsCount = m_autoProcessorCompListPtr.GetCount();
 		imtsdl::CSdlType dummyType;
-		FilePtr headerFilePtr = GetFilePtrForEntry(dummyType, headerFiles);
 		FilePtr sourceFilePtr = GetFilePtrForEntry(dummyType, sourceFiles);
-		Q_ASSERT(headerFilePtr || sourceFilePtr);
+		Q_ASSERT(sourceFilePtr);
 		for (int i = 0; i < processorsCount; ++i){
 			ICxxFileProcessor* processorPtr = m_autoProcessorCompListPtr[i];
 			Q_ASSERT(processorPtr != nullptr);
-			const bool ok = processorPtr->ProcessEntry(dummyType, headerFilePtr.get(), sourceFilePtr.get(), paramsPtr);
+			const bool ok = processorPtr->ProcessEntry(dummyType, nullptr, sourceFilePtr.get(), paramsPtr);
 			if (!ok){
 				SendErrorMessage(0, "Processing failed");
 
@@ -663,7 +662,7 @@ bool CCxxProcessorsManagerComp::ProcessRequests(const EntryFileMap& headerFiles,
 }
 
 
-bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IParamsSet* /*paramsPtr*/) const
+bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IParamsSet* paramsPtr) const
 {
 	imtsdl::ISdlProcessArgumentsParser::CppGenerationMode mode = m_argumentParserCompPtr->GetCppGenerationMode();
 	if (mode == imtsdl::ISdlProcessArgumentsParser::CGM_IMPLEMENTATION_ONLY){
@@ -684,6 +683,19 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 	// write pragma once
 	stream << QStringLiteral("#pragma once");
 	FeedStream(stream, 3, false);
+
+	// check if we have requests (need include for base class)
+	bool hasRequests = false;
+	if (m_requestsProviderListCompPtr.IsValid()){
+		const imtsdl::SdlRequestList requestsList = m_requestsProviderListCompPtr->GetRequests(true);
+		hasRequests = !requestsList.isEmpty();
+	}
+
+	// add include for CPermissibleGqlRequestHandlerComp if we have requests
+	if (hasRequests){
+		stream << QStringLiteral("#include <imtservergql/CPermissibleGqlRequestHandlerComp.h>");
+		FeedStream(stream, 3, false);
+	}
 
 	// begin namespace
 	const QString sdlNamespace = GetNamespaceFromSchemaParams(*m_schemaParamsCompPtr);
@@ -725,37 +737,28 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 		}
 	}
 
-	// forward declare controller base classes
-	bool hasRequests = false;
-	if (m_requestsProviderListCompPtr.IsValid()){
+	// forward declare requests
+	if (hasRequests){
 		const imtsdl::SdlRequestList requestsList = m_requestsProviderListCompPtr->GetRequests(true);
-		if (!requestsList.isEmpty()){
-			hasRequests = true;
-			stream << QStringLiteral("// request forward declarations");
-			FeedStream(stream, 1, false);
-			for (const imtsdl::CSdlRequest& request: requestsList){
-				stream << QStringLiteral("class C") << request.GetName() << QStringLiteral("GqlRequest;");
-				FeedStream(stream, 1, false);
-			}
+		stream << QStringLiteral("// request forward declarations");
+		FeedStream(stream, 1, false);
+		for (const imtsdl::CSdlRequest& request: requestsList){
+			stream << QStringLiteral("class C") << request.GetName() << QStringLiteral("GqlRequest;");
 			FeedStream(stream, 1, false);
 		}
+		FeedStream(stream, 1, false);
 	}
 
-	// forward declare handler base classes
+	// forward declare document type base classes
 	bool hasDocumentTypes = false;
 	if (m_sdlDocumentTypeListCompPtr.IsValid()){
 		const imtsdl::SdlDocumentTypeList documentTypesList = m_sdlDocumentTypeListCompPtr->GetDocumentTypes(true);
 		hasDocumentTypes = !documentTypesList.isEmpty();
 	}
 
-	if (hasRequests || hasDocumentTypes){
+	if (hasDocumentTypes){
 		stream << QStringLiteral("// generated base class forward declarations");
 		FeedStream(stream, 1, false);
-
-		if (hasRequests){
-			stream << QStringLiteral("class CGraphQlHandlerCompBase;");
-			FeedStream(stream, 1, false);
-		}
 
 		if (m_sdlDocumentTypeListCompPtr.IsValid()){
 			const imtsdl::SdlDocumentTypeList documentTypesList = m_sdlDocumentTypeListCompPtr->GetDocumentTypes(true);
@@ -764,15 +767,43 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 				FeedStream(stream, 1, false);
 			}
 		}
+		FeedStream(stream, 1, false);
 	}
 
-	FeedStream(stream, 1, false);
+	// generate CGraphQlHandlerCompBase class definition (moved from .h)
+	if (hasRequests && m_autoProcessorCompListPtr.IsValid()){
+		// flush the stream before passing the device to auto processors
+		stream.flush();
 
-	// end namespace
-	stream << '}';
-	stream << QStringLiteral(" // namespace ");
-	stream << sdlNamespace;
-	FeedStream(stream, 1, false);
+		const int processorsCount = m_autoProcessorCompListPtr.GetCount();
+		imtsdl::CSdlType dummyType;
+		for (int i = 0; i < processorsCount; ++i){
+			ICxxFileProcessor* processorPtr = m_autoProcessorCompListPtr[i];
+			Q_ASSERT(processorPtr != nullptr);
+			const bool ok = processorPtr->ProcessEntry(dummyType, fwdFilePtr.get(), nullptr, paramsPtr);
+			if (!ok){
+				return false;
+			}
+		}
+
+		// re-create stream after auto processors wrote to the file
+		QTextStream endStream(fwdFilePtr.get());
+
+		// end namespace
+		endStream << '}';
+		endStream << QStringLiteral(" // namespace ");
+		endStream << sdlNamespace;
+		FeedStream(endStream, 1, false);
+	}
+	else{
+		FeedStream(stream, 1, false);
+
+		// end namespace
+		stream << '}';
+		stream << QStringLiteral(" // namespace ");
+		stream << sdlNamespace;
+		FeedStream(stream, 1, false);
+	}
 
 	return true;
 }
