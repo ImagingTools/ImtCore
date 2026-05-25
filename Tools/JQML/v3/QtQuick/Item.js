@@ -223,10 +223,18 @@ class Item extends QtObject {
         let dom = this.__getDOM()
         if(target && dom){
             if(target instanceof Item){
-                target.__getDOM().appendChild(dom)
-            } else {
+                let parentDOM = target.__getDOM()
+                if(typeof target.__onChildDOM === 'function') target.__onChildDOM(this.__self || this, dom)
+                parentDOM.appendChild(dom)
+            } else if(typeof target.__getDOM === 'function'){
+                let parentDOM = target.__getDOM()
+                if(typeof target.__onChildDOM === 'function') target.__onChildDOM(this.__self || this, dom)
+                if(parentDOM) parentDOM.appendChild(dom)
+            } else if(target instanceof Node){
+                // Native DOM element (e.g. document.body)
                 target.appendChild(dom)
             }
+            // QtObject parents without DOM (e.g. non-visual) are silently ignored
         }
     }
 

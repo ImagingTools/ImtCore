@@ -3,6 +3,7 @@ const Real = require("../../QtQml/Real")
 const Var = require("../../QtQml/Var")
 const Int = require("../../QtQml/Int")
 const Signal = require("../../QtQml/Signal")
+const Font = require("../../QtQml/Font")
 
 class Control extends Item {
     static meta = Object.assign({}, Item.meta, {
@@ -13,7 +14,7 @@ class Control extends Item {
         bottomPadding: { type: Real, value: 0 },
         contentItem: { type: Var },
         focusReason: { type: Int, value: 0 },
-        font: { type: Var },
+        font: { type: Font },
         horizontalPadding: { type: Real, value: 0 },
         hoverEnabled: { type: Var },
         hovered: { type: Var, value: false },

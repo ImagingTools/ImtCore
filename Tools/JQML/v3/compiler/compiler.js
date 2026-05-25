@@ -60,6 +60,7 @@ function compile(options){
     const QtWebSockets = require('../QtWebSockets/QtWebSockets')
     const QtPositioning = require('../QtPositioning/QtPositioning')
     const QtLocation = require('../QtLocation/QtLocation')
+    const QtWebView = require('../QtWebView/QtWebView')
 
     const env = process.env
     const configFilePath = path.normalize(options.config.trim())
@@ -99,6 +100,7 @@ function compile(options){
         QtWebSockets,
         QtPositioning,
         QtLocation,
+        QtWebView,
     }
 
     const JQModules = {
