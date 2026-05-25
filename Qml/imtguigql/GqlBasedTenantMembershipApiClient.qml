@@ -655,4 +655,19 @@ QtObject {
 		}
 		root.userDataReceived(data)
 	}
+
+	// =========================================================================
+	// Permissions (via GqlBasedPermissionsProvider)
+	// =========================================================================
+
+	property var permissionsModel: __permissionsProvider.permissionsModel
+
+	property GqlBasedPermissionsProvider __permissionsProvider: GqlBasedPermissionsProvider {
+		productId: root.tenantId
+	}
+
+	function fetchPermissions() {
+		__permissionsProvider.productId = root.tenantId
+		__permissionsProvider.updateModel()
+	}
 }

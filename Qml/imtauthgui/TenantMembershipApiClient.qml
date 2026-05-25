@@ -78,4 +78,8 @@ QtObject {
 	function removeUser(userId) {}
 	function setUserData(userId, userData) {}
 	function getUserData(userId) {}
+
+	// --- Permissions ---
+	property var permissionsModel: null
+	function fetchPermissions() {}
 }

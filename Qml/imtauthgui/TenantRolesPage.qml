@@ -25,6 +25,11 @@ ViewBase {
 	
 	function updateGui() {}
 	function updateModel() {}
+
+	Component.onCompleted: {
+		if (rolesPage.apiClient)
+			rolesPage.apiClient.fetchPermissions()
+	}
 	
 	property string __editRoleId: ""
 	property string __editRoleName: ""
@@ -516,6 +521,7 @@ ViewBase {
 					id: createRoleView
 					commandsPanelVisible: false
 					productId: rolesPage.apiClient ? rolesPage.apiClient.tenantId : ""
+					permissionsModel: rolesPage.apiClient ? rolesPage.apiClient.permissionsModel : null
 					
 					Component.onCompleted: {
 						createRoleView.model = rolesPage.apiClient ? rolesPage.apiClient.createRoleData() : null
@@ -541,6 +547,7 @@ ViewBase {
 					id: editRoleView
 					commandsPanelVisible: false
 					productId: rolesPage.apiClient ? rolesPage.apiClient.tenantId : ""
+					permissionsModel: rolesPage.apiClient ? rolesPage.apiClient.permissionsModel : null
 					
 					Component.onCompleted: {
 						var roleData = rolesPage.apiClient ? rolesPage.apiClient.createRoleData() : null

@@ -37,5 +37,6 @@
 	<file alias="imtguigql/SelectableCollectionEditor.qml">SelectableCollectionEditor.qml</file>
 	<file alias="imtguigql/FilterableSelectGqlDataProvider.qml">FilterableSelectGqlDataProvider.qml</file>
 	<file alias="imtguigql/GqlBasedTenantMembershipApiClient.qml">GqlBasedTenantMembershipApiClient.qml</file>
+	<file alias="imtguigql/GqlBasedPermissionsProvider.qml">GqlBasedPermissionsProvider.qml</file>
     </qresource>
 </RCC>

@@ -46,7 +46,7 @@ RemoteCollectionView {
 	
 	property TreeItemModel permissionsModel;
 	
-	PermissionsProvider {
+	GqlBasedPermissionsProvider {
 		id: permissionsProvider;
 		productId: roleCollectionViewContainer.productId;
 		
