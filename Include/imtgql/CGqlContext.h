@@ -25,6 +25,8 @@ public:
 	virtual void SetDesignScheme(const QByteArray& designScheme) override;
 	virtual QByteArray GetToken() const override;
 	virtual void SetToken(const QByteArray& token) override;
+	virtual QByteArrayList GetScopes() const override;
+	virtual void SetScopes(const QByteArrayList& scopes) override;
 	virtual QByteArray GetUserId() const override;
 	virtual void SetUserId(const QByteArray& userId) override;
 	virtual QByteArray GetTenantId() const override;
@@ -50,11 +52,11 @@ private:
 	QByteArray m_languageId;
 	QByteArray m_designScheme;
 	QByteArray m_token;
+	QByteArrayList m_scopes;
 	istd::TSharedInterfacePtr<imtauth::IUserInfo> m_userInfoPtr;
 	Headers m_headers;
 };
 
 
 } // namespace imtgql
-
 

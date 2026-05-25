@@ -6,6 +6,9 @@
 #include <imtgql/IGqlContext.h>
 #include <imtgql/CGqlRequest.h>
 
+// Qt includes
+#include <QtCore/QString>
+
 
 namespace imtgql
 {
@@ -14,15 +17,24 @@ namespace imtgql
 class IGqlContextCreator: virtual public istd::IPolymorphic
 {
 public:
+	enum ContextCreationStatus
+	{
+		CCS_OK,
+		CCS_UNAUTHORIZED,
+		CCS_FORBIDDEN,
+		CCS_INTERNAL_ERROR
+	};
+
+	struct ContextCreationError
+	{
+		ContextCreationStatus status = CCS_OK;
+		QString message;
+	};
+
 	virtual IGqlContextUniquePtr CreateGqlContext(
-				const QByteArray& token,
-				const QByteArray& productId,
-				const QByteArray& userId,
 				const IGqlContext::Headers& headers,
-				QString& errorMessage) const = 0;
+				ContextCreationError& error) const = 0;
 };
 
 
 } // namespace imtgql
-
-

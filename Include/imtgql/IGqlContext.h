@@ -5,6 +5,9 @@
 // ACF includes
 #include <iser/IObject.h>
 
+// Qt includes
+#include <QtCore/QByteArrayList>
+
 // ImtCore includes
 #include <imtauth/IUserInfo.h>
 
@@ -34,6 +37,9 @@ public:
 	virtual QByteArray GetToken() const = 0;
 	virtual void SetToken(const QByteArray& token) = 0;
 
+	virtual QByteArrayList GetScopes() const = 0;
+	virtual void SetScopes(const QByteArrayList& scopes) = 0;
+
 	virtual QByteArray GetUserId() const = 0;
 	virtual void SetUserId(const QByteArray& userId) = 0;
 
@@ -53,5 +59,3 @@ typedef istd::TSharedInterfacePtr<IGqlContext> IGqlContextSharedPtr;
 
 
 } // namespace imtgql
-
-
