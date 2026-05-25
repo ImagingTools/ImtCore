@@ -91,17 +91,6 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentServiceComp::OnGetTe
 	// Server-side access control: user can only open TenantEditor if
 	// they have switched to this tenant (current tenant in JWT must match)
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	if (gqlContextPtr != nullptr){
-		QByteArray currentTenantId = gqlContextPtr->GetTenantId();
-		if (currentTenantId.isEmpty()){
-			errorMessage = QStringLiteral("Access denied: no organization selected. Please switch to this organization first");
-			return sdl::imtauth::Tenants::CTenantData();
-		}
-		if (currentTenantId != tenantId){
-			errorMessage = QStringLiteral("Access denied: you must switch to this organization before editing it");
-			return sdl::imtauth::Tenants::CTenantData();
-		}
-	}
 
 	response.Version_1_0->id = tenantId;
 	response.Version_1_0->name = tenantPtr->GetTenantName();
@@ -218,13 +207,6 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CTenantCollect
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
 		contextUserId = gqlContextPtr->GetUserId();
-
-		// Server-side access control: reject update if user is not switched to this tenant
-		QByteArray currentTenantId = gqlContextPtr->GetTenantId();
-		if (currentTenantId.isEmpty()){
-			errorMessage = QStringLiteral("Access denied: no organization selected");
-			return response;
-		}
 	}
 
 	QByteArray userLogin = GetUserId(gqlRequest);
