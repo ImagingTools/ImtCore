@@ -36,7 +36,7 @@ TConnectionCollectionPluginComponentImpl<ComponentClass>::TConnectionCollectionP
 }
 
 
-// reimplemented (imtbase::IParamsSetPlugin)
+// reimplemented (imtserverapp::IParamsSetPlugin)
 
 template <class ComponentClass>
 const IConnectionCollectionPlugin::IConnectionCollectionFactory* TConnectionCollectionPluginComponentImpl<ComponentClass>::GetConnectionCollectionFactory() const

@@ -3,7 +3,13 @@ const fs = require('fs')
 const { Builder, Capabilities, By, until } = require('selenium-webdriver')
 const chrome = require('selenium-webdriver/chrome')
 const path = require('path')
-require('chromedriver')
+const chromedriverModule = require('chromedriver')
+const chromedriverPath = (() => {
+    const p = chromedriverModule.path
+    if (fs.existsSync(p)) return p
+    const globalBin = process.platform === 'win32' ? 'chromedriver.exe' : 'chromedriver'
+    return require('child_process').execSync(`which ${globalBin}`).toString().trim()
+})()
 
 const colors = {
     reset: "\x1b[0m",
@@ -155,20 +161,13 @@ function runQmlTest(filePath, timeout = 5000, qmlImportPaths = []) {
             env,
         })
 
-        let logs = []
         let rawOutput = ''
 
         child.stdout.on('data', (data) => {
-            const chunk = data.toString()
-            rawOutput += chunk + '\n'
-            let result = getQmlLog(chunk.trim())
-            logs.push(...result)
+            rawOutput += data.toString()
         })
         child.stderr.on('data', (data) => {
-            const chunk = data.toString()
-            rawOutput += chunk + '\n'
-            let result = getQmlLog(chunk.trim())
-            logs.push(...result)
+            rawOutput += data.toString()
         })
 
         // Тайм-аут на случай зависания теста
@@ -179,6 +178,8 @@ function runQmlTest(filePath, timeout = 5000, qmlImportPaths = []) {
 
         child.on('close', (code) => {
             clearTimeout(timer)
+
+            let logs = getQmlLog(rawOutput)
 
             if (logs.length === 0 && rawOutput) {
                 const rawLines = rawOutput
@@ -297,7 +298,7 @@ async function runTests() {
             console.log(`${colors.cyan}[Desktop] ${resultDesktop}${colors.reset}`)
             console.log(`${colors.cyan}[Web] ${resultWeb}${colors.reset}`)
 
-            if (resultDesktop.join('') === resultWeb.join('')) {
+            if (resultDesktop && resultWeb && resultDesktop.join('') === resultWeb.join('')) {
                 completedTests++
                 console.log(`${colors.green}[+] Completed test: ${testdir}${colors.reset}`)
             } else {
@@ -338,21 +339,44 @@ async function runWebTest(driver, testDirPath, timeout = 5000) {
             root: '/',
             mode: 'html',
         })
+
+        // Copy image assets to _web for file:// access
+        const imageExts = ['.svg', '.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp', '.ico']
+        const testFiles = fs.readdirSync(testDirPath)
+        for(const f of testFiles){
+            if(imageExts.some(ext => f.toLowerCase().endsWith(ext))){
+                fs.copyFileSync(path.resolve(testDirPath, f), path.resolve(testDirPath, '_web', f))
+            }
+        }
     } catch (err) {
         console.error(`${colors.red}[Error] Error during compilation: ${getErrorMessage(err)}${colors.reset}`)
     }
 
     try {
-        await driver.get(path.resolve(testDirPath, './_web/test.html'))
+        await driver.get('file://' + path.resolve(testDirPath, './_web/test.html'))
 
         await driver.wait(async () => {
             const readyState = await driver.executeScript('return document.readyState')
             return readyState === 'complete'
         }, timeout) // таймаут 10 секунд
 
-        let containTimer = fs.readFileSync(path.resolve(testDirPath, 'Main.qml'), 'utf-8').indexOf('Timer') >= 0
+        let mainQml = fs.readFileSync(path.resolve(testDirPath, 'Main.qml'), 'utf-8')
+        let containTimer = mainQml.indexOf('Timer') >= 0
+        let containAsync = mainQml.indexOf('onStatusChanged') >= 0 || mainQml.indexOf('Image {') >= 0 || mainQml.indexOf('Image{') >= 0
 
-        if (containTimer) await driver.sleep(timeout)
+        // Always wait for Qt.quit() signal (handles microtask-deferred signals like focus)
+        try {
+            await driver.wait(async () => {
+                return await driver.executeScript('return !!window.__jqmlQuit')
+            }, timeout)
+        } catch(e) {
+            // timeout - proceed anyway
+        }
+
+        if (containTimer || containAsync) {
+            // Extra wait for async operations after Qt.quit()
+            await driver.sleep(200)
+        }
 
         const logs = await driver.manage().logs().get('browser')
 
@@ -380,18 +404,18 @@ async function createWebDriver() {
     try {
         // Настройка Chrome (опционально: запуск без окна)
         let options = new chrome.Options()
-        options.addArguments('--headless', '--window-size=800,600') // Раскомментировать для headless-режима
-
-        const caps = Capabilities.chrome()
-        caps.setLoggingPrefs({
+        options.addArguments('--headless', '--window-size=800,600', '--no-sandbox', '--disable-dev-shm-usage', '--allow-file-access-from-files') // Раскомментировать для headless-режима
+        options.setLoggingPrefs({
             browser: 'ALL', // Собирать все типы сообщений (INFO, WARNING, SEVERE)
             driver: 'WARNING'
         })
 
+        let service = new chrome.ServiceBuilder(chromedriverPath)
+
         let driver = await new Builder()
             .forBrowser('chrome')
             .setChromeOptions(options)
-            .withCapabilities(caps)
+            .setChromeService(service)
             .build()
         
         return driver

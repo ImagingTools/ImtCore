@@ -29,7 +29,7 @@
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="JwtSessionController" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="JwtSessionController"/>
+                        <Data IsEnabled="true" Value="AuthenticationManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="TenantMembershipManager">
                         <Data IsEnabled="false"/>
@@ -83,7 +83,7 @@
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="JwtSessionController" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="JwtSessionController"/>
+                        <Data IsEnabled="true" Value="AuthenticationManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -125,6 +125,18 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
+        <Element Id="AuthenticationManager" PackageId="ImtServerGqlPck" ComponentId="AuthenticationManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="SlaveJwtSessionController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="JwtSessionController"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="JwtSessionController" PackageId="ImtAuthVoce" ComponentId="JwtSessionController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -152,6 +164,6 @@
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="GraphQLDemultiplexer"/>
     </ExportedInterfaces>
     <ExportedComponents>
-        <Component ExportedId="JwtSessionController" ComponentId="JwtSessionController"/>
+        <Component ExportedId="JwtSessionController" ComponentId="AuthenticationManager"/>
     </ExportedComponents>
 </Acf>

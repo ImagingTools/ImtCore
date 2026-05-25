@@ -61,7 +61,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtqml::IPageGuiElementModel" ComponentId="Page"/>
+        <Interface InterfaceId="imtserverapp::IPageGuiElementModel" ComponentId="Page"/>
         <Interface InterfaceId="imtserverapp::ICommandPermissionsProvider" ComponentId="Page"/>
         <Interface InterfaceId="imtserverapp::IGuiElementModel" ComponentId="Page"/>
         <Interface InterfaceId="imtserverapp::IRepresentationController" ComponentId="Page"/>

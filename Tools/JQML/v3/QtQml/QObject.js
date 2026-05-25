@@ -149,15 +149,16 @@ class QObject extends QBaseObject {
 
         this.__prepareAliasProperties()
 
+        // Process own bindings FIRST so they're registered before children compute layout
+        for(let propName in this.__properties){
+            this.__updateProperty(propName)
+        } 
+
         for(let child of this.__children){
             child.__updateProperties()
         }
 
         JQApplication.endUpdate()
-
-        for(let propName in this.__properties){
-            this.__updateProperty(propName)
-        } 
     }
 
     __completeProperty(propName){

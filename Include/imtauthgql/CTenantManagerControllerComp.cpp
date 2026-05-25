@@ -85,6 +85,7 @@ sdl::imtauth::Tenants::CGetTenantPayload CTenantManagerControllerComp::OnGetTena
 	tenantData.name = tenantInfoPtr->GetTenantName();
 	tenantData.description = tenantInfoPtr->GetTenantDescription();
 	tenantData.ownerId = tenantInfoPtr->GetOwnerId();
+	tenantData.creatorId = tenantInfoPtr->GetCreatorId();
 	tenantData.isActive = tenantInfoPtr->IsActive();
 	tenantData.createdAt = tenantInfoPtr->GetCreatedAt();
 	tenantData.updatedAt = tenantInfoPtr->GetUpdatedAt();

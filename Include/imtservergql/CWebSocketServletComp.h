@@ -7,8 +7,7 @@
 #include <imtrest/IResponseDispatcher.h>
 #include <imtgql/IGqlSubscriberController.h>
 #include <imtgql/IGqlRequestHandler.h>
-#include <imtauth/IJwtSessionController.h>
-#include <imtauth/IPersonalAccessTokenManager.h>
+#include <imtgql/IGqlContextCreator.h>
 
 
 namespace imtservergql
@@ -27,8 +26,7 @@ public:
 		I_REGISTER_INTERFACE(IRequestServlet);
 		I_ASSIGN_MULTI_0(m_gqlSubscriberControllersCompPtr, "GqlSubscriberControllers", "List of gql subscriber controller for corresponding command-IDs", false);
 		I_ASSIGN(m_workerManagerCompPtr, "WorkerManager", "GraphQl multithread worker manager", false, "WorkerManager");
-		I_ASSIGN(m_jwtSessionControllerCompPtr, "JwtSessionController", "JWT session controller", false, "JwtSessionController");
-		I_ASSIGN(m_patManagerCompPtr, "PersonalAccessTokenManager", "Personal Access Token manager", false, "PersonalAccessTokenManager");
+		I_ASSIGN(m_gqlContextCreatorCompPtr, "GqlContextCreator", "GraphQL-related context creator", false, "AuthenticationManager");
 	I_END_COMPONENT
 
 	// reimplemented (imtrest::IRequestServlet)
@@ -51,8 +49,7 @@ protected:
 private:
 	I_MULTIREF(imtgql::IGqlSubscriberController, m_gqlSubscriberControllersCompPtr);
 	I_REF(imtrest::IRequestServlet, m_workerManagerCompPtr);
-	I_REF(imtauth::IJwtSessionController, m_jwtSessionControllerCompPtr);
-	I_REF(imtauth::IPersonalAccessTokenManager, m_patManagerCompPtr);
+	I_REF(imtgql::IGqlContextCreator, m_gqlContextCreatorCompPtr);
 
 	typedef QMap<QByteArray, imtgql::IGqlSubscriberController*> SubscriberControllersMap;
 
@@ -62,5 +59,4 @@ private:
 
 
 } // namespace imtservergql
-
 

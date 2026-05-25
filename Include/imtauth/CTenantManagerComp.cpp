@@ -87,6 +87,7 @@ QByteArray CTenantManagerComp::CreateTenant(const QString& tenantName, const QSt
 	tenantPtr->SetTenantName(tenantName);
 	tenantPtr->SetTenantDescription(description);
 	tenantPtr->SetOwnerId(ownerId);
+	tenantPtr->SetCreatorId(ownerId);
 	tenantPtr->SetActive(true);
 	tenantPtr->SetCreatedAt(now);
 	tenantPtr->SetUpdatedAt(now);

@@ -16,7 +16,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <imtdoc/CCollectionDocumentServiceComp.h>
+#include <imtdoc/CCollectionDocumentServiceBase.h>
 #include <imtdoc/IDocumentServiceEventHandler.h>
 
 
@@ -498,7 +498,7 @@ private:
 	Concrete subclass of CCollectionDocumentService for testing.
 	Provides mock implementations for the pure virtual methods.
 */
-class CTestableDocumentService: public imtdoc::CCollectionDocumentServiceComp
+class CTestableDocumentService: public imtdoc::CCollectionDocumentServiceBase
 {
 public:
 	CTestableDocumentService()
@@ -511,6 +511,12 @@ public:
 		, m_validationErrorMessage()
 		, m_singleCopyMode(false)
 	{
+		RegisterEventHandler(m_mockEventHandler);
+	}
+
+	~CTestableDocumentService()
+	{
+		UnregisterEventHandler(m_mockEventHandler);
 	}
 
 	// Access to mock objects for test configuration
@@ -534,7 +540,7 @@ public:
 	using imtdoc::CDocumentServiceBase::m_sharedDocuments;
 
 protected:
-	// reimplemented (CCollectionDocumentServiceComp)
+	// reimplemented (CCollectionDocumentServiceBase)
 	virtual imtbase::IObjectCollection* GetCollection() const override
 	{
 		return m_collectionPtr;
@@ -561,11 +567,6 @@ protected:
 		}
 
 		return idoc::IUndoManagerUniquePtr(new CMockUndoManager());
-	}
-
-	virtual QList<imtdoc::IDocumentServiceEventHandler*> GetDocumentServiceEventHandlers() const override
-	{
-		return { const_cast<CMockEventHandler*>(&m_mockEventHandler) };
 	}
 
 	virtual QString GetDefaultDocumentName(const WorkingDocument& /*document*/) const override

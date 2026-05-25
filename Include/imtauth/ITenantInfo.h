@@ -113,6 +113,18 @@ public:
 	virtual void SetOwnerId(const QByteArray& ownerId) = 0;
 
 	/**
+		Get creator user ID.
+		The creator is permanently assigned when the tenant is first saved.
+	*/
+	virtual QByteArray GetCreatorId() const = 0;
+
+	/**
+		Set creator user ID.
+		Should only be called once (immutable after first assignment).
+	*/
+	virtual void SetCreatorId(const QByteArray& creatorId) = 0;
+
+	/**
 		Check if tenant is active.
 	*/
 	virtual bool IsActive() const = 0;

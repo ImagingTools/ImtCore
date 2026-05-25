@@ -34,7 +34,6 @@
         <Element ComponentName="TicketMessageNotifier" X="125" Y="25" Note=""/>
         <Element ComponentName="TicketSqlRepository" X="275" Y="725" Note=""/>
         <Element ComponentName="TicketsChangeNotifier" X="450" Y="150" Note=""/>
-        <Element ComponentName="UserFilterableSelectController" X="1200" Y="75" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

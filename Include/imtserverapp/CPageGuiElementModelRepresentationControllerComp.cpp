@@ -3,7 +3,7 @@
 
 
 // ImtCore includes
-#include <imtqml/IPageGuiElementModel.h>
+#include <imtserverapp/IPageGuiElementModel.h>
 
 
 namespace imtserverapp
@@ -16,7 +16,7 @@ namespace imtserverapp
 
 bool CPageGuiElementModelRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
 {
-	const imtqml::IPageGuiElementModel* guiElementPtr = dynamic_cast<const imtqml::IPageGuiElementModel*>(&dataModel);
+	const imtserverapp::IPageGuiElementModel* guiElementPtr = dynamic_cast<const imtserverapp::IPageGuiElementModel*>(&dataModel);
 
 	return guiElementPtr != nullptr;
 }
@@ -29,7 +29,7 @@ bool CPageGuiElementModelRepresentationControllerComp::GetRepresentationFromData
 {
 	Q_ASSERT(IsModelSupported(dataModel));
 
-	const imtqml::IPageGuiElementModel* guiElementPtr = dynamic_cast<const imtqml::IPageGuiElementModel*>(&dataModel);
+	const imtserverapp::IPageGuiElementModel* guiElementPtr = dynamic_cast<const imtserverapp::IPageGuiElementModel*>(&dataModel);
 	if (guiElementPtr == nullptr){
 		return false;
 	}

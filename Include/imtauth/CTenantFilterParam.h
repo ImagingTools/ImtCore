@@ -20,6 +20,8 @@ public:
 	virtual void SetTenantId(const QByteArray& tenantId) override;
 	virtual QByteArray GetOwnerId() const override;
 	virtual void SetOwnerId(const QByteArray& ownerId) override;
+	virtual TenantFilterMode GetFilterMode() const override;
+	virtual void SetFilterMode(TenantFilterMode mode) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -33,6 +35,7 @@ public:
 private:
 	QByteArray m_tenantId;
 	QByteArray m_ownerId;
+	TenantFilterMode m_filterMode;
 };
 
 

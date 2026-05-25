@@ -796,7 +796,7 @@ bool CSqlDatabaseDocumentDelegateComp::ClearDependentMetaInfo(const MetaFieldCle
 
 	QStringList quotedIds;
 	for (const QByteArray& id : metaInfo.objectIds) {
-		QString escapedId = QString(id).replace("'", "''");
+		QString escapedId = SqlEncode(QString(id));
 		quotedIds << QString("'%1'").arg(escapedId);
 	}
 
@@ -1162,7 +1162,7 @@ void CSqlDatabaseDocumentDelegateComp::EnsureTenantBindingTableExists() const
 }
 
 
-QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingFilterQuery(const QByteArray& tenantId) const
+QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingFilterQuery(const QByteArray& tenantId, imtauth::TenantFilterMode filterMode) const
 {
 	const QString bindingsTableName = CreateTenantBindingTableName();
 	const QString escapedEntityType = SqlEncode(QString::fromUtf8(GetTableName()));
@@ -1184,6 +1184,10 @@ QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingFilterQuery(const Q
 	if (!tenantId.isEmpty()){
 		bindingsLookup += QString(" AND tenantBindings.\"TenantId\" = '%1'")
 				.arg(SqlEncode(QString::fromUtf8(tenantId)));
+
+		if (filterMode == imtauth::TFM_EXCLUDE){
+			return QString("NOT EXISTS (%1)").arg(bindingsLookup);
+		}
 
 		return QString("EXISTS (%1)").arg(bindingsLookup);
 	}
@@ -1456,7 +1460,8 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 			EnsureTenantBindingTableExists();
 
 			QByteArray tenantId = tenantFilterPtr->GetTenantId();
-			tenantFilterQuery = CreateTenantBindingFilterQuery(tenantId);
+			imtauth::TenantFilterMode filterMode = tenantFilterPtr->GetFilterMode();
+			tenantFilterQuery = CreateTenantBindingFilterQuery(tenantId, filterMode);
 		}
 	}
 
@@ -1555,8 +1560,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(
 	const QByteArray driverId = m_databaseEngineCompPtr->GetDatabaseDriverId().toUpper();
 	const bool isSQLite = (driverId == "QSQLITE");
 
-	QString escapedTextFilter = textFilter;
-	escapedTextFilter.replace("'", "''");
+	QString escapedTextFilter = SqlEncode(textFilter);
 
 	const QString likePattern = QString("%%1%").arg(escapedTextFilter);
 

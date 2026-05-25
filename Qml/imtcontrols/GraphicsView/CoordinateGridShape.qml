@@ -23,6 +23,7 @@ BoundingBox {
 	property string minorGridColor: Style.borderColor;
 	property real majorGridOpacity: 0.5
 	property string axesColor: Style.borderColor2;
+	property real gridLineThickness: 1
 
 	property string labelX: "X";
 	property string labelY: "Y";
@@ -109,7 +110,7 @@ BoundingBox {
 
 		ctx.lineCap = "round"
 		ctx.lineJoin = "round"
-		ctx.lineWidth = 1;
+		ctx.lineWidth = gridShape.gridLineThickness;
 
 		ctx.fillStyle = backgroundColor;
 		ctx.strokeStyle = gridShape.majorGridColor;
