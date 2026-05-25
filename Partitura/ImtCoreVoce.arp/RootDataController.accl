@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6390" Description="ACF"/>
-            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6397" Description="ACF"/>
+            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -18,12 +18,11 @@
     <EmbeddedRegistries>
         <EmbededRegistry Id="UserSettings">
             <PositionMap>
-                <Element ComponentName="DatabaseUserSettings" X="600" Y="275" Note=""/>
-                <Element ComponentName="Demultiplexer" X="1025" Y="50" Note=""/>
-                <Element ComponentName="SettingsController" X="625" Y="25" Note=""/>
-                <Element ComponentName="TableViewParamController" X="975" Y="250" Note=""/>
-                <Element ComponentName="UserSettings" X="125" Y="75" Note=""/>
-                <Element ComponentName="UserSettingsRepresentation" X="275" Y="275" Note=""/>
+                <Element ComponentName="Demultiplexer" X="625" Y="75" Note=""/>
+                <Element ComponentName="SettingsController" X="375" Y="250" Note=""/>
+                <Element ComponentName="TableViewParamController" X="875" Y="275" Note=""/>
+                <Element ComponentName="UserSettings" X="150" Y="500" Note=""/>
+                <Element ComponentName="UserSettingsRepresentation" X="650" Y="500" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

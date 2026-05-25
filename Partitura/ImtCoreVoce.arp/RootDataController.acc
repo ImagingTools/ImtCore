@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6390" Description="ACF"/>
-            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6397" Description="ACF"/>
+            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -126,12 +126,6 @@
         <Element Id="UserSettings" PackageId="" ComponentId="UserSettings">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="LanguageConstraints" Type="Reference" ExportId="LanguageConstraints">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -150,7 +144,7 @@
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                    <AttributeInfo Id="UserSettingsCollection" Type="Reference" ExportId="UserSettingsCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -161,27 +155,6 @@
         <EmbeddedRegistry Id="UserSettings">
             <Data Description="" Keywords="">
                 <ElementsList>
-                    <Element Id="DatabaseUserSettings" PackageId="ImtCoreVoce" ComponentId="DatabaseUserSettings">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="LanguageConstraints" Type="Reference" ExportId="LanguageConstraints">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
                     <Element Id="Demultiplexer" PackageId="ImtServerGqlPck" ComponentId="GraphQLDemultiplexer">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
@@ -220,8 +193,8 @@
                                 <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="UserSettingsCollection" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="DatabaseUserSettings/UserSettingsRepository"/>
+                                <AttributeInfo Id="UserSettingsCollection" Type="Reference" ExportId="UserSettingsCollection">
+                                    <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="UserSettingsFactory" Type="Factory" ExportId="">
                                     <Data IsEnabled="true" Value="UserSettings"/>
@@ -247,8 +220,8 @@
                                 <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="UserSettingsCollection" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="DatabaseUserSettings/UserSettingsRepository"/>
+                                <AttributeInfo Id="UserSettingsCollection" Type="Reference" ExportId="UserSettingsCollection">
+                                    <Data IsEnabled="false"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
@@ -284,7 +257,6 @@
                     <Interface InterfaceId="istd::IPolymorphic" ComponentId="Demultiplexer"/>
                 </ExportedInterfaces>
                 <ExportedComponents>
-                    <Component ExportedId="UserSettings" ComponentId="DatabaseUserSettings/UserSettings"/>
                     <Component ExportedId="UserSettingsRepository" ComponentId="DatabaseUserSettings/UserSettingsRepository"/>
                 </ExportedComponents>
             </Data>
@@ -294,7 +266,5 @@
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="Demultiplexer"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="Demultiplexer"/>
     </ExportedInterfaces>
-    <ExportedComponents>
-        <Component ExportedId="UserSettingsRepository" ComponentId="UserSettings/UserSettingsRepository"/>
-    </ExportedComponents>
+    <ExportedComponents/>
 </Acf>
