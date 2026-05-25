@@ -55,13 +55,6 @@ public:
 	virtual QByteArray GetSessionFromJwt(const QByteArray& jwt) const override;
 
 private:
-	enum TokenCacheLookupResult
-	{
-		TCLR_MISS,
-		TCLR_VALID,
-		TCLR_INVALID
-	};
-
 	struct TokenCacheEntry
 	{
 		QByteArray userId;
@@ -69,8 +62,6 @@ private:
 		QByteArray tokenId;
 		QByteArrayList scopes;
 		bool isPat = false;
-		bool isValid = true;
-		imtgql::IGqlContextCreator::ContextCreationStatus status = imtgql::IGqlContextCreator::CCS_OK;
 		qint64 expiresAt = 0;
 	};
 
@@ -82,24 +73,19 @@ private:
 				bool& isPat,
 				QString& errorMessage,
 				imtgql::IGqlContextCreator::ContextCreationStatus& status) const;
-	TokenCacheLookupResult TryGetCachedToken(
+	bool TryGetCachedToken(
 				const QByteArray& token,
 				QByteArray& userId,
 				QByteArray& tenantId,
 				QByteArrayList& scopes,
-				bool& isPat,
-				QString& errorMessage,
-				imtgql::IGqlContextCreator::ContextCreationStatus& status) const;
+				bool& isPat) const;
 	void StoreCachedToken(
 				const QByteArray& token,
 				const QByteArray& userId,
 				const QByteArray& tenantId,
 				const QByteArray& tokenId,
 				const QByteArrayList& scopes,
-				bool isPat,
-				bool isValid,
-				imtgql::IGqlContextCreator::ContextCreationStatus status,
-				qint64 ttlMs) const;
+				bool isPat) const;
 	void InvalidateTokenCache(const QByteArray& token) const;
 	imtgql::IGqlContextUniquePtr CreateContextInstance() const;
 	bool IsPatToken(const QByteArray& token) const;
