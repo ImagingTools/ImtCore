@@ -395,6 +395,12 @@ bool CCxxProcessorsManagerComp::BeginSourceFile(
 	stream << QStringLiteral("#include \"");
 	stream << QFileInfo(sourceFile).baseName();
 	stream << QStringLiteral(".h\"");
+	FeedStream(stream, 1, false);
+
+	// include forward declaration file
+	stream << QStringLiteral("#include \"");
+	stream << QFileInfo(sourceFile).baseName();
+	stream << QStringLiteral("_fwd.h\"");
 	FeedStream(stream, 3, false);
 
 	// begin namespace

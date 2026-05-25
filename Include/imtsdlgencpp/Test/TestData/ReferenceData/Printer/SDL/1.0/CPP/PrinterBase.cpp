@@ -1,4 +1,5 @@
 #include "PrinterBase.h"
+#include "PrinterBase_fwd.h"
 
 
 namespace sdl::modsdl::PrinterBase

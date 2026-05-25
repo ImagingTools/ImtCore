@@ -1,4 +1,5 @@
 #include "SubstrateSpecifications.h"
+#include "SubstrateSpecifications_fwd.h"
 
 
 namespace sdl::substrate::SubstrateSpecifications
