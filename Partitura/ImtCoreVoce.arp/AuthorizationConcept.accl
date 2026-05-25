@@ -13,6 +13,7 @@
         <Element ComponentName="GqlJwtSessionController" X="275" Y="575" Note=""/>
         <Element ComponentName="GraphQLDemultiplexer" X="200" Y="300" Note=""/>
         <Element ComponentName="HashCalculator" X="575" Y="100" Note=""/>
+        <Element ComponentName="AuthenticationManager" X="375" Y="450" Note=""/>
         <Element ComponentName="JwtSessionController" X="575" Y="450" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
