@@ -4,4 +4,5 @@ module.exports = {
     JSONListModel: require("./JSONListModel"),
     TreeItemModel: require("./TreeItemModel"),
     GqlModel: require("./GqlModel"),
+    Instantiator: require("./Instantiator"),
 }

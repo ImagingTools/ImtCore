@@ -20,13 +20,13 @@ class Image extends Item {
     static Loading = 2
     static Error = 3
 
-    static AlignLeft = 0
-    static AlignRight = 1
-    static AlignHCenter = 2
+    static AlignLeft = 0x0001
+    static AlignRight = 0x0002
+    static AlignHCenter = 0x0004
 
-    static AlignTop = 0
-    static AlignBottom = 1
-    static AlignVCenter = 2
+    static AlignTop = 0x0020
+    static AlignBottom = 0x0040
+    static AlignVCenter = 0x0080
 
     static meta = Object.assign({}, Item.meta, {
         progress: {type: Real, value:0, },
@@ -64,7 +64,13 @@ class Image extends Item {
             return
         }
 
-        let url = JQApplication.rootPath + this.source.replaceAll('qrc:/','').replaceAll('../','')
+        let src = this.source
+        let url
+        if(src.startsWith('data:') || src.startsWith('http:') || src.startsWith('https://')){
+            url = src
+        } else {
+            url = JQApplication.rootPath + src.replaceAll('qrc:/','').replaceAll('../','')
+        }
         this.$url = url
 
         this.status = Image.Loading

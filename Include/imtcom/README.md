@@ -600,7 +600,7 @@ fileTransfer->UploadFile(localPath, uploadUrl);
 - Connection pooling and load balancing support
 - Multi-server architecture
 
-### imtbase Module
+### imtserverapp Module
 
 **Integration points:**
 - `CSystemStatusComp` monitors overall system connection status

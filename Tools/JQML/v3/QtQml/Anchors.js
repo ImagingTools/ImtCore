@@ -487,7 +487,7 @@ class Anchors extends GroupProperty {
                     self.AY = ()=>{return top.AY + top.AHeight / 2 + this.__proxy.topMargin}
                 }
             }
-
+            
             if(self.parent === bottom){
                 if(bottomFloat === AnchorLine.Top){
                     self.AHeight = ()=>{return -this.__proxy.bottomMargin - self.AY}

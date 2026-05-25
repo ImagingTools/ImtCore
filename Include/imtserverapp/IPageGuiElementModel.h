@@ -6,7 +6,7 @@
 #include <imtserverapp/IGuiElementModel.h>
 
 
-namespace imtqml
+namespace imtserverapp
 {
 
 
@@ -25,6 +25,6 @@ public:
 };
 
 
-} // namespace imtqml
+} // namespace imtserverapp
 
 
