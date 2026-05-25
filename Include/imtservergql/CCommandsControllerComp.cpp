@@ -63,14 +63,14 @@ sdl::imtbase::Commands::CGuiElementContainer CCommandsControllerComp::OnGetComma
 	if (arguments.input.Version_1_0->typeId){
 		typeId = *arguments.input.Version_1_0->typeId;
 	}
-	
+
+	const imtauth::IUserInfo* userInfoPtr = nullptr;
 	QByteArray languageId;
 	const imtgql::IGqlContext* gqlContextPtr = getCommandsRequest.GetRequestContext();
 	if (gqlContextPtr !=  nullptr){
 		languageId = gqlContextPtr->GetLanguageId();
+		userInfoPtr = gqlContextPtr->GetUserInfo();
 	}
-	
-	const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
 
 	if (!GetRepresentationFromGuiElementContainer(*m_guiElementContainerCompPtr, response, languageId, userInfoPtr)){
 		errorMessage = QString("Unable to get commands for type-ID '%1'. Error: Get representation failed").arg(qPrintable(typeId));

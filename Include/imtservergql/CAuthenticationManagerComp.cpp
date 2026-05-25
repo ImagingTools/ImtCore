@@ -407,12 +407,13 @@ void CAuthenticationManagerComp::StoreCachedToken(
 	entry.scopes = scopes;
 	entry.isPat = isPat;
 	const qint64 now = QDateTime::currentMSecsSinceEpoch();
-	const qint64 tokenCacheTtlMs = static_cast<qint64>(*m_tokenCacheTtlAttrPtr) * 1000;
+
+	const qint64 tokenCacheTtlMs = m_tokenCacheTtlAttrPtr.IsValid() ? (static_cast<qint64>(*m_tokenCacheTtlAttrPtr) * 1000) : (5 * 60 * 1000);
 	entry.expiresAt = now + tokenCacheTtlMs;
 
 	QMutexLocker cacheLocker(&m_tokenCacheMutex);
 	m_tokenCache.insert(token, entry);
-	const int maxTokenCacheSize = *m_maxTokenCacheSizeAttrPtr;
+	const int maxTokenCacheSize = m_maxTokenCacheSizeAttrPtr.IsValid() ? *m_maxTokenCacheSizeAttrPtr : 10000;
 	if (m_tokenCache.size() <= maxTokenCacheSize){
 		return;
 	}
@@ -448,7 +449,7 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContextInstance()
 
 bool CAuthenticationManagerComp::IsPatToken(const QByteArray& token) const
 {
-	const QByteArray& patPrefix = *m_patPrefixAttrPtr;
+	const QByteArray& patPrefix = m_patPrefixAttrPtr.IsValid() ? *m_patPrefixAttrPtr : QByteArrayLiteral("imt_pat_");
 	return !patPrefix.isEmpty() && token.size() > patPrefix.size() && token.startsWith(patPrefix);
 }
 

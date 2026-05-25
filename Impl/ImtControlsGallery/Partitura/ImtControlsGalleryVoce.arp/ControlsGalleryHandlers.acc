@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5405" Description="ACF"/>
-            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395267" Description="Qt Framework"/>
+            <Version Id="0" Number="6397" Description="ACF"/>
+            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -19,11 +19,8 @@
                     <AttributeInfo Id="AuthOptionIndex" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="0"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="FeatureContainer" Type="Reference" ExportId="FeatureContainer">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="AuthenticationManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SimpleGqlContextCreator"/>
                     </AttributeInfo>
                     <AttributeInfo Id="FileAccessCommandId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="ControlsGallery/files/*"/>
@@ -73,7 +70,13 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserSettingsCollection" Type="Reference" ExportId="UserSettingsCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="WebCommandId" Type="Id" ExportId="">
@@ -103,6 +106,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="GqlContext" PackageId="ImtGqlPck" ComponentId="GqlContext">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="Pages" PackageId="ImtControlsGalleryVoce" ComponentId="Pages">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -121,6 +129,21 @@
         <Element Id="ParamsSetTestController" PackageId="ControlsGalleryGqlPck" ComponentId="ParamsSetTestController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="SimpleGqlContextCreator" PackageId="ImtServerGqlPck" ComponentId="SimpleGqlContextCreator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="GqlContextFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="GqlContext"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="SlaveControllers" PackageId="ImtServerGqlPck" ComponentId="GraphQLDemultiplexer">
