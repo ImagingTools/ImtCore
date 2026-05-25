@@ -10,7 +10,7 @@
     <Description>Remote object/document collection that can be accessed by GraphQL protocol</Description>
     <Keywords>GraphQL Client API Collection Document</Keywords>
     <ElementsList>
-        <Element Id="GqlObjectCollectionDelegate" PackageId="ImtClientGqlPck" ComponentId="GqlObjectCollectionDelegate">
+        <Element Id="GqlObjectCollectionDelegate" PackageId="ImtServerAppPck" ComponentId="GqlObjectCollectionDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CollectionId" Type="Id" ExportId="CollectionId">

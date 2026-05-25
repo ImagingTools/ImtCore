@@ -15,7 +15,7 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="Page" PackageId="ImtQmlPck" ComponentId="PageGuiElementModel">
+        <Element Id="Page" PackageId="ImtServerAppPck" ComponentId="PageGuiElementModel">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Alignment" Type="Integer" ExportId="Alignment">
