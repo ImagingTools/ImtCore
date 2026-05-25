@@ -11,7 +11,6 @@
 #include <imtrest/IRequest.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/CWebSocketRequest.h>
-#include <imtgql/CGqlContext.h>
 #include <imtbase/imtbase.h>
 
 
@@ -167,7 +166,6 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		body = payloadValue.toString().toUtf8();
 	}
 
-
 	imtgql::CGqlRequest gqlRequest;
 	qsizetype errorPosition;
 	if (!gqlRequest.ParseQuery(body, errorPosition)){
@@ -196,69 +194,27 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		gqlHeaders.insert(key.toUtf8().toLower(), headers.value(key).toString().toUtf8());
 	}
 
-	// Extract auth token and productId from headers
-	QByteArray accessToken = gqlHeaders.value(QByteArrayLiteral("x-authentication-token"));
-	QByteArray productId = gqlHeaders.value(imtbase::s_productIdHeaderId);
+	if (!m_gqlContextCreatorCompPtr.IsValid()){
+		return CreateErrorResponse(QByteArrayLiteral("GraphQL context creator is not configured"), request);
+	}
 
-	// NOTE: CWebSocketRequests are parented to CWebSocketThread (not QWebSocket),
-	// so auth validation calls (ValidateJwt, ValidateToken) that trigger Qt event
-	// processing are safe — even if old QWebSocket deleteLater() fires during processing,
-	// it won't cascade-delete CWebSocketRequests. No sendPostedEvents flush needed.
-
-	// Validate token and extract userId — same pattern as CHttpGraphQLServletComp::OnPost
-	QByteArray userId;
-	if (!accessToken.isEmpty()){
-		if (accessToken.size() > 8 && accessToken.startsWith("imt_pat_")){
-			// PAT token
-			if (m_patManagerCompPtr.IsValid()){
-				QByteArray tokenId;
-				QByteArrayList scopes;
-				if (!m_patManagerCompPtr->ValidateToken(accessToken, userId, tokenId, scopes)){
-					return CreateErrorResponse(QByteArrayLiteral("Forbidden: invalid PAT token"), request);
-				}
-				m_patManagerCompPtr->UpdateLastUsedAt(tokenId);
-			}
+	imtgql::IGqlContextCreator::ContextCreationError contextError;
+	imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(gqlHeaders, contextError);
+	if (!gqlContextPtr.IsValid()){
+		QByteArray errorMessage;
+		if (contextError.status == imtgql::IGqlContextCreator::CCS_UNAUTHORIZED){
+			errorMessage = QByteArrayLiteral("Unauthorized");
+		}
+		else if (contextError.status == imtgql::IGqlContextCreator::CCS_FORBIDDEN){
+			errorMessage = QByteArrayLiteral("Forbidden");
 		}
 		else{
-			// JWT token
-			if (m_jwtSessionControllerCompPtr.IsValid()){
-				using JwtState = imtauth::IJwtSessionController::JwtState;
-				JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(accessToken);
-				if (state == JwtState::JS_EXPIRED || state == JwtState::JS_INVALID){
-					return CreateErrorResponse(QByteArrayLiteral("Forbidden: invalid or expired JWT token"), request);
-				}
-				userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(accessToken);
-			}
+			errorMessage = QByteArrayLiteral("Unable to create GraphQL context: ") + contextError.message.toUtf8();
 		}
+		return CreateErrorResponse(errorMessage, request);
 	}
 
-	// Verify request is still alive after auth validation (safety check)
-	if (requestGuard.isNull()){
-		SendErrorMessage(0, QStringLiteral("WebSocket request destroyed during auth validation"), QStringLiteral("CWebSocketServletComp"));
-		return imtrest::ConstResponsePtr();
-	}
-
-	// Create simple GqlContext with authenticated user info.
-	// NOTE: We intentionally do NOT use IGqlContextCreator::CreateGqlContext() here.
-	// CreateGqlContext accesses UserCollection/UserSettingsCollection (database),
-	// which triggers Qt event loop processing — unnecessary for subscriptions.
-	// A simple CGqlContext with userId/token/productId is sufficient —
-	// PublishDataFiltered only needs GetUserId() for filtering.
-	{
-		imtgql::CGqlContext* simpleContext = new imtgql::CGqlContext();
-		simpleContext->SetHeaders(gqlHeaders);
-		simpleContext->SetUserId(userId);
-		simpleContext->SetToken(accessToken);
-		simpleContext->SetProductId(productId);
-
-		// Extract tenant ID from JWT token when available
-		if (m_jwtSessionControllerCompPtr.IsValid() && !accessToken.isEmpty() && !accessToken.startsWith("imt_pat_")){
-			QByteArray tenantId = m_jwtSessionControllerCompPtr->GetTenantFromJwt(accessToken);
-			simpleContext->SetTenantId(tenantId);
-		}
-
-		gqlRequest.SetGqlContext(simpleContext);
-	}
+	gqlRequest.SetGqlContext(std::move(gqlContextPtr));
 
 	QByteArray commandId = gqlRequest.GetCommandId();
 
@@ -372,5 +328,3 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateErrorResponse(const QByte
 
 
 } // namespace imtservergql
-
-

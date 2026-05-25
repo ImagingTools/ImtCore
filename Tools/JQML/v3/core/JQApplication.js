@@ -22,6 +22,7 @@ module.exports = {
             QtWebSockets: require('../QtWebSockets/QtWebSockets'),
             QtPositioning: require('../QtPositioning/QtPositioning'),
             QtLocation: require('../QtLocation/QtLocation'),
+            QtWebView: require('../QtWebView/QtWebView'),
             __queue: [],
         }
 

@@ -29,7 +29,14 @@ QtObject {
 			representationController.updateRepresentationFailed.connect(onUpdateRepresentationFailed)
 
 			if (updateRepresentation){
-				representationController.updateRepresentationFromDocument()
+				if (view.visible){
+					representationController.updateRepresentationFromDocument()
+				}
+				else{
+					if (!_internal.requestUpdateViews.includes(view)){
+						_internal.requestUpdateViews.push(view)
+					}
+				}
 			}
 		}
 	}
