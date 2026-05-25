@@ -158,7 +158,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="RolesPage" PackageId="ImtQmlPck" ComponentId="PageGuiElementModel">
+        <Element Id="RolesPage" PackageId="ImtServerAppPck" ComponentId="PageGuiElementModel">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Id" Type="Id" ExportId="">
@@ -170,7 +170,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="UsersPage" PackageId="ImtQmlPck" ComponentId="PageGuiElementModel">
+        <Element Id="UsersPage" PackageId="ImtServerAppPck" ComponentId="PageGuiElementModel">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Id" Type="Id" ExportId="">
