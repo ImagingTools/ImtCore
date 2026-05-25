@@ -104,7 +104,7 @@ Item {
 				id: spacer;
 				anchors.left: parent.left;
 				width: visible ? Style.marginM : 0;
-				visible: model.index === 1 && !root.initialItemTitleVisible ? false : true;
+					visible: model.index === 0 ? false : (model.index === 1 && !root.initialItemTitleVisible ? false : true);
 			}
 
 			Row {

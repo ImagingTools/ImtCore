@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6397" Description="ACF"/>
+            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="CollectionDocumentService" X="575" Y="300" Note=""/>
+        <Element ComponentName="CollectionDocumentServiceController" X="825" Y="150" Note=""/>
+        <Element ComponentName="CollectionDocumentServicePublisher" X="850" Y="600" Note=""/>
+        <Element ComponentName="Demultiplexer" X="450" Y="75" Note=""/>
+        <Element ComponentName="SerializedUndoManager" X="300" Y="600" Note=""/>
+        <Element ComponentName="TenantDocumentNameProvider" X="950" Y="300" Note=""/>
+        <Element ComponentName="TenantDocumentService" X="200" Y="300" Note=""/>
+        <Element ComponentName="TenantInfo" X="550" Y="550" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

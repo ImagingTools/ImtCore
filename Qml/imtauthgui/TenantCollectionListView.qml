@@ -10,6 +10,7 @@ Item {
 	id: root
 
 	property string collectionId: ""
+	property string tenantId: ""
 	property string filterPlaceholder: qsTr("Filter...")
 	property string emptyMessage: qsTr("No items found.")
 	property bool canManage: false
@@ -39,10 +40,31 @@ Item {
 	FilterableSelectGqlDataProvider {
 		id: dataProvider
 		collectionId: root.collectionId
+		tenantId: root.tenantId
 		pageSize: 50
 	}
 
+	SubscriptionClient {
+		id: subscriptionClient
+
+		function getHeaders(){
+			return {}
+		}
+
+		onMessageReceived: {
+			dataProvider.fetch(filterInput.text)
+		}
+	}
+
+	function __updateSubscription() {
+		if (root.collectionId !== "")
+			subscriptionClient.gqlCommandId = "On" + root.collectionId + "CollectionChanged"
+	}
+
+	onCollectionIdChanged: __updateSubscription()
+
 	Component.onCompleted: {
+		__updateSubscription()
 		dataProvider.fetch("")
 	}
 
@@ -65,7 +87,14 @@ Item {
 			id: filterInput
 			width: parent.width
 			placeHolderText: root.filterPlaceholder
-			onTextChanged: dataProvider.fetch(text)
+			onTextChanged: filterDebounce.restart()
+		}
+
+		Timer {
+			id: filterDebounce
+			interval: 250
+			repeat: false
+			onTriggered: dataProvider.fetch(filterInput.text)
 		}
 
 		Rectangle {
@@ -99,6 +128,19 @@ Item {
 		model: dataProvider.items
 		clip: true
 		boundsBehavior: Flickable.StopAtBounds
+
+		header: Item {
+			width: listViewArea.width
+			height: listViewArea.count === 0 ? Style.controlHeightL + Style.marginL : 0
+			visible: height > 0
+
+			BaseText {
+				anchors.centerIn: parent
+				text: dataProvider.isInitialLoading ? qsTr("Loading...") : root.emptyMessage
+				font.pixelSize: Style.fontSizeM
+				color: Style.inactiveTextColor
+			}
+		}
 
 		delegate: Rectangle {
 			id: delegateRoot
@@ -237,25 +279,8 @@ Item {
 				height: 1
 				color: Style.borderColor
 				opacity: 0.5
+				visible: index !== listViewArea.count - 1
 			}
 		}
-
-		// Empty state
-		BaseText {
-			visible: listViewArea.count === 0 && !dataProvider.isInitialLoading
-			anchors.centerIn: parent
-			text: root.emptyMessage
-			font.pixelSize: Style.fontSizeM
-			color: Style.inactiveTextColor
-		}
-
-		// Loading state
-		BaseText {
-			visible: dataProvider.isInitialLoading
-			anchors.centerIn: parent
-			text: qsTr("Loading...")
-			font.pixelSize: Style.fontSizeM
-			color: Style.inactiveTextColor
 		}
 	}
-}

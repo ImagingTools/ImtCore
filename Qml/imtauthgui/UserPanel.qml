@@ -192,9 +192,12 @@ Item {
 
 			MenuItem {
 				text: qsTr("No organization")
-				enabled: AuthorizationController.currentTenantId !== ""
+				checkable: true
+				checked: AuthorizationController.currentTenantId === ""
 				onTriggered: {
-					AuthorizationController.selectTenant("")
+					if (AuthorizationController.currentTenantId !== "") {
+						AuthorizationController.selectTenant("")
+					}
 				}
 			}
 		}
