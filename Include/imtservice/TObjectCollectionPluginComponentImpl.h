@@ -36,7 +36,7 @@ TObjectCollectionPluginComponentImpl<ComponentClass>::TObjectCollectionPluginCom
 }
 
 
-// reimplemented (imtbase::IParamsSetPlugin)
+// reimplemented (imtserverapp::IParamsSetPlugin)
 
 template <class ComponentClass>
 const IObjectCollectionPlugin::IObjectCollectionFactory* TObjectCollectionPluginComponentImpl<ComponentClass>::GetObjectCollectionFactory() const

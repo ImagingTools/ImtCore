@@ -39,31 +39,36 @@ class Loader extends Item {
 
     __complete(){
         super.__complete()
-    }
-
-    'SLOT_Component.completed'(){
         if(this.__lazyItem){
             this.item = this.__lazyItem
+            delete this.__lazyItem
             this.status = Loader.Ready
             this.loaded()
         }
-        
+    }
+
+    __updateProperties(){
+        super.__updateProperties()
+        if(this.__lazyItem){
+            this.item = this.__lazyItem
+            delete this.__lazyItem
+            this.status = Loader.Ready
+            this.loaded()
+        }
+        this.__propertiesUpdated = true
     }
 
     SLOT_itemChanged(oldValue, newValue){
         if(oldValue) oldValue.destroy()
 
         if(newValue instanceof Item){
-            // newValue.widthChanged.connect(()=>{
-            //     Geometry.setAuto(this.__self, 'width', newValue.width, this.__self.constructor.meta.width)
-            // })
-            // newValue.heightChanged.connect(()=>{
-            //     Geometry.setAuto(this.__self, 'height', newValue.height, this.__self.constructor.meta.height)
-            // })
-
-
             if(this.__self.width__prevent || this.__self.AWidth__prevent){
                 newValue.width = this.width
+                let originWidthSlot = this.SLOT_widthChanged?.bind(this)
+                this.SLOT_widthChanged = (o, n) => {
+                    newValue.width = n
+                    if(originWidthSlot) originWidthSlot(o, n)
+                }
             } else {
                 Geometry.setAuto(this.__self, 'width', newValue.width, this.__self.constructor.meta.width)
 
@@ -76,6 +81,11 @@ class Loader extends Item {
 
             if(this.__self.height__prevent || this.__self.AHeight__prevent){
                 newValue.height = this.height
+                let originHeightSlot = this.SLOT_heightChanged?.bind(this)
+                this.SLOT_heightChanged = (o, n) => {
+                    newValue.height = n
+                    if(originHeightSlot) originHeightSlot(o, n)
+                }
             } else {
                 Geometry.setAuto(this.__self, 'height', newValue.height, this.__self.constructor.meta.height)
 
@@ -97,15 +107,13 @@ class Loader extends Item {
             let item = this.sourceComponent.createObject(this, {}, true)
 
             if(item){
-                if(this.__completed){
+                if(this.__completed || this.__propertiesUpdated){
                     this.item = item
                     this.status = Loader.Ready
                     this.loaded()
                 } else {
                     this.__lazyItem = item
                 }
-                
-                
             } else {
                 this.item = null
                 this.status = Loader.Error
@@ -128,29 +136,67 @@ class Loader extends Item {
             let path = this.source.replaceAll('qrc:/', '').replaceAll('.qml', '').split('/')
             let className = path[path.length-1]
 
+            // 1. Search in current module by path
             let cls = null
-            try {
-                cls = eval(className)
-            } catch (error) {
-                while(path.length){
-                    if(cls){
-                        let name = path.shift()
-                        if(name in cls){
-                            cls = cls[name]
-                        }
+            let candidate = null
+            for(let i = 0; i < path.length; i++){
+                if(candidate){
+                    let name = path[i]
+                    if(name in candidate){
+                        candidate = candidate[name]
+                    } else if(name in JQModules){
+                        candidate = JQModules[name]
                     } else {
-                        cls = JQModules[path.shift()]
+                        candidate = null
+                        break
+                    }
+                } else {
+                    candidate = JQModules[path[i]]
+                }
+            }
+            if(candidate && candidate.isAssignableFrom) cls = candidate
+
+            // 2. Search by className in all modules
+            if(!cls){
+                for(let key in JQModules){
+                    candidate = JQModules[key]
+                    if(candidate && className in candidate && candidate[className] && candidate[className].isAssignableFrom){
+                        cls = candidate[className]
+                        break
+                    }
+                    let sub = candidate
+                    for(let i = 0; i < path.length; i++){
+                        if(sub){
+                            let name = path[i]
+                            if(name in sub){
+                                sub = sub[name]
+                            } else if(name in JQModules){
+                                sub = JQModules[name]
+                            } else {
+                                sub = null
+                                break
+                            }
+                        } else {
+                            sub = JQModules[path[i]]
+                        }
+                    }
+                    if(sub && sub.isAssignableFrom){
+                        cls = sub
+                        break
                     }
                 }
             }
 
-            // let source = this.source.split('/').pop().replaceAll('.qml', '')
-
-            // let cls = eval(source)
+            if(!cls){
+                console.error(`Loader: "${this.source}" is not founded | className: ${className} | modules:`, Object.keys(JQModules))
+                this.item = null
+                this.status = Loader.Error
+                return
+            }
 
             this.__updateProperty('visible')
             let item = cls.create(this)
-            
+
             if(item){
                 if(this.__completed){
                     this.item = item
@@ -158,9 +204,8 @@ class Loader extends Item {
                     this.loaded()
                 } else {
                     this.__lazyItem = item
+                    this.status = Loader.Ready
                 }
-                
-                
             } else {
                 this.item = null
                 this.status = Loader.Error

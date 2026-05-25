@@ -10,7 +10,7 @@
 #include <imtdb/IDatabaseServerConnectionChecker.h>
 
 
-namespace imtbase
+namespace imtserverapp
 {
 
 
@@ -33,6 +33,6 @@ public:
 };
 
 
-} // namespace imtbase
+} // namespace imtserverapp
 
 

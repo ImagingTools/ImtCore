@@ -2,6 +2,8 @@ const Flickable = require("./Flickable")
 const Var = require("../QtQml/Var")
 const Real = require("../QtQml/Real")
 const Signal = require("../QtQml/Signal")
+const Variant = require("../QtQml/Variant")
+const Component = require("../QtQml/Component")
 
 class GridView extends Flickable {
     static Beginning = 0
@@ -15,7 +17,7 @@ class GridView extends Flickable {
 
     static meta = Object.assign({}, Flickable.meta, {
         model: {type: Var, value:undefined, },
-        delegate: {type: Var, value:undefined, },
+        delegate: {type: Variant, typeTarget: Component, value:undefined, },
         layoutDirection: {type: Real, value:GridView.LeftToRight, },
         verticalLayoutDirection: {type: Real, value:GridView.TopToBottom, },
         currentIndex: {type: Real, value:-1, },
@@ -49,6 +51,12 @@ class GridView extends Flickable {
     __items = []
     __changeSet = []
 
+    __updatePrimaryProperties(){
+        super.__updatePrimaryProperties()
+        this.__updateProperty('delegate')
+        this.__initView(true)
+    }
+
     __complete(){
         this.__initView(true)
         super.__complete()
@@ -62,7 +70,7 @@ class GridView extends Flickable {
     }
 
     itemAtIndex(index){
-        return index >= 0 && index < this.__items.length.get() ? this.__items[index] : undefined
+        return index >= 0 && index < this.__items.length ? this.__items[index] : undefined
     }
     positionViewAtBeginning(){
         this.positionViewAtIndex(0, GridView.Beginning)
@@ -114,7 +122,7 @@ class GridView extends Flickable {
             newVlaue.__addViewListener(this)
         }
 
-        this.__initView(this.__completed)
+        this.__initView(true)
     }
 
     SLOT_delegateChanged(oldValue, newValue){
@@ -146,6 +154,7 @@ class GridView extends Flickable {
     }
 
     __createItem(index){
+        if(JQApplication.isQuitting) return null
         let properties = {}
 
         if (Array.isArray(this.model)) {
@@ -170,7 +179,6 @@ class GridView extends Flickable {
             if (Array.isArray(this.model)) {
                 length = this.model.length
             } else if(typeof this.model === 'object'){     
-                if(this.model.__changeSet.length > 0) return
                 length = this.model.count
             } else if(typeof this.model === 'number'){
                 length = this.model
@@ -203,6 +211,9 @@ class GridView extends Flickable {
 
     __updateChangedSet(changeSet) {
         this.__changeSet.push(changeSet)
+        if (this.model && typeof this.model === 'object') {
+            this.__self.count = this.model.count
+        }
     }
 
     __updateView(changeSet){

@@ -8744,7 +8744,7 @@ Errori: 0</translation>
         <translation>ID utente</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtbase/CSystemStatusComp.cpp" line="+185" />
+        <location filename="../../../Include/imtserverapp/CSystemStatusComp.cpp" line="+185" />
         <source>The %1 server cannot be connected at %2.</source>
         <translation>Impossibile connettersi al server %1 all'indirizzo %2.</translation>
     </message>
@@ -10314,7 +10314,7 @@ ID input: </translation>
 <context>
     <name>imtbase::CSystemStatusComp</name>
     <message>
-        <location filename="../../../Include/imtbase/CSystemStatusComp.cpp" line="-140" />
+        <location filename="../../../Include/imtserverapp/CSystemStatusComp.cpp" line="-140" />
         <location line="+64" />
         <source>Try connect to: '%1' ...</source>
         <translation>Connessione a: '%1' ...</translation>

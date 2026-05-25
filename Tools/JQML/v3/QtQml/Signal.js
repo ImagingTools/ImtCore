@@ -14,6 +14,24 @@ class Signal extends BaseObject {
             let slotName = 'SLOT_' + name
 
             global.queueFlag.push(false)
+            global.signalTargets.push(target)
+
+            // Priority connections (cross-item bindings) fire before SLOT_
+            if(name in target.__connections){
+                for(let connection of target.__connections[name]){
+                    if(!connection.priority) continue
+                    try {
+                        if(connection.target){
+                            connection.slot.call(connection.target.__proxy, ...args)  
+                        } else {
+                            connection.slot(...args)
+                        }
+                    } catch (error) {
+                        if(location.hash === '#jqdebug')console.error(error)
+                    }
+                }
+            }
+
             if(slotName in target){
                 try {
                     target[slotName].call(target.__proxy, ...args)
@@ -24,6 +42,7 @@ class Signal extends BaseObject {
 
             if(name in target.__connections){
                 for(let connection of target.__connections[name]){
+                    if(connection.priority) continue
                     try {
                         if(connection.target){
                             connection.slot.call(connection.target.__proxy, ...args)  
@@ -36,6 +55,7 @@ class Signal extends BaseObject {
                 }
             }
             global.queueFlag.pop()
+            global.signalTargets.pop()
         }
 
         f.connect = (...args)=>{
@@ -75,6 +95,39 @@ class Signal extends BaseObject {
 
                 target.__connections[name].push(connection)
 
+                let connectionObj = {
+                    target: target,
+                    name: name,
+                    connection: connection
+                }
+
+                if(connection.slot.meta && !connection.slot.meta.destruction){
+                    let destructionFunc = ()=>{
+                        this.removeConnection(connectionObj)
+                    }
+                    destructionFunc.meta = {
+                        name: connection.slot.meta.name,
+                        parent: connection.slot.meta.parent,
+                        destruction: true
+                    }
+                    connection.slot.meta.parent.__proxy['Component.destruction'].connect(destructionFunc)
+                }
+
+                return connectionObj
+            }
+        }
+
+        f.connectBefore = (...args)=>{
+            if(!target.__connections[name]) target.__connections[name] = []
+
+            if(args.length === 1){
+                let connection = {
+                    slot:args[0],
+                    priority: true
+                }
+
+                target.__connections[name].unshift(connection)
+                
                 let connectionObj = {
                     target: target,
                     name: name,

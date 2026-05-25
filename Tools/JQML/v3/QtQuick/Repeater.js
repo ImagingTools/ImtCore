@@ -176,7 +176,7 @@ class Repeater extends Item {
                 } else if (role === 'remove') {
                     let removed = this.__items.splice(leftTop, bottomRight - leftTop)
                     for (let r of removed) {
-                        this.itemRemoved(r)
+                        this.__proxy.itemRemoved(r)
                         if(r) r.destroy()
                     }
                 }
