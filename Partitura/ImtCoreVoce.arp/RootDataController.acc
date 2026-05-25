@@ -256,9 +256,7 @@
                     <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="Demultiplexer"/>
                     <Interface InterfaceId="istd::IPolymorphic" ComponentId="Demultiplexer"/>
                 </ExportedInterfaces>
-                <ExportedComponents>
-                    <Component ExportedId="UserSettingsRepository" ComponentId="DatabaseUserSettings/UserSettingsRepository"/>
-                </ExportedComponents>
+                <ExportedComponents/>
             </Data>
         </EmbeddedRegistry>
     </EmbeddedRegistriesList>
