@@ -678,6 +678,7 @@ ViewBase {
 				objectId: ""
 				createNew: true
 				headerVisible: false
+				documentNameInputEnabled: false
 				
 				Component.onCompleted: {
 					membersPage.__activeShellView = createUserShell
@@ -714,6 +715,7 @@ ViewBase {
 				objectId: membersPage.__editUserId
 				createNew: false
 				headerVisible: false
+				documentNameInputEnabled: false
 				
 				Component.onCompleted: {
 					membersPage.__activeShellView = editUserShell

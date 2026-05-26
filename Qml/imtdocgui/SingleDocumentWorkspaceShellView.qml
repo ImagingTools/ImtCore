@@ -38,6 +38,16 @@ Item {
 	// Whether the header bar (document name + close button) is visible.
 	property bool headerVisible: true
 
+	// Controls whether the workspace prompts the user for a document name
+	// when the underlying document manager requests one (typically on the
+	// first save of a brand new document that has no name yet).
+	//
+	// When false (e.g. for editors that don't expose a user-visible document
+	// name like the Role/User/Group editors inside TenantEditor), the
+	// workspace silently fulfils the name request with `getDefaultDocumentName()`
+	// so the in-flight Save can proceed without showing a dialog.
+	property bool documentNameInputEnabled: true
+
 	// Current resolved document id (set after open/create succeeds).
 	readonly property alias documentId: _internal.documentId
 
@@ -244,6 +254,39 @@ Item {
 						qsTr("Save document"),
 						qsTr("Save all changes ?"),
 						dialogCallback)
+		}
+
+		function onRequestDocumentName(documentId, documentTypeId){
+			if (documentId !== _internal.documentId){
+				return
+			}
+			if (workspaceView.documentManager && workspaceView.documentManager.hasDocumentNameProvider(documentTypeId)){
+				return
+			}
+			if (!workspaceView.documentNameInputEnabled){
+				// Name input is disabled for this workspace — fulfil the
+				// request with a default name so the save flow proceeds
+				// without prompting the user.
+				workspaceView.documentManager.setDocumentName(
+						documentId,
+						workspaceView.documentManager.getDefaultDocumentName())
+				return
+			}
+			ModalDialogManager.openDialog(inputDialogComp, {documentId: documentId})
+		}
+	}
+
+	Component {
+		id: inputDialogComp
+		InputDialog {
+			title: qsTr("Document Name")
+			placeHolderText: qsTr("Enter the document name")
+			property string documentId
+			onFinished: {
+				if (buttonId === Enums.ok){
+					workspaceView.documentManager.setDocumentName(documentId, inputValue)
+				}
+			}
 		}
 	}
 

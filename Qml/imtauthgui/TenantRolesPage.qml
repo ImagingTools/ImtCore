@@ -479,6 +479,7 @@ ViewBase {
 				objectId: ""
 				createNew: true
 				headerVisible: false
+				documentNameInputEnabled: false
 				
 				Component.onCompleted: {
 					rolesPage.__activeShellView = createRoleShell
@@ -515,6 +516,7 @@ ViewBase {
 				objectId: rolesPage.__editRoleId
 				createNew: false
 				headerVisible: false
+				documentNameInputEnabled: false
 				
 				Component.onCompleted: {
 					rolesPage.__activeShellView = editRoleShell

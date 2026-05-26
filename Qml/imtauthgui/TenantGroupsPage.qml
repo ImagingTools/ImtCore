@@ -476,6 +476,7 @@ ViewBase {
 				objectId: ""
 				createNew: true
 				headerVisible: false
+				documentNameInputEnabled: false
 				
 				Component.onCompleted: {
 					groupsPage.__activeShellView = createGroupShell
@@ -512,6 +513,7 @@ ViewBase {
 				objectId: groupsPage.__editGroupId
 				createNew: false
 				headerVisible: false
+				documentNameInputEnabled: false
 				
 				Component.onCompleted: {
 					groupsPage.__activeShellView = editGroupShell
