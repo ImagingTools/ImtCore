@@ -22,7 +22,9 @@ class Font extends GroupProperty {
     }
 
     onChanged(){
-        if(this.__parent && this.__parent.onFontChanged) this.__parent.onFontChanged.call(this.__parent.__proxy)
+        if(this.__parent && this.__parent.onFontChanged) {
+            this.__parent.onFontChanged.call(this.__parent.__proxy)
+        }
     }
 
     SLOT_boldChanged(oldValue, newValue){

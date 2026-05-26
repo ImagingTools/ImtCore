@@ -90,6 +90,21 @@ DocumentServiceBase {
 		createDocumentRequest.send(documentTypeIdInput)
 	}
 
+	// Unified entry point for single- and multi-document workspaces:
+	// - if objectId is empty, creates a new document of the given typeId
+	// - otherwise opens the existing collection object identified by objectId
+	// Existing per-document deduplication in openDocument() (via
+	// getDocumentIdByObjectId) still applies, so calling this repeatedly for
+	// the same objectId will surface documentAlreadyOpened.
+	function openOrCreateByObjectId(typeId, objectId){
+		if (!objectId || objectId === ""){
+			createDocument(typeId)
+		}
+		else{
+			openDocument(typeId, objectId)
+		}
+	}
+
 	function saveDocument(documentId, documentName){
 		startSaveDocument(documentId)
 

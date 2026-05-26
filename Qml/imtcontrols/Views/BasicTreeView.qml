@@ -1,26 +1,525 @@
 import QtQuick
+import QtQuick.Controls
 import Acf 1.0
 import imtcontrols 1.0
+
+/*
+    BasicTreeView — universal tree component with support for:
+    - Multi-column display with inline cell editing
+    - Tri-state checkboxes with cascading propagation up/down
+    - Text filtering with auto-expansion of matched branches
+    - Multiple selection
+    - Keyboard navigation (arrows, Home/End, F2, Tab, *, Space)
+    - writeBack mechanism for propagating changes to the source model
+
+    ═══════════════════════════════════════════════════════════════
+    MODEL FORMAT
+    ═══════════════════════════════════════════════════════════════
+
+    model: [
+        {
+            key: "unique-key",       // unique identifier (required)
+            text: "Display text",    // displayed text
+            checked: Qt.Unchecked,   // Qt.Unchecked | Qt.Checked | Qt.PartiallyChecked
+            checkable: false,        // show checkbox
+            enabled: true,           // whether the node is active
+            expanded: false,         // whether the node is expanded
+            children: [],            // child items (same format)
+            data: null               // arbitrary user data
+        }
+    ]
+
+    ═══════════════════════════════════════════════════════════════
+    COLUMNS FORMAT
+    ═══════════════════════════════════════════════════════════════
+
+    columns: [
+        {
+            name: "name",                       // column identifier
+            title: "Name",                      // header title
+            display: "text",                    // path to value in node (supports dot-notation: "data.myField")
+            type: "string",                     // "string" | "number" | "bool" | "combo" | "auto"
+            tree: true,                         // tree column (indent + expand arrow)
+            editable: true,                     // editing allowed
+            options: [],                        // for combo: array of choices
+            editor: null,                       // custom editor Component (overrides built-in editors)
+            horizontalAlignment: Text.AlignLeft // text alignment
+        }
+    ]
+
+    If columns is empty, a single default column is used (display: "text", tree: true, editable: true).
+
+    Custom editor Component contract:
+        Required properties:  value, column, nodeIndex
+        Required signals:     commit(var value), cancel()
+        The component receives focus automatically on activation.
+
+    ═══════════════════════════════════════════════════════════════
+    EXAMPLE 1: Simple tree (display only)
+    ═══════════════════════════════════════════════════════════════
+
+    BasicTreeView {
+        anchors.fill: parent
+        model: [
+            { key: "root1", text: "Folder 1", children: [
+                { key: "child1", text: "File A" },
+                { key: "child2", text: "File B" }
+            ]},
+            { key: "root2", text: "Folder 2", expanded: true, children: [
+                { key: "child3", text: "File C" }
+            ]}
+        ]
+
+        onNodeClicked: console.log("Clicked:", index.key, index.text)
+    }
+
+    ═══════════════════════════════════════════════════════════════
+    EXAMPLE 2: Checkable tree (tri-state)
+    ═══════════════════════════════════════════════════════════════
+
+    BasicTreeView {
+        anchors.fill: parent
+        tristate: true
+
+        model: [
+            { key: "all", text: "All permissions", checkable: true, expanded: true, children: [
+                { key: "read",  text: "Read",   checkable: true },
+                { key: "write", text: "Write",  checkable: true },
+                { key: "admin", text: "Admin",  checkable: true, enabled: false }
+            ]}
+        ]
+
+        onCheckedItemsChanged: {
+            var keys = getCheckedKeys()
+            console.log("Checked:", keys.join(", "))
+        }
+    }
+
+    ═══════════════════════════════════════════════════════════════
+    EXAMPLE 3: Editable tree (single column)
+    ═══════════════════════════════════════════════════════════════
+
+    BasicTreeView {
+        anchors.fill: parent
+        editable: true
+        editOnDoubleClick: true
+
+        model: myModel
+
+        onNodeTextEdited: {
+            console.log("Renamed:", index.key, oldText, "->", text)
+        }
+    }
+
+    ═══════════════════════════════════════════════════════════════
+    EXAMPLE 4: Multi-column tree table with editing
+    ═══════════════════════════════════════════════════════════════
+
+    BasicTreeView {
+        anchors.fill: parent
+        editable: true
+        showHeader: true
+
+        columns: [
+            { name: "name",  title: "Name",   display: "text",       tree: true, editable: true  },
+            { name: "type",  title: "Type",   display: "data.type",  editable: false },
+            { name: "value", title: "Value",  display: "data.value", editable: true, type: "number" }
+        ]
+
+        model: [
+            { key: "p1", text: "Parameter 1", data: { type: "int", value: 42 }, children: [
+                { key: "p1a", text: "Sub-parameter", data: { type: "float", value: 3.14 } }
+            ]}
+        ]
+
+        onCellEdited: {
+            console.log("Cell edited:", index.key, column.name, oldValue, "->", value)
+        }
+    }
+
+    ═══════════════════════════════════════════════════════════════
+    EXAMPLE 5: Typed editors (combo, bool, number)
+    ═══════════════════════════════════════════════════════════════
+
+    // The editor widget is chosen automatically based on column type:
+    //   "string"  → TextInput
+    //   "number"  → TextInput with numeric validation
+    //   "bool"    → CheckBox (click or Space toggles, Escape cancels)
+    //   "combo"   → Popup dropdown with options list
+
+    BasicTreeView {
+        anchors.fill: parent
+        editable: true
+        showHeader: true
+
+        columns: [
+            { name: "name",   title: "Name",    display: "text",         tree: true, editable: true },
+            { name: "active", title: "Active",  display: "data.active",  editable: true, type: "bool" },
+            { name: "mode",   title: "Mode",    display: "data.mode",    editable: true, type: "combo",
+              options: ["Auto", "Manual", "Disabled"] },
+            { name: "weight", title: "Weight",  display: "data.weight",  editable: true, type: "number" }
+        ]
+
+        model: [
+            { key: "item1", text: "Item 1", data: { active: true, mode: "Auto", weight: 1.5 } },
+            { key: "item2", text: "Item 2", data: { active: false, mode: "Manual", weight: 3.0 } }
+        ]
+    }
+
+    ═══════════════════════════════════════════════════════════════
+    EXAMPLE 6: Custom editor per column
+    ═══════════════════════════════════════════════════════════════
+
+    // When built-in editors (TextInput, CheckBox, Popup combo) are not enough,
+    // you can provide a custom Component as the editor for any column.
+    //
+    // HOW TO SET UP:
+    //   1. Define a Component containing your editor UI
+    //   2. The root item of the Component MUST declare:
+    //        property var value      — current cell value (set by the tree on load)
+    //        property var column     — column definition object
+    //        property var nodeIndex  — index object of the edited node (see INDEX OBJECT section)
+    //        signal commit(var value) — emit to save the new value and close the editor
+    //        signal cancel()          — emit to discard changes and close the editor
+    //   3. Assign the Component to column.editor in your columns array
+    //
+    // LIFECYCLE:
+    //   - The editor is instantiated via Loader when the cell enters edit mode
+    //   - It receives focus automatically (forceActiveFocus)
+    //   - After commit() or cancel() the Loader unloads the component
+    //   - If the delegate scrolls out of view, the editor is canceled automatically
+    //
+    // WHAT nodeIndex PROVIDES (same object as in signals):
+    //   nodeIndex.key        — unique node key
+    //   nodeIndex.text       — node text
+    //   nodeIndex.data       — user data object (from model item's "data" field)
+    //   nodeIndex.level      — nesting depth
+    //   nodeIndex.parentKey  — parent node key
+    //   nodeIndex.value(path) — read any field by dot-path
+    //   (full list: see INDEX OBJECT section above)
+
+    // --- Example: slider editor for a numeric column ---
+
+    Component {
+        id: sliderEditor
+
+        Row {
+            property var value
+            property var column
+            property var nodeIndex
+
+            signal commit(var value)
+            signal cancel()
+
+            spacing: 8
+
+            Slider {
+                id: slider
+                width: parent.width - valueLabel.width - parent.spacing
+                height: parent.height
+                from: 0
+                to: 100
+                value: parent.value || 0
+                stepSize: 1
+
+                onPressedChanged: {
+                    if (!pressed)
+                        parent.commit(slider.value)
+                }
+            }
+
+            Text {
+                id: valueLabel
+                width: 30
+                anchors.verticalCenter: parent.verticalCenter
+                text: Math.round(slider.value)
+                horizontalAlignment: Text.AlignRight
+            }
+
+            Keys.onEscapePressed: cancel()
+            Keys.onReturnPressed: commit(slider.value)
+        }
+    }
+
+    // --- Example: color picker editor ---
+
+    Component {
+        id: colorEditor
+
+        Rectangle {
+            property var value
+            property var column
+            property var nodeIndex
+
+            signal commit(var value)
+            signal cancel()
+
+            color: value || "#ffffff"
+            border.color: "gray"
+            border.width: 1
+            radius: 2
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    var colors = ["#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff"]
+                    var idx = colors.indexOf(parent.parent.value)
+                    parent.parent.commit(colors[(idx + 1) % colors.length])
+                }
+            }
+
+            Keys.onEscapePressed: cancel()
+        }
+    }
+
+    // --- Usage ---
+
+    BasicTreeView {
+        anchors.fill: parent
+        editable: true
+        showHeader: true
+
+        columns: [
+            { name: "name",     title: "Name",     display: "text",          tree: true, editable: true },
+            { name: "color",    title: "Color",    display: "data.color",    editable: true, editor: colorEditor },
+            { name: "priority", title: "Priority", display: "data.priority", editable: true, editor: sliderEditor }
+        ]
+
+        model: [
+            { key: "item1", text: "Item 1", data: { color: "#ff0000", priority: 75 } },
+            { key: "item2", text: "Item 2", data: { color: "#00ff00", priority: 30 } }
+        ]
+
+        // onCellEdited fires for ALL editors (built-in and custom) after commit
+        onCellEdited: {
+            // index   — index object of the edited node
+            // column  — column definition: { name, display, editor, ... }
+            // value   — new value after editing
+            // oldValue — value before editing
+            console.log("Edited:", index.key, column.name, oldValue, "->", value)
+        }
+    }
+
+    ═══════════════════════════════════════════════════════════════
+    EXAMPLE 7: writeBack — propagation to source model
+    ═══════════════════════════════════════════════════════════════
+
+    // PROBLEM: BasicTreeView works with a JS-array copy of the data.
+    // When using TreeModelBuilder.fromListModel() to transform a C++ ListModel
+    // (or any QAbstractItemModel) into the tree format, edits only change
+    // the local JS copy — the original source model is NOT updated automatically.
+    //
+    // SOLUTION: Use writeBack callback or onCellEdited signal to propagate
+    // changes back to the source model.
+    //
+    // HOW index.data.sourceIndex WORKS:
+    //   When building the tree model, you store the source row index in data:
+    //     data: { sourceIndex: i }
+    //   Later, in writeBack/onCellEdited, you retrieve it:
+    //     var srcIdx = index.data.sourceIndex
+    //   This gives you the row number in the ORIGINAL source model, so you can
+    //   call sourceModel.setProperty(srcIdx, propertyName, newValue) to write back.
+    //
+    // NOTE: index.data is the same object you passed as "data" when building the model.
+    //   You can store anything there: sourceIndex, sourceId, a reference to the
+    //   original item, etc. It's your link between the tree node and the source.
+    //
+    // onCellEdited SIGNAL PARAMETERS:
+    //   index    — index object of the edited node (see INDEX OBJECT section)
+    //             index.key       — node key
+    //             index.text      — current text
+    //             index.data      — your custom data object
+    //             index.item      — reference to the original model[] item
+    //             index.value(p)  — read any field by dot-path
+    //   column   — column definition object that was edited
+    //             column.name     — column identifier ("name", "value", etc.)
+    //             column.display  — dot-path to the value in the node ("text", "data.myField")
+    //             column.type     — "string" | "number" | "bool" | "combo"
+    //   value    — the new value AFTER the edit was committed and written to the local node
+    //   oldValue — the value BEFORE the edit started
+
+    BasicTreeView {
+        anchors.fill: parent
+        editable: true
+        showHeader: true
+
+        columns: [
+            { name: "name",  title: "Name",  display: "text",       tree: true, editable: true },
+            { name: "count", title: "Count", display: "data.count", editable: true, type: "number" }
+        ]
+
+        model: TreeModelBuilder.fromListModel(sourceModel, function(item, i) {
+            return {
+                key: item.m_id,          // unique key from source
+                text: item.m_name,       // display text
+                data: {
+                    sourceIndex: i,      // ← ROW INDEX in sourceModel (0, 1, 2, ...)
+                    count: item.m_count  // additional fields to display/edit
+                }
+            }
+        })
+
+        // OPTION A: writeBack — called BEFORE writing to local node.
+        // Return false to reject the edit (the cell reverts to old value).
+        writeBack: function(index, column, value, oldValue) {
+            var srcIdx = index.data.sourceIndex   // row in sourceModel
+            var prop = column.display             // e.g. "data.count" or "text"
+
+            // For "data.X" paths, extract the property name after "data."
+            if (prop.indexOf("data.") === 0)
+                prop = prop.substring(5)          // "data.count" -> "count" -> "m_count"
+
+            sourceModel.setProperty(srcIdx, "m_" + prop, value)
+            return true  // accept — local node will also be updated
+            // return false — reject, local node stays unchanged
+        }
+
+        // OPTION B: onCellEdited — called AFTER writing to local node.
+        // Use this if you don't need rejection logic.
+        onCellEdited: {
+            // index.data.sourceIndex — row in sourceModel that corresponds to this node
+            var srcIdx = index.data.sourceIndex
+            console.log("Node", index.key, "column", column.name,
+                        "changed from", oldValue, "to", value,
+                        "sourceModel row:", srcIdx)
+            // sourceModel.setProperty(srcIdx, "m_" + column.name, value)
+        }
+    }
+
+    ═══════════════════════════════════════════════════════════════
+    EXAMPLE 8: Filtering
+    ═══════════════════════════════════════════════════════════════
+
+    Column {
+        TextField {
+            id: searchField
+            placeholderText: "Search..."
+        }
+
+        BasicTreeView {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: 400
+
+            model: myTreeModel
+            filterText: searchField.text    // auto-filter by "text"
+            filterRole: "text"              // or "data.description" for searching by another field
+        }
+    }
+
+    ═══════════════════════════════════════════════════════════════
+    EXAMPLE 9: Programmatic control
+    ═══════════════════════════════════════════════════════════════
+
+    BasicTreeView {
+        id: tree
+        model: myModel
+    }
+
+    // Navigation
+    tree.selectAndEnsureVisible("node-key-123")
+    tree.expandAll()
+    tree.collapseAll()
+
+    // Reading data
+    var idx = tree.indexForKey("node-key-123")
+    console.log(idx.text, idx.value("data.myField"))
+
+    // Programmatic modification
+    idx.setText("New name")
+    idx.setChecked(Qt.Checked)
+    idx.setEnabled(false)
+    idx.setValue("data.myField", 999)
+
+    // Programmatic edit activation
+    idx.edit(0)          // edit column 0
+    tree.editCurrent(1)  // edit column 1 of the current node
+
+    // Checkboxes
+    tree.checkAll()
+    tree.uncheckAll()
+    var checked = tree.getCheckedKeys()  // ["key1", "key2"]
+    var nodes = tree.getCheckedNodes()   // [index, index, ...]
+
+    ═══════════════════════════════════════════════════════════════
+    SIGNALS
+    ═══════════════════════════════════════════════════════════════
+
+    nodeClicked(index)                  — row clicked
+    nodeDoubleClicked(index)            — row double-clicked
+    cellClicked(index, column)          — specific cell clicked
+    cellDoubleClicked(index, column)    — specific cell double-clicked
+    selectionChanged()                  — selection changed
+    checkStateChanged(index, state)     — checkbox state changed
+    checkedItemsChanged()               — any checkbox change
+    headerClicked(column)               — column header clicked
+    cellEditStarted(index, column)      — editing started
+    cellEdited(index, column, value, oldValue) — editing committed (after write)
+    cellEditCanceled(index, column)     — editing canceled (Escape)
+    nodeTextEdited(index, text, oldText) — text changed (convenience shortcut)
+
+    ═══════════════════════════════════════════════════════════════
+    INDEX OBJECT (returned by signals and createIndex)
+    ═══════════════════════════════════════════════════════════════
+
+    index.key         — node key
+    index.text        — text
+    index.checked     — checkbox state
+    index.checkable   — whether checkbox is shown
+    index.enabled     — whether node is active
+    index.expanded    — whether node is expanded
+    index.level       — nesting level (0 = root)
+    index.parentKey   — parent key ("" for roots)
+    index.data        — user data
+    index.item        — reference to original object from model[]
+    index.row         — position among siblings
+    index.path        — path in tree ("0/2/1")
+
+    index.value(columnOrPath)           — get value
+    index.setValue(columnOrPath, value)  — set value
+    index.edit(columnIndex)             — start editing
+    index.setText(value)                — set text
+    index.setChecked(state)             — set checkbox
+    index.setEnabled(value)             — enable/disable
+    index.expand()                      — expand
+    index.collapse()                    — collapse
+    index.select()                      — select
+
+    ═══════════════════════════════════════════════════════════════
+    PROPERTIES
+    ═══════════════════════════════════════════════════════════════
+
+    model: []                   — tree data
+    columns: []                 — column definitions
+    rowHeight: 28               — row height
+    indentation: 18             — indent per level
+    cacheBuffer: 4000           — ListView cache buffer
+    headerHeight: 30            — header height
+    showHeader: true            — show header row
+    multiSelect: false          — multiple selection
+    editable: false             — allow editing
+    editOnDoubleClick: true     — edit on double-click
+    allowDisabledEditing: false — allow editing disabled nodes
+    allowDisabledSelection: false — allow selecting disabled nodes
+    tristate: false             — tri-state checkboxes
+    filterText: ""              — filter text
+    filterRole: "text"          — path for filtering
+    flickable: null             — external Flickable for scroll sync
+    writeBack: null             — function(index, column, value, oldValue) -> bool
+
+    // Readonly
+    currentIndex                — currently selected index
+    visibleCount                — number of visible rows
+    selectedCount               — number of selected items
+    editing                     — whether editing is active
+    editingKey                  — key of node being edited
+    editingColumn               — column index being edited
+    contentListView             — access to internal ListView
+*/
 
 Item {
     id: root
 
-    /*
-        Fixed model format:
-
-        [
-            {
-                key: "unique-key",
-                text: "Display text",
-                checked: Qt.Unchecked,
-                checkable: false,
-                enabled: true,
-                expanded: false,
-                children: [],
-                data: null
-            }
-        ]
-    */
     property var model: []
 
     property var columns: []
@@ -89,6 +588,10 @@ Item {
     property string __editingKey: ""
     property int __editingColumn: -1
     property var __editingOriginalValue: null
+    property string __editingPendingText: ""
+
+    // Called on commit with (index, column, value, oldValue). Return false to reject.
+    property var writeBack: null
 
     height: (root.showHeader ? root.headerHeight + 1 : 0) + visibleModel.count * root.rowHeight
 
@@ -115,6 +618,11 @@ Item {
 
     ListModel {
         id: visibleModel
+    }
+
+    DoubleValidator {
+        id: doubleValidator
+        locale: "C"
     }
 
     Column {
@@ -193,7 +701,7 @@ Item {
                 }
                 
                 if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter) && root.editing) {
-                    root.commitEdit()
+                    root.commitEdit(root.__editingPendingText)
                     event.accepted = true
                     return
                 }
@@ -309,7 +817,9 @@ Item {
                     var node = root.__nodes[delegateRoot.nodeKey]
                     if (node) {
                         var indexObject = root.createIndex(node)
+                        var col = root.__columnAtX(mouseX)
                         root.nodeClicked(indexObject)
+                        root.cellClicked(indexObject, root.columnAt(col))
                     }
                 }
 
@@ -320,14 +830,16 @@ Item {
                     if (!node)
                         return
 
+                    var col = root.__columnAtX(mouseX)
                     var indexObject = root.createIndex(node)
 
                     if (root.editable && root.editOnDoubleClick) {
-                        root.beginEditCell(delegateRoot.nodeKey, 0)
+                        root.beginEditCell(delegateRoot.nodeKey, col)
                     } else if (delegateRoot.nodeHasChildren) {
                         root.toggleExpanded(delegateRoot.nodeKey)
                     }
 
+                    root.cellDoubleClicked(indexObject, root.columnAt(col))
                     root.nodeDoubleClicked(indexObject)
                 }
             }
@@ -346,6 +858,8 @@ Item {
                         property bool treeColumn: root.isTreeColumn(column, index)
                         property var value: root.cellValue(delegateRoot.nodeKey, column)
                         property string displayText: cellRoot.value !== undefined && cellRoot.value !== null ? String(cellRoot.value) : ""
+                        property bool hasCustomEditor: cellRoot.column && cellRoot.column.editor !== undefined && cellRoot.column.editor !== null
+                        property string editorType: root.editing && root.isEditingCell(delegateRoot.nodeKey, index) ? (cellRoot.hasCustomEditor ? "custom" : root.columnType(delegateRoot.nodeKey, column)) : ""
 
                         width: root.columnWidth(column)
                         height: delegateRoot.height
@@ -401,30 +915,41 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                                 width: Math.max(0, parent.width - x)
                                 text: cellRoot.displayText
-                                visible: !cellEditor.visible
+                                visible: !cellEditor.visible && !comboEditor.visible && !boolEditor.visible && !customEditorLoader.visible
                                 color: !delegateRoot.nodeIsEnabled ? root.disabledTextColor : delegateRoot.nodeSelected ? root.selectedTextColor : root.normalTextColor
                                 horizontalAlignment: cellRoot.column && cellRoot.column.horizontalAlignment !== undefined ? cellRoot.column.horizontalAlignment : Text.AlignLeft
                                 elide: Text.ElideRight
                                 verticalAlignment: Text.AlignVCenter
                             }
 
+                            // --- TextInput editor (string, number) ---
                             TextInput {
                                 id: cellEditor
                                 anchors.verticalCenter: parent.verticalCenter
                                 width: Math.max(0, parent.width - x)
-                                visible: root.editing && root.isEditingCell(delegateRoot.nodeKey, index)
+                                visible: cellRoot.editorType === "string" || cellRoot.editorType === "number"
                                 text: visible ? cellRoot.displayText : ""
                                 color: root.normalTextColor
                                 selectByMouse: true
-                                selectedTextColor: "#FFFFFF"
-                                selectionColor: Style.accentColor
+                                selectedTextColor: Style.selectedColor
+                                selectionColor: Style.imaginToolsAccentColor
                                 clip: true
+                                validator: cellRoot.editorType === "number" ? doubleValidator : null
+
+                                onTextChanged: {
+                                    if (visible)
+                                        root.__editingPendingText = text
+                                }
 
                                 onVisibleChanged: {
                                     if (visible) {
                                         text = cellRoot.displayText
+                                        root.__editingPendingText = text
                                         selectAll()
                                         forceActiveFocus()
+                                    } else if (root.editing && root.isEditingCell(delegateRoot.nodeKey, index)) {
+                                        // Delegate scrolled out of view — auto-commit
+                                        root.commitEdit(root.__editingPendingText)
                                     }
                                 }
 
@@ -451,6 +976,205 @@ Item {
                                 Keys.onBacktabPressed: {
                                     root.commitEdit(cellEditor.text)
                                     root.editPreviousCell()
+                                }
+                            }
+
+                            // --- CheckBox editor (bool, checkState) ---
+                            CheckBox {
+                                id: boolEditor
+                                anchors.verticalCenter: parent.verticalCenter
+                                visible: cellRoot.editorType === "bool" || cellRoot.editorType === "checkState"
+                                tristate: cellRoot.editorType === "checkState"
+                                checkState: {
+                                    if (!visible) return Qt.Unchecked
+                                    if (cellRoot.editorType === "checkState") return cellRoot.value !== undefined ? cellRoot.value : Qt.Unchecked
+                                    return cellRoot.value === true ? Qt.Checked : Qt.Unchecked
+                                }
+                                text: {
+                                    if (!visible) return ""
+                                    if (cellRoot.editorType === "checkState") {
+                                        if (cellRoot.value === Qt.Checked) return qsTr("Checked")
+                                        if (cellRoot.value === Qt.PartiallyChecked) return qsTr("Partial")
+                                        return qsTr("Unchecked")
+                                    }
+                                    return cellRoot.value ? qsTr("true") : qsTr("false")
+                                }
+
+                                onVisibleChanged: {
+                                    if (visible)
+                                        forceActiveFocus()
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+
+                                    onClicked: {
+                                        if (cellRoot.editorType === "checkState") {
+                                            var next = cellRoot.value === Qt.Checked ? Qt.Unchecked : Qt.Checked
+                                            root.commitEdit(next)
+                                        } else {
+                                            root.commitEdit(!cellRoot.value)
+                                        }
+                                        listView.forceActiveFocus()
+                                    }
+                                }
+
+                                Keys.onEscapePressed: {
+                                    root.cancelEdit()
+                                    listView.forceActiveFocus()
+                                }
+
+                                Keys.onSpacePressed: {
+                                    if (cellRoot.editorType === "checkState") {
+                                        var next = cellRoot.value === Qt.Checked ? Qt.Unchecked : Qt.Checked
+                                        root.commitEdit(next)
+                                    } else {
+                                        root.commitEdit(!cellRoot.value)
+                                    }
+                                    listView.forceActiveFocus()
+                                }
+
+                                Keys.onReturnPressed: {
+                                    if (cellRoot.editorType === "checkState") {
+                                        var next = cellRoot.value === Qt.Checked ? Qt.Unchecked : Qt.Checked
+                                        root.commitEdit(next)
+                                    } else {
+                                        root.commitEdit(!cellRoot.value)
+                                    }
+                                    listView.forceActiveFocus()
+                                }
+                            }
+
+                            // --- Custom editor (column.editor) ---
+                            Loader {
+                                id: customEditorLoader
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: Math.max(0, parent.width - x)
+                                height: parent.height
+                                visible: cellRoot.editorType === "custom"
+                                active: visible
+                                sourceComponent: visible && cellRoot.hasCustomEditor ? cellRoot.column.editor : null
+
+                                onLoaded: {
+                                    if (item) {
+                                        item.value = cellRoot.value
+                                        item.column = cellRoot.column
+                                        item.nodeIndex = root.createIndex(root.__nodes[delegateRoot.nodeKey])
+                                        item.commit.connect(function(val) {
+                                            root.commitEdit(val)
+                                            listView.forceActiveFocus()
+                                        })
+                                        item.cancel.connect(function() {
+                                            root.cancelEdit()
+                                            listView.forceActiveFocus()
+                                        })
+                                        item.forceActiveFocus()
+                                    }
+                                }
+
+                                onVisibleChanged: {
+                                    if (!visible && root.editing && root.isEditingCell(delegateRoot.nodeKey, index)) {
+                                        // Scrolled out — cancel
+                                        root.cancelEdit()
+                                    }
+                                }
+                            }
+
+                            // --- Combo editor (combo) ---
+                            Item {
+                                id: comboEditor
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: Math.max(0, parent.width - x)
+                                height: parent.height
+                                visible: cellRoot.editorType === "combo"
+
+                                onVisibleChanged: {
+                                    if (visible) {
+                                        comboPopup.open()
+                                    }
+                                }
+
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: parent.width - comboArrow.width - Style.marginS
+                                    text: cellRoot.displayText
+                                    color: root.normalTextColor
+                                    elide: Text.ElideRight
+                                    verticalAlignment: Text.AlignVCenter
+                                }
+
+                                Text {
+                                    id: comboArrow
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.right: parent.right
+                                    text: "\u25BE"
+                                    color: root.normalTextColor
+                                    font.pixelSize: 10
+                                }
+
+                                Keys.onEscapePressed: {
+                                    comboPopup.close()
+                                    root.cancelEdit()
+                                    listView.forceActiveFocus()
+                                }
+
+                                Popup {
+                                    id: comboPopup
+                                    x: 0
+                                    y: comboEditor.height
+                                    width: comboEditor.width
+                                    height: Math.min(comboOptionsList.contentHeight + 4, 200)
+                                    padding: 2
+                                    closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+                                    onClosed: {
+                                        if (root.editing && root.isEditingCell(delegateRoot.nodeKey, index))
+                                            root.cancelEdit()
+                                        listView.forceActiveFocus()
+                                    }
+
+                                    background: Rectangle {
+                                        color: Style.baseColor
+                                        border.color: root.gridLineColor
+                                        border.width: 1
+                                        radius: 2
+                                    }
+
+                                    contentItem: ListView {
+                                        id: comboOptionsList
+                                        clip: true
+                                        model: cellRoot.column && cellRoot.column.options ? cellRoot.column.options : []
+                                        currentIndex: cellRoot.column && cellRoot.column.options ? root.comboIndexOf(cellRoot.column.options, cellRoot.value) : -1
+
+                                        delegate: Rectangle {
+                                            width: comboOptionsList.width
+                                            height: root.rowHeight
+                                            color: optionMouse.containsMouse ? root.hoveredBackgroundColor : index === comboOptionsList.currentIndex ? root.selectedBackgroundColor : "transparent"
+
+                                            Text {
+                                                anchors.fill: parent
+                                                anchors.leftMargin: Style.marginM
+                                                anchors.rightMargin: Style.marginM
+                                                text: modelData
+                                                color: index === comboOptionsList.currentIndex ? root.selectedTextColor : root.normalTextColor
+                                                verticalAlignment: Text.AlignVCenter
+                                                elide: Text.ElideRight
+                                            }
+
+                                            MouseArea {
+                                                id: optionMouse
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+
+                                                onClicked: {
+                                                    comboPopup.close()
+                                                    root.commitEdit(modelData)
+                                                    listView.forceActiveFocus()
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -755,6 +1479,16 @@ Item {
             return root.width
         return root.width / columns.length
     }
+
+    function __columnAtX(mouseX) {
+        var count = columnCount()
+        if (count <= 1)
+            return 0
+        var w = root.width / count
+        var col = Math.floor(mouseX / w)
+        return Math.max(0, Math.min(col, count - 1))
+    }
+
     function isTreeColumn(column, columnIndex) { return column && column.tree === true ? true : columnIndex === 0 && columns.length === 0 }
     function isColumnEditable(column) { return column && column.editable === true }
 
@@ -1198,7 +1932,7 @@ Item {
             return
 
         if (__editingKey.length > 0)
-            commitEdit()
+            commitEdit(__editingPendingText)
 
         select(keyValue)
         __editingKey = keyValue
@@ -1223,20 +1957,29 @@ Item {
 
         var oldValue = __editingOriginalValue
         if (value === undefined)
-            value = cellValue(keyValue, column)
+            value = __editingPendingText.length > 0 ? __editingPendingText : cellValue(keyValue, column)
 
-        value = normalizeEditorValue(value, column)
+        value = normalizeEditorValue(value, column, keyValue)
         clearEditState()
 
         if (value === oldValue)
             return
+
+        var indexObject = createIndex(node)
+
+        // writeBack callback can reject the edit by returning false
+        if (root.writeBack) {
+            var accepted = root.writeBack(indexObject, column, value, oldValue)
+            if (accepted === false)
+                return
+        }
 
         setCellValue(keyValue, column, value)
         node = __nodes[keyValue]
         if (!node)
             return
 
-        var indexObject = createIndex(node)
+        indexObject = createIndex(node)
         currentIndex = indexObject
         cellEdited(indexObject, column, value, oldValue)
 
@@ -1260,10 +2003,11 @@ Item {
         __editingKey = ""
         __editingColumn = -1
         __editingOriginalValue = null
+        __editingPendingText = ""
     }
 
-    function normalizeEditorValue(value, column) {
-        var typeName = columnType("", column)
+    function normalizeEditorValue(value, column, keyValue) {
+        var typeName = columnType(keyValue || "", column)
         if (typeName === "number")
             return Number(value)
         if (typeName === "bool")

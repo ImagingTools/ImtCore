@@ -94,15 +94,24 @@ ViewBase {
 			permissionsPage.tenantData.m_tenantPermissions.push(selectedPermissionIds[k])
 	}
 
+	// Centered fixed-width container
+	property int maxTableWidth: 1000
+
+	Item {
+		id: centeredContainer
+		anchors.top: parent.top
+		anchors.bottom: parent.bottom
+		anchors.horizontalCenter: parent.horizontalCenter
+		width: Math.min(parent.width - Style.marginXL * 2, permissionsPage.maxTableWidth)
+	}
+
 	// --- Fixed header area ---
 	Column {
 		id: permissionsHeader
-		anchors.top: parent.top
+		anchors.top: centeredContainer.top
 		anchors.topMargin: Style.marginXL
-		anchors.left: parent.left
-		anchors.leftMargin: Style.marginXL
-		anchors.right: parent.right
-		anchors.rightMargin: Style.marginXL
+		anchors.left: centeredContainer.left
+		anchors.right: centeredContainer.right
 		spacing: Style.marginM
 
 		Row {
@@ -210,7 +219,7 @@ ViewBase {
 	CustomScrollbar {
 		id: permissionsScrollbar
 		z: parent.z + 1
-		anchors.right: parent.right
+		anchors.right: centeredContainer.right
 		anchors.top: tenantPermissionsTreeView.top
 		anchors.bottom: tenantPermissionsTreeView.bottom
 		secondSize: Style.marginM
@@ -223,8 +232,7 @@ ViewBase {
 		anchors.topMargin: Style.marginM
 		anchors.bottom: parent.bottom
 		anchors.bottomMargin: Style.marginXL
-		anchors.left: parent.left
-		anchors.leftMargin: Style.marginXL
+		anchors.left: centeredContainer.left
 		anchors.right: permissionsScrollbar.left
 		anchors.rightMargin: Style.marginXL
 		showHeader: true

@@ -2,42 +2,31 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6390" Description="ACF"/>
-            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6397" Description="ACF"/>
+            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="CheckPermissionOr" X="825" Y="525" Note=""/>
-        <Element ComponentName="CollectionCommands" X="525" Y="350" Note=""/>
-        <Element ComponentName="CollectionCommandsController" X="525" Y="250" Note=""/>
-        <Element ComponentName="CollectionDocumentService" X="675" Y="625" Note=""/>
-        <Element ComponentName="CollectionHeadersProvider" X="1025" Y="50" Note=""/>
-        <Element ComponentName="Demultiplexer" X="575" Y="75" Note=""/>
-        <Element ComponentName="DocumentCommandsController" X="1000" Y="300" Note=""/>
-        <Element ComponentName="SlaveSubscriberController" X="750" Y="775" Note=""/>
-        <Element ComponentName="TenantCollectionChangeNotifier" X="275" Y="775" Note=""/>
-        <Element ComponentName="TenantDocumentNameProvider" X="475" Y="475" Note=""/>
-        <Element ComponentName="TenantDocumentService" X="200" Y="150" Note=""/>
-        <Element ComponentName="TenantInfo" X="425" Y="600" Note=""/>
-        <Element ComponentName="TenantInvitationInfo" X="500" Y="150" Note=""/>
-        <Element ComponentName="TenantInvitationManager" X="175" Y="50" Note=""/>
+        <Element ComponentName="CollectionHeadersProvider" X="1000" Y="50" Note=""/>
+        <Element ComponentName="Demultiplexer" X="600" Y="50" Note=""/>
+        <Element ComponentName="DocumentCommandsController" X="900" Y="300" Note=""/>
+        <Element ComponentName="SlaveSubscriberController" X="800" Y="650" Note=""/>
+        <Element ComponentName="TenantCollectionChangeNotifier" X="1000" Y="775" Note=""/>
+        <Element ComponentName="TenantCollectionDocumentService" X="500" Y="550" Note=""/>
+        <Element ComponentName="TenantExclusionParamsSetJoiner" X="450" Y="425" Note=""/>
+        <Element ComponentName="TenantInfo" X="75" Y="675" Note=""/>
+        <Element ComponentName="TenantInvitationInfo" X="200" Y="50" Note=""/>
+        <Element ComponentName="TenantInvitationManager" X="125" Y="125" Note=""/>
         <Element ComponentName="TenantManager" X="150" Y="600" Note=""/>
         <Element ComponentName="TenantManagerController" X="825" Y="425" Note=""/>
         <Element ComponentName="TenantMembershipInfo" X="175" Y="375" Note=""/>
         <Element ComponentName="TenantMembershipManager" X="175" Y="275" Note=""/>
         <Element ComponentName="TenantMembershipManagerController" X="1025" Y="475" Note=""/>
-        <Element ComponentName="TenantMembershipPublisher" X="525" Y="700" Note=""/>
-        <Element ComponentName="TenantPermissions" X="1050" Y="650" Note=""/>
-        <Element ComponentName="TenantsListController" X="1025" Y="150" Note=""/>
+        <Element ComponentName="TenantMembershipPublisher" X="500" Y="775" Note=""/>
+        <Element ComponentName="TenantsCommandsController" X="500" Y="250" Note=""/>
+        <Element ComponentName="TenantsListController" X="1000" Y="175" Note=""/>
+        <Element ComponentName="UserFilterableSelectController" X="475" Y="350" Note="In order to be able to see all the users who are not in our tenant"/>
     </PositionMap>
-    <EmbeddedRegistries>
-        <EmbededRegistry Id="TenantMemberships">
-            <PositionMap>
-                <Element ComponentName="TenantMembershipInfo" X="600" Y="400" Note=""/>
-                <Element ComponentName="TenantMembershipManager" X="600" Y="225" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
-    </EmbeddedRegistries>
+    <EmbeddedRegistries/>
 </Acf>

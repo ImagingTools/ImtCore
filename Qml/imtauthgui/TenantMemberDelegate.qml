@@ -27,11 +27,14 @@ Rectangle {
 	property var stateManager: null
 	property bool canManageMembers: false
 	property bool isOwner: false
+	property var selectionManager: null
+	property bool showCheckBox: false
 
 	// --- Outputs (action requests) ---
 	signal memberActionsRequested(var menuItems, string userId, string userName,
 	                              bool isOwnerTarget, bool isCurrentUserTarget)
 	signal inviteActionsRequested(var menuItems, string invitationId, string userName)
+	signal memberEditRequested(string userId, string userName)
 
 	readonly property bool isMember: row.kind === "member"
 
@@ -58,15 +61,24 @@ Rectangle {
 		? "Expired"
 		: row.isRevoked ? "Revoked" : "Pending"
 
-	height: contentRow.implicitHeight + Style.marginM * 2
-	radius: Style.radiusS
-	color: rowMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
+	readonly property string selectionId: row.isMember ? (row.memberData.id || "") : ("inv_" + (row.memberData.id || ""))
+	readonly property bool isSelected: row.selectionManager ? row.selectionManager.isSelected(row.selectionId) : false
+
+	height: contentRow.implicitHeight + Style.marginL * 2
+	radius: 0
+	color: row.isSelected ? Style.selectedColor
+		: rowMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
 
 	MouseArea {
 		id: rowMouseArea
 		anchors.fill: parent
 		hoverEnabled: true
-		acceptedButtons: Qt.NoButton
+		acceptedButtons: Qt.LeftButton
+		onDoubleClicked: {
+			if (row.isMember && row.canManageMembers) {
+				row.memberEditRequested(row.memberData.id, row.memberData.name || row.memberData.id || "")
+			}
+		}
 	}
 
 	Row {
@@ -76,6 +88,22 @@ Rectangle {
 		anchors.verticalCenter: parent.verticalCenter
 		anchors.margins: Style.marginM
 		spacing: Style.marginM
+
+		// ----- CheckBox -----
+		CheckBox {
+			visible: row.showCheckBox
+			anchors.verticalCenter: parent.verticalCenter
+			height: Style.itemSizeS
+			width: visible ? Style.itemSizeS : 0
+			checkState: row.isSelected ? Qt.Checked : Qt.Unchecked
+			onCheckStateChanged: {
+				if (!row.selectionManager) return
+				var shouldBeSelected = (checkState === Qt.Checked)
+				var currentlySelected = row.selectionManager.isSelected(row.selectionId)
+				if (shouldBeSelected !== currentlySelected)
+					row.selectionManager.toggleSelect(row.selectionId)
+			}
+		}
 
 		// ----- Avatar -----
 		Rectangle {
@@ -118,6 +146,8 @@ Rectangle {
 				width: Style.fontSizeS
 				height: Style.fontSizeS
 				source: "qrc:/" + Style.getIconPath("Icons/Crown", Icon.State.On, Icon.Mode.Normal)
+				sourceSize.width: width
+				sourceSize.height: height
 			}
 		}
 
@@ -126,6 +156,7 @@ Rectangle {
 			anchors.verticalCenter: parent.verticalCenter
 			spacing: 2
 			width: parent.width
+				- (row.showCheckBox ? Style.itemSizeS + parent.spacing : 0)
 				- avatar.width
 				- badgesItem.width
 				- actionsItem.width
@@ -140,7 +171,7 @@ Rectangle {
 						? (row.memberData.name || row.memberData.id || "")
 						: (row.memberData.userName || row.memberData.userId || "")
 					font.bold: row.isMember && (row.isMemberOwner || row.isMemberCreator)
-					font.pixelSize: Style.fontSizeM
+					font.pixelSize: Style.fontSizeL
 					color: Style.textColor
 					elide: Text.ElideRight
 				}
@@ -228,10 +259,13 @@ Rectangle {
 			height: parent.height
 			anchors.verticalCenter: parent.verticalCenter
 
+			readonly property bool __hasActions: row.isMember
+				? ((row.canManageMembers && !row.isCurrentUser && !row.isMemberOwner && !row.isMemberCreator)
+				   || (row.isCurrentUser && !row.isMemberOwner && !row.isMemberCreator))
+				: (row.canManageMembers && row.effectiveStatus === "Pending")
+
 			ToolButton {
-				visible: row.isMember
-					? (row.canManageMembers || row.isCurrentUser)
-					: (row.canManageMembers && row.effectiveStatus === "Pending")
+				visible: actionsItem.__hasActions
 				anchors.centerIn: parent
 				tooltipText: qsTr("Actions")
 				iconSource: "qrc:/" + Style.getIconPath("Icons/More", Icon.State.On, Icon.Mode.Normal)
@@ -245,19 +279,19 @@ Rectangle {
 				onClicked: {
 					if (row.isMember) {
 						var menuItems = []
-						if (row.canManageMembers) {
+						if (row.canManageMembers && !row.isCurrentUser) {
 							if (!row.isMemberOwner && !row.isMemberCreator) {
 								menuItems.push({ text: qsTr("Change Environment Role"), action: "changeRole" })
-								menuItems.push({ text: qsTr("Remove Member"), action: "remove" })
+								menuItems.push({ text: qsTr("Exclude from Tenant"), action: "remove" })
 							}
-							if (row.isOwner && !row.isMemberOwner) {
+							if (row.isOwner && !row.isMemberOwner && !row.isMemberCreator) {
 								menuItems.push({ text: qsTr("Transfer Ownership"), action: "transfer" })
 							}
-						} else {
-							if (row.isCurrentUser && !row.isMemberOwner) {
-								menuItems.push({ text: qsTr("Leave Workspace"), action: "leave" })
-							}
 						}
+						if (row.isCurrentUser && !row.isMemberOwner && !row.isMemberCreator) {
+							menuItems.push({ text: qsTr("Leave Workspace"), action: "leave" })
+						}
+						if (menuItems.length === 0) return
 						row.memberActionsRequested(menuItems,
 							row.memberData.id,
 							row.memberData.name || row.memberData.id,
@@ -275,5 +309,15 @@ Rectangle {
 				}
 			}
 		}
+	}
+
+	// Bottom separator line
+	Rectangle {
+		anchors.bottom: parent.bottom
+		anchors.left: parent.left
+		anchors.right: parent.right
+		height: 1
+		color: Style.borderColor
+		opacity: 0.5
 	}
 }

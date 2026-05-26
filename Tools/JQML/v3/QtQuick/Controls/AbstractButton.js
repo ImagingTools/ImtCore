@@ -4,6 +4,7 @@ const Int = require("../../QtQml/Int")
 const Var = require("../../QtQml/Var")
 const String = require("../../QtQml/String")
 const Signal = require("../../QtQml/Signal")
+const Icon = require("../../QtQml/Icon")
 
 class AbstractButton extends Control {
     static meta = Object.assign({}, Control.meta, {
@@ -16,7 +17,7 @@ class AbstractButton extends Control {
         checked: { type: Var, value: false },
         display: { type: Var, value: 1 },
         down: { type: Var, value: false },
-        icon: { type: Var },
+        icon: { type: Icon },
         implicitIndicatorHeight: { type: Real, value: 0 },
         implicitIndicatorWidth: { type: Real, value: 0 },
         indicator: { type: Var },

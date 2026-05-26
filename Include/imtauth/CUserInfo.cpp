@@ -269,7 +269,7 @@ bool CUserInfo::Serialize(iser::IArchive &archive)
 		}
 	}
 
-	if (imtCoreVersion >= 20583){
+	if (imtCoreVersion >= 21627){
 		iser::CArchiveTag sidTag("Sid", "Windows SID", iser::CArchiveTag::TT_LEAF);
 		retVal = retVal && archive.BeginTag(sidTag);
 		retVal = retVal && archive.Process(m_sid);

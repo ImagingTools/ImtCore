@@ -58,6 +58,14 @@ QtObject {
 
 	signal documentAlreadyOpened(string documentId, string typeId)
 
+	// Emitted once per document when both:
+	//   - the document data has finished loading from the server, AND
+	//   - at least one view instance has been registered for the document.
+	// Useful for single-document workspaces that need to switch from a
+	// loading state to a content state regardless of the order in which the
+	// two events happen.
+	signal documentReady(string documentId)
+
 	onDocumentSaved: {
 		setDocumentIsNew(documentId, false)
 	}
@@ -279,6 +287,18 @@ QtObject {
 		return ""
 	}
 
+	// Returns the collection-objectId associated with a given documentId
+	// (symmetric to setDocumentObjectId). Returns "" if the document is unknown
+	// or has no associated objectId (e.g. a freshly created, unsaved document).
+	function getDocumentObjectId(documentId){
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index < 0){
+			return ""
+		}
+
+		return __internal.openedDocuments[index].objectId
+	}
+
 	function getDocumentIndexByDocumentId(documentId){
 		for (let i = 0; i < __internal.openedDocuments.length; ++i){
 			let documentData = __internal.openedDocuments[i]
@@ -366,6 +386,7 @@ QtObject {
 				}
 			}
 			documentDataLoaded(documentId)
+			__internal.maybeEmitDocumentReady(documentId)
 		}
 	}
 
@@ -437,6 +458,7 @@ QtObject {
 		}
 
 		__internal.openedDocuments[index].addView(viewTypeId, view)
+		__internal.maybeEmitDocumentReady(documentId)
 	}
 
 	function getDocumentServiceActiveView(){
@@ -462,6 +484,7 @@ QtObject {
 		property var pendingDataLoaded: ({}) // DocumentId -> true for early DocumentDataLoaded notifications
 		property var autoNamedTypeIds: ({}) // TypeId -> true for types with automatic name providers
 		property var documentManagerActiveView: null
+		property var readyEmitted: ({}) // DocumentId -> true once documentReady has been emitted
 
 		property Component documentDataFactory: Component{ 
 			QtObject{
@@ -541,7 +564,35 @@ QtObject {
 			}
 
 			delete pendingDataLoaded[documentId]
+			delete readyEmitted[documentId]
 			openedDocuments.splice(index, 1)
+		}
+
+		// Emits root.documentReady(documentId) at most once per document, when
+		// the document has finished loading AND at least one view has been
+		// registered for it. Safe to call from multiple code paths.
+		function maybeEmitDocumentReady(documentId){
+			let index = root.getDocumentIndexByDocumentId(documentId)
+			if (index < 0){
+				return
+			}
+
+			if (readyEmitted[documentId]){
+				return
+			}
+
+			let docData = openedDocuments[index]
+			if (docData.isLoading){
+				return
+			}
+
+			let viewTypeIds = Object.keys(docData.views)
+			if (viewTypeIds.length === 0){
+				return
+			}
+
+			readyEmitted[documentId] = true
+			root.documentReady(documentId)
 		}
 	}
 }

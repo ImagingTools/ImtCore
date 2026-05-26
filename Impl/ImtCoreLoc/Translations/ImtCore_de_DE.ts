@@ -8310,7 +8310,7 @@ Fehler: 0</translation>
         <translation>Produkt</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtbase/CSystemStatusComp.cpp" line="+185"/>
+        <location filename="../../../Include/imtserverapp/CSystemStatusComp.cpp" line="+185"/>
         <source>The %1 server cannot be connected at %2.</source>
         <translation>Der Server %1 kann nicht unter %2 verbunden werden.</translation>
     </message>
@@ -9827,7 +9827,7 @@ Eingabe-ID: </translation>
 <context>
     <name>imtbase::CSystemStatusComp</name>
     <message>
-        <location filename="../../../Include/imtbase/CSystemStatusComp.cpp" line="-140"/>
+        <location filename="../../../Include/imtserverapp/CSystemStatusComp.cpp" line="-140"/>
         <location line="+64"/>
         <source>Try connect to: '%1' ...</source>
         <translation>Verbindung zu '%1' aufbauen</translation>

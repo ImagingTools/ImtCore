@@ -20,8 +20,16 @@ class Connections extends QtObject {
         for(let signalName in this.__connectionsInfo){
             let slotName = this.__connectionsInfo[signalName]
 
-            if(oldValue) oldValue[signalName].disconnect(this, this[slotName])
-            if(newValue) newValue[signalName].connect(this, this[slotName])
+            if(oldValue){
+                let sig = oldValue[signalName]
+                if(sig && sig.disconnect) sig.disconnect(this, this[slotName])
+                else if(!this.ignoreUnknownSignals) console.warn(`Connections: signal '${signalName}' not found on target (disconnect)`)
+            }
+            if(newValue){
+                let sig = newValue[signalName]
+                if(sig && sig.connect) sig.connect(this, this[slotName])
+                else if(!this.ignoreUnknownSignals) console.warn(`Connections: signal '${signalName}' not found on target (connect)`)
+            }
         }
     }
 
@@ -30,7 +38,8 @@ class Connections extends QtObject {
             let slotName = this.__connectionsInfo[signalName]
         
             if(this.target){
-                this.target[signalName].disconnect(this, this[slotName])
+                let sig = this.target[signalName]
+                if(sig && sig.disconnect) sig.disconnect(this, this[slotName])
             }
         }
 

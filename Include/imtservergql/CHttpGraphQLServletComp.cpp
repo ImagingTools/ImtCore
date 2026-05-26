@@ -24,6 +24,21 @@ namespace imtservergql
 {
 
 
+namespace
+{
+
+QString MaskToken(const QByteArray& token)
+{
+	if (token.isEmpty()){
+		return QStringLiteral("<empty>");
+	}
+
+	return QStringLiteral("***") + QString::fromUtf8(token.right(4));
+}
+
+} // namespace
+
+
 // protected methods
 
 // reimplemented (IRequestHandler)
@@ -79,65 +94,23 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		}
 	}
 
-	QByteArray userId;
-	QByteArray accessToken = headers.value(QByteArrayLiteral("x-authentication-token"));
-
-	// Validate token based on prefix: pat_ for PAT tokens, otherwise JWT
-	if (!accessToken.isEmpty()){
-		// Check if token starts with "pat_" prefix and has content beyond the prefix
-		if (accessToken.size() > 8 && accessToken.startsWith("imt_pat_")){
-			// PAT token - validate with PAT manager
-			if (m_patManagerCompPtr.IsValid()){
-				QByteArray tokenId;
-				QByteArrayList scopes;
-				if (!m_patManagerCompPtr->ValidateToken(accessToken, userId, tokenId, scopes)){
-					return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
-				}
-
-				m_patManagerCompPtr->UpdateLastUsedAt(tokenId);
+	if (m_gqlContextCreatorCompPtr.IsValid()){
+		imtgql::IGqlContextCreator::ContextCreationError contextError;
+		imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(headers, contextError);
+		if (!gqlContextPtr.IsValid()){
+			if (contextError.status == imtgql::IGqlContextCreator::CCS_UNAUTHORIZED){
+				return CreateResponse(StatusCode::SC_UNAUTHORIZED, QByteArray(), request);
 			}
-			else{
+			if (contextError.status == imtgql::IGqlContextCreator::CCS_FORBIDDEN){
 				return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
 			}
-		}
-		else{
-			// JWT token - validate with JWT controller
-			if (m_jwtSessionControllerCompPtr.IsValid()){
-				using JwtState = imtauth::IJwtSessionController::JwtState;
-				JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(accessToken);
-				if (state == JwtState::JS_EXPIRED){
-					return CreateResponse(StatusCode::SC_UNAUTHORIZED, QByteArray(), request);
-				}
-				else if (state == JwtState::JS_INVALID){
-					return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
-				}
 
-				userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(accessToken);
-			}
-		}
-	}
-
-	QByteArray productId;
-	if (headers.contains(imtbase::s_productIdHeaderId)){
-		productId = headers.value(imtbase::s_productIdHeaderId);
-	}
-
-	if (m_gqlContextCreatorCompPtr.IsValid()){
-		QString errorMessage;
-		imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(accessToken, productId, userId, headers, errorMessage);
-		if (!gqlContextPtr.IsValid()){
 			SendCriticalMessage(
 						0,
 						QStringLiteral("Unable to create a GraphQL context for the access token '%1' for Command-ID: '%2'. Error: '%3'")
-											.arg(QString(accessToken), QString(gqlCommand), errorMessage),
+											.arg(MaskToken(headers.value(imtbase::s_authenticationTokenHeaderId)), QString(gqlCommand), contextError.message),
 						QStringLiteral("GraphQL - servlet"));
 			return GenerateError(StatusCode::SC_INTERNAL_SERVER_ERROR, QStringLiteral("Request context is invalid"), request);
-		}
-
-		// Set tenant ID from JWT token
-		if (m_jwtSessionControllerCompPtr.IsValid() && !accessToken.startsWith("pat_")){
-			QByteArray tenantId = m_jwtSessionControllerCompPtr->GetTenantFromJwt(accessToken);
-			gqlContextPtr->SetTenantId(tenantId);
 		}
 
 		m_lastRequest.SetGqlContext(std::move(gqlContextPtr));
@@ -299,5 +272,3 @@ QByteArray CHttpGraphQLServletComp::BuildGqlErrorJson(
 
 
 } // namespace imtservergql
-
-

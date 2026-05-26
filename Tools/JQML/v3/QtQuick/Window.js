@@ -54,8 +54,8 @@ class Window extends QtObject {
     }
 
     __complete(){
-        this.width = window.innerWidth
-        this.height = window.innerHeight
+        if (!this.__self.width__prevent) this.width = window.innerWidth
+        if (!this.__self.height__prevent) this.height = window.innerHeight
 
         this.__checkVisibility()
         super.__complete()

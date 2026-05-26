@@ -88,6 +88,10 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentServiceComp::OnGetTe
 
 	QByteArray tenantId = tenantPtr->GetTenantId();
 
+	// Server-side access control: user can only open TenantEditor if
+	// they have switched to this tenant (current tenant in JWT must match)
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+
 	response.Version_1_0->id = tenantId;
 	response.Version_1_0->name = tenantPtr->GetTenantName();
 	response.Version_1_0->description = tenantPtr->GetTenantDescription();
@@ -98,7 +102,6 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentServiceComp::OnGetTe
 	response.Version_1_0->updatedAt = tenantPtr->GetUpdatedAt();
 
 	// Pass current user ID so GUI can determine role-based access
-	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
 		response.Version_1_0->currentUserId = gqlContextPtr->GetUserId();
 	}

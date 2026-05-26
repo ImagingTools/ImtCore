@@ -33,9 +33,11 @@
 	<file alias="imtguigql/GqlBasedCollectionDocumentService.qml">GqlBasedCollectionDocumentService.qml</file>
 	<file alias="imtguigql/GqlCollectionDocManagerPageView.qml">GqlCollectionDocManagerPageView.qml</file>
 	<file alias="imtguigql/GqlSingleDocCollectionPageView.qml">GqlSingleDocCollectionPageView.qml</file>
+	<file alias="imtguigql/GqlSingleDocumentPageView.qml">GqlSingleDocumentPageView.qml</file>
 	<file alias="imtguigql/RemoteCollectionViewDialog.qml">RemoteCollectionViewDialog.qml</file>
 	<file alias="imtguigql/SelectableCollectionEditor.qml">SelectableCollectionEditor.qml</file>
 	<file alias="imtguigql/FilterableSelectGqlDataProvider.qml">FilterableSelectGqlDataProvider.qml</file>
 	<file alias="imtguigql/GqlBasedTenantMembershipApiClient.qml">GqlBasedTenantMembershipApiClient.qml</file>
+	<file alias="imtguigql/GqlBasedPermissionsProvider.qml">GqlBasedPermissionsProvider.qml</file>
     </qresource>
 </RCC>

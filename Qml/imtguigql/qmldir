@@ -23,6 +23,7 @@ GqlRequestSender 1.0 GqlRequestSender.qml
 WebSocketConnectionChecker 1.0 WebSocketConnectionChecker.qml
 GqlSdlRequestSender 1.0 GqlSdlRequestSender.qml
 GqlBasedTenantMembershipApiClient 1.0 GqlBasedTenantMembershipApiClient.qml
+GqlBasedPermissionsProvider 1.0 GqlBasedPermissionsProvider.qml
 XmlHttpRequestProxy 1.0 XmlHttpRequestProxy.qml
 GqlBasedCommandsController 1.0 GqlBasedCommandsController.qml
 GqlBasedCollectionDataController 1.0 GqlBasedCollectionDataController.qml
@@ -33,6 +34,7 @@ GqlBasedOptionManager 1.0 GqlBasedOptionManager.qml
 GqlBasedCollectionDocumentService 1.0 GqlBasedCollectionDocumentService.qml
 GqlCollectionDocManagerPageView 1.0 GqlCollectionDocManagerPageView.qml
 GqlSingleDocCollectionPageView 1.0 GqlSingleDocCollectionPageView.qml
+GqlSingleDocumentPageView 1.0 GqlSingleDocumentPageView.qml
 RemoteCollectionViewDialog 1.0 RemoteCollectionViewDialog.qml
 SelectableCollectionEditor 1.0 SelectableCollectionEditor.qml
 FilterableSelectGqlDataProvider 1.0 FilterableSelectGqlDataProvider.qml
