@@ -34,7 +34,7 @@ QtObject {
 	// Configuration
 	// =========================================================================
 
-	property string tenantId: ""
+	property string productId: AuthorizationController.productId
 
 	property Component __roleDataComp: Component { RoleData {} }
 	property Component __groupDataComp: Component { GroupData {} }
@@ -278,9 +278,9 @@ QtObject {
 			AddedNotificationPayload {
 				onFinished: {
 					root.__pendingAddedUserId = m_id || ""
-					if (root.tenantId !== "" && root.__pendingAddedUserId !== "") {
+					if (root.productId !== "" && root.__pendingAddedUserId !== "") {
 						root.__addMembershipInput.m_userId = root.__pendingAddedUserId
-						root.__addMembershipInput.m_tenantId = root.tenantId
+						root.__addMembershipInput.m_tenantId = root.productId
 						root.__addMembershipInput.m_role = "Member"
 						root.__addMembershipSender.send(root.__addMembershipInput)
 					} else {
@@ -393,7 +393,7 @@ QtObject {
 	}
 
 	function createRoleData() {
-		return root.__roleDataComp.createObject(root, {"m_productId": root.tenantId})
+		return root.__roleDataComp.createObject(root, {"m_id": UuidGenerator.generateUUID()})
 	}
 
 	function insertRole(roleId, roleData) {
@@ -401,10 +401,10 @@ QtObject {
 			return
 		}
 
-		roleData.m_productId = root.tenantId
+		roleData.m_productId = root.productId
 		root.__roleAddInput.m_id = roleId
 		root.__roleAddInput.m_typeId = "Role"
-		root.__roleAddInput.m_productId = root.tenantId
+		root.__roleAddInput.m_productId = root.productId
 		root.__roleAddInput.m_name = roleData.m_name
 		root.__roleAddInput.m_description = roleData.m_description
 		root.__roleAddInput.m_item = roleData
@@ -424,11 +424,11 @@ QtObject {
 			return
 		}
 
-		roleData.m_productId = root.tenantId
+		roleData.m_productId = root.productId
 		root.__pendingSetRoleId = roleId
 		root.__roleUpdateInput.m_id = roleId || ""
 		root.__roleUpdateInput.m_typeId = "Role"
-		root.__roleUpdateInput.m_productId = root.tenantId
+		root.__roleUpdateInput.m_productId = root.productId
 		root.__roleUpdateInput.m_name = roleData.m_name
 		root.__roleUpdateInput.m_description = roleData.m_description || ""
 		root.__roleUpdateInput.m_item = roleData
@@ -438,12 +438,12 @@ QtObject {
 
 	function getRoleData(roleId) {
 		root.__roleItemInput.m_id = roleId || ""
-		root.__roleItemInput.m_productId = root.tenantId
+		root.__roleItemInput.m_productId = root.productId
 		root.__roleItemSender.send(root.__roleItemInput)
 	}
 
 	function createGroupData() {
-		return root.__groupDataComp.createObject(root, {"m_productId": root.tenantId})
+		return root.__groupDataComp.createObject(root, {"m_id": UuidGenerator.generateUUID()})
 	}
 
 	function insertGroup(groupId, groupData) {
@@ -451,10 +451,10 @@ QtObject {
 			return
 		}
 
-		groupData.m_productId = root.tenantId
+		groupData.m_productId = root.productId
 		root.__groupAddInput.m_id = groupId
 		root.__groupAddInput.m_typeId = "Group"
-		root.__groupAddInput.m_productId = root.tenantId
+		root.__groupAddInput.m_productId = root.productId
 		root.__groupAddInput.m_name = groupData.m_name
 		root.__groupAddInput.m_description = groupData.m_description
 		root.__groupAddInput.m_item = groupData
@@ -474,11 +474,11 @@ QtObject {
 			return
 		}
 
-		groupData.m_productId = root.tenantId
+		groupData.m_productId = root.productId
 		root.__pendingSetGroupId = groupId
 		root.__groupUpdateInput.m_id = groupId || ""
 		root.__groupUpdateInput.m_typeId = "Group"
-		root.__groupUpdateInput.m_productId = root.tenantId
+		root.__groupUpdateInput.m_productId = root.productId
 		root.__groupUpdateInput.m_name = groupData.m_name
 		root.__groupUpdateInput.m_description = groupData.m_description || ""
 		root.__groupUpdateInput.m_item = groupData
@@ -488,12 +488,12 @@ QtObject {
 
 	function getGroupData(groupId) {
 		root.__groupItemInput.m_id = groupId || ""
-		root.__groupItemInput.m_productId = root.tenantId
+		root.__groupItemInput.m_productId = root.productId
 		root.__groupItemSender.send(root.__groupItemInput)
 	}
 
 	function createUserData() {
-		return root.__userDataComp.createObject(root, {"m_productId": root.tenantId})
+		return root.__userDataComp.createObject(root, {"m_id": UuidGenerator.generateUUID()})
 	}
 
 	function insertUser(userId, userData) {
@@ -501,10 +501,10 @@ QtObject {
 			return
 		}
 
-		userData.m_productId = root.tenantId
+		userData.m_productId = AuthorizationController.productId
 		root.__userAddInput.m_id = userId
 		root.__userAddInput.m_typeId = "User"
-		root.__userAddInput.m_productId = root.tenantId
+		root.__userAddInput.m_productId = root.productId
 		root.__userAddInput.m_name = userData.m_name
 		root.__userAddInput.m_description = userData.m_description
 		root.__userAddInput.m_item = userData
@@ -524,11 +524,11 @@ QtObject {
 			return
 		}
 
-		userData.m_productId = root.tenantId
+		userData.m_productId = root.productId
 		root.__pendingSetUserId = userId
 		root.__userUpdateInput.m_id = userId || ""
 		root.__userUpdateInput.m_typeId = "User"
-		root.__userUpdateInput.m_productId = root.tenantId
+		root.__userUpdateInput.m_productId = root.productId
 		root.__userUpdateInput.m_name = userData.m_name
 		root.__userUpdateInput.m_description = userData.m_description || ""
 		root.__userUpdateInput.m_item = userData
@@ -538,7 +538,7 @@ QtObject {
 
 	function getUserData(userId) {
 		root.__userItemInput.m_id = userId || ""
-		root.__userItemInput.m_productId = root.tenantId
+		root.__userItemInput.m_productId = root.productId
 		root.__userItemSender.send(root.__userItemInput)
 	}
 
@@ -679,11 +679,11 @@ QtObject {
 	property var permissionsModel: __permissionsProvider.permissionsModel
 
 	property GqlBasedPermissionsProvider __permissionsProvider: GqlBasedPermissionsProvider {
-		productId: root.tenantId
+		productId: root.productId
 	}
 
 	function fetchPermissions() {
-		__permissionsProvider.productId = root.tenantId
+		__permissionsProvider.productId = root.productId
 		__permissionsProvider.updateModel()
 	}
 
@@ -694,7 +694,7 @@ QtObject {
 	property Component roleListDataProviderComp: Component {
 		FilterableSelectGqlDataProvider {
 			collectionId: "Roles"
-			tenantId: root.tenantId
+			tenantId: root.productId
 			pageSize: 50
 		}
 	}
@@ -702,7 +702,7 @@ QtObject {
 	property Component groupListDataProviderComp: Component {
 		FilterableSelectGqlDataProvider {
 			collectionId: "Groups"
-			tenantId: root.tenantId
+			tenantId: root.productId
 			pageSize: 50
 		}
 	}
@@ -710,7 +710,7 @@ QtObject {
 	property Component invitableUsersListDataProviderComp: Component {
 		FilterableSelectGqlDataProvider {
 			collectionId: "UsersForInvitation"
-			tenantId: root.tenantId
+			tenantId: root.productId
 			multiSelect: true
 		}
 	}
@@ -741,7 +741,7 @@ QtObject {
 	// --- Role editor + representation controller ---
 	property Component __roleEditorComp: Component {
 		RoleView {
-			productId: root.tenantId
+			productId: root.productId
 			permissionsModel: root.permissionsModel
 			commandsControllerComp: Component {
 				GqlBasedCommandsController {
@@ -755,7 +755,9 @@ QtObject {
 		DocumentRepresentationController {
 			id: roleReprController
 
-			representationModel: RoleData {}
+			representationModel: RoleData {
+				m_id: UuidGenerator.generateUUID()
+			}
 
 			function updateRepresentationFromDocument(){
 				startUpdateRepresentation(documentId, representationModel)
@@ -817,7 +819,7 @@ QtObject {
 	// --- Group editor + representation controller ---
 	property Component __groupEditorComp: Component {
 		UserGroupView {
-			productId: root.tenantId
+			productId: root.productId
 			commandsControllerComp: Component {
 				GqlBasedCommandsController {
 					typeId: root.groupObjectTypeId
@@ -830,7 +832,9 @@ QtObject {
 		DocumentRepresentationController {
 			id: groupReprController
 
-			representationModel: GroupData {}
+			representationModel: GroupData {
+				m_id: UuidGenerator.generateUUID()
+			}
 
 			function updateRepresentationFromDocument(){
 				startUpdateRepresentation(documentId, representationModel)
@@ -892,7 +896,7 @@ QtObject {
 	// --- User editor + representation controller ---
 	property Component __userEditorComp: Component {
 		UserView {
-			productId: root.tenantId
+			productId: root.productId
 			commandsControllerComp: Component {
 				GqlBasedCommandsController {
 					typeId: root.userObjectTypeId
@@ -905,7 +909,9 @@ QtObject {
 		DocumentRepresentationController {
 			id: userReprController
 
-			representationModel: UserData {}
+			representationModel: UserData {
+				m_id: UuidGenerator.generateUUID()
+			}
 
 			function updateRepresentationFromDocument(){
 				startUpdateRepresentation(documentId, representationModel)

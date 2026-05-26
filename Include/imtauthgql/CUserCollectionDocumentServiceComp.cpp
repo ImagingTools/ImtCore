@@ -132,17 +132,14 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CUserCollectio
 		return response;
 	}
 
-	// Make sure the document has a stable UUID — generate one for newly
-	// created documents that have not yet been persisted.
-	if (userPtr->GetObjectUuid().isEmpty()){
-		userPtr->SetObjectUuid(QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8());
-	}
-
 	sdl::imtauth::Users::CUserData::V1_0 userData;
 	if (arguments.input.Version_1_0->user){
 		userData = *arguments.input.Version_1_0->user;
 	}
 
+	if (userData.id){
+		userPtr->SetObjectUuid(*userData.id);
+	}
 	if (userData.name){
 		userPtr->SetName(*userData.name);
 	}

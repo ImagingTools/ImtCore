@@ -120,17 +120,14 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CRoleCollectio
 		return response;
 	}
 
-	// Make sure the document has a stable UUID — generate one for newly
-	// created documents that have not yet been persisted.
-	if (rolePtr->GetObjectUuid().isEmpty()){
-		rolePtr->SetObjectUuid(QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8());
-	}
-
 	sdl::imtauth::Roles::CRoleData::V1_0 roleData;
 	if (arguments.input.Version_1_0->role){
 		roleData = *arguments.input.Version_1_0->role;
 	}
 
+	if (roleData.id){
+		rolePtr->SetObjectUuid(*roleData.id);
+	}
 	if (roleData.name){
 		rolePtr->SetRoleName(*roleData.name);
 	}

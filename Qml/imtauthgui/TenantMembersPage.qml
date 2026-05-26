@@ -32,7 +32,7 @@ ViewBase {
 	property var __activeShellView: null
 	
 	readonly property bool __canManage: membersPage.stateManager ? membersPage.stateManager.canManageMembers : false
-	readonly property string __productId: membersPage.apiClient ? membersPage.apiClient.tenantId : ""
+	readonly property string __productId: membersPage.apiClient ? membersPage.apiClient.productId : ""
 	
 	property var __selectionManager: null
 	

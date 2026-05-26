@@ -529,7 +529,6 @@ RemoteCollectionView {
 					// (Roles/Groups/Users) are filtered for the correct tenant scope.
 					GqlBasedTenantManagementApiClient {
 						id: tenantEditorApiClient
-						tenantId: tenantEditor.tenantData ? tenantEditor.tenantData.m_id : ""
 					}
 				}
 			}

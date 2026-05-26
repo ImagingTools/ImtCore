@@ -31,7 +31,7 @@ ViewBase {
 	property var __activeShellView: null
 	
 	readonly property bool __canManage: groupsPage.stateManager ? groupsPage.stateManager.canManageMembers : false
-	readonly property string __productId: groupsPage.apiClient ? groupsPage.apiClient.tenantId : ""
+	readonly property string __productId: groupsPage.apiClient ? groupsPage.apiClient.productId : ""
 	
 	property var __selectionManager: null
 	property var __dataProvider: null

@@ -37,7 +37,7 @@ ViewBase {
 	property var __activeShellView: null
 	
 	readonly property bool __canManage: rolesPage.stateManager ? rolesPage.stateManager.canManageMembers : false
-	readonly property string __productId: rolesPage.apiClient ? rolesPage.apiClient.tenantId : ""
+	readonly property string __productId: rolesPage.apiClient ? rolesPage.apiClient.productId : ""
 	
 	property var __selectionManager: null
 	property var __dataProvider: null
@@ -478,7 +478,6 @@ ViewBase {
 				objectTypeId: rolesPage.apiClient ? rolesPage.apiClient.roleObjectTypeId : ""
 				objectId: ""
 				createNew: true
-				proposedSourceDocumentId: UuidGenerator.generateUUID()
 				headerVisible: false
 				documentNameInputEnabled: false
 				
