@@ -272,29 +272,14 @@ I_EXPORT_COMPONENT(
 			"Role Collection Document Service");
 
 I_EXPORT_COMPONENT(
-			RemoteRoleCollectionDocumentService,
-			"Remote role collection document service proxy",
-			"Remote Role Collection Document Service");
-
-I_EXPORT_COMPONENT(
 			GroupCollectionDocumentService,
 			"Group collection document service: GetGroupRepresentation / UpdateGroupFromRepresentation",
 			"Group Collection Document Service");
 
 I_EXPORT_COMPONENT(
-			RemoteGroupCollectionDocumentService,
-			"Remote group collection document service proxy",
-			"Remote Group Collection Document Service");
-
-I_EXPORT_COMPONENT(
 			UserCollectionDocumentService,
 			"User collection document service: GetUserRepresentation / UpdateUserFromRepresentation",
 			"User Collection Document Service");
-
-I_EXPORT_COMPONENT(
-			RemoteUserCollectionDocumentService,
-			"Remote user collection document service proxy",
-			"Remote User Collection Document Service");
 
 
 } // namespace ImtAuthGqlPck
