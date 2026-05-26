@@ -23,7 +23,7 @@ TenantSimpleCollectionPage {
 	documentManager: apiClient ? apiClient.groupDocumentManager : null
 	objectTypeId: apiClient ? apiClient.groupObjectTypeId : ""
 	dataProviderComp: apiClient ? apiClient.groupListDataProviderComp : null
-	removeFn: function (id) {
+	function removeItem(id) {
 		if (groupsPage.apiClient)
 			groupsPage.apiClient.removeGroup(id)
 	}

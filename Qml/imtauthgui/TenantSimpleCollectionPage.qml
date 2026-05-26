@@ -26,7 +26,7 @@ import imtauthgui 1.0
  *     dialog text, empty-state text, filter placeholder)
  *   - `documentManager` / `objectTypeId` / `dataProviderComp` taken from
  *     the apiClient for the concrete entity type
- *   - `removeFn` — a `function(id)` callback used by Remove buttons and
+ *   - `removeItem(id)` — override to handle Remove buttons and
  *     the per-item Delete menu
  *
  * Parents that need to react to apiClient-level removal signals (e.g.
@@ -57,7 +57,7 @@ ViewBase {
 	property var documentManager: null
 	property string objectTypeId: ""
 	property Component dataProviderComp: null
-	property var removeFn: null                       // function(id) {}
+	function removeItem(id) {}                        // override in subcomponents
 
 	function updateGui() {}
 	function updateModel() {}
@@ -202,10 +202,10 @@ ViewBase {
 							collectionPage.__deleteMultipleTitle,
 							qsTr("Are you sure you want to delete %1 selected item(s)? This action cannot be undone.").arg(count),
 							function(result) {
-								if (result === Enums.yes && collectionPage.removeFn) {
+								if (result === Enums.yes) {
 									var ids = collectionPage.__selectionManager.selectedIds.slice()
 									for (var i = 0; i < ids.length; i++)
-										collectionPage.removeFn(ids[i])
+										collectionPage.removeItem(ids[i])
 									collectionPage.__selectionManager.clear()
 								}
 							}
@@ -455,8 +455,8 @@ ViewBase {
 												collectionPage.__deleteSingleTitle,
 												qsTr("Are you sure you want to delete \"%1\"? This action cannot be undone.").arg(itemDelegateRoot.itemTitle),
 												function(result) {
-													if (result === Enums.yes && collectionPage.removeFn)
-														collectionPage.removeFn(itemDelegateRoot.itemId)
+													if (result === Enums.yes)
+														collectionPage.removeItem(itemDelegateRoot.itemId)
 												}
 												)
 								}
