@@ -168,7 +168,7 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CRoleCollectio
 		QByteArrayList permissions;
 		QByteArray joined = *roleData.permissions;
 		if (!joined.isEmpty()){
-			permissions = joined.split(',');
+			permissions = joined.split(';');
 		}
 		rolePtr->SetLocalPermissions(permissions);
 	}
