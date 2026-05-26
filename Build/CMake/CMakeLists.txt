@@ -154,7 +154,7 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 	add_subdirectory("${INCLUDE_DIR}/imtdesk/CMake" "${AUX_INCLUDE_DIR}/imtdesk")
 	add_subdirectory("${INCLUDE_DIR}/imtservice/CMake" "${AUX_INCLUDE_DIR}/imtservice")
 	add_subdirectory("${INCLUDE_DIR}/imtserverapp/CMake" "${AUX_INCLUDE_DIR}/imtserverapp")
-	add_dependencies(imtserverapp imtbasesdl)
+	add_dependencies(imtserverapp imtbasesdl imtdb)
 	add_subdirectory("${INCLUDE_DIR}/imthype/CMake" "${AUX_INCLUDE_DIR}/imthype")
 	add_subdirectory("${INCLUDE_DIR}/imthypegui/CMake" "${AUX_INCLUDE_DIR}/imthypegui")
 
