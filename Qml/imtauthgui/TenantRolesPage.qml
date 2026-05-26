@@ -9,6 +9,8 @@ import imtguigql 1.0
 import imtdocgui 1.0
 import imtauthgui 1.0
 import imtauthRolesSdl 1.0
+import imtauthRoleCollectionDocumentServiceSdl 1.0
+import imtbaseCollectionDocumentServiceSdl 1.0
 
 /**
  * TenantRolesPage
@@ -509,25 +511,25 @@ ViewBase {
 			function updateRepresentationFromDocument(){
 				startUpdateRepresentation(documentId, representationModel)
 				
-				roleItemInput.InsertField(RoleItemInputTypeMetaInfo.s_id, documentId)
-				roleItemInput.InsertField(RoleItemInputTypeMetaInfo.s_productId, rolesPage.__productId)
-				getRoleRequest.send(roleItemInput)
+				getRoleRequest.send(getRoleInput)
 			}
 			
 			function updateDocumentFromRepresentation(){
 				startUpdateDocument(documentId)
 				
-				updateRoleInput.InsertField(RoleItemInputTypeMetaInfo.s_id, documentId)
-				updateRoleInput.InsertField(RoleItemInputTypeMetaInfo.s_productId, rolesPage.__productId)
-				updateRoleInput.InsertField("item", representationModel)
+				updateRoleInput.m_documentId = documentId
+				updateRoleInput.m_role = representationModel
 				updateRoleRequest.send(updateRoleInput)
 			}
 			
-			property var roleItemInput: Gql.GqlObject("input")
-			property var updateRoleInput: Gql.GqlObject("input")
+			property DocumentId getRoleInput: DocumentId {
+				m_id: roleReprController.documentId
+				m_collectionId: "Roles"
+			}
+			property UpdateRoleFromRepresentationInput updateRoleInput: UpdateRoleFromRepresentationInput {}
 			
 			property GqlSdlRequestSender getRoleRequest: GqlSdlRequestSender {
-				gqlCommandId: ImtauthRolesSdlCommandIds.s_roleItem
+				gqlCommandId: ImtauthRoleCollectionDocumentServiceSdlCommandIds.s_getRoleRepresentation
 				sdlObjectComp: Component {
 					RoleData {
 						onFinished: {
@@ -545,12 +547,14 @@ ViewBase {
 			}
 			
 			property GqlSdlRequestSender updateRoleRequest: GqlSdlRequestSender {
-				gqlCommandId: ImtauthRolesSdlCommandIds.s_roleUpdate
+				gqlCommandId: ImtauthRoleCollectionDocumentServiceSdlCommandIds.s_updateRoleFromRepresentation
 				requestType: 1
 				sdlObjectComp: Component {
-					RoleData {
+					DocumentOperationStatus {
 						onFinished: {
-							roleReprController.documentUpdated(roleReprController.documentId)
+							if (m_status === "Success"){
+								roleReprController.documentUpdated(roleReprController.documentId)
+							}
 						}
 					}
 				}

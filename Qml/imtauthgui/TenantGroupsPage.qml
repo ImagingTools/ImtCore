@@ -9,6 +9,8 @@ import imtguigql 1.0
 import imtdocgui 1.0
 import imtauthgui 1.0
 import imtauthGroupsSdl 1.0
+import imtauthGroupCollectionDocumentServiceSdl 1.0
+import imtbaseCollectionDocumentServiceSdl 1.0
 
 /**
  * TenantGroupsPage
@@ -497,25 +499,25 @@ ViewBase {
 			function updateRepresentationFromDocument(){
 				startUpdateRepresentation(documentId, representationModel)
 				
-				groupItemInput.InsertField(GroupItemInputTypeMetaInfo.s_id, documentId)
-				groupItemInput.InsertField(GroupItemInputTypeMetaInfo.s_productId, groupsPage.__productId)
-				getGroupRequest.send(groupItemInput)
+				getGroupRequest.send(getGroupInput)
 			}
 			
 			function updateDocumentFromRepresentation(){
 				startUpdateDocument(documentId)
 				
-				updateGroupInput.InsertField(GroupItemInputTypeMetaInfo.s_id, documentId)
-				updateGroupInput.InsertField(GroupItemInputTypeMetaInfo.s_productId, groupsPage.__productId)
-				updateGroupInput.InsertField("item", representationModel)
+				updateGroupInput.m_documentId = documentId
+				updateGroupInput.m_group = representationModel
 				updateGroupRequest.send(updateGroupInput)
 			}
 			
-			property var groupItemInput: Gql.GqlObject("input")
-			property var updateGroupInput: Gql.GqlObject("input")
+			property DocumentId getGroupInput: DocumentId {
+				m_id: groupReprController.documentId
+				m_collectionId: "Groups"
+			}
+			property UpdateGroupFromRepresentationInput updateGroupInput: UpdateGroupFromRepresentationInput {}
 			
 			property GqlSdlRequestSender getGroupRequest: GqlSdlRequestSender {
-				gqlCommandId: ImtauthGroupsSdlCommandIds.s_groupItem
+				gqlCommandId: ImtauthGroupCollectionDocumentServiceSdlCommandIds.s_getGroupRepresentation
 				sdlObjectComp: Component {
 					GroupData {
 						onFinished: {
@@ -533,12 +535,14 @@ ViewBase {
 			}
 			
 			property GqlSdlRequestSender updateGroupRequest: GqlSdlRequestSender {
-				gqlCommandId: ImtauthGroupsSdlCommandIds.s_groupUpdate
+				gqlCommandId: ImtauthGroupCollectionDocumentServiceSdlCommandIds.s_updateGroupFromRepresentation
 				requestType: 1
 				sdlObjectComp: Component {
-					GroupData {
+					DocumentOperationStatus {
 						onFinished: {
-							groupReprController.documentUpdated(groupReprController.documentId)
+							if (m_status === "Success"){
+								groupReprController.documentUpdated(groupReprController.documentId)
+							}
 						}
 					}
 				}

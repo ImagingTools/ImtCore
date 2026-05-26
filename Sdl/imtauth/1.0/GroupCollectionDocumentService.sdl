@@ -1,0 +1,26 @@
+schema {
+	namespace: imtauth
+	version: 1.0
+
+	query: Query
+	mutation: Mutation
+}
+
+import {
+	"Groups.sdl"
+	"../../imtbase/1.0/CollectionDocumentService.sdl"
+	"../../imtbase/1.0/UndoManager.sdl"
+}
+
+type UpdateGroupFromRepresentationInput {
+	documentId: ID!
+	group: GroupData!
+}
+
+type Query {
+	GetGroupRepresentation(input: DocumentId): GroupData!
+}
+
+type Mutation {
+	UpdateGroupFromRepresentation(input: UpdateGroupFromRepresentationInput): DocumentOperationStatus!
+}

@@ -57,6 +57,12 @@
 #include <imtauthgql/CTenantMembershipManagerControllerComp.h>
 #include <imtauthgql/CTenantMembershipPublisherComp.h>
 #include <imtauthgql/CRemoteTenantCollectionDocumentServiceControllerComp.h>
+#include <imtauthgql/CRoleCollectionDocumentServiceComp.h>
+#include <imtauthgql/CRemoteRoleCollectionDocumentServiceControllerComp.h>
+#include <imtauthgql/CGroupCollectionDocumentServiceComp.h>
+#include <imtauthgql/CRemoteGroupCollectionDocumentServiceControllerComp.h>
+#include <imtauthgql/CUserCollectionDocumentServiceComp.h>
+#include <imtauthgql/CRemoteUserCollectionDocumentServiceControllerComp.h>
 
 
 /**
@@ -116,6 +122,12 @@ typedef imtauthgql::CTenantManagerControllerComp TenantManagerController;
 typedef imtauthgql::CTenantMembershipManagerControllerComp TenantMembershipManagerController;
 typedef imtauthgql::CTenantMembershipPublisherComp TenantMembershipPublisher;
 typedef imtauthgql::CRemoteTenantCollectionDocumentServiceControllerComp RemoteTenantCollectionDocumentService;
+typedef imtauthgql::CRoleCollectionDocumentServiceComp RoleCollectionDocumentService;
+typedef imtauthgql::CRemoteRoleCollectionDocumentServiceControllerComp RemoteRoleCollectionDocumentService;
+typedef imtauthgql::CGroupCollectionDocumentServiceComp GroupCollectionDocumentService;
+typedef imtauthgql::CRemoteGroupCollectionDocumentServiceControllerComp RemoteGroupCollectionDocumentService;
+typedef imtauthgql::CUserCollectionDocumentServiceComp UserCollectionDocumentService;
+typedef imtauthgql::CRemoteUserCollectionDocumentServiceControllerComp RemoteUserCollectionDocumentService;
 
 
 } // namespace ImtAuthGqlPck

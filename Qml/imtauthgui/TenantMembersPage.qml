@@ -10,6 +10,8 @@ import imtguigql 1.0
 import imtdocgui 1.0
 import imtauthgui 1.0
 import imtauthUsersSdl 1.0
+import imtauthUserCollectionDocumentServiceSdl 1.0
+import imtbaseCollectionDocumentServiceSdl 1.0
 
 /**
  * TenantMembersPage
@@ -30,23 +32,40 @@ ViewBase {
 	function updateModel() {}
 	
 	property string __editUserId: ""
-	property string __editUserName: ""
-	property string __editUserDescription: ""
+	property bool __isCreating: false
+	property var __activeShellView: null
 	
 	readonly property bool __canManage: membersPage.stateManager ? membersPage.stateManager.canManageMembers : false
+	readonly property string __productId: membersPage.apiClient ? membersPage.apiClient.tenantId : ""
 	
 	property var __selectionManager: null
 	
+	// Single shared client to the server CollectionDocumentManager for Users.
+	GqlBasedCollectionDocumentService {
+		id: userDocumentService
+		collectionId: "Users"
+	}
+	
+	SingleDocumentTypeRegistrar {
+		documentManager: userDocumentService
+		views: [{
+			typeId: "User",
+			viewTypeId: "Editor",
+			editorComp: userEditorTypeComp,
+			controllerComp: userDataControllerComp
+		}]
+	}
+	
+	Connections {
+		target: userDocumentService
+		function onDocumentSaved(documentId) {
+			// User saved on the server; the members list will refresh via the
+			// normal tenant-data subscription pipeline.
+		}
+	}
+	
 	Connections {
 		target: membersPage.apiClient
-		function onUserDataReceived(data) {
-			if (membersPage.stateManager)
-				membersPage.stateManager.receivedUserData = data
-		}
-		function onUserCreated() {
-			if (membersPage.representationController)
-				membersPage.representationController.updateRepresentationFromDocument()
-		}
 		function onMemberRemoved(userId) {
 			if (membersPage.stateManager)
 				membersPage.stateManager.removeMemberById(userId)
@@ -644,59 +663,128 @@ ViewBase {
 	
 	// ===== Edit member =====
 	property string __editMemberId: ""
-	property string __editMemberName: ""
-	property bool __isCreatingUser: true
 	
 	function __openEditMember(userId, userName) {
 		membersPage.__editMemberId = userId
-		membersPage.__editMemberName = userName
-		membersPage.__isCreatingUser = false
+		membersPage.__editUserId = userId
+		membersPage.__isCreating = false
 		while (membersStackView.count > 1)
 			membersStackView.removePage(membersStackView.count - 1)
 		membersStackViewHeader.addHeader("edit_member", userName || qsTr("Edit Member"))
 		membersStackView.addPage(userEditView)
 		membersStackView.next()
-		if (membersPage.apiClient)
-			membersPage.apiClient.getUserData(userId)
 	}
 	
-	function __saveCurrentEditor() {
-		var page = membersStackView.currentPage()
-		if (!page) return
-		var editorView = page.children[0]
-		if (!editorView || !editorView.updateModel) return
-		editorView.updateModel()
-		var userData = editorView.model
-		if (membersPage.__isCreatingUser) {
-			if (membersPage.apiClient)
-				membersPage.apiClient.insertUser("", userData)
-		} else {
-			if (membersPage.apiClient)
-				membersPage.apiClient.setUserData(
-							membersPage.__editMemberId, userData)
+	Component {
+		id: userEditorTypeComp
+		
+		UserView {
+			productId: membersPage.__productId
+			commandsControllerComp: Component {
+				GqlBasedCommandsController {
+					typeId: "User"
+				}
+			}
 		}
-		membersStackViewHeader.popHeader()
-		membersStackView.previous()
+	}
+	
+	Component {
+		id: userDataControllerComp
+		
+		DocumentRepresentationController {
+			id: userReprController
+			
+			representationModel: UserData {}
+			
+			function updateRepresentationFromDocument(){
+				startUpdateRepresentation(documentId, representationModel)
+				
+				getUserRequest.send(getUserInput)
+			}
+			
+			function updateDocumentFromRepresentation(){
+				startUpdateDocument(documentId)
+				
+				updateUserInput.m_documentId = documentId
+				updateUserInput.m_user = representationModel
+				updateUserRequest.send(updateUserInput)
+			}
+			
+			property DocumentId getUserInput: DocumentId {
+				m_id: userReprController.documentId
+				m_collectionId: "Users"
+			}
+			property UpdateUserFromRepresentationInput updateUserInput: UpdateUserFromRepresentationInput {}
+			
+			property GqlSdlRequestSender getUserRequest: GqlSdlRequestSender {
+				gqlCommandId: ImtauthUserCollectionDocumentServiceSdlCommandIds.s_getUserRepresentation
+				sdlObjectComp: Component {
+					UserData {
+						onFinished: {
+							userReprController.representationModel.copyFrom(this)
+							userReprController.representationUpdated(
+								userReprController.documentId,
+								userReprController.representationModel)
+						}
+					}
+				}
+				
+				function onError(message, type){
+					userReprController.updateRepresentationFailed(userReprController.documentId, message)
+				}
+			}
+			
+			property GqlSdlRequestSender updateUserRequest: GqlSdlRequestSender {
+				gqlCommandId: ImtauthUserCollectionDocumentServiceSdlCommandIds.s_updateUserFromRepresentation
+				requestType: 1
+				sdlObjectComp: Component {
+					DocumentOperationStatus {
+						onFinished: {
+							if (m_status === "Success"){
+								userReprController.documentUpdated(userReprController.documentId)
+							}
+						}
+					}
+				}
+				
+				function onError(message, type){
+					userReprController.updateDocumentFailed(userReprController.documentId, message)
+				}
+			}
+		}
 	}
 	
 	Component {
 		id: userEditorView
 		
 		Item {
-			UserView {
-				id: createUserView
+			SingleDocumentWorkspaceShellView {
+				id: createUserShell
 				anchors.top: parent.top
 				anchors.bottom: parent.bottom
 				anchors.left: parent.left
 				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
-				commandsPanelVisible: false
-				productId: membersPage.apiClient ? membersPage.apiClient.tenantId : ""
+				
+				documentManager: userDocumentService
+				objectTypeId: "User"
+				objectId: ""
+				createNew: true
+				headerVisible: false
 				
 				Component.onCompleted: {
-					membersPage.__isCreatingUser = true
-					createUserView.model = membersPage.apiClient ? membersPage.apiClient.createUserData() : null
-					createUserView.updateGui()
+					membersPage.__activeShellView = createUserShell
+				}
+				Component.onDestruction: {
+					if (membersPage && membersPage.__activeShellView === createUserShell)
+						membersPage.__activeShellView = null
+				}
+				
+				onClosed: {
+					membersStackViewHeader.popHeader()
+					membersStackView.previous()
+					while (membersStackView.count > 1)
+						membersStackView.removePage(membersStackView.count - 1)
 				}
 			}
 		}
@@ -706,46 +794,33 @@ ViewBase {
 		id: userEditView
 		
 		Item {
-			UserView {
-				id: editUserView
+			SingleDocumentWorkspaceShellView {
+				id: editUserShell
 				anchors.top: parent.top
 				anchors.bottom: parent.bottom
 				anchors.left: parent.left
 				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
-				commandsPanelVisible: false
-				productId: membersPage.apiClient ? membersPage.apiClient.tenantId : ""
+				
+				documentManager: userDocumentService
+				objectTypeId: "User"
+				objectId: membersPage.__editUserId
+				createNew: false
+				headerVisible: false
 				
 				Component.onCompleted: {
-					var userData = membersPage.apiClient ? membersPage.apiClient.createUserData() : null
-					if (userData) {
-						userData.m_id = membersPage.__editMemberId
-						userData.m_name = membersPage.__editMemberName
-					}
-					editUserView.model = userData
-					editUserView.updateGui()
+					membersPage.__activeShellView = editUserShell
+				}
+				Component.onDestruction: {
+					if (membersPage && membersPage.__activeShellView === editUserShell)
+						membersPage.__activeShellView = null
 				}
 				
-				Connections {
-					target: membersPage.stateManager
-					function onReceivedUserDataChanged() {
-						if (membersPage.stateManager
-								&& membersPage.stateManager.receivedUserData
-								&& membersPage.__editMemberId) {
-							var received = membersPage.stateManager.receivedUserData
-							var userData = membersPage.apiClient ? membersPage.apiClient.createUserData() : null
-							if (userData) {
-								userData.m_id = membersPage.__editMemberId
-								userData.m_name = received.name || membersPage.__editMemberName
-								userData.m_username = received.username || ""
-								userData.m_email = received.email || ""
-								userData.m_roles = received.roles || []
-								userData.m_groups = received.groups || []
-							}
-							editUserView.model = userData
-							editUserView.updateGui()
-						}
-					}
+				onClosed: {
+					membersStackViewHeader.popHeader()
+					membersStackView.previous()
+					while (membersStackView.count > 1)
+						membersStackView.removePage(membersStackView.count - 1)
 				}
 			}
 		}
