@@ -2,6 +2,9 @@
 #include <imtauthgql/CRoleCollectionDocumentServiceComp.h>
 
 
+// Qt includes
+#include <QUuid>
+
 // ImtCore includes
 #include <imtauth/CRole.h>
 
@@ -53,7 +56,7 @@ sdl::imtauth::Roles::CRoleData CRoleCollectionDocumentServiceComp::OnGetRoleRepr
 	sdl::imtauth::Roles::CRoleData response;
 	response.Version_1_0.Emplace();
 
-	response.Version_1_0->id = rolePtr->GetRoleId();
+	response.Version_1_0->id = rolePtr->GetObjectUuid();
 	response.Version_1_0->name = rolePtr->GetRoleName();
 	response.Version_1_0->description = rolePtr->GetRoleDescription();
 	response.Version_1_0->roleId = rolePtr->GetRoleId();
@@ -111,10 +114,16 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CRoleCollectio
 		return response;
 	}
 
-	imtauth::IRole* rolePtr = dynamic_cast<imtauth::IRole*>(documentPtr.GetPtr());
+	imtauth::CIdentifiableRoleInfo* rolePtr = dynamic_cast<imtauth::CIdentifiableRoleInfo*>(documentPtr.GetPtr());
 	if (rolePtr == nullptr){
 		response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
+	}
+
+	// Make sure the document has a stable UUID — generate one for newly
+	// created documents that have not yet been persisted.
+	if (rolePtr->GetObjectUuid().isEmpty()){
+		rolePtr->SetObjectUuid(QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8());
 	}
 
 	sdl::imtauth::Roles::CRoleData::V1_0 roleData;

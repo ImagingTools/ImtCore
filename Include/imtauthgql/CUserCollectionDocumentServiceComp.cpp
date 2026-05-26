@@ -2,7 +2,11 @@
 #include <imtauthgql/CUserCollectionDocumentServiceComp.h>
 
 
+// Qt includes
+#include <QUuid>
+
 // ImtCore includes
+#include <imtauth/CUserInfo.h>
 #include <imtauth/IUserInfo.h>
 
 
@@ -44,7 +48,7 @@ sdl::imtauth::Users::CUserData CUserCollectionDocumentServiceComp::OnGetUserRepr
 		return sdl::imtauth::Users::CUserData();
 	}
 
-	const imtauth::IUserInfo* userPtr = dynamic_cast<const imtauth::IUserInfo*>(documentPtr.GetPtr());
+	const imtauth::CIdentifiableUserInfo* userPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(documentPtr.GetPtr());
 	if (userPtr == nullptr){
 		errorMessage = QStringLiteral("Invalid document type");
 		return sdl::imtauth::Users::CUserData();
@@ -53,7 +57,7 @@ sdl::imtauth::Users::CUserData CUserCollectionDocumentServiceComp::OnGetUserRepr
 	sdl::imtauth::Users::CUserData response;
 	response.Version_1_0.Emplace();
 
-	response.Version_1_0->id = userPtr->GetId();
+	response.Version_1_0->id = userPtr->GetObjectUuid();
 	response.Version_1_0->name = userPtr->GetName();
 	response.Version_1_0->username = userPtr->GetId();
 	response.Version_1_0->email = userPtr->GetMail();
@@ -122,10 +126,16 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CUserCollectio
 		return response;
 	}
 
-	imtauth::IUserInfo* userPtr = dynamic_cast<imtauth::IUserInfo*>(documentPtr.GetPtr());
+	imtauth::CIdentifiableUserInfo* userPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(documentPtr.GetPtr());
 	if (userPtr == nullptr){
 		response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
+	}
+
+	// Make sure the document has a stable UUID — generate one for newly
+	// created documents that have not yet been persisted.
+	if (userPtr->GetObjectUuid().isEmpty()){
+		userPtr->SetObjectUuid(QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8());
 	}
 
 	sdl::imtauth::Users::CUserData::V1_0 userData;

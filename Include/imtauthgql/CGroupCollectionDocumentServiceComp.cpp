@@ -2,7 +2,11 @@
 #include <imtauthgql/CGroupCollectionDocumentServiceComp.h>
 
 
+// Qt includes
+#include <QUuid>
+
 // ImtCore includes
+#include <imtauth/CUserGroupInfo.h>
 #include <imtauth/IUserGroupInfo.h>
 
 
@@ -44,7 +48,7 @@ sdl::imtauth::Groups::CGroupData CGroupCollectionDocumentServiceComp::OnGetGroup
 		return sdl::imtauth::Groups::CGroupData();
 	}
 
-	const imtauth::IUserGroupInfo* groupPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(documentPtr.GetPtr());
+	const imtauth::CIdentifiableUserGroupInfo* groupPtr = dynamic_cast<const imtauth::CIdentifiableUserGroupInfo*>(documentPtr.GetPtr());
 	if (groupPtr == nullptr){
 		errorMessage = QStringLiteral("Invalid document type");
 		return sdl::imtauth::Groups::CGroupData();
@@ -53,7 +57,7 @@ sdl::imtauth::Groups::CGroupData CGroupCollectionDocumentServiceComp::OnGetGroup
 	sdl::imtauth::Groups::CGroupData response;
 	response.Version_1_0.Emplace();
 
-	response.Version_1_0->id = groupPtr->GetId();
+	response.Version_1_0->id = groupPtr->GetObjectUuid();
 	response.Version_1_0->name = groupPtr->GetName();
 	response.Version_1_0->description = groupPtr->GetDescription();
 
@@ -114,10 +118,16 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CGroupCollecti
 		return response;
 	}
 
-	imtauth::IUserGroupInfo* groupPtr = dynamic_cast<imtauth::IUserGroupInfo*>(documentPtr.GetPtr());
+	imtauth::CIdentifiableUserGroupInfo* groupPtr = dynamic_cast<imtauth::CIdentifiableUserGroupInfo*>(documentPtr.GetPtr());
 	if (groupPtr == nullptr){
 		response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
+	}
+
+	// Make sure the document has a stable UUID — generate one for newly
+	// created documents that have not yet been persisted.
+	if (groupPtr->GetObjectUuid().isEmpty()){
+		groupPtr->SetObjectUuid(QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8());
 	}
 
 	sdl::imtauth::Groups::CGroupData::V1_0 groupData;
