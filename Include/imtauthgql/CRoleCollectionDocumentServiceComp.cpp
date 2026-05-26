@@ -3,7 +3,7 @@
 
 
 // ImtCore includes
-#include <imtauth/IRole.h>
+#include <imtauth/CRole.h>
 
 
 namespace imtauthgql
@@ -44,7 +44,7 @@ sdl::imtauth::Roles::CRoleData CRoleCollectionDocumentServiceComp::OnGetRoleRepr
 		return sdl::imtauth::Roles::CRoleData();
 	}
 
-	const imtauth::IRole* rolePtr = dynamic_cast<const imtauth::IRole*>(documentPtr.GetPtr());
+	const imtauth::CIdentifiableRoleInfo* rolePtr = dynamic_cast<const imtauth::CIdentifiableRoleInfo*>(documentPtr.GetPtr());
 	if (rolePtr == nullptr){
 		errorMessage = QStringLiteral("Invalid document type");
 		return sdl::imtauth::Roles::CRoleData();
@@ -71,7 +71,7 @@ sdl::imtauth::Roles::CRoleData CRoleCollectionDocumentServiceComp::OnGetRoleRepr
 	// schema-defined separator (kept as a single string field for parity
 	// with the existing RoleData representation).
 	QByteArrayList localPermissions = rolePtr->GetLocalPermissions();
-	response.Version_1_0->permissions = localPermissions.join(',');
+	response.Version_1_0->permissions = localPermissions.join(';');
 
 	return response;
 }

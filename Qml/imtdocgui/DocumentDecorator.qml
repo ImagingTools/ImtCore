@@ -38,13 +38,6 @@ QtObject {
 					}
 				}
 			}
-			else{
-				// No representation update is going to follow (e.g. new
-				// document), so release the model-update block immediately —
-				// otherwise the view stays in a frozen state where user edits
-				// never reach the representation controller.
-				view.setBlockingUpdateModel(false)
-			}
 		}
 	}
 
@@ -227,10 +220,6 @@ QtObject {
 			console.error("Unable to handle Save command. Error: Document manager is invalid")
 			return
 		}
-
-		// Flush any pending GUI edits into the document before saving so that
-		// the save operation persists the latest representation.
-		updateDocumentForAllViews()
 
 		if (documentManager.hasDocumentNameProvider(documentTypeId)){
 			documentManager.saveDocument(documentId, "")
