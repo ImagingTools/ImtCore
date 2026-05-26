@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <imtbase/IOperationContextController.h>
+#include <imtbase/IOperationContext.h>
 #include <imtdoc/IDocumentService.h>
 #include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService.h>
 #include <imtbasesdl/SDL/1.0/CPP/UndoManager.h>
@@ -28,7 +28,6 @@ public:
 	I_BEGIN_COMPONENT(CCollectionDocumentServiceControllerComp)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentService", "Collection-related document manager", true, "CollectionDocumentService");
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "ID of the underlaying document collection", true, "");
-		I_ASSIGN(m_operationContextControllerCompPtr, "OperationContextController", "Operation context controller for tenant/owner propagation during save", false, "OperationContextController");
 	I_END_COMPONENT
 
 protected:
@@ -83,11 +82,11 @@ protected:
 private:
 	int GetObjectFactoryIndex(const QByteArray& typeId) const;
 	QByteArray GetUserId(const ::imtgql::CGqlRequest& gqlRequest) const;
+	imtbase::IOperationContext* CreateOperationContextFromGqlRequest(const ::imtgql::CGqlRequest& gqlRequest) const;
 
 private:
 	I_REF(imtdoc::IDocumentService, m_documentManagerCompPtr);
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
-	I_REF(imtbase::IOperationContextController, m_operationContextControllerCompPtr);
 };
 
 
