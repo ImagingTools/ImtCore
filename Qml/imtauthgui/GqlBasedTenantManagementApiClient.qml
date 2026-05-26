@@ -694,7 +694,6 @@ QtObject {
 	property Component roleListDataProviderComp: Component {
 		FilterableSelectGqlDataProvider {
 			collectionId: "Roles"
-			tenantId: root.productId
 			pageSize: 50
 		}
 	}
@@ -702,7 +701,6 @@ QtObject {
 	property Component groupListDataProviderComp: Component {
 		FilterableSelectGqlDataProvider {
 			collectionId: "Groups"
-			tenantId: root.productId
 			pageSize: 50
 		}
 	}
@@ -710,7 +708,6 @@ QtObject {
 	property Component invitableUsersListDataProviderComp: Component {
 		FilterableSelectGqlDataProvider {
 			collectionId: "UsersForInvitation"
-			tenantId: root.productId
 			multiSelect: true
 		}
 	}

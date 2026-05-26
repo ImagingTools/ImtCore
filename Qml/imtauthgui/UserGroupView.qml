@@ -141,7 +141,6 @@ ViewBase {
 				ItemSelectElementView {
 					id: groupSelectableCollectionEditor
 					collectionId: "Groups"
-						productId: container.productId
 						label: qsTr("Parent Groups")
 						addButtonText: qsTr("Add Parent Group")
 						showCount: true
@@ -178,7 +177,6 @@ ViewBase {
 				ItemSelectElementView {
 					id: userSelectableCollectionEditor
 					collectionId: "Users"
-						productId: container.productId
 						label: qsTr("Users")
 						addButtonText: qsTr("Add User")
 						showCount: true
@@ -211,7 +209,6 @@ ViewBase {
 				ItemSelectElementView {
 					id: roleSelectableCollectionEditor
 					collectionId: "Roles"
-						productId: container.productId
 						label: qsTr("Roles")
 						addButtonText: qsTr("Add Role")
 						showCount: true

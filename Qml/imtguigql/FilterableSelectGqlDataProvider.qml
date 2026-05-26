@@ -25,8 +25,6 @@ import imtbaseFilterableSelectSdl 1.0
 FilterableSelectDataProvider {
 	id: root
 
-	property string tenantId: ""
-
 	function getHeaders(){
 		return {}
 	}
@@ -100,12 +98,6 @@ FilterableSelectDataProvider {
 		__gql.pendingRequestId = requestId
 
 		getSelectableItemsInput.m_collectionId = root.collectionId
-
-		// Pass tenantId for tenant-scoped filtering
-		if (root.tenantId && root.tenantId !== "")
-			getSelectableItemsInput.m_tenantId = root.tenantId
-		else
-			getSelectableItemsInput.m_tenantId = null
 
 		// Pass selected IDs as excludeIds for server-side filtering
 		var selectedIds = root.getSelectedIds()

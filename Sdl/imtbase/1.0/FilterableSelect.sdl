@@ -24,7 +24,6 @@ type SelectableItemData {
 
 input GetSelectableItemsInput {
 	collectionId: ID!
-	tenantId: ID
 	viewParams: CollectionViewParams
 	excludeIds: [ID]
 }
