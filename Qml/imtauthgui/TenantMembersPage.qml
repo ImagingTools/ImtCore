@@ -663,75 +663,38 @@ ViewBase {
 	
 	Component {
 		id: userEditorView
-		
-		Item {
-			SingleDocumentWorkspaceShellView {
-				id: createUserShell
-				anchors.top: parent.top
-				anchors.bottom: parent.bottom
-				anchors.left: parent.left
-				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
-				width: Math.min(parent.width - Style.marginXL * 2, 1000)
-				
-				documentManager: membersPage.apiClient ? membersPage.apiClient.userDocumentManager : null
-				objectTypeId: membersPage.apiClient ? membersPage.apiClient.userObjectTypeId : ""
-				objectId: ""
-				createNew: true
-				proposedSourceDocumentId: UuidGenerator.generateUUID()
-				headerVisible: false
-				documentNameInputEnabled: false
-				
-				Component.onCompleted: {
-					membersPage.__activeShellView = createUserShell
-				}
-				Component.onDestruction: {
-					if (membersPage && membersPage.__activeShellView === createUserShell)
-						membersPage.__activeShellView = null
-				}
-				
-				onClosed: {
-					membersStackViewHeader.popHeader()
-					membersStackView.previous()
-					while (membersStackView.count > 1)
-						membersStackView.removePage(membersStackView.count - 1)
-				}
+
+		TenantDocumentEditorShell {
+			documentManager: membersPage.apiClient ? membersPage.apiClient.userDocumentManager : null
+			objectTypeId: membersPage.apiClient ? membersPage.apiClient.userObjectTypeId : ""
+			createNew: true
+			generateNewId: true
+			activeShellTarget: membersPage
+
+			onClosed: {
+				membersStackViewHeader.popHeader()
+				membersStackView.previous()
+				while (membersStackView.count > 1)
+					membersStackView.removePage(membersStackView.count - 1)
 			}
 		}
 	}
-	
+
 	Component {
 		id: userEditView
-		
-		Item {
-			SingleDocumentWorkspaceShellView {
-				id: editUserShell
-				anchors.top: parent.top
-				anchors.bottom: parent.bottom
-				anchors.left: parent.left
-				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
-				width: Math.min(parent.width - Style.marginXL * 2, 1000)
-				
-				documentManager: membersPage.apiClient ? membersPage.apiClient.userDocumentManager : null
-				objectTypeId: membersPage.apiClient ? membersPage.apiClient.userObjectTypeId : ""
-				objectId: membersPage.__editUserId
-				createNew: false
-				headerVisible: false
-				documentNameInputEnabled: false
-				
-				Component.onCompleted: {
-					membersPage.__activeShellView = editUserShell
-				}
-				Component.onDestruction: {
-					if (membersPage && membersPage.__activeShellView === editUserShell)
-						membersPage.__activeShellView = null
-				}
-				
-				onClosed: {
-					membersStackViewHeader.popHeader()
-					membersStackView.previous()
-					while (membersStackView.count > 1)
-						membersStackView.removePage(membersStackView.count - 1)
-				}
+
+		TenantDocumentEditorShell {
+			documentManager: membersPage.apiClient ? membersPage.apiClient.userDocumentManager : null
+			objectTypeId: membersPage.apiClient ? membersPage.apiClient.userObjectTypeId : ""
+			objectId: membersPage.__editUserId
+			createNew: false
+			activeShellTarget: membersPage
+
+			onClosed: {
+				membersStackViewHeader.popHeader()
+				membersStackView.previous()
+				while (membersStackView.count > 1)
+					membersStackView.removePage(membersStackView.count - 1)
 			}
 		}
 	}
