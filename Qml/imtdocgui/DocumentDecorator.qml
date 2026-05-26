@@ -38,6 +38,13 @@ QtObject {
 					}
 				}
 			}
+			else{
+				// No representation update is going to follow (e.g. new
+				// document), so release the model-update block immediately —
+				// otherwise the view stays in a frozen state where user edits
+				// never reach the representation controller.
+				view.setBlockingUpdateModel(false)
+			}
 		}
 	}
 
