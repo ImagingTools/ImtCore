@@ -57,6 +57,9 @@ ViewBase {
 	property var documentManager: null
 	property string objectTypeId: ""
 	property Component dataProviderComp: null
+	property var listModel: null                       // alternative to dataProviderComp: direct model for the list
+	property Component delegateComponent: null         // custom delegate (receives modelData, selectionManager, collectionPage)
+	property Component headerButtonsComponent: null    // custom header buttons placed at right of stackViewHeader
 	function removeItem(id) {}                        // override in subcomponents
 
 	function updateGui() {}
@@ -77,6 +80,23 @@ ViewBase {
 	property var __selectionManager: null
 	property var __dataProvider: null
 	property string __lastFilterText: ""
+
+	// Public accessors for subcomponents with custom header buttons
+	readonly property var selectionManager: __selectionManager
+	readonly property var dataProvider: __dataProvider
+
+	function openCreate() {
+		while (collectionStackView.count > 1)
+			collectionStackView.removePage(collectionStackView.count - 1)
+		collectionPage.__isCreating = true
+		stackViewHeader.addHeader("create", qsTr("Create New %1").arg(collectionPage.entityName))
+		collectionStackView.addPage(createEditorView)
+		collectionStackView.next()
+	}
+
+	function openEdit(itemId, itemName, itemDescription) {
+		__openEdit(itemId, itemName, itemDescription)
+	}
 
 	readonly property string __listTitle: listHeaderTitle.length > 0 ? listHeaderTitle : entityNamePlural
 	readonly property string __createBtnText: createButtonText.length > 0 ? createButtonText : ("+ " + qsTr("Create %1").arg(entityName))
@@ -126,7 +146,7 @@ ViewBase {
 
 	Text {
 		id: createBtn
-		visible: collectionPage.__canManage && collectionStackView.currentIndex === 0
+		visible: collectionPage.__canManage && collectionStackView.currentIndex === 0 && !collectionPage.headerButtonsComponent
 		anchors.right: stackViewHeader.right
 		anchors.verticalCenter: stackViewHeader.verticalCenter
 		text: collectionPage.__createBtnText
@@ -138,20 +158,13 @@ ViewBase {
 			anchors.fill: parent
 			hoverEnabled: true
 			cursorShape: Qt.PointingHandCursor
-			onClicked: {
-				while (collectionStackView.count > 1)
-					collectionStackView.removePage(collectionStackView.count - 1)
-				collectionPage.__isCreating = true
-				stackViewHeader.addHeader("create", qsTr("Create New %1").arg(collectionPage.entityName))
-				collectionStackView.addPage(createEditorView)
-				collectionStackView.next()
-			}
+			onClicked: collectionPage.openCreate()
 		}
 	}
 
 	Text {
 		id: editBtn
-		visible: collectionPage.__canManage && collectionStackView.currentIndex === 0
+		visible: collectionPage.__canManage && collectionStackView.currentIndex === 0 && !collectionPage.headerButtonsComponent
 		anchors.right: createBtn.left
 		anchors.rightMargin: Style.marginL
 		anchors.verticalCenter: stackViewHeader.verticalCenter
@@ -181,7 +194,7 @@ ViewBase {
 
 	Text {
 		id: removeBtn
-		visible: collectionPage.__canManage && collectionStackView.currentIndex === 0
+		visible: collectionPage.__canManage && collectionStackView.currentIndex === 0 && !collectionPage.headerButtonsComponent
 		anchors.right: editBtn.left
 		anchors.rightMargin: Style.marginL
 		anchors.verticalCenter: stackViewHeader.verticalCenter
@@ -214,6 +227,15 @@ ViewBase {
 		}
 	}
 
+	Loader {
+		id: customHeaderButtonsLoader
+		visible: collectionPage.headerButtonsComponent && collectionStackView.currentIndex === 0
+		anchors.right: stackViewHeader.right
+		anchors.verticalCenter: stackViewHeader.verticalCenter
+		sourceComponent: collectionPage.headerButtonsComponent
+		property var page: collectionPage
+	}
+
 	BaseText {
 		id: descriptionLabel
 		anchors.top: stackViewHeader.bottom
@@ -243,7 +265,12 @@ ViewBase {
 		id: listView
 
 		Item {
-			property var dataProvider: dataProviderLoader.item
+			property var dataProvider: collectionPage.dataProviderComp ? dataProviderLoader.item : null
+			property var effectiveModel: {
+				if (collectionPage.listModel)
+					return collectionPage.listModel
+				return dataProvider ? dataProvider.items : []
+			}
 
 			Loader {
 				id: dataProviderLoader
@@ -306,7 +333,7 @@ ViewBase {
 							selectionManager.clear()
 						} else {
 							var allIds = []
-							var items = dataProvider ? dataProvider.items : []
+							var items = effectiveModel
 							for (var i = 0; i < items.length; i++) {
 								if (items[i] && items[i].id)
 									allIds.push(items[i].id)
@@ -318,7 +345,7 @@ ViewBase {
 
 				Item {
 					id: emptyState
-					visible: !dataProvider || dataProvider.items.length === 0
+					visible: !effectiveModel || effectiveModel.length === 0
 					anchors.top: tableHeader.bottom
 					anchors.left: parent.left
 					anchors.right: parent.right
@@ -340,11 +367,17 @@ ViewBase {
 					anchors.bottom: parent.bottom
 					clip: true
 					boundsBehavior: Flickable.StopAtBounds
-					model: dataProvider ? dataProvider.items : []
+					model: effectiveModel
 
-					delegate: Rectangle {
+					delegate: collectionPage.delegateComponent ? collectionPage.delegateComponent : defaultDelegateComp
+				}
+
+				Component {
+					id: defaultDelegateComp
+
+					Rectangle {
 						id: itemDelegateRoot
-						width: itemListView.width
+						width: ListView.view ? ListView.view.width : 0
 						height: Style.controlHeightL + Style.marginL
 
 						property string itemId: modelData.id || ""
@@ -472,7 +505,6 @@ ViewBase {
 							opacity: 0.5
 						}
 					}
-
 				}
 
 				CustomScrollbar {

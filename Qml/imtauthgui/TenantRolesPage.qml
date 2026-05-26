@@ -28,7 +28,7 @@ TenantSimpleCollectionPage {
 			rolesPage.apiClient.removeRole(id)
 	}
 
-	Component.onCompleted: {
+	onApiClientChanged: {
 		if (rolesPage.apiClient)
 			rolesPage.apiClient.fetchPermissions()
 	}
