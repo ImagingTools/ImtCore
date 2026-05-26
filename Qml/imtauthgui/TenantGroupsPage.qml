@@ -499,6 +499,8 @@ ViewBase {
 			function updateRepresentationFromDocument(){
 				startUpdateRepresentation(documentId, representationModel)
 				
+				getGroupInput.m_id = documentId
+				getGroupInput.m_collectionId = "Groups"
 				getGroupRequest.send(getGroupInput)
 			}
 			
@@ -510,10 +512,7 @@ ViewBase {
 				updateGroupRequest.send(updateGroupInput)
 			}
 			
-			property DocumentId getGroupInput: DocumentId {
-				m_id: groupReprController.documentId
-				m_collectionId: "Groups"
-			}
+			property DocumentId getGroupInput: DocumentId {}
 			property UpdateGroupFromRepresentationInput updateGroupInput: UpdateGroupFromRepresentationInput {}
 			
 			property GqlSdlRequestSender getGroupRequest: GqlSdlRequestSender {

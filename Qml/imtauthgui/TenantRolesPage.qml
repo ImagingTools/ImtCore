@@ -511,6 +511,8 @@ ViewBase {
 			function updateRepresentationFromDocument(){
 				startUpdateRepresentation(documentId, representationModel)
 				
+				getRoleInput.m_id = documentId
+				getRoleInput.m_collectionId = "Roles"
 				getRoleRequest.send(getRoleInput)
 			}
 			
@@ -522,10 +524,7 @@ ViewBase {
 				updateRoleRequest.send(updateRoleInput)
 			}
 			
-			property DocumentId getRoleInput: DocumentId {
-				m_id: roleReprController.documentId
-				m_collectionId: "Roles"
-			}
+			property DocumentId getRoleInput: DocumentId {}
 			property UpdateRoleFromRepresentationInput updateRoleInput: UpdateRoleFromRepresentationInput {}
 			
 			property GqlSdlRequestSender getRoleRequest: GqlSdlRequestSender {

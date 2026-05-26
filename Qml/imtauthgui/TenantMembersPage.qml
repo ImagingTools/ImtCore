@@ -699,6 +699,8 @@ ViewBase {
 			function updateRepresentationFromDocument(){
 				startUpdateRepresentation(documentId, representationModel)
 				
+				getUserInput.m_id = documentId
+				getUserInput.m_collectionId = "Users"
 				getUserRequest.send(getUserInput)
 			}
 			
@@ -710,10 +712,7 @@ ViewBase {
 				updateUserRequest.send(updateUserInput)
 			}
 			
-			property DocumentId getUserInput: DocumentId {
-				m_id: userReprController.documentId
-				m_collectionId: "Users"
-			}
+			property DocumentId getUserInput: DocumentId {}
 			property UpdateUserFromRepresentationInput updateUserInput: UpdateUserFromRepresentationInput {}
 			
 			property GqlSdlRequestSender getUserRequest: GqlSdlRequestSender {
