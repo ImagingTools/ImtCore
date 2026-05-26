@@ -26,6 +26,9 @@
 	<file alias="imtdocgui/DocCollectionViewDelegate.qml">DocCollectionViewDelegate.qml</file>
 	<file alias="imtdocgui/DocumentRepresentationController.qml">DocumentRepresentationController.qml</file>
 	<file alias="imtdocgui/DocumentRevisionDialog.qml">DocumentRevisionDialog.qml</file>
+	<file alias="imtdocgui/SingleDocumentTypeRegistrar.qml">SingleDocumentTypeRegistrar.qml</file>
+	<file alias="imtdocgui/SingleDocumentWorkspaceContentView.qml">SingleDocumentWorkspaceContentView.qml</file>
+	<file alias="imtdocgui/SingleDocumentWorkspaceGqlView.qml">SingleDocumentWorkspaceGqlView.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>
