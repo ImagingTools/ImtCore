@@ -29,4 +29,4 @@ DocumentRevisionDialog 1.0 DocumentRevisionDialog.qml
 DocumentRevisionDialog 1.0 DocumentRevisionDialog.qml
 SingleDocumentTypeRegistrar 1.0 SingleDocumentTypeRegistrar.qml
 SingleDocumentWorkspaceContentView 1.0 SingleDocumentWorkspaceContentView.qml
-SingleDocumentWorkspaceGqlView 1.0 SingleDocumentWorkspaceGqlView.qml
+SingleDocumentWorkspaceShellView 1.0 SingleDocumentWorkspaceShellView.qml

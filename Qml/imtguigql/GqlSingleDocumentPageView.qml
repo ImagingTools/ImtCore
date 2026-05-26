@@ -122,7 +122,7 @@ PageContainer {
 		}
 	}
 
-	SingleDocumentWorkspaceGqlView {
+	SingleDocumentWorkspaceShellView {
 		id: workspaceView_
 		anchors.fill: parent
 		documentManager: root.documentManager

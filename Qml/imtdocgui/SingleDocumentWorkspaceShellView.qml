@@ -7,9 +7,9 @@ import imtbaseImtCollectionSdl 1.0
 import imtbaseCollectionDocumentServiceSdl 1.0
 
 // Single-document workspace view that drives a single object through the
-// regular CollectionDocumentManager pipeline (via DocumentServiceBase /
-// GqlBasedCollectionDocumentService) without ever showing a CollectionView
-// or tab strip.
+// regular CollectionDocumentManager pipeline via any DocumentServiceBase
+// implementation, without ever showing a CollectionView or tab strip.
+// The shell itself contains no GQL/transport-specific code.
 //
 // States surfaced via the `state` property:
 //   - "empty"   : no objectId/typeId set, or document was closed
