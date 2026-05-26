@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6397" Description="ACF"/>
+            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="CollectionDocumentService" X="575" Y="225" Note=""/>
+        <Element ComponentName="Demultiplexer" X="550" Y="75" Note=""/>
+        <Element ComponentName="GroupCollectionDocumentService" X="200" Y="225" Note=""/>
+        <Element ComponentName="RoleCollectionAdapter" X="225" Y="625" Note=""/>
+        <Element ComponentName="UserCollectionAdapter" X="600" Y="625" Note=""/>
+        <Element ComponentName="UserGroupInfo" X="575" Y="425" Note=""/>
+        <Element ComponentName="UserGroupInfoProvider" X="975" Y="625" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

@@ -157,7 +157,7 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CRoleCollectio
 
 	if (roleData.permissions){
 		QByteArrayList permissions;
-		QByteArray joined = roleData.permissions->toUtf8();
+		QByteArray joined = *roleData.permissions;
 		if (!joined.isEmpty()){
 			permissions = joined.split(',');
 		}
