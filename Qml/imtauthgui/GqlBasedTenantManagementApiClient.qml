@@ -773,17 +773,6 @@ QtObject {
 				updateRoleRequest.send(updateRoleInput)
 			}
 
-			// Flush any pending GUI state into the server right before save so
-			// the saveDocument operation persists the latest representation
-			// (not a stale server-side copy).
-			Connections {
-				target: root.__roleDocumentService
-				function onStartSaveDocument(documentId){
-					if (documentId === roleReprController.documentId)
-						roleReprController.updateDocumentFromRepresentation()
-				}
-			}
-
 			property DocumentId getRoleInput: DocumentId {}
 			property UpdateRoleFromRepresentationInput updateRoleInput: UpdateRoleFromRepresentationInput {}
 
@@ -859,14 +848,6 @@ QtObject {
 				updateGroupRequest.send(updateGroupInput)
 			}
 
-			Connections {
-				target: root.__groupDocumentService
-				function onStartSaveDocument(documentId){
-					if (documentId === groupReprController.documentId)
-						groupReprController.updateDocumentFromRepresentation()
-				}
-			}
-
 			property DocumentId getGroupInput: DocumentId {}
 			property UpdateGroupFromRepresentationInput updateGroupInput: UpdateGroupFromRepresentationInput {}
 
@@ -940,14 +921,6 @@ QtObject {
 				updateUserInput.m_documentId = documentId
 				updateUserInput.m_user = representationModel
 				updateUserRequest.send(updateUserInput)
-			}
-
-			Connections {
-				target: root.__userDocumentService
-				function onStartSaveDocument(documentId){
-					if (documentId === userReprController.documentId)
-						userReprController.updateDocumentFromRepresentation()
-				}
 			}
 
 			property DocumentId getUserInput: DocumentId {}

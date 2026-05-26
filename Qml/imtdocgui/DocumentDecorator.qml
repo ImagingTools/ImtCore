@@ -221,6 +221,10 @@ QtObject {
 			return
 		}
 
+		// Flush any pending GUI edits into the document before saving so that
+		// the save operation persists the latest representation.
+		updateDocumentForAllViews()
+
 		if (documentManager.hasDocumentNameProvider(documentTypeId)){
 			documentManager.saveDocument(documentId, "")
 		}
