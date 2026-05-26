@@ -2,6 +2,10 @@
 #include <imtservergql/CCollectionDocumentServiceControllerComp.h>
 
 
+// ACF includes
+#include <istd/TDelPtr.h>
+
+
 namespace imtservergql
 {
 
@@ -293,10 +297,16 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSaveDo
 	retVal.Version_1_0.emplace();
 
 	if (m_documentManagerCompPtr.IsValid()) {
+		istd::TDelPtr<imtbase::IOperationContext> operationContextPtr;
+		if (m_operationContextControllerCompPtr.IsValid()){
+			operationContextPtr.SetPtr(m_operationContextControllerCompPtr->CreateOperationContext("Save", *saveDocumentInput->documentId));
+		}
+
 		imtdoc::IDocumentService::TaskParams taskParams;
 		taskParams.userId = userId;
 		taskParams.documentId = *saveDocumentInput->documentId;
 		taskParams.documentName = *saveDocumentInput->documentName;
+		taskParams.operationContextPtr = operationContextPtr.GetPtr();
 		QByteArray taskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, taskParams);
 		imtdoc::IDocumentService::TaskResult taskResult = m_documentManagerCompPtr->WaitForTaskFinished(taskId);
 		QString saveErrorMessage = taskResult.errorMessage;
