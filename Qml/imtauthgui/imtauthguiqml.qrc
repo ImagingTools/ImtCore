@@ -37,7 +37,8 @@
 	<file alias="imtauthgui/TenantCollectionView.qml">TenantCollectionView.qml</file>
 	<file alias="imtauthgui/TenantEditor.qml">TenantEditor.qml</file>
 	<file alias="imtauthgui/TenantEditorStateManager.qml">TenantEditorStateManager.qml</file>
-	<file alias="imtauthgui/TenantMembershipApiClient.qml">TenantMembershipApiClient.qml</file>
+	<file alias="imtauthgui/TenantManagementApiClient.qml">TenantManagementApiClient.qml</file>
+	<file alias="imtauthgui/GqlBasedTenantManagementApiClient.qml">GqlBasedTenantManagementApiClient.qml</file>
 	<file alias="imtauthgui/TenantGeneralPage.qml">TenantGeneralPage.qml</file>
 	<file alias="imtauthgui/TenantMembersPage.qml">TenantMembersPage.qml</file>
 	<file alias="imtauthgui/TenantMemberDelegate.qml">TenantMemberDelegate.qml</file>

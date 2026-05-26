@@ -6,12 +6,8 @@ import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0
-import imtguigql 1.0
 import imtdocgui 1.0
 import imtauthgui 1.0
-import imtauthUsersSdl 1.0
-import imtauthUserCollectionDocumentServiceSdl 1.0
-import imtbaseCollectionDocumentServiceSdl 1.0
 
 /**
  * TenantMembersPage
@@ -40,27 +36,15 @@ ViewBase {
 	
 	property var __selectionManager: null
 	
-	// Single shared client to the server CollectionDocumentManager for Users.
-	GqlBasedCollectionDocumentService {
-		id: userDocumentService
-		collectionId: "Users"
-	}
-	
-	SingleDocumentTypeRegistrar {
-		documentManager: userDocumentService
-		views: [{
-			typeId: "User",
-			viewTypeId: "Editor",
-			editorComp: userEditorTypeComp,
-			controllerComp: userDataControllerComp
-		}]
-	}
-	
 	Connections {
-		target: userDocumentService
+		target: membersPage.apiClient ? membersPage.apiClient.userDocumentManager : null
 		function onDocumentSaved(documentId) {
-			// User saved on the server; the members list will refresh via the
-			// normal tenant-data subscription pipeline.
+			// User document was saved on the server (e.g. profile update). Re-read
+			// the members list from the current tenantData so any cached display
+			// fields refresh. The actual user profile fields will be re-fetched
+			// next time the tenantData refresh pipeline pushes a new payload.
+			if (membersPage.stateManager)
+				membersPage.stateManager.loadMembersFromModel()
 		}
 	}
 	
@@ -628,10 +612,12 @@ ViewBase {
 		id: membersSelectPopupComp
 		
 		FilterableSelectPopup {
-			dataProvider: FilterableSelectGqlDataProvider {
-				collectionId: "UsersForInvitation"
-				tenantId: membersPage.apiClient ? membersPage.apiClient.tenantId : ""
-				multiSelect: true
+			id: invitePopup
+			dataProvider: invitableUsersLoader.item
+			
+			Loader {
+				id: invitableUsersLoader
+				sourceComponent: membersPage.apiClient ? membersPage.apiClient.invitableUsersListDataProviderComp : null
 			}
 			
 			itemWidth: 280
@@ -676,84 +662,6 @@ ViewBase {
 	}
 	
 	Component {
-		id: userEditorTypeComp
-		
-		UserView {
-			productId: membersPage.__productId
-			commandsControllerComp: Component {
-				GqlBasedCommandsController {
-					typeId: "User"
-				}
-			}
-		}
-	}
-	
-	Component {
-		id: userDataControllerComp
-		
-		DocumentRepresentationController {
-			id: userReprController
-			
-			representationModel: UserData {}
-			
-			function updateRepresentationFromDocument(){
-				startUpdateRepresentation(documentId, representationModel)
-				
-				getUserInput.m_id = documentId
-				getUserInput.m_collectionId = "Users"
-				getUserRequest.send(getUserInput)
-			}
-			
-			function updateDocumentFromRepresentation(){
-				startUpdateDocument(documentId)
-				
-				updateUserInput.m_documentId = documentId
-				updateUserInput.m_user = representationModel
-				updateUserRequest.send(updateUserInput)
-			}
-			
-			property DocumentId getUserInput: DocumentId {}
-			property UpdateUserFromRepresentationInput updateUserInput: UpdateUserFromRepresentationInput {}
-			
-			property GqlSdlRequestSender getUserRequest: GqlSdlRequestSender {
-				gqlCommandId: ImtauthUserCollectionDocumentServiceSdlCommandIds.s_getUserRepresentation
-				sdlObjectComp: Component {
-					UserData {
-						onFinished: {
-							userReprController.representationModel.copyFrom(this)
-							userReprController.representationUpdated(
-								userReprController.documentId,
-								userReprController.representationModel)
-						}
-					}
-				}
-				
-				function onError(message, type){
-					userReprController.updateRepresentationFailed(userReprController.documentId, message)
-				}
-			}
-			
-			property GqlSdlRequestSender updateUserRequest: GqlSdlRequestSender {
-				gqlCommandId: ImtauthUserCollectionDocumentServiceSdlCommandIds.s_updateUserFromRepresentation
-				requestType: 1
-				sdlObjectComp: Component {
-					DocumentOperationStatus {
-						onFinished: {
-							if (m_status === "Success"){
-								userReprController.documentUpdated(userReprController.documentId)
-							}
-						}
-					}
-				}
-				
-				function onError(message, type){
-					userReprController.updateDocumentFailed(userReprController.documentId, message)
-				}
-			}
-		}
-	}
-	
-	Component {
 		id: userEditorView
 		
 		Item {
@@ -765,8 +673,8 @@ ViewBase {
 				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
 				
-				documentManager: userDocumentService
-				objectTypeId: "User"
+				documentManager: membersPage.apiClient ? membersPage.apiClient.userDocumentManager : null
+				objectTypeId: membersPage.apiClient ? membersPage.apiClient.userObjectTypeId : ""
 				objectId: ""
 				createNew: true
 				headerVisible: false
@@ -801,8 +709,8 @@ ViewBase {
 				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
 				
-				documentManager: userDocumentService
-				objectTypeId: "User"
+				documentManager: membersPage.apiClient ? membersPage.apiClient.userDocumentManager : null
+				objectTypeId: membersPage.apiClient ? membersPage.apiClient.userObjectTypeId : ""
 				objectId: membersPage.__editUserId
 				createNew: false
 				headerVisible: false

@@ -5,12 +5,8 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
-import imtguigql 1.0
 import imtdocgui 1.0
 import imtauthgui 1.0
-import imtauthRolesSdl 1.0
-import imtauthRoleCollectionDocumentServiceSdl 1.0
-import imtbaseCollectionDocumentServiceSdl 1.0
 
 /**
  * TenantRolesPage
@@ -46,25 +42,8 @@ ViewBase {
 	property var __selectionManager: null
 	property var __dataProvider: null
 	
-	// Single shared client to the server CollectionDocumentManager for Roles.
-	GqlBasedCollectionDocumentService {
-		id: roleDocumentService
-		collectionId: "Roles"
-	}
-	
-	// Register the RoleView editor + its gql data controller once.
-	SingleDocumentTypeRegistrar {
-		documentManager: roleDocumentService
-		views: [{
-			typeId: "Role",
-			viewTypeId: "Editor",
-			editorComp: roleEditorTypeComp,
-			controllerComp: roleDataControllerComp
-		}]
-	}
-	
 	Connections {
-		target: roleDocumentService
+		target: rolesPage.apiClient ? rolesPage.apiClient.roleDocumentManager : null
 		function onDocumentSaved(documentId) {
 			if (rolesPage.__dataProvider)
 				rolesPage.__dataProvider.fetch("")
@@ -233,6 +212,22 @@ ViewBase {
 		id: rolesListView
 		
 		Item {
+			property var rolesDataProvider: rolesDataProviderLoader.item
+
+			Loader {
+				id: rolesDataProviderLoader
+				sourceComponent: rolesPage.apiClient ? rolesPage.apiClient.roleListDataProviderComp : null
+				onLoaded: {
+					rolesPage.__dataProvider = item
+					item.fetch("")
+				}
+				Component.onDestruction: {
+					if (rolesPage){
+						rolesPage.__dataProvider = null
+					}
+				}
+			}
+
 			SearchTextInput {
 				id: rolesFilterInput
 				anchors.top: parent.top
@@ -242,7 +237,8 @@ ViewBase {
 				placeHolderText: qsTr("Filter roles...")
 				onTextChanged: {
 					rolesSelectionManager.clear()
-					rolesDataProvider.fetch(text)
+					if (rolesDataProviderLoader.item)
+						rolesDataProviderLoader.item.fetch(text)
 				}
 			}
 			
@@ -257,26 +253,6 @@ ViewBase {
 					multiSelect: true
 					Component.onCompleted: rolesPage.__selectionManager = rolesSelectionManager
 					Component.onDestruction: rolesPage.__selectionManager = null
-				}
-				
-				FilterableSelectGqlDataProvider {
-					id: rolesDataProvider
-					collectionId: "Roles"
-					tenantId: rolesPage.apiClient ? rolesPage.apiClient.tenantId : ""
-					pageSize: 50
-					Component.onCompleted: {
-						rolesPage.__dataProvider = rolesDataProvider
-					}
-
-					Component.onDestruction: {
-						if (rolesPage){
-							rolesPage.__dataProvider = null
-						}
-					}
-				}
-				
-				Component.onCompleted: {
-					rolesDataProvider.fetch("")
 				}
 				
 				TenantTableHeader {
@@ -296,7 +272,7 @@ ViewBase {
 							rolesSelectionManager.clear()
 						} else {
 							var allIds = []
-							var items = rolesDataProvider.items
+							var items = rolesDataProvider ? rolesDataProvider.items : []
 							for (var i = 0; i < items.length; i++) {
 								if (items[i] && items[i].id)
 									allIds.push(items[i].id)
@@ -308,7 +284,7 @@ ViewBase {
 				
 				Item {
 					id: rolesEmptyState
-					visible: rolesDataProvider.items.length === 0
+					visible: !rolesDataProvider || rolesDataProvider.items.length === 0
 					anchors.top: rolesTableHeader.bottom
 					anchors.left: parent.left
 					anchors.right: parent.right
@@ -330,7 +306,7 @@ ViewBase {
 					anchors.bottom: parent.bottom
 					clip: true
 					boundsBehavior: Flickable.StopAtBounds
-					model: rolesDataProvider.items
+					model: rolesDataProvider ? rolesDataProvider.items : []
 					
 					delegate: Rectangle {
 						id: roleDelegateRoot
@@ -487,85 +463,6 @@ ViewBase {
 	}
 	
 	Component {
-		id: roleEditorTypeComp
-		
-		RoleView {
-			productId: rolesPage.__productId
-			permissionsModel: rolesPage.apiClient ? rolesPage.apiClient.permissionsModel : null
-			commandsControllerComp: Component {
-				GqlBasedCommandsController {
-					typeId: "Role"
-				}
-			}
-		}
-	}
-	
-	Component {
-		id: roleDataControllerComp
-		
-		DocumentRepresentationController {
-			id: roleReprController
-			
-			representationModel: RoleData {}
-			
-			function updateRepresentationFromDocument(){
-				startUpdateRepresentation(documentId, representationModel)
-				
-				getRoleInput.m_id = documentId
-				getRoleInput.m_collectionId = "Roles"
-				getRoleRequest.send(getRoleInput)
-			}
-			
-			function updateDocumentFromRepresentation(){
-				startUpdateDocument(documentId)
-				
-				updateRoleInput.m_documentId = documentId
-				updateRoleInput.m_role = representationModel
-				updateRoleRequest.send(updateRoleInput)
-			}
-			
-			property DocumentId getRoleInput: DocumentId {}
-			property UpdateRoleFromRepresentationInput updateRoleInput: UpdateRoleFromRepresentationInput {}
-			
-			property GqlSdlRequestSender getRoleRequest: GqlSdlRequestSender {
-				gqlCommandId: ImtauthRoleCollectionDocumentServiceSdlCommandIds.s_getRoleRepresentation
-				sdlObjectComp: Component {
-					RoleData {
-						onFinished: {
-							roleReprController.representationModel.copyFrom(this)
-							roleReprController.representationUpdated(
-								roleReprController.documentId,
-								roleReprController.representationModel)
-						}
-					}
-				}
-				
-				function onError(message, type){
-					roleReprController.updateRepresentationFailed(roleReprController.documentId, message)
-				}
-			}
-			
-			property GqlSdlRequestSender updateRoleRequest: GqlSdlRequestSender {
-				gqlCommandId: ImtauthRoleCollectionDocumentServiceSdlCommandIds.s_updateRoleFromRepresentation
-				requestType: 1
-				sdlObjectComp: Component {
-					DocumentOperationStatus {
-						onFinished: {
-							if (m_status === "Success"){
-								roleReprController.documentUpdated(roleReprController.documentId)
-							}
-						}
-					}
-				}
-				
-				function onError(message, type){
-					roleReprController.updateDocumentFailed(roleReprController.documentId, message)
-				}
-			}
-		}
-	}
-	
-	Component {
 		id: roleEditorView
 		
 		Item {
@@ -577,8 +474,8 @@ ViewBase {
 				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
 				
-				documentManager: roleDocumentService
-				objectTypeId: "Role"
+				documentManager: rolesPage.apiClient ? rolesPage.apiClient.roleDocumentManager : null
+				objectTypeId: rolesPage.apiClient ? rolesPage.apiClient.roleObjectTypeId : ""
 				objectId: ""
 				createNew: true
 				headerVisible: false
@@ -613,8 +510,8 @@ ViewBase {
 				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
 				
-				documentManager: roleDocumentService
-				objectTypeId: "Role"
+				documentManager: rolesPage.apiClient ? rolesPage.apiClient.roleDocumentManager : null
+				objectTypeId: rolesPage.apiClient ? rolesPage.apiClient.roleObjectTypeId : ""
 				objectId: rolesPage.__editRoleId
 				createNew: false
 				headerVisible: false

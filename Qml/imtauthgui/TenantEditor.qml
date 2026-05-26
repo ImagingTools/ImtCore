@@ -13,12 +13,12 @@ import imtauthTenantsSdl 1.0
  *
  * Thin orchestrator that composes:
  *   - TenantEditorStateManager  — local UI state + pure logic
- *   - an injected `apiClient` (abstract TenantMembershipApiClient) — transport
+ *   - an injected `apiClient` (abstract TenantManagementApiClient) — transport
  *   - the page components (General / Members / Roles / Groups / Permissions)
  *
  * The editor itself does NOT depend on any concrete transport (no GQL/SDL transport
- * imports). The concrete client (e.g. GqlBasedTenantMembershipApiClient from
- * imtguigql) is supplied by the embedding view (e.g. TenantCollectionView).
+ * imports). The concrete client (e.g. GqlBasedTenantManagementApiClient from
+ * imtauthgui) is supplied by the embedding view (e.g. TenantCollectionView).
  *
  * SDL imports here are limited to imtauthTenantsSdl (TenantData type of the model).
  */
@@ -34,7 +34,7 @@ DocumentViewBase {
 	property TenantData tenantData: model
 
 	/**
-	 * Injected transport implementing the TenantMembershipApiClient contract.
+	 * Injected transport implementing the TenantManagementApiClient contract.
 	 * Must be set by the embedding view before the editor becomes active.
 	 */
 	property var apiClient: null

@@ -5,17 +5,13 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
-import imtguigql 1.0
 import imtdocgui 1.0
 import imtauthgui 1.0
-import imtauthGroupsSdl 1.0
-import imtauthGroupCollectionDocumentServiceSdl 1.0
-import imtbaseCollectionDocumentServiceSdl 1.0
 
 /**
  * TenantGroupsPage
  *
- * Groups tab — list / create / edit / delete tenant groups.
+ * Groups tab — list / create / edit / delete tenant groups via the abstract apiClient.
  * Table is fixed at 800px width, centered, with gray rounded border and checkbox selection.
  */
 ViewBase {
@@ -40,24 +36,8 @@ ViewBase {
 	property var __selectionManager: null
 	property var __dataProvider: null
 	
-	// Single shared client to the server CollectionDocumentManager for Groups.
-	GqlBasedCollectionDocumentService {
-		id: groupDocumentService
-		collectionId: "Groups"
-	}
-	
-	SingleDocumentTypeRegistrar {
-		documentManager: groupDocumentService
-		views: [{
-			typeId: "Group",
-			viewTypeId: "Editor",
-			editorComp: groupEditorTypeComp,
-			controllerComp: groupDataControllerComp
-		}]
-	}
-	
 	Connections {
-		target: groupDocumentService
+		target: groupsPage.apiClient ? groupsPage.apiClient.groupDocumentManager : null
 		function onDocumentSaved(documentId) {
 			if (groupsPage.__dataProvider)
 				groupsPage.__dataProvider.fetch("")
@@ -223,6 +203,22 @@ ViewBase {
 		id: groupsListView
 		
 		Item {
+			property var groupsDataProvider: groupsDataProviderLoader.item
+
+			Loader {
+				id: groupsDataProviderLoader
+				sourceComponent: groupsPage.apiClient ? groupsPage.apiClient.groupListDataProviderComp : null
+				onLoaded: {
+					groupsPage.__dataProvider = item
+					item.fetch("")
+				}
+				Component.onDestruction: {
+					if (groupsPage){
+						groupsPage.__dataProvider = null
+					}
+				}
+			}
+
 			SearchTextInput {
 				id: groupsFilterInput
 				anchors.top: parent.top
@@ -232,7 +228,8 @@ ViewBase {
 				placeHolderText: qsTr("Filter groups...")
 				onTextChanged: {
 					groupsSelectionManager.clear()
-					groupsDataProvider.fetch(text)
+					if (groupsDataProviderLoader.item)
+						groupsDataProviderLoader.item.fetch(text)
 				}
 			}
 			
@@ -255,19 +252,6 @@ ViewBase {
 					}
 				}
 				
-				FilterableSelectGqlDataProvider {
-					id: groupsDataProvider
-					collectionId: "Groups"
-					tenantId: groupsPage.apiClient ? groupsPage.apiClient.tenantId : ""
-					pageSize: 50
-					Component.onCompleted: groupsPage.__dataProvider = groupsDataProvider
-					Component.onDestruction: groupsPage.__dataProvider = null
-				}
-				
-				Component.onCompleted: {
-					groupsDataProvider.fetch("")
-				}
-				
 				TenantTableHeader {
 					id: groupsTableHeader
 					anchors.top: parent.top
@@ -285,7 +269,7 @@ ViewBase {
 							groupsSelectionManager.clear()
 						} else {
 							var allIds = []
-							var items = groupsDataProvider.items
+							var items = groupsDataProvider ? groupsDataProvider.items : []
 							for (var i = 0; i < items.length; i++) {
 								if (items[i] && items[i].id)
 									allIds.push(items[i].id)
@@ -297,7 +281,7 @@ ViewBase {
 				
 				Item {
 					id: groupsEmptyState
-					visible: groupsDataProvider.items.length === 0
+					visible: !groupsDataProvider || groupsDataProvider.items.length === 0
 					anchors.top: groupsTableHeader.bottom
 					anchors.left: parent.left
 					anchors.right: parent.right
@@ -319,7 +303,7 @@ ViewBase {
 					anchors.bottom: parent.bottom
 					clip: true
 					boundsBehavior: Flickable.StopAtBounds
-					model: groupsDataProvider.items
+					model: groupsDataProvider ? groupsDataProvider.items : []
 					
 					delegate: Rectangle {
 						id: groupDelegateRoot
@@ -476,84 +460,6 @@ ViewBase {
 	}
 	
 	Component {
-		id: groupEditorTypeComp
-		
-		UserGroupView {
-			productId: groupsPage.__productId
-			commandsControllerComp: Component {
-				GqlBasedCommandsController {
-					typeId: "Group"
-				}
-			}
-		}
-	}
-	
-	Component {
-		id: groupDataControllerComp
-		
-		DocumentRepresentationController {
-			id: groupReprController
-			
-			representationModel: GroupData {}
-			
-			function updateRepresentationFromDocument(){
-				startUpdateRepresentation(documentId, representationModel)
-				
-				getGroupInput.m_id = documentId
-				getGroupInput.m_collectionId = "Groups"
-				getGroupRequest.send(getGroupInput)
-			}
-			
-			function updateDocumentFromRepresentation(){
-				startUpdateDocument(documentId)
-				
-				updateGroupInput.m_documentId = documentId
-				updateGroupInput.m_group = representationModel
-				updateGroupRequest.send(updateGroupInput)
-			}
-			
-			property DocumentId getGroupInput: DocumentId {}
-			property UpdateGroupFromRepresentationInput updateGroupInput: UpdateGroupFromRepresentationInput {}
-			
-			property GqlSdlRequestSender getGroupRequest: GqlSdlRequestSender {
-				gqlCommandId: ImtauthGroupCollectionDocumentServiceSdlCommandIds.s_getGroupRepresentation
-				sdlObjectComp: Component {
-					GroupData {
-						onFinished: {
-							groupReprController.representationModel.copyFrom(this)
-							groupReprController.representationUpdated(
-								groupReprController.documentId,
-								groupReprController.representationModel)
-						}
-					}
-				}
-				
-				function onError(message, type){
-					groupReprController.updateRepresentationFailed(groupReprController.documentId, message)
-				}
-			}
-			
-			property GqlSdlRequestSender updateGroupRequest: GqlSdlRequestSender {
-				gqlCommandId: ImtauthGroupCollectionDocumentServiceSdlCommandIds.s_updateGroupFromRepresentation
-				requestType: 1
-				sdlObjectComp: Component {
-					DocumentOperationStatus {
-						onFinished: {
-							if (m_status === "Success"){
-								groupReprController.documentUpdated(groupReprController.documentId)
-							}
-						}
-					}
-				}
-				
-				function onError(message, type){
-					groupReprController.updateDocumentFailed(groupReprController.documentId, message)
-				}
-			}
-		}
-	}
-	
-	Component {
 		id: groupEditorView
 		
 		Item {
@@ -565,8 +471,8 @@ ViewBase {
 				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
 				
-				documentManager: groupDocumentService
-				objectTypeId: "Group"
+				documentManager: groupsPage.apiClient ? groupsPage.apiClient.groupDocumentManager : null
+				objectTypeId: groupsPage.apiClient ? groupsPage.apiClient.groupObjectTypeId : ""
 				objectId: ""
 				createNew: true
 				headerVisible: false
@@ -601,8 +507,8 @@ ViewBase {
 				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
 				
-				documentManager: groupDocumentService
-				objectTypeId: "Group"
+				documentManager: groupsPage.apiClient ? groupsPage.apiClient.groupDocumentManager : null
+				objectTypeId: groupsPage.apiClient ? groupsPage.apiClient.groupObjectTypeId : ""
 				objectId: groupsPage.__editGroupId
 				createNew: false
 				headerVisible: false

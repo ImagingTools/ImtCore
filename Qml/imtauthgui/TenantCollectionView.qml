@@ -527,7 +527,7 @@ RemoteCollectionView {
 					// tenantId is sourced from the tenant being edited (not from the
 					// currently authorized tenant) so that GetSelectableItems queries
 					// (Roles/Groups/Users) are filtered for the correct tenant scope.
-					GqlBasedTenantMembershipApiClient {
+					GqlBasedTenantManagementApiClient {
 						id: tenantEditorApiClient
 						tenantId: tenantEditor.tenantData ? tenantEditor.tenantData.m_id : ""
 					}

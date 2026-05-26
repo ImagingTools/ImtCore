@@ -2,20 +2,27 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
+import imtgui 1.0
 import imtcontrols 1.0
+import imtdocgui 1.0
 import imtguigql 1.0
 import imtauthTenantMembershipsSdl 1.0
 import imtbaseImtCollectionSdl 1.0
+import imtbaseCollectionDocumentServiceSdl 1.0
 import imtauthRolesSdl 1.0
 import imtauthGroupsSdl 1.0
 import imtauthUsersSdl 1.0
+import imtauthRoleCollectionDocumentServiceSdl 1.0
+import imtauthGroupCollectionDocumentServiceSdl 1.0
+import imtauthUserCollectionDocumentServiceSdl 1.0
 
 /**
- * GqlBasedTenantMembershipApiClient
+ * GqlBasedTenantManagementApiClient
  *
- * GQL/SDL implementation of the abstract TenantMembershipApiClient contract.
- * This is the ONLY place that imports the membership / roles / groups / users SDL modules
- * and that owns GqlSdlRequestSender instances for these operations.
+ * GQL/SDL implementation of the abstract TenantManagementApiClient contract.
+ * This is the ONLY place that imports the membership / roles / groups / users SDL
+ * modules and owns GqlSdlRequestSender / GqlBasedCollectionDocumentService /
+ * GqlBasedCommandsController instances for these operations.
  *
  * Pages depend only on the abstract contract; the orchestrator (TenantEditor)
  * injects this concrete client.
@@ -34,8 +41,17 @@ QtObject {
 	property Component __userDataComp: Component { UserData {} }
 
 	// =========================================================================
-	// Abstract contract (must mirror TenantMembershipApiClient.qml)
+	// Abstract contract (must mirror TenantManagementApiClient.qml)
 	// =========================================================================
+
+	// --- Document services (concrete instances expose abstract managers) ---
+	property string roleObjectTypeId: "Role"
+	property string groupObjectTypeId: "Group"
+	property string userObjectTypeId: "User"
+
+	readonly property var roleDocumentManager: __roleDocumentService
+	readonly property var groupDocumentManager: __groupDocumentService
+	readonly property var userDocumentManager: __userDocumentService
 
 	signal invitationCreated()
 	signal invitationRevoked(string invitationId)
@@ -669,5 +685,320 @@ QtObject {
 	function fetchPermissions() {
 		__permissionsProvider.productId = root.tenantId
 		__permissionsProvider.updateModel()
+	}
+
+	// =========================================================================
+	// List data providers (Roles / Groups / invitable Users)
+	// =========================================================================
+
+	property Component roleListDataProviderComp: Component {
+		FilterableSelectGqlDataProvider {
+			collectionId: "Roles"
+			tenantId: root.tenantId
+			pageSize: 50
+		}
+	}
+
+	property Component groupListDataProviderComp: Component {
+		FilterableSelectGqlDataProvider {
+			collectionId: "Groups"
+			tenantId: root.tenantId
+			pageSize: 50
+		}
+	}
+
+	property Component invitableUsersListDataProviderComp: Component {
+		FilterableSelectGqlDataProvider {
+			collectionId: "UsersForInvitation"
+			tenantId: root.tenantId
+			multiSelect: true
+		}
+	}
+
+	// =========================================================================
+	// Document services (Roles / Groups / Users)
+	//
+	// These three services drive the SingleDocumentWorkspaceShellView in the
+	// Roles / Groups / Members pages. The pages themselves do NOT instantiate
+	// any GqlBasedCollectionDocumentService / SingleDocumentTypeRegistrar /
+	// DocumentRepresentationController — they only consume the abstract
+	// `roleDocumentManager` / `groupDocumentManager` / `userDocumentManager`
+	// properties.
+	// =========================================================================
+
+	property GqlBasedCollectionDocumentService __roleDocumentService: GqlBasedCollectionDocumentService {
+		collectionId: "Roles"
+	}
+
+	property GqlBasedCollectionDocumentService __groupDocumentService: GqlBasedCollectionDocumentService {
+		collectionId: "Groups"
+	}
+
+	property GqlBasedCollectionDocumentService __userDocumentService: GqlBasedCollectionDocumentService {
+		collectionId: "Users"
+	}
+
+	// --- Role editor + representation controller ---
+	property Component __roleEditorComp: Component {
+		RoleView {
+			productId: root.tenantId
+			permissionsModel: root.permissionsModel
+			commandsControllerComp: Component {
+				GqlBasedCommandsController {
+					typeId: root.roleObjectTypeId
+				}
+			}
+		}
+	}
+
+	property Component __roleControllerComp: Component {
+		DocumentRepresentationController {
+			id: roleReprController
+
+			representationModel: RoleData {}
+
+			function updateRepresentationFromDocument(){
+				startUpdateRepresentation(documentId, representationModel)
+
+				getRoleInput.m_id = documentId
+				getRoleInput.m_collectionId = "Roles"
+				getRoleRequest.send(getRoleInput)
+			}
+
+			function updateDocumentFromRepresentation(){
+				startUpdateDocument(documentId)
+
+				updateRoleInput.m_documentId = documentId
+				updateRoleInput.m_role = representationModel
+				updateRoleRequest.send(updateRoleInput)
+			}
+
+			// Flush any pending GUI state into the server right before save so
+			// the saveDocument operation persists the latest representation
+			// (not a stale server-side copy).
+			Connections {
+				target: root.__roleDocumentService
+				function onStartSaveDocument(documentId){
+					if (documentId === roleReprController.documentId)
+						roleReprController.updateDocumentFromRepresentation()
+				}
+			}
+
+			property DocumentId getRoleInput: DocumentId {}
+			property UpdateRoleFromRepresentationInput updateRoleInput: UpdateRoleFromRepresentationInput {}
+
+			property GqlSdlRequestSender getRoleRequest: GqlSdlRequestSender {
+				gqlCommandId: ImtauthRoleCollectionDocumentServiceSdlCommandIds.s_getRoleRepresentation
+				sdlObjectComp: Component {
+					RoleData {
+						onFinished: {
+							roleReprController.representationModel.copyFrom(this)
+							roleReprController.representationUpdated(
+								roleReprController.documentId,
+								roleReprController.representationModel)
+						}
+					}
+				}
+
+				function onError(message, type){
+					roleReprController.updateRepresentationFailed(roleReprController.documentId, message)
+				}
+			}
+
+			property GqlSdlRequestSender updateRoleRequest: GqlSdlRequestSender {
+				gqlCommandId: ImtauthRoleCollectionDocumentServiceSdlCommandIds.s_updateRoleFromRepresentation
+				requestType: 1
+				sdlObjectComp: Component {
+					DocumentOperationStatus {
+						onFinished: {
+							if (m_status === "Success"){
+								roleReprController.documentUpdated(roleReprController.documentId)
+							}
+						}
+					}
+				}
+
+				function onError(message, type){
+					roleReprController.updateDocumentFailed(roleReprController.documentId, message)
+				}
+			}
+		}
+	}
+
+	// --- Group editor + representation controller ---
+	property Component __groupEditorComp: Component {
+		UserGroupView {
+			productId: root.tenantId
+			commandsControllerComp: Component {
+				GqlBasedCommandsController {
+					typeId: root.groupObjectTypeId
+				}
+			}
+		}
+	}
+
+	property Component __groupControllerComp: Component {
+		DocumentRepresentationController {
+			id: groupReprController
+
+			representationModel: GroupData {}
+
+			function updateRepresentationFromDocument(){
+				startUpdateRepresentation(documentId, representationModel)
+
+				getGroupInput.m_id = documentId
+				getGroupInput.m_collectionId = "Groups"
+				getGroupRequest.send(getGroupInput)
+			}
+
+			function updateDocumentFromRepresentation(){
+				startUpdateDocument(documentId)
+
+				updateGroupInput.m_documentId = documentId
+				updateGroupInput.m_group = representationModel
+				updateGroupRequest.send(updateGroupInput)
+			}
+
+			Connections {
+				target: root.__groupDocumentService
+				function onStartSaveDocument(documentId){
+					if (documentId === groupReprController.documentId)
+						groupReprController.updateDocumentFromRepresentation()
+				}
+			}
+
+			property DocumentId getGroupInput: DocumentId {}
+			property UpdateGroupFromRepresentationInput updateGroupInput: UpdateGroupFromRepresentationInput {}
+
+			property GqlSdlRequestSender getGroupRequest: GqlSdlRequestSender {
+				gqlCommandId: ImtauthGroupCollectionDocumentServiceSdlCommandIds.s_getGroupRepresentation
+				sdlObjectComp: Component {
+					GroupData {
+						onFinished: {
+							groupReprController.representationModel.copyFrom(this)
+							groupReprController.representationUpdated(
+								groupReprController.documentId,
+								groupReprController.representationModel)
+						}
+					}
+				}
+
+				function onError(message, type){
+					groupReprController.updateRepresentationFailed(groupReprController.documentId, message)
+				}
+			}
+
+			property GqlSdlRequestSender updateGroupRequest: GqlSdlRequestSender {
+				gqlCommandId: ImtauthGroupCollectionDocumentServiceSdlCommandIds.s_updateGroupFromRepresentation
+				requestType: 1
+				sdlObjectComp: Component {
+					DocumentOperationStatus {
+						onFinished: {
+							if (m_status === "Success"){
+								groupReprController.documentUpdated(groupReprController.documentId)
+							}
+						}
+					}
+				}
+
+				function onError(message, type){
+					groupReprController.updateDocumentFailed(groupReprController.documentId, message)
+				}
+			}
+		}
+	}
+
+	// --- User editor + representation controller ---
+	property Component __userEditorComp: Component {
+		UserView {
+			productId: root.tenantId
+			commandsControllerComp: Component {
+				GqlBasedCommandsController {
+					typeId: root.userObjectTypeId
+				}
+			}
+		}
+	}
+
+	property Component __userControllerComp: Component {
+		DocumentRepresentationController {
+			id: userReprController
+
+			representationModel: UserData {}
+
+			function updateRepresentationFromDocument(){
+				startUpdateRepresentation(documentId, representationModel)
+
+				getUserInput.m_id = documentId
+				getUserInput.m_collectionId = "Users"
+				getUserRequest.send(getUserInput)
+			}
+
+			function updateDocumentFromRepresentation(){
+				startUpdateDocument(documentId)
+
+				updateUserInput.m_documentId = documentId
+				updateUserInput.m_user = representationModel
+				updateUserRequest.send(updateUserInput)
+			}
+
+			Connections {
+				target: root.__userDocumentService
+				function onStartSaveDocument(documentId){
+					if (documentId === userReprController.documentId)
+						userReprController.updateDocumentFromRepresentation()
+				}
+			}
+
+			property DocumentId getUserInput: DocumentId {}
+			property UpdateUserFromRepresentationInput updateUserInput: UpdateUserFromRepresentationInput {}
+
+			property GqlSdlRequestSender getUserRequest: GqlSdlRequestSender {
+				gqlCommandId: ImtauthUserCollectionDocumentServiceSdlCommandIds.s_getUserRepresentation
+				sdlObjectComp: Component {
+					UserData {
+						onFinished: {
+							userReprController.representationModel.copyFrom(this)
+							userReprController.representationUpdated(
+								userReprController.documentId,
+								userReprController.representationModel)
+						}
+					}
+				}
+
+				function onError(message, type){
+					userReprController.updateRepresentationFailed(userReprController.documentId, message)
+				}
+			}
+
+			property GqlSdlRequestSender updateUserRequest: GqlSdlRequestSender {
+				gqlCommandId: ImtauthUserCollectionDocumentServiceSdlCommandIds.s_updateUserFromRepresentation
+				requestType: 1
+				sdlObjectComp: Component {
+					DocumentOperationStatus {
+						onFinished: {
+							if (m_status === "Success"){
+								userReprController.documentUpdated(userReprController.documentId)
+							}
+						}
+					}
+				}
+
+				function onError(message, type){
+					userReprController.updateDocumentFailed(userReprController.documentId, message)
+				}
+			}
+		}
+	}
+
+	// Register each editor + controller pair with its document service so that
+	// pages only need to bind to the abstract `xDocumentManager` / `xObjectTypeId`.
+	Component.onCompleted: {
+		root.__roleDocumentService.registerDocumentViewData(
+			root.roleObjectTypeId, "Editor", root.__roleEditorComp, root.__roleControllerComp)
+		root.__groupDocumentService.registerDocumentViewData(
+			root.groupObjectTypeId, "Editor", root.__groupEditorComp, root.__groupControllerComp)
+		root.__userDocumentService.registerDocumentViewData(
+			root.userObjectTypeId, "Editor", root.__userEditorComp, root.__userControllerComp)
 	}
 }
