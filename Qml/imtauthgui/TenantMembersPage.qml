@@ -677,6 +677,7 @@ ViewBase {
 				objectTypeId: membersPage.apiClient ? membersPage.apiClient.userObjectTypeId : ""
 				objectId: ""
 				createNew: true
+				proposedSourceDocumentId: UuidGenerator.generateUUID()
 				headerVisible: false
 				documentNameInputEnabled: false
 				

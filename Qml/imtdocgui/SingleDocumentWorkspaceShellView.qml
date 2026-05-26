@@ -32,6 +32,14 @@ Item {
 	// MultiDocWorkspaceView navigation layer.
 	property bool createNew: false
 
+	// Optional id to forward to the document manager as
+	// `proposedSourceDocumentId` when a new document is created (i.e. when
+	// `objectId` is empty / `createNew` is true). The server inserts the new
+	// collection object with this id, which keeps the client-side
+	// representation `m_id` aligned with the persisted object id without an
+	// extra round-trip. Ignored when an existing document is opened.
+	property string proposedSourceDocumentId: ""
+
 	// Whether to render the standard loading overlay in the content area.
 	property bool showStandardLoading: true
 
@@ -138,10 +146,10 @@ Item {
 		_internal.lastErrorMessage = ""
 
 		if (typeof documentManager.openOrCreateByObjectId === "function"){
-			documentManager.openOrCreateByObjectId(objectTypeId, objectId)
+			documentManager.openOrCreateByObjectId(objectTypeId, objectId, proposedSourceDocumentId)
 		}
 		else if (objectId === ""){
-			documentManager.createDocument(objectTypeId)
+			documentManager.createDocument(objectTypeId, proposedSourceDocumentId)
 		}
 		else{
 			documentManager.openDocument(objectTypeId, objectId)

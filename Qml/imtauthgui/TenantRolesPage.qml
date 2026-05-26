@@ -478,6 +478,7 @@ ViewBase {
 				objectTypeId: rolesPage.apiClient ? rolesPage.apiClient.roleObjectTypeId : ""
 				objectId: ""
 				createNew: true
+				proposedSourceDocumentId: UuidGenerator.generateUUID()
 				headerVisible: false
 				documentNameInputEnabled: false
 				

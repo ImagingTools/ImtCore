@@ -475,6 +475,7 @@ ViewBase {
 				objectTypeId: groupsPage.apiClient ? groupsPage.apiClient.groupObjectTypeId : ""
 				objectId: ""
 				createNew: true
+				proposedSourceDocumentId: UuidGenerator.generateUUID()
 				headerVisible: false
 				documentNameInputEnabled: false
 				
