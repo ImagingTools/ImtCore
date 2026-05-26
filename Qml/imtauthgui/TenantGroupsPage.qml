@@ -6,7 +6,9 @@ import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
+import imtdocgui 1.0
 import imtauthgui 1.0
+import imtauthGroupsSdl 1.0
 
 /**
  * TenantGroupsPage
@@ -27,29 +29,41 @@ ViewBase {
 	function updateModel() {}
 	
 	property string __editGroupId: ""
-	property string __editGroupName: ""
-	property string __editGroupDescription: ""
 	property bool __isCreating: false
+	property var __activeShellView: null
 	
 	readonly property bool __canManage: groupsPage.stateManager ? groupsPage.stateManager.canManageMembers : false
+	readonly property string __productId: groupsPage.apiClient ? groupsPage.apiClient.tenantId : ""
 	
 	property var __selectionManager: null
 	property var __dataProvider: null
 	
+	// Single shared client to the server CollectionDocumentManager for Groups.
+	GqlBasedCollectionDocumentService {
+		id: groupDocumentService
+		collectionId: "Groups"
+	}
+	
+	SingleDocumentTypeRegistrar {
+		documentManager: groupDocumentService
+		views: [{
+			typeId: "Group",
+			viewTypeId: "Editor",
+			editorComp: groupEditorTypeComp,
+			controllerComp: groupDataControllerComp
+		}]
+	}
+	
+	Connections {
+		target: groupDocumentService
+		function onDocumentSaved(documentId) {
+			if (groupsPage.__dataProvider)
+				groupsPage.__dataProvider.fetch("")
+		}
+	}
+	
 	Connections {
 		target: groupsPage.apiClient
-		function onGroupDataReceived(data) {
-			if (groupsPage.stateManager)
-				groupsPage.stateManager.receivedGroupData = data
-		}
-		function onGroupCreated() {
-			if (groupsPage.__dataProvider)
-				groupsPage.__dataProvider.fetch("")
-		}
-		function onGroupUpdated(groupId) {
-			if (groupsPage.__dataProvider)
-				groupsPage.__dataProvider.fetch("")
-		}
 		function onGroupRemoved(groupId) {
 			if (groupsPage.__dataProvider)
 				groupsPage.__dataProvider.fetch("")
@@ -66,8 +80,14 @@ ViewBase {
 		initialItemTitleVisible: true
 		
 		onCloseClicked: {
-			groupsStackView.previous()
-			groupsStackViewHeader.popHeader()
+			if (groupsPage.__activeShellView
+					&& groupsPage.__activeShellView.state === "content") {
+				groupsPage.__activeShellView.closeDocument()
+			}
+			else {
+				groupsStackView.previous()
+				groupsStackViewHeader.popHeader()
+			}
 		}
 		
 		onHeaderItemClicked: {
@@ -182,34 +202,6 @@ ViewBase {
 		text: qsTr("Organize members into groups for easier permission management.")
 		font.pixelSize: Style.fontSizeM
 		color: Style.inactiveTextColor
-	}
-	
-	Rectangle {
-		id: groupsSaveBtn
-		visible: groupsPage.__canManage && groupsStackView.currentIndex > 0
-		anchors.right: groupsStackViewHeader.right
-		anchors.verticalCenter: groupsStackViewHeader.verticalCenter
-		width: groupsSaveBtnText.implicitWidth + Style.marginL * 2
-		height: Style.controlHeightS
-		radius: Style.radiusM
-		color: groupsSaveBtnMA.containsMouse ? Qt.darker(Style.linkColor, 1.1) : Style.linkColor
-		
-		Text {
-			id: groupsSaveBtnText
-			anchors.centerIn: parent
-			text: qsTr("Save")
-			font.pixelSize: Style.fontSizeM
-			font.bold: true
-			color: "white"
-		}
-		
-		MouseArea {
-			id: groupsSaveBtnMA
-			anchors.fill: parent
-			hoverEnabled: true
-			cursorShape: Qt.PointingHandCursor
-			onClicked: groupsPage.__saveCurrentEditor()
-		}
 	}
 	
 	StackView {
@@ -471,58 +463,124 @@ ViewBase {
 		}
 	}
 	
-	function __saveCurrentEditor() {
-		var page = groupsStackView.currentPage()
-		if (!page) return
-		var editorView = page.children[0]
-		if (!editorView || !editorView.updateModel) return
-		editorView.updateModel()
-		var groupData = editorView.model
-		if (groupsPage.__isCreating) {
-			if (groupsPage.apiClient)
-				groupsPage.apiClient.insertGroup("", groupData)
-		} else {
-			if (groupsPage.apiClient)
-				groupsPage.apiClient.setGroupData(
-							groupsPage.__editGroupId, groupData)
-		}
-		groupsStackViewHeader.popHeader()
-		groupsStackView.previous()
-		while (groupsStackView.count > 1)
-			groupsStackView.removePage(groupsStackView.count - 1)
-	}
-	
 	function __openEditGroup(itemId, itemName, itemDescription) {
 		groupsPage.__editGroupId = itemId
-		groupsPage.__editGroupName = itemName
-		groupsPage.__editGroupDescription = itemDescription
 		groupsPage.__isCreating = false
 		while (groupsStackView.count > 1)
 			groupsStackView.removePage(groupsStackView.count - 1)
 		groupsStackViewHeader.addHeader("edit_group", itemName || qsTr("Edit Group"))
 		groupsStackView.addPage(groupEditView)
 		groupsStackView.next()
-		if (groupsPage.apiClient)
-			groupsPage.apiClient.getGroupData(itemId)
+	}
+	
+	Component {
+		id: groupEditorTypeComp
+		
+		UserGroupView {
+			productId: groupsPage.__productId
+			commandsControllerComp: Component {
+				GqlBasedCommandsController {
+					typeId: "Group"
+				}
+			}
+		}
+	}
+	
+	Component {
+		id: groupDataControllerComp
+		
+		DocumentRepresentationController {
+			id: groupReprController
+			
+			representationModel: GroupData {}
+			
+			function updateRepresentationFromDocument(){
+				startUpdateRepresentation(documentId, representationModel)
+				
+				groupItemInput.InsertField(GroupItemInputTypeMetaInfo.s_id, documentId)
+				groupItemInput.InsertField(GroupItemInputTypeMetaInfo.s_productId, groupsPage.__productId)
+				getGroupRequest.send(groupItemInput)
+			}
+			
+			function updateDocumentFromRepresentation(){
+				startUpdateDocument(documentId)
+				
+				updateGroupInput.InsertField(GroupItemInputTypeMetaInfo.s_id, documentId)
+				updateGroupInput.InsertField(GroupItemInputTypeMetaInfo.s_productId, groupsPage.__productId)
+				updateGroupInput.InsertField("item", representationModel)
+				updateGroupRequest.send(updateGroupInput)
+			}
+			
+			property var groupItemInput: Gql.GqlObject("input")
+			property var updateGroupInput: Gql.GqlObject("input")
+			
+			property GqlSdlRequestSender getGroupRequest: GqlSdlRequestSender {
+				gqlCommandId: ImtauthGroupsSdlCommandIds.s_groupItem
+				sdlObjectComp: Component {
+					GroupData {
+						onFinished: {
+							groupReprController.representationModel.copyFrom(this)
+							groupReprController.representationUpdated(
+								groupReprController.documentId,
+								groupReprController.representationModel)
+						}
+					}
+				}
+				
+				function onError(message, type){
+					groupReprController.updateRepresentationFailed(groupReprController.documentId, message)
+				}
+			}
+			
+			property GqlSdlRequestSender updateGroupRequest: GqlSdlRequestSender {
+				gqlCommandId: ImtauthGroupsSdlCommandIds.s_groupUpdate
+				requestType: 1
+				sdlObjectComp: Component {
+					GroupData {
+						onFinished: {
+							groupReprController.documentUpdated(groupReprController.documentId)
+						}
+					}
+				}
+				
+				function onError(message, type){
+					groupReprController.updateDocumentFailed(groupReprController.documentId, message)
+				}
+			}
+		}
 	}
 	
 	Component {
 		id: groupEditorView
 		
 		Item {
-			UserGroupView {
-				id: createGroupView
+			SingleDocumentWorkspaceShellView {
+				id: createGroupShell
 				anchors.top: parent.top
 				anchors.bottom: parent.bottom
 				anchors.left: parent.left
 				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
-				commandsPanelVisible: false
-				productId: groupsPage.apiClient ? groupsPage.apiClient.tenantId : ""
+				
+				documentManager: groupDocumentService
+				objectTypeId: "Group"
+				objectId: ""
+				createNew: true
+				headerVisible: false
 				
 				Component.onCompleted: {
-					createGroupView.model = groupsPage.apiClient ? groupsPage.apiClient.createGroupData() : null
-					createGroupView.updateGui()
+					groupsPage.__activeShellView = createGroupShell
+				}
+				Component.onDestruction: {
+					if (groupsPage && groupsPage.__activeShellView === createGroupShell)
+						groupsPage.__activeShellView = null
+				}
+				
+				onClosed: {
+					groupsStackViewHeader.popHeader()
+					groupsStackView.previous()
+					while (groupsStackView.count > 1)
+						groupsStackView.removePage(groupsStackView.count - 1)
 				}
 			}
 		}
@@ -532,47 +590,33 @@ ViewBase {
 		id: groupEditView
 		
 		Item {
-			UserGroupView {
-				id: editGroupView
+			SingleDocumentWorkspaceShellView {
+				id: editGroupShell
 				anchors.top: parent.top
 				anchors.bottom: parent.bottom
 				anchors.left: parent.left
 				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
-				commandsPanelVisible: false
-				productId: groupsPage.apiClient ? groupsPage.apiClient.tenantId : ""
+				
+				documentManager: groupDocumentService
+				objectTypeId: "Group"
+				objectId: groupsPage.__editGroupId
+				createNew: false
+				headerVisible: false
 				
 				Component.onCompleted: {
-					var groupData = groupsPage.apiClient ? groupsPage.apiClient.createGroupData() : null
-					if (groupData) {
-						groupData.m_id = groupsPage.__editGroupId
-						groupData.m_name = groupsPage.__editGroupName
-						groupData.m_description = groupsPage.__editGroupDescription
-					}
-					editGroupView.model = groupData
-					editGroupView.updateGui()
+					groupsPage.__activeShellView = editGroupShell
+				}
+				Component.onDestruction: {
+					if (groupsPage && groupsPage.__activeShellView === editGroupShell)
+						groupsPage.__activeShellView = null
 				}
 				
-				Connections {
-					target: groupsPage.stateManager
-					function onReceivedGroupDataChanged() {
-						if (groupsPage.stateManager
-								&& groupsPage.stateManager.receivedGroupData
-								&& groupsPage.__editGroupId) {
-							var received = groupsPage.stateManager.receivedGroupData
-							var groupData = groupsPage.apiClient ? groupsPage.apiClient.createGroupData() : null
-							if (groupData) {
-								groupData.m_id = groupsPage.__editGroupId
-								groupData.m_name = received.name || groupsPage.__editGroupName
-								groupData.m_description = received.description || groupsPage.__editGroupDescription
-								groupData.m_parentGroups = received.parentGroups || []
-								groupData.m_users = received.users || []
-								groupData.m_roles = received.roles || []
-							}
-							editGroupView.model = groupData
-							editGroupView.updateGui()
-						}
-					}
+				onClosed: {
+					groupsStackViewHeader.popHeader()
+					groupsStackView.previous()
+					while (groupsStackView.count > 1)
+						groupsStackView.removePage(groupsStackView.count - 1)
 				}
 			}
 		}

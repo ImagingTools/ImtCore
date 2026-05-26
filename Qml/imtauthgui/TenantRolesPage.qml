@@ -6,7 +6,9 @@ import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
+import imtdocgui 1.0
 import imtauthgui 1.0
+import imtauthRolesSdl 1.0
 
 /**
  * TenantRolesPage
@@ -32,29 +34,43 @@ ViewBase {
 	}
 	
 	property string __editRoleId: ""
-	property string __editRoleName: ""
-	property string __editRoleDescription: ""
 	property bool __isCreating: false
+	// Shell view of the currently visible single-document editor page (if any).
+	property var __activeShellView: null
 	
 	readonly property bool __canManage: rolesPage.stateManager ? rolesPage.stateManager.canManageMembers : false
+	readonly property string __productId: rolesPage.apiClient ? rolesPage.apiClient.tenantId : ""
 	
 	property var __selectionManager: null
 	property var __dataProvider: null
 	
+	// Single shared client to the server CollectionDocumentManager for Roles.
+	GqlBasedCollectionDocumentService {
+		id: roleDocumentService
+		collectionId: "Roles"
+	}
+	
+	// Register the RoleView editor + its gql data controller once.
+	SingleDocumentTypeRegistrar {
+		documentManager: roleDocumentService
+		views: [{
+			typeId: "Role",
+			viewTypeId: "Editor",
+			editorComp: roleEditorTypeComp,
+			controllerComp: roleDataControllerComp
+		}]
+	}
+	
+	Connections {
+		target: roleDocumentService
+		function onDocumentSaved(documentId) {
+			if (rolesPage.__dataProvider)
+				rolesPage.__dataProvider.fetch("")
+		}
+	}
+	
 	Connections {
 		target: rolesPage.apiClient
-		function onRoleDataReceived(data) {
-			if (rolesPage.stateManager)
-				rolesPage.stateManager.receivedRoleData = data
-		}
-		function onRoleCreated() {
-			if (rolesPage.__dataProvider)
-				rolesPage.__dataProvider.fetch("")
-		}
-		function onRoleUpdated(roleId) {
-			if (rolesPage.__dataProvider)
-				rolesPage.__dataProvider.fetch("")
-		}
 		function onRoleRemoved(roleId) {
 			if (rolesPage.__dataProvider)
 				rolesPage.__dataProvider.fetch("")
@@ -71,8 +87,16 @@ ViewBase {
 		initialItemTitleVisible: true
 		
 		onCloseClicked: {
-			rolesStackView.previous()
-			rolesStackViewHeader.popHeader()
+			if (rolesPage.__activeShellView
+					&& rolesPage.__activeShellView.state === "content") {
+				// Defer the pop to the shell's onClosed handler so dirty-check
+				// can run and (optionally) save before closing.
+				rolesPage.__activeShellView.closeDocument()
+			}
+			else {
+				rolesStackView.previous()
+				rolesStackViewHeader.popHeader()
+			}
 		}
 		
 		onHeaderItemClicked: {
@@ -188,34 +212,6 @@ ViewBase {
 		text: qsTr("Manage tenant roles and assign permissions to team members.")
 		font.pixelSize: Style.fontSizeM
 		color: Style.inactiveTextColor
-	}
-	
-	Rectangle {
-		id: rolesSaveBtn
-		visible: rolesPage.__canManage && rolesStackView.currentIndex > 0
-		anchors.right: rolesStackViewHeader.right
-		anchors.verticalCenter: rolesStackViewHeader.verticalCenter
-		width: rolesSaveBtnText.implicitWidth + Style.marginL * 2
-		height: Style.controlHeightS
-		radius: Style.radiusM
-		color: rolesSaveBtnMA.containsMouse ? Qt.darker(Style.linkColor, 1.1) : Style.linkColor
-		
-		Text {
-			id: rolesSaveBtnText
-			anchors.centerIn: parent
-			text: qsTr("Save")
-			font.pixelSize: Style.fontSizeM
-			font.bold: true
-			color: "white"
-		}
-		
-		MouseArea {
-			id: rolesSaveBtnMA
-			anchors.fill: parent
-			hoverEnabled: true
-			cursorShape: Qt.PointingHandCursor
-			onClicked: rolesPage.__saveCurrentEditor()
-		}
 	}
 	
 	StackView {
@@ -478,65 +474,125 @@ ViewBase {
 		}
 	}
 	
-	function __saveCurrentEditor() {
-		var page = rolesStackView.currentPage()
-		if (!page) return
-		// Editor is nested: page > Item wrapper > RoleView
-		var wrapper = page.children[0]
-		if (!wrapper) return
-		var editorView = wrapper.children[0]
-		if (!editorView || !editorView.updateModel) return
-		editorView.updateModel()
-		var roleData = editorView.model
-		if (rolesPage.__isCreating) {
-			if (rolesPage.apiClient)
-				rolesPage.apiClient.insertRole("", roleData)
-		} else {
-			if (rolesPage.apiClient)
-				rolesPage.apiClient.setRoleData(rolesPage.__editRoleId, roleData)
-		}
-		rolesStackViewHeader.popHeader()
-		rolesStackView.previous()
-		// Remove editor pages to clean up
-		while (rolesStackView.count > 1)
-			rolesStackView.removePage(rolesStackView.count - 1)
-	}
-	
 	function __openEditRole(itemId, itemName, itemDescription) {
 		rolesPage.__editRoleId = itemId
-		rolesPage.__editRoleName = itemName
-		rolesPage.__editRoleDescription = itemDescription
 		rolesPage.__isCreating = false
 		while (rolesStackView.count > 1)
 			rolesStackView.removePage(rolesStackView.count - 1)
 		rolesStackViewHeader.addHeader("edit_role", itemName || qsTr("Edit Role"))
 		rolesStackView.addPage(roleEditView)
 		rolesStackView.next()
-		if (rolesPage.apiClient)
-			rolesPage.apiClient.getRoleData(itemId)
+	}
+	
+	Component {
+		id: roleEditorTypeComp
+		
+		RoleView {
+			productId: rolesPage.__productId
+			permissionsModel: rolesPage.apiClient ? rolesPage.apiClient.permissionsModel : null
+			commandsControllerComp: Component {
+				GqlBasedCommandsController {
+					typeId: "Role"
+				}
+			}
+		}
+	}
+	
+	Component {
+		id: roleDataControllerComp
+		
+		DocumentRepresentationController {
+			id: roleReprController
+			
+			representationModel: RoleData {}
+			
+			function updateRepresentationFromDocument(){
+				startUpdateRepresentation(documentId, representationModel)
+				
+				roleItemInput.InsertField(RoleItemInputTypeMetaInfo.s_id, documentId)
+				roleItemInput.InsertField(RoleItemInputTypeMetaInfo.s_productId, rolesPage.__productId)
+				getRoleRequest.send(roleItemInput)
+			}
+			
+			function updateDocumentFromRepresentation(){
+				startUpdateDocument(documentId)
+				
+				updateRoleInput.InsertField(RoleItemInputTypeMetaInfo.s_id, documentId)
+				updateRoleInput.InsertField(RoleItemInputTypeMetaInfo.s_productId, rolesPage.__productId)
+				updateRoleInput.InsertField("item", representationModel)
+				updateRoleRequest.send(updateRoleInput)
+			}
+			
+			property var roleItemInput: Gql.GqlObject("input")
+			property var updateRoleInput: Gql.GqlObject("input")
+			
+			property GqlSdlRequestSender getRoleRequest: GqlSdlRequestSender {
+				gqlCommandId: ImtauthRolesSdlCommandIds.s_roleItem
+				sdlObjectComp: Component {
+					RoleData {
+						onFinished: {
+							roleReprController.representationModel.copyFrom(this)
+							roleReprController.representationUpdated(
+								roleReprController.documentId,
+								roleReprController.representationModel)
+						}
+					}
+				}
+				
+				function onError(message, type){
+					roleReprController.updateRepresentationFailed(roleReprController.documentId, message)
+				}
+			}
+			
+			property GqlSdlRequestSender updateRoleRequest: GqlSdlRequestSender {
+				gqlCommandId: ImtauthRolesSdlCommandIds.s_roleUpdate
+				requestType: 1
+				sdlObjectComp: Component {
+					RoleData {
+						onFinished: {
+							roleReprController.documentUpdated(roleReprController.documentId)
+						}
+					}
+				}
+				
+				function onError(message, type){
+					roleReprController.updateDocumentFailed(roleReprController.documentId, message)
+				}
+			}
+		}
 	}
 	
 	Component {
 		id: roleEditorView
 		
 		Item {
-			Item {
+			SingleDocumentWorkspaceShellView {
+				id: createRoleShell
 				anchors.top: parent.top
 				anchors.bottom: parent.bottom
 				anchors.left: parent.left
 				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
 				
-				RoleView {
-					id: createRoleView
-					commandsPanelVisible: false
-					productId: rolesPage.apiClient ? rolesPage.apiClient.tenantId : ""
-					permissionsModel: rolesPage.apiClient ? rolesPage.apiClient.permissionsModel : null
-					
-					Component.onCompleted: {
-						createRoleView.model = rolesPage.apiClient ? rolesPage.apiClient.createRoleData() : null
-						createRoleView.updateGui()
-					}
+				documentManager: roleDocumentService
+				objectTypeId: "Role"
+				objectId: ""
+				createNew: true
+				headerVisible: false
+				
+				Component.onCompleted: {
+					rolesPage.__activeShellView = createRoleShell
+				}
+				Component.onDestruction: {
+					if (rolesPage && rolesPage.__activeShellView === createRoleShell)
+						rolesPage.__activeShellView = null
+				}
+				
+				onClosed: {
+					rolesStackViewHeader.popHeader()
+					rolesStackView.previous()
+					while (rolesStackView.count > 1)
+						rolesStackView.removePage(rolesStackView.count - 1)
 				}
 			}
 		}
@@ -546,53 +602,33 @@ ViewBase {
 		id: roleEditView
 		
 		Item {
-			Item {
+			SingleDocumentWorkspaceShellView {
+				id: editRoleShell
 				anchors.top: parent.top
 				anchors.bottom: parent.bottom
 				anchors.left: parent.left
 				anchors.leftMargin: Math.max((parent.width - Math.min(parent.width - Style.marginXL * 2, 1000)) / 2, Style.marginXL)
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
 				
-				RoleView {
-					id: editRoleView
-					commandsPanelVisible: false
-					productId: rolesPage.apiClient ? rolesPage.apiClient.tenantId : ""
-					permissionsModel: rolesPage.apiClient ? rolesPage.apiClient.permissionsModel : null
-					
-					Component.onCompleted: {
-						var roleData = rolesPage.apiClient ? rolesPage.apiClient.createRoleData() : null
-						if (roleData) {
-							roleData.m_id = rolesPage.__editRoleId
-							roleData.m_name = rolesPage.__editRoleName
-							roleData.m_description = rolesPage.__editRoleDescription
-						}
-						editRoleView.model = roleData
-						editRoleView.updateGui()
-					}
-					
-					Connections {
-						target: rolesPage.stateManager
-						function onReceivedRoleDataChanged() {
-							if (rolesPage.stateManager
-									&& rolesPage.stateManager.receivedRoleData
-									&& rolesPage.__editRoleId) {
-								var received = rolesPage.stateManager.receivedRoleData
-								var roleData = rolesPage.apiClient ? rolesPage.apiClient.createRoleData() : null
-								if (roleData) {
-									roleData.m_id = rolesPage.__editRoleId
-									roleData.m_name = received.name || rolesPage.__editRoleName
-									roleData.m_roleId = received.roleId || ""
-									roleData.m_description = received.description || rolesPage.__editRoleDescription
-									roleData.m_parentRoles = received.parentRoles || []
-									roleData.m_permissions = received.permissions || ""
-									roleData.m_isDefault = received.isDefault || false
-									roleData.m_isGuest = received.isGuest || false
-								}
-								editRoleView.model = roleData
-								editRoleView.updateGui()
-							}
-						}
-					}
+				documentManager: roleDocumentService
+				objectTypeId: "Role"
+				objectId: rolesPage.__editRoleId
+				createNew: false
+				headerVisible: false
+				
+				Component.onCompleted: {
+					rolesPage.__activeShellView = editRoleShell
+				}
+				Component.onDestruction: {
+					if (rolesPage && rolesPage.__activeShellView === editRoleShell)
+						rolesPage.__activeShellView = null
+				}
+				
+				onClosed: {
+					rolesStackViewHeader.popHeader()
+					rolesStackView.previous()
+					while (rolesStackView.count > 1)
+						rolesStackView.removePage(rolesStackView.count - 1)
 				}
 			}
 		}

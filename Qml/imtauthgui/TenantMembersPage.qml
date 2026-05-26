@@ -7,7 +7,9 @@ import imtgui 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
+import imtdocgui 1.0
 import imtauthgui 1.0
+import imtauthUsersSdl 1.0
 
 /**
  * TenantMembersPage
@@ -72,8 +74,14 @@ ViewBase {
 		initialItemTitleVisible: true
 		
 		onCloseClicked: {
-			membersStackView.previous()
-			membersStackViewHeader.popHeader()
+			if (membersPage.__activeShellView
+					&& membersPage.__activeShellView.state === "content") {
+				membersPage.__activeShellView.closeDocument()
+			}
+			else {
+				membersStackView.previous()
+				membersStackViewHeader.popHeader()
+			}
 		}
 		
 		onHeaderItemClicked: {
@@ -213,34 +221,6 @@ ViewBase {
 		text: qsTr("Manage tenant members. Users created here automatically become members.")
 		font.pixelSize: Style.fontSizeM
 		color: Style.inactiveTextColor
-	}
-	
-	Rectangle {
-		id: membersSaveBtn
-		visible: membersPage.__canManage && membersStackView.currentIndex > 0
-		anchors.right: membersStackViewHeader.right
-		anchors.verticalCenter: membersStackViewHeader.verticalCenter
-		width: membersSaveBtnText.implicitWidth + Style.marginL * 2
-		height: Style.controlHeightS
-		radius: Style.radiusM
-		color: membersSaveBtnMA.containsMouse ? Qt.darker(Style.linkColor, 1.1) : Style.linkColor
-		
-		Text {
-			id: membersSaveBtnText
-			anchors.centerIn: parent
-			text: qsTr("Save")
-			font.pixelSize: Style.fontSizeM
-			font.bold: true
-			color: "white"
-		}
-		
-		MouseArea {
-			id: membersSaveBtnMA
-			anchors.fill: parent
-			hoverEnabled: true
-			cursorShape: Qt.PointingHandCursor
-			onClicked: membersPage.__saveCurrentEditor()
-		}
 	}
 	
 	StackView {
