@@ -52,7 +52,7 @@ TenantSimpleCollectionPage {
 		var filterText = membersPage.filterText || ""
 		var lowerFilter = filterText.toLowerCase()
 
-		function matches(name) {
+		let matches = function(name) {
 			if (!lowerFilter)
 				return true
 			return (name || "").toLowerCase().indexOf(lowerFilter) >= 0

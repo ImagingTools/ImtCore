@@ -31,9 +31,6 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
-	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-
 	// reimplemented (CGraphQlHandlerCompBase)
 	virtual sdl::imtbase::CollectionDocumentService::CDocumentInfo OnCreateNewDocument(
 		const sdl::imtbase::CollectionDocumentService::CCreateNewDocumentGqlRequest& createNewDocumentRequest,

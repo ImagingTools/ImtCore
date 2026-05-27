@@ -12,13 +12,6 @@ namespace imtauthgql
 namespace CDM = sdl::imtbase::CollectionDocumentService;
 
 
-bool CTenantCollectionDocumentServiceControllerComp::CheckPermissions(
-		const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
-{
-	return BaseClass::CheckPermissions(gqlRequest, errorMessage);
-}
-
-
 CDM::CDocumentInfo CTenantCollectionDocumentServiceControllerComp::OnCreateNewDocument(
 		const CDM::CCreateNewDocumentGqlRequest& createNewDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
