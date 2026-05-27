@@ -513,7 +513,8 @@ void CTenantNotificationPublisherComp::PublishNotification(
 	PublishDataFiltered(commandId, data, [targetUserId](const imtgql::CGqlRequest& gqlRequest) -> bool {
 		const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
 		if (contextPtr != nullptr){
-			return contextPtr->GetUserId() == targetUserId;
+			const QByteArray contextUserId = contextPtr->GetUserId();
+			return contextUserId == targetUserId;
 		}
 		return false;
 	});
