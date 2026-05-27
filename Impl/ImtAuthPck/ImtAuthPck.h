@@ -147,7 +147,7 @@ typedef imtauth::CPersonalAccessTokenMetaInfoCreatorComp PersonalAccessTokenMeta
 typedef icomp::TModelCompWrap<imtauth::CUserRecentActionComp> UserRecentAction;
 typedef icomp::TModelCompWrap<imtauth::CTenantInfoComp> TenantInfo;
 typedef imtauth::CTenantMetaInfoCreatorComp TenantMetaInfoCreator;
-typedef imtauth::CTenantManagerComp TenantManager;
+typedef icomp::TModelCompWrap<imtauth::CTenantManagerComp> TenantManager;
 typedef icomp::TModelCompWrap<imtauth::CTenantMembershipComp> TenantMembershipInfo;
 typedef icomp::TModelCompWrap<imtauth::CTenantMembershipManagerComp> TenantMembershipManager;
 typedef icomp::TModelCompWrap<imtauth::CTenantInvitationComp> TenantInvitationInfo;

@@ -6,6 +6,7 @@ import imtgui 1.0
 import imtcontrols 1.0
 import imtcolgui 1.0
 import imtdocgui 1.0
+import imtauthgui 1.0
 import imtauthTenantsSdl 1.0
 
 /**
@@ -13,12 +14,12 @@ import imtauthTenantsSdl 1.0
  *
  * Thin orchestrator that composes:
  *   - TenantEditorStateManager  — local UI state + pure logic
- *   - an injected `apiClient` (abstract TenantMembershipApiClient) — transport
+ *   - an injected `apiClient` (abstract TenantManagementApiClient) — transport
  *   - the page components (General / Members / Roles / Groups / Permissions)
  *
  * The editor itself does NOT depend on any concrete transport (no GQL/SDL transport
- * imports). The concrete client (e.g. GqlBasedTenantMembershipApiClient from
- * imtguigql) is supplied by the embedding view (e.g. TenantCollectionView).
+ * imports). The concrete client (e.g. GqlBasedTenantManagementApiClient from
+ * imtauthgui) is supplied by the embedding view (e.g. TenantCollectionView).
  *
  * SDL imports here are limited to imtauthTenantsSdl (TenantData type of the model).
  */
@@ -34,7 +35,7 @@ DocumentViewBase {
 	property TenantData tenantData: model
 
 	/**
-	 * Injected transport implementing the TenantMembershipApiClient contract.
+	 * Injected transport implementing the TenantManagementApiClient contract.
 	 * Must be set by the embedding view before the editor becomes active.
 	 */
 	property var apiClient: null
@@ -168,6 +169,41 @@ DocumentViewBase {
 				return
 			if (notification.tenantId === container.tenantData.m_id) {
 				PopupManager.addInfoMessage(qsTr("Ownership transferred"), true)
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
+			}
+		}
+	}
+
+	// --- Listen to globally-broadcast tenant membership events so the editor
+	// reloads even when the change was performed by the local user via another
+	// view (e.g. accepting an invitation in TenantCollectionView) — the server
+	// does not re-deliver a subscription notification to the actor itself.
+	Connections {
+		target: AuthorizationController
+
+		function onTenantInvitationAccepted(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			if (notification && notification.tenantId === container.tenantData.m_id) {
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
+			}
+		}
+		function onTenantInvitationRejected(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			if (notification && notification.tenantId === container.tenantData.m_id) {
+				if (notification.membershipId)
+					stateManager_.removePendingInvitation(notification.membershipId)
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
+			}
+		}
+		function onTenantOwnershipTransferred(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			if (notification && notification.tenantId === container.tenantData.m_id) {
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}

@@ -3,18 +3,46 @@ import QtQuick 2.12
 import Acf 1.0
 
 /**
- * TenantMembershipApiClient
+ * TenantManagementApiClient
  *
- * Abstract contract (interface) for tenant membership / roles / groups operations.
+ * Abstract contract (interface) for tenant management operations:
+ *   - tenant membership / invitations / ownership
+ *   - roles / groups / users CRUD
+ *   - per-type document services (open / save / edit) and editor view registration
+ *
  * Pages depend on this contract — not on any concrete transport (e.g. GQL/SDL).
  *
- * A concrete implementation (e.g. GqlBasedTenantMembershipApiClient) provides the
- * actual transport and emits the signals declared here.
+ * A concrete implementation (e.g. GqlBasedTenantManagementApiClient) provides the
+ * actual transport and the wired-up document services / editor components.
  *
  * This file MUST NOT import imtguigql or any SDL module.
  */
 QtObject {
 	id: root
+
+	property string tenantId: ""
+
+	// --- Document services for the per-type document workflow ---
+	// Concrete implementations expose DocumentServiceBase-compatible managers and
+	// the typeId / Component pieces that pages need to drive the
+	// SingleDocumentWorkspaceShellView. Pages MUST NOT instantiate any concrete
+	// service or registrar themselves.
+	property var roleDocumentManager: null
+	property var groupDocumentManager: null
+	property var userDocumentManager: null
+
+	property string roleObjectTypeId: "Role"
+	property string groupObjectTypeId: "Group"
+	property string userObjectTypeId: "User"
+
+	// --- Data provider components for list views ---
+	// Concrete implementations return a Component that, when instantiated, yields
+	// a data provider exposing { items, fetch(filterText) } and emitting changes
+	// on `items`. Pages instantiate these via a Loader so they never depend on
+	// the concrete transport types.
+	property Component roleListDataProviderComp: null
+	property Component groupListDataProviderComp: null
+	property Component invitableUsersListDataProviderComp: null
 
 	// --- Invitations ---
 	signal invitationCreated()
@@ -48,6 +76,7 @@ QtObject {
 	signal requestFailed(string message)
 
 	// --- Real-time membership subscription notifications ---
+	signal subscriptionInvitationReceived(var notification)
 	signal subscriptionInvitationAccepted(var notification)
 	signal subscriptionInvitationRejected(var notification)
 	signal subscriptionOwnershipTransferred(var notification)

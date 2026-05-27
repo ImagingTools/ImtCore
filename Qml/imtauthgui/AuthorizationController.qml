@@ -30,6 +30,15 @@ QtObject {
 	signal registerSuccessfully();
 	signal registerFailed();
 
+	// --- Tenant membership lifecycle events ---
+	// Emitted by membership-aware views (e.g. TenantCollectionView) so other
+	// components anywhere in the app (e.g. an open TenantEditor) can react and
+	// reload without being directly coupled to the originating view.
+	signal tenantInvitationReceived(var notification);
+	signal tenantInvitationAccepted(var notification);
+	signal tenantInvitationRejected(var notification);
+	signal tenantOwnershipTransferred(var notification);
+
 	// Properties to store remember me state and credentials
 	property bool rememberMe: false
 	property string lastUser: ""
