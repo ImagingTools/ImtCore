@@ -26,6 +26,7 @@
 #include <imtbase/imtbase.h>
 #include <imtbase/ICollectionFilter.h>
 #include <imtdb/CComplexCollectionFilterConverter.h>
+#include <imtdb/imtdb.h>
 #include <imtcol/IObjectTypeIdFilter.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtauth/ITenantFilterParam.h>

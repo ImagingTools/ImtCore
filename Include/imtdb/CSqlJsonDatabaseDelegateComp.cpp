@@ -18,6 +18,7 @@
 #include <imtbase/imtbase.h>
 #include <imtbase/CObjectCollection.h>
 #include <imtcol/IDocumentCollectionFilter.h>
+#include <imtdb/imtdb.h>
 
 
 namespace imtdb

@@ -16,6 +16,7 @@
 // ImtCore includes
 #include <imtbase/imtbase.h>
 #include <imtbase/ICollectionFilter.h>
+#include <imtdb/imtdb.h>
 
 namespace imtdb
 {

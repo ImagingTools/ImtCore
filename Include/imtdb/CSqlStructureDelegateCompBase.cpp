@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtdb/CSqlDatabaseCollectionStructureIterator.h>
+#include <imtdb/imtdb.h>
 
 
 namespace imtdb
