@@ -50,7 +50,6 @@ TenantSimpleCollectionPage {
 	function __rebuildCombinedModel() {
 		var result = []
 		var filterText = ""  // filter is applied via refresh
-		var creatorId = (membersPage.model && membersPage.model.m_creatorId) ? membersPage.model.m_creatorId : ""
 
 		var invitations = membersPage.stateManager ? membersPage.stateManager.pendingInvitations : []
 		for (var j = 0; j < invitations.length; j++) {
@@ -65,10 +64,6 @@ TenantSimpleCollectionPage {
 
 		var members = membersPage.stateManager ? membersPage.stateManager.pendingMembers : []
 		for (var i = 0; i < members.length; i++) {
-			// Creator is already filtered on the server side; this is a
-			// client-side safety check in case old data is cached.
-			if (creatorId && members[i].id === creatorId && members[i].role === "Creator")
-				continue
 			result.push({
 				id: members[i].id,
 				title: members[i].name || members[i].id || "",
