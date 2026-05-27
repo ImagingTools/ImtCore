@@ -97,7 +97,7 @@ QtObject {
 		console.warn("openDocument() should be implemented in a subclass")
 	}
 
-	function createDocument(typeId){
+	function createDocument(typeId, proposedSourceDocumentId){
 		console.warn("createDocument() should be implemented in a subclass")
 	}
 

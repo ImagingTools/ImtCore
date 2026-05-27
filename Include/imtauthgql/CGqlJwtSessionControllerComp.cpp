@@ -251,9 +251,11 @@ sdl::imtauth::Sessions::CSelectTenantPayload CGqlJwtSessionControllerComp::OnSel
 	}
 
 	QByteArray oldSessionId;
+	QByteArray oldToken;
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
-		oldSessionId = m_jwtSessionControllerCompPtr->GetSessionFromJwt(gqlContextPtr->GetToken());
+		oldToken = gqlContextPtr->GetToken();
+		oldSessionId = m_jwtSessionControllerCompPtr->GetSessionFromJwt(oldToken);
 	}
 
 	imtauth::IJwtSessionController::UserSession userSession;
@@ -268,6 +270,12 @@ sdl::imtauth::Sessions::CSelectTenantPayload CGqlJwtSessionControllerComp::OnSel
 	QByteArray newSessionId = m_jwtSessionControllerCompPtr->GetSessionFromJwt(userSession.accessToken);
 	if (!oldSessionId.isEmpty() && oldSessionId != newSessionId){
 		m_jwtSessionControllerCompPtr->RemoveSession(oldSessionId);
+	}
+
+	// Invalidate any cached state for the old token so that requests still
+	// referencing it do not resolve to stale (e.g. empty-tenant) data.
+	if (!oldToken.isEmpty() && oldToken != userSession.accessToken){
+		m_jwtSessionControllerCompPtr->InvalidateToken(oldToken);
 	}
 
 	return response;

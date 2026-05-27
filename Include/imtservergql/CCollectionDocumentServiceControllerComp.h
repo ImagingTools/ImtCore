@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/IOperationContext.h>
 #include <imtdoc/IDocumentService.h>
 #include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService.h>
 #include <imtbasesdl/SDL/1.0/CPP/UndoManager.h>
@@ -81,6 +82,7 @@ protected:
 private:
 	int GetObjectFactoryIndex(const QByteArray& typeId) const;
 	QByteArray GetUserId(const ::imtgql::CGqlRequest& gqlRequest) const;
+	imtbase::IOperationContext* CreateOperationContextFromGqlRequest(const ::imtgql::CGqlRequest& gqlRequest) const;
 
 private:
 	I_REF(imtdoc::IDocumentService, m_documentManagerCompPtr);

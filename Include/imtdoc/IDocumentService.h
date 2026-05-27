@@ -17,6 +17,9 @@
 #include <imtdoc/IDocumentServiceEventHandler.h>
 
 
+namespace imtbase { class IOperationContext; }
+
+
 /**
 	\defgroup imtdoc imtdoc
 	\brief Server-side multi-user document management.
@@ -113,6 +116,7 @@ public:
 		QUrl url;
 		QByteArray documentId;
 		QString documentName;
+		const imtbase::IOperationContext* operationContextPtr = nullptr; ///< Optional operation context for tenant/owner propagation during save.
 	};
 
 	/**

@@ -257,14 +257,29 @@ I_EXPORT_COMPONENT(
 			"Tenant Membership Manager Controller");
 
 I_EXPORT_COMPONENT(
-			TenantMembershipPublisher,
-			"Publisher for tenant membership invitation/response notifications via WebSocket",
-			"Tenant Membership Publisher");
+			TenantNotificationPublisher,
+			"Publisher for tenant notifications (invitations, membership changes, ownership transfers) via WebSocket",
+			"Tenant Notification Publisher");
 
 I_EXPORT_COMPONENT(
 			RemoteTenantCollectionDocumentService,
 			"Remote tenant collection document service with product permissions enrichment",
 			"Remote Tenant Collection Document Service");
+
+I_EXPORT_COMPONENT(
+			RoleCollectionDocumentService,
+			"Role collection document service: GetRoleRepresentation / UpdateRoleFromRepresentation",
+			"Role Collection Document Service");
+
+I_EXPORT_COMPONENT(
+			GroupCollectionDocumentService,
+			"Group collection document service: GetGroupRepresentation / UpdateGroupFromRepresentation",
+			"Group Collection Document Service");
+
+I_EXPORT_COMPONENT(
+			UserCollectionDocumentService,
+			"User collection document service: GetUserRepresentation / UpdateUserFromRepresentation",
+			"User Collection Document Service");
 
 
 } // namespace ImtAuthGqlPck

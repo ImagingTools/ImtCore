@@ -153,7 +153,6 @@ ViewBase {
 				ItemSelectElementView {
 					id: roleSelectableCollectionEditor
 					collectionId: "Roles"
-						productId: container.productId
 						label: qsTr("Parent Roles")
 						addButtonText: qsTr("Add Parent Role")
 						showCount: true

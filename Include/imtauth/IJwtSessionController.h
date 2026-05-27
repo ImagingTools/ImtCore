@@ -41,6 +41,15 @@ public:
 	virtual QByteArray GetUserFromJwt(const QByteArray& jwt) const = 0;
 	virtual QByteArray GetTenantFromJwt(const QByteArray& jwt) const = 0;
 	virtual QByteArray GetSessionFromJwt(const QByteArray& jwt) const = 0;
+
+	/**
+	 * Invalidate any cached state associated with the given token.
+	 *
+	 * Used after a session change (e.g. SelectTenant issues a new JWT and the
+	 * previous one must no longer be considered valid by intermediate caches).
+	 * Default implementation is a no-op; cache-aware implementations should override.
+	 */
+	virtual void InvalidateToken(const QByteArray& /*token*/) const {}
 };
 
 

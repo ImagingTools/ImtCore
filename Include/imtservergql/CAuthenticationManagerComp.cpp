@@ -283,6 +283,20 @@ QByteArray CAuthenticationManagerComp::GetSessionFromJwt(const QByteArray& jwt) 
 }
 
 
+void CAuthenticationManagerComp::InvalidateToken(const QByteArray& token) const
+{
+	if (token.isEmpty()){
+		return;
+	}
+
+	InvalidateTokenCache(token);
+
+	if (m_slaveJwtSessionControllerCompPtr.IsValid()){
+		m_slaveJwtSessionControllerCompPtr->InvalidateToken(token);
+	}
+}
+
+
 // private methods
 
 bool CAuthenticationManagerComp::ResolveUserId(
