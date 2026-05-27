@@ -162,7 +162,9 @@ ImtPopup.Popup {
     // Collect declared children. We intentionally don't override the
     // default property; Popup's contentChildren goes into contentHolder.data
     // and we scan it at completion.
-    Component.onCompleted: _ingestDeclaredChildren()
+    Component.onCompleted: {
+        _ingestDeclaredChildren()
+    }
 
     function _ingestDeclaredChildren() {
         // Find the default content holder. Popup exposes its data slot via

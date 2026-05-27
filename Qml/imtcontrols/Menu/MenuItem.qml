@@ -68,8 +68,12 @@ Item {
 
     // ---- Action synchronisation ----------------------------------------
 
-    onActionChanged: _syncFromAction()
-    Component.onCompleted: _syncFromAction()
+    onActionChanged: {
+        _syncFromAction()
+    }
+    Component.onCompleted: {
+        _syncFromAction()
+    }
 
     function _syncFromAction() {
         if (!action) return;

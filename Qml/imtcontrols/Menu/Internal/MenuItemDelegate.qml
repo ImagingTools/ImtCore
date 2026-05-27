@@ -125,7 +125,11 @@ Rectangle {
         anchors.fill: parent
         hoverEnabled: true
         enabled: row.menuItem && row.menuItem.enabled && !row.isSeparator
-        onEntered: if (row.menu) row.menu._onItemHover(row.rowIndex)
-        onClicked: if (row.menu) row.menu._onItemClick(row.rowIndex)
+        onEntered: {
+            if (row.menu) row.menu._onItemHover(row.rowIndex)
+        }
+        onClicked: {
+            if (row.menu) row.menu._onItemClick(row.rowIndex)
+        }
     }
 }

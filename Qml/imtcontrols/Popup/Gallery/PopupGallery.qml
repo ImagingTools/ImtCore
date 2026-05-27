@@ -29,7 +29,9 @@ Window {
             id: openMA
             anchors.fill: parent
             hoverEnabled: true
-            onClicked: basicPopup.open()
+            onClicked: {
+                basicPopup.open()
+            }
         }
     }
     Popup {

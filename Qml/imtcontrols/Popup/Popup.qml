@@ -228,11 +228,21 @@ FocusScope {
         Internal.PopupManager.unregister(popup);
     }
 
-    onWidthChanged:  if (d.opened) popup._reposition()
-    onHeightChanged: if (d.opened) popup._reposition()
-    onXChanged:      if (d.opened) popup._reposition()
-    onYChanged:      if (d.opened) popup._reposition()
-    onParentChanged: if (d.opened) popup._reposition()
+    onWidthChanged:  {
+        if (d.opened) popup._reposition()
+    }
+    onHeightChanged: {
+        if (d.opened) popup._reposition()
+    }
+    onXChanged:      {
+        if (d.opened) popup._reposition()
+    }
+    onYChanged:      {
+        if (d.opened) popup._reposition()
+    }
+    onParentChanged: {
+        if (d.opened) popup._reposition()
+    }
 
     Connections {
         target: Internal.PopupManager
@@ -493,6 +503,10 @@ FocusScope {
         }
     }
 
-    onPopupScaleChanged:   if (d.contentRoot && d.opened) d.contentRoot.scale   = popupScale
-    onPopupOpacityChanged: if (d.contentRoot && d.opened) d.contentRoot.opacity = popupOpacity
+    onPopupScaleChanged:   {
+        if (d.contentRoot && d.opened) d.contentRoot.scale   = popupScale
+    }
+    onPopupOpacityChanged: {
+        if (d.contentRoot && d.opened) d.contentRoot.opacity = popupOpacity
+    }
 }

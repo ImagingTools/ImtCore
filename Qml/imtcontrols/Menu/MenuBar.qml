@@ -62,7 +62,9 @@ FocusScope {
         visible: false
     }
 
-    Component.onCompleted: _rebuild()
+    Component.onCompleted: {
+        _rebuild()
+    }
 
     function _rebuild() {
         // Destroy any pre-existing items.

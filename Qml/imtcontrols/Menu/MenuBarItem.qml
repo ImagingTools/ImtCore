@@ -53,7 +53,11 @@ Item {
         id: hover
         anchors.fill: parent
         hoverEnabled: true
-        onClicked: if (menuBar) menuBar._toggleAt(barIndex)
-        onEntered:  if (menuBar) menuBar._onHover(barIndex)
+        onClicked: {
+            if (menuBar) menuBar._toggleAt(barIndex)
+        }
+        onEntered:  {
+            if (menuBar) menuBar._onHover(barIndex)
+        }
     }
 }
