@@ -155,10 +155,10 @@ RemoteCollectionView {
 	function rejectInvitation(invitationId) {
 		rejectInvitationInput.m_invitationId = invitationId
 		container.__pendingRejectTenantId = ""
-		var rows2 = container.table ? container.table.elementsCount : 0
-		for (var r2 = 0; r2 < rows2; r2++) {
-			if (container.table.elements.getData(TenantItemDataTypeMetaInfo.s_invitationId, r2) === invitationId) {
-				container.__pendingRejectTenantId = container.table.elements.getData("id", r2) || ""
+		var rows = container.table ? container.table.elementsCount : 0
+		for (var r = 0; r < rows; r++) {
+			if (container.table.elements.getData(TenantItemDataTypeMetaInfo.s_invitationId, r) === invitationId) {
+				container.__pendingRejectTenantId = container.table.elements.getData("id", r) || ""
 				break
 			}
 		}

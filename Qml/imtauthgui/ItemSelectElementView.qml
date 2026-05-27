@@ -203,12 +203,19 @@ ElementView {
 								var removedData = modelData
 								var removedId = modelData ? modelData.id : ""
 								var arr = []
-								for (var k = 0; k < itemSelectElementView.items.length; k++) {
-									var it = itemSelectElementView.items[k]
-									// Match by id rather than index — robust against
-									// delegate-context drift when items mutate.
-									if (it && it.id !== removedId)
-										arr.push(it)
+								if (removedId) {
+									for (var k = 0; k < itemSelectElementView.items.length; k++) {
+										var it = itemSelectElementView.items[k]
+										// Match by id rather than index — robust against
+										// delegate-context drift when items mutate.
+										if (it && it.id !== removedId)
+											arr.push(it)
+									}
+								} else {
+									// Fallback: id is missing/empty — drop by index.
+									arr = itemSelectElementView.items.slice()
+									if (removedIndex >= 0 && removedIndex < arr.length)
+										arr.splice(removedIndex, 1)
 								}
 								itemSelectElementView.__resolvingNames = true
 								itemSelectElementView.items = arr
