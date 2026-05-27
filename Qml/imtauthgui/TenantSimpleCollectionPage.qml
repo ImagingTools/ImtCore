@@ -56,7 +56,6 @@ ViewBase {
 	// --- backend configuration ---
 	property var documentManager: null
 	property string objectTypeId: ""
-	property Component dataProviderComp: null
 	property var listModel: null                       // alternative to dataProviderComp: direct model for the list
 	property Component delegateComponent: null         // custom delegate (receives modelData, selectionManager, collectionPage)
 	property Component headerButtonsComponent: null    // custom header buttons placed at right of stackViewHeader
@@ -67,8 +66,8 @@ ViewBase {
 
 	/** Re-fetch the list. Parents call this on external removal signals. */
 	function refresh() {
-		if (__dataProvider)
-			__dataProvider.fetch(__lastFilterText)
+		if (dataProvider)
+			dataProvider.fetch(__lastFilterText)
 	}
 
 	function resolveDocumentName(documentId) {
@@ -85,12 +84,11 @@ ViewBase {
 	readonly property bool __canManage: collectionPage.stateManager ? collectionPage.stateManager.canManageMembers : false
 
 	property var __selectionManager: null
-	property var __dataProvider: null
 	property string __lastFilterText: ""
 
 	// Public accessors for subcomponents with custom header buttons
 	readonly property var selectionManager: __selectionManager
-	readonly property var dataProvider: __dataProvider
+	property var dataProvider: null
 	readonly property string filterText: __lastFilterText
 
 	function openCreate() {
@@ -204,7 +202,7 @@ ViewBase {
 			enabled: collectionPage.__selectionManager && collectionPage.__selectionManager.selectedIds.length === 1
 			onClicked: {
 				var selId = collectionPage.__selectionManager.selectedIds[0]
-				var items = collectionPage.__dataProvider ? collectionPage.__dataProvider.items : []
+				var items = collectionPage.dataProvider ? collectionPage.dataProvider.items : []
 				for (var i = 0; i < items.length; i++) {
 					if (items[i] && items[i].id === selId) {
 						collectionPage.__openEdit(selId, items[i].title || items[i].id || "", items[i].description || "")
@@ -288,25 +286,7 @@ ViewBase {
 		id: listView
 
 		Item {
-			property var dataProvider: collectionPage.dataProviderComp ? dataProviderLoader.item : null
-			property var effectiveModel: {
-				if (collectionPage.listModel)
-					return collectionPage.listModel
-				return dataProvider ? dataProvider.items : []
-			}
-
-			Loader {
-				id: dataProviderLoader
-				sourceComponent: collectionPage.dataProviderComp
-				onLoaded: {
-					collectionPage.__dataProvider = item
-					item.fetch("")
-				}
-				Component.onDestruction: {
-					if (collectionPage)
-						collectionPage.__dataProvider = null
-				}
-			}
+			property var effectiveModel: collectionPage.listModel ? collectionPage.listModel: collectionPage.dataProvider ? collectionPage.dataProvider.items : []
 
 			SearchTextInput {
 				id: filterInput
@@ -327,8 +307,8 @@ ViewBase {
 				interval: 300
 				repeat: false
 				onTriggered: {
-					if (dataProviderLoader.item)
-						dataProviderLoader.item.fetch(filterInput.text)
+					if (collectionPage.dataProvider)
+						collectionPage.dataProvider.fetch(filterInput.text)
 				}
 			}
 

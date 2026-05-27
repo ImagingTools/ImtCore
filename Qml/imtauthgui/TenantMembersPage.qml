@@ -391,16 +391,7 @@ TenantSimpleCollectionPage {
 
 		FilterableSelectPopup {
 			id: invitePopup
-			dataProvider: invitableUsersLoader.item
-
-			Loader {
-				id: invitableUsersLoader
-				sourceComponent: membersPage.apiClient ? membersPage.apiClient.invitableUsersListDataProviderComp : null
-				onLoaded: {
-					if (item)
-						item.fetch("")
-				}
-			}
+			dataProvider: membersPage.apiClient ? membersPage.apiClient.invitableUsersListDataProvider : null
 
 			itemWidth: 280
 			showCheckBox: true

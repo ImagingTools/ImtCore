@@ -710,25 +710,19 @@ QtObject {
 	// List data providers (Roles / Groups / invitable Users)
 	// =========================================================================
 
-	property Component roleListDataProviderComp: Component {
-		FilterableSelectGqlDataProvider {
-			collectionId: "Roles"
-			pageSize: 50
-		}
+	property FilterableSelectGqlDataProvider roleListDataProvider: FilterableSelectGqlDataProvider {
+		collectionId: "Roles"
+		pageSize: 50
 	}
 
-	property Component groupListDataProviderComp: Component {
-		FilterableSelectGqlDataProvider {
-			collectionId: "Groups"
-			pageSize: 50
-		}
+	property FilterableSelectGqlDataProvider groupListDataProvider: FilterableSelectGqlDataProvider {
+		collectionId: "Groups"
+		pageSize: 50
 	}
 
-	property Component invitableUsersListDataProviderComp: Component {
-		FilterableSelectGqlDataProvider {
-			collectionId: "UsersForInvitation"
-			multiSelect: true
-		}
+	property FilterableSelectGqlDataProvider invitableUsersListDataProvider: FilterableSelectGqlDataProvider {
+		collectionId: "UsersForInvitation"
+		multiSelect: true
 	}
 
 	// =========================================================================
