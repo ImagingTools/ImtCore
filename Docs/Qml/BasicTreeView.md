@@ -337,10 +337,11 @@ BasicTreeView {
 }
 ```
 
-`writeBack` MUST be synchronous (Promises are not supported in this codebase).
-If the source model needs asynchronous validation, accept the edit
-optimistically, perform the async operation outside the tree, and on failure
-call `treeView.revertCell(index, column)` to restore the previous value.
+`writeBack` MUST be synchronous: this callback does not support Promises or
+other asynchronous return values. If the source model needs asynchronous
+validation, accept the edit optimistically, perform the async operation
+outside the tree, and on failure call `treeView.revertCell(index, column)`
+to restore the previous value.
 
 ### 8. Filtering
 

@@ -106,7 +106,7 @@ Item {
     property string gridLineColor:           Style.borderColor2
     property string editorErrorColor:        "#d04848"
 
-    // ─── Public read-only state ────────────────────────────────────────────
+    // ─── Public readonly state ─────────────────────────────────────────────
 
     readonly property var  contentListView: listView
     readonly property int  visibleCount: visibleModel.count
@@ -193,6 +193,8 @@ Item {
         readonly property string ckPathExpanded: "expanded"
     }
 
+    // Debounce filterText rebuilds so fast typing doesn't trigger a full
+    // tree pass on every keystroke (interval is configurable via filterDebounceMs).
     Timer {
         id: filterDebounceTimer
         interval: root.filterDebounceMs
@@ -1324,6 +1326,8 @@ Item {
         if (!node || !node.expanded) return
 
         node.expanded = false
+        // Only explicitly-expanded nodes are tracked; deleting on collapse
+        // keeps __expandedState small and avoids stale entries after rebuild.
         delete __expandedState[keyValue]
         if (node.sourceItem) node.sourceItem.expanded = false
 
@@ -1716,9 +1720,10 @@ Item {
 
         value = __normalizeEditorValue(value, column, keyValue)
 
-        // Optional column-level validation.
+        // Optional column-level validation. Returns true on success or an
+        // error string otherwise.
         var validatorMsg = __runColumnValidator(value, column, createIndex(node))
-        if (validatorMsg !== true && validatorMsg !== "" && validatorMsg !== undefined) {
+        if (validatorMsg !== true) {
             __editingError = String(validatorMsg)
             cellEditCommitFailed(createIndex(node), column, value, __editingError)
             return false
@@ -1870,8 +1875,12 @@ Item {
     function __runColumnValidator(value, column, indexObject) {
         if (!column || column.validator === undefined || column.validator === null)
             return true
-        if (typeof column.validator === "function")
-            return column.validator(value, indexObject)
+        if (typeof column.validator === "function") {
+            // Convention: return true for success; non-true is treated as an error
+            // message (use empty string to reject silently).
+            var r = column.validator(value, indexObject)
+            return r === true ? true : (r !== undefined && r !== null ? String(r) : "")
+        }
         // QValidator: defer to the editor; treat as accepting.
         return true
     }
@@ -1985,7 +1994,10 @@ Item {
             // Use coordinate mapping so intermediate containers don't break the math.
             var headerOffset = root.showHeader ? root.headerHeight + 1 : 0
             var localY = headerOffset + row * root.rowHeight
-            var mapped = root.mapToItem(root.flickable.contentItem || root.flickable, 0, localY)
+            var target = root.flickable.contentItem ? root.flickable.contentItem : root.flickable
+            if (!target)
+                return
+            var mapped = root.mapToItem(target, 0, localY)
             var itemTop = mapped.y
             var itemBottom = itemTop + root.rowHeight
             var viewTop = root.flickable.contentY
