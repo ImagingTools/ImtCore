@@ -55,4 +55,3 @@ TenantCollectionListView 1.0 TenantCollectionListView.qml
 TenantTableContainer 1.0 TenantTableContainer.qml
 TenantTableHeader 1.0 TenantTableHeader.qml
 ItemSelectElementView 1.0 ItemSelectElementView.qml
-TenantMembershipSubscriptionClient 1.0 TenantMembershipSubscriptionClient.qml
