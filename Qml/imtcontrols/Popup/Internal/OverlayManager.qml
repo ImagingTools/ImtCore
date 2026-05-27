@@ -57,15 +57,15 @@ QtObject {
                     acceptedButtons: Qt.AllButtons
                     hoverEnabled: true
                     propagateComposedEvents: false
-                    onPressed: function(mouse) {
+                    onPressed: {
                         overlay._handleOutsidePress(mouse, "dim");
                         mouse.accepted = true;
                     }
-                    onReleased: function(mouse) {
+                    onReleased: {
                         overlay._handleOutsideRelease(mouse, "dim");
                         mouse.accepted = true;
                     }
-                    onWheel: function(wheel) { wheel.accepted = true; }
+                    onWheel: { wheel.accepted = true; }
                 }
             }
 
@@ -82,11 +82,11 @@ QtObject {
                 propagateComposedEvents: true
                 visible: overlay.openPopups.length > 0 && !root._anyModal(overlay)
                 z: -2
-                onPressed: function(mouse) {
+                onPressed: {
                     overlay._handleOutsidePress(mouse, "catcher");
                     mouse.accepted = true;
                 }
-                onReleased: function(mouse) {
+                onReleased: {
                     overlay._handleOutsideRelease(mouse, "catcher");
                     mouse.accepted = true;
                 }
@@ -138,12 +138,12 @@ QtObject {
 
             // Global key dispatcher: Escape goes to the topmost popup that
             // accepts CloseOnEscape.
-            Keys.onShortcutOverride: function(event) {
+            Keys.onShortcutOverride: {
                 if (event.key === Qt.Key_Escape && openPopups.length > 0) {
                     event.accepted = true;
                 }
             }
-            Keys.onPressed: function(event) {
+            Keys.onPressed: {
                 if (event.key === Qt.Key_Escape) {
                     var top = root._topPopup(overlay);
                     if (top && top._tryEscape()) {

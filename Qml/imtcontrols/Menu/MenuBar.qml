@@ -128,7 +128,7 @@ FocusScope {
         currentIndex = index;
     }
 
-    Keys.onPressed: function(event) {
+    Keys.onPressed: {
         if (!active) return;
         if (event.key === Qt.Key_Right) {
             _openAt((currentIndex + 1) % _items.length);

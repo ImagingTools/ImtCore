@@ -438,7 +438,7 @@ FocusScope {
                 acceptedButtons: Qt.AllButtons
                 propagateComposedEvents: true
                 hoverEnabled: true
-                onPressed: function(mouse) {
+                onPressed: {
                     if (cr.popup) {
                         Internal.PopupStackController.closeAbove(cr.popup);
                         Internal.OverlayManager.raise(cr.popup);
@@ -447,7 +447,7 @@ FocusScope {
                 }
             }
 
-            Keys.onPressed: function(event) {
+            Keys.onPressed: {
                 if (event.key === Qt.Key_Escape && cr.popup && cr.popup._tryEscape())
                     event.accepted = true;
             }

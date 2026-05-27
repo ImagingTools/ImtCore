@@ -279,7 +279,7 @@ ImtPopup.Popup {
         }
     }
 
-    Keys.onPressed: function(event) {
+    Keys.onPressed: {
         switch (event.key) {
         case Qt.Key_Down:   _moveCurrent(+1); event.accepted = true; return;
         case Qt.Key_Up:     _moveCurrent(-1); event.accepted = true; return;
