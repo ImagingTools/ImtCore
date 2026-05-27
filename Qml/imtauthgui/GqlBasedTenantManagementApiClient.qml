@@ -79,6 +79,7 @@ QtObject {
 	signal requestFailed(string message)
 
 	// --- Real-time membership subscription notifications ---
+	signal subscriptionInvitationReceived(var notification)
 	signal subscriptionInvitationAccepted(var notification)
 	signal subscriptionInvitationRejected(var notification)
 	signal subscriptionOwnershipTransferred(var notification)
@@ -103,7 +104,9 @@ QtObject {
 				"role": data.containsKey("role") ? data.getData("role") : ""
 			}
 
-			if (notificationType === "InvitationAccepted" || notificationType === 1)
+			if (notificationType === "InvitationReceived" || notificationType === 0)
+				root.subscriptionInvitationReceived(notification)
+			else if (notificationType === "InvitationAccepted" || notificationType === 1)
 				root.subscriptionInvitationAccepted(notification)
 			else if (notificationType === "InvitationRejected" || notificationType === 2)
 				root.subscriptionInvitationRejected(notification)

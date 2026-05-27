@@ -47,6 +47,36 @@ RemoteCollectionView {
 		}
 	}
 
+	// Activate Switch/Leave commands by current selection. Default base commands
+	// (New/Edit/Remove/…) are handled by CollectionViewCommandsDelegateBase, but
+	// custom commands like Switch/Leave have to be toggled explicitly here.
+	onSelectionChanged: {
+		container.__updateSwitchLeaveEnabled(selectedIds, selectedIndexes)
+	}
+
+	function __updateSwitchLeaveEnabled(selectedIds, selectedIndexes) {
+		if (!container.commandsController)
+			return
+		let singleSelection = selectedIndexes && selectedIndexes.length === 1
+		let switchEnabled = false
+		let leaveEnabled = false
+		if (singleSelection) {
+			let row = selectedIndexes[0]
+			let tenantId = container.table.elements.getData("id", row)
+			let scope = container.table.elements.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, row)
+			// Switch — only to a tenant that is not the currently selected one
+			// and that the user actually has access to (Owner/Member).
+			switchEnabled = !!tenantId
+					&& tenantId !== AuthorizationController.currentTenantId
+					&& (scope === "Owner" || scope === "Member")
+			// Leave — only for tenants the user is a member of (not Owner —
+			// the owner has to transfer ownership first — and not Invited).
+			leaveEnabled = !!tenantId && scope === "Member"
+		}
+		container.commandsController.setCommandIsEnabled("Switch", switchEnabled)
+		container.commandsController.setCommandIsEnabled("Leave", leaveEnabled)
+	}
+
 	Component {
 		id: leaveConfirmDialogComp
 		MessageDialog {
@@ -69,22 +99,30 @@ RemoteCollectionView {
 
 		onInvitationReceived: {
 			// New invitation received -> refresh the collection to show it
+			// and notify the user (the invitee may be on this view but is
+			// otherwise not informed about the incoming invitation).
 			container.doUpdateGui()
+			var tName = (notification && notification.tenantName) ? notification.tenantName : qsTr("a tenant")
+			PopupManager.addInfoMessage(qsTr("You have been invited to join \"%1\"").arg(tName), true)
+			AuthorizationController.tenantInvitationReceived(notification)
 		}
 
 		onInvitationAccepted:{
 			// Invitation accepted -> refresh to update relation scope
 			container.doUpdateGui()
+			AuthorizationController.tenantInvitationAccepted(notification)
 		}
 
 		onInvitationRejected:{
 			// Invitation rejected -> refresh to update relation scope
 			container.doUpdateGui()
+			AuthorizationController.tenantInvitationRejected(notification)
 		}
 
 		onOwnershipTransferred: {
 			// Ownership transferred -> refresh to update owner column
 			container.doUpdateGui()
+			AuthorizationController.tenantOwnershipTransferred(notification)
 		}
 	}
 
@@ -99,13 +137,36 @@ RemoteCollectionView {
 
 	function acceptInvitation(invitationId) {
 		acceptInvitationInput.m_invitationId = invitationId
+		// Capture the tenantId of the accepted invitation so we can broadcast
+		// it locally on success (the server doesn't re-notify the local actor
+		// via subscription, so any open TenantEditor for that tenant has to
+		// be refreshed explicitly here).
+		container.__pendingAcceptTenantId = ""
+		var rows = container.table ? container.table.elementsCount : 0
+		for (var r = 0; r < rows; r++) {
+			if (container.table.elements.getData(TenantItemDataTypeMetaInfo.s_invitationId, r) === invitationId) {
+				container.__pendingAcceptTenantId = container.table.elements.getData("id", r) || ""
+				break
+			}
+		}
 		acceptInvitationSender.send(acceptInvitationInput)
 	}
 
 	function rejectInvitation(invitationId) {
 		rejectInvitationInput.m_invitationId = invitationId
+		container.__pendingRejectTenantId = ""
+		var rows2 = container.table ? container.table.elementsCount : 0
+		for (var r2 = 0; r2 < rows2; r2++) {
+			if (container.table.elements.getData(TenantItemDataTypeMetaInfo.s_invitationId, r2) === invitationId) {
+				container.__pendingRejectTenantId = container.table.elements.getData("id", r2) || ""
+				break
+			}
+		}
 		rejectInvitationSender.send(rejectInvitationInput)
 	}
+
+	property string __pendingAcceptTenantId: ""
+	property string __pendingRejectTenantId: ""
 
 	property AcceptTenantInvitationInput acceptInvitationInput: AcceptTenantInvitationInput {}
 	property GqlSdlRequestSender acceptInvitationSender: GqlSdlRequestSender {
@@ -116,6 +177,14 @@ RemoteCollectionView {
 				onFinished: {
 					if (m_success) {
 						container.doUpdateGui()
+						// Fan out so any TenantEditor open on this tenant reloads.
+						AuthorizationController.tenantInvitationAccepted({
+							"membershipId": "",
+							"userId": AuthorizationController.userTokenProvider ? AuthorizationController.userTokenProvider.userId : "",
+							"tenantId": container.__pendingAcceptTenantId,
+							"tenantName": "",
+							"role": ""
+						})
 					} else if (m_errorMessage && m_errorMessage !== "") {
 						ModalDialogManager.showInfoDialog(m_errorMessage)
 					}
@@ -137,6 +206,13 @@ RemoteCollectionView {
 				onFinished: {
 					if (m_success) {
 						container.doUpdateGui()
+						AuthorizationController.tenantInvitationRejected({
+							"membershipId": "",
+							"userId": AuthorizationController.userTokenProvider ? AuthorizationController.userTokenProvider.userId : "",
+							"tenantId": container.__pendingRejectTenantId,
+							"tenantName": "",
+							"role": ""
+						})
 					} else if (m_errorMessage && m_errorMessage !== "") {
 						ModalDialogManager.showInfoDialog(m_errorMessage)
 					}

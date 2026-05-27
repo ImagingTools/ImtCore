@@ -155,12 +155,22 @@ ElementView {
 				Repeater {
 					model: itemSelectElementView.items
 					delegate: Rectangle {
-						width: Math.min(chipText.contentWidth + chipRemove.width + Style.paddingS * 3, 200)
+						// Use TextMetrics for natural-width measurement to avoid a
+						// binding loop: chipText is elided, so its contentWidth
+						// depends on its own width once anchored, which would feed
+						// back into Rectangle.width through this binding.
+						width: Math.min(chipTextMetrics.width + chipRemove.width + Style.paddingS * 3, 200)
 						height: 28
 						radius: 14
 						color: itemSelectElementView.accentBgLight
 						border.color: itemSelectElementView.accentBorderLight
 						border.width: 1
+
+						TextMetrics {
+							id: chipTextMetrics
+							font: chipText.font
+							text: chipText.text
+						}
 
 						Text {
 							id: chipText
@@ -191,8 +201,15 @@ ElementView {
 							onClicked: {
 								var removedIndex = index
 								var removedData = modelData
-								var arr = itemSelectElementView.items.slice()
-								arr.splice(removedIndex, 1)
+								var removedId = modelData ? modelData.id : ""
+								var arr = []
+								for (var k = 0; k < itemSelectElementView.items.length; k++) {
+									var it = itemSelectElementView.items[k]
+									// Match by id rather than index — robust against
+									// delegate-context drift when items mutate.
+									if (it && it.id !== removedId)
+										arr.push(it)
+								}
 								itemSelectElementView.__resolvingNames = true
 								itemSelectElementView.items = arr
 								itemSelectElementView.__resolvingNames = false

@@ -51,6 +51,7 @@ TenantSimpleCollectionPage {
 		var result = []
 		var filterText = ""  // filter is applied via refresh
 		var creatorId = (membersPage.model && membersPage.model.m_creatorId) ? membersPage.model.m_creatorId : ""
+		var ownerId = (membersPage.model && membersPage.model.m_ownerId) ? membersPage.model.m_ownerId : ""
 
 		var invitations = membersPage.stateManager ? membersPage.stateManager.pendingInvitations : []
 		for (var j = 0; j < invitations.length; j++) {
@@ -65,7 +66,10 @@ TenantSimpleCollectionPage {
 
 		var members = membersPage.stateManager ? membersPage.stateManager.pendingMembers : []
 		for (var i = 0; i < members.length; i++) {
-			if (creatorId && members[i].id === creatorId)
+			// Skip the tenant creator — but only when they are not also the
+			// current owner. The Owner must always be visible in the list,
+			// even when creator and owner happen to be the same user.
+			if (creatorId && members[i].id === creatorId && members[i].id !== ownerId)
 				continue
 			result.push({
 				id: members[i].id,

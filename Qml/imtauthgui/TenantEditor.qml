@@ -6,6 +6,7 @@ import imtgui 1.0
 import imtcontrols 1.0
 import imtcolgui 1.0
 import imtdocgui 1.0
+import imtauthgui 1.0
 import imtauthTenantsSdl 1.0
 
 /**
@@ -168,6 +169,41 @@ DocumentViewBase {
 				return
 			if (notification.tenantId === container.tenantData.m_id) {
 				PopupManager.addInfoMessage(qsTr("Ownership transferred"), true)
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
+			}
+		}
+	}
+
+	// --- Listen to globally-broadcast tenant membership events so the editor
+	// reloads even when the change was performed by the local user via another
+	// view (e.g. accepting an invitation in TenantCollectionView) — the server
+	// does not re-deliver a subscription notification to the actor itself.
+	Connections {
+		target: AuthorizationController
+
+		function onTenantInvitationAccepted(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			if (notification && notification.tenantId === container.tenantData.m_id) {
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
+			}
+		}
+		function onTenantInvitationRejected(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			if (notification && notification.tenantId === container.tenantData.m_id) {
+				if (notification.membershipId)
+					stateManager_.removePendingInvitation(notification.membershipId)
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
+			}
+		}
+		function onTenantOwnershipTransferred(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			if (notification && notification.tenantId === container.tenantData.m_id) {
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
