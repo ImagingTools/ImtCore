@@ -49,13 +49,23 @@ TenantSimpleCollectionPage {
 
 	function __rebuildCombinedModel() {
 		var result = []
-		var filterText = ""  // filter is applied via refresh
+		var filterText = membersPage.filterText || ""
+		var lowerFilter = filterText.toLowerCase()
+
+		function matches(name) {
+			if (!lowerFilter)
+				return true
+			return (name || "").toLowerCase().indexOf(lowerFilter) >= 0
+		}
 
 		var invitations = membersPage.stateManager ? membersPage.stateManager.pendingInvitations : []
 		for (var j = 0; j < invitations.length; j++) {
+			var invName = invitations[j].userName || invitations[j].name || invitations[j].id || ""
+			if (!matches(invName))
+				continue
 			result.push({
 				id: "inv_" + invitations[j].id,
-				title: invitations[j].name || invitations[j].id || "",
+				title: invName,
 				description: qsTr("Invited"),
 				kind: "invitation",
 				sourceData: invitations[j]
@@ -64,9 +74,12 @@ TenantSimpleCollectionPage {
 
 		var members = membersPage.stateManager ? membersPage.stateManager.pendingMembers : []
 		for (var i = 0; i < members.length; i++) {
+			var memName = members[i].name || members[i].id || ""
+			if (!matches(memName))
+				continue
 			result.push({
 				id: members[i].id,
-				title: members[i].name || members[i].id || "",
+				title: memName,
 				description: members[i].role || "Member",
 				kind: "member",
 				sourceData: members[i]
@@ -75,6 +88,8 @@ TenantSimpleCollectionPage {
 
 		membersPage.__combinedModel = result
 	}
+
+	onFilterTextChanged: __rebuildCombinedModel()
 
 	Connections {
 		target: membersPage.stateManager

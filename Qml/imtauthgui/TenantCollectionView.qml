@@ -47,23 +47,19 @@ RemoteCollectionView {
 		}
 	}
 
-	// Activate Switch/Leave/Edit/New commands by current selection and tenant context.
-	// Custom commands like Switch/Leave have to be toggled explicitly here.
-	// Edit is only available for the currently selected tenant.
-	// New is only available when no tenant is selected (currentTenantId === "").
+	// Activate Switch/Leave commands by current selection. Default base commands
+	// (New/Edit/Remove/…) are handled by CollectionViewCommandsDelegateBase, but
+	// custom commands like Switch/Leave have to be toggled explicitly here.
 	onSelectionChanged: {
-		container.__updateCommandStates(selectedIds, selectedIndexes)
+		container.__updateSwitchLeaveEnabled(selectedIds, selectedIndexes)
 	}
 
-	function __updateCommandStates(selectedIds, selectedIndexes) {
+	function __updateSwitchLeaveEnabled(selectedIds, selectedIndexes) {
 		if (!container.commandsController)
 			return
 		let singleSelection = selectedIndexes && selectedIndexes.length === 1
 		let switchEnabled = false
 		let leaveEnabled = false
-		let editEnabled = false
-		let currentTenantId = AuthorizationController.currentTenantId
-
 		if (singleSelection) {
 			let row = selectedIndexes[0]
 			let tenantId = container.table.elements.getData("id", row)
@@ -71,22 +67,14 @@ RemoteCollectionView {
 			// Switch — only to a tenant that is not the currently selected one
 			// and that the user actually has access to (Owner/Member).
 			switchEnabled = !!tenantId
-					&& tenantId !== currentTenantId
+					&& tenantId !== AuthorizationController.currentTenantId
 					&& (scope === "Owner" || scope === "Member")
 			// Leave — only for tenants the user is a member of (not Owner —
 			// the owner has to transfer ownership first — and not Invited).
 			leaveEnabled = !!tenantId && scope === "Member"
-			// Edit — only the currently selected tenant can be edited.
-			editEnabled = !!tenantId
-					&& currentTenantId !== ""
-					&& tenantId === currentTenantId
 		}
-
 		container.commandsController.setCommandIsEnabled("Switch", switchEnabled)
 		container.commandsController.setCommandIsEnabled("Leave", leaveEnabled)
-		container.commandsController.setCommandIsEnabled("Edit", editEnabled)
-		// New — only when no tenant is selected (user is outside any organization).
-		container.commandsController.setCommandIsEnabled("New", currentTenantId === "")
 	}
 
 	Component {
@@ -573,46 +561,6 @@ RemoteCollectionView {
 			Component.onCompleted: {
 				registerDocumentType("Tenant", qsTr("Tenant"))
 				addDocumentView("Tenant", "TenantEditor", tenantEditorComp, tenantDataControllerFactory)
-			}
-
-			// Override base command states: "New" and "Edit" are controlled
-			// by __updateCommandStates based on currentTenantId, not by
-			// selection alone. "Remove" acts as "Leave" for tenants.
-			function updateStateBaseCommands(selection, commandsController, elementsModel) {
-				if (!commandsController)
-					return
-				let currentTenantId = AuthorizationController.currentTenantId
-				// New — only when no tenant is selected.
-				commandsController.setCommandIsEnabled("New", currentTenantId === "")
-				// Edit — controlled by __updateCommandStates; re-apply here
-				// to keep consistent after base updateItemSelection calls.
-				let editEnabled = false
-				if (selection.length === 1) {
-					let tenantId = elementsModel.getData("id", selection[0])
-					editEnabled = !!tenantId
-							&& currentTenantId !== ""
-							&& tenantId === currentTenantId
-				}
-				commandsController.setCommandIsEnabled("Edit", editEnabled)
-				// Remove — enabled when Leave would be enabled (Member scope).
-				let removeEnabled = false
-				if (selection.length === 1) {
-					let scope = elementsModel.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, selection[0])
-					removeEnabled = scope === "Member"
-				}
-				commandsController.setCommandIsEnabled("Remove", removeEnabled)
-			}
-
-			// Override Remove to trigger Leave flow instead of deletion.
-			function onRemove() {
-				if (!container.table)
-					return
-				let indexes = container.table.getSelectedIndexes()
-				if (indexes.length === 1) {
-					let tenantId = container.table.elements.getData("id", indexes[0])
-					let tenantName = container.table.elements.getData("name", indexes[0])
-					ModalDialogManager.openDialog(leaveConfirmDialogComp, {"tenantId": tenantId, "tenantName": tenantName || tenantId})
-				}
 			}
 
 			Component {

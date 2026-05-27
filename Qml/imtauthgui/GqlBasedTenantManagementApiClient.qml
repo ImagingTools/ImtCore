@@ -756,6 +756,7 @@ QtObject {
 					typeId: root.roleObjectTypeId
 				}
 			}
+			Component.onCompleted: root.fetchPermissions()
 		}
 	}
 

@@ -144,6 +144,11 @@ DocumentViewBase {
 		}
 		function onUserCreated() {
 			PopupManager.addSuccessMessage(qsTr("User created successfully"), true)
+			// Refresh the tenant document so the newly added user (auto-joined
+			// as Member via AddMembership in the api client) appears in the
+			// TenantMembersPage list.
+			if (!stateManager_.isNewTenant && container.representationController)
+				container.representationController.updateRepresentationFromDocument()
 		}
 		function onSubscriptionInvitationAccepted(notification) {
 			if (!container.tenantData || stateManager_.isNewTenant)

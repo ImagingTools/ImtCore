@@ -84,6 +84,7 @@ ViewBase {
 	// Public accessors for subcomponents with custom header buttons
 	readonly property var selectionManager: __selectionManager
 	readonly property var dataProvider: __dataProvider
+	readonly property string filterText: __lastFilterText
 
 	function openCreate() {
 		while (collectionStackView.count > 1)
@@ -137,6 +138,17 @@ ViewBase {
 		}
 
 		onHeaderItemClicked: {
+			if (collectionStackView.currentIndex <= index)
+				return
+			if (collectionPage.__activeShellView
+					&& collectionPage.__activeShellView.state === "content") {
+				// Delegate to the document close flow so the standard
+				// "Save changes?" dialog is shown for dirty documents.
+				// The editor's onClosed handler will pop the header /
+				// stack back to the list page.
+				collectionPage.__activeShellView.closeDocument()
+				return
+			}
 			while (collectionStackView.currentIndex > index) {
 				collectionStackView.previous()
 				stackViewHeader.popHeader()
