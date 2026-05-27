@@ -354,7 +354,6 @@ module.exports = {
                 display: none;
             }
 
-
             .Map > *{
                 pointer-events: all;
             }
