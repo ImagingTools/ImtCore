@@ -639,7 +639,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 			QByteArray oldObjectId = workingDocumentPtr->objectId;
 
 			QByteArray newObjectId = collectionPtr->InsertNewObject(
-				workingDocumentPtr->typeId, resultDocumentName, "", documentSnapshotPtr.GetPtr());
+				workingDocumentPtr->typeId, resultDocumentName, "", documentSnapshotPtr.GetPtr(), QByteArray(), nullptr, nullptr, params.operationContextPtr);
 
 			if (newObjectId.isEmpty()){
 				this->CompleteTask(taskId, TaskResult{IDocumentService::OS_FAILED, documentId, QStringLiteral("Failed to insert copy")});
@@ -711,7 +711,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 		}
 
 		// Update object
-		bool res = collectionPtr->SetObjectData(workingDocumentPtr->objectId, *documentSnapshotPtr);
+		bool res = collectionPtr->SetObjectData(workingDocumentPtr->objectId, *documentSnapshotPtr, istd::IChangeable::CM_WITHOUT_REFS, params.operationContextPtr);
 
 		if (res){
 			QString updatedName;
@@ -820,7 +820,7 @@ inline void TCollectionDocumentServiceWrap<Base>::DoSaveDocument(
 	}
 
 	workingDocumentPtr->objectId =
-		collectionPtr->InsertNewObject(workingDocumentPtr->typeId, resultDocumentName, "", documentSnapshotPtr.GetPtr(), proposedElementId);
+		collectionPtr->InsertNewObject(workingDocumentPtr->typeId, resultDocumentName, "", documentSnapshotPtr.GetPtr(), proposedElementId, nullptr, nullptr, params.operationContextPtr);
 
 	if (this->HasDocumentNameProvider(workingDocumentPtr->typeId)){
 		resultDocumentName = this->GetDefaultDocumentName(*workingDocumentPtr);

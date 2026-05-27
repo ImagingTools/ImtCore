@@ -72,19 +72,8 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 	int count = -1;
 	iprm::CParamsSet filterParams;
 
-	// Prefer tenant selected in the request input; fall back to the authenticated GQL context.
-	// Tenant filter can be disabled via TenantFilterEnabled attribute (e.g. when this
-	// controller is used to fetch users outside the current tenant for invitation).
 	if (!m_tenantFilterEnabledAttrPtr.IsValid() || *m_tenantFilterEnabledAttrPtr){
-		QByteArray tenantId;
-		if (arguments.input.Version_1_0->tenantId){
-			tenantId = *arguments.input.Version_1_0->tenantId;
-		}
-
-		imtauth::CTenantFilterParam* tenantFilterPtr = imtauthgql::CreateTenantFilterParam(tenantId);
-		if (tenantFilterPtr == nullptr){
-			tenantFilterPtr = imtauthgql::CreateTenantFilterParam(gqlRequest);
-		}
+		imtauth::CTenantFilterParam* tenantFilterPtr = imtauthgql::CreateTenantFilterParam(gqlRequest);
 		if (tenantFilterPtr != nullptr){
 			filterParams.SetEditableParameter("TenantFilter", tenantFilterPtr, true);
 		}

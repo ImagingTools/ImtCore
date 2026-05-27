@@ -47,6 +47,36 @@ RemoteCollectionView {
 		}
 	}
 
+	// Activate Switch/Leave commands by current selection. Default base commands
+	// (New/Edit/Remove/…) are handled by CollectionViewCommandsDelegateBase, but
+	// custom commands like Switch/Leave have to be toggled explicitly here.
+	onSelectionChanged: {
+		container.__updateSwitchLeaveEnabled(selectedIds, selectedIndexes)
+	}
+
+	function __updateSwitchLeaveEnabled(selectedIds, selectedIndexes) {
+		if (!container.commandsController)
+			return
+		let singleSelection = selectedIndexes && selectedIndexes.length === 1
+		let switchEnabled = false
+		let leaveEnabled = false
+		if (singleSelection) {
+			let row = selectedIndexes[0]
+			let tenantId = container.table.elements.getData("id", row)
+			let scope = container.table.elements.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, row)
+			// Switch — only to a tenant that is not the currently selected one
+			// and that the user actually has access to (Owner/Member).
+			switchEnabled = !!tenantId
+					&& tenantId !== AuthorizationController.currentTenantId
+					&& (scope === "Owner" || scope === "Member")
+			// Leave — only for tenants the user is a member of (not Owner —
+			// the owner has to transfer ownership first — and not Invited).
+			leaveEnabled = !!tenantId && scope === "Member"
+		}
+		container.commandsController.setCommandIsEnabled("Switch", switchEnabled)
+		container.commandsController.setCommandIsEnabled("Leave", leaveEnabled)
+	}
+
 	Component {
 		id: leaveConfirmDialogComp
 		MessageDialog {
@@ -63,27 +93,21 @@ RemoteCollectionView {
 		}
 	}
 
-	// --- Subscription for real-time invitation notifications ---
-	TenantMembershipSubscriptionClient {
-		id: collectionMembershipSubscription
+	// --- Real-time invitation notifications (handled by tenantManagementApiClient) ---
+	property GqlBasedTenantManagementApiClient tenantManagementApiClient: GqlBasedTenantManagementApiClient {}
 
-		onInvitationReceived: {
-			// New invitation received -> refresh the collection to show it
+	Connections {
+		target: tenantManagementApiClient
+		function onSubscriptionInvitationReceived(notification) {
 			container.doUpdateGui()
 		}
-
-		onInvitationAccepted:{
-			// Invitation accepted -> refresh to update relation scope
+		function onSubscriptionInvitationAccepted(notification) {
 			container.doUpdateGui()
 		}
-
-		onInvitationRejected:{
-			// Invitation rejected -> refresh to update relation scope
+		function onSubscriptionInvitationRejected(notification) {
 			container.doUpdateGui()
 		}
-
-		onOwnershipTransferred: {
-			// Ownership transferred -> refresh to update owner column
+		function onSubscriptionOwnershipTransferred(notification) {
 			container.doUpdateGui()
 		}
 	}
@@ -99,13 +123,36 @@ RemoteCollectionView {
 
 	function acceptInvitation(invitationId) {
 		acceptInvitationInput.m_invitationId = invitationId
+		// Capture the tenantId of the accepted invitation so we can broadcast
+		// it locally on success (the server doesn't re-notify the local actor
+		// via subscription, so any open TenantEditor for that tenant has to
+		// be refreshed explicitly here).
+		container.__pendingAcceptTenantId = ""
+		var rows = container.table ? container.table.elementsCount : 0
+		for (var r = 0; r < rows; r++) {
+			if (container.table.elements.getData(TenantItemDataTypeMetaInfo.s_invitationId, r) === invitationId) {
+				container.__pendingAcceptTenantId = container.table.elements.getData("id", r) || ""
+				break
+			}
+		}
 		acceptInvitationSender.send(acceptInvitationInput)
 	}
 
 	function rejectInvitation(invitationId) {
 		rejectInvitationInput.m_invitationId = invitationId
+		container.__pendingRejectTenantId = ""
+		var rows = container.table ? container.table.elementsCount : 0
+		for (var r = 0; r < rows; r++) {
+			if (container.table.elements.getData(TenantItemDataTypeMetaInfo.s_invitationId, r) === invitationId) {
+				container.__pendingRejectTenantId = container.table.elements.getData("id", r) || ""
+				break
+			}
+		}
 		rejectInvitationSender.send(rejectInvitationInput)
 	}
+
+	property string __pendingAcceptTenantId: ""
+	property string __pendingRejectTenantId: ""
 
 	property AcceptTenantInvitationInput acceptInvitationInput: AcceptTenantInvitationInput {}
 	property GqlSdlRequestSender acceptInvitationSender: GqlSdlRequestSender {
@@ -116,6 +163,14 @@ RemoteCollectionView {
 				onFinished: {
 					if (m_success) {
 						container.doUpdateGui()
+						// Fan out so any TenantEditor open on this tenant reloads.
+						AuthorizationController.tenantInvitationAccepted({
+							"membershipId": "",
+							"userId": AuthorizationController.userTokenProvider ? AuthorizationController.userTokenProvider.userId : "",
+							"tenantId": container.__pendingAcceptTenantId,
+							"tenantName": "",
+							"role": ""
+						})
 					} else if (m_errorMessage && m_errorMessage !== "") {
 						ModalDialogManager.showInfoDialog(m_errorMessage)
 					}
@@ -137,6 +192,13 @@ RemoteCollectionView {
 				onFinished: {
 					if (m_success) {
 						container.doUpdateGui()
+						AuthorizationController.tenantInvitationRejected({
+							"membershipId": "",
+							"userId": AuthorizationController.userTokenProvider ? AuthorizationController.userTokenProvider.userId : "",
+							"tenantId": container.__pendingRejectTenantId,
+							"tenantName": "",
+							"role": ""
+						})
 					} else if (m_errorMessage && m_errorMessage !== "") {
 						ModalDialogManager.showInfoDialog(m_errorMessage)
 					}
@@ -506,7 +568,7 @@ RemoteCollectionView {
 
 				TenantEditor {
 					id: tenantEditor
-					apiClient: tenantEditorApiClient
+					apiClient: tenantManagementApiClient
 					commandsControllerComp: Component {
 						GqlBasedCommandsController {
 							typeId: "Tenant"
@@ -519,17 +581,6 @@ RemoteCollectionView {
 								tenantEditor.representationController.updateRepresentationFromDocument()
 							}
 						}
-					}
-
-					// Concrete GQL transport injected from this view (imtguigql is
-					// already a dependency here); TenantEditor itself stays
-					// transport-agnostic.
-					// tenantId is sourced from the tenant being edited (not from the
-					// currently authorized tenant) so that GetSelectableItems queries
-					// (Roles/Groups/Users) are filtered for the correct tenant scope.
-					GqlBasedTenantMembershipApiClient {
-						id: tenantEditorApiClient
-						tenantId: tenantEditor.tenantData ? tenantEditor.tenantData.m_id : ""
 					}
 				}
 			}

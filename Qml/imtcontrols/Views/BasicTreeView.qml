@@ -1646,11 +1646,13 @@ Item {
         flattenExpanded(node, inserted)
         if (inserted.length > 0) {
             var insertIndex = row + 1
+            var insertKeys = []
             var insertObjects = []
             for (var i = 0; i < inserted.length; ++i) {
-                __visibleKeys.splice(insertIndex + i, 0, inserted[i].key)
+                insertKeys.push(inserted[i].key)
                 insertObjects.push(toVisibleObject(inserted[i]))
             }
+            Array.prototype.splice.apply(__visibleKeys, [insertIndex, 0].concat(insertKeys))
             visibleModel.insert(insertIndex, insertObjects)
             rebuildVisibleRowsFrom(insertIndex)
         }

@@ -2,20 +2,28 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
+import imtgui 1.0
 import imtcontrols 1.0
+import imtdocgui 1.0
 import imtguigql 1.0
 import imtauthTenantMembershipsSdl 1.0
 import imtbaseImtCollectionSdl 1.0
+import imtbaseCollectionDocumentServiceSdl 1.0
 import imtauthRolesSdl 1.0
 import imtauthGroupsSdl 1.0
 import imtauthUsersSdl 1.0
+import imtauthRoleCollectionDocumentServiceSdl 1.0
+import imtauthGroupCollectionDocumentServiceSdl 1.0
+import imtauthUserCollectionDocumentServiceSdl 1.0
+import imtauthgui 1.0
 
 /**
- * GqlBasedTenantMembershipApiClient
+ * GqlBasedTenantManagementApiClient
  *
- * GQL/SDL implementation of the abstract TenantMembershipApiClient contract.
- * This is the ONLY place that imports the membership / roles / groups / users SDL modules
- * and that owns GqlSdlRequestSender instances for these operations.
+ * GQL/SDL implementation of the abstract TenantManagementApiClient contract.
+ * This is the ONLY place that imports the membership / roles / groups / users SDL
+ * modules and owns GqlSdlRequestSender / GqlBasedCollectionDocumentService /
+ * GqlBasedCommandsController instances for these operations.
  *
  * Pages depend only on the abstract contract; the orchestrator (TenantEditor)
  * injects this concrete client.
@@ -27,15 +35,24 @@ QtObject {
 	// Configuration
 	// =========================================================================
 
-	property string tenantId: ""
+	property string productId: AuthorizationController.productId
 
 	property Component __roleDataComp: Component { RoleData {} }
 	property Component __groupDataComp: Component { GroupData {} }
 	property Component __userDataComp: Component { UserData {} }
 
 	// =========================================================================
-	// Abstract contract (must mirror TenantMembershipApiClient.qml)
+	// Abstract contract (must mirror TenantManagementApiClient.qml)
 	// =========================================================================
+
+	// --- Document services (concrete instances expose abstract managers) ---
+	property string roleObjectTypeId: "Role"
+	property string groupObjectTypeId: "Group"
+	property string userObjectTypeId: "User"
+
+	readonly property var roleDocumentManager: __roleDocumentService
+	readonly property var groupDocumentManager: __groupDocumentService
+	readonly property var userDocumentManager: __userDocumentService
 
 	signal invitationCreated()
 	signal invitationRevoked(string invitationId)
@@ -63,6 +80,7 @@ QtObject {
 	signal requestFailed(string message)
 
 	// --- Real-time membership subscription notifications ---
+	signal subscriptionInvitationReceived(var notification)
 	signal subscriptionInvitationAccepted(var notification)
 	signal subscriptionInvitationRejected(var notification)
 	signal subscriptionOwnershipTransferred(var notification)
@@ -87,12 +105,21 @@ QtObject {
 				"role": data.containsKey("role") ? data.getData("role") : ""
 			}
 
-			if (notificationType === "InvitationAccepted" || notificationType === 1)
+			if (notificationType === "InvitationReceived" || notificationType === 0) {
+				var tName = notification.tenantName ? notification.tenantName : qsTr("a tenant")
+				PopupManager.addInfoMessage(qsTr("You have been invited to join \"%1\"").arg(tName), true)
+				AuthorizationController.tenantInvitationReceived(notification)
+				root.subscriptionInvitationReceived(notification)
+			} else if (notificationType === "InvitationAccepted" || notificationType === 1) {
+				AuthorizationController.tenantInvitationAccepted(notification)
 				root.subscriptionInvitationAccepted(notification)
-			else if (notificationType === "InvitationRejected" || notificationType === 2)
+			} else if (notificationType === "InvitationRejected" || notificationType === 2) {
+				AuthorizationController.tenantInvitationRejected(notification)
 				root.subscriptionInvitationRejected(notification)
-			else if (notificationType === "OwnershipTransferred" || notificationType === 3)
+			} else if (notificationType === "OwnershipTransferred" || notificationType === 3) {
+				AuthorizationController.tenantOwnershipTransferred(notification)
 				root.subscriptionOwnershipTransferred(notification)
+			}
 		}
 	}
 
@@ -262,9 +289,9 @@ QtObject {
 			AddedNotificationPayload {
 				onFinished: {
 					root.__pendingAddedUserId = m_id || ""
-					if (root.tenantId !== "" && root.__pendingAddedUserId !== "") {
+					if (root.productId !== "" && root.__pendingAddedUserId !== "") {
 						root.__addMembershipInput.m_userId = root.__pendingAddedUserId
-						root.__addMembershipInput.m_tenantId = root.tenantId
+						root.__addMembershipInput.m_tenantId = root.productId
 						root.__addMembershipInput.m_role = "Member"
 						root.__addMembershipSender.send(root.__addMembershipInput)
 					} else {
@@ -377,7 +404,7 @@ QtObject {
 	}
 
 	function createRoleData() {
-		return root.__roleDataComp.createObject(root, {"m_productId": root.tenantId})
+		return root.__roleDataComp.createObject(root, {"m_id": UuidGenerator.generateUUID()})
 	}
 
 	function insertRole(roleId, roleData) {
@@ -385,10 +412,10 @@ QtObject {
 			return
 		}
 
-		roleData.m_productId = root.tenantId
+		roleData.m_productId = root.productId
 		root.__roleAddInput.m_id = roleId
 		root.__roleAddInput.m_typeId = "Role"
-		root.__roleAddInput.m_productId = root.tenantId
+		root.__roleAddInput.m_productId = root.productId
 		root.__roleAddInput.m_name = roleData.m_name
 		root.__roleAddInput.m_description = roleData.m_description
 		root.__roleAddInput.m_item = roleData
@@ -408,11 +435,11 @@ QtObject {
 			return
 		}
 
-		roleData.m_productId = root.tenantId
+		roleData.m_productId = root.productId
 		root.__pendingSetRoleId = roleId
 		root.__roleUpdateInput.m_id = roleId || ""
 		root.__roleUpdateInput.m_typeId = "Role"
-		root.__roleUpdateInput.m_productId = root.tenantId
+		root.__roleUpdateInput.m_productId = root.productId
 		root.__roleUpdateInput.m_name = roleData.m_name
 		root.__roleUpdateInput.m_description = roleData.m_description || ""
 		root.__roleUpdateInput.m_item = roleData
@@ -422,12 +449,12 @@ QtObject {
 
 	function getRoleData(roleId) {
 		root.__roleItemInput.m_id = roleId || ""
-		root.__roleItemInput.m_productId = root.tenantId
+		root.__roleItemInput.m_productId = root.productId
 		root.__roleItemSender.send(root.__roleItemInput)
 	}
 
 	function createGroupData() {
-		return root.__groupDataComp.createObject(root, {"m_productId": root.tenantId})
+		return root.__groupDataComp.createObject(root, {"m_id": UuidGenerator.generateUUID()})
 	}
 
 	function insertGroup(groupId, groupData) {
@@ -435,10 +462,10 @@ QtObject {
 			return
 		}
 
-		groupData.m_productId = root.tenantId
+		groupData.m_productId = root.productId
 		root.__groupAddInput.m_id = groupId
 		root.__groupAddInput.m_typeId = "Group"
-		root.__groupAddInput.m_productId = root.tenantId
+		root.__groupAddInput.m_productId = root.productId
 		root.__groupAddInput.m_name = groupData.m_name
 		root.__groupAddInput.m_description = groupData.m_description
 		root.__groupAddInput.m_item = groupData
@@ -458,11 +485,11 @@ QtObject {
 			return
 		}
 
-		groupData.m_productId = root.tenantId
+		groupData.m_productId = root.productId
 		root.__pendingSetGroupId = groupId
 		root.__groupUpdateInput.m_id = groupId || ""
 		root.__groupUpdateInput.m_typeId = "Group"
-		root.__groupUpdateInput.m_productId = root.tenantId
+		root.__groupUpdateInput.m_productId = root.productId
 		root.__groupUpdateInput.m_name = groupData.m_name
 		root.__groupUpdateInput.m_description = groupData.m_description || ""
 		root.__groupUpdateInput.m_item = groupData
@@ -472,12 +499,12 @@ QtObject {
 
 	function getGroupData(groupId) {
 		root.__groupItemInput.m_id = groupId || ""
-		root.__groupItemInput.m_productId = root.tenantId
+		root.__groupItemInput.m_productId = root.productId
 		root.__groupItemSender.send(root.__groupItemInput)
 	}
 
 	function createUserData() {
-		return root.__userDataComp.createObject(root, {"m_productId": root.tenantId})
+		return root.__userDataComp.createObject(root, {"m_id": UuidGenerator.generateUUID()})
 	}
 
 	function insertUser(userId, userData) {
@@ -485,10 +512,10 @@ QtObject {
 			return
 		}
 
-		userData.m_productId = root.tenantId
+		userData.m_productId = AuthorizationController.productId
 		root.__userAddInput.m_id = userId
 		root.__userAddInput.m_typeId = "User"
-		root.__userAddInput.m_productId = root.tenantId
+		root.__userAddInput.m_productId = root.productId
 		root.__userAddInput.m_name = userData.m_name
 		root.__userAddInput.m_description = userData.m_description
 		root.__userAddInput.m_item = userData
@@ -508,11 +535,11 @@ QtObject {
 			return
 		}
 
-		userData.m_productId = root.tenantId
+		userData.m_productId = root.productId
 		root.__pendingSetUserId = userId
 		root.__userUpdateInput.m_id = userId || ""
 		root.__userUpdateInput.m_typeId = "User"
-		root.__userUpdateInput.m_productId = root.tenantId
+		root.__userUpdateInput.m_productId = root.productId
 		root.__userUpdateInput.m_name = userData.m_name
 		root.__userUpdateInput.m_description = userData.m_description || ""
 		root.__userUpdateInput.m_item = userData
@@ -522,7 +549,7 @@ QtObject {
 
 	function getUserData(userId) {
 		root.__userItemInput.m_id = userId || ""
-		root.__userItemInput.m_productId = root.tenantId
+		root.__userItemInput.m_productId = root.productId
 		root.__userItemSender.send(root.__userItemInput)
 	}
 
@@ -663,11 +690,302 @@ QtObject {
 	property var permissionsModel: __permissionsProvider.permissionsModel
 
 	property GqlBasedPermissionsProvider __permissionsProvider: GqlBasedPermissionsProvider {
-		productId: root.tenantId
+		productId: root.productId
 	}
 
 	function fetchPermissions() {
-		__permissionsProvider.productId = root.tenantId
+		__permissionsProvider.productId = root.productId
 		__permissionsProvider.updateModel()
+	}
+
+	// =========================================================================
+	// List data providers (Roles / Groups / invitable Users)
+	// =========================================================================
+
+	property Component roleListDataProviderComp: Component {
+		FilterableSelectGqlDataProvider {
+			collectionId: "Roles"
+			pageSize: 50
+		}
+	}
+
+	property Component groupListDataProviderComp: Component {
+		FilterableSelectGqlDataProvider {
+			collectionId: "Groups"
+			pageSize: 50
+		}
+	}
+
+	property Component invitableUsersListDataProviderComp: Component {
+		FilterableSelectGqlDataProvider {
+			collectionId: "UsersForInvitation"
+			multiSelect: true
+		}
+	}
+
+	// =========================================================================
+	// Document services (Roles / Groups / Users)
+	//
+	// These three services drive the SingleDocumentWorkspaceShellView in the
+	// Roles / Groups / Members pages. The pages themselves do NOT instantiate
+	// any GqlBasedCollectionDocumentService / SingleDocumentTypeRegistrar /
+	// DocumentRepresentationController — they only consume the abstract
+	// `roleDocumentManager` / `groupDocumentManager` / `userDocumentManager`
+	// properties.
+	// =========================================================================
+
+	property GqlBasedCollectionDocumentService __roleDocumentService: GqlBasedCollectionDocumentService {
+		collectionId: "Roles"
+	}
+
+	property GqlBasedCollectionDocumentService __groupDocumentService: GqlBasedCollectionDocumentService {
+		collectionId: "Groups"
+	}
+
+	property GqlBasedCollectionDocumentService __userDocumentService: GqlBasedCollectionDocumentService {
+		collectionId: "Users"
+	}
+
+	// --- Role editor + representation controller ---
+	property Component __roleEditorComp: Component {
+		RoleView {
+			productId: root.productId
+			permissionsModel: root.permissionsModel
+			commandsControllerComp: Component {
+				GqlBasedCommandsController {
+					typeId: root.roleObjectTypeId
+				}
+			}
+		}
+	}
+
+	property Component __roleControllerComp: Component {
+		DocumentRepresentationController {
+			id: roleReprController
+
+			representationModel: RoleData {
+				m_id: UuidGenerator.generateUUID()
+			}
+
+			function updateRepresentationFromDocument(){
+				startUpdateRepresentation(documentId, representationModel)
+
+				getRoleInput.m_id = documentId
+				getRoleInput.m_collectionId = "Roles"
+				getRoleRequest.send(getRoleInput)
+			}
+
+			function updateDocumentFromRepresentation(){
+				startUpdateDocument(documentId)
+
+				updateRoleInput.m_documentId = documentId
+				updateRoleInput.m_role = representationModel
+				updateRoleRequest.send(updateRoleInput)
+			}
+
+			property DocumentId getRoleInput: DocumentId {}
+			property UpdateRoleFromRepresentationInput updateRoleInput: UpdateRoleFromRepresentationInput {}
+
+			property GqlSdlRequestSender getRoleRequest: GqlSdlRequestSender {
+				gqlCommandId: ImtauthRoleCollectionDocumentServiceSdlCommandIds.s_getRoleRepresentation
+				sdlObjectComp: Component {
+					RoleData {
+						onFinished: {
+							roleReprController.representationModel.copyFrom(this)
+							roleReprController.representationUpdated(
+								roleReprController.documentId,
+								roleReprController.representationModel)
+						}
+					}
+				}
+
+				function onError(message, type){
+					roleReprController.updateRepresentationFailed(roleReprController.documentId, message)
+				}
+			}
+
+			property GqlSdlRequestSender updateRoleRequest: GqlSdlRequestSender {
+				gqlCommandId: ImtauthRoleCollectionDocumentServiceSdlCommandIds.s_updateRoleFromRepresentation
+				requestType: 1
+				sdlObjectComp: Component {
+					DocumentOperationStatus {
+						onFinished: {
+							if (m_status === "Success"){
+								roleReprController.documentUpdated(roleReprController.documentId)
+							}
+						}
+					}
+				}
+
+				function onError(message, type){
+					roleReprController.updateDocumentFailed(roleReprController.documentId, message)
+				}
+			}
+		}
+	}
+
+	// --- Group editor + representation controller ---
+	property Component __groupEditorComp: Component {
+		UserGroupView {
+			productId: root.productId
+			commandsControllerComp: Component {
+				GqlBasedCommandsController {
+					typeId: root.groupObjectTypeId
+				}
+			}
+		}
+	}
+
+	property Component __groupControllerComp: Component {
+		DocumentRepresentationController {
+			id: groupReprController
+
+			representationModel: GroupData {
+				m_id: UuidGenerator.generateUUID()
+			}
+
+			function updateRepresentationFromDocument(){
+				startUpdateRepresentation(documentId, representationModel)
+
+				getGroupInput.m_id = documentId
+				getGroupInput.m_collectionId = "Groups"
+				getGroupRequest.send(getGroupInput)
+			}
+
+			function updateDocumentFromRepresentation(){
+				startUpdateDocument(documentId)
+
+				updateGroupInput.m_documentId = documentId
+				updateGroupInput.m_group = representationModel
+				updateGroupRequest.send(updateGroupInput)
+			}
+
+			property DocumentId getGroupInput: DocumentId {}
+			property UpdateGroupFromRepresentationInput updateGroupInput: UpdateGroupFromRepresentationInput {}
+
+			property GqlSdlRequestSender getGroupRequest: GqlSdlRequestSender {
+				gqlCommandId: ImtauthGroupCollectionDocumentServiceSdlCommandIds.s_getGroupRepresentation
+				sdlObjectComp: Component {
+					GroupData {
+						onFinished: {
+							groupReprController.representationModel.copyFrom(this)
+							groupReprController.representationUpdated(
+								groupReprController.documentId,
+								groupReprController.representationModel)
+						}
+					}
+				}
+
+				function onError(message, type){
+					groupReprController.updateRepresentationFailed(groupReprController.documentId, message)
+				}
+			}
+
+			property GqlSdlRequestSender updateGroupRequest: GqlSdlRequestSender {
+				gqlCommandId: ImtauthGroupCollectionDocumentServiceSdlCommandIds.s_updateGroupFromRepresentation
+				requestType: 1
+				sdlObjectComp: Component {
+					DocumentOperationStatus {
+						onFinished: {
+							if (m_status === "Success"){
+								groupReprController.documentUpdated(groupReprController.documentId)
+							}
+						}
+					}
+				}
+
+				function onError(message, type){
+					groupReprController.updateDocumentFailed(groupReprController.documentId, message)
+				}
+			}
+		}
+	}
+
+	// --- User editor + representation controller ---
+	property Component __userEditorComp: Component {
+		UserView {
+			productId: root.productId
+			commandsControllerComp: Component {
+				GqlBasedCommandsController {
+					typeId: root.userObjectTypeId
+				}
+			}
+		}
+	}
+
+	property Component __userControllerComp: Component {
+		DocumentRepresentationController {
+			id: userReprController
+
+			representationModel: UserData {
+				m_id: UuidGenerator.generateUUID()
+			}
+
+			function updateRepresentationFromDocument(){
+				startUpdateRepresentation(documentId, representationModel)
+
+				getUserInput.m_id = documentId
+				getUserInput.m_collectionId = "Users"
+				getUserRequest.send(getUserInput)
+			}
+
+			function updateDocumentFromRepresentation(){
+				startUpdateDocument(documentId)
+
+				updateUserInput.m_documentId = documentId
+				updateUserInput.m_user = representationModel
+				updateUserRequest.send(updateUserInput)
+			}
+
+			property DocumentId getUserInput: DocumentId {}
+			property UpdateUserFromRepresentationInput updateUserInput: UpdateUserFromRepresentationInput {}
+
+			property GqlSdlRequestSender getUserRequest: GqlSdlRequestSender {
+				gqlCommandId: ImtauthUserCollectionDocumentServiceSdlCommandIds.s_getUserRepresentation
+				sdlObjectComp: Component {
+					UserData {
+						onFinished: {
+							userReprController.representationModel.copyFrom(this)
+							userReprController.representationUpdated(
+								userReprController.documentId,
+								userReprController.representationModel)
+						}
+					}
+				}
+
+				function onError(message, type){
+					userReprController.updateRepresentationFailed(userReprController.documentId, message)
+				}
+			}
+
+			property GqlSdlRequestSender updateUserRequest: GqlSdlRequestSender {
+				gqlCommandId: ImtauthUserCollectionDocumentServiceSdlCommandIds.s_updateUserFromRepresentation
+				requestType: 1
+				sdlObjectComp: Component {
+					DocumentOperationStatus {
+						onFinished: {
+							if (m_status === "Success"){
+								userReprController.documentUpdated(userReprController.documentId)
+							}
+						}
+					}
+				}
+
+				function onError(message, type){
+					userReprController.updateDocumentFailed(userReprController.documentId, message)
+				}
+			}
+		}
+	}
+
+	// Register each editor + controller pair with its document service so that
+	// pages only need to bind to the abstract `xDocumentManager` / `xObjectTypeId`.
+	Component.onCompleted: {
+		root.__roleDocumentService.registerDocumentViewData(
+			root.roleObjectTypeId, "Editor", root.__roleEditorComp, root.__roleControllerComp)
+		root.__groupDocumentService.registerDocumentViewData(
+			root.groupObjectTypeId, "Editor", root.__groupEditorComp, root.__groupControllerComp)
+		root.__userDocumentService.registerDocumentViewData(
+			root.userObjectTypeId, "Editor", root.__userEditorComp, root.__userControllerComp)
 	}
 }

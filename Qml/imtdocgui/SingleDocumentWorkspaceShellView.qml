@@ -32,11 +32,29 @@ Item {
 	// MultiDocWorkspaceView navigation layer.
 	property bool createNew: false
 
+	// Optional id to forward to the document manager as
+	// `proposedSourceDocumentId` when a new document is created (i.e. when
+	// `objectId` is empty / `createNew` is true). The server inserts the new
+	// collection object with this id, which keeps the client-side
+	// representation `m_id` aligned with the persisted object id without an
+	// extra round-trip. Ignored when an existing document is opened.
+	property string proposedSourceDocumentId: ""
+
 	// Whether to render the standard loading overlay in the content area.
 	property bool showStandardLoading: true
 
 	// Whether the header bar (document name + close button) is visible.
 	property bool headerVisible: true
+
+	// Controls whether the workspace prompts the user for a document name
+	// when the underlying document manager requests one (typically on the
+	// first save of a brand new document that has no name yet).
+	//
+	// When false (e.g. for editors that don't expose a user-visible document
+	// name like the Role/User/Group editors inside TenantEditor), the
+	// workspace silently fulfils the name request with `getDefaultDocumentName()`
+	// so the in-flight Save can proceed without showing a dialog.
+	property bool documentNameInputEnabled: true
 
 	// Current resolved document id (set after open/create succeeds).
 	readonly property alias documentId: _internal.documentId
@@ -128,10 +146,10 @@ Item {
 		_internal.lastErrorMessage = ""
 
 		if (typeof documentManager.openOrCreateByObjectId === "function"){
-			documentManager.openOrCreateByObjectId(objectTypeId, objectId)
+			documentManager.openOrCreateByObjectId(objectTypeId, objectId, proposedSourceDocumentId)
 		}
 		else if (objectId === ""){
-			documentManager.createDocument(objectTypeId)
+			documentManager.createDocument(objectTypeId, proposedSourceDocumentId)
 		}
 		else{
 			documentManager.openDocument(objectTypeId, objectId)
@@ -244,6 +262,39 @@ Item {
 						qsTr("Save document"),
 						qsTr("Save all changes ?"),
 						dialogCallback)
+		}
+
+		function onRequestDocumentName(documentId, documentTypeId){
+			if (documentId !== _internal.documentId){
+				return
+			}
+			if (workspaceView.documentManager && workspaceView.documentManager.hasDocumentNameProvider(documentTypeId)){
+				return
+			}
+			if (!workspaceView.documentNameInputEnabled){
+				// Name input is disabled for this workspace — fulfil the
+				// request with a default name so the save flow proceeds
+				// without prompting the user.
+				workspaceView.documentManager.setDocumentName(
+						documentId,
+						workspaceView.documentManager.getDefaultDocumentName())
+				return
+			}
+			ModalDialogManager.openDialog(inputDialogComp, {documentId: documentId})
+		}
+	}
+
+	Component {
+		id: inputDialogComp
+		InputDialog {
+			title: qsTr("Document Name")
+			placeHolderText: qsTr("Enter the document name")
+			property string documentId
+			onFinished: {
+				if (buttonId === Enums.ok){
+					workspaceView.documentManager.setDocumentName(documentId, inputValue)
+				}
+			}
 		}
 	}
 

@@ -113,10 +113,17 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentServiceComp::OnGetTe
 		QByteArray ownerId = tenantPtr->GetOwnerId();
 		QByteArray creatorId = tenantPtr->GetCreatorId();
 
+		bool ownerFound = false;
+
 		for (const QByteArray& membershipId : membershipIds){
 			imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
 			if (membershipPtr.IsValid() && membershipPtr->IsActive()){
 				QByteArray userId = membershipPtr->GetUserId();
+
+				// Skip Creator (unless they are also the Owner)
+				if (!creatorId.isEmpty() && userId == creatorId && userId != ownerId){
+					continue;
+				}
 
 				sdl::imtauth::Tenants::CTenantMemberEntry::V1_0 memberEntry;
 				memberEntry.id = userId;
@@ -127,18 +134,32 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentServiceComp::OnGetTe
 
 				response.Version_1_0->members->push_back(memberEntry);
 
-				// Assign environment role: Creator > Owner > stored role (Admin/Member)
+				// Assign environment role: Owner > stored role (Admin/Member)
 				sdl::imtauth::Tenants::CTenantMemberRoleEntry::V1_0 roleEntry;
 				roleEntry.userId = userId;
-				if (!creatorId.isEmpty() && userId == creatorId){
-					roleEntry.role = TenantEnvironmentRoleToString(imtauth::TER_CREATOR);
-				} else if (!ownerId.isEmpty() && userId == ownerId){
+				if (!ownerId.isEmpty() && userId == ownerId){
 					roleEntry.role = TenantEnvironmentRoleToString(imtauth::TER_OWNER);
+					ownerFound = true;
 				} else {
 					roleEntry.role = TenantEnvironmentRoleToString(membershipPtr->GetEnvironmentRole());
 				}
 				response.Version_1_0->memberRoles->push_back(roleEntry);
 			}
+		}
+
+		// Ensure the Owner always appears in the members list even if no membership entry exists
+		if (!ownerId.isEmpty() && !ownerFound){
+			sdl::imtauth::Tenants::CTenantMemberEntry::V1_0 ownerEntry;
+			ownerEntry.id = ownerId;
+			if (m_userCollectionCompPtr.IsValid()){
+				ownerEntry.name = imtauth::GetUserName(*m_userCollectionCompPtr, ownerId);
+			}
+			response.Version_1_0->members->push_back(ownerEntry);
+
+			sdl::imtauth::Tenants::CTenantMemberRoleEntry::V1_0 ownerRoleEntry;
+			ownerRoleEntry.userId = ownerId;
+			ownerRoleEntry.role = TenantEnvironmentRoleToString(imtauth::TER_OWNER);
+			response.Version_1_0->memberRoles->push_back(ownerRoleEntry);
 		}
 	}
 

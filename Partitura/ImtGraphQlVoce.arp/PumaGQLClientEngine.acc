@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6388" Description="ACF"/>
-            <Version Id="1" Number="2392" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395266" Description="Qt Framework"/>
+            <Version Id="0" Number="6397" Description="ACF"/>
+            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -130,6 +130,36 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="PublisherSubscriberBridge" PackageId="ImtServerGqlPck" ComponentId="PublisherSubscriberBridge">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>OnRolesDocumentChanged</Value>
+                                <Value>OnRolesUndoChanged</Value>
+                                <Value>OnUsersDocumentChanged</Value>
+                                <Value>OnUsersUndoChanged</Value>
+                                <Value>OnGroupsDocumentChanged</Value>
+                                <Value>OnGroupsUndoChanged</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubscriptionManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Subscription"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -306,6 +336,7 @@
                                 <Value>ConnectionSubscriber</Value>
                                 <Value>RemoteRepositories</Value>
                                 <Value>RemoteTenantController</Value>
+                                <Value>PublisherSubscriberBridge</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -585,6 +616,12 @@
                                             <Value>GroupItem</Value>
                                             <Value>GroupAdd</Value>
                                             <Value>GroupUpdate</Value>
+                                            <Value>GetGroupRepresentation</Value>
+                                            <Value>UpdateGroupFromRepresentation</Value>
+                                            <Value>GetRoleRepresentation</Value>
+                                            <Value>UpdateRoleFromRepresentation</Value>
+                                            <Value>GetUserRepresentation</Value>
+                                            <Value>UpdateUserFromRepresentation</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>

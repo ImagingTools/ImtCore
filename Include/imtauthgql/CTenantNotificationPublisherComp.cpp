@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtauthgql/CTenantMembershipPublisherComp.h>
+#include <imtauthgql/CTenantNotificationPublisherComp.h>
 
 // Qt includes
 #include <QJsonDocument>
@@ -20,7 +20,7 @@ namespace imtauthgql
 
 // reimplemented (imtgql::IGqlSubscriberController)
 
-bool CTenantMembershipPublisherComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+bool CTenantNotificationPublisherComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
 	if (m_commandIdsAttrPtr.IsValid()){
 		QByteArray commandId = m_commandIdsAttrPtr[0];
@@ -34,29 +34,77 @@ bool CTenantMembershipPublisherComp::IsRequestSupported(const imtgql::CGqlReques
 
 // reimplemented (icomp::CComponentBase)
 
-void CTenantMembershipPublisherComp::OnComponentCreated()
+void CTenantNotificationPublisherComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if (m_membershipManagerModelCompPtr.IsValid()){
-		m_membershipManagerModelCompPtr->AttachObserver(this);
+	// Initialize the membership cache so that subsequent OnUpdate() calls can
+	// detect NEW memberships (those not present in the cache).
+	if (m_membershipManagerCompPtr.IsValid() && m_tenantManagerCompPtr.IsValid()){
+		QMutexLocker locker(&m_cacheMutex);
+		QByteArrayList tenantIds = m_tenantManagerCompPtr->GetTenantIds();
+		for (const QByteArray& tenantId : tenantIds){
+			QByteArrayList membershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
+			for (const QByteArray& membershipId : membershipIds){
+				imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+				if (membershipPtr.IsValid()){
+					CachedMembership entry;
+					entry.userId = membershipPtr->GetUserId();
+					entry.tenantId = membershipPtr->GetTenantId();
+					entry.roleId = membershipPtr->GetRoleId();
+					entry.isActive = membershipPtr->IsActive();
+					m_cachedMemberships.insert(membershipId, entry);
+				}
+			}
+
+			// Also cache tenant owner
+			imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+			if (tenantPtr.IsValid()){
+				CachedTenantOwner ownerEntry;
+				ownerEntry.ownerId = tenantPtr->GetOwnerId();
+				m_cachedTenantOwners.insert(tenantId, ownerEntry);
+			}
+		}
+	}
+
+	// Initialize the invitation cache
+	if (m_invitationManagerCompPtr.IsValid() && m_tenantManagerCompPtr.IsValid()){
+		QMutexLocker locker(&m_cacheMutex);
+		QByteArrayList tenantIds = m_tenantManagerCompPtr->GetTenantIds();
+		for (const QByteArray& tenantId : tenantIds){
+			QByteArrayList invitationIds = m_invitationManagerCompPtr->GetInvitationsByTenant(tenantId);
+			for (const QByteArray& invitationId : invitationIds){
+				imtauth::ITenantInvitationUniquePtr invitationPtr = m_invitationManagerCompPtr->GetInvitation(invitationId);
+				if (invitationPtr.IsValid()){
+					CachedInvitation entry;
+					entry.userId = invitationPtr->GetUserId();
+					entry.tenantId = invitationPtr->GetTenantId();
+					entry.roleId = invitationPtr->GetRoleId();
+					entry.invitedByUserId = invitationPtr->GetInvitedByUserId();
+					entry.status = invitationPtr->GetStatus();
+					m_cachedInvitations.insert(invitationId, entry);
+				}
+			}
+		}
+	}
+
+	if (m_invitationManagerModelCompPtr.IsValid()){
+		RegisterModel(m_invitationManagerModelCompPtr.GetPtr(), 0);
 	}
 
 	if (m_tenantManagerModelCompPtr.IsValid()){
-		m_tenantManagerModelCompPtr->AttachObserver(this);
+		RegisterModel(m_tenantManagerModelCompPtr.GetPtr(), 1);
+	}
+
+	if (m_membershipManagerModelCompPtr.IsValid()){
+		RegisterModel(m_membershipManagerModelCompPtr.GetPtr(), 2);
 	}
 }
 
 
-void CTenantMembershipPublisherComp::OnComponentDestroyed()
+void CTenantNotificationPublisherComp::OnComponentDestroyed()
 {
-	if (m_tenantManagerModelCompPtr.IsValid()){
-		m_tenantManagerModelCompPtr->DetachObserver(this);
-	}
-
-	if (m_membershipManagerModelCompPtr.IsValid()){
-		m_membershipManagerModelCompPtr->DetachObserver(this);
-	}
+	BaseClass2::UnregisterAllModels();
 
 	BaseClass::OnComponentDestroyed();
 }
@@ -64,7 +112,7 @@ void CTenantMembershipPublisherComp::OnComponentDestroyed()
 
 // reimplemented (imod::CSingleModelObserverBase)
 
-void CTenantMembershipPublisherComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet & changeSet)
 {
 	struct PendingNotification
 	{
@@ -85,7 +133,6 @@ void CTenantMembershipPublisherComp::OnUpdate(const istd::IChangeable::ChangeSet
 		// --- Handle membership changes ---
 		if (m_membershipManagerCompPtr.IsValid()){
 
-			QSet<QByteArray> currentMembershipIds;
 			QMap<QByteArray, CachedMembership> currentState;
 
 			// Check all previously known memberships for changes or removal.
@@ -99,7 +146,6 @@ void CTenantMembershipPublisherComp::OnUpdate(const istd::IChangeable::ChangeSet
 					current.roleId = membershipPtr->GetRoleId();
 					current.isActive = membershipPtr->IsActive();
 					currentState.insert(membershipId, current);
-					currentMembershipIds.insert(membershipId);
 				}
 			}
 
@@ -165,18 +211,6 @@ void CTenantMembershipPublisherComp::OnUpdate(const istd::IChangeable::ChangeSet
 							newEntry.roleId = membershipPtr->GetRoleId();
 							newEntry.isActive = membershipPtr->IsActive();
 							currentState.insert(membershipId, newEntry);
-
-							// New inactive membership = invitation.
-							if (!newEntry.isActive){
-								pendingNotifications.append({
-									newEntry.userId,
-									sdl::imtauth::TenantMemberships::EMembershipNotificationType::InvitationReceived,
-									membershipId,
-									newEntry.userId,
-									newEntry.tenantId,
-									QString(),
-									newEntry.roleId});
-							}
 						}
 					}
 				}
@@ -184,6 +218,114 @@ void CTenantMembershipPublisherComp::OnUpdate(const istd::IChangeable::ChangeSet
 
 			// Update cache to current state.
 			m_cachedMemberships = currentState;
+		}
+
+		// --- Handle invitation changes ---
+		if (m_invitationManagerCompPtr.IsValid()){
+
+			QMap<QByteArray, CachedInvitation> currentInvitations;
+
+			// Collect all known tenants to scan for invitations
+			QSet<QByteArray> tenantsToCheck;
+			for (auto it = m_cachedInvitations.constBegin(); it != m_cachedInvitations.constEnd(); ++it){
+				tenantsToCheck.insert(it.value().tenantId);
+			}
+			for (auto it = m_cachedMemberships.constBegin(); it != m_cachedMemberships.constEnd(); ++it){
+				tenantsToCheck.insert(it.value().tenantId);
+			}
+			if (m_tenantManagerCompPtr.IsValid()){
+				QByteArrayList allTenantIds = m_tenantManagerCompPtr->GetTenantIds();
+				for (const QByteArray& tid : allTenantIds){
+					tenantsToCheck.insert(tid);
+				}
+			}
+
+			for (const QByteArray& tenantId : std::as_const(tenantsToCheck)){
+				QByteArrayList invitationIds = m_invitationManagerCompPtr->GetInvitationsByTenant(tenantId);
+				for (const QByteArray& invitationId : std::as_const(invitationIds)){
+					imtauth::ITenantInvitationUniquePtr invitationPtr = m_invitationManagerCompPtr->GetInvitation(invitationId);
+					if (invitationPtr.IsValid()){
+						CachedInvitation entry;
+						entry.userId = invitationPtr->GetUserId();
+						entry.tenantId = invitationPtr->GetTenantId();
+						entry.roleId = invitationPtr->GetRoleId();
+						entry.invitedByUserId = invitationPtr->GetInvitedByUserId();
+						entry.status = invitationPtr->GetStatus();
+						currentInvitations.insert(invitationId, entry);
+					}
+				}
+			}
+
+			// Detect new invitations (not in cache)
+			for (auto it = currentInvitations.constBegin(); it != currentInvitations.constEnd(); ++it){
+				const QByteArray& invitationId = it.key();
+				const CachedInvitation& current = it.value();
+
+				if (!m_cachedInvitations.contains(invitationId)){
+					// New invitation — notify the invited user
+					if (current.status == imtauth::ITenantInvitation::TIS_PENDING){
+						QString tenantName;
+						if (m_tenantManagerCompPtr.IsValid()){
+							imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(current.tenantId);
+							if (tenantPtr.IsValid()){
+								tenantName = tenantPtr->GetTenantName();
+							}
+						}
+						pendingNotifications.append({
+							current.userId,
+							sdl::imtauth::TenantMemberships::EMembershipNotificationType::InvitationReceived,
+							invitationId,
+							current.userId,
+							current.tenantId,
+							tenantName,
+							current.roleId});
+					}
+				}
+				else{
+					const CachedInvitation& cached = m_cachedInvitations.value(invitationId);
+					// Status transition detection
+					if (cached.status != current.status){
+						QByteArray ownerUserId = FindTenantOwnerUserId(current.tenantId);
+						QString tenantName;
+						if (m_tenantManagerCompPtr.IsValid()){
+							imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(current.tenantId);
+							if (tenantPtr.IsValid()){
+								tenantName = tenantPtr->GetTenantName();
+							}
+						}
+
+						if (current.status == imtauth::ITenantInvitation::TIS_ACCEPTED){
+							// Notify owner that invitation was accepted
+							if (!ownerUserId.isEmpty()){
+								pendingNotifications.append({
+									ownerUserId,
+									sdl::imtauth::TenantMemberships::EMembershipNotificationType::InvitationAccepted,
+									invitationId,
+									current.userId,
+									current.tenantId,
+									tenantName,
+									current.roleId});
+							}
+						}
+						else if (current.status == imtauth::ITenantInvitation::TIS_REJECTED){
+							// Notify owner that invitation was rejected
+							if (!ownerUserId.isEmpty()){
+								pendingNotifications.append({
+									ownerUserId,
+									sdl::imtauth::TenantMemberships::EMembershipNotificationType::InvitationRejected,
+									invitationId,
+									current.userId,
+									current.tenantId,
+									tenantName,
+									current.roleId});
+							}
+						}
+					}
+				}
+			}
+
+			// Update invitation cache
+			m_cachedInvitations = currentInvitations;
 		}
 
 		// --- Handle ownership changes ---
@@ -259,7 +401,7 @@ void CTenantMembershipPublisherComp::OnUpdate(const istd::IChangeable::ChangeSet
 
 // private methods
 
-void CTenantMembershipPublisherComp::PublishNotification(
+void CTenantNotificationPublisherComp::PublishNotification(
 	const QByteArray& targetUserId,
 	sdl::imtauth::TenantMemberships::EMembershipNotificationType notificationType,
 	const QByteArray& membershipId,
@@ -302,7 +444,7 @@ void CTenantMembershipPublisherComp::PublishNotification(
 }
 
 
-QByteArray CTenantMembershipPublisherComp::FindTenantOwnerUserId(const QByteArray& tenantId) const
+QByteArray CTenantNotificationPublisherComp::FindTenantOwnerUserId(const QByteArray& tenantId) const
 {
 	if (!m_tenantManagerCompPtr.IsValid() || tenantId.isEmpty()){
 		return QByteArray();

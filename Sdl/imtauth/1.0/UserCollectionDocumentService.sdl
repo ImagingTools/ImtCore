@@ -1,0 +1,26 @@
+schema {
+	namespace: imtauth
+	version: 1.0
+
+	query: Query
+	mutation: Mutation
+}
+
+import {
+	"Users.sdl"
+	"../../imtbase/1.0/CollectionDocumentService.sdl"
+	"../../imtbase/1.0/UndoManager.sdl"
+}
+
+type UpdateUserFromRepresentationInput {
+	documentId: ID!
+	user: UserData!
+}
+
+type Query {
+	GetUserRepresentation(input: DocumentId): UserData!
+}
+
+type Mutation {
+	UpdateUserFromRepresentation(input: UpdateUserFromRepresentationInput): DocumentOperationStatus!
+}

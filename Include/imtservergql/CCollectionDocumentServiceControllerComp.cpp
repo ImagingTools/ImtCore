@@ -2,6 +2,14 @@
 #include <imtservergql/CCollectionDocumentServiceControllerComp.h>
 
 
+// ACF includes
+#include <istd/TDelPtr.h>
+
+// ImtCore includes
+#include <imtbase/COperationContext.h>
+#include <imtauth/CUserInfo.h>
+
+
 namespace imtservergql
 {
 
@@ -293,10 +301,14 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSaveDo
 	retVal.Version_1_0.emplace();
 
 	if (m_documentManagerCompPtr.IsValid()) {
+		istd::TDelPtr<imtbase::IOperationContext> operationContextPtr;
+		operationContextPtr.SetPtr(CreateOperationContextFromGqlRequest(gqlRequest));
+
 		imtdoc::IDocumentService::TaskParams taskParams;
 		taskParams.userId = userId;
 		taskParams.documentId = *saveDocumentInput->documentId;
 		taskParams.documentName = *saveDocumentInput->documentName;
+		taskParams.operationContextPtr = operationContextPtr.GetPtr();
 		QByteArray taskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, taskParams);
 		imtdoc::IDocumentService::TaskResult taskResult = m_documentManagerCompPtr->WaitForTaskFinished(taskId);
 		QString saveErrorMessage = taskResult.errorMessage;
@@ -660,6 +672,32 @@ bool CCollectionDocumentServiceControllerComp::IsRequestSupported(const imtgql::
 
 
 // private methods
+
+imtbase::IOperationContext* CCollectionDocumentServiceControllerComp::CreateOperationContextFromGqlRequest(const ::imtgql::CGqlRequest& gqlRequest) const
+{
+	const imtgql::IGqlContext* requestContextPtr = gqlRequest.GetRequestContext();
+	if (requestContextPtr == nullptr){
+		return nullptr;
+	}
+
+	const imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(requestContextPtr->GetUserInfo());
+
+	istd::TDelPtr<imtbase::COperationContext> operationContextPtr;
+	operationContextPtr.SetPtr(new imtbase::COperationContext);
+
+	if (userInfoPtr != nullptr){
+		imtbase::IOperationContext::IdentifableObjectInfo objectInfo;
+		objectInfo.id = userInfoPtr->GetObjectUuid();
+		objectInfo.name = userInfoPtr->GetName();
+		operationContextPtr->SetOperationOwnerId(objectInfo);
+	}
+
+	QByteArray tenantId = requestContextPtr->GetTenantId();
+	operationContextPtr->SetTenantId(tenantId);
+
+	return operationContextPtr.PopPtr();
+}
+
 
 QByteArray CCollectionDocumentServiceControllerComp::GetUserId(const ::imtgql::CGqlRequest& gqlRequest) const
 {

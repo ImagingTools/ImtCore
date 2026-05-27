@@ -56,6 +56,7 @@ public:
 	virtual QByteArray GetUserFromJwt(const QByteArray& jwt) const override;
 	virtual QByteArray GetTenantFromJwt(const QByteArray& jwt) const override;
 	virtual QByteArray GetSessionFromJwt(const QByteArray& jwt) const override;
+	virtual void InvalidateToken(const QByteArray& token) const override;
 
 private:
 	struct TokenCacheEntry
