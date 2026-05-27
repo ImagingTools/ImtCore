@@ -88,16 +88,17 @@ void CTenantNotificationPublisherComp::OnComponentCreated()
 		}
 	}
 
+	// Register all models via TMultiModelObserverBase
 	if (m_membershipManagerModelCompPtr.IsValid()){
-		m_membershipManagerModelCompPtr->AttachObserver(this);
+		RegisterModel(m_membershipManagerModelCompPtr.GetPtr(), MembershipManagerModelId);
 	}
 
 	if (m_tenantManagerModelCompPtr.IsValid()){
-		m_tenantManagerModelCompPtr->AttachObserver(this);
+		RegisterModel(m_tenantManagerModelCompPtr.GetPtr(), TenantManagerModelId);
 	}
 
 	if (m_invitationManagerModelCompPtr.IsValid()){
-		m_invitationManagerModelCompPtr->AttachObserver(this);
+		RegisterModel(m_invitationManagerModelCompPtr.GetPtr(), InvitationManagerModelId);
 	}
 }
 
@@ -105,22 +106,22 @@ void CTenantNotificationPublisherComp::OnComponentCreated()
 void CTenantNotificationPublisherComp::OnComponentDestroyed()
 {
 	if (m_invitationManagerModelCompPtr.IsValid()){
-		m_invitationManagerModelCompPtr->DetachObserver(this);
+		UnregisterModel(InvitationManagerModelId);
 	}
 
 	if (m_tenantManagerModelCompPtr.IsValid()){
-		m_tenantManagerModelCompPtr->DetachObserver(this);
+		UnregisterModel(TenantManagerModelId);
 	}
 
 	if (m_membershipManagerModelCompPtr.IsValid()){
-		m_membershipManagerModelCompPtr->DetachObserver(this);
+		UnregisterModel(MembershipManagerModelId);
 	}
 
 	BaseClass::OnComponentDestroyed();
 }
 
 
-// reimplemented (imod::CSingleModelObserverBase)
+// reimplemented (imod::TMultiModelObserverBase)
 
 void CTenantNotificationPublisherComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
