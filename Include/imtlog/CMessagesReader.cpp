@@ -218,7 +218,7 @@ CMessagesReader::EventContainerPtr CMessagesReader::ImportContainer(const QStrin
 	}
 
 	QString containerPath;
-	QString uuid = QUuid::createUuid().toString();
+	QString uuid = QUuid::createUuid().toString(QUuid::WithoutBraces);
 	QString tempDir = QDir::tempPath() + "/ImtCore/" + uuid;
 
 	if (info.suffix() == m_archiveExtension){

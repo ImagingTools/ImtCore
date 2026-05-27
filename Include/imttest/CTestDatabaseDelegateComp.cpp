@@ -35,7 +35,7 @@ istd::IChangeableUniquePtr CTestDatabaseDelegateComp::CreateObjectFromRecord(con
 	}
 
 	if(record.contains("id")){
-		QByteArray testId = record.value("Id").toByteArray();
+		QByteArray testId = imtdb::VariantToByteArray(record.value("Id"));
 		testInfoPtr->SetTestId(testId);
 	}
 

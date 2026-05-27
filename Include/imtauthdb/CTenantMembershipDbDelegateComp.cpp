@@ -31,13 +31,13 @@ istd::IChangeableUniquePtr CTenantMembershipDbDelegateComp::CreateObjectFromReco
 	}
 
 	if (record.contains("Id")){
-		membershipPtr->SetMembershipId(record.value("Id").toByteArray());
+		membershipPtr->SetMembershipId(imtdb::VariantToByteArray(record.value("Id")));
 	}
 	if (record.contains("UserId")){
-		membershipPtr->SetUserId(record.value("UserId").toByteArray());
+		membershipPtr->SetUserId(imtdb::VariantToByteArray(record.value("UserId")));
 	}
 	if (record.contains("TenantId")){
-		membershipPtr->SetTenantId(record.value("TenantId").toByteArray());
+		membershipPtr->SetTenantId(imtdb::VariantToByteArray(record.value("TenantId")));
 	}
 	if (record.contains("Role")){
 		membershipPtr->SetRoleId(record.value("Role").toByteArray());

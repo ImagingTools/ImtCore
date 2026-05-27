@@ -38,7 +38,7 @@ IGqlClient::GqlResponsePtr CApiClientComp::SendRequest(GqlRequestPtr requestPtr,
 		if ((requestType == imtgql::IGqlRequest::RT_QUERY) || (requestType == imtgql::IGqlRequest::RT_MUTATION)){
 			QNetworkRequest* networkRequestPtr = m_protocolEngineCompPtr->CreateNetworkRequest(*requestPtr, urlParam);
 			if (networkRequestPtr != nullptr){
-				QByteArray uuid = QUuid::createUuid().toByteArray();
+				QByteArray uuid = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 				istd::IInformationProvider::InformationCategory category = istd::IInformationProvider::IC_INFO;
 				QString message = "Send request with ID " + uuid + "\n" + requestPtr->GetQuery();

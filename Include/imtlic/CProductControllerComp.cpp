@@ -48,7 +48,7 @@ bool CProductControllerComp::GetData(
 		return false;
 	}
 
-	QString filePathTmp = QDir::tempPath() + "/" + QUuid::createUuid().toString() + ".xml";
+	QString filePathTmp = QDir::tempPath() + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces) + ".xml";
 	{
 		ifile::CCompactXmlFileWriteArchive writeArchive(filePathTmp, m_versionInfoCompPtr.GetPtr());
 		if (!productInfoPtr->Serialize(writeArchive)){
@@ -90,7 +90,7 @@ bool CProductControllerComp::SetData(const QByteArray& data, QByteArray& dataId)
 	}
 
 	QTemporaryDir tempDir;
-	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString() + ".xml";
+	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces) + ".xml";
 
 	QFile file(filePathTmp);
 	if (!file.open(QIODevice::WriteOnly)){
