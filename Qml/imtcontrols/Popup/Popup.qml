@@ -1,5 +1,6 @@
 import QtQuick 2.12
 import QtQuick.Window 2.2
+import Acf 1.0
 import imtcontrols 1.0
 import "Internal" as Internal
 
@@ -256,15 +257,15 @@ FocusScope {
     Item {
         id: defaultBackground
         visible: false   // parented into contentRoot.bgSlot when active
-        property color bgColor:   (typeof Style !== "undefined" && Style.baseColor)    ? Style.baseColor    : "#ffffff"
-        property color borderClr: (typeof Style !== "undefined" && Style.borderColor)  ? Style.borderColor  : "#cccccc"
-        property real  radiusVal: (typeof Style !== "undefined" && Style.buttonRadius) ? Style.buttonRadius : 4
+        property color bgColor:   Style.baseColor
+        property color borderClr: Style.borderColor
+        property real  radiusVal: Style.buttonRadius
         Rectangle {
             anchors.fill: parent
             color: defaultBackground.bgColor
             radius: defaultBackground.radiusVal
             border.color: defaultBackground.borderClr
-            border.width: 1
+            border.width: Style.buttonBorderWidth
         }
     }
 

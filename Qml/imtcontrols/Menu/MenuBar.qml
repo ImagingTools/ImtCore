@@ -1,4 +1,5 @@
 import QtQuick 2.12
+import Acf 1.0
 import imtcontrols 1.0
 
 /*!
@@ -52,7 +53,7 @@ FocusScope {
         id: row
         anchors.left: parent.left
         anchors.top: parent.top
-        spacing: 2
+        spacing: Style.spacingXXS
     }
 
     // Holder for declared Menu children. We do not render them; we just

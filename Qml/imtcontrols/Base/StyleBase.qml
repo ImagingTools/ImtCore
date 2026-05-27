@@ -154,6 +154,7 @@ StyleComponents {
 	property int spacingM: 10
 	property int spacingS: 8
 	property int spacingXS: 4
+	property int spacingXXS: 2
 
 	//Icon sizes
 	property int iconSizeXXXL: 128
@@ -203,6 +204,7 @@ StyleComponents {
 
 	//menu row
 	property int menuRowHeight: 30
+	property int menuMinWidth: 160
 
 	//table sizes
 	property int tableRowHeight: 35

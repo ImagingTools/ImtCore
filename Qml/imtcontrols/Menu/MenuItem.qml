@@ -1,4 +1,5 @@
 import QtQuick 2.12
+import Acf 1.0
 import imtcontrols 1.0
 
 /*!
@@ -46,7 +47,7 @@ Item {
     property var submenu: null
 
     /*! Implicit height used by Menu's ListView delegate. */
-    property int itemHeight: (typeof Style !== "undefined" && Style.controlHeightM) ? Style.controlHeightM : 28
+    property int itemHeight: Style.controlHeightM
 
     readonly property bool isMenuItem: true
 

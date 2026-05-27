@@ -1,4 +1,5 @@
 import QtQuick 2.12
+import Acf 1.0
 import imtcontrols 1.0
 
 /*!
@@ -27,26 +28,26 @@ Item {
     /*! Highlighted state (hover or open). */
     property bool highlighted: (menu && menu.opened) || hover.containsMouse
 
-    implicitHeight: (typeof Style !== "undefined" && Style.controlHeightM) ? Style.controlHeightM : 28
-    implicitWidth: label.implicitWidth + 24
+    implicitHeight: Style.controlHeightM
+    implicitWidth: label.implicitWidth + Style.marginXL
     width: implicitWidth
     height: implicitHeight
 
     Rectangle {
         anchors.fill: parent
         color: item.highlighted
-                ? ((typeof Style !== "undefined" && Style.buttonHoverColor) ? Style.buttonHoverColor : "#e5f0ff")
+                ? Style.buttonHoverColor
                 : "transparent"
-        radius: (typeof Style !== "undefined" && Style.buttonRadius) ? Style.buttonRadius : 3
+        radius: Style.buttonRadius
     }
 
     Text {
         id: label
         anchors.centerIn: parent
         text: item.text
-        color: (typeof Style !== "undefined" && Style.textColor) ? Style.textColor : "#222"
-        font.family: (typeof Style !== "undefined" && Style.fontFamily) ? Style.fontFamily : ""
-        font.pixelSize: (typeof Style !== "undefined" && Style.fontSizeM) ? Style.fontSizeM : 13
+        color: Style.textColor
+        font.family: Style.fontFamily
+        font.pixelSize: Style.fontSizeM
     }
 
     MouseArea {

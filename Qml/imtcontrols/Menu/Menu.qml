@@ -1,4 +1,5 @@
 import QtQuick 2.12
+import Acf 1.0
 import imtcontrols 1.0
 import "../Popup" as ImtPopup
 import "../Popup/Internal" as PopupInternal
@@ -73,8 +74,8 @@ ImtPopup.Popup {
 
     /*! Sensible defaults for a menu: no padding, narrower margins, close
         on outside press or escape. */
-    padding: 4
-    margins: 4
+    padding: Style.spacingXS
+    margins: Style.spacingXS
 
     // contentItem is overridden to be the ListView; user contentChildren
     // go into Menu's own item array (separated below into rowsModel and

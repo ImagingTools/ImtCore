@@ -1,4 +1,5 @@
 import QtQuick 2.12
+import Acf 1.0
 import imtcontrols 1.0
 
 /*!
@@ -20,31 +21,31 @@ Rectangle {
     property bool isSeparator: menuItem && menuItem.isMenuSeparator === true
 
     width: ListView.view ? ListView.view.width : implicitWidth
-    implicitWidth: 160
+    implicitWidth: Style.menuMinWidth
     height: isSeparator
-            ? (menuItem ? menuItem.height : 8)
-            : (menuItem ? menuItem.itemHeight : 28)
+            ? (menuItem ? menuItem.height : Style.marginS)
+            : (menuItem ? menuItem.itemHeight : Style.controlHeightM)
 
     color: !menuItem || !menuItem.enabled
             ? "transparent"
             : (current || (menuItem.highlighted === true)
-               ? ((typeof Style !== "undefined" && Style.buttonHoverColor) ? Style.buttonHoverColor : "#e5f0ff")
+               ? Style.buttonHoverColor
                : "transparent")
 
     // Separator just renders a thin horizontal line; the actual MenuSeparator
     // object is kept in Menu's contentData and is not reparented.
     Rectangle {
         anchors.centerIn: parent
-        width: row.width - 8
-        height: 1
-        color: (typeof Style !== "undefined" && Style.borderColor) ? Style.borderColor : "#cccccc"
+        width: row.width - Style.marginS
+        height: Style.buttonBorderWidth
+        color: Style.borderColor
         visible: row.isSeparator
     }
 
     Item {
         anchors.fill: parent
-        anchors.leftMargin:  (typeof Style !== "undefined" && Style.marginM) ? Style.marginM : 8
-        anchors.rightMargin: (typeof Style !== "undefined" && Style.marginM) ? Style.marginM : 8
+        anchors.leftMargin:  Style.marginM
+        anchors.rightMargin: Style.marginM
         visible: !row.isSeparator
 
         Image {
@@ -52,7 +53,7 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             source: row.menuItem ? row.menuItem.iconSource : ""
-            width:  source != "" ? ((typeof Style !== "undefined" && Style.iconSizeS) ? Style.iconSizeS : 16) : 0
+            width:  source != "" ? Style.iconSizeS : 0
             height: width
             fillMode: Image.PreserveAspectFit
             visible: source != ""
@@ -63,15 +64,15 @@ Rectangle {
             id: check
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: icon.right
-            anchors.leftMargin: visible ? 6 : 0
-            width: visible ? 12 : 0
+            anchors.leftMargin: visible ? Style.marginXS : 0
+            width: visible ? Style.iconSizeXS : 0
             height: width
-            radius: 2
+            radius: Style.radiusXS
             color: row.menuItem && row.menuItem.checked
-                   ? ((typeof Style !== "undefined" && Style.buttonPressedColor) ? Style.buttonPressedColor : "#3a83f0")
+                   ? Style.buttonPressedColor
                    : "transparent"
-            border.width: 1
-            border.color: (typeof Style !== "undefined" && Style.borderColor) ? Style.borderColor : "#888"
+            border.width: Style.buttonBorderWidth
+            border.color: Style.borderColor
             visible: row.menuItem && row.menuItem.checkable
         }
 
@@ -79,16 +80,16 @@ Rectangle {
             id: label
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: check.visible ? check.right : (icon.visible ? icon.right : parent.left)
-            anchors.leftMargin: (check.visible || icon.visible) ? 8 : 0
+            anchors.leftMargin: (check.visible || icon.visible) ? Style.marginS : 0
             anchors.right: rightCluster.left
-            anchors.rightMargin: 8
+            anchors.rightMargin: Style.marginS
             text: row.menuItem ? _strip(row.menuItem.text) : ""
             elide: Text.ElideRight
             color: row.menuItem && row.menuItem.enabled
-                   ? ((typeof Style !== "undefined" && Style.textColor) ? Style.textColor : "#222")
-                   : ((typeof Style !== "undefined" && Style.inactiveTextColor) ? Style.inactiveTextColor : "#999")
-            font.family: (typeof Style !== "undefined" && Style.fontFamily) ? Style.fontFamily : ""
-            font.pixelSize: (typeof Style !== "undefined" && Style.fontSizeM) ? Style.fontSizeM : 13
+                   ? Style.textColor
+                   : Style.inactiveTextColor
+            font.family: Style.fontFamily
+            font.pixelSize: Style.fontSizeM
 
             // Strip mnemonic markers ('&X' -> 'X'); a future iteration may
             // render the next char with an underline when Alt is held.
@@ -105,18 +106,18 @@ Rectangle {
             id: rightCluster
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
-            spacing: 6
+            spacing: Style.marginXS
             Text {
                 visible: row.menuItem && row.menuItem.shortcut !== ""
                 text: row.menuItem ? row.menuItem.shortcut : ""
-                color: (typeof Style !== "undefined" && Style.inactiveTextColor) ? Style.inactiveTextColor : "#888"
-                font.pixelSize: (typeof Style !== "undefined" && Style.fontSizeSmall) ? Style.fontSizeSmall : 11
+                color: Style.inactiveTextColor
+                font.pixelSize: Style.fontSizeS
             }
             Text {
                 visible: row.menuItem && row.menuItem.hasSubmenu === true
                 text: "\u25B6"   // black right-pointing triangle
-                color: (typeof Style !== "undefined" && Style.textColor) ? Style.textColor : "#222"
-                font.pixelSize: 10
+                color: Style.textColor
+                font.pixelSize: Style.fontSizeXS
             }
         }
     }

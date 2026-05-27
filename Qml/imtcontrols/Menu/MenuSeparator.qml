@@ -1,4 +1,5 @@
 import QtQuick 2.12
+import Acf 1.0
 import imtcontrols 1.0
 
 /*!
@@ -12,7 +13,7 @@ Item {
     objectName: "ImtControlsMenuSeparator"
 
     width: parent ? parent.width : 0
-    height: (typeof Style !== "undefined" && Style.marginM) ? Style.marginM : 8
+    height: Style.marginM
     implicitHeight: height
 
     /*! Stable type-tag so Menu can distinguish separators from items. */
@@ -22,9 +23,9 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.leftMargin:  (typeof Style !== "undefined" && Style.marginXS) ? Style.marginXS : 4
-        anchors.rightMargin: (typeof Style !== "undefined" && Style.marginXS) ? Style.marginXS : 4
-        height: 1
-        color: (typeof Style !== "undefined" && Style.borderColor) ? Style.borderColor : "#cccccc"
+        anchors.leftMargin:  Style.marginXS
+        anchors.rightMargin: Style.marginXS
+        height: Style.buttonBorderWidth
+        color: Style.borderColor
     }
 }
