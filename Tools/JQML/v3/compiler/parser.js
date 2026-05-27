@@ -197,7 +197,8 @@ var OPERATORS = array_to_hash([
     "^=",
     "&=",
     "&&",
-    "||"
+    "||",
+    "=>"
 ]);
 
 var LE_FLAG = false
@@ -1333,7 +1334,23 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
             switch (S.token.value) {
               case "(":
                 next();
-                return subscripts(prog1(expression, curry(expect, ")")), allow_calls);
+                // Handle empty parens: () => ...
+                if (is("punc", ")")) {
+                    next();
+                    if (is("operator", "=>")) {
+                        next();
+                        return subscripts(arrow_function_([]), allow_calls);
+                    }
+                    unexpected();
+                }
+                var inner = expression();
+                expect(")");
+                // Check for arrow function: (params) => ...
+                if (is("operator", "=>")) {
+                    next();
+                    return subscripts(arrow_function_(extract_arrow_params(inner)), allow_calls);
+                }
+                return subscripts(inner, allow_calls);
               case "[":
                 next();
                 return subscripts(array_(), allow_calls);
@@ -1495,6 +1512,11 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
 
     function maybe_assign(no_in) {
         var left = maybe_conditional(no_in), val = S.token.value;
+        // Single-name arrow function: x => ...
+        if (left[0] === "name" && is("operator", "=>")) {
+            next();
+            return arrow_function_([left[1]]);
+        }
         if (is("operator") && HOP(ASSIGNMENT, val)) {
             if (is_assignable(left)) {
                 next();
@@ -1523,6 +1545,31 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
         } finally {
             --S.in_loop;
         }
+    };
+
+    function extract_arrow_params(expr) {
+        if (expr[0] === "name") return [expr[1]];
+        if (expr[0] === "seq") {
+            function flattenSeq(node) {
+                if (node[0] === "name") return [node[1]];
+                if (node[0] === "seq") return flattenSeq(node[1]).concat(flattenSeq(node[2]));
+                return [];
+            }
+            return flattenSeq(expr);
+        }
+        return [];
+    };
+
+    function arrow_function_(params) {
+        var info = S.token;
+        var body;
+        if (is("punc", "{")) {
+            body = block_();
+        } else {
+            var expr = expression(false);
+            body = [as_(info, "stat", expr)];
+        }
+        return as_(info, "arrow", params, body);
     };
 
     
@@ -1725,12 +1772,23 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
           expect(",");
         if (!is("name") && !is('keyword', 'var'))
           unexpected();
-        var type = S.token.value;
+        var firstName = S.token.value;
         next();
-        if (!is("name"))
-          unexpected();
-        args.push({ type: type, name: S.token.value });
-        next();
+        if (is("punc", ":")) {
+          // name: type syntax
+          next();
+          if (!is("name") && !is('keyword', 'var'))
+            unexpected();
+          var typeName = S.token.value;
+          next();
+          args.push({ type: typeName, name: firstName });
+        } else {
+          // type name syntax (legacy)
+          if (!is("name"))
+            unexpected();
+          args.push({ type: firstName, name: S.token.value });
+          next();
+        }
       }
       next();
     }
