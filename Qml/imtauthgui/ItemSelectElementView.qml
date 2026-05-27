@@ -155,22 +155,12 @@ ElementView {
 				Repeater {
 					model: itemSelectElementView.items
 					delegate: Rectangle {
-						// Use TextMetrics for natural-width measurement to avoid a
-						// binding loop: chipText is elided, so its contentWidth
-						// depends on its own width once anchored, which would feed
-						// back into Rectangle.width through this binding.
-						width: Math.min(chipTextMetrics.width + chipRemove.width + Style.paddingS * 3, 200)
+						width: Math.min(chipText.implicitWidth + chipRemove.width + Style.paddingS * 3, 200)
 						height: 28
 						radius: 14
 						color: itemSelectElementView.accentBgLight
 						border.color: itemSelectElementView.accentBorderLight
 						border.width: 1
-
-						TextMetrics {
-							id: chipTextMetrics
-							font: chipText.font
-							text: chipText.text
-						}
 
 						Text {
 							id: chipText
