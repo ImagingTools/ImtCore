@@ -175,8 +175,6 @@ ImtPopup.Popup {
             if (!c) continue;
             if (c.isMenuItem === true || c.isMenuSeparator === true) {
                 addItem(c);
-            } else if (c.isMenuSeparator === true) {
-                addItem(c);
             } else if (c.objectName === "ImtControlsPopup" && c !== menu && c.title !== undefined) {
                 addMenu(c);
             }

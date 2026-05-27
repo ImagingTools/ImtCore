@@ -31,21 +31,14 @@ Rectangle {
                ? ((typeof Style !== "undefined" && Style.buttonHoverColor) ? Style.buttonHoverColor : "#e5f0ff")
                : "transparent")
 
-    // Separator just renders the MenuSeparator item full-row.
-    Loader {
-        anchors.fill: parent
-        active: row.isSeparator
-        sourceComponent: row.isSeparator && row.menuItem ? null : null
-        // Render directly: the MenuSeparator owns its own rectangle.
-        // We re-render a simple line so we don't reparent menuItem itself
-        // (it remains a child of Menu's contentData).
-        Rectangle {
-            anchors.centerIn: parent
-            width: row.width - 8
-            height: 1
-            color: (typeof Style !== "undefined" && Style.borderColor) ? Style.borderColor : "#cccccc"
-            visible: row.isSeparator
-        }
+    // Separator just renders a thin horizontal line; the actual MenuSeparator
+    // object is kept in Menu's contentData and is not reparented.
+    Rectangle {
+        anchors.centerIn: parent
+        width: row.width - 8
+        height: 1
+        color: (typeof Style !== "undefined" && Style.borderColor) ? Style.borderColor : "#cccccc"
+        visible: row.isSeparator
     }
 
     Item {
