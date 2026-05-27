@@ -257,9 +257,9 @@ I_EXPORT_COMPONENT(
 			"Tenant Membership Manager Controller");
 
 I_EXPORT_COMPONENT(
-			TenantMembershipPublisher,
-			"Publisher for tenant membership invitation/response notifications via WebSocket",
-			"Tenant Membership Publisher");
+			TenantNotificationPublisher,
+			"Publisher for tenant notifications (invitations, membership changes, ownership transfers) via WebSocket",
+			"Tenant Notification Publisher");
 
 I_EXPORT_COMPONENT(
 			RemoteTenantCollectionDocumentService,

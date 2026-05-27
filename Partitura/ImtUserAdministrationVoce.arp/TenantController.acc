@@ -152,7 +152,7 @@
                             <Values>
                                 <Value>TenantCollectionDocumentService</Value>
                                 <Value>TenantCollectionChangeNotifier</Value>
-                                <Value>TenantMembershipPublisher</Value>
+                                <Value>TenantNotificationPublisher</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -345,7 +345,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="TenantMembershipPublisher" PackageId="ImtAuthGqlPck" ComponentId="TenantMembershipPublisher">
+        <Element Id="TenantNotificationPublisher" PackageId="ImtAuthGqlPck" ComponentId="TenantNotificationPublisher">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
@@ -354,6 +354,9 @@
                                 <Value>OnMembershipNotification</Value>
                             </Values>
                         </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="InvitationManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantInvitationManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>

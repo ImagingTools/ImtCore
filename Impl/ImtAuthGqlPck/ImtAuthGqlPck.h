@@ -55,7 +55,7 @@
 #include <imtauthgql/CRemoteTenantMembershipManagerControllerComp.h>
 #include <imtauthgql/CTenantManagerControllerComp.h>
 #include <imtauthgql/CTenantMembershipManagerControllerComp.h>
-#include <imtauthgql/CTenantMembershipPublisherComp.h>
+#include <imtauthgql/CTenantNotificationPublisherComp.h>
 #include <imtauthgql/CRemoteTenantCollectionDocumentServiceControllerComp.h>
 #include <imtauthgql/CRoleCollectionDocumentServiceComp.h>
 #include <imtauthgql/CGroupCollectionDocumentServiceComp.h>
@@ -117,7 +117,7 @@ typedef imtauthgql::CRemoteTenantControllerComp RemoteTenantController;
 typedef imtauthgql::CRemoteTenantMembershipManagerControllerComp RemoteTenantMembershipManagerController;
 typedef imtauthgql::CTenantManagerControllerComp TenantManagerController;
 typedef imtauthgql::CTenantMembershipManagerControllerComp TenantMembershipManagerController;
-typedef imtauthgql::CTenantMembershipPublisherComp TenantMembershipPublisher;
+typedef imtauthgql::CTenantNotificationPublisherComp TenantNotificationPublisher;
 typedef imtauthgql::CRemoteTenantCollectionDocumentServiceControllerComp RemoteTenantCollectionDocumentService;
 typedef imtauthgql::CRoleCollectionDocumentServiceComp RoleCollectionDocumentService;
 typedef imtauthgql::CGroupCollectionDocumentServiceComp GroupCollectionDocumentService;
