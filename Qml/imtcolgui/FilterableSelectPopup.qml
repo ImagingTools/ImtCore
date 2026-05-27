@@ -631,7 +631,9 @@ PopupView {
 					id: noDataItem
 
 					width: parent.width
-					height: 50
+					// Match loadingOverlay reserved height so the popup does not visibly
+					// shrink when the initial fetch completes with no results.
+					height: root.maxVisibleItems > 0 ? root.maxVisibleItems * root.itemHeight : 100
 					visible: root.dataProvider
 							&& !root.dataProvider.isInitialLoading
 							&& !root.dataProvider.error
@@ -649,7 +651,9 @@ PopupView {
 					id: errorItem
 
 					width: parent.width
-					height: 50
+					// Match loadingOverlay reserved height so the popup does not visibly
+					// shrink when the initial fetch completes with an error.
+					height: root.maxVisibleItems > 0 ? root.maxVisibleItems * root.itemHeight : 100
 					visible: root.dataProvider
 							&& root.dataProvider.error !== null
 							&& !root.dataProvider.isInitialLoading
