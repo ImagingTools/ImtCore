@@ -157,6 +157,14 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSessionsDatabaseDelegateCom
 
 	NewObjectQuery retVal;
 
+	QString driverId = m_databaseEngineCompPtr->GetDatabaseDriverId();
+	if (driverId == "QPSQL"){
+		retVal.query += QString("\nDELETE FROM \"UserSessions\" WHERE \"ExpirationDate\" < NOW();").toUtf8();
+	}
+	else if (driverId == "QSQLITE"){
+		retVal.query += QString("\nDELETE FROM \"UserSessions\" WHERE \"ExpirationDate\" < strftime('%Y-%m-%dT%H:%M:%S', 'now');").toUtf8();
+	}
+
 	retVal.query += QString("\nINSERT INTO \"UserSessions\" (\"Id\", \"RefreshToken\", \"UserId\", \"TenantId\", \"CreationDate\", \"ExpirationDate\") VALUES ('%0', '%1', '%2', '%3', '%4', '%5');")
 				.arg(SqlEncode(QString::fromUtf8(proposedObjectId)), SqlEncode(QString::fromUtf8(token)), SqlEncode(QString::fromUtf8(userId)), SqlEncode(QString::fromUtf8(tenantId)), creationDate.toString(Qt::ISODate), expirationDate.toString(Qt::ISODate)).toUtf8();
 
