@@ -3,7 +3,7 @@
 
 
 // ACF includes
-#include <imod/TMultiModelObserverBase.h>
+#include <imod/TSingleModelObserverBase.h>
 
 // Qt includes
 #include <QRecursiveMutex>
@@ -41,11 +41,11 @@ namespace imtauthgql
 */
 class CTenantNotificationPublisherComp:
 			public imtservergql::CGqlPublisherCompBase,
-			protected imod::TMultiModelObserverBase<istd::IChangeable>
+			protected imod::TSingleModelObserverBase<imtauth::ITenantMembershipManager>
 {
 public:
 	typedef imtservergql::CGqlPublisherCompBase BaseClass;
-	typedef imod::TMultiModelObserverBase<istd::IChangeable> BaseClass2;
+	typedef imod::TSingleModelObserverBase<imtauth::ITenantMembershipManager> BaseClass2;
 
 	I_BEGIN_COMPONENT(CTenantNotificationPublisherComp);
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager to observe for changes", true, "TenantMembershipManager");
@@ -64,7 +64,7 @@ protected:
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
 
-	// reimplemented (imod::TMultiModelObserverBase)
+	// reimplemented (imod::CSingleModelObserverBase)
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
 protected:
@@ -76,13 +76,6 @@ protected:
 	I_REF(imod::IModel, m_invitationManagerModelCompPtr);
 
 private:
-	enum ModelIds
-	{
-		MembershipManagerModelId = 0,
-		TenantManagerModelId = 1,
-		InvitationManagerModelId = 2
-	};
-
 	struct CachedMembership
 	{
 		QByteArray userId;
