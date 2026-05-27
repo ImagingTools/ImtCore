@@ -1050,7 +1050,7 @@ QJsonObject CLegacyObjectCollectionControllerCompBase::ImportObject(const imtgql
 	QString extension = mime.GetSuffix();
 
 	QTemporaryDir tempDir;
-	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString() + "." + extension;
+	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces) + "." + extension;
 
 	QFile file(filePathTmp);
 	if (!file.open(QIODevice::WriteOnly)){

@@ -482,8 +482,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateMetaInfoQuery(const QSq
 		return QByteArray();
 	}
 
-	QByteArray objectId = record.value(qPrintable(s_documentIdColumn)).toByteArray();
-	QByteArray typeId = record.value(qPrintable(s_typeIdColumn)).toByteArray();
+	QByteArray objectId = imtdb::VariantToByteArray(record.value(qPrintable(s_documentIdColumn)));
+	QByteArray typeId = imtdb::VariantToByteArray(record.value(qPrintable(s_typeIdColumn)));
 
 	QByteArray metaInfoRepresentation = QByteArrayLiteral("{}");
 
@@ -1331,7 +1331,7 @@ bool CSqlDatabaseDocumentDelegateComp::SetObjectMetaInfoFromRecord(
 		return true;
 	}
 
-	const QByteArray typeId = record.value(qPrintable(s_typeIdColumn)).toByteArray();
+	const QByteArray typeId = imtdb::VariantToByteArray(record.value(qPrintable(s_typeIdColumn)));
 
 	return m_jsonBasedMetaInfoDelegateCompPtr->FromJsonRepresentation(
 				metaInfoRepresentation,

@@ -47,7 +47,7 @@ protected:
 	{
 		Script()
 		{
-			uuid = QUuid::createUuid().toByteArray();
+			uuid = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 		}
 
 		QString filePath;

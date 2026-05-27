@@ -310,7 +310,7 @@ imtbase::IHierarchicalStructureInfo::Ids CSqlStructureDelegateCompBase::GetItemI
 
 	Ids retVal;
 	while (sqlQuery.next()){
-		retVal << sqlQuery.value("").toByteArray();
+		retVal << imtdb::VariantToByteArray(sqlQuery.value(""));
 	}
 
 	return retVal;
@@ -416,7 +416,7 @@ imtbase::IHierarchicalStructureInfo::Ids CSqlStructureDelegateCompBase::FindObje
 
 	Ids retVal;
 	while (sqlQuery.next()){
-		retVal << sqlQuery.value("").toByteArray();
+		retVal << imtdb::VariantToByteArray(sqlQuery.value(""));
 	}
 
 	return retVal;
