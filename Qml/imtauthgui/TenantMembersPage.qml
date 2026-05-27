@@ -117,6 +117,7 @@ TenantSimpleCollectionPage {
 		Row {
 			id: headerButtonsRow
 			spacing: Style.marginL
+			visible: membersPage.stateManager ? membersPage.stateManager.canManageMembers : false
 
 			Text {
 				text: qsTr("Exclude")
@@ -380,6 +381,10 @@ TenantSimpleCollectionPage {
 			Loader {
 				id: invitableUsersLoader
 				sourceComponent: membersPage.apiClient ? membersPage.apiClient.invitableUsersListDataProviderComp : null
+				onLoaded: {
+					if (item)
+						item.fetch("")
+				}
 			}
 
 			itemWidth: 280
