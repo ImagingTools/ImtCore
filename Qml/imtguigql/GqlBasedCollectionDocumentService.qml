@@ -120,10 +120,10 @@ DocumentServiceBase {
 	function saveDocument(documentId, documentName){
 		startSaveDocument(documentId)
 
-		saveDocumentInput.m_documentId = documentId
-		saveDocumentInput.m_documentName= documentName
-		saveDocumentInput.m_collectionId = collectionId
-		saveDocumentRequest.documentId = documentId
+		saveDocumentInput.m_documentId = documentId || ""
+		saveDocumentInput.m_documentName = documentName || ""
+		saveDocumentInput.m_collectionId = collectionId || ""
+		saveDocumentRequest.documentId = documentId || ""
 
 		saveDocumentRequest.send(saveDocumentInput)
 	}

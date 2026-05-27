@@ -88,33 +88,23 @@ void CTenantNotificationPublisherComp::OnComponentCreated()
 		}
 	}
 
-	if (m_membershipManagerModelCompPtr.IsValid()){
-		m_membershipManagerModelCompPtr->AttachObserver(this);
+	if (m_invitationManagerModelCompPtr.IsValid()){
+		RegisterModel(m_invitationManagerModelCompPtr.GetPtr(), 0);
 	}
 
 	if (m_tenantManagerModelCompPtr.IsValid()){
-		m_tenantManagerModelCompPtr->AttachObserver(this);
+		RegisterModel(m_tenantManagerModelCompPtr.GetPtr(), 1);
 	}
 
-	if (m_invitationManagerModelCompPtr.IsValid()){
-		m_invitationManagerModelCompPtr->AttachObserver(this);
+	if (m_membershipManagerModelCompPtr.IsValid()){
+		RegisterModel(m_membershipManagerModelCompPtr.GetPtr(), 2);
 	}
 }
 
 
 void CTenantNotificationPublisherComp::OnComponentDestroyed()
 {
-	if (m_invitationManagerModelCompPtr.IsValid()){
-		m_invitationManagerModelCompPtr->DetachObserver(this);
-	}
-
-	if (m_tenantManagerModelCompPtr.IsValid()){
-		m_tenantManagerModelCompPtr->DetachObserver(this);
-	}
-
-	if (m_membershipManagerModelCompPtr.IsValid()){
-		m_membershipManagerModelCompPtr->DetachObserver(this);
-	}
+	BaseClass2::UnregisterAllModels();
 
 	BaseClass::OnComponentDestroyed();
 }
@@ -122,7 +112,7 @@ void CTenantNotificationPublisherComp::OnComponentDestroyed()
 
 // reimplemented (imod::CSingleModelObserverBase)
 
-void CTenantNotificationPublisherComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet & changeSet)
 {
 	struct PendingNotification
 	{

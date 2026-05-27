@@ -115,33 +115,32 @@ TenantSimpleCollectionPage {
 		id: memberHeaderButtonsComp
 
 		Row {
+			id: headerButtonsRow
 			spacing: Style.marginL
-
-			property var pg: membersPage
 
 			Text {
 				text: qsTr("Exclude")
 				font.pixelSize: Style.fontSizeM
 				font.bold: true
-				color: pg.selectionManager && pg.selectionManager.selectedIds.length > 0 ? Style.errorColor : Style.inactiveTextColor
-				opacity: pg.selectionManager && pg.selectionManager.selectedIds.length > 0 ? 1.0 : 0.5
+				color: membersPage.selectionManager && membersPage.selectionManager.selectedIds.length > 0 ? Style.errorColor : Style.inactiveTextColor
+				opacity: membersPage.selectionManager && membersPage.selectionManager.selectedIds.length > 0 ? 1.0 : 0.5
 
 				MouseArea {
 					anchors.fill: parent
 					hoverEnabled: true
-					cursorShape: pg.selectionManager && pg.selectionManager.selectedIds.length > 0 ? Qt.PointingHandCursor : Qt.ArrowCursor
-					enabled: pg.selectionManager && pg.selectionManager.selectedIds.length > 0
+					cursorShape: membersPage.selectionManager && membersPage.selectionManager.selectedIds.length > 0 ? Qt.PointingHandCursor : Qt.ArrowCursor
+					enabled: membersPage.selectionManager && membersPage.selectionManager.selectedIds.length > 0
 					onClicked: {
-						var count = pg.selectionManager.selectedIds.length
+						var count = membersPage.selectionManager.selectedIds.length
 						ModalDialogManager.showConfirmationDialog(
 									qsTr("Exclude Members"),
 									qsTr("Are you sure you want to exclude %1 selected member(s) from this tenant?").arg(count),
 									function(result) {
 										if (result === Enums.yes) {
-											var ids = pg.selectionManager.selectedIds.slice()
+											var ids = membersPage.selectionManager.selectedIds.slice()
 											for (var i = 0; i < ids.length; i++)
-												pg.removeItem(ids[i])
-											pg.selectionManager.clear()
+												membersPage.removeItem(ids[i])
+											membersPage.selectionManager.clear()
 										}
 									}
 									)
@@ -153,20 +152,20 @@ TenantSimpleCollectionPage {
 				text: qsTr("Edit")
 				font.pixelSize: Style.fontSizeM
 				font.bold: true
-				color: pg.selectionManager && pg.selectionManager.selectedIds.length === 1 && pg.selectionManager.selectedIds[0].indexOf("inv_") !== 0 ? Style.linkColor : Style.inactiveTextColor
-				opacity: pg.selectionManager && pg.selectionManager.selectedIds.length === 1 && pg.selectionManager.selectedIds[0].indexOf("inv_") !== 0 ? 1.0 : 0.5
+				color: membersPage.selectionManager && membersPage.selectionManager.selectedIds.length === 1 && membersPage.selectionManager.selectedIds[0].indexOf("inv_") !== 0 ? Style.linkColor : Style.inactiveTextColor
+				opacity: membersPage.selectionManager && membersPage.selectionManager.selectedIds.length === 1 && membersPage.selectionManager.selectedIds[0].indexOf("inv_") !== 0 ? 1.0 : 0.5
 
 				MouseArea {
 					anchors.fill: parent
 					hoverEnabled: true
-					cursorShape: pg.selectionManager && pg.selectionManager.selectedIds.length === 1 && pg.selectionManager.selectedIds[0].indexOf("inv_") !== 0 ? Qt.PointingHandCursor : Qt.ArrowCursor
-					enabled: pg.selectionManager && pg.selectionManager.selectedIds.length === 1 && pg.selectionManager.selectedIds[0].indexOf("inv_") !== 0
+					cursorShape: membersPage.selectionManager && membersPage.selectionManager.selectedIds.length === 1 && membersPage.selectionManager.selectedIds[0].indexOf("inv_") !== 0 ? Qt.PointingHandCursor : Qt.ArrowCursor
+					enabled: membersPage.selectionManager && membersPage.selectionManager.selectedIds.length === 1 && membersPage.selectionManager.selectedIds[0].indexOf("inv_") !== 0
 					onClicked: {
-						var selId = pg.selectionManager.selectedIds[0]
-						var items = pg.__combinedModel
+						var selId = membersPage.selectionManager.selectedIds[0]
+						var items = membersPage.__combinedModel
 						for (var i = 0; i < items.length; i++) {
 							if (items[i].id === selId) {
-								pg.openEdit(selId, items[i].title, items[i].description)
+								membersPage.openEdit(selId, items[i].title, items[i].description)
 								break
 							}
 						}
@@ -184,7 +183,7 @@ TenantSimpleCollectionPage {
 					anchors.fill: parent
 					hoverEnabled: true
 					cursorShape: Qt.PointingHandCursor
-					onClicked: pg.openCreate()
+					onClicked: membersPage.openCreate()
 				}
 			}
 
