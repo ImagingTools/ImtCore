@@ -89,6 +89,10 @@ ViewBase {
 	// Public accessors for subcomponents with custom header buttons
 	readonly property var selectionManager: __selectionManager
 	property var dataProvider: null
+	onDataProviderChanged: {
+		if (dataProvider)
+			dataProvider.fetch(__lastFilterText)
+	}
 	readonly property string filterText: __lastFilterText
 
 	function openCreate() {
