@@ -48,6 +48,7 @@ public:
 	virtual bool RemoveDocument() = 0;
 	virtual bool RemoveDocument(quint64 key, const QByteArray& value = QByteArray()) = 0;
 	virtual bool RemoveDocument(const QByteArray& key, const QByteArray& value = QByteArray()) = 0;
+	virtual void Reopen() = 0;
 };
 
 
