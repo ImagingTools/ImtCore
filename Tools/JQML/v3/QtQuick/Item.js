@@ -11,8 +11,7 @@ const SpecialProperty = require("../QtQml/SpecialProperty")
 const KeyNavigation = require("../QtQml/KeyNavigation")
 const Anchors = require("../QtQml/Anchors")
 const AnchorLine = require("../QtQml/AnchorLine")
-
-
+const Layout = require("./Layouts/Layout")
 const Property = require("../QtQml/Property")
 
 class Item extends QtObject {
@@ -41,6 +40,8 @@ class Item extends QtObject {
         focus: { type: Bool, value: false},
         activeFocus: { type: Bool, value: false},
         clip: { type: Bool, value: false},
+
+        Layout: {type:Layout},
 
         KeyNavigation: {type:KeyNavigation},
         anchors: {type:Anchors},

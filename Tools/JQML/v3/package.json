@@ -5,7 +5,7 @@
   "main": "compiler/compiler.js",
   "scripts": {
     "build-core": "webpack --mode production --config webpack.config.js && node ./tests/index.js",
-    "build-core-dev": "webpack --mode development --config webpack.config.js && node ./tests/index.js",
+    "build-core-dev": "webpack --mode development --config webpack.config.js",
     "compile": "node ./compiler/compiler.js",
     "test": "node ./tests/index.js"
   },
@@ -15,7 +15,7 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "chromedriver": "^146.0.6",
+    "chromedriver": "^148.0.4",
     "commander": "^14.0.1",
     "ol": "^7.5.2",
     "selenium-webdriver": "^4.41.0",
