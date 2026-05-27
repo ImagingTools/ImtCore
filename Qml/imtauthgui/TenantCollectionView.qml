@@ -580,6 +580,17 @@ RemoteCollectionView {
 							if (tenantEditor.representationController){
 								tenantEditor.representationController.updateRepresentationFromDocument()
 							}
+							// Automatically switch to the newly created organization
+							// so the user immediately operates in its context. Inform
+							// the user that the active organization has changed.
+							var newTenantId = tenantEditor.tenantData ? tenantEditor.tenantData.m_id : ""
+							var newTenantName = (tenantEditor.tenantData && tenantEditor.tenantData.m_name) || newTenantId
+							if (newTenantId && newTenantId !== AuthorizationController.currentTenantId){
+								AuthorizationController.selectTenant(newTenantId)
+								ModalDialogManager.showInfoDialog(
+									qsTr("You have been switched to the newly created organization \"%1\".")
+									.arg(newTenantName))
+							}
 						}
 					}
 				}

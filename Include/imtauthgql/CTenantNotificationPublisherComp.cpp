@@ -169,6 +169,32 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 								cached.roleId});
 						}
 					}
+					else{
+						// Active membership was removed → notify the affected user
+						// (e.g. the admin/owner removed them) so their UI can react.
+						if (!cached.userId.isEmpty()){
+							pendingNotifications.append({
+								cached.userId,
+								sdl::imtauth::TenantMemberships::EMembershipNotificationType::MembershipRemoved,
+								membershipId,
+								cached.userId,
+								cached.tenantId,
+								QString(),
+								cached.roleId});
+						}
+						// Also notify the tenant owner so the members view updates.
+						QByteArray ownerUserId = FindTenantOwnerUserId(cached.tenantId);
+						if (!ownerUserId.isEmpty() && ownerUserId != cached.userId){
+							pendingNotifications.append({
+								ownerUserId,
+								sdl::imtauth::TenantMemberships::EMembershipNotificationType::MembershipRemoved,
+								membershipId,
+								cached.userId,
+								cached.tenantId,
+								QString(),
+								cached.roleId});
+						}
+					}
 				}
 				else{
 					const CachedMembership& current = currentState.value(membershipId);
@@ -179,6 +205,31 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 							pendingNotifications.append({
 								ownerUserId,
 								sdl::imtauth::TenantMemberships::EMembershipNotificationType::InvitationAccepted,
+								membershipId,
+								current.userId,
+								current.tenantId,
+								QString(),
+								current.roleId});
+						}
+					}
+					// Role changed on an active membership → notify the affected
+					// user AND the tenant owner so both sides refresh their UI.
+					if (cached.isActive && current.isActive && cached.roleId != current.roleId){
+						if (!current.userId.isEmpty()){
+							pendingNotifications.append({
+								current.userId,
+								sdl::imtauth::TenantMemberships::EMembershipNotificationType::MembershipRoleChanged,
+								membershipId,
+								current.userId,
+								current.tenantId,
+								QString(),
+								current.roleId});
+						}
+						QByteArray ownerUserId = FindTenantOwnerUserId(current.tenantId);
+						if (!ownerUserId.isEmpty() && ownerUserId != current.userId){
+							pendingNotifications.append({
+								ownerUserId,
+								sdl::imtauth::TenantMemberships::EMembershipNotificationType::MembershipRoleChanged,
 								membershipId,
 								current.userId,
 								current.tenantId,
@@ -306,12 +357,37 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 									tenantName,
 									current.roleId});
 							}
+							// Also notify the inviter (when different from owner)
+							// so admins who created the invitation see the result.
+							if (!current.invitedByUserId.isEmpty()
+									&& current.invitedByUserId != ownerUserId){
+								pendingNotifications.append({
+									current.invitedByUserId,
+									sdl::imtauth::TenantMemberships::EMembershipNotificationType::InvitationAccepted,
+									invitationId,
+									current.userId,
+									current.tenantId,
+									tenantName,
+									current.roleId});
+							}
 						}
 						else if (current.status == imtauth::ITenantInvitation::TIS_REJECTED){
 							// Notify owner that invitation was rejected
 							if (!ownerUserId.isEmpty()){
 								pendingNotifications.append({
 									ownerUserId,
+									sdl::imtauth::TenantMemberships::EMembershipNotificationType::InvitationRejected,
+									invitationId,
+									current.userId,
+									current.tenantId,
+									tenantName,
+									current.roleId});
+							}
+							// Also notify the inviter (when different from owner).
+							if (!current.invitedByUserId.isEmpty()
+									&& current.invitedByUserId != ownerUserId){
+								pendingNotifications.append({
+									current.invitedByUserId,
 									sdl::imtauth::TenantMemberships::EMembershipNotificationType::InvitationRejected,
 									invitationId,
 									current.userId,

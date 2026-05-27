@@ -178,6 +178,22 @@ DocumentViewBase {
 					container.representationController.updateRepresentationFromDocument()
 			}
 		}
+		function onSubscriptionMembershipRoleChanged(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			if (notification.tenantId === container.tenantData.m_id) {
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
+			}
+		}
+		function onSubscriptionMembershipRemoved(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			if (notification.tenantId === container.tenantData.m_id) {
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
+			}
+		}
 	}
 
 	// --- Listen to globally-broadcast tenant membership events so the editor

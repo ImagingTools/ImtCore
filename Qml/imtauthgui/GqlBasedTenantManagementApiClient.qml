@@ -84,6 +84,8 @@ QtObject {
 	signal subscriptionInvitationAccepted(var notification)
 	signal subscriptionInvitationRejected(var notification)
 	signal subscriptionOwnershipTransferred(var notification)
+	signal subscriptionMembershipRoleChanged(var notification)
+	signal subscriptionMembershipRemoved(var notification)
 
 	// --- Subscription client for membership notifications ---
 	property SubscriptionClient __membershipSubscription: SubscriptionClient {
@@ -119,6 +121,12 @@ QtObject {
 			} else if (notificationType === "OwnershipTransferred" || notificationType === 3) {
 				AuthorizationController.tenantOwnershipTransferred(notification)
 				root.subscriptionOwnershipTransferred(notification)
+			} else if (notificationType === "MembershipRoleChanged" || notificationType === 4) {
+				AuthorizationController.tenantMembershipRoleChanged(notification)
+				root.subscriptionMembershipRoleChanged(notification)
+			} else if (notificationType === "MembershipRemoved" || notificationType === 5) {
+				AuthorizationController.tenantMembershipRemoved(notification)
+				root.subscriptionMembershipRemoved(notification)
 			}
 		}
 	}
@@ -905,11 +913,23 @@ QtObject {
 	// --- User editor + representation controller ---
 	property Component __userEditorComp: Component {
 		UserView {
+			id: userEditor
 			productId: root.productId
 			commandsControllerComp: Component {
 				GqlBasedCommandsController {
 					typeId: root.userObjectTypeId
 				}
+			}
+
+			onUserDataChanged: {
+				if (userData && root.userDocumentManager){
+					userEditor.isNew = root.userDocumentManager.documentIsNew(userData.m_id)
+				}
+			}
+
+			function documentSaved(){
+				userEditor.isNew = false
+				userEditor.checkChangePasswordLogic()
 			}
 		}
 	}
