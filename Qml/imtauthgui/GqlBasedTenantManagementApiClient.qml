@@ -15,6 +15,7 @@ import imtauthUsersSdl 1.0
 import imtauthRoleCollectionDocumentServiceSdl 1.0
 import imtauthGroupCollectionDocumentServiceSdl 1.0
 import imtauthUserCollectionDocumentServiceSdl 1.0
+import imtauthgui 1.0
 
 /**
  * GqlBasedTenantManagementApiClient
@@ -104,14 +105,21 @@ QtObject {
 				"role": data.containsKey("role") ? data.getData("role") : ""
 			}
 
-			if (notificationType === "InvitationReceived" || notificationType === 0)
+			if (notificationType === "InvitationReceived" || notificationType === 0) {
+				var tName = notification.tenantName ? notification.tenantName : qsTr("a tenant")
+				PopupManager.addInfoMessage(qsTr("You have been invited to join \"%1\"").arg(tName), true)
+				AuthorizationController.tenantInvitationReceived(notification)
 				root.subscriptionInvitationReceived(notification)
-			else if (notificationType === "InvitationAccepted" || notificationType === 1)
+			} else if (notificationType === "InvitationAccepted" || notificationType === 1) {
+				AuthorizationController.tenantInvitationAccepted(notification)
 				root.subscriptionInvitationAccepted(notification)
-			else if (notificationType === "InvitationRejected" || notificationType === 2)
+			} else if (notificationType === "InvitationRejected" || notificationType === 2) {
+				AuthorizationController.tenantInvitationRejected(notification)
 				root.subscriptionInvitationRejected(notification)
-			else if (notificationType === "OwnershipTransferred" || notificationType === 3)
+			} else if (notificationType === "OwnershipTransferred" || notificationType === 3) {
+				AuthorizationController.tenantOwnershipTransferred(notification)
 				root.subscriptionOwnershipTransferred(notification)
+			}
 		}
 	}
 

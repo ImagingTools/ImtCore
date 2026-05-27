@@ -93,36 +93,22 @@ RemoteCollectionView {
 		}
 	}
 
-	// --- Subscription for real-time invitation notifications ---
-	TenantMembershipSubscriptionClient {
-		id: collectionMembershipSubscription
+	// --- Real-time invitation notifications (handled by tenantManagementApiClient) ---
+	property GqlBasedTenantManagementApiClient tenantManagementApiClient: GqlBasedTenantManagementApiClient {}
 
-		onInvitationReceived: {
-			// New invitation received -> refresh the collection to show it
-			// and notify the user (the invitee may be on this view but is
-			// otherwise not informed about the incoming invitation).
+	Connections {
+		target: tenantManagementApiClient
+		function onSubscriptionInvitationReceived(notification) {
 			container.doUpdateGui()
-			var tName = (notification && notification.tenantName) ? notification.tenantName : qsTr("a tenant")
-			PopupManager.addInfoMessage(qsTr("You have been invited to join \"%1\"").arg(tName), true)
-			AuthorizationController.tenantInvitationReceived(notification)
 		}
-
-		onInvitationAccepted:{
-			// Invitation accepted -> refresh to update relation scope
+		function onSubscriptionInvitationAccepted(notification) {
 			container.doUpdateGui()
-			AuthorizationController.tenantInvitationAccepted(notification)
 		}
-
-		onInvitationRejected:{
-			// Invitation rejected -> refresh to update relation scope
+		function onSubscriptionInvitationRejected(notification) {
 			container.doUpdateGui()
-			AuthorizationController.tenantInvitationRejected(notification)
 		}
-
-		onOwnershipTransferred: {
-			// Ownership transferred -> refresh to update owner column
+		function onSubscriptionOwnershipTransferred(notification) {
 			container.doUpdateGui()
-			AuthorizationController.tenantOwnershipTransferred(notification)
 		}
 	}
 
@@ -582,7 +568,7 @@ RemoteCollectionView {
 
 				TenantEditor {
 					id: tenantEditor
-					apiClient: tenantEditorApiClient
+					apiClient: tenantManagementApiClient
 					commandsControllerComp: Component {
 						GqlBasedCommandsController {
 							typeId: "Tenant"
@@ -595,16 +581,6 @@ RemoteCollectionView {
 								tenantEditor.representationController.updateRepresentationFromDocument()
 							}
 						}
-					}
-
-					// Concrete GQL transport injected from this view (imtguigql is
-					// already a dependency here); TenantEditor itself stays
-					// transport-agnostic.
-					// tenantId is sourced from the tenant being edited (not from the
-					// currently authorized tenant) so that GetSelectableItems queries
-					// (Roles/Groups/Users) are filtered for the correct tenant scope.
-					GqlBasedTenantManagementApiClient {
-						id: tenantEditorApiClient
 					}
 				}
 			}
