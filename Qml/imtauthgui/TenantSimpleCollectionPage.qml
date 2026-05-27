@@ -562,6 +562,13 @@ ViewBase {
 			createNew: true
 			generateNewId: true
 			activeShellTarget: collectionPage
+			documentNameResolver: function(documentId) {
+				var view = collectionPage.documentManager.getDocumentViewInstance(documentId, "")
+				if (view && view.model && view.model.m_name) {
+					return view.model.m_name
+				}
+				return ""
+			}
 
 			onClosed: {
 				stackViewHeader.popHeader()
@@ -581,6 +588,13 @@ ViewBase {
 			objectId: collectionPage.__editItemId
 			createNew: false
 			activeShellTarget: collectionPage
+			documentNameResolver: function(documentId) {
+				var view = collectionPage.documentManager.getDocumentViewInstance(documentId, "")
+				if (view && view.model && view.model.m_name) {
+					return view.model.m_name
+				}
+				return ""
+			}
 
 			onClosed: {
 				stackViewHeader.popHeader()
