@@ -3,6 +3,8 @@
 
 // Qt includes
 #include <QtCore/QDateTime>
+#include <QtCore/QUuid>
+#include <QtCore/QVariant>
 
 
 namespace imtdb
@@ -36,6 +38,15 @@ QString EscapeSql(const QString& value)
 	QString escaped = value;
 	escaped.replace('\'', "''");
 	return escaped;
+}
+
+
+QByteArray VariantToByteArray(const QVariant& value)
+{
+	if (value.typeId() == QMetaType::QUuid){
+		return value.value<QUuid>().toByteArray(QUuid::WithoutBraces);
+	}
+	return value.toByteArray();
 }
 
 

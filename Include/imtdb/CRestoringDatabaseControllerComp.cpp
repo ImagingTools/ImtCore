@@ -35,7 +35,7 @@ bool CRestoringDatabaseControllerComp::SetData(const QByteArray& data, QByteArra
 	int port = m_databaseLoginSettingsCompPtr->GetPort();
 
 	QTemporaryDir tempDir;
-	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString() + ".backup";
+	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces) + ".backup";
 
 	QFile file(filePathTmp);
 	if (!file.open(QIODevice::WriteOnly)){
@@ -167,7 +167,7 @@ bool CRestoringDatabaseControllerComp::GetData(
 	process.setEnvironment(envList);
 
 	QTemporaryDir tempDir;
-	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString() + ".backup";
+	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces) + ".backup";
 
 	QString pgDumpCommand = QString("pg_dump -h %1 -U %2 -p %3 -b -v -f \"%4\" \"%5\"")
 								.arg(host, userName, QString::number(port), filePathTmp, dbName);

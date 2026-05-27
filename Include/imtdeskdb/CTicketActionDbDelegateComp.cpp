@@ -48,12 +48,12 @@ istd::IChangeableUniquePtr CTicketActionDbDelegateComp::CreateObjectFromRecord(
 	}
 
 	if (record.contains("TicketId")){
-		actionPtr->SetTicketId(record.value("TicketId").toByteArray());
+		actionPtr->SetTicketId(imtdb::VariantToByteArray(record.value("TicketId")));
 	}
 
 	imtauth::IUserRecentAction::UserInfo userInfo;
 	if (record.contains("UserId")){
-		userInfo.id = record.value("UserId").toByteArray();
+		userInfo.id = imtdb::VariantToByteArray(record.value("UserId"));
 	}
 	if (record.contains("UserName")){
 		userInfo.name = record.value("UserName").toString();
@@ -62,7 +62,7 @@ istd::IChangeableUniquePtr CTicketActionDbDelegateComp::CreateObjectFromRecord(
 
 	imtauth::IUserRecentAction::ActionTypeInfo actionTypeInfo;
 	if (record.contains("ActionTypeId")){
-		actionTypeInfo.id = record.value("ActionTypeId").toByteArray();
+		actionTypeInfo.id = imtdb::VariantToByteArray(record.value("ActionTypeId"));
 	}
 	if (record.contains("ActionTypeName")){
 		actionTypeInfo.name = record.value("ActionTypeName").toString();

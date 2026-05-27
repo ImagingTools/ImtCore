@@ -918,7 +918,7 @@ sdl::imtbase::ImtCollection::CImportObjectPayload CObjectCollectionControllerCom
 	QString extension = GetExtensionFromMimeType(mime);
 
 	QTemporaryDir tempDir;
-	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString() + "." + extension;
+	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces) + "." + extension;
 
 	QFile file(filePathTmp);
 	if (!file.open(QIODevice::WriteOnly)){
@@ -2354,7 +2354,7 @@ QJsonObject CObjectCollectionControllerCompBase::ImportObject(const imtgql::CGql
 	QString extension = GetExtensionFromMimeType(mime);
 
 	QTemporaryDir tempDir;
-	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString() + "." + extension;
+	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces) + "." + extension;
 
 	QFile file(filePathTmp);
 	if (!file.open(QIODevice::WriteOnly)){
