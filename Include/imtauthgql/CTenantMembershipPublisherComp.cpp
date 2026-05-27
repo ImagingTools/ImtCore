@@ -38,6 +38,35 @@ void CTenantMembershipPublisherComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
+	// Initialize the membership cache so that subsequent OnUpdate() calls can
+	// detect NEW memberships (those not present in the cache).
+	if (m_membershipManagerCompPtr.IsValid() && m_tenantManagerCompPtr.IsValid()){
+		QMutexLocker locker(&m_cacheMutex);
+		QByteArrayList tenantIds = m_tenantManagerCompPtr->GetTenantIds();
+		for (const QByteArray& tenantId : tenantIds){
+			QByteArrayList membershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
+			for (const QByteArray& membershipId : membershipIds){
+				imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+				if (membershipPtr.IsValid()){
+					CachedMembership entry;
+					entry.userId = membershipPtr->GetUserId();
+					entry.tenantId = membershipPtr->GetTenantId();
+					entry.roleId = membershipPtr->GetRoleId();
+					entry.isActive = membershipPtr->IsActive();
+					m_cachedMemberships.insert(membershipId, entry);
+				}
+			}
+
+			// Also cache tenant owner
+			imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+			if (tenantPtr.IsValid()){
+				CachedTenantOwner ownerEntry;
+				ownerEntry.ownerId = tenantPtr->GetOwnerId();
+				m_cachedTenantOwners.insert(tenantId, ownerEntry);
+			}
+		}
+	}
+
 	if (m_membershipManagerModelCompPtr.IsValid()){
 		m_membershipManagerModelCompPtr->AttachObserver(this);
 	}

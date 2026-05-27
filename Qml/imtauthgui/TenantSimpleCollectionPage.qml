@@ -110,6 +110,10 @@ ViewBase {
 		function onDocumentSaved(documentId) {
 			collectionPage.refresh()
 		}
+		function onDocumentNameChanged(documentId, oldName, newName) {
+			stackViewHeader.setHeaderName("edit", newName)
+			stackViewHeader.setHeaderName("create", newName)
+		}
 	}
 
 	StackViewHeader {
@@ -295,8 +299,17 @@ ViewBase {
 				onTextChanged: {
 					selectionManager.clear()
 					collectionPage.__lastFilterText = text
+					filterDebounce.restart()
+				}
+			}
+
+			Timer {
+				id: filterDebounce
+				interval: 300
+				repeat: false
+				onTriggered: {
 					if (dataProviderLoader.item)
-						dataProviderLoader.item.fetch(text)
+						dataProviderLoader.item.fetch(filterInput.text)
 				}
 			}
 

@@ -65,12 +65,14 @@ TenantSimpleCollectionPage {
 		}
 
 		var members = membersPage.stateManager ? membersPage.stateManager.pendingMembers : []
+		var ownerFound = false
 		for (var i = 0; i < members.length; i++) {
 			// Skip the tenant creator — but only when they are not also the
-			// current owner. The Owner must always be visible in the list,
-			// even when creator and owner happen to be the same user.
+			// current owner. The Owner must always be visible in the list.
 			if (creatorId && members[i].id === creatorId && members[i].id !== ownerId)
 				continue
+			if (ownerId && members[i].id === ownerId)
+				ownerFound = true
 			result.push({
 				id: members[i].id,
 				title: members[i].name || members[i].id || "",
@@ -79,6 +81,18 @@ TenantSimpleCollectionPage {
 				sourceData: members[i]
 			})
 		}
+
+		// Ensure the Owner always appears even if they have no membership entry
+		if (ownerId && !ownerFound) {
+			result.splice(invitations.length, 0, {
+				id: ownerId,
+				title: ownerId,
+				description: "Owner",
+				kind: "member",
+				sourceData: { id: ownerId, name: ownerId, role: "Owner" }
+			})
+		}
+
 		membersPage.__combinedModel = result
 	}
 

@@ -122,13 +122,27 @@ QtObject {
 		if (!stateManager.tenantData)
 			return
 		var serverMembers = stateManager.tenantData.m_members
+		var serverRoles = stateManager.tenantData.m_memberRoles
+
+		// Build userId → role lookup from memberRoles
+		var roleMap = {}
+		if (serverRoles) {
+			var roleCount = serverRoles.count || 0
+			for (var r = 0; r < roleCount; r++) {
+				var re = serverRoles.get(r).item
+				if (re)
+					roleMap[re.m_userId || ""] = re.m_role || ""
+			}
+		}
+
 		var members = []
 		if (serverMembers) {
 			var count = serverMembers.count || 0
 			for (var i = 0; i < count; i++) {
 				var m = serverMembers.get(i).item
 				if (m) {
-					members.push({ id: m.m_id || "", name: m.m_name || m.m_id || "" })
+					var userId = m.m_id || ""
+					members.push({ id: userId, name: m.m_name || userId, role: roleMap[userId] || "" })
 				}
 			}
 		}
