@@ -1,0 +1,10 @@
+module imtcontrols.Popup.Internal
+
+singleton PopupManager 1.0 PopupManager.qml
+singleton OverlayManager 1.0 OverlayManager.qml
+singleton FocusCoordinator 1.0 FocusCoordinator.qml
+singleton PositioningEngine 1.0 PositioningEngine.qml
+singleton PopupStackController 1.0 PopupStackController.qml
+singleton InputCoordinator 1.0 InputCoordinator.qml
+
+PopupTransition 1.0 PopupTransition.qml
