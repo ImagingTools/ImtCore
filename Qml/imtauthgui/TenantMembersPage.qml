@@ -84,7 +84,9 @@ TenantSimpleCollectionPage {
 		function onPendingInvitationsChanged() { membersPage.__rebuildCombinedModel() }
 	}
 
-	Component.onCompleted: __rebuildCombinedModel()
+	Component.onCompleted: {
+		__rebuildCombinedModel()
+	}
 
 	Connections {
 		target: membersPage.apiClient ? membersPage.apiClient.userDocumentManager : null
