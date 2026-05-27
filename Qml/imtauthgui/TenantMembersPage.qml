@@ -51,7 +51,6 @@ TenantSimpleCollectionPage {
 		var result = []
 		var filterText = ""  // filter is applied via refresh
 		var creatorId = (membersPage.model && membersPage.model.m_creatorId) ? membersPage.model.m_creatorId : ""
-		var ownerId = (membersPage.model && membersPage.model.m_ownerId) ? membersPage.model.m_ownerId : ""
 
 		var invitations = membersPage.stateManager ? membersPage.stateManager.pendingInvitations : []
 		for (var j = 0; j < invitations.length; j++) {
@@ -65,31 +64,17 @@ TenantSimpleCollectionPage {
 		}
 
 		var members = membersPage.stateManager ? membersPage.stateManager.pendingMembers : []
-		var ownerFound = false
 		for (var i = 0; i < members.length; i++) {
-			// Skip the tenant creator — but only when they are not also the
-			// current owner. The Owner must always be visible in the list.
-			if (creatorId && members[i].id === creatorId && members[i].id !== ownerId)
+			// Creator is already filtered on the server side; this is a
+			// client-side safety check in case old data is cached.
+			if (creatorId && members[i].id === creatorId && members[i].role === "Creator")
 				continue
-			if (ownerId && members[i].id === ownerId)
-				ownerFound = true
 			result.push({
 				id: members[i].id,
 				title: members[i].name || members[i].id || "",
 				description: members[i].role || "Member",
 				kind: "member",
 				sourceData: members[i]
-			})
-		}
-
-		// Ensure the Owner always appears even if they have no membership entry
-		if (ownerId && !ownerFound) {
-			result.splice(invitations.length, 0, {
-				id: ownerId,
-				title: ownerId,
-				description: "Owner",
-				kind: "member",
-				sourceData: { id: ownerId, name: ownerId, role: "Owner" }
 			})
 		}
 
