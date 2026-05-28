@@ -20,7 +20,7 @@ Rectangle {
     property bool current: menu && menu.currentIndex === rowIndex
     property bool isSeparator: menuItem && menuItem.isMenuSeparator === true
 
-    width: ListView.view ? ListView.view.width : implicitWidth
+    width: parent ? parent.width : implicitWidth
     implicitWidth: Style.menuMinWidth
     height: isSeparator
             ? (menuItem ? menuItem.height : Style.marginS)

@@ -410,7 +410,7 @@ ImtPopup.Popup {
         keyNavigationEnabled: false   // Menu handles keys itself
         model: menu.model
         delegate: Loader {
-            width: ListView.view.width
+            width: list.width
             sourceComponent: menu.delegate
             onLoaded: {
                 if (item) {
