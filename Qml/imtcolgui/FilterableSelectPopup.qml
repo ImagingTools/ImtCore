@@ -83,6 +83,19 @@ PopupView {
 
 	// --- Private: suppress selectionChanged during initialization ---
 	property bool __initializing: false
+	// --- Private: tracks whether started() has been called (popup is open) ---
+	property bool __started: false
+
+	onDataProviderChanged: {
+		if (root.__started && root.dataProvider) {
+			for (var i = 0; i < root.knownItems.length; i++) {
+				var item = root.knownItems[i]
+				root.dataProvider.addKnownItem(item.id, item)
+			}
+			root.dataProvider.setPreselectedIds(root.preselectedIds)
+			root.dataProvider.fetch("")
+		}
+	}
 
 	// --- Embedded mode (no own background/shadow, parent provides chrome) ---
 	property bool embedded: false
@@ -206,6 +219,7 @@ PopupView {
 	// --- Lifecycle (called by ModalDialogManager via DialogManagerView) ---
 	function started(){
 		root.__initializing = true
+		root.__started = true
 
 		root.__internal.focusedIndex = -1
 		root.__internal.selectedFocusedIndex = -1
@@ -233,6 +247,7 @@ PopupView {
 	}
 
 	function closePopup(){
+		root.__started = false
 		if (root.embedded){
 			root.requestClose()
 			return
@@ -408,6 +423,7 @@ PopupView {
 				radius: Style.radiusL
 
 				onTextChanged: {
+					console.log("filterField", text)
 					root.__internal.focusedIndex = -1
 					debounce.stop()
 					debounce.start()
@@ -631,7 +647,9 @@ PopupView {
 					id: noDataItem
 
 					width: parent.width
-					height: 50
+					// Match loadingOverlay reserved height so the popup does not visibly
+					// shrink when the initial fetch completes with no results.
+					height: root.maxVisibleItems > 0 ? root.maxVisibleItems * root.itemHeight : 100
 					visible: root.dataProvider
 							&& !root.dataProvider.isInitialLoading
 							&& !root.dataProvider.error
@@ -649,7 +667,9 @@ PopupView {
 					id: errorItem
 
 					width: parent.width
-					height: 50
+					// Match loadingOverlay reserved height so the popup does not visibly
+					// shrink when the initial fetch completes with an error.
+					height: root.maxVisibleItems > 0 ? root.maxVisibleItems * root.itemHeight : 100
 					visible: root.dataProvider
 							&& root.dataProvider.error !== null
 							&& !root.dataProvider.isInitialLoading

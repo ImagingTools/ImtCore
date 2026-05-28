@@ -22,7 +22,8 @@ TenantSimpleCollectionPage {
 
 	documentManager: apiClient ? apiClient.roleDocumentManager : null
 	objectTypeId: apiClient ? apiClient.roleObjectTypeId : ""
-	dataProviderComp: apiClient ? apiClient.roleListDataProviderComp : null
+	dataProvider: apiClient ? apiClient.roleListDataProvider : null
+
 	function removeItem(id) {
 		if (rolesPage.apiClient)
 			rolesPage.apiClient.removeRole(id)

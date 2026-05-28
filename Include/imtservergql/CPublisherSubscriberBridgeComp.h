@@ -2,6 +2,10 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QMap>
+#include <QtCore/QMutex>
+
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 
@@ -19,8 +23,9 @@ namespace imtservergql
 	A bridge component that combines CGqlPublisherCompBase (server-side publish)
 	with IGqlSubscriptionClient (client-side subscribe) in a single component.
 
-	Directly inherits IGqlSubscriptionClient to receive subscription data
-	from the remote server and re-publishes it to local WebSocket clients.
+	Uses lazy registration: upstream subscriptions are created only when a real
+	client subscribes, forwarding the client's GQL context (user/token) to the
+	remote server. This ensures the remote server can identify the user.
 */
 class CPublisherSubscriberBridgeComp: public CGqlPublisherCompBase,
                                       virtual public imtclientgql::IGqlSubscriptionClient
@@ -31,6 +36,14 @@ public:
 	I_BEGIN_COMPONENT(CPublisherSubscriberBridgeComp);
 		I_ASSIGN(m_subscriptionManagerCompPtr, "SubscriptionManager", "Subscription manager for registering subscriptions", true, "SubscriptionManager");
 	I_END_COMPONENT;
+
+	// reimplemented (imtgql::IGqlSubscriberController via CGqlPublisherCompBase)
+	virtual bool RegisterSubscription(
+				const QByteArray& subscriptionId,
+				const imtgql::CGqlRequest& gqlRequest,
+				const imtrest::IRequest& networkRequest,
+				QString& errorMessage) override;
+	virtual bool UnregisterSubscription(const QByteArray& subscriptionId) override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)
@@ -47,12 +60,14 @@ protected:
 				const QString& message) override;
 
 private:
-	QByteArray GetCommandForSubscription(const QByteArray& subscriptionId) const;
-
-private:
 	I_REF(imtclientgql::IGqlSubscriptionManager, m_subscriptionManagerCompPtr);
 
-	QByteArrayList m_subscriptionIds;
+	// Mapping: client subscriptionId -> upstream subscriptionId
+	QMap<QByteArray, QByteArray> m_clientToUpstreamMap;
+	// Mapping: upstream subscriptionId -> list of client subscriptionIds
+	QMap<QByteArray, QByteArrayList> m_upstreamToClientsMap;
+
+	mutable QMutex m_bridgeMutex;
 };
 
 
