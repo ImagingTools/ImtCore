@@ -159,7 +159,21 @@ QString CMimeType::ToString()
 
 bool CMimeType::FromString(const QString& string)
 {
-	static QRegularExpression mimeRegExp("(?<type>\\w*)\\/(?<subtype>[\\w\\.-]*)(?:\\+(?<typeext>[\\w\\.-]*))?(?:;(?:(?<key>.+)=(?<value>.*))*)?");
+
+	/**
+		\brief Regular expression to parse a MIME type string.
+		\details Format: type "/" [tree "."] subtype ["+" suffix] *(";" key "=" value)
+					Named capture groups:
+						(?<type>\w*)							- The top-level type (e.g. "application", "image", "text")
+						\/										- Literal slash separator
+						(?<subtype>[\w\.-]*)					- The subtype, may include tree prefixes separated by "." (e.g. "vnd.example.data" or "plain")
+						(?:\+(?<typeext>[\w\.-]*))? 			- Optional suffix preceded by "+", indicates the structured syntax (e.g. "+json", "+xml")
+						(?:;(?:(?<key>.+)=(?<value>.*))*)? 		- Optional semicolon-separated parameters, each as key=value (e.g. "; charset=utf-8")
+
+		\example "application/vnd.example.data+json; charset=utf-8; boundary=something"
+					type=application, subtype=vnd.example.data, typeext=json, key=charset, value=utf-8
+	*/
+	static QRegularExpression mimeRegExp(R"RegExp((?<type>\w*)\/(?<subtype>[\w\.-]*)(?:\+(?<typeext>[\w\.-]*))?(?:;(?:(?<key>.+)=(?<value>.*))*)?)RegExp");
 
 	QRegularExpressionMatch mimeRegExpMatch = mimeRegExp.match(string);
 	if (mimeRegExpMatch.hasMatch()){
