@@ -236,7 +236,7 @@ TenantSimpleCollectionPage {
 		id: memberDelegateComp
 
 		TenantMemberDelegate {
-			width: ListView.view ? ListView.view.width : 0
+			width: parent.width
 			kind: modelData.kind || "member"
 			memberData: modelData.sourceData || modelData
 			tenantData: membersPage.model

@@ -402,7 +402,7 @@ ViewBase {
 
 					Rectangle {
 						id: itemDelegateRoot
-						width: ListView.view ? ListView.view.width : 0
+						width: itemListView.width
 						height: Style.controlHeightL + Style.marginL
 
 						property string itemId: modelData.id || ""
@@ -413,7 +413,6 @@ ViewBase {
 						color: isSelected ? Style.selectedColor
 										  : itemMouseArea.containsMouse ? Style.buttonHoverColor
 																		: "transparent"
-
 						MouseArea {
 							id: itemMouseArea
 							anchors.fill: parent
