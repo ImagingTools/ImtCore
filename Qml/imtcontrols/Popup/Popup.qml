@@ -224,13 +224,13 @@ FocusScope {
     // -------------------------------------------------------------------- //
 
     Component.onCompleted: {
-        PopupManager.register(popup);
+        PopupRegistry.register(popup);
     }
     Component.onDestruction: {
         d.destroyed = true;
         if (d.opened || d.opening) d._teardown(false);
         PopupStackController.detach(popup);
-        PopupManager.unregister(popup);
+        PopupRegistry.unregister(popup);
     }
 
     onWidthChanged:  {
@@ -250,7 +250,7 @@ FocusScope {
     }
 
     Connections {
-        target: PopupManager
+        target: PopupRegistry
         function onWindowGeometryChanged() { if (d.opened || d.opening) popup._reposition(); }
     }
 

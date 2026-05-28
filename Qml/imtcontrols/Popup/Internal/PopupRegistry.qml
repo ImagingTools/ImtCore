@@ -2,7 +2,7 @@ pragma Singleton
 import QtQuick 2.12
 
 /*!
-    \qmltype PopupManager
+    \qmltype PopupRegistry
     \inqmlmodule imtcontrols
     \internal
 

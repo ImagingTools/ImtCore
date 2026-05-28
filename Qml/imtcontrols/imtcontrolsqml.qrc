@@ -242,7 +242,7 @@
                 <file alias="imtcontrols/Popup/Overlay.qml">Popup/Overlay.qml</file>
                 <file alias="imtcontrols/Popup/PopupAnchors.qml">Popup/PopupAnchors.qml</file>
                 <file alias="imtcontrols/Popup/Internal/qmldir">Popup/Internal/qmldir</file>
-                <file alias="imtcontrols/Popup/Internal/PopupManager.qml">Popup/Internal/PopupManager.qml</file>
+                <file alias="imtcontrols/Popup/Internal/PopupRegistry.qml">Popup/Internal/PopupRegistry.qml</file>
                 <file alias="imtcontrols/Popup/Internal/OverlayManager.qml">Popup/Internal/OverlayManager.qml</file>
                 <file alias="imtcontrols/Popup/Internal/FocusCoordinator.qml">Popup/Internal/FocusCoordinator.qml</file>
                 <file alias="imtcontrols/Popup/Internal/PositioningEngine.qml">Popup/Internal/PositioningEngine.qml</file>
