@@ -1,6 +1,6 @@
 import QtQuick 2.12
 import imtcontrols 1.0
-import "Internal" as Internal
+import imtcontrols.Popup.Internal 1.0
 
 /*!
     \qmltype Overlay
@@ -26,7 +26,7 @@ QtObject {
     property Item anchor: null
 
     /*! Lazily resolved overlay Item. Null until \l anchor is set. */
-    readonly property Item item: anchor ? Internal.OverlayManager.overlayFor(_rootOf(anchor)) : null
+    readonly property Item item: anchor ? OverlayManager.overlayFor(_rootOf(anchor)) : null
 
     /*! Number of popups currently open on this overlay. */
     readonly property int popupCount: item ? item.openPopups.length : 0

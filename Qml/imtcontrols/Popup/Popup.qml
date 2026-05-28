@@ -1,7 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtcontrols 1.0
-import "Internal" as Internal
+import imtcontrols.Popup.Internal 1.0
 
 /*!
     \qmltype Popup
@@ -203,11 +203,11 @@ FocusScope {
     }
 
     function _onOverlayPressOutside(mouse, source) {
-        if (Internal.InputCoordinator.shouldClosePress(popup, mouse, source))
+        if (InputCoordinator.shouldClosePress(popup, mouse, source))
             popup.close();
     }
     function _onOverlayReleaseOutside(mouse, source) {
-        if (Internal.InputCoordinator.shouldCloseRelease(popup, mouse, source))
+        if (InputCoordinator.shouldCloseRelease(popup, mouse, source))
             popup.close();
     }
     function _tryEscape() {
@@ -217,20 +217,20 @@ FocusScope {
         }
         return false;
     }
-    function _reposition() { Internal.PositioningEngine.position(popup); }
+    function _reposition() { PositioningEngine.position(popup); }
 
     // -------------------------------------------------------------------- //
     //                       Lifecycle / registration                        //
     // -------------------------------------------------------------------- //
 
     Component.onCompleted: {
-        Internal.PopupManager.register(popup);
+        PopupManager.register(popup);
     }
     Component.onDestruction: {
         d.destroyed = true;
         if (d.opened || d.opening) d._teardown(false);
-        Internal.PopupStackController.detach(popup);
-        Internal.PopupManager.unregister(popup);
+        PopupStackController.detach(popup);
+        PopupManager.unregister(popup);
     }
 
     onWidthChanged:  {
@@ -250,7 +250,7 @@ FocusScope {
     }
 
     Connections {
-        target: Internal.PopupManager
+        target: PopupManager
         function onWindowGeometryChanged() { if (d.opened || d.opening) popup._reposition(); }
     }
 
@@ -329,18 +329,18 @@ FocusScope {
                 return;
             }
             popup._rootItem = targetRoot;
-            overlay = Internal.OverlayManager.overlayFor(targetRoot);
+            overlay = OverlayManager.overlayFor(targetRoot);
             if (!overlay) {
                 console.warn("imtcontrols.Popup: cannot open - overlay unavailable");
                 return;
             }
             _ensureContentRoot();
-            Internal.OverlayManager.attach(popup, targetRoot);
+            OverlayManager.attach(popup, targetRoot);
 
             // Auto-detect parent popup if not explicitly set.
             var pp = popup.parentPopup;
             if (!pp) pp = _findParentPopup();
-            if (pp) Internal.PopupStackController.attach(pp, popup);
+            if (pp) PopupStackController.attach(pp, popup);
 
             // Reparent user content & background into the live root.
             if (popup.background) {
@@ -366,7 +366,7 @@ FocusScope {
             popup._reposition();
 
             if (popup.focusOnOpen) {
-                Internal.FocusCoordinator.push(targetRoot, popup.parent);
+                FocusCoordinator.push(targetRoot, popup.parent);
                 contentRoot.forceActiveFocus();
             }
 
@@ -374,7 +374,7 @@ FocusScope {
         }
 
         function _close() {
-            Internal.PopupStackController.closeDescendants(popup);
+            PopupStackController.closeDescendants(popup);
             popup.aboutToHide();
             opening = false;
             closing = true;
@@ -400,9 +400,9 @@ FocusScope {
                     defaultBackground.visible = false;
                 }
             }
-            Internal.OverlayManager.detach(popup);
+            OverlayManager.detach(popup);
             if (opened && popup.focusOnOpen && targetRoot)
-                Internal.FocusCoordinator.pop(targetRoot);
+                FocusCoordinator.pop(targetRoot);
             opened = false;
             opening = false;
             closing = false;
@@ -465,8 +465,8 @@ FocusScope {
                 hoverEnabled: false
                 onPressed: {
                     if (cr.popup) {
-                        Internal.PopupStackController.closeAbove(cr.popup);
-                        Internal.OverlayManager.raise(cr.popup);
+                        PopupStackController.closeAbove(cr.popup);
+                        OverlayManager.raise(cr.popup);
                     }
                     mouse.accepted = false;
                 }

@@ -1,9 +1,8 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtcontrols 1.0
-import "../Popup" as ImtPopup
-import "../Popup/Internal" as PopupInternal
-import "Internal" as MenuInternal
+import imtcontrols.Popup.Internal 1.0
+import imtcontrols.Menu.Internal 1.0
 
 /*!
     \qmltype Menu
@@ -38,7 +37,7 @@ import "Internal" as MenuInternal
       \li Escape   - close the menu (subject to closePolicy)
     \endlist
 */
-ImtPopup.Popup {
+Popup {
     id: menu
     objectName: "ImtControlsPopup"   // intentionally same tag as Popup so
                                      // PopupStackController auto-detects
@@ -489,6 +488,6 @@ ImtPopup.Popup {
 
     Component {
         id: defaultRowDelegate
-        MenuInternal.MenuItemDelegate {}
+        MenuItemDelegate {}
     }
 }
