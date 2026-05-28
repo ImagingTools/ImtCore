@@ -96,7 +96,7 @@ Item {
 	}
 
 	function getObjectVisualStatus(objectId, typeId){
-		objectVisualStatusInput.m_objectId = id
+		objectVisualStatusInput.m_objectId = objectId
 		objectVisualStatusInput.m_typeId = typeId
 		getObjectVisualStatusRequest.send(objectVisualStatusInput)
 	}
@@ -199,7 +199,7 @@ Item {
 
 	function restoreObjectSet(collectionFilter){
 		let selectionParams = createSelectionParams(collectionFilter, null)
-		restoreObjectSetInput.m_selectionParams = filterModel
+		restoreObjectSetInput.m_selectionParams = selectionParams
 		restoreObjectSetRequest.send(restoreObjectSetInput)
 	}
 	

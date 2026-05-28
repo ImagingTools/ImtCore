@@ -42,8 +42,8 @@ Item {
                 ? Style.buttonHoverColor
                 : "transparent"
         radius: Style.buttonRadius
-        border.width: (menuBar && menuBar.activeFocus
-                       && menuBar.focusedIndex === barIndex
+        border.width: (item.menuBar && item.menuBar.activeFocus
+                       && item.menuBar.focusedIndex === item.barIndex
                        && !(menu && menu.opened))
                       ? Style.buttonBorderWidth : 0
         border.color: Style.buttonBorderFocusColor
@@ -63,10 +63,10 @@ Item {
         anchors.fill: parent
         hoverEnabled: true
         onClicked: {
-            if (menuBar) menuBar._toggleAt(barIndex)
+            if (item.menuBar) item.menuBar._toggleAt(item.barIndex)
         }
         onEntered:  {
-            if (menuBar) menuBar._onHover(barIndex)
+            if (item.menuBar) item.menuBar._onHover(item.barIndex)
         }
     }
 }

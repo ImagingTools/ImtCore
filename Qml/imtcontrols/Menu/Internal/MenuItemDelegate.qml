@@ -53,7 +53,7 @@ Rectangle {
             id: icon
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
-            source: row.menuItem ? row.menuItem.iconSource : ""
+            source: row.menuItem && row.menuItem.iconSource ? row.menuItem.iconSource : ""
             width:  source != "" ? Style.iconSizeS : 0
             height: width
             fillMode: Image.PreserveAspectFit
@@ -73,7 +73,7 @@ Rectangle {
             source: row.menuItem && row.menuItem.checked
                     ? "qrc:/" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal)
                     : ""
-            visible: row.menuItem && row.menuItem.checkable && row.menuItem.checked
+            visible: row.menuItem && (row.menuItem.checkable === true) && (row.menuItem.checked === true)
             sourceSize.width: width
             sourceSize.height: height
         }
@@ -110,8 +110,8 @@ Rectangle {
             anchors.right: parent.right
             spacing: Style.marginXS
             Text {
-                visible: row.menuItem && row.menuItem.shortcut !== ""
-                text: row.menuItem ? row.menuItem.shortcut : ""
+                visible: row.menuItem && row.menuItem.shortcut ? true : false
+                text: row.menuItem && row.menuItem.shortcut ? row.menuItem.shortcut : ""
                 color: Style.inactiveTextColor
                 font.pixelSize: Style.fontSizeS
             }

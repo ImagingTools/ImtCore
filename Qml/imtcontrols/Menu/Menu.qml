@@ -226,8 +226,8 @@ Popup {
         repeat: false
         property int pendingIndex: -1
         onTriggered: {
-            if (pendingIndex < 0 || pendingIndex >= _rows.length) return;
-            var mi = _rows[pendingIndex];
+            if (pendingIndex < 0 || pendingIndex >= menu._rows.length) return;
+            var mi = menu._rows[pendingIndex];
             menu._openSubmenu(mi);
         }
     }
