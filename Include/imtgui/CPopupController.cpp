@@ -133,7 +133,7 @@ QByteArray CPopupController::AddPopup(
 	bool isClosingOnMouseClickAllowed,
 	QWidget* contentWidgetPtr)
 {
-	QByteArray id = QUuid::createUuid().toByteArray();
+	QByteArray id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	if (QThread::currentThread() == qApp->thread()){
 		OnAddPopup(id, messagePtr, timeout, isClosingOnMouseClickAllowed, contentWidgetPtr);
@@ -188,7 +188,7 @@ bool CPopupController::IsMessageSupported(
 
 void CPopupController::AddMessage(const MessagePtr& messagePtr)
 {
-	QByteArray id = QUuid::createUuid().toByteArray();
+	QByteArray id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	if (QThread::currentThread() == qApp->thread()){
 		OnAddMessage(id, messagePtr);

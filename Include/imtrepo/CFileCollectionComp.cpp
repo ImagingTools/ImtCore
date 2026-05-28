@@ -686,7 +686,7 @@ QByteArray CFileCollectionComp::ImportFile(
 							SaveMetaInfo(*metaInfoPtr, newMetaInfoFile);
 
 							collectionItem.SetObjectName(newObjectName);
-							collectionItem.SetFileId(QUuid::createUuid().toByteArray());
+							collectionItem.SetFileId(QUuid::createUuid().toByteArray(QUuid::WithoutBraces));
 							collectionItem.SetPathInRepository(targetDirPath + QDir::separator() + QFileInfo(newDataFile).fileName());
 							collectionItem.SetRepositoryRevision(repositoryRevision);
 

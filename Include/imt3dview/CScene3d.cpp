@@ -113,7 +113,7 @@ QByteArray CScene3d::AddShapeToScene(imt3dview::IScene3dItem* objectPtr, int ite
 	newItemPtr->shapePtr = objectPtr;
 	newItemPtr->modelId = m_nextModelId++;
 
-	QByteArray newId = QUuid::createUuid().toByteArray();
+	QByteArray newId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 	m_shapes.insert(newId, newItemPtr);
 
 	objectPtr->OnAttachBackend(m_backendPtr);

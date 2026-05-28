@@ -172,7 +172,7 @@ protected:
 			:isEnabled(true),
 			taskFlags(OF_ALL & ~OF_SUPPORT_PAGINATION)
 		{
-			uuid = QUuid::createUuid().toByteArray();
+			uuid = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 		}
 
 		QByteArray uuid;

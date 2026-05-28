@@ -102,7 +102,7 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 		return payload;
 	}
 
-	QByteArray tokenValue = QUuid::createUuid().toByteArray();
+	QByteArray tokenValue = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	payload.Version_1_0.emplace();
 
