@@ -36,7 +36,7 @@ public:
 		Get the System-Tenant ID.
 		Returns the well-known System-Tenant ID constant.
 	*/
-	virtual QByteArray GetSystemTenantId() const { return SystemTenantId(); }
+	virtual QByteArray GetSystemTenantId() const { return imtauth::GetSystemTenantId(); }
 
 	/**
 		Ensure the System-Tenant exists.

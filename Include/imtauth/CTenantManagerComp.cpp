@@ -221,26 +221,6 @@ bool CTenantManagerComp::SetTenantHierarchy(const QByteArray& tenantId, const QB
 
 	tenantPtr->SetParentTenantId(parentTenantId);
 
-	if (!parentTenantId.isEmpty()){
-		ITenantInfoUniquePtr parentTenant = GetTenant(parentTenantId);
-		if (parentTenant.IsValid()){
-			tenantPtr->SetDepth(parentTenant->GetDepth() + 1);
-			QString parentPath = parentTenant->GetMaterializedPath();
-			if (parentPath.isEmpty()){
-				parentPath = QString("/%1").arg(QString::fromUtf8(parentTenantId));
-			}
-			tenantPtr->SetMaterializedPath(parentPath + "/" + QString::fromUtf8(tenantId));
-		}
-		else{
-			tenantPtr->SetDepth(1);
-			tenantPtr->SetMaterializedPath(QString("/%1/%2").arg(QString::fromUtf8(parentTenantId), QString::fromUtf8(tenantId)));
-		}
-	}
-	else{
-		tenantPtr->SetDepth(0);
-		tenantPtr->SetMaterializedPath(QString("/%1").arg(QString::fromUtf8(tenantId)));
-	}
-
 	tenantPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
 
 	if (!m_tenantCollectionCompPtr->SetObjectData(tenantId, *tenantPtr)){
@@ -288,9 +268,6 @@ bool CTenantManagerComp::EnsureSystemTenant()
 	tenantPtr->SetActive(true);
 	tenantPtr->SetCreatedAt(now);
 	tenantPtr->SetUpdatedAt(now);
-	tenantPtr->SetSystemTenant(true);
-	tenantPtr->SetDepth(0);
-	tenantPtr->SetMaterializedPath(QString("/%1").arg(QString::fromUtf8(systemTenantId)));
 
 	QByteArray retVal = m_tenantCollectionCompPtr->InsertNewObject("Tenant", QStringLiteral("System"), QStringLiteral("Root system tenant"), tenantPtr.GetPtr(), systemTenantId);
 	if (retVal.isEmpty()){

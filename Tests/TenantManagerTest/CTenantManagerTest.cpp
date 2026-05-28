@@ -224,11 +224,11 @@ void CTenantManagerTest::testEnsureSystemTenant_CreatesOnFirstCall()
 	QVERIFY(m_managerPtr->EnsureSystemTenant());
 	QByteArray systemId = m_managerPtr->GetSystemTenantId();
 	QVERIFY(!systemId.isEmpty());
-	QCOMPARE(systemId, imtauth::SystemTenantId());
+	QCOMPARE(systemId, imtauth::GetSystemTenantId());
 	auto tenant = m_managerPtr->GetTenant(systemId);
 	QVERIFY(tenant != nullptr);
 	QCOMPARE(tenant->name, QStringLiteral("System"));
-	QVERIFY(tenant->isSystemTenant);
+	QVERIFY(tenant->id == imtauth::GetSystemTenantId());
 }
 
 
@@ -243,12 +243,10 @@ void CTenantManagerTest::testEnsureSystemTenant_Idempotent()
 void CTenantManagerTest::testSystemTenant_HasCorrectProperties()
 {
 	QVERIFY(m_managerPtr->EnsureSystemTenant());
-	auto tenant = m_managerPtr->GetTenant(imtauth::SystemTenantId());
+	auto tenant = m_managerPtr->GetTenant(imtauth::GetSystemTenantId());
 	QVERIFY(tenant != nullptr);
 	QVERIFY(tenant->isActive);
-	QVERIFY(tenant->isSystemTenant);
-	QCOMPARE(tenant->depth, 0);
-	QVERIFY(!tenant->materializedPath.isEmpty());
+	QVERIFY(tenant->id == imtauth::GetSystemTenantId());
 	QVERIFY(tenant->parentTenantId.isEmpty());
 }
 
@@ -264,22 +262,18 @@ void CTenantManagerTest::testCreateChildTenant_SetsParentAndDepth()
 	auto child = m_managerPtr->GetTenant(childId);
 	QVERIFY(child != nullptr);
 	QCOMPARE(child->parentTenantId, parentId);
-	QCOMPARE(child->depth, 1);
 }
 
 
 void CTenantManagerTest::testCreateChildTenant_CalculatesMaterializedPath()
 {
 	QByteArray parentId = m_managerPtr->CreateTenant("Parent", "", "owner1");
-	// Set a materialized path on the parent
-	m_managerPtr->m_tenants[parentId].materializedPath = QString("/%1").arg(QString::fromUtf8(parentId));
 
 	QByteArray childId = m_managerPtr->CreateChildTenant("Child", parentId, "", "owner2");
 
 	auto child = m_managerPtr->GetTenant(childId);
 	QVERIFY(child != nullptr);
-	QString expectedPath = QString("/%1/%2").arg(QString::fromUtf8(parentId), QString::fromUtf8(childId));
-	QCOMPARE(child->materializedPath, expectedPath);
+	QCOMPARE(child->parentTenantId, parentId);
 }
 
 
@@ -296,7 +290,6 @@ void CTenantManagerTest::testHierarchy_MultiLevel()
 	QVERIFY(m_managerPtr->EnsureSystemTenant());
 
 	QByteArray level1 = m_managerPtr->CreateTenant("Level1", "", "owner1");
-	m_managerPtr->m_tenants[level1].materializedPath = QString("/%1").arg(QString::fromUtf8(level1));
 
 	QByteArray level2 = m_managerPtr->CreateChildTenant("Level2", level1, "", "owner2");
 	QByteArray level3 = m_managerPtr->CreateChildTenant("Level3", level2, "", "owner3");
@@ -305,15 +298,7 @@ void CTenantManagerTest::testHierarchy_MultiLevel()
 	auto t2 = m_managerPtr->GetTenant(level2);
 	auto t3 = m_managerPtr->GetTenant(level3);
 
-	QCOMPARE(t1->depth, 0);
-	QCOMPARE(t2->depth, 1);
-	QCOMPARE(t3->depth, 2);
-
+	QVERIFY(t1->parentTenantId.isEmpty());
 	QVERIFY(t2->parentTenantId == level1);
 	QVERIFY(t3->parentTenantId == level2);
-
-	// Materialized path should contain ancestor IDs
-	QVERIFY(t3->materializedPath.contains(QString::fromUtf8(level1)));
-	QVERIFY(t3->materializedPath.contains(QString::fromUtf8(level2)));
-	QVERIFY(t3->materializedPath.contains(QString::fromUtf8(level3)));
 }

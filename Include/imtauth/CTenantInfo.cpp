@@ -17,8 +17,7 @@ namespace imtauth
 
 CTenantInfo::CTenantInfo():
 	m_isActive(true),
-	m_depth(0),
-	m_isSystemTenant(false)
+	m_depth(0)
 {
 }
 
@@ -259,17 +258,7 @@ void CTenantInfo::SetMaterializedPath(const QString& path)
 
 bool CTenantInfo::IsSystemTenant() const
 {
-	return m_isSystemTenant;
-}
-
-
-void CTenantInfo::SetSystemTenant(bool isSystem)
-{
-	if (m_isSystemTenant != isSystem){
-		istd::CChangeNotifier notifier(this);
-
-		m_isSystemTenant = isSystem;
-	}
+	return m_tenantId == GetSystemTenantId();
 }
 
 
@@ -388,11 +377,6 @@ bool CTenantInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_materializedPath);
 	retVal = retVal && archive.EndTag(materializedPathTag);
 
-	iser::CArchiveTag isSystemTenantTag("IsSystemTenant", "Is system tenant", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(isSystemTenantTag);
-	retVal = retVal && archive.Process(m_isSystemTenant);
-	retVal = retVal && archive.EndTag(isSystemTenantTag);
-
 	return retVal;
 }
 
@@ -418,7 +402,6 @@ bool CTenantInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/
 		m_parentTenantId = sourcePtr->m_parentTenantId;
 		m_depth = sourcePtr->m_depth;
 		m_materializedPath = sourcePtr->m_materializedPath;
-		m_isSystemTenant = sourcePtr->m_isSystemTenant;
 
 		return true;
 	}
@@ -455,7 +438,6 @@ bool CTenantInfo::ResetData(CompatibilityMode /*mode*/)
 	m_parentTenantId.clear();
 	m_depth = 0;
 	m_materializedPath.clear();
-	m_isSystemTenant = false;
 
 	return true;
 }

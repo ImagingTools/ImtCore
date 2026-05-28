@@ -88,9 +88,7 @@ sdl::imtauth::Tenants::CGetTenantPayload CTenantManagerControllerComp::OnGetTena
 	tenantData.updatedAt = tenantInfoPtr->GetUpdatedAt();
 	tenantData.tenantPermissions.Emplace().FromList(tenantInfoPtr->GetTenantPermissions());
 	tenantData.parentTenantId = tenantInfoPtr->GetParentTenantId();
-	tenantData.depth = tenantInfoPtr->GetDepth();
-	tenantData.materializedPath = tenantInfoPtr->GetMaterializedPath();
-	tenantData.isSystemTenant = tenantInfoPtr->IsSystemTenant();
+	tenantData.isSystemTenant = (tenantInfoPtr->GetTenantId() == imtauth::GetSystemTenantId());
 
 	// Populate members (id + name) from TenantMemberships
 	if (m_membershipManagerCompPtr.IsValid()){

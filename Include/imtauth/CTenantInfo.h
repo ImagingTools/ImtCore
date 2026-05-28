@@ -41,12 +41,13 @@ public:
 	virtual void SetTenantPermissions(const QByteArrayList& permissions) override;
 	virtual QByteArray GetParentTenantId() const override;
 	virtual void SetParentTenantId(const QByteArray& parentTenantId) override;
-	virtual int GetDepth() const override;
-	virtual void SetDepth(int depth) override;
-	virtual QString GetMaterializedPath() const override;
-	virtual void SetMaterializedPath(const QString& path) override;
-	virtual bool IsSystemTenant() const override;
-	virtual void SetSystemTenant(bool isSystem) override;
+
+	// Hierarchy fields (internal, for DB/serialization)
+	int GetDepth() const;
+	void SetDepth(int depth);
+	QString GetMaterializedPath() const;
+	void SetMaterializedPath(const QString& path);
+	bool IsSystemTenant() const;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -70,7 +71,6 @@ protected:
 	QByteArray m_parentTenantId;
 	int m_depth;
 	QString m_materializedPath;
-	bool m_isSystemTenant;
 };
 
 

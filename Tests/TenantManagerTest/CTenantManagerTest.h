@@ -28,9 +28,6 @@ struct TenantData
 	QDateTime createdAt;
 	QDateTime updatedAt;
 	QByteArray parentTenantId;
-	int depth = 0;
-	QString materializedPath;
-	bool isSystemTenant = false;
 };
 
 struct MembershipData
@@ -84,7 +81,6 @@ public:
 		tenant.isActive = true;
 		tenant.createdAt = QDateTime::currentDateTimeUtc();
 		tenant.updatedAt = tenant.createdAt;
-		tenant.depth = 0;
 
 		m_tenants[tenant.id] = tenant;
 		return tenant.id;
@@ -106,17 +102,13 @@ public:
 		tenant.updatedAt = tenant.createdAt;
 		tenant.parentTenantId = parentTenantId;
 
-		const TenantData& parent = m_tenants[parentTenantId];
-		tenant.depth = parent.depth + 1;
-		tenant.materializedPath = parent.materializedPath + "/" + QString::fromUtf8(tenant.id);
-
 		m_tenants[tenant.id] = tenant;
 		return tenant.id;
 	}
 
 	bool EnsureSystemTenant()
 	{
-		QByteArray systemId = imtauth::SystemTenantId();
+		QByteArray systemId = imtauth::GetSystemTenantId();
 		if (m_tenants.contains(systemId)){
 			return true;
 		}
@@ -128,9 +120,6 @@ public:
 		tenant.isActive = true;
 		tenant.createdAt = QDateTime::currentDateTimeUtc();
 		tenant.updatedAt = tenant.createdAt;
-		tenant.isSystemTenant = true;
-		tenant.depth = 0;
-		tenant.materializedPath = QString("/%1").arg(QString::fromUtf8(systemId));
 
 		m_tenants[tenant.id] = tenant;
 		return true;
@@ -138,7 +127,7 @@ public:
 
 	QByteArray GetSystemTenantId() const
 	{
-		return imtauth::SystemTenantId();
+		return imtauth::GetSystemTenantId();
 	}
 
 	bool RemoveTenant(const QByteArray& id)

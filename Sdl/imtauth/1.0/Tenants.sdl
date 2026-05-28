@@ -26,7 +26,6 @@ type TenantItemData {
 	invitationId: ID
 	invitedByName: String
 	parentTenantId: ID
-	depth: Int
 	isSystemTenant: Boolean
 }
 
@@ -80,8 +79,6 @@ type TenantData {
 	tenantPermissions: [ID]
 	allProductPermissions: [TenantPermissionOption]
 	parentTenantId: ID
-	depth: Int
-	materializedPath: String
 	isSystemTenant: Boolean
 }
 

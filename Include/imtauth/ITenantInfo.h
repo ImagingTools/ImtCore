@@ -24,7 +24,7 @@ namespace imtauth
 	The System-Tenant is the root tenant that is automatically created at server startup.
 	All users implicitly belong to the System-Tenant.
 */
-inline const QByteArray& SystemTenantId()
+inline const QByteArray& GetSystemTenantId()
 {
 	static const QByteArray s_id = QByteArrayLiteral("00000000-0000-0000-0000-000000000001");
 	return s_id;
@@ -206,38 +206,6 @@ public:
 		Set parent tenant ID.
 	*/
 	virtual void SetParentTenantId(const QByteArray& parentTenantId) = 0;
-
-	/**
-		Get hierarchy depth.
-		0 for the System-Tenant and top-level tenants, incremented for each level.
-	*/
-	virtual int GetDepth() const = 0;
-
-	/**
-		Set hierarchy depth.
-	*/
-	virtual void SetDepth(int depth) = 0;
-
-	/**
-		Get materialized path for efficient hierarchy queries.
-		Format: "/rootId/parentId/.../thisId"
-	*/
-	virtual QString GetMaterializedPath() const = 0;
-
-	/**
-		Set materialized path.
-	*/
-	virtual void SetMaterializedPath(const QString& path) = 0;
-
-	/**
-		Check if this tenant is the System-Tenant.
-	*/
-	virtual bool IsSystemTenant() const = 0;
-
-	/**
-		Set the system tenant flag.
-	*/
-	virtual void SetSystemTenant(bool isSystem) = 0;
 };
 
 
