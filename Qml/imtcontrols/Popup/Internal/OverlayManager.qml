@@ -50,7 +50,17 @@ QtObject {
                 opacity: 0
                 z: -1
 
-                Behavior on opacity { NumberAnimation { duration: 120 } }
+                NumberAnimation {
+                    id: dimOpacityAnim
+                    target: dim
+                    property: "opacity"
+                    duration: 120
+                    onStopped: {
+                        if (dim.opacity === 0) {
+                            dim.visible = false;
+                        }
+                    }
+                }
 
                 MouseArea {
                     anchors.fill: parent
@@ -105,10 +115,11 @@ QtObject {
                 if (topModal) {
                     dim.z = topModal.z - 1;
                     dim.visible = true;
-                    dim.opacity = topModal.dim ? 0.5 : 0;
+                    dimOpacityAnim.to = topModal.dim ? 0.5 : 0;
+                    dimOpacityAnim.start();
                 } else {
-                    dim.opacity = 0;
-                    dim.visible = false;
+                    dimOpacityAnim.to = 0;
+                    dimOpacityAnim.start();
                 }
                 outsideCatcher.visible = openPopups.length > 0 && !topModal;
             }
