@@ -1,5 +1,3 @@
-module imtcontrols.Popup.Internal
-
 singleton PopupManager 1.0 PopupManager.qml
 singleton OverlayManager 1.0 OverlayManager.qml
 singleton FocusCoordinator 1.0 FocusCoordinator.qml

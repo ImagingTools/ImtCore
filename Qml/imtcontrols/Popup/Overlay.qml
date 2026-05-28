@@ -1,6 +1,6 @@
 import QtQuick 2.12
 import imtcontrols 1.0
-import imtcontrols.Popup.Internal 1.0
+import "Internal"
 
 /*!
     \qmltype Overlay
