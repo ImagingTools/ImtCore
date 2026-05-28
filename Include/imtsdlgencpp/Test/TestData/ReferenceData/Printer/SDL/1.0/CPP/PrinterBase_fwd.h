@@ -4,7 +4,7 @@
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
 
 
-namespace sdl::modsdl::PrinterBase
+namespace sdl::V1_0::modsdl
 {
 
 // type forward declarations
@@ -47,4 +47,4 @@ protected:
 
 
 
-} // namespace sdl::modsdl::PrinterBase
+} // namespace sdl::V1_0::modsdl

@@ -2,17 +2,17 @@
 #include "ComplexCollectionFilter_fwd.h"
 
 
-namespace sdl::imtbase::ComplexCollectionFilter
+namespace sdl::V1_0::imtbase
 {
 
 
-QByteArray CTimeFilter::V1_0::GetVersionId()
+QByteArray CTimeFilter::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CTimeFilter::V1_0::operator==(const V1_0& other) const
+bool CTimeFilter::operator==(const CTimeFilter& other) const
 {
 	return 
 				timeRange == other.timeRange &&
@@ -22,7 +22,7 @@ bool CTimeFilter::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CTimeFilter::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CTimeFilter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "TimeFilter", modelIndex);
 
@@ -54,7 +54,7 @@ bool CTimeFilter::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int model
 }
 
 
-bool CTimeFilter::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CTimeFilter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* timeRangeDataModelPtr = model.GetTreeItemModel("timeRange", modelIndex);
 	if (timeRangeDataModelPtr != nullptr){
@@ -86,7 +86,7 @@ bool CTimeFilter::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, in
 }
 
 
-bool CTimeFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CTimeFilter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* timeRangeDataModelPtr = model.GetTreeItemModel("timeRange", modelIndex);
 	if (timeRangeDataModelPtr != nullptr){
@@ -118,7 +118,7 @@ bool CTimeFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model,
 }
 
 
-bool CTimeFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CTimeFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (timeRange){
 		::imtgql::CGqlParamObject timeRangeGqlObject;
@@ -149,7 +149,7 @@ bool CTimeFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObjec
 }
 
 
-bool CTimeFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CTimeFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("timeRange") && (gqlObject.GetParamArgumentObjectPtr("timeRange") != nullptr)){
 		timeRange = ImtBaseTypes::CTimeRange::V1_0();
@@ -177,7 +177,7 @@ bool CTimeFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 }
 
 
-bool CTimeFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CTimeFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("timeRange") && (gqlObject.GetParamArgumentObjectPtr("timeRange") != nullptr)){
 		timeRange = ImtBaseTypes::CTimeRange::V1_0();
@@ -205,7 +205,7 @@ bool CTimeFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject
 }
 
 
-bool CTimeFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CTimeFilter::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (timeRange){
 		QJsonObject timeRangeJsonObject;
@@ -236,7 +236,7 @@ bool CTimeFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CTimeFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CTimeFilter::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("timeRange") && jsonObject["timeRange"].isObject()){
 		timeRange = ImtBaseTypes::CTimeRange::V1_0();
@@ -264,7 +264,7 @@ bool CTimeFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CTimeFilter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CTimeFilter::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("timeRange") && jsonObject["timeRange"].isObject()){
 		timeRange = ImtBaseTypes::CTimeRange::V1_0();
@@ -294,243 +294,13 @@ bool CTimeFilter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CTimeFilter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CTimeFilter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CTimeFilter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CTimeFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CTimeFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CTimeFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CTimeFilter::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CTimeFilter::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CTimeFilter::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CFieldSortingInfo::V1_0::GetVersionId()
+QByteArray CFieldSortingInfo::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CFieldSortingInfo::V1_0::operator==(const V1_0& other) const
+bool CFieldSortingInfo::operator==(const CFieldSortingInfo& other) const
 {
 	return 
 				fieldId == other.fieldId &&
@@ -538,7 +308,7 @@ bool CFieldSortingInfo::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CFieldSortingInfo::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CFieldSortingInfo::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "FieldSortingInfo", modelIndex);
 
@@ -561,7 +331,7 @@ bool CFieldSortingInfo::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int
 }
 
 
-bool CFieldSortingInfo::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CFieldSortingInfo::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant fieldIdData = model.GetData("fieldId", modelIndex);
 	if (fieldIdData.isNull()){
@@ -583,7 +353,7 @@ bool CFieldSortingInfo::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& mod
 }
 
 
-bool CFieldSortingInfo::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CFieldSortingInfo::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant fieldIdData = model.GetData("fieldId", modelIndex);
 	if (!fieldIdData.isNull()){
@@ -599,7 +369,7 @@ bool CFieldSortingInfo::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& 
 }
 
 
-bool CFieldSortingInfo::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CFieldSortingInfo::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!fieldId){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId").toLocal8Bit().constData();)
@@ -621,7 +391,7 @@ bool CFieldSortingInfo::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gq
 }
 
 
-bool CFieldSortingInfo::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CFieldSortingInfo::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("fieldId") || (gqlObject["fieldId"].userType() != QMetaType::QString && gqlObject["fieldId"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId").toLocal8Bit().constData();)
@@ -641,7 +411,7 @@ bool CFieldSortingInfo::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObj
 }
 
 
-bool CFieldSortingInfo::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CFieldSortingInfo::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("fieldId") && (gqlObject["fieldId"].userType() == QMetaType::QString || gqlObject["fieldId"].userType() == QMetaType::QByteArray)){
 		fieldId = gqlObject["fieldId"].toString();
@@ -655,7 +425,7 @@ bool CFieldSortingInfo::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParam
 }
 
 
-bool CFieldSortingInfo::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CFieldSortingInfo::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!fieldId){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId").toLocal8Bit().constData();)
@@ -677,7 +447,7 @@ bool CFieldSortingInfo::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CFieldSortingInfo::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CFieldSortingInfo::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("fieldId") || ! jsonObject["fieldId"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId").toLocal8Bit().constData();)
@@ -697,7 +467,7 @@ bool CFieldSortingInfo::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CFieldSortingInfo::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CFieldSortingInfo::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("fieldId") && jsonObject["fieldId"].isString()){
 		fieldId = jsonObject["fieldId"].toString();
@@ -713,243 +483,13 @@ bool CFieldSortingInfo::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObjec
 
 // serialize methods
 
-bool CFieldSortingInfo::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFieldSortingInfo::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFieldSortingInfo::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFieldSortingInfo::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFieldSortingInfo::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFieldSortingInfo::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFieldSortingInfo::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFieldSortingInfo::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFieldSortingInfo::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CFieldFilter::V1_0::GetVersionId()
+QByteArray CFieldFilter::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CFieldFilter::V1_0::operator==(const V1_0& other) const
+bool CFieldFilter::operator==(const CFieldFilter& other) const
 {
 	return 
 				fieldId == other.fieldId &&
@@ -959,7 +499,7 @@ bool CFieldFilter::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CFieldFilter::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CFieldFilter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "FieldFilter", modelIndex);
 
@@ -1035,7 +575,7 @@ bool CFieldFilter::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 }
 
 
-bool CFieldFilter::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CFieldFilter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant fieldIdData = model.GetData("fieldId", modelIndex);
 	if (fieldIdData.isNull()){
@@ -1118,7 +658,7 @@ bool CFieldFilter::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 }
 
 
-bool CFieldFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CFieldFilter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant fieldIdData = model.GetData("fieldId", modelIndex);
 	if (!fieldIdData.isNull()){
@@ -1190,7 +730,7 @@ bool CFieldFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 }
 
 
-bool CFieldFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CFieldFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!fieldId){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId").toLocal8Bit().constData();)
@@ -1264,7 +804,7 @@ bool CFieldFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 }
 
 
-bool CFieldFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CFieldFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("fieldId") || (gqlObject["fieldId"].userType() != QMetaType::QString && gqlObject["fieldId"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId").toLocal8Bit().constData();)
@@ -1343,7 +883,7 @@ bool CFieldFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 }
 
 
-bool CFieldFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CFieldFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("fieldId") && (gqlObject["fieldId"].userType() == QMetaType::QString || gqlObject["fieldId"].userType() == QMetaType::QByteArray)){
 		fieldId = gqlObject["fieldId"].toByteArray();
@@ -1413,7 +953,7 @@ bool CFieldFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 }
 
 
-bool CFieldFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CFieldFilter::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!fieldId){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId").toLocal8Bit().constData();)
@@ -1487,7 +1027,7 @@ bool CFieldFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CFieldFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CFieldFilter::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("fieldId") || ! jsonObject["fieldId"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId").toLocal8Bit().constData();)
@@ -1565,7 +1105,7 @@ bool CFieldFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CFieldFilter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CFieldFilter::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("fieldId") && jsonObject["fieldId"].isString()){
 		fieldId = jsonObject["fieldId"].toString().toUtf8();
@@ -1633,243 +1173,13 @@ bool CFieldFilter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CFieldFilter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFieldFilter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFieldFilter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFieldFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFieldFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFieldFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFieldFilter::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFieldFilter::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFieldFilter::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CGroupFilter::V1_0::GetVersionId()
+QByteArray CGroupFilter::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CGroupFilter::V1_0::operator==(const V1_0& other) const
+bool CGroupFilter::operator==(const CGroupFilter& other) const
 {
 	return 
 				fieldFilters == other.fieldFilters &&
@@ -1878,7 +1188,7 @@ bool CGroupFilter::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CGroupFilter::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CGroupFilter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "GroupFilter", modelIndex);
 
@@ -1930,7 +1240,7 @@ bool CGroupFilter::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 }
 
 
-bool CGroupFilter::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CGroupFilter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* fieldFiltersModel = model.GetTreeItemModel("fieldFilters", modelIndex);
 	if (fieldFiltersModel != nullptr){
@@ -1989,7 +1299,7 @@ bool CGroupFilter::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 }
 
 
-bool CGroupFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CGroupFilter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* fieldFiltersModel = model.GetTreeItemModel("fieldFilters", modelIndex);
 	if (fieldFiltersModel != nullptr){
@@ -2045,7 +1355,7 @@ bool CGroupFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 }
 
 
-bool CGroupFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CGroupFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (fieldFilters){
 		QList<::imtgql::CGqlParamObject> fieldFiltersDataObjectList;
@@ -2100,7 +1410,7 @@ bool CGroupFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 }
 
 
-bool CGroupFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CGroupFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("fieldFilters")){
 		fieldFilters.emplace();
@@ -2168,7 +1478,7 @@ bool CGroupFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 }
 
 
-bool CGroupFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CGroupFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("fieldFilters")){
 		fieldFilters.emplace();
@@ -2233,7 +1543,7 @@ bool CGroupFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 }
 
 
-bool CGroupFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CGroupFilter::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (fieldFilters){
 		QJsonArray newFieldFiltersArray;
@@ -2288,7 +1598,7 @@ bool CGroupFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CGroupFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CGroupFilter::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("fieldFilters") && jsonObject["fieldFilters"].isArray()){
 		const QJsonArray fieldFiltersJsonArray = jsonObject["fieldFilters"].toArray();
@@ -2342,7 +1652,7 @@ bool CGroupFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CGroupFilter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CGroupFilter::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("fieldFilters") && jsonObject["fieldFilters"].isArray()){
 		const QJsonArray fieldFiltersJsonArray = jsonObject["fieldFilters"].toArray();
@@ -2395,243 +1705,13 @@ bool CGroupFilter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CGroupFilter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CGroupFilter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CGroupFilter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CGroupFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CGroupFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CGroupFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CGroupFilter::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CGroupFilter::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CGroupFilter::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CComplexCollectionFilter::V1_0::GetVersionId()
+QByteArray CComplexCollectionFilter::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CComplexCollectionFilter::V1_0::operator==(const V1_0& other) const
+bool CComplexCollectionFilter::operator==(const CComplexCollectionFilter& other) const
 {
 	return 
 				sortingInfo == other.sortingInfo &&
@@ -2641,7 +1721,7 @@ bool CComplexCollectionFilter::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CComplexCollectionFilter::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CComplexCollectionFilter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "ComplexCollectionFilter", modelIndex);
 
@@ -2693,7 +1773,7 @@ bool CComplexCollectionFilter::V1_0::WriteToModel(::imtbase::CTreeItemModel& mod
 }
 
 
-bool CComplexCollectionFilter::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CComplexCollectionFilter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* sortingInfoModel = model.GetTreeItemModel("sortingInfo", modelIndex);
 	if (sortingInfoModel != nullptr){
@@ -2750,7 +1830,7 @@ bool CComplexCollectionFilter::V1_0::ReadFromModel(const ::imtbase::CTreeItemMod
 }
 
 
-bool CComplexCollectionFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CComplexCollectionFilter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* sortingInfoModel = model.GetTreeItemModel("sortingInfo", modelIndex);
 	if (sortingInfoModel != nullptr){
@@ -2807,7 +1887,7 @@ bool CComplexCollectionFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItem
 }
 
 
-bool CComplexCollectionFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CComplexCollectionFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (sortingInfo){
 		QList<::imtgql::CGqlParamObject> sortingInfoDataObjectList;
@@ -2859,7 +1939,7 @@ bool CComplexCollectionFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObj
 }
 
 
-bool CComplexCollectionFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CComplexCollectionFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("sortingInfo")){
 		sortingInfo.emplace();
@@ -2921,7 +2001,7 @@ bool CComplexCollectionFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlP
 }
 
 
-bool CComplexCollectionFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CComplexCollectionFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("sortingInfo")){
 		sortingInfo.emplace();
@@ -2983,7 +2063,7 @@ bool CComplexCollectionFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CG
 }
 
 
-bool CComplexCollectionFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CComplexCollectionFilter::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (sortingInfo){
 		QJsonArray newSortingInfoArray;
@@ -3035,7 +2115,7 @@ bool CComplexCollectionFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) 
 }
 
 
-bool CComplexCollectionFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CComplexCollectionFilter::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("sortingInfo") && jsonObject["sortingInfo"].isArray()){
 		const QJsonArray sortingInfoJsonArray = jsonObject["sortingInfo"].toArray();
@@ -3086,7 +2166,7 @@ bool CComplexCollectionFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonO
 }
 
 
-bool CComplexCollectionFilter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CComplexCollectionFilter::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("sortingInfo") && jsonObject["sortingInfo"].isArray()){
 		const QJsonArray sortingInfoJsonArray = jsonObject["sortingInfo"].toArray();
@@ -3139,238 +2219,7 @@ bool CComplexCollectionFilter::V1_0::OptReadFromJsonObject(const QJsonObject& js
 
 // serialize methods
 
-bool CComplexCollectionFilter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CComplexCollectionFilter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CComplexCollectionFilter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CComplexCollectionFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CComplexCollectionFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CComplexCollectionFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CComplexCollectionFilter::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CComplexCollectionFilter::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CComplexCollectionFilter::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
 CTimeFilterObject::CTimeFilterObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CTimeFilterObject::timeRangeChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CTimeFilterObject::timeUnitChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -3381,11 +2230,11 @@ CTimeFilterObject::CTimeFilterObject(QObject* parent): ::imtbase::CItemModelBase
 
 QVariant CTimeFilterObject::GetTimeRange()
 {
-	if (Version_1_0 && Version_1_0->timeRange){
+	if (timeRange){
 		if (!m_timeRangeQObjectPtr.isValid()){
 			m_timeRangeQObjectPtr = CreateObject("timeRange");
-			auto itemPtr = m_timeRangeQObjectPtr.value<sdl::imtbase::ImtBaseTypes::CTimeRangeObject*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->timeRange;
+			auto itemPtr = m_timeRangeQObjectPtr.value<sdl::V1_0::imtbase::CTimeRangeObject*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = timeRange;
 		}
 		return m_timeRangeQObjectPtr;
 	}
@@ -3396,16 +2245,13 @@ QVariant CTimeFilterObject::GetTimeRange()
 
 void CTimeFilterObject::SetTimeRange(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::imtbase::ImtBaseTypes::CTimeRangeObject* itemPtr = v.value<sdl::imtbase::ImtBaseTypes::CTimeRangeObject*>();
-		if (itemPtr != nullptr)  Version_1_0->timeRange = itemPtr->Version_1_0;
+		sdl::V1_0::imtbase::CTimeRangeObject* itemPtr = v.value<sdl::V1_0::imtbase::CTimeRangeObject*>();
+		if (itemPtr != nullptr)  timeRange = static_cast<const decltype(timeRange)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->timeRange = nullptr;
+		timeRange = nullptr;
 	}
 	m_timeRangeQObjectPtr = v;
 
@@ -3415,17 +2261,14 @@ void CTimeFilterObject::SetTimeRange(const QVariant& v)
 
 bool CTimeFilterObject::hasTimeRange()
 {
-	 return Version_1_0 && Version_1_0->timeRange.HasValue();
+	 return timeRange.HasValue();
 }
 
 
 void CTimeFilterObject::emplaceTimeRange()
 {
 	ResetTimeRange();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->timeRange.emplace();
+	timeRange.emplace();
 }
 
 
@@ -3441,8 +2284,8 @@ void CTimeFilterObject::ResetTimeRange()
 
 QVariant CTimeFilterObject::GetTimeUnit()
 {
-	if (Version_1_0 && Version_1_0->timeUnit){
-		return Version_1_0->timeUnit.value();
+	if (timeUnit){
+		return timeUnit.value();
 	}
 
 	return QVariant();
@@ -3451,25 +2294,22 @@ QVariant CTimeFilterObject::GetTimeUnit()
 
 void CTimeFilterObject::SetTimeUnit(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->timeUnit = v.value<QString>();
+	timeUnit = v.value<QString>();
 	timeUnitChanged();
 }
 
 
 bool CTimeFilterObject::hasTimeUnit()
 {
-	 return Version_1_0 && Version_1_0->timeUnit.HasValue();
+	 return timeUnit.HasValue();
 }
 
 
 QVariant CTimeFilterObject::GetInterpretationMode()
 {
-	if (Version_1_0 && Version_1_0->interpretationMode){
-		return Version_1_0->interpretationMode.value();
+	if (interpretationMode){
+		return interpretationMode.value();
 	}
 
 	return QVariant();
@@ -3478,25 +2318,22 @@ QVariant CTimeFilterObject::GetInterpretationMode()
 
 void CTimeFilterObject::SetInterpretationMode(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->interpretationMode = v.value<QString>();
+	interpretationMode = v.value<QString>();
 	interpretationModeChanged();
 }
 
 
 bool CTimeFilterObject::hasInterpretationMode()
 {
-	 return Version_1_0 && Version_1_0->interpretationMode.HasValue();
+	 return interpretationMode.HasValue();
 }
 
 
 QVariant CTimeFilterObject::GetUnitMultiplier()
 {
-	if (Version_1_0 && Version_1_0->unitMultiplier){
-		return Version_1_0->unitMultiplier.value();
+	if (unitMultiplier){
+		return unitMultiplier.value();
 	}
 
 	return QVariant();
@@ -3505,18 +2342,15 @@ QVariant CTimeFilterObject::GetUnitMultiplier()
 
 void CTimeFilterObject::SetUnitMultiplier(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->unitMultiplier = v.value<int>();
+	unitMultiplier = v.value<int>();
 	unitMultiplierChanged();
 }
 
 
 bool CTimeFilterObject::hasUnitMultiplier()
 {
-	 return Version_1_0 && Version_1_0->unitMultiplier.HasValue();
+	 return unitMultiplier.HasValue();
 }
 
 
@@ -3568,7 +2402,7 @@ QString CTimeFilterObject::toGraphQL() const
 QVariant CTimeFilterObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "timeRange"){
-		return QVariant::fromValue(new sdl::imtbase::ImtBaseTypes::CTimeRangeObject(this));
+		return QVariant::fromValue(new sdl::V1_0::imtbase::CTimeRangeObject(this));
 	}
 	return QVariant();
 }
@@ -3614,95 +2448,94 @@ QVariantMap CTimeFilterObjectList::get(int row) const
 }
 
 
-void CTimeFilterObjectList::append(sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject* item)
+void CTimeFilterObjectList::append(sdl::V1_0::imtbase::CTimeFilterObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList* sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList::copyMe()
+sdl::V1_0::imtbase::CTimeFilterObjectList* sdl::V1_0::imtbase::CTimeFilterObjectList::copyMe()
 {
-	sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList* retVal = new sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList();
+	sdl::V1_0::imtbase::CTimeFilterObjectList* retVal = new sdl::V1_0::imtbase::CTimeFilterObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList::toJson()
+QString sdl::V1_0::imtbase::CTimeFilterObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList::toGraphQL()
+QString sdl::V1_0::imtbase::CTimeFilterObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList::addElement(sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject* item)
+void sdl::V1_0::imtbase::CTimeFilterObjectList::addElement(sdl::V1_0::imtbase::CTimeFilterObject* item)
 {
 	append(item);
 }
 
 
-void sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList::removeElement(int index)
+void sdl::V1_0::imtbase::CTimeFilterObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList::isEqualWithModel(sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList* otherModelPtr)
+bool sdl::V1_0::imtbase::CTimeFilterObjectList::isEqualWithModel(sdl::V1_0::imtbase::CTimeFilterObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList::insert(int index, sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject* item)
+void sdl::V1_0::imtbase::CTimeFilterObjectList::insert(int index, sdl::V1_0::imtbase::CTimeFilterObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList::remove(int index)
+void sdl::V1_0::imtbase::CTimeFilterObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList::clear()
+void sdl::V1_0::imtbase::CTimeFilterObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CTimeFilterObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::imtbase::CTimeFilterObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_timeRange"){
 		return itemPtr->GetTimeRange();
 	}
 	if (nameId == "m_timeUnit"){
-		return QVariant::fromValue(Version_1_0->at(index)->timeUnit.value());
+		return QVariant::fromValue(at(index)->timeUnit.value());
 	}
 	if (nameId == "m_interpretationMode"){
-		return QVariant::fromValue(Version_1_0->at(index)->interpretationMode.value());
+		return QVariant::fromValue(at(index)->interpretationMode.value());
 	}
 	if (nameId == "m_unitMultiplier"){
-		return QVariant::fromValue(Version_1_0->at(index)->unitMultiplier.value());
+		return QVariant::fromValue(at(index)->unitMultiplier.value());
 	}
 
 	return QVariant();
 }
 CFieldSortingInfoObject::CFieldSortingInfoObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CFieldSortingInfoObject::fieldIdChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CFieldSortingInfoObject::sortingOrderChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -3711,8 +2544,8 @@ CFieldSortingInfoObject::CFieldSortingInfoObject(QObject* parent): ::imtbase::CI
 
 QVariant CFieldSortingInfoObject::GetFieldId()
 {
-	if (Version_1_0 && Version_1_0->fieldId){
-		return Version_1_0->fieldId.value();
+	if (fieldId){
+		return fieldId.value();
 	}
 
 	return QVariant();
@@ -3721,25 +2554,22 @@ QVariant CFieldSortingInfoObject::GetFieldId()
 
 void CFieldSortingInfoObject::SetFieldId(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->fieldId = v.value<QString>();
+	fieldId = v.value<QString>();
 	fieldIdChanged();
 }
 
 
 bool CFieldSortingInfoObject::hasFieldId()
 {
-	 return Version_1_0 && Version_1_0->fieldId.HasValue();
+	 return fieldId.HasValue();
 }
 
 
 QVariant CFieldSortingInfoObject::GetSortingOrder()
 {
-	if (Version_1_0 && Version_1_0->sortingOrder){
-		return Version_1_0->sortingOrder.value();
+	if (sortingOrder){
+		return sortingOrder.value();
 	}
 
 	return QVariant();
@@ -3748,18 +2578,15 @@ QVariant CFieldSortingInfoObject::GetSortingOrder()
 
 void CFieldSortingInfoObject::SetSortingOrder(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->sortingOrder = v.value<QString>();
+	sortingOrder = v.value<QString>();
 	sortingOrderChanged();
 }
 
 
 bool CFieldSortingInfoObject::hasSortingOrder()
 {
-	 return Version_1_0 && Version_1_0->sortingOrder.HasValue();
+	 return sortingOrder.HasValue();
 }
 
 
@@ -3848,89 +2675,88 @@ QVariantMap CFieldSortingInfoObjectList::get(int row) const
 }
 
 
-void CFieldSortingInfoObjectList::append(sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObject* item)
+void CFieldSortingInfoObjectList::append(sdl::V1_0::imtbase::CFieldSortingInfoObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList* sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList::copyMe()
+sdl::V1_0::imtbase::CFieldSortingInfoObjectList* sdl::V1_0::imtbase::CFieldSortingInfoObjectList::copyMe()
 {
-	sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList* retVal = new sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList();
+	sdl::V1_0::imtbase::CFieldSortingInfoObjectList* retVal = new sdl::V1_0::imtbase::CFieldSortingInfoObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList::toJson()
+QString sdl::V1_0::imtbase::CFieldSortingInfoObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList::toGraphQL()
+QString sdl::V1_0::imtbase::CFieldSortingInfoObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList::addElement(sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObject* item)
+void sdl::V1_0::imtbase::CFieldSortingInfoObjectList::addElement(sdl::V1_0::imtbase::CFieldSortingInfoObject* item)
 {
 	append(item);
 }
 
 
-void sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList::removeElement(int index)
+void sdl::V1_0::imtbase::CFieldSortingInfoObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList::isEqualWithModel(sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList* otherModelPtr)
+bool sdl::V1_0::imtbase::CFieldSortingInfoObjectList::isEqualWithModel(sdl::V1_0::imtbase::CFieldSortingInfoObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList::insert(int index, sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObject* item)
+void sdl::V1_0::imtbase::CFieldSortingInfoObjectList::insert(int index, sdl::V1_0::imtbase::CFieldSortingInfoObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList::remove(int index)
+void sdl::V1_0::imtbase::CFieldSortingInfoObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList::clear()
+void sdl::V1_0::imtbase::CFieldSortingInfoObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CFieldSortingInfoObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::imtbase::CFieldSortingInfoObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_fieldId"){
-		return QVariant::fromValue(Version_1_0->at(index)->fieldId.value());
+		return QVariant::fromValue(at(index)->fieldId.value());
 	}
 	if (nameId == "m_sortingOrder"){
-		return QVariant::fromValue(Version_1_0->at(index)->sortingOrder.value());
+		return QVariant::fromValue(at(index)->sortingOrder.value());
 	}
 
 	return QVariant();
 }
 CFieldFilterObject::CFieldFilterObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CFieldFilterObject::fieldIdChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CFieldFilterObject::filterValueChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -3941,8 +2767,8 @@ CFieldFilterObject::CFieldFilterObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CFieldFilterObject::GetFieldId()
 {
-	if (Version_1_0 && Version_1_0->fieldId){
-		return Version_1_0->fieldId.value();
+	if (fieldId){
+		return fieldId.value();
 	}
 
 	return QVariant();
@@ -3951,25 +2777,22 @@ QVariant CFieldFilterObject::GetFieldId()
 
 void CFieldFilterObject::SetFieldId(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->fieldId = v.value<QString>().toUtf8();
+	fieldId = v.value<QString>().toUtf8();
 	fieldIdChanged();
 }
 
 
 bool CFieldFilterObject::hasFieldId()
 {
-	 return Version_1_0 && Version_1_0->fieldId.HasValue();
+	 return fieldId.HasValue();
 }
 
 
 QVariant CFieldFilterObject::GetFilterValue()
 {
-	if (Version_1_0 && Version_1_0->filterValue){
-		return Version_1_0->filterValue.value();
+	if (filterValue){
+		return filterValue.value();
 	}
 
 	return QVariant();
@@ -3978,26 +2801,23 @@ QVariant CFieldFilterObject::GetFilterValue()
 
 void CFieldFilterObject::SetFilterValue(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->filterValue = v.value<QString>();
+	filterValue = v.value<QString>();
 	filterValueChanged();
 }
 
 
 bool CFieldFilterObject::hasFilterValue()
 {
-	 return Version_1_0 && Version_1_0->filterValue.HasValue();
+	 return filterValue.HasValue();
 }
 
 
 QVariant CFieldFilterObject::GetFilterValueType()
 {
-	if (Version_1_0 && Version_1_0->filterValueType){
-		sdl::imtbase::ComplexCollectionFilter::ValueType valueType = Version_1_0->filterValueType.value();
-		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::imtbase::ComplexCollectionFilter::ValueType>();
+	if (filterValueType){
+		sdl::V1_0::imtbase::ValueType valueType = filterValueType.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::imtbase::ValueType>();
 		QString retval = metaEnum.valueToKey((int)valueType);
 
 		return retval;
@@ -4009,15 +2829,12 @@ QVariant CFieldFilterObject::GetFilterValueType()
 
 void CFieldFilterObject::SetFilterValueType(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->filterValueType.emplace();
-	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::imtbase::ComplexCollectionFilter::ValueType>();
+	filterValueType.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::imtbase::ValueType>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
-		Version_1_0->filterValueType = (sdl::imtbase::ComplexCollectionFilter::ValueType)key;
+		filterValueType = (sdl::V1_0::imtbase::ValueType)key;
 	}
 	filterValueTypeChanged();
 }
@@ -4025,13 +2842,13 @@ void CFieldFilterObject::SetFilterValueType(const QVariant& v)
 
 bool CFieldFilterObject::hasFilterValueType()
 {
-	 return Version_1_0 && Version_1_0->filterValueType.HasValue();
+	 return filterValueType.HasValue();
 }
 
 
 QVariant CFieldFilterObject::GetFilterOperations()
 {
-	if (Version_1_0 && Version_1_0->filterOperations){
+	if (filterOperations){
 		
 	}
 
@@ -4041,9 +2858,6 @@ QVariant CFieldFilterObject::GetFilterOperations()
 
 void CFieldFilterObject::SetFilterOperations(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	
 	filterOperationsChanged();
@@ -4052,7 +2866,7 @@ void CFieldFilterObject::SetFilterOperations(const QVariant& v)
 
 bool CFieldFilterObject::hasFilterOperations()
 {
-	 return Version_1_0 && Version_1_0->filterOperations.HasValue();
+	 return filterOperations.HasValue();
 }
 
 
@@ -4147,95 +2961,94 @@ QVariantMap CFieldFilterObjectList::get(int row) const
 }
 
 
-void CFieldFilterObjectList::append(sdl::imtbase::ComplexCollectionFilter::CFieldFilterObject* item)
+void CFieldFilterObjectList::append(sdl::V1_0::imtbase::CFieldFilterObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList* sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList::copyMe()
+sdl::V1_0::imtbase::CFieldFilterObjectList* sdl::V1_0::imtbase::CFieldFilterObjectList::copyMe()
 {
-	sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList* retVal = new sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList();
+	sdl::V1_0::imtbase::CFieldFilterObjectList* retVal = new sdl::V1_0::imtbase::CFieldFilterObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList::toJson()
+QString sdl::V1_0::imtbase::CFieldFilterObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList::toGraphQL()
+QString sdl::V1_0::imtbase::CFieldFilterObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList::addElement(sdl::imtbase::ComplexCollectionFilter::CFieldFilterObject* item)
+void sdl::V1_0::imtbase::CFieldFilterObjectList::addElement(sdl::V1_0::imtbase::CFieldFilterObject* item)
 {
 	append(item);
 }
 
 
-void sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList::removeElement(int index)
+void sdl::V1_0::imtbase::CFieldFilterObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList::isEqualWithModel(sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList* otherModelPtr)
+bool sdl::V1_0::imtbase::CFieldFilterObjectList::isEqualWithModel(sdl::V1_0::imtbase::CFieldFilterObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList::insert(int index, sdl::imtbase::ComplexCollectionFilter::CFieldFilterObject* item)
+void sdl::V1_0::imtbase::CFieldFilterObjectList::insert(int index, sdl::V1_0::imtbase::CFieldFilterObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList::remove(int index)
+void sdl::V1_0::imtbase::CFieldFilterObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList::clear()
+void sdl::V1_0::imtbase::CFieldFilterObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CFieldFilterObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::imtbase::ComplexCollectionFilter::CFieldFilterObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::imtbase::CFieldFilterObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_fieldId"){
-		return QVariant::fromValue(Version_1_0->at(index)->fieldId.value());
+		return QVariant::fromValue(at(index)->fieldId.value());
 	}
 	if (nameId == "m_filterValue"){
-		return QVariant::fromValue(Version_1_0->at(index)->filterValue.value());
+		return QVariant::fromValue(at(index)->filterValue.value());
 	}
 	if (nameId == "m_filterValueType"){
-		return QVariant::fromValue(Version_1_0->at(index)->filterValueType.value());
+		return QVariant::fromValue(at(index)->filterValueType.value());
 	}
 	if (nameId == "m_filterOperations"){
-		return QVariant::fromValue(Version_1_0->at(index)->filterOperations.value());
+		return QVariant::fromValue(at(index)->filterOperations.value());
 	}
 
 	return QVariant();
 }
 CGroupFilterObject::CGroupFilterObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CGroupFilterObject::fieldFiltersChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CGroupFilterObject::groupFiltersChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -4245,11 +3058,11 @@ CGroupFilterObject::CGroupFilterObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CGroupFilterObject::GetFieldFilters()
 {
-	if (Version_1_0 && Version_1_0->fieldFilters){
+	if (fieldFilters){
 		if (!m_fieldFiltersQObjectPtr.isValid()){
 			m_fieldFiltersQObjectPtr = CreateObject("fieldFilters");
-			auto itemPtr = m_fieldFiltersQObjectPtr.value<sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->fieldFilters;
+			auto itemPtr = m_fieldFiltersQObjectPtr.value<sdl::V1_0::imtbase::CFieldFilterObjectList*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = fieldFilters;
 		}
 		return m_fieldFiltersQObjectPtr;
 	}
@@ -4260,16 +3073,13 @@ QVariant CGroupFilterObject::GetFieldFilters()
 
 void CGroupFilterObject::SetFieldFilters(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList* itemPtr = v.value<sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList*>();
-		if (itemPtr != nullptr)  Version_1_0->fieldFilters = itemPtr->Version_1_0;
+		sdl::V1_0::imtbase::CFieldFilterObjectList* itemPtr = v.value<sdl::V1_0::imtbase::CFieldFilterObjectList*>();
+		if (itemPtr != nullptr)  fieldFilters = static_cast<const decltype(fieldFilters)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->fieldFilters = nullptr;
+		fieldFilters = nullptr;
 	}
 	m_fieldFiltersQObjectPtr = v;
 
@@ -4279,17 +3089,14 @@ void CGroupFilterObject::SetFieldFilters(const QVariant& v)
 
 bool CGroupFilterObject::hasFieldFilters()
 {
-	 return Version_1_0 && Version_1_0->fieldFilters.HasValue();
+	 return fieldFilters.HasValue();
 }
 
 
 void CGroupFilterObject::emplaceFieldFilters()
 {
 	ResetFieldFilters();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->fieldFilters.emplace();
+	fieldFilters.emplace();
 }
 
 
@@ -4306,17 +3113,17 @@ void CGroupFilterObject::ResetFieldFilters()
 QVariant CGroupFilterObject::createFieldFiltersArrayElement(const QVariant& v)
 {
 	Q_UNUSED(v);
-	return QVariant::fromValue(new sdl::imtbase::ComplexCollectionFilter::CFieldFilterObject());
+	return QVariant::fromValue(new sdl::V1_0::imtbase::CFieldFilterObject());
 }
 
 
 QVariant CGroupFilterObject::GetGroupFilters()
 {
-	if (Version_1_0 && Version_1_0->groupFilters){
+	if (groupFilters){
 		if (!m_groupFiltersQObjectPtr.isValid()){
 			m_groupFiltersQObjectPtr = CreateObject("groupFilters");
-			auto itemPtr = m_groupFiltersQObjectPtr.value<sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->groupFilters;
+			auto itemPtr = m_groupFiltersQObjectPtr.value<sdl::V1_0::imtbase::CGroupFilterObjectList*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = groupFilters;
 		}
 		return m_groupFiltersQObjectPtr;
 	}
@@ -4327,16 +3134,13 @@ QVariant CGroupFilterObject::GetGroupFilters()
 
 void CGroupFilterObject::SetGroupFilters(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList* itemPtr = v.value<sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList*>();
-		if (itemPtr != nullptr)  Version_1_0->groupFilters = itemPtr->Version_1_0;
+		sdl::V1_0::imtbase::CGroupFilterObjectList* itemPtr = v.value<sdl::V1_0::imtbase::CGroupFilterObjectList*>();
+		if (itemPtr != nullptr)  groupFilters = static_cast<const decltype(groupFilters)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->groupFilters = nullptr;
+		groupFilters = nullptr;
 	}
 	m_groupFiltersQObjectPtr = v;
 
@@ -4346,17 +3150,14 @@ void CGroupFilterObject::SetGroupFilters(const QVariant& v)
 
 bool CGroupFilterObject::hasGroupFilters()
 {
-	 return Version_1_0 && Version_1_0->groupFilters.HasValue();
+	 return groupFilters.HasValue();
 }
 
 
 void CGroupFilterObject::emplaceGroupFilters()
 {
 	ResetGroupFilters();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->groupFilters.emplace();
+	groupFilters.emplace();
 }
 
 
@@ -4373,15 +3174,15 @@ void CGroupFilterObject::ResetGroupFilters()
 QVariant CGroupFilterObject::createGroupFiltersArrayElement(const QVariant& v)
 {
 	Q_UNUSED(v);
-	return QVariant::fromValue(new sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject());
+	return QVariant::fromValue(new sdl::V1_0::imtbase::CGroupFilterObject());
 }
 
 
 QVariant CGroupFilterObject::GetLogicalOperation()
 {
-	if (Version_1_0 && Version_1_0->logicalOperation){
-		sdl::imtbase::ComplexCollectionFilter::LogicalOperation valueType = Version_1_0->logicalOperation.value();
-		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::imtbase::ComplexCollectionFilter::LogicalOperation>();
+	if (logicalOperation){
+		sdl::V1_0::imtbase::LogicalOperation valueType = logicalOperation.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::imtbase::LogicalOperation>();
 		QString retval = metaEnum.valueToKey((int)valueType);
 
 		return retval;
@@ -4393,15 +3194,12 @@ QVariant CGroupFilterObject::GetLogicalOperation()
 
 void CGroupFilterObject::SetLogicalOperation(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->logicalOperation.emplace();
-	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::imtbase::ComplexCollectionFilter::LogicalOperation>();
+	logicalOperation.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::imtbase::LogicalOperation>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
-		Version_1_0->logicalOperation = (sdl::imtbase::ComplexCollectionFilter::LogicalOperation)key;
+		logicalOperation = (sdl::V1_0::imtbase::LogicalOperation)key;
 	}
 	logicalOperationChanged();
 }
@@ -4409,7 +3207,7 @@ void CGroupFilterObject::SetLogicalOperation(const QVariant& v)
 
 bool CGroupFilterObject::hasLogicalOperation()
 {
-	 return Version_1_0 && Version_1_0->logicalOperation.HasValue();
+	 return logicalOperation.HasValue();
 }
 
 
@@ -4461,10 +3259,10 @@ QString CGroupFilterObject::toGraphQL() const
 QVariant CGroupFilterObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "fieldFilters"){
-		return QVariant::fromValue(new sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList(this));
+		return QVariant::fromValue(new sdl::V1_0::imtbase::CFieldFilterObjectList(this));
 	}
 	if (key == "groupFilters"){
-		return QVariant::fromValue(new sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList(this));
+		return QVariant::fromValue(new sdl::V1_0::imtbase::CGroupFilterObjectList(this));
 	}
 	return QVariant();
 }
@@ -4507,76 +3305,76 @@ QVariantMap CGroupFilterObjectList::get(int row) const
 }
 
 
-void CGroupFilterObjectList::append(sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject* item)
+void CGroupFilterObjectList::append(sdl::V1_0::imtbase::CGroupFilterObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList* sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList::copyMe()
+sdl::V1_0::imtbase::CGroupFilterObjectList* sdl::V1_0::imtbase::CGroupFilterObjectList::copyMe()
 {
-	sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList* retVal = new sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList();
+	sdl::V1_0::imtbase::CGroupFilterObjectList* retVal = new sdl::V1_0::imtbase::CGroupFilterObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList::toJson()
+QString sdl::V1_0::imtbase::CGroupFilterObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList::toGraphQL()
+QString sdl::V1_0::imtbase::CGroupFilterObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList::addElement(sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject* item)
+void sdl::V1_0::imtbase::CGroupFilterObjectList::addElement(sdl::V1_0::imtbase::CGroupFilterObject* item)
 {
 	append(item);
 }
 
 
-void sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList::removeElement(int index)
+void sdl::V1_0::imtbase::CGroupFilterObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList::isEqualWithModel(sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList* otherModelPtr)
+bool sdl::V1_0::imtbase::CGroupFilterObjectList::isEqualWithModel(sdl::V1_0::imtbase::CGroupFilterObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList::insert(int index, sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject* item)
+void sdl::V1_0::imtbase::CGroupFilterObjectList::insert(int index, sdl::V1_0::imtbase::CGroupFilterObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList::remove(int index)
+void sdl::V1_0::imtbase::CGroupFilterObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList::clear()
+void sdl::V1_0::imtbase::CGroupFilterObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CGroupFilterObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::imtbase::CGroupFilterObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_fieldFilters"){
@@ -4586,13 +3384,12 @@ QVariant sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList::getData(
 		return itemPtr->GetGroupFilters();
 	}
 	if (nameId == "m_logicalOperation"){
-		return QVariant::fromValue(Version_1_0->at(index)->logicalOperation.value());
+		return QVariant::fromValue(at(index)->logicalOperation.value());
 	}
 
 	return QVariant();
 }
 CComplexCollectionFilterObject::CComplexCollectionFilterObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CComplexCollectionFilterObject::sortingInfoChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CComplexCollectionFilterObject::fieldsFilterChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -4603,11 +3400,11 @@ CComplexCollectionFilterObject::CComplexCollectionFilterObject(QObject* parent):
 
 QVariant CComplexCollectionFilterObject::GetSortingInfo()
 {
-	if (Version_1_0 && Version_1_0->sortingInfo){
+	if (sortingInfo){
 		if (!m_sortingInfoQObjectPtr.isValid()){
 			m_sortingInfoQObjectPtr = CreateObject("sortingInfo");
-			auto itemPtr = m_sortingInfoQObjectPtr.value<sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->sortingInfo;
+			auto itemPtr = m_sortingInfoQObjectPtr.value<sdl::V1_0::imtbase::CFieldSortingInfoObjectList*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = sortingInfo;
 		}
 		return m_sortingInfoQObjectPtr;
 	}
@@ -4618,16 +3415,13 @@ QVariant CComplexCollectionFilterObject::GetSortingInfo()
 
 void CComplexCollectionFilterObject::SetSortingInfo(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList* itemPtr = v.value<sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList*>();
-		if (itemPtr != nullptr)  Version_1_0->sortingInfo = itemPtr->Version_1_0;
+		sdl::V1_0::imtbase::CFieldSortingInfoObjectList* itemPtr = v.value<sdl::V1_0::imtbase::CFieldSortingInfoObjectList*>();
+		if (itemPtr != nullptr)  sortingInfo = static_cast<const decltype(sortingInfo)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->sortingInfo = nullptr;
+		sortingInfo = nullptr;
 	}
 	m_sortingInfoQObjectPtr = v;
 
@@ -4637,17 +3431,14 @@ void CComplexCollectionFilterObject::SetSortingInfo(const QVariant& v)
 
 bool CComplexCollectionFilterObject::hasSortingInfo()
 {
-	 return Version_1_0 && Version_1_0->sortingInfo.HasValue();
+	 return sortingInfo.HasValue();
 }
 
 
 void CComplexCollectionFilterObject::emplaceSortingInfo()
 {
 	ResetSortingInfo();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->sortingInfo.emplace();
+	sortingInfo.emplace();
 }
 
 
@@ -4664,17 +3455,17 @@ void CComplexCollectionFilterObject::ResetSortingInfo()
 QVariant CComplexCollectionFilterObject::createSortingInfoArrayElement(const QVariant& v)
 {
 	Q_UNUSED(v);
-	return QVariant::fromValue(new sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObject());
+	return QVariant::fromValue(new sdl::V1_0::imtbase::CFieldSortingInfoObject());
 }
 
 
 QVariant CComplexCollectionFilterObject::GetFieldsFilter()
 {
-	if (Version_1_0 && Version_1_0->fieldsFilter){
+	if (fieldsFilter){
 		if (!m_fieldsFilterQObjectPtr.isValid()){
 			m_fieldsFilterQObjectPtr = CreateObject("fieldsFilter");
-			auto itemPtr = m_fieldsFilterQObjectPtr.value<sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->fieldsFilter;
+			auto itemPtr = m_fieldsFilterQObjectPtr.value<sdl::V1_0::imtbase::CGroupFilterObject*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = fieldsFilter;
 		}
 		return m_fieldsFilterQObjectPtr;
 	}
@@ -4685,16 +3476,13 @@ QVariant CComplexCollectionFilterObject::GetFieldsFilter()
 
 void CComplexCollectionFilterObject::SetFieldsFilter(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject* itemPtr = v.value<sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject*>();
-		if (itemPtr != nullptr)  Version_1_0->fieldsFilter = itemPtr->Version_1_0;
+		sdl::V1_0::imtbase::CGroupFilterObject* itemPtr = v.value<sdl::V1_0::imtbase::CGroupFilterObject*>();
+		if (itemPtr != nullptr)  fieldsFilter = static_cast<const decltype(fieldsFilter)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->fieldsFilter = nullptr;
+		fieldsFilter = nullptr;
 	}
 	m_fieldsFilterQObjectPtr = v;
 
@@ -4704,17 +3492,14 @@ void CComplexCollectionFilterObject::SetFieldsFilter(const QVariant& v)
 
 bool CComplexCollectionFilterObject::hasFieldsFilter()
 {
-	 return Version_1_0 && Version_1_0->fieldsFilter.HasValue();
+	 return fieldsFilter.HasValue();
 }
 
 
 void CComplexCollectionFilterObject::emplaceFieldsFilter()
 {
 	ResetFieldsFilter();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->fieldsFilter.emplace();
+	fieldsFilter.emplace();
 }
 
 
@@ -4730,11 +3515,11 @@ void CComplexCollectionFilterObject::ResetFieldsFilter()
 
 QVariant CComplexCollectionFilterObject::GetTimeFilter()
 {
-	if (Version_1_0 && Version_1_0->timeFilter){
+	if (timeFilter){
 		if (!m_timeFilterQObjectPtr.isValid()){
 			m_timeFilterQObjectPtr = CreateObject("timeFilter");
-			auto itemPtr = m_timeFilterQObjectPtr.value<sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->timeFilter;
+			auto itemPtr = m_timeFilterQObjectPtr.value<sdl::V1_0::imtbase::CTimeFilterObject*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = timeFilter;
 		}
 		return m_timeFilterQObjectPtr;
 	}
@@ -4745,16 +3530,13 @@ QVariant CComplexCollectionFilterObject::GetTimeFilter()
 
 void CComplexCollectionFilterObject::SetTimeFilter(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject* itemPtr = v.value<sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject*>();
-		if (itemPtr != nullptr)  Version_1_0->timeFilter = itemPtr->Version_1_0;
+		sdl::V1_0::imtbase::CTimeFilterObject* itemPtr = v.value<sdl::V1_0::imtbase::CTimeFilterObject*>();
+		if (itemPtr != nullptr)  timeFilter = static_cast<const decltype(timeFilter)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->timeFilter = nullptr;
+		timeFilter = nullptr;
 	}
 	m_timeFilterQObjectPtr = v;
 
@@ -4764,17 +3546,14 @@ void CComplexCollectionFilterObject::SetTimeFilter(const QVariant& v)
 
 bool CComplexCollectionFilterObject::hasTimeFilter()
 {
-	 return Version_1_0 && Version_1_0->timeFilter.HasValue();
+	 return timeFilter.HasValue();
 }
 
 
 void CComplexCollectionFilterObject::emplaceTimeFilter()
 {
 	ResetTimeFilter();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->timeFilter.emplace();
+	timeFilter.emplace();
 }
 
 
@@ -4790,9 +3569,9 @@ void CComplexCollectionFilterObject::ResetTimeFilter()
 
 QVariant CComplexCollectionFilterObject::GetDistinctFields()
 {
-	if (Version_1_0 && Version_1_0->distinctFields){
+	if (distinctFields){
 		QList<QString> tempDistinctFieldsList;
-		for (const auto& tempValue: Version_1_0->distinctFields.value()){
+		for (const auto& tempValue: distinctFields.value()){
 			tempDistinctFieldsList << *tempValue;
 		}
 		return QVariant::fromValue(tempDistinctFieldsList);
@@ -4804,19 +3583,16 @@ QVariant CComplexCollectionFilterObject::GetDistinctFields()
 
 void CComplexCollectionFilterObject::SetDistinctFields(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	if (!Version_1_0->distinctFields){
-		Version_1_0->distinctFields.emplace();
+	if (!distinctFields){
+		distinctFields.emplace();
 	}
 	else{
-		Version_1_0->distinctFields->clear();
+		distinctFields->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QByteArray> value(tempValue.toUtf8());
-		Version_1_0->distinctFields->append(value);
+		distinctFields->append(value);
 	}
 
 	distinctFieldsChanged();
@@ -4825,7 +3601,7 @@ void CComplexCollectionFilterObject::SetDistinctFields(const QVariant& v)
 
 bool CComplexCollectionFilterObject::hasDistinctFields()
 {
-	 return Version_1_0 && Version_1_0->distinctFields.HasValue();
+	 return distinctFields.HasValue();
 }
 
 
@@ -4877,13 +3653,13 @@ QString CComplexCollectionFilterObject::toGraphQL() const
 QVariant CComplexCollectionFilterObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "sortingInfo"){
-		return QVariant::fromValue(new sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList(this));
+		return QVariant::fromValue(new sdl::V1_0::imtbase::CFieldSortingInfoObjectList(this));
 	}
 	if (key == "fieldsFilter"){
-		return QVariant::fromValue(new sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject(this));
+		return QVariant::fromValue(new sdl::V1_0::imtbase::CGroupFilterObject(this));
 	}
 	if (key == "timeFilter"){
-		return QVariant::fromValue(new sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject(this));
+		return QVariant::fromValue(new sdl::V1_0::imtbase::CTimeFilterObject(this));
 	}
 	return QVariant();
 }
@@ -4929,76 +3705,76 @@ QVariantMap CComplexCollectionFilterObjectList::get(int row) const
 }
 
 
-void CComplexCollectionFilterObjectList::append(sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObject* item)
+void CComplexCollectionFilterObjectList::append(sdl::V1_0::imtbase::CComplexCollectionFilterObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList* sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList::copyMe()
+sdl::V1_0::imtbase::CComplexCollectionFilterObjectList* sdl::V1_0::imtbase::CComplexCollectionFilterObjectList::copyMe()
 {
-	sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList* retVal = new sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList();
+	sdl::V1_0::imtbase::CComplexCollectionFilterObjectList* retVal = new sdl::V1_0::imtbase::CComplexCollectionFilterObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList::toJson()
+QString sdl::V1_0::imtbase::CComplexCollectionFilterObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList::toGraphQL()
+QString sdl::V1_0::imtbase::CComplexCollectionFilterObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList::addElement(sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObject* item)
+void sdl::V1_0::imtbase::CComplexCollectionFilterObjectList::addElement(sdl::V1_0::imtbase::CComplexCollectionFilterObject* item)
 {
 	append(item);
 }
 
 
-void sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList::removeElement(int index)
+void sdl::V1_0::imtbase::CComplexCollectionFilterObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList::isEqualWithModel(sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList* otherModelPtr)
+bool sdl::V1_0::imtbase::CComplexCollectionFilterObjectList::isEqualWithModel(sdl::V1_0::imtbase::CComplexCollectionFilterObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList::insert(int index, sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObject* item)
+void sdl::V1_0::imtbase::CComplexCollectionFilterObjectList::insert(int index, sdl::V1_0::imtbase::CComplexCollectionFilterObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList::remove(int index)
+void sdl::V1_0::imtbase::CComplexCollectionFilterObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList::clear()
+void sdl::V1_0::imtbase::CComplexCollectionFilterObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CComplexCollectionFilterObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::imtbase::CComplexCollectionFilterObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_sortingInfo"){
@@ -5011,9 +3787,9 @@ QVariant sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectLi
 		return itemPtr->GetTimeFilter();
 	}
 	if (nameId == "m_distinctFields"){
-		return QVariant::fromValue(Version_1_0->at(index)->distinctFields.value());
+		return QVariant::fromValue(at(index)->distinctFields.value());
 	}
 
 	return QVariant();
 }
-} // namespace sdl::imtbase::ComplexCollectionFilter
+} // namespace sdl::V1_0::imtbase

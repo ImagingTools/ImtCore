@@ -5,7 +5,7 @@
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
 
 
-namespace sdl::modsdl::UnionTest
+namespace sdl::V1_0::modsdl
 {
 
 // type forward declarations
@@ -69,4 +69,4 @@ protected:
 
 
 
-} // namespace sdl::modsdl::UnionTest
+} // namespace sdl::V1_0::modsdl

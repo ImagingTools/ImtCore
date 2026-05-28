@@ -30,7 +30,7 @@
 #include <imtbasesdl/SDL/1.0/CPP/ImtBaseTypes.h>
 
 
-namespace sdl::complextest::ComplexUnion2
+namespace sdl::V1_0::complextest
 {
 
 
@@ -50,949 +50,549 @@ class CCDMResultUnionTypeObjectList;
 class CResult
 {
 public:
-	enum ProtocolVersion
+	struct ResultFields
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
-		PV_1_0,
-		PV_LAST = PV_1_0
+		static const inline QString AreaResult = "AreaResult";
+		static const inline QString ExpectedMinValue = "ExpectedMinValue";
+		static const inline QString ExpectedMaxValue = "ExpectedMaxValue";
+		static const inline QString MeasuredValue = "MeasuredValue";
+		static const inline QString MinMeasuredValue = "MinMeasuredValue";
+		static const inline QString MaxMeasuredValue = "MaxMeasuredValue";
+		static const inline QString MeanMeasuredValue = "MeanMeasuredValue";
+		static const inline QString MeasurementType = "MeasurementType";
+		static const inline QString MeasurementUnit = "MeasurementUnit";
+		static const inline QString Length = "Length";
+		static const inline QString ErrorType = "ErrorType";
+		static const inline QString Geometry = "Geometry";
 	};
 
-	// V1_0 struct
-	struct V1_0
-	{
-		struct ResultFields
-		{
-			static const inline QString AreaResult = "AreaResult";
-			static const inline QString ExpectedMinValue = "ExpectedMinValue";
-			static const inline QString ExpectedMaxValue = "ExpectedMaxValue";
-			static const inline QString MeasuredValue = "MeasuredValue";
-			static const inline QString MinMeasuredValue = "MinMeasuredValue";
-			static const inline QString MaxMeasuredValue = "MaxMeasuredValue";
-			static const inline QString MeanMeasuredValue = "MeanMeasuredValue";
-			static const inline QString MeasurementType = "MeasurementType";
-			static const inline QString MeasurementUnit = "MeasurementUnit";
-			static const inline QString Length = "Length";
-			static const inline QString ErrorType = "ErrorType";
-			static const inline QString Geometry = "Geometry";
-		};
+	istd::TSharedNullable<ComplexUnion1::StatusCode> AreaResult;
+	istd::TSharedNullable<double> ExpectedMinValue;
+	istd::TSharedNullable<double> ExpectedMaxValue;
+	istd::TSharedNullable<double> MeasuredValue;
+	istd::TSharedNullable<double> MinMeasuredValue;
+	istd::TSharedNullable<double> MaxMeasuredValue;
+	istd::TSharedNullable<double> MeanMeasuredValue;
+	istd::TSharedNullable<ComplexUnion1::MeasurementType> MeasurementType;
+	istd::TSharedNullable<ComplexUnion1::MeasurementUnit> MeasurementUnit;
+	istd::TSharedNullable<double> Length;
+	istd::TSharedNullable<ComplexUnion1::ErrorCode> ErrorType;
+	istd::TSharedNullable<ComplexUnion1::CGeometry::V1_0> Geometry;
 
-		istd::TSharedNullable<ComplexUnion1::StatusCode> AreaResult;
-		istd::TSharedNullable<double> ExpectedMinValue;
-		istd::TSharedNullable<double> ExpectedMaxValue;
-		istd::TSharedNullable<double> MeasuredValue;
-		istd::TSharedNullable<double> MinMeasuredValue;
-		istd::TSharedNullable<double> MaxMeasuredValue;
-		istd::TSharedNullable<double> MeanMeasuredValue;
-		istd::TSharedNullable<ComplexUnion1::MeasurementType> MeasurementType;
-		istd::TSharedNullable<ComplexUnion1::MeasurementUnit> MeasurementUnit;
-		istd::TSharedNullable<double> Length;
-		istd::TSharedNullable<ComplexUnion1::ErrorCode> ErrorType;
-		istd::TSharedNullable<ComplexUnion1::CGeometry::V1_0> Geometry;
+	static QByteArray GetVersionId();
 
-		static QByteArray GetVersionId();
+	[[nodiscard]] bool operator==(const CResult& other) const;
+	[[nodiscard]] bool operator!=(const CResult& other) const {return !(operator==(other));}
+	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
+	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
+	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
+	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
 
-		[[nodiscard]] bool operator==(const V1_0& other) const;
-		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
-		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
-		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
-		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-	};
 
-	// available version members
-	istd::TSharedNullable<V1_0> Version_1_0;
-
-	// serialize methods
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
 };
 
 class CArea
 {
 public:
-	enum ProtocolVersion
+	struct AreaFields
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
-		PV_1_0,
-		PV_LAST = PV_1_0
+		static const inline QString AreaName = "AreaName";
+		static const inline QString Status = "Status";
+		static const inline QString IconPosition = "IconPosition";
+		static const inline QString ErrorType = "ErrorType";
+		static const inline QString Results = "Results";
 	};
 
-	// V1_0 struct
-	struct V1_0
-	{
-		struct AreaFields
-		{
-			static const inline QString AreaName = "AreaName";
-			static const inline QString Status = "Status";
-			static const inline QString IconPosition = "IconPosition";
-			static const inline QString ErrorType = "ErrorType";
-			static const inline QString Results = "Results";
-		};
+	istd::TSharedNullable<QString> AreaName;
+	istd::TSharedNullable<ComplexUnion1::StatusCode> Status;
+	istd::TSharedNullable<ComplexUnion1::CPoint::V1_0> IconPosition;
+	istd::TSharedNullable<ComplexUnion1::ErrorCode> ErrorType;
+	istd::TSharedNullable<imtsdl::TElementList<CResult::V1_0>> Results;
 
-		istd::TSharedNullable<QString> AreaName;
-		istd::TSharedNullable<ComplexUnion1::StatusCode> Status;
-		istd::TSharedNullable<ComplexUnion1::CPoint::V1_0> IconPosition;
-		istd::TSharedNullable<ComplexUnion1::ErrorCode> ErrorType;
-		istd::TSharedNullable<imtsdl::TElementList<CResult::V1_0>> Results;
+	static QByteArray GetVersionId();
 
-		static QByteArray GetVersionId();
+	[[nodiscard]] bool operator==(const CArea& other) const;
+	[[nodiscard]] bool operator!=(const CArea& other) const {return !(operator==(other));}
+	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
+	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
+	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
+	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
 
-		[[nodiscard]] bool operator==(const V1_0& other) const;
-		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
-		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
-		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
-		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-	};
 
-	// available version members
-	istd::TSharedNullable<V1_0> Version_1_0;
-
-	// serialize methods
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
 };
 
 class CAnalyzer
 {
 public:
-	enum ProtocolVersion
+	struct AnalyzerFields
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
-		PV_1_0,
-		PV_LAST = PV_1_0
+		static const inline QString AnalyzerName = "AnalyzerName";
+		static const inline QString AnalyzerResult = "AnalyzerResult";
+		static const inline QString Areas = "Areas";
 	};
 
-	// V1_0 struct
-	struct V1_0
-	{
-		struct AnalyzerFields
-		{
-			static const inline QString AnalyzerName = "AnalyzerName";
-			static const inline QString AnalyzerResult = "AnalyzerResult";
-			static const inline QString Areas = "Areas";
-		};
+	istd::TSharedNullable<QString> AnalyzerName;
+	istd::TSharedNullable<ComplexUnion1::StatusCode> AnalyzerResult;
+	istd::TSharedNullable<imtsdl::TElementList<CArea::V1_0>> Areas;
 
-		istd::TSharedNullable<QString> AnalyzerName;
-		istd::TSharedNullable<ComplexUnion1::StatusCode> AnalyzerResult;
-		istd::TSharedNullable<imtsdl::TElementList<CArea::V1_0>> Areas;
+	static QByteArray GetVersionId();
 
-		static QByteArray GetVersionId();
+	[[nodiscard]] bool operator==(const CAnalyzer& other) const;
+	[[nodiscard]] bool operator!=(const CAnalyzer& other) const {return !(operator==(other));}
+	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
+	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
+	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
+	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
 
-		[[nodiscard]] bool operator==(const V1_0& other) const;
-		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
-		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
-		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
-		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-	};
 
-	// available version members
-	istd::TSharedNullable<V1_0> Version_1_0;
-
-	// serialize methods
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
 };
 
 class CInspection
 {
 public:
-	enum ProtocolVersion
+	struct InspectionFields
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
-		PV_1_0,
-		PV_LAST = PV_1_0
+		static const inline QString ID = "ID";
+		static const inline QString TypeID = "TypeID";
+		static const inline QString Name = "Name";
+		static const inline QString Status = "Status";
+		static const inline QString Analyzers = "Analyzers";
 	};
 
-	// V1_0 struct
-	struct V1_0
-	{
-		struct InspectionFields
-		{
-			static const inline QString ID = "ID";
-			static const inline QString TypeID = "TypeID";
-			static const inline QString Name = "Name";
-			static const inline QString Status = "Status";
-			static const inline QString Analyzers = "Analyzers";
-		};
+	istd::TSharedNullable<QString> ID;
+	istd::TSharedNullable<QString> TypeID;
+	istd::TSharedNullable<QString> Name;
+	istd::TSharedNullable<ComplexUnion1::StatusCode> Status;
+	istd::TSharedNullable<imtsdl::TElementList<CAnalyzer::V1_0>> Analyzers;
 
-		istd::TSharedNullable<QString> ID;
-		istd::TSharedNullable<QString> TypeID;
-		istd::TSharedNullable<QString> Name;
-		istd::TSharedNullable<ComplexUnion1::StatusCode> Status;
-		istd::TSharedNullable<imtsdl::TElementList<CAnalyzer::V1_0>> Analyzers;
+	static QByteArray GetVersionId();
 
-		static QByteArray GetVersionId();
+	[[nodiscard]] bool operator==(const CInspection& other) const;
+	[[nodiscard]] bool operator!=(const CInspection& other) const {return !(operator==(other));}
+	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
+	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
+	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
+	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
 
-		[[nodiscard]] bool operator==(const V1_0& other) const;
-		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
-		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
-		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
-		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-	};
 
-	// available version members
-	istd::TSharedNullable<V1_0> Version_1_0;
-
-	// serialize methods
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
 };
 
 class CProductOverview
 {
 public:
-	enum ProtocolVersion
+	struct ProductOverviewFields
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
-		PV_1_0,
-		PV_LAST = PV_1_0
+		static const inline QString ProductID = "ProductID";
+		static const inline QString Name = "Name";
+		static const inline QString Status = "Status";
+		static const inline QString PartSerialNumber = "PartSerialNumber";
+		static const inline QString Timestamp = "Timestamp";
+		static const inline QString ProductImage = "ProductImage";
+		static const inline QString Inspections = "Inspections";
 	};
 
-	// V1_0 struct
-	struct V1_0
-	{
-		struct ProductOverviewFields
-		{
-			static const inline QString ProductID = "ProductID";
-			static const inline QString Name = "Name";
-			static const inline QString Status = "Status";
-			static const inline QString PartSerialNumber = "PartSerialNumber";
-			static const inline QString Timestamp = "Timestamp";
-			static const inline QString ProductImage = "ProductImage";
-			static const inline QString Inspections = "Inspections";
-		};
+	istd::TSharedNullable<int> ProductID;
+	istd::TSharedNullable<QString> Name;
+	istd::TSharedNullable<ComplexUnion1::StatusCode> Status;
+	istd::TSharedNullable<QString> PartSerialNumber;
+	istd::TSharedNullable<QString> Timestamp;
+	istd::TSharedNullable<QString> ProductImage;
+	istd::TSharedNullable<imtsdl::TElementList<CInspection::V1_0>> Inspections;
 
-		istd::TSharedNullable<int> ProductID;
-		istd::TSharedNullable<QString> Name;
-		istd::TSharedNullable<ComplexUnion1::StatusCode> Status;
-		istd::TSharedNullable<QString> PartSerialNumber;
-		istd::TSharedNullable<QString> Timestamp;
-		istd::TSharedNullable<QString> ProductImage;
-		istd::TSharedNullable<imtsdl::TElementList<CInspection::V1_0>> Inspections;
+	static QByteArray GetVersionId();
 
-		static QByteArray GetVersionId();
+	[[nodiscard]] bool operator==(const CProductOverview& other) const;
+	[[nodiscard]] bool operator!=(const CProductOverview& other) const {return !(operator==(other));}
+	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
+	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
+	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
+	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
 
-		[[nodiscard]] bool operator==(const V1_0& other) const;
-		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
-		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
-		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
-		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-	};
 
-	// available version members
-	istd::TSharedNullable<V1_0> Version_1_0;
-
-	// serialize methods
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
 };
 
 class CLocalizedText
 {
 public:
-	enum ProtocolVersion
+	struct LocalizedTextFields
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
-		PV_1_0,
-		PV_LAST = PV_1_0
+		static const inline QString Text = "text";
+		static const inline QString Locale = "locale";
 	};
 
-	// V1_0 struct
-	struct V1_0
-	{
-		struct LocalizedTextFields
-		{
-			static const inline QString Text = "text";
-			static const inline QString Locale = "locale";
-		};
+	istd::TSharedNullable<QString> text;
+	istd::TSharedNullable<QString> locale;
 
-		istd::TSharedNullable<QString> text;
-		istd::TSharedNullable<QString> locale;
+	static QByteArray GetVersionId();
 
-		static QByteArray GetVersionId();
+	[[nodiscard]] bool operator==(const CLocalizedText& other) const;
+	[[nodiscard]] bool operator!=(const CLocalizedText& other) const {return !(operator==(other));}
+	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
+	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
+	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
+	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
 
-		[[nodiscard]] bool operator==(const V1_0& other) const;
-		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
-		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
-		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
-		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-	};
 
-	// available version members
-	istd::TSharedNullable<V1_0> Version_1_0;
-
-	// serialize methods
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
 };
 
 class CCoordinates
 {
 public:
-	enum ProtocolVersion
+	struct CoordinatesFields
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
-		PV_1_0,
-		PV_LAST = PV_1_0
+		static const inline QString X = "x";
+		static const inline QString Y = "y";
+		static const inline QString Z = "z";
 	};
 
-	// V1_0 struct
-	struct V1_0
-	{
-		struct CoordinatesFields
-		{
-			static const inline QString X = "x";
-			static const inline QString Y = "y";
-			static const inline QString Z = "z";
-		};
+	istd::TSharedNullable<double> x;
+	istd::TSharedNullable<double> y;
+	istd::TSharedNullable<double> z;
 
-		istd::TSharedNullable<double> x;
-		istd::TSharedNullable<double> y;
-		istd::TSharedNullable<double> z;
+	static QByteArray GetVersionId();
 
-		static QByteArray GetVersionId();
+	[[nodiscard]] bool operator==(const CCoordinates& other) const;
+	[[nodiscard]] bool operator!=(const CCoordinates& other) const {return !(operator==(other));}
+	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
+	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
+	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
+	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
 
-		[[nodiscard]] bool operator==(const V1_0& other) const;
-		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
-		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
-		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
-		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-	};
 
-	// available version members
-	istd::TSharedNullable<V1_0> Version_1_0;
-
-	// serialize methods
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
 };
 
 class CExtendedMetaData
 {
 public:
-	enum ProtocolVersion
+	struct ExtendedMetaDataFields
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
-		PV_1_0,
-		PV_LAST = PV_1_0
+		static const inline QString Key = "key";
+		static const inline QString Value = "value";
 	};
 
-	// V1_0 struct
-	struct V1_0
-	{
-		struct ExtendedMetaDataFields
-		{
-			static const inline QString Key = "key";
-			static const inline QString Value = "value";
-		};
+	istd::TSharedNullable<QString> key;
+	istd::TSharedNullable<ExtendedMetaDataUnionType> value;
 
-		istd::TSharedNullable<QString> key;
-		istd::TSharedNullable<ExtendedMetaDataUnionType> value;
+	static QByteArray GetVersionId();
 
-		static QByteArray GetVersionId();
+	[[nodiscard]] bool operator==(const CExtendedMetaData& other) const;
+	[[nodiscard]] bool operator!=(const CExtendedMetaData& other) const {return !(operator==(other));}
+	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
+	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
+	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
+	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
 
-		[[nodiscard]] bool operator==(const V1_0& other) const;
-		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
-		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
-		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
-		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-	};
 
-	// available version members
-	istd::TSharedNullable<V1_0> Version_1_0;
-
-	// serialize methods
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
 };
 
 class CResultMetaData
 {
 public:
-	enum ProtocolVersion
+	struct ResultMetaDataFields
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
-		PV_1_0,
-		PV_LAST = PV_1_0
+		static const inline QString ResultId = "resultId";
+		static const inline QString CreationTime = "creationTime";
+		static const inline QString PartId = "partId";
+		static const inline QString ProductId = "productId";
+		static const inline QString Name = "name";
+		static const inline QString Classification = "classification";
+		static const inline QString Description = "description";
+		static const inline QString ExtendedMetaData = "extendedMetaData";
 	};
 
-	// V1_0 struct
-	struct V1_0
-	{
-		struct ResultMetaDataFields
-		{
-			static const inline QString ResultId = "resultId";
-			static const inline QString CreationTime = "creationTime";
-			static const inline QString PartId = "partId";
-			static const inline QString ProductId = "productId";
-			static const inline QString Name = "name";
-			static const inline QString Classification = "classification";
-			static const inline QString Description = "description";
-			static const inline QString ExtendedMetaData = "extendedMetaData";
-		};
+	istd::TSharedNullable<QByteArray> resultId;
+	istd::TSharedNullable<QString> creationTime;
+	istd::TSharedNullable<QString> partId;
+	istd::TSharedNullable<QString> productId;
+	istd::TSharedNullable<QString> name;
+	istd::TSharedNullable<int> classification;
+	istd::TSharedNullable<CLocalizedText::V1_0> description;
+	istd::TSharedNullable<imtsdl::TElementList<CExtendedMetaData::V1_0>> extendedMetaData;
 
-		istd::TSharedNullable<QByteArray> resultId;
-		istd::TSharedNullable<QString> creationTime;
-		istd::TSharedNullable<QString> partId;
-		istd::TSharedNullable<QString> productId;
-		istd::TSharedNullable<QString> name;
-		istd::TSharedNullable<int> classification;
-		istd::TSharedNullable<CLocalizedText::V1_0> description;
-		istd::TSharedNullable<imtsdl::TElementList<CExtendedMetaData::V1_0>> extendedMetaData;
+	static QByteArray GetVersionId();
 
-		static QByteArray GetVersionId();
+	[[nodiscard]] bool operator==(const CResultMetaData& other) const;
+	[[nodiscard]] bool operator!=(const CResultMetaData& other) const {return !(operator==(other));}
+	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
+	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
+	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
+	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
 
-		[[nodiscard]] bool operator==(const V1_0& other) const;
-		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
-		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
-		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
-		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-	};
 
-	// available version members
-	istd::TSharedNullable<V1_0> Version_1_0;
-
-	// serialize methods
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
 };
 
 class COverallResultValues
 {
 public:
-	enum ProtocolVersion
+	struct OverallResultValuesFields
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
-		PV_1_0,
-		PV_LAST = PV_1_0
+		static const inline QString Name = "name";
+		static const inline QString ValueId = "valueId";
+		static const inline QString MeasuredValue = "measuredValue";
+		static const inline QString LowLimit = "lowLimit";
+		static const inline QString HighLimit = "highLimit";
 	};
 
-	// V1_0 struct
-	struct V1_0
-	{
-		struct OverallResultValuesFields
-		{
-			static const inline QString Name = "name";
-			static const inline QString ValueId = "valueId";
-			static const inline QString MeasuredValue = "measuredValue";
-			static const inline QString LowLimit = "lowLimit";
-			static const inline QString HighLimit = "highLimit";
-		};
+	istd::TSharedNullable<QString> name;
+	istd::TSharedNullable<QString> valueId;
+	istd::TSharedNullable<double> measuredValue;
+	istd::TSharedNullable<double> lowLimit;
+	istd::TSharedNullable<double> highLimit;
 
-		istd::TSharedNullable<QString> name;
-		istd::TSharedNullable<QString> valueId;
-		istd::TSharedNullable<double> measuredValue;
-		istd::TSharedNullable<double> lowLimit;
-		istd::TSharedNullable<double> highLimit;
+	static QByteArray GetVersionId();
 
-		static QByteArray GetVersionId();
+	[[nodiscard]] bool operator==(const COverallResultValues& other) const;
+	[[nodiscard]] bool operator!=(const COverallResultValues& other) const {return !(operator==(other));}
+	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
+	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
+	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
+	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
 
-		[[nodiscard]] bool operator==(const V1_0& other) const;
-		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
-		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
-		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
-		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-	};
 
-	// available version members
-	istd::TSharedNullable<V1_0> Version_1_0;
-
-	// serialize methods
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
 };
 
 class CUnionTestingType
 {
 public:
-	enum ProtocolVersion
+	struct UnionTestingTypeFields
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
-		PV_1_0,
-		PV_LAST = PV_1_0
+		static const inline QString SimpleUnion = "simpleUnion";
+		static const inline QString ComplexUnion = "complexUnion";
+		static const inline QString MixedUnion = "mixedUnion";
 	};
 
-	// V1_0 struct
-	struct V1_0
-	{
-		struct UnionTestingTypeFields
-		{
-			static const inline QString SimpleUnion = "simpleUnion";
-			static const inline QString ComplexUnion = "complexUnion";
-			static const inline QString MixedUnion = "mixedUnion";
-		};
+	istd::TSharedNullable<ExtendedMetaDataUnionSimpleType> simpleUnion;
+	istd::TSharedNullable<CDMResultUnionType> complexUnion;
+	istd::TSharedNullable<ExtendedMetaDataUnionType> mixedUnion;
 
-		istd::TSharedNullable<ExtendedMetaDataUnionSimpleType> simpleUnion;
-		istd::TSharedNullable<CDMResultUnionType> complexUnion;
-		istd::TSharedNullable<ExtendedMetaDataUnionType> mixedUnion;
+	static QByteArray GetVersionId();
 
-		static QByteArray GetVersionId();
+	[[nodiscard]] bool operator==(const CUnionTestingType& other) const;
+	[[nodiscard]] bool operator!=(const CUnionTestingType& other) const {return !(operator==(other));}
+	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
+	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
+	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
+	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
 
-		[[nodiscard]] bool operator==(const V1_0& other) const;
-		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
-		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
-		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
-		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-	};
 
-	// available version members
-	istd::TSharedNullable<V1_0> Version_1_0;
-
-	// serialize methods
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
 };
 
 class CCDMResultVarRecursive
 {
 public:
-	enum ProtocolVersion
+	struct CDMResultVarRecursiveFields
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
-		PV_1_0,
-		PV_LAST = PV_1_0
+		static const inline QString DataModelTitle = "dataModelTitle";
+		static const inline QString DataModelVersion = "dataModelVersion";
+		static const inline QString ResultMetaData = "resultMetaData";
+		static const inline QString ResultContent = "resultContent";
+		static const inline QString OverallResultValues = "overallResultValues";
 	};
 
-	// V1_0 struct
-	struct V1_0
-	{
-		struct CDMResultVarRecursiveFields
-		{
-			static const inline QString DataModelTitle = "dataModelTitle";
-			static const inline QString DataModelVersion = "dataModelVersion";
-			static const inline QString ResultMetaData = "resultMetaData";
-			static const inline QString ResultContent = "resultContent";
-			static const inline QString OverallResultValues = "overallResultValues";
-		};
+	istd::TSharedNullable<QString> dataModelTitle;
+	istd::TSharedNullable<QString> dataModelVersion;
+	istd::TSharedNullable<CResultMetaData::V1_0> resultMetaData;
+	istd::TSharedNullable<imtsdl::TElementList<CDMResultUnionType>> resultContent;
+	istd::TSharedNullable<imtsdl::TElementList<COverallResultValues::V1_0>> overallResultValues;
 
-		istd::TSharedNullable<QString> dataModelTitle;
-		istd::TSharedNullable<QString> dataModelVersion;
-		istd::TSharedNullable<CResultMetaData::V1_0> resultMetaData;
-		istd::TSharedNullable<imtsdl::TElementList<CDMResultUnionType>> resultContent;
-		istd::TSharedNullable<imtsdl::TElementList<COverallResultValues::V1_0>> overallResultValues;
+	static QByteArray GetVersionId();
 
-		static QByteArray GetVersionId();
+	[[nodiscard]] bool operator==(const CCDMResultVarRecursive& other) const;
+	[[nodiscard]] bool operator!=(const CCDMResultVarRecursive& other) const {return !(operator==(other));}
+	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
+	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
+	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
+	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
 
-		[[nodiscard]] bool operator==(const V1_0& other) const;
-		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
-		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
-		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
-		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-	};
 
-	// available version members
-	istd::TSharedNullable<V1_0> Version_1_0;
-
-	// serialize methods
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
 };
 
 class CCDMResultVarString
 {
 public:
-	enum ProtocolVersion
+	struct CDMResultVarStringFields
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
-		PV_1_0,
-		PV_LAST = PV_1_0
+		static const inline QString DataModelTitle = "dataModelTitle";
+		static const inline QString DataModelVersion = "dataModelVersion";
+		static const inline QString ResultMetaData = "resultMetaData";
+		static const inline QString ResultContent = "resultContent";
+		static const inline QString OverallResultValues = "overallResultValues";
 	};
 
-	// V1_0 struct
-	struct V1_0
-	{
-		struct CDMResultVarStringFields
-		{
-			static const inline QString DataModelTitle = "dataModelTitle";
-			static const inline QString DataModelVersion = "dataModelVersion";
-			static const inline QString ResultMetaData = "resultMetaData";
-			static const inline QString ResultContent = "resultContent";
-			static const inline QString OverallResultValues = "overallResultValues";
-		};
+	istd::TSharedNullable<QString> dataModelTitle;
+	istd::TSharedNullable<QString> dataModelVersion;
+	istd::TSharedNullable<CResultMetaData::V1_0> resultMetaData;
+	istd::TSharedNullable<imtsdl::TElementList<QString>> resultContent;
+	istd::TSharedNullable<imtsdl::TElementList<COverallResultValues::V1_0>> overallResultValues;
 
-		istd::TSharedNullable<QString> dataModelTitle;
-		istd::TSharedNullable<QString> dataModelVersion;
-		istd::TSharedNullable<CResultMetaData::V1_0> resultMetaData;
-		istd::TSharedNullable<imtsdl::TElementList<QString>> resultContent;
-		istd::TSharedNullable<imtsdl::TElementList<COverallResultValues::V1_0>> overallResultValues;
+	static QByteArray GetVersionId();
 
-		static QByteArray GetVersionId();
+	[[nodiscard]] bool operator==(const CCDMResultVarString& other) const;
+	[[nodiscard]] bool operator!=(const CCDMResultVarString& other) const {return !(operator==(other));}
+	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
+	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
+	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
+	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
 
-		[[nodiscard]] bool operator==(const V1_0& other) const;
-		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
-		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
-		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
-		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-	};
 
-	// available version members
-	istd::TSharedNullable<V1_0> Version_1_0;
-
-	// serialize methods
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
 };
 
 class CCDMResult
 {
 public:
-	enum ProtocolVersion
+	struct CDMResultFields
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
-		PV_1_0,
-		PV_LAST = PV_1_0
+		static const inline QString DataModelTitle = "dataModelTitle";
+		static const inline QString DataModelVersion = "dataModelVersion";
+		static const inline QString ResultMetaData = "resultMetaData";
+		static const inline QString ResultContent = "resultContent";
+		static const inline QString OverallResultValues = "overallResultValues";
 	};
 
-	// V1_0 struct
-	struct V1_0
-	{
-		struct CDMResultFields
-		{
-			static const inline QString DataModelTitle = "dataModelTitle";
-			static const inline QString DataModelVersion = "dataModelVersion";
-			static const inline QString ResultMetaData = "resultMetaData";
-			static const inline QString ResultContent = "resultContent";
-			static const inline QString OverallResultValues = "overallResultValues";
-		};
+	istd::TSharedNullable<QString> dataModelTitle;
+	istd::TSharedNullable<QString> dataModelVersion;
+	istd::TSharedNullable<CResultMetaData::V1_0> resultMetaData;
+	istd::TSharedNullable<imtsdl::TElementList<CDMResultUnionType>> resultContent;
+	istd::TSharedNullable<imtsdl::TElementList<COverallResultValues::V1_0>> overallResultValues;
 
-		istd::TSharedNullable<QString> dataModelTitle;
-		istd::TSharedNullable<QString> dataModelVersion;
-		istd::TSharedNullable<CResultMetaData::V1_0> resultMetaData;
-		istd::TSharedNullable<imtsdl::TElementList<CDMResultUnionType>> resultContent;
-		istd::TSharedNullable<imtsdl::TElementList<COverallResultValues::V1_0>> overallResultValues;
+	static QByteArray GetVersionId();
 
-		static QByteArray GetVersionId();
+	[[nodiscard]] bool operator==(const CCDMResult& other) const;
+	[[nodiscard]] bool operator!=(const CCDMResult& other) const {return !(operator==(other));}
+	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
+	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
+	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
+	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
 
-		[[nodiscard]] bool operator==(const V1_0& other) const;
-		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
-		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
-		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
-		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-	};
 
-	// available version members
-	istd::TSharedNullable<V1_0> Version_1_0;
-
-	// serialize methods
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
 };
 
 class CPointsInCoordinateFormat
 {
 public:
-	enum ProtocolVersion
+	struct PointsInCoordinateFormatFields
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
-		PV_1_0,
-		PV_LAST = PV_1_0
+		static const inline QString PointAsCoordinates = "pointAsCoordinates";
 	};
 
-	// V1_0 struct
-	struct V1_0
-	{
-		struct PointsInCoordinateFormatFields
-		{
-			static const inline QString PointAsCoordinates = "pointAsCoordinates";
-		};
+	istd::TSharedNullable<bool> pointAsCoordinates;
 
-		istd::TSharedNullable<bool> pointAsCoordinates;
+	static QByteArray GetVersionId();
 
-		static QByteArray GetVersionId();
+	[[nodiscard]] bool operator==(const CPointsInCoordinateFormat& other) const;
+	[[nodiscard]] bool operator!=(const CPointsInCoordinateFormat& other) const {return !(operator==(other));}
+	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
+	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
+	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
+	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
 
-		[[nodiscard]] bool operator==(const V1_0& other) const;
-		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
-		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
-		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
-		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-	};
 
-	// available version members
-	istd::TSharedNullable<V1_0> Version_1_0;
-
-	// serialize methods
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
 };
 
 class CCollectionViewParamsTest
 {
 public:
-	enum ProtocolVersion
+	struct CollectionViewParamsTestFields
 	{
-		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with the highest version to serialize
-		PV_1_0,
-		PV_LAST = PV_1_0
+		static const inline QString Count = "count";
+		static const inline QString Offset = "offset";
+		static const inline QString FilterModel = "filterModel";
 	};
 
-	// V1_0 struct
-	struct V1_0
-	{
-		struct CollectionViewParamsTestFields
-		{
-			static const inline QString Count = "count";
-			static const inline QString Offset = "offset";
-			static const inline QString FilterModel = "filterModel";
-		};
+	istd::TSharedNullable<int> count;
+	istd::TSharedNullable<int> offset;
+	istd::TSharedNullable<imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0> filterModel;
 
-		istd::TSharedNullable<int> count;
-		istd::TSharedNullable<int> offset;
-		istd::TSharedNullable<imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0> filterModel;
+	static QByteArray GetVersionId();
 
-		static QByteArray GetVersionId();
+	[[nodiscard]] bool operator==(const CCollectionViewParamsTest& other) const;
+	[[nodiscard]] bool operator!=(const CCollectionViewParamsTest& other) const {return !(operator==(other));}
+	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
+	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
+	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
+	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
 
-		[[nodiscard]] bool operator==(const V1_0& other) const;
-		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
-		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
-		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
-		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-	};
 
-	// available version members
-	istd::TSharedNullable<V1_0> Version_1_0;
-
-	// serialize methods
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
-
-	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version = PV_AUTO) const;
-	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
-	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
 };
 
 
@@ -1089,26 +689,26 @@ protected:
 
 
 
-class CResultObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CResult::V1_0, sdl::complextest::ComplexUnion2::CResultObject>
+class CResultObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::complextest::CResult, sdl::V1_0::complextest::CResultObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CResult::V1_0, sdl::complextest::ComplexUnion2::CResultObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::complextest::CResult, sdl::V1_0::complextest::CResultObject> BaseClass;
 
 	explicit CResultObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CResultObject* item);
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CResultObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::complextest::CResultObject* item);
+	Q_INVOKABLE sdl::V1_0::complextest::CResultObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CResultObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CResultObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CResultObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CResultObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CResultObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CResultObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -1179,26 +779,26 @@ protected:
 
 
 
-class CAreaObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CArea::V1_0, sdl::complextest::ComplexUnion2::CAreaObject>
+class CAreaObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::complextest::CArea, sdl::V1_0::complextest::CAreaObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CArea::V1_0, sdl::complextest::ComplexUnion2::CAreaObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::complextest::CArea, sdl::V1_0::complextest::CAreaObject> BaseClass;
 
 	explicit CAreaObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CAreaObject* item);
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CAreaObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::complextest::CAreaObject* item);
+	Q_INVOKABLE sdl::V1_0::complextest::CAreaObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CAreaObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CAreaObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CAreaObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CAreaObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CAreaObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CAreaObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -1256,26 +856,26 @@ protected:
 
 
 
-class CAnalyzerObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CAnalyzer::V1_0, sdl::complextest::ComplexUnion2::CAnalyzerObject>
+class CAnalyzerObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::complextest::CAnalyzer, sdl::V1_0::complextest::CAnalyzerObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CAnalyzer::V1_0, sdl::complextest::ComplexUnion2::CAnalyzerObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::complextest::CAnalyzer, sdl::V1_0::complextest::CAnalyzerObject> BaseClass;
 
 	explicit CAnalyzerObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CAnalyzerObject* item);
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CAnalyzerObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::complextest::CAnalyzerObject* item);
+	Q_INVOKABLE sdl::V1_0::complextest::CAnalyzerObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CAnalyzerObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CAnalyzerObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CAnalyzerObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CAnalyzerObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CAnalyzerObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CAnalyzerObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -1343,26 +943,26 @@ protected:
 
 
 
-class CInspectionObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CInspection::V1_0, sdl::complextest::ComplexUnion2::CInspectionObject>
+class CInspectionObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::complextest::CInspection, sdl::V1_0::complextest::CInspectionObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CInspection::V1_0, sdl::complextest::ComplexUnion2::CInspectionObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::complextest::CInspection, sdl::V1_0::complextest::CInspectionObject> BaseClass;
 
 	explicit CInspectionObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CInspectionObject* item);
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CInspectionObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::complextest::CInspectionObject* item);
+	Q_INVOKABLE sdl::V1_0::complextest::CInspectionObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CInspectionObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CInspectionObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CInspectionObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CInspectionObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CInspectionObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CInspectionObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -1440,26 +1040,26 @@ protected:
 
 
 
-class CProductOverviewObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CProductOverview::V1_0, sdl::complextest::ComplexUnion2::CProductOverviewObject>
+class CProductOverviewObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::complextest::CProductOverview, sdl::V1_0::complextest::CProductOverviewObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CProductOverview::V1_0, sdl::complextest::ComplexUnion2::CProductOverviewObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::complextest::CProductOverview, sdl::V1_0::complextest::CProductOverviewObject> BaseClass;
 
 	explicit CProductOverviewObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CProductOverviewObject* item);
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CProductOverviewObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::complextest::CProductOverviewObject* item);
+	Q_INVOKABLE sdl::V1_0::complextest::CProductOverviewObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CProductOverviewObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CProductOverviewObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CProductOverviewObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CProductOverviewObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CProductOverviewObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CProductOverviewObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -1508,26 +1108,26 @@ protected:
 
 
 
-class CLocalizedTextObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CLocalizedText::V1_0, sdl::complextest::ComplexUnion2::CLocalizedTextObject>
+class CLocalizedTextObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::complextest::CLocalizedText, sdl::V1_0::complextest::CLocalizedTextObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CLocalizedText::V1_0, sdl::complextest::ComplexUnion2::CLocalizedTextObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::complextest::CLocalizedText, sdl::V1_0::complextest::CLocalizedTextObject> BaseClass;
 
 	explicit CLocalizedTextObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CLocalizedTextObject* item);
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CLocalizedTextObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::complextest::CLocalizedTextObject* item);
+	Q_INVOKABLE sdl::V1_0::complextest::CLocalizedTextObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CLocalizedTextObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CLocalizedTextObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CLocalizedTextObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CLocalizedTextObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CLocalizedTextObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CLocalizedTextObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -1581,26 +1181,26 @@ protected:
 
 
 
-class CCoordinatesObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CCoordinates::V1_0, sdl::complextest::ComplexUnion2::CCoordinatesObject>
+class CCoordinatesObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::complextest::CCoordinates, sdl::V1_0::complextest::CCoordinatesObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CCoordinates::V1_0, sdl::complextest::ComplexUnion2::CCoordinatesObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::complextest::CCoordinates, sdl::V1_0::complextest::CCoordinatesObject> BaseClass;
 
 	explicit CCoordinatesObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CCoordinatesObject* item);
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CCoordinatesObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::complextest::CCoordinatesObject* item);
+	Q_INVOKABLE sdl::V1_0::complextest::CCoordinatesObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CCoordinatesObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CCoordinatesObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CCoordinatesObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CCoordinatesObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CCoordinatesObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CCoordinatesObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -1652,26 +1252,26 @@ protected:
 
 
 
-class CExtendedMetaDataObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CExtendedMetaData::V1_0, sdl::complextest::ComplexUnion2::CExtendedMetaDataObject>
+class CExtendedMetaDataObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::complextest::CExtendedMetaData, sdl::V1_0::complextest::CExtendedMetaDataObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CExtendedMetaData::V1_0, sdl::complextest::ComplexUnion2::CExtendedMetaDataObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::complextest::CExtendedMetaData, sdl::V1_0::complextest::CExtendedMetaDataObject> BaseClass;
 
 	explicit CExtendedMetaDataObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CExtendedMetaDataObject* item);
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::complextest::CExtendedMetaDataObject* item);
+	Q_INVOKABLE sdl::V1_0::complextest::CExtendedMetaDataObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CExtendedMetaDataObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CExtendedMetaDataObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CExtendedMetaDataObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CExtendedMetaDataObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CExtendedMetaDataObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -1757,26 +1357,26 @@ protected:
 
 
 
-class CResultMetaDataObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CResultMetaData::V1_0, sdl::complextest::ComplexUnion2::CResultMetaDataObject>
+class CResultMetaDataObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::complextest::CResultMetaData, sdl::V1_0::complextest::CResultMetaDataObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CResultMetaData::V1_0, sdl::complextest::ComplexUnion2::CResultMetaDataObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::complextest::CResultMetaData, sdl::V1_0::complextest::CResultMetaDataObject> BaseClass;
 
 	explicit CResultMetaDataObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CResultMetaDataObject* item);
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CResultMetaDataObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::complextest::CResultMetaDataObject* item);
+	Q_INVOKABLE sdl::V1_0::complextest::CResultMetaDataObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CResultMetaDataObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CResultMetaDataObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CResultMetaDataObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CResultMetaDataObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CResultMetaDataObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CResultMetaDataObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -1840,26 +1440,26 @@ protected:
 
 
 
-class COverallResultValuesObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::COverallResultValues::V1_0, sdl::complextest::ComplexUnion2::COverallResultValuesObject>
+class COverallResultValuesObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::complextest::COverallResultValues, sdl::V1_0::complextest::COverallResultValuesObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::COverallResultValues::V1_0, sdl::complextest::ComplexUnion2::COverallResultValuesObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::complextest::COverallResultValues, sdl::V1_0::complextest::COverallResultValuesObject> BaseClass;
 
 	explicit COverallResultValuesObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::COverallResultValuesObject* item);
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::complextest::COverallResultValuesObject* item);
+	Q_INVOKABLE sdl::V1_0::complextest::COverallResultValuesObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::COverallResultValuesObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::complextest::COverallResultValuesObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::COverallResultValuesObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::COverallResultValuesObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::COverallResultValuesObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -1922,26 +1522,26 @@ protected:
 
 
 
-class CUnionTestingTypeObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CUnionTestingType::V1_0, sdl::complextest::ComplexUnion2::CUnionTestingTypeObject>
+class CUnionTestingTypeObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::complextest::CUnionTestingType, sdl::V1_0::complextest::CUnionTestingTypeObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CUnionTestingType::V1_0, sdl::complextest::ComplexUnion2::CUnionTestingTypeObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::complextest::CUnionTestingType, sdl::V1_0::complextest::CUnionTestingTypeObject> BaseClass;
 
 	explicit CUnionTestingTypeObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CUnionTestingTypeObject* item);
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CUnionTestingTypeObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::complextest::CUnionTestingTypeObject* item);
+	Q_INVOKABLE sdl::V1_0::complextest::CUnionTestingTypeObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CUnionTestingTypeObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CUnionTestingTypeObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CUnionTestingTypeObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CUnionTestingTypeObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CUnionTestingTypeObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CUnionTestingTypeObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -2015,26 +1615,26 @@ protected:
 
 
 
-class CCDMResultVarRecursiveObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CCDMResultVarRecursive::V1_0, sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject>
+class CCDMResultVarRecursiveObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::complextest::CCDMResultVarRecursive, sdl::V1_0::complextest::CCDMResultVarRecursiveObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CCDMResultVarRecursive::V1_0, sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::complextest::CCDMResultVarRecursive, sdl::V1_0::complextest::CCDMResultVarRecursiveObject> BaseClass;
 
 	explicit CCDMResultVarRecursiveObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject* item);
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::complextest::CCDMResultVarRecursiveObject* item);
+	Q_INVOKABLE sdl::V1_0::complextest::CCDMResultVarRecursiveObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CCDMResultVarRecursiveObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CCDMResultVarRecursiveObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CCDMResultVarRecursiveObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -2105,26 +1705,26 @@ protected:
 
 
 
-class CCDMResultVarStringObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CCDMResultVarString::V1_0, sdl::complextest::ComplexUnion2::CCDMResultVarStringObject>
+class CCDMResultVarStringObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::complextest::CCDMResultVarString, sdl::V1_0::complextest::CCDMResultVarStringObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CCDMResultVarString::V1_0, sdl::complextest::ComplexUnion2::CCDMResultVarStringObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::complextest::CCDMResultVarString, sdl::V1_0::complextest::CCDMResultVarStringObject> BaseClass;
 
 	explicit CCDMResultVarStringObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CCDMResultVarStringObject* item);
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CCDMResultVarStringObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::complextest::CCDMResultVarStringObject* item);
+	Q_INVOKABLE sdl::V1_0::complextest::CCDMResultVarStringObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CCDMResultVarStringObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CCDMResultVarStringObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CCDMResultVarStringObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CCDMResultVarStringObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CCDMResultVarStringObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CCDMResultVarStringObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -2198,26 +1798,26 @@ protected:
 
 
 
-class CCDMResultObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CCDMResult::V1_0, sdl::complextest::ComplexUnion2::CCDMResultObject>
+class CCDMResultObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::complextest::CCDMResult, sdl::V1_0::complextest::CCDMResultObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CCDMResult::V1_0, sdl::complextest::ComplexUnion2::CCDMResultObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::complextest::CCDMResult, sdl::V1_0::complextest::CCDMResultObject> BaseClass;
 
 	explicit CCDMResultObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CCDMResultObject* item);
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CCDMResultObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::complextest::CCDMResultObject* item);
+	Q_INVOKABLE sdl::V1_0::complextest::CCDMResultObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CCDMResultObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CCDMResultObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CCDMResultObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CCDMResultObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CCDMResultObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CCDMResultObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -2261,26 +1861,26 @@ protected:
 
 
 
-class CPointsInCoordinateFormatObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CPointsInCoordinateFormat::V1_0, sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject>
+class CPointsInCoordinateFormatObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::complextest::CPointsInCoordinateFormat, sdl::V1_0::complextest::CPointsInCoordinateFormatObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CPointsInCoordinateFormat::V1_0, sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::complextest::CPointsInCoordinateFormat, sdl::V1_0::complextest::CPointsInCoordinateFormatObject> BaseClass;
 
 	explicit CPointsInCoordinateFormatObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject* item);
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::complextest::CPointsInCoordinateFormatObject* item);
+	Q_INVOKABLE sdl::V1_0::complextest::CPointsInCoordinateFormatObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CPointsInCoordinateFormatObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CPointsInCoordinateFormatObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CPointsInCoordinateFormatObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -2337,26 +1937,26 @@ protected:
 
 
 
-class CCollectionViewParamsTestObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CCollectionViewParamsTest::V1_0, sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObject>
+class CCollectionViewParamsTestObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::complextest::CCollectionViewParamsTest, sdl::V1_0::complextest::CCollectionViewParamsTestObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CCollectionViewParamsTest::V1_0, sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::complextest::CCollectionViewParamsTest, sdl::V1_0::complextest::CCollectionViewParamsTestObject> BaseClass;
 
 	explicit CCollectionViewParamsTestObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObject* item);
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::complextest::CCollectionViewParamsTestObject* item);
+	Q_INVOKABLE sdl::V1_0::complextest::CCollectionViewParamsTestObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::complextest::CCollectionViewParamsTestObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CCollectionViewParamsTestObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::complextest::CCollectionViewParamsTestObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -2427,12 +2027,12 @@ public:
 
 
 
-class CExtendedMetaDataUnionTypeObjectList: public ::imtsdl::TSdlAbstractListModel<sdl::complextest::ComplexUnion2::ExtendedMetaDataUnionType, QVariant>
+class CExtendedMetaDataUnionTypeObjectList: public ::imtsdl::TSdlAbstractListModel<sdl::V1_0::complextest::ExtendedMetaDataUnionType, QVariant>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TSdlAbstractListModel<sdl::complextest::ComplexUnion2::ExtendedMetaDataUnionType, QVariant> BaseClass;
+	typedef ::imtsdl::TSdlAbstractListModel<sdl::V1_0::complextest::ExtendedMetaDataUnionType, QVariant> BaseClass;
 
 	CExtendedMetaDataUnionTypeObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
@@ -2442,12 +2042,12 @@ public:
 	Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(QVariant item);
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionTypeObjectList* copyMe();
+	Q_INVOKABLE sdl::V1_0::complextest::CExtendedMetaDataUnionTypeObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(QVariant item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionTypeObjectList* otherModelPtr);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CExtendedMetaDataUnionTypeObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, QVariant item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
@@ -2458,12 +2058,12 @@ signals:
 
 
 
-class CExtendedMetaDataUnionSimpleTypeObjectList: public ::imtsdl::TSdlAbstractListModel<sdl::complextest::ComplexUnion2::ExtendedMetaDataUnionSimpleType, QVariant>
+class CExtendedMetaDataUnionSimpleTypeObjectList: public ::imtsdl::TSdlAbstractListModel<sdl::V1_0::complextest::ExtendedMetaDataUnionSimpleType, QVariant>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TSdlAbstractListModel<sdl::complextest::ComplexUnion2::ExtendedMetaDataUnionSimpleType, QVariant> BaseClass;
+	typedef ::imtsdl::TSdlAbstractListModel<sdl::V1_0::complextest::ExtendedMetaDataUnionSimpleType, QVariant> BaseClass;
 
 	CExtendedMetaDataUnionSimpleTypeObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
@@ -2473,12 +2073,12 @@ public:
 	Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(QVariant item);
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionSimpleTypeObjectList* copyMe();
+	Q_INVOKABLE sdl::V1_0::complextest::CExtendedMetaDataUnionSimpleTypeObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(QVariant item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionSimpleTypeObjectList* otherModelPtr);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CExtendedMetaDataUnionSimpleTypeObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, QVariant item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
@@ -2489,12 +2089,12 @@ signals:
 
 
 
-class CCDMResultUnionTypeObjectList: public ::imtsdl::TSdlAbstractListModel<sdl::complextest::ComplexUnion2::CDMResultUnionType, QVariant>
+class CCDMResultUnionTypeObjectList: public ::imtsdl::TSdlAbstractListModel<sdl::V1_0::complextest::CDMResultUnionType, QVariant>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TSdlAbstractListModel<sdl::complextest::ComplexUnion2::CDMResultUnionType, QVariant> BaseClass;
+	typedef ::imtsdl::TSdlAbstractListModel<sdl::V1_0::complextest::CDMResultUnionType, QVariant> BaseClass;
 
 	CCDMResultUnionTypeObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
@@ -2504,12 +2104,12 @@ public:
 	Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(QVariant item);
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList* copyMe();
+	Q_INVOKABLE sdl::V1_0::complextest::CCDMResultUnionTypeObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(QVariant item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList* otherModelPtr);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::complextest::CCDMResultUnionTypeObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, QVariant item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
@@ -2717,35 +2317,19 @@ private:
 } // namespace sdl::complextest::ComplexUnion2
 
 
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CResult::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CResult);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CArea::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CArea);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CAnalyzer::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CAnalyzer);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CInspection::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CInspection);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CProductOverview::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CProductOverview);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CLocalizedText::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CLocalizedText);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CCoordinates::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CCoordinates);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CExtendedMetaData::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CExtendedMetaData);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CResultMetaData::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CResultMetaData);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::COverallResultValues::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::COverallResultValues);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CUnionTestingType::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CUnionTestingType);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CCDMResultVarRecursive::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CCDMResultVarRecursive);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CCDMResultVarString::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CCDMResultVarString);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CCDMResult::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CCDMResult);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CPointsInCoordinateFormat::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CPointsInCoordinateFormat);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CCollectionViewParamsTest::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CCollectionViewParamsTest);
+Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CResult);
+Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CArea);
+Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CAnalyzer);
+Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CInspection);
+Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CProductOverview);
+Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CLocalizedText);
+Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CCoordinates);
+Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CExtendedMetaData);
+Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CResultMetaData);
+Q_DECLARE_METATYPE(sdl::V1_0::V1_0::COverallResultValues);
+Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CUnionTestingType);
+Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CCDMResultVarRecursive);
+Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CCDMResultVarString);
+Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CCDMResult);
+Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CPointsInCoordinateFormat);
+Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CCollectionViewParamsTest);

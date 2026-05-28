@@ -5,7 +5,7 @@
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
 
 
-namespace sdl::substrate::SubstrateSpecifications
+namespace sdl::V1_0::V1_0
 {
 
 // type forward declarations
@@ -106,4 +106,4 @@ protected:
 
 
 
-} // namespace sdl::substrate::SubstrateSpecifications
+} // namespace sdl::V1_0::V1_0

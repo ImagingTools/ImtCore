@@ -1,7 +1,7 @@
 #pragma once
 
 
-namespace sdl::imtbase::ImtBaseTypes
+namespace sdl::V1_0::imtbase
 {
 
 // type forward declarations
@@ -25,4 +25,4 @@ class CFileNameParam;
 class CParamsSet;
 class CMimeType;
 
-} // namespace sdl::imtbase::ImtBaseTypes
+} // namespace sdl::V1_0::imtbase

@@ -2,17 +2,17 @@
 #include "ImtBaseTypes_fwd.h"
 
 
-namespace sdl::imtbase::ImtBaseTypes
+namespace sdl::V1_0::imtbase
 {
 
 
-QByteArray CTimeRange::V1_0::GetVersionId()
+QByteArray CTimeRange::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CTimeRange::V1_0::operator==(const V1_0& other) const
+bool CTimeRange::operator==(const CTimeRange& other) const
 {
 	return 
 				Begin == other.Begin &&
@@ -20,7 +20,7 @@ bool CTimeRange::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CTimeRange::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CTimeRange::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "TimeRange", modelIndex);
 
@@ -37,7 +37,7 @@ bool CTimeRange::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelI
 }
 
 
-bool CTimeRange::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CTimeRange::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant beginData = model.GetData("Begin", modelIndex);
 	if (!beginData.isNull()){
@@ -53,7 +53,7 @@ bool CTimeRange::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int
 }
 
 
-bool CTimeRange::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CTimeRange::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant beginData = model.GetData("Begin", modelIndex);
 	if (!beginData.isNull()){
@@ -69,7 +69,7 @@ bool CTimeRange::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, 
 }
 
 
-bool CTimeRange::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CTimeRange::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (Begin){
 		gqlObject.InsertParam("Begin", QVariant(*Begin));
@@ -85,7 +85,7 @@ bool CTimeRange::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject
 }
 
 
-bool CTimeRange::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CTimeRange::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("Begin") && (gqlObject["Begin"].userType() == QMetaType::QString || gqlObject["Begin"].userType() == QMetaType::QByteArray)){
 		Begin = gqlObject["Begin"].toString();
@@ -99,7 +99,7 @@ bool CTimeRange::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 }
 
 
-bool CTimeRange::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CTimeRange::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("Begin") && (gqlObject["Begin"].userType() == QMetaType::QString || gqlObject["Begin"].userType() == QMetaType::QByteArray)){
 		Begin = gqlObject["Begin"].toString();
@@ -113,7 +113,7 @@ bool CTimeRange::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 }
 
 
-bool CTimeRange::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CTimeRange::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (Begin){
 		jsonObject["Begin"] = QJsonValue::fromVariant(*Begin);
@@ -129,7 +129,7 @@ bool CTimeRange::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CTimeRange::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CTimeRange::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("Begin") && jsonObject["Begin"].isString()){
 		Begin = jsonObject["Begin"].toString();
@@ -143,7 +143,7 @@ bool CTimeRange::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CTimeRange::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CTimeRange::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("Begin") && jsonObject["Begin"].isString()){
 		Begin = jsonObject["Begin"].toString();
@@ -159,243 +159,13 @@ bool CTimeRange::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CTimeRange::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CTimeRange::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CTimeRange::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CTimeRange::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CTimeRange::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CTimeRange::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CTimeRange::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CTimeRange::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CTimeRange::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CSdlSize::V1_0::GetVersionId()
+QByteArray CSdlSize::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CSdlSize::V1_0::operator==(const V1_0& other) const
+bool CSdlSize::operator==(const CSdlSize& other) const
 {
 	return 
 				width.has_value() == other.width.has_value() &&
@@ -407,7 +177,7 @@ bool CSdlSize::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CSdlSize::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CSdlSize::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "SdlSize", modelIndex);
 
@@ -430,7 +200,7 @@ bool CSdlSize::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelInd
 }
 
 
-bool CSdlSize::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CSdlSize::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant widthData = model.GetData("width", modelIndex);
 	if (widthData.isNull()){
@@ -452,7 +222,7 @@ bool CSdlSize::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int m
 }
 
 
-bool CSdlSize::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CSdlSize::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant widthData = model.GetData("width", modelIndex);
 	if (!widthData.isNull()){
@@ -468,7 +238,7 @@ bool CSdlSize::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, in
 }
 
 
-bool CSdlSize::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CSdlSize::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!width){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "width").toLocal8Bit().constData();)
@@ -490,7 +260,7 @@ bool CSdlSize::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) 
 }
 
 
-bool CSdlSize::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CSdlSize::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("width") || (gqlObject["width"].userType() != QMetaType::Float && gqlObject["width"].userType() != QMetaType::Double && gqlObject["width"].userType() != QMetaType::Int && gqlObject["width"].userType() != QMetaType::UInt && gqlObject["width"].userType() != QMetaType::LongLong && gqlObject["width"].userType() != QMetaType::ULongLong && gqlObject["width"].userType() != QMetaType::Long && gqlObject["width"].userType() != QMetaType::Short && gqlObject["width"].userType() != QMetaType::ULong && gqlObject["width"].userType() != QMetaType::UShort && gqlObject["width"].userType() != QMetaType::UChar)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "width").toLocal8Bit().constData();)
@@ -510,7 +280,7 @@ bool CSdlSize::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 }
 
 
-bool CSdlSize::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CSdlSize::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("width") && (gqlObject["width"].userType() == QMetaType::Float || gqlObject["width"].userType() == QMetaType::Double || gqlObject["width"].userType() == QMetaType::Int || gqlObject["width"].userType() == QMetaType::UInt || gqlObject["width"].userType() == QMetaType::LongLong || gqlObject["width"].userType() == QMetaType::ULongLong || gqlObject["width"].userType() == QMetaType::Long || gqlObject["width"].userType() == QMetaType::Short || gqlObject["width"].userType() == QMetaType::ULong || gqlObject["width"].userType() == QMetaType::UShort || gqlObject["width"].userType() == QMetaType::UChar)){
 		width = gqlObject["width"].toDouble();
@@ -524,7 +294,7 @@ bool CSdlSize::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 }
 
 
-bool CSdlSize::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CSdlSize::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!width){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "width").toLocal8Bit().constData();)
@@ -546,7 +316,7 @@ bool CSdlSize::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CSdlSize::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CSdlSize::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("width") || ! jsonObject["width"].isDouble()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "width").toLocal8Bit().constData();)
@@ -566,7 +336,7 @@ bool CSdlSize::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CSdlSize::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CSdlSize::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("width") && jsonObject["width"].isDouble()){
 		width = jsonObject["width"].toDouble();
@@ -582,243 +352,13 @@ bool CSdlSize::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CSdlSize::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSdlSize::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSdlSize::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSdlSize::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSdlSize::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSdlSize::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSdlSize::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSdlSize::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSdlSize::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CSdlPoint::V1_0::GetVersionId()
+QByteArray CSdlPoint::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CSdlPoint::V1_0::operator==(const V1_0& other) const
+bool CSdlPoint::operator==(const CSdlPoint& other) const
 {
 	return 
 				x.has_value() == other.x.has_value() &&
@@ -830,7 +370,7 @@ bool CSdlPoint::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CSdlPoint::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CSdlPoint::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "SdlPoint", modelIndex);
 
@@ -853,7 +393,7 @@ bool CSdlPoint::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 }
 
 
-bool CSdlPoint::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CSdlPoint::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant xData = model.GetData("x", modelIndex);
 	if (xData.isNull()){
@@ -875,7 +415,7 @@ bool CSdlPoint::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 }
 
 
-bool CSdlPoint::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CSdlPoint::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant xData = model.GetData("x", modelIndex);
 	if (!xData.isNull()){
@@ -891,7 +431,7 @@ bool CSdlPoint::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 }
 
 
-bool CSdlPoint::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CSdlPoint::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!x){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x").toLocal8Bit().constData();)
@@ -913,7 +453,7 @@ bool CSdlPoint::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 }
 
 
-bool CSdlPoint::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CSdlPoint::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("x") || (gqlObject["x"].userType() != QMetaType::Float && gqlObject["x"].userType() != QMetaType::Double && gqlObject["x"].userType() != QMetaType::Int && gqlObject["x"].userType() != QMetaType::UInt && gqlObject["x"].userType() != QMetaType::LongLong && gqlObject["x"].userType() != QMetaType::ULongLong && gqlObject["x"].userType() != QMetaType::Long && gqlObject["x"].userType() != QMetaType::Short && gqlObject["x"].userType() != QMetaType::ULong && gqlObject["x"].userType() != QMetaType::UShort && gqlObject["x"].userType() != QMetaType::UChar)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x").toLocal8Bit().constData();)
@@ -933,7 +473,7 @@ bool CSdlPoint::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 }
 
 
-bool CSdlPoint::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CSdlPoint::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("x") && (gqlObject["x"].userType() == QMetaType::Float || gqlObject["x"].userType() == QMetaType::Double || gqlObject["x"].userType() == QMetaType::Int || gqlObject["x"].userType() == QMetaType::UInt || gqlObject["x"].userType() == QMetaType::LongLong || gqlObject["x"].userType() == QMetaType::ULongLong || gqlObject["x"].userType() == QMetaType::Long || gqlObject["x"].userType() == QMetaType::Short || gqlObject["x"].userType() == QMetaType::ULong || gqlObject["x"].userType() == QMetaType::UShort || gqlObject["x"].userType() == QMetaType::UChar)){
 		x = gqlObject["x"].toDouble();
@@ -947,7 +487,7 @@ bool CSdlPoint::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 }
 
 
-bool CSdlPoint::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CSdlPoint::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!x){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x").toLocal8Bit().constData();)
@@ -969,7 +509,7 @@ bool CSdlPoint::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CSdlPoint::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CSdlPoint::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("x") || ! jsonObject["x"].isDouble()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x").toLocal8Bit().constData();)
@@ -989,7 +529,7 @@ bool CSdlPoint::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CSdlPoint::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CSdlPoint::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("x") && jsonObject["x"].isDouble()){
 		x = jsonObject["x"].toDouble();
@@ -1005,243 +545,13 @@ bool CSdlPoint::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CSdlPoint::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSdlPoint::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSdlPoint::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSdlPoint::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSdlPoint::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSdlPoint::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSdlPoint::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSdlPoint::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSdlPoint::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CParamTypeIds::V1_0::GetVersionId()
+QByteArray CParamTypeIds::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CParamTypeIds::V1_0::operator==(const V1_0& other) const
+bool CParamTypeIds::operator==(const CParamTypeIds& other) const
 {
 	return 
 				UrlParam == other.UrlParam &&
@@ -1261,7 +571,7 @@ bool CParamTypeIds::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CParamTypeIds::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CParamTypeIds::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "ParamTypeIds", modelIndex);
 
@@ -1326,7 +636,7 @@ bool CParamTypeIds::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mod
 }
 
 
-bool CParamTypeIds::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CParamTypeIds::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant urlParamData = model.GetData("UrlParam", modelIndex);
 	if (!urlParamData.isNull()){
@@ -1402,7 +712,7 @@ bool CParamTypeIds::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, 
 }
 
 
-bool CParamTypeIds::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CParamTypeIds::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant urlParamData = model.GetData("UrlParam", modelIndex);
 	if (!urlParamData.isNull()){
@@ -1478,7 +788,7 @@ bool CParamTypeIds::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& mode
 }
 
 
-bool CParamTypeIds::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CParamTypeIds::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (UrlParam){
 		gqlObject.InsertParam("UrlParam", QVariant(*UrlParam));
@@ -1542,7 +852,7 @@ bool CParamTypeIds::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObj
 }
 
 
-bool CParamTypeIds::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CParamTypeIds::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("UrlParam") && (gqlObject["UrlParam"].userType() == QMetaType::QString || gqlObject["UrlParam"].userType() == QMetaType::QByteArray)){
 		UrlParam = gqlObject["UrlParam"].toByteArray();
@@ -1604,7 +914,7 @@ bool CParamTypeIds::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 }
 
 
-bool CParamTypeIds::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CParamTypeIds::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("UrlParam") && (gqlObject["UrlParam"].userType() == QMetaType::QString || gqlObject["UrlParam"].userType() == QMetaType::QByteArray)){
 		UrlParam = gqlObject["UrlParam"].toByteArray();
@@ -1666,7 +976,7 @@ bool CParamTypeIds::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 }
 
 
-bool CParamTypeIds::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CParamTypeIds::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (UrlParam){
 		jsonObject["UrlParam"] = QString::fromUtf8(*UrlParam);
@@ -1730,7 +1040,7 @@ bool CParamTypeIds::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CParamTypeIds::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CParamTypeIds::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("UrlParam") && jsonObject["UrlParam"].isString()){
 		UrlParam = jsonObject["UrlParam"].toString().toUtf8();
@@ -1792,7 +1102,7 @@ bool CParamTypeIds::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CParamTypeIds::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CParamTypeIds::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("UrlParam") && jsonObject["UrlParam"].isString()){
 		UrlParam = jsonObject["UrlParam"].toString().toUtf8();
@@ -1856,243 +1166,13 @@ bool CParamTypeIds::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CParamTypeIds::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CParamTypeIds::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CParamTypeIds::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CParamTypeIds::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CParamTypeIds::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CParamTypeIds::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CParamTypeIds::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CParamTypeIds::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CParamTypeIds::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CUrlParam::V1_0::GetVersionId()
+QByteArray CUrlParam::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CUrlParam::V1_0::operator==(const V1_0& other) const
+bool CUrlParam::operator==(const CUrlParam& other) const
 {
 	return 
 				scheme == other.scheme &&
@@ -2102,7 +1182,7 @@ bool CUrlParam::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CUrlParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CUrlParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "UrlParam", modelIndex);
 
@@ -2127,7 +1207,7 @@ bool CUrlParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 }
 
 
-bool CUrlParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CUrlParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant schemeData = model.GetData("scheme", modelIndex);
 	if (!schemeData.isNull()){
@@ -2153,7 +1233,7 @@ bool CUrlParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 }
 
 
-bool CUrlParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CUrlParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant schemeData = model.GetData("scheme", modelIndex);
 	if (!schemeData.isNull()){
@@ -2179,7 +1259,7 @@ bool CUrlParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 }
 
 
-bool CUrlParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CUrlParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (scheme){
 		gqlObject.InsertParam("scheme", QVariant(*scheme));
@@ -2203,7 +1283,7 @@ bool CUrlParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 }
 
 
-bool CUrlParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CUrlParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("scheme") && (gqlObject["scheme"].userType() == QMetaType::QString || gqlObject["scheme"].userType() == QMetaType::QByteArray)){
 		scheme = gqlObject["scheme"].toString();
@@ -2225,7 +1305,7 @@ bool CUrlParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 }
 
 
-bool CUrlParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CUrlParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("scheme") && (gqlObject["scheme"].userType() == QMetaType::QString || gqlObject["scheme"].userType() == QMetaType::QByteArray)){
 		scheme = gqlObject["scheme"].toString();
@@ -2247,7 +1327,7 @@ bool CUrlParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 }
 
 
-bool CUrlParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CUrlParam::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (scheme){
 		jsonObject["scheme"] = QJsonValue::fromVariant(*scheme);
@@ -2271,7 +1351,7 @@ bool CUrlParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CUrlParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CUrlParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("scheme") && jsonObject["scheme"].isString()){
 		scheme = jsonObject["scheme"].toString();
@@ -2293,7 +1373,7 @@ bool CUrlParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CUrlParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CUrlParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("scheme") && jsonObject["scheme"].isString()){
 		scheme = jsonObject["scheme"].toString();
@@ -2317,250 +1397,20 @@ bool CUrlParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CUrlParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CUrlParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CUrlParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CUrlParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CUrlParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CUrlParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CUrlParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CUrlParam::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CUrlParam::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CIdParam::V1_0::GetVersionId()
+QByteArray CIdParam::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CIdParam::V1_0::operator==(const V1_0& other) const
+bool CIdParam::operator==(const CIdParam& other) const
 {
 	return 
 				id == other.id;
 }
 
 
-bool CIdParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CIdParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "IdParam", modelIndex);
 
@@ -2573,7 +1423,7 @@ bool CIdParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelInd
 }
 
 
-bool CIdParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CIdParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant idData = model.GetData("id", modelIndex);
 	if (!idData.isNull()){
@@ -2584,7 +1434,7 @@ bool CIdParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int m
 }
 
 
-bool CIdParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CIdParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant idData = model.GetData("id", modelIndex);
 	if (!idData.isNull()){
@@ -2595,7 +1445,7 @@ bool CIdParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, in
 }
 
 
-bool CIdParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CIdParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (id){
 		gqlObject.InsertParam("id", QVariant(*id));
@@ -2607,7 +1457,7 @@ bool CIdParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) 
 }
 
 
-bool CIdParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CIdParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("id") && (gqlObject["id"].userType() == QMetaType::QString || gqlObject["id"].userType() == QMetaType::QByteArray)){
 		id = gqlObject["id"].toByteArray();
@@ -2617,7 +1467,7 @@ bool CIdParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 }
 
 
-bool CIdParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CIdParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("id") && (gqlObject["id"].userType() == QMetaType::QString || gqlObject["id"].userType() == QMetaType::QByteArray)){
 		id = gqlObject["id"].toByteArray();
@@ -2627,7 +1477,7 @@ bool CIdParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 }
 
 
-bool CIdParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CIdParam::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (id){
 		jsonObject["id"] = QString::fromUtf8(*id);
@@ -2639,7 +1489,7 @@ bool CIdParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CIdParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CIdParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("id") && jsonObject["id"].isString()){
 		id = jsonObject["id"].toString().toUtf8();
@@ -2649,7 +1499,7 @@ bool CIdParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CIdParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CIdParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("id") && jsonObject["id"].isString()){
 		id = jsonObject["id"].toString().toUtf8();
@@ -2661,250 +1511,20 @@ bool CIdParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CIdParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CIdParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CIdParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CIdParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CIdParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CIdParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CIdParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CIdParam::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CIdParam::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CTextParam::V1_0::GetVersionId()
+QByteArray CTextParam::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CTextParam::V1_0::operator==(const V1_0& other) const
+bool CTextParam::operator==(const CTextParam& other) const
 {
 	return 
 				text == other.text;
 }
 
 
-bool CTextParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CTextParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "TextParam", modelIndex);
 
@@ -2917,7 +1537,7 @@ bool CTextParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelI
 }
 
 
-bool CTextParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CTextParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant textData = model.GetData("text", modelIndex);
 	if (!textData.isNull()){
@@ -2928,7 +1548,7 @@ bool CTextParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int
 }
 
 
-bool CTextParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CTextParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant textData = model.GetData("text", modelIndex);
 	if (!textData.isNull()){
@@ -2939,7 +1559,7 @@ bool CTextParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, 
 }
 
 
-bool CTextParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CTextParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (text){
 		gqlObject.InsertParam("text", QVariant(*text));
@@ -2951,7 +1571,7 @@ bool CTextParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject
 }
 
 
-bool CTextParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CTextParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("text") && (gqlObject["text"].userType() == QMetaType::QString || gqlObject["text"].userType() == QMetaType::QByteArray)){
 		text = gqlObject["text"].toString();
@@ -2961,7 +1581,7 @@ bool CTextParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 }
 
 
-bool CTextParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CTextParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("text") && (gqlObject["text"].userType() == QMetaType::QString || gqlObject["text"].userType() == QMetaType::QByteArray)){
 		text = gqlObject["text"].toString();
@@ -2971,7 +1591,7 @@ bool CTextParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 }
 
 
-bool CTextParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CTextParam::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (text){
 		jsonObject["text"] = QJsonValue::fromVariant(*text);
@@ -2983,7 +1603,7 @@ bool CTextParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CTextParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CTextParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("text") && jsonObject["text"].isString()){
 		text = jsonObject["text"].toString();
@@ -2993,7 +1613,7 @@ bool CTextParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CTextParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CTextParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("text") && jsonObject["text"].isString()){
 		text = jsonObject["text"].toString();
@@ -3005,250 +1625,20 @@ bool CTextParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CTextParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CTextParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CTextParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CTextParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CTextParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CTextParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CTextParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CTextParam::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CTextParam::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CEnableableParam::V1_0::GetVersionId()
+QByteArray CEnableableParam::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CEnableableParam::V1_0::operator==(const V1_0& other) const
+bool CEnableableParam::operator==(const CEnableableParam& other) const
 {
 	return 
 				value == other.value;
 }
 
 
-bool CEnableableParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CEnableableParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "EnableableParam", modelIndex);
 
@@ -3261,7 +1651,7 @@ bool CEnableableParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int 
 }
 
 
-bool CEnableableParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CEnableableParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant valueData = model.GetData("value", modelIndex);
 	if (!valueData.isNull()){
@@ -3272,7 +1662,7 @@ bool CEnableableParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& mode
 }
 
 
-bool CEnableableParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CEnableableParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant valueData = model.GetData("value", modelIndex);
 	if (!valueData.isNull()){
@@ -3283,7 +1673,7 @@ bool CEnableableParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& m
 }
 
 
-bool CEnableableParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CEnableableParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (value){
 		gqlObject.InsertParam("value", QVariant(*value));
@@ -3295,7 +1685,7 @@ bool CEnableableParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gql
 }
 
 
-bool CEnableableParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CEnableableParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("value") && (gqlObject["value"].userType() == QMetaType::Bool)){
 		value = gqlObject["value"].toBool();
@@ -3305,7 +1695,7 @@ bool CEnableableParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 }
 
 
-bool CEnableableParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CEnableableParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("value") && (gqlObject["value"].userType() == QMetaType::Bool)){
 		value = gqlObject["value"].toBool();
@@ -3315,7 +1705,7 @@ bool CEnableableParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamO
 }
 
 
-bool CEnableableParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CEnableableParam::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (value){
 		jsonObject["value"] = QJsonValue::fromVariant(*value);
@@ -3327,7 +1717,7 @@ bool CEnableableParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CEnableableParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CEnableableParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("value") && jsonObject["value"].isBool()){
 		value = jsonObject["value"].toBool();
@@ -3337,7 +1727,7 @@ bool CEnableableParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CEnableableParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CEnableableParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("value") && jsonObject["value"].isBool()){
 		value = jsonObject["value"].toBool();
@@ -3349,250 +1739,20 @@ bool CEnableableParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject
 
 // serialize methods
 
-bool CEnableableParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CEnableableParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CEnableableParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CEnableableParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CEnableableParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CEnableableParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CEnableableParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CEnableableParam::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CEnableableParam::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CIntegerParam::V1_0::GetVersionId()
+QByteArray CIntegerParam::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CIntegerParam::V1_0::operator==(const V1_0& other) const
+bool CIntegerParam::operator==(const CIntegerParam& other) const
 {
 	return 
 				value == other.value;
 }
 
 
-bool CIntegerParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CIntegerParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "IntegerParam", modelIndex);
 
@@ -3605,7 +1765,7 @@ bool CIntegerParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mod
 }
 
 
-bool CIntegerParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CIntegerParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant valueData = model.GetData("value", modelIndex);
 	if (!valueData.isNull()){
@@ -3616,7 +1776,7 @@ bool CIntegerParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, 
 }
 
 
-bool CIntegerParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CIntegerParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant valueData = model.GetData("value", modelIndex);
 	if (!valueData.isNull()){
@@ -3627,7 +1787,7 @@ bool CIntegerParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& mode
 }
 
 
-bool CIntegerParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CIntegerParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (value){
 		gqlObject.InsertParam("value", QVariant(*value));
@@ -3639,7 +1799,7 @@ bool CIntegerParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObj
 }
 
 
-bool CIntegerParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CIntegerParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("value") && (gqlObject["value"].userType() == QMetaType::Int || gqlObject["value"].userType() == QMetaType::UInt || gqlObject["value"].userType() == QMetaType::LongLong || gqlObject["value"].userType() == QMetaType::ULongLong || gqlObject["value"].userType() == QMetaType::Long || gqlObject["value"].userType() == QMetaType::Short || gqlObject["value"].userType() == QMetaType::ULong || gqlObject["value"].userType() == QMetaType::UShort || gqlObject["value"].userType() == QMetaType::UChar)){
 		value = gqlObject["value"].toInt();
@@ -3649,7 +1809,7 @@ bool CIntegerParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 }
 
 
-bool CIntegerParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CIntegerParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("value") && (gqlObject["value"].userType() == QMetaType::Int || gqlObject["value"].userType() == QMetaType::UInt || gqlObject["value"].userType() == QMetaType::LongLong || gqlObject["value"].userType() == QMetaType::ULongLong || gqlObject["value"].userType() == QMetaType::Long || gqlObject["value"].userType() == QMetaType::Short || gqlObject["value"].userType() == QMetaType::ULong || gqlObject["value"].userType() == QMetaType::UShort || gqlObject["value"].userType() == QMetaType::UChar)){
 		value = gqlObject["value"].toInt();
@@ -3659,7 +1819,7 @@ bool CIntegerParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 }
 
 
-bool CIntegerParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CIntegerParam::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (value){
 		jsonObject["value"] = QJsonValue::fromVariant(*value);
@@ -3671,7 +1831,7 @@ bool CIntegerParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CIntegerParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CIntegerParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("value") && jsonObject["value"].isDouble()){
 		value = jsonObject["value"].toInt();
@@ -3681,7 +1841,7 @@ bool CIntegerParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CIntegerParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CIntegerParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("value") && jsonObject["value"].isDouble()){
 		value = jsonObject["value"].toInt();
@@ -3693,243 +1853,13 @@ bool CIntegerParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CIntegerParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CIntegerParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CIntegerParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CIntegerParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CIntegerParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CIntegerParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CIntegerParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CIntegerParam::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CIntegerParam::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CDoubleParam::V1_0::GetVersionId()
+QByteArray CDoubleParam::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CDoubleParam::V1_0::operator==(const V1_0& other) const
+bool CDoubleParam::operator==(const CDoubleParam& other) const
 {
 	return 
 				value.has_value() == other.value.has_value() &&
@@ -3938,7 +1868,7 @@ bool CDoubleParam::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CDoubleParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CDoubleParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "DoubleParam", modelIndex);
 
@@ -3951,7 +1881,7 @@ bool CDoubleParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 }
 
 
-bool CDoubleParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CDoubleParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant valueData = model.GetData("value", modelIndex);
 	if (!valueData.isNull()){
@@ -3962,7 +1892,7 @@ bool CDoubleParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 }
 
 
-bool CDoubleParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CDoubleParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant valueData = model.GetData("value", modelIndex);
 	if (!valueData.isNull()){
@@ -3973,7 +1903,7 @@ bool CDoubleParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 }
 
 
-bool CDoubleParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CDoubleParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (value){
 		gqlObject.InsertParam("value", QVariant(*value));
@@ -3985,7 +1915,7 @@ bool CDoubleParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 }
 
 
-bool CDoubleParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CDoubleParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("value") && (gqlObject["value"].userType() == QMetaType::Float || gqlObject["value"].userType() == QMetaType::Double || gqlObject["value"].userType() == QMetaType::Int || gqlObject["value"].userType() == QMetaType::UInt || gqlObject["value"].userType() == QMetaType::LongLong || gqlObject["value"].userType() == QMetaType::ULongLong || gqlObject["value"].userType() == QMetaType::Long || gqlObject["value"].userType() == QMetaType::Short || gqlObject["value"].userType() == QMetaType::ULong || gqlObject["value"].userType() == QMetaType::UShort || gqlObject["value"].userType() == QMetaType::UChar)){
 		value = gqlObject["value"].toDouble();
@@ -3995,7 +1925,7 @@ bool CDoubleParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 }
 
 
-bool CDoubleParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CDoubleParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("value") && (gqlObject["value"].userType() == QMetaType::Float || gqlObject["value"].userType() == QMetaType::Double || gqlObject["value"].userType() == QMetaType::Int || gqlObject["value"].userType() == QMetaType::UInt || gqlObject["value"].userType() == QMetaType::LongLong || gqlObject["value"].userType() == QMetaType::ULongLong || gqlObject["value"].userType() == QMetaType::Long || gqlObject["value"].userType() == QMetaType::Short || gqlObject["value"].userType() == QMetaType::ULong || gqlObject["value"].userType() == QMetaType::UShort || gqlObject["value"].userType() == QMetaType::UChar)){
 		value = gqlObject["value"].toDouble();
@@ -4005,7 +1935,7 @@ bool CDoubleParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 }
 
 
-bool CDoubleParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CDoubleParam::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (value){
 		jsonObject["value"] = QJsonValue::fromVariant(*value);
@@ -4017,7 +1947,7 @@ bool CDoubleParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CDoubleParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CDoubleParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("value") && jsonObject["value"].isDouble()){
 		value = jsonObject["value"].toDouble();
@@ -4027,7 +1957,7 @@ bool CDoubleParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CDoubleParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CDoubleParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("value") && jsonObject["value"].isDouble()){
 		value = jsonObject["value"].toDouble();
@@ -4039,243 +1969,13 @@ bool CDoubleParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CDoubleParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CDoubleParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CDoubleParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CDoubleParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CDoubleParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CDoubleParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CDoubleParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CDoubleParam::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CDoubleParam::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray COption::V1_0::GetVersionId()
+QByteArray COption::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool COption::V1_0::operator==(const V1_0& other) const
+bool COption::operator==(const COption& other) const
 {
 	return 
 				id == other.id &&
@@ -4285,7 +1985,7 @@ bool COption::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool COption::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool COption::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "Option", modelIndex);
 
@@ -4310,7 +2010,7 @@ bool COption::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelInde
 }
 
 
-bool COption::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool COption::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant idData = model.GetData("id", modelIndex);
 	if (!idData.isNull()){
@@ -4336,7 +2036,7 @@ bool COption::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mo
 }
 
 
-bool COption::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool COption::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant idData = model.GetData("id", modelIndex);
 	if (!idData.isNull()){
@@ -4362,7 +2062,7 @@ bool COption::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int
 }
 
 
-bool COption::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool COption::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (id){
 		gqlObject.InsertParam("id", QVariant(*id));
@@ -4386,7 +2086,7 @@ bool COption::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) c
 }
 
 
-bool COption::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool COption::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("id") && (gqlObject["id"].userType() == QMetaType::QString || gqlObject["id"].userType() == QMetaType::QByteArray)){
 		id = gqlObject["id"].toByteArray();
@@ -4408,7 +2108,7 @@ bool COption::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 }
 
 
-bool COption::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool COption::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("id") && (gqlObject["id"].userType() == QMetaType::QString || gqlObject["id"].userType() == QMetaType::QByteArray)){
 		id = gqlObject["id"].toByteArray();
@@ -4430,7 +2130,7 @@ bool COption::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 }
 
 
-bool COption::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool COption::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (id){
 		jsonObject["id"] = QString::fromUtf8(*id);
@@ -4454,7 +2154,7 @@ bool COption::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool COption::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool COption::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("id") && jsonObject["id"].isString()){
 		id = jsonObject["id"].toString().toUtf8();
@@ -4476,7 +2176,7 @@ bool COption::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool COption::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool COption::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("id") && jsonObject["id"].isString()){
 		id = jsonObject["id"].toString().toUtf8();
@@ -4500,243 +2200,13 @@ bool COption::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool COption::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool COption::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool COption::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool COption::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool COption::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool COption::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool COption::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool COption::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool COption::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray COptionsList::V1_0::GetVersionId()
+QByteArray COptionsList::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool COptionsList::V1_0::operator==(const V1_0& other) const
+bool COptionsList::operator==(const COptionsList& other) const
 {
 	return 
 				totalCount == other.totalCount &&
@@ -4745,7 +2215,7 @@ bool COptionsList::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool COptionsList::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool COptionsList::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "OptionsList", modelIndex);
 
@@ -4774,7 +2244,7 @@ bool COptionsList::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 }
 
 
-bool COptionsList::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool COptionsList::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant totalCountData = model.GetData("totalCount", modelIndex);
 	if (!totalCountData.isNull()){
@@ -4807,7 +2277,7 @@ bool COptionsList::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 }
 
 
-bool COptionsList::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool COptionsList::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant totalCountData = model.GetData("totalCount", modelIndex);
 	if (!totalCountData.isNull()){
@@ -4840,7 +2310,7 @@ bool COptionsList::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 }
 
 
-bool COptionsList::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool COptionsList::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (totalCount){
 		gqlObject.InsertParam("totalCount", QVariant(*totalCount));
@@ -4870,7 +2340,7 @@ bool COptionsList::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 }
 
 
-bool COptionsList::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool COptionsList::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("totalCount") && (gqlObject["totalCount"].userType() == QMetaType::Int || gqlObject["totalCount"].userType() == QMetaType::UInt || gqlObject["totalCount"].userType() == QMetaType::LongLong || gqlObject["totalCount"].userType() == QMetaType::ULongLong || gqlObject["totalCount"].userType() == QMetaType::Long || gqlObject["totalCount"].userType() == QMetaType::Short || gqlObject["totalCount"].userType() == QMetaType::ULong || gqlObject["totalCount"].userType() == QMetaType::UShort || gqlObject["totalCount"].userType() == QMetaType::UChar)){
 		totalCount = gqlObject["totalCount"].toInt();
@@ -4906,7 +2376,7 @@ bool COptionsList::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 }
 
 
-bool COptionsList::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool COptionsList::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("totalCount") && (gqlObject["totalCount"].userType() == QMetaType::Int || gqlObject["totalCount"].userType() == QMetaType::UInt || gqlObject["totalCount"].userType() == QMetaType::LongLong || gqlObject["totalCount"].userType() == QMetaType::ULongLong || gqlObject["totalCount"].userType() == QMetaType::Long || gqlObject["totalCount"].userType() == QMetaType::Short || gqlObject["totalCount"].userType() == QMetaType::ULong || gqlObject["totalCount"].userType() == QMetaType::UShort || gqlObject["totalCount"].userType() == QMetaType::UChar)){
 		totalCount = gqlObject["totalCount"].toInt();
@@ -4942,7 +2412,7 @@ bool COptionsList::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 }
 
 
-bool COptionsList::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool COptionsList::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (totalCount){
 		jsonObject["totalCount"] = QJsonValue::fromVariant(*totalCount);
@@ -4972,7 +2442,7 @@ bool COptionsList::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool COptionsList::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool COptionsList::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("totalCount") && jsonObject["totalCount"].isDouble()){
 		totalCount = jsonObject["totalCount"].toInt();
@@ -5001,7 +2471,7 @@ bool COptionsList::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool COptionsList::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool COptionsList::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("totalCount") && jsonObject["totalCount"].isDouble()){
 		totalCount = jsonObject["totalCount"].toInt();
@@ -5032,243 +2502,13 @@ bool COptionsList::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool COptionsList::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool COptionsList::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool COptionsList::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool COptionsList::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool COptionsList::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool COptionsList::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool COptionsList::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool COptionsList::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool COptionsList::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CSelectionParam::V1_0::GetVersionId()
+QByteArray CSelectionParam::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CSelectionParam::V1_0::operator==(const V1_0& other) const
+bool CSelectionParam::operator==(const CSelectionParam& other) const
 {
 	return 
 				selectedIndex == other.selectedIndex &&
@@ -5276,7 +2516,7 @@ bool CSelectionParam::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CSelectionParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CSelectionParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "SelectionParam", modelIndex);
 
@@ -5300,7 +2540,7 @@ bool CSelectionParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int m
 }
 
 
-bool CSelectionParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CSelectionParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant selectedIndexData = model.GetData("selectedIndex", modelIndex);
 	if (!selectedIndexData.isNull()){
@@ -5322,7 +2562,7 @@ bool CSelectionParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model
 }
 
 
-bool CSelectionParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CSelectionParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant selectedIndexData = model.GetData("selectedIndex", modelIndex);
 	if (!selectedIndexData.isNull()){
@@ -5344,7 +2584,7 @@ bool CSelectionParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& mo
 }
 
 
-bool CSelectionParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CSelectionParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (selectedIndex){
 		gqlObject.InsertParam("selectedIndex", QVariant(*selectedIndex));
@@ -5367,7 +2607,7 @@ bool CSelectionParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlO
 }
 
 
-bool CSelectionParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CSelectionParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("selectedIndex") && (gqlObject["selectedIndex"].userType() == QMetaType::Int || gqlObject["selectedIndex"].userType() == QMetaType::UInt || gqlObject["selectedIndex"].userType() == QMetaType::LongLong || gqlObject["selectedIndex"].userType() == QMetaType::ULongLong || gqlObject["selectedIndex"].userType() == QMetaType::Long || gqlObject["selectedIndex"].userType() == QMetaType::Short || gqlObject["selectedIndex"].userType() == QMetaType::ULong || gqlObject["selectedIndex"].userType() == QMetaType::UShort || gqlObject["selectedIndex"].userType() == QMetaType::UChar)){
 		selectedIndex = gqlObject["selectedIndex"].toInt();
@@ -5387,7 +2627,7 @@ bool CSelectionParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 }
 
 
-bool CSelectionParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CSelectionParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("selectedIndex") && (gqlObject["selectedIndex"].userType() == QMetaType::Int || gqlObject["selectedIndex"].userType() == QMetaType::UInt || gqlObject["selectedIndex"].userType() == QMetaType::LongLong || gqlObject["selectedIndex"].userType() == QMetaType::ULongLong || gqlObject["selectedIndex"].userType() == QMetaType::Long || gqlObject["selectedIndex"].userType() == QMetaType::Short || gqlObject["selectedIndex"].userType() == QMetaType::ULong || gqlObject["selectedIndex"].userType() == QMetaType::UShort || gqlObject["selectedIndex"].userType() == QMetaType::UChar)){
 		selectedIndex = gqlObject["selectedIndex"].toInt();
@@ -5407,7 +2647,7 @@ bool CSelectionParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 }
 
 
-bool CSelectionParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CSelectionParam::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (selectedIndex){
 		jsonObject["selectedIndex"] = QJsonValue::fromVariant(*selectedIndex);
@@ -5430,7 +2670,7 @@ bool CSelectionParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CSelectionParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CSelectionParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("selectedIndex") && jsonObject["selectedIndex"].isDouble()){
 		selectedIndex = jsonObject["selectedIndex"].toInt();
@@ -5450,7 +2690,7 @@ bool CSelectionParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CSelectionParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CSelectionParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("selectedIndex") && jsonObject["selectedIndex"].isDouble()){
 		selectedIndex = jsonObject["selectedIndex"].toInt();
@@ -5472,243 +2712,13 @@ bool CSelectionParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CSelectionParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSelectionParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSelectionParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSelectionParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSelectionParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSelectionParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSelectionParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSelectionParam::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSelectionParam::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CSchedulerParam::V1_0::GetVersionId()
+QByteArray CSchedulerParam::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CSchedulerParam::V1_0::operator==(const V1_0& other) const
+bool CSchedulerParam::operator==(const CSchedulerParam& other) const
 {
 	return 
 				startTime == other.startTime &&
@@ -5716,7 +2726,7 @@ bool CSchedulerParam::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CSchedulerParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CSchedulerParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "SchedulerParam", modelIndex);
 
@@ -5733,7 +2743,7 @@ bool CSchedulerParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int m
 }
 
 
-bool CSchedulerParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CSchedulerParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant startTimeData = model.GetData("startTime", modelIndex);
 	if (!startTimeData.isNull()){
@@ -5749,7 +2759,7 @@ bool CSchedulerParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model
 }
 
 
-bool CSchedulerParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CSchedulerParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant startTimeData = model.GetData("startTime", modelIndex);
 	if (!startTimeData.isNull()){
@@ -5765,7 +2775,7 @@ bool CSchedulerParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& mo
 }
 
 
-bool CSchedulerParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CSchedulerParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (startTime){
 		gqlObject.InsertParam("startTime", QVariant(*startTime));
@@ -5781,7 +2791,7 @@ bool CSchedulerParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlO
 }
 
 
-bool CSchedulerParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CSchedulerParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("startTime") && (gqlObject["startTime"].userType() == QMetaType::QString || gqlObject["startTime"].userType() == QMetaType::QByteArray)){
 		startTime = gqlObject["startTime"].toString();
@@ -5795,7 +2805,7 @@ bool CSchedulerParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 }
 
 
-bool CSchedulerParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CSchedulerParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("startTime") && (gqlObject["startTime"].userType() == QMetaType::QString || gqlObject["startTime"].userType() == QMetaType::QByteArray)){
 		startTime = gqlObject["startTime"].toString();
@@ -5809,7 +2819,7 @@ bool CSchedulerParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 }
 
 
-bool CSchedulerParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CSchedulerParam::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (startTime){
 		jsonObject["startTime"] = QJsonValue::fromVariant(*startTime);
@@ -5825,7 +2835,7 @@ bool CSchedulerParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CSchedulerParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CSchedulerParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("startTime") && jsonObject["startTime"].isString()){
 		startTime = jsonObject["startTime"].toString();
@@ -5839,7 +2849,7 @@ bool CSchedulerParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CSchedulerParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CSchedulerParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("startTime") && jsonObject["startTime"].isString()){
 		startTime = jsonObject["startTime"].toString();
@@ -5855,243 +2865,13 @@ bool CSchedulerParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CSchedulerParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSchedulerParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSchedulerParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSchedulerParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSchedulerParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSchedulerParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSchedulerParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSchedulerParam::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSchedulerParam::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CBackupSettings::V1_0::GetVersionId()
+QByteArray CBackupSettings::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CBackupSettings::V1_0::operator==(const V1_0& other) const
+bool CBackupSettings::operator==(const CBackupSettings& other) const
 {
 	return 
 				schedulerParam == other.schedulerParam &&
@@ -6099,7 +2879,7 @@ bool CBackupSettings::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CBackupSettings::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CBackupSettings::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "BackupSettings", modelIndex);
 
@@ -6123,7 +2903,7 @@ bool CBackupSettings::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int m
 }
 
 
-bool CBackupSettings::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CBackupSettings::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* schedulerParamDataModelPtr = model.GetTreeItemModel("schedulerParam", modelIndex);
 	if (schedulerParamDataModelPtr != nullptr){
@@ -6145,7 +2925,7 @@ bool CBackupSettings::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model
 }
 
 
-bool CBackupSettings::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CBackupSettings::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* schedulerParamDataModelPtr = model.GetTreeItemModel("schedulerParam", modelIndex);
 	if (schedulerParamDataModelPtr != nullptr){
@@ -6167,7 +2947,7 @@ bool CBackupSettings::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& mo
 }
 
 
-bool CBackupSettings::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CBackupSettings::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (schedulerParam){
 		::imtgql::CGqlParamObject schedulerParamGqlObject;
@@ -6190,7 +2970,7 @@ bool CBackupSettings::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlO
 }
 
 
-bool CBackupSettings::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CBackupSettings::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("schedulerParam") && (gqlObject.GetParamArgumentObjectPtr("schedulerParam") != nullptr)){
 		schedulerParam = CSchedulerParam::V1_0();
@@ -6210,7 +2990,7 @@ bool CBackupSettings::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 }
 
 
-bool CBackupSettings::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CBackupSettings::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("schedulerParam") && (gqlObject.GetParamArgumentObjectPtr("schedulerParam") != nullptr)){
 		schedulerParam = CSchedulerParam::V1_0();
@@ -6230,7 +3010,7 @@ bool CBackupSettings::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 }
 
 
-bool CBackupSettings::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CBackupSettings::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (schedulerParam){
 		QJsonObject schedulerParamJsonObject;
@@ -6253,7 +3033,7 @@ bool CBackupSettings::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CBackupSettings::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CBackupSettings::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("schedulerParam") && jsonObject["schedulerParam"].isObject()){
 		schedulerParam = CSchedulerParam::V1_0();
@@ -6273,7 +3053,7 @@ bool CBackupSettings::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CBackupSettings::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CBackupSettings::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("schedulerParam") && jsonObject["schedulerParam"].isObject()){
 		schedulerParam = CSchedulerParam::V1_0();
@@ -6295,243 +3075,13 @@ bool CBackupSettings::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CBackupSettings::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CBackupSettings::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CBackupSettings::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CBackupSettings::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CBackupSettings::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CBackupSettings::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CBackupSettings::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CBackupSettings::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CBackupSettings::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CDatabaseAccessSettings::V1_0::GetVersionId()
+QByteArray CDatabaseAccessSettings::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CDatabaseAccessSettings::V1_0::operator==(const V1_0& other) const
+bool CDatabaseAccessSettings::operator==(const CDatabaseAccessSettings& other) const
 {
 	return 
 				dbName == other.dbName &&
@@ -6543,7 +3093,7 @@ bool CDatabaseAccessSettings::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CDatabaseAccessSettings::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CDatabaseAccessSettings::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "DatabaseAccessSettings", modelIndex);
 
@@ -6576,7 +3126,7 @@ bool CDatabaseAccessSettings::V1_0::WriteToModel(::imtbase::CTreeItemModel& mode
 }
 
 
-bool CDatabaseAccessSettings::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CDatabaseAccessSettings::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant dbNameData = model.GetData("dbName", modelIndex);
 	if (!dbNameData.isNull()){
@@ -6612,7 +3162,7 @@ bool CDatabaseAccessSettings::V1_0::ReadFromModel(const ::imtbase::CTreeItemMode
 }
 
 
-bool CDatabaseAccessSettings::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CDatabaseAccessSettings::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant dbNameData = model.GetData("dbName", modelIndex);
 	if (!dbNameData.isNull()){
@@ -6648,7 +3198,7 @@ bool CDatabaseAccessSettings::V1_0::OptReadFromModel(const ::imtbase::CTreeItemM
 }
 
 
-bool CDatabaseAccessSettings::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CDatabaseAccessSettings::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (dbName){
 		gqlObject.InsertParam("dbName", QVariant(*dbName));
@@ -6680,7 +3230,7 @@ bool CDatabaseAccessSettings::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObje
 }
 
 
-bool CDatabaseAccessSettings::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CDatabaseAccessSettings::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("dbName") && (gqlObject["dbName"].userType() == QMetaType::QString || gqlObject["dbName"].userType() == QMetaType::QByteArray)){
 		dbName = gqlObject["dbName"].toString();
@@ -6710,7 +3260,7 @@ bool CDatabaseAccessSettings::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlPa
 }
 
 
-bool CDatabaseAccessSettings::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CDatabaseAccessSettings::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("dbName") && (gqlObject["dbName"].userType() == QMetaType::QString || gqlObject["dbName"].userType() == QMetaType::QByteArray)){
 		dbName = gqlObject["dbName"].toString();
@@ -6740,7 +3290,7 @@ bool CDatabaseAccessSettings::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGq
 }
 
 
-bool CDatabaseAccessSettings::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CDatabaseAccessSettings::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (dbName){
 		jsonObject["dbName"] = QJsonValue::fromVariant(*dbName);
@@ -6772,7 +3322,7 @@ bool CDatabaseAccessSettings::V1_0::WriteToJsonObject(QJsonObject& jsonObject) c
 }
 
 
-bool CDatabaseAccessSettings::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CDatabaseAccessSettings::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("dbName") && jsonObject["dbName"].isString()){
 		dbName = jsonObject["dbName"].toString();
@@ -6802,7 +3352,7 @@ bool CDatabaseAccessSettings::V1_0::ReadFromJsonObject(const QJsonObject& jsonOb
 }
 
 
-bool CDatabaseAccessSettings::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CDatabaseAccessSettings::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("dbName") && jsonObject["dbName"].isString()){
 		dbName = jsonObject["dbName"].toString();
@@ -6834,243 +3384,13 @@ bool CDatabaseAccessSettings::V1_0::OptReadFromJsonObject(const QJsonObject& jso
 
 // serialize methods
 
-bool CDatabaseAccessSettings::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CDatabaseAccessSettings::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CDatabaseAccessSettings::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CDatabaseAccessSettings::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CDatabaseAccessSettings::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CDatabaseAccessSettings::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CDatabaseAccessSettings::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CDatabaseAccessSettings::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CDatabaseAccessSettings::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CFileNameParam::V1_0::GetVersionId()
+QByteArray CFileNameParam::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CFileNameParam::V1_0::operator==(const V1_0& other) const
+bool CFileNameParam::operator==(const CFileNameParam& other) const
 {
 	return 
 				pathType == other.pathType &&
@@ -7078,7 +3398,7 @@ bool CFileNameParam::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CFileNameParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CFileNameParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "FileNameParam", modelIndex);
 
@@ -7095,7 +3415,7 @@ bool CFileNameParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mo
 }
 
 
-bool CFileNameParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CFileNameParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant pathTypeData = model.GetData("pathType", modelIndex);
 	if (!pathTypeData.isNull()){
@@ -7111,7 +3431,7 @@ bool CFileNameParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model,
 }
 
 
-bool CFileNameParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CFileNameParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant pathTypeData = model.GetData("pathType", modelIndex);
 	if (!pathTypeData.isNull()){
@@ -7127,7 +3447,7 @@ bool CFileNameParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& mod
 }
 
 
-bool CFileNameParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CFileNameParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (pathType){
 		gqlObject.InsertParam("pathType", QVariant(*pathType));
@@ -7143,7 +3463,7 @@ bool CFileNameParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlOb
 }
 
 
-bool CFileNameParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CFileNameParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("pathType") && (gqlObject["pathType"].userType() == QMetaType::Int || gqlObject["pathType"].userType() == QMetaType::UInt || gqlObject["pathType"].userType() == QMetaType::LongLong || gqlObject["pathType"].userType() == QMetaType::ULongLong || gqlObject["pathType"].userType() == QMetaType::Long || gqlObject["pathType"].userType() == QMetaType::Short || gqlObject["pathType"].userType() == QMetaType::ULong || gqlObject["pathType"].userType() == QMetaType::UShort || gqlObject["pathType"].userType() == QMetaType::UChar)){
 		pathType = gqlObject["pathType"].toInt();
@@ -7157,7 +3477,7 @@ bool CFileNameParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject
 }
 
 
-bool CFileNameParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CFileNameParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("pathType") && (gqlObject["pathType"].userType() == QMetaType::Int || gqlObject["pathType"].userType() == QMetaType::UInt || gqlObject["pathType"].userType() == QMetaType::LongLong || gqlObject["pathType"].userType() == QMetaType::ULongLong || gqlObject["pathType"].userType() == QMetaType::Long || gqlObject["pathType"].userType() == QMetaType::Short || gqlObject["pathType"].userType() == QMetaType::ULong || gqlObject["pathType"].userType() == QMetaType::UShort || gqlObject["pathType"].userType() == QMetaType::UChar)){
 		pathType = gqlObject["pathType"].toInt();
@@ -7171,7 +3491,7 @@ bool CFileNameParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObj
 }
 
 
-bool CFileNameParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CFileNameParam::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (pathType){
 		jsonObject["pathType"] = QJsonValue::fromVariant(*pathType);
@@ -7187,7 +3507,7 @@ bool CFileNameParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CFileNameParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CFileNameParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("pathType") && jsonObject["pathType"].isDouble()){
 		pathType = jsonObject["pathType"].toInt();
@@ -7201,7 +3521,7 @@ bool CFileNameParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CFileNameParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CFileNameParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("pathType") && jsonObject["pathType"].isDouble()){
 		pathType = jsonObject["pathType"].toInt();
@@ -7217,243 +3537,13 @@ bool CFileNameParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CFileNameParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFileNameParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFileNameParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFileNameParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFileNameParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFileNameParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFileNameParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFileNameParam::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFileNameParam::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CParamsSet::V1_0::GetVersionId()
+QByteArray CParamsSet::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CParamsSet::V1_0::operator==(const V1_0& other) const
+bool CParamsSet::operator==(const CParamsSet& other) const
 {
 	return 
 				paramIds == other.paramIds &&
@@ -7464,7 +3554,7 @@ bool CParamsSet::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CParamsSet::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CParamsSet::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "ParamsSet", modelIndex);
 
@@ -7518,7 +3608,7 @@ bool CParamsSet::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelI
 }
 
 
-bool CParamsSet::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CParamsSet::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* paramIdsModel = model.GetTreeItemModel("paramIds", modelIndex);
 	if (paramIdsModel != nullptr){
@@ -7584,7 +3674,7 @@ bool CParamsSet::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int
 }
 
 
-bool CParamsSet::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CParamsSet::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* paramIdsModel = model.GetTreeItemModel("paramIds", modelIndex);
 	if (paramIdsModel != nullptr){
@@ -7650,7 +3740,7 @@ bool CParamsSet::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, 
 }
 
 
-bool CParamsSet::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CParamsSet::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (paramIds){
 		QVariantList paramIdsDataObjectList;
@@ -7698,7 +3788,7 @@ bool CParamsSet::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject
 }
 
 
-bool CParamsSet::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CParamsSet::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("paramIds")){
 		paramIds.emplace();
@@ -7774,7 +3864,7 @@ bool CParamsSet::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 }
 
 
-bool CParamsSet::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CParamsSet::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("paramIds")){
 		paramIds.emplace();
@@ -7850,7 +3940,7 @@ bool CParamsSet::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 }
 
 
-bool CParamsSet::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CParamsSet::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (paramIds){
 		QJsonArray newParamIdsArray;
@@ -7898,7 +3988,7 @@ bool CParamsSet::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CParamsSet::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CParamsSet::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("paramIds") && jsonObject["paramIds"].isArray()){
 		const QJsonArray paramIdsJsonArray = jsonObject["paramIds"].toArray();
@@ -7954,7 +4044,7 @@ bool CParamsSet::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CParamsSet::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CParamsSet::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("paramIds") && jsonObject["paramIds"].isArray()){
 		const QJsonArray paramIdsJsonArray = jsonObject["paramIds"].toArray();
@@ -8012,243 +4102,13 @@ bool CParamsSet::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CParamsSet::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CParamsSet::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CParamsSet::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CParamsSet::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CParamsSet::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CParamsSet::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CParamsSet::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CParamsSet::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CParamsSet::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CMimeType::V1_0::GetVersionId()
+QByteArray CMimeType::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CMimeType::V1_0::operator==(const V1_0& other) const
+bool CMimeType::operator==(const CMimeType& other) const
 {
 	return 
 				type == other.type &&
@@ -8259,7 +4119,7 @@ bool CMimeType::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CMimeType::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CMimeType::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "MimeType", modelIndex);
 
@@ -8304,7 +4164,7 @@ bool CMimeType::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 }
 
 
-bool CMimeType::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CMimeType::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant typeData = model.GetData("type", modelIndex);
 	if (typeData.isNull()){
@@ -8355,7 +4215,7 @@ bool CMimeType::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 }
 
 
-bool CMimeType::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CMimeType::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant typeData = model.GetData("type", modelIndex);
 	if (!typeData.isNull()){
@@ -8400,7 +4260,7 @@ bool CMimeType::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 }
 
 
-bool CMimeType::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CMimeType::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!type){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "type").toLocal8Bit().constData();)
@@ -8442,7 +4302,7 @@ bool CMimeType::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 }
 
 
-bool CMimeType::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CMimeType::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("type") || (gqlObject["type"].userType() != QMetaType::QString && gqlObject["type"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "type").toLocal8Bit().constData();)
@@ -8494,7 +4354,7 @@ bool CMimeType::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 }
 
 
-bool CMimeType::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CMimeType::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("type") && (gqlObject["type"].userType() == QMetaType::QString || gqlObject["type"].userType() == QMetaType::QByteArray)){
 		type = gqlObject["type"].toString();
@@ -8540,7 +4400,7 @@ bool CMimeType::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 }
 
 
-bool CMimeType::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CMimeType::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!type){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "type").toLocal8Bit().constData();)
@@ -8582,7 +4442,7 @@ bool CMimeType::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CMimeType::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CMimeType::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("type") || ! jsonObject["type"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "type").toLocal8Bit().constData();)
@@ -8626,7 +4486,7 @@ bool CMimeType::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CMimeType::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CMimeType::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("type") && jsonObject["type"].isString()){
 		type = jsonObject["type"].toString();
@@ -8666,238 +4526,7 @@ bool CMimeType::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CMimeType::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CMimeType::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CMimeType::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CMimeType::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CMimeType::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CMimeType::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CMimeType::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CMimeType::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CMimeType::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
 CTimeRangeObject::CTimeRangeObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CTimeRangeObject::beginChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CTimeRangeObject::endChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -8906,8 +4535,8 @@ CTimeRangeObject::CTimeRangeObject(QObject* parent): ::imtbase::CItemModelBase(p
 
 QVariant CTimeRangeObject::GetBegin()
 {
-	if (Version_1_0 && Version_1_0->Begin){
-		return Version_1_0->Begin.value();
+	if (Begin){
+		return Begin.value();
 	}
 
 	return QVariant();
@@ -8916,25 +4545,22 @@ QVariant CTimeRangeObject::GetBegin()
 
 void CTimeRangeObject::SetBegin(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->Begin = v.value<QString>();
+	Begin = v.value<QString>();
 	beginChanged();
 }
 
 
 bool CTimeRangeObject::hasBegin()
 {
-	 return Version_1_0 && Version_1_0->Begin.HasValue();
+	 return Begin.HasValue();
 }
 
 
 QVariant CTimeRangeObject::GetEnd()
 {
-	if (Version_1_0 && Version_1_0->End){
-		return Version_1_0->End.value();
+	if (End){
+		return End.value();
 	}
 
 	return QVariant();
@@ -8943,18 +4569,15 @@ QVariant CTimeRangeObject::GetEnd()
 
 void CTimeRangeObject::SetEnd(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->End = v.value<QString>();
+	End = v.value<QString>();
 	endChanged();
 }
 
 
 bool CTimeRangeObject::hasEnd()
 {
-	 return Version_1_0 && Version_1_0->End.HasValue();
+	 return End.HasValue();
 }
 
 
@@ -9043,89 +4666,88 @@ QVariantMap CTimeRangeObjectList::get(int row) const
 }
 
 
-void CTimeRangeObjectList::append(sdl::imtbase::ImtBaseTypes::CTimeRangeObject* item)
+void CTimeRangeObjectList::append(sdl::V1_0::imtbase::CTimeRangeObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::imtbase::ImtBaseTypes::CTimeRangeObjectList* sdl::imtbase::ImtBaseTypes::CTimeRangeObjectList::copyMe()
+sdl::V1_0::imtbase::CTimeRangeObjectList* sdl::V1_0::imtbase::CTimeRangeObjectList::copyMe()
 {
-	sdl::imtbase::ImtBaseTypes::CTimeRangeObjectList* retVal = new sdl::imtbase::ImtBaseTypes::CTimeRangeObjectList();
+	sdl::V1_0::imtbase::CTimeRangeObjectList* retVal = new sdl::V1_0::imtbase::CTimeRangeObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CTimeRangeObjectList::toJson()
+QString sdl::V1_0::imtbase::CTimeRangeObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CTimeRangeObjectList::toGraphQL()
+QString sdl::V1_0::imtbase::CTimeRangeObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CTimeRangeObjectList::addElement(sdl::imtbase::ImtBaseTypes::CTimeRangeObject* item)
+void sdl::V1_0::imtbase::CTimeRangeObjectList::addElement(sdl::V1_0::imtbase::CTimeRangeObject* item)
 {
 	append(item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CTimeRangeObjectList::removeElement(int index)
+void sdl::V1_0::imtbase::CTimeRangeObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::imtbase::ImtBaseTypes::CTimeRangeObjectList::isEqualWithModel(sdl::imtbase::ImtBaseTypes::CTimeRangeObjectList* otherModelPtr)
+bool sdl::V1_0::imtbase::CTimeRangeObjectList::isEqualWithModel(sdl::V1_0::imtbase::CTimeRangeObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CTimeRangeObjectList::insert(int index, sdl::imtbase::ImtBaseTypes::CTimeRangeObject* item)
+void sdl::V1_0::imtbase::CTimeRangeObjectList::insert(int index, sdl::V1_0::imtbase::CTimeRangeObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CTimeRangeObjectList::remove(int index)
+void sdl::V1_0::imtbase::CTimeRangeObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CTimeRangeObjectList::clear()
+void sdl::V1_0::imtbase::CTimeRangeObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::imtbase::ImtBaseTypes::CTimeRangeObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CTimeRangeObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CTimeRangeObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::imtbase::CTimeRangeObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_begin"){
-		return QVariant::fromValue(Version_1_0->at(index)->Begin.value());
+		return QVariant::fromValue(at(index)->Begin.value());
 	}
 	if (nameId == "m_end"){
-		return QVariant::fromValue(Version_1_0->at(index)->End.value());
+		return QVariant::fromValue(at(index)->End.value());
 	}
 
 	return QVariant();
 }
 CSdlSizeObject::CSdlSizeObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CSdlSizeObject::widthChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CSdlSizeObject::heightChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -9134,8 +4756,8 @@ CSdlSizeObject::CSdlSizeObject(QObject* parent): ::imtbase::CItemModelBase(paren
 
 QVariant CSdlSizeObject::GetWidth()
 {
-	if (Version_1_0 && Version_1_0->width){
-		return Version_1_0->width.value();
+	if (width){
+		return width.value();
 	}
 
 	return QVariant();
@@ -9144,25 +4766,22 @@ QVariant CSdlSizeObject::GetWidth()
 
 void CSdlSizeObject::SetWidth(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->width = v.value<double>();
+	width = v.value<double>();
 	widthChanged();
 }
 
 
 bool CSdlSizeObject::hasWidth()
 {
-	 return Version_1_0 && Version_1_0->width.HasValue();
+	 return width.HasValue();
 }
 
 
 QVariant CSdlSizeObject::GetHeight()
 {
-	if (Version_1_0 && Version_1_0->height){
-		return Version_1_0->height.value();
+	if (height){
+		return height.value();
 	}
 
 	return QVariant();
@@ -9171,18 +4790,15 @@ QVariant CSdlSizeObject::GetHeight()
 
 void CSdlSizeObject::SetHeight(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->height = v.value<double>();
+	height = v.value<double>();
 	heightChanged();
 }
 
 
 bool CSdlSizeObject::hasHeight()
 {
-	 return Version_1_0 && Version_1_0->height.HasValue();
+	 return height.HasValue();
 }
 
 
@@ -9271,89 +4887,88 @@ QVariantMap CSdlSizeObjectList::get(int row) const
 }
 
 
-void CSdlSizeObjectList::append(sdl::imtbase::ImtBaseTypes::CSdlSizeObject* item)
+void CSdlSizeObjectList::append(sdl::V1_0::imtbase::CSdlSizeObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::imtbase::ImtBaseTypes::CSdlSizeObjectList* sdl::imtbase::ImtBaseTypes::CSdlSizeObjectList::copyMe()
+sdl::V1_0::imtbase::CSdlSizeObjectList* sdl::V1_0::imtbase::CSdlSizeObjectList::copyMe()
 {
-	sdl::imtbase::ImtBaseTypes::CSdlSizeObjectList* retVal = new sdl::imtbase::ImtBaseTypes::CSdlSizeObjectList();
+	sdl::V1_0::imtbase::CSdlSizeObjectList* retVal = new sdl::V1_0::imtbase::CSdlSizeObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CSdlSizeObjectList::toJson()
+QString sdl::V1_0::imtbase::CSdlSizeObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CSdlSizeObjectList::toGraphQL()
+QString sdl::V1_0::imtbase::CSdlSizeObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CSdlSizeObjectList::addElement(sdl::imtbase::ImtBaseTypes::CSdlSizeObject* item)
+void sdl::V1_0::imtbase::CSdlSizeObjectList::addElement(sdl::V1_0::imtbase::CSdlSizeObject* item)
 {
 	append(item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CSdlSizeObjectList::removeElement(int index)
+void sdl::V1_0::imtbase::CSdlSizeObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::imtbase::ImtBaseTypes::CSdlSizeObjectList::isEqualWithModel(sdl::imtbase::ImtBaseTypes::CSdlSizeObjectList* otherModelPtr)
+bool sdl::V1_0::imtbase::CSdlSizeObjectList::isEqualWithModel(sdl::V1_0::imtbase::CSdlSizeObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CSdlSizeObjectList::insert(int index, sdl::imtbase::ImtBaseTypes::CSdlSizeObject* item)
+void sdl::V1_0::imtbase::CSdlSizeObjectList::insert(int index, sdl::V1_0::imtbase::CSdlSizeObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CSdlSizeObjectList::remove(int index)
+void sdl::V1_0::imtbase::CSdlSizeObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CSdlSizeObjectList::clear()
+void sdl::V1_0::imtbase::CSdlSizeObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::imtbase::ImtBaseTypes::CSdlSizeObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CSdlSizeObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CSdlSizeObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::imtbase::CSdlSizeObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_width"){
-		return QVariant::fromValue(Version_1_0->at(index)->width.value());
+		return QVariant::fromValue(at(index)->width.value());
 	}
 	if (nameId == "m_height"){
-		return QVariant::fromValue(Version_1_0->at(index)->height.value());
+		return QVariant::fromValue(at(index)->height.value());
 	}
 
 	return QVariant();
 }
 CSdlPointObject::CSdlPointObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CSdlPointObject::xChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CSdlPointObject::yChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -9362,8 +4977,8 @@ CSdlPointObject::CSdlPointObject(QObject* parent): ::imtbase::CItemModelBase(par
 
 QVariant CSdlPointObject::GetX()
 {
-	if (Version_1_0 && Version_1_0->x){
-		return Version_1_0->x.value();
+	if (x){
+		return x.value();
 	}
 
 	return QVariant();
@@ -9372,25 +4987,22 @@ QVariant CSdlPointObject::GetX()
 
 void CSdlPointObject::SetX(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->x = v.value<double>();
+	x = v.value<double>();
 	xChanged();
 }
 
 
 bool CSdlPointObject::hasX()
 {
-	 return Version_1_0 && Version_1_0->x.HasValue();
+	 return x.HasValue();
 }
 
 
 QVariant CSdlPointObject::GetY()
 {
-	if (Version_1_0 && Version_1_0->y){
-		return Version_1_0->y.value();
+	if (y){
+		return y.value();
 	}
 
 	return QVariant();
@@ -9399,18 +5011,15 @@ QVariant CSdlPointObject::GetY()
 
 void CSdlPointObject::SetY(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->y = v.value<double>();
+	y = v.value<double>();
 	yChanged();
 }
 
 
 bool CSdlPointObject::hasY()
 {
-	 return Version_1_0 && Version_1_0->y.HasValue();
+	 return y.HasValue();
 }
 
 
@@ -9499,89 +5108,88 @@ QVariantMap CSdlPointObjectList::get(int row) const
 }
 
 
-void CSdlPointObjectList::append(sdl::imtbase::ImtBaseTypes::CSdlPointObject* item)
+void CSdlPointObjectList::append(sdl::V1_0::imtbase::CSdlPointObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::imtbase::ImtBaseTypes::CSdlPointObjectList* sdl::imtbase::ImtBaseTypes::CSdlPointObjectList::copyMe()
+sdl::V1_0::imtbase::CSdlPointObjectList* sdl::V1_0::imtbase::CSdlPointObjectList::copyMe()
 {
-	sdl::imtbase::ImtBaseTypes::CSdlPointObjectList* retVal = new sdl::imtbase::ImtBaseTypes::CSdlPointObjectList();
+	sdl::V1_0::imtbase::CSdlPointObjectList* retVal = new sdl::V1_0::imtbase::CSdlPointObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CSdlPointObjectList::toJson()
+QString sdl::V1_0::imtbase::CSdlPointObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CSdlPointObjectList::toGraphQL()
+QString sdl::V1_0::imtbase::CSdlPointObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CSdlPointObjectList::addElement(sdl::imtbase::ImtBaseTypes::CSdlPointObject* item)
+void sdl::V1_0::imtbase::CSdlPointObjectList::addElement(sdl::V1_0::imtbase::CSdlPointObject* item)
 {
 	append(item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CSdlPointObjectList::removeElement(int index)
+void sdl::V1_0::imtbase::CSdlPointObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::imtbase::ImtBaseTypes::CSdlPointObjectList::isEqualWithModel(sdl::imtbase::ImtBaseTypes::CSdlPointObjectList* otherModelPtr)
+bool sdl::V1_0::imtbase::CSdlPointObjectList::isEqualWithModel(sdl::V1_0::imtbase::CSdlPointObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CSdlPointObjectList::insert(int index, sdl::imtbase::ImtBaseTypes::CSdlPointObject* item)
+void sdl::V1_0::imtbase::CSdlPointObjectList::insert(int index, sdl::V1_0::imtbase::CSdlPointObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CSdlPointObjectList::remove(int index)
+void sdl::V1_0::imtbase::CSdlPointObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CSdlPointObjectList::clear()
+void sdl::V1_0::imtbase::CSdlPointObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::imtbase::ImtBaseTypes::CSdlPointObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CSdlPointObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CSdlPointObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::imtbase::CSdlPointObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_x"){
-		return QVariant::fromValue(Version_1_0->at(index)->x.value());
+		return QVariant::fromValue(at(index)->x.value());
 	}
 	if (nameId == "m_y"){
-		return QVariant::fromValue(Version_1_0->at(index)->y.value());
+		return QVariant::fromValue(at(index)->y.value());
 	}
 
 	return QVariant();
 }
 CParamTypeIdsObject::CParamTypeIdsObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CParamTypeIdsObject::urlParamChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CParamTypeIdsObject::idParamChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -9602,8 +5210,8 @@ CParamTypeIdsObject::CParamTypeIdsObject(QObject* parent): ::imtbase::CItemModel
 
 QVariant CParamTypeIdsObject::GetUrlParam()
 {
-	if (Version_1_0 && Version_1_0->UrlParam){
-		return Version_1_0->UrlParam.value();
+	if (UrlParam){
+		return UrlParam.value();
 	}
 
 	return QVariant();
@@ -9612,25 +5220,22 @@ QVariant CParamTypeIdsObject::GetUrlParam()
 
 void CParamTypeIdsObject::SetUrlParam(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->UrlParam = v.value<QString>().toUtf8();
+	UrlParam = v.value<QString>().toUtf8();
 	urlParamChanged();
 }
 
 
 bool CParamTypeIdsObject::hasUrlParam()
 {
-	 return Version_1_0 && Version_1_0->UrlParam.HasValue();
+	 return UrlParam.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetIdParam()
 {
-	if (Version_1_0 && Version_1_0->IdParam){
-		return Version_1_0->IdParam.value();
+	if (IdParam){
+		return IdParam.value();
 	}
 
 	return QVariant();
@@ -9639,25 +5244,22 @@ QVariant CParamTypeIdsObject::GetIdParam()
 
 void CParamTypeIdsObject::SetIdParam(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->IdParam = v.value<QString>().toUtf8();
+	IdParam = v.value<QString>().toUtf8();
 	idParamChanged();
 }
 
 
 bool CParamTypeIdsObject::hasIdParam()
 {
-	 return Version_1_0 && Version_1_0->IdParam.HasValue();
+	 return IdParam.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetTextParam()
 {
-	if (Version_1_0 && Version_1_0->TextParam){
-		return Version_1_0->TextParam.value();
+	if (TextParam){
+		return TextParam.value();
 	}
 
 	return QVariant();
@@ -9666,25 +5268,22 @@ QVariant CParamTypeIdsObject::GetTextParam()
 
 void CParamTypeIdsObject::SetTextParam(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->TextParam = v.value<QString>().toUtf8();
+	TextParam = v.value<QString>().toUtf8();
 	textParamChanged();
 }
 
 
 bool CParamTypeIdsObject::hasTextParam()
 {
-	 return Version_1_0 && Version_1_0->TextParam.HasValue();
+	 return TextParam.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetTextView()
 {
-	if (Version_1_0 && Version_1_0->TextView){
-		return Version_1_0->TextView.value();
+	if (TextView){
+		return TextView.value();
 	}
 
 	return QVariant();
@@ -9693,25 +5292,22 @@ QVariant CParamTypeIdsObject::GetTextView()
 
 void CParamTypeIdsObject::SetTextView(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->TextView = v.value<QString>().toUtf8();
+	TextView = v.value<QString>().toUtf8();
 	textViewChanged();
 }
 
 
 bool CParamTypeIdsObject::hasTextView()
 {
-	 return Version_1_0 && Version_1_0->TextView.HasValue();
+	 return TextView.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetSelectionParam()
 {
-	if (Version_1_0 && Version_1_0->SelectionParam){
-		return Version_1_0->SelectionParam.value();
+	if (SelectionParam){
+		return SelectionParam.value();
 	}
 
 	return QVariant();
@@ -9720,25 +5316,22 @@ QVariant CParamTypeIdsObject::GetSelectionParam()
 
 void CParamTypeIdsObject::SetSelectionParam(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->SelectionParam = v.value<QString>().toUtf8();
+	SelectionParam = v.value<QString>().toUtf8();
 	selectionParamChanged();
 }
 
 
 bool CParamTypeIdsObject::hasSelectionParam()
 {
-	 return Version_1_0 && Version_1_0->SelectionParam.HasValue();
+	 return SelectionParam.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetSchedulerParam()
 {
-	if (Version_1_0 && Version_1_0->SchedulerParam){
-		return Version_1_0->SchedulerParam.value();
+	if (SchedulerParam){
+		return SchedulerParam.value();
 	}
 
 	return QVariant();
@@ -9747,25 +5340,22 @@ QVariant CParamTypeIdsObject::GetSchedulerParam()
 
 void CParamTypeIdsObject::SetSchedulerParam(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->SchedulerParam = v.value<QString>().toUtf8();
+	SchedulerParam = v.value<QString>().toUtf8();
 	schedulerParamChanged();
 }
 
 
 bool CParamTypeIdsObject::hasSchedulerParam()
 {
-	 return Version_1_0 && Version_1_0->SchedulerParam.HasValue();
+	 return SchedulerParam.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetBackupSettings()
 {
-	if (Version_1_0 && Version_1_0->BackupSettings){
-		return Version_1_0->BackupSettings.value();
+	if (BackupSettings){
+		return BackupSettings.value();
 	}
 
 	return QVariant();
@@ -9774,25 +5364,22 @@ QVariant CParamTypeIdsObject::GetBackupSettings()
 
 void CParamTypeIdsObject::SetBackupSettings(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->BackupSettings = v.value<QString>().toUtf8();
+	BackupSettings = v.value<QString>().toUtf8();
 	backupSettingsChanged();
 }
 
 
 bool CParamTypeIdsObject::hasBackupSettings()
 {
-	 return Version_1_0 && Version_1_0->BackupSettings.HasValue();
+	 return BackupSettings.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetDatabaseAccessSettings()
 {
-	if (Version_1_0 && Version_1_0->DatabaseAccessSettings){
-		return Version_1_0->DatabaseAccessSettings.value();
+	if (DatabaseAccessSettings){
+		return DatabaseAccessSettings.value();
 	}
 
 	return QVariant();
@@ -9801,25 +5388,22 @@ QVariant CParamTypeIdsObject::GetDatabaseAccessSettings()
 
 void CParamTypeIdsObject::SetDatabaseAccessSettings(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->DatabaseAccessSettings = v.value<QString>().toUtf8();
+	DatabaseAccessSettings = v.value<QString>().toUtf8();
 	databaseAccessSettingsChanged();
 }
 
 
 bool CParamTypeIdsObject::hasDatabaseAccessSettings()
 {
-	 return Version_1_0 && Version_1_0->DatabaseAccessSettings.HasValue();
+	 return DatabaseAccessSettings.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetParamsSet()
 {
-	if (Version_1_0 && Version_1_0->ParamsSet){
-		return Version_1_0->ParamsSet.value();
+	if (ParamsSet){
+		return ParamsSet.value();
 	}
 
 	return QVariant();
@@ -9828,25 +5412,22 @@ QVariant CParamTypeIdsObject::GetParamsSet()
 
 void CParamTypeIdsObject::SetParamsSet(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->ParamsSet = v.value<QString>().toUtf8();
+	ParamsSet = v.value<QString>().toUtf8();
 	paramsSetChanged();
 }
 
 
 bool CParamTypeIdsObject::hasParamsSet()
 {
-	 return Version_1_0 && Version_1_0->ParamsSet.HasValue();
+	 return ParamsSet.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetFileNameParam()
 {
-	if (Version_1_0 && Version_1_0->FileNameParam){
-		return Version_1_0->FileNameParam.value();
+	if (FileNameParam){
+		return FileNameParam.value();
 	}
 
 	return QVariant();
@@ -9855,25 +5436,22 @@ QVariant CParamTypeIdsObject::GetFileNameParam()
 
 void CParamTypeIdsObject::SetFileNameParam(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->FileNameParam = v.value<QString>().toUtf8();
+	FileNameParam = v.value<QString>().toUtf8();
 	fileNameParamChanged();
 }
 
 
 bool CParamTypeIdsObject::hasFileNameParam()
 {
-	 return Version_1_0 && Version_1_0->FileNameParam.HasValue();
+	 return FileNameParam.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetIntegerParam()
 {
-	if (Version_1_0 && Version_1_0->IntegerParam){
-		return Version_1_0->IntegerParam.value();
+	if (IntegerParam){
+		return IntegerParam.value();
 	}
 
 	return QVariant();
@@ -9882,25 +5460,22 @@ QVariant CParamTypeIdsObject::GetIntegerParam()
 
 void CParamTypeIdsObject::SetIntegerParam(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->IntegerParam = v.value<QString>().toUtf8();
+	IntegerParam = v.value<QString>().toUtf8();
 	integerParamChanged();
 }
 
 
 bool CParamTypeIdsObject::hasIntegerParam()
 {
-	 return Version_1_0 && Version_1_0->IntegerParam.HasValue();
+	 return IntegerParam.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetDoubleParam()
 {
-	if (Version_1_0 && Version_1_0->DoubleParam){
-		return Version_1_0->DoubleParam.value();
+	if (DoubleParam){
+		return DoubleParam.value();
 	}
 
 	return QVariant();
@@ -9909,25 +5484,22 @@ QVariant CParamTypeIdsObject::GetDoubleParam()
 
 void CParamTypeIdsObject::SetDoubleParam(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->DoubleParam = v.value<QString>().toUtf8();
+	DoubleParam = v.value<QString>().toUtf8();
 	doubleParamChanged();
 }
 
 
 bool CParamTypeIdsObject::hasDoubleParam()
 {
-	 return Version_1_0 && Version_1_0->DoubleParam.HasValue();
+	 return DoubleParam.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetPasswordParam()
 {
-	if (Version_1_0 && Version_1_0->PasswordParam){
-		return Version_1_0->PasswordParam.value();
+	if (PasswordParam){
+		return PasswordParam.value();
 	}
 
 	return QVariant();
@@ -9936,25 +5508,22 @@ QVariant CParamTypeIdsObject::GetPasswordParam()
 
 void CParamTypeIdsObject::SetPasswordParam(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->PasswordParam = v.value<QString>().toUtf8();
+	PasswordParam = v.value<QString>().toUtf8();
 	passwordParamChanged();
 }
 
 
 bool CParamTypeIdsObject::hasPasswordParam()
 {
-	 return Version_1_0 && Version_1_0->PasswordParam.HasValue();
+	 return PasswordParam.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetEnableableParam()
 {
-	if (Version_1_0 && Version_1_0->EnableableParam){
-		return Version_1_0->EnableableParam.value();
+	if (EnableableParam){
+		return EnableableParam.value();
 	}
 
 	return QVariant();
@@ -9963,18 +5532,15 @@ QVariant CParamTypeIdsObject::GetEnableableParam()
 
 void CParamTypeIdsObject::SetEnableableParam(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->EnableableParam = v.value<QString>().toUtf8();
+	EnableableParam = v.value<QString>().toUtf8();
 	enableableParamChanged();
 }
 
 
 bool CParamTypeIdsObject::hasEnableableParam()
 {
-	 return Version_1_0 && Version_1_0->EnableableParam.HasValue();
+	 return EnableableParam.HasValue();
 }
 
 
@@ -10099,125 +5665,124 @@ QVariantMap CParamTypeIdsObjectList::get(int row) const
 }
 
 
-void CParamTypeIdsObjectList::append(sdl::imtbase::ImtBaseTypes::CParamTypeIdsObject* item)
+void CParamTypeIdsObjectList::append(sdl::V1_0::imtbase::CParamTypeIdsObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::imtbase::ImtBaseTypes::CParamTypeIdsObjectList* sdl::imtbase::ImtBaseTypes::CParamTypeIdsObjectList::copyMe()
+sdl::V1_0::imtbase::CParamTypeIdsObjectList* sdl::V1_0::imtbase::CParamTypeIdsObjectList::copyMe()
 {
-	sdl::imtbase::ImtBaseTypes::CParamTypeIdsObjectList* retVal = new sdl::imtbase::ImtBaseTypes::CParamTypeIdsObjectList();
+	sdl::V1_0::imtbase::CParamTypeIdsObjectList* retVal = new sdl::V1_0::imtbase::CParamTypeIdsObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CParamTypeIdsObjectList::toJson()
+QString sdl::V1_0::imtbase::CParamTypeIdsObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CParamTypeIdsObjectList::toGraphQL()
+QString sdl::V1_0::imtbase::CParamTypeIdsObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CParamTypeIdsObjectList::addElement(sdl::imtbase::ImtBaseTypes::CParamTypeIdsObject* item)
+void sdl::V1_0::imtbase::CParamTypeIdsObjectList::addElement(sdl::V1_0::imtbase::CParamTypeIdsObject* item)
 {
 	append(item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CParamTypeIdsObjectList::removeElement(int index)
+void sdl::V1_0::imtbase::CParamTypeIdsObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::imtbase::ImtBaseTypes::CParamTypeIdsObjectList::isEqualWithModel(sdl::imtbase::ImtBaseTypes::CParamTypeIdsObjectList* otherModelPtr)
+bool sdl::V1_0::imtbase::CParamTypeIdsObjectList::isEqualWithModel(sdl::V1_0::imtbase::CParamTypeIdsObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CParamTypeIdsObjectList::insert(int index, sdl::imtbase::ImtBaseTypes::CParamTypeIdsObject* item)
+void sdl::V1_0::imtbase::CParamTypeIdsObjectList::insert(int index, sdl::V1_0::imtbase::CParamTypeIdsObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CParamTypeIdsObjectList::remove(int index)
+void sdl::V1_0::imtbase::CParamTypeIdsObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CParamTypeIdsObjectList::clear()
+void sdl::V1_0::imtbase::CParamTypeIdsObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::imtbase::ImtBaseTypes::CParamTypeIdsObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CParamTypeIdsObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CParamTypeIdsObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::imtbase::CParamTypeIdsObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_urlParam"){
-		return QVariant::fromValue(Version_1_0->at(index)->UrlParam.value());
+		return QVariant::fromValue(at(index)->UrlParam.value());
 	}
 	if (nameId == "m_idParam"){
-		return QVariant::fromValue(Version_1_0->at(index)->IdParam.value());
+		return QVariant::fromValue(at(index)->IdParam.value());
 	}
 	if (nameId == "m_textParam"){
-		return QVariant::fromValue(Version_1_0->at(index)->TextParam.value());
+		return QVariant::fromValue(at(index)->TextParam.value());
 	}
 	if (nameId == "m_textView"){
-		return QVariant::fromValue(Version_1_0->at(index)->TextView.value());
+		return QVariant::fromValue(at(index)->TextView.value());
 	}
 	if (nameId == "m_selectionParam"){
-		return QVariant::fromValue(Version_1_0->at(index)->SelectionParam.value());
+		return QVariant::fromValue(at(index)->SelectionParam.value());
 	}
 	if (nameId == "m_schedulerParam"){
-		return QVariant::fromValue(Version_1_0->at(index)->SchedulerParam.value());
+		return QVariant::fromValue(at(index)->SchedulerParam.value());
 	}
 	if (nameId == "m_backupSettings"){
-		return QVariant::fromValue(Version_1_0->at(index)->BackupSettings.value());
+		return QVariant::fromValue(at(index)->BackupSettings.value());
 	}
 	if (nameId == "m_databaseAccessSettings"){
-		return QVariant::fromValue(Version_1_0->at(index)->DatabaseAccessSettings.value());
+		return QVariant::fromValue(at(index)->DatabaseAccessSettings.value());
 	}
 	if (nameId == "m_paramsSet"){
-		return QVariant::fromValue(Version_1_0->at(index)->ParamsSet.value());
+		return QVariant::fromValue(at(index)->ParamsSet.value());
 	}
 	if (nameId == "m_fileNameParam"){
-		return QVariant::fromValue(Version_1_0->at(index)->FileNameParam.value());
+		return QVariant::fromValue(at(index)->FileNameParam.value());
 	}
 	if (nameId == "m_integerParam"){
-		return QVariant::fromValue(Version_1_0->at(index)->IntegerParam.value());
+		return QVariant::fromValue(at(index)->IntegerParam.value());
 	}
 	if (nameId == "m_doubleParam"){
-		return QVariant::fromValue(Version_1_0->at(index)->DoubleParam.value());
+		return QVariant::fromValue(at(index)->DoubleParam.value());
 	}
 	if (nameId == "m_passwordParam"){
-		return QVariant::fromValue(Version_1_0->at(index)->PasswordParam.value());
+		return QVariant::fromValue(at(index)->PasswordParam.value());
 	}
 	if (nameId == "m_enableableParam"){
-		return QVariant::fromValue(Version_1_0->at(index)->EnableableParam.value());
+		return QVariant::fromValue(at(index)->EnableableParam.value());
 	}
 
 	return QVariant();
 }
 CUrlParamObject::CUrlParamObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CUrlParamObject::schemeChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CUrlParamObject::hostChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -10228,8 +5793,8 @@ CUrlParamObject::CUrlParamObject(QObject* parent): ::imtbase::CItemModelBase(par
 
 QVariant CUrlParamObject::GetScheme()
 {
-	if (Version_1_0 && Version_1_0->scheme){
-		return Version_1_0->scheme.value();
+	if (scheme){
+		return scheme.value();
 	}
 
 	return QVariant();
@@ -10238,25 +5803,22 @@ QVariant CUrlParamObject::GetScheme()
 
 void CUrlParamObject::SetScheme(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->scheme = v.value<QString>();
+	scheme = v.value<QString>();
 	schemeChanged();
 }
 
 
 bool CUrlParamObject::hasScheme()
 {
-	 return Version_1_0 && Version_1_0->scheme.HasValue();
+	 return scheme.HasValue();
 }
 
 
 QVariant CUrlParamObject::GetHost()
 {
-	if (Version_1_0 && Version_1_0->host){
-		return Version_1_0->host.value();
+	if (host){
+		return host.value();
 	}
 
 	return QVariant();
@@ -10265,25 +5827,22 @@ QVariant CUrlParamObject::GetHost()
 
 void CUrlParamObject::SetHost(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->host = v.value<QString>();
+	host = v.value<QString>();
 	hostChanged();
 }
 
 
 bool CUrlParamObject::hasHost()
 {
-	 return Version_1_0 && Version_1_0->host.HasValue();
+	 return host.HasValue();
 }
 
 
 QVariant CUrlParamObject::GetPort()
 {
-	if (Version_1_0 && Version_1_0->port){
-		return Version_1_0->port.value();
+	if (port){
+		return port.value();
 	}
 
 	return QVariant();
@@ -10292,25 +5851,22 @@ QVariant CUrlParamObject::GetPort()
 
 void CUrlParamObject::SetPort(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->port = v.value<int>();
+	port = v.value<int>();
 	portChanged();
 }
 
 
 bool CUrlParamObject::hasPort()
 {
-	 return Version_1_0 && Version_1_0->port.HasValue();
+	 return port.HasValue();
 }
 
 
 QVariant CUrlParamObject::GetPath()
 {
-	if (Version_1_0 && Version_1_0->path){
-		return Version_1_0->path.value();
+	if (path){
+		return path.value();
 	}
 
 	return QVariant();
@@ -10319,18 +5875,15 @@ QVariant CUrlParamObject::GetPath()
 
 void CUrlParamObject::SetPath(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->path = v.value<QString>();
+	path = v.value<QString>();
 	pathChanged();
 }
 
 
 bool CUrlParamObject::hasPath()
 {
-	 return Version_1_0 && Version_1_0->path.HasValue();
+	 return path.HasValue();
 }
 
 
@@ -10425,95 +5978,94 @@ QVariantMap CUrlParamObjectList::get(int row) const
 }
 
 
-void CUrlParamObjectList::append(sdl::imtbase::ImtBaseTypes::CUrlParamObject* item)
+void CUrlParamObjectList::append(sdl::V1_0::imtbase::CUrlParamObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::imtbase::ImtBaseTypes::CUrlParamObjectList* sdl::imtbase::ImtBaseTypes::CUrlParamObjectList::copyMe()
+sdl::V1_0::imtbase::CUrlParamObjectList* sdl::V1_0::imtbase::CUrlParamObjectList::copyMe()
 {
-	sdl::imtbase::ImtBaseTypes::CUrlParamObjectList* retVal = new sdl::imtbase::ImtBaseTypes::CUrlParamObjectList();
+	sdl::V1_0::imtbase::CUrlParamObjectList* retVal = new sdl::V1_0::imtbase::CUrlParamObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CUrlParamObjectList::toJson()
+QString sdl::V1_0::imtbase::CUrlParamObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CUrlParamObjectList::toGraphQL()
+QString sdl::V1_0::imtbase::CUrlParamObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CUrlParamObjectList::addElement(sdl::imtbase::ImtBaseTypes::CUrlParamObject* item)
+void sdl::V1_0::imtbase::CUrlParamObjectList::addElement(sdl::V1_0::imtbase::CUrlParamObject* item)
 {
 	append(item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CUrlParamObjectList::removeElement(int index)
+void sdl::V1_0::imtbase::CUrlParamObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::imtbase::ImtBaseTypes::CUrlParamObjectList::isEqualWithModel(sdl::imtbase::ImtBaseTypes::CUrlParamObjectList* otherModelPtr)
+bool sdl::V1_0::imtbase::CUrlParamObjectList::isEqualWithModel(sdl::V1_0::imtbase::CUrlParamObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CUrlParamObjectList::insert(int index, sdl::imtbase::ImtBaseTypes::CUrlParamObject* item)
+void sdl::V1_0::imtbase::CUrlParamObjectList::insert(int index, sdl::V1_0::imtbase::CUrlParamObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CUrlParamObjectList::remove(int index)
+void sdl::V1_0::imtbase::CUrlParamObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CUrlParamObjectList::clear()
+void sdl::V1_0::imtbase::CUrlParamObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::imtbase::ImtBaseTypes::CUrlParamObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CUrlParamObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CUrlParamObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::imtbase::CUrlParamObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_scheme"){
-		return QVariant::fromValue(Version_1_0->at(index)->scheme.value());
+		return QVariant::fromValue(at(index)->scheme.value());
 	}
 	if (nameId == "m_host"){
-		return QVariant::fromValue(Version_1_0->at(index)->host.value());
+		return QVariant::fromValue(at(index)->host.value());
 	}
 	if (nameId == "m_port"){
-		return QVariant::fromValue(Version_1_0->at(index)->port.value());
+		return QVariant::fromValue(at(index)->port.value());
 	}
 	if (nameId == "m_path"){
-		return QVariant::fromValue(Version_1_0->at(index)->path.value());
+		return QVariant::fromValue(at(index)->path.value());
 	}
 
 	return QVariant();
 }
 CIdParamObject::CIdParamObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CIdParamObject::idChanged, this, &CItemModelBase::OnInternalModelChanged);
 }
@@ -10521,8 +6073,8 @@ CIdParamObject::CIdParamObject(QObject* parent): ::imtbase::CItemModelBase(paren
 
 QVariant CIdParamObject::GetId()
 {
-	if (Version_1_0 && Version_1_0->id){
-		return Version_1_0->id.value();
+	if (id){
+		return id.value();
 	}
 
 	return QVariant();
@@ -10531,18 +6083,15 @@ QVariant CIdParamObject::GetId()
 
 void CIdParamObject::SetId(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->id = v.value<QString>().toUtf8();
+	id = v.value<QString>().toUtf8();
 	idChanged();
 }
 
 
 bool CIdParamObject::hasId()
 {
-	 return Version_1_0 && Version_1_0->id.HasValue();
+	 return id.HasValue();
 }
 
 
@@ -10628,86 +6177,85 @@ QVariantMap CIdParamObjectList::get(int row) const
 }
 
 
-void CIdParamObjectList::append(sdl::imtbase::ImtBaseTypes::CIdParamObject* item)
+void CIdParamObjectList::append(sdl::V1_0::imtbase::CIdParamObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::imtbase::ImtBaseTypes::CIdParamObjectList* sdl::imtbase::ImtBaseTypes::CIdParamObjectList::copyMe()
+sdl::V1_0::imtbase::CIdParamObjectList* sdl::V1_0::imtbase::CIdParamObjectList::copyMe()
 {
-	sdl::imtbase::ImtBaseTypes::CIdParamObjectList* retVal = new sdl::imtbase::ImtBaseTypes::CIdParamObjectList();
+	sdl::V1_0::imtbase::CIdParamObjectList* retVal = new sdl::V1_0::imtbase::CIdParamObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CIdParamObjectList::toJson()
+QString sdl::V1_0::imtbase::CIdParamObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CIdParamObjectList::toGraphQL()
+QString sdl::V1_0::imtbase::CIdParamObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CIdParamObjectList::addElement(sdl::imtbase::ImtBaseTypes::CIdParamObject* item)
+void sdl::V1_0::imtbase::CIdParamObjectList::addElement(sdl::V1_0::imtbase::CIdParamObject* item)
 {
 	append(item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CIdParamObjectList::removeElement(int index)
+void sdl::V1_0::imtbase::CIdParamObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::imtbase::ImtBaseTypes::CIdParamObjectList::isEqualWithModel(sdl::imtbase::ImtBaseTypes::CIdParamObjectList* otherModelPtr)
+bool sdl::V1_0::imtbase::CIdParamObjectList::isEqualWithModel(sdl::V1_0::imtbase::CIdParamObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CIdParamObjectList::insert(int index, sdl::imtbase::ImtBaseTypes::CIdParamObject* item)
+void sdl::V1_0::imtbase::CIdParamObjectList::insert(int index, sdl::V1_0::imtbase::CIdParamObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CIdParamObjectList::remove(int index)
+void sdl::V1_0::imtbase::CIdParamObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CIdParamObjectList::clear()
+void sdl::V1_0::imtbase::CIdParamObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::imtbase::ImtBaseTypes::CIdParamObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CIdParamObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CIdParamObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::imtbase::CIdParamObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_id"){
-		return QVariant::fromValue(Version_1_0->at(index)->id.value());
+		return QVariant::fromValue(at(index)->id.value());
 	}
 
 	return QVariant();
 }
 CTextParamObject::CTextParamObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CTextParamObject::textChanged, this, &CItemModelBase::OnInternalModelChanged);
 }
@@ -10715,8 +6263,8 @@ CTextParamObject::CTextParamObject(QObject* parent): ::imtbase::CItemModelBase(p
 
 QVariant CTextParamObject::GetText()
 {
-	if (Version_1_0 && Version_1_0->text){
-		return Version_1_0->text.value();
+	if (text){
+		return text.value();
 	}
 
 	return QVariant();
@@ -10725,18 +6273,15 @@ QVariant CTextParamObject::GetText()
 
 void CTextParamObject::SetText(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->text = v.value<QString>();
+	text = v.value<QString>();
 	textChanged();
 }
 
 
 bool CTextParamObject::hasText()
 {
-	 return Version_1_0 && Version_1_0->text.HasValue();
+	 return text.HasValue();
 }
 
 
@@ -10822,86 +6367,85 @@ QVariantMap CTextParamObjectList::get(int row) const
 }
 
 
-void CTextParamObjectList::append(sdl::imtbase::ImtBaseTypes::CTextParamObject* item)
+void CTextParamObjectList::append(sdl::V1_0::imtbase::CTextParamObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::imtbase::ImtBaseTypes::CTextParamObjectList* sdl::imtbase::ImtBaseTypes::CTextParamObjectList::copyMe()
+sdl::V1_0::imtbase::CTextParamObjectList* sdl::V1_0::imtbase::CTextParamObjectList::copyMe()
 {
-	sdl::imtbase::ImtBaseTypes::CTextParamObjectList* retVal = new sdl::imtbase::ImtBaseTypes::CTextParamObjectList();
+	sdl::V1_0::imtbase::CTextParamObjectList* retVal = new sdl::V1_0::imtbase::CTextParamObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CTextParamObjectList::toJson()
+QString sdl::V1_0::imtbase::CTextParamObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CTextParamObjectList::toGraphQL()
+QString sdl::V1_0::imtbase::CTextParamObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CTextParamObjectList::addElement(sdl::imtbase::ImtBaseTypes::CTextParamObject* item)
+void sdl::V1_0::imtbase::CTextParamObjectList::addElement(sdl::V1_0::imtbase::CTextParamObject* item)
 {
 	append(item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CTextParamObjectList::removeElement(int index)
+void sdl::V1_0::imtbase::CTextParamObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::imtbase::ImtBaseTypes::CTextParamObjectList::isEqualWithModel(sdl::imtbase::ImtBaseTypes::CTextParamObjectList* otherModelPtr)
+bool sdl::V1_0::imtbase::CTextParamObjectList::isEqualWithModel(sdl::V1_0::imtbase::CTextParamObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CTextParamObjectList::insert(int index, sdl::imtbase::ImtBaseTypes::CTextParamObject* item)
+void sdl::V1_0::imtbase::CTextParamObjectList::insert(int index, sdl::V1_0::imtbase::CTextParamObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CTextParamObjectList::remove(int index)
+void sdl::V1_0::imtbase::CTextParamObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CTextParamObjectList::clear()
+void sdl::V1_0::imtbase::CTextParamObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::imtbase::ImtBaseTypes::CTextParamObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CTextParamObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CTextParamObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::imtbase::CTextParamObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_text"){
-		return QVariant::fromValue(Version_1_0->at(index)->text.value());
+		return QVariant::fromValue(at(index)->text.value());
 	}
 
 	return QVariant();
 }
 CEnableableParamObject::CEnableableParamObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CEnableableParamObject::valueChanged, this, &CItemModelBase::OnInternalModelChanged);
 }
@@ -10909,8 +6453,8 @@ CEnableableParamObject::CEnableableParamObject(QObject* parent): ::imtbase::CIte
 
 QVariant CEnableableParamObject::GetValue()
 {
-	if (Version_1_0 && Version_1_0->value){
-		return Version_1_0->value.value();
+	if (value){
+		return value.value();
 	}
 
 	return QVariant();
@@ -10919,18 +6463,15 @@ QVariant CEnableableParamObject::GetValue()
 
 void CEnableableParamObject::SetValue(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->value = v.value<bool>();
+	value = v.value<bool>();
 	valueChanged();
 }
 
 
 bool CEnableableParamObject::hasValue()
 {
-	 return Version_1_0 && Version_1_0->value.HasValue();
+	 return value.HasValue();
 }
 
 
@@ -11016,86 +6557,85 @@ QVariantMap CEnableableParamObjectList::get(int row) const
 }
 
 
-void CEnableableParamObjectList::append(sdl::imtbase::ImtBaseTypes::CEnableableParamObject* item)
+void CEnableableParamObjectList::append(sdl::V1_0::imtbase::CEnableableParamObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::imtbase::ImtBaseTypes::CEnableableParamObjectList* sdl::imtbase::ImtBaseTypes::CEnableableParamObjectList::copyMe()
+sdl::V1_0::imtbase::CEnableableParamObjectList* sdl::V1_0::imtbase::CEnableableParamObjectList::copyMe()
 {
-	sdl::imtbase::ImtBaseTypes::CEnableableParamObjectList* retVal = new sdl::imtbase::ImtBaseTypes::CEnableableParamObjectList();
+	sdl::V1_0::imtbase::CEnableableParamObjectList* retVal = new sdl::V1_0::imtbase::CEnableableParamObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CEnableableParamObjectList::toJson()
+QString sdl::V1_0::imtbase::CEnableableParamObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CEnableableParamObjectList::toGraphQL()
+QString sdl::V1_0::imtbase::CEnableableParamObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CEnableableParamObjectList::addElement(sdl::imtbase::ImtBaseTypes::CEnableableParamObject* item)
+void sdl::V1_0::imtbase::CEnableableParamObjectList::addElement(sdl::V1_0::imtbase::CEnableableParamObject* item)
 {
 	append(item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CEnableableParamObjectList::removeElement(int index)
+void sdl::V1_0::imtbase::CEnableableParamObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::imtbase::ImtBaseTypes::CEnableableParamObjectList::isEqualWithModel(sdl::imtbase::ImtBaseTypes::CEnableableParamObjectList* otherModelPtr)
+bool sdl::V1_0::imtbase::CEnableableParamObjectList::isEqualWithModel(sdl::V1_0::imtbase::CEnableableParamObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CEnableableParamObjectList::insert(int index, sdl::imtbase::ImtBaseTypes::CEnableableParamObject* item)
+void sdl::V1_0::imtbase::CEnableableParamObjectList::insert(int index, sdl::V1_0::imtbase::CEnableableParamObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CEnableableParamObjectList::remove(int index)
+void sdl::V1_0::imtbase::CEnableableParamObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CEnableableParamObjectList::clear()
+void sdl::V1_0::imtbase::CEnableableParamObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::imtbase::ImtBaseTypes::CEnableableParamObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CEnableableParamObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CEnableableParamObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::imtbase::CEnableableParamObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_value"){
-		return QVariant::fromValue(Version_1_0->at(index)->value.value());
+		return QVariant::fromValue(at(index)->value.value());
 	}
 
 	return QVariant();
 }
 CIntegerParamObject::CIntegerParamObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CIntegerParamObject::valueChanged, this, &CItemModelBase::OnInternalModelChanged);
 }
@@ -11103,8 +6643,8 @@ CIntegerParamObject::CIntegerParamObject(QObject* parent): ::imtbase::CItemModel
 
 QVariant CIntegerParamObject::GetValue()
 {
-	if (Version_1_0 && Version_1_0->value){
-		return Version_1_0->value.value();
+	if (value){
+		return value.value();
 	}
 
 	return QVariant();
@@ -11113,18 +6653,15 @@ QVariant CIntegerParamObject::GetValue()
 
 void CIntegerParamObject::SetValue(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->value = v.value<int>();
+	value = v.value<int>();
 	valueChanged();
 }
 
 
 bool CIntegerParamObject::hasValue()
 {
-	 return Version_1_0 && Version_1_0->value.HasValue();
+	 return value.HasValue();
 }
 
 
@@ -11210,86 +6747,85 @@ QVariantMap CIntegerParamObjectList::get(int row) const
 }
 
 
-void CIntegerParamObjectList::append(sdl::imtbase::ImtBaseTypes::CIntegerParamObject* item)
+void CIntegerParamObjectList::append(sdl::V1_0::imtbase::CIntegerParamObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::imtbase::ImtBaseTypes::CIntegerParamObjectList* sdl::imtbase::ImtBaseTypes::CIntegerParamObjectList::copyMe()
+sdl::V1_0::imtbase::CIntegerParamObjectList* sdl::V1_0::imtbase::CIntegerParamObjectList::copyMe()
 {
-	sdl::imtbase::ImtBaseTypes::CIntegerParamObjectList* retVal = new sdl::imtbase::ImtBaseTypes::CIntegerParamObjectList();
+	sdl::V1_0::imtbase::CIntegerParamObjectList* retVal = new sdl::V1_0::imtbase::CIntegerParamObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CIntegerParamObjectList::toJson()
+QString sdl::V1_0::imtbase::CIntegerParamObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CIntegerParamObjectList::toGraphQL()
+QString sdl::V1_0::imtbase::CIntegerParamObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CIntegerParamObjectList::addElement(sdl::imtbase::ImtBaseTypes::CIntegerParamObject* item)
+void sdl::V1_0::imtbase::CIntegerParamObjectList::addElement(sdl::V1_0::imtbase::CIntegerParamObject* item)
 {
 	append(item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CIntegerParamObjectList::removeElement(int index)
+void sdl::V1_0::imtbase::CIntegerParamObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::imtbase::ImtBaseTypes::CIntegerParamObjectList::isEqualWithModel(sdl::imtbase::ImtBaseTypes::CIntegerParamObjectList* otherModelPtr)
+bool sdl::V1_0::imtbase::CIntegerParamObjectList::isEqualWithModel(sdl::V1_0::imtbase::CIntegerParamObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CIntegerParamObjectList::insert(int index, sdl::imtbase::ImtBaseTypes::CIntegerParamObject* item)
+void sdl::V1_0::imtbase::CIntegerParamObjectList::insert(int index, sdl::V1_0::imtbase::CIntegerParamObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CIntegerParamObjectList::remove(int index)
+void sdl::V1_0::imtbase::CIntegerParamObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CIntegerParamObjectList::clear()
+void sdl::V1_0::imtbase::CIntegerParamObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::imtbase::ImtBaseTypes::CIntegerParamObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CIntegerParamObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CIntegerParamObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::imtbase::CIntegerParamObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_value"){
-		return QVariant::fromValue(Version_1_0->at(index)->value.value());
+		return QVariant::fromValue(at(index)->value.value());
 	}
 
 	return QVariant();
 }
 CDoubleParamObject::CDoubleParamObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CDoubleParamObject::valueChanged, this, &CItemModelBase::OnInternalModelChanged);
 }
@@ -11297,8 +6833,8 @@ CDoubleParamObject::CDoubleParamObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CDoubleParamObject::GetValue()
 {
-	if (Version_1_0 && Version_1_0->value){
-		return Version_1_0->value.value();
+	if (value){
+		return value.value();
 	}
 
 	return QVariant();
@@ -11307,18 +6843,15 @@ QVariant CDoubleParamObject::GetValue()
 
 void CDoubleParamObject::SetValue(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->value = v.value<double>();
+	value = v.value<double>();
 	valueChanged();
 }
 
 
 bool CDoubleParamObject::hasValue()
 {
-	 return Version_1_0 && Version_1_0->value.HasValue();
+	 return value.HasValue();
 }
 
 
@@ -11404,86 +6937,85 @@ QVariantMap CDoubleParamObjectList::get(int row) const
 }
 
 
-void CDoubleParamObjectList::append(sdl::imtbase::ImtBaseTypes::CDoubleParamObject* item)
+void CDoubleParamObjectList::append(sdl::V1_0::imtbase::CDoubleParamObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::imtbase::ImtBaseTypes::CDoubleParamObjectList* sdl::imtbase::ImtBaseTypes::CDoubleParamObjectList::copyMe()
+sdl::V1_0::imtbase::CDoubleParamObjectList* sdl::V1_0::imtbase::CDoubleParamObjectList::copyMe()
 {
-	sdl::imtbase::ImtBaseTypes::CDoubleParamObjectList* retVal = new sdl::imtbase::ImtBaseTypes::CDoubleParamObjectList();
+	sdl::V1_0::imtbase::CDoubleParamObjectList* retVal = new sdl::V1_0::imtbase::CDoubleParamObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CDoubleParamObjectList::toJson()
+QString sdl::V1_0::imtbase::CDoubleParamObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CDoubleParamObjectList::toGraphQL()
+QString sdl::V1_0::imtbase::CDoubleParamObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CDoubleParamObjectList::addElement(sdl::imtbase::ImtBaseTypes::CDoubleParamObject* item)
+void sdl::V1_0::imtbase::CDoubleParamObjectList::addElement(sdl::V1_0::imtbase::CDoubleParamObject* item)
 {
 	append(item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CDoubleParamObjectList::removeElement(int index)
+void sdl::V1_0::imtbase::CDoubleParamObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::imtbase::ImtBaseTypes::CDoubleParamObjectList::isEqualWithModel(sdl::imtbase::ImtBaseTypes::CDoubleParamObjectList* otherModelPtr)
+bool sdl::V1_0::imtbase::CDoubleParamObjectList::isEqualWithModel(sdl::V1_0::imtbase::CDoubleParamObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CDoubleParamObjectList::insert(int index, sdl::imtbase::ImtBaseTypes::CDoubleParamObject* item)
+void sdl::V1_0::imtbase::CDoubleParamObjectList::insert(int index, sdl::V1_0::imtbase::CDoubleParamObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CDoubleParamObjectList::remove(int index)
+void sdl::V1_0::imtbase::CDoubleParamObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CDoubleParamObjectList::clear()
+void sdl::V1_0::imtbase::CDoubleParamObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::imtbase::ImtBaseTypes::CDoubleParamObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CDoubleParamObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CDoubleParamObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::imtbase::CDoubleParamObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_value"){
-		return QVariant::fromValue(Version_1_0->at(index)->value.value());
+		return QVariant::fromValue(at(index)->value.value());
 	}
 
 	return QVariant();
 }
 COptionObject::COptionObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &COptionObject::idChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &COptionObject::nameChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -11494,8 +7026,8 @@ COptionObject::COptionObject(QObject* parent): ::imtbase::CItemModelBase(parent)
 
 QVariant COptionObject::GetId()
 {
-	if (Version_1_0 && Version_1_0->id){
-		return Version_1_0->id.value();
+	if (id){
+		return id.value();
 	}
 
 	return QVariant();
@@ -11504,25 +7036,22 @@ QVariant COptionObject::GetId()
 
 void COptionObject::SetId(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->id = v.value<QString>().toUtf8();
+	id = v.value<QString>().toUtf8();
 	idChanged();
 }
 
 
 bool COptionObject::hasId()
 {
-	 return Version_1_0 && Version_1_0->id.HasValue();
+	 return id.HasValue();
 }
 
 
 QVariant COptionObject::GetName()
 {
-	if (Version_1_0 && Version_1_0->name){
-		return Version_1_0->name.value();
+	if (name){
+		return name.value();
 	}
 
 	return QVariant();
@@ -11531,25 +7060,22 @@ QVariant COptionObject::GetName()
 
 void COptionObject::SetName(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->name = v.value<QString>();
+	name = v.value<QString>();
 	nameChanged();
 }
 
 
 bool COptionObject::hasName()
 {
-	 return Version_1_0 && Version_1_0->name.HasValue();
+	 return name.HasValue();
 }
 
 
 QVariant COptionObject::GetDescription()
 {
-	if (Version_1_0 && Version_1_0->description){
-		return Version_1_0->description.value();
+	if (description){
+		return description.value();
 	}
 
 	return QVariant();
@@ -11558,25 +7084,22 @@ QVariant COptionObject::GetDescription()
 
 void COptionObject::SetDescription(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->description = v.value<QString>();
+	description = v.value<QString>();
 	descriptionChanged();
 }
 
 
 bool COptionObject::hasDescription()
 {
-	 return Version_1_0 && Version_1_0->description.HasValue();
+	 return description.HasValue();
 }
 
 
 QVariant COptionObject::GetEnabled()
 {
-	if (Version_1_0 && Version_1_0->enabled){
-		return Version_1_0->enabled.value();
+	if (enabled){
+		return enabled.value();
 	}
 
 	return QVariant();
@@ -11585,18 +7108,15 @@ QVariant COptionObject::GetEnabled()
 
 void COptionObject::SetEnabled(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->enabled = v.value<bool>();
+	enabled = v.value<bool>();
 	enabledChanged();
 }
 
 
 bool COptionObject::hasEnabled()
 {
-	 return Version_1_0 && Version_1_0->enabled.HasValue();
+	 return enabled.HasValue();
 }
 
 
@@ -11691,95 +7211,94 @@ QVariantMap COptionObjectList::get(int row) const
 }
 
 
-void COptionObjectList::append(sdl::imtbase::ImtBaseTypes::COptionObject* item)
+void COptionObjectList::append(sdl::V1_0::imtbase::COptionObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::imtbase::ImtBaseTypes::COptionObjectList* sdl::imtbase::ImtBaseTypes::COptionObjectList::copyMe()
+sdl::V1_0::imtbase::COptionObjectList* sdl::V1_0::imtbase::COptionObjectList::copyMe()
 {
-	sdl::imtbase::ImtBaseTypes::COptionObjectList* retVal = new sdl::imtbase::ImtBaseTypes::COptionObjectList();
+	sdl::V1_0::imtbase::COptionObjectList* retVal = new sdl::V1_0::imtbase::COptionObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::COptionObjectList::toJson()
+QString sdl::V1_0::imtbase::COptionObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::COptionObjectList::toGraphQL()
+QString sdl::V1_0::imtbase::COptionObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::imtbase::ImtBaseTypes::COptionObjectList::addElement(sdl::imtbase::ImtBaseTypes::COptionObject* item)
+void sdl::V1_0::imtbase::COptionObjectList::addElement(sdl::V1_0::imtbase::COptionObject* item)
 {
 	append(item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::COptionObjectList::removeElement(int index)
+void sdl::V1_0::imtbase::COptionObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::imtbase::ImtBaseTypes::COptionObjectList::isEqualWithModel(sdl::imtbase::ImtBaseTypes::COptionObjectList* otherModelPtr)
+bool sdl::V1_0::imtbase::COptionObjectList::isEqualWithModel(sdl::V1_0::imtbase::COptionObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::COptionObjectList::insert(int index, sdl::imtbase::ImtBaseTypes::COptionObject* item)
+void sdl::V1_0::imtbase::COptionObjectList::insert(int index, sdl::V1_0::imtbase::COptionObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::COptionObjectList::remove(int index)
+void sdl::V1_0::imtbase::COptionObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::COptionObjectList::clear()
+void sdl::V1_0::imtbase::COptionObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::imtbase::ImtBaseTypes::COptionObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::COptionObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::COptionObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::imtbase::COptionObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_id"){
-		return QVariant::fromValue(Version_1_0->at(index)->id.value());
+		return QVariant::fromValue(at(index)->id.value());
 	}
 	if (nameId == "m_name"){
-		return QVariant::fromValue(Version_1_0->at(index)->name.value());
+		return QVariant::fromValue(at(index)->name.value());
 	}
 	if (nameId == "m_description"){
-		return QVariant::fromValue(Version_1_0->at(index)->description.value());
+		return QVariant::fromValue(at(index)->description.value());
 	}
 	if (nameId == "m_enabled"){
-		return QVariant::fromValue(Version_1_0->at(index)->enabled.value());
+		return QVariant::fromValue(at(index)->enabled.value());
 	}
 
 	return QVariant();
 }
 COptionsListObject::COptionsListObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &COptionsListObject::totalCountChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &COptionsListObject::offsetChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -11789,8 +7308,8 @@ COptionsListObject::COptionsListObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant COptionsListObject::GetTotalCount()
 {
-	if (Version_1_0 && Version_1_0->totalCount){
-		return Version_1_0->totalCount.value();
+	if (totalCount){
+		return totalCount.value();
 	}
 
 	return QVariant();
@@ -11799,25 +7318,22 @@ QVariant COptionsListObject::GetTotalCount()
 
 void COptionsListObject::SetTotalCount(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->totalCount = v.value<int>();
+	totalCount = v.value<int>();
 	totalCountChanged();
 }
 
 
 bool COptionsListObject::hasTotalCount()
 {
-	 return Version_1_0 && Version_1_0->totalCount.HasValue();
+	 return totalCount.HasValue();
 }
 
 
 QVariant COptionsListObject::GetOffset()
 {
-	if (Version_1_0 && Version_1_0->offset){
-		return Version_1_0->offset.value();
+	if (offset){
+		return offset.value();
 	}
 
 	return QVariant();
@@ -11826,28 +7342,25 @@ QVariant COptionsListObject::GetOffset()
 
 void COptionsListObject::SetOffset(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->offset = v.value<int>();
+	offset = v.value<int>();
 	offsetChanged();
 }
 
 
 bool COptionsListObject::hasOffset()
 {
-	 return Version_1_0 && Version_1_0->offset.HasValue();
+	 return offset.HasValue();
 }
 
 
 QVariant COptionsListObject::GetOptions()
 {
-	if (Version_1_0 && Version_1_0->options){
+	if (options){
 		if (!m_optionsQObjectPtr.isValid()){
 			m_optionsQObjectPtr = CreateObject("options");
-			auto itemPtr = m_optionsQObjectPtr.value<sdl::imtbase::ImtBaseTypes::COptionObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->options;
+			auto itemPtr = m_optionsQObjectPtr.value<sdl::V1_0::imtbase::COptionObjectList*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = options;
 		}
 		return m_optionsQObjectPtr;
 	}
@@ -11858,16 +7371,13 @@ QVariant COptionsListObject::GetOptions()
 
 void COptionsListObject::SetOptions(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::imtbase::ImtBaseTypes::COptionObjectList* itemPtr = v.value<sdl::imtbase::ImtBaseTypes::COptionObjectList*>();
-		if (itemPtr != nullptr)  Version_1_0->options = itemPtr->Version_1_0;
+		sdl::V1_0::imtbase::COptionObjectList* itemPtr = v.value<sdl::V1_0::imtbase::COptionObjectList*>();
+		if (itemPtr != nullptr)  options = static_cast<const decltype(options)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->options = nullptr;
+		options = nullptr;
 	}
 	m_optionsQObjectPtr = v;
 
@@ -11877,17 +7387,14 @@ void COptionsListObject::SetOptions(const QVariant& v)
 
 bool COptionsListObject::hasOptions()
 {
-	 return Version_1_0 && Version_1_0->options.HasValue();
+	 return options.HasValue();
 }
 
 
 void COptionsListObject::emplaceOptions()
 {
 	ResetOptions();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->options.emplace();
+	options.emplace();
 }
 
 
@@ -11904,7 +7411,7 @@ void COptionsListObject::ResetOptions()
 QVariant COptionsListObject::createOptionsArrayElement(const QVariant& v)
 {
 	Q_UNUSED(v);
-	return QVariant::fromValue(new sdl::imtbase::ImtBaseTypes::COptionObject());
+	return QVariant::fromValue(new sdl::V1_0::imtbase::COptionObject());
 }
 
 
@@ -11956,7 +7463,7 @@ QString COptionsListObject::toGraphQL() const
 QVariant COptionsListObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "options"){
-		return QVariant::fromValue(new sdl::imtbase::ImtBaseTypes::COptionObjectList(this));
+		return QVariant::fromValue(new sdl::V1_0::imtbase::COptionObjectList(this));
 	}
 	return QVariant();
 }
@@ -11999,83 +7506,83 @@ QVariantMap COptionsListObjectList::get(int row) const
 }
 
 
-void COptionsListObjectList::append(sdl::imtbase::ImtBaseTypes::COptionsListObject* item)
+void COptionsListObjectList::append(sdl::V1_0::imtbase::COptionsListObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::imtbase::ImtBaseTypes::COptionsListObjectList* sdl::imtbase::ImtBaseTypes::COptionsListObjectList::copyMe()
+sdl::V1_0::imtbase::COptionsListObjectList* sdl::V1_0::imtbase::COptionsListObjectList::copyMe()
 {
-	sdl::imtbase::ImtBaseTypes::COptionsListObjectList* retVal = new sdl::imtbase::ImtBaseTypes::COptionsListObjectList();
+	sdl::V1_0::imtbase::COptionsListObjectList* retVal = new sdl::V1_0::imtbase::COptionsListObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::COptionsListObjectList::toJson()
+QString sdl::V1_0::imtbase::COptionsListObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::COptionsListObjectList::toGraphQL()
+QString sdl::V1_0::imtbase::COptionsListObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::imtbase::ImtBaseTypes::COptionsListObjectList::addElement(sdl::imtbase::ImtBaseTypes::COptionsListObject* item)
+void sdl::V1_0::imtbase::COptionsListObjectList::addElement(sdl::V1_0::imtbase::COptionsListObject* item)
 {
 	append(item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::COptionsListObjectList::removeElement(int index)
+void sdl::V1_0::imtbase::COptionsListObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::imtbase::ImtBaseTypes::COptionsListObjectList::isEqualWithModel(sdl::imtbase::ImtBaseTypes::COptionsListObjectList* otherModelPtr)
+bool sdl::V1_0::imtbase::COptionsListObjectList::isEqualWithModel(sdl::V1_0::imtbase::COptionsListObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::COptionsListObjectList::insert(int index, sdl::imtbase::ImtBaseTypes::COptionsListObject* item)
+void sdl::V1_0::imtbase::COptionsListObjectList::insert(int index, sdl::V1_0::imtbase::COptionsListObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::COptionsListObjectList::remove(int index)
+void sdl::V1_0::imtbase::COptionsListObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::COptionsListObjectList::clear()
+void sdl::V1_0::imtbase::COptionsListObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::imtbase::ImtBaseTypes::COptionsListObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::COptionsListObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::COptionsListObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::imtbase::COptionsListObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_totalCount"){
-		return QVariant::fromValue(Version_1_0->at(index)->totalCount.value());
+		return QVariant::fromValue(at(index)->totalCount.value());
 	}
 	if (nameId == "m_offset"){
-		return QVariant::fromValue(Version_1_0->at(index)->offset.value());
+		return QVariant::fromValue(at(index)->offset.value());
 	}
 	if (nameId == "m_options"){
 		return itemPtr->GetOptions();
@@ -12084,7 +7591,6 @@ QVariant sdl::imtbase::ImtBaseTypes::COptionsListObjectList::getData(const QStri
 	return QVariant();
 }
 CSelectionParamObject::CSelectionParamObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CSelectionParamObject::selectedIndexChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CSelectionParamObject::constraintsChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -12093,8 +7599,8 @@ CSelectionParamObject::CSelectionParamObject(QObject* parent): ::imtbase::CItemM
 
 QVariant CSelectionParamObject::GetSelectedIndex()
 {
-	if (Version_1_0 && Version_1_0->selectedIndex){
-		return Version_1_0->selectedIndex.value();
+	if (selectedIndex){
+		return selectedIndex.value();
 	}
 
 	return QVariant();
@@ -12103,28 +7609,25 @@ QVariant CSelectionParamObject::GetSelectedIndex()
 
 void CSelectionParamObject::SetSelectedIndex(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->selectedIndex = v.value<int>();
+	selectedIndex = v.value<int>();
 	selectedIndexChanged();
 }
 
 
 bool CSelectionParamObject::hasSelectedIndex()
 {
-	 return Version_1_0 && Version_1_0->selectedIndex.HasValue();
+	 return selectedIndex.HasValue();
 }
 
 
 QVariant CSelectionParamObject::GetConstraints()
 {
-	if (Version_1_0 && Version_1_0->constraints){
+	if (constraints){
 		if (!m_constraintsQObjectPtr.isValid()){
 			m_constraintsQObjectPtr = CreateObject("constraints");
-			auto itemPtr = m_constraintsQObjectPtr.value<sdl::imtbase::ImtBaseTypes::COptionsListObject*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->constraints;
+			auto itemPtr = m_constraintsQObjectPtr.value<sdl::V1_0::imtbase::COptionsListObject*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = constraints;
 		}
 		return m_constraintsQObjectPtr;
 	}
@@ -12135,16 +7638,13 @@ QVariant CSelectionParamObject::GetConstraints()
 
 void CSelectionParamObject::SetConstraints(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::imtbase::ImtBaseTypes::COptionsListObject* itemPtr = v.value<sdl::imtbase::ImtBaseTypes::COptionsListObject*>();
-		if (itemPtr != nullptr)  Version_1_0->constraints = itemPtr->Version_1_0;
+		sdl::V1_0::imtbase::COptionsListObject* itemPtr = v.value<sdl::V1_0::imtbase::COptionsListObject*>();
+		if (itemPtr != nullptr)  constraints = static_cast<const decltype(constraints)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->constraints = nullptr;
+		constraints = nullptr;
 	}
 	m_constraintsQObjectPtr = v;
 
@@ -12154,17 +7654,14 @@ void CSelectionParamObject::SetConstraints(const QVariant& v)
 
 bool CSelectionParamObject::hasConstraints()
 {
-	 return Version_1_0 && Version_1_0->constraints.HasValue();
+	 return constraints.HasValue();
 }
 
 
 void CSelectionParamObject::emplaceConstraints()
 {
 	ResetConstraints();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->constraints.emplace();
+	constraints.emplace();
 }
 
 
@@ -12226,7 +7723,7 @@ QString CSelectionParamObject::toGraphQL() const
 QVariant CSelectionParamObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "constraints"){
-		return QVariant::fromValue(new sdl::imtbase::ImtBaseTypes::COptionsListObject(this));
+		return QVariant::fromValue(new sdl::V1_0::imtbase::COptionsListObject(this));
 	}
 	return QVariant();
 }
@@ -12266,80 +7763,80 @@ QVariantMap CSelectionParamObjectList::get(int row) const
 }
 
 
-void CSelectionParamObjectList::append(sdl::imtbase::ImtBaseTypes::CSelectionParamObject* item)
+void CSelectionParamObjectList::append(sdl::V1_0::imtbase::CSelectionParamObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::imtbase::ImtBaseTypes::CSelectionParamObjectList* sdl::imtbase::ImtBaseTypes::CSelectionParamObjectList::copyMe()
+sdl::V1_0::imtbase::CSelectionParamObjectList* sdl::V1_0::imtbase::CSelectionParamObjectList::copyMe()
 {
-	sdl::imtbase::ImtBaseTypes::CSelectionParamObjectList* retVal = new sdl::imtbase::ImtBaseTypes::CSelectionParamObjectList();
+	sdl::V1_0::imtbase::CSelectionParamObjectList* retVal = new sdl::V1_0::imtbase::CSelectionParamObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CSelectionParamObjectList::toJson()
+QString sdl::V1_0::imtbase::CSelectionParamObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CSelectionParamObjectList::toGraphQL()
+QString sdl::V1_0::imtbase::CSelectionParamObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CSelectionParamObjectList::addElement(sdl::imtbase::ImtBaseTypes::CSelectionParamObject* item)
+void sdl::V1_0::imtbase::CSelectionParamObjectList::addElement(sdl::V1_0::imtbase::CSelectionParamObject* item)
 {
 	append(item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CSelectionParamObjectList::removeElement(int index)
+void sdl::V1_0::imtbase::CSelectionParamObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::imtbase::ImtBaseTypes::CSelectionParamObjectList::isEqualWithModel(sdl::imtbase::ImtBaseTypes::CSelectionParamObjectList* otherModelPtr)
+bool sdl::V1_0::imtbase::CSelectionParamObjectList::isEqualWithModel(sdl::V1_0::imtbase::CSelectionParamObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CSelectionParamObjectList::insert(int index, sdl::imtbase::ImtBaseTypes::CSelectionParamObject* item)
+void sdl::V1_0::imtbase::CSelectionParamObjectList::insert(int index, sdl::V1_0::imtbase::CSelectionParamObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CSelectionParamObjectList::remove(int index)
+void sdl::V1_0::imtbase::CSelectionParamObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CSelectionParamObjectList::clear()
+void sdl::V1_0::imtbase::CSelectionParamObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::imtbase::ImtBaseTypes::CSelectionParamObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CSelectionParamObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CSelectionParamObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::imtbase::CSelectionParamObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_selectedIndex"){
-		return QVariant::fromValue(Version_1_0->at(index)->selectedIndex.value());
+		return QVariant::fromValue(at(index)->selectedIndex.value());
 	}
 	if (nameId == "m_constraints"){
 		return itemPtr->GetConstraints();
@@ -12348,7 +7845,6 @@ QVariant sdl::imtbase::ImtBaseTypes::CSelectionParamObjectList::getData(const QS
 	return QVariant();
 }
 CSchedulerParamObject::CSchedulerParamObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CSchedulerParamObject::startTimeChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CSchedulerParamObject::intervalChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -12357,8 +7853,8 @@ CSchedulerParamObject::CSchedulerParamObject(QObject* parent): ::imtbase::CItemM
 
 QVariant CSchedulerParamObject::GetStartTime()
 {
-	if (Version_1_0 && Version_1_0->startTime){
-		return Version_1_0->startTime.value();
+	if (startTime){
+		return startTime.value();
 	}
 
 	return QVariant();
@@ -12367,25 +7863,22 @@ QVariant CSchedulerParamObject::GetStartTime()
 
 void CSchedulerParamObject::SetStartTime(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->startTime = v.value<QString>();
+	startTime = v.value<QString>();
 	startTimeChanged();
 }
 
 
 bool CSchedulerParamObject::hasStartTime()
 {
-	 return Version_1_0 && Version_1_0->startTime.HasValue();
+	 return startTime.HasValue();
 }
 
 
 QVariant CSchedulerParamObject::GetInterval()
 {
-	if (Version_1_0 && Version_1_0->interval){
-		return Version_1_0->interval.value();
+	if (interval){
+		return interval.value();
 	}
 
 	return QVariant();
@@ -12394,18 +7887,15 @@ QVariant CSchedulerParamObject::GetInterval()
 
 void CSchedulerParamObject::SetInterval(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->interval = v.value<int>();
+	interval = v.value<int>();
 	intervalChanged();
 }
 
 
 bool CSchedulerParamObject::hasInterval()
 {
-	 return Version_1_0 && Version_1_0->interval.HasValue();
+	 return interval.HasValue();
 }
 
 
@@ -12494,89 +7984,88 @@ QVariantMap CSchedulerParamObjectList::get(int row) const
 }
 
 
-void CSchedulerParamObjectList::append(sdl::imtbase::ImtBaseTypes::CSchedulerParamObject* item)
+void CSchedulerParamObjectList::append(sdl::V1_0::imtbase::CSchedulerParamObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::imtbase::ImtBaseTypes::CSchedulerParamObjectList* sdl::imtbase::ImtBaseTypes::CSchedulerParamObjectList::copyMe()
+sdl::V1_0::imtbase::CSchedulerParamObjectList* sdl::V1_0::imtbase::CSchedulerParamObjectList::copyMe()
 {
-	sdl::imtbase::ImtBaseTypes::CSchedulerParamObjectList* retVal = new sdl::imtbase::ImtBaseTypes::CSchedulerParamObjectList();
+	sdl::V1_0::imtbase::CSchedulerParamObjectList* retVal = new sdl::V1_0::imtbase::CSchedulerParamObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CSchedulerParamObjectList::toJson()
+QString sdl::V1_0::imtbase::CSchedulerParamObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CSchedulerParamObjectList::toGraphQL()
+QString sdl::V1_0::imtbase::CSchedulerParamObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CSchedulerParamObjectList::addElement(sdl::imtbase::ImtBaseTypes::CSchedulerParamObject* item)
+void sdl::V1_0::imtbase::CSchedulerParamObjectList::addElement(sdl::V1_0::imtbase::CSchedulerParamObject* item)
 {
 	append(item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CSchedulerParamObjectList::removeElement(int index)
+void sdl::V1_0::imtbase::CSchedulerParamObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::imtbase::ImtBaseTypes::CSchedulerParamObjectList::isEqualWithModel(sdl::imtbase::ImtBaseTypes::CSchedulerParamObjectList* otherModelPtr)
+bool sdl::V1_0::imtbase::CSchedulerParamObjectList::isEqualWithModel(sdl::V1_0::imtbase::CSchedulerParamObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CSchedulerParamObjectList::insert(int index, sdl::imtbase::ImtBaseTypes::CSchedulerParamObject* item)
+void sdl::V1_0::imtbase::CSchedulerParamObjectList::insert(int index, sdl::V1_0::imtbase::CSchedulerParamObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CSchedulerParamObjectList::remove(int index)
+void sdl::V1_0::imtbase::CSchedulerParamObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CSchedulerParamObjectList::clear()
+void sdl::V1_0::imtbase::CSchedulerParamObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::imtbase::ImtBaseTypes::CSchedulerParamObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CSchedulerParamObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CSchedulerParamObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::imtbase::CSchedulerParamObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_startTime"){
-		return QVariant::fromValue(Version_1_0->at(index)->startTime.value());
+		return QVariant::fromValue(at(index)->startTime.value());
 	}
 	if (nameId == "m_interval"){
-		return QVariant::fromValue(Version_1_0->at(index)->interval.value());
+		return QVariant::fromValue(at(index)->interval.value());
 	}
 
 	return QVariant();
 }
 CBackupSettingsObject::CBackupSettingsObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CBackupSettingsObject::schedulerParamChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CBackupSettingsObject::folderPathChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -12585,11 +8074,11 @@ CBackupSettingsObject::CBackupSettingsObject(QObject* parent): ::imtbase::CItemM
 
 QVariant CBackupSettingsObject::GetSchedulerParam()
 {
-	if (Version_1_0 && Version_1_0->schedulerParam){
+	if (schedulerParam){
 		if (!m_schedulerParamQObjectPtr.isValid()){
 			m_schedulerParamQObjectPtr = CreateObject("schedulerParam");
-			auto itemPtr = m_schedulerParamQObjectPtr.value<sdl::imtbase::ImtBaseTypes::CSchedulerParamObject*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->schedulerParam;
+			auto itemPtr = m_schedulerParamQObjectPtr.value<sdl::V1_0::imtbase::CSchedulerParamObject*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = schedulerParam;
 		}
 		return m_schedulerParamQObjectPtr;
 	}
@@ -12600,16 +8089,13 @@ QVariant CBackupSettingsObject::GetSchedulerParam()
 
 void CBackupSettingsObject::SetSchedulerParam(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::imtbase::ImtBaseTypes::CSchedulerParamObject* itemPtr = v.value<sdl::imtbase::ImtBaseTypes::CSchedulerParamObject*>();
-		if (itemPtr != nullptr)  Version_1_0->schedulerParam = itemPtr->Version_1_0;
+		sdl::V1_0::imtbase::CSchedulerParamObject* itemPtr = v.value<sdl::V1_0::imtbase::CSchedulerParamObject*>();
+		if (itemPtr != nullptr)  schedulerParam = static_cast<const decltype(schedulerParam)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->schedulerParam = nullptr;
+		schedulerParam = nullptr;
 	}
 	m_schedulerParamQObjectPtr = v;
 
@@ -12619,17 +8105,14 @@ void CBackupSettingsObject::SetSchedulerParam(const QVariant& v)
 
 bool CBackupSettingsObject::hasSchedulerParam()
 {
-	 return Version_1_0 && Version_1_0->schedulerParam.HasValue();
+	 return schedulerParam.HasValue();
 }
 
 
 void CBackupSettingsObject::emplaceSchedulerParam()
 {
 	ResetSchedulerParam();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->schedulerParam.emplace();
+	schedulerParam.emplace();
 }
 
 
@@ -12645,8 +8128,8 @@ void CBackupSettingsObject::ResetSchedulerParam()
 
 QVariant CBackupSettingsObject::GetFolderPath()
 {
-	if (Version_1_0 && Version_1_0->folderPath){
-		return Version_1_0->folderPath.value();
+	if (folderPath){
+		return folderPath.value();
 	}
 
 	return QVariant();
@@ -12655,18 +8138,15 @@ QVariant CBackupSettingsObject::GetFolderPath()
 
 void CBackupSettingsObject::SetFolderPath(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->folderPath = v.value<QString>();
+	folderPath = v.value<QString>();
 	folderPathChanged();
 }
 
 
 bool CBackupSettingsObject::hasFolderPath()
 {
-	 return Version_1_0 && Version_1_0->folderPath.HasValue();
+	 return folderPath.HasValue();
 }
 
 
@@ -12718,7 +8198,7 @@ QString CBackupSettingsObject::toGraphQL() const
 QVariant CBackupSettingsObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "schedulerParam"){
-		return QVariant::fromValue(new sdl::imtbase::ImtBaseTypes::CSchedulerParamObject(this));
+		return QVariant::fromValue(new sdl::V1_0::imtbase::CSchedulerParamObject(this));
 	}
 	return QVariant();
 }
@@ -12758,89 +8238,88 @@ QVariantMap CBackupSettingsObjectList::get(int row) const
 }
 
 
-void CBackupSettingsObjectList::append(sdl::imtbase::ImtBaseTypes::CBackupSettingsObject* item)
+void CBackupSettingsObjectList::append(sdl::V1_0::imtbase::CBackupSettingsObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::imtbase::ImtBaseTypes::CBackupSettingsObjectList* sdl::imtbase::ImtBaseTypes::CBackupSettingsObjectList::copyMe()
+sdl::V1_0::imtbase::CBackupSettingsObjectList* sdl::V1_0::imtbase::CBackupSettingsObjectList::copyMe()
 {
-	sdl::imtbase::ImtBaseTypes::CBackupSettingsObjectList* retVal = new sdl::imtbase::ImtBaseTypes::CBackupSettingsObjectList();
+	sdl::V1_0::imtbase::CBackupSettingsObjectList* retVal = new sdl::V1_0::imtbase::CBackupSettingsObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CBackupSettingsObjectList::toJson()
+QString sdl::V1_0::imtbase::CBackupSettingsObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CBackupSettingsObjectList::toGraphQL()
+QString sdl::V1_0::imtbase::CBackupSettingsObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CBackupSettingsObjectList::addElement(sdl::imtbase::ImtBaseTypes::CBackupSettingsObject* item)
+void sdl::V1_0::imtbase::CBackupSettingsObjectList::addElement(sdl::V1_0::imtbase::CBackupSettingsObject* item)
 {
 	append(item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CBackupSettingsObjectList::removeElement(int index)
+void sdl::V1_0::imtbase::CBackupSettingsObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::imtbase::ImtBaseTypes::CBackupSettingsObjectList::isEqualWithModel(sdl::imtbase::ImtBaseTypes::CBackupSettingsObjectList* otherModelPtr)
+bool sdl::V1_0::imtbase::CBackupSettingsObjectList::isEqualWithModel(sdl::V1_0::imtbase::CBackupSettingsObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CBackupSettingsObjectList::insert(int index, sdl::imtbase::ImtBaseTypes::CBackupSettingsObject* item)
+void sdl::V1_0::imtbase::CBackupSettingsObjectList::insert(int index, sdl::V1_0::imtbase::CBackupSettingsObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CBackupSettingsObjectList::remove(int index)
+void sdl::V1_0::imtbase::CBackupSettingsObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CBackupSettingsObjectList::clear()
+void sdl::V1_0::imtbase::CBackupSettingsObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::imtbase::ImtBaseTypes::CBackupSettingsObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CBackupSettingsObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CBackupSettingsObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::imtbase::CBackupSettingsObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_schedulerParam"){
 		return itemPtr->GetSchedulerParam();
 	}
 	if (nameId == "m_folderPath"){
-		return QVariant::fromValue(Version_1_0->at(index)->folderPath.value());
+		return QVariant::fromValue(at(index)->folderPath.value());
 	}
 
 	return QVariant();
 }
 CDatabaseAccessSettingsObject::CDatabaseAccessSettingsObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CDatabaseAccessSettingsObject::dbNameChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CDatabaseAccessSettingsObject::hostChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -12853,8 +8332,8 @@ CDatabaseAccessSettingsObject::CDatabaseAccessSettingsObject(QObject* parent): :
 
 QVariant CDatabaseAccessSettingsObject::GetDbName()
 {
-	if (Version_1_0 && Version_1_0->dbName){
-		return Version_1_0->dbName.value();
+	if (dbName){
+		return dbName.value();
 	}
 
 	return QVariant();
@@ -12863,25 +8342,22 @@ QVariant CDatabaseAccessSettingsObject::GetDbName()
 
 void CDatabaseAccessSettingsObject::SetDbName(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->dbName = v.value<QString>();
+	dbName = v.value<QString>();
 	dbNameChanged();
 }
 
 
 bool CDatabaseAccessSettingsObject::hasDbName()
 {
-	 return Version_1_0 && Version_1_0->dbName.HasValue();
+	 return dbName.HasValue();
 }
 
 
 QVariant CDatabaseAccessSettingsObject::GetHost()
 {
-	if (Version_1_0 && Version_1_0->host){
-		return Version_1_0->host.value();
+	if (host){
+		return host.value();
 	}
 
 	return QVariant();
@@ -12890,25 +8366,22 @@ QVariant CDatabaseAccessSettingsObject::GetHost()
 
 void CDatabaseAccessSettingsObject::SetHost(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->host = v.value<QString>();
+	host = v.value<QString>();
 	hostChanged();
 }
 
 
 bool CDatabaseAccessSettingsObject::hasHost()
 {
-	 return Version_1_0 && Version_1_0->host.HasValue();
+	 return host.HasValue();
 }
 
 
 QVariant CDatabaseAccessSettingsObject::GetPort()
 {
-	if (Version_1_0 && Version_1_0->port){
-		return Version_1_0->port.value();
+	if (port){
+		return port.value();
 	}
 
 	return QVariant();
@@ -12917,25 +8390,22 @@ QVariant CDatabaseAccessSettingsObject::GetPort()
 
 void CDatabaseAccessSettingsObject::SetPort(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->port = v.value<int>();
+	port = v.value<int>();
 	portChanged();
 }
 
 
 bool CDatabaseAccessSettingsObject::hasPort()
 {
-	 return Version_1_0 && Version_1_0->port.HasValue();
+	 return port.HasValue();
 }
 
 
 QVariant CDatabaseAccessSettingsObject::GetDbPath()
 {
-	if (Version_1_0 && Version_1_0->dbPath){
-		return Version_1_0->dbPath.value();
+	if (dbPath){
+		return dbPath.value();
 	}
 
 	return QVariant();
@@ -12944,25 +8414,22 @@ QVariant CDatabaseAccessSettingsObject::GetDbPath()
 
 void CDatabaseAccessSettingsObject::SetDbPath(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->dbPath = v.value<QString>();
+	dbPath = v.value<QString>();
 	dbPathChanged();
 }
 
 
 bool CDatabaseAccessSettingsObject::hasDbPath()
 {
-	 return Version_1_0 && Version_1_0->dbPath.HasValue();
+	 return dbPath.HasValue();
 }
 
 
 QVariant CDatabaseAccessSettingsObject::GetUsername()
 {
-	if (Version_1_0 && Version_1_0->username){
-		return Version_1_0->username.value();
+	if (username){
+		return username.value();
 	}
 
 	return QVariant();
@@ -12971,25 +8438,22 @@ QVariant CDatabaseAccessSettingsObject::GetUsername()
 
 void CDatabaseAccessSettingsObject::SetUsername(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->username = v.value<QString>();
+	username = v.value<QString>();
 	usernameChanged();
 }
 
 
 bool CDatabaseAccessSettingsObject::hasUsername()
 {
-	 return Version_1_0 && Version_1_0->username.HasValue();
+	 return username.HasValue();
 }
 
 
 QVariant CDatabaseAccessSettingsObject::GetPassword()
 {
-	if (Version_1_0 && Version_1_0->password){
-		return Version_1_0->password.value();
+	if (password){
+		return password.value();
 	}
 
 	return QVariant();
@@ -12998,18 +8462,15 @@ QVariant CDatabaseAccessSettingsObject::GetPassword()
 
 void CDatabaseAccessSettingsObject::SetPassword(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->password = v.value<QString>();
+	password = v.value<QString>();
 	passwordChanged();
 }
 
 
 bool CDatabaseAccessSettingsObject::hasPassword()
 {
-	 return Version_1_0 && Version_1_0->password.HasValue();
+	 return password.HasValue();
 }
 
 
@@ -13110,101 +8571,100 @@ QVariantMap CDatabaseAccessSettingsObjectList::get(int row) const
 }
 
 
-void CDatabaseAccessSettingsObjectList::append(sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObject* item)
+void CDatabaseAccessSettingsObjectList::append(sdl::V1_0::imtbase::CDatabaseAccessSettingsObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObjectList* sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObjectList::copyMe()
+sdl::V1_0::imtbase::CDatabaseAccessSettingsObjectList* sdl::V1_0::imtbase::CDatabaseAccessSettingsObjectList::copyMe()
 {
-	sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObjectList* retVal = new sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObjectList();
+	sdl::V1_0::imtbase::CDatabaseAccessSettingsObjectList* retVal = new sdl::V1_0::imtbase::CDatabaseAccessSettingsObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObjectList::toJson()
+QString sdl::V1_0::imtbase::CDatabaseAccessSettingsObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObjectList::toGraphQL()
+QString sdl::V1_0::imtbase::CDatabaseAccessSettingsObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObjectList::addElement(sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObject* item)
+void sdl::V1_0::imtbase::CDatabaseAccessSettingsObjectList::addElement(sdl::V1_0::imtbase::CDatabaseAccessSettingsObject* item)
 {
 	append(item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObjectList::removeElement(int index)
+void sdl::V1_0::imtbase::CDatabaseAccessSettingsObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObjectList::isEqualWithModel(sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObjectList* otherModelPtr)
+bool sdl::V1_0::imtbase::CDatabaseAccessSettingsObjectList::isEqualWithModel(sdl::V1_0::imtbase::CDatabaseAccessSettingsObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObjectList::insert(int index, sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObject* item)
+void sdl::V1_0::imtbase::CDatabaseAccessSettingsObjectList::insert(int index, sdl::V1_0::imtbase::CDatabaseAccessSettingsObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObjectList::remove(int index)
+void sdl::V1_0::imtbase::CDatabaseAccessSettingsObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObjectList::clear()
+void sdl::V1_0::imtbase::CDatabaseAccessSettingsObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CDatabaseAccessSettingsObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::imtbase::CDatabaseAccessSettingsObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_dbName"){
-		return QVariant::fromValue(Version_1_0->at(index)->dbName.value());
+		return QVariant::fromValue(at(index)->dbName.value());
 	}
 	if (nameId == "m_host"){
-		return QVariant::fromValue(Version_1_0->at(index)->host.value());
+		return QVariant::fromValue(at(index)->host.value());
 	}
 	if (nameId == "m_port"){
-		return QVariant::fromValue(Version_1_0->at(index)->port.value());
+		return QVariant::fromValue(at(index)->port.value());
 	}
 	if (nameId == "m_dbPath"){
-		return QVariant::fromValue(Version_1_0->at(index)->dbPath.value());
+		return QVariant::fromValue(at(index)->dbPath.value());
 	}
 	if (nameId == "m_username"){
-		return QVariant::fromValue(Version_1_0->at(index)->username.value());
+		return QVariant::fromValue(at(index)->username.value());
 	}
 	if (nameId == "m_password"){
-		return QVariant::fromValue(Version_1_0->at(index)->password.value());
+		return QVariant::fromValue(at(index)->password.value());
 	}
 
 	return QVariant();
 }
 CFileNameParamObject::CFileNameParamObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CFileNameParamObject::pathTypeChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CFileNameParamObject::pathChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -13213,8 +8673,8 @@ CFileNameParamObject::CFileNameParamObject(QObject* parent): ::imtbase::CItemMod
 
 QVariant CFileNameParamObject::GetPathType()
 {
-	if (Version_1_0 && Version_1_0->pathType){
-		return Version_1_0->pathType.value();
+	if (pathType){
+		return pathType.value();
 	}
 
 	return QVariant();
@@ -13223,25 +8683,22 @@ QVariant CFileNameParamObject::GetPathType()
 
 void CFileNameParamObject::SetPathType(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->pathType = v.value<int>();
+	pathType = v.value<int>();
 	pathTypeChanged();
 }
 
 
 bool CFileNameParamObject::hasPathType()
 {
-	 return Version_1_0 && Version_1_0->pathType.HasValue();
+	 return pathType.HasValue();
 }
 
 
 QVariant CFileNameParamObject::GetPath()
 {
-	if (Version_1_0 && Version_1_0->path){
-		return Version_1_0->path.value();
+	if (path){
+		return path.value();
 	}
 
 	return QVariant();
@@ -13250,18 +8707,15 @@ QVariant CFileNameParamObject::GetPath()
 
 void CFileNameParamObject::SetPath(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->path = v.value<QString>();
+	path = v.value<QString>();
 	pathChanged();
 }
 
 
 bool CFileNameParamObject::hasPath()
 {
-	 return Version_1_0 && Version_1_0->path.HasValue();
+	 return path.HasValue();
 }
 
 
@@ -13350,89 +8804,88 @@ QVariantMap CFileNameParamObjectList::get(int row) const
 }
 
 
-void CFileNameParamObjectList::append(sdl::imtbase::ImtBaseTypes::CFileNameParamObject* item)
+void CFileNameParamObjectList::append(sdl::V1_0::imtbase::CFileNameParamObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::imtbase::ImtBaseTypes::CFileNameParamObjectList* sdl::imtbase::ImtBaseTypes::CFileNameParamObjectList::copyMe()
+sdl::V1_0::imtbase::CFileNameParamObjectList* sdl::V1_0::imtbase::CFileNameParamObjectList::copyMe()
 {
-	sdl::imtbase::ImtBaseTypes::CFileNameParamObjectList* retVal = new sdl::imtbase::ImtBaseTypes::CFileNameParamObjectList();
+	sdl::V1_0::imtbase::CFileNameParamObjectList* retVal = new sdl::V1_0::imtbase::CFileNameParamObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CFileNameParamObjectList::toJson()
+QString sdl::V1_0::imtbase::CFileNameParamObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CFileNameParamObjectList::toGraphQL()
+QString sdl::V1_0::imtbase::CFileNameParamObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CFileNameParamObjectList::addElement(sdl::imtbase::ImtBaseTypes::CFileNameParamObject* item)
+void sdl::V1_0::imtbase::CFileNameParamObjectList::addElement(sdl::V1_0::imtbase::CFileNameParamObject* item)
 {
 	append(item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CFileNameParamObjectList::removeElement(int index)
+void sdl::V1_0::imtbase::CFileNameParamObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::imtbase::ImtBaseTypes::CFileNameParamObjectList::isEqualWithModel(sdl::imtbase::ImtBaseTypes::CFileNameParamObjectList* otherModelPtr)
+bool sdl::V1_0::imtbase::CFileNameParamObjectList::isEqualWithModel(sdl::V1_0::imtbase::CFileNameParamObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CFileNameParamObjectList::insert(int index, sdl::imtbase::ImtBaseTypes::CFileNameParamObject* item)
+void sdl::V1_0::imtbase::CFileNameParamObjectList::insert(int index, sdl::V1_0::imtbase::CFileNameParamObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CFileNameParamObjectList::remove(int index)
+void sdl::V1_0::imtbase::CFileNameParamObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CFileNameParamObjectList::clear()
+void sdl::V1_0::imtbase::CFileNameParamObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::imtbase::ImtBaseTypes::CFileNameParamObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CFileNameParamObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CFileNameParamObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::imtbase::CFileNameParamObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_pathType"){
-		return QVariant::fromValue(Version_1_0->at(index)->pathType.value());
+		return QVariant::fromValue(at(index)->pathType.value());
 	}
 	if (nameId == "m_path"){
-		return QVariant::fromValue(Version_1_0->at(index)->path.value());
+		return QVariant::fromValue(at(index)->path.value());
 	}
 
 	return QVariant();
 }
 CParamsSetObject::CParamsSetObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CParamsSetObject::paramIdsChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CParamsSetObject::paramTypeIdsChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -13444,9 +8897,9 @@ CParamsSetObject::CParamsSetObject(QObject* parent): ::imtbase::CItemModelBase(p
 
 QVariant CParamsSetObject::GetParamIds()
 {
-	if (Version_1_0 && Version_1_0->paramIds){
+	if (paramIds){
 		QList<QString> tempParamIdsList;
-		for (const auto& tempValue: Version_1_0->paramIds.value()){
+		for (const auto& tempValue: paramIds.value()){
 			tempParamIdsList << *tempValue;
 		}
 		return QVariant::fromValue(tempParamIdsList);
@@ -13458,19 +8911,16 @@ QVariant CParamsSetObject::GetParamIds()
 
 void CParamsSetObject::SetParamIds(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	if (!Version_1_0->paramIds){
-		Version_1_0->paramIds.emplace();
+	if (!paramIds){
+		paramIds.emplace();
 	}
 	else{
-		Version_1_0->paramIds->clear();
+		paramIds->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QByteArray> value(tempValue.toUtf8());
-		Version_1_0->paramIds->append(value);
+		paramIds->append(value);
 	}
 
 	paramIdsChanged();
@@ -13479,15 +8929,15 @@ void CParamsSetObject::SetParamIds(const QVariant& v)
 
 bool CParamsSetObject::hasParamIds()
 {
-	 return Version_1_0 && Version_1_0->paramIds.HasValue();
+	 return paramIds.HasValue();
 }
 
 
 QVariant CParamsSetObject::GetParamTypeIds()
 {
-	if (Version_1_0 && Version_1_0->paramTypeIds){
+	if (paramTypeIds){
 		QList<QString> tempParamTypeIdsList;
-		for (const auto& tempValue: Version_1_0->paramTypeIds.value()){
+		for (const auto& tempValue: paramTypeIds.value()){
 			tempParamTypeIdsList << *tempValue;
 		}
 		return QVariant::fromValue(tempParamTypeIdsList);
@@ -13499,19 +8949,16 @@ QVariant CParamsSetObject::GetParamTypeIds()
 
 void CParamsSetObject::SetParamTypeIds(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	if (!Version_1_0->paramTypeIds){
-		Version_1_0->paramTypeIds.emplace();
+	if (!paramTypeIds){
+		paramTypeIds.emplace();
 	}
 	else{
-		Version_1_0->paramTypeIds->clear();
+		paramTypeIds->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QByteArray> value(tempValue.toUtf8());
-		Version_1_0->paramTypeIds->append(value);
+		paramTypeIds->append(value);
 	}
 
 	paramTypeIdsChanged();
@@ -13520,15 +8967,15 @@ void CParamsSetObject::SetParamTypeIds(const QVariant& v)
 
 bool CParamsSetObject::hasParamTypeIds()
 {
-	 return Version_1_0 && Version_1_0->paramTypeIds.HasValue();
+	 return paramTypeIds.HasValue();
 }
 
 
 QVariant CParamsSetObject::GetParamNames()
 {
-	if (Version_1_0 && Version_1_0->paramNames){
+	if (paramNames){
 		QList<QString> tempParamNamesList;
-		for (const auto& tempValue: Version_1_0->paramNames.value()){
+		for (const auto& tempValue: paramNames.value()){
 			tempParamNamesList << *tempValue;
 		}
 		return QVariant::fromValue(tempParamNamesList);
@@ -13540,19 +8987,16 @@ QVariant CParamsSetObject::GetParamNames()
 
 void CParamsSetObject::SetParamNames(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	if (!Version_1_0->paramNames){
-		Version_1_0->paramNames.emplace();
+	if (!paramNames){
+		paramNames.emplace();
 	}
 	else{
-		Version_1_0->paramNames->clear();
+		paramNames->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QString> value(tempValue);
-		Version_1_0->paramNames->append(value);
+		paramNames->append(value);
 	}
 
 	paramNamesChanged();
@@ -13561,15 +9005,15 @@ void CParamsSetObject::SetParamNames(const QVariant& v)
 
 bool CParamsSetObject::hasParamNames()
 {
-	 return Version_1_0 && Version_1_0->paramNames.HasValue();
+	 return paramNames.HasValue();
 }
 
 
 QVariant CParamsSetObject::GetParamDescriptions()
 {
-	if (Version_1_0 && Version_1_0->paramDescriptions){
+	if (paramDescriptions){
 		QList<QString> tempParamDescriptionsList;
-		for (const auto& tempValue: Version_1_0->paramDescriptions.value()){
+		for (const auto& tempValue: paramDescriptions.value()){
 			tempParamDescriptionsList << *tempValue;
 		}
 		return QVariant::fromValue(tempParamDescriptionsList);
@@ -13581,19 +9025,16 @@ QVariant CParamsSetObject::GetParamDescriptions()
 
 void CParamsSetObject::SetParamDescriptions(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	if (!Version_1_0->paramDescriptions){
-		Version_1_0->paramDescriptions.emplace();
+	if (!paramDescriptions){
+		paramDescriptions.emplace();
 	}
 	else{
-		Version_1_0->paramDescriptions->clear();
+		paramDescriptions->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QString> value(tempValue);
-		Version_1_0->paramDescriptions->append(value);
+		paramDescriptions->append(value);
 	}
 
 	paramDescriptionsChanged();
@@ -13602,15 +9043,15 @@ void CParamsSetObject::SetParamDescriptions(const QVariant& v)
 
 bool CParamsSetObject::hasParamDescriptions()
 {
-	 return Version_1_0 && Version_1_0->paramDescriptions.HasValue();
+	 return paramDescriptions.HasValue();
 }
 
 
 QVariant CParamsSetObject::GetParameters()
 {
-	if (Version_1_0 && Version_1_0->parameters){
+	if (parameters){
 		QList<QString> tempParametersList;
-		for (const auto& tempValue: Version_1_0->parameters.value()){
+		for (const auto& tempValue: parameters.value()){
 			tempParametersList << *tempValue;
 		}
 		return QVariant::fromValue(tempParametersList);
@@ -13622,19 +9063,16 @@ QVariant CParamsSetObject::GetParameters()
 
 void CParamsSetObject::SetParameters(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	if (!Version_1_0->parameters){
-		Version_1_0->parameters.emplace();
+	if (!parameters){
+		parameters.emplace();
 	}
 	else{
-		Version_1_0->parameters->clear();
+		parameters->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QString> value(tempValue);
-		Version_1_0->parameters->append(value);
+		parameters->append(value);
 	}
 
 	parametersChanged();
@@ -13643,7 +9081,7 @@ void CParamsSetObject::SetParameters(const QVariant& v)
 
 bool CParamsSetObject::hasParameters()
 {
-	 return Version_1_0 && Version_1_0->parameters.HasValue();
+	 return parameters.HasValue();
 }
 
 
@@ -13741,98 +9179,97 @@ QVariantMap CParamsSetObjectList::get(int row) const
 }
 
 
-void CParamsSetObjectList::append(sdl::imtbase::ImtBaseTypes::CParamsSetObject* item)
+void CParamsSetObjectList::append(sdl::V1_0::imtbase::CParamsSetObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::imtbase::ImtBaseTypes::CParamsSetObjectList* sdl::imtbase::ImtBaseTypes::CParamsSetObjectList::copyMe()
+sdl::V1_0::imtbase::CParamsSetObjectList* sdl::V1_0::imtbase::CParamsSetObjectList::copyMe()
 {
-	sdl::imtbase::ImtBaseTypes::CParamsSetObjectList* retVal = new sdl::imtbase::ImtBaseTypes::CParamsSetObjectList();
+	sdl::V1_0::imtbase::CParamsSetObjectList* retVal = new sdl::V1_0::imtbase::CParamsSetObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CParamsSetObjectList::toJson()
+QString sdl::V1_0::imtbase::CParamsSetObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CParamsSetObjectList::toGraphQL()
+QString sdl::V1_0::imtbase::CParamsSetObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CParamsSetObjectList::addElement(sdl::imtbase::ImtBaseTypes::CParamsSetObject* item)
+void sdl::V1_0::imtbase::CParamsSetObjectList::addElement(sdl::V1_0::imtbase::CParamsSetObject* item)
 {
 	append(item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CParamsSetObjectList::removeElement(int index)
+void sdl::V1_0::imtbase::CParamsSetObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::imtbase::ImtBaseTypes::CParamsSetObjectList::isEqualWithModel(sdl::imtbase::ImtBaseTypes::CParamsSetObjectList* otherModelPtr)
+bool sdl::V1_0::imtbase::CParamsSetObjectList::isEqualWithModel(sdl::V1_0::imtbase::CParamsSetObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CParamsSetObjectList::insert(int index, sdl::imtbase::ImtBaseTypes::CParamsSetObject* item)
+void sdl::V1_0::imtbase::CParamsSetObjectList::insert(int index, sdl::V1_0::imtbase::CParamsSetObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CParamsSetObjectList::remove(int index)
+void sdl::V1_0::imtbase::CParamsSetObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CParamsSetObjectList::clear()
+void sdl::V1_0::imtbase::CParamsSetObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::imtbase::ImtBaseTypes::CParamsSetObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CParamsSetObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CParamsSetObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::imtbase::CParamsSetObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_paramIds"){
-		return QVariant::fromValue(Version_1_0->at(index)->paramIds.value());
+		return QVariant::fromValue(at(index)->paramIds.value());
 	}
 	if (nameId == "m_paramTypeIds"){
-		return QVariant::fromValue(Version_1_0->at(index)->paramTypeIds.value());
+		return QVariant::fromValue(at(index)->paramTypeIds.value());
 	}
 	if (nameId == "m_paramNames"){
-		return QVariant::fromValue(Version_1_0->at(index)->paramNames.value());
+		return QVariant::fromValue(at(index)->paramNames.value());
 	}
 	if (nameId == "m_paramDescriptions"){
-		return QVariant::fromValue(Version_1_0->at(index)->paramDescriptions.value());
+		return QVariant::fromValue(at(index)->paramDescriptions.value());
 	}
 	if (nameId == "m_parameters"){
-		return QVariant::fromValue(Version_1_0->at(index)->parameters.value());
+		return QVariant::fromValue(at(index)->parameters.value());
 	}
 
 	return QVariant();
 }
 CMimeTypeObject::CMimeTypeObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CMimeTypeObject::typeChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CMimeTypeObject::treeChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -13844,8 +9281,8 @@ CMimeTypeObject::CMimeTypeObject(QObject* parent): ::imtbase::CItemModelBase(par
 
 QVariant CMimeTypeObject::GetType()
 {
-	if (Version_1_0 && Version_1_0->type){
-		return Version_1_0->type.value();
+	if (type){
+		return type.value();
 	}
 
 	return QVariant();
@@ -13854,26 +9291,23 @@ QVariant CMimeTypeObject::GetType()
 
 void CMimeTypeObject::SetType(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->type = v.value<QString>();
+	type = v.value<QString>();
 	typeChanged();
 }
 
 
 bool CMimeTypeObject::hasType()
 {
-	 return Version_1_0 && Version_1_0->type.HasValue();
+	 return type.HasValue();
 }
 
 
 QVariant CMimeTypeObject::GetTree()
 {
-	if (Version_1_0 && Version_1_0->tree){
+	if (tree){
 		QList<QString> tempTreeList;
-		for (const auto& tempValue: Version_1_0->tree.value()){
+		for (const auto& tempValue: tree.value()){
 			tempTreeList << *tempValue;
 		}
 		return QVariant::fromValue(tempTreeList);
@@ -13885,19 +9319,16 @@ QVariant CMimeTypeObject::GetTree()
 
 void CMimeTypeObject::SetTree(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	if (!Version_1_0->tree){
-		Version_1_0->tree.emplace();
+	if (!tree){
+		tree.emplace();
 	}
 	else{
-		Version_1_0->tree->clear();
+		tree->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QString> value(tempValue);
-		Version_1_0->tree->append(value);
+		tree->append(value);
 	}
 
 	treeChanged();
@@ -13906,14 +9337,14 @@ void CMimeTypeObject::SetTree(const QVariant& v)
 
 bool CMimeTypeObject::hasTree()
 {
-	 return Version_1_0 && Version_1_0->tree.HasValue();
+	 return tree.HasValue();
 }
 
 
 QVariant CMimeTypeObject::GetSubType()
 {
-	if (Version_1_0 && Version_1_0->subType){
-		return Version_1_0->subType.value();
+	if (subType){
+		return subType.value();
 	}
 
 	return QVariant();
@@ -13922,25 +9353,22 @@ QVariant CMimeTypeObject::GetSubType()
 
 void CMimeTypeObject::SetSubType(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->subType = v.value<QString>();
+	subType = v.value<QString>();
 	subTypeChanged();
 }
 
 
 bool CMimeTypeObject::hasSubType()
 {
-	 return Version_1_0 && Version_1_0->subType.HasValue();
+	 return subType.HasValue();
 }
 
 
 QVariant CMimeTypeObject::GetSuffix()
 {
-	if (Version_1_0 && Version_1_0->suffix){
-		return Version_1_0->suffix.value();
+	if (suffix){
+		return suffix.value();
 	}
 
 	return QVariant();
@@ -13949,26 +9377,23 @@ QVariant CMimeTypeObject::GetSuffix()
 
 void CMimeTypeObject::SetSuffix(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->suffix = v.value<QString>();
+	suffix = v.value<QString>();
 	suffixChanged();
 }
 
 
 bool CMimeTypeObject::hasSuffix()
 {
-	 return Version_1_0 && Version_1_0->suffix.HasValue();
+	 return suffix.HasValue();
 }
 
 
 QVariant CMimeTypeObject::GetParameters()
 {
-	if (Version_1_0 && Version_1_0->parameters){
+	if (parameters){
 		QList<QString> tempParametersList;
-		for (const auto& tempValue: Version_1_0->parameters.value()){
+		for (const auto& tempValue: parameters.value()){
 			tempParametersList << *tempValue;
 		}
 		return QVariant::fromValue(tempParametersList);
@@ -13980,19 +9405,16 @@ QVariant CMimeTypeObject::GetParameters()
 
 void CMimeTypeObject::SetParameters(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	if (!Version_1_0->parameters){
-		Version_1_0->parameters.emplace();
+	if (!parameters){
+		parameters.emplace();
 	}
 	else{
-		Version_1_0->parameters->clear();
+		parameters->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QString> value(tempValue);
-		Version_1_0->parameters->append(value);
+		parameters->append(value);
 	}
 
 	parametersChanged();
@@ -14001,7 +9423,7 @@ void CMimeTypeObject::SetParameters(const QVariant& v)
 
 bool CMimeTypeObject::hasParameters()
 {
-	 return Version_1_0 && Version_1_0->parameters.HasValue();
+	 return parameters.HasValue();
 }
 
 
@@ -14099,94 +9521,94 @@ QVariantMap CMimeTypeObjectList::get(int row) const
 }
 
 
-void CMimeTypeObjectList::append(sdl::imtbase::ImtBaseTypes::CMimeTypeObject* item)
+void CMimeTypeObjectList::append(sdl::V1_0::imtbase::CMimeTypeObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::imtbase::ImtBaseTypes::CMimeTypeObjectList* sdl::imtbase::ImtBaseTypes::CMimeTypeObjectList::copyMe()
+sdl::V1_0::imtbase::CMimeTypeObjectList* sdl::V1_0::imtbase::CMimeTypeObjectList::copyMe()
 {
-	sdl::imtbase::ImtBaseTypes::CMimeTypeObjectList* retVal = new sdl::imtbase::ImtBaseTypes::CMimeTypeObjectList();
+	sdl::V1_0::imtbase::CMimeTypeObjectList* retVal = new sdl::V1_0::imtbase::CMimeTypeObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CMimeTypeObjectList::toJson()
+QString sdl::V1_0::imtbase::CMimeTypeObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::imtbase::ImtBaseTypes::CMimeTypeObjectList::toGraphQL()
+QString sdl::V1_0::imtbase::CMimeTypeObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CMimeTypeObjectList::addElement(sdl::imtbase::ImtBaseTypes::CMimeTypeObject* item)
+void sdl::V1_0::imtbase::CMimeTypeObjectList::addElement(sdl::V1_0::imtbase::CMimeTypeObject* item)
 {
 	append(item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CMimeTypeObjectList::removeElement(int index)
+void sdl::V1_0::imtbase::CMimeTypeObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::imtbase::ImtBaseTypes::CMimeTypeObjectList::isEqualWithModel(sdl::imtbase::ImtBaseTypes::CMimeTypeObjectList* otherModelPtr)
+bool sdl::V1_0::imtbase::CMimeTypeObjectList::isEqualWithModel(sdl::V1_0::imtbase::CMimeTypeObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CMimeTypeObjectList::insert(int index, sdl::imtbase::ImtBaseTypes::CMimeTypeObject* item)
+void sdl::V1_0::imtbase::CMimeTypeObjectList::insert(int index, sdl::V1_0::imtbase::CMimeTypeObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CMimeTypeObjectList::remove(int index)
+void sdl::V1_0::imtbase::CMimeTypeObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::imtbase::ImtBaseTypes::CMimeTypeObjectList::clear()
+void sdl::V1_0::imtbase::CMimeTypeObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::imtbase::ImtBaseTypes::CMimeTypeObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::imtbase::CMimeTypeObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CMimeTypeObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::imtbase::CMimeTypeObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_type"){
-		return QVariant::fromValue(Version_1_0->at(index)->type.value());
+		return QVariant::fromValue(at(index)->type.value());
 	}
 	if (nameId == "m_tree"){
-		return QVariant::fromValue(Version_1_0->at(index)->tree.value());
+		return QVariant::fromValue(at(index)->tree.value());
 	}
 	if (nameId == "m_subType"){
-		return QVariant::fromValue(Version_1_0->at(index)->subType.value());
+		return QVariant::fromValue(at(index)->subType.value());
 	}
 	if (nameId == "m_suffix"){
-		return QVariant::fromValue(Version_1_0->at(index)->suffix.value());
+		return QVariant::fromValue(at(index)->suffix.value());
 	}
 	if (nameId == "m_parameters"){
-		return QVariant::fromValue(Version_1_0->at(index)->parameters.value());
+		return QVariant::fromValue(at(index)->parameters.value());
 	}
 
 	return QVariant();
 }
-} // namespace sdl::imtbase::ImtBaseTypes
+} // namespace sdl::V1_0::imtbase

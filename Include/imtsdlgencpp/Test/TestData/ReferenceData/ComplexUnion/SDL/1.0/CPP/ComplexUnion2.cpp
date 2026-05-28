@@ -2,17 +2,17 @@
 #include "ComplexUnion2_fwd.h"
 
 
-namespace sdl::complextest::ComplexUnion2
+namespace sdl::V1_0::complextest
 {
 
 
-QByteArray CResult::V1_0::GetVersionId()
+QByteArray CResult::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CResult::V1_0::operator==(const V1_0& other) const
+bool CResult::operator==(const CResult& other) const
 {
 	return 
 				AreaResult == other.AreaResult &&
@@ -44,7 +44,7 @@ bool CResult::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CResult::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CResult::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "Result", modelIndex);
 
@@ -55,19 +55,19 @@ bool CResult::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelInde
 	}
 	QString areaResultStringValue;
 	switch (*AreaResult){
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NONE:
+	case ::sdl::V1_0::complextest::StatusCode::NONE:
 		areaResultStringValue = "NONE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::OK:
+	case ::sdl::V1_0::complextest::StatusCode::OK:
 		areaResultStringValue = "OK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::WARNING:
+	case ::sdl::V1_0::complextest::StatusCode::WARNING:
 		areaResultStringValue = "WARNING";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NOK:
+	case ::sdl::V1_0::complextest::StatusCode::NOK:
 		areaResultStringValue = "NOK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::FAILED:
+	case ::sdl::V1_0::complextest::StatusCode::FAILED:
 		areaResultStringValue = "FAILED";
 		break;
 	default:
@@ -125,37 +125,37 @@ bool CResult::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelInde
 	}
 	QString measurementTypeStringValue;
 	switch (*MeasurementType){
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::NONE:
+	case ::sdl::V1_0::complextest::MeasurementType::NONE:
 		measurementTypeStringValue = "NONE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::WIDTH:
+	case ::sdl::V1_0::complextest::MeasurementType::WIDTH:
 		measurementTypeStringValue = "WIDTH";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::BRIGHTNESS:
+	case ::sdl::V1_0::complextest::MeasurementType::BRIGHTNESS:
 		measurementTypeStringValue = "BRIGHTNESS";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::DISTANCE:
+	case ::sdl::V1_0::complextest::MeasurementType::DISTANCE:
 		measurementTypeStringValue = "DISTANCE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::DISPLACEMENT:
+	case ::sdl::V1_0::complextest::MeasurementType::DISPLACEMENT:
 		measurementTypeStringValue = "DISPLACEMENT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::HEIGHT:
+	case ::sdl::V1_0::complextest::MeasurementType::HEIGHT:
 		measurementTypeStringValue = "HEIGHT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::SYMMETRY:
+	case ::sdl::V1_0::complextest::MeasurementType::SYMMETRY:
 		measurementTypeStringValue = "SYMMETRY";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::VOLUME:
+	case ::sdl::V1_0::complextest::MeasurementType::VOLUME:
 		measurementTypeStringValue = "VOLUME";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::VOLUMERATE:
+	case ::sdl::V1_0::complextest::MeasurementType::VOLUMERATE:
 		measurementTypeStringValue = "VOLUMERATE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::LENGTH:
+	case ::sdl::V1_0::complextest::MeasurementType::LENGTH:
 		measurementTypeStringValue = "LENGTH";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::OUT_OF_BOUND:
+	case ::sdl::V1_0::complextest::MeasurementType::OUT_OF_BOUND:
 		measurementTypeStringValue = "OUT_OF_BOUND";
 		break;
 	default:
@@ -171,19 +171,19 @@ bool CResult::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelInde
 	}
 	QString measurementUnitStringValue;
 	switch (*MeasurementUnit){
-	case ::sdl::complextest::ComplexUnion1::MeasurementUnit::NONE:
+	case ::sdl::V1_0::complextest::MeasurementUnit::NONE:
 		measurementUnitStringValue = "NONE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm:
+	case ::sdl::V1_0::complextest::MeasurementUnit::mm:
 		measurementUnitStringValue = "mm";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm3:
+	case ::sdl::V1_0::complextest::MeasurementUnit::mm3:
 		measurementUnitStringValue = "mm3";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm3_mm:
+	case ::sdl::V1_0::complextest::MeasurementUnit::mm3_mm:
 		measurementUnitStringValue = "mm3_mm";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementUnit::pixel:
+	case ::sdl::V1_0::complextest::MeasurementUnit::pixel:
 		measurementUnitStringValue = "pixel";
 		break;
 	default:
@@ -206,154 +206,154 @@ bool CResult::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelInde
 	}
 	QString errorTypeStringValue;
 	switch (*ErrorType){
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::OK:
+	case ::sdl::V1_0::complextest::ErrorCode::OK:
 		errorTypeStringValue = "OK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_WIDE:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_WIDE:
 		errorTypeStringValue = "TOO_WIDE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOLERANCE:
+	case ::sdl::V1_0::complextest::ErrorCode::TOLERANCE:
 		errorTypeStringValue = "TOLERANCE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_NARROW:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_NARROW:
 		errorTypeStringValue = "TOO_NARROW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::NO_DATA_GAP:
+	case ::sdl::V1_0::complextest::ErrorCode::NO_DATA_GAP:
 		errorTypeStringValue = "NO_DATA_GAP";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::GAP:
+	case ::sdl::V1_0::complextest::ErrorCode::GAP:
 		errorTypeStringValue = "GAP";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_HIGH:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_HIGH:
 		errorTypeStringValue = "TOO_HIGH";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_LOW:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_LOW:
 		errorTypeStringValue = "TOO_LOW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_FEW:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_FEW:
 		errorTypeStringValue = "TOO_FEW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_MUCH:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_MUCH:
 		errorTypeStringValue = "TOO_MUCH";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DIAMETER:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DIAMETER:
 		errorTypeStringValue = "WRONG_DOT_DIAMETER";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_POSITION:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_POSITION:
 		errorTypeStringValue = "WRONG_DOT_POSITION";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::MISSING_DOTS:
+	case ::sdl::V1_0::complextest::ErrorCode::MISSING_DOTS:
 		errorTypeStringValue = "MISSING_DOTS";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DISTANCE:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DISTANCE:
 		errorTypeStringValue = "WRONG_DOT_DISTANCE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_TOO_LARGE:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_TOO_LARGE:
 		errorTypeStringValue = "AREA_TOO_LARGE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOTALAREA_TOO_LARGE:
+	case ::sdl::V1_0::complextest::ErrorCode::TOTALAREA_TOO_LARGE:
 		errorTypeStringValue = "TOTALAREA_TOO_LARGE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::BORDERAREA_TOO_LARGE:
+	case ::sdl::V1_0::complextest::ErrorCode::BORDERAREA_TOO_LARGE:
 		errorTypeStringValue = "BORDERAREA_TOO_LARGE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA:
 		errorTypeStringValue = "WRONG_DOT_AREA";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA_ONHEIGHT:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA_ONHEIGHT:
 		errorTypeStringValue = "WRONG_DOT_AREA_ONHEIGHT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_VOLUME:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_VOLUME:
 		errorTypeStringValue = "WRONG_DOT_VOLUME";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_HEIGHT:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_HEIGHT:
 		errorTypeStringValue = "WRONG_DOT_HEIGHT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_MEASUREMENT_ERROR:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_MEASUREMENT_ERROR:
 		errorTypeStringValue = "CONTOUR_MEASUREMENT_ERROR";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_BRIGHT:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_BRIGHT:
 		errorTypeStringValue = "TOO_BRIGHT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_DARK:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_DARK:
 		errorTypeStringValue = "TOO_DARK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::COUNT_ERROR:
+	case ::sdl::V1_0::complextest::ErrorCode::COUNT_ERROR:
 		errorTypeStringValue = "COUNT_ERROR";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_HIGH:
+	case ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_HIGH:
 		errorTypeStringValue = "Z_DISTANCE_HIGH";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_LOW:
+	case ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_LOW:
 		errorTypeStringValue = "Z_DISTANCE_LOW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::NOT_SYMMETRICAL:
+	case ::sdl::V1_0::complextest::ErrorCode::NOT_SYMMETRICAL:
 		errorTypeStringValue = "NOT_SYMMETRICAL";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_3D_ERROR:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_3D_ERROR:
 		errorTypeStringValue = "REFERENCE_3D_ERROR";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::COLOR_ERROR:
+	case ::sdl::V1_0::complextest::ErrorCode::COLOR_ERROR:
 		errorTypeStringValue = "COLOR_ERROR";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_COUNT:
+	case ::sdl::V1_0::complextest::ErrorCode::PATTERN_COUNT:
 		errorTypeStringValue = "PATTERN_COUNT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_POSITION:
+	case ::sdl::V1_0::complextest::ErrorCode::PATTERN_POSITION:
 		errorTypeStringValue = "PATTERN_POSITION";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_ROTATION:
+	case ::sdl::V1_0::complextest::ErrorCode::PATTERN_ROTATION:
 		errorTypeStringValue = "PATTERN_ROTATION";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CENTERLINE:
+	case ::sdl::V1_0::complextest::ErrorCode::CENTERLINE:
 		errorTypeStringValue = "CENTERLINE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_ERROR_COMP:
+	case ::sdl::V1_0::complextest::ErrorCode::CALIB_ERROR_COMP:
 		errorTypeStringValue = "CALIB_ERROR_COMP";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_INVALID_COMP:
+	case ::sdl::V1_0::complextest::ErrorCode::CALIB_INVALID_COMP:
 		errorTypeStringValue = "CALIB_INVALID_COMP";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_NOZZLE_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::CALIB_NOZZLE_MOVED:
 		errorTypeStringValue = "CALIB_NOZZLE_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_NOT_FOUND:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_NOT_FOUND:
 		errorTypeStringValue = "CONTOUR_NOT_FOUND";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_WIDE:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_WIDE:
 		errorTypeStringValue = "CONTOUR_TOO_WIDE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_NARROW:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_NARROW:
 		errorTypeStringValue = "CONTOUR_TOO_NARROW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_GLUE_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_GLUE_MOVED:
 		errorTypeStringValue = "CONTOUR_GLUE_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_INVALID_POLY:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_INVALID_POLY:
 		errorTypeStringValue = "CONTOUR_INVALID_POLY";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_NOT_FOUND:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_NOT_FOUND:
 		errorTypeStringValue = "REFERENCE_NOT_FOUND";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_INVALID_REF:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_INVALID_REF:
 		errorTypeStringValue = "REFERENCE_INVALID_REF";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_POS_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_POS_MOVED:
 		errorTypeStringValue = "REFERENCE_POS_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_DIST_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_DIST_MOVED:
 		errorTypeStringValue = "REFERENCE_DIST_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_NOT_FOUND:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_NOT_FOUND:
 		errorTypeStringValue = "AREA_NOT_FOUND";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_FOUND:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_FOUND:
 		errorTypeStringValue = "AREA_GLUE_FOUND";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_MOVED:
 		errorTypeStringValue = "AREA_GLUE_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GAP_LENGTH:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_GAP_LENGTH:
 		errorTypeStringValue = "AREA_GAP_LENGTH";
 		break;
 	default:
@@ -381,7 +381,7 @@ bool CResult::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelInde
 }
 
 
-bool CResult::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CResult::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant areaResultData = model.GetData("AreaResult", modelIndex);
 	if (areaResultData.isNull()){
@@ -391,19 +391,19 @@ bool CResult::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mo
 	}
 	QString areaResultStringValue = areaResultData.toString();
 	if(areaResultStringValue == "NONE"){
-		AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+		AreaResult = ::sdl::V1_0::complextest::StatusCode::NONE;
 	}
 	else if(areaResultStringValue == "OK"){
-		AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+		AreaResult = ::sdl::V1_0::complextest::StatusCode::OK;
 	}
 	else if(areaResultStringValue == "WARNING"){
-		AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+		AreaResult = ::sdl::V1_0::complextest::StatusCode::WARNING;
 	}
 	else if(areaResultStringValue == "NOK"){
-		AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+		AreaResult = ::sdl::V1_0::complextest::StatusCode::NOK;
 	}
 	else if(areaResultStringValue == "FAILED"){
-		AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+		AreaResult = ::sdl::V1_0::complextest::StatusCode::FAILED;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", areaResultStringValue);)
@@ -467,37 +467,37 @@ bool CResult::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mo
 	}
 	QString measurementTypeStringValue = measurementTypeData.toString();
 	if(measurementTypeStringValue == "NONE"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::NONE;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::NONE;
 	}
 	else if(measurementTypeStringValue == "WIDTH"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::WIDTH;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::WIDTH;
 	}
 	else if(measurementTypeStringValue == "BRIGHTNESS"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::BRIGHTNESS;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::BRIGHTNESS;
 	}
 	else if(measurementTypeStringValue == "DISTANCE"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::DISTANCE;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::DISTANCE;
 	}
 	else if(measurementTypeStringValue == "DISPLACEMENT"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::DISPLACEMENT;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::DISPLACEMENT;
 	}
 	else if(measurementTypeStringValue == "HEIGHT"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::HEIGHT;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::HEIGHT;
 	}
 	else if(measurementTypeStringValue == "SYMMETRY"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::SYMMETRY;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::SYMMETRY;
 	}
 	else if(measurementTypeStringValue == "VOLUME"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::VOLUME;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::VOLUME;
 	}
 	else if(measurementTypeStringValue == "VOLUMERATE"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::VOLUMERATE;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::VOLUMERATE;
 	}
 	else if(measurementTypeStringValue == "LENGTH"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::LENGTH;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::LENGTH;
 	}
 	else if(measurementTypeStringValue == "OUT_OF_BOUND"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::OUT_OF_BOUND;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::OUT_OF_BOUND;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "MeasurementType", measurementTypeStringValue);)
@@ -513,19 +513,19 @@ bool CResult::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mo
 	}
 	QString measurementUnitStringValue = measurementUnitData.toString();
 	if(measurementUnitStringValue == "NONE"){
-		MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::NONE;
+		MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::NONE;
 	}
 	else if(measurementUnitStringValue == "mm"){
-		MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm;
+		MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::mm;
 	}
 	else if(measurementUnitStringValue == "mm3"){
-		MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm3;
+		MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::mm3;
 	}
 	else if(measurementUnitStringValue == "mm3_mm"){
-		MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm3_mm;
+		MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::mm3_mm;
 	}
 	else if(measurementUnitStringValue == "pixel"){
-		MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::pixel;
+		MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::pixel;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "MeasurementUnit", measurementUnitStringValue);)
@@ -549,154 +549,154 @@ bool CResult::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mo
 	}
 	QString errorTypeStringValue = errorTypeData.toString();
 	if(errorTypeStringValue == "OK"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::OK;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::OK;
 	}
 	else if(errorTypeStringValue == "TOO_WIDE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_WIDE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_WIDE;
 	}
 	else if(errorTypeStringValue == "TOLERANCE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOLERANCE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOLERANCE;
 	}
 	else if(errorTypeStringValue == "TOO_NARROW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_NARROW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_NARROW;
 	}
 	else if(errorTypeStringValue == "NO_DATA_GAP"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::NO_DATA_GAP;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::NO_DATA_GAP;
 	}
 	else if(errorTypeStringValue == "GAP"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::GAP;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::GAP;
 	}
 	else if(errorTypeStringValue == "TOO_HIGH"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_HIGH;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_HIGH;
 	}
 	else if(errorTypeStringValue == "TOO_LOW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_LOW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_LOW;
 	}
 	else if(errorTypeStringValue == "TOO_FEW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_FEW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_FEW;
 	}
 	else if(errorTypeStringValue == "TOO_MUCH"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_MUCH;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_MUCH;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_DIAMETER"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DIAMETER;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DIAMETER;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_POSITION"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_POSITION;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_POSITION;
 	}
 	else if(errorTypeStringValue == "MISSING_DOTS"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::MISSING_DOTS;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::MISSING_DOTS;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_DISTANCE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DISTANCE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DISTANCE;
 	}
 	else if(errorTypeStringValue == "AREA_TOO_LARGE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_TOO_LARGE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_TOO_LARGE;
 	}
 	else if(errorTypeStringValue == "TOTALAREA_TOO_LARGE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOTALAREA_TOO_LARGE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOTALAREA_TOO_LARGE;
 	}
 	else if(errorTypeStringValue == "BORDERAREA_TOO_LARGE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::BORDERAREA_TOO_LARGE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::BORDERAREA_TOO_LARGE;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_AREA"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_AREA_ONHEIGHT"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_VOLUME"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_VOLUME;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_VOLUME;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_HEIGHT"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_HEIGHT;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_HEIGHT;
 	}
 	else if(errorTypeStringValue == "CONTOUR_MEASUREMENT_ERROR"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
 	}
 	else if(errorTypeStringValue == "TOO_BRIGHT"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_BRIGHT;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_BRIGHT;
 	}
 	else if(errorTypeStringValue == "TOO_DARK"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_DARK;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_DARK;
 	}
 	else if(errorTypeStringValue == "COUNT_ERROR"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::COUNT_ERROR;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::COUNT_ERROR;
 	}
 	else if(errorTypeStringValue == "Z_DISTANCE_HIGH"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_HIGH;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_HIGH;
 	}
 	else if(errorTypeStringValue == "Z_DISTANCE_LOW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_LOW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_LOW;
 	}
 	else if(errorTypeStringValue == "NOT_SYMMETRICAL"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::NOT_SYMMETRICAL;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::NOT_SYMMETRICAL;
 	}
 	else if(errorTypeStringValue == "REFERENCE_3D_ERROR"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_3D_ERROR;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_3D_ERROR;
 	}
 	else if(errorTypeStringValue == "COLOR_ERROR"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::COLOR_ERROR;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::COLOR_ERROR;
 	}
 	else if(errorTypeStringValue == "PATTERN_COUNT"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_COUNT;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_COUNT;
 	}
 	else if(errorTypeStringValue == "PATTERN_POSITION"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_POSITION;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_POSITION;
 	}
 	else if(errorTypeStringValue == "PATTERN_ROTATION"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_ROTATION;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_ROTATION;
 	}
 	else if(errorTypeStringValue == "CENTERLINE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CENTERLINE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CENTERLINE;
 	}
 	else if(errorTypeStringValue == "CALIB_ERROR_COMP"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_ERROR_COMP;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_ERROR_COMP;
 	}
 	else if(errorTypeStringValue == "CALIB_INVALID_COMP"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_INVALID_COMP;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_INVALID_COMP;
 	}
 	else if(errorTypeStringValue == "CALIB_NOZZLE_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_NOZZLE_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_NOZZLE_MOVED;
 	}
 	else if(errorTypeStringValue == "CONTOUR_NOT_FOUND"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_NOT_FOUND;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_NOT_FOUND;
 	}
 	else if(errorTypeStringValue == "CONTOUR_TOO_WIDE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_WIDE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_WIDE;
 	}
 	else if(errorTypeStringValue == "CONTOUR_TOO_NARROW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_NARROW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_NARROW;
 	}
 	else if(errorTypeStringValue == "CONTOUR_GLUE_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_GLUE_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_GLUE_MOVED;
 	}
 	else if(errorTypeStringValue == "CONTOUR_INVALID_POLY"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_INVALID_POLY;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_INVALID_POLY;
 	}
 	else if(errorTypeStringValue == "REFERENCE_NOT_FOUND"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_NOT_FOUND;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_NOT_FOUND;
 	}
 	else if(errorTypeStringValue == "REFERENCE_INVALID_REF"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_INVALID_REF;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_INVALID_REF;
 	}
 	else if(errorTypeStringValue == "REFERENCE_POS_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_POS_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_POS_MOVED;
 	}
 	else if(errorTypeStringValue == "REFERENCE_DIST_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_DIST_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_DIST_MOVED;
 	}
 	else if(errorTypeStringValue == "AREA_NOT_FOUND"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_NOT_FOUND;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_NOT_FOUND;
 	}
 	else if(errorTypeStringValue == "AREA_GLUE_FOUND"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_FOUND;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_FOUND;
 	}
 	else if(errorTypeStringValue == "AREA_GLUE_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_MOVED;
 	}
 	else if(errorTypeStringValue == "AREA_GAP_LENGTH"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GAP_LENGTH;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GAP_LENGTH;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ErrorCode", errorTypeStringValue);)
@@ -723,25 +723,25 @@ bool CResult::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mo
 }
 
 
-bool CResult::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CResult::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant areaResultData = model.GetData("AreaResult", modelIndex);
 	if (!areaResultData.isNull()){
 		QString areaResultStringValue = areaResultData.toString();
 		if(areaResultStringValue == "NONE"){
-			AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+			AreaResult = ::sdl::V1_0::complextest::StatusCode::NONE;
 		}
 		else if(areaResultStringValue == "OK"){
-			AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+			AreaResult = ::sdl::V1_0::complextest::StatusCode::OK;
 		}
 		else if(areaResultStringValue == "WARNING"){
-			AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+			AreaResult = ::sdl::V1_0::complextest::StatusCode::WARNING;
 		}
 		else if(areaResultStringValue == "NOK"){
-			AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+			AreaResult = ::sdl::V1_0::complextest::StatusCode::NOK;
 		}
 		else if(areaResultStringValue == "FAILED"){
-			AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+			AreaResult = ::sdl::V1_0::complextest::StatusCode::FAILED;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", areaResultStringValue);)
@@ -784,37 +784,37 @@ bool CResult::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int
 	if (!measurementTypeData.isNull()){
 		QString measurementTypeStringValue = measurementTypeData.toString();
 		if(measurementTypeStringValue == "NONE"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::NONE;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::NONE;
 		}
 		else if(measurementTypeStringValue == "WIDTH"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::WIDTH;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::WIDTH;
 		}
 		else if(measurementTypeStringValue == "BRIGHTNESS"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::BRIGHTNESS;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::BRIGHTNESS;
 		}
 		else if(measurementTypeStringValue == "DISTANCE"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::DISTANCE;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::DISTANCE;
 		}
 		else if(measurementTypeStringValue == "DISPLACEMENT"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::DISPLACEMENT;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::DISPLACEMENT;
 		}
 		else if(measurementTypeStringValue == "HEIGHT"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::HEIGHT;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::HEIGHT;
 		}
 		else if(measurementTypeStringValue == "SYMMETRY"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::SYMMETRY;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::SYMMETRY;
 		}
 		else if(measurementTypeStringValue == "VOLUME"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::VOLUME;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::VOLUME;
 		}
 		else if(measurementTypeStringValue == "VOLUMERATE"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::VOLUMERATE;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::VOLUMERATE;
 		}
 		else if(measurementTypeStringValue == "LENGTH"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::LENGTH;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::LENGTH;
 		}
 		else if(measurementTypeStringValue == "OUT_OF_BOUND"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::OUT_OF_BOUND;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::OUT_OF_BOUND;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "MeasurementType", measurementTypeStringValue);)
@@ -827,19 +827,19 @@ bool CResult::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int
 	if (!measurementUnitData.isNull()){
 		QString measurementUnitStringValue = measurementUnitData.toString();
 		if(measurementUnitStringValue == "NONE"){
-			MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::NONE;
+			MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::NONE;
 		}
 		else if(measurementUnitStringValue == "mm"){
-			MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm;
+			MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::mm;
 		}
 		else if(measurementUnitStringValue == "mm3"){
-			MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm3;
+			MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::mm3;
 		}
 		else if(measurementUnitStringValue == "mm3_mm"){
-			MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm3_mm;
+			MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::mm3_mm;
 		}
 		else if(measurementUnitStringValue == "pixel"){
-			MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::pixel;
+			MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::pixel;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "MeasurementUnit", measurementUnitStringValue);)
@@ -857,154 +857,154 @@ bool CResult::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int
 	if (!errorTypeData.isNull()){
 		QString errorTypeStringValue = errorTypeData.toString();
 		if(errorTypeStringValue == "OK"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::OK;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::OK;
 		}
 		else if(errorTypeStringValue == "TOO_WIDE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_WIDE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_WIDE;
 		}
 		else if(errorTypeStringValue == "TOLERANCE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOLERANCE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOLERANCE;
 		}
 		else if(errorTypeStringValue == "TOO_NARROW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_NARROW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_NARROW;
 		}
 		else if(errorTypeStringValue == "NO_DATA_GAP"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::NO_DATA_GAP;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::NO_DATA_GAP;
 		}
 		else if(errorTypeStringValue == "GAP"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::GAP;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::GAP;
 		}
 		else if(errorTypeStringValue == "TOO_HIGH"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_HIGH;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_HIGH;
 		}
 		else if(errorTypeStringValue == "TOO_LOW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_LOW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_LOW;
 		}
 		else if(errorTypeStringValue == "TOO_FEW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_FEW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_FEW;
 		}
 		else if(errorTypeStringValue == "TOO_MUCH"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_MUCH;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_MUCH;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_DIAMETER"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DIAMETER;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DIAMETER;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_POSITION"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_POSITION;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_POSITION;
 		}
 		else if(errorTypeStringValue == "MISSING_DOTS"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::MISSING_DOTS;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::MISSING_DOTS;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_DISTANCE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DISTANCE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DISTANCE;
 		}
 		else if(errorTypeStringValue == "AREA_TOO_LARGE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_TOO_LARGE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_TOO_LARGE;
 		}
 		else if(errorTypeStringValue == "TOTALAREA_TOO_LARGE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOTALAREA_TOO_LARGE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOTALAREA_TOO_LARGE;
 		}
 		else if(errorTypeStringValue == "BORDERAREA_TOO_LARGE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::BORDERAREA_TOO_LARGE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::BORDERAREA_TOO_LARGE;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_AREA"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_AREA_ONHEIGHT"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_VOLUME"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_VOLUME;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_VOLUME;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_HEIGHT"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_HEIGHT;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_HEIGHT;
 		}
 		else if(errorTypeStringValue == "CONTOUR_MEASUREMENT_ERROR"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
 		}
 		else if(errorTypeStringValue == "TOO_BRIGHT"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_BRIGHT;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_BRIGHT;
 		}
 		else if(errorTypeStringValue == "TOO_DARK"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_DARK;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_DARK;
 		}
 		else if(errorTypeStringValue == "COUNT_ERROR"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::COUNT_ERROR;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::COUNT_ERROR;
 		}
 		else if(errorTypeStringValue == "Z_DISTANCE_HIGH"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_HIGH;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_HIGH;
 		}
 		else if(errorTypeStringValue == "Z_DISTANCE_LOW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_LOW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_LOW;
 		}
 		else if(errorTypeStringValue == "NOT_SYMMETRICAL"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::NOT_SYMMETRICAL;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::NOT_SYMMETRICAL;
 		}
 		else if(errorTypeStringValue == "REFERENCE_3D_ERROR"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_3D_ERROR;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_3D_ERROR;
 		}
 		else if(errorTypeStringValue == "COLOR_ERROR"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::COLOR_ERROR;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::COLOR_ERROR;
 		}
 		else if(errorTypeStringValue == "PATTERN_COUNT"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_COUNT;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_COUNT;
 		}
 		else if(errorTypeStringValue == "PATTERN_POSITION"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_POSITION;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_POSITION;
 		}
 		else if(errorTypeStringValue == "PATTERN_ROTATION"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_ROTATION;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_ROTATION;
 		}
 		else if(errorTypeStringValue == "CENTERLINE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CENTERLINE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CENTERLINE;
 		}
 		else if(errorTypeStringValue == "CALIB_ERROR_COMP"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_ERROR_COMP;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_ERROR_COMP;
 		}
 		else if(errorTypeStringValue == "CALIB_INVALID_COMP"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_INVALID_COMP;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_INVALID_COMP;
 		}
 		else if(errorTypeStringValue == "CALIB_NOZZLE_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_NOZZLE_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_NOZZLE_MOVED;
 		}
 		else if(errorTypeStringValue == "CONTOUR_NOT_FOUND"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_NOT_FOUND;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_NOT_FOUND;
 		}
 		else if(errorTypeStringValue == "CONTOUR_TOO_WIDE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_WIDE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_WIDE;
 		}
 		else if(errorTypeStringValue == "CONTOUR_TOO_NARROW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_NARROW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_NARROW;
 		}
 		else if(errorTypeStringValue == "CONTOUR_GLUE_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_GLUE_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_GLUE_MOVED;
 		}
 		else if(errorTypeStringValue == "CONTOUR_INVALID_POLY"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_INVALID_POLY;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_INVALID_POLY;
 		}
 		else if(errorTypeStringValue == "REFERENCE_NOT_FOUND"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_NOT_FOUND;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_NOT_FOUND;
 		}
 		else if(errorTypeStringValue == "REFERENCE_INVALID_REF"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_INVALID_REF;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_INVALID_REF;
 		}
 		else if(errorTypeStringValue == "REFERENCE_POS_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_POS_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_POS_MOVED;
 		}
 		else if(errorTypeStringValue == "REFERENCE_DIST_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_DIST_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_DIST_MOVED;
 		}
 		else if(errorTypeStringValue == "AREA_NOT_FOUND"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_NOT_FOUND;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_NOT_FOUND;
 		}
 		else if(errorTypeStringValue == "AREA_GLUE_FOUND"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_FOUND;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_FOUND;
 		}
 		else if(errorTypeStringValue == "AREA_GLUE_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_MOVED;
 		}
 		else if(errorTypeStringValue == "AREA_GAP_LENGTH"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GAP_LENGTH;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GAP_LENGTH;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ErrorCode", errorTypeStringValue);)
@@ -1028,7 +1028,7 @@ bool CResult::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int
 }
 
 
-bool CResult::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CResult::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!AreaResult){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AreaResult").toLocal8Bit().constData();)
@@ -1037,19 +1037,19 @@ bool CResult::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) c
 	}
 	QString areaResultStringValue;
 	switch (*AreaResult){
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NONE:
+	case ::sdl::V1_0::complextest::StatusCode::NONE:
 		areaResultStringValue = "NONE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::OK:
+	case ::sdl::V1_0::complextest::StatusCode::OK:
 		areaResultStringValue = "OK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::WARNING:
+	case ::sdl::V1_0::complextest::StatusCode::WARNING:
 		areaResultStringValue = "WARNING";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NOK:
+	case ::sdl::V1_0::complextest::StatusCode::NOK:
 		areaResultStringValue = "NOK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::FAILED:
+	case ::sdl::V1_0::complextest::StatusCode::FAILED:
 		areaResultStringValue = "FAILED";
 		break;
 	default:
@@ -1107,37 +1107,37 @@ bool CResult::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) c
 	}
 	QString measurementTypeStringValue;
 	switch (*MeasurementType){
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::NONE:
+	case ::sdl::V1_0::complextest::MeasurementType::NONE:
 		measurementTypeStringValue = "NONE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::WIDTH:
+	case ::sdl::V1_0::complextest::MeasurementType::WIDTH:
 		measurementTypeStringValue = "WIDTH";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::BRIGHTNESS:
+	case ::sdl::V1_0::complextest::MeasurementType::BRIGHTNESS:
 		measurementTypeStringValue = "BRIGHTNESS";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::DISTANCE:
+	case ::sdl::V1_0::complextest::MeasurementType::DISTANCE:
 		measurementTypeStringValue = "DISTANCE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::DISPLACEMENT:
+	case ::sdl::V1_0::complextest::MeasurementType::DISPLACEMENT:
 		measurementTypeStringValue = "DISPLACEMENT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::HEIGHT:
+	case ::sdl::V1_0::complextest::MeasurementType::HEIGHT:
 		measurementTypeStringValue = "HEIGHT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::SYMMETRY:
+	case ::sdl::V1_0::complextest::MeasurementType::SYMMETRY:
 		measurementTypeStringValue = "SYMMETRY";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::VOLUME:
+	case ::sdl::V1_0::complextest::MeasurementType::VOLUME:
 		measurementTypeStringValue = "VOLUME";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::VOLUMERATE:
+	case ::sdl::V1_0::complextest::MeasurementType::VOLUMERATE:
 		measurementTypeStringValue = "VOLUMERATE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::LENGTH:
+	case ::sdl::V1_0::complextest::MeasurementType::LENGTH:
 		measurementTypeStringValue = "LENGTH";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::OUT_OF_BOUND:
+	case ::sdl::V1_0::complextest::MeasurementType::OUT_OF_BOUND:
 		measurementTypeStringValue = "OUT_OF_BOUND";
 		break;
 	default:
@@ -1153,19 +1153,19 @@ bool CResult::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) c
 	}
 	QString measurementUnitStringValue;
 	switch (*MeasurementUnit){
-	case ::sdl::complextest::ComplexUnion1::MeasurementUnit::NONE:
+	case ::sdl::V1_0::complextest::MeasurementUnit::NONE:
 		measurementUnitStringValue = "NONE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm:
+	case ::sdl::V1_0::complextest::MeasurementUnit::mm:
 		measurementUnitStringValue = "mm";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm3:
+	case ::sdl::V1_0::complextest::MeasurementUnit::mm3:
 		measurementUnitStringValue = "mm3";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm3_mm:
+	case ::sdl::V1_0::complextest::MeasurementUnit::mm3_mm:
 		measurementUnitStringValue = "mm3_mm";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementUnit::pixel:
+	case ::sdl::V1_0::complextest::MeasurementUnit::pixel:
 		measurementUnitStringValue = "pixel";
 		break;
 	default:
@@ -1188,154 +1188,154 @@ bool CResult::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) c
 	}
 	QString errorTypeStringValue;
 	switch (*ErrorType){
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::OK:
+	case ::sdl::V1_0::complextest::ErrorCode::OK:
 		errorTypeStringValue = "OK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_WIDE:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_WIDE:
 		errorTypeStringValue = "TOO_WIDE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOLERANCE:
+	case ::sdl::V1_0::complextest::ErrorCode::TOLERANCE:
 		errorTypeStringValue = "TOLERANCE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_NARROW:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_NARROW:
 		errorTypeStringValue = "TOO_NARROW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::NO_DATA_GAP:
+	case ::sdl::V1_0::complextest::ErrorCode::NO_DATA_GAP:
 		errorTypeStringValue = "NO_DATA_GAP";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::GAP:
+	case ::sdl::V1_0::complextest::ErrorCode::GAP:
 		errorTypeStringValue = "GAP";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_HIGH:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_HIGH:
 		errorTypeStringValue = "TOO_HIGH";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_LOW:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_LOW:
 		errorTypeStringValue = "TOO_LOW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_FEW:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_FEW:
 		errorTypeStringValue = "TOO_FEW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_MUCH:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_MUCH:
 		errorTypeStringValue = "TOO_MUCH";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DIAMETER:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DIAMETER:
 		errorTypeStringValue = "WRONG_DOT_DIAMETER";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_POSITION:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_POSITION:
 		errorTypeStringValue = "WRONG_DOT_POSITION";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::MISSING_DOTS:
+	case ::sdl::V1_0::complextest::ErrorCode::MISSING_DOTS:
 		errorTypeStringValue = "MISSING_DOTS";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DISTANCE:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DISTANCE:
 		errorTypeStringValue = "WRONG_DOT_DISTANCE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_TOO_LARGE:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_TOO_LARGE:
 		errorTypeStringValue = "AREA_TOO_LARGE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOTALAREA_TOO_LARGE:
+	case ::sdl::V1_0::complextest::ErrorCode::TOTALAREA_TOO_LARGE:
 		errorTypeStringValue = "TOTALAREA_TOO_LARGE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::BORDERAREA_TOO_LARGE:
+	case ::sdl::V1_0::complextest::ErrorCode::BORDERAREA_TOO_LARGE:
 		errorTypeStringValue = "BORDERAREA_TOO_LARGE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA:
 		errorTypeStringValue = "WRONG_DOT_AREA";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA_ONHEIGHT:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA_ONHEIGHT:
 		errorTypeStringValue = "WRONG_DOT_AREA_ONHEIGHT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_VOLUME:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_VOLUME:
 		errorTypeStringValue = "WRONG_DOT_VOLUME";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_HEIGHT:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_HEIGHT:
 		errorTypeStringValue = "WRONG_DOT_HEIGHT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_MEASUREMENT_ERROR:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_MEASUREMENT_ERROR:
 		errorTypeStringValue = "CONTOUR_MEASUREMENT_ERROR";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_BRIGHT:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_BRIGHT:
 		errorTypeStringValue = "TOO_BRIGHT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_DARK:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_DARK:
 		errorTypeStringValue = "TOO_DARK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::COUNT_ERROR:
+	case ::sdl::V1_0::complextest::ErrorCode::COUNT_ERROR:
 		errorTypeStringValue = "COUNT_ERROR";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_HIGH:
+	case ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_HIGH:
 		errorTypeStringValue = "Z_DISTANCE_HIGH";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_LOW:
+	case ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_LOW:
 		errorTypeStringValue = "Z_DISTANCE_LOW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::NOT_SYMMETRICAL:
+	case ::sdl::V1_0::complextest::ErrorCode::NOT_SYMMETRICAL:
 		errorTypeStringValue = "NOT_SYMMETRICAL";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_3D_ERROR:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_3D_ERROR:
 		errorTypeStringValue = "REFERENCE_3D_ERROR";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::COLOR_ERROR:
+	case ::sdl::V1_0::complextest::ErrorCode::COLOR_ERROR:
 		errorTypeStringValue = "COLOR_ERROR";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_COUNT:
+	case ::sdl::V1_0::complextest::ErrorCode::PATTERN_COUNT:
 		errorTypeStringValue = "PATTERN_COUNT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_POSITION:
+	case ::sdl::V1_0::complextest::ErrorCode::PATTERN_POSITION:
 		errorTypeStringValue = "PATTERN_POSITION";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_ROTATION:
+	case ::sdl::V1_0::complextest::ErrorCode::PATTERN_ROTATION:
 		errorTypeStringValue = "PATTERN_ROTATION";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CENTERLINE:
+	case ::sdl::V1_0::complextest::ErrorCode::CENTERLINE:
 		errorTypeStringValue = "CENTERLINE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_ERROR_COMP:
+	case ::sdl::V1_0::complextest::ErrorCode::CALIB_ERROR_COMP:
 		errorTypeStringValue = "CALIB_ERROR_COMP";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_INVALID_COMP:
+	case ::sdl::V1_0::complextest::ErrorCode::CALIB_INVALID_COMP:
 		errorTypeStringValue = "CALIB_INVALID_COMP";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_NOZZLE_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::CALIB_NOZZLE_MOVED:
 		errorTypeStringValue = "CALIB_NOZZLE_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_NOT_FOUND:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_NOT_FOUND:
 		errorTypeStringValue = "CONTOUR_NOT_FOUND";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_WIDE:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_WIDE:
 		errorTypeStringValue = "CONTOUR_TOO_WIDE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_NARROW:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_NARROW:
 		errorTypeStringValue = "CONTOUR_TOO_NARROW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_GLUE_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_GLUE_MOVED:
 		errorTypeStringValue = "CONTOUR_GLUE_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_INVALID_POLY:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_INVALID_POLY:
 		errorTypeStringValue = "CONTOUR_INVALID_POLY";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_NOT_FOUND:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_NOT_FOUND:
 		errorTypeStringValue = "REFERENCE_NOT_FOUND";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_INVALID_REF:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_INVALID_REF:
 		errorTypeStringValue = "REFERENCE_INVALID_REF";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_POS_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_POS_MOVED:
 		errorTypeStringValue = "REFERENCE_POS_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_DIST_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_DIST_MOVED:
 		errorTypeStringValue = "REFERENCE_DIST_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_NOT_FOUND:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_NOT_FOUND:
 		errorTypeStringValue = "AREA_NOT_FOUND";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_FOUND:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_FOUND:
 		errorTypeStringValue = "AREA_GLUE_FOUND";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_MOVED:
 		errorTypeStringValue = "AREA_GLUE_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GAP_LENGTH:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_GAP_LENGTH:
 		errorTypeStringValue = "AREA_GAP_LENGTH";
 		break;
 	default:
@@ -1362,7 +1362,7 @@ bool CResult::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) c
 }
 
 
-bool CResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CResult::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("AreaResult") || (gqlObject["AreaResult"].userType() != QMetaType::QString && gqlObject["AreaResult"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AreaResult").toLocal8Bit().constData();)
@@ -1371,19 +1371,19 @@ bool CResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 	}
 	const QString areaResultStringValue = gqlObject["AreaResult"].toString();
 	if(areaResultStringValue == "NONE"){
-		AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+		AreaResult = ::sdl::V1_0::complextest::StatusCode::NONE;
 	}
 	else if(areaResultStringValue == "OK"){
-		AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+		AreaResult = ::sdl::V1_0::complextest::StatusCode::OK;
 	}
 	else if(areaResultStringValue == "WARNING"){
-		AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+		AreaResult = ::sdl::V1_0::complextest::StatusCode::WARNING;
 	}
 	else if(areaResultStringValue == "NOK"){
-		AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+		AreaResult = ::sdl::V1_0::complextest::StatusCode::NOK;
 	}
 	else if(areaResultStringValue == "FAILED"){
-		AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+		AreaResult = ::sdl::V1_0::complextest::StatusCode::FAILED;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", areaResultStringValue);)
@@ -1440,37 +1440,37 @@ bool CResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 	}
 	const QString measurementTypeStringValue = gqlObject["MeasurementType"].toString();
 	if(measurementTypeStringValue == "NONE"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::NONE;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::NONE;
 	}
 	else if(measurementTypeStringValue == "WIDTH"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::WIDTH;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::WIDTH;
 	}
 	else if(measurementTypeStringValue == "BRIGHTNESS"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::BRIGHTNESS;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::BRIGHTNESS;
 	}
 	else if(measurementTypeStringValue == "DISTANCE"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::DISTANCE;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::DISTANCE;
 	}
 	else if(measurementTypeStringValue == "DISPLACEMENT"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::DISPLACEMENT;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::DISPLACEMENT;
 	}
 	else if(measurementTypeStringValue == "HEIGHT"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::HEIGHT;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::HEIGHT;
 	}
 	else if(measurementTypeStringValue == "SYMMETRY"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::SYMMETRY;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::SYMMETRY;
 	}
 	else if(measurementTypeStringValue == "VOLUME"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::VOLUME;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::VOLUME;
 	}
 	else if(measurementTypeStringValue == "VOLUMERATE"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::VOLUMERATE;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::VOLUMERATE;
 	}
 	else if(measurementTypeStringValue == "LENGTH"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::LENGTH;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::LENGTH;
 	}
 	else if(measurementTypeStringValue == "OUT_OF_BOUND"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::OUT_OF_BOUND;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::OUT_OF_BOUND;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "MeasurementType", measurementTypeStringValue);)
@@ -1485,19 +1485,19 @@ bool CResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 	}
 	const QString measurementUnitStringValue = gqlObject["MeasurementUnit"].toString();
 	if(measurementUnitStringValue == "NONE"){
-		MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::NONE;
+		MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::NONE;
 	}
 	else if(measurementUnitStringValue == "mm"){
-		MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm;
+		MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::mm;
 	}
 	else if(measurementUnitStringValue == "mm3"){
-		MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm3;
+		MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::mm3;
 	}
 	else if(measurementUnitStringValue == "mm3_mm"){
-		MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm3_mm;
+		MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::mm3_mm;
 	}
 	else if(measurementUnitStringValue == "pixel"){
-		MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::pixel;
+		MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::pixel;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "MeasurementUnit", measurementUnitStringValue);)
@@ -1519,154 +1519,154 @@ bool CResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 	}
 	const QString errorTypeStringValue = gqlObject["ErrorType"].toString();
 	if(errorTypeStringValue == "OK"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::OK;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::OK;
 	}
 	else if(errorTypeStringValue == "TOO_WIDE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_WIDE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_WIDE;
 	}
 	else if(errorTypeStringValue == "TOLERANCE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOLERANCE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOLERANCE;
 	}
 	else if(errorTypeStringValue == "TOO_NARROW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_NARROW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_NARROW;
 	}
 	else if(errorTypeStringValue == "NO_DATA_GAP"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::NO_DATA_GAP;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::NO_DATA_GAP;
 	}
 	else if(errorTypeStringValue == "GAP"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::GAP;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::GAP;
 	}
 	else if(errorTypeStringValue == "TOO_HIGH"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_HIGH;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_HIGH;
 	}
 	else if(errorTypeStringValue == "TOO_LOW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_LOW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_LOW;
 	}
 	else if(errorTypeStringValue == "TOO_FEW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_FEW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_FEW;
 	}
 	else if(errorTypeStringValue == "TOO_MUCH"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_MUCH;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_MUCH;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_DIAMETER"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DIAMETER;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DIAMETER;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_POSITION"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_POSITION;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_POSITION;
 	}
 	else if(errorTypeStringValue == "MISSING_DOTS"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::MISSING_DOTS;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::MISSING_DOTS;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_DISTANCE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DISTANCE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DISTANCE;
 	}
 	else if(errorTypeStringValue == "AREA_TOO_LARGE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_TOO_LARGE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_TOO_LARGE;
 	}
 	else if(errorTypeStringValue == "TOTALAREA_TOO_LARGE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOTALAREA_TOO_LARGE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOTALAREA_TOO_LARGE;
 	}
 	else if(errorTypeStringValue == "BORDERAREA_TOO_LARGE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::BORDERAREA_TOO_LARGE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::BORDERAREA_TOO_LARGE;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_AREA"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_AREA_ONHEIGHT"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_VOLUME"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_VOLUME;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_VOLUME;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_HEIGHT"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_HEIGHT;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_HEIGHT;
 	}
 	else if(errorTypeStringValue == "CONTOUR_MEASUREMENT_ERROR"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
 	}
 	else if(errorTypeStringValue == "TOO_BRIGHT"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_BRIGHT;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_BRIGHT;
 	}
 	else if(errorTypeStringValue == "TOO_DARK"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_DARK;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_DARK;
 	}
 	else if(errorTypeStringValue == "COUNT_ERROR"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::COUNT_ERROR;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::COUNT_ERROR;
 	}
 	else if(errorTypeStringValue == "Z_DISTANCE_HIGH"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_HIGH;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_HIGH;
 	}
 	else if(errorTypeStringValue == "Z_DISTANCE_LOW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_LOW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_LOW;
 	}
 	else if(errorTypeStringValue == "NOT_SYMMETRICAL"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::NOT_SYMMETRICAL;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::NOT_SYMMETRICAL;
 	}
 	else if(errorTypeStringValue == "REFERENCE_3D_ERROR"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_3D_ERROR;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_3D_ERROR;
 	}
 	else if(errorTypeStringValue == "COLOR_ERROR"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::COLOR_ERROR;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::COLOR_ERROR;
 	}
 	else if(errorTypeStringValue == "PATTERN_COUNT"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_COUNT;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_COUNT;
 	}
 	else if(errorTypeStringValue == "PATTERN_POSITION"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_POSITION;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_POSITION;
 	}
 	else if(errorTypeStringValue == "PATTERN_ROTATION"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_ROTATION;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_ROTATION;
 	}
 	else if(errorTypeStringValue == "CENTERLINE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CENTERLINE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CENTERLINE;
 	}
 	else if(errorTypeStringValue == "CALIB_ERROR_COMP"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_ERROR_COMP;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_ERROR_COMP;
 	}
 	else if(errorTypeStringValue == "CALIB_INVALID_COMP"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_INVALID_COMP;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_INVALID_COMP;
 	}
 	else if(errorTypeStringValue == "CALIB_NOZZLE_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_NOZZLE_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_NOZZLE_MOVED;
 	}
 	else if(errorTypeStringValue == "CONTOUR_NOT_FOUND"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_NOT_FOUND;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_NOT_FOUND;
 	}
 	else if(errorTypeStringValue == "CONTOUR_TOO_WIDE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_WIDE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_WIDE;
 	}
 	else if(errorTypeStringValue == "CONTOUR_TOO_NARROW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_NARROW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_NARROW;
 	}
 	else if(errorTypeStringValue == "CONTOUR_GLUE_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_GLUE_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_GLUE_MOVED;
 	}
 	else if(errorTypeStringValue == "CONTOUR_INVALID_POLY"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_INVALID_POLY;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_INVALID_POLY;
 	}
 	else if(errorTypeStringValue == "REFERENCE_NOT_FOUND"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_NOT_FOUND;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_NOT_FOUND;
 	}
 	else if(errorTypeStringValue == "REFERENCE_INVALID_REF"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_INVALID_REF;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_INVALID_REF;
 	}
 	else if(errorTypeStringValue == "REFERENCE_POS_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_POS_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_POS_MOVED;
 	}
 	else if(errorTypeStringValue == "REFERENCE_DIST_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_DIST_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_DIST_MOVED;
 	}
 	else if(errorTypeStringValue == "AREA_NOT_FOUND"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_NOT_FOUND;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_NOT_FOUND;
 	}
 	else if(errorTypeStringValue == "AREA_GLUE_FOUND"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_FOUND;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_FOUND;
 	}
 	else if(errorTypeStringValue == "AREA_GLUE_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_MOVED;
 	}
 	else if(errorTypeStringValue == "AREA_GAP_LENGTH"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GAP_LENGTH;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GAP_LENGTH;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ErrorCode", errorTypeStringValue);)
@@ -1691,24 +1691,24 @@ bool CResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 }
 
 
-bool CResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CResult::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("AreaResult") && (gqlObject["AreaResult"].userType() == QMetaType::QString || gqlObject["AreaResult"].userType() == QMetaType::QByteArray)){
 		const QString areaResultStringValue = gqlObject["AreaResult"].toString();
 		if(areaResultStringValue == "NONE"){
-			AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+			AreaResult = ::sdl::V1_0::complextest::StatusCode::NONE;
 		}
 		else if(areaResultStringValue == "OK"){
-			AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+			AreaResult = ::sdl::V1_0::complextest::StatusCode::OK;
 		}
 		else if(areaResultStringValue == "WARNING"){
-			AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+			AreaResult = ::sdl::V1_0::complextest::StatusCode::WARNING;
 		}
 		else if(areaResultStringValue == "NOK"){
-			AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+			AreaResult = ::sdl::V1_0::complextest::StatusCode::NOK;
 		}
 		else if(areaResultStringValue == "FAILED"){
-			AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+			AreaResult = ::sdl::V1_0::complextest::StatusCode::FAILED;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", areaResultStringValue);)
@@ -1744,37 +1744,37 @@ bool CResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 	if (gqlObject.ContainsParam("MeasurementType") && (gqlObject["MeasurementType"].userType() == QMetaType::QString || gqlObject["MeasurementType"].userType() == QMetaType::QByteArray)){
 		const QString measurementTypeStringValue = gqlObject["MeasurementType"].toString();
 		if(measurementTypeStringValue == "NONE"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::NONE;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::NONE;
 		}
 		else if(measurementTypeStringValue == "WIDTH"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::WIDTH;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::WIDTH;
 		}
 		else if(measurementTypeStringValue == "BRIGHTNESS"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::BRIGHTNESS;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::BRIGHTNESS;
 		}
 		else if(measurementTypeStringValue == "DISTANCE"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::DISTANCE;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::DISTANCE;
 		}
 		else if(measurementTypeStringValue == "DISPLACEMENT"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::DISPLACEMENT;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::DISPLACEMENT;
 		}
 		else if(measurementTypeStringValue == "HEIGHT"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::HEIGHT;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::HEIGHT;
 		}
 		else if(measurementTypeStringValue == "SYMMETRY"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::SYMMETRY;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::SYMMETRY;
 		}
 		else if(measurementTypeStringValue == "VOLUME"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::VOLUME;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::VOLUME;
 		}
 		else if(measurementTypeStringValue == "VOLUMERATE"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::VOLUMERATE;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::VOLUMERATE;
 		}
 		else if(measurementTypeStringValue == "LENGTH"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::LENGTH;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::LENGTH;
 		}
 		else if(measurementTypeStringValue == "OUT_OF_BOUND"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::OUT_OF_BOUND;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::OUT_OF_BOUND;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "MeasurementType", measurementTypeStringValue);)
@@ -1786,19 +1786,19 @@ bool CResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 	if (gqlObject.ContainsParam("MeasurementUnit") && (gqlObject["MeasurementUnit"].userType() == QMetaType::QString || gqlObject["MeasurementUnit"].userType() == QMetaType::QByteArray)){
 		const QString measurementUnitStringValue = gqlObject["MeasurementUnit"].toString();
 		if(measurementUnitStringValue == "NONE"){
-			MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::NONE;
+			MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::NONE;
 		}
 		else if(measurementUnitStringValue == "mm"){
-			MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm;
+			MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::mm;
 		}
 		else if(measurementUnitStringValue == "mm3"){
-			MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm3;
+			MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::mm3;
 		}
 		else if(measurementUnitStringValue == "mm3_mm"){
-			MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm3_mm;
+			MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::mm3_mm;
 		}
 		else if(measurementUnitStringValue == "pixel"){
-			MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::pixel;
+			MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::pixel;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "MeasurementUnit", measurementUnitStringValue);)
@@ -1814,154 +1814,154 @@ bool CResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 	if (gqlObject.ContainsParam("ErrorType") && (gqlObject["ErrorType"].userType() == QMetaType::QString || gqlObject["ErrorType"].userType() == QMetaType::QByteArray)){
 		const QString errorTypeStringValue = gqlObject["ErrorType"].toString();
 		if(errorTypeStringValue == "OK"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::OK;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::OK;
 		}
 		else if(errorTypeStringValue == "TOO_WIDE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_WIDE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_WIDE;
 		}
 		else if(errorTypeStringValue == "TOLERANCE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOLERANCE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOLERANCE;
 		}
 		else if(errorTypeStringValue == "TOO_NARROW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_NARROW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_NARROW;
 		}
 		else if(errorTypeStringValue == "NO_DATA_GAP"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::NO_DATA_GAP;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::NO_DATA_GAP;
 		}
 		else if(errorTypeStringValue == "GAP"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::GAP;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::GAP;
 		}
 		else if(errorTypeStringValue == "TOO_HIGH"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_HIGH;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_HIGH;
 		}
 		else if(errorTypeStringValue == "TOO_LOW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_LOW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_LOW;
 		}
 		else if(errorTypeStringValue == "TOO_FEW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_FEW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_FEW;
 		}
 		else if(errorTypeStringValue == "TOO_MUCH"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_MUCH;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_MUCH;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_DIAMETER"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DIAMETER;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DIAMETER;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_POSITION"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_POSITION;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_POSITION;
 		}
 		else if(errorTypeStringValue == "MISSING_DOTS"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::MISSING_DOTS;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::MISSING_DOTS;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_DISTANCE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DISTANCE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DISTANCE;
 		}
 		else if(errorTypeStringValue == "AREA_TOO_LARGE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_TOO_LARGE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_TOO_LARGE;
 		}
 		else if(errorTypeStringValue == "TOTALAREA_TOO_LARGE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOTALAREA_TOO_LARGE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOTALAREA_TOO_LARGE;
 		}
 		else if(errorTypeStringValue == "BORDERAREA_TOO_LARGE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::BORDERAREA_TOO_LARGE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::BORDERAREA_TOO_LARGE;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_AREA"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_AREA_ONHEIGHT"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_VOLUME"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_VOLUME;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_VOLUME;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_HEIGHT"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_HEIGHT;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_HEIGHT;
 		}
 		else if(errorTypeStringValue == "CONTOUR_MEASUREMENT_ERROR"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
 		}
 		else if(errorTypeStringValue == "TOO_BRIGHT"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_BRIGHT;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_BRIGHT;
 		}
 		else if(errorTypeStringValue == "TOO_DARK"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_DARK;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_DARK;
 		}
 		else if(errorTypeStringValue == "COUNT_ERROR"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::COUNT_ERROR;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::COUNT_ERROR;
 		}
 		else if(errorTypeStringValue == "Z_DISTANCE_HIGH"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_HIGH;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_HIGH;
 		}
 		else if(errorTypeStringValue == "Z_DISTANCE_LOW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_LOW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_LOW;
 		}
 		else if(errorTypeStringValue == "NOT_SYMMETRICAL"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::NOT_SYMMETRICAL;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::NOT_SYMMETRICAL;
 		}
 		else if(errorTypeStringValue == "REFERENCE_3D_ERROR"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_3D_ERROR;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_3D_ERROR;
 		}
 		else if(errorTypeStringValue == "COLOR_ERROR"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::COLOR_ERROR;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::COLOR_ERROR;
 		}
 		else if(errorTypeStringValue == "PATTERN_COUNT"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_COUNT;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_COUNT;
 		}
 		else if(errorTypeStringValue == "PATTERN_POSITION"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_POSITION;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_POSITION;
 		}
 		else if(errorTypeStringValue == "PATTERN_ROTATION"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_ROTATION;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_ROTATION;
 		}
 		else if(errorTypeStringValue == "CENTERLINE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CENTERLINE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CENTERLINE;
 		}
 		else if(errorTypeStringValue == "CALIB_ERROR_COMP"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_ERROR_COMP;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_ERROR_COMP;
 		}
 		else if(errorTypeStringValue == "CALIB_INVALID_COMP"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_INVALID_COMP;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_INVALID_COMP;
 		}
 		else if(errorTypeStringValue == "CALIB_NOZZLE_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_NOZZLE_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_NOZZLE_MOVED;
 		}
 		else if(errorTypeStringValue == "CONTOUR_NOT_FOUND"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_NOT_FOUND;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_NOT_FOUND;
 		}
 		else if(errorTypeStringValue == "CONTOUR_TOO_WIDE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_WIDE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_WIDE;
 		}
 		else if(errorTypeStringValue == "CONTOUR_TOO_NARROW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_NARROW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_NARROW;
 		}
 		else if(errorTypeStringValue == "CONTOUR_GLUE_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_GLUE_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_GLUE_MOVED;
 		}
 		else if(errorTypeStringValue == "CONTOUR_INVALID_POLY"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_INVALID_POLY;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_INVALID_POLY;
 		}
 		else if(errorTypeStringValue == "REFERENCE_NOT_FOUND"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_NOT_FOUND;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_NOT_FOUND;
 		}
 		else if(errorTypeStringValue == "REFERENCE_INVALID_REF"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_INVALID_REF;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_INVALID_REF;
 		}
 		else if(errorTypeStringValue == "REFERENCE_POS_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_POS_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_POS_MOVED;
 		}
 		else if(errorTypeStringValue == "REFERENCE_DIST_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_DIST_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_DIST_MOVED;
 		}
 		else if(errorTypeStringValue == "AREA_NOT_FOUND"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_NOT_FOUND;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_NOT_FOUND;
 		}
 		else if(errorTypeStringValue == "AREA_GLUE_FOUND"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_FOUND;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_FOUND;
 		}
 		else if(errorTypeStringValue == "AREA_GLUE_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_MOVED;
 		}
 		else if(errorTypeStringValue == "AREA_GAP_LENGTH"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GAP_LENGTH;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GAP_LENGTH;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ErrorCode", errorTypeStringValue);)
@@ -1984,7 +1984,7 @@ bool CResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 }
 
 
-bool CResult::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CResult::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!AreaResult){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AreaResult").toLocal8Bit().constData();)
@@ -1993,19 +1993,19 @@ bool CResult::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	}
 	QString areaResultStringValue;
 	switch (*AreaResult){
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NONE:
+	case ::sdl::V1_0::complextest::StatusCode::NONE:
 		areaResultStringValue = "NONE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::OK:
+	case ::sdl::V1_0::complextest::StatusCode::OK:
 		areaResultStringValue = "OK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::WARNING:
+	case ::sdl::V1_0::complextest::StatusCode::WARNING:
 		areaResultStringValue = "WARNING";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NOK:
+	case ::sdl::V1_0::complextest::StatusCode::NOK:
 		areaResultStringValue = "NOK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::FAILED:
+	case ::sdl::V1_0::complextest::StatusCode::FAILED:
 		areaResultStringValue = "FAILED";
 		break;
 	default:
@@ -2063,37 +2063,37 @@ bool CResult::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	}
 	QString measurementTypeStringValue;
 	switch (*MeasurementType){
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::NONE:
+	case ::sdl::V1_0::complextest::MeasurementType::NONE:
 		measurementTypeStringValue = "NONE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::WIDTH:
+	case ::sdl::V1_0::complextest::MeasurementType::WIDTH:
 		measurementTypeStringValue = "WIDTH";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::BRIGHTNESS:
+	case ::sdl::V1_0::complextest::MeasurementType::BRIGHTNESS:
 		measurementTypeStringValue = "BRIGHTNESS";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::DISTANCE:
+	case ::sdl::V1_0::complextest::MeasurementType::DISTANCE:
 		measurementTypeStringValue = "DISTANCE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::DISPLACEMENT:
+	case ::sdl::V1_0::complextest::MeasurementType::DISPLACEMENT:
 		measurementTypeStringValue = "DISPLACEMENT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::HEIGHT:
+	case ::sdl::V1_0::complextest::MeasurementType::HEIGHT:
 		measurementTypeStringValue = "HEIGHT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::SYMMETRY:
+	case ::sdl::V1_0::complextest::MeasurementType::SYMMETRY:
 		measurementTypeStringValue = "SYMMETRY";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::VOLUME:
+	case ::sdl::V1_0::complextest::MeasurementType::VOLUME:
 		measurementTypeStringValue = "VOLUME";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::VOLUMERATE:
+	case ::sdl::V1_0::complextest::MeasurementType::VOLUMERATE:
 		measurementTypeStringValue = "VOLUMERATE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::LENGTH:
+	case ::sdl::V1_0::complextest::MeasurementType::LENGTH:
 		measurementTypeStringValue = "LENGTH";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementType::OUT_OF_BOUND:
+	case ::sdl::V1_0::complextest::MeasurementType::OUT_OF_BOUND:
 		measurementTypeStringValue = "OUT_OF_BOUND";
 		break;
 	default:
@@ -2109,19 +2109,19 @@ bool CResult::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	}
 	QString measurementUnitStringValue;
 	switch (*MeasurementUnit){
-	case ::sdl::complextest::ComplexUnion1::MeasurementUnit::NONE:
+	case ::sdl::V1_0::complextest::MeasurementUnit::NONE:
 		measurementUnitStringValue = "NONE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm:
+	case ::sdl::V1_0::complextest::MeasurementUnit::mm:
 		measurementUnitStringValue = "mm";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm3:
+	case ::sdl::V1_0::complextest::MeasurementUnit::mm3:
 		measurementUnitStringValue = "mm3";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm3_mm:
+	case ::sdl::V1_0::complextest::MeasurementUnit::mm3_mm:
 		measurementUnitStringValue = "mm3_mm";
 		break;
-	case ::sdl::complextest::ComplexUnion1::MeasurementUnit::pixel:
+	case ::sdl::V1_0::complextest::MeasurementUnit::pixel:
 		measurementUnitStringValue = "pixel";
 		break;
 	default:
@@ -2144,154 +2144,154 @@ bool CResult::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	}
 	QString errorTypeStringValue;
 	switch (*ErrorType){
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::OK:
+	case ::sdl::V1_0::complextest::ErrorCode::OK:
 		errorTypeStringValue = "OK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_WIDE:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_WIDE:
 		errorTypeStringValue = "TOO_WIDE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOLERANCE:
+	case ::sdl::V1_0::complextest::ErrorCode::TOLERANCE:
 		errorTypeStringValue = "TOLERANCE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_NARROW:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_NARROW:
 		errorTypeStringValue = "TOO_NARROW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::NO_DATA_GAP:
+	case ::sdl::V1_0::complextest::ErrorCode::NO_DATA_GAP:
 		errorTypeStringValue = "NO_DATA_GAP";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::GAP:
+	case ::sdl::V1_0::complextest::ErrorCode::GAP:
 		errorTypeStringValue = "GAP";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_HIGH:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_HIGH:
 		errorTypeStringValue = "TOO_HIGH";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_LOW:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_LOW:
 		errorTypeStringValue = "TOO_LOW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_FEW:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_FEW:
 		errorTypeStringValue = "TOO_FEW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_MUCH:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_MUCH:
 		errorTypeStringValue = "TOO_MUCH";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DIAMETER:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DIAMETER:
 		errorTypeStringValue = "WRONG_DOT_DIAMETER";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_POSITION:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_POSITION:
 		errorTypeStringValue = "WRONG_DOT_POSITION";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::MISSING_DOTS:
+	case ::sdl::V1_0::complextest::ErrorCode::MISSING_DOTS:
 		errorTypeStringValue = "MISSING_DOTS";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DISTANCE:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DISTANCE:
 		errorTypeStringValue = "WRONG_DOT_DISTANCE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_TOO_LARGE:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_TOO_LARGE:
 		errorTypeStringValue = "AREA_TOO_LARGE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOTALAREA_TOO_LARGE:
+	case ::sdl::V1_0::complextest::ErrorCode::TOTALAREA_TOO_LARGE:
 		errorTypeStringValue = "TOTALAREA_TOO_LARGE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::BORDERAREA_TOO_LARGE:
+	case ::sdl::V1_0::complextest::ErrorCode::BORDERAREA_TOO_LARGE:
 		errorTypeStringValue = "BORDERAREA_TOO_LARGE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA:
 		errorTypeStringValue = "WRONG_DOT_AREA";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA_ONHEIGHT:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA_ONHEIGHT:
 		errorTypeStringValue = "WRONG_DOT_AREA_ONHEIGHT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_VOLUME:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_VOLUME:
 		errorTypeStringValue = "WRONG_DOT_VOLUME";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_HEIGHT:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_HEIGHT:
 		errorTypeStringValue = "WRONG_DOT_HEIGHT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_MEASUREMENT_ERROR:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_MEASUREMENT_ERROR:
 		errorTypeStringValue = "CONTOUR_MEASUREMENT_ERROR";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_BRIGHT:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_BRIGHT:
 		errorTypeStringValue = "TOO_BRIGHT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_DARK:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_DARK:
 		errorTypeStringValue = "TOO_DARK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::COUNT_ERROR:
+	case ::sdl::V1_0::complextest::ErrorCode::COUNT_ERROR:
 		errorTypeStringValue = "COUNT_ERROR";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_HIGH:
+	case ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_HIGH:
 		errorTypeStringValue = "Z_DISTANCE_HIGH";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_LOW:
+	case ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_LOW:
 		errorTypeStringValue = "Z_DISTANCE_LOW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::NOT_SYMMETRICAL:
+	case ::sdl::V1_0::complextest::ErrorCode::NOT_SYMMETRICAL:
 		errorTypeStringValue = "NOT_SYMMETRICAL";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_3D_ERROR:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_3D_ERROR:
 		errorTypeStringValue = "REFERENCE_3D_ERROR";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::COLOR_ERROR:
+	case ::sdl::V1_0::complextest::ErrorCode::COLOR_ERROR:
 		errorTypeStringValue = "COLOR_ERROR";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_COUNT:
+	case ::sdl::V1_0::complextest::ErrorCode::PATTERN_COUNT:
 		errorTypeStringValue = "PATTERN_COUNT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_POSITION:
+	case ::sdl::V1_0::complextest::ErrorCode::PATTERN_POSITION:
 		errorTypeStringValue = "PATTERN_POSITION";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_ROTATION:
+	case ::sdl::V1_0::complextest::ErrorCode::PATTERN_ROTATION:
 		errorTypeStringValue = "PATTERN_ROTATION";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CENTERLINE:
+	case ::sdl::V1_0::complextest::ErrorCode::CENTERLINE:
 		errorTypeStringValue = "CENTERLINE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_ERROR_COMP:
+	case ::sdl::V1_0::complextest::ErrorCode::CALIB_ERROR_COMP:
 		errorTypeStringValue = "CALIB_ERROR_COMP";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_INVALID_COMP:
+	case ::sdl::V1_0::complextest::ErrorCode::CALIB_INVALID_COMP:
 		errorTypeStringValue = "CALIB_INVALID_COMP";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_NOZZLE_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::CALIB_NOZZLE_MOVED:
 		errorTypeStringValue = "CALIB_NOZZLE_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_NOT_FOUND:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_NOT_FOUND:
 		errorTypeStringValue = "CONTOUR_NOT_FOUND";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_WIDE:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_WIDE:
 		errorTypeStringValue = "CONTOUR_TOO_WIDE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_NARROW:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_NARROW:
 		errorTypeStringValue = "CONTOUR_TOO_NARROW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_GLUE_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_GLUE_MOVED:
 		errorTypeStringValue = "CONTOUR_GLUE_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_INVALID_POLY:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_INVALID_POLY:
 		errorTypeStringValue = "CONTOUR_INVALID_POLY";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_NOT_FOUND:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_NOT_FOUND:
 		errorTypeStringValue = "REFERENCE_NOT_FOUND";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_INVALID_REF:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_INVALID_REF:
 		errorTypeStringValue = "REFERENCE_INVALID_REF";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_POS_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_POS_MOVED:
 		errorTypeStringValue = "REFERENCE_POS_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_DIST_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_DIST_MOVED:
 		errorTypeStringValue = "REFERENCE_DIST_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_NOT_FOUND:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_NOT_FOUND:
 		errorTypeStringValue = "AREA_NOT_FOUND";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_FOUND:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_FOUND:
 		errorTypeStringValue = "AREA_GLUE_FOUND";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_MOVED:
 		errorTypeStringValue = "AREA_GLUE_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GAP_LENGTH:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_GAP_LENGTH:
 		errorTypeStringValue = "AREA_GAP_LENGTH";
 		break;
 	default:
@@ -2318,7 +2318,7 @@ bool CResult::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CResult::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CResult::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("AreaResult") || ! jsonObject["AreaResult"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AreaResult").toLocal8Bit().constData();)
@@ -2327,19 +2327,19 @@ bool CResult::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 	const QString areaResultStringValue = jsonObject["AreaResult"].toString();
 	if(areaResultStringValue == "NONE"){
-		AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+		AreaResult = ::sdl::V1_0::complextest::StatusCode::NONE;
 	}
 	else if(areaResultStringValue == "OK"){
-		AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+		AreaResult = ::sdl::V1_0::complextest::StatusCode::OK;
 	}
 	else if(areaResultStringValue == "WARNING"){
-		AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+		AreaResult = ::sdl::V1_0::complextest::StatusCode::WARNING;
 	}
 	else if(areaResultStringValue == "NOK"){
-		AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+		AreaResult = ::sdl::V1_0::complextest::StatusCode::NOK;
 	}
 	else if(areaResultStringValue == "FAILED"){
-		AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+		AreaResult = ::sdl::V1_0::complextest::StatusCode::FAILED;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", areaResultStringValue);)
@@ -2396,37 +2396,37 @@ bool CResult::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 	const QString measurementTypeStringValue = jsonObject["MeasurementType"].toString();
 	if(measurementTypeStringValue == "NONE"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::NONE;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::NONE;
 	}
 	else if(measurementTypeStringValue == "WIDTH"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::WIDTH;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::WIDTH;
 	}
 	else if(measurementTypeStringValue == "BRIGHTNESS"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::BRIGHTNESS;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::BRIGHTNESS;
 	}
 	else if(measurementTypeStringValue == "DISTANCE"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::DISTANCE;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::DISTANCE;
 	}
 	else if(measurementTypeStringValue == "DISPLACEMENT"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::DISPLACEMENT;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::DISPLACEMENT;
 	}
 	else if(measurementTypeStringValue == "HEIGHT"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::HEIGHT;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::HEIGHT;
 	}
 	else if(measurementTypeStringValue == "SYMMETRY"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::SYMMETRY;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::SYMMETRY;
 	}
 	else if(measurementTypeStringValue == "VOLUME"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::VOLUME;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::VOLUME;
 	}
 	else if(measurementTypeStringValue == "VOLUMERATE"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::VOLUMERATE;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::VOLUMERATE;
 	}
 	else if(measurementTypeStringValue == "LENGTH"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::LENGTH;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::LENGTH;
 	}
 	else if(measurementTypeStringValue == "OUT_OF_BOUND"){
-		MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::OUT_OF_BOUND;
+		MeasurementType = ::sdl::V1_0::complextest::MeasurementType::OUT_OF_BOUND;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "MeasurementType", measurementTypeStringValue);)
@@ -2441,19 +2441,19 @@ bool CResult::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 	const QString measurementUnitStringValue = jsonObject["MeasurementUnit"].toString();
 	if(measurementUnitStringValue == "NONE"){
-		MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::NONE;
+		MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::NONE;
 	}
 	else if(measurementUnitStringValue == "mm"){
-		MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm;
+		MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::mm;
 	}
 	else if(measurementUnitStringValue == "mm3"){
-		MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm3;
+		MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::mm3;
 	}
 	else if(measurementUnitStringValue == "mm3_mm"){
-		MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm3_mm;
+		MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::mm3_mm;
 	}
 	else if(measurementUnitStringValue == "pixel"){
-		MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::pixel;
+		MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::pixel;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "MeasurementUnit", measurementUnitStringValue);)
@@ -2475,154 +2475,154 @@ bool CResult::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 	const QString errorTypeStringValue = jsonObject["ErrorType"].toString();
 	if(errorTypeStringValue == "OK"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::OK;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::OK;
 	}
 	else if(errorTypeStringValue == "TOO_WIDE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_WIDE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_WIDE;
 	}
 	else if(errorTypeStringValue == "TOLERANCE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOLERANCE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOLERANCE;
 	}
 	else if(errorTypeStringValue == "TOO_NARROW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_NARROW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_NARROW;
 	}
 	else if(errorTypeStringValue == "NO_DATA_GAP"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::NO_DATA_GAP;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::NO_DATA_GAP;
 	}
 	else if(errorTypeStringValue == "GAP"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::GAP;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::GAP;
 	}
 	else if(errorTypeStringValue == "TOO_HIGH"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_HIGH;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_HIGH;
 	}
 	else if(errorTypeStringValue == "TOO_LOW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_LOW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_LOW;
 	}
 	else if(errorTypeStringValue == "TOO_FEW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_FEW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_FEW;
 	}
 	else if(errorTypeStringValue == "TOO_MUCH"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_MUCH;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_MUCH;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_DIAMETER"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DIAMETER;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DIAMETER;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_POSITION"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_POSITION;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_POSITION;
 	}
 	else if(errorTypeStringValue == "MISSING_DOTS"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::MISSING_DOTS;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::MISSING_DOTS;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_DISTANCE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DISTANCE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DISTANCE;
 	}
 	else if(errorTypeStringValue == "AREA_TOO_LARGE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_TOO_LARGE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_TOO_LARGE;
 	}
 	else if(errorTypeStringValue == "TOTALAREA_TOO_LARGE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOTALAREA_TOO_LARGE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOTALAREA_TOO_LARGE;
 	}
 	else if(errorTypeStringValue == "BORDERAREA_TOO_LARGE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::BORDERAREA_TOO_LARGE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::BORDERAREA_TOO_LARGE;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_AREA"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_AREA_ONHEIGHT"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_VOLUME"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_VOLUME;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_VOLUME;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_HEIGHT"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_HEIGHT;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_HEIGHT;
 	}
 	else if(errorTypeStringValue == "CONTOUR_MEASUREMENT_ERROR"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
 	}
 	else if(errorTypeStringValue == "TOO_BRIGHT"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_BRIGHT;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_BRIGHT;
 	}
 	else if(errorTypeStringValue == "TOO_DARK"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_DARK;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_DARK;
 	}
 	else if(errorTypeStringValue == "COUNT_ERROR"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::COUNT_ERROR;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::COUNT_ERROR;
 	}
 	else if(errorTypeStringValue == "Z_DISTANCE_HIGH"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_HIGH;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_HIGH;
 	}
 	else if(errorTypeStringValue == "Z_DISTANCE_LOW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_LOW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_LOW;
 	}
 	else if(errorTypeStringValue == "NOT_SYMMETRICAL"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::NOT_SYMMETRICAL;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::NOT_SYMMETRICAL;
 	}
 	else if(errorTypeStringValue == "REFERENCE_3D_ERROR"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_3D_ERROR;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_3D_ERROR;
 	}
 	else if(errorTypeStringValue == "COLOR_ERROR"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::COLOR_ERROR;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::COLOR_ERROR;
 	}
 	else if(errorTypeStringValue == "PATTERN_COUNT"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_COUNT;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_COUNT;
 	}
 	else if(errorTypeStringValue == "PATTERN_POSITION"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_POSITION;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_POSITION;
 	}
 	else if(errorTypeStringValue == "PATTERN_ROTATION"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_ROTATION;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_ROTATION;
 	}
 	else if(errorTypeStringValue == "CENTERLINE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CENTERLINE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CENTERLINE;
 	}
 	else if(errorTypeStringValue == "CALIB_ERROR_COMP"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_ERROR_COMP;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_ERROR_COMP;
 	}
 	else if(errorTypeStringValue == "CALIB_INVALID_COMP"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_INVALID_COMP;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_INVALID_COMP;
 	}
 	else if(errorTypeStringValue == "CALIB_NOZZLE_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_NOZZLE_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_NOZZLE_MOVED;
 	}
 	else if(errorTypeStringValue == "CONTOUR_NOT_FOUND"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_NOT_FOUND;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_NOT_FOUND;
 	}
 	else if(errorTypeStringValue == "CONTOUR_TOO_WIDE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_WIDE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_WIDE;
 	}
 	else if(errorTypeStringValue == "CONTOUR_TOO_NARROW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_NARROW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_NARROW;
 	}
 	else if(errorTypeStringValue == "CONTOUR_GLUE_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_GLUE_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_GLUE_MOVED;
 	}
 	else if(errorTypeStringValue == "CONTOUR_INVALID_POLY"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_INVALID_POLY;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_INVALID_POLY;
 	}
 	else if(errorTypeStringValue == "REFERENCE_NOT_FOUND"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_NOT_FOUND;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_NOT_FOUND;
 	}
 	else if(errorTypeStringValue == "REFERENCE_INVALID_REF"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_INVALID_REF;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_INVALID_REF;
 	}
 	else if(errorTypeStringValue == "REFERENCE_POS_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_POS_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_POS_MOVED;
 	}
 	else if(errorTypeStringValue == "REFERENCE_DIST_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_DIST_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_DIST_MOVED;
 	}
 	else if(errorTypeStringValue == "AREA_NOT_FOUND"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_NOT_FOUND;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_NOT_FOUND;
 	}
 	else if(errorTypeStringValue == "AREA_GLUE_FOUND"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_FOUND;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_FOUND;
 	}
 	else if(errorTypeStringValue == "AREA_GLUE_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_MOVED;
 	}
 	else if(errorTypeStringValue == "AREA_GAP_LENGTH"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GAP_LENGTH;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GAP_LENGTH;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ErrorCode", errorTypeStringValue);)
@@ -2647,24 +2647,24 @@ bool CResult::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CResult::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CResult::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("AreaResult") && jsonObject["AreaResult"].isString()){
 		const QString areaResultStringValue = jsonObject["AreaResult"].toString();
 		if(areaResultStringValue == "NONE"){
-			AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+			AreaResult = ::sdl::V1_0::complextest::StatusCode::NONE;
 		}
 		else if(areaResultStringValue == "OK"){
-			AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+			AreaResult = ::sdl::V1_0::complextest::StatusCode::OK;
 		}
 		else if(areaResultStringValue == "WARNING"){
-			AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+			AreaResult = ::sdl::V1_0::complextest::StatusCode::WARNING;
 		}
 		else if(areaResultStringValue == "NOK"){
-			AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+			AreaResult = ::sdl::V1_0::complextest::StatusCode::NOK;
 		}
 		else if(areaResultStringValue == "FAILED"){
-			AreaResult = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+			AreaResult = ::sdl::V1_0::complextest::StatusCode::FAILED;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", areaResultStringValue);)
@@ -2700,37 +2700,37 @@ bool CResult::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("MeasurementType") && jsonObject["MeasurementType"].isString()){
 		const QString measurementTypeStringValue = jsonObject["MeasurementType"].toString();
 		if(measurementTypeStringValue == "NONE"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::NONE;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::NONE;
 		}
 		else if(measurementTypeStringValue == "WIDTH"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::WIDTH;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::WIDTH;
 		}
 		else if(measurementTypeStringValue == "BRIGHTNESS"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::BRIGHTNESS;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::BRIGHTNESS;
 		}
 		else if(measurementTypeStringValue == "DISTANCE"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::DISTANCE;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::DISTANCE;
 		}
 		else if(measurementTypeStringValue == "DISPLACEMENT"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::DISPLACEMENT;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::DISPLACEMENT;
 		}
 		else if(measurementTypeStringValue == "HEIGHT"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::HEIGHT;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::HEIGHT;
 		}
 		else if(measurementTypeStringValue == "SYMMETRY"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::SYMMETRY;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::SYMMETRY;
 		}
 		else if(measurementTypeStringValue == "VOLUME"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::VOLUME;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::VOLUME;
 		}
 		else if(measurementTypeStringValue == "VOLUMERATE"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::VOLUMERATE;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::VOLUMERATE;
 		}
 		else if(measurementTypeStringValue == "LENGTH"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::LENGTH;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::LENGTH;
 		}
 		else if(measurementTypeStringValue == "OUT_OF_BOUND"){
-			MeasurementType = ::sdl::complextest::ComplexUnion1::MeasurementType::OUT_OF_BOUND;
+			MeasurementType = ::sdl::V1_0::complextest::MeasurementType::OUT_OF_BOUND;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "MeasurementType", measurementTypeStringValue);)
@@ -2742,19 +2742,19 @@ bool CResult::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("MeasurementUnit") && jsonObject["MeasurementUnit"].isString()){
 		const QString measurementUnitStringValue = jsonObject["MeasurementUnit"].toString();
 		if(measurementUnitStringValue == "NONE"){
-			MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::NONE;
+			MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::NONE;
 		}
 		else if(measurementUnitStringValue == "mm"){
-			MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm;
+			MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::mm;
 		}
 		else if(measurementUnitStringValue == "mm3"){
-			MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm3;
+			MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::mm3;
 		}
 		else if(measurementUnitStringValue == "mm3_mm"){
-			MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::mm3_mm;
+			MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::mm3_mm;
 		}
 		else if(measurementUnitStringValue == "pixel"){
-			MeasurementUnit = ::sdl::complextest::ComplexUnion1::MeasurementUnit::pixel;
+			MeasurementUnit = ::sdl::V1_0::complextest::MeasurementUnit::pixel;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "MeasurementUnit", measurementUnitStringValue);)
@@ -2770,154 +2770,154 @@ bool CResult::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("ErrorType") && jsonObject["ErrorType"].isString()){
 		const QString errorTypeStringValue = jsonObject["ErrorType"].toString();
 		if(errorTypeStringValue == "OK"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::OK;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::OK;
 		}
 		else if(errorTypeStringValue == "TOO_WIDE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_WIDE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_WIDE;
 		}
 		else if(errorTypeStringValue == "TOLERANCE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOLERANCE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOLERANCE;
 		}
 		else if(errorTypeStringValue == "TOO_NARROW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_NARROW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_NARROW;
 		}
 		else if(errorTypeStringValue == "NO_DATA_GAP"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::NO_DATA_GAP;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::NO_DATA_GAP;
 		}
 		else if(errorTypeStringValue == "GAP"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::GAP;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::GAP;
 		}
 		else if(errorTypeStringValue == "TOO_HIGH"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_HIGH;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_HIGH;
 		}
 		else if(errorTypeStringValue == "TOO_LOW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_LOW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_LOW;
 		}
 		else if(errorTypeStringValue == "TOO_FEW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_FEW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_FEW;
 		}
 		else if(errorTypeStringValue == "TOO_MUCH"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_MUCH;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_MUCH;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_DIAMETER"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DIAMETER;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DIAMETER;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_POSITION"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_POSITION;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_POSITION;
 		}
 		else if(errorTypeStringValue == "MISSING_DOTS"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::MISSING_DOTS;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::MISSING_DOTS;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_DISTANCE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DISTANCE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DISTANCE;
 		}
 		else if(errorTypeStringValue == "AREA_TOO_LARGE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_TOO_LARGE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_TOO_LARGE;
 		}
 		else if(errorTypeStringValue == "TOTALAREA_TOO_LARGE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOTALAREA_TOO_LARGE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOTALAREA_TOO_LARGE;
 		}
 		else if(errorTypeStringValue == "BORDERAREA_TOO_LARGE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::BORDERAREA_TOO_LARGE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::BORDERAREA_TOO_LARGE;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_AREA"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_AREA_ONHEIGHT"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_VOLUME"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_VOLUME;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_VOLUME;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_HEIGHT"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_HEIGHT;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_HEIGHT;
 		}
 		else if(errorTypeStringValue == "CONTOUR_MEASUREMENT_ERROR"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
 		}
 		else if(errorTypeStringValue == "TOO_BRIGHT"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_BRIGHT;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_BRIGHT;
 		}
 		else if(errorTypeStringValue == "TOO_DARK"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_DARK;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_DARK;
 		}
 		else if(errorTypeStringValue == "COUNT_ERROR"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::COUNT_ERROR;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::COUNT_ERROR;
 		}
 		else if(errorTypeStringValue == "Z_DISTANCE_HIGH"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_HIGH;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_HIGH;
 		}
 		else if(errorTypeStringValue == "Z_DISTANCE_LOW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_LOW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_LOW;
 		}
 		else if(errorTypeStringValue == "NOT_SYMMETRICAL"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::NOT_SYMMETRICAL;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::NOT_SYMMETRICAL;
 		}
 		else if(errorTypeStringValue == "REFERENCE_3D_ERROR"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_3D_ERROR;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_3D_ERROR;
 		}
 		else if(errorTypeStringValue == "COLOR_ERROR"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::COLOR_ERROR;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::COLOR_ERROR;
 		}
 		else if(errorTypeStringValue == "PATTERN_COUNT"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_COUNT;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_COUNT;
 		}
 		else if(errorTypeStringValue == "PATTERN_POSITION"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_POSITION;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_POSITION;
 		}
 		else if(errorTypeStringValue == "PATTERN_ROTATION"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_ROTATION;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_ROTATION;
 		}
 		else if(errorTypeStringValue == "CENTERLINE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CENTERLINE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CENTERLINE;
 		}
 		else if(errorTypeStringValue == "CALIB_ERROR_COMP"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_ERROR_COMP;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_ERROR_COMP;
 		}
 		else if(errorTypeStringValue == "CALIB_INVALID_COMP"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_INVALID_COMP;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_INVALID_COMP;
 		}
 		else if(errorTypeStringValue == "CALIB_NOZZLE_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_NOZZLE_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_NOZZLE_MOVED;
 		}
 		else if(errorTypeStringValue == "CONTOUR_NOT_FOUND"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_NOT_FOUND;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_NOT_FOUND;
 		}
 		else if(errorTypeStringValue == "CONTOUR_TOO_WIDE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_WIDE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_WIDE;
 		}
 		else if(errorTypeStringValue == "CONTOUR_TOO_NARROW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_NARROW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_NARROW;
 		}
 		else if(errorTypeStringValue == "CONTOUR_GLUE_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_GLUE_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_GLUE_MOVED;
 		}
 		else if(errorTypeStringValue == "CONTOUR_INVALID_POLY"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_INVALID_POLY;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_INVALID_POLY;
 		}
 		else if(errorTypeStringValue == "REFERENCE_NOT_FOUND"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_NOT_FOUND;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_NOT_FOUND;
 		}
 		else if(errorTypeStringValue == "REFERENCE_INVALID_REF"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_INVALID_REF;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_INVALID_REF;
 		}
 		else if(errorTypeStringValue == "REFERENCE_POS_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_POS_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_POS_MOVED;
 		}
 		else if(errorTypeStringValue == "REFERENCE_DIST_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_DIST_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_DIST_MOVED;
 		}
 		else if(errorTypeStringValue == "AREA_NOT_FOUND"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_NOT_FOUND;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_NOT_FOUND;
 		}
 		else if(errorTypeStringValue == "AREA_GLUE_FOUND"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_FOUND;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_FOUND;
 		}
 		else if(errorTypeStringValue == "AREA_GLUE_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_MOVED;
 		}
 		else if(errorTypeStringValue == "AREA_GAP_LENGTH"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GAP_LENGTH;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GAP_LENGTH;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ErrorCode", errorTypeStringValue);)
@@ -2942,243 +2942,13 @@ bool CResult::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CResult::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CResult::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CResult::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CResult::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CResult::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CResult::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CResult::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CResult::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CResult::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CArea::V1_0::GetVersionId()
+QByteArray CArea::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CArea::V1_0::operator==(const V1_0& other) const
+bool CArea::operator==(const CArea& other) const
 {
 	return 
 				AreaName == other.AreaName &&
@@ -3189,7 +2959,7 @@ bool CArea::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CArea::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CArea::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "Area", modelIndex);
 
@@ -3207,19 +2977,19 @@ bool CArea::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex)
 	}
 	QString statusStringValue;
 	switch (*Status){
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NONE:
+	case ::sdl::V1_0::complextest::StatusCode::NONE:
 		statusStringValue = "NONE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::OK:
+	case ::sdl::V1_0::complextest::StatusCode::OK:
 		statusStringValue = "OK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::WARNING:
+	case ::sdl::V1_0::complextest::StatusCode::WARNING:
 		statusStringValue = "WARNING";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NOK:
+	case ::sdl::V1_0::complextest::StatusCode::NOK:
 		statusStringValue = "NOK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::FAILED:
+	case ::sdl::V1_0::complextest::StatusCode::FAILED:
 		statusStringValue = "FAILED";
 		break;
 	default:
@@ -3249,154 +3019,154 @@ bool CArea::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex)
 	}
 	QString errorTypeStringValue;
 	switch (*ErrorType){
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::OK:
+	case ::sdl::V1_0::complextest::ErrorCode::OK:
 		errorTypeStringValue = "OK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_WIDE:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_WIDE:
 		errorTypeStringValue = "TOO_WIDE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOLERANCE:
+	case ::sdl::V1_0::complextest::ErrorCode::TOLERANCE:
 		errorTypeStringValue = "TOLERANCE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_NARROW:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_NARROW:
 		errorTypeStringValue = "TOO_NARROW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::NO_DATA_GAP:
+	case ::sdl::V1_0::complextest::ErrorCode::NO_DATA_GAP:
 		errorTypeStringValue = "NO_DATA_GAP";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::GAP:
+	case ::sdl::V1_0::complextest::ErrorCode::GAP:
 		errorTypeStringValue = "GAP";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_HIGH:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_HIGH:
 		errorTypeStringValue = "TOO_HIGH";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_LOW:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_LOW:
 		errorTypeStringValue = "TOO_LOW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_FEW:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_FEW:
 		errorTypeStringValue = "TOO_FEW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_MUCH:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_MUCH:
 		errorTypeStringValue = "TOO_MUCH";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DIAMETER:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DIAMETER:
 		errorTypeStringValue = "WRONG_DOT_DIAMETER";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_POSITION:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_POSITION:
 		errorTypeStringValue = "WRONG_DOT_POSITION";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::MISSING_DOTS:
+	case ::sdl::V1_0::complextest::ErrorCode::MISSING_DOTS:
 		errorTypeStringValue = "MISSING_DOTS";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DISTANCE:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DISTANCE:
 		errorTypeStringValue = "WRONG_DOT_DISTANCE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_TOO_LARGE:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_TOO_LARGE:
 		errorTypeStringValue = "AREA_TOO_LARGE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOTALAREA_TOO_LARGE:
+	case ::sdl::V1_0::complextest::ErrorCode::TOTALAREA_TOO_LARGE:
 		errorTypeStringValue = "TOTALAREA_TOO_LARGE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::BORDERAREA_TOO_LARGE:
+	case ::sdl::V1_0::complextest::ErrorCode::BORDERAREA_TOO_LARGE:
 		errorTypeStringValue = "BORDERAREA_TOO_LARGE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA:
 		errorTypeStringValue = "WRONG_DOT_AREA";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA_ONHEIGHT:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA_ONHEIGHT:
 		errorTypeStringValue = "WRONG_DOT_AREA_ONHEIGHT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_VOLUME:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_VOLUME:
 		errorTypeStringValue = "WRONG_DOT_VOLUME";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_HEIGHT:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_HEIGHT:
 		errorTypeStringValue = "WRONG_DOT_HEIGHT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_MEASUREMENT_ERROR:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_MEASUREMENT_ERROR:
 		errorTypeStringValue = "CONTOUR_MEASUREMENT_ERROR";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_BRIGHT:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_BRIGHT:
 		errorTypeStringValue = "TOO_BRIGHT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_DARK:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_DARK:
 		errorTypeStringValue = "TOO_DARK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::COUNT_ERROR:
+	case ::sdl::V1_0::complextest::ErrorCode::COUNT_ERROR:
 		errorTypeStringValue = "COUNT_ERROR";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_HIGH:
+	case ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_HIGH:
 		errorTypeStringValue = "Z_DISTANCE_HIGH";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_LOW:
+	case ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_LOW:
 		errorTypeStringValue = "Z_DISTANCE_LOW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::NOT_SYMMETRICAL:
+	case ::sdl::V1_0::complextest::ErrorCode::NOT_SYMMETRICAL:
 		errorTypeStringValue = "NOT_SYMMETRICAL";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_3D_ERROR:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_3D_ERROR:
 		errorTypeStringValue = "REFERENCE_3D_ERROR";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::COLOR_ERROR:
+	case ::sdl::V1_0::complextest::ErrorCode::COLOR_ERROR:
 		errorTypeStringValue = "COLOR_ERROR";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_COUNT:
+	case ::sdl::V1_0::complextest::ErrorCode::PATTERN_COUNT:
 		errorTypeStringValue = "PATTERN_COUNT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_POSITION:
+	case ::sdl::V1_0::complextest::ErrorCode::PATTERN_POSITION:
 		errorTypeStringValue = "PATTERN_POSITION";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_ROTATION:
+	case ::sdl::V1_0::complextest::ErrorCode::PATTERN_ROTATION:
 		errorTypeStringValue = "PATTERN_ROTATION";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CENTERLINE:
+	case ::sdl::V1_0::complextest::ErrorCode::CENTERLINE:
 		errorTypeStringValue = "CENTERLINE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_ERROR_COMP:
+	case ::sdl::V1_0::complextest::ErrorCode::CALIB_ERROR_COMP:
 		errorTypeStringValue = "CALIB_ERROR_COMP";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_INVALID_COMP:
+	case ::sdl::V1_0::complextest::ErrorCode::CALIB_INVALID_COMP:
 		errorTypeStringValue = "CALIB_INVALID_COMP";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_NOZZLE_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::CALIB_NOZZLE_MOVED:
 		errorTypeStringValue = "CALIB_NOZZLE_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_NOT_FOUND:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_NOT_FOUND:
 		errorTypeStringValue = "CONTOUR_NOT_FOUND";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_WIDE:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_WIDE:
 		errorTypeStringValue = "CONTOUR_TOO_WIDE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_NARROW:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_NARROW:
 		errorTypeStringValue = "CONTOUR_TOO_NARROW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_GLUE_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_GLUE_MOVED:
 		errorTypeStringValue = "CONTOUR_GLUE_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_INVALID_POLY:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_INVALID_POLY:
 		errorTypeStringValue = "CONTOUR_INVALID_POLY";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_NOT_FOUND:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_NOT_FOUND:
 		errorTypeStringValue = "REFERENCE_NOT_FOUND";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_INVALID_REF:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_INVALID_REF:
 		errorTypeStringValue = "REFERENCE_INVALID_REF";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_POS_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_POS_MOVED:
 		errorTypeStringValue = "REFERENCE_POS_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_DIST_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_DIST_MOVED:
 		errorTypeStringValue = "REFERENCE_DIST_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_NOT_FOUND:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_NOT_FOUND:
 		errorTypeStringValue = "AREA_NOT_FOUND";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_FOUND:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_FOUND:
 		errorTypeStringValue = "AREA_GLUE_FOUND";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_MOVED:
 		errorTypeStringValue = "AREA_GLUE_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GAP_LENGTH:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_GAP_LENGTH:
 		errorTypeStringValue = "AREA_GAP_LENGTH";
 		break;
 	default:
@@ -3425,7 +3195,7 @@ bool CArea::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex)
 }
 
 
-bool CArea::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CArea::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant areaNameData = model.GetData("AreaName", modelIndex);
 	if (areaNameData.isNull()){
@@ -3443,19 +3213,19 @@ bool CArea::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mode
 	}
 	QString statusStringValue = statusData.toString();
 	if(statusStringValue == "NONE"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+		Status = ::sdl::V1_0::complextest::StatusCode::NONE;
 	}
 	else if(statusStringValue == "OK"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+		Status = ::sdl::V1_0::complextest::StatusCode::OK;
 	}
 	else if(statusStringValue == "WARNING"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+		Status = ::sdl::V1_0::complextest::StatusCode::WARNING;
 	}
 	else if(statusStringValue == "NOK"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+		Status = ::sdl::V1_0::complextest::StatusCode::NOK;
 	}
 	else if(statusStringValue == "FAILED"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+		Status = ::sdl::V1_0::complextest::StatusCode::FAILED;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
@@ -3486,154 +3256,154 @@ bool CArea::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mode
 	}
 	QString errorTypeStringValue = errorTypeData.toString();
 	if(errorTypeStringValue == "OK"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::OK;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::OK;
 	}
 	else if(errorTypeStringValue == "TOO_WIDE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_WIDE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_WIDE;
 	}
 	else if(errorTypeStringValue == "TOLERANCE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOLERANCE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOLERANCE;
 	}
 	else if(errorTypeStringValue == "TOO_NARROW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_NARROW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_NARROW;
 	}
 	else if(errorTypeStringValue == "NO_DATA_GAP"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::NO_DATA_GAP;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::NO_DATA_GAP;
 	}
 	else if(errorTypeStringValue == "GAP"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::GAP;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::GAP;
 	}
 	else if(errorTypeStringValue == "TOO_HIGH"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_HIGH;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_HIGH;
 	}
 	else if(errorTypeStringValue == "TOO_LOW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_LOW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_LOW;
 	}
 	else if(errorTypeStringValue == "TOO_FEW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_FEW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_FEW;
 	}
 	else if(errorTypeStringValue == "TOO_MUCH"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_MUCH;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_MUCH;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_DIAMETER"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DIAMETER;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DIAMETER;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_POSITION"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_POSITION;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_POSITION;
 	}
 	else if(errorTypeStringValue == "MISSING_DOTS"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::MISSING_DOTS;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::MISSING_DOTS;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_DISTANCE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DISTANCE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DISTANCE;
 	}
 	else if(errorTypeStringValue == "AREA_TOO_LARGE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_TOO_LARGE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_TOO_LARGE;
 	}
 	else if(errorTypeStringValue == "TOTALAREA_TOO_LARGE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOTALAREA_TOO_LARGE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOTALAREA_TOO_LARGE;
 	}
 	else if(errorTypeStringValue == "BORDERAREA_TOO_LARGE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::BORDERAREA_TOO_LARGE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::BORDERAREA_TOO_LARGE;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_AREA"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_AREA_ONHEIGHT"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_VOLUME"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_VOLUME;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_VOLUME;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_HEIGHT"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_HEIGHT;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_HEIGHT;
 	}
 	else if(errorTypeStringValue == "CONTOUR_MEASUREMENT_ERROR"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
 	}
 	else if(errorTypeStringValue == "TOO_BRIGHT"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_BRIGHT;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_BRIGHT;
 	}
 	else if(errorTypeStringValue == "TOO_DARK"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_DARK;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_DARK;
 	}
 	else if(errorTypeStringValue == "COUNT_ERROR"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::COUNT_ERROR;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::COUNT_ERROR;
 	}
 	else if(errorTypeStringValue == "Z_DISTANCE_HIGH"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_HIGH;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_HIGH;
 	}
 	else if(errorTypeStringValue == "Z_DISTANCE_LOW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_LOW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_LOW;
 	}
 	else if(errorTypeStringValue == "NOT_SYMMETRICAL"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::NOT_SYMMETRICAL;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::NOT_SYMMETRICAL;
 	}
 	else if(errorTypeStringValue == "REFERENCE_3D_ERROR"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_3D_ERROR;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_3D_ERROR;
 	}
 	else if(errorTypeStringValue == "COLOR_ERROR"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::COLOR_ERROR;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::COLOR_ERROR;
 	}
 	else if(errorTypeStringValue == "PATTERN_COUNT"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_COUNT;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_COUNT;
 	}
 	else if(errorTypeStringValue == "PATTERN_POSITION"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_POSITION;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_POSITION;
 	}
 	else if(errorTypeStringValue == "PATTERN_ROTATION"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_ROTATION;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_ROTATION;
 	}
 	else if(errorTypeStringValue == "CENTERLINE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CENTERLINE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CENTERLINE;
 	}
 	else if(errorTypeStringValue == "CALIB_ERROR_COMP"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_ERROR_COMP;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_ERROR_COMP;
 	}
 	else if(errorTypeStringValue == "CALIB_INVALID_COMP"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_INVALID_COMP;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_INVALID_COMP;
 	}
 	else if(errorTypeStringValue == "CALIB_NOZZLE_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_NOZZLE_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_NOZZLE_MOVED;
 	}
 	else if(errorTypeStringValue == "CONTOUR_NOT_FOUND"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_NOT_FOUND;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_NOT_FOUND;
 	}
 	else if(errorTypeStringValue == "CONTOUR_TOO_WIDE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_WIDE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_WIDE;
 	}
 	else if(errorTypeStringValue == "CONTOUR_TOO_NARROW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_NARROW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_NARROW;
 	}
 	else if(errorTypeStringValue == "CONTOUR_GLUE_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_GLUE_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_GLUE_MOVED;
 	}
 	else if(errorTypeStringValue == "CONTOUR_INVALID_POLY"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_INVALID_POLY;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_INVALID_POLY;
 	}
 	else if(errorTypeStringValue == "REFERENCE_NOT_FOUND"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_NOT_FOUND;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_NOT_FOUND;
 	}
 	else if(errorTypeStringValue == "REFERENCE_INVALID_REF"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_INVALID_REF;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_INVALID_REF;
 	}
 	else if(errorTypeStringValue == "REFERENCE_POS_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_POS_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_POS_MOVED;
 	}
 	else if(errorTypeStringValue == "REFERENCE_DIST_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_DIST_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_DIST_MOVED;
 	}
 	else if(errorTypeStringValue == "AREA_NOT_FOUND"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_NOT_FOUND;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_NOT_FOUND;
 	}
 	else if(errorTypeStringValue == "AREA_GLUE_FOUND"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_FOUND;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_FOUND;
 	}
 	else if(errorTypeStringValue == "AREA_GLUE_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_MOVED;
 	}
 	else if(errorTypeStringValue == "AREA_GAP_LENGTH"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GAP_LENGTH;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GAP_LENGTH;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ErrorCode", errorTypeStringValue);)
@@ -3665,7 +3435,7 @@ bool CArea::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mode
 }
 
 
-bool CArea::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CArea::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant areaNameData = model.GetData("AreaName", modelIndex);
 	if (!areaNameData.isNull()){
@@ -3676,19 +3446,19 @@ bool CArea::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int m
 	if (!statusData.isNull()){
 		QString statusStringValue = statusData.toString();
 		if(statusStringValue == "NONE"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+			Status = ::sdl::V1_0::complextest::StatusCode::NONE;
 		}
 		else if(statusStringValue == "OK"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+			Status = ::sdl::V1_0::complextest::StatusCode::OK;
 		}
 		else if(statusStringValue == "WARNING"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+			Status = ::sdl::V1_0::complextest::StatusCode::WARNING;
 		}
 		else if(statusStringValue == "NOK"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+			Status = ::sdl::V1_0::complextest::StatusCode::NOK;
 		}
 		else if(statusStringValue == "FAILED"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+			Status = ::sdl::V1_0::complextest::StatusCode::FAILED;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
@@ -3712,154 +3482,154 @@ bool CArea::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int m
 	if (!errorTypeData.isNull()){
 		QString errorTypeStringValue = errorTypeData.toString();
 		if(errorTypeStringValue == "OK"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::OK;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::OK;
 		}
 		else if(errorTypeStringValue == "TOO_WIDE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_WIDE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_WIDE;
 		}
 		else if(errorTypeStringValue == "TOLERANCE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOLERANCE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOLERANCE;
 		}
 		else if(errorTypeStringValue == "TOO_NARROW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_NARROW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_NARROW;
 		}
 		else if(errorTypeStringValue == "NO_DATA_GAP"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::NO_DATA_GAP;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::NO_DATA_GAP;
 		}
 		else if(errorTypeStringValue == "GAP"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::GAP;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::GAP;
 		}
 		else if(errorTypeStringValue == "TOO_HIGH"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_HIGH;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_HIGH;
 		}
 		else if(errorTypeStringValue == "TOO_LOW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_LOW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_LOW;
 		}
 		else if(errorTypeStringValue == "TOO_FEW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_FEW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_FEW;
 		}
 		else if(errorTypeStringValue == "TOO_MUCH"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_MUCH;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_MUCH;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_DIAMETER"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DIAMETER;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DIAMETER;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_POSITION"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_POSITION;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_POSITION;
 		}
 		else if(errorTypeStringValue == "MISSING_DOTS"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::MISSING_DOTS;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::MISSING_DOTS;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_DISTANCE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DISTANCE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DISTANCE;
 		}
 		else if(errorTypeStringValue == "AREA_TOO_LARGE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_TOO_LARGE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_TOO_LARGE;
 		}
 		else if(errorTypeStringValue == "TOTALAREA_TOO_LARGE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOTALAREA_TOO_LARGE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOTALAREA_TOO_LARGE;
 		}
 		else if(errorTypeStringValue == "BORDERAREA_TOO_LARGE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::BORDERAREA_TOO_LARGE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::BORDERAREA_TOO_LARGE;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_AREA"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_AREA_ONHEIGHT"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_VOLUME"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_VOLUME;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_VOLUME;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_HEIGHT"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_HEIGHT;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_HEIGHT;
 		}
 		else if(errorTypeStringValue == "CONTOUR_MEASUREMENT_ERROR"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
 		}
 		else if(errorTypeStringValue == "TOO_BRIGHT"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_BRIGHT;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_BRIGHT;
 		}
 		else if(errorTypeStringValue == "TOO_DARK"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_DARK;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_DARK;
 		}
 		else if(errorTypeStringValue == "COUNT_ERROR"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::COUNT_ERROR;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::COUNT_ERROR;
 		}
 		else if(errorTypeStringValue == "Z_DISTANCE_HIGH"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_HIGH;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_HIGH;
 		}
 		else if(errorTypeStringValue == "Z_DISTANCE_LOW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_LOW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_LOW;
 		}
 		else if(errorTypeStringValue == "NOT_SYMMETRICAL"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::NOT_SYMMETRICAL;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::NOT_SYMMETRICAL;
 		}
 		else if(errorTypeStringValue == "REFERENCE_3D_ERROR"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_3D_ERROR;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_3D_ERROR;
 		}
 		else if(errorTypeStringValue == "COLOR_ERROR"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::COLOR_ERROR;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::COLOR_ERROR;
 		}
 		else if(errorTypeStringValue == "PATTERN_COUNT"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_COUNT;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_COUNT;
 		}
 		else if(errorTypeStringValue == "PATTERN_POSITION"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_POSITION;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_POSITION;
 		}
 		else if(errorTypeStringValue == "PATTERN_ROTATION"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_ROTATION;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_ROTATION;
 		}
 		else if(errorTypeStringValue == "CENTERLINE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CENTERLINE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CENTERLINE;
 		}
 		else if(errorTypeStringValue == "CALIB_ERROR_COMP"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_ERROR_COMP;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_ERROR_COMP;
 		}
 		else if(errorTypeStringValue == "CALIB_INVALID_COMP"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_INVALID_COMP;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_INVALID_COMP;
 		}
 		else if(errorTypeStringValue == "CALIB_NOZZLE_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_NOZZLE_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_NOZZLE_MOVED;
 		}
 		else if(errorTypeStringValue == "CONTOUR_NOT_FOUND"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_NOT_FOUND;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_NOT_FOUND;
 		}
 		else if(errorTypeStringValue == "CONTOUR_TOO_WIDE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_WIDE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_WIDE;
 		}
 		else if(errorTypeStringValue == "CONTOUR_TOO_NARROW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_NARROW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_NARROW;
 		}
 		else if(errorTypeStringValue == "CONTOUR_GLUE_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_GLUE_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_GLUE_MOVED;
 		}
 		else if(errorTypeStringValue == "CONTOUR_INVALID_POLY"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_INVALID_POLY;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_INVALID_POLY;
 		}
 		else if(errorTypeStringValue == "REFERENCE_NOT_FOUND"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_NOT_FOUND;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_NOT_FOUND;
 		}
 		else if(errorTypeStringValue == "REFERENCE_INVALID_REF"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_INVALID_REF;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_INVALID_REF;
 		}
 		else if(errorTypeStringValue == "REFERENCE_POS_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_POS_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_POS_MOVED;
 		}
 		else if(errorTypeStringValue == "REFERENCE_DIST_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_DIST_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_DIST_MOVED;
 		}
 		else if(errorTypeStringValue == "AREA_NOT_FOUND"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_NOT_FOUND;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_NOT_FOUND;
 		}
 		else if(errorTypeStringValue == "AREA_GLUE_FOUND"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_FOUND;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_FOUND;
 		}
 		else if(errorTypeStringValue == "AREA_GLUE_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_MOVED;
 		}
 		else if(errorTypeStringValue == "AREA_GAP_LENGTH"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GAP_LENGTH;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GAP_LENGTH;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ErrorCode", errorTypeStringValue);)
@@ -3889,7 +3659,7 @@ bool CArea::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int m
 }
 
 
-bool CArea::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CArea::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!AreaName){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AreaName").toLocal8Bit().constData();)
@@ -3905,19 +3675,19 @@ bool CArea::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) con
 	}
 	QString statusStringValue;
 	switch (*Status){
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NONE:
+	case ::sdl::V1_0::complextest::StatusCode::NONE:
 		statusStringValue = "NONE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::OK:
+	case ::sdl::V1_0::complextest::StatusCode::OK:
 		statusStringValue = "OK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::WARNING:
+	case ::sdl::V1_0::complextest::StatusCode::WARNING:
 		statusStringValue = "WARNING";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NOK:
+	case ::sdl::V1_0::complextest::StatusCode::NOK:
 		statusStringValue = "NOK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::FAILED:
+	case ::sdl::V1_0::complextest::StatusCode::FAILED:
 		statusStringValue = "FAILED";
 		break;
 	default:
@@ -3945,154 +3715,154 @@ bool CArea::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) con
 	}
 	QString errorTypeStringValue;
 	switch (*ErrorType){
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::OK:
+	case ::sdl::V1_0::complextest::ErrorCode::OK:
 		errorTypeStringValue = "OK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_WIDE:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_WIDE:
 		errorTypeStringValue = "TOO_WIDE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOLERANCE:
+	case ::sdl::V1_0::complextest::ErrorCode::TOLERANCE:
 		errorTypeStringValue = "TOLERANCE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_NARROW:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_NARROW:
 		errorTypeStringValue = "TOO_NARROW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::NO_DATA_GAP:
+	case ::sdl::V1_0::complextest::ErrorCode::NO_DATA_GAP:
 		errorTypeStringValue = "NO_DATA_GAP";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::GAP:
+	case ::sdl::V1_0::complextest::ErrorCode::GAP:
 		errorTypeStringValue = "GAP";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_HIGH:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_HIGH:
 		errorTypeStringValue = "TOO_HIGH";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_LOW:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_LOW:
 		errorTypeStringValue = "TOO_LOW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_FEW:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_FEW:
 		errorTypeStringValue = "TOO_FEW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_MUCH:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_MUCH:
 		errorTypeStringValue = "TOO_MUCH";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DIAMETER:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DIAMETER:
 		errorTypeStringValue = "WRONG_DOT_DIAMETER";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_POSITION:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_POSITION:
 		errorTypeStringValue = "WRONG_DOT_POSITION";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::MISSING_DOTS:
+	case ::sdl::V1_0::complextest::ErrorCode::MISSING_DOTS:
 		errorTypeStringValue = "MISSING_DOTS";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DISTANCE:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DISTANCE:
 		errorTypeStringValue = "WRONG_DOT_DISTANCE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_TOO_LARGE:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_TOO_LARGE:
 		errorTypeStringValue = "AREA_TOO_LARGE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOTALAREA_TOO_LARGE:
+	case ::sdl::V1_0::complextest::ErrorCode::TOTALAREA_TOO_LARGE:
 		errorTypeStringValue = "TOTALAREA_TOO_LARGE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::BORDERAREA_TOO_LARGE:
+	case ::sdl::V1_0::complextest::ErrorCode::BORDERAREA_TOO_LARGE:
 		errorTypeStringValue = "BORDERAREA_TOO_LARGE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA:
 		errorTypeStringValue = "WRONG_DOT_AREA";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA_ONHEIGHT:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA_ONHEIGHT:
 		errorTypeStringValue = "WRONG_DOT_AREA_ONHEIGHT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_VOLUME:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_VOLUME:
 		errorTypeStringValue = "WRONG_DOT_VOLUME";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_HEIGHT:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_HEIGHT:
 		errorTypeStringValue = "WRONG_DOT_HEIGHT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_MEASUREMENT_ERROR:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_MEASUREMENT_ERROR:
 		errorTypeStringValue = "CONTOUR_MEASUREMENT_ERROR";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_BRIGHT:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_BRIGHT:
 		errorTypeStringValue = "TOO_BRIGHT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_DARK:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_DARK:
 		errorTypeStringValue = "TOO_DARK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::COUNT_ERROR:
+	case ::sdl::V1_0::complextest::ErrorCode::COUNT_ERROR:
 		errorTypeStringValue = "COUNT_ERROR";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_HIGH:
+	case ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_HIGH:
 		errorTypeStringValue = "Z_DISTANCE_HIGH";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_LOW:
+	case ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_LOW:
 		errorTypeStringValue = "Z_DISTANCE_LOW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::NOT_SYMMETRICAL:
+	case ::sdl::V1_0::complextest::ErrorCode::NOT_SYMMETRICAL:
 		errorTypeStringValue = "NOT_SYMMETRICAL";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_3D_ERROR:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_3D_ERROR:
 		errorTypeStringValue = "REFERENCE_3D_ERROR";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::COLOR_ERROR:
+	case ::sdl::V1_0::complextest::ErrorCode::COLOR_ERROR:
 		errorTypeStringValue = "COLOR_ERROR";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_COUNT:
+	case ::sdl::V1_0::complextest::ErrorCode::PATTERN_COUNT:
 		errorTypeStringValue = "PATTERN_COUNT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_POSITION:
+	case ::sdl::V1_0::complextest::ErrorCode::PATTERN_POSITION:
 		errorTypeStringValue = "PATTERN_POSITION";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_ROTATION:
+	case ::sdl::V1_0::complextest::ErrorCode::PATTERN_ROTATION:
 		errorTypeStringValue = "PATTERN_ROTATION";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CENTERLINE:
+	case ::sdl::V1_0::complextest::ErrorCode::CENTERLINE:
 		errorTypeStringValue = "CENTERLINE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_ERROR_COMP:
+	case ::sdl::V1_0::complextest::ErrorCode::CALIB_ERROR_COMP:
 		errorTypeStringValue = "CALIB_ERROR_COMP";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_INVALID_COMP:
+	case ::sdl::V1_0::complextest::ErrorCode::CALIB_INVALID_COMP:
 		errorTypeStringValue = "CALIB_INVALID_COMP";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_NOZZLE_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::CALIB_NOZZLE_MOVED:
 		errorTypeStringValue = "CALIB_NOZZLE_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_NOT_FOUND:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_NOT_FOUND:
 		errorTypeStringValue = "CONTOUR_NOT_FOUND";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_WIDE:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_WIDE:
 		errorTypeStringValue = "CONTOUR_TOO_WIDE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_NARROW:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_NARROW:
 		errorTypeStringValue = "CONTOUR_TOO_NARROW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_GLUE_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_GLUE_MOVED:
 		errorTypeStringValue = "CONTOUR_GLUE_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_INVALID_POLY:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_INVALID_POLY:
 		errorTypeStringValue = "CONTOUR_INVALID_POLY";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_NOT_FOUND:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_NOT_FOUND:
 		errorTypeStringValue = "REFERENCE_NOT_FOUND";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_INVALID_REF:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_INVALID_REF:
 		errorTypeStringValue = "REFERENCE_INVALID_REF";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_POS_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_POS_MOVED:
 		errorTypeStringValue = "REFERENCE_POS_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_DIST_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_DIST_MOVED:
 		errorTypeStringValue = "REFERENCE_DIST_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_NOT_FOUND:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_NOT_FOUND:
 		errorTypeStringValue = "AREA_NOT_FOUND";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_FOUND:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_FOUND:
 		errorTypeStringValue = "AREA_GLUE_FOUND";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_MOVED:
 		errorTypeStringValue = "AREA_GLUE_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GAP_LENGTH:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_GAP_LENGTH:
 		errorTypeStringValue = "AREA_GAP_LENGTH";
 		break;
 	default:
@@ -4124,7 +3894,7 @@ bool CArea::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) con
 }
 
 
-bool CArea::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CArea::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("AreaName") || (gqlObject["AreaName"].userType() != QMetaType::QString && gqlObject["AreaName"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AreaName").toLocal8Bit().constData();)
@@ -4140,19 +3910,19 @@ bool CArea::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObje
 	}
 	const QString statusStringValue = gqlObject["Status"].toString();
 	if(statusStringValue == "NONE"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+		Status = ::sdl::V1_0::complextest::StatusCode::NONE;
 	}
 	else if(statusStringValue == "OK"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+		Status = ::sdl::V1_0::complextest::StatusCode::OK;
 	}
 	else if(statusStringValue == "WARNING"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+		Status = ::sdl::V1_0::complextest::StatusCode::WARNING;
 	}
 	else if(statusStringValue == "NOK"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+		Status = ::sdl::V1_0::complextest::StatusCode::NOK;
 	}
 	else if(statusStringValue == "FAILED"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+		Status = ::sdl::V1_0::complextest::StatusCode::FAILED;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
@@ -4180,154 +3950,154 @@ bool CArea::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObje
 	}
 	const QString errorTypeStringValue = gqlObject["ErrorType"].toString();
 	if(errorTypeStringValue == "OK"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::OK;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::OK;
 	}
 	else if(errorTypeStringValue == "TOO_WIDE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_WIDE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_WIDE;
 	}
 	else if(errorTypeStringValue == "TOLERANCE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOLERANCE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOLERANCE;
 	}
 	else if(errorTypeStringValue == "TOO_NARROW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_NARROW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_NARROW;
 	}
 	else if(errorTypeStringValue == "NO_DATA_GAP"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::NO_DATA_GAP;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::NO_DATA_GAP;
 	}
 	else if(errorTypeStringValue == "GAP"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::GAP;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::GAP;
 	}
 	else if(errorTypeStringValue == "TOO_HIGH"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_HIGH;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_HIGH;
 	}
 	else if(errorTypeStringValue == "TOO_LOW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_LOW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_LOW;
 	}
 	else if(errorTypeStringValue == "TOO_FEW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_FEW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_FEW;
 	}
 	else if(errorTypeStringValue == "TOO_MUCH"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_MUCH;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_MUCH;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_DIAMETER"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DIAMETER;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DIAMETER;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_POSITION"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_POSITION;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_POSITION;
 	}
 	else if(errorTypeStringValue == "MISSING_DOTS"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::MISSING_DOTS;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::MISSING_DOTS;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_DISTANCE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DISTANCE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DISTANCE;
 	}
 	else if(errorTypeStringValue == "AREA_TOO_LARGE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_TOO_LARGE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_TOO_LARGE;
 	}
 	else if(errorTypeStringValue == "TOTALAREA_TOO_LARGE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOTALAREA_TOO_LARGE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOTALAREA_TOO_LARGE;
 	}
 	else if(errorTypeStringValue == "BORDERAREA_TOO_LARGE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::BORDERAREA_TOO_LARGE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::BORDERAREA_TOO_LARGE;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_AREA"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_AREA_ONHEIGHT"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_VOLUME"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_VOLUME;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_VOLUME;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_HEIGHT"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_HEIGHT;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_HEIGHT;
 	}
 	else if(errorTypeStringValue == "CONTOUR_MEASUREMENT_ERROR"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
 	}
 	else if(errorTypeStringValue == "TOO_BRIGHT"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_BRIGHT;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_BRIGHT;
 	}
 	else if(errorTypeStringValue == "TOO_DARK"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_DARK;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_DARK;
 	}
 	else if(errorTypeStringValue == "COUNT_ERROR"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::COUNT_ERROR;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::COUNT_ERROR;
 	}
 	else if(errorTypeStringValue == "Z_DISTANCE_HIGH"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_HIGH;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_HIGH;
 	}
 	else if(errorTypeStringValue == "Z_DISTANCE_LOW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_LOW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_LOW;
 	}
 	else if(errorTypeStringValue == "NOT_SYMMETRICAL"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::NOT_SYMMETRICAL;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::NOT_SYMMETRICAL;
 	}
 	else if(errorTypeStringValue == "REFERENCE_3D_ERROR"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_3D_ERROR;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_3D_ERROR;
 	}
 	else if(errorTypeStringValue == "COLOR_ERROR"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::COLOR_ERROR;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::COLOR_ERROR;
 	}
 	else if(errorTypeStringValue == "PATTERN_COUNT"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_COUNT;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_COUNT;
 	}
 	else if(errorTypeStringValue == "PATTERN_POSITION"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_POSITION;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_POSITION;
 	}
 	else if(errorTypeStringValue == "PATTERN_ROTATION"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_ROTATION;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_ROTATION;
 	}
 	else if(errorTypeStringValue == "CENTERLINE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CENTERLINE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CENTERLINE;
 	}
 	else if(errorTypeStringValue == "CALIB_ERROR_COMP"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_ERROR_COMP;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_ERROR_COMP;
 	}
 	else if(errorTypeStringValue == "CALIB_INVALID_COMP"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_INVALID_COMP;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_INVALID_COMP;
 	}
 	else if(errorTypeStringValue == "CALIB_NOZZLE_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_NOZZLE_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_NOZZLE_MOVED;
 	}
 	else if(errorTypeStringValue == "CONTOUR_NOT_FOUND"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_NOT_FOUND;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_NOT_FOUND;
 	}
 	else if(errorTypeStringValue == "CONTOUR_TOO_WIDE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_WIDE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_WIDE;
 	}
 	else if(errorTypeStringValue == "CONTOUR_TOO_NARROW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_NARROW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_NARROW;
 	}
 	else if(errorTypeStringValue == "CONTOUR_GLUE_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_GLUE_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_GLUE_MOVED;
 	}
 	else if(errorTypeStringValue == "CONTOUR_INVALID_POLY"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_INVALID_POLY;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_INVALID_POLY;
 	}
 	else if(errorTypeStringValue == "REFERENCE_NOT_FOUND"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_NOT_FOUND;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_NOT_FOUND;
 	}
 	else if(errorTypeStringValue == "REFERENCE_INVALID_REF"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_INVALID_REF;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_INVALID_REF;
 	}
 	else if(errorTypeStringValue == "REFERENCE_POS_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_POS_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_POS_MOVED;
 	}
 	else if(errorTypeStringValue == "REFERENCE_DIST_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_DIST_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_DIST_MOVED;
 	}
 	else if(errorTypeStringValue == "AREA_NOT_FOUND"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_NOT_FOUND;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_NOT_FOUND;
 	}
 	else if(errorTypeStringValue == "AREA_GLUE_FOUND"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_FOUND;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_FOUND;
 	}
 	else if(errorTypeStringValue == "AREA_GLUE_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_MOVED;
 	}
 	else if(errorTypeStringValue == "AREA_GAP_LENGTH"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GAP_LENGTH;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GAP_LENGTH;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ErrorCode", errorTypeStringValue);)
@@ -4361,7 +4131,7 @@ bool CArea::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObje
 }
 
 
-bool CArea::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CArea::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("AreaName") && (gqlObject["AreaName"].userType() == QMetaType::QString || gqlObject["AreaName"].userType() == QMetaType::QByteArray)){
 		AreaName = gqlObject["AreaName"].toString();
@@ -4370,19 +4140,19 @@ bool CArea::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 	if (gqlObject.ContainsParam("Status") && (gqlObject["Status"].userType() == QMetaType::QString || gqlObject["Status"].userType() == QMetaType::QByteArray)){
 		const QString statusStringValue = gqlObject["Status"].toString();
 		if(statusStringValue == "NONE"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+			Status = ::sdl::V1_0::complextest::StatusCode::NONE;
 		}
 		else if(statusStringValue == "OK"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+			Status = ::sdl::V1_0::complextest::StatusCode::OK;
 		}
 		else if(statusStringValue == "WARNING"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+			Status = ::sdl::V1_0::complextest::StatusCode::WARNING;
 		}
 		else if(statusStringValue == "NOK"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+			Status = ::sdl::V1_0::complextest::StatusCode::NOK;
 		}
 		else if(statusStringValue == "FAILED"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+			Status = ::sdl::V1_0::complextest::StatusCode::FAILED;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
@@ -4404,154 +4174,154 @@ bool CArea::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 	if (gqlObject.ContainsParam("ErrorType") && (gqlObject["ErrorType"].userType() == QMetaType::QString || gqlObject["ErrorType"].userType() == QMetaType::QByteArray)){
 		const QString errorTypeStringValue = gqlObject["ErrorType"].toString();
 		if(errorTypeStringValue == "OK"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::OK;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::OK;
 		}
 		else if(errorTypeStringValue == "TOO_WIDE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_WIDE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_WIDE;
 		}
 		else if(errorTypeStringValue == "TOLERANCE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOLERANCE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOLERANCE;
 		}
 		else if(errorTypeStringValue == "TOO_NARROW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_NARROW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_NARROW;
 		}
 		else if(errorTypeStringValue == "NO_DATA_GAP"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::NO_DATA_GAP;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::NO_DATA_GAP;
 		}
 		else if(errorTypeStringValue == "GAP"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::GAP;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::GAP;
 		}
 		else if(errorTypeStringValue == "TOO_HIGH"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_HIGH;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_HIGH;
 		}
 		else if(errorTypeStringValue == "TOO_LOW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_LOW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_LOW;
 		}
 		else if(errorTypeStringValue == "TOO_FEW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_FEW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_FEW;
 		}
 		else if(errorTypeStringValue == "TOO_MUCH"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_MUCH;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_MUCH;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_DIAMETER"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DIAMETER;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DIAMETER;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_POSITION"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_POSITION;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_POSITION;
 		}
 		else if(errorTypeStringValue == "MISSING_DOTS"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::MISSING_DOTS;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::MISSING_DOTS;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_DISTANCE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DISTANCE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DISTANCE;
 		}
 		else if(errorTypeStringValue == "AREA_TOO_LARGE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_TOO_LARGE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_TOO_LARGE;
 		}
 		else if(errorTypeStringValue == "TOTALAREA_TOO_LARGE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOTALAREA_TOO_LARGE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOTALAREA_TOO_LARGE;
 		}
 		else if(errorTypeStringValue == "BORDERAREA_TOO_LARGE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::BORDERAREA_TOO_LARGE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::BORDERAREA_TOO_LARGE;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_AREA"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_AREA_ONHEIGHT"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_VOLUME"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_VOLUME;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_VOLUME;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_HEIGHT"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_HEIGHT;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_HEIGHT;
 		}
 		else if(errorTypeStringValue == "CONTOUR_MEASUREMENT_ERROR"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
 		}
 		else if(errorTypeStringValue == "TOO_BRIGHT"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_BRIGHT;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_BRIGHT;
 		}
 		else if(errorTypeStringValue == "TOO_DARK"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_DARK;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_DARK;
 		}
 		else if(errorTypeStringValue == "COUNT_ERROR"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::COUNT_ERROR;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::COUNT_ERROR;
 		}
 		else if(errorTypeStringValue == "Z_DISTANCE_HIGH"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_HIGH;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_HIGH;
 		}
 		else if(errorTypeStringValue == "Z_DISTANCE_LOW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_LOW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_LOW;
 		}
 		else if(errorTypeStringValue == "NOT_SYMMETRICAL"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::NOT_SYMMETRICAL;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::NOT_SYMMETRICAL;
 		}
 		else if(errorTypeStringValue == "REFERENCE_3D_ERROR"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_3D_ERROR;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_3D_ERROR;
 		}
 		else if(errorTypeStringValue == "COLOR_ERROR"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::COLOR_ERROR;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::COLOR_ERROR;
 		}
 		else if(errorTypeStringValue == "PATTERN_COUNT"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_COUNT;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_COUNT;
 		}
 		else if(errorTypeStringValue == "PATTERN_POSITION"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_POSITION;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_POSITION;
 		}
 		else if(errorTypeStringValue == "PATTERN_ROTATION"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_ROTATION;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_ROTATION;
 		}
 		else if(errorTypeStringValue == "CENTERLINE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CENTERLINE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CENTERLINE;
 		}
 		else if(errorTypeStringValue == "CALIB_ERROR_COMP"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_ERROR_COMP;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_ERROR_COMP;
 		}
 		else if(errorTypeStringValue == "CALIB_INVALID_COMP"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_INVALID_COMP;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_INVALID_COMP;
 		}
 		else if(errorTypeStringValue == "CALIB_NOZZLE_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_NOZZLE_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_NOZZLE_MOVED;
 		}
 		else if(errorTypeStringValue == "CONTOUR_NOT_FOUND"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_NOT_FOUND;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_NOT_FOUND;
 		}
 		else if(errorTypeStringValue == "CONTOUR_TOO_WIDE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_WIDE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_WIDE;
 		}
 		else if(errorTypeStringValue == "CONTOUR_TOO_NARROW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_NARROW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_NARROW;
 		}
 		else if(errorTypeStringValue == "CONTOUR_GLUE_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_GLUE_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_GLUE_MOVED;
 		}
 		else if(errorTypeStringValue == "CONTOUR_INVALID_POLY"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_INVALID_POLY;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_INVALID_POLY;
 		}
 		else if(errorTypeStringValue == "REFERENCE_NOT_FOUND"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_NOT_FOUND;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_NOT_FOUND;
 		}
 		else if(errorTypeStringValue == "REFERENCE_INVALID_REF"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_INVALID_REF;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_INVALID_REF;
 		}
 		else if(errorTypeStringValue == "REFERENCE_POS_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_POS_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_POS_MOVED;
 		}
 		else if(errorTypeStringValue == "REFERENCE_DIST_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_DIST_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_DIST_MOVED;
 		}
 		else if(errorTypeStringValue == "AREA_NOT_FOUND"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_NOT_FOUND;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_NOT_FOUND;
 		}
 		else if(errorTypeStringValue == "AREA_GLUE_FOUND"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_FOUND;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_FOUND;
 		}
 		else if(errorTypeStringValue == "AREA_GLUE_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_MOVED;
 		}
 		else if(errorTypeStringValue == "AREA_GAP_LENGTH"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GAP_LENGTH;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GAP_LENGTH;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ErrorCode", errorTypeStringValue);)
@@ -4586,7 +4356,7 @@ bool CArea::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 }
 
 
-bool CArea::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CArea::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!AreaName){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AreaName").toLocal8Bit().constData();)
@@ -4602,19 +4372,19 @@ bool CArea::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	}
 	QString statusStringValue;
 	switch (*Status){
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NONE:
+	case ::sdl::V1_0::complextest::StatusCode::NONE:
 		statusStringValue = "NONE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::OK:
+	case ::sdl::V1_0::complextest::StatusCode::OK:
 		statusStringValue = "OK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::WARNING:
+	case ::sdl::V1_0::complextest::StatusCode::WARNING:
 		statusStringValue = "WARNING";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NOK:
+	case ::sdl::V1_0::complextest::StatusCode::NOK:
 		statusStringValue = "NOK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::FAILED:
+	case ::sdl::V1_0::complextest::StatusCode::FAILED:
 		statusStringValue = "FAILED";
 		break;
 	default:
@@ -4642,154 +4412,154 @@ bool CArea::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	}
 	QString errorTypeStringValue;
 	switch (*ErrorType){
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::OK:
+	case ::sdl::V1_0::complextest::ErrorCode::OK:
 		errorTypeStringValue = "OK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_WIDE:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_WIDE:
 		errorTypeStringValue = "TOO_WIDE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOLERANCE:
+	case ::sdl::V1_0::complextest::ErrorCode::TOLERANCE:
 		errorTypeStringValue = "TOLERANCE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_NARROW:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_NARROW:
 		errorTypeStringValue = "TOO_NARROW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::NO_DATA_GAP:
+	case ::sdl::V1_0::complextest::ErrorCode::NO_DATA_GAP:
 		errorTypeStringValue = "NO_DATA_GAP";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::GAP:
+	case ::sdl::V1_0::complextest::ErrorCode::GAP:
 		errorTypeStringValue = "GAP";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_HIGH:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_HIGH:
 		errorTypeStringValue = "TOO_HIGH";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_LOW:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_LOW:
 		errorTypeStringValue = "TOO_LOW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_FEW:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_FEW:
 		errorTypeStringValue = "TOO_FEW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_MUCH:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_MUCH:
 		errorTypeStringValue = "TOO_MUCH";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DIAMETER:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DIAMETER:
 		errorTypeStringValue = "WRONG_DOT_DIAMETER";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_POSITION:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_POSITION:
 		errorTypeStringValue = "WRONG_DOT_POSITION";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::MISSING_DOTS:
+	case ::sdl::V1_0::complextest::ErrorCode::MISSING_DOTS:
 		errorTypeStringValue = "MISSING_DOTS";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DISTANCE:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DISTANCE:
 		errorTypeStringValue = "WRONG_DOT_DISTANCE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_TOO_LARGE:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_TOO_LARGE:
 		errorTypeStringValue = "AREA_TOO_LARGE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOTALAREA_TOO_LARGE:
+	case ::sdl::V1_0::complextest::ErrorCode::TOTALAREA_TOO_LARGE:
 		errorTypeStringValue = "TOTALAREA_TOO_LARGE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::BORDERAREA_TOO_LARGE:
+	case ::sdl::V1_0::complextest::ErrorCode::BORDERAREA_TOO_LARGE:
 		errorTypeStringValue = "BORDERAREA_TOO_LARGE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA:
 		errorTypeStringValue = "WRONG_DOT_AREA";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA_ONHEIGHT:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA_ONHEIGHT:
 		errorTypeStringValue = "WRONG_DOT_AREA_ONHEIGHT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_VOLUME:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_VOLUME:
 		errorTypeStringValue = "WRONG_DOT_VOLUME";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_HEIGHT:
+	case ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_HEIGHT:
 		errorTypeStringValue = "WRONG_DOT_HEIGHT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_MEASUREMENT_ERROR:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_MEASUREMENT_ERROR:
 		errorTypeStringValue = "CONTOUR_MEASUREMENT_ERROR";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_BRIGHT:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_BRIGHT:
 		errorTypeStringValue = "TOO_BRIGHT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_DARK:
+	case ::sdl::V1_0::complextest::ErrorCode::TOO_DARK:
 		errorTypeStringValue = "TOO_DARK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::COUNT_ERROR:
+	case ::sdl::V1_0::complextest::ErrorCode::COUNT_ERROR:
 		errorTypeStringValue = "COUNT_ERROR";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_HIGH:
+	case ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_HIGH:
 		errorTypeStringValue = "Z_DISTANCE_HIGH";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_LOW:
+	case ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_LOW:
 		errorTypeStringValue = "Z_DISTANCE_LOW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::NOT_SYMMETRICAL:
+	case ::sdl::V1_0::complextest::ErrorCode::NOT_SYMMETRICAL:
 		errorTypeStringValue = "NOT_SYMMETRICAL";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_3D_ERROR:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_3D_ERROR:
 		errorTypeStringValue = "REFERENCE_3D_ERROR";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::COLOR_ERROR:
+	case ::sdl::V1_0::complextest::ErrorCode::COLOR_ERROR:
 		errorTypeStringValue = "COLOR_ERROR";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_COUNT:
+	case ::sdl::V1_0::complextest::ErrorCode::PATTERN_COUNT:
 		errorTypeStringValue = "PATTERN_COUNT";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_POSITION:
+	case ::sdl::V1_0::complextest::ErrorCode::PATTERN_POSITION:
 		errorTypeStringValue = "PATTERN_POSITION";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_ROTATION:
+	case ::sdl::V1_0::complextest::ErrorCode::PATTERN_ROTATION:
 		errorTypeStringValue = "PATTERN_ROTATION";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CENTERLINE:
+	case ::sdl::V1_0::complextest::ErrorCode::CENTERLINE:
 		errorTypeStringValue = "CENTERLINE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_ERROR_COMP:
+	case ::sdl::V1_0::complextest::ErrorCode::CALIB_ERROR_COMP:
 		errorTypeStringValue = "CALIB_ERROR_COMP";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_INVALID_COMP:
+	case ::sdl::V1_0::complextest::ErrorCode::CALIB_INVALID_COMP:
 		errorTypeStringValue = "CALIB_INVALID_COMP";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_NOZZLE_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::CALIB_NOZZLE_MOVED:
 		errorTypeStringValue = "CALIB_NOZZLE_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_NOT_FOUND:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_NOT_FOUND:
 		errorTypeStringValue = "CONTOUR_NOT_FOUND";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_WIDE:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_WIDE:
 		errorTypeStringValue = "CONTOUR_TOO_WIDE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_NARROW:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_NARROW:
 		errorTypeStringValue = "CONTOUR_TOO_NARROW";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_GLUE_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_GLUE_MOVED:
 		errorTypeStringValue = "CONTOUR_GLUE_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_INVALID_POLY:
+	case ::sdl::V1_0::complextest::ErrorCode::CONTOUR_INVALID_POLY:
 		errorTypeStringValue = "CONTOUR_INVALID_POLY";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_NOT_FOUND:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_NOT_FOUND:
 		errorTypeStringValue = "REFERENCE_NOT_FOUND";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_INVALID_REF:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_INVALID_REF:
 		errorTypeStringValue = "REFERENCE_INVALID_REF";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_POS_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_POS_MOVED:
 		errorTypeStringValue = "REFERENCE_POS_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_DIST_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::REFERENCE_DIST_MOVED:
 		errorTypeStringValue = "REFERENCE_DIST_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_NOT_FOUND:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_NOT_FOUND:
 		errorTypeStringValue = "AREA_NOT_FOUND";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_FOUND:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_FOUND:
 		errorTypeStringValue = "AREA_GLUE_FOUND";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_MOVED:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_MOVED:
 		errorTypeStringValue = "AREA_GLUE_MOVED";
 		break;
-	case ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GAP_LENGTH:
+	case ::sdl::V1_0::complextest::ErrorCode::AREA_GAP_LENGTH:
 		errorTypeStringValue = "AREA_GAP_LENGTH";
 		break;
 	default:
@@ -4821,7 +4591,7 @@ bool CArea::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CArea::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CArea::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("AreaName") || ! jsonObject["AreaName"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AreaName").toLocal8Bit().constData();)
@@ -4837,19 +4607,19 @@ bool CArea::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 	const QString statusStringValue = jsonObject["Status"].toString();
 	if(statusStringValue == "NONE"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+		Status = ::sdl::V1_0::complextest::StatusCode::NONE;
 	}
 	else if(statusStringValue == "OK"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+		Status = ::sdl::V1_0::complextest::StatusCode::OK;
 	}
 	else if(statusStringValue == "WARNING"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+		Status = ::sdl::V1_0::complextest::StatusCode::WARNING;
 	}
 	else if(statusStringValue == "NOK"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+		Status = ::sdl::V1_0::complextest::StatusCode::NOK;
 	}
 	else if(statusStringValue == "FAILED"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+		Status = ::sdl::V1_0::complextest::StatusCode::FAILED;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
@@ -4877,154 +4647,154 @@ bool CArea::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 	const QString errorTypeStringValue = jsonObject["ErrorType"].toString();
 	if(errorTypeStringValue == "OK"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::OK;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::OK;
 	}
 	else if(errorTypeStringValue == "TOO_WIDE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_WIDE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_WIDE;
 	}
 	else if(errorTypeStringValue == "TOLERANCE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOLERANCE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOLERANCE;
 	}
 	else if(errorTypeStringValue == "TOO_NARROW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_NARROW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_NARROW;
 	}
 	else if(errorTypeStringValue == "NO_DATA_GAP"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::NO_DATA_GAP;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::NO_DATA_GAP;
 	}
 	else if(errorTypeStringValue == "GAP"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::GAP;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::GAP;
 	}
 	else if(errorTypeStringValue == "TOO_HIGH"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_HIGH;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_HIGH;
 	}
 	else if(errorTypeStringValue == "TOO_LOW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_LOW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_LOW;
 	}
 	else if(errorTypeStringValue == "TOO_FEW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_FEW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_FEW;
 	}
 	else if(errorTypeStringValue == "TOO_MUCH"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_MUCH;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_MUCH;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_DIAMETER"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DIAMETER;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DIAMETER;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_POSITION"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_POSITION;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_POSITION;
 	}
 	else if(errorTypeStringValue == "MISSING_DOTS"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::MISSING_DOTS;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::MISSING_DOTS;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_DISTANCE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DISTANCE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DISTANCE;
 	}
 	else if(errorTypeStringValue == "AREA_TOO_LARGE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_TOO_LARGE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_TOO_LARGE;
 	}
 	else if(errorTypeStringValue == "TOTALAREA_TOO_LARGE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOTALAREA_TOO_LARGE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOTALAREA_TOO_LARGE;
 	}
 	else if(errorTypeStringValue == "BORDERAREA_TOO_LARGE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::BORDERAREA_TOO_LARGE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::BORDERAREA_TOO_LARGE;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_AREA"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_AREA_ONHEIGHT"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_VOLUME"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_VOLUME;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_VOLUME;
 	}
 	else if(errorTypeStringValue == "WRONG_DOT_HEIGHT"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_HEIGHT;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_HEIGHT;
 	}
 	else if(errorTypeStringValue == "CONTOUR_MEASUREMENT_ERROR"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
 	}
 	else if(errorTypeStringValue == "TOO_BRIGHT"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_BRIGHT;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_BRIGHT;
 	}
 	else if(errorTypeStringValue == "TOO_DARK"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_DARK;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_DARK;
 	}
 	else if(errorTypeStringValue == "COUNT_ERROR"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::COUNT_ERROR;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::COUNT_ERROR;
 	}
 	else if(errorTypeStringValue == "Z_DISTANCE_HIGH"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_HIGH;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_HIGH;
 	}
 	else if(errorTypeStringValue == "Z_DISTANCE_LOW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_LOW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_LOW;
 	}
 	else if(errorTypeStringValue == "NOT_SYMMETRICAL"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::NOT_SYMMETRICAL;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::NOT_SYMMETRICAL;
 	}
 	else if(errorTypeStringValue == "REFERENCE_3D_ERROR"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_3D_ERROR;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_3D_ERROR;
 	}
 	else if(errorTypeStringValue == "COLOR_ERROR"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::COLOR_ERROR;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::COLOR_ERROR;
 	}
 	else if(errorTypeStringValue == "PATTERN_COUNT"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_COUNT;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_COUNT;
 	}
 	else if(errorTypeStringValue == "PATTERN_POSITION"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_POSITION;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_POSITION;
 	}
 	else if(errorTypeStringValue == "PATTERN_ROTATION"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_ROTATION;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_ROTATION;
 	}
 	else if(errorTypeStringValue == "CENTERLINE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CENTERLINE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CENTERLINE;
 	}
 	else if(errorTypeStringValue == "CALIB_ERROR_COMP"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_ERROR_COMP;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_ERROR_COMP;
 	}
 	else if(errorTypeStringValue == "CALIB_INVALID_COMP"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_INVALID_COMP;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_INVALID_COMP;
 	}
 	else if(errorTypeStringValue == "CALIB_NOZZLE_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_NOZZLE_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_NOZZLE_MOVED;
 	}
 	else if(errorTypeStringValue == "CONTOUR_NOT_FOUND"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_NOT_FOUND;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_NOT_FOUND;
 	}
 	else if(errorTypeStringValue == "CONTOUR_TOO_WIDE"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_WIDE;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_WIDE;
 	}
 	else if(errorTypeStringValue == "CONTOUR_TOO_NARROW"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_NARROW;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_NARROW;
 	}
 	else if(errorTypeStringValue == "CONTOUR_GLUE_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_GLUE_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_GLUE_MOVED;
 	}
 	else if(errorTypeStringValue == "CONTOUR_INVALID_POLY"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_INVALID_POLY;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_INVALID_POLY;
 	}
 	else if(errorTypeStringValue == "REFERENCE_NOT_FOUND"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_NOT_FOUND;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_NOT_FOUND;
 	}
 	else if(errorTypeStringValue == "REFERENCE_INVALID_REF"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_INVALID_REF;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_INVALID_REF;
 	}
 	else if(errorTypeStringValue == "REFERENCE_POS_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_POS_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_POS_MOVED;
 	}
 	else if(errorTypeStringValue == "REFERENCE_DIST_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_DIST_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_DIST_MOVED;
 	}
 	else if(errorTypeStringValue == "AREA_NOT_FOUND"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_NOT_FOUND;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_NOT_FOUND;
 	}
 	else if(errorTypeStringValue == "AREA_GLUE_FOUND"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_FOUND;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_FOUND;
 	}
 	else if(errorTypeStringValue == "AREA_GLUE_MOVED"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_MOVED;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_MOVED;
 	}
 	else if(errorTypeStringValue == "AREA_GAP_LENGTH"){
-		ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GAP_LENGTH;
+		ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GAP_LENGTH;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ErrorCode", errorTypeStringValue);)
@@ -5054,7 +4824,7 @@ bool CArea::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CArea::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CArea::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("AreaName") && jsonObject["AreaName"].isString()){
 		AreaName = jsonObject["AreaName"].toString();
@@ -5063,19 +4833,19 @@ bool CArea::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("Status") && jsonObject["Status"].isString()){
 		const QString statusStringValue = jsonObject["Status"].toString();
 		if(statusStringValue == "NONE"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+			Status = ::sdl::V1_0::complextest::StatusCode::NONE;
 		}
 		else if(statusStringValue == "OK"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+			Status = ::sdl::V1_0::complextest::StatusCode::OK;
 		}
 		else if(statusStringValue == "WARNING"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+			Status = ::sdl::V1_0::complextest::StatusCode::WARNING;
 		}
 		else if(statusStringValue == "NOK"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+			Status = ::sdl::V1_0::complextest::StatusCode::NOK;
 		}
 		else if(statusStringValue == "FAILED"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+			Status = ::sdl::V1_0::complextest::StatusCode::FAILED;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
@@ -5097,154 +4867,154 @@ bool CArea::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("ErrorType") && jsonObject["ErrorType"].isString()){
 		const QString errorTypeStringValue = jsonObject["ErrorType"].toString();
 		if(errorTypeStringValue == "OK"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::OK;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::OK;
 		}
 		else if(errorTypeStringValue == "TOO_WIDE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_WIDE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_WIDE;
 		}
 		else if(errorTypeStringValue == "TOLERANCE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOLERANCE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOLERANCE;
 		}
 		else if(errorTypeStringValue == "TOO_NARROW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_NARROW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_NARROW;
 		}
 		else if(errorTypeStringValue == "NO_DATA_GAP"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::NO_DATA_GAP;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::NO_DATA_GAP;
 		}
 		else if(errorTypeStringValue == "GAP"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::GAP;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::GAP;
 		}
 		else if(errorTypeStringValue == "TOO_HIGH"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_HIGH;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_HIGH;
 		}
 		else if(errorTypeStringValue == "TOO_LOW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_LOW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_LOW;
 		}
 		else if(errorTypeStringValue == "TOO_FEW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_FEW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_FEW;
 		}
 		else if(errorTypeStringValue == "TOO_MUCH"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_MUCH;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_MUCH;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_DIAMETER"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DIAMETER;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DIAMETER;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_POSITION"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_POSITION;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_POSITION;
 		}
 		else if(errorTypeStringValue == "MISSING_DOTS"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::MISSING_DOTS;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::MISSING_DOTS;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_DISTANCE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_DISTANCE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_DISTANCE;
 		}
 		else if(errorTypeStringValue == "AREA_TOO_LARGE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_TOO_LARGE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_TOO_LARGE;
 		}
 		else if(errorTypeStringValue == "TOTALAREA_TOO_LARGE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOTALAREA_TOO_LARGE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOTALAREA_TOO_LARGE;
 		}
 		else if(errorTypeStringValue == "BORDERAREA_TOO_LARGE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::BORDERAREA_TOO_LARGE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::BORDERAREA_TOO_LARGE;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_AREA"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_AREA_ONHEIGHT"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_VOLUME"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_VOLUME;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_VOLUME;
 		}
 		else if(errorTypeStringValue == "WRONG_DOT_HEIGHT"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::WRONG_DOT_HEIGHT;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::WRONG_DOT_HEIGHT;
 		}
 		else if(errorTypeStringValue == "CONTOUR_MEASUREMENT_ERROR"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
 		}
 		else if(errorTypeStringValue == "TOO_BRIGHT"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_BRIGHT;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_BRIGHT;
 		}
 		else if(errorTypeStringValue == "TOO_DARK"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::TOO_DARK;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::TOO_DARK;
 		}
 		else if(errorTypeStringValue == "COUNT_ERROR"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::COUNT_ERROR;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::COUNT_ERROR;
 		}
 		else if(errorTypeStringValue == "Z_DISTANCE_HIGH"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_HIGH;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_HIGH;
 		}
 		else if(errorTypeStringValue == "Z_DISTANCE_LOW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::Z_DISTANCE_LOW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::Z_DISTANCE_LOW;
 		}
 		else if(errorTypeStringValue == "NOT_SYMMETRICAL"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::NOT_SYMMETRICAL;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::NOT_SYMMETRICAL;
 		}
 		else if(errorTypeStringValue == "REFERENCE_3D_ERROR"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_3D_ERROR;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_3D_ERROR;
 		}
 		else if(errorTypeStringValue == "COLOR_ERROR"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::COLOR_ERROR;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::COLOR_ERROR;
 		}
 		else if(errorTypeStringValue == "PATTERN_COUNT"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_COUNT;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_COUNT;
 		}
 		else if(errorTypeStringValue == "PATTERN_POSITION"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_POSITION;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_POSITION;
 		}
 		else if(errorTypeStringValue == "PATTERN_ROTATION"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::PATTERN_ROTATION;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::PATTERN_ROTATION;
 		}
 		else if(errorTypeStringValue == "CENTERLINE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CENTERLINE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CENTERLINE;
 		}
 		else if(errorTypeStringValue == "CALIB_ERROR_COMP"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_ERROR_COMP;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_ERROR_COMP;
 		}
 		else if(errorTypeStringValue == "CALIB_INVALID_COMP"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_INVALID_COMP;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_INVALID_COMP;
 		}
 		else if(errorTypeStringValue == "CALIB_NOZZLE_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CALIB_NOZZLE_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CALIB_NOZZLE_MOVED;
 		}
 		else if(errorTypeStringValue == "CONTOUR_NOT_FOUND"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_NOT_FOUND;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_NOT_FOUND;
 		}
 		else if(errorTypeStringValue == "CONTOUR_TOO_WIDE"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_WIDE;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_WIDE;
 		}
 		else if(errorTypeStringValue == "CONTOUR_TOO_NARROW"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_TOO_NARROW;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_TOO_NARROW;
 		}
 		else if(errorTypeStringValue == "CONTOUR_GLUE_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_GLUE_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_GLUE_MOVED;
 		}
 		else if(errorTypeStringValue == "CONTOUR_INVALID_POLY"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::CONTOUR_INVALID_POLY;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::CONTOUR_INVALID_POLY;
 		}
 		else if(errorTypeStringValue == "REFERENCE_NOT_FOUND"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_NOT_FOUND;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_NOT_FOUND;
 		}
 		else if(errorTypeStringValue == "REFERENCE_INVALID_REF"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_INVALID_REF;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_INVALID_REF;
 		}
 		else if(errorTypeStringValue == "REFERENCE_POS_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_POS_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_POS_MOVED;
 		}
 		else if(errorTypeStringValue == "REFERENCE_DIST_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::REFERENCE_DIST_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::REFERENCE_DIST_MOVED;
 		}
 		else if(errorTypeStringValue == "AREA_NOT_FOUND"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_NOT_FOUND;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_NOT_FOUND;
 		}
 		else if(errorTypeStringValue == "AREA_GLUE_FOUND"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_FOUND;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_FOUND;
 		}
 		else if(errorTypeStringValue == "AREA_GLUE_MOVED"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GLUE_MOVED;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GLUE_MOVED;
 		}
 		else if(errorTypeStringValue == "AREA_GAP_LENGTH"){
-			ErrorType = ::sdl::complextest::ComplexUnion1::ErrorCode::AREA_GAP_LENGTH;
+			ErrorType = ::sdl::V1_0::complextest::ErrorCode::AREA_GAP_LENGTH;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ErrorCode", errorTypeStringValue);)
@@ -5274,243 +5044,13 @@ bool CArea::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CArea::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CArea::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CArea::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CArea::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CArea::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CArea::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CArea::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CArea::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CArea::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CAnalyzer::V1_0::GetVersionId()
+QByteArray CAnalyzer::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CAnalyzer::V1_0::operator==(const V1_0& other) const
+bool CAnalyzer::operator==(const CAnalyzer& other) const
 {
 	return 
 				AnalyzerName == other.AnalyzerName &&
@@ -5519,7 +5059,7 @@ bool CAnalyzer::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CAnalyzer::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CAnalyzer::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "Analyzer", modelIndex);
 
@@ -5537,19 +5077,19 @@ bool CAnalyzer::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 	}
 	QString analyzerResultStringValue;
 	switch (*AnalyzerResult){
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NONE:
+	case ::sdl::V1_0::complextest::StatusCode::NONE:
 		analyzerResultStringValue = "NONE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::OK:
+	case ::sdl::V1_0::complextest::StatusCode::OK:
 		analyzerResultStringValue = "OK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::WARNING:
+	case ::sdl::V1_0::complextest::StatusCode::WARNING:
 		analyzerResultStringValue = "WARNING";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NOK:
+	case ::sdl::V1_0::complextest::StatusCode::NOK:
 		analyzerResultStringValue = "NOK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::FAILED:
+	case ::sdl::V1_0::complextest::StatusCode::FAILED:
 		analyzerResultStringValue = "FAILED";
 		break;
 	default:
@@ -5575,7 +5115,7 @@ bool CAnalyzer::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 }
 
 
-bool CAnalyzer::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CAnalyzer::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant analyzerNameData = model.GetData("AnalyzerName", modelIndex);
 	if (analyzerNameData.isNull()){
@@ -5593,19 +5133,19 @@ bool CAnalyzer::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 	}
 	QString analyzerResultStringValue = analyzerResultData.toString();
 	if(analyzerResultStringValue == "NONE"){
-		AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+		AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::NONE;
 	}
 	else if(analyzerResultStringValue == "OK"){
-		AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+		AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::OK;
 	}
 	else if(analyzerResultStringValue == "WARNING"){
-		AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+		AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::WARNING;
 	}
 	else if(analyzerResultStringValue == "NOK"){
-		AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+		AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::NOK;
 	}
 	else if(analyzerResultStringValue == "FAILED"){
-		AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+		AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::FAILED;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", analyzerResultStringValue);)
@@ -5634,7 +5174,7 @@ bool CAnalyzer::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 }
 
 
-bool CAnalyzer::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CAnalyzer::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant analyzerNameData = model.GetData("AnalyzerName", modelIndex);
 	if (!analyzerNameData.isNull()){
@@ -5645,19 +5185,19 @@ bool CAnalyzer::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 	if (!analyzerResultData.isNull()){
 		QString analyzerResultStringValue = analyzerResultData.toString();
 		if(analyzerResultStringValue == "NONE"){
-			AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+			AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::NONE;
 		}
 		else if(analyzerResultStringValue == "OK"){
-			AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+			AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::OK;
 		}
 		else if(analyzerResultStringValue == "WARNING"){
-			AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+			AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::WARNING;
 		}
 		else if(analyzerResultStringValue == "NOK"){
-			AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+			AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::NOK;
 		}
 		else if(analyzerResultStringValue == "FAILED"){
-			AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+			AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::FAILED;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", analyzerResultStringValue);)
@@ -5687,7 +5227,7 @@ bool CAnalyzer::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 }
 
 
-bool CAnalyzer::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CAnalyzer::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!AnalyzerName){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AnalyzerName").toLocal8Bit().constData();)
@@ -5703,19 +5243,19 @@ bool CAnalyzer::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 	}
 	QString analyzerResultStringValue;
 	switch (*AnalyzerResult){
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NONE:
+	case ::sdl::V1_0::complextest::StatusCode::NONE:
 		analyzerResultStringValue = "NONE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::OK:
+	case ::sdl::V1_0::complextest::StatusCode::OK:
 		analyzerResultStringValue = "OK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::WARNING:
+	case ::sdl::V1_0::complextest::StatusCode::WARNING:
 		analyzerResultStringValue = "WARNING";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NOK:
+	case ::sdl::V1_0::complextest::StatusCode::NOK:
 		analyzerResultStringValue = "NOK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::FAILED:
+	case ::sdl::V1_0::complextest::StatusCode::FAILED:
 		analyzerResultStringValue = "FAILED";
 		break;
 	default:
@@ -5744,7 +5284,7 @@ bool CAnalyzer::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 }
 
 
-bool CAnalyzer::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CAnalyzer::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("AnalyzerName") || (gqlObject["AnalyzerName"].userType() != QMetaType::QString && gqlObject["AnalyzerName"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AnalyzerName").toLocal8Bit().constData();)
@@ -5760,19 +5300,19 @@ bool CAnalyzer::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 	}
 	const QString analyzerResultStringValue = gqlObject["AnalyzerResult"].toString();
 	if(analyzerResultStringValue == "NONE"){
-		AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+		AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::NONE;
 	}
 	else if(analyzerResultStringValue == "OK"){
-		AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+		AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::OK;
 	}
 	else if(analyzerResultStringValue == "WARNING"){
-		AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+		AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::WARNING;
 	}
 	else if(analyzerResultStringValue == "NOK"){
-		AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+		AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::NOK;
 	}
 	else if(analyzerResultStringValue == "FAILED"){
-		AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+		AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::FAILED;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", analyzerResultStringValue);)
@@ -5806,7 +5346,7 @@ bool CAnalyzer::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 }
 
 
-bool CAnalyzer::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CAnalyzer::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("AnalyzerName") && (gqlObject["AnalyzerName"].userType() == QMetaType::QString || gqlObject["AnalyzerName"].userType() == QMetaType::QByteArray)){
 		AnalyzerName = gqlObject["AnalyzerName"].toString();
@@ -5815,19 +5355,19 @@ bool CAnalyzer::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 	if (gqlObject.ContainsParam("AnalyzerResult") && (gqlObject["AnalyzerResult"].userType() == QMetaType::QString || gqlObject["AnalyzerResult"].userType() == QMetaType::QByteArray)){
 		const QString analyzerResultStringValue = gqlObject["AnalyzerResult"].toString();
 		if(analyzerResultStringValue == "NONE"){
-			AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+			AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::NONE;
 		}
 		else if(analyzerResultStringValue == "OK"){
-			AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+			AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::OK;
 		}
 		else if(analyzerResultStringValue == "WARNING"){
-			AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+			AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::WARNING;
 		}
 		else if(analyzerResultStringValue == "NOK"){
-			AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+			AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::NOK;
 		}
 		else if(analyzerResultStringValue == "FAILED"){
-			AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+			AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::FAILED;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", analyzerResultStringValue);)
@@ -5862,7 +5402,7 @@ bool CAnalyzer::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 }
 
 
-bool CAnalyzer::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CAnalyzer::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!AnalyzerName){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AnalyzerName").toLocal8Bit().constData();)
@@ -5878,19 +5418,19 @@ bool CAnalyzer::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	}
 	QString analyzerResultStringValue;
 	switch (*AnalyzerResult){
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NONE:
+	case ::sdl::V1_0::complextest::StatusCode::NONE:
 		analyzerResultStringValue = "NONE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::OK:
+	case ::sdl::V1_0::complextest::StatusCode::OK:
 		analyzerResultStringValue = "OK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::WARNING:
+	case ::sdl::V1_0::complextest::StatusCode::WARNING:
 		analyzerResultStringValue = "WARNING";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NOK:
+	case ::sdl::V1_0::complextest::StatusCode::NOK:
 		analyzerResultStringValue = "NOK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::FAILED:
+	case ::sdl::V1_0::complextest::StatusCode::FAILED:
 		analyzerResultStringValue = "FAILED";
 		break;
 	default:
@@ -5919,7 +5459,7 @@ bool CAnalyzer::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CAnalyzer::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CAnalyzer::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("AnalyzerName") || ! jsonObject["AnalyzerName"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AnalyzerName").toLocal8Bit().constData();)
@@ -5935,19 +5475,19 @@ bool CAnalyzer::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 	const QString analyzerResultStringValue = jsonObject["AnalyzerResult"].toString();
 	if(analyzerResultStringValue == "NONE"){
-		AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+		AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::NONE;
 	}
 	else if(analyzerResultStringValue == "OK"){
-		AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+		AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::OK;
 	}
 	else if(analyzerResultStringValue == "WARNING"){
-		AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+		AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::WARNING;
 	}
 	else if(analyzerResultStringValue == "NOK"){
-		AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+		AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::NOK;
 	}
 	else if(analyzerResultStringValue == "FAILED"){
-		AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+		AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::FAILED;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", analyzerResultStringValue);)
@@ -5974,7 +5514,7 @@ bool CAnalyzer::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CAnalyzer::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CAnalyzer::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("AnalyzerName") && jsonObject["AnalyzerName"].isString()){
 		AnalyzerName = jsonObject["AnalyzerName"].toString();
@@ -5983,19 +5523,19 @@ bool CAnalyzer::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("AnalyzerResult") && jsonObject["AnalyzerResult"].isString()){
 		const QString analyzerResultStringValue = jsonObject["AnalyzerResult"].toString();
 		if(analyzerResultStringValue == "NONE"){
-			AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+			AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::NONE;
 		}
 		else if(analyzerResultStringValue == "OK"){
-			AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+			AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::OK;
 		}
 		else if(analyzerResultStringValue == "WARNING"){
-			AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+			AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::WARNING;
 		}
 		else if(analyzerResultStringValue == "NOK"){
-			AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+			AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::NOK;
 		}
 		else if(analyzerResultStringValue == "FAILED"){
-			AnalyzerResult = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+			AnalyzerResult = ::sdl::V1_0::complextest::StatusCode::FAILED;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", analyzerResultStringValue);)
@@ -6025,243 +5565,13 @@ bool CAnalyzer::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CAnalyzer::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CAnalyzer::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CAnalyzer::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CAnalyzer::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CAnalyzer::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CAnalyzer::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CAnalyzer::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CAnalyzer::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CAnalyzer::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CInspection::V1_0::GetVersionId()
+QByteArray CInspection::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CInspection::V1_0::operator==(const V1_0& other) const
+bool CInspection::operator==(const CInspection& other) const
 {
 	return 
 				ID == other.ID &&
@@ -6272,7 +5582,7 @@ bool CInspection::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CInspection::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CInspection::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "Inspection", modelIndex);
 
@@ -6304,19 +5614,19 @@ bool CInspection::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int model
 	}
 	QString statusStringValue;
 	switch (*Status){
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NONE:
+	case ::sdl::V1_0::complextest::StatusCode::NONE:
 		statusStringValue = "NONE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::OK:
+	case ::sdl::V1_0::complextest::StatusCode::OK:
 		statusStringValue = "OK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::WARNING:
+	case ::sdl::V1_0::complextest::StatusCode::WARNING:
 		statusStringValue = "WARNING";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NOK:
+	case ::sdl::V1_0::complextest::StatusCode::NOK:
 		statusStringValue = "NOK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::FAILED:
+	case ::sdl::V1_0::complextest::StatusCode::FAILED:
 		statusStringValue = "FAILED";
 		break;
 	default:
@@ -6342,7 +5652,7 @@ bool CInspection::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int model
 }
 
 
-bool CInspection::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CInspection::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant iDData = model.GetData("ID", modelIndex);
 	if (iDData.isNull()){
@@ -6376,19 +5686,19 @@ bool CInspection::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, in
 	}
 	QString statusStringValue = statusData.toString();
 	if(statusStringValue == "NONE"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+		Status = ::sdl::V1_0::complextest::StatusCode::NONE;
 	}
 	else if(statusStringValue == "OK"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+		Status = ::sdl::V1_0::complextest::StatusCode::OK;
 	}
 	else if(statusStringValue == "WARNING"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+		Status = ::sdl::V1_0::complextest::StatusCode::WARNING;
 	}
 	else if(statusStringValue == "NOK"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+		Status = ::sdl::V1_0::complextest::StatusCode::NOK;
 	}
 	else if(statusStringValue == "FAILED"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+		Status = ::sdl::V1_0::complextest::StatusCode::FAILED;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
@@ -6417,7 +5727,7 @@ bool CInspection::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, in
 }
 
 
-bool CInspection::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CInspection::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant iDData = model.GetData("ID", modelIndex);
 	if (!iDData.isNull()){
@@ -6438,19 +5748,19 @@ bool CInspection::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model,
 	if (!statusData.isNull()){
 		QString statusStringValue = statusData.toString();
 		if(statusStringValue == "NONE"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+			Status = ::sdl::V1_0::complextest::StatusCode::NONE;
 		}
 		else if(statusStringValue == "OK"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+			Status = ::sdl::V1_0::complextest::StatusCode::OK;
 		}
 		else if(statusStringValue == "WARNING"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+			Status = ::sdl::V1_0::complextest::StatusCode::WARNING;
 		}
 		else if(statusStringValue == "NOK"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+			Status = ::sdl::V1_0::complextest::StatusCode::NOK;
 		}
 		else if(statusStringValue == "FAILED"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+			Status = ::sdl::V1_0::complextest::StatusCode::FAILED;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
@@ -6480,7 +5790,7 @@ bool CInspection::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model,
 }
 
 
-bool CInspection::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CInspection::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!ID){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "ID").toLocal8Bit().constData();)
@@ -6510,19 +5820,19 @@ bool CInspection::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObjec
 	}
 	QString statusStringValue;
 	switch (*Status){
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NONE:
+	case ::sdl::V1_0::complextest::StatusCode::NONE:
 		statusStringValue = "NONE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::OK:
+	case ::sdl::V1_0::complextest::StatusCode::OK:
 		statusStringValue = "OK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::WARNING:
+	case ::sdl::V1_0::complextest::StatusCode::WARNING:
 		statusStringValue = "WARNING";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NOK:
+	case ::sdl::V1_0::complextest::StatusCode::NOK:
 		statusStringValue = "NOK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::FAILED:
+	case ::sdl::V1_0::complextest::StatusCode::FAILED:
 		statusStringValue = "FAILED";
 		break;
 	default:
@@ -6551,7 +5861,7 @@ bool CInspection::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObjec
 }
 
 
-bool CInspection::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CInspection::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("ID") || (gqlObject["ID"].userType() != QMetaType::QString && gqlObject["ID"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "ID").toLocal8Bit().constData();)
@@ -6581,19 +5891,19 @@ bool CInspection::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 	}
 	const QString statusStringValue = gqlObject["Status"].toString();
 	if(statusStringValue == "NONE"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+		Status = ::sdl::V1_0::complextest::StatusCode::NONE;
 	}
 	else if(statusStringValue == "OK"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+		Status = ::sdl::V1_0::complextest::StatusCode::OK;
 	}
 	else if(statusStringValue == "WARNING"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+		Status = ::sdl::V1_0::complextest::StatusCode::WARNING;
 	}
 	else if(statusStringValue == "NOK"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+		Status = ::sdl::V1_0::complextest::StatusCode::NOK;
 	}
 	else if(statusStringValue == "FAILED"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+		Status = ::sdl::V1_0::complextest::StatusCode::FAILED;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
@@ -6627,7 +5937,7 @@ bool CInspection::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 }
 
 
-bool CInspection::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CInspection::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("ID") && (gqlObject["ID"].userType() == QMetaType::QString || gqlObject["ID"].userType() == QMetaType::QByteArray)){
 		ID = gqlObject["ID"].toString();
@@ -6644,19 +5954,19 @@ bool CInspection::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject
 	if (gqlObject.ContainsParam("Status") && (gqlObject["Status"].userType() == QMetaType::QString || gqlObject["Status"].userType() == QMetaType::QByteArray)){
 		const QString statusStringValue = gqlObject["Status"].toString();
 		if(statusStringValue == "NONE"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+			Status = ::sdl::V1_0::complextest::StatusCode::NONE;
 		}
 		else if(statusStringValue == "OK"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+			Status = ::sdl::V1_0::complextest::StatusCode::OK;
 		}
 		else if(statusStringValue == "WARNING"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+			Status = ::sdl::V1_0::complextest::StatusCode::WARNING;
 		}
 		else if(statusStringValue == "NOK"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+			Status = ::sdl::V1_0::complextest::StatusCode::NOK;
 		}
 		else if(statusStringValue == "FAILED"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+			Status = ::sdl::V1_0::complextest::StatusCode::FAILED;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
@@ -6691,7 +6001,7 @@ bool CInspection::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject
 }
 
 
-bool CInspection::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CInspection::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!ID){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "ID").toLocal8Bit().constData();)
@@ -6721,19 +6031,19 @@ bool CInspection::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	}
 	QString statusStringValue;
 	switch (*Status){
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NONE:
+	case ::sdl::V1_0::complextest::StatusCode::NONE:
 		statusStringValue = "NONE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::OK:
+	case ::sdl::V1_0::complextest::StatusCode::OK:
 		statusStringValue = "OK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::WARNING:
+	case ::sdl::V1_0::complextest::StatusCode::WARNING:
 		statusStringValue = "WARNING";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NOK:
+	case ::sdl::V1_0::complextest::StatusCode::NOK:
 		statusStringValue = "NOK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::FAILED:
+	case ::sdl::V1_0::complextest::StatusCode::FAILED:
 		statusStringValue = "FAILED";
 		break;
 	default:
@@ -6762,7 +6072,7 @@ bool CInspection::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CInspection::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CInspection::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("ID") || ! jsonObject["ID"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "ID").toLocal8Bit().constData();)
@@ -6792,19 +6102,19 @@ bool CInspection::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 	const QString statusStringValue = jsonObject["Status"].toString();
 	if(statusStringValue == "NONE"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+		Status = ::sdl::V1_0::complextest::StatusCode::NONE;
 	}
 	else if(statusStringValue == "OK"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+		Status = ::sdl::V1_0::complextest::StatusCode::OK;
 	}
 	else if(statusStringValue == "WARNING"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+		Status = ::sdl::V1_0::complextest::StatusCode::WARNING;
 	}
 	else if(statusStringValue == "NOK"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+		Status = ::sdl::V1_0::complextest::StatusCode::NOK;
 	}
 	else if(statusStringValue == "FAILED"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+		Status = ::sdl::V1_0::complextest::StatusCode::FAILED;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
@@ -6831,7 +6141,7 @@ bool CInspection::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CInspection::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CInspection::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("ID") && jsonObject["ID"].isString()){
 		ID = jsonObject["ID"].toString();
@@ -6848,19 +6158,19 @@ bool CInspection::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("Status") && jsonObject["Status"].isString()){
 		const QString statusStringValue = jsonObject["Status"].toString();
 		if(statusStringValue == "NONE"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+			Status = ::sdl::V1_0::complextest::StatusCode::NONE;
 		}
 		else if(statusStringValue == "OK"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+			Status = ::sdl::V1_0::complextest::StatusCode::OK;
 		}
 		else if(statusStringValue == "WARNING"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+			Status = ::sdl::V1_0::complextest::StatusCode::WARNING;
 		}
 		else if(statusStringValue == "NOK"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+			Status = ::sdl::V1_0::complextest::StatusCode::NOK;
 		}
 		else if(statusStringValue == "FAILED"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+			Status = ::sdl::V1_0::complextest::StatusCode::FAILED;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
@@ -6890,243 +6200,13 @@ bool CInspection::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CInspection::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CInspection::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CInspection::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CInspection::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CInspection::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CInspection::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CInspection::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CInspection::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CInspection::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CProductOverview::V1_0::GetVersionId()
+QByteArray CProductOverview::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CProductOverview::V1_0::operator==(const V1_0& other) const
+bool CProductOverview::operator==(const CProductOverview& other) const
 {
 	return 
 				ProductID == other.ProductID &&
@@ -7139,7 +6219,7 @@ bool CProductOverview::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CProductOverview::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CProductOverview::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "ProductOverview", modelIndex);
 
@@ -7164,19 +6244,19 @@ bool CProductOverview::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int 
 	}
 	QString statusStringValue;
 	switch (*Status){
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NONE:
+	case ::sdl::V1_0::complextest::StatusCode::NONE:
 		statusStringValue = "NONE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::OK:
+	case ::sdl::V1_0::complextest::StatusCode::OK:
 		statusStringValue = "OK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::WARNING:
+	case ::sdl::V1_0::complextest::StatusCode::WARNING:
 		statusStringValue = "WARNING";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NOK:
+	case ::sdl::V1_0::complextest::StatusCode::NOK:
 		statusStringValue = "NOK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::FAILED:
+	case ::sdl::V1_0::complextest::StatusCode::FAILED:
 		statusStringValue = "FAILED";
 		break;
 	default:
@@ -7223,7 +6303,7 @@ bool CProductOverview::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int 
 }
 
 
-bool CProductOverview::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CProductOverview::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant productIDData = model.GetData("ProductID", modelIndex);
 	if (productIDData.isNull()){
@@ -7249,19 +6329,19 @@ bool CProductOverview::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& mode
 	}
 	QString statusStringValue = statusData.toString();
 	if(statusStringValue == "NONE"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+		Status = ::sdl::V1_0::complextest::StatusCode::NONE;
 	}
 	else if(statusStringValue == "OK"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+		Status = ::sdl::V1_0::complextest::StatusCode::OK;
 	}
 	else if(statusStringValue == "WARNING"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+		Status = ::sdl::V1_0::complextest::StatusCode::WARNING;
 	}
 	else if(statusStringValue == "NOK"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+		Status = ::sdl::V1_0::complextest::StatusCode::NOK;
 	}
 	else if(statusStringValue == "FAILED"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+		Status = ::sdl::V1_0::complextest::StatusCode::FAILED;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
@@ -7314,7 +6394,7 @@ bool CProductOverview::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& mode
 }
 
 
-bool CProductOverview::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CProductOverview::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant productIDData = model.GetData("ProductID", modelIndex);
 	if (!productIDData.isNull()){
@@ -7330,19 +6410,19 @@ bool CProductOverview::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& m
 	if (!statusData.isNull()){
 		QString statusStringValue = statusData.toString();
 		if(statusStringValue == "NONE"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+			Status = ::sdl::V1_0::complextest::StatusCode::NONE;
 		}
 		else if(statusStringValue == "OK"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+			Status = ::sdl::V1_0::complextest::StatusCode::OK;
 		}
 		else if(statusStringValue == "WARNING"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+			Status = ::sdl::V1_0::complextest::StatusCode::WARNING;
 		}
 		else if(statusStringValue == "NOK"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+			Status = ::sdl::V1_0::complextest::StatusCode::NOK;
 		}
 		else if(statusStringValue == "FAILED"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+			Status = ::sdl::V1_0::complextest::StatusCode::FAILED;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
@@ -7387,7 +6467,7 @@ bool CProductOverview::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& m
 }
 
 
-bool CProductOverview::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CProductOverview::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!ProductID){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "ProductID").toLocal8Bit().constData();)
@@ -7410,19 +6490,19 @@ bool CProductOverview::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gql
 	}
 	QString statusStringValue;
 	switch (*Status){
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NONE:
+	case ::sdl::V1_0::complextest::StatusCode::NONE:
 		statusStringValue = "NONE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::OK:
+	case ::sdl::V1_0::complextest::StatusCode::OK:
 		statusStringValue = "OK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::WARNING:
+	case ::sdl::V1_0::complextest::StatusCode::WARNING:
 		statusStringValue = "WARNING";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NOK:
+	case ::sdl::V1_0::complextest::StatusCode::NOK:
 		statusStringValue = "NOK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::FAILED:
+	case ::sdl::V1_0::complextest::StatusCode::FAILED:
 		statusStringValue = "FAILED";
 		break;
 	default:
@@ -7472,7 +6552,7 @@ bool CProductOverview::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gql
 }
 
 
-bool CProductOverview::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CProductOverview::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("ProductID") || (gqlObject["ProductID"].userType() != QMetaType::Int && gqlObject["ProductID"].userType() != QMetaType::UInt && gqlObject["ProductID"].userType() != QMetaType::LongLong && gqlObject["ProductID"].userType() != QMetaType::ULongLong && gqlObject["ProductID"].userType() != QMetaType::Long && gqlObject["ProductID"].userType() != QMetaType::Short && gqlObject["ProductID"].userType() != QMetaType::ULong && gqlObject["ProductID"].userType() != QMetaType::UShort && gqlObject["ProductID"].userType() != QMetaType::UChar)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "ProductID").toLocal8Bit().constData();)
@@ -7495,19 +6575,19 @@ bool CProductOverview::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 	}
 	const QString statusStringValue = gqlObject["Status"].toString();
 	if(statusStringValue == "NONE"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+		Status = ::sdl::V1_0::complextest::StatusCode::NONE;
 	}
 	else if(statusStringValue == "OK"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+		Status = ::sdl::V1_0::complextest::StatusCode::OK;
 	}
 	else if(statusStringValue == "WARNING"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+		Status = ::sdl::V1_0::complextest::StatusCode::WARNING;
 	}
 	else if(statusStringValue == "NOK"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+		Status = ::sdl::V1_0::complextest::StatusCode::NOK;
 	}
 	else if(statusStringValue == "FAILED"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+		Status = ::sdl::V1_0::complextest::StatusCode::FAILED;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
@@ -7562,7 +6642,7 @@ bool CProductOverview::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 }
 
 
-bool CProductOverview::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CProductOverview::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("ProductID") && (gqlObject["ProductID"].userType() == QMetaType::Int || gqlObject["ProductID"].userType() == QMetaType::UInt || gqlObject["ProductID"].userType() == QMetaType::LongLong || gqlObject["ProductID"].userType() == QMetaType::ULongLong || gqlObject["ProductID"].userType() == QMetaType::Long || gqlObject["ProductID"].userType() == QMetaType::Short || gqlObject["ProductID"].userType() == QMetaType::ULong || gqlObject["ProductID"].userType() == QMetaType::UShort || gqlObject["ProductID"].userType() == QMetaType::UChar)){
 		ProductID = gqlObject["ProductID"].toInt();
@@ -7575,19 +6655,19 @@ bool CProductOverview::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamO
 	if (gqlObject.ContainsParam("Status") && (gqlObject["Status"].userType() == QMetaType::QString || gqlObject["Status"].userType() == QMetaType::QByteArray)){
 		const QString statusStringValue = gqlObject["Status"].toString();
 		if(statusStringValue == "NONE"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+			Status = ::sdl::V1_0::complextest::StatusCode::NONE;
 		}
 		else if(statusStringValue == "OK"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+			Status = ::sdl::V1_0::complextest::StatusCode::OK;
 		}
 		else if(statusStringValue == "WARNING"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+			Status = ::sdl::V1_0::complextest::StatusCode::WARNING;
 		}
 		else if(statusStringValue == "NOK"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+			Status = ::sdl::V1_0::complextest::StatusCode::NOK;
 		}
 		else if(statusStringValue == "FAILED"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+			Status = ::sdl::V1_0::complextest::StatusCode::FAILED;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
@@ -7634,7 +6714,7 @@ bool CProductOverview::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamO
 }
 
 
-bool CProductOverview::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CProductOverview::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!ProductID){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "ProductID").toLocal8Bit().constData();)
@@ -7657,19 +6737,19 @@ bool CProductOverview::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	}
 	QString statusStringValue;
 	switch (*Status){
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NONE:
+	case ::sdl::V1_0::complextest::StatusCode::NONE:
 		statusStringValue = "NONE";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::OK:
+	case ::sdl::V1_0::complextest::StatusCode::OK:
 		statusStringValue = "OK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::WARNING:
+	case ::sdl::V1_0::complextest::StatusCode::WARNING:
 		statusStringValue = "WARNING";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::NOK:
+	case ::sdl::V1_0::complextest::StatusCode::NOK:
 		statusStringValue = "NOK";
 		break;
-	case ::sdl::complextest::ComplexUnion1::StatusCode::FAILED:
+	case ::sdl::V1_0::complextest::StatusCode::FAILED:
 		statusStringValue = "FAILED";
 		break;
 	default:
@@ -7719,7 +6799,7 @@ bool CProductOverview::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CProductOverview::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CProductOverview::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("ProductID") || ! jsonObject["ProductID"].isDouble()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "ProductID").toLocal8Bit().constData();)
@@ -7742,19 +6822,19 @@ bool CProductOverview::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 	const QString statusStringValue = jsonObject["Status"].toString();
 	if(statusStringValue == "NONE"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+		Status = ::sdl::V1_0::complextest::StatusCode::NONE;
 	}
 	else if(statusStringValue == "OK"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+		Status = ::sdl::V1_0::complextest::StatusCode::OK;
 	}
 	else if(statusStringValue == "WARNING"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+		Status = ::sdl::V1_0::complextest::StatusCode::WARNING;
 	}
 	else if(statusStringValue == "NOK"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+		Status = ::sdl::V1_0::complextest::StatusCode::NOK;
 	}
 	else if(statusStringValue == "FAILED"){
-		Status = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+		Status = ::sdl::V1_0::complextest::StatusCode::FAILED;
 	}
 	else {
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
@@ -7802,7 +6882,7 @@ bool CProductOverview::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CProductOverview::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CProductOverview::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("ProductID") && jsonObject["ProductID"].isDouble()){
 		ProductID = jsonObject["ProductID"].toInt();
@@ -7815,19 +6895,19 @@ bool CProductOverview::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject
 	if (jsonObject.contains("Status") && jsonObject["Status"].isString()){
 		const QString statusStringValue = jsonObject["Status"].toString();
 		if(statusStringValue == "NONE"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::NONE;
+			Status = ::sdl::V1_0::complextest::StatusCode::NONE;
 		}
 		else if(statusStringValue == "OK"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::OK;
+			Status = ::sdl::V1_0::complextest::StatusCode::OK;
 		}
 		else if(statusStringValue == "WARNING"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::WARNING;
+			Status = ::sdl::V1_0::complextest::StatusCode::WARNING;
 		}
 		else if(statusStringValue == "NOK"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::NOK;
+			Status = ::sdl::V1_0::complextest::StatusCode::NOK;
 		}
 		else if(statusStringValue == "FAILED"){
-			Status = ::sdl::complextest::ComplexUnion1::StatusCode::FAILED;
+			Status = ::sdl::V1_0::complextest::StatusCode::FAILED;
 		}
 		else {
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
@@ -7869,243 +6949,13 @@ bool CProductOverview::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject
 
 // serialize methods
 
-bool CProductOverview::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CProductOverview::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CProductOverview::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CProductOverview::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CProductOverview::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CProductOverview::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CProductOverview::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CProductOverview::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CProductOverview::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CLocalizedText::V1_0::GetVersionId()
+QByteArray CLocalizedText::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CLocalizedText::V1_0::operator==(const V1_0& other) const
+bool CLocalizedText::operator==(const CLocalizedText& other) const
 {
 	return 
 				text == other.text &&
@@ -8113,7 +6963,7 @@ bool CLocalizedText::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CLocalizedText::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CLocalizedText::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "LocalizedText", modelIndex);
 
@@ -8136,7 +6986,7 @@ bool CLocalizedText::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mo
 }
 
 
-bool CLocalizedText::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CLocalizedText::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant textData = model.GetData("text", modelIndex);
 	if (textData.isNull()){
@@ -8158,7 +7008,7 @@ bool CLocalizedText::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model,
 }
 
 
-bool CLocalizedText::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CLocalizedText::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant textData = model.GetData("text", modelIndex);
 	if (!textData.isNull()){
@@ -8174,7 +7024,7 @@ bool CLocalizedText::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& mod
 }
 
 
-bool CLocalizedText::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CLocalizedText::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!text){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "text").toLocal8Bit().constData();)
@@ -8196,7 +7046,7 @@ bool CLocalizedText::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlOb
 }
 
 
-bool CLocalizedText::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CLocalizedText::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("text") || (gqlObject["text"].userType() != QMetaType::QString && gqlObject["text"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "text").toLocal8Bit().constData();)
@@ -8216,7 +7066,7 @@ bool CLocalizedText::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject
 }
 
 
-bool CLocalizedText::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CLocalizedText::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("text") && (gqlObject["text"].userType() == QMetaType::QString || gqlObject["text"].userType() == QMetaType::QByteArray)){
 		text = gqlObject["text"].toString();
@@ -8230,7 +7080,7 @@ bool CLocalizedText::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObj
 }
 
 
-bool CLocalizedText::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CLocalizedText::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!text){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "text").toLocal8Bit().constData();)
@@ -8252,7 +7102,7 @@ bool CLocalizedText::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CLocalizedText::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CLocalizedText::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("text") || ! jsonObject["text"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "text").toLocal8Bit().constData();)
@@ -8272,7 +7122,7 @@ bool CLocalizedText::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CLocalizedText::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CLocalizedText::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("text") && jsonObject["text"].isString()){
 		text = jsonObject["text"].toString();
@@ -8288,243 +7138,13 @@ bool CLocalizedText::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CLocalizedText::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CLocalizedText::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CLocalizedText::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CLocalizedText::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CLocalizedText::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CLocalizedText::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CLocalizedText::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CLocalizedText::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CLocalizedText::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CCoordinates::V1_0::GetVersionId()
+QByteArray CCoordinates::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CCoordinates::V1_0::operator==(const V1_0& other) const
+bool CCoordinates::operator==(const CCoordinates& other) const
 {
 	return 
 				x.has_value() == other.x.has_value() &&
@@ -8539,7 +7159,7 @@ bool CCoordinates::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CCoordinates::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CCoordinates::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "Coordinates", modelIndex);
 
@@ -8569,7 +7189,7 @@ bool CCoordinates::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 }
 
 
-bool CCoordinates::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CCoordinates::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant xData = model.GetData("x", modelIndex);
 	if (xData.isNull()){
@@ -8599,7 +7219,7 @@ bool CCoordinates::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 }
 
 
-bool CCoordinates::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CCoordinates::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant xData = model.GetData("x", modelIndex);
 	if (!xData.isNull()){
@@ -8620,7 +7240,7 @@ bool CCoordinates::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 }
 
 
-bool CCoordinates::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CCoordinates::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!x){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x").toLocal8Bit().constData();)
@@ -8649,7 +7269,7 @@ bool CCoordinates::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 }
 
 
-bool CCoordinates::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CCoordinates::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("x") || (gqlObject["x"].userType() != QMetaType::Float && gqlObject["x"].userType() != QMetaType::Double && gqlObject["x"].userType() != QMetaType::Int && gqlObject["x"].userType() != QMetaType::UInt && gqlObject["x"].userType() != QMetaType::LongLong && gqlObject["x"].userType() != QMetaType::ULongLong && gqlObject["x"].userType() != QMetaType::Long && gqlObject["x"].userType() != QMetaType::Short && gqlObject["x"].userType() != QMetaType::ULong && gqlObject["x"].userType() != QMetaType::UShort && gqlObject["x"].userType() != QMetaType::UChar)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x").toLocal8Bit().constData();)
@@ -8676,7 +7296,7 @@ bool CCoordinates::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 }
 
 
-bool CCoordinates::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CCoordinates::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("x") && (gqlObject["x"].userType() == QMetaType::Float || gqlObject["x"].userType() == QMetaType::Double || gqlObject["x"].userType() == QMetaType::Int || gqlObject["x"].userType() == QMetaType::UInt || gqlObject["x"].userType() == QMetaType::LongLong || gqlObject["x"].userType() == QMetaType::ULongLong || gqlObject["x"].userType() == QMetaType::Long || gqlObject["x"].userType() == QMetaType::Short || gqlObject["x"].userType() == QMetaType::ULong || gqlObject["x"].userType() == QMetaType::UShort || gqlObject["x"].userType() == QMetaType::UChar)){
 		x = gqlObject["x"].toDouble();
@@ -8694,7 +7314,7 @@ bool CCoordinates::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 }
 
 
-bool CCoordinates::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CCoordinates::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!x){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x").toLocal8Bit().constData();)
@@ -8723,7 +7343,7 @@ bool CCoordinates::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CCoordinates::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CCoordinates::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("x") || ! jsonObject["x"].isDouble()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x").toLocal8Bit().constData();)
@@ -8750,7 +7370,7 @@ bool CCoordinates::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CCoordinates::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CCoordinates::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("x") && jsonObject["x"].isDouble()){
 		x = jsonObject["x"].toDouble();
@@ -8770,243 +7390,13 @@ bool CCoordinates::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CCoordinates::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCoordinates::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCoordinates::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCoordinates::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCoordinates::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCoordinates::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCoordinates::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCoordinates::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCoordinates::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CExtendedMetaData::V1_0::GetVersionId()
+QByteArray CExtendedMetaData::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CExtendedMetaData::V1_0::operator==(const V1_0& other) const
+bool CExtendedMetaData::operator==(const CExtendedMetaData& other) const
 {
 	return 
 				key == other.key &&
@@ -9014,7 +7404,7 @@ bool CExtendedMetaData::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CExtendedMetaData::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CExtendedMetaData::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "ExtendedMetaData", modelIndex);
 
@@ -9049,7 +7439,7 @@ bool CExtendedMetaData::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int
 }
 
 
-bool CExtendedMetaData::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CExtendedMetaData::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant keyData = model.GetData("key", modelIndex);
 	if (!keyData.isNull()){
@@ -9082,7 +7472,7 @@ bool CExtendedMetaData::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& mod
 }
 
 
-bool CExtendedMetaData::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CExtendedMetaData::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant keyData = model.GetData("key", modelIndex);
 	if (!keyData.isNull()){
@@ -9115,7 +7505,7 @@ bool CExtendedMetaData::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& 
 }
 
 
-bool CExtendedMetaData::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CExtendedMetaData::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (key){
 		gqlObject.InsertParam("key", QVariant(*key));
@@ -9147,7 +7537,7 @@ bool CExtendedMetaData::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gq
 }
 
 
-bool CExtendedMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CExtendedMetaData::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("key") && (gqlObject["key"].userType() == QMetaType::QString || gqlObject["key"].userType() == QMetaType::QByteArray)){
 		key = gqlObject["key"].toString();
@@ -9185,7 +7575,7 @@ bool CExtendedMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObj
 }
 
 
-bool CExtendedMetaData::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CExtendedMetaData::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("key") && (gqlObject["key"].userType() == QMetaType::QString || gqlObject["key"].userType() == QMetaType::QByteArray)){
 		key = gqlObject["key"].toString();
@@ -9223,7 +7613,7 @@ bool CExtendedMetaData::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParam
 }
 
 
-bool CExtendedMetaData::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CExtendedMetaData::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (key){
 		jsonObject["key"] = QJsonValue::fromVariant(*key);
@@ -9266,7 +7656,7 @@ bool CExtendedMetaData::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CExtendedMetaData::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CExtendedMetaData::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("key") && jsonObject["key"].isString()){
 		key = jsonObject["key"].toString();
@@ -9304,7 +7694,7 @@ bool CExtendedMetaData::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CExtendedMetaData::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CExtendedMetaData::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("key") && jsonObject["key"].isString()){
 		key = jsonObject["key"].toString();
@@ -9344,243 +7734,13 @@ bool CExtendedMetaData::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObjec
 
 // serialize methods
 
-bool CExtendedMetaData::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CExtendedMetaData::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CExtendedMetaData::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CExtendedMetaData::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CExtendedMetaData::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CExtendedMetaData::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CExtendedMetaData::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CExtendedMetaData::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CExtendedMetaData::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CResultMetaData::V1_0::GetVersionId()
+QByteArray CResultMetaData::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CResultMetaData::V1_0::operator==(const V1_0& other) const
+bool CResultMetaData::operator==(const CResultMetaData& other) const
 {
 	return 
 				resultId == other.resultId &&
@@ -9594,7 +7754,7 @@ bool CResultMetaData::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CResultMetaData::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CResultMetaData::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "ResultMetaData", modelIndex);
 
@@ -9653,7 +7813,7 @@ bool CResultMetaData::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int m
 }
 
 
-bool CResultMetaData::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CResultMetaData::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant resultIdData = model.GetData("resultId", modelIndex);
 	if (resultIdData.isNull()){
@@ -9720,7 +7880,7 @@ bool CResultMetaData::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model
 }
 
 
-bool CResultMetaData::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CResultMetaData::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant resultIdData = model.GetData("resultId", modelIndex);
 	if (!resultIdData.isNull()){
@@ -9784,7 +7944,7 @@ bool CResultMetaData::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& mo
 }
 
 
-bool CResultMetaData::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CResultMetaData::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!resultId){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "resultId").toLocal8Bit().constData();)
@@ -9844,7 +8004,7 @@ bool CResultMetaData::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlO
 }
 
 
-bool CResultMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CResultMetaData::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("resultId") || (gqlObject["resultId"].userType() != QMetaType::QString && gqlObject["resultId"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "resultId").toLocal8Bit().constData();)
@@ -9909,7 +8069,7 @@ bool CResultMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 }
 
 
-bool CResultMetaData::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CResultMetaData::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("resultId") && (gqlObject["resultId"].userType() == QMetaType::QString || gqlObject["resultId"].userType() == QMetaType::QByteArray)){
 		resultId = gqlObject["resultId"].toByteArray();
@@ -9971,7 +8131,7 @@ bool CResultMetaData::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 }
 
 
-bool CResultMetaData::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CResultMetaData::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!resultId){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "resultId").toLocal8Bit().constData();)
@@ -10031,7 +8191,7 @@ bool CResultMetaData::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CResultMetaData::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CResultMetaData::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("resultId") || ! jsonObject["resultId"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "resultId").toLocal8Bit().constData();)
@@ -10089,7 +8249,7 @@ bool CResultMetaData::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CResultMetaData::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CResultMetaData::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("resultId") && jsonObject["resultId"].isString()){
 		resultId = jsonObject["resultId"].toString().toUtf8();
@@ -10146,243 +8306,13 @@ bool CResultMetaData::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CResultMetaData::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CResultMetaData::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CResultMetaData::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CResultMetaData::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CResultMetaData::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CResultMetaData::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CResultMetaData::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CResultMetaData::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CResultMetaData::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray COverallResultValues::V1_0::GetVersionId()
+QByteArray COverallResultValues::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool COverallResultValues::V1_0::operator==(const V1_0& other) const
+bool COverallResultValues::operator==(const COverallResultValues& other) const
 {
 	return 
 				name == other.name &&
@@ -10399,7 +8329,7 @@ bool COverallResultValues::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool COverallResultValues::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool COverallResultValues::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "OverallResultValues", modelIndex);
 
@@ -10434,7 +8364,7 @@ bool COverallResultValues::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, 
 }
 
 
-bool COverallResultValues::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool COverallResultValues::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant nameData = model.GetData("name", modelIndex);
 	if (!nameData.isNull()){
@@ -10471,7 +8401,7 @@ bool COverallResultValues::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& 
 }
 
 
-bool COverallResultValues::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool COverallResultValues::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant nameData = model.GetData("name", modelIndex);
 	if (!nameData.isNull()){
@@ -10502,7 +8432,7 @@ bool COverallResultValues::V1_0::OptReadFromModel(const ::imtbase::CTreeItemMode
 }
 
 
-bool COverallResultValues::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool COverallResultValues::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (name){
 		gqlObject.InsertParam("name", QVariant(*name));
@@ -10536,7 +8466,7 @@ bool COverallResultValues::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject&
 }
 
 
-bool COverallResultValues::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool COverallResultValues::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("name") && (gqlObject["name"].userType() == QMetaType::QString || gqlObject["name"].userType() == QMetaType::QByteArray)){
 		name = gqlObject["name"].toString();
@@ -10568,7 +8498,7 @@ bool COverallResultValues::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParam
 }
 
 
-bool COverallResultValues::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool COverallResultValues::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("name") && (gqlObject["name"].userType() == QMetaType::QString || gqlObject["name"].userType() == QMetaType::QByteArray)){
 		name = gqlObject["name"].toString();
@@ -10594,7 +8524,7 @@ bool COverallResultValues::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlPa
 }
 
 
-bool COverallResultValues::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool COverallResultValues::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (name){
 		jsonObject["name"] = QJsonValue::fromVariant(*name);
@@ -10628,7 +8558,7 @@ bool COverallResultValues::V1_0::WriteToJsonObject(QJsonObject& jsonObject) cons
 }
 
 
-bool COverallResultValues::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool COverallResultValues::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("name") && jsonObject["name"].isString()){
 		name = jsonObject["name"].toString();
@@ -10660,7 +8590,7 @@ bool COverallResultValues::V1_0::ReadFromJsonObject(const QJsonObject& jsonObjec
 }
 
 
-bool COverallResultValues::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool COverallResultValues::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("name") && jsonObject["name"].isString()){
 		name = jsonObject["name"].toString();
@@ -10688,243 +8618,13 @@ bool COverallResultValues::V1_0::OptReadFromJsonObject(const QJsonObject& jsonOb
 
 // serialize methods
 
-bool COverallResultValues::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool COverallResultValues::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool COverallResultValues::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool COverallResultValues::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool COverallResultValues::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool COverallResultValues::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool COverallResultValues::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool COverallResultValues::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool COverallResultValues::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CUnionTestingType::V1_0::GetVersionId()
+QByteArray CUnionTestingType::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CUnionTestingType::V1_0::operator==(const V1_0& other) const
+bool CUnionTestingType::operator==(const CUnionTestingType& other) const
 {
 	return 
 				simpleUnion == other.simpleUnion &&
@@ -10933,7 +8633,7 @@ bool CUnionTestingType::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CUnionTestingType::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CUnionTestingType::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "UnionTestingType", modelIndex);
 
@@ -10999,7 +8699,7 @@ bool CUnionTestingType::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int
 }
 
 
-bool CUnionTestingType::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CUnionTestingType::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant simpleUnionData = model.GetData("simpleUnion", modelIndex);
 	if (!simpleUnionData.isNull()){
@@ -11061,7 +8761,7 @@ bool CUnionTestingType::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& mod
 }
 
 
-bool CUnionTestingType::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CUnionTestingType::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant simpleUnionData = model.GetData("simpleUnion", modelIndex);
 	if (!simpleUnionData.isNull()){
@@ -11123,7 +8823,7 @@ bool CUnionTestingType::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& 
 }
 
 
-bool CUnionTestingType::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CUnionTestingType::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (simpleUnion){
 		::imtgql::CGqlParamObject simpleUnionDataObject;
@@ -11182,7 +8882,7 @@ bool CUnionTestingType::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gq
 }
 
 
-bool CUnionTestingType::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CUnionTestingType::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("simpleUnion")){
 		QVariant simpleUnionVariantValue = gqlObject["simpleUnion"];
@@ -11255,7 +8955,7 @@ bool CUnionTestingType::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObj
 }
 
 
-bool CUnionTestingType::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CUnionTestingType::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("simpleUnion")){
 		QVariant simpleUnionVariantValue = gqlObject["simpleUnion"];
@@ -11328,7 +9028,7 @@ bool CUnionTestingType::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParam
 }
 
 
-bool CUnionTestingType::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CUnionTestingType::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (simpleUnion){
 		if (const double* doubleVal = std::get_if<double>(simpleUnion.GetPtr())){
@@ -11411,7 +9111,7 @@ bool CUnionTestingType::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CUnionTestingType::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CUnionTestingType::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("simpleUnion")){
 		QVariant simpleUnionVariantValue = jsonObject["simpleUnion"].toVariant();
@@ -11484,7 +9184,7 @@ bool CUnionTestingType::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CUnionTestingType::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CUnionTestingType::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("simpleUnion")){
 		QVariant simpleUnionVariantValue = jsonObject["simpleUnion"].toVariant();
@@ -11559,243 +9259,13 @@ bool CUnionTestingType::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObjec
 
 // serialize methods
 
-bool CUnionTestingType::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CUnionTestingType::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CUnionTestingType::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CUnionTestingType::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CUnionTestingType::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CUnionTestingType::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CUnionTestingType::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CUnionTestingType::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CUnionTestingType::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CCDMResultVarRecursive::V1_0::GetVersionId()
+QByteArray CCDMResultVarRecursive::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CCDMResultVarRecursive::V1_0::operator==(const V1_0& other) const
+bool CCDMResultVarRecursive::operator==(const CCDMResultVarRecursive& other) const
 {
 	return 
 				dataModelTitle == other.dataModelTitle &&
@@ -11806,7 +9276,7 @@ bool CCDMResultVarRecursive::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CCDMResultVarRecursive::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CCDMResultVarRecursive::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "CDMResultVarRecursive", modelIndex);
 
@@ -11874,7 +9344,7 @@ bool CCDMResultVarRecursive::V1_0::WriteToModel(::imtbase::CTreeItemModel& model
 }
 
 
-bool CCDMResultVarRecursive::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CCDMResultVarRecursive::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant dataModelTitleData = model.GetData("dataModelTitle", modelIndex);
 	if (dataModelTitleData.isNull()){
@@ -11958,7 +9428,7 @@ bool CCDMResultVarRecursive::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel
 }
 
 
-bool CCDMResultVarRecursive::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CCDMResultVarRecursive::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant dataModelTitleData = model.GetData("dataModelTitle", modelIndex);
 	if (!dataModelTitleData.isNull()){
@@ -12036,7 +9506,7 @@ bool CCDMResultVarRecursive::V1_0::OptReadFromModel(const ::imtbase::CTreeItemMo
 }
 
 
-bool CCDMResultVarRecursive::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CCDMResultVarRecursive::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!dataModelTitle){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
@@ -12104,7 +9574,7 @@ bool CCDMResultVarRecursive::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObjec
 }
 
 
-bool CCDMResultVarRecursive::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CCDMResultVarRecursive::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("dataModelTitle") || (gqlObject["dataModelTitle"].userType() != QMetaType::QString && gqlObject["dataModelTitle"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
@@ -12193,7 +9663,7 @@ bool CCDMResultVarRecursive::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlPar
 }
 
 
-bool CCDMResultVarRecursive::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CCDMResultVarRecursive::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("dataModelTitle") && (gqlObject["dataModelTitle"].userType() == QMetaType::QString || gqlObject["dataModelTitle"].userType() == QMetaType::QByteArray)){
 		dataModelTitle = gqlObject["dataModelTitle"].toString();
@@ -12276,7 +9746,7 @@ bool CCDMResultVarRecursive::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGql
 }
 
 
-bool CCDMResultVarRecursive::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CCDMResultVarRecursive::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!dataModelTitle){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
@@ -12348,7 +9818,7 @@ bool CCDMResultVarRecursive::V1_0::WriteToJsonObject(QJsonObject& jsonObject) co
 }
 
 
-bool CCDMResultVarRecursive::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CCDMResultVarRecursive::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("dataModelTitle") || ! jsonObject["dataModelTitle"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
@@ -12424,7 +9894,7 @@ bool CCDMResultVarRecursive::V1_0::ReadFromJsonObject(const QJsonObject& jsonObj
 }
 
 
-bool CCDMResultVarRecursive::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CCDMResultVarRecursive::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("dataModelTitle") && jsonObject["dataModelTitle"].isString()){
 		dataModelTitle = jsonObject["dataModelTitle"].toString();
@@ -12496,243 +9966,13 @@ bool CCDMResultVarRecursive::V1_0::OptReadFromJsonObject(const QJsonObject& json
 
 // serialize methods
 
-bool CCDMResultVarRecursive::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCDMResultVarRecursive::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCDMResultVarRecursive::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCDMResultVarRecursive::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCDMResultVarRecursive::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCDMResultVarRecursive::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCDMResultVarRecursive::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCDMResultVarRecursive::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCDMResultVarRecursive::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CCDMResultVarString::V1_0::GetVersionId()
+QByteArray CCDMResultVarString::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CCDMResultVarString::V1_0::operator==(const V1_0& other) const
+bool CCDMResultVarString::operator==(const CCDMResultVarString& other) const
 {
 	return 
 				dataModelTitle == other.dataModelTitle &&
@@ -12743,7 +9983,7 @@ bool CCDMResultVarString::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CCDMResultVarString::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CCDMResultVarString::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "CDMResultVarString", modelIndex);
 
@@ -12798,7 +10038,7 @@ bool CCDMResultVarString::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, i
 }
 
 
-bool CCDMResultVarString::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CCDMResultVarString::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant dataModelTitleData = model.GetData("dataModelTitle", modelIndex);
 	if (dataModelTitleData.isNull()){
@@ -12860,7 +10100,7 @@ bool CCDMResultVarString::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& m
 }
 
 
-bool CCDMResultVarString::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CCDMResultVarString::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant dataModelTitleData = model.GetData("dataModelTitle", modelIndex);
 	if (!dataModelTitleData.isNull()){
@@ -12916,7 +10156,7 @@ bool CCDMResultVarString::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel
 }
 
 
-bool CCDMResultVarString::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CCDMResultVarString::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!dataModelTitle){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
@@ -12971,7 +10211,7 @@ bool CCDMResultVarString::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& 
 }
 
 
-bool CCDMResultVarString::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CCDMResultVarString::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("dataModelTitle") || (gqlObject["dataModelTitle"].userType() != QMetaType::QString && gqlObject["dataModelTitle"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
@@ -13037,7 +10277,7 @@ bool CCDMResultVarString::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 }
 
 
-bool CCDMResultVarString::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CCDMResultVarString::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("dataModelTitle") && (gqlObject["dataModelTitle"].userType() == QMetaType::QString || gqlObject["dataModelTitle"].userType() == QMetaType::QByteArray)){
 		dataModelTitle = gqlObject["dataModelTitle"].toString();
@@ -13097,7 +10337,7 @@ bool CCDMResultVarString::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlPar
 }
 
 
-bool CCDMResultVarString::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CCDMResultVarString::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!dataModelTitle){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
@@ -13152,7 +10392,7 @@ bool CCDMResultVarString::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CCDMResultVarString::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CCDMResultVarString::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("dataModelTitle") || ! jsonObject["dataModelTitle"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
@@ -13207,7 +10447,7 @@ bool CCDMResultVarString::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject
 }
 
 
-bool CCDMResultVarString::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CCDMResultVarString::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("dataModelTitle") && jsonObject["dataModelTitle"].isString()){
 		dataModelTitle = jsonObject["dataModelTitle"].toString();
@@ -13258,243 +10498,13 @@ bool CCDMResultVarString::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObj
 
 // serialize methods
 
-bool CCDMResultVarString::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCDMResultVarString::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCDMResultVarString::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCDMResultVarString::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCDMResultVarString::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCDMResultVarString::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCDMResultVarString::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCDMResultVarString::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCDMResultVarString::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CCDMResult::V1_0::GetVersionId()
+QByteArray CCDMResult::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CCDMResult::V1_0::operator==(const V1_0& other) const
+bool CCDMResult::operator==(const CCDMResult& other) const
 {
 	return 
 				dataModelTitle == other.dataModelTitle &&
@@ -13505,7 +10515,7 @@ bool CCDMResult::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CCDMResult::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CCDMResult::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "CDMResult", modelIndex);
 
@@ -13573,7 +10583,7 @@ bool CCDMResult::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelI
 }
 
 
-bool CCDMResult::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CCDMResult::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant dataModelTitleData = model.GetData("dataModelTitle", modelIndex);
 	if (dataModelTitleData.isNull()){
@@ -13657,7 +10667,7 @@ bool CCDMResult::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int
 }
 
 
-bool CCDMResult::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CCDMResult::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant dataModelTitleData = model.GetData("dataModelTitle", modelIndex);
 	if (!dataModelTitleData.isNull()){
@@ -13735,7 +10745,7 @@ bool CCDMResult::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, 
 }
 
 
-bool CCDMResult::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CCDMResult::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!dataModelTitle){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
@@ -13803,7 +10813,7 @@ bool CCDMResult::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject
 }
 
 
-bool CCDMResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CCDMResult::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("dataModelTitle") || (gqlObject["dataModelTitle"].userType() != QMetaType::QString && gqlObject["dataModelTitle"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
@@ -13892,7 +10902,7 @@ bool CCDMResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 }
 
 
-bool CCDMResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CCDMResult::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("dataModelTitle") && (gqlObject["dataModelTitle"].userType() == QMetaType::QString || gqlObject["dataModelTitle"].userType() == QMetaType::QByteArray)){
 		dataModelTitle = gqlObject["dataModelTitle"].toString();
@@ -13975,7 +10985,7 @@ bool CCDMResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 }
 
 
-bool CCDMResult::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CCDMResult::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!dataModelTitle){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
@@ -14047,7 +11057,7 @@ bool CCDMResult::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CCDMResult::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CCDMResult::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("dataModelTitle") || ! jsonObject["dataModelTitle"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
@@ -14123,7 +11133,7 @@ bool CCDMResult::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CCDMResult::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CCDMResult::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("dataModelTitle") && jsonObject["dataModelTitle"].isString()){
 		dataModelTitle = jsonObject["dataModelTitle"].toString();
@@ -14195,250 +11205,20 @@ bool CCDMResult::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CCDMResult::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCDMResult::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCDMResult::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCDMResult::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCDMResult::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCDMResult::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCDMResult::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCDMResult::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCDMResult::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CPointsInCoordinateFormat::V1_0::GetVersionId()
+QByteArray CPointsInCoordinateFormat::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CPointsInCoordinateFormat::V1_0::operator==(const V1_0& other) const
+bool CPointsInCoordinateFormat::operator==(const CPointsInCoordinateFormat& other) const
 {
 	return 
 				pointAsCoordinates == other.pointAsCoordinates;
 }
 
 
-bool CPointsInCoordinateFormat::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CPointsInCoordinateFormat::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "PointsInCoordinateFormat", modelIndex);
 
@@ -14451,7 +11231,7 @@ bool CPointsInCoordinateFormat::V1_0::WriteToModel(::imtbase::CTreeItemModel& mo
 }
 
 
-bool CPointsInCoordinateFormat::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CPointsInCoordinateFormat::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant pointAsCoordinatesData = model.GetData("pointAsCoordinates", modelIndex);
 	if (!pointAsCoordinatesData.isNull()){
@@ -14462,7 +11242,7 @@ bool CPointsInCoordinateFormat::V1_0::ReadFromModel(const ::imtbase::CTreeItemMo
 }
 
 
-bool CPointsInCoordinateFormat::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CPointsInCoordinateFormat::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant pointAsCoordinatesData = model.GetData("pointAsCoordinates", modelIndex);
 	if (!pointAsCoordinatesData.isNull()){
@@ -14473,7 +11253,7 @@ bool CPointsInCoordinateFormat::V1_0::OptReadFromModel(const ::imtbase::CTreeIte
 }
 
 
-bool CPointsInCoordinateFormat::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CPointsInCoordinateFormat::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (pointAsCoordinates){
 		gqlObject.InsertParam("pointAsCoordinates", QVariant(*pointAsCoordinates));
@@ -14485,7 +11265,7 @@ bool CPointsInCoordinateFormat::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamOb
 }
 
 
-bool CPointsInCoordinateFormat::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CPointsInCoordinateFormat::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("pointAsCoordinates") && (gqlObject["pointAsCoordinates"].userType() == QMetaType::Bool)){
 		pointAsCoordinates = gqlObject["pointAsCoordinates"].toBool();
@@ -14495,7 +11275,7 @@ bool CPointsInCoordinateFormat::V1_0::ReadFromGraphQlObject(const ::imtgql::CGql
 }
 
 
-bool CPointsInCoordinateFormat::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CPointsInCoordinateFormat::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("pointAsCoordinates") && (gqlObject["pointAsCoordinates"].userType() == QMetaType::Bool)){
 		pointAsCoordinates = gqlObject["pointAsCoordinates"].toBool();
@@ -14505,7 +11285,7 @@ bool CPointsInCoordinateFormat::V1_0::OptReadFromGraphQlObject(const ::imtgql::C
 }
 
 
-bool CPointsInCoordinateFormat::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CPointsInCoordinateFormat::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (pointAsCoordinates){
 		jsonObject["pointAsCoordinates"] = QJsonValue::fromVariant(*pointAsCoordinates);
@@ -14517,7 +11297,7 @@ bool CPointsInCoordinateFormat::V1_0::WriteToJsonObject(QJsonObject& jsonObject)
 }
 
 
-bool CPointsInCoordinateFormat::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CPointsInCoordinateFormat::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("pointAsCoordinates") && jsonObject["pointAsCoordinates"].isBool()){
 		pointAsCoordinates = jsonObject["pointAsCoordinates"].toBool();
@@ -14527,7 +11307,7 @@ bool CPointsInCoordinateFormat::V1_0::ReadFromJsonObject(const QJsonObject& json
 }
 
 
-bool CPointsInCoordinateFormat::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CPointsInCoordinateFormat::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("pointAsCoordinates") && jsonObject["pointAsCoordinates"].isBool()){
 		pointAsCoordinates = jsonObject["pointAsCoordinates"].toBool();
@@ -14539,243 +11319,13 @@ bool CPointsInCoordinateFormat::V1_0::OptReadFromJsonObject(const QJsonObject& j
 
 // serialize methods
 
-bool CPointsInCoordinateFormat::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPointsInCoordinateFormat::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPointsInCoordinateFormat::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPointsInCoordinateFormat::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPointsInCoordinateFormat::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPointsInCoordinateFormat::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPointsInCoordinateFormat::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPointsInCoordinateFormat::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPointsInCoordinateFormat::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CCollectionViewParamsTest::V1_0::GetVersionId()
+QByteArray CCollectionViewParamsTest::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CCollectionViewParamsTest::V1_0::operator==(const V1_0& other) const
+bool CCollectionViewParamsTest::operator==(const CCollectionViewParamsTest& other) const
 {
 	return 
 				count == other.count &&
@@ -14784,7 +11334,7 @@ bool CCollectionViewParamsTest::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CCollectionViewParamsTest::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CCollectionViewParamsTest::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "CollectionViewParamsTest", modelIndex);
 
@@ -14812,7 +11362,7 @@ bool CCollectionViewParamsTest::V1_0::WriteToModel(::imtbase::CTreeItemModel& mo
 }
 
 
-bool CCollectionViewParamsTest::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CCollectionViewParamsTest::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant countData = model.GetData("count", modelIndex);
 	if (!countData.isNull()){
@@ -14839,7 +11389,7 @@ bool CCollectionViewParamsTest::V1_0::ReadFromModel(const ::imtbase::CTreeItemMo
 }
 
 
-bool CCollectionViewParamsTest::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CCollectionViewParamsTest::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant countData = model.GetData("count", modelIndex);
 	if (!countData.isNull()){
@@ -14866,7 +11416,7 @@ bool CCollectionViewParamsTest::V1_0::OptReadFromModel(const ::imtbase::CTreeIte
 }
 
 
-bool CCollectionViewParamsTest::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CCollectionViewParamsTest::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (count){
 		gqlObject.InsertParam("count", QVariant(*count));
@@ -14893,7 +11443,7 @@ bool CCollectionViewParamsTest::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamOb
 }
 
 
-bool CCollectionViewParamsTest::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CCollectionViewParamsTest::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("count") && (gqlObject["count"].userType() == QMetaType::Int || gqlObject["count"].userType() == QMetaType::UInt || gqlObject["count"].userType() == QMetaType::LongLong || gqlObject["count"].userType() == QMetaType::ULongLong || gqlObject["count"].userType() == QMetaType::Long || gqlObject["count"].userType() == QMetaType::Short || gqlObject["count"].userType() == QMetaType::ULong || gqlObject["count"].userType() == QMetaType::UShort || gqlObject["count"].userType() == QMetaType::UChar)){
 		count = gqlObject["count"].toInt();
@@ -14917,7 +11467,7 @@ bool CCollectionViewParamsTest::V1_0::ReadFromGraphQlObject(const ::imtgql::CGql
 }
 
 
-bool CCollectionViewParamsTest::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CCollectionViewParamsTest::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("count") && (gqlObject["count"].userType() == QMetaType::Int || gqlObject["count"].userType() == QMetaType::UInt || gqlObject["count"].userType() == QMetaType::LongLong || gqlObject["count"].userType() == QMetaType::ULongLong || gqlObject["count"].userType() == QMetaType::Long || gqlObject["count"].userType() == QMetaType::Short || gqlObject["count"].userType() == QMetaType::ULong || gqlObject["count"].userType() == QMetaType::UShort || gqlObject["count"].userType() == QMetaType::UChar)){
 		count = gqlObject["count"].toInt();
@@ -14941,7 +11491,7 @@ bool CCollectionViewParamsTest::V1_0::OptReadFromGraphQlObject(const ::imtgql::C
 }
 
 
-bool CCollectionViewParamsTest::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CCollectionViewParamsTest::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (count){
 		jsonObject["count"] = QJsonValue::fromVariant(*count);
@@ -14968,7 +11518,7 @@ bool CCollectionViewParamsTest::V1_0::WriteToJsonObject(QJsonObject& jsonObject)
 }
 
 
-bool CCollectionViewParamsTest::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CCollectionViewParamsTest::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("count") && jsonObject["count"].isDouble()){
 		count = jsonObject["count"].toInt();
@@ -14992,7 +11542,7 @@ bool CCollectionViewParamsTest::V1_0::ReadFromJsonObject(const QJsonObject& json
 }
 
 
-bool CCollectionViewParamsTest::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CCollectionViewParamsTest::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("count") && jsonObject["count"].isDouble()){
 		count = jsonObject["count"].toInt();
@@ -15018,238 +11568,7 @@ bool CCollectionViewParamsTest::V1_0::OptReadFromJsonObject(const QJsonObject& j
 
 // serialize methods
 
-bool CCollectionViewParamsTest::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCollectionViewParamsTest::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCollectionViewParamsTest::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCollectionViewParamsTest::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCollectionViewParamsTest::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCollectionViewParamsTest::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCollectionViewParamsTest::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCollectionViewParamsTest::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCollectionViewParamsTest::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
 CResultObject::CResultObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CResultObject::areaResultChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CResultObject::expectedMinValueChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -15268,9 +11587,9 @@ CResultObject::CResultObject(QObject* parent): ::imtbase::CItemModelBase(parent)
 
 QVariant CResultObject::GetAreaResult()
 {
-	if (Version_1_0 && Version_1_0->AreaResult){
-		sdl::complextest::ComplexUnion1::StatusCode valueType = Version_1_0->AreaResult.value();
-		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::StatusCode>();
+	if (AreaResult){
+		sdl::V1_0::complextest::StatusCode valueType = AreaResult.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 		QString retval = metaEnum.valueToKey((int)valueType);
 
 		return retval;
@@ -15282,15 +11601,12 @@ QVariant CResultObject::GetAreaResult()
 
 void CResultObject::SetAreaResult(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->AreaResult.emplace();
-	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::StatusCode>();
+	AreaResult.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
-		Version_1_0->AreaResult = (sdl::complextest::ComplexUnion1::StatusCode)key;
+		AreaResult = (sdl::V1_0::complextest::StatusCode)key;
 	}
 	areaResultChanged();
 }
@@ -15298,14 +11614,14 @@ void CResultObject::SetAreaResult(const QVariant& v)
 
 bool CResultObject::hasAreaResult()
 {
-	 return Version_1_0 && Version_1_0->AreaResult.HasValue();
+	 return AreaResult.HasValue();
 }
 
 
 QVariant CResultObject::GetExpectedMinValue()
 {
-	if (Version_1_0 && Version_1_0->ExpectedMinValue){
-		return Version_1_0->ExpectedMinValue.value();
+	if (ExpectedMinValue){
+		return ExpectedMinValue.value();
 	}
 
 	return QVariant();
@@ -15314,25 +11630,22 @@ QVariant CResultObject::GetExpectedMinValue()
 
 void CResultObject::SetExpectedMinValue(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->ExpectedMinValue = v.value<double>();
+	ExpectedMinValue = v.value<double>();
 	expectedMinValueChanged();
 }
 
 
 bool CResultObject::hasExpectedMinValue()
 {
-	 return Version_1_0 && Version_1_0->ExpectedMinValue.HasValue();
+	 return ExpectedMinValue.HasValue();
 }
 
 
 QVariant CResultObject::GetExpectedMaxValue()
 {
-	if (Version_1_0 && Version_1_0->ExpectedMaxValue){
-		return Version_1_0->ExpectedMaxValue.value();
+	if (ExpectedMaxValue){
+		return ExpectedMaxValue.value();
 	}
 
 	return QVariant();
@@ -15341,25 +11654,22 @@ QVariant CResultObject::GetExpectedMaxValue()
 
 void CResultObject::SetExpectedMaxValue(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->ExpectedMaxValue = v.value<double>();
+	ExpectedMaxValue = v.value<double>();
 	expectedMaxValueChanged();
 }
 
 
 bool CResultObject::hasExpectedMaxValue()
 {
-	 return Version_1_0 && Version_1_0->ExpectedMaxValue.HasValue();
+	 return ExpectedMaxValue.HasValue();
 }
 
 
 QVariant CResultObject::GetMeasuredValue()
 {
-	if (Version_1_0 && Version_1_0->MeasuredValue){
-		return Version_1_0->MeasuredValue.value();
+	if (MeasuredValue){
+		return MeasuredValue.value();
 	}
 
 	return QVariant();
@@ -15368,25 +11678,22 @@ QVariant CResultObject::GetMeasuredValue()
 
 void CResultObject::SetMeasuredValue(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->MeasuredValue = v.value<double>();
+	MeasuredValue = v.value<double>();
 	measuredValueChanged();
 }
 
 
 bool CResultObject::hasMeasuredValue()
 {
-	 return Version_1_0 && Version_1_0->MeasuredValue.HasValue();
+	 return MeasuredValue.HasValue();
 }
 
 
 QVariant CResultObject::GetMinMeasuredValue()
 {
-	if (Version_1_0 && Version_1_0->MinMeasuredValue){
-		return Version_1_0->MinMeasuredValue.value();
+	if (MinMeasuredValue){
+		return MinMeasuredValue.value();
 	}
 
 	return QVariant();
@@ -15395,25 +11702,22 @@ QVariant CResultObject::GetMinMeasuredValue()
 
 void CResultObject::SetMinMeasuredValue(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->MinMeasuredValue = v.value<double>();
+	MinMeasuredValue = v.value<double>();
 	minMeasuredValueChanged();
 }
 
 
 bool CResultObject::hasMinMeasuredValue()
 {
-	 return Version_1_0 && Version_1_0->MinMeasuredValue.HasValue();
+	 return MinMeasuredValue.HasValue();
 }
 
 
 QVariant CResultObject::GetMaxMeasuredValue()
 {
-	if (Version_1_0 && Version_1_0->MaxMeasuredValue){
-		return Version_1_0->MaxMeasuredValue.value();
+	if (MaxMeasuredValue){
+		return MaxMeasuredValue.value();
 	}
 
 	return QVariant();
@@ -15422,25 +11726,22 @@ QVariant CResultObject::GetMaxMeasuredValue()
 
 void CResultObject::SetMaxMeasuredValue(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->MaxMeasuredValue = v.value<double>();
+	MaxMeasuredValue = v.value<double>();
 	maxMeasuredValueChanged();
 }
 
 
 bool CResultObject::hasMaxMeasuredValue()
 {
-	 return Version_1_0 && Version_1_0->MaxMeasuredValue.HasValue();
+	 return MaxMeasuredValue.HasValue();
 }
 
 
 QVariant CResultObject::GetMeanMeasuredValue()
 {
-	if (Version_1_0 && Version_1_0->MeanMeasuredValue){
-		return Version_1_0->MeanMeasuredValue.value();
+	if (MeanMeasuredValue){
+		return MeanMeasuredValue.value();
 	}
 
 	return QVariant();
@@ -15449,26 +11750,23 @@ QVariant CResultObject::GetMeanMeasuredValue()
 
 void CResultObject::SetMeanMeasuredValue(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->MeanMeasuredValue = v.value<double>();
+	MeanMeasuredValue = v.value<double>();
 	meanMeasuredValueChanged();
 }
 
 
 bool CResultObject::hasMeanMeasuredValue()
 {
-	 return Version_1_0 && Version_1_0->MeanMeasuredValue.HasValue();
+	 return MeanMeasuredValue.HasValue();
 }
 
 
 QVariant CResultObject::GetMeasurementType()
 {
-	if (Version_1_0 && Version_1_0->MeasurementType){
-		sdl::complextest::ComplexUnion1::MeasurementType valueType = Version_1_0->MeasurementType.value();
-		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::MeasurementType>();
+	if (MeasurementType){
+		sdl::V1_0::complextest::MeasurementType valueType = MeasurementType.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::MeasurementType>();
 		QString retval = metaEnum.valueToKey((int)valueType);
 
 		return retval;
@@ -15480,15 +11778,12 @@ QVariant CResultObject::GetMeasurementType()
 
 void CResultObject::SetMeasurementType(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->MeasurementType.emplace();
-	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::MeasurementType>();
+	MeasurementType.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::MeasurementType>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
-		Version_1_0->MeasurementType = (sdl::complextest::ComplexUnion1::MeasurementType)key;
+		MeasurementType = (sdl::V1_0::complextest::MeasurementType)key;
 	}
 	measurementTypeChanged();
 }
@@ -15496,15 +11791,15 @@ void CResultObject::SetMeasurementType(const QVariant& v)
 
 bool CResultObject::hasMeasurementType()
 {
-	 return Version_1_0 && Version_1_0->MeasurementType.HasValue();
+	 return MeasurementType.HasValue();
 }
 
 
 QVariant CResultObject::GetMeasurementUnit()
 {
-	if (Version_1_0 && Version_1_0->MeasurementUnit){
-		sdl::complextest::ComplexUnion1::MeasurementUnit valueType = Version_1_0->MeasurementUnit.value();
-		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::MeasurementUnit>();
+	if (MeasurementUnit){
+		sdl::V1_0::complextest::MeasurementUnit valueType = MeasurementUnit.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::MeasurementUnit>();
 		QString retval = metaEnum.valueToKey((int)valueType);
 
 		return retval;
@@ -15516,15 +11811,12 @@ QVariant CResultObject::GetMeasurementUnit()
 
 void CResultObject::SetMeasurementUnit(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->MeasurementUnit.emplace();
-	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::MeasurementUnit>();
+	MeasurementUnit.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::MeasurementUnit>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
-		Version_1_0->MeasurementUnit = (sdl::complextest::ComplexUnion1::MeasurementUnit)key;
+		MeasurementUnit = (sdl::V1_0::complextest::MeasurementUnit)key;
 	}
 	measurementUnitChanged();
 }
@@ -15532,14 +11824,14 @@ void CResultObject::SetMeasurementUnit(const QVariant& v)
 
 bool CResultObject::hasMeasurementUnit()
 {
-	 return Version_1_0 && Version_1_0->MeasurementUnit.HasValue();
+	 return MeasurementUnit.HasValue();
 }
 
 
 QVariant CResultObject::GetLength()
 {
-	if (Version_1_0 && Version_1_0->Length){
-		return Version_1_0->Length.value();
+	if (Length){
+		return Length.value();
 	}
 
 	return QVariant();
@@ -15548,26 +11840,23 @@ QVariant CResultObject::GetLength()
 
 void CResultObject::SetLength(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->Length = v.value<double>();
+	Length = v.value<double>();
 	lengthChanged();
 }
 
 
 bool CResultObject::hasLength()
 {
-	 return Version_1_0 && Version_1_0->Length.HasValue();
+	 return Length.HasValue();
 }
 
 
 QVariant CResultObject::GetErrorType()
 {
-	if (Version_1_0 && Version_1_0->ErrorType){
-		sdl::complextest::ComplexUnion1::ErrorCode valueType = Version_1_0->ErrorType.value();
-		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::ErrorCode>();
+	if (ErrorType){
+		sdl::V1_0::complextest::ErrorCode valueType = ErrorType.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::ErrorCode>();
 		QString retval = metaEnum.valueToKey((int)valueType);
 
 		return retval;
@@ -15579,15 +11868,12 @@ QVariant CResultObject::GetErrorType()
 
 void CResultObject::SetErrorType(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->ErrorType.emplace();
-	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::ErrorCode>();
+	ErrorType.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::ErrorCode>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
-		Version_1_0->ErrorType = (sdl::complextest::ComplexUnion1::ErrorCode)key;
+		ErrorType = (sdl::V1_0::complextest::ErrorCode)key;
 	}
 	errorTypeChanged();
 }
@@ -15595,17 +11881,17 @@ void CResultObject::SetErrorType(const QVariant& v)
 
 bool CResultObject::hasErrorType()
 {
-	 return Version_1_0 && Version_1_0->ErrorType.HasValue();
+	 return ErrorType.HasValue();
 }
 
 
 QVariant CResultObject::GetGeometry()
 {
-	if (Version_1_0 && Version_1_0->Geometry){
+	if (Geometry){
 		if (!m_geometryQObjectPtr.isValid()){
 			m_geometryQObjectPtr = CreateObject("Geometry");
-			auto itemPtr = m_geometryQObjectPtr.value<sdl::complextest::ComplexUnion1::CGeometryObject*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->Geometry;
+			auto itemPtr = m_geometryQObjectPtr.value<sdl::V1_0::complextest::CGeometryObject*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = Geometry;
 		}
 		return m_geometryQObjectPtr;
 	}
@@ -15616,16 +11902,13 @@ QVariant CResultObject::GetGeometry()
 
 void CResultObject::SetGeometry(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::complextest::ComplexUnion1::CGeometryObject* itemPtr = v.value<sdl::complextest::ComplexUnion1::CGeometryObject*>();
-		if (itemPtr != nullptr)  Version_1_0->Geometry = itemPtr->Version_1_0;
+		sdl::V1_0::complextest::CGeometryObject* itemPtr = v.value<sdl::V1_0::complextest::CGeometryObject*>();
+		if (itemPtr != nullptr)  Geometry = static_cast<const decltype(Geometry)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->Geometry = nullptr;
+		Geometry = nullptr;
 	}
 	m_geometryQObjectPtr = v;
 
@@ -15635,17 +11918,14 @@ void CResultObject::SetGeometry(const QVariant& v)
 
 bool CResultObject::hasGeometry()
 {
-	 return Version_1_0 && Version_1_0->Geometry.HasValue();
+	 return Geometry.HasValue();
 }
 
 
 void CResultObject::emplaceGeometry()
 {
 	ResetGeometry();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->Geometry.emplace();
+	Geometry.emplace();
 }
 
 
@@ -15707,7 +11987,7 @@ QString CResultObject::toGraphQL() const
 QVariant CResultObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "Geometry"){
-		return QVariant::fromValue(new sdl::complextest::ComplexUnion1::CGeometryObject(this));
+		return QVariant::fromValue(new sdl::V1_0::complextest::CGeometryObject(this));
 	}
 	return QVariant();
 }
@@ -15777,110 +12057,110 @@ QVariantMap CResultObjectList::get(int row) const
 }
 
 
-void CResultObjectList::append(sdl::complextest::ComplexUnion2::CResultObject* item)
+void CResultObjectList::append(sdl::V1_0::complextest::CResultObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::complextest::ComplexUnion2::CResultObjectList* sdl::complextest::ComplexUnion2::CResultObjectList::copyMe()
+sdl::V1_0::complextest::CResultObjectList* sdl::V1_0::complextest::CResultObjectList::copyMe()
 {
-	sdl::complextest::ComplexUnion2::CResultObjectList* retVal = new sdl::complextest::ComplexUnion2::CResultObjectList();
+	sdl::V1_0::complextest::CResultObjectList* retVal = new sdl::V1_0::complextest::CResultObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::complextest::ComplexUnion2::CResultObjectList::toJson()
+QString sdl::V1_0::complextest::CResultObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::complextest::ComplexUnion2::CResultObjectList::toGraphQL()
+QString sdl::V1_0::complextest::CResultObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::complextest::ComplexUnion2::CResultObjectList::addElement(sdl::complextest::ComplexUnion2::CResultObject* item)
+void sdl::V1_0::complextest::CResultObjectList::addElement(sdl::V1_0::complextest::CResultObject* item)
 {
 	append(item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CResultObjectList::removeElement(int index)
+void sdl::V1_0::complextest::CResultObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::complextest::ComplexUnion2::CResultObjectList::isEqualWithModel(sdl::complextest::ComplexUnion2::CResultObjectList* otherModelPtr)
+bool sdl::V1_0::complextest::CResultObjectList::isEqualWithModel(sdl::V1_0::complextest::CResultObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::complextest::ComplexUnion2::CResultObjectList::insert(int index, sdl::complextest::ComplexUnion2::CResultObject* item)
+void sdl::V1_0::complextest::CResultObjectList::insert(int index, sdl::V1_0::complextest::CResultObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CResultObjectList::remove(int index)
+void sdl::V1_0::complextest::CResultObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::complextest::ComplexUnion2::CResultObjectList::clear()
+void sdl::V1_0::complextest::CResultObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::complextest::ComplexUnion2::CResultObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CResultObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::complextest::ComplexUnion2::CResultObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::complextest::CResultObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_areaResult"){
-		return QVariant::fromValue(Version_1_0->at(index)->AreaResult.value());
+		return QVariant::fromValue(at(index)->AreaResult.value());
 	}
 	if (nameId == "m_expectedMinValue"){
-		return QVariant::fromValue(Version_1_0->at(index)->ExpectedMinValue.value());
+		return QVariant::fromValue(at(index)->ExpectedMinValue.value());
 	}
 	if (nameId == "m_expectedMaxValue"){
-		return QVariant::fromValue(Version_1_0->at(index)->ExpectedMaxValue.value());
+		return QVariant::fromValue(at(index)->ExpectedMaxValue.value());
 	}
 	if (nameId == "m_measuredValue"){
-		return QVariant::fromValue(Version_1_0->at(index)->MeasuredValue.value());
+		return QVariant::fromValue(at(index)->MeasuredValue.value());
 	}
 	if (nameId == "m_minMeasuredValue"){
-		return QVariant::fromValue(Version_1_0->at(index)->MinMeasuredValue.value());
+		return QVariant::fromValue(at(index)->MinMeasuredValue.value());
 	}
 	if (nameId == "m_maxMeasuredValue"){
-		return QVariant::fromValue(Version_1_0->at(index)->MaxMeasuredValue.value());
+		return QVariant::fromValue(at(index)->MaxMeasuredValue.value());
 	}
 	if (nameId == "m_meanMeasuredValue"){
-		return QVariant::fromValue(Version_1_0->at(index)->MeanMeasuredValue.value());
+		return QVariant::fromValue(at(index)->MeanMeasuredValue.value());
 	}
 	if (nameId == "m_measurementType"){
-		return QVariant::fromValue(Version_1_0->at(index)->MeasurementType.value());
+		return QVariant::fromValue(at(index)->MeasurementType.value());
 	}
 	if (nameId == "m_measurementUnit"){
-		return QVariant::fromValue(Version_1_0->at(index)->MeasurementUnit.value());
+		return QVariant::fromValue(at(index)->MeasurementUnit.value());
 	}
 	if (nameId == "m_length"){
-		return QVariant::fromValue(Version_1_0->at(index)->Length.value());
+		return QVariant::fromValue(at(index)->Length.value());
 	}
 	if (nameId == "m_errorType"){
-		return QVariant::fromValue(Version_1_0->at(index)->ErrorType.value());
+		return QVariant::fromValue(at(index)->ErrorType.value());
 	}
 	if (nameId == "m_geometry"){
 		return itemPtr->GetGeometry();
@@ -15889,7 +12169,6 @@ QVariant sdl::complextest::ComplexUnion2::CResultObjectList::getData(const QStri
 	return QVariant();
 }
 CAreaObject::CAreaObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CAreaObject::areaNameChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CAreaObject::statusChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -15901,8 +12180,8 @@ CAreaObject::CAreaObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
 QVariant CAreaObject::GetAreaName()
 {
-	if (Version_1_0 && Version_1_0->AreaName){
-		return Version_1_0->AreaName.value();
+	if (AreaName){
+		return AreaName.value();
 	}
 
 	return QVariant();
@@ -15911,26 +12190,23 @@ QVariant CAreaObject::GetAreaName()
 
 void CAreaObject::SetAreaName(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->AreaName = v.value<QString>();
+	AreaName = v.value<QString>();
 	areaNameChanged();
 }
 
 
 bool CAreaObject::hasAreaName()
 {
-	 return Version_1_0 && Version_1_0->AreaName.HasValue();
+	 return AreaName.HasValue();
 }
 
 
 QVariant CAreaObject::GetStatus()
 {
-	if (Version_1_0 && Version_1_0->Status){
-		sdl::complextest::ComplexUnion1::StatusCode valueType = Version_1_0->Status.value();
-		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::StatusCode>();
+	if (Status){
+		sdl::V1_0::complextest::StatusCode valueType = Status.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 		QString retval = metaEnum.valueToKey((int)valueType);
 
 		return retval;
@@ -15942,15 +12218,12 @@ QVariant CAreaObject::GetStatus()
 
 void CAreaObject::SetStatus(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->Status.emplace();
-	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::StatusCode>();
+	Status.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
-		Version_1_0->Status = (sdl::complextest::ComplexUnion1::StatusCode)key;
+		Status = (sdl::V1_0::complextest::StatusCode)key;
 	}
 	statusChanged();
 }
@@ -15958,17 +12231,17 @@ void CAreaObject::SetStatus(const QVariant& v)
 
 bool CAreaObject::hasStatus()
 {
-	 return Version_1_0 && Version_1_0->Status.HasValue();
+	 return Status.HasValue();
 }
 
 
 QVariant CAreaObject::GetIconPosition()
 {
-	if (Version_1_0 && Version_1_0->IconPosition){
+	if (IconPosition){
 		if (!m_iconPositionQObjectPtr.isValid()){
 			m_iconPositionQObjectPtr = CreateObject("IconPosition");
-			auto itemPtr = m_iconPositionQObjectPtr.value<sdl::complextest::ComplexUnion1::CPointObject*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->IconPosition;
+			auto itemPtr = m_iconPositionQObjectPtr.value<sdl::V1_0::complextest::CPointObject*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = IconPosition;
 		}
 		return m_iconPositionQObjectPtr;
 	}
@@ -15979,16 +12252,13 @@ QVariant CAreaObject::GetIconPosition()
 
 void CAreaObject::SetIconPosition(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::complextest::ComplexUnion1::CPointObject* itemPtr = v.value<sdl::complextest::ComplexUnion1::CPointObject*>();
-		if (itemPtr != nullptr)  Version_1_0->IconPosition = itemPtr->Version_1_0;
+		sdl::V1_0::complextest::CPointObject* itemPtr = v.value<sdl::V1_0::complextest::CPointObject*>();
+		if (itemPtr != nullptr)  IconPosition = static_cast<const decltype(IconPosition)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->IconPosition = nullptr;
+		IconPosition = nullptr;
 	}
 	m_iconPositionQObjectPtr = v;
 
@@ -15998,17 +12268,14 @@ void CAreaObject::SetIconPosition(const QVariant& v)
 
 bool CAreaObject::hasIconPosition()
 {
-	 return Version_1_0 && Version_1_0->IconPosition.HasValue();
+	 return IconPosition.HasValue();
 }
 
 
 void CAreaObject::emplaceIconPosition()
 {
 	ResetIconPosition();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->IconPosition.emplace();
+	IconPosition.emplace();
 }
 
 
@@ -16024,9 +12291,9 @@ void CAreaObject::ResetIconPosition()
 
 QVariant CAreaObject::GetErrorType()
 {
-	if (Version_1_0 && Version_1_0->ErrorType){
-		sdl::complextest::ComplexUnion1::ErrorCode valueType = Version_1_0->ErrorType.value();
-		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::ErrorCode>();
+	if (ErrorType){
+		sdl::V1_0::complextest::ErrorCode valueType = ErrorType.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::ErrorCode>();
 		QString retval = metaEnum.valueToKey((int)valueType);
 
 		return retval;
@@ -16038,15 +12305,12 @@ QVariant CAreaObject::GetErrorType()
 
 void CAreaObject::SetErrorType(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->ErrorType.emplace();
-	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::ErrorCode>();
+	ErrorType.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::ErrorCode>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
-		Version_1_0->ErrorType = (sdl::complextest::ComplexUnion1::ErrorCode)key;
+		ErrorType = (sdl::V1_0::complextest::ErrorCode)key;
 	}
 	errorTypeChanged();
 }
@@ -16054,17 +12318,17 @@ void CAreaObject::SetErrorType(const QVariant& v)
 
 bool CAreaObject::hasErrorType()
 {
-	 return Version_1_0 && Version_1_0->ErrorType.HasValue();
+	 return ErrorType.HasValue();
 }
 
 
 QVariant CAreaObject::GetResults()
 {
-	if (Version_1_0 && Version_1_0->Results){
+	if (Results){
 		if (!m_resultsQObjectPtr.isValid()){
 			m_resultsQObjectPtr = CreateObject("Results");
-			auto itemPtr = m_resultsQObjectPtr.value<sdl::complextest::ComplexUnion2::CResultObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->Results;
+			auto itemPtr = m_resultsQObjectPtr.value<sdl::V1_0::complextest::CResultObjectList*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = Results;
 		}
 		return m_resultsQObjectPtr;
 	}
@@ -16075,16 +12339,13 @@ QVariant CAreaObject::GetResults()
 
 void CAreaObject::SetResults(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::complextest::ComplexUnion2::CResultObjectList* itemPtr = v.value<sdl::complextest::ComplexUnion2::CResultObjectList*>();
-		if (itemPtr != nullptr)  Version_1_0->Results = itemPtr->Version_1_0;
+		sdl::V1_0::complextest::CResultObjectList* itemPtr = v.value<sdl::V1_0::complextest::CResultObjectList*>();
+		if (itemPtr != nullptr)  Results = static_cast<const decltype(Results)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->Results = nullptr;
+		Results = nullptr;
 	}
 	m_resultsQObjectPtr = v;
 
@@ -16094,17 +12355,14 @@ void CAreaObject::SetResults(const QVariant& v)
 
 bool CAreaObject::hasResults()
 {
-	 return Version_1_0 && Version_1_0->Results.HasValue();
+	 return Results.HasValue();
 }
 
 
 void CAreaObject::emplaceResults()
 {
 	ResetResults();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->Results.emplace();
+	Results.emplace();
 }
 
 
@@ -16121,7 +12379,7 @@ void CAreaObject::ResetResults()
 QVariant CAreaObject::createResultsArrayElement(const QVariant& v)
 {
 	Q_UNUSED(v);
-	return QVariant::fromValue(new sdl::complextest::ComplexUnion2::CResultObject());
+	return QVariant::fromValue(new sdl::V1_0::complextest::CResultObject());
 }
 
 
@@ -16173,10 +12431,10 @@ QString CAreaObject::toGraphQL() const
 QVariant CAreaObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "IconPosition"){
-		return QVariant::fromValue(new sdl::complextest::ComplexUnion1::CPointObject(this));
+		return QVariant::fromValue(new sdl::V1_0::complextest::CPointObject(this));
 	}
 	if (key == "Results"){
-		return QVariant::fromValue(new sdl::complextest::ComplexUnion2::CResultObjectList(this));
+		return QVariant::fromValue(new sdl::V1_0::complextest::CResultObjectList(this));
 	}
 	return QVariant();
 }
@@ -16225,89 +12483,89 @@ QVariantMap CAreaObjectList::get(int row) const
 }
 
 
-void CAreaObjectList::append(sdl::complextest::ComplexUnion2::CAreaObject* item)
+void CAreaObjectList::append(sdl::V1_0::complextest::CAreaObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::complextest::ComplexUnion2::CAreaObjectList* sdl::complextest::ComplexUnion2::CAreaObjectList::copyMe()
+sdl::V1_0::complextest::CAreaObjectList* sdl::V1_0::complextest::CAreaObjectList::copyMe()
 {
-	sdl::complextest::ComplexUnion2::CAreaObjectList* retVal = new sdl::complextest::ComplexUnion2::CAreaObjectList();
+	sdl::V1_0::complextest::CAreaObjectList* retVal = new sdl::V1_0::complextest::CAreaObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::complextest::ComplexUnion2::CAreaObjectList::toJson()
+QString sdl::V1_0::complextest::CAreaObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::complextest::ComplexUnion2::CAreaObjectList::toGraphQL()
+QString sdl::V1_0::complextest::CAreaObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::complextest::ComplexUnion2::CAreaObjectList::addElement(sdl::complextest::ComplexUnion2::CAreaObject* item)
+void sdl::V1_0::complextest::CAreaObjectList::addElement(sdl::V1_0::complextest::CAreaObject* item)
 {
 	append(item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CAreaObjectList::removeElement(int index)
+void sdl::V1_0::complextest::CAreaObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::complextest::ComplexUnion2::CAreaObjectList::isEqualWithModel(sdl::complextest::ComplexUnion2::CAreaObjectList* otherModelPtr)
+bool sdl::V1_0::complextest::CAreaObjectList::isEqualWithModel(sdl::V1_0::complextest::CAreaObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::complextest::ComplexUnion2::CAreaObjectList::insert(int index, sdl::complextest::ComplexUnion2::CAreaObject* item)
+void sdl::V1_0::complextest::CAreaObjectList::insert(int index, sdl::V1_0::complextest::CAreaObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CAreaObjectList::remove(int index)
+void sdl::V1_0::complextest::CAreaObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::complextest::ComplexUnion2::CAreaObjectList::clear()
+void sdl::V1_0::complextest::CAreaObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::complextest::ComplexUnion2::CAreaObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CAreaObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::complextest::ComplexUnion2::CAreaObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::complextest::CAreaObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_areaName"){
-		return QVariant::fromValue(Version_1_0->at(index)->AreaName.value());
+		return QVariant::fromValue(at(index)->AreaName.value());
 	}
 	if (nameId == "m_status"){
-		return QVariant::fromValue(Version_1_0->at(index)->Status.value());
+		return QVariant::fromValue(at(index)->Status.value());
 	}
 	if (nameId == "m_iconPosition"){
 		return itemPtr->GetIconPosition();
 	}
 	if (nameId == "m_errorType"){
-		return QVariant::fromValue(Version_1_0->at(index)->ErrorType.value());
+		return QVariant::fromValue(at(index)->ErrorType.value());
 	}
 	if (nameId == "m_results"){
 		return itemPtr->GetResults();
@@ -16316,7 +12574,6 @@ QVariant sdl::complextest::ComplexUnion2::CAreaObjectList::getData(const QString
 	return QVariant();
 }
 CAnalyzerObject::CAnalyzerObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CAnalyzerObject::analyzerNameChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CAnalyzerObject::analyzerResultChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -16326,8 +12583,8 @@ CAnalyzerObject::CAnalyzerObject(QObject* parent): ::imtbase::CItemModelBase(par
 
 QVariant CAnalyzerObject::GetAnalyzerName()
 {
-	if (Version_1_0 && Version_1_0->AnalyzerName){
-		return Version_1_0->AnalyzerName.value();
+	if (AnalyzerName){
+		return AnalyzerName.value();
 	}
 
 	return QVariant();
@@ -16336,26 +12593,23 @@ QVariant CAnalyzerObject::GetAnalyzerName()
 
 void CAnalyzerObject::SetAnalyzerName(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->AnalyzerName = v.value<QString>();
+	AnalyzerName = v.value<QString>();
 	analyzerNameChanged();
 }
 
 
 bool CAnalyzerObject::hasAnalyzerName()
 {
-	 return Version_1_0 && Version_1_0->AnalyzerName.HasValue();
+	 return AnalyzerName.HasValue();
 }
 
 
 QVariant CAnalyzerObject::GetAnalyzerResult()
 {
-	if (Version_1_0 && Version_1_0->AnalyzerResult){
-		sdl::complextest::ComplexUnion1::StatusCode valueType = Version_1_0->AnalyzerResult.value();
-		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::StatusCode>();
+	if (AnalyzerResult){
+		sdl::V1_0::complextest::StatusCode valueType = AnalyzerResult.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 		QString retval = metaEnum.valueToKey((int)valueType);
 
 		return retval;
@@ -16367,15 +12621,12 @@ QVariant CAnalyzerObject::GetAnalyzerResult()
 
 void CAnalyzerObject::SetAnalyzerResult(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->AnalyzerResult.emplace();
-	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::StatusCode>();
+	AnalyzerResult.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
-		Version_1_0->AnalyzerResult = (sdl::complextest::ComplexUnion1::StatusCode)key;
+		AnalyzerResult = (sdl::V1_0::complextest::StatusCode)key;
 	}
 	analyzerResultChanged();
 }
@@ -16383,17 +12634,17 @@ void CAnalyzerObject::SetAnalyzerResult(const QVariant& v)
 
 bool CAnalyzerObject::hasAnalyzerResult()
 {
-	 return Version_1_0 && Version_1_0->AnalyzerResult.HasValue();
+	 return AnalyzerResult.HasValue();
 }
 
 
 QVariant CAnalyzerObject::GetAreas()
 {
-	if (Version_1_0 && Version_1_0->Areas){
+	if (Areas){
 		if (!m_areasQObjectPtr.isValid()){
 			m_areasQObjectPtr = CreateObject("Areas");
-			auto itemPtr = m_areasQObjectPtr.value<sdl::complextest::ComplexUnion2::CAreaObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->Areas;
+			auto itemPtr = m_areasQObjectPtr.value<sdl::V1_0::complextest::CAreaObjectList*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = Areas;
 		}
 		return m_areasQObjectPtr;
 	}
@@ -16404,16 +12655,13 @@ QVariant CAnalyzerObject::GetAreas()
 
 void CAnalyzerObject::SetAreas(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::complextest::ComplexUnion2::CAreaObjectList* itemPtr = v.value<sdl::complextest::ComplexUnion2::CAreaObjectList*>();
-		if (itemPtr != nullptr)  Version_1_0->Areas = itemPtr->Version_1_0;
+		sdl::V1_0::complextest::CAreaObjectList* itemPtr = v.value<sdl::V1_0::complextest::CAreaObjectList*>();
+		if (itemPtr != nullptr)  Areas = static_cast<const decltype(Areas)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->Areas = nullptr;
+		Areas = nullptr;
 	}
 	m_areasQObjectPtr = v;
 
@@ -16423,17 +12671,14 @@ void CAnalyzerObject::SetAreas(const QVariant& v)
 
 bool CAnalyzerObject::hasAreas()
 {
-	 return Version_1_0 && Version_1_0->Areas.HasValue();
+	 return Areas.HasValue();
 }
 
 
 void CAnalyzerObject::emplaceAreas()
 {
 	ResetAreas();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->Areas.emplace();
+	Areas.emplace();
 }
 
 
@@ -16450,7 +12695,7 @@ void CAnalyzerObject::ResetAreas()
 QVariant CAnalyzerObject::createAreasArrayElement(const QVariant& v)
 {
 	Q_UNUSED(v);
-	return QVariant::fromValue(new sdl::complextest::ComplexUnion2::CAreaObject());
+	return QVariant::fromValue(new sdl::V1_0::complextest::CAreaObject());
 }
 
 
@@ -16502,7 +12747,7 @@ QString CAnalyzerObject::toGraphQL() const
 QVariant CAnalyzerObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "Areas"){
-		return QVariant::fromValue(new sdl::complextest::ComplexUnion2::CAreaObjectList(this));
+		return QVariant::fromValue(new sdl::V1_0::complextest::CAreaObjectList(this));
 	}
 	return QVariant();
 }
@@ -16545,83 +12790,83 @@ QVariantMap CAnalyzerObjectList::get(int row) const
 }
 
 
-void CAnalyzerObjectList::append(sdl::complextest::ComplexUnion2::CAnalyzerObject* item)
+void CAnalyzerObjectList::append(sdl::V1_0::complextest::CAnalyzerObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::complextest::ComplexUnion2::CAnalyzerObjectList* sdl::complextest::ComplexUnion2::CAnalyzerObjectList::copyMe()
+sdl::V1_0::complextest::CAnalyzerObjectList* sdl::V1_0::complextest::CAnalyzerObjectList::copyMe()
 {
-	sdl::complextest::ComplexUnion2::CAnalyzerObjectList* retVal = new sdl::complextest::ComplexUnion2::CAnalyzerObjectList();
+	sdl::V1_0::complextest::CAnalyzerObjectList* retVal = new sdl::V1_0::complextest::CAnalyzerObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::complextest::ComplexUnion2::CAnalyzerObjectList::toJson()
+QString sdl::V1_0::complextest::CAnalyzerObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::complextest::ComplexUnion2::CAnalyzerObjectList::toGraphQL()
+QString sdl::V1_0::complextest::CAnalyzerObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::complextest::ComplexUnion2::CAnalyzerObjectList::addElement(sdl::complextest::ComplexUnion2::CAnalyzerObject* item)
+void sdl::V1_0::complextest::CAnalyzerObjectList::addElement(sdl::V1_0::complextest::CAnalyzerObject* item)
 {
 	append(item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CAnalyzerObjectList::removeElement(int index)
+void sdl::V1_0::complextest::CAnalyzerObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::complextest::ComplexUnion2::CAnalyzerObjectList::isEqualWithModel(sdl::complextest::ComplexUnion2::CAnalyzerObjectList* otherModelPtr)
+bool sdl::V1_0::complextest::CAnalyzerObjectList::isEqualWithModel(sdl::V1_0::complextest::CAnalyzerObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::complextest::ComplexUnion2::CAnalyzerObjectList::insert(int index, sdl::complextest::ComplexUnion2::CAnalyzerObject* item)
+void sdl::V1_0::complextest::CAnalyzerObjectList::insert(int index, sdl::V1_0::complextest::CAnalyzerObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CAnalyzerObjectList::remove(int index)
+void sdl::V1_0::complextest::CAnalyzerObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::complextest::ComplexUnion2::CAnalyzerObjectList::clear()
+void sdl::V1_0::complextest::CAnalyzerObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::complextest::ComplexUnion2::CAnalyzerObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CAnalyzerObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::complextest::ComplexUnion2::CAnalyzerObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::complextest::CAnalyzerObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_analyzerName"){
-		return QVariant::fromValue(Version_1_0->at(index)->AnalyzerName.value());
+		return QVariant::fromValue(at(index)->AnalyzerName.value());
 	}
 	if (nameId == "m_analyzerResult"){
-		return QVariant::fromValue(Version_1_0->at(index)->AnalyzerResult.value());
+		return QVariant::fromValue(at(index)->AnalyzerResult.value());
 	}
 	if (nameId == "m_areas"){
 		return itemPtr->GetAreas();
@@ -16630,7 +12875,6 @@ QVariant sdl::complextest::ComplexUnion2::CAnalyzerObjectList::getData(const QSt
 	return QVariant();
 }
 CInspectionObject::CInspectionObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CInspectionObject::iDChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CInspectionObject::typeIDChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -16642,8 +12886,8 @@ CInspectionObject::CInspectionObject(QObject* parent): ::imtbase::CItemModelBase
 
 QVariant CInspectionObject::GetID()
 {
-	if (Version_1_0 && Version_1_0->ID){
-		return Version_1_0->ID.value();
+	if (ID){
+		return ID.value();
 	}
 
 	return QVariant();
@@ -16652,25 +12896,22 @@ QVariant CInspectionObject::GetID()
 
 void CInspectionObject::SetID(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->ID = v.value<QString>();
+	ID = v.value<QString>();
 	iDChanged();
 }
 
 
 bool CInspectionObject::hasID()
 {
-	 return Version_1_0 && Version_1_0->ID.HasValue();
+	 return ID.HasValue();
 }
 
 
 QVariant CInspectionObject::GetTypeID()
 {
-	if (Version_1_0 && Version_1_0->TypeID){
-		return Version_1_0->TypeID.value();
+	if (TypeID){
+		return TypeID.value();
 	}
 
 	return QVariant();
@@ -16679,25 +12920,22 @@ QVariant CInspectionObject::GetTypeID()
 
 void CInspectionObject::SetTypeID(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->TypeID = v.value<QString>();
+	TypeID = v.value<QString>();
 	typeIDChanged();
 }
 
 
 bool CInspectionObject::hasTypeID()
 {
-	 return Version_1_0 && Version_1_0->TypeID.HasValue();
+	 return TypeID.HasValue();
 }
 
 
 QVariant CInspectionObject::GetName()
 {
-	if (Version_1_0 && Version_1_0->Name){
-		return Version_1_0->Name.value();
+	if (Name){
+		return Name.value();
 	}
 
 	return QVariant();
@@ -16706,26 +12944,23 @@ QVariant CInspectionObject::GetName()
 
 void CInspectionObject::SetName(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->Name = v.value<QString>();
+	Name = v.value<QString>();
 	nameChanged();
 }
 
 
 bool CInspectionObject::hasName()
 {
-	 return Version_1_0 && Version_1_0->Name.HasValue();
+	 return Name.HasValue();
 }
 
 
 QVariant CInspectionObject::GetStatus()
 {
-	if (Version_1_0 && Version_1_0->Status){
-		sdl::complextest::ComplexUnion1::StatusCode valueType = Version_1_0->Status.value();
-		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::StatusCode>();
+	if (Status){
+		sdl::V1_0::complextest::StatusCode valueType = Status.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 		QString retval = metaEnum.valueToKey((int)valueType);
 
 		return retval;
@@ -16737,15 +12972,12 @@ QVariant CInspectionObject::GetStatus()
 
 void CInspectionObject::SetStatus(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->Status.emplace();
-	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::StatusCode>();
+	Status.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
-		Version_1_0->Status = (sdl::complextest::ComplexUnion1::StatusCode)key;
+		Status = (sdl::V1_0::complextest::StatusCode)key;
 	}
 	statusChanged();
 }
@@ -16753,17 +12985,17 @@ void CInspectionObject::SetStatus(const QVariant& v)
 
 bool CInspectionObject::hasStatus()
 {
-	 return Version_1_0 && Version_1_0->Status.HasValue();
+	 return Status.HasValue();
 }
 
 
 QVariant CInspectionObject::GetAnalyzers()
 {
-	if (Version_1_0 && Version_1_0->Analyzers){
+	if (Analyzers){
 		if (!m_analyzersQObjectPtr.isValid()){
 			m_analyzersQObjectPtr = CreateObject("Analyzers");
-			auto itemPtr = m_analyzersQObjectPtr.value<sdl::complextest::ComplexUnion2::CAnalyzerObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->Analyzers;
+			auto itemPtr = m_analyzersQObjectPtr.value<sdl::V1_0::complextest::CAnalyzerObjectList*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = Analyzers;
 		}
 		return m_analyzersQObjectPtr;
 	}
@@ -16774,16 +13006,13 @@ QVariant CInspectionObject::GetAnalyzers()
 
 void CInspectionObject::SetAnalyzers(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::complextest::ComplexUnion2::CAnalyzerObjectList* itemPtr = v.value<sdl::complextest::ComplexUnion2::CAnalyzerObjectList*>();
-		if (itemPtr != nullptr)  Version_1_0->Analyzers = itemPtr->Version_1_0;
+		sdl::V1_0::complextest::CAnalyzerObjectList* itemPtr = v.value<sdl::V1_0::complextest::CAnalyzerObjectList*>();
+		if (itemPtr != nullptr)  Analyzers = static_cast<const decltype(Analyzers)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->Analyzers = nullptr;
+		Analyzers = nullptr;
 	}
 	m_analyzersQObjectPtr = v;
 
@@ -16793,17 +13022,14 @@ void CInspectionObject::SetAnalyzers(const QVariant& v)
 
 bool CInspectionObject::hasAnalyzers()
 {
-	 return Version_1_0 && Version_1_0->Analyzers.HasValue();
+	 return Analyzers.HasValue();
 }
 
 
 void CInspectionObject::emplaceAnalyzers()
 {
 	ResetAnalyzers();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->Analyzers.emplace();
+	Analyzers.emplace();
 }
 
 
@@ -16820,7 +13046,7 @@ void CInspectionObject::ResetAnalyzers()
 QVariant CInspectionObject::createAnalyzersArrayElement(const QVariant& v)
 {
 	Q_UNUSED(v);
-	return QVariant::fromValue(new sdl::complextest::ComplexUnion2::CAnalyzerObject());
+	return QVariant::fromValue(new sdl::V1_0::complextest::CAnalyzerObject());
 }
 
 
@@ -16872,7 +13098,7 @@ QString CInspectionObject::toGraphQL() const
 QVariant CInspectionObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "Analyzers"){
-		return QVariant::fromValue(new sdl::complextest::ComplexUnion2::CAnalyzerObjectList(this));
+		return QVariant::fromValue(new sdl::V1_0::complextest::CAnalyzerObjectList(this));
 	}
 	return QVariant();
 }
@@ -16921,89 +13147,89 @@ QVariantMap CInspectionObjectList::get(int row) const
 }
 
 
-void CInspectionObjectList::append(sdl::complextest::ComplexUnion2::CInspectionObject* item)
+void CInspectionObjectList::append(sdl::V1_0::complextest::CInspectionObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::complextest::ComplexUnion2::CInspectionObjectList* sdl::complextest::ComplexUnion2::CInspectionObjectList::copyMe()
+sdl::V1_0::complextest::CInspectionObjectList* sdl::V1_0::complextest::CInspectionObjectList::copyMe()
 {
-	sdl::complextest::ComplexUnion2::CInspectionObjectList* retVal = new sdl::complextest::ComplexUnion2::CInspectionObjectList();
+	sdl::V1_0::complextest::CInspectionObjectList* retVal = new sdl::V1_0::complextest::CInspectionObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::complextest::ComplexUnion2::CInspectionObjectList::toJson()
+QString sdl::V1_0::complextest::CInspectionObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::complextest::ComplexUnion2::CInspectionObjectList::toGraphQL()
+QString sdl::V1_0::complextest::CInspectionObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::complextest::ComplexUnion2::CInspectionObjectList::addElement(sdl::complextest::ComplexUnion2::CInspectionObject* item)
+void sdl::V1_0::complextest::CInspectionObjectList::addElement(sdl::V1_0::complextest::CInspectionObject* item)
 {
 	append(item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CInspectionObjectList::removeElement(int index)
+void sdl::V1_0::complextest::CInspectionObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::complextest::ComplexUnion2::CInspectionObjectList::isEqualWithModel(sdl::complextest::ComplexUnion2::CInspectionObjectList* otherModelPtr)
+bool sdl::V1_0::complextest::CInspectionObjectList::isEqualWithModel(sdl::V1_0::complextest::CInspectionObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::complextest::ComplexUnion2::CInspectionObjectList::insert(int index, sdl::complextest::ComplexUnion2::CInspectionObject* item)
+void sdl::V1_0::complextest::CInspectionObjectList::insert(int index, sdl::V1_0::complextest::CInspectionObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CInspectionObjectList::remove(int index)
+void sdl::V1_0::complextest::CInspectionObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::complextest::ComplexUnion2::CInspectionObjectList::clear()
+void sdl::V1_0::complextest::CInspectionObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::complextest::ComplexUnion2::CInspectionObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CInspectionObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::complextest::ComplexUnion2::CInspectionObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::complextest::CInspectionObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_iD"){
-		return QVariant::fromValue(Version_1_0->at(index)->ID.value());
+		return QVariant::fromValue(at(index)->ID.value());
 	}
 	if (nameId == "m_typeID"){
-		return QVariant::fromValue(Version_1_0->at(index)->TypeID.value());
+		return QVariant::fromValue(at(index)->TypeID.value());
 	}
 	if (nameId == "m_name"){
-		return QVariant::fromValue(Version_1_0->at(index)->Name.value());
+		return QVariant::fromValue(at(index)->Name.value());
 	}
 	if (nameId == "m_status"){
-		return QVariant::fromValue(Version_1_0->at(index)->Status.value());
+		return QVariant::fromValue(at(index)->Status.value());
 	}
 	if (nameId == "m_analyzers"){
 		return itemPtr->GetAnalyzers();
@@ -17012,7 +13238,6 @@ QVariant sdl::complextest::ComplexUnion2::CInspectionObjectList::getData(const Q
 	return QVariant();
 }
 CProductOverviewObject::CProductOverviewObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CProductOverviewObject::productIDChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CProductOverviewObject::nameChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -17026,8 +13251,8 @@ CProductOverviewObject::CProductOverviewObject(QObject* parent): ::imtbase::CIte
 
 QVariant CProductOverviewObject::GetProductID()
 {
-	if (Version_1_0 && Version_1_0->ProductID){
-		return Version_1_0->ProductID.value();
+	if (ProductID){
+		return ProductID.value();
 	}
 
 	return QVariant();
@@ -17036,25 +13261,22 @@ QVariant CProductOverviewObject::GetProductID()
 
 void CProductOverviewObject::SetProductID(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->ProductID = v.value<int>();
+	ProductID = v.value<int>();
 	productIDChanged();
 }
 
 
 bool CProductOverviewObject::hasProductID()
 {
-	 return Version_1_0 && Version_1_0->ProductID.HasValue();
+	 return ProductID.HasValue();
 }
 
 
 QVariant CProductOverviewObject::GetName()
 {
-	if (Version_1_0 && Version_1_0->Name){
-		return Version_1_0->Name.value();
+	if (Name){
+		return Name.value();
 	}
 
 	return QVariant();
@@ -17063,26 +13285,23 @@ QVariant CProductOverviewObject::GetName()
 
 void CProductOverviewObject::SetName(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->Name = v.value<QString>();
+	Name = v.value<QString>();
 	nameChanged();
 }
 
 
 bool CProductOverviewObject::hasName()
 {
-	 return Version_1_0 && Version_1_0->Name.HasValue();
+	 return Name.HasValue();
 }
 
 
 QVariant CProductOverviewObject::GetStatus()
 {
-	if (Version_1_0 && Version_1_0->Status){
-		sdl::complextest::ComplexUnion1::StatusCode valueType = Version_1_0->Status.value();
-		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::StatusCode>();
+	if (Status){
+		sdl::V1_0::complextest::StatusCode valueType = Status.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 		QString retval = metaEnum.valueToKey((int)valueType);
 
 		return retval;
@@ -17094,15 +13313,12 @@ QVariant CProductOverviewObject::GetStatus()
 
 void CProductOverviewObject::SetStatus(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->Status.emplace();
-	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::StatusCode>();
+	Status.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
-		Version_1_0->Status = (sdl::complextest::ComplexUnion1::StatusCode)key;
+		Status = (sdl::V1_0::complextest::StatusCode)key;
 	}
 	statusChanged();
 }
@@ -17110,14 +13326,14 @@ void CProductOverviewObject::SetStatus(const QVariant& v)
 
 bool CProductOverviewObject::hasStatus()
 {
-	 return Version_1_0 && Version_1_0->Status.HasValue();
+	 return Status.HasValue();
 }
 
 
 QVariant CProductOverviewObject::GetPartSerialNumber()
 {
-	if (Version_1_0 && Version_1_0->PartSerialNumber){
-		return Version_1_0->PartSerialNumber.value();
+	if (PartSerialNumber){
+		return PartSerialNumber.value();
 	}
 
 	return QVariant();
@@ -17126,25 +13342,22 @@ QVariant CProductOverviewObject::GetPartSerialNumber()
 
 void CProductOverviewObject::SetPartSerialNumber(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->PartSerialNumber = v.value<QString>();
+	PartSerialNumber = v.value<QString>();
 	partSerialNumberChanged();
 }
 
 
 bool CProductOverviewObject::hasPartSerialNumber()
 {
-	 return Version_1_0 && Version_1_0->PartSerialNumber.HasValue();
+	 return PartSerialNumber.HasValue();
 }
 
 
 QVariant CProductOverviewObject::GetTimestamp()
 {
-	if (Version_1_0 && Version_1_0->Timestamp){
-		return Version_1_0->Timestamp.value();
+	if (Timestamp){
+		return Timestamp.value();
 	}
 
 	return QVariant();
@@ -17153,25 +13366,22 @@ QVariant CProductOverviewObject::GetTimestamp()
 
 void CProductOverviewObject::SetTimestamp(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->Timestamp = v.value<QString>();
+	Timestamp = v.value<QString>();
 	timestampChanged();
 }
 
 
 bool CProductOverviewObject::hasTimestamp()
 {
-	 return Version_1_0 && Version_1_0->Timestamp.HasValue();
+	 return Timestamp.HasValue();
 }
 
 
 QVariant CProductOverviewObject::GetProductImage()
 {
-	if (Version_1_0 && Version_1_0->ProductImage){
-		return Version_1_0->ProductImage.value();
+	if (ProductImage){
+		return ProductImage.value();
 	}
 
 	return QVariant();
@@ -17180,28 +13390,25 @@ QVariant CProductOverviewObject::GetProductImage()
 
 void CProductOverviewObject::SetProductImage(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->ProductImage = v.value<QString>();
+	ProductImage = v.value<QString>();
 	productImageChanged();
 }
 
 
 bool CProductOverviewObject::hasProductImage()
 {
-	 return Version_1_0 && Version_1_0->ProductImage.HasValue();
+	 return ProductImage.HasValue();
 }
 
 
 QVariant CProductOverviewObject::GetInspections()
 {
-	if (Version_1_0 && Version_1_0->Inspections){
+	if (Inspections){
 		if (!m_inspectionsQObjectPtr.isValid()){
 			m_inspectionsQObjectPtr = CreateObject("Inspections");
-			auto itemPtr = m_inspectionsQObjectPtr.value<sdl::complextest::ComplexUnion2::CInspectionObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->Inspections;
+			auto itemPtr = m_inspectionsQObjectPtr.value<sdl::V1_0::complextest::CInspectionObjectList*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = Inspections;
 		}
 		return m_inspectionsQObjectPtr;
 	}
@@ -17212,16 +13419,13 @@ QVariant CProductOverviewObject::GetInspections()
 
 void CProductOverviewObject::SetInspections(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::complextest::ComplexUnion2::CInspectionObjectList* itemPtr = v.value<sdl::complextest::ComplexUnion2::CInspectionObjectList*>();
-		if (itemPtr != nullptr)  Version_1_0->Inspections = itemPtr->Version_1_0;
+		sdl::V1_0::complextest::CInspectionObjectList* itemPtr = v.value<sdl::V1_0::complextest::CInspectionObjectList*>();
+		if (itemPtr != nullptr)  Inspections = static_cast<const decltype(Inspections)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->Inspections = nullptr;
+		Inspections = nullptr;
 	}
 	m_inspectionsQObjectPtr = v;
 
@@ -17231,17 +13435,14 @@ void CProductOverviewObject::SetInspections(const QVariant& v)
 
 bool CProductOverviewObject::hasInspections()
 {
-	 return Version_1_0 && Version_1_0->Inspections.HasValue();
+	 return Inspections.HasValue();
 }
 
 
 void CProductOverviewObject::emplaceInspections()
 {
 	ResetInspections();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->Inspections.emplace();
+	Inspections.emplace();
 }
 
 
@@ -17258,7 +13459,7 @@ void CProductOverviewObject::ResetInspections()
 QVariant CProductOverviewObject::createInspectionsArrayElement(const QVariant& v)
 {
 	Q_UNUSED(v);
-	return QVariant::fromValue(new sdl::complextest::ComplexUnion2::CInspectionObject());
+	return QVariant::fromValue(new sdl::V1_0::complextest::CInspectionObject());
 }
 
 
@@ -17310,7 +13511,7 @@ QString CProductOverviewObject::toGraphQL() const
 QVariant CProductOverviewObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "Inspections"){
-		return QVariant::fromValue(new sdl::complextest::ComplexUnion2::CInspectionObjectList(this));
+		return QVariant::fromValue(new sdl::V1_0::complextest::CInspectionObjectList(this));
 	}
 	return QVariant();
 }
@@ -17365,95 +13566,95 @@ QVariantMap CProductOverviewObjectList::get(int row) const
 }
 
 
-void CProductOverviewObjectList::append(sdl::complextest::ComplexUnion2::CProductOverviewObject* item)
+void CProductOverviewObjectList::append(sdl::V1_0::complextest::CProductOverviewObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::complextest::ComplexUnion2::CProductOverviewObjectList* sdl::complextest::ComplexUnion2::CProductOverviewObjectList::copyMe()
+sdl::V1_0::complextest::CProductOverviewObjectList* sdl::V1_0::complextest::CProductOverviewObjectList::copyMe()
 {
-	sdl::complextest::ComplexUnion2::CProductOverviewObjectList* retVal = new sdl::complextest::ComplexUnion2::CProductOverviewObjectList();
+	sdl::V1_0::complextest::CProductOverviewObjectList* retVal = new sdl::V1_0::complextest::CProductOverviewObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::complextest::ComplexUnion2::CProductOverviewObjectList::toJson()
+QString sdl::V1_0::complextest::CProductOverviewObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::complextest::ComplexUnion2::CProductOverviewObjectList::toGraphQL()
+QString sdl::V1_0::complextest::CProductOverviewObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::complextest::ComplexUnion2::CProductOverviewObjectList::addElement(sdl::complextest::ComplexUnion2::CProductOverviewObject* item)
+void sdl::V1_0::complextest::CProductOverviewObjectList::addElement(sdl::V1_0::complextest::CProductOverviewObject* item)
 {
 	append(item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CProductOverviewObjectList::removeElement(int index)
+void sdl::V1_0::complextest::CProductOverviewObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::complextest::ComplexUnion2::CProductOverviewObjectList::isEqualWithModel(sdl::complextest::ComplexUnion2::CProductOverviewObjectList* otherModelPtr)
+bool sdl::V1_0::complextest::CProductOverviewObjectList::isEqualWithModel(sdl::V1_0::complextest::CProductOverviewObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::complextest::ComplexUnion2::CProductOverviewObjectList::insert(int index, sdl::complextest::ComplexUnion2::CProductOverviewObject* item)
+void sdl::V1_0::complextest::CProductOverviewObjectList::insert(int index, sdl::V1_0::complextest::CProductOverviewObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CProductOverviewObjectList::remove(int index)
+void sdl::V1_0::complextest::CProductOverviewObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::complextest::ComplexUnion2::CProductOverviewObjectList::clear()
+void sdl::V1_0::complextest::CProductOverviewObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::complextest::ComplexUnion2::CProductOverviewObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CProductOverviewObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::complextest::ComplexUnion2::CProductOverviewObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::complextest::CProductOverviewObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_productID"){
-		return QVariant::fromValue(Version_1_0->at(index)->ProductID.value());
+		return QVariant::fromValue(at(index)->ProductID.value());
 	}
 	if (nameId == "m_name"){
-		return QVariant::fromValue(Version_1_0->at(index)->Name.value());
+		return QVariant::fromValue(at(index)->Name.value());
 	}
 	if (nameId == "m_status"){
-		return QVariant::fromValue(Version_1_0->at(index)->Status.value());
+		return QVariant::fromValue(at(index)->Status.value());
 	}
 	if (nameId == "m_partSerialNumber"){
-		return QVariant::fromValue(Version_1_0->at(index)->PartSerialNumber.value());
+		return QVariant::fromValue(at(index)->PartSerialNumber.value());
 	}
 	if (nameId == "m_timestamp"){
-		return QVariant::fromValue(Version_1_0->at(index)->Timestamp.value());
+		return QVariant::fromValue(at(index)->Timestamp.value());
 	}
 	if (nameId == "m_productImage"){
-		return QVariant::fromValue(Version_1_0->at(index)->ProductImage.value());
+		return QVariant::fromValue(at(index)->ProductImage.value());
 	}
 	if (nameId == "m_inspections"){
 		return itemPtr->GetInspections();
@@ -17462,7 +13663,6 @@ QVariant sdl::complextest::ComplexUnion2::CProductOverviewObjectList::getData(co
 	return QVariant();
 }
 CLocalizedTextObject::CLocalizedTextObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CLocalizedTextObject::textChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CLocalizedTextObject::localeChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -17471,8 +13671,8 @@ CLocalizedTextObject::CLocalizedTextObject(QObject* parent): ::imtbase::CItemMod
 
 QVariant CLocalizedTextObject::GetText()
 {
-	if (Version_1_0 && Version_1_0->text){
-		return Version_1_0->text.value();
+	if (text){
+		return text.value();
 	}
 
 	return QVariant();
@@ -17481,25 +13681,22 @@ QVariant CLocalizedTextObject::GetText()
 
 void CLocalizedTextObject::SetText(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->text = v.value<QString>();
+	text = v.value<QString>();
 	textChanged();
 }
 
 
 bool CLocalizedTextObject::hasText()
 {
-	 return Version_1_0 && Version_1_0->text.HasValue();
+	 return text.HasValue();
 }
 
 
 QVariant CLocalizedTextObject::GetLocale()
 {
-	if (Version_1_0 && Version_1_0->locale){
-		return Version_1_0->locale.value();
+	if (locale){
+		return locale.value();
 	}
 
 	return QVariant();
@@ -17508,18 +13705,15 @@ QVariant CLocalizedTextObject::GetLocale()
 
 void CLocalizedTextObject::SetLocale(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->locale = v.value<QString>();
+	locale = v.value<QString>();
 	localeChanged();
 }
 
 
 bool CLocalizedTextObject::hasLocale()
 {
-	 return Version_1_0 && Version_1_0->locale.HasValue();
+	 return locale.HasValue();
 }
 
 
@@ -17608,89 +13802,88 @@ QVariantMap CLocalizedTextObjectList::get(int row) const
 }
 
 
-void CLocalizedTextObjectList::append(sdl::complextest::ComplexUnion2::CLocalizedTextObject* item)
+void CLocalizedTextObjectList::append(sdl::V1_0::complextest::CLocalizedTextObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::complextest::ComplexUnion2::CLocalizedTextObjectList* sdl::complextest::ComplexUnion2::CLocalizedTextObjectList::copyMe()
+sdl::V1_0::complextest::CLocalizedTextObjectList* sdl::V1_0::complextest::CLocalizedTextObjectList::copyMe()
 {
-	sdl::complextest::ComplexUnion2::CLocalizedTextObjectList* retVal = new sdl::complextest::ComplexUnion2::CLocalizedTextObjectList();
+	sdl::V1_0::complextest::CLocalizedTextObjectList* retVal = new sdl::V1_0::complextest::CLocalizedTextObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::complextest::ComplexUnion2::CLocalizedTextObjectList::toJson()
+QString sdl::V1_0::complextest::CLocalizedTextObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::complextest::ComplexUnion2::CLocalizedTextObjectList::toGraphQL()
+QString sdl::V1_0::complextest::CLocalizedTextObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::complextest::ComplexUnion2::CLocalizedTextObjectList::addElement(sdl::complextest::ComplexUnion2::CLocalizedTextObject* item)
+void sdl::V1_0::complextest::CLocalizedTextObjectList::addElement(sdl::V1_0::complextest::CLocalizedTextObject* item)
 {
 	append(item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CLocalizedTextObjectList::removeElement(int index)
+void sdl::V1_0::complextest::CLocalizedTextObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::complextest::ComplexUnion2::CLocalizedTextObjectList::isEqualWithModel(sdl::complextest::ComplexUnion2::CLocalizedTextObjectList* otherModelPtr)
+bool sdl::V1_0::complextest::CLocalizedTextObjectList::isEqualWithModel(sdl::V1_0::complextest::CLocalizedTextObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::complextest::ComplexUnion2::CLocalizedTextObjectList::insert(int index, sdl::complextest::ComplexUnion2::CLocalizedTextObject* item)
+void sdl::V1_0::complextest::CLocalizedTextObjectList::insert(int index, sdl::V1_0::complextest::CLocalizedTextObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CLocalizedTextObjectList::remove(int index)
+void sdl::V1_0::complextest::CLocalizedTextObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::complextest::ComplexUnion2::CLocalizedTextObjectList::clear()
+void sdl::V1_0::complextest::CLocalizedTextObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::complextest::ComplexUnion2::CLocalizedTextObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CLocalizedTextObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::complextest::ComplexUnion2::CLocalizedTextObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::complextest::CLocalizedTextObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_text"){
-		return QVariant::fromValue(Version_1_0->at(index)->text.value());
+		return QVariant::fromValue(at(index)->text.value());
 	}
 	if (nameId == "m_locale"){
-		return QVariant::fromValue(Version_1_0->at(index)->locale.value());
+		return QVariant::fromValue(at(index)->locale.value());
 	}
 
 	return QVariant();
 }
 CCoordinatesObject::CCoordinatesObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CCoordinatesObject::xChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CCoordinatesObject::yChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -17700,8 +13893,8 @@ CCoordinatesObject::CCoordinatesObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CCoordinatesObject::GetX()
 {
-	if (Version_1_0 && Version_1_0->x){
-		return Version_1_0->x.value();
+	if (x){
+		return x.value();
 	}
 
 	return QVariant();
@@ -17710,25 +13903,22 @@ QVariant CCoordinatesObject::GetX()
 
 void CCoordinatesObject::SetX(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->x = v.value<double>();
+	x = v.value<double>();
 	xChanged();
 }
 
 
 bool CCoordinatesObject::hasX()
 {
-	 return Version_1_0 && Version_1_0->x.HasValue();
+	 return x.HasValue();
 }
 
 
 QVariant CCoordinatesObject::GetY()
 {
-	if (Version_1_0 && Version_1_0->y){
-		return Version_1_0->y.value();
+	if (y){
+		return y.value();
 	}
 
 	return QVariant();
@@ -17737,25 +13927,22 @@ QVariant CCoordinatesObject::GetY()
 
 void CCoordinatesObject::SetY(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->y = v.value<double>();
+	y = v.value<double>();
 	yChanged();
 }
 
 
 bool CCoordinatesObject::hasY()
 {
-	 return Version_1_0 && Version_1_0->y.HasValue();
+	 return y.HasValue();
 }
 
 
 QVariant CCoordinatesObject::GetZ()
 {
-	if (Version_1_0 && Version_1_0->z){
-		return Version_1_0->z.value();
+	if (z){
+		return z.value();
 	}
 
 	return QVariant();
@@ -17764,18 +13951,15 @@ QVariant CCoordinatesObject::GetZ()
 
 void CCoordinatesObject::SetZ(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->z = v.value<double>();
+	z = v.value<double>();
 	zChanged();
 }
 
 
 bool CCoordinatesObject::hasZ()
 {
-	 return Version_1_0 && Version_1_0->z.HasValue();
+	 return z.HasValue();
 }
 
 
@@ -17867,92 +14051,91 @@ QVariantMap CCoordinatesObjectList::get(int row) const
 }
 
 
-void CCoordinatesObjectList::append(sdl::complextest::ComplexUnion2::CCoordinatesObject* item)
+void CCoordinatesObjectList::append(sdl::V1_0::complextest::CCoordinatesObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::complextest::ComplexUnion2::CCoordinatesObjectList* sdl::complextest::ComplexUnion2::CCoordinatesObjectList::copyMe()
+sdl::V1_0::complextest::CCoordinatesObjectList* sdl::V1_0::complextest::CCoordinatesObjectList::copyMe()
 {
-	sdl::complextest::ComplexUnion2::CCoordinatesObjectList* retVal = new sdl::complextest::ComplexUnion2::CCoordinatesObjectList();
+	sdl::V1_0::complextest::CCoordinatesObjectList* retVal = new sdl::V1_0::complextest::CCoordinatesObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::complextest::ComplexUnion2::CCoordinatesObjectList::toJson()
+QString sdl::V1_0::complextest::CCoordinatesObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::complextest::ComplexUnion2::CCoordinatesObjectList::toGraphQL()
+QString sdl::V1_0::complextest::CCoordinatesObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::complextest::ComplexUnion2::CCoordinatesObjectList::addElement(sdl::complextest::ComplexUnion2::CCoordinatesObject* item)
+void sdl::V1_0::complextest::CCoordinatesObjectList::addElement(sdl::V1_0::complextest::CCoordinatesObject* item)
 {
 	append(item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CCoordinatesObjectList::removeElement(int index)
+void sdl::V1_0::complextest::CCoordinatesObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::complextest::ComplexUnion2::CCoordinatesObjectList::isEqualWithModel(sdl::complextest::ComplexUnion2::CCoordinatesObjectList* otherModelPtr)
+bool sdl::V1_0::complextest::CCoordinatesObjectList::isEqualWithModel(sdl::V1_0::complextest::CCoordinatesObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::complextest::ComplexUnion2::CCoordinatesObjectList::insert(int index, sdl::complextest::ComplexUnion2::CCoordinatesObject* item)
+void sdl::V1_0::complextest::CCoordinatesObjectList::insert(int index, sdl::V1_0::complextest::CCoordinatesObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CCoordinatesObjectList::remove(int index)
+void sdl::V1_0::complextest::CCoordinatesObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::complextest::ComplexUnion2::CCoordinatesObjectList::clear()
+void sdl::V1_0::complextest::CCoordinatesObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::complextest::ComplexUnion2::CCoordinatesObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CCoordinatesObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::complextest::ComplexUnion2::CCoordinatesObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::complextest::CCoordinatesObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_x"){
-		return QVariant::fromValue(Version_1_0->at(index)->x.value());
+		return QVariant::fromValue(at(index)->x.value());
 	}
 	if (nameId == "m_y"){
-		return QVariant::fromValue(Version_1_0->at(index)->y.value());
+		return QVariant::fromValue(at(index)->y.value());
 	}
 	if (nameId == "m_z"){
-		return QVariant::fromValue(Version_1_0->at(index)->z.value());
+		return QVariant::fromValue(at(index)->z.value());
 	}
 
 	return QVariant();
 }
 CExtendedMetaDataObject::CExtendedMetaDataObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CExtendedMetaDataObject::keyChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CExtendedMetaDataObject::valueChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -17961,8 +14144,8 @@ CExtendedMetaDataObject::CExtendedMetaDataObject(QObject* parent): ::imtbase::CI
 
 QVariant CExtendedMetaDataObject::GetKey()
 {
-	if (Version_1_0 && Version_1_0->key){
-		return Version_1_0->key.value();
+	if (key){
+		return key.value();
 	}
 
 	return QVariant();
@@ -17971,37 +14154,34 @@ QVariant CExtendedMetaDataObject::GetKey()
 
 void CExtendedMetaDataObject::SetKey(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->key = v.value<QString>();
+	key = v.value<QString>();
 	keyChanged();
 }
 
 
 bool CExtendedMetaDataObject::hasKey()
 {
-	 return Version_1_0 && Version_1_0->key.HasValue();
+	 return key.HasValue();
 }
 
 
 QVariant CExtendedMetaDataObject::GetValue()
 {
-	if (Version_1_0 && Version_1_0->value){
+	if (value){
 		if (m_valueQObjectPtr.isValid()){
-			if (const CCoordinates* val = std::get_if<CCoordinates>((Version_1_0->value).GetPtr())){
+			if (const CCoordinates* val = std::get_if<CCoordinates>((value).GetPtr())){
 				CCoordinatesObject *newObjectPtr = new CCoordinatesObject(this);
-				newObjectPtr->Version_1_0 = val->Version_1_0;
+				static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
 				m_valueQObjectPtr = QVariant::fromValue(newObjectPtr);
 			}
-			if (const double* val = std::get_if<double>((Version_1_0->value).GetPtr())){
+			if (const double* val = std::get_if<double>((value).GetPtr())){
 				m_valueQObjectPtr = QVariant::fromValue(val);
 			}
-			if (const bool* val = std::get_if<bool>((Version_1_0->value).GetPtr())){
+			if (const bool* val = std::get_if<bool>((value).GetPtr())){
 				m_valueQObjectPtr = QVariant::fromValue(val);
 			}
-			if (const QString* val = std::get_if<QString>((Version_1_0->value).GetPtr())){
+			if (const QString* val = std::get_if<QString>((value).GetPtr())){
 				m_valueQObjectPtr = QVariant::fromValue(val);
 			}
 		}
@@ -18014,26 +14194,23 @@ QVariant CExtendedMetaDataObject::GetValue()
 
 void CExtendedMetaDataObject::SetValue(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
 		if (const CCoordinatesObject* val = v.value<const CCoordinatesObject*>()){
-			*Version_1_0->value = *val;
+			*value = *val;
 		}
 		if (const double* val = v.value<const double*>()){
-			*Version_1_0->value = *val;
+			*value = *val;
 		}
 		if (const bool* val = v.value<const bool*>()){
-			*Version_1_0->value = *val;
+			*value = *val;
 		}
 		if (const QString* val = v.value<const QString*>()){
-			*Version_1_0->value = *val;
+			*value = *val;
 		}
 	}
 	else {
-		Version_1_0->value = nullptr;
+		value = nullptr;
 	}
 	m_valueQObjectPtr = v;
 
@@ -18043,17 +14220,14 @@ void CExtendedMetaDataObject::SetValue(const QVariant& v)
 
 bool CExtendedMetaDataObject::hasValue()
 {
-	 return Version_1_0 && Version_1_0->value.HasValue();
+	 return value.HasValue();
 }
 
 
 void CExtendedMetaDataObject::emplaceValue()
 {
 	ResetValue();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->value.emplace();
+	value.emplace();
 }
 
 
@@ -18152,80 +14326,80 @@ QVariantMap CExtendedMetaDataObjectList::get(int row) const
 }
 
 
-void CExtendedMetaDataObjectList::append(sdl::complextest::ComplexUnion2::CExtendedMetaDataObject* item)
+void CExtendedMetaDataObjectList::append(sdl::V1_0::complextest::CExtendedMetaDataObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList* sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList::copyMe()
+sdl::V1_0::complextest::CExtendedMetaDataObjectList* sdl::V1_0::complextest::CExtendedMetaDataObjectList::copyMe()
 {
-	sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList* retVal = new sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList();
+	sdl::V1_0::complextest::CExtendedMetaDataObjectList* retVal = new sdl::V1_0::complextest::CExtendedMetaDataObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList::toJson()
+QString sdl::V1_0::complextest::CExtendedMetaDataObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList::toGraphQL()
+QString sdl::V1_0::complextest::CExtendedMetaDataObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList::addElement(sdl::complextest::ComplexUnion2::CExtendedMetaDataObject* item)
+void sdl::V1_0::complextest::CExtendedMetaDataObjectList::addElement(sdl::V1_0::complextest::CExtendedMetaDataObject* item)
 {
 	append(item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList::removeElement(int index)
+void sdl::V1_0::complextest::CExtendedMetaDataObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList::isEqualWithModel(sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList* otherModelPtr)
+bool sdl::V1_0::complextest::CExtendedMetaDataObjectList::isEqualWithModel(sdl::V1_0::complextest::CExtendedMetaDataObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList::insert(int index, sdl::complextest::ComplexUnion2::CExtendedMetaDataObject* item)
+void sdl::V1_0::complextest::CExtendedMetaDataObjectList::insert(int index, sdl::V1_0::complextest::CExtendedMetaDataObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList::remove(int index)
+void sdl::V1_0::complextest::CExtendedMetaDataObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList::clear()
+void sdl::V1_0::complextest::CExtendedMetaDataObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CExtendedMetaDataObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::complextest::ComplexUnion2::CExtendedMetaDataObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::complextest::CExtendedMetaDataObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_key"){
-		return QVariant::fromValue(Version_1_0->at(index)->key.value());
+		return QVariant::fromValue(at(index)->key.value());
 	}
 	if (nameId == "m_value"){
 		return itemPtr->GetValue();
@@ -18234,7 +14408,6 @@ QVariant sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList::getData(c
 	return QVariant();
 }
 CResultMetaDataObject::CResultMetaDataObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CResultMetaDataObject::resultIdChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CResultMetaDataObject::creationTimeChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -18249,8 +14422,8 @@ CResultMetaDataObject::CResultMetaDataObject(QObject* parent): ::imtbase::CItemM
 
 QVariant CResultMetaDataObject::GetResultId()
 {
-	if (Version_1_0 && Version_1_0->resultId){
-		return Version_1_0->resultId.value();
+	if (resultId){
+		return resultId.value();
 	}
 
 	return QVariant();
@@ -18259,25 +14432,22 @@ QVariant CResultMetaDataObject::GetResultId()
 
 void CResultMetaDataObject::SetResultId(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->resultId = v.value<QString>().toUtf8();
+	resultId = v.value<QString>().toUtf8();
 	resultIdChanged();
 }
 
 
 bool CResultMetaDataObject::hasResultId()
 {
-	 return Version_1_0 && Version_1_0->resultId.HasValue();
+	 return resultId.HasValue();
 }
 
 
 QVariant CResultMetaDataObject::GetCreationTime()
 {
-	if (Version_1_0 && Version_1_0->creationTime){
-		return Version_1_0->creationTime.value();
+	if (creationTime){
+		return creationTime.value();
 	}
 
 	return QVariant();
@@ -18286,25 +14456,22 @@ QVariant CResultMetaDataObject::GetCreationTime()
 
 void CResultMetaDataObject::SetCreationTime(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->creationTime = v.value<QString>();
+	creationTime = v.value<QString>();
 	creationTimeChanged();
 }
 
 
 bool CResultMetaDataObject::hasCreationTime()
 {
-	 return Version_1_0 && Version_1_0->creationTime.HasValue();
+	 return creationTime.HasValue();
 }
 
 
 QVariant CResultMetaDataObject::GetPartId()
 {
-	if (Version_1_0 && Version_1_0->partId){
-		return Version_1_0->partId.value();
+	if (partId){
+		return partId.value();
 	}
 
 	return QVariant();
@@ -18313,25 +14480,22 @@ QVariant CResultMetaDataObject::GetPartId()
 
 void CResultMetaDataObject::SetPartId(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->partId = v.value<QString>();
+	partId = v.value<QString>();
 	partIdChanged();
 }
 
 
 bool CResultMetaDataObject::hasPartId()
 {
-	 return Version_1_0 && Version_1_0->partId.HasValue();
+	 return partId.HasValue();
 }
 
 
 QVariant CResultMetaDataObject::GetProductId()
 {
-	if (Version_1_0 && Version_1_0->productId){
-		return Version_1_0->productId.value();
+	if (productId){
+		return productId.value();
 	}
 
 	return QVariant();
@@ -18340,25 +14504,22 @@ QVariant CResultMetaDataObject::GetProductId()
 
 void CResultMetaDataObject::SetProductId(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->productId = v.value<QString>();
+	productId = v.value<QString>();
 	productIdChanged();
 }
 
 
 bool CResultMetaDataObject::hasProductId()
 {
-	 return Version_1_0 && Version_1_0->productId.HasValue();
+	 return productId.HasValue();
 }
 
 
 QVariant CResultMetaDataObject::GetName()
 {
-	if (Version_1_0 && Version_1_0->name){
-		return Version_1_0->name.value();
+	if (name){
+		return name.value();
 	}
 
 	return QVariant();
@@ -18367,25 +14528,22 @@ QVariant CResultMetaDataObject::GetName()
 
 void CResultMetaDataObject::SetName(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->name = v.value<QString>();
+	name = v.value<QString>();
 	nameChanged();
 }
 
 
 bool CResultMetaDataObject::hasName()
 {
-	 return Version_1_0 && Version_1_0->name.HasValue();
+	 return name.HasValue();
 }
 
 
 QVariant CResultMetaDataObject::GetClassification()
 {
-	if (Version_1_0 && Version_1_0->classification){
-		return Version_1_0->classification.value();
+	if (classification){
+		return classification.value();
 	}
 
 	return QVariant();
@@ -18394,28 +14552,25 @@ QVariant CResultMetaDataObject::GetClassification()
 
 void CResultMetaDataObject::SetClassification(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->classification = v.value<int>();
+	classification = v.value<int>();
 	classificationChanged();
 }
 
 
 bool CResultMetaDataObject::hasClassification()
 {
-	 return Version_1_0 && Version_1_0->classification.HasValue();
+	 return classification.HasValue();
 }
 
 
 QVariant CResultMetaDataObject::GetDescription()
 {
-	if (Version_1_0 && Version_1_0->description){
+	if (description){
 		if (!m_descriptionQObjectPtr.isValid()){
 			m_descriptionQObjectPtr = CreateObject("description");
-			auto itemPtr = m_descriptionQObjectPtr.value<sdl::complextest::ComplexUnion2::CLocalizedTextObject*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->description;
+			auto itemPtr = m_descriptionQObjectPtr.value<sdl::V1_0::complextest::CLocalizedTextObject*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = description;
 		}
 		return m_descriptionQObjectPtr;
 	}
@@ -18426,16 +14581,13 @@ QVariant CResultMetaDataObject::GetDescription()
 
 void CResultMetaDataObject::SetDescription(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::complextest::ComplexUnion2::CLocalizedTextObject* itemPtr = v.value<sdl::complextest::ComplexUnion2::CLocalizedTextObject*>();
-		if (itemPtr != nullptr)  Version_1_0->description = itemPtr->Version_1_0;
+		sdl::V1_0::complextest::CLocalizedTextObject* itemPtr = v.value<sdl::V1_0::complextest::CLocalizedTextObject*>();
+		if (itemPtr != nullptr)  description = static_cast<const decltype(description)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->description = nullptr;
+		description = nullptr;
 	}
 	m_descriptionQObjectPtr = v;
 
@@ -18445,17 +14597,14 @@ void CResultMetaDataObject::SetDescription(const QVariant& v)
 
 bool CResultMetaDataObject::hasDescription()
 {
-	 return Version_1_0 && Version_1_0->description.HasValue();
+	 return description.HasValue();
 }
 
 
 void CResultMetaDataObject::emplaceDescription()
 {
 	ResetDescription();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->description.emplace();
+	description.emplace();
 }
 
 
@@ -18471,11 +14620,11 @@ void CResultMetaDataObject::ResetDescription()
 
 QVariant CResultMetaDataObject::GetExtendedMetaData()
 {
-	if (Version_1_0 && Version_1_0->extendedMetaData){
+	if (extendedMetaData){
 		if (!m_extendedMetaDataQObjectPtr.isValid()){
 			m_extendedMetaDataQObjectPtr = CreateObject("extendedMetaData");
-			auto itemPtr = m_extendedMetaDataQObjectPtr.value<sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->extendedMetaData;
+			auto itemPtr = m_extendedMetaDataQObjectPtr.value<sdl::V1_0::complextest::CExtendedMetaDataObjectList*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = extendedMetaData;
 		}
 		return m_extendedMetaDataQObjectPtr;
 	}
@@ -18486,16 +14635,13 @@ QVariant CResultMetaDataObject::GetExtendedMetaData()
 
 void CResultMetaDataObject::SetExtendedMetaData(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList* itemPtr = v.value<sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList*>();
-		if (itemPtr != nullptr)  Version_1_0->extendedMetaData = itemPtr->Version_1_0;
+		sdl::V1_0::complextest::CExtendedMetaDataObjectList* itemPtr = v.value<sdl::V1_0::complextest::CExtendedMetaDataObjectList*>();
+		if (itemPtr != nullptr)  extendedMetaData = static_cast<const decltype(extendedMetaData)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->extendedMetaData = nullptr;
+		extendedMetaData = nullptr;
 	}
 	m_extendedMetaDataQObjectPtr = v;
 
@@ -18505,17 +14651,14 @@ void CResultMetaDataObject::SetExtendedMetaData(const QVariant& v)
 
 bool CResultMetaDataObject::hasExtendedMetaData()
 {
-	 return Version_1_0 && Version_1_0->extendedMetaData.HasValue();
+	 return extendedMetaData.HasValue();
 }
 
 
 void CResultMetaDataObject::emplaceExtendedMetaData()
 {
 	ResetExtendedMetaData();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->extendedMetaData.emplace();
+	extendedMetaData.emplace();
 }
 
 
@@ -18532,7 +14675,7 @@ void CResultMetaDataObject::ResetExtendedMetaData()
 QVariant CResultMetaDataObject::createExtendedMetaDataArrayElement(const QVariant& v)
 {
 	Q_UNUSED(v);
-	return QVariant::fromValue(new sdl::complextest::ComplexUnion2::CExtendedMetaDataObject());
+	return QVariant::fromValue(new sdl::V1_0::complextest::CExtendedMetaDataObject());
 }
 
 
@@ -18584,10 +14727,10 @@ QString CResultMetaDataObject::toGraphQL() const
 QVariant CResultMetaDataObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "description"){
-		return QVariant::fromValue(new sdl::complextest::ComplexUnion2::CLocalizedTextObject(this));
+		return QVariant::fromValue(new sdl::V1_0::complextest::CLocalizedTextObject(this));
 	}
 	if (key == "extendedMetaData"){
-		return QVariant::fromValue(new sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList(this));
+		return QVariant::fromValue(new sdl::V1_0::complextest::CExtendedMetaDataObjectList(this));
 	}
 	return QVariant();
 }
@@ -18645,95 +14788,95 @@ QVariantMap CResultMetaDataObjectList::get(int row) const
 }
 
 
-void CResultMetaDataObjectList::append(sdl::complextest::ComplexUnion2::CResultMetaDataObject* item)
+void CResultMetaDataObjectList::append(sdl::V1_0::complextest::CResultMetaDataObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::complextest::ComplexUnion2::CResultMetaDataObjectList* sdl::complextest::ComplexUnion2::CResultMetaDataObjectList::copyMe()
+sdl::V1_0::complextest::CResultMetaDataObjectList* sdl::V1_0::complextest::CResultMetaDataObjectList::copyMe()
 {
-	sdl::complextest::ComplexUnion2::CResultMetaDataObjectList* retVal = new sdl::complextest::ComplexUnion2::CResultMetaDataObjectList();
+	sdl::V1_0::complextest::CResultMetaDataObjectList* retVal = new sdl::V1_0::complextest::CResultMetaDataObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::complextest::ComplexUnion2::CResultMetaDataObjectList::toJson()
+QString sdl::V1_0::complextest::CResultMetaDataObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::complextest::ComplexUnion2::CResultMetaDataObjectList::toGraphQL()
+QString sdl::V1_0::complextest::CResultMetaDataObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::complextest::ComplexUnion2::CResultMetaDataObjectList::addElement(sdl::complextest::ComplexUnion2::CResultMetaDataObject* item)
+void sdl::V1_0::complextest::CResultMetaDataObjectList::addElement(sdl::V1_0::complextest::CResultMetaDataObject* item)
 {
 	append(item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CResultMetaDataObjectList::removeElement(int index)
+void sdl::V1_0::complextest::CResultMetaDataObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::complextest::ComplexUnion2::CResultMetaDataObjectList::isEqualWithModel(sdl::complextest::ComplexUnion2::CResultMetaDataObjectList* otherModelPtr)
+bool sdl::V1_0::complextest::CResultMetaDataObjectList::isEqualWithModel(sdl::V1_0::complextest::CResultMetaDataObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::complextest::ComplexUnion2::CResultMetaDataObjectList::insert(int index, sdl::complextest::ComplexUnion2::CResultMetaDataObject* item)
+void sdl::V1_0::complextest::CResultMetaDataObjectList::insert(int index, sdl::V1_0::complextest::CResultMetaDataObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CResultMetaDataObjectList::remove(int index)
+void sdl::V1_0::complextest::CResultMetaDataObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::complextest::ComplexUnion2::CResultMetaDataObjectList::clear()
+void sdl::V1_0::complextest::CResultMetaDataObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::complextest::ComplexUnion2::CResultMetaDataObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CResultMetaDataObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::complextest::ComplexUnion2::CResultMetaDataObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::complextest::CResultMetaDataObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_resultId"){
-		return QVariant::fromValue(Version_1_0->at(index)->resultId.value());
+		return QVariant::fromValue(at(index)->resultId.value());
 	}
 	if (nameId == "m_creationTime"){
-		return QVariant::fromValue(Version_1_0->at(index)->creationTime.value());
+		return QVariant::fromValue(at(index)->creationTime.value());
 	}
 	if (nameId == "m_partId"){
-		return QVariant::fromValue(Version_1_0->at(index)->partId.value());
+		return QVariant::fromValue(at(index)->partId.value());
 	}
 	if (nameId == "m_productId"){
-		return QVariant::fromValue(Version_1_0->at(index)->productId.value());
+		return QVariant::fromValue(at(index)->productId.value());
 	}
 	if (nameId == "m_name"){
-		return QVariant::fromValue(Version_1_0->at(index)->name.value());
+		return QVariant::fromValue(at(index)->name.value());
 	}
 	if (nameId == "m_classification"){
-		return QVariant::fromValue(Version_1_0->at(index)->classification.value());
+		return QVariant::fromValue(at(index)->classification.value());
 	}
 	if (nameId == "m_description"){
 		return itemPtr->GetDescription();
@@ -18745,7 +14888,6 @@ QVariant sdl::complextest::ComplexUnion2::CResultMetaDataObjectList::getData(con
 	return QVariant();
 }
 COverallResultValuesObject::COverallResultValuesObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &COverallResultValuesObject::nameChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &COverallResultValuesObject::valueIdChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -18757,8 +14899,8 @@ COverallResultValuesObject::COverallResultValuesObject(QObject* parent): ::imtba
 
 QVariant COverallResultValuesObject::GetName()
 {
-	if (Version_1_0 && Version_1_0->name){
-		return Version_1_0->name.value();
+	if (name){
+		return name.value();
 	}
 
 	return QVariant();
@@ -18767,25 +14909,22 @@ QVariant COverallResultValuesObject::GetName()
 
 void COverallResultValuesObject::SetName(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->name = v.value<QString>();
+	name = v.value<QString>();
 	nameChanged();
 }
 
 
 bool COverallResultValuesObject::hasName()
 {
-	 return Version_1_0 && Version_1_0->name.HasValue();
+	 return name.HasValue();
 }
 
 
 QVariant COverallResultValuesObject::GetValueId()
 {
-	if (Version_1_0 && Version_1_0->valueId){
-		return Version_1_0->valueId.value();
+	if (valueId){
+		return valueId.value();
 	}
 
 	return QVariant();
@@ -18794,25 +14933,22 @@ QVariant COverallResultValuesObject::GetValueId()
 
 void COverallResultValuesObject::SetValueId(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->valueId = v.value<QString>();
+	valueId = v.value<QString>();
 	valueIdChanged();
 }
 
 
 bool COverallResultValuesObject::hasValueId()
 {
-	 return Version_1_0 && Version_1_0->valueId.HasValue();
+	 return valueId.HasValue();
 }
 
 
 QVariant COverallResultValuesObject::GetMeasuredValue()
 {
-	if (Version_1_0 && Version_1_0->measuredValue){
-		return Version_1_0->measuredValue.value();
+	if (measuredValue){
+		return measuredValue.value();
 	}
 
 	return QVariant();
@@ -18821,25 +14957,22 @@ QVariant COverallResultValuesObject::GetMeasuredValue()
 
 void COverallResultValuesObject::SetMeasuredValue(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->measuredValue = v.value<double>();
+	measuredValue = v.value<double>();
 	measuredValueChanged();
 }
 
 
 bool COverallResultValuesObject::hasMeasuredValue()
 {
-	 return Version_1_0 && Version_1_0->measuredValue.HasValue();
+	 return measuredValue.HasValue();
 }
 
 
 QVariant COverallResultValuesObject::GetLowLimit()
 {
-	if (Version_1_0 && Version_1_0->lowLimit){
-		return Version_1_0->lowLimit.value();
+	if (lowLimit){
+		return lowLimit.value();
 	}
 
 	return QVariant();
@@ -18848,25 +14981,22 @@ QVariant COverallResultValuesObject::GetLowLimit()
 
 void COverallResultValuesObject::SetLowLimit(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->lowLimit = v.value<double>();
+	lowLimit = v.value<double>();
 	lowLimitChanged();
 }
 
 
 bool COverallResultValuesObject::hasLowLimit()
 {
-	 return Version_1_0 && Version_1_0->lowLimit.HasValue();
+	 return lowLimit.HasValue();
 }
 
 
 QVariant COverallResultValuesObject::GetHighLimit()
 {
-	if (Version_1_0 && Version_1_0->highLimit){
-		return Version_1_0->highLimit.value();
+	if (highLimit){
+		return highLimit.value();
 	}
 
 	return QVariant();
@@ -18875,18 +15005,15 @@ QVariant COverallResultValuesObject::GetHighLimit()
 
 void COverallResultValuesObject::SetHighLimit(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->highLimit = v.value<double>();
+	highLimit = v.value<double>();
 	highLimitChanged();
 }
 
 
 bool COverallResultValuesObject::hasHighLimit()
 {
-	 return Version_1_0 && Version_1_0->highLimit.HasValue();
+	 return highLimit.HasValue();
 }
 
 
@@ -18984,98 +15111,97 @@ QVariantMap COverallResultValuesObjectList::get(int row) const
 }
 
 
-void COverallResultValuesObjectList::append(sdl::complextest::ComplexUnion2::COverallResultValuesObject* item)
+void COverallResultValuesObjectList::append(sdl::V1_0::complextest::COverallResultValuesObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* sdl::complextest::ComplexUnion2::COverallResultValuesObjectList::copyMe()
+sdl::V1_0::complextest::COverallResultValuesObjectList* sdl::V1_0::complextest::COverallResultValuesObjectList::copyMe()
 {
-	sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* retVal = new sdl::complextest::ComplexUnion2::COverallResultValuesObjectList();
+	sdl::V1_0::complextest::COverallResultValuesObjectList* retVal = new sdl::V1_0::complextest::COverallResultValuesObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::complextest::ComplexUnion2::COverallResultValuesObjectList::toJson()
+QString sdl::V1_0::complextest::COverallResultValuesObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::complextest::ComplexUnion2::COverallResultValuesObjectList::toGraphQL()
+QString sdl::V1_0::complextest::COverallResultValuesObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::complextest::ComplexUnion2::COverallResultValuesObjectList::addElement(sdl::complextest::ComplexUnion2::COverallResultValuesObject* item)
+void sdl::V1_0::complextest::COverallResultValuesObjectList::addElement(sdl::V1_0::complextest::COverallResultValuesObject* item)
 {
 	append(item);
 }
 
 
-void sdl::complextest::ComplexUnion2::COverallResultValuesObjectList::removeElement(int index)
+void sdl::V1_0::complextest::COverallResultValuesObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::complextest::ComplexUnion2::COverallResultValuesObjectList::isEqualWithModel(sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* otherModelPtr)
+bool sdl::V1_0::complextest::COverallResultValuesObjectList::isEqualWithModel(sdl::V1_0::complextest::COverallResultValuesObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::complextest::ComplexUnion2::COverallResultValuesObjectList::insert(int index, sdl::complextest::ComplexUnion2::COverallResultValuesObject* item)
+void sdl::V1_0::complextest::COverallResultValuesObjectList::insert(int index, sdl::V1_0::complextest::COverallResultValuesObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::complextest::ComplexUnion2::COverallResultValuesObjectList::remove(int index)
+void sdl::V1_0::complextest::COverallResultValuesObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::complextest::ComplexUnion2::COverallResultValuesObjectList::clear()
+void sdl::V1_0::complextest::COverallResultValuesObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::complextest::ComplexUnion2::COverallResultValuesObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::COverallResultValuesObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::complextest::ComplexUnion2::COverallResultValuesObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::complextest::COverallResultValuesObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_name"){
-		return QVariant::fromValue(Version_1_0->at(index)->name.value());
+		return QVariant::fromValue(at(index)->name.value());
 	}
 	if (nameId == "m_valueId"){
-		return QVariant::fromValue(Version_1_0->at(index)->valueId.value());
+		return QVariant::fromValue(at(index)->valueId.value());
 	}
 	if (nameId == "m_measuredValue"){
-		return QVariant::fromValue(Version_1_0->at(index)->measuredValue.value());
+		return QVariant::fromValue(at(index)->measuredValue.value());
 	}
 	if (nameId == "m_lowLimit"){
-		return QVariant::fromValue(Version_1_0->at(index)->lowLimit.value());
+		return QVariant::fromValue(at(index)->lowLimit.value());
 	}
 	if (nameId == "m_highLimit"){
-		return QVariant::fromValue(Version_1_0->at(index)->highLimit.value());
+		return QVariant::fromValue(at(index)->highLimit.value());
 	}
 
 	return QVariant();
 }
 CUnionTestingTypeObject::CUnionTestingTypeObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CUnionTestingTypeObject::simpleUnionChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CUnionTestingTypeObject::complexUnionChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -19085,15 +15211,15 @@ CUnionTestingTypeObject::CUnionTestingTypeObject(QObject* parent): ::imtbase::CI
 
 QVariant CUnionTestingTypeObject::GetSimpleUnion()
 {
-	if (Version_1_0 && Version_1_0->simpleUnion){
+	if (simpleUnion){
 		if (m_simpleUnionQObjectPtr.isValid()){
-			if (const double* val = std::get_if<double>((Version_1_0->simpleUnion).GetPtr())){
+			if (const double* val = std::get_if<double>((simpleUnion).GetPtr())){
 				m_simpleUnionQObjectPtr = QVariant::fromValue(val);
 			}
-			if (const bool* val = std::get_if<bool>((Version_1_0->simpleUnion).GetPtr())){
+			if (const bool* val = std::get_if<bool>((simpleUnion).GetPtr())){
 				m_simpleUnionQObjectPtr = QVariant::fromValue(val);
 			}
-			if (const QString* val = std::get_if<QString>((Version_1_0->simpleUnion).GetPtr())){
+			if (const QString* val = std::get_if<QString>((simpleUnion).GetPtr())){
 				m_simpleUnionQObjectPtr = QVariant::fromValue(val);
 			}
 		}
@@ -19106,23 +15232,20 @@ QVariant CUnionTestingTypeObject::GetSimpleUnion()
 
 void CUnionTestingTypeObject::SetSimpleUnion(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
 		if (const double* val = v.value<const double*>()){
-			*Version_1_0->simpleUnion = *val;
+			*simpleUnion = *val;
 		}
 		if (const bool* val = v.value<const bool*>()){
-			*Version_1_0->simpleUnion = *val;
+			*simpleUnion = *val;
 		}
 		if (const QString* val = v.value<const QString*>()){
-			*Version_1_0->simpleUnion = *val;
+			*simpleUnion = *val;
 		}
 	}
 	else {
-		Version_1_0->simpleUnion = nullptr;
+		simpleUnion = nullptr;
 	}
 	m_simpleUnionQObjectPtr = v;
 
@@ -19132,17 +15255,14 @@ void CUnionTestingTypeObject::SetSimpleUnion(const QVariant& v)
 
 bool CUnionTestingTypeObject::hasSimpleUnion()
 {
-	 return Version_1_0 && Version_1_0->simpleUnion.HasValue();
+	 return simpleUnion.HasValue();
 }
 
 
 void CUnionTestingTypeObject::emplaceSimpleUnion()
 {
 	ResetSimpleUnion();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->simpleUnion.emplace();
+	simpleUnion.emplace();
 }
 
 
@@ -19158,16 +15278,16 @@ void CUnionTestingTypeObject::ResetSimpleUnion()
 
 QVariant CUnionTestingTypeObject::GetComplexUnion()
 {
-	if (Version_1_0 && Version_1_0->complexUnion){
+	if (complexUnion){
 		if (m_complexUnionQObjectPtr.isValid()){
-			if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>((Version_1_0->complexUnion).GetPtr())){
+			if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>((complexUnion).GetPtr())){
 				CCDMResultVarStringObject *newObjectPtr = new CCDMResultVarStringObject(this);
-				newObjectPtr->Version_1_0 = val->Version_1_0;
+				static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
 				m_complexUnionQObjectPtr = QVariant::fromValue(newObjectPtr);
 			}
-			if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>((Version_1_0->complexUnion).GetPtr())){
+			if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>((complexUnion).GetPtr())){
 				CCDMResultVarRecursiveObject *newObjectPtr = new CCDMResultVarRecursiveObject(this);
-				newObjectPtr->Version_1_0 = val->Version_1_0;
+				static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
 				m_complexUnionQObjectPtr = QVariant::fromValue(newObjectPtr);
 			}
 		}
@@ -19180,20 +15300,17 @@ QVariant CUnionTestingTypeObject::GetComplexUnion()
 
 void CUnionTestingTypeObject::SetComplexUnion(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
 		if (const CCDMResultVarStringObject* val = v.value<const CCDMResultVarStringObject*>()){
-			*Version_1_0->complexUnion = *val;
+			*complexUnion = *val;
 		}
 		if (const CCDMResultVarRecursiveObject* val = v.value<const CCDMResultVarRecursiveObject*>()){
-			*Version_1_0->complexUnion = *val;
+			*complexUnion = *val;
 		}
 	}
 	else {
-		Version_1_0->complexUnion = nullptr;
+		complexUnion = nullptr;
 	}
 	m_complexUnionQObjectPtr = v;
 
@@ -19203,17 +15320,14 @@ void CUnionTestingTypeObject::SetComplexUnion(const QVariant& v)
 
 bool CUnionTestingTypeObject::hasComplexUnion()
 {
-	 return Version_1_0 && Version_1_0->complexUnion.HasValue();
+	 return complexUnion.HasValue();
 }
 
 
 void CUnionTestingTypeObject::emplaceComplexUnion()
 {
 	ResetComplexUnion();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->complexUnion.emplace();
+	complexUnion.emplace();
 }
 
 
@@ -19229,20 +15343,20 @@ void CUnionTestingTypeObject::ResetComplexUnion()
 
 QVariant CUnionTestingTypeObject::GetMixedUnion()
 {
-	if (Version_1_0 && Version_1_0->mixedUnion){
+	if (mixedUnion){
 		if (m_mixedUnionQObjectPtr.isValid()){
-			if (const CCoordinates* val = std::get_if<CCoordinates>((Version_1_0->mixedUnion).GetPtr())){
+			if (const CCoordinates* val = std::get_if<CCoordinates>((mixedUnion).GetPtr())){
 				CCoordinatesObject *newObjectPtr = new CCoordinatesObject(this);
-				newObjectPtr->Version_1_0 = val->Version_1_0;
+				static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
 				m_mixedUnionQObjectPtr = QVariant::fromValue(newObjectPtr);
 			}
-			if (const double* val = std::get_if<double>((Version_1_0->mixedUnion).GetPtr())){
+			if (const double* val = std::get_if<double>((mixedUnion).GetPtr())){
 				m_mixedUnionQObjectPtr = QVariant::fromValue(val);
 			}
-			if (const bool* val = std::get_if<bool>((Version_1_0->mixedUnion).GetPtr())){
+			if (const bool* val = std::get_if<bool>((mixedUnion).GetPtr())){
 				m_mixedUnionQObjectPtr = QVariant::fromValue(val);
 			}
-			if (const QString* val = std::get_if<QString>((Version_1_0->mixedUnion).GetPtr())){
+			if (const QString* val = std::get_if<QString>((mixedUnion).GetPtr())){
 				m_mixedUnionQObjectPtr = QVariant::fromValue(val);
 			}
 		}
@@ -19255,26 +15369,23 @@ QVariant CUnionTestingTypeObject::GetMixedUnion()
 
 void CUnionTestingTypeObject::SetMixedUnion(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
 		if (const CCoordinatesObject* val = v.value<const CCoordinatesObject*>()){
-			*Version_1_0->mixedUnion = *val;
+			*mixedUnion = *val;
 		}
 		if (const double* val = v.value<const double*>()){
-			*Version_1_0->mixedUnion = *val;
+			*mixedUnion = *val;
 		}
 		if (const bool* val = v.value<const bool*>()){
-			*Version_1_0->mixedUnion = *val;
+			*mixedUnion = *val;
 		}
 		if (const QString* val = v.value<const QString*>()){
-			*Version_1_0->mixedUnion = *val;
+			*mixedUnion = *val;
 		}
 	}
 	else {
-		Version_1_0->mixedUnion = nullptr;
+		mixedUnion = nullptr;
 	}
 	m_mixedUnionQObjectPtr = v;
 
@@ -19284,17 +15395,14 @@ void CUnionTestingTypeObject::SetMixedUnion(const QVariant& v)
 
 bool CUnionTestingTypeObject::hasMixedUnion()
 {
-	 return Version_1_0 && Version_1_0->mixedUnion.HasValue();
+	 return mixedUnion.HasValue();
 }
 
 
 void CUnionTestingTypeObject::emplaceMixedUnion()
 {
 	ResetMixedUnion();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->mixedUnion.emplace();
+	mixedUnion.emplace();
 }
 
 
@@ -19396,76 +15504,76 @@ QVariantMap CUnionTestingTypeObjectList::get(int row) const
 }
 
 
-void CUnionTestingTypeObjectList::append(sdl::complextest::ComplexUnion2::CUnionTestingTypeObject* item)
+void CUnionTestingTypeObjectList::append(sdl::V1_0::complextest::CUnionTestingTypeObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::complextest::ComplexUnion2::CUnionTestingTypeObjectList* sdl::complextest::ComplexUnion2::CUnionTestingTypeObjectList::copyMe()
+sdl::V1_0::complextest::CUnionTestingTypeObjectList* sdl::V1_0::complextest::CUnionTestingTypeObjectList::copyMe()
 {
-	sdl::complextest::ComplexUnion2::CUnionTestingTypeObjectList* retVal = new sdl::complextest::ComplexUnion2::CUnionTestingTypeObjectList();
+	sdl::V1_0::complextest::CUnionTestingTypeObjectList* retVal = new sdl::V1_0::complextest::CUnionTestingTypeObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::complextest::ComplexUnion2::CUnionTestingTypeObjectList::toJson()
+QString sdl::V1_0::complextest::CUnionTestingTypeObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::complextest::ComplexUnion2::CUnionTestingTypeObjectList::toGraphQL()
+QString sdl::V1_0::complextest::CUnionTestingTypeObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::complextest::ComplexUnion2::CUnionTestingTypeObjectList::addElement(sdl::complextest::ComplexUnion2::CUnionTestingTypeObject* item)
+void sdl::V1_0::complextest::CUnionTestingTypeObjectList::addElement(sdl::V1_0::complextest::CUnionTestingTypeObject* item)
 {
 	append(item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CUnionTestingTypeObjectList::removeElement(int index)
+void sdl::V1_0::complextest::CUnionTestingTypeObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::complextest::ComplexUnion2::CUnionTestingTypeObjectList::isEqualWithModel(sdl::complextest::ComplexUnion2::CUnionTestingTypeObjectList* otherModelPtr)
+bool sdl::V1_0::complextest::CUnionTestingTypeObjectList::isEqualWithModel(sdl::V1_0::complextest::CUnionTestingTypeObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::complextest::ComplexUnion2::CUnionTestingTypeObjectList::insert(int index, sdl::complextest::ComplexUnion2::CUnionTestingTypeObject* item)
+void sdl::V1_0::complextest::CUnionTestingTypeObjectList::insert(int index, sdl::V1_0::complextest::CUnionTestingTypeObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CUnionTestingTypeObjectList::remove(int index)
+void sdl::V1_0::complextest::CUnionTestingTypeObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::complextest::ComplexUnion2::CUnionTestingTypeObjectList::clear()
+void sdl::V1_0::complextest::CUnionTestingTypeObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::complextest::ComplexUnion2::CUnionTestingTypeObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CUnionTestingTypeObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::complextest::ComplexUnion2::CUnionTestingTypeObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::complextest::CUnionTestingTypeObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_simpleUnion"){
@@ -19481,7 +15589,6 @@ QVariant sdl::complextest::ComplexUnion2::CUnionTestingTypeObjectList::getData(c
 	return QVariant();
 }
 CCDMResultVarRecursiveObject::CCDMResultVarRecursiveObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CCDMResultVarRecursiveObject::dataModelTitleChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CCDMResultVarRecursiveObject::dataModelVersionChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -19493,8 +15600,8 @@ CCDMResultVarRecursiveObject::CCDMResultVarRecursiveObject(QObject* parent): ::i
 
 QVariant CCDMResultVarRecursiveObject::GetDataModelTitle()
 {
-	if (Version_1_0 && Version_1_0->dataModelTitle){
-		return Version_1_0->dataModelTitle.value();
+	if (dataModelTitle){
+		return dataModelTitle.value();
 	}
 
 	return QVariant();
@@ -19503,25 +15610,22 @@ QVariant CCDMResultVarRecursiveObject::GetDataModelTitle()
 
 void CCDMResultVarRecursiveObject::SetDataModelTitle(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->dataModelTitle = v.value<QString>();
+	dataModelTitle = v.value<QString>();
 	dataModelTitleChanged();
 }
 
 
 bool CCDMResultVarRecursiveObject::hasDataModelTitle()
 {
-	 return Version_1_0 && Version_1_0->dataModelTitle.HasValue();
+	 return dataModelTitle.HasValue();
 }
 
 
 QVariant CCDMResultVarRecursiveObject::GetDataModelVersion()
 {
-	if (Version_1_0 && Version_1_0->dataModelVersion){
-		return Version_1_0->dataModelVersion.value();
+	if (dataModelVersion){
+		return dataModelVersion.value();
 	}
 
 	return QVariant();
@@ -19530,28 +15634,25 @@ QVariant CCDMResultVarRecursiveObject::GetDataModelVersion()
 
 void CCDMResultVarRecursiveObject::SetDataModelVersion(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->dataModelVersion = v.value<QString>();
+	dataModelVersion = v.value<QString>();
 	dataModelVersionChanged();
 }
 
 
 bool CCDMResultVarRecursiveObject::hasDataModelVersion()
 {
-	 return Version_1_0 && Version_1_0->dataModelVersion.HasValue();
+	 return dataModelVersion.HasValue();
 }
 
 
 QVariant CCDMResultVarRecursiveObject::GetResultMetaData()
 {
-	if (Version_1_0 && Version_1_0->resultMetaData){
+	if (resultMetaData){
 		if (!m_resultMetaDataQObjectPtr.isValid()){
 			m_resultMetaDataQObjectPtr = CreateObject("resultMetaData");
-			auto itemPtr = m_resultMetaDataQObjectPtr.value<sdl::complextest::ComplexUnion2::CResultMetaDataObject*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->resultMetaData;
+			auto itemPtr = m_resultMetaDataQObjectPtr.value<sdl::V1_0::complextest::CResultMetaDataObject*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = resultMetaData;
 		}
 		return m_resultMetaDataQObjectPtr;
 	}
@@ -19562,16 +15663,13 @@ QVariant CCDMResultVarRecursiveObject::GetResultMetaData()
 
 void CCDMResultVarRecursiveObject::SetResultMetaData(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::complextest::ComplexUnion2::CResultMetaDataObject* itemPtr = v.value<sdl::complextest::ComplexUnion2::CResultMetaDataObject*>();
-		if (itemPtr != nullptr)  Version_1_0->resultMetaData = itemPtr->Version_1_0;
+		sdl::V1_0::complextest::CResultMetaDataObject* itemPtr = v.value<sdl::V1_0::complextest::CResultMetaDataObject*>();
+		if (itemPtr != nullptr)  resultMetaData = static_cast<const decltype(resultMetaData)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->resultMetaData = nullptr;
+		resultMetaData = nullptr;
 	}
 	m_resultMetaDataQObjectPtr = v;
 
@@ -19581,17 +15679,14 @@ void CCDMResultVarRecursiveObject::SetResultMetaData(const QVariant& v)
 
 bool CCDMResultVarRecursiveObject::hasResultMetaData()
 {
-	 return Version_1_0 && Version_1_0->resultMetaData.HasValue();
+	 return resultMetaData.HasValue();
 }
 
 
 void CCDMResultVarRecursiveObject::emplaceResultMetaData()
 {
 	ResetResultMetaData();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->resultMetaData.emplace();
+	resultMetaData.emplace();
 }
 
 
@@ -19607,11 +15702,11 @@ void CCDMResultVarRecursiveObject::ResetResultMetaData()
 
 QVariant CCDMResultVarRecursiveObject::GetResultContent()
 {
-	if (Version_1_0 && Version_1_0->resultContent){
+	if (resultContent){
 		if (!m_resultContentQObjectPtr.isValid()){
 			m_resultContentQObjectPtr = CreateObject("resultContent");
-			auto itemPtr = m_resultContentQObjectPtr.value<sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->resultContent;
+			auto itemPtr = m_resultContentQObjectPtr.value<sdl::V1_0::complextest::CCDMResultUnionTypeObjectList*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = resultContent;
 		}
 		return m_resultContentQObjectPtr;
 	}
@@ -19622,16 +15717,13 @@ QVariant CCDMResultVarRecursiveObject::GetResultContent()
 
 void CCDMResultVarRecursiveObject::SetResultContent(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList* itemPtr = v.value<sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList*>();
-		if (itemPtr != nullptr)  Version_1_0->resultContent = itemPtr->Version_1_0;
+		sdl::V1_0::complextest::CCDMResultUnionTypeObjectList* itemPtr = v.value<sdl::V1_0::complextest::CCDMResultUnionTypeObjectList*>();
+		if (itemPtr != nullptr)  resultContent = static_cast<const decltype(resultContent)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->resultContent = nullptr;
+		resultContent = nullptr;
 	}
 	m_resultContentQObjectPtr = v;
 
@@ -19641,17 +15733,14 @@ void CCDMResultVarRecursiveObject::SetResultContent(const QVariant& v)
 
 bool CCDMResultVarRecursiveObject::hasResultContent()
 {
-	 return Version_1_0 && Version_1_0->resultContent.HasValue();
+	 return resultContent.HasValue();
 }
 
 
 void CCDMResultVarRecursiveObject::emplaceResultContent()
 {
 	ResetResultContent();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->resultContent.emplace();
+	resultContent.emplace();
 }
 
 
@@ -19667,11 +15756,11 @@ void CCDMResultVarRecursiveObject::ResetResultContent()
 
 QVariant CCDMResultVarRecursiveObject::GetOverallResultValues()
 {
-	if (Version_1_0 && Version_1_0->overallResultValues){
+	if (overallResultValues){
 		if (!m_overallResultValuesQObjectPtr.isValid()){
 			m_overallResultValuesQObjectPtr = CreateObject("overallResultValues");
-			auto itemPtr = m_overallResultValuesQObjectPtr.value<sdl::complextest::ComplexUnion2::COverallResultValuesObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->overallResultValues;
+			auto itemPtr = m_overallResultValuesQObjectPtr.value<sdl::V1_0::complextest::COverallResultValuesObjectList*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = overallResultValues;
 		}
 		return m_overallResultValuesQObjectPtr;
 	}
@@ -19682,16 +15771,13 @@ QVariant CCDMResultVarRecursiveObject::GetOverallResultValues()
 
 void CCDMResultVarRecursiveObject::SetOverallResultValues(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* itemPtr = v.value<sdl::complextest::ComplexUnion2::COverallResultValuesObjectList*>();
-		if (itemPtr != nullptr)  Version_1_0->overallResultValues = itemPtr->Version_1_0;
+		sdl::V1_0::complextest::COverallResultValuesObjectList* itemPtr = v.value<sdl::V1_0::complextest::COverallResultValuesObjectList*>();
+		if (itemPtr != nullptr)  overallResultValues = static_cast<const decltype(overallResultValues)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->overallResultValues = nullptr;
+		overallResultValues = nullptr;
 	}
 	m_overallResultValuesQObjectPtr = v;
 
@@ -19701,17 +15787,14 @@ void CCDMResultVarRecursiveObject::SetOverallResultValues(const QVariant& v)
 
 bool CCDMResultVarRecursiveObject::hasOverallResultValues()
 {
-	 return Version_1_0 && Version_1_0->overallResultValues.HasValue();
+	 return overallResultValues.HasValue();
 }
 
 
 void CCDMResultVarRecursiveObject::emplaceOverallResultValues()
 {
 	ResetOverallResultValues();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->overallResultValues.emplace();
+	overallResultValues.emplace();
 }
 
 
@@ -19728,7 +15811,7 @@ void CCDMResultVarRecursiveObject::ResetOverallResultValues()
 QVariant CCDMResultVarRecursiveObject::createOverallResultValuesArrayElement(const QVariant& v)
 {
 	Q_UNUSED(v);
-	return QVariant::fromValue(new sdl::complextest::ComplexUnion2::COverallResultValuesObject());
+	return QVariant::fromValue(new sdl::V1_0::complextest::COverallResultValuesObject());
 }
 
 
@@ -19780,13 +15863,13 @@ QString CCDMResultVarRecursiveObject::toGraphQL() const
 QVariant CCDMResultVarRecursiveObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "resultMetaData"){
-		return QVariant::fromValue(new sdl::complextest::ComplexUnion2::CResultMetaDataObject(this));
+		return QVariant::fromValue(new sdl::V1_0::complextest::CResultMetaDataObject(this));
 	}
 	if (key == "resultContent"){
-		return QVariant::fromValue(new sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList(this));
+		return QVariant::fromValue(new sdl::V1_0::complextest::CCDMResultUnionTypeObjectList(this));
 	}
 	if (key == "overallResultValues"){
-		return QVariant::fromValue(new sdl::complextest::ComplexUnion2::COverallResultValuesObjectList(this));
+		return QVariant::fromValue(new sdl::V1_0::complextest::COverallResultValuesObjectList(this));
 	}
 	return QVariant();
 }
@@ -19835,83 +15918,83 @@ QVariantMap CCDMResultVarRecursiveObjectList::get(int row) const
 }
 
 
-void CCDMResultVarRecursiveObjectList::append(sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject* item)
+void CCDMResultVarRecursiveObjectList::append(sdl::V1_0::complextest::CCDMResultVarRecursiveObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObjectList* sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObjectList::copyMe()
+sdl::V1_0::complextest::CCDMResultVarRecursiveObjectList* sdl::V1_0::complextest::CCDMResultVarRecursiveObjectList::copyMe()
 {
-	sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObjectList* retVal = new sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObjectList();
+	sdl::V1_0::complextest::CCDMResultVarRecursiveObjectList* retVal = new sdl::V1_0::complextest::CCDMResultVarRecursiveObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObjectList::toJson()
+QString sdl::V1_0::complextest::CCDMResultVarRecursiveObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObjectList::toGraphQL()
+QString sdl::V1_0::complextest::CCDMResultVarRecursiveObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObjectList::addElement(sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject* item)
+void sdl::V1_0::complextest::CCDMResultVarRecursiveObjectList::addElement(sdl::V1_0::complextest::CCDMResultVarRecursiveObject* item)
 {
 	append(item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObjectList::removeElement(int index)
+void sdl::V1_0::complextest::CCDMResultVarRecursiveObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObjectList::isEqualWithModel(sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObjectList* otherModelPtr)
+bool sdl::V1_0::complextest::CCDMResultVarRecursiveObjectList::isEqualWithModel(sdl::V1_0::complextest::CCDMResultVarRecursiveObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObjectList::insert(int index, sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject* item)
+void sdl::V1_0::complextest::CCDMResultVarRecursiveObjectList::insert(int index, sdl::V1_0::complextest::CCDMResultVarRecursiveObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObjectList::remove(int index)
+void sdl::V1_0::complextest::CCDMResultVarRecursiveObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObjectList::clear()
+void sdl::V1_0::complextest::CCDMResultVarRecursiveObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CCDMResultVarRecursiveObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::complextest::CCDMResultVarRecursiveObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_dataModelTitle"){
-		return QVariant::fromValue(Version_1_0->at(index)->dataModelTitle.value());
+		return QVariant::fromValue(at(index)->dataModelTitle.value());
 	}
 	if (nameId == "m_dataModelVersion"){
-		return QVariant::fromValue(Version_1_0->at(index)->dataModelVersion.value());
+		return QVariant::fromValue(at(index)->dataModelVersion.value());
 	}
 	if (nameId == "m_resultMetaData"){
 		return itemPtr->GetResultMetaData();
@@ -19926,7 +16009,6 @@ QVariant sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObjectList::getD
 	return QVariant();
 }
 CCDMResultVarStringObject::CCDMResultVarStringObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CCDMResultVarStringObject::dataModelTitleChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CCDMResultVarStringObject::dataModelVersionChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -19938,8 +16020,8 @@ CCDMResultVarStringObject::CCDMResultVarStringObject(QObject* parent): ::imtbase
 
 QVariant CCDMResultVarStringObject::GetDataModelTitle()
 {
-	if (Version_1_0 && Version_1_0->dataModelTitle){
-		return Version_1_0->dataModelTitle.value();
+	if (dataModelTitle){
+		return dataModelTitle.value();
 	}
 
 	return QVariant();
@@ -19948,25 +16030,22 @@ QVariant CCDMResultVarStringObject::GetDataModelTitle()
 
 void CCDMResultVarStringObject::SetDataModelTitle(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->dataModelTitle = v.value<QString>();
+	dataModelTitle = v.value<QString>();
 	dataModelTitleChanged();
 }
 
 
 bool CCDMResultVarStringObject::hasDataModelTitle()
 {
-	 return Version_1_0 && Version_1_0->dataModelTitle.HasValue();
+	 return dataModelTitle.HasValue();
 }
 
 
 QVariant CCDMResultVarStringObject::GetDataModelVersion()
 {
-	if (Version_1_0 && Version_1_0->dataModelVersion){
-		return Version_1_0->dataModelVersion.value();
+	if (dataModelVersion){
+		return dataModelVersion.value();
 	}
 
 	return QVariant();
@@ -19975,28 +16054,25 @@ QVariant CCDMResultVarStringObject::GetDataModelVersion()
 
 void CCDMResultVarStringObject::SetDataModelVersion(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->dataModelVersion = v.value<QString>();
+	dataModelVersion = v.value<QString>();
 	dataModelVersionChanged();
 }
 
 
 bool CCDMResultVarStringObject::hasDataModelVersion()
 {
-	 return Version_1_0 && Version_1_0->dataModelVersion.HasValue();
+	 return dataModelVersion.HasValue();
 }
 
 
 QVariant CCDMResultVarStringObject::GetResultMetaData()
 {
-	if (Version_1_0 && Version_1_0->resultMetaData){
+	if (resultMetaData){
 		if (!m_resultMetaDataQObjectPtr.isValid()){
 			m_resultMetaDataQObjectPtr = CreateObject("resultMetaData");
-			auto itemPtr = m_resultMetaDataQObjectPtr.value<sdl::complextest::ComplexUnion2::CResultMetaDataObject*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->resultMetaData;
+			auto itemPtr = m_resultMetaDataQObjectPtr.value<sdl::V1_0::complextest::CResultMetaDataObject*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = resultMetaData;
 		}
 		return m_resultMetaDataQObjectPtr;
 	}
@@ -20007,16 +16083,13 @@ QVariant CCDMResultVarStringObject::GetResultMetaData()
 
 void CCDMResultVarStringObject::SetResultMetaData(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::complextest::ComplexUnion2::CResultMetaDataObject* itemPtr = v.value<sdl::complextest::ComplexUnion2::CResultMetaDataObject*>();
-		if (itemPtr != nullptr)  Version_1_0->resultMetaData = itemPtr->Version_1_0;
+		sdl::V1_0::complextest::CResultMetaDataObject* itemPtr = v.value<sdl::V1_0::complextest::CResultMetaDataObject*>();
+		if (itemPtr != nullptr)  resultMetaData = static_cast<const decltype(resultMetaData)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->resultMetaData = nullptr;
+		resultMetaData = nullptr;
 	}
 	m_resultMetaDataQObjectPtr = v;
 
@@ -20026,17 +16099,14 @@ void CCDMResultVarStringObject::SetResultMetaData(const QVariant& v)
 
 bool CCDMResultVarStringObject::hasResultMetaData()
 {
-	 return Version_1_0 && Version_1_0->resultMetaData.HasValue();
+	 return resultMetaData.HasValue();
 }
 
 
 void CCDMResultVarStringObject::emplaceResultMetaData()
 {
 	ResetResultMetaData();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->resultMetaData.emplace();
+	resultMetaData.emplace();
 }
 
 
@@ -20052,9 +16122,9 @@ void CCDMResultVarStringObject::ResetResultMetaData()
 
 QVariant CCDMResultVarStringObject::GetResultContent()
 {
-	if (Version_1_0 && Version_1_0->resultContent){
+	if (resultContent){
 		QList<QString> tempResultContentList;
-		for (const auto& tempValue: Version_1_0->resultContent.value()){
+		for (const auto& tempValue: resultContent.value()){
 			tempResultContentList << *tempValue;
 		}
 		return QVariant::fromValue(tempResultContentList);
@@ -20066,19 +16136,16 @@ QVariant CCDMResultVarStringObject::GetResultContent()
 
 void CCDMResultVarStringObject::SetResultContent(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	if (!Version_1_0->resultContent){
-		Version_1_0->resultContent.emplace();
+	if (!resultContent){
+		resultContent.emplace();
 	}
 	else{
-		Version_1_0->resultContent->clear();
+		resultContent->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QString> value(tempValue);
-		Version_1_0->resultContent->append(value);
+		resultContent->append(value);
 	}
 
 	resultContentChanged();
@@ -20087,17 +16154,17 @@ void CCDMResultVarStringObject::SetResultContent(const QVariant& v)
 
 bool CCDMResultVarStringObject::hasResultContent()
 {
-	 return Version_1_0 && Version_1_0->resultContent.HasValue();
+	 return resultContent.HasValue();
 }
 
 
 QVariant CCDMResultVarStringObject::GetOverallResultValues()
 {
-	if (Version_1_0 && Version_1_0->overallResultValues){
+	if (overallResultValues){
 		if (!m_overallResultValuesQObjectPtr.isValid()){
 			m_overallResultValuesQObjectPtr = CreateObject("overallResultValues");
-			auto itemPtr = m_overallResultValuesQObjectPtr.value<sdl::complextest::ComplexUnion2::COverallResultValuesObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->overallResultValues;
+			auto itemPtr = m_overallResultValuesQObjectPtr.value<sdl::V1_0::complextest::COverallResultValuesObjectList*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = overallResultValues;
 		}
 		return m_overallResultValuesQObjectPtr;
 	}
@@ -20108,16 +16175,13 @@ QVariant CCDMResultVarStringObject::GetOverallResultValues()
 
 void CCDMResultVarStringObject::SetOverallResultValues(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* itemPtr = v.value<sdl::complextest::ComplexUnion2::COverallResultValuesObjectList*>();
-		if (itemPtr != nullptr)  Version_1_0->overallResultValues = itemPtr->Version_1_0;
+		sdl::V1_0::complextest::COverallResultValuesObjectList* itemPtr = v.value<sdl::V1_0::complextest::COverallResultValuesObjectList*>();
+		if (itemPtr != nullptr)  overallResultValues = static_cast<const decltype(overallResultValues)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->overallResultValues = nullptr;
+		overallResultValues = nullptr;
 	}
 	m_overallResultValuesQObjectPtr = v;
 
@@ -20127,17 +16191,14 @@ void CCDMResultVarStringObject::SetOverallResultValues(const QVariant& v)
 
 bool CCDMResultVarStringObject::hasOverallResultValues()
 {
-	 return Version_1_0 && Version_1_0->overallResultValues.HasValue();
+	 return overallResultValues.HasValue();
 }
 
 
 void CCDMResultVarStringObject::emplaceOverallResultValues()
 {
 	ResetOverallResultValues();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->overallResultValues.emplace();
+	overallResultValues.emplace();
 }
 
 
@@ -20154,7 +16215,7 @@ void CCDMResultVarStringObject::ResetOverallResultValues()
 QVariant CCDMResultVarStringObject::createOverallResultValuesArrayElement(const QVariant& v)
 {
 	Q_UNUSED(v);
-	return QVariant::fromValue(new sdl::complextest::ComplexUnion2::COverallResultValuesObject());
+	return QVariant::fromValue(new sdl::V1_0::complextest::COverallResultValuesObject());
 }
 
 
@@ -20206,10 +16267,10 @@ QString CCDMResultVarStringObject::toGraphQL() const
 QVariant CCDMResultVarStringObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "resultMetaData"){
-		return QVariant::fromValue(new sdl::complextest::ComplexUnion2::CResultMetaDataObject(this));
+		return QVariant::fromValue(new sdl::V1_0::complextest::CResultMetaDataObject(this));
 	}
 	if (key == "overallResultValues"){
-		return QVariant::fromValue(new sdl::complextest::ComplexUnion2::COverallResultValuesObjectList(this));
+		return QVariant::fromValue(new sdl::V1_0::complextest::COverallResultValuesObjectList(this));
 	}
 	return QVariant();
 }
@@ -20258,89 +16319,89 @@ QVariantMap CCDMResultVarStringObjectList::get(int row) const
 }
 
 
-void CCDMResultVarStringObjectList::append(sdl::complextest::ComplexUnion2::CCDMResultVarStringObject* item)
+void CCDMResultVarStringObjectList::append(sdl::V1_0::complextest::CCDMResultVarStringObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::complextest::ComplexUnion2::CCDMResultVarStringObjectList* sdl::complextest::ComplexUnion2::CCDMResultVarStringObjectList::copyMe()
+sdl::V1_0::complextest::CCDMResultVarStringObjectList* sdl::V1_0::complextest::CCDMResultVarStringObjectList::copyMe()
 {
-	sdl::complextest::ComplexUnion2::CCDMResultVarStringObjectList* retVal = new sdl::complextest::ComplexUnion2::CCDMResultVarStringObjectList();
+	sdl::V1_0::complextest::CCDMResultVarStringObjectList* retVal = new sdl::V1_0::complextest::CCDMResultVarStringObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::complextest::ComplexUnion2::CCDMResultVarStringObjectList::toJson()
+QString sdl::V1_0::complextest::CCDMResultVarStringObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::complextest::ComplexUnion2::CCDMResultVarStringObjectList::toGraphQL()
+QString sdl::V1_0::complextest::CCDMResultVarStringObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::complextest::ComplexUnion2::CCDMResultVarStringObjectList::addElement(sdl::complextest::ComplexUnion2::CCDMResultVarStringObject* item)
+void sdl::V1_0::complextest::CCDMResultVarStringObjectList::addElement(sdl::V1_0::complextest::CCDMResultVarStringObject* item)
 {
 	append(item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CCDMResultVarStringObjectList::removeElement(int index)
+void sdl::V1_0::complextest::CCDMResultVarStringObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::complextest::ComplexUnion2::CCDMResultVarStringObjectList::isEqualWithModel(sdl::complextest::ComplexUnion2::CCDMResultVarStringObjectList* otherModelPtr)
+bool sdl::V1_0::complextest::CCDMResultVarStringObjectList::isEqualWithModel(sdl::V1_0::complextest::CCDMResultVarStringObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::complextest::ComplexUnion2::CCDMResultVarStringObjectList::insert(int index, sdl::complextest::ComplexUnion2::CCDMResultVarStringObject* item)
+void sdl::V1_0::complextest::CCDMResultVarStringObjectList::insert(int index, sdl::V1_0::complextest::CCDMResultVarStringObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CCDMResultVarStringObjectList::remove(int index)
+void sdl::V1_0::complextest::CCDMResultVarStringObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::complextest::ComplexUnion2::CCDMResultVarStringObjectList::clear()
+void sdl::V1_0::complextest::CCDMResultVarStringObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::complextest::ComplexUnion2::CCDMResultVarStringObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CCDMResultVarStringObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::complextest::ComplexUnion2::CCDMResultVarStringObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::complextest::CCDMResultVarStringObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_dataModelTitle"){
-		return QVariant::fromValue(Version_1_0->at(index)->dataModelTitle.value());
+		return QVariant::fromValue(at(index)->dataModelTitle.value());
 	}
 	if (nameId == "m_dataModelVersion"){
-		return QVariant::fromValue(Version_1_0->at(index)->dataModelVersion.value());
+		return QVariant::fromValue(at(index)->dataModelVersion.value());
 	}
 	if (nameId == "m_resultMetaData"){
 		return itemPtr->GetResultMetaData();
 	}
 	if (nameId == "m_resultContent"){
-		return QVariant::fromValue(Version_1_0->at(index)->resultContent.value());
+		return QVariant::fromValue(at(index)->resultContent.value());
 	}
 	if (nameId == "m_overallResultValues"){
 		return itemPtr->GetOverallResultValues();
@@ -20349,7 +16410,6 @@ QVariant sdl::complextest::ComplexUnion2::CCDMResultVarStringObjectList::getData
 	return QVariant();
 }
 CCDMResultObject::CCDMResultObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CCDMResultObject::dataModelTitleChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CCDMResultObject::dataModelVersionChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -20361,8 +16421,8 @@ CCDMResultObject::CCDMResultObject(QObject* parent): ::imtbase::CItemModelBase(p
 
 QVariant CCDMResultObject::GetDataModelTitle()
 {
-	if (Version_1_0 && Version_1_0->dataModelTitle){
-		return Version_1_0->dataModelTitle.value();
+	if (dataModelTitle){
+		return dataModelTitle.value();
 	}
 
 	return QVariant();
@@ -20371,25 +16431,22 @@ QVariant CCDMResultObject::GetDataModelTitle()
 
 void CCDMResultObject::SetDataModelTitle(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->dataModelTitle = v.value<QString>();
+	dataModelTitle = v.value<QString>();
 	dataModelTitleChanged();
 }
 
 
 bool CCDMResultObject::hasDataModelTitle()
 {
-	 return Version_1_0 && Version_1_0->dataModelTitle.HasValue();
+	 return dataModelTitle.HasValue();
 }
 
 
 QVariant CCDMResultObject::GetDataModelVersion()
 {
-	if (Version_1_0 && Version_1_0->dataModelVersion){
-		return Version_1_0->dataModelVersion.value();
+	if (dataModelVersion){
+		return dataModelVersion.value();
 	}
 
 	return QVariant();
@@ -20398,28 +16455,25 @@ QVariant CCDMResultObject::GetDataModelVersion()
 
 void CCDMResultObject::SetDataModelVersion(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->dataModelVersion = v.value<QString>();
+	dataModelVersion = v.value<QString>();
 	dataModelVersionChanged();
 }
 
 
 bool CCDMResultObject::hasDataModelVersion()
 {
-	 return Version_1_0 && Version_1_0->dataModelVersion.HasValue();
+	 return dataModelVersion.HasValue();
 }
 
 
 QVariant CCDMResultObject::GetResultMetaData()
 {
-	if (Version_1_0 && Version_1_0->resultMetaData){
+	if (resultMetaData){
 		if (!m_resultMetaDataQObjectPtr.isValid()){
 			m_resultMetaDataQObjectPtr = CreateObject("resultMetaData");
-			auto itemPtr = m_resultMetaDataQObjectPtr.value<sdl::complextest::ComplexUnion2::CResultMetaDataObject*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->resultMetaData;
+			auto itemPtr = m_resultMetaDataQObjectPtr.value<sdl::V1_0::complextest::CResultMetaDataObject*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = resultMetaData;
 		}
 		return m_resultMetaDataQObjectPtr;
 	}
@@ -20430,16 +16484,13 @@ QVariant CCDMResultObject::GetResultMetaData()
 
 void CCDMResultObject::SetResultMetaData(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::complextest::ComplexUnion2::CResultMetaDataObject* itemPtr = v.value<sdl::complextest::ComplexUnion2::CResultMetaDataObject*>();
-		if (itemPtr != nullptr)  Version_1_0->resultMetaData = itemPtr->Version_1_0;
+		sdl::V1_0::complextest::CResultMetaDataObject* itemPtr = v.value<sdl::V1_0::complextest::CResultMetaDataObject*>();
+		if (itemPtr != nullptr)  resultMetaData = static_cast<const decltype(resultMetaData)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->resultMetaData = nullptr;
+		resultMetaData = nullptr;
 	}
 	m_resultMetaDataQObjectPtr = v;
 
@@ -20449,17 +16500,14 @@ void CCDMResultObject::SetResultMetaData(const QVariant& v)
 
 bool CCDMResultObject::hasResultMetaData()
 {
-	 return Version_1_0 && Version_1_0->resultMetaData.HasValue();
+	 return resultMetaData.HasValue();
 }
 
 
 void CCDMResultObject::emplaceResultMetaData()
 {
 	ResetResultMetaData();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->resultMetaData.emplace();
+	resultMetaData.emplace();
 }
 
 
@@ -20475,11 +16523,11 @@ void CCDMResultObject::ResetResultMetaData()
 
 QVariant CCDMResultObject::GetResultContent()
 {
-	if (Version_1_0 && Version_1_0->resultContent){
+	if (resultContent){
 		if (!m_resultContentQObjectPtr.isValid()){
 			m_resultContentQObjectPtr = CreateObject("resultContent");
-			auto itemPtr = m_resultContentQObjectPtr.value<sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->resultContent;
+			auto itemPtr = m_resultContentQObjectPtr.value<sdl::V1_0::complextest::CCDMResultUnionTypeObjectList*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = resultContent;
 		}
 		return m_resultContentQObjectPtr;
 	}
@@ -20490,16 +16538,13 @@ QVariant CCDMResultObject::GetResultContent()
 
 void CCDMResultObject::SetResultContent(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList* itemPtr = v.value<sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList*>();
-		if (itemPtr != nullptr)  Version_1_0->resultContent = itemPtr->Version_1_0;
+		sdl::V1_0::complextest::CCDMResultUnionTypeObjectList* itemPtr = v.value<sdl::V1_0::complextest::CCDMResultUnionTypeObjectList*>();
+		if (itemPtr != nullptr)  resultContent = static_cast<const decltype(resultContent)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->resultContent = nullptr;
+		resultContent = nullptr;
 	}
 	m_resultContentQObjectPtr = v;
 
@@ -20509,17 +16554,14 @@ void CCDMResultObject::SetResultContent(const QVariant& v)
 
 bool CCDMResultObject::hasResultContent()
 {
-	 return Version_1_0 && Version_1_0->resultContent.HasValue();
+	 return resultContent.HasValue();
 }
 
 
 void CCDMResultObject::emplaceResultContent()
 {
 	ResetResultContent();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->resultContent.emplace();
+	resultContent.emplace();
 }
 
 
@@ -20535,11 +16577,11 @@ void CCDMResultObject::ResetResultContent()
 
 QVariant CCDMResultObject::GetOverallResultValues()
 {
-	if (Version_1_0 && Version_1_0->overallResultValues){
+	if (overallResultValues){
 		if (!m_overallResultValuesQObjectPtr.isValid()){
 			m_overallResultValuesQObjectPtr = CreateObject("overallResultValues");
-			auto itemPtr = m_overallResultValuesQObjectPtr.value<sdl::complextest::ComplexUnion2::COverallResultValuesObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->overallResultValues;
+			auto itemPtr = m_overallResultValuesQObjectPtr.value<sdl::V1_0::complextest::COverallResultValuesObjectList*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = overallResultValues;
 		}
 		return m_overallResultValuesQObjectPtr;
 	}
@@ -20550,16 +16592,13 @@ QVariant CCDMResultObject::GetOverallResultValues()
 
 void CCDMResultObject::SetOverallResultValues(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* itemPtr = v.value<sdl::complextest::ComplexUnion2::COverallResultValuesObjectList*>();
-		if (itemPtr != nullptr)  Version_1_0->overallResultValues = itemPtr->Version_1_0;
+		sdl::V1_0::complextest::COverallResultValuesObjectList* itemPtr = v.value<sdl::V1_0::complextest::COverallResultValuesObjectList*>();
+		if (itemPtr != nullptr)  overallResultValues = static_cast<const decltype(overallResultValues)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->overallResultValues = nullptr;
+		overallResultValues = nullptr;
 	}
 	m_overallResultValuesQObjectPtr = v;
 
@@ -20569,17 +16608,14 @@ void CCDMResultObject::SetOverallResultValues(const QVariant& v)
 
 bool CCDMResultObject::hasOverallResultValues()
 {
-	 return Version_1_0 && Version_1_0->overallResultValues.HasValue();
+	 return overallResultValues.HasValue();
 }
 
 
 void CCDMResultObject::emplaceOverallResultValues()
 {
 	ResetOverallResultValues();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->overallResultValues.emplace();
+	overallResultValues.emplace();
 }
 
 
@@ -20596,7 +16632,7 @@ void CCDMResultObject::ResetOverallResultValues()
 QVariant CCDMResultObject::createOverallResultValuesArrayElement(const QVariant& v)
 {
 	Q_UNUSED(v);
-	return QVariant::fromValue(new sdl::complextest::ComplexUnion2::COverallResultValuesObject());
+	return QVariant::fromValue(new sdl::V1_0::complextest::COverallResultValuesObject());
 }
 
 
@@ -20648,13 +16684,13 @@ QString CCDMResultObject::toGraphQL() const
 QVariant CCDMResultObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "resultMetaData"){
-		return QVariant::fromValue(new sdl::complextest::ComplexUnion2::CResultMetaDataObject(this));
+		return QVariant::fromValue(new sdl::V1_0::complextest::CResultMetaDataObject(this));
 	}
 	if (key == "resultContent"){
-		return QVariant::fromValue(new sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList(this));
+		return QVariant::fromValue(new sdl::V1_0::complextest::CCDMResultUnionTypeObjectList(this));
 	}
 	if (key == "overallResultValues"){
-		return QVariant::fromValue(new sdl::complextest::ComplexUnion2::COverallResultValuesObjectList(this));
+		return QVariant::fromValue(new sdl::V1_0::complextest::COverallResultValuesObjectList(this));
 	}
 	return QVariant();
 }
@@ -20703,83 +16739,83 @@ QVariantMap CCDMResultObjectList::get(int row) const
 }
 
 
-void CCDMResultObjectList::append(sdl::complextest::ComplexUnion2::CCDMResultObject* item)
+void CCDMResultObjectList::append(sdl::V1_0::complextest::CCDMResultObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::complextest::ComplexUnion2::CCDMResultObjectList* sdl::complextest::ComplexUnion2::CCDMResultObjectList::copyMe()
+sdl::V1_0::complextest::CCDMResultObjectList* sdl::V1_0::complextest::CCDMResultObjectList::copyMe()
 {
-	sdl::complextest::ComplexUnion2::CCDMResultObjectList* retVal = new sdl::complextest::ComplexUnion2::CCDMResultObjectList();
+	sdl::V1_0::complextest::CCDMResultObjectList* retVal = new sdl::V1_0::complextest::CCDMResultObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::complextest::ComplexUnion2::CCDMResultObjectList::toJson()
+QString sdl::V1_0::complextest::CCDMResultObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::complextest::ComplexUnion2::CCDMResultObjectList::toGraphQL()
+QString sdl::V1_0::complextest::CCDMResultObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::complextest::ComplexUnion2::CCDMResultObjectList::addElement(sdl::complextest::ComplexUnion2::CCDMResultObject* item)
+void sdl::V1_0::complextest::CCDMResultObjectList::addElement(sdl::V1_0::complextest::CCDMResultObject* item)
 {
 	append(item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CCDMResultObjectList::removeElement(int index)
+void sdl::V1_0::complextest::CCDMResultObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::complextest::ComplexUnion2::CCDMResultObjectList::isEqualWithModel(sdl::complextest::ComplexUnion2::CCDMResultObjectList* otherModelPtr)
+bool sdl::V1_0::complextest::CCDMResultObjectList::isEqualWithModel(sdl::V1_0::complextest::CCDMResultObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::complextest::ComplexUnion2::CCDMResultObjectList::insert(int index, sdl::complextest::ComplexUnion2::CCDMResultObject* item)
+void sdl::V1_0::complextest::CCDMResultObjectList::insert(int index, sdl::V1_0::complextest::CCDMResultObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CCDMResultObjectList::remove(int index)
+void sdl::V1_0::complextest::CCDMResultObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::complextest::ComplexUnion2::CCDMResultObjectList::clear()
+void sdl::V1_0::complextest::CCDMResultObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::complextest::ComplexUnion2::CCDMResultObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CCDMResultObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::complextest::ComplexUnion2::CCDMResultObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::complextest::CCDMResultObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_dataModelTitle"){
-		return QVariant::fromValue(Version_1_0->at(index)->dataModelTitle.value());
+		return QVariant::fromValue(at(index)->dataModelTitle.value());
 	}
 	if (nameId == "m_dataModelVersion"){
-		return QVariant::fromValue(Version_1_0->at(index)->dataModelVersion.value());
+		return QVariant::fromValue(at(index)->dataModelVersion.value());
 	}
 	if (nameId == "m_resultMetaData"){
 		return itemPtr->GetResultMetaData();
@@ -20794,7 +16830,6 @@ QVariant sdl::complextest::ComplexUnion2::CCDMResultObjectList::getData(const QS
 	return QVariant();
 }
 CPointsInCoordinateFormatObject::CPointsInCoordinateFormatObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CPointsInCoordinateFormatObject::pointAsCoordinatesChanged, this, &CItemModelBase::OnInternalModelChanged);
 }
@@ -20802,8 +16837,8 @@ CPointsInCoordinateFormatObject::CPointsInCoordinateFormatObject(QObject* parent
 
 QVariant CPointsInCoordinateFormatObject::GetPointAsCoordinates()
 {
-	if (Version_1_0 && Version_1_0->pointAsCoordinates){
-		return Version_1_0->pointAsCoordinates.value();
+	if (pointAsCoordinates){
+		return pointAsCoordinates.value();
 	}
 
 	return QVariant();
@@ -20812,18 +16847,15 @@ QVariant CPointsInCoordinateFormatObject::GetPointAsCoordinates()
 
 void CPointsInCoordinateFormatObject::SetPointAsCoordinates(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->pointAsCoordinates = v.value<bool>();
+	pointAsCoordinates = v.value<bool>();
 	pointAsCoordinatesChanged();
 }
 
 
 bool CPointsInCoordinateFormatObject::hasPointAsCoordinates()
 {
-	 return Version_1_0 && Version_1_0->pointAsCoordinates.HasValue();
+	 return pointAsCoordinates.HasValue();
 }
 
 
@@ -20909,86 +16941,85 @@ QVariantMap CPointsInCoordinateFormatObjectList::get(int row) const
 }
 
 
-void CPointsInCoordinateFormatObjectList::append(sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject* item)
+void CPointsInCoordinateFormatObjectList::append(sdl::V1_0::complextest::CPointsInCoordinateFormatObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObjectList* sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObjectList::copyMe()
+sdl::V1_0::complextest::CPointsInCoordinateFormatObjectList* sdl::V1_0::complextest::CPointsInCoordinateFormatObjectList::copyMe()
 {
-	sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObjectList* retVal = new sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObjectList();
+	sdl::V1_0::complextest::CPointsInCoordinateFormatObjectList* retVal = new sdl::V1_0::complextest::CPointsInCoordinateFormatObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObjectList::toJson()
+QString sdl::V1_0::complextest::CPointsInCoordinateFormatObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObjectList::toGraphQL()
+QString sdl::V1_0::complextest::CPointsInCoordinateFormatObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObjectList::addElement(sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject* item)
+void sdl::V1_0::complextest::CPointsInCoordinateFormatObjectList::addElement(sdl::V1_0::complextest::CPointsInCoordinateFormatObject* item)
 {
 	append(item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObjectList::removeElement(int index)
+void sdl::V1_0::complextest::CPointsInCoordinateFormatObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObjectList::isEqualWithModel(sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObjectList* otherModelPtr)
+bool sdl::V1_0::complextest::CPointsInCoordinateFormatObjectList::isEqualWithModel(sdl::V1_0::complextest::CPointsInCoordinateFormatObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObjectList::insert(int index, sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject* item)
+void sdl::V1_0::complextest::CPointsInCoordinateFormatObjectList::insert(int index, sdl::V1_0::complextest::CPointsInCoordinateFormatObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObjectList::remove(int index)
+void sdl::V1_0::complextest::CPointsInCoordinateFormatObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObjectList::clear()
+void sdl::V1_0::complextest::CPointsInCoordinateFormatObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CPointsInCoordinateFormatObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::complextest::CPointsInCoordinateFormatObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_pointAsCoordinates"){
-		return QVariant::fromValue(Version_1_0->at(index)->pointAsCoordinates.value());
+		return QVariant::fromValue(at(index)->pointAsCoordinates.value());
 	}
 
 	return QVariant();
 }
 CCollectionViewParamsTestObject::CCollectionViewParamsTestObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CCollectionViewParamsTestObject::countChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CCollectionViewParamsTestObject::offsetChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -20998,8 +17029,8 @@ CCollectionViewParamsTestObject::CCollectionViewParamsTestObject(QObject* parent
 
 QVariant CCollectionViewParamsTestObject::GetCount()
 {
-	if (Version_1_0 && Version_1_0->count){
-		return Version_1_0->count.value();
+	if (count){
+		return count.value();
 	}
 
 	return QVariant();
@@ -21008,25 +17039,22 @@ QVariant CCollectionViewParamsTestObject::GetCount()
 
 void CCollectionViewParamsTestObject::SetCount(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->count = v.value<int>();
+	count = v.value<int>();
 	countChanged();
 }
 
 
 bool CCollectionViewParamsTestObject::hasCount()
 {
-	 return Version_1_0 && Version_1_0->count.HasValue();
+	 return count.HasValue();
 }
 
 
 QVariant CCollectionViewParamsTestObject::GetOffset()
 {
-	if (Version_1_0 && Version_1_0->offset){
-		return Version_1_0->offset.value();
+	if (offset){
+		return offset.value();
 	}
 
 	return QVariant();
@@ -21035,28 +17063,25 @@ QVariant CCollectionViewParamsTestObject::GetOffset()
 
 void CCollectionViewParamsTestObject::SetOffset(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->offset = v.value<int>();
+	offset = v.value<int>();
 	offsetChanged();
 }
 
 
 bool CCollectionViewParamsTestObject::hasOffset()
 {
-	 return Version_1_0 && Version_1_0->offset.HasValue();
+	 return offset.HasValue();
 }
 
 
 QVariant CCollectionViewParamsTestObject::GetFilterModel()
 {
-	if (Version_1_0 && Version_1_0->filterModel){
+	if (filterModel){
 		if (!m_filterModelQObjectPtr.isValid()){
 			m_filterModelQObjectPtr = CreateObject("filterModel");
-			auto itemPtr = m_filterModelQObjectPtr.value<sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObject*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->filterModel;
+			auto itemPtr = m_filterModelQObjectPtr.value<sdl::V1_0::imtbase::CComplexCollectionFilterObject*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = filterModel;
 		}
 		return m_filterModelQObjectPtr;
 	}
@@ -21067,16 +17092,13 @@ QVariant CCollectionViewParamsTestObject::GetFilterModel()
 
 void CCollectionViewParamsTestObject::SetFilterModel(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObject* itemPtr = v.value<sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObject*>();
-		if (itemPtr != nullptr)  Version_1_0->filterModel = itemPtr->Version_1_0;
+		sdl::V1_0::imtbase::CComplexCollectionFilterObject* itemPtr = v.value<sdl::V1_0::imtbase::CComplexCollectionFilterObject*>();
+		if (itemPtr != nullptr)  filterModel = static_cast<const decltype(filterModel)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->filterModel = nullptr;
+		filterModel = nullptr;
 	}
 	m_filterModelQObjectPtr = v;
 
@@ -21086,17 +17108,14 @@ void CCollectionViewParamsTestObject::SetFilterModel(const QVariant& v)
 
 bool CCollectionViewParamsTestObject::hasFilterModel()
 {
-	 return Version_1_0 && Version_1_0->filterModel.HasValue();
+	 return filterModel.HasValue();
 }
 
 
 void CCollectionViewParamsTestObject::emplaceFilterModel()
 {
 	ResetFilterModel();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->filterModel.emplace();
+	filterModel.emplace();
 }
 
 
@@ -21158,7 +17177,7 @@ QString CCollectionViewParamsTestObject::toGraphQL() const
 QVariant CCollectionViewParamsTestObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "filterModel"){
-		return QVariant::fromValue(new sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObject(this));
+		return QVariant::fromValue(new sdl::V1_0::imtbase::CComplexCollectionFilterObject(this));
 	}
 	return QVariant();
 }
@@ -21201,83 +17220,83 @@ QVariantMap CCollectionViewParamsTestObjectList::get(int row) const
 }
 
 
-void CCollectionViewParamsTestObjectList::append(sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObject* item)
+void CCollectionViewParamsTestObjectList::append(sdl::V1_0::complextest::CCollectionViewParamsTestObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObjectList* sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObjectList::copyMe()
+sdl::V1_0::complextest::CCollectionViewParamsTestObjectList* sdl::V1_0::complextest::CCollectionViewParamsTestObjectList::copyMe()
 {
-	sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObjectList* retVal = new sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObjectList();
+	sdl::V1_0::complextest::CCollectionViewParamsTestObjectList* retVal = new sdl::V1_0::complextest::CCollectionViewParamsTestObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObjectList::toJson()
+QString sdl::V1_0::complextest::CCollectionViewParamsTestObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObjectList::toGraphQL()
+QString sdl::V1_0::complextest::CCollectionViewParamsTestObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObjectList::addElement(sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObject* item)
+void sdl::V1_0::complextest::CCollectionViewParamsTestObjectList::addElement(sdl::V1_0::complextest::CCollectionViewParamsTestObject* item)
 {
 	append(item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObjectList::removeElement(int index)
+void sdl::V1_0::complextest::CCollectionViewParamsTestObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObjectList::isEqualWithModel(sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObjectList* otherModelPtr)
+bool sdl::V1_0::complextest::CCollectionViewParamsTestObjectList::isEqualWithModel(sdl::V1_0::complextest::CCollectionViewParamsTestObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObjectList::insert(int index, sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObject* item)
+void sdl::V1_0::complextest::CCollectionViewParamsTestObjectList::insert(int index, sdl::V1_0::complextest::CCollectionViewParamsTestObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObjectList::remove(int index)
+void sdl::V1_0::complextest::CCollectionViewParamsTestObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObjectList::clear()
+void sdl::V1_0::complextest::CCollectionViewParamsTestObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CCollectionViewParamsTestObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::complextest::CCollectionViewParamsTestObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_count"){
-		return QVariant::fromValue(Version_1_0->at(index)->count.value());
+		return QVariant::fromValue(at(index)->count.value());
 	}
 	if (nameId == "m_offset"){
-		return QVariant::fromValue(Version_1_0->at(index)->offset.value());
+		return QVariant::fromValue(at(index)->offset.value());
 	}
 	if (nameId == "m_filterModel"){
 		return itemPtr->GetFilterModel();
@@ -21295,21 +17314,21 @@ QVariant CExtendedMetaDataUnionTypeObjectList::GetOrCreateCachedObject(int index
 		retVal = this->m_objectDataTypeMap[index];
 	}
 	else{
-		if (const CCoordinates* val = std::get_if<CCoordinates>(this->Version_1_0->at(index).GetPtr())){
+		if (const CCoordinates* val = std::get_if<CCoordinates>(this->at(index).GetPtr())){
 			CCoordinatesObject *newObjectPtr = new CCoordinatesObject();
-			newObjectPtr->Version_1_0 = val->Version_1_0;
+			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
-		if (const double* val = std::get_if<double>(this->Version_1_0->at(index).GetPtr())){
+		if (const double* val = std::get_if<double>(this->at(index).GetPtr())){
 			retVal =  QVariant::fromValue(val);
 		}
 
-		if (const bool* val = std::get_if<bool>(this->Version_1_0->at(index).GetPtr())){
+		if (const bool* val = std::get_if<bool>(this->at(index).GetPtr())){
 			retVal =  QVariant::fromValue(val);
 		}
 
-		if (const QString* val = std::get_if<QString>(this->Version_1_0->at(index).GetPtr())){
+		if (const QString* val = std::get_if<QString>(this->at(index).GetPtr())){
 			retVal =  QVariant::fromValue(val);
 		}
 
@@ -21339,27 +17358,27 @@ QVariantMap CExtendedMetaDataUnionTypeObjectList::get(int row) const
 
 void CExtendedMetaDataUnionTypeObjectList::append(QVariant item)
 {
-	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
+	beginInsertRows(QModelIndex(), count(), 0);
 
 	if (item.canConvert<CCoordinatesObject*>()){
 		CCoordinatesObject* val = item.value<CCoordinatesObject*>();
 		CCoordinates* newItemPtr = dynamic_cast<CCoordinates*>(val);
-		Version_1_0->append(istd::TSharedNullable<ExtendedMetaDataUnionType>(*newItemPtr));
+		append(istd::TSharedNullable<ExtendedMetaDataUnionType>(*newItemPtr));
 	}
 
 	if (item.canConvert<double>()){
 		double val = item.value<double>();
-		Version_1_0->append(istd::TSharedNullable<ExtendedMetaDataUnionType>(val));
+		append(istd::TSharedNullable<ExtendedMetaDataUnionType>(val));
 	}
 
 	if (item.canConvert<bool>()){
 		bool val = item.value<bool>();
-		Version_1_0->append(istd::TSharedNullable<ExtendedMetaDataUnionType>(val));
+		append(istd::TSharedNullable<ExtendedMetaDataUnionType>(val));
 	}
 
 	if (item.canConvert<QString>()){
 		QString val = item.value<QString>();
-		Version_1_0->append(istd::TSharedNullable<ExtendedMetaDataUnionType>(val));
+		append(istd::TSharedNullable<ExtendedMetaDataUnionType>(val));
 	}
 
 	ClearCache();
@@ -21367,9 +17386,9 @@ void CExtendedMetaDataUnionTypeObjectList::append(QVariant item)
 }
 
 
-sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionTypeObjectList* CExtendedMetaDataUnionTypeObjectList::copyMe()
+sdl::V1_0::complextest::CExtendedMetaDataUnionTypeObjectList* CExtendedMetaDataUnionTypeObjectList::copyMe()
 {
-	sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionTypeObjectList* objectListPtr = new sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionTypeObjectList();
+	sdl::V1_0::complextest::CExtendedMetaDataUnionTypeObjectList* objectListPtr = new sdl::V1_0::complextest::CExtendedMetaDataUnionTypeObjectList();
 
 	for (int i = 0; i < this->rowCount(); i++){
 		QVariant item = this->getData("item", i);
@@ -21484,7 +17503,7 @@ void CExtendedMetaDataUnionTypeObjectList::removeElement(int index)
 	remove(index);
 }
 
-bool CExtendedMetaDataUnionTypeObjectList::isEqualWithModel(sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionTypeObjectList* otherModelPtr)
+bool CExtendedMetaDataUnionTypeObjectList::isEqualWithModel(sdl::V1_0::complextest::CExtendedMetaDataUnionTypeObjectList* otherModelPtr)
 {
 	if (otherModelPtr == nullptr){
 		return false;
@@ -21513,28 +17532,28 @@ bool CExtendedMetaDataUnionTypeObjectList::isEqualWithModel(sdl::complextest::Co
 
 void CExtendedMetaDataUnionTypeObjectList::insert(int index, QVariant item)
 {
-	if (index < 0 || index > Version_1_0->size()) return;
-	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
+	if (index < 0 || index > size()) return;
+	beginInsertRows(QModelIndex(), count(), 0);
 
 	if (item.canConvert<CCoordinatesObject*>()){
 		CCoordinatesObject* val = item.value<CCoordinatesObject*>();
 		CCoordinates* newItemPtr = dynamic_cast<CCoordinates*>(val);
-		Version_1_0->append(istd::TSharedNullable<ExtendedMetaDataUnionType>(*newItemPtr));
+		append(istd::TSharedNullable<ExtendedMetaDataUnionType>(*newItemPtr));
 	}
 
 	if (item.canConvert<double>()){
 		double val = item.value<double>();
-		Version_1_0->append(istd::TSharedNullable<ExtendedMetaDataUnionType>(val));
+		append(istd::TSharedNullable<ExtendedMetaDataUnionType>(val));
 	}
 
 	if (item.canConvert<bool>()){
 		bool val = item.value<bool>();
-		Version_1_0->append(istd::TSharedNullable<ExtendedMetaDataUnionType>(val));
+		append(istd::TSharedNullable<ExtendedMetaDataUnionType>(val));
 	}
 
 	if (item.canConvert<QString>()){
 		QString val = item.value<QString>();
-		Version_1_0->append(istd::TSharedNullable<ExtendedMetaDataUnionType>(val));
+		append(istd::TSharedNullable<ExtendedMetaDataUnionType>(val));
 	}
 
 	ClearCache();
@@ -21556,7 +17575,7 @@ void CExtendedMetaDataUnionTypeObjectList::clear()
 
 QVariant CExtendedMetaDataUnionTypeObjectList::getData(const QString& nameId, int index)
 {
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		QVariant retVal = GetOrCreateCachedObject(index);
 		return retVal;
 	}
@@ -21572,15 +17591,15 @@ QVariant CExtendedMetaDataUnionSimpleTypeObjectList::GetOrCreateCachedObject(int
 		retVal = this->m_objectDataTypeMap[index];
 	}
 	else{
-		if (const double* val = std::get_if<double>(this->Version_1_0->at(index).GetPtr())){
+		if (const double* val = std::get_if<double>(this->at(index).GetPtr())){
 			retVal =  QVariant::fromValue(val);
 		}
 
-		if (const bool* val = std::get_if<bool>(this->Version_1_0->at(index).GetPtr())){
+		if (const bool* val = std::get_if<bool>(this->at(index).GetPtr())){
 			retVal =  QVariant::fromValue(val);
 		}
 
-		if (const QString* val = std::get_if<QString>(this->Version_1_0->at(index).GetPtr())){
+		if (const QString* val = std::get_if<QString>(this->at(index).GetPtr())){
 			retVal =  QVariant::fromValue(val);
 		}
 
@@ -21610,21 +17629,21 @@ QVariantMap CExtendedMetaDataUnionSimpleTypeObjectList::get(int row) const
 
 void CExtendedMetaDataUnionSimpleTypeObjectList::append(QVariant item)
 {
-	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
+	beginInsertRows(QModelIndex(), count(), 0);
 
 	if (item.canConvert<double>()){
 		double val = item.value<double>();
-		Version_1_0->append(istd::TSharedNullable<ExtendedMetaDataUnionSimpleType>(val));
+		append(istd::TSharedNullable<ExtendedMetaDataUnionSimpleType>(val));
 	}
 
 	if (item.canConvert<bool>()){
 		bool val = item.value<bool>();
-		Version_1_0->append(istd::TSharedNullable<ExtendedMetaDataUnionSimpleType>(val));
+		append(istd::TSharedNullable<ExtendedMetaDataUnionSimpleType>(val));
 	}
 
 	if (item.canConvert<QString>()){
 		QString val = item.value<QString>();
-		Version_1_0->append(istd::TSharedNullable<ExtendedMetaDataUnionSimpleType>(val));
+		append(istd::TSharedNullable<ExtendedMetaDataUnionSimpleType>(val));
 	}
 
 	ClearCache();
@@ -21632,9 +17651,9 @@ void CExtendedMetaDataUnionSimpleTypeObjectList::append(QVariant item)
 }
 
 
-sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionSimpleTypeObjectList* CExtendedMetaDataUnionSimpleTypeObjectList::copyMe()
+sdl::V1_0::complextest::CExtendedMetaDataUnionSimpleTypeObjectList* CExtendedMetaDataUnionSimpleTypeObjectList::copyMe()
 {
-	sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionSimpleTypeObjectList* objectListPtr = new sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionSimpleTypeObjectList();
+	sdl::V1_0::complextest::CExtendedMetaDataUnionSimpleTypeObjectList* objectListPtr = new sdl::V1_0::complextest::CExtendedMetaDataUnionSimpleTypeObjectList();
 
 	for (int i = 0; i < this->rowCount(); i++){
 		QVariant item = this->getData("item", i);
@@ -21734,7 +17753,7 @@ void CExtendedMetaDataUnionSimpleTypeObjectList::removeElement(int index)
 	remove(index);
 }
 
-bool CExtendedMetaDataUnionSimpleTypeObjectList::isEqualWithModel(sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionSimpleTypeObjectList* otherModelPtr)
+bool CExtendedMetaDataUnionSimpleTypeObjectList::isEqualWithModel(sdl::V1_0::complextest::CExtendedMetaDataUnionSimpleTypeObjectList* otherModelPtr)
 {
 	if (otherModelPtr == nullptr){
 		return false;
@@ -21763,22 +17782,22 @@ bool CExtendedMetaDataUnionSimpleTypeObjectList::isEqualWithModel(sdl::complexte
 
 void CExtendedMetaDataUnionSimpleTypeObjectList::insert(int index, QVariant item)
 {
-	if (index < 0 || index > Version_1_0->size()) return;
-	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
+	if (index < 0 || index > size()) return;
+	beginInsertRows(QModelIndex(), count(), 0);
 
 	if (item.canConvert<double>()){
 		double val = item.value<double>();
-		Version_1_0->append(istd::TSharedNullable<ExtendedMetaDataUnionSimpleType>(val));
+		append(istd::TSharedNullable<ExtendedMetaDataUnionSimpleType>(val));
 	}
 
 	if (item.canConvert<bool>()){
 		bool val = item.value<bool>();
-		Version_1_0->append(istd::TSharedNullable<ExtendedMetaDataUnionSimpleType>(val));
+		append(istd::TSharedNullable<ExtendedMetaDataUnionSimpleType>(val));
 	}
 
 	if (item.canConvert<QString>()){
 		QString val = item.value<QString>();
-		Version_1_0->append(istd::TSharedNullable<ExtendedMetaDataUnionSimpleType>(val));
+		append(istd::TSharedNullable<ExtendedMetaDataUnionSimpleType>(val));
 	}
 
 	ClearCache();
@@ -21800,7 +17819,7 @@ void CExtendedMetaDataUnionSimpleTypeObjectList::clear()
 
 QVariant CExtendedMetaDataUnionSimpleTypeObjectList::getData(const QString& nameId, int index)
 {
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		QVariant retVal = GetOrCreateCachedObject(index);
 		return retVal;
 	}
@@ -21816,15 +17835,15 @@ QVariant CCDMResultUnionTypeObjectList::GetOrCreateCachedObject(int index) const
 		retVal = this->m_objectDataTypeMap[index];
 	}
 	else{
-		if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>(this->Version_1_0->at(index).GetPtr())){
+		if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>(this->at(index).GetPtr())){
 			CCDMResultVarStringObject *newObjectPtr = new CCDMResultVarStringObject();
-			newObjectPtr->Version_1_0 = val->Version_1_0;
+			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
-		if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>(this->Version_1_0->at(index).GetPtr())){
+		if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>(this->at(index).GetPtr())){
 			CCDMResultVarRecursiveObject *newObjectPtr = new CCDMResultVarRecursiveObject();
-			newObjectPtr->Version_1_0 = val->Version_1_0;
+			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
@@ -21854,18 +17873,18 @@ QVariantMap CCDMResultUnionTypeObjectList::get(int row) const
 
 void CCDMResultUnionTypeObjectList::append(QVariant item)
 {
-	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
+	beginInsertRows(QModelIndex(), count(), 0);
 
 	if (item.canConvert<CCDMResultVarStringObject*>()){
 		CCDMResultVarStringObject* val = item.value<CCDMResultVarStringObject*>();
 		CCDMResultVarString* newItemPtr = dynamic_cast<CCDMResultVarString*>(val);
-		Version_1_0->append(istd::TSharedNullable<CDMResultUnionType>(*newItemPtr));
+		append(istd::TSharedNullable<CDMResultUnionType>(*newItemPtr));
 	}
 
 	if (item.canConvert<CCDMResultVarRecursiveObject*>()){
 		CCDMResultVarRecursiveObject* val = item.value<CCDMResultVarRecursiveObject*>();
 		CCDMResultVarRecursive* newItemPtr = dynamic_cast<CCDMResultVarRecursive*>(val);
-		Version_1_0->append(istd::TSharedNullable<CDMResultUnionType>(*newItemPtr));
+		append(istd::TSharedNullable<CDMResultUnionType>(*newItemPtr));
 	}
 
 	ClearCache();
@@ -21873,9 +17892,9 @@ void CCDMResultUnionTypeObjectList::append(QVariant item)
 }
 
 
-sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList* CCDMResultUnionTypeObjectList::copyMe()
+sdl::V1_0::complextest::CCDMResultUnionTypeObjectList* CCDMResultUnionTypeObjectList::copyMe()
 {
-	sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList* objectListPtr = new sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList();
+	sdl::V1_0::complextest::CCDMResultUnionTypeObjectList* objectListPtr = new sdl::V1_0::complextest::CCDMResultUnionTypeObjectList();
 
 	for (int i = 0; i < this->rowCount(); i++){
 		QVariant item = this->getData("item", i);
@@ -21960,7 +17979,7 @@ void CCDMResultUnionTypeObjectList::removeElement(int index)
 	remove(index);
 }
 
-bool CCDMResultUnionTypeObjectList::isEqualWithModel(sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList* otherModelPtr)
+bool CCDMResultUnionTypeObjectList::isEqualWithModel(sdl::V1_0::complextest::CCDMResultUnionTypeObjectList* otherModelPtr)
 {
 	if (otherModelPtr == nullptr){
 		return false;
@@ -21989,19 +18008,19 @@ bool CCDMResultUnionTypeObjectList::isEqualWithModel(sdl::complextest::ComplexUn
 
 void CCDMResultUnionTypeObjectList::insert(int index, QVariant item)
 {
-	if (index < 0 || index > Version_1_0->size()) return;
-	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
+	if (index < 0 || index > size()) return;
+	beginInsertRows(QModelIndex(), count(), 0);
 
 	if (item.canConvert<CCDMResultVarStringObject*>()){
 		CCDMResultVarStringObject* val = item.value<CCDMResultVarStringObject*>();
 		CCDMResultVarString* newItemPtr = dynamic_cast<CCDMResultVarString*>(val);
-		Version_1_0->append(istd::TSharedNullable<CDMResultUnionType>(*newItemPtr));
+		append(istd::TSharedNullable<CDMResultUnionType>(*newItemPtr));
 	}
 
 	if (item.canConvert<CCDMResultVarRecursiveObject*>()){
 		CCDMResultVarRecursiveObject* val = item.value<CCDMResultVarRecursiveObject*>();
 		CCDMResultVarRecursive* newItemPtr = dynamic_cast<CCDMResultVarRecursive*>(val);
-		Version_1_0->append(istd::TSharedNullable<CDMResultUnionType>(*newItemPtr));
+		append(istd::TSharedNullable<CDMResultUnionType>(*newItemPtr));
 	}
 
 	ClearCache();
@@ -22023,7 +18042,7 @@ void CCDMResultUnionTypeObjectList::clear()
 
 QVariant CCDMResultUnionTypeObjectList::getData(const QString& nameId, int index)
 {
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		QVariant retVal = GetOrCreateCachedObject(index);
 		return retVal;
 	}
@@ -22427,4 +18446,4 @@ QJsonObject CGraphQlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGql
 }
 
 
-} // namespace sdl::complextest::ComplexUnion2
+} // namespace sdl::V1_0::complextest

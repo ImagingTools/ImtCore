@@ -2,17 +2,17 @@
 #include "ComplexUnion1_fwd.h"
 
 
-namespace sdl::complextest::ComplexUnion1
+namespace sdl::V1_0::complextest
 {
 
 
-QByteArray CPoint::V1_0::GetVersionId()
+QByteArray CPoint::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CPoint::V1_0::operator==(const V1_0& other) const
+bool CPoint::operator==(const CPoint& other) const
 {
 	return 
 				X.has_value() == other.X.has_value() &&
@@ -24,7 +24,7 @@ bool CPoint::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CPoint::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CPoint::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "Point", modelIndex);
 
@@ -47,7 +47,7 @@ bool CPoint::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex
 }
 
 
-bool CPoint::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CPoint::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant xData = model.GetData("X", modelIndex);
 	if (xData.isNull()){
@@ -69,7 +69,7 @@ bool CPoint::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mod
 }
 
 
-bool CPoint::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CPoint::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant xData = model.GetData("X", modelIndex);
 	if (!xData.isNull()){
@@ -85,7 +85,7 @@ bool CPoint::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 }
 
 
-bool CPoint::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CPoint::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!X){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "X").toLocal8Bit().constData();)
@@ -107,7 +107,7 @@ bool CPoint::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) co
 }
 
 
-bool CPoint::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CPoint::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("X") || (gqlObject["X"].userType() != QMetaType::Float && gqlObject["X"].userType() != QMetaType::Double && gqlObject["X"].userType() != QMetaType::Int && gqlObject["X"].userType() != QMetaType::UInt && gqlObject["X"].userType() != QMetaType::LongLong && gqlObject["X"].userType() != QMetaType::ULongLong && gqlObject["X"].userType() != QMetaType::Long && gqlObject["X"].userType() != QMetaType::Short && gqlObject["X"].userType() != QMetaType::ULong && gqlObject["X"].userType() != QMetaType::UShort && gqlObject["X"].userType() != QMetaType::UChar)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "X").toLocal8Bit().constData();)
@@ -127,7 +127,7 @@ bool CPoint::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObj
 }
 
 
-bool CPoint::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CPoint::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("X") && (gqlObject["X"].userType() == QMetaType::Float || gqlObject["X"].userType() == QMetaType::Double || gqlObject["X"].userType() == QMetaType::Int || gqlObject["X"].userType() == QMetaType::UInt || gqlObject["X"].userType() == QMetaType::LongLong || gqlObject["X"].userType() == QMetaType::ULongLong || gqlObject["X"].userType() == QMetaType::Long || gqlObject["X"].userType() == QMetaType::Short || gqlObject["X"].userType() == QMetaType::ULong || gqlObject["X"].userType() == QMetaType::UShort || gqlObject["X"].userType() == QMetaType::UChar)){
 		X = gqlObject["X"].toDouble();
@@ -141,7 +141,7 @@ bool CPoint::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 }
 
 
-bool CPoint::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CPoint::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!X){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "X").toLocal8Bit().constData();)
@@ -163,7 +163,7 @@ bool CPoint::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CPoint::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CPoint::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("X") || ! jsonObject["X"].isDouble()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "X").toLocal8Bit().constData();)
@@ -183,7 +183,7 @@ bool CPoint::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CPoint::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CPoint::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("X") && jsonObject["X"].isDouble()){
 		X = jsonObject["X"].toDouble();
@@ -199,243 +199,13 @@ bool CPoint::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CPoint::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPoint::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPoint::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPoint::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPoint::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPoint::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPoint::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPoint::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPoint::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CGeometry::V1_0::GetVersionId()
+QByteArray CGeometry::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CGeometry::V1_0::operator==(const V1_0& other) const
+bool CGeometry::operator==(const CGeometry& other) const
 {
 	return 
 				GeometryType == other.GeometryType &&
@@ -448,7 +218,7 @@ bool CGeometry::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CGeometry::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CGeometry::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "Geometry", modelIndex);
 
@@ -525,7 +295,7 @@ bool CGeometry::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 }
 
 
-bool CGeometry::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CGeometry::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant geometryTypeData = model.GetData("GeometryType", modelIndex);
 	if (geometryTypeData.isNull()){
@@ -620,7 +390,7 @@ bool CGeometry::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 }
 
 
-bool CGeometry::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CGeometry::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant geometryTypeData = model.GetData("GeometryType", modelIndex);
 	if (!geometryTypeData.isNull()){
@@ -706,7 +476,7 @@ bool CGeometry::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 }
 
 
-bool CGeometry::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CGeometry::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!GeometryType){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "GeometryType").toLocal8Bit().constData();)
@@ -788,7 +558,7 @@ bool CGeometry::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 }
 
 
-bool CGeometry::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CGeometry::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("GeometryType") || (gqlObject["GeometryType"].userType() != QMetaType::QString && gqlObject["GeometryType"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "GeometryType").toLocal8Bit().constData();)
@@ -890,7 +660,7 @@ bool CGeometry::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 }
 
 
-bool CGeometry::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CGeometry::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("GeometryType") && (gqlObject["GeometryType"].userType() == QMetaType::QString || gqlObject["GeometryType"].userType() == QMetaType::QByteArray)){
 		const QString geometryTypeStringValue = gqlObject["GeometryType"].toString();
@@ -986,7 +756,7 @@ bool CGeometry::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 }
 
 
-bool CGeometry::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CGeometry::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!GeometryType){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "GeometryType").toLocal8Bit().constData();)
@@ -1068,7 +838,7 @@ bool CGeometry::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CGeometry::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CGeometry::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("GeometryType") || ! jsonObject["GeometryType"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "GeometryType").toLocal8Bit().constData();)
@@ -1155,7 +925,7 @@ bool CGeometry::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CGeometry::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CGeometry::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("GeometryType") && jsonObject["GeometryType"].isString()){
 		const QString geometryTypeStringValue = jsonObject["GeometryType"].toString();
@@ -1235,238 +1005,7 @@ bool CGeometry::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CGeometry::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CGeometry::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CGeometry::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CGeometry::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CGeometry::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CGeometry::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CGeometry::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CGeometry::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CGeometry::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
 CPointObject::CPointObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CPointObject::xChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CPointObject::yChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -1475,8 +1014,8 @@ CPointObject::CPointObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
 QVariant CPointObject::GetX()
 {
-	if (Version_1_0 && Version_1_0->X){
-		return Version_1_0->X.value();
+	if (X){
+		return X.value();
 	}
 
 	return QVariant();
@@ -1485,25 +1024,22 @@ QVariant CPointObject::GetX()
 
 void CPointObject::SetX(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->X = v.value<double>();
+	X = v.value<double>();
 	xChanged();
 }
 
 
 bool CPointObject::hasX()
 {
-	 return Version_1_0 && Version_1_0->X.HasValue();
+	 return X.HasValue();
 }
 
 
 QVariant CPointObject::GetY()
 {
-	if (Version_1_0 && Version_1_0->Y){
-		return Version_1_0->Y.value();
+	if (Y){
+		return Y.value();
 	}
 
 	return QVariant();
@@ -1512,18 +1048,15 @@ QVariant CPointObject::GetY()
 
 void CPointObject::SetY(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->Y = v.value<double>();
+	Y = v.value<double>();
 	yChanged();
 }
 
 
 bool CPointObject::hasY()
 {
-	 return Version_1_0 && Version_1_0->Y.HasValue();
+	 return Y.HasValue();
 }
 
 
@@ -1612,89 +1145,88 @@ QVariantMap CPointObjectList::get(int row) const
 }
 
 
-void CPointObjectList::append(sdl::complextest::ComplexUnion1::CPointObject* item)
+void CPointObjectList::append(sdl::V1_0::complextest::CPointObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::complextest::ComplexUnion1::CPointObjectList* sdl::complextest::ComplexUnion1::CPointObjectList::copyMe()
+sdl::V1_0::complextest::CPointObjectList* sdl::V1_0::complextest::CPointObjectList::copyMe()
 {
-	sdl::complextest::ComplexUnion1::CPointObjectList* retVal = new sdl::complextest::ComplexUnion1::CPointObjectList();
+	sdl::V1_0::complextest::CPointObjectList* retVal = new sdl::V1_0::complextest::CPointObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::complextest::ComplexUnion1::CPointObjectList::toJson()
+QString sdl::V1_0::complextest::CPointObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::complextest::ComplexUnion1::CPointObjectList::toGraphQL()
+QString sdl::V1_0::complextest::CPointObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::complextest::ComplexUnion1::CPointObjectList::addElement(sdl::complextest::ComplexUnion1::CPointObject* item)
+void sdl::V1_0::complextest::CPointObjectList::addElement(sdl::V1_0::complextest::CPointObject* item)
 {
 	append(item);
 }
 
 
-void sdl::complextest::ComplexUnion1::CPointObjectList::removeElement(int index)
+void sdl::V1_0::complextest::CPointObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::complextest::ComplexUnion1::CPointObjectList::isEqualWithModel(sdl::complextest::ComplexUnion1::CPointObjectList* otherModelPtr)
+bool sdl::V1_0::complextest::CPointObjectList::isEqualWithModel(sdl::V1_0::complextest::CPointObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::complextest::ComplexUnion1::CPointObjectList::insert(int index, sdl::complextest::ComplexUnion1::CPointObject* item)
+void sdl::V1_0::complextest::CPointObjectList::insert(int index, sdl::V1_0::complextest::CPointObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::complextest::ComplexUnion1::CPointObjectList::remove(int index)
+void sdl::V1_0::complextest::CPointObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::complextest::ComplexUnion1::CPointObjectList::clear()
+void sdl::V1_0::complextest::CPointObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::complextest::ComplexUnion1::CPointObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CPointObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::complextest::ComplexUnion1::CPointObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::complextest::CPointObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_x"){
-		return QVariant::fromValue(Version_1_0->at(index)->X.value());
+		return QVariant::fromValue(at(index)->X.value());
 	}
 	if (nameId == "m_y"){
-		return QVariant::fromValue(Version_1_0->at(index)->Y.value());
+		return QVariant::fromValue(at(index)->Y.value());
 	}
 
 	return QVariant();
 }
 CGeometryObject::CGeometryObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CGeometryObject::geometryTypeChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CGeometryObject::radiusChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -1706,9 +1238,9 @@ CGeometryObject::CGeometryObject(QObject* parent): ::imtbase::CItemModelBase(par
 
 QVariant CGeometryObject::GetGeometryType()
 {
-	if (Version_1_0 && Version_1_0->GeometryType){
-		sdl::complextest::ComplexUnion1::GeometryType valueType = Version_1_0->GeometryType.value();
-		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::GeometryType>();
+	if (GeometryType){
+		sdl::V1_0::complextest::GeometryType valueType = GeometryType.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::GeometryType>();
 		QString retval = metaEnum.valueToKey((int)valueType);
 
 		return retval;
@@ -1720,15 +1252,12 @@ QVariant CGeometryObject::GetGeometryType()
 
 void CGeometryObject::SetGeometryType(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->GeometryType.emplace();
-	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::ComplexUnion1::GeometryType>();
+	GeometryType.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::GeometryType>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
-		Version_1_0->GeometryType = (sdl::complextest::ComplexUnion1::GeometryType)key;
+		GeometryType = (sdl::V1_0::complextest::GeometryType)key;
 	}
 	geometryTypeChanged();
 }
@@ -1736,14 +1265,14 @@ void CGeometryObject::SetGeometryType(const QVariant& v)
 
 bool CGeometryObject::hasGeometryType()
 {
-	 return Version_1_0 && Version_1_0->GeometryType.HasValue();
+	 return GeometryType.HasValue();
 }
 
 
 QVariant CGeometryObject::GetRadius()
 {
-	if (Version_1_0 && Version_1_0->Radius){
-		return Version_1_0->Radius.value();
+	if (Radius){
+		return Radius.value();
 	}
 
 	return QVariant();
@@ -1752,28 +1281,25 @@ QVariant CGeometryObject::GetRadius()
 
 void CGeometryObject::SetRadius(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->Radius = v.value<double>();
+	Radius = v.value<double>();
 	radiusChanged();
 }
 
 
 bool CGeometryObject::hasRadius()
 {
-	 return Version_1_0 && Version_1_0->Radius.HasValue();
+	 return Radius.HasValue();
 }
 
 
 QVariant CGeometryObject::GetPoints()
 {
-	if (Version_1_0 && Version_1_0->Points){
+	if (Points){
 		if (!m_pointsQObjectPtr.isValid()){
 			m_pointsQObjectPtr = CreateObject("Points");
-			auto itemPtr = m_pointsQObjectPtr.value<sdl::complextest::ComplexUnion1::CPointObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->Points;
+			auto itemPtr = m_pointsQObjectPtr.value<sdl::V1_0::complextest::CPointObjectList*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = Points;
 		}
 		return m_pointsQObjectPtr;
 	}
@@ -1784,16 +1310,13 @@ QVariant CGeometryObject::GetPoints()
 
 void CGeometryObject::SetPoints(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::complextest::ComplexUnion1::CPointObjectList* itemPtr = v.value<sdl::complextest::ComplexUnion1::CPointObjectList*>();
-		if (itemPtr != nullptr)  Version_1_0->Points = itemPtr->Version_1_0;
+		sdl::V1_0::complextest::CPointObjectList* itemPtr = v.value<sdl::V1_0::complextest::CPointObjectList*>();
+		if (itemPtr != nullptr)  Points = static_cast<const decltype(Points)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->Points = nullptr;
+		Points = nullptr;
 	}
 	m_pointsQObjectPtr = v;
 
@@ -1803,17 +1326,14 @@ void CGeometryObject::SetPoints(const QVariant& v)
 
 bool CGeometryObject::hasPoints()
 {
-	 return Version_1_0 && Version_1_0->Points.HasValue();
+	 return Points.HasValue();
 }
 
 
 void CGeometryObject::emplacePoints()
 {
 	ResetPoints();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->Points.emplace();
+	Points.emplace();
 }
 
 
@@ -1830,17 +1350,17 @@ void CGeometryObject::ResetPoints()
 QVariant CGeometryObject::createPointsArrayElement(const QVariant& v)
 {
 	Q_UNUSED(v);
-	return QVariant::fromValue(new sdl::complextest::ComplexUnion1::CPointObject());
+	return QVariant::fromValue(new sdl::V1_0::complextest::CPointObject());
 }
 
 
 QVariant CGeometryObject::GetRequiredPoints()
 {
-	if (Version_1_0 && Version_1_0->RequiredPoints){
+	if (RequiredPoints){
 		if (!m_requiredPointsQObjectPtr.isValid()){
 			m_requiredPointsQObjectPtr = CreateObject("RequiredPoints");
-			auto itemPtr = m_requiredPointsQObjectPtr.value<sdl::complextest::ComplexUnion1::CPointObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->RequiredPoints;
+			auto itemPtr = m_requiredPointsQObjectPtr.value<sdl::V1_0::complextest::CPointObjectList*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = RequiredPoints;
 		}
 		return m_requiredPointsQObjectPtr;
 	}
@@ -1851,16 +1371,13 @@ QVariant CGeometryObject::GetRequiredPoints()
 
 void CGeometryObject::SetRequiredPoints(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::complextest::ComplexUnion1::CPointObjectList* itemPtr = v.value<sdl::complextest::ComplexUnion1::CPointObjectList*>();
-		if (itemPtr != nullptr)  Version_1_0->RequiredPoints = itemPtr->Version_1_0;
+		sdl::V1_0::complextest::CPointObjectList* itemPtr = v.value<sdl::V1_0::complextest::CPointObjectList*>();
+		if (itemPtr != nullptr)  RequiredPoints = static_cast<const decltype(RequiredPoints)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->RequiredPoints = nullptr;
+		RequiredPoints = nullptr;
 	}
 	m_requiredPointsQObjectPtr = v;
 
@@ -1870,17 +1387,14 @@ void CGeometryObject::SetRequiredPoints(const QVariant& v)
 
 bool CGeometryObject::hasRequiredPoints()
 {
-	 return Version_1_0 && Version_1_0->RequiredPoints.HasValue();
+	 return RequiredPoints.HasValue();
 }
 
 
 void CGeometryObject::emplaceRequiredPoints()
 {
 	ResetRequiredPoints();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->RequiredPoints.emplace();
+	RequiredPoints.emplace();
 }
 
 
@@ -1897,17 +1411,17 @@ void CGeometryObject::ResetRequiredPoints()
 QVariant CGeometryObject::createRequiredPointsArrayElement(const QVariant& v)
 {
 	Q_UNUSED(v);
-	return QVariant::fromValue(new sdl::complextest::ComplexUnion1::CPointObject());
+	return QVariant::fromValue(new sdl::V1_0::complextest::CPointObject());
 }
 
 
 QVariant CGeometryObject::GetOptionalPoints()
 {
-	if (Version_1_0 && Version_1_0->OptionalPoints){
+	if (OptionalPoints){
 		if (!m_optionalPointsQObjectPtr.isValid()){
 			m_optionalPointsQObjectPtr = CreateObject("OptionalPoints");
-			auto itemPtr = m_optionalPointsQObjectPtr.value<sdl::complextest::ComplexUnion1::CPointObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->OptionalPoints;
+			auto itemPtr = m_optionalPointsQObjectPtr.value<sdl::V1_0::complextest::CPointObjectList*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = OptionalPoints;
 		}
 		return m_optionalPointsQObjectPtr;
 	}
@@ -1918,16 +1432,13 @@ QVariant CGeometryObject::GetOptionalPoints()
 
 void CGeometryObject::SetOptionalPoints(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::complextest::ComplexUnion1::CPointObjectList* itemPtr = v.value<sdl::complextest::ComplexUnion1::CPointObjectList*>();
-		if (itemPtr != nullptr)  Version_1_0->OptionalPoints = itemPtr->Version_1_0;
+		sdl::V1_0::complextest::CPointObjectList* itemPtr = v.value<sdl::V1_0::complextest::CPointObjectList*>();
+		if (itemPtr != nullptr)  OptionalPoints = static_cast<const decltype(OptionalPoints)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->OptionalPoints = nullptr;
+		OptionalPoints = nullptr;
 	}
 	m_optionalPointsQObjectPtr = v;
 
@@ -1937,17 +1448,14 @@ void CGeometryObject::SetOptionalPoints(const QVariant& v)
 
 bool CGeometryObject::hasOptionalPoints()
 {
-	 return Version_1_0 && Version_1_0->OptionalPoints.HasValue();
+	 return OptionalPoints.HasValue();
 }
 
 
 void CGeometryObject::emplaceOptionalPoints()
 {
 	ResetOptionalPoints();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->OptionalPoints.emplace();
+	OptionalPoints.emplace();
 }
 
 
@@ -1964,7 +1472,7 @@ void CGeometryObject::ResetOptionalPoints()
 QVariant CGeometryObject::createOptionalPointsArrayElement(const QVariant& v)
 {
 	Q_UNUSED(v);
-	return QVariant::fromValue(new sdl::complextest::ComplexUnion1::CPointObject());
+	return QVariant::fromValue(new sdl::V1_0::complextest::CPointObject());
 }
 
 
@@ -2016,13 +1524,13 @@ QString CGeometryObject::toGraphQL() const
 QVariant CGeometryObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "Points"){
-		return QVariant::fromValue(new sdl::complextest::ComplexUnion1::CPointObjectList(this));
+		return QVariant::fromValue(new sdl::V1_0::complextest::CPointObjectList(this));
 	}
 	if (key == "RequiredPoints"){
-		return QVariant::fromValue(new sdl::complextest::ComplexUnion1::CPointObjectList(this));
+		return QVariant::fromValue(new sdl::V1_0::complextest::CPointObjectList(this));
 	}
 	if (key == "OptionalPoints"){
-		return QVariant::fromValue(new sdl::complextest::ComplexUnion1::CPointObjectList(this));
+		return QVariant::fromValue(new sdl::V1_0::complextest::CPointObjectList(this));
 	}
 	return QVariant();
 }
@@ -2071,83 +1579,83 @@ QVariantMap CGeometryObjectList::get(int row) const
 }
 
 
-void CGeometryObjectList::append(sdl::complextest::ComplexUnion1::CGeometryObject* item)
+void CGeometryObjectList::append(sdl::V1_0::complextest::CGeometryObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::complextest::ComplexUnion1::CGeometryObjectList* sdl::complextest::ComplexUnion1::CGeometryObjectList::copyMe()
+sdl::V1_0::complextest::CGeometryObjectList* sdl::V1_0::complextest::CGeometryObjectList::copyMe()
 {
-	sdl::complextest::ComplexUnion1::CGeometryObjectList* retVal = new sdl::complextest::ComplexUnion1::CGeometryObjectList();
+	sdl::V1_0::complextest::CGeometryObjectList* retVal = new sdl::V1_0::complextest::CGeometryObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::complextest::ComplexUnion1::CGeometryObjectList::toJson()
+QString sdl::V1_0::complextest::CGeometryObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::complextest::ComplexUnion1::CGeometryObjectList::toGraphQL()
+QString sdl::V1_0::complextest::CGeometryObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::complextest::ComplexUnion1::CGeometryObjectList::addElement(sdl::complextest::ComplexUnion1::CGeometryObject* item)
+void sdl::V1_0::complextest::CGeometryObjectList::addElement(sdl::V1_0::complextest::CGeometryObject* item)
 {
 	append(item);
 }
 
 
-void sdl::complextest::ComplexUnion1::CGeometryObjectList::removeElement(int index)
+void sdl::V1_0::complextest::CGeometryObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::complextest::ComplexUnion1::CGeometryObjectList::isEqualWithModel(sdl::complextest::ComplexUnion1::CGeometryObjectList* otherModelPtr)
+bool sdl::V1_0::complextest::CGeometryObjectList::isEqualWithModel(sdl::V1_0::complextest::CGeometryObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::complextest::ComplexUnion1::CGeometryObjectList::insert(int index, sdl::complextest::ComplexUnion1::CGeometryObject* item)
+void sdl::V1_0::complextest::CGeometryObjectList::insert(int index, sdl::V1_0::complextest::CGeometryObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::complextest::ComplexUnion1::CGeometryObjectList::remove(int index)
+void sdl::V1_0::complextest::CGeometryObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::complextest::ComplexUnion1::CGeometryObjectList::clear()
+void sdl::V1_0::complextest::CGeometryObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::complextest::ComplexUnion1::CGeometryObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::complextest::CGeometryObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::complextest::ComplexUnion1::CGeometryObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::complextest::CGeometryObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_geometryType"){
-		return QVariant::fromValue(Version_1_0->at(index)->GeometryType.value());
+		return QVariant::fromValue(at(index)->GeometryType.value());
 	}
 	if (nameId == "m_radius"){
-		return QVariant::fromValue(Version_1_0->at(index)->Radius.value());
+		return QVariant::fromValue(at(index)->Radius.value());
 	}
 	if (nameId == "m_points"){
 		return itemPtr->GetPoints();
@@ -2161,4 +1669,4 @@ QVariant sdl::complextest::ComplexUnion1::CGeometryObjectList::getData(const QSt
 
 	return QVariant();
 }
-} // namespace sdl::complextest::ComplexUnion1
+} // namespace sdl::V1_0::complextest

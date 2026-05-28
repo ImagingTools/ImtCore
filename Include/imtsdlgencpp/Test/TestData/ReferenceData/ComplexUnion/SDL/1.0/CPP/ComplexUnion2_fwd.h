@@ -4,7 +4,7 @@
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
 
 
-namespace sdl::complextest::ComplexUnion2
+namespace sdl::V1_0::complextest
 {
 
 // type forward declarations
@@ -61,4 +61,4 @@ protected:
 
 
 
-} // namespace sdl::complextest::ComplexUnion2
+} // namespace sdl::V1_0::complextest

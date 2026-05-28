@@ -1,7 +1,7 @@
 #pragma once
 
 
-namespace sdl::imtbase::ComplexCollectionFilter
+namespace sdl::V1_0::imtbase
 {
 
 // type forward declarations
@@ -11,4 +11,4 @@ class CFieldFilter;
 class CGroupFilter;
 class CComplexCollectionFilter;
 
-} // namespace sdl::imtbase::ComplexCollectionFilter
+} // namespace sdl::V1_0::imtbase
