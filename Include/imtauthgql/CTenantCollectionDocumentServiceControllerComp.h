@@ -32,6 +32,10 @@ public:
 
 protected:
 	// reimplemented (CGraphQlHandlerCompBase)
+	virtual sdl::imtbase::CollectionDocumentService::CDocumentList OnGetOpenedDocumentList(
+		const sdl::imtbase::CollectionDocumentService::CGetOpenedDocumentListGqlRequest& getOpenedDocumentListRequest,
+		const ::imtgql::CGqlRequest& gqlRequest,
+		QString& errorMessage) const override;
 	virtual sdl::imtbase::CollectionDocumentService::CDocumentInfo OnCreateNewDocument(
 		const sdl::imtbase::CollectionDocumentService::CCreateNewDocumentGqlRequest& createNewDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,

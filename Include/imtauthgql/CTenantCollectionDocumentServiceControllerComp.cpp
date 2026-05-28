@@ -12,6 +12,40 @@ namespace imtauthgql
 namespace CDM = sdl::imtbase::CollectionDocumentService;
 
 
+CDM::CDocumentList CTenantCollectionDocumentServiceControllerComp::OnGetOpenedDocumentList(
+		const CDM::CGetOpenedDocumentListGqlRequest& getOpenedDocumentListRequest,
+		const ::imtgql::CGqlRequest& gqlRequest,
+		QString& errorMessage) const
+{
+	// Get the full list from the base class
+	CDM::CDocumentList fullList = BaseClass::OnGetOpenedDocumentList(getOpenedDocumentListRequest, gqlRequest, errorMessage);
+
+	// Determine the current session tenant
+	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+	if (contextPtr == nullptr){
+		return fullList;
+	}
+
+	QByteArray sessionTenantId = contextPtr->GetTenantId();
+
+	// If no tenant is selected, return an empty list — user cannot edit any tenant
+	// If a tenant is selected, only return documents matching that tenant
+	CDM::CDocumentList filteredList;
+	filteredList.Version_1_0.emplace();
+	filteredList.Version_1_0->documentList.emplace();
+
+	if (!sessionTenantId.isEmpty() && fullList.Version_1_0 && fullList.Version_1_0->documentList){
+		for (const auto& docInfo : *fullList.Version_1_0->documentList){
+			if (docInfo && docInfo->objectId && *docInfo->objectId == sessionTenantId){
+				filteredList.Version_1_0->documentList->append(docInfo);
+			}
+		}
+	}
+
+	return filteredList;
+}
+
+
 CDM::CDocumentInfo CTenantCollectionDocumentServiceControllerComp::OnCreateNewDocument(
 		const CDM::CCreateNewDocumentGqlRequest& createNewDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
