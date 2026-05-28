@@ -64,18 +64,8 @@ module.exports.listComponents = [
     'BaseModel',
     'DropArea',
     'Settings',
-    // Menu components (Qt Quick Controls)
+    // Action (Qt Quick Controls)
     'Action',
-    'Menu',
-    'MenuItem',
-    'MenuSeparator',
-    'MenuBar',
-    'MenuBarItem',
-    // Popup components (Qt Quick Controls)
-    'Popup',
-    'Overlay',
-    'ToolTip',
-    'Drawer',
     // TableView / TreeView components
     'TableView',
     'TreeView',
