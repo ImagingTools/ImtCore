@@ -168,12 +168,13 @@ bool CMimeType::FromString(const QString& string)
 						\/										- Literal slash separator
 						(?<subtype>[\w\.-]*)					- The subtype, may include tree prefixes separated by "." (e.g. "vnd.example.data" or "plain")
 						(?:\+(?<typeext>[\w\.-]*))? 			- Optional suffix preceded by "+", indicates the structured syntax (e.g. "+json", "+xml")
-						(?:;(?:(?<key>.+)=(?<value>.*))*)? 		- Optional semicolon-separated parameters, each as key=value (e.g. "; charset=utf-8")
+						(?:\s*;\s*(?<params>.*))? 				- Optional semicolon-separated parameter list
 
 		\example "application/vnd.example.data+json; charset=utf-8; boundary=something"
-					type=application, subtype=vnd.example.data, typeext=json, key=charset, value=utf-8
+					type=application, subtype=vnd.example.data, typeext=json, params=charset=utf-8; boundary=something
 	*/
-	static QRegularExpression mimeRegExp(R"RegExp((?<type>\w*)\/(?<subtype>[\w\.-]*)(?:\+(?<typeext>[\w\.-]*))?(?:;(?:(?<key>.+)=(?<value>.*))*)?)RegExp");
+	static QRegularExpression mimeRegExp(R"RegExp((?<type>\w*)\/(?<subtype>[\w\.-]*)(?:\+(?<typeext>[\w\.-]*))?(?:\s*;\s*(?<params>.*))?)RegExp");
+	static QRegularExpression paramsRegExp(R"RegExp((?<key>[^=;]+?)\s*=\s*(?<value>[^;]*))RegExp");
 
 	QRegularExpressionMatch mimeRegExpMatch = mimeRegExp.match(string);
 	if (mimeRegExpMatch.hasMatch()){
@@ -181,10 +182,16 @@ bool CMimeType::FromString(const QString& string)
 		m_subType = mimeRegExpMatch.captured("subtype");
 		m_suffix = mimeRegExpMatch.captured("typeext");
 
-		QString key = mimeRegExpMatch.captured("key").trimmed();
-		QString value = mimeRegExpMatch.captured("value").trimmed();
-		if (!key.isEmpty() && !value.isEmpty()){
-			m_parameters[key] = value;
+		m_parameters.clear();
+		const QString parameters = mimeRegExpMatch.captured("params");
+		QRegularExpressionMatchIterator paramsIt = paramsRegExp.globalMatch(parameters);
+		while (paramsIt.hasNext()){
+			QRegularExpressionMatch paramMatch = paramsIt.next();
+			QString key = paramMatch.captured("key").trimmed();
+			QString value = paramMatch.captured("value").trimmed();
+			if (!key.isEmpty() && !value.isEmpty()){
+				m_parameters[key] = value;
+			}
 		}
 
 		return true;
@@ -227,5 +234,4 @@ bool CMimeType::isParametersValid(const Parameters& /*parameters*/)
 
 
 } // namespace imtbase
-
 
