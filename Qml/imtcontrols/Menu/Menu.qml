@@ -447,6 +447,15 @@ Popup {
     onAboutToShow: { currentIndex = -1; }
     onClosed: { _closeSubmenu(); currentIndex = -1; }
 
+    function _calcListImplicitWidth() {
+        var w = 0;
+        for (var i = 0; i < list.contentItem.children.length; ++i) {
+            var c = list.contentItem.children[i];
+            if (c && c.implicitWidth > w) w = c.implicitWidth;
+        }
+        return Math.max(w, Style.menuMinWidth);
+    }
+
     // -------------------------------------------------------------------- //
     //                          Internal contentItem                         //
     // -------------------------------------------------------------------- //
@@ -475,14 +484,7 @@ Popup {
         Keys.onPressed: {
             menu._handleKeyPress(event)
         }
-        implicitWidth: {
-            var w = 0;
-            for (var i = 0; i < contentItem.children.length; ++i) {
-                var c = contentItem.children[i];
-                if (c && c.implicitWidth > w) w = c.implicitWidth;
-            }
-            return Math.max(w, 180);
-        }
+        implicitWidth: menu._calcListImplicitWidth()
         implicitHeight: contentHeight
     }
 
