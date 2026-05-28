@@ -99,6 +99,7 @@ ControlBase {
 	}
 
 	function updateText(){
+		if (!comboBoxContainer.model || typeof comboBoxContainer.model.containsKey !== "function") return;
 		comboBoxContainer.displayId = model.containsKey('m_' + nameId, 0) ? 'm_' + nameId : nameId;
 		if (comboBoxContainer.currentIndex >= 0 && comboBoxContainer.model.containsKey(comboBoxContainer.displayId, comboBoxContainer.currentIndex)){
 			comboBoxContainer.currentText = comboBoxContainer.model.getData(comboBoxContainer.displayId, comboBoxContainer.currentIndex);

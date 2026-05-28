@@ -14,10 +14,11 @@ import imtcontrols 1.0
 Rectangle {
     id: row
 
-    property var menuItem: model && model.menuItem ? model.menuItem : null
+    property var menuItem: null
     property var menu: null
-    property int rowIndex: model ? model.index : -1
+    property int rowIndex: -1
     property bool current: menu && menu.currentIndex === rowIndex
+    property bool hovered: mouseArea.containsMouse
     property bool isSeparator: menuItem && menuItem.isMenuSeparator === true
 
     width: parent ? parent.width : implicitWidth
@@ -28,7 +29,7 @@ Rectangle {
 
     color: !menuItem || !menuItem.enabled
             ? "transparent"
-            : (current || (menuItem.highlighted === true)
+            : (current || hovered || (menuItem.highlighted === true)
                ? Style.buttonHoverColor
                : "transparent")
 
@@ -57,23 +58,24 @@ Rectangle {
             height: width
             fillMode: Image.PreserveAspectFit
             visible: source != ""
+            sourceSize.width: width
+            sourceSize.height: height
         }
 
         // Check mark for checkable items.
-        Rectangle {
+        Image {
             id: check
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: icon.right
             anchors.leftMargin: visible ? Style.marginXS : 0
-            width: visible ? Style.iconSizeXS : 0
+            width: visible ? Style.iconSizeS : 0
             height: width
-            radius: Style.radiusXS
-            color: row.menuItem && row.menuItem.checked
-                   ? Style.buttonPressedColor
-                   : "transparent"
-            border.width: Style.buttonBorderWidth
-            border.color: Style.borderColor
-            visible: row.menuItem && row.menuItem.checkable
+            source: row.menuItem && row.menuItem.checked
+                    ? "qrc:/" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal)
+                    : ""
+            visible: row.menuItem && row.menuItem.checkable && row.menuItem.checked
+            sourceSize.width: width
+            sourceSize.height: height
         }
 
         Text {
@@ -123,11 +125,13 @@ Rectangle {
     }
 
     MouseArea {
+        id: mouseArea
         anchors.fill: parent
         hoverEnabled: true
         enabled: row.menuItem && row.menuItem.enabled && !row.isSeparator
-        onEntered: {
-            if (row.menu) row.menu._onItemHover(row.rowIndex)
+        onContainsMouseChanged: {
+            if (containsMouse && row.menu)
+                row.menu._onItemHover(row.rowIndex)
         }
         onClicked: {
             if (row.menu) row.menu._onItemClick(row.rowIndex)

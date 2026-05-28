@@ -65,9 +65,8 @@ ImtPopup.Popup {
     property int submenuHoverDelay: 250
 
     /*! Model exposed to the internal ListView. Auto-built from
-        \l contentChildren but can also be assigned a user-supplied
-        ListModel. */
-    property var model: rowsModel
+        \l contentChildren but can also be assigned a user-supplied model. */
+    property var model: []
 
     /*! Per-row delegate. Receives \c model.menuItem. */
     property Component delegate: defaultRowDelegate
@@ -98,16 +97,17 @@ ImtPopup.Popup {
     // -------------------------------------------------------------------- //
 
     /*! Number of rows (items + separators + submenus). */
-    readonly property int count: rowsModel.count
+    readonly property int count: model.length
 
     function itemAt(index) {
-        if (index < 0 || index >= rowsModel.count) return null;
-        return rowsModel.get(index).menuItem;
+        if (index < 0 || index >= _rows.length) return null;
+        return _rows[index];
     }
 
     function addItem(menuItem) {
         if (!menuItem) return;
-        rowsModel.append({ "menuItem": menuItem });
+        _rows.push(menuItem);
+        _syncModel();
     }
 
     function addSeparator() {
@@ -115,7 +115,8 @@ ImtPopup.Popup {
         var sep = Qt.createQmlObject(
             'import imtcontrols 1.0; MenuSeparator {}',
             menu, "Menu.addSeparator");
-        rowsModel.append({ "menuItem": sep });
+        _rows.push(sep);
+        _syncModel();
     }
 
     function addAction(action) {
@@ -127,8 +128,6 @@ ImtPopup.Popup {
     }
 
     function addMenu(sub) {
-        // Add a placeholder MenuItem row whose hasSubmenu=true; clicking
-        // or hovering opens the nested Menu.
         if (!sub) return;
         submenusList.push(sub);
         var mi = Qt.createQmlObject(
@@ -139,9 +138,23 @@ ImtPopup.Popup {
         addItem(mi);
     }
 
-    function removeItem(index) {
-        if (index < 0 || index >= rowsModel.count) return;
-        rowsModel.remove(index);
+    function insertItem(index, menuItem) {
+        if (!menuItem) return;
+        if (index < 0) index = 0;
+        if (index > _rows.length) index = _rows.length;
+        _rows.splice(index, 0, menuItem);
+        _syncModel();
+    }
+
+    function removeItem(indexOrItem) {
+        if (typeof indexOrItem === "number") {
+            if (indexOrItem < 0 || indexOrItem >= _rows.length) return;
+            _rows.splice(indexOrItem, 1);
+        } else {
+            var idx = _rows.indexOf(indexOrItem);
+            if (idx !== -1) _rows.splice(idx, 1);
+        }
+        _syncModel();
     }
 
     function takeItem(index) {
@@ -168,28 +181,38 @@ ImtPopup.Popup {
     }
 
     function _ingestDeclaredChildren() {
-        // Find the default content holder. Popup exposes its data slot via
-        // contentItem when not overridden, but we've overridden contentItem
-        // to `list`. The original children remain accessible through the
-        // popup's `data` property (default property of FocusScope/Item).
-        var arr = menu.children;
+        // Popup's default property (contentChildren) places declared
+        // children into contentHolder.data, not menu.children.
+        var arr = menu.contentData;
         for (var i = 0; i < arr.length; ++i) {
             var c = arr[i];
             if (!c) continue;
             if (c.isMenuItem === true || c.isMenuSeparator === true) {
-                addItem(c);
+                _rows.push(c);
             } else if (c.objectName === "ImtControlsPopup" && c !== menu && c.title !== undefined) {
-                addMenu(c);
+                submenusList.push(c);
+                var mi = Qt.createQmlObject(
+                    'import imtcontrols 1.0; MenuItem { hasSubmenu: true }',
+                    menu, "Menu.addMenu");
+                mi.text = c.title;
+                mi.submenu = c;
+                _rows.push(mi);
             }
         }
+        _syncModel();
     }
 
     // -------------------------------------------------------------------- //
     //                              Internal state                           //
     // -------------------------------------------------------------------- //
 
-    /*! ListModel feeding the ListView. */
-    ListModel { id: rowsModel }
+    /*! JS array of menu row items. */
+    property var _rows: []
+
+    function _syncModel() {
+        // Force ListView to re-read the model by reassigning it.
+        model = _rows.slice();
+    }
 
     /*! Plain JS array of nested Menu refs. */
     property var submenusList: []
@@ -204,15 +227,15 @@ ImtPopup.Popup {
         repeat: false
         property int pendingIndex: -1
         onTriggered: {
-            if (pendingIndex < 0 || pendingIndex >= rowsModel.count) return;
-            var mi = rowsModel.get(pendingIndex).menuItem;
+            if (pendingIndex < 0 || pendingIndex >= _rows.length) return;
+            var mi = _rows[pendingIndex];
             menu._openSubmenu(mi);
         }
     }
 
     function _onItemHover(index) {
         currentIndex = index;
-        var mi = rowsModel.get(index).menuItem;
+        var mi = _rows[index];
         if (!mi) return;
         if (mi.hasSubmenu) {
             hoverTimer.pendingIndex = index;
@@ -225,15 +248,23 @@ ImtPopup.Popup {
 
     function _onItemClick(index) {
         currentIndex = index;
-        var mi = rowsModel.get(index).menuItem;
+        var mi = _rows[index];
         if (!mi) return;
         if (mi.hasSubmenu) {
             _openSubmenu(mi);
         } else {
             mi.trigger();
             menu.triggered(mi);
-            menu.close();
+            _closeAll();
         }
+    }
+
+    /*! Walks up the parentPopup chain and closes every menu in the stack. */
+    function _closeAll() {
+        var root = menu;
+        while (root.parentPopup && root.parentPopup.objectName === "ImtControlsPopup")
+            root = root.parentPopup;
+        root.close();
     }
 
     function _openSubmenu(parentMi) {
@@ -242,12 +273,25 @@ ImtPopup.Popup {
         if (openSubmenu) openSubmenu.close();
         var sub = parentMi.submenu;
         sub.parentPopup = menu;
-        // Position to the right of the current row.
+        // Submenus must not push/pop FocusCoordinator — keyboard focus
+        // between parent and child menus is managed explicitly.
+        sub.focusOnOpen = false;
+        // Position to the right or left of the current row depending on space.
         var rowItem = list.itemAtIndex ? list.itemAtIndex(currentIndex) : null;
         if (rowItem && menu._overlay) {
             var top = rowItem.mapToItem(menu._overlay, 0, 0);
-            sub.x = top.x + menu.width - menu.overlap - (menu.parent ? menu.parent.x : 0);
-            sub.y = top.y - (menu.parent ? menu.parent.y : 0);
+            var subWidth = sub.width > 0 ? sub.width : 180;
+            var rightX = top.x + menu.width - menu.overlap;
+            var leftX = top.x - subWidth + menu.overlap;
+            // Prefer right; fall back to left if it would go off-screen.
+            if (rightX + subWidth <= menu._overlay.width) {
+                sub.x = rightX - (menu.parent ? menu.parent.mapToItem(menu._overlay, 0, 0).x : 0);
+            } else if (leftX >= 0) {
+                sub.x = leftX - (menu.parent ? menu.parent.mapToItem(menu._overlay, 0, 0).x : 0);
+            } else {
+                sub.x = rightX - (menu.parent ? menu.parent.mapToItem(menu._overlay, 0, 0).x : 0);
+            }
+            sub.y = top.y - (menu.parent ? menu.parent.mapToItem(menu._overlay, 0, 0).y : 0);
         }
         sub.parent = menu.parent || menu;
         sub.open();
@@ -263,12 +307,8 @@ ImtPopup.Popup {
 
     // Skip-disabled-and-separator navigation helpers.
     function _moveCurrent(step) {
-        if (rowsModel.count === 0) return;
-        var n = rowsModel.count;
-        // When nothing is selected yet, position the cursor just before the
-        // first row (for Down) or just after the last row (for Up) so the
-        // first iteration lands on the first/last enabled entry, matching
-        // QQC2 Menu behaviour.
+        if (_rows.length === 0) return;
+        var n = _rows.length;
         var i;
         if (currentIndex < 0)
             i = step > 0 ? -1 : 0;
@@ -276,7 +316,7 @@ ImtPopup.Popup {
             i = currentIndex;
         for (var tries = 0; tries < n; ++tries) {
             i = (i + step + n) % n;
-            var mi = rowsModel.get(i).menuItem;
+            var mi = _rows[i];
             if (mi && mi.enabled && !mi.isMenuSeparator) {
                 currentIndex = i;
                 return;
@@ -285,11 +325,11 @@ ImtPopup.Popup {
     }
 
     function _moveToEdge(forward) {
-        if (rowsModel.count === 0) return;
-        var n = rowsModel.count;
+        if (_rows.length === 0) return;
+        var n = _rows.length;
         if (forward) {
             for (var i = 0; i < n; ++i) {
-                var mi = rowsModel.get(i).menuItem;
+                var mi = _rows[i];
                 if (mi && mi.enabled && !mi.isMenuSeparator) {
                     currentIndex = i;
                     return;
@@ -297,7 +337,7 @@ ImtPopup.Popup {
             }
         } else {
             for (var j = n - 1; j >= 0; --j) {
-                var mj = rowsModel.get(j).menuItem;
+                var mj = _rows[j];
                 if (mj && mj.enabled && !mj.isMenuSeparator) {
                     currentIndex = j;
                     return;
@@ -307,7 +347,7 @@ ImtPopup.Popup {
     }
 
     function _activateCurrent() {
-        if (currentIndex >= 0 && currentIndex < rowsModel.count) {
+        if (currentIndex >= 0 && currentIndex < _rows.length) {
             _onItemClick(currentIndex);
         }
     }
@@ -326,15 +366,15 @@ ImtPopup.Popup {
     // Letter-key navigation. Selects the next enabled row whose label starts
     // with \a ch; activates it immediately if it's the only match.
     function _searchByLetter(ch) {
-        if (!ch || rowsModel.count === 0) return false;
-        var n = rowsModel.count;
+        if (!ch || _rows.length === 0) return false;
+        var n = _rows.length;
         var start = currentIndex >= 0 ? currentIndex + 1 : 0;
         var matches = 0;
         var firstMatch = -1;
         ch = ch.toLowerCase();
         for (var k = 0; k < n; ++k) {
             var i = (start + k) % n;
-            var mi = rowsModel.get(i).menuItem;
+            var mi = _rows[i];
             if (!mi || !mi.enabled || mi.isMenuSeparator) continue;
             if (_mnemonicChar(mi.text) === ch) {
                 if (firstMatch === -1) firstMatch = i;
@@ -365,17 +405,27 @@ ImtPopup.Popup {
             _moveToEdge(false); event.accepted = true; return;
         case Qt.Key_Right:
             if (currentIndex >= 0) {
-                var mi = rowsModel.get(currentIndex).menuItem;
-                if (mi && mi.hasSubmenu) { _openSubmenu(mi); event.accepted = true; return; }
+                var mi = _rows[currentIndex];
+                if (mi && mi.hasSubmenu) {
+                    _openSubmenu(mi);
+                    // Give keyboard focus to the submenu's list.
+                    if (openSubmenu && openSubmenu.contentItem)
+                        openSubmenu.contentItem.forceActiveFocus();
+                    event.accepted = true;
+                    return;
+                }
             }
             break;
         case Qt.Key_Left:
             if (parentPopup) {
-                // Restore focus to the parent menu before tearing ourselves
-                // down so its keyboard navigation continues seamlessly.
-                if (parentPopup._contentRoot)
-                    parentPopup._contentRoot.forceActiveFocus();
+                // Close submenu and return focus to parent menu's list.
+                if (parentPopup.openSubmenu === menu)
+                    parentPopup.openSubmenu = null;
                 close();
+                if (parentPopup.contentItem)
+                    parentPopup.contentItem.forceActiveFocus();
+                else if (parentPopup._contentRoot)
+                    parentPopup._contentRoot.forceActiveFocus();
                 event.accepted = true;
                 return;
             }
@@ -409,13 +459,17 @@ ImtPopup.Popup {
         interactive: true
         keyNavigationEnabled: false   // Menu handles keys itself
         model: menu.model
+        width: implicitWidth
+        height: implicitHeight
         delegate: Loader {
             width: list.width
             sourceComponent: menu.delegate
+            property var menuItemData: modelData
             onLoaded: {
                 if (item) {
                     item.menu = menu;
-                    if (item.rowIndex === undefined) item.rowIndex = index;
+                    item.menuItem = modelData;
+                    item.rowIndex = index;
                 }
             }
         }
@@ -428,7 +482,7 @@ ImtPopup.Popup {
                 var c = contentItem.children[i];
                 if (c && c.implicitWidth > w) w = c.implicitWidth;
             }
-            return Math.max(w, 160);
+            return Math.max(w, 180);
         }
         implicitHeight: contentHeight
     }

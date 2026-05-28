@@ -1126,7 +1126,7 @@ Item {
                                     width: comboEditor.width
                                     height: Math.min(comboOptionsList.contentHeight + 4, 200)
                                     padding: 2
-                                    closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+                                    closePolicy: Enums.popupCloseOnEscape | Enums.popupCloseOnPressOutside
 
                                     onClosed: {
                                         if (root.editing && root.isEditingCell(delegateRoot.nodeKey, index))

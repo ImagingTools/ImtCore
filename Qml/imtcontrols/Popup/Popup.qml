@@ -61,8 +61,8 @@ FocusScope {
     //                         Public Qt Quick Controls API                  //
     // -------------------------------------------------------------------- //
 
-    /*! True while the popup is fully open (after enter transition). */
-    readonly property bool opened: d.opened
+    /*! True while the popup is open or opening (visible on overlay). */
+    readonly property bool opened: d.opened || d.opening
 
     /*! Whether the popup blocks input to items below the overlay. */
     property bool modal: false
@@ -71,7 +71,10 @@ FocusScope {
     property bool dim: modal
 
     /*! Whether to take keyboard focus when opened. */
-    property bool focus: true
+    property bool focusOnOpen: true
+
+    /*! Font propagated to content (API-compatible with Controls.Popup). */
+    property font font
 
     /*! Padding around content. Individual sides override the common value. */
     property real padding: 0
@@ -113,8 +116,8 @@ FocusScope {
         attached to. */
     readonly property Item overlay: d.overlay
 
-    /*! Bit-mask of close-policy flags. See InputCoordinator for values. */
-    property int closePolicy: Internal.InputCoordinator.defaultPolicy
+    /*! Bit-mask of close-policy flags. */
+    property int closePolicy: Enums.popupDefaultClosePolicy
 
     /*! Visual transform origin used by enter/exit transitions. */
     property int transformOrigin: Item.Center
@@ -140,7 +143,6 @@ FocusScope {
 
     signal aboutToShow()
     signal aboutToHide()
-    signal opened()
     signal closed()
 
     // -------------------------------------------------------------------- //
@@ -209,7 +211,7 @@ FocusScope {
             popup.close();
     }
     function _tryEscape() {
-        if (closePolicy & Internal.InputCoordinator.closeOnEscape) {
+        if (closePolicy & Enums.popupCloseOnEscape) {
             close();
             return true;
         }
@@ -232,24 +234,30 @@ FocusScope {
     }
 
     onWidthChanged:  {
-        if (d.opened) popup._reposition()
+        if (d.opened || d.opening) popup._reposition()
     }
     onHeightChanged: {
-        if (d.opened) popup._reposition()
+        if (d.opened || d.opening) popup._reposition()
     }
     onXChanged:      {
-        if (d.opened) popup._reposition()
+        if (d.opened || d.opening) popup._reposition()
     }
     onYChanged:      {
-        if (d.opened) popup._reposition()
+        if (d.opened || d.opening) popup._reposition()
     }
     onParentChanged: {
-        if (d.opened) popup._reposition()
+        if (d.opened || d.opening) popup._reposition()
     }
 
     Connections {
         target: Internal.PopupManager
-        function onWindowGeometryChanged() { if (d.opened) popup._reposition(); }
+        function onWindowGeometryChanged() { if (d.opened || d.opening) popup._reposition(); }
+    }
+
+    Connections {
+        target: d.overlay
+        function onWidthChanged()  { if (d.opened || d.opening) popup._reposition(); }
+        function onHeightChanged() { if (d.opened || d.opening) popup._reposition(); }
     }
 
     // -------------------------------------------------------------------- //
@@ -337,10 +345,12 @@ FocusScope {
             // Reparent user content & background into the live root.
             if (popup.background) {
                 popup.background.parent = contentRoot.bgSlot;
+                popup.background.anchors.fill = contentRoot.bgSlot;
                 popup.background.visible = true;
             }
             if (popup.contentItem) {
                 popup.contentItem.parent = contentRoot.contentSlot;
+                popup.contentItem.anchors.fill = contentRoot.contentSlot;
                 popup.contentItem.visible = true;
             }
 
@@ -355,7 +365,7 @@ FocusScope {
             contentRoot.visible = true;
             popup._reposition();
 
-            if (popup.focus) {
+            if (popup.focusOnOpen) {
                 Internal.FocusCoordinator.push(targetRoot, popup.parent);
                 contentRoot.forceActiveFocus();
             }
@@ -391,7 +401,7 @@ FocusScope {
                 }
             }
             Internal.OverlayManager.detach(popup);
-            if (opened && popup.focus && targetRoot)
+            if (opened && popup.focusOnOpen && targetRoot)
                 Internal.FocusCoordinator.pop(targetRoot);
             opened = false;
             opening = false;
@@ -452,7 +462,7 @@ FocusScope {
                 anchors.fill: parent
                 acceptedButtons: Qt.AllButtons
                 propagateComposedEvents: true
-                hoverEnabled: true
+                hoverEnabled: false
                 onPressed: {
                     if (cr.popup) {
                         Internal.PopupStackController.closeAbove(cr.popup);
@@ -507,7 +517,6 @@ FocusScope {
                 d.opening = false;
                 d.opened = true;
                 if (d.contentRoot) { d.contentRoot.opacity = 1; d.contentRoot.scale = 1; }
-                popup.opened();
             }
         }
     }

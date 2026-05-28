@@ -37,9 +37,12 @@ QtObject {
         actions.push(action);
         action.group = group;
         action.triggered.connect(function() { group.triggered(action); });
-        action.toggledChanged ? action.toggledChanged.connect(function(){ _syncFrom(action); }) : null;
-        // Listen via property change.
-        action.checkedChanged ? action.checkedChanged.connect(function(){ _syncFrom(action); }) : null;
+        if (action.toggledChanged) {
+            action.toggledChanged.connect(function() { group._syncFrom(action); });
+        }
+        if (action.checkedChanged) {
+            action.checkedChanged.connect(function() { group._syncFrom(action); });
+        }
         _syncFrom(action);
     }
 
