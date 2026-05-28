@@ -85,6 +85,7 @@ ViewBase {
 
 	property var __selectionManager: null
 	property string __lastFilterText: ""
+	property var __listItems: []
 
 	// Public accessors for subcomponents with custom header buttons
 	readonly property var selectionManager: __selectionManager
@@ -94,6 +95,13 @@ ViewBase {
 			dataProvider.fetch(__lastFilterText)
 	}
 	readonly property string filterText: __lastFilterText
+
+	Connections {
+		target: collectionPage.dataProvider
+		function onDataChanged() {
+			collectionPage.__listItems = collectionPage.dataProvider.items
+		}
+	}
 
 	function openCreate() {
 		while (collectionStackView.count > 1)
@@ -206,7 +214,7 @@ ViewBase {
 			enabled: collectionPage.__selectionManager && collectionPage.__selectionManager.selectedIds.length === 1
 			onClicked: {
 				var selId = collectionPage.__selectionManager.selectedIds[0]
-				var items = collectionPage.dataProvider ? collectionPage.dataProvider.items : []
+				var items = collectionPage.__listItems
 				for (var i = 0; i < items.length; i++) {
 					if (items[i] && items[i].id === selId) {
 						collectionPage.__openEdit(selId, items[i].title || items[i].id || "", items[i].description || "")
@@ -291,7 +299,7 @@ ViewBase {
 
 		Item {
 			id: listViewItem
-			property var effectiveModel: collectionPage.listModel ? collectionPage.listModel: collectionPage.dataProvider ? collectionPage.dataProvider.items : []
+			readonly property var effectiveModel: collectionPage.listModel ? collectionPage.listModel : collectionPage.__listItems
 
 			SearchTextInput {
 				id: filterInput
