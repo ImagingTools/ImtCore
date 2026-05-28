@@ -25,6 +25,9 @@ type TenantItemData {
 	tenantRelationScope: String
 	invitationId: ID
 	invitedByName: String
+	parentTenantId: ID
+	depth: Int
+	isSystemTenant: Boolean
 }
 
 type TenantMemberEntry {
@@ -76,6 +79,10 @@ type TenantData {
 	pendingInvitations: [TenantInvitationEntry]
 	tenantPermissions: [ID]
 	allProductPermissions: [TenantPermissionOption]
+	parentTenantId: ID
+	depth: Int
+	materializedPath: String
+	isSystemTenant: Boolean
 }
 
 input GetTenantListInput {
@@ -103,6 +110,7 @@ input CreateTenantInput {
 	name: String!
 	description: String
 	ownerId: ID
+	parentTenantId: ID
 }
 
 type CreateTenantPayload {
@@ -213,11 +221,77 @@ type GetTenantRelationshipsPayload {
 	errorMessage: String
 }
 
+# --- Cross-Org Grants ---
+
+enum CrossOrgAccessLevel {
+	None
+	Read
+	Write
+	Admin
+}
+
+type CrossOrgGrant {
+	id: ID!
+	sourceTenantId: ID!
+	targetTenantId: ID!
+	relationshipId: ID!
+	targetTeamId: ID
+	accessLevel: CrossOrgAccessLevel!
+	resourceScope: String
+	description: String
+	createdAt: String
+	expiresAt: String
+	isActive: Boolean
+}
+
+input CreateCrossOrgGrantInput {
+	sourceTenantId: ID!
+	targetTenantId: ID!
+	relationshipId: ID!
+	accessLevel: CrossOrgAccessLevel!
+	resourceScope: String
+	targetTeamId: ID
+	description: String
+	expiresAt: String
+}
+
+type CreateCrossOrgGrantPayload {
+	grantId: ID
+	errorMessage: String
+}
+
+input RevokeCrossOrgGrantInput {
+	grantId: ID!
+}
+
+type RevokeCrossOrgGrantPayload {
+	success: Boolean
+	errorMessage: String
+}
+
+input GetCrossOrgGrantsInput {
+	tenantId: ID!
+}
+
+type GetCrossOrgGrantsPayload {
+	grants: [CrossOrgGrant]
+	errorMessage: String
+}
+
+# --- System Tenant ---
+
+type EnsureSystemTenantPayload {
+	success: Boolean
+	systemTenantId: ID
+	errorMessage: String
+}
+
 type Query {
 	GetTenantList (input: GetTenantListInput): GetTenantListPayload!
 	GetTenant (input: GetTenantInput): GetTenantPayload!
 	GetTenantIds: GetTenantIdsPayload!
 	GetTenantRelationships (input: GetTenantRelationshipsInput): GetTenantRelationshipsPayload!
+	GetCrossOrgGrants (input: GetCrossOrgGrantsInput): GetCrossOrgGrantsPayload!
 }
 
 type Mutation {
@@ -227,6 +301,9 @@ type Mutation {
 	SetTenantActive (input: SetTenantActiveInput): SetTenantActivePayload!
 	AddTenantRelationship (input: AddTenantRelationshipInput): AddTenantRelationshipPayload!
 	RemoveTenantRelationship (input: RemoveTenantRelationshipInput): RemoveTenantRelationshipPayload!
+	CreateCrossOrgGrant (input: CreateCrossOrgGrantInput): CreateCrossOrgGrantPayload!
+	RevokeCrossOrgGrant (input: RevokeCrossOrgGrantInput): RevokeCrossOrgGrantPayload!
+	EnsureSystemTenant: EnsureSystemTenantPayload!
 }
 
 collectionSchema {

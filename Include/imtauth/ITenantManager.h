@@ -22,6 +22,20 @@ public:
 	virtual bool RemoveTenant(const QByteArray& tenantId) = 0;
 	virtual bool UpdateTenant(const QByteArray& tenantId, const QString& tenantName, const QString& description, const QByteArray& ownerId = QByteArray(), bool updateOwner = false) = 0;
 	virtual bool SetTenantActive(const QByteArray& tenantId, bool isActive) = 0;
+
+	/**
+		Get the System-Tenant ID.
+		Returns the well-known System-Tenant ID constant.
+	*/
+	virtual QByteArray GetSystemTenantId() const { return SystemTenantId; }
+
+	/**
+		Ensure the System-Tenant exists.
+		Creates the System-Tenant if it does not already exist.
+		Should be called during server bootstrap/initialization.
+		\return true if the System-Tenant exists or was successfully created.
+	*/
+	virtual bool EnsureSystemTenant() { return false; }
 };
 
 

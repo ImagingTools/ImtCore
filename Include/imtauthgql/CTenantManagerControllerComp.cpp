@@ -90,6 +90,10 @@ sdl::imtauth::Tenants::CGetTenantPayload CTenantManagerControllerComp::OnGetTena
 	tenantData.createdAt = tenantInfoPtr->GetCreatedAt();
 	tenantData.updatedAt = tenantInfoPtr->GetUpdatedAt();
 	tenantData.tenantPermissions.Emplace().FromList(tenantInfoPtr->GetTenantPermissions());
+	tenantData.parentTenantId = tenantInfoPtr->GetParentTenantId();
+	tenantData.depth = tenantInfoPtr->GetDepth();
+	tenantData.materializedPath = tenantInfoPtr->GetMaterializedPath();
+	tenantData.isSystemTenant = tenantInfoPtr->IsSystemTenant();
 
 	// Populate members (id + name) from TenantMemberships
 	if (m_membershipManagerCompPtr.IsValid()){
@@ -134,6 +138,7 @@ sdl::imtauth::Tenants::CCreateTenantPayload CTenantManagerControllerComp::OnCrea
 	QString name;
 	QString description;
 	QByteArray ownerId = GetUserId(gqlRequest);
+	QByteArray parentTenantId;
 	sdl::imtauth::Tenants::CreateTenantRequestArguments arguments = createTenantRequest.GetRequestedArguments();
 	if (arguments.input.Version_1_0->name){
 		name = *arguments.input.Version_1_0->name;
@@ -144,12 +149,38 @@ sdl::imtauth::Tenants::CCreateTenantPayload CTenantManagerControllerComp::OnCrea
 	if (arguments.input.Version_1_0->ownerId){
 		ownerId = *arguments.input.Version_1_0->ownerId;
 	}
+	if (arguments.input.Version_1_0->parentTenantId){
+		parentTenantId = *arguments.input.Version_1_0->parentTenantId;
+	}
 
 	QByteArray tenantId = m_tenantManagerCompPtr->CreateTenant(name, description, ownerId);
 
 	if (tenantId.isEmpty()){
 		response.Version_1_0->errorMessage = QStringLiteral("Failed to create tenant");
 		return response;
+	}
+
+	// Set hierarchy fields if parentTenantId was provided
+	if (!parentTenantId.isEmpty()){
+		imtauth::ITenantInfoUniquePtr newTenant = m_tenantManagerCompPtr->GetTenant(tenantId);
+		if (newTenant.IsValid()){
+			newTenant->SetParentTenantId(parentTenantId);
+
+			// Calculate depth and materialized path from parent
+			imtauth::ITenantInfoUniquePtr parentTenant = m_tenantManagerCompPtr->GetTenant(parentTenantId);
+			if (parentTenant.IsValid()){
+				int parentDepth = parentTenant->GetDepth();
+				QString parentPath = parentTenant->GetMaterializedPath();
+				newTenant->SetDepth(parentDepth + 1);
+				newTenant->SetMaterializedPath(parentPath + "/" + QString::fromUtf8(tenantId));
+			}
+			else{
+				newTenant->SetDepth(1);
+				newTenant->SetMaterializedPath(QString("/%1/%2").arg(QString::fromUtf8(parentTenantId), QString::fromUtf8(tenantId)));
+			}
+
+			m_tenantManagerCompPtr->UpdateTenant(tenantId, name, description, ownerId, true);
+		}
 	}
 
 	if (m_membershipManagerCompPtr.IsValid() && !ownerId.isEmpty()){

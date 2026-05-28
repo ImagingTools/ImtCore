@@ -198,4 +198,53 @@ bool CTenantManagerComp::SetTenantActive(const QByteArray& tenantId, bool isActi
 }
 
 
+bool CTenantManagerComp::EnsureSystemTenant()
+{
+	if (!m_tenantCollectionCompPtr.IsValid() || !m_tenantFactoryCompPtr.IsValid()){
+		SendErrorMessage(0, "Tenant collection or factory not configured", "CTenantManagerComp");
+		return false;
+	}
+
+	QByteArray systemTenantId = GetSystemTenantId();
+
+	// Check if System-Tenant already exists
+	ITenantInfoUniquePtr existingTenant = GetTenant(systemTenantId);
+	if (existingTenant.IsValid()){
+		SendInfoMessage(0, "System-Tenant already exists", "CTenantManagerComp");
+		return true;
+	}
+
+	// Create the System-Tenant
+	istd::CChangeNotifier changeNotifier(this);
+
+	ITenantInfoUniquePtr tenantPtr = m_tenantFactoryCompPtr.CreateInstance();
+	if (!tenantPtr.IsValid()){
+		SendErrorMessage(0, "Failed to create System-Tenant object", "CTenantManagerComp");
+		return false;
+	}
+
+	QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+
+	tenantPtr->SetTenantId(systemTenantId);
+	tenantPtr->SetTenantName(QStringLiteral("System"));
+	tenantPtr->SetTenantDescription(QStringLiteral("Root system tenant"));
+	tenantPtr->SetActive(true);
+	tenantPtr->SetCreatedAt(now);
+	tenantPtr->SetUpdatedAt(now);
+	tenantPtr->SetSystemTenant(true);
+	tenantPtr->SetDepth(0);
+	tenantPtr->SetMaterializedPath(QString("/%1").arg(QString::fromUtf8(systemTenantId)));
+
+	QByteArray retVal = m_tenantCollectionCompPtr->InsertNewObject("Tenant", QStringLiteral("System"), QStringLiteral("Root system tenant"), tenantPtr.GetPtr(), systemTenantId);
+	if (retVal.isEmpty()){
+		SendErrorMessage(0, "Failed to store System-Tenant in collection", "CTenantManagerComp");
+		return false;
+	}
+
+	SendInfoMessage(0, "System-Tenant created successfully", "CTenantManagerComp");
+
+	return true;
+}
+
+
 } // namespace imtauth

@@ -10,6 +10,9 @@
 
 #include <memory>
 
+// ImtCore includes
+#include <imtauth/ITenantInfo.h>
+
 
 namespace imtauth
 {
@@ -24,6 +27,10 @@ struct TenantData
 	bool isActive = true;
 	QDateTime createdAt;
 	QDateTime updatedAt;
+	QByteArray parentTenantId;
+	int depth = 0;
+	QString materializedPath;
+	bool isSystemTenant = false;
 };
 
 struct MembershipData
@@ -77,9 +84,61 @@ public:
 		tenant.isActive = true;
 		tenant.createdAt = QDateTime::currentDateTimeUtc();
 		tenant.updatedAt = tenant.createdAt;
+		tenant.depth = 0;
 
 		m_tenants[tenant.id] = tenant;
 		return tenant.id;
+	}
+
+	QByteArray CreateChildTenant(const QString& name, const QByteArray& parentTenantId, const QString& description = QString(), const QByteArray& ownerId = QByteArray())
+	{
+		if (name.isEmpty() || !m_tenants.contains(parentTenantId)){
+			return QByteArray();
+		}
+
+		TenantData tenant;
+		tenant.id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+		tenant.name = name;
+		tenant.description = description;
+		tenant.ownerId = ownerId;
+		tenant.isActive = true;
+		tenant.createdAt = QDateTime::currentDateTimeUtc();
+		tenant.updatedAt = tenant.createdAt;
+		tenant.parentTenantId = parentTenantId;
+
+		const TenantData& parent = m_tenants[parentTenantId];
+		tenant.depth = parent.depth + 1;
+		tenant.materializedPath = parent.materializedPath + "/" + QString::fromUtf8(tenant.id);
+
+		m_tenants[tenant.id] = tenant;
+		return tenant.id;
+	}
+
+	bool EnsureSystemTenant()
+	{
+		QByteArray systemId = imtauth::SystemTenantId;
+		if (m_tenants.contains(systemId)){
+			return true;
+		}
+
+		TenantData tenant;
+		tenant.id = systemId;
+		tenant.name = QStringLiteral("System");
+		tenant.description = QStringLiteral("Root system tenant");
+		tenant.isActive = true;
+		tenant.createdAt = QDateTime::currentDateTimeUtc();
+		tenant.updatedAt = tenant.createdAt;
+		tenant.isSystemTenant = true;
+		tenant.depth = 0;
+		tenant.materializedPath = QString("/%1").arg(QString::fromUtf8(systemId));
+
+		m_tenants[tenant.id] = tenant;
+		return true;
+	}
+
+	QByteArray GetSystemTenantId() const
+	{
+		return imtauth::SystemTenantId;
 	}
 
 	bool RemoveTenant(const QByteArray& id)
@@ -176,6 +235,17 @@ private Q_SLOTS:
 	void testCreateTenant_DuplicateNameAllowed();
 	void testRemoveTenant_CascadesMemberships();
 	void testRemoveTenant_CascadesPermissions();
+
+	// System-Tenant tests
+	void testEnsureSystemTenant_CreatesOnFirstCall();
+	void testEnsureSystemTenant_Idempotent();
+	void testSystemTenant_HasCorrectProperties();
+
+	// Hierarchy tests
+	void testCreateChildTenant_SetsParentAndDepth();
+	void testCreateChildTenant_CalculatesMaterializedPath();
+	void testCreateChildTenant_InvalidParent_Fails();
+	void testHierarchy_MultiLevel();
 
 private:
 	imtauth::CMockTenantManager* m_managerPtr = nullptr;

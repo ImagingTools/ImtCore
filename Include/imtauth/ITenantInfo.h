@@ -19,6 +19,13 @@ namespace imtauth
 	Interface for describing a tenant.
 	\ingroup Tenant
 */
+/**
+	Well-known System-Tenant ID.
+	The System-Tenant is the root tenant that is automatically created at server startup.
+	All users implicitly belong to the System-Tenant.
+*/
+static const QByteArray SystemTenantId = QByteArrayLiteral("00000000-0000-0000-0000-000000000001");
+
 class ITenantInfo: virtual public iser::IObject
 {
 public:
@@ -28,7 +35,8 @@ public:
 		MIT_TENANT_NAME,
 		MIT_TENANT_DESCRIPTION,
 		MIT_TENANT_IS_ACTIVE,
-		MIT_TENANT_OWNER_ID
+		MIT_TENANT_OWNER_ID,
+		MIT_PARENT_TENANT_ID
 	};
 
 	/**
@@ -183,6 +191,49 @@ public:
 		Set the list of permissions available for this tenant.
 	*/
 	virtual void SetTenantPermissions(const QByteArrayList& permissions) = 0;
+
+	/**
+		Get parent tenant ID.
+		Empty if this is a top-level tenant or the System-Tenant.
+	*/
+	virtual QByteArray GetParentTenantId() const = 0;
+
+	/**
+		Set parent tenant ID.
+	*/
+	virtual void SetParentTenantId(const QByteArray& parentTenantId) = 0;
+
+	/**
+		Get hierarchy depth.
+		0 for the System-Tenant and top-level tenants, incremented for each level.
+	*/
+	virtual int GetDepth() const = 0;
+
+	/**
+		Set hierarchy depth.
+	*/
+	virtual void SetDepth(int depth) = 0;
+
+	/**
+		Get materialized path for efficient hierarchy queries.
+		Format: "/rootId/parentId/.../thisId"
+	*/
+	virtual QString GetMaterializedPath() const = 0;
+
+	/**
+		Set materialized path.
+	*/
+	virtual void SetMaterializedPath(const QString& path) = 0;
+
+	/**
+		Check if this tenant is the System-Tenant.
+	*/
+	virtual bool IsSystemTenant() const = 0;
+
+	/**
+		Set the system tenant flag.
+	*/
+	virtual void SetSystemTenant(bool isSystem) = 0;
 };
 
 
