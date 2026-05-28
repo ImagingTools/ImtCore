@@ -1,28 +1,28 @@
 pragma Singleton
 import QtQuick 2.12
-import QtQuick.Window 2.2
 
 /*!
     \qmltype OverlayManager
     \inqmlmodule imtcontrols
     \internal
 
-    Owns a single \l Overlay item per \c Window. The overlay is the parent
-    surface for every open popup that belongs to that window; it sits above
-    the regular content tree, hosts the modal dim and the outside-click
-    catcher, and orders popups by z.
+    Owns a single \l Overlay item per hosting root Item (typically the
+    window's contentItem, resolved by walking the QML parent chain). The
+    overlay is the parent surface for every open popup that belongs to
+    that root; it sits above the regular content tree, hosts the modal
+    dim and the outside-click catcher, and orders popups by z.
 
     Overlays are created lazily: the first \l attach() call for a given
-    window builds one, parents it to \c window.contentItem and fills it. When
-    its last popup detaches, the overlay item is kept alive (cheap, single
-    Item) so subsequent opens are immediate.
+    root builds one, parents it to the root and fills it. When its last
+    popup detaches, the overlay item is kept alive (cheap, single Item)
+    so subsequent opens are immediate.
 */
 QtObject {
     id: root
 
-    // Map from Window -> overlay Item. Stored as parallel arrays because
+    // Map from rootItem -> overlay Item. Stored as parallel arrays because
     // QML's `var` map keys must be strings.
-    property var _windows: []
+    property var _roots: []
     property var _overlays: []
 
     // Internal Component used to build an overlay item on demand. The
@@ -155,37 +155,36 @@ QtObject {
         }
     }
 
-    /*! Return (creating if needed) the overlay item for \a window. */
-    function overlayFor(window) {
-        if (!window) return null;
-        var idx = _windows.indexOf(window);
+    /*! Return (creating if needed) the overlay item for \a rootItem. */
+    function overlayFor(rootItem) {
+        if (!rootItem) return null;
+        var idx = _roots.indexOf(rootItem);
         if (idx !== -1) return _overlays[idx];
-        if (!window.contentItem) return null;
-        var ov = _overlayComponent.createObject(window.contentItem, {
-            "width": Qt.binding(function(){ return window.contentItem.width; }),
-            "height": Qt.binding(function(){ return window.contentItem.height; })
+        var ov = _overlayComponent.createObject(rootItem, {
+            "width": Qt.binding(function(){ return rootItem.width; }),
+            "height": Qt.binding(function(){ return rootItem.height; })
         });
         if (!ov) {
-            console.warn("OverlayManager: failed to create overlay for window", window);
+            console.warn("OverlayManager: failed to create overlay for root", rootItem);
             return null;
         }
-        _windows.push(window);
+        _roots.push(rootItem);
         _overlays.push(ov);
-        // Detect window destruction.
-        window.Component.destruction.connect(function() {
-            var i = _windows.indexOf(window);
+        // Detect root destruction.
+        rootItem.Component.destruction.connect(function() {
+            var i = _roots.indexOf(rootItem);
             if (i !== -1) {
-                _windows.splice(i, 1);
+                _roots.splice(i, 1);
                 _overlays.splice(i, 1);
             }
         });
         return ov;
     }
 
-    /*! Attach \a popup to the overlay belonging to its target window.
+    /*! Attach \a popup to the overlay belonging to its target root.
         Returns the overlay item or null on failure. */
-    function attach(popup, window) {
-        var ov = overlayFor(window);
+    function attach(popup, rootItem) {
+        var ov = overlayFor(rootItem);
         if (!ov) return null;
         if (ov.openPopups.indexOf(popup) === -1) {
             // Assign a z above all currently open popups in this overlay.

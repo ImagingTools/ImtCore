@@ -1,5 +1,4 @@
 import QtQuick 2.12
-import QtQuick.Window 2.2
 import Acf 1.0
 import imtcontrols 1.0
 import "Internal" as Internal
@@ -186,7 +185,7 @@ FocusScope {
 
     readonly property Item _contentRoot: d.contentRoot
     readonly property Item _overlay: d.overlay
-    property var _window: null   // resolved Window at open()
+    property Item _rootItem: null   // resolved root content item at open()
     property point _cursorPos: Qt.point(0, 0)
     property bool _flippedVertically: false
     property bool _flippedHorizontally: false
@@ -293,18 +292,19 @@ FocusScope {
         property bool destroyed: false
 
         property Item overlay: null
-        property var targetWindow: null
+        property Item targetRoot: null
         property Item contentRoot: null
 
-        function resolveWindow() {
-            // Walk QML parent chain looking for a Window.
+        function resolveRoot() {
+            // Walk the QML parent chain to the topmost Item. For controls
+            // hosted in a QQuickWindow this is the window's contentItem,
+            // which is what we want to use both as the overlay parent and
+            // as the key identifying the hosting surface — without taking
+            // any dependency on QtQuick.Window.
             var n = popup.parent;
-            while (n) {
-                if (n.Window !== undefined && n.Window.window) return n.Window.window;
-                n = n.parent;
-            }
-            if (popup.Window !== undefined && popup.Window.window) return popup.Window.window;
-            return null;
+            if (!n) return null;
+            while (n.parent) n = n.parent;
+            return n;
         }
 
         function _ensureContentRoot() {
@@ -315,19 +315,19 @@ FocusScope {
 
         function _open() {
             popup.aboutToShow();
-            targetWindow = resolveWindow();
-            if (!targetWindow) {
-                console.warn("imtcontrols.Popup: cannot open - no parent Window");
+            targetRoot = resolveRoot();
+            if (!targetRoot) {
+                console.warn("imtcontrols.Popup: cannot open - no root parent item");
                 return;
             }
-            popup._window = targetWindow;
-            overlay = Internal.OverlayManager.overlayFor(targetWindow);
+            popup._rootItem = targetRoot;
+            overlay = Internal.OverlayManager.overlayFor(targetRoot);
             if (!overlay) {
                 console.warn("imtcontrols.Popup: cannot open - overlay unavailable");
                 return;
             }
             _ensureContentRoot();
-            Internal.OverlayManager.attach(popup, targetWindow);
+            Internal.OverlayManager.attach(popup, targetRoot);
 
             // Auto-detect parent popup if not explicitly set.
             var pp = popup.parentPopup;
@@ -356,7 +356,7 @@ FocusScope {
             popup._reposition();
 
             if (popup.focus) {
-                Internal.FocusCoordinator.push(targetWindow);
+                Internal.FocusCoordinator.push(targetRoot, popup.parent);
                 contentRoot.forceActiveFocus();
             }
 
@@ -391,8 +391,8 @@ FocusScope {
                 }
             }
             Internal.OverlayManager.detach(popup);
-            if (opened && popup.focus && targetWindow)
-                Internal.FocusCoordinator.pop(targetWindow);
+            if (opened && popup.focus && targetRoot)
+                Internal.FocusCoordinator.pop(targetRoot);
             opened = false;
             opening = false;
             closing = false;
