@@ -72,6 +72,30 @@ bool HasTenantAccess(
 }
 
 
+/**
+	Check if the user can manage members (create invitations, remove members, change roles).
+	Only Creator, Owner, or Admin can manage members.
+*/
+bool CanManageMembers(
+		const imtauth::ITenantManager& tenantManager,
+		const imtauth::ITenantMembershipManager& membershipManager,
+		const QByteArray& userId,
+		const QByteArray& tenantId)
+{
+	// Owner and Creator always can manage
+	imtauth::ITenantInfoUniquePtr tenantPtr = tenantManager.GetTenant(tenantId);
+	if (tenantPtr.IsValid()){
+		if (tenantPtr->GetOwnerId() == userId || tenantPtr->GetCreatorId() == userId){
+			return true;
+		}
+	}
+
+	// Check Admin role
+	QByteArray adminRoleId = imtauth::TenantEnvironmentRoleToString(imtauth::TER_ADMIN).toUtf8();
+	return membershipManager.HasMinimumRole(userId, tenantId, adminRoleId);
+}
+
+
 } // anonymous namespace
 
 
@@ -419,6 +443,12 @@ sdl::imtauth::TenantMemberships::CAddMembershipPayload CTenantMembershipManagerC
 		return response;
 	}
 
+	// Only Creator/Owner/Admin can add members
+	if (!CanManageMembers(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, tenantId)){
+		response.Version_1_0->errorMessage = QStringLiteral("Only Admin, Owner, or Creator can add members");
+		return response;
+	}
+
 	QByteArray membershipId = m_membershipManagerCompPtr->AddMembership(userId, tenantId, roleId);
 
 	if (membershipId.isEmpty()){
@@ -460,6 +490,13 @@ sdl::imtauth::TenantMemberships::CRemoveMembershipPayload CTenantMembershipManag
 		if (!HasTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, tenantId)){
 			response.Version_1_0->success = false;
 			response.Version_1_0->errorMessage = QStringLiteral("Access denied");
+			return response;
+		}
+		// Only Creator/Owner/Admin can remove other members; regular members can only remove themselves
+		bool isSelfRemoval = (membershipPtr->GetUserId() == contextUserId);
+		if (!isSelfRemoval && !CanManageMembers(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, tenantId)){
+			response.Version_1_0->success = false;
+			response.Version_1_0->errorMessage = QStringLiteral("Only Admin, Owner, or Creator can remove other members");
 			return response;
 		}
 	}
@@ -505,6 +542,12 @@ sdl::imtauth::TenantMemberships::CCreateTenantInvitationPayload CTenantMembershi
 	QByteArray contextUserId = ContextUserId(gqlRequest);
 	if (!m_tenantManagerCompPtr.IsValid() || !HasTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, tenantId)){
 		response.Version_1_0->errorMessage = QStringLiteral("Access denied");
+		return response;
+	}
+
+	// Only Creator/Owner/Admin can create invitations
+	if (!CanManageMembers(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, tenantId)){
+		response.Version_1_0->errorMessage = QStringLiteral("Only Admin, Owner, or Creator can invite members");
 		return response;
 	}
 
@@ -681,6 +724,13 @@ sdl::imtauth::TenantMemberships::CUpdateMembershipRolePayload CTenantMembershipM
 		if (m_tenantManagerCompPtr.IsValid() && !HasTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, tenantId)){
 			response.Version_1_0->success = false;
 			response.Version_1_0->errorMessage = QStringLiteral("Access denied");
+			return response;
+		}
+
+		// Only Creator/Owner/Admin can change member roles
+		if (m_tenantManagerCompPtr.IsValid() && !CanManageMembers(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, tenantId)){
+			response.Version_1_0->success = false;
+			response.Version_1_0->errorMessage = QStringLiteral("Only Admin, Owner, or Creator can change member roles");
 			return response;
 		}
 

@@ -24,7 +24,7 @@ Item {
 	property var menuCommands: []
 
 	// Expose selection manager for external access
-	readonly property alias selectionManager: selectionManager
+	readonly property alias selectionManager: selectionManager_
 
 	signal editRequested(string itemId, string itemName, string itemDescription)
 	signal deleteRequested(string itemId, string itemName)
@@ -32,7 +32,7 @@ Item {
 	signal selectionChanged(var selectedIds)
 
 	IdSelectionManager {
-		id: selectionManager
+		id: selectionManager_
 		multiSelect: root.selectionMode === "multi"
 		onSelectionChanged: root.selectionChanged(selectedIds)
 	}
@@ -93,7 +93,9 @@ Item {
 			id: filterDebounce
 			interval: 250
 			repeat: false
-			onTriggered: dataProvider.fetch(filterInput.text)
+			onTriggered: {
+				dataProvider.fetch(filterInput.text)
+			}
 		}
 
 		Rectangle {
@@ -149,7 +151,7 @@ Item {
 			property string itemId: modelData.id || ""
 			property string itemTitle: modelData.title || modelData.id || ""
 			property string itemDescription: modelData.description || ""
-			property bool isSelected: selectionManager.isSelected(itemId)
+			property bool isSelected: selectionManager_.isSelected(itemId)
 
 			color: isSelected ? Style.selectedColor
 				 : itemMouseArea.containsMouse ? Style.buttonHoverColor
@@ -168,9 +170,9 @@ Item {
 					} else {
 						// Selection logic
 						if (root.selectionMode === "multi" && (mouse.modifiers & Qt.ControlModifier)) {
-							selectionManager.toggleSelect(delegateRoot.itemId)
+							selectionManager_.toggleSelect(delegateRoot.itemId)
 						} else {
-							selectionManager.singleSelect(delegateRoot.itemId)
+							selectionManager_.singleSelect(delegateRoot.itemId)
 						}
 					}
 				}

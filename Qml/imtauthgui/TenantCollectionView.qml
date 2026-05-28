@@ -47,36 +47,6 @@ RemoteCollectionView {
 		}
 	}
 
-	// Activate Switch/Leave commands by current selection. Default base commands
-	// (New/Edit/Remove/…) are handled by CollectionViewCommandsDelegateBase, but
-	// custom commands like Switch/Leave have to be toggled explicitly here.
-	onSelectionChanged: {
-		container.__updateSwitchLeaveEnabled(selectedIds, selectedIndexes)
-	}
-
-	function __updateSwitchLeaveEnabled(selectedIds, selectedIndexes) {
-		if (!container.commandsController)
-			return
-		let singleSelection = selectedIndexes && selectedIndexes.length === 1
-		let switchEnabled = false
-		let leaveEnabled = false
-		if (singleSelection) {
-			let row = selectedIndexes[0]
-			let tenantId = container.table.elements.getData("id", row)
-			let scope = container.table.elements.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, row)
-			// Switch — only to a tenant that is not the currently selected one
-			// and that the user actually has access to (Owner/Member).
-			switchEnabled = !!tenantId
-					&& tenantId !== AuthorizationController.currentTenantId
-					&& (scope === "Owner" || scope === "Member")
-			// Leave — only for tenants the user is a member of (not Owner —
-			// the owner has to transfer ownership first — and not Invited).
-			leaveEnabled = !!tenantId && scope === "Member"
-		}
-		container.commandsController.setCommandIsEnabled("Switch", switchEnabled)
-		container.commandsController.setCommandIsEnabled("Leave", leaveEnabled)
-	}
-
 	Component {
 		id: leaveConfirmDialogComp
 		MessageDialog {
@@ -97,7 +67,7 @@ RemoteCollectionView {
 	property GqlBasedTenantManagementApiClient tenantManagementApiClient: GqlBasedTenantManagementApiClient {}
 
 	Connections {
-		target: tenantManagementApiClient
+		target: container.tenantManagementApiClient
 		function onSubscriptionInvitationReceived(notification) {
 			container.doUpdateGui()
 		}
@@ -558,6 +528,23 @@ RemoteCollectionView {
 			id: tenantCommandsDelegate
 			collectionView: container
 
+			function updateStateCustomCommands(selection, commandsController, elementsModel){
+				let singleSelection = selection && selection.length === 1
+				let switchEnabled = false
+				let leaveEnabled = false
+				if (singleSelection) {
+					let row = selection[0]
+
+					let tenantId = elementsModel.getData("id", row)
+					let scope = elementsModel.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, row)
+
+					switchEnabled =  tenantId !== AuthorizationController.currentTenantId
+					leaveEnabled =  scope === "Member"
+				}
+				commandsController.setCommandIsEnabled("Switch", switchEnabled)
+				commandsController.setCommandIsEnabled("Leave", leaveEnabled)
+			}
+
 			Component.onCompleted: {
 				registerDocumentType("Tenant", qsTr("Tenant"))
 				addDocumentView("Tenant", "TenantEditor", tenantEditorComp, tenantDataControllerFactory)
@@ -568,7 +555,7 @@ RemoteCollectionView {
 
 				TenantEditor {
 					id: tenantEditor
-					apiClient: tenantManagementApiClient
+					apiClient: container.tenantManagementApiClient
 					commandsControllerComp: Component {
 						GqlBasedCommandsController {
 							typeId: "Tenant"
@@ -579,6 +566,17 @@ RemoteCollectionView {
 						if (isNewTenant){
 							if (tenantEditor.representationController){
 								tenantEditor.representationController.updateRepresentationFromDocument()
+							}
+							// Automatically switch to the newly created organization
+							// so the user immediately operates in its context. Inform
+							// the user that the active organization has changed.
+							var newTenantId = tenantEditor.tenantData ? tenantEditor.tenantData.m_id : ""
+							var newTenantName = (tenantEditor.tenantData && tenantEditor.tenantData.m_name) || newTenantId
+							if (newTenantId && newTenantId !== AuthorizationController.currentTenantId){
+								AuthorizationController.selectTenant(newTenantId)
+								ModalDialogManager.showInfoDialog(
+									qsTr("You have been switched to the newly created organization \"%1\".")
+									.arg(newTenantName))
 							}
 						}
 					}

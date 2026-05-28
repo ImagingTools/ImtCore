@@ -35,15 +35,6 @@ QtObject {
 	property string groupObjectTypeId: "Group"
 	property string userObjectTypeId: "User"
 
-	// --- Data provider components for list views ---
-	// Concrete implementations return a Component that, when instantiated, yields
-	// a data provider exposing { items, fetch(filterText) } and emitting changes
-	// on `items`. Pages instantiate these via a Loader so they never depend on
-	// the concrete transport types.
-	property Component roleListDataProviderComp: null
-	property Component groupListDataProviderComp: null
-	property Component invitableUsersListDataProviderComp: null
-
 	// --- Invitations ---
 	signal invitationCreated()
 	signal invitationRevoked(string invitationId)

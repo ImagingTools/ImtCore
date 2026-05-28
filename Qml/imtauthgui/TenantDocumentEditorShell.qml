@@ -37,6 +37,12 @@ Item {
 	// with the client-allocated id.
 	property bool generateNewId: false
 
+	// Optional callback `function(documentId) → string` forwarded to the
+	// inner shell's `documentNameResolver`. Used to resolve a meaningful
+	// document name (e.g. from the representation model) when the standard
+	// document-name-input dialog is disabled.
+	property var documentNameResolver: null
+
 	// Optional target object whose `__activeShellView` property will be
 	// kept in sync with the inner shell. Used by the parent page's header
 	// close-button handler to defer the close to the document decorator.
@@ -61,6 +67,7 @@ Item {
 		proposedSourceDocumentId: (root.createNew && root.generateNewId) ? UuidGenerator.generateUUID() : ""
 		headerVisible: false
 		documentNameInputEnabled: false
+		documentNameResolver: root.documentNameResolver
 
 		onClosed: root.closed()
 	}
