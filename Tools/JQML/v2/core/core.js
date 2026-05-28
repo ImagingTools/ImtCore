@@ -373,7 +373,6 @@ global.JQModules = {
         TextEdit: __components.TextEdit,
     },
     QtQuick_Controls: {
-        Action: __components.Action,
     },
     QtQuick_Layouts: {
         ColumnLayout: __components.ColumnLayout,

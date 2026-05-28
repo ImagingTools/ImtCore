@@ -39,6 +39,5 @@ module.exports = {
     DropArea: require("./DropArea"),
 
     Dialogs: require("./Dialogs/Dialogs"),
-    Controls: require("./Controls/Controls"),
     Layouts: require("./Layouts/Layouts"),
 }

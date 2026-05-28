@@ -64,21 +64,9 @@ module.exports.listComponents = [
     'BaseModel',
     'DropArea',
     'Settings',
-    // Action (Qt Quick Controls)
-    'Action',
-    // TableView / TreeView components
-    'TableView',
-    'TreeView',
-    'TableModel',
-    'TableModelColumn',
-    'ModelIndex',
-    'ItemSelectionModel',
-    'SelectionRectangle',
-    'HorizontalHeaderView',
-    'VerticalHeaderView',
+    // QtQml.Models (used by ListView delegate resolution)
     'DelegateChooser',
     'DelegateChoice',
-    // 'SplitView',
     // 3D (Qt Quick 3D analogs, Web runtime backed by Three.js, lazy-loaded)
     'View3D',
     'Node3D',
