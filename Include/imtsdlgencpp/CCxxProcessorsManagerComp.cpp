@@ -55,17 +55,6 @@ void WriteDeclareMetaType(const QList<T>& entryList, QTextStream& stream)
 			stream << ':' << ':';
 		}
 		stream << 'C' << sdlType.GetName();
-		stream << ':' << ':';
-		stream << CSdlGenTools::GetSdlEntryVersion(sdlType);
-		stream << QStringLiteral(");");
-
-		imtsdl::CSdlTools::FeedStream(stream, 1, false);
-		stream << QStringLiteral("Q_DECLARE_METATYPE(");
-		if (typeNamespace.length() > 0){
-			stream << typeNamespace;
-			stream << ':' << ':';
-		}
-		stream << 'C' << sdlType.GetName();
 		stream << QStringLiteral(");");
 	}
 }

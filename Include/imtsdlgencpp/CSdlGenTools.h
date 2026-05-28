@@ -76,7 +76,7 @@ public:
 		bool* isArrayPtr = nullptr,
 		bool* isEnumPtr = nullptr,
 		bool* isUnionPtr = nullptr,
-		const bool& addVersion = true);
+		const bool& addVersion = false);
 
 	/**
 		\brief Generates a string, checks, if a field of object, named \c objectName, defined or not

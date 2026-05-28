@@ -14,7 +14,6 @@
 // ImtCore includes
 #include <imtsdl/ISdlProcessArgumentsParser.h>
 #include <imtsdl/CSdlTools.h>
-#include <imtsdlgencpp/ICxxModifier.h>
 #include <imtsdlgencpp/CSdlGenTools.h>
 #include <imtsdlgencpp/CCxxProcessorCompBase.h>
 
@@ -59,14 +58,6 @@ public:
 	virtual QList<imtsdl::IncludeDirective> GetIncludeDirectives() const override;
 
 private:
-	enum MetdodType
-	{
-		MT_READ,
-		MT_WRITE,
-		MT_OPT_READ,
-		MT_OPT_WRITE
-	};
-
 	bool BeginClassFiles(const imtsdl::CSdlType& sdlType, QIODevice* headerPtr, QIODevice* sourcePtr, const iprm::IParamsSet* paramsPtr) const;
 	bool BeginHeaderClassFile(const imtsdl::CSdlType& sdlType, QIODevice* headerPtr, const iprm::IParamsSet* paramsPtr) const;
 	bool BeginSourceClassFile(const imtsdl::CSdlType& sdlType, QIODevice* sourcePtr, const iprm::IParamsSet* paramsPtr) const;
@@ -75,34 +66,6 @@ private:
 				QTextStream& stream,
 				const imtsdl::CSdlType& sdlType,
 				uint indents = 1) const;
-	void GenerateVersionStruct(
-				QTextStream& stream,
-				const imtsdl::CSdlType& sdlType,
-				uint indents = 1) const;
-	void GenerateMethodDefinition(
-				QTextStream& stream,
-				const imtsdl::CSdlType& sdlType,
-				MetdodType methodType,
-				ICxxModifier& modifier,
-				bool forHeader) const;
-	QString GetVersionMemberVariableName(
-				const imtsdl::CSdlType& sdlType,
-				int versionIndex = -1) const;
-	void GenerateVersionMemberDeclaration(
-				QTextStream& stream,
-				const imtsdl::CSdlType& sdlType,
-				bool optWrap = false,
-				int versionIndex = -1) const;
-	void GenerateMethodImplementation(
-				QTextStream& stream,
-				const imtsdl::CSdlType& sdlType,
-				MetdodType methodType,
-				ICxxModifier& modifier) const;
-	void GenerateMethodCall(
-				QTextStream& stream,
-				const imtsdl::CSdlType& sdlType,
-				MetdodType methodType,
-				ICxxModifier& modifier) const;
 
 private:
 	I_REF(imtsdl::ISdlTypeListProvider, m_sdlTypeListCompPtr);

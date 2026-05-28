@@ -166,11 +166,7 @@ QString CSdlGenTools::CStructNamespaceConverter::GetString() const
 	if (sdlUnionPtr != nullptr){
 		retVal += imtsdl::CSdlTools::GetCapitalizedValue(sdlUnionPtr->GetName());
 	}
-	// versions does NOT exist for enumerators and unions
-	if ((sdlEnumPtr == nullptr && sdlUnionPtr == nullptr) && addVersion){
-		retVal += QStringLiteral("::");
-		retVal += GetSdlEntryVersion(*namespaceEntryPtr);
-	}
+	// version is now part of the namespace, no need to append it to the type name
 
 	if (!relatedNamespace.isEmpty()){
 		QString typeNamespace = GetNamespaceFromSchemaParams(namespaceEntryPtr->GetSchemaParams());
@@ -241,6 +237,13 @@ QString CSdlGenTools::GetNamespaceFromSchemaParams(const iprm::IParamsSet& schem
 		}
 	}
 
+	// add version to namespace
+	QString versionString = GetSchemaVerstionString(schemaParams, true);
+	if (!versionString.isEmpty()){
+		retVal += versionString;
+		retVal += QStringLiteral("::");
+	}
+
 	QString schemaNamespace;
 	iprm::TParamsPtr<iprm::ITextParam> namespaceParamPtr(&schemaParams, imtsdl::SdlCustomSchemaKeys::SchemaNamespace.toUtf8(), false);
 	if (namespaceParamPtr.IsValid()){
@@ -248,18 +251,6 @@ QString CSdlGenTools::GetNamespaceFromSchemaParams(const iprm::IParamsSet& schem
 	}
 	if (!schemaNamespace.isEmpty()){
 		retVal += schemaNamespace;
-		if (!retVal.isEmpty()){
-			retVal += QStringLiteral("::");
-		}
-	}
-
-	QString schemaName;
-	iprm::TParamsPtr<iprm::ITextParam> nameParamPtr(&schemaParams, imtsdl::SdlCustomSchemaKeys::SchemaName.toUtf8(), false);
-	if (nameParamPtr.IsValid()){
-		schemaName = nameParamPtr->GetText();
-	}
-	if (!schemaName.isEmpty()){
-		retVal += schemaName;
 	}
 
 	return imtsdl::CSdlTools::GetNamespaceAcceptableString(retVal);

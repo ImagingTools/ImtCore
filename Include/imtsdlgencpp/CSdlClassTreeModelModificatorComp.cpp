@@ -49,7 +49,7 @@ bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const imtsdl::CSd
 
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 	CStructNamespaceConverter structNameConverter(sdlType, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
-	structNameConverter.addVersion = true;
+	structNameConverter.addVersion = false;
 
 	// add method implementation
 	ofStream << QStringLiteral("bool ");
@@ -667,7 +667,7 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadFromModelImplCode(
 	FeedStreamHorizontally(stream, hIndents);
 	stream << variableName;
 	stream << QStringLiteral(" = ");
-	structNameConverter.addVersion = true;
+	structNameConverter.addVersion = false;
 	stream << structNameConverter.GetString();
 	stream << QStringLiteral("();");
 	FeedStream(stream, 1, false);
@@ -926,7 +926,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 
 	// declare temp list var
 	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, true);
-	structNameConverter.addVersion = true;
+	structNameConverter.addVersion = false;
 
 	const QString listVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("List");
 	FeedStreamHorizontally(stream, hIndents);
@@ -1197,7 +1197,7 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldReadFromModelImplCod
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
-	structNameConverter.addVersion = true;
+	structNameConverter.addVersion = false;
 	structNameConverter.listWrap = true;
 
 	FeedStreamHorizontally(stream, hIndents);
