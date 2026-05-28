@@ -290,6 +290,7 @@ ViewBase {
 		id: listView
 
 		Item {
+			id: listViewItem
 			property var effectiveModel: collectionPage.listModel ? collectionPage.listModel: collectionPage.dataProvider ? collectionPage.dataProvider.items : []
 
 			SearchTextInput {
@@ -349,7 +350,7 @@ ViewBase {
 							selectionManager.clear()
 						} else {
 							var allIds = []
-							var items = effectiveModel
+							var items = listViewItem.effectiveModel
 							for (var i = 0; i < items.length; i++) {
 								if (items[i] && items[i].id)
 									allIds.push(items[i].id)
@@ -361,7 +362,7 @@ ViewBase {
 
 				Item {
 					id: emptyState
-					visible: !effectiveModel || effectiveModel.length === 0
+					visible: !listViewItem.effectiveModel || listViewItem.effectiveModel.length === 0
 					anchors.top: tableHeader.bottom
 					anchors.left: parent.left
 					anchors.right: parent.right
@@ -383,7 +384,7 @@ ViewBase {
 					anchors.bottom: parent.bottom
 					clip: true
 					boundsBehavior: Flickable.StopAtBounds
-					model: effectiveModel
+					model: listViewItem.effectiveModel
 
 					delegate: collectionPage.delegateComponent ? collectionPage.delegateComponent : defaultDelegateComp
 				}

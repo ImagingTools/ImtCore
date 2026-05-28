@@ -423,6 +423,7 @@ PopupView {
 				radius: Style.radiusL
 
 				onTextChanged: {
+					console.log("filterField", text)
 					root.__internal.focusedIndex = -1
 					debounce.stop()
 					debounce.start()

@@ -67,7 +67,7 @@ RemoteCollectionView {
 	property GqlBasedTenantManagementApiClient tenantManagementApiClient: GqlBasedTenantManagementApiClient {}
 
 	Connections {
-		target: tenantManagementApiClient
+		target: container.tenantManagementApiClient
 		function onSubscriptionInvitationReceived(notification) {
 			container.doUpdateGui()
 		}
