@@ -13,11 +13,13 @@ namespace imtauthgql
 /**
  * Tenant-aware collection document service controller.
  *
- * Extends imtservergql::CCollectionDocumentServiceControllerComp with a
- * permission check that ensures the user has switched to a tenant before
- * accessing tenant documents and that the document being opened belongs to
- * that same tenant (i.e. while authorized in Tenant A the user cannot open
- * Tenant B).
+ * Extends imtservergql::CCollectionDocumentServiceControllerComp with
+ * permission checks that enforce:
+ * - Creating a new tenant is only allowed when the session has NO active
+ *   tenant (tenantId is empty).
+ * - Opening/editing a tenant is only allowed when the session's active
+ *   tenantId matches the tenant being accessed (i.e. while authorized in
+ *   Tenant A the user cannot open Tenant B).
  */
 class CTenantCollectionDocumentServiceControllerComp:
 		public imtservergql::CCollectionDocumentServiceControllerComp
@@ -29,8 +31,19 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
-	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	// reimplemented (CGraphQlHandlerCompBase)
+	virtual sdl::imtbase::CollectionDocumentService::CDocumentList OnGetOpenedDocumentList(
+		const sdl::imtbase::CollectionDocumentService::CGetOpenedDocumentListGqlRequest& getOpenedDocumentListRequest,
+		const ::imtgql::CGqlRequest& gqlRequest,
+		QString& errorMessage) const override;
+	virtual sdl::imtbase::CollectionDocumentService::CDocumentInfo OnCreateNewDocument(
+		const sdl::imtbase::CollectionDocumentService::CCreateNewDocumentGqlRequest& createNewDocumentRequest,
+		const ::imtgql::CGqlRequest& gqlRequest,
+		QString& errorMessage) const override;
+	virtual sdl::imtbase::CollectionDocumentService::CDocumentInfo OnOpenDocument(
+		const sdl::imtbase::CollectionDocumentService::COpenDocumentGqlRequest& openDocumentRequest,
+		const ::imtgql::CGqlRequest& gqlRequest,
+		QString& errorMessage) const override;
 };
 
 

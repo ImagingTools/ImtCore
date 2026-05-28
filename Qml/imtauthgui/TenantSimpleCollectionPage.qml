@@ -56,7 +56,6 @@ ViewBase {
 	// --- backend configuration ---
 	property var documentManager: null
 	property string objectTypeId: ""
-	property Component dataProviderComp: null
 	property var listModel: null                       // alternative to dataProviderComp: direct model for the list
 	property Component delegateComponent: null         // custom delegate (receives modelData, selectionManager, collectionPage)
 	property Component headerButtonsComponent: null    // custom header buttons placed at right of stackViewHeader
@@ -67,8 +66,15 @@ ViewBase {
 
 	/** Re-fetch the list. Parents call this on external removal signals. */
 	function refresh() {
-		if (__dataProvider)
-			__dataProvider.fetch(__lastFilterText)
+		if (dataProvider)
+			dataProvider.fetch(__lastFilterText)
+	}
+
+	function resolveDocumentName(documentId) {
+		var view = collectionPage.documentManager.getDocumentViewInstance(documentId, "")
+		if (view && view.model && view.model.m_name)
+			return view.model.m_name
+		return ""
 	}
 
 	property string __editItemId: ""
@@ -78,12 +84,24 @@ ViewBase {
 	readonly property bool __canManage: collectionPage.stateManager ? collectionPage.stateManager.canManageMembers : false
 
 	property var __selectionManager: null
-	property var __dataProvider: null
 	property string __lastFilterText: ""
+	property var __listItems: []
 
 	// Public accessors for subcomponents with custom header buttons
 	readonly property var selectionManager: __selectionManager
-	readonly property var dataProvider: __dataProvider
+	property var dataProvider: null
+	onDataProviderChanged: {
+		if (dataProvider)
+			dataProvider.fetch(__lastFilterText)
+	}
+	readonly property string filterText: __lastFilterText
+
+	Connections {
+		target: collectionPage.dataProvider
+		function onDataChanged() {
+			collectionPage.__listItems = collectionPage.dataProvider.items
+		}
+	}
 
 	function openCreate() {
 		while (collectionStackView.count > 1)
@@ -137,6 +155,17 @@ ViewBase {
 		}
 
 		onHeaderItemClicked: {
+			if (collectionStackView.currentIndex <= index)
+				return
+			if (collectionPage.__activeShellView
+					&& collectionPage.__activeShellView.state === "content") {
+				// Delegate to the document close flow so the standard
+				// "Save changes?" dialog is shown for dirty documents.
+				// The editor's onClosed handler will pop the header /
+				// stack back to the list page.
+				collectionPage.__activeShellView.closeDocument()
+				return
+			}
 			while (collectionStackView.currentIndex > index) {
 				collectionStackView.previous()
 				stackViewHeader.popHeader()
@@ -185,7 +214,7 @@ ViewBase {
 			enabled: collectionPage.__selectionManager && collectionPage.__selectionManager.selectedIds.length === 1
 			onClicked: {
 				var selId = collectionPage.__selectionManager.selectedIds[0]
-				var items = collectionPage.__dataProvider ? collectionPage.__dataProvider.items : []
+				var items = collectionPage.__listItems
 				for (var i = 0; i < items.length; i++) {
 					if (items[i] && items[i].id === selId) {
 						collectionPage.__openEdit(selId, items[i].title || items[i].id || "", items[i].description || "")
@@ -269,25 +298,8 @@ ViewBase {
 		id: listView
 
 		Item {
-			property var dataProvider: collectionPage.dataProviderComp ? dataProviderLoader.item : null
-			property var effectiveModel: {
-				if (collectionPage.listModel)
-					return collectionPage.listModel
-				return dataProvider ? dataProvider.items : []
-			}
-
-			Loader {
-				id: dataProviderLoader
-				sourceComponent: collectionPage.dataProviderComp
-				onLoaded: {
-					collectionPage.__dataProvider = item
-					item.fetch("")
-				}
-				Component.onDestruction: {
-					if (collectionPage)
-						collectionPage.__dataProvider = null
-				}
-			}
+			id: listViewItem
+			readonly property var effectiveModel: collectionPage.listModel ? collectionPage.listModel : collectionPage.__listItems
 
 			SearchTextInput {
 				id: filterInput
@@ -308,8 +320,8 @@ ViewBase {
 				interval: 300
 				repeat: false
 				onTriggered: {
-					if (dataProviderLoader.item)
-						dataProviderLoader.item.fetch(filterInput.text)
+					if (collectionPage.dataProvider)
+						collectionPage.dataProvider.fetch(filterInput.text)
 				}
 			}
 
@@ -346,7 +358,7 @@ ViewBase {
 							selectionManager.clear()
 						} else {
 							var allIds = []
-							var items = effectiveModel
+							var items = listViewItem.effectiveModel
 							for (var i = 0; i < items.length; i++) {
 								if (items[i] && items[i].id)
 									allIds.push(items[i].id)
@@ -358,7 +370,7 @@ ViewBase {
 
 				Item {
 					id: emptyState
-					visible: !effectiveModel || effectiveModel.length === 0
+					visible: !listViewItem.effectiveModel || listViewItem.effectiveModel.length === 0
 					anchors.top: tableHeader.bottom
 					anchors.left: parent.left
 					anchors.right: parent.right
@@ -380,7 +392,7 @@ ViewBase {
 					anchors.bottom: parent.bottom
 					clip: true
 					boundsBehavior: Flickable.StopAtBounds
-					model: effectiveModel
+					model: listViewItem.effectiveModel
 
 					delegate: collectionPage.delegateComponent ? collectionPage.delegateComponent : defaultDelegateComp
 				}
@@ -390,7 +402,7 @@ ViewBase {
 
 					Rectangle {
 						id: itemDelegateRoot
-						width: ListView.view ? ListView.view.width : 0
+						width: itemListView.width
 						height: Style.controlHeightL + Style.marginL
 
 						property string itemId: modelData.id || ""
@@ -401,7 +413,6 @@ ViewBase {
 						color: isSelected ? Style.selectedColor
 										  : itemMouseArea.containsMouse ? Style.buttonHoverColor
 																		: "transparent"
-
 						MouseArea {
 							id: itemMouseArea
 							anchors.fill: parent
@@ -550,6 +561,7 @@ ViewBase {
 			createNew: true
 			generateNewId: true
 			activeShellTarget: collectionPage
+			documentNameResolver: collectionPage.resolveDocumentName
 
 			onClosed: {
 				stackViewHeader.popHeader()
@@ -569,6 +581,7 @@ ViewBase {
 			objectId: collectionPage.__editItemId
 			createNew: false
 			activeShellTarget: collectionPage
+			documentNameResolver: collectionPage.resolveDocumentName
 
 			onClosed: {
 				stackViewHeader.popHeader()

@@ -144,6 +144,11 @@ DocumentViewBase {
 		}
 		function onUserCreated() {
 			PopupManager.addSuccessMessage(qsTr("User created successfully"), true)
+			// Refresh the tenant document so the newly added user (auto-joined
+			// as Member via AddMembership in the api client) appears in the
+			// TenantMembersPage list.
+			if (!stateManager_.isNewTenant && container.representationController)
+				container.representationController.updateRepresentationFromDocument()
 		}
 		function onSubscriptionInvitationAccepted(notification) {
 			if (!container.tenantData || stateManager_.isNewTenant)
@@ -169,6 +174,22 @@ DocumentViewBase {
 				return
 			if (notification.tenantId === container.tenantData.m_id) {
 				PopupManager.addInfoMessage(qsTr("Ownership transferred"), true)
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
+			}
+		}
+		function onSubscriptionMembershipRoleChanged(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			if (notification.tenantId === container.tenantData.m_id) {
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
+			}
+		}
+		function onSubscriptionMembershipRemoved(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			if (notification.tenantId === container.tenantData.m_id) {
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
