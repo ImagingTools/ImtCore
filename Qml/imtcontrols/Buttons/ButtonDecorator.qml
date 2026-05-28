@@ -144,9 +144,9 @@ DecoratorBase {
 								  (commonButtonDecorator.baseElement.icon && commonButtonDecorator.baseElement.icon.width !== 0) ?
 								  commonButtonDecorator.baseElement.icon.width : Style.iconSizeS
 
-			property real _iconH: !commonButtonDecorator.baseElement ? 0 :
+			property real _iconH: (isEmpty || !commonButtonDecorator.baseElement) ? 0 :
 								  (commonButtonDecorator.baseElement.icon && commonButtonDecorator.baseElement.icon.height !== 0) ?
-								  commonButtonDecorator.baseElement.icon.height : _iconW
+								  commonButtonDecorator.baseElement.icon.height : Style.iconSizeS
 
 			width: _iconW
 			height: _iconH

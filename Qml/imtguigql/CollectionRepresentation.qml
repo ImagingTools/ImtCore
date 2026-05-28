@@ -125,7 +125,7 @@ Item {
 	function addAdditionalInputParams(inputParams){
 		// override for derived implementations
 	}
-	
+
 	function updateModel(){
 		getCollectionHeaders()
 	}

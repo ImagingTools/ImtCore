@@ -74,7 +74,7 @@ FocusScope {
     property bool focusOnOpen: true
 
     /*! Font propagated to content (API-compatible with Controls.Popup). */
-    property font font
+    property var font
 
     /*! Padding around content. Individual sides override the common value. */
     property real padding: 0
@@ -322,6 +322,7 @@ FocusScope {
         }
 
         function _open() {
+            console.log("_open")
             popup.aboutToShow();
             targetRoot = resolveRoot();
             if (!targetRoot) {
@@ -445,16 +446,20 @@ FocusScope {
             transformOrigin: popup ? popup.transformOrigin : Item.Center
             activeFocusOnTab: true
 
-            Item { id: bgSlot; anchors.fill: parent; z: -1 }
-            property alias bgSlot: bgSlot
+            Item { id: bgSlot_; anchors.fill: parent; z: -1 }
+            property alias bgSlot: bgSlot_
             Item {
-                id: contentSlot
+                id: contentSlot_
                 x: popup ? popup.leftPadding : 0
                 y: popup ? popup.topPadding  : 0
                 width: popup ? popup.availableWidth  : 0
                 height: popup ? popup.availableHeight : 0
             }
-            property alias contentSlot: contentSlot
+            property alias contentSlot: contentSlot_
+
+            Component.onCompleted: {
+                console.log("contentRootComponent onCompleted")
+            }
 
             // Eat presses so they don't reach the outside-click catcher,
             // and use them as "raise + collapse chain above me" signals.
@@ -513,6 +518,7 @@ FocusScope {
         duration: 120
         easing.type: Easing.OutQuad
         onStopped: {
+            console.log("NumberAnimation onStopped", d.opening, d.contentRoot)
             if (d.opening) {
                 d.opening = false;
                 d.opened = true;

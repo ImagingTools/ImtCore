@@ -1,8 +1,11 @@
+module imtcontrols
+
 singleton PopupRegistry 1.0 PopupRegistry.qml
 singleton OverlayManager 1.0 OverlayManager.qml
 singleton FocusCoordinator 1.0 FocusCoordinator.qml
 singleton PositioningEngine 1.0 PositioningEngine.qml
 singleton PopupStackController 1.0 PopupStackController.qml
 singleton InputCoordinator 1.0 InputCoordinator.qml
+singleton PopupRegistry 1.0 PopupRegistry.qml
 
 PopupTransition 1.0 PopupTransition.qml

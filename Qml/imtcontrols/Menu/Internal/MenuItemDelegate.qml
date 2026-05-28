@@ -42,6 +42,10 @@ Rectangle {
         color: Style.borderColor
         visible: row.isSeparator
     }
+    
+    Component.onCompleted: {
+        console.log("MenuItemDelegate.qml onCompleted", width, height, visible)
+    }
 
     Item {
         anchors.fill: parent

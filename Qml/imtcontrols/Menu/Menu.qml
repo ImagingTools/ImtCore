@@ -110,18 +110,13 @@ Popup {
     }
 
     function addSeparator() {
-        // Create a MenuSeparator dynamically and store it.
-        var sep = Qt.createQmlObject(
-            'import imtcontrols 1.0; MenuSeparator {}',
-            menu, "Menu.addSeparator");
+        var sep = _separatorComponent.createObject(menu);
         _rows.push(sep);
         _syncModel();
     }
 
     function addAction(action) {
-        var mi = Qt.createQmlObject(
-            'import imtcontrols 1.0; MenuItem {}',
-            menu, "Menu.addAction");
+        var mi = _menuItemComponent.createObject(menu);
         mi.action = action;
         addItem(mi);
     }
@@ -129,9 +124,7 @@ Popup {
     function addMenu(sub) {
         if (!sub) return;
         submenusList.push(sub);
-        var mi = Qt.createQmlObject(
-            'import imtcontrols 1.0; MenuItem { hasSubmenu: true }',
-            menu, "Menu.addMenu");
+        var mi = _submenuItemComponent.createObject(menu);
         mi.text = sub.title;
         mi.submenu = sub;
         addItem(mi);
@@ -180,9 +173,14 @@ Popup {
     }
 
     function _ingestDeclaredChildren() {
-        // Popup's default property (contentChildren) places declared
-        // children into contentHolder.data, not menu.children.
+        // In native Qt the "default property alias contentChildren: contentHolder.data"
+        // redirects declared children into contentData. In JQML the compiler
+        // parents children directly onto the Menu itself (menu.data). We scan
+        // both locations to stay compatible with both runtimes.
         var arr = menu.contentData;
+        if (!arr || arr.length === 0) arr = menu.data;
+        if (!arr) return;
+        
         for (var i = 0; i < arr.length; ++i) {
             var c = arr[i];
             if (!c) continue;
@@ -190,9 +188,7 @@ Popup {
                 _rows.push(c);
             } else if (c.objectName === "ImtControlsPopup" && c !== menu && c.title !== undefined) {
                 submenusList.push(c);
-                var mi = Qt.createQmlObject(
-                    'import imtcontrols 1.0; MenuItem { hasSubmenu: true }',
-                    menu, "Menu.addMenu");
+                var mi = _submenuItemComponent.createObject(menu);
                 mi.text = c.title;
                 mi.submenu = c;
                 _rows.push(mi);
@@ -473,6 +469,7 @@ Popup {
             width: list.width
             sourceComponent: menu.delegate
             property var menuItemData: modelData
+
             onLoaded: {
                 if (item) {
                     item.menu = menu;
@@ -491,5 +488,20 @@ Popup {
     Component {
         id: defaultRowDelegate
         MenuItemDelegate {}
+    }
+
+    Component {
+        id: _menuItemComponent
+        MenuItem {}
+    }
+
+    Component {
+        id: _submenuItemComponent
+        MenuItem { hasSubmenu: true }
+    }
+
+    Component {
+        id: _separatorComponent
+        MenuSeparator {}
     }
 }

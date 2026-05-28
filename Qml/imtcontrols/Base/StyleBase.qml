@@ -204,7 +204,7 @@ StyleComponents {
 
 	//menu row
 	property int menuRowHeight: 30
-	property int menuMinWidth: 160
+	property int menuMinWidth: 200
 
 	//table sizes
 	property int tableRowHeight: 35

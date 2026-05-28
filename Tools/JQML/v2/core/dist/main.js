@@ -10210,6 +10210,16 @@ class QObject extends ComplexObject {
         'Component.destruction': { params: [] },
     }
 
+    // Provides obj.Component.destruction / obj.Component.completed access
+    // so that QML idiom `obj.Component.destruction.connect(fn)` works at runtime.
+    get Component() {
+        const self = this
+        return {
+            get destruction() { return self.getSignal('Component.destruction') },
+            get completed() { return self.getSignal('Component.completed') }
+        }
+    }
+
     constructor(parent,exCtx,exModel){
         super(parent,exCtx,exModel)
         // this.$children = []

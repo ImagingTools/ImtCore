@@ -23,7 +23,7 @@ Item {
     property string text: ""
 
     /*! Optional icon source. */
-    property url iconSource: ""
+    property string iconSource: ""
 
     /*! Optional shortcut text rendered right-aligned (display only; the
         actual shortcut binding belongs on an \l Action). */
