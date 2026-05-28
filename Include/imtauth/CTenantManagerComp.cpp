@@ -98,7 +98,7 @@ QByteArray CTenantManagerComp::CreateTenant(const QString& tenantName, const QSt
 		return QByteArray();
 	}
 
-	SendInfoMessage(0, QString("Created tenant '%1' (id: %2)").arg(tenantName, QString::fromUtf8(tenantId), "CTenantManagerComp"));
+	SendInfoMessage(0, QString("Created tenant '%1' (id: %2)").arg(tenantName, QString::fromUtf8(tenantId)), "CTenantManagerComp");
 
 	return tenantId;
 }

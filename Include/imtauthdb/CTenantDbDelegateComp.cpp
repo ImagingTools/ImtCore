@@ -146,19 +146,19 @@ CTenantDbDelegateComp::NewObjectQuery CTenantDbDelegateComp::CreateNewObjectQuer
 		"INSERT INTO \"%1\" (\"Id\", \"Name\", \"Description\", \"OwnerId\", \"CreatorId\", \"IsActive\", \"CreatedAt\", \"UpdatedAt\", "
 		"\"ParentTenantId\", \"Depth\", \"MaterializedPath\", \"IsSystemTenant\") "
 		"VALUES ('%2', '%3', '%4', '%5', '%6', %7, '%8', '%9', '%10', %11, '%12', %13);")
-		.arg(*m_tableNameAttrPtr,
-			 id,
-			 name,
-			 description,
-			 ownerId,
-			 creatorId,
-			 isActive ? "true" : "false",
-			 now,
-			 now,
-			 parentTenantId,
-			 QString::number(depth),
-			 materializedPath,
-			 isSystemTenant ? "true" : "false").toUtf8();
+		.arg(*m_tableNameAttrPtr)
+		.arg(id)
+		.arg(name)
+		.arg(description)
+		.arg(ownerId)
+		.arg(creatorId)
+		.arg(isActive ? "true" : "false")
+		.arg(now)
+		.arg(now)
+		.arg(parentTenantId)
+		.arg(QString::number(depth))
+		.arg(materializedPath)
+		.arg(isSystemTenant ? "true" : "false").toUtf8();
 
 	// Append permissions insert if tenant has permissions
 	if (tenantPtr != nullptr){
@@ -200,18 +200,18 @@ QByteArray CTenantDbDelegateComp::CreateUpdateObjectQuery(
 		"\"MaterializedPath\"='%10', "
 		"\"IsSystemTenant\"=%11 "
 		"WHERE \"Id\"='%12';")
-		.arg(*m_tableNameAttrPtr,
-			 imtdb::EscapeSql(tenantPtr->GetTenantName()),
-			 imtdb::EscapeSql(tenantPtr->GetTenantDescription()),
-			 imtdb::EscapeSql(QString::fromUtf8(tenantPtr->GetOwnerId())),
-			 imtdb::EscapeSql(QString::fromUtf8(tenantPtr->GetCreatorId())),
-			 tenantPtr->IsActive() ? "true" : "false",
-			 now,
-			 imtdb::EscapeSql(QString::fromUtf8(tenantPtr->GetParentTenantId())),
-			 QString::number(tenantPtr->GetDepth()),
-			 imtdb::EscapeSql(tenantPtr->GetMaterializedPath()),
-			 tenantPtr->IsSystemTenant() ? "true" : "false",
-			 escapedId).toUtf8()
+		.arg(*m_tableNameAttrPtr)
+		.arg(imtdb::EscapeSql(tenantPtr->GetTenantName()))
+		.arg(imtdb::EscapeSql(tenantPtr->GetTenantDescription()))
+		.arg(imtdb::EscapeSql(QString::fromUtf8(tenantPtr->GetOwnerId())))
+		.arg(imtdb::EscapeSql(QString::fromUtf8(tenantPtr->GetCreatorId())))
+		.arg(tenantPtr->IsActive() ? "true" : "false")
+		.arg(now)
+		.arg(imtdb::EscapeSql(QString::fromUtf8(tenantPtr->GetParentTenantId())))
+		.arg(QString::number(tenantPtr->GetDepth()))
+		.arg(imtdb::EscapeSql(tenantPtr->GetMaterializedPath()))
+		.arg(tenantPtr->IsSystemTenant() ? "true" : "false")
+		.arg(escapedId).toUtf8()
 		+ CreatePermissionsDeleteQuery(objectId)
 		+ CreatePermissionsInsertQuery(objectId, tenantPtr->GetTenantPermissions());
 }
