@@ -524,6 +524,16 @@ module.exports = {
     Horizontal: 0,
     Vertical: 1,
 
+    AlignLeft: 0x0001,
+    AlignHCenter: 0x0004,
+    AlignRight: 0x0002,
+    AlignJustify: 0x0008,
+    AlignTop: 0x0020,
+    AlignVCenter: 0x0080,
+    AlignBottom: 0x0040,
+    AlignCenter: 0x0004 | 0x0080,
+    AlignBaseline: 0x0100,
+
     platform: {
         os: 'web',
     },

@@ -12,6 +12,7 @@
 
 // ImtCore includes
 #include <imtauth/CUserSettings.h>
+#include <imtdb/imtdb.h>
 
 
 namespace imtauthdb
@@ -55,7 +56,7 @@ istd::IChangeableUniquePtr CUsersSettingsDatabaseDelegateComp::CreateObjectFromR
 
 	QByteArray userId;
 	if (record.contains("UserId")){
-		userId = record.value("UserId").toByteArray();
+		userId = imtdb::VariantToByteArray(record.value("UserId"));
 	}
 
 	userSettingsPtr->SetUserId(userId);

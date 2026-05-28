@@ -48,20 +48,20 @@ istd::IChangeableUniquePtr CMessageDbDelegateComp::CreateObjectFromRecord(
 	}
 
 	if (record.contains("Id")){
-		msgPtr->SetId(record.value("Id").toByteArray());
+		msgPtr->SetId(imtdb::VariantToByteArray(record.value("Id")));
 	}
 	if (record.contains("ConversationId")){
-		msgPtr->SetConversationId(record.value("ConversationId").toByteArray());
+		msgPtr->SetConversationId(imtdb::VariantToByteArray(record.value("ConversationId")));
 	}
 	if (record.contains("SenderId")){
-		msgPtr->SetSenderId(record.value("SenderId").toByteArray());
+		msgPtr->SetSenderId(imtdb::VariantToByteArray(record.value("SenderId")));
 	}
 	if (record.contains("Content")){
 		msgPtr->SetContent(record.value("Content").toString());
 	}
 	// AttachmentIds are loaded from the MessageAttachments junction table
 	if (m_databaseEngineCompPtr.IsValid() && record.contains("Id")){
-		QByteArray messageId = record.value("Id").toByteArray();
+		QByteArray messageId = imtdb::VariantToByteArray(record.value("Id"));
 		if (!messageId.isEmpty()){
 			QString escaped = QString::fromUtf8(messageId);
 			escaped.replace('\'', "''");
@@ -76,7 +76,7 @@ istd::IChangeableUniquePtr CMessageDbDelegateComp::CreateObjectFromRecord(
 				while (sqlQuery.next()){
 					QSqlRecord r = sqlQuery.record();
 					if (r.contains("AttachmentId")){
-						QByteArray aid = r.value("AttachmentId").toByteArray();
+						QByteArray aid = imtdb::VariantToByteArray(r.value("AttachmentId"));
 						if (!aid.isEmpty()){
 							attachIds.append(aid);
 						}
@@ -100,7 +100,7 @@ istd::IChangeableUniquePtr CMessageDbDelegateComp::CreateObjectFromRecord(
 		msgPtr->SetUpdatedAt(dt.isValid() ? dt.toString(Qt::ISODateWithMs) : val.toString());
 	}
 	if (record.contains("ReplyToId")){
-		msgPtr->SetReplyToId(record.value("ReplyToId").toByteArray());
+		msgPtr->SetReplyToId(imtdb::VariantToByteArray(record.value("ReplyToId")));
 	}
 
 	return msgPtr;

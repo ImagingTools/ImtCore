@@ -16,6 +16,7 @@
 // ImtCore includes
 #include <imtbase/imtbase.h>
 #include <imtbase/ICollectionFilter.h>
+#include <imtdb/imtdb.h>
 
 namespace imtdb
 {
@@ -493,7 +494,7 @@ bool CSqlDatabaseDocumentDelegateLegacyComp::RestoreRevision(
 	if (queryResult.next()){
 		QSqlRecord record = queryResult.record();
 		if (record.contains(qPrintable(s_idColumn))){
-			revisionUuid = record.value(qPrintable(s_idColumn)).toByteArray();
+			revisionUuid = imtdb::VariantToByteArray(record.value(qPrintable(s_idColumn)));
 		}
 	}
 
@@ -663,7 +664,7 @@ bool CSqlDatabaseDocumentDelegateLegacyComp::CreateObjectInfoFromRecord(
 		return false;
 	}
 
-	QByteArray objectId = record.value(qPrintable(s_idColumn)).toByteArray();
+	QByteArray objectId = imtdb::VariantToByteArray(record.value(qPrintable(s_idColumn)));
 
 	QByteArray sqlMetaInfoQuery = QString("SELECT * FROM \"%1\" WHERE \"RevisionId\" = (SELECT \"LastRevisionId\" FROM \"%3\" WHERE \"Id\" = '%2')")
 				.arg(qPrintable(*m_metaInfoTableNameAttrPtr))

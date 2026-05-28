@@ -117,7 +117,7 @@ QString CFileCollectionCompBase::GetFile(
 			if (outputFilePath.isEmpty()){
 				QString fileExtension = QFileInfo(filePathInRepository).suffix();
 
-				outputFilePath = QDir::tempPath() + "/ImtCore/" + QFileInfo(filePathInRepository).completeBaseName() + "_" + QUuid::createUuid().toString() + "." + fileExtension;
+				outputFilePath = QDir::tempPath() + "/ImtCore/" + QFileInfo(filePathInRepository).completeBaseName() + "_" + QUuid::createUuid().toString(QUuid::WithoutBraces) + "." + fileExtension;
 			}
 
 			if (filePathInRepository == outputFilePath){
@@ -158,7 +158,7 @@ QByteArray CFileCollectionCompBase::InsertFile(
 	QWriteLocker locker(&m_filesLock);
 
 	// Generate unique file-ID accroding to \c proposedObjectId variable provided by caller:
-	QByteArray fileId = (IsObjectIdUsed(proposedObjectId) || proposedObjectId.isEmpty()) ? QUuid::createUuid().toByteArray() : proposedObjectId;
+	QByteArray fileId = (IsObjectIdUsed(proposedObjectId) || proposedObjectId.isEmpty()) ? QUuid::createUuid().toByteArray(QUuid::WithoutBraces) : proposedObjectId;
 
 	// Generate teraget absolute file path for the data file:
 	QString targetFilePath = CalculateTargetFilePath(localFilePath, objectName, typeId);
@@ -453,7 +453,7 @@ QByteArray CFileCollectionCompBase::InsertNewObject(
 				return QByteArray();
 			}
 
-			QString tempFileBaseName = tempDir.GetPath() + "/" + QUuid::createUuid().toString();
+			QString tempFileBaseName = tempDir.GetPath() + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces);
 
 			QString workingExt = GetWorkingExt(
 						persistencePtr,
@@ -598,7 +598,7 @@ bool CFileCollectionCompBase::SetObjectData(
 			return false;
 		}
 
-		QString tempFileBaseName = tempDir.GetPath() + "/" + QUuid::createUuid().toString();
+		QString tempFileBaseName = tempDir.GetPath() + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces);
 
 		QString workingExt = GetWorkingExt(
 					persistencePtr,
@@ -885,7 +885,7 @@ void CFileCollectionCompBase::EnumerateRepositoryItems(QFileInfoList& fileList) 
 
 QString CFileCollectionCompBase::CreateWorkingDir() const
 {
-	QString workingPath = QDir::tempPath() + "/ImtCore/" + QUuid::createUuid().toString();
+	QString workingPath = QDir::tempPath() + "/ImtCore/" + QUuid::createUuid().toString(QUuid::WithoutBraces);
 
 	if (istd::CSystem::EnsurePathExists(workingPath)){
 		return workingPath;
@@ -1442,7 +1442,7 @@ bool CFileCollectionCompBase::RepositoryItemInfoProvider::UpdateItems()
 		itemInfo.SetRepositoryItemFilePath(IRepositoryItemInfo::RFT_DATA_METAINFO, itemBasePath + "." + m_parent.GetRepositoryInfo().metaInfoFileSuffix);
 
 		Item item;
-		item.id = QUuid::createUuid().toByteArray();
+		item.id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 		item.itemInfo = itemInfo;
 
 		m_repositoryItems.append(item);
