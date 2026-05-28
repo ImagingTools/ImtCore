@@ -32,7 +32,7 @@ CLayout::CLayout(CLayout* parentLayoutPtr)
 	// Delegate change notifications to the parent layout:
 	SetSlavePtr(m_parent);
 
-	m_id = QUuid::createUuid().toByteArray();
+	m_id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 }
 
 
@@ -328,7 +328,7 @@ void CLayout::SplitLayout(ILayout::LayoutType type, int width, int height)
 		CLayout* leftLayoutPtr = new CLayout(this);
 		leftLayoutPtr->CopyData(this);
 
-		m_id = QUuid::createUuid().toByteArray();
+		m_id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 		// Reset parent layout:
 		Clear();

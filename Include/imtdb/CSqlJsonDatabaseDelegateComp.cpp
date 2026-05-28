@@ -18,6 +18,7 @@
 #include <imtbase/imtbase.h>
 #include <imtbase/CObjectCollection.h>
 #include <imtcol/IDocumentCollectionFilter.h>
+#include <imtdb/imtdb.h>
 
 
 namespace imtdb
@@ -45,7 +46,7 @@ istd::IChangeableUniquePtr CSqlJsonDatabaseDelegateComp::CreateObjectFromRecord(
 	int index = 0;
 	QByteArray typeId = "DocumentInfo";
 	if (record.contains("TypeId")){
-		typeId = record.value("TypeId").toByteArray();
+		typeId = imtdb::VariantToByteArray(record.value("TypeId"));
 		index = -1;
 
 		if (m_typesCompPtr.IsValid()){
@@ -242,7 +243,7 @@ bool CSqlJsonDatabaseDelegateComp::SetCollectionItemMetaInfoFromRecord(const QSq
 {
 	QByteArray objectId;
 	if (record.contains(*m_objectIdColumnAttrPtr)){
-		objectId = record.value(qPrintable(*m_objectIdColumnAttrPtr)).toByteArray();
+		objectId = imtdb::VariantToByteArray(record.value(qPrintable(*m_objectIdColumnAttrPtr)));
 	}
 
 	if (!objectId.isEmpty()){

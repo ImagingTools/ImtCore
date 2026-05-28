@@ -35,7 +35,7 @@ istd::IChangeableUniquePtr CAddressTypeDatabaseDelegateComp::CreateObjectFromRec
 	}
 
 	if (record.contains("Id")){
-		QByteArray id = record.value("Id").toByteArray();
+		QByteArray id = imtdb::VariantToByteArray(record.value("Id"));
 		adrTypeInfoPtr->SetId(id);
 	}
 

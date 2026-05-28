@@ -38,7 +38,7 @@ QByteArray CMessagesReadJobController::AddJob(const IEventFilter* filterPtr, con
 	Job newJob;
 
 	newJob.status = JS_WAITING;
-	newJob.uuid = QUuid::createUuid().toByteArray();
+	newJob.uuid = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 	newJob.filterPtr = filterPtr;
 	newJob.filterParams.CopyFrom(*filterParamsPtr);
 

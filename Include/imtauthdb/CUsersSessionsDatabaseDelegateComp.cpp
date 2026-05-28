@@ -14,6 +14,7 @@
 #include <imtlic/CFeatureInfo.h>
 #include <imtauth/CSessionInfo.h>
 #include <imtauth/CUserInfo.h>
+#include <imtdb/imtdb.h>
 
 
 namespace imtauthdb
@@ -113,12 +114,12 @@ istd::IChangeableUniquePtr CUsersSessionsDatabaseDelegateComp::CreateObjectFromR
 	}
 
 	if (record.contains("UserId")){
-		QByteArray userId = record.value("UserId").toByteArray();
+		QByteArray userId = imtdb::VariantToByteArray(record.value("UserId"));
 		sessionInfoPtr->SetUserId(userId);
 	}
 
 	if (record.contains("TenantId")){
-		QByteArray tenantId = record.value("TenantId").toByteArray();
+		QByteArray tenantId = imtdb::VariantToByteArray(record.value("TenantId"));
 		sessionInfoPtr->SetTenantId(tenantId);
 	}
 

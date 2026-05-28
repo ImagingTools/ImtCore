@@ -235,7 +235,7 @@ QByteArray CPopupControllerComp::CreatePopupItem(const MessagePtr& messagePtr, i
 		popupWidgetPtr.PopPtr();
 
 		PopupItemPtr itemPtr(new PopupItem());
-		itemPtr->id = QUuid::createUuid().toByteArray();
+		itemPtr->id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 		itemPtr->widgetPtr = widgetPtr;
 		itemPtr->widgetPtr->setGraphicsEffect(&itemPtr->effect);
 		itemPtr->timeout = timeout;

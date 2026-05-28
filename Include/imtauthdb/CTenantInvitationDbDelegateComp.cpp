@@ -61,13 +61,13 @@ istd::IChangeableUniquePtr CTenantInvitationDbDelegateComp::CreateObjectFromReco
 	}
 
 	if (record.contains("Id")){
-		invitationPtr->SetInvitationId(record.value("Id").toByteArray());
+		invitationPtr->SetInvitationId(imtdb::VariantToByteArray(record.value("Id")));
 	}
 	if (record.contains("UserId")){
-		invitationPtr->SetUserId(record.value("UserId").toByteArray());
+		invitationPtr->SetUserId(imtdb::VariantToByteArray(record.value("UserId")));
 	}
 	if (record.contains("TenantId")){
-		invitationPtr->SetTenantId(record.value("TenantId").toByteArray());
+		invitationPtr->SetTenantId(imtdb::VariantToByteArray(record.value("TenantId")));
 	}
 	if (record.contains("Role")){
 		invitationPtr->SetRoleId(record.value("Role").toByteArray());
@@ -76,10 +76,10 @@ istd::IChangeableUniquePtr CTenantInvitationDbDelegateComp::CreateObjectFromReco
 		invitationPtr->SetStatus(static_cast<imtauth::ITenantInvitation::TenantInvitationStatus>(record.value("Status").toInt()));
 	}
 	if (record.contains("InvitedByUserId")){
-		invitationPtr->SetInvitedByUserId(record.value("InvitedByUserId").toByteArray());
+		invitationPtr->SetInvitedByUserId(imtdb::VariantToByteArray(record.value("InvitedByUserId")));
 	}
 	if (record.contains("RevokedByUserId")){
-		invitationPtr->SetRevokedByUserId(record.value("RevokedByUserId").toByteArray());
+		invitationPtr->SetRevokedByUserId(imtdb::VariantToByteArray(record.value("RevokedByUserId")));
 	}
 
 	invitationPtr->SetCreatedAt(RecordDateTimeToString(record, "CreatedAt"));
