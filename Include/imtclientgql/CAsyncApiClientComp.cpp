@@ -237,7 +237,7 @@ IAsyncGqlRequestTokenPtr CAsyncApiClientComp::SendRequest(
 		return tokenPtr;
 	}
 
-	const QByteArray uuid = QUuid::createUuid().toByteArray();
+	const QByteArray uuid = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 	SendVerboseMessage(QString("Send async request with ID ") + uuid + "\n" + requestPtr->GetQuery(), "Async API client");
 
 	QNetworkReply* replyPtr = m_networkManagerPtr->post(*networkRequestPtr, requestPtr->GetQuery());

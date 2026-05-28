@@ -41,7 +41,7 @@ istd::IChangeableUniquePtr CAddressElementDatabaseDelegateComp::CreateObjectFrom
 	if (record.contains("Id")){
 		auto adrElementIdentifiableInfoPtr = dynamic_cast<CPositionIdentifiable*>(adrElementInfoPtr.GetPtr());
 		if (adrElementIdentifiableInfoPtr != nullptr){
-			QByteArray id = record.value("Id").toByteArray();
+			QByteArray id = imtdb::VariantToByteArray(record.value("Id"));
 			adrElementIdentifiableInfoPtr->SetObjectUuid(id);
 		}
 	}

@@ -163,7 +163,7 @@ protected:
 			flags(OF_ALL),
 			copyMode(istd::IChangeable::CM_WITHOUT_REFS)
 		{
-			id = QUuid::createUuid().toByteArray();
+			id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 		}
 
 		ObjectInfo(const ObjectInfo& object)

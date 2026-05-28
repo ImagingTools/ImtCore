@@ -13,6 +13,7 @@
 #include <imtauth/CPersonalAccessTokenMetaInfoCreatorComp.h>
 #include <imtauth/IPersonalAccessToken.h>
 #include <imtdb/CDatabaseEngineComp.h>
+#include <imtdb/imtdb.h>
 
 
 namespace imtauthdb
@@ -46,12 +47,12 @@ istd::IChangeableUniquePtr CPersonalAccessTokenDatabaseDelegateComp::CreateObjec
 	}
 
 	if (record.contains("Id")){
-		const QByteArray tokenId = record.value("Id").toByteArray();
+		const QByteArray tokenId = imtdb::VariantToByteArray(record.value("Id"));
 		tokenPtr->SetId(tokenId);
 	}
 
 	if (record.contains("UserId")){
-		const QByteArray userId = record.value("UserId").toByteArray();
+		const QByteArray userId = imtdb::VariantToByteArray(record.value("UserId"));
 		tokenPtr->SetUserId(userId);
 	}
 
