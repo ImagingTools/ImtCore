@@ -95,20 +95,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessEntry (
 
 QList<imtsdl::IncludeDirective> CGqlCollectionControllerBaseClassGeneratorComp::GetIncludeDirectives() const
 {
-	if (!m_sdlRequestListCompPtr.IsValid()){
-		return {};
-	}
-
-	imtsdl::SdlDocumentTypeList list = m_sdlDocumentListCompPtr->GetDocumentTypes(true);
-	if (list.isEmpty()){
-		return {};
-	}
-
-	static QList retVal = {
-		CreateImtDirective("<imtservergql/CObjectCollectionControllerCompBase.h>")
-	};
-
-	return retVal;
+	return {};
 }
 
 

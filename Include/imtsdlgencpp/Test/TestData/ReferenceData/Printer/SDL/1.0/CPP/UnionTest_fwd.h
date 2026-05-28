@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include <imtservergql/CObjectCollectionControllerCompBase.h>
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
 
 
@@ -21,8 +22,32 @@ class CPrinterSpecificationObjectList;
 // request forward declarations
 class CGetSpecificationsGqlRequest;
 
-// generated base class forward declarations
-class CPrinterCollectionControllerCompBase;
+class CPrinterCollectionControllerCompBase: public ::imtservergql::CObjectCollectionControllerCompBase
+{
+
+public:
+	typedef ::imtservergql::CObjectCollectionControllerCompBase BaseClass;
+
+	I_BEGIN_BASE_COMPONENT(CPrinterCollectionControllerCompBase)
+	I_END_COMPONENT
+
+	virtual QMap<int, QByteArray> GetSupportedCommandIds() const override;
+
+protected:
+	// reimplemented (::imtservergql::CObjectCollectionControllerCompBase)
+	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
+	virtual bool GetOperationFromRequest(const ::imtgql::CGqlRequest& gqlRequest, ::imtgql::CGqlParamObject& gqlObject, QString& errorMessage, int& operationType) const override;
+	virtual bool CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const ::imtgql::CGqlRequest& gqlRequest, QJsonObject& dataObj, QString& errorMessage) const override;
+
+protected:
+	// Printer methods
+	virtual bool CreateRepresentationFromObject(
+				const istd::IChangeable& data,
+				const CGetSpecificationsGqlRequest& getSpecificationsRequest,
+				PrinterSpecification& representationPayload,
+				QString& errorMessage) const = 0;
+
+};
 
 class CGraphQlHandlerCompBase: public ::imtservergql::CPermissibleGqlRequestHandlerComp
 {

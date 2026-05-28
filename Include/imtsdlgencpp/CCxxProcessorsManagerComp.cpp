@@ -616,10 +616,9 @@ bool CCxxProcessorsManagerComp::ProcessDocumentTypes(const EntryFileMap& headerF
 		ICxxFileProcessor* processorPtr = m_documentTypeProcessorCompListPtr[i];
 		Q_ASSERT(processorPtr != nullptr);
 		for (const imtsdl::CSdlDocumentType& documentType: documentTypesList){
-			FilePtr headerFilePtr = GetFilePtrForEntry(documentType, headerFiles);
 			FilePtr sourceFilePtr = GetFilePtrForEntry(documentType, sourceFiles);
-			Q_ASSERT(headerFilePtr || sourceFilePtr);
-			const bool ok = processorPtr->ProcessEntry(documentType, headerFilePtr.get(), sourceFilePtr.get(), paramsPtr);
+			Q_ASSERT(sourceFilePtr);
+			const bool ok = processorPtr->ProcessEntry(documentType, nullptr, sourceFilePtr.get(), paramsPtr);
 			if (!ok){
 				SendErrorMessage(0, QString("Unable to process document type '%1'").arg(documentType.GetName()));
 			}
@@ -697,10 +696,27 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 		hasRequests = !requestsList.isEmpty();
 	}
 
+	// check if we have document types
+	bool hasDocumentTypes = false;
+	if (m_sdlDocumentTypeListCompPtr.IsValid()){
+		const imtsdl::SdlDocumentTypeList documentTypesList = m_sdlDocumentTypeListCompPtr->GetDocumentTypes(true);
+		hasDocumentTypes = !documentTypesList.isEmpty();
+	}
+
+	// add include for CObjectCollectionControllerCompBase if we have document types
+	if (hasDocumentTypes){
+		stream << QStringLiteral("#include <imtservergql/CObjectCollectionControllerCompBase.h>");
+		FeedStream(stream, 1, false);
+	}
+
 	// add include for CPermissibleGqlRequestHandlerComp if we have requests
 	if (hasRequests){
 		stream << QStringLiteral("#include <imtservergql/CPermissibleGqlRequestHandlerComp.h>");
-		FeedStream(stream, 3, false);
+		FeedStream(stream, 1, false);
+	}
+
+	if (hasDocumentTypes || hasRequests){
+		FeedStream(stream, 2, false);
 	}
 
 	// begin namespace
@@ -755,25 +771,23 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 		FeedStream(stream, 1, false);
 	}
 
-	// forward declare document type base classes
-	bool hasDocumentTypes = false;
-	if (m_sdlDocumentTypeListCompPtr.IsValid()){
+	// generate CCollectionControllerCompBase class definitions (moved from .h)
+	if (hasDocumentTypes && m_documentTypeProcessorCompListPtr.IsValid()){
+		// flush the stream before passing the device to document type processors
+		stream.flush();
+
 		const imtsdl::SdlDocumentTypeList documentTypesList = m_sdlDocumentTypeListCompPtr->GetDocumentTypes(true);
-		hasDocumentTypes = !documentTypesList.isEmpty();
-	}
-
-	if (hasDocumentTypes){
-		stream << QStringLiteral("// generated base class forward declarations");
-		FeedStream(stream, 1, false);
-
-		if (m_sdlDocumentTypeListCompPtr.IsValid()){
-			const imtsdl::SdlDocumentTypeList documentTypesList = m_sdlDocumentTypeListCompPtr->GetDocumentTypes(true);
+		const int documentTypeProcessorsCount = m_documentTypeProcessorCompListPtr.GetCount();
+		for (int i = 0; i < documentTypeProcessorsCount; ++i){
+			ICxxFileProcessor* processorPtr = m_documentTypeProcessorCompListPtr[i];
+			Q_ASSERT(processorPtr != nullptr);
 			for (const imtsdl::CSdlDocumentType& documentType: documentTypesList){
-				stream << QStringLiteral("class C") << documentType.GetName() << QStringLiteral("CollectionControllerCompBase;");
-				FeedStream(stream, 1, false);
+				const bool ok = processorPtr->ProcessEntry(documentType, fwdFilePtr.get(), nullptr, paramsPtr);
+				if (!ok){
+					return false;
+				}
 			}
 		}
-		FeedStream(stream, 1, false);
 	}
 
 	// generate CGraphQlHandlerCompBase class definition (moved from .h)
@@ -791,8 +805,10 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 				return false;
 			}
 		}
+	}
 
-		// re-create stream after auto processors wrote to the file
+	if (hasDocumentTypes || hasRequests){
+		// re-create stream after processors wrote to the file
 		QTextStream endStream(fwdFilePtr.get());
 
 		// end namespace
