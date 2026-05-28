@@ -116,7 +116,7 @@ public:
 
 	bool EnsureSystemTenant()
 	{
-		QByteArray systemId = imtauth::SystemTenantId;
+		QByteArray systemId = imtauth::SystemTenantId();
 		if (m_tenants.contains(systemId)){
 			return true;
 		}
@@ -138,7 +138,7 @@ public:
 
 	QByteArray GetSystemTenantId() const
 	{
-		return imtauth::SystemTenantId;
+		return imtauth::SystemTenantId();
 	}
 
 	bool RemoveTenant(const QByteArray& id)

@@ -20,11 +20,15 @@ namespace imtauth
 	\ingroup Tenant
 */
 /**
-	Well-known System-Tenant ID.
+	Get the well-known System-Tenant ID.
 	The System-Tenant is the root tenant that is automatically created at server startup.
 	All users implicitly belong to the System-Tenant.
 */
-static const QByteArray SystemTenantId = QByteArrayLiteral("00000000-0000-0000-0000-000000000001");
+inline const QByteArray& SystemTenantId()
+{
+	static const QByteArray s_id = QByteArrayLiteral("00000000-0000-0000-0000-000000000001");
+	return s_id;
+}
 
 class ITenantInfo: virtual public iser::IObject
 {

@@ -162,25 +162,7 @@ sdl::imtauth::Tenants::CCreateTenantPayload CTenantManagerControllerComp::OnCrea
 
 	// Set hierarchy fields if parentTenantId was provided
 	if (!parentTenantId.isEmpty()){
-		imtauth::ITenantInfoUniquePtr newTenant = m_tenantManagerCompPtr->GetTenant(tenantId);
-		if (newTenant.IsValid()){
-			newTenant->SetParentTenantId(parentTenantId);
-
-			// Calculate depth and materialized path from parent
-			imtauth::ITenantInfoUniquePtr parentTenant = m_tenantManagerCompPtr->GetTenant(parentTenantId);
-			if (parentTenant.IsValid()){
-				int parentDepth = parentTenant->GetDepth();
-				QString parentPath = parentTenant->GetMaterializedPath();
-				newTenant->SetDepth(parentDepth + 1);
-				newTenant->SetMaterializedPath(parentPath + "/" + QString::fromUtf8(tenantId));
-			}
-			else{
-				newTenant->SetDepth(1);
-				newTenant->SetMaterializedPath(QString("/%1/%2").arg(QString::fromUtf8(parentTenantId), QString::fromUtf8(tenantId)));
-			}
-
-			m_tenantManagerCompPtr->UpdateTenant(tenantId, name, description, ownerId, true);
-		}
+		m_tenantManagerCompPtr->SetTenantHierarchy(tenantId, parentTenantId);
 	}
 
 	if (m_membershipManagerCompPtr.IsValid() && !ownerId.isEmpty()){

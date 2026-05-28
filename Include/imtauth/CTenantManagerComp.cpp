@@ -198,6 +198,63 @@ bool CTenantManagerComp::SetTenantActive(const QByteArray& tenantId, bool isActi
 }
 
 
+bool CTenantManagerComp::SetTenantHierarchy(const QByteArray& tenantId, const QByteArray& parentTenantId)
+{
+	if (!m_tenantCollectionCompPtr.IsValid()){
+		SendErrorMessage(0, "Tenant collection not configured", "CTenantManagerComp");
+		return false;
+	}
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (!m_tenantCollectionCompPtr->GetObjectData(tenantId, dataPtr)){
+		SendErrorMessage(0, QString("Tenant '%1' not found").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
+		return false;
+	}
+
+	ITenantInfo* tenantPtr = dynamic_cast<ITenantInfo*>(dataPtr.GetPtr());
+	if (tenantPtr == nullptr){
+		SendErrorMessage(0, "Invalid tenant object", "CTenantManagerComp");
+		return false;
+	}
+
+	istd::CChangeNotifier changeNotifier(this);
+
+	tenantPtr->SetParentTenantId(parentTenantId);
+
+	if (!parentTenantId.isEmpty()){
+		ITenantInfoUniquePtr parentTenant = GetTenant(parentTenantId);
+		if (parentTenant.IsValid()){
+			tenantPtr->SetDepth(parentTenant->GetDepth() + 1);
+			QString parentPath = parentTenant->GetMaterializedPath();
+			if (parentPath.isEmpty()){
+				parentPath = QString("/%1").arg(QString::fromUtf8(parentTenantId));
+			}
+			tenantPtr->SetMaterializedPath(parentPath + "/" + QString::fromUtf8(tenantId));
+		}
+		else{
+			tenantPtr->SetDepth(1);
+			tenantPtr->SetMaterializedPath(QString("/%1/%2").arg(QString::fromUtf8(parentTenantId), QString::fromUtf8(tenantId)));
+		}
+	}
+	else{
+		tenantPtr->SetDepth(0);
+		tenantPtr->SetMaterializedPath(QString("/%1").arg(QString::fromUtf8(tenantId)));
+	}
+
+	tenantPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
+
+	if (!m_tenantCollectionCompPtr->SetObjectData(tenantId, *tenantPtr)){
+		SendErrorMessage(0, QString("Failed to set hierarchy for tenant '%1'").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
+		return false;
+	}
+
+	SendInfoMessage(0, QString("Set hierarchy for tenant '%1' (parent: %2)").arg(
+		QString::fromUtf8(tenantId), parentTenantId.isEmpty() ? "none" : QString::fromUtf8(parentTenantId)), "CTenantManagerComp");
+
+	return true;
+}
+
+
 bool CTenantManagerComp::EnsureSystemTenant()
 {
 	if (!m_tenantCollectionCompPtr.IsValid() || !m_tenantFactoryCompPtr.IsValid()){

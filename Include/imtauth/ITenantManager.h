@@ -24,10 +24,19 @@ public:
 	virtual bool SetTenantActive(const QByteArray& tenantId, bool isActive) = 0;
 
 	/**
+		Set hierarchy fields on an existing tenant.
+		Calculates depth and materialized path based on the parent tenant.
+		\param tenantId The tenant to update.
+		\param parentTenantId The parent tenant ID (empty to make top-level).
+		\return true if hierarchy was set successfully.
+	*/
+	virtual bool SetTenantHierarchy(const QByteArray& tenantId, const QByteArray& parentTenantId) { Q_UNUSED(tenantId); Q_UNUSED(parentTenantId); return false; }
+
+	/**
 		Get the System-Tenant ID.
 		Returns the well-known System-Tenant ID constant.
 	*/
-	virtual QByteArray GetSystemTenantId() const { return SystemTenantId; }
+	virtual QByteArray GetSystemTenantId() const { return SystemTenantId(); }
 
 	/**
 		Ensure the System-Tenant exists.

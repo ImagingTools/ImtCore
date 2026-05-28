@@ -224,7 +224,7 @@ void CTenantManagerTest::testEnsureSystemTenant_CreatesOnFirstCall()
 	QVERIFY(m_managerPtr->EnsureSystemTenant());
 	QByteArray systemId = m_managerPtr->GetSystemTenantId();
 	QVERIFY(!systemId.isEmpty());
-	QCOMPARE(systemId, imtauth::SystemTenantId);
+	QCOMPARE(systemId, imtauth::SystemTenantId());
 	auto tenant = m_managerPtr->GetTenant(systemId);
 	QVERIFY(tenant != nullptr);
 	QCOMPARE(tenant->name, QStringLiteral("System"));
@@ -243,7 +243,7 @@ void CTenantManagerTest::testEnsureSystemTenant_Idempotent()
 void CTenantManagerTest::testSystemTenant_HasCorrectProperties()
 {
 	QVERIFY(m_managerPtr->EnsureSystemTenant());
-	auto tenant = m_managerPtr->GetTenant(imtauth::SystemTenantId);
+	auto tenant = m_managerPtr->GetTenant(imtauth::SystemTenantId());
 	QVERIFY(tenant != nullptr);
 	QVERIFY(tenant->isActive);
 	QVERIFY(tenant->isSystemTenant);
