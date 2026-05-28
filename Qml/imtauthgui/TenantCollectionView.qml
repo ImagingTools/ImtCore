@@ -555,7 +555,7 @@ RemoteCollectionView {
 
 				TenantEditor {
 					id: tenantEditor
-					apiClient: tenantManagementApiClient
+					apiClient: container.tenantManagementApiClient
 					commandsControllerComp: Component {
 						GqlBasedCommandsController {
 							typeId: "Tenant"
