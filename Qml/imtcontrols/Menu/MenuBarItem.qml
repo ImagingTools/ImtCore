@@ -25,8 +25,11 @@ Item {
     /*! Reference back to the MenuBar. */
     property var menuBar: null
 
-    /*! Highlighted state (hover or open). */
-    property bool highlighted: (menu && menu.opened) || hover.containsMouse
+    /*! Highlighted state (hover, open or keyboard focus on this index). */
+    property bool highlighted: (menu && menu.opened)
+                                || hover.containsMouse
+                                || (menuBar && menuBar.activeFocus
+                                    && menuBar.focusedIndex === barIndex)
 
     implicitHeight: Style.controlHeightM
     implicitWidth: label.implicitWidth + Style.marginXL
@@ -39,6 +42,11 @@ Item {
                 ? Style.buttonHoverColor
                 : "transparent"
         radius: Style.buttonRadius
+        border.width: (menuBar && menuBar.activeFocus
+                       && menuBar.focusedIndex === barIndex
+                       && !(menu && menu.opened))
+                      ? Style.buttonBorderWidth : 0
+        border.color: Style.buttonBorderFocusColor
     }
 
     Text {

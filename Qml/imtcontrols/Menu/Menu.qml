@@ -265,7 +265,15 @@ ImtPopup.Popup {
     function _moveCurrent(step) {
         if (rowsModel.count === 0) return;
         var n = rowsModel.count;
-        var i = currentIndex;
+        // When nothing is selected yet, position the cursor just before the
+        // first row (for Down) or just after the last row (for Up) so the
+        // first iteration lands on the first/last enabled entry, matching
+        // QQC2 Menu behaviour.
+        var i;
+        if (currentIndex < 0)
+            i = step > 0 ? -1 : 0;
+        else
+            i = currentIndex;
         for (var tries = 0; tries < n; ++tries) {
             i = (i + step + n) % n;
             var mi = rowsModel.get(i).menuItem;
@@ -276,16 +284,85 @@ ImtPopup.Popup {
         }
     }
 
+    function _moveToEdge(forward) {
+        if (rowsModel.count === 0) return;
+        var n = rowsModel.count;
+        if (forward) {
+            for (var i = 0; i < n; ++i) {
+                var mi = rowsModel.get(i).menuItem;
+                if (mi && mi.enabled && !mi.isMenuSeparator) {
+                    currentIndex = i;
+                    return;
+                }
+            }
+        } else {
+            for (var j = n - 1; j >= 0; --j) {
+                var mj = rowsModel.get(j).menuItem;
+                if (mj && mj.enabled && !mj.isMenuSeparator) {
+                    currentIndex = j;
+                    return;
+                }
+            }
+        }
+    }
+
     function _activateCurrent() {
         if (currentIndex >= 0 && currentIndex < rowsModel.count) {
             _onItemClick(currentIndex);
         }
     }
 
-    Keys.onPressed: {
+    // Strip mnemonic markers ("&File" -> "File", "&&" -> "&") and return
+    // the first character (preferring the mnemonic, if any).
+    function _mnemonicChar(text) {
+        if (!text) return "";
+        var s = String(text);
+        var m = s.match(/(^|[^&])&([^&])/);
+        if (m && m[2]) return m[2].toLowerCase();
+        var stripped = s.replace(/&&/g, "\u0001").replace(/&(.)/g, "$1").replace(/\u0001/g, "&");
+        return stripped.length > 0 ? stripped.charAt(0).toLowerCase() : "";
+    }
+
+    // Letter-key navigation. Selects the next enabled row whose label starts
+    // with \a ch; activates it immediately if it's the only match.
+    function _searchByLetter(ch) {
+        if (!ch || rowsModel.count === 0) return false;
+        var n = rowsModel.count;
+        var start = currentIndex >= 0 ? currentIndex + 1 : 0;
+        var matches = 0;
+        var firstMatch = -1;
+        ch = ch.toLowerCase();
+        for (var k = 0; k < n; ++k) {
+            var i = (start + k) % n;
+            var mi = rowsModel.get(i).menuItem;
+            if (!mi || !mi.enabled || mi.isMenuSeparator) continue;
+            if (_mnemonicChar(mi.text) === ch) {
+                if (firstMatch === -1) firstMatch = i;
+                matches++;
+            }
+        }
+        if (firstMatch === -1) return false;
+        currentIndex = firstMatch;
+        if (matches === 1)
+            _activateCurrent();
+        return true;
+    }
+
+    // Key handling helpers. Invoked from list.Keys.onPressed because the
+    // ListView is the actual focused descendant after the popup reparents
+    // its contentItem onto the overlay's content root.
+    function _handleKeyPress(event) {
         switch (event.key) {
-        case Qt.Key_Down:   _moveCurrent(+1); event.accepted = true; return;
-        case Qt.Key_Up:     _moveCurrent(-1); event.accepted = true; return;
+        case Qt.Key_Down:
+            _moveCurrent(+1); event.accepted = true; return;
+        case Qt.Key_Up:
+            _moveCurrent(-1); event.accepted = true; return;
+        case Qt.Key_Home:
+        case Qt.Key_PageUp:
+            _moveToEdge(true); event.accepted = true; return;
+        case Qt.Key_End:
+        case Qt.Key_PageDown:
+            _moveToEdge(false); event.accepted = true; return;
         case Qt.Key_Right:
             if (currentIndex >= 0) {
                 var mi = rowsModel.get(currentIndex).menuItem;
@@ -293,12 +370,28 @@ ImtPopup.Popup {
             }
             break;
         case Qt.Key_Left:
-            if (parentPopup) { close(); event.accepted = true; return; }
+            if (parentPopup) {
+                // Restore focus to the parent menu before tearing ourselves
+                // down so its keyboard navigation continues seamlessly.
+                if (parentPopup._contentRoot)
+                    parentPopup._contentRoot.forceActiveFocus();
+                close();
+                event.accepted = true;
+                return;
+            }
             break;
         case Qt.Key_Return:
         case Qt.Key_Enter:
         case Qt.Key_Space:
             _activateCurrent(); event.accepted = true; return;
+        }
+        // Letter-key search: accept printable single-character text.
+        if (event.text && event.text.length === 1) {
+            var c = event.text.charCodeAt(0);
+            if (c >= 0x20 && c !== 0x7F && _searchByLetter(event.text)) {
+                event.accepted = true;
+                return;
+            }
         }
     }
 
@@ -325,6 +418,9 @@ ImtPopup.Popup {
                     if (item.rowIndex === undefined) item.rowIndex = index;
                 }
             }
+        }
+        Keys.onPressed: {
+            menu._handleKeyPress(event)
         }
         implicitWidth: {
             var w = 0;

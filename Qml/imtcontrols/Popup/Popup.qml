@@ -54,6 +54,9 @@ FocusScope {
     visible: false
     width: implicitWidth
     height: implicitHeight
+    // Participate in the Tab focus chain so popups can be reached via the
+    // keyboard (matches QQC2 Popup which defaults to activeFocusOnTab).
+    activeFocusOnTab: true
 
     // -------------------------------------------------------------------- //
     //                         Public Qt Quick Controls API                  //
@@ -430,6 +433,7 @@ FocusScope {
             opacity: popup ? popup.popupOpacity : 1
             scale: popup ? popup.popupScale : 1
             transformOrigin: popup ? popup.transformOrigin : Item.Center
+            activeFocusOnTab: true
 
             Item { id: bgSlot; anchors.fill: parent; z: -1 }
             property alias bgSlot: bgSlot
@@ -458,9 +462,35 @@ FocusScope {
                 }
             }
 
+            // Trap Tab/Backtab inside modal popups so keyboard focus cannot
+            // leak to controls underneath the modal. For non-modal popups
+            // the standard focus chain is preserved.
+            function _isWithin(item) {
+                var n = item;
+                while (n) {
+                    if (n === cr) return true;
+                    n = n.parent;
+                }
+                return false;
+            }
+
             Keys.onPressed: {
-                if (event.key === Qt.Key_Escape && cr.popup && cr.popup._tryEscape())
+                if (event.key === Qt.Key_Escape && cr.popup && cr.popup._tryEscape()) {
                     event.accepted = true;
+                    return;
+                }
+                if ((event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab)
+                        && cr.popup && cr.popup.modal) {
+                    var fwd = (event.key === Qt.Key_Tab) && !(event.modifiers & Qt.ShiftModifier);
+                    var next = cr.nextItemInFocusChain(fwd);
+                    if (!next || !cr._isWithin(next)) {
+                        // Wrap focus back to the popup scope itself.
+                        cr.forceActiveFocus();
+                    } else {
+                        next.forceActiveFocus();
+                    }
+                    event.accepted = true;
+                }
             }
         }
     }

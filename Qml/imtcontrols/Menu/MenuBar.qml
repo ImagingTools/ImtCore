@@ -31,11 +31,19 @@ FocusScope {
     id: bar
     objectName: "ImtControlsMenuBar"
 
+    activeFocusOnTab: true
+
     /*! Default property collects Menu children. */
     default property alias menus: container.data
 
     /*! Currently visible MenuBarItem index (-1 if none). */
     property int currentIndex: -1
+
+    /*! Index that the keyboard cursor is on. Independent from
+        \l currentIndex, which tracks the currently-open menu. The visual
+        focus highlight on bar items follows this index when the bar has
+        keyboard focus. */
+    property int focusedIndex: -1
 
     /*! True when at least one menu in this bar is open. */
     readonly property bool active: currentIndex >= 0 && currentIndex < _items.length
@@ -93,6 +101,10 @@ FocusScope {
         proxy.barIndex = _items.length;
         _items.push(proxy);
         menu.parent = proxy;
+        // When the menu closes (e.g. via Escape or outside click), keep the
+        // keyboard cursor on its bar item and pull focus back to the bar so
+        // arrow keys keep working without an extra Tab.
+        menu.closed.connect(function() { bar._onMenuClosed(proxy.barIndex); });
     }
 
     /*! Add a menu programmatically. */
@@ -116,6 +128,40 @@ FocusScope {
         _openAt(index);
     }
 
+    function _onMenuClosed(index) {
+        if (currentIndex === index) currentIndex = -1;
+        // If our bar still owns the focus chain, keep the visual cursor on
+        // the item the user just dismissed.
+        if (bar.activeFocus && focusedIndex < 0)
+            focusedIndex = index;
+    }
+
+    function _focusFirstEnabled() {
+        for (var i = 0; i < _items.length; ++i) {
+            if (_items[i] && _items[i].menu) {
+                focusedIndex = i;
+                return;
+            }
+        }
+    }
+
+    function _moveFocus(step) {
+        if (_items.length === 0) return;
+        var n = _items.length;
+        var i = focusedIndex < 0 ? (step > 0 ? -1 : 0) : focusedIndex;
+        for (var tries = 0; tries < n; ++tries) {
+            i = (i + step + n) % n;
+            if (_items[i] && _items[i].menu) {
+                if (active) {
+                    _openAt(i);
+                } else {
+                    focusedIndex = i;
+                }
+                return;
+            }
+        }
+    }
+
     function _openAt(index) {
         // Close currently open one first.
         if (currentIndex >= 0 && currentIndex < _items.length) {
@@ -129,16 +175,42 @@ FocusScope {
         it.menu.parent = it;
         it.menu.open();
         currentIndex = index;
+        focusedIndex = index;
+    }
+
+    onActiveFocusChanged: {
+        if (activeFocus && focusedIndex < 0 && !active)
+            _focusFirstEnabled();
     }
 
     Keys.onPressed: {
-        if (!active) return;
-        if (event.key === Qt.Key_Right) {
-            _openAt((currentIndex + 1) % _items.length);
-            event.accepted = true;
-        } else if (event.key === Qt.Key_Left) {
-            _openAt((currentIndex - 1 + _items.length) % _items.length);
-            event.accepted = true;
+        if (_items.length === 0) return;
+        switch (event.key) {
+        case Qt.Key_Right:
+            _moveFocus(+1); event.accepted = true; return;
+        case Qt.Key_Left:
+            _moveFocus(-1); event.accepted = true; return;
+        case Qt.Key_Home:
+            focusedIndex = -1; _moveFocus(+1); event.accepted = true; return;
+        case Qt.Key_End:
+            focusedIndex = -1; _moveFocus(-1); event.accepted = true; return;
+        case Qt.Key_Down:
+        case Qt.Key_Return:
+        case Qt.Key_Enter:
+        case Qt.Key_Space:
+            if (!active && focusedIndex >= 0) {
+                _openAt(focusedIndex);
+                event.accepted = true;
+                return;
+            }
+            break;
+        case Qt.Key_Escape:
+            if (active) {
+                _items[currentIndex].menu.close();
+                event.accepted = true;
+                return;
+            }
+            break;
         }
     }
 }
