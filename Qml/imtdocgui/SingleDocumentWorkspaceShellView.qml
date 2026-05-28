@@ -56,6 +56,12 @@ Item {
 	// so the in-flight Save can proceed without showing a dialog.
 	property bool documentNameInputEnabled: true
 
+	// Optional callback `function(documentId) → string` that resolves the
+	// document name when `documentNameInputEnabled` is false. When set and
+	// returning a non-empty string, its result is used instead of the
+	// generic `getDefaultDocumentName()` fallback.
+	property var documentNameResolver: null
+
 	// Current resolved document id (set after open/create succeeds).
 	readonly property alias documentId: _internal.documentId
 
@@ -275,9 +281,14 @@ Item {
 				// Name input is disabled for this workspace — fulfil the
 				// request with a default name so the save flow proceeds
 				// without prompting the user.
-				workspaceView.documentManager.setDocumentName(
-						documentId,
-						workspaceView.documentManager.getDefaultDocumentName())
+				let resolvedName = ""
+				if (typeof workspaceView.documentNameResolver === "function"){
+					resolvedName = workspaceView.documentNameResolver(documentId)
+				}
+				if (!resolvedName){
+					resolvedName = workspaceView.documentManager.getDefaultDocumentName()
+				}
+				workspaceView.documentManager.setDocumentName(documentId, resolvedName)
 				return
 			}
 			ModalDialogManager.openDialog(inputDialogComp, {documentId: documentId})
