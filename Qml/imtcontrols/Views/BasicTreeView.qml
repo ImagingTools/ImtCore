@@ -18,19 +18,19 @@ import imtcontrols 1.0
         headerHeight[30], showHeader[true], multiSelect[false], editable[false],
         editOnDoubleClick[true], allowDisabledEditing[false],
         allowDisabledSelection[false], skipDisabledOrNonCheckableOnCheck[true],
-        tristate[false], filterText[""], filterRole["text"],
-        filterDebounceMs[150], flickable[null], writeBack[null],
+        tristate[false], filterText[""], filterRole[[]],
+        filterDebounceMs[150], writeBack[null],
         editingFocusOutPolicy["commit"].
 
     Public read-only:
         currentIndex, editingIndex, visibleCount, selectedCount,
-        editing, editingKey, editingColumn, contentListView.
+        editing, editingKey, editingColumn, contentListView, contentHeight.
 
     Public signals:
         nodeClicked, nodeDoubleClicked, cellClicked, cellDoubleClicked,
         selectionChanged, checkStateChanged, checkedItemsChanged,
         headerClicked, cellEditStarted, cellEdited, cellEditCanceled,
-        cellEditCommitFailed, nodeTextEdited, editingChanged.
+        cellEditCommitFailed, editingChanged.
 
     Public functions:
         rebuild(), expandAll(), collapseAll(), checkAll(), uncheckAll(),
@@ -42,7 +42,7 @@ import imtcontrols 1.0
         expandNode(key), collapseNode(key), toggleExpanded(key), expandParents(key),
         setCheckState(key, state), toggleCheckState(key),
         checkItem(key), uncheckItem(key),
-        setNodeText(key, value), setNodeEnabled(key, value),
+        setNodeEnabled(key, value),
         setNodeVisible(key, value), setNodeVisibleBatch(updates),
         setNodeCheckable(key, value), setCheckStateSilent(key, state),
         setCellValue(key, column, value), cellValue(key, column),
@@ -52,7 +52,7 @@ import imtcontrols 1.0
         editNextCell(), editPreviousCell(),
         revertCell(index, column),
         columnAt(i), columnCount(), columnWidth(column), columnTitle(column),
-        columnType(key, column), columnDisplayPath(column),
+        columnType(key, column), columnKey(column), columnDataPath(column),
         isTreeColumn(column, i), isColumnEditable(column),
         valueByPath(obj, path), setValueByPath(obj, path, value),
         comboIndexOf(options, value).
@@ -68,7 +68,10 @@ Item {
 
     property int    rowHeight: 28
     property int    indentation: 18
-    property int    cacheBuffer: 4000
+    // Pixels of off-screen rows the ListView keeps realized on each side.
+    // Kept small so virtualization actually pays off; a few rows is enough
+    // for smooth flicking. (Was 4000px ≈ 140 rows, which realized whole trees.)
+    property int    cacheBuffer: 4000//rowHeight * 4
     property int    headerHeight: 30
 
     property bool   showHeader: true
@@ -83,10 +86,8 @@ Item {
     property bool   tristate: false
 
     property string filterText: ""
-    property string filterRole: "text"
-    property int    filterDebounceMs: 150
-
-    property var    flickable: null
+    property var    filterRole: []
+    property int    filterDebounceMs: 300
 
     // Synchronous: function(index, column, value, oldValue) -> bool.
     // Return false to reject the edit.
@@ -136,7 +137,6 @@ Item {
     signal cellEdited(var index, var column, var value, var oldValue)
     signal cellEditCanceled(var index, var column)
     signal cellEditCommitFailed(var index, var column, var value, string reason)
-    signal nodeTextEdited(var index, string text, string oldText)
 
     // ─── Internal state (prefix __) ────────────────────────────────────────
 
@@ -166,33 +166,15 @@ Item {
 
     // ─── Sizing ────────────────────────────────────────────────────────────
 
-    height: (root.showHeader ? root.headerHeight + 1 : 0) + visibleModel.count * root.rowHeight
-
-    // ─── Default column ────────────────────────────────────────────────────
-
-    readonly property var __defaultColumn: ({
-        name: "name",
-        title: "Name",
-        display: "text",
-        type: "string",
-        tree: true,
-        editable: true,
-        options: [],
-        horizontalAlignment: Text.AlignLeft,
-        width: 0,
-        minWidth: 0
-    })
+    // Height the fully-expanded visible rows would occupy. The component does
+    // NOT bind its own height to this — it fills the geometry assigned by its
+    // parent (anchors / explicit size) so the internal ListView can virtualize
+    // and only realize the rows on screen. Consumers that want the tree to grow
+    // with its content should bind their height to contentHeight (capped).
+    readonly property real contentHeight: (root.showHeader ? root.headerHeight + 1 : 0)
+                                          + visibleModel.count * root.rowHeight
 
     // ─── Helpers ───────────────────────────────────────────────────────────
-
-    QtObject {
-        id: priv
-        readonly property string ckPathText: "text"
-        readonly property string ckPathChecked: "checked"
-        readonly property string ckPathEnabled: "enabled"
-        readonly property string ckPathCheckable: "checkable"
-        readonly property string ckPathExpanded: "expanded"
-    }
 
     // Debounce filterText rebuilds so fast typing doesn't trigger a full
     // tree pass on every keystroke (interval is configurable via filterDebounceMs).
@@ -297,6 +279,7 @@ Item {
             property bool   nodeCheckable: model.checkable
             property bool   nodeIsEnabled: model.nodeEnabled
             property string nodeText: model.text
+            property int    nodeDataTick: model.dataTick !== undefined ? model.dataTick : 0
             property int    nodeVisibleRow: index
             property bool   rowHovered: false
 
@@ -324,7 +307,12 @@ Item {
                         root.__autoLeaveEdit()
 
                     listView.forceActiveFocus()
-                    root.select(delegateRoot.nodeKey)
+
+                    var ctrl = (mouse.modifiers & Qt.ControlModifier) !== 0
+                    if (ctrl)
+                        root.toggleSelection(delegateRoot.nodeKey)
+                    else
+                        root.select(delegateRoot.nodeKey)
 
                     var node = root.__nodes[delegateRoot.nodeKey]
                     if (node) {
@@ -346,12 +334,16 @@ Item {
                     var column = root.columnAt(col)
                     var idx = root.createIndex(node)
 
+                    // Bool / checkState cells are toggled only by clicking the
+                    // CheckBox directly — double-click must not enter edit mode.
+                    var isBool = column && (column.type === "bool" || column.type === "checkState")
+
                     // Tree column on a node with children → toggle expansion;
                     // otherwise — try to enter edit mode.
                     var clickedTree = root.isTreeColumn(column, col)
                     if (clickedTree && delegateRoot.nodeHasChildren && !root.editable) {
                         root.toggleExpanded(delegateRoot.nodeKey)
-                    } else if (root.editable && root.editOnDoubleClick) {
+                    } else if (root.editable && root.editOnDoubleClick && !isBool) {
                         if (!root.beginEditCell(delegateRoot.nodeKey, col) && delegateRoot.nodeHasChildren && clickedTree)
                             root.toggleExpanded(delegateRoot.nodeKey)
                     } else if (delegateRoot.nodeHasChildren && clickedTree) {
@@ -375,13 +367,24 @@ Item {
 
                         property var    column: root.columnAt(index)
                         property bool   treeColumn: root.isTreeColumn(column, index)
-                        property var    cellRawValue: root.cellValue(delegateRoot.nodeKey, column)
+                        property var    cellRawValue: delegateRoot.nodeDataTick >= 0
+                            ? root.cellValue(delegateRoot.nodeKey, column) : undefined
                         property string displayText: cellRawValue !== undefined && cellRawValue !== null ? String(cellRawValue) : ""
+                        property bool   isBoolColumn: column && (column.type === "bool" || column.type === "checkState")
                         property bool   isEditingHere: root.editing && root.__editingKey === delegateRoot.nodeKey && root.__editingColumn === index
                         property string editorType: isEditingHere ? root.__pickEditorType(column, cellRawValue, delegateRoot.nodeKey) : ""
 
                         width: root.__columnWidths[index] !== undefined ? root.__columnWidths[index] : 0
                         height: delegateRoot.height
+
+                        Rectangle {
+                            anchors.fill: parent
+                            color: "transparent"
+                            border.width: cellRoot.isEditingHere ? 2 : 0
+                            border.color: Style.imaginToolsAccentColor
+                            radius: 2
+                            z: 10
+                        }
 
                         Row {
                             id: cellContent
@@ -421,20 +424,23 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                                 tristate: root.tristate
                                 checkState: delegateRoot.nodeChecked
+                                isActive: delegateRoot.nodeIsEnabled
 
                                 MouseArea {
                                     anchors.fill: parent
+                                    enabled: delegateRoot.nodeIsEnabled
+                                    visible: delegateRoot.nodeIsEnabled
                                     cursorShape: Qt.PointingHandCursor
                                     onClicked: root.toggleCheckState(delegateRoot.nodeKey)
                                 }
                             }
 
-                            // Cell text (only when not editing this cell)
+                            // Cell text (only when not editing this cell and not a bool column)
                             Text {
                                 anchors.verticalCenter: parent.verticalCenter
                                 width: Math.max(0, parent.width - x)
                                 text: cellRoot.displayText
-                                visible: !cellRoot.isEditingHere
+                                visible: !cellRoot.isEditingHere && !cellRoot.isBoolColumn
                                 color: !delegateRoot.nodeIsEnabled ? root.disabledTextColor
                                      : delegateRoot.nodeSelected   ? root.selectedTextColor
                                                                    : root.normalTextColor
@@ -442,6 +448,31 @@ Item {
                                     ? cellRoot.column.horizontalAlignment : Text.AlignLeft
                                 elide: Text.ElideRight
                                 verticalAlignment: Text.AlignVCenter
+                            }
+
+                            // Bool / checkState cell renderer (single-click toggles when editable)
+                            CheckBox {
+                                visible: !cellRoot.isEditingHere && cellRoot.isBoolColumn
+                                anchors.verticalCenter: parent.verticalCenter
+                                tristate: cellRoot.column && cellRoot.column.type === "checkState"
+                                isActive: root.isColumnEditable(cellRoot.column) && delegateRoot.nodeIsEnabled
+                                checkState: cellRoot.column && cellRoot.column.type === "checkState"
+                                    ? (cellRoot.cellRawValue !== undefined && cellRoot.cellRawValue !== null ? cellRoot.cellRawValue : Qt.Unchecked)
+                                    : (cellRoot.cellRawValue === true ? Qt.Checked : Qt.Unchecked)
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    cursorShape: Qt.PointingHandCursor
+                                    enabled: root.isColumnEditable(cellRoot.column) && delegateRoot.nodeIsEnabled
+                                    onClicked: {
+                                        if (cellRoot.column && cellRoot.column.type === "checkState") {
+                                            var next = cellRoot.cellRawValue === Qt.Checked ? Qt.Unchecked : Qt.Checked
+                                            root.setCellValue(delegateRoot.nodeKey, cellRoot.column, next)
+                                        } else {
+                                            root.setCellValue(delegateRoot.nodeKey, cellRoot.column, cellRoot.cellRawValue !== true)
+                                        }
+                                    }
+                                }
                             }
 
                             // Single editor Loader per row (active only for the edited cell)
@@ -495,8 +526,15 @@ Item {
                                         item.cancel.connect(__cancelHandler)
                                     }
 
-                                    if (item.autoFocus === undefined || item.autoFocus === true)
-                                        item.forceActiveFocus()
+                                    if (item.autoFocus === undefined || item.autoFocus === true) {
+                                        if (item.forceEditorFocus)
+                                            item.forceEditorFocus()
+                                        else
+                                            item.forceActiveFocus()
+                                    }
+
+                                    if (item.selectAll)
+                                        item.selectAll()
                                 }
 
                                 onVisibleChanged: {
@@ -534,6 +572,9 @@ Item {
             border.color: root.editorErrorColor
             radius: 2
 
+            function selectAll() { textEditor.selectAll() }
+            function forceEditorFocus() { textEditor.forceActiveFocus() }
+
             TextInput {
                 id: textEditor
                 anchors.fill: parent
@@ -552,17 +593,27 @@ Item {
 
                 Component.onCompleted: {
                     root.__editingPendingValue = text
-                    if (textEditorRoot.autoFocus) {
-                        selectAll()
-                        forceActiveFocus()
-                    }
                 }
 
-                onTextChanged: root.__editingPendingValue = text
+                onTextChanged: {
+                    root.__editingPendingValue = text
+                }
 
-                Keys.onEscapePressed: textEditorRoot.cancel()
-                Keys.onReturnPressed: textEditorRoot.commit(text)
-                Keys.onEnterPressed:  textEditorRoot.commit(text)
+                // TextInput emits accepted() on Enter/Return and may consume the
+                // key before Keys.onReturnPressed fires — commit here too.
+                onAccepted: {
+                    textEditorRoot.commit(text)
+                }
+
+                Keys.onEscapePressed: {
+                    textEditorRoot.cancel()
+                }
+                Keys.onReturnPressed: {
+                    textEditorRoot.commit(text)
+                }
+                Keys.onEnterPressed: {
+                    textEditorRoot.commit(text)
+                }
                 Keys.onTabPressed: {
                     var c = root.__editingColumn
                     textEditorRoot.commit(text)
@@ -683,8 +734,43 @@ Item {
     onFilterDebounceMsChanged: filterDebounceTimer.interval = filterDebounceMs
 
     Component.onCompleted: {
+        __syncDeclarativeColumns()
         __recomputeColumnWidths()
         rebuildTree()
+    }
+
+    // Discovers TreeViewColumn instances declared as children and, when present,
+    // adopts them as the column set. This lets callers either assign the
+    // `columns` array imperatively or simply nest TreeViewColumn { } children.
+    function __syncDeclarativeColumns() {
+        if (columns && columns.length > 0)
+            return
+        var declared = __collectDeclarativeColumns()
+        if (declared.length > 0) {
+            columns = declared
+            return
+        }
+        // No columns supplied imperatively or declaratively: fall back to a
+        // single implicit tree column that renders each node's `text`.
+        columns = [{ tree: true }]
+    }
+
+    function __collectDeclarativeColumns() {
+        var found = []
+        var seen = []
+        var pools = [root.data, root.resources, root.children]
+        for (var p = 0; p < pools.length; ++p) {
+            var pool = pools[p]
+            if (!pool) continue
+            for (var i = 0; i < pool.length; ++i) {
+                var obj = pool[i]
+                if (obj && obj.isTreeViewColumn === true && seen.indexOf(obj) < 0) {
+                    seen.push(obj)
+                    found.push(obj)
+                }
+            }
+        }
+        return found
     }
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -786,6 +872,7 @@ Item {
     // ═══════════════════════════════════════════════════════════════════════
 
     function buildVisibleTree() {
+        var t0 = Date.now()
         var items = []
         __visibleKeys = []
         __visibleRowsByKey = ({})
@@ -805,6 +892,7 @@ Item {
         visibleModel.clear()
         if (items.length > 0)
             visibleModel.append(items)
+         console.log("buildVisibleTree:", Date.now() - t0, "ms, rows:", items.length)
     }
 
     function __appendBranchIterative(rootKey, items) {
@@ -827,9 +915,29 @@ Item {
         }
     }
 
+    function __columnPathByName(key) {
+        if (!key) return ""
+        for (var i = 0; i < columns.length; ++i) {
+            var col = columns[i]
+            if (col && columnKey(col) === key)
+                return columnDataPath(col)
+        }
+        return "data." + String(key)
+    }
+
     function __nodeMatchesFilter(node, ft) {
-        var value = valueByPath(node, filterRole)
-        return value !== undefined && value !== null && String(value).toLowerCase().indexOf(ft) >= 0
+        var roles = Array.isArray(filterRole) ? filterRole : [filterRole]
+        if (roles.length === 0)
+            return false
+        for (var i = 0; i < roles.length; ++i) {
+            var role = roles[i]
+            if (!role) continue
+            var path = __columnPathByName(role)
+            var value = valueByPath(node, path)
+            if (value !== undefined && value !== null && String(value).toLowerCase().indexOf(ft) >= 0)
+                return true
+        }
+        return false
     }
 
     function __buildFilteredVisible(ft, items, autoExpand) {
@@ -919,7 +1027,8 @@ Item {
             checked:      node.checked,
             checkable:    node.checkable,
             nodeEnabled:  node.enabled,
-            text:         node.text
+            text:         node.text,
+            dataTick:     node.__tick || 0
         }
     }
 
@@ -959,6 +1068,24 @@ Item {
         // reference here would surprise callers who keep their own pointers.
     }
 
+    // Minimal write-back for check operations: only the `checked` field changed,
+    // so avoid the 5-property mirror that writeBackNode performs. Critical for
+    // checkAll/uncheckAll and subtree propagation on large trees.
+    function __writeBackChecked(node) {
+        if (node && node.sourceItem)
+            node.sourceItem.checked = node.checked
+    }
+
+    // Update only the `checked` role of a visible row (a single dataChanged
+    // instead of a full row replacement via syncVisibleNode/set).
+    function __syncVisibleChecked(keyValue) {
+        var row = __visibleRowsByKey[keyValue]
+        if (row === undefined) return
+        var node = __nodes[keyValue]
+        if (node) visibleModel.setProperty(row, "checked", node.checked)
+    }
+
+
     // ═══════════════════════════════════════════════════════════════════════
     //  Index object
     // ═══════════════════════════════════════════════════════════════════════
@@ -994,7 +1121,6 @@ Item {
                 root.setCellValue(node.key, columnOrPath, value)
             },
             edit:       function (columnIndex) { root.beginEditCell(node.key, columnIndex) },
-            setText:    function (value)       { root.setNodeText(node.key, value) },
             setChecked: function (state)       { root.setCheckState(node.key, state) },
             setEnabled: function (value)       { root.setNodeEnabled(node.key, value) },
             expand:     function ()            { root.expandNode(node.key) },
@@ -1007,16 +1133,32 @@ Item {
     //  Columns
     // ═══════════════════════════════════════════════════════════════════════
 
-    function columnCount() { return columns.length > 0 ? columns.length : 1 }
-    function columnAt(i)   { return columns.length > 0 ? columns[i] : __defaultColumn }
+    function columnCount() {
+        if (columns.length === 0) {
+            console.warn("BasicTreeView: columns not set")
+            return 0
+        }
+        return columns.length
+    }
+    function columnAt(i)   { return columns[i] }
+
+    // Resolves the field identifier of a column. Plain-object columns use the
+    // `id` key; declarative TreeViewColumn instances expose it as `columnId`
+    // (because `id` is reserved by QML).
+    function columnKey(column) {
+        if (!column) return ""
+        if (column.id !== undefined && column.id !== null && String(column.id).length > 0)
+            return String(column.id)
+        if (column.columnId !== undefined && column.columnId !== null && String(column.columnId).length > 0)
+            return String(column.columnId)
+        return ""
+    }
 
     function columnTitle(column) {
         if (!column) return ""
-        if (column.title !== undefined && column.title !== null && String(column.title).length > 0)
-            return String(column.title)
-        if (column.name !== undefined && column.name !== null)
+        if (column.name !== undefined && column.name !== null && String(column.name).length > 0)
             return String(column.name)
-        return ""
+        return columnKey(column)
     }
 
     function columnWidth(column) {
@@ -1080,20 +1222,14 @@ Item {
     }
 
     function isTreeColumn(column, columnIndex) {
-        if (column && column.tree === true)
-            return true
-        return columnIndex === 0 && columns.length === 0
+        return column && column.tree === true
     }
 
     function isColumnEditable(column) { return column && column.editable === true }
 
-    function columnDisplayPath(column) {
-        if (!column) return ""
-        if (column.display !== undefined && column.display !== null && String(column.display).length > 0)
-            return String(column.display)
-        if (column.name !== undefined && column.name !== null && String(column.name).length > 0)
-            return String(column.name)
-        return ""
+    function columnDataPath(column) {
+        var key = columnKey(column)
+        return key.length > 0 ? "data." + key : ""
     }
 
     function columnType(keyValue, column) {
@@ -1105,8 +1241,6 @@ Item {
         }
         if (column.options && column.options.length > 0)
             return "combo"
-        if (columnDisplayPath(column) === priv.ckPathChecked)
-            return "checkState"
         var v = cellValue(keyValue, column)
         if (typeof v === "boolean") return "bool"
         if (typeof v === "number")  return "number"
@@ -1122,28 +1256,40 @@ Item {
     function cellValue(keyValue, column) {
         var node = __nodes[keyValue]
         if (!node) return undefined
-        return valueByPath(node, columnDisplayPath(column))
+        // When column.source is set, always read live from the underlying QObject
+        // so that external mutations (undo/redo, model edits) reflect immediately.
+        if (column && column.source && node.data && node.data.sourceItem) {
+            var src = node.data.sourceItem
+            var liveValue = src[String(column.source)]
+            if (liveValue !== undefined)
+                return liveValue
+        }
+        // A tree column without an explicit field id renders the node's `text`,
+        // supporting simple single-column checkable trees.
+        if (isTreeColumn(column) && columnKey(column).length === 0)
+            return node.text
+        return valueByPath(node, columnDataPath(column))
     }
 
     function setCellValue(keyValue, column, value) {
         var node = __nodes[keyValue]
         if (!node) return
 
-        var path = columnDisplayPath(column)
+        var path = columnDataPath(column)
         setValueByPath(node, path, value)
 
-        switch (path) {
-            case "text":      node.text      = String(value); break
-            case "checked":   node.checked   = value; break
-            case "enabled":   node.enabled   = value; break
-            case "checkable": node.checkable = value; break
-            case "expanded":  node.expanded  = value; break
+        // Optional explicit write-through to the underlying source object.
+        // node.data.sourceItem is the actual QObject (set by TreeModelBuilder.*ByFields).
+        if (column && column.source) {
+            var src = node.data && node.data.sourceItem ? node.data.sourceItem : null
+            if (src)
+                src[String(column.source)] = value
         }
+
+        node.__tick = (node.__tick || 0) + 1
 
         writeBackNode(node)
         syncVisibleNode(keyValue)
-        if (path === "checked")
-            syncVisibleAncestors(node)
     }
 
     function valueByPath(object, path) {
@@ -1278,6 +1424,7 @@ Item {
     }
 
     function expandAll() {
+        var t0 = Date.now()
         for (var key in __nodes) {
             var n = __nodes[key]
             if (n && n.childrenKeys.length > 0 && !n.expanded) {
@@ -1287,6 +1434,7 @@ Item {
             }
         }
         buildVisibleTree()
+        console.log("expandAll:", Date.now() - t0, "ms")
     }
 
     function collapseAll() {
@@ -1367,6 +1515,8 @@ Item {
         if (!node || !node.selected) return
         node.selected = false
         delete __selectedKeys[keyValue]
+        if (currentIndex && currentIndex.key === keyValue)
+            currentIndex = null
         syncVisibleNode(keyValue)
         __updateSelectedCount()
         selectionChanged()
@@ -1444,8 +1594,8 @@ Item {
 
         __propagateDownIterative(node, state)
         __propagateUpIterative(node)
-        __syncVisibleSubtreeIterative(node)
-        syncVisibleAncestors(node)
+        __syncVisibleSubtreeChecked(node)
+        __syncVisibleAncestorsChecked(node)
         checkStateChanged(createIndex(node), state)
         checkedItemsChanged()
     }
@@ -1458,34 +1608,38 @@ Item {
     function setCheckStateSilent(keyValue, state) {
         var node = __nodes[keyValue]
         if (!node) return
+        if (node.checked === state) return
         node.checked = state
-        writeBackNode(node)
-        syncVisibleNode(keyValue)
+        __writeBackChecked(node)
+        __syncVisibleChecked(keyValue)
     }
 
-    function checkAll() {
-        for (var k in __nodes) {
-            var n = __nodes[k]
-            if (n && n.checkable && n.enabled) {
-                n.checked = Qt.Checked
-                writeBackNode(n)
-            }
-        }
-        for (var i = 0; i < __visibleKeys.length; ++i)
-            syncVisibleNode(__visibleKeys[i])
-        checkedItemsChanged()
-    }
+    function checkAll()   { __setAllChecked(Qt.Checked) }
+    function uncheckAll() { __setAllChecked(Qt.Unchecked) }
 
-    function uncheckAll() {
+    // Bulk check / uncheck. Touches only nodes whose state actually changes and
+    // updates only the `checked` role of the (few) visible rows that changed,
+    // instead of replacing every visible row object.
+    function __setAllChecked(state) {
+        var requireEnabled = state !== Qt.Unchecked
+        var changed = ({})
+        var any = false
         for (var k in __nodes) {
             var n = __nodes[k]
-            if (n && n.checkable) {
-                n.checked = Qt.Unchecked
-                writeBackNode(n)
-            }
+            if (!n || !n.checkable) continue
+            if (requireEnabled && !n.enabled) continue
+            if (n.checked === state) continue
+            n.checked = state
+            __writeBackChecked(n)
+            changed[k] = true
+            any = true
         }
-        for (var i = 0; i < __visibleKeys.length; ++i)
-            syncVisibleNode(__visibleKeys[i])
+        if (!any) return
+        for (var i = 0; i < __visibleKeys.length; ++i) {
+            var key = __visibleKeys[i]
+            if (changed[key])
+                visibleModel.setProperty(i, "checked", __nodes[key].checked)
+        }
         checkedItemsChanged()
     }
 
@@ -1536,7 +1690,7 @@ Item {
             var n = stack.pop()
             if (!__shouldParticipateInCheck(n)) continue
             n.checked = state
-            writeBackNode(n)
+            __writeBackChecked(n)
             for (var i = 0; i < n.childrenKeys.length; ++i) {
                 var c = __nodes[n.childrenKeys[i]]
                 if (c) stack.push(c)
@@ -1547,35 +1701,49 @@ Item {
     function __propagateUpIterative(startNode) {
         var current = startNode
         while (current && current.parentKey !== "") {
-            var parent = __nodes[current.parentKey]
-            if (!parent || !parent.childrenKeys) return
+            var prnt = __nodes[current.parentKey]
+            if (!prnt || !prnt.childrenKeys) return
 
             var hasParticipating = false
             var allChecked = true
             var allUnchecked = true
-            for (var i = 0; i < parent.childrenKeys.length; ++i) {
-                var child = __nodes[parent.childrenKeys[i]]
+            for (var i = 0; i < prnt.childrenKeys.length; ++i) {
+                var child = __nodes[prnt.childrenKeys[i]]
                 if (!__shouldParticipateInCheck(child)) continue
                 hasParticipating = true
                 if (child.checked !== Qt.Checked)   allChecked = false
                 if (child.checked !== Qt.Unchecked) allUnchecked = false
             }
-            if (hasParticipating && __shouldParticipateInCheck(parent)) {
-                parent.checked = allChecked ? Qt.Checked : allUnchecked ? Qt.Unchecked : Qt.PartiallyChecked
-                writeBackNode(parent)
+            if (hasParticipating && __shouldParticipateInCheck(prnt)) {
+                prnt.checked = allChecked ? Qt.Checked : allUnchecked ? Qt.Unchecked : Qt.PartiallyChecked
+                __writeBackChecked(prnt)
             }
-            current = parent
+            current = prnt
         }
     }
 
-    function __syncVisibleSubtreeIterative(rootNode) {
+    // Sync the `checked` role of visible rows in a subtree. Only descends into
+    // expanded branches, since collapsed descendants have no visible row.
+    function __syncVisibleSubtreeChecked(rootNode) {
         var stack = [rootNode]
         while (stack.length > 0) {
             var n = stack.pop()
             if (!n) continue
-            syncVisibleNode(n.key)
+            __syncVisibleChecked(n.key)
+            if (!n.expanded) continue
             for (var i = 0; i < n.childrenKeys.length; ++i)
                 stack.push(__nodes[n.childrenKeys[i]])
+        }
+    }
+
+    // Sync the `checked` role of a node's visible ancestors (tri-state rollup).
+    function __syncVisibleAncestorsChecked(node) {
+        var current = node
+        while (current && current.parentKey !== "") {
+            var prnt = __nodes[current.parentKey]
+            if (!prnt) return
+            __syncVisibleChecked(prnt.key)
+            current = prnt
         }
     }
 
@@ -1690,9 +1858,6 @@ Item {
         currentIndex = indexObject
         cellEdited(indexObject, column, value, oldValue)
 
-        if (columnDisplayPath(column) === priv.ckPathText)
-            nodeTextEdited(indexObject, String(value), String(oldValue))
-
         return true
     }
 
@@ -1712,13 +1877,12 @@ Item {
         if (!indexObject || !indexObject.key) return
         var node = __nodes[indexObject.key]
         if (!node) return
-        // Re-read from the source item if available, otherwise re-emit the
-        // current local value to give consumers a chance to refresh.
-        var path = columnDisplayPath(column)
-        if (node.sourceItem) {
-            var sourceVal = valueByPath(node.sourceItem, path)
+        // Re-read from the live source property if the column is bound to one,
+        // restoring the node's cached value to the underlying object's state.
+        if (column && column.source && node.data && node.data.sourceItem) {
+            var sourceVal = node.data.sourceItem[String(column.source)]
             if (sourceVal !== undefined)
-                setValueByPath(node, path, sourceVal)
+                setValueByPath(node, columnDataPath(column), sourceVal)
         }
         syncVisibleNode(node.key)
     }
@@ -1835,7 +1999,7 @@ Item {
     function __columnIndexByName(name) {
         for (var i = 0; i < columnCount(); ++i) {
             var col = columnAt(i)
-            if (col && col.name === name) return i
+            if (col && columnKey(col) === name) return i
         }
         return -1
     }
@@ -1850,16 +2014,6 @@ Item {
     // ═══════════════════════════════════════════════════════════════════════
     //  Node setters
     // ═══════════════════════════════════════════════════════════════════════
-
-    function setNodeText(keyValue, value) {
-        var node = __nodes[keyValue]
-        if (!node) return
-        node.text = String(value)
-        writeBackNode(node)
-        syncVisibleNode(keyValue)
-        if (currentIndex && currentIndex.key === keyValue)
-            currentIndex = createIndex(node)
-    }
 
     function setNodeEnabled(keyValue, value) {
         var node = __nodes[keyValue]
@@ -1886,14 +2040,6 @@ Item {
             syncVisibleNode(keys[i])
     }
 
-    function syncVisibleAncestors(node) {
-        var current = node
-        while (current && current.parentKey !== "") {
-            current = __nodes[current.parentKey]
-            if (current) syncVisibleNode(current.key)
-        }
-    }
-
     function __rebuildVisibleRowsFrom(startRow) {
         if (startRow < 0) startRow = 0
         for (var i = startRow; i < __visibleKeys.length; ++i)
@@ -1911,6 +2057,33 @@ Item {
     function isExpanded(keyValue)  { var n = __nodes[keyValue]; return n ? n.expanded : false }
     function isSelected(keyValue)  { var n = __nodes[keyValue]; return n ? n.selected : false }
 
+    // Bump __tick on a node (or all nodes) and resync visible rows so cells
+    // bound to cellValue (especially those with column.source) re-evaluate.
+    // Use this after external mutations of source objects (undo/redo, etc.)
+    // without paying the cost of a full rebuild.
+    function refreshNode(keyValue) {
+        var node = __nodes[keyValue]
+        if (!node) return
+        node.__tick = (node.__tick || 0) + 1
+        syncVisibleNode(keyValue)
+        if (currentIndex && currentIndex.key === keyValue)
+            currentIndex = createIndex(node)
+    }
+
+    function refreshAll() {
+        for (var k in __nodes) {
+            var n = __nodes[k]
+            if (!n) continue
+            n.__tick = (n.__tick || 0) + 1
+        }
+        for (var i = 0; i < __visibleKeys.length; ++i)
+            syncVisibleNode(__visibleKeys[i])
+        if (currentIndex) {
+            var cn = __nodes[currentIndex.key]
+            if (cn) currentIndex = createIndex(cn)
+        }
+    }
+
     // ═══════════════════════════════════════════════════════════════════════
     //  Visibility / scroll
     // ═══════════════════════════════════════════════════════════════════════
@@ -1921,25 +2094,6 @@ Item {
         if (row < 0) return
 
         listView.positionViewAtIndex(row, ListView.Contain)
-
-        if (root.flickable) {
-            // Use coordinate mapping so intermediate containers don't break the math.
-            var headerOffset = root.showHeader ? root.headerHeight + 1 : 0
-            var localY = headerOffset + row * root.rowHeight
-            var target = root.flickable.contentItem ? root.flickable.contentItem : root.flickable
-            if (!target)
-                return
-            var mapped = root.mapToItem(target, 0, localY)
-            var itemTop = mapped.y
-            var itemBottom = itemTop + root.rowHeight
-            var viewTop = root.flickable.contentY
-            var viewBottom = viewTop + root.flickable.height
-
-            if (itemBottom > viewBottom)
-                root.flickable.contentY = itemBottom - root.flickable.height
-            else if (itemTop < viewTop)
-                root.flickable.contentY = itemTop
-        }
     }
 
     function expandParents(keyValue) {
@@ -1953,9 +2107,9 @@ Item {
             if (current) parents.unshift(current.key)
         }
         for (var i = 0; i < parents.length; ++i) {
-            var parent = __nodes[parents[i]]
-            if (parent && !parent.expanded)
-                expandNode(parent.key)
+            var prnt = __nodes[parents[i]]
+            if (prnt && !prnt.expanded)
+                expandNode(prnt.key)
         }
     }
 

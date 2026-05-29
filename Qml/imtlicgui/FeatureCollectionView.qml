@@ -51,51 +51,7 @@ RemoteCollectionView {
 					typeId: "Feature";
 				}
 			}
-			
-			commandsDelegateComp: Component {ViewCommandsDelegateBase {
-					view: featureEditor;
-					onCommandActivated: {
-						let selectedIndex = featureEditor.tableView.currentIndex;
-						
-						if (commandId === "InsertFeature"){
-							if (!featureEditor.featureData.hasSubFeatures()){
-								featureEditor.featureData.emplaceSubFeatures()
-							}
-
-							let childModel = featureEditor.featureData.m_subFeatures;
-							if (selectedIndex != null && selectedIndex.item){
-								let selectedItemData = selectedIndex.item.itemData;
-								if (selectedItemData) {
-									if (!selectedItemData.hasSubFeatures()){
-										selectedItemData.emplaceSubFeatures()
-									}
-									childModel = selectedItemData.m_subFeatures;
-								}
-							}
-							let newFeatureData = featureDataComp.createObject(childModel)
-							newFeatureData.m_isPermission = true;
-							newFeatureData.m_featureName = qsTr("Feature Name");
-							childModel.addElement(newFeatureData)
-							featureEditor.model.modelChanged([])
-						}
-						else if (commandId === "RemoveFeature"){
-							if (selectedIndex != null && selectedIndex.item){
-								let parentModel = featureEditor.featureData.m_subFeatures;
-								if (selectedIndex.parentKey && selectedIndex.parentKey !== "") {
-									let parentNode = featureEditor.tableView.nodeForKey(selectedIndex.parentKey);
-									if (parentNode && parentNode.sourceItem && parentNode.sourceItem.itemData) {
-										parentModel = parentNode.sourceItem.itemData.m_subFeatures;
-									}
-								}
-								
-								parentModel.remove(selectedIndex.item.sourceRow);
-								
-								featureEditor.model.modelChanged([])
-							}
-						}
-					}
-				}
-			}
+			// commandsDelegateComp is now defined inside FeatureEditor itself.
 		}
 	}
 	

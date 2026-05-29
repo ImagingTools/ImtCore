@@ -18,8 +18,6 @@ ViewBase {
 
     property ProductData productData: model ? model : null;
 
-    property int __keyCounter: 0
-
     Component.onCompleted: {
         CachedFeatureCollection.updateModel();
 
@@ -50,77 +48,54 @@ ViewBase {
 
     function __buildColumns() {
         return [
-            { name: "featureName", title: qsTr("Feature Name"), display: "data.featureName", tree: true, editable: false },
-            { name: "featureId", title: qsTr("Feature-ID"), display: "data.featureId", tree: false, editable: false },
-            { name: "featureDescription", title: qsTr("Description"), display: "data.featureDescription", tree: false, editable: false }
+            { id: "featureName", name: qsTr("Feature Name"), tree: true, editable: false },
+            { id: "featureId", name: qsTr("Feature-ID"), tree: false, editable: false },
+            { id: "description", name: qsTr("Description"), tree: false, editable: false }
         ]
     }
 
-    function __convertTreeModel(treeModel, childKey) {
-        if (!treeModel) return [];
-        var count = 0;
-        if (treeModel.getItemsCount) count = treeModel.getItemsCount();
-        else if (treeModel.count !== undefined) count = treeModel.count;
-        else return [];
+    function __buildFeaturesTreeModel() {
+        if (!productViewContainer.productFeaturesViewModel)
+            return [];
 
-        var items = [];
-        for (var i = 0; i < count; ++i)
-            items.push(__convertTreeModelItem(treeModel, i, childKey));
-        return items;
+        return TreeModelBuilder.fromTreeItemModelByFields(productViewContainer.productFeaturesViewModel, {
+            key: FeatureItemTypeMetaInfo.s_id,
+            children: FeatureItemTypeMetaInfo.s_subFeatures,
+            checkable: FeatureItemTypeMetaInfo.s_optional,
+            columns: {
+                id: FeatureItemTypeMetaInfo.s_id,
+                featureName: FeatureItemTypeMetaInfo.s_featureName,
+                featureId: FeatureItemTypeMetaInfo.s_featureId,
+                description: FeatureItemTypeMetaInfo.s_description,
+                optional: FeatureItemTypeMetaInfo.s_optional
+            }
+        });
     }
 
-    function __convertTreeModelItem(treeModel, row, childKey) {
-        var keys = [];
-        if (treeModel.getKeys)
-            keys = treeModel.getKeys(row);
-        else if (treeModel.get) {
-            var obj = treeModel.get(row);
-            if (obj) keys = Object.keys(obj).filter(function(k) { return k !== "index" && k !== "model" && k !== "context" });
-        }
+    // Initializes the check state of optional feature nodes from the product's
+    // stored composite ids ("<rootFeatureUuid>/<featureId>").
+    function __applyOptionalSelection() {
+        let nodes = tableView_.allNodes();
+        for (let i = 0; i < nodes.length; ++i) {
+            let node = nodes[i];
+            if (!node.data || node.data[FeatureItemTypeMetaInfo.s_optional] !== true)
+                continue;
 
-        var data = {};
-        var children = [];
-        var keyVal = "";
-        var textVal = "";
-
-        for (var j = 0; j < keys.length; ++j) {
-            var k = keys[j];
-            var value;
-            if (treeModel.getData)
-                value = treeModel.getData(k, row);
-            else if (treeModel.get)
-                value = treeModel.get(row)[k];
-            else
-                value = undefined;
-
-            if (childKey && k === childKey && value && typeof value === "object") {
-                var childCount = 0;
-                if (value.getItemsCount) childCount = value.getItemsCount();
-                else if (value.count !== undefined) childCount = value.count;
-                for (var c = 0; c < childCount; ++c)
-                    children.push(__convertTreeModelItem(value, c, childKey));
-            } else {
-                data[k] = value;
+            let rootKey = node.key;
+            let parentKey = node.parentKey;
+            while (parentKey && parentKey !== "") {
+                rootKey = parentKey;
+                let parentNode = tableView_.nodeForKey(parentKey);
+                parentKey = parentNode ? parentNode.parentKey || "" : "";
             }
 
-            if (!keyVal && (k === "id" || k === "key" || k === "m_id"))
-                keyVal = String(value || "");
-            if (!textVal && (k === "name" || k === "text" || k === "featureName" || k === "m_featureName"))
-                textVal = String(value || "");
+            let rootNode = tableView_.nodeForKey(rootKey);
+            let rootUuid = rootNode && rootNode.data ? rootNode.data[FeatureItemTypeMetaInfo.s_id] || "" : "";
+            let compositeId = rootUuid + "/" + (node.data[FeatureItemTypeMetaInfo.s_featureId] || "");
+
+            let checked = tableView_.selectedOptionalFeatures.indexOf(compositeId) >= 0;
+            tableView_.setCheckStateSilent(node.key, checked ? Qt.Checked : Qt.Unchecked);
         }
-
-        if (!keyVal) keyVal = "row_" + row + "_" + (++productViewContainer.__keyCounter);
-
-        return {
-            key: keyVal,
-            text: textVal,
-            data: data,
-            children: children,
-            checkable: false,
-            enabled: true,
-            expanded: false,
-            checked: Qt.Unchecked
-        };
     }
 
     function updateModel(){
@@ -155,15 +130,15 @@ ViewBase {
 
     function updateFeaturesGui(){
         productViewContainer.productFeaturesViewModel.clear();
+        tableView_.selectedOptionalFeatures = [];
 
         let features = productData.m_features;
         if (!features){
+            tableView_.model = [];
             return;
         }
 
         let featureIds = features.split(';')
-
-        tableView_.selectedOptionalFeatures = [];
 
         for (let featureId of featureIds){
             if (featureId.includes('/')){
@@ -180,8 +155,9 @@ ViewBase {
             }
         }
 
-        productViewContainer.__keyCounter = 0;
-        tableView_.model = __convertTreeModel(productViewContainer.productFeaturesViewModel, FeatureItemTypeMetaInfo.s_subFeatures);
+        tableView_.model = __buildFeaturesTreeModel();
+        tableView_.expandAll();
+        __applyOptionalSelection();
     }
 
     function addFeature(featureId){
@@ -324,7 +300,7 @@ ViewBase {
         anchors.top: headerPanel.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left;
-        anchors.right: parent.right;
+        anchors.right: scrollbar_.left;
 
         tristate: true;
 
@@ -344,7 +320,7 @@ ViewBase {
             let featureId = node.data[FeatureItemTypeMetaInfo.s_featureId] || "";
             if (featureId === "") return;
 
-            // For optional features, build composite id with root feature
+            // Resolve the top-level ancestor's uuid to build the composite id.
             let rootKey = node.key;
             let parentKey = node.parentKey;
             while (parentKey && parentKey !== "") {
@@ -354,19 +330,37 @@ ViewBase {
             }
 
             let rootNode = tableView_.nodeForKey(rootKey);
-            let rootFeatureId = rootNode && rootNode.data ? rootNode.data["id"] || "" : "";
+            let rootFeatureUuid = rootNode && rootNode.data ? rootNode.data[FeatureItemTypeMetaInfo.s_id] || "" : "";
 
-            let compositeId = rootFeatureId + "/" + featureId;
+            let compositeId = rootFeatureUuid + "/" + featureId;
+
+            // Read the current state live so check/uncheck stays consistent
+            // even when selectedOptionalFeatures has not been rebuilt yet.
+            let features = productViewContainer.productData.m_features;
+            let featureIds = features !== "" ? features.split(';') : [];
 
             if (state === Qt.Checked) {
-                if (!tableView_.selectedOptionalFeatures.includes(compositeId)) {
+                if (!featureIds.includes(compositeId))
                     productViewContainer.addFeature(compositeId);
-                }
             } else if (state === Qt.Unchecked) {
-                if (tableView_.selectedOptionalFeatures.includes(compositeId)) {
+                if (featureIds.includes(compositeId))
                     productViewContainer.removeFeature(compositeId);
-                }
             }
+
+            tableView_.selectedOptionalFeatures =
+                productViewContainer.productData.m_features !== ""
+                    ? productViewContainer.productData.m_features.split(';')
+                    : [];
         }
+    }
+
+    CustomScrollbar {
+        id: scrollbar_;
+        z: parent.z + 1;
+        anchors.right: parent.right;
+        anchors.top: tableView_.top;
+        anchors.bottom: tableView_.bottom;
+        secondSize: Style.marginM;
+        targetItem: tableView_.contentListView;
     }
 }

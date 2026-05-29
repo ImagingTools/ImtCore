@@ -17,13 +17,12 @@ ViewCommandsDelegateBase {
     Connections {
         id: tableConnections;
 
-        function onSelectedIndexChanged(){
-            let selectedIndex = container.view.tableView.selectedIndex;
+        function onSelectionChanged(){
+            let idx = container.view.tableView.currentIndex;
 
             let isEnabled = false;
-            if (selectedIndex != null){
-                let level = selectedIndex.depth;
-                if (level === 0){
+            if (idx != null){
+                if (idx.level === 0){
                     isEnabled = true;
                 }
             }
