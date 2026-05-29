@@ -115,6 +115,8 @@ Item {
     // tableSelection provides backward-compatible selected items access.
     readonly property var tableSelection: __tableSelectionObject
 
+    property int __convertKeyCounter: 0
+
     onRowModelChanged: __convertRowModel()
     onColumnModelChanged: __convertColumnModel()
     onReadOnlyChanged: { if (editable === !readOnly) return; editable = !readOnly }
@@ -2170,6 +2172,7 @@ Item {
     function __convertRowModel() {
         if (!rowModel) { model = []; return }
         if (rowModel === 0) { model = []; return }
+        __convertKeyCounter = 0
         var count = 0
         if (rowModel.getItemsCount) count = rowModel.getItemsCount()
         else if (rowModel.count !== undefined) count = rowModel.count
@@ -2235,7 +2238,7 @@ Item {
                 textVal = String(value || "")
         }
 
-        if (!keyVal) keyVal = "row_" + row + "_" + Math.random().toString(36).substr(2, 6)
+        if (!keyVal) keyVal = "row_" + row + "_" + (++root.__convertKeyCounter)
 
         return {
             key: keyVal,
