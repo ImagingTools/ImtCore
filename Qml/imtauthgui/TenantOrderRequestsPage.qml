@@ -30,9 +30,6 @@ ViewBase {
 	readonly property bool __canManage: orderRequestsPage.stateManager
 		&& (orderRequestsPage.stateManager.isCreator || orderRequestsPage.stateManager.isOwner)
 
-	// Status options. Index maps to the SDL OrderRequestStatus tokens.
-	readonly property var __statusTokens: ["Received", "Confirmed", "Rejected", "InProgress", "Completed", "Cancelled"]
-
 	function updateGui() {
 		orderRequestsPage.__refresh()
 	}
@@ -223,7 +220,7 @@ ViewBase {
 									text: qsTr("In Progress")
 									onClicked: {
 										if (orderRequestsPage.apiClient)
-											orderRequestsPage.apiClient.updateOrderRequestStatus(model.orderRequestId || "", orderRequestsPage.__statusTokens[3], "")
+											orderRequestsPage.apiClient.updateOrderRequestStatus(model.orderRequestId || "", "InProgress", "")
 									}
 								}
 
@@ -231,7 +228,7 @@ ViewBase {
 									text: qsTr("Completed")
 									onClicked: {
 										if (orderRequestsPage.apiClient)
-											orderRequestsPage.apiClient.updateOrderRequestStatus(model.orderRequestId || "", orderRequestsPage.__statusTokens[4], "")
+											orderRequestsPage.apiClient.updateOrderRequestStatus(model.orderRequestId || "", "Completed", "")
 									}
 								}
 							}
