@@ -91,10 +91,13 @@ FocusScope {
         }
     }
 
+    Component {
+        id: _menuBarItemComponent
+        MenuBarItem {}
+    }
+
     function _addMenu(menu) {
-        var proxy = Qt.createQmlObject(
-            'import imtcontrols 1.0; MenuBarItem {}',
-            row, "MenuBar._addMenu");
+        var proxy = _menuBarItemComponent.createObject(row);
         proxy.text = menu.title;
         proxy.menu = menu;
         proxy.menuBar = bar;
