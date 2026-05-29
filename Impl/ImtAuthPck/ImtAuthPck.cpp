@@ -262,6 +262,16 @@ I_EXPORT_COMPONENT(
 			"Tenant Invitation Manager");
 
 I_EXPORT_COMPONENT(
+			CrossOrgGrantInfo,
+			"Entity representing a cross-org grant delegating access between tenants",
+			"Cross Org Grant Info");
+
+I_EXPORT_COMPONENT(
+			CrossOrgGrantManager,
+			"Manager for cross-org grants (create/revoke/query access delegation)",
+			"Cross Org Grant Manager");
+
+I_EXPORT_COMPONENT(
 			TenantDocumentNameProvider,
 			"Provides default document name from tenant name",
 			"Tenant Document Name Provider");

@@ -96,5 +96,10 @@ I_EXPORT_COMPONENT(
 			"SQL delegate for tenant invitations (hydration, INSERT/UPDATE/DELETE)",
 			"Tenant Invitation Database Delegate");
 
+I_EXPORT_COMPONENT(
+			CrossOrgGrantDatabaseDelegate,
+			"SQL delegate for cross-org grants (hydration, INSERT/UPDATE/DELETE)",
+			"Cross Org Grant Database Delegate");
+
 } // namespace ImtAuthDbPck
 

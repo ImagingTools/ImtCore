@@ -3,7 +3,7 @@
 
 
 // ACF includes
-#include <istd/IPolymorphic.h>
+#include <istd/IChangeable.h>
 
 // Qt includes
 #include <QByteArray>
@@ -83,7 +83,7 @@ typedef QList<CrossOrgGrantInfo> CrossOrgGrants;
 
 	\ingroup Permission
 */
-class ICrossOrgGrant: virtual public istd::IPolymorphic
+class ICrossOrgGrant: virtual public istd::IChangeable
 {
 public:
 	/**
