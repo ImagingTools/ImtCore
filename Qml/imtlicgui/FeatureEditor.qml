@@ -19,6 +19,8 @@ ViewBase {
 	property Component treeItemModelComp: Component {
 		TreeItemModel {}
 	}
+
+	property int __keyCounter: 0
 	
 	Component.onCompleted: {
 		CachedFeatureCollection.updateModel();
@@ -41,9 +43,81 @@ ViewBase {
 				featureData.emplaceSubFeatures()
 			}
 
-			tableView_.rowModel = featureData.m_subFeatures;
-			tableView_.childModelKey = FeatureItemTypeMetaInfo.s_subFeatures;
+			tableView_.model = __convertTreeModel(featureData.m_subFeatures, FeatureItemTypeMetaInfo.s_subFeatures);
 		}
+	}
+
+	function __convertTreeModel(treeModel, childKey) {
+		if (!treeModel) return [];
+		var count = 0;
+		if (treeModel.getItemsCount) count = treeModel.getItemsCount();
+		else if (treeModel.count !== undefined) count = treeModel.count;
+		else return [];
+
+		var items = [];
+		for (var i = 0; i < count; ++i)
+			items.push(__convertTreeModelItem(treeModel, i, childKey));
+		return items;
+	}
+
+	function __convertTreeModelItem(treeModel, row, childKey) {
+		var keys = [];
+		if (treeModel.getKeys)
+			keys = treeModel.getKeys(row);
+		else if (treeModel.get) {
+			var obj = treeModel.get(row);
+			if (obj) keys = Object.keys(obj).filter(function(k) { return k !== "index" && k !== "model" && k !== "context" });
+		}
+
+		var data = {};
+		var children = [];
+		var keyVal = "";
+		var textVal = "";
+
+		// Store reference to the original model item for mutation operations
+		var itemData = treeModel.get ? treeModel.get(row) : null;
+
+		for (var j = 0; j < keys.length; ++j) {
+			var k = keys[j];
+			var value;
+			if (treeModel.getData)
+				value = treeModel.getData(k, row);
+			else if (treeModel.get)
+				value = treeModel.get(row)[k];
+			else
+				value = undefined;
+
+			if (childKey && k === childKey && value && typeof value === "object") {
+				var childCount = 0;
+				if (value.getItemsCount) childCount = value.getItemsCount();
+				else if (value.count !== undefined) childCount = value.count;
+				for (var c = 0; c < childCount; ++c)
+					children.push(__convertTreeModelItem(value, c, childKey));
+			} else {
+				data[k] = value;
+			}
+
+			if (!keyVal && (k === "id" || k === "key" || k === "m_id"))
+				keyVal = String(value || "");
+			if (!textVal && (k === "name" || k === "text" || k === "featureName" || k === "m_featureName"))
+				textVal = String(value || "");
+		}
+
+		if (!keyVal) keyVal = "row_" + row + "_" + (++featureEditor.__keyCounter);
+
+		return {
+			key: keyVal,
+			text: textVal,
+			data: data,
+			children: children,
+			checkable: false,
+			enabled: true,
+			expanded: false,
+			checked: Qt.Unchecked,
+			itemData: itemData,
+			sourceModel: treeModel,
+			sourceRow: row
+		};
 	}
 	
 	function getAllParents(selectedIndex){
@@ -147,8 +221,7 @@ ViewBase {
 		featureData.m_featureId = featureIdInput.text
 		featureData.m_optional = optionalSwitch.checked
 		featureData.m_isPermission = permissionSwitch.checked
-		tableView_.rowModel = featureData.m_subFeatures
-		tableView_.childModelKey = FeatureItemTypeMetaInfo.s_subFeatures
+		tableView_.model = __convertTreeModel(featureData.m_subFeatures, FeatureItemTypeMetaInfo.s_subFeatures)
 	}
 	
 	Rectangle {
@@ -290,7 +363,7 @@ ViewBase {
 					}
 				}
 				
-				featureDependenciesView.contentVisible = featureId !== "" && selectedIndex != null;
+				featureDependenciesView.visible = featureId !== "" && selectedIndex != null;
 				
 				let removeIsEnabled = selectedIndex != null;
 				
@@ -371,15 +444,14 @@ ViewBase {
 			tristate: true;
 
 			columns: featureEditor.__buildDependencyColumns()
-			childModelKey: FeatureItemTypeMetaInfo.s_subFeatures
 
 			property bool __delegateUpdatingBlock: false
 			
 			Component.onCompleted: {
 				let ok = PermissionsController.checkPermission("ChangeFeature");
-				featureDependenciesView.readOnly = !ok;
+				featureDependenciesView.editable = ok;
 				featureEditor.dependenciewViewModel.copy(CachedFeatureCollection.collectionModel);
-				featureDependenciesView.rowModel = featureEditor.dependenciewViewModel;
+				featureDependenciesView.model = featureEditor.__convertTreeModel(featureEditor.dependenciewViewModel, FeatureItemTypeMetaInfo.s_subFeatures);
 				CachedFeatureCollection.modelUpdated.connect(featureDependenciesView.onFeaturesProviderModelChanged);
 			}
 			
@@ -389,7 +461,7 @@ ViewBase {
 
 			function onFeaturesProviderModelChanged(){
 				featureEditor.dependenciewViewModel.copy(CachedFeatureCollection.collectionModel)
-				featureDependenciesView.rowModel = featureEditor.dependenciewViewModel;
+				featureDependenciesView.model = featureEditor.__convertTreeModel(featureEditor.dependenciewViewModel, FeatureItemTypeMetaInfo.s_subFeatures);
 				featureEditor.updateTreeViewGui();
 			}
 

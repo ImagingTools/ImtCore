@@ -55,10 +55,7 @@ RemoteCollectionView {
 			commandsDelegateComp: Component {ViewCommandsDelegateBase {
 					view: featureEditor;
 					onCommandActivated: {
-						let selectedIndex = null;
-						if (featureEditor.tableView.tableSelection.items.length > 0){
-							selectedIndex = featureEditor.tableView.tableSelection.items[0];
-						}
+						let selectedIndex = featureEditor.tableView.currentIndex;
 						
 						if (commandId === "InsertFeature"){
 							if (!featureEditor.featureData.hasSubFeatures()){
@@ -66,11 +63,14 @@ RemoteCollectionView {
 							}
 
 							let childModel = featureEditor.featureData.m_subFeatures;
-							if (selectedIndex != null){
-								if (!selectedIndex.itemData.hasSubFeatures()){
-									selectedIndex.itemData.emplaceSubFeatures()
+							if (selectedIndex != null && selectedIndex.item){
+								let selectedItemData = selectedIndex.item.itemData;
+								if (selectedItemData) {
+									if (!selectedItemData.hasSubFeatures()){
+										selectedItemData.emplaceSubFeatures()
+									}
+									childModel = selectedItemData.m_subFeatures;
 								}
-								childModel = selectedIndex.itemData.m_subFeatures;
 							}
 							let newFeatureData = featureDataComp.createObject(childModel)
 							newFeatureData.m_isPermission = true;
@@ -79,13 +79,16 @@ RemoteCollectionView {
 							featureEditor.model.modelChanged([])
 						}
 						else if (commandId === "RemoveFeature"){
-							if (selectedIndex != null){
+							if (selectedIndex != null && selectedIndex.item){
 								let parentModel = featureEditor.featureData.m_subFeatures;
-								if (selectedIndex.parentIndex != null){
-									parentModel = selectedIndex.parentIndex.itemData.m_subFeatures;
+								if (selectedIndex.parentKey && selectedIndex.parentKey !== "") {
+									let parentNode = featureEditor.tableView.nodeForKey(selectedIndex.parentKey);
+									if (parentNode && parentNode.sourceItem && parentNode.sourceItem.itemData) {
+										parentModel = parentNode.sourceItem.itemData.m_subFeatures;
+									}
 								}
 								
-								parentModel.remove(selectedIndex.index);
+								parentModel.remove(selectedIndex.item.sourceRow);
 								
 								featureEditor.model.modelChanged([])
 							}

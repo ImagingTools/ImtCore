@@ -18,6 +18,8 @@ ViewBase {
 
     property ProductData productData: model ? model : null;
 
+    property int __keyCounter: 0
+
     Component.onCompleted: {
         CachedFeatureCollection.updateModel();
 
@@ -52,6 +54,73 @@ ViewBase {
             { name: "featureId", title: qsTr("Feature-ID"), display: "data.featureId", tree: false, editable: false },
             { name: "featureDescription", title: qsTr("Description"), display: "data.featureDescription", tree: false, editable: false }
         ]
+    }
+
+    function __convertTreeModel(treeModel, childKey) {
+        if (!treeModel) return [];
+        var count = 0;
+        if (treeModel.getItemsCount) count = treeModel.getItemsCount();
+        else if (treeModel.count !== undefined) count = treeModel.count;
+        else return [];
+
+        var items = [];
+        for (var i = 0; i < count; ++i)
+            items.push(__convertTreeModelItem(treeModel, i, childKey));
+        return items;
+    }
+
+    function __convertTreeModelItem(treeModel, row, childKey) {
+        var keys = [];
+        if (treeModel.getKeys)
+            keys = treeModel.getKeys(row);
+        else if (treeModel.get) {
+            var obj = treeModel.get(row);
+            if (obj) keys = Object.keys(obj).filter(function(k) { return k !== "index" && k !== "model" && k !== "context" });
+        }
+
+        var data = {};
+        var children = [];
+        var keyVal = "";
+        var textVal = "";
+
+        for (var j = 0; j < keys.length; ++j) {
+            var k = keys[j];
+            var value;
+            if (treeModel.getData)
+                value = treeModel.getData(k, row);
+            else if (treeModel.get)
+                value = treeModel.get(row)[k];
+            else
+                value = undefined;
+
+            if (childKey && k === childKey && value && typeof value === "object") {
+                var childCount = 0;
+                if (value.getItemsCount) childCount = value.getItemsCount();
+                else if (value.count !== undefined) childCount = value.count;
+                for (var c = 0; c < childCount; ++c)
+                    children.push(__convertTreeModelItem(value, c, childKey));
+            } else {
+                data[k] = value;
+            }
+
+            if (!keyVal && (k === "id" || k === "key" || k === "m_id"))
+                keyVal = String(value || "");
+            if (!textVal && (k === "name" || k === "text" || k === "featureName" || k === "m_featureName"))
+                textVal = String(value || "");
+        }
+
+        if (!keyVal) keyVal = "row_" + row + "_" + (++productViewContainer.__keyCounter);
+
+        return {
+            key: keyVal,
+            text: textVal,
+            data: data,
+            children: children,
+            checkable: false,
+            enabled: true,
+            expanded: false,
+            checked: Qt.Unchecked
+        };
     }
 
     function updateModel(){
@@ -111,8 +180,8 @@ ViewBase {
             }
         }
 
-        tableView_.rowModel = 0;
-        tableView_.rowModel = productViewContainer.productFeaturesViewModel;
+        productViewContainer.__keyCounter = 0;
+        tableView_.model = __convertTreeModel(productViewContainer.productFeaturesViewModel, FeatureItemTypeMetaInfo.s_subFeatures);
     }
 
     function addFeature(featureId){
@@ -260,13 +329,12 @@ ViewBase {
         tristate: true;
 
         columns: productViewContainer.__buildColumns()
-        childModelKey: FeatureItemTypeMetaInfo.s_subFeatures
 
         property var selectedOptionalFeatures: [];
 
         Component.onCompleted: {
             let ok = PermissionsController.checkPermission("ChangeProduct");
-            tableView_.readOnly = !ok;
+            tableView_.editable = ok;
         }
 
         onCheckStateChanged: {

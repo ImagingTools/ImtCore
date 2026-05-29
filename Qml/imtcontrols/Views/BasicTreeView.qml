@@ -43,6 +43,8 @@ import imtcontrols 1.0
         setCheckState(key, state), toggleCheckState(key),
         checkItem(key), uncheckItem(key),
         setNodeText(key, value), setNodeEnabled(key, value),
+        setNodeVisible(key, value), setNodeVisibleBatch(updates),
+        setNodeCheckable(key, value), setCheckStateSilent(key, state),
         setCellValue(key, column, value), cellValue(key, column),
         editCurrent(col), startEdit(key, col), beginEditCell(key, col),
         commitCurrentEdit(), cancelCurrentEdit(),
@@ -94,34 +96,6 @@ Item {
     // "commit" (default), "cancel", "keep".
     property string editingFocusOutPolicy: "commit"
 
-    // ─── Backward-compatible properties (TreeItemModel bridge) ─────────────
-
-    // Setting rowModel (a TreeItemModel or compatible ListModel) converts it
-    // to the internal JS-array model format. The childModelKey tells which
-    // field in each item holds the nested TreeItemModel for children.
-    property var    rowModel: null
-    property string childModelKey: ""
-
-    // Setting columnModel (a TreeItemModel with "id"/"name" pairs) converts
-    // it to the internal columns array format.
-    property var    columnModel: null
-
-    // readOnly inverts editable for consumers that used the old API.
-    property bool   readOnly: true
-
-    // contentVisible controls whether the tree content is shown.
-    property bool   contentVisible: true
-
-    // tableSelection provides backward-compatible selected items access.
-    readonly property var tableSelection: __tableSelectionObject
-
-    property int __convertKeyCounter: 0
-
-    onRowModelChanged: __convertRowModel()
-    onColumnModelChanged: __convertColumnModel()
-    onReadOnlyChanged: { if (editable === !readOnly) return; editable = !readOnly }
-    onEditableChanged: { if (readOnly === !editable) return; readOnly = !editable }
-    onContentVisibleChanged: visible = contentVisible
 
     // ─── Theming ───────────────────────────────────────────────────────────
 
@@ -2105,150 +2079,4 @@ Item {
             buildVisibleTree()
     }
 
-    // ═══════════════════════════════════════════════════════════════════════
-    //  Backward-compat: tableSelection / getItemsDataAsList
-    // ═══════════════════════════════════════════════════════════════════════
-
-    property var __tableSelectionObject: QtObject {
-        property var items: root.currentIndex ? [root.currentIndex] : []
-    }
-
-    Connections {
-        target: root
-        function onSelectionChanged() {
-            root.__tableSelectionObject.items = root.selectedIndexes()
-        }
-    }
-
-    function getItemsDataAsList() {
-        var result = []
-        for (var k in __nodes) {
-            var n = __nodes[k]
-            if (!n) continue
-            result.push({
-                _node: n,
-                getItemData: function() { return this._node.sourceItem || this._node.data || {} }
-            })
-        }
-        return result
-    }
-
-    // ═══════════════════════════════════════════════════════════════════════
-    //  Backward-compat: TreeItemModel conversion
-    // ═══════════════════════════════════════════════════════════════════════
-
-    function __convertColumnModel() {
-        if (!columnModel) return
-        var count = 0
-        if (columnModel.getItemsCount) count = columnModel.getItemsCount()
-        else if (columnModel.count !== undefined) count = columnModel.count
-        else return
-
-        var cols = []
-        for (var i = 0; i < count; ++i) {
-            var id = ""
-            var name = ""
-            if (columnModel.getData) {
-                id = columnModel.getData("id", i) || ""
-                name = columnModel.getData("name", i) || ""
-            } else if (columnModel.get) {
-                var item = columnModel.get(i)
-                if (item) {
-                    id = item.id || ""
-                    name = item.name || ""
-                }
-            }
-            cols.push({
-                name: id,
-                title: name,
-                display: "data." + id,
-                tree: i === 0,
-                editable: false
-            })
-        }
-        columns = cols
-    }
-
-    function __convertRowModel() {
-        if (!rowModel) { model = []; return }
-        if (rowModel === 0) { model = []; return }
-        __convertKeyCounter = 0
-        var count = 0
-        if (rowModel.getItemsCount) count = rowModel.getItemsCount()
-        else if (rowModel.count !== undefined) count = rowModel.count
-        else if (rowModel.length !== undefined) count = rowModel.length
-        else return
-
-        var items = []
-        for (var i = 0; i < count; ++i)
-            items.push(__convertTreeModelItem(rowModel, i))
-
-        model = items
-    }
-
-    function __convertTreeModelItem(treeModel, row) {
-        var keys = []
-        if (treeModel.getKeys)
-            keys = treeModel.getKeys(row)
-        else if (treeModel.get) {
-            var obj = treeModel.get(row)
-            if (obj) keys = Object.keys(obj).filter(function(k) { return k !== "index" && k !== "model" && k !== "context" })
-        }
-
-        var data = {}
-        var children = []
-        var keyVal = ""
-        var textVal = ""
-        var checkableVal = false
-        var enabledVal = true
-        var expandedVal = false
-
-        for (var j = 0; j < keys.length; ++j) {
-            var k = keys[j]
-            var value
-            if (treeModel.getData)
-                value = treeModel.getData(k, row)
-            else if (treeModel.get)
-                value = treeModel.get(row)[k]
-            else
-                value = undefined
-
-            // Detect child TreeItemModel via childModelKey or isTreeModel
-            var isChild = false
-            if (childModelKey && k === childModelKey) {
-                isChild = true
-            } else if (treeModel.isTreeModel && treeModel.isTreeModel(k, row)) {
-                isChild = true
-            }
-
-            if (isChild && value && typeof value === "object") {
-                var childCount = 0
-                if (value.getItemsCount) childCount = value.getItemsCount()
-                else if (value.count !== undefined) childCount = value.count
-                for (var c = 0; c < childCount; ++c)
-                    children.push(__convertTreeModelItem(value, c))
-            } else {
-                data[k] = value
-            }
-
-            // Heuristic key/text detection
-            if (!keyVal && (k === "id" || k === "key" || k === "m_id"))
-                keyVal = String(value || "")
-            if (!textVal && (k === "name" || k === "text" || k === "featureName" || k === "m_featureName"))
-                textVal = String(value || "")
-        }
-
-        if (!keyVal) keyVal = "row_" + row + "_" + (++root.__convertKeyCounter)
-
-        return {
-            key: keyVal,
-            text: textVal,
-            data: data,
-            children: children,
-            checkable: checkableVal,
-            enabled: enabledVal,
-            expanded: expandedVal,
-            checked: Qt.Unchecked
-        }
-    }
 }
