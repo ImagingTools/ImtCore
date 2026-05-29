@@ -82,6 +82,17 @@ QtObject {
 	signal crossOrgGrantRevoked(string grantId)
 	signal crossOrgGrantsReceived(var grants)
 
+	signal tenantRelationshipAdded(string relationshipId)
+	signal tenantRelationshipRemoved(string relationshipId)
+	signal tenantRelationshipsReceived(var relationships)
+
+	signal connectionRequestCreated(string requestId)
+	signal connectCodeCreated(string requestId, string connectCode)
+	signal connectionRequestAccepted(string requestId)
+	signal connectionRequestRejected(string requestId)
+	signal connectionRequestRevoked(string requestId)
+	signal connectionRequestsReceived(var requests)
+
 	signal requestFailed(string message)
 
 	// --- Real-time membership subscription notifications ---
@@ -821,6 +832,340 @@ QtObject {
 		root.__pendingRevokeGrantId = grantId || ""
 		root.__revokeCrossOrgGrantInput.m_grantId = grantId || ""
 		root.__revokeCrossOrgGrantSender.send(root.__revokeCrossOrgGrantInput)
+	}
+
+	// =========================================================================
+	// Tenant relationships (Tenants.sdl: AddTenantRelationship /
+	// RemoveTenantRelationship / GetTenantRelationships)
+	// =========================================================================
+
+	property ListModel tenantRelationshipsModel: ListModel {}
+
+	property AddTenantRelationshipInput __addTenantRelationshipInput: AddTenantRelationshipInput {}
+	property GqlSdlRequestSender __addTenantRelationshipSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_addTenantRelationship
+
+		sdlObjectComp: Component {
+			AddTenantRelationshipPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.tenantRelationshipAdded(m_relationshipId || "")
+					}
+				}
+			}
+		}
+	}
+
+	property RemoveTenantRelationshipInput __removeTenantRelationshipInput: RemoveTenantRelationshipInput {}
+	property string __pendingRemoveRelationshipId: ""
+	property GqlSdlRequestSender __removeTenantRelationshipSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_removeTenantRelationship
+
+		sdlObjectComp: Component {
+			RemoveTenantRelationshipPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.tenantRelationshipRemoved(root.__pendingRemoveRelationshipId)
+					}
+				}
+			}
+		}
+	}
+
+	property GetTenantRelationshipsInput __getTenantRelationshipsInput: GetTenantRelationshipsInput {}
+	property GqlSdlRequestSender __getTenantRelationshipsSender: GqlSdlRequestSender {
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_getTenantRelationships
+
+		sdlObjectComp: Component {
+			GetTenantRelationshipsPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.__populateTenantRelationshipsModel(m_relationships)
+					}
+				}
+			}
+		}
+	}
+
+	function __populateTenantRelationshipsModel(relationships) {
+		root.tenantRelationshipsModel.clear()
+		if (relationships) {
+			for (var i = 0; i < relationships.length; ++i) {
+				var rel = relationships[i]
+				if (!rel)
+					continue
+				root.tenantRelationshipsModel.append({
+					"relationshipId": rel.m_id || "",
+					"sourceTenantId": rel.m_sourceTenantId || "",
+					"targetTenantId": rel.m_targetTenantId || "",
+					"role": rel.m_role || TenantRelationshipRoleEnum.s_partner,
+					"sourceRole": rel.m_sourceRole || TenantRelationshipRoleEnum.s_partner,
+					"targetRole": rel.m_targetRole || TenantRelationshipRoleEnum.s_partner,
+					"scope": rel.m_scope || "",
+					"validFrom": rel.m_validFrom || "",
+					"validUntil": rel.m_validUntil || "",
+					"isActive": rel.m_isActive === undefined ? true : rel.m_isActive,
+					"description": rel.m_description || "",
+					"createdAt": rel.m_createdAt || ""
+				})
+			}
+		}
+		root.tenantRelationshipsReceived(relationships || [])
+	}
+
+	function fetchTenantRelationships(tenantId) {
+		root.__getTenantRelationshipsInput.m_tenantId = tenantId || root.tenantId || ""
+		root.__getTenantRelationshipsSender.send(root.__getTenantRelationshipsInput)
+	}
+
+	function addTenantRelationship(sourceTenantId, targetTenantId, sourceRole, targetRole, scope, validFrom, validUntil, description) {
+		root.__addTenantRelationshipInput.m_sourceTenantId = sourceTenantId || root.tenantId || ""
+		root.__addTenantRelationshipInput.m_targetTenantId = targetTenantId || ""
+		root.__addTenantRelationshipInput.m_role = sourceRole || TenantRelationshipRoleEnum.s_partner
+		root.__addTenantRelationshipInput.m_sourceRole = sourceRole || TenantRelationshipRoleEnum.s_partner
+		root.__addTenantRelationshipInput.m_targetRole = targetRole || TenantRelationshipRoleEnum.s_partner
+		root.__addTenantRelationshipInput.m_scope = scope || ""
+		root.__addTenantRelationshipInput.m_validFrom = validFrom || ""
+		root.__addTenantRelationshipInput.m_validUntil = validUntil || ""
+		root.__addTenantRelationshipInput.m_description = description || ""
+		root.__addTenantRelationshipSender.send(root.__addTenantRelationshipInput)
+	}
+
+	function removeTenantRelationship(tenantId, relationshipId) {
+		root.__pendingRemoveRelationshipId = relationshipId || ""
+		root.__removeTenantRelationshipInput.m_tenantId = tenantId || root.tenantId || ""
+		root.__removeTenantRelationshipInput.m_relationshipId = relationshipId || ""
+		root.__removeTenantRelationshipSender.send(root.__removeTenantRelationshipInput)
+	}
+
+	// =========================================================================
+	// Tenant connection requests (Tenants.sdl: CreateTenantConnectionRequest /
+	// CreateTenantConnectCode / AcceptTenantConnectionRequest /
+	// AcceptTenantConnectCode / RejectTenantConnectionRequest /
+	// RevokeTenantConnectionRequest / GetTenantConnectionRequests)
+	// =========================================================================
+
+	property ListModel connectionRequestsModel: ListModel {}
+
+	property CreateTenantConnectionRequestInput __createConnectionRequestInput: CreateTenantConnectionRequestInput {}
+	property GqlSdlRequestSender __createConnectionRequestSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_createTenantConnectionRequest
+
+		sdlObjectComp: Component {
+			CreateTenantConnectionRequestPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.connectionRequestCreated(m_requestId || "")
+					}
+				}
+			}
+		}
+	}
+
+	property CreateTenantConnectCodeInput __createConnectCodeInput: CreateTenantConnectCodeInput {}
+	property GqlSdlRequestSender __createConnectCodeSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_createTenantConnectCode
+
+		sdlObjectComp: Component {
+			CreateTenantConnectCodePayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.connectCodeCreated(m_requestId || "", m_connectCode || "")
+					}
+				}
+			}
+		}
+	}
+
+	property AcceptTenantConnectionRequestInput __acceptConnectionRequestInput: AcceptTenantConnectionRequestInput {}
+	property string __pendingAcceptRequestId: ""
+	property GqlSdlRequestSender __acceptConnectionRequestSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_acceptTenantConnectionRequest
+
+		sdlObjectComp: Component {
+			AcceptTenantConnectionRequestPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.connectionRequestAccepted(root.__pendingAcceptRequestId)
+					}
+				}
+			}
+		}
+	}
+
+	property AcceptTenantConnectCodeInput __acceptConnectCodeInput: AcceptTenantConnectCodeInput {}
+	property GqlSdlRequestSender __acceptConnectCodeSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_acceptTenantConnectCode
+
+		sdlObjectComp: Component {
+			AcceptTenantConnectCodePayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.connectionRequestAccepted(m_requestId || "")
+					}
+				}
+			}
+		}
+	}
+
+	property RejectTenantConnectionRequestInput __rejectConnectionRequestInput: RejectTenantConnectionRequestInput {}
+	property string __pendingRejectRequestId: ""
+	property GqlSdlRequestSender __rejectConnectionRequestSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_rejectTenantConnectionRequest
+
+		sdlObjectComp: Component {
+			RejectTenantConnectionRequestPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.connectionRequestRejected(root.__pendingRejectRequestId)
+					}
+				}
+			}
+		}
+	}
+
+	property RevokeTenantConnectionRequestInput __revokeConnectionRequestInput: RevokeTenantConnectionRequestInput {}
+	property string __pendingRevokeRequestId: ""
+	property GqlSdlRequestSender __revokeConnectionRequestSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_revokeTenantConnectionRequest
+
+		sdlObjectComp: Component {
+			RevokeTenantConnectionRequestPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.connectionRequestRevoked(root.__pendingRevokeRequestId)
+					}
+				}
+			}
+		}
+	}
+
+	property GetTenantConnectionRequestsInput __getConnectionRequestsInput: GetTenantConnectionRequestsInput {}
+	property GqlSdlRequestSender __getConnectionRequestsSender: GqlSdlRequestSender {
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_getTenantConnectionRequests
+
+		sdlObjectComp: Component {
+			GetTenantConnectionRequestsPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.__populateConnectionRequestsModel(m_requests)
+					}
+				}
+			}
+		}
+	}
+
+	function __populateConnectionRequestsModel(requests) {
+		root.connectionRequestsModel.clear()
+		if (requests) {
+			for (var i = 0; i < requests.length; ++i) {
+				var req = requests[i]
+				if (!req)
+					continue
+				root.connectionRequestsModel.append({
+					"requestId": req.m_id || "",
+					"sourceTenantId": req.m_sourceTenantId || "",
+					"targetTenantId": req.m_targetTenantId || "",
+					"targetIdentifier": req.m_targetIdentifier || "",
+					"connectCode": req.m_connectCode || "",
+					"proposedSourceRole": req.m_proposedSourceRole || TenantRelationshipRoleEnum.s_partner,
+					"proposedTargetRole": req.m_proposedTargetRole || TenantRelationshipRoleEnum.s_partner,
+					"message": req.m_message || "",
+					"status": req.m_status || TenantConnectionStatusEnum.s_pending,
+					"createdAt": req.m_createdAt || "",
+					"expiresAt": req.m_expiresAt || "",
+					"respondedAt": req.m_respondedAt || ""
+				})
+			}
+		}
+		root.connectionRequestsReceived(requests || [])
+	}
+
+	function fetchConnectionRequests(tenantId) {
+		root.__getConnectionRequestsInput.m_tenantId = tenantId || root.tenantId || ""
+		root.__getConnectionRequestsSender.send(root.__getConnectionRequestsInput)
+	}
+
+	function createConnectionRequest(sourceTenantId, targetIdentifier, proposedSourceRole, proposedTargetRole, message, expiresAt) {
+		root.__createConnectionRequestInput.m_sourceTenantId = sourceTenantId || root.tenantId || ""
+		root.__createConnectionRequestInput.m_targetIdentifier = targetIdentifier || ""
+		root.__createConnectionRequestInput.m_proposedSourceRole = proposedSourceRole || TenantRelationshipRoleEnum.s_partner
+		root.__createConnectionRequestInput.m_proposedTargetRole = proposedTargetRole || TenantRelationshipRoleEnum.s_partner
+		root.__createConnectionRequestInput.m_message = message || ""
+		root.__createConnectionRequestInput.m_expiresAt = expiresAt || ""
+		root.__createConnectionRequestSender.send(root.__createConnectionRequestInput)
+	}
+
+	function createConnectCode(sourceTenantId, proposedSourceRole, proposedTargetRole, message, expiresAt) {
+		root.__createConnectCodeInput.m_sourceTenantId = sourceTenantId || root.tenantId || ""
+		root.__createConnectCodeInput.m_proposedSourceRole = proposedSourceRole || TenantRelationshipRoleEnum.s_partner
+		root.__createConnectCodeInput.m_proposedTargetRole = proposedTargetRole || TenantRelationshipRoleEnum.s_partner
+		root.__createConnectCodeInput.m_message = message || ""
+		root.__createConnectCodeInput.m_expiresAt = expiresAt || ""
+		root.__createConnectCodeSender.send(root.__createConnectCodeInput)
+	}
+
+	function acceptConnectionRequest(requestId, acceptingTenantId) {
+		root.__pendingAcceptRequestId = requestId || ""
+		root.__acceptConnectionRequestInput.m_requestId = requestId || ""
+		root.__acceptConnectionRequestInput.m_acceptingTenantId = acceptingTenantId || root.tenantId || ""
+		root.__acceptConnectionRequestSender.send(root.__acceptConnectionRequestInput)
+	}
+
+	function acceptConnectCode(connectCode, acceptingTenantId) {
+		root.__acceptConnectCodeInput.m_connectCode = connectCode || ""
+		root.__acceptConnectCodeInput.m_acceptingTenantId = acceptingTenantId || root.tenantId || ""
+		root.__acceptConnectCodeSender.send(root.__acceptConnectCodeInput)
+	}
+
+	function rejectConnectionRequest(requestId) {
+		root.__pendingRejectRequestId = requestId || ""
+		root.__rejectConnectionRequestInput.m_requestId = requestId || ""
+		root.__rejectConnectionRequestSender.send(root.__rejectConnectionRequestInput)
+	}
+
+	function revokeConnectionRequest(requestId) {
+		root.__pendingRevokeRequestId = requestId || ""
+		root.__revokeConnectionRequestInput.m_requestId = requestId || ""
+		root.__revokeConnectionRequestSender.send(root.__revokeConnectionRequestInput)
 	}
 
 	// =========================================================================

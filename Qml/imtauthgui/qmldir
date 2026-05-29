@@ -49,6 +49,8 @@ TenantRolesPage 1.0 TenantRolesPage.qml
 TenantGroupsPage 1.0 TenantGroupsPage.qml
 TenantPermissionsPage 1.0 TenantPermissionsPage.qml
 TenantCrossOrgGrantsPage 1.0 TenantCrossOrgGrantsPage.qml
+TenantRelationshipsPage 1.0 TenantRelationshipsPage.qml
+TenantConnectionRequestsPage 1.0 TenantConnectionRequestsPage.qml
 TenantSimpleCollectionPage 1.0 TenantSimpleCollectionPage.qml
 TenantDocumentEditorShell 1.0 TenantDocumentEditorShell.qml
 StatusBadge 1.0 StatusBadge.qml

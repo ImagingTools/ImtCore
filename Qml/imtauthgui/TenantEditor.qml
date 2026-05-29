@@ -93,6 +93,8 @@ DocumentViewBase {
 				if (stateManager_.isCreator) {
 					multiPageView.addPage("Permissions", qsTr("Permissions"), permissionsPageComp, "Icons/Role")
 					multiPageView.addPage("CrossOrgGrants", qsTr("Cross-Org Grants"), crossOrgGrantsPageComp, "Icons/Link")
+					multiPageView.addPage("Relationships", qsTr("Relationships"), relationshipsPageComp, "Icons/Link")
+					multiPageView.addPage("Connections", qsTr("Connections"), connectionRequestsPageComp, "Icons/Link")
 				}
 			}
 			multiPageView.currentIndex = 0
@@ -286,6 +288,26 @@ DocumentViewBase {
 		id: crossOrgGrantsPageComp
 
 		TenantCrossOrgGrantsPage {
+			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
+		}
+	}
+
+	Component {
+		id: relationshipsPageComp
+
+		TenantRelationshipsPage {
+			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
+		}
+	}
+
+	Component {
+		id: connectionRequestsPageComp
+
+		TenantConnectionRequestsPage {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient

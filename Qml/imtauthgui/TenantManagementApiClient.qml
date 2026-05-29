@@ -68,6 +68,19 @@ QtObject {
 	signal crossOrgGrantRevoked(string grantId)
 	signal crossOrgGrantsReceived(var grants)
 
+	// --- Tenant relationships (asymmetric) ---
+	signal tenantRelationshipAdded(string relationshipId)
+	signal tenantRelationshipRemoved(string relationshipId)
+	signal tenantRelationshipsReceived(var relationships)
+
+	// --- Tenant connection requests (discovery) ---
+	signal connectionRequestCreated(string requestId)
+	signal connectCodeCreated(string requestId, string connectCode)
+	signal connectionRequestAccepted(string requestId)
+	signal connectionRequestRejected(string requestId)
+	signal connectionRequestRevoked(string requestId)
+	signal connectionRequestsReceived(var requests)
+
 	// --- Generic error ---
 	signal requestFailed(string message)
 
@@ -115,4 +128,24 @@ QtObject {
 	function fetchCrossOrgGrants(tenantId) {}
 	function createCrossOrgGrant(sourceTenantId, targetTenantId, relationshipId, accessLevel, resourceScope, targetTeamId, description, expiresAt) {}
 	function revokeCrossOrgGrant(grantId) {}
+
+	// --- Tenant relationships (asymmetric) ---
+	// Model holding the relationships for the current tenant (see
+	// tenantRelationshipsReceived for the raw payload).
+	property var tenantRelationshipsModel: null
+	function fetchTenantRelationships(tenantId) {}
+	function addTenantRelationship(sourceTenantId, targetTenantId, sourceRole, targetRole, scope, validFrom, validUntil, description) {}
+	function removeTenantRelationship(tenantId, relationshipId) {}
+
+	// --- Tenant connection requests (discovery) ---
+	// Model holding the connection requests for the current tenant (see
+	// connectionRequestsReceived for the raw payload).
+	property var connectionRequestsModel: null
+	function fetchConnectionRequests(tenantId) {}
+	function createConnectionRequest(sourceTenantId, targetIdentifier, proposedSourceRole, proposedTargetRole, message, expiresAt) {}
+	function createConnectCode(sourceTenantId, proposedSourceRole, proposedTargetRole, message, expiresAt) {}
+	function acceptConnectionRequest(requestId, acceptingTenantId) {}
+	function acceptConnectCode(connectCode, acceptingTenantId) {}
+	function rejectConnectionRequest(requestId) {}
+	function revokeConnectionRequest(requestId) {}
 }
