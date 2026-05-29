@@ -302,6 +302,40 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="CrossTenantMessageInfo" PackageId="ImtAuthPck" ComponentId="CrossTenantMessageInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="CrossTenantMessageProjection" PackageId="ImtAuthPck" ComponentId="CrossTenantMessageProjection">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="CrossTenantMessageBroker" PackageId="ImtAuthPck" ComponentId="CrossTenantMessageBroker">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="MessageCollection" Type="Reference" ExportId="CrossTenantMessageRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MessageFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="CrossTenantMessageInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Projection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CrossTenantMessageProjection"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="TenantManager" PackageId="ImtAuthPck" ComponentId="TenantManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>

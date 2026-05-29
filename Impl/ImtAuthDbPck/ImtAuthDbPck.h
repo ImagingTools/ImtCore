@@ -20,6 +20,7 @@
 #include <imtauthdb/CTenantInvitationDbDelegateComp.h>
 #include <imtauthdb/CCrossOrgGrantDbDelegateComp.h>
 #include <imtauthdb/CTenantConnectionRequestDbDelegateComp.h>
+#include <imtauthdb/CCrossTenantMessageDbDelegateComp.h>
 
 /**
 	ImtAuthDbPck package
@@ -46,6 +47,7 @@ typedef imtauthdb::CTenantMembershipDbDelegateComp TenantMembershipDatabaseDeleg
 typedef imtauthdb::CTenantInvitationDbDelegateComp TenantInvitationDatabaseDelegate;
 typedef imtauthdb::CCrossOrgGrantDbDelegateComp CrossOrgGrantDatabaseDelegate;
 typedef imtauthdb::CTenantConnectionRequestDbDelegateComp TenantConnectionRequestDatabaseDelegate;
+typedef imtauthdb::CCrossTenantMessageDbDelegateComp CrossTenantMessageDatabaseDelegate;
 
 
 } // namespace ImtAuthDbPck

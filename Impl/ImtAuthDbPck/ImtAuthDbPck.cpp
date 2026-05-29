@@ -106,5 +106,10 @@ I_EXPORT_COMPONENT(
 			"SQL delegate for tenant connection requests (hydration, INSERT/UPDATE/DELETE)",
 			"Tenant Connection Request Database Delegate");
 
+I_EXPORT_COMPONENT(
+			CrossTenantMessageDatabaseDelegate,
+			"SQL delegate for cross-tenant messages (hydration, INSERT/UPDATE/DELETE)",
+			"Cross Tenant Message Database Delegate");
+
 } // namespace ImtAuthDbPck
 

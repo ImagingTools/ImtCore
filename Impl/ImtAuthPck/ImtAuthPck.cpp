@@ -282,6 +282,21 @@ I_EXPORT_COMPONENT(
 			"Tenant Connection Request Manager");
 
 I_EXPORT_COMPONENT(
+			CrossTenantMessageInfo,
+			"Entity representing a cross-tenant message exchanged through the messaging pipeline",
+			"Cross Tenant Message Info");
+
+I_EXPORT_COMPONENT(
+			CrossTenantMessageProjection,
+			"Projection applying field whitelist/blacklist to cross-tenant payloads",
+			"Cross Tenant Message Projection");
+
+I_EXPORT_COMPONENT(
+			CrossTenantMessageBroker,
+			"Broker validating, projecting, storing and dispatching cross-tenant messages",
+			"Cross Tenant Message Broker");
+
+I_EXPORT_COMPONENT(
 			TenantDocumentNameProvider,
 			"Provides default document name from tenant name",
 			"Tenant Document Name Provider");

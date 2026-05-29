@@ -60,6 +60,9 @@
 #include <imtauth/CCrossOrgGrantManagerComp.h>
 #include <imtauth/CTenantConnectionRequestComp.h>
 #include <imtauth/CTenantConnectionRequestManagerComp.h>
+#include <imtauth/CCrossTenantMessageComp.h>
+#include <imtauth/CCrossTenantMessageProjectionComp.h>
+#include <imtauth/CCrossTenantMessageBrokerComp.h>
 #include <imtauth/CTenantDocumentNameProviderComp.h>
 
 
@@ -160,6 +163,9 @@ typedef icomp::TModelCompWrap<imtauth::CCrossOrgGrantComp> CrossOrgGrantInfo;
 typedef icomp::TModelCompWrap<imtauth::CCrossOrgGrantManagerComp> CrossOrgGrantManager;
 typedef icomp::TModelCompWrap<imtauth::CTenantConnectionRequestComp> TenantConnectionRequestInfo;
 typedef icomp::TModelCompWrap<imtauth::CTenantConnectionRequestManagerComp> TenantConnectionRequestManager;
+typedef icomp::TModelCompWrap<imtauth::CCrossTenantMessageComp> CrossTenantMessageInfo;
+typedef imtauth::CCrossTenantMessageProjectionComp CrossTenantMessageProjection;
+typedef icomp::TModelCompWrap<imtauth::CCrossTenantMessageBrokerComp> CrossTenantMessageBroker;
 typedef imtauth::CTenantDocumentNameProviderComp TenantDocumentNameProvider;
 
 
