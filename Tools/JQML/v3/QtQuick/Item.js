@@ -30,6 +30,8 @@ class Item extends QtObject {
         y: {type:Geometry, value:0, },
         width: {type:Geometry, value:0, },
         height: {type:Geometry, value:0, },
+        implicitWidth: {type:Geometry, value:0, },
+        implicitHeight: {type:Geometry, value:0, },
         z: {type:Int, value:0, },
         rotation: { type: Real, value: 0},
         transformOrigin: { type: Real, value: Item.Center},
@@ -65,6 +67,8 @@ class Item extends QtObject {
         yChanged: {type:Signal, args:[]},
         widthChanged: {type:Signal, args:[]},
         heightChanged: {type:Signal, args:[]},
+        implicitWidthChanged: {type:Signal, args:[]},
+        implicitHeightChanged: {type:Signal, args:[]},
         zChanged: {type:Signal, args:[]},
         rotationChanged: {type:Signal, args:[]},
         transformOriginChanged: {type:Signal, args:[]},
@@ -373,6 +377,7 @@ class Item extends QtObject {
             width: newValue > 0 ? newValue + 'px' : '0px',
             minWidth: newValue > 0 ? newValue + 'px' : '0px',
         })
+        this.implicitWidth = newValue
         JQApplication.updateLater(this.parent)
         Geometry.setAuto(this.__self, 'AWidth', newValue, this.__self.constructor.meta.AWidth)
         this.__updateSiblingAnchors()
@@ -384,6 +389,7 @@ class Item extends QtObject {
             height: newValue > 0 ? newValue + 'px' : '0px',
             minHeight: newValue > 0 ? newValue + 'px' : '0px',
         })
+        this.implicitHeight = newValue
         JQApplication.updateLater(this.parent)
         Geometry.setAuto(this.__self, 'AHeight', newValue, this.__self.constructor.meta.AHeight)
         this.__updateSiblingAnchors()

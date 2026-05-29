@@ -1,7 +1,7 @@
-const GroupProperty = require("../QtQml/GroupProperty")
-const Int = require("../QtQml/Int")
-const Real = require("../QtQml/Real")
-const Signal = require("../QtQml/Signal")
+const GroupProperty = require("./GroupProperty")
+const Int = require("./Int")
+const Real = require("./Real")
+const Signal = require("./Signal")
 
 class EasingGroup extends GroupProperty {
     static meta = {

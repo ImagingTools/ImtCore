@@ -2,9 +2,9 @@ const Animation = require("./Animation")
 const String = require("../QtQml/String")
 const Real = require("../QtQml/Real")
 const Var = require("../QtQml/Var")
-const EasingGroup = require("./EasingGroup")
+const EasingGroup = require("../QtQml/EasingGroup")
 const Signal = require("../QtQml/Signal")
-const { $easingFunc } = require("./easing")
+const { $easingFunc } = require("../Qt/easing")
 
 class PropertyAnimation extends Animation {
     static meta = Object.assign({}, Animation.meta, {
