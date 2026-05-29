@@ -92,7 +92,7 @@ DocumentViewBase {
 				}
 				if (stateManager_.isCreator) {
 					multiPageView.addPage("Permissions", qsTr("Permissions"), permissionsPageComp, "Icons/Role")
-					multiPageView.addPage("CrossOrgGrants", qsTr("Cross-Org Grants"), crossOrgGrantsPageComp, "Icons/Role")
+					multiPageView.addPage("CrossOrgGrants", qsTr("Cross-Org Grants"), crossOrgGrantsPageComp, "Icons/Link")
 				}
 			}
 			multiPageView.currentIndex = 0
