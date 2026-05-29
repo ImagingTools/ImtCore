@@ -751,7 +751,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 			FeedStream(stream, 1, false);
 
 			FeedStreamHorizontally(stream, 2);
-			stream << field.GetId();
+			stream << QStringLiteral("C") << sdlEntry.GetName() << QStringLiteral("::") << field.GetId();
 			stream << QStringLiteral(" = nullptr;");
 			FeedStream(stream, 1, false);
 
@@ -780,7 +780,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream);
-		stream << QStringLiteral(" return ") << field.GetId() << QStringLiteral(".HasValue();");
+		stream << QStringLiteral(" return ") << QStringLiteral("C") << sdlEntry.GetName() << QStringLiteral("::") << field.GetId() << QStringLiteral(".HasValue();");
 		FeedStream(stream, 1, false);
 
 		stream << QStringLiteral("}");
@@ -800,7 +800,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 			FeedStream(stream, 1, false);
 
 			FeedStreamHorizontally(stream);
-			stream << field.GetId() << QStringLiteral(".emplace();");
+			stream << QStringLiteral("C") << sdlEntry.GetName() << QStringLiteral("::") << field.GetId() << QStringLiteral(".emplace();");
 			FeedStream(stream, 1, false);
 
 			stream << QStringLiteral("}");
