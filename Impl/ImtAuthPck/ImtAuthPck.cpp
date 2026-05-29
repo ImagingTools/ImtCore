@@ -272,6 +272,16 @@ I_EXPORT_COMPONENT(
 			"Cross Org Grant Manager");
 
 I_EXPORT_COMPONENT(
+			TenantConnectionRequestInfo,
+			"Entity representing a tenant connection request used for discovery/bootstrap",
+			"Tenant Connection Request Info");
+
+I_EXPORT_COMPONENT(
+			TenantConnectionRequestManager,
+			"Manager for tenant connection requests and connect codes (create/accept/reject/revoke)",
+			"Tenant Connection Request Manager");
+
+I_EXPORT_COMPONENT(
 			TenantDocumentNameProvider,
 			"Provides default document name from tenant name",
 			"Tenant Document Name Provider");

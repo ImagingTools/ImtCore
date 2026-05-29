@@ -184,6 +184,12 @@ type TenantRelationship {
 	sourceTenantId: ID!
 	targetTenantId: ID!
 	role: TenantRelationshipRole!
+	sourceRole: TenantRelationshipRole
+	targetRole: TenantRelationshipRole
+	scope: String
+	validFrom: String
+	validUntil: String
+	isActive: Boolean
 	description: String
 	createdAt: String
 }
@@ -192,6 +198,11 @@ input AddTenantRelationshipInput {
 	sourceTenantId: ID!
 	targetTenantId: ID!
 	role: TenantRelationshipRole!
+	sourceRole: TenantRelationshipRole
+	targetRole: TenantRelationshipRole
+	scope: String
+	validFrom: String
+	validUntil: String
 	description: String
 }
 
@@ -201,6 +212,7 @@ type AddTenantRelationshipPayload {
 }
 
 input RemoveTenantRelationshipInput {
+	tenantId: ID!
 	relationshipId: ID!
 }
 

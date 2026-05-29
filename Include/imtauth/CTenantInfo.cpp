@@ -325,12 +325,24 @@ bool CTenantInfo::Serialize(iser::IArchive& archive)
 				int role = static_cast<int>(m_relationships[i].role);
 				QString desc = m_relationships[i].description;
 				QString created = m_relationships[i].createdAt;
+				int sourceRole = static_cast<int>(m_relationships[i].sourceRole);
+				int targetRole = static_cast<int>(m_relationships[i].targetRole);
+				QString scope = m_relationships[i].scope;
+				QString validFrom = m_relationships[i].validFrom;
+				QString validUntil = m_relationships[i].validUntil;
+				bool isActive = m_relationships[i].isActive;
 
 				retVal = retVal && archive.Process(relId);
 				retVal = retVal && archive.Process(targetId);
 				retVal = retVal && archive.Process(role);
 				retVal = retVal && archive.Process(desc);
 				retVal = retVal && archive.Process(created);
+				retVal = retVal && archive.Process(sourceRole);
+				retVal = retVal && archive.Process(targetRole);
+				retVal = retVal && archive.Process(scope);
+				retVal = retVal && archive.Process(validFrom);
+				retVal = retVal && archive.Process(validUntil);
+				retVal = retVal && archive.Process(isActive);
 
 				retVal = retVal && archive.EndTag(relTag);
 			}
@@ -343,14 +355,24 @@ bool CTenantInfo::Serialize(iser::IArchive& archive)
 
 				TenantRelationship rel;
 				int role = 0;
+				int sourceRole = 0;
+				int targetRole = 0;
 
 				retVal = retVal && archive.Process(rel.relationshipId);
 				retVal = retVal && archive.Process(rel.targetTenantId);
 				retVal = retVal && archive.Process(role);
 				retVal = retVal && archive.Process(rel.description);
 				retVal = retVal && archive.Process(rel.createdAt);
+				retVal = retVal && archive.Process(sourceRole);
+				retVal = retVal && archive.Process(targetRole);
+				retVal = retVal && archive.Process(rel.scope);
+				retVal = retVal && archive.Process(rel.validFrom);
+				retVal = retVal && archive.Process(rel.validUntil);
+				retVal = retVal && archive.Process(rel.isActive);
 
 				rel.role = static_cast<TenantRelationshipRole>(role);
+				rel.sourceRole = static_cast<TenantRelationshipRole>(sourceRole);
+				rel.targetRole = static_cast<TenantRelationshipRole>(targetRole);
 				m_relationships.append(rel);
 
 				retVal = retVal && archive.EndTag(relTag);

@@ -58,12 +58,27 @@ public:
 
 	/**
 		Structure describing a relationship between tenants.
+
+		Relationships are direction-aware and asymmetric: \a sourceRole describes
+		the role of the tenant owning this relationship entry, while \a targetRole
+		describes the role of the \a targetTenantId. For example a Customer→Supplier
+		relationship stored on the customer tenant has sourceRole = Customer and
+		targetRole = Supplier.
+
+		The legacy \a role field is kept for backward compatibility and mirrors
+		\a targetRole (the role of the target tenant).
 	*/
 	struct TenantRelationship
 	{
 		QByteArray relationshipId;
 		QByteArray targetTenantId;
-		TenantRelationshipRole role;
+		TenantRelationshipRole role = Partner;
+		TenantRelationshipRole sourceRole = Partner;
+		TenantRelationshipRole targetRole = Partner;
+		QString scope;
+		QString validFrom;
+		QString validUntil;
+		bool isActive = true;
 		QString description;
 		QString createdAt;
 
@@ -72,6 +87,12 @@ public:
 			return relationshipId == other.relationshipId
 				&& targetTenantId == other.targetTenantId
 				&& role == other.role
+				&& sourceRole == other.sourceRole
+				&& targetRole == other.targetRole
+				&& scope == other.scope
+				&& validFrom == other.validFrom
+				&& validUntil == other.validUntil
+				&& isActive == other.isActive
 				&& description == other.description
 				&& createdAt == other.createdAt;
 		}

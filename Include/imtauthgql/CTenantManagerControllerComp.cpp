@@ -14,6 +14,72 @@ namespace imtauthgql
 {
 
 
+namespace
+{
+
+
+imtauth::ITenantInfo::TenantRelationshipRole FromSdlRelationshipRole(sdl::imtauth::Tenants::TenantRelationshipRole role)
+{
+	switch (role){
+	case sdl::imtauth::Tenants::TenantRelationshipRole::Parent:
+		return imtauth::ITenantInfo::Parent;
+	case sdl::imtauth::Tenants::TenantRelationshipRole::Child:
+		return imtauth::ITenantInfo::Child;
+	case sdl::imtauth::Tenants::TenantRelationshipRole::Supplier:
+		return imtauth::ITenantInfo::Supplier;
+	case sdl::imtauth::Tenants::TenantRelationshipRole::Customer:
+		return imtauth::ITenantInfo::Customer;
+	case sdl::imtauth::Tenants::TenantRelationshipRole::Affiliate:
+		return imtauth::ITenantInfo::Affiliate;
+	default:
+		return imtauth::ITenantInfo::Partner;
+	}
+}
+
+
+sdl::imtauth::Tenants::TenantRelationshipRole ToSdlRelationshipRole(imtauth::ITenantInfo::TenantRelationshipRole role)
+{
+	switch (role){
+	case imtauth::ITenantInfo::Parent:
+		return sdl::imtauth::Tenants::TenantRelationshipRole::Parent;
+	case imtauth::ITenantInfo::Child:
+		return sdl::imtauth::Tenants::TenantRelationshipRole::Child;
+	case imtauth::ITenantInfo::Supplier:
+		return sdl::imtauth::Tenants::TenantRelationshipRole::Supplier;
+	case imtauth::ITenantInfo::Customer:
+		return sdl::imtauth::Tenants::TenantRelationshipRole::Customer;
+	case imtauth::ITenantInfo::Affiliate:
+		return sdl::imtauth::Tenants::TenantRelationshipRole::Affiliate;
+	default:
+		return sdl::imtauth::Tenants::TenantRelationshipRole::Partner;
+	}
+}
+
+
+sdl::imtauth::Tenants::CTenantRelationship::V1_0 RelationshipToData(
+		const QByteArray& sourceTenantId,
+		const imtauth::ITenantInfo::TenantRelationship& relationship)
+{
+	sdl::imtauth::Tenants::CTenantRelationship::V1_0 data;
+	data.id = relationship.relationshipId;
+	data.sourceTenantId = sourceTenantId;
+	data.targetTenantId = relationship.targetTenantId;
+	data.role = ToSdlRelationshipRole(relationship.role);
+	data.sourceRole = ToSdlRelationshipRole(relationship.sourceRole);
+	data.targetRole = ToSdlRelationshipRole(relationship.targetRole);
+	data.scope = relationship.scope;
+	data.validFrom = relationship.validFrom;
+	data.validUntil = relationship.validUntil;
+	data.isActive = relationship.isActive;
+	data.description = relationship.description;
+	data.createdAt = relationship.createdAt;
+	return data;
+}
+
+
+} // anonymous namespace
+
+
 // protected methods
 
 // reimplemented (sdl::imtauth::Tenants::CGraphQlHandlerCompBase)
@@ -41,11 +107,43 @@ sdl::imtauth::Tenants::CGetTenantIdsPayload CTenantManagerControllerComp::OnGetT
 
 
 sdl::imtauth::Tenants::CGetTenantRelationshipsPayload CTenantManagerControllerComp::OnGetTenantRelationships(
-			const sdl::imtauth::Tenants::CGetTenantRelationshipsGqlRequest& /*getTenantRelationshipsRequest*/,
+			const sdl::imtauth::Tenants::CGetTenantRelationshipsGqlRequest& getTenantRelationshipsRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
 	sdl::imtauth::Tenants::CGetTenantRelationshipsPayload response;
+
+	response.Version_1_0.emplace();
+
+	if (!m_tenantManagerCompPtr.IsValid()){
+		response.Version_1_0->errorMessage = QStringLiteral("Tenant manager is not configured");
+		return response;
+	}
+
+	QByteArray tenantId;
+	sdl::imtauth::Tenants::GetTenantRelationshipsRequestArguments arguments = getTenantRelationshipsRequest.GetRequestedArguments();
+	if (arguments.input.Version_1_0->tenantId){
+		tenantId = *arguments.input.Version_1_0->tenantId;
+	}
+
+	if (tenantId.isEmpty()){
+		response.Version_1_0->errorMessage = QStringLiteral("Tenant ID is required");
+		return response;
+	}
+
+	imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+	if (!tenantPtr.IsValid()){
+		response.Version_1_0->errorMessage = QStringLiteral("Tenant not found");
+		return response;
+	}
+
+	response.Version_1_0->relationships.Emplace();
+
+	const imtauth::ITenantInfo::TenantRelationships relationships = tenantPtr->GetRelationships();
+	for (const imtauth::ITenantInfo::TenantRelationship& relationship : relationships){
+		response.Version_1_0->relationships->push_back(RelationshipToData(tenantId, relationship));
+	}
+
 	return response;
 }
 
@@ -317,21 +415,112 @@ sdl::imtauth::Tenants::CSetTenantActivePayload CTenantManagerControllerComp::OnS
 
 
 sdl::imtauth::Tenants::CAddTenantRelationshipPayload CTenantManagerControllerComp::OnAddTenantRelationship(
-			const sdl::imtauth::Tenants::CAddTenantRelationshipGqlRequest& /*addTenantRelationshipRequest*/,
+			const sdl::imtauth::Tenants::CAddTenantRelationshipGqlRequest& addTenantRelationshipRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
 	sdl::imtauth::Tenants::CAddTenantRelationshipPayload response;
+
+	response.Version_1_0.emplace();
+
+	if (!m_tenantManagerCompPtr.IsValid()){
+		response.Version_1_0->errorMessage = QStringLiteral("Tenant manager is not configured");
+		return response;
+	}
+
+	QByteArray sourceTenantId;
+	QByteArray targetTenantId;
+	imtauth::ITenantInfo::TenantRelationshipRole role = imtauth::ITenantInfo::Partner;
+	imtauth::ITenantInfo::TenantRelationshipRole sourceRole = imtauth::ITenantInfo::Partner;
+	imtauth::ITenantInfo::TenantRelationshipRole targetRole = imtauth::ITenantInfo::Partner;
+	QString scope;
+	QString validFrom;
+	QString validUntil;
+	QString description;
+
+	sdl::imtauth::Tenants::AddTenantRelationshipRequestArguments arguments = addTenantRelationshipRequest.GetRequestedArguments();
+	if (arguments.input.Version_1_0->sourceTenantId){
+		sourceTenantId = *arguments.input.Version_1_0->sourceTenantId;
+	}
+	if (arguments.input.Version_1_0->targetTenantId){
+		targetTenantId = *arguments.input.Version_1_0->targetTenantId;
+	}
+	if (arguments.input.Version_1_0->role){
+		role = FromSdlRelationshipRole(*arguments.input.Version_1_0->role);
+		targetRole = role;
+	}
+	if (arguments.input.Version_1_0->sourceRole){
+		sourceRole = FromSdlRelationshipRole(*arguments.input.Version_1_0->sourceRole);
+	}
+	if (arguments.input.Version_1_0->targetRole){
+		targetRole = FromSdlRelationshipRole(*arguments.input.Version_1_0->targetRole);
+	}
+	if (arguments.input.Version_1_0->scope){
+		scope = *arguments.input.Version_1_0->scope;
+	}
+	if (arguments.input.Version_1_0->validFrom){
+		validFrom = *arguments.input.Version_1_0->validFrom;
+	}
+	if (arguments.input.Version_1_0->validUntil){
+		validUntil = *arguments.input.Version_1_0->validUntil;
+	}
+	if (arguments.input.Version_1_0->description){
+		description = *arguments.input.Version_1_0->description;
+	}
+
+	QByteArray relationshipId = m_tenantManagerCompPtr->AddTenantRelationship(
+				sourceTenantId,
+				targetTenantId,
+				role,
+				sourceRole,
+				targetRole,
+				scope,
+				validFrom,
+				validUntil,
+				description);
+
+	if (relationshipId.isEmpty()){
+		response.Version_1_0->errorMessage = QStringLiteral("Failed to add tenant relationship");
+		return response;
+	}
+
+	response.Version_1_0->relationshipId = relationshipId;
+
 	return response;
 }
 
 
 sdl::imtauth::Tenants::CRemoveTenantRelationshipPayload CTenantManagerControllerComp::OnRemoveTenantRelationship(
-			const sdl::imtauth::Tenants::CRemoveTenantRelationshipGqlRequest& /*removeTenantRelationshipRequest*/,
+			const sdl::imtauth::Tenants::CRemoveTenantRelationshipGqlRequest& removeTenantRelationshipRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
 	sdl::imtauth::Tenants::CRemoveTenantRelationshipPayload response;
+
+	response.Version_1_0.emplace();
+
+	if (!m_tenantManagerCompPtr.IsValid()){
+		response.Version_1_0->success = false;
+		response.Version_1_0->errorMessage = QStringLiteral("Tenant manager is not configured");
+		return response;
+	}
+
+	QByteArray tenantId;
+	QByteArray relationshipId;
+	sdl::imtauth::Tenants::RemoveTenantRelationshipRequestArguments arguments = removeTenantRelationshipRequest.GetRequestedArguments();
+	if (arguments.input.Version_1_0->tenantId){
+		tenantId = *arguments.input.Version_1_0->tenantId;
+	}
+	if (arguments.input.Version_1_0->relationshipId){
+		relationshipId = *arguments.input.Version_1_0->relationshipId;
+	}
+
+	bool success = m_tenantManagerCompPtr->RemoveTenantRelationship(tenantId, relationshipId);
+	response.Version_1_0->success = success;
+	if (!success){
+		response.Version_1_0->errorMessage = QStringLiteral("Failed to remove tenant relationship");
+	}
+
 	return response;
 }
 
