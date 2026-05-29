@@ -544,7 +544,26 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 					FeedStream(stream, 1, false);
 
 					FeedStreamHorizontally(stream, 3);
-					stream << QStringLiteral("if (itemPtr != nullptr) itemPtr->") << field.GetId() << QStringLiteral(" = ") << field.GetId() << ';';
+					if (!isArray){
+						const auto* sdlTypeField = dynamic_cast<const imtsdl::CSdlType*>(sdlEntryField.get());
+						if (sdlTypeField != nullptr){
+							stream << QStringLiteral("if (itemPtr != nullptr) {");
+							FeedStream(stream, 1, false);
+
+							const imtsdl::SdlFieldList subFields = sdlTypeField->GetFields();
+							for (const imtsdl::CSdlField& subField: subFields){
+								FeedStreamHorizontally(stream, 4);
+								stream << QStringLiteral("itemPtr->") << subField.GetId() << QStringLiteral(" = ") << field.GetId() << QStringLiteral("->") << subField.GetId() << ';';
+								FeedStream(stream, 1, false);
+							}
+
+							FeedStreamHorizontally(stream, 3);
+							stream << QStringLiteral("}");
+						}
+					}
+					else{
+						stream << QStringLiteral("if (itemPtr != nullptr) itemPtr->") << field.GetId() << QStringLiteral(" = ") << field.GetId() << ';';
+					}
 					FeedStream(stream, 1, false);
 				}
 

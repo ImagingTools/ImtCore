@@ -3253,7 +3253,10 @@ QVariant CSubstrateSpecificationListInputObject::GetViewParams()
 		if (!m_viewParamsQObjectPtr.isValid()){
 			m_viewParamsQObjectPtr = CreateObject("viewParams");
 			auto itemPtr = m_viewParamsQObjectPtr.value<sdl::V1_0::V1_0::CCollectionViewParamsTestObject*>();
-			if (itemPtr != nullptr) static_cast<decltype(viewParams)::value_type&>(*itemPtr) = *viewParams;
+			if (itemPtr != nullptr) {
+				itemPtr->count = viewParams->count;
+				itemPtr->offset = viewParams->offset;
+			}
 		}
 		return m_viewParamsQObjectPtr;
 	}
@@ -3883,7 +3886,7 @@ QVariant CSubstrateSpecificationListResponseObject::GetItems()
 		if (!m_itemsQObjectPtr.isValid()){
 			m_itemsQObjectPtr = CreateObject("items");
 			auto itemPtr = m_itemsQObjectPtr.value<sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList*>();
-			if (itemPtr != nullptr) static_cast<decltype(items)::value_type&>(*itemPtr) = *items;
+			if (itemPtr != nullptr) itemPtr->items = items;
 		}
 		return m_itemsQObjectPtr;
 	}
