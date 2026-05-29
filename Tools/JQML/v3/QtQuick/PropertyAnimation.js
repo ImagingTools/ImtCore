@@ -2,6 +2,7 @@ const Animation = require("./Animation")
 const String = require("../QtQml/String")
 const Real = require("../QtQml/Real")
 const Var = require("../QtQml/Var")
+const EasingGroup = require("./EasingGroup")
 const Signal = require("../QtQml/Signal")
 const { $easingFunc } = require("./easing")
 
@@ -13,7 +14,7 @@ class PropertyAnimation extends Animation {
         property: { type: String, value: '', signalName: 'propertyChanged'},
         properties: { type: String, value: ''},
         target: { type: Var, value: undefined},
-        easing: { type: Var, value: undefined},
+        easing: { type: EasingGroup},
 
         durationChanged: { type:Signal, args:[] },
         toChanged: { type:Signal, args:[] },
@@ -28,7 +29,6 @@ class PropertyAnimation extends Animation {
         let obj = super.create(parent, ...args)
         obj.target = parent
         obj.__elapsed = 0
-        obj.__easingObj = { type: 0, amplitude: 1.0, overshoot: 1.70158, period: 0.3 }
 
         return obj
     }
@@ -37,15 +37,6 @@ class PropertyAnimation extends Animation {
         this.properties = this.property
     }
 
-    SLOT_easingChanged(oldValue, newValue){
-        if(newValue && typeof newValue === 'object'){
-            if('type' in newValue) this.__easingObj.type = newValue.type
-            if('amplitude' in newValue) this.__easingObj.amplitude = newValue.amplitude
-            if('overshoot' in newValue) this.__easingObj.overshoot = newValue.overshoot
-            if('period' in newValue) this.__easingObj.period = newValue.period
-        }
-    }
-    
     restart() { 
         this.__elapsed = 0
         let properties = this.properties.split(',')
@@ -73,7 +64,7 @@ class PropertyAnimation extends Animation {
 
                 this.__elapsed += 1000 / 60
                 let t = Math.min(1, this.__elapsed / duration)
-                let progress = $easingFunc(t, this.__easingObj)
+                let progress = $easingFunc(t, this.easing)
                 let value = from + (to - from) * progress
 
                 if(t >= 1){
