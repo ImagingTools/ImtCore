@@ -207,6 +207,10 @@ bool CUserDatabaseDelegateComp::CreateSortQuery(const imtbase::IComplexCollectio
 
 QByteArray CUserDatabaseDelegateComp::CreateJoinTablesQuery() const
 {
+	if (IsSQLite()){
+		return QByteArray();
+	}
+
 	return QByteArray(R"(
 			LEFT JOIN "UserConnections" AS conn
 				ON conn."DocumentId" = root."DocumentId"
@@ -217,6 +221,10 @@ QByteArray CUserDatabaseDelegateComp::CreateJoinTablesQuery() const
 
 QByteArray CUserDatabaseDelegateComp::GetCustomColumnsQuery() const
 {
+	if (IsSQLite()){
+		return QByteArray();
+	}
+
 	return QByteArray(R"(
 			conn."Document"->>'LastConnection' as "LastConnection"
 	)");

@@ -67,11 +67,9 @@
 	├─ CreateUpdateObjectQuery() - SQL UPDATE for user changes
 	├─ CreateDeleteObjectsQuery() - SQL DELETE for users
 	├─ CreateObjectFilterQuery() - SQL WHERE clauses for filtering
-	└─ CreateJoinTablesQuery() - SQL JOIN with user groups
-	    │
-	    └─ CSqliteUserDatabaseDelegateComp (SQLite-specific)
-	        ├─ SQLite-specific SQL syntax
-	        └─ Optimized for embedded database
+	├─ CreateJoinTablesQuery() - SQL JOIN with user connections (Postgres)
+	└─ GetCustomColumnsQuery() - LastConnection column (Postgres)
+	    Handles both SQLite and PostgreSQL via IsSQLite() branching
 	\endcode
 	
 	<b>Role Management Delegates:</b>
@@ -81,10 +79,7 @@
 	├─ Role-permission associations
 	├─ Role hierarchy queries
 	└─ Permission lookup and validation
-	    │
-	    └─ CSqliteRoleDatabaseDelegateComp (SQLite-specific)
-	        ├─ SQLite role storage
-	        └─ Optimized role queries
+	    Handles both SQLite and PostgreSQL via IsSQLite() branching
 	\endcode
 	
 	<b>Group Management Delegates:</b>
@@ -94,8 +89,7 @@
 	├─ Group membership management
 	├─ Group hierarchy support
 	└─ Multi-level group queries
-	    │
-	    └─ CSqliteUserGroupDatabaseDelegateComp (SQLite-specific)
+	    Handles both SQLite and PostgreSQL via IsSQLite() branching
 	\endcode
 	
 	<b>Session Management Delegates:</b>
@@ -196,10 +190,10 @@
 	
 	**SQLite (Embedded/Development):**
 	\code{.cpp}
-	// Use SQLite-specific delegates
-	auto userDelegate = CSqliteUserDatabaseDelegateComp::CreateInstance();
-	auto roleDelegate = CSqliteRoleDatabaseDelegateComp::CreateInstance();
-	auto groupDelegate = CSqliteUserGroupDatabaseDelegateComp::CreateInstance();
+	// Use unified delegates (handle both SQLite and PostgreSQL via IsSQLite())
+	auto userDelegate = CUserDatabaseDelegateComp::CreateInstance();
+	auto roleDelegate = CRoleDatabaseDelegateComp::CreateInstance();
+	auto groupDelegate = CUserGroupDatabaseDelegateComp::CreateInstance();
 	
 	// SQLite database engine
 	auto dbEngine = CSqliteDatabaseEngineComp::CreateInstance();
