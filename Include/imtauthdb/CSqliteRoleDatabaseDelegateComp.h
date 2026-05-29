@@ -3,17 +3,17 @@
 
 
 // ImtCore includes
-#include <imtdb/CSqliteDatabaseDocumentDelegateComp.h>
+#include <imtdb/CSqlDatabaseDocumentDelegateComp.h>
 
 
 namespace imtauthdb
 {
 
 
-class CSqliteRoleDatabaseDelegateComp: public imtdb::CSqliteDatabaseDocumentDelegateComp
+class CSqliteRoleDatabaseDelegateComp: public imtdb::CSqlDatabaseDocumentDelegateComp
 {
 public:
-	typedef imtdb::CSqliteDatabaseDocumentDelegateComp BaseClass;
+	typedef imtdb::CSqlDatabaseDocumentDelegateComp BaseClass;
 
 	I_BEGIN_COMPONENT(CSqliteRoleDatabaseDelegateComp)
 	I_END_COMPONENT

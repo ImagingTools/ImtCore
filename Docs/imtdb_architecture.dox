@@ -125,8 +125,8 @@ The interface layer defines the core abstractions for database management:
     <td>Legacy version of document delegate for backward compatibility</td></tr>
 <tr><td>@ref imtdb::CSqlJsonDatabaseDelegateComp</td>
     <td>Extension supporting JSON-based object serialization and deserialization</td></tr>
-<tr><td>@ref imtdb::CSqliteDatabaseDocumentDelegateComp</td>
-    <td>SQLite-specific document delegate with dialect-specific SQL (LIMIT/OFFSET, JSON functions)</td></tr>
+<tr><td>@ref imtdb::CSqlDatabaseDocumentDelegateComp</td>
+    <td>Unified document delegate supporting both PostgreSQL and SQLite via GetDatabaseDriverId()</td></tr>
 <tr><td>@ref imtdb::CSqliteJsonDatabaseDelegateComp</td>
     <td>SQLite-specific JSON delegate implementation</td></tr>
 <tr><td>@ref imtdb::CSqlDatabaseObjectCollectionIterator</td>

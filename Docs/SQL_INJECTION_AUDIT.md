@@ -131,7 +131,7 @@ These are directly user-controlled strings (message content, ticket descriptions
 | 123 | `json_extract("Document",'$.%1') = '%2'` | `value` from `GetText()` |
 | 140–145 | `json_extract("Document",'$.%1') LIKE '%%2%'` | `textFilter` from `GetTextFilter()` |
 
-**CSqliteDatabaseDocumentDelegateComp.cpp:**
+**CSqlDatabaseDocumentDelegateComp.cpp (SQLite branch):**
 
 | Line | Query | Unescaped Parameter |
 |------|-------|-------------------|
