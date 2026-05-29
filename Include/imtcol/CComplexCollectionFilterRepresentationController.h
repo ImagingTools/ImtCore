@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <imtbase/IComplexCollectionFilter.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter>
 
 
 namespace imtcol
@@ -18,7 +18,7 @@ class CComplexCollectionFilterRepresentationController
 {
 public:
 	static bool ComplexCollectionFilterRepresentationToModel(
-		sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0& filterRepresentaion,
+		sdl::V1_0::imtbase::CComplexCollectionFilter& filterRepresentaion,
 		imtbase::IComplexCollectionFilter& filter,
 		ilog::IMessageConsumer* messageConsumerPtr);
 
@@ -35,11 +35,11 @@ private:
 private:
 	static QString GetFlagsAsString(int flags);
 	static bool ProcessFieldFilter(
-		const sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0& source,
+		const sdl::V1_0::imtbase::CFieldFilter& source,
 		imtbase::IComplexCollectionFilter::FieldFilter& target,
 		ilog::IMessageConsumer* messageConsumerPtr);
 	static bool ProcessGroupFilter(
-		const sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0& source,
+		const sdl::V1_0::imtbase::CGroupFilter& source,
 		imtbase::IComplexCollectionFilter::FilterExpression& target,
 		ilog::IMessageConsumer* messageConsumerPtr);
 

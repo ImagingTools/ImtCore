@@ -29,7 +29,7 @@
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtauth/IUserActionManager.h>
 #include <imtauth/CTenantFilterParam.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection>
 
 
 #undef GetObject
@@ -42,10 +42,10 @@ namespace imtservergql
 class CObjectCollectionControllerAttrCompBase: 
 			virtual public imtgql::IGqlRequestExtractor,
 			virtual public imtbase::ISearchController,
-			public sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase
+			public sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase
 {
 public:
-	typedef sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(CObjectCollectionControllerAttrCompBase)
 		I_REGISTER_INTERFACE(imtgql::IGqlRequestExtractor)
@@ -98,89 +98,89 @@ public:
 	virtual QString GetControllerName() const override;
 	virtual const imtbase::ISearchResults* Search(const QString& text) const override;
 
-	// reimplemented (sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase)
-	virtual sdl::imtbase::ImtCollection::CDuplicateElementsPayload OnDuplicateElements(
-				const sdl::imtbase::ImtCollection::CDuplicateElementsGqlRequest& duplicateElementsRequest,
+	// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+	virtual sdl::V1_0::imtbase::CDuplicateElementsPayload OnDuplicateElements(
+				const sdl::V1_0::imtbase::CDuplicateElementsGqlRequest& duplicateElementsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::ImtCollection::CVisualStatus OnGetObjectVisualStatus(
-				const sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
+	virtual sdl::V1_0::imtbase::CVisualStatus OnGetObjectVisualStatus(
+				const sdl::V1_0::imtbase::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::ImtCollection::CRemoveElementsPayload OnRemoveElements(
-				const sdl::imtbase::ImtCollection::CRemoveElementsGqlRequest& removeElementsRequest,
+	virtual sdl::V1_0::imtbase::CRemoveElementsPayload OnRemoveElements(
+				const sdl::V1_0::imtbase::CRemoveElementsGqlRequest& removeElementsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::ImtCollection::CRemoveElementSetPayload OnRemoveElementSet(
-				const sdl::imtbase::ImtCollection::CRemoveElementSetGqlRequest& removeElementSetRequest,
+	virtual sdl::V1_0::imtbase::CRemoveElementSetPayload OnRemoveElementSet(
+				const sdl::V1_0::imtbase::CRemoveElementSetGqlRequest& removeElementSetRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::ImtCollection::CRestoreObjectsPayload OnRestoreObjects(
-				const sdl::imtbase::ImtCollection::CRestoreObjectsGqlRequest& restoreObjectsRequest,
+	virtual sdl::V1_0::imtbase::CRestoreObjectsPayload OnRestoreObjects(
+				const sdl::V1_0::imtbase::CRestoreObjectsGqlRequest& restoreObjectsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::ImtCollection::CRestoreObjectSetPayload OnRestoreObjectSet(
-				const sdl::imtbase::ImtCollection::CRestoreObjectSetGqlRequest& restoreObjectSetRequest,
+	virtual sdl::V1_0::imtbase::CRestoreObjectSetPayload OnRestoreObjectSet(
+				const sdl::V1_0::imtbase::CRestoreObjectSetGqlRequest& restoreObjectSetRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::ImtCollection::CSetObjectNamePayload OnSetObjectName(
-				const sdl::imtbase::ImtCollection::CSetObjectNameGqlRequest& setObjectNameRequest,
+	virtual sdl::V1_0::imtbase::CSetObjectNamePayload OnSetObjectName(
+				const sdl::V1_0::imtbase::CSetObjectNameGqlRequest& setObjectNameRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::ImtCollection::CSetObjectDescriptionPayload OnSetObjectDescription(
-				const sdl::imtbase::ImtCollection::CSetObjectDescriptionGqlRequest& setObjectDescriptionRequest,
+	virtual sdl::V1_0::imtbase::CSetObjectDescriptionPayload OnSetObjectDescription(
+				const sdl::V1_0::imtbase::CSetObjectDescriptionGqlRequest& setObjectDescriptionRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::ImtCollection::CExportObjectPayload OnExportObject(
-				const sdl::imtbase::ImtCollection::CExportObjectGqlRequest& exportObjectRequest,
+	virtual sdl::V1_0::imtbase::CExportObjectPayload OnExportObject(
+				const sdl::V1_0::imtbase::CExportObjectGqlRequest& exportObjectRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::ImtCollection::CImportObjectPayload OnImportObject(
-				const sdl::imtbase::ImtCollection::CImportObjectGqlRequest& importObjectRequest,
+	virtual sdl::V1_0::imtbase::CImportObjectPayload OnImportObject(
+				const sdl::V1_0::imtbase::CImportObjectGqlRequest& importObjectRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::ImtCollection::CGetObjectTypeIdPayload OnGetObjectTypeId(
-				const sdl::imtbase::ImtCollection::CGetObjectTypeIdGqlRequest& getObjectTypeIdRequest,
+	virtual sdl::V1_0::imtbase::CGetObjectTypeIdPayload OnGetObjectTypeId(
+				const sdl::V1_0::imtbase::CGetObjectTypeIdGqlRequest& getObjectTypeIdRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::ImtCollection::CGetCollectionHeadersPayload OnGetCollectionHeaders(
-				const sdl::imtbase::ImtCollection::CGetCollectionHeadersGqlRequest& getCollectionHeadersRequest,
+	virtual sdl::V1_0::imtbase::CGetCollectionHeadersPayload OnGetCollectionHeaders(
+				const sdl::V1_0::imtbase::CGetCollectionHeadersGqlRequest& getCollectionHeadersRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::ImtCollection::CGetElementsCountPayload OnGetElementsCount(
-				const sdl::imtbase::ImtCollection::CGetElementsCountGqlRequest& getElementsCountRequest,
+	virtual sdl::V1_0::imtbase::CGetElementsCountPayload OnGetElementsCount(
+				const sdl::V1_0::imtbase::CGetElementsCountGqlRequest& getElementsCountRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::ImtCollection::CGetElementIdsPayload OnGetElementIds(
-				const sdl::imtbase::ImtCollection::CGetElementIdsGqlRequest& getElementIdsRequest,
+	virtual sdl::V1_0::imtbase::CGetElementIdsPayload OnGetElementIds(
+				const sdl::V1_0::imtbase::CGetElementIdsGqlRequest& getElementIdsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::ImtCollection::CInsertNewObjectPayload OnInsertNewObject(
-				const sdl::imtbase::ImtCollection::CInsertNewObjectGqlRequest& insertNewObjectRequest,
+	virtual sdl::V1_0::imtbase::CInsertNewObjectPayload OnInsertNewObject(
+				const sdl::V1_0::imtbase::CInsertNewObjectGqlRequest& insertNewObjectRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::ImtCollection::CSetObjectDataPayload OnSetObjectData(
-				const sdl::imtbase::ImtCollection::CSetObjectDataGqlRequest& setObjectDataRequest,
+	virtual sdl::V1_0::imtbase::CSetObjectDataPayload OnSetObjectData(
+				const sdl::V1_0::imtbase::CSetObjectDataGqlRequest& setObjectDataRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::ImtCollection::CGetObjectDataPayload OnGetObjectData(
-				const sdl::imtbase::ImtCollection::CGetObjectDataGqlRequest& getObjectDataRequest,
+	virtual sdl::V1_0::imtbase::CGetObjectDataPayload OnGetObjectData(
+				const sdl::V1_0::imtbase::CGetObjectDataGqlRequest& getObjectDataRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::ImtCollection::CGetDataMetaInfoPayload OnGetDataMetaInfo(
-				const sdl::imtbase::ImtCollection::CGetDataMetaInfoGqlRequest& getDataMetaInfoRequest,
+	virtual sdl::V1_0::imtbase::CGetDataMetaInfoPayload OnGetDataMetaInfo(
+				const sdl::V1_0::imtbase::CGetDataMetaInfoGqlRequest& getDataMetaInfoRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::ImtCollection::CGetElementInfoPayload OnGetElementInfo(
-				const sdl::imtbase::ImtCollection::CGetElementInfoGqlRequest& getElementInfoRequest,
+	virtual sdl::V1_0::imtbase::CGetElementInfoPayload OnGetElementInfo(
+				const sdl::V1_0::imtbase::CGetElementInfoGqlRequest& getElementInfoRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload OnGetElementMetaInfo(
-				const sdl::imtbase::ImtCollection::CGetElementMetaInfoGqlRequest& getElementMetaInfoRequest,
+	virtual sdl::V1_0::imtbase::CGetElementMetaInfoPayload OnGetElementMetaInfo(
+				const sdl::V1_0::imtbase::CGetElementMetaInfoGqlRequest& getElementMetaInfoRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::ImtCollection::CCreateSubCollectionPayload OnCreateSubCollection(
-				const sdl::imtbase::ImtCollection::CCreateSubCollectionGqlRequest& createSubCollectionRequest,
+	virtual sdl::V1_0::imtbase::CCreateSubCollectionPayload OnCreateSubCollection(
+				const sdl::V1_0::imtbase::CCreateSubCollectionGqlRequest& createSubCollectionRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
@@ -304,18 +304,18 @@ protected:
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const;
 	virtual QString GetObjectNameFromRequest(const imtgql::CGqlRequest& gqlRequest) const;
 	virtual bool CreateCollectionFilterFromViewParamsSdl(
-				const sdl::imtbase::ImtCollection::CCollectionViewParams::V1_0& viewParams,
+				const sdl::V1_0::imtbase::CCollectionViewParams& viewParams,
 				int& offset,
 				int& count,
 				iprm::CParamsSet& filterParams) const;
 	virtual bool CreateCollectionFilterFromSdl(
-				sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0& collectionFilter,
+				sdl::V1_0::imtbase::CComplexCollectionFilter& collectionFilter,
 				iprm::CParamsSet& filterParams) const;
 	virtual bool CreateDocumentFilterFromSdl(
-				sdl::imtbase::DocumentCollectionFilter::CDocumentCollectionFilter::V1_0& documentFilter,
+				sdl::V1_0::imtbase::CDocumentCollectionFilter& documentFilter,
 				iprm::CParamsSet& filterParams) const;
 	virtual QString ConvertMetaInfoToString(int infoType, const QVariant& metaInfoValue) const;
-	bool GetParamsSetFromRepresentation(sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0& representation, iprm::IParamsSet& paramsSet) const;
+	bool GetParamsSetFromRepresentation(sdl::V1_0::imtbase::CParamsSet& representation, iprm::IParamsSet& paramsSet) const;
 	bool RegisterFilterToSelectionParams(
 				iser::ISerializable& filterParam,
 				const imtserverapp::IJsonRepresentationController& representationController);

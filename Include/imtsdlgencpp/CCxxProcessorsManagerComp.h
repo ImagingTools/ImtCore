@@ -116,7 +116,7 @@ private:
 				const iprm::IParamsSet* paramsPtr) const;
 
 	/**
-		Generates a forward declaration header file (*_fwd.h) containing forward declarations
+		Generates a forward declaration header file containing forward declarations
 		for all generated classes (types, unions, document types).
 		This enables consumers to use forward declarations instead of heavy full includes.
 	*/
