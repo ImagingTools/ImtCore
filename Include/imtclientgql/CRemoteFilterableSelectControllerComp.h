@@ -3,7 +3,7 @@
 
 // ImtCore includes
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/FilterableSelect.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/FilterableSelect>
 
 
 namespace imtclientgql

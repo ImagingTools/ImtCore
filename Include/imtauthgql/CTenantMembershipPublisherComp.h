@@ -12,7 +12,7 @@
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/ITenantManager.h>
 #include <imtservergql/CGqlPublisherCompBase.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantMemberships.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantMemberships>
 
 
 namespace imtauthgql

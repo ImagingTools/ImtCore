@@ -5,7 +5,7 @@
 // ImtCore includes
 #include <imtauth/IRoleManager.h>
 #include <imtauthgql/CClientRequestManagerCompBase.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Roles.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Roles>
 
 
 namespace imtauthgql

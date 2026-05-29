@@ -6,7 +6,7 @@
 #include <imtauth/IUserGroupInfo.h>
 #include <imtauth/IUserInfoProvider.h>
 #include <imtauth/IUserGroupInfoProvider.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Groups.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Groups>
 
 
 namespace imtauthgql

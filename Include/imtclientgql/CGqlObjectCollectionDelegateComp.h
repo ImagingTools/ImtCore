@@ -18,7 +18,7 @@
 #include <imtserverapp/CComplexCollectionFilterRepresentationController.h>
 #include <imtserverapp/CDocumentFilterRepresentationController.h>
 #include <imtserverapp/CDocumentIdFilterRepresentationController.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection>
 
 
 namespace imtclientgql

@@ -5,7 +5,7 @@
 // ImtCore includes
 #include <imtserverapp/TJsonRepresentationControllerCompWrap.h>
 #include <imtserverapp/CParamSetRepresentationController.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtBaseTypes.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtBaseTypes>
 
 
 namespace imtserverapp

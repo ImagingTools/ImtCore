@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <imtcol/IDocumentCollectionFilter.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentCollectionFilter.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentCollectionFilter>
 
 
 namespace imtcol

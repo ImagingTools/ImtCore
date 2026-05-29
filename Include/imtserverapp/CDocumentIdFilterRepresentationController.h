@@ -4,7 +4,7 @@
 
 // ImtCore includes
 #include <imtserverapp/TJsonRepresentationControllerWrap.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentIdFilter.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentIdFilter>
 
 
 namespace imtserverapp

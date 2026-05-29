@@ -6,7 +6,7 @@
 #include <imtbase/IComplexCollectionFilter.h>
 #include <imtserverapp/TJsonRepresentationControllerWrap.h>
 #include <imtserverapp/CTimeFilterParamRepresentationController.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter>
 
 
 namespace imtserverapp

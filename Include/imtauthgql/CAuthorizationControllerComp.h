@@ -9,7 +9,7 @@
 #include <imtauth/ICredentialController.h>
 #include <imtauth/CUserInfo.h>
 #include <imtauth/IJwtSessionController.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization>
 
 
 namespace imtauthgql

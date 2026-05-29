@@ -4,7 +4,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/ImtDesk.h>
+#include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/ImtDesk>
 
 
 namespace imtdeskgql

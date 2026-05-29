@@ -8,7 +8,7 @@
 #include <imtservergql/CGqlPublisherCompBase.h>
 
 // ImtCore includes
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/CollectionDocumentService.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/CollectionDocumentService>
 
 
 namespace imtservergql

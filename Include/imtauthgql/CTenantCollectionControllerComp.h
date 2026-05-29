@@ -5,7 +5,7 @@
 // ImtCore includes
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/ITenantInvitationManager.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants>
 
 
 namespace imtauthgql

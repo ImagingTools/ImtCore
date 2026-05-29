@@ -18,7 +18,7 @@
 #include <imtauth/IUserGroupInfoProvider.h>
 
 // Generated includes
-#include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/TicketCollectionDocumentService.h>
+#include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/TicketCollectionDocumentService>
 
 
 namespace imtdeskgql

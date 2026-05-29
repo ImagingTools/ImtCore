@@ -11,8 +11,8 @@
 #include <imtbase/IObjectCollection.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtdoc/CCollectionDocumentServiceBase.h>
-#include <imtbasesdl/SDL/1.0/CPP/DocumentService.h>
-#include <imtbasesdl/SDL/1.0/CPP/UndoManager.h>
+#include <imtbasesdl/SDL/1.0/CPP/DocumentService>
+#include <imtbasesdl/SDL/1.0/CPP/UndoManager>
 
 
 namespace imtservergql

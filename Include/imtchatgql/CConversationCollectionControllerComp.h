@@ -3,7 +3,7 @@
 
 // ImtCore includes
 #include <imtchat/IConversation.h>
-#include <GeneratedFiles/imtchatsdl/SDL/1.0/CPP/ImtChat.h>
+#include <GeneratedFiles/imtchatsdl/SDL/1.0/CPP/ImtChat>
 
 
 namespace imtchatgql

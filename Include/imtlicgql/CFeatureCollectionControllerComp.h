@@ -4,7 +4,7 @@
 
 // ImtCore includes
 #include <imtlic/CFeatureInfo.h>
-#include <GeneratedFiles/imtlicsdl/SDL/1.0/CPP/Features.h>
+#include <GeneratedFiles/imtlicsdl/SDL/1.0/CPP/Features>
 
 
 namespace imtlicgql

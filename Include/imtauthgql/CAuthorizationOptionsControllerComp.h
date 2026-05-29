@@ -10,7 +10,7 @@
 #include <imtdb/IDatabaseServerConnectionChecker.h>
 #include <imtauth/ISuperuserProvider.h>
 #include <imtservergql/CGqlRepresentationDataControllerComp.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/AuthorizationOptions.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/AuthorizationOptions>
 
 
 namespace imtauthgql

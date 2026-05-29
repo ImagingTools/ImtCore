@@ -4,10 +4,10 @@
 
 // ImtCore includes
 #include <imtdoc/IDocumentService.h>
-#include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService.h>
+#include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService>
 
 // Generated includes
-#include <GeneratedFiles/imtchatsdl/SDL/1.0/CPP/ConversationCollectionDocumentService.h>
+#include <GeneratedFiles/imtchatsdl/SDL/1.0/CPP/ConversationCollectionDocumentService>
 
 
 namespace imtchatgql

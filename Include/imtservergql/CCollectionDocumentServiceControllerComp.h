@@ -8,8 +8,8 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtdoc/IDocumentService.h>
-#include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService.h>
-#include <imtbasesdl/SDL/1.0/CPP/UndoManager.h>
+#include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService>
+#include <imtbasesdl/SDL/1.0/CPP/UndoManager>
 
 
 namespace imtservergql

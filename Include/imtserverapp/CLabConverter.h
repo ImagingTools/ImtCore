@@ -3,7 +3,7 @@
 
 
 // Generated includes
-#include <GeneratedFiles/imtcolorsdl/SDL/1.0/CPP/Lab.h>
+#include <GeneratedFiles/imtcolorsdl/SDL/1.0/CPP/Lab>
 
 
 namespace icmm
