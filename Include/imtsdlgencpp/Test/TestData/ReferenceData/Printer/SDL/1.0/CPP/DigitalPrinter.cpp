@@ -639,16 +639,12 @@ CDigitalPrinterSpecificationObject::CDigitalPrinterSpecificationObject(QObject* 
 
 QVariant CDigitalPrinterSpecificationObject::GetBase()
 {
-	if (base){
-		if (!m_baseQObjectPtr.isValid()){
-			m_baseQObjectPtr = CreateObject("base");
-			auto itemPtr = m_baseQObjectPtr.value<sdl::V1_0::modsdl::CPrinterSpecificationBaseObject*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = base;
-		}
-		return m_baseQObjectPtr;
+	if (!m_baseQObjectPtr.isValid()){
+		m_baseQObjectPtr = CreateObject("base");
+		auto itemPtr = m_baseQObjectPtr.value<sdl::V1_0::modsdl::CPrinterSpecificationBaseObject*>();
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = base;
 	}
-
-	return QVariant();
+	return m_baseQObjectPtr;
 }
 
 
@@ -693,15 +689,11 @@ void CDigitalPrinterSpecificationObject::ResetBase()
 
 QVariant CDigitalPrinterSpecificationObject::GetPrintingTechnology()
 {
-	if (printingTechnology){
-		sdl::V1_0::modsdl::PrintingTechnology valueType = printingTechnology.value();
-		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::modsdl::PrintingTechnology>();
-		QString retval = metaEnum.valueToKey((int)valueType);
+	sdl::V1_0::modsdl::PrintingTechnology valueType = printingTechnology.value();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::modsdl::PrintingTechnology>();
+	QString retval = metaEnum.valueToKey((int)valueType);
 
-		return retval;
-	}
-
-	return QVariant();
+	return retval;
 }
 
 
@@ -902,16 +894,12 @@ CDigitalPrinterObject::CDigitalPrinterObject(QObject* parent): ::imtbase::CItemM
 
 QVariant CDigitalPrinterObject::GetBase()
 {
-	if (base){
-		if (!m_baseQObjectPtr.isValid()){
-			m_baseQObjectPtr = CreateObject("base");
-			auto itemPtr = m_baseQObjectPtr.value<sdl::V1_0::modsdl::CPrinterBaseObject*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = base;
-		}
-		return m_baseQObjectPtr;
+	if (!m_baseQObjectPtr.isValid()){
+		m_baseQObjectPtr = CreateObject("base");
+		auto itemPtr = m_baseQObjectPtr.value<sdl::V1_0::modsdl::CPrinterBaseObject*>();
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = base;
 	}
-
-	return QVariant();
+	return m_baseQObjectPtr;
 }
 
 
@@ -956,15 +944,11 @@ void CDigitalPrinterObject::ResetBase()
 
 QVariant CDigitalPrinterObject::GetPrintingTechnology()
 {
-	if (printingTechnology){
-		sdl::V1_0::modsdl::PrintingTechnology valueType = printingTechnology.value();
-		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::modsdl::PrintingTechnology>();
-		QString retval = metaEnum.valueToKey((int)valueType);
+	sdl::V1_0::modsdl::PrintingTechnology valueType = printingTechnology.value();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::modsdl::PrintingTechnology>();
+	QString retval = metaEnum.valueToKey((int)valueType);
 
-		return retval;
-	}
-
-	return QVariant();
+	return retval;
 }
 
 

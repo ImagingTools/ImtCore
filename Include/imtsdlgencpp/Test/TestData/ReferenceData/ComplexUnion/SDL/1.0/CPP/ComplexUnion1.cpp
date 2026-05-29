@@ -1014,11 +1014,7 @@ CPointObject::CPointObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
 QVariant CPointObject::GetX()
 {
-	if (X){
-		return X.value();
-	}
-
-	return QVariant();
+	return X.value();
 }
 
 
@@ -1038,11 +1034,7 @@ bool CPointObject::hasX()
 
 QVariant CPointObject::GetY()
 {
-	if (Y){
-		return Y.value();
-	}
-
-	return QVariant();
+	return Y.value();
 }
 
 
@@ -1238,15 +1230,11 @@ CGeometryObject::CGeometryObject(QObject* parent): ::imtbase::CItemModelBase(par
 
 QVariant CGeometryObject::GetGeometryType()
 {
-	if (GeometryType){
-		sdl::V1_0::complextest::GeometryType valueType = GeometryType.value();
-		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::GeometryType>();
-		QString retval = metaEnum.valueToKey((int)valueType);
+	sdl::V1_0::complextest::GeometryType valueType = GeometryType.value();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::GeometryType>();
+	QString retval = metaEnum.valueToKey((int)valueType);
 
-		return retval;
-	}
-
-	return QVariant();
+	return retval;
 }
 
 
@@ -1271,11 +1259,7 @@ bool CGeometryObject::hasGeometryType()
 
 QVariant CGeometryObject::GetRadius()
 {
-	if (Radius){
-		return Radius.value();
-	}
-
-	return QVariant();
+	return Radius.value();
 }
 
 
@@ -1295,16 +1279,12 @@ bool CGeometryObject::hasRadius()
 
 QVariant CGeometryObject::GetPoints()
 {
-	if (Points){
-		if (!m_pointsQObjectPtr.isValid()){
-			m_pointsQObjectPtr = CreateObject("Points");
-			auto itemPtr = m_pointsQObjectPtr.value<sdl::V1_0::complextest::CPointObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Points;
-		}
-		return m_pointsQObjectPtr;
+	if (!m_pointsQObjectPtr.isValid()){
+		m_pointsQObjectPtr = CreateObject("Points");
+		auto itemPtr = m_pointsQObjectPtr.value<sdl::V1_0::complextest::CPointObjectList*>();
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = Points;
 	}
-
-	return QVariant();
+	return m_pointsQObjectPtr;
 }
 
 
@@ -1356,16 +1336,12 @@ QVariant CGeometryObject::createPointsArrayElement(const QVariant& v)
 
 QVariant CGeometryObject::GetRequiredPoints()
 {
-	if (RequiredPoints){
-		if (!m_requiredPointsQObjectPtr.isValid()){
-			m_requiredPointsQObjectPtr = CreateObject("RequiredPoints");
-			auto itemPtr = m_requiredPointsQObjectPtr.value<sdl::V1_0::complextest::CPointObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = RequiredPoints;
-		}
-		return m_requiredPointsQObjectPtr;
+	if (!m_requiredPointsQObjectPtr.isValid()){
+		m_requiredPointsQObjectPtr = CreateObject("RequiredPoints");
+		auto itemPtr = m_requiredPointsQObjectPtr.value<sdl::V1_0::complextest::CPointObjectList*>();
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = RequiredPoints;
 	}
-
-	return QVariant();
+	return m_requiredPointsQObjectPtr;
 }
 
 
@@ -1417,16 +1393,12 @@ QVariant CGeometryObject::createRequiredPointsArrayElement(const QVariant& v)
 
 QVariant CGeometryObject::GetOptionalPoints()
 {
-	if (OptionalPoints){
-		if (!m_optionalPointsQObjectPtr.isValid()){
-			m_optionalPointsQObjectPtr = CreateObject("OptionalPoints");
-			auto itemPtr = m_optionalPointsQObjectPtr.value<sdl::V1_0::complextest::CPointObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = OptionalPoints;
-		}
-		return m_optionalPointsQObjectPtr;
+	if (!m_optionalPointsQObjectPtr.isValid()){
+		m_optionalPointsQObjectPtr = CreateObject("OptionalPoints");
+		auto itemPtr = m_optionalPointsQObjectPtr.value<sdl::V1_0::complextest::CPointObjectList*>();
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = OptionalPoints;
 	}
-
-	return QVariant();
+	return m_optionalPointsQObjectPtr;
 }
 
 

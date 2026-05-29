@@ -1704,11 +1704,7 @@ CCoordsObject::CCoordsObject(QObject* parent): ::imtbase::CItemModelBase(parent)
 
 QVariant CCoordsObject::GetX()
 {
-	if (X){
-		return X.value();
-	}
-
-	return QVariant();
+	return X.value();
 }
 
 
@@ -1728,11 +1724,7 @@ bool CCoordsObject::hasX()
 
 QVariant CCoordsObject::GetY()
 {
-	if (Y){
-		return Y.value();
-	}
-
-	return QVariant();
+	return Y.value();
 }
 
 
@@ -1924,11 +1916,7 @@ CPrinterSpecificationBaseObject::CPrinterSpecificationBaseObject(QObject* parent
 
 QVariant CPrinterSpecificationBaseObject::GetName()
 {
-	if (name){
-		return name.value();
-	}
-
-	return QVariant();
+	return name.value();
 }
 
 
@@ -2116,11 +2104,7 @@ CLinkObject::CLinkObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
 QVariant CLinkObject::GetLink()
 {
-	if (link){
-		return link.value();
-	}
-
-	return QVariant();
+	return link.value();
 }
 
 
@@ -2140,15 +2124,11 @@ bool CLinkObject::hasLink()
 
 QVariant CLinkObject::GetStatus()
 {
-	if (status){
-		sdl::V1_0::modsdl::LinkStatus valueType = status.value();
-		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::modsdl::LinkStatus>();
-		QString retval = metaEnum.valueToKey((int)valueType);
+	sdl::V1_0::modsdl::LinkStatus valueType = status.value();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::modsdl::LinkStatus>();
+	QString retval = metaEnum.valueToKey((int)valueType);
 
-		return retval;
-	}
-
-	return QVariant();
+	return retval;
 }
 
 
@@ -2173,11 +2153,7 @@ bool CLinkObject::hasStatus()
 
 QVariant CLinkObject::GetStatusList()
 {
-	if (statusList){
-		
-	}
-
-	return QVariant();
+	
 }
 
 
@@ -2378,11 +2354,7 @@ CPrinterBaseObject::CPrinterBaseObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CPrinterBaseObject::GetName()
 {
-	if (name){
-		return name.value();
-	}
-
-	return QVariant();
+	return name.value();
 }
 
 
@@ -2402,16 +2374,12 @@ bool CPrinterBaseObject::hasName()
 
 QVariant CPrinterBaseObject::GetLinkList()
 {
-	if (linkList){
-		if (!m_linkListQObjectPtr.isValid()){
-			m_linkListQObjectPtr = CreateObject("linkList");
-			auto itemPtr = m_linkListQObjectPtr.value<sdl::V1_0::modsdl::CLinkObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = linkList;
-		}
-		return m_linkListQObjectPtr;
+	if (!m_linkListQObjectPtr.isValid()){
+		m_linkListQObjectPtr = CreateObject("linkList");
+		auto itemPtr = m_linkListQObjectPtr.value<sdl::V1_0::modsdl::CLinkObjectList*>();
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = linkList;
 	}
-
-	return QVariant();
+	return m_linkListQObjectPtr;
 }
 
 
@@ -2463,29 +2431,25 @@ QVariant CPrinterBaseObject::createLinkListArrayElement(const QVariant& v)
 
 QVariant CPrinterBaseObject::GetSpecification()
 {
-	if (specification){
-		if (m_specificationQObjectPtr.isValid()){
-			if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>((specification).GetPtr())){
-				CPrinterSpecificationBaseObject *newObjectPtr = new CPrinterSpecificationBaseObject(this);
-				static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
-				m_specificationQObjectPtr = QVariant::fromValue(newObjectPtr);
-			}
-			if (const CLink* val = std::get_if<CLink>((specification).GetPtr())){
-				CLinkObject *newObjectPtr = new CLinkObject(this);
-				static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
-				m_specificationQObjectPtr = QVariant::fromValue(newObjectPtr);
-			}
-			if (const QString* val = std::get_if<QString>((specification).GetPtr())){
-				m_specificationQObjectPtr = QVariant::fromValue(val);
-			}
-			if (const double* val = std::get_if<double>((specification).GetPtr())){
-				m_specificationQObjectPtr = QVariant::fromValue(val);
-			}
+	if (m_specificationQObjectPtr.isValid()){
+		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>((specification).GetPtr())){
+			CPrinterSpecificationBaseObject *newObjectPtr = new CPrinterSpecificationBaseObject(this);
+			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			m_specificationQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
-		return m_specificationQObjectPtr;
+		if (const CLink* val = std::get_if<CLink>((specification).GetPtr())){
+			CLinkObject *newObjectPtr = new CLinkObject(this);
+			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			m_specificationQObjectPtr = QVariant::fromValue(newObjectPtr);
+		}
+		if (const QString* val = std::get_if<QString>((specification).GetPtr())){
+			m_specificationQObjectPtr = QVariant::fromValue(val);
+		}
+		if (const double* val = std::get_if<double>((specification).GetPtr())){
+			m_specificationQObjectPtr = QVariant::fromValue(val);
+		}
 	}
-
-	return QVariant();
+	return m_specificationQObjectPtr;
 }
 
 
@@ -2540,16 +2504,12 @@ void CPrinterBaseObject::ResetSpecification()
 
 QVariant CPrinterBaseObject::GetSpecificationList()
 {
-	if (specificationList){
-		if (!m_specificationListQObjectPtr.isValid()){
-			m_specificationListQObjectPtr = CreateObject("specificationList");
-			auto itemPtr = m_specificationListQObjectPtr.value<sdl::V1_0::modsdl::CPrinterSpecificationObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = specificationList;
-		}
-		return m_specificationListQObjectPtr;
+	if (!m_specificationListQObjectPtr.isValid()){
+		m_specificationListQObjectPtr = CreateObject("specificationList");
+		auto itemPtr = m_specificationListQObjectPtr.value<sdl::V1_0::modsdl::CPrinterSpecificationObjectList*>();
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = specificationList;
 	}
-
-	return QVariant();
+	return m_specificationListQObjectPtr;
 }
 
 

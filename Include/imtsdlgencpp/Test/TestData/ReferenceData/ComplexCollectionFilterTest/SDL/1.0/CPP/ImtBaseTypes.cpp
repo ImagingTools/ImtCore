@@ -4535,11 +4535,7 @@ CTimeRangeObject::CTimeRangeObject(QObject* parent): ::imtbase::CItemModelBase(p
 
 QVariant CTimeRangeObject::GetBegin()
 {
-	if (Begin){
-		return Begin.value();
-	}
-
-	return QVariant();
+	return Begin.value();
 }
 
 
@@ -4559,11 +4555,7 @@ bool CTimeRangeObject::hasBegin()
 
 QVariant CTimeRangeObject::GetEnd()
 {
-	if (End){
-		return End.value();
-	}
-
-	return QVariant();
+	return End.value();
 }
 
 
@@ -4756,11 +4748,7 @@ CSdlSizeObject::CSdlSizeObject(QObject* parent): ::imtbase::CItemModelBase(paren
 
 QVariant CSdlSizeObject::GetWidth()
 {
-	if (width){
-		return width.value();
-	}
-
-	return QVariant();
+	return width.value();
 }
 
 
@@ -4780,11 +4768,7 @@ bool CSdlSizeObject::hasWidth()
 
 QVariant CSdlSizeObject::GetHeight()
 {
-	if (height){
-		return height.value();
-	}
-
-	return QVariant();
+	return height.value();
 }
 
 
@@ -4977,11 +4961,7 @@ CSdlPointObject::CSdlPointObject(QObject* parent): ::imtbase::CItemModelBase(par
 
 QVariant CSdlPointObject::GetX()
 {
-	if (x){
-		return x.value();
-	}
-
-	return QVariant();
+	return x.value();
 }
 
 
@@ -5001,11 +4981,7 @@ bool CSdlPointObject::hasX()
 
 QVariant CSdlPointObject::GetY()
 {
-	if (y){
-		return y.value();
-	}
-
-	return QVariant();
+	return y.value();
 }
 
 
@@ -5210,11 +5186,7 @@ CParamTypeIdsObject::CParamTypeIdsObject(QObject* parent): ::imtbase::CItemModel
 
 QVariant CParamTypeIdsObject::GetUrlParam()
 {
-	if (UrlParam){
-		return UrlParam.value();
-	}
-
-	return QVariant();
+	return UrlParam.value();
 }
 
 
@@ -5234,11 +5206,7 @@ bool CParamTypeIdsObject::hasUrlParam()
 
 QVariant CParamTypeIdsObject::GetIdParam()
 {
-	if (IdParam){
-		return IdParam.value();
-	}
-
-	return QVariant();
+	return IdParam.value();
 }
 
 
@@ -5258,11 +5226,7 @@ bool CParamTypeIdsObject::hasIdParam()
 
 QVariant CParamTypeIdsObject::GetTextParam()
 {
-	if (TextParam){
-		return TextParam.value();
-	}
-
-	return QVariant();
+	return TextParam.value();
 }
 
 
@@ -5282,11 +5246,7 @@ bool CParamTypeIdsObject::hasTextParam()
 
 QVariant CParamTypeIdsObject::GetTextView()
 {
-	if (TextView){
-		return TextView.value();
-	}
-
-	return QVariant();
+	return TextView.value();
 }
 
 
@@ -5306,11 +5266,7 @@ bool CParamTypeIdsObject::hasTextView()
 
 QVariant CParamTypeIdsObject::GetSelectionParam()
 {
-	if (SelectionParam){
-		return SelectionParam.value();
-	}
-
-	return QVariant();
+	return SelectionParam.value();
 }
 
 
@@ -5330,11 +5286,7 @@ bool CParamTypeIdsObject::hasSelectionParam()
 
 QVariant CParamTypeIdsObject::GetSchedulerParam()
 {
-	if (SchedulerParam){
-		return SchedulerParam.value();
-	}
-
-	return QVariant();
+	return SchedulerParam.value();
 }
 
 
@@ -5354,11 +5306,7 @@ bool CParamTypeIdsObject::hasSchedulerParam()
 
 QVariant CParamTypeIdsObject::GetBackupSettings()
 {
-	if (BackupSettings){
-		return BackupSettings.value();
-	}
-
-	return QVariant();
+	return BackupSettings.value();
 }
 
 
@@ -5378,11 +5326,7 @@ bool CParamTypeIdsObject::hasBackupSettings()
 
 QVariant CParamTypeIdsObject::GetDatabaseAccessSettings()
 {
-	if (DatabaseAccessSettings){
-		return DatabaseAccessSettings.value();
-	}
-
-	return QVariant();
+	return DatabaseAccessSettings.value();
 }
 
 
@@ -5402,11 +5346,7 @@ bool CParamTypeIdsObject::hasDatabaseAccessSettings()
 
 QVariant CParamTypeIdsObject::GetParamsSet()
 {
-	if (ParamsSet){
-		return ParamsSet.value();
-	}
-
-	return QVariant();
+	return ParamsSet.value();
 }
 
 
@@ -5426,11 +5366,7 @@ bool CParamTypeIdsObject::hasParamsSet()
 
 QVariant CParamTypeIdsObject::GetFileNameParam()
 {
-	if (FileNameParam){
-		return FileNameParam.value();
-	}
-
-	return QVariant();
+	return FileNameParam.value();
 }
 
 
@@ -5450,11 +5386,7 @@ bool CParamTypeIdsObject::hasFileNameParam()
 
 QVariant CParamTypeIdsObject::GetIntegerParam()
 {
-	if (IntegerParam){
-		return IntegerParam.value();
-	}
-
-	return QVariant();
+	return IntegerParam.value();
 }
 
 
@@ -5474,11 +5406,7 @@ bool CParamTypeIdsObject::hasIntegerParam()
 
 QVariant CParamTypeIdsObject::GetDoubleParam()
 {
-	if (DoubleParam){
-		return DoubleParam.value();
-	}
-
-	return QVariant();
+	return DoubleParam.value();
 }
 
 
@@ -5498,11 +5426,7 @@ bool CParamTypeIdsObject::hasDoubleParam()
 
 QVariant CParamTypeIdsObject::GetPasswordParam()
 {
-	if (PasswordParam){
-		return PasswordParam.value();
-	}
-
-	return QVariant();
+	return PasswordParam.value();
 }
 
 
@@ -5522,11 +5446,7 @@ bool CParamTypeIdsObject::hasPasswordParam()
 
 QVariant CParamTypeIdsObject::GetEnableableParam()
 {
-	if (EnableableParam){
-		return EnableableParam.value();
-	}
-
-	return QVariant();
+	return EnableableParam.value();
 }
 
 
@@ -5793,11 +5713,7 @@ CUrlParamObject::CUrlParamObject(QObject* parent): ::imtbase::CItemModelBase(par
 
 QVariant CUrlParamObject::GetScheme()
 {
-	if (scheme){
-		return scheme.value();
-	}
-
-	return QVariant();
+	return scheme.value();
 }
 
 
@@ -5817,11 +5733,7 @@ bool CUrlParamObject::hasScheme()
 
 QVariant CUrlParamObject::GetHost()
 {
-	if (host){
-		return host.value();
-	}
-
-	return QVariant();
+	return host.value();
 }
 
 
@@ -5841,11 +5753,7 @@ bool CUrlParamObject::hasHost()
 
 QVariant CUrlParamObject::GetPort()
 {
-	if (port){
-		return port.value();
-	}
-
-	return QVariant();
+	return port.value();
 }
 
 
@@ -5865,11 +5773,7 @@ bool CUrlParamObject::hasPort()
 
 QVariant CUrlParamObject::GetPath()
 {
-	if (path){
-		return path.value();
-	}
-
-	return QVariant();
+	return path.value();
 }
 
 
@@ -6073,11 +5977,7 @@ CIdParamObject::CIdParamObject(QObject* parent): ::imtbase::CItemModelBase(paren
 
 QVariant CIdParamObject::GetId()
 {
-	if (id){
-		return id.value();
-	}
-
-	return QVariant();
+	return id.value();
 }
 
 
@@ -6263,11 +6163,7 @@ CTextParamObject::CTextParamObject(QObject* parent): ::imtbase::CItemModelBase(p
 
 QVariant CTextParamObject::GetText()
 {
-	if (text){
-		return text.value();
-	}
-
-	return QVariant();
+	return text.value();
 }
 
 
@@ -6453,11 +6349,7 @@ CEnableableParamObject::CEnableableParamObject(QObject* parent): ::imtbase::CIte
 
 QVariant CEnableableParamObject::GetValue()
 {
-	if (value){
-		return value.value();
-	}
-
-	return QVariant();
+	return value.value();
 }
 
 
@@ -6643,11 +6535,7 @@ CIntegerParamObject::CIntegerParamObject(QObject* parent): ::imtbase::CItemModel
 
 QVariant CIntegerParamObject::GetValue()
 {
-	if (value){
-		return value.value();
-	}
-
-	return QVariant();
+	return value.value();
 }
 
 
@@ -6833,11 +6721,7 @@ CDoubleParamObject::CDoubleParamObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CDoubleParamObject::GetValue()
 {
-	if (value){
-		return value.value();
-	}
-
-	return QVariant();
+	return value.value();
 }
 
 
@@ -7026,11 +6910,7 @@ COptionObject::COptionObject(QObject* parent): ::imtbase::CItemModelBase(parent)
 
 QVariant COptionObject::GetId()
 {
-	if (id){
-		return id.value();
-	}
-
-	return QVariant();
+	return id.value();
 }
 
 
@@ -7050,11 +6930,7 @@ bool COptionObject::hasId()
 
 QVariant COptionObject::GetName()
 {
-	if (name){
-		return name.value();
-	}
-
-	return QVariant();
+	return name.value();
 }
 
 
@@ -7074,11 +6950,7 @@ bool COptionObject::hasName()
 
 QVariant COptionObject::GetDescription()
 {
-	if (description){
-		return description.value();
-	}
-
-	return QVariant();
+	return description.value();
 }
 
 
@@ -7098,11 +6970,7 @@ bool COptionObject::hasDescription()
 
 QVariant COptionObject::GetEnabled()
 {
-	if (enabled){
-		return enabled.value();
-	}
-
-	return QVariant();
+	return enabled.value();
 }
 
 
@@ -7308,11 +7176,7 @@ COptionsListObject::COptionsListObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant COptionsListObject::GetTotalCount()
 {
-	if (totalCount){
-		return totalCount.value();
-	}
-
-	return QVariant();
+	return totalCount.value();
 }
 
 
@@ -7332,11 +7196,7 @@ bool COptionsListObject::hasTotalCount()
 
 QVariant COptionsListObject::GetOffset()
 {
-	if (offset){
-		return offset.value();
-	}
-
-	return QVariant();
+	return offset.value();
 }
 
 
@@ -7356,16 +7216,12 @@ bool COptionsListObject::hasOffset()
 
 QVariant COptionsListObject::GetOptions()
 {
-	if (options){
-		if (!m_optionsQObjectPtr.isValid()){
-			m_optionsQObjectPtr = CreateObject("options");
-			auto itemPtr = m_optionsQObjectPtr.value<sdl::V1_0::imtbase::COptionObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = options;
-		}
-		return m_optionsQObjectPtr;
+	if (!m_optionsQObjectPtr.isValid()){
+		m_optionsQObjectPtr = CreateObject("options");
+		auto itemPtr = m_optionsQObjectPtr.value<sdl::V1_0::imtbase::COptionObjectList*>();
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = options;
 	}
-
-	return QVariant();
+	return m_optionsQObjectPtr;
 }
 
 
@@ -7599,11 +7455,7 @@ CSelectionParamObject::CSelectionParamObject(QObject* parent): ::imtbase::CItemM
 
 QVariant CSelectionParamObject::GetSelectedIndex()
 {
-	if (selectedIndex){
-		return selectedIndex.value();
-	}
-
-	return QVariant();
+	return selectedIndex.value();
 }
 
 
@@ -7623,16 +7475,12 @@ bool CSelectionParamObject::hasSelectedIndex()
 
 QVariant CSelectionParamObject::GetConstraints()
 {
-	if (constraints){
-		if (!m_constraintsQObjectPtr.isValid()){
-			m_constraintsQObjectPtr = CreateObject("constraints");
-			auto itemPtr = m_constraintsQObjectPtr.value<sdl::V1_0::imtbase::COptionsListObject*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = constraints;
-		}
-		return m_constraintsQObjectPtr;
+	if (!m_constraintsQObjectPtr.isValid()){
+		m_constraintsQObjectPtr = CreateObject("constraints");
+		auto itemPtr = m_constraintsQObjectPtr.value<sdl::V1_0::imtbase::COptionsListObject*>();
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = constraints;
 	}
-
-	return QVariant();
+	return m_constraintsQObjectPtr;
 }
 
 
@@ -7853,11 +7701,7 @@ CSchedulerParamObject::CSchedulerParamObject(QObject* parent): ::imtbase::CItemM
 
 QVariant CSchedulerParamObject::GetStartTime()
 {
-	if (startTime){
-		return startTime.value();
-	}
-
-	return QVariant();
+	return startTime.value();
 }
 
 
@@ -7877,11 +7721,7 @@ bool CSchedulerParamObject::hasStartTime()
 
 QVariant CSchedulerParamObject::GetInterval()
 {
-	if (interval){
-		return interval.value();
-	}
-
-	return QVariant();
+	return interval.value();
 }
 
 
@@ -8074,16 +7914,12 @@ CBackupSettingsObject::CBackupSettingsObject(QObject* parent): ::imtbase::CItemM
 
 QVariant CBackupSettingsObject::GetSchedulerParam()
 {
-	if (schedulerParam){
-		if (!m_schedulerParamQObjectPtr.isValid()){
-			m_schedulerParamQObjectPtr = CreateObject("schedulerParam");
-			auto itemPtr = m_schedulerParamQObjectPtr.value<sdl::V1_0::imtbase::CSchedulerParamObject*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = schedulerParam;
-		}
-		return m_schedulerParamQObjectPtr;
+	if (!m_schedulerParamQObjectPtr.isValid()){
+		m_schedulerParamQObjectPtr = CreateObject("schedulerParam");
+		auto itemPtr = m_schedulerParamQObjectPtr.value<sdl::V1_0::imtbase::CSchedulerParamObject*>();
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = schedulerParam;
 	}
-
-	return QVariant();
+	return m_schedulerParamQObjectPtr;
 }
 
 
@@ -8128,11 +7964,7 @@ void CBackupSettingsObject::ResetSchedulerParam()
 
 QVariant CBackupSettingsObject::GetFolderPath()
 {
-	if (folderPath){
-		return folderPath.value();
-	}
-
-	return QVariant();
+	return folderPath.value();
 }
 
 
@@ -8332,11 +8164,7 @@ CDatabaseAccessSettingsObject::CDatabaseAccessSettingsObject(QObject* parent): :
 
 QVariant CDatabaseAccessSettingsObject::GetDbName()
 {
-	if (dbName){
-		return dbName.value();
-	}
-
-	return QVariant();
+	return dbName.value();
 }
 
 
@@ -8356,11 +8184,7 @@ bool CDatabaseAccessSettingsObject::hasDbName()
 
 QVariant CDatabaseAccessSettingsObject::GetHost()
 {
-	if (host){
-		return host.value();
-	}
-
-	return QVariant();
+	return host.value();
 }
 
 
@@ -8380,11 +8204,7 @@ bool CDatabaseAccessSettingsObject::hasHost()
 
 QVariant CDatabaseAccessSettingsObject::GetPort()
 {
-	if (port){
-		return port.value();
-	}
-
-	return QVariant();
+	return port.value();
 }
 
 
@@ -8404,11 +8224,7 @@ bool CDatabaseAccessSettingsObject::hasPort()
 
 QVariant CDatabaseAccessSettingsObject::GetDbPath()
 {
-	if (dbPath){
-		return dbPath.value();
-	}
-
-	return QVariant();
+	return dbPath.value();
 }
 
 
@@ -8428,11 +8244,7 @@ bool CDatabaseAccessSettingsObject::hasDbPath()
 
 QVariant CDatabaseAccessSettingsObject::GetUsername()
 {
-	if (username){
-		return username.value();
-	}
-
-	return QVariant();
+	return username.value();
 }
 
 
@@ -8452,11 +8264,7 @@ bool CDatabaseAccessSettingsObject::hasUsername()
 
 QVariant CDatabaseAccessSettingsObject::GetPassword()
 {
-	if (password){
-		return password.value();
-	}
-
-	return QVariant();
+	return password.value();
 }
 
 
@@ -8673,11 +8481,7 @@ CFileNameParamObject::CFileNameParamObject(QObject* parent): ::imtbase::CItemMod
 
 QVariant CFileNameParamObject::GetPathType()
 {
-	if (pathType){
-		return pathType.value();
-	}
-
-	return QVariant();
+	return pathType.value();
 }
 
 
@@ -8697,11 +8501,7 @@ bool CFileNameParamObject::hasPathType()
 
 QVariant CFileNameParamObject::GetPath()
 {
-	if (path){
-		return path.value();
-	}
-
-	return QVariant();
+	return path.value();
 }
 
 
@@ -8897,15 +8697,11 @@ CParamsSetObject::CParamsSetObject(QObject* parent): ::imtbase::CItemModelBase(p
 
 QVariant CParamsSetObject::GetParamIds()
 {
-	if (paramIds){
-		QList<QString> tempParamIdsList;
-		for (const auto& tempValue: paramIds.value()){
-			tempParamIdsList << *tempValue;
-		}
-		return QVariant::fromValue(tempParamIdsList);
+	QList<QString> tempParamIdsList;
+	for (const auto& tempValue: paramIds.value()){
+		tempParamIdsList << *tempValue;
 	}
-
-	return QVariant();
+	return QVariant::fromValue(tempParamIdsList);
 }
 
 
@@ -8935,15 +8731,11 @@ bool CParamsSetObject::hasParamIds()
 
 QVariant CParamsSetObject::GetParamTypeIds()
 {
-	if (paramTypeIds){
-		QList<QString> tempParamTypeIdsList;
-		for (const auto& tempValue: paramTypeIds.value()){
-			tempParamTypeIdsList << *tempValue;
-		}
-		return QVariant::fromValue(tempParamTypeIdsList);
+	QList<QString> tempParamTypeIdsList;
+	for (const auto& tempValue: paramTypeIds.value()){
+		tempParamTypeIdsList << *tempValue;
 	}
-
-	return QVariant();
+	return QVariant::fromValue(tempParamTypeIdsList);
 }
 
 
@@ -8973,15 +8765,11 @@ bool CParamsSetObject::hasParamTypeIds()
 
 QVariant CParamsSetObject::GetParamNames()
 {
-	if (paramNames){
-		QList<QString> tempParamNamesList;
-		for (const auto& tempValue: paramNames.value()){
-			tempParamNamesList << *tempValue;
-		}
-		return QVariant::fromValue(tempParamNamesList);
+	QList<QString> tempParamNamesList;
+	for (const auto& tempValue: paramNames.value()){
+		tempParamNamesList << *tempValue;
 	}
-
-	return QVariant();
+	return QVariant::fromValue(tempParamNamesList);
 }
 
 
@@ -9011,15 +8799,11 @@ bool CParamsSetObject::hasParamNames()
 
 QVariant CParamsSetObject::GetParamDescriptions()
 {
-	if (paramDescriptions){
-		QList<QString> tempParamDescriptionsList;
-		for (const auto& tempValue: paramDescriptions.value()){
-			tempParamDescriptionsList << *tempValue;
-		}
-		return QVariant::fromValue(tempParamDescriptionsList);
+	QList<QString> tempParamDescriptionsList;
+	for (const auto& tempValue: paramDescriptions.value()){
+		tempParamDescriptionsList << *tempValue;
 	}
-
-	return QVariant();
+	return QVariant::fromValue(tempParamDescriptionsList);
 }
 
 
@@ -9049,15 +8833,11 @@ bool CParamsSetObject::hasParamDescriptions()
 
 QVariant CParamsSetObject::GetParameters()
 {
-	if (parameters){
-		QList<QString> tempParametersList;
-		for (const auto& tempValue: parameters.value()){
-			tempParametersList << *tempValue;
-		}
-		return QVariant::fromValue(tempParametersList);
+	QList<QString> tempParametersList;
+	for (const auto& tempValue: parameters.value()){
+		tempParametersList << *tempValue;
 	}
-
-	return QVariant();
+	return QVariant::fromValue(tempParametersList);
 }
 
 
@@ -9281,11 +9061,7 @@ CMimeTypeObject::CMimeTypeObject(QObject* parent): ::imtbase::CItemModelBase(par
 
 QVariant CMimeTypeObject::GetType()
 {
-	if (type){
-		return type.value();
-	}
-
-	return QVariant();
+	return type.value();
 }
 
 
@@ -9305,15 +9081,11 @@ bool CMimeTypeObject::hasType()
 
 QVariant CMimeTypeObject::GetTree()
 {
-	if (tree){
-		QList<QString> tempTreeList;
-		for (const auto& tempValue: tree.value()){
-			tempTreeList << *tempValue;
-		}
-		return QVariant::fromValue(tempTreeList);
+	QList<QString> tempTreeList;
+	for (const auto& tempValue: tree.value()){
+		tempTreeList << *tempValue;
 	}
-
-	return QVariant();
+	return QVariant::fromValue(tempTreeList);
 }
 
 
@@ -9343,11 +9115,7 @@ bool CMimeTypeObject::hasTree()
 
 QVariant CMimeTypeObject::GetSubType()
 {
-	if (subType){
-		return subType.value();
-	}
-
-	return QVariant();
+	return subType.value();
 }
 
 
@@ -9367,11 +9135,7 @@ bool CMimeTypeObject::hasSubType()
 
 QVariant CMimeTypeObject::GetSuffix()
 {
-	if (suffix){
-		return suffix.value();
-	}
-
-	return QVariant();
+	return suffix.value();
 }
 
 
@@ -9391,15 +9155,11 @@ bool CMimeTypeObject::hasSuffix()
 
 QVariant CMimeTypeObject::GetParameters()
 {
-	if (parameters){
-		QList<QString> tempParametersList;
-		for (const auto& tempValue: parameters.value()){
-			tempParametersList << *tempValue;
-		}
-		return QVariant::fromValue(tempParametersList);
+	QList<QString> tempParametersList;
+	for (const auto& tempValue: parameters.value()){
+		tempParametersList << *tempValue;
 	}
-
-	return QVariant();
+	return QVariant::fromValue(tempParametersList);
 }
 
 

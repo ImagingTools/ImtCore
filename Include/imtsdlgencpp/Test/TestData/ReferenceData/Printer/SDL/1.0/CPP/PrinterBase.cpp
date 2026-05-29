@@ -1128,11 +1128,7 @@ CPrinterSpecificationBaseObject::CPrinterSpecificationBaseObject(QObject* parent
 
 QVariant CPrinterSpecificationBaseObject::GetName()
 {
-	if (name){
-		return name.value();
-	}
-
-	return QVariant();
+	return name.value();
 }
 
 
@@ -1318,11 +1314,7 @@ CLinkObject::CLinkObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
 QVariant CLinkObject::GetLink()
 {
-	if (link){
-		return link.value();
-	}
-
-	return QVariant();
+	return link.value();
 }
 
 
@@ -1511,11 +1503,7 @@ CPrinterBaseObject::CPrinterBaseObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CPrinterBaseObject::GetName()
 {
-	if (name){
-		return name.value();
-	}
-
-	return QVariant();
+	return name.value();
 }
 
 
@@ -1535,23 +1523,19 @@ bool CPrinterBaseObject::hasName()
 
 QVariant CPrinterBaseObject::GetSpecification()
 {
-	if (specification){
-		if (m_specificationQObjectPtr.isValid()){
-			if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>((specification).GetPtr())){
-				CPrinterSpecificationBaseObject *newObjectPtr = new CPrinterSpecificationBaseObject(this);
-				static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
-				m_specificationQObjectPtr = QVariant::fromValue(newObjectPtr);
-			}
-			if (const CLink* val = std::get_if<CLink>((specification).GetPtr())){
-				CLinkObject *newObjectPtr = new CLinkObject(this);
-				static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
-				m_specificationQObjectPtr = QVariant::fromValue(newObjectPtr);
-			}
+	if (m_specificationQObjectPtr.isValid()){
+		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>((specification).GetPtr())){
+			CPrinterSpecificationBaseObject *newObjectPtr = new CPrinterSpecificationBaseObject(this);
+			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			m_specificationQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
-		return m_specificationQObjectPtr;
+		if (const CLink* val = std::get_if<CLink>((specification).GetPtr())){
+			CLinkObject *newObjectPtr = new CLinkObject(this);
+			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			m_specificationQObjectPtr = QVariant::fromValue(newObjectPtr);
+		}
 	}
-
-	return QVariant();
+	return m_specificationQObjectPtr;
 }
 
 
@@ -1600,19 +1584,15 @@ void CPrinterBaseObject::ResetSpecification()
 
 QVariant CPrinterBaseObject::GetSimpleTest()
 {
-	if (simpleTest){
-		if (m_simpleTestQObjectPtr.isValid()){
-			if (const QString* val = std::get_if<QString>((simpleTest).GetPtr())){
-				m_simpleTestQObjectPtr = QVariant::fromValue(val);
-			}
-			if (const double* val = std::get_if<double>((simpleTest).GetPtr())){
-				m_simpleTestQObjectPtr = QVariant::fromValue(val);
-			}
+	if (m_simpleTestQObjectPtr.isValid()){
+		if (const QString* val = std::get_if<QString>((simpleTest).GetPtr())){
+			m_simpleTestQObjectPtr = QVariant::fromValue(val);
 		}
-		return m_simpleTestQObjectPtr;
+		if (const double* val = std::get_if<double>((simpleTest).GetPtr())){
+			m_simpleTestQObjectPtr = QVariant::fromValue(val);
+		}
 	}
-
-	return QVariant();
+	return m_simpleTestQObjectPtr;
 }
 
 
@@ -1661,21 +1641,17 @@ void CPrinterBaseObject::ResetSimpleTest()
 
 QVariant CPrinterBaseObject::GetMixedTest()
 {
-	if (mixedTest){
-		if (m_mixedTestQObjectPtr.isValid()){
-			if (const QString* val = std::get_if<QString>((mixedTest).GetPtr())){
-				m_mixedTestQObjectPtr = QVariant::fromValue(val);
-			}
-			if (const CLink* val = std::get_if<CLink>((mixedTest).GetPtr())){
-				CLinkObject *newObjectPtr = new CLinkObject(this);
-				static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
-				m_mixedTestQObjectPtr = QVariant::fromValue(newObjectPtr);
-			}
+	if (m_mixedTestQObjectPtr.isValid()){
+		if (const QString* val = std::get_if<QString>((mixedTest).GetPtr())){
+			m_mixedTestQObjectPtr = QVariant::fromValue(val);
 		}
-		return m_mixedTestQObjectPtr;
+		if (const CLink* val = std::get_if<CLink>((mixedTest).GetPtr())){
+			CLinkObject *newObjectPtr = new CLinkObject(this);
+			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			m_mixedTestQObjectPtr = QVariant::fromValue(newObjectPtr);
+		}
 	}
-
-	return QVariant();
+	return m_mixedTestQObjectPtr;
 }
 
 
@@ -1908,16 +1884,12 @@ CPrinterListObject::CPrinterListObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CPrinterListObject::GetData()
 {
-	if (data){
-		if (!m_dataQObjectPtr.isValid()){
-			m_dataQObjectPtr = CreateObject("data");
-			auto itemPtr = m_dataQObjectPtr.value<sdl::V1_0::modsdl::CPrinterBaseObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = data;
-		}
-		return m_dataQObjectPtr;
+	if (!m_dataQObjectPtr.isValid()){
+		m_dataQObjectPtr = CreateObject("data");
+		auto itemPtr = m_dataQObjectPtr.value<sdl::V1_0::modsdl::CPrinterBaseObjectList*>();
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = data;
 	}
-
-	return QVariant();
+	return m_dataQObjectPtr;
 }
 
 
