@@ -1078,3 +1078,112 @@ Impl/ImtAuthDbPck/
 Impl/ImtOidcPck/
   ImtOidcPck.h / .cpp
 ```
+
+---
+
+## Phase 6 — External OIDC Provider Support (Relying Party)
+
+### Overview
+
+In addition to acting as an OIDC **Provider** (issuing tokens to client apps), ImtCore can also act as an OIDC **Relying Party / Client**, authenticating users via external providers (Google, Apple, Facebook) and creating internal sessions.
+
+### Architecture
+
+| Module | New Files | Responsibility |
+|--------|-----------|----------------|
+| `imtauth` | `IExternalOidcProvider.h`, `IExternalIdentity.h`, `CExternalIdentity.h/.cpp`, `IExternalOidcAuthController.h`, `CExternalOidcAuthControllerComp.h/.cpp`, `CGoogleOidcProviderComp.h/.cpp`, `CAppleOidcProviderComp.h/.cpp`, `CFacebookOidcProviderComp.h/.cpp` | Interfaces, data model, provider configs, auth controller |
+| `imtoidc` | `CExternalOidcServletComp.h/.cpp` | REST endpoints for external auth flows |
+| `imtauthdb` | `CExternalIdentityDbDelegateComp.h/.cpp`, `CreateExternalIdentitiesTable.sql` (Postgres + SQLite) | Database persistence for external identities |
+
+### Interfaces
+
+#### `IExternalOidcProvider`
+Describes an external OIDC provider configuration:
+- `GetProviderId()` — unique name ("google", "apple", "facebook")
+- `GetDiscoveryUrl()` — `.well-known/openid-configuration` URL
+- `GetAuthorizationEndpoint()` / `GetTokenEndpoint()` / `GetUserInfoEndpoint()`
+- `GetClientId()` / `GetClientSecret()` — OAuth app credentials
+- `GetScopes()` — requested scopes
+- `GetRedirectUri()` — callback URL
+
+#### `IExternalIdentity`
+Links an external provider account to an ImtCore user:
+- `Id`, `UserId`, `Provider`, `ExternalSubject` (sub claim), `ExternalEmail`, `LinkedAt`, `LastAuthAt`
+
+#### `IExternalOidcAuthController`
+Orchestrates the external login flow:
+- `GetAvailableProviders()` — list configured providers
+- `GetAuthorizationUrl(providerId, state, nonce)` — build redirect URL
+- `HandleCallback(providerId, authCode, state)` — exchange code, validate, link user, create session
+- `UnlinkProvider(userId, providerId)` — remove provider link
+- `GetLinkedProviders(userId)` — list linked providers
+
+### Provider Components
+
+| Component | Discovery URL | Scopes |
+|-----------|--------------|--------|
+| `CGoogleOidcProviderComp` | `https://accounts.google.com/.well-known/openid-configuration` | `openid profile email` |
+| `CAppleOidcProviderComp` | `https://appleid.apple.com/.well-known/openid-configuration` | `openid name email` |
+| `CFacebookOidcProviderComp` | N/A (Graph API) | `openid email public_profile` |
+
+Each provider is configured via ACF attributes: `ClientId`, `ClientSecret`, `RedirectUri`, `Scopes`.
+
+### REST Endpoints (`CExternalOidcServletComp`)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/oauth/external/providers` | List available external providers |
+| GET | `/oauth/external/authorize/{provider}` | Get authorization redirect URL |
+| GET | `/oauth/external/callback` | Handle provider callback (code exchange) |
+| POST | `/oauth/external/unlink/{provider}` | Unlink external provider (requires bearer token) |
+| GET | `/oauth/external/identities` | List linked providers for current user (requires bearer token) |
+
+### Database Schema
+
+Table `ExternalIdentities`:
+
+| Column | Postgres Type | Description |
+|--------|--------------|-------------|
+| `Id` | `uuid PRIMARY KEY` | Record ID |
+| `UserId` | `uuid NOT NULL` | Local ImtCore user |
+| `Provider` | `text NOT NULL` | Provider name |
+| `ExternalSubject` | `text NOT NULL` | Provider's sub claim |
+| `ExternalEmail` | `text` | Email from provider |
+| `LinkedAt` | `timestamp` | When linked |
+| `LastAuthAt` | `timestamp` | Last auth timestamp |
+
+Indexes: unique on `(Provider, ExternalSubject)`, index on `UserId`.
+
+### Package Registration
+
+- **ImtAuthPck**: `ExternalIdentity`, `GoogleOidcProvider`, `AppleOidcProvider`, `FacebookOidcProvider`, `ExternalOidcAuthController`
+- **ImtAuthDbPck**: `ExternalIdentityDatabaseDelegate`
+- **ImtOidcPck**: `ExternalOidcServlet`
+
+### Security Considerations
+
+- **CSRF Protection**: `state` parameter generated at `/authorize` and validated at `/callback`
+- **Nonce Validation**: `nonce` included in authorization request for ID token validation
+- **HTTPS Required**: All redirect URIs must use HTTPS in production
+- **Token Signature Validation**: External `id_token` signatures should be verified against provider JWKS
+- **Account Linking**: External identities are linked by `(Provider, ExternalSubject)` unique constraint
+- **Email Verification**: Only verified emails should be used for auto-user creation
+
+### Provider Setup
+
+#### Google
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create OAuth 2.0 credentials (Web application)
+3. Set authorized redirect URI to your ImtCore callback URL
+4. Configure `ClientId` and `ClientSecret` in the `CGoogleOidcProviderComp` ACF attributes
+
+#### Apple
+1. Go to [Apple Developer Portal](https://developer.apple.com/)
+2. Register a Services ID and configure Sign in with Apple
+3. Apple uses `client_secret_jwt` with ES256 — generate the JWT client secret
+4. Configure `ClientId` (Services ID) and `ClientSecret` (JWT) in `CAppleOidcProviderComp`
+
+#### Facebook
+1. Go to [Facebook Developer Dashboard](https://developers.facebook.com/)
+2. Create a Facebook Login app and configure OAuth redirect URI
+3. Configure `ClientId` (App ID) and `ClientSecret` (App Secret) in `CFacebookOidcProviderComp`

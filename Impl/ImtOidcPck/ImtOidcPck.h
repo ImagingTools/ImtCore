@@ -9,6 +9,7 @@
 // ImtCore includes
 #include <imtoidc/COidcServletComp.h>
 #include <imtoidc/COidcScopeMapperComp.h>
+#include <imtoidc/CExternalOidcServletComp.h>
 
 
 namespace ImtOidcPck
@@ -17,6 +18,7 @@ namespace ImtOidcPck
 
 typedef imtoidc::COidcServletComp OidcServlet;
 typedef imtoidc::COidcScopeMapperComp OidcScopeMapper;
+typedef imtoidc::CExternalOidcServletComp ExternalOidcServlet;
 
 
 } // namespace ImtOidcPck

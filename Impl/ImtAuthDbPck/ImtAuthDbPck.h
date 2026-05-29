@@ -20,6 +20,7 @@
 #include <imtauthdb/CTenantDbDelegateComp.h>
 #include <imtauthdb/CTenantMembershipDbDelegateComp.h>
 #include <imtauthdb/CTenantInvitationDbDelegateComp.h>
+#include <imtauthdb/CExternalIdentityDbDelegateComp.h>
 
 
 /**
@@ -47,6 +48,7 @@ typedef imtauthdb::COidcTokenDbDelegateComp OidcTokenDatabaseDelegate;
 typedef imtauthdb::CTenantDbDelegateComp TenantDatabaseDelegate;
 typedef imtauthdb::CTenantMembershipDbDelegateComp TenantMembershipDatabaseDelegate;
 typedef imtauthdb::CTenantInvitationDbDelegateComp TenantInvitationDatabaseDelegate;
+typedef imtauthdb::CExternalIdentityDbDelegateComp ExternalIdentityDatabaseDelegate;
 
 
 } // namespace ImtAuthDbPck

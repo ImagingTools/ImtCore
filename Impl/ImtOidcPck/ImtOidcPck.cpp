@@ -25,6 +25,11 @@ I_EXPORT_COMPONENT(
 			"OIDC scope mapper",
 			"OIDC Scope Mapper Claims");
 
+I_EXPORT_COMPONENT(
+			ExternalOidcServlet,
+			"External OIDC REST servlet for provider-based authentication",
+			"External OIDC Servlet OAuth Provider");
+
 
 } // namespace ImtOidcPck
 

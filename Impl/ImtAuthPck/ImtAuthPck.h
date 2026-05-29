@@ -62,6 +62,11 @@
 #include <imtauth/CTenantInvitationComp.h>
 #include <imtauth/CTenantInvitationManagerComp.h>
 #include <imtauth/CTenantDocumentNameProviderComp.h>
+#include <imtauth/CExternalIdentity.h>
+#include <imtauth/CGoogleOidcProviderComp.h>
+#include <imtauth/CAppleOidcProviderComp.h>
+#include <imtauth/CFacebookOidcProviderComp.h>
+#include <imtauth/CExternalOidcAuthControllerComp.h>
 
 
 namespace ImtAuthPck
@@ -178,6 +183,16 @@ typedef icomp::TModelCompWrap<imtauth::CTenantMembershipManagerComp> TenantMembe
 typedef icomp::TModelCompWrap<imtauth::CTenantInvitationComp> TenantInvitationInfo;
 typedef icomp::TModelCompWrap<imtauth::CTenantInvitationManagerComp> TenantInvitationManager;
 typedef imtauth::CTenantDocumentNameProviderComp TenantDocumentNameProvider;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap <
+						imtauth::CExternalIdentity,
+						imtauth::IExternalIdentity,
+						iser::ISerializable,
+						istd::IChangeable>> ExternalIdentity;
+typedef imtauth::CGoogleOidcProviderComp GoogleOidcProvider;
+typedef imtauth::CAppleOidcProviderComp AppleOidcProvider;
+typedef imtauth::CFacebookOidcProviderComp FacebookOidcProvider;
+typedef imtauth::CExternalOidcAuthControllerComp ExternalOidcAuthController;
 
 
 } // namespace ImtAuthPck

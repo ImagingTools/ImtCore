@@ -289,6 +289,31 @@ I_EXPORT_COMPONENT(
 			"Provides default document name from tenant name",
 			"Tenant Document Name Provider");
 
+I_EXPORT_COMPONENT(
+			ExternalIdentity,
+			"External identity linking external provider to local user",
+			"External Identity OIDC Provider");
+
+I_EXPORT_COMPONENT(
+			GoogleOidcProvider,
+			"Google external OIDC provider configuration",
+			"Google OIDC Provider External");
+
+I_EXPORT_COMPONENT(
+			AppleOidcProvider,
+			"Apple external OIDC provider configuration",
+			"Apple OIDC Provider External");
+
+I_EXPORT_COMPONENT(
+			FacebookOidcProvider,
+			"Facebook external OIDC provider configuration",
+			"Facebook OIDC Provider External");
+
+I_EXPORT_COMPONENT(
+			ExternalOidcAuthController,
+			"External OIDC authentication controller for provider login flows",
+			"External OIDC Auth Controller");
+
 
 } // namespace ImtAuthPck
 
