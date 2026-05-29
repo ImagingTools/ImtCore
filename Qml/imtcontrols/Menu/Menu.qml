@@ -181,7 +181,12 @@ Popup {
         console.log("_ingestDeclaredChildren", arr)
         if (!arr || arr.length === 0) arr = menu.data;
         if (!arr) return;
-        
+
+        // Take a snapshot before the loop: createObject(menu) below adds new
+        // items to menu.data (the live array), which would cause submenu proxy
+        // MenuItems to be iterated and duplicated without a copy.
+        arr = arr.slice();
+
         for (var i = 0; i < arr.length; ++i) {
             var c = arr[i];
             if (!c) continue;
