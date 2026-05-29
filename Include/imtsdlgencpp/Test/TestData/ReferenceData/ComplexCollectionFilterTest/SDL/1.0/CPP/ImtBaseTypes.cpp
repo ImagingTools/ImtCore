@@ -7219,7 +7219,7 @@ QVariant COptionsListObject::GetOptions()
 	if (!m_optionsQObjectPtr.isValid()){
 		m_optionsQObjectPtr = CreateObject("options");
 		auto itemPtr = m_optionsQObjectPtr.value<sdl::V1_0::imtbase::COptionObjectList*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = options;
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = COptionsList::options;
 	}
 	return m_optionsQObjectPtr;
 }
@@ -7230,7 +7230,7 @@ void COptionsListObject::SetOptions(const QVariant& v)
 
 	if (v.isValid()){
 		sdl::V1_0::imtbase::COptionObjectList* itemPtr = v.value<sdl::V1_0::imtbase::COptionObjectList*>();
-		if (itemPtr != nullptr)  options = itemPtr->Version_1_0;
+		if (itemPtr != nullptr)  COptionsList::options = itemPtr->Version_1_0;
 	}
 	else {
 		options = nullptr;
@@ -7478,7 +7478,7 @@ QVariant CSelectionParamObject::GetConstraints()
 	if (!m_constraintsQObjectPtr.isValid()){
 		m_constraintsQObjectPtr = CreateObject("constraints");
 		auto itemPtr = m_constraintsQObjectPtr.value<sdl::V1_0::imtbase::COptionsListObject*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = constraints;
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = CSelectionParam::constraints;
 	}
 	return m_constraintsQObjectPtr;
 }
@@ -7489,7 +7489,7 @@ void CSelectionParamObject::SetConstraints(const QVariant& v)
 
 	if (v.isValid()){
 		sdl::V1_0::imtbase::COptionsListObject* itemPtr = v.value<sdl::V1_0::imtbase::COptionsListObject*>();
-		if (itemPtr != nullptr)  constraints = itemPtr->Version_1_0;
+		if (itemPtr != nullptr)  CSelectionParam::constraints = itemPtr->Version_1_0;
 	}
 	else {
 		constraints = nullptr;
@@ -7917,7 +7917,7 @@ QVariant CBackupSettingsObject::GetSchedulerParam()
 	if (!m_schedulerParamQObjectPtr.isValid()){
 		m_schedulerParamQObjectPtr = CreateObject("schedulerParam");
 		auto itemPtr = m_schedulerParamQObjectPtr.value<sdl::V1_0::imtbase::CSchedulerParamObject*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = schedulerParam;
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = CBackupSettings::schedulerParam;
 	}
 	return m_schedulerParamQObjectPtr;
 }
@@ -7928,7 +7928,7 @@ void CBackupSettingsObject::SetSchedulerParam(const QVariant& v)
 
 	if (v.isValid()){
 		sdl::V1_0::imtbase::CSchedulerParamObject* itemPtr = v.value<sdl::V1_0::imtbase::CSchedulerParamObject*>();
-		if (itemPtr != nullptr)  schedulerParam = itemPtr->Version_1_0;
+		if (itemPtr != nullptr)  CBackupSettings::schedulerParam = itemPtr->Version_1_0;
 	}
 	else {
 		schedulerParam = nullptr;

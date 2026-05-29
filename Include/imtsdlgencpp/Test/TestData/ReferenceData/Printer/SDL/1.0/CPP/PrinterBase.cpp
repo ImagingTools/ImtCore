@@ -1887,7 +1887,7 @@ QVariant CPrinterListObject::GetData()
 	if (!m_dataQObjectPtr.isValid()){
 		m_dataQObjectPtr = CreateObject("data");
 		auto itemPtr = m_dataQObjectPtr.value<sdl::V1_0::modsdl::CPrinterBaseObjectList*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = data;
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = CPrinterList::data;
 	}
 	return m_dataQObjectPtr;
 }

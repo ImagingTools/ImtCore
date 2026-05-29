@@ -2377,7 +2377,7 @@ QVariant CPrinterBaseObject::GetLinkList()
 	if (!m_linkListQObjectPtr.isValid()){
 		m_linkListQObjectPtr = CreateObject("linkList");
 		auto itemPtr = m_linkListQObjectPtr.value<sdl::V1_0::modsdl::CLinkObjectList*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = linkList;
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = CPrinterBase::linkList;
 	}
 	return m_linkListQObjectPtr;
 }
@@ -2507,7 +2507,7 @@ QVariant CPrinterBaseObject::GetSpecificationList()
 	if (!m_specificationListQObjectPtr.isValid()){
 		m_specificationListQObjectPtr = CreateObject("specificationList");
 		auto itemPtr = m_specificationListQObjectPtr.value<sdl::V1_0::modsdl::CPrinterSpecificationObjectList*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = specificationList;
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = CPrinterBase::specificationList;
 	}
 	return m_specificationListQObjectPtr;
 }

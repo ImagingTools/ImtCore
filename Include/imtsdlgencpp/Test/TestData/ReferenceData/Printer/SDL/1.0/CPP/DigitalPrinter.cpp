@@ -642,7 +642,7 @@ QVariant CDigitalPrinterSpecificationObject::GetBase()
 	if (!m_baseQObjectPtr.isValid()){
 		m_baseQObjectPtr = CreateObject("base");
 		auto itemPtr = m_baseQObjectPtr.value<sdl::V1_0::modsdl::CPrinterSpecificationBaseObject*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = base;
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = CDigitalPrinterSpecification::base;
 	}
 	return m_baseQObjectPtr;
 }
@@ -897,7 +897,7 @@ QVariant CDigitalPrinterObject::GetBase()
 	if (!m_baseQObjectPtr.isValid()){
 		m_baseQObjectPtr = CreateObject("base");
 		auto itemPtr = m_baseQObjectPtr.value<sdl::V1_0::modsdl::CPrinterBaseObject*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = base;
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = CDigitalPrinter::base;
 	}
 	return m_baseQObjectPtr;
 }

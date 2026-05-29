@@ -1282,7 +1282,7 @@ QVariant CGeometryObject::GetPoints()
 	if (!m_pointsQObjectPtr.isValid()){
 		m_pointsQObjectPtr = CreateObject("Points");
 		auto itemPtr = m_pointsQObjectPtr.value<sdl::V1_0::complextest::CPointObjectList*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = Points;
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = CGeometry::Points;
 	}
 	return m_pointsQObjectPtr;
 }
@@ -1339,7 +1339,7 @@ QVariant CGeometryObject::GetRequiredPoints()
 	if (!m_requiredPointsQObjectPtr.isValid()){
 		m_requiredPointsQObjectPtr = CreateObject("RequiredPoints");
 		auto itemPtr = m_requiredPointsQObjectPtr.value<sdl::V1_0::complextest::CPointObjectList*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = RequiredPoints;
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = CGeometry::RequiredPoints;
 	}
 	return m_requiredPointsQObjectPtr;
 }
@@ -1396,7 +1396,7 @@ QVariant CGeometryObject::GetOptionalPoints()
 	if (!m_optionalPointsQObjectPtr.isValid()){
 		m_optionalPointsQObjectPtr = CreateObject("OptionalPoints");
 		auto itemPtr = m_optionalPointsQObjectPtr.value<sdl::V1_0::complextest::CPointObjectList*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = OptionalPoints;
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = CGeometry::OptionalPoints;
 	}
 	return m_optionalPointsQObjectPtr;
 }

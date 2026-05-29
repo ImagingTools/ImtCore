@@ -2233,7 +2233,7 @@ QVariant CTimeFilterObject::GetTimeRange()
 	if (!m_timeRangeQObjectPtr.isValid()){
 		m_timeRangeQObjectPtr = CreateObject("timeRange");
 		auto itemPtr = m_timeRangeQObjectPtr.value<sdl::V1_0::imtbase::CTimeRangeObject*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = timeRange;
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = CTimeFilter::timeRange;
 	}
 	return m_timeRangeQObjectPtr;
 }
@@ -3021,7 +3021,7 @@ QVariant CGroupFilterObject::GetFieldFilters()
 	if (!m_fieldFiltersQObjectPtr.isValid()){
 		m_fieldFiltersQObjectPtr = CreateObject("fieldFilters");
 		auto itemPtr = m_fieldFiltersQObjectPtr.value<sdl::V1_0::imtbase::CFieldFilterObjectList*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = fieldFilters;
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = CGroupFilter::fieldFilters;
 	}
 	return m_fieldFiltersQObjectPtr;
 }
@@ -3078,7 +3078,7 @@ QVariant CGroupFilterObject::GetGroupFilters()
 	if (!m_groupFiltersQObjectPtr.isValid()){
 		m_groupFiltersQObjectPtr = CreateObject("groupFilters");
 		auto itemPtr = m_groupFiltersQObjectPtr.value<sdl::V1_0::imtbase::CGroupFilterObjectList*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = groupFilters;
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = CGroupFilter::groupFilters;
 	}
 	return m_groupFiltersQObjectPtr;
 }
@@ -3351,7 +3351,7 @@ QVariant CComplexCollectionFilterObject::GetSortingInfo()
 	if (!m_sortingInfoQObjectPtr.isValid()){
 		m_sortingInfoQObjectPtr = CreateObject("sortingInfo");
 		auto itemPtr = m_sortingInfoQObjectPtr.value<sdl::V1_0::imtbase::CFieldSortingInfoObjectList*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = sortingInfo;
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = CComplexCollectionFilter::sortingInfo;
 	}
 	return m_sortingInfoQObjectPtr;
 }
@@ -3408,7 +3408,7 @@ QVariant CComplexCollectionFilterObject::GetFieldsFilter()
 	if (!m_fieldsFilterQObjectPtr.isValid()){
 		m_fieldsFilterQObjectPtr = CreateObject("fieldsFilter");
 		auto itemPtr = m_fieldsFilterQObjectPtr.value<sdl::V1_0::imtbase::CGroupFilterObject*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = fieldsFilter;
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = CComplexCollectionFilter::fieldsFilter;
 	}
 	return m_fieldsFilterQObjectPtr;
 }
@@ -3458,7 +3458,7 @@ QVariant CComplexCollectionFilterObject::GetTimeFilter()
 	if (!m_timeFilterQObjectPtr.isValid()){
 		m_timeFilterQObjectPtr = CreateObject("timeFilter");
 		auto itemPtr = m_timeFilterQObjectPtr.value<sdl::V1_0::imtbase::CTimeFilterObject*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = timeFilter;
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = CComplexCollectionFilter::timeFilter;
 	}
 	return m_timeFilterQObjectPtr;
 }
