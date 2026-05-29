@@ -148,7 +148,7 @@ bool CComplexCollectionFilterRepresentationController::GetDataModelFromSdlRepres
 		return false;
 	}
 
-	namespace Filter = sdl::imtbase::ComplexCollectionFilter;
+	namespace Filter = sdl::V1_0::imtbase;
 
 	imtsdl::TElementList<Filter::CFieldSortingInfo> sourceSorting;
 	if (sdlRepresentation.sortingInfo){
@@ -264,7 +264,7 @@ bool CComplexCollectionFilterRepresentationController::GetFieldFilterFromSdlRepr
 			const sdl::V1_0::imtbase::FieldFilterUnion& u,
 			imtbase::IComplexCollectionFilter::FieldFilter& fieldFilter) const
 {
-	namespace Filter = sdl::imtbase::ComplexCollectionFilter;
+	namespace Filter = sdl::V1_0::imtbase;
 
 	bool isOk = true;
 	bool retVal = true;
@@ -361,7 +361,7 @@ bool CComplexCollectionFilterRepresentationController::GetSdlRepresentationFromF
 			const imtbase::IComplexCollectionFilter::FieldFilter& fieldFilter,
 			sdl::V1_0::imtbase::FieldFilterUnion& u) const
 {
-	namespace Filter = sdl::imtbase::ComplexCollectionFilter;
+	namespace Filter = sdl::V1_0::imtbase;
 
 	int typeId = fieldFilter.filterValue.typeId();
 
@@ -434,7 +434,7 @@ bool CComplexCollectionFilterRepresentationController::GetGroupFilterFromSdlRepr
 			const sdl::V1_0::imtbase::CGroupFilter& representation,
 			imtbase::IComplexCollectionFilter::FilterExpression& groupFilter) const
 {
-	namespace Filter = sdl::imtbase::ComplexCollectionFilter;
+	namespace Filter = sdl::V1_0::imtbase;
 
 	imtsdl::TElementList<Filter::FieldFilterUnion> sourceFieldSubFilters;
 	if (representation.fieldFilters){
@@ -498,7 +498,7 @@ bool CComplexCollectionFilterRepresentationController::GetSdlRepresentationFromG
 			const imtbase::IComplexCollectionFilter::FilterExpression& groupFilter,
 			sdl::V1_0::imtbase::CGroupFilter& representation) const
 {
-	namespace Filter = sdl::imtbase::ComplexCollectionFilter;
+	namespace Filter = sdl::V1_0::imtbase;
 
 	// Logical operation
 	imtbase::IComplexCollectionFilter::LogicalOperation logicalOperation = groupFilter.logicalOperation;
@@ -541,7 +541,7 @@ bool CComplexCollectionFilterRepresentationController::GetSdlRepresentationFromG
 
 bool CComplexCollectionFilterRepresentationController::GetSdlMetaTypeFromVariantType(const int& typeId, sdl::V1_0::imtbase::ValueType& sdlType) const
 {
-	namespace Filter = sdl::imtbase::ComplexCollectionFilter;
+	namespace Filter = sdl::V1_0::imtbase;
 
 	if (typeId == QMetaType::Int){
 		sdlType = Filter::ValueType::Integer;
@@ -568,7 +568,7 @@ bool CComplexCollectionFilterRepresentationController::GetQVariantFromSdlValue(
 			const sdl::V1_0::imtbase::ValueType& valueType,
 			QVariant& value) const
 {
-	namespace Filter = sdl::imtbase::ComplexCollectionFilter;
+	namespace Filter = sdl::V1_0::imtbase;
 
 	bool isOk = true;
 	switch (valueType){
@@ -603,7 +603,7 @@ bool CComplexCollectionFilterRepresentationController::GetQVariantFromSdlValue(
 int CComplexCollectionFilterRepresentationController::ComputeFlagsFromSdlOperations(
 	const imtsdl::TElementList<sdl::V1_0::imtbase::FilterOperation>& filterOperations) const
 {
-	namespace Filter = sdl::imtbase::ComplexCollectionFilter;
+	namespace Filter = sdl::V1_0::imtbase;
 
 	int flags = 0;
 	if (filterOperations.contains(Filter::FilterOperation::Not)){
@@ -642,7 +642,7 @@ void CComplexCollectionFilterRepresentationController::MapFieldOperationToSdlOpe
 			imtbase::IComplexCollectionFilter::FieldOperation op,
 			imtsdl::TElementList<sdl::V1_0::imtbase::FilterOperation>& outOperations) const
 {
-	namespace Filter = sdl::imtbase::ComplexCollectionFilter;
+	namespace Filter = sdl::V1_0::imtbase;
 
 	switch(op){
 	case imtbase::IComplexCollectionFilter::FO_EQUAL:
