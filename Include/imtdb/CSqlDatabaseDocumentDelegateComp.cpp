@@ -126,10 +126,10 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
 			return QByteArray();
 		}
 
-		QString baseSelelectionQuery = GetBaseSelectionQuery();
+		QString baseSelectionQuery = GetBaseSelectionQuery();
 
 		// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
-		QString retVal = baseSelelectionQuery;
+		QString retVal = baseSelectionQuery;
 		retVal += QString(" ") + filterQuery;
 		retVal += QString(" ") + sortQuery;
 		retVal += QString(" ") + qPrintable(paginationQuery);
