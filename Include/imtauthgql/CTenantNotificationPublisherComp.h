@@ -101,7 +101,7 @@ private:
 
 	void PublishNotification(
 		const QByteArray& targetUserId,
-		sdl::imtauth::TenantMemberships::EMembershipNotificationType notificationType,
+		sdl::V1_0::imtauth::EMembershipNotificationType notificationType,
 		const QByteArray& membershipId,
 		const QByteArray& userId,
 		const QByteArray& tenantId,

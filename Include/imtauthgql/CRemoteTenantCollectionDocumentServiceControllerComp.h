@@ -15,31 +15,31 @@ namespace imtauthgql
 
 class CRemoteTenantCollectionDocumentServiceControllerComp:
 			public imtclientgql::TClientRequestManagerCompWrap<
-							sdl::imtauth::TenantCollectionDocumentService::CGraphQlHandlerCompBase>
+							sdl::V1_0::imtauth::CGraphQlHandlerCompBase>
 {
 public:
 	typedef imtclientgql::TClientRequestManagerCompWrap<
-					sdl::imtauth::TenantCollectionDocumentService::CGraphQlHandlerCompBase> BaseClass;
+					sdl::V1_0::imtauth::CGraphQlHandlerCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CRemoteTenantCollectionDocumentServiceControllerComp);
 		I_ASSIGN(m_productInfoCompPtr, "ProductInfo", "Product info for loading available permissions", true, "ProductInfo");
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtauth::TenantCollectionDocumentService::CGraphQlHandlerCompBase)
-	virtual sdl::imtauth::Tenants::CTenantData OnGetTenantRepresentation(
-				const sdl::imtauth::TenantCollectionDocumentService::CGetTenantRepresentationGqlRequest& getTenantRepresentationRequest,
+	// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+	virtual sdl::V1_0::imtauth::CTenantData OnGetTenantRepresentation(
+				const sdl::V1_0::imtauth::CGetTenantRepresentationGqlRequest& getTenantRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus OnUpdateTenantFromRepresentation(
-				const sdl::imtauth::TenantCollectionDocumentService::CUpdateTenantFromRepresentationGqlRequest& updateTenantFromRepresentationRequest,
+	virtual sdl::V1_0::imtbase::CDocumentOperationStatus OnUpdateTenantFromRepresentation(
+				const sdl::V1_0::imtauth::CUpdateTenantFromRepresentationGqlRequest& updateTenantFromRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
 private:
 	void CollectPermissionsTree(
 				const imtlic::IFeatureInfo* featureInfoPtr,
-				imtsdl::TElementList<sdl::imtauth::Tenants::CTenantPermissionOption::V1_0>& permissions) const;
+				imtsdl::TElementList<sdl::V1_0::imtauth::CTenantPermissionOption>& permissions) const;
 
 	I_REF(imtlic::IProductInfo, m_productInfoCompPtr);
 };

@@ -19,25 +19,25 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (sdl::imtauth::Profile::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
 
-sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
-			const sdl::imtauth::Profile::CGetProfileGqlRequest& getProfileRequest,
+sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
+			const sdl::V1_0::imtauth::CGetProfileGqlRequest& getProfileRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtauth::Profile::CProfileData::V1_0 profileData;
+	sdl::V1_0::imtauth::CProfileData profileData;
 
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CProfileControllerComp");
-		return sdl::imtauth::Profile::CProfileData();
+		return sdl::V1_0::imtauth::CProfileData();
 	}
 
-	sdl::imtauth::Profile::GetProfileRequestArguments arguments = getProfileRequest.GetRequestedArguments();
+	sdl::V1_0::imtauth::GetProfileRequestArguments arguments = getProfileRequest.GetRequestedArguments();
 
 	if (!arguments.input.Version_1_0.has_value()){
 		Q_ASSERT(false);
-		return sdl::imtauth::Profile::CProfileData();
+		return sdl::V1_0::imtauth::CProfileData();
 	}
 
 	QByteArray objectId;
@@ -59,7 +59,7 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 	if (userInfoPtr == nullptr){
 		errorMessage = QString("Unable to get a profile info. Error: User with ID '%1' does not exists").arg(qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "CProfileControllerComp");
-		return sdl::imtauth::Profile::CProfileData();
+		return sdl::V1_0::imtauth::CProfileData();
 	}
 
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
@@ -80,7 +80,7 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 		profileData.currentTenantId = gqlContextPtr->GetTenantId();
 	}
 
-	imtsdl::TElementList<sdl::imtauth::Profile::CRoleInfo::V1_0> roleList;
+	imtsdl::TElementList<sdl::V1_0::imtauth::CRoleInfo> roleList;
 
 	if (m_roleCollectionCompPtr.IsValid()){
 		const QByteArrayList roles = userInfoPtr->GetRoles(productId);
@@ -90,7 +90,7 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 			if (m_roleCollectionCompPtr->GetObjectData(roleId, roleDataPtr)){
 				const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(roleDataPtr.GetPtr());
 				if (roleInfoPtr != nullptr){
-					sdl::imtauth::Profile::CRoleInfo::V1_0 info;
+					sdl::V1_0::imtauth::CRoleInfo info;
 					info.id = QByteArray(roleInfoPtr->GetRoleId());
 					info.name = QString(roleInfoPtr->GetRoleName());
 					info.description = QString(roleInfoPtr->GetRoleDescription());
@@ -103,7 +103,7 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 
 	profileData.roles = std::move(roleList);
 
-	imtsdl::TElementList<sdl::imtauth::Profile::CGroupInfo::V1_0> groupList;
+	imtsdl::TElementList<sdl::V1_0::imtauth::CGroupInfo> groupList;
 
 	if (m_groupCollectionCompPtr.IsValid()){
 		QByteArrayList groups = userInfoPtr->GetGroups();
@@ -113,7 +113,7 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 			if (m_groupCollectionCompPtr->GetObjectData(groupId, groupDataPtr)){
 				const imtauth::IUserGroupInfo* groupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(groupDataPtr.GetPtr());
 				if (groupInfoPtr != nullptr){
-					sdl::imtauth::Profile::CGroupInfo::V1_0 info;
+					sdl::V1_0::imtauth::CGroupInfo info;
 
 					info.id = QByteArray(groupInfoPtr->GetId());
 					info.name = QString(groupInfoPtr->GetName());
@@ -127,33 +127,33 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 
 	profileData.groups = std::move(groupList);
 
-	imtsdl::TElementList<sdl::imtauth::Profile::CPermissionInfo::V1_0> permissionList;
+	imtsdl::TElementList<sdl::V1_0::imtauth::CPermissionInfo> permissionList;
 
 	QByteArrayList permissions = userInfoPtr->GetPermissions(productId);
 	for (const QByteArray& permissionId : std::as_const(permissions)){
-		sdl::imtauth::Profile::CPermissionInfo::V1_0 info;
+		sdl::V1_0::imtauth::CPermissionInfo info;
 		info.id = permissionId;
 		permissionList << info;
 	}
 
 	profileData.permissions = std::move(permissionList);
 
-	sdl::imtauth::Profile::CProfileData retVal;
+	sdl::V1_0::imtauth::CProfileData retVal;
 	retVal.Version_1_0 = std::move(profileData);
 
 	return retVal;
 }
 
 
-sdl::imtauth::Profile::CGetUserOrganizationsPayload CProfileControllerComp::OnGetUserOrganizations(
-			const sdl::imtauth::Profile::CGetUserOrganizationsGqlRequest& getUserOrganizationsRequest,
+sdl::V1_0::imtauth::CGetUserOrganizationsPayload CProfileControllerComp::OnGetUserOrganizations(
+			const sdl::V1_0::imtauth::CGetUserOrganizationsGqlRequest& getUserOrganizationsRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	sdl::imtauth::Profile::CGetUserOrganizationsPayload response;
+	sdl::V1_0::imtauth::CGetUserOrganizationsPayload response;
 	response.Version_1_0.emplace();
 
-	sdl::imtauth::Profile::GetUserOrganizationsRequestArguments arguments = getUserOrganizationsRequest.GetRequestedArguments();
+	sdl::V1_0::imtauth::GetUserOrganizationsRequestArguments arguments = getUserOrganizationsRequest.GetRequestedArguments();
 
 	QByteArray userId;
 	if (arguments.input.Version_1_0.has_value() && arguments.input.Version_1_0->id){
@@ -168,10 +168,10 @@ sdl::imtauth::Profile::CGetUserOrganizationsPayload CProfileControllerComp::OnGe
 }
 
 
-imtsdl::TElementList<sdl::imtauth::Profile::CProfileTenantInfo::V1_0> CProfileControllerComp::CreateOrganizationList(
+imtsdl::TElementList<sdl::V1_0::imtauth::CProfileTenantInfo> CProfileControllerComp::CreateOrganizationList(
 			const QByteArray& userId) const
 {
-	imtsdl::TElementList<sdl::imtauth::Profile::CProfileTenantInfo::V1_0> organizationList;
+	imtsdl::TElementList<sdl::V1_0::imtauth::CProfileTenantInfo> organizationList;
 
 	if (!m_tenantManagerCompPtr.IsValid()){
 		return organizationList;
@@ -194,7 +194,7 @@ imtsdl::TElementList<sdl::imtauth::Profile::CProfileTenantInfo::V1_0> CProfileCo
 			continue;
 		}
 
-		sdl::imtauth::Profile::CProfileTenantInfo::V1_0 organizationInfo;
+		sdl::V1_0::imtauth::CProfileTenantInfo organizationInfo;
 		organizationInfo.id = tenantId;
 		organizationInfo.name = tenantPtr->GetTenantName();
 		organizationInfo.description = tenantPtr->GetTenantDescription();
@@ -221,23 +221,23 @@ QString CProfileControllerComp::TenantMembershipRoleToString(const QByteArray& r
 }
 
 
-sdl::imtauth::Profile::CSetProfileResponse CProfileControllerComp::OnSetProfile(
-			const sdl::imtauth::Profile::CSetProfileGqlRequest& setProfileRequest,
+sdl::V1_0::imtauth::CSetProfileResponse CProfileControllerComp::OnSetProfile(
+			const sdl::V1_0::imtauth::CSetProfileGqlRequest& setProfileRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtauth::Profile::CSetProfileResponse::V1_0 response;
+	sdl::V1_0::imtauth::CSetProfileResponse response;
 
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CProfileControllerComp");
 
-		return sdl::imtauth::Profile::CSetProfileResponse();
+		return sdl::V1_0::imtauth::CSetProfileResponse();
 	}
 
-	sdl::imtauth::Profile::SetProfileRequestArguments arguments = setProfileRequest.GetRequestedArguments();
+	sdl::V1_0::imtauth::SetProfileRequestArguments arguments = setProfileRequest.GetRequestedArguments();
 	if (!arguments.input.Version_1_0.has_value()){
 		Q_ASSERT(false);
-		return sdl::imtauth::Profile::CSetProfileResponse();
+		return sdl::V1_0::imtauth::CSetProfileResponse();
 	}
 
 	QByteArray id;
@@ -253,7 +253,7 @@ sdl::imtauth::Profile::CSetProfileResponse CProfileControllerComp::OnSetProfile(
 
 	if (userInfoPtr == nullptr){
 		errorMessage = QString("Unable to set a profile info. Error: User with ID '%1' does not exists").arg(qPrintable(id));
-		return sdl::imtauth::Profile::CSetProfileResponse();
+		return sdl::V1_0::imtauth::CSetProfileResponse();
 	}
 
 	QString name;
@@ -272,12 +272,12 @@ sdl::imtauth::Profile::CSetProfileResponse CProfileControllerComp::OnSetProfile(
 	if (!m_userCollectionCompPtr->SetObjectData(id, *userInfoPtr)){
 		errorMessage = QString("Unable to set a profile info. Error: User collection cannot to update an object with ID '%1'").arg(qPrintable(id));
 
-		return sdl::imtauth::Profile::CSetProfileResponse();
+		return sdl::V1_0::imtauth::CSetProfileResponse();
 	}
 
 	response.status = true;
 
-	sdl::imtauth::Profile::CSetProfileResponse retVal;
+	sdl::V1_0::imtauth::CSetProfileResponse retVal;
 	retVal.Version_1_0 = std::move(response);
 
 	return retVal;

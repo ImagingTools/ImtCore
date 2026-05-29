@@ -51,8 +51,8 @@ protected:
 		imtdoc::IDocumentService::DocumentNotification& notification) const;
 	void FillSdlNotification(
 		const imtdoc::IDocumentService::DocumentNotification& notification,
-		sdl::imtbase::CollectionDocumentService::EDocumentOperation operation,
-		sdl::imtbase::CollectionDocumentService::CDocumentServiceNotification::V1_0& sdlNotification) const;
+		sdl::V1_0::imtbase::EDocumentOperation operation,
+		sdl::V1_0::imtbase::CDocumentServiceNotification& sdlNotification) const;
 	QByteArray ConvertUrlToObjectId(const QUrl& url) const;
 	QByteArray GetCommandId() const;
 

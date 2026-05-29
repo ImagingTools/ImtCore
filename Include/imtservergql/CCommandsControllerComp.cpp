@@ -16,7 +16,7 @@ namespace imtservergql
 
 // protected methods
 
-// reimplemented (sdl::imtbase::Commands::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
 
 bool CCommandsControllerComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
@@ -42,22 +42,22 @@ bool CCommandsControllerComp::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 }
 
 
-sdl::imtbase::Commands::CGuiElementContainer CCommandsControllerComp::OnGetCommands(
-			const sdl::imtbase::Commands::CGetCommandsGqlRequest& getCommandsRequest,
+sdl::V1_0::imtbase::CGuiElementContainer CCommandsControllerComp::OnGetCommands(
+			const sdl::V1_0::imtbase::CGetCommandsGqlRequest& getCommandsRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtbase::Commands::CGuiElementContainer::V1_0 response;
+	sdl::V1_0::imtbase::CGuiElementContainer response;
 	
 	if (!m_guiElementContainerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'GuiElementContainer' was not set", "CCommandsControllerComp");
-		return sdl::imtbase::Commands::CGuiElementContainer();
+		return sdl::V1_0::imtbase::CGuiElementContainer();
 	}
 	
-	sdl::imtbase::Commands::GetCommandsRequestArguments arguments = getCommandsRequest.GetRequestedArguments();
+	sdl::V1_0::imtbase::GetCommandsRequestArguments arguments = getCommandsRequest.GetRequestedArguments();
 	if (!arguments.input.Version_1_0.has_value()){
 		Q_ASSERT(false);
-		return sdl::imtbase::Commands::CGuiElementContainer();
+		return sdl::V1_0::imtbase::CGuiElementContainer();
 	}
 	
 	QByteArray typeId;
@@ -76,10 +76,10 @@ sdl::imtbase::Commands::CGuiElementContainer CCommandsControllerComp::OnGetComma
 	if (!GetRepresentationFromGuiElementContainer(*m_guiElementContainerCompPtr, response, languageId, userInfoPtr)){
 		errorMessage = QString("Unable to get commands for type-ID '%1'. Error: Get representation failed").arg(qPrintable(typeId));
 		SendErrorMessage(0, errorMessage, "CCommandsControllerComp");
-		return sdl::imtbase::Commands::CGuiElementContainer();
+		return sdl::V1_0::imtbase::CGuiElementContainer();
 	}
 	
-	sdl::imtbase::Commands::CGuiElementContainer retVal;
+	sdl::V1_0::imtbase::CGuiElementContainer retVal;
 	retVal.Version_1_0 = std::move(response);
 	
 	return retVal;
@@ -96,7 +96,7 @@ bool CCommandsControllerComp::CheckPermissions(const imtgql::CGqlRequest& /*gqlR
 
 bool CCommandsControllerComp::GetRepresentationFromGuiElementContainer(
 			const imtserverapp::IGuiElementContainer& guiElementContainer,
-			sdl::imtbase::Commands::CGuiElementContainer::V1_0& representation,
+			sdl::V1_0::imtbase::CGuiElementContainer& representation,
 			const QByteArray& languageId,
 			const imtauth::IUserInfo* userInfoPtr) const
 {
@@ -109,7 +109,7 @@ bool CCommandsControllerComp::GetRepresentationFromGuiElementContainer(
 	
 	QByteArrayList elementIds = guiElementContainer.GetElementIds();
 	
-	imtsdl::TElementList<sdl::imtbase::Commands::CGuiElementModel::V1_0> elementList;
+	imtsdl::TElementList<sdl::V1_0::imtbase::CGuiElementModel> elementList;
 	
 	for (const QByteArray& elementId : elementIds){
 		const imtserverapp::IGuiElementModel* guiElementPtr = guiElementContainer.GetGuiElementModel(elementId);
@@ -126,20 +126,20 @@ bool CCommandsControllerComp::GetRepresentationFromGuiElementContainer(
 				}
 			}
 			
-			sdl::imtbase::Commands::CGuiElementModel::V1_0 element;
+			sdl::V1_0::imtbase::CGuiElementModel element;
 			if (!GetRepresentationFromGuiElement(*guiElementPtr, element, languageId)){
 				return false;
 			}
 			
 			const imtserverapp::IGuiElementContainer* subElementContainerPtr = guiElementPtr->GetSubElements();
 			if (subElementContainerPtr != nullptr){
-				sdl::imtbase::Commands::CGuiElementContainer::V1_0 subElements;
+				sdl::V1_0::imtbase::CGuiElementContainer subElements;
 				if (!GetRepresentationFromGuiElementContainer(*subElementContainerPtr, subElements, languageId, userInfoPtr)){
 					return false;
 				}
 				
-				imtsdl::TElementList<sdl::imtbase::Commands::CGuiElementModel::V1_0> subElementList;
-				for (const istd::TSharedNullable<sdl::imtbase::Commands::CGuiElementModel::V1_0>& subElement : *subElements.elements){
+				imtsdl::TElementList<sdl::V1_0::imtbase::CGuiElementModel> subElementList;
+				for (const istd::TSharedNullable<sdl::V1_0::imtbase::CGuiElementModel>& subElement : *subElements.elements){
 					subElementList << *subElement;
 				}
 
@@ -158,7 +158,7 @@ bool CCommandsControllerComp::GetRepresentationFromGuiElementContainer(
 
 bool CCommandsControllerComp::GetRepresentationFromGuiElement(
 	const imtserverapp::IGuiElementModel& guiElementModel,
-	sdl::imtbase::Commands::CGuiElementModel::V1_0& representation,
+	sdl::V1_0::imtbase::CGuiElementModel& representation,
 	const QByteArray& languageId) const
 {
 	representation.elementId = guiElementModel.GetElementId();

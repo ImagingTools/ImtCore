@@ -14,30 +14,30 @@ namespace controlsgallerygql
 {
 
 
-class CContactInfoCollectionDocumentServiceComp: public sdl::controlsgallery::ContactInfoCollectionDocumentService::CGraphQlHandlerCompBase
+class CContactInfoCollectionDocumentServiceComp: public sdl::V1_0::controlsgallery::CGraphQlHandlerCompBase
 {
 public:
-	typedef sdl::controlsgallery::ContactInfoCollectionDocumentService::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::controlsgallery::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CContactInfoCollectionDocumentServiceComp)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentService", "Collection document manager", false, "CollectionDocumentService");
 	I_END_COMPONENT
 
 protected:
-	virtual sdl::controlsgallery::ContactInfos::CContactInfoData OnGetContactInfoRepresentation(
-				const sdl::controlsgallery::ContactInfoCollectionDocumentService::CGetContactInfoRepresentationGqlRequest& getContactInfoRepresentationRequest,
+	virtual sdl::V1_0::controlsgallery::CContactInfoData OnGetContactInfoRepresentation(
+				const sdl::V1_0::controlsgallery::CGetContactInfoRepresentationGqlRequest& getContactInfoRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus OnUpdateContactInfoFromRepresentation(
-				const sdl::controlsgallery::ContactInfoCollectionDocumentService::CUpdateContactInfoFromRepresentationGqlRequest& updateContactInfoFromRepresentationRequest,
+	virtual sdl::V1_0::imtbase::CDocumentOperationStatus OnUpdateContactInfoFromRepresentation(
+				const sdl::V1_0::controlsgallery::CUpdateContactInfoFromRepresentationGqlRequest& updateContactInfoFromRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::controlsgallery::ContactInfoCollectionDocumentService::CEmailData OnGetContactInfoEmailRepresentation(
-				const sdl::controlsgallery::ContactInfoCollectionDocumentService::CGetContactInfoEmailRepresentationGqlRequest& getContactInfoEmailRepresentationRequest,
+	virtual sdl::V1_0::controlsgallery::CEmailData OnGetContactInfoEmailRepresentation(
+				const sdl::V1_0::controlsgallery::CGetContactInfoEmailRepresentationGqlRequest& getContactInfoEmailRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus OnUpdateContactInfoEmailFromRepresentation(
-				const sdl::controlsgallery::ContactInfoCollectionDocumentService::CUpdateContactInfoEmailFromRepresentationGqlRequest& updateContactInfoEmailFromRepresentationRequest,
+	virtual sdl::V1_0::imtbase::CDocumentOperationStatus OnUpdateContactInfoEmailFromRepresentation(
+				const sdl::V1_0::controlsgallery::CUpdateContactInfoEmailFromRepresentationGqlRequest& updateContactInfoEmailFromRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 

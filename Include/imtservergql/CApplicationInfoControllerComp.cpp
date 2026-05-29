@@ -14,10 +14,10 @@ namespace imtservergql
 
 // protected methods
 
-// reimplemented (sdl::imtapp::Application::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtapp::CGraphQlHandlerCompBase)
 
 CApplicationInfoControllerComp::ApplicationInfo CApplicationInfoControllerComp::OnGetApplicationInfo(
-			const sdl::imtapp::Application::CGetApplicationInfoGqlRequest& /*getApplicationInfoRequest*/,
+			const sdl::V1_0::imtapp::CGetApplicationInfoGqlRequest& /*getApplicationInfoRequest*/,
 			const imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {

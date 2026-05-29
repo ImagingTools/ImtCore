@@ -41,11 +41,11 @@ imtauth::ISuperuserProvider::ExistsStatus CClientRequestRemoteSuperuserProviderC
 
 		imtauth::ISuperuserProvider::ExistsStatus retVal = imtauth::ISuperuserProvider::ES_UNKNOWN;
 		if (response.Version_1_0->status){
-			sdl::imtauth::Users::ExistsStatus status = *response.Version_1_0->status;
-			if (status == sdl::imtauth::Users::ExistsStatus::EXISTS){
+			sdl::V1_0::imtauth::ExistsStatus status = *response.Version_1_0->status;
+			if (status == sdl::V1_0::imtauth::ExistsStatus::EXISTS){
 				retVal = imtauth::ISuperuserProvider::ES_EXISTS;
 			}
-			else if (status == sdl::imtauth::Users::ExistsStatus::NOT_EXISTS){
+			else if (status == sdl::V1_0::imtauth::ExistsStatus::NOT_EXISTS){
 				retVal = imtauth::ISuperuserProvider::ES_NOT_EXISTS;
 			}
 		}

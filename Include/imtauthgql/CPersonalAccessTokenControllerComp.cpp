@@ -8,10 +8,10 @@ namespace imtauthgql
 
 
 // Helper function to convert IPersonalAccessToken to SDL type
-static sdl::imtauth::PersonalAccessTokens::CPersonalAccessToken::V1_0 ConvertToSdlToken(
+static sdl::V1_0::imtauth::CPersonalAccessToken ConvertToSdlToken(
 	const imtauth::IPersonalAccessToken& token)
 {
-	sdl::imtauth::PersonalAccessTokens::CPersonalAccessToken::V1_0 sdlToken;
+	sdl::V1_0::imtauth::CPersonalAccessToken sdlToken;
 
 	sdlToken.id = token.GetId();
 	sdlToken.userId = token.GetUserId();
@@ -49,14 +49,14 @@ static sdl::imtauth::PersonalAccessTokens::CPersonalAccessToken::V1_0 ConvertToS
 
 // protected methods
 
-// reimplemented (sdl::imtauth::PersonalAccessTokens::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
 
-sdl::imtauth::PersonalAccessTokens::CPersonalAccessTokenList CPersonalAccessTokenControllerComp::OnGetTokenList(
-			const sdl::imtauth::PersonalAccessTokens::CGetTokenListGqlRequest& getTokenListRequest,
+sdl::V1_0::imtauth::CPersonalAccessTokenList CPersonalAccessTokenControllerComp::OnGetTokenList(
+			const sdl::V1_0::imtauth::CGetTokenListGqlRequest& getTokenListRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtauth::PersonalAccessTokens::CPersonalAccessTokenList response;
+	sdl::V1_0::imtauth::CPersonalAccessTokenList response;
 
 	if (!m_tokenManagerCompPtr.IsValid()){
 		errorMessage = "PersonalAccessTokenManager not available";
@@ -64,7 +64,7 @@ sdl::imtauth::PersonalAccessTokens::CPersonalAccessTokenList CPersonalAccessToke
 	}
 
 	// Get request arguments
-	sdl::imtauth::PersonalAccessTokens::GetTokenListRequestArguments arguments = 
+	sdl::V1_0::imtauth::GetTokenListRequestArguments arguments = 
 		getTokenListRequest.GetRequestedArguments();
 
 	if (!arguments.input.Version_1_0.has_value()){
@@ -72,7 +72,7 @@ sdl::imtauth::PersonalAccessTokens::CPersonalAccessTokenList CPersonalAccessToke
 		return response;
 	}
 
-	sdl::imtauth::PersonalAccessTokens::CUserIdInput::V1_0 inputArgument = *arguments.input.Version_1_0;
+	sdl::V1_0::imtauth::CUserIdInput inputArgument = *arguments.input.Version_1_0;
 
 	QByteArray userId;
 	if (inputArgument.userId){
@@ -88,7 +88,7 @@ sdl::imtauth::PersonalAccessTokens::CPersonalAccessTokenList CPersonalAccessToke
 	QByteArrayList tokenIds = m_tokenManagerCompPtr->GetTokenIds(userId);
 
 	// Get each token and convert to SDL type
-	QList<sdl::imtauth::PersonalAccessTokens::CPersonalAccessToken::V1_0> tokens;
+	QList<sdl::V1_0::imtauth::CPersonalAccessToken> tokens;
 	for (const QByteArray& tokenId : std::as_const(tokenIds)){
 		imtauth::IPersonalAccessTokenSharedPtr tokenPtr = m_tokenManagerCompPtr->GetToken(tokenId);
 		if (tokenPtr.IsValid()){
@@ -103,12 +103,12 @@ sdl::imtauth::PersonalAccessTokens::CPersonalAccessTokenList CPersonalAccessToke
 }
 
 
-sdl::imtauth::PersonalAccessTokens::CPersonalAccessToken CPersonalAccessTokenControllerComp::OnGetToken(
-			const sdl::imtauth::PersonalAccessTokens::CGetTokenGqlRequest& getTokenRequest,
+sdl::V1_0::imtauth::CPersonalAccessToken CPersonalAccessTokenControllerComp::OnGetToken(
+			const sdl::V1_0::imtauth::CGetTokenGqlRequest& getTokenRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtauth::PersonalAccessTokens::CPersonalAccessToken response;
+	sdl::V1_0::imtauth::CPersonalAccessToken response;
 
 	if (!m_tokenManagerCompPtr.IsValid()){
 		errorMessage = "PersonalAccessTokenManager not available";
@@ -116,7 +116,7 @@ sdl::imtauth::PersonalAccessTokens::CPersonalAccessToken CPersonalAccessTokenCon
 	}
 
 	// Get request arguments
-	sdl::imtauth::PersonalAccessTokens::GetTokenRequestArguments arguments = 
+	sdl::V1_0::imtauth::GetTokenRequestArguments arguments = 
 		getTokenRequest.GetRequestedArguments();
 
 	if (!arguments.input.Version_1_0.has_value()){
@@ -124,7 +124,7 @@ sdl::imtauth::PersonalAccessTokens::CPersonalAccessToken CPersonalAccessTokenCon
 		return response;
 	}
 
-	sdl::imtbase::ImtCollection::CInputId::V1_0 inputArgument = *arguments.input.Version_1_0;
+	sdl::V1_0::imtbase::CInputId inputArgument = *arguments.input.Version_1_0;
 
 	QByteArray tokenId;
 	if (inputArgument.id){
@@ -149,12 +149,12 @@ sdl::imtauth::PersonalAccessTokens::CPersonalAccessToken CPersonalAccessTokenCon
 }
 
 
-sdl::imtauth::PersonalAccessTokens::CValidateTokenPayload CPersonalAccessTokenControllerComp::OnValidateToken(
-			const sdl::imtauth::PersonalAccessTokens::CValidateTokenGqlRequest& validateTokenRequest,
+sdl::V1_0::imtauth::CValidateTokenPayload CPersonalAccessTokenControllerComp::OnValidateToken(
+			const sdl::V1_0::imtauth::CValidateTokenGqlRequest& validateTokenRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtauth::PersonalAccessTokens::CValidateTokenPayload response;
+	sdl::V1_0::imtauth::CValidateTokenPayload response;
 	response.Version_1_0.Emplace();
 	response.Version_1_0->valid = false;
 
@@ -165,7 +165,7 @@ sdl::imtauth::PersonalAccessTokens::CValidateTokenPayload CPersonalAccessTokenCo
 	}
 
 	// Get request arguments
-	sdl::imtauth::PersonalAccessTokens::ValidateTokenRequestArguments arguments = 
+	sdl::V1_0::imtauth::ValidateTokenRequestArguments arguments = 
 		validateTokenRequest.GetRequestedArguments();
 
 	if (!arguments.input.Version_1_0.has_value()){
@@ -174,7 +174,7 @@ sdl::imtauth::PersonalAccessTokens::CValidateTokenPayload CPersonalAccessTokenCo
 		return response;
 	}
 
-	sdl::imtauth::PersonalAccessTokens::CTokenInput::V1_0 inputArgument = *arguments.input.Version_1_0;
+	sdl::V1_0::imtauth::CTokenInput inputArgument = *arguments.input.Version_1_0;
 
 	QByteArray rawToken;
 	if (inputArgument.token){
@@ -208,12 +208,12 @@ sdl::imtauth::PersonalAccessTokens::CValidateTokenPayload CPersonalAccessTokenCo
 }
 
 
-sdl::imtauth::PersonalAccessTokens::CCreateTokenPayload CPersonalAccessTokenControllerComp::OnCreateToken(
-			const sdl::imtauth::PersonalAccessTokens::CCreateTokenGqlRequest& createTokenRequest,
+sdl::V1_0::imtauth::CCreateTokenPayload CPersonalAccessTokenControllerComp::OnCreateToken(
+			const sdl::V1_0::imtauth::CCreateTokenGqlRequest& createTokenRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtauth::PersonalAccessTokens::CCreateTokenPayload response;
+	sdl::V1_0::imtauth::CCreateTokenPayload response;
 	response.Version_1_0.Emplace();
 	response.Version_1_0->success = false;
 
@@ -224,7 +224,7 @@ sdl::imtauth::PersonalAccessTokens::CCreateTokenPayload CPersonalAccessTokenCont
 	}
 
 	// Get request arguments
-	sdl::imtauth::PersonalAccessTokens::CreateTokenRequestArguments arguments = 
+	sdl::V1_0::imtauth::CreateTokenRequestArguments arguments = 
 		createTokenRequest.GetRequestedArguments();
 
 	if (!arguments.input.Version_1_0.has_value()){
@@ -233,7 +233,7 @@ sdl::imtauth::PersonalAccessTokens::CCreateTokenPayload CPersonalAccessTokenCont
 		return response;
 	}
 
-	sdl::imtauth::PersonalAccessTokens::CCreateTokenInput::V1_0 inputArgument = *arguments.input.Version_1_0;
+	sdl::V1_0::imtauth::CCreateTokenInput inputArgument = *arguments.input.Version_1_0;
 
 	QByteArray userId;
 	if (inputArgument.userId){
@@ -299,12 +299,12 @@ sdl::imtauth::PersonalAccessTokens::CCreateTokenPayload CPersonalAccessTokenCont
 }
 
 
-sdl::imtauth::PersonalAccessTokens::CRevokeTokenPayload CPersonalAccessTokenControllerComp::OnRevokeToken(
-			const sdl::imtauth::PersonalAccessTokens::CRevokeTokenGqlRequest& revokeTokenRequest,
+sdl::V1_0::imtauth::CRevokeTokenPayload CPersonalAccessTokenControllerComp::OnRevokeToken(
+			const sdl::V1_0::imtauth::CRevokeTokenGqlRequest& revokeTokenRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtauth::PersonalAccessTokens::CRevokeTokenPayload response;
+	sdl::V1_0::imtauth::CRevokeTokenPayload response;
 	response.Version_1_0.Emplace();
 	response.Version_1_0->success = false;
 
@@ -315,7 +315,7 @@ sdl::imtauth::PersonalAccessTokens::CRevokeTokenPayload CPersonalAccessTokenCont
 	}
 
 	// Get request arguments
-	sdl::imtauth::PersonalAccessTokens::RevokeTokenRequestArguments arguments = 
+	sdl::V1_0::imtauth::RevokeTokenRequestArguments arguments = 
 		revokeTokenRequest.GetRequestedArguments();
 
 	if (!arguments.input.Version_1_0.has_value()){
@@ -324,7 +324,7 @@ sdl::imtauth::PersonalAccessTokens::CRevokeTokenPayload CPersonalAccessTokenCont
 		return response;
 	}
 
-	sdl::imtbase::ImtCollection::CInputId::V1_0 inputArgument = *arguments.input.Version_1_0;
+	sdl::V1_0::imtbase::CInputId inputArgument = *arguments.input.Version_1_0;
 
 	QByteArray tokenId;
 	if (inputArgument.id){
@@ -354,12 +354,12 @@ sdl::imtauth::PersonalAccessTokens::CRevokeTokenPayload CPersonalAccessTokenCont
 }
 
 
-sdl::imtauth::PersonalAccessTokens::CDeleteTokenPayload CPersonalAccessTokenControllerComp::OnDeleteToken(
-			const sdl::imtauth::PersonalAccessTokens::CDeleteTokenGqlRequest& deleteTokenRequest,
+sdl::V1_0::imtauth::CDeleteTokenPayload CPersonalAccessTokenControllerComp::OnDeleteToken(
+			const sdl::V1_0::imtauth::CDeleteTokenGqlRequest& deleteTokenRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtauth::PersonalAccessTokens::CDeleteTokenPayload response;
+	sdl::V1_0::imtauth::CDeleteTokenPayload response;
 	response.Version_1_0.Emplace();
 	response.Version_1_0->success = false;
 
@@ -370,7 +370,7 @@ sdl::imtauth::PersonalAccessTokens::CDeleteTokenPayload CPersonalAccessTokenCont
 	}
 
 	// Get request arguments
-	sdl::imtauth::PersonalAccessTokens::DeleteTokenRequestArguments arguments = 
+	sdl::V1_0::imtauth::DeleteTokenRequestArguments arguments = 
 		deleteTokenRequest.GetRequestedArguments();
 
 	if (!arguments.input.Version_1_0.has_value()){
@@ -379,7 +379,7 @@ sdl::imtauth::PersonalAccessTokens::CDeleteTokenPayload CPersonalAccessTokenCont
 		return response;
 	}
 
-	sdl::imtbase::ImtCollection::CInputId::V1_0 inputArgument = *arguments.input.Version_1_0;
+	sdl::V1_0::imtbase::CInputId inputArgument = *arguments.input.Version_1_0;
 
 	QByteArray tokenId;
 	if (inputArgument.id){

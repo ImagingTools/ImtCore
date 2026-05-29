@@ -18,15 +18,15 @@ namespace imtauthgql
 
 // reimplemented (CGraphQlHandlerCompBase)
 
-sdl::imtauth::Groups::CGroupData CGroupCollectionDocumentServiceComp::OnGetGroupRepresentation(
-		const sdl::imtauth::GroupCollectionDocumentService::CGetGroupRepresentationGqlRequest& getGroupRepresentationRequest,
+sdl::V1_0::imtauth::CGroupData CGroupCollectionDocumentServiceComp::OnGetGroupRepresentation(
+		const sdl::V1_0::imtauth::CGetGroupRepresentationGqlRequest& getGroupRepresentationRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
-	sdl::imtauth::GroupCollectionDocumentService::GetGroupRepresentationRequestArguments arguments = getGroupRepresentationRequest.GetRequestedArguments();
+	sdl::V1_0::imtauth::GetGroupRepresentationRequestArguments arguments = getGroupRepresentationRequest.GetRequestedArguments();
 	if (!arguments.input.Version_1_0){
 		Q_ASSERT(false);
-		return sdl::imtauth::Groups::CGroupData();
+		return sdl::V1_0::imtauth::CGroupData();
 	}
 
 	QByteArray userId = GetUserId(gqlRequest);
@@ -38,23 +38,23 @@ sdl::imtauth::Groups::CGroupData CGroupCollectionDocumentServiceComp::OnGetGroup
 
 	if (objectId.isEmpty()){
 		errorMessage = QStringLiteral("Missing document ID");
-		return sdl::imtauth::Groups::CGroupData();
+		return sdl::V1_0::imtauth::CGroupData();
 	}
 
 	istd::IChangeableSharedPtr documentPtr;
 	m_documentManagerCompPtr->GetDocumentData(userId, objectId, documentPtr);
 	if (!documentPtr.IsValid()){
 		errorMessage = QStringLiteral("Document not found");
-		return sdl::imtauth::Groups::CGroupData();
+		return sdl::V1_0::imtauth::CGroupData();
 	}
 
 	const imtauth::CIdentifiableUserGroupInfo* groupPtr = dynamic_cast<const imtauth::CIdentifiableUserGroupInfo*>(documentPtr.GetPtr());
 	if (groupPtr == nullptr){
 		errorMessage = QStringLiteral("Invalid document type");
-		return sdl::imtauth::Groups::CGroupData();
+		return sdl::V1_0::imtauth::CGroupData();
 	}
 
-	sdl::imtauth::Groups::CGroupData response;
+	sdl::V1_0::imtauth::CGroupData response;
 	response.Version_1_0.Emplace();
 
 	response.Version_1_0->id = groupPtr->GetObjectUuid();
@@ -84,20 +84,20 @@ sdl::imtauth::Groups::CGroupData CGroupCollectionDocumentServiceComp::OnGetGroup
 }
 
 
-sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CGroupCollectionDocumentServiceComp::OnUpdateGroupFromRepresentation(
-		const sdl::imtauth::GroupCollectionDocumentService::CUpdateGroupFromRepresentationGqlRequest& updateGroupFromRepresentationRequest,
+sdl::V1_0::imtbase::CDocumentOperationStatus CGroupCollectionDocumentServiceComp::OnUpdateGroupFromRepresentation(
+		const sdl::V1_0::imtauth::CUpdateGroupFromRepresentationGqlRequest& updateGroupFromRepresentationRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
-	sdl::imtauth::GroupCollectionDocumentService::UpdateGroupFromRepresentationRequestArguments arguments = updateGroupFromRepresentationRequest.GetRequestedArguments();
+	sdl::V1_0::imtauth::UpdateGroupFromRepresentationRequestArguments arguments = updateGroupFromRepresentationRequest.GetRequestedArguments();
 	if (!arguments.input.Version_1_0){
 		Q_ASSERT(false);
-		return sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus();
+		return sdl::V1_0::imtbase::CDocumentOperationStatus();
 	}
 
-	sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus response;
+	sdl::V1_0::imtbase::CDocumentOperationStatus response;
 	response.Version_1_0.Emplace();
-	response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::Failed;
+	response.Version_1_0->status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
 
 	QByteArray documentId;
 	if (arguments.input.Version_1_0->documentId){
@@ -114,17 +114,17 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CGroupCollecti
 	istd::IChangeableSharedPtr documentPtr;
 	m_documentManagerCompPtr->GetDocumentData(userLogin, documentId, documentPtr);
 	if (!documentPtr.IsValid()){
-		response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::InvalidDocumentId;
+		response.Version_1_0->status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
 
 	imtauth::CIdentifiableUserGroupInfo* groupPtr = dynamic_cast<imtauth::CIdentifiableUserGroupInfo*>(documentPtr.GetPtr());
 	if (groupPtr == nullptr){
-		response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::InvalidDocumentId;
+		response.Version_1_0->status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
 
-	sdl::imtauth::Groups::CGroupData::V1_0 groupData;
+	sdl::V1_0::imtauth::CGroupData groupData;
 	if (arguments.input.Version_1_0->group){
 		groupData = *arguments.input.Version_1_0->group;
 	}
@@ -175,7 +175,7 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CGroupCollecti
 
 	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr);
 
-	response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::Success;
+	response.Version_1_0->status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 
 	return response;
 }

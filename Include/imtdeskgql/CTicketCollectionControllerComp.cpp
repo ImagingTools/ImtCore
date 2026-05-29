@@ -22,8 +22,8 @@ namespace imtdeskgql
 
 bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-			const sdl::imtdesk::ImtDesk::CTicketsListGqlRequest& /*listRequest*/,
-			sdl::imtdesk::ImtDesk::CTicketItemData::V1_0& representationObject,
+			const sdl::V1_0::imtdesk::CTicketsListGqlRequest& /*listRequest*/,
+			sdl::V1_0::imtdesk::CTicketItemData& representationObject,
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
@@ -53,10 +53,10 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 	imtdesk::ISupportTicket::TicketStatus ticketStatus = ticketPtr->GetStatus();
 	switch (ticketStatus){
 	case imtdesk::ISupportTicket::TS_OPEN:
-		representationObject.status = sdl::imtdesk::ImtDesk::TicketStatus::Open;
+		representationObject.status = sdl::V1_0::imtdesk::TicketStatus::Open;
 		break;
 	case imtdesk::ISupportTicket::TS_CLOSED:
-		representationObject.status = sdl::imtdesk::ImtDesk::TicketStatus::Closed;
+		representationObject.status = sdl::V1_0::imtdesk::TicketStatus::Closed;
 		break;
 	default:
 		break;
@@ -65,16 +65,16 @@ bool CTicketCollectionControllerComp::CreateRepresentationFromObject(
 	imtdesk::ISupportTicket::TicketPriority ticketPriority = ticketPtr->GetPriority();
 	switch (ticketPriority){
 	case imtdesk::ISupportTicket::TP_LOW:
-		representationObject.priority = sdl::imtdesk::ImtDesk::TicketPriority::Low;
+		representationObject.priority = sdl::V1_0::imtdesk::TicketPriority::Low;
 		break;
 	case imtdesk::ISupportTicket::TP_MEDIUM:
-		representationObject.priority = sdl::imtdesk::ImtDesk::TicketPriority::Medium;
+		representationObject.priority = sdl::V1_0::imtdesk::TicketPriority::Medium;
 		break;
 	case imtdesk::ISupportTicket::TP_HIGH:
-		representationObject.priority = sdl::imtdesk::ImtDesk::TicketPriority::High;
+		representationObject.priority = sdl::V1_0::imtdesk::TicketPriority::High;
 		break;
 	case imtdesk::ISupportTicket::TP_CRITICAL:
-		representationObject.priority = sdl::imtdesk::ImtDesk::TicketPriority::Critical;
+		representationObject.priority = sdl::V1_0::imtdesk::TicketPriority::Critical;
 		break;
 	}
 

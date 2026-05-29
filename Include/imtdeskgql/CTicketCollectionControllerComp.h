@@ -12,21 +12,21 @@ namespace imtdeskgql
 
 
 class CTicketCollectionControllerComp:
-		public sdl::imtdesk::ImtDesk::CTicketCollectionControllerCompBase
+		public sdl::V1_0::imtdesk::CTicketCollectionControllerCompBase
 {
 public:
-	typedef sdl::imtdesk::ImtDesk::CTicketCollectionControllerCompBase BaseClass;
+	typedef sdl::V1_0::imtdesk::CTicketCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CTicketCollectionControllerComp);
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Collection of users", true, "UserCollection");
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtdesk::ImtDesk::CTicketCollectionControllerCompBase)
+	// reimplemented (sdl::V1_0::imtdesk::CTicketCollectionControllerCompBase)
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-				const sdl::imtdesk::ImtDesk::CTicketsListGqlRequest& listRequest,
-				sdl::imtdesk::ImtDesk::CTicketItemData::V1_0& representationObject,
+				const sdl::V1_0::imtdesk::CTicketsListGqlRequest& listRequest,
+				sdl::V1_0::imtdesk::CTicketItemData& representationObject,
 				QString& errorMessage) const override;
 	virtual void SetAdditionalFilters(
 				const imtgql::CGqlRequest& gqlRequest,

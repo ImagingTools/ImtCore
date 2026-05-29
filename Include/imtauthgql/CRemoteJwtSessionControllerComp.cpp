@@ -31,7 +31,7 @@ bool CRemoteJwtSessionControllerComp::ValidateSession(const QByteArray& sessionI
 		return false;
 	}
 
-	typedef sdl::imtauth::Sessions::CValidateSessionPayload Response;
+	typedef sdl::V1_0::imtauth::CValidateSessionPayload Response;
 
 	QString errorMessage;
 	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
@@ -60,7 +60,7 @@ imtauth::IJwtSessionController::JwtState CRemoteJwtSessionControllerComp::Valida
 		return imtauth::IJwtSessionController::JS_NONE;
 	}
 
-	typedef sdl::imtauth::Sessions::CValidateJwtPayload Response;
+	typedef sdl::V1_0::imtauth::CValidateJwtPayload Response;
 
 	QString errorMessage;
 	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
@@ -101,7 +101,7 @@ bool CRemoteJwtSessionControllerComp::RefreshToken(
 		return false;
 	}
 
-	typedef sdl::imtauth::Sessions::CRefreshTokenPayload Response;
+	typedef sdl::V1_0::imtauth::CRefreshTokenPayload Response;
 
 	QString errorMessage;
 	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
@@ -154,7 +154,7 @@ bool CRemoteJwtSessionControllerComp::CreateNewSession(
 		return false;
 	}
 
-	typedef sdl::imtauth::Sessions::CCreateNewSessionPayload Response;
+	typedef sdl::V1_0::imtauth::CCreateNewSessionPayload Response;
 
 	QString errorMessage;
 	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
@@ -201,7 +201,7 @@ imtauth::ISessionSharedPtr CRemoteJwtSessionControllerComp::GetSession(const QBy
 		return nullptr;
 	}
 
-	typedef sdl::imtauth::Sessions::CGetSessionPayload Response;
+	typedef sdl::V1_0::imtauth::CGetSessionPayload Response;
 
 	QString errorMessage;
 	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
@@ -240,7 +240,7 @@ bool CRemoteJwtSessionControllerComp::RemoveSession(const QByteArray& sessionId)
 		return false;
 	}
 
-	typedef sdl::imtauth::Sessions::CRemoveSessionPayload Response;
+	typedef sdl::V1_0::imtauth::CRemoveSessionPayload Response;
 
 	QString errorMessage;
 	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
@@ -269,7 +269,7 @@ QByteArray CRemoteJwtSessionControllerComp::GetUserFromJwt(const QByteArray& jwt
 		return QByteArray();
 	}
 
-	typedef sdl::imtauth::Sessions::CGetUserFromJwtPayload Response;
+	typedef sdl::V1_0::imtauth::CGetUserFromJwtPayload Response;
 
 	QString errorMessage;
 	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
@@ -304,7 +304,7 @@ QByteArray CRemoteJwtSessionControllerComp::GetTenantFromJwt(const QByteArray& j
 		return QByteArray();
 	}
 
-	typedef sdl::imtauth::Sessions::CGetTenantFromJwtPayload Response;
+	typedef sdl::V1_0::imtauth::CGetTenantFromJwtPayload Response;
 
 	QString errorMessage;
 	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);

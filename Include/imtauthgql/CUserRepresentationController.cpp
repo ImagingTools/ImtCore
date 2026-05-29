@@ -17,7 +17,7 @@ namespace imtauthgql
 
 
 bool CUserRepresentationController::FillUserInfoFromRepresentation(
-			const sdl::imtauth::Users::CUserData::V1_0& representation,
+			const sdl::V1_0::imtauth::CUserData& representation,
 			istd::IChangeable& userObject,
 			imtbase::IObjectCollection* userCollectionPtr,
 			const QByteArray& userId,
@@ -92,7 +92,7 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 
 	userInfoPtr->SetName(name);
 
-	imtsdl::TElementList<sdl::imtauth::Users::CSystemInfo::V1_0> systemInfos;
+	imtsdl::TElementList<sdl::V1_0::imtauth::CSystemInfo> systemInfos;
 	if (representation.systemInfos){
 		systemInfos = *representation.systemInfos;
 	}
@@ -102,7 +102,7 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 		userInfoPtr->AddToSystem(systemInfo);
 	}
 	else{
-		for (const istd::TSharedNullable<sdl::imtauth::Users::CSystemInfo::V1_0>& sdlSystemInfo : systemInfos){
+		for (const istd::TSharedNullable<sdl::V1_0::imtauth::CSystemInfo>& sdlSystemInfo : systemInfos){
 			QByteArray systemId;
 			if (!sdlSystemInfo.HasValue()){
 				continue;

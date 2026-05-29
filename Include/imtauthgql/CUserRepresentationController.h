@@ -18,7 +18,7 @@ class CUserRepresentationController: public istd::IPolymorphic
 {
 public:
 	virtual bool FillUserInfoFromRepresentation(
-				const sdl::imtauth::Users::CUserData::V1_0& representation,
+				const sdl::V1_0::imtauth::CUserData& representation,
 				istd::IChangeable& userObject,
 				imtbase::IObjectCollection* userCollectionPtr,
 				const QByteArray& userId,

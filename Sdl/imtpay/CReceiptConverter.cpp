@@ -100,7 +100,7 @@ bool SelectOptionByIdForParamsSet(iprm::IParamsSet& params, const QByteArray& pa
 
 // public static methods
 
-bool CReceiptConverter::CreateSdlFromParams(sdl::imtpay::ImtPay::CReceipt::V1_0& receipt, const iprm::IParamsSet& params)
+bool CReceiptConverter::CreateSdlFromParams(sdl::V1_0::imtpay::CReceipt& receipt, const iprm::IParamsSet& params)
 {
 	namespace ImtPayV1 = sdl::imtpay::ImtPay;
 	// set type
@@ -355,7 +355,7 @@ bool CReceiptConverter::CreateSdlFromParams(sdl::imtpay::ImtPay::CReceipt::V1_0&
 }
 
 
-bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl::imtpay::ImtPay::CReceipt::V1_0& receipt)
+bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl::V1_0::imtpay::CReceipt& receipt)
 {
 	namespace ImtPayV1 = sdl::imtpay::ImtPay;
 

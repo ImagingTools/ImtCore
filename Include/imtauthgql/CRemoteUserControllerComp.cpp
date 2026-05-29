@@ -13,10 +13,10 @@ namespace imtauthgql
 
 imtauth::ISuperuserProvider::ExistsStatus CRemoteUserControllerComp::SuperuserExists(QString& errorMessage) const
 {
-	imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_QUERY, sdl::imtauth::Users::CCheckSuperuserExistsGqlRequest::GetCommandId());
-	sdl::imtauth::Users::CCheckSuperuserExistsGqlRequest checkSuperuserExistsGqlRequest(gqlRequest, false);
+	imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_QUERY, sdl::V1_0::imtauth::CCheckSuperuserExistsGqlRequest::GetCommandId());
+	sdl::V1_0::imtauth::CCheckSuperuserExistsGqlRequest checkSuperuserExistsGqlRequest(gqlRequest, false);
 
-	sdl::imtauth::Users::CCheckSuperuserPayload result = OnCheckSuperuserExists(checkSuperuserExistsGqlRequest, gqlRequest, errorMessage);
+	sdl::V1_0::imtauth::CCheckSuperuserPayload result = OnCheckSuperuserExists(checkSuperuserExistsGqlRequest, gqlRequest, errorMessage);
 	if (!result.Version_1_0.has_value()){
 		return imtauth::ISuperuserProvider::ES_UNKNOWN;
 	}
@@ -27,11 +27,11 @@ imtauth::ISuperuserProvider::ExistsStatus CRemoteUserControllerComp::SuperuserEx
 
 	imtauth::ISuperuserProvider::ExistsStatus retVal = imtauth::ISuperuserProvider::ES_UNKNOWN;
 	if (result.Version_1_0->status){
-		sdl::imtauth::Users::ExistsStatus status = *result.Version_1_0->status;
-		if (status == sdl::imtauth::Users::ExistsStatus::EXISTS){
+		sdl::V1_0::imtauth::ExistsStatus status = *result.Version_1_0->status;
+		if (status == sdl::V1_0::imtauth::ExistsStatus::EXISTS){
 			retVal = imtauth::ISuperuserProvider::ES_EXISTS;
 		}
-		else if (status == sdl::imtauth::Users::ExistsStatus::NOT_EXISTS){
+		else if (status == sdl::V1_0::imtauth::ExistsStatus::NOT_EXISTS){
 			retVal = imtauth::ISuperuserProvider::ES_NOT_EXISTS;
 		}
 	}
@@ -46,77 +46,77 @@ QByteArray CRemoteUserControllerComp::GetSuperuserId() const
 }
 
 
-// reimplemented (sdl::imtauth::Users::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
 
-sdl::imtauth::Users::CChangePasswordPayload CRemoteUserControllerComp::OnChangePassword(
-			const sdl::imtauth::Users::CChangePasswordGqlRequest& /*changePasswordRequest*/,
+sdl::V1_0::imtauth::CChangePasswordPayload CRemoteUserControllerComp::OnChangePassword(
+			const sdl::V1_0::imtauth::CChangePasswordGqlRequest& /*changePasswordRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtauth::Users::CChangePasswordPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtauth::CChangePasswordPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtauth::Users::CRegisterUserPayload CRemoteUserControllerComp::OnRegisterUser(
-			const sdl::imtauth::Users::CRegisterUserGqlRequest& /*registerUserRequest*/,
+sdl::V1_0::imtauth::CRegisterUserPayload CRemoteUserControllerComp::OnRegisterUser(
+			const sdl::V1_0::imtauth::CRegisterUserGqlRequest& /*registerUserRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtauth::Users::CRegisterUserPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtauth::CRegisterUserPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtauth::Users::CCheckEmailPayload CRemoteUserControllerComp::OnCheckEmail(
-			const sdl::imtauth::Users::CCheckEmailGqlRequest& /*checkEmailRequest*/,
+sdl::V1_0::imtauth::CCheckEmailPayload CRemoteUserControllerComp::OnCheckEmail(
+			const sdl::V1_0::imtauth::CCheckEmailGqlRequest& /*checkEmailRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtauth::Users::CCheckEmailPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtauth::CCheckEmailPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtauth::Users::CSendEmailCodePayload CRemoteUserControllerComp::OnSendEmailCode(
-			const sdl::imtauth::Users::CSendEmailCodeGqlRequest& /*sendEmailCodeRequest*/,
+sdl::V1_0::imtauth::CSendEmailCodePayload CRemoteUserControllerComp::OnSendEmailCode(
+			const sdl::V1_0::imtauth::CSendEmailCodeGqlRequest& /*sendEmailCodeRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtauth::Users::CSendEmailCodePayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtauth::CSendEmailCodePayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtauth::Users::CCheckEmailCodePayload CRemoteUserControllerComp::OnCheckEmailCode(
-			const sdl::imtauth::Users::CCheckEmailCodeGqlRequest& /*checkEmailCodeRequest*/,
+sdl::V1_0::imtauth::CCheckEmailCodePayload CRemoteUserControllerComp::OnCheckEmailCode(
+			const sdl::V1_0::imtauth::CCheckEmailCodeGqlRequest& /*checkEmailCodeRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtauth::Users::CCheckEmailCodePayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtauth::CCheckEmailCodePayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtauth::Users::CCheckSuperuserPayload CRemoteUserControllerComp::OnCheckSuperuserExists(
-			const sdl::imtauth::Users::CCheckSuperuserExistsGqlRequest& /*checkSuperuserExistsRequest*/,
+sdl::V1_0::imtauth::CCheckSuperuserPayload CRemoteUserControllerComp::OnCheckSuperuserExists(
+			const sdl::V1_0::imtauth::CCheckSuperuserExistsGqlRequest& /*checkSuperuserExistsRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtauth::Users::CCheckSuperuserPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtauth::CCheckSuperuserPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtauth::Users::CCreateSuperuserPayload CRemoteUserControllerComp::OnCreateSuperuser(
-			const sdl::imtauth::Users::CCreateSuperuserGqlRequest& /*createSuperuserRequest*/,
+sdl::V1_0::imtauth::CCreateSuperuserPayload CRemoteUserControllerComp::OnCreateSuperuser(
+			const sdl::V1_0::imtauth::CCreateSuperuserGqlRequest& /*createSuperuserRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtauth::Users::CCreateSuperuserPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtauth::CCreateSuperuserPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtauth::Users::CUserObjectId CRemoteUserControllerComp::OnGetUserObjectId(
-			const sdl::imtauth::Users::CGetUserObjectIdGqlRequest& /*getUserObjectIdRequest*/,
+sdl::V1_0::imtauth::CUserObjectId CRemoteUserControllerComp::OnGetUserObjectId(
+			const sdl::V1_0::imtauth::CGetUserObjectIdGqlRequest& /*getUserObjectIdRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtauth::Users::CUserObjectId>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtauth::CUserObjectId>(gqlRequest, errorMessage);
 }
 
 

@@ -9,41 +9,41 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (sdl::imtauth::Authorization::V1_0::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::V1_0::CGraphQlHandlerCompBase)
 
-sdl::imtauth::Authorization::CAuthorizationPayload CRemoteAuthorizationControllerComp::OnAuthorization(
-			const sdl::imtauth::Authorization::CAuthorizationGqlRequest& /*authorizationRequest*/,
+sdl::V1_0::imtauth::CAuthorizationPayload CRemoteAuthorizationControllerComp::OnAuthorization(
+			const sdl::V1_0::imtauth::CAuthorizationGqlRequest& /*authorizationRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtauth::Authorization::CAuthorizationPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtauth::CAuthorizationPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtauth::Authorization::CAuthorizationPayload CRemoteAuthorizationControllerComp::OnUserToken(
-			const sdl::imtauth::Authorization::CUserTokenGqlRequest& /*userTokenRequest*/,
+sdl::V1_0::imtauth::CAuthorizationPayload CRemoteAuthorizationControllerComp::OnUserToken(
+			const sdl::V1_0::imtauth::CUserTokenGqlRequest& /*userTokenRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtauth::Authorization::CAuthorizationPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtauth::CAuthorizationPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtauth::Authorization::CLogoutPayload CRemoteAuthorizationControllerComp::OnLogout(
-			const sdl::imtauth::Authorization::CLogoutGqlRequest& /*logoutRequest*/,
+sdl::V1_0::imtauth::CLogoutPayload CRemoteAuthorizationControllerComp::OnLogout(
+			const sdl::V1_0::imtauth::CLogoutGqlRequest& /*logoutRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtauth::Authorization::CLogoutPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtauth::CLogoutPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtauth::Authorization::CPermissionList CRemoteAuthorizationControllerComp::OnGetPermissions(
-			const sdl::imtauth::Authorization::CGetPermissionsGqlRequest& /*getPermissionsRequest*/,
+sdl::V1_0::imtauth::CPermissionList CRemoteAuthorizationControllerComp::OnGetPermissions(
+			const sdl::V1_0::imtauth::CGetPermissionsGqlRequest& /*getPermissionsRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtauth::Authorization::CPermissionList>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtauth::CPermissionList>(gqlRequest, errorMessage);
 }
 
 

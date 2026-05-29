@@ -43,7 +43,7 @@ void CQmlLineShape::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 	}
 }
 
-void imtqml2d::CQmlLineShape::SetPoint1(sdl::imtsdl2d::imt2d::CPoint2d newPoint1)
+void imtqml2d::CQmlLineShape::SetPoint1(sdl::V1_0::imtsdl2d::CPoint2d newPoint1)
 {
 	BaseClass2::SetPoint1(newPoint1);
 	i2d::CLine2d* objectPtr = GetObjectPtr();
@@ -56,7 +56,7 @@ void imtqml2d::CQmlLineShape::SetPoint1(sdl::imtsdl2d::imt2d::CPoint2d newPoint1
 	objectPtr->SetPoint1(i2d::CVector2d(newPoint1.GetX(), newPoint1.GetY()));
 }
 
-void CQmlLineShape::SetPoint2(sdl::imtsdl2d::imt2d::CPoint2d newPoint2)
+void CQmlLineShape::SetPoint2(sdl::V1_0::imtsdl2d::CPoint2d newPoint2)
 {
 	BaseClass2::SetPoint2(newPoint2);
 	i2d::CLine2d* objectPtr = GetObjectPtr();

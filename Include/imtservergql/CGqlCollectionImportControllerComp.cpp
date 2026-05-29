@@ -9,7 +9,7 @@ namespace imtservergql
 
 // protected methods
 
-// reimplemented (sdl::imtbase::CollectionImport::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
 
 collectionImport::CSessionStatus CGqlCollectionImportControllerComp::OnBeginCollectionImportSession(
 	const collectionImport::CBeginCollectionImportSessionGqlRequest& request,

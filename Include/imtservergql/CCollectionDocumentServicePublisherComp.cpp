@@ -77,7 +77,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentCreated(imtdoc::CEventBa
 	imtdoc::IDocumentService::DocumentNotification notification;
 	FillDocumentNotification(concreteEventPtr, notification);
 
-	sdl::imtbase::CollectionDocumentService::CDocumentServiceNotification::V1_0 sdlNotification;
+	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
 	FillSdlNotification(notification, CDM::EDocumentOperation::NewDocumentCreated, sdlNotification);
 
 	PublishRepresentation(GetCommandId(), notification.userId, sdlNotification);
@@ -96,7 +96,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentOpened(imtdoc::CEventBas
 	imtdoc::IDocumentService::DocumentNotification notification;
 	FillDocumentNotification(concreteEventPtr, notification);
 
-	sdl::imtbase::CollectionDocumentService::CDocumentServiceNotification::V1_0 sdlNotification;
+	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
 	FillSdlNotification(notification, CDM::EDocumentOperation::DocumentOpened, sdlNotification);
 
 	PublishRepresentation(GetCommandId(), notification.userId, sdlNotification);
@@ -115,7 +115,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentRenamed(imtdoc::CEventBa
 	imtdoc::IDocumentService::DocumentNotification notification;
 	FillDocumentNotification(concreteEventPtr, notification);
 
-	sdl::imtbase::CollectionDocumentService::CDocumentServiceNotification::V1_0 sdlNotification;
+	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
 	FillSdlNotification(notification, CDM::EDocumentOperation::DocumentRenamed, sdlNotification);
 
 	PublishRepresentation(GetCommandId(), notification.userId, sdlNotification);
@@ -134,7 +134,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentChanged(imtdoc::CEventBa
 	imtdoc::IDocumentService::DocumentNotification notification;
 	FillDocumentNotification(concreteEventPtr, notification);
 
-	sdl::imtbase::CollectionDocumentService::CDocumentServiceNotification::V1_0 sdlNotification;
+	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
 	FillSdlNotification(notification, CDM::EDocumentOperation::DocumentChanged, sdlNotification);
 
 	PublishRepresentation(GetCommandId(), notification.userId, sdlNotification);
@@ -151,10 +151,10 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentUndoRedoChanged(
 		return false;
 	}
 
-	sdl::imtbase::UndoManager::CUndoInfo::V1_0 sdlNotification;
+	sdl::V1_0::imtbase::CUndoInfo sdlNotification;
 
 	sdlNotification.documentId = concreteEventPtr->GetDocumentId();
-	sdlNotification.status.emplace().status = sdl::imtbase::UndoManager::EUndoStatus::Success;
+	sdlNotification.status.emplace().status = sdl::V1_0::imtbase::EUndoStatus::Success;
 	sdlNotification.isDirty = concreteEventPtr->IsDocumentDirty();
 
 	const idoc::IUndoManager& undoManager = concreteEventPtr->GetUndoManager();
@@ -191,7 +191,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentSaved(imtdoc::CEventBase
 	imtdoc::IDocumentService::DocumentNotification notification;
 	FillDocumentNotification(concreteEventPtr, notification);
 
-	sdl::imtbase::CollectionDocumentService::CDocumentServiceNotification::V1_0 sdlNotification;
+	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
 	FillSdlNotification(notification, CDM::EDocumentOperation::DocumentSaved, sdlNotification);
 
 	PublishRepresentation(GetCommandId(), notification.userId, sdlNotification);
@@ -210,7 +210,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentSavedAs(imtdoc::CEventBa
 	imtdoc::IDocumentService::DocumentNotification notification;
 	FillDocumentNotification(concreteEventPtr, notification);
 
-	sdl::imtbase::CollectionDocumentService::CDocumentServiceNotification::V1_0 sdlNotification;
+	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
 	FillSdlNotification(notification, CDM::EDocumentOperation::DocumentSavedAs, sdlNotification);
 
 	PublishRepresentation(GetCommandId(), notification.userId, sdlNotification);
@@ -226,7 +226,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentClosed(imtdoc::CEventBas
 		return false;
 	}
 
-	sdl::imtbase::CollectionDocumentService::CDocumentServiceNotification::V1_0 sdlNotification;
+	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
 	sdlNotification.documentOperation = CDM::EDocumentOperation::DocumentClosed;
 	sdlNotification.documentId = concreteEventPtr->GetDocumentId();
 	sdlNotification.documentName.emplace();
@@ -247,7 +247,7 @@ bool CCollectionDocumentServicePublisherComp::OnDocumentDataLoaded(imtdoc::CEven
 	imtdoc::IDocumentService::DocumentNotification notification;
 	FillDocumentNotification(concreteEventPtr, notification);
 
-	sdl::imtbase::CollectionDocumentService::CDocumentServiceNotification::V1_0 sdlNotification;
+	sdl::V1_0::imtbase::CDocumentServiceNotification sdlNotification;
 	FillSdlNotification(notification, CDM::EDocumentOperation::DocumentDataLoaded, sdlNotification);
 
 	PublishRepresentation(GetCommandId(), notification.userId, sdlNotification);
@@ -271,8 +271,8 @@ void CCollectionDocumentServicePublisherComp::FillDocumentNotification(
 
 void CCollectionDocumentServicePublisherComp::FillSdlNotification(
 	const imtdoc::IDocumentService::DocumentNotification& notification,
-	sdl::imtbase::CollectionDocumentService::EDocumentOperation operation,
-	sdl::imtbase::CollectionDocumentService::CDocumentServiceNotification::V1_0& sdlNotification) const
+	sdl::V1_0::imtbase::EDocumentOperation operation,
+	sdl::V1_0::imtbase::CDocumentServiceNotification& sdlNotification) const
 {
 	sdlNotification.documentOperation = operation;
 	sdlNotification.documentId = notification.documentId;

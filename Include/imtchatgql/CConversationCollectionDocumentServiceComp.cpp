@@ -19,15 +19,15 @@ namespace imtchatgql
 
 // reimplemented (CGraphQlHandlerCompBase)
 
-sdl::imtchat::ImtChat::CConversationData CConversationCollectionDocumentServiceComp::OnGetConversationRepresentation(
-			const sdl::imtchat::ConversationCollectionDocumentService::CGetConversationRepresentationGqlRequest& getConversationRepresentationRequest,
+sdl::V1_0::imtchat::CConversationData CConversationCollectionDocumentServiceComp::OnGetConversationRepresentation(
+			const sdl::V1_0::imtchat::CGetConversationRepresentationGqlRequest& getConversationRepresentationRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtchat::ConversationCollectionDocumentService::GetConversationRepresentationRequestArguments arguments = getConversationRepresentationRequest.GetRequestedArguments();
+	sdl::V1_0::imtchat::GetConversationRepresentationRequestArguments arguments = getConversationRepresentationRequest.GetRequestedArguments();
 	if (!arguments.input.Version_1_0){
 		Q_ASSERT(false);
-		return sdl::imtchat::ImtChat::CConversationData();
+		return sdl::V1_0::imtchat::CConversationData();
 	}
 
 	QByteArray userId = GetUserId(gqlRequest);
@@ -41,15 +41,15 @@ sdl::imtchat::ImtChat::CConversationData CConversationCollectionDocumentServiceC
 	}
 
 	if (!documentPtr.IsValid()){
-		return sdl::imtchat::ImtChat::CConversationData();
+		return sdl::V1_0::imtchat::CConversationData();
 	}
 
 	imtchat::IConversation* convPtr = dynamic_cast<imtchat::IConversation*>(documentPtr.GetPtr());
 	if (convPtr == nullptr){
-		return sdl::imtchat::ImtChat::CConversationData();
+		return sdl::V1_0::imtchat::CConversationData();
 	}
 
-	sdl::imtchat::ImtChat::CConversationData response;
+	sdl::V1_0::imtchat::CConversationData response;
 	response.Version_1_0.Emplace();
 
 	response.Version_1_0->id = convPtr->GetId();
@@ -62,27 +62,27 @@ sdl::imtchat::ImtChat::CConversationData CConversationCollectionDocumentServiceC
 }
 
 
-sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CConversationCollectionDocumentServiceComp::OnUpdateConversationFromRepresentation(
-			const sdl::imtchat::ConversationCollectionDocumentService::CUpdateConversationFromRepresentationGqlRequest& updateConversationFromRepresentationRequest,
+sdl::V1_0::imtbase::CDocumentOperationStatus CConversationCollectionDocumentServiceComp::OnUpdateConversationFromRepresentation(
+			const sdl::V1_0::imtchat::CUpdateConversationFromRepresentationGqlRequest& updateConversationFromRepresentationRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtchat::ConversationCollectionDocumentService::UpdateConversationFromRepresentationRequestArguments arguments = updateConversationFromRepresentationRequest.GetRequestedArguments();
+	sdl::V1_0::imtchat::UpdateConversationFromRepresentationRequestArguments arguments = updateConversationFromRepresentationRequest.GetRequestedArguments();
 	if (!arguments.input.Version_1_0){
 		Q_ASSERT(false);
-		return sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus();
+		return sdl::V1_0::imtbase::CDocumentOperationStatus();
 	}
 
-	sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus response;
+	sdl::V1_0::imtbase::CDocumentOperationStatus response;
 	response.Version_1_0.Emplace();
-	response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::Failed;
+	response.Version_1_0->status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
 
 	QByteArray documentId;
 	if (arguments.input.Version_1_0->documentId){
 		documentId = *arguments.input.Version_1_0->documentId;
 	}
 
-	sdl::imtchat::ImtChat::CConversationData::V1_0 convInfo;
+	sdl::V1_0::imtchat::CConversationData convInfo;
 	if (arguments.input.Version_1_0->conversation){
 		convInfo = *arguments.input.Version_1_0->conversation;
 	}
@@ -92,13 +92,13 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CConversationC
 	istd::IChangeableSharedPtr documentPtr;
 	m_documentManagerCompPtr->GetDocumentData(userId, documentId, documentPtr);
 	if (!documentPtr.IsValid()){
-		response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::InvalidDocumentId;
+		response.Version_1_0->status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
 
 	imtchat::IConversation* convPtr = dynamic_cast<imtchat::IConversation*>(documentPtr.GetPtr());
 	if (convPtr == nullptr){
-		response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::InvalidDocumentId;
+		response.Version_1_0->status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
 
@@ -122,7 +122,7 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CConversationC
 
 	m_documentManagerCompPtr->SetDocumentData(userId, documentId, *convPtr);
 
-	response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::Success;
+	response.Version_1_0->status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 
 	return response;
 }

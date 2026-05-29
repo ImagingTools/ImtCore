@@ -9,7 +9,7 @@ namespace imtclientgql
 
 // protected methods
 
-// reimplemented (sdl::imtbase::Commands::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
 
 bool CRemoteCommandsControllerComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
@@ -30,12 +30,12 @@ bool CRemoteCommandsControllerComp::IsRequestSupported(const imtgql::CGqlRequest
 }
 
 
-sdl::imtbase::Commands::CGuiElementContainer CRemoteCommandsControllerComp::OnGetCommands(
-			const sdl::imtbase::Commands::CGetCommandsGqlRequest& /*getCommandsRequest*/,
+sdl::V1_0::imtbase::CGuiElementContainer CRemoteCommandsControllerComp::OnGetCommands(
+			const sdl::V1_0::imtbase::CGetCommandsGqlRequest& /*getCommandsRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::Commands::CGuiElementContainer>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CGuiElementContainer>(gqlRequest, errorMessage);
 }
 
 

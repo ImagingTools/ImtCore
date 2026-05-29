@@ -18,7 +18,7 @@ namespace imtauthgql
 // protected methods
 
 bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
-			const sdl::imtauth::Groups::CGroupData::V1_0& groupDataRepresentation,
+			const sdl::V1_0::imtauth::CGroupData& groupDataRepresentation,
 			istd::IChangeable& object,
 			QByteArray& newObjectId,
 			QString& errorMessage) const
@@ -102,16 +102,16 @@ bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
 }
 
 
-// reimplemented (sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
 
-sdl::imtbase::ImtCollection::CVisualStatus CUserGroupCollectionControllerComp::OnGetObjectVisualStatus(
-			const sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
+sdl::V1_0::imtbase::CVisualStatus CUserGroupCollectionControllerComp::OnGetObjectVisualStatus(
+			const sdl::V1_0::imtbase::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::ImtCollection::CVisualStatus response = BaseClass::OnGetObjectVisualStatus(getObjectVisualStatusRequest, gqlRequest, errorMessage);
+	sdl::V1_0::imtbase::CVisualStatus response = BaseClass::OnGetObjectVisualStatus(getObjectVisualStatusRequest, gqlRequest, errorMessage);
 	if (!errorMessage.isEmpty()){
-		return sdl::imtbase::ImtCollection::CVisualStatus();
+		return sdl::V1_0::imtbase::CVisualStatus();
 	}
 	
 	if (!response.Version_1_0.has_value()){
@@ -141,15 +141,15 @@ sdl::imtbase::ImtCollection::CVisualStatus CUserGroupCollectionControllerComp::O
 }
 
 
-sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CUserGroupCollectionControllerComp::OnGetElementMetaInfo(
-			const sdl::imtbase::ImtCollection::CGetElementMetaInfoGqlRequest& getElementMetaInfoRequest,
+sdl::V1_0::imtbase::CGetElementMetaInfoPayload CUserGroupCollectionControllerComp::OnGetElementMetaInfo(
+			const sdl::V1_0::imtbase::CGetElementMetaInfoGqlRequest& getElementMetaInfoRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& /*errorMessage*/) const
 {
-	sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload response;
+	sdl::V1_0::imtbase::CGetElementMetaInfoPayload response;
 	response.Version_1_0.Emplace();
 
-	sdl::imtbase::ImtCollection::GetElementMetaInfoRequestArguments arguments = getElementMetaInfoRequest.GetRequestedArguments();
+	sdl::V1_0::imtbase::GetElementMetaInfoRequestArguments arguments = getElementMetaInfoRequest.GetRequestedArguments();
 	if (!arguments.input.Version_1_0){
 		Q_ASSERT(false);
 		return response;
@@ -166,11 +166,11 @@ sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CUserGroupCollectionCont
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 		auto userGroupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
 		if (userGroupInfoPtr != nullptr){
-			sdl::imtbase::ImtCollection::CElementMetaInfo::V1_0 elementMetaInfo;
+			sdl::V1_0::imtbase::CElementMetaInfo elementMetaInfo;
 		
-			imtsdl::TElementList<sdl::imtbase::ImtBaseTypes::CParameter::V1_0> infoParams;
+			imtsdl::TElementList<sdl::V1_0::imtbase::CParameter> infoParams;
 
-			sdl::imtbase::ImtBaseTypes::CParameter::V1_0 parentGroupsParameter;
+			sdl::V1_0::imtbase::CParameter parentGroupsParameter;
 			parentGroupsParameter.id = QByteArrayLiteral("ParentGroups");
 			parentGroupsParameter.typeId = parentGroupsParameter.id;
 			parentGroupsParameter.name = QStringLiteral("Parent Groups");
@@ -195,7 +195,7 @@ sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CUserGroupCollectionCont
 
 			infoParams << parentGroupsParameter;
 
-			sdl::imtbase::ImtBaseTypes::CParameter::V1_0 usersParameter;
+			sdl::V1_0::imtbase::CParameter usersParameter;
 			usersParameter.id = QByteArrayLiteral("Users");
 			usersParameter.typeId = usersParameter.id;
 			usersParameter.name = QStringLiteral("Users");
@@ -220,7 +220,7 @@ sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CUserGroupCollectionCont
 
 			infoParams << usersParameter;
 
-			sdl::imtbase::ImtBaseTypes::CParameter::V1_0 rolesParameter;
+			sdl::V1_0::imtbase::CParameter rolesParameter;
 			rolesParameter.id = QByteArrayLiteral("Roles");
 			rolesParameter.typeId = rolesParameter.id;
 			rolesParameter.name = QStringLiteral("Roles");
@@ -254,12 +254,12 @@ sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CUserGroupCollectionCont
 	return response;
 }
 
-// reimplemented (sdl::imtauth::Groups::CGroupCollectionControllerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CGroupCollectionControllerCompBase)
 
 bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-			const sdl::imtauth::Groups::CGroupsListGqlRequest& groupsListRequest,
-			sdl::imtauth::Groups::CGroupItemData::V1_0& representationObject,
+			const sdl::V1_0::imtauth::CGroupsListGqlRequest& groupsListRequest,
+			sdl::V1_0::imtauth::CGroupItemData& representationObject,
 			QString& errorMessage) const
 {
 	QByteArray objectId = objectCollectionIterator.GetObjectId();
@@ -281,7 +281,7 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	sdl::imtauth::Groups::GroupsListRequestInfo requestInfo = groupsListRequest.GetRequestInfo();
+	sdl::V1_0::imtauth::GroupsListRequestInfo requestInfo = groupsListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
 		representationObject.id = QByteArray(objectId);
@@ -328,7 +328,7 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 
 
 istd::IChangeableUniquePtr CUserGroupCollectionControllerComp::CreateObjectFromRepresentation(
-			const sdl::imtauth::Groups::CGroupData::V1_0& groupDataRepresentation,
+			const sdl::V1_0::imtauth::CGroupData& groupDataRepresentation,
 			QByteArray& newObjectId,
 			QString& errorMessage) const
 {
@@ -373,8 +373,8 @@ istd::IChangeableUniquePtr CUserGroupCollectionControllerComp::CreateObjectFromR
 
 bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 			const istd::IChangeable& data,
-			const sdl::imtauth::Groups::CGroupItemGqlRequest& groupItemRequest,
-			sdl::imtauth::Groups::CGroupData::V1_0& representationPayload,
+			const sdl::V1_0::imtauth::CGroupItemGqlRequest& groupItemRequest,
+			sdl::V1_0::imtauth::CGroupData& representationPayload,
 			QString& errorMessage) const
 {
 	auto userGroupInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserGroupInfo*>(&data);
@@ -385,7 +385,7 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	sdl::imtauth::Groups::GroupItemRequestArguments arguments = groupItemRequest.GetRequestedArguments();
+	sdl::V1_0::imtauth::GroupItemRequestArguments arguments = groupItemRequest.GetRequestedArguments();
 
 	QByteArray productId;
 	if (arguments.input.Version_1_0->productId){
@@ -412,11 +412,11 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 
 bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 			const imtgql::CGqlRequest& /*rawGqlRequest*/,
-			const sdl::imtauth::Groups::CGroupUpdateGqlRequest& groupUpdateRequest,
+			const sdl::V1_0::imtauth::CGroupUpdateGqlRequest& groupUpdateRequest,
 			istd::IChangeable& object,
 			QString& errorMessage) const
 {
-	sdl::imtauth::Groups::CGroupData representation;
+	sdl::V1_0::imtauth::CGroupData representation;
 	
 	if (!groupUpdateRequest.GetRequestedArguments().input.Version_1_0.has_value()){
 		I_CRITICAL();
@@ -466,15 +466,15 @@ bool CUserGroupCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequ
 	}
 
 	QByteArray commandId = gqlRequest.GetCommandId();
-	if (commandId == sdl::imtauth::Groups::CGroupItemGqlRequest::GetCommandId() ||
-		commandId == sdl::imtbase::ImtCollection::CGetObjectDataGqlRequest::GetCommandId() ||
-		commandId == sdl::imtbase::ImtCollection::CGetObjectTypeIdGqlRequest::GetCommandId()){
+	if (commandId == sdl::V1_0::imtauth::CGroupItemGqlRequest::GetCommandId() ||
+		commandId == sdl::V1_0::imtbase::CGetObjectDataGqlRequest::GetCommandId() ||
+		commandId == sdl::V1_0::imtbase::CGetObjectTypeIdGqlRequest::GetCommandId()){
 		return true;
 	}
 
 	QByteArray groupId;
-	if (commandId == sdl::imtauth::Groups::CGroupItemGqlRequest::GetCommandId()){
-		sdl::imtauth::Groups::CGroupItemGqlRequest groupItemGqlRequest(gqlRequest, false);
+	if (commandId == sdl::V1_0::imtauth::CGroupItemGqlRequest::GetCommandId()){
+		sdl::V1_0::imtauth::CGroupItemGqlRequest groupItemGqlRequest(gqlRequest, false);
 		if (groupItemGqlRequest.IsValid()){
 			auto arguments = groupItemGqlRequest.GetRequestedArguments();
 			if (arguments.input.Version_1_0.HasValue()){
@@ -484,10 +484,10 @@ bool CUserGroupCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequ
 			}
 		}
 	}
-	else if (commandId == sdl::imtbase::ImtCollection::CGetObjectTypeIdGqlRequest::GetCommandId()){
+	else if (commandId == sdl::V1_0::imtbase::CGetObjectTypeIdGqlRequest::GetCommandId()){
 		groupId = ExtractObjectIdFromGetObjectTypeIdGqlRequest(gqlRequest);
 	}
-	else if (commandId == sdl::imtbase::ImtCollection::CGetObjectDataGqlRequest::GetCommandId()){
+	else if (commandId == sdl::V1_0::imtbase::CGetObjectDataGqlRequest::GetCommandId()){
 		groupId = ExtractObjectIdFromGetObjectDataGqlRequest(gqlRequest);
 	}
 

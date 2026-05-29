@@ -17,16 +17,16 @@ namespace imtservergql
 
 // protected methods
 
-// reimplemented (sdl::imtbase::Settings::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
 
-sdl::imtbase::Settings::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
-			const sdl::imtbase::Settings::CSetSettingsGqlRequest& setSettingsRequest,
+sdl::V1_0::imtbase::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
+			const sdl::V1_0::imtbase::CSetSettingsGqlRequest& setSettingsRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtbase::Settings::CSetSettingsPayload response;
+	sdl::V1_0::imtbase::CSetSettingsPayload response;
 	
-	sdl::imtbase::Settings::SetSettingsRequestArguments arguments = setSettingsRequest.GetRequestedArguments();
+	sdl::V1_0::imtbase::SetSettingsRequestArguments arguments = setSettingsRequest.GetRequestedArguments();
 	if (!arguments.input.Version_1_0.has_value()){
 		Q_ASSERT(false);
 		return response;
@@ -96,12 +96,12 @@ sdl::imtbase::Settings::CSetSettingsPayload CSettingsControllerComp::OnSetSettin
 }
 
 
-sdl::imtbase::ImtBaseTypes::CParamsSet CSettingsControllerComp::OnGetSettings(
-			const sdl::imtbase::Settings::CGetSettingsGqlRequest& getSettingsRequest,
+sdl::V1_0::imtbase::CParamsSet CSettingsControllerComp::OnGetSettings(
+			const sdl::V1_0::imtbase::CGetSettingsGqlRequest& getSettingsRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::ImtBaseTypes::CParamsSet response;
+	sdl::V1_0::imtbase::CParamsSet response;
 	
 	if (!m_userSettingsCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserSettingsCollection' was not set", "CSettingsControllerComp");
@@ -118,7 +118,7 @@ sdl::imtbase::ImtBaseTypes::CParamsSet CSettingsControllerComp::OnGetSettings(
 		return response;
 	}
 	
-	sdl::imtbase::Settings::GetSettingsRequestArguments arguments = getSettingsRequest.GetRequestedArguments();
+	sdl::V1_0::imtbase::GetSettingsRequestArguments arguments = getSettingsRequest.GetRequestedArguments();
 	if (!arguments.input.Version_1_0.has_value()){
 		Q_ASSERT(false);
 		return response;
@@ -180,14 +180,14 @@ sdl::imtbase::ImtBaseTypes::CParamsSet CSettingsControllerComp::OnGetSettings(
 }
 
 
-sdl::imtbase::Settings::CStyleData CSettingsControllerComp::OnGetStyleData(
-			const sdl::imtbase::Settings::CGetStyleDataGqlRequest& getStyleRequest,
+sdl::V1_0::imtbase::CStyleData CSettingsControllerComp::OnGetStyleData(
+			const sdl::V1_0::imtbase::CGetStyleDataGqlRequest& getStyleRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtbase::Settings::CStyleData response;
+	sdl::V1_0::imtbase::CStyleData response;
 	
-	sdl::imtbase::Settings::GetStyleDataRequestArguments arguments = getStyleRequest.GetRequestedArguments();
+	sdl::V1_0::imtbase::GetStyleDataRequestArguments arguments = getStyleRequest.GetRequestedArguments();
 	if (!arguments.input.Version_1_0.has_value()){
 		Q_ASSERT(false);
 		return response;
@@ -225,17 +225,17 @@ sdl::imtbase::Settings::CStyleData CSettingsControllerComp::OnGetStyleData(
 }
 
 
-sdl::imtbase::ImtBaseTypes::CUrlParam CSettingsControllerComp::OnGetWebSocketUrl(
-			const sdl::imtbase::Settings::CGetWebSocketUrlGqlRequest& /*getWebSocketUrlRequest*/,
+sdl::V1_0::imtbase::CUrlParam CSettingsControllerComp::OnGetWebSocketUrl(
+			const sdl::V1_0::imtbase::CGetWebSocketUrlGqlRequest& /*getWebSocketUrlRequest*/,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
 	if (!m_serverInterfaceCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'WebSocketUrlParam' was not set", "CSettingsControllerComp");
-		return sdl::imtbase::ImtBaseTypes::CUrlParam();
+		return sdl::V1_0::imtbase::CUrlParam();
 	}
 	
-	sdl::imtbase::ImtBaseTypes::CUrlParam response;
+	sdl::V1_0::imtbase::CUrlParam response;
 	response.Version_1_0.emplace();
 	
 	QUrl url;
@@ -250,7 +250,7 @@ sdl::imtbase::ImtBaseTypes::CUrlParam CSettingsControllerComp::OnGetWebSocketUrl
 
 	errorMessage = "Websocket URL could not be provided";
 
-	return sdl::imtbase::ImtBaseTypes::CUrlParam();
+	return sdl::V1_0::imtbase::CUrlParam();
 }
 
 

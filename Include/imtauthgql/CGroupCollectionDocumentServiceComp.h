@@ -21,10 +21,10 @@ namespace imtauthgql
  * CollectionDocumentManager holds for a given documentId.
  */
 class CGroupCollectionDocumentServiceComp:
-			public sdl::imtauth::GroupCollectionDocumentService::CGraphQlHandlerCompBase
+			public sdl::V1_0::imtauth::CGraphQlHandlerCompBase
 {
 public:
-	typedef sdl::imtauth::GroupCollectionDocumentService::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtauth::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGroupCollectionDocumentServiceComp)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentService", "Collection document manager", false, "CollectionDocumentService");
@@ -32,12 +32,12 @@ public:
 
 protected:
 	// reimplemented (CGraphQlHandlerCompBase)
-	virtual sdl::imtauth::Groups::CGroupData OnGetGroupRepresentation(
-				const sdl::imtauth::GroupCollectionDocumentService::CGetGroupRepresentationGqlRequest& getGroupRepresentationRequest,
+	virtual sdl::V1_0::imtauth::CGroupData OnGetGroupRepresentation(
+				const sdl::V1_0::imtauth::CGetGroupRepresentationGqlRequest& getGroupRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus OnUpdateGroupFromRepresentation(
-				const sdl::imtauth::GroupCollectionDocumentService::CUpdateGroupFromRepresentationGqlRequest& updateGroupFromRepresentationRequest,
+	virtual sdl::V1_0::imtbase::CDocumentOperationStatus OnUpdateGroupFromRepresentation(
+				const sdl::V1_0::imtauth::CUpdateGroupFromRepresentationGqlRequest& updateGroupFromRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 

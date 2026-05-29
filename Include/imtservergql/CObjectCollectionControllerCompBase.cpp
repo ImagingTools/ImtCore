@@ -220,27 +220,27 @@ const imtbase::ISearchResults* CObjectCollectionControllerCompBase::Search(const
 
 	typename imtcol::ICollectionHeadersProvider::HeaderIds headerIds = m_headersProviderCompPtr->GetHeaderIds();
 
-	sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0 complexFilter;
+	sdl::V1_0::imtbase::CComplexCollectionFilter complexFilter;
 
-	sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0 groupFilter;
-	groupFilter.logicalOperation = sdl::imtbase::ComplexCollectionFilter::LogicalOperation::Or;
+	sdl::V1_0::imtbase::CGroupFilter groupFilter;
+	groupFilter.logicalOperation = sdl::V1_0::imtbase::LogicalOperation::Or;
 
-	QList<sdl::imtbase::ComplexCollectionFilter::FieldFilterUnion> fieldList;
+	QList<sdl::V1_0::imtbase::FieldFilterUnion> fieldList;
 	for (const QByteArray& headerId : headerIds){
 		typename imtcol::ICollectionHeadersProvider::HeaderInfo headerInfo;
 		if (m_headersProviderCompPtr->GetHeaderInfo(headerId, headerInfo)){
 			if (headerInfo.filterable){
-				sdl::imtbase::ComplexCollectionFilter::CFieldFilter fieldFilter;
+				sdl::V1_0::imtbase::CFieldFilter fieldFilter;
 				fieldFilter.Version_1_0.Emplace();
 				fieldFilter.Version_1_0->fieldId = headerInfo.headerId;
 				fieldFilter.Version_1_0->filterValue = text;
-				fieldFilter.Version_1_0->filterValueType = sdl::imtbase::ComplexCollectionFilter::ValueType::String;
+				fieldFilter.Version_1_0->filterValueType = sdl::V1_0::imtbase::ValueType::String;
 
-				imtsdl::TElementList<sdl::imtbase::ComplexCollectionFilter::FilterOperation> filterOperations;
-				filterOperations << sdl::imtbase::ComplexCollectionFilter::FilterOperation::Contains;
+				imtsdl::TElementList<sdl::V1_0::imtbase::FilterOperation> filterOperations;
+				filterOperations << sdl::V1_0::imtbase::FilterOperation::Contains;
 				fieldFilter.Version_1_0->filterOperations = filterOperations;
 
-				fieldList << sdl::imtbase::ComplexCollectionFilter::FieldFilterUnion(fieldFilter);
+				fieldList << sdl::V1_0::imtbase::FieldFilterUnion(fieldFilter);
 			}
 		}
 	}
@@ -525,7 +525,7 @@ sdl::V1_0::imtbase::CRemoveElementSetPayload CObjectCollectionControllerCompBase
 	iprm::CParamsSet filterParams;
 	if (arguments.input.Version_1_0->selectionParams){
 		if (filterParams.CopyFrom(m_selectionParams)){
-			sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 paramsSet = *arguments.input.Version_1_0->selectionParams;
+			sdl::V1_0::imtbase::CParamsSet paramsSet = *arguments.input.Version_1_0->selectionParams;
 			if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
 				errorMessage = QString("Unable to remove element set for collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
 				return sdl::V1_0::imtbase::CRemoveElementSetPayload();
@@ -606,7 +606,7 @@ sdl::V1_0::imtbase::CRestoreObjectSetPayload CObjectCollectionControllerCompBase
 	iprm::CParamsSet filterParams;
 	if (arguments.input.Version_1_0->selectionParams){
 		if (filterParams.CopyFrom(m_selectionParams)){
-			sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 paramsSet = *arguments.input.Version_1_0->selectionParams;
+			sdl::V1_0::imtbase::CParamsSet paramsSet = *arguments.input.Version_1_0->selectionParams;
 			if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
 				errorMessage = QString("Unable to restore object set for collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
 				return sdl::V1_0::imtbase::CRestoreObjectSetPayload();
@@ -1102,7 +1102,7 @@ sdl::V1_0::imtbase::CGetElementsCountPayload CObjectCollectionControllerCompBase
 	iprm::CParamsSet filterParams;
 	if (arguments.input.Version_1_0->selectionParams){
 		if (filterParams.CopyFrom(m_selectionParams)){
-			sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 paramsSet = *arguments.input.Version_1_0->selectionParams;
+			sdl::V1_0::imtbase::CParamsSet paramsSet = *arguments.input.Version_1_0->selectionParams;
 			if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
 				errorMessage = QString("Unable to get elements count for collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
 				return sdl::V1_0::imtbase::CGetElementsCountPayload();
@@ -1150,7 +1150,7 @@ sdl::V1_0::imtbase::CGetElementIdsPayload CObjectCollectionControllerCompBase::O
 	iprm::CParamsSet filterParams;
 	if (arguments.input.Version_1_0->selectionParams){
 		if (filterParams.CopyFrom(m_selectionParams)){
-			sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 paramsSet = *arguments.input.Version_1_0->selectionParams;
+			sdl::V1_0::imtbase::CParamsSet paramsSet = *arguments.input.Version_1_0->selectionParams;
 			if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
 				errorMessage = QString("Unable to get element IDs for collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
 				return sdl::V1_0::imtbase::CGetElementIdsPayload();
@@ -1405,7 +1405,7 @@ sdl::V1_0::imtbase::CGetElementInfoPayload CObjectCollectionControllerCompBase::
 		objectId = *arguments.input.Version_1_0->elementId;
 	}
 
-	sdl::imtbase::ImtBaseTypes::CParameter::V1_0 parameterInfo;
+	sdl::V1_0::imtbase::CParameter parameterInfo;
 	parameterInfo.id = objectId;
 
 	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
@@ -1458,10 +1458,10 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CObjectCollectionControllerCompBa
 		return sdl::V1_0::imtbase::CGetElementMetaInfoPayload();
 	}
 
-	QList<sdl::imtbase::ImtBaseTypes::CParameter::V1_0> parameterInfos;
+	QList<sdl::V1_0::imtbase::CParameter> parameterInfos;
 	idoc::IDocumentMetaInfo::MetaInfoTypes metaInfoTypes = metaInfo->GetMetaInfoTypes();
 	for (const int& infoType : metaInfoTypes){
-		sdl::imtbase::ImtBaseTypes::CParameter::V1_0 parameterInfo;
+		sdl::V1_0::imtbase::CParameter parameterInfo;
 		parameterInfo.id = metaInfo->GetMetaInfoId(infoType);
 		parameterInfo.name = metaInfo->GetMetaInfoName(infoType);
 		parameterInfo.description = metaInfo->GetMetaInfoDescription(infoType);
@@ -1518,7 +1518,7 @@ sdl::V1_0::imtbase::CCreateSubCollectionPayload CObjectCollectionControllerCompB
 	iprm::CParamsSet filterParams;
 	if (arguments.input.Version_1_0->selectionParams){
 		if (filterParams.CopyFrom(m_selectionParams)){
-			sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 paramsSet = *arguments.input.Version_1_0->selectionParams;
+			sdl::V1_0::imtbase::CParamsSet paramsSet = *arguments.input.Version_1_0->selectionParams;
 			if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
 				errorMessage = QString("Unable to create sub collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
 				return sdl::V1_0::imtbase::CCreateSubCollectionPayload();
@@ -1533,7 +1533,7 @@ sdl::V1_0::imtbase::CCreateSubCollectionPayload CObjectCollectionControllerCompB
 			sdl::V1_0::imtbase::CSubCollectionItem::V1_0 collectionItem;
 
 			if (requestInfo.items.isItemInfoRequested){
-				sdl::imtbase::ImtBaseTypes::CParameter::V1_0 parameterInfo;
+				sdl::V1_0::imtbase::CParameter parameterInfo;
 
 				if (requestInfo.items.itemInfo.isIdRequested){
 					parameterInfo.id = id;
@@ -2841,9 +2841,9 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 	const imtgql::CGqlParamObject* complexFilterModelPtr = inputParamsGql.GetParamArgumentObjectPtr("filterModel");
 	const imtgql::CGqlParamObject* documentFilterModelPtr = inputParamsGql.GetParamArgumentObjectPtr("documentFilterModel");
 
-	sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 paramsSet;
+	sdl::V1_0::imtbase::CParamsSet paramsSet;
 	if (inputParamsGql.ContainsParam("parameters") && paramsSet.ReadFromGraphQlObject(inputParamsGql)){
-		for (sdl::imtbase::ImtBaseTypes::CParameter::V1_0 parameter: paramsSet.parameters->ToList()){
+		for (sdl::V1_0::imtbase::CParameter parameter: paramsSet.parameters->ToList()){
 			if (parameter.id){
 				QByteArray parameterId = *parameter.id;
 				const iser::ISerializable* parameterPtr = m_selectionParams.GetParameter(parameterId);
@@ -2870,7 +2870,7 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 	}
 
 	if (complexFilterModelPtr != nullptr){
-		sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0 complexFilterSdl;
+		sdl::V1_0::imtbase::CComplexCollectionFilter complexFilterSdl;
 		bool isComplexFilterOk = complexFilterSdl.ReadFromGraphQlObject(*complexFilterModelPtr);
 		if (isComplexFilterOk){
 			istd::TDelPtr<imtbase::CComplexCollectionFilter> complexFilterPtr = new imtbase::CComplexCollectionFilter();
@@ -2890,7 +2890,7 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 	}
 
 	if (documentFilterModelPtr != nullptr){
-		sdl::imtbase::DocumentCollectionFilter::CDocumentCollectionFilter::V1_0 documentFilterSdl;
+		sdl::V1_0::imtbase::CDocumentCollectionFilter documentFilterSdl;
 		bool isDocumentFilterOk = documentFilterSdl.ReadFromGraphQlObject(*documentFilterModelPtr);
 		if (isDocumentFilterOk){
 			istd::TDelPtr<imtcol::CDocumentCollectionFilter> documentFilterPtr = new imtcol::CDocumentCollectionFilter();
@@ -2960,14 +2960,14 @@ bool CObjectCollectionControllerCompBase::CreateCollectionFilterFromViewParamsSd
 	}
 
 	if (viewParams.filterModel){
-		sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0 sdlFilter = *viewParams.filterModel;
+		sdl::V1_0::imtbase::CComplexCollectionFilter sdlFilter = *viewParams.filterModel;
 		if (!CreateCollectionFilterFromSdl(sdlFilter, filterParams)){
 			return false;
 		}
 	}
 
 	if (viewParams.documentFilterModel){
-		sdl::imtbase::DocumentCollectionFilter::CDocumentCollectionFilter::V1_0 documentFilterModel = *viewParams.documentFilterModel;
+		sdl::V1_0::imtbase::CDocumentCollectionFilter documentFilterModel = *viewParams.documentFilterModel;
 		if (!CreateDocumentFilterFromSdl(documentFilterModel, filterParams)){
 			return false;
 		}
@@ -2978,7 +2978,7 @@ bool CObjectCollectionControllerCompBase::CreateCollectionFilterFromViewParamsSd
 
 
 bool CObjectCollectionControllerCompBase::CreateCollectionFilterFromSdl(
-			sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0& collectionFilter,
+			sdl::V1_0::imtbase::CComplexCollectionFilter& collectionFilter,
 			iprm::CParamsSet& filterParams) const
 {
 	istd::TDelPtr<imtbase::CComplexCollectionFilter> complexFilterPtr = new imtbase::CComplexCollectionFilter();
@@ -2994,7 +2994,7 @@ bool CObjectCollectionControllerCompBase::CreateCollectionFilterFromSdl(
 
 
 bool CObjectCollectionControllerCompBase::CreateDocumentFilterFromSdl(
-			sdl::imtbase::DocumentCollectionFilter::CDocumentCollectionFilter::V1_0& documentFilter,
+			sdl::V1_0::imtbase::CDocumentCollectionFilter& documentFilter,
 			iprm::CParamsSet& filterParams) const
 {
 	istd::TDelPtr<imtcol::CDocumentCollectionFilter> documentFilterPtr = new imtcol::CDocumentCollectionFilter();
@@ -3063,7 +3063,7 @@ bool CObjectCollectionControllerCompBase::DoUpdateObjectFromRequest(
 }
 
 
-bool CObjectCollectionControllerCompBase::GetParamsSetFromRepresentation(sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0& representation, iprm::IParamsSet& paramsSet) const
+bool CObjectCollectionControllerCompBase::GetParamsSetFromRepresentation(sdl::V1_0::imtbase::CParamsSet& representation, iprm::IParamsSet& paramsSet) const
 {
 	QJsonObject jsonObject;
 	if (!representation.WriteToJsonObject(jsonObject)){

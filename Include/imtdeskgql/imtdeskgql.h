@@ -40,16 +40,16 @@ namespace imtdeskgql
 {
 
 
-inline imtdesk::ISupportTicket::TicketType GetTicketTypeFromSdlType(sdl::imtdesk::ImtDesk::TicketType sdlTicketType)
+inline imtdesk::ISupportTicket::TicketType GetTicketTypeFromSdlType(sdl::V1_0::imtdesk::TicketType sdlTicketType)
 {
 	switch(sdlTicketType){
-	case sdl::imtdesk::ImtDesk::TicketType::AccessRequest:
+	case sdl::V1_0::imtdesk::TicketType::AccessRequest:
 		return imtdesk::ISupportTicket::TT_ACCESS_REQUEST;
-	case sdl::imtdesk::ImtDesk::TicketType::SupportRequest:
+	case sdl::V1_0::imtdesk::TicketType::SupportRequest:
 		return imtdesk::ISupportTicket::TT_SUPPORT_REQUEST;
-	case sdl::imtdesk::ImtDesk::TicketType::FeatureRequest:
+	case sdl::V1_0::imtdesk::TicketType::FeatureRequest:
 		return imtdesk::ISupportTicket::TT_FEATURE_REQUEST;
-	case sdl::imtdesk::ImtDesk::TicketType::BugReport:
+	case sdl::V1_0::imtdesk::TicketType::BugReport:
 		return imtdesk::ISupportTicket::TT_BUG_REPORT;
 	}
 
@@ -57,29 +57,29 @@ inline imtdesk::ISupportTicket::TicketType GetTicketTypeFromSdlType(sdl::imtdesk
 }
 
 
-inline sdl::imtdesk::ImtDesk::TicketType GetSdlTypeFromTicketType(imtdesk::ISupportTicket::TicketType ticketType)
+inline sdl::V1_0::imtdesk::TicketType GetSdlTypeFromTicketType(imtdesk::ISupportTicket::TicketType ticketType)
 {
 	switch(ticketType){
 	case imtdesk::ISupportTicket::TT_ACCESS_REQUEST:
-		return sdl::imtdesk::ImtDesk::TicketType::AccessRequest;
+		return sdl::V1_0::imtdesk::TicketType::AccessRequest;
 	case imtdesk::ISupportTicket::TT_SUPPORT_REQUEST:
-		return sdl::imtdesk::ImtDesk::TicketType::SupportRequest;
+		return sdl::V1_0::imtdesk::TicketType::SupportRequest;
 	case imtdesk::ISupportTicket::TT_FEATURE_REQUEST:
-		return sdl::imtdesk::ImtDesk::TicketType::FeatureRequest;
+		return sdl::V1_0::imtdesk::TicketType::FeatureRequest;
 	case imtdesk::ISupportTicket::TT_BUG_REPORT:
-		return sdl::imtdesk::ImtDesk::TicketType::BugReport;
+		return sdl::V1_0::imtdesk::TicketType::BugReport;
 	}
 
-	return sdl::imtdesk::ImtDesk::TicketType::AccessRequest;
+	return sdl::V1_0::imtdesk::TicketType::AccessRequest;
 }
 
 
-inline imtdesk::ISupportTicket::TicketStatus GetStatusTypeFromSdlType(sdl::imtdesk::ImtDesk::TicketStatus sdlTicketStatus)
+inline imtdesk::ISupportTicket::TicketStatus GetStatusTypeFromSdlType(sdl::V1_0::imtdesk::TicketStatus sdlTicketStatus)
 {
 	switch(sdlTicketStatus){
-	case sdl::imtdesk::ImtDesk::TicketStatus::Open:
+	case sdl::V1_0::imtdesk::TicketStatus::Open:
 		return imtdesk::ISupportTicket::TicketStatus::TS_OPEN;
-	case sdl::imtdesk::ImtDesk::TicketStatus::Closed:
+	case sdl::V1_0::imtdesk::TicketStatus::Closed:
 		return imtdesk::ISupportTicket::TicketStatus::TS_CLOSED;
 	}
 
@@ -87,29 +87,29 @@ inline imtdesk::ISupportTicket::TicketStatus GetStatusTypeFromSdlType(sdl::imtde
 }
 
 
-inline sdl::imtdesk::ImtDesk::TicketStatus GetSdlTypeFromStatusType(imtdesk::ISupportTicket::TicketStatus ticketStatus)
+inline sdl::V1_0::imtdesk::TicketStatus GetSdlTypeFromStatusType(imtdesk::ISupportTicket::TicketStatus ticketStatus)
 {
 	switch (ticketStatus){
 	case imtdesk::ISupportTicket::TS_OPEN:
-		return sdl::imtdesk::ImtDesk::TicketStatus::Open;
+		return sdl::V1_0::imtdesk::TicketStatus::Open;
 	case imtdesk::ISupportTicket::TS_CLOSED:
-		return sdl::imtdesk::ImtDesk::TicketStatus::Closed;
+		return sdl::V1_0::imtdesk::TicketStatus::Closed;
 	}
 
-	return sdl::imtdesk::ImtDesk::TicketStatus::Open;
+	return sdl::V1_0::imtdesk::TicketStatus::Open;
 }
 
 
-inline imtdesk::ISupportTicket::StateReason GetStateReasonFromSdlType(sdl::imtdesk::ImtDesk::StateReason sdlStateReason)
+inline imtdesk::ISupportTicket::StateReason GetStateReasonFromSdlType(sdl::V1_0::imtdesk::StateReason sdlStateReason)
 {
 	switch(sdlStateReason){
-	case sdl::imtdesk::ImtDesk::StateReason::None:
+	case sdl::V1_0::imtdesk::StateReason::None:
 		return imtdesk::ISupportTicket::StateReason::SR_NONE;
-	case sdl::imtdesk::ImtDesk::StateReason::Completed:
+	case sdl::V1_0::imtdesk::StateReason::Completed:
 		return imtdesk::ISupportTicket::StateReason::SR_COMPLETED;
-	case sdl::imtdesk::ImtDesk::StateReason::NotPlanned:
+	case sdl::V1_0::imtdesk::StateReason::NotPlanned:
 		return imtdesk::ISupportTicket::StateReason::SR_NOT_PLANNED;
-	case sdl::imtdesk::ImtDesk::StateReason::Reopened:
+	case sdl::V1_0::imtdesk::StateReason::Reopened:
 		return imtdesk::ISupportTicket::StateReason::SR_REOPENED;
 	}
 
@@ -117,33 +117,33 @@ inline imtdesk::ISupportTicket::StateReason GetStateReasonFromSdlType(sdl::imtde
 }
 
 
-inline sdl::imtdesk::ImtDesk::StateReason GetSdlTypeFromStateReason(imtdesk::ISupportTicket::StateReason stateReason)
+inline sdl::V1_0::imtdesk::StateReason GetSdlTypeFromStateReason(imtdesk::ISupportTicket::StateReason stateReason)
 {
 	switch (stateReason){
 	case imtdesk::ISupportTicket::SR_NONE:
-		return sdl::imtdesk::ImtDesk::StateReason::None;
+		return sdl::V1_0::imtdesk::StateReason::None;
 	case imtdesk::ISupportTicket::SR_COMPLETED:
-		return sdl::imtdesk::ImtDesk::StateReason::Completed;
+		return sdl::V1_0::imtdesk::StateReason::Completed;
 	case imtdesk::ISupportTicket::SR_NOT_PLANNED:
-		return sdl::imtdesk::ImtDesk::StateReason::NotPlanned;
+		return sdl::V1_0::imtdesk::StateReason::NotPlanned;
 	case imtdesk::ISupportTicket::SR_REOPENED:
-		return sdl::imtdesk::ImtDesk::StateReason::Reopened;
+		return sdl::V1_0::imtdesk::StateReason::Reopened;
 	}
 
-	return sdl::imtdesk::ImtDesk::StateReason::None;
+	return sdl::V1_0::imtdesk::StateReason::None;
 }
 
 
-inline imtdesk::ISupportTicket::TicketPriority GetPriorityTypeFromSdlType(sdl::imtdesk::ImtDesk::TicketPriority sdlTicketPriority)
+inline imtdesk::ISupportTicket::TicketPriority GetPriorityTypeFromSdlType(sdl::V1_0::imtdesk::TicketPriority sdlTicketPriority)
 {
 	switch (sdlTicketPriority){
-	case sdl::imtdesk::ImtDesk::TicketPriority::Low:
+	case sdl::V1_0::imtdesk::TicketPriority::Low:
 		return imtdesk::ISupportTicket::TicketPriority::TP_LOW;
-	case sdl::imtdesk::ImtDesk::TicketPriority::Medium:
+	case sdl::V1_0::imtdesk::TicketPriority::Medium:
 		return imtdesk::ISupportTicket::TicketPriority::TP_MEDIUM;
-	case sdl::imtdesk::ImtDesk::TicketPriority::High:
+	case sdl::V1_0::imtdesk::TicketPriority::High:
 		return imtdesk::ISupportTicket::TicketPriority::TP_HIGH;
-	case sdl::imtdesk::ImtDesk::TicketPriority::Critical:
+	case sdl::V1_0::imtdesk::TicketPriority::Critical:
 		return imtdesk::ISupportTicket::TicketPriority::TP_CRITICAL;
 	}
 
@@ -151,20 +151,20 @@ inline imtdesk::ISupportTicket::TicketPriority GetPriorityTypeFromSdlType(sdl::i
 }
 
 
-inline sdl::imtdesk::ImtDesk::TicketPriority GetSdlTypeFromPriorityType(imtdesk::ISupportTicket::TicketPriority ticketPriority)
+inline sdl::V1_0::imtdesk::TicketPriority GetSdlTypeFromPriorityType(imtdesk::ISupportTicket::TicketPriority ticketPriority)
 {
 	switch (ticketPriority){
 	case imtdesk::ISupportTicket::TP_LOW:
-		return sdl::imtdesk::ImtDesk::TicketPriority::Low;
+		return sdl::V1_0::imtdesk::TicketPriority::Low;
 	case imtdesk::ISupportTicket::TP_MEDIUM:
-		return sdl::imtdesk::ImtDesk::TicketPriority::Medium;
+		return sdl::V1_0::imtdesk::TicketPriority::Medium;
 	case imtdesk::ISupportTicket::TP_HIGH:
-		return sdl::imtdesk::ImtDesk::TicketPriority::High;
+		return sdl::V1_0::imtdesk::TicketPriority::High;
 	case imtdesk::ISupportTicket::TP_CRITICAL:
-		return sdl::imtdesk::ImtDesk::TicketPriority::Critical;
+		return sdl::V1_0::imtdesk::TicketPriority::Critical;
 	}
 
-	return sdl::imtdesk::ImtDesk::TicketPriority::Low;
+	return sdl::V1_0::imtdesk::TicketPriority::Low;
 }
 
 

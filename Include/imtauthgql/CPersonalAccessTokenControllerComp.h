@@ -12,10 +12,10 @@ namespace imtauthgql
 
 
 class CPersonalAccessTokenControllerComp: 
-			public sdl::imtauth::PersonalAccessTokens::CGraphQlHandlerCompBase
+			public sdl::V1_0::imtauth::CGraphQlHandlerCompBase
 {
 public:
-	typedef sdl::imtauth::PersonalAccessTokens::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtauth::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CPersonalAccessTokenControllerComp);
 		I_ASSIGN(m_tokenManagerCompPtr, "PersonalAccessTokenManager", "Personal access token manager", true, "PersonalAccessTokenManager");
@@ -23,29 +23,29 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtauth::PersonalAccessTokens::CGraphQlHandlerCompBase)
-	virtual sdl::imtauth::PersonalAccessTokens::CPersonalAccessTokenList OnGetTokenList(
-				const sdl::imtauth::PersonalAccessTokens::CGetTokenListGqlRequest& getTokenListRequest,
+	// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+	virtual sdl::V1_0::imtauth::CPersonalAccessTokenList OnGetTokenList(
+				const sdl::V1_0::imtauth::CGetTokenListGqlRequest& getTokenListRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::PersonalAccessTokens::CPersonalAccessToken OnGetToken(
-				const sdl::imtauth::PersonalAccessTokens::CGetTokenGqlRequest& getTokenRequest,
+	virtual sdl::V1_0::imtauth::CPersonalAccessToken OnGetToken(
+				const sdl::V1_0::imtauth::CGetTokenGqlRequest& getTokenRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::PersonalAccessTokens::CValidateTokenPayload OnValidateToken(
-				const sdl::imtauth::PersonalAccessTokens::CValidateTokenGqlRequest& validateTokenRequest,
+	virtual sdl::V1_0::imtauth::CValidateTokenPayload OnValidateToken(
+				const sdl::V1_0::imtauth::CValidateTokenGqlRequest& validateTokenRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::PersonalAccessTokens::CCreateTokenPayload OnCreateToken(
-				const sdl::imtauth::PersonalAccessTokens::CCreateTokenGqlRequest& createTokenRequest,
+	virtual sdl::V1_0::imtauth::CCreateTokenPayload OnCreateToken(
+				const sdl::V1_0::imtauth::CCreateTokenGqlRequest& createTokenRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::PersonalAccessTokens::CRevokeTokenPayload OnRevokeToken(
-				const sdl::imtauth::PersonalAccessTokens::CRevokeTokenGqlRequest& revokeTokenRequest,
+	virtual sdl::V1_0::imtauth::CRevokeTokenPayload OnRevokeToken(
+				const sdl::V1_0::imtauth::CRevokeTokenGqlRequest& revokeTokenRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::PersonalAccessTokens::CDeleteTokenPayload OnDeleteToken(
-				const sdl::imtauth::PersonalAccessTokens::CDeleteTokenGqlRequest& deleteTokenRequest,
+	virtual sdl::V1_0::imtauth::CDeleteTokenPayload OnDeleteToken(
+				const sdl::V1_0::imtauth::CDeleteTokenGqlRequest& deleteTokenRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 

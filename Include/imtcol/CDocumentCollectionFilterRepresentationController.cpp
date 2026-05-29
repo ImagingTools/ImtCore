@@ -8,7 +8,7 @@ namespace imtcol
 
 
 bool CDocumentCollectionFilterRepresentationController::DocumentCollectionFilterRepresentationToModel(
-			const sdl::imtbase::DocumentCollectionFilter::CDocumentCollectionFilter::V1_0& filterRepresentaion,
+			const sdl::V1_0::imtbase::CDocumentCollectionFilter& filterRepresentaion,
 			IDocumentCollectionFilter& filterModel,
 			ilog::IMessageConsumer* /*messageConsumerPtr*/)
 {

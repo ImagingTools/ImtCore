@@ -13,21 +13,21 @@ namespace imtauthgql
 {
 
 
-class CUserActionCollectionControllerComp: public sdl::imtauth::UserActions::CUserActionCollectionControllerCompBase
+class CUserActionCollectionControllerComp: public sdl::V1_0::imtauth::CUserActionCollectionControllerCompBase
 {
 public:
-	typedef sdl::imtauth::UserActions::CUserActionCollectionControllerCompBase BaseClass;
+	typedef sdl::V1_0::imtauth::CUserActionCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CUserActionCollectionControllerComp);
 		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info", true, "ApplicationInfo");
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtauth::UserActions::CUserCollectionControllerCompBase )
+	// reimplemented (sdl::V1_0::imtauth::CUserCollectionControllerCompBase )
 	virtual bool CreateRepresentationFromObject(
 				const ::imtbase::IObjectCollectionIterator& objectCollectionIterator,
-				const sdl::imtauth::UserActions::CGetUserActionsGqlRequest& getUserActionsRequest,
-				sdl::imtauth::UserActions::CUserActionItemData::V1_0& representationObject,
+				const sdl::V1_0::imtauth::CGetUserActionsGqlRequest& getUserActionsRequest,
+				sdl::V1_0::imtauth::CUserActionItemData& representationObject,
 				QString& errorMessage) const override;
 	void SetAdditionalFilters(
 				const imtgql::CGqlRequest& gqlRequest,

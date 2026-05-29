@@ -118,7 +118,7 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 	struct PendingNotification
 	{
 		QByteArray targetUserId;
-		sdl::imtauth::TenantMemberships::EMembershipNotificationType notificationType;
+		sdl::V1_0::imtauth::EMembershipNotificationType notificationType;
 		QByteArray membershipId;
 		QByteArray userId;
 		QByteArray tenantId;
@@ -162,7 +162,7 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 						if (!ownerUserId.isEmpty()){
 							pendingNotifications.append({
 								ownerUserId,
-								sdl::imtauth::TenantMemberships::EMembershipNotificationType::InvitationRejected,
+								sdl::V1_0::imtauth::EMembershipNotificationType::InvitationRejected,
 								membershipId,
 								cached.userId,
 								cached.tenantId,
@@ -176,7 +176,7 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 						if (!cached.userId.isEmpty()){
 							pendingNotifications.append({
 								cached.userId,
-								sdl::imtauth::TenantMemberships::EMembershipNotificationType::MembershipRemoved,
+								sdl::V1_0::imtauth::EMembershipNotificationType::MembershipRemoved,
 								membershipId,
 								cached.userId,
 								cached.tenantId,
@@ -188,7 +188,7 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 						if (!ownerUserId.isEmpty() && ownerUserId != cached.userId){
 							pendingNotifications.append({
 								ownerUserId,
-								sdl::imtauth::TenantMemberships::EMembershipNotificationType::MembershipRemoved,
+								sdl::V1_0::imtauth::EMembershipNotificationType::MembershipRemoved,
 								membershipId,
 								cached.userId,
 								cached.tenantId,
@@ -205,7 +205,7 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 						if (!ownerUserId.isEmpty()){
 							pendingNotifications.append({
 								ownerUserId,
-								sdl::imtauth::TenantMemberships::EMembershipNotificationType::InvitationAccepted,
+								sdl::V1_0::imtauth::EMembershipNotificationType::InvitationAccepted,
 								membershipId,
 								current.userId,
 								current.tenantId,
@@ -219,7 +219,7 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 						if (!current.userId.isEmpty()){
 							pendingNotifications.append({
 								current.userId,
-								sdl::imtauth::TenantMemberships::EMembershipNotificationType::MembershipRoleChanged,
+								sdl::V1_0::imtauth::EMembershipNotificationType::MembershipRoleChanged,
 								membershipId,
 								current.userId,
 								current.tenantId,
@@ -230,7 +230,7 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 						if (!ownerUserId.isEmpty() && ownerUserId != current.userId){
 							pendingNotifications.append({
 								ownerUserId,
-								sdl::imtauth::TenantMemberships::EMembershipNotificationType::MembershipRoleChanged,
+								sdl::V1_0::imtauth::EMembershipNotificationType::MembershipRoleChanged,
 								membershipId,
 								current.userId,
 								current.tenantId,
@@ -325,7 +325,7 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 						}
 						pendingNotifications.append({
 							current.userId,
-							sdl::imtauth::TenantMemberships::EMembershipNotificationType::InvitationReceived,
+							sdl::V1_0::imtauth::EMembershipNotificationType::InvitationReceived,
 							invitationId,
 							current.userId,
 							current.tenantId,
@@ -351,7 +351,7 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 							if (!ownerUserId.isEmpty()){
 								pendingNotifications.append({
 									ownerUserId,
-									sdl::imtauth::TenantMemberships::EMembershipNotificationType::InvitationAccepted,
+									sdl::V1_0::imtauth::EMembershipNotificationType::InvitationAccepted,
 									invitationId,
 									current.userId,
 									current.tenantId,
@@ -364,7 +364,7 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 									&& current.invitedByUserId != ownerUserId){
 								pendingNotifications.append({
 									current.invitedByUserId,
-									sdl::imtauth::TenantMemberships::EMembershipNotificationType::InvitationAccepted,
+									sdl::V1_0::imtauth::EMembershipNotificationType::InvitationAccepted,
 									invitationId,
 									current.userId,
 									current.tenantId,
@@ -377,7 +377,7 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 							if (!ownerUserId.isEmpty()){
 								pendingNotifications.append({
 									ownerUserId,
-									sdl::imtauth::TenantMemberships::EMembershipNotificationType::InvitationRejected,
+									sdl::V1_0::imtauth::EMembershipNotificationType::InvitationRejected,
 									invitationId,
 									current.userId,
 									current.tenantId,
@@ -389,7 +389,7 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 									&& current.invitedByUserId != ownerUserId){
 								pendingNotifications.append({
 									current.invitedByUserId,
-									sdl::imtauth::TenantMemberships::EMembershipNotificationType::InvitationRejected,
+									sdl::V1_0::imtauth::EMembershipNotificationType::InvitationRejected,
 									invitationId,
 									current.userId,
 									current.tenantId,
@@ -431,7 +431,7 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 						if (!cached.ownerId.isEmpty()){
 							pendingNotifications.append({
 								cached.ownerId,
-								sdl::imtauth::TenantMemberships::EMembershipNotificationType::OwnershipTransferred,
+								sdl::V1_0::imtauth::EMembershipNotificationType::OwnershipTransferred,
 								QByteArray(),
 								currentOwnerId,
 								tenantId,
@@ -443,7 +443,7 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 						if (!currentOwnerId.isEmpty()){
 							pendingNotifications.append({
 								currentOwnerId,
-								sdl::imtauth::TenantMemberships::EMembershipNotificationType::OwnershipTransferred,
+								sdl::V1_0::imtauth::EMembershipNotificationType::OwnershipTransferred,
 								QByteArray(),
 								currentOwnerId,
 								tenantId,
@@ -480,14 +480,14 @@ void CTenantNotificationPublisherComp::OnModelChanged(int /*modelId*/, const ist
 
 void CTenantNotificationPublisherComp::PublishNotification(
 	const QByteArray& targetUserId,
-	sdl::imtauth::TenantMemberships::EMembershipNotificationType notificationType,
+	sdl::V1_0::imtauth::EMembershipNotificationType notificationType,
 	const QByteArray& membershipId,
 	const QByteArray& userId,
 	const QByteArray& tenantId,
 	const QString& tenantName,
 	const QByteArray& roleId) const
 {
-	sdl::imtauth::TenantMemberships::CMembershipNotification notification;
+	sdl::V1_0::imtauth::CMembershipNotification notification;
 	notification.Version_1_0.emplace();
 	notification.Version_1_0->notificationType = notificationType;
 	notification.Version_1_0->membershipId = membershipId;

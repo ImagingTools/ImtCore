@@ -21,10 +21,10 @@ namespace imtauthgql
  * CollectionDocumentManager holds for a given documentId.
  */
 class CUserCollectionDocumentServiceComp:
-			public sdl::imtauth::UserCollectionDocumentService::CGraphQlHandlerCompBase
+			public sdl::V1_0::imtauth::CGraphQlHandlerCompBase
 {
 public:
-	typedef sdl::imtauth::UserCollectionDocumentService::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtauth::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CUserCollectionDocumentServiceComp)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentService", "Collection document manager", false, "CollectionDocumentService");
@@ -32,12 +32,12 @@ public:
 
 protected:
 	// reimplemented (CGraphQlHandlerCompBase)
-	virtual sdl::imtauth::Users::CUserData OnGetUserRepresentation(
-				const sdl::imtauth::UserCollectionDocumentService::CGetUserRepresentationGqlRequest& getUserRepresentationRequest,
+	virtual sdl::V1_0::imtauth::CUserData OnGetUserRepresentation(
+				const sdl::V1_0::imtauth::CGetUserRepresentationGqlRequest& getUserRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus OnUpdateUserFromRepresentation(
-				const sdl::imtauth::UserCollectionDocumentService::CUpdateUserFromRepresentationGqlRequest& updateUserFromRepresentationRequest,
+	virtual sdl::V1_0::imtbase::CDocumentOperationStatus OnUpdateUserFromRepresentation(
+				const sdl::V1_0::imtauth::CUpdateUserFromRepresentationGqlRequest& updateUserFromRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 

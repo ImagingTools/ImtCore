@@ -11,24 +11,24 @@ namespace controlsgallerygql
 
 // protected methods
 
-// reimplemented (sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
 
-sdl::imtbase::ImtCollection::CVisualStatus CContactInfoCollectionControllerComp::OnGetObjectVisualStatus(
-			const sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
+sdl::V1_0::imtbase::CVisualStatus CContactInfoCollectionControllerComp::OnGetObjectVisualStatus(
+			const sdl::V1_0::imtbase::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	sdl::imtbase::ImtCollection::CVisualStatus::V1_0 response;
+	sdl::V1_0::imtbase::CVisualStatus response;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CDeviceCollectionControllerComp");
-		return sdl::imtbase::ImtCollection::CVisualStatus();
+		return sdl::V1_0::imtbase::CVisualStatus();
 	}
 
-	sdl::imtbase::ImtCollection::GetObjectVisualStatusRequestArguments arguments = getObjectVisualStatusRequest.GetRequestedArguments();
+	sdl::V1_0::imtbase::GetObjectVisualStatusRequestArguments arguments = getObjectVisualStatusRequest.GetRequestedArguments();
 	if (!arguments.input.Version_1_0.has_value()){
 		Q_ASSERT(false);
-		return sdl::imtbase::ImtCollection::CVisualStatus();
+		return sdl::V1_0::imtbase::CVisualStatus();
 	}
 
 	QByteArray objectId;
@@ -49,19 +49,19 @@ sdl::imtbase::ImtCollection::CVisualStatus CContactInfoCollectionControllerComp:
 		}
 	}
 
-	sdl::imtbase::ImtCollection::CVisualStatus retVal;
+	sdl::V1_0::imtbase::CVisualStatus retVal;
 	retVal.Version_1_0 = std::move(response);
 
 	return retVal;
 }
 
 
-// reimplemented (sdl::controlsgallery::ContactInfos::CContactInfoCollectionControllerCompBase)
+// reimplemented (sdl::V1_0::controlsgallery::CContactInfoCollectionControllerCompBase)
 
 bool CContactInfoCollectionControllerComp::CreateRepresentationFromObject(
 			const ::imtbase::IObjectCollectionIterator& objectCollectionIterator,
-			const sdl::controlsgallery::ContactInfos::CContactInfoListGqlRequest& contactInfoListRequest,
-			sdl::controlsgallery::ContactInfos::CContactInfoItemData::V1_0& representationObject,
+			const sdl::V1_0::controlsgallery::CContactInfoListGqlRequest& contactInfoListRequest,
+			sdl::V1_0::controlsgallery::CContactInfoItemData& representationObject,
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
@@ -84,7 +84,7 @@ bool CContactInfoCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	sdl::controlsgallery::ContactInfos::ContactInfoListRequestInfo requestInfo = contactInfoListRequest.GetRequestInfo();
+	sdl::V1_0::controlsgallery::ContactInfoListRequestInfo requestInfo = contactInfoListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
 		representationObject.id = objectId;
@@ -127,8 +127,8 @@ bool CContactInfoCollectionControllerComp::CreateRepresentationFromObject(
 
 bool CContactInfoCollectionControllerComp::CreateRepresentationFromObject(
 			const istd::IChangeable& data,
-			const sdl::controlsgallery::ContactInfos::CGetContactInfoGqlRequest& getContactInfoRequest,
-			sdl::controlsgallery::ContactInfos::CContactInfoData::V1_0& representationPayload,
+			const sdl::V1_0::controlsgallery::CGetContactInfoGqlRequest& getContactInfoRequest,
+			sdl::V1_0::controlsgallery::CContactInfoData& representationPayload,
 			QString& errorMessage) const
 {
 	const imtauth::CContactInfo* contactInfoPtr = dynamic_cast<const imtauth::CContactInfo*>(&data);
@@ -138,7 +138,7 @@ bool CContactInfoCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	sdl::controlsgallery::ContactInfos::GetContactInfoRequestArguments arguments = getContactInfoRequest.GetRequestedArguments();
+	sdl::V1_0::controlsgallery::GetContactInfoRequestArguments arguments = getContactInfoRequest.GetRequestedArguments();
 	if (!arguments.input.Version_1_0){
 		I_CRITICAL();
 		return false;
@@ -157,13 +157,13 @@ bool CContactInfoCollectionControllerComp::CreateRepresentationFromObject(
 	imtauth::CContactInfo::GenderType genderType = contactInfoPtr->GetGenderType();
 	switch (genderType){
 	case imtauth::IContactInfo::GT_DIVERSE:
-		representationPayload.genderType = sdl::controlsgallery::ContactInfos::GenderType::DIVERSE;
+		representationPayload.genderType = sdl::V1_0::controlsgallery::GenderType::DIVERSE;
 		break;
 	case imtauth::IContactInfo::GT_FEMALE:
-		representationPayload.genderType = sdl::controlsgallery::ContactInfos::GenderType::FEMALE;
+		representationPayload.genderType = sdl::V1_0::controlsgallery::GenderType::FEMALE;
 	case imtauth::IContactInfo::GT_MALE:
 		break;
-		representationPayload.genderType = sdl::controlsgallery::ContactInfos::GenderType::MALE;
+		representationPayload.genderType = sdl::V1_0::controlsgallery::GenderType::MALE;
 		break;
 	}
 
@@ -175,7 +175,7 @@ bool CContactInfoCollectionControllerComp::CreateRepresentationFromObject(
 
 
 istd::IChangeableUniquePtr CContactInfoCollectionControllerComp::CreateObjectFromRepresentation(
-			const sdl::controlsgallery::ContactInfos::CContactInfoData::V1_0& contactInfoDataRepresentation,
+			const sdl::V1_0::controlsgallery::CContactInfoData& contactInfoDataRepresentation,
 			QByteArray& newObjectId,
 			QString& errorMessage) const
 {
@@ -217,7 +217,7 @@ istd::IChangeableUniquePtr CContactInfoCollectionControllerComp::CreateObjectFro
 
 bool CContactInfoCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 			const ::imtgql::CGqlRequest& rawGqlRequest,
-			const sdl::controlsgallery::ContactInfos::CUpdateContactInfoGqlRequest& updateContactInfoRequest,
+			const sdl::V1_0::controlsgallery::CUpdateContactInfoGqlRequest& updateContactInfoRequest,
 			istd::IChangeable& object,
 			QString& errorMessage) const
 {
@@ -226,7 +226,7 @@ bool CContactInfoCollectionControllerComp::UpdateObjectFromRepresentationRequest
 		return false;
 	}
 
-	sdl::controlsgallery::ContactInfos::UpdateContactInfoRequestArguments inputArguments = updateContactInfoRequest.GetRequestedArguments();
+	sdl::V1_0::controlsgallery::UpdateContactInfoRequestArguments inputArguments = updateContactInfoRequest.GetRequestedArguments();
 	if (!inputArguments.input.Version_1_0){
 		I_CRITICAL();
 		return false;
@@ -240,7 +240,7 @@ bool CContactInfoCollectionControllerComp::UpdateObjectFromRepresentationRequest
 	imtauth::CContactInfo* contactInfoPtr = dynamic_cast<imtauth::CContactInfo*>(&object);
 	Q_ASSERT(contactInfoPtr != nullptr);
 
-	sdl::controlsgallery::ContactInfos::CContactInfoData::V1_0 contactInfoData = *inputArguments.input.Version_1_0->item;
+	sdl::V1_0::controlsgallery::CContactInfoData contactInfoData = *inputArguments.input.Version_1_0->item;
 
 	QByteArray objectId;
 	if (!FillObjectFromRepresentation(contactInfoData, *contactInfoPtr, objectId, errorMessage)){
@@ -254,7 +254,7 @@ bool CContactInfoCollectionControllerComp::UpdateObjectFromRepresentationRequest
 // private methods
 
 bool CContactInfoCollectionControllerComp::FillObjectFromRepresentation(
-			const sdl::controlsgallery::ContactInfos::CContactInfoData::V1_0& representation,
+			const sdl::V1_0::controlsgallery::CContactInfoData& representation,
 			istd::IChangeable& object,
 			QByteArray& objectId,
 			QString& /*errorMessage*/) const
@@ -285,15 +285,15 @@ bool CContactInfoCollectionControllerComp::FillObjectFromRepresentation(
 	}
 
 	if (representation.genderType){
-		sdl::controlsgallery::ContactInfos::GenderType genderType = *representation.genderType;
+		sdl::V1_0::controlsgallery::GenderType genderType = *representation.genderType;
 		switch (genderType){
-		case sdl::controlsgallery::ContactInfos::GenderType::DIVERSE:
+		case sdl::V1_0::controlsgallery::GenderType::DIVERSE:
 			contactInfoPtr->SetGenderType(imtauth::CContactInfo::GT_DIVERSE);
 			break;
-		case sdl::controlsgallery::ContactInfos::GenderType::MALE:
+		case sdl::V1_0::controlsgallery::GenderType::MALE:
 			contactInfoPtr->SetGenderType(imtauth::CContactInfo::GT_MALE);
 			break;
-		case sdl::controlsgallery::ContactInfos::GenderType::FEMALE:
+		case sdl::V1_0::controlsgallery::GenderType::FEMALE:
 			contactInfoPtr->SetGenderType(imtauth::CContactInfo::GT_FEMALE);
 			break;
 		}

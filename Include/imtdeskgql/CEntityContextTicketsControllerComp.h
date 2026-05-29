@@ -15,10 +15,10 @@ namespace imtdeskgql
 
 
 class CEntityContextTicketsControllerComp:
-		public sdl::imtdesk::ImtDesk::CGraphQlHandlerCompBase
+		public sdl::V1_0::imtdesk::CGraphQlHandlerCompBase
 {
 public:
-	typedef sdl::imtdesk::ImtDesk::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtdesk::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CEntityContextTicketsControllerComp);
 		I_ASSIGN(m_ticketCollectionCompPtr, "TicketCollection", "Ticket collection", true, "TicketCollection");
@@ -30,13 +30,13 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtdesk::ImtDesk::CGraphQlHandlerCompBase)
-	virtual sdl::imtdesk::ImtDesk::CEntityContextTicketsPayload OnEntityContextTickets(
-				const sdl::imtdesk::ImtDesk::CEntityContextTicketsGqlRequest& entityContextTicketsRequest,
+	// reimplemented (sdl::V1_0::imtdesk::CGraphQlHandlerCompBase)
+	virtual sdl::V1_0::imtdesk::CEntityContextTicketsPayload OnEntityContextTickets(
+				const sdl::V1_0::imtdesk::CEntityContextTicketsGqlRequest& entityContextTicketsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtdesk::ImtDesk::CCreateEntityContextTicketPayload OnCreateEntityContextTicket(
-				const sdl::imtdesk::ImtDesk::CCreateEntityContextTicketGqlRequest& createEntityContextTicketRequest,
+	virtual sdl::V1_0::imtdesk::CCreateEntityContextTicketPayload OnCreateEntityContextTicket(
+				const sdl::V1_0::imtdesk::CCreateEntityContextTicketGqlRequest& createEntityContextTicketRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 

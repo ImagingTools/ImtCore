@@ -16,10 +16,10 @@ namespace imtauthgql
 {
 
 
-class CAuthorizationControllerComp: public sdl::imtauth::Authorization::CGraphQlHandlerCompBase
+class CAuthorizationControllerComp: public sdl::V1_0::imtauth::CGraphQlHandlerCompBase
 {
 public:
-	typedef sdl::imtauth::Authorization::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtauth::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CAuthorizationControllerComp);
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection", true, "UserCollection");
@@ -33,28 +33,28 @@ protected:
 	bool ParseDataFromGqlRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& login, QByteArray& password, QByteArray& productId) const;
 	QByteArray GetUserObjectId(const QByteArray& login) const;
 	bool CheckCredential(const QByteArray& systemId, const QByteArray& login, const QByteArray& password) const;
-	sdl::imtauth::Authorization::CAuthorizationPayload CreateInvalidLoginOrPasswordResponse(const QByteArray& login, QString& errorMessage) const;
-	sdl::imtauth::Authorization::CAuthorizationPayload CreateAuthorizationSuccessfulResponse(
+	sdl::V1_0::imtauth::CAuthorizationPayload CreateInvalidLoginOrPasswordResponse(const QByteArray& login, QString& errorMessage) const;
+	sdl::V1_0::imtauth::CAuthorizationPayload CreateAuthorizationSuccessfulResponse(
 				imtauth::CUserInfo& userInfo,
 				const QByteArray& systemId,
 				const QByteArray& productId,
 				QString& errorMessage) const;
 
-	// reimplemented (sdl::imtauth::Authorization::CGraphQlHandlerCompBase)
-	virtual sdl::imtauth::Authorization::CAuthorizationPayload OnAuthorization(
-				const sdl::imtauth::Authorization::CAuthorizationGqlRequest& authorizationRequest,
+	// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+	virtual sdl::V1_0::imtauth::CAuthorizationPayload OnAuthorization(
+				const sdl::V1_0::imtauth::CAuthorizationGqlRequest& authorizationRequest,
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Authorization::CAuthorizationPayload OnUserToken(
-				const sdl::imtauth::Authorization::CUserTokenGqlRequest& userTokenRequest,
+	virtual sdl::V1_0::imtauth::CAuthorizationPayload OnUserToken(
+				const sdl::V1_0::imtauth::CUserTokenGqlRequest& userTokenRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Authorization::CLogoutPayload OnLogout(
-				const sdl::imtauth::Authorization::CLogoutGqlRequest& logoutRequest,
+	virtual sdl::V1_0::imtauth::CLogoutPayload OnLogout(
+				const sdl::V1_0::imtauth::CLogoutGqlRequest& logoutRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Authorization::CPermissionList OnGetPermissions(
-				const sdl::imtauth::Authorization::CGetPermissionsGqlRequest& getPermissionsRequest,
+	virtual sdl::V1_0::imtauth::CPermissionList OnGetPermissions(
+				const sdl::V1_0::imtauth::CGetPermissionsGqlRequest& getPermissionsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 

@@ -41,8 +41,8 @@ QByteArray CClientRequestGroupManagerComp::CreateGroup(const QString& groupName,
 
 	arguments.input.Version_1_0->item = groupData;
 
-	sdl::imtbase::ImtCollection::CAddedNotificationPayload payload;
-	bool ok = SendModelRequestInternal<groupssdl::GroupAddRequestArguments, sdl::imtbase::ImtCollection::CAddedNotificationPayload, groupssdl::CGroupAddGqlRequest>(arguments, payload);
+	sdl::V1_0::imtbase::CAddedNotificationPayload payload;
+	bool ok = SendModelRequestInternal<groupssdl::GroupAddRequestArguments, sdl::V1_0::imtbase::CAddedNotificationPayload, groupssdl::CGroupAddGqlRequest>(arguments, payload);
 	if (!ok){
 		return QByteArray();
 	}
@@ -67,7 +67,7 @@ imtauth::IUserGroupInfoUniquePtr CClientRequestGroupManagerComp::GetGroup(const 
 		return nullptr;
 	}
 
-	sdl::imtauth::Groups::CGroupData::V1_0 groupData;
+	sdl::V1_0::imtauth::CGroupData groupData;
 	bool ok = GetGroupDataSdl(groupId, groupData);
 	if (!ok){
 		return nullptr;
@@ -113,7 +113,7 @@ bool CClientRequestGroupManagerComp::AddUsersToGroup(const QByteArray& groupId, 
 		return false;
 	}
 
-	sdl::imtauth::Groups::CGroupData::V1_0 groupData;
+	sdl::V1_0::imtauth::CGroupData groupData;
 	bool ok = GetGroupDataSdl(groupId, groupData);
 	if (!ok){
 		return false;
@@ -144,7 +144,7 @@ bool CClientRequestGroupManagerComp::RemoveUsersFromGroup(const QByteArray& grou
 		return false;
 	}
 
-	sdl::imtauth::Groups::CGroupData::V1_0 groupData;
+	sdl::V1_0::imtauth::CGroupData groupData;
 	bool ok = GetGroupDataSdl(groupId, groupData);
 	if (!ok){
 		return false;
@@ -175,7 +175,7 @@ bool CClientRequestGroupManagerComp::AddRolesToGroup(const QByteArray& groupId, 
 		return false;
 	}
 
-	sdl::imtauth::Groups::CGroupData::V1_0 groupData;
+	sdl::V1_0::imtauth::CGroupData groupData;
 	bool ok = GetGroupDataSdl(groupId, groupData);
 	if (!ok){
 		return false;
@@ -206,7 +206,7 @@ bool CClientRequestGroupManagerComp::RemoveRolesFromGroup(const QByteArray& grou
 		return false;
 	}
 
-	sdl::imtauth::Groups::CGroupData::V1_0 groupData;
+	sdl::V1_0::imtauth::CGroupData groupData;
 	bool ok = GetGroupDataSdl(groupId, groupData);
 	if (!ok){
 		return false;
@@ -233,7 +233,7 @@ bool CClientRequestGroupManagerComp::RemoveRolesFromGroup(const QByteArray& grou
 
 // private methods
 
-bool CClientRequestGroupManagerComp::GetGroupDataSdl(const QByteArray& groupId, sdl::imtauth::Groups::CGroupData::V1_0& groupData) const
+bool CClientRequestGroupManagerComp::GetGroupDataSdl(const QByteArray& groupId, sdl::V1_0::imtauth::CGroupData& groupData) const
 {
 	namespace groupssdl = sdl::imtauth::Groups;
 
@@ -257,7 +257,7 @@ bool CClientRequestGroupManagerComp::GetGroupDataSdl(const QByteArray& groupId, 
 }
 
 
-bool CClientRequestGroupManagerComp::SetGroupDataSdl(const QByteArray& groupId, const sdl::imtauth::Groups::CGroupData::V1_0& groupData) const
+bool CClientRequestGroupManagerComp::SetGroupDataSdl(const QByteArray& groupId, const sdl::V1_0::imtauth::CGroupData& groupData) const
 {
 	namespace groupssdl = sdl::imtauth::Groups;
 
@@ -271,8 +271,8 @@ bool CClientRequestGroupManagerComp::SetGroupDataSdl(const QByteArray& groupId, 
 		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
 
-	sdl::imtbase::ImtCollection::CUpdatedNotificationPayload payload;
-	bool ok = SendModelRequestInternal<groupssdl::GroupUpdateRequestArguments, sdl::imtbase::ImtCollection::CUpdatedNotificationPayload, groupssdl::CGroupUpdateGqlRequest>(arguments, payload);
+	sdl::V1_0::imtbase::CUpdatedNotificationPayload payload;
+	bool ok = SendModelRequestInternal<groupssdl::GroupUpdateRequestArguments, sdl::V1_0::imtbase::CUpdatedNotificationPayload, groupssdl::CGroupUpdateGqlRequest>(arguments, payload);
 	if (!ok){
 		return false;
 	}

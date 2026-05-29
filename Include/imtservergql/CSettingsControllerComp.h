@@ -14,10 +14,10 @@ namespace imtservergql
 {
 
 
-class CSettingsControllerComp: public sdl::imtbase::Settings::CGraphQlHandlerCompBase
+class CSettingsControllerComp: public sdl::V1_0::imtbase::CGraphQlHandlerCompBase
 {
 public:
-	typedef sdl::imtbase::Settings::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtbase::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSettingsControllerComp);
 		I_ASSIGN(m_userSettingsRepresentationControllerCompPtr, "UserSettingsRepresentationController", "Controller for user related data model representation", true, "RepresentationController");
@@ -28,21 +28,21 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtbase::Settings::CGraphQlHandlerCompBase)
-	virtual sdl::imtbase::Settings::CSetSettingsPayload OnSetSettings(
-				const sdl::imtbase::Settings::CSetSettingsGqlRequest& setSettingsRequest,
+	// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+	virtual sdl::V1_0::imtbase::CSetSettingsPayload OnSetSettings(
+				const sdl::V1_0::imtbase::CSetSettingsGqlRequest& setSettingsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::ImtBaseTypes::CParamsSet OnGetSettings(
-				const sdl::imtbase::Settings::CGetSettingsGqlRequest& getSettingsRequest,
+	virtual sdl::V1_0::imtbase::CParamsSet OnGetSettings(
+				const sdl::V1_0::imtbase::CGetSettingsGqlRequest& getSettingsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::Settings::CStyleData OnGetStyleData(
-				const sdl::imtbase::Settings::CGetStyleDataGqlRequest& getStyleRequest,
+	virtual sdl::V1_0::imtbase::CStyleData OnGetStyleData(
+				const sdl::V1_0::imtbase::CGetStyleDataGqlRequest& getStyleRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::ImtBaseTypes::CUrlParam OnGetWebSocketUrl(
-				const sdl::imtbase::Settings::CGetWebSocketUrlGqlRequest& getWebSocketUrlRequest,
+	virtual sdl::V1_0::imtbase::CUrlParam OnGetWebSocketUrl(
+				const sdl::V1_0::imtbase::CGetWebSocketUrlGqlRequest& getWebSocketUrlRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 	

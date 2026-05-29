@@ -17,10 +17,10 @@ namespace imtauthgql
 {
 
 
-class CAuthorizationOptionsControllerComp: public sdl::imtauth::AuthorizationOptions::CGraphQlHandlerCompBase
+class CAuthorizationOptionsControllerComp: public sdl::V1_0::imtauth::CGraphQlHandlerCompBase
 {
 public:
-	typedef sdl::imtauth::AuthorizationOptions::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtauth::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CAuthorizationOptionsControllerComp);
 		I_ASSIGN(m_selectionParamCompPtr, "SelectionParam", "Selection param", true, "SelectionParam");
@@ -34,9 +34,9 @@ protected:
 		UM_STRONG_USER_MANAGEMENT
 	};
 
-	// reimplemented (sdl::imtauth::AuthorizationOptions::CGraphQlHandlerCompBase)
-	virtual sdl::imtauth::AuthorizationOptions::CUserManagementPayload OnGetUserMode(
-				const sdl::imtauth::AuthorizationOptions::CGetUserModeGqlRequest& getUserModeRequest,
+	// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+	virtual sdl::V1_0::imtauth::CUserManagementPayload OnGetUserMode(
+				const sdl::V1_0::imtauth::CGetUserModeGqlRequest& getUserModeRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 

@@ -17,7 +17,7 @@ namespace imtqml2d
 {
 
 
-class CQmlAnnulusShape: public sdl::imtsdl2d::imt2d::CAnnulus, public imod::TSingleModelObserverBase<i2d::CAnnulus>
+class CQmlAnnulusShape: public sdl::V1_0::imtsdl2d::CAnnulus, public imod::TSingleModelObserverBase<i2d::CAnnulus>
 {
 	Q_OBJECT
 
@@ -32,8 +32,8 @@ public:
 	virtual bool OnModelDetached(imod::IModel* modelPtr) override;
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
-	// reimplemented (sdl::imtsdl2d::imt2d::CAnnulus)
-	virtual void SetCenter(sdl::imtsdl2d::imt2d::CPoint2d newCenter) override;
+	// reimplemented (sdl::V1_0::imtsdl2d::CAnnulus)
+	virtual void SetCenter(sdl::V1_0::imtsdl2d::CPoint2d newCenter) override;
 	virtual void SetInnerRadius(double newInnerRadius) override;
 	virtual void SetOuterRadius(double newOuterRadius) override;
 };

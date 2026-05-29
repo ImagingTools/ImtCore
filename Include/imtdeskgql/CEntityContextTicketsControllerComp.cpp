@@ -58,19 +58,19 @@ namespace imtdeskgql
 {
 
 
-sdl::imtdesk::ImtDesk::CEntityContextTicketsPayload CEntityContextTicketsControllerComp::OnEntityContextTickets(
-			const sdl::imtdesk::ImtDesk::CEntityContextTicketsGqlRequest& entityContextTicketsRequest,
+sdl::V1_0::imtdesk::CEntityContextTicketsPayload CEntityContextTicketsControllerComp::OnEntityContextTickets(
+			const sdl::V1_0::imtdesk::CEntityContextTicketsGqlRequest& entityContextTicketsRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtdesk::ImtDesk::CEntityContextTicketsPayload response;
+	sdl::V1_0::imtdesk::CEntityContextTicketsPayload response;
 
 	if (!m_ticketCollectionCompPtr.IsValid() || !m_entityReferenceStorageCompPtr.IsValid()){
 		errorMessage = QStringLiteral("Ticket collection is not configured");
 		return response;
 	}
 
-	sdl::imtdesk::ImtDesk::EntityContextTicketsRequestArguments arguments = entityContextTicketsRequest.GetRequestedArguments();
+	sdl::V1_0::imtdesk::EntityContextTicketsRequestArguments arguments = entityContextTicketsRequest.GetRequestedArguments();
 	if (!arguments.input.Version_1_0){
 		errorMessage = QStringLiteral("Invalid request input");
 		return response;
@@ -110,7 +110,7 @@ sdl::imtdesk::ImtDesk::CEntityContextTicketsPayload CEntityContextTicketsControl
 		return response;
 	}
 
-	QList<sdl::imtdesk::ImtDesk::CTicketItemData::V1_0> itemList;
+	QList<sdl::V1_0::imtdesk::CTicketItemData> itemList;
 	int matchedCount = 0;
 	while (iteratorPtr->Next()){
 		imtbase::IObjectCollection::DataPtr dataPtr;
@@ -140,7 +140,7 @@ sdl::imtdesk::ImtDesk::CEntityContextTicketsPayload CEntityContextTicketsControl
 			break;
 		}
 
-		sdl::imtdesk::ImtDesk::CTicketItemData::V1_0 itemData;
+		sdl::V1_0::imtdesk::CTicketItemData itemData;
 		itemData.id = ticketPtr->GetId();
 		itemData.typeId = iteratorPtr->GetObjectTypeId();
 		itemData.number = ticketPtr->GetNumber();
@@ -168,19 +168,19 @@ sdl::imtdesk::ImtDesk::CEntityContextTicketsPayload CEntityContextTicketsControl
 }
 
 
-sdl::imtdesk::ImtDesk::CCreateEntityContextTicketPayload CEntityContextTicketsControllerComp::OnCreateEntityContextTicket(
-			const sdl::imtdesk::ImtDesk::CCreateEntityContextTicketGqlRequest& createEntityContextTicketRequest,
+sdl::V1_0::imtdesk::CCreateEntityContextTicketPayload CEntityContextTicketsControllerComp::OnCreateEntityContextTicket(
+			const sdl::V1_0::imtdesk::CCreateEntityContextTicketGqlRequest& createEntityContextTicketRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtdesk::ImtDesk::CCreateEntityContextTicketPayload response;
+	sdl::V1_0::imtdesk::CCreateEntityContextTicketPayload response;
 
 	if (!m_ticketCollectionCompPtr.IsValid() || !m_ticketFactCompPtr.IsValid() || !m_entityReferenceStorageCompPtr.IsValid()){
 		errorMessage = QStringLiteral("Ticket creation dependencies are not configured");
 		return response;
 	}
 
-	sdl::imtdesk::ImtDesk::CreateEntityContextTicketRequestArguments arguments = createEntityContextTicketRequest.GetRequestedArguments();
+	sdl::V1_0::imtdesk::CreateEntityContextTicketRequestArguments arguments = createEntityContextTicketRequest.GetRequestedArguments();
 	if (!arguments.input.Version_1_0){
 		errorMessage = QStringLiteral("Invalid request input");
 		return response;

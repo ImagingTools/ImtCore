@@ -38,7 +38,7 @@ public:
 	static QByteArray GetCancelSessionId(const GqlRequest& request);
 
 protected:
-	// reimplemented (sdl::imtbase::CollectionImport::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
 	virtual collectionImport::CSessionStatus OnBeginCollectionImportSession(
 		const collectionImport::CBeginCollectionImportSessionGqlRequest& request,
 		const ::imtgql::CGqlRequest& gqlRequest,

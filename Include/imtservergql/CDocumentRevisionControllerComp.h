@@ -13,10 +13,10 @@ namespace imtservergql
 {
 
 
-class CDocumentRevisionControllerComp: public sdl::imtbase::DocumentRevision::CGraphQlHandlerCompBase
+class CDocumentRevisionControllerComp: public sdl::V1_0::imtbase::CGraphQlHandlerCompBase
 {
 public:
-	typedef sdl::imtbase::DocumentRevision::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtbase::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CDocumentRevisionControllerComp);
 		I_ASSIGN_MULTI_0(m_collectionIdsAttrPtr, "CollectionIds", "Collection ID-s", false);
@@ -29,12 +29,12 @@ protected:
 	virtual imtbase::IObjectCollection* FindObjectCollection(const QByteArray& typeId) const;
 	virtual imtbase::IDocumentChangeGenerator* FindDocumentChangeGenerator(const QByteArray& typeId) const;
 
-	// reimplemented (sdl::imtbase::DocumentRevision::CGraphQlHandlerCompBase)
-	virtual sdl::imtbase::DocumentRevision::CRevisionInfoList OnGetRevisionInfoList(const sdl::imtbase::DocumentRevision::CGetRevisionInfoListGqlRequest& getRevisionInfoListRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual sdl::imtbase::DocumentRevision::CBackupRevisionResponse OnBackupRevision(const sdl::imtbase::DocumentRevision::CBackupRevisionGqlRequest& backupRevisionRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual sdl::imtbase::DocumentRevision::CRestoreRevisionResponse OnRestoreRevision(const sdl::imtbase::DocumentRevision::CRestoreRevisionGqlRequest& restoreRevisionRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual sdl::imtbase::DocumentRevision::CExportRevisionResponse OnExportRevision(const sdl::imtbase::DocumentRevision::CExportRevisionGqlRequest& exportRevisionRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual sdl::imtbase::DocumentRevision::CDeleteRevisionResponse OnDeleteRevision(const sdl::imtbase::DocumentRevision::CDeleteRevisionGqlRequest& deleteRevisionRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+	virtual sdl::V1_0::imtbase::CRevisionInfoList OnGetRevisionInfoList(const sdl::V1_0::imtbase::CGetRevisionInfoListGqlRequest& getRevisionInfoListRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual sdl::V1_0::imtbase::CBackupRevisionResponse OnBackupRevision(const sdl::V1_0::imtbase::CBackupRevisionGqlRequest& backupRevisionRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual sdl::V1_0::imtbase::CRestoreRevisionResponse OnRestoreRevision(const sdl::V1_0::imtbase::CRestoreRevisionGqlRequest& restoreRevisionRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual sdl::V1_0::imtbase::CExportRevisionResponse OnExportRevision(const sdl::V1_0::imtbase::CExportRevisionGqlRequest& exportRevisionRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual sdl::V1_0::imtbase::CDeleteRevisionResponse OnDeleteRevision(const sdl::V1_0::imtbase::CDeleteRevisionGqlRequest& deleteRevisionRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 	// reimplemented (imtgql::IGqlRequestHandler)
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;

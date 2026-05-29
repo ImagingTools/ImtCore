@@ -21,10 +21,10 @@ namespace imtauthgql
  * CollectionDocumentManager holds for a given documentId.
  */
 class CRoleCollectionDocumentServiceComp:
-			public sdl::imtauth::RoleCollectionDocumentService::CGraphQlHandlerCompBase
+			public sdl::V1_0::imtauth::CGraphQlHandlerCompBase
 {
 public:
-	typedef sdl::imtauth::RoleCollectionDocumentService::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtauth::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CRoleCollectionDocumentServiceComp)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentService", "Collection document manager", false, "CollectionDocumentService");
@@ -32,12 +32,12 @@ public:
 
 protected:
 	// reimplemented (CGraphQlHandlerCompBase)
-	virtual sdl::imtauth::Roles::CRoleData OnGetRoleRepresentation(
-				const sdl::imtauth::RoleCollectionDocumentService::CGetRoleRepresentationGqlRequest& getRoleRepresentationRequest,
+	virtual sdl::V1_0::imtauth::CRoleData OnGetRoleRepresentation(
+				const sdl::V1_0::imtauth::CGetRoleRepresentationGqlRequest& getRoleRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus OnUpdateRoleFromRepresentation(
-				const sdl::imtauth::RoleCollectionDocumentService::CUpdateRoleFromRepresentationGqlRequest& updateRoleFromRepresentationRequest,
+	virtual sdl::V1_0::imtbase::CDocumentOperationStatus OnUpdateRoleFromRepresentation(
+				const sdl::V1_0::imtauth::CUpdateRoleFromRepresentationGqlRequest& updateRoleFromRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 

@@ -15,12 +15,12 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (sdl::imtauth::UserActions::CUserCollectionControllerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CUserCollectionControllerCompBase)
 
 bool CUserActionCollectionControllerComp::CreateRepresentationFromObject(
 			const ::imtbase::IObjectCollectionIterator& objectCollectionIterator,
-			const sdl::imtauth::UserActions::CGetUserActionsGqlRequest& getUserActionsRequest,
-			sdl::imtauth::UserActions::CUserActionItemData::V1_0& representationObject,
+			const sdl::V1_0::imtauth::CGetUserActionsGqlRequest& getUserActionsRequest,
+			sdl::V1_0::imtauth::CUserActionItemData& representationObject,
 			QString& errorMessage) const
 {
 	if (!m_applicationInfoCompPtr.IsValid()){
@@ -28,7 +28,7 @@ bool CUserActionCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	QByteArray objectId = objectCollectionIterator.GetObjectId();
-	sdl::imtauth::UserActions::GetUserActionsRequestInfo requestInfo = getUserActionsRequest.GetRequestInfo();
+	sdl::V1_0::imtauth::GetUserActionsRequestInfo requestInfo = getUserActionsRequest.GetRequestInfo();
 
 	const imtauth::IUserRecentAction* userRecentActionPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
@@ -64,12 +64,12 @@ bool CUserActionCollectionControllerComp::CreateRepresentationFromObject(
 	QString targetSource = metaInfoPtr->GetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_SOURCE).toString();
 
 	if (requestInfo.items.isTargetTypeLinkRequested){
-		sdl::imtbase::ImtBaseTypes::CObjectLink::V1_0 objectLink;
+		sdl::V1_0::imtbase::CObjectLink objectLink;
 		objectLink.id = targetTypeId;
 		objectLink.typeId = targetTypeId;
 		objectLink.name = targetTypeName;
 
-		sdl::imtbase::ImtBaseTypes::CUrlParam::V1_0 urlParam;
+		sdl::V1_0::imtbase::CUrlParam urlParam;
 		urlParam.scheme = scheme;
 		urlParam.host = applicationId;
 		urlParam.path = targetSource + "/" + targetTypeId;
@@ -80,12 +80,12 @@ bool CUserActionCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isTargetLinkRequested){
-		sdl::imtbase::ImtBaseTypes::CObjectLink::V1_0 objectLink;
+		sdl::V1_0::imtbase::CObjectLink objectLink;
 		objectLink.id = targetId;
 		objectLink.name = metaInfoPtr->GetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_NAME).toString();
 		objectLink.typeId = targetTypeId;
 
-		sdl::imtbase::ImtBaseTypes::CUrlParam::V1_0 urlParam;
+		sdl::V1_0::imtbase::CUrlParam urlParam;
 		urlParam.scheme = scheme;
 		urlParam.host = applicationId;
 
@@ -104,12 +104,12 @@ bool CUserActionCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isUserLinkRequested){
-		sdl::imtbase::ImtBaseTypes::CObjectLink::V1_0 objectLink;
+		sdl::V1_0::imtbase::CObjectLink objectLink;
 		objectLink.id = metaInfoPtr->GetMetaInfo(imtauth::IUserRecentAction::MIT_USER_ID).toString().toUtf8();
 		objectLink.typeId = QByteArrayLiteral("User");
 		objectLink.name = metaInfoPtr->GetMetaInfo(imtauth::IUserRecentAction::MIT_USER_NAME).toString();
 
-		sdl::imtbase::ImtBaseTypes::CUrlParam::V1_0 urlParam;
+		sdl::V1_0::imtbase::CUrlParam urlParam;
 		urlParam.scheme = "applink";
 		urlParam.host = applicationId;
 		urlParam.path = QByteArrayLiteral("Administration/Users/User/") + *objectLink.id;

@@ -9,193 +9,193 @@ namespace imtclientgql
 
 // protected methods
 
-// reimplemented (sdl::imtbase::DocumentRevision::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
 
-sdl::imtbase::ImtCollection::CDuplicateElementsPayload CRemoteObjectCollectionControllerComp::OnDuplicateElements(
-			const sdl::imtbase::ImtCollection::CDuplicateElementsGqlRequest& /*duplicateElementsRequest*/,
+sdl::V1_0::imtbase::CDuplicateElementsPayload CRemoteObjectCollectionControllerComp::OnDuplicateElements(
+			const sdl::V1_0::imtbase::CDuplicateElementsGqlRequest& /*duplicateElementsRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::ImtCollection::CDuplicateElementsPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CDuplicateElementsPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::ImtCollection::CVisualStatus CRemoteObjectCollectionControllerComp::OnGetObjectVisualStatus(
-			const sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest& /*getObjectVisualStatusRequest*/,
+sdl::V1_0::imtbase::CVisualStatus CRemoteObjectCollectionControllerComp::OnGetObjectVisualStatus(
+			const sdl::V1_0::imtbase::CGetObjectVisualStatusGqlRequest& /*getObjectVisualStatusRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::ImtCollection::CVisualStatus>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CVisualStatus>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::ImtCollection::CRemoveElementsPayload CRemoteObjectCollectionControllerComp::OnRemoveElements(
-			const sdl::imtbase::ImtCollection::CRemoveElementsGqlRequest& /*removeElementsRequest*/,
+sdl::V1_0::imtbase::CRemoveElementsPayload CRemoteObjectCollectionControllerComp::OnRemoveElements(
+			const sdl::V1_0::imtbase::CRemoveElementsGqlRequest& /*removeElementsRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::ImtCollection::CRemoveElementsPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CRemoveElementsPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::ImtCollection::CRemoveElementSetPayload CRemoteObjectCollectionControllerComp::OnRemoveElementSet(
-			const sdl::imtbase::ImtCollection::CRemoveElementSetGqlRequest& /*removeElementSetRequest*/,
+sdl::V1_0::imtbase::CRemoveElementSetPayload CRemoteObjectCollectionControllerComp::OnRemoveElementSet(
+			const sdl::V1_0::imtbase::CRemoveElementSetGqlRequest& /*removeElementSetRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::ImtCollection::CRemoveElementSetPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CRemoveElementSetPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::ImtCollection::CRestoreObjectsPayload CRemoteObjectCollectionControllerComp::OnRestoreObjects(
-			const sdl::imtbase::ImtCollection::CRestoreObjectsGqlRequest& /*restoreObjectsRequest*/,
+sdl::V1_0::imtbase::CRestoreObjectsPayload CRemoteObjectCollectionControllerComp::OnRestoreObjects(
+			const sdl::V1_0::imtbase::CRestoreObjectsGqlRequest& /*restoreObjectsRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::ImtCollection::CRestoreObjectsPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CRestoreObjectsPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::ImtCollection::CRestoreObjectSetPayload CRemoteObjectCollectionControllerComp::OnRestoreObjectSet(
-			const sdl::imtbase::ImtCollection::CRestoreObjectSetGqlRequest& /*restoreObjectSetRequest*/,
+sdl::V1_0::imtbase::CRestoreObjectSetPayload CRemoteObjectCollectionControllerComp::OnRestoreObjectSet(
+			const sdl::V1_0::imtbase::CRestoreObjectSetGqlRequest& /*restoreObjectSetRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::ImtCollection::CRestoreObjectSetPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CRestoreObjectSetPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::ImtCollection::CSetObjectNamePayload CRemoteObjectCollectionControllerComp::OnSetObjectName(
-			const sdl::imtbase::ImtCollection::CSetObjectNameGqlRequest& /*setObjectNameRequest*/,
+sdl::V1_0::imtbase::CSetObjectNamePayload CRemoteObjectCollectionControllerComp::OnSetObjectName(
+			const sdl::V1_0::imtbase::CSetObjectNameGqlRequest& /*setObjectNameRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::ImtCollection::CSetObjectNamePayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CSetObjectNamePayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::ImtCollection::CSetObjectDescriptionPayload CRemoteObjectCollectionControllerComp::OnSetObjectDescription(
-			const sdl::imtbase::ImtCollection::CSetObjectDescriptionGqlRequest& /*setObjectDescriptionRequest*/,
+sdl::V1_0::imtbase::CSetObjectDescriptionPayload CRemoteObjectCollectionControllerComp::OnSetObjectDescription(
+			const sdl::V1_0::imtbase::CSetObjectDescriptionGqlRequest& /*setObjectDescriptionRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::ImtCollection::CSetObjectDescriptionPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CSetObjectDescriptionPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::ImtCollection::CExportObjectPayload CRemoteObjectCollectionControllerComp::OnExportObject(
-			const sdl::imtbase::ImtCollection::CExportObjectGqlRequest& /*exportObjectRequest*/,
+sdl::V1_0::imtbase::CExportObjectPayload CRemoteObjectCollectionControllerComp::OnExportObject(
+			const sdl::V1_0::imtbase::CExportObjectGqlRequest& /*exportObjectRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::ImtCollection::CExportObjectPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CExportObjectPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::ImtCollection::CImportObjectPayload CRemoteObjectCollectionControllerComp::OnImportObject(
-			const sdl::imtbase::ImtCollection::CImportObjectGqlRequest& /*importObjectRequest*/,
+sdl::V1_0::imtbase::CImportObjectPayload CRemoteObjectCollectionControllerComp::OnImportObject(
+			const sdl::V1_0::imtbase::CImportObjectGqlRequest& /*importObjectRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::ImtCollection::CImportObjectPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CImportObjectPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::ImtCollection::CGetObjectTypeIdPayload CRemoteObjectCollectionControllerComp::OnGetObjectTypeId(
-			const sdl::imtbase::ImtCollection::CGetObjectTypeIdGqlRequest& /*getObjectTypeIdRequest*/,
+sdl::V1_0::imtbase::CGetObjectTypeIdPayload CRemoteObjectCollectionControllerComp::OnGetObjectTypeId(
+			const sdl::V1_0::imtbase::CGetObjectTypeIdGqlRequest& /*getObjectTypeIdRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::ImtCollection::CGetObjectTypeIdPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CGetObjectTypeIdPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::ImtCollection::CGetCollectionHeadersPayload CRemoteObjectCollectionControllerComp::OnGetCollectionHeaders(
-			const sdl::imtbase::ImtCollection::CGetCollectionHeadersGqlRequest& /*getCollectionHeadersRequest*/,
+sdl::V1_0::imtbase::CGetCollectionHeadersPayload CRemoteObjectCollectionControllerComp::OnGetCollectionHeaders(
+			const sdl::V1_0::imtbase::CGetCollectionHeadersGqlRequest& /*getCollectionHeadersRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::ImtCollection::CGetCollectionHeadersPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CGetCollectionHeadersPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::ImtCollection::CGetElementsCountPayload CRemoteObjectCollectionControllerComp::OnGetElementsCount(
-			const sdl::imtbase::ImtCollection::CGetElementsCountGqlRequest& /*getElementsCountRequest*/,
+sdl::V1_0::imtbase::CGetElementsCountPayload CRemoteObjectCollectionControllerComp::OnGetElementsCount(
+			const sdl::V1_0::imtbase::CGetElementsCountGqlRequest& /*getElementsCountRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::ImtCollection::CGetElementsCountPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CGetElementsCountPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::ImtCollection::CGetElementIdsPayload CRemoteObjectCollectionControllerComp::OnGetElementIds(
-			const sdl::imtbase::ImtCollection::CGetElementIdsGqlRequest& /*getElementIdsRequest*/,
+sdl::V1_0::imtbase::CGetElementIdsPayload CRemoteObjectCollectionControllerComp::OnGetElementIds(
+			const sdl::V1_0::imtbase::CGetElementIdsGqlRequest& /*getElementIdsRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::ImtCollection::CGetElementIdsPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CGetElementIdsPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::ImtCollection::CInsertNewObjectPayload CRemoteObjectCollectionControllerComp::OnInsertNewObject(
-			const sdl::imtbase::ImtCollection::CInsertNewObjectGqlRequest& /*insertNewObjectRequest*/,
+sdl::V1_0::imtbase::CInsertNewObjectPayload CRemoteObjectCollectionControllerComp::OnInsertNewObject(
+			const sdl::V1_0::imtbase::CInsertNewObjectGqlRequest& /*insertNewObjectRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::ImtCollection::CInsertNewObjectPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CInsertNewObjectPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::ImtCollection::CSetObjectDataPayload CRemoteObjectCollectionControllerComp::OnSetObjectData(
-			const sdl::imtbase::ImtCollection::CSetObjectDataGqlRequest& /*setObjectDataRequest*/,
+sdl::V1_0::imtbase::CSetObjectDataPayload CRemoteObjectCollectionControllerComp::OnSetObjectData(
+			const sdl::V1_0::imtbase::CSetObjectDataGqlRequest& /*setObjectDataRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::ImtCollection::CSetObjectDataPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CSetObjectDataPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::ImtCollection::CGetObjectDataPayload CRemoteObjectCollectionControllerComp::OnGetObjectData(
-			const sdl::imtbase::ImtCollection::CGetObjectDataGqlRequest& /*getObjectDataRequest*/,
+sdl::V1_0::imtbase::CGetObjectDataPayload CRemoteObjectCollectionControllerComp::OnGetObjectData(
+			const sdl::V1_0::imtbase::CGetObjectDataGqlRequest& /*getObjectDataRequest*/,
 			const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::ImtCollection::CGetObjectDataPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CGetObjectDataPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::ImtCollection::CGetDataMetaInfoPayload CRemoteObjectCollectionControllerComp::OnGetDataMetaInfo(
-			const sdl::imtbase::ImtCollection::CGetDataMetaInfoGqlRequest& /*getDataMetaInfoRequest*/,
+sdl::V1_0::imtbase::CGetDataMetaInfoPayload CRemoteObjectCollectionControllerComp::OnGetDataMetaInfo(
+			const sdl::V1_0::imtbase::CGetDataMetaInfoGqlRequest& /*getDataMetaInfoRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::ImtCollection::CGetDataMetaInfoPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CGetDataMetaInfoPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::ImtCollection::CGetElementInfoPayload CRemoteObjectCollectionControllerComp::OnGetElementInfo(
-			const sdl::imtbase::ImtCollection::CGetElementInfoGqlRequest& /*getElementInfoRequest*/,
+sdl::V1_0::imtbase::CGetElementInfoPayload CRemoteObjectCollectionControllerComp::OnGetElementInfo(
+			const sdl::V1_0::imtbase::CGetElementInfoGqlRequest& /*getElementInfoRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::ImtCollection::CGetElementInfoPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CGetElementInfoPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CRemoteObjectCollectionControllerComp::OnGetElementMetaInfo(
-			const sdl::imtbase::ImtCollection::CGetElementMetaInfoGqlRequest& /*getElementMetaInfoRequest*/,
+sdl::V1_0::imtbase::CGetElementMetaInfoPayload CRemoteObjectCollectionControllerComp::OnGetElementMetaInfo(
+			const sdl::V1_0::imtbase::CGetElementMetaInfoGqlRequest& /*getElementMetaInfoRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CGetElementMetaInfoPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::ImtCollection::CCreateSubCollectionPayload CRemoteObjectCollectionControllerComp::OnCreateSubCollection(
-			const sdl::imtbase::ImtCollection::CCreateSubCollectionGqlRequest& /*createSubCollectionRequest*/,
+sdl::V1_0::imtbase::CCreateSubCollectionPayload CRemoteObjectCollectionControllerComp::OnCreateSubCollection(
+			const sdl::V1_0::imtbase::CCreateSubCollectionGqlRequest& /*createSubCollectionRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::ImtCollection::CCreateSubCollectionPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CCreateSubCollectionPayload>(gqlRequest, errorMessage);
 }
 
 

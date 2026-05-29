@@ -11,10 +11,10 @@ namespace imtlicgql
 {
 
 
-class CFeatureCollectionControllerComp: public sdl::imtlic::Features::CFeatureCollectionControllerCompBase
+class CFeatureCollectionControllerComp: public sdl::V1_0::imtlic::CFeatureCollectionControllerCompBase
 {
 public:
-	typedef sdl::imtlic::Features::CFeatureCollectionControllerCompBase BaseClass;
+	typedef sdl::V1_0::imtlic::CFeatureCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CFeatureCollectionControllerComp);
 		I_ASSIGN(m_featureInfoFactCompPtr, "FeatureFactory", "Factory used for creation of the new feature instance", true, "FeatureFactory");
@@ -24,35 +24,35 @@ public:
 
 protected:
 	bool CreateFeatureFromRepresentationModel(
-				const sdl::imtlic::Features::CFeatureData::V1_0& featureRepresentationData,
+				const sdl::V1_0::imtlic::CFeatureData& featureRepresentationData,
 				const QByteArray& rootFeatureId,
 				imtlic::CFeatureInfo& featureInfo,
 				QString& errorMessage) const;
 	bool CreateRepresentationModelFromFeatureInfo(
 				const imtlic::CFeatureInfo& featureInfo,
-				sdl::imtlic::Features::CFeatureData::V1_0& featureRepresentationData,
+				sdl::V1_0::imtlic::CFeatureData& featureRepresentationData,
 				QString& errorMessage) const;
 
-	// reimplemented (sdl::imtlic::Features::CFeatureCollectionControllerCompBase)
+	// reimplemented (sdl::V1_0::imtlic::CFeatureCollectionControllerCompBase)
 	virtual void OnAfterRemoveElements(const QByteArrayList& elementIds, const imtgql::CGqlRequest& gqlRequest) const override;
 
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-				const sdl::imtlic::Features::CFeaturesListGqlRequest& featuresListRequest,
-				sdl::imtlic::Features::CFeatureItem::V1_0& representationObject,
+				const sdl::V1_0::imtlic::CFeaturesListGqlRequest& featuresListRequest,
+				sdl::V1_0::imtlic::CFeatureItem& representationObject,
 				QString& errorMessage) const override;
 	virtual istd::IChangeableUniquePtr CreateObjectFromRepresentation(
-				const sdl::imtlic::Features::CFeatureData::V1_0& featureDataRepresentation,
+				const sdl::V1_0::imtlic::CFeatureData& featureDataRepresentation,
 				QByteArray& newObjectId,
 				QString& errorMessage) const override;
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
-				const sdl::imtlic::Features::CGetFeatureItemGqlRequest& featureItemRequest,
-				sdl::imtlic::Features::CFeatureData::V1_0& representationPayload,
+				const sdl::V1_0::imtlic::CGetFeatureItemGqlRequest& featureItemRequest,
+				sdl::V1_0::imtlic::CFeatureData& representationPayload,
 				QString& errorMessage) const override;
 	virtual bool UpdateObjectFromRepresentationRequest(
 				const ::imtgql::CGqlRequest& rawGqlRequest,
-				const sdl::imtlic::Features::CUpdateFeatureGqlRequest& updateFeatureRequest,
+				const sdl::V1_0::imtlic::CUpdateFeatureGqlRequest& updateFeatureRequest,
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
 

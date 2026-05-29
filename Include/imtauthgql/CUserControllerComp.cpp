@@ -14,33 +14,33 @@ namespace imtauthgql
 {
 
 
-// reimplemented (sdl::imtauth::Users::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
 
-sdl::imtauth::Users::CChangePasswordPayload CUserControllerComp::OnChangePassword(
-			const sdl::imtauth::Users::CChangePasswordGqlRequest& changePasswordRequest,
+sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword(
+			const sdl::V1_0::imtauth::CChangePasswordGqlRequest& changePasswordRequest,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtauth::Users::CChangePasswordPayload::V1_0 payload;
+	sdl::V1_0::imtauth::CChangePasswordPayload payload;
 	payload.success = false;
 
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CUserControllerComp");
-		return sdl::imtauth::Users::CChangePasswordPayload();
+		return sdl::V1_0::imtauth::CChangePasswordPayload();
 	}
 
 	if (!m_hashCalculatorCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'HashCalculator' was not set", "CUserControllerComp");
-		return sdl::imtauth::Users::CChangePasswordPayload();
+		return sdl::V1_0::imtauth::CChangePasswordPayload();
 	}
 
-	sdl::imtauth::Users::ChangePasswordRequestArguments arguments = changePasswordRequest.GetRequestedArguments();
+	sdl::V1_0::imtauth::ChangePasswordRequestArguments arguments = changePasswordRequest.GetRequestedArguments();
 	if (!arguments.input.Version_1_0.has_value()){
 		Q_ASSERT(false);
-		return sdl::imtauth::Users::CChangePasswordPayload();
+		return sdl::V1_0::imtauth::CChangePasswordPayload();
 	}
 
-	sdl::imtauth::Users::CChangePasswordInput::V1_0 inputArgument = *arguments.input.Version_1_0;
+	sdl::V1_0::imtauth::CChangePasswordInput inputArgument = *arguments.input.Version_1_0;
 	QByteArray login;
 	if (inputArgument.login){
 		login = *inputArgument.login;
@@ -66,14 +66,14 @@ sdl::imtauth::Users::CChangePasswordPayload CUserControllerComp::OnChangePasswor
 
 	if (userInfoPtr == nullptr){
 		errorMessage = QString("Unable to change password for user '%1'. Error: The user does not exist").arg(qPrintable(login));
-		return sdl::imtauth::Users::CChangePasswordPayload();
+		return sdl::V1_0::imtauth::CChangePasswordPayload();
 	}
 
 	if (userInfoPtr == nullptr){
 		errorMessage = QString("Unable to change password for user '%1'. Error: The user does not exist").arg(qPrintable(login));
 		SendErrorMessage(0, errorMessage, "CUserControllerComp");
 
-		return sdl::imtauth::Users::CChangePasswordPayload();
+		return sdl::V1_0::imtauth::CChangePasswordPayload();
 	}
 
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
@@ -82,7 +82,7 @@ sdl::imtauth::Users::CChangePasswordPayload CUserControllerComp::OnChangePasswor
 			errorMessage = QString("Unable to change password for user '%1'. Error: A user from an external system").arg(qPrintable(login));
 			SendErrorMessage(0, errorMessage, "CUserControllerComp");
 
-			return sdl::imtauth::Users::CChangePasswordPayload();
+			return sdl::V1_0::imtauth::CChangePasswordPayload();
 		}
 	}
 
@@ -111,7 +111,7 @@ sdl::imtauth::Users::CChangePasswordPayload CUserControllerComp::OnChangePasswor
 		errorMessage = QString("Unable to change password for user '%1'. Error: Invalid login or password.").arg(qPrintable(login));
 		SendErrorMessage(0, errorMessage, "CUserControllerComp");
 
-		return sdl::imtauth::Users::CChangePasswordPayload();
+		return sdl::V1_0::imtauth::CChangePasswordPayload();
 	}
 
 	QByteArray passwordHash = m_hashCalculatorCompPtr->GenerateHash(login + newPassword.toUtf8());
@@ -126,48 +126,48 @@ sdl::imtauth::Users::CChangePasswordPayload CUserControllerComp::OnChangePasswor
 		errorMessage = QString("Unable to change password for user '%1'").arg(qPrintable(login));
 		SendErrorMessage(0, errorMessage, "CUserControllerComp");
 
-		return sdl::imtauth::Users::CChangePasswordPayload();
+		return sdl::V1_0::imtauth::CChangePasswordPayload();
 	}
 
 	payload.success = true;
 
-	sdl::imtauth::Users::CChangePasswordPayload retVal;
+	sdl::V1_0::imtauth::CChangePasswordPayload retVal;
 	retVal.Version_1_0 = std::move(payload);
 
 	return retVal;
 }
 
 
-sdl::imtauth::Users::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
-			const sdl::imtauth::Users::CRegisterUserGqlRequest& registerUserRequest,
+sdl::V1_0::imtauth::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
+			const sdl::V1_0::imtauth::CRegisterUserGqlRequest& registerUserRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtauth::Users::CRegisterUserPayload::V1_0 response;
+	sdl::V1_0::imtauth::CRegisterUserPayload response;
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CUserControllerComp");
-		return sdl::imtauth::Users::CRegisterUserPayload();
+		return sdl::V1_0::imtauth::CRegisterUserPayload();
 	}
 
 	if (!m_userFactoryCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserFactory' was not set", "CUserControllerComp");
-		return sdl::imtauth::Users::CRegisterUserPayload();
+		return sdl::V1_0::imtauth::CRegisterUserPayload();
 	}
 
 	if (!m_hashCalculatorCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'HashCalculator' was not set", "CUserControllerComp");
-		return sdl::imtauth::Users::CRegisterUserPayload();
+		return sdl::V1_0::imtauth::CRegisterUserPayload();
 	}
 
-	sdl::imtauth::Users::RegisterUserRequestArguments arguments = registerUserRequest.GetRequestedArguments();
+	sdl::V1_0::imtauth::RegisterUserRequestArguments arguments = registerUserRequest.GetRequestedArguments();
 	if (!arguments.input.Version_1_0.has_value()){
 		Q_ASSERT(false);
-		return sdl::imtauth::Users::CRegisterUserPayload();
+		return sdl::V1_0::imtauth::CRegisterUserPayload();
 	}
 
 	if (!arguments.input.Version_1_0->userData){
 		errorMessage = QString("Unable to register user. Error: User data is invalid");
-		return sdl::imtauth::Users::CRegisterUserPayload();
+		return sdl::V1_0::imtauth::CRegisterUserPayload();
 	}
 
 	QByteArray productId;
@@ -179,17 +179,17 @@ sdl::imtauth::Users::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 	if (!userInfoPtr.IsValid()){
 		Q_ASSERT_X(false, "User instance is invalid", "CUserControllerComp");
 
-		return sdl::imtauth::Users::CRegisterUserPayload();
+		return sdl::V1_0::imtauth::CRegisterUserPayload();
 	}
 
 	auto userIdentifierPtr = dynamic_cast<imtbase::IIdentifiable*>(userInfoPtr.GetPtr());
 	if (userIdentifierPtr == nullptr){
 		Q_ASSERT_X(false, "User instance is invalid", "CUserControllerComp");
 
-		return sdl::imtauth::Users::CRegisterUserPayload();
+		return sdl::V1_0::imtauth::CRegisterUserPayload();
 	}
 
-	sdl::imtauth::Users::CUserData::V1_0 userData = *arguments.input.Version_1_0->userData;
+	sdl::V1_0::imtauth::CUserData userData = *arguments.input.Version_1_0->userData;
 
 	QByteArray userId;
 	if (arguments.input.Version_1_0->userData->id){
@@ -203,13 +203,13 @@ sdl::imtauth::Users::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 		errorMessage = QString("Unable to register user. Error: User with ID: '%1' already exists")
 					.arg(QString::fromUtf8(userId)).arg(errorMessage);
 
-		return sdl::imtauth::Users::CRegisterUserPayload();
+		return sdl::V1_0::imtauth::CRegisterUserPayload();
 	}
 
 	if (!m_userRepresentationController.FillUserInfoFromRepresentation(userData, *userInfoPtr, m_userCollectionCompPtr.GetPtr(), userId, errorMessage)){
 		errorMessage = QString("Unable to register user. Error: %1").arg(errorMessage);
 
-		return sdl::imtauth::Users::CRegisterUserPayload();
+		return sdl::V1_0::imtauth::CRegisterUserPayload();
 	}
 
 	imtauth::IUserInfo::SystemInfo systemInfo;
@@ -223,13 +223,13 @@ sdl::imtauth::Users::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 	if (password.isEmpty()){
 		errorMessage = QString("Unable to register user. Error: password cannot be empty");
 
-		return sdl::imtauth::Users::CRegisterUserPayload();
+		return sdl::V1_0::imtauth::CRegisterUserPayload();
 	}
 
 	if (!userData.username){
 		errorMessage = QString("Unable to register user. Error: Invalid username");
 
-		return sdl::imtauth::Users::CRegisterUserPayload();
+		return sdl::V1_0::imtauth::CRegisterUserPayload();
 	}
 
 	password = m_hashCalculatorCompPtr->GenerateHash(*userData.username + password.toUtf8());
@@ -259,44 +259,44 @@ sdl::imtauth::Users::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 		errorMessage = QString("Unable to register user. Error: Insert object to collection failed");
 		SendWarningMessage(0, errorMessage, "CUserControllerComp");
 
-		return sdl::imtauth::Users::CRegisterUserPayload();
+		return sdl::V1_0::imtauth::CRegisterUserPayload();
 	}
 
-	sdl::imtauth::Users::CRegisterUserPayload retVal;
+	sdl::V1_0::imtauth::CRegisterUserPayload retVal;
 	retVal.Version_1_0 = response;
 
 	return retVal;
 }
 
 
-sdl::imtauth::Users::CCheckEmailPayload CUserControllerComp::OnCheckEmail(
-			const sdl::imtauth::Users::CCheckEmailGqlRequest& checkEmailRequest,
+sdl::V1_0::imtauth::CCheckEmailPayload CUserControllerComp::OnCheckEmail(
+			const sdl::V1_0::imtauth::CCheckEmailGqlRequest& checkEmailRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	sdl::imtauth::Users::CCheckEmailPayload retVal;
-	retVal.Version_1_0 = sdl::imtauth::Users::CCheckEmailPayload::V1_0();
+	sdl::V1_0::imtauth::CCheckEmailPayload retVal;
+	retVal.Version_1_0 = sdl::V1_0::imtauth::CCheckEmailPayload();
 
-	sdl::imtauth::Users::CCheckEmailPayload::V1_0& response = *retVal.Version_1_0;
+	sdl::V1_0::imtauth::CCheckEmailPayload& response = *retVal.Version_1_0;
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CUserControllerComp");
 
-		return sdl::imtauth::Users::CCheckEmailPayload();
+		return sdl::V1_0::imtauth::CCheckEmailPayload();
 	}
 
 	if (!m_userVerificationControllerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserVerificationController' was not set", "CUserControllerComp");
 
-		return sdl::imtauth::Users::CCheckEmailPayload();
+		return sdl::V1_0::imtauth::CCheckEmailPayload();
 	}
 
 	response.success = false;
 
-	sdl::imtauth::Users::CheckEmailRequestArguments arguments = checkEmailRequest.GetRequestedArguments();
+	sdl::V1_0::imtauth::CheckEmailRequestArguments arguments = checkEmailRequest.GetRequestedArguments();
 	
 	if (!arguments.input.Version_1_0.has_value()){
 		Q_ASSERT(false);
-		return sdl::imtauth::Users::CCheckEmailPayload();
+		return sdl::V1_0::imtauth::CCheckEmailPayload();
 	}
 
 	QString email;
@@ -331,21 +331,21 @@ sdl::imtauth::Users::CCheckEmailPayload CUserControllerComp::OnCheckEmail(
 }
 
 
-sdl::imtauth::Users::CSendEmailCodePayload CUserControllerComp::OnSendEmailCode(
-			const sdl::imtauth::Users::CSendEmailCodeGqlRequest& sendEmailCodeRequest,
+sdl::V1_0::imtauth::CSendEmailCodePayload CUserControllerComp::OnSendEmailCode(
+			const sdl::V1_0::imtauth::CSendEmailCodeGqlRequest& sendEmailCodeRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	sdl::imtauth::Users::CSendEmailCodePayload retVal;
-	retVal.Version_1_0 = sdl::imtauth::Users::CSendEmailCodePayload::V1_0();
-	sdl::imtauth::Users::CSendEmailCodePayload::V1_0& response = *retVal.Version_1_0;
+	sdl::V1_0::imtauth::CSendEmailCodePayload retVal;
+	retVal.Version_1_0 = sdl::V1_0::imtauth::CSendEmailCodePayload();
+	sdl::V1_0::imtauth::CSendEmailCodePayload& response = *retVal.Version_1_0;
 
 	if (!m_userVerificationControllerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserVerificationController' was not set", "CUserControllerComp");
 		return retVal;
 	}
 
-	sdl::imtauth::Users::SendEmailCodeRequestArguments arguments = sendEmailCodeRequest.GetRequestedArguments();
+	sdl::V1_0::imtauth::SendEmailCodeRequestArguments arguments = sendEmailCodeRequest.GetRequestedArguments();
 	if (!arguments.input.Version_1_0.has_value()){
 		Q_ASSERT(false);
 		return retVal;
@@ -378,24 +378,24 @@ sdl::imtauth::Users::CSendEmailCodePayload CUserControllerComp::OnSendEmailCode(
 }
 
 
-sdl::imtauth::Users::CCheckEmailCodePayload CUserControllerComp::OnCheckEmailCode(
-			const sdl::imtauth::Users::CCheckEmailCodeGqlRequest& checkEmailCodeRequest,
+sdl::V1_0::imtauth::CCheckEmailCodePayload CUserControllerComp::OnCheckEmailCode(
+			const sdl::V1_0::imtauth::CCheckEmailCodeGqlRequest& checkEmailCodeRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	sdl::imtauth::Users::CCheckEmailCodePayload::V1_0 response;
+	sdl::V1_0::imtauth::CCheckEmailCodePayload response;
 
 	if (!m_userVerificationControllerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserVerificationController' was not set", "CUserControllerComp");
 
-		return sdl::imtauth::Users::CCheckEmailCodePayload();
+		return sdl::V1_0::imtauth::CCheckEmailCodePayload();
 	}
 
-	sdl::imtauth::Users::CheckEmailCodeRequestArguments arguments = checkEmailCodeRequest.GetRequestedArguments();
+	sdl::V1_0::imtauth::CheckEmailCodeRequestArguments arguments = checkEmailCodeRequest.GetRequestedArguments();
 	
 	if (!arguments.input.Version_1_0.has_value()){
 		Q_ASSERT(false);
-		return sdl::imtauth::Users::CCheckEmailCodePayload();
+		return sdl::V1_0::imtauth::CCheckEmailCodePayload();
 	}
 	
 	QByteArray login;
@@ -412,21 +412,21 @@ sdl::imtauth::Users::CCheckEmailCodePayload CUserControllerComp::OnCheckEmailCod
 
 	response.correctCode = m_userVerificationControllerCompPtr->VerifyUser(userId, code.toUtf8());
 
-	sdl::imtauth::Users::CCheckEmailCodePayload retVal;
+	sdl::V1_0::imtauth::CCheckEmailCodePayload retVal;
 	retVal.Version_1_0 = std::move(response);
 
 	return retVal;
 }
 
 
-sdl::imtauth::Users::CCheckSuperuserPayload CUserControllerComp::OnCheckSuperuserExists(
-			const sdl::imtauth::Users::CCheckSuperuserExistsGqlRequest& /*checkSuperuserExistsRequest*/,
+sdl::V1_0::imtauth::CCheckSuperuserPayload CUserControllerComp::OnCheckSuperuserExists(
+			const sdl::V1_0::imtauth::CCheckSuperuserExistsGqlRequest& /*checkSuperuserExistsRequest*/,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	sdl::imtauth::Users::CCheckSuperuserPayload retVal;
-	retVal.Version_1_0 = sdl::imtauth::Users::CCheckSuperuserPayload::V1_0();
-	sdl::imtauth::Users::CCheckSuperuserPayload::V1_0& response = *retVal.Version_1_0;
+	sdl::V1_0::imtauth::CCheckSuperuserPayload retVal;
+	retVal.Version_1_0 = sdl::V1_0::imtauth::CCheckSuperuserPayload();
+	sdl::V1_0::imtauth::CCheckSuperuserPayload& response = *retVal.Version_1_0;
 
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CUserControllerComp");
@@ -440,7 +440,7 @@ sdl::imtauth::Users::CCheckSuperuserPayload CUserControllerComp::OnCheckSuperuse
 		QString connectionMessage;
 		bool ok = m_databaseConnectionCheckerCompPtr->CheckDatabaseConnection(connectionMessage);
 		if (!ok){
-			response.status = sdl::imtauth::Users::ExistsStatus::UNKNOWN;
+			response.status = sdl::V1_0::imtauth::ExistsStatus::UNKNOWN;
 			response.message = connectionMessage;
 
 			return retVal;
@@ -449,24 +449,24 @@ sdl::imtauth::Users::CCheckSuperuserPayload CUserControllerComp::OnCheckSuperuse
 
 	imtauth::IUserInfoSharedPtr userInfoPtr = GetUserInfoByLogin("su");
 	if (!userInfoPtr.IsValid()){
-		response.status = sdl::imtauth::Users::ExistsStatus::NOT_EXISTS;
+		response.status = sdl::V1_0::imtauth::ExistsStatus::NOT_EXISTS;
 		return retVal;
 	}
 
-	response.status = sdl::imtauth::Users::ExistsStatus::EXISTS;
+	response.status = sdl::V1_0::imtauth::ExistsStatus::EXISTS;
 
 	return retVal;
 }
 
 
-sdl::imtauth::Users::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperuser(
-			const sdl::imtauth::Users::CCreateSuperuserGqlRequest& createSuperuserRequest,
+sdl::V1_0::imtauth::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperuser(
+			const sdl::V1_0::imtauth::CCreateSuperuserGqlRequest& createSuperuserRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	sdl::imtauth::Users::CCreateSuperuserPayload retVal;
-	retVal.Version_1_0 = sdl::imtauth::Users::CCreateSuperuserPayload::V1_0();
-	sdl::imtauth::Users::CCreateSuperuserPayload::V1_0& response = *retVal.Version_1_0;
+	sdl::V1_0::imtauth::CCreateSuperuserPayload retVal;
+	retVal.Version_1_0 = sdl::V1_0::imtauth::CCreateSuperuserPayload();
+	sdl::V1_0::imtauth::CCreateSuperuserPayload& response = *retVal.Version_1_0;
 
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CUserControllerComp");
@@ -490,7 +490,7 @@ sdl::imtauth::Users::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperu
 		return retVal;
 	}
 
-	sdl::imtauth::Users::CreateSuperuserRequestArguments arguments = createSuperuserRequest.GetRequestedArguments();
+	sdl::V1_0::imtauth::CreateSuperuserRequestArguments arguments = createSuperuserRequest.GetRequestedArguments();
 
 	if (!arguments.input.Version_1_0.has_value()){
 		Q_ASSERT(false);
@@ -569,14 +569,14 @@ sdl::imtauth::Users::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperu
 }
 
 
-sdl::imtauth::Users::CUserObjectId CUserControllerComp::OnGetUserObjectId(
-			const sdl::imtauth::Users::CGetUserObjectIdGqlRequest& getUserObjectIdRequest,
+sdl::V1_0::imtauth::CUserObjectId CUserControllerComp::OnGetUserObjectId(
+			const sdl::V1_0::imtauth::CGetUserObjectIdGqlRequest& getUserObjectIdRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtauth::Users::CUserObjectId response;
+	sdl::V1_0::imtauth::CUserObjectId response;
 
-	sdl::imtauth::Users::GetUserObjectIdRequestArguments arguments = getUserObjectIdRequest.GetRequestedArguments();
+	sdl::V1_0::imtauth::GetUserObjectIdRequestArguments arguments = getUserObjectIdRequest.GetRequestedArguments();
 	if (!arguments.input.Version_1_0.HasValue()){
 		errorMessage = QString("Unable to get user object-ID. Error: GraphQL version is invalid");
 		return response;
@@ -602,9 +602,9 @@ sdl::imtauth::Users::CUserObjectId CUserControllerComp::OnGetUserObjectId(
 bool CUserControllerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	QByteArray commandId = gqlRequest.GetCommandId();
-	if (commandId == sdl::imtauth::Users::CCheckSuperuserExistsGqlRequest::GetCommandId() ||
-		commandId == sdl::imtauth::Users::CCreateSuperuserGqlRequest::GetCommandId() ||
-		commandId == sdl::imtauth::Users::CRegisterUserGqlRequest::GetCommandId()){
+	if (commandId == sdl::V1_0::imtauth::CCheckSuperuserExistsGqlRequest::GetCommandId() ||
+		commandId == sdl::V1_0::imtauth::CCreateSuperuserGqlRequest::GetCommandId() ||
+		commandId == sdl::V1_0::imtauth::CRegisterUserGqlRequest::GetCommandId()){
 		return true;
 	}
 

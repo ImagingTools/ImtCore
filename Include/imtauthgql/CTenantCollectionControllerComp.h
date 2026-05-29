@@ -12,10 +12,10 @@ namespace imtauthgql
 {
 
 
-class CTenantCollectionControllerComp: public sdl::imtauth::Tenants::CTenantCollectionControllerCompBase
+class CTenantCollectionControllerComp: public sdl::V1_0::imtauth::CTenantCollectionControllerCompBase
 {
 public:
-	typedef sdl::imtauth::Tenants::CTenantCollectionControllerCompBase BaseClass;
+	typedef sdl::V1_0::imtauth::CTenantCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CTenantCollectionControllerComp);
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager for member count", false, "MembershipManager");
@@ -24,11 +24,11 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtauth::Tenants::CTenantCollectionControllerCompBase)
+	// reimplemented (sdl::V1_0::imtauth::CTenantCollectionControllerCompBase)
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-				const sdl::imtauth::Tenants::CGetTenantListGqlRequest& getTenantListRequest,
-				sdl::imtauth::Tenants::CTenantItemData::V1_0& representationObject,
+				const sdl::V1_0::imtauth::CGetTenantListGqlRequest& getTenantListRequest,
+				sdl::V1_0::imtauth::CTenantItemData& representationObject,
 				QString& errorMessage) const override;
 	virtual void SetAdditionalFilters(
 				const imtgql::CGqlRequest& gqlRequest,

@@ -17,15 +17,15 @@ namespace imtauthgql
 
 // reimplemented (CGraphQlHandlerCompBase)
 
-sdl::imtauth::Roles::CRoleData CRoleCollectionDocumentServiceComp::OnGetRoleRepresentation(
-		const sdl::imtauth::RoleCollectionDocumentService::CGetRoleRepresentationGqlRequest& getRoleRepresentationRequest,
+sdl::V1_0::imtauth::CRoleData CRoleCollectionDocumentServiceComp::OnGetRoleRepresentation(
+		const sdl::V1_0::imtauth::CGetRoleRepresentationGqlRequest& getRoleRepresentationRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
-	sdl::imtauth::RoleCollectionDocumentService::GetRoleRepresentationRequestArguments arguments = getRoleRepresentationRequest.GetRequestedArguments();
+	sdl::V1_0::imtauth::GetRoleRepresentationRequestArguments arguments = getRoleRepresentationRequest.GetRequestedArguments();
 	if (!arguments.input.Version_1_0){
 		Q_ASSERT(false);
-		return sdl::imtauth::Roles::CRoleData();
+		return sdl::V1_0::imtauth::CRoleData();
 	}
 
 	QByteArray userId = GetUserId(gqlRequest);
@@ -37,23 +37,23 @@ sdl::imtauth::Roles::CRoleData CRoleCollectionDocumentServiceComp::OnGetRoleRepr
 
 	if (objectId.isEmpty()){
 		errorMessage = QStringLiteral("Missing document ID");
-		return sdl::imtauth::Roles::CRoleData();
+		return sdl::V1_0::imtauth::CRoleData();
 	}
 
 	istd::IChangeableSharedPtr documentPtr;
 	m_documentManagerCompPtr->GetDocumentData(userId, objectId, documentPtr);
 	if (!documentPtr.IsValid()){
 		errorMessage = QStringLiteral("Document not found");
-		return sdl::imtauth::Roles::CRoleData();
+		return sdl::V1_0::imtauth::CRoleData();
 	}
 
 	const imtauth::CIdentifiableRoleInfo* rolePtr = dynamic_cast<const imtauth::CIdentifiableRoleInfo*>(documentPtr.GetPtr());
 	if (rolePtr == nullptr){
 		errorMessage = QStringLiteral("Invalid document type");
-		return sdl::imtauth::Roles::CRoleData();
+		return sdl::V1_0::imtauth::CRoleData();
 	}
 
-	sdl::imtauth::Roles::CRoleData response;
+	sdl::V1_0::imtauth::CRoleData response;
 	response.Version_1_0.Emplace();
 
 	response.Version_1_0->id = rolePtr->GetObjectUuid();
@@ -80,20 +80,20 @@ sdl::imtauth::Roles::CRoleData CRoleCollectionDocumentServiceComp::OnGetRoleRepr
 }
 
 
-sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CRoleCollectionDocumentServiceComp::OnUpdateRoleFromRepresentation(
-		const sdl::imtauth::RoleCollectionDocumentService::CUpdateRoleFromRepresentationGqlRequest& updateRoleFromRepresentationRequest,
+sdl::V1_0::imtbase::CDocumentOperationStatus CRoleCollectionDocumentServiceComp::OnUpdateRoleFromRepresentation(
+		const sdl::V1_0::imtauth::CUpdateRoleFromRepresentationGqlRequest& updateRoleFromRepresentationRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
-	sdl::imtauth::RoleCollectionDocumentService::UpdateRoleFromRepresentationRequestArguments arguments = updateRoleFromRepresentationRequest.GetRequestedArguments();
+	sdl::V1_0::imtauth::UpdateRoleFromRepresentationRequestArguments arguments = updateRoleFromRepresentationRequest.GetRequestedArguments();
 	if (!arguments.input.Version_1_0){
 		Q_ASSERT(false);
-		return sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus();
+		return sdl::V1_0::imtbase::CDocumentOperationStatus();
 	}
 
-	sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus response;
+	sdl::V1_0::imtbase::CDocumentOperationStatus response;
 	response.Version_1_0.Emplace();
-	response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::Failed;
+	response.Version_1_0->status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
 
 	QByteArray documentId;
 	if (arguments.input.Version_1_0->documentId){
@@ -110,17 +110,17 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CRoleCollectio
 	istd::IChangeableSharedPtr documentPtr;
 	m_documentManagerCompPtr->GetDocumentData(userLogin, documentId, documentPtr);
 	if (!documentPtr.IsValid()){
-		response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::InvalidDocumentId;
+		response.Version_1_0->status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
 
 	imtauth::CIdentifiableRoleInfo* rolePtr = dynamic_cast<imtauth::CIdentifiableRoleInfo*>(documentPtr.GetPtr());
 	if (rolePtr == nullptr){
-		response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::InvalidDocumentId;
+		response.Version_1_0->status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
 
-	sdl::imtauth::Roles::CRoleData::V1_0 roleData;
+	sdl::V1_0::imtauth::CRoleData roleData;
 	if (arguments.input.Version_1_0->role){
 		roleData = *arguments.input.Version_1_0->role;
 	}
@@ -172,7 +172,7 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CRoleCollectio
 
 	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr);
 
-	response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::Success;
+	response.Version_1_0->status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 
 	return response;
 }

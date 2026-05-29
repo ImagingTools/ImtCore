@@ -13,16 +13,16 @@ namespace imtservergql
 
 // protected methods
 
-// reimplemented (sdl::imtbase::Search::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
 
-sdl::imtbase::Search::CSearchResults CGqlSearchControllerComp::OnSearch(
-			const sdl::imtbase::Search::CSearchGqlRequest& searchRequest,
+sdl::V1_0::imtbase::CSearchResults CGqlSearchControllerComp::OnSearch(
+			const sdl::V1_0::imtbase::CSearchGqlRequest& searchRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	sdl::imtbase::Search::CSearchResults response;
+	sdl::V1_0::imtbase::CSearchResults response;
 
-	sdl::imtbase::Search::SearchRequestArguments arguments = searchRequest.GetRequestedArguments();
+	sdl::V1_0::imtbase::SearchRequestArguments arguments = searchRequest.GetRequestedArguments();
 	if (!arguments.input.Version_1_0.has_value()){
 		Q_ASSERT(false);
 		return response;
@@ -35,7 +35,7 @@ sdl::imtbase::Search::CSearchResults CGqlSearchControllerComp::OnSearch(
 		text = *arguments.input.Version_1_0->text;
 	}
 
-	imtsdl::TElementList<sdl::imtbase::Search::CSearchResult::V1_0> searchResultList;
+	imtsdl::TElementList<sdl::V1_0::imtbase::CSearchResult> searchResultList;
 
 	for (int i = 0; i < m_searchControllersCompPtr.GetCount(); i++){
 		imtbase::ISearchController* searchControllerPtr = m_searchControllersCompPtr[i];
@@ -44,7 +44,7 @@ sdl::imtbase::Search::CSearchResults CGqlSearchControllerComp::OnSearch(
 			if (searchResultsPtr.IsValid()){
 				int count = searchResultsPtr->GetSearchResultsCount();
 				if (count > 0){
-					sdl::imtbase::Search::CSearchResult::V1_0 searchRepresentation;
+					sdl::V1_0::imtbase::CSearchResult searchRepresentation;
 
 					QByteArray controllerId = searchControllerPtr->GetControllerId();
 					searchRepresentation.id = controllerId;
@@ -55,7 +55,7 @@ sdl::imtbase::Search::CSearchResults CGqlSearchControllerComp::OnSearch(
 					}
 					searchRepresentation.name = controllerName;
 
-					imtsdl::TElementList<sdl::imtbase::Search::CResultItem::V1_0> resultItemList;
+					imtsdl::TElementList<sdl::V1_0::imtbase::CResultItem> resultItemList;
 
 					for (int resultIndex = 0; resultIndex < count; ++resultIndex){
 						imtbase::ISearchResults::SearchResult searchResult = searchResultsPtr->GetSearchResult(resultIndex);
@@ -63,14 +63,14 @@ sdl::imtbase::Search::CSearchResults CGqlSearchControllerComp::OnSearch(
 							searchResult.resultName = QT_TR_NOOP("Unnamed result");
 						}
 
-						sdl::imtbase::Search::CResultItem::V1_0 itemRepresentation;
+						sdl::V1_0::imtbase::CResultItem itemRepresentation;
 						itemRepresentation.resultName = searchResult.resultName;
 						itemRepresentation.contextId = searchResult.contextId;
 						itemRepresentation.contextTypeId = searchResult.contextTypeId;
 						itemRepresentation.resultDescription = searchResult.resultDescription;
 						
-						sdl::imtbase::ImtBaseTypes::CObjectLink::V1_0 objectLink;
-						sdl::imtbase::ImtBaseTypes::CUrlParam::V1_0 urlParam;
+						sdl::V1_0::imtbase::CObjectLink objectLink;
+						sdl::V1_0::imtbase::CUrlParam urlParam;
 						urlParam.scheme = "applink";
 						urlParam.path = searchResult.url.path();
 						objectLink.url = urlParam;

@@ -19,11 +19,11 @@ namespace imtauthgql
 
 
 class CTenantCollectionDocumentServiceComp:
-			public sdl::imtauth::TenantCollectionDocumentService::CGraphQlHandlerCompBase,
+			public sdl::V1_0::imtauth::CGraphQlHandlerCompBase,
 			virtual public imtdoc::IDocumentServiceEventHandler
 {
 public:
-	typedef sdl::imtauth::TenantCollectionDocumentService::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtauth::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CTenantCollectionDocumentServiceComp)
 		I_REGISTER_INTERFACE(imtdoc::IDocumentServiceEventHandler)
@@ -35,12 +35,12 @@ public:
 
 protected:
 	// reimplemented (CGraphQlHandlerCompBase)
-	virtual sdl::imtauth::Tenants::CTenantData OnGetTenantRepresentation(
-				const sdl::imtauth::TenantCollectionDocumentService::CGetTenantRepresentationGqlRequest& getTenantRepresentationRequest,
+	virtual sdl::V1_0::imtauth::CTenantData OnGetTenantRepresentation(
+				const sdl::V1_0::imtauth::CGetTenantRepresentationGqlRequest& getTenantRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus OnUpdateTenantFromRepresentation(
-				const sdl::imtauth::TenantCollectionDocumentService::CUpdateTenantFromRepresentationGqlRequest& updateTenantFromRepresentationRequest,
+	virtual sdl::V1_0::imtbase::CDocumentOperationStatus OnUpdateTenantFromRepresentation(
+				const sdl::V1_0::imtauth::CUpdateTenantFromRepresentationGqlRequest& updateTenantFromRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 

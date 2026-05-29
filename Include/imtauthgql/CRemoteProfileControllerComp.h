@@ -14,27 +14,27 @@ namespace imtauthgql
 
 class CRemoteProfileControllerComp:
 			public imtclientgql::TClientRequestManagerCompWrap<
-							sdl::imtauth::Profile::CGraphQlHandlerCompBase>
+							sdl::V1_0::imtauth::CGraphQlHandlerCompBase>
 {
 public:
-	typedef imtclientgql::TClientRequestManagerCompWrap<sdl::imtauth::Profile::CGraphQlHandlerCompBase> BaseClass;
+	typedef imtclientgql::TClientRequestManagerCompWrap<sdl::V1_0::imtauth::CGraphQlHandlerCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CRemoteProfileControllerComp);
 		I_ASSIGN(m_productInfoCompPtr, "ProductInfo", "Product feature container", false, "ProductInfo");
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtauth::Profile::CGraphQlHandlerCompBase)
-	virtual sdl::imtauth::Profile::CProfileData OnGetProfile(
-				const sdl::imtauth::Profile::CGetProfileGqlRequest& getProfileRequest,
+	// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+	virtual sdl::V1_0::imtauth::CProfileData OnGetProfile(
+				const sdl::V1_0::imtauth::CGetProfileGqlRequest& getProfileRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Profile::CSetProfileResponse OnSetProfile(
-				const sdl::imtauth::Profile::CSetProfileGqlRequest& setProfileRequest,
+	virtual sdl::V1_0::imtauth::CSetProfileResponse OnSetProfile(
+				const sdl::V1_0::imtauth::CSetProfileGqlRequest& setProfileRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Profile::CGetUserOrganizationsPayload OnGetUserOrganizations(
-				const sdl::imtauth::Profile::CGetUserOrganizationsGqlRequest& getUserOrganizationsRequest,
+	virtual sdl::V1_0::imtauth::CGetUserOrganizationsPayload OnGetUserOrganizations(
+				const sdl::V1_0::imtauth::CGetUserOrganizationsGqlRequest& getUserOrganizationsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:

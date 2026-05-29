@@ -18,16 +18,16 @@ QByteArray ContextUserId(const imtgql::CGqlRequest& gqlRequest)
 }
 
 
-sdl::imtauth::TenantMemberships::CTenantInvitationData::V1_0 ToTenantInvitationData(
+sdl::V1_0::imtauth::CTenantInvitationData ToTenantInvitationData(
 		const imtauth::ITenantInvitation& invitation,
 		imtauth::ITenantInvitation::TenantInvitationStatus status)
 {
-	sdl::imtauth::TenantMemberships::CTenantInvitationData::V1_0 data;
+	sdl::V1_0::imtauth::CTenantInvitationData data;
 	data.id = invitation.GetInvitationId();
 	data.userId = invitation.GetUserId();
 	data.tenantId = invitation.GetTenantId();
 	data.role = invitation.GetRoleId();
-	data.status = static_cast<sdl::imtauth::TenantMemberships::TenantInvitationStatus>(status);
+	data.status = static_cast<sdl::V1_0::imtauth::TenantInvitationStatus>(status);
 	data.invitedByUserId = invitation.GetInvitedByUserId();
 	data.createdAt = invitation.GetCreatedAt();
 	data.updatedAt = invitation.GetUpdatedAt();
@@ -106,14 +106,14 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (sdl::imtauth::TenantMemberships::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
 
-sdl::imtauth::TenantMemberships::CGetMembershipsByTenantPayload CTenantMembershipManagerControllerComp::OnGetMembershipsByTenant(
-	const sdl::imtauth::TenantMemberships::CGetMembershipsByTenantGqlRequest& request,
+sdl::V1_0::imtauth::CGetMembershipsByTenantPayload CTenantMembershipManagerControllerComp::OnGetMembershipsByTenant(
+	const sdl::V1_0::imtauth::CGetMembershipsByTenantGqlRequest& request,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::TenantMemberships::CGetMembershipsByTenantPayload response;
+	sdl::V1_0::imtauth::CGetMembershipsByTenantPayload response;
 
 	if (!m_invitationManagerCompPtr.IsValid() || !m_membershipManagerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'InvitationManager' or 'MembershipManager' was not set", "CTenantMembershipManagerControllerComp");
@@ -123,7 +123,7 @@ sdl::imtauth::TenantMemberships::CGetMembershipsByTenantPayload CTenantMembershi
 	response.Version_1_0.emplace();
 
 	QByteArray tenantId;
-	sdl::imtauth::TenantMemberships::GetMembershipsByTenantRequestArguments arguments = request.GetRequestedArguments();
+	sdl::V1_0::imtauth::GetMembershipsByTenantRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input.Version_1_0->tenantId){
 		tenantId = *arguments.input.Version_1_0->tenantId;
 	}
@@ -138,12 +138,12 @@ sdl::imtauth::TenantMemberships::CGetMembershipsByTenantPayload CTenantMembershi
 }
 
 
-sdl::imtauth::TenantMemberships::CGetMembershipsByUserPayload CTenantMembershipManagerControllerComp::OnGetMembershipsByUser(
-	const sdl::imtauth::TenantMemberships::CGetMembershipsByUserGqlRequest& request,
+sdl::V1_0::imtauth::CGetMembershipsByUserPayload CTenantMembershipManagerControllerComp::OnGetMembershipsByUser(
+	const sdl::V1_0::imtauth::CGetMembershipsByUserGqlRequest& request,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::TenantMemberships::CGetMembershipsByUserPayload response;
+	sdl::V1_0::imtauth::CGetMembershipsByUserPayload response;
 
 	if (!m_membershipManagerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'MembershipManager' was not set", "CTenantMembershipManagerControllerComp");
@@ -153,7 +153,7 @@ sdl::imtauth::TenantMemberships::CGetMembershipsByUserPayload CTenantMembershipM
 	response.Version_1_0.emplace();
 
 	QByteArray userId;
-	sdl::imtauth::TenantMemberships::GetMembershipsByUserRequestArguments arguments = request.GetRequestedArguments();
+	sdl::V1_0::imtauth::GetMembershipsByUserRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input.Version_1_0->userId){
 		userId = *arguments.input.Version_1_0->userId;
 	}
@@ -168,12 +168,12 @@ sdl::imtauth::TenantMemberships::CGetMembershipsByUserPayload CTenantMembershipM
 }
 
 
-sdl::imtauth::TenantMemberships::CGetMembershipPayload CTenantMembershipManagerControllerComp::OnGetMembership(
-	const sdl::imtauth::TenantMemberships::CGetMembershipGqlRequest& request,
+sdl::V1_0::imtauth::CGetMembershipPayload CTenantMembershipManagerControllerComp::OnGetMembership(
+	const sdl::V1_0::imtauth::CGetMembershipGqlRequest& request,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::TenantMemberships::CGetMembershipPayload response;
+	sdl::V1_0::imtauth::CGetMembershipPayload response;
 
 	if (!m_membershipManagerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'MembershipManager' was not set", "CTenantMembershipManagerControllerComp");
@@ -183,7 +183,7 @@ sdl::imtauth::TenantMemberships::CGetMembershipPayload CTenantMembershipManagerC
 	response.Version_1_0.emplace();
 
 	QByteArray membershipId;
-	sdl::imtauth::TenantMemberships::GetMembershipRequestArguments arguments = request.GetRequestedArguments();
+	sdl::V1_0::imtauth::GetMembershipRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input.Version_1_0->membershipId){
 		membershipId = *arguments.input.Version_1_0->membershipId;
 	}
@@ -195,7 +195,7 @@ sdl::imtauth::TenantMemberships::CGetMembershipPayload CTenantMembershipManagerC
 		return response;
 	}
 
-	sdl::imtauth::TenantMemberships::CTenantMembershipData::V1_0 membershipData;
+	sdl::V1_0::imtauth::CTenantMembershipData membershipData;
 	membershipData.id = membershipPtr->GetMembershipId();
 	membershipData.userId = membershipPtr->GetUserId();
 	membershipData.tenantId = membershipPtr->GetTenantId();
@@ -210,12 +210,12 @@ sdl::imtauth::TenantMemberships::CGetMembershipPayload CTenantMembershipManagerC
 }
 
 
-sdl::imtauth::TenantMemberships::CFindMembershipPayload CTenantMembershipManagerControllerComp::OnFindMembership(
-	const sdl::imtauth::TenantMemberships::CFindMembershipGqlRequest& request,
+sdl::V1_0::imtauth::CFindMembershipPayload CTenantMembershipManagerControllerComp::OnFindMembership(
+	const sdl::V1_0::imtauth::CFindMembershipGqlRequest& request,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::TenantMemberships::CFindMembershipPayload response;
+	sdl::V1_0::imtauth::CFindMembershipPayload response;
 
 	if (!m_membershipManagerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'MembershipManager' was not set", "CTenantMembershipManagerControllerComp");
@@ -226,7 +226,7 @@ sdl::imtauth::TenantMemberships::CFindMembershipPayload CTenantMembershipManager
 
 	QByteArray userId;
 	QByteArray tenantId;
-	sdl::imtauth::TenantMemberships::FindMembershipRequestArguments arguments = request.GetRequestedArguments();
+	sdl::V1_0::imtauth::FindMembershipRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input.Version_1_0->userId){
 		userId = *arguments.input.Version_1_0->userId;
 	}
@@ -241,7 +241,7 @@ sdl::imtauth::TenantMemberships::CFindMembershipPayload CTenantMembershipManager
 		return response;
 	}
 
-	sdl::imtauth::TenantMemberships::CTenantMembershipData::V1_0 membershipData;
+	sdl::V1_0::imtauth::CTenantMembershipData membershipData;
 	membershipData.id = membershipPtr->GetMembershipId();
 	membershipData.userId = membershipPtr->GetUserId();
 	membershipData.tenantId = membershipPtr->GetTenantId();
@@ -256,12 +256,12 @@ sdl::imtauth::TenantMemberships::CFindMembershipPayload CTenantMembershipManager
 }
 
 
-sdl::imtauth::TenantMemberships::CIsMemberPayload CTenantMembershipManagerControllerComp::OnIsMember(
-	const sdl::imtauth::TenantMemberships::CIsMemberGqlRequest& request,
+sdl::V1_0::imtauth::CIsMemberPayload CTenantMembershipManagerControllerComp::OnIsMember(
+	const sdl::V1_0::imtauth::CIsMemberGqlRequest& request,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::TenantMemberships::CIsMemberPayload response;
+	sdl::V1_0::imtauth::CIsMemberPayload response;
 
 	if (!m_membershipManagerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'MembershipManager' was not set", "CTenantMembershipManagerControllerComp");
@@ -272,7 +272,7 @@ sdl::imtauth::TenantMemberships::CIsMemberPayload CTenantMembershipManagerContro
 
 	QByteArray userId;
 	QByteArray tenantId;
-	sdl::imtauth::TenantMemberships::IsMemberRequestArguments arguments = request.GetRequestedArguments();
+	sdl::V1_0::imtauth::IsMemberRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input.Version_1_0->userId){
 		userId = *arguments.input.Version_1_0->userId;
 	}
@@ -286,12 +286,12 @@ sdl::imtauth::TenantMemberships::CIsMemberPayload CTenantMembershipManagerContro
 }
 
 
-sdl::imtauth::TenantMemberships::CHasMinimumRolePayload CTenantMembershipManagerControllerComp::OnHasMinimumRole(
-	const sdl::imtauth::TenantMemberships::CHasMinimumRoleGqlRequest& request,
+sdl::V1_0::imtauth::CHasMinimumRolePayload CTenantMembershipManagerControllerComp::OnHasMinimumRole(
+	const sdl::V1_0::imtauth::CHasMinimumRoleGqlRequest& request,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::TenantMemberships::CHasMinimumRolePayload response;
+	sdl::V1_0::imtauth::CHasMinimumRolePayload response;
 
 	if (!m_membershipManagerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'MembershipManager' was not set", "CTenantMembershipManagerControllerComp");
@@ -302,7 +302,7 @@ sdl::imtauth::TenantMemberships::CHasMinimumRolePayload CTenantMembershipManager
 
 	QByteArray userId;
 	QByteArray tenantId;
-	sdl::imtauth::TenantMemberships::HasMinimumRoleRequestArguments arguments = request.GetRequestedArguments();
+	sdl::V1_0::imtauth::HasMinimumRoleRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input.Version_1_0->userId){
 		userId = *arguments.input.Version_1_0->userId;
 	}
@@ -321,12 +321,12 @@ sdl::imtauth::TenantMemberships::CHasMinimumRolePayload CTenantMembershipManager
 }
 
 
-sdl::imtauth::TenantMemberships::CGetTenantInvitationsPayload CTenantMembershipManagerControllerComp::OnGetTenantInvitations(
-	const sdl::imtauth::TenantMemberships::CGetTenantInvitationsGqlRequest& request,
+sdl::V1_0::imtauth::CGetTenantInvitationsPayload CTenantMembershipManagerControllerComp::OnGetTenantInvitations(
+	const sdl::V1_0::imtauth::CGetTenantInvitationsGqlRequest& request,
 	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::TenantMemberships::CGetTenantInvitationsPayload response;
+	sdl::V1_0::imtauth::CGetTenantInvitationsPayload response;
 	response.Version_1_0.emplace();
 
 	if (!m_invitationManagerCompPtr.IsValid() || !m_membershipManagerCompPtr.IsValid()){
@@ -336,7 +336,7 @@ sdl::imtauth::TenantMemberships::CGetTenantInvitationsPayload CTenantMembershipM
 
 	QByteArray tenantId;
 	imtauth::ITenantInvitationManager::Statuses statuses;
-	sdl::imtauth::TenantMemberships::GetTenantInvitationsRequestArguments arguments = request.GetRequestedArguments();
+	sdl::V1_0::imtauth::GetTenantInvitationsRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input.Version_1_0->tenantId){
 		tenantId = *arguments.input.Version_1_0->tenantId;
 	}
@@ -355,7 +355,7 @@ sdl::imtauth::TenantMemberships::CGetTenantInvitationsPayload CTenantMembershipM
 	for (const QByteArray& invitationId : m_invitationManagerCompPtr->GetInvitationsByTenant(tenantId, statuses)){
 		imtauth::ITenantInvitationUniquePtr invitationPtr = m_invitationManagerCompPtr->GetInvitation(invitationId);
 		if (invitationPtr.IsValid()){
-			sdl::imtauth::TenantMemberships::CTenantInvitationData::V1_0 data = ToTenantInvitationData(*invitationPtr, m_invitationManagerCompPtr->GetEffectiveStatus(*invitationPtr));
+			sdl::V1_0::imtauth::CTenantInvitationData data = ToTenantInvitationData(*invitationPtr, m_invitationManagerCompPtr->GetEffectiveStatus(*invitationPtr));
 			if (m_tenantManagerCompPtr.IsValid()){
 				imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(invitationPtr->GetTenantId());
 				if (tenantPtr.IsValid()){
@@ -370,12 +370,12 @@ sdl::imtauth::TenantMemberships::CGetTenantInvitationsPayload CTenantMembershipM
 }
 
 
-sdl::imtauth::TenantMemberships::CGetMyTenantInvitationsPayload CTenantMembershipManagerControllerComp::OnGetMyTenantInvitations(
-	const sdl::imtauth::TenantMemberships::CGetMyTenantInvitationsGqlRequest& request,
+sdl::V1_0::imtauth::CGetMyTenantInvitationsPayload CTenantMembershipManagerControllerComp::OnGetMyTenantInvitations(
+	const sdl::V1_0::imtauth::CGetMyTenantInvitationsGqlRequest& request,
 	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::TenantMemberships::CGetMyTenantInvitationsPayload response;
+	sdl::V1_0::imtauth::CGetMyTenantInvitationsPayload response;
 	response.Version_1_0.emplace();
 
 	if (!m_invitationManagerCompPtr.IsValid()){
@@ -384,7 +384,7 @@ sdl::imtauth::TenantMemberships::CGetMyTenantInvitationsPayload CTenantMembershi
 	}
 
 	imtauth::ITenantInvitationManager::Statuses statuses;
-	sdl::imtauth::TenantMemberships::GetMyTenantInvitationsRequestArguments arguments = request.GetRequestedArguments();
+	sdl::V1_0::imtauth::GetMyTenantInvitationsRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input.Version_1_0->statuses){
 		for (const auto& status : *arguments.input.Version_1_0->statuses){
 			statuses.append(static_cast<imtauth::ITenantInvitation::TenantInvitationStatus>(*status));
@@ -395,7 +395,7 @@ sdl::imtauth::TenantMemberships::CGetMyTenantInvitationsPayload CTenantMembershi
 	for (const QByteArray& invitationId : m_invitationManagerCompPtr->GetInvitationsByUser(ContextUserId(gqlRequest), statuses)){
 		imtauth::ITenantInvitationUniquePtr invitationPtr = m_invitationManagerCompPtr->GetInvitation(invitationId);
 		if (invitationPtr.IsValid()){
-			sdl::imtauth::TenantMemberships::CTenantInvitationData::V1_0 data = ToTenantInvitationData(*invitationPtr, m_invitationManagerCompPtr->GetEffectiveStatus(*invitationPtr));
+			sdl::V1_0::imtauth::CTenantInvitationData data = ToTenantInvitationData(*invitationPtr, m_invitationManagerCompPtr->GetEffectiveStatus(*invitationPtr));
 			if (m_tenantManagerCompPtr.IsValid()){
 				imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(invitationPtr->GetTenantId());
 				if (tenantPtr.IsValid()){
@@ -410,12 +410,12 @@ sdl::imtauth::TenantMemberships::CGetMyTenantInvitationsPayload CTenantMembershi
 }
 
 
-sdl::imtauth::TenantMemberships::CAddMembershipPayload CTenantMembershipManagerControllerComp::OnAddMembership(
-	const sdl::imtauth::TenantMemberships::CAddMembershipGqlRequest& request,
+sdl::V1_0::imtauth::CAddMembershipPayload CTenantMembershipManagerControllerComp::OnAddMembership(
+	const sdl::V1_0::imtauth::CAddMembershipGqlRequest& request,
 	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::TenantMemberships::CAddMembershipPayload response;
+	sdl::V1_0::imtauth::CAddMembershipPayload response;
 
 	if (!m_membershipManagerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'MembershipManager' was not set", "CTenantMembershipManagerControllerComp");
@@ -427,7 +427,7 @@ sdl::imtauth::TenantMemberships::CAddMembershipPayload CTenantMembershipManagerC
 	QByteArray userId;
 	QByteArray tenantId;
 	QByteArray roleId;
-	sdl::imtauth::TenantMemberships::AddMembershipRequestArguments arguments = request.GetRequestedArguments();
+	sdl::V1_0::imtauth::AddMembershipRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input.Version_1_0->userId){
 		userId = *arguments.input.Version_1_0->userId;
 	}
@@ -463,12 +463,12 @@ sdl::imtauth::TenantMemberships::CAddMembershipPayload CTenantMembershipManagerC
 }
 
 
-sdl::imtauth::TenantMemberships::CRemoveMembershipPayload CTenantMembershipManagerControllerComp::OnRemoveMembership(
-	const sdl::imtauth::TenantMemberships::CRemoveMembershipGqlRequest& request,
+sdl::V1_0::imtauth::CRemoveMembershipPayload CTenantMembershipManagerControllerComp::OnRemoveMembership(
+	const sdl::V1_0::imtauth::CRemoveMembershipGqlRequest& request,
 	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::TenantMemberships::CRemoveMembershipPayload response;
+	sdl::V1_0::imtauth::CRemoveMembershipPayload response;
 
 	if (!m_membershipManagerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'MembershipManager' was not set", "CTenantMembershipManagerControllerComp");
@@ -478,7 +478,7 @@ sdl::imtauth::TenantMemberships::CRemoveMembershipPayload CTenantMembershipManag
 	response.Version_1_0.emplace();
 
 	QByteArray membershipId;
-	sdl::imtauth::TenantMemberships::RemoveMembershipRequestArguments arguments = request.GetRequestedArguments();
+	sdl::V1_0::imtauth::RemoveMembershipRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input.Version_1_0->membershipId){
 		membershipId = *arguments.input.Version_1_0->membershipId;
 	}
@@ -513,12 +513,12 @@ sdl::imtauth::TenantMemberships::CRemoveMembershipPayload CTenantMembershipManag
 }
 
 
-sdl::imtauth::TenantMemberships::CCreateTenantInvitationPayload CTenantMembershipManagerControllerComp::OnCreateTenantInvitation(
-	const sdl::imtauth::TenantMemberships::CCreateTenantInvitationGqlRequest& request,
+sdl::V1_0::imtauth::CCreateTenantInvitationPayload CTenantMembershipManagerControllerComp::OnCreateTenantInvitation(
+	const sdl::V1_0::imtauth::CCreateTenantInvitationGqlRequest& request,
 	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::TenantMemberships::CCreateTenantInvitationPayload response;
+	sdl::V1_0::imtauth::CCreateTenantInvitationPayload response;
 	response.Version_1_0.emplace();
 
 	if (!m_invitationManagerCompPtr.IsValid() || !m_membershipManagerCompPtr.IsValid()){
@@ -529,7 +529,7 @@ sdl::imtauth::TenantMemberships::CCreateTenantInvitationPayload CTenantMembershi
 	QByteArray userId;
 	QByteArray tenantId;
 	QByteArray roleId;
-	sdl::imtauth::TenantMemberships::CreateTenantInvitationRequestArguments arguments = request.GetRequestedArguments();
+	sdl::V1_0::imtauth::CreateTenantInvitationRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input.Version_1_0->userId){
 		userId = *arguments.input.Version_1_0->userId;
 	}
@@ -563,12 +563,12 @@ sdl::imtauth::TenantMemberships::CCreateTenantInvitationPayload CTenantMembershi
 }
 
 
-sdl::imtauth::TenantMemberships::CAcceptTenantInvitationPayload CTenantMembershipManagerControllerComp::OnAcceptTenantInvitation(
-	const sdl::imtauth::TenantMemberships::CAcceptTenantInvitationGqlRequest& request,
+sdl::V1_0::imtauth::CAcceptTenantInvitationPayload CTenantMembershipManagerControllerComp::OnAcceptTenantInvitation(
+	const sdl::V1_0::imtauth::CAcceptTenantInvitationGqlRequest& request,
 	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::TenantMemberships::CAcceptTenantInvitationPayload response;
+	sdl::V1_0::imtauth::CAcceptTenantInvitationPayload response;
 	response.Version_1_0.emplace();
 	response.Version_1_0->success = false;
 
@@ -578,7 +578,7 @@ sdl::imtauth::TenantMemberships::CAcceptTenantInvitationPayload CTenantMembershi
 	}
 
 	QByteArray invitationId;
-	sdl::imtauth::TenantMemberships::AcceptTenantInvitationRequestArguments arguments = request.GetRequestedArguments();
+	sdl::V1_0::imtauth::AcceptTenantInvitationRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input.Version_1_0->invitationId){
 		invitationId = *arguments.input.Version_1_0->invitationId;
 	}
@@ -595,16 +595,16 @@ sdl::imtauth::TenantMemberships::CAcceptTenantInvitationPayload CTenantMembershi
 }
 
 
-sdl::imtauth::TenantMemberships::CRejectTenantInvitationPayload CTenantMembershipManagerControllerComp::OnRejectTenantInvitation(
-	const sdl::imtauth::TenantMemberships::CRejectTenantInvitationGqlRequest& request,
+sdl::V1_0::imtauth::CRejectTenantInvitationPayload CTenantMembershipManagerControllerComp::OnRejectTenantInvitation(
+	const sdl::V1_0::imtauth::CRejectTenantInvitationGqlRequest& request,
 	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::TenantMemberships::CRejectTenantInvitationPayload response;
+	sdl::V1_0::imtauth::CRejectTenantInvitationPayload response;
 	response.Version_1_0.emplace();
 
 	QByteArray invitationId;
-	sdl::imtauth::TenantMemberships::RejectTenantInvitationRequestArguments arguments = request.GetRequestedArguments();
+	sdl::V1_0::imtauth::RejectTenantInvitationRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input.Version_1_0->invitationId){
 		invitationId = *arguments.input.Version_1_0->invitationId;
 	}
@@ -618,12 +618,12 @@ sdl::imtauth::TenantMemberships::CRejectTenantInvitationPayload CTenantMembershi
 }
 
 
-sdl::imtauth::TenantMemberships::CRevokeTenantInvitationPayload CTenantMembershipManagerControllerComp::OnRevokeTenantInvitation(
-	const sdl::imtauth::TenantMemberships::CRevokeTenantInvitationGqlRequest& request,
+sdl::V1_0::imtauth::CRevokeTenantInvitationPayload CTenantMembershipManagerControllerComp::OnRevokeTenantInvitation(
+	const sdl::V1_0::imtauth::CRevokeTenantInvitationGqlRequest& request,
 	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::TenantMemberships::CRevokeTenantInvitationPayload response;
+	sdl::V1_0::imtauth::CRevokeTenantInvitationPayload response;
 	response.Version_1_0.emplace();
 
 	if (!m_invitationManagerCompPtr.IsValid() || !m_membershipManagerCompPtr.IsValid()){
@@ -633,7 +633,7 @@ sdl::imtauth::TenantMemberships::CRevokeTenantInvitationPayload CTenantMembershi
 	}
 
 	QByteArray invitationId;
-	sdl::imtauth::TenantMemberships::RevokeTenantInvitationRequestArguments arguments = request.GetRequestedArguments();
+	sdl::V1_0::imtauth::RevokeTenantInvitationRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input.Version_1_0->invitationId){
 		invitationId = *arguments.input.Version_1_0->invitationId;
 	}
@@ -655,12 +655,12 @@ sdl::imtauth::TenantMemberships::CRevokeTenantInvitationPayload CTenantMembershi
 }
 
 
-sdl::imtauth::TenantMemberships::CResendTenantInvitationPayload CTenantMembershipManagerControllerComp::OnResendTenantInvitation(
-	const sdl::imtauth::TenantMemberships::CResendTenantInvitationGqlRequest& request,
+sdl::V1_0::imtauth::CResendTenantInvitationPayload CTenantMembershipManagerControllerComp::OnResendTenantInvitation(
+	const sdl::V1_0::imtauth::CResendTenantInvitationGqlRequest& request,
 	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::TenantMemberships::CResendTenantInvitationPayload response;
+	sdl::V1_0::imtauth::CResendTenantInvitationPayload response;
 	response.Version_1_0.emplace();
 
 	if (!m_invitationManagerCompPtr.IsValid() || !m_membershipManagerCompPtr.IsValid()){
@@ -670,7 +670,7 @@ sdl::imtauth::TenantMemberships::CResendTenantInvitationPayload CTenantMembershi
 	}
 
 	QByteArray invitationId;
-	sdl::imtauth::TenantMemberships::ResendTenantInvitationRequestArguments arguments = request.GetRequestedArguments();
+	sdl::V1_0::imtauth::ResendTenantInvitationRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input.Version_1_0->invitationId){
 		invitationId = *arguments.input.Version_1_0->invitationId;
 	}
@@ -691,12 +691,12 @@ sdl::imtauth::TenantMemberships::CResendTenantInvitationPayload CTenantMembershi
 }
 
 
-sdl::imtauth::TenantMemberships::CUpdateMembershipRolePayload CTenantMembershipManagerControllerComp::OnUpdateMembershipRole(
-	const sdl::imtauth::TenantMemberships::CUpdateMembershipRoleGqlRequest& request,
+sdl::V1_0::imtauth::CUpdateMembershipRolePayload CTenantMembershipManagerControllerComp::OnUpdateMembershipRole(
+	const sdl::V1_0::imtauth::CUpdateMembershipRoleGqlRequest& request,
 	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::TenantMemberships::CUpdateMembershipRolePayload response;
+	sdl::V1_0::imtauth::CUpdateMembershipRolePayload response;
 
 	if (!m_membershipManagerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'MembershipManager' was not set", "CTenantMembershipManagerControllerComp");
@@ -707,7 +707,7 @@ sdl::imtauth::TenantMemberships::CUpdateMembershipRolePayload CTenantMembershipM
 
 	QByteArray membershipId;
 	QByteArray roleId;
-	sdl::imtauth::TenantMemberships::UpdateMembershipRoleRequestArguments arguments = request.GetRequestedArguments();
+	sdl::V1_0::imtauth::UpdateMembershipRoleRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input.Version_1_0->membershipId){
 		membershipId = *arguments.input.Version_1_0->membershipId;
 	}
@@ -757,12 +757,12 @@ sdl::imtauth::TenantMemberships::CUpdateMembershipRolePayload CTenantMembershipM
 }
 
 
-sdl::imtauth::TenantMemberships::CTransferTenantOwnershipPayload CTenantMembershipManagerControllerComp::OnTransferTenantOwnership(
-	const sdl::imtauth::TenantMemberships::CTransferTenantOwnershipGqlRequest& request,
+sdl::V1_0::imtauth::CTransferTenantOwnershipPayload CTenantMembershipManagerControllerComp::OnTransferTenantOwnership(
+	const sdl::V1_0::imtauth::CTransferTenantOwnershipGqlRequest& request,
 	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::TenantMemberships::CTransferTenantOwnershipPayload response;
+	sdl::V1_0::imtauth::CTransferTenantOwnershipPayload response;
 
 	if (!m_membershipManagerCompPtr.IsValid() || !m_tenantManagerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'MembershipManager' or 'TenantManager' was not set", "CTenantMembershipManagerControllerComp");
@@ -775,7 +775,7 @@ sdl::imtauth::TenantMemberships::CTransferTenantOwnershipPayload CTenantMembersh
 
 	QByteArray tenantId;
 	QByteArray newOwnerId;
-	sdl::imtauth::TenantMemberships::TransferTenantOwnershipRequestArguments arguments = request.GetRequestedArguments();
+	sdl::V1_0::imtauth::TransferTenantOwnershipRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input.Version_1_0->tenantId){
 		tenantId = *arguments.input.Version_1_0->tenantId;
 	}

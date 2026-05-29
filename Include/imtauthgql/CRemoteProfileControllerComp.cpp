@@ -12,15 +12,15 @@ namespace imtauthgql
 {
 
 
-// reimplemented (sdl::imtauth::Profile::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
 
-sdl::imtauth::Profile::CProfileData CRemoteProfileControllerComp::OnGetProfile(
-			const sdl::imtauth::Profile::CGetProfileGqlRequest& /*getProfileRequest*/,
+sdl::V1_0::imtauth::CProfileData CRemoteProfileControllerComp::OnGetProfile(
+			const sdl::V1_0::imtauth::CGetProfileGqlRequest& /*getProfileRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtauth::Profile::CProfileData profileData =
-				SendModelRequest<sdl::imtauth::Profile::CProfileData>(gqlRequest, errorMessage);
+	sdl::V1_0::imtauth::CProfileData profileData =
+				SendModelRequest<sdl::V1_0::imtauth::CProfileData>(gqlRequest, errorMessage);
 
 	if (!profileData.Version_1_0.has_value()){
 		return profileData;
@@ -39,7 +39,7 @@ sdl::imtauth::Profile::CProfileData CRemoteProfileControllerComp::OnGetProfile(
 				}
 			}
 
-			imtsdl::TElementList<sdl::imtauth::Profile::CPermissionInfo::V1_0> permissionList;
+			imtsdl::TElementList<sdl::V1_0::imtauth::CPermissionInfo> permissionList;
 
 			for (imtbase::ICollectionInfo::Id& elementId : featureCollectionPtr->GetElementIds()){
 				imtbase::IObjectCollection::DataPtr permissionDataPtr;
@@ -50,7 +50,7 @@ sdl::imtauth::Profile::CProfileData CRemoteProfileControllerComp::OnGetProfile(
 							if (permissions.contains(subFeatureId)){
 								imtlic::IFeatureInfoSharedPtr subFeatureInfoPtr = featureInfoPtr->GetSubFeature(subFeatureId);
 								if (subFeatureInfoPtr.IsValid()){
-									sdl::imtauth::Profile::CPermissionInfo::V1_0 info;
+									sdl::V1_0::imtauth::CPermissionInfo info;
 
 									info.id = QByteArray(subFeatureInfoPtr->GetFeatureId());
 									info.name = QString(subFeatureInfoPtr->GetFeatureName());
@@ -72,20 +72,20 @@ sdl::imtauth::Profile::CProfileData CRemoteProfileControllerComp::OnGetProfile(
 }
 
 
-sdl::imtauth::Profile::CSetProfileResponse CRemoteProfileControllerComp::OnSetProfile(
-			const sdl::imtauth::Profile::CSetProfileGqlRequest& /*setProfileRequest*/,
+sdl::V1_0::imtauth::CSetProfileResponse CRemoteProfileControllerComp::OnSetProfile(
+			const sdl::V1_0::imtauth::CSetProfileGqlRequest& /*setProfileRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtauth::Profile::CSetProfileResponse>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtauth::CSetProfileResponse>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtauth::Profile::CGetUserOrganizationsPayload CRemoteProfileControllerComp::OnGetUserOrganizations(
-			const sdl::imtauth::Profile::CGetUserOrganizationsGqlRequest& /*getUserOrganizationsRequest*/,
+sdl::V1_0::imtauth::CGetUserOrganizationsPayload CRemoteProfileControllerComp::OnGetUserOrganizations(
+			const sdl::V1_0::imtauth::CGetUserOrganizationsGqlRequest& /*getUserOrganizationsRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtauth::Profile::CGetUserOrganizationsPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtauth::CGetUserOrganizationsPayload>(gqlRequest, errorMessage);
 }
 
 

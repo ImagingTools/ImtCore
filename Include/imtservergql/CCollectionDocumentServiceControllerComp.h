@@ -20,10 +20,10 @@ namespace imtservergql
 namespace CDM = sdl::imtbase::CollectionDocumentService;
 
 
-class CCollectionDocumentServiceControllerComp: public sdl::imtbase::CollectionDocumentService::CGraphQlHandlerCompBase
+class CCollectionDocumentServiceControllerComp: public sdl::V1_0::imtbase::CGraphQlHandlerCompBase
 {
 public:
-	typedef sdl::imtbase::CollectionDocumentService::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtbase::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CCollectionDocumentServiceControllerComp)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentService", "Collection-related document manager", true, "CollectionDocumentService");
@@ -31,48 +31,48 @@ public:
 	I_END_COMPONENT
 
 protected:
-	virtual sdl::imtbase::CollectionDocumentService::CDocumentList OnGetOpenedDocumentList(
-		const sdl::imtbase::CollectionDocumentService::CGetOpenedDocumentListGqlRequest& getOpenedDocumentListRequest,
+	virtual sdl::V1_0::imtbase::CDocumentList OnGetOpenedDocumentList(
+		const sdl::V1_0::imtbase::CGetOpenedDocumentListGqlRequest& getOpenedDocumentListRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtbase::CollectionDocumentService::CDocumentInfo OnCreateNewDocument(
-		const sdl::imtbase::CollectionDocumentService::CCreateNewDocumentGqlRequest& createNewDocumentRequest,
+	virtual sdl::V1_0::imtbase::CDocumentInfo OnCreateNewDocument(
+		const sdl::V1_0::imtbase::CCreateNewDocumentGqlRequest& createNewDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtbase::CollectionDocumentService::CDocumentInfo OnOpenDocument(
-		const sdl::imtbase::CollectionDocumentService::COpenDocumentGqlRequest& openDocumentRequest,
+	virtual sdl::V1_0::imtbase::CDocumentInfo OnOpenDocument(
+		const sdl::V1_0::imtbase::COpenDocumentGqlRequest& openDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtbase::CollectionDocumentService::CDocumentInfo OnGetDocumentName(
-		const sdl::imtbase::CollectionDocumentService::CGetDocumentNameGqlRequest& getDocumentNameRequest,
+	virtual sdl::V1_0::imtbase::CDocumentInfo OnGetDocumentName(
+		const sdl::V1_0::imtbase::CGetDocumentNameGqlRequest& getDocumentNameRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus OnSetDocumentName(
-		const sdl::imtbase::CollectionDocumentService::CSetDocumentNameGqlRequest& setDocumentNameRequest,
+	virtual sdl::V1_0::imtbase::CDocumentOperationStatus OnSetDocumentName(
+		const sdl::V1_0::imtbase::CSetDocumentNameGqlRequest& setDocumentNameRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus OnSaveDocument(
-		const sdl::imtbase::CollectionDocumentService::CSaveDocumentGqlRequest& saveDocumentRequest,
+	virtual sdl::V1_0::imtbase::CDocumentOperationStatus OnSaveDocument(
+		const sdl::V1_0::imtbase::CSaveDocumentGqlRequest& saveDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus OnCloseDocument(
-		const sdl::imtbase::CollectionDocumentService::CCloseDocumentGqlRequest& closeDocumentRequest,
+	virtual sdl::V1_0::imtbase::CDocumentOperationStatus OnCloseDocument(
+		const sdl::V1_0::imtbase::CCloseDocumentGqlRequest& closeDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtbase::UndoManager::CUndoInfo OnGetUndoInfo(
-		const sdl::imtbase::CollectionDocumentService::CGetUndoInfoGqlRequest& getUndoInfoRequest,
+	virtual sdl::V1_0::imtbase::CUndoInfo OnGetUndoInfo(
+		const sdl::V1_0::imtbase::CGetUndoInfoGqlRequest& getUndoInfoRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtbase::UndoManager::CUndoStatus OnDoUndo(
-		const sdl::imtbase::CollectionDocumentService::CDoUndoGqlRequest& doUndoRequest,
+	virtual sdl::V1_0::imtbase::CUndoStatus OnDoUndo(
+		const sdl::V1_0::imtbase::CDoUndoGqlRequest& doUndoRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtbase::UndoManager::CUndoStatus OnDoRedo(
-		const sdl::imtbase::CollectionDocumentService::CDoRedoGqlRequest& doRedoRequest,
+	virtual sdl::V1_0::imtbase::CUndoStatus OnDoRedo(
+		const sdl::V1_0::imtbase::CDoRedoGqlRequest& doRedoRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtbase::UndoManager::CUndoStatus OnResetUndo(
-		const sdl::imtbase::CollectionDocumentService::CResetUndoGqlRequest& resetUndoRequest,
+	virtual sdl::V1_0::imtbase::CUndoStatus OnResetUndo(
+		const sdl::V1_0::imtbase::CResetUndoGqlRequest& resetUndoRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
 

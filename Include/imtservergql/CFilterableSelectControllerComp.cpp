@@ -44,12 +44,12 @@ bool CFilterableSelectControllerComp::IsRequestSupported(const imtgql::CGqlReque
 }
 
 
-sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectControllerComp::OnGetSelectableItems(
-			const sdl::imtbase::FilterableSelect::CGetSelectableItemsGqlRequest& getSelectableItemsRequest,
+sdl::V1_0::imtbase::CGetSelectableItemsPayload CFilterableSelectControllerComp::OnGetSelectableItems(
+			const sdl::V1_0::imtbase::CGetSelectableItemsGqlRequest& getSelectableItemsRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload response;
+	sdl::V1_0::imtbase::CGetSelectableItemsPayload response;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QStringLiteral("Object collection is not set");
@@ -57,7 +57,7 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 		return response;
 	}
 
-	sdl::imtbase::FilterableSelect::GetSelectableItemsRequestArguments arguments = getSelectableItemsRequest.GetRequestedArguments();
+	sdl::V1_0::imtbase::GetSelectableItemsRequestArguments arguments = getSelectableItemsRequest.GetRequestedArguments();
 	if (!arguments.input.Version_1_0.has_value()){
 		errorMessage = QStringLiteral("Invalid request arguments");
 		SendErrorMessage(0, errorMessage, "CFilterableSelectControllerComp");
@@ -66,7 +66,7 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 
 	response.Version_1_0.emplace();
 
-	imtsdl::TElementList<sdl::imtbase::FilterableSelect::CSelectableItemData::V1_0> itemsList;
+	imtsdl::TElementList<sdl::V1_0::imtbase::CSelectableItemData> itemsList;
 
 	// Normal paginated fetch mode
 	int offset = 0;
@@ -137,7 +137,7 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 			continue;
 		}
 
-		sdl::imtbase::FilterableSelect::CSelectableItemData::V1_0 itemRepresentation;
+		sdl::V1_0::imtbase::CSelectableItemData itemRepresentation;
 		itemRepresentation.id = objectId;
 
 		QByteArray objectTypeId = iteratorPtr->GetObjectTypeId();
@@ -162,7 +162,7 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 		pagesCount = 1;
 	}
 
-	sdl::imtbase::ImtCollection::CNotificationItem::V1_0 notification;
+	sdl::V1_0::imtbase::CNotificationItem notification;
 	notification.pagesCount = pagesCount;
 	notification.totalCount = elementsCount;
 	response.Version_1_0->notification = notification;

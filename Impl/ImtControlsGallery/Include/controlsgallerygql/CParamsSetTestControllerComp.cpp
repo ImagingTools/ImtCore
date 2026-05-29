@@ -7,17 +7,17 @@ namespace controlsgallerygql
 
 // protected methods
 
-// reimplemented (sdl::controlsgallery::ParamsSetTest::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::controlsgallery::CGraphQlHandlerCompBase)
 
-sdl::imtbase::ImtBaseTypes::CParamsSet CParamsSetTestControllerComp::OnGetParamsSet(
-	const sdl::controlsgallery::ParamsSetTest::CGetParamsSetGqlRequest& getParamsSetRequest,
+sdl::V1_0::imtbase::CParamsSet CParamsSetTestControllerComp::OnGetParamsSet(
+	const sdl::V1_0::controlsgallery::CGetParamsSetGqlRequest& getParamsSetRequest,
 	const::imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
-	sdl::imtbase::ImtBaseTypes::CParamsSet retVal;
+	sdl::V1_0::imtbase::CParamsSet retVal;
 
 	// Text parameter
-	sdl::imtbase::ImtBaseTypes::CTextParam strParam;
+	sdl::V1_0::imtbase::CTextParam strParam;
 	strParam.Version_1_0.emplace().text = "SampleText";
 
 	QJsonObject jsonObject;
@@ -31,7 +31,7 @@ sdl::imtbase::ImtBaseTypes::CParamsSet CParamsSetTestControllerComp::OnGetParams
 	jsonDocument.setObject(jsonObject);
 
 	// ParamsSet parameter
-	sdl::imtbase::ImtBaseTypes::CParameter::V1_0 parameter;
+	sdl::V1_0::imtbase::CParameter parameter;
 	parameter.id = "SampleId";
 	parameter.name = "SampleName";
 	parameter.description = "SampleDesc";
@@ -45,13 +45,13 @@ sdl::imtbase::ImtBaseTypes::CParamsSet CParamsSetTestControllerComp::OnGetParams
 }
 
 
-sdl::controlsgallery::ParamsSetTest::CSetParamsSetResult CParamsSetTestControllerComp::OnSetParamsSet(
-	const sdl::controlsgallery::ParamsSetTest::CSetParamsSetGqlRequest& setParamsSetRequest,
+sdl::V1_0::controlsgallery::CSetParamsSetResult CParamsSetTestControllerComp::OnSetParamsSet(
+	const sdl::V1_0::controlsgallery::CSetParamsSetGqlRequest& setParamsSetRequest,
 	const::imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
 
-	sdl::controlsgallery::ParamsSetTest::CSetParamsSetResult retVal;
+	sdl::V1_0::controlsgallery::CSetParamsSetResult retVal;
 
 	retVal.Version_1_0.emplace().result = true;
 
@@ -94,7 +94,7 @@ sdl::controlsgallery::ParamsSetTest::CSetParamsSetResult CParamsSetTestControlle
 	}
 
 	QJsonDocument jsonDoc = QJsonDocument::fromJson(parameter->data->toUtf8());
-	sdl::imtbase::ImtBaseTypes::CTextParam strParam;
+	sdl::V1_0::imtbase::CTextParam strParam;
 	if (!strParam.ReadFromJsonObject(jsonDoc.object())){
 		errorMessage = "ParamsSet: Failed to deserialize text param";
 		return retVal;

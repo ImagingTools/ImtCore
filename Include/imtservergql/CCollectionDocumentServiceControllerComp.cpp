@@ -407,12 +407,12 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnCloseD
 }
 
 
-sdl::imtbase::UndoManager::CUndoInfo CCollectionDocumentServiceControllerComp::OnGetUndoInfo(
+sdl::V1_0::imtbase::CUndoInfo CCollectionDocumentServiceControllerComp::OnGetUndoInfo(
 			const CDM::CGetUndoInfoGqlRequest& getUndoInfoRequest,
 			const::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::UndoManager::CUndoInfo retVal;
+	sdl::V1_0::imtbase::CUndoInfo retVal;
 	retVal.Version_1_0.emplace();
 	retVal.Version_1_0->status.emplace();
 
@@ -422,7 +422,7 @@ sdl::imtbase::UndoManager::CUndoInfo CCollectionDocumentServiceControllerComp::O
 	if (!documentId || !documentId->id){
 		errorMessage = "Invalid GraphQL request params";
 
-		retVal.Version_1_0->status->status = sdl::imtbase::UndoManager::EUndoStatus::Failed;
+		retVal.Version_1_0->status->status = sdl::V1_0::imtbase::EUndoStatus::Failed;
 
 		return retVal;
 	}
@@ -439,13 +439,13 @@ sdl::imtbase::UndoManager::CUndoInfo CCollectionDocumentServiceControllerComp::O
 		if (m_documentManagerCompPtr-> GetDocumentUndoManager(userId, *documentId->id, undoManagerPtr) != imtdoc::IDocumentService::OS_OK){
 			errorMessage = "Undo manager not available";
 
-			retVal.Version_1_0->status->status = sdl::imtbase::UndoManager::EUndoStatus::Failed;
+			retVal.Version_1_0->status->status = sdl::V1_0::imtbase::EUndoStatus::Failed;
 
 			return retVal;
 		}
 
 		retVal.Version_1_0->isDirty = undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL;
-		retVal.Version_1_0->status.emplace().status = sdl::imtbase::UndoManager::EUndoStatus::Success;
+		retVal.Version_1_0->status.emplace().status = sdl::V1_0::imtbase::EUndoStatus::Success;
 
 		int count = undoManagerPtr->GetAvailableUndoSteps();
 		retVal.Version_1_0->availableUndoSteps = count;
@@ -463,19 +463,19 @@ sdl::imtbase::UndoManager::CUndoInfo CCollectionDocumentServiceControllerComp::O
 			retVal.Version_1_0->redoLevelDescriptions->append(description);
 		}
 
-		retVal.Version_1_0->status->status = sdl::imtbase::UndoManager::EUndoStatus::Success;
+		retVal.Version_1_0->status->status = sdl::V1_0::imtbase::EUndoStatus::Success;
 	}
 
 	return retVal;
 }
 
 
-sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentServiceControllerComp::OnDoUndo(
+sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnDoUndo(
 			const CDM::CDoUndoGqlRequest& doUndoRequest,
 			const::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::UndoManager::CUndoStatus retVal;
+	sdl::V1_0::imtbase::CUndoStatus retVal;
 	retVal.Version_1_0.emplace();
 	retVal.Version_1_0->status.emplace();
 
@@ -489,12 +489,12 @@ sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentServiceControllerComp:
 		return retVal;
 	}
 
-	istd::TSharedNullable<sdl::imtbase::UndoManager::CUndoRedoInput::V1_0> undoRedoInput = collectionUndoRedoInput->undoRedoInput;
+	istd::TSharedNullable<sdl::V1_0::imtbase::CUndoRedoInput> undoRedoInput = collectionUndoRedoInput->undoRedoInput;
 
 	if (!undoRedoInput || !undoRedoInput->documentId || !undoRedoInput->steps){
 		errorMessage = "Invalid GraphQL request params";
 
-		retVal.Version_1_0->status = sdl::imtbase::UndoManager::EUndoStatus::InvalidDocumentId;
+		retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::InvalidDocumentId;
 
 		return retVal;
 	}
@@ -511,7 +511,7 @@ sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentServiceControllerComp:
 		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, documentId, undoManagerPtr) != imtdoc::IDocumentService::OS_OK) {
 			errorMessage = "Undo manager not available";
 
-			retVal.Version_1_0->status = sdl::imtbase::UndoManager::EUndoStatus::Failed;
+			retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::Failed;
 
 			return retVal;
 		}
@@ -519,7 +519,7 @@ sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentServiceControllerComp:
 		if (undoManagerPtr->GetAvailableUndoSteps() < *undoRedoInput->steps){
 			errorMessage = "The number of available undo steps is less than requested";
 
-			retVal.Version_1_0->status = sdl::imtbase::UndoManager::EUndoStatus::InvalidStepCount;
+			retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::InvalidStepCount;
 
 			return retVal;
 		}
@@ -527,24 +527,24 @@ sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentServiceControllerComp:
 		if (!undoManagerPtr->DoUndo(*undoRedoInput->steps)){
 			errorMessage = "Undo operation failed";
 
-			retVal.Version_1_0->status = sdl::imtbase::UndoManager::EUndoStatus::Failed;
+			retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::Failed;
 
 			return retVal;
 		}
 
-		retVal.Version_1_0->status = sdl::imtbase::UndoManager::EUndoStatus::Success;
+		retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::Success;
 	}
 
 	return retVal;
 }
 
 
-sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentServiceControllerComp::OnDoRedo(
+sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnDoRedo(
 			const CDM::CDoRedoGqlRequest& doRedoRequest,
 			const::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::UndoManager::CUndoStatus retVal;
+	sdl::V1_0::imtbase::CUndoStatus retVal;
 	retVal.Version_1_0.emplace();
 	retVal.Version_1_0->status.emplace();
 
@@ -558,12 +558,12 @@ sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentServiceControllerComp:
 		return retVal;
 	}
 
-	istd::TSharedNullable<sdl::imtbase::UndoManager::CUndoRedoInput::V1_0> undoRedoInput = collectionUndoRedoInput->undoRedoInput;
+	istd::TSharedNullable<sdl::V1_0::imtbase::CUndoRedoInput> undoRedoInput = collectionUndoRedoInput->undoRedoInput;
 
 	if (!undoRedoInput || !undoRedoInput->documentId || !undoRedoInput->steps){
 		errorMessage = "Invalid GraphQL request params";
 
-		retVal.Version_1_0->status = sdl::imtbase::UndoManager::EUndoStatus::InvalidDocumentId;
+		retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::InvalidDocumentId;
 
 		return retVal;
 	}
@@ -580,7 +580,7 @@ sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentServiceControllerComp:
 		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, documentId, undoManagerPtr) != imtdoc::IDocumentService::OS_OK) {
 			errorMessage = "Undo manager not available";
 
-			retVal.Version_1_0->status = sdl::imtbase::UndoManager::EUndoStatus::Failed;
+			retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::Failed;
 
 			return retVal;
 		}
@@ -588,7 +588,7 @@ sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentServiceControllerComp:
 		if (undoManagerPtr->GetAvailableRedoSteps() < *undoRedoInput->steps){
 			errorMessage = "The number of available redo steps is less than requested";
 
-			retVal.Version_1_0->status = sdl::imtbase::UndoManager::EUndoStatus::InvalidStepCount;
+			retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::InvalidStepCount;
 
 			return retVal;
 		}
@@ -596,24 +596,24 @@ sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentServiceControllerComp:
 		if (!undoManagerPtr->DoRedo(*undoRedoInput->steps)){
 			errorMessage = "Redo operation failed";
 
-			retVal.Version_1_0->status = sdl::imtbase::UndoManager::EUndoStatus::Failed;
+			retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::Failed;
 
 			return retVal;
 		}
 
-		retVal.Version_1_0->status = sdl::imtbase::UndoManager::EUndoStatus::Success;
+		retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::Success;
 	}
 
 	return retVal;
 }
 
 
-sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentServiceControllerComp::OnResetUndo(
+sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnResetUndo(
 			const CDM::CResetUndoGqlRequest& resetUndoRequest,
 			const::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::UndoManager::CUndoStatus retVal;
+	sdl::V1_0::imtbase::CUndoStatus retVal;
 	retVal.Version_1_0.emplace();
 	retVal.Version_1_0->status.emplace();
 
@@ -623,7 +623,7 @@ sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentServiceControllerComp:
 	if (!documentId || !documentId->id){
 		errorMessage = "Invalid GraphQL request params";
 
-		retVal.Version_1_0->status = sdl::imtbase::UndoManager::EUndoStatus::InvalidDocumentId;
+		retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::InvalidDocumentId;
 
 		return retVal;
 	}
@@ -639,14 +639,14 @@ sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentServiceControllerComp:
 		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, *documentId->id, undoManagerPtr) != imtdoc::IDocumentService::OS_OK) {
 			errorMessage = "Undo manager not available";
 
-			retVal.Version_1_0->status = sdl::imtbase::UndoManager::EUndoStatus::Failed;
+			retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::Failed;
 
 			return retVal;
 		}
 
 		undoManagerPtr->ResetUndo();
 
-		retVal.Version_1_0->status = sdl::imtbase::UndoManager::EUndoStatus::Success;
+		retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::Success;
 	}
 
 	return retVal;

@@ -76,24 +76,24 @@ bool CAuthorizationControllerComp::CheckCredential(
 }
 
 
-sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp::CreateInvalidLoginOrPasswordResponse(
+sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateInvalidLoginOrPasswordResponse(
 			const QByteArray& login,
 			QString& errorMessage) const
 {
 	errorMessage = QT_TR_NOOP(QString("Invalid login or password. Login: '%1'").arg(qPrintable(login)));
 	SendErrorMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
 
-	return sdl::imtauth::Authorization::CAuthorizationPayload();
+	return sdl::V1_0::imtauth::CAuthorizationPayload();
 }
 
 
-sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp::CreateAuthorizationSuccessfulResponse(
+sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAuthorizationSuccessfulResponse(
 			imtauth::CUserInfo& userInfo,
 			const QByteArray& systemId,
 			const QByteArray& productId,
 			QString& errorMessage) const
 {
-	sdl::imtauth::Authorization::CAuthorizationPayload payload;
+	sdl::V1_0::imtauth::CAuthorizationPayload payload;
 
 	QByteArray login = userInfo.GetId();
 	QByteArray objectId = GetUserObjectId(login);
@@ -168,22 +168,22 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 }
 
 
-// reimplemented (sdl::imtauth::Authorization::V1_0::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::V1_0::CGraphQlHandlerCompBase)
 
-sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp::OnAuthorization(
-			const sdl::imtauth::Authorization::CAuthorizationGqlRequest& authorizationRequest,
+sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthorization(
+			const sdl::V1_0::imtauth::CAuthorizationGqlRequest& authorizationRequest,
 			const imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Component 'UserCollection' was not set", "CAuthorizationControllerComp");
-		return sdl::imtauth::Authorization::CAuthorizationPayload();
+		return sdl::V1_0::imtauth::CAuthorizationPayload();
 	}
 
-	sdl::imtauth::Authorization::CAuthorizationInput inputArgument = authorizationRequest.GetRequestedArguments().input;
+	sdl::V1_0::imtauth::CAuthorizationInput inputArgument = authorizationRequest.GetRequestedArguments().input;
 	if (!inputArgument.Version_1_0.has_value()){
 		Q_ASSERT(false);
-		return sdl::imtauth::Authorization::CAuthorizationPayload();
+		return sdl::V1_0::imtauth::CAuthorizationPayload();
 	}
 
 	QByteArray login;
@@ -236,20 +236,20 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 }
 
 
-sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp::OnUserToken(
-			const sdl::imtauth::Authorization::CUserTokenGqlRequest& userTokenRequest,
+sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserToken(
+			const sdl::V1_0::imtauth::CUserTokenGqlRequest& userTokenRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Component 'UserCollection' was not set", "CAuthorizationControllerComp");
-		return sdl::imtauth::Authorization::CAuthorizationPayload();
+		return sdl::V1_0::imtauth::CAuthorizationPayload();
 	}
 
-	sdl::imtauth::Authorization::CAuthorizationInput inputArgument = userTokenRequest.GetRequestedArguments().input;
+	sdl::V1_0::imtauth::CAuthorizationInput inputArgument = userTokenRequest.GetRequestedArguments().input;
 	if (!inputArgument.Version_1_0.has_value()){
 		Q_ASSERT(false);
-		return sdl::imtauth::Authorization::CAuthorizationPayload();
+		return sdl::V1_0::imtauth::CAuthorizationPayload();
 	}
 	
 	QByteArray login;
@@ -302,12 +302,12 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 }
 
 
-sdl::imtauth::Authorization::CLogoutPayload CAuthorizationControllerComp::OnLogout(
-			const sdl::imtauth::Authorization::CLogoutGqlRequest& logoutRequest,
+sdl::V1_0::imtauth::CLogoutPayload CAuthorizationControllerComp::OnLogout(
+			const sdl::V1_0::imtauth::CLogoutGqlRequest& logoutRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtauth::Authorization::CLogoutPayload response;
+	sdl::V1_0::imtauth::CLogoutPayload response;
 	const imtgql::IGqlContext* gqlContextPtr = logoutRequest.GetRequestContext();
 	if (gqlContextPtr == nullptr){
 		errorMessage = QString("Unable to logout user with token '%1'. Error: GraphQL context is invalid");
@@ -317,7 +317,7 @@ sdl::imtauth::Authorization::CLogoutPayload CAuthorizationControllerComp::OnLogo
 
 	response.Version_1_0.emplace();
 
-	sdl::imtauth::Authorization::CTokenInput arguments = logoutRequest.GetRequestedArguments().input;
+	sdl::V1_0::imtauth::CTokenInput arguments = logoutRequest.GetRequestedArguments().input;
 
 	QByteArray accessToken = gqlContextPtr->GetToken();
 	if (m_jwtSessionControllerCompPtr.IsValid()){
@@ -334,12 +334,12 @@ sdl::imtauth::Authorization::CLogoutPayload CAuthorizationControllerComp::OnLogo
 }
 
 
-sdl::imtauth::Authorization::CPermissionList CAuthorizationControllerComp::OnGetPermissions(
-			const sdl::imtauth::Authorization::CGetPermissionsGqlRequest& getPermissionsRequest,
+sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissions(
+			const sdl::V1_0::imtauth::CGetPermissionsGqlRequest& getPermissionsRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	sdl::imtauth::Authorization::CPermissionList response;
+	sdl::V1_0::imtauth::CPermissionList response;
 
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Component 'UserCollection' was not set", "CAuthorizationControllerComp");
@@ -351,7 +351,7 @@ sdl::imtauth::Authorization::CPermissionList CAuthorizationControllerComp::OnGet
 		return response;
 	}
 
-	sdl::imtauth::Authorization::CTokenInput arguments = getPermissionsRequest.GetRequestedArguments().input;
+	sdl::V1_0::imtauth::CTokenInput arguments = getPermissionsRequest.GetRequestedArguments().input;
 	if (!arguments.Version_1_0.HasValue()){
 		Q_ASSERT(false);
 		return response;

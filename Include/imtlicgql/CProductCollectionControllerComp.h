@@ -12,10 +12,10 @@ namespace imtlicgql
 {
 
 
-class CProductCollectionControllerComp: public sdl::imtlic::Products::CProductCollectionControllerCompBase
+class CProductCollectionControllerComp: public sdl::V1_0::imtlic::CProductCollectionControllerCompBase
 {
 public:
-	typedef sdl::imtlic::Products::CProductCollectionControllerCompBase BaseClass;
+	typedef sdl::V1_0::imtlic::CProductCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CProductCollectionControllerComp);
 		I_ASSIGN(m_licenseCollectionCompPtr, "LicenseCollection", "License collection", true, "LicenseCollection");
@@ -24,9 +24,9 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase)
-	virtual sdl::imtbase::ImtCollection::CImportObjectPayload OnImportObject(
-				const sdl::imtbase::ImtCollection::CImportObjectGqlRequest& importObjectRequest,
+	// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+	virtual sdl::V1_0::imtbase::CImportObjectPayload OnImportObject(
+				const sdl::V1_0::imtbase::CImportObjectGqlRequest& importObjectRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
@@ -36,24 +36,24 @@ protected:
 				const QString& newName,
 				const imtgql::CGqlRequest& gqlRequest) const override;
 
-	// reimplemented (sdl::imtlic::Products::CProductCollectionControllerCompBase)
+	// reimplemented (sdl::V1_0::imtlic::CProductCollectionControllerCompBase)
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-				const sdl::imtlic::Products::CProductsListGqlRequest& productsListRequest,
-				sdl::imtlic::Products::CProductItem::V1_0& representationObject,
+				const sdl::V1_0::imtlic::CProductsListGqlRequest& productsListRequest,
+				sdl::V1_0::imtlic::CProductItem& representationObject,
 				QString& errorMessage) const override;
 	virtual istd::IChangeableUniquePtr CreateObjectFromRepresentation(
-				const sdl::imtlic::Products::CProductData::V1_0& productDataRepresentation,
+				const sdl::V1_0::imtlic::CProductData& productDataRepresentation,
 				QByteArray& newObjectId,
 				QString& errorMessage) const override;
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
-				const sdl::imtlic::Products::CProductItemGqlRequest& productItemRequest,
-				sdl::imtlic::Products::CProductData::V1_0& representationPayload,
+				const sdl::V1_0::imtlic::CProductItemGqlRequest& productItemRequest,
+				sdl::V1_0::imtlic::CProductData& representationPayload,
 				QString& errorMessage) const override;
 	virtual bool UpdateObjectFromRepresentationRequest(
 				const ::imtgql::CGqlRequest& rawGqlRequest,
-				const sdl::imtlic::Products::CProductUpdateGqlRequest& productUpdateRequest,
+				const sdl::V1_0::imtlic::CProductUpdateGqlRequest& productUpdateRequest,
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
 
@@ -62,7 +62,7 @@ protected:
 
 private:
 	bool FillObjectFromRepresentation(
-				const sdl::imtlic::Products::CProductData::V1_0& representation,
+				const sdl::V1_0::imtlic::CProductData& representation,
 				istd::IChangeable& object,
 				QByteArray& objectId,
 				QString& errorMessage) const;

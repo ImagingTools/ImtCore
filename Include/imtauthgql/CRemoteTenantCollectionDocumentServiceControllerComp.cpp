@@ -14,14 +14,14 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (sdl::imtauth::TenantCollectionDocumentService::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
 
-sdl::imtauth::Tenants::CTenantData CRemoteTenantCollectionDocumentServiceControllerComp::OnGetTenantRepresentation(
-		const sdl::imtauth::TenantCollectionDocumentService::CGetTenantRepresentationGqlRequest& /*getTenantRepresentationRequest*/,
+sdl::V1_0::imtauth::CTenantData CRemoteTenantCollectionDocumentServiceControllerComp::OnGetTenantRepresentation(
+		const sdl::V1_0::imtauth::CGetTenantRepresentationGqlRequest& /*getTenantRepresentationRequest*/,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
-	sdl::imtauth::Tenants::CTenantData response = SendModelRequest<sdl::imtauth::Tenants::CTenantData>(gqlRequest, errorMessage);
+	sdl::V1_0::imtauth::CTenantData response = SendModelRequest<sdl::V1_0::imtauth::CTenantData>(gqlRequest, errorMessage);
 	if (!errorMessage.isEmpty()){
 		return response;
 	}
@@ -52,12 +52,12 @@ sdl::imtauth::Tenants::CTenantData CRemoteTenantCollectionDocumentServiceControl
 }
 
 
-sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CRemoteTenantCollectionDocumentServiceControllerComp::OnUpdateTenantFromRepresentation(
-		const sdl::imtauth::TenantCollectionDocumentService::CUpdateTenantFromRepresentationGqlRequest& /*updateTenantFromRepresentationRequest*/,
+sdl::V1_0::imtbase::CDocumentOperationStatus CRemoteTenantCollectionDocumentServiceControllerComp::OnUpdateTenantFromRepresentation(
+		const sdl::V1_0::imtauth::CUpdateTenantFromRepresentationGqlRequest& /*updateTenantFromRepresentationRequest*/,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CDocumentOperationStatus>(gqlRequest, errorMessage);
 }
 
 
@@ -65,13 +65,13 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CRemoteTenantC
 
 void CRemoteTenantCollectionDocumentServiceControllerComp::CollectPermissionsTree(
 		const imtlic::IFeatureInfo* featureInfoPtr,
-		imtsdl::TElementList<sdl::imtauth::Tenants::CTenantPermissionOption::V1_0>& permissions) const
+		imtsdl::TElementList<sdl::V1_0::imtauth::CTenantPermissionOption>& permissions) const
 {
 	if (featureInfoPtr == nullptr){
 		return;
 	}
 
-	sdl::imtauth::Tenants::CTenantPermissionOption::V1_0 permOpt;
+	sdl::V1_0::imtauth::CTenantPermissionOption permOpt;
 	permOpt.id = featureInfoPtr->GetFeatureId();
 	permOpt.name = featureInfoPtr->GetFeatureName();
 	permOpt.description = featureInfoPtr->GetFeatureDescription();

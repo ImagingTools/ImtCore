@@ -163,8 +163,8 @@ QByteArray CClientRequestUserManagerComp::CreateUser(const QString& userName, co
 		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
 
-	sdl::imtbase::ImtCollection::CAddedNotificationPayload payload;
-	bool ok = SendModelRequestInternal<userssdl::UserAddRequestArguments, sdl::imtbase::ImtCollection::CAddedNotificationPayload, userssdl::CUserAddGqlRequest>(arguments, payload);
+	sdl::V1_0::imtbase::CAddedNotificationPayload payload;
+	bool ok = SendModelRequestInternal<userssdl::UserAddRequestArguments, sdl::V1_0::imtbase::CAddedNotificationPayload, userssdl::CUserAddGqlRequest>(arguments, payload);
 	if (!ok){
 		return QByteArray();
 	}
@@ -207,7 +207,7 @@ bool CClientRequestUserManagerComp::AddRolesToUser(const QByteArray& userId, con
 		return false;
 	}
 
-	sdl::imtauth::Users::CUserData::V1_0 userData;
+	sdl::V1_0::imtauth::CUserData userData;
 	bool ok = GetUserDataSdl(userId, userData);
 	if (!ok){
 		return false;
@@ -238,7 +238,7 @@ bool CClientRequestUserManagerComp::RemoveRolesFromUser(const QByteArray& userId
 		return false;
 	}
 
-	sdl::imtauth::Users::CUserData::V1_0 userData;
+	sdl::V1_0::imtauth::CUserData userData;
 	bool ok = GetUserDataSdl(userId, userData);
 	if (!ok){
 		return false;
@@ -288,7 +288,7 @@ bool CClientRequestUserManagerComp::GetUserAuthSystem(const QByteArray& login, i
 		return false;
 	}
 
-	sdl::imtauth::Users::CUserData::V1_0 userData;
+	sdl::V1_0::imtauth::CUserData userData;
 	bool ok = GetUserDataSdl(objectId, userData);
 	if (!ok){
 		return false;
@@ -302,7 +302,7 @@ bool CClientRequestUserManagerComp::GetUserAuthSystem(const QByteArray& login, i
 		return false;
 	}
 
-	QList<sdl::imtauth::Users::CSystemInfo::V1_0> infos = userData.systemInfos->ToList();
+	QList<sdl::V1_0::imtauth::CSystemInfo> infos = userData.systemInfos->ToList();
 	if (infos[0].id){
 		systemInfo.systemId = *infos[0].id;
 	}
@@ -321,7 +321,7 @@ bool CClientRequestUserManagerComp::GetUserAuthSystem(const QByteArray& login, i
 
 // private methods
 
-bool CClientRequestUserManagerComp::GetUserDataSdl(const QByteArray& userId, sdl::imtauth::Users::CUserData::V1_0& userData) const
+bool CClientRequestUserManagerComp::GetUserDataSdl(const QByteArray& userId, sdl::V1_0::imtauth::CUserData& userData) const
 {
 	namespace userssdl = sdl::imtauth::Users;
 
@@ -333,8 +333,8 @@ bool CClientRequestUserManagerComp::GetUserDataSdl(const QByteArray& userId, sdl
 		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
 
-	sdl::imtauth::Users::CUserData payload;
-	bool ok = SendModelRequestInternal<userssdl::UserItemRequestArguments, sdl::imtauth::Users::CUserData, userssdl::CUserItemGqlRequest>(arguments, payload);
+	sdl::V1_0::imtauth::CUserData payload;
+	bool ok = SendModelRequestInternal<userssdl::UserItemRequestArguments, sdl::V1_0::imtauth::CUserData, userssdl::CUserItemGqlRequest>(arguments, payload);
 	if (!ok){
 		return false;
 	}
@@ -345,7 +345,7 @@ bool CClientRequestUserManagerComp::GetUserDataSdl(const QByteArray& userId, sdl
 }
 
 
-bool CClientRequestUserManagerComp::SetUserDataSdl(const QByteArray& userId, const sdl::imtauth::Users::CUserData::V1_0& userData) const
+bool CClientRequestUserManagerComp::SetUserDataSdl(const QByteArray& userId, const sdl::V1_0::imtauth::CUserData& userData) const
 {
 	namespace userssdl = sdl::imtauth::Users;
 
@@ -360,8 +360,8 @@ bool CClientRequestUserManagerComp::SetUserDataSdl(const QByteArray& userId, con
 
 	arguments.input.Version_1_0->item = userData;
 
-	sdl::imtbase::ImtCollection::CUpdatedNotificationPayload payload;
-	bool ok = SendModelRequestInternal<userssdl::UserUpdateRequestArguments, sdl::imtbase::ImtCollection::CUpdatedNotificationPayload, userssdl::CUserUpdateGqlRequest>(arguments, payload);
+	sdl::V1_0::imtbase::CUpdatedNotificationPayload payload;
+	bool ok = SendModelRequestInternal<userssdl::UserUpdateRequestArguments, sdl::V1_0::imtbase::CUpdatedNotificationPayload, userssdl::CUserUpdateGqlRequest>(arguments, payload);
 	if (!ok){
 		return false;
 	}

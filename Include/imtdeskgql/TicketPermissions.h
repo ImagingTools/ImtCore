@@ -215,18 +215,18 @@ Computes the access level for the current user on the given ticket:
 - CommentOnly: same-group viewer — can view and leave comments, no field editing
 - ViewOnly: fallback — pure read-only, no editing at all
 */
-inline sdl::imtdesk::ImtDesk::TicketAccessLevel GetTicketAccessLevel(
+inline sdl::V1_0::imtdesk::TicketAccessLevel GetTicketAccessLevel(
 		const imtgql::IGqlContext* contextPtr,
 		const imtdesk::ISupportTicket* ticketPtr,
 		const imtbase::IObjectCollection* userCollectionPtr,
 		const imtauth::IUserGroupInfoProvider* userGroupInfoProviderPtr)
 {
 	if (ticketPtr == nullptr){
-		return sdl::imtdesk::ImtDesk::TicketAccessLevel::ViewOnly;
+		return sdl::V1_0::imtdesk::TicketAccessLevel::ViewOnly;
 	}
 
 	if (IsCurrentUserAdmin(contextPtr)){
-		return sdl::imtdesk::ImtDesk::TicketAccessLevel::FullAccess;
+		return sdl::V1_0::imtdesk::TicketAccessLevel::FullAccess;
 	}
 
 	bool isReporter = false;
@@ -234,18 +234,18 @@ inline sdl::imtdesk::ImtDesk::TicketAccessLevel GetTicketAccessLevel(
 	IsCurrentUserRelatedToTicket(contextPtr, ticketPtr, isReporter, isAssignee);
 
 	if (isReporter){
-		return sdl::imtdesk::ImtDesk::TicketAccessLevel::FullAccess;
+		return sdl::V1_0::imtdesk::TicketAccessLevel::FullAccess;
 	}
 
 	if (isAssignee){
-		return sdl::imtdesk::ImtDesk::TicketAccessLevel::LimitedAccess;
+		return sdl::V1_0::imtdesk::TicketAccessLevel::LimitedAccess;
 	}
 
 	if (IsCurrentUserInSameGroupAsReporter(contextPtr, ticketPtr->GetReporterId(), userCollectionPtr, userGroupInfoProviderPtr)){
-		return sdl::imtdesk::ImtDesk::TicketAccessLevel::CommentOnly;
+		return sdl::V1_0::imtdesk::TicketAccessLevel::CommentOnly;
 	}
 
-	return sdl::imtdesk::ImtDesk::TicketAccessLevel::ViewOnly;
+	return sdl::V1_0::imtdesk::TicketAccessLevel::ViewOnly;
 }
 
 

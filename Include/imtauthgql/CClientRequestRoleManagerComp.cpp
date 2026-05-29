@@ -27,7 +27,7 @@ imtauth::IRoleUniquePtr CClientRequestRoleManagerComp::GetRole(const QByteArray&
 		return nullptr;
 	}
 
-	sdl::imtauth::Roles::CRoleData::V1_0 roleData;
+	sdl::V1_0::imtauth::CRoleData roleData;
 	bool ok = GetRoleDataSdl(roleId, roleData);
 	if (!ok){
 		return nullptr;
@@ -104,8 +104,8 @@ QByteArray CClientRequestRoleManagerComp::CreateRole(
 
 	arguments.input.Version_1_0->item = roleData;
 
-	sdl::imtbase::ImtCollection::CAddedNotificationPayload payload;
-	bool ok = SendModelRequestInternal<rolessdl::RoleAddRequestArguments, sdl::imtbase::ImtCollection::CAddedNotificationPayload, rolessdl::CRoleAddGqlRequest>(arguments, payload);
+	sdl::V1_0::imtbase::CAddedNotificationPayload payload;
+	bool ok = SendModelRequestInternal<rolessdl::RoleAddRequestArguments, sdl::V1_0::imtbase::CAddedNotificationPayload, rolessdl::CRoleAddGqlRequest>(arguments, payload);
 	if (!ok){
 		return QByteArray();
 	}
@@ -141,7 +141,7 @@ bool CClientRequestRoleManagerComp::AddPermissionsToRole(const QByteArray& roleI
 		return false;
 	}
 
-	sdl::imtauth::Roles::CRoleData::V1_0 roleData;
+	sdl::V1_0::imtauth::CRoleData roleData;
 	bool ok = GetRoleDataSdl(roleId, roleData);
 	if (!ok){
 		return false;
@@ -172,7 +172,7 @@ bool CClientRequestRoleManagerComp::RemovePermissionsFromRole(const QByteArray& 
 		return false;
 	}
 
-	sdl::imtauth::Roles::CRoleData::V1_0 roleData;
+	sdl::V1_0::imtauth::CRoleData roleData;
 	bool ok = GetRoleDataSdl(roleId, roleData);
 	if (!ok){
 		return false;
@@ -199,7 +199,7 @@ bool CClientRequestRoleManagerComp::RemovePermissionsFromRole(const QByteArray& 
 
 // private methods
 
-bool CClientRequestRoleManagerComp::GetRoleDataSdl(const QByteArray& roleId, sdl::imtauth::Roles::CRoleData::V1_0& roleData) const
+bool CClientRequestRoleManagerComp::GetRoleDataSdl(const QByteArray& roleId, sdl::V1_0::imtauth::CRoleData& roleData) const
 {
 	if (!m_applicationInfoCompPtr.IsValid()){
 		return false;
@@ -224,7 +224,7 @@ bool CClientRequestRoleManagerComp::GetRoleDataSdl(const QByteArray& roleId, sdl
 }
 
 
-bool CClientRequestRoleManagerComp::SetRoleDataSdl(const QByteArray& roleId, const sdl::imtauth::Roles::CRoleData::V1_0& roleData) const
+bool CClientRequestRoleManagerComp::SetRoleDataSdl(const QByteArray& roleId, const sdl::V1_0::imtauth::CRoleData& roleData) const
 {
 	if (!m_applicationInfoCompPtr.IsValid()){
 		return false;
