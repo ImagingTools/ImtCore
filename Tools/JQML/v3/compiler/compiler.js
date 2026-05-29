@@ -60,6 +60,7 @@ function compile(options){
     const QtWebSockets = require('../QtWebSockets/QtWebSockets')
     const QtPositioning = require('../QtPositioning/QtPositioning')
     const QtLocation = require('../QtLocation/QtLocation')
+    const QtWebView = require('../QtWebView/QtWebView')
 
     const env = process.env
     const configFilePath = path.normalize(options.config.trim())
@@ -99,6 +100,7 @@ function compile(options){
         QtWebSockets,
         QtPositioning,
         QtLocation,
+        QtWebView,
     }
 
     const JQModules = {
@@ -146,7 +148,14 @@ function compile(options){
             this.targetContext = targetContext
 
             for (let m of meta) {
-                if (m) this[m[0]](m)
+                if (m) {
+                    if(typeof this[m[0]] === 'function'){
+                        this[m[0]](m)
+                    } else {
+                        
+                    }
+                    
+                }
             }
         }
 
@@ -270,7 +279,7 @@ function compile(options){
 
         }
         qmlprop(meta) {
-            if (meta[2][0] === "block" || meta[2][1][0] === "assign") {
+            if (meta[2][0] === "block" || (meta[2][1] && meta[2][1][0] === "assign")) {
                 if (meta[1][0] === "dot") {
                     let name = meta[1].slice(1)
 
@@ -676,16 +685,19 @@ function compile(options){
                     }
                     case 'var': {
                         let name = tree[1][0][0]
-                        let local = []
-                        if (stat.local.length) {
-                            local = stat.local[stat.local.length - 1]
-                            local.push(name)
-                        } else {
-                            local.push(name)
-                            stat.local.push(local)
+                        let alreadyDeclared = stat.local.some(l => l.indexOf(name) >= 0)
+                        if (!alreadyDeclared) {
+                            let local = []
+                            if (stat.local.length) {
+                                local = stat.local[stat.local.length - 1]
+                                local.push(name)
+                            } else {
+                                local.push(name)
+                                stat.local.push(local)
+                            }
                         }
 
-                        stat.value.add(`var ${name}`)
+                        stat.value.add(alreadyDeclared ? name : `var ${name}`)
                         if (tree[1][0][1]) {
                             stat.value.add(`=`)
                             this.prepare(tree[1][0][1], stat)
@@ -856,6 +868,7 @@ function compile(options){
 
                         stat.value.add(')')
                         stat.value.add(`{let __self=this;let [${Array.from(ids).join(',')}] = [${Array.from(context).join(',')}];try{JQApplication.beginUpdate();`)
+                        for (let id of ids) { local.push(id) }
                         stat.local.push(local)
                         this.prepare(tree[3], stat)
                         let index = stat.local.indexOf(local)
@@ -1008,6 +1021,18 @@ function compile(options){
                             console.log(`${this.qmlFile.fileName}:${tree.info[0].line + 1}:${tree.info[0].col + 1}: warning: ${tree.info[0].value} is not founded`)
                         }
 
+                        return stat
+                    }
+                    case 'arrow': {
+                        let local = tree[1].slice()
+                        stat.local.push(local)
+                        stat.value.add(`(`)
+                        stat.value.add(tree[1].join(','))
+                        stat.value.add(`)=>{`)
+                        this.prepare(tree[2], stat)
+                        stat.value.add(`}`)
+                        let index = stat.local.indexOf(local)
+                        if (index >= 0) stat.local.splice(index, 1)
                         return stat
                     }
                     default: {
@@ -1200,10 +1225,10 @@ function compile(options){
 
         checkDefineProperty(name){
             for(let defineProperty of this.defineProperties){
-                if(name === defineProperty.name) return true
+                if(name === defineProperty.name) return defineProperty
             }
 
-            return false
+            return undefined
         }
 
         getProperties() {
@@ -1387,9 +1412,16 @@ function compile(options){
                             code.add(`${this.name}['${names[0]}'].__updateProperties()`)
                             code.add('\n')
                         } else {
-                            if(this.checkDefineProperty(assignProperty.name)){
-                                classCode.add(`${this.name}.${assignProperty.name}=${stat.value}`)
-                                classCode.add('\n')
+                            let defineProperty = this.checkDefineProperty(assignProperty.name)
+                            if(defineProperty){
+                                if(defineProperty.modifiers && defineProperty.modifiers.readonly){
+                                    classCode.add(`${this.name}.${assignProperty.name}=()=>{return ${stat.value}}`)
+                                    classCode.add('\n')
+                                } else {
+                                    classCode.add(`${this.name}.${assignProperty.name}=${stat.value}`)
+                                    classCode.add('\n')
+                                }
+                                
                             } else {
                                 // lazyCode.add(`${this.name}.__properties['${assignProperty.name}']=${stat.value}`)
                                 lazyCode.add(`${this.name}.${assignProperty.name}=${stat.value}`)
@@ -1431,7 +1463,36 @@ function compile(options){
                 let ids = new Set()
                 let context = new Set()
 
-                if (args){
+                // Detect if source is an arrow function: (params) => body
+                let isArrowSource = connectedSignal.source &&
+                    connectedSignal.source[0] === 'stat' &&
+                    connectedSignal.source[1] &&
+                    connectedSignal.source[1][0] === 'arrow'
+
+                // Detect if source is a function expression: function(params) { body }
+                let isFunctionSource = connectedSignal.source &&
+                    connectedSignal.source[0] === 'function'
+
+                if (isArrowSource) {
+                    let arrowNode = connectedSignal.source[1]
+                    connectedSignal.args = arrowNode[1].slice()
+                    connectedSignal.source = arrowNode[2] // array of body statements
+                    for (let name of Object.keys(this.qmlFile.context)) {
+                        if (connectedSignal.args.indexOf(name) < 0) {
+                            ids.add(name)
+                            context.add(`__self.__${this.qmlFile.getContextName()}.${name}`)
+                        }
+                    }
+                } else if (isFunctionSource) {
+                    connectedSignal.args = connectedSignal.source[2].slice()
+                    connectedSignal.source = connectedSignal.source[3] // array of body statements
+                    for (let name of Object.keys(this.qmlFile.context)) {
+                        if (connectedSignal.args.indexOf(name) < 0) {
+                            ids.add(name)
+                            context.add(`__self.__${this.qmlFile.getContextName()}.${name}`)
+                        }
+                    }
+                } else if (args){
                     if(args.length){
                         for (let arg of args) {
                             connectedSignal.args.push(arg.replaceAll('`', ''))

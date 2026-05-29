@@ -6,26 +6,22 @@ import imtgui 1.0
 import imtcontrols 1.0
 import imtcolgui 1.0
 import imtdocgui 1.0
+import imtauthgui 1.0
 import imtauthTenantsSdl 1.0
-import imtauthRolesSdl 1.0
-import imtauthGroupsSdl 1.0
-import imtauthUsersSdl 1.0
 
 /**
  * TenantEditor
  *
  * Thin orchestrator that composes:
- *   - TenantEditorStateManager   — local UI state + pure logic
- *   - an injected `apiClient` (abstract TenantMembershipApiClient) — transport
+ *   - TenantEditorStateManager  — local UI state + pure logic
+ *   - an injected `apiClient` (abstract TenantManagementApiClient) — transport
  *   - the page components (General / Members / Roles / Groups / Permissions)
  *
  * The editor itself does NOT depend on any concrete transport (no GQL/SDL transport
- * imports). The concrete client (e.g. GqlBasedTenantMembershipApiClient from
- * imtguigql) is supplied by the embedding view (e.g. TenantCollectionView).
+ * imports). The concrete client (e.g. GqlBasedTenantManagementApiClient from
+ * imtauthgui) is supplied by the embedding view (e.g. TenantCollectionView).
  *
- * SDL imports here are limited to:
- *   - imtauthTenantsSdl (TenantData type of the model)
- *   - imtauthRolesSdl / imtauthGroupsSdl / imtauthUsersSdl (data factories for editors)
+ * SDL imports here are limited to imtauthTenantsSdl (TenantData type of the model).
  */
 DocumentViewBase {
 	id: container
@@ -33,47 +29,33 @@ DocumentViewBase {
 	anchors.fill: parent
 	contentColor: Style.baseColor
 
+	// GitHub-like typography applied locally within TenantEditor scope
+	// font.family: "Segoe UI, Helvetica, Arial, sans-serif"
+
 	property TenantData tenantData: model
 
 	/**
-	 * Injected transport implementing the TenantMembershipApiClient contract.
+	 * Injected transport implementing the TenantManagementApiClient contract.
 	 * Must be set by the embedding view before the editor becomes active.
 	 */
 	property var apiClient: null
 
+	/**
+	 * Exposed so that TenantCollectionView can bind commandsPanelVisible: isNewTenant.
+	 * After save, m_id is populated → isNewTenant becomes false → panel hides.
+	 */
+	readonly property bool isNewTenant: stateManager_.isNewTenant
+
 	// --- Composition root ---
 	TenantEditorStateManager {
-		id: stateManager
+		id: stateManager_
 		tenantData: container.tenantData
 		apiClient: container.apiClient
 	}
 
-	// --- Convenience: data factories the pages cannot create themselves
-	// (they can't import the SDL modules).
-	function createRoleData() {
-		var comp = Qt.createComponent("qrc:/imtauthRolesSdl/RoleData.qml")
-		if (comp.status === Component.Ready)
-			return comp.createObject(container)
-		return null
-	}
-
-	function createGroupData() {
-		var comp = Qt.createComponent("qrc:/imtauthGroupsSdl/GroupData.qml")
-		if (comp.status === Component.Ready)
-			return comp.createObject(container)
-		return null
-	}
-
-	function createUserData() {
-		var comp = Qt.createComponent("qrc:/imtauthUsersSdl/UserData.qml")
-		if (comp.status === Component.Ready)
-			return comp.createObject(container)
-		return null
-	}
-
 	function updateGui() {
-		stateManager.loadMembersFromModel()
-		stateManager.loadInvitationsFromModel()
+		stateManager_.loadMembersFromModel()
+		stateManager_.loadInvitationsFromModel()
 		var generalPage = multiPageView.getPageByIndex(0)
 		if (generalPage)
 			generalPage.doUpdateGui()
@@ -87,7 +69,7 @@ DocumentViewBase {
 		if (generalPage)
 			generalPage.doUpdateModel()
 		if (container.tenantData) {
-			stateManager.syncMembersToModel()
+			stateManager_.syncMembersToModel()
 			var permissionsPage = multiPageView.getPageById("Permissions")
 			if (permissionsPage)
 				permissionsPage.doUpdateModel()
@@ -102,13 +84,13 @@ DocumentViewBase {
 		function updatePages() {
 			multiPageView.clear()
 			multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
-			if (!stateManager.isNewTenant) {
+			if (!stateManager_.isNewTenant) {
 				multiPageView.addPage("Members", qsTr("Members"), membersPageComp, "Icons/MultipleUser")
-				if (stateManager.canManageMembers) {
+				if (stateManager_.canManageMembers) {
 					multiPageView.addPage("Roles", qsTr("Roles"), rolesPageComp, "Icons/Role")
 					multiPageView.addPage("Groups", qsTr("Groups"), groupsPageComp, "Icons/MultipleUser")
 				}
-				if (stateManager.isCreator) {
+				if (stateManager_.isCreator) {
 					multiPageView.addPage("Permissions", qsTr("Permissions"), permissionsPageComp, "Icons/Role")
 				}
 			}
@@ -122,22 +104,22 @@ DocumentViewBase {
 
 	// Re-build pages when role / ownership state flips.
 	Connections {
-		target: stateManager
+		target: stateManager_
 		function onIsNewTenantChanged() {
 			multiPageView.updatePages()
-			if (!stateManager.isNewTenant) {
-				stateManager.loadMembersFromModel()
-				stateManager.loadInvitationsFromModel()
+			if (!stateManager_.isNewTenant) {
+				stateManager_.loadMembersFromModel()
+				stateManager_.loadInvitationsFromModel()
 			}
 		}
 		function onIsOwnerChanged() {
-			if (!stateManager.isNewTenant) multiPageView.updatePages()
+			if (!stateManager_.isNewTenant) multiPageView.updatePages()
 		}
 		function onIsCreatorChanged() {
-			if (!stateManager.isNewTenant) multiPageView.updatePages()
+			if (!stateManager_.isNewTenant) multiPageView.updatePages()
 		}
 		function onCanManageMembersChanged() {
-			if (!stateManager.isNewTenant) multiPageView.updatePages()
+			if (!stateManager_.isNewTenant) multiPageView.updatePages()
 		}
 	}
 
@@ -145,42 +127,104 @@ DocumentViewBase {
 	Connections {
 		target: container.apiClient
 		function onInvitationCreated() {
+			PopupManager.addSuccessMessage(qsTr("Invitation created successfully"), true)
 			if (container.representationController)
 				container.representationController.updateRepresentationFromDocument()
 		}
 		function onOwnershipTransferred() {
+			PopupManager.addSuccessMessage(qsTr("Ownership transferred successfully"), true)
 			if (container.representationController)
 				container.representationController.updateRepresentationFromDocument()
 		}
+		function onRoleCreated() {
+			PopupManager.addSuccessMessage(qsTr("Role created successfully"), true)
+		}
+		function onGroupCreated() {
+			PopupManager.addSuccessMessage(qsTr("Group created successfully"), true)
+		}
+		function onUserCreated() {
+			PopupManager.addSuccessMessage(qsTr("User created successfully"), true)
+			// Refresh the tenant document so the newly added user (auto-joined
+			// as Member via AddMembership in the api client) appears in the
+			// TenantMembersPage list.
+			if (!stateManager_.isNewTenant && container.representationController)
+				container.representationController.updateRepresentationFromDocument()
+		}
+		function onSubscriptionInvitationAccepted(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			if (notification.tenantId === container.tenantData.m_id) {
+				PopupManager.addSuccessMessage(qsTr("Invitation accepted"), true)
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
+			}
+		}
+		function onSubscriptionInvitationRejected(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			if (notification.tenantId === container.tenantData.m_id) {
+				PopupManager.addInfoMessage(qsTr("Invitation rejected"), true)
+				stateManager_.removePendingInvitation(notification.membershipId)
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
+			}
+		}
+		function onSubscriptionOwnershipTransferred(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			if (notification.tenantId === container.tenantData.m_id) {
+				PopupManager.addInfoMessage(qsTr("Ownership transferred"), true)
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
+			}
+		}
+		function onSubscriptionMembershipRoleChanged(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			if (notification.tenantId === container.tenantData.m_id) {
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
+			}
+		}
+		function onSubscriptionMembershipRemoved(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			if (notification.tenantId === container.tenantData.m_id) {
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
+			}
+		}
 	}
 
-	// --- Subscription: real-time membership notifications ---
-	TenantMembershipSubscriptionClient {
-		id: membershipSubscription
+	// --- Listen to globally-broadcast tenant membership events so the editor
+	// reloads even when the change was performed by the local user via another
+	// view (e.g. accepting an invitation in TenantCollectionView) — the server
+	// does not re-deliver a subscription notification to the actor itself.
+	Connections {
+		target: AuthorizationController
 
-		onInvitationAccepted: {
-			if (!container.tenantData || stateManager.isNewTenant)
+		function onTenantInvitationAccepted(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
 				return
-			if (notification.tenantId === container.tenantData.m_id) {
+			if (notification && notification.tenantId === container.tenantData.m_id) {
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
 		}
-
-		onInvitationRejected: {
-			if (!container.tenantData || stateManager.isNewTenant)
+		function onTenantInvitationRejected(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
 				return
-			if (notification.tenantId === container.tenantData.m_id) {
-				stateManager.removePendingInvitation(notification.membershipId)
+			if (notification && notification.tenantId === container.tenantData.m_id) {
+				if (notification.membershipId)
+					stateManager_.removePendingInvitation(notification.membershipId)
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
 		}
-
-		onOwnershipTransferred: {
-			if (!container.tenantData || stateManager.isNewTenant)
+		function onTenantOwnershipTransferred(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
 				return
-			if (notification.tenantId === container.tenantData.m_id) {
+			if (notification && notification.tenantId === container.tenantData.m_id) {
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
@@ -195,7 +239,7 @@ DocumentViewBase {
 
 		TenantGeneralPage {
 			model: container.tenantData
-			stateManager: stateManager
+			stateManager: stateManager_
 		}
 	}
 
@@ -204,9 +248,8 @@ DocumentViewBase {
 
 		TenantMembersPage {
 			model: container.tenantData
-			stateManager: stateManager
+			stateManager: stateManager_
 			apiClient: container.apiClient
-			userDataFactory: container.createUserData
 		}
 	}
 
@@ -215,9 +258,8 @@ DocumentViewBase {
 
 		TenantRolesPage {
 			model: container.tenantData
-			stateManager: stateManager
+			stateManager: stateManager_
 			apiClient: container.apiClient
-			roleDataFactory: container.createRoleData
 		}
 	}
 
@@ -226,9 +268,8 @@ DocumentViewBase {
 
 		TenantGroupsPage {
 			model: container.tenantData
-			stateManager: stateManager
+			stateManager: stateManager_
 			apiClient: container.apiClient
-			groupDataFactory: container.createGroupData
 		}
 	}
 

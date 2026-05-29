@@ -28,7 +28,6 @@ public:
 	I_BEGIN_COMPONENT(CTenantCollectionDocumentServiceComp)
 		I_REGISTER_INTERFACE(imtdoc::IDocumentServiceEventHandler)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentService", "Collection document manager", false, "CollectionDocumentService");
-		I_ASSIGN(m_tenantCollectionCompPtr, "TenantCollection", "Tenant collection for refreshing DB-computed fields after save", false, "TenantCollection");
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager for members", false, "MembershipManager");
 		I_ASSIGN(m_invitationManagerCompPtr, "InvitationManager", "Tenant invitation manager for pending invitations", false, "TenantInvitationManager");
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Collection of users", true, "UserCollection");
@@ -50,7 +49,6 @@ protected:
 
 private:
 	I_REF(imtdoc::IDocumentService, m_documentManagerCompPtr);
-	I_REF(imtbase::IObjectCollection, m_tenantCollectionCompPtr);
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 	I_REF(imtauth::ITenantInvitationManager, m_invitationManagerCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);

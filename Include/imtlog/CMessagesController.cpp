@@ -290,7 +290,7 @@ void CMessagesController::Writer::run()
 			continue;
 		}
 
-		QString uuid = QUuid::createUuid().toString();
+		QString uuid = QUuid::createUuid().toString(QUuid::WithoutBraces);
 		QString tempDir = QDir::tempPath() + "/ImtCore/" + uuid;
 		if (istd::CSystem::EnsurePathExists(tempDir)){
 			do{

@@ -13,6 +13,7 @@ namespace imtauth
 
 
 CTenantFilterParam::CTenantFilterParam()
+	: m_filterMode(TFM_INCLUDE)
 {
 }
 
@@ -51,6 +52,22 @@ void CTenantFilterParam::SetOwnerId(const QByteArray& ownerId)
 }
 
 
+TenantFilterMode CTenantFilterParam::GetFilterMode() const
+{
+	return m_filterMode;
+}
+
+
+void CTenantFilterParam::SetFilterMode(TenantFilterMode mode)
+{
+	if (m_filterMode != mode){
+		istd::CChangeNotifier notifier(this);
+
+		m_filterMode = mode;
+	}
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CTenantFilterParam::Serialize(iser::IArchive& archive)
@@ -68,6 +85,13 @@ bool CTenantFilterParam::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.BeginTag(ownerIdTag);
 	retVal = retVal && archive.Process(m_ownerId);
 	retVal = retVal && archive.EndTag(ownerIdTag);
+
+	iser::CArchiveTag filterModeTag("FilterMode", "Filter Mode", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(filterModeTag);
+	int filterModeInt = static_cast<int>(m_filterMode);
+	retVal = retVal && archive.Process(filterModeInt);
+	m_filterMode = static_cast<TenantFilterMode>(filterModeInt);
+	retVal = retVal && archive.EndTag(filterModeTag);
 
 	return retVal;
 }
@@ -89,6 +113,7 @@ bool CTenantFilterParam::CopyFrom(const IChangeable& object, CompatibilityMode /
 
 		m_tenantId = sourcePtr->GetTenantId();
 		m_ownerId = sourcePtr->GetOwnerId();
+		m_filterMode = sourcePtr->GetFilterMode();
 
 		return true;
 	}
@@ -114,6 +139,7 @@ bool CTenantFilterParam::ResetData(CompatibilityMode /*mode*/)
 
 	m_tenantId.clear();
 	m_ownerId.clear();
+	m_filterMode = TFM_INCLUDE;
 
 	return true;
 }

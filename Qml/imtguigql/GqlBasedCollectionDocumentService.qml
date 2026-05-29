@@ -80,23 +80,50 @@ DocumentServiceBase {
 		openDocumentRequest.send(objectIdInput)
 	}
 
-	function createDocument(typeId){
+	// Creates a new document of the given typeId.
+	//
+	// Optional `proposedSourceDocumentId`: if non-empty, propagated to the
+	// server in `DocumentTypeId.proposedSourceDocumentId` so that the new
+	// collection object is inserted with this id (see
+	// CCollectionDocumentServiceControllerComp::OnCreateNewDocument and
+	// TCollectionDocumentServiceWrap::InsertNewObject). This lets the client
+	// pre-allocate the object id (e.g. a fresh UUID) and keeps client- and
+	// server-side representations consistent (`representation.m_id` matches
+	// the persisted object id without an extra round-trip).
+	function createDocument(typeId, proposedSourceDocumentId){
 		startCreateDocument(typeId)
 
 		documentTypeIdInput.m_typeId = typeId
 		documentTypeIdInput.m_collectionId = collectionId
+		documentTypeIdInput.m_proposedSourceDocumentId = proposedSourceDocumentId || ""
 		createDocumentRequest.typeId = typeId
 
 		createDocumentRequest.send(documentTypeIdInput)
 	}
 
+	// Unified entry point for single- and multi-document workspaces:
+	// - if objectId is empty, creates a new document of the given typeId
+	//   (forwarding `proposedSourceDocumentId` to createDocument())
+	// - otherwise opens the existing collection object identified by objectId
+	// Existing per-document deduplication in openDocument() (via
+	// getDocumentIdByObjectId) still applies, so calling this repeatedly for
+	// the same objectId will surface documentAlreadyOpened.
+	function openOrCreateByObjectId(typeId, objectId, proposedSourceDocumentId){
+		if (!objectId || objectId === ""){
+			createDocument(typeId, proposedSourceDocumentId)
+		}
+		else{
+			openDocument(typeId, objectId)
+		}
+	}
+
 	function saveDocument(documentId, documentName){
 		startSaveDocument(documentId)
 
-		saveDocumentInput.m_documentId = documentId
-		saveDocumentInput.m_documentName= documentName
-		saveDocumentInput.m_collectionId = collectionId
-		saveDocumentRequest.documentId = documentId
+		saveDocumentInput.m_documentId = documentId || ""
+		saveDocumentInput.m_documentName = documentName || ""
+		saveDocumentInput.m_collectionId = collectionId || ""
+		saveDocumentRequest.documentId = documentId || ""
 
 		saveDocumentRequest.send(saveDocumentInput)
 	}

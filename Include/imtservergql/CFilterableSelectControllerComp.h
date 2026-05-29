@@ -21,6 +21,7 @@ public:
 	I_BEGIN_COMPONENT(CFilterableSelectControllerComp);
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection ID to match incoming requests", true, "");
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection providing selectable items", true, "ObjectCollection");
+		I_ASSIGN(m_tenantFilterEnabledAttrPtr, "TenantFilterEnabled", "Apply tenant filter from request input or GQL context", false, true);
 		I_ASSIGN_MULTI_0(m_filterFillersCompPtr, "ParamsSetJoiners", "Optional params set joiners for injecting additional filters", false);
 	I_END_COMPONENT;
 
@@ -40,6 +41,7 @@ private:
 private:
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
+	I_ATTR(bool, m_tenantFilterEnabledAttrPtr);
 	I_MULTIREF(IParamsSetJoiner, m_filterFillersCompPtr);
 };
 

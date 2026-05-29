@@ -8679,7 +8679,7 @@ Errors: 0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../Include/imtbase/CSystemStatusComp.cpp" line="+185"/>
+        <location filename="../../../Include/imtserverapp/CSystemStatusComp.cpp" line="+185"/>
         <source>The %1 server cannot be connected at %2.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10243,7 +10243,7 @@ Input-ID: </source>
 <context>
     <name>imtbase::CSystemStatusComp</name>
     <message>
-        <location filename="../../../Include/imtbase/CSystemStatusComp.cpp" line="-140"/>
+        <location filename="../../../Include/imtserverapp/CSystemStatusComp.cpp" line="-140"/>
         <location line="+64"/>
         <source>Try connect to: &apos;%1&apos; ...</source>
         <translation type="unfinished"></translation>

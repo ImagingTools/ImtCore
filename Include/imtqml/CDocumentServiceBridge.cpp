@@ -159,19 +159,27 @@ void CDocumentServiceBridge::OpenDocument(
 		return;
 	}
 	const QUrl url(QStringLiteral("collection:///") + documentId);
-	const QByteArray openedId = mgrPtr->OpenDocument(QByteArray(), url);
-	if (openedId.isEmpty()){
-		PostToMainThread([cb = std::move(callback)]() mutable {
-				cb(OpenedDocumentInfo{}, QStringLiteral("Failed to open document"));
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = QByteArray();
+	params.url = url;
+	const QByteArray taskId = mgrPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
+	const imtdoc::IDocumentService::TaskResult result = mgrPtr->WaitForTaskFinished(taskId);
+	if (result.status != imtdoc::IDocumentService::OS_OK || result.documentId.isEmpty()){
+		QString message = result.errorMessage;
+		if (message.isEmpty()){
+			message = QStringLiteral("Failed to open document");
+		}
+		PostToMainThread([cb = std::move(callback), message = std::move(message)]() mutable {
+				cb(OpenedDocumentInfo{}, message);
 			});
 		return;
 	}
 	OpenedDocumentInfo info;
-	info.documentId = QString::fromUtf8(openedId);
+	info.documentId = QString::fromUtf8(result.documentId);
 	info.typeId = typeId;
 	info.objectId = documentId;
 	QString name;
-	if (mgrPtr->GetDocumentName(QByteArray(), openedId, name) == imtdoc::IDocumentService::OS_OK){
+	if (mgrPtr->GetDocumentName(QByteArray(), result.documentId, name) == imtdoc::IDocumentService::OS_OK){
 		info.name = name;
 	}
 	PostToMainThread([cb = std::move(callback), info = std::move(info)]() mutable {
@@ -195,18 +203,26 @@ void CDocumentServiceBridge::CreateDocument(
 			});
 		return;
 	}
-	const QByteArray newId = mgrPtr->CreateNewDocument(QByteArray(), typeId.toUtf8());
-	if (newId.isEmpty()){
-		PostToMainThread([cb = std::move(callback)]() mutable {
-				cb(OpenedDocumentInfo{}, QStringLiteral("Failed to create document"));
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = QByteArray();
+	params.documentTypeId = typeId.toUtf8();
+	const QByteArray taskId = mgrPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_NEW, params);
+	const imtdoc::IDocumentService::TaskResult result = mgrPtr->WaitForTaskFinished(taskId);
+	if (result.status != imtdoc::IDocumentService::OS_OK || result.documentId.isEmpty()){
+		QString message = result.errorMessage;
+		if (message.isEmpty()){
+			message = QStringLiteral("Failed to create document");
+		}
+		PostToMainThread([cb = std::move(callback), message = std::move(message)]() mutable {
+				cb(OpenedDocumentInfo{}, message);
 			});
 		return;
 	}
 	OpenedDocumentInfo info;
-	info.documentId = QString::fromUtf8(newId);
+	info.documentId = QString::fromUtf8(result.documentId);
 	info.typeId = typeId;
 	QString name;
-	if (mgrPtr->GetDocumentName(QByteArray(), newId, name) == imtdoc::IDocumentService::OS_OK){
+	if (mgrPtr->GetDocumentName(QByteArray(), result.documentId, name) == imtdoc::IDocumentService::OS_OK){
 		info.name = name;
 	}
 	PostToMainThread([cb = std::move(callback), info = std::move(info)]() mutable {
@@ -231,19 +247,19 @@ void CDocumentServiceBridge::SaveDocument(
 			});
 		return;
 	}
-	QString errorMessage;
-	const auto status = mgrPtr->SaveDocument(
-			QByteArray(),
-			documentId.toUtf8(),
-			documentName,
-			&errorMessage);
-	const auto mapped = MapStatus(status);
-	QString msg = errorMessage;
-	if (msg.isEmpty() && status != imtdoc::IDocumentService::OS_OK){
-		msg = StatusToErrorMessage(status);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = QByteArray();
+	params.documentId = documentId.toUtf8();
+	params.documentName = documentName;
+	const QByteArray taskId = mgrPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, params);
+	const imtdoc::IDocumentService::TaskResult result = mgrPtr->WaitForTaskFinished(taskId);
+	const auto mapped = MapStatus(result.status);
+	QString message = result.errorMessage;
+	if (message.isEmpty() && result.status != imtdoc::IDocumentService::OS_OK){
+		message = StatusToErrorMessage(result.status);
 	}
-	PostToMainThread([cb = std::move(callback), mapped, msg = std::move(msg)]() mutable {
-			cb(mapped, msg);
+	PostToMainThread([cb = std::move(callback), mapped, message = std::move(message)]() mutable {
+			cb(mapped, message);
 		});
 }
 
@@ -263,13 +279,20 @@ void CDocumentServiceBridge::CloseDocument(
 			});
 		return;
 	}
-	const auto status = mgrPtr->CloseDocument(QByteArray(), documentId.toUtf8());
-	QString msg;
-	if (status != imtdoc::IDocumentService::OS_OK){
-		msg = StatusToErrorMessage(status);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = QByteArray();
+	params.documentId = documentId.toUtf8();
+	const QByteArray taskId = mgrPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_CLOSE, params);
+	const imtdoc::IDocumentService::TaskResult result = mgrPtr->WaitForTaskFinished(taskId);
+	QString message;
+	if (result.status != imtdoc::IDocumentService::OS_OK){
+		message = result.errorMessage;
+		if (message.isEmpty()){
+			message = StatusToErrorMessage(result.status);
+		}
 	}
-	PostToMainThread([cb = std::move(callback), msg = std::move(msg)]() mutable {
-			cb(msg);
+	PostToMainThread([cb = std::move(callback), message = std::move(message)]() mutable {
+			cb(message);
 		});
 }
 
@@ -328,12 +351,12 @@ void CDocumentServiceBridge::DoUndo(
 		return;
 	}
 	const bool ok = undoManagerPtr->DoUndo(steps);
-	QString msg;
+	QString message;
 	if (!ok){
-		msg = QStringLiteral("Undo failed");
+		message = QStringLiteral("Undo failed");
 	}
-	PostToMainThread([cb = std::move(callback), msg = std::move(msg)]() mutable {
-			cb(msg);
+	PostToMainThread([cb = std::move(callback), message = std::move(message)]() mutable {
+			cb(message);
 		});
 }
 
@@ -357,12 +380,12 @@ void CDocumentServiceBridge::DoRedo(
 		return;
 	}
 	const bool ok = undoManagerPtr->DoRedo(steps);
-	QString msg;
+	QString message;
 	if (!ok){
-		msg = QStringLiteral("Redo failed");
+		message = QStringLiteral("Redo failed");
 	}
-	PostToMainThread([cb = std::move(callback), msg = std::move(msg)]() mutable {
-			cb(msg);
+	PostToMainThread([cb = std::move(callback), message = std::move(message)]() mutable {
+			cb(message);
 		});
 }
 

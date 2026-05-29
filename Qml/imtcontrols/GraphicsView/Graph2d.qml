@@ -79,6 +79,7 @@ Rectangle{
 	property alias restrictZoom: graphicsView.restrictZoom;
 	property alias restrictSelect: graphicsView.restrictSelect;
 	property alias hideScrollbars: graphicsView.hideScrollbars;
+	property alias coordinateGridLineThickness: gridShape.gridLineThickness
 
 	signal invalidPoint(int lineIndex, int pointIndex);
 	signal editingFinished();

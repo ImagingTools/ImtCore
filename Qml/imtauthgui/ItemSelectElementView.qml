@@ -22,6 +22,7 @@ ElementView {
 	property string filterPlaceholder: qsTr("Type or choose an item")
 	// CollectionId for the data provider
 	property string collectionId: ""
+
 	// Text shown when no items selected
 	property string emptyText: qsTr("No items")
 	// Whether to show selected count next to the label
@@ -154,7 +155,7 @@ ElementView {
 				Repeater {
 					model: itemSelectElementView.items
 					delegate: Rectangle {
-						width: Math.min(chipText.contentWidth + chipRemove.width + Style.paddingS * 3, 200)
+						width: Math.min(chipText.implicitWidth + chipRemove.width + Style.paddingS * 3, 200)
 						height: 28
 						radius: 14
 						color: itemSelectElementView.accentBgLight
@@ -190,8 +191,22 @@ ElementView {
 							onClicked: {
 								var removedIndex = index
 								var removedData = modelData
-								var arr = itemSelectElementView.items.slice()
-								arr.splice(removedIndex, 1)
+								var removedId = modelData ? modelData.id : ""
+								var arr = []
+								if (removedId) {
+									for (var k = 0; k < itemSelectElementView.items.length; k++) {
+										var it = itemSelectElementView.items[k]
+										// Match by id rather than index — robust against
+										// delegate-context drift when items mutate.
+										if (it && it.id !== removedId)
+											arr.push(it)
+									}
+								} else {
+									// Fallback: id is missing/empty — drop by index.
+									arr = itemSelectElementView.items.slice()
+									if (removedIndex >= 0 && removedIndex < arr.length)
+										arr.splice(removedIndex, 1)
+								}
 								itemSelectElementView.__resolvingNames = true
 								itemSelectElementView.items = arr
 								itemSelectElementView.__resolvingNames = false

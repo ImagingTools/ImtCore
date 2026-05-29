@@ -36,7 +36,6 @@
 #include <imtbase/CSelectionComp.h>
 #include <imtbase/CSelectionAdapterComp.h>
 #include <imtbase/CSelectionParamAdapterComp.h>
-#include <imtbase/CSystemStatusComp.h>
 #include <imtbase/CCachedObjectCollectionComp.h>
 #include <imtbase/CSelectionIdBinderComp.h>
 #include <imtbase/CTableViewParam.h>
@@ -101,7 +100,6 @@ typedef ibase::TModelObserverCompWrap<icomp::TModelCompWrap<imtbase::CTransactio
 typedef icomp::TModelCompWrap<imtbase::CSelectionComp> Selection;
 typedef icomp::TModelCompWrap<imtbase::CSelectionAdapterComp> SelectionAdapter;
 typedef icomp::TModelCompWrap<imtbase::CSelectionParamAdapterComp> SelectionParamAdapter;
-typedef icomp::TModelCompWrap<imtbase::CSystemStatusComp> SystemStatus;
 typedef icomp::TModelCompWrap<imtbase::CSelectionIdBinderComp> SelectionIdBinder;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<

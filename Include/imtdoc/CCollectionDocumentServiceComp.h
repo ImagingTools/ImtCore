@@ -3,7 +3,7 @@
 
 
 // ImtCore includes
-#include <imtdoc/CCollectionDocumentServiceBase.h>
+#include <imtdoc/TCollectionDocumentServiceWrap.h>
 #include <imtdoc/CDocumentServiceCompBase.h>
 
 
@@ -11,11 +11,30 @@ namespace imtdoc
 {
 
 
-class CCollectionDocumentServiceComp: public CDocumentServiceCompBase, public CCollectionDocumentServiceBase
+/**
+	\ingroup imtdoc
+	\brief Concrete ACF component that implements \c IDocumentService on top of an \c IObjectCollection.
+
+	\c CCollectionDocumentServiceComp is the standard ready-to-use document
+	service component for server-side multi-user scenarios.  It inherits
+	the full implementation from
+	\c TCollectionDocumentServiceWrap<CDocumentServiceCompBase> and adds only
+	the two ACF component attributes that complete the concrete class:
+
+	- \c "Collection" — reference to the \c IObjectCollection that provides
+	  persistent storage (required).
+	- \c "IsSingleCopyMode" — when \c true, all users that open the same
+	  collection element share a single in-memory data object and undo
+	  manager (default: \c false).
+
+	Register it in the component descriptor with the interface
+	\c imtdoc::IDocumentService so that clients can obtain it via the ACF
+	service locator.
+*/
+class CCollectionDocumentServiceComp: public TCollectionDocumentServiceWrap<CDocumentServiceCompBase>
 {
 public:
-	typedef CDocumentServiceCompBase BaseClass;
-	typedef CCollectionDocumentServiceBase BaseClass2;
+	typedef TCollectionDocumentServiceWrap<CDocumentServiceCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CCollectionDocumentServiceComp)
 		I_REGISTER_INTERFACE(imtdoc::IDocumentService)
@@ -24,7 +43,7 @@ public:
 	I_END_COMPONENT
 
 protected:
-	// reimplemented (imtdoc::CCollectionDocumentServiceBase)
+	// reimplemented (imtdoc::TCollectionDocumentServiceWrap)
 	virtual imtbase::IObjectCollection* GetCollection() const override;
 
 	// reimplemented (imtdoc::CDocumentServiceBase)
@@ -37,3 +56,5 @@ private:
 
 
 } // namespace imtdoc
+
+

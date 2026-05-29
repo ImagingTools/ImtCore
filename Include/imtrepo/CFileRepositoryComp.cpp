@@ -102,7 +102,7 @@ QString CFileRepositoryComp::GetFile(
 		if (outputFilePath.isEmpty()){
 			QString fileExtension = fileInfo.suffix();
 
-			outputFilePath = QDir::tempPath() + "/ImtCore/" + fileInfo.completeBaseName() + "_" + QUuid::createUuid().toString() + "." + fileExtension;
+			outputFilePath = QDir::tempPath() + "/ImtCore/" + fileInfo.completeBaseName() + "_" + QUuid::createUuid().toString(QUuid::WithoutBraces) + "." + fileExtension;
 		}
 
 		if (fileItemInfo.GetFilePath() == outputFilePath){
@@ -140,7 +140,7 @@ QByteArray CFileRepositoryComp::InsertFile(
 	}
 
 	// Generate unique file-ID accroding to \c proposedObjectId variable provided by caller:
-	QByteArray fileId = proposedObjectId.isEmpty() ? QUuid::createUuid().toByteArray() : proposedObjectId;
+	QByteArray fileId = proposedObjectId.isEmpty() ? QUuid::createUuid().toByteArray(QUuid::WithoutBraces) : proposedObjectId;
 
 	// Generate target absolute file path for the data file:
 	QString targetFilePath = CalculateTargetFilePath(localFilePath, objectName, typeId);
@@ -330,7 +330,7 @@ QByteArray CFileRepositoryComp::InsertNewObject(
 				return QByteArray();
 			}
 
-			QString tempFileBaseName = tempDir.GetPath() + "/" + QUuid::createUuid().toString();
+			QString tempFileBaseName = tempDir.GetPath() + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces);
 
 			QString workingExt = GetWorkingExt(
 						persistencePtr,
@@ -513,7 +513,7 @@ bool CFileRepositoryComp::SetObjectData(
 			return false;
 		}
 
-		QString tempFileBaseName = tempDir.GetPath() + "/" + QUuid::createUuid().toString();
+		QString tempFileBaseName = tempDir.GetPath() + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces);
 
 		QString workingExt = GetWorkingExt(
 					persistencePtr,
@@ -734,7 +734,7 @@ const ifile::IFilePersistence* CFileRepositoryComp::GetObjectPersistence(const Q
 
 QString CFileRepositoryComp::CreateWorkingDir() const
 {
-	QString workingPath = QDir::tempPath() + "/ImtCore/" + QUuid::createUuid().toString();
+	QString workingPath = QDir::tempPath() + "/ImtCore/" + QUuid::createUuid().toString(QUuid::WithoutBraces);
 
 	if (istd::CSystem::EnsurePathExists(workingPath)){
 		return workingPath;

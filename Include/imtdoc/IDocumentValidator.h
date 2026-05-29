@@ -26,6 +26,19 @@ namespace imtdoc
 {
 
 
+/**
+	\ingroup imtdoc
+	\brief Strategy interface for validating document data before it is saved.
+
+	Implementations are registered with \c CDocumentServiceCompBase via the
+	\c "DocumentValidators" multi-reference slot (one validator per document
+	type-ID, matched by position with \c "ObjectTypeIdList").
+
+	The service calls \c ValidateDocumentData during \c DoSaveDocument before
+	any write is attempted.  A failed validation aborts the save and returns
+	\c IDocumentService::OS_INVALID_DOCUMENT_DATA to the caller together with
+	the error message produced by the validator.
+*/
 class IDocumentValidator : virtual public istd::IPolymorphic
 {
 public:
@@ -43,3 +56,5 @@ public:
 
 
 } // namespace imtdoc
+
+

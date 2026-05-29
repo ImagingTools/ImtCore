@@ -45,7 +45,7 @@ istd::IChangeableUniquePtr CConversationDbDelegateComp::CreateObjectFromRecord(
 	}
 
 	if (record.contains("Id")){
-		convPtr->SetId(record.value("Id").toByteArray());
+		convPtr->SetId(imtdb::VariantToByteArray(record.value("Id")));
 	}
 	if (record.contains("Name")){
 		convPtr->SetName(record.value("Name").toString());

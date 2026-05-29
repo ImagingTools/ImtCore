@@ -60,7 +60,7 @@ class Text extends Item {
             whiteSpace: 'pre',
             lineHeight: 'normal',
             fontSize: '12px',
-            fontFamily: 'Verdana',
+            fontFamily: 'Segoe UI',
         })
 
         this.impl = document.createElement('span')
@@ -171,7 +171,7 @@ class Text extends Item {
         if(this.getPropertyValue('elide') === Text.ElideRight){
             this.setStyle({
                 textOverflow: 'ellipsis',
-                overflow: 'hidden',
+                overflow: 'auto',
             })
         } else {
             this.setStyle({

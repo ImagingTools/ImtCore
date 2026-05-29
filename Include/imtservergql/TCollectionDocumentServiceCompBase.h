@@ -4,13 +4,12 @@
 
 // ACF includes
 #include <icomp/CComponentBase.h>
-#include <idoc/IDocumentManager.h>
 #include <idoc/IUndoManager.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtgql/CGqlRequest.h>
-#include <imtdoc/CCollectionDocumentServiceBase.h>
+#include <imtdoc/TCollectionDocumentServiceWrap.h>
 #include <imtbasesdl/SDL/1.0/CPP/DocumentService>
 #include <imtbasesdl/SDL/1.0/CPP/UndoManager>
 
@@ -24,12 +23,16 @@ namespace UM = sdl::imtbase::UndoManager;
 
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
-class TCollectionDocumentServiceCompBase : public Base, public imtdoc::CCollectionDocumentServiceBase
+class TCollectionDocumentServiceCompBase : public imtdoc::TCollectionDocumentServiceWrap<Base>
 {
 public:
-	typedef Base BaseClass;
-	typedef imtdoc::CCollectionDocumentServiceBase BaseClass2;
+	typedef imtdoc::TCollectionDocumentServiceWrap<Base> BaseClass;
 	typedef ColorCollectionDocumentServiceDefs Defs;
+
+	using OperationStatus = typename BaseClass::OperationStatus;
+	using DocumentList = typename BaseClass::DocumentList;
+	using DocumentListItem = typename BaseClass::DocumentListItem;
+	using DocumentInfo = typename BaseClass::DocumentInfo;
 
 	I_BEGIN_BASE_COMPONENT(TCollectionDocumentServiceCompBase)
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection ID", true, "CollectiondId");
@@ -45,50 +48,50 @@ public:
 protected:
 	// reimplemented (CGraphQlHandlerCompBase)
 	CDM::CDocumentList OnGetOpenedDocumentList(
-		const typename Defs::GetOpenedDocumentListGqlRequest& getDocumentListRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const typename Defs::GetOpenedDocumentListGqlRequest& getDocumentListRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	CDM::CDocumentInfo OnCreateNewDocument(
-		const typename Defs::CreateNewDocumentGqlRequest& createDocumentRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const typename Defs::CreateNewDocumentGqlRequest& createDocumentRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	CDM::CDocumentInfo OnOpenDocument(
-		const typename Defs::OpenDocumentGqlRequest& openDocumentRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const typename Defs::OpenDocumentGqlRequest& openDocumentRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	CDM::CDocumentOperationStatus OnSaveDocument(
-		const typename Defs::SaveDocumentGqlRequest& saveDocumentRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const typename Defs::SaveDocumentGqlRequest& saveDocumentRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	CDM::CDocumentOperationStatus OnCloseDocument(
-		const typename Defs::CloseDocumentGqlRequest& closeDocumentRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const typename Defs::CloseDocumentGqlRequest& closeDocumentRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	UM::CUndoInfo OnGetUndoInfo(
-		const typename Defs::GetUndoInfoGqlRequest& getUndoInfoRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const typename Defs::GetUndoInfoGqlRequest& getUndoInfoRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	UM::CUndoStatus OnDoUndo(
-		const typename Defs::DoUndoGqlRequest& doUndoRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const typename Defs::DoUndoGqlRequest& doUndoRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	UM::CUndoStatus OnDoRedo(
-		const typename Defs::DoRedoGqlRequest& doRedoRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const typename Defs::DoRedoGqlRequest& doRedoRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	UM::CUndoStatus OnResetUndo(
-		const typename Defs::ResetUndoGqlRequest& resetUndoRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
+				const typename Defs::ResetUndoGqlRequest& resetUndoRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 
-	imtdoc::CCollectionDocumentServiceBase* GetNonConstThis() const;
+	BaseClass* GetNonConstThis() const;
 	int GetObjectFactoryIndex(const QByteArray& typeId) const;
 	QByteArray GetUserId(const ::imtgql::CGqlRequest& gqlRequest) const;
 
-	// reimplemented (imtdoc::CCollectionDocumentServiceBase)
+	// reimplemented (imtdoc::TCollectionDocumentServiceWrap)
 	virtual imtbase::IObjectCollection* GetCollection() const override;
-	virtual istd::IChangeableSharedPtr CreateObject(const QByteArray& typeId) const override;
-	virtual idoc::IUndoManagerSharedPtr CreateUndoManager() const override;
+	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const override;
+	virtual idoc::IUndoManagerUniquePtr CreateUndoManager() const override;
 
 	// reimplemented (::imtservergql::CPermissibleGqlRequestHandlerComp)
 	bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
@@ -120,17 +123,18 @@ inline void TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServ
 // protected methods
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
-inline imtdoc::CCollectionDocumentServiceBase* TCollectionDocumentServiceCompBase<
-	Base,
-	ColorCollectionDocumentServiceDefs>::GetNonConstThis() const
+inline typename TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::BaseClass*
+TCollectionDocumentServiceCompBase<
+			Base,
+			ColorCollectionDocumentServiceDefs>::GetNonConstThis() const
 {
-	return const_cast<imtdoc::CCollectionDocumentServiceBase*>(dynamic_cast<const imtdoc::CCollectionDocumentServiceBase*>(this));
+	return const_cast<BaseClass*>(static_cast<const BaseClass*>(this));
 }
 
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
 inline int TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::GetObjectFactoryIndex(
-	const QByteArray& typeId) const
+			const QByteArray& typeId) const
 {
 	int count = qMin(m_objectTypeIdAttrPtr.GetCount(), m_objectFactPtr.GetCount());
 	for (int i = 0; i < count; i++) {
@@ -145,7 +149,7 @@ inline int TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServi
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
 inline QByteArray TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::GetUserId(
-	const ::imtgql::CGqlRequest& gqlRequest) const
+			const ::imtgql::CGqlRequest& gqlRequest) const
 {
 	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
 	if (contextPtr != nullptr) {
@@ -159,11 +163,11 @@ inline QByteArray TCollectionDocumentServiceCompBase<Base, ColorCollectionDocume
 }
 
 
-// reimplemented (imtdoc::CCollectionDocumentServiceBase)
+// reimplemented (imtdoc::TCollectionDocumentServiceWrap)
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
 inline imtbase::IObjectCollection* TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::
-	GetCollection() const
+			GetCollection() const
 {
 	if (m_collectionCompPtr.IsValid()) {
 		return m_collectionCompPtr.GetPtr();
@@ -174,8 +178,8 @@ inline imtbase::IObjectCollection* TCollectionDocumentServiceCompBase<Base, Colo
 
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
-inline istd::IChangeableSharedPtr TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::
-	CreateObject(const QByteArray& typeId) const
+inline istd::IChangeableUniquePtr TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::
+			CreateObject(const QByteArray& typeId) const
 {
 	int index = GetObjectFactoryIndex(typeId);
 
@@ -188,8 +192,8 @@ inline istd::IChangeableSharedPtr TCollectionDocumentServiceCompBase<Base, Color
 
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
-inline idoc::IUndoManagerSharedPtr TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::
-	CreateUndoManager() const
+inline idoc::IUndoManagerUniquePtr TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::
+			CreateUndoManager() const
 {
 	return m_undoManagerFactPtr.CreateInstance();
 }
@@ -199,7 +203,7 @@ inline idoc::IUndoManagerSharedPtr TCollectionDocumentServiceCompBase<Base, Colo
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
 inline bool TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::IsRequestSupported(
-	const imtgql::CGqlRequest& gqlRequest) const
+			const imtgql::CGqlRequest& gqlRequest) const
 {
 	bool isSupported = BaseClass::IsRequestSupported(gqlRequest);
 	if (isSupported) {
@@ -221,10 +225,10 @@ inline bool TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServ
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
 inline CDM::CDocumentList TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::
-	OnGetOpenedDocumentList(
-		const typename Defs::GetOpenedDocumentListGqlRequest& getOpenedDocumentListRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const
+			OnGetOpenedDocumentList(
+				const typename Defs::GetOpenedDocumentListGqlRequest& getOpenedDocumentListRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const
 {
 	CDM::CDocumentList retVal;
 	retVal.Version_1_0.emplace();
@@ -233,7 +237,7 @@ inline CDM::CDocumentList TCollectionDocumentServiceCompBase<Base, ColorCollecti
 	QByteArray userId = GetUserId(gqlRequest);
 
 	if (!userId.isEmpty()) {
-		DocumentList list = BaseClass2::GetOpenedDocumentList(userId);
+		DocumentList list = BaseClass::GetOpenedDocumentList(userId);
 		for (const DocumentInfo& info : list) {
 			CDM::CDocumentInfo sdlInfo;
 			sdlInfo.Version_1_0.emplace();
@@ -251,10 +255,10 @@ inline CDM::CDocumentList TCollectionDocumentServiceCompBase<Base, ColorCollecti
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
 inline CDM::CDocumentInfo TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::
-	OnCreateNewDocument(
-		const typename Defs::CreateNewDocumentGqlRequest& createDocumentRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const
+			OnCreateNewDocument(
+				const typename Defs::CreateNewDocumentGqlRequest& createDocumentRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const
 {
 	CDM::CDocumentInfo retVal;
 
@@ -275,9 +279,16 @@ inline CDM::CDocumentInfo TCollectionDocumentServiceCompBase<Base, ColorCollecti
 		return retVal;
 	}
 
-	QByteArray documentId = GetNonConstThis()->CreateNewDocument(userId, *documentTypeId->typeId);
+	typename BaseClass::TaskParams taskParams;
+	taskParams.userId = userId;
+	taskParams.documentTypeId = *documentTypeId->typeId;
+	QByteArray taskId = GetNonConstThis()->BeginDocumentTask(BaseClass::TT_NEW, taskParams);
+	typename BaseClass::TaskResult taskResult = GetNonConstThis()->WaitForTaskFinished(taskId);
+	QByteArray documentId = taskResult.documentId;
 	if (documentId.isEmpty()) {
-		errorMessage = "Unable to create document or undo manager";
+		errorMessage = taskResult.errorMessage.isEmpty()
+			? "Unable to create document or undo manager"
+			: taskResult.errorMessage;
 
 		return retVal;
 	}
@@ -290,7 +301,7 @@ inline CDM::CDocumentInfo TCollectionDocumentServiceCompBase<Base, ColorCollecti
 	retVal.Version_1_0->hasNameProvider = false;
 	retVal.Version_1_0->isLoading = false;
 
-	DocumentList list = BaseClass2::GetOpenedDocumentList(userId);
+	DocumentList list = BaseClass::GetOpenedDocumentList(userId);
 	for (const DocumentListItem& docInfo : list) {
 		if (docInfo.documentId == documentId) {
 			retVal.Version_1_0->documentName = docInfo.name;
@@ -305,9 +316,9 @@ inline CDM::CDocumentInfo TCollectionDocumentServiceCompBase<Base, ColorCollecti
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
 inline CDM::CDocumentInfo TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::OnOpenDocument(
-	const typename Defs::OpenDocumentGqlRequest& openDocumentRequest,
-	const ::imtgql::CGqlRequest& gqlRequest,
-	QString& errorMessage) const
+			const typename Defs::OpenDocumentGqlRequest& openDocumentRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	CDM::CDocumentInfo retVal;
 
@@ -328,9 +339,16 @@ inline CDM::CDocumentInfo TCollectionDocumentServiceCompBase<Base, ColorCollecti
 		return retVal;
 	}
 
-	QByteArray documentId = GetNonConstThis()->OpenDocument(userId, *objectId->id);
+	typename BaseClass::TaskParams taskParams;
+	taskParams.userId = userId;
+	taskParams.url = *objectId->id;
+	QByteArray taskId = GetNonConstThis()->BeginDocumentTask(BaseClass::TT_OPEN, taskParams);
+	typename BaseClass::TaskResult taskResult = GetNonConstThis()->WaitForTaskFinished(taskId);
+	QByteArray documentId = taskResult.documentId;
 	if (documentId.isEmpty()) {
-		errorMessage = "Unable to open document or create undo manager";
+		errorMessage = taskResult.errorMessage.isEmpty()
+			? "Unable to open document or create undo manager"
+			: taskResult.errorMessage;
 
 		return retVal;
 	}
@@ -342,7 +360,7 @@ inline CDM::CDocumentInfo TCollectionDocumentServiceCompBase<Base, ColorCollecti
 	retVal.Version_1_0->hasNameProvider = false;
 	retVal.Version_1_0->isLoading = true;
 
-	DocumentList list = BaseClass2::GetOpenedDocumentList(userId);
+	DocumentList list = BaseClass::GetOpenedDocumentList(userId);
 	for (const DocumentListItem& docInfo : list) {
 		if (docInfo.documentId == documentId) {
 			retVal.Version_1_0->documentName = docInfo.name;
@@ -358,10 +376,10 @@ inline CDM::CDocumentInfo TCollectionDocumentServiceCompBase<Base, ColorCollecti
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
 inline CDM::CDocumentOperationStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::
-	OnSaveDocument(
-		const typename Defs::SaveDocumentGqlRequest& saveDocumentRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const
+			OnSaveDocument(
+				const typename Defs::SaveDocumentGqlRequest& saveDocumentRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const
 {
 	CDM::CDocumentOperationStatus retVal;
 
@@ -384,12 +402,14 @@ inline CDM::CDocumentOperationStatus TCollectionDocumentServiceCompBase<Base, Co
 
 	retVal.Version_1_0.emplace();
 
-	QString saveErrorMessage;
-	OperationStatus status = GetNonConstThis()->SaveDocument(
-		userId,
-		*documentId->id,
-		QString(),
-		&saveErrorMessage);
+	typename BaseClass::TaskParams taskParams;
+	taskParams.userId = userId;
+	taskParams.documentId = *documentId->id;
+	taskParams.documentName = QString();
+	QByteArray taskId = GetNonConstThis()->BeginDocumentTask(BaseClass::TT_SAVE, taskParams);
+	typename BaseClass::TaskResult taskResult = GetNonConstThis()->WaitForTaskFinished(taskId);
+	QString saveErrorMessage = taskResult.errorMessage;
+	OperationStatus status = taskResult.status;
 	switch (status) {
 	case imtdoc::ICollectionDocumentService::OS_OK:
 		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;
@@ -446,10 +466,10 @@ inline CDM::CDocumentOperationStatus TCollectionDocumentServiceCompBase<Base, Co
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
 inline CDM::CDocumentOperationStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::
-	OnCloseDocument(
-		const typename Defs::CloseDocumentGqlRequest& closeDocumentRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const
+			OnCloseDocument(
+				const typename Defs::CloseDocumentGqlRequest& closeDocumentRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const
 {
 	CDM::CDocumentOperationStatus retVal;
 
@@ -472,7 +492,12 @@ inline CDM::CDocumentOperationStatus TCollectionDocumentServiceCompBase<Base, Co
 
 	retVal.Version_1_0.emplace();
 
-	OperationStatus status = GetNonConstThis()->CloseDocument(userId, *documentId->id);
+	typename BaseClass::TaskParams taskParams;
+	taskParams.userId = userId;
+	taskParams.documentId = *documentId->id;
+	QByteArray taskId = GetNonConstThis()->BeginDocumentTask(BaseClass::TT_CLOSE, taskParams);
+	typename BaseClass::TaskResult taskResult = GetNonConstThis()->WaitForTaskFinished(taskId);
+	OperationStatus status = taskResult.status;
 	switch (status) {
 	case imtdoc::ICollectionDocumentService::OS_OK:
 		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;
@@ -496,9 +521,9 @@ inline CDM::CDocumentOperationStatus TCollectionDocumentServiceCompBase<Base, Co
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
 inline UM::CUndoInfo TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::OnGetUndoInfo(
-	const typename Defs::GetUndoInfoGqlRequest& getUndoInfoRequest,
-	const ::imtgql::CGqlRequest& gqlRequest,
-	QString& errorMessage) const
+			const typename Defs::GetUndoInfoGqlRequest& getUndoInfoRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	UM::CUndoInfo retVal;
 	retVal.Version_1_0.emplace();
@@ -554,9 +579,9 @@ inline UM::CUndoInfo TCollectionDocumentServiceCompBase<Base, ColorCollectionDoc
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
 inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::OnDoUndo(
-	const typename Defs::DoUndoGqlRequest& doUndoRequest,
-	const ::imtgql::CGqlRequest& gqlRequest,
-	QString& errorMessage) const
+			const typename Defs::DoUndoGqlRequest& doUndoRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	UM::CUndoStatus retVal;
 	retVal.Version_1_0.emplace();
@@ -622,9 +647,9 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
 inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::OnDoRedo(
-	const typename Defs::DoRedoGqlRequest& doRedoRequest,
-	const ::imtgql::CGqlRequest& gqlRequest,
-	QString& errorMessage) const
+			const typename Defs::DoRedoGqlRequest& doRedoRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	UM::CUndoStatus retVal;
 	retVal.Version_1_0.emplace();
@@ -690,9 +715,9 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
 inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::OnResetUndo(
-	const typename Defs::ResetUndoGqlRequest& resetUndoRequest,
-	const ::imtgql::CGqlRequest& gqlRequest,
-	QString& errorMessage) const
+			const typename Defs::ResetUndoGqlRequest& resetUndoRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	UM::CUndoStatus retVal;
 	retVal.Version_1_0.emplace();

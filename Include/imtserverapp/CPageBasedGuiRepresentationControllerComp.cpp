@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <imtauth/IUserInfo.h>
-#include <imtqml/IPageGuiElementModel.h>
+#include <imtserverapp/IPageGuiElementModel.h>
 #include <imtserverapp/IGuiElementContainer.h>
 
 
@@ -26,7 +26,7 @@ bool CPageBasedGuiRepresentationControllerComp::SetupItemModel(
 {
 	BaseClass::SetupItemModel(guiElementModel, representation, paramsPtr);
 
-	const imtqml::IPageGuiElementModel* pageGuiElementPtr = dynamic_cast<const imtqml::IPageGuiElementModel*>(&guiElementModel);
+	const imtserverapp::IPageGuiElementModel* pageGuiElementPtr = dynamic_cast<const imtserverapp::IPageGuiElementModel*>(&guiElementModel);
 	if (pageGuiElementPtr == nullptr){
 		return false;
 	}

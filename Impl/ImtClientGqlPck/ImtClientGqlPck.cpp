@@ -21,14 +21,19 @@ I_EXPORT_COMPONENT(
 			"GraphQL API Client");
 
 I_EXPORT_COMPONENT(
+			AsyncApiClient,
+			"Asynchronous GraphQL API client",
+			"Async GraphQL API Client");
+
+I_EXPORT_COMPONENT(
+			GqlClientSyncAdapter,
+			"Synchronous IGqlClient adapter on top of an IAsyncGqlClient",
+			"GraphQL Client Sync Adapter");
+
+I_EXPORT_COMPONENT(
 			GraphQLClientEngine,
 			"GraphQLClientEngine",
 			"GraphQL Client Engine");
-
-I_EXPORT_COMPONENT(
-			GqlObjectCollectionDelegate,
-			"GraphQl based delegate for object collection",
-			"GraphQl Gql Object Collection Delegate");
 
 I_EXPORT_COMPONENT(
 			GqlObjectCollection,

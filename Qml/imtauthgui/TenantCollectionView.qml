@@ -30,27 +30,54 @@ RemoteCollectionView {
 		registerFieldFilterDelegate("tenantRelationFilter", tenantRelationDelegateFilterComp)
 	}
 
-	// --- Subscription for real-time invitation notifications ---
-	TenantMembershipSubscriptionClient {
-		id: collectionMembershipSubscription
+	onCommandActivated: {
+		if (commandId === "Switch") {
+			let indexes = table.getSelectedIndexes()
+			if (indexes.length === 1) {
+				let tenantId = table.elements.getData("id", indexes[0])
+				container.switchToTenant(tenantId)
+			}
+		} else if (commandId === "Leave") {
+			let indexes = table.getSelectedIndexes()
+			if (indexes.length === 1) {
+				let tenantId = table.elements.getData("id", indexes[0])
+				let tenantName = table.elements.getData("name", indexes[0])
+				ModalDialogManager.openDialog(leaveConfirmDialogComp, {"tenantId": tenantId, "tenantName": tenantName || tenantId})
+			}
+		}
+	}
 
-		onInvitationReceived: {
-			// New invitation received -> refresh the collection to show it
+	Component {
+		id: leaveConfirmDialogComp
+		MessageDialog {
+			property string tenantId: ""
+			property string tenantName: ""
+			width: Style.sizeHintM
+			title: qsTr("Leave organization")
+			message: qsTr("Are you sure you want to leave \"%1\"?").arg(tenantName)
+			onFinished: {
+				if (buttonId == Enums.yes) {
+					container.leaveTenant(tenantId)
+				}
+			}
+		}
+	}
+
+	// --- Real-time invitation notifications (handled by tenantManagementApiClient) ---
+	property GqlBasedTenantManagementApiClient tenantManagementApiClient: GqlBasedTenantManagementApiClient {}
+
+	Connections {
+		target: container.tenantManagementApiClient
+		function onSubscriptionInvitationReceived(notification) {
 			container.doUpdateGui()
 		}
-
-		onInvitationAccepted:{
-			// Invitation accepted -> refresh to update relation scope
+		function onSubscriptionInvitationAccepted(notification) {
 			container.doUpdateGui()
 		}
-
-		onInvitationRejected:{
-			// Invitation rejected -> refresh to update relation scope
+		function onSubscriptionInvitationRejected(notification) {
 			container.doUpdateGui()
 		}
-
-		onOwnershipTransferred: {
-			// Ownership transferred -> refresh to update owner column
+		function onSubscriptionOwnershipTransferred(notification) {
 			container.doUpdateGui()
 		}
 	}
@@ -66,13 +93,36 @@ RemoteCollectionView {
 
 	function acceptInvitation(invitationId) {
 		acceptInvitationInput.m_invitationId = invitationId
+		// Capture the tenantId of the accepted invitation so we can broadcast
+		// it locally on success (the server doesn't re-notify the local actor
+		// via subscription, so any open TenantEditor for that tenant has to
+		// be refreshed explicitly here).
+		container.__pendingAcceptTenantId = ""
+		var rows = container.table ? container.table.elementsCount : 0
+		for (var r = 0; r < rows; r++) {
+			if (container.table.elements.getData(TenantItemDataTypeMetaInfo.s_invitationId, r) === invitationId) {
+				container.__pendingAcceptTenantId = container.table.elements.getData("id", r) || ""
+				break
+			}
+		}
 		acceptInvitationSender.send(acceptInvitationInput)
 	}
 
 	function rejectInvitation(invitationId) {
 		rejectInvitationInput.m_invitationId = invitationId
+		container.__pendingRejectTenantId = ""
+		var rows = container.table ? container.table.elementsCount : 0
+		for (var r = 0; r < rows; r++) {
+			if (container.table.elements.getData(TenantItemDataTypeMetaInfo.s_invitationId, r) === invitationId) {
+				container.__pendingRejectTenantId = container.table.elements.getData("id", r) || ""
+				break
+			}
+		}
 		rejectInvitationSender.send(rejectInvitationInput)
 	}
+
+	property string __pendingAcceptTenantId: ""
+	property string __pendingRejectTenantId: ""
 
 	property AcceptTenantInvitationInput acceptInvitationInput: AcceptTenantInvitationInput {}
 	property GqlSdlRequestSender acceptInvitationSender: GqlSdlRequestSender {
@@ -83,6 +133,14 @@ RemoteCollectionView {
 				onFinished: {
 					if (m_success) {
 						container.doUpdateGui()
+						// Fan out so any TenantEditor open on this tenant reloads.
+						AuthorizationController.tenantInvitationAccepted({
+							"membershipId": "",
+							"userId": AuthorizationController.userTokenProvider ? AuthorizationController.userTokenProvider.userId : "",
+							"tenantId": container.__pendingAcceptTenantId,
+							"tenantName": "",
+							"role": ""
+						})
 					} else if (m_errorMessage && m_errorMessage !== "") {
 						ModalDialogManager.showInfoDialog(m_errorMessage)
 					}
@@ -104,6 +162,13 @@ RemoteCollectionView {
 				onFinished: {
 					if (m_success) {
 						container.doUpdateGui()
+						AuthorizationController.tenantInvitationRejected({
+							"membershipId": "",
+							"userId": AuthorizationController.userTokenProvider ? AuthorizationController.userTokenProvider.userId : "",
+							"tenantId": container.__pendingRejectTenantId,
+							"tenantName": "",
+							"role": ""
+						})
 					} else if (m_errorMessage && m_errorMessage !== "") {
 						ModalDialogManager.showInfoDialog(m_errorMessage)
 					}
@@ -392,9 +457,93 @@ RemoteCollectionView {
 		}
 	}
 
+	// --- Switch to organization ---
+	function switchToTenant(tenantId) {
+		if (tenantId && tenantId !== AuthorizationController.currentTenantId) {
+			AuthorizationController.selectTenant(tenantId)
+		}
+	}
+
+	// --- Leave organization ---
+	function leaveTenant(tenantId) {
+		if (!tenantId) return
+		__leaveTenantId = tenantId
+		__findMembershipForLeaveInput.m_userId = AuthorizationController.userTokenProvider.userId
+		__findMembershipForLeaveInput.m_tenantId = tenantId
+		__findMembershipForLeaveSender.send(__findMembershipForLeaveInput)
+	}
+
+	property string __leaveTenantId: ""
+
+	property FindMembershipInput __findMembershipForLeaveInput: FindMembershipInput {}
+	property GqlSdlRequestSender __findMembershipForLeaveSender: GqlSdlRequestSender {
+		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_findMembership
+
+		sdlObjectComp: Component {
+			FindMembershipPayload {
+				onFinished: {
+					if (m_membership && m_membership.m_id && m_membership.m_id !== "") {
+						container.__removeMembershipForLeaveInput.m_membershipId = m_membership.m_id
+						container.__removeMembershipForLeaveSender.send(container.__removeMembershipForLeaveInput)
+					} else if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+					}
+				}
+			}
+		}
+
+		function onError(message, type) {
+			ModalDialogManager.showInfoDialog(message)
+		}
+	}
+
+	property RemoveMembershipInput __removeMembershipForLeaveInput: RemoveMembershipInput {}
+	property GqlSdlRequestSender __removeMembershipForLeaveSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_removeMembership
+
+		sdlObjectComp: Component {
+			RemoveMembershipPayload {
+				onFinished: {
+					if (m_success) {
+						// If we left the currently selected tenant, deselect it
+						if (container.__leaveTenantId === AuthorizationController.currentTenantId) {
+							AuthorizationController.selectTenant("")
+						}
+						container.doUpdateGui()
+					} else if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+					}
+				}
+			}
+		}
+
+		function onError(message, type) {
+			ModalDialogManager.showInfoDialog(message)
+		}
+	}
+
 	commandsDelegateComp: Component {
 		DocCollectionViewDelegate {
+			id: tenantCommandsDelegate
 			collectionView: container
+
+			function updateStateCustomCommands(selection, commandsController, elementsModel){
+				let singleSelection = selection && selection.length === 1
+				let switchEnabled = false
+				let leaveEnabled = false
+				if (singleSelection) {
+					let row = selection[0]
+
+					let tenantId = elementsModel.getData("id", row)
+					let scope = elementsModel.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, row)
+
+					switchEnabled =  tenantId !== AuthorizationController.currentTenantId
+					leaveEnabled =  scope === "Member"
+				}
+				commandsController.setCommandIsEnabled("Switch", switchEnabled)
+				commandsController.setCommandIsEnabled("Leave", leaveEnabled)
+			}
 
 			Component.onCompleted: {
 				registerDocumentType("Tenant", qsTr("Tenant"))
@@ -406,7 +555,7 @@ RemoteCollectionView {
 
 				TenantEditor {
 					id: tenantEditor
-					apiClient: tenantEditorApiClient
+					apiClient: container.tenantManagementApiClient
 					commandsControllerComp: Component {
 						GqlBasedCommandsController {
 							typeId: "Tenant"
@@ -418,14 +567,18 @@ RemoteCollectionView {
 							if (tenantEditor.representationController){
 								tenantEditor.representationController.updateRepresentationFromDocument()
 							}
+							// Automatically switch to the newly created organization
+							// so the user immediately operates in its context. Inform
+							// the user that the active organization has changed.
+							var newTenantId = tenantEditor.tenantData ? tenantEditor.tenantData.m_id : ""
+							var newTenantName = (tenantEditor.tenantData && tenantEditor.tenantData.m_name) || newTenantId
+							if (newTenantId && newTenantId !== AuthorizationController.currentTenantId){
+								AuthorizationController.selectTenant(newTenantId)
+								ModalDialogManager.showInfoDialog(
+									qsTr("You have been switched to the newly created organization \"%1\".")
+									.arg(newTenantName))
+							}
 						}
-					}
-
-					// Concrete GQL transport injected from this view (imtguigql is
-					// already a dependency here); TenantEditor itself stays
-					// transport-agnostic.
-					GqlBasedTenantMembershipApiClient {
-						id: tenantEditorApiClient
 					}
 				}
 			}

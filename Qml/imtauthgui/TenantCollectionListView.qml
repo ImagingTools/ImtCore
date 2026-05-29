@@ -10,6 +10,7 @@ Item {
 	id: root
 
 	property string collectionId: ""
+	property string tenantId: ""
 	property string filterPlaceholder: qsTr("Filter...")
 	property string emptyMessage: qsTr("No items found.")
 	property bool canManage: false
@@ -23,7 +24,7 @@ Item {
 	property var menuCommands: []
 
 	// Expose selection manager for external access
-	readonly property alias selection: selectionManager
+	readonly property alias selectionManager: selectionManager_
 
 	signal editRequested(string itemId, string itemName, string itemDescription)
 	signal deleteRequested(string itemId, string itemName)
@@ -31,7 +32,7 @@ Item {
 	signal selectionChanged(var selectedIds)
 
 	IdSelectionManager {
-		id: selectionManager
+		id: selectionManager_
 		multiSelect: root.selectionMode === "multi"
 		onSelectionChanged: root.selectionChanged(selectedIds)
 	}
@@ -42,7 +43,27 @@ Item {
 		pageSize: 50
 	}
 
+	SubscriptionClient {
+		id: subscriptionClient
+
+		function getHeaders(){
+			return {}
+		}
+
+		onMessageReceived: {
+			dataProvider.fetch(filterInput.text)
+		}
+	}
+
+	function __updateSubscription() {
+		if (root.collectionId !== "")
+			subscriptionClient.gqlCommandId = "On" + root.collectionId + "CollectionChanged"
+	}
+
+	onCollectionIdChanged: __updateSubscription()
+
 	Component.onCompleted: {
+		__updateSubscription()
 		dataProvider.fetch("")
 	}
 
@@ -65,7 +86,16 @@ Item {
 			id: filterInput
 			width: parent.width
 			placeHolderText: root.filterPlaceholder
-			onTextChanged: dataProvider.fetch(text)
+			onTextChanged: filterDebounce.restart()
+		}
+
+		Timer {
+			id: filterDebounce
+			interval: 250
+			repeat: false
+			onTriggered: {
+				dataProvider.fetch(filterInput.text)
+			}
 		}
 
 		Rectangle {
@@ -100,6 +130,19 @@ Item {
 		clip: true
 		boundsBehavior: Flickable.StopAtBounds
 
+		header: Item {
+			width: listViewArea.width
+			height: listViewArea.count === 0 ? Style.controlHeightL + Style.marginL : 0
+			visible: height > 0
+
+			BaseText {
+				anchors.centerIn: parent
+				text: dataProvider.isInitialLoading ? qsTr("Loading...") : root.emptyMessage
+				font.pixelSize: Style.fontSizeM
+				color: Style.inactiveTextColor
+			}
+		}
+
 		delegate: Rectangle {
 			id: delegateRoot
 			width: listViewArea.width
@@ -108,9 +151,9 @@ Item {
 			property string itemId: modelData.id || ""
 			property string itemTitle: modelData.title || modelData.id || ""
 			property string itemDescription: modelData.description || ""
-			property bool isSelected: selectionManager.isSelected(itemId)
+			property bool isSelected: selectionManager_.isSelected(itemId)
 
-			color: isSelected ? Style.selectionColor
+			color: isSelected ? Style.selectedColor
 				 : itemMouseArea.containsMouse ? Style.buttonHoverColor
 				 : "transparent"
 
@@ -127,9 +170,9 @@ Item {
 					} else {
 						// Selection logic
 						if (root.selectionMode === "multi" && (mouse.modifiers & Qt.ControlModifier)) {
-							selectionManager.toggleSelect(delegateRoot.itemId)
+							selectionManager_.toggleSelect(delegateRoot.itemId)
 						} else {
-							selectionManager.singleSelect(delegateRoot.itemId)
+							selectionManager_.singleSelect(delegateRoot.itemId)
 						}
 					}
 				}
@@ -237,25 +280,8 @@ Item {
 				height: 1
 				color: Style.borderColor
 				opacity: 0.5
+				visible: index !== listViewArea.count - 1
 			}
 		}
-
-		// Empty state
-		BaseText {
-			visible: listViewArea.count === 0 && !dataProvider.isInitialLoading
-			anchors.centerIn: parent
-			text: root.emptyMessage
-			font.pixelSize: Style.fontSizeM
-			color: Style.inactiveTextColor
-		}
-
-		// Loading state
-		BaseText {
-			visible: dataProvider.isInitialLoading
-			anchors.centerIn: parent
-			text: qsTr("Loading...")
-			font.pixelSize: Style.fontSizeM
-			color: Style.inactiveTextColor
 		}
 	}
-}

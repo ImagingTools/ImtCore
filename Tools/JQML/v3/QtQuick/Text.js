@@ -226,12 +226,14 @@ class Text extends Item {
 
     onFontChanged(oldValue, newValue){
         let font = this.font
-        this.__setDOMStyle({
+        let styles = {
             fontWeight: font.bold == true ? 'bold' : 'normal',
             fontSize: font.pixelSize+'px',
             fontFamily: `'${font.family}'`,
             textDecoration: font.underline == true ? 'underline' : 'unset',
-        })
+        }
+        this.__setDOMStyle(styles)
+        this.__setImplStyle(styles)
 
         JQApplication.updateLater(this)
     }

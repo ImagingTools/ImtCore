@@ -511,6 +511,12 @@ public:
 		, m_validationErrorMessage()
 		, m_singleCopyMode(false)
 	{
+		RegisterEventHandler(m_mockEventHandler);
+	}
+
+	~CTestableDocumentService()
+	{
+		UnregisterEventHandler(m_mockEventHandler);
 	}
 
 	// Access to mock objects for test configuration
@@ -561,11 +567,6 @@ protected:
 		}
 
 		return idoc::IUndoManagerUniquePtr(new CMockUndoManager());
-	}
-
-	virtual QList<imtdoc::IDocumentServiceEventHandler*> GetDocumentServiceEventHandlers() const override
-	{
-		return { const_cast<CMockEventHandler*>(&m_mockEventHandler) };
 	}
 
 	virtual QString GetDefaultDocumentName(const WorkingDocument& /*document*/) const override

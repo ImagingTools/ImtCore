@@ -6,8 +6,6 @@ import imtcontrols 1.0
 import imtauthRolesSdl 1.0
 import imtdocgui 1.0
 import imtguigql 1.0
-import imtbaseComplexCollectionFilterSdl 1.0
-import imtbaseImtBaseTypesSdl 1.0
 
 ViewBase {
 	id: container;
@@ -16,7 +14,16 @@ ViewBase {
 	contentColor: Style.baseColor
 	
 	property TreeItemModel permissionsModel: TreeItemModel {};
-	onPermissionsModelChanged: permissionsGroup.buildPermissionsModel()
+	onPermissionsModelChanged: {
+		permissionsGroup.buildPermissionsModel()
+		// After the permissions tree is rebuilt (e.g. fetchPermissions completes
+		// asynchronously after the role has been loaded), re-apply the checked
+		// state from the current roleData; otherwise the tree appears empty and
+		// a subsequent Save would clear all permissions.
+		if (container.roleData){
+			container.doUpdateGui()
+		}
+	}
 	
 	property string productId: "";
 	
@@ -152,51 +159,36 @@ ViewBase {
 					KeyNavigation.backtab: roleIdInput;
 				}
 				
-				SelectableCollectionEditor {
+				ItemSelectElementView {
 					id: roleSelectableCollectionEditor
 					collectionId: "Roles"
-					targetTitle: qsTr("Parent Roles")
-					sourceTitle: qsTr("Adding Parent Role")
-					onSelectionChanged: {
-						container.doUpdateModel()
-					}
-					
-					Component {
-						id: fieldFilterComp
-						FieldFilter {
-							m_fieldId: "DocumentId"
-							m_filterValueType: "String"
-							m_filterValue: !container.roleData ? "" : container.roleData.m_id
-							m_filterOperations: ["Not", "Equal"]
+						label: qsTr("Parent Roles")
+						addButtonText: qsTr("Add Parent Role")
+						showCount: true
+						onSelectionChanged: {
+							container.doUpdateModel()
 						}
 					}
-
-					IdParam {
-						id: idParameter
-						m_id: !container.roleData ? "" : container.roleData.m_id
-					}
-
-					function setSourceAdditionalFilters(collection){
-						let fieldFilter = fieldFilterComp.createObject(collection.collectionFilter)
-						collection.collectionFilter.addFieldFilter(fieldFilter)
-
-						collection.registerFilter("ParentListFilter", idParameter)
-						collection.setFilterIsEnabled("ParentListFilter", true)
-					}
-				}
 
 				function updateGui(){
 					roleIdInput.text = container.roleData.m_roleId;
 					roleNameInput.text = container.roleData.m_name;
 					descriptionInput.text = container.roleData.m_description;
-					roleSelectableCollectionEditor.selectedIds = container.roleData.m_parentRoles.slice()
+					var ids = container.roleData.m_parentRoles ? container.roleData.m_parentRoles.slice() : []
+					var arr = []
+					for (var i = 0; i < ids.length; i++)
+						arr.push({id: ids[i], name: ids[i]})
+					roleSelectableCollectionEditor.items = arr
 				}
 				
 				function updateModel(){
 					container.roleData.m_roleId = roleIdInput.text;
 					container.roleData.m_name = roleNameInput.text;
 					container.roleData.m_description = descriptionInput.text;
-					container.roleData.m_parentRoles = roleSelectableCollectionEditor.selectedIds.slice()
+					var arr = []
+					for (var i = 0; i < roleSelectableCollectionEditor.items.length; i++)
+						arr.push(roleSelectableCollectionEditor.items[i].id)
+					container.roleData.m_parentRoles = arr
 				}
 			}
 			

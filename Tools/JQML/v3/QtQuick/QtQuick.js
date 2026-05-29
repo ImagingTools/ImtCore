@@ -36,7 +36,9 @@ module.exports = {
     MultiPointHandler: require("./MultiPointHandler"),
     WheelHandler: require("./WheelHandler"),
     DragHandler: require("./DragHandler"),
+    DropArea: require("./DropArea"),
 
     Dialogs: require("./Dialogs/Dialogs"),
     Controls: require("./Controls/Controls"),
+    Layouts: require("./Layouts/Layouts"),
 }

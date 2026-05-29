@@ -258,6 +258,7 @@ module.exports = {
         return btoa(data)
     },
     createComponent(source, currentModule){
+        if(!source || source === '') return null
         let path = source.replaceAll('qrc:/', '').replaceAll('.qml', '').split('/')
         let className = path[path.length-1]
 
@@ -281,19 +282,27 @@ module.exports = {
 
         if(!cls || !cls.isAssignableFrom){
             for(let key in JQModules){
-                cls = JQModules[key]
+                let candidate = JQModules[key]
 
                 for(let i = 0; i < path.length; i++){
-                    if(cls){
+                    if(candidate){
                         let name = path[i]
-                        if(name in cls){
-                            cls = cls[name]
+                        if(name in candidate){
+                            candidate = candidate[name]
                         } else if(name in JQModules){
-                            cls = JQModules[name]
+                            candidate = JQModules[name]
+                        } else {
+                            candidate = null
+                            break
                         }
                     } else {
-                        cls = JQModules[path[i]]
+                        candidate = JQModules[path[i]]
                     }
+                }
+
+                if(candidate && candidate.isAssignableFrom){
+                    cls = candidate
+                    break
                 }
             }
         }
@@ -307,9 +316,12 @@ module.exports = {
         }
         
 
-        if(cls && cls.isAssignableFrom && cls.isAssignableFrom(JQModules.QtBase.BaseObject)) return JQModules.QtQml.Component.create(null, {}, cls)
+        if(cls && cls.isAssignableFrom && cls.isAssignableFrom(JQModules.QtBase.BaseObject)){
+            return JQModules.QtQml.Component.create(null, {}, cls)
+        }
 
-        console.error(`${source} is not founded`)
+        console.error(`${source} is not founded | className: ${className} | cls:`, cls)
+        return null
 
         // let cls = currentModule
         // try {
@@ -346,6 +358,10 @@ module.exports = {
         // }
 
         // if(cls && cls.isAssignableFrom && cls.isAssignableFrom(JQModules.QtBase.BaseObject)) return JQModules.QtQml.Component.create(null, {}, cls)
+    },
+
+    quit: function(){
+        JQApplication.quit()
     },
 
     get localStorage(){return global.localStorage},
