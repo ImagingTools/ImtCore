@@ -18,6 +18,7 @@ Rectangle {
 
 	property bool canRecoveryPassword: true;
 	property bool canRegisterUser: true;
+	property bool canLoginWithOpenId: AuthorizationController.openIdEnabled;
 
 	property string appName: context ? context.appName : ""
 	
@@ -458,6 +459,57 @@ Rectangle {
 					}
 				}
 			}//
+
+			// --- OpenID Connect login section ---
+			Item {
+				id: openIdSeparatorItem;
+				width: parent.width;
+				height: openIdSeparatorRow.height;
+				visible: authPageContainer.canLoginWithOpenId;
+
+				Row {
+					id: openIdSeparatorRow;
+					width: parent.width;
+					spacing: Style.marginS;
+
+					Rectangle {
+						width: (parent.width - orText.width - 2 * parent.spacing) / 2;
+						height: 1;
+						color: Style.borderColor;
+						anchors.verticalCenter: parent.verticalCenter;
+					}
+
+					Text {
+						id: orText;
+						text: qsTr("or");
+						color: Style.textColor;
+						font.family: Style.fontFamily;
+						font.pixelSize: Style.fontSizeM;
+					}
+
+					Rectangle {
+						width: (parent.width - orText.width - 2 * parent.spacing) / 2;
+						height: 1;
+						color: Style.borderColor;
+						anchors.verticalCenter: parent.verticalCenter;
+					}
+				}
+			}
+
+			Item {
+				id: openIdButtonItem;
+				width: parent.width;
+				height: 50;
+				visible: authPageContainer.canLoginWithOpenId;
+
+				OpenIdLoginButton {
+					anchors.centerIn: parent;
+
+					onClicked: {
+						AuthorizationController.loginWithOpenId();
+					}
+				}
+			}
 		}//bodyColumn
 	}
 

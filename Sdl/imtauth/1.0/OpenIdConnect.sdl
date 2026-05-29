@@ -1,0 +1,47 @@
+schema {
+	query: Query
+	mutation: Mutation
+	namespace: imtauth
+	version: 1.0
+}
+
+type OpenIdConfiguration {
+	issuer: String!
+	authorizationEndpoint: String!
+	tokenEndpoint: String!
+	userinfoEndpoint: String
+	jwksUri: String
+	clientId: String!
+	scopes: String
+}
+
+type OpenIdTokenPayload {
+	ok: Boolean!
+	userId: ID
+	username: ID
+	accessToken: ID
+	refreshToken: ID
+	idToken: ID
+	systemId: ID
+	permissions: ID
+	errorMessage: String
+}
+
+input OpenIdAuthorizationCodeInput {
+	code: String!
+	redirectUri: String!
+	codeVerifier: String
+}
+
+input OpenIdRefreshTokenInput {
+	refreshToken: String!
+}
+
+type Query {
+	GetOpenIdConfiguration: OpenIdConfiguration!
+}
+
+type Mutation {
+	ExchangeOpenIdCode (input: OpenIdAuthorizationCodeInput): OpenIdTokenPayload!
+	RefreshOpenIdToken (input: OpenIdRefreshTokenInput): OpenIdTokenPayload!
+}
