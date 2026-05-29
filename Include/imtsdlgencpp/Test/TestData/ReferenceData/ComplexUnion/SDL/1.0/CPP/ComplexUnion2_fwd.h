@@ -5,9 +5,9 @@
 
 
 // custom types includes
-#include <complextestsdl/SDL/1.0/CPP/ComplexUnion1.h>
-#include <imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
-#include <imtbasesdl/SDL/1.0/CPP/ImtBaseTypes.h>
+#include <complextestsdl/SDL/1.0/CPP/ComplexUnion1_fwd.h>
+#include <imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter_fwd.h>
+#include <imtbasesdl/SDL/1.0/CPP/ImtBaseTypes_fwd.h>
 
 
 namespace sdl::V1_0::complextest

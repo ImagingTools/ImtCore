@@ -2,7 +2,7 @@
 
 
 // custom types includes
-#include <modsdlsdl/SDL/1.0/CPP/PrinterBase.h>
+#include <modsdlsdl/SDL/1.0/CPP/PrinterBase_fwd.h>
 
 
 namespace sdl::V1_0::modsdl

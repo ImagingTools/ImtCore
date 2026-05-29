@@ -735,8 +735,13 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 		stream << QStringLiteral("// custom types includes");
 		FeedStream(stream, 1, false);
 		for (const imtsdl::IncludeDirective& directive: customDirectives){
+			// Convert .h path to _fwd.h for forward declaration files
+			QString fwdPath = directive.path;
+			if (fwdPath.endsWith(QStringLiteral(".h>"))){
+				fwdPath.replace(fwdPath.length() - 3, 3, QStringLiteral("_fwd.h>"));
+			}
 			stream << QStringLiteral("#include ");
-			stream << directive.path;
+			stream << fwdPath;
 			FeedStream(stream, 1, false);
 		}
 		FeedStream(stream, 2, false);
