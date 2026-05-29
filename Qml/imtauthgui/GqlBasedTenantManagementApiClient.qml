@@ -7,6 +7,7 @@ import imtcontrols 1.0
 import imtdocgui 1.0
 import imtguigql 1.0
 import imtauthTenantMembershipsSdl 1.0
+import imtauthTenantsSdl 1.0
 import imtbaseImtCollectionSdl 1.0
 import imtbaseCollectionDocumentServiceSdl 1.0
 import imtauthRolesSdl 1.0
@@ -76,6 +77,10 @@ QtObject {
 	signal userRemoved(string userId)
 	signal userUpdated(string userId)
 	signal userDataReceived(var data)
+
+	signal crossOrgGrantCreated(string grantId)
+	signal crossOrgGrantRevoked(string grantId)
+	signal crossOrgGrantsReceived(var grants)
 
 	signal requestFailed(string message)
 
@@ -704,6 +709,118 @@ QtObject {
 	function fetchPermissions() {
 		__permissionsProvider.productId = root.productId
 		__permissionsProvider.updateModel()
+	}
+
+	// =========================================================================
+	// Cross-org grants (Tenants.sdl: CreateCrossOrgGrant / RevokeCrossOrgGrant /
+	// GetCrossOrgGrants)
+	// =========================================================================
+
+	property ListModel crossOrgGrantsModel: ListModel {}
+
+	property CreateCrossOrgGrantInput __createCrossOrgGrantInput: CreateCrossOrgGrantInput {}
+	property GqlSdlRequestSender __createCrossOrgGrantSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_createCrossOrgGrant
+
+		sdlObjectComp: Component {
+			CreateCrossOrgGrantPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.crossOrgGrantCreated(m_grantId || "")
+					}
+				}
+			}
+		}
+	}
+
+	property RevokeCrossOrgGrantInput __revokeCrossOrgGrantInput: RevokeCrossOrgGrantInput {}
+	property string __pendingRevokeGrantId: ""
+	property GqlSdlRequestSender __revokeCrossOrgGrantSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_revokeCrossOrgGrant
+
+		sdlObjectComp: Component {
+			RevokeCrossOrgGrantPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.crossOrgGrantRevoked(root.__pendingRevokeGrantId)
+					}
+				}
+			}
+		}
+	}
+
+	property GetCrossOrgGrantsInput __getCrossOrgGrantsInput: GetCrossOrgGrantsInput {}
+	property GqlSdlRequestSender __getCrossOrgGrantsSender: GqlSdlRequestSender {
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_getCrossOrgGrants
+
+		sdlObjectComp: Component {
+			GetCrossOrgGrantsPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.__populateCrossOrgGrantsModel(m_grants)
+					}
+				}
+			}
+		}
+	}
+
+	function __populateCrossOrgGrantsModel(grants) {
+		root.crossOrgGrantsModel.clear()
+		if (grants) {
+			for (var i = 0; i < grants.length; ++i) {
+				var grant = grants[i]
+				if (!grant)
+					continue
+				root.crossOrgGrantsModel.append({
+					"grantId": grant.m_id || "",
+					"sourceTenantId": grant.m_sourceTenantId || "",
+					"targetTenantId": grant.m_targetTenantId || "",
+					"relationshipId": grant.m_relationshipId || "",
+					"targetTeamId": grant.m_targetTeamId || "",
+					"accessLevel": grant.m_accessLevel || CrossOrgAccessLevelEnum.s_none,
+					"resourceScope": grant.m_resourceScope || "",
+					"description": grant.m_description || "",
+					"createdAt": grant.m_createdAt || "",
+					"expiresAt": grant.m_expiresAt || "",
+					"isActive": grant.m_isActive === undefined ? true : grant.m_isActive
+				})
+			}
+		}
+		root.crossOrgGrantsReceived(grants || [])
+	}
+
+	function fetchCrossOrgGrants(tenantId) {
+		root.__getCrossOrgGrantsInput.m_tenantId = tenantId || root.tenantId || ""
+		root.__getCrossOrgGrantsSender.send(root.__getCrossOrgGrantsInput)
+	}
+
+	function createCrossOrgGrant(sourceTenantId, targetTenantId, relationshipId, accessLevel, resourceScope, targetTeamId, description, expiresAt) {
+		root.__createCrossOrgGrantInput.m_sourceTenantId = sourceTenantId || ""
+		root.__createCrossOrgGrantInput.m_targetTenantId = targetTenantId || ""
+		root.__createCrossOrgGrantInput.m_relationshipId = relationshipId || ""
+		root.__createCrossOrgGrantInput.m_accessLevel = accessLevel || CrossOrgAccessLevelEnum.s_read
+		root.__createCrossOrgGrantInput.m_resourceScope = resourceScope || ""
+		root.__createCrossOrgGrantInput.m_targetTeamId = targetTeamId || ""
+		root.__createCrossOrgGrantInput.m_description = description || ""
+		root.__createCrossOrgGrantInput.m_expiresAt = expiresAt || ""
+		root.__createCrossOrgGrantSender.send(root.__createCrossOrgGrantInput)
+	}
+
+	function revokeCrossOrgGrant(grantId) {
+		root.__pendingRevokeGrantId = grantId || ""
+		root.__revokeCrossOrgGrantInput.m_grantId = grantId || ""
+		root.__revokeCrossOrgGrantSender.send(root.__revokeCrossOrgGrantInput)
 	}
 
 	// =========================================================================

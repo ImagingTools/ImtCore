@@ -63,6 +63,11 @@ QtObject {
 	signal userUpdated(string userId)
 	signal userDataReceived(var data)
 
+	// --- Cross-org grants ---
+	signal crossOrgGrantCreated(string grantId)
+	signal crossOrgGrantRevoked(string grantId)
+	signal crossOrgGrantsReceived(var grants)
+
 	// --- Generic error ---
 	signal requestFailed(string message)
 
@@ -102,4 +107,12 @@ QtObject {
 	// --- Permissions ---
 	property var permissionsModel: null
 	function fetchPermissions() {}
+
+	// --- Cross-org grants ---
+	// Model holding the cross-org grants for the current tenant (see
+	// crossOrgGrantsReceived for the raw payload).
+	property var crossOrgGrantsModel: null
+	function fetchCrossOrgGrants(tenantId) {}
+	function createCrossOrgGrant(sourceTenantId, targetTenantId, relationshipId, accessLevel, resourceScope, targetTeamId, description, expiresAt) {}
+	function revokeCrossOrgGrant(grantId) {}
 }
