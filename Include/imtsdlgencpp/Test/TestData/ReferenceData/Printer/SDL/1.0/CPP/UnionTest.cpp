@@ -910,9 +910,9 @@ bool CPrinterBase::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mod
 		return false;
 	}
 	int linkListCount = linkListModel->GetItemsCount();
-	imtsdl::TElementList<CLink::V1_0> linkListList;
+	imtsdl::TElementList<CLink> linkListList;
 	for (int linkListIndex = 0; linkListIndex < linkListCount; ++linkListIndex){
-		CLink::V1_0 t_linkList;
+		CLink t_linkList;
 		if (!t_linkList.ReadFromModel(*linkListModel, linkListIndex)){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "linkList").toLocal8Bit().constData();)
 
@@ -1009,9 +1009,9 @@ bool CPrinterBase::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 	::imtbase::CTreeItemModel* linkListModel = model.GetTreeItemModel("linkList", modelIndex);
 	if (linkListModel != nullptr){
 		int linkListCount = linkListModel->GetItemsCount();
-		imtsdl::TElementList<CLink::V1_0> linkListList;
+		imtsdl::TElementList<CLink> linkListList;
 		for (int linkListIndex = 0; linkListIndex < linkListCount; ++linkListIndex){
-			CLink::V1_0 t_linkList;
+			CLink t_linkList;
 			if (!t_linkList.OptReadFromModel(*linkListModel, linkListIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "linkList").toLocal8Bit().constData();)
 
@@ -1186,14 +1186,14 @@ bool CPrinterBase::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObj
 		return false;
 	}
 	const qsizetype linkListElementsCount = gqlObject.GetObjectsCount("linkList");
-	linkList = imtsdl::TElementList<CLink::V1_0>();
+	linkList = imtsdl::TElementList<CLink>();
 	for (qsizetype linkListIndex = 0; linkListIndex < linkListElementsCount; ++linkListIndex){
 		const ::imtgql::CGqlParamObject* linkListDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("linkList", linkListIndex);
 		if (linkListDataObjectPtr == nullptr){
 			qDebug() << "invalid type" << linkListDataObjectPtr;
 			return false;
 		}
-		CLink::V1_0 tempLinkList;
+		CLink tempLinkList;
 		if (!tempLinkList.ReadFromGraphQlObject(*linkListDataObjectPtr)){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "linkList").toLocal8Bit().constData();)
 
@@ -1296,14 +1296,14 @@ bool CPrinterBase::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 	}
 	if (gqlObject.ContainsParam("linkList") && (gqlObject.GetObjectsCount("linkList") > 0)){
 		const qsizetype linkListElementsCount = gqlObject.GetObjectsCount("linkList");
-		linkList = imtsdl::TElementList<CLink::V1_0>();
+		linkList = imtsdl::TElementList<CLink>();
 		for (qsizetype linkListIndex = 0; linkListIndex < linkListElementsCount; ++linkListIndex){
 			const ::imtgql::CGqlParamObject* linkListDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("linkList", linkListIndex);
 			if (linkListDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << linkListDataObjectPtr;
 				return false;
 			}
-			CLink::V1_0 tempLinkList;
+			CLink tempLinkList;
 			if (!tempLinkList.OptReadFromGraphQlObject(*linkListDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "linkList").toLocal8Bit().constData();)
 
@@ -1507,9 +1507,9 @@ bool CPrinterBase::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 	const QJsonArray linkListJsonArray = jsonObject["linkList"].toArray();
 	const qsizetype linkListArrayCount = linkListJsonArray.size();
-	linkList = imtsdl::TElementList<CLink::V1_0>();
+	linkList = imtsdl::TElementList<CLink>();
 	for (qsizetype linkListIndex = 0; linkListIndex < linkListArrayCount; ++linkListIndex){
-		CLink::V1_0 tempLinkList;
+		CLink tempLinkList;
 		if (!tempLinkList.ReadFromJsonObject(linkListJsonArray[linkListIndex].toObject())){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "linkList").toLocal8Bit().constData();)
 
@@ -1607,9 +1607,9 @@ bool CPrinterBase::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("linkList") && jsonObject["linkList"].isArray()){
 		const QJsonArray linkListJsonArray = jsonObject["linkList"].toArray();
 		const qsizetype linkListArrayCount = linkListJsonArray.size();
-		linkList = imtsdl::TElementList<CLink::V1_0>();
+		linkList = imtsdl::TElementList<CLink>();
 		for (qsizetype linkListIndex = 0; linkListIndex < linkListArrayCount; ++linkListIndex){
-			CLink::V1_0 tempLinkList;
+			CLink tempLinkList;
 			if (!tempLinkList.OptReadFromJsonObject(linkListJsonArray[linkListIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "linkList").toLocal8Bit().constData();)
 

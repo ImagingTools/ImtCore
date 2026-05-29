@@ -331,9 +331,9 @@ bool CGeometry::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelI
 		return false;
 	}
 	int pointsCount = pointsModel->GetItemsCount();
-	imtsdl::TElementList<CPoint::V1_0> pointsList;
+	imtsdl::TElementList<CPoint> pointsList;
 	for (int pointsIndex = 0; pointsIndex < pointsCount; ++pointsIndex){
-		CPoint::V1_0 t_points;
+		CPoint t_points;
 		if (!t_points.ReadFromModel(*pointsModel, pointsIndex)){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Points").toLocal8Bit().constData();)
 
@@ -356,9 +356,9 @@ bool CGeometry::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelI
 
 		return false;
 	}
-	imtsdl::TElementList<CPoint::V1_0> requiredPointsList;
+	imtsdl::TElementList<CPoint> requiredPointsList;
 	for (int requiredPointsIndex = 0; requiredPointsIndex < requiredPointsCount; ++requiredPointsIndex){
-		CPoint::V1_0 t_requiredPoints;
+		CPoint t_requiredPoints;
 		if (!t_requiredPoints.ReadFromModel(*requiredPointsModel, requiredPointsIndex)){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "RequiredPoints").toLocal8Bit().constData();)
 
@@ -372,9 +372,9 @@ bool CGeometry::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelI
 	::imtbase::CTreeItemModel* optionalPointsModel = model.GetTreeItemModel("OptionalPoints", modelIndex);
 	if (optionalPointsModel != nullptr){
 		int optionalPointsCount = optionalPointsModel->GetItemsCount();
-		imtsdl::TElementList<CPoint::V1_0> optionalPointsList;
+		imtsdl::TElementList<CPoint> optionalPointsList;
 		for (int optionalPointsIndex = 0; optionalPointsIndex < optionalPointsCount; ++optionalPointsIndex){
-			CPoint::V1_0 t_optionalPoints;
+			CPoint t_optionalPoints;
 			if (!t_optionalPoints.ReadFromModel(*optionalPointsModel, optionalPointsIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "OptionalPoints").toLocal8Bit().constData();)
 
@@ -419,9 +419,9 @@ bool CGeometry::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int mod
 	::imtbase::CTreeItemModel* pointsModel = model.GetTreeItemModel("Points", modelIndex);
 	if (pointsModel != nullptr){
 		int pointsCount = pointsModel->GetItemsCount();
-		imtsdl::TElementList<CPoint::V1_0> pointsList;
+		imtsdl::TElementList<CPoint> pointsList;
 		for (int pointsIndex = 0; pointsIndex < pointsCount; ++pointsIndex){
-			CPoint::V1_0 t_points;
+			CPoint t_points;
 			if (!t_points.OptReadFromModel(*pointsModel, pointsIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Points").toLocal8Bit().constData();)
 
@@ -441,9 +441,9 @@ bool CGeometry::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int mod
 
 			return false;
 		}
-		imtsdl::TElementList<CPoint::V1_0> requiredPointsList;
+		imtsdl::TElementList<CPoint> requiredPointsList;
 		for (int requiredPointsIndex = 0; requiredPointsIndex < requiredPointsCount; ++requiredPointsIndex){
-			CPoint::V1_0 t_requiredPoints;
+			CPoint t_requiredPoints;
 			if (!t_requiredPoints.OptReadFromModel(*requiredPointsModel, requiredPointsIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "RequiredPoints").toLocal8Bit().constData();)
 
@@ -458,9 +458,9 @@ bool CGeometry::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int mod
 	::imtbase::CTreeItemModel* optionalPointsModel = model.GetTreeItemModel("OptionalPoints", modelIndex);
 	if (optionalPointsModel != nullptr){
 		int optionalPointsCount = optionalPointsModel->GetItemsCount();
-		imtsdl::TElementList<CPoint::V1_0> optionalPointsList;
+		imtsdl::TElementList<CPoint> optionalPointsList;
 		for (int optionalPointsIndex = 0; optionalPointsIndex < optionalPointsCount; ++optionalPointsIndex){
-			CPoint::V1_0 t_optionalPoints;
+			CPoint t_optionalPoints;
 			if (!t_optionalPoints.OptReadFromModel(*optionalPointsModel, optionalPointsIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "OptionalPoints").toLocal8Bit().constData();)
 
@@ -591,14 +591,14 @@ bool CGeometry::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject
 		return false;
 	}
 	const qsizetype pointsElementsCount = gqlObject.GetObjectsCount("Points");
-	Points = imtsdl::TElementList<CPoint::V1_0>();
+	Points = imtsdl::TElementList<CPoint>();
 	for (qsizetype pointsIndex = 0; pointsIndex < pointsElementsCount; ++pointsIndex){
 		const ::imtgql::CGqlParamObject* pointsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Points", pointsIndex);
 		if (pointsDataObjectPtr == nullptr){
 			qDebug() << "invalid type" << pointsDataObjectPtr;
 			return false;
 		}
-		CPoint::V1_0 tempPoints;
+		CPoint tempPoints;
 		if (!tempPoints.ReadFromGraphQlObject(*pointsDataObjectPtr)){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Points").toLocal8Bit().constData();)
 
@@ -618,14 +618,14 @@ bool CGeometry::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject
 
 		return false;
 	}
-	RequiredPoints = imtsdl::TElementList<CPoint::V1_0>();
+	RequiredPoints = imtsdl::TElementList<CPoint>();
 	for (qsizetype requiredPointsIndex = 0; requiredPointsIndex < requiredPointsElementsCount; ++requiredPointsIndex){
 		const ::imtgql::CGqlParamObject* requiredPointsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("RequiredPoints", requiredPointsIndex);
 		if (requiredPointsDataObjectPtr == nullptr){
 			qDebug() << "invalid type" << requiredPointsDataObjectPtr;
 			return false;
 		}
-		CPoint::V1_0 tempRequiredPoints;
+		CPoint tempRequiredPoints;
 		if (!tempRequiredPoints.ReadFromGraphQlObject(*requiredPointsDataObjectPtr)){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "RequiredPoints").toLocal8Bit().constData();)
 
@@ -639,14 +639,14 @@ bool CGeometry::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject
 	}
 	if (gqlObject.ContainsParam("OptionalPoints") && (gqlObject.GetObjectsCount("OptionalPoints") > 0)){
 		const qsizetype optionalPointsElementsCount = gqlObject.GetObjectsCount("OptionalPoints");
-		OptionalPoints = imtsdl::TElementList<CPoint::V1_0>();
+		OptionalPoints = imtsdl::TElementList<CPoint>();
 		for (qsizetype optionalPointsIndex = 0; optionalPointsIndex < optionalPointsElementsCount; ++optionalPointsIndex){
 			const ::imtgql::CGqlParamObject* optionalPointsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("OptionalPoints", optionalPointsIndex);
 			if (optionalPointsDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << optionalPointsDataObjectPtr;
 				return false;
 			}
-			CPoint::V1_0 tempOptionalPoints;
+			CPoint tempOptionalPoints;
 			if (!tempOptionalPoints.ReadFromGraphQlObject(*optionalPointsDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "OptionalPoints").toLocal8Bit().constData();)
 
@@ -689,14 +689,14 @@ bool CGeometry::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObj
 	}
 	if (gqlObject.ContainsParam("Points") && (gqlObject.GetObjectsCount("Points") > 0)){
 		const qsizetype pointsElementsCount = gqlObject.GetObjectsCount("Points");
-		Points = imtsdl::TElementList<CPoint::V1_0>();
+		Points = imtsdl::TElementList<CPoint>();
 		for (qsizetype pointsIndex = 0; pointsIndex < pointsElementsCount; ++pointsIndex){
 			const ::imtgql::CGqlParamObject* pointsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Points", pointsIndex);
 			if (pointsDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << pointsDataObjectPtr;
 				return false;
 			}
-			CPoint::V1_0 tempPoints;
+			CPoint tempPoints;
 			if (!tempPoints.OptReadFromGraphQlObject(*pointsDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Points").toLocal8Bit().constData();)
 
@@ -713,14 +713,14 @@ bool CGeometry::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObj
 
 			return false;
 		}
-		RequiredPoints = imtsdl::TElementList<CPoint::V1_0>();
+		RequiredPoints = imtsdl::TElementList<CPoint>();
 		for (qsizetype requiredPointsIndex = 0; requiredPointsIndex < requiredPointsElementsCount; ++requiredPointsIndex){
 			const ::imtgql::CGqlParamObject* requiredPointsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("RequiredPoints", requiredPointsIndex);
 			if (requiredPointsDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << requiredPointsDataObjectPtr;
 				return false;
 			}
-			CPoint::V1_0 tempRequiredPoints;
+			CPoint tempRequiredPoints;
 			if (!tempRequiredPoints.OptReadFromGraphQlObject(*requiredPointsDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "RequiredPoints").toLocal8Bit().constData();)
 
@@ -735,14 +735,14 @@ bool CGeometry::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObj
 	}
 	if (gqlObject.ContainsParam("OptionalPoints") && (gqlObject.GetObjectsCount("OptionalPoints") > 0)){
 		const qsizetype optionalPointsElementsCount = gqlObject.GetObjectsCount("OptionalPoints");
-		OptionalPoints = imtsdl::TElementList<CPoint::V1_0>();
+		OptionalPoints = imtsdl::TElementList<CPoint>();
 		for (qsizetype optionalPointsIndex = 0; optionalPointsIndex < optionalPointsElementsCount; ++optionalPointsIndex){
 			const ::imtgql::CGqlParamObject* optionalPointsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("OptionalPoints", optionalPointsIndex);
 			if (optionalPointsDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << optionalPointsDataObjectPtr;
 				return false;
 			}
-			CPoint::V1_0 tempOptionalPoints;
+			CPoint tempOptionalPoints;
 			if (!tempOptionalPoints.OptReadFromGraphQlObject(*optionalPointsDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "OptionalPoints").toLocal8Bit().constData();)
 
@@ -872,9 +872,9 @@ bool CGeometry::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 	const QJsonArray pointsJsonArray = jsonObject["Points"].toArray();
 	const qsizetype pointsArrayCount = pointsJsonArray.size();
-	Points = imtsdl::TElementList<CPoint::V1_0>();
+	Points = imtsdl::TElementList<CPoint>();
 	for (qsizetype pointsIndex = 0; pointsIndex < pointsArrayCount; ++pointsIndex){
-		CPoint::V1_0 tempPoints;
+		CPoint tempPoints;
 		if (!tempPoints.ReadFromJsonObject(pointsJsonArray[pointsIndex].toObject())){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Points").toLocal8Bit().constData();)
 
@@ -895,9 +895,9 @@ bool CGeometry::ReadFromJsonObject(const QJsonObject& jsonObject)
 
 		return false;
 	}
-	RequiredPoints = imtsdl::TElementList<CPoint::V1_0>();
+	RequiredPoints = imtsdl::TElementList<CPoint>();
 	for (qsizetype requiredPointsIndex = 0; requiredPointsIndex < requiredPointsArrayCount; ++requiredPointsIndex){
-		CPoint::V1_0 tempRequiredPoints;
+		CPoint tempRequiredPoints;
 		if (!tempRequiredPoints.ReadFromJsonObject(requiredPointsJsonArray[requiredPointsIndex].toObject())){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "RequiredPoints").toLocal8Bit().constData();)
 
@@ -909,9 +909,9 @@ bool CGeometry::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("OptionalPoints") && jsonObject["OptionalPoints"].isArray()){
 		const QJsonArray optionalPointsJsonArray = jsonObject["OptionalPoints"].toArray();
 		const qsizetype optionalPointsArrayCount = optionalPointsJsonArray.size();
-		OptionalPoints = imtsdl::TElementList<CPoint::V1_0>();
+		OptionalPoints = imtsdl::TElementList<CPoint>();
 		for (qsizetype optionalPointsIndex = 0; optionalPointsIndex < optionalPointsArrayCount; ++optionalPointsIndex){
-			CPoint::V1_0 tempOptionalPoints;
+			CPoint tempOptionalPoints;
 			if (!tempOptionalPoints.ReadFromJsonObject(optionalPointsJsonArray[optionalPointsIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "OptionalPoints").toLocal8Bit().constData();)
 
@@ -952,9 +952,9 @@ bool CGeometry::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("Points") && jsonObject["Points"].isArray()){
 		const QJsonArray pointsJsonArray = jsonObject["Points"].toArray();
 		const qsizetype pointsArrayCount = pointsJsonArray.size();
-		Points = imtsdl::TElementList<CPoint::V1_0>();
+		Points = imtsdl::TElementList<CPoint>();
 		for (qsizetype pointsIndex = 0; pointsIndex < pointsArrayCount; ++pointsIndex){
-			CPoint::V1_0 tempPoints;
+			CPoint tempPoints;
 			if (!tempPoints.OptReadFromJsonObject(pointsJsonArray[pointsIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Points").toLocal8Bit().constData();)
 
@@ -972,9 +972,9 @@ bool CGeometry::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 			return false;
 		}
-		RequiredPoints = imtsdl::TElementList<CPoint::V1_0>();
+		RequiredPoints = imtsdl::TElementList<CPoint>();
 		for (qsizetype requiredPointsIndex = 0; requiredPointsIndex < requiredPointsArrayCount; ++requiredPointsIndex){
-			CPoint::V1_0 tempRequiredPoints;
+			CPoint tempRequiredPoints;
 			if (!tempRequiredPoints.OptReadFromJsonObject(requiredPointsJsonArray[requiredPointsIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "RequiredPoints").toLocal8Bit().constData();)
 
@@ -987,9 +987,9 @@ bool CGeometry::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("OptionalPoints") && jsonObject["OptionalPoints"].isArray()){
 		const QJsonArray optionalPointsJsonArray = jsonObject["OptionalPoints"].toArray();
 		const qsizetype optionalPointsArrayCount = optionalPointsJsonArray.size();
-		OptionalPoints = imtsdl::TElementList<CPoint::V1_0>();
+		OptionalPoints = imtsdl::TElementList<CPoint>();
 		for (qsizetype optionalPointsIndex = 0; optionalPointsIndex < optionalPointsArrayCount; ++optionalPointsIndex){
-			CPoint::V1_0 tempOptionalPoints;
+			CPoint tempOptionalPoints;
 			if (!tempOptionalPoints.OptReadFromJsonObject(optionalPointsJsonArray[optionalPointsIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "OptionalPoints").toLocal8Bit().constData();)
 

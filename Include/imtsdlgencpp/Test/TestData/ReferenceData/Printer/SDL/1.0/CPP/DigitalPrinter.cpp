@@ -60,7 +60,7 @@ bool CDigitalPrinterSpecification::ReadFromModel(const ::imtbase::CTreeItemModel
 {
 	::imtbase::CTreeItemModel* baseDataModelPtr = model.GetTreeItemModel("base", modelIndex);
 	if (baseDataModelPtr != nullptr){
-		base = PrinterBase::CPrinterSpecificationBase::V1_0();
+		base = CPrinterSpecificationBase();
 		const bool isBaseRead = base->ReadFromModel(*baseDataModelPtr, modelIndex);
 		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
@@ -93,7 +93,7 @@ bool CDigitalPrinterSpecification::OptReadFromModel(const ::imtbase::CTreeItemMo
 {
 	::imtbase::CTreeItemModel* baseDataModelPtr = model.GetTreeItemModel("base", modelIndex);
 	if (baseDataModelPtr != nullptr){
-		base = PrinterBase::CPrinterSpecificationBase::V1_0();
+		base = CPrinterSpecificationBase();
 		const bool isBaseRead = base->ReadFromModel(*baseDataModelPtr, modelIndex);
 		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
@@ -160,7 +160,7 @@ bool CDigitalPrinterSpecification::WriteToGraphQlObject(::imtgql::CGqlParamObjec
 bool CDigitalPrinterSpecification::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("base") && (gqlObject.GetParamArgumentObjectPtr("base") != nullptr)){
-		base = PrinterBase::CPrinterSpecificationBase::V1_0();
+		base = CPrinterSpecificationBase();
 		const bool isBaseRead = base->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("base"));
 		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
@@ -191,7 +191,7 @@ bool CDigitalPrinterSpecification::ReadFromGraphQlObject(const ::imtgql::CGqlPar
 bool CDigitalPrinterSpecification::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("base") && (gqlObject.GetParamArgumentObjectPtr("base") != nullptr)){
-		base = PrinterBase::CPrinterSpecificationBase::V1_0();
+		base = CPrinterSpecificationBase();
 		const bool isBaseRead = base->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("base"));
 		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
@@ -257,7 +257,7 @@ bool CDigitalPrinterSpecification::WriteToJsonObject(QJsonObject& jsonObject) co
 bool CDigitalPrinterSpecification::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("base") && jsonObject["base"].isObject()){
-		base = PrinterBase::CPrinterSpecificationBase::V1_0();
+		base = CPrinterSpecificationBase();
 		const bool isBaseRead = base->ReadFromJsonObject(jsonObject["base"].toObject());
 		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
@@ -288,7 +288,7 @@ bool CDigitalPrinterSpecification::ReadFromJsonObject(const QJsonObject& jsonObj
 bool CDigitalPrinterSpecification::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("base") && jsonObject["base"].isObject()){
-		base = PrinterBase::CPrinterSpecificationBase::V1_0();
+		base = CPrinterSpecificationBase();
 		const bool isBaseRead = base->OptReadFromJsonObject(jsonObject["base"].toObject());
 		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
@@ -372,7 +372,7 @@ bool CDigitalPrinter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 {
 	::imtbase::CTreeItemModel* baseDataModelPtr = model.GetTreeItemModel("base", modelIndex);
 	if (baseDataModelPtr != nullptr){
-		base = PrinterBase::CPrinterBase::V1_0();
+		base = CPrinterBase();
 		const bool isBaseRead = base->ReadFromModel(*baseDataModelPtr, modelIndex);
 		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
@@ -405,7 +405,7 @@ bool CDigitalPrinter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 {
 	::imtbase::CTreeItemModel* baseDataModelPtr = model.GetTreeItemModel("base", modelIndex);
 	if (baseDataModelPtr != nullptr){
-		base = PrinterBase::CPrinterBase::V1_0();
+		base = CPrinterBase();
 		const bool isBaseRead = base->ReadFromModel(*baseDataModelPtr, modelIndex);
 		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
@@ -472,7 +472,7 @@ bool CDigitalPrinter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 bool CDigitalPrinter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("base") && (gqlObject.GetParamArgumentObjectPtr("base") != nullptr)){
-		base = PrinterBase::CPrinterBase::V1_0();
+		base = CPrinterBase();
 		const bool isBaseRead = base->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("base"));
 		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
@@ -503,7 +503,7 @@ bool CDigitalPrinter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 bool CDigitalPrinter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("base") && (gqlObject.GetParamArgumentObjectPtr("base") != nullptr)){
-		base = PrinterBase::CPrinterBase::V1_0();
+		base = CPrinterBase();
 		const bool isBaseRead = base->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("base"));
 		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
@@ -569,7 +569,7 @@ bool CDigitalPrinter::WriteToJsonObject(QJsonObject& jsonObject) const
 bool CDigitalPrinter::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("base") && jsonObject["base"].isObject()){
-		base = PrinterBase::CPrinterBase::V1_0();
+		base = CPrinterBase();
 		const bool isBaseRead = base->ReadFromJsonObject(jsonObject["base"].toObject());
 		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
@@ -600,7 +600,7 @@ bool CDigitalPrinter::ReadFromJsonObject(const QJsonObject& jsonObject)
 bool CDigitalPrinter::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("base") && jsonObject["base"].isObject()){
-		base = PrinterBase::CPrinterBase::V1_0();
+		base = CPrinterBase();
 		const bool isBaseRead = base->OptReadFromJsonObject(jsonObject["base"].toObject());
 		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)

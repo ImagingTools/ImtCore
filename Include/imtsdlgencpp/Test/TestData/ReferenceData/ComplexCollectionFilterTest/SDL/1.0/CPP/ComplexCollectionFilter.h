@@ -138,7 +138,7 @@ public:
 		static const inline QString UnitMultiplier = "unitMultiplier";
 	};
 
-	istd::TSharedNullable<ImtBaseTypes::CTimeRange::V1_0> timeRange;
+	istd::TSharedNullable<CTimeRange> timeRange;
 	istd::TSharedNullable<QString> timeUnit;
 	istd::TSharedNullable<QString> interpretationMode;
 	istd::TSharedNullable<int> unitMultiplier;
@@ -232,8 +232,8 @@ public:
 		static const inline QString LogicalOperation = "logicalOperation";
 	};
 
-	istd::TSharedNullable<imtsdl::TElementList<CFieldFilter::V1_0>> fieldFilters;
-	istd::TSharedNullable<imtsdl::TElementList<CGroupFilter::V1_0>> groupFilters;
+	istd::TSharedNullable<imtsdl::TElementList<CFieldFilter>> fieldFilters;
+	istd::TSharedNullable<imtsdl::TElementList<CGroupFilter>> groupFilters;
 	istd::TSharedNullable<LogicalOperation> logicalOperation;
 
 	static QByteArray GetVersionId();
@@ -264,9 +264,9 @@ public:
 		static const inline QString DistinctFields = "distinctFields";
 	};
 
-	istd::TSharedNullable<imtsdl::TElementList<CFieldSortingInfo::V1_0>> sortingInfo;
-	istd::TSharedNullable<CGroupFilter::V1_0> fieldsFilter;
-	istd::TSharedNullable<CTimeFilter::V1_0> timeFilter;
+	istd::TSharedNullable<imtsdl::TElementList<CFieldSortingInfo>> sortingInfo;
+	istd::TSharedNullable<CGroupFilter> fieldsFilter;
+	istd::TSharedNullable<CTimeFilter> timeFilter;
 	istd::TSharedNullable<imtsdl::TElementList<QByteArray>> distinctFields;
 
 	static QByteArray GetVersionId();
@@ -716,7 +716,7 @@ signals:
 }
 #endif
 
-} // namespace sdl::imtbase::ComplexCollectionFilter
+} // namespace sdl::V1_0::imtbase
 
 
 Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CTimeFilter);

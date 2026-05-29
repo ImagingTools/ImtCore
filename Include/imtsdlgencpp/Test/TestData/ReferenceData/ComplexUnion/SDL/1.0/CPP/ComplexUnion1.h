@@ -451,9 +451,9 @@ public:
 
 	istd::TSharedNullable<GeometryType> GeometryType;
 	istd::TSharedNullable<double> Radius;
-	istd::TSharedNullable<imtsdl::TElementList<CPoint::V1_0>> Points;
-	istd::TSharedNullable<imtsdl::TElementList<CPoint::V1_0>> RequiredPoints;
-	istd::TSharedNullable<imtsdl::TElementList<CPoint::V1_0>> OptionalPoints;
+	istd::TSharedNullable<imtsdl::TElementList<CPoint>> Points;
+	istd::TSharedNullable<imtsdl::TElementList<CPoint>> RequiredPoints;
+	istd::TSharedNullable<imtsdl::TElementList<CPoint>> OptionalPoints;
 
 	static QByteArray GetVersionId();
 
@@ -680,7 +680,7 @@ signals:
 }
 #endif
 
-} // namespace sdl::complextest::ComplexUnion1
+} // namespace sdl::V1_0::complextest
 
 
 Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CPoint);

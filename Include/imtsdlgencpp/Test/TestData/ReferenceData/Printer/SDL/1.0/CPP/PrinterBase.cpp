@@ -935,9 +935,9 @@ bool CPrinterList::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mod
 	::imtbase::CTreeItemModel* dataModel = model.GetTreeItemModel("data", modelIndex);
 	if (dataModel != nullptr){
 		int dataCount = dataModel->GetItemsCount();
-		imtsdl::TElementList<CPrinterBase::V1_0> dataList;
+		imtsdl::TElementList<CPrinterBase> dataList;
 		for (int dataIndex = 0; dataIndex < dataCount; ++dataIndex){
-			CPrinterBase::V1_0 t_data;
+			CPrinterBase t_data;
 			if (!t_data.ReadFromModel(*dataModel, dataIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
 
@@ -958,9 +958,9 @@ bool CPrinterList::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 	::imtbase::CTreeItemModel* dataModel = model.GetTreeItemModel("data", modelIndex);
 	if (dataModel != nullptr){
 		int dataCount = dataModel->GetItemsCount();
-		imtsdl::TElementList<CPrinterBase::V1_0> dataList;
+		imtsdl::TElementList<CPrinterBase> dataList;
 		for (int dataIndex = 0; dataIndex < dataCount; ++dataIndex){
-			CPrinterBase::V1_0 t_data;
+			CPrinterBase t_data;
 			if (!t_data.OptReadFromModel(*dataModel, dataIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
 
@@ -1005,14 +1005,14 @@ bool CPrinterList::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObj
 	}
 	if (gqlObject.ContainsParam("data") && (gqlObject.GetObjectsCount("data") > 0)){
 		const qsizetype dataElementsCount = gqlObject.GetObjectsCount("data");
-		data = imtsdl::TElementList<CPrinterBase::V1_0>();
+		data = imtsdl::TElementList<CPrinterBase>();
 		for (qsizetype dataIndex = 0; dataIndex < dataElementsCount; ++dataIndex){
 			const ::imtgql::CGqlParamObject* dataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("data", dataIndex);
 			if (dataDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << dataDataObjectPtr;
 				return false;
 			}
-			CPrinterBase::V1_0 tempData;
+			CPrinterBase tempData;
 			if (!tempData.ReadFromGraphQlObject(*dataDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
 
@@ -1033,14 +1033,14 @@ bool CPrinterList::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 	}
 	if (gqlObject.ContainsParam("data") && (gqlObject.GetObjectsCount("data") > 0)){
 		const qsizetype dataElementsCount = gqlObject.GetObjectsCount("data");
-		data = imtsdl::TElementList<CPrinterBase::V1_0>();
+		data = imtsdl::TElementList<CPrinterBase>();
 		for (qsizetype dataIndex = 0; dataIndex < dataElementsCount; ++dataIndex){
 			const ::imtgql::CGqlParamObject* dataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("data", dataIndex);
 			if (dataDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << dataDataObjectPtr;
 				return false;
 			}
-			CPrinterBase::V1_0 tempData;
+			CPrinterBase tempData;
 			if (!tempData.OptReadFromGraphQlObject(*dataDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
 
@@ -1081,9 +1081,9 @@ bool CPrinterList::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("data") && jsonObject["data"].isArray()){
 		const QJsonArray dataJsonArray = jsonObject["data"].toArray();
 		const qsizetype dataArrayCount = dataJsonArray.size();
-		data = imtsdl::TElementList<CPrinterBase::V1_0>();
+		data = imtsdl::TElementList<CPrinterBase>();
 		for (qsizetype dataIndex = 0; dataIndex < dataArrayCount; ++dataIndex){
-			CPrinterBase::V1_0 tempData;
+			CPrinterBase tempData;
 			if (!tempData.ReadFromJsonObject(dataJsonArray[dataIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
 
@@ -1102,9 +1102,9 @@ bool CPrinterList::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("data") && jsonObject["data"].isArray()){
 		const QJsonArray dataJsonArray = jsonObject["data"].toArray();
 		const qsizetype dataArrayCount = dataJsonArray.size();
-		data = imtsdl::TElementList<CPrinterBase::V1_0>();
+		data = imtsdl::TElementList<CPrinterBase>();
 		for (qsizetype dataIndex = 0; dataIndex < dataArrayCount; ++dataIndex){
-			CPrinterBase::V1_0 tempData;
+			CPrinterBase tempData;
 			if (!tempData.OptReadFromJsonObject(dataJsonArray[dataIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
 

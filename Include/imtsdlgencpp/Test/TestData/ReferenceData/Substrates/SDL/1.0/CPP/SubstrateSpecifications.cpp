@@ -520,7 +520,7 @@ bool CSubstrateSpecificationListInput::ReadFromModel(const ::imtbase::CTreeItemM
 {
 	::imtbase::CTreeItemModel* viewParamsDataModelPtr = model.GetTreeItemModel("viewParams", modelIndex);
 	if (viewParamsDataModelPtr != nullptr){
-		viewParams = CCollectionViewParamsTest::V1_0();
+		viewParams = CCollectionViewParamsTest();
 		const bool isViewParamsRead = viewParams->ReadFromModel(*viewParamsDataModelPtr, modelIndex);
 		if (!isViewParamsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
@@ -537,7 +537,7 @@ bool CSubstrateSpecificationListInput::OptReadFromModel(const ::imtbase::CTreeIt
 {
 	::imtbase::CTreeItemModel* viewParamsDataModelPtr = model.GetTreeItemModel("viewParams", modelIndex);
 	if (viewParamsDataModelPtr != nullptr){
-		viewParams = CCollectionViewParamsTest::V1_0();
+		viewParams = CCollectionViewParamsTest();
 		const bool isViewParamsRead = viewParams->ReadFromModel(*viewParamsDataModelPtr, modelIndex);
 		if (!isViewParamsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
@@ -572,7 +572,7 @@ bool CSubstrateSpecificationListInput::WriteToGraphQlObject(::imtgql::CGqlParamO
 bool CSubstrateSpecificationListInput::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("viewParams") && (gqlObject.GetParamArgumentObjectPtr("viewParams") != nullptr)){
-		viewParams = CCollectionViewParamsTest::V1_0();
+		viewParams = CCollectionViewParamsTest();
 		const bool isViewParamsRead = viewParams->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("viewParams"));
 		if (!isViewParamsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
@@ -588,7 +588,7 @@ bool CSubstrateSpecificationListInput::ReadFromGraphQlObject(const ::imtgql::CGq
 bool CSubstrateSpecificationListInput::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("viewParams") && (gqlObject.GetParamArgumentObjectPtr("viewParams") != nullptr)){
-		viewParams = CCollectionViewParamsTest::V1_0();
+		viewParams = CCollectionViewParamsTest();
 		const bool isViewParamsRead = viewParams->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("viewParams"));
 		if (!isViewParamsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
@@ -623,7 +623,7 @@ bool CSubstrateSpecificationListInput::WriteToJsonObject(QJsonObject& jsonObject
 bool CSubstrateSpecificationListInput::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("viewParams") && jsonObject["viewParams"].isObject()){
-		viewParams = CCollectionViewParamsTest::V1_0();
+		viewParams = CCollectionViewParamsTest();
 		const bool isViewParamsRead = viewParams->ReadFromJsonObject(jsonObject["viewParams"].toObject());
 		if (!isViewParamsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
@@ -639,7 +639,7 @@ bool CSubstrateSpecificationListInput::ReadFromJsonObject(const QJsonObject& jso
 bool CSubstrateSpecificationListInput::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("viewParams") && jsonObject["viewParams"].isObject()){
-		viewParams = CCollectionViewParamsTest::V1_0();
+		viewParams = CCollectionViewParamsTest();
 		const bool isViewParamsRead = viewParams->OptReadFromJsonObject(jsonObject["viewParams"].toObject());
 		if (!isViewParamsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
@@ -1134,9 +1134,9 @@ bool CSubstrateSpecificationListResponse::ReadFromModel(const ::imtbase::CTreeIt
 	::imtbase::CTreeItemModel* itemsModel = model.GetTreeItemModel("items", modelIndex);
 	if (itemsModel != nullptr){
 		int itemsCount = itemsModel->GetItemsCount();
-		imtsdl::TElementList<CSubstrateSpecificationListItem::V1_0> itemsList;
+		imtsdl::TElementList<CSubstrateSpecificationListItem> itemsList;
 		for (int itemsIndex = 0; itemsIndex < itemsCount; ++itemsIndex){
-			CSubstrateSpecificationListItem::V1_0 t_items;
+			CSubstrateSpecificationListItem t_items;
 			if (!t_items.ReadFromModel(*itemsModel, itemsIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
@@ -1157,9 +1157,9 @@ bool CSubstrateSpecificationListResponse::OptReadFromModel(const ::imtbase::CTre
 	::imtbase::CTreeItemModel* itemsModel = model.GetTreeItemModel("items", modelIndex);
 	if (itemsModel != nullptr){
 		int itemsCount = itemsModel->GetItemsCount();
-		imtsdl::TElementList<CSubstrateSpecificationListItem::V1_0> itemsList;
+		imtsdl::TElementList<CSubstrateSpecificationListItem> itemsList;
 		for (int itemsIndex = 0; itemsIndex < itemsCount; ++itemsIndex){
-			CSubstrateSpecificationListItem::V1_0 t_items;
+			CSubstrateSpecificationListItem t_items;
 			if (!t_items.OptReadFromModel(*itemsModel, itemsIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
@@ -1204,14 +1204,14 @@ bool CSubstrateSpecificationListResponse::ReadFromGraphQlObject(const ::imtgql::
 	}
 	if (gqlObject.ContainsParam("items") && (gqlObject.GetObjectsCount("items") > 0)){
 		const qsizetype itemsElementsCount = gqlObject.GetObjectsCount("items");
-		items = imtsdl::TElementList<CSubstrateSpecificationListItem::V1_0>();
+		items = imtsdl::TElementList<CSubstrateSpecificationListItem>();
 		for (qsizetype itemsIndex = 0; itemsIndex < itemsElementsCount; ++itemsIndex){
 			const ::imtgql::CGqlParamObject* itemsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("items", itemsIndex);
 			if (itemsDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << itemsDataObjectPtr;
 				return false;
 			}
-			CSubstrateSpecificationListItem::V1_0 tempItems;
+			CSubstrateSpecificationListItem tempItems;
 			if (!tempItems.ReadFromGraphQlObject(*itemsDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
@@ -1232,14 +1232,14 @@ bool CSubstrateSpecificationListResponse::OptReadFromGraphQlObject(const ::imtgq
 	}
 	if (gqlObject.ContainsParam("items") && (gqlObject.GetObjectsCount("items") > 0)){
 		const qsizetype itemsElementsCount = gqlObject.GetObjectsCount("items");
-		items = imtsdl::TElementList<CSubstrateSpecificationListItem::V1_0>();
+		items = imtsdl::TElementList<CSubstrateSpecificationListItem>();
 		for (qsizetype itemsIndex = 0; itemsIndex < itemsElementsCount; ++itemsIndex){
 			const ::imtgql::CGqlParamObject* itemsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("items", itemsIndex);
 			if (itemsDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << itemsDataObjectPtr;
 				return false;
 			}
-			CSubstrateSpecificationListItem::V1_0 tempItems;
+			CSubstrateSpecificationListItem tempItems;
 			if (!tempItems.OptReadFromGraphQlObject(*itemsDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
@@ -1280,9 +1280,9 @@ bool CSubstrateSpecificationListResponse::ReadFromJsonObject(const QJsonObject& 
 	if (jsonObject.contains("items") && jsonObject["items"].isArray()){
 		const QJsonArray itemsJsonArray = jsonObject["items"].toArray();
 		const qsizetype itemsArrayCount = itemsJsonArray.size();
-		items = imtsdl::TElementList<CSubstrateSpecificationListItem::V1_0>();
+		items = imtsdl::TElementList<CSubstrateSpecificationListItem>();
 		for (qsizetype itemsIndex = 0; itemsIndex < itemsArrayCount; ++itemsIndex){
-			CSubstrateSpecificationListItem::V1_0 tempItems;
+			CSubstrateSpecificationListItem tempItems;
 			if (!tempItems.ReadFromJsonObject(itemsJsonArray[itemsIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
@@ -1301,9 +1301,9 @@ bool CSubstrateSpecificationListResponse::OptReadFromJsonObject(const QJsonObjec
 	if (jsonObject.contains("items") && jsonObject["items"].isArray()){
 		const QJsonArray itemsJsonArray = jsonObject["items"].toArray();
 		const qsizetype itemsArrayCount = itemsJsonArray.size();
-		items = imtsdl::TElementList<CSubstrateSpecificationListItem::V1_0>();
+		items = imtsdl::TElementList<CSubstrateSpecificationListItem>();
 		for (qsizetype itemsIndex = 0; itemsIndex < itemsArrayCount; ++itemsIndex){
-			CSubstrateSpecificationListItem::V1_0 tempItems;
+			CSubstrateSpecificationListItem tempItems;
 			if (!tempItems.OptReadFromJsonObject(itemsJsonArray[itemsIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
@@ -6297,7 +6297,7 @@ I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create object iterator.
 	}
 
 	//GetSubstrateSpecificationList
-	CSubstrateSpecificationListItem::V1_0 representationObject;
+	CSubstrateSpecificationListItem representationObject;
 	const bool isRepresentationCreated = CreateRepresentationFromObject(*objectCollectionIterator, *typedSetupContext, representationObject, errorMessage);
 	if (!isRepresentationCreated){
 	I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create representation").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
@@ -6332,7 +6332,7 @@ I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create object iterator.
 			return nullptr;
 		}
 
-		imtbase::ImtBaseTypes::COptionsList replyPayload = OnGetOptionsList(getOptionsListGqlRequest, errorMessage);
+		sdl::V1_0::imtbase::COptionsList replyPayload = OnGetOptionsList(getOptionsListGqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
 			SendErrorMessage(0, QString("The derived call [OnGetOptionsList] returned an error: %1").arg(errorMessage));
 
@@ -6465,7 +6465,7 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 			return nullptr;
 		}
 
-		imtbase::ImtBaseTypes::COptionsList replyPayload = OnGetOptionsList(getOptionsListGqlRequest, gqlRequest, errorMessage);
+		sdl::V1_0::imtbase::COptionsList replyPayload = OnGetOptionsList(getOptionsListGqlRequest, gqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
 			SendErrorMessage(0, QString("The derived call [OnGetOptionsList] returned an error: %1").arg(errorMessage));
 

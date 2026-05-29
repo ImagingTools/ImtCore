@@ -999,7 +999,7 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 		stream << QStringLiteral("const ") << GetUnionListElementType(forScalar);
 	}
 	else{
-		stream << OptListConvertTypeWithNamespace(field, QString(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr);
+		stream << OptListConvertTypeWithNamespaceStruct(field, QString(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr);
 	}
 	if(result.customListAccessCode.isEmpty()){
 		stream << QStringLiteral(" temp") << GetCapitalizedValue(field.GetId());
@@ -1030,7 +1030,7 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 		Q_ASSERT(found);
 
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr);
+		stream << OptListConvertTypeWithNamespaceStruct(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr);
 		stream << ' ' << dataVarName << ';';
 		FeedStream(stream, 1, false);
 
@@ -1052,7 +1052,7 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 		Q_ASSERT(found);
 
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << OptListConvertTypeWithNamespace(field,
+		stream << OptListConvertTypeWithNamespaceStruct(field,
 			m_originalSchemaNamespaceCompPtr->GetText(),
 			*m_sdlTypeListCompPtr,
 			*m_sdlEnumListCompPtr,

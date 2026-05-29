@@ -385,7 +385,7 @@ public:
 
 	istd::TSharedNullable<int> totalCount;
 	istd::TSharedNullable<int> offset;
-	istd::TSharedNullable<imtsdl::TElementList<COption::V1_0>> options;
+	istd::TSharedNullable<imtsdl::TElementList<COption>> options;
 
 	static QByteArray GetVersionId();
 
@@ -414,7 +414,7 @@ public:
 	};
 
 	istd::TSharedNullable<int> selectedIndex;
-	istd::TSharedNullable<COptionsList::V1_0> constraints;
+	istd::TSharedNullable<COptionsList> constraints;
 
 	static QByteArray GetVersionId();
 
@@ -471,7 +471,7 @@ public:
 		static const inline QString FolderPath = "folderPath";
 	};
 
-	istd::TSharedNullable<CSchedulerParam::V1_0> schedulerParam;
+	istd::TSharedNullable<CSchedulerParam> schedulerParam;
 	istd::TSharedNullable<QString> folderPath;
 
 	static QByteArray GetVersionId();
@@ -2066,7 +2066,7 @@ signals:
 }
 #endif
 
-} // namespace sdl::imtbase::ImtBaseTypes
+} // namespace sdl::V1_0::imtbase
 
 
 Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CTimeRange);

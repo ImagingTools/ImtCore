@@ -137,7 +137,7 @@ public:
 		static const inline QString Data = "data";
 	};
 
-	istd::TSharedNullable<imtsdl::TElementList<CPrinterBase::V1_0>> data;
+	istd::TSharedNullable<imtsdl::TElementList<CPrinterBase>> data;
 
 	static QByteArray GetVersionId();
 
@@ -633,7 +633,7 @@ private:
 }
 #endif
 
-} // namespace sdl::modsdl::PrinterBase
+} // namespace sdl::V1_0::modsdl
 
 
 Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CPrinterSpecificationBase);

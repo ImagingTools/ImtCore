@@ -557,7 +557,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 						}
 					}
 					else{
-						stream << QStringLiteral("if (itemPtr != nullptr) itemPtr->") << field.GetId() << QStringLiteral(" = ") << field.GetId() << ';';
+						stream << QStringLiteral("if (itemPtr != nullptr) itemPtr->Version_1_0 = ") << field.GetId() << ';';
 					}
 					FeedStream(stream, 1, false);
 				}
@@ -730,7 +730,12 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 				FeedStream(stream, 1, false);
 
 				FeedStreamHorizontally(stream, 2);
-				stream << QStringLiteral("if (itemPtr != nullptr) ") << field.GetId() << QStringLiteral(" = static_cast<const C") << sdlEntryField->GetName() << QStringLiteral("&>(*itemPtr);");
+				if (isArray){
+					stream << QStringLiteral("if (itemPtr != nullptr) ") << field.GetId() << QStringLiteral(" = itemPtr->Version_1_0;");
+				}
+				else{
+					stream << QStringLiteral("if (itemPtr != nullptr) ") << field.GetId() << QStringLiteral(" = static_cast<const C") << sdlEntryField->GetName() << QStringLiteral("&>(*itemPtr);");
+				}
 				FeedStream(stream, 1, false);
 			}
 

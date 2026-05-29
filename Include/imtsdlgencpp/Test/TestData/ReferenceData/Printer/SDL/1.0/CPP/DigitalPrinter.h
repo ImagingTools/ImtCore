@@ -68,7 +68,7 @@ public:
 		static const inline QString PrintingTechnology = "printingTechnology";
 	};
 
-	istd::TSharedNullable<PrinterBase::CPrinterSpecificationBase::V1_0> base;
+	istd::TSharedNullable<CPrinterSpecificationBase> base;
 	istd::TSharedNullable<PrintingTechnology> printingTechnology;
 
 	static QByteArray GetVersionId();
@@ -97,7 +97,7 @@ public:
 		static const inline QString PrintingTechnology = "printingTechnology";
 	};
 
-	istd::TSharedNullable<PrinterBase::CPrinterBase::V1_0> base;
+	istd::TSharedNullable<CPrinterBase> base;
 	istd::TSharedNullable<PrintingTechnology> printingTechnology;
 
 	static QByteArray GetVersionId();
@@ -276,7 +276,7 @@ signals:
 }
 #endif
 
-} // namespace sdl::modsdl::DigitalPrinter
+} // namespace sdl::V1_0::modsdl
 
 
 Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CDigitalPrinterSpecification);

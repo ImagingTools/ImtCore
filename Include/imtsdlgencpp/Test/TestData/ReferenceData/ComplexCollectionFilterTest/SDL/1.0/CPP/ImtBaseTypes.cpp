@@ -2259,9 +2259,9 @@ bool COptionsList::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mod
 	::imtbase::CTreeItemModel* optionsModel = model.GetTreeItemModel("options", modelIndex);
 	if (optionsModel != nullptr){
 		int optionsCount = optionsModel->GetItemsCount();
-		imtsdl::TElementList<COption::V1_0> optionsList;
+		imtsdl::TElementList<COption> optionsList;
 		for (int optionsIndex = 0; optionsIndex < optionsCount; ++optionsIndex){
-			COption::V1_0 t_options;
+			COption t_options;
 			if (!t_options.ReadFromModel(*optionsModel, optionsIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
 
@@ -2292,9 +2292,9 @@ bool COptionsList::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 	::imtbase::CTreeItemModel* optionsModel = model.GetTreeItemModel("options", modelIndex);
 	if (optionsModel != nullptr){
 		int optionsCount = optionsModel->GetItemsCount();
-		imtsdl::TElementList<COption::V1_0> optionsList;
+		imtsdl::TElementList<COption> optionsList;
 		for (int optionsIndex = 0; optionsIndex < optionsCount; ++optionsIndex){
-			COption::V1_0 t_options;
+			COption t_options;
 			if (!t_options.OptReadFromModel(*optionsModel, optionsIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
 
@@ -2355,14 +2355,14 @@ bool COptionsList::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObj
 	}
 	if (gqlObject.ContainsParam("options") && (gqlObject.GetObjectsCount("options") > 0)){
 		const qsizetype optionsElementsCount = gqlObject.GetObjectsCount("options");
-		options = imtsdl::TElementList<COption::V1_0>();
+		options = imtsdl::TElementList<COption>();
 		for (qsizetype optionsIndex = 0; optionsIndex < optionsElementsCount; ++optionsIndex){
 			const ::imtgql::CGqlParamObject* optionsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("options", optionsIndex);
 			if (optionsDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << optionsDataObjectPtr;
 				return false;
 			}
-			COption::V1_0 tempOptions;
+			COption tempOptions;
 			if (!tempOptions.ReadFromGraphQlObject(*optionsDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
 
@@ -2391,14 +2391,14 @@ bool COptionsList::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 	}
 	if (gqlObject.ContainsParam("options") && (gqlObject.GetObjectsCount("options") > 0)){
 		const qsizetype optionsElementsCount = gqlObject.GetObjectsCount("options");
-		options = imtsdl::TElementList<COption::V1_0>();
+		options = imtsdl::TElementList<COption>();
 		for (qsizetype optionsIndex = 0; optionsIndex < optionsElementsCount; ++optionsIndex){
 			const ::imtgql::CGqlParamObject* optionsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("options", optionsIndex);
 			if (optionsDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << optionsDataObjectPtr;
 				return false;
 			}
-			COption::V1_0 tempOptions;
+			COption tempOptions;
 			if (!tempOptions.OptReadFromGraphQlObject(*optionsDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
 
@@ -2455,9 +2455,9 @@ bool COptionsList::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("options") && jsonObject["options"].isArray()){
 		const QJsonArray optionsJsonArray = jsonObject["options"].toArray();
 		const qsizetype optionsArrayCount = optionsJsonArray.size();
-		options = imtsdl::TElementList<COption::V1_0>();
+		options = imtsdl::TElementList<COption>();
 		for (qsizetype optionsIndex = 0; optionsIndex < optionsArrayCount; ++optionsIndex){
-			COption::V1_0 tempOptions;
+			COption tempOptions;
 			if (!tempOptions.ReadFromJsonObject(optionsJsonArray[optionsIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
 
@@ -2484,9 +2484,9 @@ bool COptionsList::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("options") && jsonObject["options"].isArray()){
 		const QJsonArray optionsJsonArray = jsonObject["options"].toArray();
 		const qsizetype optionsArrayCount = optionsJsonArray.size();
-		options = imtsdl::TElementList<COption::V1_0>();
+		options = imtsdl::TElementList<COption>();
 		for (qsizetype optionsIndex = 0; optionsIndex < optionsArrayCount; ++optionsIndex){
-			COption::V1_0 tempOptions;
+			COption tempOptions;
 			if (!tempOptions.OptReadFromJsonObject(optionsJsonArray[optionsIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
 
@@ -2549,7 +2549,7 @@ bool CSelectionParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 
 	::imtbase::CTreeItemModel* constraintsDataModelPtr = model.GetTreeItemModel("constraints", modelIndex);
 	if (constraintsDataModelPtr != nullptr){
-		constraints = COptionsList::V1_0();
+		constraints = COptionsList();
 		const bool isConstraintsRead = constraints->ReadFromModel(*constraintsDataModelPtr, modelIndex);
 		if (!isConstraintsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "constraints").toLocal8Bit().constData();)
@@ -2571,7 +2571,7 @@ bool CSelectionParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 
 	::imtbase::CTreeItemModel* constraintsDataModelPtr = model.GetTreeItemModel("constraints", modelIndex);
 	if (constraintsDataModelPtr != nullptr){
-		constraints = COptionsList::V1_0();
+		constraints = COptionsList();
 		const bool isConstraintsRead = constraints->ReadFromModel(*constraintsDataModelPtr, modelIndex);
 		if (!isConstraintsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "constraints").toLocal8Bit().constData();)
@@ -2614,7 +2614,7 @@ bool CSelectionParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 	}
 
 	if (gqlObject.ContainsParam("constraints") && (gqlObject.GetParamArgumentObjectPtr("constraints") != nullptr)){
-		constraints = COptionsList::V1_0();
+		constraints = COptionsList();
 		const bool isConstraintsRead = constraints->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("constraints"));
 		if (!isConstraintsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints").toLocal8Bit().constData();)
@@ -2634,7 +2634,7 @@ bool CSelectionParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 	}
 
 	if (gqlObject.ContainsParam("constraints") && (gqlObject.GetParamArgumentObjectPtr("constraints") != nullptr)){
-		constraints = COptionsList::V1_0();
+		constraints = COptionsList();
 		const bool isConstraintsRead = constraints->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("constraints"));
 		if (!isConstraintsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints").toLocal8Bit().constData();)
@@ -2677,7 +2677,7 @@ bool CSelectionParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("constraints") && jsonObject["constraints"].isObject()){
-		constraints = COptionsList::V1_0();
+		constraints = COptionsList();
 		const bool isConstraintsRead = constraints->ReadFromJsonObject(jsonObject["constraints"].toObject());
 		if (!isConstraintsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints").toLocal8Bit().constData();)
@@ -2697,7 +2697,7 @@ bool CSelectionParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("constraints") && jsonObject["constraints"].isObject()){
-		constraints = COptionsList::V1_0();
+		constraints = COptionsList();
 		const bool isConstraintsRead = constraints->OptReadFromJsonObject(jsonObject["constraints"].toObject());
 		if (!isConstraintsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints").toLocal8Bit().constData();)
@@ -2907,7 +2907,7 @@ bool CBackupSettings::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 {
 	::imtbase::CTreeItemModel* schedulerParamDataModelPtr = model.GetTreeItemModel("schedulerParam", modelIndex);
 	if (schedulerParamDataModelPtr != nullptr){
-		schedulerParam = CSchedulerParam::V1_0();
+		schedulerParam = CSchedulerParam();
 		const bool isSchedulerParamRead = schedulerParam->ReadFromModel(*schedulerParamDataModelPtr, modelIndex);
 		if (!isSchedulerParamRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam").toLocal8Bit().constData();)
@@ -2929,7 +2929,7 @@ bool CBackupSettings::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 {
 	::imtbase::CTreeItemModel* schedulerParamDataModelPtr = model.GetTreeItemModel("schedulerParam", modelIndex);
 	if (schedulerParamDataModelPtr != nullptr){
-		schedulerParam = CSchedulerParam::V1_0();
+		schedulerParam = CSchedulerParam();
 		const bool isSchedulerParamRead = schedulerParam->ReadFromModel(*schedulerParamDataModelPtr, modelIndex);
 		if (!isSchedulerParamRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam").toLocal8Bit().constData();)
@@ -2973,7 +2973,7 @@ bool CBackupSettings::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 bool CBackupSettings::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("schedulerParam") && (gqlObject.GetParamArgumentObjectPtr("schedulerParam") != nullptr)){
-		schedulerParam = CSchedulerParam::V1_0();
+		schedulerParam = CSchedulerParam();
 		const bool isSchedulerParamRead = schedulerParam->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("schedulerParam"));
 		if (!isSchedulerParamRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam").toLocal8Bit().constData();)
@@ -2993,7 +2993,7 @@ bool CBackupSettings::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 bool CBackupSettings::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("schedulerParam") && (gqlObject.GetParamArgumentObjectPtr("schedulerParam") != nullptr)){
-		schedulerParam = CSchedulerParam::V1_0();
+		schedulerParam = CSchedulerParam();
 		const bool isSchedulerParamRead = schedulerParam->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("schedulerParam"));
 		if (!isSchedulerParamRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam").toLocal8Bit().constData();)
@@ -3036,7 +3036,7 @@ bool CBackupSettings::WriteToJsonObject(QJsonObject& jsonObject) const
 bool CBackupSettings::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("schedulerParam") && jsonObject["schedulerParam"].isObject()){
-		schedulerParam = CSchedulerParam::V1_0();
+		schedulerParam = CSchedulerParam();
 		const bool isSchedulerParamRead = schedulerParam->ReadFromJsonObject(jsonObject["schedulerParam"].toObject());
 		if (!isSchedulerParamRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam").toLocal8Bit().constData();)
@@ -3056,7 +3056,7 @@ bool CBackupSettings::ReadFromJsonObject(const QJsonObject& jsonObject)
 bool CBackupSettings::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("schedulerParam") && jsonObject["schedulerParam"].isObject()){
-		schedulerParam = CSchedulerParam::V1_0();
+		schedulerParam = CSchedulerParam();
 		const bool isSchedulerParamRead = schedulerParam->OptReadFromJsonObject(jsonObject["schedulerParam"].toObject());
 		if (!isSchedulerParamRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam").toLocal8Bit().constData();)
@@ -7230,7 +7230,7 @@ void COptionsListObject::SetOptions(const QVariant& v)
 
 	if (v.isValid()){
 		sdl::V1_0::imtbase::COptionObjectList* itemPtr = v.value<sdl::V1_0::imtbase::COptionObjectList*>();
-		if (itemPtr != nullptr)  options = static_cast<const decltype(options)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr)  options = itemPtr->Version_1_0;
 	}
 	else {
 		options = nullptr;
@@ -7489,7 +7489,7 @@ void CSelectionParamObject::SetConstraints(const QVariant& v)
 
 	if (v.isValid()){
 		sdl::V1_0::imtbase::COptionsListObject* itemPtr = v.value<sdl::V1_0::imtbase::COptionsListObject*>();
-		if (itemPtr != nullptr)  constraints = static_cast<const decltype(constraints)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr)  constraints = itemPtr->Version_1_0;
 	}
 	else {
 		constraints = nullptr;
@@ -7928,7 +7928,7 @@ void CBackupSettingsObject::SetSchedulerParam(const QVariant& v)
 
 	if (v.isValid()){
 		sdl::V1_0::imtbase::CSchedulerParamObject* itemPtr = v.value<sdl::V1_0::imtbase::CSchedulerParamObject*>();
-		if (itemPtr != nullptr)  schedulerParam = static_cast<const decltype(schedulerParam)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr)  schedulerParam = itemPtr->Version_1_0;
 	}
 	else {
 		schedulerParam = nullptr;

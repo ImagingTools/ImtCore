@@ -710,7 +710,7 @@ bool CResult::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelInd
 
 		return false;
 	}
-	Geometry = ComplexUnion1::CGeometry::V1_0();
+	Geometry = CGeometry();
 	const bool isGeometryRead = Geometry->ReadFromModel(*geometryDataModelPtr, modelIndex);
 	if (!isGeometryRead){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Geometry").toLocal8Bit().constData();)
@@ -1015,7 +1015,7 @@ bool CResult::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int model
 
 	::imtbase::CTreeItemModel* geometryDataModelPtr = model.GetTreeItemModel("Geometry", modelIndex);
 	if (geometryDataModelPtr != nullptr){
-		Geometry = ComplexUnion1::CGeometry::V1_0();
+		Geometry = CGeometry();
 		const bool isGeometryRead = Geometry->ReadFromModel(*geometryDataModelPtr, modelIndex);
 		if (!isGeometryRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Geometry").toLocal8Bit().constData();)
@@ -1679,7 +1679,7 @@ bool CResult::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 
 		return false;
 	}
-	Geometry = ComplexUnion1::CGeometry::V1_0();
+	Geometry = CGeometry();
 	const bool isGeometryRead = Geometry->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("Geometry"));
 	if (!isGeometryRead){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "Geometry").toLocal8Bit().constData();)
@@ -1971,7 +1971,7 @@ bool CResult::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObjec
 	}
 
 	if (gqlObject.ContainsParam("Geometry") && (gqlObject.GetParamArgumentObjectPtr("Geometry") != nullptr)){
-		Geometry = ComplexUnion1::CGeometry::V1_0();
+		Geometry = CGeometry();
 		const bool isGeometryRead = Geometry->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("Geometry"));
 		if (!isGeometryRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "Geometry").toLocal8Bit().constData();)
@@ -2635,7 +2635,7 @@ bool CResult::ReadFromJsonObject(const QJsonObject& jsonObject)
 
 		return false;
 	}
-	Geometry = ComplexUnion1::CGeometry::V1_0();
+	Geometry = CGeometry();
 	const bool isGeometryRead = Geometry->ReadFromJsonObject(jsonObject["Geometry"].toObject());
 	if (!isGeometryRead){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "Geometry").toLocal8Bit().constData();)
@@ -2927,7 +2927,7 @@ bool CResult::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("Geometry") && jsonObject["Geometry"].isObject()){
-		Geometry = ComplexUnion1::CGeometry::V1_0();
+		Geometry = CGeometry();
 		const bool isGeometryRead = Geometry->OptReadFromJsonObject(jsonObject["Geometry"].toObject());
 		if (!isGeometryRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "Geometry").toLocal8Bit().constData();)
@@ -3239,7 +3239,7 @@ bool CArea::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex
 
 		return false;
 	}
-	IconPosition = ComplexUnion1::CPoint::V1_0();
+	IconPosition = CPoint();
 	const bool isIconPositionRead = IconPosition->ReadFromModel(*iconPositionDataModelPtr, modelIndex);
 	if (!isIconPositionRead){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "IconPosition").toLocal8Bit().constData();)
@@ -3418,9 +3418,9 @@ bool CArea::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex
 		return false;
 	}
 	int resultsCount = resultsModel->GetItemsCount();
-	imtsdl::TElementList<CResult::V1_0> resultsList;
+	imtsdl::TElementList<CResult> resultsList;
 	for (int resultsIndex = 0; resultsIndex < resultsCount; ++resultsIndex){
-		CResult::V1_0 t_results;
+		CResult t_results;
 		if (!t_results.ReadFromModel(*resultsModel, resultsIndex)){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Results").toLocal8Bit().constData();)
 
@@ -3469,7 +3469,7 @@ bool CArea::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIn
 
 	::imtbase::CTreeItemModel* iconPositionDataModelPtr = model.GetTreeItemModel("IconPosition", modelIndex);
 	if (iconPositionDataModelPtr != nullptr){
-		IconPosition = ComplexUnion1::CPoint::V1_0();
+		IconPosition = CPoint();
 		const bool isIconPositionRead = IconPosition->ReadFromModel(*iconPositionDataModelPtr, modelIndex);
 		if (!isIconPositionRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "IconPosition").toLocal8Bit().constData();)
@@ -3641,9 +3641,9 @@ bool CArea::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIn
 	::imtbase::CTreeItemModel* resultsModel = model.GetTreeItemModel("Results", modelIndex);
 	if (resultsModel != nullptr){
 		int resultsCount = resultsModel->GetItemsCount();
-		imtsdl::TElementList<CResult::V1_0> resultsList;
+		imtsdl::TElementList<CResult> resultsList;
 		for (int resultsIndex = 0; resultsIndex < resultsCount; ++resultsIndex){
-			CResult::V1_0 t_results;
+			CResult t_results;
 			if (!t_results.OptReadFromModel(*resultsModel, resultsIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Results").toLocal8Bit().constData();)
 
@@ -3935,7 +3935,7 @@ bool CArea::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 
 		return false;
 	}
-	IconPosition = ComplexUnion1::CPoint::V1_0();
+	IconPosition = CPoint();
 	const bool isIconPositionRead = IconPosition->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("IconPosition"));
 	if (!isIconPositionRead){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "IconPosition").toLocal8Bit().constData();)
@@ -4111,14 +4111,14 @@ bool CArea::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 		return false;
 	}
 	const qsizetype resultsElementsCount = gqlObject.GetObjectsCount("Results");
-	Results = imtsdl::TElementList<CResult::V1_0>();
+	Results = imtsdl::TElementList<CResult>();
 	for (qsizetype resultsIndex = 0; resultsIndex < resultsElementsCount; ++resultsIndex){
 		const ::imtgql::CGqlParamObject* resultsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Results", resultsIndex);
 		if (resultsDataObjectPtr == nullptr){
 			qDebug() << "invalid type" << resultsDataObjectPtr;
 			return false;
 		}
-		CResult::V1_0 tempResults;
+		CResult tempResults;
 		if (!tempResults.ReadFromGraphQlObject(*resultsDataObjectPtr)){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Results").toLocal8Bit().constData();)
 
@@ -4162,7 +4162,7 @@ bool CArea::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 	}
 
 	if (gqlObject.ContainsParam("IconPosition") && (gqlObject.GetParamArgumentObjectPtr("IconPosition") != nullptr)){
-		IconPosition = ComplexUnion1::CPoint::V1_0();
+		IconPosition = CPoint();
 		const bool isIconPositionRead = IconPosition->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("IconPosition"));
 		if (!isIconPositionRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "IconPosition").toLocal8Bit().constData();)
@@ -4335,14 +4335,14 @@ bool CArea::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 	}
 	if (gqlObject.ContainsParam("Results") && (gqlObject.GetObjectsCount("Results") > 0)){
 		const qsizetype resultsElementsCount = gqlObject.GetObjectsCount("Results");
-		Results = imtsdl::TElementList<CResult::V1_0>();
+		Results = imtsdl::TElementList<CResult>();
 		for (qsizetype resultsIndex = 0; resultsIndex < resultsElementsCount; ++resultsIndex){
 			const ::imtgql::CGqlParamObject* resultsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Results", resultsIndex);
 			if (resultsDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << resultsDataObjectPtr;
 				return false;
 			}
-			CResult::V1_0 tempResults;
+			CResult tempResults;
 			if (!tempResults.OptReadFromGraphQlObject(*resultsDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Results").toLocal8Bit().constData();)
 
@@ -4632,7 +4632,7 @@ bool CArea::ReadFromJsonObject(const QJsonObject& jsonObject)
 
 		return false;
 	}
-	IconPosition = ComplexUnion1::CPoint::V1_0();
+	IconPosition = CPoint();
 	const bool isIconPositionRead = IconPosition->ReadFromJsonObject(jsonObject["IconPosition"].toObject());
 	if (!isIconPositionRead){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "IconPosition").toLocal8Bit().constData();)
@@ -4809,9 +4809,9 @@ bool CArea::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 	const QJsonArray resultsJsonArray = jsonObject["Results"].toArray();
 	const qsizetype resultsArrayCount = resultsJsonArray.size();
-	Results = imtsdl::TElementList<CResult::V1_0>();
+	Results = imtsdl::TElementList<CResult>();
 	for (qsizetype resultsIndex = 0; resultsIndex < resultsArrayCount; ++resultsIndex){
-		CResult::V1_0 tempResults;
+		CResult tempResults;
 		if (!tempResults.ReadFromJsonObject(resultsJsonArray[resultsIndex].toObject())){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Results").toLocal8Bit().constData();)
 
@@ -4855,7 +4855,7 @@ bool CArea::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("IconPosition") && jsonObject["IconPosition"].isObject()){
-		IconPosition = ComplexUnion1::CPoint::V1_0();
+		IconPosition = CPoint();
 		const bool isIconPositionRead = IconPosition->OptReadFromJsonObject(jsonObject["IconPosition"].toObject());
 		if (!isIconPositionRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "IconPosition").toLocal8Bit().constData();)
@@ -5026,9 +5026,9 @@ bool CArea::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("Results") && jsonObject["Results"].isArray()){
 		const QJsonArray resultsJsonArray = jsonObject["Results"].toArray();
 		const qsizetype resultsArrayCount = resultsJsonArray.size();
-		Results = imtsdl::TElementList<CResult::V1_0>();
+		Results = imtsdl::TElementList<CResult>();
 		for (qsizetype resultsIndex = 0; resultsIndex < resultsArrayCount; ++resultsIndex){
-			CResult::V1_0 tempResults;
+			CResult tempResults;
 			if (!tempResults.OptReadFromJsonObject(resultsJsonArray[resultsIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Results").toLocal8Bit().constData();)
 
@@ -5156,9 +5156,9 @@ bool CAnalyzer::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelI
 	::imtbase::CTreeItemModel* areasModel = model.GetTreeItemModel("Areas", modelIndex);
 	if (areasModel != nullptr){
 		int areasCount = areasModel->GetItemsCount();
-		imtsdl::TElementList<CArea::V1_0> areasList;
+		imtsdl::TElementList<CArea> areasList;
 		for (int areasIndex = 0; areasIndex < areasCount; ++areasIndex){
-			CArea::V1_0 t_areas;
+			CArea t_areas;
 			if (!t_areas.ReadFromModel(*areasModel, areasIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Areas").toLocal8Bit().constData();)
 
@@ -5209,9 +5209,9 @@ bool CAnalyzer::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int mod
 	::imtbase::CTreeItemModel* areasModel = model.GetTreeItemModel("Areas", modelIndex);
 	if (areasModel != nullptr){
 		int areasCount = areasModel->GetItemsCount();
-		imtsdl::TElementList<CArea::V1_0> areasList;
+		imtsdl::TElementList<CArea> areasList;
 		for (int areasIndex = 0; areasIndex < areasCount; ++areasIndex){
-			CArea::V1_0 t_areas;
+			CArea t_areas;
 			if (!t_areas.OptReadFromModel(*areasModel, areasIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Areas").toLocal8Bit().constData();)
 
@@ -5325,14 +5325,14 @@ bool CAnalyzer::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject
 	}
 	if (gqlObject.ContainsParam("Areas") && (gqlObject.GetObjectsCount("Areas") > 0)){
 		const qsizetype areasElementsCount = gqlObject.GetObjectsCount("Areas");
-		Areas = imtsdl::TElementList<CArea::V1_0>();
+		Areas = imtsdl::TElementList<CArea>();
 		for (qsizetype areasIndex = 0; areasIndex < areasElementsCount; ++areasIndex){
 			const ::imtgql::CGqlParamObject* areasDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Areas", areasIndex);
 			if (areasDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << areasDataObjectPtr;
 				return false;
 			}
-			CArea::V1_0 tempAreas;
+			CArea tempAreas;
 			if (!tempAreas.ReadFromGraphQlObject(*areasDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Areas").toLocal8Bit().constData();)
 
@@ -5381,14 +5381,14 @@ bool CAnalyzer::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObj
 	}
 	if (gqlObject.ContainsParam("Areas") && (gqlObject.GetObjectsCount("Areas") > 0)){
 		const qsizetype areasElementsCount = gqlObject.GetObjectsCount("Areas");
-		Areas = imtsdl::TElementList<CArea::V1_0>();
+		Areas = imtsdl::TElementList<CArea>();
 		for (qsizetype areasIndex = 0; areasIndex < areasElementsCount; ++areasIndex){
 			const ::imtgql::CGqlParamObject* areasDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Areas", areasIndex);
 			if (areasDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << areasDataObjectPtr;
 				return false;
 			}
-			CArea::V1_0 tempAreas;
+			CArea tempAreas;
 			if (!tempAreas.OptReadFromGraphQlObject(*areasDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Areas").toLocal8Bit().constData();)
 
@@ -5498,9 +5498,9 @@ bool CAnalyzer::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("Areas") && jsonObject["Areas"].isArray()){
 		const QJsonArray areasJsonArray = jsonObject["Areas"].toArray();
 		const qsizetype areasArrayCount = areasJsonArray.size();
-		Areas = imtsdl::TElementList<CArea::V1_0>();
+		Areas = imtsdl::TElementList<CArea>();
 		for (qsizetype areasIndex = 0; areasIndex < areasArrayCount; ++areasIndex){
-			CArea::V1_0 tempAreas;
+			CArea tempAreas;
 			if (!tempAreas.ReadFromJsonObject(areasJsonArray[areasIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Areas").toLocal8Bit().constData();)
 
@@ -5547,9 +5547,9 @@ bool CAnalyzer::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("Areas") && jsonObject["Areas"].isArray()){
 		const QJsonArray areasJsonArray = jsonObject["Areas"].toArray();
 		const qsizetype areasArrayCount = areasJsonArray.size();
-		Areas = imtsdl::TElementList<CArea::V1_0>();
+		Areas = imtsdl::TElementList<CArea>();
 		for (qsizetype areasIndex = 0; areasIndex < areasArrayCount; ++areasIndex){
-			CArea::V1_0 tempAreas;
+			CArea tempAreas;
 			if (!tempAreas.OptReadFromJsonObject(areasJsonArray[areasIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Areas").toLocal8Bit().constData();)
 
@@ -5709,9 +5709,9 @@ bool CInspection::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mode
 	::imtbase::CTreeItemModel* analyzersModel = model.GetTreeItemModel("Analyzers", modelIndex);
 	if (analyzersModel != nullptr){
 		int analyzersCount = analyzersModel->GetItemsCount();
-		imtsdl::TElementList<CAnalyzer::V1_0> analyzersList;
+		imtsdl::TElementList<CAnalyzer> analyzersList;
 		for (int analyzersIndex = 0; analyzersIndex < analyzersCount; ++analyzersIndex){
-			CAnalyzer::V1_0 t_analyzers;
+			CAnalyzer t_analyzers;
 			if (!t_analyzers.ReadFromModel(*analyzersModel, analyzersIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Analyzers").toLocal8Bit().constData();)
 
@@ -5772,9 +5772,9 @@ bool CInspection::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int m
 	::imtbase::CTreeItemModel* analyzersModel = model.GetTreeItemModel("Analyzers", modelIndex);
 	if (analyzersModel != nullptr){
 		int analyzersCount = analyzersModel->GetItemsCount();
-		imtsdl::TElementList<CAnalyzer::V1_0> analyzersList;
+		imtsdl::TElementList<CAnalyzer> analyzersList;
 		for (int analyzersIndex = 0; analyzersIndex < analyzersCount; ++analyzersIndex){
-			CAnalyzer::V1_0 t_analyzers;
+			CAnalyzer t_analyzers;
 			if (!t_analyzers.OptReadFromModel(*analyzersModel, analyzersIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Analyzers").toLocal8Bit().constData();)
 
@@ -5916,14 +5916,14 @@ bool CInspection::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObje
 	}
 	if (gqlObject.ContainsParam("Analyzers") && (gqlObject.GetObjectsCount("Analyzers") > 0)){
 		const qsizetype analyzersElementsCount = gqlObject.GetObjectsCount("Analyzers");
-		Analyzers = imtsdl::TElementList<CAnalyzer::V1_0>();
+		Analyzers = imtsdl::TElementList<CAnalyzer>();
 		for (qsizetype analyzersIndex = 0; analyzersIndex < analyzersElementsCount; ++analyzersIndex){
 			const ::imtgql::CGqlParamObject* analyzersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Analyzers", analyzersIndex);
 			if (analyzersDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << analyzersDataObjectPtr;
 				return false;
 			}
-			CAnalyzer::V1_0 tempAnalyzers;
+			CAnalyzer tempAnalyzers;
 			if (!tempAnalyzers.ReadFromGraphQlObject(*analyzersDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Analyzers").toLocal8Bit().constData();)
 
@@ -5980,14 +5980,14 @@ bool CInspection::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 	}
 	if (gqlObject.ContainsParam("Analyzers") && (gqlObject.GetObjectsCount("Analyzers") > 0)){
 		const qsizetype analyzersElementsCount = gqlObject.GetObjectsCount("Analyzers");
-		Analyzers = imtsdl::TElementList<CAnalyzer::V1_0>();
+		Analyzers = imtsdl::TElementList<CAnalyzer>();
 		for (qsizetype analyzersIndex = 0; analyzersIndex < analyzersElementsCount; ++analyzersIndex){
 			const ::imtgql::CGqlParamObject* analyzersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Analyzers", analyzersIndex);
 			if (analyzersDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << analyzersDataObjectPtr;
 				return false;
 			}
-			CAnalyzer::V1_0 tempAnalyzers;
+			CAnalyzer tempAnalyzers;
 			if (!tempAnalyzers.OptReadFromGraphQlObject(*analyzersDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Analyzers").toLocal8Bit().constData();)
 
@@ -6125,9 +6125,9 @@ bool CInspection::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("Analyzers") && jsonObject["Analyzers"].isArray()){
 		const QJsonArray analyzersJsonArray = jsonObject["Analyzers"].toArray();
 		const qsizetype analyzersArrayCount = analyzersJsonArray.size();
-		Analyzers = imtsdl::TElementList<CAnalyzer::V1_0>();
+		Analyzers = imtsdl::TElementList<CAnalyzer>();
 		for (qsizetype analyzersIndex = 0; analyzersIndex < analyzersArrayCount; ++analyzersIndex){
-			CAnalyzer::V1_0 tempAnalyzers;
+			CAnalyzer tempAnalyzers;
 			if (!tempAnalyzers.ReadFromJsonObject(analyzersJsonArray[analyzersIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Analyzers").toLocal8Bit().constData();)
 
@@ -6182,9 +6182,9 @@ bool CInspection::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("Analyzers") && jsonObject["Analyzers"].isArray()){
 		const QJsonArray analyzersJsonArray = jsonObject["Analyzers"].toArray();
 		const qsizetype analyzersArrayCount = analyzersJsonArray.size();
-		Analyzers = imtsdl::TElementList<CAnalyzer::V1_0>();
+		Analyzers = imtsdl::TElementList<CAnalyzer>();
 		for (qsizetype analyzersIndex = 0; analyzersIndex < analyzersArrayCount; ++analyzersIndex){
-			CAnalyzer::V1_0 tempAnalyzers;
+			CAnalyzer tempAnalyzers;
 			if (!tempAnalyzers.OptReadFromJsonObject(analyzersJsonArray[analyzersIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Analyzers").toLocal8Bit().constData();)
 
@@ -6376,9 +6376,9 @@ bool CProductOverview::ReadFromModel(const ::imtbase::CTreeItemModel& model, int
 	::imtbase::CTreeItemModel* inspectionsModel = model.GetTreeItemModel("Inspections", modelIndex);
 	if (inspectionsModel != nullptr){
 		int inspectionsCount = inspectionsModel->GetItemsCount();
-		imtsdl::TElementList<CInspection::V1_0> inspectionsList;
+		imtsdl::TElementList<CInspection> inspectionsList;
 		for (int inspectionsIndex = 0; inspectionsIndex < inspectionsCount; ++inspectionsIndex){
-			CInspection::V1_0 t_inspections;
+			CInspection t_inspections;
 			if (!t_inspections.ReadFromModel(*inspectionsModel, inspectionsIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Inspections").toLocal8Bit().constData();)
 
@@ -6449,9 +6449,9 @@ bool CProductOverview::OptReadFromModel(const ::imtbase::CTreeItemModel& model, 
 	::imtbase::CTreeItemModel* inspectionsModel = model.GetTreeItemModel("Inspections", modelIndex);
 	if (inspectionsModel != nullptr){
 		int inspectionsCount = inspectionsModel->GetItemsCount();
-		imtsdl::TElementList<CInspection::V1_0> inspectionsList;
+		imtsdl::TElementList<CInspection> inspectionsList;
 		for (int inspectionsIndex = 0; inspectionsIndex < inspectionsCount; ++inspectionsIndex){
-			CInspection::V1_0 t_inspections;
+			CInspection t_inspections;
 			if (!t_inspections.OptReadFromModel(*inspectionsModel, inspectionsIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Inspections").toLocal8Bit().constData();)
 
@@ -6621,14 +6621,14 @@ bool CProductOverview::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 	}
 	if (gqlObject.ContainsParam("Inspections") && (gqlObject.GetObjectsCount("Inspections") > 0)){
 		const qsizetype inspectionsElementsCount = gqlObject.GetObjectsCount("Inspections");
-		Inspections = imtsdl::TElementList<CInspection::V1_0>();
+		Inspections = imtsdl::TElementList<CInspection>();
 		for (qsizetype inspectionsIndex = 0; inspectionsIndex < inspectionsElementsCount; ++inspectionsIndex){
 			const ::imtgql::CGqlParamObject* inspectionsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Inspections", inspectionsIndex);
 			if (inspectionsDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << inspectionsDataObjectPtr;
 				return false;
 			}
-			CInspection::V1_0 tempInspections;
+			CInspection tempInspections;
 			if (!tempInspections.ReadFromGraphQlObject(*inspectionsDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Inspections").toLocal8Bit().constData();)
 
@@ -6693,14 +6693,14 @@ bool CProductOverview::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 	}
 	if (gqlObject.ContainsParam("Inspections") && (gqlObject.GetObjectsCount("Inspections") > 0)){
 		const qsizetype inspectionsElementsCount = gqlObject.GetObjectsCount("Inspections");
-		Inspections = imtsdl::TElementList<CInspection::V1_0>();
+		Inspections = imtsdl::TElementList<CInspection>();
 		for (qsizetype inspectionsIndex = 0; inspectionsIndex < inspectionsElementsCount; ++inspectionsIndex){
 			const ::imtgql::CGqlParamObject* inspectionsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Inspections", inspectionsIndex);
 			if (inspectionsDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << inspectionsDataObjectPtr;
 				return false;
 			}
-			CInspection::V1_0 tempInspections;
+			CInspection tempInspections;
 			if (!tempInspections.OptReadFromGraphQlObject(*inspectionsDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Inspections").toLocal8Bit().constData();)
 
@@ -6866,9 +6866,9 @@ bool CProductOverview::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("Inspections") && jsonObject["Inspections"].isArray()){
 		const QJsonArray inspectionsJsonArray = jsonObject["Inspections"].toArray();
 		const qsizetype inspectionsArrayCount = inspectionsJsonArray.size();
-		Inspections = imtsdl::TElementList<CInspection::V1_0>();
+		Inspections = imtsdl::TElementList<CInspection>();
 		for (qsizetype inspectionsIndex = 0; inspectionsIndex < inspectionsArrayCount; ++inspectionsIndex){
-			CInspection::V1_0 tempInspections;
+			CInspection tempInspections;
 			if (!tempInspections.ReadFromJsonObject(inspectionsJsonArray[inspectionsIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Inspections").toLocal8Bit().constData();)
 
@@ -6931,9 +6931,9 @@ bool CProductOverview::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("Inspections") && jsonObject["Inspections"].isArray()){
 		const QJsonArray inspectionsJsonArray = jsonObject["Inspections"].toArray();
 		const qsizetype inspectionsArrayCount = inspectionsJsonArray.size();
-		Inspections = imtsdl::TElementList<CInspection::V1_0>();
+		Inspections = imtsdl::TElementList<CInspection>();
 		for (qsizetype inspectionsIndex = 0; inspectionsIndex < inspectionsArrayCount; ++inspectionsIndex){
-			CInspection::V1_0 tempInspections;
+			CInspection tempInspections;
 			if (!tempInspections.OptReadFromJsonObject(inspectionsJsonArray[inspectionsIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Inspections").toLocal8Bit().constData();)
 
@@ -7850,7 +7850,7 @@ bool CResultMetaData::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 
 	::imtbase::CTreeItemModel* descriptionDataModelPtr = model.GetTreeItemModel("description", modelIndex);
 	if (descriptionDataModelPtr != nullptr){
-		description = CLocalizedText::V1_0();
+		description = CLocalizedText();
 		const bool isDescriptionRead = description->ReadFromModel(*descriptionDataModelPtr, modelIndex);
 		if (!isDescriptionRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "description").toLocal8Bit().constData();)
@@ -7862,9 +7862,9 @@ bool CResultMetaData::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 	::imtbase::CTreeItemModel* extendedMetaDataModel = model.GetTreeItemModel("extendedMetaData", modelIndex);
 	if (extendedMetaDataModel != nullptr){
 		int extendedMetaDataCount = extendedMetaDataModel->GetItemsCount();
-		imtsdl::TElementList<CExtendedMetaData::V1_0> extendedMetaDataList;
+		imtsdl::TElementList<CExtendedMetaData> extendedMetaDataList;
 		for (int extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataCount; ++extendedMetaDataIndex){
-			CExtendedMetaData::V1_0 t_extendedMetaData;
+			CExtendedMetaData t_extendedMetaData;
 			if (!t_extendedMetaData.ReadFromModel(*extendedMetaDataModel, extendedMetaDataIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "extendedMetaData").toLocal8Bit().constData();)
 
@@ -7914,7 +7914,7 @@ bool CResultMetaData::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 
 	::imtbase::CTreeItemModel* descriptionDataModelPtr = model.GetTreeItemModel("description", modelIndex);
 	if (descriptionDataModelPtr != nullptr){
-		description = CLocalizedText::V1_0();
+		description = CLocalizedText();
 		const bool isDescriptionRead = description->ReadFromModel(*descriptionDataModelPtr, modelIndex);
 		if (!isDescriptionRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "description").toLocal8Bit().constData();)
@@ -7926,9 +7926,9 @@ bool CResultMetaData::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 	::imtbase::CTreeItemModel* extendedMetaDataModel = model.GetTreeItemModel("extendedMetaData", modelIndex);
 	if (extendedMetaDataModel != nullptr){
 		int extendedMetaDataCount = extendedMetaDataModel->GetItemsCount();
-		imtsdl::TElementList<CExtendedMetaData::V1_0> extendedMetaDataList;
+		imtsdl::TElementList<CExtendedMetaData> extendedMetaDataList;
 		for (int extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataCount; ++extendedMetaDataIndex){
-			CExtendedMetaData::V1_0 t_extendedMetaData;
+			CExtendedMetaData t_extendedMetaData;
 			if (!t_extendedMetaData.OptReadFromModel(*extendedMetaDataModel, extendedMetaDataIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "extendedMetaData").toLocal8Bit().constData();)
 
@@ -8034,7 +8034,7 @@ bool CResultMetaData::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 	}
 
 	if (gqlObject.ContainsParam("description") && (gqlObject.GetParamArgumentObjectPtr("description") != nullptr)){
-		description = CLocalizedText::V1_0();
+		description = CLocalizedText();
 		const bool isDescriptionRead = description->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("description"));
 		if (!isDescriptionRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "description").toLocal8Bit().constData();)
@@ -8048,14 +8048,14 @@ bool CResultMetaData::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 	}
 	if (gqlObject.ContainsParam("extendedMetaData") && (gqlObject.GetObjectsCount("extendedMetaData") > 0)){
 		const qsizetype extendedMetaDataElementsCount = gqlObject.GetObjectsCount("extendedMetaData");
-		extendedMetaData = imtsdl::TElementList<CExtendedMetaData::V1_0>();
+		extendedMetaData = imtsdl::TElementList<CExtendedMetaData>();
 		for (qsizetype extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataElementsCount; ++extendedMetaDataIndex){
 			const ::imtgql::CGqlParamObject* extendedMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("extendedMetaData", extendedMetaDataIndex);
 			if (extendedMetaDataDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << extendedMetaDataDataObjectPtr;
 				return false;
 			}
-			CExtendedMetaData::V1_0 tempExtendedMetaData;
+			CExtendedMetaData tempExtendedMetaData;
 			if (!tempExtendedMetaData.ReadFromGraphQlObject(*extendedMetaDataDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "extendedMetaData").toLocal8Bit().constData();)
 
@@ -8096,7 +8096,7 @@ bool CResultMetaData::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 	}
 
 	if (gqlObject.ContainsParam("description") && (gqlObject.GetParamArgumentObjectPtr("description") != nullptr)){
-		description = CLocalizedText::V1_0();
+		description = CLocalizedText();
 		const bool isDescriptionRead = description->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("description"));
 		if (!isDescriptionRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "description").toLocal8Bit().constData();)
@@ -8110,14 +8110,14 @@ bool CResultMetaData::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 	}
 	if (gqlObject.ContainsParam("extendedMetaData") && (gqlObject.GetObjectsCount("extendedMetaData") > 0)){
 		const qsizetype extendedMetaDataElementsCount = gqlObject.GetObjectsCount("extendedMetaData");
-		extendedMetaData = imtsdl::TElementList<CExtendedMetaData::V1_0>();
+		extendedMetaData = imtsdl::TElementList<CExtendedMetaData>();
 		for (qsizetype extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataElementsCount; ++extendedMetaDataIndex){
 			const ::imtgql::CGqlParamObject* extendedMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("extendedMetaData", extendedMetaDataIndex);
 			if (extendedMetaDataDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << extendedMetaDataDataObjectPtr;
 				return false;
 			}
-			CExtendedMetaData::V1_0 tempExtendedMetaData;
+			CExtendedMetaData tempExtendedMetaData;
 			if (!tempExtendedMetaData.OptReadFromGraphQlObject(*extendedMetaDataDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "extendedMetaData").toLocal8Bit().constData();)
 
@@ -8221,7 +8221,7 @@ bool CResultMetaData::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("description") && jsonObject["description"].isObject()){
-		description = CLocalizedText::V1_0();
+		description = CLocalizedText();
 		const bool isDescriptionRead = description->ReadFromJsonObject(jsonObject["description"].toObject());
 		if (!isDescriptionRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "description").toLocal8Bit().constData();)
@@ -8233,9 +8233,9 @@ bool CResultMetaData::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("extendedMetaData") && jsonObject["extendedMetaData"].isArray()){
 		const QJsonArray extendedMetaDataJsonArray = jsonObject["extendedMetaData"].toArray();
 		const qsizetype extendedMetaDataArrayCount = extendedMetaDataJsonArray.size();
-		extendedMetaData = imtsdl::TElementList<CExtendedMetaData::V1_0>();
+		extendedMetaData = imtsdl::TElementList<CExtendedMetaData>();
 		for (qsizetype extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataArrayCount; ++extendedMetaDataIndex){
-			CExtendedMetaData::V1_0 tempExtendedMetaData;
+			CExtendedMetaData tempExtendedMetaData;
 			if (!tempExtendedMetaData.ReadFromJsonObject(extendedMetaDataJsonArray[extendedMetaDataIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "extendedMetaData").toLocal8Bit().constData();)
 
@@ -8276,7 +8276,7 @@ bool CResultMetaData::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("description") && jsonObject["description"].isObject()){
-		description = CLocalizedText::V1_0();
+		description = CLocalizedText();
 		const bool isDescriptionRead = description->OptReadFromJsonObject(jsonObject["description"].toObject());
 		if (!isDescriptionRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "description").toLocal8Bit().constData();)
@@ -8288,9 +8288,9 @@ bool CResultMetaData::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("extendedMetaData") && jsonObject["extendedMetaData"].isArray()){
 		const QJsonArray extendedMetaDataJsonArray = jsonObject["extendedMetaData"].toArray();
 		const qsizetype extendedMetaDataArrayCount = extendedMetaDataJsonArray.size();
-		extendedMetaData = imtsdl::TElementList<CExtendedMetaData::V1_0>();
+		extendedMetaData = imtsdl::TElementList<CExtendedMetaData>();
 		for (qsizetype extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataArrayCount; ++extendedMetaDataIndex){
-			CExtendedMetaData::V1_0 tempExtendedMetaData;
+			CExtendedMetaData tempExtendedMetaData;
 			if (!tempExtendedMetaData.OptReadFromJsonObject(extendedMetaDataJsonArray[extendedMetaDataIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "extendedMetaData").toLocal8Bit().constData();)
 
@@ -9364,7 +9364,7 @@ bool CCDMResultVarRecursive::ReadFromModel(const ::imtbase::CTreeItemModel& mode
 
 	::imtbase::CTreeItemModel* resultMetaDataDataModelPtr = model.GetTreeItemModel("resultMetaData", modelIndex);
 	if (resultMetaDataDataModelPtr != nullptr){
-		resultMetaData = CResultMetaData::V1_0();
+		resultMetaData = CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromModel(*resultMetaDataDataModelPtr, modelIndex);
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -9410,9 +9410,9 @@ bool CCDMResultVarRecursive::ReadFromModel(const ::imtbase::CTreeItemModel& mode
 	::imtbase::CTreeItemModel* overallResultValuesModel = model.GetTreeItemModel("overallResultValues", modelIndex);
 	if (overallResultValuesModel != nullptr){
 		int overallResultValuesCount = overallResultValuesModel->GetItemsCount();
-		imtsdl::TElementList<COverallResultValues::V1_0> overallResultValuesList;
+		imtsdl::TElementList<COverallResultValues> overallResultValuesList;
 		for (int overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesCount; ++overallResultValuesIndex){
-			COverallResultValues::V1_0 t_overallResultValues;
+			COverallResultValues t_overallResultValues;
 			if (!t_overallResultValues.ReadFromModel(*overallResultValuesModel, overallResultValuesIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -9442,7 +9442,7 @@ bool CCDMResultVarRecursive::OptReadFromModel(const ::imtbase::CTreeItemModel& m
 
 	::imtbase::CTreeItemModel* resultMetaDataDataModelPtr = model.GetTreeItemModel("resultMetaData", modelIndex);
 	if (resultMetaDataDataModelPtr != nullptr){
-		resultMetaData = CResultMetaData::V1_0();
+		resultMetaData = CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromModel(*resultMetaDataDataModelPtr, modelIndex);
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -9488,9 +9488,9 @@ bool CCDMResultVarRecursive::OptReadFromModel(const ::imtbase::CTreeItemModel& m
 	::imtbase::CTreeItemModel* overallResultValuesModel = model.GetTreeItemModel("overallResultValues", modelIndex);
 	if (overallResultValuesModel != nullptr){
 		int overallResultValuesCount = overallResultValuesModel->GetItemsCount();
-		imtsdl::TElementList<COverallResultValues::V1_0> overallResultValuesList;
+		imtsdl::TElementList<COverallResultValues> overallResultValuesList;
 		for (int overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesCount; ++overallResultValuesIndex){
-			COverallResultValues::V1_0 t_overallResultValues;
+			COverallResultValues t_overallResultValues;
 			if (!t_overallResultValues.OptReadFromModel(*overallResultValuesModel, overallResultValuesIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -9591,7 +9591,7 @@ bool CCDMResultVarRecursive::ReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 	dataModelVersion = gqlObject["dataModelVersion"].toString();
 
 	if (gqlObject.ContainsParam("resultMetaData") && (gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr)){
-		resultMetaData = CResultMetaData::V1_0();
+		resultMetaData = CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -9606,14 +9606,14 @@ bool CCDMResultVarRecursive::ReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 	if (gqlObject.ContainsParam("resultContent")){
 		const QList<const ::imtgql::CGqlParamObject*> resultContentDataList = gqlObject.GetParamArgumentObjectPtrList("resultContent");
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
-		resultContent = imtsdl::TElementList<complextest::ComplexUnion2::CDMResultUnionType>();
+		resultContent = imtsdl::TElementList<CDMResultUnionType>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
 			const ::imtgql::CGqlParamObject* tempResultContent = resultContentDataList[resultContentIndex];
 			if (tempResultContent == nullptr){
 				return false;
 			}
 			QString resultContentDataValueTypename = tempResultContent->GetParamArgumentValue("__typename").toString();
-			complextest::ComplexUnion2::CDMResultUnionType resultContentDataValue;
+			CDMResultUnionType resultContentDataValue;
 			if (resultContentDataValueTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataValueConvert;
 				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*tempResultContent);
@@ -9642,14 +9642,14 @@ bool CCDMResultVarRecursive::ReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 	}
 	if (gqlObject.ContainsParam("overallResultValues") && (gqlObject.GetObjectsCount("overallResultValues") > 0)){
 		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
-		overallResultValues = imtsdl::TElementList<COverallResultValues::V1_0>();
+		overallResultValues = imtsdl::TElementList<COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
 			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
 			if (overallResultValuesDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << overallResultValuesDataObjectPtr;
 				return false;
 			}
-			COverallResultValues::V1_0 tempOverallResultValues;
+			COverallResultValues tempOverallResultValues;
 			if (!tempOverallResultValues.ReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -9674,7 +9674,7 @@ bool CCDMResultVarRecursive::OptReadFromGraphQlObject(const ::imtgql::CGqlParamO
 	}
 
 	if (gqlObject.ContainsParam("resultMetaData") && (gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr)){
-		resultMetaData = CResultMetaData::V1_0();
+		resultMetaData = CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -9689,14 +9689,14 @@ bool CCDMResultVarRecursive::OptReadFromGraphQlObject(const ::imtgql::CGqlParamO
 	if (gqlObject.ContainsParam("resultContent")){
 		const QList<const ::imtgql::CGqlParamObject*> resultContentDataList = gqlObject.GetParamArgumentObjectPtrList("resultContent");
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
-		resultContent = imtsdl::TElementList<complextest::ComplexUnion2::CDMResultUnionType>();
+		resultContent = imtsdl::TElementList<CDMResultUnionType>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
 			const ::imtgql::CGqlParamObject* tempResultContent = resultContentDataList[resultContentIndex];
 			if (tempResultContent == nullptr){
 				return false;
 			}
 			QString resultContentDataValueTypename = tempResultContent->GetParamArgumentValue("__typename").toString();
-			complextest::ComplexUnion2::CDMResultUnionType resultContentDataValue;
+			CDMResultUnionType resultContentDataValue;
 			if (resultContentDataValueTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataValueConvert;
 				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*tempResultContent);
@@ -9725,14 +9725,14 @@ bool CCDMResultVarRecursive::OptReadFromGraphQlObject(const ::imtgql::CGqlParamO
 	}
 	if (gqlObject.ContainsParam("overallResultValues") && (gqlObject.GetObjectsCount("overallResultValues") > 0)){
 		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
-		overallResultValues = imtsdl::TElementList<COverallResultValues::V1_0>();
+		overallResultValues = imtsdl::TElementList<COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
 			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
 			if (overallResultValuesDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << overallResultValuesDataObjectPtr;
 				return false;
 			}
-			COverallResultValues::V1_0 tempOverallResultValues;
+			COverallResultValues tempOverallResultValues;
 			if (!tempOverallResultValues.OptReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -9835,7 +9835,7 @@ bool CCDMResultVarRecursive::ReadFromJsonObject(const QJsonObject& jsonObject)
 	dataModelVersion = jsonObject["dataModelVersion"].toString();
 
 	if (jsonObject.contains("resultMetaData") && jsonObject["resultMetaData"].isObject()){
-		resultMetaData = CResultMetaData::V1_0();
+		resultMetaData = CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromJsonObject(jsonObject["resultMetaData"].toObject());
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -9847,11 +9847,11 @@ bool CCDMResultVarRecursive::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("resultContent")){
 		const QJsonArray resultContentJsonArray = jsonObject["resultContent"].toArray();
 		const qsizetype resultContentArrayCount = resultContentJsonArray.size();
-		resultContent = imtsdl::TElementList<complextest::ComplexUnion2::CDMResultUnionType>();
+		resultContent = imtsdl::TElementList<CDMResultUnionType>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
 			const QVariant tempResultContent = resultContentJsonArray[resultContentIndex].toVariant();
 			QString resultContentDataValueTypename = resultContentJsonArray[resultContentIndex].toObject().value("__typename").toString();
-			complextest::ComplexUnion2::CDMResultUnionType resultContentDataValue;
+			CDMResultUnionType resultContentDataValue;
 			if (resultContentDataValueTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataValueConvert;
 				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
@@ -9878,9 +9878,9 @@ bool CCDMResultVarRecursive::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("overallResultValues") && jsonObject["overallResultValues"].isArray()){
 		const QJsonArray overallResultValuesJsonArray = jsonObject["overallResultValues"].toArray();
 		const qsizetype overallResultValuesArrayCount = overallResultValuesJsonArray.size();
-		overallResultValues = imtsdl::TElementList<COverallResultValues::V1_0>();
+		overallResultValues = imtsdl::TElementList<COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesArrayCount; ++overallResultValuesIndex){
-			COverallResultValues::V1_0 tempOverallResultValues;
+			COverallResultValues tempOverallResultValues;
 			if (!tempOverallResultValues.ReadFromJsonObject(overallResultValuesJsonArray[overallResultValuesIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -9905,7 +9905,7 @@ bool CCDMResultVarRecursive::OptReadFromJsonObject(const QJsonObject& jsonObject
 	}
 
 	if (jsonObject.contains("resultMetaData") && jsonObject["resultMetaData"].isObject()){
-		resultMetaData = CResultMetaData::V1_0();
+		resultMetaData = CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->OptReadFromJsonObject(jsonObject["resultMetaData"].toObject());
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -9917,11 +9917,11 @@ bool CCDMResultVarRecursive::OptReadFromJsonObject(const QJsonObject& jsonObject
 	if (jsonObject.contains("resultContent")){
 		const QJsonArray resultContentJsonArray = jsonObject["resultContent"].toArray();
 		const qsizetype resultContentArrayCount = resultContentJsonArray.size();
-		resultContent = imtsdl::TElementList<complextest::ComplexUnion2::CDMResultUnionType>();
+		resultContent = imtsdl::TElementList<CDMResultUnionType>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
 			const QVariant tempResultContent = resultContentJsonArray[resultContentIndex].toVariant();
 			QString resultContentDataValueTypename = resultContentJsonArray[resultContentIndex].toObject().value("__typename").toString();
-			complextest::ComplexUnion2::CDMResultUnionType resultContentDataValue;
+			CDMResultUnionType resultContentDataValue;
 			if (resultContentDataValueTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataValueConvert;
 				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
@@ -9948,9 +9948,9 @@ bool CCDMResultVarRecursive::OptReadFromJsonObject(const QJsonObject& jsonObject
 	if (jsonObject.contains("overallResultValues") && jsonObject["overallResultValues"].isArray()){
 		const QJsonArray overallResultValuesJsonArray = jsonObject["overallResultValues"].toArray();
 		const qsizetype overallResultValuesArrayCount = overallResultValuesJsonArray.size();
-		overallResultValues = imtsdl::TElementList<COverallResultValues::V1_0>();
+		overallResultValues = imtsdl::TElementList<COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesArrayCount; ++overallResultValuesIndex){
-			COverallResultValues::V1_0 tempOverallResultValues;
+			COverallResultValues tempOverallResultValues;
 			if (!tempOverallResultValues.OptReadFromJsonObject(overallResultValuesJsonArray[overallResultValuesIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -10058,7 +10058,7 @@ bool CCDMResultVarString::ReadFromModel(const ::imtbase::CTreeItemModel& model, 
 
 	::imtbase::CTreeItemModel* resultMetaDataDataModelPtr = model.GetTreeItemModel("resultMetaData", modelIndex);
 	if (resultMetaDataDataModelPtr != nullptr){
-		resultMetaData = CResultMetaData::V1_0();
+		resultMetaData = CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromModel(*resultMetaDataDataModelPtr, modelIndex);
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -10082,9 +10082,9 @@ bool CCDMResultVarString::ReadFromModel(const ::imtbase::CTreeItemModel& model, 
 	::imtbase::CTreeItemModel* overallResultValuesModel = model.GetTreeItemModel("overallResultValues", modelIndex);
 	if (overallResultValuesModel != nullptr){
 		int overallResultValuesCount = overallResultValuesModel->GetItemsCount();
-		imtsdl::TElementList<COverallResultValues::V1_0> overallResultValuesList;
+		imtsdl::TElementList<COverallResultValues> overallResultValuesList;
 		for (int overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesCount; ++overallResultValuesIndex){
-			COverallResultValues::V1_0 t_overallResultValues;
+			COverallResultValues t_overallResultValues;
 			if (!t_overallResultValues.ReadFromModel(*overallResultValuesModel, overallResultValuesIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -10114,7 +10114,7 @@ bool CCDMResultVarString::OptReadFromModel(const ::imtbase::CTreeItemModel& mode
 
 	::imtbase::CTreeItemModel* resultMetaDataDataModelPtr = model.GetTreeItemModel("resultMetaData", modelIndex);
 	if (resultMetaDataDataModelPtr != nullptr){
-		resultMetaData = CResultMetaData::V1_0();
+		resultMetaData = CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromModel(*resultMetaDataDataModelPtr, modelIndex);
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -10138,9 +10138,9 @@ bool CCDMResultVarString::OptReadFromModel(const ::imtbase::CTreeItemModel& mode
 	::imtbase::CTreeItemModel* overallResultValuesModel = model.GetTreeItemModel("overallResultValues", modelIndex);
 	if (overallResultValuesModel != nullptr){
 		int overallResultValuesCount = overallResultValuesModel->GetItemsCount();
-		imtsdl::TElementList<COverallResultValues::V1_0> overallResultValuesList;
+		imtsdl::TElementList<COverallResultValues> overallResultValuesList;
 		for (int overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesCount; ++overallResultValuesIndex){
-			COverallResultValues::V1_0 t_overallResultValues;
+			COverallResultValues t_overallResultValues;
 			if (!t_overallResultValues.OptReadFromModel(*overallResultValuesModel, overallResultValuesIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -10228,7 +10228,7 @@ bool CCDMResultVarString::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 	dataModelVersion = gqlObject["dataModelVersion"].toString();
 
 	if (gqlObject.ContainsParam("resultMetaData") && (gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr)){
-		resultMetaData = CResultMetaData::V1_0();
+		resultMetaData = CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -10256,14 +10256,14 @@ bool CCDMResultVarString::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 	}
 	if (gqlObject.ContainsParam("overallResultValues") && (gqlObject.GetObjectsCount("overallResultValues") > 0)){
 		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
-		overallResultValues = imtsdl::TElementList<COverallResultValues::V1_0>();
+		overallResultValues = imtsdl::TElementList<COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
 			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
 			if (overallResultValuesDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << overallResultValuesDataObjectPtr;
 				return false;
 			}
-			COverallResultValues::V1_0 tempOverallResultValues;
+			COverallResultValues tempOverallResultValues;
 			if (!tempOverallResultValues.ReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -10288,7 +10288,7 @@ bool CCDMResultVarString::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 	}
 
 	if (gqlObject.ContainsParam("resultMetaData") && (gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr)){
-		resultMetaData = CResultMetaData::V1_0();
+		resultMetaData = CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -10316,14 +10316,14 @@ bool CCDMResultVarString::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 	}
 	if (gqlObject.ContainsParam("overallResultValues") && (gqlObject.GetObjectsCount("overallResultValues") > 0)){
 		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
-		overallResultValues = imtsdl::TElementList<COverallResultValues::V1_0>();
+		overallResultValues = imtsdl::TElementList<COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
 			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
 			if (overallResultValuesDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << overallResultValuesDataObjectPtr;
 				return false;
 			}
-			COverallResultValues::V1_0 tempOverallResultValues;
+			COverallResultValues tempOverallResultValues;
 			if (!tempOverallResultValues.OptReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -10409,7 +10409,7 @@ bool CCDMResultVarString::ReadFromJsonObject(const QJsonObject& jsonObject)
 	dataModelVersion = jsonObject["dataModelVersion"].toString();
 
 	if (jsonObject.contains("resultMetaData") && jsonObject["resultMetaData"].isObject()){
-		resultMetaData = CResultMetaData::V1_0();
+		resultMetaData = CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromJsonObject(jsonObject["resultMetaData"].toObject());
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -10431,9 +10431,9 @@ bool CCDMResultVarString::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("overallResultValues") && jsonObject["overallResultValues"].isArray()){
 		const QJsonArray overallResultValuesJsonArray = jsonObject["overallResultValues"].toArray();
 		const qsizetype overallResultValuesArrayCount = overallResultValuesJsonArray.size();
-		overallResultValues = imtsdl::TElementList<COverallResultValues::V1_0>();
+		overallResultValues = imtsdl::TElementList<COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesArrayCount; ++overallResultValuesIndex){
-			COverallResultValues::V1_0 tempOverallResultValues;
+			COverallResultValues tempOverallResultValues;
 			if (!tempOverallResultValues.ReadFromJsonObject(overallResultValuesJsonArray[overallResultValuesIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -10458,7 +10458,7 @@ bool CCDMResultVarString::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("resultMetaData") && jsonObject["resultMetaData"].isObject()){
-		resultMetaData = CResultMetaData::V1_0();
+		resultMetaData = CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->OptReadFromJsonObject(jsonObject["resultMetaData"].toObject());
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -10480,9 +10480,9 @@ bool CCDMResultVarString::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("overallResultValues") && jsonObject["overallResultValues"].isArray()){
 		const QJsonArray overallResultValuesJsonArray = jsonObject["overallResultValues"].toArray();
 		const qsizetype overallResultValuesArrayCount = overallResultValuesJsonArray.size();
-		overallResultValues = imtsdl::TElementList<COverallResultValues::V1_0>();
+		overallResultValues = imtsdl::TElementList<COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesArrayCount; ++overallResultValuesIndex){
-			COverallResultValues::V1_0 tempOverallResultValues;
+			COverallResultValues tempOverallResultValues;
 			if (!tempOverallResultValues.OptReadFromJsonObject(overallResultValuesJsonArray[overallResultValuesIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -10603,7 +10603,7 @@ bool CCDMResult::ReadFromModel(const ::imtbase::CTreeItemModel& model, int model
 
 	::imtbase::CTreeItemModel* resultMetaDataDataModelPtr = model.GetTreeItemModel("resultMetaData", modelIndex);
 	if (resultMetaDataDataModelPtr != nullptr){
-		resultMetaData = CResultMetaData::V1_0();
+		resultMetaData = CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromModel(*resultMetaDataDataModelPtr, modelIndex);
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -10649,9 +10649,9 @@ bool CCDMResult::ReadFromModel(const ::imtbase::CTreeItemModel& model, int model
 	::imtbase::CTreeItemModel* overallResultValuesModel = model.GetTreeItemModel("overallResultValues", modelIndex);
 	if (overallResultValuesModel != nullptr){
 		int overallResultValuesCount = overallResultValuesModel->GetItemsCount();
-		imtsdl::TElementList<COverallResultValues::V1_0> overallResultValuesList;
+		imtsdl::TElementList<COverallResultValues> overallResultValuesList;
 		for (int overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesCount; ++overallResultValuesIndex){
-			COverallResultValues::V1_0 t_overallResultValues;
+			COverallResultValues t_overallResultValues;
 			if (!t_overallResultValues.ReadFromModel(*overallResultValuesModel, overallResultValuesIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -10681,7 +10681,7 @@ bool CCDMResult::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int mo
 
 	::imtbase::CTreeItemModel* resultMetaDataDataModelPtr = model.GetTreeItemModel("resultMetaData", modelIndex);
 	if (resultMetaDataDataModelPtr != nullptr){
-		resultMetaData = CResultMetaData::V1_0();
+		resultMetaData = CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromModel(*resultMetaDataDataModelPtr, modelIndex);
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -10727,9 +10727,9 @@ bool CCDMResult::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int mo
 	::imtbase::CTreeItemModel* overallResultValuesModel = model.GetTreeItemModel("overallResultValues", modelIndex);
 	if (overallResultValuesModel != nullptr){
 		int overallResultValuesCount = overallResultValuesModel->GetItemsCount();
-		imtsdl::TElementList<COverallResultValues::V1_0> overallResultValuesList;
+		imtsdl::TElementList<COverallResultValues> overallResultValuesList;
 		for (int overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesCount; ++overallResultValuesIndex){
-			COverallResultValues::V1_0 t_overallResultValues;
+			COverallResultValues t_overallResultValues;
 			if (!t_overallResultValues.OptReadFromModel(*overallResultValuesModel, overallResultValuesIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -10830,7 +10830,7 @@ bool CCDMResult::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObjec
 	dataModelVersion = gqlObject["dataModelVersion"].toString();
 
 	if (gqlObject.ContainsParam("resultMetaData") && (gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr)){
-		resultMetaData = CResultMetaData::V1_0();
+		resultMetaData = CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -10845,14 +10845,14 @@ bool CCDMResult::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObjec
 	if (gqlObject.ContainsParam("resultContent")){
 		const QList<const ::imtgql::CGqlParamObject*> resultContentDataList = gqlObject.GetParamArgumentObjectPtrList("resultContent");
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
-		resultContent = imtsdl::TElementList<complextest::ComplexUnion2::CDMResultUnionType>();
+		resultContent = imtsdl::TElementList<CDMResultUnionType>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
 			const ::imtgql::CGqlParamObject* tempResultContent = resultContentDataList[resultContentIndex];
 			if (tempResultContent == nullptr){
 				return false;
 			}
 			QString resultContentDataValueTypename = tempResultContent->GetParamArgumentValue("__typename").toString();
-			complextest::ComplexUnion2::CDMResultUnionType resultContentDataValue;
+			CDMResultUnionType resultContentDataValue;
 			if (resultContentDataValueTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataValueConvert;
 				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*tempResultContent);
@@ -10881,14 +10881,14 @@ bool CCDMResult::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObjec
 	}
 	if (gqlObject.ContainsParam("overallResultValues") && (gqlObject.GetObjectsCount("overallResultValues") > 0)){
 		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
-		overallResultValues = imtsdl::TElementList<COverallResultValues::V1_0>();
+		overallResultValues = imtsdl::TElementList<COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
 			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
 			if (overallResultValuesDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << overallResultValuesDataObjectPtr;
 				return false;
 			}
-			COverallResultValues::V1_0 tempOverallResultValues;
+			COverallResultValues tempOverallResultValues;
 			if (!tempOverallResultValues.ReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -10913,7 +10913,7 @@ bool CCDMResult::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 	}
 
 	if (gqlObject.ContainsParam("resultMetaData") && (gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr)){
-		resultMetaData = CResultMetaData::V1_0();
+		resultMetaData = CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -10928,14 +10928,14 @@ bool CCDMResult::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 	if (gqlObject.ContainsParam("resultContent")){
 		const QList<const ::imtgql::CGqlParamObject*> resultContentDataList = gqlObject.GetParamArgumentObjectPtrList("resultContent");
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
-		resultContent = imtsdl::TElementList<complextest::ComplexUnion2::CDMResultUnionType>();
+		resultContent = imtsdl::TElementList<CDMResultUnionType>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
 			const ::imtgql::CGqlParamObject* tempResultContent = resultContentDataList[resultContentIndex];
 			if (tempResultContent == nullptr){
 				return false;
 			}
 			QString resultContentDataValueTypename = tempResultContent->GetParamArgumentValue("__typename").toString();
-			complextest::ComplexUnion2::CDMResultUnionType resultContentDataValue;
+			CDMResultUnionType resultContentDataValue;
 			if (resultContentDataValueTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataValueConvert;
 				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*tempResultContent);
@@ -10964,14 +10964,14 @@ bool CCDMResult::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 	}
 	if (gqlObject.ContainsParam("overallResultValues") && (gqlObject.GetObjectsCount("overallResultValues") > 0)){
 		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
-		overallResultValues = imtsdl::TElementList<COverallResultValues::V1_0>();
+		overallResultValues = imtsdl::TElementList<COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
 			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
 			if (overallResultValuesDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << overallResultValuesDataObjectPtr;
 				return false;
 			}
-			COverallResultValues::V1_0 tempOverallResultValues;
+			COverallResultValues tempOverallResultValues;
 			if (!tempOverallResultValues.OptReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -11074,7 +11074,7 @@ bool CCDMResult::ReadFromJsonObject(const QJsonObject& jsonObject)
 	dataModelVersion = jsonObject["dataModelVersion"].toString();
 
 	if (jsonObject.contains("resultMetaData") && jsonObject["resultMetaData"].isObject()){
-		resultMetaData = CResultMetaData::V1_0();
+		resultMetaData = CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromJsonObject(jsonObject["resultMetaData"].toObject());
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -11086,11 +11086,11 @@ bool CCDMResult::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("resultContent")){
 		const QJsonArray resultContentJsonArray = jsonObject["resultContent"].toArray();
 		const qsizetype resultContentArrayCount = resultContentJsonArray.size();
-		resultContent = imtsdl::TElementList<complextest::ComplexUnion2::CDMResultUnionType>();
+		resultContent = imtsdl::TElementList<CDMResultUnionType>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
 			const QVariant tempResultContent = resultContentJsonArray[resultContentIndex].toVariant();
 			QString resultContentDataValueTypename = resultContentJsonArray[resultContentIndex].toObject().value("__typename").toString();
-			complextest::ComplexUnion2::CDMResultUnionType resultContentDataValue;
+			CDMResultUnionType resultContentDataValue;
 			if (resultContentDataValueTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataValueConvert;
 				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
@@ -11117,9 +11117,9 @@ bool CCDMResult::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("overallResultValues") && jsonObject["overallResultValues"].isArray()){
 		const QJsonArray overallResultValuesJsonArray = jsonObject["overallResultValues"].toArray();
 		const qsizetype overallResultValuesArrayCount = overallResultValuesJsonArray.size();
-		overallResultValues = imtsdl::TElementList<COverallResultValues::V1_0>();
+		overallResultValues = imtsdl::TElementList<COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesArrayCount; ++overallResultValuesIndex){
-			COverallResultValues::V1_0 tempOverallResultValues;
+			COverallResultValues tempOverallResultValues;
 			if (!tempOverallResultValues.ReadFromJsonObject(overallResultValuesJsonArray[overallResultValuesIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -11144,7 +11144,7 @@ bool CCDMResult::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("resultMetaData") && jsonObject["resultMetaData"].isObject()){
-		resultMetaData = CResultMetaData::V1_0();
+		resultMetaData = CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->OptReadFromJsonObject(jsonObject["resultMetaData"].toObject());
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -11156,11 +11156,11 @@ bool CCDMResult::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("resultContent")){
 		const QJsonArray resultContentJsonArray = jsonObject["resultContent"].toArray();
 		const qsizetype resultContentArrayCount = resultContentJsonArray.size();
-		resultContent = imtsdl::TElementList<complextest::ComplexUnion2::CDMResultUnionType>();
+		resultContent = imtsdl::TElementList<CDMResultUnionType>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
 			const QVariant tempResultContent = resultContentJsonArray[resultContentIndex].toVariant();
 			QString resultContentDataValueTypename = resultContentJsonArray[resultContentIndex].toObject().value("__typename").toString();
-			complextest::ComplexUnion2::CDMResultUnionType resultContentDataValue;
+			CDMResultUnionType resultContentDataValue;
 			if (resultContentDataValueTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataValueConvert;
 				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
@@ -11187,9 +11187,9 @@ bool CCDMResult::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("overallResultValues") && jsonObject["overallResultValues"].isArray()){
 		const QJsonArray overallResultValuesJsonArray = jsonObject["overallResultValues"].toArray();
 		const qsizetype overallResultValuesArrayCount = overallResultValuesJsonArray.size();
-		overallResultValues = imtsdl::TElementList<COverallResultValues::V1_0>();
+		overallResultValues = imtsdl::TElementList<COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesArrayCount; ++overallResultValuesIndex){
-			COverallResultValues::V1_0 tempOverallResultValues;
+			COverallResultValues tempOverallResultValues;
 			if (!tempOverallResultValues.OptReadFromJsonObject(overallResultValuesJsonArray[overallResultValuesIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -11376,7 +11376,7 @@ bool CCollectionViewParamsTest::ReadFromModel(const ::imtbase::CTreeItemModel& m
 
 	::imtbase::CTreeItemModel* filterModelDataModelPtr = model.GetTreeItemModel("filterModel", modelIndex);
 	if (filterModelDataModelPtr != nullptr){
-		filterModel = imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0();
+		filterModel = sdl::V1_0::imtbase::CComplexCollectionFilter();
 		const bool isFilterModelRead = filterModel->ReadFromModel(*filterModelDataModelPtr, modelIndex);
 		if (!isFilterModelRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "filterModel").toLocal8Bit().constData();)
@@ -11403,7 +11403,7 @@ bool CCollectionViewParamsTest::OptReadFromModel(const ::imtbase::CTreeItemModel
 
 	::imtbase::CTreeItemModel* filterModelDataModelPtr = model.GetTreeItemModel("filterModel", modelIndex);
 	if (filterModelDataModelPtr != nullptr){
-		filterModel = imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0();
+		filterModel = sdl::V1_0::imtbase::CComplexCollectionFilter();
 		const bool isFilterModelRead = filterModel->ReadFromModel(*filterModelDataModelPtr, modelIndex);
 		if (!isFilterModelRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "filterModel").toLocal8Bit().constData();)
@@ -11454,7 +11454,7 @@ bool CCollectionViewParamsTest::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 	}
 
 	if (gqlObject.ContainsParam("filterModel") && (gqlObject.GetParamArgumentObjectPtr("filterModel") != nullptr)){
-		filterModel = imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0();
+		filterModel = sdl::V1_0::imtbase::CComplexCollectionFilter();
 		const bool isFilterModelRead = filterModel->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("filterModel"));
 		if (!isFilterModelRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "filterModel").toLocal8Bit().constData();)
@@ -11478,7 +11478,7 @@ bool CCollectionViewParamsTest::OptReadFromGraphQlObject(const ::imtgql::CGqlPar
 	}
 
 	if (gqlObject.ContainsParam("filterModel") && (gqlObject.GetParamArgumentObjectPtr("filterModel") != nullptr)){
-		filterModel = imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0();
+		filterModel = sdl::V1_0::imtbase::CComplexCollectionFilter();
 		const bool isFilterModelRead = filterModel->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("filterModel"));
 		if (!isFilterModelRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "filterModel").toLocal8Bit().constData();)
@@ -11529,7 +11529,7 @@ bool CCollectionViewParamsTest::ReadFromJsonObject(const QJsonObject& jsonObject
 	}
 
 	if (jsonObject.contains("filterModel") && jsonObject["filterModel"].isObject()){
-		filterModel = imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0();
+		filterModel = sdl::V1_0::imtbase::CComplexCollectionFilter();
 		const bool isFilterModelRead = filterModel->ReadFromJsonObject(jsonObject["filterModel"].toObject());
 		if (!isFilterModelRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "filterModel").toLocal8Bit().constData();)
@@ -11553,7 +11553,7 @@ bool CCollectionViewParamsTest::OptReadFromJsonObject(const QJsonObject& jsonObj
 	}
 
 	if (jsonObject.contains("filterModel") && jsonObject["filterModel"].isObject()){
-		filterModel = imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0();
+		filterModel = sdl::V1_0::imtbase::CComplexCollectionFilter();
 		const bool isFilterModelRead = filterModel->OptReadFromJsonObject(jsonObject["filterModel"].toObject());
 		if (!isFilterModelRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "filterModel").toLocal8Bit().constData();)

@@ -134,7 +134,7 @@ public:
 		static const inline QString ViewParams = "viewParams";
 	};
 
-	istd::TSharedNullable<CCollectionViewParamsTest::V1_0> viewParams;
+	istd::TSharedNullable<CCollectionViewParamsTest> viewParams;
 
 	static QByteArray GetVersionId();
 
@@ -202,7 +202,7 @@ public:
 		static const inline QString Items = "items";
 	};
 
-	istd::TSharedNullable<imtsdl::TElementList<CSubstrateSpecificationListItem::V1_0>> items;
+	istd::TSharedNullable<imtsdl::TElementList<CSubstrateSpecificationListItem>> items;
 
 	static QByteArray GetVersionId();
 
@@ -1444,7 +1444,7 @@ private:
 }
 #endif
 
-} // namespace sdl::substrate::SubstrateSpecifications
+} // namespace sdl::V1_0::substrate
 
 
 Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CInputId);

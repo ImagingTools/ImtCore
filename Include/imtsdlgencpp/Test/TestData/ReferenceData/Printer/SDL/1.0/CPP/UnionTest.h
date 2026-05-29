@@ -159,7 +159,7 @@ public:
 	};
 
 	istd::TSharedNullable<QString> name;
-	istd::TSharedNullable<imtsdl::TElementList<CLink::V1_0>> linkList;
+	istd::TSharedNullable<imtsdl::TElementList<CLink>> linkList;
 	istd::TSharedNullable<PrinterSpecification> specification;
 	istd::TSharedNullable<imtsdl::TElementList<PrinterSpecification>> specificationList;
 
@@ -580,7 +580,7 @@ private:
 }
 #endif
 
-} // namespace sdl::modsdl::UnionTest
+} // namespace sdl::V1_0::modsdl
 
 
 Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CCoords);
