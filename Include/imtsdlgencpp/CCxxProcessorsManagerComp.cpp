@@ -818,7 +818,7 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 		}
 	}
 
-	// generate CGraphQlHandlerCompBase class definition (moved from .h)
+	// generate GqlHandlerCompBase class definition (moved from .h)
 	if (hasRequests && m_autoProcessorCompListPtr.IsValid()){
 		// flush the stream before passing the device to auto processors
 		stream.flush();

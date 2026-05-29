@@ -3205,7 +3205,7 @@ bool CPrinterCollectionControllerCompBase::CreateRepresentationFromObject(const 
 }
 
 
-bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+bool CUnionTestGqlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
 	const QByteArray commandId = gqlRequest.GetCommandId();
 	if (commandId == CGetSpecificationsGqlRequest::GetCommandId()){
@@ -3216,7 +3216,7 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 }
 
 
-QJsonObject CGraphQlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CUnionTestGqlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	const QByteArray commandId = gqlRequest.GetCommandId();
 	QJsonObject modelObj;

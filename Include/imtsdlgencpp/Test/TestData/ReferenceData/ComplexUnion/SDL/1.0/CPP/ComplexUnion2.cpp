@@ -18067,7 +18067,7 @@ GetLastProductionResultsCDMRequestInfo CGetLastProductionResultsCDMGqlRequest::G
 {
 	return m_requestInfo;
 }
-bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+bool CComplexUnion2GqlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
 	const QByteArray commandId = gqlRequest.GetCommandId();
 	if (commandId == CGetLastProductionResultsGqlRequest::GetCommandId()){
@@ -18081,7 +18081,7 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 }
 
 
-QJsonObject CGraphQlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CComplexUnion2GqlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	const QByteArray commandId = gqlRequest.GetCommandId();
 	QJsonObject modelObj;

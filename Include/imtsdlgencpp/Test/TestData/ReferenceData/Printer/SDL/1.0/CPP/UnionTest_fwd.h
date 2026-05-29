@@ -49,13 +49,13 @@ protected:
 
 };
 
-class CGraphQlHandlerCompBase: public ::imtservergql::CPermissibleGqlRequestHandlerComp
+class CUnionTestGqlHandlerCompBase: public ::imtservergql::CPermissibleGqlRequestHandlerComp
 {
 
 public:
 	typedef ::imtservergql::CPermissibleGqlRequestHandlerComp BaseClass;
 
-	I_BEGIN_BASE_COMPONENT(CGraphQlHandlerCompBase)
+	I_BEGIN_BASE_COMPONENT(CUnionTestGqlHandlerCompBase)
 	I_END_COMPONENT
 
 	// reimplemented (::imtservergql::CPermissibleGqlRequestHandlerComp)

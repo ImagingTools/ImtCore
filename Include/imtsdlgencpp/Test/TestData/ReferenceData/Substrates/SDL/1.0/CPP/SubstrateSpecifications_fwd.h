@@ -86,13 +86,13 @@ protected:
 
 };
 
-class CGraphQlHandlerCompBase: public ::imtservergql::CPermissibleGqlRequestHandlerComp
+class CSubstrateSpecificationsGqlHandlerCompBase: public ::imtservergql::CPermissibleGqlRequestHandlerComp
 {
 
 public:
 	typedef ::imtservergql::CPermissibleGqlRequestHandlerComp BaseClass;
 
-	I_BEGIN_BASE_COMPONENT(CGraphQlHandlerCompBase)
+	I_BEGIN_BASE_COMPONENT(CSubstrateSpecificationsGqlHandlerCompBase)
 	I_END_COMPONENT
 
 	// reimplemented (::imtservergql::CPermissibleGqlRequestHandlerComp)
