@@ -43,7 +43,6 @@ public:
 		I_ASSIGN(m_customSchemaParamsCompPtr, "CustomSchemaParams", "Custom schema parameters, that contains additional options", false, "CustomSchemaParams")
 		I_ASSIGN(m_originalSchemaNamespaceCompPtr, "OriginalSchemaNamespace", "The namespace of the original(root) schema", true, "OriginalSchemaNamespace");
 		I_ASSIGN_MULTI_0(m_includeDirectivesProviderListCompPtr, "IncludeDirectivesProviderList", "Providers of include directives, used to generate C(++) directives", false)
-		I_ASSIGN_MULTI_0(m_modifierListCompPtr, "ModifierList", "Modifiers for specific containers, used to generate C++ methods serialization methods ", false)
 		I_ASSIGN(m_dependentSchemaListCompPtr, "DependentSchemaList", "The list of dependent schemas, used to generate dependencies of output file", true, "DependentSchemaList");
 	I_END_COMPONENT
 
@@ -75,7 +74,6 @@ private:
 	I_REF(iprm::IParamsSet, m_customSchemaParamsCompPtr);
 	I_REF(iprm::ITextParam, m_originalSchemaNamespaceCompPtr);
 	I_MULTIREF(IIncludeDirectivesProvider, m_includeDirectivesProviderListCompPtr);
-	I_MULTIREF(ICxxModifier, m_modifierListCompPtr);
 	I_REF(iprm::IOptionsManager, m_dependentSchemaListCompPtr);
 };
 
