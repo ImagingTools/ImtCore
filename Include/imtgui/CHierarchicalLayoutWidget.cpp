@@ -104,7 +104,7 @@ void CHierarchicalLayoutWidget::CleanLayoutRecursive(QLayout* layoutPtr)
 
 CCustomLayoutWidget* CHierarchicalLayoutWidget::createCustomWidget()
 {
-	QByteArray id = QUuid::createUuid().toByteArray();
+	QByteArray id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	CCustomLayoutWidget* customLayoutWidgetPtr = new CCustomLayoutWidget(id, *this);
 	m_customWidgetMap.insert(id, customLayoutWidgetPtr);

@@ -72,7 +72,7 @@ protected:
 			:isEnabled(true)
 		{
 			if (id.isEmpty()){
-				this->id = QUuid::createUuid().toByteArray();
+				this->id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 			}
 			else{
 				this->id = id;

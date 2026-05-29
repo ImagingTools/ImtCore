@@ -46,11 +46,9 @@ Rectangle {
 	readonly property bool isCurrentUser: row.isMember && row.tenantData
 		&& row.tenantData.m_currentUserId
 		&& row.memberData.id === row.tenantData.m_currentUserId
-	readonly property string memberRole: row.isMemberCreator
-		? "Creator"
-		: row.isMemberOwner
-			? "Owner"
-			: (row.stateManager ? row.stateManager.getUserRole(row.memberData.id) : "Member")
+	readonly property string memberRole: row.isMemberOwner
+		? "Owner"
+		: (row.stateManager ? row.stateManager.getUserRole(row.memberData.id) : "Member")
 
 	readonly property bool isExpired: !row.isMember && row.stateManager
 		? row.stateManager.isInvitationExpired(row.memberData.expiresAt)

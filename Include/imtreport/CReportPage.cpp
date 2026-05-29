@@ -310,7 +310,7 @@ template <typename TObject> TObject* CReportPage::AddObject(QByteArray& uuid)
 		return nullptr;
 	}
 
-	uuid = QUuid::createUuid().toByteArray();
+	uuid = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	m_elementsIndicies.insert(uuid, BaseClass::GetItemsCount() - 1);
 

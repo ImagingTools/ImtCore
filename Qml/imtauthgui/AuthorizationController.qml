@@ -38,6 +38,8 @@ QtObject {
 	signal tenantInvitationAccepted(var notification);
 	signal tenantInvitationRejected(var notification);
 	signal tenantOwnershipTransferred(var notification);
+	signal tenantMembershipRoleChanged(var notification);
+	signal tenantMembershipRemoved(var notification);
 
 	// Properties to store remember me state and credentials
 	property bool rememberMe: false

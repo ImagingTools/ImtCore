@@ -168,9 +168,34 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentServiceComp::OnGetTe
 		statuses.append(imtauth::ITenantInvitation::TIS_PENDING);
 		QByteArrayList invitationIds = m_invitationManagerCompPtr->GetInvitationsByTenant(tenantId, statuses);
 		response.Version_1_0->pendingInvitations.Emplace();
+
+		// Collect IDs of users that are already part of the tenant so we can
+		// suppress stale pending invitations for them (e.g. an invitation that
+		// pre-dates the user becoming the tenant's owner/creator/member).
+		QSet<QByteArray> existingMemberUserIds;
+		if (!tenantPtr->GetOwnerId().isEmpty()){
+			existingMemberUserIds.insert(tenantPtr->GetOwnerId());
+		}
+		if (!tenantPtr->GetCreatorId().isEmpty()){
+			existingMemberUserIds.insert(tenantPtr->GetCreatorId());
+		}
+		if (m_membershipManagerCompPtr.IsValid()){
+			QByteArrayList membershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
+			for (const QByteArray& mId : membershipIds){
+				imtauth::ITenantMembershipUniquePtr mPtr = m_membershipManagerCompPtr->GetMembership(mId);
+				if (mPtr.IsValid() && mPtr->IsActive()){
+					existingMemberUserIds.insert(mPtr->GetUserId());
+				}
+			}
+		}
 		for (const QByteArray& invitationId : invitationIds){
 			imtauth::ITenantInvitationUniquePtr invitationPtr = m_invitationManagerCompPtr->GetInvitation(invitationId);
 			if (invitationPtr.IsValid()){
+				// Suppress invitations targeting users that are already
+				// part of the tenant (owner/creator/active member).
+				if (existingMemberUserIds.contains(invitationPtr->GetUserId())){
+					continue;
+				}
 				sdl::imtauth::Tenants::CTenantInvitationEntry::V1_0 invitationEntry;
 				invitationEntry.id = invitationPtr->GetInvitationId();
 				invitationEntry.userId = invitationPtr->GetUserId();

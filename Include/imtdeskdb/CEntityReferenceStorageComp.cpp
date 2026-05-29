@@ -88,7 +88,7 @@ bool CEntityReferenceStorageComp::GetEntityReference(
 
 	QSqlRecord r = sqlQuery.record();
 	entityType = r.value("EntityType").toString();
-	entityId = r.value("EntityId").toString().toUtf8();
+	entityId = imtdb::VariantToByteArray(r.value("EntityId"));
 	displayName = r.value("DisplayName").toString();
 	entityUrl = r.value("EntityUrl").toString();
 

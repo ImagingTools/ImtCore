@@ -14,7 +14,16 @@ ViewBase {
 	contentColor: Style.baseColor
 	
 	property TreeItemModel permissionsModel: TreeItemModel {};
-	onPermissionsModelChanged: permissionsGroup.buildPermissionsModel()
+	onPermissionsModelChanged: {
+		permissionsGroup.buildPermissionsModel()
+		// After the permissions tree is rebuilt (e.g. fetchPermissions completes
+		// asynchronously after the role has been loaded), re-apply the checked
+		// state from the current roleData; otherwise the tree appears empty and
+		// a subsequent Save would clear all permissions.
+		if (container.roleData){
+			container.doUpdateGui()
+		}
+	}
 	
 	property string productId: "";
 	
