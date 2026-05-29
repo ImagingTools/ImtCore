@@ -102,6 +102,41 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
 		return GetObjectSelectionQuery(objectId, paramsPtr);
 	}
 
+	if (IsSQLite()){
+		QString sortQuery;
+		QString filterQuery;
+		if (count == 0){
+			return QByteArray();
+		}
+		if (paramsPtr != nullptr){
+			if (!CreateFilterQuery(*paramsPtr, filterQuery)){
+				return QByteArray();
+			}
+
+			iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(paramsPtr, "ComplexFilter");
+			if (complexFilterParamPtr.IsValid()){
+				if (!CreateSortQuery(*complexFilterParamPtr, sortQuery)){
+					return QByteArray();
+				}
+			}
+		}
+
+		QByteArray paginationQuery;
+		if (!CreatePaginationQuery(offset, count, paginationQuery)){
+			return QByteArray();
+		}
+
+		QString baseSelelectionQuery = GetBaseSelectionQuery();
+
+		// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
+		QString retVal = baseSelelectionQuery;
+		retVal += QString(" ") + filterQuery;
+		retVal += QString(" ") + sortQuery;
+		retVal += QString(" ") + qPrintable(paginationQuery);
+
+		return retVal.toUtf8();
+	}
+
 	QByteArray selectionQuery = BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
 
 	if (paramsPtr != nullptr){
@@ -1035,7 +1070,10 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRevisionInfoQuery(
 
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateJsonBuildObjectQuery(const QVariantMap& paramMap) const
 {
-	QString revisionInfo = QStringLiteral(R"(jsonb_build_object()");
+	const bool isSqlite = IsSQLite();
+	QString revisionInfo = isSqlite
+				? QStringLiteral(R"(json_object()")
+				: QStringLiteral(R"(jsonb_build_object()");
 
 	const QStringList keys = paramMap.keys();
 
@@ -1259,6 +1297,33 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 		customColumns = QStringLiteral(", ") + customColumns;
 	}
 
+	if (IsSQLite()){
+		QString query = QString(R"(
+			SELECT
+				root.*,
+				root1."TimeStamp" AS "Added" %4
+			FROM %1"%2" AS root
+			LEFT JOIN (
+				SELECT root1."DocumentId", root1."TimeStamp"
+				FROM %1"%2" AS root1
+				WHERE root1."RevisionInfo" IS NOT NULL
+				  AND CAST(json_extract(root1."RevisionInfo", '$.RevisionNumber') AS INTEGER) = 1
+				ORDER BY root1."TimeStamp" DESC
+				LIMIT 1
+			) AS root1
+			ON root1."DocumentId" = root."DocumentId"
+			%3
+			)")
+				.arg(
+					schema,
+					tableName,
+					joinTablesQuery.isEmpty() ? "" : QString::fromUtf8(joinTablesQuery),
+					customColumns
+					);
+
+		return query;
+	}
+
 	QString query = QStringLiteral(R"(
 			SELECT
 				root.*,
@@ -1339,6 +1404,23 @@ bool CSqlDatabaseDocumentDelegateComp::SetObjectMetaInfoFromRecord(
 				metaInfo,
 				typeId
 				);
+}
+
+
+bool CSqlDatabaseDocumentDelegateComp::CreatePaginationQuery(int offset, int count, QByteArray& paginationQuery) const
+{
+	paginationQuery.clear();
+
+	if (offset >= 0 && count > 0){
+		if (IsSQLite()){
+			paginationQuery = QString("LIMIT %1 OFFSET %2").arg(count).arg(offset).toUtf8();
+		}
+		else{
+			paginationQuery = QStringLiteral("OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY").arg(offset).arg(count).toUtf8();
+		}
+	}
+
+	return true;
 }
 
 
@@ -1609,6 +1691,94 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(
 
 bool CSqlDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery, const QString& timeFieldId) const
 {
+	if (IsSQLite()){
+		QString addedStrQuery = QString(R"((SELECT "TimeStamp" FROM "%1" as temp WHERE %2 = 1 AND root."DocumentId" = temp."DocumentId" LIMIT 1))")
+		.arg(
+			qPrintable(*m_tableNameAttrPtr),
+			CreateJsonExtractSql("RevisionInfo", "RevisionNumber", QMetaType::Int)
+			);
+
+		switch (timeFilter.GetTimeUnit()){
+		case imtbase::ITimeFilterParam::TU_CUSTOM:
+			break;
+		case imtbase::ITimeFilterParam::TU_HOUR:
+			switch (timeFilter.GetInterpretationMode()){
+			case imtbase::ITimeFilterParam::IM_CURRENT:
+				timeFilterQuery += QString(R"((strftime('%Y-%m-%d %H', %1) = strftime('%Y-%m-%d %H', 'now')))").arg(addedStrQuery);
+				break;
+			case imtbase::ITimeFilterParam::IM_LAST:
+				timeFilterQuery += QString(R"((strftime('%Y-%m-%d %H', %1) = strftime('%Y-%m-%d %H', datetime('now', '-1 hour'))))").arg(addedStrQuery);
+				break;
+			case imtbase::ITimeFilterParam::IM_FOR:
+				timeFilterQuery += QString(R"((%1 >= datetime('now', '-1 hour') AND %1 <= datetime('now')))").arg(addedStrQuery);
+				break;
+			}
+			break;
+		case imtbase::ITimeFilterParam::TU_DAY:
+			switch (timeFilter.GetInterpretationMode()){
+			case imtbase::ITimeFilterParam::IM_CURRENT:
+				timeFilterQuery += QString(R"((date(%1) = date('now')))").arg(addedStrQuery);
+				break;
+			case imtbase::ITimeFilterParam::IM_LAST:
+				timeFilterQuery += QString(R"((date(%1) = date('now', '-1 day')))").arg(addedStrQuery);
+				break;
+			case imtbase::ITimeFilterParam::IM_FOR:
+				timeFilterQuery += QString(R"((%1 >= datetime('now', '-1 day') AND %1 <= datetime('now')))").arg(addedStrQuery);
+				break;
+			}
+			break;
+		case imtbase::ITimeFilterParam::TU_WEEK:
+			switch (timeFilter.GetInterpretationMode()){
+			case imtbase::ITimeFilterParam::IM_CURRENT:
+				timeFilterQuery += QString(R"(strftime('%Y-%W', %1) = strftime('%Y-%W', 'now'))").arg(addedStrQuery);
+				break;
+			case imtbase::ITimeFilterParam::IM_LAST:
+				timeFilterQuery += QString(R"(strftime('%Y-%W', %1) = strftime('%Y-%W', datetime('now', '-7 days')))").arg(addedStrQuery);
+				break;
+			case imtbase::ITimeFilterParam::IM_FOR:
+				timeFilterQuery += QString(R"((%1 >= datetime('now', '-7 days') AND %1 <= datetime('now')))").arg(addedStrQuery);
+				break;
+			}
+			break;
+		case imtbase::ITimeFilterParam::TU_MONTH:
+			switch (timeFilter.GetInterpretationMode()){
+			case imtbase::ITimeFilterParam::IM_CURRENT:
+				timeFilterQuery += QString(R"(strftime('%Y-%m', %1) = strftime('%Y-%m', 'now'))").arg(addedStrQuery);
+				break;
+			case imtbase::ITimeFilterParam::IM_LAST:
+				timeFilterQuery += QString(R"(strftime('%Y-%m', %1) = strftime('%Y-%m', datetime('now', '-1 month')))").arg(addedStrQuery);
+				break;
+			case imtbase::ITimeFilterParam::IM_FOR:
+				timeFilterQuery += QString(R"((%1 >= datetime('now', '-1 month') AND %1 <= datetime('now')))").arg(addedStrQuery);
+				break;
+			}
+			break;
+		case imtbase::ITimeFilterParam::TU_YEAR:
+			switch (timeFilter.GetInterpretationMode()){
+			case imtbase::ITimeFilterParam::IM_CURRENT:
+				timeFilterQuery += QString(R"(strftime('%Y', %1) = strftime('%Y', 'now'))").arg(addedStrQuery);
+				break;
+			case imtbase::ITimeFilterParam::IM_LAST:
+				timeFilterQuery += QString(R"(strftime('%Y', %1) = strftime('%Y', datetime('now', '-1 year')))").arg(addedStrQuery);
+				break;
+			case imtbase::ITimeFilterParam::IM_FOR:
+				timeFilterQuery += QString(R"((%1 >= datetime('now', '-1 year') AND %1 <= datetime('now')))").arg(addedStrQuery);
+				break;
+			}
+			break;
+		}
+
+		if (timeFilterQuery.isEmpty()){
+			imtbase::CTimeRange timeRange = timeFilter.GetTimeRange();
+			if (!timeRange.IsNull()){
+				timeFilterQuery += QString(R"(date(%0) >= date('%1') AND date(%0) <= date('%2'))")
+				.arg(addedStrQuery, timeRange.GetBeginTime().toString(Qt::ISODate), timeRange.GetEndTime().toString(Qt::ISODate));
+			}
+		}
+
+		return true;
+	}
+
 	switch (timeFilter.GetTimeUnit()){
 	case imtbase::ITimeFilterParam::TU_CUSTOM:
 		break;
@@ -1695,9 +1865,17 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::ITim
 
 bool CSqlDatabaseDocumentDelegateComp::CreateObjectFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& filterQuery) const
 {
-	filterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter, CComplexCollectionFilterConverter::SC_POSTGRES);
-	if (!filterQuery.isEmpty()) {
-		SubstituteFieldIds(filterQuery);
+	if (IsSQLite()){
+		filterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter);
+		if (!filterQuery.isEmpty()){
+			SubstituteFieldIds(filterQuery, false);
+		}
+	}
+	else{
+		filterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter, CComplexCollectionFilterConverter::SC_POSTGRES);
+		if (!filterQuery.isEmpty()) {
+			SubstituteFieldIds(filterQuery);
+		}
 	}
 
 	return true;
@@ -1866,6 +2044,38 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectSelectionQuery(const QByte
 		schemaPrefix = QStringLiteral("%1.").arg(qPrintable(*m_tableSchemaAttrPtr));
 	}
 
+	if (IsSQLite()){
+		return QString(R"(
+		SELECT
+			root.*,
+			root1."TimeStamp" AS "Added"
+		FROM %0 "%1" AS root
+		LEFT JOIN %0 "%1" AS root1
+			ON root1."%3" = root."%3"
+		   AND %6 = 1
+		WHERE (%2)
+		  AND root."%3" = '%4'
+		ORDER BY %5 DESC;
+	)")
+				.arg(
+					schemaPrefix,
+					QString::fromUtf8(*m_tableNameAttrPtr),
+					documentFilterQuery,
+					QString::fromUtf8(s_documentIdColumn),
+					QString::fromUtf8(objectId),
+					CreateJsonExtractSql(
+						s_revisionInfoColumn,
+						s_revisionNumberKey,
+						QMetaType::Int,
+						"root"),
+					CreateJsonExtractSql(
+						s_revisionInfoColumn,
+						s_revisionNumberKey,
+						QMetaType::Int,
+						"root1"))
+				.toUtf8();
+	}
+
 	return QStringLiteral(R"(
 			SELECT root.*, root1."TimeStamp" as "Added"
 			FROM %1 "%2" as root
@@ -2007,6 +2217,17 @@ bool CSqlDatabaseDocumentDelegateComp::IsArrayOperation(
 				);
 
 	return reFunctions.match(query).hasMatch();
+}
+
+
+bool CSqlDatabaseDocumentDelegateComp::IsSQLite() const
+{
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return false;
+	}
+
+	return m_databaseEngineCompPtr->GetDatabaseDriverId().compare(
+				QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
 }
 
 
