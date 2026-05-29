@@ -335,6 +335,9 @@ module.exports = {
             .Column {
                 flex-direction: column;
             }
+            .Flow {
+                flex-wrap: wrap;
+            }    
             .Row > *{
                 position: relative;
             }
