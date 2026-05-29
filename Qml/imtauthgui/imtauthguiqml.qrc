@@ -14,6 +14,7 @@
         <file alias="imtauthgui/UserTokenProvider.qml">UserTokenProvider.qml</file>
         <file alias="imtauthgui/OpenIdConnectProvider.qml">OpenIdConnectProvider.qml</file>
         <file alias="imtauthgui/OpenIdLoginButton.qml">OpenIdLoginButton.qml</file>
+        <file alias="imtauthgui/OpenIdProviderListView.qml">OpenIdProviderListView.qml</file>
         <file alias="imtauthgui/RoleCollectionViewCommandsDelegate.qml">RoleCollectionViewCommandsDelegate.qml</file>
         <file alias="imtauthgui/RoleCollectionView.qml">RoleCollectionView.qml</file>
         <file alias="imtauthgui/RoleView.qml">RoleView.qml</file>

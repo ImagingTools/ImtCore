@@ -497,16 +497,20 @@ Rectangle {
 			}
 
 			Item {
-				id: openIdButtonItem;
+				id: openIdProvidersItem;
 				width: parent.width;
-				height: 50;
+				height: openIdProviderList.height;
 				visible: authPageContainer.canLoginWithOpenId;
 
-				OpenIdLoginButton {
-					anchors.centerIn: parent;
+				OpenIdProviderListView {
+					id: openIdProviderList;
+					anchors.horizontalCenter: parent.horizontalCenter;
+					width: parent.width;
 
-					onClicked: {
-						AuthorizationController.loginWithOpenId();
+					providers: AuthorizationController.openIdProviders;
+
+					onProviderSelected: {
+						AuthorizationController.loginWithOpenId(providerId);
 					}
 				}
 			}

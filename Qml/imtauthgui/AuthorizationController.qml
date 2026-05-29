@@ -20,6 +20,7 @@ QtObject {
 	// OpenID Connect support
 	property bool openIdEnabled: false
 	property string openIdRedirectUri: ""
+	property var openIdProviders: []
 	
 	signal userModeChanged(string userMode);
 	signal superuserExistResult(string status, string error);
@@ -523,8 +524,9 @@ QtObject {
 	property OpenIdConnectProvider openIdConnectProvider: OpenIdConnectProvider {
 		redirectUri: root.openIdRedirectUri;
 
-		onConfigurationLoaded: {
-			root.openIdEnabled = true;
+		onProvidersLoaded: {
+			root.openIdProviders = openIdConnectProvider.providers;
+			root.openIdEnabled = openIdConnectProvider.configured;
 		}
 
 		onLoginSucceeded: {
@@ -537,23 +539,25 @@ QtObject {
 	}
 
 	function initOpenId() {
-		openIdConnectProvider.loadConfiguration();
+		openIdConnectProvider.loadProviders();
 	}
 
-	function loginWithOpenId() {
+	function loginWithOpenId(providerId) {
 		if (!root.openIdEnabled) {
 			return;
 		}
 
-		var authUrl = openIdConnectProvider.buildAuthorizationUrl();
-		root.openIdLoginStarted(authUrl);
+		var authUrl = openIdConnectProvider.buildAuthorizationUrl(providerId);
+		if (authUrl !== "") {
+			root.openIdLoginStarted(authUrl);
+		}
 	}
 
 	function handleOpenIdCallback(urlString) {
 		openIdConnectProvider.handleRedirectCallback(urlString);
 	}
 
-	function refreshOpenIdToken(refreshToken) {
-		openIdConnectProvider.refreshToken(refreshToken);
+	function refreshOpenIdToken(providerId, refreshToken) {
+		openIdConnectProvider.refreshToken(providerId, refreshToken);
 	}
 }
