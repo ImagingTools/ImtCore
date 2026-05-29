@@ -151,11 +151,13 @@ bool CTenantConnectionRequestManagerComp::EstablishRelationship(
 		return false;
 	}
 
-	// Source tenant keeps a relationship pointing at the accepting tenant ...
+	// Source tenant keeps a relationship pointing at the accepting tenant.
+	// The legacy 'role' argument mirrors 'targetRole' (the counterparty's role),
+	// matching the convention used in OnAddTenantRelationship where role -> targetRole.
 	QByteArray sourceRel = m_tenantManagerCompPtr->AddTenantRelationship(
 				info.sourceTenantId,
 				acceptingTenantId,
-				info.proposedTargetRole,
+				info.proposedTargetRole, // role == targetRole
 				info.proposedSourceRole,
 				info.proposedTargetRole,
 				QString(),
@@ -167,7 +169,7 @@ bool CTenantConnectionRequestManagerComp::EstablishRelationship(
 	QByteArray targetRel = m_tenantManagerCompPtr->AddTenantRelationship(
 				acceptingTenantId,
 				info.sourceTenantId,
-				info.proposedSourceRole,
+				info.proposedSourceRole, // role == targetRole
 				info.proposedTargetRole,
 				info.proposedSourceRole,
 				QString(),
