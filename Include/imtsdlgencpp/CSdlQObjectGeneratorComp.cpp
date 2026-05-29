@@ -502,7 +502,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 								FeedStream(stream, 1, false);
 
 								FeedStreamHorizontally(stream, 3);
-								stream << QStringLiteral("static_cast<C") << sdlEntry.GetName() << QStringLiteral("&>(*newObjectPtr) = *val;");
+								stream << QStringLiteral("static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;");
 								FeedStream(stream, 1, false);
 								FeedStreamHorizontally(stream, 3);
 								stream << QStringLiteral("m_") << GetDecapitalizedValue(field.GetId());
@@ -734,7 +734,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 					stream << QStringLiteral("if (itemPtr != nullptr) ") << field.GetId() << QStringLiteral(" = itemPtr->Version_1_0;");
 				}
 				else{
-					stream << QStringLiteral("if (itemPtr != nullptr) ") << field.GetId() << QStringLiteral(" = static_cast<const C") << sdlEntryField->GetName() << QStringLiteral("&>(*itemPtr);");
+					stream << QStringLiteral("if (itemPtr != nullptr) ") << field.GetId() << QStringLiteral(" = static_cast<const decltype(") << field.GetId() << QStringLiteral(")::value_type&>(*itemPtr);");
 				}
 				FeedStream(stream, 1, false);
 			}
