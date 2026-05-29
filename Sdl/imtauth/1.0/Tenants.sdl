@@ -395,6 +395,172 @@ type GetTenantConnectionRequestsPayload {
 	errorMessage: String
 }
 
+# --- Cross-Tenant Messages (phase 2) ---
+
+enum CrossTenantMessageType {
+	Custom
+	OrderRequest
+	OrderConfirmation
+	OrderRejection
+	OrderStatusUpdate
+	OrderCancellation
+	DocumentShare
+}
+
+enum CrossTenantMessageStatus {
+	Created
+	Validated
+	Delivered
+	Acknowledged
+	Processed
+	Failed
+	Expired
+}
+
+enum CrossTenantMessageDirection {
+	Incoming
+	Outgoing
+}
+
+type CrossTenantMessage {
+	id: ID!
+	sourceTenantId: ID!
+	targetTenantId: ID!
+	relationshipId: ID!
+	sourceObjectId: ID
+	targetObjectId: ID
+	messageType: CrossTenantMessageType!
+	customType: String
+	payload: String
+	status: CrossTenantMessageStatus!
+	errorMessage: String
+	createdAt: String
+	updatedAt: String
+	expiresAt: String
+}
+
+input SendCrossTenantMessageInput {
+	sourceTenantId: ID!
+	targetTenantId: ID!
+	relationshipId: ID!
+	messageType: CrossTenantMessageType!
+	payload: String
+	sourceObjectId: ID
+	customType: String
+	expiresAt: String
+}
+
+type SendCrossTenantMessagePayload {
+	messageId: ID
+	errorMessage: String
+}
+
+input GetCrossTenantMessageInput {
+	messageId: ID!
+}
+
+type GetCrossTenantMessagePayload {
+	message: CrossTenantMessage
+	errorMessage: String
+}
+
+input GetCrossTenantMessagesInput {
+	tenantId: ID!
+	direction: CrossTenantMessageDirection
+}
+
+type GetCrossTenantMessagesPayload {
+	messages: [CrossTenantMessage]
+	errorMessage: String
+}
+
+input UpdateCrossTenantMessageStatusInput {
+	messageId: ID!
+	status: CrossTenantMessageStatus!
+	errorMessage: String
+}
+
+type UpdateCrossTenantMessageStatusPayload {
+	success: Boolean
+	errorMessage: String
+}
+
+# --- Order Requests (phase 3) ---
+
+enum OrderRequestStatus {
+	Received
+	Confirmed
+	Rejected
+	InProgress
+	Completed
+	Cancelled
+}
+
+type OrderRequest {
+	id: ID!
+	messageId: ID
+	sourceTenantId: ID!
+	targetTenantId: ID!
+	relationshipId: ID
+	sourceOrderId: ID
+	articleNumber: String
+	quantity: Int
+	note: String
+	status: OrderRequestStatus!
+	statusNote: String
+	createdAt: String
+	updatedAt: String
+}
+
+input GetOrderRequestsInput {
+	tenantId: ID!
+}
+
+type GetOrderRequestsPayload {
+	orderRequests: [OrderRequest]
+	errorMessage: String
+}
+
+input GetOrderRequestInput {
+	orderRequestId: ID!
+}
+
+type GetOrderRequestPayload {
+	orderRequest: OrderRequest
+	errorMessage: String
+}
+
+input ConfirmOrderRequestInput {
+	orderRequestId: ID!
+	note: String
+}
+
+type ConfirmOrderRequestPayload {
+	success: Boolean
+	errorMessage: String
+}
+
+input RejectOrderRequestInput {
+	orderRequestId: ID!
+	reason: String
+}
+
+type RejectOrderRequestPayload {
+	success: Boolean
+	errorMessage: String
+}
+
+input UpdateOrderRequestStatusInput {
+	orderRequestId: ID!
+	status: OrderRequestStatus!
+	note: String
+}
+
+type UpdateOrderRequestStatusPayload {
+	success: Boolean
+	errorMessage: String
+}
+
 type Query {
 	GetTenantList (input: GetTenantListInput): GetTenantListPayload!
 	GetTenant (input: GetTenantInput): GetTenantPayload!
@@ -402,6 +568,10 @@ type Query {
 	GetTenantRelationships (input: GetTenantRelationshipsInput): GetTenantRelationshipsPayload!
 	GetCrossOrgGrants (input: GetCrossOrgGrantsInput): GetCrossOrgGrantsPayload!
 	GetTenantConnectionRequests (input: GetTenantConnectionRequestsInput): GetTenantConnectionRequestsPayload!
+	GetCrossTenantMessage (input: GetCrossTenantMessageInput): GetCrossTenantMessagePayload!
+	GetCrossTenantMessages (input: GetCrossTenantMessagesInput): GetCrossTenantMessagesPayload!
+	GetOrderRequest (input: GetOrderRequestInput): GetOrderRequestPayload!
+	GetOrderRequests (input: GetOrderRequestsInput): GetOrderRequestsPayload!
 }
 
 type Mutation {
@@ -420,6 +590,11 @@ type Mutation {
 	AcceptTenantConnectCode (input: AcceptTenantConnectCodeInput): AcceptTenantConnectCodePayload!
 	RejectTenantConnectionRequest (input: RejectTenantConnectionRequestInput): RejectTenantConnectionRequestPayload!
 	RevokeTenantConnectionRequest (input: RevokeTenantConnectionRequestInput): RevokeTenantConnectionRequestPayload!
+	SendCrossTenantMessage (input: SendCrossTenantMessageInput): SendCrossTenantMessagePayload!
+	UpdateCrossTenantMessageStatus (input: UpdateCrossTenantMessageStatusInput): UpdateCrossTenantMessageStatusPayload!
+	ConfirmOrderRequest (input: ConfirmOrderRequestInput): ConfirmOrderRequestPayload!
+	RejectOrderRequest (input: RejectOrderRequestInput): RejectOrderRequestPayload!
+	UpdateOrderRequestStatus (input: UpdateOrderRequestStatusInput): UpdateOrderRequestStatusPayload!
 }
 
 collectionSchema {

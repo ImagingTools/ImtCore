@@ -95,6 +95,8 @@ DocumentViewBase {
 					multiPageView.addPage("CrossOrgGrants", qsTr("Cross-Org Grants"), crossOrgGrantsPageComp, "Icons/Link")
 					multiPageView.addPage("Relationships", qsTr("Relationships"), relationshipsPageComp, "Icons/Link")
 					multiPageView.addPage("Connections", qsTr("Connections"), connectionRequestsPageComp, "Icons/Link")
+					multiPageView.addPage("Messages", qsTr("Messages"), messagesPageComp, "Icons/Link")
+					multiPageView.addPage("OrderRequests", qsTr("Order Requests"), orderRequestsPageComp, "Icons/Link")
 				}
 			}
 			multiPageView.currentIndex = 0
@@ -308,6 +310,26 @@ DocumentViewBase {
 		id: connectionRequestsPageComp
 
 		TenantConnectionRequestsPage {
+			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
+		}
+	}
+
+	Component {
+		id: messagesPageComp
+
+		TenantMessagesPage {
+			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
+		}
+	}
+
+	Component {
+		id: orderRequestsPageComp
+
+		TenantOrderRequestsPage {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient

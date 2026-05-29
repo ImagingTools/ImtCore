@@ -81,6 +81,17 @@ QtObject {
 	signal connectionRequestRevoked(string requestId)
 	signal connectionRequestsReceived(var requests)
 
+	// --- Cross-tenant messages (phase 2) ---
+	signal crossTenantMessageSent(string messageId)
+	signal crossTenantMessageStatusUpdated(string messageId)
+	signal crossTenantMessagesReceived(var messages)
+
+	// --- Order requests (phase 3) ---
+	signal orderRequestConfirmed(string orderRequestId)
+	signal orderRequestRejected(string orderRequestId)
+	signal orderRequestStatusUpdated(string orderRequestId)
+	signal orderRequestsReceived(var orderRequests)
+
 	// --- Generic error ---
 	signal requestFailed(string message)
 
@@ -148,4 +159,21 @@ QtObject {
 	function acceptConnectCode(connectCode, acceptingTenantId) {}
 	function rejectConnectionRequest(requestId) {}
 	function revokeConnectionRequest(requestId) {}
+
+	// --- Cross-tenant messages (phase 2) ---
+	// Model holding the cross-tenant messages for the current tenant (see
+	// crossTenantMessagesReceived for the raw payload).
+	property var crossTenantMessagesModel: null
+	function fetchCrossTenantMessages(tenantId, direction) {}
+	function sendCrossTenantMessage(sourceTenantId, targetTenantId, relationshipId, messageType, payload, sourceObjectId, customType, expiresAt) {}
+	function updateCrossTenantMessageStatus(messageId, status, errorMessage) {}
+
+	// --- Order requests (phase 3) ---
+	// Model holding the order requests for the current tenant (see
+	// orderRequestsReceived for the raw payload).
+	property var orderRequestsModel: null
+	function fetchOrderRequests(tenantId) {}
+	function confirmOrderRequest(orderRequestId, note) {}
+	function rejectOrderRequest(orderRequestId, reason) {}
+	function updateOrderRequestStatus(orderRequestId, status, note) {}
 }

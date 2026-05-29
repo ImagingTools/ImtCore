@@ -1169,6 +1169,262 @@ QtObject {
 	}
 
 	// =========================================================================
+	// Cross-tenant messages (phase 2)
+	// =========================================================================
+
+	property ListModel crossTenantMessagesModel: ListModel {}
+
+	property SendCrossTenantMessageInput __sendMessageInput: SendCrossTenantMessageInput {}
+	property GqlSdlRequestSender __sendMessageSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_sendCrossTenantMessage
+
+		sdlObjectComp: Component {
+			SendCrossTenantMessagePayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.crossTenantMessageSent(m_messageId || "")
+					}
+				}
+			}
+		}
+	}
+
+	property UpdateCrossTenantMessageStatusInput __updateMessageStatusInput: UpdateCrossTenantMessageStatusInput {}
+	property string __pendingUpdateMessageId: ""
+	property GqlSdlRequestSender __updateMessageStatusSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_updateCrossTenantMessageStatus
+
+		sdlObjectComp: Component {
+			UpdateCrossTenantMessageStatusPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.crossTenantMessageStatusUpdated(root.__pendingUpdateMessageId)
+					}
+				}
+			}
+		}
+	}
+
+	property GetCrossTenantMessagesInput __getMessagesInput: GetCrossTenantMessagesInput {}
+	property GqlSdlRequestSender __getMessagesSender: GqlSdlRequestSender {
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_getCrossTenantMessages
+
+		sdlObjectComp: Component {
+			GetCrossTenantMessagesPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.__populateCrossTenantMessagesModel(m_messages)
+					}
+				}
+			}
+		}
+	}
+
+	function __populateCrossTenantMessagesModel(messages) {
+		root.crossTenantMessagesModel.clear()
+		if (messages) {
+			for (var i = 0; i < messages.length; ++i) {
+				var msg = messages[i]
+				if (!msg)
+					continue
+				root.crossTenantMessagesModel.append({
+					"messageId": msg.m_id || "",
+					"sourceTenantId": msg.m_sourceTenantId || "",
+					"targetTenantId": msg.m_targetTenantId || "",
+					"relationshipId": msg.m_relationshipId || "",
+					"sourceObjectId": msg.m_sourceObjectId || "",
+					"targetObjectId": msg.m_targetObjectId || "",
+					"messageType": msg.m_messageType || CrossTenantMessageTypeEnum.s_custom,
+					"customType": msg.m_customType || "",
+					"payload": msg.m_payload || "",
+					"status": msg.m_status || CrossTenantMessageStatusEnum.s_created,
+					"errorMessage": msg.m_errorMessage || "",
+					"createdAt": msg.m_createdAt || "",
+					"updatedAt": msg.m_updatedAt || "",
+					"expiresAt": msg.m_expiresAt || ""
+				})
+			}
+		}
+		root.crossTenantMessagesReceived(messages || [])
+	}
+
+	function fetchCrossTenantMessages(tenantId, direction) {
+		root.__getMessagesInput.m_tenantId = tenantId || root.tenantId || ""
+		if (direction && direction !== "")
+			root.__getMessagesInput.m_direction = direction
+		root.__getMessagesSender.send(root.__getMessagesInput)
+	}
+
+	function sendCrossTenantMessage(sourceTenantId, targetTenantId, relationshipId, messageType, payload, sourceObjectId, customType, expiresAt) {
+		root.__sendMessageInput.m_sourceTenantId = sourceTenantId || root.tenantId || ""
+		root.__sendMessageInput.m_targetTenantId = targetTenantId || ""
+		root.__sendMessageInput.m_relationshipId = relationshipId || ""
+		root.__sendMessageInput.m_messageType = messageType || CrossTenantMessageTypeEnum.s_custom
+		root.__sendMessageInput.m_payload = payload || ""
+		root.__sendMessageInput.m_sourceObjectId = sourceObjectId || ""
+		root.__sendMessageInput.m_customType = customType || ""
+		root.__sendMessageInput.m_expiresAt = expiresAt || ""
+		root.__sendMessageSender.send(root.__sendMessageInput)
+	}
+
+	function updateCrossTenantMessageStatus(messageId, status, errorMessage) {
+		root.__pendingUpdateMessageId = messageId || ""
+		root.__updateMessageStatusInput.m_messageId = messageId || ""
+		root.__updateMessageStatusInput.m_status = status || CrossTenantMessageStatusEnum.s_created
+		root.__updateMessageStatusInput.m_errorMessage = errorMessage || ""
+		root.__updateMessageStatusSender.send(root.__updateMessageStatusInput)
+	}
+
+	// =========================================================================
+	// Order requests (phase 3)
+	// =========================================================================
+
+	property ListModel orderRequestsModel: ListModel {}
+
+	property ConfirmOrderRequestInput __confirmOrderRequestInput: ConfirmOrderRequestInput {}
+	property string __pendingConfirmOrderRequestId: ""
+	property GqlSdlRequestSender __confirmOrderRequestSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_confirmOrderRequest
+
+		sdlObjectComp: Component {
+			ConfirmOrderRequestPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.orderRequestConfirmed(root.__pendingConfirmOrderRequestId)
+					}
+				}
+			}
+		}
+	}
+
+	property RejectOrderRequestInput __rejectOrderRequestInput: RejectOrderRequestInput {}
+	property string __pendingRejectOrderRequestId: ""
+	property GqlSdlRequestSender __rejectOrderRequestSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_rejectOrderRequest
+
+		sdlObjectComp: Component {
+			RejectOrderRequestPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.orderRequestRejected(root.__pendingRejectOrderRequestId)
+					}
+				}
+			}
+		}
+	}
+
+	property UpdateOrderRequestStatusInput __updateOrderRequestStatusInput: UpdateOrderRequestStatusInput {}
+	property string __pendingUpdateOrderRequestId: ""
+	property GqlSdlRequestSender __updateOrderRequestStatusSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_updateOrderRequestStatus
+
+		sdlObjectComp: Component {
+			UpdateOrderRequestStatusPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.orderRequestStatusUpdated(root.__pendingUpdateOrderRequestId)
+					}
+				}
+			}
+		}
+	}
+
+	property GetOrderRequestsInput __getOrderRequestsInput: GetOrderRequestsInput {}
+	property GqlSdlRequestSender __getOrderRequestsSender: GqlSdlRequestSender {
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_getOrderRequests
+
+		sdlObjectComp: Component {
+			GetOrderRequestsPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.__populateOrderRequestsModel(m_orderRequests)
+					}
+				}
+			}
+		}
+	}
+
+	function __populateOrderRequestsModel(orderRequests) {
+		root.orderRequestsModel.clear()
+		if (orderRequests) {
+			for (var i = 0; i < orderRequests.length; ++i) {
+				var ord = orderRequests[i]
+				if (!ord)
+					continue
+				root.orderRequestsModel.append({
+					"orderRequestId": ord.m_id || "",
+					"messageId": ord.m_messageId || "",
+					"sourceTenantId": ord.m_sourceTenantId || "",
+					"targetTenantId": ord.m_targetTenantId || "",
+					"relationshipId": ord.m_relationshipId || "",
+					"sourceOrderId": ord.m_sourceOrderId || "",
+					"articleNumber": ord.m_articleNumber || "",
+					"quantity": ord.m_quantity || 0,
+					"note": ord.m_note || "",
+					"status": ord.m_status || OrderRequestStatusEnum.s_received,
+					"statusNote": ord.m_statusNote || "",
+					"createdAt": ord.m_createdAt || "",
+					"updatedAt": ord.m_updatedAt || ""
+				})
+			}
+		}
+		root.orderRequestsReceived(orderRequests || [])
+	}
+
+	function fetchOrderRequests(tenantId) {
+		root.__getOrderRequestsInput.m_tenantId = tenantId || root.tenantId || ""
+		root.__getOrderRequestsSender.send(root.__getOrderRequestsInput)
+	}
+
+	function confirmOrderRequest(orderRequestId, note) {
+		root.__pendingConfirmOrderRequestId = orderRequestId || ""
+		root.__confirmOrderRequestInput.m_orderRequestId = orderRequestId || ""
+		root.__confirmOrderRequestInput.m_note = note || ""
+		root.__confirmOrderRequestSender.send(root.__confirmOrderRequestInput)
+	}
+
+	function rejectOrderRequest(orderRequestId, reason) {
+		root.__pendingRejectOrderRequestId = orderRequestId || ""
+		root.__rejectOrderRequestInput.m_orderRequestId = orderRequestId || ""
+		root.__rejectOrderRequestInput.m_reason = reason || ""
+		root.__rejectOrderRequestSender.send(root.__rejectOrderRequestInput)
+	}
+
+	function updateOrderRequestStatus(orderRequestId, status, note) {
+		root.__pendingUpdateOrderRequestId = orderRequestId || ""
+		root.__updateOrderRequestStatusInput.m_orderRequestId = orderRequestId || ""
+		root.__updateOrderRequestStatusInput.m_status = status || OrderRequestStatusEnum.s_received
+		root.__updateOrderRequestStatusInput.m_note = note || ""
+		root.__updateOrderRequestStatusSender.send(root.__updateOrderRequestStatusInput)
+	}
+
+	// =========================================================================
 	// List data providers (Roles / Groups / invitable Users)
 	// =========================================================================
 

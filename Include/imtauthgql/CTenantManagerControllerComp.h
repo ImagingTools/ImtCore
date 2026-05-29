@@ -11,6 +11,8 @@
 #include <imtauth/IUserManager.h>
 #include <imtauth/ICrossOrgGrant.h>
 #include <imtauth/ITenantConnectionRequest.h>
+#include <imtauth/ICrossTenantMessage.h>
+#include <imtauth/IOrderRequest.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
 
 
@@ -29,6 +31,8 @@ public:
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Collection of users", true, "UserCollection");
 		I_ASSIGN(m_grantManagerCompPtr, "CrossOrgGrantManager", "Manager for cross-org grants", false, "CrossOrgGrantManager");
 		I_ASSIGN(m_connectionRequestManagerCompPtr, "TenantConnectionRequestManager", "Manager for tenant connection requests", false, "TenantConnectionRequestManager");
+		I_ASSIGN(m_messageBrokerCompPtr, "CrossTenantMessageBroker", "Broker for cross-tenant messages", false, "CrossTenantMessageBroker");
+		I_ASSIGN(m_orderRequestManagerCompPtr, "OrderRequestManager", "Manager for order requests", false, "OrderRequestManager");
 	I_END_COMPONENT;
 
 protected:
@@ -115,6 +119,42 @@ protected:
 				const sdl::imtauth::Tenants::CRevokeTenantConnectionRequestGqlRequest& revokeTenantConnectionRequestRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::imtauth::Tenants::CGetCrossTenantMessagePayload OnGetCrossTenantMessage(
+				const sdl::imtauth::Tenants::CGetCrossTenantMessageGqlRequest& getCrossTenantMessageRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtauth::Tenants::CGetCrossTenantMessagesPayload OnGetCrossTenantMessages(
+				const sdl::imtauth::Tenants::CGetCrossTenantMessagesGqlRequest& getCrossTenantMessagesRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtauth::Tenants::CSendCrossTenantMessagePayload OnSendCrossTenantMessage(
+				const sdl::imtauth::Tenants::CSendCrossTenantMessageGqlRequest& sendCrossTenantMessageRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtauth::Tenants::CUpdateCrossTenantMessageStatusPayload OnUpdateCrossTenantMessageStatus(
+				const sdl::imtauth::Tenants::CUpdateCrossTenantMessageStatusGqlRequest& updateCrossTenantMessageStatusRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtauth::Tenants::CGetOrderRequestPayload OnGetOrderRequest(
+				const sdl::imtauth::Tenants::CGetOrderRequestGqlRequest& getOrderRequestRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtauth::Tenants::CGetOrderRequestsPayload OnGetOrderRequests(
+				const sdl::imtauth::Tenants::CGetOrderRequestsGqlRequest& getOrderRequestsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtauth::Tenants::CConfirmOrderRequestPayload OnConfirmOrderRequest(
+				const sdl::imtauth::Tenants::CConfirmOrderRequestGqlRequest& confirmOrderRequestRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtauth::Tenants::CRejectOrderRequestPayload OnRejectOrderRequest(
+				const sdl::imtauth::Tenants::CRejectOrderRequestGqlRequest& rejectOrderRequestRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtauth::Tenants::CUpdateOrderRequestStatusPayload OnUpdateOrderRequestStatus(
+				const sdl::imtauth::Tenants::CUpdateOrderRequestStatusGqlRequest& updateOrderRequestStatusRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 
 private:
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
@@ -122,6 +162,8 @@ private:
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 	I_REF(imtauth::ICrossOrgGrant, m_grantManagerCompPtr);
 	I_REF(imtauth::ITenantConnectionRequest, m_connectionRequestManagerCompPtr);
+	I_REF(imtauth::ICrossTenantMessage, m_messageBrokerCompPtr);
+	I_REF(imtauth::IOrderRequest, m_orderRequestManagerCompPtr);
 };
 
 
