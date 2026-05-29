@@ -19,7 +19,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CTextParam::V1_0>)
+	// reimplemented (TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CTextParam>)
 	virtual QByteArray GetTypeId() const override;
 };
 

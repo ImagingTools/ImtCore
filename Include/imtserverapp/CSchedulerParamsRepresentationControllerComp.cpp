@@ -12,11 +12,11 @@ namespace imtserverapp
 
 // protected methods
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CSchedulerParam::V1_0>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CSchedulerParam>)
 
 QByteArray CSchedulerParamsRepresentationControllerComp::GetTypeId() const
 {
-	return sdl::imtbase::ImtBaseTypes::CParamTypeIds::V1_0::ParamTypeIdsFields::SchedulerParam.toUtf8();
+	return sdl::V1_0::imtbase::CParamTypeIds::ParamTypeIdsFields::SchedulerParam.toUtf8();
 }
 
 
@@ -29,7 +29,7 @@ bool CSchedulerParamsRepresentationControllerComp::IsModelSupported(const istd::
 
 
 bool CSchedulerParamsRepresentationControllerComp::GetSdlRepresentationFromDataModel(
-			sdl::imtbase::ImtBaseTypes::CSchedulerParam::V1_0& sdlRepresentation,
+			sdl::V1_0::imtbase::CSchedulerParam& sdlRepresentation,
 			const istd::IChangeable& dataModel,
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
@@ -52,7 +52,7 @@ bool CSchedulerParamsRepresentationControllerComp::GetSdlRepresentationFromDataM
 
 bool CSchedulerParamsRepresentationControllerComp::GetDataModelFromSdlRepresentation(
 			istd::IChangeable& dataModel,
-			const sdl::imtbase::ImtBaseTypes::CSchedulerParam::V1_0& sdlRepresentation) const
+			const sdl::V1_0::imtbase::CSchedulerParam& sdlRepresentation) const
 {
 	imtapp::ISchedulerParams* schedulerParamsPtr = dynamic_cast<imtapp::ISchedulerParams*>(&dataModel);
 	Q_ASSERT(schedulerParamsPtr != nullptr);

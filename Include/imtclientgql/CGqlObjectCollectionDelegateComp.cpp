@@ -39,14 +39,14 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectTypeIdRequ
 		return nullptr;
 	}
 
-	sdl::imtbase::ImtCollection::GetObjectTypeIdRequestArguments arguments;
+	sdl::V1_0::imtbase::GetObjectTypeIdRequestArguments arguments;
 	arguments.input.Version_1_0.emplace();
 	arguments.input.Version_1_0->objectId = objectId;
 	arguments.input.Version_1_0->collectionId = *m_collectionIdAttrPtr;
 
 	return CreateGqlRequest<
-				sdl::imtbase::ImtCollection::GetObjectTypeIdRequestArguments,
-				sdl::imtbase::ImtCollection::CGetObjectTypeIdGqlRequest>(arguments).PopInterfacePtr();
+				sdl::V1_0::imtbase::GetObjectTypeIdRequestArguments,
+				sdl::V1_0::imtbase::CGetObjectTypeIdGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -56,14 +56,14 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectInfoReques
 		return nullptr;
 	}
 
-	sdl::imtbase::ImtCollection::GetElementInfoRequestArguments arguments;
+	sdl::V1_0::imtbase::GetElementInfoRequestArguments arguments;
 	arguments.input.Version_1_0.emplace();
 	arguments.input.Version_1_0->collectionId = *m_collectionIdAttrPtr;
 	arguments.input.Version_1_0->elementId = objectId;
 
 	return CreateGqlRequest<
-				sdl::imtbase::ImtCollection::GetElementInfoRequestArguments,
-				sdl::imtbase::ImtCollection::CGetElementInfoGqlRequest>(arguments).PopInterfacePtr();
+				sdl::V1_0::imtbase::GetElementInfoRequestArguments,
+				sdl::V1_0::imtbase::CGetElementInfoGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -73,14 +73,14 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectMetaInfoRe
 		return nullptr;
 	}
 
-	sdl::imtbase::ImtCollection::GetElementMetaInfoRequestArguments arguments;
+	sdl::V1_0::imtbase::GetElementMetaInfoRequestArguments arguments;
 	arguments.input.Version_1_0.emplace();
 	arguments.input.Version_1_0->collectionId = *m_collectionIdAttrPtr;
 	arguments.input.Version_1_0->elementId = objectId;
 
 	return CreateGqlRequest<
-				sdl::imtbase::ImtCollection::GetElementMetaInfoRequestArguments,
-				sdl::imtbase::ImtCollection::CGetElementMetaInfoGqlRequest>(arguments).PopInterfacePtr();
+				sdl::V1_0::imtbase::GetElementMetaInfoRequestArguments,
+				sdl::V1_0::imtbase::CGetElementMetaInfoGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -90,14 +90,14 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectDataMetaIn
 		return nullptr;
 	}
 
-	sdl::imtbase::ImtCollection::GetDataMetaInfoRequestArguments arguments;
+	sdl::V1_0::imtbase::GetDataMetaInfoRequestArguments arguments;
 	arguments.input.Version_1_0.emplace();
 	arguments.input.Version_1_0->collectionId = *m_collectionIdAttrPtr;
 	arguments.input.Version_1_0->objectId = objectId;
 
 	return CreateGqlRequest<
-				sdl::imtbase::ImtCollection::GetDataMetaInfoRequestArguments,
-				sdl::imtbase::ImtCollection::CGetDataMetaInfoGqlRequest>(arguments).PopInterfacePtr();
+				sdl::V1_0::imtbase::GetDataMetaInfoRequestArguments,
+				sdl::V1_0::imtbase::CGetDataMetaInfoGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -117,7 +117,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateInsertObjectRequest
 		return nullptr;
 	}
 
-	sdl::imtbase::ImtCollection::InsertNewObjectRequestArguments arguments;
+	sdl::V1_0::imtbase::InsertNewObjectRequestArguments arguments;
 	arguments.input.Version_1_0.emplace();
 	arguments.input.Version_1_0->collectionId = *m_collectionIdAttrPtr;
 	arguments.input.Version_1_0->name = name;
@@ -159,8 +159,8 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateInsertObjectRequest
 	}
 
 	return CreateGqlRequest<
-				sdl::imtbase::ImtCollection::InsertNewObjectRequestArguments,
-				sdl::imtbase::ImtCollection::CInsertNewObjectGqlRequest>(arguments).PopInterfacePtr();
+				sdl::V1_0::imtbase::InsertNewObjectRequestArguments,
+				sdl::V1_0::imtbase::CInsertNewObjectGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -172,14 +172,14 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectRequest(
 		return nullptr;
 	}
 
-	sdl::imtbase::ImtCollection::GetObjectDataRequestArguments arguments;
+	sdl::V1_0::imtbase::GetObjectDataRequestArguments arguments;
 	arguments.input.Version_1_0.emplace();
 	arguments.input.Version_1_0->objectId = objectId;
 	arguments.input.Version_1_0->collectionId = *m_collectionIdAttrPtr;
 
 	return CreateGqlRequest<
-				sdl::imtbase::ImtCollection::GetObjectDataRequestArguments,
-				sdl::imtbase::ImtCollection::CGetObjectDataGqlRequest>(arguments).PopInterfacePtr();
+				sdl::V1_0::imtbase::GetObjectDataRequestArguments,
+				sdl::V1_0::imtbase::CGetObjectDataGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -197,7 +197,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectRequest(
 		return nullptr;
 	}
 
-	sdl::imtbase::ImtCollection::SetObjectDataRequestArguments arguments;
+	sdl::V1_0::imtbase::SetObjectDataRequestArguments arguments;
 	arguments.input.Version_1_0.emplace();
 	arguments.input.Version_1_0->collectionId = *m_collectionIdAttrPtr;
 	arguments.input.Version_1_0->objectId = objectId;
@@ -217,8 +217,8 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectRequest(
 	}
 
 	return CreateGqlRequest<
-				sdl::imtbase::ImtCollection::SetObjectDataRequestArguments,
-				sdl::imtbase::ImtCollection::CSetObjectDataGqlRequest>(arguments).PopInterfacePtr();
+				sdl::V1_0::imtbase::SetObjectDataRequestArguments,
+				sdl::V1_0::imtbase::CSetObjectDataGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -231,15 +231,15 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateRemoveObjectsReques
 		return nullptr;
 	}
 
-	sdl::imtbase::ImtCollection::RemoveElementsRequestArguments arguments;
+	sdl::V1_0::imtbase::RemoveElementsRequestArguments arguments;
 	arguments.input.Version_1_0.emplace();
 	arguments.input.Version_1_0->collectionId = *m_collectionIdAttrPtr;
 	arguments.input.Version_1_0->elementIds.Emplace();
 	arguments.input.Version_1_0->elementIds->FromList(objectIds);
 
 	return CreateGqlRequest<
-				sdl::imtbase::ImtCollection::RemoveElementsRequestArguments,
-				sdl::imtbase::ImtCollection::CRemoveElementsGqlRequest>(arguments).PopInterfacePtr();
+				sdl::V1_0::imtbase::RemoveElementsRequestArguments,
+				sdl::V1_0::imtbase::CRemoveElementsGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -252,20 +252,20 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateRemoveObjectSetRequ
 		return nullptr;
 	}
 
-	sdl::imtbase::ImtCollection::RemoveElementSetRequestArguments arguments;
+	sdl::V1_0::imtbase::RemoveElementSetRequestArguments arguments;
 	arguments.input.Version_1_0.emplace();
 	arguments.input.Version_1_0->collectionId = *m_collectionIdAttrPtr;
 
 	if (selectionParamsPtr != nullptr){
-		sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 paramsSet;
+		sdl::V1_0::imtbase::CParamsSet paramsSet;
 		if (GetParamsSetRepresentation(*selectionParamsPtr, paramsSet)){
 			arguments.input.Version_1_0->selectionParams = paramsSet;
 		}
 	}
 
 	return CreateGqlRequest<
-				sdl::imtbase::ImtCollection::RemoveElementSetRequestArguments,
-				sdl::imtbase::ImtCollection::CRemoveElementSetGqlRequest>(arguments).PopInterfacePtr();
+				sdl::V1_0::imtbase::RemoveElementSetRequestArguments,
+				sdl::V1_0::imtbase::CRemoveElementSetGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -276,13 +276,13 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetElementCountRequ
 		return nullptr;
 	}
 
-	sdl::imtbase::ImtCollection::GetElementsCountRequestArguments arguments;
+	sdl::V1_0::imtbase::GetElementsCountRequestArguments arguments;
 	arguments.input.Version_1_0.emplace();
 	arguments.input.Version_1_0->collectionId = *m_collectionIdAttrPtr;
 
 	if (selectionParamsPtr != nullptr){
 		if (selectionParamsPtr != nullptr){
-			sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 paramsSet;
+			sdl::V1_0::imtbase::CParamsSet paramsSet;
 			if (GetParamsSetRepresentation(*selectionParamsPtr, paramsSet)){
 				arguments.input.Version_1_0->selectionParams = paramsSet;
 			}
@@ -290,8 +290,8 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetElementCountRequ
 	}
 
 	return CreateGqlRequest<
-				sdl::imtbase::ImtCollection::GetElementsCountRequestArguments,
-				sdl::imtbase::ImtCollection::CGetElementsCountGqlRequest>(arguments).PopInterfacePtr();
+				sdl::V1_0::imtbase::GetElementsCountRequestArguments,
+				sdl::V1_0::imtbase::CGetElementsCountGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -304,7 +304,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetElementListReque
 		return nullptr;
 	}
 
-	sdl::imtbase::ImtCollection::GetElementIdsRequestArguments arguments;
+	sdl::V1_0::imtbase::GetElementIdsRequestArguments arguments;
 	arguments.input.Version_1_0.emplace();
 	arguments.input.Version_1_0->collectionId = *m_collectionIdAttrPtr;
 	arguments.input.Version_1_0->count = count;
@@ -312,7 +312,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetElementListReque
 
 	if (selectionParamsPtr != nullptr){
 		if (selectionParamsPtr != nullptr){
-			sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 paramsSet;
+			sdl::V1_0::imtbase::CParamsSet paramsSet;
 			if (GetParamsSetRepresentation(*selectionParamsPtr, paramsSet)){
 				arguments.input.Version_1_0->selectionParams = paramsSet;
 			}
@@ -320,8 +320,8 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetElementListReque
 	}
 
 	return CreateGqlRequest<
-				sdl::imtbase::ImtCollection::GetElementIdsRequestArguments,
-				sdl::imtbase::ImtCollection::CGetElementIdsGqlRequest>(arguments).PopInterfacePtr();
+				sdl::V1_0::imtbase::GetElementIdsRequestArguments,
+				sdl::V1_0::imtbase::CGetElementIdsGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -334,7 +334,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetSubCollectionReq
 		return nullptr;
 	}
 
-	sdl::imtbase::ImtCollection::CreateSubCollectionRequestArguments arguments;
+	sdl::V1_0::imtbase::CreateSubCollectionRequestArguments arguments;
 	arguments.input.Version_1_0.emplace();
 	arguments.input.Version_1_0->collectionId = *m_collectionIdAttrPtr;
 	arguments.input.Version_1_0->offset = offset;
@@ -342,7 +342,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetSubCollectionReq
 
 	if (selectionParamsPtr != nullptr){
 		if (selectionParamsPtr != nullptr){
-			sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 paramsSet;
+			sdl::V1_0::imtbase::CParamsSet paramsSet;
 			if (GetParamsSetRepresentation(*selectionParamsPtr, paramsSet)){
 				arguments.input.Version_1_0->selectionParams = paramsSet;
 			}
@@ -350,8 +350,8 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetSubCollectionReq
 	}
 
 	return CreateGqlRequest<
-				sdl::imtbase::ImtCollection::CreateSubCollectionRequestArguments,
-				sdl::imtbase::ImtCollection::CCreateSubCollectionGqlRequest>(arguments).PopInterfacePtr();
+				sdl::V1_0::imtbase::CreateSubCollectionRequestArguments,
+				sdl::V1_0::imtbase::CCreateSubCollectionGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -365,15 +365,15 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectNameReques
 		return nullptr;
 	}
 
-	sdl::imtbase::ImtCollection::SetObjectNameRequestArguments arguments;
+	sdl::V1_0::imtbase::SetObjectNameRequestArguments arguments;
 	arguments.input.Version_1_0.emplace();
 	arguments.input.Version_1_0->collectionId = *m_collectionIdAttrPtr;
 	arguments.input.Version_1_0->objectId = objectId;
 	arguments.input.Version_1_0->name = name;
 
 	return CreateGqlRequest<
-				sdl::imtbase::ImtCollection::SetObjectNameRequestArguments,
-				sdl::imtbase::ImtCollection::CSetObjectNameGqlRequest>(arguments).PopInterfacePtr();
+				sdl::V1_0::imtbase::SetObjectNameRequestArguments,
+				sdl::V1_0::imtbase::CSetObjectNameGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -387,15 +387,15 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectDescriptio
 		return nullptr;
 	}
 
-	sdl::imtbase::ImtCollection::SetObjectDescriptionRequestArguments arguments;
+	sdl::V1_0::imtbase::SetObjectDescriptionRequestArguments arguments;
 	arguments.input.Version_1_0.emplace();
 	arguments.input.Version_1_0->collectionId = *m_collectionIdAttrPtr;
 	arguments.input.Version_1_0->objectId = objectId;
 	arguments.input.Version_1_0->description = description;
 
 	return CreateGqlRequest<
-				sdl::imtbase::ImtCollection::SetObjectDescriptionRequestArguments,
-				sdl::imtbase::ImtCollection::CSetObjectDescriptionGqlRequest>(arguments).PopInterfacePtr();
+				sdl::V1_0::imtbase::SetObjectDescriptionRequestArguments,
+				sdl::V1_0::imtbase::CSetObjectDescriptionGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -417,7 +417,7 @@ bool CGqlObjectCollectionDelegateComp::GetOperationResult(const imtgql::IGqlResp
 
 bool CGqlObjectCollectionDelegateComp::GetObjectId(const imtgql::IGqlResponse& response, Id& out) const
 {
-	sdl::imtbase::ImtCollection::CInsertNewObjectPayload::V1_0 insertNewObjectPayload;
+	sdl::V1_0::imtbase::CInsertNewObjectPayload insertNewObjectPayload;
 
 	ResponseData responseData = GetResponseData(response);
 	if (insertNewObjectPayload.ReadFromJsonObject(responseData.data)){
@@ -434,7 +434,7 @@ bool CGqlObjectCollectionDelegateComp::GetObjectId(const imtgql::IGqlResponse& r
 
 bool CGqlObjectCollectionDelegateComp::GetObjectTypeId(const imtgql::IGqlResponse& response, Id& out) const
 {
-	sdl::imtbase::ImtCollection::CGetObjectTypeIdPayload::V1_0 getObjectTypeIdPayload;
+	sdl::V1_0::imtbase::CGetObjectTypeIdPayload getObjectTypeIdPayload;
 	ResponseData responseData = GetResponseData(response);
 	if (getObjectTypeIdPayload.ReadFromJsonObject(responseData.data)){
 		if (getObjectTypeIdPayload.typeId){
@@ -449,11 +449,11 @@ bool CGqlObjectCollectionDelegateComp::GetObjectTypeId(const imtgql::IGqlRespons
 
 bool CGqlObjectCollectionDelegateComp::GetObjectInfo(const imtgql::IGqlResponse& response, ObjectInfo& out) const
 {
-	sdl::imtbase::ImtCollection::CGetElementInfoPayload::V1_0 getElementInfoPayload;
+	sdl::V1_0::imtbase::CGetElementInfoPayload getElementInfoPayload;
 	ResponseData responseData = GetResponseData(response);
 	if (getElementInfoPayload.ReadFromJsonObject(responseData.data)){
 		if (getElementInfoPayload.elementInfo){
-			sdl::imtbase::ImtBaseTypes::CParameter::V1_0 parameter = *getElementInfoPayload.elementInfo;
+			sdl::V1_0::imtbase::CParameter parameter = *getElementInfoPayload.elementInfo;
 			if (parameter.id){
 				out.id = *parameter.id;
 			}
@@ -480,7 +480,7 @@ bool CGqlObjectCollectionDelegateComp::GetObjectInfo(const imtgql::IGqlResponse&
 
 bool CGqlObjectCollectionDelegateComp::GetObjectData(const imtgql::IGqlResponse& response, istd::IChangeable& out) const
 {
-	sdl::imtbase::ImtCollection::CGetObjectDataPayload::V1_0 getObjectDataPayload;
+	sdl::V1_0::imtbase::CGetObjectDataPayload getObjectDataPayload;
 	ResponseData responseData = GetResponseData(response);
 	if (getObjectDataPayload.ReadFromJsonObject(responseData.data)){
 		if (getObjectDataPayload.objectData){
@@ -494,7 +494,7 @@ bool CGqlObjectCollectionDelegateComp::GetObjectData(const imtgql::IGqlResponse&
 
 bool CGqlObjectCollectionDelegateComp::GetMetaInfo(const imtgql::IGqlResponse& response, idoc::IDocumentMetaInfo& /* out */) const
 {
-	sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload::V1_0 getElementMetaInfoPayload;
+	sdl::V1_0::imtbase::CGetElementMetaInfoPayload getElementMetaInfoPayload;
 	ResponseData responseData = GetResponseData(response);
 
 	if (getElementMetaInfoPayload.ReadFromJsonObject(responseData.data)){
@@ -512,7 +512,7 @@ bool CGqlObjectCollectionDelegateComp::GetMetaInfo(const imtgql::IGqlResponse& r
 
 bool CGqlObjectCollectionDelegateComp::GetItemCount(const imtgql::IGqlResponse& response, int& out) const
 {
-	sdl::imtbase::ImtCollection::CGetElementsCountPayload::V1_0 getElementsCountPayload;
+	sdl::V1_0::imtbase::CGetElementsCountPayload getElementsCountPayload;
 	ResponseData responseData = GetResponseData(response);
 	if (getElementsCountPayload.ReadFromJsonObject(responseData.data)){
 		if (getElementsCountPayload.count){
@@ -529,7 +529,7 @@ bool CGqlObjectCollectionDelegateComp::GetItemCount(const imtgql::IGqlResponse& 
 
 bool CGqlObjectCollectionDelegateComp::GetItemIds(const imtgql::IGqlResponse& response, Ids& out) const
 {
-	sdl::imtbase::ImtCollection::CGetElementIdsPayload::V1_0 getElementIdsPayload;
+	sdl::V1_0::imtbase::CGetElementIdsPayload getElementIdsPayload;
 	ResponseData responseData = GetResponseData(response);
 	if (getElementIdsPayload.ReadFromJsonObject(responseData.data)){
 		if (getElementIdsPayload.elementIds.HasValue()){
@@ -550,12 +550,12 @@ imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
 {
 	istd::TDelPtr<imtbase::IObjectCollection> subCollectionPtr(new imtbase::CFilterCollectionProxy(collection));
 
-	sdl::imtbase::ImtCollection::CCreateSubCollectionPayload::V1_0 createSubCollectionPayload;
+	sdl::V1_0::imtbase::CCreateSubCollectionPayload createSubCollectionPayload;
 	ResponseData responseData = GetResponseData(response);
 	if (createSubCollectionPayload.ReadFromJsonObject(responseData.data)){
 		if (createSubCollectionPayload.items){
-			imtsdl::TElementList<sdl::imtbase::ImtCollection::CSubCollectionItem::V1_0> subCollectionItems = *createSubCollectionPayload.items;
-			for (const istd::TSharedNullable<sdl::imtbase::ImtCollection::CSubCollectionItem::V1_0>& subCollectionItem : subCollectionItems){
+			imtsdl::TElementList<sdl::V1_0::imtbase::CSubCollectionItem> subCollectionItems = *createSubCollectionPayload.items;
+			for (const istd::TSharedNullable<sdl::V1_0::imtbase::CSubCollectionItem>& subCollectionItem : subCollectionItems){
 				QByteArray objectId = *subCollectionItem->itemInfo->id;
 				QByteArray objectTypeId = *subCollectionItem->itemInfo->typeId;
 				QString name = *subCollectionItem->itemInfo->name;
@@ -738,7 +738,7 @@ bool CGqlObjectCollectionDelegateComp::DeSerializeObject(istd::IPolymorphic* obj
 
 bool CGqlObjectCollectionDelegateComp::GetParamsSetRepresentation(
 			const iprm::IParamsSet& paramsSet,
-			sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0& representation) const
+			sdl::V1_0::imtbase::CParamsSet& representation) const
 {
 	QJsonObject jsonObject;
 	if (m_paramSetRepresentationController.GetRepresentationFromDataModel(paramsSet, jsonObject)){

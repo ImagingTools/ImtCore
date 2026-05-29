@@ -30,7 +30,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CSchedulerParam::V1_0>)
+	// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CSchedulerParam>)
 	virtual RepresentationInfo GetRepresentationInfo() const override;
 	virtual QByteArray GetTypeId() const override;
 	virtual bool IsModelSupported(const istd::IChangeable &dataModel) const override;
@@ -49,10 +49,10 @@ private:
 	IJsonRepresentationController* GetRepresentationController(const istd::IChangeable& dataModel) const;
 	bool ParamsSetModelToSdl(
 		const iprm::IParamsSet& model,
-		sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0& sdl,
+		sdl::V1_0::imtbase::CParamsSet& sdl,
 		const iprm::IParamsSet* paramsPtr) const;
 	bool ParamsSetSdlToModel(
-		const sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0& sdl,
+		const sdl::V1_0::imtbase::CParamsSet& sdl,
 		iprm::IParamsSet& model,
 		const iprm::IParamsSet* paramsPtr) const;
 

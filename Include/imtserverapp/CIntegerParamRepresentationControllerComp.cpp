@@ -12,11 +12,11 @@ namespace imtserverapp
 
 // protected methods
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CIntegerParam::V1_0>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CIntegerParam>)
 
 QByteArray CIntegerParamRepresentationControllerComp::GetTypeId() const
 {
-	return sdl::imtbase::ImtBaseTypes::CParamTypeIds::V1_0::ParamTypeIdsFields::IntegerParam.toUtf8();
+	return sdl::V1_0::imtbase::CParamTypeIds::ParamTypeIdsFields::IntegerParam.toUtf8();
 }
 
 
@@ -29,7 +29,7 @@ bool CIntegerParamRepresentationControllerComp::IsModelSupported(const istd::ICh
 
 
 bool CIntegerParamRepresentationControllerComp::GetSdlRepresentationFromDataModel(
-			sdl::imtbase::ImtBaseTypes::CIntegerParam::V1_0& sdlRepresentation,
+			sdl::V1_0::imtbase::CIntegerParam& sdlRepresentation,
 			const istd::IChangeable& dataModel,
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
@@ -52,7 +52,7 @@ bool CIntegerParamRepresentationControllerComp::GetSdlRepresentationFromDataMode
 
 bool CIntegerParamRepresentationControllerComp::GetDataModelFromSdlRepresentation(
 			istd::IChangeable& dataModel,
-			const sdl::imtbase::ImtBaseTypes::CIntegerParam::V1_0& sdlRepresentation) const
+			const sdl::V1_0::imtbase::CIntegerParam& sdlRepresentation) const
 {
 	iprm::ITextParam* textParamPtr = dynamic_cast<iprm::ITextParam*>(&dataModel);
 	Q_ASSERT(textParamPtr != nullptr);

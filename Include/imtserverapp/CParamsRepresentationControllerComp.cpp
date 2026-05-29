@@ -15,7 +15,7 @@ namespace imtserverapp
 
 // protected methods
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CSchedulerParam::V1_0>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CSchedulerParam>)
 
 IJsonRepresentationController::RepresentationInfo CParamsRepresentationControllerComp::GetRepresentationInfo() const
 {
@@ -55,7 +55,7 @@ bool CParamsRepresentationControllerComp::GetRepresentationFromDataModel(
 		return controllerPtr->GetRepresentationFromDataModel(dataModel, representation, paramsPtr);
 	}
 
-	sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 sdlParamsSet;
+	sdl::V1_0::imtbase::CParamsSet sdlParamsSet;
 	if (ParamsSetModelToSdl(*sourcePtr, sdlParamsSet, paramsPtr)){
 		return sdlParamsSet.WriteToJsonObject(representation);
 	}
@@ -76,7 +76,7 @@ bool CParamsRepresentationControllerComp::GetDataModelFromRepresentation(const Q
 		return controllerPtr->GetDataModelFromRepresentation(representation, dataModel);
 	}
 
-	//sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 sdlParamsSet;
+	//sdl::V1_0::imtbase::CParamsSet sdlParamsSet;
 	//if (!sdlParamsSet.ReadFromJsonObject(representation)){
 	//	return false;
 	//}
@@ -125,7 +125,7 @@ IJsonRepresentationController* CParamsRepresentationControllerComp::GetRepresent
 
 bool CParamsRepresentationControllerComp::ParamsSetModelToSdl(
 			const iprm::IParamsSet& model,
-			sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0& sdl,
+			sdl::V1_0::imtbase::CParamsSet& sdl,
 			const iprm::IParamsSet* paramsPtr) const
 {
 	QByteArray languageId;
@@ -140,7 +140,7 @@ bool CParamsRepresentationControllerComp::ParamsSetModelToSdl(
 	QByteArrayList parameterIds = paramSetIds.values();
 	std::sort(parameterIds.begin(), parameterIds.end());
 
-	imtsdl::TElementList<sdl::imtbase::ImtBaseTypes::CParameter::V1_0> parameterList;
+	imtsdl::TElementList<sdl::V1_0::imtbase::CParameter> parameterList;
 
 	for (const QByteArray& parameterId : parameterIds){
 		if (!parameterId.contains("/")){
@@ -176,7 +176,7 @@ bool CParamsRepresentationControllerComp::ParamsSetModelToSdl(
 
 			Q_ASSERT(!typeId.isEmpty());
 
-			sdl::imtbase::ImtBaseTypes::CParameter::V1_0 parameter;
+			sdl::V1_0::imtbase::CParameter parameter;
 			QJsonDocument jsonDocument(parameterRepresentation);
 
 			parameter.id = parameterId;
@@ -213,7 +213,7 @@ bool CParamsRepresentationControllerComp::ParamsSetModelToSdl(
 
 
 bool CParamsRepresentationControllerComp::ParamsSetSdlToModel(
-			const sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0& /*sdl*/,
+			const sdl::V1_0::imtbase::CParamsSet& /*sdl*/,
 			iprm::IParamsSet& /*model*/,
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {

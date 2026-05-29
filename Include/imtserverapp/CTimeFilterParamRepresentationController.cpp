@@ -31,7 +31,7 @@ CTimeFilterParamRepresentationController::CTimeFilterParamRepresentationControll
 }
 
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerWrap<sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CTimeFilter>)
 
 QByteArray CTimeFilterParamRepresentationController::GetTypeId() const
 {
@@ -48,7 +48,7 @@ bool CTimeFilterParamRepresentationController::IsModelSupported(const istd::ICha
 
 
 bool CTimeFilterParamRepresentationController::GetSdlRepresentationFromDataModel(
-			sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0& sdlRepresentation,
+			sdl::V1_0::imtbase::CTimeFilter& sdlRepresentation,
 			const istd::IChangeable& dataModel,
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
@@ -57,7 +57,7 @@ bool CTimeFilterParamRepresentationController::GetSdlRepresentationFromDataModel
 		return false;
 	}
 
-	sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0 sdlTimeFilter;
+	sdl::V1_0::imtbase::CTimeFilter sdlTimeFilter;
 
 	imtbase::CTimeRange timeRange = timeFilterParamPtr->GetTimeRange();
 	sdlRepresentation.timeRange.emplace();
@@ -107,7 +107,7 @@ bool CTimeFilterParamRepresentationController::GetSdlRepresentationFromDataModel
 
 bool CTimeFilterParamRepresentationController::GetDataModelFromSdlRepresentation(
 			istd::IChangeable& dataModel,
-			const sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0& sdlRepresentation) const
+			const sdl::V1_0::imtbase::CTimeFilter& sdlRepresentation) const
 {
 	imtbase::ITimeFilterParam* timeFilterParamPtr = dynamic_cast<imtbase::ITimeFilterParam*>(&dataModel);
 	if (timeFilterParamPtr == nullptr){
@@ -115,7 +115,7 @@ bool CTimeFilterParamRepresentationController::GetDataModelFromSdlRepresentation
 	}
 
 	if (sdlRepresentation.timeRange){
-		sdl::imtbase::ImtBaseTypes::CTimeRange::V1_0 timeRangeSdl = *sdlRepresentation.timeRange;
+		sdl::V1_0::imtbase::CTimeRange timeRangeSdl = *sdlRepresentation.timeRange;
 
 		QString startRange;
 		if (timeRangeSdl.Begin){

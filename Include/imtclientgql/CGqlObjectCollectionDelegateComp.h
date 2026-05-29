@@ -120,7 +120,7 @@ private:
 	ResponseData GetResponseData(const imtgql::IGqlResponse& response) const;
 	bool SerializeObject(const istd::IPolymorphic* object, QByteArray& objectData) const;
 	bool DeSerializeObject(istd::IPolymorphic* object, const QByteArray& objectData) const;
-	bool GetParamsSetRepresentation(const iprm::IParamsSet& paramsSet, sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0& representation) const;
+	bool GetParamsSetRepresentation(const iprm::IParamsSet& paramsSet, sdl::V1_0::imtbase::CParamsSet& representation) const;
 
 	template<class Arguments,class SdlRequest>
 	istd::TUniqueInterfacePtr<imtgql::IGqlRequest> CreateGqlRequest(Arguments arguments) const;

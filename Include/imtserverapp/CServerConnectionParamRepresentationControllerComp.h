@@ -11,25 +11,25 @@ namespace imtserverapp
 {
 
 
-class CServerConnectionParamRepresentationControllerComp: public imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CServerConnectionParam::V1_0>
+class CServerConnectionParamRepresentationControllerComp: public imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CServerConnectionParam>
 {
 public:
-	typedef imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CServerConnectionParam::V1_0> BaseClass;
+	typedef imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CServerConnectionParam> BaseClass;
 
 	I_BEGIN_COMPONENT(CServerConnectionParamRepresentationControllerComp)
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CServerConnectionParam::V1_0>)
+	// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CServerConnectionParam>)
 	virtual QByteArray GetTypeId() const override;
 	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;
 	virtual bool GetSdlRepresentationFromDataModel(
-				sdl::imtbase::ImtBaseTypes::CServerConnectionParam::V1_0& sdlRepresentation,
+				sdl::V1_0::imtbase::CServerConnectionParam& sdlRepresentation,
 				const istd::IChangeable& dataModel,
 				const iprm::IParamsSet* paramsPtr = nullptr) const override;
 	virtual bool GetDataModelFromSdlRepresentation(
 				istd::IChangeable& dataModel,
-				const sdl::imtbase::ImtBaseTypes::CServerConnectionParam::V1_0& sdlRepresentation) const override;
+				const sdl::V1_0::imtbase::CServerConnectionParam& sdlRepresentation) const override;
 };
 
 

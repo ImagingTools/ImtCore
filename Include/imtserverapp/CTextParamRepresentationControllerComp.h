@@ -11,25 +11,25 @@ namespace imtserverapp
 {
 
 
-class CTextParamRepresentationControllerComp: public TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CTextParam::V1_0>
+class CTextParamRepresentationControllerComp: public TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CTextParam>
 {
 public:
-	typedef TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CTextParam::V1_0> BaseClass;
+	typedef TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CTextParam> BaseClass;
 
 	I_BEGIN_COMPONENT(CTextParamRepresentationControllerComp)
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CTextParam::V1_0>)
+	// reimplemented (TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CTextParam>)
 	virtual QByteArray GetTypeId() const override;
 	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;
 	virtual bool GetSdlRepresentationFromDataModel(
-				sdl::imtbase::ImtBaseTypes::CTextParam::V1_0& sdlRepresentation,
+				sdl::V1_0::imtbase::CTextParam& sdlRepresentation,
 				const istd::IChangeable& dataModel,
 				const iprm::IParamsSet* paramsPtr = nullptr) const override;
 	virtual bool GetDataModelFromSdlRepresentation(
 				istd::IChangeable& dataModel,
-				const sdl::imtbase::ImtBaseTypes::CTextParam::V1_0& sdlRepresentation) const override;
+				const sdl::V1_0::imtbase::CTextParam& sdlRepresentation) const override;
 };
 
 

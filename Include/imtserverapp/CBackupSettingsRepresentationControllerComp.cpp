@@ -15,11 +15,11 @@ namespace imtserverapp
 
 // protected methods
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CSchedulerParam::V1_0>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CSchedulerParam>)
 
 QByteArray CBackupSettingsRepresentationControllerComp::GetTypeId() const
 {
-	return sdl::imtbase::ImtBaseTypes::CParamTypeIds::V1_0::ParamTypeIdsFields::BackupSettings.toUtf8();
+	return sdl::V1_0::imtbase::CParamTypeIds::ParamTypeIdsFields::BackupSettings.toUtf8();
 }
 
 
@@ -32,7 +32,7 @@ bool CBackupSettingsRepresentationControllerComp::IsModelSupported(const istd::I
 
 
 bool CBackupSettingsRepresentationControllerComp::GetSdlRepresentationFromDataModel(
-			sdl::imtbase::ImtBaseTypes::CBackupSettings::V1_0& sdlRepresentation,
+			sdl::V1_0::imtbase::CBackupSettings& sdlRepresentation,
 			const istd::IChangeable& dataModel,
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
@@ -42,7 +42,7 @@ bool CBackupSettingsRepresentationControllerComp::GetSdlRepresentationFromDataMo
 		return false;
 	}
 
-	sdl::imtbase::ImtBaseTypes::CSchedulerParam::V1_0 schedulerParam;
+	sdl::V1_0::imtbase::CSchedulerParam schedulerParam;
 	schedulerParam.interval = backupSettingsPtr->GetInterval();
 
 	QDateTime startTime = backupSettingsPtr->GetStartTime();
@@ -61,7 +61,7 @@ bool CBackupSettingsRepresentationControllerComp::GetSdlRepresentationFromDataMo
 
 bool CBackupSettingsRepresentationControllerComp::GetDataModelFromSdlRepresentation(
 			istd::IChangeable& dataModel,
-			const sdl::imtbase::ImtBaseTypes::CBackupSettings::V1_0& sdlRepresentation) const
+			const sdl::V1_0::imtbase::CBackupSettings& sdlRepresentation) const
 {
 	imtapp::IBackupSettings* backupSettingsPtr = dynamic_cast<imtapp::IBackupSettings*>(&dataModel);
 	Q_ASSERT(backupSettingsPtr != nullptr);
@@ -73,7 +73,7 @@ bool CBackupSettingsRepresentationControllerComp::GetDataModelFromSdlRepresentat
 		return false;
 	}
 
-	sdl::imtbase::ImtBaseTypes::CSchedulerParam::V1_0 schedulerParam = *sdlRepresentation.schedulerParam;
+	sdl::V1_0::imtbase::CSchedulerParam schedulerParam = *sdlRepresentation.schedulerParam;
 
 	int interval = *schedulerParam.interval;
 	backupSettingsPtr->SetInterval(interval);

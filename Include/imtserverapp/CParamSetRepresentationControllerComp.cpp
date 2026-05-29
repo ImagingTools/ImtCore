@@ -8,7 +8,7 @@ namespace imtserverapp
 
 // protected methods
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CParamsSet>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CParamsSet>)
 
 QByteArray CParamSetRepresentationControllerComp::GetTypeId() const
 {
@@ -23,7 +23,7 @@ bool CParamSetRepresentationControllerComp::IsModelSupported(const istd::IChange
 
 
 bool CParamSetRepresentationControllerComp::GetSdlRepresentationFromDataModel(
-			sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0& sdlRepresentation,
+			sdl::V1_0::imtbase::CParamsSet& sdlRepresentation,
 			const istd::IChangeable& dataModel,
 			const iprm::IParamsSet* paramsPtr) const
 {
@@ -33,7 +33,7 @@ bool CParamSetRepresentationControllerComp::GetSdlRepresentationFromDataModel(
 
 bool CParamSetRepresentationControllerComp::GetDataModelFromSdlRepresentation(
 			istd::IChangeable& dataModel,
-			const sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0& sdlRepresentation) const
+			const sdl::V1_0::imtbase::CParamsSet& sdlRepresentation) const
 {
 	return m_representationController.GetDataModelFromSdlRepresentation(dataModel, sdlRepresentation);
 }

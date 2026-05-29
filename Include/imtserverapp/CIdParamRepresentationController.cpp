@@ -20,11 +20,11 @@ CIdParamRepresentationController::CIdParamRepresentationController(QByteArray mo
 
 // protected methods
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CParamsSet>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CParamsSet>)
 
 QByteArray CIdParamRepresentationController::GetTypeId() const
 {
-	return sdl::imtbase::ImtBaseTypes::CParamTypeIds::V1_0::ParamTypeIdsFields::IdParam.toUtf8();
+	return sdl::V1_0::imtbase::CParamTypeIds::ParamTypeIdsFields::IdParam.toUtf8();
 }
 
 
@@ -37,7 +37,7 @@ bool CIdParamRepresentationController::IsModelSupported(const istd::IChangeable&
 
 
 bool CIdParamRepresentationController::GetSdlRepresentationFromDataModel(
-			sdl::imtbase::ImtBaseTypes::CIdParam::V1_0& sdlRepresentation,
+			sdl::V1_0::imtbase::CIdParam& sdlRepresentation,
 			const istd::IChangeable& dataModel,
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
@@ -54,7 +54,7 @@ bool CIdParamRepresentationController::GetSdlRepresentationFromDataModel(
 
 bool CIdParamRepresentationController::GetDataModelFromSdlRepresentation(
 			istd::IChangeable& dataModel,
-			const sdl::imtbase::ImtBaseTypes::CIdParam::V1_0& sdlRepresentation) const
+			const sdl::V1_0::imtbase::CIdParam& sdlRepresentation) const
 {
 	iprm::IIdParam* idParamPtr = dynamic_cast<iprm::IIdParam*>(&dataModel);
 	if (idParamPtr == nullptr){

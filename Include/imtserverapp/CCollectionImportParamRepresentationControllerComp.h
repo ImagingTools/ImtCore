@@ -11,25 +11,25 @@ namespace imtserverapp
 {
 
 
-class CCollectionImportParamRepresentationControllerComp: public TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CCollectionImportParam::V1_0>
+class CCollectionImportParamRepresentationControllerComp: public TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CCollectionImportParam>
 {
 public:
-	typedef TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CCollectionImportParam::V1_0> BaseClass;
+	typedef TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CCollectionImportParam> BaseClass;
 
 	I_BEGIN_COMPONENT(CCollectionImportParamRepresentationControllerComp)
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CCollectionImportParam::V1_0>)
+	// reimplemented (TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CCollectionImportParam>)
 	virtual QByteArray GetTypeId() const override;
 	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;
 	virtual bool GetSdlRepresentationFromDataModel(
-				sdl::imtbase::ImtBaseTypes::CCollectionImportParam::V1_0& sdlRepresentation,
+				sdl::V1_0::imtbase::CCollectionImportParam& sdlRepresentation,
 				const istd::IChangeable& dataModel,
 				const iprm::IParamsSet* paramsPtr = nullptr) const override;
 	virtual bool GetDataModelFromSdlRepresentation(
 				istd::IChangeable& dataModel,
-				const sdl::imtbase::ImtBaseTypes::CCollectionImportParam::V1_0& sdlRepresentation) const override;
+				const sdl::V1_0::imtbase::CCollectionImportParam& sdlRepresentation) const override;
 };
 
 

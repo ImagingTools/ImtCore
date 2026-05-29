@@ -13,11 +13,11 @@ namespace imtserverapp
 // protected methods
 
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::Settings::CTextParam::V1_0>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CTextParam>)
 
 QByteArray CTextParamRepresentationControllerComp::GetTypeId() const
 {
-	return sdl::imtbase::ImtBaseTypes::CParamTypeIds::V1_0::ParamTypeIdsFields::TextParam.toUtf8();
+	return sdl::V1_0::imtbase::CParamTypeIds::ParamTypeIdsFields::TextParam.toUtf8();
 }
 
 
@@ -30,7 +30,7 @@ bool CTextParamRepresentationControllerComp::IsModelSupported(const istd::IChang
 
 
 bool CTextParamRepresentationControllerComp::GetSdlRepresentationFromDataModel(
-			sdl::imtbase::ImtBaseTypes::CTextParam::V1_0& sdlRepresentation,
+			sdl::V1_0::imtbase::CTextParam& sdlRepresentation,
 			const istd::IChangeable& dataModel,
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
@@ -49,7 +49,7 @@ bool CTextParamRepresentationControllerComp::GetSdlRepresentationFromDataModel(
 
 bool CTextParamRepresentationControllerComp::GetDataModelFromSdlRepresentation(
 			istd::IChangeable& dataModel,
-			const sdl::imtbase::ImtBaseTypes::CTextParam::V1_0& sdlRepresentation) const
+			const sdl::V1_0::imtbase::CTextParam& sdlRepresentation) const
 {
 	iprm::ITextParam* textParamPtr = dynamic_cast<iprm::ITextParam*>(&dataModel);
 	Q_ASSERT(textParamPtr != nullptr);

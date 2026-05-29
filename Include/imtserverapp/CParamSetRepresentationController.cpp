@@ -17,11 +17,11 @@ namespace imtserverapp
 
 // protected methods
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CParamsSet>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CParamsSet>)
 
 QByteArray CParamSetRepresentationController::GetTypeId() const
 {
-	return sdl::imtbase::ImtBaseTypes::CParamTypeIds::V1_0::ParamTypeIdsFields::ParamsSet.toUtf8();
+	return sdl::V1_0::imtbase::CParamTypeIds::ParamTypeIdsFields::ParamsSet.toUtf8();
 }
 
 
@@ -34,7 +34,7 @@ bool CParamSetRepresentationController::IsModelSupported(const istd::IChangeable
 
 
 bool CParamSetRepresentationController::GetSdlRepresentationFromDataModel(
-			sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0& sdlRepresentation,
+			sdl::V1_0::imtbase::CParamsSet& sdlRepresentation,
 			const istd::IChangeable& dataModel,
 			const iprm::IParamsSet* paramsPtr) const
 {
@@ -56,7 +56,7 @@ bool CParamSetRepresentationController::GetSdlRepresentationFromDataModel(
 	QByteArrayList parameterIds = paramSetIds.values();
 	std::sort(parameterIds.begin(), parameterIds.end());
 
-	imtsdl::TElementList<sdl::imtbase::ImtBaseTypes::CParameter::V1_0> parameterList;
+	imtsdl::TElementList<sdl::V1_0::imtbase::CParameter> parameterList;
 
 	for (const QByteArray& parameterId : parameterIds){
 		if (!parameterId.contains("/")){
@@ -79,7 +79,7 @@ bool CParamSetRepresentationController::GetSdlRepresentationFromDataModel(
 				return false;
 			}
 
-			sdl::imtbase::ImtBaseTypes::CParameter::V1_0 parameter;
+			sdl::V1_0::imtbase::CParameter parameter;
 			QJsonDocument jsonDocument(parameterRepresentation);
 
 			parameter.data = jsonDocument.toJson(QJsonDocument::Compact);
@@ -113,7 +113,7 @@ bool CParamSetRepresentationController::GetSdlRepresentationFromDataModel(
 
 bool CParamSetRepresentationController::GetDataModelFromSdlRepresentation(
 			istd::IChangeable& dataModel,
-			const sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0& sdlRepresentation) const
+			const sdl::V1_0::imtbase::CParamsSet& sdlRepresentation) const
 {
 	iprm::IParamsSet* paramsSetPtr = dynamic_cast<iprm::IParamsSet*>(&dataModel);
 	Q_ASSERT(paramsSetPtr != nullptr);
@@ -125,9 +125,9 @@ bool CParamSetRepresentationController::GetDataModelFromSdlRepresentation(
 		return false;
 	}
 
-	imtsdl::TElementList<sdl::imtbase::ImtBaseTypes::CParameter::V1_0> parameters = *sdlRepresentation.parameters;
+	imtsdl::TElementList<sdl::V1_0::imtbase::CParameter> parameters = *sdlRepresentation.parameters;
 
-	for (const istd::TSharedNullable<sdl::imtbase::ImtBaseTypes::CParameter::V1_0>& parameter : parameters){
+	for (const istd::TSharedNullable<sdl::V1_0::imtbase::CParameter>& parameter : parameters){
 		if (!parameter->id){
 			continue;
 		}

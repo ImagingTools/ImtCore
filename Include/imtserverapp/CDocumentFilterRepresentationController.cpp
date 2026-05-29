@@ -20,7 +20,7 @@ CDocumentFilterRepresentationController::CDocumentFilterRepresentationController
 }
 
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<Filter::CDocumentCollectionFilter::V1_0>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<Filter::CDocumentCollectionFilter>)
 
 QByteArray CDocumentFilterRepresentationController::GetTypeId() const
 {
@@ -37,7 +37,7 @@ bool CDocumentFilterRepresentationController::IsModelSupported(const istd::IChan
 
 
 bool CDocumentFilterRepresentationController::GetSdlRepresentationFromDataModel(
-			Filter::CDocumentCollectionFilter::V1_0& sdlRepresentation,
+			Filter::CDocumentCollectionFilter& sdlRepresentation,
 			const istd::IChangeable& dataModel,
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
@@ -70,7 +70,7 @@ bool CDocumentFilterRepresentationController::GetSdlRepresentationFromDataModel(
 
 bool CDocumentFilterRepresentationController::GetDataModelFromSdlRepresentation(
 			istd::IChangeable& dataModel,
-			const Filter::CDocumentCollectionFilter::V1_0& sdlRepresentation) const
+			const Filter::CDocumentCollectionFilter& sdlRepresentation) const
 {
 	imtcol::IDocumentCollectionFilter* documentCollectionFilter = dynamic_cast<imtcol::IDocumentCollectionFilter*>(&dataModel);
 	if (documentCollectionFilter == nullptr){
