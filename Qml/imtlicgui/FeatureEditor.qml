@@ -32,7 +32,7 @@ ViewBase {
 	
 	function onLocalizationChanged(language){
 		featureEditor.updateHeaders();
-		dependenciesHeadersModel.updateHeaders();
+		featureDependenciesView.columns = __buildDependencyColumns();
 	}
 	
 	onFeatureDataChanged: {
@@ -42,6 +42,7 @@ ViewBase {
 			}
 
 			tableView_.rowModel = featureData.m_subFeatures;
+			tableView_.childModelKey = FeatureItemTypeMetaInfo.s_subFeatures;
 		}
 	}
 	
@@ -49,12 +50,17 @@ ViewBase {
 		let retVal = []
 		
 		if (selectedIndex != null){
-			let parent = selectedIndex.parentIndex;
+			let parentKey = selectedIndex.parentKey;
 			
-			while (parent && parent.itemData){
-				let parentId = parent.itemData.m_featureId
-				retVal.push(parentId);
-				parent = parent.parentIndex;
+			while (parentKey && parentKey !== "") {
+				let parentNode = tableView_.nodeForKey(parentKey);
+				if (parentNode) {
+					let parentId = parentNode.data ? parentNode.data[FeatureItemTypeMetaInfo.s_featureId] : "";
+					if (parentId) retVal.push(parentId);
+					parentKey = parentNode.parentKey || "";
+				} else {
+					break;
+				}
 			}
 		}
 		
@@ -62,68 +68,68 @@ ViewBase {
 	}
 	
 	function updateTreeViewGui(){
-		let selectedIndex = null;
-		if (tableView.tableSelection.items.length > 0){
-			selectedIndex = tableView.tableSelection.items[0];
-		}
+		let selectedIndex = tableView_.currentIndex;
 		
-		if (selectedIndex == null || !selectedIndex.itemData){
+		if (selectedIndex == null || !selectedIndex.data){
 			return;
 		}
 		
-		featureDependenciesView.delegateUpdatingBlock = true;
+		featureDependenciesView.__delegateUpdatingBlock = true;
 		
-		let selectedId = "";
-		
-		if (selectedIndex != null && selectedIndex.itemData){
-			selectedId = selectedIndex.itemData.m_featureId;
-		}
+		let selectedId = selectedIndex.data[FeatureItemTypeMetaInfo.s_featureId] || "";
 		
 		let childrenFeatureList = [];
-		tableView.findChildrenFeatureDependencies(selectedId, childrenFeatureList);
+		tableView_.findChildrenFeatureDependencies(selectedId, childrenFeatureList);
 		
 		let inactiveElements = [];
-		tableView.findParentFeatureDependencies(selectedId, inactiveElements);
+		tableView_.findParentFeatureDependencies(selectedId, inactiveElements);
 		
 		let parentIds = featureEditor.getAllParents(selectedIndex);
 		inactiveElements = inactiveElements.concat(parentIds);
 		
 		for (let i = 0; i < parentIds.length; i++){
 			let parentId = parentIds[i];
-			tableView.findParentFeatureDependencies(parentId, inactiveElements);
+			tableView_.findParentFeatureDependencies(parentId, inactiveElements);
 			
-			tableView.findChildrenFeatureDependencies(parentId, childrenFeatureList);
+			tableView_.findChildrenFeatureDependencies(parentId, childrenFeatureList);
 		}
 		
 		let dependenciesList = []
 		
-		let dependencies = selectedIndex.itemData.m_dependencies;
+		let dependencies = selectedIndex.data[FeatureItemTypeMetaInfo.s_dependencies] || "";
 		if (dependencies && dependencies !== ""){
 			dependenciesList = dependencies.split(';');
 		}
 		
-		let itemsDataList = featureDependenciesView.getItemsDataAsList();
-		for (let i = 0; i < itemsDataList.length; i++){
-			let delegateItem = itemsDataList[i]
-			let itemData = delegateItem.getItemData();
-			let itemId = itemData.featureId;
+		let allDepNodes = featureDependenciesView.allNodes();
+		for (let i = 0; i < allDepNodes.length; i++){
+			let node = allDepNodes[i];
+			let itemData = node.data || {};
+			let itemId = itemData[FeatureItemTypeMetaInfo.s_featureId] || "";
 			
-			delegateItem.isVisible = itemId !== selectedId;
-			delegateItem.isActive = !inactiveElements.includes(itemId);
-			delegateItem.isCheckable = itemId !== "";
-			delegateItem.checkState = Qt.Unchecked;
+			let isVisible = itemId !== selectedId;
+			let isActive = !inactiveElements.includes(itemId);
+			let isCheckable = itemId !== "";
+			let checkState = Qt.Unchecked;
 			
 			if (childrenFeatureList.includes(itemId) && !dependenciesList.includes(itemId)){
-				delegateItem.isActive = false;
-				delegateItem.checkState = Qt.Checked;
+				isActive = false;
+				checkState = Qt.Checked;
 			}
 			else if (childrenFeatureList.includes(itemId) && dependenciesList.includes(itemId)){
-				delegateItem.isActive = true;
-				delegateItem.checkState = Qt.Checked;
+				isActive = true;
+				checkState = Qt.Checked;
+			}
+			
+			featureDependenciesView.setNodeVisible(node.key, isVisible);
+			featureDependenciesView.setNodeEnabled(node.key, isActive);
+			featureDependenciesView.setNodeCheckable(node.key, isCheckable);
+			if (isCheckable) {
+				featureDependenciesView.setCheckStateSilent(node.key, checkState);
 			}
 		}
 		
-		featureDependenciesView.delegateUpdatingBlock = false;
+		featureDependenciesView.__delegateUpdatingBlock = false;
 	}
 	
 	function updateGui(){
@@ -142,6 +148,7 @@ ViewBase {
 		featureData.m_optional = optionalSwitch.checked
 		featureData.m_isPermission = permissionSwitch.checked
 		tableView_.rowModel = featureData.m_subFeatures
+		tableView_.childModelKey = FeatureItemTypeMetaInfo.s_subFeatures
 	}
 	
 	Rectangle {
@@ -268,45 +275,16 @@ ViewBase {
 			anchors.left: parent.left;
 			anchors.bottom: parent.bottom;
 			width: parent.width;
-			// readOnly: false;
-			// rowDelegate: Component { PackageViewItemDelegate {
-			// 		root: tableView_;
-					
-			// 		function canRename(id){
-			// 			return true;
-			// 		}
-					
-			// 		function featureIsValid(featureId, featureName){
-			// 			if (featureEditor.featureData.m_featureId === featureId){
-			// 				return false;
-			// 			}
-						
-			// 			let delegates = tableView_.getItemsDataAsList();
-			// 			for (let delegate of delegates){
-			// 				if (delegate.itemData.m_featureId === featureId){
-			// 					return false;
-			// 				}
-			// 			}
-						
-			// 			return true;
-			// 		}
-			// 	} }
-			
-			// Component.onCompleted: {
-			// 	let ok = PermissionsController.checkPermission("ChangeFeature");
-			// 	tableView_.readOnly = !ok;
-			// }
-			
+
+			columns: featureEditor.__buildMainColumns()
+
 			onSelectionChanged: {
 				let featureId = "";
 				
-				let selectedIndex =  null;
-				if (tableSelection.items.length > 0){
-					selectedIndex = tableSelection.items[0];
-				}
+				let selectedIndex = tableView_.currentIndex;
 				
-				if (selectedIndex != null){
-					featureId = selectedIndex.itemData.m_featureId;
+				if (selectedIndex != null && selectedIndex.data){
+					featureId = selectedIndex.data[FeatureItemTypeMetaInfo.s_featureId] || "";
 					if (featureId !== ""){
 						featureEditor.updateTreeViewGui();
 					}
@@ -314,7 +292,6 @@ ViewBase {
 				
 				featureDependenciesView.contentVisible = featureId !== "" && selectedIndex != null;
 				
-				let newIsEnabled = selectedIndex != null;
 				let removeIsEnabled = selectedIndex != null;
 				
 				if (featureEditor.commandsController){
@@ -323,13 +300,13 @@ ViewBase {
 			}
 			
 			function findParentFeatureDependencies(featureId, retVal){
-				let itemsDataList = tableView_.getItemsDataAsList();
-				for (let i = 0; i < itemsDataList.length; i++){
-					let delegateItem = itemsDataList[i]
-					let itemData = delegateItem.getItemData();
-					let id = itemData.m_featureId;
-					let dependencies = itemData.m_dependencies;
-					if (dependencies && dependencies !== ""){
+				let nodes = tableView_.allNodes();
+				for (let i = 0; i < nodes.length; i++){
+					let node = nodes[i];
+					let itemData = node.data || {};
+					let id = itemData[FeatureItemTypeMetaInfo.s_featureId] || "";
+					let dependencies = itemData[FeatureItemTypeMetaInfo.s_dependencies] || "";
+					if (dependencies !== ""){
 						let dependencyList = dependencies.split(';');
 						
 						if (dependencyList.includes(featureId)){
@@ -347,15 +324,15 @@ ViewBase {
 			}
 			
 			function findChildrenFeatureDependencies(featureId, retVal){
-				let itemsDataList = tableView_.getItemsDataAsList();
-				for (let i = 0; i < itemsDataList.length; i++){
-					let delegateItem = itemsDataList[i]
-					let itemData = delegateItem.getItemData();
-					let id = itemData.m_featureId;
+				let nodes = tableView_.allNodes();
+				for (let i = 0; i < nodes.length; i++){
+					let node = nodes[i];
+					let itemData = node.data || {};
+					let id = itemData[FeatureItemTypeMetaInfo.s_featureId] || "";
 					
 					if (featureId === id){
-						let dependencies = itemData.m_dependencies;
-						if (dependencies && dependencies !== ""){
+						let dependencies = itemData[FeatureItemTypeMetaInfo.s_dependencies] || "";
+						if (dependencies !== ""){
 							let dependencyList = dependencies.split(';');
 							
 							for (let dependencyId of dependencyList){
@@ -392,14 +369,15 @@ ViewBase {
 			anchors.left: parent.left;
 			clip: true;
 			tristate: true;
-			// contentVisible: false;
-			
-			property bool delegateUpdatingBlock: false;
+
+			columns: featureEditor.__buildDependencyColumns()
+			childModelKey: FeatureItemTypeMetaInfo.s_subFeatures
+
+			property bool __delegateUpdatingBlock: false
 			
 			Component.onCompleted: {
 				let ok = PermissionsController.checkPermission("ChangeFeature");
 				featureDependenciesView.readOnly = !ok;
-				dependenciesHeadersModel.updateHeaders();
 				featureEditor.dependenciewViewModel.copy(CachedFeatureCollection.collectionModel);
 				featureDependenciesView.rowModel = featureEditor.dependenciewViewModel;
 				CachedFeatureCollection.modelUpdated.connect(featureDependenciesView.onFeaturesProviderModelChanged);
@@ -408,87 +386,63 @@ ViewBase {
 			Component.onDestruction: {
 				CachedFeatureCollection.modelUpdated.disconnect(featureDependenciesView.onFeaturesProviderModelChanged);
 			}
-			
-			TreeItemModel {
-				id: dependenciesHeadersModel;
-				
-				function updateHeaders(){
-					dependenciesHeadersModel.clear();
-					
-					let index = dependenciesHeadersModel.insertNewItem();
-					dependenciesHeadersModel.setData("id", FeatureItemTypeMetaInfo.s_featureName, index)
-					dependenciesHeadersModel.setData("name", qsTr("Dependencies"), index)
-					
-					dependenciesHeadersModel.refresh();
-					
-					featureDependenciesView.columnModel = dependenciesHeadersModel;
+
+			function onFeaturesProviderModelChanged(){
+				featureEditor.dependenciewViewModel.copy(CachedFeatureCollection.collectionModel)
+				featureDependenciesView.rowModel = featureEditor.dependenciewViewModel;
+				featureEditor.updateTreeViewGui();
+			}
+
+			onCheckStateChanged: {
+				if (featureDependenciesView.__delegateUpdatingBlock) return;
+
+				let selectedIndex = tableView_.currentIndex;
+				if (selectedIndex == null || !selectedIndex.data) return;
+
+				let nodeData = index.data || {};
+				let featureIdVal = nodeData[FeatureItemTypeMetaInfo.s_featureId] || "";
+				if (featureIdVal === "") return;
+
+				let selectedId = selectedIndex.data[FeatureItemTypeMetaInfo.s_featureId] || "";
+				let dependencies = selectedIndex.data[FeatureItemTypeMetaInfo.s_dependencies] || "";
+
+				let dependencyList = [];
+				if (dependencies !== ""){
+					dependencyList = dependencies.split(';');
+				}
+
+				if (state === Qt.Checked){
+					if (!dependencyList.includes(featureIdVal)){
+						dependencyList.push(featureIdVal);
+					}
+				} else {
+					let pos = dependencyList.indexOf(featureIdVal);
+					if (pos >= 0){
+						dependencyList.splice(pos, 1);
+					}
+				}
+
+				// Update the source model via the main tree
+				let newDeps = dependencyList.length > 0 ? dependencyList.join(';') : "";
+				let mainNode = tableView_.nodeForKey(selectedIndex.key);
+				if (mainNode && mainNode.sourceItem) {
+					if (mainNode.sourceItem.setData) {
+						mainNode.sourceItem.setData(FeatureItemTypeMetaInfo.s_dependencies, newDeps, 0);
+					} else if (mainNode.data) {
+						mainNode.data[FeatureItemTypeMetaInfo.s_dependencies] = newDeps;
+					}
 				}
 			}
 			
-			function onFeaturesProviderModelChanged(){
-				featureEditor.dependenciewViewModel.copy(CachedFeatureCollection.collectionModel)
-				featureEditor.dependenciewViewModel.refresh();
-				featureEditor.updateTreeViewGui();
-			}
-			
-			// rowDelegate: Component {TreeViewItemDelegateBase {
-			// 		id: delegate;
-			// 		root: featureDependenciesView;
-			// 		childModelKey: FeatureItemTypeMetaInfo.s_subFeatures;
-			// 		onCheckStateChanged: {
-			// 			let selectedIndex =  null;
-			// 			if (tableView_.tableSelection.items.length > 0){
-			// 				selectedIndex = tableView_.tableSelection.items[0];
-			// 			}
-
-			// 			if (selectedIndex != null){
-			// 				if (!featureDependenciesView.delegateUpdatingBlock){
-			// 					if (delegate.itemData.featureId !== ""){
-			// 						let featureId = delegate.itemData.featureId;
-			// 						let state = delegate.checkState;
-									
-			// 						let selectedId = selectedIndex.itemData.m_featureId;
-			// 						let dependencies = selectedIndex.itemData.m_dependencies;
-									
-			// 						let dependencyList = []
-			// 						if (dependencies != ""){
-			// 							dependencyList = dependencies.split(';')
-			// 						}
-									
-			// 						if (state == Qt.Checked){
-			// 							if (!dependencyList.includes(featureId)){
-			// 								dependencyList.push(featureId);
-			// 							}
-			// 						}
-			// 						else{
-			// 							let pos = dependencyList.indexOf(featureId);
-			// 							if (pos >= 0){
-			// 								dependencyList.splice(pos, 1)
-			// 							}
-			// 						}
-									
-			// 						if (dependencyList.length > 0){
-			// 							selectedIndex.itemData.m_dependencies = dependencyList.join(';')
-			// 						}
-			// 						else{
-			// 							selectedIndex.itemData.m_dependencies = "";
-			// 						}
-			// 					}
-			// 				}
-			// 			}
-			// 		}
-			// 	}
-			// }
-			
 			function findParentFeatureDependencies(featureId, retVal){
-				let itemsDataList = featureDependenciesView.getItemsDataAsList();
-				for (let i = 0; i < itemsDataList.length; i++){
-					let delegateItem = itemsDataList[i]
-					let itemData = delegateItem.getItemData();
-					let id = itemData.featureId;
-					let dependencies = itemData.Dependencies;
+				let nodes = featureDependenciesView.allNodes();
+				for (let i = 0; i < nodes.length; i++){
+					let node = nodes[i];
+					let itemData = node.data || {};
+					let id = itemData[FeatureItemTypeMetaInfo.s_featureId] || "";
+					let dependencies = itemData[FeatureItemTypeMetaInfo.s_dependencies] || "";
 					
-					if (dependencies && dependencies !== ""){
+					if (dependencies !== ""){
 						let dependencyList = dependencies.split(';');
 						
 						if (dependencyList.includes(featureId)){
@@ -503,21 +457,15 @@ ViewBase {
 			}
 			
 			function findChildrenFeatureDependencies(featureId, retVal){
-				let itemsDataList = featureDependenciesView.getItemsDataAsList();
-				for (let i = 0; i < itemsDataList.length; i++){
-					let delegateItem = itemsDataList[i]
-					let itemData = delegateItem.getItemData();
-					// let rootId = itemData.RootFeatureId;
-					
-					// if (rootId === featureEditor.featureId){
-					//     continue;
-					// }
-					
-					let id = itemData.featureId;
+				let nodes = featureDependenciesView.allNodes();
+				for (let i = 0; i < nodes.length; i++){
+					let node = nodes[i];
+					let itemData = node.data || {};
+					let id = itemData[FeatureItemTypeMetaInfo.s_featureId] || "";
 					
 					if (featureId === id){
-						let dependencies = itemData.Dependencies;
-						if (dependencies && dependencies !== ""){
+						let dependencies = itemData[FeatureItemTypeMetaInfo.s_dependencies] || "";
+						if (dependencies !== ""){
 							let dependencyList = dependencies.split(';');
 							
 							for (let dependencyId of dependencyList){
@@ -534,39 +482,23 @@ ViewBase {
 		}
 	}
 	
-	function updateHeaders(){
-		headersModel.clear();
-		
-		let index = headersModel.insertNewItem();
-		headersModel.setData("id", FeatureItemTypeMetaInfo.s_featureName, index);
-		headersModel.setData("name", qsTr("Feature Name"), index);
-		
-		index = headersModel.insertNewItem();
-		headersModel.setData("id", FeatureItemTypeMetaInfo.s_featureId, index);
-		headersModel.setData("name", qsTr("Feature-ID"), index);
-		
-		index = headersModel.insertNewItem();
-		headersModel.setData("id", FeatureItemTypeMetaInfo.s_description, index);
-		headersModel.setData("name", qsTr("Feature Description"), index);
-		
-		index = headersModel.insertNewItem();
-		headersModel.setData("id", FeatureItemTypeMetaInfo.s_optional, index);
-		headersModel.setData("name", qsTr("Optional"), index);
-		
-		index = headersModel.insertNewItem();
-		headersModel.setData("id", FeatureItemTypeMetaInfo.s_isPermission, index);
-		headersModel.setData("name", qsTr("Is Permission"), index);
-		
-		headersModel.refresh();
-		
-		tableView_.columnModel = headersModel;
+	function __buildMainColumns() {
+		return [
+			{ name: FeatureItemTypeMetaInfo.s_featureName, title: qsTr("Feature Name"), display: "data." + FeatureItemTypeMetaInfo.s_featureName, tree: true, editable: false },
+			{ name: FeatureItemTypeMetaInfo.s_featureId, title: qsTr("Feature-ID"), display: "data." + FeatureItemTypeMetaInfo.s_featureId, tree: false, editable: false },
+			{ name: FeatureItemTypeMetaInfo.s_description, title: qsTr("Feature Description"), display: "data." + FeatureItemTypeMetaInfo.s_description, tree: false, editable: false },
+			{ name: FeatureItemTypeMetaInfo.s_optional, title: qsTr("Optional"), display: "data." + FeatureItemTypeMetaInfo.s_optional, tree: false, editable: false },
+			{ name: FeatureItemTypeMetaInfo.s_isPermission, title: qsTr("Is Permission"), display: "data." + FeatureItemTypeMetaInfo.s_isPermission, tree: false, editable: false }
+		]
 	}
-	
-	TreeItemModel {
-		id: headersModel;
-		
-		Component.onCompleted: {
-			featureEditor.updateHeaders();
-		}
+
+	function __buildDependencyColumns() {
+		return [
+			{ name: FeatureItemTypeMetaInfo.s_featureName, title: qsTr("Dependencies"), display: "data." + FeatureItemTypeMetaInfo.s_featureName, tree: true, editable: false }
+		]
+	}
+
+	function updateHeaders(){
+		tableView_.columns = __buildMainColumns();
 	}
 }
