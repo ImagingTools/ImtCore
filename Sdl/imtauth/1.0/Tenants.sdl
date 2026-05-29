@@ -295,12 +295,113 @@ type EnsureSystemTenantPayload {
 	errorMessage: String
 }
 
+# --- Tenant Connection Requests (discovery / bootstrap) ---
+
+enum TenantConnectionStatus {
+	Pending
+	Accepted
+	Rejected
+	Expired
+	Revoked
+}
+
+type TenantConnectionRequest {
+	id: ID!
+	sourceTenantId: ID!
+	targetTenantId: ID
+	targetIdentifier: String
+	connectCode: String
+	proposedSourceRole: TenantRelationshipRole!
+	proposedTargetRole: TenantRelationshipRole!
+	message: String
+	status: TenantConnectionStatus!
+	createdAt: String
+	expiresAt: String
+	respondedAt: String
+}
+
+input CreateTenantConnectionRequestInput {
+	sourceTenantId: ID!
+	targetIdentifier: String!
+	proposedSourceRole: TenantRelationshipRole!
+	proposedTargetRole: TenantRelationshipRole!
+	message: String
+	expiresAt: String
+}
+
+type CreateTenantConnectionRequestPayload {
+	requestId: ID
+	errorMessage: String
+}
+
+input CreateTenantConnectCodeInput {
+	sourceTenantId: ID!
+	proposedSourceRole: TenantRelationshipRole!
+	proposedTargetRole: TenantRelationshipRole!
+	message: String
+	expiresAt: String
+}
+
+type CreateTenantConnectCodePayload {
+	requestId: ID
+	connectCode: String
+	errorMessage: String
+}
+
+input AcceptTenantConnectionRequestInput {
+	requestId: ID!
+	acceptingTenantId: ID!
+}
+
+type AcceptTenantConnectionRequestPayload {
+	success: Boolean
+	errorMessage: String
+}
+
+input AcceptTenantConnectCodeInput {
+	connectCode: String!
+	acceptingTenantId: ID!
+}
+
+type AcceptTenantConnectCodePayload {
+	requestId: ID
+	errorMessage: String
+}
+
+input RejectTenantConnectionRequestInput {
+	requestId: ID!
+}
+
+type RejectTenantConnectionRequestPayload {
+	success: Boolean
+	errorMessage: String
+}
+
+input RevokeTenantConnectionRequestInput {
+	requestId: ID!
+}
+
+type RevokeTenantConnectionRequestPayload {
+	success: Boolean
+	errorMessage: String
+}
+
+input GetTenantConnectionRequestsInput {
+	tenantId: ID!
+}
+
+type GetTenantConnectionRequestsPayload {
+	requests: [TenantConnectionRequest]
+	errorMessage: String
+}
+
 type Query {
 	GetTenantList (input: GetTenantListInput): GetTenantListPayload!
 	GetTenant (input: GetTenantInput): GetTenantPayload!
 	GetTenantIds: GetTenantIdsPayload!
 	GetTenantRelationships (input: GetTenantRelationshipsInput): GetTenantRelationshipsPayload!
 	GetCrossOrgGrants (input: GetCrossOrgGrantsInput): GetCrossOrgGrantsPayload!
+	GetTenantConnectionRequests (input: GetTenantConnectionRequestsInput): GetTenantConnectionRequestsPayload!
 }
 
 type Mutation {
@@ -313,6 +414,12 @@ type Mutation {
 	CreateCrossOrgGrant (input: CreateCrossOrgGrantInput): CreateCrossOrgGrantPayload!
 	RevokeCrossOrgGrant (input: RevokeCrossOrgGrantInput): RevokeCrossOrgGrantPayload!
 	EnsureSystemTenant: EnsureSystemTenantPayload!
+	CreateTenantConnectionRequest (input: CreateTenantConnectionRequestInput): CreateTenantConnectionRequestPayload!
+	CreateTenantConnectCode (input: CreateTenantConnectCodeInput): CreateTenantConnectCodePayload!
+	AcceptTenantConnectionRequest (input: AcceptTenantConnectionRequestInput): AcceptTenantConnectionRequestPayload!
+	AcceptTenantConnectCode (input: AcceptTenantConnectCodeInput): AcceptTenantConnectCodePayload!
+	RejectTenantConnectionRequest (input: RejectTenantConnectionRequestInput): RejectTenantConnectionRequestPayload!
+	RevokeTenantConnectionRequest (input: RevokeTenantConnectionRequestInput): RevokeTenantConnectionRequestPayload!
 }
 
 collectionSchema {

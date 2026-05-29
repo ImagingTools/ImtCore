@@ -10,6 +10,7 @@
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/IUserManager.h>
 #include <imtauth/ICrossOrgGrant.h>
+#include <imtauth/ITenantConnectionRequest.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
 
 
@@ -27,6 +28,7 @@ public:
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager for member operations", true, "MembershipManager");
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Collection of users", true, "UserCollection");
 		I_ASSIGN(m_grantManagerCompPtr, "CrossOrgGrantManager", "Manager for cross-org grants", false, "CrossOrgGrantManager");
+		I_ASSIGN(m_connectionRequestManagerCompPtr, "TenantConnectionRequestManager", "Manager for tenant connection requests", false, "TenantConnectionRequestManager");
 	I_END_COMPONENT;
 
 protected:
@@ -85,12 +87,41 @@ protected:
 				const sdl::imtauth::Tenants::CEnsureSystemTenantGqlRequest& ensureSystemTenantRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::imtauth::Tenants::CGetTenantConnectionRequestsPayload OnGetTenantConnectionRequests(
+				const sdl::imtauth::Tenants::CGetTenantConnectionRequestsGqlRequest& getTenantConnectionRequestsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtauth::Tenants::CCreateTenantConnectionRequestPayload OnCreateTenantConnectionRequest(
+				const sdl::imtauth::Tenants::CCreateTenantConnectionRequestGqlRequest& createTenantConnectionRequestRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtauth::Tenants::CCreateTenantConnectCodePayload OnCreateTenantConnectCode(
+				const sdl::imtauth::Tenants::CCreateTenantConnectCodeGqlRequest& createTenantConnectCodeRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtauth::Tenants::CAcceptTenantConnectionRequestPayload OnAcceptTenantConnectionRequest(
+				const sdl::imtauth::Tenants::CAcceptTenantConnectionRequestGqlRequest& acceptTenantConnectionRequestRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtauth::Tenants::CAcceptTenantConnectCodePayload OnAcceptTenantConnectCode(
+				const sdl::imtauth::Tenants::CAcceptTenantConnectCodeGqlRequest& acceptTenantConnectCodeRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtauth::Tenants::CRejectTenantConnectionRequestPayload OnRejectTenantConnectionRequest(
+				const sdl::imtauth::Tenants::CRejectTenantConnectionRequestGqlRequest& rejectTenantConnectionRequestRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtauth::Tenants::CRevokeTenantConnectionRequestPayload OnRevokeTenantConnectionRequest(
+				const sdl::imtauth::Tenants::CRevokeTenantConnectionRequestGqlRequest& revokeTenantConnectionRequestRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 
 private:
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 	I_REF(imtauth::ICrossOrgGrant, m_grantManagerCompPtr);
+	I_REF(imtauth::ITenantConnectionRequest, m_connectionRequestManagerCompPtr);
 };
 
 
