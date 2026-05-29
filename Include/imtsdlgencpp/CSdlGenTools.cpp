@@ -170,7 +170,22 @@ QString CSdlGenTools::CStructNamespaceConverter::GetString() const
 
 	if (!relatedNamespace.isEmpty()){
 		QString typeNamespace = GetNamespaceFromSchemaParams(namespaceEntryPtr->GetSchemaParams());
-		if (typeNamespace != relatedNamespace){
+
+		// Support callers that pass only the schema namespace (e.g. "imtbase")
+		// without the version/prefix parts that GetNamespaceFromSchemaParams adds.
+		// Extract the bare schema namespace from the type's params for comparison.
+		bool namespacesMatch = (typeNamespace == relatedNamespace);
+		if (!namespacesMatch){
+			iprm::TParamsPtr<iprm::ITextParam> nsParam(
+				&namespaceEntryPtr->GetSchemaParams(),
+				imtsdl::SdlCustomSchemaKeys::SchemaNamespace.toUtf8(),
+				false);
+			if (nsParam.IsValid() && nsParam->GetText() == relatedNamespace){
+				namespacesMatch = true;
+			}
+		}
+
+		if (!namespacesMatch){
 
 			bool namespaceCleaned = false;
 			// clean namespace

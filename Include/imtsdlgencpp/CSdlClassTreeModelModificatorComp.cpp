@@ -324,12 +324,13 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(
 	bool isCustom = false;
 	bool isEnum = false;
 	bool isUnion = false;
-	const QString convertedType = ConvertTypeWithNamespace(
+	const QString convertedType = OptListConvertTypeWithNamespaceStruct(
 		field,
 		m_originalSchemaNamespaceCompPtr->GetText(),
 		*m_sdlTypeListCompPtr,
 		*m_sdlEnumListCompPtr,
 		*m_sdlUnionListCompPtr,
+		true,
 		&isCustom,
 		nullptr,
 		&isArray,
@@ -934,7 +935,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 		stream << structNameConverter.GetString();
 	}
 	else{
-		stream << ConvertTypeWithNamespace(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr);
+		stream << OptListConvertTypeWithNamespaceStruct(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, true);
 	}
 	stream << ' ' << listVariableName << ';';
 	FeedStream(stream, 1, false);

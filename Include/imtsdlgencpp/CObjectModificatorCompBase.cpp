@@ -970,7 +970,7 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 	FeedStreamHorizontally(stream, hIndents);
 	stream << field.GetId();
 	stream << ' ' << '=' << ' ';
-	stream << ConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr);
+	stream << OptListConvertTypeWithNamespaceStruct(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, true);
 	stream << '(' << ')' << ';';
 	FeedStream(stream, 1, false);
 
