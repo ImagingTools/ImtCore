@@ -147,6 +147,42 @@ QtObject {
 		}
 	}
 
+	// --- Real-time cross-tenant message subscription notifications ---
+	signal subscriptionCrossTenantMessageReceived(var notification)
+	signal subscriptionCrossTenantMessageStatusChanged(var notification)
+
+	// --- Subscription client for cross-tenant message notifications ---
+	property SubscriptionClient __crossTenantMessageSubscription: SubscriptionClient {
+		gqlCommandId: "OnCrossTenantMessageNotification"
+
+		function getHeaders() { return {} }
+
+		onMessageReceived: {
+			if (!data) return
+			var notificationType = ""
+			if (data.containsKey("notificationType"))
+				notificationType = data.getData("notificationType")
+
+			var notification = {
+				"messageId": data.containsKey("messageId") ? data.getData("messageId") : "",
+				"sourceTenantId": data.containsKey("sourceTenantId") ? data.getData("sourceTenantId") : "",
+				"targetTenantId": data.containsKey("targetTenantId") ? data.getData("targetTenantId") : "",
+				"relationshipId": data.containsKey("relationshipId") ? data.getData("relationshipId") : "",
+				"messageType": data.containsKey("messageType") ? data.getData("messageType") : "",
+				"status": data.containsKey("status") ? data.getData("status") : "",
+				"tenantName": data.containsKey("tenantName") ? data.getData("tenantName") : ""
+			}
+
+			if (notificationType === "MessageReceived" || notificationType === 0) {
+				var tName = notification.tenantName ? notification.tenantName : qsTr("another tenant")
+				PopupManager.addInfoMessage(qsTr("New cross-tenant message from \"%1\"").arg(tName), true)
+				root.subscriptionCrossTenantMessageReceived(notification)
+			} else if (notificationType === "MessageStatusChanged" || notificationType === 1) {
+				root.subscriptionCrossTenantMessageStatusChanged(notification)
+			}
+		}
+	}
+
 	// =========================================================================
 	// GQL implementation
 	// =========================================================================

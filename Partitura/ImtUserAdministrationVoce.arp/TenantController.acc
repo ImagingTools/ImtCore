@@ -504,6 +504,34 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="CrossTenantMessageNotificationPublisher" PackageId="ImtAuthGqlPck" ComponentId="CrossTenantMessageNotificationPublisher">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>OnCrossTenantMessageNotification</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MessageBroker" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CrossTenantMessageBroker"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="TenantsCommandsController" PackageId="ImtUserAdministrationVoce" ComponentId="TenantsCommandsController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>

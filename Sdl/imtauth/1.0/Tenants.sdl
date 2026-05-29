@@ -561,6 +561,28 @@ type UpdateOrderRequestStatusPayload {
 	errorMessage: String
 }
 
+# --- Cross-tenant message notifications (phase 2) ---
+
+enum ECrossTenantMessageNotificationType {
+	MessageReceived
+	MessageStatusChanged
+}
+
+type CrossTenantMessageNotification {
+	notificationType: ECrossTenantMessageNotificationType!
+	messageId: ID!
+	sourceTenantId: ID!
+	targetTenantId: ID!
+	relationshipId: ID
+	messageType: CrossTenantMessageType!
+	status: CrossTenantMessageStatus!
+	tenantName: String
+}
+
+input CrossTenantMessageSubscriptionInput {
+	userId: ID!
+}
+
 type Query {
 	GetTenantList (input: GetTenantListInput): GetTenantListPayload!
 	GetTenant (input: GetTenantInput): GetTenantPayload!
@@ -595,6 +617,10 @@ type Mutation {
 	ConfirmOrderRequest (input: ConfirmOrderRequestInput): ConfirmOrderRequestPayload!
 	RejectOrderRequest (input: RejectOrderRequestInput): RejectOrderRequestPayload!
 	UpdateOrderRequestStatus (input: UpdateOrderRequestStatusInput): UpdateOrderRequestStatusPayload!
+}
+
+type Subscription {
+	OnCrossTenantMessageNotification (input: CrossTenantMessageSubscriptionInput): CrossTenantMessageNotification!
 }
 
 collectionSchema {

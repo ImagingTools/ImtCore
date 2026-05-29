@@ -101,6 +101,10 @@ QtObject {
 	signal subscriptionInvitationRejected(var notification)
 	signal subscriptionOwnershipTransferred(var notification)
 
+	// --- Real-time cross-tenant message subscription notifications ---
+	signal subscriptionCrossTenantMessageReceived(var notification)
+	signal subscriptionCrossTenantMessageStatusChanged(var notification)
+
 	// --- Stub methods (overridden by concrete implementations) ---
 	function createInvitation(tenantId, userId, role) {}
 	function revokeInvitation(invitationId) {}
