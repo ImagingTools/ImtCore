@@ -407,8 +407,11 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 		}
 
 		if (isEnum){
-			if (isArray){
+			if (isArray){ // TODO!!!
+				FeedStream(stream, 1, false);
 
+				FeedStreamHorizontally(stream);
+				stream << QStringLiteral("return QVariant();");
 			}
 			else{
 				stream << fieldNameSpace << QStringLiteral("::") << field.GetType() << QStringLiteral(" valueType = ");
@@ -734,7 +737,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 					stream << QStringLiteral("if (itemPtr != nullptr) ") << field.GetId() << QStringLiteral(" = itemPtr->Version_1_0;");
 				}
 				else{
-					stream << QStringLiteral("if (itemPtr != nullptr) ") << field.GetId() << QStringLiteral(" = static_cast<const decltype(") << field.GetId() << QStringLiteral(")::value_type&>(*itemPtr);");
+					stream << QStringLiteral("if (itemPtr != nullptr) ") << field.GetId() << QStringLiteral(" = (*itemPtr);");
 				}
 				FeedStream(stream, 1, false);
 			}

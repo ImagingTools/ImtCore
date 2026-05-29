@@ -4,7 +4,7 @@
 
 // ImtCore includes
 #include <imtserverapp/TJsonRepresentationControllerWrap.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
 
 
 namespace imtserverapp

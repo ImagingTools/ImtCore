@@ -1654,13 +1654,8 @@ QString CGqlCollectionControllerBaseClassGeneratorComp::GetInputExtractionString
 		QString callChain;
 		if (FindCallChainForField(sdlField, typeName, callChain)){
 			retVal.append(sdlField.GetId());
-			retVal.append('.');
-			if (!version.isEmpty()){
-				retVal.append(version);
-			}
 			if (!callChain.isEmpty()){
-				retVal.append('-');
-				retVal.append('>');
+				retVal.append('.');
 				retVal.append(callChain);
 			}
 
