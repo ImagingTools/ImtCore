@@ -327,6 +327,39 @@
                     <AttributeInfo Id="Projection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="CrossTenantMessageProjection"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="Handlers" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>OrderRequestHandler</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="OrderRequestInfo" PackageId="ImtAuthPck" ComponentId="OrderRequestInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="OrderRequestHandler" PackageId="ImtAuthPck" ComponentId="OrderRequestHandler">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="OrderRequestCollection" Type="Reference" ExportId="OrderRequestRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OrderRequestFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="OrderRequestInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MessageBroker" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CrossTenantMessageBroker"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

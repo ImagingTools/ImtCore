@@ -63,6 +63,8 @@
 #include <imtauth/CCrossTenantMessageComp.h>
 #include <imtauth/CCrossTenantMessageProjectionComp.h>
 #include <imtauth/CCrossTenantMessageBrokerComp.h>
+#include <imtauth/COrderRequestComp.h>
+#include <imtauth/COrderRequestHandlerComp.h>
 #include <imtauth/CTenantDocumentNameProviderComp.h>
 
 
@@ -166,6 +168,8 @@ typedef icomp::TModelCompWrap<imtauth::CTenantConnectionRequestManagerComp> Tena
 typedef icomp::TModelCompWrap<imtauth::CCrossTenantMessageComp> CrossTenantMessageInfo;
 typedef imtauth::CCrossTenantMessageProjectionComp CrossTenantMessageProjection;
 typedef icomp::TModelCompWrap<imtauth::CCrossTenantMessageBrokerComp> CrossTenantMessageBroker;
+typedef icomp::TModelCompWrap<imtauth::COrderRequestComp> OrderRequestInfo;
+typedef icomp::TModelCompWrap<imtauth::COrderRequestHandlerComp> OrderRequestHandler;
 typedef imtauth::CTenantDocumentNameProviderComp TenantDocumentNameProvider;
 
 

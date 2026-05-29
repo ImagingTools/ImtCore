@@ -297,6 +297,16 @@ I_EXPORT_COMPONENT(
 			"Cross Tenant Message Broker");
 
 I_EXPORT_COMPONENT(
+			OrderRequestInfo,
+			"Entity representing an order request materialized inside the target tenant (Order -> OrderRequest)",
+			"Order Request Info");
+
+I_EXPORT_COMPONENT(
+			OrderRequestHandler,
+			"Domain handler materializing order requests and reporting status feedback to the source tenant",
+			"Order Request Handler");
+
+I_EXPORT_COMPONENT(
 			TenantDocumentNameProvider,
 			"Provides default document name from tenant name",
 			"Tenant Document Name Provider");
