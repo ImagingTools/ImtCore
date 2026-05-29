@@ -276,6 +276,32 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="TenantConnectionRequestInfo" PackageId="ImtAuthPck" ComponentId="TenantConnectionRequestInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="TenantConnectionRequestManager" PackageId="ImtAuthPck" ComponentId="TenantConnectionRequestManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="RequestCollection" Type="Reference" ExportId="TenantConnectionRequestRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="TenantConnectionRequestInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="TenantManager" PackageId="ImtAuthPck" ComponentId="TenantManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -299,6 +325,9 @@
                 <AttributeInfoMap>
                     <AttributeInfo Id="CrossOrgGrantManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="CrossOrgGrantManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantConnectionRequestManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantConnectionRequestManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
