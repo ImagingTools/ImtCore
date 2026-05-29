@@ -5,6 +5,10 @@
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
 
 
+// custom types includes
+#include <imtbasesdl/SDL/1.0/CPP/ImtBaseTypes.h>
+
+
 namespace sdl::V1_0::V1_0
 {
 

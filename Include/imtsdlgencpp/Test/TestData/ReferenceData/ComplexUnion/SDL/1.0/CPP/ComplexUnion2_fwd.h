@@ -4,6 +4,12 @@
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
 
 
+// custom types includes
+#include <complextestsdl/SDL/1.0/CPP/ComplexUnion1.h>
+#include <imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
+#include <imtbasesdl/SDL/1.0/CPP/ImtBaseTypes.h>
+
+
 namespace sdl::V1_0::complextest
 {
 

@@ -708,6 +708,40 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 		FeedStream(stream, 2, false);
 	}
 
+	// add custom types includes (from external/dependent schemas)
+	QList<imtsdl::IncludeDirective> customDirectives;
+	if (m_sdlTypeListCompPtr.IsValid()){
+		imtsdl::SdlTypeList list = m_sdlTypeListCompPtr->GetSdlTypes(false);
+		CreateDirectivesFromEntryList(list, customDirectives);
+	}
+	if (m_sdlUnionListCompPtr.IsValid()){
+		imtsdl::SdlUnionList list = m_sdlUnionListCompPtr->GetUnions(false);
+		CreateDirectivesFromEntryList(list, customDirectives);
+	}
+	if (m_sdlDocumentTypeListCompPtr.IsValid()){
+		imtsdl::SdlDocumentTypeList list = m_sdlDocumentTypeListCompPtr->GetDocumentTypes(false);
+		CreateDirectivesFromEntryList(list, customDirectives);
+	}
+	if (m_requestsProviderListCompPtr.IsValid()){
+		imtsdl::SdlRequestList list = m_requestsProviderListCompPtr->GetRequests(false);
+		CreateDirectivesFromEntryList(list, customDirectives);
+	}
+	if (m_sdlEnumListCompPtr.IsValid()){
+		imtsdl::SdlEnumList list = m_sdlEnumListCompPtr->GetEnums(false);
+		CreateDirectivesFromEntryList(list, customDirectives);
+	}
+
+	if (!customDirectives.isEmpty()){
+		stream << QStringLiteral("// custom types includes");
+		FeedStream(stream, 1, false);
+		for (const imtsdl::IncludeDirective& directive: customDirectives){
+			stream << QStringLiteral("#include ");
+			stream << directive.path;
+			FeedStream(stream, 1, false);
+		}
+		FeedStream(stream, 2, false);
+	}
+
 	// begin namespace
 	const QString sdlNamespace = GetNamespaceFromSchemaParams(*m_schemaParamsCompPtr);
 	stream << QStringLiteral("namespace ");

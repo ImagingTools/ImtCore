@@ -1,6 +1,10 @@
 #pragma once
 
 
+// custom types includes
+#include <modsdlsdl/SDL/1.0/CPP/PrinterBase.h>
+
+
 namespace sdl::V1_0::modsdl
 {
 
