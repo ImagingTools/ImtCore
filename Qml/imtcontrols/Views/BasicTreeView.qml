@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import Acf 1.0
 import imtcontrols 1.0
 
@@ -135,7 +134,6 @@ Item {
     signal cellEditCanceled(var index, var column)
     signal cellEditCommitFailed(var index, var column, var value, string reason)
     signal nodeTextEdited(var index, string text, string oldText)
-    signal editingChanged()
 
     // ─── Internal state (prefix __) ────────────────────────────────────────
 
@@ -272,7 +270,7 @@ Item {
             model: visibleModel
             delegate: treeRowDelegate
 
-            Keys.onPressed: function (event) {
+            Keys.onPressed:{
                 if (root.__handleKey(event))
                     event.accepted = true
             }
@@ -317,7 +315,7 @@ Item {
 
                 onContainsMouseChanged: delegateRoot.rowHovered = containsMouse
 
-                onClicked: function (mouse) {
+                onClicked:{
                     // If we're editing another row, honour focus-out policy
                     if (root.editing && root.__editingKey !== delegateRoot.nodeKey)
                         root.__autoLeaveEdit()
@@ -334,7 +332,7 @@ Item {
                     }
                 }
 
-                onDoubleClicked: function (mouse) {
+                onDoubleClicked: {
                     listView.forceActiveFocus()
 
                     var node = root.__nodes[delegateRoot.nodeKey]
@@ -600,19 +598,13 @@ Item {
             signal cancel()
 
             tristate: editorType === "checkState"
-            checkState: {
-                if (editorType === "checkState")
-                    return value !== undefined && value !== null ? value : Qt.Unchecked
-                return value === true ? Qt.Checked : Qt.Unchecked
-            }
-            text: {
-                if (editorType === "checkState") {
-                    if (value === Qt.Checked)          return qsTr("Checked")
-                    if (value === Qt.PartiallyChecked) return qsTr("Partial")
-                    return qsTr("Unchecked")
-                }
-                return value ? qsTr("true") : qsTr("false")
-            }
+            checkState: editorType === "checkState"
+                ? (value !== undefined && value !== null ? value : Qt.Unchecked)
+                : (value === true ? Qt.Checked : Qt.Unchecked)
+            text: editorType === "checkState"
+                ? (value === Qt.Checked ? qsTr("Checked")
+                    : (value === Qt.PartiallyChecked ? qsTr("Partial") : qsTr("Unchecked")))
+                : (value ? qsTr("true") : qsTr("false"))
 
             function __toggle() {
                 if (editorType === "checkState") {
@@ -623,7 +615,9 @@ Item {
                 }
             }
 
-            Component.onCompleted: if (autoFocus) forceActiveFocus()
+            Component.onCompleted: {
+                if (autoFocus) forceActiveFocus()
+            }
 
             MouseArea {
                 anchors.fill: parent
@@ -668,80 +662,6 @@ Item {
                 text: "\u25BE"
                 color: root.normalTextColor
                 font.pixelSize: 10
-            }
-
-            Component.onCompleted: {
-                if (autoFocus) forceActiveFocus()
-                comboPopup.open()
-            }
-
-            Keys.onEscapePressed: { comboPopup.close(); comboEditor.cancel() }
-            Keys.onReturnPressed: {
-                if (comboList.currentIndex >= 0) {
-                    var opt = comboList.model[comboList.currentIndex]
-                    comboPopup.close()
-                    comboEditor.commit(root.__comboValue(opt))
-                }
-            }
-            Keys.onUpPressed:   if (comboList.currentIndex > 0) comboList.currentIndex -= 1
-            Keys.onDownPressed: if (comboList.currentIndex < comboList.count - 1) comboList.currentIndex += 1
-
-            Popup {
-                id: comboPopup
-                x: 0
-                y: comboEditor.height
-                width: comboEditor.width
-                height: Math.min(comboList.contentHeight + 4, 200)
-                padding: 2
-                closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-
-                onClosed: {
-                    if (root.editing && root.__editingKey === comboEditor.nodeIndex.key)
-                        comboEditor.cancel()
-                }
-
-                background: Rectangle {
-                    color: Style.baseColor
-                    border.color: root.gridLineColor
-                    border.width: 1
-                    radius: 2
-                }
-
-                contentItem: ListView {
-                    id: comboList
-                    clip: true
-                    model: comboEditor.column && comboEditor.column.options ? comboEditor.column.options : []
-                    currentIndex: comboEditor.column && comboEditor.column.options
-                        ? root.comboIndexOf(comboEditor.column.options, comboEditor.value) : -1
-
-                    delegate: Rectangle {
-                        width: comboList.width
-                        height: root.rowHeight
-                        color: optMouse.containsMouse           ? root.hoveredBackgroundColor
-                             : index === comboList.currentIndex ? root.selectedBackgroundColor
-                                                                : "transparent"
-
-                        Text {
-                            anchors.fill: parent
-                            anchors.leftMargin: Style.marginM
-                            anchors.rightMargin: Style.marginM
-                            text: root.__comboLabel(comboEditor.column, modelData)
-                            color: index === comboList.currentIndex ? root.selectedTextColor : root.normalTextColor
-                            verticalAlignment: Text.AlignVCenter
-                            elide: Text.ElideRight
-                        }
-
-                        MouseArea {
-                            id: optMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            onClicked: {
-                                comboPopup.close()
-                                comboEditor.commit(root.__comboValue(modelData))
-                            }
-                        }
-                    }
-                }
             }
         }
     }
@@ -1109,11 +1029,10 @@ Item {
         var widths = new Array(n)
         var stretchIndices = []
         var fixedTotal = 0
-        var i, col, w
 
-        for (i = 0; i < n; ++i) {
-            col = columnAt(i)
-            w = (col && col.width !== undefined && col.width > 0) ? Number(col.width) : 0
+        for (var i = 0; i < n; ++i) {
+            var col = columnAt(i)
+            var w = (col && col.width !== undefined && col.width > 0) ? Number(col.width) : 0
             if (w > 0) {
                 widths[i] = w
                 fixedTotal += w
@@ -1127,13 +1046,13 @@ Item {
             var remaining = Math.max(0, root.width - fixedTotal)
             var share = Math.floor(remaining / stretchIndices.length)
             var leftover = remaining - share * stretchIndices.length
-            for (i = 0; i < stretchIndices.length; ++i) {
-                var idx = stretchIndices[i]
+            for (var i2 = 0; i2 < stretchIndices.length; ++i2) {
+                var idx = stretchIndices[i2]
                 var minW = 0
-                col = columnAt(idx)
-                if (col && col.minWidth !== undefined && col.minWidth > 0)
-                    minW = Number(col.minWidth)
-                widths[idx] = Math.max(minW, share + (i === stretchIndices.length - 1 ? leftover : 0))
+                var col2 = columnAt(idx)
+                if (col2 && col2.minWidth !== undefined && col2.minWidth > 0)
+                    minW = Number(col2.minWidth)
+                widths[idx] = Math.max(minW, share + (i2 === stretchIndices.length - 1 ? leftover : 0))
             }
         } else if (fixedTotal < root.width && n > 0) {
             // Distribute leftover proportionally so the rightmost column fills the row.
@@ -1613,7 +1532,7 @@ Item {
         var current = startNode
         while (current && current.parentKey !== "") {
             var parent = __nodes[current.parentKey]
-            if (!parent) return
+            if (!parent || !parent.childrenKeys) return
 
             var hasParticipating = false
             var allChecked = true
@@ -1695,7 +1614,6 @@ Item {
 
         currentIndex = createIndex(node)
         editingIndex = createIndex(node)
-        editingChanged()
         cellEditStarted(editingIndex, column)
         return true
     }
@@ -1856,8 +1774,6 @@ Item {
         __editingIsDirty = false
         __editingError = ""
         editingIndex = null
-        if (wasEditing)
-            editingChanged()
     }
 
     function __normalizeEditorValue(value, column, keyValue) {
