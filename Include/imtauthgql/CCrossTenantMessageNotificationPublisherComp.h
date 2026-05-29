@@ -23,7 +23,7 @@ namespace imtauthgql
 
 /**
 	Server-side publisher that broadcasts notifications when cross-tenant
-	messages change state (RFC phase 2 notifications).
+	messages change state.
 
 	The component observes the cross-tenant message broker
 	(imtauth::ICrossTenantMessage) and publishes:
