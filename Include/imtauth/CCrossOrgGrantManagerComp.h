@@ -27,8 +27,8 @@ public:
 
 	I_BEGIN_COMPONENT(CCrossOrgGrantManagerComp);
 		I_REGISTER_INTERFACE(imtauth::ICrossOrgGrant);
-		I_ASSIGN(m_grantCollectionCompPtr, "GrantCollection", "Cross-org grant collection", true, "GrantCollection");
-		I_ASSIGN(m_grantFactoryCompPtr, "GrantFactory", "Cross-org grant factory", true, "CrossOrgGrantInfo");
+		I_ASSIGN(m_grantCollectionCompPtr, "GrantCollection", "Cross-org grant collection", false, "GrantCollection");
+		I_ASSIGN(m_grantFactoryCompPtr, "GrantFactory", "Cross-org grant factory", false, "CrossOrgGrantInfo");
 	I_END_COMPONENT;
 
 	virtual QByteArray CreateGrant(
