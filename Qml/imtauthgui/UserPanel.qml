@@ -162,56 +162,56 @@ Item {
 				ModalDialogManager.openDialog(profileViewComp, {})
 			}
 		}
-		// Menu {
-		// 	id: organizationsSubmenu
-		// 	title: qsTr("Organization")
-		// 	Instantiator {
-		// 		model: root.__organizationsList.length
+		Menu {
+			id: organizationsSubmenu
+			title: qsTr("Organization")
+			Instantiator {
+				model: root.__organizationsList.length
 
-		// 		delegate: MenuItem {
-		// 			property var orgData: root.__organizationsList[index]
-		// 			text: orgData ? orgData.name : ""
-		// 			checkable: true
-		// 			checked: orgData && orgData.id === AuthorizationController.currentTenantId
-		// 			onTriggered: {
-		// 				if (orgData && orgData.id !== AuthorizationController.currentTenantId) {
-		// 					AuthorizationController.selectTenant(orgData.id)
-		// 				}
-		// 			}
-		// 		}
+				delegate: MenuItem {
+					property var orgData: root.__organizationsList[index]
+					text: orgData ? orgData.name : ""
+					checkable: true
+					checked: orgData && orgData.id === AuthorizationController.currentTenantId
+					onTriggered: {
+						if (orgData && orgData.id !== AuthorizationController.currentTenantId) {
+							AuthorizationController.selectTenant(orgData.id)
+						}
+					}
+				}
 
-		// 		onObjectAdded:{ organizationsSubmenu.insertItem(index, object) }
-		// 		onObjectRemoved: { organizationsSubmenu.removeItem(object) }
-		// 	}
+				onObjectAdded:{ organizationsSubmenu.insertItem(index, object) }
+				onObjectRemoved: { organizationsSubmenu.removeItem(object) }
+			}
 
-		// 	MenuSeparator {
-		// 		visible: root.__organizationsList.length > 0
-		// 	}
+			MenuSeparator {
+				visible: root.__organizationsList.length > 0
+			}
 
-		// 	MenuItem {
-		// 		text: qsTr("No organization")
-		// 		checkable: true
-		// 		checked: AuthorizationController.currentTenantId === ""
-		// 		onTriggered: {
-		// 			if (AuthorizationController.currentTenantId !== "") {
-		// 				AuthorizationController.selectTenant("")
-		// 			}
-		// 		}
-		// 	}
-		// }
+			MenuItem {
+				text: qsTr("No organization")
+				checkable: true
+				checked: AuthorizationController.currentTenantId === ""
+				onTriggered: {
+					if (AuthorizationController.currentTenantId !== "") {
+						AuthorizationController.selectTenant("")
+					}
+				}
+			}
+		}
 
-		// MenuSeparator {}
-		// MenuItem {
-		// 	text: qsTr("Logout")
-		// 	iconSource: "qrc:/" + Style.getIconPath("Icons/Exit", Icon.State.On, Icon.Mode.Normal)
-		// 	onTriggered: {
-		// 		AuthorizationController.logout()
-		// 	}
-		// }
+		MenuSeparator {}
+		MenuItem {
+			text: qsTr("Logout")
+			iconSource: "qrc:/" + Style.getIconPath("Icons/Exit", Icon.State.On, Icon.Mode.Normal)
+			onTriggered: {
+				AuthorizationController.logout()
+			}
+		}
 
-		// onAboutToShow: {
-		// 	root.__loadOrganizations()
-		// }
+		onAboutToShow: {
+			root.__loadOrganizations()
+		}
 	}
 
 	Component {
