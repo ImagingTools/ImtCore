@@ -60,7 +60,7 @@ istd::IChangeableUniquePtr CTenantDbDelegateComp::CreateObjectFromRecord(
 	}
 
 	if (record.contains("Id")){
-		tenantPtr->SetTenantId(record.value("Id").toByteArray());
+		tenantPtr->SetTenantId(imtdb::VariantToByteArray(record.value("Id")));
 	}
 	if (record.contains("Name")){
 		tenantPtr->SetTenantName(record.value("Name").toString());
@@ -69,10 +69,10 @@ istd::IChangeableUniquePtr CTenantDbDelegateComp::CreateObjectFromRecord(
 		tenantPtr->SetTenantDescription(record.value("Description").toString());
 	}
 	if (record.contains("OwnerId")){
-		tenantPtr->SetOwnerId(record.value("OwnerId").toByteArray());
+		tenantPtr->SetOwnerId(imtdb::VariantToByteArray(record.value("OwnerId")));
 	}
 	if (record.contains("CreatorId")){
-		tenantPtr->SetCreatorId(record.value("CreatorId").toByteArray());
+		tenantPtr->SetCreatorId(imtdb::VariantToByteArray(record.value("CreatorId")));
 	}
 	if (record.contains("IsActive")){
 		tenantPtr->SetActive(record.value("IsActive").toBool());
@@ -90,7 +90,7 @@ istd::IChangeableUniquePtr CTenantDbDelegateComp::CreateObjectFromRecord(
 
 	// Load permissions from the TenantPermissions table
 	if (record.contains("Id")){
-		QByteArrayList permissions = LoadTenantPermissions(record.value("Id").toByteArray());
+		QByteArrayList permissions = LoadTenantPermissions(imtdb::VariantToByteArray(record.value("Id")));
 		tenantPtr->SetTenantPermissions(permissions);
 	}
 
@@ -524,7 +524,7 @@ QByteArrayList CTenantDbDelegateComp::LoadTenantPermissions(const QByteArray& te
 	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(queryStr.toUtf8(), &sqlError);
 	if (sqlError.type() == QSqlError::NoError){
 		while (sqlQuery.next()){
-			result.append(sqlQuery.value(0).toByteArray());
+			result.append(imtdb::VariantToByteArray(sqlQuery.value(0)));
 		}
 	}
 

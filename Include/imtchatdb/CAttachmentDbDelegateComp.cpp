@@ -42,7 +42,7 @@ istd::IChangeableUniquePtr CAttachmentDbDelegateComp::CreateObjectFromRecord(
 	}
 
 	if (record.contains("Id")){
-		attachPtr->SetId(record.value("Id").toByteArray());
+		attachPtr->SetId(imtdb::VariantToByteArray(record.value("Id")));
 	}
 	if (record.contains("FileName")){
 		attachPtr->SetFileName(record.value("FileName").toString());

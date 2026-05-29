@@ -918,7 +918,7 @@ sdl::imtbase::ImtCollection::CImportObjectPayload CObjectCollectionControllerCom
 	QString extension = GetExtensionFromMimeType(mime);
 
 	QTemporaryDir tempDir;
-	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString() + "." + extension;
+	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces) + "." + extension;
 
 	QFile file(filePathTmp);
 	if (!file.open(QIODevice::WriteOnly)){
@@ -2354,7 +2354,7 @@ QJsonObject CObjectCollectionControllerCompBase::ImportObject(const imtgql::CGql
 	QString extension = GetExtensionFromMimeType(mime);
 
 	QTemporaryDir tempDir;
-	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString() + "." + extension;
+	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces) + "." + extension;
 
 	QFile file(filePathTmp);
 	if (!file.open(QIODevice::WriteOnly)){
@@ -2552,7 +2552,13 @@ int CObjectCollectionControllerCompBase::GetMimeTypeIndex(const QString& mimeTyp
 
 QString CObjectCollectionControllerCompBase::GetExtensionFromMimeType(const imtbase::CMimeType& mimeType) const
 {
-	return mimeType.GetSuffix();
+	const QString& suffix = mimeType.GetSuffix();
+
+	if (!suffix.isEmpty()){
+		return suffix;
+	}
+
+	return mimeType.GetSubType();
 }
 
 

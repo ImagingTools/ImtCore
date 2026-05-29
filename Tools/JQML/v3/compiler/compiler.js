@@ -279,7 +279,7 @@ function compile(options){
 
         }
         qmlprop(meta) {
-            if (meta[2][0] === "block" || meta[2][1][0] === "assign") {
+            if (meta[2][0] === "block" || (meta[2][1] && meta[2][1][0] === "assign")) {
                 if (meta[1][0] === "dot") {
                     let name = meta[1].slice(1)
 
@@ -1023,6 +1023,18 @@ function compile(options){
 
                         return stat
                     }
+                    case 'arrow': {
+                        let local = tree[1].slice()
+                        stat.local.push(local)
+                        stat.value.add(`(`)
+                        stat.value.add(tree[1].join(','))
+                        stat.value.add(`)=>{`)
+                        this.prepare(tree[2], stat)
+                        stat.value.add(`}`)
+                        let index = stat.local.indexOf(local)
+                        if (index >= 0) stat.local.splice(index, 1)
+                        return stat
+                    }
                     default: {
                         for (let t of tree) {
                             this.prepare(t, stat)
@@ -1451,7 +1463,36 @@ function compile(options){
                 let ids = new Set()
                 let context = new Set()
 
-                if (args){
+                // Detect if source is an arrow function: (params) => body
+                let isArrowSource = connectedSignal.source &&
+                    connectedSignal.source[0] === 'stat' &&
+                    connectedSignal.source[1] &&
+                    connectedSignal.source[1][0] === 'arrow'
+
+                // Detect if source is a function expression: function(params) { body }
+                let isFunctionSource = connectedSignal.source &&
+                    connectedSignal.source[0] === 'function'
+
+                if (isArrowSource) {
+                    let arrowNode = connectedSignal.source[1]
+                    connectedSignal.args = arrowNode[1].slice()
+                    connectedSignal.source = arrowNode[2] // array of body statements
+                    for (let name of Object.keys(this.qmlFile.context)) {
+                        if (connectedSignal.args.indexOf(name) < 0) {
+                            ids.add(name)
+                            context.add(`__self.__${this.qmlFile.getContextName()}.${name}`)
+                        }
+                    }
+                } else if (isFunctionSource) {
+                    connectedSignal.args = connectedSignal.source[2].slice()
+                    connectedSignal.source = connectedSignal.source[3] // array of body statements
+                    for (let name of Object.keys(this.qmlFile.context)) {
+                        if (connectedSignal.args.indexOf(name) < 0) {
+                            ids.add(name)
+                            context.add(`__self.__${this.qmlFile.getContextName()}.${name}`)
+                        }
+                    }
+                } else if (args){
                     if(args.length){
                         for (let arg of args) {
                             connectedSignal.args.push(arg.replaceAll('`', ''))

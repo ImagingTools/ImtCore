@@ -265,7 +265,7 @@ ControlBase {
 	}
 
 	Shortcut {
-		sequence: "Space";
+		sequence: "Alt+Down";
 		enabled: !comboBoxContainer.isOpen && (comboBoxContainer.activeFocus) && comboBoxContainer.visible;
 		onActivated: {
 			comboBoxContainer.openPopupMenu();
@@ -273,7 +273,7 @@ ControlBase {
 	}
 
 	Shortcut {
-		sequence: "Ctrl+Up";
+		sequence: "Up";
 		enabled: !comboBoxContainer.isOpen && comboBoxContainer.activeFocus && comboBoxContainer.visible;
 		onActivated: {
 			if(comboBoxContainer.model !==undefined && comboBoxContainer.model.getItemsCount() && comboBoxContainer.currentIndex > 0){
@@ -283,7 +283,7 @@ ControlBase {
 	}
 
 	Shortcut {
-		sequence: "Ctrl+Down";
+		sequence: "Down";
 		enabled: !comboBoxContainer.isOpen && comboBoxContainer.activeFocus && comboBoxContainer.visible;
 		onActivated: {
 			if(comboBoxContainer.model !==undefined && comboBoxContainer.model.getItemsCount() && comboBoxContainer.currentIndex < (comboBoxContainer.model.getItemsCount()-1)){

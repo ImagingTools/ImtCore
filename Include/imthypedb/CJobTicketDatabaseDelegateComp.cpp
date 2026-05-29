@@ -33,7 +33,7 @@ istd::IChangeableUniquePtr CJobTicketDatabaseDelegateComp::CreateObjectFromRecor
 		return nullptr;
 	}
 
-	QByteArray typeId = record.value("TypeId").toByteArray();
+	QByteArray typeId = imtdb::VariantToByteArray(record.value("TypeId"));
 	if (typeId.isEmpty()){
 		return nullptr;
 	}
@@ -56,7 +56,7 @@ istd::IChangeableUniquePtr CJobTicketDatabaseDelegateComp::CreateObjectFromRecor
 	}
 
 	if (record.contains("Id")){
-		QByteArray uuid = record.value("Id").toByteArray();
+		QByteArray uuid = imtdb::VariantToByteArray(record.value("Id"));
 		jobTicketPtr->SetUuid(uuid);
 	}
 
@@ -66,7 +66,7 @@ istd::IChangeableUniquePtr CJobTicketDatabaseDelegateComp::CreateObjectFromRecor
 	}
 
 	if (record.contains("ContextId")){
-		QByteArray contextId = record.value("ContextId").toByteArray();
+		QByteArray contextId = imtdb::VariantToByteArray(record.value("ContextId"));
 		jobTicketPtr->SetContextId(contextId);
 	}
 

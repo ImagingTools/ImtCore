@@ -40,4 +40,5 @@ module.exports = {
 
     Dialogs: require("./Dialogs/Dialogs"),
     Controls: require("./Controls/Controls"),
+    Layouts: require("./Layouts/Layouts"),
 }
