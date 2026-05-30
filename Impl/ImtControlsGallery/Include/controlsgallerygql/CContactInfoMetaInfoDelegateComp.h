@@ -8,7 +8,7 @@
 #include <imtdbgql/TSdlBasedMetaInfoDelegate.h>
 
 // ControlsGallery includes
-#include <GeneratedFiles/controlsgallerysdl/SDL/1.0/CPP/ContactInfos.h>
+#include <GeneratedFiles/controlsgallerysdl/SDL/1.0/CPP/ContactInfos>
 
 
 namespace controlsgallerygql

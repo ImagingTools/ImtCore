@@ -10,7 +10,7 @@
 #include <imtauth/IJwtSessionController.h>
 
 // ControlsGallery includes
-#include <GeneratedFiles/controlsgallerysdl/SDL/1.0/CPP/ContactInfos.h>
+#include <GeneratedFiles/controlsgallerysdl/SDL/1.0/CPP/ContactInfos>
 
 
 namespace controlsgallerygql
@@ -26,7 +26,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase)
 	virtual sdl::V1_0::imtbase::CVisualStatus OnGetObjectVisualStatus(
 				const sdl::V1_0::imtbase::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

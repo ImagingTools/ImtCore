@@ -11,7 +11,7 @@ namespace controlsgallerygql
 
 // protected methods
 
-// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase)
 
 sdl::V1_0::imtbase::CVisualStatus CContactInfoCollectionControllerComp::OnGetObjectVisualStatus(
 			const sdl::V1_0::imtbase::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
@@ -26,14 +26,10 @@ sdl::V1_0::imtbase::CVisualStatus CContactInfoCollectionControllerComp::OnGetObj
 	}
 
 	sdl::V1_0::imtbase::GetObjectVisualStatusRequestArguments arguments = getObjectVisualStatusRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.has_value()){
-		Q_ASSERT(false);
-		return sdl::V1_0::imtbase::CVisualStatus();
-	}
 
 	QByteArray objectId;
-	if (arguments.input.Version_1_0->objectId.has_value()){
-		objectId = *arguments.input.Version_1_0->objectId;
+	if (arguments.input.objectId.has_value()){
+		objectId = *arguments.input.objectId;
 	}
 
 	response.objectId = objectId;
@@ -49,10 +45,7 @@ sdl::V1_0::imtbase::CVisualStatus CContactInfoCollectionControllerComp::OnGetObj
 		}
 	}
 
-	sdl::V1_0::imtbase::CVisualStatus retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 
@@ -139,14 +132,10 @@ bool CContactInfoCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	sdl::V1_0::controlsgallery::GetContactInfoRequestArguments arguments = getContactInfoRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		I_CRITICAL();
-		return false;
-	}
 
 	QByteArray id;
-	if (arguments.input.Version_1_0->id){
-		id = *arguments.input.Version_1_0->id;
+	if (arguments.input.id){
+		id = *arguments.input.id;
 	}
 
 	representationPayload.id = id;
@@ -227,12 +216,7 @@ bool CContactInfoCollectionControllerComp::UpdateObjectFromRepresentationRequest
 	}
 
 	sdl::V1_0::controlsgallery::UpdateContactInfoRequestArguments inputArguments = updateContactInfoRequest.GetRequestedArguments();
-	if (!inputArguments.input.Version_1_0){
-		I_CRITICAL();
-		return false;
-	}
-
-	if (!inputArguments.input.Version_1_0->item){
+	if (!inputArguments.input.item){
 		I_CRITICAL();
 		return false;
 	}
@@ -240,7 +224,7 @@ bool CContactInfoCollectionControllerComp::UpdateObjectFromRepresentationRequest
 	imtauth::CContactInfo* contactInfoPtr = dynamic_cast<imtauth::CContactInfo*>(&object);
 	Q_ASSERT(contactInfoPtr != nullptr);
 
-	sdl::V1_0::controlsgallery::CContactInfoData contactInfoData = *inputArguments.input.Version_1_0->item;
+	sdl::V1_0::controlsgallery::CContactInfoData contactInfoData = *inputArguments.input.item;
 
 	QByteArray objectId;
 	if (!FillObjectFromRepresentation(contactInfoData, *contactInfoPtr, objectId, errorMessage)){

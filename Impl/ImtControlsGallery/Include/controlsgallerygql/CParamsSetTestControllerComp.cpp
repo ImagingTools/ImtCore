@@ -7,7 +7,7 @@ namespace controlsgallerygql
 
 // protected methods
 
-// reimplemented (sdl::V1_0::controlsgallery::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::controlsgallery::CParamsSetTestGqlHandlerCompBase)
 
 sdl::V1_0::imtbase::CParamsSet CParamsSetTestControllerComp::OnGetParamsSet(
 	const sdl::V1_0::controlsgallery::CGetParamsSetGqlRequest& getParamsSetRequest,
@@ -18,14 +18,13 @@ sdl::V1_0::imtbase::CParamsSet CParamsSetTestControllerComp::OnGetParamsSet(
 
 	// Text parameter
 	sdl::V1_0::imtbase::CTextParam strParam;
-	strParam.Version_1_0.emplace().text = "SampleText";
+	strParam.text = "SampleText";
 
 	QJsonObject jsonObject;
-	if (!strParam.WriteToJsonObject(jsonObject, strParam.PV_1_0)){
+	if (!strParam.WriteToJsonObject(jsonObject)){
 		return retVal;
 	}
 
-	retVal.Version_1_0.emplace();
 
 	QJsonDocument jsonDocument;
 	jsonDocument.setObject(jsonObject);
@@ -39,7 +38,7 @@ sdl::V1_0::imtbase::CParamsSet CParamsSetTestControllerComp::OnGetParamsSet(
 	parameter.typeId = "TextParam";
 	parameter.data = jsonDocument.toJson(QJsonDocument::Compact);
 
-	retVal.Version_1_0->parameters.emplace().append(parameter);
+	retVal.parameters.emplace().append(parameter);
 
 	return retVal;
 }
@@ -53,24 +52,20 @@ sdl::V1_0::controlsgallery::CSetParamsSetResult CParamsSetTestControllerComp::On
 
 	sdl::V1_0::controlsgallery::CSetParamsSetResult retVal;
 
-	retVal.Version_1_0.emplace().result = true;
+	retVal.result = true;
 
 	return retVal;
 
 
 	auto paramsSet = setParamsSetRequest.GetRequestedArguments().input;
 
-	if (!paramsSet.Version_1_0){
-		errorMessage = "ParamsSet: V1_0 is null";
-		return retVal;
-	}
 
-	if (paramsSet.Version_1_0->parameters){
+	if (paramsSet.parameters){
 		errorMessage = "ParamsSet: parameters is null";
 		return retVal;
 	}
 
-	auto parameters = *paramsSet.Version_1_0->parameters;
+	auto parameters = *paramsSet.parameters;
 	if (parameters.count() == 1){
 		errorMessage = "ParamsSet: invalid parameters count";
 		return retVal;
@@ -100,17 +95,13 @@ sdl::V1_0::controlsgallery::CSetParamsSetResult CParamsSetTestControllerComp::On
 		return retVal;
 	}
 
-	if (!strParam.Version_1_0){
-		errorMessage = "ParamsSet: Text param V1_0 is null";
-		return retVal;
-	}
 
-	if (strParam.Version_1_0->text != "SampleText"){
+	if (strParam.text != "SampleText"){
 		errorMessage = "ParamsSet: Invalid text param value";
 		return retVal;
 	}
 
-	retVal.Version_1_0.emplace().result = true;
+	retVal.result = true;
 
 	return retVal;
 }

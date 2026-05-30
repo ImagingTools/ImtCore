@@ -3,10 +3,10 @@
 
 // ImtCore includes
 #include <imtdoc/IDocumentService.h>
-#include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService.h>
+#include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService>
 
 // ControlsGallery includes
-#include <controlsgallerysdl/SDL/1.0/CPP/ContactInfoCollectionDocumentService.h>
+#include <controlsgallerysdl/SDL/1.0/CPP/ContactInfoCollectionDocumentService>
 
 
 
@@ -14,10 +14,10 @@ namespace controlsgallerygql
 {
 
 
-class CContactInfoCollectionDocumentServiceComp: public sdl::V1_0::controlsgallery::CGraphQlHandlerCompBase
+class CContactInfoCollectionDocumentServiceComp: public sdl::V1_0::controlsgallery::CContactInfoCollectionDocumentServiceGqlHandlerCompBase
 {
 public:
-	typedef sdl::V1_0::controlsgallery::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::controlsgallery::CContactInfoCollectionDocumentServiceGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CContactInfoCollectionDocumentServiceComp)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentService", "Collection document manager", false, "CollectionDocumentService");
