@@ -3031,7 +3031,7 @@ bool CGetSpecificationsGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest& gqlReq
 
 	// writting input arguments
 	::imtgql::CGqlParamObject inputDataObject;
-	if (!requestArguments.input.WriteToGraphQlObject(inputDataObject)){
+	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 		return false;
@@ -3056,10 +3056,10 @@ CGetSpecificationsGqlRequest::CGetSpecificationsGqlRequest(const ::imtgql::CGqlR
 			if (protocolVersion == "1.0"){
 				bool isInputRead;
 				if (optRead){
-					isInputRead = m_requestedArguments.input.OptReadFromGraphQlObject(*inputDataObjectPtr, CLink::PV_1_0);
+					isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr, CLink::PV_1_0);
 				}
 				else {
-					isInputRead = m_requestedArguments.input.ReadFromGraphQlObject(*inputDataObjectPtr, CLink::PV_1_0);
+					isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr, CLink::PV_1_0);
 				}
 				m_isValid = isInputRead;
 				if (!isInputRead){
@@ -3076,10 +3076,10 @@ CGetSpecificationsGqlRequest::CGetSpecificationsGqlRequest(const ::imtgql::CGqlR
 		else {
 			bool isInputRead;
 			if (optRead){
-				isInputRead = m_requestedArguments.input.OptReadFromGraphQlObject(*inputDataObjectPtr);
+				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
 			}
 			else {
-				isInputRead = m_requestedArguments.input.ReadFromGraphQlObject(*inputDataObjectPtr);
+				isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr);
 			}
 			m_isValid = isInputRead;
 			if (!isInputRead){

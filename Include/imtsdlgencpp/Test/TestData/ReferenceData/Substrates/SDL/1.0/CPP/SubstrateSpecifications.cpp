@@ -5559,7 +5559,7 @@ bool CGetSubstrateSpecificationListGqlRequest::SetupGqlRequest(::imtgql::CGqlReq
 
 	// writting input arguments
 	::imtgql::CGqlParamObject inputDataObject;
-	if (!requestArguments.input.WriteToGraphQlObject(inputDataObject)){
+	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 		return false;
@@ -5584,10 +5584,10 @@ CGetSubstrateSpecificationListGqlRequest::CGetSubstrateSpecificationListGqlReque
 			if (protocolVersion == "1.0"){
 				bool isInputRead;
 				if (optRead){
-					isInputRead = m_requestedArguments.input.OptReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationListInput::PV_1_0);
+					isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationListInput::PV_1_0);
 				}
 				else {
-					isInputRead = m_requestedArguments.input.ReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationListInput::PV_1_0);
+					isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationListInput::PV_1_0);
 				}
 				m_isValid = isInputRead;
 				if (!isInputRead){
@@ -5604,10 +5604,10 @@ CGetSubstrateSpecificationListGqlRequest::CGetSubstrateSpecificationListGqlReque
 		else {
 			bool isInputRead;
 			if (optRead){
-				isInputRead = m_requestedArguments.input.OptReadFromGraphQlObject(*inputDataObjectPtr);
+				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
 			}
 			else {
-				isInputRead = m_requestedArguments.input.ReadFromGraphQlObject(*inputDataObjectPtr);
+				isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr);
 			}
 			m_isValid = isInputRead;
 			if (!isInputRead){
@@ -5680,7 +5680,7 @@ bool CGetSubstrateSpecificationGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest
 
 	// writting input arguments
 	::imtgql::CGqlParamObject inputDataObject;
-	if (!requestArguments.input.WriteToGraphQlObject(inputDataObject)){
+	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 		return false;
@@ -5705,10 +5705,10 @@ CGetSubstrateSpecificationGqlRequest::CGetSubstrateSpecificationGqlRequest(const
 			if (protocolVersion == "1.0"){
 				bool isInputRead;
 				if (optRead){
-					isInputRead = m_requestedArguments.input.OptReadFromGraphQlObject(*inputDataObjectPtr, CInputId::PV_1_0);
+					isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr, CInputId::PV_1_0);
 				}
 				else {
-					isInputRead = m_requestedArguments.input.ReadFromGraphQlObject(*inputDataObjectPtr, CInputId::PV_1_0);
+					isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr, CInputId::PV_1_0);
 				}
 				m_isValid = isInputRead;
 				if (!isInputRead){
@@ -5725,10 +5725,10 @@ CGetSubstrateSpecificationGqlRequest::CGetSubstrateSpecificationGqlRequest(const
 		else {
 			bool isInputRead;
 			if (optRead){
-				isInputRead = m_requestedArguments.input.OptReadFromGraphQlObject(*inputDataObjectPtr);
+				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
 			}
 			else {
-				isInputRead = m_requestedArguments.input.ReadFromGraphQlObject(*inputDataObjectPtr);
+				isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr);
 			}
 			m_isValid = isInputRead;
 			if (!isInputRead){
@@ -5784,7 +5784,7 @@ bool CGetOptionsListGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest& gqlReques
 
 	// writting input arguments
 	::imtgql::CGqlParamObject inputDataObject;
-	if (!requestArguments.input.WriteToGraphQlObject(inputDataObject)){
+	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 		return false;
@@ -5809,10 +5809,10 @@ CGetOptionsListGqlRequest::CGetOptionsListGqlRequest(const ::imtgql::CGqlRequest
 			if (protocolVersion == "1.0"){
 				bool isInputRead;
 				if (optRead){
-					isInputRead = m_requestedArguments.input.OptReadFromGraphQlObject(*inputDataObjectPtr, CCollectionViewParamsTest::PV_1_0);
+					isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr, CCollectionViewParamsTest::PV_1_0);
 				}
 				else {
-					isInputRead = m_requestedArguments.input.ReadFromGraphQlObject(*inputDataObjectPtr, CCollectionViewParamsTest::PV_1_0);
+					isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr, CCollectionViewParamsTest::PV_1_0);
 				}
 				m_isValid = isInputRead;
 				if (!isInputRead){
@@ -5829,10 +5829,10 @@ CGetOptionsListGqlRequest::CGetOptionsListGqlRequest(const ::imtgql::CGqlRequest
 		else {
 			bool isInputRead;
 			if (optRead){
-				isInputRead = m_requestedArguments.input.OptReadFromGraphQlObject(*inputDataObjectPtr);
+				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
 			}
 			else {
-				isInputRead = m_requestedArguments.input.ReadFromGraphQlObject(*inputDataObjectPtr);
+				isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr);
 			}
 			m_isValid = isInputRead;
 			if (!isInputRead){
@@ -5903,7 +5903,7 @@ bool CInsertSubstrateSpecificationGqlRequest::SetupGqlRequest(::imtgql::CGqlRequ
 
 	// writting input arguments
 	::imtgql::CGqlParamObject inputDataObject;
-	if (!requestArguments.input.WriteToGraphQlObject(inputDataObject)){
+	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 		return false;
@@ -5928,10 +5928,10 @@ CInsertSubstrateSpecificationGqlRequest::CInsertSubstrateSpecificationGqlRequest
 			if (protocolVersion == "1.0"){
 				bool isInputRead;
 				if (optRead){
-					isInputRead = m_requestedArguments.input.OptReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationInput::PV_1_0);
+					isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationInput::PV_1_0);
 				}
 				else {
-					isInputRead = m_requestedArguments.input.ReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationInput::PV_1_0);
+					isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationInput::PV_1_0);
 				}
 				m_isValid = isInputRead;
 				if (!isInputRead){
@@ -5948,10 +5948,10 @@ CInsertSubstrateSpecificationGqlRequest::CInsertSubstrateSpecificationGqlRequest
 		else {
 			bool isInputRead;
 			if (optRead){
-				isInputRead = m_requestedArguments.input.OptReadFromGraphQlObject(*inputDataObjectPtr);
+				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
 			}
 			else {
-				isInputRead = m_requestedArguments.input.ReadFromGraphQlObject(*inputDataObjectPtr);
+				isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr);
 			}
 			m_isValid = isInputRead;
 			if (!isInputRead){
@@ -6010,7 +6010,7 @@ bool CUpdateSubstrateSpecificationGqlRequest::SetupGqlRequest(::imtgql::CGqlRequ
 
 	// writting input arguments
 	::imtgql::CGqlParamObject inputDataObject;
-	if (!requestArguments.input.WriteToGraphQlObject(inputDataObject)){
+	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 		return false;
@@ -6035,10 +6035,10 @@ CUpdateSubstrateSpecificationGqlRequest::CUpdateSubstrateSpecificationGqlRequest
 			if (protocolVersion == "1.0"){
 				bool isInputRead;
 				if (optRead){
-					isInputRead = m_requestedArguments.input.OptReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationInput::PV_1_0);
+					isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationInput::PV_1_0);
 				}
 				else {
-					isInputRead = m_requestedArguments.input.ReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationInput::PV_1_0);
+					isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationInput::PV_1_0);
 				}
 				m_isValid = isInputRead;
 				if (!isInputRead){
@@ -6055,10 +6055,10 @@ CUpdateSubstrateSpecificationGqlRequest::CUpdateSubstrateSpecificationGqlRequest
 		else {
 			bool isInputRead;
 			if (optRead){
-				isInputRead = m_requestedArguments.input.OptReadFromGraphQlObject(*inputDataObjectPtr);
+				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
 			}
 			else {
-				isInputRead = m_requestedArguments.input.ReadFromGraphQlObject(*inputDataObjectPtr);
+				isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr);
 			}
 			m_isValid = isInputRead;
 			if (!isInputRead){

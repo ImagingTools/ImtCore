@@ -510,7 +510,7 @@ struct GetSpecificationsRequestInfo
 
 struct GetSpecificationsRequestArguments
 {
-	CLink input;
+	istd::TSharedNullable<CLink> input;
 };
 
 

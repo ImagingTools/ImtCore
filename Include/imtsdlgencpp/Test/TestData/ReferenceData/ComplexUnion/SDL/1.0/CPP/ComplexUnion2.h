@@ -2264,7 +2264,7 @@ struct GetLastProductionResultsCDMRequestInfo
 
 struct GetLastProductionResultsCDMRequestArguments
 {
-	CPointsInCoordinateFormat pointAsCoordinates;
+	istd::TSharedNullable<CPointsInCoordinateFormat> pointAsCoordinates;
 };
 
 

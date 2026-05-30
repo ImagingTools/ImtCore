@@ -111,8 +111,9 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlRe
 		CStructNamespaceConverter structNameConverter(sdlField, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 
 		FeedStreamHorizontally(ifStream, 1);
+		ifStream << QStringLiteral("istd::TSharedNullable<");
 		ifStream << structNameConverter.GetString();
-		ifStream << ' ' << sdlField.GetId() << ';';
+		ifStream << QStringLiteral("> ") << sdlField.GetId() << ';';
 		FeedStream(ifStream, 1, false);
 	}
 
@@ -842,7 +843,7 @@ void CGqlWrapClassCodeGeneratorComp::AddCustomFieldWriteToRequestCode(QTextStrea
 	stream << QStringLiteral("if (!");
 	stream << QStringLiteral("requestArguments.");
 	stream << field.GetId();
-	stream << (".WriteToGraphQlObject(");
+	stream << QStringLiteral("->WriteToGraphQlObject(");
 	stream << dataObjectVariableName;
 	stream << QStringLiteral(")){");
 	FeedStream(stream, 1, false);
@@ -1023,7 +1024,7 @@ void CGqlWrapClassCodeGeneratorComp::AddReadFromRequestCode(
 	stream << readVariableName;
 	stream << QStringLiteral(" = ");
 	stream << QStringLiteral("m_requestedArguments.") << field.GetId();
-	stream << '.';
+	stream << QStringLiteral(".emplace().");
 	if (optRead){
 		stream << QStringLiteral("Opt");
 	}

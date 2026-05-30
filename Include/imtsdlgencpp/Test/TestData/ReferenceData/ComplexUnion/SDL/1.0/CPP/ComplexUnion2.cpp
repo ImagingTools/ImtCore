@@ -17929,7 +17929,7 @@ bool CGetLastProductionResultsCDMGqlRequest::SetupGqlRequest(::imtgql::CGqlReque
 
 	// writting input arguments
 	::imtgql::CGqlParamObject pointAsCoordinatesDataObject;
-	if (!requestArguments.pointAsCoordinates.WriteToGraphQlObject(pointAsCoordinatesDataObject)){
+	if (!requestArguments.pointAsCoordinates->WriteToGraphQlObject(pointAsCoordinatesDataObject)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 		return false;
@@ -17954,10 +17954,10 @@ CGetLastProductionResultsCDMGqlRequest::CGetLastProductionResultsCDMGqlRequest(c
 			if (protocolVersion == "1.0"){
 				bool isPointAsCoordinatesRead;
 				if (optRead){
-					isPointAsCoordinatesRead = m_requestedArguments.pointAsCoordinates.OptReadFromGraphQlObject(*pointAsCoordinatesDataObjectPtr, CPointsInCoordinateFormat::PV_1_0);
+					isPointAsCoordinatesRead = m_requestedArguments.pointAsCoordinates.emplace().OptReadFromGraphQlObject(*pointAsCoordinatesDataObjectPtr, CPointsInCoordinateFormat::PV_1_0);
 				}
 				else {
-					isPointAsCoordinatesRead = m_requestedArguments.pointAsCoordinates.ReadFromGraphQlObject(*pointAsCoordinatesDataObjectPtr, CPointsInCoordinateFormat::PV_1_0);
+					isPointAsCoordinatesRead = m_requestedArguments.pointAsCoordinates.emplace().ReadFromGraphQlObject(*pointAsCoordinatesDataObjectPtr, CPointsInCoordinateFormat::PV_1_0);
 				}
 				m_isValid = isPointAsCoordinatesRead;
 				if (!isPointAsCoordinatesRead){
@@ -17974,10 +17974,10 @@ CGetLastProductionResultsCDMGqlRequest::CGetLastProductionResultsCDMGqlRequest(c
 		else {
 			bool isPointAsCoordinatesRead;
 			if (optRead){
-				isPointAsCoordinatesRead = m_requestedArguments.pointAsCoordinates.OptReadFromGraphQlObject(*pointAsCoordinatesDataObjectPtr);
+				isPointAsCoordinatesRead = m_requestedArguments.pointAsCoordinates.emplace().OptReadFromGraphQlObject(*pointAsCoordinatesDataObjectPtr);
 			}
 			else {
-				isPointAsCoordinatesRead = m_requestedArguments.pointAsCoordinates.ReadFromGraphQlObject(*pointAsCoordinatesDataObjectPtr);
+				isPointAsCoordinatesRead = m_requestedArguments.pointAsCoordinates.emplace().ReadFromGraphQlObject(*pointAsCoordinatesDataObjectPtr);
 			}
 			m_isValid = isPointAsCoordinatesRead;
 			if (!isPointAsCoordinatesRead){

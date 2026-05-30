@@ -1250,7 +1250,7 @@ struct GetSubstrateSpecificationListRequestInfo
 
 struct GetSubstrateSpecificationListRequestArguments
 {
-	CSubstrateSpecificationListInput input;
+	istd::TSharedNullable<CSubstrateSpecificationListInput> input;
 };
 
 
@@ -1284,7 +1284,7 @@ struct GetSubstrateSpecificationRequestInfo
 
 struct GetSubstrateSpecificationRequestArguments
 {
-	CInputId input;
+	istd::TSharedNullable<CInputId> input;
 };
 
 
@@ -1328,7 +1328,7 @@ struct GetOptionsListRequestInfo
 
 struct GetOptionsListRequestArguments
 {
-	CCollectionViewParamsTest input;
+	istd::TSharedNullable<CCollectionViewParamsTest> input;
 };
 
 
@@ -1363,7 +1363,7 @@ struct InsertSubstrateSpecificationRequestInfo
 
 struct InsertSubstrateSpecificationRequestArguments
 {
-	CSubstrateSpecificationInput input;
+	istd::TSharedNullable<CSubstrateSpecificationInput> input;
 };
 
 
@@ -1398,7 +1398,7 @@ struct UpdateSubstrateSpecificationRequestInfo
 
 struct UpdateSubstrateSpecificationRequestArguments
 {
-	CSubstrateSpecificationInput input;
+	istd::TSharedNullable<CSubstrateSpecificationInput> input;
 };
 
 
