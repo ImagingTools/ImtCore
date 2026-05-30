@@ -9,7 +9,7 @@
 
 // ImtCore includes
 #include <imtserverapp/IJsonRepresentationController.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtBaseTypes>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtBaseTypes_fwd.h>
 
 
 namespace imtserverapp

@@ -10,7 +10,7 @@
 #include <imtauth/IJwtSessionController.h>
 
 // ControlsGallery includes
-#include <GeneratedFiles/controlsgallerysdl/SDL/1.0/CPP/ContactInfos>
+#include <GeneratedFiles/controlsgallerysdl/SDL/1.0/CPP/ContactInfos_fwd.h>
 
 
 namespace controlsgallerygql

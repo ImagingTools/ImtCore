@@ -10,8 +10,8 @@
 #include <imtbase/IObjectCollection.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtdoc/TCollectionDocumentServiceWrap.h>
-#include <imtbasesdl/SDL/1.0/CPP/DocumentService>
-#include <imtbasesdl/SDL/1.0/CPP/UndoManager>
+#include <imtbasesdl/SDL/1.0/CPP/DocumentService_fwd.h>
+#include <imtbasesdl/SDL/1.0/CPP/UndoManager_fwd.h>
 
 
 namespace imtservergql

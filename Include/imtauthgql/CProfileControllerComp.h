@@ -8,7 +8,7 @@
 #include <imtauth/ITenantMembership.h>
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/ITenantManager.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Profile>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Profile_fwd.h>
 
 
 namespace imtauthgql

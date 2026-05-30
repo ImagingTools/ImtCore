@@ -9,7 +9,7 @@
 #include <imtauth/ITenantManager.h>
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/ITenantInvitationManager.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantMemberships>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantMemberships_fwd.h>
 
 
 namespace imtauthgql

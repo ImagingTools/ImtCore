@@ -6,7 +6,7 @@
 #include <ibase/IApplicationInfo.h>
 
 // ImtCore includes
-#include <GeneratedFiles/imtappsdl/SDL/1.0/CPP/Application>
+#include <GeneratedFiles/imtappsdl/SDL/1.0/CPP/Application_fwd.h>
 
 
 namespace imtservergql

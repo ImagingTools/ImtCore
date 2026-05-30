@@ -7,7 +7,7 @@
 #include <imtauth/IUserSettings.h>
 #include <imtserverapp/IJsonRepresentationController.h>
 #include <imtbase/IObjectCollection.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Settings>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Settings_fwd.h>
 
 
 namespace imtservergql

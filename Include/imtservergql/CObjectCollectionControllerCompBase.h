@@ -29,7 +29,7 @@
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtauth/IUserActionManager.h>
 #include <imtauth/CTenantFilterParam.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection_fwd.h>
 
 
 #undef GetObject

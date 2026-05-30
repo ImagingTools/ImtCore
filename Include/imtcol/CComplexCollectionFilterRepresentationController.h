@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <imtbase/IComplexCollectionFilter.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter_fwd.h>
 
 
 namespace imtcol

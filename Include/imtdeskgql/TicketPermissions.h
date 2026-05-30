@@ -10,7 +10,7 @@
 #include <imtgql/IGqlContext.h>
 
 // Generated includes
-#include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/ImtDesk>
+#include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/ImtDesk_fwd.h>
 
 
 /**

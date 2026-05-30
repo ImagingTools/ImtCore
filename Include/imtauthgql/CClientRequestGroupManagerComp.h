@@ -5,7 +5,7 @@
 // ImtCore includes
 #include <imtauth/IUserGroupManager.h>
 #include <imtauthgql/CClientRequestManagerCompBase.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Groups>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Groups_fwd.h>
 
 
 namespace imtauthgql

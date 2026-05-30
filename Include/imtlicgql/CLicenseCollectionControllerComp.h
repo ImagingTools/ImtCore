@@ -4,7 +4,7 @@
 
 // ImtCore includes
 #include <imtlic/ILicenseDefinition.h>
-#include <GeneratedFiles/imtlicsdl/SDL/1.0/CPP/Licenses>
+#include <GeneratedFiles/imtlicsdl/SDL/1.0/CPP/Licenses_fwd.h>
 
 
 namespace imtlicgql

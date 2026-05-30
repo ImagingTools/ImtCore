@@ -119,7 +119,7 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 		QStringList cumulatedFiles;
 		const QString sourceFilePath = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsCompPtr, *m_argumentParserCompPtr)[imtsdl::ISdlProcessArgumentsParser::s_sourceFileType];
 		const QString headerFilePath = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsCompPtr, *m_argumentParserCompPtr)[imtsdl::ISdlProcessArgumentsParser::s_headerFileType];
-		const QString fwdFilePath = headerFilePath.chopped(2);
+		const QString fwdFilePath = headerFilePath.chopped(2) + "_fwd.h";
 		cumulatedFiles << sourceFilePath;
 		cumulatedFiles << headerFilePath;
 		cumulatedFiles << fwdFilePath;
@@ -264,7 +264,13 @@ bool CCxxProcessorsManagerComp::BeginHeaderFile(
 	// write pragma once first
 	QTextStream stream(&headerFile);
 	stream << QStringLiteral("#pragma once");
-	FeedStream(stream, 3, false);
+	FeedStream(stream, 2, false);
+
+	// include forward declarations file (contains enum classes)
+	stream << QStringLiteral("#include \"");
+	stream << QFileInfo(headerFile).baseName();
+	stream << QStringLiteral("_fwd.h\"");
+	FeedStream(stream, 2, false);
 
 	// special optional qt include
 	stream << QStringLiteral("#ifdef QT_QML_LIB");
@@ -378,7 +384,7 @@ bool CCxxProcessorsManagerComp::BeginSourceFile(
 	// include forward declaration file
 	stream << QStringLiteral("#include \"");
 	stream << QFileInfo(sourceFile).baseName();
-	stream << QStringLiteral("\"");
+	stream << QStringLiteral("_fwd.h\"");
 	FeedStream(stream, 3, false);
 
 	// begin namespace
@@ -654,7 +660,7 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 
 	// calculate fwd file path (same as header but with _fwd suffix)
 	const QString headerFilePath = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsCompPtr, *m_argumentParserCompPtr)[imtsdl::ISdlProcessArgumentsParser::s_headerFileType];
-	const QString fwdFilePath = headerFilePath.chopped(2); // replace ".h" with "_fwd.h"
+	const QString fwdFilePath = headerFilePath.chopped(2) + "_fwd.h";
 
 	FilePtr fwdFilePtr = CreateFile(fwdFilePath);
 	if (!fwdFilePtr){
@@ -740,7 +746,7 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 			// Convert .h path to _fwd.h for forward declaration files
 			QString fwdPath = directive.path;
 			if (fwdPath.endsWith(QStringLiteral(".h>"))){
-				fwdPath.replace(fwdPath.length() - 3, 3, QStringLiteral(">"));
+				fwdPath.replace(fwdPath.length() - 3, 3, QStringLiteral("_fwd.h>"));
 			}
 			stream << QStringLiteral("#include ");
 			stream << fwdPath;

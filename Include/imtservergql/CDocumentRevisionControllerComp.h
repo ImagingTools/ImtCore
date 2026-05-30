@@ -6,7 +6,7 @@
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IDocumentChangeGenerator.h>
 #include <imtservergql/CGqlRequestHandlerCompBase.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentRevision>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentRevision_fwd.h>
 
 
 namespace imtservergql

@@ -7,7 +7,7 @@
 #include <imtdesk/IEntityReferenceStorage.h>
 #include <imtauth/IUserGroupInfoProvider.h>
 #include <imtchat/IChatService.h>
-#include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/ImtDesk>
+#include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/ImtDesk_fwd.h>
 
 
 namespace imtdeskgql

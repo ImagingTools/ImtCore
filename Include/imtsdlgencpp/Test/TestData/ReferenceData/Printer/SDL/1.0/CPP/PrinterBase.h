@@ -1,5 +1,6 @@
 #pragma once
 
+#include "PrinterBase_fwd.h"
 
 #ifdef QT_QML_LIB
 #include <QtQml/QQmlEngine>
