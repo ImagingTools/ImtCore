@@ -29,7 +29,6 @@ namespace sdl::V1_0::imtbase
 {
 
 
-
 class CTimeRange
 {
 public:

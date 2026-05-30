@@ -3,6 +3,7 @@
 
 #include <QtCore/QObject>
 
+
 // custom types includes
 #include <imtbasesdl/SDL/1.0/CPP/ImtBaseTypes_fwd.h>
 
@@ -102,7 +103,6 @@ signals:
 	void AndChanged();
 	void OrChanged();
 };
-
 
 
 // type forward declarations

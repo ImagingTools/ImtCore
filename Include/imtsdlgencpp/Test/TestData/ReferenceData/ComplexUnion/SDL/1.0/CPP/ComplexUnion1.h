@@ -29,7 +29,6 @@ namespace sdl::V1_0::complextest
 {
 
 
-
 class CPoint
 {
 public:

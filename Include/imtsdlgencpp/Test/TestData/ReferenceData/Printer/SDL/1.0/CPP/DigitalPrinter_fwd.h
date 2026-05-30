@@ -3,6 +3,7 @@
 
 #include <QtCore/QObject>
 
+
 // custom types includes
 #include <modsdlsdl/SDL/1.0/CPP/PrinterBase_fwd.h>
 
@@ -34,7 +35,6 @@ signals:
 	void InkjetChanged();
 	void TonerChanged();
 };
-
 
 
 // type forward declarations

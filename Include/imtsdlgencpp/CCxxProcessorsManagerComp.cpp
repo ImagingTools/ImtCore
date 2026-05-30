@@ -777,23 +777,25 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 				}
 			}
 		}
-
-		// re-create stream after enum processors wrote to the file
-		QTextStream enumEndStream(fwdFilePtr.get());
-		FeedStream(enumEndStream, 1, false);
 	}
+	else{
+		stream.flush();
+	}
+
+	// re-create stream after enum processors may have written to the file
+	QTextStream fwdStream(fwdFilePtr.get());
 
 	// forward declare all types
 	if (m_sdlTypeListCompPtr.IsValid()){
 		const imtsdl::SdlTypeList typeList = m_sdlTypeListCompPtr->GetSdlTypes(true);
 		if (!typeList.isEmpty()){
-			stream << QStringLiteral("// type forward declarations");
-			FeedStream(stream, 1, false);
+			fwdStream << QStringLiteral("// type forward declarations");
+			FeedStream(fwdStream, 1, false);
 			for (const imtsdl::CSdlType& sdlType: typeList){
-				stream << QStringLiteral("class C") << sdlType.GetName() << ';';
-				FeedStream(stream, 1, false);
+				fwdStream << QStringLiteral("class C") << sdlType.GetName() << ';';
+				FeedStream(fwdStream, 1, false);
 			}
-			FeedStream(stream, 1, false);
+			FeedStream(fwdStream, 1, false);
 		}
 	}
 
@@ -801,36 +803,36 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 	if (m_sdlUnionListCompPtr.IsValid()){
 		const imtsdl::SdlUnionList unionList = m_sdlUnionListCompPtr->GetUnions(true);
 		if (!unionList.isEmpty()){
-			stream << QStringLiteral("// union forward declarations");
-			FeedStream(stream, 1, false);
+			fwdStream << QStringLiteral("// union forward declarations");
+			FeedStream(fwdStream, 1, false);
 			for (const imtsdl::CSdlUnion& sdlUnion: unionList){
-				stream << QStringLiteral("class ") << sdlUnion.GetName() << ';';
-				FeedStream(stream, 1, false);
-				stream << QStringLiteral("class C") << sdlUnion.GetName() << QStringLiteral("Object;");
-				FeedStream(stream, 1, false);
-				stream << QStringLiteral("class C") << sdlUnion.GetName() << QStringLiteral("ObjectList;");
-				FeedStream(stream, 1, false);
+				fwdStream << QStringLiteral("class ") << sdlUnion.GetName() << ';';
+				FeedStream(fwdStream, 1, false);
+				fwdStream << QStringLiteral("class C") << sdlUnion.GetName() << QStringLiteral("Object;");
+				FeedStream(fwdStream, 1, false);
+				fwdStream << QStringLiteral("class C") << sdlUnion.GetName() << QStringLiteral("ObjectList;");
+				FeedStream(fwdStream, 1, false);
 			}
-			FeedStream(stream, 1, false);
+			FeedStream(fwdStream, 1, false);
 		}
 	}
 
 	// forward declare requests
 	if (hasRequests){
 		const imtsdl::SdlRequestList requestsList = m_requestsProviderListCompPtr->GetRequests(true);
-		stream << QStringLiteral("// request forward declarations");
-		FeedStream(stream, 1, false);
+		fwdStream << QStringLiteral("// request forward declarations");
+		FeedStream(fwdStream, 1, false);
 		for (const imtsdl::CSdlRequest& request: requestsList){
-			stream << QStringLiteral("class C") << request.GetName() << QStringLiteral("GqlRequest;");
-			FeedStream(stream, 1, false);
+			fwdStream << QStringLiteral("class C") << request.GetName() << QStringLiteral("GqlRequest;");
+			FeedStream(fwdStream, 1, false);
 		}
-		FeedStream(stream, 1, false);
+		FeedStream(fwdStream, 1, false);
 	}
 
 	// generate CCollectionControllerCompBase class definitions (moved from .h)
 	if (hasDocumentTypes && m_documentTypeProcessorCompListPtr.IsValid()){
 		// flush the stream before passing the device to document type processors
-		stream.flush();
+		fwdStream.flush();
 
 		const imtsdl::SdlDocumentTypeList documentTypesList = m_sdlDocumentTypeListCompPtr->GetDocumentTypes(true);
 		const int documentTypeProcessorsCount = m_documentTypeProcessorCompListPtr.GetCount();
@@ -849,7 +851,7 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 	// generate GqlHandlerCompBase class definition (moved from .h)
 	if (hasRequests && m_autoProcessorCompListPtr.IsValid()){
 		// flush the stream before passing the device to auto processors
-		stream.flush();
+		fwdStream.flush();
 
 		const int processorsCount = m_autoProcessorCompListPtr.GetCount();
 		imtsdl::CSdlType dummyType;
@@ -874,13 +876,13 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 		FeedStream(endStream, 1, false);
 	}
 	else{
-		FeedStream(stream, 1, false);
+		FeedStream(fwdStream, 1, false);
 
 		// end namespace
-		stream << '}';
-		stream << QStringLiteral(" // namespace ");
-		stream << sdlNamespace;
-		FeedStream(stream, 1, false);
+		fwdStream << '}';
+		fwdStream << QStringLiteral(" // namespace ");
+		fwdStream << sdlNamespace;
+		FeedStream(fwdStream, 1, false);
 	}
 
 	return true;

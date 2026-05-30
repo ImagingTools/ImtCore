@@ -35,7 +35,6 @@ signals:
 };
 
 
-
 // type forward declarations
 class CCoords;
 class CPrinterSpecificationBase;

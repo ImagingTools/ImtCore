@@ -3,6 +3,7 @@
 
 #include <QtCore/QObject>
 
+
 namespace sdl::V1_0::complextest
 {
 
@@ -382,7 +383,6 @@ void LINEChanged();
 void POLYGONChanged();
 void CIRCLEChanged();
 };
-
 
 
 // type forward declarations

@@ -32,7 +32,6 @@ namespace sdl::V1_0::modsdl
 {
 
 
-
 class CDigitalPrinterSpecification
 {
 public:

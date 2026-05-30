@@ -29,7 +29,6 @@ namespace sdl::V1_0::modsdl
 {
 
 
-
 // forward declaration for union types
 class PrinterSpecification;
 class CPrinterSpecificationObject;
