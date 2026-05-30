@@ -84,7 +84,7 @@ Canvas {
 		ctx.reset();
 		ctx.clearRect(0, 0, rowDelegate.width, rowDelegate.height);
 
-		let color = (containsMouse || rowDelegate.selected) ? Style.selectedColor :
+		let color = (rowDelegate.mouseArea.containsMouse || rowDelegate.selected) ? Style.selectedColor :
 				rowDelegate.tableItem.enableAlternating ? rowDelegate.tableItem.alternatingColor : 'white';
 		ctx.fillStyle = color
 		ctx.fillRect(x, y, rowDelegate.width, rowDelegate.height)
@@ -94,7 +94,7 @@ Canvas {
 		// ctx.fillStyle = "red" //rowDelegate.selected ? Style.selectedColor : "transparent";
 
 		ctx.moveTo(0, 0);
-		ctx.lineWidth = (rowDelegate.rowIndex > 0 && rowDelegate.rowIndex < rowCount) ? rowDelegate.horizontalBorderSize :
+		ctx.lineWidth = (rowDelegate.rowIndex > 0) ? rowDelegate.horizontalBorderSize :
 																																	  (rowDelegate.rowIndex == 0 && rowDelegate.visibleTopBorderFirst) ? rowDelegate.horizontalBorderSize : 0;
 		ctx.lineTo(rowDelegate.width, 0);
 
@@ -105,7 +105,7 @@ Canvas {
 
 		// ctx.stroke();
 		ctx.strokeStyle =  rowDelegate.tableItem.borderColorVertical
-		let fontPixelSize = rowDelegate.tableItem.emptyDecorCell ? Style.fontSizeM : rowDelegate.tableItem.cellDecorator.isValidData("FontSize", columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontSize", columnIndex) : Style.fontSizeM
+		let fontPixelSize = rowDelegate.tableItem.emptyDecorCell ? Style.fontSizeM : rowDelegate.tableItem.cellDecorator.isValidData("FontSize", rowDelegate.rowIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontSize", rowDelegate.rowIndex) : Style.fontSizeM
 		ctx.font = '' + fontPixelSize + "px " + Style.fontFamily
 
 

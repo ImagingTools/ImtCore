@@ -18,7 +18,7 @@ QtObject {
     }
 
     function isNoUserManagement(){
-        return userMode === UserModeTypeMetaInfo.s_nO_USER_MANAGEMENT;
+        return userMode === "NO_USER_MANAGEMENT";
     }
 
     function updateModel(){

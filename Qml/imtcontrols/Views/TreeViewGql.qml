@@ -746,7 +746,7 @@ Rectangle{
 		let parentId = arr[arr.length - 1];
 
 		for(let foundIndex = index - 1; foundIndex >= 0; foundIndex--){
-			if(treeViewGql.model.getData("InnerId__", i) === parentId){
+			if(treeViewGql.model.getData("InnerId__", foundIndex) === parentId){
 				return foundIndex;
 			}
 		}
