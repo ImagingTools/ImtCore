@@ -94,7 +94,11 @@ class Property extends BaseObject {
             }
 
             if(!found){
-                let connectionObj = target.constructor.meta[name + 'Changed'].type.get(target, name + 'Changed').connect(()=>{
+                const signalFunc = target.constructor.meta[name + 'Changed'].type.get(target, name + 'Changed')
+                // Cross-item bindings use connectBefore so they fire before the source item's own SLOT_
+                const isCrossItem = link.target !== target
+                const connectFn = isCrossItem && signalFunc.connectBefore ? signalFunc.connectBefore : signalFunc.connect
+                let connectionObj = connectFn(()=>{
                     if(!link.target[link.name+'__updating']){
                         link.target[link.name+'__updating'] = true
                         link.meta.type.set(link.target, link.name, link.func, link.meta)
@@ -169,14 +173,16 @@ class Property extends BaseObject {
             throw new Error(`Cannot assign to read-only property "${name}"`)
         }
             
-        if(target.__depends[name]){
-            for(let connectionObj of target.__depends[name]){
-                target.constructor.meta[name + 'Changed'].type.removeConnection(connectionObj)
+        if(!(global.signalTargets[global.signalTargets.length-1] === target)){
+            if(target.__depends[name]){
+                for(let connectionObj of target.__depends[name]){
+                    target.constructor.meta[name + 'Changed'].type.removeConnection(connectionObj)
+                }
+                delete target.__depends[name]
             }
-            delete target.__depends[name]
-        }
 
-        if(target.__properties) delete target.__properties[name]
+            if(target.__properties) delete target.__properties[name]
+        }
         return this.set(target, name, value, meta)
     }
 

@@ -15,6 +15,7 @@
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtcol/CDocumentIdFilter.h>
 #include <imtgql/CGqlRequest.h>
+#include <imtauthgql/imtauthgql.h>
 
 
 namespace imtservergql
@@ -70,6 +71,13 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 	int offset = 0;
 	int count = -1;
 	iprm::CParamsSet filterParams;
+
+	if (!m_tenantFilterEnabledAttrPtr.IsValid() || *m_tenantFilterEnabledAttrPtr){
+		imtauth::CTenantFilterParam* tenantFilterPtr = imtauthgql::CreateTenantFilterParam(gqlRequest);
+		if (tenantFilterPtr != nullptr){
+			filterParams.SetEditableParameter("TenantFilter", tenantFilterPtr, true);
+		}
+	}
 
 	// Exclude selected IDs: create CDocumentIdFilter with CT_NOT_IN
 	if (arguments.input.Version_1_0->excludeIds && !arguments.input.Version_1_0->excludeIds->empty()){
@@ -163,5 +171,4 @@ sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CFilterableSelectCont
 
 
 }
-
 

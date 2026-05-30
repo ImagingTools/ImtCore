@@ -13,6 +13,17 @@ namespace imtauth
 {
 
 
+/**
+	Tenant filter mode: Include returns items belonging to the tenant,
+	Exclude returns items NOT belonging to the tenant.
+*/
+enum TenantFilterMode
+{
+	TFM_INCLUDE = 0,
+	TFM_EXCLUDE = 1
+};
+
+
 class ITenantFilterParam: virtual public iser::ISerializable
 {
 public:
@@ -21,6 +32,9 @@ public:
 
 	virtual QByteArray GetOwnerId() const = 0;
 	virtual void SetOwnerId(const QByteArray& ownerId) = 0;
+
+	virtual TenantFilterMode GetFilterMode() const = 0;
+	virtual void SetFilterMode(TenantFilterMode mode) = 0;
 };
 
 

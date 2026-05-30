@@ -45,6 +45,7 @@
 #include <imtcol/CComplexCollectionFilterRepresentationController.h>
 #include <imtcol/CDocumentCollectionFilterRepresentationController.h>
 #include <imtcol/CDocumentCollectionFilter.h>
+#include <imtauthgql/imtauthgql.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentCollectionFilter.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
@@ -917,7 +918,7 @@ sdl::imtbase::ImtCollection::CImportObjectPayload CObjectCollectionControllerCom
 	QString extension = GetExtensionFromMimeType(mime);
 
 	QTemporaryDir tempDir;
-	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString() + "." + extension;
+	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces) + "." + extension;
 
 	QFile file(filePathTmp);
 	if (!file.open(QIODevice::WriteOnly)){
@@ -2353,7 +2354,7 @@ QJsonObject CObjectCollectionControllerCompBase::ImportObject(const imtgql::CGql
 	QString extension = GetExtensionFromMimeType(mime);
 
 	QTemporaryDir tempDir;
-	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString() + "." + extension;
+	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString(QUuid::WithoutBraces) + "." + extension;
 
 	QFile file(filePathTmp);
 	if (!file.open(QIODevice::WriteOnly)){
@@ -2551,7 +2552,13 @@ int CObjectCollectionControllerCompBase::GetMimeTypeIndex(const QString& mimeTyp
 
 QString CObjectCollectionControllerCompBase::GetExtensionFromMimeType(const imtbase::CMimeType& mimeType) const
 {
-	return mimeType.GetSuffix();
+	const QString& suffix = mimeType.GetSuffix();
+
+	if (!suffix.isEmpty()){
+		return suffix;
+	}
+
+	return mimeType.GetSubType();
 }
 
 
@@ -2918,16 +2925,7 @@ imtauth::CTenantFilterParam* CObjectCollectionControllerCompBase::CreateTenantFi
 		return nullptr;
 	}
 
-	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	if (gqlContextPtr == nullptr){
-		return nullptr;
-	}
-
-	imtauth::CTenantFilterParam* tenantFilterPtr = new imtauth::CTenantFilterParam();
-	tenantFilterPtr->SetTenantId(gqlContextPtr->GetTenantId());
-	tenantFilterPtr->SetOwnerId(gqlContextPtr->GetUserId());
-
-	return tenantFilterPtr;
+	return imtauthgql::CreateTenantFilterParam(gqlRequest);
 }
 
 

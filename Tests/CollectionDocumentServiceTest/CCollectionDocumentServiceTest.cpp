@@ -43,15 +43,17 @@ QByteArray CCollectionDocumentServiceTest::CreateDocumentAndWaitForLoad(
 	const QByteArray& userId,
 	const QByteArray& typeId)
 {
-	QByteArray documentId = manager.CreateNewDocument(userId, typeId);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = userId;
+	params.documentTypeId = typeId;
 
-	// Process events to let async thread complete and main thread callbacks fire
-	for (int i = 0; i < 50; ++i){
-		QCoreApplication::processEvents();
-		QThread::msleep(10);
+	QByteArray taskId = manager.BeginDocumentTask(imtdoc::IDocumentService::TT_NEW, params);
+	if (taskId.isEmpty()) {
+		return QByteArray();
 	}
 
-	return documentId;
+	auto result = manager.WaitForTaskFinished(taskId);
+	return result.documentId;
 }
 
 
@@ -60,16 +62,17 @@ QByteArray CCollectionDocumentServiceTest::OpenDocumentAndWaitForLoad(
 	const QByteArray& userId,
 	const QByteArray& objectId)
 {
-	QUrl url = QUrl("collection:///" + objectId);
-	QByteArray documentId = manager.OpenDocument(userId, url);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = userId;
+	params.url = QUrl("collection:///" + objectId);
 
-	// Process events to let async thread complete and main thread callbacks fire
-	for (int i = 0; i < 50; ++i){
-		QCoreApplication::processEvents();
-		QThread::msleep(10);
+	QByteArray taskId = manager.BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
+	if (taskId.isEmpty()) {
+		return QByteArray();
 	}
 
-	return documentId;
+	auto result = manager.WaitForTaskFinished(taskId);
+	return result.documentId;
 }
 
 
@@ -155,8 +158,16 @@ void CCollectionDocumentServiceTest::GetOpenedDocumentListMultipleUsersTest()
 
 void CCollectionDocumentServiceTest::CreateNewDocumentSuccessTest()
 {
-	QByteArray docId = m_managerPtr->CreateNewDocument(TEST_USER_ID, TEST_TYPE_ID);
-	QVERIFY2(!docId.isEmpty(), "CreateNewDocument should return a non-empty document ID");
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentTypeId = TEST_TYPE_ID;
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_NEW, params);
+	QVERIFY2(!taskId.isEmpty(), "BeginDocumentTask should return a non-empty task ID");
+
+	auto result = m_managerPtr->WaitForTaskFinished(taskId);
+	QByteArray docId = result.documentId;
+	QVERIFY2(!docId.isEmpty(), "Task result should contain a non-empty document ID");
 
 	auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
 	QCOMPARE(list.size(), 1);
@@ -169,8 +180,12 @@ void CCollectionDocumentServiceTest::CreateNewDocumentUndoManagerFailTest()
 {
 	m_managerPtr->SetCreateUndoManagerShouldFail(true);
 
-	QByteArray docId = m_managerPtr->CreateNewDocument(TEST_USER_ID, TEST_TYPE_ID);
-	QVERIFY2(docId.isEmpty(), "CreateNewDocument should return empty ID when undo manager creation fails");
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentTypeId = TEST_TYPE_ID;
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_NEW, params);
+	QVERIFY2(taskId.isEmpty(), "BeginDocumentTask should return empty task ID when undo manager creation fails");
 
 	auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
 	QVERIFY2(list.isEmpty(), "No documents should be created when undo manager fails");
@@ -181,11 +196,15 @@ void CCollectionDocumentServiceTest::CreateNewDocumentObjectCreationFailAsyncTes
 {
 	m_managerPtr->SetCreateObjectShouldFail(true);
 
-	QByteArray docId = m_managerPtr->CreateNewDocument(TEST_USER_ID, TEST_TYPE_ID);
-	QVERIFY2(!docId.isEmpty(), "CreateNewDocument returns ID immediately even if object creation will fail async");
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentTypeId = TEST_TYPE_ID;
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_NEW, params);
+	QVERIFY2(!taskId.isEmpty(), "BeginDocumentTask returns task ID immediately even if object creation will fail async");
 
 	// Wait for async completion — the document should be closed due to failure
-	QTRY_VERIFY_WITH_TIMEOUT(m_managerPtr->GetOpenedDocumentList(TEST_USER_ID).isEmpty(), 5000);
+	auto result = m_managerPtr->WaitForTaskFinished(taskId);
 
 	auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
 	QVERIFY2(list.isEmpty(), "Document should be closed after async object creation failure");
@@ -196,7 +215,11 @@ void CCollectionDocumentServiceTest::CreateNewDocumentEventFiredTest()
 {
 	m_managerPtr->GetMockEventHandler().ClearEvents();
 
-	m_managerPtr->CreateNewDocument(TEST_USER_ID, TEST_TYPE_ID);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentTypeId = TEST_TYPE_ID;
+
+	m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_NEW, params);
 
 	const auto& events = m_managerPtr->GetMockEventHandler().GetEvents();
 	QVERIFY2(!events.isEmpty(), "At least one event should have been fired");
@@ -216,8 +239,12 @@ void CCollectionDocumentServiceTest::CreateNewDocumentEventFiredTest()
 
 void CCollectionDocumentServiceTest::CreateNewDocumentIsLoadingTest()
 {
-	QByteArray docId = m_managerPtr->CreateNewDocument(TEST_USER_ID, TEST_TYPE_ID);
-	QVERIFY2(!docId.isEmpty(), "Document ID should not be empty");
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentTypeId = TEST_TYPE_ID;
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_NEW, params);
+	QVERIFY2(!taskId.isEmpty(), "Task ID should not be empty");
 
 	auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
 	QCOMPARE(list.size(), 1);
@@ -227,8 +254,22 @@ void CCollectionDocumentServiceTest::CreateNewDocumentIsLoadingTest()
 
 void CCollectionDocumentServiceTest::CreateNewDocumentMultipleDocumentsTest()
 {
-	QByteArray docId1 = m_managerPtr->CreateNewDocument(TEST_USER_ID, TEST_TYPE_ID);
-	QByteArray docId2 = m_managerPtr->CreateNewDocument(TEST_USER_ID, TEST_TYPE_ID_2);
+	imtdoc::IDocumentService::TaskParams params1;
+	params1.userId = TEST_USER_ID;
+	params1.documentTypeId = TEST_TYPE_ID;
+
+	imtdoc::IDocumentService::TaskParams params2;
+	params2.userId = TEST_USER_ID;
+	params2.documentTypeId = TEST_TYPE_ID_2;
+
+	QByteArray taskId1 = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_NEW, params1);
+	QByteArray taskId2 = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_NEW, params2);
+
+	auto result1 = m_managerPtr->WaitForTaskFinished(taskId1);
+	auto result2 = m_managerPtr->WaitForTaskFinished(taskId2);
+
+	QByteArray docId1 = result1.documentId;
+	QByteArray docId2 = result2.documentId;
 
 	QVERIFY2(!docId1.isEmpty(), "First document ID should not be empty");
 	QVERIFY2(!docId2.isEmpty(), "Second document ID should not be empty");
@@ -243,23 +284,27 @@ void CCollectionDocumentServiceTest::CreateNewDocumentProposedSourceDocumentIdUs
 {
 	const QByteArray proposedId = "proposed-object-id";
 
-	QByteArray docId = m_managerPtr->CreateNewDocument(TEST_USER_ID, TEST_TYPE_ID, proposedId);
-	QVERIFY2(!docId.isEmpty(), "CreateNewDocument should return a non-empty document ID");
+	imtdoc::IDocumentService::TaskParams createParams;
+	createParams.userId = TEST_USER_ID;
+	createParams.documentTypeId = TEST_TYPE_ID;
+	createParams.proposedSourceDocumentId = proposedId;
 
-	// Wait for async object creation to complete
-	QTRY_VERIFY_WITH_TIMEOUT([&]() {
-		auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
-		for (const auto& info : list) {
-			if (info.documentId == docId) {
-				return !info.isLoading;
-			}
-		}
-		return true;
-	}(), 5000);
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_NEW, createParams);
+	QVERIFY2(!taskId.isEmpty(), "BeginDocumentTask should return a non-empty task ID");
+
+	auto createResult = m_managerPtr->WaitForTaskFinished(taskId);
+	QByteArray docId = createResult.documentId;
+	QVERIFY2(!docId.isEmpty(), "Task result should contain a non-empty document ID");
 
 	// Save the document – this should insert it into the collection using the proposed ID
-	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId, TEST_DOC_NAME);
-	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
+	imtdoc::IDocumentService::TaskParams saveParams;
+	saveParams.userId = TEST_USER_ID;
+	saveParams.documentId = docId;
+	saveParams.documentName = TEST_DOC_NAME;
+
+	QByteArray saveTaskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, saveParams);
+	auto saveResult = m_managerPtr->WaitForTaskFinished(saveTaskId);
+	QCOMPARE(saveResult.status, imtdoc::IDocumentService::OS_OK);
 
 	// Verify the proposed ID was used as the collection element ID
 	QCOMPARE(m_managerPtr->GetMockCollection().GetLastInsertedId(), proposedId);
@@ -277,10 +322,16 @@ void CCollectionDocumentServiceTest::OpenDocumentSuccessTest()
 		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
 		istd::IChangeableSharedPtr(mockObj));
 
-	QUrl url("collection:///" + QString::fromUtf8(TEST_OBJECT_ID));
-	QByteArray docId = m_managerPtr->OpenDocument(TEST_USER_ID, url);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.url = QUrl("collection:///" + QString::fromUtf8(TEST_OBJECT_ID));
 
-	QVERIFY2(!docId.isEmpty(), "OpenDocument should return a non-empty document ID");
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
+	QVERIFY2(!taskId.isEmpty(), "BeginDocumentTask should return a non-empty task ID");
+
+	auto result = m_managerPtr->WaitForTaskFinished(taskId);
+	QByteArray docId = result.documentId;
+	QVERIFY2(!docId.isEmpty(), "Task result should contain a non-empty document ID");
 
 	auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
 	QCOMPARE(list.size(), 1);
@@ -292,25 +343,34 @@ void CCollectionDocumentServiceTest::OpenDocumentSuccessTest()
 
 void CCollectionDocumentServiceTest::OpenDocumentInvalidSchemeTest()
 {
-	QUrl url("file:///some/path");
-	QByteArray docId = m_managerPtr->OpenDocument(TEST_USER_ID, url);
-	QVERIFY2(docId.isEmpty(), "OpenDocument should fail with non-collection scheme");
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.url = QUrl("file:///some/path");
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
+	QVERIFY2(taskId.isEmpty(), "BeginDocumentTask should fail with non-collection scheme");
 }
 
 
 void CCollectionDocumentServiceTest::OpenDocumentInvalidUrlTest()
 {
-	QUrl url("invalid-url");
-	QByteArray docId = m_managerPtr->OpenDocument(TEST_USER_ID, url);
-	QVERIFY2(docId.isEmpty(), "OpenDocument should fail with invalid URL");
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.url = QUrl("invalid-url");
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
+	QVERIFY2(taskId.isEmpty(), "BeginDocumentTask should fail with invalid URL");
 }
 
 
 void CCollectionDocumentServiceTest::OpenDocumentNonExistentObjectTest()
 {
-	QUrl url("collection:///nonexistentObject");
-	QByteArray docId = m_managerPtr->OpenDocument(TEST_USER_ID, url);
-	QVERIFY2(docId.isEmpty(), "OpenDocument should fail for non-existent object");
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.url = QUrl("collection:///nonexistentObject");
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
+	QVERIFY2(taskId.isEmpty(), "BeginDocumentTask should fail for non-existent object");
 }
 
 
@@ -321,9 +381,12 @@ void CCollectionDocumentServiceTest::OpenDocumentUndoManagerFailTest()
 		istd::IChangeableSharedPtr(new CMockDocumentObject()));
 	m_managerPtr->SetCreateUndoManagerShouldFail(true);
 
-	QUrl url("collection:///" + QString::fromUtf8(TEST_OBJECT_ID));
-	QByteArray docId = m_managerPtr->OpenDocument(TEST_USER_ID, url);
-	QVERIFY2(docId.isEmpty(), "OpenDocument should fail when undo manager creation fails");
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.url = QUrl("collection:///" + QString::fromUtf8(TEST_OBJECT_ID));
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
+	QVERIFY2(taskId.isEmpty(), "BeginDocumentTask should fail when undo manager creation fails");
 }
 
 
@@ -334,8 +397,11 @@ void CCollectionDocumentServiceTest::OpenDocumentEventFiredTest()
 		istd::IChangeableSharedPtr(new CMockDocumentObject()));
 	m_managerPtr->GetMockEventHandler().ClearEvents();
 
-	QUrl url("collection:///" + QString::fromUtf8(TEST_OBJECT_ID));
-	m_managerPtr->OpenDocument(TEST_USER_ID, url);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.url = QUrl("collection:///" + QString::fromUtf8(TEST_OBJECT_ID));
+
+	m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
 
 	const auto& events = m_managerPtr->GetMockEventHandler().GetEvents();
 	bool foundOpenedEvent = false;
@@ -356,9 +422,12 @@ void CCollectionDocumentServiceTest::OpenDocumentIsLoadingTest()
 		TEST_OBJECT_ID, TEST_TYPE_ID, TEST_DOC_NAME,
 		istd::IChangeableSharedPtr(new CMockDocumentObject()));
 
-	QUrl url("collection:///" + QString::fromUtf8(TEST_OBJECT_ID));
-	QByteArray docId = m_managerPtr->OpenDocument(TEST_USER_ID, url);
-	QVERIFY2(!docId.isEmpty(), "Document ID should not be empty");
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.url = QUrl("collection:///" + QString::fromUtf8(TEST_OBJECT_ID));
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
+	QVERIFY2(!taskId.isEmpty(), "Task ID should not be empty");
 
 	auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
 	QCOMPARE(list.size(), 1);
@@ -368,17 +437,23 @@ void CCollectionDocumentServiceTest::OpenDocumentIsLoadingTest()
 
 void CCollectionDocumentServiceTest::OpenDocumentWithHostTest()
 {
-	QUrl url("collection://hostname/objectId");
-	QByteArray docId = m_managerPtr->OpenDocument(TEST_USER_ID, url);
-	QVERIFY2(docId.isEmpty(), "OpenDocument should fail when URL has a host");
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.url = QUrl("collection://hostname/objectId");
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
+	QVERIFY2(taskId.isEmpty(), "BeginDocumentTask should fail when URL has a host");
 }
 
 
 void CCollectionDocumentServiceTest::OpenDocumentMultiplePathSegmentsTest()
 {
-	QUrl url("collection:///segment1/segment2");
-	QByteArray docId = m_managerPtr->OpenDocument(TEST_USER_ID, url);
-	QVERIFY2(docId.isEmpty(), "OpenDocument should fail when URL has multiple path segments");
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.url = QUrl("collection:///segment1/segment2");
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
+	QVERIFY2(taskId.isEmpty(), "BeginDocumentTask should fail when URL has multiple path segments");
 }
 
 
@@ -550,10 +625,18 @@ void CCollectionDocumentServiceTest::GetDocumentPtrInvalidDocumentTest()
 
 void CCollectionDocumentServiceTest::GetDocumentPtrWhileLoadingTest()
 {
-	QByteArray docId = m_managerPtr->CreateNewDocument(TEST_USER_ID, TEST_TYPE_ID);
-	QVERIFY2(!docId.isEmpty(), "Document should be created");
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentTypeId = TEST_TYPE_ID;
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_NEW, params);
+	QVERIFY2(!taskId.isEmpty(), "Document should be created");
 
 	// Document is loading, should return nullptr
+	auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
+	QCOMPARE(list.size(), 1);
+	QByteArray docId = list[0].documentId;
+
 	const istd::IChangeable* ptr = m_managerPtr->GetDocumentPtr(TEST_USER_ID, docId);
 	QVERIFY2(ptr == nullptr, "GetDocumentPtr should return nullptr while document is loading");
 }
@@ -599,7 +682,15 @@ void CCollectionDocumentServiceTest::GetDocumentDataInvalidDocumentTest()
 
 void CCollectionDocumentServiceTest::GetDocumentDataWhileLoadingTest()
 {
-	QByteArray docId = m_managerPtr->CreateNewDocument(TEST_USER_ID, TEST_TYPE_ID);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentTypeId = TEST_TYPE_ID;
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_NEW, params);
+
+	auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
+	QCOMPARE(list.size(), 1);
+	QByteArray docId = list[0].documentId;
 
 	istd::IChangeableSharedPtr dataPtr;
 	auto status = m_managerPtr->GetDocumentData(TEST_USER_ID, docId, dataPtr);
@@ -655,7 +746,15 @@ void CCollectionDocumentServiceTest::SetDocumentDataInvalidDocumentTest()
 
 void CCollectionDocumentServiceTest::SetDocumentDataWhileLoadingTest()
 {
-	QByteArray docId = m_managerPtr->CreateNewDocument(TEST_USER_ID, TEST_TYPE_ID);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentTypeId = TEST_TYPE_ID;
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_NEW, params);
+
+	auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
+	QCOMPARE(list.size(), 1);
+	QByteArray docId = list[0].documentId;
 
 	CMockDocumentObject newData;
 	auto status = m_managerPtr->SetDocumentData(TEST_USER_ID, docId, newData);
@@ -672,8 +771,14 @@ void CCollectionDocumentServiceTest::SaveDocumentNewDocumentTest()
 {
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID);
 
-	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId, TEST_DOC_NAME);
-	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = docId;
+	params.documentName = TEST_DOC_NAME;
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, params);
+	auto result = m_managerPtr->WaitForTaskFinished(taskId);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_OK);
 
 	// Verify the document name was set
 	QString name;
@@ -694,8 +799,13 @@ void CCollectionDocumentServiceTest::SaveDocumentExistingDocumentTest()
 
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID, TEST_OBJECT_ID, TEST_DOC_NAME);
 
-	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId);
-	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = docId;
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, params);
+	auto result = m_managerPtr->WaitForTaskFinished(taskId);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_OK);
 }
 
 
@@ -708,8 +818,14 @@ void CCollectionDocumentServiceTest::SaveDocumentSaveAsTest()
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID, TEST_OBJECT_ID, TEST_DOC_NAME);
 
 	QString newName = "Saved As Copy";
-	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId, newName);
-	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = docId;
+	params.documentName = newName;
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, params);
+	auto result = m_managerPtr->WaitForTaskFinished(taskId);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_OK);
 
 	// Verify name was updated
 	QString name;
@@ -722,8 +838,19 @@ void CCollectionDocumentServiceTest::SaveDocumentInvalidUserTest()
 {
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
 
-	auto status = m_managerPtr->SaveDocument("invalidUser", docId);
-	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_USER_ID);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = "invalidUser";
+	params.documentId = docId;
+
+	imtdoc::IDocumentService::Error error;
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, params, &error);
+	if (taskId.isEmpty()) {
+		QCOMPARE(error.status, imtdoc::IDocumentService::OS_INVALID_USER_ID);
+	}
+	else {
+		auto result = m_managerPtr->WaitForTaskFinished(taskId);
+		QCOMPARE(result.status, imtdoc::IDocumentService::OS_INVALID_USER_ID);
+	}
 }
 
 
@@ -731,17 +858,47 @@ void CCollectionDocumentServiceTest::SaveDocumentInvalidDocumentTest()
 {
 	SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
 
-	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, "invalidDocId");
-	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = "invalidDocId";
+
+	imtdoc::IDocumentService::Error error;
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, params, &error);
+	if (taskId.isEmpty()) {
+		QCOMPARE(error.status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID);
+	}
+	else {
+		auto result = m_managerPtr->WaitForTaskFinished(taskId);
+		QCOMPARE(result.status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID);
+	}
 }
 
 
 void CCollectionDocumentServiceTest::SaveDocumentWhileLoadingTest()
 {
-	QByteArray docId = m_managerPtr->CreateNewDocument(TEST_USER_ID, TEST_TYPE_ID);
+	imtdoc::IDocumentService::TaskParams createParams;
+	createParams.userId = TEST_USER_ID;
+	createParams.documentTypeId = TEST_TYPE_ID;
 
-	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId);
-	QCOMPARE(status, imtdoc::IDocumentService::OS_FAILED);
+	QByteArray createTaskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_NEW, createParams);
+
+	auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
+	QCOMPARE(list.size(), 1);
+	QByteArray docId = list[0].documentId;
+
+	imtdoc::IDocumentService::TaskParams saveParams;
+	saveParams.userId = TEST_USER_ID;
+	saveParams.documentId = docId;
+
+	imtdoc::IDocumentService::Error error;
+	QByteArray saveTaskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, saveParams, &error);
+	if (saveTaskId.isEmpty()) {
+		QCOMPARE(error.status, imtdoc::IDocumentService::OS_FAILED);
+	}
+	else {
+		auto result = m_managerPtr->WaitForTaskFinished(saveTaskId);
+		QCOMPARE(result.status, imtdoc::IDocumentService::OS_FAILED);
+	}
 }
 
 
@@ -750,8 +907,14 @@ void CCollectionDocumentServiceTest::SaveDocumentCollectionInsertFailTest()
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID);
 	m_managerPtr->GetMockCollection().SetInsertShouldFail(true);
 
-	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId, TEST_DOC_NAME);
-	QCOMPARE(status, imtdoc::IDocumentService::OS_FAILED);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = docId;
+	params.documentName = TEST_DOC_NAME;
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, params);
+	auto result = m_managerPtr->WaitForTaskFinished(taskId);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_FAILED);
 }
 
 
@@ -764,8 +927,13 @@ void CCollectionDocumentServiceTest::SaveDocumentCollectionSetDataFailTest()
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID, TEST_OBJECT_ID, TEST_DOC_NAME);
 	m_managerPtr->GetMockCollection().SetSetObjectDataShouldFail(true);
 
-	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId);
-	QCOMPARE(status, imtdoc::IDocumentService::OS_FAILED);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = docId;
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, params);
+	auto result = m_managerPtr->WaitForTaskFinished(taskId);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_FAILED);
 }
 
 
@@ -774,8 +942,14 @@ void CCollectionDocumentServiceTest::SaveDocumentValidationFailTest()
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID);
 	m_managerPtr->SetValidateShouldFail(true);
 
-	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId, TEST_DOC_NAME);
-	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_DATA);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = docId;
+	params.documentName = TEST_DOC_NAME;
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, params);
+	auto result = m_managerPtr->WaitForTaskFinished(taskId);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_DATA);
 }
 
 
@@ -785,10 +959,15 @@ void CCollectionDocumentServiceTest::SaveDocumentValidationFailWithMessageTest()
 	m_managerPtr->SetValidateShouldFail(true);
 	m_managerPtr->SetValidationErrorMessage("Custom validation error");
 
-	QString errorMessage;
-	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId, TEST_DOC_NAME, &errorMessage);
-	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_DATA);
-	QCOMPARE(errorMessage, QString("Custom validation error"));
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = docId;
+	params.documentName = TEST_DOC_NAME;
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, params);
+	auto result = m_managerPtr->WaitForTaskFinished(taskId);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_DATA);
+	QCOMPARE(result.errorMessage, QString("Custom validation error"));
 }
 
 
@@ -799,8 +978,14 @@ void CCollectionDocumentServiceTest::SaveDocumentWithNameProviderTest()
 
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID);
 
-	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId, TEST_DOC_NAME);
-	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = docId;
+	params.documentName = TEST_DOC_NAME;
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, params);
+	auto result = m_managerPtr->WaitForTaskFinished(taskId);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_OK);
 
 	QString name;
 	m_managerPtr->GetDocumentName(TEST_USER_ID, docId, name);
@@ -817,7 +1002,12 @@ void CCollectionDocumentServiceTest::SaveDocumentEventFiredTest()
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID, TEST_OBJECT_ID, TEST_DOC_NAME);
 	m_managerPtr->GetMockEventHandler().ClearEvents();
 
-	m_managerPtr->SaveDocument(TEST_USER_ID, docId);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = docId;
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, params);
+	m_managerPtr->WaitForTaskFinished(taskId);
 
 	const auto& events = m_managerPtr->GetMockEventHandler().GetEvents();
 	bool foundSavedEvent = false;
@@ -840,7 +1030,13 @@ void CCollectionDocumentServiceTest::SaveDocumentSaveAsEventFiredTest()
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID, TEST_TYPE_ID, TEST_OBJECT_ID, TEST_DOC_NAME);
 	m_managerPtr->GetMockEventHandler().ClearEvents();
 
-	m_managerPtr->SaveDocument(TEST_USER_ID, docId, "New Copy Name");
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = docId;
+	params.documentName = "New Copy Name";
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, params);
+	m_managerPtr->WaitForTaskFinished(taskId);
 
 	const auto& events = m_managerPtr->GetMockEventHandler().GetEvents();
 	bool foundSavedAsEvent = false;
@@ -862,8 +1058,13 @@ void CCollectionDocumentServiceTest::CloseDocumentSuccessTest()
 {
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
 
-	auto status = m_managerPtr->CloseDocument(TEST_USER_ID, docId);
-	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = docId;
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_CLOSE, params);
+	auto result = m_managerPtr->WaitForTaskFinished(taskId);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_OK);
 }
 
 
@@ -871,8 +1072,19 @@ void CCollectionDocumentServiceTest::CloseDocumentInvalidUserTest()
 {
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
 
-	auto status = m_managerPtr->CloseDocument("invalidUser", docId);
-	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_USER_ID);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = "invalidUser";
+	params.documentId = docId;
+
+	imtdoc::IDocumentService::Error error;
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_CLOSE, params, &error);
+	if (taskId.isEmpty()) {
+		QCOMPARE(error.status, imtdoc::IDocumentService::OS_INVALID_USER_ID);
+	}
+	else {
+		auto result = m_managerPtr->WaitForTaskFinished(taskId);
+		QCOMPARE(result.status, imtdoc::IDocumentService::OS_INVALID_USER_ID);
+	}
 }
 
 
@@ -880,8 +1092,19 @@ void CCollectionDocumentServiceTest::CloseDocumentInvalidDocumentTest()
 {
 	SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
 
-	auto status = m_managerPtr->CloseDocument(TEST_USER_ID, "invalidDocId");
-	QCOMPARE(status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = "invalidDocId";
+
+	imtdoc::IDocumentService::Error error;
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_CLOSE, params, &error);
+	if (taskId.isEmpty()) {
+		QCOMPARE(error.status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID);
+	}
+	else {
+		auto result = m_managerPtr->WaitForTaskFinished(taskId);
+		QCOMPARE(result.status, imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID);
+	}
 }
 
 
@@ -890,7 +1113,12 @@ void CCollectionDocumentServiceTest::CloseDocumentEventFiredTest()
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
 	m_managerPtr->GetMockEventHandler().ClearEvents();
 
-	m_managerPtr->CloseDocument(TEST_USER_ID, docId);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = docId;
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_CLOSE, params);
+	m_managerPtr->WaitForTaskFinished(taskId);
 
 	const auto& events = m_managerPtr->GetMockEventHandler().GetEvents();
 	bool foundClosedEvent = false;
@@ -910,7 +1138,12 @@ void CCollectionDocumentServiceTest::CloseDocumentRemovesFromListTest()
 	QByteArray docId = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
 	QCOMPARE(m_managerPtr->GetOpenedDocumentList(TEST_USER_ID).size(), 1);
 
-	m_managerPtr->CloseDocument(TEST_USER_ID, docId);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = docId;
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_CLOSE, params);
+	m_managerPtr->WaitForTaskFinished(taskId);
 
 	auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
 	QVERIFY2(list.isEmpty(), "Document should be removed from list after closing");
@@ -922,12 +1155,24 @@ void CCollectionDocumentServiceTest::CloseDocumentLastDocForUserTest()
 	QByteArray docId1 = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
 	QByteArray docId2 = SetupDocumentDirectly(*m_managerPtr, TEST_USER_ID);
 
-	m_managerPtr->CloseDocument(TEST_USER_ID, docId1);
+	imtdoc::IDocumentService::TaskParams params1;
+	params1.userId = TEST_USER_ID;
+	params1.documentId = docId1;
+
+	QByteArray taskId1 = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_CLOSE, params1);
+	m_managerPtr->WaitForTaskFinished(taskId1);
+
 	auto list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
 	QCOMPARE(list.size(), 1);
 	QCOMPARE(list[0].documentId, docId2);
 
-	m_managerPtr->CloseDocument(TEST_USER_ID, docId2);
+	imtdoc::IDocumentService::TaskParams params2;
+	params2.userId = TEST_USER_ID;
+	params2.documentId = docId2;
+
+	QByteArray taskId2 = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_CLOSE, params2);
+	m_managerPtr->WaitForTaskFinished(taskId2);
+
 	list = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
 	QVERIFY2(list.isEmpty(), "All documents should be removed after closing the last one");
 }
@@ -1187,7 +1432,12 @@ void CCollectionDocumentServiceTest::MultiUserCreateAndCloseTest()
 	QCOMPARE(m_managerPtr->GetOpenedDocumentList(TEST_USER_ID_2).size(), 1);
 
 	// Close document for user 1 should not affect user 2
-	m_managerPtr->CloseDocument(TEST_USER_ID, docId1);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = docId1;
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_CLOSE, params);
+	m_managerPtr->WaitForTaskFinished(taskId);
 
 	QVERIFY2(m_managerPtr->GetOpenedDocumentList(TEST_USER_ID).isEmpty(),
 		"User 1 should have no documents after closing");
@@ -1264,13 +1514,16 @@ void CCollectionDocumentServiceTest::SingleCopySecondUserGetsDataLoadedEventTest
 	m_managerPtr->GetMockEventHandler().ClearEvents();
 
 	// Second user opens the same object (shared document already loaded)
-	QUrl url("collection:///" + QString::fromUtf8(TEST_OBJECT_ID));
-	QByteArray docId2 = m_managerPtr->OpenDocument(TEST_USER_ID_2, url);
-	QVERIFY2(!docId2.isEmpty(), "Second user should open document successfully");
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID_2;
+	params.url = QUrl("collection:///" + QString::fromUtf8(TEST_OBJECT_ID));
 
-	// DocumentDataLoaded is deferred via QTimer::singleShot — wait for event
-	QTRY_VERIFY_WITH_TIMEOUT(
-		m_managerPtr->GetMockEventHandler().CountEventsOfType("DocumentDataLoadedEvent") >= 1, 5000);
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_OPEN, params);
+	QVERIFY2(!taskId.isEmpty(), "Second user should begin open task successfully");
+
+	auto result = m_managerPtr->WaitForTaskFinished(taskId);
+	QByteArray docId2 = result.documentId;
+	QVERIFY2(!docId2.isEmpty(), "Second user should open document successfully");
 
 	// Second user should have received DocumentDataLoaded event
 	int dataLoadedCount = m_managerPtr->GetMockEventHandler().CountEventsOfType("DocumentDataLoadedEvent");
@@ -1324,8 +1577,13 @@ void CCollectionDocumentServiceTest::SingleCopyCloseOneUserTest()
 	QByteArray docId2 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID_2, TEST_OBJECT_ID);
 
 	// Close first user's document
-	auto status = m_managerPtr->CloseDocument(TEST_USER_ID, docId1);
-	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = docId1;
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_CLOSE, params);
+	auto result = m_managerPtr->WaitForTaskFinished(taskId);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_OK);
 
 	// First user should have no documents
 	auto list1 = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);
@@ -1355,8 +1613,19 @@ void CCollectionDocumentServiceTest::SingleCopyCloseBothUsersTest()
 	QByteArray docId1 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID, TEST_OBJECT_ID);
 	QByteArray docId2 = OpenDocumentAndWaitForLoad(*m_managerPtr, TEST_USER_ID_2, TEST_OBJECT_ID);
 
-	m_managerPtr->CloseDocument(TEST_USER_ID, docId1);
-	m_managerPtr->CloseDocument(TEST_USER_ID_2, docId2);
+	imtdoc::IDocumentService::TaskParams params1;
+	params1.userId = TEST_USER_ID;
+	params1.documentId = docId1;
+
+	QByteArray taskId1 = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_CLOSE, params1);
+	m_managerPtr->WaitForTaskFinished(taskId1);
+
+	imtdoc::IDocumentService::TaskParams params2;
+	params2.userId = TEST_USER_ID_2;
+	params2.documentId = docId2;
+
+	QByteArray taskId2 = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_CLOSE, params2);
+	m_managerPtr->WaitForTaskFinished(taskId2);
 
 	// Both users should have no documents
 	QVERIFY2(m_managerPtr->GetOpenedDocumentList(TEST_USER_ID).isEmpty(),
@@ -1383,8 +1652,13 @@ void CCollectionDocumentServiceTest::SingleCopySaveUpdatesAllTest()
 	m_managerPtr->GetMockEventHandler().ClearEvents();
 
 	// User 1 saves the document
-	auto status = m_managerPtr->SaveDocument(TEST_USER_ID, docId1);
-	QCOMPARE(status, imtdoc::IDocumentService::OS_OK);
+	imtdoc::IDocumentService::TaskParams params;
+	params.userId = TEST_USER_ID;
+	params.documentId = docId1;
+
+	QByteArray taskId = m_managerPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, params);
+	auto result = m_managerPtr->WaitForTaskFinished(taskId);
+	QCOMPARE(result.status, imtdoc::IDocumentService::OS_OK);
 
 	// Both users should see the document as not dirty
 	auto list1 = m_managerPtr->GetOpenedDocumentList(TEST_USER_ID);

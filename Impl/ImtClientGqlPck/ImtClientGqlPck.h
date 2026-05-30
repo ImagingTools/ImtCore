@@ -8,22 +8,23 @@
 
 // ImtCore includes
 #include <imtclientgql/CApiClientComp.h>
+#include <imtclientgql/CAsyncApiClientComp.h>
+#include <imtclientgql/CGqlClientSyncAdapterComp.h>
 #include <imtclientgql/CGqlClientEngineComp.h>
 #include <imtclientgql/CGqlObjectCollectionComp.h>
-#include <imtclientgql/CGqlObjectCollectionDelegateComp.h>
 #include <imtclientgql/CGqlRemoteRepresentationControllerCompBase.h>
 #include <imtclientgql/CGqlRemoteRepresentationControllerComp.h>
 #include <imtclientgql/CSubscriptionManagerComp.h>
 #include <imtclientgql/CWebSocketClientComp.h>
 #include <imtclientgql/CModelSubscriberComp.h>
 #include <imtclientgql/CGqlHierarchicalStructureDelegateComp.h>
-#include <imtclientgql/CGqlObjectCollectionDelegateComp.h>
 #include <imtclientgql/CConnectionStatusSubscriberComp.h>
 #include <imtclientgql/CRemoteDocumentRevisionControllerComp.h>
 #include <imtclientgql/CRemoteObjectCollectionControllerComp.h>
 #include <imtclientgql/CObjectCollectionSubscriberComp.h>
 #include <imtclientgql/CRemoteCollectionDocumentServiceControllerComp.h>
 #include <imtclientgql/CRemoteCommandsControllerComp.h>
+#include <imtclientgql/CRemoteFilterableSelectControllerComp.h>
 
 
 /**
@@ -34,8 +35,9 @@ namespace ImtClientGqlPck
 
 
 typedef imtclientgql::CApiClientComp ApiClient;
+typedef imtclientgql::CAsyncApiClientComp AsyncApiClient;
+typedef imtclientgql::CGqlClientSyncAdapterComp GqlClientSyncAdapter;
 typedef imtclientgql::CGqlClientEngineComp GraphQLClientEngine;
-typedef imtclientgql::CGqlObjectCollectionDelegateComp GqlObjectCollectionDelegate;
 typedef icomp::TModelCompWrap<imtclientgql::CGqlObjectCollectionComp> GqlObjectCollection;
 typedef imtclientgql::CGqlRemoteRepresentationControllerCompBase GraphQLRemoteRepresentationController;
 typedef imtclientgql::CGqlRemoteRepresentationControllerComp PumaGqlRemoteRepresentationController;
@@ -49,6 +51,7 @@ typedef imtclientgql::CRemoteObjectCollectionControllerComp RemoteObjectCollecti
 typedef imtclientgql::CRemoteCollectionDocumentServiceControllerComp RemoteCollectionDocumentServiceController;
 typedef imtclientgql::CObjectCollectionSubscriberComp ObjectCollectionSubscriber;
 typedef imtclientgql::CRemoteCommandsControllerComp RemoteCommandsController;
+typedef imtclientgql::CRemoteFilterableSelectControllerComp RemoteFilterableSelectController;
 
 
 } // namespace ImtClientGqlPck

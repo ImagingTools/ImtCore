@@ -5,6 +5,7 @@
 // ImtCore includes
 #include <imtbase/COperationContext.h>
 #include <imtauth/CUserInfo.h>
+#include <imtgql/CGqlRequest.h>
 #include <imtgql/IGqlRequestProvider.h>
 
 
@@ -74,5 +75,4 @@ imtbase::IOperationContext* COperationContextControllerComp::CreateOperationCont
 
 
 } // namespace imtservergql
-
 

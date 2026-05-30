@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6397" Description="ACF"/>
+            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="CollectionCommands" X="575" Y="500" Note=""/>
+        <Element ComponentName="CollectionCommandsController" X="600" Y="175" Note=""/>
+        <Element ComponentName="Leave" X="900" Y="300" Note=""/>
+        <Element ComponentName="Switch" X="275" Y="300" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

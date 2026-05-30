@@ -61,25 +61,25 @@ istd::IChangeableUniquePtr CTenantInvitationDbDelegateComp::CreateObjectFromReco
 	}
 
 	if (record.contains("Id")){
-		invitationPtr->SetInvitationId(record.value("Id").toByteArray());
+		invitationPtr->SetInvitationId(imtdb::VariantToByteArray(record.value("Id")));
 	}
 	if (record.contains("UserId")){
-		invitationPtr->SetUserId(record.value("UserId").toByteArray());
+		invitationPtr->SetUserId(imtdb::VariantToByteArray(record.value("UserId")));
 	}
 	if (record.contains("TenantId")){
-		invitationPtr->SetTenantId(record.value("TenantId").toByteArray());
+		invitationPtr->SetTenantId(imtdb::VariantToByteArray(record.value("TenantId")));
 	}
 	if (record.contains("Role")){
-		invitationPtr->SetRole(static_cast<imtauth::ITenantMembership::TenantMemberRole>(record.value("Role").toInt()));
+		invitationPtr->SetRoleId(record.value("Role").toByteArray());
 	}
 	if (record.contains("Status")){
 		invitationPtr->SetStatus(static_cast<imtauth::ITenantInvitation::TenantInvitationStatus>(record.value("Status").toInt()));
 	}
 	if (record.contains("InvitedByUserId")){
-		invitationPtr->SetInvitedByUserId(record.value("InvitedByUserId").toByteArray());
+		invitationPtr->SetInvitedByUserId(imtdb::VariantToByteArray(record.value("InvitedByUserId")));
 	}
 	if (record.contains("RevokedByUserId")){
-		invitationPtr->SetRevokedByUserId(record.value("RevokedByUserId").toByteArray());
+		invitationPtr->SetRevokedByUserId(imtdb::VariantToByteArray(record.value("RevokedByUserId")));
 	}
 
 	invitationPtr->SetCreatedAt(RecordDateTimeToString(record, "CreatedAt"));
@@ -114,7 +114,7 @@ CTenantInvitationDbDelegateComp::NewObjectQuery CTenantInvitationDbDelegateComp:
 	QString tenantId = imtdb::EscapeSql(QString::fromUtf8(invitationPtr->GetTenantId()));
 	QString invitedByUserId = imtdb::EscapeSql(QString::fromUtf8(invitationPtr->GetInvitedByUserId()));
 	QString revokedByUserId = NullableSqlText(QString::fromUtf8(invitationPtr->GetRevokedByUserId()));
-	int role = static_cast<int>(invitationPtr->GetRole());
+	QString roleId = imtdb::EscapeSql(QString::fromUtf8(invitationPtr->GetRoleId()));
 	int status = static_cast<int>(invitationPtr->GetStatus());
 	QString createdAt = !invitationPtr->GetCreatedAt().isEmpty() ? imtdb::EscapeSql(invitationPtr->GetCreatedAt()) : imtdb::UtcNow();
 	QString updatedAt = !invitationPtr->GetUpdatedAt().isEmpty() ? imtdb::EscapeSql(invitationPtr->GetUpdatedAt()) : createdAt;
@@ -126,12 +126,12 @@ CTenantInvitationDbDelegateComp::NewObjectQuery CTenantInvitationDbDelegateComp:
 
 	result.query = QString(
 		"INSERT INTO \"%1\" (\"Id\", \"UserId\", \"TenantId\", \"Role\", \"Status\", \"InvitedByUserId\", \"CreatedAt\", \"UpdatedAt\", \"ExpiresAt\", \"AcceptedAt\", \"RejectedAt\", \"RevokedAt\", \"RevokedByUserId\", \"LastSentAt\") "
-		"VALUES ('%2', '%3', '%4', %5, %6, '%7', '%8', '%9', '%10', %11, %12, %13, %14, '%15');")
+		"VALUES ('%2', '%3', '%4', '%5', %6, '%7', '%8', '%9', '%10', %11, %12, %13, %14, '%15');")
 		.arg(*m_tableNameAttrPtr)
 		.arg(id)
 		.arg(userId)
 		.arg(tenantId)
-		.arg(QString::number(role))
+		.arg(roleId)
 		.arg(QString::number(status))
 		.arg(invitedByUserId)
 		.arg(createdAt)
@@ -172,7 +172,7 @@ QByteArray CTenantInvitationDbDelegateComp::CreateUpdateObjectQuery(
 		"\"LastSentAt\"='%10' "
 		"WHERE \"Id\"='%11';")
 		.arg(*m_tableNameAttrPtr)
-		.arg(QString::number(static_cast<int>(invitationPtr->GetRole())))
+		.arg(QString("'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(invitationPtr->GetRoleId()))))
 		.arg(QString::number(static_cast<int>(invitationPtr->GetStatus())))
 		.arg(imtdb::EscapeSql(invitationPtr->GetUpdatedAt()))
 		.arg(imtdb::EscapeSql(invitationPtr->GetExpiresAt()))

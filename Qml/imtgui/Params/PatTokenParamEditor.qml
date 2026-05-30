@@ -206,7 +206,7 @@ ParamEditorBase {
 
 			ButtonElementView {
 				id: headerElementView
-				width: contentColumn.width
+				width: parent.width
 				name: patTokenEditor.name
 				description: patTokenEditor.description
 				text: qsTr("New Token")

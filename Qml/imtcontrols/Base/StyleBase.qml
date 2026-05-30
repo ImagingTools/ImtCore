@@ -34,8 +34,8 @@ StyleComponents {
 	//Font properties
 	property string mainFontSource: "../../../Fonts/Ubuntu-Light.ttf";
 	property string boldFontSource: "../../../Fonts/Ubuntu-Medium.ttf";
-	property string fontFamily: mainFont.name !== "" ? mainFont.name : "Verdana";
-	property string fontFamilyBold: boldFont.name !== "" ? boldFont.name : "Verdana";
+	property string fontFamily: "Verdana";
+	property string fontFamilyBold: "Verdana";
 
 	property alias mainFontLoader: mainFont;
 	property alias boldFontLoader: boldFont;
@@ -154,6 +154,7 @@ StyleComponents {
 	property int spacingM: 10
 	property int spacingS: 8
 	property int spacingXS: 4
+	property int spacingXXS: 2
 
 	//Icon sizes
 	property int iconSizeXXXL: 128
@@ -203,6 +204,7 @@ StyleComponents {
 
 	//menu row
 	property int menuRowHeight: 30
+	property int menuMinWidth: 200
 
 	//table sizes
 	property int tableRowHeight: 35

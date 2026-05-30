@@ -1,9 +1,10 @@
 import QtQuick 2.12
-import QtQuick.Controls
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
 import imtgui 1.0
+import imtguigql 1.0
+import imtauthProfileSdl 1.0
 
 Item {
 	id: root;
@@ -23,13 +24,7 @@ Item {
 	Component.onDestruction: {
 		Events.unSubscribeEvent("SetUserPanelEnabled", root.setUserPanelEnabled);
 	}
-	
-	LocalizationEvent {
-		onLocalizationChanged: {
-			contextMenuModel.fillModel();
-		}
-	}
-	
+
 	Connections {
 		target: AuthorizationController;
 		
@@ -49,11 +44,57 @@ Item {
 	function setVisible(visible){
 		root.visible = visible;
 	}
-	
-	function onLocalizationChanged(language){
-		contextMenuModel.fillModel();
+
+	// --- Organizations list for submenu ---
+	property var __organizationsList: []
+
+	function __loadOrganizations() {
+		if (!AuthorizationController.userTokenProvider.userId)
+			return
+		organizationsRequest.send(organizationsInput)
 	}
-	
+
+	GqlSdlRequestSender {
+		id: organizationsRequest
+		requestType: 0
+		gqlCommandId: ImtauthProfileSdlCommandIds.s_getUserOrganizations
+
+		sdlObjectComp: Component {
+			GetUserOrganizationsPayload {
+				onFinished: {
+					var orgs = m_organizations
+					var list = []
+					if (orgs) {
+						for (var i = 0; i < orgs.count; i++) {
+							var org = orgs.get(i).item
+							if (org && org.m_isActive) {
+								list.push({ id: org.m_id || "", name: org.m_name || org.m_id || "" })
+							}
+						}
+					}
+					root.__organizationsList = list
+				}
+			}
+		}
+	}
+
+	property GetProfileInput organizationsInput: GetProfileInput {
+		m_id: AuthorizationController.userTokenProvider.userId
+		m_productId: AuthorizationController.productId
+	}
+
+	Text {
+		id: tenantText;
+		anchors.verticalCenter: root.verticalCenter;
+		anchors.right: usernameText.left;
+		anchors.rightMargin: Style.marginM;
+		color: Style.inactiveTextColor;
+		font.family: Style.fontFamily;
+		font.pixelSize: Style.fontSizeM;
+		text: AuthorizationController.currentTenantName ? AuthorizationController.currentTenantName : "";
+		visible: text !== "";
+	}
+
 	Text {
 		id: usernameText;
 		anchors.verticalCenter: root.verticalCenter;
@@ -83,13 +124,7 @@ Item {
 				AuthorizationController.logout();
 			}
 			else{
-				contextMenuModel.fillModel();
-				
-				var point = mapToItem(null, x - width, y + height);
-				point.x = point.x - 200;
-				
 				menu.open()
-				// ModalDialogManager.openDialog(popupMenu, {"x": point.x, "y": point.y, "model": contextMenuModel});
 			}
 		}
 	}
@@ -111,45 +146,74 @@ Item {
 		}
 	}
 
+
+	
 	Menu {
 		id: menu
 		x: loginButton.x - menu.width
 		y: loginButton.y + loginButton.height + Style.spacingM
-		closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
-		font.pixelSize: Style.fontSizeM
-		font.family: Style.fontFamily
+		closePolicy: Enums.popupCloseOnEscape | Enums.popupCloseOnPressOutsideParent
+
 		MenuItem {
+			id: profileItem
 			text: qsTr("Profile")
-			icon.source: "qrc:/" + Style.getIconPath("Icons/Account", Icon.State.On, Icon.Mode.Normal)
+			iconSource: "qrc:/" + Style.getIconPath("Icons/Account", Icon.State.On, Icon.Mode.Normal)
 			onTriggered: {
 				ModalDialogManager.openDialog(profileViewComp, {})
 			}
 		}
+		Menu {
+			id: organizationsSubmenu
+			title: qsTr("Organization")
+			Instantiator {
+				model: root.__organizationsList.length
+
+				delegate: MenuItem {
+					property var orgData: root.__organizationsList[index]
+					text: orgData ? orgData.name : ""
+					checkable: true
+					checked: orgData && orgData.id === AuthorizationController.currentTenantId
+					onTriggered: {
+						if (orgData && orgData.id !== AuthorizationController.currentTenantId) {
+							AuthorizationController.selectTenant(orgData.id)
+						}
+					}
+				}
+
+				onObjectAdded:{ organizationsSubmenu.insertItem(index, object) }
+				onObjectRemoved: { organizationsSubmenu.removeItem(object) }
+			}
+
+			MenuSeparator {
+				visible: root.__organizationsList.length > 0
+			}
+
+			MenuItem {
+				text: qsTr("No organization")
+				checkable: true
+				checked: AuthorizationController.currentTenantId === ""
+				onTriggered: {
+					if (AuthorizationController.currentTenantId !== "") {
+						AuthorizationController.selectTenant("")
+					}
+				}
+			}
+		}
+
 		MenuSeparator {}
 		MenuItem {
 			text: qsTr("Logout")
-			icon.source: "qrc:/" + Style.getIconPath("Icons/Exit", Icon.State.On, Icon.Mode.Normal)
+			iconSource: "qrc:/" + Style.getIconPath("Icons/Exit", Icon.State.On, Icon.Mode.Normal)
 			onTriggered: {
 				AuthorizationController.logout()
 			}
 		}
+
+		onAboutToShow: {
+			root.__loadOrganizations()
+		}
 	}
 
-	ListModel {
-		id: contextMenuModel;
-		
-		Component.onCompleted: {
-			fillModel();
-		}
-		
-		function fillModel(){
-			contextMenuModel.clear();
-			contextMenuModel.append({"id": "Profile", "name": qsTr("Profile"), "icon": "Icons/Account", "isEnabled": true});
-			contextMenuModel.append({"id": "", "name": "", "Icon": ""});
-			contextMenuModel.append({"id": "Logout", "name": qsTr("Logout"), "icon": "Icons/Exit", "isEnabled": true});
-		}
-	}
-	
 	Component {
 		id: profileViewComp;
 		

@@ -27,3 +27,6 @@ DocCollectionViewDelegate 1.0 DocCollectionViewDelegate.qml
 DocumentRepresentationController 1.0 DocumentRepresentationController.qml
 DocumentRevisionDialog 1.0 DocumentRevisionDialog.qml
 DocumentRevisionDialog 1.0 DocumentRevisionDialog.qml
+SingleDocumentTypeRegistrar 1.0 SingleDocumentTypeRegistrar.qml
+SingleDocumentWorkspaceContentView 1.0 SingleDocumentWorkspaceContentView.qml
+SingleDocumentWorkspaceShellView 1.0 SingleDocumentWorkspaceShellView.qml

@@ -123,6 +123,7 @@
                 <file alias="imtcontrols/Models/OptionsListAdapter.qml">Models/OptionsListAdapter.qml</file>
                 <file alias="imtcontrols/Models/OptionsListManager.qml">Models/OptionsListManager.qml</file>
                 <file alias="imtcontrols/Models/NavigableItem.qml">Models/NavigableItem.qml</file>
+                <file alias="imtcontrols/Models/TreeModelBuilder.qml">Models/TreeModelBuilder.qml</file>
                 <file alias="imtcontrols/Views/StackViewHeader.qml">Views/StackViewHeader.qml</file>
                 <file alias="imtcontrols/Views/StackedBarChart.qml">Views/StackedBarChart.qml</file>
                 <file alias="imtcontrols/Views/TableRowViewer.qml">Views/TableRowViewer.qml</file>
@@ -152,6 +153,7 @@
                 <file alias="imtcontrols/Views/BarChartSimple.qml">Views/BarChartSimple.qml</file>
                 <file alias="imtcontrols/Views/BasicTableView.qml">Views/BasicTableView.qml</file>
                 <file alias="imtcontrols/Views/BasicTreeView.qml">Views/BasicTreeView.qml</file>
+                <file alias="imtcontrols/Views/TreeViewColumn.qml">Views/TreeViewColumn.qml</file>
                 <file alias="imtcontrols/Views/ChangeItemSize.qml">Views/ChangeItemSize.qml</file>
                 <file alias="imtcontrols/Views/CustomScrollbar.qml">Views/CustomScrollbar.qml</file>
                 <file alias="imtcontrols/Views/ScrollIndicator.qml">Views/ScrollIndicator.qml</file>
@@ -234,6 +236,26 @@
                 <file alias="imtcontrols/GraphicsView/MultiGraph2d.qml">GraphicsView/MultiGraph2d.qml</file>
                 <file alias="imtcontrols/GraphicsView/GraphicsShapeFactoryManager.qml">GraphicsView/GraphicsShapeFactoryManager.qml</file>
                 <file alias="imtcontrols/GraphicsView/GraphicsShapeFactoryBase.qml">GraphicsView/GraphicsShapeFactoryBase.qml</file>
+
+                <!-- Popup / Menu infrastructure (Stage 1 + Stage 2). -->
+                <file alias="imtcontrols/Popup/Popup.qml">Popup/Popup.qml</file>
+                <file alias="imtcontrols/Popup/Overlay.qml">Popup/Overlay.qml</file>
+                <file alias="imtcontrols/Popup/PopupAnchors.qml">Popup/PopupAnchors.qml</file>
+                <file alias="imtcontrols/Popup/Internal/qmldir">Popup/Internal/qmldir</file>
+                <file alias="imtcontrols/Popup/Internal/PopupRegistry.qml">Popup/Internal/PopupRegistry.qml</file>
+                <file alias="imtcontrols/Popup/Internal/OverlayManager.qml">Popup/Internal/OverlayManager.qml</file>
+                <file alias="imtcontrols/Popup/Internal/FocusCoordinator.qml">Popup/Internal/FocusCoordinator.qml</file>
+                <file alias="imtcontrols/Popup/Internal/PositioningEngine.qml">Popup/Internal/PositioningEngine.qml</file>
+                <file alias="imtcontrols/Popup/Internal/PopupStackController.qml">Popup/Internal/PopupStackController.qml</file>
+                <file alias="imtcontrols/Popup/Internal/InputCoordinator.qml">Popup/Internal/InputCoordinator.qml</file>
+                <file alias="imtcontrols/Popup/Internal/PopupTransition.qml">Popup/Internal/PopupTransition.qml</file>
+                <file alias="imtcontrols/Actions/ActionGroup.qml">Actions/ActionGroup.qml</file>
+                <file alias="imtcontrols/Menu/Menu.qml">Menu/Menu.qml</file>
+                <file alias="imtcontrols/Menu/MenuItem.qml">Menu/MenuItem.qml</file>
+                <file alias="imtcontrols/Menu/MenuSeparator.qml">Menu/MenuSeparator.qml</file>
+                <file alias="imtcontrols/Menu/MenuBar.qml">Menu/MenuBar.qml</file>
+                <file alias="imtcontrols/Menu/MenuBarItem.qml">Menu/MenuBarItem.qml</file>
+                <file alias="imtcontrols/Menu/Internal/MenuItemDelegate.qml">Menu/Internal/MenuItemDelegate.qml</file>
         </qresource>
         <qresource prefix="/" />
 </RCC>

@@ -50,7 +50,7 @@ void COpenDocumentWorker::Run()
 
 	const QString fileExtension = fileExtensions[0];
 
-	result.tempPath = QDir::tempPath() + "/ImtCore/" + QUuid::createUuid().toString();
+	result.tempPath = QDir::tempPath() + "/ImtCore/" + QUuid::createUuid().toString(QUuid::WithoutBraces);
 	istd::CSystem::EnsurePathExists(result.tempPath);
 	result.tempFilePath = result.tempPath + "/" + result.objectName + "." + fileExtension;
 

@@ -6,15 +6,24 @@ import imtcontrols 1.0
 import imtauthRolesSdl 1.0
 import imtdocgui 1.0
 import imtguigql 1.0
-import imtbaseComplexCollectionFilterSdl 1.0
-import imtbaseImtBaseTypesSdl 1.0
 
 ViewBase {
 	id: container;
 	
 	anchors.fill: parent;
+	contentColor: Style.baseColor
 	
 	property TreeItemModel permissionsModel: TreeItemModel {};
+	onPermissionsModelChanged: {
+		permissionsGroup.buildPermissionsModel()
+		// After the permissions tree is rebuilt (e.g. fetchPermissions completes
+		// asynchronously after the role has been loaded), re-apply the checked
+		// state from the current roleData; otherwise the tree appears empty and
+		// a subsequent Save would clear all permissions.
+		if (container.roleData){
+			container.doUpdateGui()
+		}
+	}
 	
 	property string productId: "";
 	
@@ -150,51 +159,36 @@ ViewBase {
 					KeyNavigation.backtab: roleIdInput;
 				}
 				
-				SelectableCollectionEditor {
+				ItemSelectElementView {
 					id: roleSelectableCollectionEditor
 					collectionId: "Roles"
-					targetTitle: qsTr("Parent Roles")
-					sourceTitle: qsTr("Adding Parent Role")
-					onSelectionChanged: {
-						container.doUpdateModel()
-					}
-					
-					Component {
-						id: fieldFilterComp
-						FieldFilter {
-							m_fieldId: "DocumentId"
-							m_filterValueType: "String"
-							m_filterValue: !container.roleData ? "" : container.roleData.m_id
-							m_filterOperations: ["Not", "Equal"]
+						label: qsTr("Parent Roles")
+						addButtonText: qsTr("Add Parent Role")
+						showCount: true
+						onSelectionChanged: {
+							container.doUpdateModel()
 						}
 					}
-
-					IdParam {
-						id: idParameter
-						m_id: !container.roleData ? "" : container.roleData.m_id
-					}
-
-					function setSourceAdditionalFilters(collection){
-						let fieldFilter = fieldFilterComp.createObject(collection.collectionFilter)
-						collection.collectionFilter.addFieldFilter(fieldFilter)
-
-						collection.registerFilter("ParentListFilter", idParameter)
-						collection.setFilterIsEnabled("ParentListFilter", true)
-					}
-				}
 
 				function updateGui(){
 					roleIdInput.text = container.roleData.m_roleId;
 					roleNameInput.text = container.roleData.m_name;
 					descriptionInput.text = container.roleData.m_description;
-					roleSelectableCollectionEditor.selectedIds = container.roleData.m_parentRoles.slice()
+					var ids = container.roleData.m_parentRoles ? container.roleData.m_parentRoles.slice() : []
+					var arr = []
+					for (var i = 0; i < ids.length; i++)
+						arr.push({id: ids[i], name: ids[i]})
+					roleSelectableCollectionEditor.items = arr
 				}
 				
 				function updateModel(){
 					container.roleData.m_roleId = roleIdInput.text;
 					container.roleData.m_name = roleNameInput.text;
 					container.roleData.m_description = descriptionInput.text;
-					container.roleData.m_parentRoles = roleSelectableCollectionEditor.selectedIds.slice()
+					var arr = []
+					for (var i = 0; i < roleSelectableCollectionEditor.items.length; i++)
+						arr.push(roleSelectableCollectionEditor.items[i].id)
+					container.roleData.m_parentRoles = arr
 				}
 			}
 			
@@ -220,6 +214,32 @@ ViewBase {
 						permissionsGroup.treeView.tristate = true;
 					}
 					
+					function buildPermissionsModel() {
+						if (!container.permissionsModel)
+							return;
+						
+						var nodes = TreeModelBuilder.fromTreeItemModel(
+							container.permissionsModel,
+							function(wrapper, index) {
+								return {
+									key: wrapper.data("FeatureId", ""),
+									text: wrapper.data("FeatureName", ""),
+									checkable: true,
+									expanded: true,
+									data: {
+										FeatureId: wrapper.data("FeatureId", ""),
+										FeatureName: wrapper.data("FeatureName", "")
+									}
+								};
+							},
+							function(wrapper, index) {
+								return wrapper.childModel("ChildModel");
+							}
+						);
+						
+						permissionsGroup.treeView.model = nodes;
+					}
+					
 					function updateGui(){
 						let selectedPermissionsIds = [];
 						let selectedPermissions = container.roleData.m_permissions;
@@ -231,32 +251,31 @@ ViewBase {
 						
 						permissionsGroup.treeView.uncheckAll();
 						
-						let itemsList = permissionsGroup.treeView.getItemsDataAsList();
-						for (let i = 0; i < itemsList.length; i++){
-							let delegateItem = itemsList[i];
-							if (!delegateItem.hasChild){
-								let itemData = delegateItem.getItemData();
-								let id = itemData.FeatureId;
+						let allNodesList = permissionsGroup.treeView.allNodes();
+						for (let i = 0; i < allNodesList.length; i++){
+							let nodeIdx = allNodesList[i];
+							let nodeChildren = nodeIdx.item && nodeIdx.item.children ? nodeIdx.item.children : [];
+							if (nodeChildren.length === 0){
+								let nodeData = nodeIdx.data || {};
+								let id = nodeData.FeatureId;
 								
 								if (selectedPermissionsIds.includes(id)){
-									delegateItem.isOpened = true;
-									permissionsGroup.treeView.checkItem(delegateItem);
-								}
-								else{
-									delegateItem.isOpened = false;
+									permissionsGroup.treeView.checkItem(nodeIdx.key);
 								}
 							}
 						}
 					}
 					
 					function updateModel(){
-						let selectedPermissionIds = []
-						let itemsList = permissionsGroup.treeView.getCheckedItems();
-						for (let delegate of itemsList){
-							if (!delegate.hasChild){
-								let itemData = delegate.getItemData();
-								let id = itemData.FeatureId;
-								selectedPermissionIds.push(id)
+						let selectedPermissionIds = [];
+						let checkedNodes = permissionsGroup.treeView.getCheckedNodes();
+						for (let j = 0; j < checkedNodes.length; j++){
+							let nodeIdx = checkedNodes[j];
+							let nodeChildren = nodeIdx.item && nodeIdx.item.children ? nodeIdx.item.children : [];
+							if (nodeChildren.length === 0){
+								let nodeData = nodeIdx.data || {};
+								let id = nodeData.FeatureId;
+								selectedPermissionIds.push(id);
 							}
 						}
 						
@@ -270,27 +289,6 @@ ViewBase {
 						
 						function onCheckedItemsChanged(){
 							container.doUpdateModel();
-						}
-					}
-					
-					TreeItemModel {
-						id: permissionHeaders;
-						
-						function updateHeaders(){
-							permissionHeaders.clear();
-							
-							let index = permissionHeaders.insertNewItem();
-							permissionHeaders.setData("id", "FeatureName", index)
-							permissionHeaders.setData("name", qsTr("Permission"), index)
-							
-							permissionHeaders.refresh();
-							
-							permissionsGroup.treeView.columnModel = permissionHeaders;
-							permissionsGroup.treeView.rowModel = container.permissionsModel;
-						}
-						
-						Component.onCompleted: {
-							updateHeaders();
 						}
 					}
 				}

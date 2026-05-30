@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5405" Description="ACF"/>
-            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395267" Description="Qt Framework"/>
+            <Version Id="0" Number="6397" Description="ACF"/>
+            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -19,10 +19,7 @@
                     <AttributeInfo Id="AuthOptionIndex" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="0"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="FeatureContainer" Type="Reference" ExportId="FeatureContainer">
+                    <AttributeInfo Id="AuthenticationManager" Type="Reference" ExportId="AuthenticationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="FileAccessCommandId" Type="Id" ExportId="">
@@ -73,7 +70,13 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserSettingsCollection" Type="Reference" ExportId="UserSettingsCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="WebCommandId" Type="Id" ExportId="">

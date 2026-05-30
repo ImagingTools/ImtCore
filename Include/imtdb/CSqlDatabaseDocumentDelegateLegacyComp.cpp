@@ -16,6 +16,7 @@
 // ImtCore includes
 #include <imtbase/imtbase.h>
 #include <imtbase/ICollectionFilter.h>
+#include <imtdb/imtdb.h>
 
 namespace imtdb
 {
@@ -279,7 +280,6 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateUpdateObjectQuery(
 					.toUtf8();
 
 		QString operationComment = operationContextPtr != nullptr ? operationContextPtr->GetOperationDescription() : QString();
-		operationComment = operationComment.replace("'", "''");
 		retVal += QString("INSERT INTO \"%1\"(\"Id\", \"%2\", \"%3\", \"RevisionNumber\", \"Comment\", \"LastModified\", \"Checksum\") VALUES('%4', '%5', '%6', '%7', '%8', '%9', %10);")
 					.arg(qPrintable(*m_revisionsTableNameAttrPtr))
 					.arg(qPrintable(s_documentIdColumn))
@@ -288,7 +288,7 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateUpdateObjectQuery(
 					.arg(qPrintable(objectId))
 					.arg(qPrintable(documentContent.toBase64()))
 					.arg(revisionsCount + 1)
-					.arg(operationComment)
+					.arg(SqlEncode(operationComment))
 					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 					.arg(checksum)
 					.toUtf8();
@@ -440,8 +440,14 @@ int CSqlDatabaseDocumentDelegateLegacyComp::BackupRevision(
 				.arg(qPrintable(objectId))
 				.toUtf8();
 
-	QString escapedComment = userComment;
-	escapedComment = escapedComment.replace("'", "''");
+	QString escapedComment = SqlEncode(userComment);
+	if (escapedComment.length() > *m_maxLengthRevisionCommentAttrPtr){
+		escapedComment = escapedComment.left(*m_maxLengthRevisionCommentAttrPtr);
+		// Ensure we don't split an escaped quote pair ('')
+		while (escapedComment.endsWith(QLatin1Char('\'')) && escapedComment.count(QLatin1Char('\'')) % 2 != 0){
+			escapedComment.chop(1);
+		}
+	}
 	QByteArray updateCommentQuery = QString("UPDATE \"%1\" SET \"Comment\" = '%2' WHERE \"%3\" in (%4)")
 				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
 				.arg(escapedComment)
@@ -488,7 +494,7 @@ bool CSqlDatabaseDocumentDelegateLegacyComp::RestoreRevision(
 	if (queryResult.next()){
 		QSqlRecord record = queryResult.record();
 		if (record.contains(qPrintable(s_idColumn))){
-			revisionUuid = record.value(qPrintable(s_idColumn)).toByteArray();
+			revisionUuid = imtdb::VariantToByteArray(record.value(qPrintable(s_idColumn)));
 		}
 	}
 
@@ -658,7 +664,7 @@ bool CSqlDatabaseDocumentDelegateLegacyComp::CreateObjectInfoFromRecord(
 		return false;
 	}
 
-	QByteArray objectId = record.value(qPrintable(s_idColumn)).toByteArray();
+	QByteArray objectId = imtdb::VariantToByteArray(record.value(qPrintable(s_idColumn)));
 
 	QByteArray sqlMetaInfoQuery = QString("SELECT * FROM \"%1\" WHERE \"RevisionId\" = (SELECT \"LastRevisionId\" FROM \"%3\" WHERE \"Id\" = '%2')")
 				.arg(qPrintable(*m_metaInfoTableNameAttrPtr))

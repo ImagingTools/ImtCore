@@ -113,6 +113,18 @@ public:
 	virtual void SetOwnerId(const QByteArray& ownerId) = 0;
 
 	/**
+		Get creator user ID.
+		The creator is permanently assigned when the tenant is first saved.
+	*/
+	virtual QByteArray GetCreatorId() const = 0;
+
+	/**
+		Set creator user ID.
+		Should only be called once (immutable after first assignment).
+	*/
+	virtual void SetCreatorId(const QByteArray& creatorId) = 0;
+
+	/**
 		Check if tenant is active.
 	*/
 	virtual bool IsActive() const = 0;
@@ -161,6 +173,16 @@ public:
 		Remove a relationship by its ID.
 	*/
 	virtual bool RemoveRelationship(const QByteArray& relationshipId) = 0;
+
+	/**
+		Get the list of permissions available for this tenant.
+	*/
+	virtual QByteArrayList GetTenantPermissions() const = 0;
+
+	/**
+		Set the list of permissions available for this tenant.
+	*/
+	virtual void SetTenantPermissions(const QByteArrayList& permissions) = 0;
 };
 
 

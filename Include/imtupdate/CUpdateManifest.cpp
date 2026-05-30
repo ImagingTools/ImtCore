@@ -103,18 +103,14 @@ bool CUpdateManifest::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeableUniquePtr CUpdateManifest::CloneMe(CompatibilityMode /*mode*/) const
+istd::IChangeableUniquePtr CUpdateManifest::CloneMe(CompatibilityMode mode) const
 {
-	istd::IChangeableUniquePtr clonedPtr(new CUpdateManifest());
+	istd::IChangeableUniquePtr clonePtr(new CUpdateManifest);
+	if (clonePtr->CopyFrom(*this, mode)){
+		return clonePtr;
+	}
 
-	clonedPtr->m_downloadLink = m_downloadLink;
-	clonedPtr->m_downloadLink = m_downloadPath;
-	clonedPtr->m_moduleType = m_moduleType;
-	clonedPtr->m_ver = m_ver;
-	clonedPtr->m_hash = m_hash;
-	clonedPtr->m_hashType = m_hashType;
-
-	return clonedPtr;
+	return nullptr;
 }
 
 

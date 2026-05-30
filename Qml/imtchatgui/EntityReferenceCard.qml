@@ -27,12 +27,12 @@ Rectangle {
 	// Compact chip mode (used inside MessageInput)
 	Row {
 		id: compactRow
-		visible: compact
+		visible: entityRefCardRoot.compact
 		anchors.centerIn: parent
 		spacing: Style.paddingXS
 
 		Text {
-			text: entityTypeIcon(entityRefCardRoot.entityType)
+			text: entityRefCardRoot.entityTypeIcon(entityRefCardRoot.entityType)
 			font.pixelSize: Style.fontSizeXS
 			color: Style.accentColor
 			anchors.verticalCenter: parent.verticalCenter
@@ -64,7 +64,7 @@ Rectangle {
 
 	// Full card mode (used in message body)
 	Column {
-		visible: !compact
+		visible: !entityRefCardRoot.compact
 		anchors.left: parent.left
 		anchors.right: parent.right
 		anchors.top: parent.top
@@ -75,7 +75,7 @@ Rectangle {
 			spacing: Style.paddingXS
 
 			Text {
-				text: entityTypeIcon(entityRefCardRoot.entityType)
+				text: entityRefCardRoot.entityTypeIcon(entityRefCardRoot.entityType)
 				font.pixelSize: Style.fontSizeM
 				color: Style.accentColor
 			}
@@ -84,7 +84,6 @@ Rectangle {
 				text: entityRefCardRoot.entityType
 				font.pixelSize: Style.fontSizeXS
 				color: Style.textSecondaryColor
-				font.capitalization: Font.AllUppercase
 				anchors.verticalCenter: parent.verticalCenter
 			}
 		}

@@ -89,6 +89,22 @@ void CGqlContext::SetToken(const QByteArray &token)
 }
 
 
+QByteArrayList CGqlContext::GetScopes() const
+{
+	return m_scopes;
+}
+
+
+void CGqlContext::SetScopes(const QByteArrayList& scopes)
+{
+	if (m_scopes != scopes){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_scopes = scopes;
+	}
+}
+
+
 QByteArray CGqlContext::GetUserId() const
 {
 	return m_userId;
@@ -230,6 +246,7 @@ bool CGqlContext::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/
 		m_languageId = sourcePtr->m_languageId;
 		m_designScheme = sourcePtr->m_designScheme;
 		m_token = sourcePtr->m_token;
+		m_scopes = sourcePtr->m_scopes;
 		m_userId = sourcePtr->m_userId;
 		m_tenantId = sourcePtr->m_tenantId;
 		m_productId = sourcePtr->m_productId;
@@ -263,6 +280,7 @@ bool CGqlContext::ResetData(CompatibilityMode /*mode*/)
 	m_productId.clear();
 	m_designScheme.clear();
 	m_token.clear();
+	m_scopes.clear();
 	m_userId.clear();
 	m_tenantId.clear();
 	m_headers.clear();
@@ -273,5 +291,4 @@ bool CGqlContext::ResetData(CompatibilityMode /*mode*/)
 
 
 } // namespace imtgql
-
 

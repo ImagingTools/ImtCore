@@ -78,6 +78,18 @@ imtauth::ITenantInfoUniquePtr CRemoteTenantControllerComp::GetTenant(const QByte
 	if (tenantData.isActive){
 		tenantInfoPtr->SetActive(*tenantData.isActive);
 	}
+	if (tenantData.tenantPermissions){
+		tenantInfoPtr->SetTenantPermissions(tenantData.tenantPermissions->ToList());
+	}
+	if (tenantData.createdAt){
+		tenantInfoPtr->SetCreatedAt(*tenantData.createdAt);
+	}
+	if (tenantData.updatedAt){
+		tenantInfoPtr->SetUpdatedAt(*tenantData.updatedAt);
+	}
+	if (tenantData.ownerId){
+		tenantInfoPtr->SetOwnerId(*tenantData.ownerId);
+	}
 
 	return tenantInfoPtr;
 }

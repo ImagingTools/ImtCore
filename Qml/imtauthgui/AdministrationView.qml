@@ -26,7 +26,7 @@ Item {
         Events.unSubscribeEvent("OnLocalizationChanged", administrationContainer.onLocalizationChanged);
     }
     
-    onDocumentServiceChanged: {
+    onDocumentManagerChanged: {
         if (documentManager){
             if (documentManager.activeView){
                 documentManager.activeView.visualStatusProvider = visualStatusProvider

@@ -55,7 +55,7 @@ DecoratorBase {
 			width: Style.iconSizeL;
             height: width;
             fillMode: Image.PreserveAspectFit;
-            source: !leftPanelElement.baseElement ? "" : leftPanelElement.baseElement.iconSource
+            source: leftPanelElement.baseElement && leftPanelElement.baseElement.iconSource ? leftPanelElement.baseElement.iconSource : ""
             sourceSize.height: height;
             sourceSize.width: width;
         }

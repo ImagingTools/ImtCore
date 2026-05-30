@@ -56,7 +56,7 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetObjectTypeId(const QByteArray&
 
 					QSqlRecord record = sqlQuery.record();
 					if (record.contains(columnId)){
-						return record.value(columnId).toByteArray();
+						return imtdb::VariantToByteArray(record.value(columnId));
 					}
 
 					// Fallback:
@@ -174,7 +174,7 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetObjectIdFromRecord(const QSqlR
 	QString columnId = qPrintable(*m_objectIdColumnAttrPtr);
 
 	if (record.contains(columnId)){
-		return record.value(columnId).toByteArray();
+		return imtdb::VariantToByteArray(record.value(columnId));
 	}
 
 	return QByteArray();
@@ -186,7 +186,7 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetObjectTypeIdFromRecord(const Q
 	QString columnId = qPrintable(*m_objectTypeIdColumnAttrPtr);
 
 	if (record.contains(columnId)){
-		return record.value(columnId).toByteArray();
+		return imtdb::VariantToByteArray(record.value(columnId));
 	}
 
 	return QByteArray();
@@ -610,11 +610,7 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateSortQuery(const imtbase::IComplex
 
 QString CSqlDatabaseObjectDelegateCompBase::EncodeTextArgument(const QString& argument) const
 {
-	QString retVal = argument;
-
-	retVal.replace("'", "''");
-
-	return retVal;
+	return SqlEncode(argument);
 }
 
 

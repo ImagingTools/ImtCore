@@ -13,6 +13,10 @@ class Component extends QQmlComponent {
     __context = {}
 
     createObject(parent = null, properties = {}, forceUpdate = false){
+        if(!this.__component){
+            console.error('Component.createObject: __component is undefined')
+            return null
+        }
         // if(!forceUpdate){
         //     let obj = this.__component.create(parent, properties, this.__context, false)
         //     obj.__updatePrimaryProperties()

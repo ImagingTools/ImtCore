@@ -17,6 +17,8 @@
 
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
+#include <imtauth/CLdapUserCollectionControllerComp.h>
+#include <imtbase/CComplexCollectionFilter.h>
 
 
 namespace imtauthgql
@@ -118,6 +120,9 @@ istd::TUniqueInterfacePtr<imtauth::IUserInfo> CLdapAuthorizationControllerComp::
 		userInfoPtr->AddToSystem(systemInfo);
 		userInfoPtr->SetId(ldapUserId);
 
+		QByteArray sid = imtauth::CLdapUserCollectionControllerComp::GetSidForUser(ldapUserId);
+		userInfoPtr->SetSid(sid);
+
 		QByteArray password = QString::fromWCharArray(userInfo3BufPtr->usri3_password).toUtf8();
 		userInfoPtr->SetPasswordHash(password);
 
@@ -132,6 +137,11 @@ istd::TUniqueInterfacePtr<imtauth::IUserInfo> CLdapAuthorizationControllerComp::
 		QString description = QString::fromWCharArray(userInfo3BufPtr->usri3_comment);
 		userInfoPtr->SetDescription(description);
 
+		QString email = imtauth::CLdapUserCollectionControllerComp::GetEmailForUser(ldapUserId);
+		if (!email.isEmpty()){
+			userInfoPtr->SetMail(email);
+		}
+
 		NetApiBufferFree(userInfo3BufPtr);
 
 		return userInfoPtr.PopPtr();
@@ -142,6 +152,27 @@ istd::TUniqueInterfacePtr<imtauth::IUserInfo> CLdapAuthorizationControllerComp::
 #endif
 
 	return nullptr;
+}
+
+
+QByteArray CLdapAuthorizationControllerComp::GetUserObjectIdBySid(const QByteArray& sid) const
+{
+	if (sid.isEmpty()){
+		return QByteArray();
+	}
+
+	imtbase::IObjectCollection::Ids userIds = m_userCollectionCompPtr->GetElementIds();
+	for (const QByteArray& userId : userIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_userCollectionCompPtr->GetObjectData(userId, dataPtr)){
+			const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
+			if (userInfoPtr != nullptr && userInfoPtr->GetSid() == sid){
+				return userId;
+			}
+		}
+	}
+
+	return QByteArray();
 }
 
 
@@ -179,6 +210,15 @@ sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerC
 
 			QByteArray userObjectId = GetUserObjectId(login);
 
+			// If user not found by login name, try to find by SID
+			// This handles the case where user logged in with a different login format
+			if (userObjectId.isEmpty()){
+				QByteArray sid = imtauth::CLdapUserCollectionControllerComp::GetSidForUser(login);
+				if (!sid.isEmpty()){
+					userObjectId = GetUserObjectIdBySid(sid);
+				}
+			}
+
 			bool ok = CheckCredential(*m_systemIdAttrPtr, login, password);
 			if (ok){
 				QByteArray guestRoleId = CheckExistsRole(productId, RT_GUEST);
@@ -199,6 +239,12 @@ sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerC
 						userInfoPtr->SetObjectUuid(QUuid::createUuid().toByteArray(QUuid::WithoutBraces));
 						userInfoPtr->SetId(login);
 						userInfoPtr->SetName(login);
+
+						QByteArray sid = imtauth::CLdapUserCollectionControllerComp::GetSidForUser(login);
+						userInfoPtr->SetSid(sid);
+
+						QString mail = imtauth::CLdapUserCollectionControllerComp::GetEmailForUser(login);
+						userInfoPtr->SetMail(mail);
 					}
 
 					userObjectId = userInfoPtr->GetObjectUuid();
@@ -210,7 +256,7 @@ sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerC
 
 					userInfoPtr->AddRole(productId, defaultRoleId);
 
-					QByteArray retVal = m_userCollectionCompPtr->InsertNewObject("User", "", "", userInfoPtr.GetPtr(), userObjectId);
+					QByteArray retVal = m_userCollectionCompPtr->InsertNewObject("User", userInfoPtr->GetName(), "", userInfoPtr.GetPtr(), userObjectId);
 					if (retVal.isEmpty()){
 						errorMessage = QString("Unable to insert LDAP user to the collection");
 						return sdl::imtauth::Authorization::CAuthorizationPayload();
@@ -221,13 +267,41 @@ sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerC
 					if (m_userCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
 						userInfoPtr.MoveCastedPtr(dataPtr.GetPtr()->CloneMe());
 						if (userInfoPtr.IsValid()){
+							bool needsUpdate = false;
+
+							// Update login in case the user logged in with a different format
+							if (userInfoPtr->GetId() != login){
+								userInfoPtr->SetId(login);
+								needsUpdate = true;
+							}
+
+							// Ensure SID is set (may be empty for users created before SID support)
+							if (userInfoPtr->GetSid().isEmpty()){
+								QByteArray sid = imtauth::CLdapUserCollectionControllerComp::GetSidForUser(login);
+								userInfoPtr->SetSid(sid);
+								needsUpdate = true;
+							}
+
+							// Ensure email is set (may be empty for users created before email lookup)
+							if (userInfoPtr->GetMail().isEmpty()){
+								QString email = imtauth::CLdapUserCollectionControllerComp::GetEmailForUser(login);
+								if (!email.isEmpty()){
+									userInfoPtr->SetMail(email);
+									needsUpdate = true;
+								}
+							}
+
 							QByteArrayList products = userInfoPtr->GetProducts();
 							if (!products.contains(productId)){
 								userInfoPtr->AddRole(productId, defaultRoleId);
+								needsUpdate = true;
+							}
+
+							if (needsUpdate){
 								if (!m_userCollectionCompPtr->SetObjectData(userObjectId, *userInfoPtr.GetPtr())){
 									SendWarningMessage(
 										0,
-										QString("Unable to set product '%1' for user '%2'").arg(qPrintable(productId), qPrintable(userObjectId)),
+										QString("Unable to update user data for user '%1'").arg(qPrintable(userObjectId)),
 										"CLdapAuthorizationControllerComp");
 								}
 							}

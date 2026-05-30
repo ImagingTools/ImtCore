@@ -2,6 +2,7 @@
 AuxInclude/
 Bin/
 Lib/
+node_modules/
 
 # CMake build artifacts
 CMakeCache.txt
@@ -13,6 +14,12 @@ CTestTestfile.cmake
 Testing/
 _deps/
 Build/*/*.dir/
+**/CMake/build/
+.cmake/
+
+# Playwright test artifacts
+playwright-report/
+test-results/
 
 # Visual Studio artifacts
 # Note: We keep 3rdParty Visual Studio files tracked
@@ -119,6 +126,7 @@ __pycache__/
 # IDE and Editor files
 .vscode/
 .idea/
+.qtc_clangd/
 *.swp
 *.swo
 *~

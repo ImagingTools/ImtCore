@@ -10,6 +10,7 @@ module.exports = {
 
     init: function(){ 
         global.queueFlag = []
+        global.signalTargets = []
         
         global.JQModules = {
             QtBase: require('../QtBase/QtBase'),
@@ -21,6 +22,7 @@ module.exports = {
             QtWebSockets: require('../QtWebSockets/QtWebSockets'),
             QtPositioning: require('../QtPositioning/QtPositioning'),
             QtLocation: require('../QtLocation/QtLocation'),
+            QtWebView: require('../QtWebView/QtWebView'),
             __queue: [],
         }
 
@@ -95,6 +97,17 @@ module.exports = {
         })
         
         global.JSContext = Context.create()
+
+        // Qt QString.arg() — replaces %1, %2, ... with arguments
+        if (!String.prototype.arg) {
+            String.prototype.arg = function(...args) {
+                let result = String(this)
+                for (let i = 0; i < args.length; i++) {
+                    result = result.replace('%' + (i + 1), args[i] !== undefined && args[i] !== null ? String(args[i]) : '')
+                }
+                return result
+            }
+        }
 
         RegExp.prototype.toPartialMatchRegex = function() {
             "use strict";
@@ -322,6 +335,9 @@ module.exports = {
             .Column {
                 flex-direction: column;
             }
+            .Flow {
+                flex-wrap: wrap;
+            }    
             .Row > *{
                 position: relative;
             }
@@ -340,7 +356,6 @@ module.exports = {
             .Flow > *[no-view] {
                 display: none;
             }
-
 
             .Map > *{
                 pointer-events: all;
@@ -385,10 +400,27 @@ module.exports = {
     deleteObjects: [],
 
     focusTree: [],
+    pendingFocusTree: null,  // deferred during beginUpdate/endUpdate
     setFocusTree(tree){
+        // Qt semantics: when multiple siblings request focus synchronously,
+        // the FIRST one wins. Use a microtask to batch; first request is kept.
+        if(this.pendingFocusTree !== null){
+            // Another request already queued — ignore (first wins)
+            return
+        }
+        this.pendingFocusTree = tree
+        Promise.resolve().then(()=>{
+            let t = this.pendingFocusTree
+            this.pendingFocusTree = null
+            if(t) this._applyFocusTree(t)
+        })
+    },
+
+    _applyFocusTree(tree){
         let unionTree = []
-        while(this.focusTree.length || tree.length){
-            let origin = this.focusTree.pop()
+        let focusTree = this.focusTree
+        while(focusTree.length || tree.length){
+            let origin = focusTree.pop()
             let current = tree.pop()
 
             if(origin === current){
@@ -459,6 +491,11 @@ module.exports = {
             obj.__beginUpdate()
             obj.__endUpdate()
         }
+    },
+
+    quit: function(){
+        this.isQuitting = true
+        if(typeof window !== 'undefined') window.__jqmlQuit = true
     },
 
     endUpdate: function(){

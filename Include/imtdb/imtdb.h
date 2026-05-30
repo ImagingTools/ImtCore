@@ -182,6 +182,29 @@ QString UtcNow();
 QString EscapeSql(const QString& value);
 
 
+/**
+ * @brief Safely converts a QVariant to QByteArray, handling QUuid without braces.
+ *
+ * In Qt 6.11+, database drivers may return UUID columns as QUuid values. When
+ * QVariant::toByteArray() is called on such a value, the result is wrapped in
+ * curly braces (e.g. "{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}"), which breaks
+ * existing data and comparison logic that expects braces-free UUID strings.
+ *
+ * This function detects QUuid-typed variants and converts them using
+ * QUuid::WithoutBraces. For all other types, it falls through to
+ * QVariant::toByteArray().
+ *
+ * @param value The QVariant value to convert.
+ * @return The byte array representation without UUID braces.
+ *
+ * Example:
+ * @code{.cpp}
+ * QByteArray id = imtdb::VariantToByteArray(record.value("Id"));
+ * @endcode
+ */
+QByteArray VariantToByteArray(const QVariant& value);
+
+
 } // namespace imtdb
 
 

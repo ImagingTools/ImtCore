@@ -2,18 +2,17 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6318" Description="ACF"/>
-            <Version Id="1" Number="2296" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="6154" Description="ACF"/>
+            <Version Id="1" Number="2274" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="396032" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="AuthorizationController" X="575" Y="300" Note=""/>
-        <Element ComponentName="CredentialController" X="569" Y="207" Note=""/>
-        <Element ComponentName="GqlJwtSessionController" X="275" Y="575" Note=""/>
-        <Element ComponentName="GraphQLDemultiplexer" X="200" Y="300" Note=""/>
-        <Element ComponentName="HashCalculator" X="575" Y="100" Note=""/>
-        <Element ComponentName="JwtSessionController" X="575" Y="450" Note=""/>
+        <Element ComponentName="AuthorizationController" X="200" Y="275" Note=""/>
+        <Element ComponentName="CredentialController" X="225" Y="425" Note=""/>
+        <Element ComponentName="GqlJwtSessionController" X="925" Y="275" Note=""/>
+        <Element ComponentName="GraphQLDemultiplexer" X="625" Y="125" Note=""/>
+        <Element ComponentName="HashCalculator" X="225" Y="575" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

@@ -1,6 +1,12 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
+
+// ImtCore includes
+#include <imtauth/CTenantFilterParam.h>
+#include <imtgql/CGqlRequest.h>
+
+
 /**
 	\file imtauthgql.h
 	\brief Main header file for the imtauthgql module - Authentication GraphQL API Layer
@@ -597,5 +603,40 @@
 
 namespace imtauthgql
 {
-	// Namespace for authentication GraphQL API layer
+
+
+/**
+	Create an optional tenant filter param from a tenant id.
+	Returns nullptr when no tenant id is available.
+	The returned pointer is owned by the caller (ParamsSet takes ownership via SetEditableParameter).
+*/
+inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const QByteArray& tenantId)
+{
+	if (tenantId.isEmpty()){
+		return nullptr;
+	}
+
+	imtauth::CTenantFilterParam* tenantFilterPtr = new imtauth::CTenantFilterParam();
+	tenantFilterPtr->SetTenantId(tenantId);
+
+	return tenantFilterPtr;
 }
+
+
+/**
+	Create an optional tenant filter param from the GQL request context.
+	Returns nullptr when no tenant context is available.
+	The returned pointer is owned by the caller (ParamsSet takes ownership via SetEditableParameter).
+*/
+inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRequest& gqlRequest)
+{
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr == nullptr){
+		return nullptr;
+	}
+
+	return CreateTenantFilterParam(gqlContextPtr->GetTenantId());
+}
+
+
+} // namespace imtauthgql

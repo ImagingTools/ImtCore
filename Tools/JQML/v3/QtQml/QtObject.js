@@ -83,6 +83,16 @@ class QtObject extends QObject {
         return this.JQAbstractModel ? this.JQAbstractModel.index : -1
     }
 
+    // Provides obj.Component.destruction / obj.Component.completed access
+    // so that QML idiom `obj.Component.destruction.connect(fn)` works at runtime.
+    get Component() {
+        const proxy = this.__proxy
+        return {
+            get destruction() { return proxy['Component.destruction'] },
+            get completed() { return proxy['Component.completed'] }
+        }
+    }
+
     PROXY__get__children(){
         return this.__proxy.data.filter(obj => obj instanceof JQModules.QtQuick.Item)
     }
@@ -218,18 +228,18 @@ class QtObject extends QObject {
     //     }
     // }
 
-    SLOT_dataChanged(leftTop, bottonRight, roles){
+    SLOT_dataChanged(...args){
         if(args.length === 3){
             let leftTop = args[0]
-            let bottonRight = args[1]
+            let bottomRight = args[1]
             let roles = args[2]
 
             if(roles === 'append'){
-                for(let i = leftTop; i < bottonRight; i++){
+                for(let i = leftTop; i < bottomRight; i++){
                     this.data[i].setParent(this)
                 }
             }
-        } else {
+        } else if(args.length >= 2){
             let oldValue = args[0]
             let newValue = args[1]
 

@@ -96,11 +96,6 @@ I_EXPORT_COMPONENT(
 			"Check Permissions");
 
 I_EXPORT_COMPONENT(
-			FeaturePackageRepresentationController,
-			"Controller for feature package representation",
-			"FeaturePackage Package Features Controller Representation");
-
-I_EXPORT_COMPONENT(
 			CollectionPermissionsProvider,
 			"Collection permissions provider",
 			"Collection Permissions Provider");
