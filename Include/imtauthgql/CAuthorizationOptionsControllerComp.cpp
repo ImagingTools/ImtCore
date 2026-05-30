@@ -43,8 +43,7 @@ sdl::V1_0::imtauth::CUserManagementPayload CAuthorizationOptionsControllerComp::
 		break;
 	}
 
-	payload.Version_1_0.emplace();
-	payload.Version_1_0->userMode = userMode;
+	payload.userMode = userMode;
 
 	return payload;
 }

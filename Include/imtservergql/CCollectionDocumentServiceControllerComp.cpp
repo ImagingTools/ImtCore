@@ -26,8 +26,7 @@ CDM::CDocumentList CCollectionDocumentServiceControllerComp::OnGetOpenedDocument
 			QString& /*errorMessage*/) const
 {
 	CDM::CDocumentList retVal;
-	retVal.Version_1_0.emplace();
-	retVal.Version_1_0->documentList.emplace();
+	retVal.documentList.emplace();
 
 	if (m_documentManagerCompPtr.IsValid()){
 		QByteArray userId = GetUserId(gqlRequest);
@@ -35,20 +34,19 @@ CDM::CDocumentList CCollectionDocumentServiceControllerComp::OnGetOpenedDocument
 		imtdoc::IDocumentService::DocumentList list = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
 		for (const imtdoc::IDocumentService::DocumentListItem& info : list){
 			CDM::CDocumentInfo sdlInfo;
-			sdlInfo.Version_1_0.emplace();
 
 			QString path = info.url.path();
 			QStringList parts = path.split('/', Qt::SkipEmptyParts);
 			QByteArray objectId = parts.count() > 0 ? parts.last().toUtf8() : QByteArray();
 
-			sdlInfo.Version_1_0->documentId = info.documentId;
-			sdlInfo.Version_1_0->documentName = info.name;
-			sdlInfo.Version_1_0->objectId = objectId;
-			sdlInfo.Version_1_0->objectTypeId = info.typeId;
-			sdlInfo.Version_1_0->isDirty = info.isDirty;
-			sdlInfo.Version_1_0->hasNameProvider = info.hasNameProvider;
+			sdlInfo.documentId = info.documentId;
+			sdlInfo.documentName = info.name;
+			sdlInfo.objectId = objectId;
+			sdlInfo.objectTypeId = info.typeId;
+			sdlInfo.isDirty = info.isDirty;
+			sdlInfo.hasNameProvider = info.hasNameProvider;
 
-			retVal.Version_1_0->documentList->append(sdlInfo.Version_1_0);
+			retVal.documentList->append(sdlInfo.Version_1_0);
 		}
 	}
 
@@ -65,8 +63,8 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnCreateNewDocument
 
 	const auto& arguments = createNewDocumentRequest.GetRequestedArguments();
 
-	auto documentTypeId = arguments.input.Version_1_0;
-	if (!documentTypeId || !documentTypeId->typeId){
+	auto documentTypeId = arguments.input;
+	if (!documentTypeId.typeId){
 		errorMessage = "Invalid GraphQL request params";
 
 		return retVal;
@@ -78,12 +76,12 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnCreateNewDocument
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
-		const QByteArray proposedSourceDocumentId = documentTypeId->proposedSourceDocumentId
-			? *documentTypeId->proposedSourceDocumentId
+		const QByteArray proposedSourceDocumentId = documentTypeId.proposedSourceDocumentId
+			? *documentTypeId.proposedSourceDocumentId
 			: QByteArray();
 		imtdoc::IDocumentService::TaskParams taskParams;
 		taskParams.userId = userId;
-		taskParams.documentTypeId = *documentTypeId->typeId;
+		taskParams.documentTypeId = *documentTypeId.typeId;
 		taskParams.proposedSourceDocumentId = proposedSourceDocumentId;
 		QByteArray taskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_NEW, taskParams);
 		imtdoc::IDocumentService::TaskResult taskResult = m_documentManagerCompPtr->WaitForTaskFinished(taskId);
@@ -97,19 +95,18 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnCreateNewDocument
 		QString documentName;
 		m_documentManagerCompPtr->GetDocumentName(userId, documentId, documentName);
 
-		retVal.Version_1_0.emplace();
-		retVal.Version_1_0->documentId = documentId;
-		retVal.Version_1_0->documentName = documentName;
-		retVal.Version_1_0->objectTypeId = *documentTypeId->typeId;
-		retVal.Version_1_0->objectId = QByteArray();
-		retVal.Version_1_0->isDirty = false;
-		retVal.Version_1_0->hasNameProvider = false;
-		retVal.Version_1_0->isLoading = false;
+		retVal.documentId = documentId;
+		retVal.documentName = documentName;
+		retVal.objectTypeId = *documentTypeId->typeId;
+		retVal.objectId = QByteArray();
+		retVal.isDirty = false;
+		retVal.hasNameProvider = false;
+		retVal.isLoading = false;
 
 		imtdoc::IDocumentService::DocumentList list = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
 		for (const imtdoc::IDocumentService::DocumentListItem& info : list){
 			if (info.documentId == documentId){
-				retVal.Version_1_0->hasNameProvider = info.hasNameProvider;
+				retVal.hasNameProvider = info.hasNameProvider;
 				break;
 			}
 		}
@@ -128,8 +125,8 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnOpenDocument(
 
 	const auto& arguments = openDocumentRequest.GetRequestedArguments();
 
-	auto objectId = arguments.input.Version_1_0;
-	if (!objectId || !objectId->id){
+	auto objectId = arguments.input;
+	if (!objectId.id){
 		errorMessage = "Invalid GraphQL request params";
 
 		return retVal;
@@ -140,7 +137,7 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnOpenDocument(
 		SendWarningMessage(0, "Unable to get user-ID from context");
 	}
 
-	QUrl url(QString("collection:///%1").arg(*objectId->id));
+	QUrl url(QString("collection:///%1").arg(*objectId.id));
 
 	if (m_documentManagerCompPtr.IsValid()) {
 		imtdoc::IDocumentService::TaskParams taskParams;
@@ -155,20 +152,19 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnOpenDocument(
 			return retVal;
 		}
 
-		retVal.Version_1_0.emplace();
-		retVal.Version_1_0->documentId = documentId;
-		retVal.Version_1_0->objectId = *objectId->id;
-		retVal.Version_1_0->isDirty = false;
-		retVal.Version_1_0->hasNameProvider = false;
-		retVal.Version_1_0->isLoading = true;
+		retVal.documentId = documentId;
+		retVal.objectId = *objectId.id;
+		retVal.isDirty = false;
+		retVal.hasNameProvider = false;
+		retVal.isLoading = true;
 
 		imtdoc::IDocumentService::DocumentList list = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
 		for (const imtdoc::IDocumentService::DocumentListItem& info : list){
 			if (info.documentId == documentId){
-				retVal.Version_1_0->documentName = info.name;
-				retVal.Version_1_0->objectTypeId = info.typeId;
-				retVal.Version_1_0->hasNameProvider = info.hasNameProvider;
-				retVal.Version_1_0->isLoading = info.isLoading;
+				retVal.documentName = info.name;
+				retVal.objectTypeId = info.typeId;
+				retVal.hasNameProvider = info.hasNameProvider;
+				retVal.isLoading = info.isLoading;
 				break;
 			}
 		}
@@ -187,8 +183,8 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnGetDocumentName(
 
 	const auto& arguments = getDocumentNameRequest.GetRequestedArguments();
 
-	auto documentId = arguments.input.Version_1_0;
-	if (!documentId || !documentId->id){
+	auto documentId = arguments.input;
+	if (!documentId.id){
 		errorMessage = "Invalid GraphQL request params";
 
 		return retVal;
@@ -205,9 +201,8 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnGetDocumentName(
 
 		switch (status){
 		case imtdoc::IDocumentService::OS_OK:{
-			retVal.Version_1_0.emplace();
-			retVal.Version_1_0->documentId = *documentId->id;
-			retVal.Version_1_0->documentName = name;
+			retVal.documentId = *documentId.id;
+			retVal.documentName = name;
 			break;
 		}
 
@@ -237,8 +232,8 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSetDoc
 
 	const auto& arguments = setDocumentNameRequest.GetRequestedArguments();
 
-	auto documentId = arguments.input.Version_1_0;
-	if (!documentId || !documentId->documentId || !documentId->documentName){
+	auto documentId = arguments.input;
+	if (!documentId.documentId || !documentId.documentName){
 		errorMessage = "Invalid GraphQL request params";
 
 		return retVal;
@@ -249,24 +244,22 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSetDoc
 		SendWarningMessage(0, "Unable to get user-ID from context");
 	}
 
-	retVal.Version_1_0.emplace();
-
 	if (m_documentManagerCompPtr.IsValid()) {
 		imtdoc::IDocumentService::OperationStatus status = m_documentManagerCompPtr->SetDocumentName(userId, *documentId->documentId, *documentId->documentName);
 		switch (status){
 		case imtdoc::IDocumentService::OS_OK:
-			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;
+			retVal.status = CDM::EDocumentOperationStatus::Success;
 			break;
 		case imtdoc::IDocumentService::OS_INVALID_USER_ID:
 			errorMessage = "Invalid user-ID";
-			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidUserId;
+			retVal.status = CDM::EDocumentOperationStatus::InvalidUserId;
 			break;
 		case imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID:
-			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentId;
+			retVal.status = CDM::EDocumentOperationStatus::InvalidDocumentId;
 			errorMessage = "Invalid document ID";
 			break;
 		case imtdoc::IDocumentService::OS_FAILED:
-			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Failed;
+			retVal.status = CDM::EDocumentOperationStatus::Failed;
 			errorMessage = "Failed to set document name";
 			break;
 		default:
@@ -288,8 +281,8 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSaveDo
 
 	const auto& arguments = saveDocumentRequest.GetRequestedArguments();
 
-	auto saveDocumentInput = arguments.input.Version_1_0;
-	if (!saveDocumentInput || !saveDocumentInput->documentId || !saveDocumentInput->documentName){
+	auto saveDocumentInput = arguments.input;
+	if (!saveDocumentInput.documentId || !saveDocumentInput.documentName){
 		errorMessage = "Invalid GraphQL request params";
 
 		return retVal;
@@ -300,16 +293,14 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSaveDo
 		SendWarningMessage(0, "Unable to get user-ID from context");
 	}
 
-	retVal.Version_1_0.emplace();
-
 	if (m_documentManagerCompPtr.IsValid()) {
 		istd::TDelPtr<imtbase::IOperationContext> operationContextPtr;
 		operationContextPtr.SetPtr(CreateOperationContextFromGqlRequest(gqlRequest));
 
 		imtdoc::IDocumentService::TaskParams taskParams;
 		taskParams.userId = userId;
-		taskParams.documentId = *saveDocumentInput->documentId;
-		taskParams.documentName = *saveDocumentInput->documentName;
+		taskParams.documentId = *saveDocumentInput.documentId;
+		taskParams.documentName = *saveDocumentInput.documentName;
 		taskParams.operationContextPtr = operationContextPtr.GetPtr();
 		QByteArray taskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, taskParams);
 		imtdoc::IDocumentService::TaskResult taskResult = m_documentManagerCompPtr->WaitForTaskFinished(taskId);
@@ -318,35 +309,35 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSaveDo
 		QString responseMessage;
 		switch (status){
 		case imtdoc::IDocumentService::OS_OK:
-			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;
+			retVal.status = CDM::EDocumentOperationStatus::Success;
 			{
 				QString resolvedName;
-				if (m_documentManagerCompPtr->GetDocumentName(userId, *saveDocumentInput->documentId, resolvedName) == imtdoc::IDocumentService::OS_OK){
-					retVal.Version_1_0->documentName = resolvedName;
+				if (m_documentManagerCompPtr->GetDocumentName(userId, *saveDocumentInput.documentId, resolvedName) == imtdoc::IDocumentService::OS_OK){
+					retVal.documentName = resolvedName;
 				}
 			}
 			break;
 		case imtdoc::IDocumentService::OS_INVALID_USER_ID:
-			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidUserId;
+			retVal.status = CDM::EDocumentOperationStatus::InvalidUserId;
 			responseMessage = "Invalid user-ID";
 			break;
 		case imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID:
-			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentId;
+			retVal.status = CDM::EDocumentOperationStatus::InvalidDocumentId;
 			responseMessage = "Invalid document ID";
 			break;
 		case imtdoc::IDocumentService::OS_INVALID_DOCUMENT_DATA:
-			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentData;
+			retVal.status = CDM::EDocumentOperationStatus::InvalidDocumentData;
 			responseMessage = saveErrorMessage.isEmpty() ? "Document data is invalid" : saveErrorMessage;
 			break;
 		case imtdoc::IDocumentService::OS_FAILED:
-			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Failed;
+			retVal.status = CDM::EDocumentOperationStatus::Failed;
 			responseMessage = "Failed to save document";
 			break;
 		default:
 			break;
 		}
 		if (!responseMessage.isEmpty()) {
-			retVal.Version_1_0->message = responseMessage;
+			retVal.message = responseMessage;
 			errorMessage = responseMessage;
 		}
 	}
@@ -364,8 +355,8 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnCloseD
 
 	const auto& arguments = closeDocumentRequest.GetRequestedArguments();
 
-	auto documentId = arguments.input.Version_1_0;
-	if (!documentId || !documentId->id){
+	auto documentId = arguments.input;
+	if (!documentId.id){
 		errorMessage = "Invalid GraphQL request params";
 
 		return retVal;
@@ -376,27 +367,25 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnCloseD
 		SendWarningMessage(0, "Unable to get user-ID from context");
 	}
 
-	retVal.Version_1_0.emplace();
-
 	if (m_documentManagerCompPtr.IsValid()) {
 		imtdoc::IDocumentService::TaskParams taskParams;
 		taskParams.userId = userId;
-		taskParams.documentId = *documentId->id;
+		taskParams.documentId = *documentId.id;
 		QByteArray taskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_CLOSE, taskParams);
 		imtdoc::IDocumentService::TaskResult taskResult = m_documentManagerCompPtr->WaitForTaskFinished(taskId);
 		imtdoc::IDocumentService::OperationStatus status = taskResult.status;
 		switch (status){
 		case imtdoc::IDocumentService::OS_OK:
-			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;
+			retVal.status = CDM::EDocumentOperationStatus::Success;
 			break;
 		case imtdoc::IDocumentService::OS_INVALID_USER_ID:
-			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidUserId;
+			retVal.status = CDM::EDocumentOperationStatus::InvalidUserId;
 			break;
 		case imtdoc::IDocumentService::OS_INVALID_DOCUMENT_ID:
-			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentId;
+			retVal.status = CDM::EDocumentOperationStatus::InvalidDocumentId;
 			break;
 		case imtdoc::IDocumentService::OS_FAILED:
-			retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Failed;
+			retVal.status = CDM::EDocumentOperationStatus::Failed;
 			break;
 		default:
 			break;
@@ -413,21 +402,20 @@ sdl::V1_0::imtbase::CUndoInfo CCollectionDocumentServiceControllerComp::OnGetUnd
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CUndoInfo retVal;
-	retVal.Version_1_0.emplace();
-	retVal.Version_1_0->status.emplace();
+	retVal.status.emplace();
 
 	const auto& arguments = getUndoInfoRequest.GetRequestedArguments();
 
-	auto documentId = arguments.input.Version_1_0;
-	if (!documentId || !documentId->id){
+	auto documentId = arguments.input;
+	if (!documentId.id){
 		errorMessage = "Invalid GraphQL request params";
 
-		retVal.Version_1_0->status->status = sdl::V1_0::imtbase::EUndoStatus::Failed;
+		retVal.status->status = sdl::V1_0::imtbase::EUndoStatus::Failed;
 
 		return retVal;
 	}
 
-	retVal.Version_1_0->documentId = documentId->id;
+	retVal.documentId = documentId.id;
 
 	QByteArray userId = GetUserId(gqlRequest);
 	if (userId.isEmpty()){
@@ -436,34 +424,34 @@ sdl::V1_0::imtbase::CUndoInfo CCollectionDocumentServiceControllerComp::OnGetUnd
 
 	if (m_documentManagerCompPtr.IsValid()) {
 		idoc::IUndoManager* undoManagerPtr = nullptr;
-		if (m_documentManagerCompPtr-> GetDocumentUndoManager(userId, *documentId->id, undoManagerPtr) != imtdoc::IDocumentService::OS_OK){
+		if (m_documentManagerCompPtr-> GetDocumentUndoManager(userId, *documentId.id, undoManagerPtr) != imtdoc::IDocumentService::OS_OK){
 			errorMessage = "Undo manager not available";
 
-			retVal.Version_1_0->status->status = sdl::V1_0::imtbase::EUndoStatus::Failed;
+			retVal.status->status = sdl::V1_0::imtbase::EUndoStatus::Failed;
 
 			return retVal;
 		}
 
-		retVal.Version_1_0->isDirty = undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL;
-		retVal.Version_1_0->status.emplace().status = sdl::V1_0::imtbase::EUndoStatus::Success;
+		retVal.isDirty = undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL;
+		retVal.status.emplace().status = sdl::V1_0::imtbase::EUndoStatus::Success;
 
 		int count = undoManagerPtr->GetAvailableUndoSteps();
-		retVal.Version_1_0->availableUndoSteps = count;
-		retVal.Version_1_0->undoLevelDescriptions.emplace();
+		retVal.availableUndoSteps = count;
+		retVal.undoLevelDescriptions.emplace();
 		for (int i = 0; i < count; i++){
 			QString description = undoManagerPtr->GetUndoLevelDescription(i);
-			retVal.Version_1_0->undoLevelDescriptions->append(description);
+			retVal.undoLevelDescriptions->append(description);
 		}
 
 		count = undoManagerPtr->GetAvailableRedoSteps();
-		retVal.Version_1_0->availableRedoSteps = count;
-		retVal.Version_1_0->redoLevelDescriptions.emplace();
+		retVal.availableRedoSteps = count;
+		retVal.redoLevelDescriptions.emplace();
 		for (int i = 0; i < count; i++){
 			QString description = undoManagerPtr->GetRedoLevelDescription(i);
-			retVal.Version_1_0->redoLevelDescriptions->append(description);
+			retVal.redoLevelDescriptions->append(description);
 		}
 
-		retVal.Version_1_0->status->status = sdl::V1_0::imtbase::EUndoStatus::Success;
+		retVal.status->status = sdl::V1_0::imtbase::EUndoStatus::Success;
 	}
 
 	return retVal;
@@ -476,12 +464,11 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnDoUn
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CUndoStatus retVal;
-	retVal.Version_1_0.emplace();
-	retVal.Version_1_0->status.emplace();
+	retVal.status.emplace();
 
 	const auto& arguments = doUndoRequest.GetRequestedArguments();
 
-	istd::TSharedNullable<CDM::CCollectionUndoRedoInput::V1_0> collectionUndoRedoInput = arguments.input.Version_1_0;
+	istd::TSharedNullable<CDM::CCollectionUndoRedoInput> collectionUndoRedoInput = arguments.input;
 
 	if (!collectionUndoRedoInput || !collectionUndoRedoInput->undoRedoInput){
 		errorMessage = "Invalid GraphQL request params";
@@ -494,7 +481,7 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnDoUn
 	if (!undoRedoInput || !undoRedoInput->documentId || !undoRedoInput->steps){
 		errorMessage = "Invalid GraphQL request params";
 
-		retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::InvalidDocumentId;
+		retVal.status = sdl::V1_0::imtbase::EUndoStatus::InvalidDocumentId;
 
 		return retVal;
 	}
@@ -511,7 +498,7 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnDoUn
 		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, documentId, undoManagerPtr) != imtdoc::IDocumentService::OS_OK) {
 			errorMessage = "Undo manager not available";
 
-			retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::Failed;
+			retVal.status = sdl::V1_0::imtbase::EUndoStatus::Failed;
 
 			return retVal;
 		}
@@ -519,7 +506,7 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnDoUn
 		if (undoManagerPtr->GetAvailableUndoSteps() < *undoRedoInput->steps){
 			errorMessage = "The number of available undo steps is less than requested";
 
-			retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::InvalidStepCount;
+			retVal.status = sdl::V1_0::imtbase::EUndoStatus::InvalidStepCount;
 
 			return retVal;
 		}
@@ -527,12 +514,12 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnDoUn
 		if (!undoManagerPtr->DoUndo(*undoRedoInput->steps)){
 			errorMessage = "Undo operation failed";
 
-			retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::Failed;
+			retVal.status = sdl::V1_0::imtbase::EUndoStatus::Failed;
 
 			return retVal;
 		}
 
-		retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::Success;
+		retVal.status = sdl::V1_0::imtbase::EUndoStatus::Success;
 	}
 
 	return retVal;
@@ -545,12 +532,11 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnDoRe
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CUndoStatus retVal;
-	retVal.Version_1_0.emplace();
-	retVal.Version_1_0->status.emplace();
+	retVal.status.emplace();
 
 	const auto& arguments = doRedoRequest.GetRequestedArguments();
 
-	istd::TSharedNullable<CDM::CCollectionUndoRedoInput::V1_0> collectionUndoRedoInput = arguments.input.Version_1_0;
+	istd::TSharedNullable<CDM::CCollectionUndoRedoInput> collectionUndoRedoInput = arguments.input;
 
 	if (!collectionUndoRedoInput || !collectionUndoRedoInput->undoRedoInput){
 		errorMessage = "Invalid GraphQL request params";
@@ -563,7 +549,7 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnDoRe
 	if (!undoRedoInput || !undoRedoInput->documentId || !undoRedoInput->steps){
 		errorMessage = "Invalid GraphQL request params";
 
-		retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::InvalidDocumentId;
+		retVal.status = sdl::V1_0::imtbase::EUndoStatus::InvalidDocumentId;
 
 		return retVal;
 	}
@@ -580,7 +566,7 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnDoRe
 		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, documentId, undoManagerPtr) != imtdoc::IDocumentService::OS_OK) {
 			errorMessage = "Undo manager not available";
 
-			retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::Failed;
+			retVal.status = sdl::V1_0::imtbase::EUndoStatus::Failed;
 
 			return retVal;
 		}
@@ -588,7 +574,7 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnDoRe
 		if (undoManagerPtr->GetAvailableRedoSteps() < *undoRedoInput->steps){
 			errorMessage = "The number of available redo steps is less than requested";
 
-			retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::InvalidStepCount;
+			retVal.status = sdl::V1_0::imtbase::EUndoStatus::InvalidStepCount;
 
 			return retVal;
 		}
@@ -596,12 +582,12 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnDoRe
 		if (!undoManagerPtr->DoRedo(*undoRedoInput->steps)){
 			errorMessage = "Redo operation failed";
 
-			retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::Failed;
+			retVal.status = sdl::V1_0::imtbase::EUndoStatus::Failed;
 
 			return retVal;
 		}
 
-		retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::Success;
+		retVal.status = sdl::V1_0::imtbase::EUndoStatus::Success;
 	}
 
 	return retVal;
@@ -614,16 +600,15 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnRese
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CUndoStatus retVal;
-	retVal.Version_1_0.emplace();
-	retVal.Version_1_0->status.emplace();
+	retVal.status.emplace();
 
 	const auto& arguments = resetUndoRequest.GetRequestedArguments();
 
-	auto documentId = arguments.input.Version_1_0;
-	if (!documentId || !documentId->id){
+	auto documentId = arguments.input;
+	if (!documentId.id){
 		errorMessage = "Invalid GraphQL request params";
 
-		retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::InvalidDocumentId;
+		retVal.status = sdl::V1_0::imtbase::EUndoStatus::InvalidDocumentId;
 
 		return retVal;
 	}
@@ -636,17 +621,17 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnRese
 
 	if (m_documentManagerCompPtr.IsValid()) {
 		idoc::IUndoManager* undoManagerPtr = nullptr;
-		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, *documentId->id, undoManagerPtr) != imtdoc::IDocumentService::OS_OK) {
+		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, *documentId.id, undoManagerPtr) != imtdoc::IDocumentService::OS_OK) {
 			errorMessage = "Undo manager not available";
 
-			retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::Failed;
+			retVal.status = sdl::V1_0::imtbase::EUndoStatus::Failed;
 
 			return retVal;
 		}
 
 		undoManagerPtr->ResetUndo();
 
-		retVal.Version_1_0->status = sdl::V1_0::imtbase::EUndoStatus::Success;
+		retVal.status = sdl::V1_0::imtbase::EUndoStatus::Success;
 	}
 
 	return retVal;

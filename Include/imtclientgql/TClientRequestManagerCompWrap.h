@@ -77,7 +77,7 @@ protected:
 			}
 
 			SdlClass response;
-			response.Version_1_0.emplace();
+
 			return response;
 		}
 
@@ -93,9 +93,8 @@ protected:
 		}
 
 		SdlClass response;
-		response.Version_1_0.emplace();
 
-		if (!response.Version_1_0->ReadFromJsonObject(object)){
+		if (!response.ReadFromJsonObject(object)){
 			errorMessage = QStringLiteral("Response parsing error");
 		}
 

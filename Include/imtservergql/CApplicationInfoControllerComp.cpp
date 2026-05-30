@@ -28,8 +28,7 @@ CApplicationInfoControllerComp::ApplicationInfo CApplicationInfoControllerComp::
 		return {};
 	}
 
-	ApplicationInfo retVal;
-	ApplicationInfo::V1_0& applicationInfo = retVal.Version_1_0.Emplace();
+	ApplicationInfo applicationInfo;
 
 	const iser::IVersionInfo& versionInfo = m_applicationInfoCompPtr->GetVersionInfo();
 	int mainVersion = m_applicationInfoCompPtr->GetMainVersionId();
@@ -41,14 +40,14 @@ CApplicationInfoControllerComp::ApplicationInfo CApplicationInfoControllerComp::
 	}
 
 	using AppAttribute = ibase::IApplicationInfo::ApplicationAttribute;
-	using AppInfoMember = istd::TSharedNullable<QString> ApplicationInfo::V1_0::*;
+	using AppInfoMember = istd::TSharedNullable<QString> ApplicationInfo::*;
 
 	const QHash<AppAttribute, QPair<QByteArray, AppInfoMember>> attributeHash = {
-		{ AppAttribute::AA_APPLICATION_ID,	 { QByteArrayLiteral("ApplicationInfo/ApplicationId"),	 &ApplicationInfo::V1_0::applicationId	 } },
-		{ AppAttribute::AA_APPLICATION_NAME, { QByteArrayLiteral("ApplicationInfo/ApplicationName"), &ApplicationInfo::V1_0::applicationName } },
-		{ AppAttribute::AA_APPLICATION_TYPE, { QByteArrayLiteral("ApplicationInfo/ApplicationType"), &ApplicationInfo::V1_0::applicationType } },
-		{ AppAttribute::AA_COMPANY_NAME,	 { QByteArrayLiteral("ApplicationInfo/CompanyName"),	 &ApplicationInfo::V1_0::companyName	 } },
-		{ AppAttribute::AA_PRODUCT_NAME,	 { QByteArrayLiteral("ApplicationInfo/ProductName"),	 &ApplicationInfo::V1_0::productName	 } },
+		{ AppAttribute::AA_APPLICATION_ID,	 { QByteArrayLiteral("ApplicationInfo/ApplicationId"),	 &ApplicationInfo::applicationId	 } },
+		{ AppAttribute::AA_APPLICATION_NAME, { QByteArrayLiteral("ApplicationInfo/ApplicationName"), &ApplicationInfo::applicationName } },
+		{ AppAttribute::AA_APPLICATION_TYPE, { QByteArrayLiteral("ApplicationInfo/ApplicationType"), &ApplicationInfo::applicationType } },
+		{ AppAttribute::AA_COMPANY_NAME,	 { QByteArrayLiteral("ApplicationInfo/CompanyName"),	 &ApplicationInfo::companyName	 } },
+		{ AppAttribute::AA_PRODUCT_NAME,	 { QByteArrayLiteral("ApplicationInfo/ProductName"),	 &ApplicationInfo::productName	 } },
 	};
 
 	for (auto it = attributeHash.constBegin(); it != attributeHash.constEnd(); ++it) {
@@ -80,7 +79,7 @@ CApplicationInfoControllerComp::ApplicationInfo CApplicationInfoControllerComp::
 		applicationInfo.logoIconName = logoIconNameParamPtr->GetText();
 	}
 
-	return retVal;
+	return applicationInfo;
 }
 
 

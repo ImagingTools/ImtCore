@@ -271,11 +271,7 @@ bool CComplexCollectionFilterRepresentationController::GetFieldFilterFromSdlRepr
 	bool retVal = true;
 
 	if (const auto *fieldFilterSdl = std::get_if<Filter::CFieldFilter>(&u)){
-		if (!fieldFilterSdl->Version_1_0.HasValue()){
-			return false;
-		}
-
-		Filter::CFieldFilter representation = *fieldFilterSdl->Version_1_0;
+		Filter::CFieldFilter representation = *fieldFilterSdl;
 		fieldFilter.fieldId = *representation.fieldId;
 
 		QString value;
@@ -311,11 +307,7 @@ bool CComplexCollectionFilterRepresentationController::GetFieldFilterFromSdlRepr
 		}
 	}
 	else if (const auto* arrayFilterSdl = std::get_if<Filter::CArrayFieldFilter>(&u)){
-		if (!arrayFilterSdl->Version_1_0.HasValue()){
-			return false;
-		}
-
-		Filter::CArrayFieldFilter representation = *arrayFilterSdl->Version_1_0;
+		Filter::CArrayFieldFilter representation = *arrayFilterSdl;
 		fieldFilter.fieldId = *representation.fieldId;
 
 		if (!representation.filterValueType.HasValue()){
@@ -367,9 +359,7 @@ bool CComplexCollectionFilterRepresentationController::GetSdlRepresentationFromF
 	int typeId = fieldFilter.filterValue.typeId();
 
 	if (typeId == QMetaType::QVariantList){ // Array
-		Filter::CArrayFieldFilter arrayFilter;
-		arrayFilter.Version_1_0.Emplace();
-		Filter::CArrayFieldFilter representation = *arrayFilter.Version_1_0;
+		Filter::CArrayFieldFilter representation;
 
 		representation.fieldId = fieldFilter.fieldId;
 
@@ -393,12 +383,10 @@ bool CComplexCollectionFilterRepresentationController::GetSdlRepresentationFromF
 		representation.filterOperations.Emplace();
 		MapFieldOperationToSdlOperations(fieldFilter.filterOperation, *representation.filterOperations);
 
-		u = std::move(arrayFilter);
+		u = std::move(representation);
 	}
 	else{
-		Filter::CFieldFilter scalarFilter;
-		scalarFilter.Version_1_0.Emplace();
-		Filter::CFieldFilter representation = *scalarFilter.Version_1_0;
+		Filter::CFieldFilter representation;
 
 		representation.fieldId = fieldFilter.fieldId;
 
@@ -423,7 +411,7 @@ bool CComplexCollectionFilterRepresentationController::GetSdlRepresentationFromF
 		representation.filterOperations.Emplace();
 		MapFieldOperationToSdlOperations(fieldFilter.filterOperation, *representation.filterOperations);
 
-		u = std::move(scalarFilter);
+		u = std::move(representation);
 	}
 
 	return true;

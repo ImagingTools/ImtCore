@@ -871,25 +871,14 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 		}
 	}
 
-	if (hasEnums || hasDocumentTypes || hasRequests){
-		// re-create stream after processors wrote to the file
-		QTextStream endStream(fwdFilePtr.get());
 
-		// end namespace
-		endStream << '}';
-		endStream << QStringLiteral(" // namespace ");
-		endStream << sdlNamespace;
-		FeedStream(endStream, 1, false);
-	}
-	else{
-		FeedStream(fwdStream, 1, false);
 
-		// end namespace
-		fwdStream << '}';
-		fwdStream << QStringLiteral(" // namespace ");
-		fwdStream << sdlNamespace;
-		FeedStream(fwdStream, 1, false);
-	}
+	// end namespace
+	fwdStream << '}';
+	fwdStream << QStringLiteral(" // namespace ");
+	fwdStream << sdlNamespace;
+	FeedStream(fwdStream, 1, false);
+	fwdStream.flush();
 
 	return true;
 }
