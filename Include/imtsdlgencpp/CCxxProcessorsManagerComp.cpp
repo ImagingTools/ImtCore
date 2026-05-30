@@ -201,10 +201,11 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 		imtsdl::CSdlType dummyType;
 		FilePtr sourceFilePtr = GetFilePtrForEntry(dummyType, sourceFiles);
 		Q_ASSERT(sourceFilePtr);
+		FilePtr headerFilePtr = GetFilePtrForEntry(dummyType, headerFiles);
 		for (int i = 0; i < processorsCount; ++i){
 			ICxxFileProcessor* processorPtr = m_autoProcessorCompListPtr[i];
 			Q_ASSERT(processorPtr != nullptr);
-			const bool ok = processorPtr->ProcessEntry(dummyType, nullptr, sourceFilePtr.get(), paramsPtr);
+			const bool ok = processorPtr->ProcessEntry(dummyType, headerFilePtr.get(), sourceFilePtr.get(), paramsPtr);
 			if (!ok){
 				SendErrorMessage(0, "Processing failed");
 

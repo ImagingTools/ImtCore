@@ -43,7 +43,7 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessEntry(
 	}
 
 	bool retVal = true;
-	if (headerDevicePtr != nullptr){
+	if (headerDevicePtr != nullptr && sourceDevicePtr == nullptr){
 		retVal = retVal && ProcessHeaderClassFile(sdlEntry, headerDevicePtr);
 	}
 	if (sourceDevicePtr != nullptr){
