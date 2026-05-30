@@ -103,6 +103,10 @@ sdl::imtauth::Sessions::CGetSessionPayload CGqlJwtSessionControllerComp::OnGetSe
 	}
 
 	imtauth::ISessionSharedPtr sessionInfoPtr = m_jwtSessionControllerCompPtr->GetSession(sessionId);
+	if (!sessionInfoPtr.IsValid()){
+		SendErrorMessage(0, QString("Unable to get session '%1'. Error: Session not found").arg(qPrintable(sessionId)));
+		return response;
+	}
 
 	istd::TDelPtr<iser::CMemoryWriteArchive> archivePtr;
 	if (m_versionInfoCompPtr.IsValid()){
