@@ -58,12 +58,19 @@ class QProperty {
     get(){
         if(!this.completed){
             this.update()
-        }   
+        }
         return this.value
     }
 
     getStatement(name){
-        return this.get().getStatement(name)
+        let val = this.get()
+        if(val && typeof val.getStatement === 'function'){
+            return val.getStatement(name)
+        }
+        // Fallback for non-complex values (e.g. icon.source on a plain QVariant)
+        if(!this.$sub) this.$sub = {}
+        if(!this.$sub[name]) this.$sub[name] = new QVar()
+        return this.$sub[name]
     }
 
     set(newValue){
@@ -783,7 +790,7 @@ class QAnchorLine {
 class QFont extends ComplexObject {
     static defaultProperties = {
         bold: { type: QBool, value: false, changed: 'mainChanged' },
-        family: { type: QString, value: 'Verdana', changed: 'mainChanged' },
+        family: { type: QString, value: 'Segoe UI', changed: 'mainChanged' },
         italic: { type: QBool, value: false, changed: 'mainChanged' },
         underline: { type: QBool, value: false, changed: 'mainChanged' },
         pointSize: { type: QReal, value: 12/0.75, changed: 'mainChanged' },
@@ -813,6 +820,40 @@ class QFont extends ComplexObject {
         if(this.$properties.pointSize) this.$properties.pointSize.update()
         if(this.$properties.pixelSize) this.$properties.pixelSize.update()
 
+    }
+}
+
+class QIcon extends ComplexObject {
+    static defaultProperties = {
+        source: { type: QString, value: '', changed: 'mainChanged' },
+        name: { type: QString, value: '', changed: 'mainChanged' },
+        color: { type: QColor, value: 'transparent', changed: 'mainChanged' },
+        width: { type: QReal, value: 0, changed: 'mainChanged' },
+        height: { type: QReal, value: 0, changed: 'mainChanged' },
+        cache: { type: QBool, value: true, changed: 'mainChanged' },
+    }
+
+    mainChanged(){
+        this.getNotify()()
+    }
+
+    getNotify(){
+        if(!this.notify) this.notify = new QSignal()
+        return this.notify
+    }
+
+    updateOnce(){
+        if(!this.completed) this.update()
+    }
+
+    update(){
+        this.completed = true
+        if(this.$properties.source) this.$properties.source.update()
+        if(this.$properties.name) this.$properties.name.update()
+        if(this.$properties.color) this.$properties.color.update()
+        if(this.$properties.width) this.$properties.width.update()
+        if(this.$properties.height) this.$properties.height.update()
+        if(this.$properties.cache) this.$properties.cache.update()
     }
 }
 
@@ -1394,6 +1435,7 @@ module.exports.QSourceSize = QSourceSize
 module.exports.QKeyNavigation = QKeyNavigation
 module.exports.MapGestureArea = MapGestureArea
 module.exports.QDrag = QDrag
+module.exports.QIcon = QIcon
 
 
 module.exports.QVariant = QVariant

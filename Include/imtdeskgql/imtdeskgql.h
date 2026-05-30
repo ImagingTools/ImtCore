@@ -7,7 +7,7 @@
 #include <iprm/IIdParam.h>
 
 // Generated includes
-#include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/TicketCollectionDocumentManager.h>
+#include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/TicketCollectionDocumentService.h>
 
 
 /**
@@ -28,7 +28,7 @@
 
 	- \b CTicketCollectionControllerComp — handles TicketsList / TicketItem queries,
 	  TicketCreate and TicketUpdate mutations
-	- \b CTicketCollectionDocumentManagerComp — handles GetTicketRepresentation query,
+	- \b CTicketCollectionDocumentServiceComp — handles GetTicketRepresentation query,
 	  UpdateTicketFromRepresentation mutation for the document editor
 
 	\section imtdeskgql_related Related Modules

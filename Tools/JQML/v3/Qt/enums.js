@@ -524,7 +524,31 @@ module.exports = {
     Horizontal: 0,
     Vertical: 1,
 
+    AlignLeft: 0x0001,
+    AlignHCenter: 0x0004,
+    AlignRight: 0x0002,
+    AlignJustify: 0x0008,
+    AlignTop: 0x0020,
+    AlignVCenter: 0x0080,
+    AlignBottom: 0x0040,
+    AlignCenter: 0x0004 | 0x0080,
+    AlignBaseline: 0x0100,
+
     platform: {
         os: 'web',
+    },
+
+    Easing: {
+        Linear: 0,
+        InQuad: 1, OutQuad: 2, InOutQuad: 3, OutInQuad: 4,
+        InCubic: 5, OutCubic: 6, InOutCubic: 7, OutInCubic: 8,
+        InQuart: 9, OutQuart: 10, InOutQuart: 11, OutInQuart: 12,
+        InQuint: 13, OutQuint: 14, InOutQuint: 15, OutInQuint: 16,
+        InSine: 17, OutSine: 18, InOutSine: 19, OutInSine: 20,
+        InExpo: 21, OutExpo: 22, InOutExpo: 23, OutInExpo: 24,
+        InCirc: 25, OutCirc: 26, InOutCirc: 27, OutInCirc: 28,
+        InElastic: 29, OutElastic: 30, InOutElastic: 31, OutInElastic: 32,
+        InBack: 33, OutBack: 34, InOutBack: 35, OutInBack: 36,
+        InBounce: 37, OutBounce: 38, InOutBounce: 39, OutInBounce: 40,
     },
 }

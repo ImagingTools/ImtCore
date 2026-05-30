@@ -163,7 +163,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ObserverQml" PackageId="ImtQmlPck" ComponentId="ObserverQml">
+        <Element Id="ObserverQml" PackageId="ImtServerAppPck" ComponentId="ObserverQml">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="">

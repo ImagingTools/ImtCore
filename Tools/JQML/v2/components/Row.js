@@ -8,6 +8,11 @@ class Row extends Item {
     static defaultProperties = {
         spacing: { type: QReal, value: 0, changed: '$spacingChanged' },
         layoutDirection: { type: QInt, value: Row.LeftToRight, changed: '$layoutDirectionChanged' },
+        padding: { type: QReal, value: 0, changed: '$paddingChanged' },
+        leftPadding: { type: QReal, value: 0, changed: '$paddingChanged' },
+        rightPadding: { type: QReal, value: 0, changed: '$paddingChanged' },
+        topPadding: { type: QReal, value: 0, changed: '$paddingChanged' },
+        bottomPadding: { type: QReal, value: 0, changed: '$paddingChanged' },
     }
 
     constructor(parent,exCtx,exModel){
@@ -20,6 +25,12 @@ class Row extends Item {
         let children = this.getProperty('children').get()
         let w = 0
         let h = 0
+
+        let pLeft = this.$properties.leftPadding ? this.getPropertyValue('leftPadding') : this.getPropertyValue('padding')
+        let pRight = this.$properties.rightPadding ? this.getPropertyValue('rightPadding') : this.getPropertyValue('padding')
+        let pTop = this.$properties.topPadding ? this.getPropertyValue('topPadding') : this.getPropertyValue('padding')
+        let pBottom = this.$properties.bottomPadding ? this.getPropertyValue('bottomPadding') : this.getPropertyValue('padding')
+
         for(let i = 0; i < children.length; i++){
             if(children[i].getPropertyValue('visible')){
                 if(children[i] instanceof Repeater) continue
@@ -55,8 +66,15 @@ class Row extends Item {
             }
         }
 
-        this.getProperty('width').setAuto(w)
-        this.getProperty('height').setAuto(h)
+        this.setStyle({
+            paddingLeft: pLeft+'px',
+            paddingRight: pRight+'px',
+            paddingTop: pTop+'px',
+            paddingBottom: pBottom+'px',
+        })
+
+        this.getProperty('implicitWidth').set(w + pLeft + pRight)
+        this.getProperty('implicitHeight').set(h + pTop + pBottom)
     }
 
     addChild(child){
@@ -75,6 +93,10 @@ class Row extends Item {
     }
 
     $spacingChanged(){
+        this.updateGeometry()
+    }
+
+    $paddingChanged(){
         this.updateGeometry()
     }
 

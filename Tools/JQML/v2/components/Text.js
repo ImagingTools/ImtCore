@@ -60,7 +60,7 @@ class Text extends Item {
             whiteSpace: 'pre',
             lineHeight: 'normal',
             fontSize: '12px',
-            fontFamily: 'Verdana',
+            fontFamily: 'Segoe UI',
         })
 
         this.impl = document.createElement('span')
@@ -81,8 +81,8 @@ class Text extends Item {
             minHeight: 0,
             height: 0,
         })
-        this.getProperty('width').setAuto(this.impl.scrollWidth)
-        this.getProperty('height').setAuto(this.impl.scrollHeight)
+        this.getProperty('implicitWidth').set(this.impl.scrollWidth)
+        this.getProperty('implicitHeight').set(this.impl.scrollHeight)
 
         this.getProperty('contentWidth').reset(this.impl.scrollWidth)
         this.getProperty('contentHeight').reset(this.impl.scrollHeight)
@@ -107,8 +107,8 @@ class Text extends Item {
             this.impl.innerText = this.getPropertyValue('text').replaceAll('<br>', '\r')
         }
 
-        this.getProperty('width').setAuto(textMetrics.width)
-        this.getProperty('height').setAuto(textMetrics.height)
+        this.getProperty('implicitWidth').set(textMetrics.width)
+        this.getProperty('implicitHeight').set(textMetrics.height)
 
         this.getProperty('contentWidth').reset(textMetrics.width)
         this.getProperty('contentHeight').reset(textMetrics.height)
@@ -118,6 +118,11 @@ class Text extends Item {
 
     $lineHeightChanged(){
 
+    }
+
+    $paddingChanged(){
+        super.$paddingChanged()
+        this.applyMetrics()
     }
 
     $widthChanged(){
@@ -166,7 +171,7 @@ class Text extends Item {
         if(this.getPropertyValue('elide') === Text.ElideRight){
             this.setStyle({
                 textOverflow: 'ellipsis',
-                overflow: 'hidden',
+                overflow: 'auto',
             })
         } else {
             this.setStyle({

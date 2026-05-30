@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6379" Description="ACF"/>
-            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6397" Description="ACF"/>
+            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -37,17 +37,14 @@
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="CollectionDocumentManager" Type="Reference" ExportId="">
+                    <AttributeInfo Id="AuthenticationManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SimpleGqlContextCreator"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CollectionDocumentService" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ContactInfoDocCollectionManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ContactInfoCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Repositories/ContactsCollection"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DatabaseEngine"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="FeatureContainer" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ProductInfo"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -67,9 +64,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ImtCoreLocalization"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -117,6 +111,11 @@
                         <Data IsEnabled="true" Value="ControlsGallerySettings/TracingConfiguration"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="GqlContext" PackageId="ImtGqlPck" ComponentId="GqlContext">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="HttpServerFramework" PackageId="ImtHttpServerVoce" ComponentId="HttpServerFramework">
@@ -206,6 +205,21 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="SimpleGqlContextCreator" PackageId="ImtServerGqlPck" ComponentId="SimpleGqlContextCreator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="GqlContextFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="GqlContext"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="Subscribers" PackageId="" ComponentId="Subscribers">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -227,6 +241,9 @@
         <Element Id="WebSocketServerFramework" PackageId="ImtHttpServerVoce" ComponentId="WebSocketServerFramework">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AuthenticationManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SimpleGqlContextCreator"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="GqlSubscriberControllers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -264,16 +281,16 @@
         <EmbeddedRegistry Id="ContactInfoDocCollectionManager">
             <Data Description="" Keywords="">
                 <ElementsList>
-                    <Element Id="CollectionDocumentManager" PackageId="ImtDocPck" ComponentId="CollectionDocumentManager">
+                    <Element Id="CollectionDocumentService" PackageId="ImtDocPck" ComponentId="CollectionDocumentService">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="Collection" Type="Reference" ExportId="ContactInfoCollection">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="DocumentManagerEventHandler" Type="Reference[]" ExportId="">
+                                <AttributeInfo Id="DocumentServiceEventHandler" Type="Reference[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>CollectionDocumentManagerPublisher</Value>
+                                            <Value>CollectionDocumentServicePublisher</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -303,11 +320,11 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
-                    <Element Id="CollectionDocumentManagerController" PackageId="ImtServerGqlPck" ComponentId="CollectionDocumentManagerController">
+                    <Element Id="CollectionDocumentServiceController" PackageId="ImtServerGqlPck" ComponentId="CollectionDocumentServiceController">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
-                                <AttributeInfo Id="CollectionDocumentManager" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="CollectionDocumentManager"/>
+                                <AttributeInfo Id="CollectionDocumentService" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="CollectionDocumentService"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="ContactInfos"/>
@@ -318,7 +335,7 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
-                    <Element Id="CollectionDocumentManagerPublisher" PackageId="ImtServerGqlPck" ComponentId="CollectionDocumentManagerPublisher">
+                    <Element Id="CollectionDocumentServicePublisher" PackageId="ImtServerGqlPck" ComponentId="CollectionDocumentServicePublisher">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
@@ -349,9 +366,9 @@
                 </ElementsList>
                 <EmbeddedRegistriesList/>
                 <ExportedInterfaces>
-                    <Interface InterfaceId="imtdoc::IDocumentManager" ComponentId="CollectionDocumentManager"/>
-                    <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="CollectionDocumentManagerController"/>
-                    <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="CollectionDocumentManagerPublisher"/>
+                    <Interface InterfaceId="imtdoc::IDocumentService" ComponentId="CollectionDocumentService"/>
+                    <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="CollectionDocumentServiceController"/>
+                    <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="CollectionDocumentServicePublisher"/>
                 </ExportedInterfaces>
                 <ExportedComponents/>
             </Data>

@@ -1177,7 +1177,7 @@ StyleComponents {
 					radius: width;
 					border.color: Style.borderColor;
 					border.width: 1;
-					color: Style.grayColor;
+					color: Style.baseColor
 
 					Rectangle{
 						id: selectCircle

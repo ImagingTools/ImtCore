@@ -30,6 +30,7 @@ public:
 		I_ASSIGN(m_documentContentColumnIdAttrPtr, "DocumentContentColumnId", "ID of the column in the table containing document content", true, "Document");
 		I_ASSIGN(m_metaInfoTableNameAttrPtr, "MetaInfoTableName", "Name of the meta-info table", true, "");
 		I_ASSIGN(m_revisionsTableNameAttrPtr, "RevisionsTableName", "Name of the table contained document revisions", true, "");
+		I_ASSIGN(m_maxLengthRevisionCommentAttrPtr, "MaxLengthRevisionComment", "Maximum length of the revision comment when saving document", true, 1000);
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
@@ -133,6 +134,7 @@ protected:
 	I_ATTR(QByteArray, m_documentContentColumnIdAttrPtr);
 	I_ATTR(QByteArray, m_metaInfoTableNameAttrPtr);
 	I_ATTR(QByteArray, m_revisionsTableNameAttrPtr);
+	I_ATTR(int, m_maxLengthRevisionCommentAttrPtr);
 };
 
 

@@ -33,6 +33,10 @@ bool CLdapCredentialControllerComp::CheckCredential(const QByteArray& login, con
 		username = data[1];
 	}
 
+	if (login.contains("@")){
+		domain.clear();
+	}
+
 	HANDLE  hUser;
 	result = LogonUser(qUtf16Printable(username), qUtf16Printable(domain), qUtf16Printable(password), LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT, &hUser);
 

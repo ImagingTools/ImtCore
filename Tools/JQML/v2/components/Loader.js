@@ -8,6 +8,7 @@ class Loader extends Item {
     static Error = 3
 
     static defaultProperties = {
+        active: { type: QBool, value: true, changed: '$activeChanged' },
         status: { type: QReal, value: Loader.Null },
         progress: { type: QReal, value: 0 },
         asynchronous: { type: QBool, value: false },
@@ -40,7 +41,23 @@ class Loader extends Item {
         if(this.$signals['Component.completed']) this.$signals['Component.completed']()
     }
 
+    $activeChanged(){
+        if(this.getPropertyValue('active')){
+            if(this.getPropertyValue('sourceComponent')){
+                this.$sourceComponentChanged()
+            } else if(this.getPropertyValue('source')){
+                this.$sourceChanged()
+            }
+        } else {
+            if(this.getPropertyValue('item') && this.getPropertyValue('item') !== this) this.getPropertyValue('item').destroy()
+            this.getStatement('item').reset(undefined)
+            this.getStatement('status').reset(Loader.Null)
+        }
+    }
+
     $sourceComponentChanged(){
+        if(!this.getPropertyValue('active')) return
+
         // if(this.$widthAuto && this.getProperty('width').compute) this.$widthAuto = false
         // if(this.$heightAuto && this.getProperty('height').compute) this.$heightAuto = false
         // if(!this.$completed) {
@@ -66,15 +83,15 @@ class Loader extends Item {
             // })
             if(item instanceof Item){
                 item.getProperty('width').getNotify().connect(()=>{
-                    this.getProperty('width').setAuto(item.getPropertyValue('width'))
+                    this.getProperty('implicitWidth').set(item.getPropertyValue('width'))
                 })
                 item.getProperty('height').getNotify().connect(()=>{
-                    this.getProperty('height').setAuto(item.getPropertyValue('height'))
+                    this.getProperty('implicitHeight').set(item.getPropertyValue('height'))
                 })
                 // this.getProperty('x').setAuto(item.getPropertyValue('x'))
                 // this.getProperty('y').setAuto(item.getPropertyValue('y'))
-                this.getProperty('width').setAuto(item.getPropertyValue('width'))
-                this.getProperty('height').setAuto(item.getPropertyValue('height'))
+                this.getProperty('implicitWidth').set(item.getPropertyValue('width'))
+                this.getProperty('implicitHeight').set(item.getPropertyValue('height'))
             }
             
 
@@ -140,6 +157,8 @@ class Loader extends Item {
     }
 
     $sourceChanged(){
+        if(!this.getPropertyValue('active')) return
+
         // if(!this.$completed) {
         //     this.$lazy = this.getProperty('source').getNotify()
         //     return
@@ -184,17 +203,17 @@ class Loader extends Item {
             // })
             if(item instanceof Item){
                 item.getProperty('width').getNotify().connect(()=>{
-                    this.getProperty('width').setAuto(item.getPropertyValue('width'))
+                    this.getProperty('implicitWidth').set(item.getPropertyValue('width'))
                 })
                 item.getProperty('height').getNotify().connect(()=>{
-                    this.getProperty('height').setAuto(item.getPropertyValue('height'))
+                    this.getProperty('implicitHeight').set(item.getPropertyValue('height'))
                 })
             }
             
             // this.getProperty('x').setAuto(item.getPropertyValue('x'))
             // this.getProperty('y').setAuto(item.getPropertyValue('y'))
-            this.getProperty('width').setAuto(item.getPropertyValue('width'))
-            this.getProperty('height').setAuto(item.getPropertyValue('height'))
+            this.getProperty('implicitWidth').set(item.getPropertyValue('width'))
+            this.getProperty('implicitHeight').set(item.getPropertyValue('height'))
             
 
             // while(updateList.length){

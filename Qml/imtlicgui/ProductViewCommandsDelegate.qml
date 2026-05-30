@@ -17,13 +17,12 @@ ViewCommandsDelegateBase {
     Connections {
         id: tableConnections;
 
-        function onSelectedIndexChanged(){
-            let selectedIndex = container.view.tableView.selectedIndex;
+        function onSelectionChanged(){
+            let idx = container.view.tableView.currentIndex;
 
             let isEnabled = false;
-            if (selectedIndex != null){
-                let level = selectedIndex.depth;
-                if (level === 0){
+            if (idx != null){
+                if (idx.level === 0){
                     isEnabled = true;
                 }
             }
@@ -48,14 +47,13 @@ ViewCommandsDelegateBase {
             ModalDialogManager.openDialog(featuresDialogComp, {"excludeFeatureIds": featureIds, "featuresModel": container.view.allFeaturesModel});
         }
         else if (commandId === "Remove"){
-            let selectedIndex = container.view.tableView.selectedIndex;
-            if (selectedIndex !== null){
-                let index = selectedIndex.index;
-
-                let featureId = container.view.tableView.rowModel.getData("id", index);
-                container.view.removeFeature(featureId);
-
-                container.view.updateFeaturesGui();
+            let selectedIndex = container.view.tableView.currentIndex;
+            if (selectedIndex !== null && selectedIndex.data){
+                let featureId = selectedIndex.data["id"] || "";
+                if (featureId !== "") {
+                    container.view.removeFeature(featureId);
+                    container.view.updateFeaturesGui();
+                }
             }
         }
     }

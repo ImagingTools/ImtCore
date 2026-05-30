@@ -13,7 +13,7 @@ ControlBase {
     property int checkState: checked ? Qt.Checked : Qt.Unchecked;
     property bool checked: false;
 
-	property int checkSize: Style.controlHeightS;
+	property int checkSize: Style.buttonWidthSmall;
     property int fontPixelSize: Style.fontSizeM;
     property bool fontBold: false;
 

@@ -5,14 +5,17 @@ import imtgui 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0
 import imtbaseImtCollectionSdl 1.0
-import imtbaseCollectionDocumentManagerSdl 1.0
+import imtbaseCollectionDocumentServiceSdl 1.0
 
 Item {
 	id: workspaceView
 
 	property bool showStandardLoading: true
 	property CollectionView collectionView: null
-	property DocumentManagerBase documentManager
+	property DocumentServiceBase documentManager
+	property string collectionTabId: ""
+
+	property bool tabVisible: true
 
 	signal startLoading(string documentId)
 	signal stopLoading(string documentId)
@@ -26,7 +29,7 @@ Item {
 
 	onDocumentManagerChanged: {
 		if (documentManager){
-			documentManager.setDocumentManagerActiveView(workspaceView)
+			documentManager.setDocumentServiceActiveView(workspaceView)
 		}
 	}
 
@@ -76,6 +79,31 @@ Item {
 
 	function setCurrentTabIndex(index){
 		tabView.currentIndex = index
+	}
+
+
+	function onTryCloseDirtyDocument(documentId, callback){
+		if (!workspaceView.documentManager.documentIsDirty(documentId)){
+			callback(false)
+			return
+		}
+
+		let dialogCallback = function(result){
+			if (result === Enums.yes){
+				callback(true)
+			}
+			else if (result === Enums.no){
+				callback(false)
+			}
+			else{
+				callback(undefined)
+			}
+		}
+
+		ModalDialogManager.showConfirmationDialog(
+					qsTr("Save document"),
+					qsTr("Save all changes ?"),
+					dialogCallback)
 	}
 
 	Component {
@@ -148,7 +176,9 @@ Item {
 
 		function onOpenedDocumentListReceiveFailed(message){
 			globalLoading.stop()
-			ModalDialogManager.showErrorDialog(message)
+			if(message !==""){
+				ModalDialogManager.showErrorDialog(message)
+			}
 		}
 
 		function onDocumentGuiUpdated(documentId, representation){
@@ -170,13 +200,15 @@ Item {
 		}
 
 		function onUpdateRepresentationFailed(documentId, message){
-			ModalDialogManager.showErrorDialog(message)
+			if(message !==""){
+				ModalDialogManager.showErrorDialog(message)
+			}
 			if (!workspaceView.documentManager.documentIsLoading(documentId)){
 				workspaceView.stopLoading(documentId)
 			}
 		}
 
-		function onDocumentManagerChanged(typeOperation, objectId, documentId, documentName){
+		function onDocumentServiceChanged(typeOperation, objectId, documentId, documentName){
 			if (typeOperation === EDocumentOperationEnum.s_documentClosed){
 				tabView.removeTab(documentId)
 			}
@@ -221,7 +253,9 @@ Item {
 
 		function onOpenDocumentFailed(documentId, message){
 			workspaceView.stopLoading(documentId)
-			ModalDialogManager.showErrorDialog(message)
+			if(message !==""){
+				ModalDialogManager.showErrorDialog(message)
+			}
 		}
 
 		// Close document signals
@@ -236,7 +270,9 @@ Item {
 
 		function onCloseDocumentFailed(documentId, message){
 			workspaceView.stopLoading(documentId)
-			ModalDialogManager.showErrorDialog(message)
+			if(message !==""){
+				ModalDialogManager.showErrorDialog(message)
+			}
 			onDocumentClosed(documentId)
 		}
 
@@ -251,7 +287,9 @@ Item {
 
 		function onSaveDocumentFailed(documentId, message){
 			workspaceView.stopLoading(documentId)
-			ModalDialogManager.showErrorDialog(message)
+			if(message !==""){
+				ModalDialogManager.showErrorDialog(message)
+			}
 		}
 
 		// Create document signals
@@ -259,7 +297,9 @@ Item {
 		}
 
 		function onCreateDocumentFailed(documentTypeId, message){
-			ModalDialogManager.showErrorDialog(message)
+			if(message !==""){
+				ModalDialogManager.showErrorDialog(message)
+			}
 		}
 
 		function onDocumentCreated(documentId, documentTypeId){
@@ -281,7 +321,9 @@ Item {
 
 		function onUndoInfoReceiveFailed(documentId, message){
 			workspaceView.stopLoading(documentId)
-			ModalDialogManager.showErrorDialog(message)
+			if(message !==""){
+				ModalDialogManager.showErrorDialog(message)
+			}
 		}
 
 		// Undo signals
@@ -295,7 +337,9 @@ Item {
 
 		function onUndoFailed(documentId, message){
 			workspaceView.stopLoading(documentId)
-			ModalDialogManager.showErrorDialog(message)
+			if(message !==""){
+				ModalDialogManager.showErrorDialog(message)
+			}
 		}
 
 		// Redo signals
@@ -309,36 +353,20 @@ Item {
 
 		function onRedoFailed(documentId, message){
 			workspaceView.stopLoading(documentId)
-			ModalDialogManager.showErrorDialog(message)
+			if(message !==""){
+				ModalDialogManager.showErrorDialog(message)
+			}
 		}
 
 		function onTryCloseDirtyDocument(documentId, callback){
-			if (!workspaceView.documentManager.documentIsDirty(documentId)){
-				callback(false)
-				return
-			}
-
-			let dialogCallback = function(result){
-				if (result === Enums.yes){
-					callback(true)
-				}
-				else if (result === Enums.no){
-					callback(false)
-				}
-				else{
-					callback(undefined)
-				}
-			}
-
-			ModalDialogManager.showConfirmationDialog(
-						qsTr("Save document"),
-						qsTr("Save all changes ?"),
-						dialogCallback)
+			workspaceView.onTryCloseDirtyDocument(documentId, callback)
 		}
 	}
 
 	function setCollectionViewComp(name, collectionViewComp){
-		tabView.addTab(UuidGenerator.generateUUID(), name, collectionViewComp, false)
+		let tabId = UuidGenerator.generateUUID()
+		workspaceView.collectionTabId = tabId
+		tabView.addTab(tabId, name, collectionViewComp, "", "", false, true)
 		tabView.currentIndex = 0
 	}
 
@@ -354,8 +382,8 @@ Item {
 			itemWidth: Style.sizeHintXXS
 			onFinished: {
 				if (commandId === "Close"){
-					if (tabView.currentIndex > 0){
-						let tabId = tabView.getTabIdByIndex(tabView.currentIndex)
+					let tabId = tabView.getTabIdByIndex(tabView.currentIndex)
+					if (tabId !== workspaceView.collectionTabId){
 						workspaceView.documentManager.closeDocument(tabId)
 					}
 				}
@@ -515,9 +543,10 @@ Item {
 		id: tabView
 		anchors.fill: parent
 		closable: true
+		tabVisible: workspaceView.tabVisible
 
 		onTabLoaded: {
-			if (index === 0){
+			if (tabId === workspaceView.collectionTabId){
 				workspaceView.collectionView = tabItem
 			}
 			else{
@@ -528,9 +557,12 @@ Item {
 		}
 
 		onTabClicked: {
-			if (mouse.button === Qt.RightButton && index != 0){
-				var point = tabItem.mapToItem(this, 0, 0)
-				ModalDialogManager.openDialog(popupMenuDialog, {"x": point.x + Style.sizeHintXXS, "y": point.y, "model": tabContextMenuModel})
+			if (mouse.button === Qt.RightButton){
+				let clickedTabId = tabView.getTabIdByIndex(index)
+				if (clickedTabId !== workspaceView.collectionTabId){
+					var point = tabItem.mapToItem(this, 0, 0)
+					ModalDialogManager.openDialog(popupMenuDialog, {"x": point.x + Style.sizeHintXXS, "y": point.y, "model": tabContextMenuModel})
+				}
 			}
 		}
 

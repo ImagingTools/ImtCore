@@ -8,7 +8,9 @@
 
 // ImtCore includes
 #include <imtauth/ITenantInfo.h>
+#include <imtauth/ITenantInvitation.h>
 #include <imtauth/imtauth.h>
+#include <imtgql/IGqlContext.h>
 
 
 namespace imtauthgql
@@ -84,6 +86,33 @@ bool CTenantCollectionControllerComp::CreateRepresentationFromObject(
 		representationObject.membersCount = activeMembersCount;
 	}
 
+	if (requestInfo.items.isTenantRelationScopeRequested){
+		QVariant scope = objectCollectionIterator.GetElementInfo("TenantRelationScope");
+		if (scope.isValid() && !scope.isNull()){
+			representationObject.tenantRelationScope = scope.toString();
+		}
+	}
+
+	if ((requestInfo.items.isInvitationIdRequested || requestInfo.items.isInvitedByNameRequested)
+		&& representationObject.tenantRelationScope == "Invited"
+		&& m_invitationManagerCompPtr.IsValid()){
+		const imtgql::IGqlContext* gqlContextPtr = getTenantListRequest.GetRequestContext();
+		if (gqlContextPtr != nullptr){
+			QByteArray userId = gqlContextPtr->GetUserId();
+			if (!userId.isEmpty()){
+				imtauth::ITenantInvitationUniquePtr invitationPtr = m_invitationManagerCompPtr->FindPendingInvitation(userId, objectId);
+				if (invitationPtr.IsValid()){
+					if (requestInfo.items.isInvitationIdRequested){
+						representationObject.invitationId = invitationPtr->GetInvitationId();
+					}
+					if (requestInfo.items.isInvitedByNameRequested && m_userCollectionCompPtr.IsValid()){
+						representationObject.invitedByName = imtauth::GetUserName(*m_userCollectionCompPtr, invitationPtr->GetInvitedByUserId());
+					}
+				}
+			}
+		}
+	}
+
 	return true;
 }
 
@@ -108,7 +137,7 @@ void CTenantCollectionControllerComp::SetAdditionalFilters(
 	}
 
 	if (userInfoPtr->IsAdmin()){
-		return;
+		// return;
 	}
 
 	QByteArray userId = gqlContextPtr->GetUserId();

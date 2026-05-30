@@ -150,11 +150,10 @@ QtObject {
 	}
 	
 	function getRepresentationModel(){
-		return paramsSet
+		return null
 	}
 	
 	function updateModel(){
-		getSettingsQuery.send()
 	}
 	
 	function saveLocalModel(){
@@ -162,7 +161,6 @@ QtObject {
 	}
 	
 	function saveServerModel(){
-		setSettingsQuery.send()
 	}
 	
 	function setDesignSchema(schema){
@@ -205,8 +203,6 @@ QtObject {
 		
 		if (container.serverModel){
 			container.cacheServerModel();
-			
-			preferenceSaveQuery.save();
 		}
 		else{
 			container.localSettingsSaved();
@@ -255,8 +251,6 @@ QtObject {
 		
 		if (container.serverModel){
 			container.cacheServerModel();
-			
-			preferenceSaveQuery.save();
 		}
 		else{
 			container.localSettingsSaved();

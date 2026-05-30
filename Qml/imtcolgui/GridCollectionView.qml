@@ -19,7 +19,7 @@ Item {
 	property alias baseGridCollectionView: gridCollectionViewBase;
 
 	property string itemName;
-	property bool isUsedDocumentManager: true;
+	property bool isUsedDocumentService: true;
 	property bool visibleMetaInfo: true;
 	property bool hasMetaInfo: true;
 
@@ -117,7 +117,7 @@ Item {
 		let editorPath = gridCollectionViewBase.commands.objectViewEditorPath;
 		let commandsId = gridCollectionViewBase.commands.objectViewEditorCommandsId;
 
-		if (gridCollectionViewContainer.isUsedDocumentManager){
+		if (gridCollectionViewContainer.isUsedDocumentService){
 			documentManagerPtr.insertNewDocument(commandsId);
 		}
 		else{

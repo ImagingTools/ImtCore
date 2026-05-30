@@ -4647,27 +4647,27 @@
     </message>
 </context>
 <context>
-    <name>DocumentManager</name>
+    <name>DocumentService</name>
     <message>
-        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Document/DocumentManager.qml" line="+352"/>
-        <location filename="../../../Qml/imtdocgui/DocumentManager.qml" line="+836"/>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Document/DocumentService.qml" line="+352"/>
+        <location filename="../../../Qml/imtdocgui/DocumentService.qml" line="+836"/>
         <source>Save document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
-        <location filename="../../../Qml/imtdocgui/DocumentManager.qml" line="+2"/>
+        <location filename="../../../Qml/imtdocgui/DocumentService.qml" line="+2"/>
         <source>Save all changes ?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../../../Qml/imtdocgui/DocumentManager.qml" line="+3"/>
+        <location filename="../../../Qml/imtdocgui/DocumentService.qml" line="+3"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../Qml/imtdocgui/DocumentManager.qml" line="-832"/>
+        <location filename="../../../Qml/imtdocgui/DocumentService.qml" line="-832"/>
         <source>&lt;no name&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5395,7 +5395,7 @@
     </message>
     <message>
         <location line="+25"/>
-        <location filename="../../../Include/imtclientgql/CGqlObjectCollectionDelegateComp.cpp" line="+581"/>
+        <location filename="../../../Include/imtserverapp/CGqlObjectCollectionDelegateComp.cpp" line="+581"/>
         <location filename="../../../Include/imtgql/CSerializableObjectCollectionControllerComp.cpp" line="+33"/>
         <location line="+26"/>
         <location line="+155"/>
@@ -5479,7 +5479,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../Include/imtbase/CSystemStatusComp.cpp" line="+184"/>
+        <location filename="../../../Include/imtserverapp/CSystemStatusComp.cpp" line="+184"/>
         <source>The %1 server cannot be connected at %2.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5514,7 +5514,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../Include/imtclientgql/CGqlObjectCollectionDelegateComp.cpp" line="-7"/>
+        <location filename="../../../Include/imtserverapp/CGqlObjectCollectionDelegateComp.cpp" line="-7"/>
         <location filename="../../../Include/imtgql/CSerializableObjectCollectionControllerComp.cpp" line="-159"/>
         <location line="+26"/>
         <source>Object data metainfo is not Serializable</source>
@@ -7331,7 +7331,7 @@ Errors: 0</source>
 <context>
     <name>imtbase::CSystemStatusComp</name>
     <message>
-        <location filename="../../../Include/imtbase/CSystemStatusComp.cpp" line="-140"/>
+        <location filename="../../../Include/imtserverapp/CSystemStatusComp.cpp" line="-140"/>
         <location line="+64"/>
         <source>Try connect to: &apos;%1&apos; ...</source>
         <translation type="unfinished"></translation>

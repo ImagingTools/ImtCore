@@ -1,6 +1,6 @@
 import QtQuick 2.12
 import imtgui 1.0
-import imtbaseCollectionDocumentManagerSdl 1.0
+import imtbaseCollectionDocumentServiceSdl 1.0
 
 QtObject {
 	id: root
@@ -29,7 +29,14 @@ QtObject {
 			representationController.updateRepresentationFailed.connect(onUpdateRepresentationFailed)
 
 			if (updateRepresentation){
-				representationController.updateRepresentationFromDocument()
+				if (view.visible){
+					representationController.updateRepresentationFromDocument()
+				}
+				else{
+					if (!_internal.requestUpdateViews.includes(view)){
+						_internal.requestUpdateViews.push(view)
+					}
+				}
 			}
 		}
 	}

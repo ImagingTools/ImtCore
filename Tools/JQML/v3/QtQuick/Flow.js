@@ -1,10 +1,15 @@
 const Item = require("./Item")
 const Repeater = require("./Repeater")
+const Int = require("../QtQml/Int")
 const Real = require("../QtQml/Real")
 const Geometry = require("../QtQml/Geometry")
 const Signal = require("../QtQml/Signal")
+const QtEnums = require("../Qt/enums")
 
 class Flow extends Item {
+    static LeftToRight = 0
+    static TopToBottom = 1
+
     static meta = Object.assign({}, Item.meta, {
         spacing: {type: Real, value:0, },
         padding: {type: Real, value:0, },
@@ -12,6 +17,8 @@ class Flow extends Item {
         topPadding: {type: Real, value:0, },
         rightPadding: {type: Real, value:0, },
         bottomPadding: {type: Real, value:0, },
+        flow: {type: Int, value:Flow.LeftToRight },
+        layoutDirection: {type: Int, value:QtEnums.LeftToRight },
         
         spacingChanged: {type:Signal, args:[]},
         paddingChanged: {type:Signal, args:[]},
@@ -19,6 +26,8 @@ class Flow extends Item {
         topPaddingChanged: {type:Signal, args:[]},
         rightPaddingChanged: {type:Signal, args:[]},
         bottomPaddingChanged: {type:Signal, args:[]},
+        flowChanged: {type:Signal, args:[]},
+        layoutDirectionChanged: {type:Signal, args:[]},
 
         positioningComplete: {type:Signal, args:[]},
     })
@@ -53,10 +62,31 @@ class Flow extends Item {
         JQApplication.updateLater(this)
     }
 
+    SLOT_flowChanged(oldValue, newValue){
+        this.__updateFlow()
+    }
+
+    SLOT_layoutDirectionChanged(oldValue, newValue){
+        this.__updateFlow()
+    }
+
     SLOT_spacingChanged(oldValue, newValue){
-        this.__setDOMStyle({
-            gap: this.spacing + 'px'
-        })
+        this.__updateFlow()
+    }
+
+    __updateFlow(){
+        if(this.flow === Flow.LeftToRight){
+            this.__setDOMStyle({
+                flexDirection: this.layoutDirection === QtEnums.LeftToRight ? 'row' : 'row-reverse',
+                columnGap: this.spacing + 'px'
+            })
+        } else {
+            this.__setDOMStyle({
+                flexDirection: this.layoutDirection === QtEnums.RightToLeft ? 'column' : 'column-reverse',
+                rowGap: this.spacing + 'px'
+            })
+        }
+
         JQApplication.updateLater(this)
     }
 
@@ -95,6 +125,18 @@ class Flow extends Item {
     __endUpdate(){
         this.__updateGeometry()
         super.__endUpdate()
+    }
+
+    __removeChild(child){
+        super.__removeChild(child)
+
+        JQApplication.updateLater(this)
+    }
+
+    __addChild(child){
+        super.__addChild(child)
+
+        JQApplication.updateLater(this)
     }
 
     forceLayout(){

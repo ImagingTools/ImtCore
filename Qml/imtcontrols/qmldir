@@ -108,6 +108,7 @@ SearchTextInput 1.0 ./Inputs/SearchTextInput.qml
 
 singleton UuidGenerator 1.0 Models/UuidGenerator.qml
 singleton NavigationController 1.0 Models/NavigationController.qml
+singleton TreeModelBuilder 1.0 ./Models/TreeModelBuilder.qml
 ModelIndex 1.0 Models/ModelIndex.qml
 SortController 1.0 Models/SortController.qml
 StateMachine 1.0 Models/StateMachine.qml
@@ -158,6 +159,7 @@ TreeViewCommandsDelegateBase 1.0 ./Views/TreeViewCommandsDelegateBase.qml
 TreeViewItemDelegateBase 1.0 ./Views/TreeViewItemDelegateBase.qml
 
 TreeItemDelegate 1.0 ./Views/TreeItemDelegate.qml
+TreeViewColumn 1.0 ./Views/TreeViewColumn.qml
 TreeViewGql 1.0 ./Views/TreeViewGql.qml
 TreeViewSelection 1.0 ./Views/TreeViewSelection.qml
 
@@ -245,3 +247,20 @@ ImageParams 1.0 ./GraphicsView/ImageParams.qml
 ComplexShape 1.0 ./GraphicsView/ComplexShape.qml
 SelectionShape 1.0 ./GraphicsView/SelectionShape.qml
 BoundingBox 1.0 ./GraphicsView/BoundingBox.qml
+
+
+# -------------------------------------------------------------------------
+# Popup / Menu infrastructure (Stage 1 + Stage 2). Lives parallel to the
+# pre-existing PopupDecorator / ModalDialogManager / MenuButton stack.
+# -------------------------------------------------------------------------
+Popup 1.0 ./Popup/Popup.qml
+Overlay 1.0 ./Popup/Overlay.qml
+PopupAnchors 1.0 ./Popup/PopupAnchors.qml
+
+ActionGroup 1.0 ./Actions/ActionGroup.qml
+
+Menu 1.0 ./Menu/Menu.qml
+MenuItem 1.0 ./Menu/MenuItem.qml
+MenuSeparator 1.0 ./Menu/MenuSeparator.qml
+MenuBar 1.0 ./Menu/MenuBar.qml
+MenuBarItem 1.0 ./Menu/MenuBarItem.qml

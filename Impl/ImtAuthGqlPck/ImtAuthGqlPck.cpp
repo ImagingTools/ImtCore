@@ -211,14 +211,29 @@ I_EXPORT_COMPONENT(
 			"Tenant Meta Info Delegate");
 
 I_EXPORT_COMPONENT(
-			TenantCollectionDocumentManager,
+			TenantCollectionDocumentService,
 			"Tenant collection document manager",
 			"Tenant Collection Document Manager");
+
+I_EXPORT_COMPONENT(
+			TenantCollectionDocumentServiceController,
+			"Tenant collection document service controller with tenant access checks",
+			"Tenant Collection Document Service Controller");
+
+I_EXPORT_COMPONENT(
+			TenantExclusionParamsSetJoiner,
+			"Params set joiner that applies tenant filter in Exclude mode",
+			"Tenant Exclusion Params Set Joiner");
 
 I_EXPORT_COMPONENT(
 			RemoteTenantController,
 			"Remote tenant controller",
 			"Remote Tenant Controller");
+
+I_EXPORT_COMPONENT(
+			RemoteTenantMembershipManagerController,
+			"Remote tenant membership manager controller",
+			"Remote Tenant Membership Manager Controller");
 
 I_EXPORT_COMPONENT(
 			RemoteProfileController,
@@ -242,9 +257,29 @@ I_EXPORT_COMPONENT(
 			"Tenant Membership Manager Controller");
 
 I_EXPORT_COMPONENT(
-			TenantMembershipPublisher,
-			"Publisher for tenant membership invitation/response notifications via WebSocket",
-			"Tenant Membership Publisher");
+			TenantNotificationPublisher,
+			"Publisher for tenant notifications (invitations, membership changes, ownership transfers) via WebSocket",
+			"Tenant Notification Publisher");
+
+I_EXPORT_COMPONENT(
+			RemoteTenantCollectionDocumentService,
+			"Remote tenant collection document service with product permissions enrichment",
+			"Remote Tenant Collection Document Service");
+
+I_EXPORT_COMPONENT(
+			RoleCollectionDocumentService,
+			"Role collection document service: GetRoleRepresentation / UpdateRoleFromRepresentation",
+			"Role Collection Document Service");
+
+I_EXPORT_COMPONENT(
+			GroupCollectionDocumentService,
+			"Group collection document service: GetGroupRepresentation / UpdateGroupFromRepresentation",
+			"Group Collection Document Service");
+
+I_EXPORT_COMPONENT(
+			UserCollectionDocumentService,
+			"User collection document service: GetUserRepresentation / UpdateUserFromRepresentation",
+			"User Collection Document Service");
 
 
 } // namespace ImtAuthGqlPck

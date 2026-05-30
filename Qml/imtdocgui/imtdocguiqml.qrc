@@ -2,13 +2,13 @@
     <qresource prefix="/qml">
         <file alias="imtdocgui/qmldir">qmldir</file>
         <file alias="imtdocgui/DocumentWorkspaceCommandsDelegate.qml">DocumentWorkspaceCommandsDelegate.qml</file>
-        <file alias="imtdocgui/MainDocumentManager.qml">MainDocumentManager.qml</file>
+        <file alias="imtdocgui/MainDocumentService.qml">MainDocumentService.qml</file>
         <file alias="imtdocgui/MultiDocWorkspacePageView.qml">MultiDocWorkspacePageView.qml</file>
         <file alias="imtdocgui/MultiDocWorkspaceView.qml">MultiDocWorkspaceView.qml</file>
         <file alias="imtdocgui/SingleDocumentWorkspaceView.qml">SingleDocumentWorkspaceView.qml</file>
         <file alias="imtdocgui/SearchPageSingleDocumentView.qml">SearchPageSingleDocumentView.qml</file>
         <file alias="imtdocgui/UndoRedoManager.qml">UndoRedoManager.qml</file>
-        <file alias="imtdocgui/DocumentManager.qml">DocumentManager.qml</file>
+        <file alias="imtdocgui/DocumentService.qml">DocumentService.qml</file>
         <file alias="imtdocgui/DocumentHistoryDialog.qml">DocumentHistoryDialog.qml</file>
         <file alias="imtdocgui/DocumentHistoryView.qml">DocumentHistoryView.qml</file>
         <file alias="imtdocgui/DocumentDataController.qml">DocumentDataController.qml</file>
@@ -19,13 +19,16 @@
         <file alias="imtdocgui/DocumentHistoryPanel.qml">DocumentHistoryPanel.qml</file>
         <file alias="imtdocgui/DocumentView.qml">DocumentView.qml</file>
         <file alias="imtdocgui/DocumentViewBase.qml">DocumentViewBase.qml</file>
-	<file alias="imtdocgui/DocumentManagerBase.qml">DocumentManagerBase.qml</file>
+	<file alias="imtdocgui/DocumentServiceBase.qml">DocumentServiceBase.qml</file>
 	<file alias="imtdocgui/MultiDocumentCollectionView.qml">MultiDocumentCollectionView.qml</file>
 	<file alias="imtdocgui/SingleDocumentCollectionView.qml">SingleDocumentCollectionView.qml</file>
 	<file alias="imtdocgui/DocumentDecorator.qml">DocumentDecorator.qml</file>
 	<file alias="imtdocgui/DocCollectionViewDelegate.qml">DocCollectionViewDelegate.qml</file>
 	<file alias="imtdocgui/DocumentRepresentationController.qml">DocumentRepresentationController.qml</file>
 	<file alias="imtdocgui/DocumentRevisionDialog.qml">DocumentRevisionDialog.qml</file>
+	<file alias="imtdocgui/SingleDocumentTypeRegistrar.qml">SingleDocumentTypeRegistrar.qml</file>
+	<file alias="imtdocgui/SingleDocumentWorkspaceContentView.qml">SingleDocumentWorkspaceContentView.qml</file>
+	<file alias="imtdocgui/SingleDocumentWorkspaceShellView.qml">SingleDocumentWorkspaceShellView.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

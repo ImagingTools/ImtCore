@@ -9,6 +9,7 @@ Item {
     property bool initialItemTitleVisible: true
 
     signal closeClicked()
+    signal headerItemClicked(int index, string headerId)
 
     ListModel {
         id: headersModel
@@ -88,7 +89,6 @@ Item {
 		anchors.verticalCenter: parent.verticalCenter
         anchors.top: parent.top;
         anchors.left: buttonPanel.right;
-        anchors.leftMargin: Style.marginM;
 		anchors.right: parent.right;
 		height: visible ? Style.controlHeightL : 0;
 		orientation: ListView.Horizontal;
@@ -104,7 +104,7 @@ Item {
 				id: spacer;
 				anchors.left: parent.left;
 				width: visible ? Style.marginM : 0;
-				visible: model.index === 1 && !root.initialItemTitleVisible ? false : true;
+					visible: model.index === 0 ? false : (model.index === 1 && !root.initialItemTitleVisible ? false : true);
 			}
 
 			Row {
@@ -128,14 +128,22 @@ Item {
 					anchors.verticalCenter: content.verticalCenter;
 					font.pixelSize: Style.fontSizeXXL;
 					font.family: Style.fontFamily;
-					color: Style.titleColor;
+					font.underline: model.index < headersModel.count - 1 && headerItemMA.containsMouse
+					color: model.index < headersModel.count - 1 && headerItemMA.containsMouse ? Style.linkColor : Style.titleColor;
 					text: model.name;
 				}
 			}
 
 			MouseArea {
+				id: headerItemMA
 				anchors.fill: parent;
-				onClicked: {}
+				hoverEnabled: true
+				cursorShape: model.index < headersModel.count - 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
+				onClicked: {
+					if (model.index < headersModel.count - 1) {
+						root.headerItemClicked(model.index, headersModel.get(model.index).id)
+					}
+				}
 			}
 		}
 	}

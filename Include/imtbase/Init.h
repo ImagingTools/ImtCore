@@ -61,7 +61,7 @@ public:
 		Q_INIT_RESOURCE(imtappApplicationSdl);
 		Q_INIT_RESOURCE(imtcolorLabSdl);
 		Q_INIT_RESOURCE(imtcolorRgbColorHexSdl);
-		Q_INIT_RESOURCE(imtbaseCollectionDocumentManagerSdl);
+		Q_INIT_RESOURCE(imtbaseCollectionDocumentServiceSdl);
 		Q_INIT_RESOURCE(imtbaseUndoManagerSdl);
 		Q_INIT_RESOURCE(imtbaseDocumentIdFilterSdl);
 		Q_INIT_RESOURCE(imtbaseProgressManagerSdl);
@@ -72,7 +72,10 @@ public:
 		Q_INIT_RESOURCE(imtbaseFilterableSelectSdl);
 		Q_INIT_RESOURCE(imtauthTenantsSdl);
 		Q_INIT_RESOURCE(imtauthTenantMembershipsSdl);
-		Q_INIT_RESOURCE(imtauthTenantCollectionDocumentManagerSdl);
+		Q_INIT_RESOURCE(imtauthTenantCollectionDocumentServiceSdl);
+		Q_INIT_RESOURCE(imtauthRoleCollectionDocumentServiceSdl);
+		Q_INIT_RESOURCE(imtauthGroupCollectionDocumentServiceSdl);
+		Q_INIT_RESOURCE(imtauthUserCollectionDocumentServiceSdl);
 	}
 
 	static void InitQml()

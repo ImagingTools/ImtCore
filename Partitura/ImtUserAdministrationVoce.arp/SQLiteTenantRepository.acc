@@ -80,6 +80,15 @@
         <Element Id="TenantDatabaseDelegate" PackageId="ImtAuthDbPck" ComponentId="TenantDatabaseDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AutoCreatePermissionsTable" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AutoCreateTable" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CreatePermissionsTableScriptPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value=":/SQL/SQLite/CreateTenantPermissionsTable.sql"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CreateTableScriptPath" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value=":/SQL/SQLite/CreateTenantsTable.sql"/>
                     </AttributeInfo>
@@ -91,6 +100,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectTypes" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Types"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PermissionsTableName" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="TenantPermissions"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TableName" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Tenants"/>

@@ -28,10 +28,18 @@ class Binding extends QtObject {
         whenChanged: {type:Signal, args:[]},
     })
 
-    __complete(){
-        super.__complete()
-        this.__update()
+    static create(parent = null, properties = {}){
+        let obj = super.create(parent, properties)
+
+        obj.__getValue = ()=>{return obj.value}
+
+        return obj
     }
+
+    // __complete(){
+    //     super.__complete()
+    //     this.__update()
+    // }
 
     SLOT_delayedChanged(oldValue, newValue){
         this.__update()
@@ -70,7 +78,7 @@ class Binding extends QtObject {
                 obj = obj[name]
             }
 
-            obj[propName] = this.value
+            obj[propName] = this.__getValue
         }
     }
 }

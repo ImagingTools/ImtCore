@@ -31,16 +31,16 @@ istd::IChangeableUniquePtr CTenantMembershipDbDelegateComp::CreateObjectFromReco
 	}
 
 	if (record.contains("Id")){
-		membershipPtr->SetMembershipId(record.value("Id").toByteArray());
+		membershipPtr->SetMembershipId(imtdb::VariantToByteArray(record.value("Id")));
 	}
 	if (record.contains("UserId")){
-		membershipPtr->SetUserId(record.value("UserId").toByteArray());
+		membershipPtr->SetUserId(imtdb::VariantToByteArray(record.value("UserId")));
 	}
 	if (record.contains("TenantId")){
-		membershipPtr->SetTenantId(record.value("TenantId").toByteArray());
+		membershipPtr->SetTenantId(imtdb::VariantToByteArray(record.value("TenantId")));
 	}
 	if (record.contains("Role")){
-		membershipPtr->SetRole(static_cast<imtauth::ITenantMembership::TenantMemberRole>(record.value("Role").toInt()));
+		membershipPtr->SetRoleId(record.value("Role").toByteArray());
 	}
 	if (record.contains("IsActive")){
 		membershipPtr->SetActive(record.value("IsActive").toBool());
@@ -82,18 +82,18 @@ CTenantMembershipDbDelegateComp::NewObjectQuery CTenantMembershipDbDelegateComp:
 
 	QString userId = membershipPtr != nullptr ? imtdb::EscapeSql(QString::fromUtf8(membershipPtr->GetUserId())) : QString();
 	QString tenantId = membershipPtr != nullptr ? imtdb::EscapeSql(QString::fromUtf8(membershipPtr->GetTenantId())) : QString();
-	int role = membershipPtr != nullptr ? static_cast<int>(membershipPtr->GetRole()) : static_cast<int>(imtauth::ITenantMembership::TMR_MEMBER);
+	QString roleId = membershipPtr != nullptr ? imtdb::EscapeSql(QString::fromUtf8(membershipPtr->GetRoleId())) : QString();
 	bool isActive = membershipPtr != nullptr ? membershipPtr->IsActive() : true;
 	QString now = imtdb::UtcNow();
 
 	result.query = QString(
 		"INSERT INTO \"%1\" (\"Id\", \"UserId\", \"TenantId\", \"Role\", \"IsActive\", \"JoinedAt\", \"UpdatedAt\") "
-		"VALUES ('%2', '%3', '%4', %5, %6, '%7', '%8');")
+		"VALUES ('%2', '%3', '%4', '%5', %6, '%7', '%8');")
 		.arg(*m_tableNameAttrPtr,
 			 id,
 			 userId,
 			 tenantId,
-			 QString::number(role),
+			 roleId,
 			 isActive ? "true" : "false",
 			 now,
 			 now).toUtf8();
@@ -119,12 +119,12 @@ QByteArray CTenantMembershipDbDelegateComp::CreateUpdateObjectQuery(
 
 	return QString(
 		"UPDATE \"%1\" SET "
-		"\"Role\"=%2, "
+		"\"Role\"='%2', "
 		"\"IsActive\"=%3, "
 		"\"UpdatedAt\"='%4' "
 		"WHERE \"Id\"='%5';")
 		.arg(*m_tableNameAttrPtr,
-			 QString::number(static_cast<int>(membershipPtr->GetRole())),
+			 imtdb::EscapeSql(QString::fromUtf8(membershipPtr->GetRoleId())),
 			 membershipPtr->IsActive() ? "true" : "false",
 			 now,
 			 escapedId).toUtf8();

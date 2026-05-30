@@ -183,6 +183,7 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 
 	if(NOT DEFINED USE_QTDB OR USE_QTDB)
 		add_subdirectory("${INCLUDE_DIR}/imtdb/CMake" "${AUX_INCLUDE_DIR}/imtdb")
+		add_dependencies(imtserverapp imtdb)
 		add_subdirectory("${INCLUDE_DIR}/imtdbgui/CMake" "${AUX_INCLUDE_DIR}/imtdbgui")
 		add_subdirectory("${INCLUDE_DIR}/imtlicdb/CMake" "${AUX_INCLUDE_DIR}/imtlicdb")
 		add_subdirectory("${INCLUDE_DIR}/imtdbgql/CMake" "${AUX_INCLUDE_DIR}/imtdbgql")
@@ -314,8 +315,10 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 		add_subdirectory("${IMPL_DIR}/ImtColPck/CMake" "${AUX_INCLUDE_DIR}/ImtColPck")
 		add_dependencies(ImtColPck imtcol)
 
-		add_subdirectory("${IMPL_DIR}/ImtServerAppPck/CMake" "${AUX_INCLUDE_DIR}/ImtServerAppPck")
-		add_dependencies(ImtServerAppPck imtserverapp)
+		if(NOT DEFINED USE_QTDB OR USE_QTDB)
+			add_subdirectory("${IMPL_DIR}/ImtServerAppPck/CMake" "${AUX_INCLUDE_DIR}/ImtServerAppPck")
+			add_dependencies(ImtServerAppPck imtserverapp imtdb)
+		endif()
 
 		add_subdirectory("${IMPL_DIR}/ImtHypePck/CMake" "${AUX_INCLUDE_DIR}/ImtHypePck")
 		add_dependencies(ImtHypePck imthype)
@@ -323,14 +326,14 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 		add_subdirectory("${IMPL_DIR}/ImtHypeGuiPck/CMake" "${AUX_INCLUDE_DIR}/ImtHypeGuiPck")
 		add_dependencies(ImtHypeGuiPck imthypegui imthype)
 
-		if(NOT DEFINED USE_GEO OR USE_GEO)
+		if((NOT DEFINED USE_GEO OR USE_GEO) AND (NOT DEFINED USE_QTDB OR USE_QTDB))
 			add_subdirectory("${IMPL_DIR}/ImtGeoPck/CMake" "${AUX_INCLUDE_DIR}/ImtGeoPck")
-			add_dependencies(ImtGeoPck imtgeo)
+			add_dependencies(ImtGeoPck imtgeo imtdb)
 		endif()
 
-		if(DEFINED USE_MONGODB AND USE_MONGODB)
+		if((DEFINED USE_MONGODB AND USE_MONGODB) AND (NOT DEFINED USE_QTDB OR USE_QTDB))
 			add_subdirectory("${IMPL_DIR}/ImtMongoPck/CMake" "${AUX_INCLUDE_DIR}/ImtMongoPck")
-			add_dependencies(ImtMongoPck imtmongo)
+			add_dependencies(ImtMongoPck imtmongo imtdb)
 		endif()
 
 		if(NOT DEFINED USE_EJ OR USE_EJ)
@@ -349,7 +352,7 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 			add_dependencies(ImtLicenseDbPck imtbase imtdb imtlicdb)
 
 			add_subdirectory("${IMPL_DIR}/ImtLicenseGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtLicenseGqlPck")
-			add_dependencies(ImtLicenseGuiPck imtbase imtlic imtlicgql imtdb)
+			add_dependencies(ImtLicenseGqlPck imtbase imtlic imtlicgql imtdb)
 
 			add_subdirectory("${IMPL_DIR}/ImtDatabaseGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtDatabaseGqlPck")
 			add_dependencies(ImtDatabaseGqlPck imtdbgql)
@@ -387,9 +390,10 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 		endif()
 
 		if(NOT DEFINED USE_QTQML OR USE_QTQML)
-			add_subdirectory("${IMPL_DIR}/ImtQmlPck/CMake" "${AUX_INCLUDE_DIR}/ImtQmlPck")
-			add_dependencies(ImtQmlPck imtqml)
 			if(NOT DEFINED USE_QTDB OR USE_QTDB)
+				add_subdirectory("${IMPL_DIR}/ImtQmlPck/CMake" "${AUX_INCLUDE_DIR}/ImtQmlPck")
+				add_dependencies(ImtQmlPck imtqml imtdb)
+
 				add_subdirectory("${IMPL_DIR}/ImtAuthGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthGqlPck")
 				add_dependencies(ImtAuthGqlPck imtauthgql imtdb)
 
@@ -437,8 +441,8 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 	add_subdirectory("${TESTS_DIR}/PersonalAccessTokenTest/CMake" "${AUX_INCLUDE_DIR}/PersonalAccessTokenTest")
 	add_dependencies(PersonalAccessTokenTest imtbase imtauth)
 
-	add_subdirectory("${TESTS_DIR}/CollectionDocumentManagerTest/CMake" "${AUX_INCLUDE_DIR}/CollectionDocumentManagerTest")
-	add_dependencies(CollectionDocumentManagerTest imtbase imtdoc)
+	add_subdirectory("${TESTS_DIR}/CollectionDocumentServiceTest/CMake" "${AUX_INCLUDE_DIR}/CollectionDocumentServiceTest")
+	add_dependencies(CollectionDocumentServiceTest imtbase imtdoc)
 
 	file(COPY ${TESTS_DIR}/Migrations DESTINATION ${TESTS_DIR}/../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
 

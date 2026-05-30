@@ -89,13 +89,13 @@ class ListView extends Flickable {
     }
 
     itemAtIndex(index) {
-        return index >= 0 && index < this.__items.length.get() ? this.__items[index] : undefined
+        return index >= 0 && index < this.__items.length ? this.__items[index] : undefined
     }
     positionViewAtBeginning() {
         this.positionViewAtIndex(0, ListView.Beginning)
     }
     positionViewAtEnd() {
-        this.positionViewAtIndex(this.__items.length.get() - 1, ListView.Beginning)
+        this.positionViewAtIndex(this.__items.length - 1, ListView.Beginning)
 
 
     }
@@ -143,7 +143,7 @@ class ListView extends Flickable {
             newVlaue.__addViewListener(this)
         }
 
-        this.__initView(this.__completed)
+        this.__initView(true)
     }
 
     SLOT_delegateChanged() {
@@ -298,6 +298,7 @@ class ListView extends Flickable {
     }
 
     __createItem(index, itemInfo) {
+        if(JQApplication.isQuitting) return null
         let properties = {}
 
         if (Array.isArray(this.model)) {
@@ -414,7 +415,6 @@ class ListView extends Flickable {
             if (Array.isArray(this.model)) {
                 length = this.model.length
             } else if (typeof this.model === 'object') {
-                if(this.model.count === this.count) return
                 length = this.model.count
             } else if (typeof this.model === 'number') {
                 length = this.model
@@ -452,6 +452,9 @@ class ListView extends Flickable {
 
     __updateChangedSet(changeSet) {
         this.__changeSet.push(changeSet)
+        if (this.model && typeof this.model === 'object') {
+            this.count = this.model.count
+        }
     }
 
     __updateView() {

@@ -36,6 +36,9 @@ public:
 
 	CLdapUserCollectionControllerComp();
 
+	static QByteArray GetSidForUser(const QByteArray& username);
+	static QString GetEmailForUser(const QByteArray& username);
+
 protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;

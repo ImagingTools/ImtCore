@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6390" Description="ACF"/>
-            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6397" Description="ACF"/>
+            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -21,17 +21,17 @@
         <Element ComponentName="RolesDataController" X="975" Y="325" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
+        <EmbededRegistry Id="RoleCommands">
+            <PositionMap>
+                <Element ComponentName="StandardDocumentCommandsController" X="575" Y="200" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
         <EmbededRegistry Id="RolesCommands">
             <PositionMap>
                 <Element ComponentName="CollectionCommands" X="550" Y="425" Note=""/>
                 <Element ComponentName="CollectionCommandsController" X="575" Y="125" Note=""/>
                 <Element ComponentName="Revision" X="950" Y="125" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
-        <EmbededRegistry Id="RoleCommands">
-            <PositionMap>
-                <Element ComponentName="StandardDocumentCommandsController" X="575" Y="200" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

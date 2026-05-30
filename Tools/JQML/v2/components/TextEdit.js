@@ -52,7 +52,7 @@ class TextEdit extends Item {
 
         this.setStyle({
             fontSize: '12px',
-            fontFamily: 'Verdana',
+            fontFamily: 'Segoe UI',
             pointerEvents: 'auto',
             touchAction: 'auto',
         })
@@ -238,7 +238,7 @@ class TextEdit extends Item {
         this.setStyle({
             fontWeight: this.getProperty('font').getPropertyValue('bold') ? 'bold' : 'normal',
             fontSize: `${this.getProperty('font').getPropertyValue('pixelSize')}px`,
-            fontFamily: `'${this.getProperty('font').getPropertyValue('family')}'`,
+            fontFamily: `${this.getProperty('font').getPropertyValue('family')}`,
         })
         
         this.applyMetrics()
@@ -294,8 +294,8 @@ class TextEdit extends Item {
             let textMetrics = TextFontController.measureText(this.getPropertyValue('text'), this.getProperty('font'), this.getProperty('width').auto ? 0 : this.getProperty('width').get(), this.getPropertyValue('wrapMode'))
             
             this.impl.innerHTML = this.getPropertyValue('text').replaceAll('\n', '<br>') + '.'
-            this.getProperty('width').setAuto(textMetrics.width)
-            this.getProperty('height').setAuto(textMetrics.height)
+            this.getProperty('implicitWidth').set(textMetrics.width)
+            this.getProperty('implicitHeight').set(textMetrics.height)
 
             this.getProperty('contentWidth').reset(textMetrics.width)
             this.getProperty('contentHeight').reset(textMetrics.height)
@@ -313,8 +313,8 @@ class TextEdit extends Item {
             minHeight: 0,
             height: 0,
         })
-        this.getProperty('width').setAuto(this.impl.scrollWidth)
-        this.getProperty('height').setAuto(Math.max(this.impl.scrollHeight, this.getProperty('font').getProperty('pixelSize').get()))
+        this.getProperty('implicitWidth').set(this.impl.scrollWidth)
+        this.getProperty('implicitHeight').set(Math.max(this.impl.scrollHeight, this.getProperty('font').getProperty('pixelSize').get()))
         
         this.getProperty('contentWidth').reset(this.impl.scrollWidth)
         this.getProperty('contentHeight').reset(Math.max(this.impl.scrollHeight, this.getProperty('font').getProperty('pixelSize').get()))

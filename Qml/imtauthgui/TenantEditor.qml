@@ -4,553 +4,280 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
+import imtcolgui 1.0
 import imtdocgui 1.0
-import imtguigql 1.0
+import imtauthgui 1.0
 import imtauthTenantsSdl 1.0
-import imtauthTenantMembershipsSdl 1.0
 
+/**
+ * TenantEditor
+ *
+ * Thin orchestrator that composes:
+ *   - TenantEditorStateManager  — local UI state + pure logic
+ *   - an injected `apiClient` (abstract TenantManagementApiClient) — transport
+ *   - the page components (General / Members / Roles / Groups / Permissions)
+ *
+ * The editor itself does NOT depend on any concrete transport (no GQL/SDL transport
+ * imports). The concrete client (e.g. GqlBasedTenantManagementApiClient from
+ * imtauthgui) is supplied by the embedding view (e.g. TenantCollectionView).
+ *
+ * SDL imports here are limited to imtauthTenantsSdl (TenantData type of the model).
+ */
 DocumentViewBase {
 	id: container
 
 	anchors.fill: parent
 	contentColor: Style.baseColor
 
+	// GitHub-like typography applied locally within TenantEditor scope
+	// font.family: "Segoe UI, Helvetica, Arial, sans-serif"
+
 	property TenantData tenantData: model
-	property var pendingMembers: []
-	property var pendingInvitations: []
-	property bool isNewTenant: tenantData ? (!tenantData.m_id || tenantData.m_id === "") : true
-	readonly property real memberRoleNameWidthRatio: 0.55
-	readonly property real memberRoleComboWidthRatio: 0.45
-	readonly property int memberRoleHorizontalMargin: Style.marginL
-	readonly property int totalMemberRoleHorizontalMargin: memberRoleHorizontalMargin * 2
-	readonly property int memberRoleRowMargin: Style.marginS
-	readonly property int totalMemberRoleRowMargin: memberRoleRowMargin * 2
-	// Guard: set when members are modified locally, prevents updateGui from overwriting
-	property bool __membersModifiedLocally: false
 
-	onPendingMembersChanged: {
-		memberRolesRepeater.model = __buildMemberRolesModel()
+	/**
+	 * Injected transport implementing the TenantManagementApiClient contract.
+	 * Must be set by the embedding view before the editor becomes active.
+	 */
+	property var apiClient: null
+
+	/**
+	 * Exposed so that TenantCollectionView can bind commandsPanelVisible: isNewTenant.
+	 * After save, m_id is populated → isNewTenant becomes false → panel hides.
+	 */
+	readonly property bool isNewTenant: stateManager_.isNewTenant
+
+	// --- Composition root ---
+	TenantEditorStateManager {
+		id: stateManager_
+		tenantData: container.tenantData
+		apiClient: container.apiClient
 	}
 
-	function updateGui(){
-		__loadMembersFromModel();
-		__loadInvitationsFromModel();
-		generalGroup.updateGui();
+	function updateGui() {
+		stateManager_.loadMembersFromModel()
+		stateManager_.loadInvitationsFromModel()
+		var generalPage = multiPageView.getPageByIndex(0)
+		if (generalPage)
+			generalPage.doUpdateGui()
+		var permissionsPage = multiPageView.getPageById("Permissions")
+		if (permissionsPage)
+			permissionsPage.doUpdateGui()
 	}
 
-	function updateModel(){
-		generalGroup.updateModel();
-		// Sync members and memberRoles back to model
+	function updateModel() {
+		var generalPage = multiPageView.getPageByIndex(0)
+		if (generalPage)
+			generalPage.doUpdateModel()
 		if (container.tenantData) {
-			if (!container.tenantData.hasMembers()) {
-				container.tenantData.emplaceMembers()
-			}
-			container.tenantData.m_members.clear()
-			var pendingMembers = container.pendingMembers
-			for (var memberIndex = 0; memberIndex < pendingMembers.length; memberIndex++) {
-				var memberEntry = container.tenantData.createMembersArrayElement()
-				if (memberEntry) {
-					memberEntry.m_id = pendingMembers[memberIndex].id
-					memberEntry.m_name = pendingMembers[memberIndex].name || pendingMembers[memberIndex].id
-					container.tenantData.m_members.addElement(memberEntry)
-				}
-			}
+			stateManager_.syncMembersToModel()
+			var permissionsPage = multiPageView.getPageById("Permissions")
+			if (permissionsPage)
+				permissionsPage.doUpdateModel()
+		}
+	}
 
-			// memberRoles: structured SDL list — use emplace/create/addElement API
-			if (!container.tenantData.hasMemberRoles()) {
-				container.tenantData.emplaceMemberRoles()
-			}
-			container.tenantData.m_memberRoles.clear()
-			var members = container.pendingMembers
-			for (var i = 0; i < members.length; i++) {
-				var entry = container.tenantData.createMemberRolesArrayElement()
-				if (entry) {
-					entry.m_userId = members[i].id
-					entry.m_role = container.__memberRolesMap[members[i].id] || container.defaultRole
-					container.tenantData.m_memberRoles.addElement(entry)
+	// --- Multi-page navigation ---
+	MultiPageView {
+		id: multiPageView
+		anchors.fill: parent
+
+		function updatePages() {
+			multiPageView.clear()
+			multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
+			if (!stateManager_.isNewTenant) {
+				multiPageView.addPage("Members", qsTr("Members"), membersPageComp, "Icons/MultipleUser")
+				if (stateManager_.canManageMembers) {
+					multiPageView.addPage("Roles", qsTr("Roles"), rolesPageComp, "Icons/Role")
+					multiPageView.addPage("Groups", qsTr("Groups"), groupsPageComp, "Icons/MultipleUser")
 				}
+				if (stateManager_.isCreator) {
+					multiPageView.addPage("Permissions", qsTr("Permissions"), permissionsPageComp, "Icons/Role")
+				}
+			}
+			multiPageView.currentIndex = 0
+		}
+
+		Component.onCompleted: {
+			multiPageView.updatePages()
+		}
+	}
+
+	// Re-build pages when role / ownership state flips.
+	Connections {
+		target: stateManager_
+		function onIsNewTenantChanged() {
+			multiPageView.updatePages()
+			if (!stateManager_.isNewTenant) {
+				stateManager_.loadMembersFromModel()
+				stateManager_.loadInvitationsFromModel()
+			}
+		}
+		function onIsOwnerChanged() {
+			if (!stateManager_.isNewTenant) multiPageView.updatePages()
+		}
+		function onIsCreatorChanged() {
+			if (!stateManager_.isNewTenant) multiPageView.updatePages()
+		}
+		function onCanManageMembersChanged() {
+			if (!stateManager_.isNewTenant) multiPageView.updatePages()
+		}
+	}
+
+	// --- Refresh the document when the server confirms membership changes ---
+	Connections {
+		target: container.apiClient
+		function onInvitationCreated() {
+			PopupManager.addSuccessMessage(qsTr("Invitation created successfully"), true)
+			if (container.representationController)
+				container.representationController.updateRepresentationFromDocument()
+		}
+		function onOwnershipTransferred() {
+			PopupManager.addSuccessMessage(qsTr("Ownership transferred successfully"), true)
+			if (container.representationController)
+				container.representationController.updateRepresentationFromDocument()
+		}
+		function onRoleCreated() {
+			PopupManager.addSuccessMessage(qsTr("Role created successfully"), true)
+		}
+		function onGroupCreated() {
+			PopupManager.addSuccessMessage(qsTr("Group created successfully"), true)
+		}
+		function onUserCreated() {
+			PopupManager.addSuccessMessage(qsTr("User created successfully"), true)
+			// Refresh the tenant document so the newly added user (auto-joined
+			// as Member via AddMembership in the api client) appears in the
+			// TenantMembersPage list.
+			if (!stateManager_.isNewTenant && container.representationController)
+				container.representationController.updateRepresentationFromDocument()
+		}
+		function onSubscriptionInvitationAccepted(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			if (notification.tenantId === container.tenantData.m_id) {
+				PopupManager.addSuccessMessage(qsTr("Invitation accepted"), true)
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
+			}
+		}
+		function onSubscriptionInvitationRejected(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			if (notification.tenantId === container.tenantData.m_id) {
+				PopupManager.addInfoMessage(qsTr("Invitation rejected"), true)
+				stateManager_.removePendingInvitation(notification.membershipId)
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
+			}
+		}
+		function onSubscriptionOwnershipTransferred(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			if (notification.tenantId === container.tenantData.m_id) {
+				PopupManager.addInfoMessage(qsTr("Ownership transferred"), true)
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
+			}
+		}
+		function onSubscriptionMembershipRoleChanged(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			if (notification.tenantId === container.tenantData.m_id) {
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
+			}
+		}
+		function onSubscriptionMembershipRemoved(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			if (notification.tenantId === container.tenantData.m_id) {
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
 			}
 		}
 	}
 
-	function __loadMembersFromModel() {
-		if (container.__membersModifiedLocally) {
-			container.__membersModifiedLocally = false
-			return
-		}
-		if (!container.tenantData)
-			return
-		// m_members is an SDL-generated list — access via .count and .get(i).item
-		var serverMembers = container.tenantData.m_members
-		var members = []
-		if (serverMembers) {
-			var count = serverMembers.count || 0
-			for (var i = 0; i < count; i++) {
-				var m = serverMembers.get(i).item
-				if (m) {
-					// Keep id visible if server cannot resolve the display name; this avoids blank chips/role rows.
-					members.push({ id: m.m_id || "", name: m.m_name || m.m_id || "" })
-				}
+	// --- Listen to globally-broadcast tenant membership events so the editor
+	// reloads even when the change was performed by the local user via another
+	// view (e.g. accepting an invitation in TenantCollectionView) — the server
+	// does not re-deliver a subscription notification to the actor itself.
+	Connections {
+		target: AuthorizationController
+
+		function onTenantInvitationAccepted(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			if (notification && notification.tenantId === container.tenantData.m_id) {
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
 			}
 		}
-		container.pendingMembers = members
-		__loadMemberRolesFromModel()
-	}
-
-	function __loadInvitationsFromModel() {
-		if (!container.tenantData)
-			return
-		var invitationsModel = container.tenantData.m_pendingInvitations
-		var invitations = []
-		if (invitationsModel) {
-			var count = invitationsModel.count || 0
-			for (var i = 0; i < count; i++) {
-				var invitation = invitationsModel.get(i).item
-				if (invitation) {
-					invitations.push({
-						id: invitation.m_id || "",
-						userId: invitation.m_userId || "",
-						userName: invitation.m_userName || invitation.m_userId || "",
-						role: invitation.m_role || container.defaultRole,
-						status: invitation.m_status || "Pending",
-						invitedByUserId: invitation.m_invitedByUserId || "",
-						invitedByName: invitation.m_invitedByName || invitation.m_invitedByUserId || "",
-						createdAt: invitation.m_createdAt || "",
-						expiresAt: invitation.m_expiresAt || ""
-					})
-				}
+		function onTenantInvitationRejected(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			if (notification && notification.tenantId === container.tenantData.m_id) {
+				if (notification.membershipId)
+					stateManager_.removePendingInvitation(notification.membershipId)
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
 			}
 		}
-		container.pendingInvitations = invitations
-	}
-
-	function __inviteSelectedUsers(selectedItems) {
-		var activeIds = {}
-		for (var i = 0; i < container.pendingMembers.length; i++)
-			activeIds[container.pendingMembers[i].id] = true
-		for (var j = 0; j < container.pendingInvitations.length; j++)
-			activeIds[container.pendingInvitations[j].userId] = true
-		for (var k = 0; k < selectedItems.length; k++) {
-			var selected = selectedItems[k]
-			if (selected && selected.id && !activeIds[selected.id]) {
-				createInvitationInput.m_tenantId = container.tenantData.m_id || ""
-				createInvitationInput.m_userId = selected.id
-				createInvitationInput.m_role = TenantMemberRole.Member
-				createInvitationSender.send(createInvitationInput)
+		function onTenantOwnershipTransferred(notification) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			if (notification && notification.tenantId === container.tenantData.m_id) {
+				if (container.representationController)
+					container.representationController.updateRepresentationFromDocument()
 			}
 		}
 	}
 
-	function __removePendingInvitation(invitationId) {
-		var invitations = []
-		for (var i = 0; i < container.pendingInvitations.length; i++) {
-			if (container.pendingInvitations[i].id !== invitationId)
-				invitations.push(container.pendingInvitations[i])
-		}
-		container.pendingInvitations = invitations
-	}
+	// =========================================================================
+	// Page factories — each delegates to a dedicated component file.
+	// =========================================================================
+	Component {
+		id: generalPageComp
 
-	function __formatDateTime(value) {
-		if (!value)
-			return ""
-		var date = new Date(value)
-		if (isNaN(date.getTime()))
-			return value
-		return Qt.formatDateTime(date, Qt.DefaultLocaleShortDate)
-	}
-
-	function __displayNameOrId(name, id) {
-		return name ? name : id
-	}
-
-	// --- Member roles support ---
-	// Available role options from server (TenantData.availableRoles)
-	readonly property string defaultRole: "Member"
-
-	function __getAvailableRolesModel() {
-		if (!container.tenantData || !container.tenantData.m_availableRoles)
-			return null
-		return container.tenantData.m_availableRoles
-	}
-
-	function __getRoleModelValue(rolesModel, index, key) {
-		if (!rolesModel || index < 0)
-			return ""
-		// Prefer SDL-generated m_* roles but keep plain-key lookup for regular QML models.
-		if (rolesModel.getData)
-			return rolesModel.getData("m_" + key, index) || rolesModel.getData(key, index) || ""
-		var modelItem = rolesModel.get(index)
-		var role = modelItem ? modelItem.item : null
-		if (!role)
-			return ""
-		return role["m_" + key] || role[key] || ""
-	}
-
-	function __findRoleIndex(roleId) {
-		var roles = container.__getAvailableRolesModel()
-		if (!roles)
-			return -1
-
-		var count = roles.getItemsCount ? roles.getItemsCount() : (roles.count || 0)
-		for (var i = 0; i < count; i++) {
-			var id = container.__getRoleModelValue(roles, i, "id")
-			var name = container.__getRoleModelValue(roles, i, "name")
-			if (id === roleId || name === roleId)
-				return i
-		}
-
-		return -1
-	}
-
-	// Map of userId -> role string (built from TenantData.memberRoles)
-	property var __memberRolesMap: ({})
-
-	function __loadMemberRolesFromModel() {
-		var rolesMap = {}
-		if (container.tenantData && container.tenantData.m_memberRoles) {
-			var roleEntries = container.tenantData.m_memberRoles
-			var count = roleEntries.count || 0
-			for (var i = 0; i < count; i++) {
-				var entry = roleEntries.get(i).item
-				if (entry && entry.m_userId) {
-					rolesMap[entry.m_userId] = entry.m_role || container.defaultRole
-				}
-			}
-		}
-		container.__memberRolesMap = rolesMap
-		memberRolesRepeater.model = container.__buildMemberRolesModel()
-	}
-
-	function __updateMemberRole(userId, newRole) {
-		var rolesMap = container.__memberRolesMap
-		rolesMap[userId] = newRole
-		container.__memberRolesMap = rolesMap
-		memberRolesRepeater.model = container.__buildMemberRolesModel()
-		container.doUpdateModel()
-	}
-
-	function __buildMemberRolesModel() {
-		var result = []
-		var members = container.pendingMembers
-		for (var i = 0; i < members.length; i++) {
-			var userId = members[i].id
-			var userName = members[i].name || userId
-			var role = container.__memberRolesMap[userId] || container.defaultRole
-			result.push({ userId: userId, userName: userName, role: role })
-		}
-		return result
-	}
-
-	CustomScrollbar {
-		id: scrollbar
-		z: parent.z + 1
-		anchors.right: parent.right
-		anchors.top: flickable.top
-		anchors.bottom: flickable.bottom
-		secondSize: Style.marginM
-		targetItem: flickable
-	}
-
-	Flickable {
-		id: flickable
-		anchors.top: parent.top
-		anchors.topMargin: Style.marginXL
-		anchors.bottom: parent.bottom
-		anchors.bottomMargin: Style.marginXL
-		anchors.left: parent.left
-		anchors.leftMargin: Style.marginXL
-		anchors.right: scrollbar.left
-		anchors.rightMargin: Style.marginXL
-		contentWidth: bodyColumn.width
-		contentHeight: bodyColumn.height + 2 * Style.marginXL
-
-		boundsBehavior: Flickable.StopAtBounds
-		clip: true
-
-		Column {
-			id: bodyColumn
-			width: Style.sizeHintXXL
-			spacing: Style.marginXL
-
-			GroupHeaderView {
-				width: parent.width
-				title: qsTr("General")
-				groupView: generalGroup
-			}
-
-			GroupElementView {
-				id: generalGroup
-				width: parent.width
-
-				TextInputElementView {
-					id: nameInput
-
-					name: qsTr("Tenant Name")
-					placeHolderText: qsTr("Enter the tenant name")
-
-					onEditingFinished: {
-						let oldText = container.tenantData ? container.tenantData.m_name : ""
-						if (oldText !== nameInput.text){
-							container.doUpdateModel();
-						}
-					}
-
-					KeyNavigation.tab: descriptionInput
-					KeyNavigation.backtab: isActiveInput
-				}
-
-				TextInputElementView {
-					id: descriptionInput
-
-					name: qsTr("Description")
-					placeHolderText: qsTr("Enter the description")
-
-					onEditingFinished: {
-						let oldText = container.tenantData ? container.tenantData.m_description : ""
-						if (oldText !== descriptionInput.text){
-							container.doUpdateModel();
-						}
-					}
-
-					KeyNavigation.tab: isActiveInput
-					KeyNavigation.backtab: nameInput
-				}
-
-				SwitchElementView {
-					id: isActiveInput
-
-					name: qsTr("Active")
-
-					onCheckedChanged: {
-						container.doUpdateModel();
-					}
-				}
-
-				function updateGui(){
-					if (!container.tenantData) return;
-					nameInput.text = container.tenantData.m_name || ""
-					descriptionInput.text = container.tenantData.m_description || ""
-					isActiveInput.checked = container.tenantData.m_isActive !== undefined ? container.tenantData.m_isActive : true
-				}
-
-				function updateModel(){
-					if (!container.tenantData) return;
-					container.tenantData.m_name = nameInput.text
-					container.tenantData.m_description = descriptionInput.text
-					container.tenantData.m_isActive = isActiveInput.checked
-				}
-			}
-
-			ItemSelectElementView {
-				id: membersSelector
-				width: parent.width
-				visible: !container.isNewTenant
-				items: container.pendingMembers
-				label: qsTr("Active Members")
-				addButtonText: qsTr("Create invitation")
-				filterPlaceholder: qsTr("Type or choose a user")
-				collectionId: "Users"
-				emptyText: qsTr("No members")
-				showCount: true
-
-				onItemRemoved: {
-					container.pendingMembers = membersSelector.items.slice()
-					container.__membersModifiedLocally = true
-					container.doUpdateModel()
-				}
-
-				onSelectionChanged: {
-					container.__inviteSelectedUsers(selectedItems)
-					membersSelector.items = container.pendingMembers.slice()
-				}
-
-				onPopupClosed: {
-					if (container.__membersModifiedLocally) {
-						container.doUpdateModel()
-						container.__membersModifiedLocally = false
-					}
-					membersSelector.items = container.pendingMembers.slice()
-				}
-			}
-
-			GroupHeaderView {
-				width: parent.width
-				title: qsTr("Pending Invitations")
-				groupView: pendingInvitationsGroup
-				visible: pendingInvitationsGroup.visible
-			}
-
-			GroupElementView {
-				id: pendingInvitationsGroup
-				width: parent.width
-				visible: !container.isNewTenant && container.pendingInvitations.length > 0
-
-				Column {
-					width: parent.width - container.totalMemberRoleHorizontalMargin
-					x: container.memberRoleHorizontalMargin
-					spacing: Style.marginM
-
-					Repeater {
-						model: container.pendingInvitations
-
-						delegate: Item {
-							width: parent.width
-							height: Style.controlHeightM * 2 + container.totalMemberRoleRowMargin
-
-							Column {
-								anchors.fill: parent
-								anchors.margins: container.memberRoleRowMargin
-								spacing: Style.marginXS
-
-								Row {
-									width: parent.width
-									spacing: Style.marginS
-
-									BaseText {
-										width: (parent.width - parent.spacing * 2) * 0.5
-										text: modelData.userName
-										elide: Text.ElideRight
-									}
-
-									BaseText {
-										width: (parent.width - parent.spacing * 2) * 0.25
-										text: modelData.role
-										elide: Text.ElideRight
-									}
-
-									BaseText {
-										width: (parent.width - parent.spacing * 2) * 0.25
-										text: modelData.status
-										elide: Text.ElideRight
-									}
-								}
-
-								Row {
-									width: parent.width
-									spacing: Style.marginM
-
-									BaseText {
-										width: parent.width - revokeInviteButton.width - resendInviteButton.width - parent.spacing * 2
-										text: qsTr("Invited by %1 at %2").arg(container.__displayNameOrId(modelData.invitedByName, modelData.invitedByUserId)).arg(container.__formatDateTime(modelData.createdAt))
-										elide: Text.ElideRight
-									}
-
-									Button {
-										id: resendInviteButton
-										text: qsTr("Resend")
-										onClicked: {
-											container.resendInvitationInput.m_invitationId = modelData.id
-											container.resendInvitationSender.send(container.resendInvitationInput)
-										}
-									}
-
-									Button {
-										id: revokeInviteButton
-										text: qsTr("Revoke")
-										onClicked: {
-											container.revokeInvitationInput.m_invitationId = modelData.id
-											container.revokeInvitationSender.send(container.revokeInvitationInput)
-											container.__removePendingInvitation(modelData.id)
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-
-			// --- Member Roles Section ---
-			GroupHeaderView {
-				width: parent.width
-				title: qsTr("Member Roles")
-				groupView: memberRolesGroup
-				visible: memberRolesGroup.visible
-			}
-
-			GroupElementView {
-				id: memberRolesGroup
-				width: parent.width
-				visible: !container.isNewTenant && container.pendingMembers.length > 0
-
-				Column {
-					width: parent.width - container.totalMemberRoleHorizontalMargin
-					x: container.memberRoleHorizontalMargin
-					spacing: Style.marginM
-
-					Repeater {
-						id: memberRolesRepeater
-						model: []
-
-						delegate: Item {
-							width: parent.width
-							height: Style.controlHeightM + container.totalMemberRoleRowMargin
-
-							Row {
-								anchors.fill: parent
-								anchors.margins: container.memberRoleRowMargin
-								spacing: Style.marginL
-
-								BaseText {
-									width: (parent.width - parent.spacing) * container.memberRoleNameWidthRatio
-									anchors.verticalCenter: parent.verticalCenter
-									text: modelData.userName
-									elide: Text.ElideRight
-								}
-
-								ComboBox {
-									id: roleCombo
-									width: (parent.width - parent.spacing) * container.memberRoleComboWidthRatio
-									anchors.verticalCenter: parent.verticalCenter
-									model: container.__getAvailableRolesModel()
-									nameId: "name"
-									currentIndex: container.__findRoleIndex(modelData.role)
-
-									onFinished: {
-										var selectedIndex = index
-										if (!roleCombo.model || selectedIndex < 0)
-											return
-
-										var selectedRole = container.__getRoleModelValue(roleCombo.model, selectedIndex, "id")
-										if (!selectedRole)
-											return
-										if (selectedRole !== modelData.role) {
-											container.__updateMemberRole(modelData.userId, selectedRole)
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
+		TenantGeneralPage {
+			model: container.tenantData
+			stateManager: stateManager_
 		}
 	}
 
-	property CreateTenantInvitationInput createInvitationInput: CreateTenantInvitationInput {}
-	property GqlSdlRequestSender createInvitationSender: GqlSdlRequestSender {
-		requestType: 1
-		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_createTenantInvitation
+	Component {
+		id: membersPageComp
 
-		sdlObjectComp: Component {
-			CreateTenantInvitationPayload {
-				onFinished: {
-					if (m_errorMessage && m_errorMessage !== "")
-						ModalDialogManager.showInfoDialog(m_errorMessage)
-				}
-			}
+		TenantMembersPage {
+			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
 		}
 	}
 
-	property RevokeTenantInvitationInput revokeInvitationInput: RevokeTenantInvitationInput {}
-	property GqlSdlRequestSender revokeInvitationSender: GqlSdlRequestSender {
-		requestType: 1
-		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_revokeTenantInvitation
+	Component {
+		id: rolesPageComp
+
+		TenantRolesPage {
+			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
+		}
 	}
 
-	property ResendTenantInvitationInput resendInvitationInput: ResendTenantInvitationInput {}
-	property GqlSdlRequestSender resendInvitationSender: GqlSdlRequestSender {
-		requestType: 1
-		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_resendTenantInvitation
+	Component {
+		id: groupsPageComp
+
+		TenantGroupsPage {
+			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
+		}
+	}
+
+	Component {
+		id: permissionsPageComp
+
+		TenantPermissionsPage {
+			model: container.tenantData
+		}
 	}
 }

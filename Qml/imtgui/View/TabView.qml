@@ -15,6 +15,7 @@ Item {
 	property alias closable: tabPanel.isCloseEnable;
 
 	property int mainMargin: Style.marginM;
+	property bool tabVisible: true
 
 	signal tabLoaded(int index, string tabId, var tabItem);
 	signal tabClicked(var mouse, var tabItem, int index);
@@ -33,12 +34,15 @@ Item {
 		tabModel.clear();
 	}
 
-	function addTab(tabId, tabName, tabComp, icon, description, waitName){
+	function addTab(tabId, tabName, tabComp, icon, description, waitName, pinned){
 		if (!waitName){
 			waitName = false;
 		}
+		if (!pinned){
+			pinned = false;
+		}
 
-		tabModel.append({id: tabId, name: tabName, sourceComponent: tabComp, icon: icon, description: description, waitName: waitName})
+		tabModel.append({id: tabId, name: tabName, sourceComponent: tabComp, icon: icon, description: description, waitName: waitName, pinned: pinned})
 	}
 
 	function removeTab(tabId){
@@ -138,6 +142,7 @@ Item {
 		model: root.tabModel;
 		isCloseEnable: false
 		clip: true;
+		visible: root.tabVisible
 		onRightClicked: {
 			if (tabPanel.selectedIndex < root.tabModel.count - 1){
 				tabPanel.selectedIndex++;

@@ -2,6 +2,9 @@
 #include <imtauthdb/CUsersSettingsDatabaseDelegateComp.h>
 
 
+// Qt includes
+#include <QtCore/QDebug>
+
 // ACF includes
 #include <iser/CCompactXmlMemWriteArchive.h>
 #include <iser/CCompactXmlMemReadArchive.h>
@@ -9,6 +12,7 @@
 
 // ImtCore includes
 #include <imtauth/CUserSettings.h>
+#include <imtdb/imtdb.h>
 
 
 namespace imtauthdb
@@ -52,7 +56,7 @@ istd::IChangeableUniquePtr CUsersSettingsDatabaseDelegateComp::CreateObjectFromR
 
 	QByteArray userId;
 	if (record.contains("UserId")){
-		userId = record.value("UserId").toByteArray();
+		userId = imtdb::VariantToByteArray(record.value("UserId"));
 	}
 
 	userSettingsPtr->SetUserId(userId);
@@ -91,6 +95,10 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSettingsDatabaseDelegateCom
 	}
 
 	QByteArray userId = userSettingsPtr->GetUserId();
+	if (userId.isEmpty()){
+		qWarning() << "CUsersSettingsDatabaseDelegateComp: Cannot insert UserSettings with empty UserId";
+		return NewObjectQuery();
+	}
 
 	QByteArray data;
 	{

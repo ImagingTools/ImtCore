@@ -142,7 +142,7 @@ istd::IChangeableUniquePtr CSupportTicketDbDelegateComp::CreateObjectFromRecord(
 	}
 
 	if (record.contains("Id")){
-		ticketPtr->SetId(record.value("Id").toByteArray());
+		ticketPtr->SetId(imtdb::VariantToByteArray(record.value("Id")));
 	}
 	if (record.contains("Title")){
 		ticketPtr->SetTitle(record.value("Title").toString());
@@ -173,13 +173,13 @@ istd::IChangeableUniquePtr CSupportTicketDbDelegateComp::CreateObjectFromRecord(
 		ticketPtr->SetAssigneeIds(assigneeIds);
 	}
 	if (record.contains("ReporterId")){
-		ticketPtr->SetReporterId(record.value("ReporterId").toByteArray());
+		ticketPtr->SetReporterId(imtdb::VariantToByteArray(record.value("ReporterId")));
 	}
 	if (record.contains("ConversationId")){
-		ticketPtr->SetConversationId(record.value("ConversationId").toByteArray());
+		ticketPtr->SetConversationId(imtdb::VariantToByteArray(record.value("ConversationId")));
 	}
 	if (record.contains("MessageId")){
-		ticketPtr->SetMessageId(record.value("MessageId").toByteArray());
+		ticketPtr->SetMessageId(imtdb::VariantToByteArray(record.value("MessageId")));
 	}
 	if (record.contains("Locked")){
 		ticketPtr->SetLocked(record.value("Locked").toBool());
@@ -212,7 +212,7 @@ istd::IChangeableUniquePtr CSupportTicketDbDelegateComp::CreateObjectFromRecord(
 	}
 	// EntityReferences are loaded from the TicketEntityReferences junction table
 	if (m_databaseEngineCompPtr.IsValid() && record.contains("Id")){
-		QByteArray ticketId = record.value("Id").toByteArray();
+		QByteArray ticketId = imtdb::VariantToByteArray(record.value("Id"));
 		if (!ticketId.isEmpty()){
 			QString escaped = QString::fromUtf8(ticketId);
 			escaped.replace('\'', "''");
@@ -227,7 +227,7 @@ istd::IChangeableUniquePtr CSupportTicketDbDelegateComp::CreateObjectFromRecord(
 			if (sqlError.type() == QSqlError::NoError){
 				QByteArrayList refIds;
 				while (sqlQuery.next()){
-					refIds << sqlQuery.record().value("EntityReferenceId").toByteArray();
+					refIds << imtdb::VariantToByteArray(sqlQuery.record().value("EntityReferenceId"));
 				}
 				if (!refIds.isEmpty()){
 					ticketPtr->SetEntityReferences(refIds);

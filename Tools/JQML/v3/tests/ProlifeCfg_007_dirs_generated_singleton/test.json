@@ -1,0 +1,6 @@
+{
+    "includes": [],
+    "dirs": [
+        "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtappsdl/SDL/1.0/QML/imtappApplicationSdl"
+    ]
+}

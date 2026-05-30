@@ -8,7 +8,7 @@ import imtcolgui 1.0
 import imtguigql 1.0
 
 ElementView {
-	id: root
+	id: itemSelectElementView
 
 	// Data: array of {id, name} objects
 	property var items: []
@@ -22,10 +22,13 @@ ElementView {
 	property string filterPlaceholder: qsTr("Type or choose an item")
 	// CollectionId for the data provider
 	property string collectionId: ""
+
 	// Text shown when no items selected
 	property string emptyText: qsTr("No items")
 	// Whether to show selected count next to the label
 	property bool showCount: false
+	// List of item IDs that cannot be removed
+	property var nonRemovableIds: []
 
 	// Chip colors (matching TicketEditor accent palette)
 	readonly property string accentColor: "#5b8fd6"
@@ -36,34 +39,34 @@ ElementView {
 	signal selectionChanged(var selectedItems)
 	signal popupClosed()
 
-	name: root.showCount && root.items.length > 0
-		? root.label + " (" + root.items.length + ")"
-		: root.label
+	name: itemSelectElementView.showCount && itemSelectElementView.items.length > 0
+		? itemSelectElementView.label + " (" + itemSelectElementView.items.length + ")"
+		: itemSelectElementView.label
 
 	// --- Name resolution via FilterableSelectPopup's data provider pattern ---
 	property bool __resolvingNames: false
 
 	FilterableSelectGqlDataProvider {
 		id: nameResolver
-		collectionId: root.collectionId
+		collectionId: itemSelectElementView.collectionId
 		multiSelect: true
 		pageSize: 100
 
 		onDataChanged: {
-			root.__resolveItemNames()
+			itemSelectElementView.__resolveItemNames()
 		}
 	}
 
 	onItemsChanged: {
-		if (!root.__resolvingNames)
-			root.__triggerResolveIfNeeded()
+		if (!itemSelectElementView.__resolvingNames)
+			itemSelectElementView.__triggerResolveIfNeeded()
 	}
 
 	function __triggerResolveIfNeeded() {
-		if (!root.items || root.items.length === 0) return
+		if (!itemSelectElementView.items || itemSelectElementView.items.length === 0) return
 		var hasUnresolved = false
-		for (var i = 0; i < root.items.length; i++) {
-			var item = root.items[i]
+		for (var i = 0; i < itemSelectElementView.items.length; i++) {
+			var item = itemSelectElementView.items[i]
 			if (!item.name || item.name === item.id) {
 				hasUnresolved = true
 				break
@@ -87,8 +90,8 @@ ElementView {
 
 		var updated = false
 		var newItems = []
-		for (var j = 0; j < root.items.length; j++) {
-			var cur = root.items[j]
+		for (var j = 0; j < itemSelectElementView.items.length; j++) {
+			var cur = itemSelectElementView.items[j]
 			var resolved = nameMap[cur.id]
 			if (resolved && cur.name !== resolved) {
 				newItems.push({ id: cur.id, name: resolved })
@@ -98,20 +101,20 @@ ElementView {
 			}
 		}
 		if (updated) {
-			root.__resolvingNames = true
-			root.items = newItems
-			root.__resolvingNames = false
+			itemSelectElementView.__resolvingNames = true
+			itemSelectElementView.items = newItems
+			itemSelectElementView.__resolvingNames = false
 		}
 	}
 
 	controlComp: Component {
 		Text {
 			id: addBtn
-			visible: root.editable
-			text: "+ " + root.addButtonText
+			visible: itemSelectElementView.editable
+			text: "+ " + itemSelectElementView.addButtonText
 			font.pixelSize: Style.fontSizeM
 			font.bold: true
-			color: root.accentColor
+			color: itemSelectElementView.accentColor
 
 			MouseArea {
 				anchors.fill: parent
@@ -119,13 +122,13 @@ ElementView {
 				cursorShape: Qt.PointingHandCursor
 				onClicked: {
 					var known = []
-					for (var j = 0; j < root.items.length; j++) {
-						var item = root.items[j]
+					for (var j = 0; j < itemSelectElementView.items.length; j++) {
+						var item = itemSelectElementView.items[j]
 						known.push({ id: item.id, title: item.name || item.id })
 					}
 					var ids = []
-					for (var i = 0; i < root.items.length; i++)
-						ids.push(root.items[i].id)
+					for (var i = 0; i < itemSelectElementView.items.length; i++)
+						ids.push(itemSelectElementView.items[i].id)
 					var point = addBtn.mapToItem(null, 0, addBtn.height)
 					ModalDialogManager.openDialog(selectComp, {
 						"x": point.x,
@@ -147,16 +150,16 @@ ElementView {
 				width: parent.width
 				clip: true
 				spacing: Style.spacingXS
-				visible: root.items.length > 0
+				visible: itemSelectElementView.items.length > 0
 
 				Repeater {
-					model: root.items
+					model: itemSelectElementView.items
 					delegate: Rectangle {
-						width: Math.min(chipText.contentWidth + chipRemove.width + Style.paddingS * 3, 200)
+						width: Math.min(chipText.implicitWidth + chipRemove.width + Style.paddingS * 3, 200)
 						height: 28
 						radius: 14
-						color: root.accentBgLight
-						border.color: root.accentBorderLight
+						color: itemSelectElementView.accentBgLight
+						border.color: itemSelectElementView.accentBorderLight
 						border.width: 1
 
 						Text {
@@ -168,14 +171,14 @@ ElementView {
 							anchors.verticalCenter: parent.verticalCenter
 							text: modelData.name || modelData.id
 							font.pixelSize: Style.fontSizeM
-							color: root.accentColor
+							color: itemSelectElementView.accentColor
 							elide: Text.ElideRight
 							maximumLineCount: 1
 						}
 
 						ToolButton {
 							id: chipRemove
-							visible: root.editable
+							visible: itemSelectElementView.editable && itemSelectElementView.nonRemovableIds.indexOf(modelData.id) < 0
 							anchors.right: parent.right
 							anchors.verticalCenter: parent.verticalCenter
 							iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
@@ -188,13 +191,27 @@ ElementView {
 							onClicked: {
 								var removedIndex = index
 								var removedData = modelData
-								var arr = root.items.slice()
-								arr.splice(removedIndex, 1)
-								root.__resolvingNames = true
-								root.items = arr
-								root.__resolvingNames = false
-								root.itemRemoved(removedIndex, removedData)
-								root.selectionChanged(arr)
+								var removedId = modelData ? modelData.id : ""
+								var arr = []
+								if (removedId) {
+									for (var k = 0; k < itemSelectElementView.items.length; k++) {
+										var it = itemSelectElementView.items[k]
+										// Match by id rather than index — robust against
+										// delegate-context drift when items mutate.
+										if (it && it.id !== removedId)
+											arr.push(it)
+									}
+								} else {
+									// Fallback: id is missing/empty — drop by index.
+									arr = itemSelectElementView.items.slice()
+									if (removedIndex >= 0 && removedIndex < arr.length)
+										arr.splice(removedIndex, 1)
+								}
+								itemSelectElementView.__resolvingNames = true
+								itemSelectElementView.items = arr
+								itemSelectElementView.__resolvingNames = false
+								itemSelectElementView.itemRemoved(removedIndex, removedData)
+								itemSelectElementView.selectionChanged(arr)
 							}
 						}
 					}
@@ -202,9 +219,9 @@ ElementView {
 			}
 
 			Text {
-				visible: root.items.length === 0
+				visible: itemSelectElementView.items.length === 0
 				width: parent.width
-				text: root.emptyText
+				text: itemSelectElementView.emptyText
 				font.pixelSize: Style.fontSizeM
 				color: Style.inactiveTextColor
 				wrapMode: Text.WordWrap
@@ -218,14 +235,14 @@ ElementView {
 
 		FilterableSelectPopup {
 			dataProvider: FilterableSelectGqlDataProvider {
-				collectionId: root.collectionId
+				collectionId: itemSelectElementView ? itemSelectElementView.collectionId : ""
 				multiSelect: true
 			}
 
 			itemWidth: 280
 			showCheckBox: true
 			showSelectedGroup: true
-			filterPlaceholder: root.filterPlaceholder
+			filterPlaceholder: itemSelectElementView ? itemSelectElementView.filterPlaceholder : ""
 
 			onSelectionChanged: {
 				var arr = []
@@ -236,14 +253,16 @@ ElementView {
 						selName = selId
 					arr.push({id: selId, name: selName})
 				}
-				root.__resolvingNames = true
-				root.items = arr
-				root.__resolvingNames = false
-				root.selectionChanged(arr)
+				itemSelectElementView.__resolvingNames = true
+				itemSelectElementView.items = arr
+				itemSelectElementView.__resolvingNames = false
+				itemSelectElementView.selectionChanged(arr)
 			}
 
 			Component.onDestruction: {
-				root.popupClosed()
+				if (itemSelectElementView){
+					itemSelectElementView.popupClosed()
+				}
 			}
 		}
 	}

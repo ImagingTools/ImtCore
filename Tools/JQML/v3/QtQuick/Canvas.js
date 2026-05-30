@@ -13,8 +13,8 @@ class Canvas extends Item {
     static Image = 0
 
     static meta = Object.assign({}, Item.meta, {
-        available: {type: Bool, value: true},
-        canvasSize: {type: Bool, value: true},
+        available: {type: Bool, value: false},
+        canvasSize: {type: Var, value: null},
         antialiasing: {type: Bool, value: false},
         context: {type: Var, value: undefined},
         renderStrategy: {type: Real, value: Canvas.Immediate},
@@ -117,15 +117,23 @@ class Canvas extends Item {
         this.__init = true
     }
 
+    __updateCanvasSize(){
+        const w = this.width
+        const h = this.height
+        this.canvasSize = `QSizeF(${w}, ${h})`
+    }
+
     SLOT_widthChanged(oldValue, newValue){
         super.SLOT_widthChanged(oldValue, newValue)
         this.__getDOM().setAttribute('width', newValue)
+        this.__updateCanvasSize()
         if(newValue > 0 && this.height > 0) this.paint()
     }
 
     SLOT_heightChanged(oldValue, newValue){
         super.SLOT_heightChanged(oldValue, newValue)
         this.__getDOM().setAttribute('height', newValue)
+        this.__updateCanvasSize()
         if(this.width > 0 && newValue > 0) this.paint()
     }
 

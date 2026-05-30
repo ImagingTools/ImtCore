@@ -69,6 +69,13 @@ QJsonObject CUserSettingsControllerComp::CreateRepresentationFromRequest(
 	}
 
 	if (!userSettingsPtr.IsValid()){
+		if (userId.isEmpty()){
+			errorMessage = QString("Unable to create representation for user settings. Error: User-ID is empty.");
+			SendErrorMessage(0, errorMessage, "CUserSettingsControllerComp");
+
+			return QJsonObject();
+		}
+
 		userSettingsPtr.FromUnique(m_userSettingsInfoFactCompPtr.CreateInstance());
 		Q_ASSERT(userSettingsPtr.IsValid());
 		if (!userSettingsPtr.IsValid()){

@@ -112,7 +112,7 @@ ITenantInvitationUniquePtr CTenantInvitationManagerComp::FindPendingInvitation(c
 }
 
 
-QByteArray CTenantInvitationManagerComp::CreateInvitation(const QByteArray& invitedByUserId, const QByteArray& userId, const QByteArray& tenantId, ITenantMembership::TenantMemberRole role)
+QByteArray CTenantInvitationManagerComp::CreateInvitation(const QByteArray& invitedByUserId, const QByteArray& userId, const QByteArray& tenantId, const QByteArray& roleId)
 {
 	if (!m_invitationCollectionCompPtr.IsValid() || !m_invitationFactoryCompPtr.IsValid() || !m_membershipManagerCompPtr.IsValid()){
 		SendErrorMessage(0, "Invitation collection, factory or membership manager not configured", "CTenantInvitationManagerComp");
@@ -147,7 +147,7 @@ QByteArray CTenantInvitationManagerComp::CreateInvitation(const QByteArray& invi
 	invitationPtr->SetInvitationId(invitationId);
 	invitationPtr->SetUserId(userId);
 	invitationPtr->SetTenantId(tenantId);
-	invitationPtr->SetRole(role);
+	invitationPtr->SetRoleId(roleId);
 	invitationPtr->SetStatus(ITenantInvitation::TIS_PENDING);
 	invitationPtr->SetInvitedByUserId(invitedByUserId);
 	invitationPtr->SetCreatedAt(now);
@@ -176,7 +176,10 @@ QByteArray CTenantInvitationManagerComp::AcceptInvitation(const QByteArray& invi
 		return QByteArray();
 	}
 
-	QByteArray membershipId = m_membershipManagerCompPtr->AddMembership(invitationPtr->GetUserId(), invitationPtr->GetTenantId(), invitationPtr->GetRole());
+	QByteArray membershipId = m_membershipManagerCompPtr->AddMembership(
+		invitationPtr->GetUserId(),
+		invitationPtr->GetTenantId(),
+		invitationPtr->GetRoleId().isEmpty() ? QByteArrayLiteral("Member") : invitationPtr->GetRoleId());
 	if (membershipId.isEmpty()){
 		return QByteArray();
 	}

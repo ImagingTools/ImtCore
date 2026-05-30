@@ -405,8 +405,8 @@ macro(getImtBaseQmlWebDirs webdirs buildwebdir useImtControlsStyle)
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseSettingsSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseSettingsSdl)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseCollectionDocumentManagerSdl)
-	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseCollectionDocumentManagerSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseCollectionDocumentServiceSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseCollectionDocumentServiceSdl)
 
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseCollectionImportSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseCollectionImportSdl)
@@ -484,8 +484,17 @@ macro(getImtAuthQmlWebDirs webdirs buildwebdir)
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthTenantsSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthTenantsSdl)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthTenantCollectionDocumentManagerSdl)
-	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthTenantCollectionDocumentManagerSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthTenantCollectionDocumentServiceSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthTenantCollectionDocumentServiceSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthRoleCollectionDocumentServiceSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthRoleCollectionDocumentServiceSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthGroupCollectionDocumentServiceSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthGroupCollectionDocumentServiceSdl)
+
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthUserCollectionDocumentServiceSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthUserCollectionDocumentServiceSdl)
 
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthTenantMembershipsSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtauthTenantMembershipsSdl)
@@ -503,8 +512,8 @@ macro(getImtDeskQmlWebDirs webdirs buildwebdir)
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtdesksdl/SDL/1.0/QML/imtdeskImtDeskSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtdeskImtDeskSdl)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtdesksdl/SDL/1.0/QML/imtdeskTicketCollectionDocumentManagerSdl)
-	list(APPEND ${webdirs} ${buildwebdir}/src/imtdeskTicketCollectionDocumentManagerSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtdesksdl/SDL/1.0/QML/imtdeskTicketCollectionDocumentServiceSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtdeskTicketCollectionDocumentServiceSdl)
 endmacro(getImtDeskQmlWebDirs)
 
 macro(getImtChatQmlWebDirs webdirs buildwebdir)
@@ -514,8 +523,8 @@ macro(getImtChatQmlWebDirs webdirs buildwebdir)
 	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtchatsdl/SDL/1.0/QML/imtchatImtChatSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtchatImtChatSdl)
 
-	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtchatsdl/SDL/1.0/QML/imtchatConversationCollectionDocumentManagerSdl)
-	list(APPEND ${webdirs} ${buildwebdir}/src/imtchatConversationCollectionDocumentManagerSdl)
+	list(APPEND ${webdirs} ${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtchatsdl/SDL/1.0/QML/imtchatConversationCollectionDocumentServiceSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtchatConversationCollectionDocumentServiceSdl)
 endmacro(getImtChatQmlWebDirs)
 
 macro(getImtCoreQmlWebDirs webdirs buildwebdir)

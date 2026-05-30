@@ -59,7 +59,7 @@ ifile::IFilePersistence::OperationState CCompositeObjectPersistenceComp::LoadFro
 	}
 
 	QDir tempPath = QDir::temp();
-	QString uuid = QUuid::createUuid().toString();
+	QString uuid = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
 	if (!tempPath.mkpath(uuid)){
 		SendErrorMessage(0, QString("Temporary directory could not be created: '%1'").arg(tempPath.absolutePath() + "/" + uuid));
@@ -175,7 +175,7 @@ ifile::IFilePersistence::OperationState CCompositeObjectPersistenceComp::SaveToF
 	}
 
 	QDir tempPath = QDir::temp();
-	QString uuid = QUuid::createUuid().toString();
+	QString uuid = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
 	if (!tempPath.mkpath(uuid)){
 		return OS_FAILED;

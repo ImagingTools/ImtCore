@@ -29,36 +29,7 @@ CDocumentTable::CDocumentTable(
 	m_valueMode(valueMode),
 	m_hasIndex(hasIndex)
 {
-	bool isReadOnly = m_txn.is_readonly();
-	if (isReadOnly){
-		m_mapHandle = m_txn.open_map(
-							m_tableName.toStdString(),
-							keyMode,
-							valueMode);
-	}
-	else{
-		m_mapHandle = m_txn.create_map(
-							m_tableName.toStdString(),
-							keyMode,
-							valueMode);
-	}
-	m_cursor = m_txn.open_cursor(m_mapHandle);
-
-	if(m_hasIndex){
-		if (isReadOnly){
-			m_mapHandleIndex = m_txn.open_map(
-									(m_tableName + s_index).toStdString(),
-									keyMode,
-									valueMode);
-		}
-		else {
-			m_mapHandleIndex = m_txn.create_map(
-									(m_tableName + s_index).toStdString(),
-									keyMode,
-									valueMode);
-		}
-		m_cursorIndex = m_txn.open_cursor(m_mapHandleIndex);
-	}
+	OpenCursors();
 }
 
 
@@ -635,6 +606,56 @@ bool CDocumentTable::CloseTable(mdbx::env_managed& env)
 	}
 
 	return false;
+}
+
+
+void CDocumentTable::Reopen()
+{
+	try {
+		m_cursor.close();
+		if(m_hasIndex){
+			m_cursorIndex.close();
+		}
+	}
+	catch(...){
+	}
+
+	OpenCursors();
+}
+
+
+void CDocumentTable::OpenCursors()
+{
+	bool isReadOnly = m_txn.is_readonly();
+	if (isReadOnly){
+		m_mapHandle = m_txn.open_map(
+							m_tableName.toStdString(),
+							m_keyMode,
+							m_valueMode);
+	}
+	else{
+		m_mapHandle = m_txn.create_map(
+							m_tableName.toStdString(),
+							m_keyMode,
+							m_valueMode);
+	}
+	m_cursor = m_txn.open_cursor(m_mapHandle);
+
+	if(m_hasIndex){
+		if (isReadOnly){
+			m_mapHandleIndex = m_txn.open_map(
+									(m_tableName + s_index).toStdString(),
+									m_keyMode,
+									m_valueMode);
+		}
+		else {
+			m_mapHandleIndex = m_txn.create_map(
+									(m_tableName + s_index).toStdString(),
+									m_keyMode,
+									m_valueMode);
+		}
+		m_cursorIndex = m_txn.open_cursor(m_mapHandleIndex);
+	}
 }
 
 

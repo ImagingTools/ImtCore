@@ -23,6 +23,8 @@ class Item extends QtObject {
         antialiasing: { type: QBool, value: false },
         width: { type: QAutoGeometry, value: 0, changed: '$widthChanged' },
         height: { type: QAutoGeometry, value: 0, changed: '$heightChanged' },
+        implicitWidth: { type: QReal, value: 0, changed: '$implicitWidthChanged' },
+        implicitHeight: { type: QReal, value: 0, changed: '$implicitHeightChanged' },
         visible: { type: QVisible, value: true, changed: '$visibleChanged' },
         enabled: { type: QBool, value: true, changed: '$enabledChanged' },
         clip: { type: QBool, value: false, changed: '$clipChanged' },
@@ -43,6 +45,13 @@ class Item extends QtObject {
         bottom: { type: QAnchorLine, value: QAnchorLine.Bottom},
         horizontalCenter: { type: QAnchorLine, value: QAnchorLine.HorizontalCenter},
         verticalCenter: { type: QAnchorLine, value: QAnchorLine.VerticalCenter},
+
+        // Padding (Qt 5.6+)
+        padding: { type: QReal, value: 0, changed: '$paddingChanged' },
+        topPadding: { type: QReal, value: -1, changed: '$paddingChanged' },
+        bottomPadding: { type: QReal, value: -1, changed: '$paddingChanged' },
+        leftPadding: { type: QReal, value: -1, changed: '$paddingChanged' },
+        rightPadding: { type: QReal, value: -1, changed: '$paddingChanged' },
     }
 
     static defaultSignals = {
@@ -288,6 +297,21 @@ class Item extends QtObject {
         this.setStyle({ overflow: this.getPropertyValue('clip') ? "hidden" : "unset" })
     }
 
+    $paddingChanged(){
+        let pad = this.getPropertyValue('padding')
+        let top = this.getPropertyValue('topPadding')
+        let bottom = this.getPropertyValue('bottomPadding')
+        let left = this.getPropertyValue('leftPadding')
+        let right = this.getPropertyValue('rightPadding')
+
+        let t = top >= 0 ? top : pad
+        let b = bottom >= 0 ? bottom : pad
+        let l = left >= 0 ? left : pad
+        let r = right >= 0 ? right : pad
+
+        this.setStyle({ padding: `${t}px ${r}px ${b}px ${l}px` })
+    }
+
     $rotationAndScaleChanged(){
         this.setStyle({ transform: `scale(${this.getPropertyValue('scale')}) rotate(${this.getPropertyValue('rotation')}deg)` })
     }
@@ -457,6 +481,14 @@ class Item extends QtObject {
             minHeight: `${this.getProperty('height').get()}px`,
         })
         // this.$dom.style.height = `${this.getProperty('height').get() > 0 ? this.getProperty('height').get() : 0}px`
+    }
+
+    $implicitWidthChanged(){
+        this.getProperty('width').setAuto(this.getPropertyValue('implicitWidth'))
+    }
+
+    $implicitHeightChanged(){
+        this.getProperty('height').setAuto(this.getPropertyValue('implicitHeight'))
     }
 
     $anchorsChanged(){
@@ -1088,7 +1120,7 @@ class Item extends QtObject {
     }
 
     destroy(){
-        this.$dom.remove()
+        if(this.$dom) this.$dom.remove()
         super.destroy()
 
         let index = mainRoot.$focusedElements.indexOf(this)

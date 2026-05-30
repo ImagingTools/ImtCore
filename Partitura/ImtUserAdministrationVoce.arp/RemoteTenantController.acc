@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6390" Description="ACF"/>
-            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6397" Description="ACF"/>
+            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -24,7 +24,10 @@
                                 <Value>TenantRemoteRepresentationController</Value>
                                 <Value>RemoteCommandsController</Value>
                                 <Value>RemoteDocumentRevisionController</Value>
-                                <Value>RemoteCollectionDocumentManagerController</Value>
+                                <Value>RemoteCollectionDocumentServiceController</Value>
+                                <Value>TenantMembershipManagerController</Value>
+                                <Value>RemoteFilterableSelectController</Value>
+                                <Value>RemoteTenantCollectionDocumentService</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -93,7 +96,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="RemoteCollectionDocumentManagerController" PackageId="ImtClientGqlPck" ComponentId="RemoteCollectionDocumentManagerController">
+        <Element Id="RemoteCollectionDocumentServiceController" PackageId="ImtClientGqlPck" ComponentId="RemoteCollectionDocumentServiceController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
@@ -175,6 +178,52 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="RemoteFilterableSelectController" PackageId="ImtClientGqlPck" ComponentId="RemoteFilterableSelectController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CollectionIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>UsersForInvitation</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RemoteTenantCollectionDocumentService" PackageId="ImtAuthGqlPck" ComponentId="RemoteTenantCollectionDocumentService">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductInfo" Type="Reference" ExportId="ProductInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="RemoteTenantController" PackageId="ImtAuthGqlPck" ComponentId="RemoteTenantController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -201,6 +250,24 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
+        <Element Id="TenantMembershipManagerController" PackageId="ImtAuthGqlPck" ComponentId="RemoteTenantMembershipManagerController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="TenantRemoteRepresentationController" PackageId="ImtClientGqlPck" ComponentId="PumaGqlRemoteRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -214,8 +281,6 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>GetTenantList</Value>
-                                <Value>GetTenantRepresentation</Value>
-                                <Value>UpdateTenantFromRepresentation</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -243,5 +308,7 @@
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="GqlDemultiplexer"/>
         <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="PublisherSubscriberBridge"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="RemoteTenantController" ComponentId="RemoteTenantController"/>
+    </ExportedComponents>
 </Acf>
