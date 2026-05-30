@@ -220,6 +220,10 @@ sdl::imtauth::Tenants::CTenantData CTenantCollectionDocumentServiceComp::OnGetTe
 	// Tenant-scoped permissions (selected subset of product permissions)
 	response.Version_1_0->tenantPermissions.Emplace().FromList(tenantPtr->GetTenantPermissions());
 
+	// Hierarchy fields
+	response.Version_1_0->parentTenantId = tenantPtr->GetParentTenantId();
+	response.Version_1_0->isSystemTenant = (tenantPtr->GetTenantId() == imtauth::GetSystemTenantId());
+
 	return response;
 }
 

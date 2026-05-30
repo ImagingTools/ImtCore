@@ -10,6 +10,9 @@
 
 #include <memory>
 
+// ImtCore includes
+#include <imtauth/ITenantInfo.h>
+
 
 namespace imtauth
 {
@@ -24,6 +27,7 @@ struct TenantData
 	bool isActive = true;
 	QDateTime createdAt;
 	QDateTime updatedAt;
+	QByteArray parentTenantId;
 };
 
 struct MembershipData
@@ -80,6 +84,50 @@ public:
 
 		m_tenants[tenant.id] = tenant;
 		return tenant.id;
+	}
+
+	QByteArray CreateChildTenant(const QString& name, const QByteArray& parentTenantId, const QString& description = QString(), const QByteArray& ownerId = QByteArray())
+	{
+		if (name.isEmpty() || !m_tenants.contains(parentTenantId)){
+			return QByteArray();
+		}
+
+		TenantData tenant;
+		tenant.id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+		tenant.name = name;
+		tenant.description = description;
+		tenant.ownerId = ownerId;
+		tenant.isActive = true;
+		tenant.createdAt = QDateTime::currentDateTimeUtc();
+		tenant.updatedAt = tenant.createdAt;
+		tenant.parentTenantId = parentTenantId;
+
+		m_tenants[tenant.id] = tenant;
+		return tenant.id;
+	}
+
+	bool EnsureSystemTenant()
+	{
+		QByteArray systemId = imtauth::GetSystemTenantId();
+		if (m_tenants.contains(systemId)){
+			return true;
+		}
+
+		TenantData tenant;
+		tenant.id = systemId;
+		tenant.name = QStringLiteral("System");
+		tenant.description = QStringLiteral("Root system tenant");
+		tenant.isActive = true;
+		tenant.createdAt = QDateTime::currentDateTimeUtc();
+		tenant.updatedAt = tenant.createdAt;
+
+		m_tenants[tenant.id] = tenant;
+		return true;
+	}
+
+	QByteArray GetSystemTenantId() const
+	{
+		return imtauth::GetSystemTenantId();
 	}
 
 	bool RemoveTenant(const QByteArray& id)
@@ -176,6 +224,17 @@ private Q_SLOTS:
 	void testCreateTenant_DuplicateNameAllowed();
 	void testRemoveTenant_CascadesMemberships();
 	void testRemoveTenant_CascadesPermissions();
+
+	// System-Tenant tests
+	void testEnsureSystemTenant_CreatesOnFirstCall();
+	void testEnsureSystemTenant_Idempotent();
+	void testSystemTenant_HasCorrectProperties();
+
+	// Hierarchy tests
+	void testCreateChildTenant_SetsParentAndDepth();
+	void testCreateChildTenant_CalculatesMaterializedPath();
+	void testCreateChildTenant_InvalidParent_Fails();
+	void testHierarchy_MultiLevel();
 
 private:
 	imtauth::CMockTenantManager* m_managerPtr = nullptr;

@@ -113,6 +113,14 @@ bool CTenantCollectionControllerComp::CreateRepresentationFromObject(
 		}
 	}
 
+	if (requestInfo.items.isParentTenantIdRequested){
+		representationObject.parentTenantId = tenantInfoPtr->GetParentTenantId();
+	}
+
+	if (requestInfo.items.isIsSystemTenantRequested){
+		representationObject.isSystemTenant = (tenantInfoPtr->GetTenantId() == imtauth::GetSystemTenantId());
+	}
+
 	return true;
 }
 

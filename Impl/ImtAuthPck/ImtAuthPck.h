@@ -56,6 +56,15 @@
 #include <imtauth/CTenantMembershipManagerComp.h>
 #include <imtauth/CTenantInvitationComp.h>
 #include <imtauth/CTenantInvitationManagerComp.h>
+#include <imtauth/CCrossOrgGrantComp.h>
+#include <imtauth/CCrossOrgGrantManagerComp.h>
+#include <imtauth/CTenantConnectionRequestComp.h>
+#include <imtauth/CTenantConnectionRequestManagerComp.h>
+#include <imtauth/CCrossTenantMessageComp.h>
+#include <imtauth/CCrossTenantMessageProjectionComp.h>
+#include <imtauth/CCrossTenantMessageBrokerComp.h>
+#include <imtauth/COrderRequestComp.h>
+#include <imtauth/COrderRequestHandlerComp.h>
 #include <imtauth/CTenantDocumentNameProviderComp.h>
 
 
@@ -152,6 +161,15 @@ typedef icomp::TModelCompWrap<imtauth::CTenantMembershipComp> TenantMembershipIn
 typedef icomp::TModelCompWrap<imtauth::CTenantMembershipManagerComp> TenantMembershipManager;
 typedef icomp::TModelCompWrap<imtauth::CTenantInvitationComp> TenantInvitationInfo;
 typedef icomp::TModelCompWrap<imtauth::CTenantInvitationManagerComp> TenantInvitationManager;
+typedef icomp::TModelCompWrap<imtauth::CCrossOrgGrantComp> CrossOrgGrantInfo;
+typedef icomp::TModelCompWrap<imtauth::CCrossOrgGrantManagerComp> CrossOrgGrantManager;
+typedef icomp::TModelCompWrap<imtauth::CTenantConnectionRequestComp> TenantConnectionRequestInfo;
+typedef icomp::TModelCompWrap<imtauth::CTenantConnectionRequestManagerComp> TenantConnectionRequestManager;
+typedef icomp::TModelCompWrap<imtauth::CCrossTenantMessageComp> CrossTenantMessageInfo;
+typedef imtauth::CCrossTenantMessageProjectionComp CrossTenantMessageProjection;
+typedef icomp::TModelCompWrap<imtauth::CCrossTenantMessageBrokerComp> CrossTenantMessageBroker;
+typedef icomp::TModelCompWrap<imtauth::COrderRequestComp> OrderRequestInfo;
+typedef icomp::TModelCompWrap<imtauth::COrderRequestHandlerComp> OrderRequestHandler;
 typedef imtauth::CTenantDocumentNameProviderComp TenantDocumentNameProvider;
 
 

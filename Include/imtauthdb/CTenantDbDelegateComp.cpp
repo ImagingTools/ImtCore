@@ -94,6 +94,10 @@ istd::IChangeableUniquePtr CTenantDbDelegateComp::CreateObjectFromRecord(
 		tenantPtr->SetTenantPermissions(permissions);
 	}
 
+	if (record.contains("ParentTenantId")){
+		tenantPtr->SetParentTenantId(imtdb::VariantToByteArray(record.value("ParentTenantId")));
+	}
+
 	return tenantPtr;
 }
 
@@ -123,20 +127,23 @@ CTenantDbDelegateComp::NewObjectQuery CTenantDbDelegateComp::CreateNewObjectQuer
 	QString ownerId = imtdb::EscapeSql(tenantPtr != nullptr ? QString::fromUtf8(tenantPtr->GetOwnerId()) : QString());
 	QString creatorId = imtdb::EscapeSql(tenantPtr != nullptr ? QString::fromUtf8(tenantPtr->GetCreatorId()) : QString());
 	bool isActive = tenantPtr != nullptr ? tenantPtr->IsActive() : true;
+	QString parentTenantId = imtdb::EscapeSql(tenantPtr != nullptr ? QString::fromUtf8(tenantPtr->GetParentTenantId()) : QString());
 	QString now = imtdb::UtcNow();
 
 	result.query = QString(
-		"INSERT INTO \"%1\" (\"Id\", \"Name\", \"Description\", \"OwnerId\", \"CreatorId\", \"IsActive\", \"CreatedAt\", \"UpdatedAt\") "
-		"VALUES ('%2', '%3', '%4', '%5', '%6', %7, '%8', '%9');")
-		.arg(*m_tableNameAttrPtr,
-			 id,
-			 name,
-			 description,
-			 ownerId,
-			 creatorId,
-			 isActive ? "true" : "false",
-			 now,
-			 now).toUtf8();
+		"INSERT INTO \"%1\" (\"Id\", \"Name\", \"Description\", \"OwnerId\", \"CreatorId\", \"IsActive\", \"CreatedAt\", \"UpdatedAt\", "
+		"\"ParentTenantId\") "
+		"VALUES ('%2', '%3', '%4', '%5', '%6', %7, '%8', '%9', '%10');")
+		.arg(*m_tableNameAttrPtr)
+		.arg(id)
+		.arg(name)
+		.arg(description)
+		.arg(ownerId)
+		.arg(creatorId)
+		.arg(isActive ? "true" : "false")
+		.arg(now)
+		.arg(now)
+		.arg(parentTenantId).toUtf8();
 
 	// Append permissions insert if tenant has permissions
 	if (tenantPtr != nullptr){
@@ -172,16 +179,18 @@ QByteArray CTenantDbDelegateComp::CreateUpdateObjectQuery(
 		"\"OwnerId\"='%4', "
 		"\"CreatorId\"='%5', "
 		"\"IsActive\"=%6, "
-		"\"UpdatedAt\"='%7' "
-		"WHERE \"Id\"='%8';")
-		.arg(*m_tableNameAttrPtr,
-			 imtdb::EscapeSql(tenantPtr->GetTenantName()),
-			 imtdb::EscapeSql(tenantPtr->GetTenantDescription()),
-			 imtdb::EscapeSql(QString::fromUtf8(tenantPtr->GetOwnerId())),
-			 imtdb::EscapeSql(QString::fromUtf8(tenantPtr->GetCreatorId())),
-			 tenantPtr->IsActive() ? "true" : "false",
-			 now,
-			 escapedId).toUtf8()
+		"\"UpdatedAt\"='%7', "
+		"\"ParentTenantId\"='%8' "
+		"WHERE \"Id\"='%9';")
+		.arg(*m_tableNameAttrPtr)
+		.arg(imtdb::EscapeSql(tenantPtr->GetTenantName()))
+		.arg(imtdb::EscapeSql(tenantPtr->GetTenantDescription()))
+		.arg(imtdb::EscapeSql(QString::fromUtf8(tenantPtr->GetOwnerId())))
+		.arg(imtdb::EscapeSql(QString::fromUtf8(tenantPtr->GetCreatorId())))
+		.arg(tenantPtr->IsActive() ? "true" : "false")
+		.arg(now)
+		.arg(imtdb::EscapeSql(QString::fromUtf8(tenantPtr->GetParentTenantId())))
+		.arg(escapedId).toUtf8()
 		+ CreatePermissionsDeleteQuery(objectId)
 		+ CreatePermissionsInsertQuery(objectId, tenantPtr->GetTenantPermissions());
 }
