@@ -29,7 +29,6 @@ namespace sdl::V1_0::modsdl
 {
 
 
-Q_NAMESPACE
 
 // forward declaration for union types
 class PrinterSpecification;

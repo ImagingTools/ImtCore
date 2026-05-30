@@ -172,12 +172,6 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 	}
 
 	// process
-	if (!ProcessEnums(headerFiles, sourceFiles, paramsPtr)){
-		SendErrorMessage(0, "Unable to process enums");
-
-		return TS_INVALID;
-	}
-
 	if (!ProcessTypes(headerFiles, sourceFiles, paramsPtr)){
 		SendErrorMessage(0, "Unable to process types");
 
@@ -363,11 +357,6 @@ bool CCxxProcessorsManagerComp::BeginHeaderFile(
 
 	stream << '{';
 	FeedStream(stream, 3, false);
-
-
-	// add Q_NAMESPACE macro
-	stream << QStringLiteral("Q_NAMESPACE");
-	FeedStream(stream, 2, false);
 
 	return true;
 }
@@ -678,6 +667,13 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 	stream << QStringLiteral("#pragma once");
 	FeedStream(stream, 3, false);
 
+	// check if we have enums
+	bool hasEnums = false;
+	if (m_enumProcessorCompListPtr.IsValid() && m_sdlEnumListCompPtr.IsValid()){
+		const imtsdl::SdlEnumList enumList = m_sdlEnumListCompPtr->GetEnums(true);
+		hasEnums = !enumList.isEmpty();
+	}
+
 	// check if we have requests (need include for base class)
 	bool hasRequests = false;
 	if (m_requestsProviderListCompPtr.IsValid()){
@@ -692,6 +688,12 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 		hasDocumentTypes = !documentTypesList.isEmpty();
 	}
 
+	// add include for QObject if we have enums (needed for EnumXxx wrapper classes)
+	if (hasEnums){
+		stream << QStringLiteral("#include <QtCore/QObject>");
+		FeedStream(stream, 1, false);
+	}
+
 	// add include for CObjectCollectionControllerCompBase if we have document types
 	if (hasDocumentTypes){
 		stream << QStringLiteral("#include <imtservergql/CObjectCollectionControllerCompBase.h>");
@@ -704,7 +706,7 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 		FeedStream(stream, 1, false);
 	}
 
-	if (hasDocumentTypes || hasRequests){
+	if (hasEnums || hasDocumentTypes || hasRequests){
 		FeedStream(stream, 2, false);
 	}
 
@@ -754,6 +756,32 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 	FeedStream(stream, 1, false);
 	stream << '{';
 	FeedStream(stream, 2, false);
+
+	// generate enum classes
+	if (hasEnums){
+		stream << QStringLiteral("Q_NAMESPACE");
+		FeedStream(stream, 2, false);
+
+		// flush the stream before passing the device to enum processors
+		stream.flush();
+
+		const imtsdl::SdlEnumList enumList = m_sdlEnumListCompPtr->GetEnums(true);
+		const int enumProcessorsCount = m_enumProcessorCompListPtr.GetCount();
+		for (int i = 0; i < enumProcessorsCount; ++i){
+			ICxxFileProcessor* enumProcessorPtr = m_enumProcessorCompListPtr[i];
+			Q_ASSERT(enumProcessorPtr != nullptr);
+			for (const imtsdl::CSdlEnum& sdlEnum: enumList){
+				const bool ok = enumProcessorPtr->ProcessEntry(sdlEnum, fwdFilePtr.get(), nullptr, paramsPtr);
+				if (!ok){
+					return false;
+				}
+			}
+		}
+
+		// re-create stream after enum processors wrote to the file
+		QTextStream enumEndStream(fwdFilePtr.get());
+		FeedStream(enumEndStream, 1, false);
+	}
 
 	// forward declare all types
 	if (m_sdlTypeListCompPtr.IsValid()){
@@ -835,7 +863,7 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 		}
 	}
 
-	if (hasDocumentTypes || hasRequests){
+	if (hasEnums || hasDocumentTypes || hasRequests){
 		// re-create stream after processors wrote to the file
 		QTextStream endStream(fwdFilePtr.get());
 

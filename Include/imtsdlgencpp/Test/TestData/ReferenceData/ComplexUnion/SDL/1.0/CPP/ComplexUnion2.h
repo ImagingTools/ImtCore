@@ -34,7 +34,6 @@ namespace sdl::V1_0::complextest
 {
 
 
-Q_NAMESPACE
 
 // forward declaration for union types
 class ExtendedMetaDataUnionType;
