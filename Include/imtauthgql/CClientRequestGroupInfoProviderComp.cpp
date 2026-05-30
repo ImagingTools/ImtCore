@@ -67,10 +67,6 @@ imtauth::IUserGroupInfoSharedPtr CClientRequestGroupInfoProviderComp::GetUserGro
 		return nullptr;
 	}
 
-	if (!payload.HasValue()){
-		return nullptr;
-	}
-
 	imtauth::IUserGroupInfoUniquePtr userGroupInfoPtr = m_userGroupFactoryCompPtr.CreateInstance();
 	if (!userGroupInfoPtr.IsValid()){
 		return nullptr;

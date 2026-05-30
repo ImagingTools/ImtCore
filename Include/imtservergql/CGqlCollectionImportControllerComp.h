@@ -89,9 +89,6 @@ bool CGqlCollectionImportControllerComp::FillSessionInfo(
 	else{
 		errorMessage = tr("Invalid import request");
 	}
-	else{
-		errorMessage = tr("Invalid import request");
-	}
 
 	return false;
 }

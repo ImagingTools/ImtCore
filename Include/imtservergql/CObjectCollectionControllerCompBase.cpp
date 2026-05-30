@@ -3006,10 +3006,8 @@ QByteArray CObjectCollectionControllerCompBase::ExtractObjectIdFromGetObjectType
 	sdl::V1_0::imtbase::CGetObjectTypeIdGqlRequest getObjectTypeIdGqlRequest(gqlRequest, false);
 	if (getObjectTypeIdGqlRequest.IsValid()){
 		auto arguments = getObjectTypeIdGqlRequest.GetRequestedArguments();
-		if (arguments.input.HasValue()){
-			if (arguments.input.objectId.HasValue()){
-				return *arguments.input.objectId;
-			}
+		if (arguments.input.objectId.HasValue()){
+			return *arguments.input.objectId;
 		}
 	}
 
@@ -3022,10 +3020,8 @@ QByteArray CObjectCollectionControllerCompBase::ExtractObjectIdFromGetObjectData
 	sdl::V1_0::imtbase::CGetObjectDataGqlRequest getObjectDataGqlRequest(gqlRequest, false);
 	if (getObjectDataGqlRequest.IsValid()){
 		auto arguments = getObjectDataGqlRequest.GetRequestedArguments();
-		if (arguments.input.HasValue()){
-			if (arguments.input.objectId.HasValue()){
-				return *arguments.input.objectId;
-			}
+		if (arguments.input.objectId.HasValue()){
+			return *arguments.input.objectId;
 		}
 	}
 

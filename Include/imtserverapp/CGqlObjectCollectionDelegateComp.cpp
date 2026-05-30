@@ -41,9 +41,8 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectTypeIdRequ
 	}
 
 	sdl::V1_0::imtbase::GetObjectTypeIdRequestArguments arguments;
-	arguments.input.emplace();
-	arguments.input->objectId = objectId;
-	arguments.input->collectionId = *m_collectionIdAttrPtr;
+	arguments.input.objectId = objectId;
+	arguments.input.collectionId = *m_collectionIdAttrPtr;
 
 	return CreateGqlRequest<
 				sdl::V1_0::imtbase::GetObjectTypeIdRequestArguments,
@@ -58,9 +57,8 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectInfoReques
 	}
 
 	sdl::V1_0::imtbase::GetElementInfoRequestArguments arguments;
-	arguments.input.emplace();
-	arguments.input->collectionId = *m_collectionIdAttrPtr;
-	arguments.input->elementId = objectId;
+	arguments.input.collectionId = *m_collectionIdAttrPtr;
+	arguments.input.elementId = objectId;
 
 	return CreateGqlRequest<
 				sdl::V1_0::imtbase::GetElementInfoRequestArguments,
@@ -75,9 +73,8 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectMetaInfoRe
 	}
 
 	sdl::V1_0::imtbase::GetElementMetaInfoRequestArguments arguments;
-	arguments.input.emplace();
-	arguments.input->collectionId = *m_collectionIdAttrPtr;
-	arguments.input->elementId = objectId;
+	arguments.input.collectionId = *m_collectionIdAttrPtr;
+	arguments.input.elementId = objectId;
 
 	return CreateGqlRequest<
 				sdl::V1_0::imtbase::GetElementMetaInfoRequestArguments,
@@ -92,9 +89,8 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectDataMetaIn
 	}
 
 	sdl::V1_0::imtbase::GetDataMetaInfoRequestArguments arguments;
-	arguments.input.emplace();
-	arguments.input->collectionId = *m_collectionIdAttrPtr;
-	arguments.input->objectId = objectId;
+	arguments.input.collectionId = *m_collectionIdAttrPtr;
+	arguments.input.objectId = objectId;
 
 	return CreateGqlRequest<
 				sdl::V1_0::imtbase::GetDataMetaInfoRequestArguments,
@@ -119,10 +115,9 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateInsertObjectRequest
 	}
 
 	sdl::V1_0::imtbase::InsertNewObjectRequestArguments arguments;
-	arguments.input.emplace();
-	arguments.input->collectionId = *m_collectionIdAttrPtr;
-	arguments.input->name = name;
-	arguments.input->description = description;
+	arguments.input.collectionId = *m_collectionIdAttrPtr;
+	arguments.input.name = name;
+	arguments.input.description = description;
 
 	QByteArray objectData;
 	if (objectPtr != nullptr){
@@ -135,27 +130,27 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateInsertObjectRequest
 			return nullptr;
 		}
 	}
-	arguments.input->objectData = objectData;
-	arguments.input->proposedObjectId = proposedObjectId;
+	arguments.input.objectData = objectData;
+	arguments.input.proposedObjectId = proposedObjectId;
 
 	if (dataMetaInfoPtr != nullptr){
 		QByteArray dataMetaInfo;
 		if (SerializeObject(dataMetaInfoPtr, dataMetaInfo)){
-			arguments.input->documentMetaInfo = dataMetaInfo;
+			arguments.input.documentMetaInfo = dataMetaInfo;
 		}
 	}
 
 	if (collectionItemMetaInfoPtr != nullptr){
 		QByteArray collectionMetaInfo;
 		if (SerializeObject(collectionItemMetaInfoPtr, collectionMetaInfo)){
-			arguments.input->collectionItemMetaInfo = collectionMetaInfo;
+			arguments.input.collectionItemMetaInfo = collectionMetaInfo;
 		}
 	}
 
 	if (operationContextPtr != nullptr){
 		QByteArray operationContext;
 		if (SerializeObject(operationContextPtr, operationContext)){
-			arguments.input->operationContext = operationContext;
+			arguments.input.operationContext = operationContext;
 		}
 	}
 
@@ -174,9 +169,8 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectRequest(
 	}
 
 	sdl::V1_0::imtbase::GetObjectDataRequestArguments arguments;
-	arguments.input.emplace();
-	arguments.input->objectId = objectId;
-	arguments.input->collectionId = *m_collectionIdAttrPtr;
+	arguments.input.objectId = objectId;
+	arguments.input.collectionId = *m_collectionIdAttrPtr;
 
 	return CreateGqlRequest<
 				sdl::V1_0::imtbase::GetObjectDataRequestArguments,
@@ -199,21 +193,20 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectRequest(
 	}
 
 	sdl::V1_0::imtbase::SetObjectDataRequestArguments arguments;
-	arguments.input.emplace();
-	arguments.input->collectionId = *m_collectionIdAttrPtr;
-	arguments.input->objectId = objectId;
+	arguments.input.collectionId = *m_collectionIdAttrPtr;
+	arguments.input.objectId = objectId;
 
 	if (objectPtr != nullptr){
 		QByteArray objectData;
 		if (SerializeObject(objectPtr, objectData)){
-			arguments.input->objectData = objectData;
+			arguments.input.objectData = objectData;
 		}
 	}
 
 	if (operationContextPtr != nullptr){
 		QByteArray operationContext;
 		if (SerializeObject(operationContextPtr, operationContext)){
-			arguments.input->operationContext = operationContext;
+			arguments.input.operationContext = operationContext;
 		}
 	}
 
@@ -233,10 +226,9 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateRemoveObjectsReques
 	}
 
 	sdl::V1_0::imtbase::RemoveElementsRequestArguments arguments;
-	arguments.input.emplace();
-	arguments.input->collectionId = *m_collectionIdAttrPtr;
-	arguments.input->elementIds.Emplace();
-	arguments.input->elementIds->FromList(objectIds);
+	arguments.input.collectionId = *m_collectionIdAttrPtr;
+	arguments.input.elementIds.Emplace();
+	arguments.input.elementIds->FromList(objectIds);
 
 	return CreateGqlRequest<
 				sdl::V1_0::imtbase::RemoveElementsRequestArguments,
@@ -254,13 +246,12 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateRemoveObjectSetRequ
 	}
 
 	sdl::V1_0::imtbase::RemoveElementSetRequestArguments arguments;
-	arguments.input.emplace();
-	arguments.input->collectionId = *m_collectionIdAttrPtr;
+	arguments.input.collectionId = *m_collectionIdAttrPtr;
 
 	if (selectionParamsPtr != nullptr){
 		sdl::V1_0::imtbase::CParamsSet paramsSet;
 		if (GetParamsSetRepresentation(*selectionParamsPtr, paramsSet)){
-			arguments.input->selectionParams = paramsSet;
+			arguments.input.selectionParams = paramsSet;
 		}
 	}
 
@@ -278,14 +269,13 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetElementCountRequ
 	}
 
 	sdl::V1_0::imtbase::GetElementsCountRequestArguments arguments;
-	arguments.input.emplace();
-	arguments.input->collectionId = *m_collectionIdAttrPtr;
+	arguments.input.collectionId = *m_collectionIdAttrPtr;
 
 	if (selectionParamsPtr != nullptr){
 		if (selectionParamsPtr != nullptr){
 			sdl::V1_0::imtbase::CParamsSet paramsSet;
 			if (GetParamsSetRepresentation(*selectionParamsPtr, paramsSet)){
-				arguments.input->selectionParams = paramsSet;
+				arguments.input.selectionParams = paramsSet;
 			}
 		}
 	}
@@ -306,16 +296,15 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetElementListReque
 	}
 
 	sdl::V1_0::imtbase::GetElementIdsRequestArguments arguments;
-	arguments.input.emplace();
-	arguments.input->collectionId = *m_collectionIdAttrPtr;
-	arguments.input->count = count;
-	arguments.input->offset = offset;
+	arguments.input.collectionId = *m_collectionIdAttrPtr;
+	arguments.input.count = count;
+	arguments.input.offset = offset;
 
 	if (selectionParamsPtr != nullptr){
 		if (selectionParamsPtr != nullptr){
 			sdl::V1_0::imtbase::CParamsSet paramsSet;
 			if (GetParamsSetRepresentation(*selectionParamsPtr, paramsSet)){
-				arguments.input->selectionParams = paramsSet;
+				arguments.input.selectionParams = paramsSet;
 			}
 		}
 	}
@@ -336,16 +325,15 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetSubCollectionReq
 	}
 
 	sdl::V1_0::imtbase::CreateSubCollectionRequestArguments arguments;
-	arguments.input.emplace();
-	arguments.input->collectionId = *m_collectionIdAttrPtr;
-	arguments.input->offset = offset;
-	arguments.input->count = count;
+	arguments.input.collectionId = *m_collectionIdAttrPtr;
+	arguments.input.offset = offset;
+	arguments.input.count = count;
 
 	if (selectionParamsPtr != nullptr){
 		if (selectionParamsPtr != nullptr){
 			sdl::V1_0::imtbase::CParamsSet paramsSet;
 			if (GetParamsSetRepresentation(*selectionParamsPtr, paramsSet)){
-				arguments.input->selectionParams = paramsSet;
+				arguments.input.selectionParams = paramsSet;
 			}
 		}
 	}
@@ -367,10 +355,9 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectNameReques
 	}
 
 	sdl::V1_0::imtbase::SetObjectNameRequestArguments arguments;
-	arguments.input.emplace();
-	arguments.input->collectionId = *m_collectionIdAttrPtr;
-	arguments.input->objectId = objectId;
-	arguments.input->name = name;
+	arguments.input.collectionId = *m_collectionIdAttrPtr;
+	arguments.input.objectId = objectId;
+	arguments.input.name = name;
 
 	return CreateGqlRequest<
 				sdl::V1_0::imtbase::SetObjectNameRequestArguments,
@@ -389,10 +376,9 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectDescriptio
 	}
 
 	sdl::V1_0::imtbase::SetObjectDescriptionRequestArguments arguments;
-	arguments.input.emplace();
-	arguments.input->collectionId = *m_collectionIdAttrPtr;
-	arguments.input->objectId = objectId;
-	arguments.input->description = description;
+	arguments.input.collectionId = *m_collectionIdAttrPtr;
+	arguments.input.objectId = objectId;
+	arguments.input.description = description;
 
 	return CreateGqlRequest<
 				sdl::V1_0::imtbase::SetObjectDescriptionRequestArguments,

@@ -35,7 +35,7 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 	}
 
 	sdl::V1_0::imtauth::ChangePasswordRequestArguments arguments = changePasswordRequest.GetRequestedArguments();
-	sdl::V1_0::imtauth::CChangePasswordInput inputArgument = *arguments.input;
+	sdl::V1_0::imtauth::CChangePasswordInput& inputArgument = arguments.input;
 	QByteArray login;
 	if (inputArgument.login){
 		login = *inputArgument.login;

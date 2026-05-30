@@ -19,6 +19,7 @@
 #include <imtauth/CUserInfo.h>
 #include <imtauth/CLdapUserCollectionControllerComp.h>
 #include <imtbase/CComplexCollectionFilter.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
 
 
 namespace imtauthgql
@@ -186,7 +187,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 		if (enabled){
 
 			sdl::V1_0::imtauth::AuthorizationRequestArguments arguments = authorizationRequest.GetRequestedArguments();
-					sdl::V1_0::imtauth::CAuthorizationInput inputArgument = *arguments.input;
+					sdl::V1_0::imtauth::CAuthorizationInput& inputArgument = arguments.input;
 
 			QByteArray login;
 			if (inputArgument.login){

@@ -61,10 +61,6 @@ imtauth::IUserInfoUniquePtr CClientRequestUserInfoProviderComp::GetUser(const QB
 		return nullptr;
 	}
 
-	if (!payload.HasValue()){
-		return nullptr;
-	}
-
 	imtauth::IUserInfoUniquePtr userInfoPtr = m_userFactoryCompPtr.CreateInstance();
 	if (!userInfoPtr.IsValid()){
 		return nullptr;

@@ -67,7 +67,7 @@ sdl::V1_0::imtauth::CPersonalAccessTokenList CPersonalAccessTokenControllerComp:
 	sdl::V1_0::imtauth::GetTokenListRequestArguments arguments = 
 		getTokenListRequest.GetRequestedArguments();
 
-	sdl::V1_0::imtauth::CUserIdInput inputArgument = *arguments.input;
+	sdl::V1_0::imtauth::CUserIdInput& inputArgument = arguments.input;
 
 	QByteArray userId;
 	if (inputArgument.userId){
@@ -113,7 +113,7 @@ sdl::V1_0::imtauth::CPersonalAccessToken CPersonalAccessTokenControllerComp::OnG
 	sdl::V1_0::imtauth::GetTokenRequestArguments arguments = 
 		getTokenRequest.GetRequestedArguments();
 
-	sdl::V1_0::imtbase::CInputId inputArgument = *arguments.input;
+	sdl::V1_0::imtbase::CInputId& inputArgument = arguments.input;
 
 	QByteArray tokenId;
 	if (inputArgument.id){
@@ -154,7 +154,7 @@ sdl::V1_0::imtauth::CValidateTokenPayload CPersonalAccessTokenControllerComp::On
 	sdl::V1_0::imtauth::ValidateTokenRequestArguments arguments = 
 		validateTokenRequest.GetRequestedArguments();
 
-	sdl::V1_0::imtauth::CTokenInput inputArgument = *arguments.input;
+	sdl::V1_0::imtauth::CTokenInput& inputArgument = arguments.input;
 
 	QByteArray rawToken;
 	if (inputArgument.token){
@@ -206,7 +206,7 @@ sdl::V1_0::imtauth::CCreateTokenPayload CPersonalAccessTokenControllerComp::OnCr
 	sdl::V1_0::imtauth::CreateTokenRequestArguments arguments = 
 		createTokenRequest.GetRequestedArguments();
 
-	sdl::V1_0::imtauth::CCreateTokenInput inputArgument = *arguments.input;
+	sdl::V1_0::imtauth::CCreateTokenInput& inputArgument = arguments.input;
 
 	QByteArray userId;
 	if (inputArgument.userId){
@@ -290,7 +290,7 @@ sdl::V1_0::imtauth::CRevokeTokenPayload CPersonalAccessTokenControllerComp::OnRe
 	sdl::V1_0::imtauth::RevokeTokenRequestArguments arguments = 
 		revokeTokenRequest.GetRequestedArguments();
 
-	sdl::V1_0::imtbase::CInputId inputArgument = *arguments.input;
+	sdl::V1_0::imtbase::CInputId& inputArgument = arguments.input;
 
 	QByteArray tokenId;
 	if (inputArgument.id){
@@ -338,7 +338,7 @@ sdl::V1_0::imtauth::CDeleteTokenPayload CPersonalAccessTokenControllerComp::OnDe
 	sdl::V1_0::imtauth::DeleteTokenRequestArguments arguments = 
 		deleteTokenRequest.GetRequestedArguments();
 
-	sdl::V1_0::imtbase::CInputId inputArgument = *arguments.input;
+	sdl::V1_0::imtbase::CInputId& inputArgument = arguments.input;
 
 	QByteArray tokenId;
 	if (inputArgument.id){

@@ -133,9 +133,9 @@ bool CReceiptConverter::CreateSdlFromParams(sdl::V1_0::imtpay::CReceipt& receipt
 	iprm::TParamsPtr<iprm::IParamsManager> paymentsManagerParamsPtr(&params, ReceiptParamKeys::Payments, false);
 	if (paymentsManagerParamsPtr.IsValid()){
 		const int paymentsCount = paymentsManagerParamsPtr->GetParamsSetsCount();
-		imtsdl::TElementList<ImtPayV1::CPayment::V1_0> payments;
+		imtsdl::TElementList<ImtPayV1::CPayment> payments;
 		for (int index = 0; index < paymentsCount; ++index){
-			ImtPayV1::CPayment::V1_0 payment;
+			ImtPayV1::CPayment payment;
 			iprm::IParamsSet* paymentParamsPtr = paymentsManagerParamsPtr->GetParamsSet(index);
 			Q_ASSERT(paymentParamsPtr != nullptr);
 
@@ -169,7 +169,7 @@ bool CReceiptConverter::CreateSdlFromParams(sdl::V1_0::imtpay::CReceipt& receipt
 	// set operator
 	iprm::TParamsPtr<iprm::IParamsSet> operatorParamsPtr(&params, ReceiptParamKeys::Operator, false);
 	if (operatorParamsPtr.IsValid()){
-		ImtPayV1::COperator::V1_0 receiptOperator;
+		ImtPayV1::COperator receiptOperator;
 
 		iprm::TParamsPtr<iprm::IIdParam> operatorIdParamPtr(&*operatorParamsPtr, ReceiptOperatorKeys::Id, false);
 		if (operatorIdParamPtr.IsValid()){
@@ -193,9 +193,9 @@ bool CReceiptConverter::CreateSdlFromParams(sdl::V1_0::imtpay::CReceipt& receipt
 	iprm::TParamsPtr<iprm::IParamsManager> clientsParamsManagerPtr(&params, ReceiptParamKeys::Clients, false);
 	Q_ASSERT(clientsParamsManagerPtr.IsValid());
 	const int clientsCount = clientsParamsManagerPtr->GetParamsSetsCount();
-	imtsdl::TElementList<ImtPayV1::CClient::V1_0> clientList;
+	imtsdl::TElementList<ImtPayV1::CClient> clientList;
 	for (int clientIndex = 0; clientIndex < clientsCount; ++clientIndex){
-		ImtPayV1::CClient::V1_0 clientInfo;
+		ImtPayV1::CClient clientInfo;
 
 		iprm::IParamsSet* clientItemParamsSetPtr = clientsParamsManagerPtr->GetParamsSet(clientIndex);
 		Q_ASSERT(clientItemParamsSetPtr != nullptr);
@@ -254,9 +254,9 @@ bool CReceiptConverter::CreateSdlFromParams(sdl::V1_0::imtpay::CReceipt& receipt
 	iprm::TParamsPtr<iprm::IParamsManager> itemsParamsManagerPtr(&params, ReceiptParamKeys::Items);
 	Q_ASSERT(itemsParamsManagerPtr.IsValid());
 	const int itemsCount = itemsParamsManagerPtr->GetParamsSetsCount();
-	imtsdl::TElementList<ImtPayV1::CItem::V1_0> itemList;
+	imtsdl::TElementList<ImtPayV1::CItem> itemList;
 	for (int intmIndex = 0; intmIndex < itemsCount; ++intmIndex){
-		ImtPayV1::CItem::V1_0 paymentItem;
+		ImtPayV1::CItem paymentItem;
 
 		iprm::IParamsSet* paymentItemParamsSetPtr = itemsParamsManagerPtr->GetParamsSet(intmIndex);
 		Q_ASSERT(paymentItemParamsSetPtr != nullptr);
@@ -405,10 +405,10 @@ bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl:
 
 	// set payments
 	if (receipt.payments){
-		const imtsdl::TElementList<ImtPayV1::CPayment::V1_0> receiptPaymentList = *receipt.payments;
+		const imtsdl::TElementList<ImtPayV1::CPayment> receiptPaymentList = *receipt.payments;
 		iprm::IParamsManager* paymentsManagerParamsPtr = dynamic_cast<iprm::IParamsManager*>(params.GetEditableParameter(ReceiptParamKeys::Payments));
 		if (!receiptPaymentList.isEmpty() && paymentsManagerParamsPtr != nullptr){
-			for (const istd::TSharedNullable<ImtPayV1::CPayment::V1_0>& receiptPayment: receiptPaymentList){
+			for (const istd::TSharedNullable<ImtPayV1::CPayment>& receiptPayment: receiptPaymentList){
 				const int insertedParamsIndex = paymentsManagerParamsPtr->InsertParamsSet();
 				Q_ASSERT(insertedParamsIndex >= 0);
 
@@ -446,7 +446,7 @@ bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl:
 	if (receipt.operatorData){
 		iprm::IParamsSet* operatorParamsPtr = dynamic_cast<iprm::IParamsSet*>(params.GetEditableParameter(ReceiptParamKeys::Operator));
 		if (operatorParamsPtr != nullptr){
-			ImtPayV1::COperator::V1_0 receiptOperator = *receipt.operatorData;
+			ImtPayV1::COperator receiptOperator = *receipt.operatorData;
 			iprm::IIdParam* idParamPtr = dynamic_cast<iprm::IIdParam*>(operatorParamsPtr->GetEditableParameter( ReceiptClientKeys::Id));
 			if (idParamPtr != nullptr){
 				idParamPtr->SetId(receiptOperator.id->toUtf8());
@@ -459,10 +459,10 @@ bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl:
 
 	// set clients
 	Q_ASSERT_X(receipt.clients.HasValue(), __func__, "Receipt clients expected but missing");
-	const imtsdl::TElementList<ImtPayV1::CClient::V1_0> receiptClientList = *receipt.clients;
+	const imtsdl::TElementList<ImtPayV1::CClient> receiptClientList = *receipt.clients;
 	iprm::IParamsManager* clientsParamsManagerPtr = dynamic_cast<iprm::IParamsManager*>(params.GetEditableParameter(ReceiptParamKeys::Clients));
 	if (!receiptClientList.isEmpty() && clientsParamsManagerPtr != nullptr){
-		for (const istd::TSharedNullable<ImtPayV1::CClient::V1_0>& receiptClient: receiptClientList){
+		for (const istd::TSharedNullable<ImtPayV1::CClient>& receiptClient: receiptClientList){
 			const int insertedParamsIndex = clientsParamsManagerPtr->InsertParamsSet();
 			Q_ASSERT(insertedParamsIndex >= 0);
 
@@ -487,10 +487,10 @@ bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl:
 
 	// set items
 	Q_ASSERT_X(receipt.items.HasValue(), __func__, "Receipt items expected but missing");
-	const imtsdl::TElementList<ImtPayV1::CItem::V1_0> receiptItemList = *receipt.items;
+	const imtsdl::TElementList<ImtPayV1::CItem> receiptItemList = *receipt.items;
 	iprm::IParamsManager* itemsParamsManagerPtr = dynamic_cast<iprm::IParamsManager*>(params.GetEditableParameter(ReceiptParamKeys::Items));
 	if (!receiptItemList.isEmpty() && itemsParamsManagerPtr != nullptr){
-		for (const istd::TSharedNullable<ImtPayV1::CItem::V1_0>& receiptItem: receiptItemList){
+		for (const istd::TSharedNullable<ImtPayV1::CItem>& receiptItem: receiptItemList){
 			const int insertedParamsIndex = itemsParamsManagerPtr->InsertParamsSet();
 			Q_ASSERT(insertedParamsIndex >= 0);
 

@@ -338,10 +338,6 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 	}
 
 	sdl::V1_0::imtauth::CTokenInput arguments = getPermissionsRequest.GetRequestedArguments().input;
-	if (!arguments.HasValue()){
-		Q_ASSERT(false);
-		return response;
-	}
 
 	QByteArray token;
 	if (arguments.accessToken.HasValue()){

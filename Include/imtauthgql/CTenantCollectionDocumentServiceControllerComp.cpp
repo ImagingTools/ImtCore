@@ -3,6 +3,8 @@
 
 // ImtCore includes
 #include <imtgql/IGqlContext.h>
+#include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService.h>
+#include <imtbasesdl/SDL/1.0/CPP/UndoManager.h>
 
 
 namespace imtauthgql
@@ -82,7 +84,7 @@ CDM::CDocumentInfo CTenantCollectionDocumentServiceControllerComp::OnOpenDocumen
 
 		// Extract the objectId (tenantId) being opened from the request arguments
 		const auto& arguments = openDocumentRequest.GetRequestedArguments();
-		if (arguments.arguments.input.id){
+		if (arguments.input.id){
 			QByteArray requestedTenantId = *arguments.input.id;
 			if (!requestedTenantId.isEmpty() && requestedTenantId != sessionTenantId){
 				errorMessage = QStringLiteral("Cannot edit a tenant you are not currently switched to. Please switch to this organization first.");

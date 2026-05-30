@@ -57,10 +57,6 @@ imtauth::IRoleUniquePtr CClientRequestRoleInfoProviderComp::GetRole(const QByteA
 		return nullptr;
 	}
 
-	if (!payload.HasValue()){
-		return nullptr;
-	}
-
 	imtauth::IRoleUniquePtr roleInfoPtr = m_roleFactoryCompPtr.CreateInstance();
 	if (!roleInfoPtr.IsValid()){
 		return nullptr;

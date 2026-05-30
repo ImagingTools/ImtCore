@@ -46,7 +46,7 @@ CDM::CDocumentList CCollectionDocumentServiceControllerComp::OnGetOpenedDocument
 			sdlInfo.isDirty = info.isDirty;
 			sdlInfo.hasNameProvider = info.hasNameProvider;
 
-			retVal.documentList->append(sdlInfo.Version_1_0);
+			retVal.documentList->append(sdlInfo);
 		}
 	}
 
@@ -97,7 +97,7 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnCreateNewDocument
 
 		retVal.documentId = documentId;
 		retVal.documentName = documentName;
-		retVal.objectTypeId = *documentTypeId->typeId;
+		retVal.objectTypeId = *documentTypeId.typeId;
 		retVal.objectId = QByteArray();
 		retVal.isDirty = false;
 		retVal.hasNameProvider = false;
@@ -197,7 +197,7 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnGetDocumentName(
 
 	if (m_documentManagerCompPtr.IsValid()) {
 		QString name;
-		imtdoc::IDocumentService::OperationStatus status = m_documentManagerCompPtr->GetDocumentName(userId, *documentId->id, name);
+		imtdoc::IDocumentService::OperationStatus status = m_documentManagerCompPtr->GetDocumentName(userId, *documentId.id, name);
 
 		switch (status){
 		case imtdoc::IDocumentService::OS_OK:{
@@ -245,7 +245,7 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSetDoc
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
-		imtdoc::IDocumentService::OperationStatus status = m_documentManagerCompPtr->SetDocumentName(userId, *documentId->documentId, *documentId->documentName);
+		imtdoc::IDocumentService::OperationStatus status = m_documentManagerCompPtr->SetDocumentName(userId, *documentId.documentId, *documentId.documentName);
 		switch (status){
 		case imtdoc::IDocumentService::OS_OK:
 			retVal.status = CDM::EDocumentOperationStatus::Success;

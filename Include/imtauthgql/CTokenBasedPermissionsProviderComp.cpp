@@ -32,10 +32,6 @@ const QByteArrayList CTokenBasedPermissionsProviderComp::GetPermissions(const QB
 		return QByteArrayList();
 	}
 
-	if (!payload.HasValue()){
-		return QByteArrayList();
-	}
-
 	if (!payload.permissions.HasValue()){
 		return QByteArrayList();
 	}

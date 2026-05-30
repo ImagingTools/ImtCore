@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtlic/IFeatureInfo.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 
 
 namespace imtauthgql
@@ -57,11 +58,6 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CRoleRemoteCollectionControllerCo
 {
 	sdl::V1_0::imtbase::CGetElementMetaInfoPayload payload = BaseClass::OnGetElementMetaInfo(getElementMetaInfoRequest, gqlRequest, errorMessage);
 	if (!errorMessage.isEmpty()){
-		return payload;
-	}
-
-	if (!payload.HasValue()){
-		Q_ASSERT(false);
 		return payload;
 	}
 
