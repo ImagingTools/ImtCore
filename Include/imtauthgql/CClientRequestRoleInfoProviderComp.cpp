@@ -33,10 +33,9 @@ imtauth::IRoleUniquePtr CClientRequestRoleInfoProviderComp::GetRole(const QByteA
 	namespace rolessdl = sdl::V1_0::imtauth;
 
 	rolessdl::RoleItemRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->id = objectId;
+	arguments.input.id = objectId;
 
-	arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+	arguments.input.productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 
 	QString errorMessage;
 	imtgql::CGqlRequest gqlRequest;
@@ -58,7 +57,7 @@ imtauth::IRoleUniquePtr CClientRequestRoleInfoProviderComp::GetRole(const QByteA
 		return nullptr;
 	}
 
-	if (!payload.Version_1_0.HasValue()){
+	if (!payload.HasValue()){
 		return nullptr;
 	}
 
@@ -67,39 +66,39 @@ imtauth::IRoleUniquePtr CClientRequestRoleInfoProviderComp::GetRole(const QByteA
 		return nullptr;
 	}
 
-	if (payload.Version_1_0->roleId){
-		roleInfoPtr->SetRoleId(*payload.Version_1_0->roleId);
+	if (payload.roleId){
+		roleInfoPtr->SetRoleId(*payload.roleId);
 	}
 
-	if (payload.Version_1_0->productId){
-		roleInfoPtr->SetProductId(*payload.Version_1_0->productId);
+	if (payload.productId){
+		roleInfoPtr->SetProductId(*payload.productId);
 	}
 
-	if (payload.Version_1_0->name){
-		roleInfoPtr->SetRoleName(*payload.Version_1_0->name);
+	if (payload.name){
+		roleInfoPtr->SetRoleName(*payload.name);
 	}
 
-	if (payload.Version_1_0->description){
-		roleInfoPtr->SetRoleDescription(*payload.Version_1_0->description);
+	if (payload.description){
+		roleInfoPtr->SetRoleDescription(*payload.description);
 	}
 
-	if (payload.Version_1_0->isDefault){
-		roleInfoPtr->SetDefault(*payload.Version_1_0->isDefault);
+	if (payload.isDefault){
+		roleInfoPtr->SetDefault(*payload.isDefault);
 	}
 
-	if (payload.Version_1_0->isGuest){
-		roleInfoPtr->SetGuest(*payload.Version_1_0->isGuest);
+	if (payload.isGuest){
+		roleInfoPtr->SetGuest(*payload.isGuest);
 	}
 
-	if (payload.Version_1_0->permissions){
-		QByteArray permissions = *payload.Version_1_0->permissions;
+	if (payload.permissions){
+		QByteArray permissions = *payload.permissions;
 		if (!permissions.isEmpty()){
 			roleInfoPtr->SetLocalPermissions(permissions.split(';'));
 		}
 	}
 
-	if (payload.Version_1_0->parentRoles){
-		for (const QByteArray& roleId : payload.Version_1_0->parentRoles->ToList()){
+	if (payload.parentRoles){
+		for (const QByteArray& roleId : payload.parentRoles->ToList()){
 			roleInfoPtr->IncludeRole(roleId);
 		}
 	}

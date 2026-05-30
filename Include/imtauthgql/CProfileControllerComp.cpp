@@ -35,19 +35,14 @@ sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 
 	sdl::V1_0::imtauth::GetProfileRequestArguments arguments = getProfileRequest.GetRequestedArguments();
 
-	if (!arguments.input.Version_1_0.has_value()){
-		Q_ASSERT(false);
-		return sdl::V1_0::imtauth::CProfileData();
-	}
-
 	QByteArray objectId;
-	if (arguments.input.Version_1_0->id){
-		objectId = *arguments.input.Version_1_0->id;
+	if (arguments.input.id){
+		objectId = *arguments.input.id;
 	}
 
 	QByteArray productId;
-	if (arguments.input.Version_1_0->productId){
-		productId = *arguments.input.Version_1_0->productId;
+	if (arguments.input.productId){
+		productId = *arguments.input.productId;
 	}
 
 	const imtauth::IUserInfo* userInfoPtr = nullptr;
@@ -138,10 +133,7 @@ sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 
 	profileData.permissions = std::move(permissionList);
 
-	sdl::V1_0::imtauth::CProfileData retVal;
-	retVal.Version_1_0 = std::move(profileData);
-
-	return retVal;
+	return profileData;
 }
 
 
@@ -151,17 +143,15 @@ sdl::V1_0::imtauth::CGetUserOrganizationsPayload CProfileControllerComp::OnGetUs
 			QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CGetUserOrganizationsPayload response;
-	response.Version_1_0.emplace();
-
 	sdl::V1_0::imtauth::GetUserOrganizationsRequestArguments arguments = getUserOrganizationsRequest.GetRequestedArguments();
 
 	QByteArray userId;
-	if (arguments.input.Version_1_0.has_value() && arguments.input.Version_1_0->id){
-		userId = *arguments.input.Version_1_0->id;
+	if (arguments.input.id){
+		userId = *arguments.input.id;
 	}
 
 	if (!userId.isEmpty()){
-		response.Version_1_0->organizations = CreateOrganizationList(userId);
+		response.organizations = CreateOrganizationList(userId);
 	}
 
 	return response;
@@ -235,14 +225,9 @@ sdl::V1_0::imtauth::CSetProfileResponse CProfileControllerComp::OnSetProfile(
 	}
 
 	sdl::V1_0::imtauth::SetProfileRequestArguments arguments = setProfileRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.has_value()){
-		Q_ASSERT(false);
-		return sdl::V1_0::imtauth::CSetProfileResponse();
-	}
-
 	QByteArray id;
-	if (arguments.input.Version_1_0->id){
-		id = *arguments.input.Version_1_0->id;
+	if (arguments.input.id){
+		id = *arguments.input.id;
 	}
 
 	imtauth::IUserInfo* userInfoPtr = nullptr;
@@ -257,13 +242,13 @@ sdl::V1_0::imtauth::CSetProfileResponse CProfileControllerComp::OnSetProfile(
 	}
 
 	QString name;
-	if (arguments.input.Version_1_0->name){
-		name = *arguments.input.Version_1_0->name;
+	if (arguments.input.name){
+		name = *arguments.input.name;
 	}
 
 	QString email;
-	if (arguments.input.Version_1_0->email){
-		email = *arguments.input.Version_1_0->email;
+	if (arguments.input.email){
+		email = *arguments.input.email;
 	}
 
 	userInfoPtr->SetName(name);
@@ -277,10 +262,7 @@ sdl::V1_0::imtauth::CSetProfileResponse CProfileControllerComp::OnSetProfile(
 
 	response.status = true;
 
-	sdl::V1_0::imtauth::CSetProfileResponse retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 

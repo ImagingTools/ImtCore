@@ -105,27 +105,25 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAu
 
 	QByteArray tokenValue = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
-	payload.Version_1_0.emplace();
-
-	payload.Version_1_0->token = tokenValue;
-	payload.Version_1_0->username = login;
-	payload.Version_1_0->userId = objectId;
-	payload.Version_1_0->systemId = systemId;
+	payload.token = tokenValue;
+	payload.username = login;
+	payload.userId = objectId;
+	payload.systemId = systemId;
 
 	if (!productId.isEmpty()){
 		imtauth::IUserInfo::FeatureIds permissionIds = userInfo.GetPermissions(productId);
 		QByteArrayList uniqueList = QSet<QByteArray>(permissionIds.begin(), permissionIds.end()).values();
 		std::sort(uniqueList.begin(), uniqueList.end());
 		QByteArray permissions = uniqueList.join(';');
-		(*payload.Version_1_0).permissions = permissions;
+		(payload).permissions = permissions;
 	}
 
 	if (m_jwtSessionControllerCompPtr.IsValid()){
 		imtauth::IJwtSessionController::UserSession userSession;
 		if (m_jwtSessionControllerCompPtr->CreateNewSession(objectId, QByteArray(), userSession)){
-			payload.Version_1_0->refreshToken = userSession.refreshToken;
-			payload.Version_1_0->token = userSession.accessToken;
-			payload.Version_1_0->userId = userSession.userId;
+			payload.refreshToken = userSession.refreshToken;
+			payload.token = userSession.accessToken;
+			payload.userId = userSession.userId;
 		}
 	}
 
@@ -181,24 +179,19 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 	}
 
 	sdl::V1_0::imtauth::CAuthorizationInput inputArgument = authorizationRequest.GetRequestedArguments().input;
-	if (!inputArgument.Version_1_0.has_value()){
-		Q_ASSERT(false);
-		return sdl::V1_0::imtauth::CAuthorizationPayload();
-	}
-
 	QByteArray login;
-	if (inputArgument.Version_1_0->login){
-		login = inputArgument.Version_1_0->login->toUtf8();
+	if (inputArgument.login){
+		login = inputArgument.login->toUtf8();
 	}
 
 	QByteArray productId;
-	if (inputArgument.Version_1_0->productId){
-		productId = *inputArgument.Version_1_0->productId;
+	if (inputArgument.productId){
+		productId = *inputArgument.productId;
 	}
 
 	QByteArray password;
-	if (inputArgument.Version_1_0->password){
-		password = inputArgument.Version_1_0->password->toUtf8();
+	if (inputArgument.password){
+		password = inputArgument.password->toUtf8();
 	}
 
 	QByteArray userObjectId = GetUserObjectId(login);
@@ -247,24 +240,19 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserTo
 	}
 
 	sdl::V1_0::imtauth::CAuthorizationInput inputArgument = userTokenRequest.GetRequestedArguments().input;
-	if (!inputArgument.Version_1_0.has_value()){
-		Q_ASSERT(false);
-		return sdl::V1_0::imtauth::CAuthorizationPayload();
-	}
-	
 	QByteArray login;
-	if (inputArgument.Version_1_0->login){
-		login = inputArgument.Version_1_0->login->toUtf8();
+	if (inputArgument.login){
+		login = inputArgument.login->toUtf8();
 	}
 	
 	QByteArray productId;
-	if (inputArgument.Version_1_0->productId){
-		productId = *inputArgument.Version_1_0->productId;
+	if (inputArgument.productId){
+		productId = *inputArgument.productId;
 	}
 	
 	QByteArray password;
-	if (inputArgument.Version_1_0->password){
-		password = inputArgument.Version_1_0->password->toUtf8();
+	if (inputArgument.password){
+		password = inputArgument.password->toUtf8();
 	}
 
 	QByteArray userObjectId = GetUserObjectId(login);
@@ -315,20 +303,18 @@ sdl::V1_0::imtauth::CLogoutPayload CAuthorizationControllerComp::OnLogout(
 		return response;
 	}
 
-	response.Version_1_0.emplace();
-
 	sdl::V1_0::imtauth::CTokenInput arguments = logoutRequest.GetRequestedArguments().input;
 
 	QByteArray accessToken = gqlContextPtr->GetToken();
 	if (m_jwtSessionControllerCompPtr.IsValid()){
 		QByteArray sessionId = m_jwtSessionControllerCompPtr->GetSessionFromJwt(accessToken);
 		if (!m_jwtSessionControllerCompPtr->RemoveSession(sessionId)){
-			response.Version_1_0->ok = false;
+			response.ok = false;
 			return response;
 		}
 	}
 
-	response.Version_1_0->ok = true;
+	response.ok = true;
 
 	return response;
 }
@@ -352,14 +338,14 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 	}
 
 	sdl::V1_0::imtauth::CTokenInput arguments = getPermissionsRequest.GetRequestedArguments().input;
-	if (!arguments.Version_1_0.HasValue()){
+	if (!arguments.HasValue()){
 		Q_ASSERT(false);
 		return response;
 	}
 
 	QByteArray token;
-	if (arguments.Version_1_0->accessToken.HasValue()){
-		token = *arguments.Version_1_0->accessToken;
+	if (arguments.accessToken.HasValue()){
+		token = *arguments.accessToken;
 	}
 
 	QByteArray userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
@@ -375,9 +361,8 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 		return response;
 	}
 
-	response.Version_1_0.Emplace();
 	QByteArrayList permissions = userInfoPtr->GetPermissions();
-	response.Version_1_0->permissions.Emplace().FromList(permissions);
+	response.permissions.Emplace().FromList(permissions);
 
 	return response;
 }

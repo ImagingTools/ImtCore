@@ -27,12 +27,12 @@ sdl::V1_0::imtbase::CImportObjectPayload CProductCollectionControllerComp::OnImp
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CImportObjectPayload response = BaseClass::OnImportObject(importObjectRequest, gqlRequest, errorMessage);
-	if (response.Version_1_0 && response.Version_1_0->success){
-		bool success = *response.Version_1_0->success;
+	if (response.success){
+		bool success = *response.success;
 		if (success){
 			QByteArray objectId;
-			if (response.Version_1_0->objectId){
-				objectId = *response.Version_1_0->objectId;
+			if (response.objectId){
+				objectId = *response.objectId;
 			}
 
 			imtbase::IObjectCollection::DataPtr dataPtr;
@@ -271,8 +271,8 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::V1_0::imtlic::ProductItemRequestArguments arguments = productItemRequest.GetRequestedArguments();
 
 	QByteArray id;
-	if (arguments.input.Version_1_0->id){
-		id = *arguments.input.Version_1_0->id;
+	if (arguments.input.id){
+		id = *arguments.input.id;
 	}
 	representationPayload.id = QByteArray(id);
 
@@ -310,19 +310,14 @@ bool CProductCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 	}
 
 	sdl::V1_0::imtlic::ProductUpdateRequestArguments arguments = productUpdateRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.has_value()){
-		Q_ASSERT(false);
-		return false;
-	}
-
 	QByteArray objectId;
-	if (arguments.input.Version_1_0->id){
-		objectId = *productUpdateRequest.GetRequestedArguments().input.Version_1_0->id;
+	if (arguments.input.id){
+		objectId = *productUpdateRequest.GetRequestedArguments().input.id;
 	}
 
 	sdl::V1_0::imtlic::CProductData productData;
-	if (arguments.input.Version_1_0->item){
-		productData = *productUpdateRequest.GetRequestedArguments().input.Version_1_0->item;
+	if (arguments.input.item){
+		productData = *productUpdateRequest.GetRequestedArguments().input.item;
 	}
 
 	productInfoPtr->ResetData();

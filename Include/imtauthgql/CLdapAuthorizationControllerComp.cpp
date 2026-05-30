@@ -186,12 +186,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 		if (enabled){
 
 			sdl::V1_0::imtauth::AuthorizationRequestArguments arguments = authorizationRequest.GetRequestedArguments();
-			if (!arguments.input.Version_1_0.has_value()){
-				Q_ASSERT(false);
-				return sdl::V1_0::imtauth::CAuthorizationPayload();
-			}
-
-			sdl::V1_0::imtauth::CAuthorizationInput inputArgument = *arguments.input.Version_1_0;
+					sdl::V1_0::imtauth::CAuthorizationInput inputArgument = *arguments.input;
 
 			QByteArray login;
 			if (inputArgument.login){

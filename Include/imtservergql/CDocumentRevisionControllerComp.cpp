@@ -68,19 +68,14 @@ sdl::V1_0::imtbase::CRevisionInfoList CDocumentRevisionControllerComp::OnGetRevi
 	sdl::V1_0::imtbase::CRevisionInfoList response;
 	
 	sdl::V1_0::imtbase::GetRevisionInfoListRequestArguments arguments = getRevisionInfoListRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.has_value()){
-		errorMessage = QString("Unable to get revision list. Error: Request invalid");
-		return sdl::V1_0::imtbase::CRevisionInfoList();
-	}
-	
 	QByteArray documentId;
-	if (arguments.input.Version_1_0->documentId){
-		documentId = *arguments.input.Version_1_0->documentId;
+	if (arguments.input.documentId){
+		documentId = *arguments.input.documentId;
 	}
 
 	QByteArray collectionId;
-	if (arguments.input.Version_1_0->collectionId){
-		collectionId = *arguments.input.Version_1_0->collectionId;
+	if (arguments.input.collectionId){
+		collectionId = *arguments.input.collectionId;
 	}
 
 	if (!IsCollectionSupported(collectionId)){
@@ -139,10 +134,7 @@ sdl::V1_0::imtbase::CRevisionInfoList CDocumentRevisionControllerComp::OnGetRevi
 
 	response.revisions = std::move(revisionItemList);
 
-	sdl::V1_0::imtbase::CRevisionInfoList retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 
@@ -163,24 +155,19 @@ sdl::V1_0::imtbase::CRestoreRevisionResponse CDocumentRevisionControllerComp::On
 	sdl::V1_0::imtbase::CRestoreRevisionResponse response;
 	
 	sdl::V1_0::imtbase::RestoreRevisionRequestArguments arguments = restoreRevisionRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.has_value()){
-		errorMessage = QString("Unable to restore revision. Error: Request invalid");
-		return sdl::V1_0::imtbase::CRestoreRevisionResponse();
-	}
-	
 	QByteArray documentId;
-	if (arguments.input.Version_1_0->objectId){
-		documentId = *arguments.input.Version_1_0->objectId;
+	if (arguments.input.objectId){
+		documentId = *arguments.input.objectId;
 	}
 	
 	int revisionNumber = -1;
-	if (arguments.input.Version_1_0->revision){
-		revisionNumber = *arguments.input.Version_1_0->revision;
+	if (arguments.input.revision){
+		revisionNumber = *arguments.input.revision;
 	}
 	
 	QByteArray collectionId;
-	if (arguments.input.Version_1_0->collectionId){
-		collectionId = *arguments.input.Version_1_0->collectionId;
+	if (arguments.input.collectionId){
+		collectionId = *arguments.input.collectionId;
 	}
 	
 	if (!IsCollectionSupported(collectionId)){
@@ -204,10 +191,7 @@ sdl::V1_0::imtbase::CRestoreRevisionResponse CDocumentRevisionControllerComp::On
 
 	response.result = (ok);
 
-	sdl::V1_0::imtbase::CRestoreRevisionResponse retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 
@@ -240,24 +224,19 @@ sdl::V1_0::imtbase::CDeleteRevisionResponse CDocumentRevisionControllerComp::OnD
 	}
 	
 	sdl::V1_0::imtbase::DeleteRevisionRequestArguments arguments = deleteRevisionRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.has_value()){
-		errorMessage = QString("Unable to delete revision. Error: Request invalid");
-		return sdl::V1_0::imtbase::CDeleteRevisionResponse();
-	}
-	
 	QByteArray documentId;
-	if (arguments.input.Version_1_0->objectId){
-		documentId = *arguments.input.Version_1_0->objectId;
+	if (arguments.input.objectId){
+		documentId = *arguments.input.objectId;
 	}
 	
 	int revisionNumber = -1;
-	if (arguments.input.Version_1_0->revision){
-		revisionNumber = *arguments.input.Version_1_0->revision;
+	if (arguments.input.revision){
+		revisionNumber = *arguments.input.revision;
 	}
 	
 	QByteArray collectionId;
-	if (arguments.input.Version_1_0->collectionId){
-		collectionId = *arguments.input.Version_1_0->collectionId;
+	if (arguments.input.collectionId){
+		collectionId = *arguments.input.collectionId;
 	}
 
 	if (!IsCollectionSupported(collectionId)){
@@ -277,10 +256,7 @@ sdl::V1_0::imtbase::CDeleteRevisionResponse CDocumentRevisionControllerComp::OnD
 
 	response.result = (ok);
 
-	sdl::V1_0::imtbase::CDeleteRevisionResponse retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 

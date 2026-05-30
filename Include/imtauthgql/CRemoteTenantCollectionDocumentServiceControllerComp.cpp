@@ -26,12 +26,12 @@ sdl::V1_0::imtauth::CTenantData CRemoteTenantCollectionDocumentServiceController
 		return response;
 	}
 
-	if (!response.Version_1_0.HasValue()){
+	if (!response.HasValue()){
 		return response;
 	}
 
 	// Enrich response with allProductPermissions as tree from local IProductInfo
-	response.Version_1_0->allProductPermissions.Emplace();
+	response.allProductPermissions.Emplace();
 	if (m_productInfoCompPtr.IsValid()){
 		imtbase::IObjectCollection* featureCollectionPtr = m_productInfoCompPtr->GetFeatures();
 		if (featureCollectionPtr != nullptr){
@@ -41,7 +41,7 @@ sdl::V1_0::imtauth::CTenantData CRemoteTenantCollectionDocumentServiceController
 				if (featureCollectionPtr->GetObjectData(elementId, dataPtr)){
 					const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr());
 					if (featureInfoPtr != nullptr && featureInfoPtr->IsPermission()){
-						CollectPermissionsTree(featureInfoPtr, *response.Version_1_0->allProductPermissions);
+						CollectPermissionsTree(featureInfoPtr, *response.allProductPermissions);
 					}
 				}
 			}

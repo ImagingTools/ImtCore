@@ -28,21 +28,20 @@ imtauth::IPersonalAccessTokenManager::TokenCreationResult CClientRequestPersonal
 	namespace tokensdl = sdl::V1_0::imtauth;
 
 	tokensdl::CreateTokenRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->userId = userId;
-	arguments.input.Version_1_0->name = name;
+	arguments.input.userId = userId;
+	arguments.input.name = name;
 	
 	if (!description.isEmpty()){
-		arguments.input.Version_1_0->description = description;
+		arguments.input.description = description;
 	}
 	
 	if (!scopes.isEmpty()){
-		arguments.input.Version_1_0->scopes.Emplace();
-		arguments.input.Version_1_0->scopes->FromList(scopes);
+		arguments.input.scopes.Emplace();
+		arguments.input.scopes->FromList(scopes);
 	}
 	
 	if (expiresAt.isValid()){
-		arguments.input.Version_1_0->expiresAt = expiresAt.toUTC().toString(Qt::ISODate);
+		arguments.input.expiresAt = expiresAt.toUTC().toString(Qt::ISODate);
 	}
 
 	tokensdl::CCreateTokenPayload payload;
@@ -55,11 +54,11 @@ imtauth::IPersonalAccessTokenManager::TokenCreationResult CClientRequestPersonal
 		return result;
 	}
 
-	if (!payload.Version_1_0->success.HasValue() || !*payload.Version_1_0->success){
+	if (!payload.success.HasValue() || !*payload.success){
 		return result;
 	}
 
-	if (!payload.Version_1_0->id.HasValue() || !payload.Version_1_0->token.HasValue()){
+	if (!payload.id.HasValue() || !payload.token.HasValue()){
 		return result;
 	}
 
@@ -67,8 +66,8 @@ imtauth::IPersonalAccessTokenManager::TokenCreationResult CClientRequestPersonal
 	istd::CChangeNotifier changeNotifier(this);
 
 	result.success = true;
-	result.tokenId = *payload.Version_1_0->id;
-	result.rawToken = *payload.Version_1_0->token;
+	result.tokenId = *payload.id;
+	result.rawToken = *payload.token;
 
 	return result;
 }
@@ -79,8 +78,7 @@ bool CClientRequestPersonalAccessTokenManagerComp::ValidateToken(const QByteArra
 	namespace tokensdl = sdl::V1_0::imtauth;
 
 	tokensdl::ValidateTokenRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->token = rawToken;
+	arguments.input.token = rawToken;
 
 	tokensdl::CValidateTokenPayload payload;
 	bool ok = SendModelRequestInternal<tokensdl::ValidateTokenRequestArguments, tokensdl::CValidateTokenPayload, tokensdl::CValidateTokenGqlRequest>(arguments, payload);
@@ -88,16 +86,16 @@ bool CClientRequestPersonalAccessTokenManagerComp::ValidateToken(const QByteArra
 		return false;
 	}
 
-	if (!payload.Version_1_0->valid.HasValue() || !*payload.Version_1_0->valid){
+	if (!payload.valid.HasValue() || !*payload.valid){
 		return false;
 	}
 
-	if (payload.Version_1_0->userId.HasValue()){
-		userId = *payload.Version_1_0->userId;
+	if (payload.userId.HasValue()){
+		userId = *payload.userId;
 	}
 
-	if (payload.Version_1_0->scopes.HasValue()){
-		scopes = payload.Version_1_0->scopes->ToList();
+	if (payload.scopes.HasValue()){
+		scopes = payload.scopes->ToList();
 	}
 
 	// Note: The SDL schema's ValidateTokenPayload does not include a tokenId field.
@@ -115,8 +113,7 @@ QByteArrayList CClientRequestPersonalAccessTokenManagerComp::GetTokenIds(const Q
 	namespace tokensdl = sdl::V1_0::imtauth;
 
 	tokensdl::GetTokenListRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->userId = userId;
+	arguments.input.userId = userId;
 
 	tokensdl::CPersonalAccessTokenList payload;
 	bool ok = SendModelRequestInternal<tokensdl::GetTokenListRequestArguments, tokensdl::CPersonalAccessTokenList, tokensdl::CGetTokenListGqlRequest>(arguments, payload);
@@ -124,12 +121,12 @@ QByteArrayList CClientRequestPersonalAccessTokenManagerComp::GetTokenIds(const Q
 		return QByteArrayList();
 	}
 
-	if (!payload.Version_1_0->tokens.HasValue()){
+	if (!payload.tokens.HasValue()){
 		return QByteArrayList();
 	}
 
 	QByteArrayList tokenIds;
-	const auto& tokensList = payload.Version_1_0->tokens->ToList();
+	const auto& tokensList = payload.tokens->ToList();
 	for (const auto& token : tokensList){
 		if (token.id.HasValue()){
 			tokenIds << *token.id;
@@ -149,8 +146,7 @@ imtauth::IPersonalAccessTokenSharedPtr CClientRequestPersonalAccessTokenManagerC
 	namespace tokensdl = sdl::V1_0::imtauth;
 
 	tokensdl::GetTokenRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->id = tokenId;
+	arguments.input.id = tokenId;
 
 	tokensdl::CPersonalAccessToken payload;
 	bool ok = SendModelRequestInternal<tokensdl::GetTokenRequestArguments, tokensdl::CPersonalAccessToken, tokensdl::CGetTokenGqlRequest>(arguments, payload);
@@ -164,47 +160,47 @@ imtauth::IPersonalAccessTokenSharedPtr CClientRequestPersonalAccessTokenManagerC
 	}
 
 	// Populate token from SDL payload
-	if (payload.Version_1_0->id.HasValue()){
-		tokenPtr->SetId(*payload.Version_1_0->id);
+	if (payload.id.HasValue()){
+		tokenPtr->SetId(*payload.id);
 	}
 
-	if (payload.Version_1_0->userId.HasValue()){
-		tokenPtr->SetUserId(*payload.Version_1_0->userId);
+	if (payload.userId.HasValue()){
+		tokenPtr->SetUserId(*payload.userId);
 	}
 
-	if (payload.Version_1_0->name.HasValue()){
-		tokenPtr->SetName(*payload.Version_1_0->name);
+	if (payload.name.HasValue()){
+		tokenPtr->SetName(*payload.name);
 	}
 
-	if (payload.Version_1_0->description.HasValue()){
-		tokenPtr->SetDescription(*payload.Version_1_0->description);
+	if (payload.description.HasValue()){
+		tokenPtr->SetDescription(*payload.description);
 	}
 
-	if (payload.Version_1_0->tokenHash.HasValue()){
-		tokenPtr->SetTokenHash(*payload.Version_1_0->tokenHash);
+	if (payload.tokenHash.HasValue()){
+		tokenPtr->SetTokenHash(*payload.tokenHash);
 	}
 
-	if (payload.Version_1_0->scopes.HasValue()){
-		tokenPtr->SetScopes(payload.Version_1_0->scopes->ToList());
+	if (payload.scopes.HasValue()){
+		tokenPtr->SetScopes(payload.scopes->ToList());
 	}
 
-	if (payload.Version_1_0->createdAt.HasValue()){
-		QDateTime createdAt = QDateTime::fromString(*payload.Version_1_0->createdAt, Qt::ISODate).toUTC();
+	if (payload.createdAt.HasValue()){
+		QDateTime createdAt = QDateTime::fromString(*payload.createdAt, Qt::ISODate).toUTC();
 		tokenPtr->SetCreatedAt(createdAt);
 	}
 
-	if (payload.Version_1_0->lastUsedAt.HasValue()){
-		QDateTime lastUsedAt = QDateTime::fromString(*payload.Version_1_0->lastUsedAt, Qt::ISODate).toUTC();
+	if (payload.lastUsedAt.HasValue()){
+		QDateTime lastUsedAt = QDateTime::fromString(*payload.lastUsedAt, Qt::ISODate).toUTC();
 		tokenPtr->SetLastUsedAt(lastUsedAt);
 	}
 
-	if (payload.Version_1_0->expiresAt.HasValue()){
-		QDateTime expiresAt = QDateTime::fromString(*payload.Version_1_0->expiresAt, Qt::ISODate).toUTC();
+	if (payload.expiresAt.HasValue()){
+		QDateTime expiresAt = QDateTime::fromString(*payload.expiresAt, Qt::ISODate).toUTC();
 		tokenPtr->SetExpiresAt(expiresAt);
 	}
 
-	if (payload.Version_1_0->revoked.HasValue()){
-		tokenPtr->SetRevoked(*payload.Version_1_0->revoked);
+	if (payload.revoked.HasValue()){
+		tokenPtr->SetRevoked(*payload.revoked);
 	}
 
 	return imtauth::IPersonalAccessTokenSharedPtr::CreateFromUnique(tokenPtr);
@@ -216,8 +212,7 @@ bool CClientRequestPersonalAccessTokenManagerComp::RevokeToken(const QByteArray&
 	namespace tokensdl = sdl::V1_0::imtauth;
 
 	tokensdl::RevokeTokenRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->id = tokenId;
+	arguments.input.id = tokenId;
 
 	tokensdl::CRevokeTokenPayload payload;
 	bool ok = SendModelRequestInternal<tokensdl::RevokeTokenRequestArguments, tokensdl::CRevokeTokenPayload, tokensdl::CRevokeTokenGqlRequest>(arguments, payload);
@@ -225,11 +220,11 @@ bool CClientRequestPersonalAccessTokenManagerComp::RevokeToken(const QByteArray&
 		return false;
 	}
 
-	if (!payload.Version_1_0->success.HasValue()){
+	if (!payload.success.HasValue()){
 		return false;
 	}
 
-	bool success = *payload.Version_1_0->success;
+	bool success = *payload.success;
 	
 	// Notify observers if the operation succeeded
 	if (success){
@@ -263,8 +258,7 @@ bool CClientRequestPersonalAccessTokenManagerComp::DeleteToken(const QByteArray&
 	namespace tokensdl = sdl::V1_0::imtauth;
 
 	tokensdl::DeleteTokenRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->id = tokenId;
+	arguments.input.id = tokenId;
 
 	tokensdl::CDeleteTokenPayload payload;
 	bool ok = SendModelRequestInternal<tokensdl::DeleteTokenRequestArguments, tokensdl::CDeleteTokenPayload, tokensdl::CDeleteTokenGqlRequest>(arguments, payload);
@@ -272,11 +266,11 @@ bool CClientRequestPersonalAccessTokenManagerComp::DeleteToken(const QByteArray&
 		return false;
 	}
 
-	if (!payload.Version_1_0->success.HasValue()){
+	if (!payload.success.HasValue()){
 		return false;
 	}
 
-	bool success = *payload.Version_1_0->success;
+	bool success = *payload.success;
 	
 	// Notify observers if the operation succeeded
 	if (success){

@@ -22,24 +22,23 @@ QByteArray CClientRequestGroupManagerComp::CreateGroup(const QString& groupName,
 	namespace groupssdl = sdl::V1_0::imtauth;
 
 	groupssdl::GroupAddRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-	arguments.input.Version_1_0->typeId = QByteArrayLiteral("Group");
-	arguments.input.Version_1_0->name = groupName;
-	arguments.input.Version_1_0->description = description;
+	arguments.input.id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+	arguments.input.typeId = QByteArrayLiteral("Group");
+	arguments.input.name = groupName;
+	arguments.input.description = description;
 
 	QByteArray productId;
 	if (m_applicationInfoCompPtr.IsValid()){
 		productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
-	arguments.input.Version_1_0->productId = productId;
+	arguments.input.productId = productId;
 
-	groupssdl::CGroupData::V1_0 groupData;
+	groupssdl::CGroupData groupData;
 	groupData.description = description;
 	groupData.name = groupName;
 	groupData.productId = productId;
 
-	arguments.input.Version_1_0->item = groupData;
+	arguments.input.item = groupData;
 
 	sdl::V1_0::imtbase::CAddedNotificationPayload payload;
 	bool ok = SendModelRequestInternal<groupssdl::GroupAddRequestArguments, sdl::V1_0::imtbase::CAddedNotificationPayload, groupssdl::CGroupAddGqlRequest>(arguments, payload);
@@ -47,11 +46,11 @@ QByteArray CClientRequestGroupManagerComp::CreateGroup(const QString& groupName,
 		return QByteArray();
 	}
 
-	if (!payload.Version_1_0->id.HasValue()){
+	if (!payload.id.HasValue()){
 		return QByteArray();
 	}
 
-	return *payload.Version_1_0->id;
+	return *payload.id;
 }
 
 
@@ -238,11 +237,10 @@ bool CClientRequestGroupManagerComp::GetGroupDataSdl(const QByteArray& groupId, 
 	namespace groupssdl = sdl::V1_0::imtauth;
 
 	groupssdl::GroupItemRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->id = groupId;
+	arguments.input.id = groupId;
 
 	if (m_applicationInfoCompPtr.IsValid()){
-		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+		arguments.input.productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
 
 	groupssdl::CGroupData payload;
@@ -251,7 +249,7 @@ bool CClientRequestGroupManagerComp::GetGroupDataSdl(const QByteArray& groupId, 
 		return false;
 	}
 
-	groupData = *payload.Version_1_0;
+	groupData = payload;
 
 	return true;
 }
@@ -262,13 +260,12 @@ bool CClientRequestGroupManagerComp::SetGroupDataSdl(const QByteArray& groupId, 
 	namespace groupssdl = sdl::V1_0::imtauth;
 
 	groupssdl::GroupUpdateRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->id = groupId;
-	arguments.input.Version_1_0->typeId = QByteArray("Group");
-	arguments.input.Version_1_0->item = groupData;
+	arguments.input.id = groupId;
+	arguments.input.typeId = QByteArray("Group");
+	arguments.input.item = groupData;
 
 	if (m_applicationInfoCompPtr.IsValid()){
-		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+		arguments.input.productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
 
 	sdl::V1_0::imtbase::CUpdatedNotificationPayload payload;
@@ -277,11 +274,11 @@ bool CClientRequestGroupManagerComp::SetGroupDataSdl(const QByteArray& groupId, 
 		return false;
 	}
 
-	if (!payload.Version_1_0->id){
+	if (!payload.id){
 		return false;
 	}
 
-	return !payload.Version_1_0->id->isEmpty();
+	return !payload.id->isEmpty();
 }
 
 

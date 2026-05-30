@@ -20,7 +20,6 @@ imtauth::ISuperuserProvider::ExistsStatus CClientRequestRemoteSuperuserProviderC
 	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::CheckSuperuserExistsRequestArguments arguments;
-	arguments.input.Version_1_0 = userssdl::CCheckSuperuserInput::V1_0();
 
 	imtgql::CGqlRequest gqlRequest;
 	if (userssdl::CCheckSuperuserExistsGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
@@ -31,17 +30,13 @@ imtauth::ISuperuserProvider::ExistsStatus CClientRequestRemoteSuperuserProviderC
 			return imtauth::ISuperuserProvider::ES_UNKNOWN;
 		}
 
-		if (!response.Version_1_0){
-			return imtauth::ISuperuserProvider::ES_UNKNOWN;
-		}
-
-		if (response.Version_1_0->message){
-			errorMessage = *response.Version_1_0->message;
+		if (response.message){
+			errorMessage = *response.message;
 		}
 
 		imtauth::ISuperuserProvider::ExistsStatus retVal = imtauth::ISuperuserProvider::ES_UNKNOWN;
-		if (response.Version_1_0->status){
-			sdl::V1_0::imtauth::ExistsStatus status = *response.Version_1_0->status;
+		if (response.status){
+			sdl::V1_0::imtauth::ExistsStatus status = *response.status;
 			if (status == sdl::V1_0::imtauth::ExistsStatus::EXISTS){
 				retVal = imtauth::ISuperuserProvider::ES_EXISTS;
 			}

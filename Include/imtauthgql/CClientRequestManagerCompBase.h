@@ -54,7 +54,7 @@ protected:
 			return false;
 		}
 	
-		if (!payload.Version_1_0.HasValue()){
+		if (!payload.HasValue()){
 			return false;
 		}
 	

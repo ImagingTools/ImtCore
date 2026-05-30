@@ -25,17 +25,12 @@ sdl::V1_0::imtchat::CConversationData CConversationCollectionDocumentServiceComp
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtchat::GetConversationRepresentationRequestArguments arguments = getConversationRepresentationRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::V1_0::imtchat::CConversationData();
-	}
-
 	QByteArray userId = GetUserId(gqlRequest);
 
 	QByteArray objectId;
 	istd::IChangeableSharedPtr documentPtr;
-	if (arguments.input.Version_1_0->id){
-		objectId = *arguments.input.Version_1_0->id;
+	if (arguments.input.id){
+		objectId = *arguments.input.id;
 
 		m_documentManagerCompPtr->GetDocumentData(userId, objectId, documentPtr);
 	}
@@ -50,13 +45,11 @@ sdl::V1_0::imtchat::CConversationData CConversationCollectionDocumentServiceComp
 	}
 
 	sdl::V1_0::imtchat::CConversationData response;
-	response.Version_1_0.Emplace();
-
-	response.Version_1_0->id = convPtr->GetId();
-	response.Version_1_0->name = convPtr->GetName();
-	response.Version_1_0->createdAt = convPtr->GetCreatedAt();
-	response.Version_1_0->updatedAt = convPtr->GetUpdatedAt();
-	response.Version_1_0->metadata = convPtr->GetMetadata();
+	response.id = convPtr->GetId();
+	response.name = convPtr->GetName();
+	response.createdAt = convPtr->GetCreatedAt();
+	response.updatedAt = convPtr->GetUpdatedAt();
+	response.metadata = convPtr->GetMetadata();
 
 	return response;
 }
@@ -68,23 +61,17 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CConversationCollectionDocumentServ
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtchat::UpdateConversationFromRepresentationRequestArguments arguments = updateConversationFromRepresentationRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::V1_0::imtbase::CDocumentOperationStatus();
-	}
-
 	sdl::V1_0::imtbase::CDocumentOperationStatus response;
-	response.Version_1_0.Emplace();
-	response.Version_1_0->status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
+	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
 
 	QByteArray documentId;
-	if (arguments.input.Version_1_0->documentId){
-		documentId = *arguments.input.Version_1_0->documentId;
+	if (arguments.input.documentId){
+		documentId = *arguments.input.documentId;
 	}
 
 	sdl::V1_0::imtchat::CConversationData convInfo;
-	if (arguments.input.Version_1_0->conversation){
-		convInfo = *arguments.input.Version_1_0->conversation;
+	if (arguments.input.conversation){
+		convInfo = *arguments.input.conversation;
 	}
 
 	QByteArray userId = GetUserId(gqlRequest);
@@ -92,13 +79,13 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CConversationCollectionDocumentServ
 	istd::IChangeableSharedPtr documentPtr;
 	m_documentManagerCompPtr->GetDocumentData(userId, documentId, documentPtr);
 	if (!documentPtr.IsValid()){
-		response.Version_1_0->status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
+		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
 
 	imtchat::IConversation* convPtr = dynamic_cast<imtchat::IConversation*>(documentPtr.GetPtr());
 	if (convPtr == nullptr){
-		response.Version_1_0->status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
+		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
 
@@ -122,7 +109,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CConversationCollectionDocumentServ
 
 	m_documentManagerCompPtr->SetDocumentData(userId, documentId, *convPtr);
 
-	response.Version_1_0->status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
+	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 
 	return response;
 }

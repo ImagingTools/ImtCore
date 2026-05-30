@@ -25,13 +25,12 @@ collectionImport::CSessionStatus CGqlCollectionImportControllerComp::OnBeginColl
 		return retVal;
 	}
 
-	retVal.Version_1_0.emplace();
-	retVal.Version_1_0->status = collectionImport::Status::Failed;
+	retVal.status = collectionImport::Status::Failed;
 
 	imtservergql::ICollectionImportController::SessionInfo sessionInfo;
 	if (FillSessionInfo(request, sessionInfo, errorMessage)){
 		if (m_collectionImportControllerCompPtr->BeginCollectionImportSession(sessionInfo, errorMessage)){
-			retVal.Version_1_0->status = collectionImport::Status::Success;
+			retVal.status = collectionImport::Status::Success;
 		}
 	}
 
@@ -53,13 +52,12 @@ collectionImport::CSessionStatus CGqlCollectionImportControllerComp::OnCancelCol
 		return retVal;
 	}
 
-	retVal.Version_1_0.emplace();
-	retVal.Version_1_0->status = collectionImport::Status::Failed;
+	retVal.status = collectionImport::Status::Failed;
 
 	QByteArray sessionId = GetCancelSessionId(request);
 	if (!sessionId.isEmpty()){
 		if (m_collectionImportControllerCompPtr->CancelCollectionImportSession(sessionId, errorMessage)){
-			retVal.Version_1_0->status = collectionImport::Status::Success;
+			retVal.status = collectionImport::Status::Success;
 		}
 	}
 	else{

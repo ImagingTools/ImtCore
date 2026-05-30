@@ -17,17 +17,13 @@ imtauth::ISuperuserProvider::ExistsStatus CRemoteUserControllerComp::SuperuserEx
 	sdl::V1_0::imtauth::CCheckSuperuserExistsGqlRequest checkSuperuserExistsGqlRequest(gqlRequest, false);
 
 	sdl::V1_0::imtauth::CCheckSuperuserPayload result = OnCheckSuperuserExists(checkSuperuserExistsGqlRequest, gqlRequest, errorMessage);
-	if (!result.Version_1_0.has_value()){
-		return imtauth::ISuperuserProvider::ES_UNKNOWN;
-	}
-
-	if (result.Version_1_0->message){
-		errorMessage = *result.Version_1_0->message;
+	if (result.message){
+		errorMessage = *result.message;
 	}
 
 	imtauth::ISuperuserProvider::ExistsStatus retVal = imtauth::ISuperuserProvider::ES_UNKNOWN;
-	if (result.Version_1_0->status){
-		sdl::V1_0::imtauth::ExistsStatus status = *result.Version_1_0->status;
+	if (result.status){
+		sdl::V1_0::imtauth::ExistsStatus status = *result.status;
 		if (status == sdl::V1_0::imtauth::ExistsStatus::EXISTS){
 			retVal = imtauth::ISuperuserProvider::ES_EXISTS;
 		}

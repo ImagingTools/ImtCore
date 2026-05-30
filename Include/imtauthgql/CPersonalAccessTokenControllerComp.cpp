@@ -67,12 +67,7 @@ sdl::V1_0::imtauth::CPersonalAccessTokenList CPersonalAccessTokenControllerComp:
 	sdl::V1_0::imtauth::GetTokenListRequestArguments arguments = 
 		getTokenListRequest.GetRequestedArguments();
 
-	if (!arguments.input.Version_1_0.has_value()){
-		errorMessage = "Invalid request: missing input argument";
-		return response;
-	}
-
-	sdl::V1_0::imtauth::CUserIdInput inputArgument = *arguments.input.Version_1_0;
+	sdl::V1_0::imtauth::CUserIdInput inputArgument = *arguments.input;
 
 	QByteArray userId;
 	if (inputArgument.userId){
@@ -96,8 +91,7 @@ sdl::V1_0::imtauth::CPersonalAccessTokenList CPersonalAccessTokenControllerComp:
 		}
 	}
 
-	response.Version_1_0.Emplace();
-	response.Version_1_0->tokens.Emplace().FromList(tokens);
+	response.tokens.Emplace().FromList(tokens);
 
 	return response;
 }
@@ -119,12 +113,7 @@ sdl::V1_0::imtauth::CPersonalAccessToken CPersonalAccessTokenControllerComp::OnG
 	sdl::V1_0::imtauth::GetTokenRequestArguments arguments = 
 		getTokenRequest.GetRequestedArguments();
 
-	if (!arguments.input.Version_1_0.has_value()){
-		errorMessage = "Invalid request: missing input argument";
-		return response;
-	}
-
-	sdl::V1_0::imtbase::CInputId inputArgument = *arguments.input.Version_1_0;
+	sdl::V1_0::imtbase::CInputId inputArgument = *arguments.input;
 
 	QByteArray tokenId;
 	if (inputArgument.id){
@@ -143,9 +132,7 @@ sdl::V1_0::imtauth::CPersonalAccessToken CPersonalAccessTokenControllerComp::OnG
 		return response;
 	}
 
-	response.Version_1_0 = ConvertToSdlToken(*tokenPtr.GetPtr());
-
-	return response;
+	return ConvertToSdlToken(*tokenPtr.GetPtr());
 }
 
 
@@ -155,12 +142,11 @@ sdl::V1_0::imtauth::CValidateTokenPayload CPersonalAccessTokenControllerComp::On
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CValidateTokenPayload response;
-	response.Version_1_0.Emplace();
-	response.Version_1_0->valid = false;
+	response.valid = false;
 
 	if (!m_tokenManagerCompPtr.IsValid()){
 		errorMessage = "PersonalAccessTokenManager not available";
-		response.Version_1_0->message = errorMessage;
+		response.message = errorMessage;
 		return response;
 	}
 
@@ -168,13 +154,7 @@ sdl::V1_0::imtauth::CValidateTokenPayload CPersonalAccessTokenControllerComp::On
 	sdl::V1_0::imtauth::ValidateTokenRequestArguments arguments = 
 		validateTokenRequest.GetRequestedArguments();
 
-	if (!arguments.input.Version_1_0.has_value()){
-		errorMessage = "Invalid request: missing input argument";
-		response.Version_1_0->message = errorMessage;
-		return response;
-	}
-
-	sdl::V1_0::imtauth::CTokenInput inputArgument = *arguments.input.Version_1_0;
+	sdl::V1_0::imtauth::CTokenInput inputArgument = *arguments.input;
 
 	QByteArray rawToken;
 	if (inputArgument.token){
@@ -183,7 +163,7 @@ sdl::V1_0::imtauth::CValidateTokenPayload CPersonalAccessTokenControllerComp::On
 
 	if (rawToken.isEmpty()){
 		errorMessage = "Invalid request: token is required";
-		response.Version_1_0->message = errorMessage;
+		response.message = errorMessage;
 		return response;
 	}
 
@@ -193,15 +173,15 @@ sdl::V1_0::imtauth::CValidateTokenPayload CPersonalAccessTokenControllerComp::On
 	QByteArrayList scopes;
 	bool isValid = m_tokenManagerCompPtr->ValidateToken(rawToken, userId, tokenId, scopes);
 
-	response.Version_1_0->valid = isValid;
+	response.valid = isValid;
 
 	if (isValid){
-		response.Version_1_0->userId = userId;
-		response.Version_1_0->scopes.Emplace().FromList(scopes);
-		response.Version_1_0->message = "Token is valid";
+		response.userId = userId;
+		response.scopes.Emplace().FromList(scopes);
+		response.message = "Token is valid";
 	}
 	else{
-		response.Version_1_0->message = "Token is invalid, revoked, or expired";
+		response.message = "Token is invalid, revoked, or expired";
 	}
 
 	return response;
@@ -214,12 +194,11 @@ sdl::V1_0::imtauth::CCreateTokenPayload CPersonalAccessTokenControllerComp::OnCr
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CCreateTokenPayload response;
-	response.Version_1_0.Emplace();
-	response.Version_1_0->success = false;
+	response.success = false;
 
 	if (!m_tokenManagerCompPtr.IsValid()){
 		errorMessage = "PersonalAccessTokenManager not available";
-		response.Version_1_0->message = errorMessage;
+		response.message = errorMessage;
 		return response;
 	}
 
@@ -227,13 +206,7 @@ sdl::V1_0::imtauth::CCreateTokenPayload CPersonalAccessTokenControllerComp::OnCr
 	sdl::V1_0::imtauth::CreateTokenRequestArguments arguments = 
 		createTokenRequest.GetRequestedArguments();
 
-	if (!arguments.input.Version_1_0.has_value()){
-		errorMessage = "Invalid request: missing input argument";
-		response.Version_1_0->message = errorMessage;
-		return response;
-	}
-
-	sdl::V1_0::imtauth::CCreateTokenInput inputArgument = *arguments.input.Version_1_0;
+	sdl::V1_0::imtauth::CCreateTokenInput inputArgument = *arguments.input;
 
 	QByteArray userId;
 	if (inputArgument.userId){
@@ -269,13 +242,13 @@ sdl::V1_0::imtauth::CCreateTokenPayload CPersonalAccessTokenControllerComp::OnCr
 
 	if (userId.isEmpty()){
 		errorMessage = "Invalid request: userId is required";
-		response.Version_1_0->message = errorMessage;
+		response.message = errorMessage;
 		return response;
 	}
 
 	if (name.isEmpty()){
 		errorMessage = "Invalid request: name is required";
-		response.Version_1_0->message = errorMessage;
+		response.message = errorMessage;
 		return response;
 	}
 
@@ -283,16 +256,16 @@ sdl::V1_0::imtauth::CCreateTokenPayload CPersonalAccessTokenControllerComp::OnCr
 	imtauth::IPersonalAccessTokenManager::TokenCreationResult result = 
 		m_tokenManagerCompPtr->CreateToken(userId, name, description, scopes, expiresAt);
 
-	response.Version_1_0->success = result.success;
+	response.success = result.success;
 
 	if (result.success){
-		response.Version_1_0->id = result.tokenId;
-		response.Version_1_0->token = result.rawToken;
-		response.Version_1_0->message = "Token created successfully";
+		response.id = result.tokenId;
+		response.token = result.rawToken;
+		response.message = "Token created successfully";
 	}
 	else{
 		errorMessage = "Failed to create token";
-		response.Version_1_0->message = errorMessage;
+		response.message = errorMessage;
 	}
 
 	return response;
@@ -305,12 +278,11 @@ sdl::V1_0::imtauth::CRevokeTokenPayload CPersonalAccessTokenControllerComp::OnRe
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CRevokeTokenPayload response;
-	response.Version_1_0.Emplace();
-	response.Version_1_0->success = false;
+	response.success = false;
 
 	if (!m_tokenManagerCompPtr.IsValid()){
 		errorMessage = "PersonalAccessTokenManager not available";
-		response.Version_1_0->message = errorMessage;
+		response.message = errorMessage;
 		return response;
 	}
 
@@ -318,13 +290,7 @@ sdl::V1_0::imtauth::CRevokeTokenPayload CPersonalAccessTokenControllerComp::OnRe
 	sdl::V1_0::imtauth::RevokeTokenRequestArguments arguments = 
 		revokeTokenRequest.GetRequestedArguments();
 
-	if (!arguments.input.Version_1_0.has_value()){
-		errorMessage = "Invalid request: missing input argument";
-		response.Version_1_0->message = errorMessage;
-		return response;
-	}
-
-	sdl::V1_0::imtbase::CInputId inputArgument = *arguments.input.Version_1_0;
+	sdl::V1_0::imtbase::CInputId inputArgument = *arguments.input;
 
 	QByteArray tokenId;
 	if (inputArgument.id){
@@ -333,21 +299,21 @@ sdl::V1_0::imtauth::CRevokeTokenPayload CPersonalAccessTokenControllerComp::OnRe
 
 	if (tokenId.isEmpty()){
 		errorMessage = "Invalid request: id is required";
-		response.Version_1_0->message = errorMessage;
+		response.message = errorMessage;
 		return response;
 	}
 
 	// Revoke token
 	bool success = m_tokenManagerCompPtr->RevokeToken(tokenId);
 
-	response.Version_1_0->success = success;
+	response.success = success;
 
 	if (success){
-		response.Version_1_0->message = "Token revoked successfully";
+		response.message = "Token revoked successfully";
 	}
 	else{
 		errorMessage = QString("Failed to revoke token with id '%1'").arg(QString::fromUtf8(tokenId));
-		response.Version_1_0->message = errorMessage;
+		response.message = errorMessage;
 	}
 
 	return response;
@@ -360,12 +326,11 @@ sdl::V1_0::imtauth::CDeleteTokenPayload CPersonalAccessTokenControllerComp::OnDe
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::CDeleteTokenPayload response;
-	response.Version_1_0.Emplace();
-	response.Version_1_0->success = false;
+	response.success = false;
 
 	if (!m_tokenManagerCompPtr.IsValid()){
 		errorMessage = "PersonalAccessTokenManager not available";
-		response.Version_1_0->message = errorMessage;
+		response.message = errorMessage;
 		return response;
 	}
 
@@ -373,13 +338,7 @@ sdl::V1_0::imtauth::CDeleteTokenPayload CPersonalAccessTokenControllerComp::OnDe
 	sdl::V1_0::imtauth::DeleteTokenRequestArguments arguments = 
 		deleteTokenRequest.GetRequestedArguments();
 
-	if (!arguments.input.Version_1_0.has_value()){
-		errorMessage = "Invalid request: missing input argument";
-		response.Version_1_0->message = errorMessage;
-		return response;
-	}
-
-	sdl::V1_0::imtbase::CInputId inputArgument = *arguments.input.Version_1_0;
+	sdl::V1_0::imtbase::CInputId inputArgument = *arguments.input;
 
 	QByteArray tokenId;
 	if (inputArgument.id){
@@ -388,21 +347,21 @@ sdl::V1_0::imtauth::CDeleteTokenPayload CPersonalAccessTokenControllerComp::OnDe
 
 	if (tokenId.isEmpty()){
 		errorMessage = "Invalid request: id is required";
-		response.Version_1_0->message = errorMessage;
+		response.message = errorMessage;
 		return response;
 	}
 
 	// Delete token
 	bool success = m_tokenManagerCompPtr->DeleteToken(tokenId);
 
-	response.Version_1_0->success = success;
+	response.success = success;
 
 	if (success){
-		response.Version_1_0->message = "Token deleted successfully";
+		response.message = "Token deleted successfully";
 	}
 	else{
 		errorMessage = QString("Failed to delete token with id '%1'").arg(QString::fromUtf8(tokenId));
-		response.Version_1_0->message = errorMessage;
+		response.message = errorMessage;
 	}
 
 	return response;

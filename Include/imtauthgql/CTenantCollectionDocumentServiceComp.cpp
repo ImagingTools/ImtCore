@@ -54,16 +54,11 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 		QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::GetTenantRepresentationRequestArguments arguments = getTenantRepresentationRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::V1_0::imtauth::CTenantData();
-	}
-
 	QByteArray userId = GetUserId(gqlRequest);
 
 	QByteArray objectId;
-	if (arguments.input.Version_1_0->id){
-		objectId = *arguments.input.Version_1_0->id;
+	if (arguments.input.id){
+		objectId = *arguments.input.id;
 	}
 
 	if (objectId.isEmpty()){
@@ -85,31 +80,29 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 	}
 
 	sdl::V1_0::imtauth::CTenantData response;
-	response.Version_1_0.Emplace();
-
 	QByteArray tenantId = tenantPtr->GetTenantId();
 
 	// Server-side access control: user can only open TenantEditor if
 	// they have switched to this tenant (current tenant in JWT must match)
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 
-	response.Version_1_0->id = tenantId;
-	response.Version_1_0->name = tenantPtr->GetTenantName();
-	response.Version_1_0->description = tenantPtr->GetTenantDescription();
-	response.Version_1_0->ownerId = tenantPtr->GetOwnerId();
-	response.Version_1_0->creatorId = tenantPtr->GetCreatorId();
-	response.Version_1_0->isActive = tenantPtr->IsActive();
-	response.Version_1_0->createdAt = tenantPtr->GetCreatedAt();
-	response.Version_1_0->updatedAt = tenantPtr->GetUpdatedAt();
+	response.id = tenantId;
+	response.name = tenantPtr->GetTenantName();
+	response.description = tenantPtr->GetTenantDescription();
+	response.ownerId = tenantPtr->GetOwnerId();
+	response.creatorId = tenantPtr->GetCreatorId();
+	response.isActive = tenantPtr->IsActive();
+	response.createdAt = tenantPtr->GetCreatedAt();
+	response.updatedAt = tenantPtr->GetUpdatedAt();
 
 	// Pass current user ID so GUI can determine role-based access
 	if (gqlContextPtr != nullptr){
-		response.Version_1_0->currentUserId = gqlContextPtr->GetUserId();
+		response.currentUserId = gqlContextPtr->GetUserId();
 	}
 	if (m_membershipManagerCompPtr.IsValid()){
 		QByteArrayList membershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
-		response.Version_1_0->members.Emplace();
-		response.Version_1_0->memberRoles.Emplace();
+		response.members.Emplace();
+		response.memberRoles.Emplace();
 
 		QByteArray ownerId = tenantPtr->GetOwnerId();
 		QByteArray creatorId = tenantPtr->GetCreatorId();
@@ -133,7 +126,7 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 					memberEntry.name = imtauth::GetUserName(*m_userCollectionCompPtr, userId);
 				}
 
-				response.Version_1_0->members->push_back(memberEntry);
+				response.members->push_back(memberEntry);
 
 				// Assign environment role: Owner > stored role (Admin/Member)
 				sdl::V1_0::imtauth::CTenantMemberRoleEntry roleEntry;
@@ -144,7 +137,7 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 				} else {
 					roleEntry.role = TenantEnvironmentRoleToString(membershipPtr->GetEnvironmentRole());
 				}
-				response.Version_1_0->memberRoles->push_back(roleEntry);
+				response.memberRoles->push_back(roleEntry);
 			}
 		}
 
@@ -155,12 +148,12 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 			if (m_userCollectionCompPtr.IsValid()){
 				ownerEntry.name = imtauth::GetUserName(*m_userCollectionCompPtr, ownerId);
 			}
-			response.Version_1_0->members->push_back(ownerEntry);
+			response.members->push_back(ownerEntry);
 
 			sdl::V1_0::imtauth::CTenantMemberRoleEntry ownerRoleEntry;
 			ownerRoleEntry.userId = ownerId;
 			ownerRoleEntry.role = TenantEnvironmentRoleToString(imtauth::TER_OWNER);
-			response.Version_1_0->memberRoles->push_back(ownerRoleEntry);
+			response.memberRoles->push_back(ownerRoleEntry);
 		}
 	}
 
@@ -168,7 +161,7 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 		imtauth::ITenantInvitationManager::Statuses statuses;
 		statuses.append(imtauth::ITenantInvitation::TIS_PENDING);
 		QByteArrayList invitationIds = m_invitationManagerCompPtr->GetInvitationsByTenant(tenantId, statuses);
-		response.Version_1_0->pendingInvitations.Emplace();
+		response.pendingInvitations.Emplace();
 
 		// Collect IDs of users that are already part of the tenant so we can
 		// suppress stale pending invitations for them (e.g. an invitation that
@@ -211,7 +204,7 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 					invitationEntry.invitedByName = imtauth::GetUserName(*m_userCollectionCompPtr, invitationPtr->GetInvitedByUserId());
 				}
 
-				response.Version_1_0->pendingInvitations->push_back(invitationEntry);
+				response.pendingInvitations->push_back(invitationEntry);
 			}
 		}
 	}
@@ -219,7 +212,7 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 	// availableRoles will be provided by the client-side RoleCollectionDataProvider
 
 	// Tenant-scoped permissions (selected subset of product permissions)
-	response.Version_1_0->tenantPermissions.Emplace().FromList(tenantPtr->GetTenantPermissions());
+	response.tenantPermissions.Emplace().FromList(tenantPtr->GetTenantPermissions());
 
 	return response;
 }
@@ -231,18 +224,12 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 		QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::UpdateTenantFromRepresentationRequestArguments arguments = updateTenantFromRepresentationRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::V1_0::imtbase::CDocumentOperationStatus();
-	}
-
 	sdl::V1_0::imtbase::CDocumentOperationStatus response;
-	response.Version_1_0.Emplace();
-	response.Version_1_0->status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
+	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
 
 	QByteArray documentId;
-	if (arguments.input.Version_1_0->documentId){
-		documentId = *arguments.input.Version_1_0->documentId;
+	if (arguments.input.documentId){
+		documentId = *arguments.input.documentId;
 	}
 
 	if (documentId.isEmpty()){
@@ -261,19 +248,19 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 	istd::IChangeableSharedPtr documentPtr;
 	m_documentManagerCompPtr->GetDocumentData(userLogin, documentId, documentPtr);
 	if (!documentPtr.IsValid()){
-		response.Version_1_0->status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
+		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
 
 	imtauth::ITenantInfo* tenantPtr = dynamic_cast<imtauth::ITenantInfo*>(documentPtr.GetPtr());
 	if (tenantPtr == nullptr){
-		response.Version_1_0->status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
+		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
 
 	sdl::V1_0::imtauth::CTenantData tenantData;
-	if (arguments.input.Version_1_0->tenant){
-		tenantData = *arguments.input.Version_1_0->tenant;
+	if (arguments.input.tenant){
+		tenantData = *arguments.input.tenant;
 	}
 
 	QByteArray tenantId = tenantPtr->GetTenantId();
@@ -415,7 +402,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 		m_documentManagerCompPtr->WaitForTaskFinished(saveTaskId);
 	}
 
-	response.Version_1_0->status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
+	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 
 	return response;
 }

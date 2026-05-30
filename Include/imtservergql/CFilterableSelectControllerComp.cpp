@@ -58,14 +58,6 @@ sdl::V1_0::imtbase::CGetSelectableItemsPayload CFilterableSelectControllerComp::
 	}
 
 	sdl::V1_0::imtbase::GetSelectableItemsRequestArguments arguments = getSelectableItemsRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.has_value()){
-		errorMessage = QStringLiteral("Invalid request arguments");
-		SendErrorMessage(0, errorMessage, "CFilterableSelectControllerComp");
-		return response;
-	}
-
-	response.Version_1_0.emplace();
-
 	imtsdl::TElementList<sdl::V1_0::imtbase::CSelectableItemData> itemsList;
 
 	// Normal paginated fetch mode
@@ -81,8 +73,8 @@ sdl::V1_0::imtbase::CGetSelectableItemsPayload CFilterableSelectControllerComp::
 	}
 
 	// Exclude selected IDs: create CDocumentIdFilter with CT_NOT_IN
-	if (arguments.input.Version_1_0->excludeIds && !arguments.input.Version_1_0->excludeIds->empty()){
-		const auto& excludeIdsList = *arguments.input.Version_1_0->excludeIds;
+	if (arguments.input.excludeIds && !arguments.input.excludeIds->empty()){
+		const auto& excludeIdsList = *arguments.input.excludeIds;
 		QByteArrayList documentIds;
 		for (size_t i = 0; i < excludeIdsList.size(); ++i){
 			QByteArray docId = *excludeIdsList[i];
@@ -98,8 +90,8 @@ sdl::V1_0::imtbase::CGetSelectableItemsPayload CFilterableSelectControllerComp::
 		}
 	}
 
-	if (arguments.input.Version_1_0->viewParams){
-		auto& viewParams = *arguments.input.Version_1_0->viewParams;
+	if (arguments.input.viewParams){
+		auto& viewParams = *arguments.input.viewParams;
 		if (viewParams.offset){
 			offset = *viewParams.offset;
 		}
@@ -154,7 +146,7 @@ sdl::V1_0::imtbase::CGetSelectableItemsPayload CFilterableSelectControllerComp::
 		itemsList << itemRepresentation;
 	}
 
-	response.Version_1_0->items = itemsList;
+	response.items = itemsList;
 
 	int elementsCount = iteratorPtr->GetElementsCount();
 	int pagesCount = (count > 0) ? static_cast<int>(std::ceil(elementsCount / static_cast<double>(count))) : 1;
@@ -165,7 +157,7 @@ sdl::V1_0::imtbase::CGetSelectableItemsPayload CFilterableSelectControllerComp::
 	sdl::V1_0::imtbase::CNotificationItem notification;
 	notification.pagesCount = pagesCount;
 	notification.totalCount = elementsCount;
-	response.Version_1_0->notification = notification;
+	response.notification = notification;
 
 	return response;
 }

@@ -23,16 +23,9 @@ sdl::V1_0::imtbase::CSearchResults CGqlSearchControllerComp::OnSearch(
 	sdl::V1_0::imtbase::CSearchResults response;
 
 	sdl::V1_0::imtbase::SearchRequestArguments arguments = searchRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.has_value()){
-		Q_ASSERT(false);
-		return response;
-	}
-
-	response.Version_1_0.emplace();
-
 	QString text;
-	if (arguments.input.Version_1_0->text){
-		text = *arguments.input.Version_1_0->text;
+	if (arguments.input.text){
+		text = *arguments.input.text;
 	}
 
 	imtsdl::TElementList<sdl::V1_0::imtbase::CSearchResult> searchResultList;
@@ -87,7 +80,7 @@ sdl::V1_0::imtbase::CSearchResults CGqlSearchControllerComp::OnSearch(
 		}
 	}
 
-	response.Version_1_0->searchResults = searchResultList;
+	response.searchResults = searchResultList;
 
 	return response;
 }

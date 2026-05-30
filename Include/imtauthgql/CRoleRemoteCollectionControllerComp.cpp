@@ -60,13 +60,13 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CRoleRemoteCollectionControllerCo
 		return payload;
 	}
 
-	if (!payload.Version_1_0.HasValue()){
+	if (!payload.HasValue()){
 		Q_ASSERT(false);
 		return payload;
 	}
 
-	if (payload.Version_1_0->elementMetaInfo.HasValue() && payload.Version_1_0->elementMetaInfo->infoParams.HasValue()){
-		imtsdl::TElementList<sdl::V1_0::imtbase::CParameter> infoParams = *payload.Version_1_0->elementMetaInfo->infoParams;
+	if (payload.elementMetaInfo.HasValue() && payload.elementMetaInfo->infoParams.HasValue()){
+		imtsdl::TElementList<sdl::V1_0::imtbase::CParameter> infoParams = *payload.elementMetaInfo->infoParams;
 		QList<sdl::V1_0::imtbase::CParameter> paramList = infoParams.ToList();
 		for (sdl::V1_0::imtbase::CParameter& parameter : paramList){
 			if (parameter.id == QByteArrayLiteral("Permissions")){

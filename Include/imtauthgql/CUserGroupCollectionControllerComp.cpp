@@ -114,18 +114,13 @@ sdl::V1_0::imtbase::CVisualStatus CUserGroupCollectionControllerComp::OnGetObjec
 		return sdl::V1_0::imtbase::CVisualStatus();
 	}
 	
-	if (!response.Version_1_0.has_value()){
+	if (!response.text.has_value()){
 		Q_ASSERT(false);
 		return response;
 	}
 	
-	if (!response.Version_1_0->text.has_value()){
-		Q_ASSERT(false);
-		return response;
-	}
-	
-	if (response.Version_1_0->text->isEmpty()){
-		response.Version_1_0->text = "<no name>";
+	if (response.text->isEmpty()){
+		response.text = "<no name>";
 	}
 	
 	QByteArray languageId;
@@ -135,7 +130,7 @@ sdl::V1_0::imtbase::CVisualStatus CUserGroupCollectionControllerComp::OnGetObjec
 	}
 
 	QString translation = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QString(QT_TR_NOOP("Groups")).toUtf8(), languageId, "CRoleCollectionControllerComp");
-	response.Version_1_0->text = translation + QByteArrayLiteral(" / ") + *response.Version_1_0->text;
+	response.text = translation + QByteArrayLiteral(" / ") + *response.text;
 
 	return response;
 }
@@ -147,17 +142,10 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CUserGroupCollectionControllerCom
 			QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtbase::CGetElementMetaInfoPayload response;
-	response.Version_1_0.Emplace();
-
 	sdl::V1_0::imtbase::GetElementMetaInfoRequestArguments arguments = getElementMetaInfoRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return response;
-	}
-
 	QByteArray objectId;
-	if (arguments.input.Version_1_0->elementId){
-		objectId = *arguments.input.Version_1_0->elementId;
+	if (arguments.input.elementId){
+		objectId = *arguments.input.elementId;
 	}
 
 	QByteArray productId = gqlRequest.GetHeader("productId");
@@ -247,7 +235,7 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CUserGroupCollectionControllerCom
 			infoParams << rolesParameter;
 			elementMetaInfo.infoParams = infoParams;
 
-			response.Version_1_0->elementMetaInfo = elementMetaInfo;
+			response.elementMetaInfo = elementMetaInfo;
 		}
 	}
 
@@ -264,8 +252,8 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 {
 	QByteArray objectId = objectCollectionIterator.GetObjectId();
 	QByteArray productId;
-	if (groupsListRequest.GetRequestedArguments().input.Version_1_0->productId){
-		productId = *groupsListRequest.GetRequestedArguments().input.Version_1_0->productId;
+	if (groupsListRequest.GetRequestedArguments().input.productId){
+		productId = *groupsListRequest.GetRequestedArguments().input.productId;
 	}
 
 	const imtauth::IUserGroupInfo* userGroupInfoPtr = nullptr;
@@ -388,8 +376,8 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::V1_0::imtauth::GroupItemRequestArguments arguments = groupItemRequest.GetRequestedArguments();
 
 	QByteArray productId;
-	if (arguments.input.Version_1_0->productId){
-		productId = *arguments.input.Version_1_0->productId;
+	if (arguments.input.productId){
+		productId = *arguments.input.productId;
 	}
 
 	representationPayload.id = QByteArray(userGroupInfoPtr->GetObjectUuid());
@@ -418,13 +406,8 @@ bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 {
 	sdl::V1_0::imtauth::CGroupData representation;
 	
-	if (!groupUpdateRequest.GetRequestedArguments().input.Version_1_0.has_value()){
-		I_CRITICAL();
-		return false;
-	}
-
-	if (groupUpdateRequest.GetRequestedArguments().input.Version_1_0->item){
-		representation.Version_1_0 = groupUpdateRequest.GetRequestedArguments().input.Version_1_0->item;
+	if (groupUpdateRequest.GetRequestedArguments().input.item){
+		representation = groupUpdateRequest.GetRequestedArguments().input.item;
 	}
 
 	imtauth::CIdentifiableUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::CIdentifiableUserGroupInfo*>(&object);
@@ -447,7 +430,7 @@ bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 		userGroupInfoPtr->RemoveUser(userId);
 	}
 
-	return FillObjectFromRepresentation(*representation.Version_1_0, object, objectId, errorMessage);
+	return FillObjectFromRepresentation(representation, object, objectId, errorMessage);
 }
 
 
@@ -477,9 +460,9 @@ bool CUserGroupCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequ
 		sdl::V1_0::imtauth::CGroupItemGqlRequest groupItemGqlRequest(gqlRequest, false);
 		if (groupItemGqlRequest.IsValid()){
 			auto arguments = groupItemGqlRequest.GetRequestedArguments();
-			if (arguments.input.Version_1_0.HasValue()){
-				if (arguments.input.Version_1_0->id.HasValue()){
-					groupId = *arguments.input.Version_1_0->id;
+			if (arguments.input.HasValue()){
+				if (arguments.input.id.HasValue()){
+					groupId = *arguments.input.id;
 				}
 			}
 		}

@@ -488,13 +488,12 @@ void CTenantNotificationPublisherComp::PublishNotification(
 	const QByteArray& roleId) const
 {
 	sdl::V1_0::imtauth::CMembershipNotification notification;
-	notification.Version_1_0.emplace();
-	notification.Version_1_0->notificationType = notificationType;
-	notification.Version_1_0->membershipId = membershipId;
-	notification.Version_1_0->userId = userId;
-	notification.Version_1_0->tenantId = tenantId;
-	notification.Version_1_0->tenantName = tenantName;
-	notification.Version_1_0->role = roleId;
+	notification.notificationType = notificationType;
+	notification.membershipId = membershipId;
+	notification.userId = userId;
+	notification.tenantId = tenantId;
+	notification.tenantName = tenantName;
+	notification.role = roleId;
 
 	QJsonObject jsonObject;
 	if (!notification.WriteToJsonObject(jsonObject)){

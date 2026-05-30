@@ -23,8 +23,7 @@ bool CRemoteJwtSessionControllerComp::ValidateSession(const QByteArray& sessionI
 	namespace sessionsdl = sdl::V1_0::imtauth;
 
 	sessionsdl::ValidateSessionRequestArguments arguments;
-	arguments.input.Version_1_0 = sessionsdl::CValidateSessionInput::V1_0();
-	arguments.input.Version_1_0->sessionId = sessionId;
+	arguments.input.sessionId = sessionId;
 
 	imtgql::CGqlRequest gqlRequest;
 	if (!sessionsdl::CValidateSessionGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
@@ -39,8 +38,8 @@ bool CRemoteJwtSessionControllerComp::ValidateSession(const QByteArray& sessionI
 		return false;
 	}
 
-	if (response.Version_1_0 && response.Version_1_0->isValid.has_value()){
-		return *response.Version_1_0->isValid;
+	if (response.isValid.has_value()){
+		return *response.isValid;
 	}
 
 	return false;
@@ -52,8 +51,7 @@ imtauth::IJwtSessionController::JwtState CRemoteJwtSessionControllerComp::Valida
 	namespace sessionsdl = sdl::V1_0::imtauth;
 
 	sessionsdl::ValidateJwtRequestArguments arguments;
-	arguments.input.Version_1_0 = sessionsdl::CValidateJwtInput::V1_0();
-	arguments.input.Version_1_0->jwt = token;
+	arguments.input.jwt = token;
 
 	imtgql::CGqlRequest gqlRequest;
 	if (!sessionsdl::CValidateJwtGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
@@ -68,8 +66,8 @@ imtauth::IJwtSessionController::JwtState CRemoteJwtSessionControllerComp::Valida
 		return imtauth::IJwtSessionController::JS_NONE;
 	}
 
-	if (response.Version_1_0 && response.Version_1_0->state.has_value()){
-		sessionsdl::JwtState state = *response.Version_1_0->state;
+	if (response.state.has_value()){
+		sessionsdl::JwtState state = *response.state;
 
 		if (state == sessionsdl::JwtState::EXPIRED){
 			return imtauth::IJwtSessionController::JS_EXPIRED;
@@ -93,8 +91,7 @@ bool CRemoteJwtSessionControllerComp::RefreshToken(
 	namespace sessionsdl = sdl::V1_0::imtauth;
 
 	sessionsdl::RefreshTokenRequestArguments arguments;
-	arguments.input.Version_1_0 = sessionsdl::CRefreshTokenInput::V1_0();
-	arguments.input.Version_1_0->refreshToken = refreshToken;
+	arguments.input.refreshToken = refreshToken;
 
 	imtgql::CGqlRequest gqlRequest;
 	if (!sessionsdl::CRefreshTokenGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
@@ -109,22 +106,22 @@ bool CRemoteJwtSessionControllerComp::RefreshToken(
 		return false;
 	}
 
-	if (response.Version_1_0 && response.Version_1_0->ok.has_value() && *response.Version_1_0->ok){
-		if (response.Version_1_0->userSession.has_value()){
-			if (response.Version_1_0->userSession->userId.has_value()){
-				userSession.userId = *response.Version_1_0->userSession->userId;
+	if (response.ok.has_value() && *response.ok){
+		if (response.userSession.has_value()){
+			if (response.userSession->userId.has_value()){
+				userSession.userId = *response.userSession->userId;
 			}
 
-			if (response.Version_1_0->userSession->tenantId.has_value()){
-				userSession.tenantId = *response.Version_1_0->userSession->tenantId;
+			if (response.userSession->tenantId.has_value()){
+				userSession.tenantId = *response.userSession->tenantId;
 			}
 
-			if (response.Version_1_0->userSession->accessToken.has_value()){
-				userSession.accessToken = *response.Version_1_0->userSession->accessToken;
+			if (response.userSession->accessToken.has_value()){
+				userSession.accessToken = *response.userSession->accessToken;
 			}
 
-			if (response.Version_1_0->userSession->refreshToken.has_value()){
-				userSession.refreshToken = *response.Version_1_0->userSession->refreshToken;
+			if (response.userSession->refreshToken.has_value()){
+				userSession.refreshToken = *response.userSession->refreshToken;
 			}
 
 			return true;
@@ -143,10 +140,9 @@ bool CRemoteJwtSessionControllerComp::CreateNewSession(
 	namespace sessionsdl = sdl::V1_0::imtauth;
 
 	sessionsdl::CreateNewSessionRequestArguments arguments;
-	arguments.input.Version_1_0 = sessionsdl::CCreateNewSessionInput::V1_0();
-	arguments.input.Version_1_0->userId = userId;
+	arguments.input.userId = userId;
 	if (!tenantId.isEmpty()){
-		arguments.input.Version_1_0->tenantId = tenantId;
+		arguments.input.tenantId = tenantId;
 	}
 
 	imtgql::CGqlRequest gqlRequest;
@@ -162,22 +158,22 @@ bool CRemoteJwtSessionControllerComp::CreateNewSession(
 		return false;
 	}
 
-	if (response.Version_1_0 && response.Version_1_0->ok.has_value() && *response.Version_1_0->ok){
-		if (response.Version_1_0->userSession.has_value()){
-			if (response.Version_1_0->userSession->userId.has_value()){
-				userSession.userId = *response.Version_1_0->userSession->userId;
+	if (response.ok.has_value() && *response.ok){
+		if (response.userSession.has_value()){
+			if (response.userSession->userId.has_value()){
+				userSession.userId = *response.userSession->userId;
 			}
 
-			if (response.Version_1_0->userSession->tenantId.has_value()){
-				userSession.tenantId = *response.Version_1_0->userSession->tenantId;
+			if (response.userSession->tenantId.has_value()){
+				userSession.tenantId = *response.userSession->tenantId;
 			}
 
-			if (response.Version_1_0->userSession->accessToken.has_value()){
-				userSession.accessToken = *response.Version_1_0->userSession->accessToken;
+			if (response.userSession->accessToken.has_value()){
+				userSession.accessToken = *response.userSession->accessToken;
 			}
 
-			if (response.Version_1_0->userSession->refreshToken.has_value()){
-				userSession.refreshToken = *response.Version_1_0->userSession->refreshToken;
+			if (response.userSession->refreshToken.has_value()){
+				userSession.refreshToken = *response.userSession->refreshToken;
 			}
 
 			return true;
@@ -193,8 +189,7 @@ imtauth::ISessionSharedPtr CRemoteJwtSessionControllerComp::GetSession(const QBy
 	namespace sessionsdl = sdl::V1_0::imtauth;
 
 	sessionsdl::GetSessionRequestArguments arguments;
-	arguments.input.Version_1_0 = sessionsdl::CGetSessionInput::V1_0();
-	arguments.input.Version_1_0->sessionId = sessionId;
+	arguments.input.sessionId = sessionId;
 
 	imtgql::CGqlRequest gqlRequest;
 	if (!sessionsdl::CGetSessionGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
@@ -209,8 +204,8 @@ imtauth::ISessionSharedPtr CRemoteJwtSessionControllerComp::GetSession(const QBy
 		return nullptr;
 	}
 
-	if (response.Version_1_0 && response.Version_1_0->sessionData.has_value() && m_sessionFactCompPtr.IsValid()){
-		QByteArray sessionData = *response.Version_1_0->sessionData;
+	if (response.sessionData.has_value() && m_sessionFactCompPtr.IsValid()){
+		QByteArray sessionData = *response.sessionData;
 
 		imtauth::ISessionUniquePtr sessionInfoPtr = m_sessionFactCompPtr.CreateInstance();
 
@@ -232,8 +227,7 @@ bool CRemoteJwtSessionControllerComp::RemoveSession(const QByteArray& sessionId)
 	namespace sessionsdl = sdl::V1_0::imtauth;
 
 	sessionsdl::RemoveSessionRequestArguments arguments;
-	arguments.input.Version_1_0 = sessionsdl::CRemoveSessionInput::V1_0();
-	arguments.input.Version_1_0->sessionId = sessionId;
+	arguments.input.sessionId = sessionId;
 
 	imtgql::CGqlRequest gqlRequest;
 	if (!sessionsdl::CRemoveSessionGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
@@ -248,8 +242,8 @@ bool CRemoteJwtSessionControllerComp::RemoveSession(const QByteArray& sessionId)
 		return false;
 	}
 
-	if (response.Version_1_0 && response.Version_1_0->ok.has_value()){
-		return *response.Version_1_0->ok;
+	if (response.ok.has_value()){
+		return *response.ok;
 	}
 
 	return false;
@@ -261,8 +255,7 @@ QByteArray CRemoteJwtSessionControllerComp::GetUserFromJwt(const QByteArray& jwt
 	namespace sessionsdl = sdl::V1_0::imtauth;
 
 	sessionsdl::GetUserFromJwtRequestArguments arguments;
-	arguments.input.Version_1_0 = sessionsdl::CGetUserFromJwtInput::V1_0();
-	arguments.input.Version_1_0->jwt = jwt;
+	arguments.input.jwt = jwt;
 
 	imtgql::CGqlRequest gqlRequest;
 	if (!sessionsdl::CGetUserFromJwtGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
@@ -277,8 +270,8 @@ QByteArray CRemoteJwtSessionControllerComp::GetUserFromJwt(const QByteArray& jwt
 		return QByteArray();
 	}
 
-	if (response.Version_1_0 && response.Version_1_0->userId.has_value()){
-		return *response.Version_1_0->userId;
+	if (response.userId.has_value()){
+		return *response.userId;
 	}
 
 	return QByteArray();
@@ -296,8 +289,7 @@ QByteArray CRemoteJwtSessionControllerComp::GetTenantFromJwt(const QByteArray& j
 	namespace sessionsdl = sdl::V1_0::imtauth;
 
 	sessionsdl::GetTenantFromJwtRequestArguments arguments;
-	arguments.input.Version_1_0 = sessionsdl::CGetTenantFromJwtInput::V1_0();
-	arguments.input.Version_1_0->jwt = jwt;
+	arguments.input.jwt = jwt;
 
 	imtgql::CGqlRequest gqlRequest;
 	if (!sessionsdl::CGetTenantFromJwtGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
@@ -312,8 +304,8 @@ QByteArray CRemoteJwtSessionControllerComp::GetTenantFromJwt(const QByteArray& j
 		return QByteArray();
 	}
 
-	if (response.Version_1_0 && response.Version_1_0->tenantId.has_value()){
-		return *response.Version_1_0->tenantId;
+	if (response.tenantId.has_value()){
+		return *response.tenantId;
 	}
 
 	return QByteArray();

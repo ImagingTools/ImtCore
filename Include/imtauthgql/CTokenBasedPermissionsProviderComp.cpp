@@ -19,8 +19,7 @@ const QByteArrayList CTokenBasedPermissionsProviderComp::GetPermissions(const QB
 	namespace authsdl = sdl::V1_0::imtauth;
 
 	authsdl::GetPermissionsRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->accessToken = token;
+	arguments.input.accessToken = token;
 
 	imtgql::CGqlRequest gqlRequest;
 	if (!authsdl::CGetPermissionsGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
@@ -33,15 +32,15 @@ const QByteArrayList CTokenBasedPermissionsProviderComp::GetPermissions(const QB
 		return QByteArrayList();
 	}
 
-	if (!payload.Version_1_0.HasValue()){
+	if (!payload.HasValue()){
 		return QByteArrayList();
 	}
 
-	if (!payload.Version_1_0->permissions.HasValue()){
+	if (!payload.permissions.HasValue()){
 		return QByteArrayList();
 	}
 
-	return payload.Version_1_0->permissions->ToList();
+	return payload.permissions->ToList();
 }
 
 

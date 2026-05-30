@@ -25,10 +25,8 @@ QList<imtauth::IUserManager::User> CClientRequestUserManagerComp::GetUserList() 
 	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::UsersListRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-
 	if (m_applicationInfoCompPtr.IsValid()){
-		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+		arguments.input.productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
 
 	userssdl::CUsersListPayload payload;
@@ -37,13 +35,13 @@ QList<imtauth::IUserManager::User> CClientRequestUserManagerComp::GetUserList() 
 		return {};
 	}
 
-	if (!payload.Version_1_0->items.HasValue()){
+	if (!payload.items.HasValue()){
 		return {};
 	}
 
 	QList<imtauth::IUserManager::User> result;
 
-	for (const auto& item : payload.Version_1_0->items->ToList()){
+	for (const auto& item : payload.items->ToList()){
 		imtauth::IUserManager::User user;
 
 		if (item.id){
@@ -86,8 +84,7 @@ QByteArray CClientRequestUserManagerComp::GetUserObjectId(const QByteArray& logi
 	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::GetUserObjectIdRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->login = login;
+	arguments.input.login = login;
 
 	userssdl::CUserObjectId payload;
 	bool ok = SendModelRequestInternal<userssdl::GetUserObjectIdRequestArguments, userssdl::CUserObjectId, userssdl::CGetUserObjectIdGqlRequest>(arguments, payload);
@@ -95,11 +92,11 @@ QByteArray CClientRequestUserManagerComp::GetUserObjectId(const QByteArray& logi
 		return nullptr;
 	}
 
-	if (!payload.Version_1_0->objectId.HasValue()){
+	if (!payload.objectId.HasValue()){
 		return QByteArray();
 	}
 
-	return *payload.Version_1_0->objectId;
+	return *payload.objectId;
 }
 
 
@@ -108,11 +105,10 @@ imtauth::IUserInfoUniquePtr CClientRequestUserManagerComp::GetUser(const QByteAr
 	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::UserItemRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->id = userId;
+	arguments.input.id = userId;
 
 	if (m_applicationInfoCompPtr.IsValid()){
-		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+		arguments.input.productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
 
 	userssdl::CUserData payload;
@@ -127,7 +123,7 @@ imtauth::IUserInfoUniquePtr CClientRequestUserManagerComp::GetUser(const QByteAr
 	}
 
 	QString errorMessage;
-	if (!m_userRepresentationController.FillUserInfoFromRepresentation(*payload.Version_1_0, *userInfoPtr, nullptr, userId, errorMessage)){
+	if (!m_userRepresentationController.FillUserInfoFromRepresentation(payload, *userInfoPtr, nullptr, userId, errorMessage)){
 		return nullptr;
 	}
 
@@ -146,21 +142,20 @@ QByteArray CClientRequestUserManagerComp::CreateUser(const QString& userName, co
 	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::UserAddRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-	arguments.input.Version_1_0->typeId = QByteArrayLiteral("User");
-	arguments.input.Version_1_0->name = userName;
+	arguments.input.id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+	arguments.input.typeId = QByteArrayLiteral("User");
+	arguments.input.name = userName;
 
-	userssdl::CUserData::V1_0 userData;
+	userssdl::CUserData userData;
 	userData.name = userName;
 	userData.username = login;
 	userData.email = email;
 	userData.password = password;
 
-	arguments.input.Version_1_0->item = userData;
+	arguments.input.item = userData;
 
 	if (m_applicationInfoCompPtr.IsValid()){
-		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+		arguments.input.productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
 
 	sdl::V1_0::imtbase::CAddedNotificationPayload payload;
@@ -169,11 +164,11 @@ QByteArray CClientRequestUserManagerComp::CreateUser(const QString& userName, co
 		return QByteArray();
 	}
 
-	if (!payload.Version_1_0->id.HasValue()){
+	if (!payload.id.HasValue()){
 		return QByteArray();
 	}
 
-	return *payload.Version_1_0->id;
+	return *payload.id;
 }
 
 
@@ -182,10 +177,9 @@ bool CClientRequestUserManagerComp::ChangeUserPassword(const QByteArray& login, 
 	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::ChangePasswordRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->login = login;
-	arguments.input.Version_1_0->oldPassword = oldPassword;
-	arguments.input.Version_1_0->newPassword = newPassword;
+	arguments.input.login = login;
+	arguments.input.oldPassword = oldPassword;
+	arguments.input.newPassword = newPassword;
 
 	userssdl::CChangePasswordPayload payload;
 	bool ok = SendModelRequestInternal<userssdl::ChangePasswordRequestArguments, userssdl::CChangePasswordPayload, userssdl::CChangePasswordGqlRequest>(arguments, payload);
@@ -193,11 +187,11 @@ bool CClientRequestUserManagerComp::ChangeUserPassword(const QByteArray& login, 
 		return false;
 	}
 
-	if (!payload.Version_1_0->success.HasValue()){
+	if (!payload.success.HasValue()){
 		return false;
 	}
 
-	return *payload.Version_1_0->success;
+	return *payload.success;
 }
 
 
@@ -326,11 +320,10 @@ bool CClientRequestUserManagerComp::GetUserDataSdl(const QByteArray& userId, sdl
 	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::UserItemRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->id = userId;
+	arguments.input.id = userId;
 
 	if (m_applicationInfoCompPtr.IsValid()){
-		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+		arguments.input.productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
 
 	sdl::V1_0::imtauth::CUserData payload;
@@ -339,7 +332,7 @@ bool CClientRequestUserManagerComp::GetUserDataSdl(const QByteArray& userId, sdl
 		return false;
 	}
 
-	userData = *payload.Version_1_0;
+	userData = payload;
 
 	return true;
 }
@@ -350,15 +343,14 @@ bool CClientRequestUserManagerComp::SetUserDataSdl(const QByteArray& userId, con
 	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::UserUpdateRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->id = userId;
-	arguments.input.Version_1_0->typeId = QByteArray("User");
+	arguments.input.id = userId;
+	arguments.input.typeId = QByteArray("User");
 
 	if (m_applicationInfoCompPtr.IsValid()){
-		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+		arguments.input.productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
 
-	arguments.input.Version_1_0->item = userData;
+	arguments.input.item = userData;
 
 	sdl::V1_0::imtbase::CUpdatedNotificationPayload payload;
 	bool ok = SendModelRequestInternal<userssdl::UserUpdateRequestArguments, sdl::V1_0::imtbase::CUpdatedNotificationPayload, userssdl::CUserUpdateGqlRequest>(arguments, payload);
@@ -366,11 +358,11 @@ bool CClientRequestUserManagerComp::SetUserDataSdl(const QByteArray& userId, con
 		return false;
 	}
 
-	if (!payload.Version_1_0->id){
+	if (!payload.id){
 		return false;
 	}
 
-	return !payload.Version_1_0->id->isEmpty();
+	return !payload.id->isEmpty();
 }
 
 

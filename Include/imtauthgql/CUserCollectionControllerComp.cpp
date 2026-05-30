@@ -195,22 +195,17 @@ sdl::V1_0::imtbase::CVisualStatus CUserCollectionControllerComp::OnGetObjectVisu
 		languageId = gqlContextPtr->GetLanguageId();
 	}
 	
-	if (!response.Version_1_0.has_value()){
-		Q_ASSERT(false);
-		return response;
-	}
-	
-	if (!response.Version_1_0->text.has_value()){
+	if (!response.text.has_value()){
 		Q_ASSERT(false);
 		return response;
 	}
 
-	if (response.Version_1_0->text->isEmpty()){
-		response.Version_1_0->text = "<no name>";
+	if (response.text->isEmpty()){
+		response.text = "<no name>";
 	}
 
 	QString translation = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QString(QT_TR_NOOP("Users")).toUtf8(), languageId, "CUserCollectionControllerComp");
-	response.Version_1_0->text = translation + QByteArrayLiteral(" / ") + *response.Version_1_0->text;
+	response.text = translation + QByteArrayLiteral(" / ") + *response.text;
 	return response;
 }
 
@@ -221,17 +216,10 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CUserCollectionControllerComp::On
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CGetElementMetaInfoPayload response;
-	response.Version_1_0.Emplace();
-
 	sdl::V1_0::imtbase::GetElementMetaInfoRequestArguments arguments = getElementMetaInfoRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return response;
-	}
-
 	QByteArray objectId;
-	if (arguments.input.Version_1_0->elementId){
-		objectId = *arguments.input.Version_1_0->elementId;
+	if (arguments.input.elementId){
+		objectId = *arguments.input.elementId;
 	}
 
 	QByteArray productId = gqlRequest.GetHeader("productid");
@@ -303,7 +291,7 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CUserCollectionControllerComp::On
 	}
 
 	elementMetaInfo.infoParams = infoParams;
-	response.Version_1_0->elementMetaInfo = elementMetaInfo;
+	response.elementMetaInfo = elementMetaInfo;
 
 	return response;
 }
@@ -335,8 +323,8 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::V1_0::imtauth::UsersListRequestArguments arguments = usersListRequest.GetRequestedArguments();
 
 	QByteArray productId;
-	if (arguments.input.Version_1_0->productId){
-		productId = *arguments.input.Version_1_0->productId;
+	if (arguments.input.productId){
+		productId = *arguments.input.productId;
 	}
 
 	const imtauth::IUserInfo* userInfoPtr = nullptr;
@@ -562,8 +550,8 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 
 	sdl::V1_0::imtauth::UserItemRequestArguments arguments = userItemRequest.GetRequestedArguments();
 	QByteArray productId;
-	if (arguments.input.Version_1_0->productId){
-		productId = *arguments.input.Version_1_0->productId;
+	if (arguments.input.productId){
+		productId = *arguments.input.productId;
 	}
 	
 	QByteArray objectId = userInfoPtr->GetObjectUuid();
@@ -626,17 +614,12 @@ bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::UserUpdateRequestArguments arguments =userUpdateRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.has_value()){
+	if (!arguments.input.item.has_value()){
 		I_CRITICAL();
 		return false;
 	}
 	
-	if (!arguments.input.Version_1_0->item.has_value()){
-		I_CRITICAL();
-		return false;
-	}
-	
-	sdl::V1_0::imtauth::CUserData userData = *arguments.input.Version_1_0->item;
+	sdl::V1_0::imtauth::CUserData userData = *arguments.input.item;
 
 	auto userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(&object);
 	if (userInfoPtr == nullptr){
@@ -680,9 +663,9 @@ bool CUserCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& 
 		sdl::V1_0::imtauth::CUserItemGqlRequest userItemGqlRequest(gqlRequest, false);
 		if (userItemGqlRequest.IsValid()){
 			sdl::V1_0::imtauth::UserItemRequestArguments arguments = userItemGqlRequest.GetRequestedArguments();
-			if (arguments.input.Version_1_0.HasValue()){
-				if (arguments.input.Version_1_0->id.HasValue()){
-					requestedUserId = *arguments.input.Version_1_0->id;
+			if (arguments.input.HasValue()){
+				if (arguments.input.id.HasValue()){
+					requestedUserId = *arguments.input.id;
 				}
 			}
 		}

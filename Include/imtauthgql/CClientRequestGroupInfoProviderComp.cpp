@@ -39,15 +39,14 @@ imtauth::IUserGroupInfoSharedPtr CClientRequestGroupInfoProviderComp::GetUserGro
 	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::GroupItemRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->id = groupId;
+	arguments.input.id = groupId;
 
 	QByteArray productId;
 	if (m_applicationInfoCompPtr.IsValid()){
 		productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
 
-	arguments.input.Version_1_0->productId = productId;
+	arguments.input.productId = productId;
 
 	imtgql::CGqlRequest gqlRequest;
 	if (!userssdl::CGroupItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
@@ -68,7 +67,7 @@ imtauth::IUserGroupInfoSharedPtr CClientRequestGroupInfoProviderComp::GetUserGro
 		return nullptr;
 	}
 
-	if (!payload.Version_1_0.HasValue()){
+	if (!payload.HasValue()){
 		return nullptr;
 	}
 
@@ -77,24 +76,24 @@ imtauth::IUserGroupInfoSharedPtr CClientRequestGroupInfoProviderComp::GetUserGro
 		return nullptr;
 	}
 
-	if (payload.Version_1_0->name){
-		userGroupInfoPtr->SetName(*payload.Version_1_0->name);
+	if (payload.name){
+		userGroupInfoPtr->SetName(*payload.name);
 	}
 
-	if (payload.Version_1_0->description){
-		userGroupInfoPtr->SetDescription(*payload.Version_1_0->description);
+	if (payload.description){
+		userGroupInfoPtr->SetDescription(*payload.description);
 	}
 
-	if (payload.Version_1_0->roles){
-		userGroupInfoPtr->SetRoles(productId, payload.Version_1_0->roles->ToList());
+	if (payload.roles){
+		userGroupInfoPtr->SetRoles(productId, payload.roles->ToList());
 	}
 
-	if (payload.Version_1_0->users){
-		userGroupInfoPtr->SetUsers(payload.Version_1_0->users->ToList());
+	if (payload.users){
+		userGroupInfoPtr->SetUsers(payload.users->ToList());
 	}
 
-	if (payload.Version_1_0->parentGroups){
-		for (const QByteArray& groupId : payload.Version_1_0->parentGroups->ToList()){
+	if (payload.parentGroups){
+		for (const QByteArray& groupId : payload.parentGroups->ToList()){
 			userGroupInfoPtr->AddParentGroup(groupId);
 		}
 	}

@@ -71,19 +71,14 @@ sdl::V1_0::imtdesk::CEntityContextTicketsPayload CEntityContextTicketsController
 	}
 
 	sdl::V1_0::imtdesk::EntityContextTicketsRequestArguments arguments = entityContextTicketsRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		errorMessage = QStringLiteral("Invalid request input");
-		return response;
-	}
-
 	QString entityType;
-	if (arguments.input.Version_1_0->entityType){
-		entityType = *arguments.input.Version_1_0->entityType;
+	if (arguments.input.entityType){
+		entityType = *arguments.input.entityType;
 	}
 
 	QByteArray entityId;
-	if (arguments.input.Version_1_0->entityId){
-		entityId = *arguments.input.Version_1_0->entityId;
+	if (arguments.input.entityId){
+		entityId = *arguments.input.entityId;
 	}
 
 	if (entityType.isEmpty() || entityId.isEmpty()){
@@ -93,12 +88,12 @@ sdl::V1_0::imtdesk::CEntityContextTicketsPayload CEntityContextTicketsController
 
 	int offset = 0;
 	int count = 250;
-	if (arguments.input.Version_1_0->viewParams){
-		if (arguments.input.Version_1_0->viewParams->offset){
-			offset = qMax(0, *arguments.input.Version_1_0->viewParams->offset);
+	if (arguments.input.viewParams){
+		if (arguments.input.viewParams->offset){
+			offset = qMax(0, *arguments.input.viewParams->offset);
 		}
-		if (arguments.input.Version_1_0->viewParams->count){
-			count = qMax(1, *arguments.input.Version_1_0->viewParams->count);
+		if (arguments.input.viewParams->count){
+			count = qMax(1, *arguments.input.viewParams->count);
 		}
 	}
 
@@ -159,9 +154,8 @@ sdl::V1_0::imtdesk::CEntityContextTicketsPayload CEntityContextTicketsController
 		++matchedCount;
 	}
 
-	response.Version_1_0.Emplace();
 	if (!itemList.isEmpty()){
-		response.Version_1_0->items.Emplace().FromList(itemList);
+		response.items.Emplace().FromList(itemList);
 	}
 
 	return response;
@@ -181,34 +175,29 @@ sdl::V1_0::imtdesk::CCreateEntityContextTicketPayload CEntityContextTicketsContr
 	}
 
 	sdl::V1_0::imtdesk::CreateEntityContextTicketRequestArguments arguments = createEntityContextTicketRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		errorMessage = QStringLiteral("Invalid request input");
-		return response;
-	}
-
 	QString entityType;
-	if (arguments.input.Version_1_0->entityType){
-		entityType = *arguments.input.Version_1_0->entityType;
+	if (arguments.input.entityType){
+		entityType = *arguments.input.entityType;
 	}
 
 	QByteArray entityId;
-	if (arguments.input.Version_1_0->entityId){
-		entityId = *arguments.input.Version_1_0->entityId;
+	if (arguments.input.entityId){
+		entityId = *arguments.input.entityId;
 	}
 
 	QString title;
-	if (arguments.input.Version_1_0->title){
-		title = *arguments.input.Version_1_0->title;
+	if (arguments.input.title){
+		title = *arguments.input.title;
 	}
 
 	QString description;
-	if (arguments.input.Version_1_0->description){
-		description = *arguments.input.Version_1_0->description;
+	if (arguments.input.description){
+		description = *arguments.input.description;
 	}
 
 	QString entityDisplayName = QString::fromUtf8(entityId);
-	if (arguments.input.Version_1_0->entityDisplayName && !arguments.input.Version_1_0->entityDisplayName->isEmpty()){
-		entityDisplayName = *arguments.input.Version_1_0->entityDisplayName;
+	if (arguments.input.entityDisplayName && !arguments.input.entityDisplayName->isEmpty()){
+		entityDisplayName = *arguments.input.entityDisplayName;
 	}
 
 	if (entityType.isEmpty() || entityId.isEmpty() || title.trimmed().isEmpty()){
@@ -270,8 +259,7 @@ sdl::V1_0::imtdesk::CCreateEntityContextTicketPayload CEntityContextTicketsContr
 		}
 	}
 
-	response.Version_1_0.Emplace();
-	response.Version_1_0->id = createdId;
+	response.id = createdId;
 	return response;
 }
 

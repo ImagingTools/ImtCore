@@ -35,12 +35,7 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 	}
 
 	sdl::V1_0::imtauth::ChangePasswordRequestArguments arguments = changePasswordRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.has_value()){
-		Q_ASSERT(false);
-		return sdl::V1_0::imtauth::CChangePasswordPayload();
-	}
-
-	sdl::V1_0::imtauth::CChangePasswordInput inputArgument = *arguments.input.Version_1_0;
+	sdl::V1_0::imtauth::CChangePasswordInput inputArgument = *arguments.input;
 	QByteArray login;
 	if (inputArgument.login){
 		login = *inputArgument.login;
@@ -131,10 +126,7 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 
 	payload.success = true;
 
-	sdl::V1_0::imtauth::CChangePasswordPayload retVal;
-	retVal.Version_1_0 = std::move(payload);
-
-	return retVal;
+	return payload;
 }
 
 
@@ -160,19 +152,14 @@ sdl::V1_0::imtauth::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 	}
 
 	sdl::V1_0::imtauth::RegisterUserRequestArguments arguments = registerUserRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.has_value()){
-		Q_ASSERT(false);
-		return sdl::V1_0::imtauth::CRegisterUserPayload();
-	}
-
-	if (!arguments.input.Version_1_0->userData){
+	if (!arguments.input.userData){
 		errorMessage = QString("Unable to register user. Error: User data is invalid");
 		return sdl::V1_0::imtauth::CRegisterUserPayload();
 	}
 
 	QByteArray productId;
-	if (arguments.input.Version_1_0->productId){
-		productId = *arguments.input.Version_1_0->productId;
+	if (arguments.input.productId){
+		productId = *arguments.input.productId;
 	}
 
 	imtauth::IUserInfoUniquePtr userInfoPtr = m_userFactoryCompPtr.CreateInstance();
@@ -189,11 +176,11 @@ sdl::V1_0::imtauth::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 		return sdl::V1_0::imtauth::CRegisterUserPayload();
 	}
 
-	sdl::V1_0::imtauth::CUserData userData = *arguments.input.Version_1_0->userData;
+	sdl::V1_0::imtauth::CUserData userData = *arguments.input.userData;
 
 	QByteArray userId;
-	if (arguments.input.Version_1_0->userData->id){
-		userId = *arguments.input.Version_1_0->userData->id;
+	if (arguments.input.userData->id){
+		userId = *arguments.input.userData->id;
 	}
 
 	userIdentifierPtr->SetObjectUuid(userId);
@@ -262,10 +249,7 @@ sdl::V1_0::imtauth::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 		return sdl::V1_0::imtauth::CRegisterUserPayload();
 	}
 
-	sdl::V1_0::imtauth::CRegisterUserPayload retVal;
-	retVal.Version_1_0 = response;
-
-	return retVal;
+	return response;
 }
 
 
@@ -275,9 +259,8 @@ sdl::V1_0::imtauth::CCheckEmailPayload CUserControllerComp::OnCheckEmail(
 			QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CCheckEmailPayload retVal;
-	retVal.Version_1_0 = sdl::V1_0::imtauth::CCheckEmailPayload();
 
-	sdl::V1_0::imtauth::CCheckEmailPayload& response = *retVal.Version_1_0;
+	sdl::V1_0::imtauth::CCheckEmailPayload& response = retVal;
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CUserControllerComp");
 
@@ -294,14 +277,9 @@ sdl::V1_0::imtauth::CCheckEmailPayload CUserControllerComp::OnCheckEmail(
 
 	sdl::V1_0::imtauth::CheckEmailRequestArguments arguments = checkEmailRequest.GetRequestedArguments();
 	
-	if (!arguments.input.Version_1_0.has_value()){
-		Q_ASSERT(false);
-		return sdl::V1_0::imtauth::CCheckEmailPayload();
-	}
-
 	QString email;
-	if (arguments.input.Version_1_0->email){
-		email = *arguments.input.Version_1_0->email;
+	if (arguments.input.email){
+		email = *arguments.input.email;
 	}
 
 	if (email.isEmpty()){
@@ -337,8 +315,7 @@ sdl::V1_0::imtauth::CSendEmailCodePayload CUserControllerComp::OnSendEmailCode(
 			QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CSendEmailCodePayload retVal;
-	retVal.Version_1_0 = sdl::V1_0::imtauth::CSendEmailCodePayload();
-	sdl::V1_0::imtauth::CSendEmailCodePayload& response = *retVal.Version_1_0;
+	sdl::V1_0::imtauth::CSendEmailCodePayload& response = retVal;
 
 	if (!m_userVerificationControllerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserVerificationController' was not set", "CUserControllerComp");
@@ -346,14 +323,9 @@ sdl::V1_0::imtauth::CSendEmailCodePayload CUserControllerComp::OnSendEmailCode(
 	}
 
 	sdl::V1_0::imtauth::SendEmailCodeRequestArguments arguments = sendEmailCodeRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.has_value()){
-		Q_ASSERT(false);
-		return retVal;
-	}
-
 	QByteArray login;
-	if (arguments.input.Version_1_0->login){
-		login = *arguments.input.Version_1_0->login;
+	if (arguments.input.login){
+		login = *arguments.input.login;
 	}
 
 	response.login = login;
@@ -393,29 +365,21 @@ sdl::V1_0::imtauth::CCheckEmailCodePayload CUserControllerComp::OnCheckEmailCode
 
 	sdl::V1_0::imtauth::CheckEmailCodeRequestArguments arguments = checkEmailCodeRequest.GetRequestedArguments();
 	
-	if (!arguments.input.Version_1_0.has_value()){
-		Q_ASSERT(false);
-		return sdl::V1_0::imtauth::CCheckEmailCodePayload();
-	}
-	
 	QByteArray login;
-	if (arguments.input.Version_1_0->login){
-		login = *arguments.input.Version_1_0->login;
+	if (arguments.input.login){
+		login = *arguments.input.login;
 	}
 
 	QByteArray userId = GetUserIdByLogin(login);
 
 	QString code;
-	if (arguments.input.Version_1_0->code){
-		code = *arguments.input.Version_1_0->code;
+	if (arguments.input.code){
+		code = *arguments.input.code;
 	}
 
 	response.correctCode = m_userVerificationControllerCompPtr->VerifyUser(userId, code.toUtf8());
 
-	sdl::V1_0::imtauth::CCheckEmailCodePayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 
@@ -425,8 +389,7 @@ sdl::V1_0::imtauth::CCheckSuperuserPayload CUserControllerComp::OnCheckSuperuser
 			QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CCheckSuperuserPayload retVal;
-	retVal.Version_1_0 = sdl::V1_0::imtauth::CCheckSuperuserPayload();
-	sdl::V1_0::imtauth::CCheckSuperuserPayload& response = *retVal.Version_1_0;
+	sdl::V1_0::imtauth::CCheckSuperuserPayload& response = retVal;
 
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CUserControllerComp");
@@ -465,8 +428,7 @@ sdl::V1_0::imtauth::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperus
 			QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CCreateSuperuserPayload retVal;
-	retVal.Version_1_0 = sdl::V1_0::imtauth::CCreateSuperuserPayload();
-	sdl::V1_0::imtauth::CCreateSuperuserPayload& response = *retVal.Version_1_0;
+	sdl::V1_0::imtauth::CCreateSuperuserPayload& response = retVal;
 
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CUserControllerComp");
@@ -492,14 +454,9 @@ sdl::V1_0::imtauth::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperus
 
 	sdl::V1_0::imtauth::CreateSuperuserRequestArguments arguments = createSuperuserRequest.GetRequestedArguments();
 
-	if (!arguments.input.Version_1_0.has_value()){
-		Q_ASSERT(false);
-		return retVal;
-	}
-
 	QString name;
-	if (arguments.input.Version_1_0->name){
-		name = *arguments.input.Version_1_0->name;
+	if (arguments.input.name){
+		name = *arguments.input.name;
 	}
 
 	if (name.isEmpty()){
@@ -507,8 +464,8 @@ sdl::V1_0::imtauth::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperus
 	}
 
 	QString mail;
-	if (arguments.input.Version_1_0->mail){
-		mail = *arguments.input.Version_1_0->mail;
+	if (arguments.input.mail){
+		mail = *arguments.input.mail;
 	}
 
 	if (mail.isEmpty()){
@@ -517,8 +474,8 @@ sdl::V1_0::imtauth::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperus
 	}
 
 	QString password;
-	if (arguments.input.Version_1_0->password){
-		password = *arguments.input.Version_1_0->password;
+	if (arguments.input.password){
+		password = *arguments.input.password;
 	}
 
 	if (password.isEmpty()){
@@ -577,21 +534,20 @@ sdl::V1_0::imtauth::CUserObjectId CUserControllerComp::OnGetUserObjectId(
 	sdl::V1_0::imtauth::CUserObjectId response;
 
 	sdl::V1_0::imtauth::GetUserObjectIdRequestArguments arguments = getUserObjectIdRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.HasValue()){
+	if (!arguments.input.HasValue()){
 		errorMessage = QString("Unable to get user object-ID. Error: GraphQL version is invalid");
 		return response;
 	}
 
-	if (!arguments.input.Version_1_0->login.HasValue()){
+	if (!arguments.input.login.HasValue()){
 		errorMessage = QString("Unable to get user object-ID. Error: Login field is invalid");
 		return response;
 	}
 
-	QByteArray login = *arguments.input.Version_1_0->login;
+	QByteArray login = *arguments.input.login;
 	QByteArray objectId = GetUserIdByLogin(login);
 
-	response.Version_1_0.Emplace();
-	response.Version_1_0->objectId = objectId;
+	response.objectId = objectId;
 
 	return response;
 }

@@ -22,17 +22,13 @@ sdl::V1_0::imtauth::CProfileData CRemoteProfileControllerComp::OnGetProfile(
 	sdl::V1_0::imtauth::CProfileData profileData =
 				SendModelRequest<sdl::V1_0::imtauth::CProfileData>(gqlRequest, errorMessage);
 
-	if (!profileData.Version_1_0.has_value()){
-		return profileData;
-	}
-
 	// Supplement permissions from local ProductInfo
 	if (m_productInfoCompPtr.IsValid()){
 		imtbase::IObjectCollection* featureCollectionPtr = m_productInfoCompPtr->GetFeatures();
 		if (featureCollectionPtr != nullptr){
 			QByteArrayList permissions;
-			if (profileData.Version_1_0->permissions.has_value()){
-				for (const auto& permInfo : *profileData.Version_1_0->permissions){
+			if (profileData.permissions.has_value()){
+				for (const auto& permInfo : *profileData.permissions){
 					if (permInfo->id){
 						permissions.append(*permInfo->id);
 					}
@@ -64,7 +60,7 @@ sdl::V1_0::imtauth::CProfileData CRemoteProfileControllerComp::OnGetProfile(
 				}
 			}
 
-			profileData.Version_1_0->permissions = std::move(permissionList);
+			profileData.permissions = std::move(permissionList);
 		}
 	}
 

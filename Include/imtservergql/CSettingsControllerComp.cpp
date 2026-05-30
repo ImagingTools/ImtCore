@@ -27,17 +27,12 @@ sdl::V1_0::imtbase::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
 	sdl::V1_0::imtbase::CSetSettingsPayload response;
 	
 	sdl::V1_0::imtbase::SetSettingsRequestArguments arguments = setSettingsRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.has_value()){
+	if (!arguments.input.userId.has_value()){
 		Q_ASSERT(false);
 		return response;
 	}
 	
-	if (!arguments.input.Version_1_0->userId.has_value()){
-		Q_ASSERT(false);
-		return response;
-	}
-	
-	QByteArray userId = *arguments.input.Version_1_0->userId;
+	QByteArray userId = *arguments.input.userId;
 
 	if (userId.isEmpty()){
 		errorMessage = QString("Unable to set settings. User-ID is empty!");
@@ -45,15 +40,14 @@ sdl::V1_0::imtbase::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
 		return response;
 	}
 
-	if (!arguments.input.Version_1_0->settings.has_value()){
+	if (!arguments.input.settings.has_value()){
 		Q_ASSERT(false);
 		return response;
 	}
 	
-	QString settings = *arguments.input.Version_1_0->settings;
+	QString settings = *arguments.input.settings;
 	
-	response.Version_1_0.emplace();
-	response.Version_1_0->ok = false;
+	response.ok = false;
 
 	imtauth::IUserSettingsSharedPtr userSettingsPtr = GetOrCreateUserSettings(userId);
 	if (!userSettingsPtr.IsValid()){
@@ -90,7 +84,7 @@ sdl::V1_0::imtbase::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
 		return response;
 	}
 
-	response.Version_1_0->ok = true;
+	response.ok = true;
 	
 	return response;
 }
@@ -119,14 +113,9 @@ sdl::V1_0::imtbase::CParamsSet CSettingsControllerComp::OnGetSettings(
 	}
 	
 	sdl::V1_0::imtbase::GetSettingsRequestArguments arguments = getSettingsRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.has_value()){
-		Q_ASSERT(false);
-		return response;
-	}
-	
 	QByteArray userId;
-	if (arguments.input.Version_1_0->userId){
-		userId = *arguments.input.Version_1_0->userId;
+	if (arguments.input.userId){
+		userId = *arguments.input.userId;
 	}
 
 	if (userId.isEmpty()){
@@ -168,9 +157,7 @@ sdl::V1_0::imtbase::CParamsSet CSettingsControllerComp::OnGetSettings(
 		return response;
 	}
 	
-	response.Version_1_0.emplace();
-	
-	if (!response.Version_1_0->ReadFromJsonObject(representationObject)){
+	if (!response.ReadFromJsonObject(representationObject)){
 		errorMessage = QString("Unable to get settings for user '%1'. Error: Read from Json object failed").arg(qPrintable(userId));
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
 		return response;
@@ -188,14 +175,9 @@ sdl::V1_0::imtbase::CStyleData CSettingsControllerComp::OnGetStyleData(
 	sdl::V1_0::imtbase::CStyleData response;
 	
 	sdl::V1_0::imtbase::GetStyleDataRequestArguments arguments = getStyleRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.has_value()){
-		Q_ASSERT(false);
-		return response;
-	}
-	
 	QByteArray schemeId;
-	if (arguments.input.Version_1_0->schemeId){
-		schemeId = *arguments.input.Version_1_0->schemeId;
+	if (arguments.input.schemeId){
+		schemeId = *arguments.input.schemeId;
 	}
 	
 	if(schemeId.isEmpty()){
@@ -217,8 +199,7 @@ sdl::V1_0::imtbase::CStyleData CSettingsControllerComp::OnGetStyleData(
 		return response;
 	}
 	
-	response.Version_1_0.emplace();
-	response.Version_1_0->data = resource.readAll();
+	response.data = resource.readAll();
 	resource.close();
 	
 	return response;
@@ -236,14 +217,12 @@ sdl::V1_0::imtbase::CUrlParam CSettingsControllerComp::OnGetWebSocketUrl(
 	}
 	
 	sdl::V1_0::imtbase::CUrlParam response;
-	response.Version_1_0.emplace();
-	
 	QUrl url;
 	
 	if (m_serverInterfaceCompPtr->GetUrl(imtcom::IServerConnectionInterface::PT_WEBSOCKET, url)){
-		response.Version_1_0->host = url.host();
-		response.Version_1_0->port = url.port();
-		response.Version_1_0->scheme = url.scheme();
+		response.host = url.host();
+		response.port = url.port();
+		response.scheme = url.scheme();
 
 		return response;
 	}

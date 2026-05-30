@@ -31,15 +31,13 @@ sdl::V1_0::imtauth::CValidateSessionPayload CGqlJwtSessionControllerComp::OnVali
 		return response;
 	}
 
-	response.Version_1_0.emplace();
-
 	QByteArray sessionId;
 	sdl::V1_0::imtauth::ValidateSessionRequestArguments arguments = validateSessionRequest.GetRequestedArguments();
-	if (arguments.input.Version_1_0->sessionId){
-		sessionId = *arguments.input.Version_1_0->sessionId;
+	if (arguments.input.sessionId){
+		sessionId = *arguments.input.sessionId;
 	}
 
-	response.Version_1_0->isValid = m_jwtSessionControllerCompPtr->ValidateSession(sessionId);
+	response.isValid = m_jwtSessionControllerCompPtr->ValidateSession(sessionId);
 
 	return response;
 }
@@ -59,24 +57,22 @@ sdl::V1_0::imtauth::CValidateJwtPayload CGqlJwtSessionControllerComp::OnValidate
 
 	QString jwt;
 	sdl::V1_0::imtauth::ValidateJwtRequestArguments arguments = validateJwtRequest.GetRequestedArguments();
-	if (arguments.input.Version_1_0->jwt){
-		jwt = *arguments.input.Version_1_0->jwt;
+	if (arguments.input.jwt){
+		jwt = *arguments.input.jwt;
 	}
-
-	response.Version_1_0.emplace();
 
 	imtauth::IJwtSessionController::JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(jwt.toUtf8());
 
-	response.Version_1_0->state = sdl::V1_0::imtauth::JwtState::NONE;
+	response.state = sdl::V1_0::imtauth::JwtState::NONE;
 
 	if (state == imtauth::IJwtSessionController::JS_EXPIRED){
-		response.Version_1_0->state = sdl::V1_0::imtauth::JwtState::EXPIRED;
+		response.state = sdl::V1_0::imtauth::JwtState::EXPIRED;
 	}
 	else if (state == imtauth::IJwtSessionController::JS_INVALID){
-		response.Version_1_0->state = sdl::V1_0::imtauth::JwtState::INVALID;
+		response.state = sdl::V1_0::imtauth::JwtState::INVALID;
 	}
 	else if (state == imtauth::IJwtSessionController::JS_OK){
-		response.Version_1_0->state = sdl::V1_0::imtauth::JwtState::OK;
+		response.state = sdl::V1_0::imtauth::JwtState::OK;
 	}
 
 	return response;
@@ -95,12 +91,10 @@ sdl::V1_0::imtauth::CGetSessionPayload CGqlJwtSessionControllerComp::OnGetSessio
 		return response;
 	}
 
-	response.Version_1_0.emplace();
-
 	QByteArray sessionId;
 	sdl::V1_0::imtauth::GetSessionRequestArguments arguments = getSessionRequest.GetRequestedArguments();
-	if (arguments.input.Version_1_0->sessionId){
-		sessionId = *arguments.input.Version_1_0->sessionId;
+	if (arguments.input.sessionId){
+		sessionId = *arguments.input.sessionId;
 	}
 
 	imtauth::ISessionSharedPtr sessionInfoPtr = m_jwtSessionControllerCompPtr->GetSession(sessionId);
@@ -120,7 +114,7 @@ sdl::V1_0::imtauth::CGetSessionPayload CGqlJwtSessionControllerComp::OnGetSessio
 
 	QByteArray objectData = QByteArray((char*)archivePtr->GetBuffer(), archivePtr->GetBufferSize());
 
-	response.Version_1_0->sessionData = objectData;
+	response.sessionData = objectData;
 
 	return response;
 }
@@ -138,18 +132,16 @@ sdl::V1_0::imtauth::CRefreshTokenPayload CGqlJwtSessionControllerComp::OnRefresh
 		return response;
 	}
 
-	response.Version_1_0.emplace();
-
 	QByteArray refreshToken;
 	sdl::V1_0::imtauth::RefreshTokenRequestArguments arguments = refreshTokenRequest.GetRequestedArguments();
-	if (arguments.input.Version_1_0->refreshToken){
-		refreshToken = *arguments.input.Version_1_0->refreshToken;
+	if (arguments.input.refreshToken){
+		refreshToken = *arguments.input.refreshToken;
 	}
 
 	imtauth::IJwtSessionController::UserSession userSession;
-	response.Version_1_0->ok = m_jwtSessionControllerCompPtr->RefreshToken(refreshToken, userSession);
-	if (response.Version_1_0->ok){
-		response.Version_1_0->userSession = CreateUserSessionData(userSession);
+	response.ok = m_jwtSessionControllerCompPtr->RefreshToken(refreshToken, userSession);
+	if (response.ok){
+		response.userSession = CreateUserSessionData(userSession);
 	}
 
 	return response;
@@ -168,47 +160,45 @@ sdl::V1_0::imtauth::CCreateNewSessionPayload CGqlJwtSessionControllerComp::OnCre
 		return response;
 	}
 
-	response.Version_1_0.emplace();
-
 	QByteArray userId;
 	QByteArray tenantId;
 	sdl::V1_0::imtauth::CreateNewSessionRequestArguments arguments = createNewSessionRequest.GetRequestedArguments();
-	if (arguments.input.Version_1_0->userId){
-		userId = *arguments.input.Version_1_0->userId;
+	if (arguments.input.userId){
+		userId = *arguments.input.userId;
 	}
-	if (arguments.input.Version_1_0->tenantId){
-		tenantId = *arguments.input.Version_1_0->tenantId;
+	if (arguments.input.tenantId){
+		tenantId = *arguments.input.tenantId;
 	}
 
 	if (!tenantId.isEmpty()){
 		QByteArray authenticatedUserId = GetAuthenticatedUserId(gqlRequest);
 		if (authenticatedUserId.isEmpty()){
-			response.Version_1_0->ok = false;
-			response.Version_1_0->errorMessage = QStringLiteral("Authenticated user is required to select tenant");
+			response.ok = false;
+			response.errorMessage = QStringLiteral("Authenticated user is required to select tenant");
 			return response;
 		}
 
 		if (authenticatedUserId != userId){
-			response.Version_1_0->ok = false;
-			response.Version_1_0->errorMessage = QStringLiteral("Cannot create tenant session for another user");
+			response.ok = false;
+			response.errorMessage = QStringLiteral("Cannot create tenant session for another user");
 			return response;
 		}
 
 		QString tenantError;
 		if (!CanUseTenant(userId, tenantId, tenantError)){
-			response.Version_1_0->ok = false;
-			response.Version_1_0->errorMessage = tenantError;
+			response.ok = false;
+			response.errorMessage = tenantError;
 			return response;
 		}
 	}
 
 	imtauth::IJwtSessionController::UserSession userSession;
-	response.Version_1_0->ok = m_jwtSessionControllerCompPtr->CreateNewSession(userId, tenantId, userSession);
-	if (response.Version_1_0->ok){
-		response.Version_1_0->userSession = CreateUserSessionData(userSession);
+	response.ok = m_jwtSessionControllerCompPtr->CreateNewSession(userId, tenantId, userSession);
+	if (response.ok){
+		response.userSession = CreateUserSessionData(userSession);
 	}
 	else{
-		response.Version_1_0->errorMessage = QStringLiteral("Failed to create session");
+		response.errorMessage = QStringLiteral("Failed to create session");
 	}
 
 	return response;
@@ -227,26 +217,24 @@ sdl::V1_0::imtauth::CSelectTenantPayload CGqlJwtSessionControllerComp::OnSelectT
 		return response;
 	}
 
-	response.Version_1_0.emplace();
-
 	QByteArray userId = GetAuthenticatedUserId(gqlRequest);
 	if (userId.isEmpty()){
-		response.Version_1_0->ok = false;
-		response.Version_1_0->errorMessage = QStringLiteral("Authenticated user is required to select tenant");
+		response.ok = false;
+		response.errorMessage = QStringLiteral("Authenticated user is required to select tenant");
 		return response;
 	}
 
 	QByteArray tenantId;
 	sdl::V1_0::imtauth::SelectTenantRequestArguments arguments = selectTenantRequest.GetRequestedArguments();
-	if (arguments.input.Version_1_0->tenantId){
-		tenantId = *arguments.input.Version_1_0->tenantId;
+	if (arguments.input.tenantId){
+		tenantId = *arguments.input.tenantId;
 	}
 
 	if (!tenantId.isEmpty()){
 		QString tenantError;
 		if (!CanUseTenant(userId, tenantId, tenantError)){
-			response.Version_1_0->ok = false;
-			response.Version_1_0->errorMessage = tenantError;
+			response.ok = false;
+			response.errorMessage = tenantError;
 			return response;
 		}
 	}
@@ -260,13 +248,13 @@ sdl::V1_0::imtauth::CSelectTenantPayload CGqlJwtSessionControllerComp::OnSelectT
 	}
 
 	imtauth::IJwtSessionController::UserSession userSession;
-	response.Version_1_0->ok = m_jwtSessionControllerCompPtr->CreateNewSession(userId, tenantId, userSession);
-	if (!response.Version_1_0->ok){
-		response.Version_1_0->errorMessage = QStringLiteral("Failed to create tenant session");
+	response.ok = m_jwtSessionControllerCompPtr->CreateNewSession(userId, tenantId, userSession);
+	if (!response.ok){
+		response.errorMessage = QStringLiteral("Failed to create tenant session");
 		return response;
 	}
 
-	response.Version_1_0->userSession = CreateUserSessionData(userSession);
+	response.userSession = CreateUserSessionData(userSession);
 
 	QByteArray newSessionId = m_jwtSessionControllerCompPtr->GetSessionFromJwt(userSession.accessToken);
 	if (!oldSessionId.isEmpty() && oldSessionId != newSessionId){
@@ -295,15 +283,13 @@ sdl::V1_0::imtauth::CRemoveSessionPayload CGqlJwtSessionControllerComp::OnRemove
 		return response;
 	}
 
-	response.Version_1_0.emplace();
-
 	QByteArray sessionId;
 	sdl::V1_0::imtauth::RemoveSessionRequestArguments arguments = removeSessionRequest.GetRequestedArguments();
-	if (arguments.input.Version_1_0->sessionId){
-		sessionId = *arguments.input.Version_1_0->sessionId;
+	if (arguments.input.sessionId){
+		sessionId = *arguments.input.sessionId;
 	}
 
-	response.Version_1_0->ok = m_jwtSessionControllerCompPtr->RemoveSession(sessionId);
+	response.ok = m_jwtSessionControllerCompPtr->RemoveSession(sessionId);
 
 	return response;
 }
@@ -323,16 +309,13 @@ sdl::V1_0::imtauth::CGetUserFromJwtPayload CGqlJwtSessionControllerComp::OnGetUs
 
 	QString jwt;
 	sdl::V1_0::imtauth::GetUserFromJwtRequestArguments arguments = getUserFromJwtRequest.GetRequestedArguments();
-	if (arguments.input.Version_1_0->jwt){
-		jwt = *arguments.input.Version_1_0->jwt;
+	if (arguments.input.jwt){
+		jwt = *arguments.input.jwt;
 	}
 
 	response.userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(jwt.toUtf8());
 
-	sdl::V1_0::imtauth::CGetUserFromJwtPayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 
@@ -350,16 +333,13 @@ sdl::V1_0::imtauth::CGetTenantFromJwtPayload CGqlJwtSessionControllerComp::OnGet
 
 	QString jwt;
 	sdl::V1_0::imtauth::GetTenantFromJwtRequestArguments arguments = getTenantFromJwtRequest.GetRequestedArguments();
-	if (arguments.input.Version_1_0->jwt){
-		jwt = *arguments.input.Version_1_0->jwt;
+	if (arguments.input.jwt){
+		jwt = *arguments.input.jwt;
 	}
 
 	response.tenantId = m_jwtSessionControllerCompPtr->GetTenantFromJwt(jwt.toUtf8());
 
-	sdl::V1_0::imtauth::CGetTenantFromJwtPayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 

@@ -25,15 +25,15 @@ bool CCommandsControllerComp::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 		return false;
 	}
 
-	namespace Commands = ::sdl::imtbase::Commands;
+	namespace Commands = ::sdl::V1_0::imtbase;
 
 	Commands::CGetCommandsGqlRequest getCommandsGqlRequest(gqlRequest, false);
 	const Commands::GetCommandsRequestArguments& arguments = getCommandsGqlRequest.GetRequestedArguments();
-	if (!getCommandsGqlRequest.IsValid() || !arguments.input.Version_1_0.has_value()){
+	if (!getCommandsGqlRequest.IsValid()){
 		return false;
 	}
 	
-	const QByteArray& typeId = arguments.input.Version_1_0->typeId.value_or(QByteArray());
+	const QByteArray& typeId = arguments.input.typeId.value_or(QByteArray());
 	if (!typeId.isEmpty()){
 		return *m_typeIdAttrPtr == typeId;
 	}
@@ -55,14 +55,9 @@ sdl::V1_0::imtbase::CGuiElementContainer CCommandsControllerComp::OnGetCommands(
 	}
 	
 	sdl::V1_0::imtbase::GetCommandsRequestArguments arguments = getCommandsRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.has_value()){
-		Q_ASSERT(false);
-		return sdl::V1_0::imtbase::CGuiElementContainer();
-	}
-	
 	QByteArray typeId;
-	if (arguments.input.Version_1_0->typeId){
-		typeId = *arguments.input.Version_1_0->typeId;
+	if (arguments.input.typeId){
+		typeId = *arguments.input.typeId;
 	}
 
 	const imtauth::IUserInfo* userInfoPtr = nullptr;
@@ -79,10 +74,7 @@ sdl::V1_0::imtbase::CGuiElementContainer CCommandsControllerComp::OnGetCommands(
 		return sdl::V1_0::imtbase::CGuiElementContainer();
 	}
 	
-	sdl::V1_0::imtbase::CGuiElementContainer retVal;
-	retVal.Version_1_0 = std::move(response);
-	
-	return retVal;
+	return response;
 }
 
 
