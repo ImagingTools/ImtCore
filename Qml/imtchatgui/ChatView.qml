@@ -85,7 +85,7 @@ Rectangle {
 				hasEntityRefs: model.hasEntityRefs || false
 
 				onCreateTicketRequested: {
-					chatViewContainer.ticketCreateRequested(msgId, msgContent);
+					chatViewContainer.ticketCreateRequested(messageId, content);
 				}
 			}
 

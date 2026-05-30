@@ -83,6 +83,16 @@ class QtObject extends QObject {
         return this.JQAbstractModel ? this.JQAbstractModel.index : -1
     }
 
+    // Provides obj.Component.destruction / obj.Component.completed access
+    // so that QML idiom `obj.Component.destruction.connect(fn)` works at runtime.
+    get Component() {
+        const proxy = this.__proxy
+        return {
+            get destruction() { return proxy['Component.destruction'] },
+            get completed() { return proxy['Component.completed'] }
+        }
+    }
+
     PROXY__get__children(){
         return this.__proxy.data.filter(obj => obj instanceof JQModules.QtQuick.Item)
     }

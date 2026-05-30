@@ -22,6 +22,27 @@ QtObject {
     property int ignore: 1048576
     property int noButton: 0
 
+    // -------------------------------------------------------------------- //
+    // imtcontrols.Popup close-policy bit flags. Combine with |.
+    // Mirrors Qt Quick Controls Popup.ClosePolicy.
+    // -------------------------------------------------------------------- //
+    readonly property int popupNoAutoClose:                  0x00
+    readonly property int popupCloseOnPressOutside:          0x01
+    readonly property int popupCloseOnPressOutsideParent:    0x02
+    readonly property int popupCloseOnReleaseOutside:        0x04
+    readonly property int popupCloseOnReleaseOutsideParent:  0x08
+    readonly property int popupCloseOnEscape:                0x10
+    readonly property int popupDefaultClosePolicy:           popupCloseOnEscape | popupCloseOnPressOutside
+
+    enum PopupClosePolicy {
+        NoAutoClose                  = 0x00,
+        CloseOnPressOutside          = 0x01,
+        CloseOnPressOutsideParent    = 0x02,
+        CloseOnReleaseOutside        = 0x04,
+        CloseOnReleaseOutsideParent  = 0x08,
+        CloseOnEscape                = 0x10
+    }
+
     enum ButtonType {
         Ok = 1024,
         Open = 8192,
