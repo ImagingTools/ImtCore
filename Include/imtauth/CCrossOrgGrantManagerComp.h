@@ -39,7 +39,8 @@ public:
 				const QString& resourceScope = QString(),
 				const QByteArray& targetTeamId = QByteArray(),
 				const QString& description = QString(),
-				const QString& expiresAt = QString()) override;
+				const QString& expiresAt = QString(),
+				const QByteArray& contractId = QByteArray()) override;
 	virtual bool RevokeGrant(const QByteArray& grantId) override;
 	virtual CrossOrgGrantInfo GetGrant(const QByteArray& grantId) const override;
 	virtual CrossOrgGrants GetGrantsBySourceTenant(const QByteArray& sourceTenantId) const override;

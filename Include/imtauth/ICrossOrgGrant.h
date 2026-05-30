@@ -39,6 +39,7 @@ struct CrossOrgGrantInfo
 	QByteArray sourceTenantId;
 	QByteArray targetTenantId;
 	QByteArray relationshipId;
+	QByteArray contractId;
 	QByteArray targetTeamId;
 	CrossOrgAccessLevel accessLevel;
 	QString resourceScope;
@@ -53,6 +54,7 @@ struct CrossOrgGrantInfo
 			&& sourceTenantId == other.sourceTenantId
 			&& targetTenantId == other.targetTenantId
 			&& relationshipId == other.relationshipId
+			&& contractId == other.contractId
 			&& targetTeamId == other.targetTeamId
 			&& accessLevel == other.accessLevel
 			&& resourceScope == other.resourceScope
@@ -96,6 +98,7 @@ public:
 		\param targetTeamId Optional team in the target tenant that receives the grant.
 		\param description Human-readable description of the grant.
 		\param expiresAt Optional expiry timestamp (empty for no expiry).
+		\param contractId Optional contract that governs this grant (empty for ad-hoc grants).
 		\return Grant ID if successful, empty if failed.
 	*/
 	virtual QByteArray CreateGrant(
@@ -106,7 +109,8 @@ public:
 		const QString& resourceScope = QString(),
 		const QByteArray& targetTeamId = QByteArray(),
 		const QString& description = QString(),
-		const QString& expiresAt = QString()) = 0;
+		const QString& expiresAt = QString(),
+		const QByteArray& contractId = QByteArray()) = 0;
 
 	/**
 		Remove a cross-org grant by its ID.

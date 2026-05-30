@@ -602,6 +602,7 @@ sdl::imtauth::Tenants::CCrossOrgGrant::V1_0 GrantInfoToData(const imtauth::Cross
 	data.sourceTenantId = info.sourceTenantId;
 	data.targetTenantId = info.targetTenantId;
 	data.relationshipId = info.relationshipId;
+	data.contractId = info.contractId;
 	data.targetTeamId = info.targetTeamId;
 	data.accessLevel = ToSdlAccessLevel(info.accessLevel);
 	data.resourceScope = info.resourceScope;
@@ -734,6 +735,7 @@ sdl::imtauth::Tenants::CCreateCrossOrgGrantPayload CTenantManagerControllerComp:
 	QByteArray sourceTenantId;
 	QByteArray targetTenantId;
 	QByteArray relationshipId;
+	QByteArray contractId;
 	QByteArray targetTeamId;
 	imtauth::CrossOrgAccessLevel accessLevel = imtauth::COAL_NONE;
 	QString resourceScope;
@@ -749,6 +751,9 @@ sdl::imtauth::Tenants::CCreateCrossOrgGrantPayload CTenantManagerControllerComp:
 	}
 	if (arguments.input.Version_1_0->relationshipId){
 		relationshipId = *arguments.input.Version_1_0->relationshipId;
+	}
+	if (arguments.input.Version_1_0->contractId){
+		contractId = *arguments.input.Version_1_0->contractId;
 	}
 	if (arguments.input.Version_1_0->accessLevel){
 		accessLevel = FromSdlAccessLevel(*arguments.input.Version_1_0->accessLevel);
@@ -774,7 +779,8 @@ sdl::imtauth::Tenants::CCreateCrossOrgGrantPayload CTenantManagerControllerComp:
 				resourceScope,
 				targetTeamId,
 				description,
-				expiresAt);
+				expiresAt,
+				contractId);
 
 	if (grantId.isEmpty()){
 		response.Version_1_0->errorMessage = QStringLiteral("Failed to create cross-org grant");

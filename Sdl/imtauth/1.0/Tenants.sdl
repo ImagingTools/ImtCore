@@ -244,6 +244,7 @@ type CrossOrgGrant {
 	sourceTenantId: ID!
 	targetTenantId: ID!
 	relationshipId: ID!
+	contractId: ID
 	targetTeamId: ID
 	accessLevel: CrossOrgAccessLevel!
 	resourceScope: String
@@ -257,6 +258,7 @@ input CreateCrossOrgGrantInput {
 	sourceTenantId: ID!
 	targetTenantId: ID!
 	relationshipId: ID!
+	contractId: ID
 	accessLevel: CrossOrgAccessLevel!
 	resourceScope: String
 	targetTeamId: ID

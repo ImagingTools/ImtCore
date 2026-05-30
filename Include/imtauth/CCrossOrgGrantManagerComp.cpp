@@ -22,7 +22,8 @@ QByteArray CCrossOrgGrantManagerComp::CreateGrant(
 		const QString& resourceScope,
 		const QByteArray& targetTeamId,
 		const QString& description,
-		const QString& expiresAt)
+		const QString& expiresAt,
+		const QByteArray& contractId)
 {
 	if (!m_grantCollectionCompPtr.IsValid() || !m_grantFactoryCompPtr.IsValid()){
 		SendErrorMessage(0, "Grant collection or factory not configured", "CCrossOrgGrantManagerComp");
@@ -54,6 +55,7 @@ QByteArray CCrossOrgGrantManagerComp::CreateGrant(
 	info.sourceTenantId = sourceTenantId;
 	info.targetTenantId = targetTenantId;
 	info.relationshipId = relationshipId;
+	info.contractId = contractId;
 	info.targetTeamId = targetTeamId;
 	info.accessLevel = accessLevel;
 	info.resourceScope = resourceScope;

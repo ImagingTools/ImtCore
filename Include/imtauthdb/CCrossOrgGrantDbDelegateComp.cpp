@@ -73,6 +73,9 @@ istd::IChangeableUniquePtr CCrossOrgGrantDbDelegateComp::CreateObjectFromRecord(
 	if (record.contains("RelationshipId")){
 		info.relationshipId = imtdb::VariantToByteArray(record.value("RelationshipId"));
 	}
+	if (record.contains("ContractId")){
+		info.contractId = imtdb::VariantToByteArray(record.value("ContractId"));
+	}
 	if (record.contains("TargetTeamId")){
 		info.targetTeamId = imtdb::VariantToByteArray(record.value("TargetTeamId"));
 	}
@@ -116,6 +119,7 @@ CCrossOrgGrantDbDelegateComp::NewObjectQuery CCrossOrgGrantDbDelegateComp::Creat
 	QString sourceTenantId = imtdb::EscapeSql(QString::fromUtf8(info.sourceTenantId));
 	QString targetTenantId = imtdb::EscapeSql(QString::fromUtf8(info.targetTenantId));
 	QString relationshipId = imtdb::EscapeSql(QString::fromUtf8(info.relationshipId));
+	QString contractId = NullableSqlText(QString::fromUtf8(info.contractId));
 	QString targetTeamId = NullableSqlText(QString::fromUtf8(info.targetTeamId));
 	int accessLevel = static_cast<int>(info.accessLevel);
 	QString resourceScope = NullableSqlText(info.resourceScope);
@@ -125,13 +129,14 @@ CCrossOrgGrantDbDelegateComp::NewObjectQuery CCrossOrgGrantDbDelegateComp::Creat
 	int isActive = info.isActive ? 1 : 0;
 
 	result.query = QString(
-		"INSERT INTO \"%1\" (\"Id\", \"SourceTenantId\", \"TargetTenantId\", \"RelationshipId\", \"TargetTeamId\", \"AccessLevel\", \"ResourceScope\", \"Description\", \"CreatedAt\", \"ExpiresAt\", \"IsActive\") "
-		"VALUES ('%2', '%3', '%4', '%5', %6, %7, %8, %9, '%10', %11, %12);")
+		"INSERT INTO \"%1\" (\"Id\", \"SourceTenantId\", \"TargetTenantId\", \"RelationshipId\", \"ContractId\", \"TargetTeamId\", \"AccessLevel\", \"ResourceScope\", \"Description\", \"CreatedAt\", \"ExpiresAt\", \"IsActive\") "
+		"VALUES ('%2', '%3', '%4', '%5', %6, %7, %8, %9, %10, '%11', %12, %13);")
 		.arg(*m_tableNameAttrPtr)
 		.arg(id)
 		.arg(sourceTenantId)
 		.arg(targetTenantId)
 		.arg(relationshipId)
+		.arg(contractId)
 		.arg(targetTeamId)
 		.arg(QString::number(accessLevel))
 		.arg(resourceScope)
@@ -160,14 +165,16 @@ QByteArray CCrossOrgGrantDbDelegateComp::CreateUpdateObjectQuery(
 
 	return QString(
 		"UPDATE \"%1\" SET "
-		"\"TargetTeamId\"=%2, "
-		"\"AccessLevel\"=%3, "
-		"\"ResourceScope\"=%4, "
-		"\"Description\"=%5, "
-		"\"ExpiresAt\"=%6, "
-		"\"IsActive\"=%7 "
-		"WHERE \"Id\"='%8';")
+		"\"ContractId\"=%2, "
+		"\"TargetTeamId\"=%3, "
+		"\"AccessLevel\"=%4, "
+		"\"ResourceScope\"=%5, "
+		"\"Description\"=%6, "
+		"\"ExpiresAt\"=%7, "
+		"\"IsActive\"=%8 "
+		"WHERE \"Id\"='%9';")
 		.arg(*m_tableNameAttrPtr)
+		.arg(NullableSqlText(QString::fromUtf8(info.contractId)))
 		.arg(NullableSqlText(QString::fromUtf8(info.targetTeamId)))
 		.arg(QString::number(static_cast<int>(info.accessLevel)))
 		.arg(NullableSqlText(info.resourceScope))
