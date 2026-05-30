@@ -244,6 +244,8 @@ I_EXPORT_COMPONENT(
 			Rs256JwtTokenProvider,
 			"RS256 JWT token provider for OIDC",
 			"RS256 JWT Token Provider OIDC");
+
+I_EXPORT_COMPONENT(
 			TenantInfo,
 			"Tenant entity storing organization data (name, description, status, relationships)",
 			"Tenant Info");

@@ -90,6 +90,7 @@ I_EXPORT_COMPONENT(
 			"OIDC token database delegate",
 			"OIDC Token Database Delegate");
 
+I_EXPORT_COMPONENT(
 			TenantDatabaseDelegate,
 			"Tenant database delegate",
 			"Tenant Database Delegate");
