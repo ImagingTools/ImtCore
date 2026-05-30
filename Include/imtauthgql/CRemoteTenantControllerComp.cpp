@@ -15,7 +15,7 @@ namespace imtauthgql
 
 QByteArrayList CRemoteTenantControllerComp::GetTenantIds() const
 {
-	namespace tenantsdl = sdl::imtauth::Tenants;
+	namespace tenantsdl = sdl::V1_0::imtauth;
 
 	imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_QUERY, tenantsdl::CGetTenantIdsGqlRequest::GetCommandId());
 	tenantsdl::CGetTenantIdsGqlRequest getTenantIdsRequest(gqlRequest, false);
@@ -37,7 +37,7 @@ QByteArrayList CRemoteTenantControllerComp::GetTenantIds() const
 
 imtauth::ITenantInfoUniquePtr CRemoteTenantControllerComp::GetTenant(const QByteArray& tenantId) const
 {
-	namespace tenantsdl = sdl::imtauth::Tenants;
+	namespace tenantsdl = sdl::V1_0::imtauth;
 
 	if (!m_tenantFactoryCompPtr.IsValid()){
 		return nullptr;
@@ -98,7 +98,7 @@ imtauth::ITenantInfoUniquePtr CRemoteTenantControllerComp::GetTenant(const QByte
 
 QByteArray CRemoteTenantControllerComp::CreateTenant(const QString& tenantName, const QString& description, const QByteArray& ownerId)
 {
-	namespace tenantsdl = sdl::imtauth::Tenants;
+	namespace tenantsdl = sdl::V1_0::imtauth;
 
 	tenantsdl::CreateTenantRequestArguments arguments;
 	arguments.input.Version_1_0 = tenantsdl::CCreateTenantInput::V1_0();
@@ -125,7 +125,7 @@ QByteArray CRemoteTenantControllerComp::CreateTenant(const QString& tenantName, 
 
 bool CRemoteTenantControllerComp::RemoveTenant(const QByteArray& tenantId)
 {
-	namespace tenantsdl = sdl::imtauth::Tenants;
+	namespace tenantsdl = sdl::V1_0::imtauth;
 
 	tenantsdl::RemoveTenantRequestArguments arguments;
 	arguments.input.Version_1_0 = tenantsdl::CRemoveTenantInput::V1_0();
@@ -150,7 +150,7 @@ bool CRemoteTenantControllerComp::RemoveTenant(const QByteArray& tenantId)
 
 bool CRemoteTenantControllerComp::UpdateTenant(const QByteArray& tenantId, const QString& tenantName, const QString& description, const QByteArray& ownerId, bool updateOwner)
 {
-	namespace tenantsdl = sdl::imtauth::Tenants;
+	namespace tenantsdl = sdl::V1_0::imtauth;
 
 	tenantsdl::UpdateTenantRequestArguments arguments;
 	arguments.input.Version_1_0 = tenantsdl::CUpdateTenantInput::V1_0();
@@ -180,7 +180,7 @@ bool CRemoteTenantControllerComp::UpdateTenant(const QByteArray& tenantId, const
 
 bool CRemoteTenantControllerComp::SetTenantActive(const QByteArray& tenantId, bool isActive)
 {
-	namespace tenantsdl = sdl::imtauth::Tenants;
+	namespace tenantsdl = sdl::V1_0::imtauth;
 
 	tenantsdl::SetTenantActiveRequestArguments arguments;
 	arguments.input.Version_1_0 = tenantsdl::CSetTenantActiveInput::V1_0();

@@ -30,7 +30,7 @@ imtauth::IRoleUniquePtr CClientRequestRoleInfoProviderComp::GetRole(const QByteA
 		return nullptr;
 	}
 
-	namespace rolessdl = sdl::imtauth::Roles;
+	namespace rolessdl = sdl::V1_0::imtauth;
 
 	rolessdl::RoleItemRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();

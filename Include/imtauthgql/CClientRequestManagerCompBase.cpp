@@ -12,7 +12,7 @@ namespace imtauthgql
 
 QByteArrayList CClientRequestManagerCompBase::GetElementIds(const QByteArray& collectionId) const
 {
-	namespace imtcollection = sdl::imtbase::ImtCollection;
+	namespace imtcollection = sdl::V1_0::imtbase;
 
 	imtcollection::GetElementIdsRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
@@ -34,7 +34,7 @@ QByteArrayList CClientRequestManagerCompBase::GetElementIds(const QByteArray& co
 
 bool CClientRequestManagerCompBase::RemoveElements(const QByteArray& collectionId, const QByteArrayList& elementIds) const
 {
-	namespace imtcollection = sdl::imtbase::ImtCollection;
+	namespace imtcollection = sdl::V1_0::imtbase;
 
 	imtcollection::RemoveElementsRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();

@@ -22,7 +22,7 @@ QByteArrayList CClientRequestUserManagerComp::GetUserIds() const
 
 QList<imtauth::IUserManager::User> CClientRequestUserManagerComp::GetUserList() const
 {
-	namespace userssdl = sdl::imtauth::Users;
+	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::UsersListRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
@@ -83,7 +83,7 @@ QList<imtauth::IUserManager::User> CClientRequestUserManagerComp::GetUserList() 
 
 QByteArray CClientRequestUserManagerComp::GetUserObjectId(const QByteArray& login) const
 {
-	namespace userssdl = sdl::imtauth::Users;
+	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::GetUserObjectIdRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
@@ -105,7 +105,7 @@ QByteArray CClientRequestUserManagerComp::GetUserObjectId(const QByteArray& logi
 
 imtauth::IUserInfoUniquePtr CClientRequestUserManagerComp::GetUser(const QByteArray& userId) const
 {
-	namespace userssdl = sdl::imtauth::Users;
+	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::UserItemRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
@@ -143,7 +143,7 @@ bool CClientRequestUserManagerComp::RemoveUser(const QByteArray& userId)
 
 QByteArray CClientRequestUserManagerComp::CreateUser(const QString& userName, const QByteArray& login, const QByteArray& password, const QString& email)
 {
-	namespace userssdl = sdl::imtauth::Users;
+	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::UserAddRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
@@ -179,7 +179,7 @@ QByteArray CClientRequestUserManagerComp::CreateUser(const QString& userName, co
 
 bool CClientRequestUserManagerComp::ChangeUserPassword(const QByteArray& login, const QByteArray& oldPassword, const QByteArray& newPassword)
 {
-	namespace userssdl = sdl::imtauth::Users;
+	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::ChangePasswordRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
@@ -323,7 +323,7 @@ bool CClientRequestUserManagerComp::GetUserAuthSystem(const QByteArray& login, i
 
 bool CClientRequestUserManagerComp::GetUserDataSdl(const QByteArray& userId, sdl::V1_0::imtauth::CUserData& userData) const
 {
-	namespace userssdl = sdl::imtauth::Users;
+	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::UserItemRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
@@ -347,7 +347,7 @@ bool CClientRequestUserManagerComp::GetUserDataSdl(const QByteArray& userId, sdl
 
 bool CClientRequestUserManagerComp::SetUserDataSdl(const QByteArray& userId, const sdl::V1_0::imtauth::CUserData& userData) const
 {
-	namespace userssdl = sdl::imtauth::Users;
+	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::UserUpdateRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();

@@ -36,7 +36,7 @@ imtauth::IUserGroupInfoSharedPtr CClientRequestGroupInfoProviderComp::GetUserGro
 		return nullptr;
 	}
 
-	namespace userssdl = sdl::imtauth::Groups;
+	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::GroupItemRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();

@@ -19,7 +19,7 @@ namespace imtservergql
 {
 
 
-namespace CDM = sdl::imtbase::CollectionDocumentService;
+namespace CDM = sdl::V1_0::imtbase;
 
 
 // protected methods

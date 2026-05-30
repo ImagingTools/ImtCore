@@ -19,7 +19,7 @@ QByteArrayList CClientRequestGroupManagerComp::GetGroupIds() const
 
 QByteArray CClientRequestGroupManagerComp::CreateGroup(const QString& groupName, const QString& description)
 {
-	namespace groupssdl = sdl::imtauth::Groups;
+	namespace groupssdl = sdl::V1_0::imtauth;
 
 	groupssdl::GroupAddRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
@@ -235,7 +235,7 @@ bool CClientRequestGroupManagerComp::RemoveRolesFromGroup(const QByteArray& grou
 
 bool CClientRequestGroupManagerComp::GetGroupDataSdl(const QByteArray& groupId, sdl::V1_0::imtauth::CGroupData& groupData) const
 {
-	namespace groupssdl = sdl::imtauth::Groups;
+	namespace groupssdl = sdl::V1_0::imtauth;
 
 	groupssdl::GroupItemRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
@@ -259,7 +259,7 @@ bool CClientRequestGroupManagerComp::GetGroupDataSdl(const QByteArray& groupId, 
 
 bool CClientRequestGroupManagerComp::SetGroupDataSdl(const QByteArray& groupId, const sdl::V1_0::imtauth::CGroupData& groupData) const
 {
-	namespace groupssdl = sdl::imtauth::Groups;
+	namespace groupssdl = sdl::V1_0::imtauth;
 
 	groupssdl::GroupUpdateRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();

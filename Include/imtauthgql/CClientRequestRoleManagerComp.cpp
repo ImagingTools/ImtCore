@@ -78,7 +78,7 @@ QByteArray CClientRequestRoleManagerComp::CreateRole(
 			const QString& roleDescription,
 			const QByteArrayList& permissions)
 {
-	namespace rolessdl = sdl::imtauth::Roles;
+	namespace rolessdl = sdl::V1_0::imtauth;
 
 	rolessdl::RoleAddRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
@@ -205,7 +205,7 @@ bool CClientRequestRoleManagerComp::GetRoleDataSdl(const QByteArray& roleId, sdl
 		return false;
 	}
 
-	namespace rolessdl = sdl::imtauth::Roles;
+	namespace rolessdl = sdl::V1_0::imtauth;
 
 	rolessdl::RoleItemRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
@@ -230,7 +230,7 @@ bool CClientRequestRoleManagerComp::SetRoleDataSdl(const QByteArray& roleId, con
 		return false;
 	}
 
-	namespace rolessdl = sdl::imtauth::Roles;
+	namespace rolessdl = sdl::V1_0::imtauth;
 
 	rolessdl::RoleUpdateRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();

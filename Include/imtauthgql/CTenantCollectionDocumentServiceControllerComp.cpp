@@ -9,7 +9,7 @@ namespace imtauthgql
 {
 
 
-namespace CDM = sdl::imtbase::CollectionDocumentService;
+namespace CDM = sdl::V1_0::imtbase;
 
 
 CDM::CDocumentList CTenantCollectionDocumentServiceControllerComp::OnGetOpenedDocumentList(

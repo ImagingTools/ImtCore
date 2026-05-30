@@ -25,7 +25,7 @@ imtauth::IPersonalAccessTokenManager::TokenCreationResult CClientRequestPersonal
 			const QByteArrayList& scopes,
 			const QDateTime& expiresAt)
 {
-	namespace tokensdl = sdl::imtauth::PersonalAccessTokens;
+	namespace tokensdl = sdl::V1_0::imtauth;
 
 	tokensdl::CreateTokenRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
@@ -76,7 +76,7 @@ imtauth::IPersonalAccessTokenManager::TokenCreationResult CClientRequestPersonal
 
 bool CClientRequestPersonalAccessTokenManagerComp::ValidateToken(const QByteArray& rawToken, QByteArray& userId, QByteArray& tokenId, QByteArrayList& scopes) const
 {
-	namespace tokensdl = sdl::imtauth::PersonalAccessTokens;
+	namespace tokensdl = sdl::V1_0::imtauth;
 
 	tokensdl::ValidateTokenRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
@@ -112,7 +112,7 @@ bool CClientRequestPersonalAccessTokenManagerComp::ValidateToken(const QByteArra
 
 QByteArrayList CClientRequestPersonalAccessTokenManagerComp::GetTokenIds(const QByteArray& userId) const
 {
-	namespace tokensdl = sdl::imtauth::PersonalAccessTokens;
+	namespace tokensdl = sdl::V1_0::imtauth;
 
 	tokensdl::GetTokenListRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
@@ -146,7 +146,7 @@ imtauth::IPersonalAccessTokenSharedPtr CClientRequestPersonalAccessTokenManagerC
 		return nullptr;
 	}
 
-	namespace tokensdl = sdl::imtauth::PersonalAccessTokens;
+	namespace tokensdl = sdl::V1_0::imtauth;
 
 	tokensdl::GetTokenRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
@@ -213,7 +213,7 @@ imtauth::IPersonalAccessTokenSharedPtr CClientRequestPersonalAccessTokenManagerC
 
 bool CClientRequestPersonalAccessTokenManagerComp::RevokeToken(const QByteArray& tokenId)
 {
-	namespace tokensdl = sdl::imtauth::PersonalAccessTokens;
+	namespace tokensdl = sdl::V1_0::imtauth;
 
 	tokensdl::RevokeTokenRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
@@ -260,7 +260,7 @@ bool CClientRequestPersonalAccessTokenManagerComp::UpdateLastUsedAt(const QByteA
 
 bool CClientRequestPersonalAccessTokenManagerComp::DeleteToken(const QByteArray& tokenId)
 {
-	namespace tokensdl = sdl::imtauth::PersonalAccessTokens;
+	namespace tokensdl = sdl::V1_0::imtauth;
 
 	tokensdl::DeleteTokenRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();

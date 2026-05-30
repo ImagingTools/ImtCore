@@ -22,7 +22,7 @@ bool CRemoteSuperuserControllerComp::SetSuperuserPassword(const QByteArray& pass
 		return false;
 	}
 
-	namespace userssdl = sdl::imtauth::Users;
+	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::CreateSuperuserRequestArguments arguments;
 	arguments.input.Version_1_0 = userssdl::CCreateSuperuserInput::V1_0();

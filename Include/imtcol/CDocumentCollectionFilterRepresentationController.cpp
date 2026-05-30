@@ -12,7 +12,7 @@ bool CDocumentCollectionFilterRepresentationController::DocumentCollectionFilter
 			IDocumentCollectionFilter& filterModel,
 			ilog::IMessageConsumer* /*messageConsumerPtr*/)
 {
-	namespace Filter = sdl::imtbase::DocumentCollectionFilter;
+	namespace Filter = sdl::V1_0::imtbase;
 
 	if (filterRepresentaion.documentId.has_value()){
 		QByteArray documentId = *filterRepresentaion.documentId;

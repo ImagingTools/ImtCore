@@ -102,7 +102,7 @@ bool SelectOptionByIdForParamsSet(iprm::IParamsSet& params, const QByteArray& pa
 
 bool CReceiptConverter::CreateSdlFromParams(sdl::V1_0::imtpay::CReceipt& receipt, const iprm::IParamsSet& params)
 {
-	namespace ImtPayV1 = sdl::imtpay::ImtPay;
+	namespace ImtPayV1 = sdl::V1_0::imtpay;
 	// set type
 	iprm::TParamsPtr<iprm::ISelectionParam> receiptTypeSelectionParamPtr(&params, ReceiptParamKeys::Type);
 	Q_ASSERT(receiptTypeSelectionParamPtr.IsValid());
@@ -357,7 +357,7 @@ bool CReceiptConverter::CreateSdlFromParams(sdl::V1_0::imtpay::CReceipt& receipt
 
 bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl::V1_0::imtpay::CReceipt& receipt)
 {
-	namespace ImtPayV1 = sdl::imtpay::ImtPay;
+	namespace ImtPayV1 = sdl::V1_0::imtpay;
 
 	if (!receipt.type){
 		I_IF_DEBUG(qWarning() << __FILE__ << __LINE__ << "Receip->type is missing";)

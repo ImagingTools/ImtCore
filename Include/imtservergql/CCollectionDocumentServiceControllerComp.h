@@ -17,7 +17,7 @@ namespace imtservergql
 {
 
 
-namespace CDM = sdl::imtbase::CollectionDocumentService;
+namespace CDM = sdl::V1_0::imtbase;
 
 
 class CCollectionDocumentServiceControllerComp: public sdl::V1_0::imtbase::CGraphQlHandlerCompBase

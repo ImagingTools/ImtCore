@@ -16,7 +16,7 @@ namespace imtauthgql
 
 const QByteArrayList CTokenBasedPermissionsProviderComp::GetPermissions(const QByteArray& token) const
 {
-	namespace authsdl = sdl::imtauth::Authorization;
+	namespace authsdl = sdl::V1_0::imtauth;
 
 	authsdl::GetPermissionsRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();

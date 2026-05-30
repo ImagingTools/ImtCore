@@ -32,7 +32,7 @@ const imtbase::ICollectionInfo& CClientRequestUserInfoProviderComp::GetUserList(
 
 imtauth::IUserInfoUniquePtr CClientRequestUserInfoProviderComp::GetUser(const QByteArray& userId, const iprm::IParamsSet* /*paramsPtr*/) const
 {
-	namespace userssdl = sdl::imtauth::Users;
+	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::UserItemRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();

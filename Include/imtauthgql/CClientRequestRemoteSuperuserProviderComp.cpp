@@ -17,7 +17,7 @@ namespace imtauthgql
 
 imtauth::ISuperuserProvider::ExistsStatus CClientRequestRemoteSuperuserProviderComp::SuperuserExists(QString& errorMessage) const
 {
-	namespace userssdl = sdl::imtauth::Users;
+	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::CheckSuperuserExistsRequestArguments arguments;
 	arguments.input.Version_1_0 = userssdl::CCheckSuperuserInput::V1_0();

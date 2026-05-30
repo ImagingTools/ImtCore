@@ -18,8 +18,8 @@ namespace imtservergql
 {
 
 
-namespace CDM = sdl::imtbase::DocumentService;
-namespace UM = sdl::imtbase::UndoManager;
+namespace CDM = sdl::V1_0::imtbase;
+namespace UM = sdl::V1_0::imtbase;
 
 
 template<class Base, class ColorCollectionDocumentServiceDefs>

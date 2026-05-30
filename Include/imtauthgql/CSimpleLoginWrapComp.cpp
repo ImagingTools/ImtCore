@@ -53,7 +53,7 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 		return false;
 	}
 
-	namespace authsdl = sdl::imtauth::Authorization;
+	namespace authsdl = sdl::V1_0::imtauth;
 
 	QByteArray productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	authsdl::AuthorizationRequestArguments arguments;
@@ -162,7 +162,7 @@ bool CSimpleLoginWrapComp::LoginWithRefreshToken(const QString& userName, const 
 	}
 
 	// Use Sessions SDL schema to refresh token
-	namespace sessionsdl = sdl::imtauth::Sessions;
+	namespace sessionsdl = sdl::V1_0::imtauth;
 
 	sessionsdl::RefreshTokenRequestArguments arguments;
 	arguments.input.Version_1_0 = sessionsdl::CRefreshTokenInput::V1_0();

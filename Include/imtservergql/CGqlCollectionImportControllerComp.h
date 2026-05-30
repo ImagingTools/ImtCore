@@ -15,7 +15,7 @@ namespace imtservergql
 {
 
 
-namespace collectionImport = sdl::imtbase::CollectionImport;
+namespace collectionImport = sdl::V1_0::imtbase;
 
 
 class CGqlCollectionImportControllerComp: public collectionImport::CGraphQlHandlerCompBase
