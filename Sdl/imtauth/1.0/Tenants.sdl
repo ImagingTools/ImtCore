@@ -287,6 +287,75 @@ type GetCrossOrgGrantsPayload {
 	errorMessage: String
 }
 
+# --- Cooperation Contracts ---
+
+enum ContractStatus {
+	Draft
+	Active
+	Expired
+	Terminated
+	Renewed
+}
+
+type Contract {
+	id: ID!
+	relationshipId: ID!
+	sourceTenantId: ID!
+	targetTenantId: ID!
+	status: ContractStatus!
+	scope: String
+	validFrom: String
+	validUntil: String
+	description: String
+	terms: String
+	createdAt: String
+	updatedAt: String
+}
+
+input CreateContractInput {
+	relationshipId: ID!
+	sourceTenantId: ID!
+	targetTenantId: ID!
+	scope: String
+	validFrom: String
+	validUntil: String
+	description: String
+	terms: String
+}
+
+type CreateContractPayload {
+	contractId: ID
+	errorMessage: String
+}
+
+input UpdateContractStatusInput {
+	contractId: ID!
+	status: ContractStatus!
+}
+
+type UpdateContractStatusPayload {
+	success: Boolean
+	errorMessage: String
+}
+
+input TerminateContractInput {
+	contractId: ID!
+}
+
+type TerminateContractPayload {
+	success: Boolean
+	errorMessage: String
+}
+
+input GetContractsInput {
+	tenantId: ID!
+}
+
+type GetContractsPayload {
+	contracts: [Contract]
+	errorMessage: String
+}
+
 # --- System Tenant ---
 
 type EnsureSystemTenantPayload {
@@ -589,6 +658,7 @@ type Query {
 	GetTenantIds: GetTenantIdsPayload!
 	GetTenantRelationships (input: GetTenantRelationshipsInput): GetTenantRelationshipsPayload!
 	GetCrossOrgGrants (input: GetCrossOrgGrantsInput): GetCrossOrgGrantsPayload!
+	GetContracts (input: GetContractsInput): GetContractsPayload!
 	GetTenantConnectionRequests (input: GetTenantConnectionRequestsInput): GetTenantConnectionRequestsPayload!
 	GetCrossTenantMessage (input: GetCrossTenantMessageInput): GetCrossTenantMessagePayload!
 	GetCrossTenantMessages (input: GetCrossTenantMessagesInput): GetCrossTenantMessagesPayload!
@@ -605,6 +675,9 @@ type Mutation {
 	RemoveTenantRelationship (input: RemoveTenantRelationshipInput): RemoveTenantRelationshipPayload!
 	CreateCrossOrgGrant (input: CreateCrossOrgGrantInput): CreateCrossOrgGrantPayload!
 	RevokeCrossOrgGrant (input: RevokeCrossOrgGrantInput): RevokeCrossOrgGrantPayload!
+	CreateContract (input: CreateContractInput): CreateContractPayload!
+	UpdateContractStatus (input: UpdateContractStatusInput): UpdateContractStatusPayload!
+	TerminateContract (input: TerminateContractInput): TerminateContractPayload!
 	EnsureSystemTenant: EnsureSystemTenantPayload!
 	CreateTenantConnectionRequest (input: CreateTenantConnectionRequestInput): CreateTenantConnectionRequestPayload!
 	CreateTenantConnectCode (input: CreateTenantConnectCodeInput): CreateTenantConnectCodePayload!

@@ -10,6 +10,7 @@
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/IUserManager.h>
 #include <imtauth/ICrossOrgGrant.h>
+#include <imtauth/IContract.h>
 #include <imtauth/ITenantConnectionRequest.h>
 #include <imtauth/ICrossTenantMessage.h>
 #include <imtauth/IOrderRequest.h>
@@ -30,6 +31,7 @@ public:
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager for member operations", true, "MembershipManager");
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Collection of users", true, "UserCollection");
 		I_ASSIGN(m_grantManagerCompPtr, "CrossOrgGrantManager", "Manager for cross-org grants", false, "CrossOrgGrantManager");
+		I_ASSIGN(m_contractManagerCompPtr, "ContractManager", "Manager for cooperation contracts", false, "ContractManager");
 		I_ASSIGN(m_connectionRequestManagerCompPtr, "TenantConnectionRequestManager", "Manager for tenant connection requests", false, "TenantConnectionRequestManager");
 		I_ASSIGN(m_messageBrokerCompPtr, "CrossTenantMessageBroker", "Broker for cross-tenant messages", false, "CrossTenantMessageBroker");
 		I_ASSIGN(m_orderRequestManagerCompPtr, "OrderRequestManager", "Manager for order requests", false, "OrderRequestManager");
@@ -85,6 +87,22 @@ protected:
 				QString& errorMessage) const override;
 	virtual sdl::imtauth::Tenants::CRevokeCrossOrgGrantPayload OnRevokeCrossOrgGrant(
 				const sdl::imtauth::Tenants::CRevokeCrossOrgGrantGqlRequest& revokeCrossOrgGrantRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtauth::Tenants::CGetContractsPayload OnGetContracts(
+				const sdl::imtauth::Tenants::CGetContractsGqlRequest& getContractsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtauth::Tenants::CCreateContractPayload OnCreateContract(
+				const sdl::imtauth::Tenants::CCreateContractGqlRequest& createContractRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtauth::Tenants::CUpdateContractStatusPayload OnUpdateContractStatus(
+				const sdl::imtauth::Tenants::CUpdateContractStatusGqlRequest& updateContractStatusRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtauth::Tenants::CTerminateContractPayload OnTerminateContract(
+				const sdl::imtauth::Tenants::CTerminateContractGqlRequest& terminateContractRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 	virtual sdl::imtauth::Tenants::CEnsureSystemTenantPayload OnEnsureSystemTenant(
@@ -161,6 +179,7 @@ private:
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 	I_REF(imtauth::ICrossOrgGrant, m_grantManagerCompPtr);
+	I_REF(imtauth::IContract, m_contractManagerCompPtr);
 	I_REF(imtauth::ITenantConnectionRequest, m_connectionRequestManagerCompPtr);
 	I_REF(imtauth::ICrossTenantMessage, m_messageBrokerCompPtr);
 	I_REF(imtauth::IOrderRequest, m_orderRequestManagerCompPtr);

@@ -613,6 +613,59 @@ sdl::imtauth::Tenants::CCrossOrgGrant::V1_0 GrantInfoToData(const imtauth::Cross
 }
 
 
+imtauth::ContractStatus FromSdlContractStatus(sdl::imtauth::Tenants::ContractStatus status)
+{
+	switch (status){
+	case sdl::imtauth::Tenants::ContractStatus::Active:
+		return imtauth::CTS_ACTIVE;
+	case sdl::imtauth::Tenants::ContractStatus::Expired:
+		return imtauth::CTS_EXPIRED;
+	case sdl::imtauth::Tenants::ContractStatus::Terminated:
+		return imtauth::CTS_TERMINATED;
+	case sdl::imtauth::Tenants::ContractStatus::Renewed:
+		return imtauth::CTS_RENEWED;
+	default:
+		return imtauth::CTS_DRAFT;
+	}
+}
+
+
+sdl::imtauth::Tenants::ContractStatus ToSdlContractStatus(imtauth::ContractStatus status)
+{
+	switch (status){
+	case imtauth::CTS_ACTIVE:
+		return sdl::imtauth::Tenants::ContractStatus::Active;
+	case imtauth::CTS_EXPIRED:
+		return sdl::imtauth::Tenants::ContractStatus::Expired;
+	case imtauth::CTS_TERMINATED:
+		return sdl::imtauth::Tenants::ContractStatus::Terminated;
+	case imtauth::CTS_RENEWED:
+		return sdl::imtauth::Tenants::ContractStatus::Renewed;
+	default:
+		return sdl::imtauth::Tenants::ContractStatus::Draft;
+	}
+}
+
+
+sdl::imtauth::Tenants::CContract::V1_0 ContractInfoToData(const imtauth::ContractInfo& info)
+{
+	sdl::imtauth::Tenants::CContract::V1_0 data;
+	data.id = info.contractId;
+	data.relationshipId = info.relationshipId;
+	data.sourceTenantId = info.sourceTenantId;
+	data.targetTenantId = info.targetTenantId;
+	data.status = ToSdlContractStatus(info.status);
+	data.scope = info.scope;
+	data.validFrom = info.validFrom;
+	data.validUntil = info.validUntil;
+	data.description = info.description;
+	data.terms = info.terms;
+	data.createdAt = info.createdAt;
+	data.updatedAt = info.updatedAt;
+	return data;
+}
+
+
 } // anonymous namespace
 
 
@@ -759,6 +812,191 @@ sdl::imtauth::Tenants::CRevokeCrossOrgGrantPayload CTenantManagerControllerComp:
 	response.Version_1_0->success = success;
 	if (!success){
 		response.Version_1_0->errorMessage = QStringLiteral("Failed to revoke cross-org grant");
+	}
+
+	return response;
+}
+
+
+sdl::imtauth::Tenants::CGetContractsPayload CTenantManagerControllerComp::OnGetContracts(
+			const sdl::imtauth::Tenants::CGetContractsGqlRequest& getContractsRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
+{
+	sdl::imtauth::Tenants::CGetContractsPayload response;
+
+	response.Version_1_0.emplace();
+
+	if (!m_contractManagerCompPtr.IsValid()){
+		response.Version_1_0->errorMessage = QStringLiteral("Contract manager is not configured");
+		return response;
+	}
+
+	QByteArray tenantId;
+	sdl::imtauth::Tenants::GetContractsRequestArguments arguments = getContractsRequest.GetRequestedArguments();
+	if (arguments.input.Version_1_0->tenantId){
+		tenantId = *arguments.input.Version_1_0->tenantId;
+	}
+
+	if (tenantId.isEmpty()){
+		response.Version_1_0->errorMessage = QStringLiteral("Tenant ID is required");
+		return response;
+	}
+
+	response.Version_1_0->contracts.Emplace();
+
+	QSet<QByteArray> seenIds;
+	const imtauth::Contracts outgoing = m_contractManagerCompPtr->GetContractsBySourceTenant(tenantId);
+	for (const imtauth::ContractInfo& info : outgoing){
+		if (!seenIds.contains(info.contractId)){
+			seenIds.insert(info.contractId);
+			response.Version_1_0->contracts->push_back(ContractInfoToData(info));
+		}
+	}
+
+	const imtauth::Contracts incoming = m_contractManagerCompPtr->GetContractsByTargetTenant(tenantId);
+	for (const imtauth::ContractInfo& info : incoming){
+		if (!seenIds.contains(info.contractId)){
+			seenIds.insert(info.contractId);
+			response.Version_1_0->contracts->push_back(ContractInfoToData(info));
+		}
+	}
+
+	return response;
+}
+
+
+sdl::imtauth::Tenants::CCreateContractPayload CTenantManagerControllerComp::OnCreateContract(
+			const sdl::imtauth::Tenants::CCreateContractGqlRequest& createContractRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
+{
+	sdl::imtauth::Tenants::CCreateContractPayload response;
+
+	response.Version_1_0.emplace();
+
+	if (!m_contractManagerCompPtr.IsValid()){
+		response.Version_1_0->errorMessage = QStringLiteral("Contract manager is not configured");
+		return response;
+	}
+
+	QByteArray relationshipId;
+	QByteArray sourceTenantId;
+	QByteArray targetTenantId;
+	QString scope;
+	QString validFrom;
+	QString validUntil;
+	QString description;
+	QString terms;
+
+	sdl::imtauth::Tenants::CreateContractRequestArguments arguments = createContractRequest.GetRequestedArguments();
+	if (arguments.input.Version_1_0->relationshipId){
+		relationshipId = *arguments.input.Version_1_0->relationshipId;
+	}
+	if (arguments.input.Version_1_0->sourceTenantId){
+		sourceTenantId = *arguments.input.Version_1_0->sourceTenantId;
+	}
+	if (arguments.input.Version_1_0->targetTenantId){
+		targetTenantId = *arguments.input.Version_1_0->targetTenantId;
+	}
+	if (arguments.input.Version_1_0->scope){
+		scope = *arguments.input.Version_1_0->scope;
+	}
+	if (arguments.input.Version_1_0->validFrom){
+		validFrom = *arguments.input.Version_1_0->validFrom;
+	}
+	if (arguments.input.Version_1_0->validUntil){
+		validUntil = *arguments.input.Version_1_0->validUntil;
+	}
+	if (arguments.input.Version_1_0->description){
+		description = *arguments.input.Version_1_0->description;
+	}
+	if (arguments.input.Version_1_0->terms){
+		terms = *arguments.input.Version_1_0->terms;
+	}
+
+	QByteArray contractId = m_contractManagerCompPtr->CreateContract(
+				relationshipId,
+				sourceTenantId,
+				targetTenantId,
+				scope,
+				validFrom,
+				validUntil,
+				description,
+				terms);
+
+	if (contractId.isEmpty()){
+		response.Version_1_0->errorMessage = QStringLiteral("Failed to create contract");
+		return response;
+	}
+
+	response.Version_1_0->contractId = contractId;
+
+	return response;
+}
+
+
+sdl::imtauth::Tenants::CUpdateContractStatusPayload CTenantManagerControllerComp::OnUpdateContractStatus(
+			const sdl::imtauth::Tenants::CUpdateContractStatusGqlRequest& updateContractStatusRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
+{
+	sdl::imtauth::Tenants::CUpdateContractStatusPayload response;
+
+	response.Version_1_0.emplace();
+
+	if (!m_contractManagerCompPtr.IsValid()){
+		response.Version_1_0->errorMessage = QStringLiteral("Contract manager is not configured");
+		response.Version_1_0->success = false;
+		return response;
+	}
+
+	QByteArray contractId;
+	imtauth::ContractStatus status = imtauth::CTS_DRAFT;
+
+	sdl::imtauth::Tenants::UpdateContractStatusRequestArguments arguments = updateContractStatusRequest.GetRequestedArguments();
+	if (arguments.input.Version_1_0->contractId){
+		contractId = *arguments.input.Version_1_0->contractId;
+	}
+	if (arguments.input.Version_1_0->status){
+		status = FromSdlContractStatus(*arguments.input.Version_1_0->status);
+	}
+
+	bool success = m_contractManagerCompPtr->UpdateContractStatus(contractId, status);
+	response.Version_1_0->success = success;
+	if (!success){
+		response.Version_1_0->errorMessage = QStringLiteral("Failed to update contract status");
+	}
+
+	return response;
+}
+
+
+sdl::imtauth::Tenants::CTerminateContractPayload CTenantManagerControllerComp::OnTerminateContract(
+			const sdl::imtauth::Tenants::CTerminateContractGqlRequest& terminateContractRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
+{
+	sdl::imtauth::Tenants::CTerminateContractPayload response;
+
+	response.Version_1_0.emplace();
+
+	if (!m_contractManagerCompPtr.IsValid()){
+		response.Version_1_0->errorMessage = QStringLiteral("Contract manager is not configured");
+		response.Version_1_0->success = false;
+		return response;
+	}
+
+	QByteArray contractId;
+	sdl::imtauth::Tenants::TerminateContractRequestArguments arguments = terminateContractRequest.GetRequestedArguments();
+	if (arguments.input.Version_1_0->contractId){
+		contractId = *arguments.input.Version_1_0->contractId;
+	}
+
+	bool success = m_contractManagerCompPtr->TerminateContract(contractId);
+	response.Version_1_0->success = success;
+	if (!success){
+		response.Version_1_0->errorMessage = QStringLiteral("Failed to terminate contract");
 	}
 
 	return response;
