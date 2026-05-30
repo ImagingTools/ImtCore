@@ -65,6 +65,7 @@ struct CrossTenantMessageInfo
 	QByteArray sourceTenantId;
 	QByteArray targetTenantId;
 	QByteArray relationshipId;
+	QByteArray contractId;
 	QByteArray sourceObjectId;
 	QByteArray targetObjectId;
 	CrossTenantMessageType messageType = CTMT_CUSTOM;
@@ -82,6 +83,7 @@ struct CrossTenantMessageInfo
 			&& sourceTenantId == other.sourceTenantId
 			&& targetTenantId == other.targetTenantId
 			&& relationshipId == other.relationshipId
+			&& contractId == other.contractId
 			&& sourceObjectId == other.sourceObjectId
 			&& targetObjectId == other.targetObjectId
 			&& messageType == other.messageType
@@ -137,6 +139,7 @@ public:
 			produced from.
 		\param customType Concrete type name when \a messageType is CTMT_CUSTOM.
 		\param expiresAt Optional expiry timestamp (empty for no expiry).
+		\param contractId Optional contract that authorizes this exchange (empty for ad-hoc messages).
 		\return Message ID if successful, empty if validation or storage failed.
 	*/
 	virtual QByteArray SendMessage(
@@ -147,7 +150,8 @@ public:
 				const QByteArray& payload,
 				const QByteArray& sourceObjectId = QByteArray(),
 				const QString& customType = QString(),
-				const QString& expiresAt = QString()) = 0;
+				const QString& expiresAt = QString(),
+				const QByteArray& contractId = QByteArray()) = 0;
 
 	/**
 		Get a specific message by its ID.

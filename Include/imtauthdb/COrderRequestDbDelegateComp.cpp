@@ -66,6 +66,9 @@ istd::IChangeableUniquePtr COrderRequestDbDelegateComp::CreateObjectFromRecord(
 	if (record.contains("RelationshipId")){
 		info.relationshipId = imtdb::VariantToByteArray(record.value("RelationshipId"));
 	}
+	if (record.contains("ContractId")){
+		info.contractId = imtdb::VariantToByteArray(record.value("ContractId"));
+	}
 	if (record.contains("SourceOrderId")){
 		info.sourceOrderId = imtdb::VariantToByteArray(record.value("SourceOrderId"));
 	}
@@ -115,6 +118,7 @@ COrderRequestDbDelegateComp::NewObjectQuery COrderRequestDbDelegateComp::CreateN
 	QString sourceTenantId = imtdb::EscapeSql(QString::fromUtf8(info.sourceTenantId));
 	QString targetTenantId = imtdb::EscapeSql(QString::fromUtf8(info.targetTenantId));
 	QString relationshipId = imtdb::EscapeSql(QString::fromUtf8(info.relationshipId));
+	QString contractId = NullableSqlText(QString::fromUtf8(info.contractId));
 	QString sourceOrderId = NullableSqlText(QString::fromUtf8(info.sourceOrderId));
 	QString articleNumber = NullableSqlText(info.articleNumber);
 	int quantity = info.quantity;
@@ -125,14 +129,15 @@ COrderRequestDbDelegateComp::NewObjectQuery COrderRequestDbDelegateComp::CreateN
 	QString updatedAt = !info.updatedAt.isEmpty() ? imtdb::EscapeSql(info.updatedAt) : imtdb::UtcNow();
 
 	result.query = QString(
-		"INSERT INTO \"%1\" (\"Id\", \"MessageId\", \"SourceTenantId\", \"TargetTenantId\", \"RelationshipId\", \"SourceOrderId\", \"ArticleNumber\", \"Quantity\", \"Note\", \"Status\", \"StatusNote\", \"CreatedAt\", \"UpdatedAt\") "
-		"VALUES ('%2', %3, '%4', '%5', '%6', %7, %8, %9, %10, %11, %12, '%13', '%14');")
+		"INSERT INTO \"%1\" (\"Id\", \"MessageId\", \"SourceTenantId\", \"TargetTenantId\", \"RelationshipId\", \"ContractId\", \"SourceOrderId\", \"ArticleNumber\", \"Quantity\", \"Note\", \"Status\", \"StatusNote\", \"CreatedAt\", \"UpdatedAt\") "
+		"VALUES ('%2', %3, '%4', '%5', '%6', %7, %8, %9, %10, %11, %12, %13, '%14', '%15');")
 		.arg(*m_tableNameAttrPtr)
 		.arg(id)
 		.arg(messageId)
 		.arg(sourceTenantId)
 		.arg(targetTenantId)
 		.arg(relationshipId)
+		.arg(contractId)
 		.arg(sourceOrderId)
 		.arg(articleNumber)
 		.arg(QString::number(quantity))

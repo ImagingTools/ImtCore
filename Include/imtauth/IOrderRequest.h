@@ -51,6 +51,7 @@ struct OrderRequestInfo
 	QByteArray sourceTenantId;
 	QByteArray targetTenantId;
 	QByteArray relationshipId;
+	QByteArray contractId;
 	QByteArray sourceOrderId;
 	QString articleNumber;
 	int quantity = 0;
@@ -67,6 +68,7 @@ struct OrderRequestInfo
 			&& sourceTenantId == other.sourceTenantId
 			&& targetTenantId == other.targetTenantId
 			&& relationshipId == other.relationshipId
+			&& contractId == other.contractId
 			&& sourceOrderId == other.sourceOrderId
 			&& articleNumber == other.articleNumber
 			&& quantity == other.quantity

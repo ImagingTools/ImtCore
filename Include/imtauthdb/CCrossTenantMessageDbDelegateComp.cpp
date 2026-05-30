@@ -73,6 +73,9 @@ istd::IChangeableUniquePtr CCrossTenantMessageDbDelegateComp::CreateObjectFromRe
 	if (record.contains("RelationshipId")){
 		info.relationshipId = imtdb::VariantToByteArray(record.value("RelationshipId"));
 	}
+	if (record.contains("ContractId")){
+		info.contractId = imtdb::VariantToByteArray(record.value("ContractId"));
+	}
 	if (record.contains("SourceObjectId")){
 		info.sourceObjectId = imtdb::VariantToByteArray(record.value("SourceObjectId"));
 	}
@@ -125,6 +128,7 @@ CCrossTenantMessageDbDelegateComp::NewObjectQuery CCrossTenantMessageDbDelegateC
 	QString sourceTenantId = imtdb::EscapeSql(QString::fromUtf8(info.sourceTenantId));
 	QString targetTenantId = imtdb::EscapeSql(QString::fromUtf8(info.targetTenantId));
 	QString relationshipId = imtdb::EscapeSql(QString::fromUtf8(info.relationshipId));
+	QString contractId = NullableSqlText(QString::fromUtf8(info.contractId));
 	QString sourceObjectId = NullableSqlText(QString::fromUtf8(info.sourceObjectId));
 	QString targetObjectId = NullableSqlText(QString::fromUtf8(info.targetObjectId));
 	int messageType = static_cast<int>(info.messageType);
@@ -137,13 +141,14 @@ CCrossTenantMessageDbDelegateComp::NewObjectQuery CCrossTenantMessageDbDelegateC
 	QString expiresAt = NullableSqlDateTime(info.expiresAt);
 
 	result.query = QString(
-		"INSERT INTO \"%1\" (\"Id\", \"SourceTenantId\", \"TargetTenantId\", \"RelationshipId\", \"SourceObjectId\", \"TargetObjectId\", \"MessageType\", \"CustomType\", \"Payload\", \"Status\", \"ErrorMessage\", \"CreatedAt\", \"UpdatedAt\", \"ExpiresAt\") "
-		"VALUES ('%2', '%3', '%4', '%5', %6, %7, %8, %9, %10, %11, %12, '%13', '%14', %15);")
+		"INSERT INTO \"%1\" (\"Id\", \"SourceTenantId\", \"TargetTenantId\", \"RelationshipId\", \"ContractId\", \"SourceObjectId\", \"TargetObjectId\", \"MessageType\", \"CustomType\", \"Payload\", \"Status\", \"ErrorMessage\", \"CreatedAt\", \"UpdatedAt\", \"ExpiresAt\") "
+		"VALUES ('%2', '%3', '%4', '%5', %6, %7, %8, %9, %10, %11, %12, %13, '%14', '%15', %16);")
 		.arg(*m_tableNameAttrPtr)
 		.arg(id)
 		.arg(sourceTenantId)
 		.arg(targetTenantId)
 		.arg(relationshipId)
+		.arg(contractId)
 		.arg(sourceObjectId)
 		.arg(targetObjectId)
 		.arg(QString::number(messageType))

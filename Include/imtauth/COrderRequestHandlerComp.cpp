@@ -51,6 +51,7 @@ bool COrderRequestHandlerComp::HandleMessage(
 	info.sourceTenantId = messageInfo.sourceTenantId;
 	info.targetTenantId = messageInfo.targetTenantId;
 	info.relationshipId = messageInfo.relationshipId;
+	info.contractId = messageInfo.contractId;
 	info.sourceOrderId = messageInfo.sourceObjectId;
 	info.articleNumber = payloadObject.value("articleNumber").toString();
 	info.quantity = payloadObject.value("quantity").toInt();
@@ -190,7 +191,10 @@ bool COrderRequestHandlerComp::ApplyStatusFeedback(
 					info.relationshipId,
 					feedbackType,
 					feedbackPayload,
-					info.orderRequestId);
+					info.orderRequestId,
+					QString() /*customType*/,
+					QString() /*expiresAt*/,
+					info.contractId);
 	}
 
 	return true;

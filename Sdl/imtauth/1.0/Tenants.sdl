@@ -498,6 +498,7 @@ type CrossTenantMessage {
 	sourceTenantId: ID!
 	targetTenantId: ID!
 	relationshipId: ID!
+	contractId: ID
 	sourceObjectId: ID
 	targetObjectId: ID
 	messageType: CrossTenantMessageType!
@@ -514,6 +515,7 @@ input SendCrossTenantMessageInput {
 	sourceTenantId: ID!
 	targetTenantId: ID!
 	relationshipId: ID!
+	contractId: ID
 	messageType: CrossTenantMessageType!
 	payload: String
 	sourceObjectId: ID
@@ -573,6 +575,7 @@ type OrderRequest {
 	sourceTenantId: ID!
 	targetTenantId: ID!
 	relationshipId: ID
+	contractId: ID
 	sourceOrderId: ID
 	articleNumber: String
 	quantity: Int

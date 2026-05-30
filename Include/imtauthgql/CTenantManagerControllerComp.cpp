@@ -1429,6 +1429,7 @@ sdl::imtauth::Tenants::CCrossTenantMessage::V1_0 MessageInfoToData(const imtauth
 	data.sourceTenantId = info.sourceTenantId;
 	data.targetTenantId = info.targetTenantId;
 	data.relationshipId = info.relationshipId;
+	data.contractId = info.contractId;
 	data.sourceObjectId = info.sourceObjectId;
 	data.targetObjectId = info.targetObjectId;
 	data.messageType = ToSdlMessageType(info.messageType);
@@ -1489,6 +1490,7 @@ sdl::imtauth::Tenants::COrderRequest::V1_0 OrderRequestToData(const imtauth::Ord
 	data.sourceTenantId = info.sourceTenantId;
 	data.targetTenantId = info.targetTenantId;
 	data.relationshipId = info.relationshipId;
+	data.contractId = info.contractId;
 	data.sourceOrderId = info.sourceOrderId;
 	data.articleNumber = info.articleNumber;
 	data.quantity = info.quantity;
@@ -1619,6 +1621,7 @@ sdl::imtauth::Tenants::CSendCrossTenantMessagePayload CTenantManagerControllerCo
 	QByteArray sourceTenantId;
 	QByteArray targetTenantId;
 	QByteArray relationshipId;
+	QByteArray contractId;
 	imtauth::CrossTenantMessageType messageType = imtauth::CTMT_CUSTOM;
 	QByteArray payload;
 	QByteArray sourceObjectId;
@@ -1634,6 +1637,9 @@ sdl::imtauth::Tenants::CSendCrossTenantMessagePayload CTenantManagerControllerCo
 	}
 	if (arguments.input.Version_1_0->relationshipId){
 		relationshipId = *arguments.input.Version_1_0->relationshipId;
+	}
+	if (arguments.input.Version_1_0->contractId){
+		contractId = *arguments.input.Version_1_0->contractId;
 	}
 	if (arguments.input.Version_1_0->messageType){
 		messageType = FromSdlMessageType(*arguments.input.Version_1_0->messageType);
@@ -1659,7 +1665,8 @@ sdl::imtauth::Tenants::CSendCrossTenantMessagePayload CTenantManagerControllerCo
 				payload,
 				sourceObjectId,
 				customType,
-				expiresAt);
+				expiresAt,
+				contractId);
 
 	if (messageId.isEmpty()){
 		response.Version_1_0->errorMessage = QStringLiteral("Failed to send cross-tenant message");

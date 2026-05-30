@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS "OrderRequests" (
 	"SourceTenantId" TEXT NOT NULL,
 	"TargetTenantId" TEXT NOT NULL,
 	"RelationshipId" TEXT NOT NULL,
+	"ContractId" TEXT,
 	"SourceOrderId" TEXT,
 	"ArticleNumber" TEXT,
 	"Quantity" INTEGER NOT NULL DEFAULT 0,
@@ -17,3 +18,4 @@ CREATE TABLE IF NOT EXISTS "OrderRequests" (
 CREATE INDEX IF NOT EXISTS "IdxOrderRequestsSourceTenantId" ON "OrderRequests" ("SourceTenantId");
 CREATE INDEX IF NOT EXISTS "IdxOrderRequestsTargetTenantId" ON "OrderRequests" ("TargetTenantId");
 CREATE INDEX IF NOT EXISTS "IdxOrderRequestsRelationshipId" ON "OrderRequests" ("RelationshipId");
+CREATE INDEX IF NOT EXISTS "IdxOrderRequestsContractId" ON "OrderRequests" ("ContractId");
