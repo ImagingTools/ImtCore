@@ -7,6 +7,7 @@
 	<file alias="CreateTenantInvitationsTable.sql">Resources/SQL/Postgres/CreateTenantInvitationsTable.sql</file>
 	<file alias="CreateTenantPermissionsTable.sql">Resources/SQL/Postgres/CreateTenantPermissionsTable.sql</file>
 	<file alias="CreateCrossOrgGrantsTable.sql">Resources/SQL/Postgres/CreateCrossOrgGrantsTable.sql</file>
+	<file alias="CreateContractsTable.sql">Resources/SQL/Postgres/CreateContractsTable.sql</file>
 	<file alias="CreateTenantConnectionRequestsTable.sql">Resources/SQL/Postgres/CreateTenantConnectionRequestsTable.sql</file>
 	<file alias="CreateCrossTenantMessagesTable.sql">Resources/SQL/Postgres/CreateCrossTenantMessagesTable.sql</file>
 	<file alias="CreateOrderRequestsTable.sql">Resources/SQL/Postgres/CreateOrderRequestsTable.sql</file>
@@ -19,6 +20,7 @@
 	<file alias="CreateTenantInvitationsTable.sql">Resources/SQL/SQLite/CreateTenantInvitationsTable.sql</file>
 	<file alias="CreateTenantPermissionsTable.sql">Resources/SQL/SQLite/CreateTenantPermissionsTable.sql</file>
 	<file alias="CreateCrossOrgGrantsTable.sql">Resources/SQL/SQLite/CreateCrossOrgGrantsTable.sql</file>
+	<file alias="CreateContractsTable.sql">Resources/SQL/SQLite/CreateContractsTable.sql</file>
 	<file alias="CreateTenantConnectionRequestsTable.sql">Resources/SQL/SQLite/CreateTenantConnectionRequestsTable.sql</file>
 	<file alias="CreateCrossTenantMessagesTable.sql">Resources/SQL/SQLite/CreateCrossTenantMessagesTable.sql</file>
 	<file alias="CreateOrderRequestsTable.sql">Resources/SQL/SQLite/CreateOrderRequestsTable.sql</file>

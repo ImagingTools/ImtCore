@@ -272,6 +272,16 @@ I_EXPORT_COMPONENT(
 			"Cross Org Grant Manager");
 
 I_EXPORT_COMPONENT(
+			ContractInfo,
+			"Entity representing a cooperation contract between two tenants",
+			"Contract Info");
+
+I_EXPORT_COMPONENT(
+			ContractManager,
+			"Manager for cooperation contracts (create/update-status/terminate/query)",
+			"Contract Manager");
+
+I_EXPORT_COMPONENT(
 			TenantConnectionRequestInfo,
 			"Entity representing a tenant connection request used for discovery/bootstrap",
 			"Tenant Connection Request Info");
