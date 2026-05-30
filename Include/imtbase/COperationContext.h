@@ -19,17 +19,20 @@ public:
 	void SetOperationOwnerId(const imtbase::IOperationContext::IdentifableObjectInfo& operationOwnerId);
 	void SetTenantId(const QByteArray& tenantId);
 	void SetOperationDescription(const QString& operationDescription);
+	void SetOperationTimestamp(const QDateTime& timestamp);
 
 	// reimplemented (imtbase::IOperationContext)
 	virtual IdentifableObjectInfo GetOperationOwnerId() const override;
 	virtual QByteArray GetTenantId() const override;
 	virtual QString GetOperationDescription() const override;
+	virtual QDateTime GetOperationTimestamp() const override;
 	virtual imtbase::IObjectCollection* GetChangesCollection() override;
 
 private:
 	IdentifableObjectInfo m_operationOwnerId;
 	QByteArray m_tenantId;
 	QString m_operationDescription;
+	QDateTime m_operationTimestamp;
 	imtbase::CObjectCollection m_changesCollection;
 };
 

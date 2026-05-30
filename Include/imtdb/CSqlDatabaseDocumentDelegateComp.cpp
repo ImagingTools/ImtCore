@@ -220,7 +220,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectsQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const imtbase::ICollectionInfo::Ids& objectIds,
-			const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const imtbase::IOperationContext* operationContextPtr) const
 {
 	if (objectIds.isEmpty()){
 		return QByteArray();
@@ -232,12 +232,16 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectsQuery(
 	}
 
 	const QString quotedIds = objectIds.toList().join("','").append('\'').prepend('\'');
+	const QString timestamp = GetEffectiveTimestamp(operationContextPtr).toString(Qt::ISODateWithMs);
+
 	QString query = 
-		QStringLiteral(R"sql(UPDATE %0 "%1" SET "%2" = 'Disabled' WHERE "%2" = 'Active' AND "%3" IN (%4);)sql")
+		QStringLiteral(R"sql(UPDATE %0 "%1" SET "%2" = 'Disabled', "%3" = '%4' WHERE "%2" = 'Active' AND "%5" IN (%6);)sql")
 					.arg(
 								schemaPrefix,
 								QString::fromUtf8(*m_tableNameAttrPtr),
 								QString::fromUtf8(s_stateColumn),
+								QString::fromUtf8(s_lastModifiedColumn),
+								timestamp,
 								QString::fromUtf8(s_documentIdColumn),
 								quotedIds);
 
@@ -248,13 +252,17 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectsQuery(
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectSetQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const iprm::IParamsSet* paramsPtr,
-			const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const imtbase::IOperationContext* operationContextPtr) const
 {
 	QString schemaPrefix;
 	if (m_tableSchemaAttrPtr.IsValid()){
 		schemaPrefix = QString("%1.").arg(qPrintable(*m_tableSchemaAttrPtr));
 	}
-	QByteArray retVal = QString("UPDATE %0 \"%1\" as root SET \"%2\" = 'Disabled' WHERE \"%2\" = 'Active'").arg(schemaPrefix, QString::fromUtf8(*m_tableNameAttrPtr), QString::fromUtf8(s_stateColumn)).toUtf8();
+
+	const QString timestamp = GetEffectiveTimestamp(operationContextPtr).toString(Qt::ISODateWithMs);
+
+	QByteArray retVal = QString("UPDATE %0 \"%1\" as root SET \"%2\" = 'Disabled', \"%3\" = '%4' WHERE \"%2\" = 'Active'")
+				.arg(schemaPrefix, QString::fromUtf8(*m_tableNameAttrPtr), QString::fromUtf8(s_stateColumn), QString::fromUtf8(s_lastModifiedColumn), timestamp).toUtf8();
 
 	if (paramsPtr != nullptr){
 		iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(paramsPtr, "ComplexFilter");
@@ -294,7 +302,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectSetQuery(
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateRestoreObjectsQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const imtbase::ICollectionInfo::Ids& objectIds,
-			const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const imtbase::IOperationContext* operationContextPtr) const
 {
 	if (objectIds.isEmpty()){
 		return QByteArray();
@@ -307,15 +315,19 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRestoreObjectsQuery(
 		schemaPrefix = QString("%1.").arg(qPrintable(*m_tableSchemaAttrPtr));
 	}
 
+	const QString timestamp = GetEffectiveTimestamp(operationContextPtr).toString(Qt::ISODateWithMs);
+
 	return QString(R"(
 				UPDATE %0 "%1"
-				SET "%2" = 'Active'
-				WHERE "%3" IN (%4)
+				SET "%2" = 'Active', "%3" = '%4'
+				WHERE "%5" IN (%6)
 				AND "State" = 'Disabled';)")
 				.arg(
 					schemaPrefix,
 					QString::fromUtf8(*m_tableNameAttrPtr),
 					QString::fromUtf8(s_stateColumn),
+					QString::fromUtf8(s_lastModifiedColumn),
+					timestamp,
 					QString::fromUtf8(s_documentIdColumn),
 					quotedIds
 			).toUtf8();
@@ -325,15 +337,18 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRestoreObjectsQuery(
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateRestoreObjectSetQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const iprm::IParamsSet* paramsPtr,
-			const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const imtbase::IOperationContext* operationContextPtr) const
 {
 	QString schemaPrefix;
 	if (m_tableSchemaAttrPtr.IsValid()){
 		schemaPrefix = QString("%1.").arg(qPrintable(*m_tableSchemaAttrPtr));
 	}
+
+	const QString timestamp = GetEffectiveTimestamp(operationContextPtr).toString(Qt::ISODateWithMs);
+
 	QByteArray retVal = 
-				QString("UPDATE %0 \"%1\" as root SET \"%2\" = 'Active' WHERE \"%2\" = 'Disabled'")
-							.arg(schemaPrefix, QString::fromUtf8(*m_tableNameAttrPtr), QString::fromUtf8(s_stateColumn)).toUtf8();
+				QString("UPDATE %0 \"%1\" as root SET \"%2\" = 'Active', \"%3\" = '%4' WHERE \"%2\" = 'Disabled'")
+							.arg(schemaPrefix, QString::fromUtf8(*m_tableNameAttrPtr), QString::fromUtf8(s_stateColumn), QString::fromUtf8(s_lastModifiedColumn), timestamp).toUtf8();
 
 	if (paramsPtr != nullptr){
 		iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(paramsPtr, "ComplexFilter");
@@ -913,7 +928,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 						SqlEncode(documentContentJson),
 						metaInfoRepresentation.isEmpty() ? nullDataLiteral : SqlEncode(metaInfoRepresentation).append('\'').prepend('\''),
 						revisionInfoQuery.isEmpty() ? nullDataLiteral : revisionInfoQuery,
-						QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs),
+						GetEffectiveTimestamp(operationContextPtr).toString(Qt::ISODateWithMs),
 						QStringLiteral("Active")
 					);
 
@@ -2007,6 +2022,19 @@ bool CSqlDatabaseDocumentDelegateComp::IsArrayOperation(
 				);
 
 	return reFunctions.match(query).hasMatch();
+}
+
+
+QDateTime CSqlDatabaseDocumentDelegateComp::GetEffectiveTimestamp(const imtbase::IOperationContext* operationContextPtr) const
+{
+	if (operationContextPtr != nullptr){
+		QDateTime customTimestamp = operationContextPtr->GetOperationTimestamp();
+		if (customTimestamp.isValid()){
+			return customTimestamp;
+		}
+	}
+
+	return QDateTime::currentDateTimeUtc();
 }
 
 

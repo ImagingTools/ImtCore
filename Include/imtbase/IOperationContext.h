@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QDateTime>
+
 // ACF includes
 #include <istd/IChangeable.h>
 
@@ -59,6 +62,13 @@ public:
 	virtual QString GetOperationDescription() const = 0;
 
 	/**
+		Get custom timestamp for the operation.
+		If the returned value is valid, it will be used as the timestamp for the database record.
+		Otherwise, the current UTC time will be used.
+	*/
+	virtual QDateTime GetOperationTimestamp() const;
+
+	/**
 		Get changes collection.
 	*/
 	virtual imtbase::IObjectCollection* GetChangesCollection() = 0;
@@ -66,6 +76,14 @@ public:
 
 
 } // namespace imtbase
+
+
+// public inline methods
+
+inline QDateTime imtbase::IOperationContext::GetOperationTimestamp() const
+{
+	return QDateTime();
+}
 
 
 Q_DECLARE_METATYPE(imtbase::IOperationContext::OperationContextInfo);

@@ -53,6 +53,16 @@ void COperationContext::SetOperationDescription(const QString& operationDescript
 }
 
 
+void COperationContext::SetOperationTimestamp(const QDateTime& timestamp)
+{
+	if (m_operationTimestamp != timestamp){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_operationTimestamp = timestamp;
+	}
+}
+
+
 // reimplemented (imtbase::IOperationContext)
 
 imtbase::IOperationContext::IdentifableObjectInfo COperationContext::GetOperationOwnerId() const
@@ -70,6 +80,12 @@ QByteArray COperationContext::GetTenantId() const
 QString COperationContext::GetOperationDescription() const
 {
 	return m_operationDescription;
+}
+
+
+QDateTime COperationContext::GetOperationTimestamp() const
+{
+	return m_operationTimestamp;
 }
 
 
