@@ -31,7 +31,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (CGraphQlHandlerCompBase)
+	// reimplemented (CTenantCollectionDocumentServiceGqlHandlerCompBase)
 	virtual sdl::V1_0::imtbase::CDocumentList OnGetOpenedDocumentList(
 		const sdl::V1_0::imtbase::CGetOpenedDocumentListGqlRequest& getOpenedDocumentListRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,

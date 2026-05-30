@@ -13,17 +13,17 @@ namespace imtclientgql
 
 
 class CRemoteCollectionDocumentServiceControllerComp:
-			public TClientRequestManagerCompWrap<sdl::V1_0::imtbase::CGraphQlHandlerCompBase>
+			public TClientRequestManagerCompWrap<sdl::V1_0::imtbase::CCollectionDocumentServiceGqlHandlerCompBase>
 {
 public:
-	typedef TClientRequestManagerCompWrap<sdl::V1_0::imtbase::CGraphQlHandlerCompBase> BaseClass;
+	typedef TClientRequestManagerCompWrap<sdl::V1_0::imtbase::CCollectionDocumentServiceGqlHandlerCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CRemoteCollectionDocumentServiceControllerComp);
 		I_ASSIGN_MULTI_0(m_collectionIdsAttrPtr, "CollectionIds", "Collection ID-s", false);
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtbase::CCollectionDocumentServiceGqlHandlerCompBase)
 	virtual sdl::V1_0::imtbase::CDocumentList OnGetOpenedDocumentList(
 				const sdl::V1_0::imtbase::CGetOpenedDocumentListGqlRequest& getOpenedDocumentListRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

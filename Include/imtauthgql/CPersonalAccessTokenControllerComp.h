@@ -12,10 +12,10 @@ namespace imtauthgql
 
 
 class CPersonalAccessTokenControllerComp: 
-			public sdl::V1_0::imtauth::CGraphQlHandlerCompBase
+			public sdl::V1_0::imtauth::CPersonalAccessTokensGqlHandlerCompBase
 {
 public:
-	typedef sdl::V1_0::imtauth::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtauth::CPersonalAccessTokensGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CPersonalAccessTokenControllerComp);
 		I_ASSIGN(m_tokenManagerCompPtr, "PersonalAccessTokenManager", "Personal access token manager", true, "PersonalAccessTokenManager");
@@ -23,7 +23,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtauth::CPersonalAccessTokensGqlHandlerCompBase)
 	virtual sdl::V1_0::imtauth::CPersonalAccessTokenList OnGetTokenList(
 				const sdl::V1_0::imtauth::CGetTokenListGqlRequest& getTokenListRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

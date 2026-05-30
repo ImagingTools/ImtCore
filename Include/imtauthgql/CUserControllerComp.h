@@ -17,10 +17,10 @@ namespace imtauthgql
 {
 
 
-class CUserControllerComp: public sdl::V1_0::imtauth::CGraphQlHandlerCompBase
+class CUserControllerComp: public sdl::V1_0::imtauth::CUsersGqlHandlerCompBase
 {
 public:
-	typedef sdl::V1_0::imtauth::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtauth::CUsersGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CUserControllerComp);
 		I_ASSIGN(m_userVerificationControllerCompPtr, "UserVerificationController", "User verification controller", true, "UserVerificationController");
@@ -35,7 +35,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtauth::CUsersGqlHandlerCompBase)
 	virtual sdl::V1_0::imtauth::CChangePasswordPayload OnChangePassword(
 				const sdl::V1_0::imtauth::CChangePasswordGqlRequest& changePasswordRequest,
 				const imtgql::CGqlRequest& gqlRequest,

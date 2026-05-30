@@ -204,7 +204,7 @@ bool CRemoteTenantControllerComp::SetTenantActive(const QByteArray& tenantId, bo
 }
 
 
-// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CTenantsGqlHandlerCompBase)
 
 sdl::V1_0::imtauth::CGetTenantIdsPayload CRemoteTenantControllerComp::OnGetTenantIds(
 			const sdl::V1_0::imtauth::CGetTenantIdsGqlRequest& /*getTenantIdsRequest*/,

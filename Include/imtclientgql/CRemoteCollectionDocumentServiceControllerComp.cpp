@@ -10,7 +10,7 @@ namespace imtclientgql
 
 // protected methods
 
-// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CCollectionDocumentServiceGqlHandlerCompBase)
 
 sdl::V1_0::imtbase::CDocumentList CRemoteCollectionDocumentServiceControllerComp::OnGetOpenedDocumentList(
 			const sdl::V1_0::imtbase::CGetOpenedDocumentListGqlRequest& /*getOpenedDocumentListRequest*/,

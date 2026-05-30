@@ -13,7 +13,7 @@ namespace imtservergql
 
 // protected methods
 
-// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CSearchGqlHandlerCompBase)
 
 sdl::V1_0::imtbase::CSearchResults CGqlSearchControllerComp::OnSearch(
 			const sdl::V1_0::imtbase::CSearchGqlRequest& searchRequest,

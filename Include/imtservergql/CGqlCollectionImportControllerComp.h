@@ -18,11 +18,11 @@ namespace imtservergql
 namespace collectionImport = sdl::V1_0::imtbase;
 
 
-class CGqlCollectionImportControllerComp: public collectionImport::CGraphQlHandlerCompBase
+class CGqlCollectionImportControllerComp: public collectionImport::CCollectionImportGqlHandlerCompBase
 {
 	Q_DECLARE_TR_FUNCTIONS(CGqlCollectionImportControllerComp)
 public:
-	typedef collectionImport::CGraphQlHandlerCompBase BaseClass;
+	typedef collectionImport::CCollectionImportGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGqlCollectionImportControllerComp);
 		I_ASSIGN(m_collectionImportControllerCompPtr, "CollectionImportController", "Collection import controller", false, "CollectionImportController");
@@ -38,7 +38,7 @@ public:
 	static QByteArray GetCancelSessionId(const GqlRequest& request);
 
 protected:
-	// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtbase::CCollectionImportGqlHandlerCompBase)
 	virtual collectionImport::CSessionStatus OnBeginCollectionImportSession(
 		const collectionImport::CBeginCollectionImportSessionGqlRequest& request,
 		const ::imtgql::CGqlRequest& gqlRequest,

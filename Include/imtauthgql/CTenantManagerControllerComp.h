@@ -16,10 +16,10 @@ namespace imtauthgql
 {
 
 
-class CTenantManagerControllerComp: public sdl::V1_0::imtauth::CGraphQlHandlerCompBase
+class CTenantManagerControllerComp: public sdl::V1_0::imtauth::CTenantsGqlHandlerCompBase
 {
 public:
-	typedef sdl::V1_0::imtauth::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtauth::CTenantsGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CTenantManagerControllerComp);
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager providing CRUD operations", true, "TenantManager");
@@ -28,7 +28,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtauth::CTenantsGqlHandlerCompBase)
 	virtual sdl::V1_0::imtauth::CGetTenantIdsPayload OnGetTenantIds(
 				const sdl::V1_0::imtauth::CGetTenantIdsGqlRequest& getTenantIdsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

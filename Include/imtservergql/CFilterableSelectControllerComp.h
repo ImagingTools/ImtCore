@@ -13,10 +13,10 @@ namespace imtservergql
 
 
 class CFilterableSelectControllerComp:
-		public sdl::V1_0::imtbase::CGraphQlHandlerCompBase
+		public sdl::V1_0::imtbase::CFilterableSelectGqlHandlerCompBase
 {
 public:
-	typedef sdl::V1_0::imtbase::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtbase::CFilterableSelectGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CFilterableSelectControllerComp);
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection ID to match incoming requests", true, "");
@@ -29,7 +29,7 @@ public:
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 
 protected:
-	// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtbase::CFilterableSelectGqlHandlerCompBase)
 	virtual sdl::V1_0::imtbase::CGetSelectableItemsPayload OnGetSelectableItems(
 				const sdl::V1_0::imtbase::CGetSelectableItemsGqlRequest& getSelectableItemsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

@@ -46,7 +46,7 @@ QByteArray CRemoteUserControllerComp::GetSuperuserId() const
 }
 
 
-// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CUsersGqlHandlerCompBase)
 
 sdl::V1_0::imtauth::CChangePasswordPayload CRemoteUserControllerComp::OnChangePassword(
 			const sdl::V1_0::imtauth::CChangePasswordGqlRequest& /*changePasswordRequest*/,

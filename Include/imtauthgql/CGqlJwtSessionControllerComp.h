@@ -16,10 +16,10 @@ namespace imtauthgql
 {
 
 
-class CGqlJwtSessionControllerComp: public sdl::V1_0::imtauth::CGraphQlHandlerCompBase
+class CGqlJwtSessionControllerComp: public sdl::V1_0::imtauth::CSessionsGqlHandlerCompBase
 {
 public:
-	typedef sdl::V1_0::imtauth::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtauth::CSessionsGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGqlJwtSessionControllerComp);
 		I_ASSIGN(m_jwtSessionControllerCompPtr, "JwtSessionController", "Json Web Token session controller", false, "JwtSessionController");
@@ -29,7 +29,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtauth::CSessionsGqlHandlerCompBase)
 	virtual sdl::V1_0::imtauth::CValidateSessionPayload OnValidateSession(
 		const sdl::V1_0::imtauth::CValidateSessionGqlRequest& validateSessionRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,

@@ -98,7 +98,7 @@ public:
 	virtual QString GetControllerName() const override;
 	virtual const imtbase::ISearchResults* Search(const QString& text) const override;
 
-	// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase)
 	virtual sdl::V1_0::imtbase::CDuplicateElementsPayload OnDuplicateElements(
 				const sdl::V1_0::imtbase::CDuplicateElementsGqlRequest& duplicateElementsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

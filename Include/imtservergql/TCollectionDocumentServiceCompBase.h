@@ -46,7 +46,7 @@ public:
 	void OnComponentCreated() override;
 
 protected:
-	// reimplemented (CGraphQlHandlerCompBase)
+	// reimplemented (CCollectionDocumentServiceGqlHandlerCompBase)
 	CDM::CDocumentList OnGetOpenedDocumentList(
 				const typename Defs::GetOpenedDocumentListGqlRequest& getDocumentListRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
@@ -221,7 +221,7 @@ inline bool TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServ
 }
 
 
-// reimplemented (CGraphQlHandlerCompBase)
+// reimplemented (CCollectionDocumentServiceGqlHandlerCompBase)
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
 inline CDM::CDocumentList TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::

@@ -13,16 +13,16 @@ namespace imtauthgql
 
 class CRemoteTenantMembershipManagerControllerComp:
 			public imtclientgql::TClientRequestManagerCompWrap<
-							sdl::V1_0::imtauth::CGraphQlHandlerCompBase>
+							sdl::V1_0::imtauth::CTenantMembershipsGqlHandlerCompBase>
 {
 public:
-	typedef imtclientgql::TClientRequestManagerCompWrap<sdl::V1_0::imtauth::CGraphQlHandlerCompBase> BaseClass;
+	typedef imtclientgql::TClientRequestManagerCompWrap<sdl::V1_0::imtauth::CTenantMembershipsGqlHandlerCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CRemoteTenantMembershipManagerControllerComp);
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtauth::CTenantMembershipsGqlHandlerCompBase)
 	virtual sdl::V1_0::imtauth::CGetMembershipsByTenantPayload OnGetMembershipsByTenant(
 				const sdl::V1_0::imtauth::CGetMembershipsByTenantGqlRequest& request,
 				const ::imtgql::CGqlRequest& gqlRequest,

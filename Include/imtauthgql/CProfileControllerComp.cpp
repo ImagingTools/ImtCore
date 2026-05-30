@@ -19,7 +19,7 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CProfileGqlHandlerCompBase)
 
 sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 			const sdl::V1_0::imtauth::CGetProfileGqlRequest& getProfileRequest,

@@ -49,7 +49,7 @@ static sdl::V1_0::imtauth::CPersonalAccessToken ConvertToSdlToken(
 
 // protected methods
 
-// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CPersonalAccessTokensGqlHandlerCompBase)
 
 sdl::V1_0::imtauth::CPersonalAccessTokenList CPersonalAccessTokenControllerComp::OnGetTokenList(
 			const sdl::V1_0::imtauth::CGetTokenListGqlRequest& getTokenListRequest,

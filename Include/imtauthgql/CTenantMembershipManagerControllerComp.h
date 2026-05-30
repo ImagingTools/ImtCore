@@ -16,10 +16,10 @@ namespace imtauthgql
 {
 
 
-class CTenantMembershipManagerControllerComp: public sdl::V1_0::imtauth::CGraphQlHandlerCompBase
+class CTenantMembershipManagerControllerComp: public sdl::V1_0::imtauth::CTenantMembershipsGqlHandlerCompBase
 {
 public:
-	typedef sdl::V1_0::imtauth::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtauth::CTenantMembershipsGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CTenantMembershipManagerControllerComp);
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager providing CRUD operations", true, "TenantMembershipManager");
@@ -28,7 +28,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtauth::CTenantMembershipsGqlHandlerCompBase)
 	virtual sdl::V1_0::imtauth::CGetMembershipsByTenantPayload OnGetMembershipsByTenant(
 				const sdl::V1_0::imtauth::CGetMembershipsByTenantGqlRequest& request,
 				const ::imtgql::CGqlRequest& gqlRequest,

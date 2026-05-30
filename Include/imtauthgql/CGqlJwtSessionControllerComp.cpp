@@ -17,7 +17,7 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CSessionsGqlHandlerCompBase)
 
 sdl::V1_0::imtauth::CValidateSessionPayload CGqlJwtSessionControllerComp::OnValidateSession(
 	const sdl::V1_0::imtauth::CValidateSessionGqlRequest& validateSessionRequest,

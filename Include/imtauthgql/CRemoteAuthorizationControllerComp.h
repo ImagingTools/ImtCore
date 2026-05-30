@@ -13,16 +13,16 @@ namespace imtauthgql
 
 class CRemoteAuthorizationControllerComp:
 		public imtclientgql::TClientRequestManagerCompWrap<
-					sdl::V1_0::imtauth::CGraphQlHandlerCompBase>
+					sdl::V1_0::imtauth::CAuthorizationGqlHandlerCompBase>
 {
 public:
-	typedef imtclientgql::TClientRequestManagerCompWrap<sdl::V1_0::imtauth::CGraphQlHandlerCompBase> BaseClass;
+	typedef imtclientgql::TClientRequestManagerCompWrap<sdl::V1_0::imtauth::CAuthorizationGqlHandlerCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CRemoteAuthorizationControllerComp);
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtauth::CAuthorizationGqlHandlerCompBase)
 	virtual sdl::V1_0::imtauth::CAuthorizationPayload OnAuthorization(
 				const sdl::V1_0::imtauth::CAuthorizationGqlRequest& authorizationRequest,
 				const imtgql::CGqlRequest& gqlRequest,

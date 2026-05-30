@@ -13,10 +13,10 @@ namespace imtservergql
 {
 
 
-class CDocumentRevisionControllerComp: public sdl::V1_0::imtbase::CGraphQlHandlerCompBase
+class CDocumentRevisionControllerComp: public sdl::V1_0::imtbase::CDocumentRevisionGqlHandlerCompBase
 {
 public:
-	typedef sdl::V1_0::imtbase::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtbase::CDocumentRevisionGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CDocumentRevisionControllerComp);
 		I_ASSIGN_MULTI_0(m_collectionIdsAttrPtr, "CollectionIds", "Collection ID-s", false);
@@ -29,7 +29,7 @@ protected:
 	virtual imtbase::IObjectCollection* FindObjectCollection(const QByteArray& typeId) const;
 	virtual imtbase::IDocumentChangeGenerator* FindDocumentChangeGenerator(const QByteArray& typeId) const;
 
-	// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtbase::CDocumentRevisionGqlHandlerCompBase)
 	virtual sdl::V1_0::imtbase::CRevisionInfoList OnGetRevisionInfoList(const sdl::V1_0::imtbase::CGetRevisionInfoListGqlRequest& getRevisionInfoListRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual sdl::V1_0::imtbase::CBackupRevisionResponse OnBackupRevision(const sdl::V1_0::imtbase::CBackupRevisionGqlRequest& backupRevisionRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual sdl::V1_0::imtbase::CRestoreRevisionResponse OnRestoreRevision(const sdl::V1_0::imtbase::CRestoreRevisionGqlRequest& restoreRevisionRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;

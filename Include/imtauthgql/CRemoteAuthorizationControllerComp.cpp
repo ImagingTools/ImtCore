@@ -9,7 +9,7 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (sdl::V1_0::imtauth::V1_0::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CAuthorizationGqlHandlerCompBase)
 
 sdl::V1_0::imtauth::CAuthorizationPayload CRemoteAuthorizationControllerComp::OnAuthorization(
 			const sdl::V1_0::imtauth::CAuthorizationGqlRequest& /*authorizationRequest*/,

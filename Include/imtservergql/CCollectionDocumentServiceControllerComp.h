@@ -20,10 +20,10 @@ namespace imtservergql
 namespace CDM = sdl::V1_0::imtbase;
 
 
-class CCollectionDocumentServiceControllerComp: public sdl::V1_0::imtbase::CGraphQlHandlerCompBase
+class CCollectionDocumentServiceControllerComp: public sdl::V1_0::imtbase::CCollectionDocumentServiceGqlHandlerCompBase
 {
 public:
-	typedef sdl::V1_0::imtbase::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtbase::CCollectionDocumentServiceGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CCollectionDocumentServiceControllerComp)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentService", "Collection-related document manager", true, "CollectionDocumentService");

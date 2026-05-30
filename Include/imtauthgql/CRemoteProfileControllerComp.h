@@ -14,17 +14,17 @@ namespace imtauthgql
 
 class CRemoteProfileControllerComp:
 			public imtclientgql::TClientRequestManagerCompWrap<
-							sdl::V1_0::imtauth::CGraphQlHandlerCompBase>
+							sdl::V1_0::imtauth::CProfileGqlHandlerCompBase>
 {
 public:
-	typedef imtclientgql::TClientRequestManagerCompWrap<sdl::V1_0::imtauth::CGraphQlHandlerCompBase> BaseClass;
+	typedef imtclientgql::TClientRequestManagerCompWrap<sdl::V1_0::imtauth::CProfileGqlHandlerCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CRemoteProfileControllerComp);
 		I_ASSIGN(m_productInfoCompPtr, "ProductInfo", "Product feature container", false, "ProductInfo");
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtauth::CProfileGqlHandlerCompBase)
 	virtual sdl::V1_0::imtauth::CProfileData OnGetProfile(
 				const sdl::V1_0::imtauth::CGetProfileGqlRequest& getProfileRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

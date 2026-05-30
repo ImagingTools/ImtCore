@@ -11,7 +11,7 @@ namespace imtauthgql
 {
 
 
-// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CTenantMembershipsGqlHandlerCompBase)
 
 sdl::V1_0::imtauth::CGetMembershipsByTenantPayload CRemoteTenantMembershipManagerControllerComp::OnGetMembershipsByTenant(
 			const sdl::V1_0::imtauth::CGetMembershipsByTenantGqlRequest& /*request*/,

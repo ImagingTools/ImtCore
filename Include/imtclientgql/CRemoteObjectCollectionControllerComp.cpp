@@ -9,7 +9,7 @@ namespace imtclientgql
 
 // protected methods
 
-// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase)
 
 sdl::V1_0::imtbase::CDuplicateElementsPayload CRemoteObjectCollectionControllerComp::OnDuplicateElements(
 			const sdl::V1_0::imtbase::CDuplicateElementsGqlRequest& /*duplicateElementsRequest*/,

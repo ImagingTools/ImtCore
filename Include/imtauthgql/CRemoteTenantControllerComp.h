@@ -15,10 +15,10 @@ namespace imtauthgql
 class CRemoteTenantControllerComp:
 			virtual public imtauth::ITenantManager,
 			public imtclientgql::TClientRequestManagerCompWrap<
-							sdl::V1_0::imtauth::CGraphQlHandlerCompBase>
+							sdl::V1_0::imtauth::CTenantsGqlHandlerCompBase>
 {
 public:
-	typedef imtclientgql::TClientRequestManagerCompWrap<sdl::V1_0::imtauth::CGraphQlHandlerCompBase> BaseClass;
+	typedef imtclientgql::TClientRequestManagerCompWrap<sdl::V1_0::imtauth::CTenantsGqlHandlerCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CRemoteTenantControllerComp);
 		I_REGISTER_INTERFACE(imtauth::ITenantManager);
@@ -34,7 +34,7 @@ public:
 	virtual bool SetTenantActive(const QByteArray& tenantId, bool isActive) override;
 
 protected:
-	// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtauth::CTenantsGqlHandlerCompBase)
 	virtual sdl::V1_0::imtauth::CGetTenantIdsPayload OnGetTenantIds(
 				const sdl::V1_0::imtauth::CGetTenantIdsGqlRequest& getTenantIdsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

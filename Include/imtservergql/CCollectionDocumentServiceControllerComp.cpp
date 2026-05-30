@@ -18,7 +18,7 @@ namespace imtservergql
 
 // protected methods
 
-// reimplemented (CGraphQlHandlerCompBase)
+// reimplemented (CCollectionDocumentServiceGqlHandlerCompBase)
 
 CDM::CDocumentList CCollectionDocumentServiceControllerComp::OnGetOpenedDocumentList(
 			const CDM::CGetOpenedDocumentListGqlRequest& /*getOpenedDocumentListRequest*/,

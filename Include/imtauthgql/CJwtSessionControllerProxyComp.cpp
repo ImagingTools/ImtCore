@@ -7,7 +7,7 @@ namespace imtauthgql
 {
 
 
-// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CSessionsGqlHandlerCompBase)
 
 sdl::V1_0::imtauth::CValidateSessionPayload CJwtSessionControllerProxyComp::OnValidateSession(
 			const sdl::V1_0::imtauth::CValidateSessionGqlRequest& /*validateSessionRequest*/,

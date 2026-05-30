@@ -19,11 +19,11 @@ namespace imtauthgql
 
 
 class CTenantCollectionDocumentServiceComp:
-			public sdl::V1_0::imtauth::CGraphQlHandlerCompBase,
+			public sdl::V1_0::imtauth::CTenantCollectionDocumentServiceGqlHandlerCompBase,
 			virtual public imtdoc::IDocumentServiceEventHandler
 {
 public:
-	typedef sdl::V1_0::imtauth::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtauth::CTenantCollectionDocumentServiceGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CTenantCollectionDocumentServiceComp)
 		I_REGISTER_INTERFACE(imtdoc::IDocumentServiceEventHandler)
@@ -34,7 +34,7 @@ public:
 	I_END_COMPONENT
 
 protected:
-	// reimplemented (CGraphQlHandlerCompBase)
+	// reimplemented (CTenantCollectionDocumentServiceGqlHandlerCompBase)
 	virtual sdl::V1_0::imtauth::CTenantData OnGetTenantRepresentation(
 				const sdl::V1_0::imtauth::CGetTenantRepresentationGqlRequest& getTenantRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

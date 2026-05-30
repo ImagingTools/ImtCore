@@ -14,10 +14,10 @@ namespace imtservergql
 {
 
 
-class CSettingsControllerComp: public sdl::V1_0::imtbase::CGraphQlHandlerCompBase
+class CSettingsControllerComp: public sdl::V1_0::imtbase::CSettingsGqlHandlerCompBase
 {
 public:
-	typedef sdl::V1_0::imtbase::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtbase::CSettingsGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSettingsControllerComp);
 		I_ASSIGN(m_userSettingsRepresentationControllerCompPtr, "UserSettingsRepresentationController", "Controller for user related data model representation", true, "RepresentationController");
@@ -28,7 +28,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtbase::CSettingsGqlHandlerCompBase)
 	virtual sdl::V1_0::imtbase::CSetSettingsPayload OnSetSettings(
 				const sdl::V1_0::imtbase::CSetSettingsGqlRequest& setSettingsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

@@ -15,18 +15,18 @@ namespace imtauthgql
 
 class CRemoteTenantCollectionDocumentServiceControllerComp:
 			public imtclientgql::TClientRequestManagerCompWrap<
-							sdl::V1_0::imtauth::CGraphQlHandlerCompBase>
+							sdl::V1_0::imtauth::CTenantCollectionDocumentServiceGqlHandlerCompBase>
 {
 public:
 	typedef imtclientgql::TClientRequestManagerCompWrap<
-					sdl::V1_0::imtauth::CGraphQlHandlerCompBase> BaseClass;
+					sdl::V1_0::imtauth::CTenantCollectionDocumentServiceGqlHandlerCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CRemoteTenantCollectionDocumentServiceControllerComp);
 		I_ASSIGN(m_productInfoCompPtr, "ProductInfo", "Product info for loading available permissions", true, "ProductInfo");
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtauth::CTenantCollectionDocumentServiceGqlHandlerCompBase)
 	virtual sdl::V1_0::imtauth::CTenantData OnGetTenantRepresentation(
 				const sdl::V1_0::imtauth::CGetTenantRepresentationGqlRequest& getTenantRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

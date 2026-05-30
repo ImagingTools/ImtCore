@@ -13,16 +13,16 @@ namespace imtauthgql
 
 class CJwtSessionControllerProxyComp:
 			public imtclientgql::TClientRequestManagerCompWrap<
-							sdl::V1_0::imtauth::CGraphQlHandlerCompBase>
+							sdl::V1_0::imtauth::CSessionsGqlHandlerCompBase>
 {
 public:
-	typedef imtclientgql::TClientRequestManagerCompWrap<sdl::V1_0::imtauth::CGraphQlHandlerCompBase> BaseClass;
+	typedef imtclientgql::TClientRequestManagerCompWrap<sdl::V1_0::imtauth::CSessionsGqlHandlerCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CJwtSessionControllerProxyComp);
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtauth::CSessionsGqlHandlerCompBase)
 	virtual sdl::V1_0::imtauth::CValidateSessionPayload OnValidateSession(
 				const sdl::V1_0::imtauth::CValidateSessionGqlRequest& validateSessionRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

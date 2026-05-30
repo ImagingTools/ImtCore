@@ -58,7 +58,7 @@ imtbase::IDocumentChangeGenerator* CDocumentRevisionControllerComp::FindDocument
 }
 
 
-// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CDocumentRevisionGqlHandlerCompBase)
 
 sdl::V1_0::imtbase::CRevisionInfoList CDocumentRevisionControllerComp::OnGetRevisionInfoList(
 	const sdl::V1_0::imtbase::CGetRevisionInfoListGqlRequest& getRevisionInfoListRequest,

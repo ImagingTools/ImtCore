@@ -16,7 +16,7 @@ namespace imtservergql
 
 // protected methods
 
-// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CCommandsGqlHandlerCompBase)
 
 bool CCommandsControllerComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {

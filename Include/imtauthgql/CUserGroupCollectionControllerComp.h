@@ -32,7 +32,7 @@ protected:
 				QByteArray& newObjectId,
 				QString& errorMessage) const;
 
-	// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase)
 	virtual sdl::V1_0::imtbase::CVisualStatus OnGetObjectVisualStatus(
 				const sdl::V1_0::imtbase::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

@@ -11,17 +11,17 @@ namespace imtclientgql
 {
 
 
-class CRemoteObjectCollectionControllerComp: public TClientRequestManagerCompWrap<sdl::V1_0::imtbase::CGraphQlHandlerCompBase>
+class CRemoteObjectCollectionControllerComp: public TClientRequestManagerCompWrap<sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase>
 {
 public:
-	typedef TClientRequestManagerCompWrap<sdl::V1_0::imtbase::CGraphQlHandlerCompBase> BaseClass;
+	typedef TClientRequestManagerCompWrap<sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CRemoteObjectCollectionControllerComp);
 		I_ASSIGN_MULTI_0(m_collectionIdsAttrPtr, "CollectionIds", "Collection-IDs", false);
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase)
 	virtual sdl::V1_0::imtbase::CDuplicateElementsPayload OnDuplicateElements(
 				const sdl::V1_0::imtbase::CDuplicateElementsGqlRequest& duplicateElementsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

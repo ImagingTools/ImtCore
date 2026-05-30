@@ -14,7 +14,7 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CTenantCollectionDocumentServiceGqlHandlerCompBase)
 
 sdl::V1_0::imtauth::CTenantData CRemoteTenantCollectionDocumentServiceControllerComp::OnGetTenantRepresentation(
 		const sdl::V1_0::imtauth::CGetTenantRepresentationGqlRequest& /*getTenantRepresentationRequest*/,

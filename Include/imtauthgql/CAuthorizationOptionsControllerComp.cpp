@@ -9,7 +9,7 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CAuthorizationOptionsGqlHandlerCompBase)
 
 sdl::V1_0::imtauth::CUserManagementPayload CAuthorizationOptionsControllerComp::OnGetUserMode(
 			const sdl::V1_0::imtauth::CGetUserModeGqlRequest& /*getUserModeRequest*/,

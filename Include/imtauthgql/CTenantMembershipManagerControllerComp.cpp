@@ -106,7 +106,7 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CTenantMembershipsGqlHandlerCompBase)
 
 sdl::V1_0::imtauth::CGetMembershipsByTenantPayload CTenantMembershipManagerControllerComp::OnGetMembershipsByTenant(
 	const sdl::V1_0::imtauth::CGetMembershipsByTenantGqlRequest& request,

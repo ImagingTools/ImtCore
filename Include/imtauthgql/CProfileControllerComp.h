@@ -15,10 +15,10 @@ namespace imtauthgql
 {
 
 
-class CProfileControllerComp: public sdl::V1_0::imtauth::CGraphQlHandlerCompBase
+class CProfileControllerComp: public sdl::V1_0::imtauth::CProfileGqlHandlerCompBase
 {
 public:
-	typedef sdl::V1_0::imtauth::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtauth::CProfileGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CProfileControllerComp);
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection", false, "UserCollection");
@@ -29,7 +29,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtauth::CProfileGqlHandlerCompBase)
 	virtual sdl::V1_0::imtauth::CProfileData OnGetProfile(
 				const sdl::V1_0::imtauth::CGetProfileGqlRequest& getProfileRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

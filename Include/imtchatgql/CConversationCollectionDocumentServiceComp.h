@@ -14,10 +14,10 @@ namespace imtchatgql
 {
 
 
-class CConversationCollectionDocumentServiceComp: public sdl::V1_0::imtchat::CGraphQlHandlerCompBase
+class CConversationCollectionDocumentServiceComp: public sdl::V1_0::imtchat::CConversationCollectionDocumentServiceGqlHandlerCompBase
 {
 public:
-	typedef sdl::V1_0::imtchat::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtchat::CConversationCollectionDocumentServiceGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CConversationCollectionDocumentServiceComp)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentService", "Collection document manager", false, "CollectionDocumentService");

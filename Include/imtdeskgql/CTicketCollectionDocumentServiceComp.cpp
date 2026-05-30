@@ -31,7 +31,7 @@ namespace imtdeskgql
 
 // protected methods
 
-// reimplemented (CGraphQlHandlerCompBase)
+// reimplemented (CTicketCollectionDocumentServiceGqlHandlerCompBase)
 
 sdl::V1_0::imtdesk::CTicketData CTicketCollectionDocumentServiceComp::OnGetTicketRepresentation(
 			const sdl::V1_0::imtdesk::CGetTicketRepresentationGqlRequest& getTicketRepresentationRequest,

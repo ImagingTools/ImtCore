@@ -15,10 +15,10 @@ namespace imtdeskgql
 
 
 class CEntityContextTicketsControllerComp:
-		public sdl::V1_0::imtdesk::CGraphQlHandlerCompBase
+		public sdl::V1_0::imtdesk::CImtDeskGqlHandlerCompBase
 {
 public:
-	typedef sdl::V1_0::imtdesk::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtdesk::CImtDeskGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CEntityContextTicketsControllerComp);
 		I_ASSIGN(m_ticketCollectionCompPtr, "TicketCollection", "Ticket collection", true, "TicketCollection");
@@ -30,7 +30,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::V1_0::imtdesk::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtdesk::CImtDeskGqlHandlerCompBase)
 	virtual sdl::V1_0::imtdesk::CEntityContextTicketsPayload OnEntityContextTickets(
 				const sdl::V1_0::imtdesk::CEntityContextTicketsGqlRequest& entityContextTicketsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

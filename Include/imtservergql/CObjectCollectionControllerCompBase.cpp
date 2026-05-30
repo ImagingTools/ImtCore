@@ -334,7 +334,7 @@ void CObjectCollectionControllerCompBase::OnComponentCreated()
 }
 
 
-// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase)
 
 sdl::V1_0::imtbase::CDuplicateElementsPayload CObjectCollectionControllerCompBase::OnDuplicateElements(
 			const sdl::V1_0::imtbase::CDuplicateElementsGqlRequest& duplicateElementsRequest,

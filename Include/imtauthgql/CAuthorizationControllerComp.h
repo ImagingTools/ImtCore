@@ -16,10 +16,10 @@ namespace imtauthgql
 {
 
 
-class CAuthorizationControllerComp: public sdl::V1_0::imtauth::CGraphQlHandlerCompBase
+class CAuthorizationControllerComp: public sdl::V1_0::imtauth::CAuthorizationGqlHandlerCompBase
 {
 public:
-	typedef sdl::V1_0::imtauth::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtauth::CAuthorizationGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CAuthorizationControllerComp);
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection", true, "UserCollection");
@@ -40,7 +40,7 @@ protected:
 				const QByteArray& productId,
 				QString& errorMessage) const;
 
-	// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtauth::CAuthorizationGqlHandlerCompBase)
 	virtual sdl::V1_0::imtauth::CAuthorizationPayload OnAuthorization(
 				const sdl::V1_0::imtauth::CAuthorizationGqlRequest& authorizationRequest,
 				const imtgql::CGqlRequest& gqlRequest,

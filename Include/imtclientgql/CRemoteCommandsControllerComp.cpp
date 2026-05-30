@@ -9,7 +9,7 @@ namespace imtclientgql
 
 // protected methods
 
-// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CCommandsGqlHandlerCompBase)
 
 bool CRemoteCommandsControllerComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {

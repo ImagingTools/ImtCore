@@ -13,10 +13,10 @@ namespace imtservergql
 {
 
 
-class CApplicationInfoControllerComp: public sdl::V1_0::imtapp::CGraphQlHandlerCompBase
+class CApplicationInfoControllerComp: public sdl::V1_0::imtapp::CApplicationGqlHandlerCompBase
 {
 public:
-	using BaseClass = sdl::V1_0::imtapp::CGraphQlHandlerCompBase;
+	using BaseClass = sdl::V1_0::imtapp::CApplicationGqlHandlerCompBase;
 	using ApplicationInfo = sdl::V1_0::imtapp::CApplicationInfo;
 
 	I_BEGIN_COMPONENT(CApplicationInfoControllerComp);
@@ -25,7 +25,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::V1_0::imtapp::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtapp::CApplicationGqlHandlerCompBase)
 	virtual ApplicationInfo OnGetApplicationInfo(
 				const sdl::V1_0::imtapp::CGetApplicationInfoGqlRequest& getApplicationInfoRequest,
 				const imtgql::CGqlRequest& gqlRequest,

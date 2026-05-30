@@ -11,10 +11,10 @@ namespace imtservergql
 {
 
 
-class CCommandsControllerComp: public sdl::V1_0::imtbase::CGraphQlHandlerCompBase
+class CCommandsControllerComp: public sdl::V1_0::imtbase::CCommandsGqlHandlerCompBase
 {
 public:
-	typedef sdl::V1_0::imtbase::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtbase::CCommandsGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CCommandsControllerComp);
 		I_ASSIGN(m_guiElementContainerCompPtr, "GuiElementContainer", "GUI element  container", true, "GuiElementContainer");
@@ -22,7 +22,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtbase::CCommandsGqlHandlerCompBase)
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 	virtual sdl::V1_0::imtbase::CGuiElementContainer OnGetCommands(
 				const sdl::V1_0::imtbase::CGetCommandsGqlRequest& getCommandsRequest,

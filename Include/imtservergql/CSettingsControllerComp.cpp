@@ -17,7 +17,7 @@ namespace imtservergql
 
 // protected methods
 
-// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CSettingsGqlHandlerCompBase)
 
 sdl::V1_0::imtbase::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
 			const sdl::V1_0::imtbase::CSetSettingsGqlRequest& setSettingsRequest,

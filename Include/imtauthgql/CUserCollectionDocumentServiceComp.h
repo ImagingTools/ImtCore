@@ -21,17 +21,17 @@ namespace imtauthgql
  * CollectionDocumentManager holds for a given documentId.
  */
 class CUserCollectionDocumentServiceComp:
-			public sdl::V1_0::imtauth::CGraphQlHandlerCompBase
+			public sdl::V1_0::imtauth::CUserCollectionDocumentServiceGqlHandlerCompBase
 {
 public:
-	typedef sdl::V1_0::imtauth::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtauth::CUserCollectionDocumentServiceGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CUserCollectionDocumentServiceComp)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentService", "Collection document manager", false, "CollectionDocumentService");
 	I_END_COMPONENT
 
 protected:
-	// reimplemented (CGraphQlHandlerCompBase)
+	// reimplemented (CUserCollectionDocumentServiceGqlHandlerCompBase)
 	virtual sdl::V1_0::imtauth::CUserData OnGetUserRepresentation(
 				const sdl::V1_0::imtauth::CGetUserRepresentationGqlRequest& getUserRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

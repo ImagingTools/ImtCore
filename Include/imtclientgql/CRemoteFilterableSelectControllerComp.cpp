@@ -28,7 +28,7 @@ bool CRemoteFilterableSelectControllerComp::IsRequestSupported(const imtgql::CGq
 }
 
 
-// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CFilterableSelectGqlHandlerCompBase)
 
 sdl::V1_0::imtbase::CGetSelectableItemsPayload CRemoteFilterableSelectControllerComp::OnGetSelectableItems(
 			const sdl::V1_0::imtbase::CGetSelectableItemsGqlRequest& /*getSelectableItemsRequest*/,

@@ -132,7 +132,7 @@ bool CRoleCollectionControllerComp::FillObjectFromRepresentation(
 }
 
 
-// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase)
 
 sdl::V1_0::imtbase::CVisualStatus CRoleCollectionControllerComp::OnGetObjectVisualStatus(
 			const sdl::V1_0::imtbase::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,

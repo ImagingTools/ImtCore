@@ -9,7 +9,7 @@ namespace imtclientgql
 
 // protected methods
 
-// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CDocumentRevisionGqlHandlerCompBase)
 
 sdl::V1_0::imtbase::CRevisionInfoList CRemoteDocumentRevisionControllerComp::OnGetRevisionInfoList(
 			const sdl::V1_0::imtbase::CGetRevisionInfoListGqlRequest& /*getRevisionInfoListRequest*/,

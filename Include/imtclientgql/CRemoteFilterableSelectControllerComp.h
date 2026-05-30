@@ -12,10 +12,10 @@ namespace imtclientgql
 
 class CRemoteFilterableSelectControllerComp:
 		public TClientRequestManagerCompWrap<
-						sdl::V1_0::imtbase::CGraphQlHandlerCompBase>
+						sdl::V1_0::imtbase::CFilterableSelectGqlHandlerCompBase>
 {
 public:
-	typedef TClientRequestManagerCompWrap<sdl::V1_0::imtbase::CGraphQlHandlerCompBase> BaseClass;
+	typedef TClientRequestManagerCompWrap<sdl::V1_0::imtbase::CFilterableSelectGqlHandlerCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CRemoteFilterableSelectControllerComp);
 		I_ASSIGN_MULTI_0(m_collectionIdsAttrPtr, "CollectionIds", "Collection ID to match incoming requests", true);
@@ -25,7 +25,7 @@ public:
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 
 protected:
-	// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtbase::CFilterableSelectGqlHandlerCompBase)
 	virtual sdl::V1_0::imtbase::CGetSelectableItemsPayload OnGetSelectableItems(
 				const sdl::V1_0::imtbase::CGetSelectableItemsGqlRequest& getSelectableItemsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

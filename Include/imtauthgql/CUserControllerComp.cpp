@@ -14,7 +14,7 @@ namespace imtauthgql
 {
 
 
-// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CUsersGqlHandlerCompBase)
 
 sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword(
 			const sdl::V1_0::imtauth::CChangePasswordGqlRequest& changePasswordRequest,

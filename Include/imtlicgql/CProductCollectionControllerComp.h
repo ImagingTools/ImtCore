@@ -24,7 +24,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase)
 	virtual sdl::V1_0::imtbase::CImportObjectPayload OnImportObject(
 				const sdl::V1_0::imtbase::CImportObjectGqlRequest& importObjectRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

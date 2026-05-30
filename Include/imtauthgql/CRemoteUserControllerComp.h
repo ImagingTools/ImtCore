@@ -15,10 +15,10 @@ namespace imtauthgql
 class CRemoteUserControllerComp:
 			virtual public imtauth::ISuperuserProvider,
 			public imtclientgql::TClientRequestManagerCompWrap<
-						sdl::V1_0::imtauth::CGraphQlHandlerCompBase>
+						sdl::V1_0::imtauth::CUsersGqlHandlerCompBase>
 {
 public:
-	typedef imtclientgql::TClientRequestManagerCompWrap<sdl::V1_0::imtauth::CGraphQlHandlerCompBase> BaseClass;
+	typedef imtclientgql::TClientRequestManagerCompWrap<sdl::V1_0::imtauth::CUsersGqlHandlerCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CRemoteUserControllerComp);
 	I_END_COMPONENT;
@@ -28,7 +28,7 @@ protected:
 	virtual ExistsStatus SuperuserExists(QString& errorMessage) const override;
 	virtual QByteArray GetSuperuserId() const override;
 
-	// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtauth::CUsersGqlHandlerCompBase)
 	virtual sdl::V1_0::imtauth::CChangePasswordPayload OnChangePassword(
 				const sdl::V1_0::imtauth::CChangePasswordGqlRequest& changePasswordRequest,
 				const imtgql::CGqlRequest& gqlRequest,

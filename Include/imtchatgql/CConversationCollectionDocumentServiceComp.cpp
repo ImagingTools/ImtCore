@@ -17,7 +17,7 @@ namespace imtchatgql
 
 // protected methods
 
-// reimplemented (CGraphQlHandlerCompBase)
+// reimplemented (CConversationCollectionDocumentServiceGqlHandlerCompBase)
 
 sdl::V1_0::imtchat::CConversationData CConversationCollectionDocumentServiceComp::OnGetConversationRepresentation(
 			const sdl::V1_0::imtchat::CGetConversationRepresentationGqlRequest& getConversationRepresentationRequest,

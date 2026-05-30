@@ -26,11 +26,11 @@ namespace imtdeskgql
 
 
 class CTicketCollectionDocumentServiceComp: 
-			public sdl::V1_0::imtdesk::CGraphQlHandlerCompBase,
+			public sdl::V1_0::imtdesk::CTicketCollectionDocumentServiceGqlHandlerCompBase,
 			virtual public imtdoc::IDocumentServiceEventHandler
 {
 public:
-	typedef sdl::V1_0::imtdesk::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtdesk::CTicketCollectionDocumentServiceGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CTicketCollectionDocumentServiceComp)
 		I_REGISTER_INTERFACE(imtdoc::IDocumentServiceEventHandler)

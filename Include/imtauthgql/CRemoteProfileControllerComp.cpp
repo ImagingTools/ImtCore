@@ -12,7 +12,7 @@ namespace imtauthgql
 {
 
 
-// reimplemented (sdl::V1_0::imtauth::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CProfileGqlHandlerCompBase)
 
 sdl::V1_0::imtauth::CProfileData CRemoteProfileControllerComp::OnGetProfile(
 			const sdl::V1_0::imtauth::CGetProfileGqlRequest& /*getProfileRequest*/,

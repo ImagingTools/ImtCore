@@ -12,7 +12,7 @@ namespace imtservergql
 {
 
 
-class CGqlSearchControllerComp: public sdl::V1_0::imtbase::CGraphQlHandlerCompBase
+class CGqlSearchControllerComp: public sdl::V1_0::imtbase::CSearchGqlHandlerCompBase
 {
 public:
 	typedef imtservergql::CGqlRequestHandlerCompBase BaseClass;
@@ -22,7 +22,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::V1_0::imtbase::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtbase::CSearchGqlHandlerCompBase)
 	virtual sdl::V1_0::imtbase::CSearchResults OnSearch(
 				const sdl::V1_0::imtbase::CSearchGqlRequest& searchRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
