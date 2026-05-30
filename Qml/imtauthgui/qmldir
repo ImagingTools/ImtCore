@@ -49,6 +49,7 @@ TenantRolesPage 1.0 TenantRolesPage.qml
 TenantGroupsPage 1.0 TenantGroupsPage.qml
 TenantPermissionsPage 1.0 TenantPermissionsPage.qml
 TenantCrossOrgGrantsPage 1.0 TenantCrossOrgGrantsPage.qml
+TenantContractsPage 1.0 TenantContractsPage.qml
 TenantRelationshipsPage 1.0 TenantRelationshipsPage.qml
 TenantConnectionRequestsPage 1.0 TenantConnectionRequestsPage.qml
 TenantMessagesPage 1.0 TenantMessagesPage.qml

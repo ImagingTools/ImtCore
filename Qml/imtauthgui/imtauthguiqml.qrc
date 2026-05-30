@@ -46,6 +46,7 @@
 	<file alias="imtauthgui/TenantGroupsPage.qml">TenantGroupsPage.qml</file>
 	<file alias="imtauthgui/TenantPermissionsPage.qml">TenantPermissionsPage.qml</file>
 	<file alias="imtauthgui/TenantCrossOrgGrantsPage.qml">TenantCrossOrgGrantsPage.qml</file>
+	<file alias="imtauthgui/TenantContractsPage.qml">TenantContractsPage.qml</file>
 	<file alias="imtauthgui/TenantRelationshipsPage.qml">TenantRelationshipsPage.qml</file>
 	<file alias="imtauthgui/TenantConnectionRequestsPage.qml">TenantConnectionRequestsPage.qml</file>
 	<file alias="imtauthgui/TenantMessagesPage.qml">TenantMessagesPage.qml</file>

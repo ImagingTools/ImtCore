@@ -82,6 +82,11 @@ QtObject {
 	signal crossOrgGrantRevoked(string grantId)
 	signal crossOrgGrantsReceived(var grants)
 
+	signal contractCreated(string contractId)
+	signal contractStatusUpdated(string contractId)
+	signal contractTerminated(string contractId)
+	signal contractsReceived(var contracts)
+
 	signal tenantRelationshipAdded(string relationshipId)
 	signal tenantRelationshipRemoved(string relationshipId)
 	signal tenantRelationshipsReceived(var relationships)
@@ -868,6 +873,146 @@ QtObject {
 		root.__pendingRevokeGrantId = grantId || ""
 		root.__revokeCrossOrgGrantInput.m_grantId = grantId || ""
 		root.__revokeCrossOrgGrantSender.send(root.__revokeCrossOrgGrantInput)
+	}
+
+	// =========================================================================
+	// Cooperation contracts (Tenants.sdl: CreateContract / UpdateContractStatus
+	// / TerminateContract / GetContracts)
+	// =========================================================================
+
+	property ListModel contractsModel: ListModel {}
+
+	property CreateContractInput __createContractInput: CreateContractInput {}
+	property GqlSdlRequestSender __createContractSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_createContract
+
+		sdlObjectComp: Component {
+			CreateContractPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.contractCreated(m_contractId || "")
+					}
+				}
+			}
+		}
+	}
+
+	property UpdateContractStatusInput __updateContractStatusInput: UpdateContractStatusInput {}
+	property string __pendingUpdateContractId: ""
+	property GqlSdlRequestSender __updateContractStatusSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_updateContractStatus
+
+		sdlObjectComp: Component {
+			UpdateContractStatusPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.contractStatusUpdated(root.__pendingUpdateContractId)
+					}
+				}
+			}
+		}
+	}
+
+	property TerminateContractInput __terminateContractInput: TerminateContractInput {}
+	property string __pendingTerminateContractId: ""
+	property GqlSdlRequestSender __terminateContractSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_terminateContract
+
+		sdlObjectComp: Component {
+			TerminateContractPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.contractTerminated(root.__pendingTerminateContractId)
+					}
+				}
+			}
+		}
+	}
+
+	property GetContractsInput __getContractsInput: GetContractsInput {}
+	property GqlSdlRequestSender __getContractsSender: GqlSdlRequestSender {
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_getContracts
+
+		sdlObjectComp: Component {
+			GetContractsPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.__populateContractsModel(m_contracts)
+					}
+				}
+			}
+		}
+	}
+
+	function __populateContractsModel(contracts) {
+		root.contractsModel.clear()
+		if (contracts) {
+			for (var i = 0; i < contracts.length; ++i) {
+				var contract = contracts[i]
+				if (!contract)
+					continue
+				root.contractsModel.append({
+					"contractId": contract.m_id || "",
+					"relationshipId": contract.m_relationshipId || "",
+					"sourceTenantId": contract.m_sourceTenantId || "",
+					"targetTenantId": contract.m_targetTenantId || "",
+					"status": contract.m_status || ContractStatusEnum.s_draft,
+					"scope": contract.m_scope || "",
+					"validFrom": contract.m_validFrom || "",
+					"validUntil": contract.m_validUntil || "",
+					"description": contract.m_description || "",
+					"terms": contract.m_terms || "",
+					"createdAt": contract.m_createdAt || "",
+					"updatedAt": contract.m_updatedAt || ""
+				})
+			}
+		}
+		root.contractsReceived(contracts || [])
+	}
+
+	function fetchContracts(tenantId) {
+		root.__getContractsInput.m_tenantId = tenantId || root.tenantId || ""
+		root.__getContractsSender.send(root.__getContractsInput)
+	}
+
+	function createContract(relationshipId, sourceTenantId, targetTenantId, scope, validFrom, validUntil, description, terms) {
+		root.__createContractInput.m_relationshipId = relationshipId || ""
+		root.__createContractInput.m_sourceTenantId = sourceTenantId || ""
+		root.__createContractInput.m_targetTenantId = targetTenantId || ""
+		root.__createContractInput.m_scope = scope || ""
+		root.__createContractInput.m_validFrom = validFrom || ""
+		root.__createContractInput.m_validUntil = validUntil || ""
+		root.__createContractInput.m_description = description || ""
+		root.__createContractInput.m_terms = terms || ""
+		root.__createContractSender.send(root.__createContractInput)
+	}
+
+	function updateContractStatus(contractId, status) {
+		root.__pendingUpdateContractId = contractId || ""
+		root.__updateContractStatusInput.m_contractId = contractId || ""
+		root.__updateContractStatusInput.m_status = status || ContractStatusEnum.s_active
+		root.__updateContractStatusSender.send(root.__updateContractStatusInput)
+	}
+
+	function terminateContract(contractId) {
+		root.__pendingTerminateContractId = contractId || ""
+		root.__terminateContractInput.m_contractId = contractId || ""
+		root.__terminateContractSender.send(root.__terminateContractInput)
 	}
 
 	// =========================================================================

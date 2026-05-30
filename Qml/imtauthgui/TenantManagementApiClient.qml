@@ -68,6 +68,12 @@ QtObject {
 	signal crossOrgGrantRevoked(string grantId)
 	signal crossOrgGrantsReceived(var grants)
 
+	// --- Cooperation contracts ---
+	signal contractCreated(string contractId)
+	signal contractStatusUpdated(string contractId)
+	signal contractTerminated(string contractId)
+	signal contractsReceived(var contracts)
+
 	// --- Tenant relationships (asymmetric) ---
 	signal tenantRelationshipAdded(string relationshipId)
 	signal tenantRelationshipRemoved(string relationshipId)
@@ -143,6 +149,15 @@ QtObject {
 	function fetchCrossOrgGrants(tenantId) {}
 	function createCrossOrgGrant(sourceTenantId, targetTenantId, relationshipId, accessLevel, resourceScope, targetTeamId, description, expiresAt) {}
 	function revokeCrossOrgGrant(grantId) {}
+
+	// --- Cooperation contracts ---
+	// Model holding the contracts for the current tenant (see
+	// contractsReceived for the raw payload).
+	property var contractsModel: null
+	function fetchContracts(tenantId) {}
+	function createContract(relationshipId, sourceTenantId, targetTenantId, scope, validFrom, validUntil, description, terms) {}
+	function updateContractStatus(contractId, status) {}
+	function terminateContract(contractId) {}
 
 	// --- Tenant relationships (asymmetric) ---
 	// Model holding the relationships for the current tenant (see
