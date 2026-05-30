@@ -37,7 +37,7 @@ public:
 
 	virtual bool GetNearestOffset(quint64& offset, quint64 startOffset = 0) override;
 	virtual bool GetNextItemOffset(quint64& offset, quint64 startOffset = -1) override;
-	virtual bool GetPreviosItemOffset(quint64& offset, quint64 startOffset = 0xffffffffffffff) override;
+	virtual bool GetPreviousItemOffset(quint64& offset, quint64 startOffset = 0xffffffffffffff) override;
 
 	// reimplemented (imtmdbx::IMaskContainer)
 	virtual void AddMask(IMask* mask, bool isInversion = false) override;

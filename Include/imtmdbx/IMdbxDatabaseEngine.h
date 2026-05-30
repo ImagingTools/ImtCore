@@ -9,10 +9,23 @@ namespace imtmdbx
 {
 
 
+/**
+ * \brief Interface for accessing the MDBX database environment.
+ *
+ * Provides access to the underlying mdbx::env_managed instance,
+ * which is required for starting transactions and opening tables.
+ */
 class IMdbxDatabaseEngine
 {
 
 public:
+	virtual ~IMdbxDatabaseEngine() = default;
+
+	/**
+	 * \brief Returns a reference to the managed MDBX environment.
+	 * \warning Callers should prefer StartScopedRead() (on CMdbxDatabaseEngine)
+	 *          over direct env.start_read() to avoid exceeding the reader limit.
+	 */
 	virtual mdbx::env_managed& GetEnv() = 0;
 };
 

@@ -14,8 +14,6 @@ namespace imtmdbx
 {
 
 
-extern int getItemCount;
-
 class CMask: virtual public IMask, public CDocumentTable
 {
 public:
@@ -36,7 +34,7 @@ protected:
 	virtual bool SetItem(quint64 offset, quint64 item) override;
 	virtual bool GetNearestOffset(quint64& offset, quint64 startOffset = 0) override;
 	virtual bool GetNextItemOffset(quint64& offset, quint64 startOffset = -1) override;
-	virtual bool GetPreviosItemOffset(quint64& offset, quint64 startOffset = 0xffffffff) override;
+	virtual bool GetPreviousItemOffset(quint64& offset, quint64 startOffset = 0xffffffff) override;
 
 protected:
 	QMap<quint64,quint64> m_cache;

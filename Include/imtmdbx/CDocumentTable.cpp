@@ -2,6 +2,9 @@
 #include <imtmdbx/CDocumentTable.h>
 
 
+// STL includes
+#include <limits>
+
 // Qt includes
 #include <QDebug>
 
@@ -35,14 +38,7 @@ CDocumentTable::CDocumentTable(
 
 CDocumentTable::~CDocumentTable()
 {
-	try{
-		m_cursor.close();
-		if(m_hasIndex){
-			m_cursorIndex.close();
-		}
-	}
-	catch(...){
-	}
+	// mdbx::cursor_managed is RAII — cursors close automatically on destruction
 }
 
 
@@ -68,13 +64,12 @@ quint64 CDocumentTable::AddDocument(const QByteArray& key, const QByteArray& dat
 
 QByteArray CDocumentTable::GetDocument()
 {
-	QByteArray doc = QByteArray();
+	QByteArray doc;
 
 	mdbx::cursor::move_result result = m_cursor.current(false);
-	if (result.done){
-		std::string value;
-		value = result.value.as_string();
-		doc = QByteArray::fromStdString(value);
+	if (result.done) {
+		doc = QByteArray(static_cast<const char*>(result.value.data()),
+						 static_cast<int>(result.value.size()));
 	}
 
 	return doc;
@@ -83,14 +78,13 @@ QByteArray CDocumentTable::GetDocument()
 
 QByteArray CDocumentTable::GetDocument(quint64 key)
 {
-	QByteArray doc = QByteArray();
+	QByteArray doc;
 	mdbx::slice keySlice(&key, 8);
 
 	mdbx::cursor::move_result result = m_cursor.find(keySlice, false);
-	if (result.done){
-		std::string value;
-		value = result.value.as_string();
-		doc = QByteArray::fromStdString(value);
+	if (result.done) {
+		doc = QByteArray(static_cast<const char*>(result.value.data()),
+						 static_cast<int>(result.value.size()));
 	}
 
 	return doc;
@@ -99,14 +93,13 @@ QByteArray CDocumentTable::GetDocument(quint64 key)
 
 QByteArray CDocumentTable::GetDocument(const QByteArray& key)
 {
-	QByteArray doc = QByteArray();
+	QByteArray doc;
 	mdbx::slice keySlice(key.data(), key.length());
 
 	mdbx::cursor::move_result result = m_cursor.find(keySlice, false);
-	if (result.done){
-		std::string value;
-		value = result.value.as_string();
-		doc = QByteArray::fromStdString(value);
+	if (result.done) {
+		doc = QByteArray(static_cast<const char*>(result.value.data()),
+						 static_cast<int>(result.value.size()));
 	}
 
 	return doc;
@@ -135,10 +128,9 @@ bool CDocumentTable::GetKey(QByteArray& key) const
 	}
 
 	mdbx::cursor::move_result result = m_cursor.current(false);
-	if (result.done){
-		std::string value;
-		value = result.key.as_string();
-		key = QByteArray::fromStdString(value);
+	if (result.done) {
+		key = QByteArray(static_cast<const char*>(result.key.data()),
+						 static_cast<int>(result.key.size()));
 	}
 
 	return true;
@@ -175,8 +167,6 @@ bool CDocumentTable::UpdateDocument(const QByteArray& key, const QByteArray& dat
 
 bool CDocumentTable::GetKey(quint64& key, const QByteArray& value)
 {
-	//qDebug() << "CDocumentTable::GetKey";
-
 	bool ok = false;
 
 	if(value.isEmpty()){
@@ -196,31 +186,35 @@ bool CDocumentTable::GetKey(quint64& key, const QByteArray& value)
 			}
 		}
 		else {
-			try{
+			try {
 				mdbx::cursor::move_result result = m_cursor.to_first(false);
-				if(result.done){
-					while(1){
-						quint64 keyRead;
-						std::string valueRead;
-						if (result.done){
-							keyRead = result.key.as_uint64();
-							valueRead = result.value.as_string();
-							ok = valueRead.data() == value;
-							if(ok){
+				if (result.done) {
+					while (true) {
+						if (result.done) {
+							quint64 keyRead = result.key.as_uint64();
+							QByteArray valueRead(
+								static_cast<const char*>(result.value.data()),
+								static_cast<int>(result.value.size()));
+							if (valueRead == value) {
 								key = keyRead;
-
+								ok = true;
 								break;
 							}
 						}
 
 						result = m_cursor.to_next(false);
-						if(!result.done){
+						if (!result.done) {
 							break;
 						}
 					}
 				}
 			}
-			catch(...){
+			catch (const mdbx::exception& e) {
+				qWarning() << "CDocumentTable::GetKey: mdbx exception:" << e.what();
+				return false;
+			}
+			catch (...) {
+				qWarning() << "CDocumentTable::GetKey: unknown exception";
 				return false;
 			}
 		}
@@ -255,50 +249,41 @@ bool CDocumentTable::GetLastKey(quint64& key)
 
 QByteArray CDocumentTable::GetKeyBA(const QByteArray& value)
 {
-	//qDebug() << "CDocumentTable::GetKey";
-
 	QByteArray key;
 
-	if(value.isEmpty()){
+	if (value.isEmpty()) {
 		mdbx::cursor::move_result result = m_cursor.current(false);
-		if(result.done){
-			std::string keyStr;
-			keyStr = result.key.as_string();
-			key = QByteArray::fromStdString(keyStr);
+		if (result.done) {
+			key = QByteArray(static_cast<const char*>(result.key.data()),
+							 static_cast<int>(result.key.size()));
 		}
 	}
-	else {//not empty value
-		if(m_hasIndex){
+	else {
+		if (m_hasIndex) {
 			mdbx::slice valueSlice(value);
 			mdbx::cursor::move_result result = m_cursorIndex.find(valueSlice, false);
-			if(result.done){
-				std::string valueStr;
-				valueStr = result.value.as_string();
-				key = QByteArray::fromStdString(valueStr);
+			if (result.done) {
+				key = QByteArray(static_cast<const char*>(result.value.data()),
+								 static_cast<int>(result.value.size()));
 			}
 		}
 		else {
 			mdbx::cursor::move_result result = m_cursor.to_first(false);
-			if(result.done){
-				while(1){
-					QByteArray keyRead;
-					QByteArray valueRead;
-					if (result.done){
-						std::string keyStr;
-						std::string valueStr;
-						keyStr = result.key.as_string();
-						valueStr = result.value.as_string();
-						keyRead = QByteArray::fromStdString(keyStr);
-						valueRead = QByteArray::fromStdString(valueStr);
-						if(valueRead == value){
-							key = keyRead;
-
+			if (result.done) {
+				while (true) {
+					if (result.done) {
+						QByteArray valueRead(
+							static_cast<const char*>(result.value.data()),
+							static_cast<int>(result.value.size()));
+						if (valueRead == value) {
+							key = QByteArray(static_cast<const char*>(result.key.data()),
+											 static_cast<int>(result.key.size()));
 							break;
 						}
 					}
 
 					result = m_cursor.to_next(false);
-					if(!result.done){
+					if (!result.done) {
 						break;
 					}
 				}
@@ -312,39 +297,39 @@ QByteArray CDocumentTable::GetKeyBA(const QByteArray& value)
 
 bool CDocumentTable::CreateIndex()
 {
-	// qDebug() << "CDocumentTable::CreateIndex";
-
-	try{
-		if(m_hasIndex){
-			qDebug() << "Index exists!";
-
+	try {
+		if (m_hasIndex) {
+			qWarning() << "CDocumentTable::CreateIndex: index already exists for table" << m_tableName;
 			return false;
 		}
 
 		mdbx::cursor::move_result result = m_cursor.to_first();
 
-		while(1){
-			quint64 keyRead;
-			std::string valueRead;
-			if (result.done){
-				keyRead = result.key.as_uint64();
-				valueRead = result.value.as_string();
-				mdbx::slice keyIndex (valueRead.data());
-				mdbx::slice valueIndex (&keyRead, 8);
+		while (true) {
+			if (result.done) {
+				quint64 keyRead = result.key.as_uint64();
+				std::string valueRead = result.value.as_string();
+				mdbx::slice keyIndex(valueRead.data());
+				mdbx::slice valueIndex(&keyRead, 8);
 				mdbx::map_handle mapHandleIndex = m_txn.create_map(
-														(m_tableName + s_index).toStdString(),
-														m_keyMode,
-														m_valueMode);
+					(m_tableName + s_index).toStdString(),
+					m_keyMode,
+					m_valueMode);
 				m_txn.put(mapHandleIndex, keyIndex, valueIndex, mdbx::put_mode::upsert);
 			}
 
 			result = m_cursor.to_next();
-			if(!result.done){
+			if (!result.done) {
 				break;
 			}
 		}
 	}
-	catch(...){
+	catch (const mdbx::exception& e) {
+		qWarning() << "CDocumentTable::CreateIndex: mdbx exception:" << e.what();
+		return false;
+	}
+	catch (...) {
+		qWarning() << "CDocumentTable::CreateIndex: unknown exception";
 		return false;
 	}
 
@@ -457,27 +442,31 @@ bool CDocumentTable::MoveToValue(const QByteArray& value)
 
 	}// has index
 	else {// has no index
-		try{
+		try {
 			mdbx::cursor::move_result result = m_cursor.to_first(false);
-			if(result.done){
-				while(1){
-					std::string valueRead;
-					if (result.done){
-						valueRead = result.value.as_string();
+			if (result.done) {
+				while (true) {
+					if (result.done) {
+						std::string valueRead = result.value.as_string();
 						ok = valueRead == value.toStdString();
-						if(ok){
+						if (ok) {
 							break;
 						}
 					}
 
 					result = m_cursor.to_next(false);
-					if(!result.done){
+					if (!result.done) {
 						break;
 					}
 				}
 			}
 		}
-		catch(...){
+		catch (const mdbx::exception& e) {
+			qWarning() << "CDocumentTable::MoveToValue: mdbx exception:" << e.what();
+			return false;
+		}
+		catch (...) {
+			qWarning() << "CDocumentTable::MoveToValue: unknown exception";
 			return false;
 		}
 	}
@@ -507,7 +496,12 @@ bool CDocumentTable::RemoveDocument()
 		}
 
 	}
+	catch (const mdbx::exception& e) {
+		qWarning() << "CDocumentTable::RemoveDocument: mdbx exception:" << e.what();
+		return false;
+	}
 	catch (...) {
+		qWarning() << "CDocumentTable::RemoveDocument: unknown exception";
 		return false;
 	}
 
@@ -545,8 +539,12 @@ bool CDocumentTable::RemoveDocument(quint64 key, const QByteArray& value)
 			}
 		}
 	}
-
+	catch (const mdbx::exception& e) {
+		qWarning() << "CDocumentTable::RemoveDocument: mdbx exception:" << e.what();
+		return false;
+	}
 	catch (...) {
+		qWarning() << "CDocumentTable::RemoveDocument: unknown exception";
 		return false;
 	}
 
@@ -585,7 +583,12 @@ bool CDocumentTable::RemoveDocument(const QByteArray& key, const QByteArray& val
 			}
 		}
 	}
+	catch (const mdbx::exception& e) {
+		qWarning() << "CDocumentTable::RemoveDocument: mdbx exception:" << e.what();
+		return false;
+	}
 	catch (...) {
+		qWarning() << "CDocumentTable::RemoveDocument: unknown exception";
 		return false;
 	}
 
@@ -595,14 +598,17 @@ bool CDocumentTable::RemoveDocument(const QByteArray& key, const QByteArray& val
 
 bool CDocumentTable::CloseTable(mdbx::env_managed& env)
 {
-	try{
+	try {
 		m_cursor.close();
 		env.close_map(m_mapHandle);
 
 		return true;
 	}
-	catch(...){
-		//qDebug() << "НЕ УДАЛОСЬ ЗАКРЫТЬ ТАБЛИЦУ";
+	catch (const mdbx::exception& e) {
+		qWarning() << "CDocumentTable::CloseTable: mdbx exception:" << e.what();
+	}
+	catch (...) {
+		qWarning() << "CDocumentTable::CloseTable: unknown exception";
 	}
 
 	return false;
@@ -611,15 +617,7 @@ bool CDocumentTable::CloseTable(mdbx::env_managed& env)
 
 void CDocumentTable::Reopen()
 {
-	try {
-		m_cursor.close();
-		if(m_hasIndex){
-			m_cursorIndex.close();
-		}
-	}
-	catch(...){
-	}
-
+	// Reassigning cursor_managed objects in OpenCursors() will close the old cursors via RAII
 	OpenCursors();
 }
 
@@ -663,12 +661,12 @@ void CDocumentTable::OpenCursors()
 
 quint64 CDocumentTable::AddDocument(const char *data, int count, const QByteArray& keyStr)
 {
-	try{
+	try {
 		mdbx::cursor::move_result result = m_cursor.to_last(false);
 
 		quint64 key = 0;
 
-		if(result.done && keyStr.isEmpty()){
+		if (result.done && keyStr.isEmpty()) {
 			key = result.key.as_uint64();
 			key++;
 		}
@@ -676,18 +674,18 @@ quint64 CDocumentTable::AddDocument(const char *data, int count, const QByteArra
 		mdbx::slice keySlice(&key, 8);
 		mdbx::slice keyStrSlice(keyStr.data(), keyStr.length());
 		mdbx::slice valueSlice(data, count);
-		if(keyStr.isEmpty()){
+		if (keyStr.isEmpty()) {
 			m_txn.put(m_mapHandle, keySlice, valueSlice, mdbx::put_mode::upsert);
 		}
 		else {
 			m_txn.put(m_mapHandle, keyStrSlice, valueSlice, mdbx::put_mode::upsert);
 		}
 
-		if(m_hasIndex){
+		if (m_hasIndex) {
 			mdbx::slice keySliceIndex(data, count);
 			mdbx::slice valueSliceIndex(&key, 8);
 			mdbx::slice valueStrSliceIndex(keyStr.data(), keyStr.length());
-			if(keyStr.isEmpty()){
+			if (keyStr.isEmpty()) {
 				m_txn.put(m_mapHandleIndex, keySliceIndex, valueSliceIndex, mdbx::put_mode::upsert);
 			}
 			else {
@@ -697,51 +695,57 @@ quint64 CDocumentTable::AddDocument(const char *data, int count, const QByteArra
 
 		return key;
 	}
-	catch(...){
+	catch (const mdbx::exception& e) {
+		qWarning() << "CDocumentTable::AddDocument: mdbx exception:" << e.what();
+	}
+	catch (...) {
+		qWarning() << "CDocumentTable::AddDocument: unknown exception";
 	}
 
-	return -1;
+	return std::numeric_limits<quint64>::max();
 }
 
 
 bool CDocumentTable::UpdateDocument(const char *key, int count, const QByteArray& data)
 {
-	// qDebug() << "CDocumentTable::UpdateDocument";
-
-	try{
+	try {
 		mdbx::slice keySlice(key, count);
 		mdbx::slice valueSlice(data.data(), data.length());
 		mdbx::slice valueSliceOld;
 
 		mdbx::cursor::move_result result = m_cursor.find(keySlice, false);
 		bool oldValueFound = result.done;
-		if (oldValueFound){
+		if (oldValueFound) {
 			valueSliceOld = result.value;
 		}
 
-		try{
+		try {
 			m_txn.update(m_mapHandle, keySlice, valueSlice);
 		}
-		catch(...){
-			Q_ASSERT_X(false, "Index out of range", "imtmdbx::CDocumentTable::UpdateDocument");
-
+		catch (const mdbx::exception& e) {
+			qWarning() << "CDocumentTable::UpdateDocument: update failed:" << e.what();
 			return false;
 		}
 
-		if(m_hasIndex){
-			if(oldValueFound){
+		if (m_hasIndex) {
+			if (oldValueFound) {
 				mdbx::cursor::move_result resultIndex = m_cursorIndex.find(valueSliceOld, false);
-				if(resultIndex.done){
+				if (resultIndex.done) {
 					m_cursorIndex.erase();
 				}
 				resultIndex = m_cursorIndex.to_last(false);
-				if(resultIndex.done){
+				if (resultIndex.done) {
 					m_txn.put(m_mapHandleIndex, valueSlice, keySlice, mdbx::put_mode::upsert);
 				}
 			}
 		}
 	}
-	catch(...){
+	catch (const mdbx::exception& e) {
+		qWarning() << "CDocumentTable::UpdateDocument: mdbx exception:" << e.what();
+		return false;
+	}
+	catch (...) {
+		qWarning() << "CDocumentTable::UpdateDocument: unknown exception";
 		return false;
 	}
 
@@ -753,10 +757,10 @@ bool CDocumentTable::Exists(const QString& name)
 {
 	bool ok = true;
 
-	try{
-		/*mdbx::map_handle mapHandle =*/m_txn.open_map(name.toStdString(), m_keyMode, m_valueMode);
+	try {
+		m_txn.open_map(name.toStdString(), m_keyMode, m_valueMode);
 	}
-	catch (...){
+	catch (...) {
 		ok = false;
 	}
 

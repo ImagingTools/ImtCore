@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
+// STL includes
+#include <memory>
+
 // Qt includes
-#include "QtCore/QString"
+#include <QtCore/QString>
 
 // ACF includes
 #include <icomp/CComponentBase.h>
-#include <istd/TDelPtr.h>
 #include <ifile/IFileNameParam.h>
 
 // ImtCore includes
@@ -17,6 +19,12 @@ namespace imtmdbx
 {
 
 
+/**
+ * \brief ACF component wrapper for CMdbxDatabaseEngine.
+ *
+ * Provides the IMdbxDatabaseEngine interface within the ACF component framework.
+ * The database path is configured via the "DbPath" reference.
+ */
 class CMdbxDatabaseEngineComp: public icomp::CComponentBase, virtual public IMdbxDatabaseEngine
 {
 
@@ -36,10 +44,9 @@ protected:
 	virtual void OnComponentCreated() override;
 
 private:
-	istd::TDelPtr<CMdbxDatabaseEngine> m_databaseEngine;
+	std::unique_ptr<CMdbxDatabaseEngine> m_databaseEngine;
 
 	I_REF(ifile::IFileNameParam, m_dbPathCompPtr);
-	// I_ATTR(QByteArray, m_dbPathAttrPtr);
 };
 
 

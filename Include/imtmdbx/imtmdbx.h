@@ -5,9 +5,10 @@
 // STL includes
 #include <array>
 #include <cstdint>
+#include <limits>
 
 #if __cplusplus >= 202002L // C++20 or newer
-#include <bit.h>
+#include <bit>
 #endif
 
 #if defined(_MSC_VER)
@@ -25,19 +26,22 @@ namespace imtmdbx
 {
 
 
-// Maximum value for a 64-bit unsigned integer
-static const quint64 QUINT64_MAX = 0xffffffffffffffff;
+/// Maximum value for a 64-bit unsigned integer.
+inline constexpr quint64 QUINT64_MAX = std::numeric_limits<quint64>::max();
 
 
+/**
+ * \brief Utility functions for bit counting (population count).
+ */
 namespace BitUtils {
 
 
 /**
-	\brief	Fallback table for software bit counting.
-			Generates a lookup table for counting bits set to 1 in a byte (0-255).
-			Each entry at index i contains the number of bits set to 1 in the binary representation of i.
-			For example, table[5] = 2 since the binary representation of 5 is 101, which has two bits set to 1.
-*/
+ * \brief Generates a compile-time lookup table for counting bits set in a byte (0-255).
+ *
+ * Each entry at index i contains the number of bits set to 1 in the binary representation of i.
+ * For example, table[5] = 2 since 5 = 0b101 has two bits set.
+ */
 constexpr std::array<int, 256> MakeBitsSetTable256() {
 	std::array<int, 256> table = {};
 	for (int i = 0; i < 256; ++i) {
@@ -47,16 +51,18 @@ constexpr std::array<int, 256> MakeBitsSetTable256() {
 	return table;
 }
 
-// initialize at compile time
+/// Compile-time initialized lookup table for byte-level popcount.
 inline constexpr std::array<int, 256> BitsSetTable256 = MakeBitsSetTable256();
 
 /**
-	\brief Fallback table-based popcount (if no hardware support is available).
-			Counts the number of bits set to 1 in a 64-bit integer using a precomputed lookup table.
-			Processes the integer byte by byte (starting from the lowest), summing the counts from the table.
-	\param n - The 64-bit integer to count bits in.
-	\return The number of bits set to 1.
-*/
+ * \brief Fallback table-based popcount (if no hardware support is available).
+ *
+ * Counts the number of bits set to 1 in a 64-bit integer using a precomputed lookup table.
+ * Processes the integer byte by byte (starting from the lowest), summing the counts.
+ *
+ * \param n The 64-bit integer to count bits in.
+ * \return The number of bits set to 1.
+ */
 inline int BitCountTable(uint64_t n) {
 	return  BitsSetTable256[n & 0xff] +
 			BitsSetTable256[(n >> 8) & 0xff] +
@@ -69,15 +75,18 @@ inline int BitCountTable(uint64_t n) {
 }
 
 /**
-	\brief Counts the number of bits set to 1 in a 64-bit integer.
-			Uses hardware acceleration if available.
-			CPU instructions:
-				- __popcnt64 (MSVC)
-				- __builtin_popcountll (GCC or Clang)
-			Falls back on a lookup table method if no hardware support is available.
-	\param n - The 64-bit integer to count bits in.
-	\return The number of bits set to 1.
-*/
+ * \brief Counts the number of bits set to 1 in a 64-bit integer.
+ *
+ * Uses hardware acceleration if available:
+ *   - std::popcount (C++20)
+ *   - __popcnt64 (MSVC)
+ *   - __builtin_popcountll (GCC/Clang)
+ *
+ * Falls back to a lookup table method if no hardware support is available.
+ *
+ * \param n The 64-bit integer to count bits in.
+ * \return The number of bits set to 1.
+ */
 inline int BitCount(uint64_t n) {
 #if __cplusplus >= 202002L
 	return std::popcount(n);
@@ -91,11 +100,7 @@ inline int BitCount(uint64_t n) {
 }
 
 
-}; // namespace BitUtils
+} // namespace BitUtils
 
 
 } // namespace imtmdbx
-
-
-
-
