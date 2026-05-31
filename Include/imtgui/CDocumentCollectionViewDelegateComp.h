@@ -51,12 +51,14 @@ public:
 		I_ASSIGN(m_objectImportPersistenceCompPtr, "ImportPersistence", "Persistence used for importing documents", false, "ImportPersistence");
 		I_ASSIGN(m_objectExportPersistenceCompPtr, "ExportPersistence", "Persistence used for exporting documents", false, "ExportPersistence");
 		I_ASSIGN(m_statusIconsProviderCompPtr, "StatusIcons", "Icons for delegate visual status", false, "StatusIcons");
-		I_ASSIGN(m_documentManagerCompPtr, "DocumentManager", "Document manager", true, "DocumentManager");
+		I_ASSIGN(m_documentManagerCompPtr, "DocumentService", "Document manager", true, "DocumentService");
 		I_ASSIGN_TO(m_documentManagerModelCompPtr, m_documentManagerCompPtr, true);
 		I_ASSIGN(m_informationViewCompPtr, "InformationView", "Document summary information view", false, "InformationView");
 		I_ASSIGN(m_useCompressorAttrPtr, "UseCompressor", "If enable, use ZIP-compression for import/export of objects", true, true);
 		I_ASSIGN(m_editCommandLabelAttrPtr, "EditCommandLabel", "Label of the edit command", true, "Edit");
 		I_ASSIGN(m_editCommandDescriptionAttrPtr, "EditCommandDescription", "Description of the edit command", true, "Edit existing object");
+		I_ASSIGN(m_maxLengthRevisionCommentAttrPtr, "MaxLengthRevisionComment", "Maximum length of the revision comment when saving document", true, 1000);
+		I_ASSIGN(m_maxLengthCommentAttrPtr, "MaxLengthComment", "Maximum length of the document comment", true, 1000);
 	I_END_COMPONENT;
 
 	CDocumentCollectionViewDelegateComp();
@@ -124,10 +126,10 @@ protected:
 	};
 
 
-	class DocumentManagerObserver: public imod::TSingleModelObserverBase<idoc::IDocumentManager>
+	class DocumentServiceObserver: public imod::TSingleModelObserverBase<idoc::IDocumentManager>
 	{
 	public:
-		DocumentManagerObserver(CDocumentCollectionViewDelegateComp& parent);
+		DocumentServiceObserver(CDocumentCollectionViewDelegateComp& parent);
 
 		// reimplemented (imod::CSingleModelObserverBase)
 		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet);
@@ -177,6 +179,8 @@ protected:
 	*/
 	I_REF(idoc::IDocumentManager, m_documentManagerCompPtr);
 	I_REF(imod::IModel, m_documentManagerModelCompPtr);
+	I_ATTR(int, m_maxLengthRevisionCommentAttrPtr);
+	I_ATTR(int, m_maxLengthCommentAttrPtr);
 
 private:
 	/**
@@ -229,7 +233,7 @@ private:
 
 	ObjectPersistenceProxy m_collectionPersistence;
 
-	DocumentManagerObserver m_documentManagerObserver;
+	DocumentServiceObserver m_documentManagerObserver;
 
 	QByteArray m_closedForRestoreId;
 

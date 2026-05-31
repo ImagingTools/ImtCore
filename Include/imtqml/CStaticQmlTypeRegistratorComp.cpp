@@ -3,15 +3,19 @@
 
 
 // Qt includes
-#include<QtQml/qqml.h>
+#include <QtQml/qqml.h>
+#include <QtQml/QQmlEngine>
+#include <QtQml/QJSEngine>
 
 // ImtCore includes
+#include <imtqml/CDataModelController.h>
+#include <imtqml/CDocumentServiceController.h>
+#include <imtqml/CFileIO.h>
 #include <imtqml/CGqlModel.h>
 #include <imtqml/CGqlRequest.h>
-#include <imtqml/CRemoteFileController.h>
-#include <imtqml/CFileIO.h>
 #include <imtqml/CNetworkEventInterceptor.h>
 #include <imtqml/CQmlProcess.h>
+#include <imtqml/CRemoteFileController.h>
 
 
 namespace imtqml
@@ -54,6 +58,12 @@ void CStaticQmlTypeRegistratorComp::OnComponentCreated()
 	}
 	if (!m_registerCNetworkEventInterceptorAttrPtr.IsValid() || *m_registerCNetworkEventInterceptorAttrPtr){
 		qmlRegisterSingletonInstance<imtqml::CNetworkEventInterceptor>("com.imtcore.imtqml", 1, 0, "NetworkEventInterceptor", imtqml::CNetworkEventInterceptor::Instance());
+	}
+	if (!m_registerCDocumentServiceControllerAttrPtr.IsValid() || *m_registerCDocumentServiceControllerAttrPtr){
+		qmlRegisterType<imtqml::CDocumentServiceController>("com.imtcore.imtqml", 1, 0, "DocumentServiceController");
+	}
+	if (!m_registerCDataModelControllerAttrPtr.IsValid() || *m_registerCDataModelControllerAttrPtr){
+		qmlRegisterType<imtqml::CDataModelController>("com.imtcore.imtqml", 1, 0, "DataModelController");
 	}
 }
 

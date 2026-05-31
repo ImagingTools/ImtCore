@@ -9,7 +9,7 @@ Rectangle {
 	color: "transparent"
 
 	function start(){
-		root.visible = width >= square.width && height >= square.height
+		root.visible = width >= square.width
 	}
 
 	function stop(){

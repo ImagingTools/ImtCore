@@ -72,6 +72,7 @@ DialogDecorator 1.0 ./Dialogs/DialogDecorator.qml
 DialogManagerView 1.0 ./Dialogs/DialogManagerView.qml
 CriticalErrorDialog 1.0 ./Dialogs/CriticalErrorDialog.qml
 FileImportDialog 1.0 ./Dialogs/FileImportDialog.qml
+FileExportDialog 1.0 ./Dialogs/FileExportDialog.qml
 
 Calendar 1.0 ./Inputs/Calendar.qml
 CalendarCellDelegateBase 1.0 ./Inputs/CalendarCellDelegateBase.qml
@@ -107,6 +108,7 @@ SearchTextInput 1.0 ./Inputs/SearchTextInput.qml
 
 singleton UuidGenerator 1.0 Models/UuidGenerator.qml
 singleton NavigationController 1.0 Models/NavigationController.qml
+singleton TreeModelBuilder 1.0 ./Models/TreeModelBuilder.qml
 ModelIndex 1.0 Models/ModelIndex.qml
 SortController 1.0 Models/SortController.qml
 StateMachine 1.0 Models/StateMachine.qml
@@ -133,6 +135,8 @@ TableCellTextDelegate 1.0 ./Views/TableCellTextDelegate.qml
 TableCellTextWithTooltipDelegate 1.0 ./Views/TableCellTextWithTooltipDelegate.qml
 TableCellRowNumberDelegate 1.0 ./Views/TableCellRowNumberDelegate.qml
 TableCellIconTextDelegate 1.0 ./Views/TableCellIconTextDelegate.qml
+TableCellDelegateCheckable 1.0 ./Views/TableCellDelegateCheckable.qml
+TableCellDateDelegate 1.0 ./Views/TableCellDateDelegate.qml
 TableDelegate 1.0 ./Views/TableDelegate.qml
 TableRowDelegateBase 1.0 ./Views/TableRowDelegateBase.qml
 TablePainterRowDelegateBase 1.0 ./Views/TablePainterRowDelegateBase.qml
@@ -155,6 +159,7 @@ TreeViewCommandsDelegateBase 1.0 ./Views/TreeViewCommandsDelegateBase.qml
 TreeViewItemDelegateBase 1.0 ./Views/TreeViewItemDelegateBase.qml
 
 TreeItemDelegate 1.0 ./Views/TreeItemDelegate.qml
+TreeViewColumn 1.0 ./Views/TreeViewColumn.qml
 TreeViewGql 1.0 ./Views/TreeViewGql.qml
 TreeViewSelection 1.0 ./Views/TreeViewSelection.qml
 
@@ -178,6 +183,8 @@ Splitter 1.0 ./Views/Splitter.qml
 StackView 1.0 ./Views/StackView.qml
 Gallery 1.0 ./Views/Gallery.qml
 ExpandingContainer 1.0 ./Views/ExpandingContainer.qml
+CollapsibleRectangle 1.0 ./Views/CollapsibleRectangle.qml
+Title 1.0 ./Views/Title.qml
 TextInputCellContentComp 1.0 ./Views/TextInputCellContentComp.qml
 ComboBoxCellContentComp 1.0 ./Views/ComboBoxCellContentComp.qml
 SubMenuPanelButtonDecorator 1.0 ./Views/SubMenuPanelButtonDecorator.qml
@@ -209,6 +216,9 @@ Matrix3x3 1.0 ./GraphicsView/Matrix3x3.qml
 Graph2d 1.0 ./GraphicsView/Graph2d.qml
 MultiGraph2d 1.0 ./GraphicsView/MultiGraph2d.qml
 
+GraphicsShapeFactoryManager 1.0 ./GraphicsView/GraphicsShapeFactoryManager.qml
+GraphicsShapeFactoryBase 1.0 ./GraphicsView/GraphicsShapeFactoryBase.qml
+
 PolygonShape 1.0 ./GraphicsView/PolygonShape.qml
 RectangleShape 1.0 ./GraphicsView/RectangleShape.qml
 CircleShape 1.0 ./GraphicsView/CircleShape.qml
@@ -218,7 +228,7 @@ ArcShape 1.0 ./GraphicsView/ArcShape.qml
 BezierCurveShape 1.0 ./GraphicsView/BezierCurveShape.qml
 QuadraticCurveShape 1.0 ./GraphicsView/QuadraticCurveShape.qml
 TextShape 1.0 ./GraphicsView/TextShape.qml
-ImageShape 1.0 ./GraphicsView/ImageShape.qml
+ImageShape2d 1.0 ./GraphicsView/ImageShape2d.qml
 CoordinateGridShape 1.0 ./GraphicsView/CoordinateGridShape.qml
 SegmentShape 1.0 ./GraphicsView/SegmentShape.qml
 DiskSegmentShape 1.0 ./GraphicsView/DiskSegmentShape.qml
@@ -237,3 +247,20 @@ ImageParams 1.0 ./GraphicsView/ImageParams.qml
 ComplexShape 1.0 ./GraphicsView/ComplexShape.qml
 SelectionShape 1.0 ./GraphicsView/SelectionShape.qml
 BoundingBox 1.0 ./GraphicsView/BoundingBox.qml
+
+
+# -------------------------------------------------------------------------
+# Popup / Menu infrastructure (Stage 1 + Stage 2). Lives parallel to the
+# pre-existing PopupDecorator / ModalDialogManager / MenuButton stack.
+# -------------------------------------------------------------------------
+Popup 1.0 ./Popup/Popup.qml
+Overlay 1.0 ./Popup/Overlay.qml
+PopupAnchors 1.0 ./Popup/PopupAnchors.qml
+
+ActionGroup 1.0 ./Actions/ActionGroup.qml
+
+Menu 1.0 ./Menu/Menu.qml
+MenuItem 1.0 ./Menu/MenuItem.qml
+MenuSeparator 1.0 ./Menu/MenuSeparator.qml
+MenuBar 1.0 ./Menu/MenuBar.qml
+MenuBarItem 1.0 ./Menu/MenuBarItem.qml

@@ -10,7 +10,7 @@ ControlBase {
 
     property bool isDinamicHeight: true;
 
-    property alias text: textArea.text;
+	property string text: textArea.text;
     property alias textInputFocus: textArea.focus;
     property alias readOnly: textArea.readOnly;
     property alias horizontalAlignment: textArea.horizontalAlignment;
@@ -37,6 +37,10 @@ ControlBase {
     property bool fontBold: false;
 
     property real placeHolderOpacity: 1;
+	property bool placeHolderVerticalCentered: true;
+
+	property int editingFinishedInterval: 1000
+	property bool notEmitEditingFinishedWhenFocusLost: false
 
     signal accepted();
     signal cancelled();
@@ -68,6 +72,10 @@ ControlBase {
             }
         }
     }
+
+	onTextChanged: {
+		textArea.text = text;
+	}
 
     function setFocus(value){
         //textArea.focus = value;
@@ -117,7 +125,7 @@ ControlBase {
 
     Timer {
         id: editingFinishedTimer;
-        interval: 1000;
+		interval: containerTextArea.editingFinishedInterval;
 
         onTriggered: {
             containerTextArea.editingFinished();
@@ -182,11 +190,11 @@ ControlBase {
             id: textArea;
             objectName: "TextInput"
 
-            anchors.left: parent.left;
-            anchors.right: parent.right;
-            anchors.top: parent.top;
+			anchors.left: flick.left;
+			anchors.right: flick.right;
+			anchors.top: flick.top;
 
-            anchors.bottom: parent.bottom;
+			anchors.bottom: flick.bottom;
             anchors.bottomMargin: containerTextArea.margin;
 
             anchors.topMargin: containerTextArea.margin;
@@ -234,11 +242,14 @@ ControlBase {
             }
 
             onEditingFinished: {
-                containerTextArea.editingFinished();
+				if(!containerTextArea.notEmitEditingFinishedWhenFocusLost){
+					containerTextArea.editingFinished();
+				}
             }
 
 
             onTextChanged:  {
+				containerTextArea.text = text
                 containerTextArea.textEdited();
 
                 editingFinishedTimer.restart();

@@ -21,8 +21,8 @@ public:
 
 protected:
 	// reimplemented (imtservergql::CGqlRepresentationControllerCompBase)
-	virtual imtbase::CTreeItemModel* CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual bool UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, imtbase::CTreeItemModel* representationPtr) const override;
+	virtual QJsonObject CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual bool UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, const QJsonObject& representation) const override;
 
 protected:
 	I_MULTIREF(imtgql::IGqlRepresentationController, m_representationControllersCompPtr);

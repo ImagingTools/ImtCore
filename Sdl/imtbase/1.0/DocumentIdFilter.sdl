@@ -4,6 +4,7 @@ schema {
 }
 
 enum ConditionType {
+	None
 	In
 	NotIn
 }

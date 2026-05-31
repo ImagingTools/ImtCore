@@ -13,9 +13,14 @@ Item {
 	width: itemWidth;
 	height: filterField.height + itemBody.height;
 
-	property var model;
 	//property TreeItemModel model: TreeItemModel{};
+	property var model;
+
+	// For closing in Main dialog manager
+	property string uuid: ""
+	// Main dialog manager reference
 	property Item root: null;
+
 	property Item rootItem: null;
 
 	property int itemWidth: Style.sizeHintXXS;
@@ -102,6 +107,7 @@ Item {
 
 
 	function onBackgroundClicked(){
+		popupMenuContainer.finished('', -1);
 		popupMenuContainer.root.closeDialog();
 	}
 
@@ -111,27 +117,7 @@ Item {
 
 	Component.onCompleted: {
 		Events.subscribeEvent("AppSizeChanged", onAppSizeChanged);
-	}
-
-	Component.onDestruction: {
-		Events.unSubscribeEvent("AppSizeChanged", onAppSizeChanged);
-	}
-
-
-	function onAppSizeChanged(parameters){
-		onBackgroundClicked();
-	}
-
-	function onBackgroundClicked(events){
-		popupMenuContainer.finished('', -1);
-	}
-
-	TreeItemModel{
-		id: modelFilter;
-	}
-
-
-	Component.onCompleted: {
+		
 		//console.log("_____________POPUP_COMPL_____________", popupMenuContainer.preventFirstLoading);
 		popupMenuContainer.forceActiveFocus();
 		modelFilter.addTreeModel("FilterIds");
@@ -144,9 +130,17 @@ Item {
 	}
 
 	Component.onDestruction: {
+		Events.unSubscribeEvent("AppSizeChanged", onAppSizeChanged);
 		destructionSignal();
 	}
 
+	function onAppSizeChanged(parameters){
+		onBackgroundClicked();
+	}
+
+	TreeItemModel{
+		id: modelFilter;
+	}
 
 	onPropertiesChanged: {
 		//console.log("_____________PROPERTIES_CHANGED_____________")

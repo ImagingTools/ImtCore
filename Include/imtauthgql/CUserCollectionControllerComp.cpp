@@ -138,35 +138,6 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 		mail = *representation.email;
 	}
 
-	if (!userInfoPtr->IsAdmin()){
-		if (mail.isEmpty()){
-			errorMessage = QString("Email cannot be empty");
-			return false;
-		}
-		
-		imtbase::IComplexCollectionFilter::FieldFilter mailFieldFilter;
-		mailFieldFilter.fieldId = "Mail";
-		mailFieldFilter.filterValue = mail;
-		
-		imtbase::IComplexCollectionFilter::FilterExpression mailGroupFilter;
-		mailGroupFilter.fieldFilters << mailFieldFilter;
-		
-		imtbase::CComplexCollectionFilter mailComplexFilter;
-		mailComplexFilter.SetFilterExpression(mailGroupFilter);
-		
-		iprm::CParamsSet mailFilterParam;
-		mailFilterParam.SetEditableParameter("ComplexFilter", &mailComplexFilter);
-
-		userIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &mailFilterParam);
-		if (!userIds.isEmpty()){
-			QByteArray userObjectId = userIds[0];
-			if (newObjectId != userObjectId){
-				errorMessage = QT_TR_NOOP("Email already exists");
-				return false;
-			}
-		}
-	}
-
 	userInfoPtr->SetMail(mail);
 
 	imtauth::IUserInfo::FeatureIds permissions;
@@ -394,7 +365,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isTypeIdRequested){
-		representationObject.typeId = QByteArray(m_objectCollectionCompPtr->GetObjectTypeId(objectId));
+		representationObject.typeId = objectCollectionIterator.GetObjectTypeId();
 	}
 
 	if (requestInfo.items.isUserIdRequested){
@@ -569,10 +540,8 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateObjectFromRepres
 			break;
 		}
 	}
-	istd::IChangeableUniquePtr retVal;
-	retVal.MoveCastedPtr<imtauth::IUserInfo>(userInstancePtr);
 
-	return retVal;
+	return userInstancePtr;
 }
 
 

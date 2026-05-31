@@ -10,7 +10,7 @@
 
 // ImtCore includes
 #include <imtrest/IRequest.h>
-#include <imtrest/ISender.h>
+#include <imtrest/IResponse.h>
 #include <imtrest/CWorker.h>
 
 
@@ -35,7 +35,7 @@ public:
 	Status GetStatus();
 	void SetStatus(Status status);
 	void SetRequestPtr(const IRequest* requestPtr);
-	const ISender* GetSender(const QByteArray& requestId);
+	bool SendResponse(const QByteArray& requestId, ConstResponsePtr& response);
 
 	//reimplemented (QThread)
 	virtual void run() override;

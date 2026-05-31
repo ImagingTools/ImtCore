@@ -9,13 +9,13 @@ namespace imtdoc
 // public methods
 
 CDocumentUndoRedoChangedEvent::CDocumentUndoRedoChangedEvent(
-	const QByteArray& userId,
-	const QByteArray& documentId,
-	const QByteArray& documentTypeId,
-	const QString& documentName,
-	const QUrl& documentUrl,
-	bool isDirty,
-	const idoc::IUndoManager& undoManager)
+			const QByteArray& userId,
+			const QByteArray& documentId,
+			const QByteArray& documentTypeId,
+			const QString& documentName,
+			const QUrl& documentUrl,
+			bool isDirty,
+			const idoc::IUndoManager& undoManager)
 	:m_undoManager(undoManager)
 {
 	m_userId = userId;

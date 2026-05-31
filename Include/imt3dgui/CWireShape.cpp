@@ -37,7 +37,7 @@ void CWireShape::SetInfoBoxEnabled(bool isEnabled)
 
 // protected methods
 
-// reimplement (imt3dgui::CShape3dBase)
+// reimplemented (imt3dgui::CShape3dBase)
 
 void CWireShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
@@ -65,15 +65,25 @@ void CWireShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*chang
 }
 
 
-void CWireShape::DrawShapeGl(QOpenGLShaderProgram& /*program*/, QOpenGLFunctions& functions)
+imt3dview::PrimitiveType CWireShape::GetPrimitiveType() const
 {
-	functions.glDrawElements(GL_LINES, m_indices.size(), GL_UNSIGNED_INT, (GLuint*)0);
+	return imt3dview::PT_LINES;
+}
+
+
+void CWireShape::FillMaterial(imt3dview::Material& material) const
+{
+	BaseClass::FillMaterial(material);
+	if (material.colorMode == imt3dview::Material::CM_SOLID){
+		material.solidColor = m_color;
+	}
+	material.lineWidth = 1.0f;
 }
 
 
 // reimplemented (imt3dview::IDrawable)
 
-void CWireShape::Draw(QPainter& painter)
+void CWireShape::DrawOverlay(QPainter& painter)
 {
 	if (m_isInfoBoxEnabled && m_pointsDataPtr != nullptr){
 		QString text = QString("<b><p>Total vertices: %1</p>").arg(m_pointsDataPtr->GetPointsCount());

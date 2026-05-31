@@ -1,9 +1,13 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CHttpGraphQLServletComp.h>
 
+// Qt includes
+#include <QtCore/QScopeGuard>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
 
 // ACF includes
-#include <iser/CJsonMemWriteArchive.h>
 #include <iprm/TParamsPtr.h>
 #include <iprm/ISelectionParam.h>
 #include <iprm/IOptionsList.h>
@@ -18,6 +22,21 @@
 
 namespace imtservergql
 {
+
+
+namespace
+{
+
+QString MaskToken(const QByteArray& token)
+{
+	if (token.isEmpty()){
+		return QStringLiteral("<empty>");
+	}
+
+	return QStringLiteral("***") + QString::fromUtf8(token.right(4));
+}
+
+} // namespace
 
 
 // protected methods
@@ -45,6 +64,11 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	const HeadersMap& headers,
 	const imtrest::CHttpRequest& request) const
 {
+	// Ensure Clear() is called on every return path
+	auto cleanup = qScopeGuard([]() {
+		imtgql::CGqlRequestContextManager::Clear();
+	});
+
 	m_lastRequest.ResetData();
 
 	qsizetype errorPosition = -1;
@@ -59,10 +83,10 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 
 	const QByteArray gqlCommand = m_lastRequest.GetCommandId();
 
-	// set a protocol version to gql object
-	for (HeadersMap::const_iterator headerIter = headers.cbegin(); headerIter != headers.cend(); ++headerIter){
+	// Set protocol version - RFC 2616: 4.2 case-insensitive header comparison
+	for (HeadersMap::const_iterator headerIter = headers.cbegin(); headerIter != headers.cend(); ++headerIter) {
 		// find header. compare with lowercase. RFC 2616: 4.2
-		if (headerIter.key().toLower() == imtbase::s_protocolVersionHeaderId.toLower()){
+		if (headerIter.key().toLower() == imtbase::s_protocolVersionHeaderId.toLower()) {
 			const QByteArray& protocolVersion = *headerIter;
 			m_lastRequest.SetProtocolVersion(protocolVersion);
 
@@ -70,72 +94,33 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		}
 	}
 
-	bool isSuccessful = false;
-
-	QByteArray userId;
-	QByteArray accessToken = headers.value(QByteArrayLiteral("x-authentication-token"));
-
-	// Validate token based on prefix: pat_ for PAT tokens, otherwise JWT
-	if (!accessToken.isEmpty()){
-		// Check if token starts with "pat_" prefix and has content beyond the prefix
-		if (accessToken.size() > 4 && accessToken.startsWith("pat_")){
-			// PAT token - validate with PAT manager
-			if (m_patManagerCompPtr.IsValid()){
-				QByteArray tokenId;
-				QByteArrayList scopes;
-				if (!m_patManagerCompPtr->ValidateToken(accessToken, userId, tokenId, scopes)){
-					return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
-				}
-
-				m_patManagerCompPtr->UpdateLastUsedAt(tokenId);
+	if (m_gqlContextCreatorCompPtr.IsValid()){
+		imtgql::IGqlContextCreator::ContextCreationError contextError;
+		imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(headers, contextError);
+		if (!gqlContextPtr.IsValid()){
+			if (contextError.status == imtgql::IGqlContextCreator::CCS_UNAUTHORIZED){
+				return CreateResponse(StatusCode::SC_UNAUTHORIZED, QByteArray(), request);
 			}
-			else{
+			if (contextError.status == imtgql::IGqlContextCreator::CCS_FORBIDDEN){
 				return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
 			}
-		}
-		else{
-			// JWT token - validate with JWT controller
-			if (m_jwtSessionControllerCompPtr.IsValid()){
-				using JwtState = imtauth::IJwtSessionController::JwtState;
-				JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(accessToken);
-				if (state == JwtState::JS_EXPIRED){
-					return CreateResponse(StatusCode::SC_UNAUTHORIZED, QByteArray(), request);
-				}
-				else if (state == JwtState::JS_INVALID){
-					return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
-				}
 
-				userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(accessToken);
-			}
-		}
-	}
-
-	QByteArray productId;
-	if (headers.contains(imtbase::s_productIdHeaderId)){
-		productId = headers.value(imtbase::s_productIdHeaderId);
-	}
-
-	if (m_gqlContextCreatorCompPtr.IsValid()){
-		QString errorMessage;
-		imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(accessToken, productId, userId, headers, errorMessage);
-		if (!gqlContextPtr.IsValid()){
 			SendCriticalMessage(
 						0,
 						QStringLiteral("Unable to create a GraphQL context for the access token '%1' for Command-ID: '%2'. Error: '%3'")
-											.arg(QString(accessToken), QString(gqlCommand), errorMessage),
+											.arg(MaskToken(headers.value(imtbase::s_authenticationTokenHeaderId)), QString(gqlCommand), contextError.message),
 						QStringLiteral("GraphQL - servlet"));
 			return GenerateError(StatusCode::SC_INTERNAL_SERVER_ERROR, QStringLiteral("Request context is invalid"), request);
 		}
 
-		imtgql::IGqlContextSharedPtr shared;
-		shared.MoveCastedPtr(gqlContextPtr);
-		m_lastRequest.SetGqlContext(shared);
+		m_lastRequest.SetGqlContext(std::move(gqlContextPtr));
 	}
 	else{
-		Q_ASSERT(false);
+		// Q_ASSERT(false);
 	}
 
 	QByteArray responseData;
+	bool isSuccessful = false;
 
 	int dataControllersCount = m_gqlRequestHandlerCompPtr.GetCount();
 	for (int index = 0; index < dataControllersCount; index++){
@@ -144,82 +129,76 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 			continue;
 		}
 
-		isSuccessful = requestHandlerPtr->IsRequestSupported(m_lastRequest);
-		// unsupported request
-		if (!isSuccessful){
+		if (!requestHandlerPtr->IsRequestSupported(m_lastRequest)) {
+			// unsupported request
 			continue;
 		}
 
 		QString errorMessage;
 		QString errorType = QStringLiteral("Warning");
-		istd::TDelPtr<imtbase::CTreeItemModel> sourceItemModelPtr;
-		sourceItemModelPtr.SetPtr(requestHandlerPtr->CreateResponse(m_lastRequest, errorMessage));
+		QJsonObject sourceItemObj = requestHandlerPtr->CreateResponse(m_lastRequest, errorMessage);
 
-		bool isError = false;
-		imtbase::CTreeItemModel rootModel;
+		bool isError = sourceItemObj.isEmpty();
 
-		isError = !sourceItemModelPtr.IsValid();
-		if(!isError){
-			imtbase::CTreeItemModel* errorsModelPtr = sourceItemModelPtr->GetTreeItemModel(QByteArrayLiteral("errors"));
-			isError = errorsModelPtr != nullptr;
-
-			if (isError){
-				if (errorsModelPtr->ContainsKey(QByteArrayLiteral("message"))){
-					errorMessage = errorsModelPtr->GetData(QByteArrayLiteral("message")).toString();
+		// Detect if result model itself contains an "errors" child
+		if (!isError) {
+			if (sourceItemObj.contains(QStringLiteral("errors"))) {
+				isError = true;
+				QJsonObject errorsObj = sourceItemObj.value(QStringLiteral("errors")).toObject();
+				if (errorsObj.contains(QStringLiteral("message"))) {
+					errorMessage = errorsObj.value(QStringLiteral("message")).toString();
 				}
 
-				if (errorsModelPtr->ContainsKey(QByteArrayLiteral("type"))){
-					errorType = errorsModelPtr->GetData(QByteArrayLiteral("type")).toString();
-				}
-			}
-			else{
-				imtbase::CTreeItemModel* dataModelPtr = rootModel.AddTreeModel(QByteArrayLiteral("data"));
-
-				imtbase::CTreeItemModel* sourceDataModelPtr = sourceItemModelPtr->GetTreeItemModel(QByteArrayLiteral("data"));
-				if (sourceDataModelPtr != nullptr){
-					dataModelPtr->SetExternTreeModel(gqlCommand, sourceDataModelPtr->CopyMe());
-				}
-				else{
-					dataModelPtr->SetExternTreeModel(gqlCommand, sourceItemModelPtr->CopyMe());
+				if (errorsObj.contains(QStringLiteral("type"))) {
+					errorType = errorsObj.value(QStringLiteral("type")).toString();
 				}
 			}
 		}
 
-		if (isError){
-			imtbase::CTreeItemModel* errorsModelPtr = rootModel.AddTreeModel(QByteArrayLiteral("errors"));
-			imtbase::CTreeItemModel* errorItemModelPtr = errorsModelPtr->AddTreeModel(gqlCommand);
-
-			errorItemModelPtr->SetData(QByteArrayLiteral("message"), errorMessage);
-			errorItemModelPtr->SetData(QByteArrayLiteral("type"), errorType);
+		if (isError) {
+			responseData = BuildGqlErrorJson(gqlCommand, errorMessage, errorType);
+			isSuccessful = !responseData.isEmpty();
 		}
+		else {
+			// Success path: wrap source data under "data" → commandId
+			QJsonObject rootObj;
+			QJsonObject dataWrapperObj;
+			QJsonValue sourceData = sourceItemObj.contains(QStringLiteral("data"))
+				? sourceItemObj.value(QStringLiteral("data"))
+				: QJsonValue(sourceItemObj);
 
-		iser::CJsonMemWriteArchive archive(nullptr, false);
+			dataWrapperObj.insert(QString::fromUtf8(gqlCommand), sourceData);
+			rootObj.insert(QStringLiteral("data"), dataWrapperObj);
 
-		isSuccessful = rootModel.SerializeModel(archive);
-		if (isSuccessful){
-			responseData = archive.GetData();
+			QJsonDocument doc(rootObj);
+			responseData = doc.toJson(QJsonDocument::Compact);
+			isSuccessful = true;
 		}
 
 		break;
 	}
 
-	imtgql::CGqlRequestContextManager::Clear();
+	// If we have a GraphQL JSON response (Success OR Warning/Execution Error)
+	// We return 200 OK so the client can read the { data: null, errors: [...] } structure.
+	if (!responseData.isEmpty()){
+		return CreateResponse(
+					StatusCode::SC_OK,
+					responseData,
+					request,
+					QByteArrayLiteral("application/json; charset=utf-8"));;
+	}
 
+	// If no handler supported the request (isSuccessful is still false)
+	// or if the loop never ran/serialization failed.
 	if (!isSuccessful){
 		SendErrorMessage(0, QStringLiteral("Invalid command request:'%1'").arg(QString(gqlCommand)), QStringLiteral("GraphQL - servlet"));
 
-		return CreateResponse(StatusCode::SC_BAD_REQUEST, responseData, request);
-	}
-	if (!responseData.isEmpty()){
-		return CreateResponse(
-			StatusCode::SC_OK,
-			responseData,
-			request,
-			QByteArrayLiteral("application/json; charset=utf-8"));
+		 // Return 400 because this is a transport/routing failure, not a business logic error.
+		return GenerateError(StatusCode::SC_BAD_REQUEST, responseData, request);
 	}
 
+	// Fallback for unexpected internal state
 	SendErrorMessage(0, QStringLiteral("Internal server error for command '%1'").arg(QString(gqlCommand)), QStringLiteral("GraphQL - servlet"));
-
 	return GenerateError(StatusCode::SC_INTERNAL_SERVER_ERROR, QStringLiteral("Request is incorrect"), request);
 }
 
@@ -246,25 +225,50 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::CreateResponse(
 
 imtrest::ConstResponsePtr CHttpGraphQLServletComp::GenerateError(
 	const StatusCode& errorCode,
-	const QString& /*errorString*/,
+	const QString& errorString,
 	const imtrest::CHttpRequest& request) const
 {
-	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
+	// Default type to "Error" for 400/500 codes.
+	QByteArray responseJson = BuildGqlErrorJson(QByteArray(), errorString, QStringLiteral("Error"));
 
-	int protocolErrorCode = 200;
-	QByteArray protocolErrorString;
-	engine.GetProtocolStatusCode(errorCode, protocolErrorCode, protocolErrorString);
-
-	QByteArray responseJson;
 	return imtrest::ConstResponsePtr(
-		engine.CreateResponse(
-			request,
-			errorCode,
-			responseJson,
-			QByteArray("application/json;charset=utf-8")).PopInterfacePtr());
+		request.GetProtocolEngine().CreateResponse(
+									   request,
+									   errorCode,
+									   responseJson,
+									   QByteArray("application/json;charset=utf-8")).PopInterfacePtr());
+}
+
+
+QByteArray CHttpGraphQLServletComp::BuildGqlErrorJson(
+	const QByteArray& gqlCommand,
+	const QString& message,
+	const QString& type) const
+{
+	QJsonObject rootObj;
+
+	QJsonArray errorsArr;
+	QJsonObject errorObj;
+	errorObj.insert(QStringLiteral("message"), message);
+
+	// path: [ "CommandName" ]
+	if (!gqlCommand.isEmpty()) {
+		QJsonArray pathArr;
+		pathArr.append(QString::fromUtf8(gqlCommand));
+		errorObj.insert(QStringLiteral("path"), pathArr);
+	}
+
+	// extensions: { "type": "Warning/Error" }
+	QJsonObject extObj;
+	extObj.insert(QStringLiteral("type"), type);
+	errorObj.insert(QStringLiteral("extensions"), extObj);
+
+	errorsArr.append(errorObj);
+	rootObj.insert(QStringLiteral("errors"), errorsArr);
+
+	QJsonDocument doc(rootObj);
+	return doc.toJson(QJsonDocument::Compact);
 }
 
 
 } // namespace imtservergql
-
-

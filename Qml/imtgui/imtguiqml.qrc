@@ -13,7 +13,6 @@
         <file alias="imtgui/Application/ThumbnailDecorator.qml">Application/ThumbnailDecorator.qml</file>
         <file alias="imtgui/Application/ApplicationEvents.qml">Application/ApplicationEvents.qml</file>
         <file alias="imtgui/Application/ClientSettingsController.qml">Application/ClientSettingsController.qml</file>
-        <file alias="imtgui/Application/LocalStorage.qml">Application/LocalStorage.qml</file>
         <file alias="imtgui/Panels/ButtonPanel.qml">Panels/ButtonPanel.qml</file>
         <file alias="imtgui/Panels/CommandsDecorator.qml">Panels/CommandsDecorator.qml</file>
         <file alias="imtgui/Panels/FilterMenu.qml">Panels/FilterMenu.qml</file>
@@ -35,6 +34,7 @@
         <file alias="imtgui/Panels/TopRightPanel.qml">Panels/TopRightPanel.qml</file>
         <file alias="imtgui/Panels/TopRightPanelDecorator.qml">Panels/TopRightPanelDecorator.qml</file>
         <file alias="imtgui/Panels/CommandsPanel.qml">Panels/CommandsPanel.qml</file>
+        <file alias="imtgui/Panels/EnableableFilterDelegate.qml">Panels/EnableableFilterDelegate.qml</file>
         <file alias="imtgui/Panels/FieldFilterDelegate.qml">Panels/FieldFilterDelegate.qml</file>
         <file alias="imtgui/Panels/FilterDelegateBase.qml">Panels/FilterDelegateBase.qml</file>
         <file alias="imtgui/Panels/OptionsFilterDelegate.qml">Panels/OptionsFilterDelegate.qml</file>

@@ -22,7 +22,6 @@
 #include <imtauth/CUserGroupInfoComp.h>
 #include <imtauth/CRoleCollectionAdapterComp.h>
 #include <imtauth/CCheckPermissionCompBase.h>
-#include <imtauth/CFeaturePackageRepresentationControllerComp.h>
 #include <imtauth/CCollectionPermissionsProviderComp.h>
 #include <imtauth/CCheckPermissionOrComp.h>
 #include <imtauth/CUserSettingsComp.h>
@@ -50,6 +49,14 @@
 #include <imtauth/CPersonalAccessTokenManagerComp.h>
 #include <imtauth/CPersonalAccessTokenMetaInfoCreatorComp.h>
 #include <imtauth/CUserRecentActionComp.h>
+#include <imtauth/CTenantInfoComp.h>
+#include <imtauth/CTenantMetaInfoCreatorComp.h>
+#include <imtauth/CTenantManagerComp.h>
+#include <imtauth/CTenantMembershipComp.h>
+#include <imtauth/CTenantMembershipManagerComp.h>
+#include <imtauth/CTenantInvitationComp.h>
+#include <imtauth/CTenantInvitationManagerComp.h>
+#include <imtauth/CTenantDocumentNameProviderComp.h>
 
 
 namespace ImtAuthPck
@@ -97,7 +104,6 @@ typedef imtauth::CUserInfoMetaInfoCreatorComp UserInfoMetaInfoCreator;
 typedef imtauth::CRoleCollectionAdapterComp RoleCollectionAdapter;
 typedef imtauth::CUserCollectionAdapterComp UserCollectionAdapter;
 typedef imtauth::CCheckPermissionCompBase CheckPermissions;
-typedef imtauth::CFeaturePackageRepresentationControllerComp FeaturePackageRepresentationController;
 typedef imtauth::CCollectionPermissionsProviderComp CollectionPermissionsProvider;
 typedef imtauth::CCheckPermissionOrComp CheckPermissionOr;
 typedef icomp::TModelCompWrap<imtauth::CUserSettingsComp> UserSettings;
@@ -139,8 +145,15 @@ typedef icomp::TModelCompWrap<
 typedef imtauth::CPersonalAccessTokenManagerComp PersonalAccessTokenManager;
 typedef imtauth::CPersonalAccessTokenMetaInfoCreatorComp PersonalAccessTokenMetaInfoCreator;
 typedef icomp::TModelCompWrap<imtauth::CUserRecentActionComp> UserRecentAction;
+typedef icomp::TModelCompWrap<imtauth::CTenantInfoComp> TenantInfo;
+typedef imtauth::CTenantMetaInfoCreatorComp TenantMetaInfoCreator;
+typedef icomp::TModelCompWrap<imtauth::CTenantManagerComp> TenantManager;
+typedef icomp::TModelCompWrap<imtauth::CTenantMembershipComp> TenantMembershipInfo;
+typedef icomp::TModelCompWrap<imtauth::CTenantMembershipManagerComp> TenantMembershipManager;
+typedef icomp::TModelCompWrap<imtauth::CTenantInvitationComp> TenantInvitationInfo;
+typedef icomp::TModelCompWrap<imtauth::CTenantInvitationManagerComp> TenantInvitationManager;
+typedef imtauth::CTenantDocumentNameProviderComp TenantDocumentNameProvider;
 
 
 } // namespace ImtAuthPck
-
 

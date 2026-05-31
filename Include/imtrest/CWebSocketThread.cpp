@@ -60,6 +60,12 @@ void CWebSocketThread::SetWebSocket(QWebSocket* webSocketPtr)
 }
 
 
+const QWebSocket* CWebSocketThread::GetWebSocket() const
+{
+	return m_socket;
+}
+
+
 void CWebSocketThread::SetSocketStatus(Status socketStatus)
 {
 	QMutexLocker lock(&m_statusMutex);
@@ -140,7 +146,12 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 		imtrest::CWebSocketRequest::MethodType methodType = webSocketRequest->GetMethodType();
 		if (methodType == CWebSocketRequest::MT_START || methodType == CWebSocketRequest::MT_SUBSCRIBE){
 			newRequestPtr.PopPtr();
-			webSocketRequest->setParent(m_socket);
+			// Parent to CWebSocketThread instead of QWebSocket to avoid cascade-deletion.
+			// When auth validation (ValidateJwt, ValidateToken) triggers Qt event processing,
+			// pending deleteLater() for old QWebSockets fires, cascade-deleting children.
+			// By parenting to the thread, CWebSocketRequests survive socket destruction.
+			// Cleanup happens explicitly in OnSocketDisconnected.
+			webSocketRequest->setParent(this);
 			if (m_server != nullptr){
 				m_server->RegisterSender(webSocketRequest->GetRequestId(), webSocketPtr);
 			}
@@ -216,6 +227,12 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 
 void CWebSocketThread::OnSocketDisconnected()
 {
+	// Explicitly clean up subscription requests parented to this thread.
+	// Their destructors call OnRequestDestroyed on publishers, cleanly
+	// unregistering subscriptions before the QWebSocket is destroyed.
+	QList<CWebSocketRequest*> requests = findChildren<CWebSocketRequest*>(QString(), Qt::FindDirectChildrenOnly);
+	qDeleteAll(requests);
+
 	m_socket = nullptr;
 	exit();
 }
@@ -232,8 +249,13 @@ void CWebSocketThread::OnWebSocketBinaryMessage(const QByteArray& dataMessage)
 }
 
 
-void CWebSocketThread::OnError(QAbstractSocket::SocketError /*error*/)
+void CWebSocketThread::OnError(QAbstractSocket::SocketError error)
 {
+	if (error == QAbstractSocket::RemoteHostClosedError) {
+		// This is a normal disconnect. Let the 'disconnected()' signal handle the cleanup.
+		return;
+	}
+
 	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
 	if (webSocketPtr != nullptr && m_server != nullptr){
 		QString errorMessage = QString("Web socket server error: '%1'").arg(webSocketPtr->errorString());

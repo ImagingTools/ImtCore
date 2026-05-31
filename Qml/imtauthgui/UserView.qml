@@ -6,11 +6,13 @@ import imtcontrols 1.0
 import imtauthUsersSdl 1.0
 import imtdocgui 1.0
 import imtguigql 1.0
+import imtdeskgui 1.0
 
 ViewBase {
 	id: container;
 	
 	anchors.fill: parent;
+	contentColor: Style.baseColor
 
 	property UserData userData: model;
 	property string productId;
@@ -19,6 +21,10 @@ ViewBase {
 	property alias passwordInputConfirm: userGeneralEditor.confirmPasswordInput;
 	
 	property bool isNew: true
+	readonly property bool hasValidUserId: container.userData && container.userData.m_id && container.userData.m_id !== ""
+	readonly property string contextEntityDisplayName: container.userData
+		? (container.userData.m_name || container.userData.m_username || container.userData.m_id)
+		: ""
 	
 	function updateGui(){
 		userGeneralEditor.updateGui();
@@ -183,7 +189,7 @@ ViewBase {
 				width: parent.width;
 				title: qsTr("General");
 			}
-			
+
 			UserGeneralEditor {
 				id: userGeneralEditor;
 				width: parent.width;
@@ -313,22 +319,30 @@ ViewBase {
 				
 				width: parent.width;
 
-				SelectableCollectionEditor {
+				ItemSelectElementView {
 					id: roleSelectableCollectionEditor
 					collectionId: "Roles"
-					targetTitle: qsTr("Roles")
-					sourceTitle: qsTr("Adding Role")
-					onSelectionChanged: {
-						container.doUpdateModel()
+						label: qsTr("Roles")
+						addButtonText: qsTr("Add Role")
+						showCount: true
+						onSelectionChanged: {
+							container.doUpdateModel()
+						}
 					}
-				}
 
 				function updateGui(){
-					roleSelectableCollectionEditor.selectedIds = container.userData.m_roles.slice()
+					var ids = container.userData.m_roles ? container.userData.m_roles.slice() : []
+					var arr = []
+					for (var i = 0; i < ids.length; i++)
+						arr.push({id: ids[i], name: ids[i]})
+					roleSelectableCollectionEditor.items = arr
 				}
 				
 				function updateModel(){
-					container.userData.m_roles = roleSelectableCollectionEditor.selectedIds.slice()
+					var arr = []
+					for (var i = 0; i < roleSelectableCollectionEditor.items.length; i++)
+						arr.push(roleSelectableCollectionEditor.items[i].id)
+					container.userData.m_roles = arr
 				}
 			}
 			
@@ -344,22 +358,30 @@ ViewBase {
 				
 				width: parent.width;
 
-				SelectableCollectionEditor {
+				ItemSelectElementView {
 					id: groupSelectableCollectionEditor
 					collectionId: "Groups"
-					targetTitle: qsTr("Groups")
-					sourceTitle: qsTr("Adding Group")
-					onSelectionChanged: {
-						container.doUpdateModel()
+						label: qsTr("Groups")
+						addButtonText: qsTr("Add Group")
+						showCount: true
+						onSelectionChanged: {
+							container.doUpdateModel()
+						}
 					}
-				}
 
 				function updateGui(){
-					groupSelectableCollectionEditor.selectedIds = container.userData.m_groups.slice()
+					var ids = container.userData.m_groups ? container.userData.m_groups.slice() : []
+					var arr = []
+					for (var i = 0; i < ids.length; i++)
+						arr.push({id: ids[i], name: ids[i]})
+					groupSelectableCollectionEditor.items = arr
 				}
 				
 				function updateModel(){
-					container.userData.m_groups = groupSelectableCollectionEditor.selectedIds.slice()
+					var arr = []
+					for (var i = 0; i < groupSelectableCollectionEditor.items.length; i++)
+						arr.push(groupSelectableCollectionEditor.items[i].id)
+					container.userData.m_groups = arr
 				}
 			}
 		}

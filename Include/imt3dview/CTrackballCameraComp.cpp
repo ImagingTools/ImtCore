@@ -25,7 +25,7 @@ constexpr float minDelta = 0.01f;
 
 CTrackballCameraComp::CTrackballCameraComp()
 	:m_position(0.0, 0.0, 5.0),
-	m_sceneBoundingCuboid(-1., 1., -1., 1., 1., -1.)
+	m_sceneBoundingCuboid(-1., 1., -1., 1., -1., 1.)
 {
 }
 
@@ -153,11 +153,11 @@ void CTrackballCameraComp::SetBoundingCuboid(const imt3d::CCuboid & cuboid)
 			m_sceneBoundingCuboid.SetRight(cuboid.GetRight());
 		}
 
-		if (cuboid.GetFar() < m_sceneBoundingCuboid.GetFar()){
+		if (cuboid.GetFar() > m_sceneBoundingCuboid.GetFar()){
 			m_sceneBoundingCuboid.SetFar(cuboid.GetFar());
 		}
 
-		if (cuboid.GetNear() > m_sceneBoundingCuboid.GetNear()){
+		if (cuboid.GetNear() < m_sceneBoundingCuboid.GetNear()){
 			m_sceneBoundingCuboid.SetNear(cuboid.GetNear());
 		}
 	}

@@ -44,6 +44,22 @@
 #include <imtauthgql/CTokenBasedPermissionsProviderComp.h>
 #include <imtauthgql/CPersonalAccessTokenControllerComp.h>
 #include <imtauthgql/CClientRequestPersonalAccessTokenManagerComp.h>
+#include <imtauthgql/CTenantCollectionControllerComp.h>
+#include <imtauthgql/CTenantMetaInfoDelegateComp.h>
+#include <imtauthgql/CTenantCollectionDocumentServiceComp.h>
+#include <imtauthgql/CTenantCollectionDocumentServiceControllerComp.h>
+#include <imtauthgql/CTenantExclusionParamsSetJoinerComp.h>
+#include <imtauthgql/CRemoteProfileControllerComp.h>
+#include <imtauthgql/CJwtSessionControllerProxyComp.h>
+#include <imtauthgql/CRemoteTenantControllerComp.h>
+#include <imtauthgql/CRemoteTenantMembershipManagerControllerComp.h>
+#include <imtauthgql/CTenantManagerControllerComp.h>
+#include <imtauthgql/CTenantMembershipManagerControllerComp.h>
+#include <imtauthgql/CTenantNotificationPublisherComp.h>
+#include <imtauthgql/CRemoteTenantCollectionDocumentServiceControllerComp.h>
+#include <imtauthgql/CRoleCollectionDocumentServiceComp.h>
+#include <imtauthgql/CGroupCollectionDocumentServiceComp.h>
+#include <imtauthgql/CUserCollectionDocumentServiceComp.h>
 
 
 /**
@@ -90,8 +106,23 @@ typedef imtauthgql::CClientRequestGroupInfoProviderComp ClientRequestGroupInfoPr
 typedef imtauthgql::CTokenBasedPermissionsProviderComp ClientRequestTokenBasedPermissionsProvider;
 typedef imtauthgql::CPersonalAccessTokenControllerComp PersonalAccessTokenController;
 typedef icomp::TModelCompWrap<imtauthgql::CClientRequestPersonalAccessTokenManagerComp> ClientRequestPersonalAccessTokenManager;
+typedef imtauthgql::CTenantCollectionControllerComp TenantCollectionController;
+typedef imtauthgql::CTenantMetaInfoDelegateComp TenantMetaInfoDelegate;
+typedef imtauthgql::CTenantCollectionDocumentServiceComp TenantCollectionDocumentService;
+typedef imtauthgql::CTenantCollectionDocumentServiceControllerComp TenantCollectionDocumentServiceController;
+typedef imtauthgql::CTenantExclusionParamsSetJoinerComp TenantExclusionParamsSetJoiner;
+typedef imtauthgql::CRemoteProfileControllerComp RemoteProfileController;
+typedef imtauthgql::CJwtSessionControllerProxyComp JwtSessionControllerProxy;
+typedef imtauthgql::CRemoteTenantControllerComp RemoteTenantController;
+typedef imtauthgql::CRemoteTenantMembershipManagerControllerComp RemoteTenantMembershipManagerController;
+typedef imtauthgql::CTenantManagerControllerComp TenantManagerController;
+typedef imtauthgql::CTenantMembershipManagerControllerComp TenantMembershipManagerController;
+typedef imtauthgql::CTenantNotificationPublisherComp TenantNotificationPublisher;
+typedef imtauthgql::CRemoteTenantCollectionDocumentServiceControllerComp RemoteTenantCollectionDocumentService;
+typedef imtauthgql::CRoleCollectionDocumentServiceComp RoleCollectionDocumentService;
+typedef imtauthgql::CGroupCollectionDocumentServiceComp GroupCollectionDocumentService;
+typedef imtauthgql::CUserCollectionDocumentServiceComp UserCollectionDocumentService;
 
 
 } // namespace ImtAuthGqlPck
-
 

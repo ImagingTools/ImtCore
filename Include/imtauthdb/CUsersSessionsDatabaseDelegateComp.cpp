@@ -6,10 +6,15 @@
 #include <iprm/TParamsPtr.h>
 #include <iprm/ITextParam.h>
 
+// Qt includes
+#include <QtSql/QSqlQuery>
+#include <QtSql/QSqlError>
+
 // ImtCore includes
 #include <imtlic/CFeatureInfo.h>
 #include <imtauth/CSessionInfo.h>
 #include <imtauth/CUserInfo.h>
+#include <imtdb/imtdb.h>
 
 
 namespace imtauthdb
@@ -17,6 +22,52 @@ namespace imtauthdb
 
 
 // public methods
+
+// reimplemented (icomp::CComponentBase)
+
+void CUsersSessionsDatabaseDelegateComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return;
+	}
+
+	const QString tableName = QString::fromUtf8(GetTableName());
+	if (tableName.isEmpty() || !TableExists(tableName)){
+		return;
+	}
+
+	QString driverId = m_databaseEngineCompPtr->GetDatabaseDriverId();
+	QString checkColumnQuery;
+
+	if (driverId == "QPSQL"){
+		checkColumnQuery = QString(
+			"SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = '%1' AND column_name = 'TenantId');"
+		).arg(tableName);
+	}
+	else if (driverId == "QSQLITE"){
+		checkColumnQuery = QString(
+			"SELECT COUNT(*) > 0 FROM pragma_table_info('%1') WHERE name = 'TenantId';"
+		).arg(tableName);
+	}
+	else{
+		return;
+	}
+
+	QSqlError sqlError;
+	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(checkColumnQuery.toUtf8(), &sqlError);
+
+	if (sqlError.type() != QSqlError::NoError){
+		return;
+	}
+
+	if (sqlQuery.next() && !sqlQuery.value(0).toBool()){
+		QString alterQuery = QString("ALTER TABLE \"%1\" ADD COLUMN \"TenantId\" VARCHAR(1000);").arg(tableName);
+		m_databaseEngineCompPtr->ExecSqlQuery(alterQuery.toUtf8(), &sqlError);
+	}
+}
+
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
@@ -28,7 +79,7 @@ QByteArray CUsersSessionsDatabaseDelegateComp::GetSelectionQuery(
 {
 	if (!objectId.isEmpty()){
 		return QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
-			.arg(qPrintable(*m_tableNameAttrPtr), qPrintable(*m_objectIdColumnAttrPtr), qPrintable(objectId)).toUtf8();
+			.arg(qPrintable(*m_tableNameAttrPtr), qPrintable(*m_objectIdColumnAttrPtr), SqlEncode(QString::fromUtf8(objectId))).toUtf8();
 	}
 
 	QString filterQuery;
@@ -63,8 +114,13 @@ istd::IChangeableUniquePtr CUsersSessionsDatabaseDelegateComp::CreateObjectFromR
 	}
 
 	if (record.contains("UserId")){
-		QByteArray userId = record.value("UserId").toByteArray();
+		QByteArray userId = imtdb::VariantToByteArray(record.value("UserId"));
 		sessionInfoPtr->SetUserId(userId);
+	}
+
+	if (record.contains("TenantId")){
+		QByteArray tenantId = imtdb::VariantToByteArray(record.value("TenantId"));
+		sessionInfoPtr->SetTenantId(tenantId);
 	}
 
 	if (record.contains("CreationDate")){
@@ -96,13 +152,22 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSessionsDatabaseDelegateCom
 
 	QByteArray token = sessionPtr->GetToken();
 	QByteArray userId = sessionPtr->GetUserId();
+	QByteArray tenantId = sessionPtr->GetTenantId();
 	QDateTime creationDate = sessionPtr->GetCreationDate();
 	QDateTime expirationDate = sessionPtr->GetExpirationDate();
 
 	NewObjectQuery retVal;
 
-	retVal.query += QString("\nINSERT INTO \"UserSessions\" (\"Id\", \"RefreshToken\", \"UserId\", \"CreationDate\", \"ExpirationDate\") VALUES ('%0', '%1', '%2', '%3', '%4');")
-				.arg(qPrintable(proposedObjectId), qPrintable(token), qPrintable(userId), creationDate.toString(Qt::ISODate), expirationDate.toString(Qt::ISODate)).toUtf8();
+	QString driverId = m_databaseEngineCompPtr->GetDatabaseDriverId();
+	if (driverId == "QPSQL"){
+		retVal.query += QString("\nDELETE FROM \"UserSessions\" WHERE \"ExpirationDate\" < NOW();").toUtf8();
+	}
+	else if (driverId == "QSQLITE"){
+		retVal.query += QString("\nDELETE FROM \"UserSessions\" WHERE \"ExpirationDate\" < strftime('%Y-%m-%dT%H:%M:%S', 'now');").toUtf8();
+	}
+
+	retVal.query += QString("\nINSERT INTO \"UserSessions\" (\"Id\", \"RefreshToken\", \"UserId\", \"TenantId\", \"CreationDate\", \"ExpirationDate\") VALUES ('%0', '%1', '%2', '%3', '%4', '%5');")
+				.arg(SqlEncode(QString::fromUtf8(proposedObjectId)), SqlEncode(QString::fromUtf8(token)), SqlEncode(QString::fromUtf8(userId)), SqlEncode(QString::fromUtf8(tenantId)), creationDate.toString(Qt::ISODate), expirationDate.toString(Qt::ISODate)).toUtf8();
 
 	return retVal;
 }
@@ -122,19 +187,21 @@ QByteArray CUsersSessionsDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 	QByteArray token = sessionPtr->GetToken();
 	QByteArray userId = sessionPtr->GetUserId();
+	QByteArray tenantId = sessionPtr->GetTenantId();
 	QDateTime creationDate = sessionPtr->GetCreationDate();
 	QDateTime expirationDate = sessionPtr->GetExpirationDate();
 
 	QByteArray retVal;
 
-	retVal += QString("\nUPDATE \"%0\" SET \"RefreshToken\" = '%1', \"CreationDate\" = '%2', \"ExpirationDate\" = '%3' WHERE \"%4\" = '%5'")
+	retVal += QString("\nUPDATE \"%0\" SET \"RefreshToken\" = '%1', \"TenantId\" = '%2', \"CreationDate\" = '%3', \"ExpirationDate\" = '%4' WHERE \"%5\" = '%6'")
 				  .arg(
 					  qPrintable(*m_tableNameAttrPtr),
-					  qPrintable(token),
+					  SqlEncode(QString::fromUtf8(token)),
+					  SqlEncode(QString::fromUtf8(tenantId)),
 					creationDate.toString(Qt::ISODate),
 					expirationDate.toString(Qt::ISODate),
 					qPrintable(*m_objectIdColumnAttrPtr),
-					qPrintable(objectId)).toUtf8();
+					SqlEncode(QString::fromUtf8(objectId))).toUtf8();
 
 	return retVal;
 }
@@ -157,7 +224,7 @@ QByteArray CUsersSessionsDatabaseDelegateComp::CreateDeleteObjectsQuery(
 	
 	QStringList quotedIds;
 	for (const QByteArray& objectId : objectIds){
-		quotedIds << QString("'%1'").arg(qPrintable(objectId));
+		quotedIds << QString("'%1'").arg(SqlEncode(QString::fromUtf8(objectId)));
 	}
 	
 	QString query = QString(
@@ -181,7 +248,7 @@ bool CUsersSessionsDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSe
 			return false;
 		}
 
-		filterQuery += QString(R"( WHERE "RefreshToken" = '%1')").arg(textParamPtr->GetText());
+		filterQuery += QString(R"( WHERE "RefreshToken" = '%1')").arg(SqlEncode(textParamPtr->GetText()));
 
 		return true;
 	}
@@ -191,5 +258,4 @@ bool CUsersSessionsDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSe
 
 
 } // namespace imtauthdb
-
 

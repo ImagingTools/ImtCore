@@ -171,11 +171,6 @@ I_EXPORT_COMPONENT(
 			"Selection SelectionParam Adapter");
 
 I_EXPORT_COMPONENT(
-			SystemStatus,
-			"System status",
-			"System Status");
-
-I_EXPORT_COMPONENT(
 			SelectionIdBinder,
 			"Combined list of selected ids",
 			"Selection Param Id Ids Bind");
@@ -224,6 +219,11 @@ I_EXPORT_COMPONENT(
 			ApplicationInfoDelegator,
 			"Application info delegator",
 			"Application Info Delegator");
+
+I_EXPORT_COMPONENT(
+			OrderedObjectCollectionProxy,
+			"Implementation of an ordered object collection facade",
+			"Object Data Model Collection Container Composition Order");
 
 
 } // namespace ImtCorePck

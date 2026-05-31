@@ -58,6 +58,7 @@ public:
 	virtual bool RemoveDocument(const QByteArray& key, const QByteArray& value = QByteArray()) override;
 
 	bool CloseTable(mdbx::env_managed& env);
+	virtual void Reopen() override;
 
 protected:
 	virtual quint64 AddDocument(
@@ -69,6 +70,9 @@ protected:
 				int count,
 				const QByteArray& data);
 	virtual bool Exists(const QString& name);
+
+private:
+	void OpenCursors();
 
 protected:
 	QString m_tableName;

@@ -1110,7 +1110,7 @@ bool CLink::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 
 		return false;
 	}
-	jsonObject["link"] = QJsonValue::fromVariant(*link);
+	jsonObject["link"] = QString::fromUtf8(*link);
 
 	if (status){
 		QString statusStringValue;
@@ -1528,27 +1528,27 @@ bool CPrinterBase::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 		return false;
 	}
 	QVariant specificationVariantValue;
-		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(specification.GetPtr())){
-			if (!val->WriteToModel(*(model.AddTreeModel("specification", modelIndex)), 0)){
+		if (const CPrinterSpecificationBase* printerSpecificationBaseVal = std::get_if<CPrinterSpecificationBase>(specification.GetPtr())){
+			if (!printerSpecificationBaseVal->WriteToModel(*(model.AddTreeModel("specification", modelIndex)), 0)){
 				return false;
 			}
 			if(model.GetTreeItemModel("specification", modelIndex) != nullptr){
 				model.GetTreeItemModel("specification", modelIndex)->SetData("__typename", "PrinterSpecificationBase", 0);
 			}
 		}
-		else if (const CLink* val = std::get_if<CLink>(specification.GetPtr())){
-			if (!val->WriteToModel(*(model.AddTreeModel("specification", modelIndex)), 0)){
+		else if (const CLink* linkVal = std::get_if<CLink>(specification.GetPtr())){
+			if (!linkVal->WriteToModel(*(model.AddTreeModel("specification", modelIndex)), 0)){
 				return false;
 			}
 			if(model.GetTreeItemModel("specification", modelIndex) != nullptr){
 				model.GetTreeItemModel("specification", modelIndex)->SetData("__typename", "Link", 0);
 			}
 		}
-		else if (const QString* val = std::get_if<QString>(specification.GetPtr())){
-			model.SetData("", *val);
+		else if (const QString* stringVal = std::get_if<QString>(specification.GetPtr())){
+			model.SetData("", *stringVal);
 		}
-		else if (const double* val = std::get_if<double>(specification.GetPtr())){
-			model.SetData("", *val);
+		else if (const double* doubleVal = std::get_if<double>(specification.GetPtr())){
+			model.SetData("", *doubleVal);
 		}
 
 
@@ -1556,27 +1556,27 @@ bool CPrinterBase::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 	newSpecificationListModelPtr->setIsArray(true);
 	for (qsizetype specificationListIndex = 0; specificationListIndex < specificationList->size(); ++specificationListIndex){
 		QVariant specificationListVariantValue;
-		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(specificationList->at(specificationListIndex).GetPtr())){
+		if (const CPrinterSpecificationBase* printerSpecificationBaseVal = std::get_if<CPrinterSpecificationBase>(specificationList->at(specificationListIndex).GetPtr())){
 			newSpecificationListModelPtr->InsertNewItem();
-			if(!val->WriteToModel(*newSpecificationListModelPtr, specificationListIndex)){
+			if(!printerSpecificationBaseVal->WriteToModel(*newSpecificationListModelPtr, specificationListIndex)){
 				return false;
 			}
 			newSpecificationListModelPtr->SetData("__typename", "PrinterSpecificationBase", specificationListIndex);
 		}
-		else if (const CLink* val = std::get_if<CLink>(specificationList->at(specificationListIndex).GetPtr())){
+		else if (const CLink* linkVal = std::get_if<CLink>(specificationList->at(specificationListIndex).GetPtr())){
 			newSpecificationListModelPtr->InsertNewItem();
-			if(!val->WriteToModel(*newSpecificationListModelPtr, specificationListIndex)){
+			if(!linkVal->WriteToModel(*newSpecificationListModelPtr, specificationListIndex)){
 				return false;
 			}
 			newSpecificationListModelPtr->SetData("__typename", "Link", specificationListIndex);
 		}
-		else if (const QString* val = std::get_if<QString>(specificationList->at(specificationListIndex).GetPtr())){
+		else if (const QString* stringVal = std::get_if<QString>(specificationList->at(specificationListIndex).GetPtr())){
 			newSpecificationListModelPtr->InsertNewItem();
-			newSpecificationListModelPtr->SetData("", *val);
+			newSpecificationListModelPtr->SetData("", *stringVal);
 		}
-		else if (const double* val = std::get_if<double>(specificationList->at(specificationListIndex).GetPtr())){
+		else if (const double* doubleVal = std::get_if<double>(specificationList->at(specificationListIndex).GetPtr())){
 			newSpecificationListModelPtr->InsertNewItem();
-			newSpecificationListModelPtr->SetData("", *val);
+			newSpecificationListModelPtr->SetData("", *doubleVal);
 		}
 	}
 
@@ -1618,7 +1618,7 @@ bool CPrinterBase::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 
 		return false;
 	}
-	QString specificationTypename = specificationData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+	QString specificationTypename = model.GetTreeItemModel("specification", modelIndex)->GetData("__typename").toString();
 	if (specificationTypename == "PrinterSpecificationBase") {
 		CPrinterSpecificationBase specificationConvert;
 		const bool isspecificationRead = specificationConvert.ReadFromModel(*model.GetTreeItemModel("specification", modelIndex)); 
@@ -1714,7 +1714,7 @@ bool CPrinterBase::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 
 	QVariant specificationData = model.GetData("specification", modelIndex);
 	if (!specificationData.isNull()){
-		QString specificationTypename = specificationData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+		QString specificationTypename = model.GetTreeItemModel("specification", modelIndex)->GetData("__typename").toString();
 		if (specificationTypename == "PrinterSpecificationBase") {
 			CPrinterSpecificationBase specificationConvert;
 			const bool isspecificationRead = specificationConvert.ReadFromModel(*model.GetTreeItemModel("specification", modelIndex)); 
@@ -1812,46 +1812,46 @@ bool CPrinterBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 		return false;
 	}
 	::imtgql::CGqlParamObject specificationDataObject;
-	if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(specification.GetPtr())){
-		if (!val->WriteToGraphQlObject(specificationDataObject)){
+	if (const CPrinterSpecificationBase* printerSpecificationBaseVal = std::get_if<CPrinterSpecificationBase>(specification.GetPtr())){
+		if (!printerSpecificationBaseVal->WriteToGraphQlObject(specificationDataObject)){
 			return false;
 		}
 		specificationDataObject.InsertParam("__typename", QVariant("PrinterSpecificationBase"));
 	}
-	else if (const CLink* val = std::get_if<CLink>(specification.GetPtr())){
-		if (!val->WriteToGraphQlObject(specificationDataObject)){
+	else if (const CLink* linkVal = std::get_if<CLink>(specification.GetPtr())){
+		if (!linkVal->WriteToGraphQlObject(specificationDataObject)){
 			return false;
 		}
 		specificationDataObject.InsertParam("__typename", QVariant("Link"));
 	}
-	else if (const QString* val = std::get_if<QString>(specification.GetPtr())){
-		specificationDataObject.InsertParam("specification", *val);
+	else if (const QString* stringVal = std::get_if<QString>(specification.GetPtr())){
+		specificationDataObject.InsertParam("specification", *stringVal);
 	}
-	else if (const double* val = std::get_if<double>(specification.GetPtr())){
-		specificationDataObject.InsertParam("specification", *val);
+	else if (const double* doubleVal = std::get_if<double>(specification.GetPtr())){
+		specificationDataObject.InsertParam("specification", *doubleVal);
 	}
 	gqlObject.InsertParam("specification", specificationDataObject);
 
 	QList<::imtgql::CGqlParamObject> specificationListDataObjectList;
 	for (qsizetype specificationListIndex = 0; specificationListIndex < specificationList->size(); ++specificationListIndex){
 		::imtgql::CGqlParamObject specificationListDataObject;
-		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(specificationList->at(specificationListIndex).GetPtr())){
-			if (!val->WriteToGraphQlObject(specificationListDataObject)){
+		if (const CPrinterSpecificationBase* printerSpecificationBaseVal = std::get_if<CPrinterSpecificationBase>(specificationList->at(specificationListIndex).GetPtr())){
+			if (!printerSpecificationBaseVal->WriteToGraphQlObject(specificationListDataObject)){
 				return false;
 			}
 			specificationListDataObject.InsertParam("__typename", QVariant("PrinterSpecificationBase"));
 		}
-		else if (const CLink* val = std::get_if<CLink>(specificationList->at(specificationListIndex).GetPtr())){
-			if (!val->WriteToGraphQlObject(specificationListDataObject)){
+		else if (const CLink* linkVal = std::get_if<CLink>(specificationList->at(specificationListIndex).GetPtr())){
+			if (!linkVal->WriteToGraphQlObject(specificationListDataObject)){
 				return false;
 			}
 			specificationListDataObject.InsertParam("__typename", QVariant("Link"));
 		}
-		else if (const QString* val = std::get_if<QString>(specificationList->at(specificationListIndex).GetPtr())){
-			specificationListDataObject.InsertParam("specificationList", *val);
+		else if (const QString* stringVal = std::get_if<QString>(specificationList->at(specificationListIndex).GetPtr())){
+			specificationListDataObject.InsertParam("specificationList", *stringVal);
 		}
-		else if (const double* val = std::get_if<double>(specificationList->at(specificationListIndex).GetPtr())){
-			specificationListDataObject.InsertParam("specificationList", *val);
+		else if (const double* doubleVal = std::get_if<double>(specificationList->at(specificationListIndex).GetPtr())){
+			specificationListDataObject.InsertParam("specificationList", *doubleVal);
 		}
 		specificationListDataObjectList << specificationListDataObject;
 	}
@@ -2110,69 +2110,69 @@ bool CPrinterBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 
 		return false;
 	}
-	if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(specification.GetPtr())){
+	if (const CPrinterSpecificationBase* printerSpecificationBaseVal = std::get_if<CPrinterSpecificationBase>(specification.GetPtr())){
 		QJsonObject specificationJsonObject;
-		const bool isspecificationAdded = val->WriteToJsonObject(specificationJsonObject);
+		const bool isspecificationAdded = printerSpecificationBaseVal->WriteToJsonObject(specificationJsonObject);
 		if (!isspecificationAdded){
 			return false;
 		}
 		specificationJsonObject["__typename"] = "PrinterSpecificationBase";
 		jsonObject["specification"] = specificationJsonObject;
 	}
-	else if (const CLink* val = std::get_if<CLink>(specification.GetPtr())){
+	else if (const CLink* linkVal = std::get_if<CLink>(specification.GetPtr())){
 		QJsonObject specificationJsonObject;
-		const bool isspecificationAdded = val->WriteToJsonObject(specificationJsonObject);
+		const bool isspecificationAdded = linkVal->WriteToJsonObject(specificationJsonObject);
 		if (!isspecificationAdded){
 			return false;
 		}
 		specificationJsonObject["__typename"] = "Link";
 		jsonObject["specification"] = specificationJsonObject;
 	}
-	else if (const QString* val = std::get_if<QString>(specification.GetPtr())){
+	else if (const QString* stringVal = std::get_if<QString>(specification.GetPtr())){
 		if (!specification){
 			return false;
 		}
-		jsonObject["specification"] = QJsonValue::fromVariant(*val);
+		jsonObject["specification"] = QJsonValue::fromVariant(*stringVal);
 	}
-	else if (const double* val = std::get_if<double>(specification.GetPtr())){
+	else if (const double* doubleVal = std::get_if<double>(specification.GetPtr())){
 		if (!specification){
 			return false;
 		}
-		jsonObject["specification"] = QJsonValue::fromVariant(*val);
+		jsonObject["specification"] = QJsonValue::fromVariant(*doubleVal);
 	}
 
 
 	QJsonArray newSpecificationListArray;
 	for (qsizetype specificationListIndex = 0; specificationListIndex < specificationList->size(); ++specificationListIndex){
-		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(specificationList->at(specificationListIndex).GetPtr())){
+		if (const CPrinterSpecificationBase* printerSpecificationBaseVal = std::get_if<CPrinterSpecificationBase>(specificationList->at(specificationListIndex).GetPtr())){
 			QJsonObject specificationListJsonObject;
-			const bool isspecificationListAdded = val->WriteToJsonObject(specificationListJsonObject);
+			const bool isspecificationListAdded = printerSpecificationBaseVal->WriteToJsonObject(specificationListJsonObject);
 			if (!isspecificationListAdded){
 				return false;
 			}
 			specificationListJsonObject["__typename"] = "PrinterSpecificationBase";
 			newSpecificationListArray << specificationListJsonObject;
 		}
-		else if (const CLink* val = std::get_if<CLink>(specificationList->at(specificationListIndex).GetPtr())){
+		else if (const CLink* linkVal = std::get_if<CLink>(specificationList->at(specificationListIndex).GetPtr())){
 			QJsonObject specificationListJsonObject;
-			const bool isspecificationListAdded = val->WriteToJsonObject(specificationListJsonObject);
+			const bool isspecificationListAdded = linkVal->WriteToJsonObject(specificationListJsonObject);
 			if (!isspecificationListAdded){
 				return false;
 			}
 			specificationListJsonObject["__typename"] = "Link";
 			newSpecificationListArray << specificationListJsonObject;
 		}
-		else if (const QString* val = std::get_if<QString>(specificationList->at(specificationListIndex).GetPtr())){
+		else if (const QString* stringVal = std::get_if<QString>(specificationList->at(specificationListIndex).GetPtr())){
 			if (!specificationList){
 				return false;
 			}
-			newSpecificationListArray << QJsonValue::fromVariant(*val);
+			newSpecificationListArray << QJsonValue::fromVariant(*stringVal);
 		}
-		else if (const double* val = std::get_if<double>(specificationList->at(specificationListIndex).GetPtr())){
+		else if (const double* doubleVal = std::get_if<double>(specificationList->at(specificationListIndex).GetPtr())){
 			if (!specificationList){
 				return false;
 			}
-			newSpecificationListArray << QJsonValue::fromVariant(*val);
+			newSpecificationListArray << QJsonValue::fromVariant(*doubleVal);
 		}
 	}
 	jsonObject["specificationList"] = newSpecificationListArray;
@@ -4158,7 +4158,7 @@ bool CPrinterCollectionControllerCompBase::GetOperationFromRequest(const ::imtgq
 }
 
 
-bool CPrinterCollectionControllerCompBase::CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const ::imtgql::CGqlRequest& gqlRequest, ::imtbase::CTreeItemModel& dataModel, QString& errorMessage) const
+bool CPrinterCollectionControllerCompBase::CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const ::imtgql::CGqlRequest& gqlRequest, QJsonObject& dataObj, QString& errorMessage) const
 {
 	Q_UNUSED(objectTypeId);
 
@@ -4175,23 +4175,25 @@ bool CPrinterCollectionControllerCompBase::CreateRepresentationFromObject(const 
 			return false;
 		}
 
-		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(&representationObject)){
-			if (!val->WriteToModel(dataModel)){
+		if (const CPrinterSpecificationBase* printerSpecificationBaseVal = std::get_if<CPrinterSpecificationBase>(&representationObject)){
+			const bool isAdded = printerSpecificationBaseVal->WriteToJsonObject(dataObj);
+			if (!isAdded){
 				return false;
 			}
-			dataModel.SetData("__typename", "PrinterSpecificationBase", 0);
+			dataObj["__typename"] = "PrinterSpecificationBase";
 		}
-		else if (const CLink* val = std::get_if<CLink>(&representationObject)){
-			if (!val->WriteToModel(dataModel)){
+		else if (const CLink* linkVal = std::get_if<CLink>(&representationObject)){
+			const bool isAdded = linkVal->WriteToJsonObject(dataObj);
+			if (!isAdded){
 				return false;
 			}
-			dataModel.SetData("__typename", "Link", 0);
+			dataObj["__typename"] = "Link";
 		}
-		else if (const QString* val = std::get_if<QString>(&representationObject)){
-			dataModel.SetData("", *val);
+		else if (const QString* stringVal = std::get_if<QString>(&representationObject)){
+			dataObj["representationObject"] = QJsonValue::fromVariant(*stringVal);
 		}
-		else if (const double* val = std::get_if<double>(&representationObject)){
-			dataModel.SetData("", *val);
+		else if (const double* doubleVal = std::get_if<double>(&representationObject)){
+			dataObj["representationObject"] = QJsonValue::fromVariant(*doubleVal);
 		}
 
 		return true;
@@ -4216,11 +4218,11 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 }
 
 
-::imtbase::CTreeItemModel* CGraphQlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CGraphQlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	const QByteArray commandId = gqlRequest.GetCommandId();
-	istd::TDelPtr<::imtbase::CTreeItemModel> modelPtr(new ::imtbase::CTreeItemModel);
-	::imtbase::CTreeItemModel* dataModelPtr = modelPtr->AddTreeModel("data");
+	QJsonObject modelObj;
+	QJsonObject dataModelObj;
 
 	// GetSpecifications
 	if (commandId == CGetSpecificationsGqlRequest::GetCommandId()){
@@ -4229,45 +4231,43 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 			errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
 			SendErrorMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
 
 		PrinterSpecification replyPayload = OnGetSpecifications(getSpecificationsGqlRequest, gqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
 			SendErrorMessage(0, QString("The derived call [OnGetSpecifications] returned an error: %1").arg(errorMessage));
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(&replyPayload)){
-			if (!val->WriteToModel(*dataModelPtr)){
-				return nullptr;
+		if (const CPrinterSpecificationBase* printerSpecificationBaseVal = std::get_if<CPrinterSpecificationBase>(&replyPayload)){
+			const bool isAdded = printerSpecificationBaseVal->WriteToJsonObject(dataModelObj);
+			if (!isAdded){
+				return QJsonObject();
 			}
-			if(dataModelPtr != nullptr){
-				dataModelPtr->SetData("__typename", "PrinterSpecificationBase", 0);
+			dataModelObj["__typename"] = "PrinterSpecificationBase";
+		}
+		else if (const CLink* linkVal = std::get_if<CLink>(&replyPayload)){
+			const bool isAdded = linkVal->WriteToJsonObject(dataModelObj);
+			if (!isAdded){
+				return QJsonObject();
 			}
+			dataModelObj["__typename"] = "Link";
 		}
-		else if (const CLink* val = std::get_if<CLink>(&replyPayload)){
-			if (!val->WriteToModel(*dataModelPtr)){
-				return nullptr;
-			}
-			if(dataModelPtr != nullptr){
-				dataModelPtr->SetData("__typename", "Link", 0);
-			}
+		else if (const QString* stringVal = std::get_if<QString>(&replyPayload)){
+			dataModelObj.insert("", *stringVal);
 		}
-		else if (const QString* val = std::get_if<QString>(&replyPayload)){
-			dataModelPtr->SetData("", *val);
+		else if (const double* doubleVal = std::get_if<double>(&replyPayload)){
+			dataModelObj.insert("", *doubleVal);
 		}
-		else if (const double* val = std::get_if<double>(&replyPayload)){
-			dataModelPtr->SetData("", *val);
-		}
-		return modelPtr.PopPtr();
+		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
 	}
 
 	errorMessage = QString("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
 	SendErrorMessage(0, errorMessage);
 
-	return nullptr;
+	return QJsonObject();
 }
 
 

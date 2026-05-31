@@ -17,6 +17,14 @@ Rectangle {
 	property bool contentVisible: true;
 	
 	property var registeredViewDelegates: ({})
+
+	Component.onCompleted: {
+		registerViewDelegate("Date", metaInfoViewDateDelegateComp)
+		registerViewDelegate("Time", metaInfoViewDateDelegateComp)
+		registerViewDelegate("DateTime", metaInfoViewDateDelegateComp)
+		registerViewDelegate("StringList", metaInfoViewStringListDelegateComp)
+		registerViewDelegate("ByteArrayList", metaInfoViewStringListDelegateComp)
+	}
 	
 	function startLoading(){
 		loading.start();
@@ -26,13 +34,26 @@ Rectangle {
 		loading.stop();
 	}
 
-	function registerViewDelegate(parameterId, viewComp){
-		registeredViewDelegates[parameterId] = viewComp
+	function registerViewDelegate(parameterTypeId, viewComp){
+		registeredViewDelegates[parameterTypeId] = viewComp
 	}
 	
 	Component {
 		id: metaInfoViewDelegateBaseComp
 		MetaInfoTextDelegate {
+		}
+	}
+
+	Component {
+		id: metaInfoViewStringListDelegateComp
+		MetaInfoStringListDelegate {
+		}
+	}
+
+	Component {
+		id: metaInfoViewDateDelegateComp
+
+		MetaInfoDateDelegate{
 		}
 	}
 	
@@ -77,8 +98,8 @@ Rectangle {
 
 					Loader {
 						sourceComponent:
-							model.item.m_id in container.registeredViewDelegates ?
-								container.registeredViewDelegates[model.item.m_id] : metaInfoViewDelegateBaseComp
+							model.item.m_typeId in container.registeredViewDelegates ?
+								container.registeredViewDelegates[model.item.m_typeId] : metaInfoViewDelegateBaseComp
 						width: parent.width
 						onLoaded: {
 							item.metaInfoView = container

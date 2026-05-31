@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
+// Qt includes
+#include <QtCore/QJsonObject>
+
 // ACF includes
 #include <ilog/CMessageContainer.h>
 
@@ -25,12 +28,12 @@ public:
 
 protected:
 	// reimplemented (imtservergql::CGqlRepresentationDataControllerComp)
-	virtual imtbase::CTreeItemModel* CreateInternalResponse(
+	virtual QJsonObject CreateInternalResponse(
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
 protected:
-	imtbase::CTreeItemModel* CreateTreeItemModelFromResponse(const QByteArray& commandId, const imtgql::IGqlResponse& response) const;
+	QJsonObject CreateJsonObjectFromResponse(const QByteArray& commandId, const imtgql::IGqlResponse& response) const;
 
 protected:
 	I_REF(imtclientgql::IGqlClient, m_apiClientCompPtr);

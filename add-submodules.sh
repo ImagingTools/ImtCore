@@ -10,9 +10,6 @@ GITHUB_ORG="ImagingTools"
 # Libraries to add as submodules
 LIBRARIES=(
     "EJ"
-    "JQ"
-    "JQML"
-    "JQML2"
     "QXlsx"
     "WebCompiler"
     "boost"

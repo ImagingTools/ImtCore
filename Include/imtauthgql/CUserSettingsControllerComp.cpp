@@ -2,6 +2,10 @@
 #include <imtauthgql/CUserSettingsControllerComp.h>
 
 
+// Qt includes
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonDocument>
+
 // ACF includes
 #include <istd/TOptDelPtr.h>
 #include <iprm/CParamsSet.h>
@@ -17,23 +21,23 @@ namespace imtauthgql
 
 // reimplemented (imtservergql::CGqlRepresentationDataControllerComp)
 
-imtbase::CTreeItemModel* CUserSettingsControllerComp::CreateRepresentationFromRequest(
+QJsonObject CUserSettingsControllerComp::CreateRepresentationFromRequest(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	if (!m_userSettingsRepresentationControllerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'm_userSettingsRepresentationControllerCompPtr' was not set", "CUserSettingsControllerComp");
-		return nullptr;
+		return QJsonObject();
 	}
 
 	if (!m_userSettingsCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'm_userSettingsCollectionCompPtr' was not set", "CUserSettingsControllerComp");
-		return nullptr;
+		return QJsonObject();
 	}
 
 	if (!m_userSettingsInfoFactCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'm_userSettingsInfoFactCompPtr' was not set", "CUserSettingsControllerComp");
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QByteArray languageId;
@@ -56,23 +60,29 @@ imtbase::CTreeItemModel* CUserSettingsControllerComp::CreateRepresentationFromRe
 	languageIdParamPtr->SetId(languageId);
 	paramsPtr->SetEditableParameter("LanguageParam", languageIdParamPtr, true);
 
-	imtauth::IUserSettingsUniquePtr userSettingsPtr;
+	imtauth::IUserSettingsSharedPtr userSettingsPtr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!userId.isEmpty()){
 		if (m_userSettingsCollectionCompPtr->GetObjectData(userId, dataPtr)){
-			istd::IChangeableUniquePtr uniqueDataPtr = dataPtr.GetPtr();
-			userSettingsPtr.MoveCastedPtr<istd::IChangeable>(uniqueDataPtr);
+			userSettingsPtr = dataPtr.dynamicCast<imtauth::IUserSettings>();
 		}
 	}
 
 	if (!userSettingsPtr.IsValid()){
+		if (userId.isEmpty()){
+			errorMessage = QString("Unable to create representation for user settings. Error: User-ID is empty.");
+			SendErrorMessage(0, errorMessage, "CUserSettingsControllerComp");
+
+			return QJsonObject();
+		}
+
 		userSettingsPtr = m_userSettingsInfoFactCompPtr.CreateInstance();
 		Q_ASSERT(userSettingsPtr.IsValid());
 		if (!userSettingsPtr.IsValid()){
 			errorMessage = QString("Unable to create representation for user settings. Error: User settings is invalid.");
 			SendErrorMessage(0, errorMessage, "CUserSettingsControllerComp");
 
-			return nullptr;
+			return QJsonObject();
 		}
 
 		userSettingsPtr->SetUserId(userId);
@@ -84,27 +94,27 @@ imtbase::CTreeItemModel* CUserSettingsControllerComp::CreateRepresentationFromRe
 		errorMessage = QString("Unable to create representation for user settings. Error: Params set from user settings is invalid.");
 		SendErrorMessage(0, errorMessage, "CUserSettingsControllerComp");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> userSettingsRepresentation(new imtbase::CTreeItemModel);
-	imtbase::CTreeItemModel* dataModelPtr = userSettingsRepresentation->AddTreeModel("data");
-
-	bool result = m_userSettingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(*paramSetPtr, *dataModelPtr, paramsPtr.GetPtr());
+	QJsonObject dataModel;
+	bool result = m_userSettingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(*paramSetPtr, dataModel, paramsPtr.GetPtr());
 	if (!result){
 		errorMessage = QString("Unable to create representation for user settings.");
 		SendErrorMessage(0, errorMessage, "CUserSettingsControllerComp");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
-	return userSettingsRepresentation.PopPtr();
+	QJsonObject rootObj;
+	rootObj.insert(QStringLiteral("data"), dataModel);
+	return rootObj;
 }
 
 
 bool CUserSettingsControllerComp::UpdateModelFromRepresentation(
 			const imtgql::CGqlRequest& request,
-			imtbase::CTreeItemModel* representationPtr) const
+			const QJsonObject& representation) const
 {
 	if (!m_userSettingsRepresentationControllerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'm_userSettingsRepresentationControllerCompPtr' was not set", "CUserSettingsControllerComp");
@@ -137,11 +147,10 @@ bool CUserSettingsControllerComp::UpdateModelFromRepresentation(
 		return false;
 	}
 
-	imtauth::IUserSettingsUniquePtr userSettingsPtr;
+	imtauth::IUserSettingsSharedPtr userSettingsPtr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_userSettingsCollectionCompPtr->GetObjectData(userId, dataPtr)){
-		istd::IChangeableUniquePtr uniqueDataPtr = dataPtr.GetPtr();
-		userSettingsPtr.MoveCastedPtr<istd::IChangeable>(uniqueDataPtr);
+		userSettingsPtr = dataPtr.dynamicCast<imtauth::IUserSettings>();
 	}
 
 	if (!userSettingsPtr.IsValid()){
@@ -158,7 +167,7 @@ bool CUserSettingsControllerComp::UpdateModelFromRepresentation(
 		return false;
 	}
 
-	bool retVal = m_userSettingsRepresentationControllerCompPtr->GetDataModelFromRepresentation(*representationPtr, *paramSetPtr);
+	bool retVal = m_userSettingsRepresentationControllerCompPtr->GetDataModelFromRepresentation(representation, *paramSetPtr);
 	if (retVal){
 		imtbase::ICollectionInfo::Ids collectionIds = m_userSettingsCollectionCompPtr->GetElementIds();
 		if (collectionIds.contains(userId)){
@@ -174,5 +183,4 @@ bool CUserSettingsControllerComp::UpdateModelFromRepresentation(
 
 
 } // namespace imtauthgql
-
 

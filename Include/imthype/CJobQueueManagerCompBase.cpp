@@ -40,11 +40,7 @@ IJobTicketSharedPtr CJobQueueManagerCompBase::GetJobTicket(const QByteArray& job
 		if (ticketPtr){
 			// Set params factory for proper deserialization
 			ticketPtr->SetParamsFactory([this](const QByteArray& ctx, const QByteArray& type) -> iprm::IParamsSetSharedPtr {
-				iprm::IParamsSetUniquePtr uniquePtr = CreateJobParameters(ctx, type, nullptr);
-				iprm::IParamsSetSharedPtr retVal;
-				retVal.MoveCastedPtr(uniquePtr);
-				
-				return retVal;
+				return CreateJobParameters(ctx, type, nullptr);
 			});
 			IJobTicketSharedPtr retVal;
 			retVal.SetCastedPtr(dataPtr);
@@ -107,11 +103,7 @@ QByteArray CJobQueueManagerCompBase::InsertNewJobIntoQueue(
 
 	// Set params factory for proper deserialization
 	jobTicket.SetParamsFactory([this](const QByteArray& ctx, const QByteArray& type) -> iprm::IParamsSetSharedPtr {
-		iprm::IParamsSetUniquePtr uniquePtr = CreateJobParameters(ctx, type, nullptr);
-		iprm::IParamsSetSharedPtr retVal;
-		retVal.MoveCastedPtr(uniquePtr);
-
-		return retVal;
+		return CreateJobParameters(ctx, type, nullptr);
 	});
 
 	if (jobProcessingParamsPtr != nullptr){
@@ -121,10 +113,8 @@ QByteArray CJobQueueManagerCompBase::InsertNewJobIntoQueue(
 
 			return QByteArray();
 		}
-		iprm::IParamsSetSharedPtr paramsSetSharedPtr;
-		paramsSetSharedPtr.MoveCastedPtr(paramsPtr);
 
-		jobTicket.SetParams(iprm::IParamsSetSharedPtr(paramsSetSharedPtr));
+		jobTicket.SetParams(std::move(paramsPtr));
 	}
 
 	QWriteLocker lock(&m_mutex);

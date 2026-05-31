@@ -3,7 +3,7 @@
 
 
 // ImtCore includes
-#include <imtqml/IPageGuiElementModel.h>
+#include <imtserverapp/IPageGuiElementModel.h>
 
 
 namespace imtserverapp
@@ -16,7 +16,7 @@ namespace imtserverapp
 
 bool CPageGuiElementModelRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
 {
-	const imtqml::IPageGuiElementModel* guiElementPtr = dynamic_cast<const imtqml::IPageGuiElementModel*>(&dataModel);
+	const imtserverapp::IPageGuiElementModel* guiElementPtr = dynamic_cast<const imtserverapp::IPageGuiElementModel*>(&dataModel);
 
 	return guiElementPtr != nullptr;
 }
@@ -24,12 +24,12 @@ bool CPageGuiElementModelRepresentationControllerComp::IsModelSupported(const is
 
 bool CPageGuiElementModelRepresentationControllerComp::GetRepresentationFromDataModel(
 			const istd::IChangeable& dataModel,
-			imtbase::CTreeItemModel& representation,
+			QJsonObject& representation,
 			const iprm::IParamsSet* paramsPtr) const
 {
 	Q_ASSERT(IsModelSupported(dataModel));
 
-	const imtqml::IPageGuiElementModel* guiElementPtr = dynamic_cast<const imtqml::IPageGuiElementModel*>(&dataModel);
+	const imtserverapp::IPageGuiElementModel* guiElementPtr = dynamic_cast<const imtserverapp::IPageGuiElementModel*>(&dataModel);
 	if (guiElementPtr == nullptr){
 		return false;
 	}
@@ -42,15 +42,15 @@ bool CPageGuiElementModelRepresentationControllerComp::GetRepresentationFromData
 	QString pageQmlItemFilePath = guiElementPtr->GetPageQmlItemFilePath();
 	QString startSourceItem = guiElementPtr->GetStartSourceItem();
 
-	representation.SetData("source", pageQmlItemFilePath);
-	representation.SetData("startItem", startSourceItem);
+	representation.insert(QStringLiteral("source"), pageQmlItemFilePath);
+	representation.insert(QStringLiteral("startItem"), startSourceItem);
 
 	return true;
 }
 
 
 bool CPageGuiElementModelRepresentationControllerComp::GetDataModelFromRepresentation(
-			const imtbase::CTreeItemModel& /*representation*/,
+			const QJsonObject& /*representation*/,
 			istd::IChangeable& /*dataModel*/) const
 {
 	return false;
@@ -58,5 +58,4 @@ bool CPageGuiElementModelRepresentationControllerComp::GetDataModelFromRepresent
 
 
 } // namespace imtgui
-
 

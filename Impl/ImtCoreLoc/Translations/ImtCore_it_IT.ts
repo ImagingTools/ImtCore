@@ -6615,9 +6615,9 @@
     </message>
 </context>
 <context>
-    <name>DocumentManager</name>
+    <name>DocumentService</name>
     <message>
-        <location filename="../../../Qml/imtdocgui/DocumentManager.qml" line="+9" />
+        <location filename="../../../Qml/imtdocgui/DocumentService.qml" line="+9" />
         <source>&lt;no name&gt;</source>
         <translation>&lt;senza nome&gt;</translation>
     </message>
@@ -6634,9 +6634,9 @@
     </message>
 </context>
 <context>
-    <name>DocumentManagerBase</name>
+    <name>DocumentServiceBase</name>
     <message>
-        <location filename="../../../Qml/imtdocgui/DocumentManagerBase.qml" line="+100" />
+        <location filename="../../../Qml/imtdocgui/DocumentServiceBase.qml" line="+100" />
         <source>&lt;no name&gt;</source>
         <translation>&lt;senza nome&gt;</translation>
     </message>
@@ -6924,9 +6924,9 @@
     </message>
 </context>
 <context>
-    <name>GqlBasedCollectionDocumentManager</name>
+    <name>GqlBasedCollectionDocumentService</name>
     <message>
-        <location filename="../../../Qml/imtguigql/GqlBasedCollectionDocumentManager.qml" line="+252" />
+        <location filename="../../../Qml/imtguigql/GqlBasedCollectionDocumentService.qml" line="+252" />
         <location line="+33" />
         <location line="+34" />
         <location line="+37" />
@@ -8744,7 +8744,7 @@ Errori: 0</translation>
         <translation>ID utente</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtbase/CSystemStatusComp.cpp" line="+185" />
+        <location filename="../../../Include/imtserverapp/CSystemStatusComp.cpp" line="+185" />
         <source>The %1 server cannot be connected at %2.</source>
         <translation>Impossibile connettersi al server %1 all'indirizzo %2.</translation>
     </message>
@@ -10314,7 +10314,7 @@ ID input: </translation>
 <context>
     <name>imtbase::CSystemStatusComp</name>
     <message>
-        <location filename="../../../Include/imtbase/CSystemStatusComp.cpp" line="-140" />
+        <location filename="../../../Include/imtserverapp/CSystemStatusComp.cpp" line="-140" />
         <location line="+64" />
         <source>Try connect to: '%1' ...</source>
         <translation>Connessione a: '%1' ...</translation>

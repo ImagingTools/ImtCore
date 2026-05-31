@@ -102,7 +102,7 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 		return payload;
 	}
 
-	QByteArray tokenValue = QUuid::createUuid().toByteArray();
+	QByteArray tokenValue = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	payload.Version_1_0.emplace();
 
@@ -121,7 +121,7 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 
 	if (m_jwtSessionControllerCompPtr.IsValid()){
 		imtauth::IJwtSessionController::UserSession userSession;
-		if (m_jwtSessionControllerCompPtr->CreateNewSession(objectId, userSession)){
+		if (m_jwtSessionControllerCompPtr->CreateNewSession(objectId, QByteArray(), userSession)){
 			payload.Version_1_0->refreshToken = userSession.refreshToken;
 			payload.Version_1_0->token = userSession.accessToken;
 			payload.Version_1_0->userId = userSession.userId;
@@ -153,13 +153,11 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 			QByteArray typeId = userConnectionInfoPtr->GetFactoryId();
 			QByteArray result = m_userConnectionCollectionCompPtr->InsertNewObject(typeId, "", "", userConnectionInfoPtr.GetPtr(), objectId);
 			if (result.isEmpty()){
-				errorMessage = QString("Unable to insert last connection info for user with login: '%1'").arg(qPrintable(login));
 				SendWarningMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
 			}
 		}
 		else{
 			if (!m_userConnectionCollectionCompPtr->SetObjectData(objectId, *userConnectionInfoPtr.GetPtr())){
-				errorMessage = QString("Unable to set last connection info for user with login: '%1'").arg(qPrintable(login));
 				SendWarningMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
 			}
 		}

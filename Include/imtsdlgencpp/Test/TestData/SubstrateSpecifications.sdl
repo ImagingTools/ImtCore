@@ -6,18 +6,22 @@ schema {
 	mutation: Mutation
 }
 
+
 import {
 	"ImtBaseTypes.sdl"
 }
+
 
 input InputId {
 	id: ID!
 }
 
+
 type CollectionViewParamsTest {
 	count: Int
 	offset: Int
 }
+
 
 type SubstrateSpecificationDocumentTypeIds {
 	PaperID: ID
@@ -25,9 +29,11 @@ type SubstrateSpecificationDocumentTypeIds {
 	FilmID: ID
 }
 
+
 input SubstrateSpecificationListInput {
 	viewParams: CollectionViewParamsTest
 }
+
 
 type SubstrateSpecificationListItem {
 	id: ID!
@@ -40,20 +46,24 @@ type SubstrateSpecificationListItem {
 	colorPreview: String
 }
 
+
 type SubstrateSpecificationListResponse{
 	items: [SubstrateSpecificationListItem]
 }
+
 
 type CardboardSubstrateSpecification {
 	color: String
 	grammage: Double
 }
 
+
 type PaperSubstrateSpecification {
 	grammage: Double
 	color: String
 	coatType: String
 }
+
 
 type FilmSubstrateSpecification {
 	transparency: Double
@@ -63,6 +73,7 @@ type FilmSubstrateSpecification {
 
 union SubstrateSpecificationDocument = CardboardSubstrateSpecification | PaperSubstrateSpecification | FilmSubstrateSpecification
 
+
 input SubstrateSpecificationInput {
 	id: ID!
 	name: String
@@ -70,6 +81,7 @@ input SubstrateSpecificationInput {
 	item: SubstrateSpecificationDocument!
 	typeId: ID!
 }
+
 
 type SubstrateSpecificationDocumentMetaInfo {
 	materialId: ID

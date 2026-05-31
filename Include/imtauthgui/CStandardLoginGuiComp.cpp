@@ -242,14 +242,14 @@ void CStandardLoginGuiComp::on_SuPasswordEdit_textEdited(const QString& text)
 	SuPasswordEdit->setStyleSheet("");
 	SuPasswordMessage->setText("");
 
-	CheckMatchingPassword();
-
 	if (text.isEmpty()){
 		SuPasswordMessage->setStyleSheet("color: red");
 		SuPasswordMessage->setText(tr("Please enter a non-empty password"));
+		SetPasswordButton->setEnabled(false);
 	}
-
-	SetPasswordButton->setEnabled(!text.isEmpty());
+	else{
+		CheckMatchingPassword();
+	}
 }
 
 

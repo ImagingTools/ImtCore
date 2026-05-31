@@ -5,6 +5,9 @@
 // Qt includes
 #include <QtCore/QString>
 
+// ImtCore includes
+#include <imtdb/IDatabaseEngine.h>
+
 
 /**
  * @namespace imtdb
@@ -134,6 +137,72 @@ static const QString DEFAULT_DATA_LITERAL	= QStringLiteral("DEFAULT");
  * @endcode
  */
 QString SqlEncode(const QString& sqlQuery);
+
+
+/**
+ * @brief Returns the resource path for an SQL script file based on the database driver.
+ *
+ * Selects between `:/SQL/SQLite/` and `:/SQL/Postgres/` prefixes depending on
+ * whether the engine uses the `QSQLITE` driver.
+ *
+ * @param databaseEngine  The database engine to query for the driver ID.
+ * @param fileName        The SQL script file name (e.g. "CreateUsersTable.sql").
+ * @return Full resource path to the SQL script.
+ */
+QString GetSqlResourcePath(const IDatabaseEngine& databaseEngine, const QString& fileName);
+
+
+/**
+ * @brief Returns the current UTC date-time as an ISO 8601 string with milliseconds.
+ *
+ * Commonly used in SQL delegates to generate timestamps for CreatedAt/UpdatedAt columns.
+ *
+ * @return Current UTC timestamp in Qt::ISODateWithMs format (e.g. "2025-01-15T12:30:45.123Z").
+ */
+QString UtcNow();
+
+
+/**
+ * @brief Escapes single quotes in a string for safe use in SQL literals.
+ *
+ * Doubles single-quote characters to prevent SQL syntax errors. Unlike SqlEncode(),
+ * this function does not touch semicolons, making it suitable for escaping user-provided
+ * values that will be wrapped in single quotes in SQL statements.
+ *
+ * @param value The string to escape.
+ * @return The escaped string with single quotes doubled.
+ *
+ * Example:
+ * @code{.cpp}
+ * QString name = "O'Reilly";
+ * QString sql = QString("INSERT INTO t(name) VALUES('%1')").arg(imtdb::EscapeSql(name));
+ * // sql = "INSERT INTO t(name) VALUES('O''Reilly')"
+ * @endcode
+ */
+QString EscapeSql(const QString& value);
+
+
+/**
+ * @brief Safely converts a QVariant to QByteArray, handling QUuid without braces.
+ *
+ * In Qt 6.11+, database drivers may return UUID columns as QUuid values. When
+ * QVariant::toByteArray() is called on such a value, the result is wrapped in
+ * curly braces (e.g. "{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}"), which breaks
+ * existing data and comparison logic that expects braces-free UUID strings.
+ *
+ * This function detects QUuid-typed variants and converts them using
+ * QUuid::WithoutBraces. For all other types, it falls through to
+ * QVariant::toByteArray().
+ *
+ * @param value The QVariant value to convert.
+ * @return The byte array representation without UUID braces.
+ *
+ * Example:
+ * @code{.cpp}
+ * QByteArray id = imtdb::VariantToByteArray(record.value("Id"));
+ * @endcode
+ */
+QByteArray VariantToByteArray(const QVariant& value);
 
 
 } // namespace imtdb

@@ -11,6 +11,14 @@ namespace imtdb
 {
 
 
+QString GetSqlResourcePath(const QByteArray& databaseDriverId, const QString& fileName)
+{
+	const bool isSqlite = databaseDriverId.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
+	const QString prefix = isSqlite ? QStringLiteral(":/SQL/SQLite/") : QStringLiteral(":/SQL/Postgres/");
+	return prefix + fileName;
+}
+
+
 // public methods
 
 CDatabaseEngineComp::CDatabaseEngineComp()
@@ -48,6 +56,11 @@ bool CDatabaseEngineComp::CancelTransaction() const
 	}
 
 	return QSqlDatabase::database(GetConnectionName()).rollback();
+}
+
+QByteArray CDatabaseEngineComp::GetDatabaseDriverId() const
+{
+	return *m_dbTypeAttrPtr;
 }
 
 
@@ -260,7 +273,7 @@ bool CDatabaseEngineComp::OpenDatabase() const
 bool CDatabaseEngineComp::CreateDatabase(int flags) const
 {
 	if ((*m_maintenanceDatabaseNameAttrPtr).isEmpty()){
-		SendCriticalMessage(0, QT_TR_NOOP("Maintenance database name was not set"));
+		SendCriticalMessage(0, QObject::tr("Maintenance database name was not set"));
 
 		return false;
 	}
@@ -338,7 +351,7 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 		// Set max revision to database
 		QSqlError sqlError;
 		QVariantMap valuesRevision({ {QStringLiteral(":Revision"), newRevision} });
-		ExecSqlQueryFromFile(QStringLiteral(":/SQL/SetRevision.sql"), valuesRevision, &sqlError);
+		ExecSqlQueryFromFile(GetSqlResourcePath(GetDatabaseDriverId(), QStringLiteral("SetRevision.sql")), valuesRevision, &sqlError);
 
 		if (sqlError.type() != QSqlError::NoError){
 			SendErrorMessage(0, QStringLiteral("Execution of SetRevision.sql failed: '%1'").arg(sqlError.text()), __FILE__);
@@ -405,6 +418,8 @@ QSqlDatabase CDatabaseEngineComp::InitDatabase(const QByteArray& databaseDriverT
 
 void CDatabaseEngineComp::OnComponentCreated()
 {
+	m_shuttingDown = false;
+
 	BaseClass::OnComponentCreated();
 
 	if (m_databaseAccessSettingsCompPtr.IsValid()){
@@ -418,6 +433,8 @@ void CDatabaseEngineComp::OnComponentCreated()
 
 void CDatabaseEngineComp::OnComponentDestroyed()
 {
+	m_shuttingDown = true;
+
 	m_databaseAccessObserver.UnregisterAllObjects();
 
 	BaseClass::OnComponentDestroyed();
@@ -431,8 +448,16 @@ bool CDatabaseEngineComp::EnsureDatabaseConnected(QSqlError* sqlError) const
 	QString databaseConnectionName = GetConnectionName();
 	QSqlDatabase databaseConnection = QSqlDatabase::database(databaseConnectionName);
 
-	QThread* threadPtr = QThread::currentThread();
-	connect(threadPtr, &QThread::finished, this, &CDatabaseEngineComp::OnThreadFinished, Qt::DirectConnection);
+	{
+		std::lock_guard lock(m_connectedThreadsMutex);
+		QThread* threadPtr = QThread::currentThread();
+		quintptr threadId = reinterpret_cast<quintptr>(QThread::currentThreadId());
+
+		if (m_connectedThreads.count(threadId) == 0) {
+			connect(threadPtr, &QThread::finished, this, &CDatabaseEngineComp::OnThreadFinished, Qt::DirectConnection);
+			m_connectedThreads.insert(threadId);
+		}
+	}
 
 	bool isOpened = databaseConnection.isOpen();
 	if (!isOpened){
@@ -502,7 +527,7 @@ bool CDatabaseEngineComp::EnsureDatabaseConsistency() const
 bool CDatabaseEngineComp::CreateDatabaseInstance() const
 {
 	if ((*m_maintenanceDatabaseNameAttrPtr).isEmpty()){
-		SendCriticalMessage(0, QT_TR_NOOP("Maintenance database name was not set"));
+		SendCriticalMessage(0, QObject::tr("Maintenance database name was not set"));
 
 		return false;
 	}
@@ -527,7 +552,7 @@ bool CDatabaseEngineComp::CreateDatabaseInstance() const
 		return false;
 	}
 
-	QFile scriptFile(QStringLiteral(":/SQL/CreateDatabase.sql"));
+	QFile scriptFile(GetSqlResourcePath(GetDatabaseDriverId(), QStringLiteral("CreateDatabase.sql")));
 	if (!scriptFile.open(QFile::ReadOnly)){
 		SendErrorMessage(0, QStringLiteral("Database creation script '%1'could not be loaded").arg(scriptFile.fileName()));
 
@@ -570,7 +595,7 @@ bool CDatabaseEngineComp::CreateDatabaseMetaInfo() const
 	QSqlError sqlError;
 
 	// Create revision table in the database:
-	ExecSqlQueryFromFile(QStringLiteral(":/SQL/CreateRevision.sql"), &sqlError);
+	ExecSqlQueryFromFile(GetSqlResourcePath(GetDatabaseDriverId(), QStringLiteral("CreateRevision.sql")), &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
 		SendErrorMessage(0, QStringLiteral("\n\t| Revision table could not be created""\n\t| Error: %1").arg(sqlError.text()));
 
@@ -611,14 +636,23 @@ QString CDatabaseEngineComp::GetDatabasePath() const
 	if (m_databaseAccessSettingsCompPtr.IsValid()){
 		return m_databaseAccessSettingsCompPtr->GetDatabasePath();
 	}
+	else{
+		SendInfoMessageOnce(0, QObject::tr("Database settings were not set. Use default database configuration"));
+
+	}
 
 	if (!m_dbFilePathCompPtr.IsValid()){
-		SendErrorMessage(0, QT_TR_NOOP("Database file path incorrect"));
+		SendErrorMessage(0, QObject::tr("Database file path incorrect"));
 
 		return QString();
 	}
+	else{
+		QString databaseFilePath = m_dbFilePathCompPtr->GetPath();
 
-	return m_dbFilePathCompPtr->GetPath();
+		SendInfoMessageOnce(0, QObject::tr("Use database file: %1").arg(databaseFilePath));
+
+		return databaseFilePath;
+	}
 }
 
 
@@ -675,7 +709,7 @@ QString CDatabaseEngineComp::GetPassword() const
 int CDatabaseEngineComp::GetDatabaseVersion() const
 {
 	QSqlError sqlError;
-	QSqlQuery queryGetRevision = ExecSqlQueryFromFile(QStringLiteral(":/SQL/GetRevision.sql"), &sqlError);
+	QSqlQuery queryGetRevision = ExecSqlQueryFromFile(GetSqlResourcePath(GetDatabaseDriverId(), QStringLiteral("GetRevision.sql")), &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
 		return -1;
 	}
@@ -771,6 +805,10 @@ bool CDatabaseEngineComp::ExecuteTransaction(const QByteArray& sqlQuery) const
 
 void CDatabaseEngineComp::OnThreadFinished()
 {
+	if (m_shuttingDown){
+		return;
+	}
+
 	QString connectionName = GetConnectionName();
 
 	QSqlDatabase::removeDatabase(connectionName);
@@ -778,5 +816,3 @@ void CDatabaseEngineComp::OnThreadFinished()
 
 
 } // namespace imtdb
-
-

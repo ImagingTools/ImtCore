@@ -19,9 +19,6 @@ TEMP_DIR="/tmp/3rdparty-migration"
 # List of libraries to migrate
 LIBRARIES=(
     "EJ"
-    "JQ"
-    "JQML"
-    "JQML2"
     "QXlsx"
     "WebCompiler"
     "boost"
@@ -223,9 +220,6 @@ GITHUB_ORG="ImagingTools"
 # Libraries to add as submodules
 LIBRARIES=(
     "EJ"
-    "JQ"
-    "JQML"
-    "JQML2"
     "QXlsx"
     "WebCompiler"
     "boost"

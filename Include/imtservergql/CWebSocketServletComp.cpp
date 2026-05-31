@@ -5,12 +5,13 @@
 // Qt includes
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
+#include <QtCore/QPointer>
 
 // ImtCore includes
 #include <imtrest/IRequest.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/CWebSocketRequest.h>
-#include <imtgql/CGqlContext.h>
+#include <imtbase/imtbase.h>
 
 
 namespace imtservergql
@@ -59,6 +60,9 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessRequest(const imtrest::I
 			SendErrorMessage(0, "Data request", "CWebSocketServletComp");
 			return imtrest::ConstResponsePtr();
 
+		case imtrest::CWebSocketRequest::MT_COMPLETE:
+			return imtrest::ConstResponsePtr();
+
 		default:{
 			QByteArray errorMessage = QString("Method type not correct: %1").arg(webSocketRequest->GetMethodType()).toUtf8();
 			return CreateErrorResponse(errorMessage, request);
@@ -74,11 +78,17 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessRequest(const imtrest::I
 }
 
 
-// reimplemented (imtrest::IRequestManager)
+// reimplemented (imtrest::IResponseDispatcher)
 
-const imtrest::ISender* CWebSocketServletComp::GetSender(const QByteArray& /*requestId*/) const
+bool CWebSocketServletComp::SendResponse(const QByteArray& /*requestId*/, imtrest::ConstResponsePtr& /*response*/) const
 {
-	return nullptr;
+	return false;
+}
+
+
+bool CWebSocketServletComp::SendRequest(const QByteArray& /*requestId*/, imtrest::ConstRequestPtr& /*request*/) const
+{
+	return false;
 }
 
 
@@ -124,6 +134,14 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessGqlRequest(const imtrest
 imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtrest::IRequest& request) const
 {
 	const auto* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
+	if (webSocketRequest == nullptr){
+		return CreateErrorResponse(QByteArrayLiteral("Invalid WebSocket request"), request);
+	}
+
+	// Capture all data from the request immediately - the CWebSocketRequest is parented
+	// to QWebSocket via setParent(m_socket) in CWebSocketThread, so it can be
+	// cascade-destroyed if the socket disconnects during processing.
+	const QByteArray subscriptionId = webSocketRequest->GetRequestId();
 	QByteArray body = request.GetBody();
 	const QJsonDocument document = QJsonDocument::fromJson(body);
 	if (document.isNull() || !document.isObject()) {
@@ -148,7 +166,6 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		body = payloadValue.toString().toUtf8();
 	}
 
-
 	imtgql::CGqlRequest gqlRequest;
 	qsizetype errorPosition;
 	if (!gqlRequest.ParseQuery(body, errorPosition)){
@@ -157,26 +174,47 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		return CreateErrorResponse(errorMessage.toUtf8(), request);
 	}
 
-	imtrest::CWebSocketRequest* webSocketRequestPtr = const_cast<imtrest::CWebSocketRequest*>(dynamic_cast<const imtrest::CWebSocketRequest*>(&request));
+	// Track request lifetime with QPointer — the request is a QObject
+	QPointer<QObject> requestGuard(const_cast<QObject*>(static_cast<const QObject*>(webSocketRequest)));
+
+	imtrest::CWebSocketRequest* webSocketRequestPtr = const_cast<imtrest::CWebSocketRequest*>(webSocketRequest);
 	if (webSocketRequestPtr != nullptr){
 		webSocketRequestPtr->SetCommandId(gqlRequest.GetCommandId());
 	}
 
-	imtgql::IGqlContext* gqlContextPtr = const_cast<imtgql::IGqlContext*>(gqlRequest.GetRequestContext());
+	// Extract headers from the message JSON
 	imtgql::IGqlContext::Headers gqlHeaders;
-	if (gqlContextPtr != nullptr){
-		gqlHeaders = gqlContextPtr->GetHeaders();
+	imtgql::IGqlContext* existingContextPtr = const_cast<imtgql::IGqlContext*>(gqlRequest.GetRequestContext());
+	if (existingContextPtr != nullptr){
+		gqlHeaders = existingContextPtr->GetHeaders();
 	}
-	else{
-		gqlContextPtr = new imtgql::CGqlContext();
-	}
+
 	QJsonObject headers = rootObject.value("headers").toObject();
-	for (QString& key: headers.keys()){
+	for (const QString& key: headers.keys()){
 		gqlHeaders.insert(key.toUtf8().toLower(), headers.value(key).toString().toUtf8());
 	}
 
-	gqlContextPtr->SetHeaders(gqlHeaders);
-	gqlRequest.SetGqlContext(gqlContextPtr);
+	if (!m_gqlContextCreatorCompPtr.IsValid()){
+		return CreateErrorResponse(QByteArrayLiteral("GraphQL context creator is not configured"), request);
+	}
+
+	imtgql::IGqlContextCreator::ContextCreationError contextError;
+	imtgql::IGqlContextUniquePtr gqlContextPtr = m_gqlContextCreatorCompPtr->CreateGqlContext(gqlHeaders, contextError);
+	if (!gqlContextPtr.IsValid()){
+		QByteArray errorMessage;
+		if (contextError.status == imtgql::IGqlContextCreator::CCS_UNAUTHORIZED){
+			errorMessage = QByteArrayLiteral("Unauthorized");
+		}
+		else if (contextError.status == imtgql::IGqlContextCreator::CCS_FORBIDDEN){
+			errorMessage = QByteArrayLiteral("Forbidden");
+		}
+		else{
+			errorMessage = QByteArrayLiteral("Unable to create GraphQL context: ") + contextError.message.toUtf8();
+		}
+		return CreateErrorResponse(errorMessage, request);
+	}
+
+	gqlRequest.SetGqlContext(std::move(gqlContextPtr));
 
 	QByteArray commandId = gqlRequest.GetCommandId();
 
@@ -197,8 +235,14 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	}
 
 	if (subscriberControllerPtr != nullptr){
+		// Final lifetime check before passing request reference to publisher
+		if (requestGuard.isNull()){
+			SendErrorMessage(0, QStringLiteral("WebSocket request destroyed before subscription registration"), QStringLiteral("CWebSocketServletComp"));
+			return imtrest::ConstResponsePtr();
+		}
+
 		QString errorMessage;
-		if (subscriberControllerPtr->RegisterSubscription(webSocketRequest->GetRequestId(), gqlRequest, request, errorMessage)){
+		if (subscriberControllerPtr->RegisterSubscription(subscriptionId, gqlRequest, request, errorMessage)){
 			return imtrest::ConstResponsePtr();
 		}
 	}
@@ -263,9 +307,10 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateErrorResponse(const QByte
 
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
 
-	QString body = QString(R"({"id": "%1","type": "error","payload": {"errors": [{"errorType": "ProcessRequestError","message": "%2"}]}})")
-							.arg(object["id"].toString())
-							.arg(QString(errorMessage));
+	QString body = QString(R"({"id": "%1","type": "error","payload": [ {"message": "%2", "extensions": { "type": "Warning" }} ]})")
+					   .arg(object["id"].toString())
+					   .arg(errorMessage);
+
 
 	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
@@ -283,5 +328,3 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateErrorResponse(const QByte
 
 
 } // namespace imtservergql
-
-

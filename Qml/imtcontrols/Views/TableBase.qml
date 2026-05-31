@@ -219,6 +219,9 @@ Rectangle {
 	}
 
 	onHeadersChanged: {
+		if(!tableContainer.headers){
+			return
+		}
 		let keys = Object.keys(columnContentComps);
 		for (let i = 0; i < tableContainer.headers.getItemsCount(); i++){
 			let headerId = getHeaderId(i)

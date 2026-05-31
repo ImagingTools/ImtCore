@@ -5,6 +5,10 @@
 // ACF includes
 #include <iser/CMemoryWriteArchive.h>
 
+// ImtCore includes
+#include <imtauth/ITenantInfo.h>
+#include <imtgql/IGqlContext.h>
+
 
 namespace imtauthgql
 {
@@ -144,12 +148,7 @@ sdl::imtauth::Sessions::CRefreshTokenPayload CGqlJwtSessionControllerComp::OnRef
 	imtauth::IJwtSessionController::UserSession userSession;
 	response.Version_1_0->ok = m_jwtSessionControllerCompPtr->RefreshToken(refreshToken, userSession);
 	if (response.Version_1_0->ok){
-		sdl::imtauth::Sessions::CUserSession::V1_0 userData;
-		userData.userId = userSession.userId;
-		userData.accessToken = userSession.accessToken;
-		userData.refreshToken = userSession.refreshToken;
-
-		response.Version_1_0->userSession = userData;
+		response.Version_1_0->userSession = CreateUserSessionData(userSession);
 	}
 
 	return response;
@@ -158,7 +157,7 @@ sdl::imtauth::Sessions::CRefreshTokenPayload CGqlJwtSessionControllerComp::OnRef
 
 sdl::imtauth::Sessions::CCreateNewSessionPayload CGqlJwtSessionControllerComp::OnCreateNewSession(
 	const sdl::imtauth::Sessions::CCreateNewSessionGqlRequest& createNewSessionRequest,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& /*errorMessage*/) const
 {
 	sdl::imtauth::Sessions::CCreateNewSessionPayload response;
@@ -171,20 +170,112 @@ sdl::imtauth::Sessions::CCreateNewSessionPayload CGqlJwtSessionControllerComp::O
 	response.Version_1_0.emplace();
 
 	QByteArray userId;
+	QByteArray tenantId;
 	sdl::imtauth::Sessions::CreateNewSessionRequestArguments arguments = createNewSessionRequest.GetRequestedArguments();
 	if (arguments.input.Version_1_0->userId){
 		userId = *arguments.input.Version_1_0->userId;
 	}
+	if (arguments.input.Version_1_0->tenantId){
+		tenantId = *arguments.input.Version_1_0->tenantId;
+	}
+
+	if (!tenantId.isEmpty()){
+		QByteArray authenticatedUserId = GetAuthenticatedUserId(gqlRequest);
+		if (authenticatedUserId.isEmpty()){
+			response.Version_1_0->ok = false;
+			response.Version_1_0->errorMessage = QStringLiteral("Authenticated user is required to select tenant");
+			return response;
+		}
+
+		if (authenticatedUserId != userId){
+			response.Version_1_0->ok = false;
+			response.Version_1_0->errorMessage = QStringLiteral("Cannot create tenant session for another user");
+			return response;
+		}
+
+		QString tenantError;
+		if (!CanUseTenant(userId, tenantId, tenantError)){
+			response.Version_1_0->ok = false;
+			response.Version_1_0->errorMessage = tenantError;
+			return response;
+		}
+	}
 
 	imtauth::IJwtSessionController::UserSession userSession;
-	response.Version_1_0->ok = m_jwtSessionControllerCompPtr->CreateNewSession(userId, userSession);
+	response.Version_1_0->ok = m_jwtSessionControllerCompPtr->CreateNewSession(userId, tenantId, userSession);
 	if (response.Version_1_0->ok){
-		sdl::imtauth::Sessions::CUserSession::V1_0 userData;
-		userData.userId = userSession.userId;
-		userData.accessToken = userSession.accessToken;
-		userData.refreshToken = userSession.refreshToken;
+		response.Version_1_0->userSession = CreateUserSessionData(userSession);
+	}
+	else{
+		response.Version_1_0->errorMessage = QStringLiteral("Failed to create session");
+	}
 
-		response.Version_1_0->userSession = userData;
+	return response;
+}
+
+
+sdl::imtauth::Sessions::CSelectTenantPayload CGqlJwtSessionControllerComp::OnSelectTenant(
+	const sdl::imtauth::Sessions::CSelectTenantGqlRequest& selectTenantRequest,
+	const ::imtgql::CGqlRequest& gqlRequest,
+	QString& /*errorMessage*/) const
+{
+	sdl::imtauth::Sessions::CSelectTenantPayload response;
+
+	if (!m_jwtSessionControllerCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'JwtSessionController' was not set", "CGqlJwtSessionControllerComp");
+		return response;
+	}
+
+	response.Version_1_0.emplace();
+
+	QByteArray userId = GetAuthenticatedUserId(gqlRequest);
+	if (userId.isEmpty()){
+		response.Version_1_0->ok = false;
+		response.Version_1_0->errorMessage = QStringLiteral("Authenticated user is required to select tenant");
+		return response;
+	}
+
+	QByteArray tenantId;
+	sdl::imtauth::Sessions::SelectTenantRequestArguments arguments = selectTenantRequest.GetRequestedArguments();
+	if (arguments.input.Version_1_0->tenantId){
+		tenantId = *arguments.input.Version_1_0->tenantId;
+	}
+
+	if (!tenantId.isEmpty()){
+		QString tenantError;
+		if (!CanUseTenant(userId, tenantId, tenantError)){
+			response.Version_1_0->ok = false;
+			response.Version_1_0->errorMessage = tenantError;
+			return response;
+		}
+	}
+
+	QByteArray oldSessionId;
+	QByteArray oldToken;
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		oldToken = gqlContextPtr->GetToken();
+		oldSessionId = m_jwtSessionControllerCompPtr->GetSessionFromJwt(oldToken);
+	}
+
+	imtauth::IJwtSessionController::UserSession userSession;
+	response.Version_1_0->ok = m_jwtSessionControllerCompPtr->CreateNewSession(userId, tenantId, userSession);
+	if (!response.Version_1_0->ok){
+		response.Version_1_0->errorMessage = QStringLiteral("Failed to create tenant session");
+		return response;
+	}
+
+	response.Version_1_0->userSession = CreateUserSessionData(userSession);
+
+	QByteArray newSessionId = m_jwtSessionControllerCompPtr->GetSessionFromJwt(userSession.accessToken);
+	if (!oldSessionId.isEmpty() && oldSessionId != newSessionId){
+		m_jwtSessionControllerCompPtr->RemoveSession(oldSessionId);
+	}
+
+	// Invalidate any cached state for the old token so that requests still
+	// referencing it do not resolve to stale (e.g. empty-tenant) data.
+	if (!oldToken.isEmpty() && oldToken != userSession.accessToken){
+		m_jwtSessionControllerCompPtr->InvalidateToken(oldToken);
 	}
 
 	return response;
@@ -241,6 +332,112 @@ sdl::imtauth::Sessions::CGetUserFromJwtPayload CGqlJwtSessionControllerComp::OnG
 	retVal.Version_1_0 = std::move(response);
 
 	return retVal;
+}
+
+
+sdl::imtauth::Sessions::CGetTenantFromJwtPayload CGqlJwtSessionControllerComp::OnGetTenantFromJwt(
+	const sdl::imtauth::Sessions::CGetTenantFromJwtGqlRequest& getTenantFromJwtRequest,
+	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& /*errorMessage*/) const
+{
+	sdl::imtauth::Sessions::CGetTenantFromJwtPayload::V1_0 response;
+
+	if (!m_jwtSessionControllerCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'JwtSessionController' was not set", "CGqlJwtSessionControllerComp");
+		return sdl::imtauth::Sessions::CGetTenantFromJwtPayload();
+	}
+
+	QString jwt;
+	sdl::imtauth::Sessions::GetTenantFromJwtRequestArguments arguments = getTenantFromJwtRequest.GetRequestedArguments();
+	if (arguments.input.Version_1_0->jwt){
+		jwt = *arguments.input.Version_1_0->jwt;
+	}
+
+	response.tenantId = m_jwtSessionControllerCompPtr->GetTenantFromJwt(jwt.toUtf8());
+
+	sdl::imtauth::Sessions::CGetTenantFromJwtPayload retVal;
+	retVal.Version_1_0 = std::move(response);
+
+	return retVal;
+}
+
+
+// private methods
+
+QByteArray CGqlJwtSessionControllerComp::GetAuthenticatedUserId(const ::imtgql::CGqlRequest& gqlRequest) const
+{
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr == nullptr){
+		return QByteArray();
+	}
+
+	return gqlContextPtr->GetUserId();
+}
+
+
+bool CGqlJwtSessionControllerComp::CanUseTenant(
+			const QByteArray& userId,
+			const QByteArray& tenantId,
+			QString& errorMessage) const
+{
+	if (tenantId.isEmpty()){
+		errorMessage = QStringLiteral("Tenant id is empty");
+		return false;
+	}
+
+	if (!m_tenantManagerCompPtr.IsValid()){
+		errorMessage = QStringLiteral("Tenant manager is not configured");
+		return false;
+	}
+
+	imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+	if (!tenantPtr.IsValid()){
+		errorMessage = QStringLiteral("Tenant not found");
+		return false;
+	}
+
+	if (!tenantPtr->IsActive()){
+		errorMessage = QStringLiteral("Tenant is not active");
+		return false;
+	}
+
+	if (tenantPtr->GetOwnerId() == userId){
+		return true;
+	}
+
+	if (!m_membershipManagerCompPtr.IsValid()){
+		errorMessage = QStringLiteral("Tenant membership manager is not configured");
+		return false;
+	}
+
+	imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->FindMembership(userId, tenantId);
+	if (membershipPtr.IsValid() && membershipPtr->IsActive()){
+		return true;
+	}
+
+	errorMessage = QStringLiteral("User is not an active member of tenant");
+	return false;
+}
+
+
+sdl::imtauth::Sessions::CUserSession::V1_0 CGqlJwtSessionControllerComp::CreateUserSessionData(
+			const imtauth::IJwtSessionController::UserSession& userSession) const
+{
+	sdl::imtauth::Sessions::CUserSession::V1_0 userData;
+	userData.userId = userSession.userId;
+	userData.tenantId = userSession.tenantId;
+	userData.accessToken = userSession.accessToken;
+	userData.refreshToken = userSession.refreshToken;
+
+	// Resolve tenant name if tenant is set
+	if (!userSession.tenantId.isEmpty() && m_tenantManagerCompPtr.IsValid()){
+		imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(userSession.tenantId);
+		if (tenantPtr.IsValid()){
+			userData.tenantName = tenantPtr->GetTenantName();
+		}
+	}
+
+	return userData;
 }
 
 

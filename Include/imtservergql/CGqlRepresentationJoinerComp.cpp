@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CGqlRepresentationJoinerComp.h>
 
-
-// ACF includes
-#include <istd/TDelPtr.h>
+// Qt includes
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
 
 
 namespace imtservergql
@@ -14,54 +14,51 @@ namespace imtservergql
 
 // reimplemented (imtservergql::CGqlRepresentationDataControllerComp)
 
-imtbase::CTreeItemModel* CGqlRepresentationJoinerComp::CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CGqlRepresentationJoinerComp::CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_representationControllersCompPtr.IsValid()){
-		return nullptr;
+		return QJsonObject();
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> commonRepresentationModelPtr(new imtbase::CTreeItemModel);
-	imtbase::CTreeItemModel* dataModelPtr = commonRepresentationModelPtr->AddTreeModel("data");
+	QJsonObject rootObj;
+	QJsonObject dataObj;
 	for (int i = 0; i < m_representationControllersCompPtr.GetCount(); i++){
 		imtgql::IGqlRepresentationController* representationControllerPtr = m_representationControllersCompPtr[i];
 		if (representationControllerPtr != nullptr){
-			imtbase::CTreeItemModel* representationModelPtr = representationControllerPtr->CreateRepresentationFromRequest(gqlRequest, errorMessage);
-			if (representationModelPtr != nullptr){
-				if (representationModelPtr->ContainsKey("data")){
-					representationModelPtr = representationModelPtr->GetTreeItemModel("data");
+			QJsonObject representationObj = representationControllerPtr->CreateRepresentationFromRequest(gqlRequest, errorMessage);
+			if (!representationObj.isEmpty()){
+				QJsonObject sourceData = representationObj.contains(QStringLiteral("data"))
+					? representationObj.value(QStringLiteral("data")).toObject()
+					: representationObj;
+
+				for (auto it = sourceData.begin(); it != sourceData.end(); ++it){
+					dataObj.insert(it.key(), it.value());
 				}
-
-				int index = dataModelPtr->InsertNewItem();
-
-				dataModelPtr->CopyItemDataFromModel(index, representationModelPtr);
 			}
 		}
 	}
 
-	return commonRepresentationModelPtr.PopPtr();
+	rootObj.insert(QStringLiteral("data"), dataObj);
+	return rootObj;
 }
 
 
-bool CGqlRepresentationJoinerComp::UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, imtbase::CTreeItemModel* representationPtr) const
+bool CGqlRepresentationJoinerComp::UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, const QJsonObject& representation) const
 {
 	if (!m_representationControllersCompPtr.IsValid()){
 		return false;
 	}
 
-	Q_ASSERT(representationPtr != nullptr);
-	if (representationPtr == nullptr){
+	if (representation.isEmpty()){
 		return false;
 	}
 
 	for (int i = 0; i < m_representationControllersCompPtr.GetCount(); i++){
 		imtgql::IGqlRepresentationController* representationControllerPtr = m_representationControllersCompPtr[i];
 		if (representationControllerPtr != nullptr){
-			istd::TDelPtr<imtbase::CTreeItemModel> subModelPtr = representationPtr->GetModelFromItem(i);
-			if (subModelPtr.IsValid()){
-				bool result = representationControllerPtr->UpdateModelFromRepresentation(request, subModelPtr.GetPtr());
-				if (!result){
-					return false;
-				}
+			bool result = representationControllerPtr->UpdateModelFromRepresentation(request, representation);
+			if (!result){
+				return false;
 			}
 		}
 	}

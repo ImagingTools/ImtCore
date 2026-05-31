@@ -2,13 +2,13 @@
 
 ## Summary
 
-This PR prepares the migration of all 17 third-party libraries from the monolithic `3rdParty` directory to individual git submodules. The migration has been **partially automated** with scripts and documentation, but **manual steps are required** to complete the process.
+This PR prepares the migration of 14 third-party libraries from the monolithic `3rdParty` directory to individual git submodules. The migration has been **partially automated** with scripts and documentation, but **manual steps are required** to complete the process.
 
 ## What Has Been Done ✅
 
 The following preparation work has been completed:
 
-1. **Analysis**: Identified all 17 libraries in `3rdParty/` directory
+1. **Analysis**: Identified all 14 libraries in `3rdParty/` directory
 2. **Documentation**: Created comprehensive migration guides
 3. **Automation Scripts**: Created helper scripts for the migration
 4. **Configuration**: Prepared `.gitmodules` template
@@ -39,7 +39,7 @@ The following steps require **GitHub organization permissions** and must be comp
 
 ### Step 1: Create GitHub Repositories
 
-You need to create 17 new repositories under the `ImagingTools` organization:
+You need to create 14 new repositories under the `ImagingTools` organization:
 
 **Option A: Using GitHub CLI (Recommended)**
 
@@ -67,9 +67,6 @@ Create each repository manually at: https://github.com/organizations/ImagingTool
 
 Repository names:
 - `EJ`
-- `JQ`
-- `JQML`
-- `JQML2`
 - `QXlsx`
 - `WebCompiler`
 - `boost`
@@ -95,7 +92,7 @@ Linux/macOS:
 
 # Push each library to GitHub
 cd /tmp/3rdparty-migration
-for lib in EJ JQ JQML JQML2 QXlsx WebCompiler boost icu libmdbx mongoc mongocxx nodejs openssl pybind11 quazip zlib zstd; do
+for lib in EJ QXlsx WebCompiler boost icu libmdbx mongoc mongocxx nodejs openssl pybind11 quazip zlib zstd; do
     echo "Pushing $lib..."
     cd "$lib"
     git remote add origin "https://github.com/ImagingTools/${lib}.git"
@@ -112,7 +109,7 @@ migrate-3rdparty.bat prepare-all
 
 # Push each library to GitHub
 cd %TEMP%\3rdparty-migration
-for %L in (EJ JQ JQML JQML2 QXlsx WebCompiler boost icu libmdbx mongoc mongocxx nodejs openssl pybind11 quazip zlib zstd) do (
+for %L in (EJ QXlsx WebCompiler boost icu libmdbx mongoc mongocxx nodejs openssl pybind11 quazip zlib zstd) do (
     echo Pushing %L...
     cd %L
     git remote add origin "https://github.com/ImagingTools/%L.git"

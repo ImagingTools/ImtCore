@@ -61,6 +61,7 @@ Dialog {
 				width: parent.width;
 				height: Math.min(ModalDialogManager.activeView.height - 200, itemHeight * elementsCount + headerHeight);
 
+				itemHeight: 35;
 				checkable: true;
 				onCheckedItemsChanged: {
 					item.checkedIndexes = getCheckedItems();

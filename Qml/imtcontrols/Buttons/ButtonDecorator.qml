@@ -20,6 +20,7 @@ DecoratorBase {
 
 	property int widthDefault: 0;
 	property alias icon: iconObj
+	property alias arrowIconAlias: arrowIcon
 	property alias font: textObj.font
 	property string fontFamily: (baseElement && baseElement.font && baseElement.fontFamily) ? baseElement.font.fontFamily : Style.fontFamily
 	property int fontSize:  (baseElement && baseElement.font) ? baseElement.font.pixelSize : Style.fontSizeM
@@ -62,12 +63,28 @@ DecoratorBase {
 		}
 	}
 
+	function closeTooltip(){
+		//console.log("closeTooltip", tooltip)
+		if(tooltip && tooltip.openST){
+			tooltip.closeTooltip();
+		}
+	}
+
 	onBaseElementChanged: {
 		if(baseElement){
 			baseElement.exited.connect(commonButtonDecorator.mouseExited);
 			baseElement.entered.connect(commonButtonDecorator.mouseEntered);
-			baseElement.positionChanged.connect(commonButtonDecorator.mousePositionChanged);
-			baseElement.closeTooltip.connect(commonButtonDecorator.closeTooltip);
+			if (baseElement.positionChanged) baseElement.positionChanged.connect(commonButtonDecorator.mousePositionChanged);
+			if (baseElement.closeTooltip) baseElement.closeTooltip.connect(commonButtonDecorator.closeTooltip);
+		}
+	}
+
+	Component.onDestruction: {
+		if(baseElement){
+			if (baseElement.exited) baseElement.exited.disconnect(commonButtonDecorator.mouseExited);
+			if (baseElement.entered) baseElement.entered.disconnect(commonButtonDecorator.mouseEntered);
+			if (baseElement.positionChanged) baseElement.positionChanged.disconnect(commonButtonDecorator.mousePositionChanged);
+			if (baseElement.closeTooltip) baseElement.closeTooltip.disconnect(commonButtonDecorator.closeTooltip);
 		}
 	}
 
@@ -123,16 +140,19 @@ DecoratorBase {
 			anchors.verticalCenter: content.verticalCenter;
 			anchors.left: parent.left;
 
-			width: (isEmpty || !commonButtonDecorator.baseElement) ? 0 :
-																	  (commonButtonDecorator.baseElement.icon && commonButtonDecorator.baseElement.icon.width !== 0) ?
-																	  commonButtonDecorator.baseElement.icon.width : Style.iconSizeS
+			property real _iconW: (isEmpty || !commonButtonDecorator.baseElement) ? 0 :
+								  (commonButtonDecorator.baseElement.icon && commonButtonDecorator.baseElement.icon.width !== 0) ?
+								  commonButtonDecorator.baseElement.icon.width : Style.iconSizeS
 
-			height: !commonButtonDecorator.baseElement ? 0 :
-														 (commonButtonDecorator.baseElement.icon && commonButtonDecorator.baseElement.icon.height !== 0) ?
-														 commonButtonDecorator.baseElement.icon.height : width
+			property real _iconH: (isEmpty || !commonButtonDecorator.baseElement) ? 0 :
+								  (commonButtonDecorator.baseElement.icon && commonButtonDecorator.baseElement.icon.height !== 0) ?
+								  commonButtonDecorator.baseElement.icon.height : Style.iconSizeS
 
-			sourceSize.width: width
-			sourceSize.height: height
+			width: _iconW
+			height: _iconH
+
+			sourceSize.width: _iconW
+			sourceSize.height: _iconH
 			source: !commonButtonDecorator.baseElement ? "" :
 														(commonButtonDecorator.baseElement.icon && commonButtonDecorator.baseElement.icon.source !== "") ?
 															 commonButtonDecorator.baseElement.icon.source :
@@ -205,12 +225,6 @@ DecoratorBase {
 
 			visible: commonButtonDecorator.isMenuButton;
 
-		}
-	}
-
-	function closeTooltip(){
-		if(tooltip && tooltip.openST){
-			tooltip.closeTooltip();
 		}
 	}
 

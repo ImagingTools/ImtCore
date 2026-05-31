@@ -7,17 +7,19 @@
 #include <icomp/TModelCompWrap.h>
 
 // ImtCore includes
-#include <imtdoc/CCollectionDocumentManagerComp.h>
+#include <imtdoc/CCollectionDocumentServiceComp.h>
+#include <imtdoc/CDocumentServiceEventHandlerDemultiplexerComp.h>
 
 
 /**
-	ImtDocPck package
+ImtDocPck package
 */
 namespace ImtDocPck
 {
 
 
-typedef icomp::TModelCompWrap<imtdoc::CCollectionDocumentManagerComp> CollectionDocumentManager;
+typedef icomp::TModelCompWrap<imtdoc::CCollectionDocumentServiceComp> CollectionDocumentService;
+typedef imtdoc::CDocumentServiceEventHandlerDemultiplexerComp DocumentServiceEventHandlerDemultiplexer;
 
 
 } // namespace ImtDocPck

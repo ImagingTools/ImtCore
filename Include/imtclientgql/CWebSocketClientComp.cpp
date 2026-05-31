@@ -94,7 +94,7 @@ IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(GqlRequestPtr reque
 }
 
 
-// reimplemented (imtrest::ISender)
+// reimplemented (imtrest::ITransport)
 
 bool CWebSocketClientComp::SendResponse(imtrest::ConstResponsePtr& response) const
 {
@@ -122,11 +122,17 @@ bool CWebSocketClientComp::SendRequest(imtrest::ConstRequestPtr& request) const
 }
 
 
-// reimplemented (imtrest::IRequestManager)
+// reimplemented (imtrest::IResponseDispatcher)
 
-const imtrest::ISender* CWebSocketClientComp::GetSender(const QByteArray& /*requestId*/) const
+bool CWebSocketClientComp::SendResponse(const QByteArray& /*requestId*/, imtrest::ConstResponsePtr& response) const
 {
-	return this;
+	return SendResponse(response);
+}
+
+
+bool CWebSocketClientComp::SendRequest(const QByteArray& /*requestId*/, imtrest::ConstRequestPtr& request) const
+{
+	return SendRequest(request);
 }
 
 
@@ -178,12 +184,12 @@ void CWebSocketClientComp::OnModelChanged(int modelId, const istd::IChangeable::
 void CWebSocketClientComp::OnSystemShutdown()
 {
 	disconnect(&m_webSocket, &QWebSocket::connected, this, &CWebSocketClientComp::OnWebSocketConnected);
-	m_refreshTimer.stop();
+
+	emit EmitStopTimer();
+
 	m_webSocket.disconnect();
 
-	m_webSocket.moveToThread(qApp->thread());
-
-	m_webSocket.close();
+	emit EmitWebSocketClose();
 
 	BaseClass2::UnregisterAllModels();
 }
@@ -346,6 +352,9 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 				methodType == imtrest::CWebSocketRequest::MT_START ||
 				methodType == imtrest::CWebSocketRequest::MT_DATA){
 		responsePtr = m_clientRequestHandlerCompPtr->ProcessRequest(*webSocketRequest);
+		if (methodType == imtrest::CWebSocketRequest::MT_START){
+			m_startQueries.PushBack(webSocketRequest.PopPtr());
+		}
 	}
 	else{
 		if (methodType == imtrest::CWebSocketRequest::MT_QUERY && m_httpProtocolEngineCompPtr.IsValid() && m_serverRequestHandlerCompPtr.IsValid()){
@@ -375,10 +384,6 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 		QByteArray data = responsePtr->GetData();
 
 		webSocketPtr->sendTextMessage(data);
-
-		if (methodType == imtrest::CWebSocketRequest::MT_START){
-			m_startQueries.PushBack(webSocketRequest.PopPtr());
-		}
 	}
 }
 

@@ -12,6 +12,19 @@
 namespace imtauthdb
 {
 
+namespace
+{
+
+QString GetSqlResourcePath(const imtdb::IDatabaseEngine& databaseEngine, const QString& fileName)
+{
+	const QByteArray databaseDriverId = databaseEngine.GetDatabaseDriverId();
+	const bool isSqlite = databaseDriverId.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
+	const QString prefix = isSqlite ? QStringLiteral(":/SQL/SQLite/") : QStringLiteral(":/SQL/Postgres/");
+	return prefix + fileName;
+}
+
+} // namespace
+
 
 // protected methods
 
@@ -40,7 +53,7 @@ QString CUserActionDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm
 						array += ",";
 					}
 
-					array += "'" + groupIds[i] + "'";
+					array += "'" + SqlEncode(QString::fromUtf8(groupIds[i])) + "'";
 				}
 
 				array += "]";
@@ -48,7 +61,7 @@ QString CUserActionDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm
 				filterQuery += QString(R"((users."Document"->'Groups' ?| %1))").arg(array);
 			}
 			else{
-				filterQuery += QString(R"(users."Document"->>'Id' = '%1')").arg(qPrintable(userId));
+				filterQuery += QString(R"(users."Document"->>'Id' = '%1')").arg(SqlEncode(QString::fromUtf8(userId)));
 			}
 		}
 	}
@@ -73,47 +86,5 @@ QByteArray CUserActionDatabaseDelegateComp::CreateJoinTablesQuery() const
 }
 
 
-// reimplemented (icomp::CComponentBase)
-
-void CUserActionDatabaseDelegateComp::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-
-	if (m_databaseEngineCompPtr.IsValid()){
-		QString tableName = GetTableName();
-
-		if (!TableExists(tableName)){
-			QFile scriptFile(":/SQL/CreateCollectionTable.sql");
-			if (!scriptFile.open(QFile::ReadOnly)){
-				SendErrorMessage(0, QT_TR_NOOP(QString("Collection table creation script '%1'could not be loaded").arg(scriptFile.fileName())));
-				return;
-			}
-
-			QByteArray createTableQuery = scriptFile.readAll();
-			scriptFile.close();
-
-			createTableQuery.replace("${TableName}", tableName.toUtf8());
-			createTableQuery.replace("${TableScheme}", "public");
-
-			QSqlError sqlError;
-			m_databaseEngineCompPtr->ExecSqlQuery(createTableQuery, &sqlError);
-	
-			if (sqlError.type() != QSqlError::NoError){
-				qCritical() << __FILE__ << __LINE__
-							<< "\n\t| Table could not be created"
-							<< "\n\t| Error: " << sqlError
-							<< "\n\t| Query: " << createTableQuery;
-	
-				SendErrorMessage(0, QT_TR_NOOP(QString("\n\t| Table could not be created"
-														"\n\t| Error: %1"
-														 "\n\t| Query: %2")
-													.arg(sqlError.text(), qPrintable(createTableQuery))));
-			}
-		}
-	}
-}
-
-
 } // namespace imtauthdb
-
 

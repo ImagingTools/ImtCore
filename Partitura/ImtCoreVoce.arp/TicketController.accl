@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6390" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="Attachment" X="450" Y="425" Note=""/>
+        <Element ComponentName="AttachmentSqlRepository" X="475" Y="300" Note=""/>
+        <Element ComponentName="AttachmentStorage" X="450" Y="375" Note=""/>
+        <Element ComponentName="ChatMessage" X="1100" Y="700" Note=""/>
+        <Element ComponentName="ChatMessageSqlRepository" X="875" Y="275" Note=""/>
+        <Element ComponentName="ChatService" X="1125" Y="350" Note=""/>
+        <Element ComponentName="CollectionCommandsController" X="1000" Y="50" Note=""/>
+        <Element ComponentName="CollectionDocumentService" X="650" Y="725" Note=""/>
+        <Element ComponentName="CollectionHeadersProvider" X="650" Y="575" Note=""/>
+        <Element ComponentName="Conversation" X="825" Y="375" Note=""/>
+        <Element ComponentName="ConversationSqlRepository" X="150" Y="150" Note=""/>
+        <Element ComponentName="Demultiplexer" X="550" Y="75" Note=""/>
+        <Element ComponentName="EditorCommandsController" X="225" Y="275" Note=""/>
+        <Element ComponentName="EntityContextTicketsController" X="150" Y="350" Note=""/>
+        <Element ComponentName="EntityReferenceStorage" X="225" Y="75" Note=""/>
+        <Element ComponentName="SlaveSubscriberController" X="625" Y="200" Note=""/>
+        <Element ComponentName="StandardCollectionCommands" X="1000" Y="150" Note=""/>
+        <Element ComponentName="StandardDocumentCommands" X="225" Y="450" Note=""/>
+        <Element ComponentName="SupportTicket" X="1000" Y="750" Note=""/>
+        <Element ComponentName="TicketAssigneeNotifier" X="125" Y="225" Note=""/>
+        <Element ComponentName="TicketCollectionController" X="1050" Y="525" Note=""/>
+        <Element ComponentName="TicketCollectionDocumentService" X="775" Y="450" Note=""/>
+        <Element ComponentName="TicketDocumentNameProvider" X="1050" Y="625" Note=""/>
+        <Element ComponentName="TicketMessageNotifier" X="125" Y="25" Note=""/>
+        <Element ComponentName="TicketSqlRepository" X="275" Y="725" Note=""/>
+        <Element ComponentName="TicketsChangeNotifier" X="450" Y="150" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

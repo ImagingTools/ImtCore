@@ -6,34 +6,28 @@ This document describes the process of migrating all libraries from the `3rdPart
 
 ## Libraries to Migrate
 
-The following 17 libraries will be migrated to separate repositories:
+The following 14 libraries will be migrated to separate repositories:
 
 1. **EJ** - Export library
-2. **JQ** - Qt-based library  
-3. **JQML** - QML compiler (with node packages)
-4. **JQML2** - QML compiler v2 (with node packages)
-5. **QXlsx** - Excel file library
-6. **WebCompiler** - Python-based web compiler
-7. **boost** (version 1.75.0) - C++ Boost libraries
-8. **icu** (version 72.1) - International Components for Unicode
-9. **libmdbx** - Memory-mapped database library
-10. **mongoc** (version 1.23.2) - MongoDB C driver
-11. **mongocxx** (version 3.7.0) - MongoDB C++ driver
-12. **nodejs** - Node.js runtime and npm
-13. **openssl** (version 1.1) - OpenSSL cryptography library
-14. **pybind11** - Python/C++ binding library
-15. **quazip** - Qt/C++ wrapper for ZIP/UNZIP
-16. **zlib** (version 1.2.13) - Compression library
-17. **zstd** (version 1.5.4) - Zstandard compression library
+2. **QXlsx** - Excel file library
+3. **WebCompiler** - Python-based web compiler
+4. **boost** (version 1.75.0) - C++ Boost libraries
+5. **icu** (version 72.1) - International Components for Unicode
+6. **libmdbx** - Memory-mapped database library
+7. **mongoc** (version 1.23.2) - MongoDB C driver
+8. **mongocxx** (version 3.7.0) - MongoDB C++ driver
+9. **nodejs** - Node.js runtime and npm
+10. **openssl** (version 1.1) - OpenSSL cryptography library
+11. **pybind11** - Python/C++ binding library
+12. **quazip** - Qt/C++ wrapper for ZIP/UNZIP
+13. **zlib** (version 1.2.13) - Compression library
+14. **zstd** (version 1.5.4) - Zstandard compression library
 
 ## Suggested Repository Naming Convention
 
 Repositories should be named under the `ImagingTools` organization:
 
 - `ImagingTools/EJ`
-- `ImagingTools/JQ`
-- `ImagingTools/JQML`
-- `ImagingTools/JQML2`
 - `ImagingTools/QXlsx`
 - `ImagingTools/WebCompiler`
 - `ImagingTools/boost`
@@ -129,9 +123,6 @@ Use the provided `.gitmodules` configuration or add each submodule manually:
 
 ```bash
 git submodule add https://github.com/ImagingTools/EJ.git 3rdParty/EJ
-git submodule add https://github.com/ImagingTools/JQ.git 3rdParty/JQ
-git submodule add https://github.com/ImagingTools/JQML.git 3rdParty/JQML
-git submodule add https://github.com/ImagingTools/JQML2.git 3rdParty/JQML2
 git submodule add https://github.com/ImagingTools/QXlsx.git 3rdParty/QXlsx
 git submodule add https://github.com/ImagingTools/WebCompiler.git 3rdParty/WebCompiler
 git submodule add https://github.com/ImagingTools/boost.git 3rdParty/boost

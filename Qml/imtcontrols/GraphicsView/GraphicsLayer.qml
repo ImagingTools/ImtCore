@@ -27,8 +27,15 @@ QtObject {
 	property var viewMode;
 
 	property rect clipRect: Qt.rect(0,0,0,0)
+	property rect clipRectBackup: Qt.rect(0,0,0,0)
 
 	signal layerChanded()
+
+	onClipRectChanged: {
+		if(clipRect.width > 0 && clipRect.height > 0){
+			clipRectBackup = Qt.rect(clipRect.x, clipRect.y, clipRect.width, clipRect.height)
+		}
+	}
 
 	onLayerChanded: {
 		viewItem.requestPaint();
@@ -101,6 +108,82 @@ QtObject {
 		}
 
 		shape.drawComplex(ctx, tempMatrix);
+	}
+
+	function getScreenPosition(logPosition){
+		let matrix = LinearAlgebra.multiplyByMatrix3x3(viewItem.viewMatrix.matrix, layer.layerMatrix.matrix)
+		let screenPosition = LinearAlgebra.transformPoint2d(logPosition, matrix)
+		return screenPosition
+	}
+
+	function getLogPosition(screenPosition){
+		let matrix = LinearAlgebra.multiplyByMatrix3x3(viewItem.viewMatrix.matrix, layer.layerMatrix.matrix)
+		matrix = LinearAlgebra.getInvertedMatrix3x3(matrix)
+		let logPosition = LinearAlgebra.transformPoint2d(screenPosition, matrix)
+
+		return logPosition
+	}
+
+	function getLayerBoundingBox(isScreenPosition){
+		let allPoints = []
+		let bbPoints
+		for(let i = 0; i < shapeModel.length; i++){
+			let shape = shapeModel[i]
+			let currBBPoints = shape.getBoundingBoxCornerPoints(true)
+			allPoints.push(currBBPoints.topLeftPoint)
+			allPoints.push(currBBPoints.topRightPoint)
+			allPoints.push(currBBPoints.bottomLeftPoint)
+			allPoints.push(currBBPoints.bottomRightPoint)
+		}
+
+		bbPoints = getLimitsObject(allPoints)
+
+		return bbPoints
+	}
+
+	function getLimitsObject(pointsArg){
+		let pointCount = 0
+		if(pointsArg.length){
+			pointCount = pointsArg.length
+		}
+		let pointsObj = ({});
+
+		let minX = 0;
+		let minY = 0;
+		let maxX = 0
+		let maxY = 0;
+
+		for(let i = 0; i < pointCount; i++){
+			let point = pointsArg[i]
+			if (i == 0){
+				minX = maxX = point.x
+				minY = maxY = point.y
+
+				continue
+			}
+
+			let x_ = point.x
+			let y_ = point.y
+			if(x_ < minX){
+				minX = x_
+			}
+			if(y_ < minY){
+				minY = y_
+			}
+			if(x_ > maxX){
+				maxX = x_
+			}
+			if(y_ > maxY){
+				maxY = y_
+			}
+		}
+
+		pointsObj.topLeftPoint = Qt.point(minX, minY)
+		pointsObj.topRightPoint = Qt.point(maxX, minY)
+		pointsObj.bottomLeftPoint = Qt.point(minX, maxY)
+		pointsObj.bottomRightPoint = Qt.point(maxX, maxY)
+
+		return pointsObj;
 	}
 
 }

@@ -16,9 +16,10 @@ add_custom_target(${PROJECT_NAME}-SDL-related-files SOURCES
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/Settings.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/CollectionImport.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/ProgressManager.sdl
-			${CMAKE_CURRENT_LIST_DIR}/../1.0/CollectionDocumentManager.sdl
+			${CMAKE_CURRENT_LIST_DIR}/../1.0/CollectionDocumentService.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/UndoManager.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/DocumentIdFilter.sdl
+			${CMAKE_CURRENT_LIST_DIR}/../1.0/FilterableSelect.sdl
 		)
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
@@ -66,7 +67,7 @@ ImtCoreCustomConfigureSdlCppQml(CXX QML
 	VERSION		"1.0")
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
-	SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/CollectionDocumentManager.sdl"
+	SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/CollectionDocumentService.sdl"
 	VERSION		"1.0")
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
@@ -75,4 +76,8 @@ ImtCoreCustomConfigureSdlCppQml(CXX QML
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
 	SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/DocumentIdFilter.sdl"
+	VERSION		"1.0")
+
+ImtCoreCustomConfigureSdlCppQml(CXX QML
+	SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/FilterableSelect.sdl"
 	VERSION		"1.0")

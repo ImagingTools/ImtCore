@@ -136,8 +136,6 @@ bool CParamsRepresentationControllerComp::ParamsSetModelToSdl(
 		}
 	}
 
-	const iprm::IParamsInfoProvider* paramsInfoProviderPtr = model.GetParamsInfoProvider();
-
 	iprm::IParamsSet::Ids paramSetIds = model.GetParamIds();
 	QByteArrayList parameterIds = paramSetIds.values();
 	std::sort(parameterIds.begin(), parameterIds.end());
@@ -187,6 +185,7 @@ bool CParamsRepresentationControllerComp::ParamsSetModelToSdl(
 			parameter.name.emplace();
 			parameter.description.emplace();
 
+			const iprm::IParamsInfoProvider* paramsInfoProviderPtr = model.GetParamsInfoProvider();
 			if (paramsInfoProviderPtr != nullptr){
 				auto infoPtr = paramsInfoProviderPtr->GetParamInfo(parameterId);
 				if (infoPtr != nullptr){
@@ -214,9 +213,9 @@ bool CParamsRepresentationControllerComp::ParamsSetModelToSdl(
 
 
 bool CParamsRepresentationControllerComp::ParamsSetSdlToModel(
-			const sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0& sdl,
-			iprm::IParamsSet& model,
-			const iprm::IParamsSet* paramsPtr) const
+			const sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0& /*sdl*/,
+			iprm::IParamsSet& /*model*/,
+			const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	return false;
 }

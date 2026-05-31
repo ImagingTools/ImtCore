@@ -7,7 +7,7 @@ include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
 target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::QuickWidgets)
-target_link_libraries(${PROJECT_NAME} imtqml imtbasesdl)
+target_link_libraries(${PROJECT_NAME} imtbasesdl)
 target_link_libraries(${PROJECT_NAME} imtqml imtgui imtgql imtauth imtdb imtserverapp imtcom imtbase imtservergql)
 
 if(WIN32)

@@ -13,7 +13,7 @@
 // ImtCore includes
 #include <imtrest/IRequest.h>
 #include <imtrest/IResponse.h>
-#include <imtrest/ISender.h>
+#include <imtrest/ITransport.h>
 #include <imtrest/CMultiThreadServer.h>
 
 
@@ -102,11 +102,15 @@ void CTcpServerComp::OnComponentCreated()
 }
 
 
-const ISender* CTcpServerComp::GetSender(const QByteArray& requestId) const
+bool CTcpServerComp::SendResponse(const QByteArray& requestId, ConstResponsePtr& response) const
 {
-	const ISender* senderPtr = m_serverPtr->GetSender(requestId);
+	return m_serverPtr->SendResponse(requestId, response);
+}
 
-	return senderPtr;
+
+bool CTcpServerComp::SendRequest(const QByteArray& requestId, ConstRequestPtr& request) const
+{
+	return m_serverPtr->SendRequest(requestId, request);
 }
 
 

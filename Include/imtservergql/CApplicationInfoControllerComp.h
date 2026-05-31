@@ -16,21 +16,24 @@ namespace imtservergql
 class CApplicationInfoControllerComp: public sdl::imtapp::Application::CGraphQlHandlerCompBase
 {
 public:
-	typedef sdl::imtapp::Application::CGraphQlHandlerCompBase BaseClass;
+	using BaseClass = sdl::imtapp::Application::CGraphQlHandlerCompBase;
+	using ApplicationInfo = sdl::imtapp::Application::CApplicationInfo;
 
 	I_BEGIN_COMPONENT(CApplicationInfoControllerComp);
 		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application data info", true, "ApplicationInfo");
+		I_ASSIGN(m_applicationPreferencesCompPtr, "ApplicationPreferences", "Optional reference to ParamSet written to XML file containing application preferences. May overwrite default ApplicationInfo attrubutes if configured", false, "IParamsSet");
 	I_END_COMPONENT;
 
 protected:
 	// reimplemented (sdl::imtapp::Application::CGraphQlHandlerCompBase)
-	virtual sdl::imtapp::Application::CApplicationInfo OnGetApplicationInfo(
+	virtual ApplicationInfo OnGetApplicationInfo(
 				const sdl::imtapp::Application::CGetApplicationInfoGqlRequest& getApplicationInfoRequest,
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
 protected:
 	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
+	I_REF(iprm::IParamsSet, m_applicationPreferencesCompPtr);
 };
 
 

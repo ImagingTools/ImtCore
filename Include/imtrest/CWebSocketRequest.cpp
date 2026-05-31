@@ -125,6 +125,9 @@ void CWebSocketRequest::SetBody(const QByteArray &body)
 	if (object.value("type") == "connection_error"){
 		m_type = MT_ERROR;
 	}
+	if (object.value("type") == "connection_terminate"){
+		m_type = MT_COMPLETE;
+	}
 	if (object.value("type") == "stop"){
 		m_type = MT_STOP;
 	}

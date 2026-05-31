@@ -36,7 +36,7 @@ class CObjectCollectionBase:
 {
 public:
 	CObjectCollectionBase();
-	virtual ~CObjectCollectionBase();
+	virtual ~CObjectCollectionBase() = default;
 
 	// reimplemented (ICollectionDataController)
 	virtual const ifile::IFilePersistence* GetPersistenceForObjectType(const QByteArray& typeId) const override;
@@ -142,6 +142,7 @@ protected:
 		virtual QByteArray GetObjectTypeId() const override;
 		virtual bool GetObjectData(IObjectCollection::DataPtr& dataPtr) const override;
 		virtual idoc::MetaInfoPtr GetDataMetaInfo() const override;
+		virtual int GetElementsCount() const override;
 		virtual idoc::MetaInfoPtr GetCollectionMetaInfo() const override;
 		virtual QVariant GetElementInfo(int infoType) const override;
 		virtual QVariant GetElementInfo(QByteArray infoId) const override;
@@ -162,7 +163,7 @@ protected:
 			flags(OF_ALL),
 			copyMode(istd::IChangeable::CM_WITHOUT_REFS)
 		{
-			id = QUuid::createUuid().toByteArray();
+			id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 		}
 
 		ObjectInfo(const ObjectInfo& object)

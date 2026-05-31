@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5405" Description="ACF"/>
-            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6397" Description="ACF"/>
+            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -106,6 +106,9 @@
         <Element Id="WebSocketServlet" PackageId="ImtServerGqlPck" ComponentId="WebSocketServlet">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="GqlContextCreator" Type="Reference" ExportId="AuthenticationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="GqlSubscriberControllers" Type="Reference[]" ExportId="GqlSubscriberControllers">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -150,8 +153,8 @@
         <Interface InterfaceId="imtclientgql::IGqlSubscriptionManager" ComponentId="SubscriptionManager"/>
         <Interface InterfaceId="imtcom::IConnectionStatusProvider" ComponentId="WebSocketServer"/>
         <Interface InterfaceId="imtrest::IProtocolEngine" ComponentId="WebSocketProtocolEngine"/>
-        <Interface InterfaceId="imtrest::IRequestManager" ComponentId="WebSocketServer"/>
         <Interface InterfaceId="imtrest::IRequestServlet" ComponentId="WebSocketServlet"/>
+        <Interface InterfaceId="imtrest::IResponseDispatcher" ComponentId="WebSocketServer"/>
         <Interface InterfaceId="imtrest::IServer" ComponentId="WebSocketServer"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="WebSocketServer"/>
     </ExportedInterfaces>

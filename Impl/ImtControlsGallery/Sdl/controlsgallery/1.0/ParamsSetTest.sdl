@@ -1,0 +1,24 @@
+schema {
+	query: Query
+	mutation: Mutation
+	subscription: Subscription
+	namespace: controlsgallery
+	version: 1.0
+}
+
+import {
+	"../../../../../Sdl/imtbase/1.0/ImtBaseTypes.sdl"
+}
+
+type SetParamsSetResult
+{
+	result: Bool!
+}
+
+type Query {
+	GetParamsSet : ParamsSet!
+}
+
+type Mutation {
+	SetParamsSet (input: ParamsSet): SetParamsSetResult!
+}

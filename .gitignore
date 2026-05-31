@@ -2,6 +2,7 @@
 AuxInclude/
 Bin/
 Lib/
+node_modules/
 
 # CMake build artifacts
 CMakeCache.txt
@@ -12,8 +13,13 @@ install_manifest.txt
 CTestTestfile.cmake
 Testing/
 _deps/
-build/
 Build/*/*.dir/
+**/CMake/build/
+.cmake/
+
+# Playwright test artifacts
+playwright-report/
+test-results/
 
 # Visual Studio artifacts
 # Note: We keep 3rdParty Visual Studio files tracked
@@ -37,6 +43,11 @@ ipch/
 /Release/
 /RelWithDebInfo/
 /MinSizeRel/
+/Build/CMake/.vs/
+/Build/CMake/out/
+CMakeUserPresets.json
+CMakePresets.json
+
 # Build output in source directories
 **/obj/
 # Debug symbols and intermediates
@@ -102,7 +113,6 @@ conan.lock
 graph_info.json
 *conanbuildenv*.sh
 *conanrunenv*.sh
-CMakeUserPresets.json
 
 # Python artifacts (build scripts)
 __pycache__/
@@ -116,6 +126,7 @@ __pycache__/
 # IDE and Editor files
 .vscode/
 .idea/
+.qtc_clangd/
 *.swp
 *.swo
 *~

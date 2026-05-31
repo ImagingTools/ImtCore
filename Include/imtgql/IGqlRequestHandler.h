@@ -2,8 +2,10 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QJsonObject>
+
 // ImtCore includes
-#include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlRequest.h>
 
 
@@ -22,7 +24,7 @@ public:
 	/**
 		Create response for a GraphQL-based request.
 	*/
-	virtual imtbase::CTreeItemModel* CreateResponse(const CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
+	virtual QJsonObject CreateResponse(const CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
 };
 
 

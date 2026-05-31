@@ -166,21 +166,40 @@ I_EXPORT_COMPONENT(
 			"Collection Import Job Params Filler");
 
 I_EXPORT_COMPONENT(
-			CollectionDocumentManagerController,
+			CollectionDocumentServiceController,
 			"Server-side document manager based on document collection",
 			"Collection Document Manager");
 
 I_EXPORT_COMPONENT(
-			CollectionDocumentManagerPublisher,
+			CollectionDocumentServicePublisher,
 			"Collection document manager publisher",
 			"Collection Document Manager Publisher");
 
 I_EXPORT_COMPONENT(
-			GqlContextCreator,
-			"GraphQL context creator",
-			"GraphQL GQL Context Creator");
+			PublisherSubscriberBridge,
+			"Publisher-subscriber bridge",
+			"Publisher Subscriber Bridge");
 
-\
+I_EXPORT_COMPONENT(
+			AuthenticationManager,
+			"Authentication manager",
+			"Authentication Manager GraphQL Context Creator");
+
+I_EXPORT_COMPONENT(
+			SimpleGqlContextCreator,
+			"Simple GraphQL context creator",
+			"Simple GraphQL Context Creator");
+
+I_EXPORT_COMPONENT(
+			FilterableSelectController,
+			"Filterable select items controller",
+			"Filterable Select Controller");
+
+I_EXPORT_COMPONENT(
+			UserGroupParamsSetJoiner,
+			"User group params set joiner",
+			"User Group Params Set Joiner");
+
+
 } // namespace ImtServerGqlPck
-
 

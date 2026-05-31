@@ -13,15 +13,25 @@
 #include <imtauth/CPersonalAccessTokenMetaInfoCreatorComp.h>
 #include <imtauth/IPersonalAccessToken.h>
 #include <imtdb/CDatabaseEngineComp.h>
+#include <imtdb/imtdb.h>
 
 
 namespace imtauthdb
 {
 
 
+QString GetSqlResourcePath(const imtdb::IDatabaseEngine& databaseEngine, const QString& fileName)
+{
+	const QByteArray databaseDriverId = databaseEngine.GetDatabaseDriverId();
+	const bool isSqlite = databaseDriverId.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
+	const QString prefix = isSqlite ? QStringLiteral(":/SQL/SQLite/") : QStringLiteral(":/SQL/Postgres/");
+	return prefix + fileName;
+}
+
+
 istd::IChangeableUniquePtr CPersonalAccessTokenDatabaseDelegateComp::CreateObjectFromRecord(
-	const QSqlRecord& record,
-	const iprm::IParamsSet* /*dataConfigurationPtr*/) const
+		const QSqlRecord& record,
+		const iprm::IParamsSet* /*dataConfigurationPtr*/) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
@@ -37,12 +47,12 @@ istd::IChangeableUniquePtr CPersonalAccessTokenDatabaseDelegateComp::CreateObjec
 	}
 
 	if (record.contains("Id")){
-		const QByteArray tokenId = record.value("Id").toByteArray();
+		const QByteArray tokenId = imtdb::VariantToByteArray(record.value("Id"));
 		tokenPtr->SetId(tokenId);
 	}
 
 	if (record.contains("UserId")){
-		const QByteArray userId = record.value("UserId").toByteArray();
+		const QByteArray userId = imtdb::VariantToByteArray(record.value("UserId"));
 		tokenPtr->SetUserId(userId);
 	}
 
@@ -105,19 +115,17 @@ istd::IChangeableUniquePtr CPersonalAccessTokenDatabaseDelegateComp::CreateObjec
 		tokenPtr->SetRevoked(revoked);
 	}
 
-	istd::IChangeableUniquePtr retVal;
-	retVal.MoveCastedPtr<imtauth::IPersonalAccessToken>(tokenPtr);
-	return retVal;
+	return tokenPtr;
 }
 
 
 imtdb::IDatabaseObjectDelegate::NewObjectQuery CPersonalAccessTokenDatabaseDelegateComp::CreateNewObjectQuery(
-	const QByteArray& typeId,
-	const QByteArray& proposedObjectId,
-	const QString& objectName,
-	const QString& objectDescription,
-	const istd::IChangeable* valuePtr,
-	const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const QByteArray& typeId,
+			const QByteArray& proposedObjectId,
+			const QString& objectName,
+			const QString& objectDescription,
+			const istd::IChangeable* valuePtr,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	if (typeId.isEmpty() || (typeId != "PersonalAccessToken")){
 		return NewObjectQuery();
@@ -170,12 +178,12 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CPersonalAccessTokenDatabaseDeleg
 			"INSERT INTO \"PersonalAccessTokens\""
 			"(\"Id\", \"Name\", \"Description\", \"UserId\", \"TokenHash\", \"Scopes\", \"CreatedAt\", \"LastUsedAt\", \"ExpiresAt\", \"Revoked\") "
 			"VALUES('%1', '%2', '%3', '%4', '%5', '%6', %7, %8, %9, %10);")
-		.arg(QString::fromUtf8(tokenId))
-		.arg(name)
-		.arg(description)
-		.arg(userId)
-		.arg(tokenHash)
-		.arg(scopesStr)
+		.arg(SqlEncode(QString::fromUtf8(tokenId)))
+		.arg(SqlEncode(name))
+		.arg(SqlEncode(description))
+		.arg(SqlEncode(userId))
+		.arg(SqlEncode(tokenHash))
+		.arg(SqlEncode(scopesStr))
 		.arg(createdAtSql)
 		.arg(lastUsedAtSql)
 		.arg(expiresAtSql)
@@ -237,15 +245,15 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateUpdateObjectQuery(
 		"\"ExpiresAt\"=%7, "
 		"\"Revoked\"=%8 "
 		"WHERE \"Id\"='%9';")
-		.arg(name)
-		.arg(description)
-		.arg(userId)
-		.arg(tokenHash)
-		.arg(scopesStr)
+		.arg(SqlEncode(name))
+		.arg(SqlEncode(description))
+		.arg(SqlEncode(userId))
+		.arg(SqlEncode(tokenHash))
+		.arg(SqlEncode(scopesStr))
 		.arg(lastUsedAtSql)
 		.arg(expiresAtSql)
 		.arg(revokedSql)
-		.arg(QString::fromUtf8(objectId))
+		.arg(SqlEncode(QString::fromUtf8(objectId)))
 		.toUtf8();
 
 	return retVal;
@@ -253,9 +261,9 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 
 QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateDeleteObjectsQuery(
-	const imtbase::IObjectCollection& /*collection*/,
-	const QByteArrayList& objectIds,
-	const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArrayList& objectIds,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	if (objectIds.isEmpty()){
 		return QByteArray();
@@ -266,7 +274,7 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateDeleteObjectsQuery(
 		if (i > 0){
 			idsStr += ", ";
 		}
-		idsStr += QString("'%1'").arg(QString::fromUtf8(objectIds[i]));
+		idsStr += QString("'%1'").arg(SqlEncode(QString::fromUtf8(objectIds[i])));
 	}
 
 	const QByteArray retVal = QString("DELETE FROM \"PersonalAccessTokens\" WHERE \"Id\" IN (%1);")
@@ -278,19 +286,19 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateDeleteObjectsQuery(
 
 
 QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateDeleteObjectSetQuery(
-	const imtbase::IObjectCollection& /*collection*/,
-	const iprm::IParamsSet* /*paramsPtr*/,
-	const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const iprm::IParamsSet* /*paramsPtr*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	return QByteArray();
 }
 
 
 QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateRenameObjectQuery(
-	const imtbase::IObjectCollection& /*collection*/,
-	const QByteArray& objectId,
-	const QString& newObjectName,
-	const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& objectId,
+			const QString& newObjectName,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	if (objectId.isEmpty() || newObjectName.isEmpty()){
 		return QByteArray();
@@ -301,8 +309,8 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateRenameObjectQuery(
 			"UPDATE \"PersonalAccessTokens\" SET "
 			"\"Name\"='%1' "
 			"WHERE \"Id\"='%2';")
-		.arg(newObjectName)
-		.arg(QString::fromUtf8(objectId))
+		.arg(SqlEncode(newObjectName))
+		.arg(SqlEncode(QString::fromUtf8(objectId)))
 		.toUtf8();
 }
 
@@ -322,49 +330,9 @@ QByteArray CPersonalAccessTokenDatabaseDelegateComp::CreateDescriptionObjectQuer
 			"UPDATE \"PersonalAccessTokens\" SET "
 			"\"Description\"='%1' "
 			"WHERE \"Id\"='%2';")
-		.arg(description)
-		.arg(QString::fromUtf8(objectId))
+		.arg(SqlEncode(description))
+		.arg(SqlEncode(QString::fromUtf8(objectId)))
 		.toUtf8();
-}
-
-
-// reimplemented (icomp::CComponentBase)
-
-void CPersonalAccessTokenDatabaseDelegateComp::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-
-	if (m_databaseEngineCompPtr.IsValid()){
-		QString tableName = GetTableName();
-		if (!TableExists(tableName)){
-			QFile scriptFile(":/SQL/CreatePersonalAccessTokenTable.sql");
-			if (!scriptFile.open(QFile::ReadOnly)){
-				SendErrorMessage(0, QT_TR_NOOP(QString("Personal access tokens table creation script '%1'could not be loaded").arg(scriptFile.fileName())));
-				return;
-			}
-
-			QByteArray createTableQuery = scriptFile.readAll();
-			scriptFile.close();
-
-			createTableQuery.replace("${TableName}", tableName.toUtf8());
-			createTableQuery.replace("${TableScheme}", "public");
-
-			QSqlError sqlError;
-			m_databaseEngineCompPtr->ExecSqlQuery(createTableQuery, &sqlError);
-	
-			if (sqlError.type() != QSqlError::NoError){
-				qCritical() << __FILE__ << __LINE__
-							<< "\n\t| Table could not be created"
-							<< "\n\t| Error: " << sqlError
-							<< "\n\t| Query: " << createTableQuery;
-	
-				SendErrorMessage(0, QT_TR_NOOP(QString("\n\t| Table could not be created"
-														"\n\t| Error: %1"
-														 "\n\t| Query: %2")
-													.arg(sqlError.text(), qPrintable(createTableQuery))));
-			}
-		}
-	}
 }
 
 

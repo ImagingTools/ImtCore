@@ -18,9 +18,6 @@ VISIBILITY="public"  # Change to "private" if needed
 # List of libraries
 LIBRARIES=(
     "EJ"
-    "JQ"
-    "JQML"
-    "JQML2"
     "QXlsx"
     "WebCompiler"
     "boost"
@@ -39,9 +36,6 @@ LIBRARIES=(
 # Library descriptions
 declare -A DESCRIPTIONS=(
     ["EJ"]="Export library for ImtCore"
-    ["JQ"]="Qt-based library for ImtCore"
-    ["JQML"]="QML compiler for ImtCore"
-    ["JQML2"]="QML compiler v2 for ImtCore"
     ["QXlsx"]="Excel file library for ImtCore"
     ["WebCompiler"]="Python-based web compiler for ImtCore"
     ["boost"]="Boost C++ libraries (v1.75.0) for ImtCore"

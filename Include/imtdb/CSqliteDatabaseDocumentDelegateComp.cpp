@@ -123,7 +123,7 @@ QByteArray CSqliteDatabaseDocumentDelegateComp::CreateJsonBuildObjectQuery(const
 			revisionInfo += QString("'%1', %2").arg(key, raw.sql);
 		}
 		else if (value.type() == QMetaType::QString || value.type() == QMetaType::QByteArray){
-			revisionInfo += QString("'%1', '%2'").arg(key, value.toString());
+			revisionInfo += QString("'%1', '%2'").arg(key, SqlEncode(value.toString()));
 		}
 		else if (value.type() == QMetaType::Int){
 			revisionInfo += QString("'%1', %2").arg(key).arg(value.toInt());
@@ -242,17 +242,6 @@ bool CSqliteDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::I
 }
 
 
-bool CSqliteDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& textFilterQuery) const
-{
-	textFilterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter);
-	if (!textFilterQuery.isEmpty()){
-		SubstituteFieldIds(textFilterQuery, false);
-	}
-
-	return true;
-}
-
-
 bool CSqliteDatabaseDocumentDelegateComp::CreateObjectFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& filterQuery) const
 {
 	filterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter);
@@ -323,7 +312,6 @@ QByteArray CSqliteDatabaseDocumentDelegateComp::GetObjectSelectionQuery(
 					"root1"))
 			.toUtf8();
 }
-
 
 
 } // namespace imtdb

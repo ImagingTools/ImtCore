@@ -11,7 +11,7 @@ namespace ImtColPck
 
 
 I_EXPORT_PACKAGE(
-			"ImtColvPck",
+			"ImtColPck",
 			"Collection components", 
 			IM_PROJECT("ImtCore") IM_COMPANY("ImagingTools") "Collection");
 

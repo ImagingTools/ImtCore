@@ -7,6 +7,9 @@
 #include <iprm/IIdParam.h>
 #include <iqt/iqt.h>
 
+// Qt includes
+#include <QtCore/QJsonValue>
+
 
 namespace imtserverapp
 {
@@ -37,7 +40,7 @@ QByteArray CObjectRepresentationControllerCompBase::GetModelId() const
 }
 
 
-bool CObjectRepresentationControllerCompBase::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, imtbase::CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr) const
+bool CObjectRepresentationControllerCompBase::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, QJsonObject& representation, const iprm::IParamsSet* paramsPtr) const
 {
 	if (!IsModelSupported(dataModel)){
 		SendErrorMessage(0, QString("Unable to get representation model from data model. Model is not supported."));
@@ -46,7 +49,7 @@ bool CObjectRepresentationControllerCompBase::GetRepresentationFromDataModel(con
 	}
 
 	if (m_objectIdAttrPtr.IsValid()){
-		representation.SetData("Id", *m_objectIdAttrPtr);
+		representation.insert(QStringLiteral("Id"), QString::fromUtf8(*m_objectIdAttrPtr));
 	}
 
 	QByteArray languageId;
@@ -77,10 +80,10 @@ bool CObjectRepresentationControllerCompBase::GetRepresentationFromDataModel(con
 		paramName = elementNameTr;
 	}
 
-	representation.SetData("Name", paramName);
+	representation.insert(QStringLiteral("Name"), paramName);
 
 	if (m_qmlPathAttrPtr.IsValid()){
-		representation.SetData("Source", *m_qmlPathAttrPtr);
+		representation.insert(QStringLiteral("Source"), QString::fromUtf8(*m_qmlPathAttrPtr));
 	}
 
 	return GetRepresentationFromValue(dataModel, representation, paramsPtr);
@@ -88,5 +91,3 @@ bool CObjectRepresentationControllerCompBase::GetRepresentationFromDataModel(con
 
 
 } // namespace imtserverapp
-
-

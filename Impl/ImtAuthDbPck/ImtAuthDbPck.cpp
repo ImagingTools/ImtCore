@@ -80,7 +80,21 @@ I_EXPORT_COMPONENT(
 			"Personal access token database delegate",
 			"Personal Access Token Database Delegate");
 
+I_EXPORT_COMPONENT(
+			TenantDatabaseDelegate,
+			"Tenant database delegate",
+			"Tenant Database Delegate");
+
+
+I_EXPORT_COMPONENT(
+			TenantMembershipDatabaseDelegate,
+			"SQL delegate for tenant memberships (hydration, INSERT/UPDATE/DELETE)",
+			"Tenant Membership Database Delegate");
+
+I_EXPORT_COMPONENT(
+			TenantInvitationDatabaseDelegate,
+			"SQL delegate for tenant invitations (hydration, INSERT/UPDATE/DELETE)",
+			"Tenant Invitation Database Delegate");
 
 } // namespace ImtAuthDbPck
-
 

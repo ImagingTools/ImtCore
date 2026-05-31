@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #pragma once
 
+#include <memory>
+
 
 // ACF includes
 #include <iprm/CParamsSet.h>
@@ -26,6 +28,7 @@
 #include <imtcol/CDocumentIdFilter.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtauth/IUserActionManager.h>
+#include <imtauth/CTenantFilterParam.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 
 
@@ -69,6 +72,7 @@ public:
 		I_ASSIGN(m_userActionManagerCompPtr, "UserActionManager", "User action manager", false, "UserActionManager");
 		I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Collection headers provider", false, "HeadersProvider");
 		I_ASSIGN(m_operationContextControllerCompPtr, "OperationContextController", "Operation context controller", false, "OperationContextController");
+		I_ASSIGN(m_tenantFilterEnabledAttrPtr, "TenantFilterEnabled", "Enable tenant filter param injection", false, false);
 		I_ASSIGN_MULTI_0(m_objectTypeIdAttrPtr, "ObjectTypeIds", "Object type IDs", false);
 		I_ASSIGN_MULTI_0(m_objectIconPathsAttrPtr, "ObjectIconPaths", "List of item paths related to object type-IDs", false);
 		I_ASSIGN_MULTI_0(m_objectFactCompPtr, "CollectionObjectFactory", "Collection object factories", false);
@@ -181,7 +185,7 @@ public:
 				QString& errorMessage) const override;
 
 	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
-	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual QJsonObject CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 
 	// reimplemented (imtgql::IGqlRequestExtractor)
@@ -194,21 +198,21 @@ protected:
 	virtual bool GetOperationFromRequest(const imtgql::CGqlRequest& gqlRequest, imtgql::CGqlParamObject& gqlObject, QString& errorMessage, int& operationType) const;
 	virtual QByteArray GetObjectIdFromInputParams(const imtgql::CGqlParamObject &inputParams) const;
 	virtual QByteArray GetObjectIdFromRequest(const imtgql::CGqlRequest& gqlRequest) const;
-	virtual imtbase::CTreeItemModel* GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* InsertObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* UpdateObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* RenameObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* SetObjectDescription(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetElementsCount(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* DeleteObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject InsertObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject UpdateObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject RenameObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject SetObjectDescription(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject GetElementsCount(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject DeleteObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	/// \todo rename to GetElementMetaInfo
-	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetDataMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetObjectTypeId(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* ImportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* ExportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject GetInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject GetDataMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject GetObjectTypeId(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject ImportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual QJsonObject ExportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 
 	virtual bool ConvertObject(const istd::IChangeable& source, istd::IChangeable& target) const;
 	virtual int GetObjectTypeIdIndex(const QByteArray& typeId) const;
@@ -219,20 +223,27 @@ protected:
 	virtual QVariant GetInputArgumentFromRequest(const imtgql::CGqlRequest& gqlRequest, const QString& argumentKey) const;
 	virtual imtbase::ICollectionInfo::Ids ExtractObjectIdsForRemoval(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 
+	using GqlItemSetupContext = std::shared_ptr<const void>;
+	virtual GqlItemSetupContext CreateGqlItemSetupContext(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual bool SetupGqlItemWithContext(
+			const imtgql::CGqlRequest& gqlRequest,
+			const GqlItemSetupContext& setupContext,
+			QJsonObject& itemObj,
+			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
+			QString& errorMessage) const;
+
 	/**
-		Setup a GraphQL item at the given position in the model based on the information about an element in the object collection.
+		Setup a GraphQL item based on the information about an element in the object collection.
 	*/
 	virtual bool SetupGqlItem(
 			const imtgql::CGqlRequest& gqlRequest,
-			imtbase::CTreeItemModel& model,
-			int itemIndex,
+			QJsonObject& itemObj,
 			const QByteArray& collectionId,
 			QString& errorMessage) const;
 
 	virtual bool SetupGqlItem(
 			const imtgql::CGqlRequest& gqlRequest,
-			imtbase::CTreeItemModel& model,
-			int itemIndex,
+			QJsonObject& itemObj,
 			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
 			QString& errorMessage) const;
 
@@ -258,7 +269,7 @@ protected:
 				const istd::IChangeable& data,
 				const QByteArray& objectTypeId,
 				const imtgql::CGqlRequest& gqlRequest,
-				imtbase::CTreeItemModel& dataModel,
+				QJsonObject& dataObj,
 				QString& errorMessage) const;
 
 	/**
@@ -282,6 +293,13 @@ protected:
 	virtual void SetAdditionalFilters(const imtgql::CGqlRequest& gqlRequest,const imtgql::CGqlParamObject& viewParamsGql, iprm::CParamsSet* filterParams) const;
 	
 	virtual void SetAdditionalFilters(const imtgql::CGqlRequest& gqlRequest, imtbase::CComplexCollectionFilter& complexFilter) const;
+
+	/**
+		Create an optional tenant filter param to be injected into filter params.
+		Returns nullptr when tenant filtering is disabled.
+		The returned pointer is owned by the caller (ParamsSet takes ownership).
+	*/
+	virtual imtauth::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRequest& gqlRequest) const;
 
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const;
 	virtual QString GetObjectNameFromRequest(const imtgql::CGqlRequest& gqlRequest) const;
@@ -355,6 +373,7 @@ protected:
 	I_REF(imtcol::ICollectionHeadersProvider, m_headersProviderCompPtr);
 	I_REF(imtbase::IOperationContextController, m_operationContextControllerCompPtr);
 	I_REF(imtauth::IUserActionManager, m_userActionManagerCompPtr);
+	I_ATTR(bool, m_tenantFilterEnabledAttrPtr);
 
 	I_MULTIATTR(QByteArray, m_objectTypeIdAttrPtr);
 	I_MULTIATTR(QByteArray, m_objectIconPathsAttrPtr);
@@ -368,5 +387,3 @@ protected:
 
 
 } // namespace imtservergql
-
-

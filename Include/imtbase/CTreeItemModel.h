@@ -183,6 +183,10 @@ private:
 protected:
 	virtual int GetKeyRole(const QByteArray& key) const;
 	virtual bool ParseRecursive(const QJsonObject& jsonObject, int index = 0);
+
+private:
+	inline int GetVariantTypeId(const QVariant& value);
+	bool SerializeVariantValue(iser::IArchive& archive, const QVariant& value);
 };
 
 

@@ -4,9 +4,10 @@
 
 // ImtCore includes
 #include <imtrest/CHttpRootServletComp.h>
-#include <imtrest/IRequestManager.h>
+#include <imtrest/IResponseDispatcher.h>
 #include <imtgql/IGqlSubscriberController.h>
 #include <imtgql/IGqlRequestHandler.h>
+#include <imtgql/IGqlContextCreator.h>
 
 
 namespace imtservergql
@@ -16,7 +17,7 @@ namespace imtservergql
 class CWebSocketServletComp:
 			public ilog::CLoggerComponentBase,
 			virtual public imtrest::IRequestServlet,
-			virtual public imtrest::IRequestManager
+			virtual public imtrest::IResponseDispatcher
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
@@ -25,14 +26,16 @@ public:
 		I_REGISTER_INTERFACE(IRequestServlet);
 		I_ASSIGN_MULTI_0(m_gqlSubscriberControllersCompPtr, "GqlSubscriberControllers", "List of gql subscriber controller for corresponding command-IDs", false);
 		I_ASSIGN(m_workerManagerCompPtr, "WorkerManager", "GraphQl multithread worker manager", false, "WorkerManager");
+		I_ASSIGN(m_gqlContextCreatorCompPtr, "GqlContextCreator", "GraphQL-related context creator", false, "AuthenticationManager");
 	I_END_COMPONENT
 
 	// reimplemented (imtrest::IRequestServlet)
 	virtual bool IsCommandSupported(const QByteArray& commandId) const override;
 	virtual imtrest::ConstResponsePtr ProcessRequest(const imtrest::IRequest& request, const QByteArray& subCommandId = QByteArray()) const override;
 
-	// reimplemented (imtrest::IRequestManager)
-	virtual const imtrest::ISender* GetSender(const QByteArray& requestId) const override;
+	// reimplemented (imtrest::IResponseDispatcher)
+	virtual bool SendResponse(const QByteArray& requestId, imtrest::ConstResponsePtr& response) const override;
+	virtual bool SendRequest(const QByteArray& requestId, imtrest::ConstRequestPtr& request) const override;
 
 protected:
 	virtual imtrest::ConstResponsePtr InitConnection(const imtrest::IRequest& request) const;
@@ -46,6 +49,7 @@ protected:
 private:
 	I_MULTIREF(imtgql::IGqlSubscriberController, m_gqlSubscriberControllersCompPtr);
 	I_REF(imtrest::IRequestServlet, m_workerManagerCompPtr);
+	I_REF(imtgql::IGqlContextCreator, m_gqlContextCreatorCompPtr);
 
 	typedef QMap<QByteArray, imtgql::IGqlSubscriberController*> SubscriberControllersMap;
 
@@ -55,5 +59,4 @@ private:
 
 
 } // namespace imtservergql
-
 

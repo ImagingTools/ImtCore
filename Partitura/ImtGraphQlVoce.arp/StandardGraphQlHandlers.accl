@@ -2,17 +2,17 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5715" Description="ACF"/>
-            <Version Id="1" Number="2274" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6397" Description="ACF"/>
+            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="AttachmentBinaryDataProvider" X="550" Y="700" Note=""/>
+        <Element ComponentName="DelegatedBinaryDataControllers" X="975" Y="450" Note=""/>
         <Element ComponentName="DelegatedBinaryDataProviders" X="650" Y="550" Note=""/>
         <Element ComponentName="ExternalHttpRequestHandler" X="450" Y="475" Note=""/>
         <Element ComponentName="FileAccess" X="1050" Y="550" Note=""/>
-        <Element ComponentName="GqlContext" X="150" Y="250" Note=""/>
-        <Element ComponentName="GqlContextCreator" X="150" Y="350" Note=""/>
         <Element ComponentName="GraphQlRoot" X="150" Y="525" Note="Handler/Servlet for all GraphQL requests"/>
         <Element ComponentName="HttpRedirect" X="325" Y="125" Note="HTTP redirect component used for web applications"/>
         <Element ComponentName="HttpRootHandler" X="600" Y="375" Note=""/>

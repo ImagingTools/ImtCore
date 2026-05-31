@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5423" Description="ACF"/>
+            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="BackupParams" X="825" Y="575" Note=""/>
+        <Element ComponentName="DatabaseParams" X="150" Y="375" Note=""/>
+        <Element ComponentName="FileAutoPersistence" X="600" Y="125" Note=""/>
+        <Element ComponentName="FileBasedSslConfiguration" X="275" Y="125" Note=""/>
+        <Element ComponentName="LoggingParams" X="300" Y="575" Note=""/>
+        <Element ComponentName="Preferences" X="600" Y="375" Note=""/>
+        <Element ComponentName="ServerParams" X="575" Y="575" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries>
+        <EmbededRegistry Id="ServerParams">
+            <PositionMap>
+                <Element ComponentName="Server" X="575" Y="125" Note=""/>
+                <Element ComponentName="ServerConnectionInterface" X="575" Y="325" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="DatabaseParams">
+            <PositionMap>
+                <Element ComponentName="Database" X="525" Y="150" Note=""/>
+                <Element ComponentName="DatabaseAccessSettings" X="525" Y="350" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="BackupParams">
+            <PositionMap>
+                <Element ComponentName="Backup" X="550" Y="75" Note=""/>
+                <Element ComponentName="CompanyDataLocation" X="825" Y="500" Note=""/>
+                <Element ComponentName="RelativeFileNameParam" X="823.585786438" Y="350" Note=""/>
+                <Element ComponentName="SchedulerParams" X="325" Y="350" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+    </EmbeddedRegistries>
+</Acf>

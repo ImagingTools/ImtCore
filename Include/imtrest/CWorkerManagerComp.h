@@ -10,7 +10,7 @@
 
 // ImtCore includes
 #include <imtrest/IRequestServlet.h>
-#include <imtrest/IRequestManager.h>
+#include <imtrest/IResponseDispatcher.h>
 #include <imtrest/CWorkerThread.h>
 
 
@@ -37,7 +37,7 @@ public:
 	CWorkerManagerComp();
 
 	IRequestServletPtr CreateServlet();
-	const ISender* GetSender(const QByteArray& requestId);
+	bool SendResponse(const QByteArray& requestId, ConstResponsePtr& response);
 
 	// reimplemented (imtrest::IRequestServlet)
 	virtual bool IsCommandSupported(const QByteArray& commandId) const override;
@@ -52,7 +52,7 @@ protected Q_SLOTS:
 
 private:
 	I_FACT(imtrest::IRequestServlet, m_requestHandlerCompPtr);
-	I_REF(imtrest::IRequestManager, m_requestManagerCompPtr);
+	I_REF(imtrest::IResponseDispatcher, m_requestManagerCompPtr);
 	I_ATTR(int, m_threadsLimitAttrPtr);
 
 	mutable QList<CWorkerThread*> m_workerList;

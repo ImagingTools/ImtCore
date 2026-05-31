@@ -16,7 +16,7 @@ Item {
     signal multiPageUpdated();
 
 	property string productId: AuthorizationController.productId
-    property var documentManager: MainDocumentManager.getDocumentManager("Administration");
+    property var documentManager: MainDocumentService.getDocumentService("Administration");
 
     Component.onCompleted: {
         Events.subscribeEvent("OnLocalizationChanged", administrationContainer.onLocalizationChanged);
@@ -117,17 +117,17 @@ Item {
         }
 
         Component.onCompleted: {
-            MainDocumentManager.registerDocumentManager("Administration/Roles", administrationContainer.documentManager)
-            MainDocumentManager.registerDocumentManager("Administration/Users", administrationContainer.documentManager)
-            MainDocumentManager.registerDocumentManager("Administration/Groups", administrationContainer.documentManager)
+            MainDocumentService.registerDocumentService("Administration/Roles", administrationContainer.documentManager)
+            MainDocumentService.registerDocumentService("Administration/Users", administrationContainer.documentManager)
+            MainDocumentService.registerDocumentService("Administration/Groups", administrationContainer.documentManager)
             
             updateModel();
         }
 
         property bool block: false
         onCurrentIndexChanged: {
-            if (currentIndex >= 0){
-                let pageId = pagesModel.get(currentIndex).id
+            if (currentIndex >= 0 && multiPageView.pagesModel.count > currentIndex){
+                let pageId = multiPageView.pagesModel.get(currentIndex).id
                 visualStatusProvider.collectionId = pageId
                 if (!block){
                     NavigationController.push("Administration/" + pageId)

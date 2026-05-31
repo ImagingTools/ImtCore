@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6397" Description="ACF"/>
+            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="UserVerification" PackageId="ImtAuthPck" ComponentId="UserVerification">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="UserVerificationCollection" PackageId="ImtCorePck" ComponentId="ObjectCollection">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>UserVerification</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>UserVerification</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModel" ComponentId="UserVerificationCollection"/>
+        <Interface InterfaceId="imtbase::ICollectionInfo" ComponentId="UserVerificationCollection"/>
+        <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="UserVerificationCollection"/>
+        <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="UserVerificationCollection"/>
+        <Interface InterfaceId="iser::ISerializable" ComponentId="UserVerificationCollection"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="UserVerificationCollection"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="UserVerificationCollection"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

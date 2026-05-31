@@ -1,0 +1,35 @@
+const { QtObject } = require('./QtObject')
+const { QVar, QBool, QString, QReal } = require('../utils/properties')
+const { Qt } = require('../utils/Qt')
+
+class Shortcut extends QtObject {
+    static defaultProperties = {
+        context: { type: QReal, value: Qt.WindowShortcut },
+        autoRepeat: { type: QBool, value: true },
+        enabled: { type: QBool, value: true },
+        nativeText: { type: QString, value: '' },
+        portableText: { type: QString, value: '' },
+        sequence: { type: QString, value: '' },
+        sequences: { type: QVar, value: [] },
+
+    }
+
+    static defaultSignals = {
+        activated: { params: [] },
+        activatedAmbiguously: { params: [] },
+    }
+
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
+        KeyboardController.add(this)
+    }
+
+
+    destroy(){
+        KeyboardController.remove(this)
+        super.destroy()
+    }
+    
+}
+
+module.exports.Shortcut = Shortcut

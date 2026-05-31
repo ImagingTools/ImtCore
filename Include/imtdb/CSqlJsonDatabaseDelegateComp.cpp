@@ -18,6 +18,7 @@
 #include <imtbase/imtbase.h>
 #include <imtbase/CObjectCollection.h>
 #include <imtcol/IDocumentCollectionFilter.h>
+#include <imtdb/imtdb.h>
 
 
 namespace imtdb
@@ -45,7 +46,7 @@ istd::IChangeableUniquePtr CSqlJsonDatabaseDelegateComp::CreateObjectFromRecord(
 	int index = 0;
 	QByteArray typeId = "DocumentInfo";
 	if (record.contains("TypeId")){
-		typeId = record.value("TypeId").toByteArray();
+		typeId = imtdb::VariantToByteArray(record.value("TypeId"));
 		index = -1;
 
 		if (m_typesCompPtr.IsValid()){
@@ -242,7 +243,7 @@ bool CSqlJsonDatabaseDelegateComp::SetCollectionItemMetaInfoFromRecord(const QSq
 {
 	QByteArray objectId;
 	if (record.contains(*m_objectIdColumnAttrPtr)){
-		objectId = record.value(qPrintable(*m_objectIdColumnAttrPtr)).toByteArray();
+		objectId = imtdb::VariantToByteArray(record.value(qPrintable(*m_objectIdColumnAttrPtr)));
 	}
 
 	if (!objectId.isEmpty()){
@@ -421,7 +422,7 @@ bool CSqlJsonDatabaseDelegateComp::CreateObjectFilterQuery(
 			}
 
 			QString value = textParamPtr->GetText();
-			filterQuery += QString("lower(\"Document\"->>'%1') = lower('%2')").arg(qPrintable(key)).arg(value);
+			filterQuery += QString("lower(\"Document\"->>'%1') = lower('%2')").arg(qPrintable(key)).arg(SqlEncode(value));
 		}
 	}
 
@@ -440,12 +441,13 @@ bool CSqlJsonDatabaseDelegateComp::CreateTextFilterQuery(
 
 	QString textFilter = collectionFilter.GetTextFilter();
 	if (!textFilter.isEmpty()){
-		textFilterQuery = QString("\"Document\"->>'%1' ILIKE '%%2%'").arg(qPrintable(filteringColumnIds.first())).arg(textFilter);
+		QString encodedFilter = SqlEncode(textFilter);
+		textFilterQuery = QString("\"Document\"->>'%1' ILIKE '%%2%'").arg(qPrintable(filteringColumnIds.first())).arg(encodedFilter);
 
 		for (int i = 1; i < filteringColumnIds.count(); ++i){
 			textFilterQuery += " OR ";
 
-			textFilterQuery += QString("\"Document\"->>'%1' ILIKE '%%2%'").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
+			textFilterQuery += QString("\"Document\"->>'%1' ILIKE '%%2%'").arg(qPrintable(filteringColumnIds[i])).arg(encodedFilter);
 		}
 	}
 
@@ -609,7 +611,7 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateOperationDescriptionQuery(
 			return QString(R"(UPDATE "%1" SET "OwnerId" = '%2', "OwnerName" = '%3', "OperationDescription" = '%4' WHERE "IsActive" = true AND "DocumentId" = '%5';)")
 				.arg(qPrintable(*m_tableNameAttrPtr))
 				.arg(qPrintable(objectInfo.id))
-				.arg(objectInfo.name)
+				.arg(SqlEncode(objectInfo.name))
 				.arg(SqlEncode(operationDescription))
 				.arg(qPrintable(objectId))
 				.toUtf8();

@@ -2,6 +2,10 @@
 #include <imtservergql/CSdlCollectionControllerCompBase.h>
 
 
+// Qt includes
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonDocument>
+
 // ACF includes
 #include <istd/TDelPtr.h>
 
@@ -12,7 +16,7 @@ namespace imtservergql
 
 // protected methods
 
-imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::ListObjects(
+QJsonObject CSdlCollectionControllerCompBase::ListObjects(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
@@ -21,7 +25,7 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::ListObjects(
 
 		SendCriticalMessage(0, errorMessage);
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	int offset = 0;
@@ -42,55 +46,56 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::ListObjects(
 		PrepareFilters(gqlRequest, *viewParamsGql, filterParams);
 	}
 
-	int elementsCount = m_objectCollectionCompPtr->GetElementsCount(&filterParams);
-
-	int pagesCount = std::ceil(elementsCount / (double)count);
-	if (pagesCount <= 0){
-		pagesCount = 1;
-	}
-
 	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams));
 	if (!objectCollectionIterator.IsValid()){
 		errorMessage = QString("Object collection iterator could not be created");
 
 		SendCriticalMessage(0, errorMessage, "CSdlCollectionControllerCompBase");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	// GetElementsCount() returns the total count across all pages (from COUNT(*) OVER()),
+	// not just the number of records in the current page.
+	int elementsCount = objectCollectionIterator->GetElementsCount();
 
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
-	if (dataModelPtr != nullptr){
-		istd::TDelPtr<imtbase::ITreeModelWrittable> listPayloadWrittablePtr(
-					CreateSdlItemList(
-								gqlRequest,
-								pagesCount,
-								elementsCount,
-								objectCollectionIterator.GetPtr(),
-								errorMessage));
-		if (listPayloadWrittablePtr.IsValid()){
-			if (!listPayloadWrittablePtr->WriteToModel(*dataModelPtr)){
-				errorMessage = QString("Unable to setup GraphQL-item. Unable to write the list model");
+	int pagesCount = std::ceil(elementsCount / (double)count);
+	if (pagesCount <= 0){
+		pagesCount = 1;
+	}
 
-				SendCriticalMessage(0, errorMessage, "CSdlCollectionControllerCompBase");
+	QJsonObject rootObj;
+	QJsonObject dataObj;
 
-				return nullptr;
-			}
+	istd::TDelPtr<imtbase::ITreeModelWrittable> listPayloadWrittablePtr(
+				CreateSdlItemList(
+							gqlRequest,
+							pagesCount,
+							elementsCount,
+							objectCollectionIterator.GetPtr(),
+							errorMessage));
+	if (listPayloadWrittablePtr.IsValid()){
+		imtbase::CTreeItemModel tempModel;
+		if (!listPayloadWrittablePtr->WriteToModel(tempModel)){
+			errorMessage = QString("Unable to setup GraphQL-item. Unable to write the list model");
+
+			SendCriticalMessage(0, errorMessage, "CSdlCollectionControllerCompBase");
+
+			return QJsonObject();
 		}
-		else{
-			return nullptr;
-		}
+		QJsonDocument doc = QJsonDocument::fromJson(tempModel.ToJson().toUtf8());
+		dataObj = doc.object();
 	}
-	else {
-		return nullptr;
+	else{
+		return QJsonObject();
 	}
 
-	return rootModelPtr.PopPtr();
+	rootObj.insert(QStringLiteral("data"), dataObj);
+	return rootObj;
 }
 
 
-imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::GetObject(
+QJsonObject CSdlCollectionControllerCompBase::GetObject(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
@@ -99,7 +104,7 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::GetObject(
 
 		SendCriticalMessage(0, errorMessage, "CSdlCollectionControllerCompBase");
 
-		return nullptr;
+		return QJsonObject();
 	}
 
 	QByteArray objectId;
@@ -111,8 +116,8 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::GetObject(
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-		imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+		QJsonObject rootObj;
+		QJsonObject dataObj;
 
 		istd::TDelPtr<imtbase::ITreeModelWrittable> substrateWrittablePtr(CreateSdlItem(gqlRequest,objectId, dataPtr, errorMessage));
 
@@ -122,24 +127,29 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::GetObject(
 			}
 
 			SendCriticalMessage(0, errorMessage, "CSdlCollectionControllerCompBase");
-			return nullptr;
+			return QJsonObject();
 		}
 
-		if(!substrateWrittablePtr->WriteToModel(*dataModelPtr)){
+		imtbase::CTreeItemModel tempModel;
+		if(!substrateWrittablePtr->WriteToModel(tempModel)){
 			errorMessage = QString("Unable to setup GraphQL-item. Unable to write model");
 			SendCriticalMessage(0, errorMessage, "CSdlCollectionControllerCompBase");
 			Q_ASSERT(0);
-			return nullptr;
+			return QJsonObject();
 		}
 
-		return rootModelPtr.PopPtr();
+		QJsonDocument doc = QJsonDocument::fromJson(tempModel.ToJson().toUtf8());
+		dataObj = doc.object();
+
+		rootObj.insert(QStringLiteral("data"), dataObj);
+		return rootObj;
 	}
 
 	errorMessage = QT_TR_NOOP(QString("Unable to get an object with ID: '%1'.").arg(qPrintable(objectId)));
 
 	SendErrorMessage(0, errorMessage, "CSdlCollectionControllerCompBase");
 
-	return nullptr;
+	return QJsonObject();
 }
 
 

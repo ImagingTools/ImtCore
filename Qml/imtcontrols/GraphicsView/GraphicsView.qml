@@ -13,6 +13,16 @@ Rectangle {
 
 	color: Style.baseColor;
 
+	property GraphicsShapeFactoryManager shapeFactoryManger: GraphicsShapeFactoryManager{
+		graphicsViewItem: graphicsView
+		sdlShapeModel: graphicsView.sdlShapeModel
+		onSdlShapesCreated :{
+			graphicsView.sdlShapesCreated();
+		}
+	}
+	property BaseModel sdlShapeModel: null
+
+
 	property alias selectedIndex: canvas.selectedIndex;
 
 	//for scrollBars
@@ -61,7 +71,7 @@ Rectangle {
 	property Component controlPanelComp: null
 	property Item controlPanelItem: null
 
-	property alias scaleCoeff: canvas.scaleCoeff;
+	property real scaleCoeff: canvas.scaleCoeff;
 	property alias deltaX: canvas.deltaX;
 	property alias deltaY: canvas.deltaY;
 	property alias viewMatrix: canvasMatrix;
@@ -116,6 +126,11 @@ Rectangle {
 
 	signal painted()
 	signal imageLoaded()
+	signal sdlShapesCreated();
+
+	onSdlShapesCreated: {
+		drawSdlShapes()
+	}
 
 	Component.onCompleted: {
 		Events.subscribeEvent("DesignSchemeChanged", designSchemeChanged);
@@ -143,6 +158,10 @@ Rectangle {
 		layerTools.canApplyViewTransform = false;
 		layerModel.push(layerTools);
 
+	}
+
+	onScaleCoeffChanged: {
+		canvas.scaleCoeff = scaleCoeff
 	}
 
 	Component.onDestruction: {
@@ -176,6 +195,10 @@ Rectangle {
 			graphicsView.restrictDrawing = false
 			graphicsView.resize()
 		}
+	}
+
+	function drawSdlShapes(){
+		requestPaintPause.restart();
 	}
 
 	function resize(){
@@ -391,7 +414,8 @@ Rectangle {
 
 		if(onlyOneLayer){
 			let clipRect = layer.clipRect;
-			if(clipRect.width == 0 && clipRect.height == 0){
+			let clipRectBackup = layer.clipRectBackup;
+			if(clipRectBackup.width == 0 && clipRectBackup.height == 0){
 				clipRect.width = canvas.width
 				clipRect.height = canvas.height
 			}
@@ -425,7 +449,8 @@ Rectangle {
 			if(!onlyOneLayer){
 				let layerCurr = shape.layer;
 				let clipRectCurr = layerCurr.clipRect;
-				if(clipRectCurr.width == 0 && clipRectCurr.height == 0){
+				let clipRectCurrBackup = layerCurr.clipRectBackup;
+				if(clipRectCurrBackup.width == 0 && clipRectCurrBackup.height == 0){
 					clipRectCurr.width = canvas.width
 					clipRectCurr.height = canvas.height
 				}
@@ -954,6 +979,7 @@ Rectangle {
 
 			onScaleCoeffChanged: {
 				//console.log("scaleCoeff:::", scaleCoeff)
+				graphicsView.scaleCoeff = scaleCoeff
 				requestPaintPause.restart();
 			}
 

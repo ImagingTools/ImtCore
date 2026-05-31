@@ -19,6 +19,7 @@
                                 <Value>Pages/RolesPage</Value>
                                 <Value>Pages/UsersPage</Value>
                                 <Value>Pages/UserGroupsPage</Value>
+                                <Value>Pages/TenantsPage</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -157,7 +158,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="RolesPage" PackageId="ImtQmlPck" ComponentId="PageGuiElementModel">
+        <Element Id="RolesPage" PackageId="ImtServerAppPck" ComponentId="PageGuiElementModel">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Id" Type="Id" ExportId="">
@@ -169,7 +170,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="UsersPage" PackageId="ImtQmlPck" ComponentId="PageGuiElementModel">
+        <Element Id="UsersPage" PackageId="ImtServerAppPck" ComponentId="PageGuiElementModel">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Id" Type="Id" ExportId="">
@@ -274,6 +275,24 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
+                    <Element Id="TenantsPage" PackageId="ImtUserAdministrationVoce" ComponentId="TenantsPage">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TenantRepository" Type="Reference" ExportId="TenantRepository">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TenantMembershipRepository" Type="Reference" ExportId="TenantMembershipRepository">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
                     <Element Id="UsersPage" PackageId="ImtUserAdministrationVoce" ComponentId="UsersPage">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
@@ -306,6 +325,7 @@
                 <ExportedInterfaces/>
                 <ExportedComponents>
                     <Component ExportedId="RolesPage" ComponentId="RolesPage"/>
+                    <Component ExportedId="TenantsPage" ComponentId="TenantsPage"/>
                     <Component ExportedId="UserGroupsPage" ComponentId="UserGroupsPage"/>
                     <Component ExportedId="UsersPage" ComponentId="UsersPage"/>
                 </ExportedComponents>
@@ -322,6 +342,7 @@
                                         <Values>
                                             <Value>RolesPermissions</Value>
                                             <Value>UsersPermissions</Value>
+                                            <Value>TenantsPermissions</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -338,6 +359,25 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>ViewRoles</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="TenantsPermissions" PackageId="ImtServerAppPck" ComponentId="SingleCommandPermissionsProvider">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="CommandId" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="Tenants"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>ViewTenants</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>

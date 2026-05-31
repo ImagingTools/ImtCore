@@ -22,7 +22,7 @@
 ## Step 3: Push to GitHub (10 min)
 ```bash
 cd /tmp/3rdparty-migration
-for lib in EJ JQ JQML JQML2 QXlsx WebCompiler boost icu libmdbx mongoc mongocxx nodejs openssl pybind11 quazip zlib zstd; do
+for lib in EJ QXlsx WebCompiler boost icu libmdbx mongoc mongocxx nodejs openssl pybind11 quazip zlib zstd; do
     cd "$lib"
     git remote add origin "https://github.com/ImagingTools/${lib}.git"
     git branch -M main
@@ -78,7 +78,7 @@ migrate-3rdparty.bat prepare-all
 ## Step 3: Push to GitHub (10 min)
 ```powershell
 cd $env:TEMP\3rdparty-migration
-foreach ($lib in @("EJ", "JQ", "JQML", "JQML2", "QXlsx", "WebCompiler", "boost", "icu", "libmdbx", "mongoc", "mongocxx", "nodejs", "openssl", "pybind11", "quazip", "zlib", "zstd")) {
+foreach ($lib in @("EJ", "QXlsx", "WebCompiler", "boost", "icu", "libmdbx", "mongoc", "mongocxx", "nodejs", "openssl", "pybind11", "quazip", "zlib", "zstd")) {
     cd $lib
     git remote add origin "https://github.com/ImagingTools/$lib.git"
     git branch -M main
@@ -138,8 +138,8 @@ git add 3rdParty/
 git commit -m "Rollback: Restore 3rdParty directory"
 ```
 
-## 17 Libraries to Migrate
-EJ, JQ, JQML, JQML2, QXlsx, WebCompiler, boost, icu, libmdbx, mongoc, mongocxx, nodejs, openssl, pybind11, quazip, zlib, zstd
+## 14 Libraries to Migrate
+EJ, QXlsx, WebCompiler, boost, icu, libmdbx, mongoc, mongocxx, nodejs, openssl, pybind11, quazip, zlib, zstd
 
 ## After Migration - Developer Instructions
 

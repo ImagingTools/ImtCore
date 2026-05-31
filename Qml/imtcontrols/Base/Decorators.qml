@@ -10,6 +10,7 @@ StyleComponents {
 	property string styleId: "StyleAcf"
 	menuPanelButtonDecorator: menuPanelButtonDecoratorComp
 	subMenuPanelButtonDecorator: subMenuPanelButtonDecoratorComp
+	menuPanelDecorator: Component{Item{}}
 	filterPanelDecorator: filterPanelDecoratorComp
 	// bottomPanelDecorator: bottomPanelDecoratorComp
 	topButtonDecorator: topButtonDecoratorComp
@@ -1176,14 +1177,14 @@ StyleComponents {
 					radius: width;
 					border.color: Style.borderColor;
 					border.width: 1;
-					color: Style.grayColor;
+					color: Style.baseColor
 
 					Rectangle{
 						id: selectCircle
 
 						anchors.centerIn: circle;
 
-						height: circle.height - 8;
+						height: circle.height - 4;
 						width: height;
 						radius: width;
 						color: !radioButtonItem.baseElement ? "transparent" : radioButtonItem.baseElement.selectedColor;
@@ -1245,7 +1246,9 @@ StyleComponents {
 
 				anchors.left: textAreaItem.left;
 				anchors.leftMargin: !textAreaItem.baseElement ? 0 : textAreaItem.baseElement.margin;
-				anchors.verticalCenter: textAreaItem.verticalCenter;
+				anchors.verticalCenter: !textAreaItem.baseElement ? undefined : textAreaItem.baseElement.placeHolderVerticalCentered ? textAreaItem.verticalCenter : undefined;
+				anchors.top: !textAreaItem.baseElement ? undefined : !textAreaItem.baseElement.placeHolderVerticalCentered ? textAreaItem.top : undefined;
+				anchors.topMargin: !textAreaItem.baseElement ? 0 : !textAreaItem.baseElement.placeHolderVerticalCentered ? textAreaItem.baseElement.margin : 0;
 
 
 				font.pixelSize: Style.fontSizeM;

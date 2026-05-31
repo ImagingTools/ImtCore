@@ -15,10 +15,11 @@ class IDocumentIdFilter: virtual public iser::ISerializable
 public:
 	enum ConditionType
 	{
+		CT_NONE,
 		CT_IN,
 		CT_NOT_IN
 	};
-	I_DECLARE_ENUM(ConditionType, CT_IN, CT_NOT_IN);
+	I_DECLARE_ENUM(ConditionType, CT_NONE, CT_IN, CT_NOT_IN);
 
 	virtual QByteArrayList GetDocumentIds() const = 0;
 	virtual void SetDocumentIds(const QByteArrayList& documentIds) = 0;

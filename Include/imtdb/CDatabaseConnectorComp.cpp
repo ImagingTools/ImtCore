@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtdb/CDatabaseConnectorComp.h>
 
+#include <imtdb/imtdb.h>
+
 
 namespace imtdb
 {
@@ -91,7 +93,7 @@ bool CDatabaseConnectorComp::ConnectToDatabase(const IDatabaseLoginSettings& log
 				'%4',
 				'%5'
 			);
-		)").arg(*m_serverNameAttrPtr, host, name, userName, password, *m_schemaNameAttrPtr);
+		)").arg(*m_serverNameAttrPtr, SqlEncode(host), SqlEncode(name), SqlEncode(userName), SqlEncode(password), SqlEncode(*m_schemaNameAttrPtr));
 	
 	QSqlError sqlError;
 	m_databaseEngineCompPtr->ExecSqlQuery(query.toUtf8(), &sqlError);

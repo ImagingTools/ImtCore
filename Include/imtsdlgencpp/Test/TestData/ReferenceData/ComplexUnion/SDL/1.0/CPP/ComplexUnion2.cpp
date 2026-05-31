@@ -9023,22 +9023,22 @@ bool CExtendedMetaData::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int
 
 	if (value){
 		QVariant valueVariantValue;
-		if (const CCoordinates* val = std::get_if<CCoordinates>(value.GetPtr())){
-			if (!val->WriteToModel(*(model.AddTreeModel("value", modelIndex)), 0)){
+		if (const CCoordinates* coordinatesVal = std::get_if<CCoordinates>(value.GetPtr())){
+			if (!coordinatesVal->WriteToModel(*(model.AddTreeModel("value", modelIndex)), 0)){
 				return false;
 			}
 			if(model.GetTreeItemModel("value", modelIndex) != nullptr){
 				model.GetTreeItemModel("value", modelIndex)->SetData("__typename", "Coordinates", 0);
 			}
 		}
-		else if (const double* val = std::get_if<double>(value.GetPtr())){
-			model.SetData("", *val);
+		else if (const double* doubleVal = std::get_if<double>(value.GetPtr())){
+			model.SetData("", *doubleVal);
 		}
-		else if (const bool* val = std::get_if<bool>(value.GetPtr())){
-			model.SetData("", *val);
+		else if (const bool* booleanVal = std::get_if<bool>(value.GetPtr())){
+			model.SetData("", *booleanVal);
 		}
-		else if (const QString* val = std::get_if<QString>(value.GetPtr())){
-			model.SetData("", *val);
+		else if (const QString* stringVal = std::get_if<QString>(value.GetPtr())){
+			model.SetData("", *stringVal);
 		}
 
 	}
@@ -9057,7 +9057,7 @@ bool CExtendedMetaData::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& mod
 
 	QVariant valueData = model.GetData("value", modelIndex);
 	if (!valueData.isNull()){
-		QString valueTypename = valueData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+		QString valueTypename = model.GetTreeItemModel("value", modelIndex)->GetData("__typename").toString();
 		if (valueTypename == "Coordinates") {
 			CCoordinates valueConvert;
 			const bool isvalueRead = valueConvert.ReadFromModel(*model.GetTreeItemModel("value", modelIndex)); 
@@ -9090,7 +9090,7 @@ bool CExtendedMetaData::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& 
 
 	QVariant valueData = model.GetData("value", modelIndex);
 	if (!valueData.isNull()){
-		QString valueTypename = valueData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+		QString valueTypename = model.GetTreeItemModel("value", modelIndex)->GetData("__typename").toString();
 		if (valueTypename == "Coordinates") {
 			CCoordinates valueConvert;
 			const bool isvalueRead = valueConvert.ReadFromModel(*model.GetTreeItemModel("value", modelIndex)); 
@@ -9122,20 +9122,20 @@ bool CExtendedMetaData::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gq
 
 	if (value){
 		::imtgql::CGqlParamObject valueDataObject;
-		if (const CCoordinates* val = std::get_if<CCoordinates>(value.GetPtr())){
-			if (!val->WriteToGraphQlObject(valueDataObject)){
+		if (const CCoordinates* coordinatesVal = std::get_if<CCoordinates>(value.GetPtr())){
+			if (!coordinatesVal->WriteToGraphQlObject(valueDataObject)){
 				return false;
 			}
 			valueDataObject.InsertParam("__typename", QVariant("Coordinates"));
 		}
-		else if (const double* val = std::get_if<double>(value.GetPtr())){
-			valueDataObject.InsertParam("value", *val);
+		else if (const double* doubleVal = std::get_if<double>(value.GetPtr())){
+			valueDataObject.InsertParam("value", *doubleVal);
 		}
-		else if (const bool* val = std::get_if<bool>(value.GetPtr())){
-			valueDataObject.InsertParam("value", *val);
+		else if (const bool* booleanVal = std::get_if<bool>(value.GetPtr())){
+			valueDataObject.InsertParam("value", *booleanVal);
 		}
-		else if (const QString* val = std::get_if<QString>(value.GetPtr())){
-			valueDataObject.InsertParam("value", *val);
+		else if (const QString* stringVal = std::get_if<QString>(value.GetPtr())){
+			valueDataObject.InsertParam("value", *stringVal);
 		}
 		gqlObject.InsertParam("value", valueDataObject);
 	}
@@ -9229,32 +9229,32 @@ bool CExtendedMetaData::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	}
 
 	if (value){
-		if (const CCoordinates* val = std::get_if<CCoordinates>(value.GetPtr())){
+		if (const CCoordinates* coordinatesVal = std::get_if<CCoordinates>(value.GetPtr())){
 			QJsonObject valueJsonObject;
-			const bool isvalueAdded = val->WriteToJsonObject(valueJsonObject);
+			const bool isvalueAdded = coordinatesVal->WriteToJsonObject(valueJsonObject);
 			if (!isvalueAdded){
 				return false;
 			}
 			valueJsonObject["__typename"] = "Coordinates";
 			jsonObject["value"] = valueJsonObject;
 		}
-		else if (const double* val = std::get_if<double>(value.GetPtr())){
+		else if (const double* doubleVal = std::get_if<double>(value.GetPtr())){
 			if (!value){
 				return false;
 			}
-			jsonObject["value"] = QJsonValue::fromVariant(*val);
+			jsonObject["value"] = QJsonValue::fromVariant(*doubleVal);
 		}
-		else if (const bool* val = std::get_if<bool>(value.GetPtr())){
+		else if (const bool* booleanVal = std::get_if<bool>(value.GetPtr())){
 			if (!value){
 				return false;
 			}
-			jsonObject["value"] = QJsonValue::fromVariant(*val);
+			jsonObject["value"] = QJsonValue::fromVariant(*booleanVal);
 		}
-		else if (const QString* val = std::get_if<QString>(value.GetPtr())){
+		else if (const QString* stringVal = std::get_if<QString>(value.GetPtr())){
 			if (!value){
 				return false;
 			}
-			jsonObject["value"] = QJsonValue::fromVariant(*val);
+			jsonObject["value"] = QJsonValue::fromVariant(*stringVal);
 		}
 
 	}
@@ -9977,7 +9977,7 @@ bool CResultMetaData::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 
 		return false;
 	}
-	jsonObject["resultId"] = QJsonValue::fromVariant(*resultId);
+	jsonObject["resultId"] = QString::fromUtf8(*resultId);
 
 	if (creationTime){
 		jsonObject["creationTime"] = QJsonValue::fromVariant(*creationTime);
@@ -10938,30 +10938,30 @@ bool CUnionTestingType::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int
 
 	if (simpleUnion){
 		QVariant simpleUnionVariantValue;
-		if (const double* val = std::get_if<double>(simpleUnion.GetPtr())){
-			model.SetData("", *val);
+		if (const double* doubleVal = std::get_if<double>(simpleUnion.GetPtr())){
+			model.SetData("", *doubleVal);
 		}
-		else if (const bool* val = std::get_if<bool>(simpleUnion.GetPtr())){
-			model.SetData("", *val);
+		else if (const bool* booleanVal = std::get_if<bool>(simpleUnion.GetPtr())){
+			model.SetData("", *booleanVal);
 		}
-		else if (const QString* val = std::get_if<QString>(simpleUnion.GetPtr())){
-			model.SetData("", *val);
+		else if (const QString* stringVal = std::get_if<QString>(simpleUnion.GetPtr())){
+			model.SetData("", *stringVal);
 		}
 
 	}
 
 	if (complexUnion){
 		QVariant complexUnionVariantValue;
-		if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>(complexUnion.GetPtr())){
-			if (!val->WriteToModel(*(model.AddTreeModel("complexUnion", modelIndex)), 0)){
+		if (const CCDMResultVarString* cDMResultVarStringVal = std::get_if<CCDMResultVarString>(complexUnion.GetPtr())){
+			if (!cDMResultVarStringVal->WriteToModel(*(model.AddTreeModel("complexUnion", modelIndex)), 0)){
 				return false;
 			}
 			if(model.GetTreeItemModel("complexUnion", modelIndex) != nullptr){
 				model.GetTreeItemModel("complexUnion", modelIndex)->SetData("__typename", "CDMResultVarString", 0);
 			}
 		}
-		else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>(complexUnion.GetPtr())){
-			if (!val->WriteToModel(*(model.AddTreeModel("complexUnion", modelIndex)), 0)){
+		else if (const CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<CCDMResultVarRecursive>(complexUnion.GetPtr())){
+			if (!cDMResultVarRecursiveVal->WriteToModel(*(model.AddTreeModel("complexUnion", modelIndex)), 0)){
 				return false;
 			}
 			if(model.GetTreeItemModel("complexUnion", modelIndex) != nullptr){
@@ -10973,22 +10973,22 @@ bool CUnionTestingType::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int
 
 	if (mixedUnion){
 		QVariant mixedUnionVariantValue;
-		if (const CCoordinates* val = std::get_if<CCoordinates>(mixedUnion.GetPtr())){
-			if (!val->WriteToModel(*(model.AddTreeModel("mixedUnion", modelIndex)), 0)){
+		if (const CCoordinates* coordinatesVal = std::get_if<CCoordinates>(mixedUnion.GetPtr())){
+			if (!coordinatesVal->WriteToModel(*(model.AddTreeModel("mixedUnion", modelIndex)), 0)){
 				return false;
 			}
 			if(model.GetTreeItemModel("mixedUnion", modelIndex) != nullptr){
 				model.GetTreeItemModel("mixedUnion", modelIndex)->SetData("__typename", "Coordinates", 0);
 			}
 		}
-		else if (const double* val = std::get_if<double>(mixedUnion.GetPtr())){
-			model.SetData("", *val);
+		else if (const double* doubleVal = std::get_if<double>(mixedUnion.GetPtr())){
+			model.SetData("", *doubleVal);
 		}
-		else if (const bool* val = std::get_if<bool>(mixedUnion.GetPtr())){
-			model.SetData("", *val);
+		else if (const bool* booleanVal = std::get_if<bool>(mixedUnion.GetPtr())){
+			model.SetData("", *booleanVal);
 		}
-		else if (const QString* val = std::get_if<QString>(mixedUnion.GetPtr())){
-			model.SetData("", *val);
+		else if (const QString* stringVal = std::get_if<QString>(mixedUnion.GetPtr())){
+			model.SetData("", *stringVal);
 		}
 
 	}
@@ -11002,7 +11002,6 @@ bool CUnionTestingType::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& mod
 {
 	QVariant simpleUnionData = model.GetData("simpleUnion", modelIndex);
 	if (!simpleUnionData.isNull()){
-		QString simpleUnionTypename = simpleUnionData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
 		if (simpleUnionData.canConvert<double>()){
 			simpleUnion = ExtendedMetaDataUnionSimpleType(simpleUnionData.value<double>());
 		}
@@ -11016,7 +11015,7 @@ bool CUnionTestingType::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& mod
 
 	QVariant complexUnionData = model.GetData("complexUnion", modelIndex);
 	if (!complexUnionData.isNull()){
-		QString complexUnionTypename = complexUnionData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+		QString complexUnionTypename = model.GetTreeItemModel("complexUnion", modelIndex)->GetData("__typename").toString();
 		if (complexUnionTypename == "CDMResultVarString") {
 			CCDMResultVarString complexUnionConvert;
 			const bool iscomplexUnionRead = complexUnionConvert.ReadFromModel(*model.GetTreeItemModel("complexUnion", modelIndex)); 
@@ -11037,7 +11036,7 @@ bool CUnionTestingType::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& mod
 
 	QVariant mixedUnionData = model.GetData("mixedUnion", modelIndex);
 	if (!mixedUnionData.isNull()){
-		QString mixedUnionTypename = mixedUnionData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+		QString mixedUnionTypename = model.GetTreeItemModel("mixedUnion", modelIndex)->GetData("__typename").toString();
 		if (mixedUnionTypename == "Coordinates") {
 			CCoordinates mixedUnionConvert;
 			const bool ismixedUnionRead = mixedUnionConvert.ReadFromModel(*model.GetTreeItemModel("mixedUnion", modelIndex)); 
@@ -11065,7 +11064,6 @@ bool CUnionTestingType::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& 
 {
 	QVariant simpleUnionData = model.GetData("simpleUnion", modelIndex);
 	if (!simpleUnionData.isNull()){
-		QString simpleUnionTypename = simpleUnionData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
 		if (simpleUnionData.canConvert<double>()){
 			simpleUnion = ExtendedMetaDataUnionSimpleType(simpleUnionData.value<double>());
 		}
@@ -11079,7 +11077,7 @@ bool CUnionTestingType::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& 
 
 	QVariant complexUnionData = model.GetData("complexUnion", modelIndex);
 	if (!complexUnionData.isNull()){
-		QString complexUnionTypename = complexUnionData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+		QString complexUnionTypename = model.GetTreeItemModel("complexUnion", modelIndex)->GetData("__typename").toString();
 		if (complexUnionTypename == "CDMResultVarString") {
 			CCDMResultVarString complexUnionConvert;
 			const bool iscomplexUnionRead = complexUnionConvert.ReadFromModel(*model.GetTreeItemModel("complexUnion", modelIndex)); 
@@ -11100,7 +11098,7 @@ bool CUnionTestingType::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& 
 
 	QVariant mixedUnionData = model.GetData("mixedUnion", modelIndex);
 	if (!mixedUnionData.isNull()){
-		QString mixedUnionTypename = mixedUnionData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+		QString mixedUnionTypename = model.GetTreeItemModel("mixedUnion", modelIndex)->GetData("__typename").toString();
 		if (mixedUnionTypename == "Coordinates") {
 			CCoordinates mixedUnionConvert;
 			const bool ismixedUnionRead = mixedUnionConvert.ReadFromModel(*model.GetTreeItemModel("mixedUnion", modelIndex)); 
@@ -11128,28 +11126,28 @@ bool CUnionTestingType::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gq
 {
 	if (simpleUnion){
 		::imtgql::CGqlParamObject simpleUnionDataObject;
-		if (const double* val = std::get_if<double>(simpleUnion.GetPtr())){
-			simpleUnionDataObject.InsertParam("simpleUnion", *val);
+		if (const double* doubleVal = std::get_if<double>(simpleUnion.GetPtr())){
+			simpleUnionDataObject.InsertParam("simpleUnion", *doubleVal);
 		}
-		else if (const bool* val = std::get_if<bool>(simpleUnion.GetPtr())){
-			simpleUnionDataObject.InsertParam("simpleUnion", *val);
+		else if (const bool* booleanVal = std::get_if<bool>(simpleUnion.GetPtr())){
+			simpleUnionDataObject.InsertParam("simpleUnion", *booleanVal);
 		}
-		else if (const QString* val = std::get_if<QString>(simpleUnion.GetPtr())){
-			simpleUnionDataObject.InsertParam("simpleUnion", *val);
+		else if (const QString* stringVal = std::get_if<QString>(simpleUnion.GetPtr())){
+			simpleUnionDataObject.InsertParam("simpleUnion", *stringVal);
 		}
 		gqlObject.InsertParam("simpleUnion", simpleUnionDataObject);
 	}
 
 	if (complexUnion){
 		::imtgql::CGqlParamObject complexUnionDataObject;
-		if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>(complexUnion.GetPtr())){
-			if (!val->WriteToGraphQlObject(complexUnionDataObject)){
+		if (const CCDMResultVarString* cDMResultVarStringVal = std::get_if<CCDMResultVarString>(complexUnion.GetPtr())){
+			if (!cDMResultVarStringVal->WriteToGraphQlObject(complexUnionDataObject)){
 				return false;
 			}
 			complexUnionDataObject.InsertParam("__typename", QVariant("CDMResultVarString"));
 		}
-		else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>(complexUnion.GetPtr())){
-			if (!val->WriteToGraphQlObject(complexUnionDataObject)){
+		else if (const CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<CCDMResultVarRecursive>(complexUnion.GetPtr())){
+			if (!cDMResultVarRecursiveVal->WriteToGraphQlObject(complexUnionDataObject)){
 				return false;
 			}
 			complexUnionDataObject.InsertParam("__typename", QVariant("CDMResultVarRecursive"));
@@ -11159,20 +11157,20 @@ bool CUnionTestingType::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gq
 
 	if (mixedUnion){
 		::imtgql::CGqlParamObject mixedUnionDataObject;
-		if (const CCoordinates* val = std::get_if<CCoordinates>(mixedUnion.GetPtr())){
-			if (!val->WriteToGraphQlObject(mixedUnionDataObject)){
+		if (const CCoordinates* coordinatesVal = std::get_if<CCoordinates>(mixedUnion.GetPtr())){
+			if (!coordinatesVal->WriteToGraphQlObject(mixedUnionDataObject)){
 				return false;
 			}
 			mixedUnionDataObject.InsertParam("__typename", QVariant("Coordinates"));
 		}
-		else if (const double* val = std::get_if<double>(mixedUnion.GetPtr())){
-			mixedUnionDataObject.InsertParam("mixedUnion", *val);
+		else if (const double* doubleVal = std::get_if<double>(mixedUnion.GetPtr())){
+			mixedUnionDataObject.InsertParam("mixedUnion", *doubleVal);
 		}
-		else if (const bool* val = std::get_if<bool>(mixedUnion.GetPtr())){
-			mixedUnionDataObject.InsertParam("mixedUnion", *val);
+		else if (const bool* booleanVal = std::get_if<bool>(mixedUnion.GetPtr())){
+			mixedUnionDataObject.InsertParam("mixedUnion", *booleanVal);
 		}
-		else if (const QString* val = std::get_if<QString>(mixedUnion.GetPtr())){
-			mixedUnionDataObject.InsertParam("mixedUnion", *val);
+		else if (const QString* stringVal = std::get_if<QString>(mixedUnion.GetPtr())){
+			mixedUnionDataObject.InsertParam("mixedUnion", *stringVal);
 		}
 		gqlObject.InsertParam("mixedUnion", mixedUnionDataObject);
 	}
@@ -11332,40 +11330,40 @@ bool CUnionTestingType::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParam
 bool CUnionTestingType::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (simpleUnion){
-		if (const double* val = std::get_if<double>(simpleUnion.GetPtr())){
+		if (const double* doubleVal = std::get_if<double>(simpleUnion.GetPtr())){
 			if (!simpleUnion){
 				return false;
 			}
-			jsonObject["simpleUnion"] = QJsonValue::fromVariant(*val);
+			jsonObject["simpleUnion"] = QJsonValue::fromVariant(*doubleVal);
 		}
-		else if (const bool* val = std::get_if<bool>(simpleUnion.GetPtr())){
+		else if (const bool* booleanVal = std::get_if<bool>(simpleUnion.GetPtr())){
 			if (!simpleUnion){
 				return false;
 			}
-			jsonObject["simpleUnion"] = QJsonValue::fromVariant(*val);
+			jsonObject["simpleUnion"] = QJsonValue::fromVariant(*booleanVal);
 		}
-		else if (const QString* val = std::get_if<QString>(simpleUnion.GetPtr())){
+		else if (const QString* stringVal = std::get_if<QString>(simpleUnion.GetPtr())){
 			if (!simpleUnion){
 				return false;
 			}
-			jsonObject["simpleUnion"] = QJsonValue::fromVariant(*val);
+			jsonObject["simpleUnion"] = QJsonValue::fromVariant(*stringVal);
 		}
 
 	}
 
 	if (complexUnion){
-		if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>(complexUnion.GetPtr())){
+		if (const CCDMResultVarString* cDMResultVarStringVal = std::get_if<CCDMResultVarString>(complexUnion.GetPtr())){
 			QJsonObject complexUnionJsonObject;
-			const bool iscomplexUnionAdded = val->WriteToJsonObject(complexUnionJsonObject);
+			const bool iscomplexUnionAdded = cDMResultVarStringVal->WriteToJsonObject(complexUnionJsonObject);
 			if (!iscomplexUnionAdded){
 				return false;
 			}
 			complexUnionJsonObject["__typename"] = "CDMResultVarString";
 			jsonObject["complexUnion"] = complexUnionJsonObject;
 		}
-		else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>(complexUnion.GetPtr())){
+		else if (const CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<CCDMResultVarRecursive>(complexUnion.GetPtr())){
 			QJsonObject complexUnionJsonObject;
-			const bool iscomplexUnionAdded = val->WriteToJsonObject(complexUnionJsonObject);
+			const bool iscomplexUnionAdded = cDMResultVarRecursiveVal->WriteToJsonObject(complexUnionJsonObject);
 			if (!iscomplexUnionAdded){
 				return false;
 			}
@@ -11376,32 +11374,32 @@ bool CUnionTestingType::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	}
 
 	if (mixedUnion){
-		if (const CCoordinates* val = std::get_if<CCoordinates>(mixedUnion.GetPtr())){
+		if (const CCoordinates* coordinatesVal = std::get_if<CCoordinates>(mixedUnion.GetPtr())){
 			QJsonObject mixedUnionJsonObject;
-			const bool ismixedUnionAdded = val->WriteToJsonObject(mixedUnionJsonObject);
+			const bool ismixedUnionAdded = coordinatesVal->WriteToJsonObject(mixedUnionJsonObject);
 			if (!ismixedUnionAdded){
 				return false;
 			}
 			mixedUnionJsonObject["__typename"] = "Coordinates";
 			jsonObject["mixedUnion"] = mixedUnionJsonObject;
 		}
-		else if (const double* val = std::get_if<double>(mixedUnion.GetPtr())){
+		else if (const double* doubleVal = std::get_if<double>(mixedUnion.GetPtr())){
 			if (!mixedUnion){
 				return false;
 			}
-			jsonObject["mixedUnion"] = QJsonValue::fromVariant(*val);
+			jsonObject["mixedUnion"] = QJsonValue::fromVariant(*doubleVal);
 		}
-		else if (const bool* val = std::get_if<bool>(mixedUnion.GetPtr())){
+		else if (const bool* booleanVal = std::get_if<bool>(mixedUnion.GetPtr())){
 			if (!mixedUnion){
 				return false;
 			}
-			jsonObject["mixedUnion"] = QJsonValue::fromVariant(*val);
+			jsonObject["mixedUnion"] = QJsonValue::fromVariant(*booleanVal);
 		}
-		else if (const QString* val = std::get_if<QString>(mixedUnion.GetPtr())){
+		else if (const QString* stringVal = std::get_if<QString>(mixedUnion.GetPtr())){
 			if (!mixedUnion){
 				return false;
 			}
-			jsonObject["mixedUnion"] = QJsonValue::fromVariant(*val);
+			jsonObject["mixedUnion"] = QJsonValue::fromVariant(*stringVal);
 		}
 
 	}
@@ -11841,16 +11839,16 @@ bool CCDMResultVarRecursive::V1_0::WriteToModel(::imtbase::CTreeItemModel& model
 		newResultContentModelPtr->setIsArray(true);
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContent->size(); ++resultContentIndex){
 			QVariant resultContentVariantValue;
-			if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>(resultContent->at(resultContentIndex).GetPtr())){
+			if (const CCDMResultVarString* cDMResultVarStringVal = std::get_if<CCDMResultVarString>(resultContent->at(resultContentIndex).GetPtr())){
 				newResultContentModelPtr->InsertNewItem();
-				if(!val->WriteToModel(*newResultContentModelPtr, resultContentIndex)){
+				if(!cDMResultVarStringVal->WriteToModel(*newResultContentModelPtr, resultContentIndex)){
 					return false;
 				}
 				newResultContentModelPtr->SetData("__typename", "CDMResultVarString", resultContentIndex);
 			}
-			else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
+			else if (const CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
 				newResultContentModelPtr->InsertNewItem();
-				if(!val->WriteToModel(*newResultContentModelPtr, resultContentIndex)){
+				if(!cDMResultVarRecursiveVal->WriteToModel(*newResultContentModelPtr, resultContentIndex)){
 					return false;
 				}
 				newResultContentModelPtr->SetData("__typename", "CDMResultVarRecursive", resultContentIndex);
@@ -12068,14 +12066,14 @@ bool CCDMResultVarRecursive::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObjec
 		QList<::imtgql::CGqlParamObject> resultContentDataObjectList;
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContent->size(); ++resultContentIndex){
 			::imtgql::CGqlParamObject resultContentDataObject;
-			if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>(resultContent->at(resultContentIndex).GetPtr())){
-				if (!val->WriteToGraphQlObject(resultContentDataObject)){
+			if (const CCDMResultVarString* cDMResultVarStringVal = std::get_if<CCDMResultVarString>(resultContent->at(resultContentIndex).GetPtr())){
+				if (!cDMResultVarStringVal->WriteToGraphQlObject(resultContentDataObject)){
 					return false;
 				}
 				resultContentDataObject.InsertParam("__typename", QVariant("CDMResultVarString"));
 			}
-			else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
-				if (!val->WriteToGraphQlObject(resultContentDataObject)){
+			else if (const CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
+				if (!cDMResultVarRecursiveVal->WriteToGraphQlObject(resultContentDataObject)){
 					return false;
 				}
 				resultContentDataObject.InsertParam("__typename", QVariant("CDMResultVarRecursive"));
@@ -12307,18 +12305,18 @@ bool CCDMResultVarRecursive::V1_0::WriteToJsonObject(QJsonObject& jsonObject) co
 	if (resultContent){
 		QJsonArray newResultContentArray;
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContent->size(); ++resultContentIndex){
-			if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>(resultContent->at(resultContentIndex).GetPtr())){
+			if (const CCDMResultVarString* cDMResultVarStringVal = std::get_if<CCDMResultVarString>(resultContent->at(resultContentIndex).GetPtr())){
 				QJsonObject resultContentJsonObject;
-				const bool isresultContentAdded = val->WriteToJsonObject(resultContentJsonObject);
+				const bool isresultContentAdded = cDMResultVarStringVal->WriteToJsonObject(resultContentJsonObject);
 				if (!isresultContentAdded){
 					return false;
 				}
 				resultContentJsonObject["__typename"] = "CDMResultVarString";
 				newResultContentArray << resultContentJsonObject;
 			}
-			else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
+			else if (const CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
 				QJsonObject resultContentJsonObject;
-				const bool isresultContentAdded = val->WriteToJsonObject(resultContentJsonObject);
+				const bool isresultContentAdded = cDMResultVarRecursiveVal->WriteToJsonObject(resultContentJsonObject);
 				if (!isresultContentAdded){
 					return false;
 				}
@@ -13540,16 +13538,16 @@ bool CCDMResult::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelI
 		newResultContentModelPtr->setIsArray(true);
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContent->size(); ++resultContentIndex){
 			QVariant resultContentVariantValue;
-			if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>(resultContent->at(resultContentIndex).GetPtr())){
+			if (const CCDMResultVarString* cDMResultVarStringVal = std::get_if<CCDMResultVarString>(resultContent->at(resultContentIndex).GetPtr())){
 				newResultContentModelPtr->InsertNewItem();
-				if(!val->WriteToModel(*newResultContentModelPtr, resultContentIndex)){
+				if(!cDMResultVarStringVal->WriteToModel(*newResultContentModelPtr, resultContentIndex)){
 					return false;
 				}
 				newResultContentModelPtr->SetData("__typename", "CDMResultVarString", resultContentIndex);
 			}
-			else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
+			else if (const CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
 				newResultContentModelPtr->InsertNewItem();
-				if(!val->WriteToModel(*newResultContentModelPtr, resultContentIndex)){
+				if(!cDMResultVarRecursiveVal->WriteToModel(*newResultContentModelPtr, resultContentIndex)){
 					return false;
 				}
 				newResultContentModelPtr->SetData("__typename", "CDMResultVarRecursive", resultContentIndex);
@@ -13767,14 +13765,14 @@ bool CCDMResult::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject
 		QList<::imtgql::CGqlParamObject> resultContentDataObjectList;
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContent->size(); ++resultContentIndex){
 			::imtgql::CGqlParamObject resultContentDataObject;
-			if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>(resultContent->at(resultContentIndex).GetPtr())){
-				if (!val->WriteToGraphQlObject(resultContentDataObject)){
+			if (const CCDMResultVarString* cDMResultVarStringVal = std::get_if<CCDMResultVarString>(resultContent->at(resultContentIndex).GetPtr())){
+				if (!cDMResultVarStringVal->WriteToGraphQlObject(resultContentDataObject)){
 					return false;
 				}
 				resultContentDataObject.InsertParam("__typename", QVariant("CDMResultVarString"));
 			}
-			else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
-				if (!val->WriteToGraphQlObject(resultContentDataObject)){
+			else if (const CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
+				if (!cDMResultVarRecursiveVal->WriteToGraphQlObject(resultContentDataObject)){
 					return false;
 				}
 				resultContentDataObject.InsertParam("__typename", QVariant("CDMResultVarRecursive"));
@@ -14006,18 +14004,18 @@ bool CCDMResult::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	if (resultContent){
 		QJsonArray newResultContentArray;
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContent->size(); ++resultContentIndex){
-			if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>(resultContent->at(resultContentIndex).GetPtr())){
+			if (const CCDMResultVarString* cDMResultVarStringVal = std::get_if<CCDMResultVarString>(resultContent->at(resultContentIndex).GetPtr())){
 				QJsonObject resultContentJsonObject;
-				const bool isresultContentAdded = val->WriteToJsonObject(resultContentJsonObject);
+				const bool isresultContentAdded = cDMResultVarStringVal->WriteToJsonObject(resultContentJsonObject);
 				if (!isresultContentAdded){
 					return false;
 				}
 				resultContentJsonObject["__typename"] = "CDMResultVarString";
 				newResultContentArray << resultContentJsonObject;
 			}
-			else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
+			else if (const CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
 				QJsonObject resultContentJsonObject;
-				const bool isresultContentAdded = val->WriteToJsonObject(resultContentJsonObject);
+				const bool isresultContentAdded = cDMResultVarRecursiveVal->WriteToJsonObject(resultContentJsonObject);
 				if (!isresultContentAdded){
 					return false;
 				}
@@ -22359,11 +22357,11 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 }
 
 
-::imtbase::CTreeItemModel* CGraphQlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CGraphQlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	const QByteArray commandId = gqlRequest.GetCommandId();
-	istd::TDelPtr<::imtbase::CTreeItemModel> modelPtr(new ::imtbase::CTreeItemModel);
-	::imtbase::CTreeItemModel* dataModelPtr = modelPtr->AddTreeModel("data");
+	QJsonObject modelObj;
+	QJsonObject dataModelObj;
 
 	// GetLastProductionResults
 	if (commandId == CGetLastProductionResultsGqlRequest::GetCommandId()){
@@ -22372,25 +22370,25 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 			errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
 			SendErrorMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
 
 		CProductOverview replyPayload = OnGetLastProductionResults(getLastProductionResultsGqlRequest, gqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
 			SendErrorMessage(0, QString("The derived call [OnGetLastProductionResults] returned an error: %1").arg(errorMessage));
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		const bool isModelCreated = replyPayload.WriteToModel(*dataModelPtr);
+		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
 		if (!isModelCreated){
 			errorMessage = QString("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
 			SendCriticalMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		return modelPtr.PopPtr();
+		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
 	}
 
 	// GetLastProductionResultsCDM
@@ -22400,31 +22398,31 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 			errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
 			SendErrorMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
 
 		CCDMResult replyPayload = OnGetLastProductionResultsCDM(getLastProductionResultsCDMGqlRequest, gqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
 			SendErrorMessage(0, QString("The derived call [OnGetLastProductionResultsCDM] returned an error: %1").arg(errorMessage));
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		const bool isModelCreated = replyPayload.WriteToModel(*dataModelPtr);
+		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
 		if (!isModelCreated){
 			errorMessage = QString("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
 			SendCriticalMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		return modelPtr.PopPtr();
+		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
 	}
 
 	errorMessage = QString("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
 	SendErrorMessage(0, errorMessage);
 
-	return nullptr;
+	return QJsonObject();
 }
 
 
