@@ -3229,8 +3229,8 @@ QVariant CSubstrateSpecificationListInputObject::GetViewParams()
 		m_viewParamsQObjectPtr = CreateObject("viewParams");
 		auto itemPtr = m_viewParamsQObjectPtr.value<sdl::V1_0::V1_0::CCollectionViewParamsTestObject*>();
 		if (itemPtr != nullptr) {
-			itemPtr->count = viewParams->count;
-			itemPtr->offset = viewParams->offset;
+			itemPtr->CCollectionViewParamsTest::count = viewParams->CCollectionViewParamsTest::count;
+			itemPtr->CCollectionViewParamsTest::offset = viewParams->CCollectionViewParamsTest::offset;
 		}
 	}
 	return m_viewParamsQObjectPtr;
