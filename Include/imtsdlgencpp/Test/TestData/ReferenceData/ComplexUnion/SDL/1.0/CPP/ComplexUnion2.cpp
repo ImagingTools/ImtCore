@@ -11587,7 +11587,7 @@ CResultObject::CResultObject(QObject* parent): ::imtbase::CItemModelBase(parent)
 
 QVariant CResultObject::GetAreaResult()
 {
-	sdl::V1_0::complextest::StatusCode valueType = AreaResult.value();
+	sdl::V1_0::complextest::StatusCode valueType = CResult::AreaResult.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	QString retval = metaEnum.valueToKey((int)valueType);
 
@@ -11598,11 +11598,11 @@ QVariant CResultObject::GetAreaResult()
 void CResultObject::SetAreaResult(const QVariant& v)
 {
 
-	AreaResult.emplace();
+	CResult::AreaResult.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
-		AreaResult = (sdl::V1_0::complextest::StatusCode)key;
+		CResult::AreaResult = (sdl::V1_0::complextest::StatusCode)key;
 	}
 	areaResultChanged();
 }
@@ -11610,133 +11610,133 @@ void CResultObject::SetAreaResult(const QVariant& v)
 
 bool CResultObject::hasAreaResult()
 {
-	 return AreaResult.HasValue();
+	 return CResult::AreaResult.HasValue();
 }
 
 
 QVariant CResultObject::GetExpectedMinValue()
 {
-	return ExpectedMinValue.value();
+	return CResult::ExpectedMinValue.value();
 }
 
 
 void CResultObject::SetExpectedMinValue(const QVariant& v)
 {
 
-	ExpectedMinValue = v.value<double>();
+	CResult::ExpectedMinValue = v.value<double>();
 	expectedMinValueChanged();
 }
 
 
 bool CResultObject::hasExpectedMinValue()
 {
-	 return ExpectedMinValue.HasValue();
+	 return CResult::ExpectedMinValue.HasValue();
 }
 
 
 QVariant CResultObject::GetExpectedMaxValue()
 {
-	return ExpectedMaxValue.value();
+	return CResult::ExpectedMaxValue.value();
 }
 
 
 void CResultObject::SetExpectedMaxValue(const QVariant& v)
 {
 
-	ExpectedMaxValue = v.value<double>();
+	CResult::ExpectedMaxValue = v.value<double>();
 	expectedMaxValueChanged();
 }
 
 
 bool CResultObject::hasExpectedMaxValue()
 {
-	 return ExpectedMaxValue.HasValue();
+	 return CResult::ExpectedMaxValue.HasValue();
 }
 
 
 QVariant CResultObject::GetMeasuredValue()
 {
-	return MeasuredValue.value();
+	return CResult::MeasuredValue.value();
 }
 
 
 void CResultObject::SetMeasuredValue(const QVariant& v)
 {
 
-	MeasuredValue = v.value<double>();
+	CResult::MeasuredValue = v.value<double>();
 	measuredValueChanged();
 }
 
 
 bool CResultObject::hasMeasuredValue()
 {
-	 return MeasuredValue.HasValue();
+	 return CResult::MeasuredValue.HasValue();
 }
 
 
 QVariant CResultObject::GetMinMeasuredValue()
 {
-	return MinMeasuredValue.value();
+	return CResult::MinMeasuredValue.value();
 }
 
 
 void CResultObject::SetMinMeasuredValue(const QVariant& v)
 {
 
-	MinMeasuredValue = v.value<double>();
+	CResult::MinMeasuredValue = v.value<double>();
 	minMeasuredValueChanged();
 }
 
 
 bool CResultObject::hasMinMeasuredValue()
 {
-	 return MinMeasuredValue.HasValue();
+	 return CResult::MinMeasuredValue.HasValue();
 }
 
 
 QVariant CResultObject::GetMaxMeasuredValue()
 {
-	return MaxMeasuredValue.value();
+	return CResult::MaxMeasuredValue.value();
 }
 
 
 void CResultObject::SetMaxMeasuredValue(const QVariant& v)
 {
 
-	MaxMeasuredValue = v.value<double>();
+	CResult::MaxMeasuredValue = v.value<double>();
 	maxMeasuredValueChanged();
 }
 
 
 bool CResultObject::hasMaxMeasuredValue()
 {
-	 return MaxMeasuredValue.HasValue();
+	 return CResult::MaxMeasuredValue.HasValue();
 }
 
 
 QVariant CResultObject::GetMeanMeasuredValue()
 {
-	return MeanMeasuredValue.value();
+	return CResult::MeanMeasuredValue.value();
 }
 
 
 void CResultObject::SetMeanMeasuredValue(const QVariant& v)
 {
 
-	MeanMeasuredValue = v.value<double>();
+	CResult::MeanMeasuredValue = v.value<double>();
 	meanMeasuredValueChanged();
 }
 
 
 bool CResultObject::hasMeanMeasuredValue()
 {
-	 return MeanMeasuredValue.HasValue();
+	 return CResult::MeanMeasuredValue.HasValue();
 }
 
 
 QVariant CResultObject::GetMeasurementType()
 {
-	sdl::V1_0::complextest::MeasurementType valueType = MeasurementType.value();
+	sdl::V1_0::complextest::MeasurementType valueType = CResult::MeasurementType.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::MeasurementType>();
 	QString retval = metaEnum.valueToKey((int)valueType);
 
@@ -11747,11 +11747,11 @@ QVariant CResultObject::GetMeasurementType()
 void CResultObject::SetMeasurementType(const QVariant& v)
 {
 
-	MeasurementType.emplace();
+	CResult::MeasurementType.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::MeasurementType>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
-		MeasurementType = (sdl::V1_0::complextest::MeasurementType)key;
+		CResult::MeasurementType = (sdl::V1_0::complextest::MeasurementType)key;
 	}
 	measurementTypeChanged();
 }
@@ -11759,13 +11759,13 @@ void CResultObject::SetMeasurementType(const QVariant& v)
 
 bool CResultObject::hasMeasurementType()
 {
-	 return MeasurementType.HasValue();
+	 return CResult::MeasurementType.HasValue();
 }
 
 
 QVariant CResultObject::GetMeasurementUnit()
 {
-	sdl::V1_0::complextest::MeasurementUnit valueType = MeasurementUnit.value();
+	sdl::V1_0::complextest::MeasurementUnit valueType = CResult::MeasurementUnit.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::MeasurementUnit>();
 	QString retval = metaEnum.valueToKey((int)valueType);
 
@@ -11776,11 +11776,11 @@ QVariant CResultObject::GetMeasurementUnit()
 void CResultObject::SetMeasurementUnit(const QVariant& v)
 {
 
-	MeasurementUnit.emplace();
+	CResult::MeasurementUnit.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::MeasurementUnit>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
-		MeasurementUnit = (sdl::V1_0::complextest::MeasurementUnit)key;
+		CResult::MeasurementUnit = (sdl::V1_0::complextest::MeasurementUnit)key;
 	}
 	measurementUnitChanged();
 }
@@ -11788,33 +11788,33 @@ void CResultObject::SetMeasurementUnit(const QVariant& v)
 
 bool CResultObject::hasMeasurementUnit()
 {
-	 return MeasurementUnit.HasValue();
+	 return CResult::MeasurementUnit.HasValue();
 }
 
 
 QVariant CResultObject::GetLength()
 {
-	return Length.value();
+	return CResult::Length.value();
 }
 
 
 void CResultObject::SetLength(const QVariant& v)
 {
 
-	Length = v.value<double>();
+	CResult::Length = v.value<double>();
 	lengthChanged();
 }
 
 
 bool CResultObject::hasLength()
 {
-	 return Length.HasValue();
+	 return CResult::Length.HasValue();
 }
 
 
 QVariant CResultObject::GetErrorType()
 {
-	sdl::V1_0::complextest::ErrorCode valueType = ErrorType.value();
+	sdl::V1_0::complextest::ErrorCode valueType = CResult::ErrorType.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::ErrorCode>();
 	QString retval = metaEnum.valueToKey((int)valueType);
 
@@ -11825,11 +11825,11 @@ QVariant CResultObject::GetErrorType()
 void CResultObject::SetErrorType(const QVariant& v)
 {
 
-	ErrorType.emplace();
+	CResult::ErrorType.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::ErrorCode>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
-		ErrorType = (sdl::V1_0::complextest::ErrorCode)key;
+		CResult::ErrorType = (sdl::V1_0::complextest::ErrorCode)key;
 	}
 	errorTypeChanged();
 }
@@ -11837,7 +11837,7 @@ void CResultObject::SetErrorType(const QVariant& v)
 
 bool CResultObject::hasErrorType()
 {
-	 return ErrorType.HasValue();
+	 return CResult::ErrorType.HasValue();
 }
 
 
@@ -11860,7 +11860,7 @@ void CResultObject::SetGeometry(const QVariant& v)
 		if (itemPtr != nullptr)  Geometry = static_cast<const decltype(Geometry)::value_type&>(*itemPtr);
 	}
 	else {
-		Geometry = nullptr;
+		CResult::Geometry = nullptr;
 	}
 	m_geometryQObjectPtr = v;
 
@@ -11870,14 +11870,14 @@ void CResultObject::SetGeometry(const QVariant& v)
 
 bool CResultObject::hasGeometry()
 {
-	 return Geometry.HasValue();
+	 return CResult::Geometry.HasValue();
 }
 
 
 void CResultObject::emplaceGeometry()
 {
 	ResetGeometry();
-	Geometry.emplace();
+	CResult::Geometry.emplace();
 }
 
 
@@ -12132,27 +12132,27 @@ CAreaObject::CAreaObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
 QVariant CAreaObject::GetAreaName()
 {
-	return AreaName.value();
+	return CArea::AreaName.value();
 }
 
 
 void CAreaObject::SetAreaName(const QVariant& v)
 {
 
-	AreaName = v.value<QString>();
+	CArea::AreaName = v.value<QString>();
 	areaNameChanged();
 }
 
 
 bool CAreaObject::hasAreaName()
 {
-	 return AreaName.HasValue();
+	 return CArea::AreaName.HasValue();
 }
 
 
 QVariant CAreaObject::GetStatus()
 {
-	sdl::V1_0::complextest::StatusCode valueType = Status.value();
+	sdl::V1_0::complextest::StatusCode valueType = CArea::Status.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	QString retval = metaEnum.valueToKey((int)valueType);
 
@@ -12163,11 +12163,11 @@ QVariant CAreaObject::GetStatus()
 void CAreaObject::SetStatus(const QVariant& v)
 {
 
-	Status.emplace();
+	CArea::Status.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
-		Status = (sdl::V1_0::complextest::StatusCode)key;
+		CArea::Status = (sdl::V1_0::complextest::StatusCode)key;
 	}
 	statusChanged();
 }
@@ -12175,7 +12175,7 @@ void CAreaObject::SetStatus(const QVariant& v)
 
 bool CAreaObject::hasStatus()
 {
-	 return Status.HasValue();
+	 return CArea::Status.HasValue();
 }
 
 
@@ -12198,7 +12198,7 @@ void CAreaObject::SetIconPosition(const QVariant& v)
 		if (itemPtr != nullptr)  IconPosition = static_cast<const decltype(IconPosition)::value_type&>(*itemPtr);
 	}
 	else {
-		IconPosition = nullptr;
+		CArea::IconPosition = nullptr;
 	}
 	m_iconPositionQObjectPtr = v;
 
@@ -12208,14 +12208,14 @@ void CAreaObject::SetIconPosition(const QVariant& v)
 
 bool CAreaObject::hasIconPosition()
 {
-	 return IconPosition.HasValue();
+	 return CArea::IconPosition.HasValue();
 }
 
 
 void CAreaObject::emplaceIconPosition()
 {
 	ResetIconPosition();
-	IconPosition.emplace();
+	CArea::IconPosition.emplace();
 }
 
 
@@ -12231,7 +12231,7 @@ void CAreaObject::ResetIconPosition()
 
 QVariant CAreaObject::GetErrorType()
 {
-	sdl::V1_0::complextest::ErrorCode valueType = ErrorType.value();
+	sdl::V1_0::complextest::ErrorCode valueType = CArea::ErrorType.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::ErrorCode>();
 	QString retval = metaEnum.valueToKey((int)valueType);
 
@@ -12242,11 +12242,11 @@ QVariant CAreaObject::GetErrorType()
 void CAreaObject::SetErrorType(const QVariant& v)
 {
 
-	ErrorType.emplace();
+	CArea::ErrorType.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::ErrorCode>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
-		ErrorType = (sdl::V1_0::complextest::ErrorCode)key;
+		CArea::ErrorType = (sdl::V1_0::complextest::ErrorCode)key;
 	}
 	errorTypeChanged();
 }
@@ -12254,7 +12254,7 @@ void CAreaObject::SetErrorType(const QVariant& v)
 
 bool CAreaObject::hasErrorType()
 {
-	 return ErrorType.HasValue();
+	 return CArea::ErrorType.HasValue();
 }
 
 
@@ -12277,7 +12277,7 @@ void CAreaObject::SetResults(const QVariant& v)
 		if (itemPtr != nullptr)  Results = static_cast<const decltype(Results)::value_type&>(*itemPtr);
 	}
 	else {
-		Results = nullptr;
+		CArea::Results = nullptr;
 	}
 	m_resultsQObjectPtr = v;
 
@@ -12287,14 +12287,14 @@ void CAreaObject::SetResults(const QVariant& v)
 
 bool CAreaObject::hasResults()
 {
-	 return Results.HasValue();
+	 return CArea::Results.HasValue();
 }
 
 
 void CAreaObject::emplaceResults()
 {
 	ResetResults();
-	Results.emplace();
+	CArea::Results.emplace();
 }
 
 
@@ -12515,27 +12515,27 @@ CAnalyzerObject::CAnalyzerObject(QObject* parent): ::imtbase::CItemModelBase(par
 
 QVariant CAnalyzerObject::GetAnalyzerName()
 {
-	return AnalyzerName.value();
+	return CAnalyzer::AnalyzerName.value();
 }
 
 
 void CAnalyzerObject::SetAnalyzerName(const QVariant& v)
 {
 
-	AnalyzerName = v.value<QString>();
+	CAnalyzer::AnalyzerName = v.value<QString>();
 	analyzerNameChanged();
 }
 
 
 bool CAnalyzerObject::hasAnalyzerName()
 {
-	 return AnalyzerName.HasValue();
+	 return CAnalyzer::AnalyzerName.HasValue();
 }
 
 
 QVariant CAnalyzerObject::GetAnalyzerResult()
 {
-	sdl::V1_0::complextest::StatusCode valueType = AnalyzerResult.value();
+	sdl::V1_0::complextest::StatusCode valueType = CAnalyzer::AnalyzerResult.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	QString retval = metaEnum.valueToKey((int)valueType);
 
@@ -12546,11 +12546,11 @@ QVariant CAnalyzerObject::GetAnalyzerResult()
 void CAnalyzerObject::SetAnalyzerResult(const QVariant& v)
 {
 
-	AnalyzerResult.emplace();
+	CAnalyzer::AnalyzerResult.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
-		AnalyzerResult = (sdl::V1_0::complextest::StatusCode)key;
+		CAnalyzer::AnalyzerResult = (sdl::V1_0::complextest::StatusCode)key;
 	}
 	analyzerResultChanged();
 }
@@ -12558,7 +12558,7 @@ void CAnalyzerObject::SetAnalyzerResult(const QVariant& v)
 
 bool CAnalyzerObject::hasAnalyzerResult()
 {
-	 return AnalyzerResult.HasValue();
+	 return CAnalyzer::AnalyzerResult.HasValue();
 }
 
 
@@ -12581,7 +12581,7 @@ void CAnalyzerObject::SetAreas(const QVariant& v)
 		if (itemPtr != nullptr)  Areas = static_cast<const decltype(Areas)::value_type&>(*itemPtr);
 	}
 	else {
-		Areas = nullptr;
+		CAnalyzer::Areas = nullptr;
 	}
 	m_areasQObjectPtr = v;
 
@@ -12591,14 +12591,14 @@ void CAnalyzerObject::SetAreas(const QVariant& v)
 
 bool CAnalyzerObject::hasAreas()
 {
-	 return Areas.HasValue();
+	 return CAnalyzer::Areas.HasValue();
 }
 
 
 void CAnalyzerObject::emplaceAreas()
 {
 	ResetAreas();
-	Areas.emplace();
+	CAnalyzer::Areas.emplace();
 }
 
 
@@ -12806,67 +12806,67 @@ CInspectionObject::CInspectionObject(QObject* parent): ::imtbase::CItemModelBase
 
 QVariant CInspectionObject::GetID()
 {
-	return ID.value();
+	return CInspection::ID.value();
 }
 
 
 void CInspectionObject::SetID(const QVariant& v)
 {
 
-	ID = v.value<QString>();
+	CInspection::ID = v.value<QString>();
 	iDChanged();
 }
 
 
 bool CInspectionObject::hasID()
 {
-	 return ID.HasValue();
+	 return CInspection::ID.HasValue();
 }
 
 
 QVariant CInspectionObject::GetTypeID()
 {
-	return TypeID.value();
+	return CInspection::TypeID.value();
 }
 
 
 void CInspectionObject::SetTypeID(const QVariant& v)
 {
 
-	TypeID = v.value<QString>();
+	CInspection::TypeID = v.value<QString>();
 	typeIDChanged();
 }
 
 
 bool CInspectionObject::hasTypeID()
 {
-	 return TypeID.HasValue();
+	 return CInspection::TypeID.HasValue();
 }
 
 
 QVariant CInspectionObject::GetName()
 {
-	return Name.value();
+	return CInspection::Name.value();
 }
 
 
 void CInspectionObject::SetName(const QVariant& v)
 {
 
-	Name = v.value<QString>();
+	CInspection::Name = v.value<QString>();
 	nameChanged();
 }
 
 
 bool CInspectionObject::hasName()
 {
-	 return Name.HasValue();
+	 return CInspection::Name.HasValue();
 }
 
 
 QVariant CInspectionObject::GetStatus()
 {
-	sdl::V1_0::complextest::StatusCode valueType = Status.value();
+	sdl::V1_0::complextest::StatusCode valueType = CInspection::Status.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	QString retval = metaEnum.valueToKey((int)valueType);
 
@@ -12877,11 +12877,11 @@ QVariant CInspectionObject::GetStatus()
 void CInspectionObject::SetStatus(const QVariant& v)
 {
 
-	Status.emplace();
+	CInspection::Status.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
-		Status = (sdl::V1_0::complextest::StatusCode)key;
+		CInspection::Status = (sdl::V1_0::complextest::StatusCode)key;
 	}
 	statusChanged();
 }
@@ -12889,7 +12889,7 @@ void CInspectionObject::SetStatus(const QVariant& v)
 
 bool CInspectionObject::hasStatus()
 {
-	 return Status.HasValue();
+	 return CInspection::Status.HasValue();
 }
 
 
@@ -12912,7 +12912,7 @@ void CInspectionObject::SetAnalyzers(const QVariant& v)
 		if (itemPtr != nullptr)  Analyzers = static_cast<const decltype(Analyzers)::value_type&>(*itemPtr);
 	}
 	else {
-		Analyzers = nullptr;
+		CInspection::Analyzers = nullptr;
 	}
 	m_analyzersQObjectPtr = v;
 
@@ -12922,14 +12922,14 @@ void CInspectionObject::SetAnalyzers(const QVariant& v)
 
 bool CInspectionObject::hasAnalyzers()
 {
-	 return Analyzers.HasValue();
+	 return CInspection::Analyzers.HasValue();
 }
 
 
 void CInspectionObject::emplaceAnalyzers()
 {
 	ResetAnalyzers();
-	Analyzers.emplace();
+	CInspection::Analyzers.emplace();
 }
 
 
@@ -13151,47 +13151,47 @@ CProductOverviewObject::CProductOverviewObject(QObject* parent): ::imtbase::CIte
 
 QVariant CProductOverviewObject::GetProductID()
 {
-	return ProductID.value();
+	return CProductOverview::ProductID.value();
 }
 
 
 void CProductOverviewObject::SetProductID(const QVariant& v)
 {
 
-	ProductID = v.value<int>();
+	CProductOverview::ProductID = v.value<int>();
 	productIDChanged();
 }
 
 
 bool CProductOverviewObject::hasProductID()
 {
-	 return ProductID.HasValue();
+	 return CProductOverview::ProductID.HasValue();
 }
 
 
 QVariant CProductOverviewObject::GetName()
 {
-	return Name.value();
+	return CProductOverview::Name.value();
 }
 
 
 void CProductOverviewObject::SetName(const QVariant& v)
 {
 
-	Name = v.value<QString>();
+	CProductOverview::Name = v.value<QString>();
 	nameChanged();
 }
 
 
 bool CProductOverviewObject::hasName()
 {
-	 return Name.HasValue();
+	 return CProductOverview::Name.HasValue();
 }
 
 
 QVariant CProductOverviewObject::GetStatus()
 {
-	sdl::V1_0::complextest::StatusCode valueType = Status.value();
+	sdl::V1_0::complextest::StatusCode valueType = CProductOverview::Status.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	QString retval = metaEnum.valueToKey((int)valueType);
 
@@ -13202,11 +13202,11 @@ QVariant CProductOverviewObject::GetStatus()
 void CProductOverviewObject::SetStatus(const QVariant& v)
 {
 
-	Status.emplace();
+	CProductOverview::Status.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
-		Status = (sdl::V1_0::complextest::StatusCode)key;
+		CProductOverview::Status = (sdl::V1_0::complextest::StatusCode)key;
 	}
 	statusChanged();
 }
@@ -13214,67 +13214,67 @@ void CProductOverviewObject::SetStatus(const QVariant& v)
 
 bool CProductOverviewObject::hasStatus()
 {
-	 return Status.HasValue();
+	 return CProductOverview::Status.HasValue();
 }
 
 
 QVariant CProductOverviewObject::GetPartSerialNumber()
 {
-	return PartSerialNumber.value();
+	return CProductOverview::PartSerialNumber.value();
 }
 
 
 void CProductOverviewObject::SetPartSerialNumber(const QVariant& v)
 {
 
-	PartSerialNumber = v.value<QString>();
+	CProductOverview::PartSerialNumber = v.value<QString>();
 	partSerialNumberChanged();
 }
 
 
 bool CProductOverviewObject::hasPartSerialNumber()
 {
-	 return PartSerialNumber.HasValue();
+	 return CProductOverview::PartSerialNumber.HasValue();
 }
 
 
 QVariant CProductOverviewObject::GetTimestamp()
 {
-	return Timestamp.value();
+	return CProductOverview::Timestamp.value();
 }
 
 
 void CProductOverviewObject::SetTimestamp(const QVariant& v)
 {
 
-	Timestamp = v.value<QString>();
+	CProductOverview::Timestamp = v.value<QString>();
 	timestampChanged();
 }
 
 
 bool CProductOverviewObject::hasTimestamp()
 {
-	 return Timestamp.HasValue();
+	 return CProductOverview::Timestamp.HasValue();
 }
 
 
 QVariant CProductOverviewObject::GetProductImage()
 {
-	return ProductImage.value();
+	return CProductOverview::ProductImage.value();
 }
 
 
 void CProductOverviewObject::SetProductImage(const QVariant& v)
 {
 
-	ProductImage = v.value<QString>();
+	CProductOverview::ProductImage = v.value<QString>();
 	productImageChanged();
 }
 
 
 bool CProductOverviewObject::hasProductImage()
 {
-	 return ProductImage.HasValue();
+	 return CProductOverview::ProductImage.HasValue();
 }
 
 
@@ -13297,7 +13297,7 @@ void CProductOverviewObject::SetInspections(const QVariant& v)
 		if (itemPtr != nullptr)  Inspections = static_cast<const decltype(Inspections)::value_type&>(*itemPtr);
 	}
 	else {
-		Inspections = nullptr;
+		CProductOverview::Inspections = nullptr;
 	}
 	m_inspectionsQObjectPtr = v;
 
@@ -13307,14 +13307,14 @@ void CProductOverviewObject::SetInspections(const QVariant& v)
 
 bool CProductOverviewObject::hasInspections()
 {
-	 return Inspections.HasValue();
+	 return CProductOverview::Inspections.HasValue();
 }
 
 
 void CProductOverviewObject::emplaceInspections()
 {
 	ResetInspections();
-	Inspections.emplace();
+	CProductOverview::Inspections.emplace();
 }
 
 
@@ -13543,41 +13543,41 @@ CLocalizedTextObject::CLocalizedTextObject(QObject* parent): ::imtbase::CItemMod
 
 QVariant CLocalizedTextObject::GetText()
 {
-	return text.value();
+	return CLocalizedText::text.value();
 }
 
 
 void CLocalizedTextObject::SetText(const QVariant& v)
 {
 
-	text = v.value<QString>();
+	CLocalizedText::text = v.value<QString>();
 	textChanged();
 }
 
 
 bool CLocalizedTextObject::hasText()
 {
-	 return text.HasValue();
+	 return CLocalizedText::text.HasValue();
 }
 
 
 QVariant CLocalizedTextObject::GetLocale()
 {
-	return locale.value();
+	return CLocalizedText::locale.value();
 }
 
 
 void CLocalizedTextObject::SetLocale(const QVariant& v)
 {
 
-	locale = v.value<QString>();
+	CLocalizedText::locale = v.value<QString>();
 	localeChanged();
 }
 
 
 bool CLocalizedTextObject::hasLocale()
 {
-	 return locale.HasValue();
+	 return CLocalizedText::locale.HasValue();
 }
 
 
@@ -13757,61 +13757,61 @@ CCoordinatesObject::CCoordinatesObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CCoordinatesObject::GetX()
 {
-	return x.value();
+	return CCoordinates::x.value();
 }
 
 
 void CCoordinatesObject::SetX(const QVariant& v)
 {
 
-	x = v.value<double>();
+	CCoordinates::x = v.value<double>();
 	xChanged();
 }
 
 
 bool CCoordinatesObject::hasX()
 {
-	 return x.HasValue();
+	 return CCoordinates::x.HasValue();
 }
 
 
 QVariant CCoordinatesObject::GetY()
 {
-	return y.value();
+	return CCoordinates::y.value();
 }
 
 
 void CCoordinatesObject::SetY(const QVariant& v)
 {
 
-	y = v.value<double>();
+	CCoordinates::y = v.value<double>();
 	yChanged();
 }
 
 
 bool CCoordinatesObject::hasY()
 {
-	 return y.HasValue();
+	 return CCoordinates::y.HasValue();
 }
 
 
 QVariant CCoordinatesObject::GetZ()
 {
-	return z.value();
+	return CCoordinates::z.value();
 }
 
 
 void CCoordinatesObject::SetZ(const QVariant& v)
 {
 
-	z = v.value<double>();
+	CCoordinates::z = v.value<double>();
 	zChanged();
 }
 
 
 bool CCoordinatesObject::hasZ()
 {
-	 return z.HasValue();
+	 return CCoordinates::z.HasValue();
 }
 
 
@@ -13996,39 +13996,39 @@ CExtendedMetaDataObject::CExtendedMetaDataObject(QObject* parent): ::imtbase::CI
 
 QVariant CExtendedMetaDataObject::GetKey()
 {
-	return key.value();
+	return CExtendedMetaData::key.value();
 }
 
 
 void CExtendedMetaDataObject::SetKey(const QVariant& v)
 {
 
-	key = v.value<QString>();
+	CExtendedMetaData::key = v.value<QString>();
 	keyChanged();
 }
 
 
 bool CExtendedMetaDataObject::hasKey()
 {
-	 return key.HasValue();
+	 return CExtendedMetaData::key.HasValue();
 }
 
 
 QVariant CExtendedMetaDataObject::GetValue()
 {
 	if (m_valueQObjectPtr.isValid()){
-		if (const CCoordinates* val = std::get_if<CCoordinates>((value).GetPtr())){
+		if (const CCoordinates* val = std::get_if<CCoordinates>((CExtendedMetaData::value).GetPtr())){
 			CCoordinatesObject *newObjectPtr = new CCoordinatesObject(this);
 			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
 			m_valueQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
-		if (const double* val = std::get_if<double>((value).GetPtr())){
+		if (const double* val = std::get_if<double>((CExtendedMetaData::value).GetPtr())){
 			m_valueQObjectPtr = QVariant::fromValue(val);
 		}
-		if (const bool* val = std::get_if<bool>((value).GetPtr())){
+		if (const bool* val = std::get_if<bool>((CExtendedMetaData::value).GetPtr())){
 			m_valueQObjectPtr = QVariant::fromValue(val);
 		}
-		if (const QString* val = std::get_if<QString>((value).GetPtr())){
+		if (const QString* val = std::get_if<QString>((CExtendedMetaData::value).GetPtr())){
 			m_valueQObjectPtr = QVariant::fromValue(val);
 		}
 	}
@@ -14054,7 +14054,7 @@ void CExtendedMetaDataObject::SetValue(const QVariant& v)
 		}
 	}
 	else {
-		value = nullptr;
+		CExtendedMetaData::value = nullptr;
 	}
 	m_valueQObjectPtr = v;
 
@@ -14064,14 +14064,14 @@ void CExtendedMetaDataObject::SetValue(const QVariant& v)
 
 bool CExtendedMetaDataObject::hasValue()
 {
-	 return value.HasValue();
+	 return CExtendedMetaData::value.HasValue();
 }
 
 
 void CExtendedMetaDataObject::emplaceValue()
 {
 	ResetValue();
-	value.emplace();
+	CExtendedMetaData::value.emplace();
 }
 
 
@@ -14266,121 +14266,121 @@ CResultMetaDataObject::CResultMetaDataObject(QObject* parent): ::imtbase::CItemM
 
 QVariant CResultMetaDataObject::GetResultId()
 {
-	return resultId.value();
+	return CResultMetaData::resultId.value();
 }
 
 
 void CResultMetaDataObject::SetResultId(const QVariant& v)
 {
 
-	resultId = v.value<QString>().toUtf8();
+	CResultMetaData::resultId = v.value<QString>().toUtf8();
 	resultIdChanged();
 }
 
 
 bool CResultMetaDataObject::hasResultId()
 {
-	 return resultId.HasValue();
+	 return CResultMetaData::resultId.HasValue();
 }
 
 
 QVariant CResultMetaDataObject::GetCreationTime()
 {
-	return creationTime.value();
+	return CResultMetaData::creationTime.value();
 }
 
 
 void CResultMetaDataObject::SetCreationTime(const QVariant& v)
 {
 
-	creationTime = v.value<QString>();
+	CResultMetaData::creationTime = v.value<QString>();
 	creationTimeChanged();
 }
 
 
 bool CResultMetaDataObject::hasCreationTime()
 {
-	 return creationTime.HasValue();
+	 return CResultMetaData::creationTime.HasValue();
 }
 
 
 QVariant CResultMetaDataObject::GetPartId()
 {
-	return partId.value();
+	return CResultMetaData::partId.value();
 }
 
 
 void CResultMetaDataObject::SetPartId(const QVariant& v)
 {
 
-	partId = v.value<QString>();
+	CResultMetaData::partId = v.value<QString>();
 	partIdChanged();
 }
 
 
 bool CResultMetaDataObject::hasPartId()
 {
-	 return partId.HasValue();
+	 return CResultMetaData::partId.HasValue();
 }
 
 
 QVariant CResultMetaDataObject::GetProductId()
 {
-	return productId.value();
+	return CResultMetaData::productId.value();
 }
 
 
 void CResultMetaDataObject::SetProductId(const QVariant& v)
 {
 
-	productId = v.value<QString>();
+	CResultMetaData::productId = v.value<QString>();
 	productIdChanged();
 }
 
 
 bool CResultMetaDataObject::hasProductId()
 {
-	 return productId.HasValue();
+	 return CResultMetaData::productId.HasValue();
 }
 
 
 QVariant CResultMetaDataObject::GetName()
 {
-	return name.value();
+	return CResultMetaData::name.value();
 }
 
 
 void CResultMetaDataObject::SetName(const QVariant& v)
 {
 
-	name = v.value<QString>();
+	CResultMetaData::name = v.value<QString>();
 	nameChanged();
 }
 
 
 bool CResultMetaDataObject::hasName()
 {
-	 return name.HasValue();
+	 return CResultMetaData::name.HasValue();
 }
 
 
 QVariant CResultMetaDataObject::GetClassification()
 {
-	return classification.value();
+	return CResultMetaData::classification.value();
 }
 
 
 void CResultMetaDataObject::SetClassification(const QVariant& v)
 {
 
-	classification = v.value<int>();
+	CResultMetaData::classification = v.value<int>();
 	classificationChanged();
 }
 
 
 bool CResultMetaDataObject::hasClassification()
 {
-	 return classification.HasValue();
+	 return CResultMetaData::classification.HasValue();
 }
 
 
@@ -14403,7 +14403,7 @@ void CResultMetaDataObject::SetDescription(const QVariant& v)
 		if (itemPtr != nullptr)  description = static_cast<const decltype(description)::value_type&>(*itemPtr);
 	}
 	else {
-		description = nullptr;
+		CResultMetaData::description = nullptr;
 	}
 	m_descriptionQObjectPtr = v;
 
@@ -14413,14 +14413,14 @@ void CResultMetaDataObject::SetDescription(const QVariant& v)
 
 bool CResultMetaDataObject::hasDescription()
 {
-	 return description.HasValue();
+	 return CResultMetaData::description.HasValue();
 }
 
 
 void CResultMetaDataObject::emplaceDescription()
 {
 	ResetDescription();
-	description.emplace();
+	CResultMetaData::description.emplace();
 }
 
 
@@ -14453,7 +14453,7 @@ void CResultMetaDataObject::SetExtendedMetaData(const QVariant& v)
 		if (itemPtr != nullptr)  extendedMetaData = static_cast<const decltype(extendedMetaData)::value_type&>(*itemPtr);
 	}
 	else {
-		extendedMetaData = nullptr;
+		CResultMetaData::extendedMetaData = nullptr;
 	}
 	m_extendedMetaDataQObjectPtr = v;
 
@@ -14463,14 +14463,14 @@ void CResultMetaDataObject::SetExtendedMetaData(const QVariant& v)
 
 bool CResultMetaDataObject::hasExtendedMetaData()
 {
-	 return extendedMetaData.HasValue();
+	 return CResultMetaData::extendedMetaData.HasValue();
 }
 
 
 void CResultMetaDataObject::emplaceExtendedMetaData()
 {
 	ResetExtendedMetaData();
-	extendedMetaData.emplace();
+	CResultMetaData::extendedMetaData.emplace();
 }
 
 
@@ -14711,101 +14711,101 @@ COverallResultValuesObject::COverallResultValuesObject(QObject* parent): ::imtba
 
 QVariant COverallResultValuesObject::GetName()
 {
-	return name.value();
+	return COverallResultValues::name.value();
 }
 
 
 void COverallResultValuesObject::SetName(const QVariant& v)
 {
 
-	name = v.value<QString>();
+	COverallResultValues::name = v.value<QString>();
 	nameChanged();
 }
 
 
 bool COverallResultValuesObject::hasName()
 {
-	 return name.HasValue();
+	 return COverallResultValues::name.HasValue();
 }
 
 
 QVariant COverallResultValuesObject::GetValueId()
 {
-	return valueId.value();
+	return COverallResultValues::valueId.value();
 }
 
 
 void COverallResultValuesObject::SetValueId(const QVariant& v)
 {
 
-	valueId = v.value<QString>();
+	COverallResultValues::valueId = v.value<QString>();
 	valueIdChanged();
 }
 
 
 bool COverallResultValuesObject::hasValueId()
 {
-	 return valueId.HasValue();
+	 return COverallResultValues::valueId.HasValue();
 }
 
 
 QVariant COverallResultValuesObject::GetMeasuredValue()
 {
-	return measuredValue.value();
+	return COverallResultValues::measuredValue.value();
 }
 
 
 void COverallResultValuesObject::SetMeasuredValue(const QVariant& v)
 {
 
-	measuredValue = v.value<double>();
+	COverallResultValues::measuredValue = v.value<double>();
 	measuredValueChanged();
 }
 
 
 bool COverallResultValuesObject::hasMeasuredValue()
 {
-	 return measuredValue.HasValue();
+	 return COverallResultValues::measuredValue.HasValue();
 }
 
 
 QVariant COverallResultValuesObject::GetLowLimit()
 {
-	return lowLimit.value();
+	return COverallResultValues::lowLimit.value();
 }
 
 
 void COverallResultValuesObject::SetLowLimit(const QVariant& v)
 {
 
-	lowLimit = v.value<double>();
+	COverallResultValues::lowLimit = v.value<double>();
 	lowLimitChanged();
 }
 
 
 bool COverallResultValuesObject::hasLowLimit()
 {
-	 return lowLimit.HasValue();
+	 return COverallResultValues::lowLimit.HasValue();
 }
 
 
 QVariant COverallResultValuesObject::GetHighLimit()
 {
-	return highLimit.value();
+	return COverallResultValues::highLimit.value();
 }
 
 
 void COverallResultValuesObject::SetHighLimit(const QVariant& v)
 {
 
-	highLimit = v.value<double>();
+	COverallResultValues::highLimit = v.value<double>();
 	highLimitChanged();
 }
 
 
 bool COverallResultValuesObject::hasHighLimit()
 {
-	 return highLimit.HasValue();
+	 return COverallResultValues::highLimit.HasValue();
 }
 
 
@@ -15004,13 +15004,13 @@ CUnionTestingTypeObject::CUnionTestingTypeObject(QObject* parent): ::imtbase::CI
 QVariant CUnionTestingTypeObject::GetSimpleUnion()
 {
 	if (m_simpleUnionQObjectPtr.isValid()){
-		if (const double* val = std::get_if<double>((simpleUnion).GetPtr())){
+		if (const double* val = std::get_if<double>((CUnionTestingType::simpleUnion).GetPtr())){
 			m_simpleUnionQObjectPtr = QVariant::fromValue(val);
 		}
-		if (const bool* val = std::get_if<bool>((simpleUnion).GetPtr())){
+		if (const bool* val = std::get_if<bool>((CUnionTestingType::simpleUnion).GetPtr())){
 			m_simpleUnionQObjectPtr = QVariant::fromValue(val);
 		}
-		if (const QString* val = std::get_if<QString>((simpleUnion).GetPtr())){
+		if (const QString* val = std::get_if<QString>((CUnionTestingType::simpleUnion).GetPtr())){
 			m_simpleUnionQObjectPtr = QVariant::fromValue(val);
 		}
 	}
@@ -15033,7 +15033,7 @@ void CUnionTestingTypeObject::SetSimpleUnion(const QVariant& v)
 		}
 	}
 	else {
-		simpleUnion = nullptr;
+		CUnionTestingType::simpleUnion = nullptr;
 	}
 	m_simpleUnionQObjectPtr = v;
 
@@ -15043,14 +15043,14 @@ void CUnionTestingTypeObject::SetSimpleUnion(const QVariant& v)
 
 bool CUnionTestingTypeObject::hasSimpleUnion()
 {
-	 return simpleUnion.HasValue();
+	 return CUnionTestingType::simpleUnion.HasValue();
 }
 
 
 void CUnionTestingTypeObject::emplaceSimpleUnion()
 {
 	ResetSimpleUnion();
-	simpleUnion.emplace();
+	CUnionTestingType::simpleUnion.emplace();
 }
 
 
@@ -15067,12 +15067,12 @@ void CUnionTestingTypeObject::ResetSimpleUnion()
 QVariant CUnionTestingTypeObject::GetComplexUnion()
 {
 	if (m_complexUnionQObjectPtr.isValid()){
-		if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>((complexUnion).GetPtr())){
+		if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>((CUnionTestingType::complexUnion).GetPtr())){
 			CCDMResultVarStringObject *newObjectPtr = new CCDMResultVarStringObject(this);
 			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
 			m_complexUnionQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
-		if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>((complexUnion).GetPtr())){
+		if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>((CUnionTestingType::complexUnion).GetPtr())){
 			CCDMResultVarRecursiveObject *newObjectPtr = new CCDMResultVarRecursiveObject(this);
 			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
 			m_complexUnionQObjectPtr = QVariant::fromValue(newObjectPtr);
@@ -15094,7 +15094,7 @@ void CUnionTestingTypeObject::SetComplexUnion(const QVariant& v)
 		}
 	}
 	else {
-		complexUnion = nullptr;
+		CUnionTestingType::complexUnion = nullptr;
 	}
 	m_complexUnionQObjectPtr = v;
 
@@ -15104,14 +15104,14 @@ void CUnionTestingTypeObject::SetComplexUnion(const QVariant& v)
 
 bool CUnionTestingTypeObject::hasComplexUnion()
 {
-	 return complexUnion.HasValue();
+	 return CUnionTestingType::complexUnion.HasValue();
 }
 
 
 void CUnionTestingTypeObject::emplaceComplexUnion()
 {
 	ResetComplexUnion();
-	complexUnion.emplace();
+	CUnionTestingType::complexUnion.emplace();
 }
 
 
@@ -15128,18 +15128,18 @@ void CUnionTestingTypeObject::ResetComplexUnion()
 QVariant CUnionTestingTypeObject::GetMixedUnion()
 {
 	if (m_mixedUnionQObjectPtr.isValid()){
-		if (const CCoordinates* val = std::get_if<CCoordinates>((mixedUnion).GetPtr())){
+		if (const CCoordinates* val = std::get_if<CCoordinates>((CUnionTestingType::mixedUnion).GetPtr())){
 			CCoordinatesObject *newObjectPtr = new CCoordinatesObject(this);
 			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
 			m_mixedUnionQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
-		if (const double* val = std::get_if<double>((mixedUnion).GetPtr())){
+		if (const double* val = std::get_if<double>((CUnionTestingType::mixedUnion).GetPtr())){
 			m_mixedUnionQObjectPtr = QVariant::fromValue(val);
 		}
-		if (const bool* val = std::get_if<bool>((mixedUnion).GetPtr())){
+		if (const bool* val = std::get_if<bool>((CUnionTestingType::mixedUnion).GetPtr())){
 			m_mixedUnionQObjectPtr = QVariant::fromValue(val);
 		}
-		if (const QString* val = std::get_if<QString>((mixedUnion).GetPtr())){
+		if (const QString* val = std::get_if<QString>((CUnionTestingType::mixedUnion).GetPtr())){
 			m_mixedUnionQObjectPtr = QVariant::fromValue(val);
 		}
 	}
@@ -15165,7 +15165,7 @@ void CUnionTestingTypeObject::SetMixedUnion(const QVariant& v)
 		}
 	}
 	else {
-		mixedUnion = nullptr;
+		CUnionTestingType::mixedUnion = nullptr;
 	}
 	m_mixedUnionQObjectPtr = v;
 
@@ -15175,14 +15175,14 @@ void CUnionTestingTypeObject::SetMixedUnion(const QVariant& v)
 
 bool CUnionTestingTypeObject::hasMixedUnion()
 {
-	 return mixedUnion.HasValue();
+	 return CUnionTestingType::mixedUnion.HasValue();
 }
 
 
 void CUnionTestingTypeObject::emplaceMixedUnion()
 {
 	ResetMixedUnion();
-	mixedUnion.emplace();
+	CUnionTestingType::mixedUnion.emplace();
 }
 
 
@@ -15380,41 +15380,41 @@ CCDMResultVarRecursiveObject::CCDMResultVarRecursiveObject(QObject* parent): ::i
 
 QVariant CCDMResultVarRecursiveObject::GetDataModelTitle()
 {
-	return dataModelTitle.value();
+	return CCDMResultVarRecursive::dataModelTitle.value();
 }
 
 
 void CCDMResultVarRecursiveObject::SetDataModelTitle(const QVariant& v)
 {
 
-	dataModelTitle = v.value<QString>();
+	CCDMResultVarRecursive::dataModelTitle = v.value<QString>();
 	dataModelTitleChanged();
 }
 
 
 bool CCDMResultVarRecursiveObject::hasDataModelTitle()
 {
-	 return dataModelTitle.HasValue();
+	 return CCDMResultVarRecursive::dataModelTitle.HasValue();
 }
 
 
 QVariant CCDMResultVarRecursiveObject::GetDataModelVersion()
 {
-	return dataModelVersion.value();
+	return CCDMResultVarRecursive::dataModelVersion.value();
 }
 
 
 void CCDMResultVarRecursiveObject::SetDataModelVersion(const QVariant& v)
 {
 
-	dataModelVersion = v.value<QString>();
+	CCDMResultVarRecursive::dataModelVersion = v.value<QString>();
 	dataModelVersionChanged();
 }
 
 
 bool CCDMResultVarRecursiveObject::hasDataModelVersion()
 {
-	 return dataModelVersion.HasValue();
+	 return CCDMResultVarRecursive::dataModelVersion.HasValue();
 }
 
 
@@ -15437,7 +15437,7 @@ void CCDMResultVarRecursiveObject::SetResultMetaData(const QVariant& v)
 		if (itemPtr != nullptr)  resultMetaData = static_cast<const decltype(resultMetaData)::value_type&>(*itemPtr);
 	}
 	else {
-		resultMetaData = nullptr;
+		CCDMResultVarRecursive::resultMetaData = nullptr;
 	}
 	m_resultMetaDataQObjectPtr = v;
 
@@ -15447,14 +15447,14 @@ void CCDMResultVarRecursiveObject::SetResultMetaData(const QVariant& v)
 
 bool CCDMResultVarRecursiveObject::hasResultMetaData()
 {
-	 return resultMetaData.HasValue();
+	 return CCDMResultVarRecursive::resultMetaData.HasValue();
 }
 
 
 void CCDMResultVarRecursiveObject::emplaceResultMetaData()
 {
 	ResetResultMetaData();
-	resultMetaData.emplace();
+	CCDMResultVarRecursive::resultMetaData.emplace();
 }
 
 
@@ -15487,7 +15487,7 @@ void CCDMResultVarRecursiveObject::SetResultContent(const QVariant& v)
 		if (itemPtr != nullptr)  resultContent = static_cast<const decltype(resultContent)::value_type&>(*itemPtr);
 	}
 	else {
-		resultContent = nullptr;
+		CCDMResultVarRecursive::resultContent = nullptr;
 	}
 	m_resultContentQObjectPtr = v;
 
@@ -15497,14 +15497,14 @@ void CCDMResultVarRecursiveObject::SetResultContent(const QVariant& v)
 
 bool CCDMResultVarRecursiveObject::hasResultContent()
 {
-	 return resultContent.HasValue();
+	 return CCDMResultVarRecursive::resultContent.HasValue();
 }
 
 
 void CCDMResultVarRecursiveObject::emplaceResultContent()
 {
 	ResetResultContent();
-	resultContent.emplace();
+	CCDMResultVarRecursive::resultContent.emplace();
 }
 
 
@@ -15537,7 +15537,7 @@ void CCDMResultVarRecursiveObject::SetOverallResultValues(const QVariant& v)
 		if (itemPtr != nullptr)  overallResultValues = static_cast<const decltype(overallResultValues)::value_type&>(*itemPtr);
 	}
 	else {
-		overallResultValues = nullptr;
+		CCDMResultVarRecursive::overallResultValues = nullptr;
 	}
 	m_overallResultValuesQObjectPtr = v;
 
@@ -15547,14 +15547,14 @@ void CCDMResultVarRecursiveObject::SetOverallResultValues(const QVariant& v)
 
 bool CCDMResultVarRecursiveObject::hasOverallResultValues()
 {
-	 return overallResultValues.HasValue();
+	 return CCDMResultVarRecursive::overallResultValues.HasValue();
 }
 
 
 void CCDMResultVarRecursiveObject::emplaceOverallResultValues()
 {
 	ResetOverallResultValues();
-	overallResultValues.emplace();
+	CCDMResultVarRecursive::overallResultValues.emplace();
 }
 
 
@@ -15780,41 +15780,41 @@ CCDMResultVarStringObject::CCDMResultVarStringObject(QObject* parent): ::imtbase
 
 QVariant CCDMResultVarStringObject::GetDataModelTitle()
 {
-	return dataModelTitle.value();
+	return CCDMResultVarString::dataModelTitle.value();
 }
 
 
 void CCDMResultVarStringObject::SetDataModelTitle(const QVariant& v)
 {
 
-	dataModelTitle = v.value<QString>();
+	CCDMResultVarString::dataModelTitle = v.value<QString>();
 	dataModelTitleChanged();
 }
 
 
 bool CCDMResultVarStringObject::hasDataModelTitle()
 {
-	 return dataModelTitle.HasValue();
+	 return CCDMResultVarString::dataModelTitle.HasValue();
 }
 
 
 QVariant CCDMResultVarStringObject::GetDataModelVersion()
 {
-	return dataModelVersion.value();
+	return CCDMResultVarString::dataModelVersion.value();
 }
 
 
 void CCDMResultVarStringObject::SetDataModelVersion(const QVariant& v)
 {
 
-	dataModelVersion = v.value<QString>();
+	CCDMResultVarString::dataModelVersion = v.value<QString>();
 	dataModelVersionChanged();
 }
 
 
 bool CCDMResultVarStringObject::hasDataModelVersion()
 {
-	 return dataModelVersion.HasValue();
+	 return CCDMResultVarString::dataModelVersion.HasValue();
 }
 
 
@@ -15837,7 +15837,7 @@ void CCDMResultVarStringObject::SetResultMetaData(const QVariant& v)
 		if (itemPtr != nullptr)  resultMetaData = static_cast<const decltype(resultMetaData)::value_type&>(*itemPtr);
 	}
 	else {
-		resultMetaData = nullptr;
+		CCDMResultVarString::resultMetaData = nullptr;
 	}
 	m_resultMetaDataQObjectPtr = v;
 
@@ -15847,14 +15847,14 @@ void CCDMResultVarStringObject::SetResultMetaData(const QVariant& v)
 
 bool CCDMResultVarStringObject::hasResultMetaData()
 {
-	 return resultMetaData.HasValue();
+	 return CCDMResultVarString::resultMetaData.HasValue();
 }
 
 
 void CCDMResultVarStringObject::emplaceResultMetaData()
 {
 	ResetResultMetaData();
-	resultMetaData.emplace();
+	CCDMResultVarString::resultMetaData.emplace();
 }
 
 
@@ -15871,7 +15871,7 @@ void CCDMResultVarStringObject::ResetResultMetaData()
 QVariant CCDMResultVarStringObject::GetResultContent()
 {
 	QList<QString> tempResultContentList;
-	for (const auto& tempValue: resultContent.value()){
+	for (const auto& tempValue: CCDMResultVarString::resultContent.value()){
 		tempResultContentList << *tempValue;
 	}
 	return QVariant::fromValue(tempResultContentList);
@@ -15881,15 +15881,15 @@ QVariant CCDMResultVarStringObject::GetResultContent()
 void CCDMResultVarStringObject::SetResultContent(const QVariant& v)
 {
 
-	if (!resultContent){
-		resultContent.emplace();
+	if (!CCDMResultVarString::resultContent){
+		CCDMResultVarString::resultContent.emplace();
 	}
 	else{
-		resultContent->clear();
+		CCDMResultVarString::resultContent->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QString> value(tempValue);
-		resultContent->append(value);
+		CCDMResultVarString::resultContent->append(value);
 	}
 
 	resultContentChanged();
@@ -15898,7 +15898,7 @@ void CCDMResultVarStringObject::SetResultContent(const QVariant& v)
 
 bool CCDMResultVarStringObject::hasResultContent()
 {
-	 return resultContent.HasValue();
+	 return CCDMResultVarString::resultContent.HasValue();
 }
 
 
@@ -15921,7 +15921,7 @@ void CCDMResultVarStringObject::SetOverallResultValues(const QVariant& v)
 		if (itemPtr != nullptr)  overallResultValues = static_cast<const decltype(overallResultValues)::value_type&>(*itemPtr);
 	}
 	else {
-		overallResultValues = nullptr;
+		CCDMResultVarString::overallResultValues = nullptr;
 	}
 	m_overallResultValuesQObjectPtr = v;
 
@@ -15931,14 +15931,14 @@ void CCDMResultVarStringObject::SetOverallResultValues(const QVariant& v)
 
 bool CCDMResultVarStringObject::hasOverallResultValues()
 {
-	 return overallResultValues.HasValue();
+	 return CCDMResultVarString::overallResultValues.HasValue();
 }
 
 
 void CCDMResultVarStringObject::emplaceOverallResultValues()
 {
 	ResetOverallResultValues();
-	overallResultValues.emplace();
+	CCDMResultVarString::overallResultValues.emplace();
 }
 
 
@@ -16161,41 +16161,41 @@ CCDMResultObject::CCDMResultObject(QObject* parent): ::imtbase::CItemModelBase(p
 
 QVariant CCDMResultObject::GetDataModelTitle()
 {
-	return dataModelTitle.value();
+	return CCDMResult::dataModelTitle.value();
 }
 
 
 void CCDMResultObject::SetDataModelTitle(const QVariant& v)
 {
 
-	dataModelTitle = v.value<QString>();
+	CCDMResult::dataModelTitle = v.value<QString>();
 	dataModelTitleChanged();
 }
 
 
 bool CCDMResultObject::hasDataModelTitle()
 {
-	 return dataModelTitle.HasValue();
+	 return CCDMResult::dataModelTitle.HasValue();
 }
 
 
 QVariant CCDMResultObject::GetDataModelVersion()
 {
-	return dataModelVersion.value();
+	return CCDMResult::dataModelVersion.value();
 }
 
 
 void CCDMResultObject::SetDataModelVersion(const QVariant& v)
 {
 
-	dataModelVersion = v.value<QString>();
+	CCDMResult::dataModelVersion = v.value<QString>();
 	dataModelVersionChanged();
 }
 
 
 bool CCDMResultObject::hasDataModelVersion()
 {
-	 return dataModelVersion.HasValue();
+	 return CCDMResult::dataModelVersion.HasValue();
 }
 
 
@@ -16218,7 +16218,7 @@ void CCDMResultObject::SetResultMetaData(const QVariant& v)
 		if (itemPtr != nullptr)  resultMetaData = static_cast<const decltype(resultMetaData)::value_type&>(*itemPtr);
 	}
 	else {
-		resultMetaData = nullptr;
+		CCDMResult::resultMetaData = nullptr;
 	}
 	m_resultMetaDataQObjectPtr = v;
 
@@ -16228,14 +16228,14 @@ void CCDMResultObject::SetResultMetaData(const QVariant& v)
 
 bool CCDMResultObject::hasResultMetaData()
 {
-	 return resultMetaData.HasValue();
+	 return CCDMResult::resultMetaData.HasValue();
 }
 
 
 void CCDMResultObject::emplaceResultMetaData()
 {
 	ResetResultMetaData();
-	resultMetaData.emplace();
+	CCDMResult::resultMetaData.emplace();
 }
 
 
@@ -16268,7 +16268,7 @@ void CCDMResultObject::SetResultContent(const QVariant& v)
 		if (itemPtr != nullptr)  resultContent = static_cast<const decltype(resultContent)::value_type&>(*itemPtr);
 	}
 	else {
-		resultContent = nullptr;
+		CCDMResult::resultContent = nullptr;
 	}
 	m_resultContentQObjectPtr = v;
 
@@ -16278,14 +16278,14 @@ void CCDMResultObject::SetResultContent(const QVariant& v)
 
 bool CCDMResultObject::hasResultContent()
 {
-	 return resultContent.HasValue();
+	 return CCDMResult::resultContent.HasValue();
 }
 
 
 void CCDMResultObject::emplaceResultContent()
 {
 	ResetResultContent();
-	resultContent.emplace();
+	CCDMResult::resultContent.emplace();
 }
 
 
@@ -16318,7 +16318,7 @@ void CCDMResultObject::SetOverallResultValues(const QVariant& v)
 		if (itemPtr != nullptr)  overallResultValues = static_cast<const decltype(overallResultValues)::value_type&>(*itemPtr);
 	}
 	else {
-		overallResultValues = nullptr;
+		CCDMResult::overallResultValues = nullptr;
 	}
 	m_overallResultValuesQObjectPtr = v;
 
@@ -16328,14 +16328,14 @@ void CCDMResultObject::SetOverallResultValues(const QVariant& v)
 
 bool CCDMResultObject::hasOverallResultValues()
 {
-	 return overallResultValues.HasValue();
+	 return CCDMResult::overallResultValues.HasValue();
 }
 
 
 void CCDMResultObject::emplaceOverallResultValues()
 {
 	ResetOverallResultValues();
-	overallResultValues.emplace();
+	CCDMResult::overallResultValues.emplace();
 }
 
 
@@ -16557,21 +16557,21 @@ CPointsInCoordinateFormatObject::CPointsInCoordinateFormatObject(QObject* parent
 
 QVariant CPointsInCoordinateFormatObject::GetPointAsCoordinates()
 {
-	return pointAsCoordinates.value();
+	return CPointsInCoordinateFormat::pointAsCoordinates.value();
 }
 
 
 void CPointsInCoordinateFormatObject::SetPointAsCoordinates(const QVariant& v)
 {
 
-	pointAsCoordinates = v.value<bool>();
+	CPointsInCoordinateFormat::pointAsCoordinates = v.value<bool>();
 	pointAsCoordinatesChanged();
 }
 
 
 bool CPointsInCoordinateFormatObject::hasPointAsCoordinates()
 {
-	 return pointAsCoordinates.HasValue();
+	 return CPointsInCoordinateFormat::pointAsCoordinates.HasValue();
 }
 
 
@@ -16745,41 +16745,41 @@ CCollectionViewParamsTestObject::CCollectionViewParamsTestObject(QObject* parent
 
 QVariant CCollectionViewParamsTestObject::GetCount()
 {
-	return count.value();
+	return CCollectionViewParamsTest::count.value();
 }
 
 
 void CCollectionViewParamsTestObject::SetCount(const QVariant& v)
 {
 
-	count = v.value<int>();
+	CCollectionViewParamsTest::count = v.value<int>();
 	countChanged();
 }
 
 
 bool CCollectionViewParamsTestObject::hasCount()
 {
-	 return count.HasValue();
+	 return CCollectionViewParamsTest::count.HasValue();
 }
 
 
 QVariant CCollectionViewParamsTestObject::GetOffset()
 {
-	return offset.value();
+	return CCollectionViewParamsTest::offset.value();
 }
 
 
 void CCollectionViewParamsTestObject::SetOffset(const QVariant& v)
 {
 
-	offset = v.value<int>();
+	CCollectionViewParamsTest::offset = v.value<int>();
 	offsetChanged();
 }
 
 
 bool CCollectionViewParamsTestObject::hasOffset()
 {
-	 return offset.HasValue();
+	 return CCollectionViewParamsTest::offset.HasValue();
 }
 
 
@@ -16802,7 +16802,7 @@ void CCollectionViewParamsTestObject::SetFilterModel(const QVariant& v)
 		if (itemPtr != nullptr)  filterModel = static_cast<const decltype(filterModel)::value_type&>(*itemPtr);
 	}
 	else {
-		filterModel = nullptr;
+		CCollectionViewParamsTest::filterModel = nullptr;
 	}
 	m_filterModelQObjectPtr = v;
 
@@ -16812,14 +16812,14 @@ void CCollectionViewParamsTestObject::SetFilterModel(const QVariant& v)
 
 bool CCollectionViewParamsTestObject::hasFilterModel()
 {
-	 return filterModel.HasValue();
+	 return CCollectionViewParamsTest::filterModel.HasValue();
 }
 
 
 void CCollectionViewParamsTestObject::emplaceFilterModel()
 {
 	ResetFilterModel();
-	filterModel.emplace();
+	CCollectionViewParamsTest::filterModel.emplace();
 }
 
 

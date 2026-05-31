@@ -2247,7 +2247,7 @@ void CTimeFilterObject::SetTimeRange(const QVariant& v)
 		if (itemPtr != nullptr)  timeRange = static_cast<const decltype(timeRange)::value_type&>(*itemPtr);
 	}
 	else {
-		timeRange = nullptr;
+		CTimeFilter::timeRange = nullptr;
 	}
 	m_timeRangeQObjectPtr = v;
 
@@ -2257,14 +2257,14 @@ void CTimeFilterObject::SetTimeRange(const QVariant& v)
 
 bool CTimeFilterObject::hasTimeRange()
 {
-	 return timeRange.HasValue();
+	 return CTimeFilter::timeRange.HasValue();
 }
 
 
 void CTimeFilterObject::emplaceTimeRange()
 {
 	ResetTimeRange();
-	timeRange.emplace();
+	CTimeFilter::timeRange.emplace();
 }
 
 
@@ -2280,61 +2280,61 @@ void CTimeFilterObject::ResetTimeRange()
 
 QVariant CTimeFilterObject::GetTimeUnit()
 {
-	return timeUnit.value();
+	return CTimeFilter::timeUnit.value();
 }
 
 
 void CTimeFilterObject::SetTimeUnit(const QVariant& v)
 {
 
-	timeUnit = v.value<QString>();
+	CTimeFilter::timeUnit = v.value<QString>();
 	timeUnitChanged();
 }
 
 
 bool CTimeFilterObject::hasTimeUnit()
 {
-	 return timeUnit.HasValue();
+	 return CTimeFilter::timeUnit.HasValue();
 }
 
 
 QVariant CTimeFilterObject::GetInterpretationMode()
 {
-	return interpretationMode.value();
+	return CTimeFilter::interpretationMode.value();
 }
 
 
 void CTimeFilterObject::SetInterpretationMode(const QVariant& v)
 {
 
-	interpretationMode = v.value<QString>();
+	CTimeFilter::interpretationMode = v.value<QString>();
 	interpretationModeChanged();
 }
 
 
 bool CTimeFilterObject::hasInterpretationMode()
 {
-	 return interpretationMode.HasValue();
+	 return CTimeFilter::interpretationMode.HasValue();
 }
 
 
 QVariant CTimeFilterObject::GetUnitMultiplier()
 {
-	return unitMultiplier.value();
+	return CTimeFilter::unitMultiplier.value();
 }
 
 
 void CTimeFilterObject::SetUnitMultiplier(const QVariant& v)
 {
 
-	unitMultiplier = v.value<int>();
+	CTimeFilter::unitMultiplier = v.value<int>();
 	unitMultiplierChanged();
 }
 
 
 bool CTimeFilterObject::hasUnitMultiplier()
 {
-	 return unitMultiplier.HasValue();
+	 return CTimeFilter::unitMultiplier.HasValue();
 }
 
 
@@ -2528,41 +2528,41 @@ CFieldSortingInfoObject::CFieldSortingInfoObject(QObject* parent): ::imtbase::CI
 
 QVariant CFieldSortingInfoObject::GetFieldId()
 {
-	return fieldId.value();
+	return CFieldSortingInfo::fieldId.value();
 }
 
 
 void CFieldSortingInfoObject::SetFieldId(const QVariant& v)
 {
 
-	fieldId = v.value<QString>();
+	CFieldSortingInfo::fieldId = v.value<QString>();
 	fieldIdChanged();
 }
 
 
 bool CFieldSortingInfoObject::hasFieldId()
 {
-	 return fieldId.HasValue();
+	 return CFieldSortingInfo::fieldId.HasValue();
 }
 
 
 QVariant CFieldSortingInfoObject::GetSortingOrder()
 {
-	return sortingOrder.value();
+	return CFieldSortingInfo::sortingOrder.value();
 }
 
 
 void CFieldSortingInfoObject::SetSortingOrder(const QVariant& v)
 {
 
-	sortingOrder = v.value<QString>();
+	CFieldSortingInfo::sortingOrder = v.value<QString>();
 	sortingOrderChanged();
 }
 
 
 bool CFieldSortingInfoObject::hasSortingOrder()
 {
-	 return sortingOrder.HasValue();
+	 return CFieldSortingInfo::sortingOrder.HasValue();
 }
 
 
@@ -2743,47 +2743,47 @@ CFieldFilterObject::CFieldFilterObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CFieldFilterObject::GetFieldId()
 {
-	return fieldId.value();
+	return CFieldFilter::fieldId.value();
 }
 
 
 void CFieldFilterObject::SetFieldId(const QVariant& v)
 {
 
-	fieldId = v.value<QString>().toUtf8();
+	CFieldFilter::fieldId = v.value<QString>().toUtf8();
 	fieldIdChanged();
 }
 
 
 bool CFieldFilterObject::hasFieldId()
 {
-	 return fieldId.HasValue();
+	 return CFieldFilter::fieldId.HasValue();
 }
 
 
 QVariant CFieldFilterObject::GetFilterValue()
 {
-	return filterValue.value();
+	return CFieldFilter::filterValue.value();
 }
 
 
 void CFieldFilterObject::SetFilterValue(const QVariant& v)
 {
 
-	filterValue = v.value<QString>();
+	CFieldFilter::filterValue = v.value<QString>();
 	filterValueChanged();
 }
 
 
 bool CFieldFilterObject::hasFilterValue()
 {
-	 return filterValue.HasValue();
+	 return CFieldFilter::filterValue.HasValue();
 }
 
 
 QVariant CFieldFilterObject::GetFilterValueType()
 {
-	sdl::V1_0::imtbase::ValueType valueType = filterValueType.value();
+	sdl::V1_0::imtbase::ValueType valueType = CFieldFilter::filterValueType.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::imtbase::ValueType>();
 	QString retval = metaEnum.valueToKey((int)valueType);
 
@@ -2794,11 +2794,11 @@ QVariant CFieldFilterObject::GetFilterValueType()
 void CFieldFilterObject::SetFilterValueType(const QVariant& v)
 {
 
-	filterValueType.emplace();
+	CFieldFilter::filterValueType.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::imtbase::ValueType>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
-		filterValueType = (sdl::V1_0::imtbase::ValueType)key;
+		CFieldFilter::filterValueType = (sdl::V1_0::imtbase::ValueType)key;
 	}
 	filterValueTypeChanged();
 }
@@ -2806,7 +2806,7 @@ void CFieldFilterObject::SetFilterValueType(const QVariant& v)
 
 bool CFieldFilterObject::hasFilterValueType()
 {
-	 return filterValueType.HasValue();
+	 return CFieldFilter::filterValueType.HasValue();
 }
 
 
@@ -2826,7 +2826,7 @@ void CFieldFilterObject::SetFilterOperations(const QVariant& v)
 
 bool CFieldFilterObject::hasFilterOperations()
 {
-	 return filterOperations.HasValue();
+	 return CFieldFilter::filterOperations.HasValue();
 }
 
 
@@ -3035,7 +3035,7 @@ void CGroupFilterObject::SetFieldFilters(const QVariant& v)
 		if (itemPtr != nullptr)  fieldFilters = static_cast<const decltype(fieldFilters)::value_type&>(*itemPtr);
 	}
 	else {
-		fieldFilters = nullptr;
+		CGroupFilter::fieldFilters = nullptr;
 	}
 	m_fieldFiltersQObjectPtr = v;
 
@@ -3045,14 +3045,14 @@ void CGroupFilterObject::SetFieldFilters(const QVariant& v)
 
 bool CGroupFilterObject::hasFieldFilters()
 {
-	 return fieldFilters.HasValue();
+	 return CGroupFilter::fieldFilters.HasValue();
 }
 
 
 void CGroupFilterObject::emplaceFieldFilters()
 {
 	ResetFieldFilters();
-	fieldFilters.emplace();
+	CGroupFilter::fieldFilters.emplace();
 }
 
 
@@ -3092,7 +3092,7 @@ void CGroupFilterObject::SetGroupFilters(const QVariant& v)
 		if (itemPtr != nullptr)  groupFilters = static_cast<const decltype(groupFilters)::value_type&>(*itemPtr);
 	}
 	else {
-		groupFilters = nullptr;
+		CGroupFilter::groupFilters = nullptr;
 	}
 	m_groupFiltersQObjectPtr = v;
 
@@ -3102,14 +3102,14 @@ void CGroupFilterObject::SetGroupFilters(const QVariant& v)
 
 bool CGroupFilterObject::hasGroupFilters()
 {
-	 return groupFilters.HasValue();
+	 return CGroupFilter::groupFilters.HasValue();
 }
 
 
 void CGroupFilterObject::emplaceGroupFilters()
 {
 	ResetGroupFilters();
-	groupFilters.emplace();
+	CGroupFilter::groupFilters.emplace();
 }
 
 
@@ -3132,7 +3132,7 @@ QVariant CGroupFilterObject::createGroupFiltersArrayElement(const QVariant& v)
 
 QVariant CGroupFilterObject::GetLogicalOperation()
 {
-	sdl::V1_0::imtbase::LogicalOperation valueType = logicalOperation.value();
+	sdl::V1_0::imtbase::LogicalOperation valueType = CGroupFilter::logicalOperation.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::imtbase::LogicalOperation>();
 	QString retval = metaEnum.valueToKey((int)valueType);
 
@@ -3143,11 +3143,11 @@ QVariant CGroupFilterObject::GetLogicalOperation()
 void CGroupFilterObject::SetLogicalOperation(const QVariant& v)
 {
 
-	logicalOperation.emplace();
+	CGroupFilter::logicalOperation.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::imtbase::LogicalOperation>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
-		logicalOperation = (sdl::V1_0::imtbase::LogicalOperation)key;
+		CGroupFilter::logicalOperation = (sdl::V1_0::imtbase::LogicalOperation)key;
 	}
 	logicalOperationChanged();
 }
@@ -3155,7 +3155,7 @@ void CGroupFilterObject::SetLogicalOperation(const QVariant& v)
 
 bool CGroupFilterObject::hasLogicalOperation()
 {
-	 return logicalOperation.HasValue();
+	 return CGroupFilter::logicalOperation.HasValue();
 }
 
 
@@ -3365,7 +3365,7 @@ void CComplexCollectionFilterObject::SetSortingInfo(const QVariant& v)
 		if (itemPtr != nullptr)  sortingInfo = static_cast<const decltype(sortingInfo)::value_type&>(*itemPtr);
 	}
 	else {
-		sortingInfo = nullptr;
+		CComplexCollectionFilter::sortingInfo = nullptr;
 	}
 	m_sortingInfoQObjectPtr = v;
 
@@ -3375,14 +3375,14 @@ void CComplexCollectionFilterObject::SetSortingInfo(const QVariant& v)
 
 bool CComplexCollectionFilterObject::hasSortingInfo()
 {
-	 return sortingInfo.HasValue();
+	 return CComplexCollectionFilter::sortingInfo.HasValue();
 }
 
 
 void CComplexCollectionFilterObject::emplaceSortingInfo()
 {
 	ResetSortingInfo();
-	sortingInfo.emplace();
+	CComplexCollectionFilter::sortingInfo.emplace();
 }
 
 
@@ -3422,7 +3422,7 @@ void CComplexCollectionFilterObject::SetFieldsFilter(const QVariant& v)
 		if (itemPtr != nullptr)  fieldsFilter = static_cast<const decltype(fieldsFilter)::value_type&>(*itemPtr);
 	}
 	else {
-		fieldsFilter = nullptr;
+		CComplexCollectionFilter::fieldsFilter = nullptr;
 	}
 	m_fieldsFilterQObjectPtr = v;
 
@@ -3432,14 +3432,14 @@ void CComplexCollectionFilterObject::SetFieldsFilter(const QVariant& v)
 
 bool CComplexCollectionFilterObject::hasFieldsFilter()
 {
-	 return fieldsFilter.HasValue();
+	 return CComplexCollectionFilter::fieldsFilter.HasValue();
 }
 
 
 void CComplexCollectionFilterObject::emplaceFieldsFilter()
 {
 	ResetFieldsFilter();
-	fieldsFilter.emplace();
+	CComplexCollectionFilter::fieldsFilter.emplace();
 }
 
 
@@ -3472,7 +3472,7 @@ void CComplexCollectionFilterObject::SetTimeFilter(const QVariant& v)
 		if (itemPtr != nullptr)  timeFilter = static_cast<const decltype(timeFilter)::value_type&>(*itemPtr);
 	}
 	else {
-		timeFilter = nullptr;
+		CComplexCollectionFilter::timeFilter = nullptr;
 	}
 	m_timeFilterQObjectPtr = v;
 
@@ -3482,14 +3482,14 @@ void CComplexCollectionFilterObject::SetTimeFilter(const QVariant& v)
 
 bool CComplexCollectionFilterObject::hasTimeFilter()
 {
-	 return timeFilter.HasValue();
+	 return CComplexCollectionFilter::timeFilter.HasValue();
 }
 
 
 void CComplexCollectionFilterObject::emplaceTimeFilter()
 {
 	ResetTimeFilter();
-	timeFilter.emplace();
+	CComplexCollectionFilter::timeFilter.emplace();
 }
 
 
@@ -3506,7 +3506,7 @@ void CComplexCollectionFilterObject::ResetTimeFilter()
 QVariant CComplexCollectionFilterObject::GetDistinctFields()
 {
 	QList<QString> tempDistinctFieldsList;
-	for (const auto& tempValue: distinctFields.value()){
+	for (const auto& tempValue: CComplexCollectionFilter::distinctFields.value()){
 		tempDistinctFieldsList << *tempValue;
 	}
 	return QVariant::fromValue(tempDistinctFieldsList);
@@ -3516,15 +3516,15 @@ QVariant CComplexCollectionFilterObject::GetDistinctFields()
 void CComplexCollectionFilterObject::SetDistinctFields(const QVariant& v)
 {
 
-	if (!distinctFields){
-		distinctFields.emplace();
+	if (!CComplexCollectionFilter::distinctFields){
+		CComplexCollectionFilter::distinctFields.emplace();
 	}
 	else{
-		distinctFields->clear();
+		CComplexCollectionFilter::distinctFields->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QByteArray> value(tempValue.toUtf8());
-		distinctFields->append(value);
+		CComplexCollectionFilter::distinctFields->append(value);
 	}
 
 	distinctFieldsChanged();
@@ -3533,7 +3533,7 @@ void CComplexCollectionFilterObject::SetDistinctFields(const QVariant& v)
 
 bool CComplexCollectionFilterObject::hasDistinctFields()
 {
-	 return distinctFields.HasValue();
+	 return CComplexCollectionFilter::distinctFields.HasValue();
 }
 
 

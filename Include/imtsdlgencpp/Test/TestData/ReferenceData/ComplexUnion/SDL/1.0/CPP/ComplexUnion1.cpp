@@ -1014,41 +1014,41 @@ CPointObject::CPointObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
 QVariant CPointObject::GetX()
 {
-	return X.value();
+	return CPoint::X.value();
 }
 
 
 void CPointObject::SetX(const QVariant& v)
 {
 
-	X = v.value<double>();
+	CPoint::X = v.value<double>();
 	xChanged();
 }
 
 
 bool CPointObject::hasX()
 {
-	 return X.HasValue();
+	 return CPoint::X.HasValue();
 }
 
 
 QVariant CPointObject::GetY()
 {
-	return Y.value();
+	return CPoint::Y.value();
 }
 
 
 void CPointObject::SetY(const QVariant& v)
 {
 
-	Y = v.value<double>();
+	CPoint::Y = v.value<double>();
 	yChanged();
 }
 
 
 bool CPointObject::hasY()
 {
-	 return Y.HasValue();
+	 return CPoint::Y.HasValue();
 }
 
 
@@ -1230,7 +1230,7 @@ CGeometryObject::CGeometryObject(QObject* parent): ::imtbase::CItemModelBase(par
 
 QVariant CGeometryObject::GetGeometryType()
 {
-	sdl::V1_0::complextest::GeometryType valueType = GeometryType.value();
+	sdl::V1_0::complextest::GeometryType valueType = CGeometry::GeometryType.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::GeometryType>();
 	QString retval = metaEnum.valueToKey((int)valueType);
 
@@ -1241,11 +1241,11 @@ QVariant CGeometryObject::GetGeometryType()
 void CGeometryObject::SetGeometryType(const QVariant& v)
 {
 
-	GeometryType.emplace();
+	CGeometry::GeometryType.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::GeometryType>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
-		GeometryType = (sdl::V1_0::complextest::GeometryType)key;
+		CGeometry::GeometryType = (sdl::V1_0::complextest::GeometryType)key;
 	}
 	geometryTypeChanged();
 }
@@ -1253,27 +1253,27 @@ void CGeometryObject::SetGeometryType(const QVariant& v)
 
 bool CGeometryObject::hasGeometryType()
 {
-	 return GeometryType.HasValue();
+	 return CGeometry::GeometryType.HasValue();
 }
 
 
 QVariant CGeometryObject::GetRadius()
 {
-	return Radius.value();
+	return CGeometry::Radius.value();
 }
 
 
 void CGeometryObject::SetRadius(const QVariant& v)
 {
 
-	Radius = v.value<double>();
+	CGeometry::Radius = v.value<double>();
 	radiusChanged();
 }
 
 
 bool CGeometryObject::hasRadius()
 {
-	 return Radius.HasValue();
+	 return CGeometry::Radius.HasValue();
 }
 
 
@@ -1296,7 +1296,7 @@ void CGeometryObject::SetPoints(const QVariant& v)
 		if (itemPtr != nullptr)  Points = static_cast<const decltype(Points)::value_type&>(*itemPtr);
 	}
 	else {
-		Points = nullptr;
+		CGeometry::Points = nullptr;
 	}
 	m_pointsQObjectPtr = v;
 
@@ -1306,14 +1306,14 @@ void CGeometryObject::SetPoints(const QVariant& v)
 
 bool CGeometryObject::hasPoints()
 {
-	 return Points.HasValue();
+	 return CGeometry::Points.HasValue();
 }
 
 
 void CGeometryObject::emplacePoints()
 {
 	ResetPoints();
-	Points.emplace();
+	CGeometry::Points.emplace();
 }
 
 
@@ -1353,7 +1353,7 @@ void CGeometryObject::SetRequiredPoints(const QVariant& v)
 		if (itemPtr != nullptr)  RequiredPoints = static_cast<const decltype(RequiredPoints)::value_type&>(*itemPtr);
 	}
 	else {
-		RequiredPoints = nullptr;
+		CGeometry::RequiredPoints = nullptr;
 	}
 	m_requiredPointsQObjectPtr = v;
 
@@ -1363,14 +1363,14 @@ void CGeometryObject::SetRequiredPoints(const QVariant& v)
 
 bool CGeometryObject::hasRequiredPoints()
 {
-	 return RequiredPoints.HasValue();
+	 return CGeometry::RequiredPoints.HasValue();
 }
 
 
 void CGeometryObject::emplaceRequiredPoints()
 {
 	ResetRequiredPoints();
-	RequiredPoints.emplace();
+	CGeometry::RequiredPoints.emplace();
 }
 
 
@@ -1410,7 +1410,7 @@ void CGeometryObject::SetOptionalPoints(const QVariant& v)
 		if (itemPtr != nullptr)  OptionalPoints = static_cast<const decltype(OptionalPoints)::value_type&>(*itemPtr);
 	}
 	else {
-		OptionalPoints = nullptr;
+		CGeometry::OptionalPoints = nullptr;
 	}
 	m_optionalPointsQObjectPtr = v;
 
@@ -1420,14 +1420,14 @@ void CGeometryObject::SetOptionalPoints(const QVariant& v)
 
 bool CGeometryObject::hasOptionalPoints()
 {
-	 return OptionalPoints.HasValue();
+	 return CGeometry::OptionalPoints.HasValue();
 }
 
 
 void CGeometryObject::emplaceOptionalPoints()
 {
 	ResetOptionalPoints();
-	OptionalPoints.emplace();
+	CGeometry::OptionalPoints.emplace();
 }
 
 

@@ -4535,41 +4535,41 @@ CTimeRangeObject::CTimeRangeObject(QObject* parent): ::imtbase::CItemModelBase(p
 
 QVariant CTimeRangeObject::GetBegin()
 {
-	return Begin.value();
+	return CTimeRange::Begin.value();
 }
 
 
 void CTimeRangeObject::SetBegin(const QVariant& v)
 {
 
-	Begin = v.value<QString>();
+	CTimeRange::Begin = v.value<QString>();
 	beginChanged();
 }
 
 
 bool CTimeRangeObject::hasBegin()
 {
-	 return Begin.HasValue();
+	 return CTimeRange::Begin.HasValue();
 }
 
 
 QVariant CTimeRangeObject::GetEnd()
 {
-	return End.value();
+	return CTimeRange::End.value();
 }
 
 
 void CTimeRangeObject::SetEnd(const QVariant& v)
 {
 
-	End = v.value<QString>();
+	CTimeRange::End = v.value<QString>();
 	endChanged();
 }
 
 
 bool CTimeRangeObject::hasEnd()
 {
-	 return End.HasValue();
+	 return CTimeRange::End.HasValue();
 }
 
 
@@ -4748,41 +4748,41 @@ CSdlSizeObject::CSdlSizeObject(QObject* parent): ::imtbase::CItemModelBase(paren
 
 QVariant CSdlSizeObject::GetWidth()
 {
-	return width.value();
+	return CSdlSize::width.value();
 }
 
 
 void CSdlSizeObject::SetWidth(const QVariant& v)
 {
 
-	width = v.value<double>();
+	CSdlSize::width = v.value<double>();
 	widthChanged();
 }
 
 
 bool CSdlSizeObject::hasWidth()
 {
-	 return width.HasValue();
+	 return CSdlSize::width.HasValue();
 }
 
 
 QVariant CSdlSizeObject::GetHeight()
 {
-	return height.value();
+	return CSdlSize::height.value();
 }
 
 
 void CSdlSizeObject::SetHeight(const QVariant& v)
 {
 
-	height = v.value<double>();
+	CSdlSize::height = v.value<double>();
 	heightChanged();
 }
 
 
 bool CSdlSizeObject::hasHeight()
 {
-	 return height.HasValue();
+	 return CSdlSize::height.HasValue();
 }
 
 
@@ -4961,41 +4961,41 @@ CSdlPointObject::CSdlPointObject(QObject* parent): ::imtbase::CItemModelBase(par
 
 QVariant CSdlPointObject::GetX()
 {
-	return x.value();
+	return CSdlPoint::x.value();
 }
 
 
 void CSdlPointObject::SetX(const QVariant& v)
 {
 
-	x = v.value<double>();
+	CSdlPoint::x = v.value<double>();
 	xChanged();
 }
 
 
 bool CSdlPointObject::hasX()
 {
-	 return x.HasValue();
+	 return CSdlPoint::x.HasValue();
 }
 
 
 QVariant CSdlPointObject::GetY()
 {
-	return y.value();
+	return CSdlPoint::y.value();
 }
 
 
 void CSdlPointObject::SetY(const QVariant& v)
 {
 
-	y = v.value<double>();
+	CSdlPoint::y = v.value<double>();
 	yChanged();
 }
 
 
 bool CSdlPointObject::hasY()
 {
-	 return y.HasValue();
+	 return CSdlPoint::y.HasValue();
 }
 
 
@@ -5186,281 +5186,281 @@ CParamTypeIdsObject::CParamTypeIdsObject(QObject* parent): ::imtbase::CItemModel
 
 QVariant CParamTypeIdsObject::GetUrlParam()
 {
-	return UrlParam.value();
+	return CParamTypeIds::UrlParam.value();
 }
 
 
 void CParamTypeIdsObject::SetUrlParam(const QVariant& v)
 {
 
-	UrlParam = v.value<QString>().toUtf8();
+	CParamTypeIds::UrlParam = v.value<QString>().toUtf8();
 	urlParamChanged();
 }
 
 
 bool CParamTypeIdsObject::hasUrlParam()
 {
-	 return UrlParam.HasValue();
+	 return CParamTypeIds::UrlParam.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetIdParam()
 {
-	return IdParam.value();
+	return CParamTypeIds::IdParam.value();
 }
 
 
 void CParamTypeIdsObject::SetIdParam(const QVariant& v)
 {
 
-	IdParam = v.value<QString>().toUtf8();
+	CParamTypeIds::IdParam = v.value<QString>().toUtf8();
 	idParamChanged();
 }
 
 
 bool CParamTypeIdsObject::hasIdParam()
 {
-	 return IdParam.HasValue();
+	 return CParamTypeIds::IdParam.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetTextParam()
 {
-	return TextParam.value();
+	return CParamTypeIds::TextParam.value();
 }
 
 
 void CParamTypeIdsObject::SetTextParam(const QVariant& v)
 {
 
-	TextParam = v.value<QString>().toUtf8();
+	CParamTypeIds::TextParam = v.value<QString>().toUtf8();
 	textParamChanged();
 }
 
 
 bool CParamTypeIdsObject::hasTextParam()
 {
-	 return TextParam.HasValue();
+	 return CParamTypeIds::TextParam.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetTextView()
 {
-	return TextView.value();
+	return CParamTypeIds::TextView.value();
 }
 
 
 void CParamTypeIdsObject::SetTextView(const QVariant& v)
 {
 
-	TextView = v.value<QString>().toUtf8();
+	CParamTypeIds::TextView = v.value<QString>().toUtf8();
 	textViewChanged();
 }
 
 
 bool CParamTypeIdsObject::hasTextView()
 {
-	 return TextView.HasValue();
+	 return CParamTypeIds::TextView.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetSelectionParam()
 {
-	return SelectionParam.value();
+	return CParamTypeIds::SelectionParam.value();
 }
 
 
 void CParamTypeIdsObject::SetSelectionParam(const QVariant& v)
 {
 
-	SelectionParam = v.value<QString>().toUtf8();
+	CParamTypeIds::SelectionParam = v.value<QString>().toUtf8();
 	selectionParamChanged();
 }
 
 
 bool CParamTypeIdsObject::hasSelectionParam()
 {
-	 return SelectionParam.HasValue();
+	 return CParamTypeIds::SelectionParam.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetSchedulerParam()
 {
-	return SchedulerParam.value();
+	return CParamTypeIds::SchedulerParam.value();
 }
 
 
 void CParamTypeIdsObject::SetSchedulerParam(const QVariant& v)
 {
 
-	SchedulerParam = v.value<QString>().toUtf8();
+	CParamTypeIds::SchedulerParam = v.value<QString>().toUtf8();
 	schedulerParamChanged();
 }
 
 
 bool CParamTypeIdsObject::hasSchedulerParam()
 {
-	 return SchedulerParam.HasValue();
+	 return CParamTypeIds::SchedulerParam.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetBackupSettings()
 {
-	return BackupSettings.value();
+	return CParamTypeIds::BackupSettings.value();
 }
 
 
 void CParamTypeIdsObject::SetBackupSettings(const QVariant& v)
 {
 
-	BackupSettings = v.value<QString>().toUtf8();
+	CParamTypeIds::BackupSettings = v.value<QString>().toUtf8();
 	backupSettingsChanged();
 }
 
 
 bool CParamTypeIdsObject::hasBackupSettings()
 {
-	 return BackupSettings.HasValue();
+	 return CParamTypeIds::BackupSettings.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetDatabaseAccessSettings()
 {
-	return DatabaseAccessSettings.value();
+	return CParamTypeIds::DatabaseAccessSettings.value();
 }
 
 
 void CParamTypeIdsObject::SetDatabaseAccessSettings(const QVariant& v)
 {
 
-	DatabaseAccessSettings = v.value<QString>().toUtf8();
+	CParamTypeIds::DatabaseAccessSettings = v.value<QString>().toUtf8();
 	databaseAccessSettingsChanged();
 }
 
 
 bool CParamTypeIdsObject::hasDatabaseAccessSettings()
 {
-	 return DatabaseAccessSettings.HasValue();
+	 return CParamTypeIds::DatabaseAccessSettings.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetParamsSet()
 {
-	return ParamsSet.value();
+	return CParamTypeIds::ParamsSet.value();
 }
 
 
 void CParamTypeIdsObject::SetParamsSet(const QVariant& v)
 {
 
-	ParamsSet = v.value<QString>().toUtf8();
+	CParamTypeIds::ParamsSet = v.value<QString>().toUtf8();
 	paramsSetChanged();
 }
 
 
 bool CParamTypeIdsObject::hasParamsSet()
 {
-	 return ParamsSet.HasValue();
+	 return CParamTypeIds::ParamsSet.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetFileNameParam()
 {
-	return FileNameParam.value();
+	return CParamTypeIds::FileNameParam.value();
 }
 
 
 void CParamTypeIdsObject::SetFileNameParam(const QVariant& v)
 {
 
-	FileNameParam = v.value<QString>().toUtf8();
+	CParamTypeIds::FileNameParam = v.value<QString>().toUtf8();
 	fileNameParamChanged();
 }
 
 
 bool CParamTypeIdsObject::hasFileNameParam()
 {
-	 return FileNameParam.HasValue();
+	 return CParamTypeIds::FileNameParam.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetIntegerParam()
 {
-	return IntegerParam.value();
+	return CParamTypeIds::IntegerParam.value();
 }
 
 
 void CParamTypeIdsObject::SetIntegerParam(const QVariant& v)
 {
 
-	IntegerParam = v.value<QString>().toUtf8();
+	CParamTypeIds::IntegerParam = v.value<QString>().toUtf8();
 	integerParamChanged();
 }
 
 
 bool CParamTypeIdsObject::hasIntegerParam()
 {
-	 return IntegerParam.HasValue();
+	 return CParamTypeIds::IntegerParam.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetDoubleParam()
 {
-	return DoubleParam.value();
+	return CParamTypeIds::DoubleParam.value();
 }
 
 
 void CParamTypeIdsObject::SetDoubleParam(const QVariant& v)
 {
 
-	DoubleParam = v.value<QString>().toUtf8();
+	CParamTypeIds::DoubleParam = v.value<QString>().toUtf8();
 	doubleParamChanged();
 }
 
 
 bool CParamTypeIdsObject::hasDoubleParam()
 {
-	 return DoubleParam.HasValue();
+	 return CParamTypeIds::DoubleParam.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetPasswordParam()
 {
-	return PasswordParam.value();
+	return CParamTypeIds::PasswordParam.value();
 }
 
 
 void CParamTypeIdsObject::SetPasswordParam(const QVariant& v)
 {
 
-	PasswordParam = v.value<QString>().toUtf8();
+	CParamTypeIds::PasswordParam = v.value<QString>().toUtf8();
 	passwordParamChanged();
 }
 
 
 bool CParamTypeIdsObject::hasPasswordParam()
 {
-	 return PasswordParam.HasValue();
+	 return CParamTypeIds::PasswordParam.HasValue();
 }
 
 
 QVariant CParamTypeIdsObject::GetEnableableParam()
 {
-	return EnableableParam.value();
+	return CParamTypeIds::EnableableParam.value();
 }
 
 
 void CParamTypeIdsObject::SetEnableableParam(const QVariant& v)
 {
 
-	EnableableParam = v.value<QString>().toUtf8();
+	CParamTypeIds::EnableableParam = v.value<QString>().toUtf8();
 	enableableParamChanged();
 }
 
 
 bool CParamTypeIdsObject::hasEnableableParam()
 {
-	 return EnableableParam.HasValue();
+	 return CParamTypeIds::EnableableParam.HasValue();
 }
 
 
@@ -5713,81 +5713,81 @@ CUrlParamObject::CUrlParamObject(QObject* parent): ::imtbase::CItemModelBase(par
 
 QVariant CUrlParamObject::GetScheme()
 {
-	return scheme.value();
+	return CUrlParam::scheme.value();
 }
 
 
 void CUrlParamObject::SetScheme(const QVariant& v)
 {
 
-	scheme = v.value<QString>();
+	CUrlParam::scheme = v.value<QString>();
 	schemeChanged();
 }
 
 
 bool CUrlParamObject::hasScheme()
 {
-	 return scheme.HasValue();
+	 return CUrlParam::scheme.HasValue();
 }
 
 
 QVariant CUrlParamObject::GetHost()
 {
-	return host.value();
+	return CUrlParam::host.value();
 }
 
 
 void CUrlParamObject::SetHost(const QVariant& v)
 {
 
-	host = v.value<QString>();
+	CUrlParam::host = v.value<QString>();
 	hostChanged();
 }
 
 
 bool CUrlParamObject::hasHost()
 {
-	 return host.HasValue();
+	 return CUrlParam::host.HasValue();
 }
 
 
 QVariant CUrlParamObject::GetPort()
 {
-	return port.value();
+	return CUrlParam::port.value();
 }
 
 
 void CUrlParamObject::SetPort(const QVariant& v)
 {
 
-	port = v.value<int>();
+	CUrlParam::port = v.value<int>();
 	portChanged();
 }
 
 
 bool CUrlParamObject::hasPort()
 {
-	 return port.HasValue();
+	 return CUrlParam::port.HasValue();
 }
 
 
 QVariant CUrlParamObject::GetPath()
 {
-	return path.value();
+	return CUrlParam::path.value();
 }
 
 
 void CUrlParamObject::SetPath(const QVariant& v)
 {
 
-	path = v.value<QString>();
+	CUrlParam::path = v.value<QString>();
 	pathChanged();
 }
 
 
 bool CUrlParamObject::hasPath()
 {
-	 return path.HasValue();
+	 return CUrlParam::path.HasValue();
 }
 
 
@@ -5977,21 +5977,21 @@ CIdParamObject::CIdParamObject(QObject* parent): ::imtbase::CItemModelBase(paren
 
 QVariant CIdParamObject::GetId()
 {
-	return id.value();
+	return CIdParam::id.value();
 }
 
 
 void CIdParamObject::SetId(const QVariant& v)
 {
 
-	id = v.value<QString>().toUtf8();
+	CIdParam::id = v.value<QString>().toUtf8();
 	idChanged();
 }
 
 
 bool CIdParamObject::hasId()
 {
-	 return id.HasValue();
+	 return CIdParam::id.HasValue();
 }
 
 
@@ -6163,21 +6163,21 @@ CTextParamObject::CTextParamObject(QObject* parent): ::imtbase::CItemModelBase(p
 
 QVariant CTextParamObject::GetText()
 {
-	return text.value();
+	return CTextParam::text.value();
 }
 
 
 void CTextParamObject::SetText(const QVariant& v)
 {
 
-	text = v.value<QString>();
+	CTextParam::text = v.value<QString>();
 	textChanged();
 }
 
 
 bool CTextParamObject::hasText()
 {
-	 return text.HasValue();
+	 return CTextParam::text.HasValue();
 }
 
 
@@ -6349,21 +6349,21 @@ CEnableableParamObject::CEnableableParamObject(QObject* parent): ::imtbase::CIte
 
 QVariant CEnableableParamObject::GetValue()
 {
-	return value.value();
+	return CEnableableParam::value.value();
 }
 
 
 void CEnableableParamObject::SetValue(const QVariant& v)
 {
 
-	value = v.value<bool>();
+	CEnableableParam::value = v.value<bool>();
 	valueChanged();
 }
 
 
 bool CEnableableParamObject::hasValue()
 {
-	 return value.HasValue();
+	 return CEnableableParam::value.HasValue();
 }
 
 
@@ -6535,21 +6535,21 @@ CIntegerParamObject::CIntegerParamObject(QObject* parent): ::imtbase::CItemModel
 
 QVariant CIntegerParamObject::GetValue()
 {
-	return value.value();
+	return CIntegerParam::value.value();
 }
 
 
 void CIntegerParamObject::SetValue(const QVariant& v)
 {
 
-	value = v.value<int>();
+	CIntegerParam::value = v.value<int>();
 	valueChanged();
 }
 
 
 bool CIntegerParamObject::hasValue()
 {
-	 return value.HasValue();
+	 return CIntegerParam::value.HasValue();
 }
 
 
@@ -6721,21 +6721,21 @@ CDoubleParamObject::CDoubleParamObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CDoubleParamObject::GetValue()
 {
-	return value.value();
+	return CDoubleParam::value.value();
 }
 
 
 void CDoubleParamObject::SetValue(const QVariant& v)
 {
 
-	value = v.value<double>();
+	CDoubleParam::value = v.value<double>();
 	valueChanged();
 }
 
 
 bool CDoubleParamObject::hasValue()
 {
-	 return value.HasValue();
+	 return CDoubleParam::value.HasValue();
 }
 
 
@@ -6910,81 +6910,81 @@ COptionObject::COptionObject(QObject* parent): ::imtbase::CItemModelBase(parent)
 
 QVariant COptionObject::GetId()
 {
-	return id.value();
+	return COption::id.value();
 }
 
 
 void COptionObject::SetId(const QVariant& v)
 {
 
-	id = v.value<QString>().toUtf8();
+	COption::id = v.value<QString>().toUtf8();
 	idChanged();
 }
 
 
 bool COptionObject::hasId()
 {
-	 return id.HasValue();
+	 return COption::id.HasValue();
 }
 
 
 QVariant COptionObject::GetName()
 {
-	return name.value();
+	return COption::name.value();
 }
 
 
 void COptionObject::SetName(const QVariant& v)
 {
 
-	name = v.value<QString>();
+	COption::name = v.value<QString>();
 	nameChanged();
 }
 
 
 bool COptionObject::hasName()
 {
-	 return name.HasValue();
+	 return COption::name.HasValue();
 }
 
 
 QVariant COptionObject::GetDescription()
 {
-	return description.value();
+	return COption::description.value();
 }
 
 
 void COptionObject::SetDescription(const QVariant& v)
 {
 
-	description = v.value<QString>();
+	COption::description = v.value<QString>();
 	descriptionChanged();
 }
 
 
 bool COptionObject::hasDescription()
 {
-	 return description.HasValue();
+	 return COption::description.HasValue();
 }
 
 
 QVariant COptionObject::GetEnabled()
 {
-	return enabled.value();
+	return COption::enabled.value();
 }
 
 
 void COptionObject::SetEnabled(const QVariant& v)
 {
 
-	enabled = v.value<bool>();
+	COption::enabled = v.value<bool>();
 	enabledChanged();
 }
 
 
 bool COptionObject::hasEnabled()
 {
-	 return enabled.HasValue();
+	 return COption::enabled.HasValue();
 }
 
 
@@ -7176,41 +7176,41 @@ COptionsListObject::COptionsListObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant COptionsListObject::GetTotalCount()
 {
-	return totalCount.value();
+	return COptionsList::totalCount.value();
 }
 
 
 void COptionsListObject::SetTotalCount(const QVariant& v)
 {
 
-	totalCount = v.value<int>();
+	COptionsList::totalCount = v.value<int>();
 	totalCountChanged();
 }
 
 
 bool COptionsListObject::hasTotalCount()
 {
-	 return totalCount.HasValue();
+	 return COptionsList::totalCount.HasValue();
 }
 
 
 QVariant COptionsListObject::GetOffset()
 {
-	return offset.value();
+	return COptionsList::offset.value();
 }
 
 
 void COptionsListObject::SetOffset(const QVariant& v)
 {
 
-	offset = v.value<int>();
+	COptionsList::offset = v.value<int>();
 	offsetChanged();
 }
 
 
 bool COptionsListObject::hasOffset()
 {
-	 return offset.HasValue();
+	 return COptionsList::offset.HasValue();
 }
 
 
@@ -7233,7 +7233,7 @@ void COptionsListObject::SetOptions(const QVariant& v)
 		if (itemPtr != nullptr)  COptionsList::options = itemPtr->Version_1_0;
 	}
 	else {
-		options = nullptr;
+		COptionsList::options = nullptr;
 	}
 	m_optionsQObjectPtr = v;
 
@@ -7243,14 +7243,14 @@ void COptionsListObject::SetOptions(const QVariant& v)
 
 bool COptionsListObject::hasOptions()
 {
-	 return options.HasValue();
+	 return COptionsList::options.HasValue();
 }
 
 
 void COptionsListObject::emplaceOptions()
 {
 	ResetOptions();
-	options.emplace();
+	COptionsList::options.emplace();
 }
 
 
@@ -7455,21 +7455,21 @@ CSelectionParamObject::CSelectionParamObject(QObject* parent): ::imtbase::CItemM
 
 QVariant CSelectionParamObject::GetSelectedIndex()
 {
-	return selectedIndex.value();
+	return CSelectionParam::selectedIndex.value();
 }
 
 
 void CSelectionParamObject::SetSelectedIndex(const QVariant& v)
 {
 
-	selectedIndex = v.value<int>();
+	CSelectionParam::selectedIndex = v.value<int>();
 	selectedIndexChanged();
 }
 
 
 bool CSelectionParamObject::hasSelectedIndex()
 {
-	 return selectedIndex.HasValue();
+	 return CSelectionParam::selectedIndex.HasValue();
 }
 
 
@@ -7492,7 +7492,7 @@ void CSelectionParamObject::SetConstraints(const QVariant& v)
 		if (itemPtr != nullptr)  CSelectionParam::constraints = itemPtr->Version_1_0;
 	}
 	else {
-		constraints = nullptr;
+		CSelectionParam::constraints = nullptr;
 	}
 	m_constraintsQObjectPtr = v;
 
@@ -7502,14 +7502,14 @@ void CSelectionParamObject::SetConstraints(const QVariant& v)
 
 bool CSelectionParamObject::hasConstraints()
 {
-	 return constraints.HasValue();
+	 return CSelectionParam::constraints.HasValue();
 }
 
 
 void CSelectionParamObject::emplaceConstraints()
 {
 	ResetConstraints();
-	constraints.emplace();
+	CSelectionParam::constraints.emplace();
 }
 
 
@@ -7701,41 +7701,41 @@ CSchedulerParamObject::CSchedulerParamObject(QObject* parent): ::imtbase::CItemM
 
 QVariant CSchedulerParamObject::GetStartTime()
 {
-	return startTime.value();
+	return CSchedulerParam::startTime.value();
 }
 
 
 void CSchedulerParamObject::SetStartTime(const QVariant& v)
 {
 
-	startTime = v.value<QString>();
+	CSchedulerParam::startTime = v.value<QString>();
 	startTimeChanged();
 }
 
 
 bool CSchedulerParamObject::hasStartTime()
 {
-	 return startTime.HasValue();
+	 return CSchedulerParam::startTime.HasValue();
 }
 
 
 QVariant CSchedulerParamObject::GetInterval()
 {
-	return interval.value();
+	return CSchedulerParam::interval.value();
 }
 
 
 void CSchedulerParamObject::SetInterval(const QVariant& v)
 {
 
-	interval = v.value<int>();
+	CSchedulerParam::interval = v.value<int>();
 	intervalChanged();
 }
 
 
 bool CSchedulerParamObject::hasInterval()
 {
-	 return interval.HasValue();
+	 return CSchedulerParam::interval.HasValue();
 }
 
 
@@ -7931,7 +7931,7 @@ void CBackupSettingsObject::SetSchedulerParam(const QVariant& v)
 		if (itemPtr != nullptr)  CBackupSettings::schedulerParam = itemPtr->Version_1_0;
 	}
 	else {
-		schedulerParam = nullptr;
+		CBackupSettings::schedulerParam = nullptr;
 	}
 	m_schedulerParamQObjectPtr = v;
 
@@ -7941,14 +7941,14 @@ void CBackupSettingsObject::SetSchedulerParam(const QVariant& v)
 
 bool CBackupSettingsObject::hasSchedulerParam()
 {
-	 return schedulerParam.HasValue();
+	 return CBackupSettings::schedulerParam.HasValue();
 }
 
 
 void CBackupSettingsObject::emplaceSchedulerParam()
 {
 	ResetSchedulerParam();
-	schedulerParam.emplace();
+	CBackupSettings::schedulerParam.emplace();
 }
 
 
@@ -7964,21 +7964,21 @@ void CBackupSettingsObject::ResetSchedulerParam()
 
 QVariant CBackupSettingsObject::GetFolderPath()
 {
-	return folderPath.value();
+	return CBackupSettings::folderPath.value();
 }
 
 
 void CBackupSettingsObject::SetFolderPath(const QVariant& v)
 {
 
-	folderPath = v.value<QString>();
+	CBackupSettings::folderPath = v.value<QString>();
 	folderPathChanged();
 }
 
 
 bool CBackupSettingsObject::hasFolderPath()
 {
-	 return folderPath.HasValue();
+	 return CBackupSettings::folderPath.HasValue();
 }
 
 
@@ -8164,121 +8164,121 @@ CDatabaseAccessSettingsObject::CDatabaseAccessSettingsObject(QObject* parent): :
 
 QVariant CDatabaseAccessSettingsObject::GetDbName()
 {
-	return dbName.value();
+	return CDatabaseAccessSettings::dbName.value();
 }
 
 
 void CDatabaseAccessSettingsObject::SetDbName(const QVariant& v)
 {
 
-	dbName = v.value<QString>();
+	CDatabaseAccessSettings::dbName = v.value<QString>();
 	dbNameChanged();
 }
 
 
 bool CDatabaseAccessSettingsObject::hasDbName()
 {
-	 return dbName.HasValue();
+	 return CDatabaseAccessSettings::dbName.HasValue();
 }
 
 
 QVariant CDatabaseAccessSettingsObject::GetHost()
 {
-	return host.value();
+	return CDatabaseAccessSettings::host.value();
 }
 
 
 void CDatabaseAccessSettingsObject::SetHost(const QVariant& v)
 {
 
-	host = v.value<QString>();
+	CDatabaseAccessSettings::host = v.value<QString>();
 	hostChanged();
 }
 
 
 bool CDatabaseAccessSettingsObject::hasHost()
 {
-	 return host.HasValue();
+	 return CDatabaseAccessSettings::host.HasValue();
 }
 
 
 QVariant CDatabaseAccessSettingsObject::GetPort()
 {
-	return port.value();
+	return CDatabaseAccessSettings::port.value();
 }
 
 
 void CDatabaseAccessSettingsObject::SetPort(const QVariant& v)
 {
 
-	port = v.value<int>();
+	CDatabaseAccessSettings::port = v.value<int>();
 	portChanged();
 }
 
 
 bool CDatabaseAccessSettingsObject::hasPort()
 {
-	 return port.HasValue();
+	 return CDatabaseAccessSettings::port.HasValue();
 }
 
 
 QVariant CDatabaseAccessSettingsObject::GetDbPath()
 {
-	return dbPath.value();
+	return CDatabaseAccessSettings::dbPath.value();
 }
 
 
 void CDatabaseAccessSettingsObject::SetDbPath(const QVariant& v)
 {
 
-	dbPath = v.value<QString>();
+	CDatabaseAccessSettings::dbPath = v.value<QString>();
 	dbPathChanged();
 }
 
 
 bool CDatabaseAccessSettingsObject::hasDbPath()
 {
-	 return dbPath.HasValue();
+	 return CDatabaseAccessSettings::dbPath.HasValue();
 }
 
 
 QVariant CDatabaseAccessSettingsObject::GetUsername()
 {
-	return username.value();
+	return CDatabaseAccessSettings::username.value();
 }
 
 
 void CDatabaseAccessSettingsObject::SetUsername(const QVariant& v)
 {
 
-	username = v.value<QString>();
+	CDatabaseAccessSettings::username = v.value<QString>();
 	usernameChanged();
 }
 
 
 bool CDatabaseAccessSettingsObject::hasUsername()
 {
-	 return username.HasValue();
+	 return CDatabaseAccessSettings::username.HasValue();
 }
 
 
 QVariant CDatabaseAccessSettingsObject::GetPassword()
 {
-	return password.value();
+	return CDatabaseAccessSettings::password.value();
 }
 
 
 void CDatabaseAccessSettingsObject::SetPassword(const QVariant& v)
 {
 
-	password = v.value<QString>();
+	CDatabaseAccessSettings::password = v.value<QString>();
 	passwordChanged();
 }
 
 
 bool CDatabaseAccessSettingsObject::hasPassword()
 {
-	 return password.HasValue();
+	 return CDatabaseAccessSettings::password.HasValue();
 }
 
 
@@ -8481,41 +8481,41 @@ CFileNameParamObject::CFileNameParamObject(QObject* parent): ::imtbase::CItemMod
 
 QVariant CFileNameParamObject::GetPathType()
 {
-	return pathType.value();
+	return CFileNameParam::pathType.value();
 }
 
 
 void CFileNameParamObject::SetPathType(const QVariant& v)
 {
 
-	pathType = v.value<int>();
+	CFileNameParam::pathType = v.value<int>();
 	pathTypeChanged();
 }
 
 
 bool CFileNameParamObject::hasPathType()
 {
-	 return pathType.HasValue();
+	 return CFileNameParam::pathType.HasValue();
 }
 
 
 QVariant CFileNameParamObject::GetPath()
 {
-	return path.value();
+	return CFileNameParam::path.value();
 }
 
 
 void CFileNameParamObject::SetPath(const QVariant& v)
 {
 
-	path = v.value<QString>();
+	CFileNameParam::path = v.value<QString>();
 	pathChanged();
 }
 
 
 bool CFileNameParamObject::hasPath()
 {
-	 return path.HasValue();
+	 return CFileNameParam::path.HasValue();
 }
 
 
@@ -8698,7 +8698,7 @@ CParamsSetObject::CParamsSetObject(QObject* parent): ::imtbase::CItemModelBase(p
 QVariant CParamsSetObject::GetParamIds()
 {
 	QList<QString> tempParamIdsList;
-	for (const auto& tempValue: paramIds.value()){
+	for (const auto& tempValue: CParamsSet::paramIds.value()){
 		tempParamIdsList << *tempValue;
 	}
 	return QVariant::fromValue(tempParamIdsList);
@@ -8708,15 +8708,15 @@ QVariant CParamsSetObject::GetParamIds()
 void CParamsSetObject::SetParamIds(const QVariant& v)
 {
 
-	if (!paramIds){
-		paramIds.emplace();
+	if (!CParamsSet::paramIds){
+		CParamsSet::paramIds.emplace();
 	}
 	else{
-		paramIds->clear();
+		CParamsSet::paramIds->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QByteArray> value(tempValue.toUtf8());
-		paramIds->append(value);
+		CParamsSet::paramIds->append(value);
 	}
 
 	paramIdsChanged();
@@ -8725,14 +8725,14 @@ void CParamsSetObject::SetParamIds(const QVariant& v)
 
 bool CParamsSetObject::hasParamIds()
 {
-	 return paramIds.HasValue();
+	 return CParamsSet::paramIds.HasValue();
 }
 
 
 QVariant CParamsSetObject::GetParamTypeIds()
 {
 	QList<QString> tempParamTypeIdsList;
-	for (const auto& tempValue: paramTypeIds.value()){
+	for (const auto& tempValue: CParamsSet::paramTypeIds.value()){
 		tempParamTypeIdsList << *tempValue;
 	}
 	return QVariant::fromValue(tempParamTypeIdsList);
@@ -8742,15 +8742,15 @@ QVariant CParamsSetObject::GetParamTypeIds()
 void CParamsSetObject::SetParamTypeIds(const QVariant& v)
 {
 
-	if (!paramTypeIds){
-		paramTypeIds.emplace();
+	if (!CParamsSet::paramTypeIds){
+		CParamsSet::paramTypeIds.emplace();
 	}
 	else{
-		paramTypeIds->clear();
+		CParamsSet::paramTypeIds->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QByteArray> value(tempValue.toUtf8());
-		paramTypeIds->append(value);
+		CParamsSet::paramTypeIds->append(value);
 	}
 
 	paramTypeIdsChanged();
@@ -8759,14 +8759,14 @@ void CParamsSetObject::SetParamTypeIds(const QVariant& v)
 
 bool CParamsSetObject::hasParamTypeIds()
 {
-	 return paramTypeIds.HasValue();
+	 return CParamsSet::paramTypeIds.HasValue();
 }
 
 
 QVariant CParamsSetObject::GetParamNames()
 {
 	QList<QString> tempParamNamesList;
-	for (const auto& tempValue: paramNames.value()){
+	for (const auto& tempValue: CParamsSet::paramNames.value()){
 		tempParamNamesList << *tempValue;
 	}
 	return QVariant::fromValue(tempParamNamesList);
@@ -8776,15 +8776,15 @@ QVariant CParamsSetObject::GetParamNames()
 void CParamsSetObject::SetParamNames(const QVariant& v)
 {
 
-	if (!paramNames){
-		paramNames.emplace();
+	if (!CParamsSet::paramNames){
+		CParamsSet::paramNames.emplace();
 	}
 	else{
-		paramNames->clear();
+		CParamsSet::paramNames->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QString> value(tempValue);
-		paramNames->append(value);
+		CParamsSet::paramNames->append(value);
 	}
 
 	paramNamesChanged();
@@ -8793,14 +8793,14 @@ void CParamsSetObject::SetParamNames(const QVariant& v)
 
 bool CParamsSetObject::hasParamNames()
 {
-	 return paramNames.HasValue();
+	 return CParamsSet::paramNames.HasValue();
 }
 
 
 QVariant CParamsSetObject::GetParamDescriptions()
 {
 	QList<QString> tempParamDescriptionsList;
-	for (const auto& tempValue: paramDescriptions.value()){
+	for (const auto& tempValue: CParamsSet::paramDescriptions.value()){
 		tempParamDescriptionsList << *tempValue;
 	}
 	return QVariant::fromValue(tempParamDescriptionsList);
@@ -8810,15 +8810,15 @@ QVariant CParamsSetObject::GetParamDescriptions()
 void CParamsSetObject::SetParamDescriptions(const QVariant& v)
 {
 
-	if (!paramDescriptions){
-		paramDescriptions.emplace();
+	if (!CParamsSet::paramDescriptions){
+		CParamsSet::paramDescriptions.emplace();
 	}
 	else{
-		paramDescriptions->clear();
+		CParamsSet::paramDescriptions->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QString> value(tempValue);
-		paramDescriptions->append(value);
+		CParamsSet::paramDescriptions->append(value);
 	}
 
 	paramDescriptionsChanged();
@@ -8827,14 +8827,14 @@ void CParamsSetObject::SetParamDescriptions(const QVariant& v)
 
 bool CParamsSetObject::hasParamDescriptions()
 {
-	 return paramDescriptions.HasValue();
+	 return CParamsSet::paramDescriptions.HasValue();
 }
 
 
 QVariant CParamsSetObject::GetParameters()
 {
 	QList<QString> tempParametersList;
-	for (const auto& tempValue: parameters.value()){
+	for (const auto& tempValue: CParamsSet::parameters.value()){
 		tempParametersList << *tempValue;
 	}
 	return QVariant::fromValue(tempParametersList);
@@ -8844,15 +8844,15 @@ QVariant CParamsSetObject::GetParameters()
 void CParamsSetObject::SetParameters(const QVariant& v)
 {
 
-	if (!parameters){
-		parameters.emplace();
+	if (!CParamsSet::parameters){
+		CParamsSet::parameters.emplace();
 	}
 	else{
-		parameters->clear();
+		CParamsSet::parameters->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QString> value(tempValue);
-		parameters->append(value);
+		CParamsSet::parameters->append(value);
 	}
 
 	parametersChanged();
@@ -8861,7 +8861,7 @@ void CParamsSetObject::SetParameters(const QVariant& v)
 
 bool CParamsSetObject::hasParameters()
 {
-	 return parameters.HasValue();
+	 return CParamsSet::parameters.HasValue();
 }
 
 
@@ -9061,28 +9061,28 @@ CMimeTypeObject::CMimeTypeObject(QObject* parent): ::imtbase::CItemModelBase(par
 
 QVariant CMimeTypeObject::GetType()
 {
-	return type.value();
+	return CMimeType::type.value();
 }
 
 
 void CMimeTypeObject::SetType(const QVariant& v)
 {
 
-	type = v.value<QString>();
+	CMimeType::type = v.value<QString>();
 	typeChanged();
 }
 
 
 bool CMimeTypeObject::hasType()
 {
-	 return type.HasValue();
+	 return CMimeType::type.HasValue();
 }
 
 
 QVariant CMimeTypeObject::GetTree()
 {
 	QList<QString> tempTreeList;
-	for (const auto& tempValue: tree.value()){
+	for (const auto& tempValue: CMimeType::tree.value()){
 		tempTreeList << *tempValue;
 	}
 	return QVariant::fromValue(tempTreeList);
@@ -9092,15 +9092,15 @@ QVariant CMimeTypeObject::GetTree()
 void CMimeTypeObject::SetTree(const QVariant& v)
 {
 
-	if (!tree){
-		tree.emplace();
+	if (!CMimeType::tree){
+		CMimeType::tree.emplace();
 	}
 	else{
-		tree->clear();
+		CMimeType::tree->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QString> value(tempValue);
-		tree->append(value);
+		CMimeType::tree->append(value);
 	}
 
 	treeChanged();
@@ -9109,54 +9109,54 @@ void CMimeTypeObject::SetTree(const QVariant& v)
 
 bool CMimeTypeObject::hasTree()
 {
-	 return tree.HasValue();
+	 return CMimeType::tree.HasValue();
 }
 
 
 QVariant CMimeTypeObject::GetSubType()
 {
-	return subType.value();
+	return CMimeType::subType.value();
 }
 
 
 void CMimeTypeObject::SetSubType(const QVariant& v)
 {
 
-	subType = v.value<QString>();
+	CMimeType::subType = v.value<QString>();
 	subTypeChanged();
 }
 
 
 bool CMimeTypeObject::hasSubType()
 {
-	 return subType.HasValue();
+	 return CMimeType::subType.HasValue();
 }
 
 
 QVariant CMimeTypeObject::GetSuffix()
 {
-	return suffix.value();
+	return CMimeType::suffix.value();
 }
 
 
 void CMimeTypeObject::SetSuffix(const QVariant& v)
 {
 
-	suffix = v.value<QString>();
+	CMimeType::suffix = v.value<QString>();
 	suffixChanged();
 }
 
 
 bool CMimeTypeObject::hasSuffix()
 {
-	 return suffix.HasValue();
+	 return CMimeType::suffix.HasValue();
 }
 
 
 QVariant CMimeTypeObject::GetParameters()
 {
 	QList<QString> tempParametersList;
-	for (const auto& tempValue: parameters.value()){
+	for (const auto& tempValue: CMimeType::parameters.value()){
 		tempParametersList << *tempValue;
 	}
 	return QVariant::fromValue(tempParametersList);
@@ -9166,15 +9166,15 @@ QVariant CMimeTypeObject::GetParameters()
 void CMimeTypeObject::SetParameters(const QVariant& v)
 {
 
-	if (!parameters){
-		parameters.emplace();
+	if (!CMimeType::parameters){
+		CMimeType::parameters.emplace();
 	}
 	else{
-		parameters->clear();
+		CMimeType::parameters->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
 		istd::TSharedNullable<QString> value(tempValue);
-		parameters->append(value);
+		CMimeType::parameters->append(value);
 	}
 
 	parametersChanged();
@@ -9183,7 +9183,7 @@ void CMimeTypeObject::SetParameters(const QVariant& v)
 
 bool CMimeTypeObject::hasParameters()
 {
-	 return parameters.HasValue();
+	 return CMimeType::parameters.HasValue();
 }
 
 
