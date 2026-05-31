@@ -287,3 +287,8 @@ ToolTip 1.0 ./Controls/ToolTip.qml
 ScrollBar 1.0 ./Controls/ScrollBar.qml
 ScrollView 1.0 ./Controls/ScrollView.qml
 Dial 1.0 ./Controls/Dial.qml
+Container 1.0 ./Controls/Container.qml
+ApplicationWindow 1.0 ./Controls/ApplicationWindow.qml
+DelayButton 1.0 ./Controls/DelayButton.qml
+Tumbler 1.0 ./Controls/Tumbler.qml
+Drawer 1.0 ./Controls/Drawer.qml

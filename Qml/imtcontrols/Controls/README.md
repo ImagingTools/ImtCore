@@ -44,6 +44,11 @@ import imtcontrols 1.0
 | [`ScrollBar`](#scrollbar)          | `ScrollBar`       | indicator       | Interactive scroll bar for a `Flickable`.          |
 | [`ScrollView`](#scrollview)         | `ScrollView`      | container       | Scrollable container with scroll bars.             |
 | [`Dial`](#dial)               | `Dial`            | input           | Circular value control.                            |
+| [`Container`](#container)          | `Container`        | base            | Item collection with a current-index selection.    |
+| [`ApplicationWindow`](#applicationwindow) | `ApplicationWindow` | window     | Window with docked header / footer.                |
+| [`DelayButton`](#delaybutton)        | `DelayButton`     | button          | Press-and-hold activation button.                  |
+| [`Tumbler`](#tumbler)            | `Tumbler`         | input           | Spinnable wheel of items.                          |
+| [`Drawer`](#drawer)             | `Drawer`          | navigation      | Edge panel that slides into view.                  |
 
 ---
 
@@ -90,6 +95,29 @@ auto-exclusive buttons that share the same parent — the mechanism behind
 `TabBar` and radio-style groups.
 
 `Switch`, `RoundButton` and `TabButton` all extend `AbstractButton`.
+
+### Container
+
+Non-visual base that collects a set of child items and exposes a
+current-item selection on top of them. It does not lay the items out itself —
+concrete containers decide how the current item is presented.
+
+| Member                  | Description                                  |
+|-------------------------|----------------------------------------------|
+| `count`                 | Number of contained items (read-only).       |
+| `currentIndex`          | Selected item index (`-1` when empty).       |
+| `currentItem`           | Item at `currentIndex` (read-only).          |
+| `itemAt(index)`         | Returns the item at `index`, or `null`.      |
+| `incrementCurrentIndex()` | Selects the next item.                     |
+| `decrementCurrentIndex()` | Selects the previous item.                 |
+
+```qml
+Container {
+    id: container
+    Item { }
+    Item { }
+}
+```
 
 ---
 
@@ -204,6 +232,26 @@ ScrollView {
 The internal `Flickable` is exposed as `flickable`; `contentWidth` /
 `contentHeight` are aliased for explicit sizing.
 
+### ApplicationWindow
+
+A `Window` that adds the conventional application layout: an optional
+`header` docked at the top, an optional `footer` docked at the bottom and the
+page content (its default children) in between. The window background is
+themed through `Style`.
+
+| Property | Type | Description                              |
+|----------|------|------------------------------------------|
+| `header` | Item | Item docked at the top (e.g. `ToolBar`). |
+| `footer` | Item | Item docked at the bottom.               |
+
+```qml
+ApplicationWindow {
+    visible: true
+    header: ToolBar { Label { text: qsTr("My App") } }
+    Page { }
+}
+```
+
 ---
 
 ## Dividers & text
@@ -289,6 +337,47 @@ Dial {
 }
 ```
 
+### DelayButton
+
+A checkable button that activates only after being held pressed for `delay`
+milliseconds. While held, `progress` fills from `0` to `1`; reaching `1`
+toggles `checked` and emits `activated()`. Releasing early drains the
+progress back to `0`, guarding against accidental activation.
+
+| Member        | Description                                       |
+|---------------|---------------------------------------------------|
+| `delay`       | Hold duration before activation, in ms (`3000`).  |
+| `progress`    | Normalised hold progress in `[0, 1]` (read-only). |
+| `activated()` | Emitted once the button has been held for `delay`.|
+
+```qml
+DelayButton {
+    text: qsTr("Hold to delete")
+    delay: 2000
+    onActivated: model.removeSelected()
+}
+```
+
+### Tumbler
+
+A vertical, scrollable wheel of items that keeps the centred item selected.
+Flick or drag the wheel to change `currentIndex`.
+
+| Member            | Description                                   |
+|-------------------|-----------------------------------------------|
+| `model`           | The model providing the items.                |
+| `currentIndex`    | Index of the centred (selected) item.         |
+| `count`           | Number of items (read-only).                  |
+| `visibleItemCount`| Number of items visible at once (`5`).        |
+| `delegate`        | Component rendering each item.                |
+
+```qml
+Tumbler {
+    model: 12
+    onCurrentIndexChanged: console.log("value:", currentIndex)
+}
+```
+
 ---
 
 ## Navigation
@@ -339,6 +428,32 @@ PageIndicator {
     currentIndex: view.currentIndex
     interactive: true
     onCurrentIndexChanged: view.currentIndex = currentIndex
+}
+```
+
+### Drawer
+
+A panel that overlays its parent and slides in from one of the four `edge`
+values. Open it with `open()` and close it with `close()`; `position`
+animates between `0` (closed) and `1` (open). When `modal` is `true` a dim
+layer covers the rest of the parent and a click on it closes the drawer.
+
+| Member       | Description                                        |
+|--------------|----------------------------------------------------|
+| `edge`       | `Qt.LeftEdge` / `RightEdge` / `TopEdge` / `BottomEdge`. |
+| `position`   | Open amount in `[0, 1]`.                            |
+| `modal`      | Whether the area behind is dimmed and blocked.     |
+| `open()` / `close()` | Show / hide the drawer.                    |
+| `opened()` / `closed()` | Emitted when fully open / closed.       |
+
+```qml
+Item {
+    Drawer {
+        id: drawer
+        edge: Qt.LeftEdge
+        Column { Label { text: qsTr("Menu") } }
+    }
+    Button { text: qsTr("Open"); onClicked: drawer.open() }
 }
 ```
 

@@ -276,6 +276,11 @@
                 <file alias="imtcontrols/Controls/ScrollBar.qml">Controls/ScrollBar.qml</file>
                 <file alias="imtcontrols/Controls/ScrollView.qml">Controls/ScrollView.qml</file>
                 <file alias="imtcontrols/Controls/Dial.qml">Controls/Dial.qml</file>
+                <file alias="imtcontrols/Controls/Container.qml">Controls/Container.qml</file>
+                <file alias="imtcontrols/Controls/ApplicationWindow.qml">Controls/ApplicationWindow.qml</file>
+                <file alias="imtcontrols/Controls/DelayButton.qml">Controls/DelayButton.qml</file>
+                <file alias="imtcontrols/Controls/Tumbler.qml">Controls/Tumbler.qml</file>
+                <file alias="imtcontrols/Controls/Drawer.qml">Controls/Drawer.qml</file>
         </qresource>
         <qresource prefix="/" />
 </RCC>
