@@ -259,6 +259,13 @@ class Item extends QtObject {
         
     }
 
+    __applyQmlIdToDOM(){
+        if(this.__DOM){
+            if(this.__qmlId !== undefined) this.__DOM.setAttribute('data-qml-id', this.__qmlId)
+            if(this.__qmlName) this.__DOM.setAttribute('data-qml-name', this.__qmlName)
+        }
+    }
+
     SLOT_objectNameChanged(oldValue, newValue){
         this.__DOM.setAttribute('objectName', newValue)
     }

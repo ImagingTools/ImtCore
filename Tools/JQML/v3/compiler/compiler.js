@@ -1621,6 +1621,7 @@ function compile(options){
             
             code.add('\n')
             if (this.children[0].id) code.add(`${this.children[0].name}.__${this.qmlFile.getContextName()}.${this.children[0].id}=${this.children[0].name}`)
+            code.add(this.children[0].getQmlIdCode(this.children[0].name))
             code.add('\n')
             code.add(properties.classCode) 
 
@@ -1687,6 +1688,31 @@ function compile(options){
             return code
         }
 
+        // Builds the deterministic, selector-safe local key for this element.
+        // Uses the author supplied QML `id:` when available (semantic, stable),
+        // otherwise a structural key from the type name and the per-file element
+        // index (`__elN`). Both inputs are deterministic per source file.
+        getQmlLocalKey() {
+            let explicit = typeof this.id === 'string' && this.id
+            let base
+            if (explicit) {
+                base = this.id
+            } else {
+                let typeName = this.className || (this.extends ? String(this.extends).split('.').pop() : '')
+                base = typeName ? typeName + '_' + this.name : this.name
+            }
+            return {
+                key: String(base).replace(/[^A-Za-z0-9_-]/g, '_'),
+                explicit: !!explicit,
+            }
+        }
+
+        // Emits the runtime call that assigns the stable DOM id to varName.
+        getQmlIdCode(varName) {
+            let info = this.getQmlLocalKey()
+            return `\n${varName}.__applyQmlId(\`${info.key}\`,${info.explicit})\n`
+        }
+
         toCode() {
             let code = new SourceNode()
             let childrenCode = new SourceNode()
@@ -1720,6 +1746,7 @@ function compile(options){
                     ${this.name}.__${this.qmlFile.getContextName()} = context
                     ${id}`)
 
+            code.add(this.getQmlIdCode(this.name))
             code.add('\n')
 
             code.add(properties.classCode)      
@@ -1885,6 +1912,7 @@ function compile(options){
                 ${this.instruction.name}.__${this.getContextName()} = __context`)
             code.add('\n')
             if (this.instruction.id) code.add(`${this.instruction.name}.__${this.getContextName()}.${this.instruction.id}=${this.instruction.name}`)
+            code.add(this.instruction.getQmlIdCode(this.instruction.name))
             code.add('\n')
             code.add(properties.classCode)
 

@@ -7,7 +7,8 @@
     "build-core": "webpack --mode production --config webpack.config.js && node ./tests/index.js",
     "build-core-dev": "webpack --mode development --config webpack.config.js",
     "compile": "node ./compiler/compiler.js",
-    "test": "node ./tests/index.js"
+    "test": "node ./tests/index.js",
+    "test-stable-id": "node ./tests/stableId.test.js"
   },
   "author": "Artur Menshikov",
   "license": "ISC",

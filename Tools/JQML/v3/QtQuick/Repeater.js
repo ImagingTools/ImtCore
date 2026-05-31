@@ -80,6 +80,8 @@ class Repeater extends Item {
 
         let properties = {}
 
+        properties.__qmlIndex = index
+
         if (Array.isArray(this.model)) {
             properties.modelData = this.model[index]
             properties.model = { index: index }
