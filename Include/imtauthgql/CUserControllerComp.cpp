@@ -37,7 +37,7 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 	sdl::V1_0::imtauth::ChangePasswordRequestArguments arguments = changePasswordRequest.GetRequestedArguments();
 	if (!arguments.input.has_value()){
 		Q_ASSERT(false);
-		return response;
+		return sdl::V1_0::imtauth::CChangePasswordPayload();
 	}
 
 	auto& inputArgument = *arguments.input;

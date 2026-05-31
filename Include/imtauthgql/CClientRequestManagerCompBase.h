@@ -54,10 +54,6 @@ protected:
 			return false;
 		}
 	
-		if (!payload.HasValue()){
-			return false;
-		}
-	
 		return true;
 	}
 

@@ -26,10 +26,6 @@ sdl::V1_0::imtauth::CTenantData CRemoteTenantCollectionDocumentServiceController
 		return response;
 	}
 
-	if (!response.HasValue()){
-		return response;
-	}
-
 	// Enrich response with allProductPermissions as tree from local IProductInfo
 	response.allProductPermissions.Emplace();
 	if (m_productInfoCompPtr.IsValid()){

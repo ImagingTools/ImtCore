@@ -406,8 +406,9 @@ bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 {
 	sdl::V1_0::imtauth::CGroupData representation;
 	
-	if (groupUpdateRequest.GetRequestedArguments().input->item){
-		representation = groupUpdateRequest.GetRequestedArguments().input->item;
+	istd::TSharedNullable<sdl::V1_0::imtauth::CGroupDataInput> input = groupUpdateRequest.GetRequestedArguments().input;
+	if (input && input->item){
+		representation = *input->item;
 	}
 
 	imtauth::CIdentifiableUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::CIdentifiableUserGroupInfo*>(&object);

@@ -174,7 +174,7 @@ bool CSimpleLoginWrapComp::LoginWithRefreshToken(const QString& userName, const 
 			return false;
 		}
 
-		if (!response || !response.ok.has_value() || !*response.ok){
+		if (!response.ok.has_value() || !*response.ok){
 			return false;
 		}
 
