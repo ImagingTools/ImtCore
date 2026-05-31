@@ -43,8 +43,8 @@ sdl::V1_0::imtdesk::CTicketData CTicketCollectionDocumentServiceComp::OnGetTicke
 
 	QByteArray objectId;
 	istd::IChangeableSharedPtr documentPtr;
-	if (arguments.input.id){
-		objectId = *arguments.input.id;
+	if (arguments.input->id){
+		objectId = *arguments.input->id;
 
 		m_documentManagerCompPtr->GetDocumentData(userId, objectId, documentPtr);
 	}
@@ -295,13 +295,13 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTicketCollectionDocumentServiceCom
 	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
 
 	QByteArray documentId;
-	if (arguments.input.documentId){
-		documentId = *arguments.input.documentId;
+	if (arguments.input->documentId){
+		documentId = *arguments.input->documentId;
 	}
 
 	sdl::V1_0::imtdesk::CTicketData ticketInfo;
-	if (arguments.input.ticket){
-		ticketInfo = *arguments.input.ticket;
+	if (arguments.input->ticket){
+		ticketInfo = *arguments.input->ticket;
 	}
 
 	QByteArray userId;

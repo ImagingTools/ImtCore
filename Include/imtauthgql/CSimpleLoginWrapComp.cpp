@@ -57,9 +57,10 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 
 	QByteArray productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	authsdl::AuthorizationRequestArguments arguments;
-	arguments.input.login = QString(userName);
-	arguments.input.password = QString(password);
-	arguments.input.productId = QByteArray(productId);
+	arguments.input.emplace();
+	arguments.input->login = QString(userName);
+	arguments.input->password = QString(password);
+	arguments.input->productId = QByteArray(productId);
 
 	imtgql::CGqlRequest gqlRequest;
 	if (authsdl::CAuthorizationGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
@@ -160,7 +161,8 @@ bool CSimpleLoginWrapComp::LoginWithRefreshToken(const QString& userName, const 
 	namespace sessionsdl = sdl::V1_0::imtauth;
 
 	sessionsdl::RefreshTokenRequestArguments arguments;
-	arguments.input.refreshToken = refreshToken;
+	arguments.input.emplace();
+	arguments.input->refreshToken = refreshToken;
 
 	imtgql::CGqlRequest gqlRequest;
 	if (sessionsdl::CRefreshTokenGqlRequest::SetupGqlRequest(gqlRequest, arguments)){

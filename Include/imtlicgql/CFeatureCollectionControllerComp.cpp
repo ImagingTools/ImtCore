@@ -345,8 +345,8 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 
 	sdl::V1_0::imtlic::GetFeatureItemRequestArguments arguments = featureItemRequest.GetRequestedArguments();
 	QByteArray id;
-	if (arguments.input.id){
-		id = *arguments.input.id;
+	if (arguments.input->id){
+		id = *arguments.input->id;
 	}
 	representationPayload.id = std::move(id);
 
@@ -377,22 +377,22 @@ bool CFeatureCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 	}
 	
 	sdl::V1_0::imtlic::UpdateFeatureRequestArguments arguments = updateFeatureRequest.GetRequestedArguments();
-	if (!arguments.input.id.has_value()){
+	if (!arguments.input->id.has_value()){
 		I_CRITICAL();
 		return false;
 	}
 	
-	if (!arguments.input.item.has_value()){
+	if (!arguments.input->item.has_value()){
 		I_CRITICAL();
 		return false;
 	}
 
-	QByteArray featureId = *arguments.input.id;
+	QByteArray featureId = *arguments.input->id;
 
 	featureInfoPtr->ResetData();
 
 	featureInfoPtr->SetObjectUuid(featureId);
-	sdl::V1_0::imtlic::CFeatureData featureData = *arguments.input.item;
+	sdl::V1_0::imtlic::CFeatureData featureData = *arguments.input->item;
 
 	bool ok = CreateFeatureFromRepresentationModel(featureData, featureId, *featureInfoPtr, errorMessage);
 	if (!ok){

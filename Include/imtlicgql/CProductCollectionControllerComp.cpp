@@ -271,8 +271,8 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::V1_0::imtlic::ProductItemRequestArguments arguments = productItemRequest.GetRequestedArguments();
 
 	QByteArray id;
-	if (arguments.input.id){
-		id = *arguments.input.id;
+	if (arguments.input->id){
+		id = *arguments.input->id;
 	}
 	representationPayload.id = QByteArray(id);
 
@@ -311,13 +311,13 @@ bool CProductCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 
 	sdl::V1_0::imtlic::ProductUpdateRequestArguments arguments = productUpdateRequest.GetRequestedArguments();
 	QByteArray objectId;
-	if (arguments.input.id){
-		objectId = *productUpdateRequest.GetRequestedArguments().input.id;
+	if (arguments.input->id){
+		objectId = *productUpdateRequest.GetRequestedArguments().input->id;
 	}
 
 	sdl::V1_0::imtlic::CProductData productData;
-	if (arguments.input.item){
-		productData = *productUpdateRequest.GetRequestedArguments().input.item;
+	if (arguments.input->item){
+		productData = *productUpdateRequest.GetRequestedArguments().input->item;
 	}
 
 	productInfoPtr->ResetData();

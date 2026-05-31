@@ -36,13 +36,13 @@ sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 	sdl::V1_0::imtauth::GetProfileRequestArguments arguments = getProfileRequest.GetRequestedArguments();
 
 	QByteArray objectId;
-	if (arguments.input.id){
-		objectId = *arguments.input.id;
+	if (arguments.input->id){
+		objectId = *arguments.input->id;
 	}
 
 	QByteArray productId;
-	if (arguments.input.productId){
-		productId = *arguments.input.productId;
+	if (arguments.input->productId){
+		productId = *arguments.input->productId;
 	}
 
 	const imtauth::IUserInfo* userInfoPtr = nullptr;
@@ -146,8 +146,8 @@ sdl::V1_0::imtauth::CGetUserOrganizationsPayload CProfileControllerComp::OnGetUs
 	sdl::V1_0::imtauth::GetUserOrganizationsRequestArguments arguments = getUserOrganizationsRequest.GetRequestedArguments();
 
 	QByteArray userId;
-	if (arguments.input.id){
-		userId = *arguments.input.id;
+	if (arguments.input->id){
+		userId = *arguments.input->id;
 	}
 
 	if (!userId.isEmpty()){
@@ -226,8 +226,8 @@ sdl::V1_0::imtauth::CSetProfileResponse CProfileControllerComp::OnSetProfile(
 
 	sdl::V1_0::imtauth::SetProfileRequestArguments arguments = setProfileRequest.GetRequestedArguments();
 	QByteArray id;
-	if (arguments.input.id){
-		id = *arguments.input.id;
+	if (arguments.input->id){
+		id = *arguments.input->id;
 	}
 
 	imtauth::IUserInfo* userInfoPtr = nullptr;
@@ -242,13 +242,13 @@ sdl::V1_0::imtauth::CSetProfileResponse CProfileControllerComp::OnSetProfile(
 	}
 
 	QString name;
-	if (arguments.input.name){
-		name = *arguments.input.name;
+	if (arguments.input->name){
+		name = *arguments.input->name;
 	}
 
 	QString email;
-	if (arguments.input.email){
-		email = *arguments.input.email;
+	if (arguments.input->email){
+		email = *arguments.input->email;
 	}
 
 	userInfoPtr->SetName(name);

@@ -177,8 +177,8 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CRoleCollectionControllerComp::On
 	sdl::V1_0::imtbase::CGetElementMetaInfoPayload response;
 	sdl::V1_0::imtbase::GetElementMetaInfoRequestArguments arguments = getElementMetaInfoRequest.GetRequestedArguments();
 	QByteArray objectId;
-	if (arguments.input.elementId){
-		objectId = *arguments.input.elementId;
+	if (arguments.input->elementId){
+		objectId = *arguments.input->elementId;
 	}
 
 	QByteArray productId = gqlRequest.GetHeader("productId");
@@ -449,8 +449,8 @@ bool CRoleCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& 
 		if (roleItemGqlRequest.IsValid()){
 			auto arguments = roleItemGqlRequest.GetRequestedArguments();
 			if (arguments.input.HasValue()){
-				if (arguments.input.id.HasValue()){
-					roleId = *arguments.input.id;
+				if (arguments.input->id.HasValue()){
+					roleId = *arguments.input->id;
 				}
 			}
 		}
@@ -477,12 +477,12 @@ bool CRoleCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::RoleUpdateRequestArguments arguments = roleUpdateRequest.GetRequestedArguments();
-	if (!arguments.input.item.has_value()){
+	if (!arguments.input->item.has_value()){
 		Q_ASSERT(false);
 		return false;
 	}
 
-	sdl::V1_0::imtauth::CRoleData roleDataRepresentation = *roleUpdateRequest.GetRequestedArguments().input.item;
+	sdl::V1_0::imtauth::CRoleData roleDataRepresentation = *roleUpdateRequest.GetRequestedArguments().input->item;
 	imtauth::CIdentifiableRoleInfo* roleInfoPtr = dynamic_cast<imtauth::CIdentifiableRoleInfo*>(&object);
 	if (roleInfoPtr == nullptr){
 		errorMessage = QString("Unable to cast role instance to identifable object. Error: Invalid object");

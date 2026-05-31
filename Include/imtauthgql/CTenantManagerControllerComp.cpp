@@ -66,8 +66,8 @@ sdl::V1_0::imtauth::CGetTenantPayload CTenantManagerControllerComp::OnGetTenant(
 
 	QByteArray tenantId;
 	sdl::V1_0::imtauth::GetTenantRequestArguments arguments = getTenantRequest.GetRequestedArguments();
-	if (arguments.input.tenantId){
-		tenantId = *arguments.input.tenantId;
+	if (arguments.input->tenantId){
+		tenantId = *arguments.input->tenantId;
 	}
 
 	imtauth::ITenantInfoUniquePtr tenantInfoPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
@@ -130,14 +130,14 @@ sdl::V1_0::imtauth::CCreateTenantPayload CTenantManagerControllerComp::OnCreateT
 	QString description;
 	QByteArray ownerId = GetUserId(gqlRequest);
 	sdl::V1_0::imtauth::CreateTenantRequestArguments arguments = createTenantRequest.GetRequestedArguments();
-	if (arguments.input.name){
-		name = *arguments.input.name;
+	if (arguments.input->name){
+		name = *arguments.input->name;
 	}
-	if (arguments.input.description){
-		description = *arguments.input.description;
+	if (arguments.input->description){
+		description = *arguments.input->description;
 	}
-	if (arguments.input.ownerId){
-		ownerId = *arguments.input.ownerId;
+	if (arguments.input->ownerId){
+		ownerId = *arguments.input->ownerId;
 	}
 
 	QByteArray tenantId = m_tenantManagerCompPtr->CreateTenant(name, description, ownerId);
@@ -171,8 +171,8 @@ sdl::V1_0::imtauth::CRemoveTenantPayload CTenantManagerControllerComp::OnRemoveT
 
 	QByteArray tenantId;
 	sdl::V1_0::imtauth::RemoveTenantRequestArguments arguments = removeTenantRequest.GetRequestedArguments();
-	if (arguments.input.tenantId){
-		tenantId = *arguments.input.tenantId;
+	if (arguments.input->tenantId){
+		tenantId = *arguments.input->tenantId;
 	}
 
 	bool success = m_tenantManagerCompPtr->RemoveTenant(tenantId);
@@ -203,23 +203,23 @@ sdl::V1_0::imtauth::CUpdateTenantPayload CTenantManagerControllerComp::OnUpdateT
 	QString description;
 	QByteArray ownerId;
 	sdl::V1_0::imtauth::UpdateTenantRequestArguments arguments = updateTenantRequest.GetRequestedArguments();
-	if (arguments.input.tenantId){
-		tenantId = *arguments.input.tenantId;
+	if (arguments.input->tenantId){
+		tenantId = *arguments.input->tenantId;
 	}
-	if (arguments.input.name){
-		name = *arguments.input.name;
+	if (arguments.input->name){
+		name = *arguments.input->name;
 	}
-	if (arguments.input.description){
-		description = *arguments.input.description;
+	if (arguments.input->description){
+		description = *arguments.input->description;
 	}
-	if (arguments.input.ownerId){
-		ownerId = *arguments.input.ownerId;
+	if (arguments.input->ownerId){
+		ownerId = *arguments.input->ownerId;
 	}
 
-	bool success = m_tenantManagerCompPtr->UpdateTenant(tenantId, name, description, ownerId, bool(arguments.input.ownerId));
+	bool success = m_tenantManagerCompPtr->UpdateTenant(tenantId, name, description, ownerId, bool(arguments.input->ownerId));
 
 	// Sync members with TenantMemberships
-	if (success && m_membershipManagerCompPtr.IsValid() && arguments.input.members){
+	if (success && m_membershipManagerCompPtr.IsValid() && arguments.input->members){
 		// Get current member user IDs
 		QByteArrayList currentMembershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
 		QSet<QByteArray> currentUserIds;
@@ -234,7 +234,7 @@ sdl::V1_0::imtauth::CUpdateTenantPayload CTenantManagerControllerComp::OnUpdateT
 
 		// Build new set
 		QSet<QByteArray> newUserIds;
-		for (const auto& member : *arguments.input.members){
+		for (const auto& member : *arguments.input->members){
 			if (member->id){
 				newUserIds << *member->id;
 			}
@@ -279,11 +279,11 @@ sdl::V1_0::imtauth::CSetTenantActivePayload CTenantManagerControllerComp::OnSetT
 	QByteArray tenantId;
 	bool isActive = false;
 	sdl::V1_0::imtauth::SetTenantActiveRequestArguments arguments = setTenantActiveRequest.GetRequestedArguments();
-	if (arguments.input.tenantId){
-		tenantId = *arguments.input.tenantId;
+	if (arguments.input->tenantId){
+		tenantId = *arguments.input->tenantId;
 	}
-	if (arguments.input.isActive){
-		isActive = *arguments.input.isActive;
+	if (arguments.input->isActive){
+		isActive = *arguments.input->isActive;
 	}
 
 	bool success = m_tenantManagerCompPtr->SetTenantActive(tenantId, isActive);

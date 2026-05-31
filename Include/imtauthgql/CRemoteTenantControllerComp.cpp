@@ -44,7 +44,8 @@ imtauth::ITenantInfoUniquePtr CRemoteTenantControllerComp::GetTenant(const QByte
 	}
 
 	tenantsdl::GetTenantRequestArguments arguments;
-	arguments.input.tenantId = tenantId;
+	arguments.input.emplace();
+	arguments.input->tenantId = tenantId;
 
 	imtgql::CGqlRequest gqlRequest;
 	if (!tenantsdl::CGetTenantGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
@@ -100,9 +101,10 @@ QByteArray CRemoteTenantControllerComp::CreateTenant(const QString& tenantName, 
 	namespace tenantsdl = sdl::V1_0::imtauth;
 
 	tenantsdl::CreateTenantRequestArguments arguments;
-	arguments.input.name = tenantName;
-	arguments.input.description = description;
-	arguments.input.ownerId = ownerId;
+	arguments.input.emplace();
+	arguments.input->name = tenantName;
+	arguments.input->description = description;
+	arguments.input->ownerId = ownerId;
 
 	imtgql::CGqlRequest gqlRequest;
 	if (!tenantsdl::CCreateTenantGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
@@ -126,7 +128,8 @@ bool CRemoteTenantControllerComp::RemoveTenant(const QByteArray& tenantId)
 	namespace tenantsdl = sdl::V1_0::imtauth;
 
 	tenantsdl::RemoveTenantRequestArguments arguments;
-	arguments.input.tenantId = tenantId;
+	arguments.input.emplace();
+	arguments.input->tenantId = tenantId;
 
 	imtgql::CGqlRequest gqlRequest;
 	if (!tenantsdl::CRemoveTenantGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
@@ -150,11 +153,12 @@ bool CRemoteTenantControllerComp::UpdateTenant(const QByteArray& tenantId, const
 	namespace tenantsdl = sdl::V1_0::imtauth;
 
 	tenantsdl::UpdateTenantRequestArguments arguments;
-	arguments.input.tenantId = tenantId;
-	arguments.input.name = tenantName;
-	arguments.input.description = description;
+	arguments.input.emplace();
+	arguments.input->tenantId = tenantId;
+	arguments.input->name = tenantName;
+	arguments.input->description = description;
 	if (updateOwner){
-		arguments.input.ownerId = ownerId;
+		arguments.input->ownerId = ownerId;
 	}
 
 	imtgql::CGqlRequest gqlRequest;
@@ -179,8 +183,9 @@ bool CRemoteTenantControllerComp::SetTenantActive(const QByteArray& tenantId, bo
 	namespace tenantsdl = sdl::V1_0::imtauth;
 
 	tenantsdl::SetTenantActiveRequestArguments arguments;
-	arguments.input.tenantId = tenantId;
-	arguments.input.isActive = isActive;
+	arguments.input.emplace();
+	arguments.input->tenantId = tenantId;
+	arguments.input->isActive = isActive;
 
 	imtgql::CGqlRequest gqlRequest;
 	if (!tenantsdl::CSetTenantActiveGqlRequest::SetupGqlRequest(gqlRequest, arguments)){

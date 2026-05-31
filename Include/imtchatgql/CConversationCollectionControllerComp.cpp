@@ -117,21 +117,21 @@ bool CConversationCollectionControllerComp::UpdateObjectFromRepresentationReques
 	}
 
 	auto arguments = updateRequest.GetRequestedArguments();
-	if (!arguments.input.id.has_value()){
+	if (!arguments.input->id.has_value()){
 		I_CRITICAL();
 		return false;
 	}
 
-	if (!arguments.input.item.has_value()){
+	if (!arguments.input->item.has_value()){
 		I_CRITICAL();
 		return false;
 	}
 
-	QByteArray objectId = *arguments.input.id;
+	QByteArray objectId = *arguments.input->id;
 	convPtr->ResetData();
 	convPtr->SetId(objectId);
 
-	sdl::V1_0::imtchat::CConversationData itemData = *arguments.input.item;
+	sdl::V1_0::imtchat::CConversationData itemData = *arguments.input->item;
 	return FillObjectFromRepresentation(itemData, *convPtr, objectId, errorMessage);
 }
 

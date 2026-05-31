@@ -170,8 +170,8 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	sdl::V1_0::imtlic::LicenseItemRequestArguments arguments = licenseItemRequest.GetRequestedArguments();
-	if (arguments.input.id){
-		representationPayload.id = QByteArray(*arguments.input.id);
+	if (arguments.input->id){
+		representationPayload.id = QByteArray(*arguments.input->id);
 	}
 
 	QString name = licenseInfoPtr->GetLicenseName();
@@ -213,22 +213,22 @@ bool CLicenseCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 	}
 	
 	sdl::V1_0::imtlic::LicenseUpdateRequestArguments arguments = licenseUpdateRequest.GetRequestedArguments();
-	if (!arguments.input.id.has_value()){
+	if (!arguments.input->id.has_value()){
 		I_CRITICAL();
 		return false;
 	}
 	
-	if (!arguments.input.item.has_value()){
+	if (!arguments.input->item.has_value()){
 		I_CRITICAL();
 		return false;
 	}
 
-	QByteArray objectId = *arguments.input.id;
+	QByteArray objectId = *arguments.input->id;
 	licenseInfoPtr->ResetData();
 
 	licenseInfoPtr->SetObjectUuid(objectId);
 
-	sdl::V1_0::imtlic::CLicenseDefinitionData licenseData = *arguments.input.item;
+	sdl::V1_0::imtlic::CLicenseDefinitionData licenseData = *arguments.input->item;
 
 	if (!FillObjectFromRepresentation(licenseData, *licenseInfoPtr, objectId, errorMessage)){
 		errorMessage = QString("Unable to update object from representation. Error: '%1'").arg(errorMessage);

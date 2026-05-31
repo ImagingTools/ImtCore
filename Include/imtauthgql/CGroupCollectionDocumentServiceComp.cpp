@@ -27,8 +27,8 @@ sdl::V1_0::imtauth::CGroupData CGroupCollectionDocumentServiceComp::OnGetGroupRe
 	QByteArray userId = GetUserId(gqlRequest);
 
 	QByteArray objectId;
-	if (arguments.input.id){
-		objectId = *arguments.input.id;
+	if (arguments.input->id){
+		objectId = *arguments.input->id;
 	}
 
 	if (objectId.isEmpty()){
@@ -87,8 +87,8 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CGroupCollectionDocumentServiceComp
 	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
 
 	QByteArray documentId;
-	if (arguments.input.documentId){
-		documentId = *arguments.input.documentId;
+	if (arguments.input->documentId){
+		documentId = *arguments.input->documentId;
 	}
 
 	if (documentId.isEmpty()){
@@ -112,8 +112,8 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CGroupCollectionDocumentServiceComp
 	}
 
 	sdl::V1_0::imtauth::CGroupData groupData;
-	if (arguments.input.group){
-		groupData = *arguments.input.group;
+	if (arguments.input->group){
+		groupData = *arguments.input->group;
 	}
 
 	if (groupData.id){

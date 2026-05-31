@@ -218,8 +218,8 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CUserCollectionControllerComp::On
 	sdl::V1_0::imtbase::CGetElementMetaInfoPayload response;
 	sdl::V1_0::imtbase::GetElementMetaInfoRequestArguments arguments = getElementMetaInfoRequest.GetRequestedArguments();
 	QByteArray objectId;
-	if (arguments.input.elementId){
-		objectId = *arguments.input.elementId;
+	if (arguments.input->elementId){
+		objectId = *arguments.input->elementId;
 	}
 
 	QByteArray productId = gqlRequest.GetHeader("productid");
@@ -323,8 +323,8 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::V1_0::imtauth::UsersListRequestArguments arguments = usersListRequest.GetRequestedArguments();
 
 	QByteArray productId;
-	if (arguments.input.productId){
-		productId = *arguments.input.productId;
+	if (arguments.input->productId){
+		productId = *arguments.input->productId;
 	}
 
 	const imtauth::IUserInfo* userInfoPtr = nullptr;
@@ -550,8 +550,8 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 
 	sdl::V1_0::imtauth::UserItemRequestArguments arguments = userItemRequest.GetRequestedArguments();
 	QByteArray productId;
-	if (arguments.input.productId){
-		productId = *arguments.input.productId;
+	if (arguments.input->productId){
+		productId = *arguments.input->productId;
 	}
 	
 	QByteArray objectId = userInfoPtr->GetObjectUuid();
@@ -614,12 +614,12 @@ bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::UserUpdateRequestArguments arguments =userUpdateRequest.GetRequestedArguments();
-	if (!arguments.input.item.has_value()){
+	if (!arguments.input->item.has_value()){
 		I_CRITICAL();
 		return false;
 	}
 	
-	sdl::V1_0::imtauth::CUserData userData = *arguments.input.item;
+	sdl::V1_0::imtauth::CUserData userData = *arguments.input->item;
 
 	auto userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(&object);
 	if (userInfoPtr == nullptr){
@@ -664,8 +664,8 @@ bool CUserCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& 
 		if (userItemGqlRequest.IsValid()){
 			sdl::V1_0::imtauth::UserItemRequestArguments arguments = userItemGqlRequest.GetRequestedArguments();
 			if (arguments.input.HasValue()){
-				if (arguments.input.id.HasValue()){
-					requestedUserId = *arguments.input.id;
+				if (arguments.input->id.HasValue()){
+					requestedUserId = *arguments.input->id;
 				}
 			}
 		}

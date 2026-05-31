@@ -72,13 +72,13 @@ sdl::V1_0::imtdesk::CEntityContextTicketsPayload CEntityContextTicketsController
 
 	sdl::V1_0::imtdesk::EntityContextTicketsRequestArguments arguments = entityContextTicketsRequest.GetRequestedArguments();
 	QString entityType;
-	if (arguments.input.entityType){
-		entityType = *arguments.input.entityType;
+	if (arguments.input->entityType){
+		entityType = *arguments.input->entityType;
 	}
 
 	QByteArray entityId;
-	if (arguments.input.entityId){
-		entityId = *arguments.input.entityId;
+	if (arguments.input->entityId){
+		entityId = *arguments.input->entityId;
 	}
 
 	if (entityType.isEmpty() || entityId.isEmpty()){
@@ -88,12 +88,12 @@ sdl::V1_0::imtdesk::CEntityContextTicketsPayload CEntityContextTicketsController
 
 	int offset = 0;
 	int count = 250;
-	if (arguments.input.viewParams){
-		if (arguments.input.viewParams->offset){
-			offset = qMax(0, *arguments.input.viewParams->offset);
+	if (arguments.input->viewParams){
+		if (arguments.input->viewParams->offset){
+			offset = qMax(0, *arguments.input->viewParams->offset);
 		}
-		if (arguments.input.viewParams->count){
-			count = qMax(1, *arguments.input.viewParams->count);
+		if (arguments.input->viewParams->count){
+			count = qMax(1, *arguments.input->viewParams->count);
 		}
 	}
 
@@ -176,28 +176,28 @@ sdl::V1_0::imtdesk::CCreateEntityContextTicketPayload CEntityContextTicketsContr
 
 	sdl::V1_0::imtdesk::CreateEntityContextTicketRequestArguments arguments = createEntityContextTicketRequest.GetRequestedArguments();
 	QString entityType;
-	if (arguments.input.entityType){
-		entityType = *arguments.input.entityType;
+	if (arguments.input->entityType){
+		entityType = *arguments.input->entityType;
 	}
 
 	QByteArray entityId;
-	if (arguments.input.entityId){
-		entityId = *arguments.input.entityId;
+	if (arguments.input->entityId){
+		entityId = *arguments.input->entityId;
 	}
 
 	QString title;
-	if (arguments.input.title){
-		title = *arguments.input.title;
+	if (arguments.input->title){
+		title = *arguments.input->title;
 	}
 
 	QString description;
-	if (arguments.input.description){
-		description = *arguments.input.description;
+	if (arguments.input->description){
+		description = *arguments.input->description;
 	}
 
 	QString entityDisplayName = QString::fromUtf8(entityId);
-	if (arguments.input.entityDisplayName && !arguments.input.entityDisplayName->isEmpty()){
-		entityDisplayName = *arguments.input.entityDisplayName;
+	if (arguments.input->entityDisplayName && !arguments.input->entityDisplayName->isEmpty()){
+		entityDisplayName = *arguments.input->entityDisplayName;
 	}
 
 	if (entityType.isEmpty() || entityId.isEmpty() || title.trimmed().isEmpty()){

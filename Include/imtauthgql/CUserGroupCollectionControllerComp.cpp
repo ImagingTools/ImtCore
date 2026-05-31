@@ -144,8 +144,8 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CUserGroupCollectionControllerCom
 	sdl::V1_0::imtbase::CGetElementMetaInfoPayload response;
 	sdl::V1_0::imtbase::GetElementMetaInfoRequestArguments arguments = getElementMetaInfoRequest.GetRequestedArguments();
 	QByteArray objectId;
-	if (arguments.input.elementId){
-		objectId = *arguments.input.elementId;
+	if (arguments.input->elementId){
+		objectId = *arguments.input->elementId;
 	}
 
 	QByteArray productId = gqlRequest.GetHeader("productId");
@@ -252,8 +252,8 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 {
 	QByteArray objectId = objectCollectionIterator.GetObjectId();
 	QByteArray productId;
-	if (groupsListRequest.GetRequestedArguments().input.productId){
-		productId = *groupsListRequest.GetRequestedArguments().input.productId;
+	if (groupsListRequest.GetRequestedArguments().input->productId){
+		productId = *groupsListRequest.GetRequestedArguments().input->productId;
 	}
 
 	const imtauth::IUserGroupInfo* userGroupInfoPtr = nullptr;
@@ -376,8 +376,8 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::V1_0::imtauth::GroupItemRequestArguments arguments = groupItemRequest.GetRequestedArguments();
 
 	QByteArray productId;
-	if (arguments.input.productId){
-		productId = *arguments.input.productId;
+	if (arguments.input->productId){
+		productId = *arguments.input->productId;
 	}
 
 	representationPayload.id = QByteArray(userGroupInfoPtr->GetObjectUuid());
@@ -406,8 +406,8 @@ bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 {
 	sdl::V1_0::imtauth::CGroupData representation;
 	
-	if (groupUpdateRequest.GetRequestedArguments().input.item){
-		representation = groupUpdateRequest.GetRequestedArguments().input.item;
+	if (groupUpdateRequest.GetRequestedArguments().input->item){
+		representation = groupUpdateRequest.GetRequestedArguments().input->item;
 	}
 
 	imtauth::CIdentifiableUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::CIdentifiableUserGroupInfo*>(&object);
@@ -461,8 +461,8 @@ bool CUserGroupCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequ
 		if (groupItemGqlRequest.IsValid()){
 			auto arguments = groupItemGqlRequest.GetRequestedArguments();
 			if (arguments.input.HasValue()){
-				if (arguments.input.id.HasValue()){
-					groupId = *arguments.input.id;
+				if (arguments.input->id.HasValue()){
+					groupId = *arguments.input->id;
 				}
 			}
 		}

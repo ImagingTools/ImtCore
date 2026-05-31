@@ -27,12 +27,13 @@ bool CRemoteSuperuserControllerComp::SetSuperuserPassword(const QByteArray& pass
 	userssdl::CreateSuperuserRequestArguments arguments;
 
 	QString superuserName = m_superuserNameAttrPtr.IsValid() ? *m_superuserNameAttrPtr : QStringLiteral("superuser");
-	arguments.input.name = superuserName;
+	arguments.input.emplace();
+	arguments.input->name = superuserName;
 
 	QString superuserMail = m_superuserMailAttrPtr.IsValid() ? *m_superuserMailAttrPtr : QStringLiteral("superuser");
-	arguments.input.mail = superuserMail;
+	arguments.input->mail = superuserMail;
 
-	arguments.input.password = password;
+	arguments.input->password = password;
 
 	imtgql::CGqlRequest gqlRequest;
 	if (userssdl::CCreateSuperuserGqlRequest::SetupGqlRequest(gqlRequest, arguments)){

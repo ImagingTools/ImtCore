@@ -33,9 +33,10 @@ imtauth::IRoleUniquePtr CClientRequestRoleInfoProviderComp::GetRole(const QByteA
 	namespace rolessdl = sdl::V1_0::imtauth;
 
 	rolessdl::RoleItemRequestArguments arguments;
-	arguments.input.id = objectId;
+	arguments.input.emplace();
+	arguments.input->id = objectId;
 
-	arguments.input.productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+	arguments.input->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 
 	QString errorMessage;
 	imtgql::CGqlRequest gqlRequest;

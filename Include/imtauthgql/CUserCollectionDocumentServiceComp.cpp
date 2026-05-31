@@ -27,8 +27,8 @@ sdl::V1_0::imtauth::CUserData CUserCollectionDocumentServiceComp::OnGetUserRepre
 	QByteArray userId = GetUserId(gqlRequest);
 
 	QByteArray objectId;
-	if (arguments.input.id){
-		objectId = *arguments.input.id;
+	if (arguments.input->id){
+		objectId = *arguments.input->id;
 	}
 
 	if (objectId.isEmpty()){
@@ -95,8 +95,8 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
 
 	QByteArray documentId;
-	if (arguments.input.documentId){
-		documentId = *arguments.input.documentId;
+	if (arguments.input->documentId){
+		documentId = *arguments.input->documentId;
 	}
 
 	if (documentId.isEmpty()){
@@ -120,8 +120,8 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 	}
 
 	sdl::V1_0::imtauth::CUserData userData;
-	if (arguments.input.user){
-		userData = *arguments.input.user;
+	if (arguments.input->user){
+		userData = *arguments.input->user;
 	}
 
 	if (userData.id){

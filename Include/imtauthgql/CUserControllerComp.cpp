@@ -35,7 +35,12 @@ sdl::V1_0::imtauth::CChangePasswordPayload CUserControllerComp::OnChangePassword
 	}
 
 	sdl::V1_0::imtauth::ChangePasswordRequestArguments arguments = changePasswordRequest.GetRequestedArguments();
-	sdl::V1_0::imtauth::CChangePasswordInput& inputArgument = arguments.input;
+	if (!arguments.input.has_value()){
+		Q_ASSERT(false);
+		return response;
+	}
+
+	auto& inputArgument = *arguments.input;
 	QByteArray login;
 	if (inputArgument.login){
 		login = *inputArgument.login;
@@ -152,14 +157,14 @@ sdl::V1_0::imtauth::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 	}
 
 	sdl::V1_0::imtauth::RegisterUserRequestArguments arguments = registerUserRequest.GetRequestedArguments();
-	if (!arguments.input.userData){
+	if (!arguments.input->userData){
 		errorMessage = QString("Unable to register user. Error: User data is invalid");
 		return sdl::V1_0::imtauth::CRegisterUserPayload();
 	}
 
 	QByteArray productId;
-	if (arguments.input.productId){
-		productId = *arguments.input.productId;
+	if (arguments.input->productId){
+		productId = *arguments.input->productId;
 	}
 
 	imtauth::IUserInfoUniquePtr userInfoPtr = m_userFactoryCompPtr.CreateInstance();
@@ -176,11 +181,11 @@ sdl::V1_0::imtauth::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 		return sdl::V1_0::imtauth::CRegisterUserPayload();
 	}
 
-	sdl::V1_0::imtauth::CUserData userData = *arguments.input.userData;
+	sdl::V1_0::imtauth::CUserData userData = *arguments.input->userData;
 
 	QByteArray userId;
-	if (arguments.input.userData->id){
-		userId = *arguments.input.userData->id;
+	if (arguments.input->userData->id){
+		userId = *arguments.input->userData->id;
 	}
 
 	userIdentifierPtr->SetObjectUuid(userId);
@@ -278,8 +283,8 @@ sdl::V1_0::imtauth::CCheckEmailPayload CUserControllerComp::OnCheckEmail(
 	sdl::V1_0::imtauth::CheckEmailRequestArguments arguments = checkEmailRequest.GetRequestedArguments();
 	
 	QString email;
-	if (arguments.input.email){
-		email = *arguments.input.email;
+	if (arguments.input->email){
+		email = *arguments.input->email;
 	}
 
 	if (email.isEmpty()){
@@ -324,8 +329,8 @@ sdl::V1_0::imtauth::CSendEmailCodePayload CUserControllerComp::OnSendEmailCode(
 
 	sdl::V1_0::imtauth::SendEmailCodeRequestArguments arguments = sendEmailCodeRequest.GetRequestedArguments();
 	QByteArray login;
-	if (arguments.input.login){
-		login = *arguments.input.login;
+	if (arguments.input->login){
+		login = *arguments.input->login;
 	}
 
 	response.login = login;
@@ -366,15 +371,15 @@ sdl::V1_0::imtauth::CCheckEmailCodePayload CUserControllerComp::OnCheckEmailCode
 	sdl::V1_0::imtauth::CheckEmailCodeRequestArguments arguments = checkEmailCodeRequest.GetRequestedArguments();
 	
 	QByteArray login;
-	if (arguments.input.login){
-		login = *arguments.input.login;
+	if (arguments.input->login){
+		login = *arguments.input->login;
 	}
 
 	QByteArray userId = GetUserIdByLogin(login);
 
 	QString code;
-	if (arguments.input.code){
-		code = *arguments.input.code;
+	if (arguments.input->code){
+		code = *arguments.input->code;
 	}
 
 	response.correctCode = m_userVerificationControllerCompPtr->VerifyUser(userId, code.toUtf8());
@@ -455,8 +460,8 @@ sdl::V1_0::imtauth::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperus
 	sdl::V1_0::imtauth::CreateSuperuserRequestArguments arguments = createSuperuserRequest.GetRequestedArguments();
 
 	QString name;
-	if (arguments.input.name){
-		name = *arguments.input.name;
+	if (arguments.input->name){
+		name = *arguments.input->name;
 	}
 
 	if (name.isEmpty()){
@@ -464,8 +469,8 @@ sdl::V1_0::imtauth::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperus
 	}
 
 	QString mail;
-	if (arguments.input.mail){
-		mail = *arguments.input.mail;
+	if (arguments.input->mail){
+		mail = *arguments.input->mail;
 	}
 
 	if (mail.isEmpty()){
@@ -474,8 +479,8 @@ sdl::V1_0::imtauth::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperus
 	}
 
 	QString password;
-	if (arguments.input.password){
-		password = *arguments.input.password;
+	if (arguments.input->password){
+		password = *arguments.input->password;
 	}
 
 	if (password.isEmpty()){
@@ -539,12 +544,12 @@ sdl::V1_0::imtauth::CUserObjectId CUserControllerComp::OnGetUserObjectId(
 		return response;
 	}
 
-	if (!arguments.input.login.HasValue()){
+	if (!arguments.input->login.HasValue()){
 		errorMessage = QString("Unable to get user object-ID. Error: Login field is invalid");
 		return response;
 	}
 
-	QByteArray login = *arguments.input.login;
+	QByteArray login = *arguments.input->login;
 	QByteArray objectId = GetUserIdByLogin(login);
 
 	response.objectId = objectId;

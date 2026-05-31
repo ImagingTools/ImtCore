@@ -57,8 +57,8 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 	QByteArray userId = GetUserId(gqlRequest);
 
 	QByteArray objectId;
-	if (arguments.input.id){
-		objectId = *arguments.input.id;
+	if (arguments.input->id){
+		objectId = *arguments.input->id;
 	}
 
 	if (objectId.isEmpty()){
@@ -228,8 +228,8 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
 
 	QByteArray documentId;
-	if (arguments.input.documentId){
-		documentId = *arguments.input.documentId;
+	if (arguments.input->documentId){
+		documentId = *arguments.input->documentId;
 	}
 
 	if (documentId.isEmpty()){
@@ -259,8 +259,8 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 	}
 
 	sdl::V1_0::imtauth::CTenantData tenantData;
-	if (arguments.input.tenant){
-		tenantData = *arguments.input.tenant;
+	if (arguments.input->tenant){
+		tenantData = *arguments.input->tenant;
 	}
 
 	QByteArray tenantId = tenantPtr->GetTenantId();

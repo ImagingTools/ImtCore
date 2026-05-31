@@ -29,8 +29,8 @@ sdl::V1_0::imtchat::CConversationData CConversationCollectionDocumentServiceComp
 
 	QByteArray objectId;
 	istd::IChangeableSharedPtr documentPtr;
-	if (arguments.input.id){
-		objectId = *arguments.input.id;
+	if (arguments.input->id){
+		objectId = *arguments.input->id;
 
 		m_documentManagerCompPtr->GetDocumentData(userId, objectId, documentPtr);
 	}
@@ -65,13 +65,13 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CConversationCollectionDocumentServ
 	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
 
 	QByteArray documentId;
-	if (arguments.input.documentId){
-		documentId = *arguments.input.documentId;
+	if (arguments.input->documentId){
+		documentId = *arguments.input->documentId;
 	}
 
 	sdl::V1_0::imtchat::CConversationData convInfo;
-	if (arguments.input.conversation){
-		convInfo = *arguments.input.conversation;
+	if (arguments.input->conversation){
+		convInfo = *arguments.input->conversation;
 	}
 
 	QByteArray userId = GetUserId(gqlRequest);
