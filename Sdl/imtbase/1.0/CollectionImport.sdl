@@ -5,6 +5,9 @@ schema
 	query: Query
 }
 
+import {
+	"ImtBaseTypes.sdl"
+}
 
 type FileInfo {
 	fileId: ID!
@@ -17,10 +20,6 @@ type ImportParams {
 	sessionId: ID!
 	collectionId: ID!
 	fileList: [FileInfo!]!
-}
-
-type SessionId {
-	sessionId: ID!
 }
 
 enum Status {
