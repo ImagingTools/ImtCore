@@ -256,6 +256,26 @@
                 <file alias="imtcontrols/Menu/MenuBar.qml">Menu/MenuBar.qml</file>
                 <file alias="imtcontrols/Menu/MenuBarItem.qml">Menu/MenuBarItem.qml</file>
                 <file alias="imtcontrols/Menu/Internal/MenuItemDelegate.qml">Menu/Internal/MenuItemDelegate.qml</file>
+
+                <!-- Qt Quick Controls analogues. See Controls/README.md. -->
+                <file alias="imtcontrols/Controls/Control.qml">Controls/Control.qml</file>
+                <file alias="imtcontrols/Controls/AbstractButton.qml">Controls/AbstractButton.qml</file>
+                <file alias="imtcontrols/Controls/Pane.qml">Controls/Pane.qml</file>
+                <file alias="imtcontrols/Controls/Frame.qml">Controls/Frame.qml</file>
+                <file alias="imtcontrols/Controls/GroupBox.qml">Controls/GroupBox.qml</file>
+                <file alias="imtcontrols/Controls/Label.qml">Controls/Label.qml</file>
+                <file alias="imtcontrols/Controls/Page.qml">Controls/Page.qml</file>
+                <file alias="imtcontrols/Controls/ToolBar.qml">Controls/ToolBar.qml</file>
+                <file alias="imtcontrols/Controls/ToolSeparator.qml">Controls/ToolSeparator.qml</file>
+                <file alias="imtcontrols/Controls/Switch.qml">Controls/Switch.qml</file>
+                <file alias="imtcontrols/Controls/RoundButton.qml">Controls/RoundButton.qml</file>
+                <file alias="imtcontrols/Controls/TabBar.qml">Controls/TabBar.qml</file>
+                <file alias="imtcontrols/Controls/TabButton.qml">Controls/TabButton.qml</file>
+                <file alias="imtcontrols/Controls/PageIndicator.qml">Controls/PageIndicator.qml</file>
+                <file alias="imtcontrols/Controls/ToolTip.qml">Controls/ToolTip.qml</file>
+                <file alias="imtcontrols/Controls/ScrollBar.qml">Controls/ScrollBar.qml</file>
+                <file alias="imtcontrols/Controls/ScrollView.qml">Controls/ScrollView.qml</file>
+                <file alias="imtcontrols/Controls/Dial.qml">Controls/Dial.qml</file>
         </qresource>
         <qresource prefix="/" />
 </RCC>

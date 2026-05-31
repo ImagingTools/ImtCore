@@ -264,3 +264,26 @@ MenuItem 1.0 ./Menu/MenuItem.qml
 MenuSeparator 1.0 ./Menu/MenuSeparator.qml
 MenuBar 1.0 ./Menu/MenuBar.qml
 MenuBarItem 1.0 ./Menu/MenuBarItem.qml
+
+# -------------------------------------------------------------------------
+# Qt Quick Controls analogues (faithful re-implementations following the
+# Popup / Menu approach). See Controls/README.md for full documentation.
+# -------------------------------------------------------------------------
+Control 1.0 ./Controls/Control.qml
+AbstractButton 1.0 ./Controls/AbstractButton.qml
+Pane 1.0 ./Controls/Pane.qml
+Frame 1.0 ./Controls/Frame.qml
+GroupBox 1.0 ./Controls/GroupBox.qml
+Label 1.0 ./Controls/Label.qml
+Page 1.0 ./Controls/Page.qml
+ToolBar 1.0 ./Controls/ToolBar.qml
+ToolSeparator 1.0 ./Controls/ToolSeparator.qml
+Switch 1.0 ./Controls/Switch.qml
+RoundButton 1.0 ./Controls/RoundButton.qml
+TabBar 1.0 ./Controls/TabBar.qml
+TabButton 1.0 ./Controls/TabButton.qml
+PageIndicator 1.0 ./Controls/PageIndicator.qml
+ToolTip 1.0 ./Controls/ToolTip.qml
+ScrollBar 1.0 ./Controls/ScrollBar.qml
+ScrollView 1.0 ./Controls/ScrollView.qml
+Dial 1.0 ./Controls/Dial.qml
