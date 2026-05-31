@@ -14,8 +14,10 @@ BaseModel {
 		return Qt.createComponent('qrc:/qml/imtbaseComplexCollectionFilterSdl/GroupFilter.qml').createObject()
 	}
 
-	function addGroupFilter(){
-		let element = createGroupFilter()
+	function addGroupFilter(element){
+		if (!element){
+			element = createGroupFilter()
+		}
 		appendElement(element)
 		return element
 	}
@@ -30,6 +32,13 @@ BaseModel {
 	function add(typename){
 		let element = create(typename)
 		if (element){
+			appendElement(element)
+		}
+		return element
+	}
+
+	function addElement(element){
+		if (element && isAllowedType(element.__typename)){
 			appendElement(element)
 		}
 		return element

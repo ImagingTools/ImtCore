@@ -1004,13 +1004,19 @@ bool CQmlCodeGeneratorComp::WriteListTypeFile(
 		FeedStreamHorizontally(ifStream, 1);
 		ifStream << '}';
 
-		// add<Member>()
+		// add<Member>(element)
 		FeedStream(ifStream, 2, false);
 		FeedStreamHorizontally(ifStream, 1);
-		ifStream << QStringLiteral("function add") << capMember << QStringLiteral("(){");
+		ifStream << QStringLiteral("function add") << capMember << QStringLiteral("(element){");
 		FeedStream(ifStream, 1, false);
 		FeedStreamHorizontally(ifStream, 2);
-		ifStream << QStringLiteral("let element = create") << capMember << QStringLiteral("()");
+		ifStream << QStringLiteral("if (!element){");
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 3);
+		ifStream << QStringLiteral("element = create") << capMember << QStringLiteral("()");
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 2);
+		ifStream << '}';
 		FeedStream(ifStream, 1, false);
 		FeedStreamHorizontally(ifStream, 2);
 		ifStream << QStringLiteral("appendElement(element)");
@@ -1055,6 +1061,26 @@ bool CQmlCodeGeneratorComp::WriteListTypeFile(
 	FeedStream(ifStream, 1, false);
 	FeedStreamHorizontally(ifStream, 2);
 	ifStream << QStringLiteral("if (element){");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 3);
+	ifStream << QStringLiteral("appendElement(element)");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << '}';
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << QStringLiteral("return element");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << '}';
+
+	// addElement(element) — append a pre-created element with type validation
+	FeedStream(ifStream, 2, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("function addElement(element){");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << QStringLiteral("if (element && isAllowedType(element.__typename)){");
 	FeedStream(ifStream, 1, false);
 	FeedStreamHorizontally(ifStream, 3);
 	ifStream << QStringLiteral("appendElement(element)");

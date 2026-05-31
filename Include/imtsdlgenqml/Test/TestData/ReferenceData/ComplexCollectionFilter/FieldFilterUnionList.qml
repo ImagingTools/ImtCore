@@ -14,8 +14,10 @@ BaseModel {
 		return Qt.createComponent('qrc:/qml/imtbaseComplexCollectionFilterSdl/FieldFilter.qml').createObject()
 	}
 
-	function addFieldFilter(){
-		let element = createFieldFilter()
+	function addFieldFilter(element){
+		if (!element){
+			element = createFieldFilter()
+		}
 		appendElement(element)
 		return element
 	}
@@ -24,8 +26,10 @@ BaseModel {
 		return Qt.createComponent('qrc:/qml/imtbaseComplexCollectionFilterSdl/ArrayFieldFilter.qml').createObject()
 	}
 
-	function addArrayFieldFilter(){
-		let element = createArrayFieldFilter()
+	function addArrayFieldFilter(element){
+		if (!element){
+			element = createArrayFieldFilter()
+		}
 		appendElement(element)
 		return element
 	}
@@ -41,6 +45,13 @@ BaseModel {
 	function add(typename){
 		let element = create(typename)
 		if (element){
+			appendElement(element)
+		}
+		return element
+	}
+
+	function addElement(element){
+		if (element && isAllowedType(element.__typename)){
 			appendElement(element)
 		}
 		return element
