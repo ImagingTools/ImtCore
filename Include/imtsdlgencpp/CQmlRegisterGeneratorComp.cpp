@@ -74,7 +74,7 @@ void GenerateRegisterFunctions(QTextStream& stream, const QList<T>& entryList, b
 bool CQmlRegisterGeneratorComp::ProcessEntry (
 			const imtsdl::CSdlEntryBase& /* sdlEntry */,
 			QIODevice* headerDevicePtr,
-			QIODevice* /*sourceDevicePtr*/,
+			QIODevice* sourceDevicePtr,
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
@@ -85,7 +85,14 @@ bool CQmlRegisterGeneratorComp::ProcessEntry (
 	Q_ASSERT(m_customSchemaParamsCompPtr.IsValid());
 	Q_ASSERT(m_dependentSchemaListCompPtr.IsValid());
 
-	if (headerDevicePtr == nullptr){
+	// RegisterQmlTypes() belongs in the generated *.h file, not in the *_fwd.h
+	// declarations file. The forward declaration generation path passes only a
+	// header device (the *_fwd.h file) and a null source device, while the main
+	// header generation path (DoProcessing) passes both header and source
+	// devices. Only emit RegisterQmlTypes() when both devices are present so it
+	// ends up exclusively in the *.h file, where the QtQml include and the full
+	// CXxxObject class definitions are available.
+	if (headerDevicePtr == nullptr || sourceDevicePtr == nullptr){
 		// nothing todo
 		return true;
 	}
