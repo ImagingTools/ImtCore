@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QSet>
+#include <QtCore/QStringList>
 
 // ACF includes
 #include <icomp/TReferenceMember.h>
@@ -104,6 +105,23 @@ public:
 	[[nodiscard]] static std::shared_ptr<CSdlEntryBase> GetSdlTypeOrEnumOrUnionForField(const CSdlField& sdlField, const SdlTypeList& typeList, const SdlEnumList& enumList, const SdlUnionList& unionList);
 
 	[[nodiscard]] static std::shared_ptr<CSdlEntryBase> FindEntryByName(const QString& entryName, const SdlTypeList& typeList, const SdlEnumList& enumList = SdlEnumList(), const SdlUnionList& unionList = SdlUnionList());
+
+	/**
+		Collects, in first-seen order, the distinct element type/union names that are used as
+		array element types (i.e. \c [T] fields) by the fields of the given \a localTypes. Only
+		user-defined types and unions are returned; scalar and enum element types are skipped.
+		This is used to decide for which element types a typed list model (\c <T>List.qml) has to
+		be generated and registered.
+
+		\param localTypes The schema's own types, whose fields are scanned for array fields.
+		\param allTypes All visible types (local and dependencies), used to recognize user types.
+		\param unionList All visible unions, used to recognize unions. May be empty, in which case
+			union element types are not reported.
+	*/
+	[[nodiscard]] static QStringList CollectListElementTypeNames(
+				const SdlTypeList& localTypes,
+				const SdlTypeList& allTypes,
+				const SdlUnionList& unionList);
 
 	[[nodiscard]] static QString GetNamespaceAcceptableString(const QString& originalText);
 	[[nodiscard]] static QString GetFileSystemAcceptableEntryPath(const QString& originalText);

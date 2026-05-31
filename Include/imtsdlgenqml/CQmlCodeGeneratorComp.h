@@ -55,6 +55,26 @@ private:
 	bool EndQmlFile(const imtsdl::CSdlType& sdlType);
 	void AbortCurrentProcessing();
 
+	/**
+		Generates the typed list models (\c <Name>List.qml, derived from \c BaseModel) for all
+		local types and unions of the current schema. Each generated list knows its element
+		type(s) and exposes typed \c add/create helpers.
+	*/
+	bool WriteListTypeFiles(const QString& outputDirectoryPath);
+	/**
+		Writes a single typed list model file.
+		\param outputDirectoryPath Target directory of the generated module.
+		\param listElementName Bare name of the element/union the list is built for (e.g. \c SearchResult).
+		\param memberTypeNames Concrete element type names that the list may contain. For a plain type
+			this is a single entry, for a union it contains all union members.
+	*/
+	bool WriteListTypeFile(
+				const QString& outputDirectoryPath,
+				const QString& listElementName,
+				const QStringList& memberTypeNames);
+	/// Returns the QML module (qrc folder) declaration for the type with the given name, or the current module as fallback.
+	QString GetQmlModuleForTypeName(const QString& typeName) const;
+
 private:
 	I_REF(imtsdl::ISdlProcessArgumentsParser, m_argumentParserCompPtr);
 	I_REF(imtsdl::ISdlTypeListProvider, m_sdlTypeListCompPtr);

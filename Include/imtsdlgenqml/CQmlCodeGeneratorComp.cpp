@@ -18,6 +18,7 @@
 #include <imtsdl/CSdlType.h>
 #include <imtsdl/CSdlField.h>
 #include <imtsdl/CSdlEnum.h>
+#include <imtsdl/CSdlUnion.h>
 #include <imtsdlgenqml/CSdlQmlGenerationResult.h>
 #include <imtsdlgenqml/CQmlGenTools.h>
 
@@ -128,6 +129,15 @@ iproc::IProcessor::TaskState CQmlCodeGeneratorComp::DoProcessing(
 		EndQmlFile(sdlType);
 	}
 
+	// generate the typed list models (<Name>List.qml) for array element types
+	if (!WriteListTypeFiles(outputDirectoryPath)){
+		return TS_INVALID;
+	}
+	const QStringList listElementNames = imtsdl::CSdlTools::CollectListElementTypeNames(
+				sdlTypeList,
+				m_sdlTypeListCompPtr->GetSdlTypes(false),
+				m_sdlUnionListCompPtr->GetUnions(false));
+
 	// then create a qmldir file
 	QFile qmldirFile(outputDirectoryPath + "/qmldir");
 	if (!qmldirFile.open(QIODevice::WriteOnly)){
@@ -161,6 +171,15 @@ iproc::IProcessor::TaskState CQmlCodeGeneratorComp::DoProcessing(
 		qmldirStream << QStringLiteral(".qml");
 		FeedStream(qmldirStream, 1, false);
 	}
+	for (const QString& listElementName: listElementNames){
+		// add generated list model QML file
+		const QString listTypeName = listElementName + QStringLiteral("List");
+		qmldirStream << listTypeName;
+		qmldirStream << ' ' << moduleVersion << ' ';
+		qmldirStream << listTypeName;
+		qmldirStream << QStringLiteral(".qml");
+		FeedStream(qmldirStream, 1, false);
+	}
 
 	// and finally create a QRC file
 	QString qrcFilePath = GetAutoDefinedQmlQrcFilePath(*m_customSchemaParamsCompPtr, GetCompleteOutputPath(m_customSchemaParamsCompPtr, *m_argumentParserCompPtr, true, false));
@@ -189,6 +208,14 @@ iproc::IProcessor::TaskState CQmlCodeGeneratorComp::DoProcessing(
 		xmlWriter.writeStartElement("file");
 		xmlWriter.writeAttribute("alias", qmlModuleName + '/' + sdlType.GetName() + ".qml");
 		xmlWriter.writeCharacters(sdlType.GetName() + ".qml");
+		xmlWriter.writeEndElement();
+	}
+	// add generated list model QML files
+	for (const QString& listElementName: listElementNames){
+		const QString listTypeName = listElementName + QStringLiteral("List");
+		xmlWriter.writeStartElement("file");
+		xmlWriter.writeAttribute("alias", qmlModuleName + '/' + listTypeName + ".qml");
+		xmlWriter.writeCharacters(listTypeName + ".qml");
 		xmlWriter.writeEndElement();
 	}
 	// also add qmldir file
@@ -348,7 +375,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 			ifStream << QStringLiteral("var");
 		}
 		else if (sdlField.IsArray()){
-			ifStream << QStringLiteral("BaseModel");
+			ifStream << convertedType << QStringLiteral("List");
 		}
 		else if (isEnum){
 			ifStream << QStringLiteral("string");
@@ -662,7 +689,9 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 			FeedStream(ifStream, 1, false);
 
 			FeedStreamHorizontally(ifStream, 4);
-			ifStream << QStringLiteral("retVal = Qt.createComponent('qrc:/qml/imtcontrols/Base/BaseModel.qml')");
+			ifStream << QStringLiteral("retVal = Qt.createComponent('qrc:/qml/");
+			ifStream << GetQmlModuleForTypeName(convertedType) << '/';
+			ifStream << convertedType << QStringLiteral("List.qml')");
 			FeedStream(ifStream, 1, false);
 
 			FeedStreamHorizontally(ifStream, 4);
@@ -771,7 +800,10 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 		ifStream << QStringLiteral("case '") << propertyName;
 		ifStream << QStringLiteral("': ");
 		if (sdlField.IsArray()){
-			if (isCustom){
+			if (isCustom && !isEnum){
+				ifStream << QStringLiteral("return '") << convertedType << QStringLiteral("List'");
+			}
+			else if (isCustom){
 				ifStream << QStringLiteral("return 'BaseModel'");
 			}
 			else{
@@ -838,6 +870,252 @@ bool CQmlCodeGeneratorComp::EndQmlFile(const imtsdl::CSdlType& /*sdlType*/)
 	QTextStream ifStream(m_qmlFilePtr.GetPtr());
 	ifStream << '}';
 	FeedStream(ifStream, 2);
+
+	return true;
+}
+
+
+}
+
+
+QString CQmlCodeGeneratorComp::GetQmlModuleForTypeName(const QString& typeName) const
+{
+	const imtsdl::SdlTypeList allTypes = m_sdlTypeListCompPtr->GetSdlTypes(false);
+	for (const imtsdl::CSdlType& sdlType: allTypes){
+		if (sdlType.GetName() == typeName){
+			return BuildQmlImportDeclarationFromParams(sdlType.GetSchemaParams(), QStringLiteral("Sdl"), false);
+		}
+	}
+
+	const imtsdl::SdlUnionList unionList = m_sdlUnionListCompPtr->GetUnions(false);
+	for (const imtsdl::CSdlUnion& sdlUnion: unionList){
+		if (sdlUnion.GetName() == typeName){
+			return BuildQmlImportDeclarationFromParams(sdlUnion.GetSchemaParams(), QStringLiteral("Sdl"), false);
+		}
+	}
+
+	// fall back to the current schema module
+	return GetQmlModuleNameFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
+}
+
+
+bool CQmlCodeGeneratorComp::WriteListTypeFiles(const QString& outputDirectoryPath)
+{
+	const imtsdl::SdlTypeList localTypes = m_sdlTypeListCompPtr->GetSdlTypes(true);
+	const imtsdl::SdlTypeList allTypes = m_sdlTypeListCompPtr->GetSdlTypes(false);
+	const imtsdl::SdlUnionList unionList = m_sdlUnionListCompPtr->GetUnions(false);
+
+	const QStringList elementNames = CollectListElementTypeNames(localTypes, allTypes, unionList);
+
+	for (const QString& elementName: elementNames){
+		// resolve the concrete member types: a union expands to its members, a type maps to itself
+		QStringList memberTypeNames;
+		const auto unionIter =
+			std::find_if(unionList.cbegin(), unionList.cend(), [&elementName](const imtsdl::CSdlUnion& sdlUnion){
+				return sdlUnion.GetName() == elementName;
+			});
+		if (unionIter != unionList.cend()){
+			memberTypeNames = unionIter->GetTypes();
+		}
+		else{
+			memberTypeNames << elementName;
+		}
+
+		if (!WriteListTypeFile(outputDirectoryPath, elementName, memberTypeNames)){
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+bool CQmlCodeGeneratorComp::WriteListTypeFile(
+			const QString& outputDirectoryPath,
+			const QString& listElementName,
+			const QStringList& memberTypeNames)
+{
+	QFile listFile(outputDirectoryPath + '/' + listElementName + QStringLiteral("List.qml"));
+	if (!listFile.open(QIODevice::WriteOnly)){
+		SendCriticalMessage(0,
+						 QString("Unable to open file: '%1'. Error: %2")
+							 .arg(listFile.fileName(), listFile.errorString()));
+		I_CRITICAL();
+
+		return false;
+	}
+
+	QTextStream ifStream(&listFile);
+
+	// import section
+	ifStream << QStringLiteral("import QtQuick");
+	FeedStream(ifStream, 1, false);
+	ifStream << QStringLiteral("import imtcontrols 1.0");
+	FeedStream(ifStream, 2, false);
+
+	// typed list is a BaseModel that knows its element type(s)
+	ifStream << QStringLiteral("BaseModel {");
+
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("id: ") << GetDecapitalizedValue(listElementName) << QStringLiteral("List");
+
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("readonly property string __elementTypename: '") << listElementName << '\'';
+
+	// the concrete element type names allowed in this list
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("readonly property var allowedTypeNames: [");
+	for (int index = 0; index < memberTypeNames.count(); ++index){
+		if (index > 0){
+			ifStream << QStringLiteral(", ");
+		}
+		ifStream << '\'' << memberTypeNames[index] << '\'';
+	}
+	ifStream << ']';
+
+	// isAllowedType(typename)
+	FeedStream(ifStream, 2, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("function isAllowedType(typename){");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << QStringLiteral("return allowedTypeNames.indexOf(typename) !== -1");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << '}';
+
+	// per-member create<Member>() and add<Member>()
+	for (const QString& memberTypeName: memberTypeNames){
+		const QString capMember = GetCapitalizedValue(memberTypeName);
+
+		// create<Member>()
+		FeedStream(ifStream, 2, false);
+		FeedStreamHorizontally(ifStream, 1);
+		ifStream << QStringLiteral("function create") << capMember << QStringLiteral("(){");
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 2);
+		ifStream << QStringLiteral("return Qt.createComponent('qrc:/qml/");
+		ifStream << GetQmlModuleForTypeName(memberTypeName) << '/';
+		ifStream << memberTypeName << QStringLiteral(".qml').createObject()");
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 1);
+		ifStream << '}';
+
+		// add<Member>()
+		FeedStream(ifStream, 2, false);
+		FeedStreamHorizontally(ifStream, 1);
+		ifStream << QStringLiteral("function add") << capMember << QStringLiteral("(){");
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 2);
+		ifStream << QStringLiteral("let element = create") << capMember << QStringLiteral("()");
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 2);
+		ifStream << QStringLiteral("appendElement(element)");
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 2);
+		ifStream << QStringLiteral("return element");
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 1);
+		ifStream << '}';
+	}
+
+	// generic create(typename)
+	FeedStream(ifStream, 2, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("function create(typename){");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << QStringLiteral("switch (typename){");
+	for (const QString& memberTypeName: memberTypeNames){
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 3);
+		ifStream << QStringLiteral("case '") << memberTypeName << QStringLiteral("': return create");
+		ifStream << GetCapitalizedValue(memberTypeName) << QStringLiteral("()");
+	}
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << '}';
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << QStringLiteral("return null");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << '}';
+
+	// generic add(typename)
+	FeedStream(ifStream, 2, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("function add(typename){");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << QStringLiteral("let element = create(typename)");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << QStringLiteral("if (element){");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 3);
+	ifStream << QStringLiteral("appendElement(element)");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << '}';
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << QStringLiteral("return element");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << '}';
+
+	// findByType(typename)
+	FeedStream(ifStream, 2, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("function findByType(typename){");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << QStringLiteral("let retVal = []");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << QStringLiteral("for (let i = 0; i < count; ++i){");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 3);
+	ifStream << QStringLiteral("let item = get(i).item");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 3);
+	ifStream << QStringLiteral("if (item && item.__typename === typename){");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 4);
+	ifStream << QStringLiteral("retVal.push(item)");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 3);
+	ifStream << '}';
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << '}';
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << QStringLiteral("return retVal");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << '}';
+
+	// countOfType(typename)
+	FeedStream(ifStream, 2, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("function countOfType(typename){");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << QStringLiteral("return findByType(typename).length");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << '}';
+
+	FeedStream(ifStream, 1, false);
+	ifStream << '}';
+	FeedStream(ifStream, 2);
+
+	listFile.close();
 
 	return true;
 }
