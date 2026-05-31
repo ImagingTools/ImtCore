@@ -235,8 +235,9 @@ macro (ImtCoreCustomConfigureSdlCpp)
 
 	foreach(SDL_HEADER ${FOUND_DEPS})
 		string(FIND "${SDL_HEADER}" ".h" matchres)
+		string(FIND "${SDL_HEADER}" "_fwd.h" matchres_fwd)
 
-		if (${matchres} GREATER  -1)
+		if (${matchres} GREATER -1 AND ${matchres_fwd} EQUAL -1)
 			LIST(APPEND HEADER_FILES ${SDL_HEADER})
 		endif ()
 	endforeach()
