@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QDir>
+#include <QtCore/QFileInfo>
 #include <QtCore/QTextStream>
 
 //Acf includes
@@ -105,7 +106,8 @@ bool CQmlRegisterGeneratorComp::ProcessEntry (
 	FeedStream(stream, 1, false);
 
 	// add function
-	stream << QStringLiteral("[[maybe_unused]] static void RegisterQmlTypes()");
+	const QString schemaFileName = QFileInfo(m_argumentParserCompPtr->GetSchemaFilePath()).baseName();
+	stream << QStringLiteral("[[maybe_unused]] static void Register") << schemaFileName << QStringLiteral("QmlTypes()");
 	FeedStream(stream, 1, false);
 
 	stream << '{';

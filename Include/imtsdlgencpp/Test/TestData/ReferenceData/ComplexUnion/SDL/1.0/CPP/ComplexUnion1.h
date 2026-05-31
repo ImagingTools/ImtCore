@@ -260,7 +260,7 @@ signals:
 
 
 #ifdef QT_QML_LIB
-[[maybe_unused]] static void RegisterQmlTypes()
+[[maybe_unused]] static void RegisterComplexUnion1QmlTypes()
 {
 	qmlRegisterType<CPointObject>("complextestComplexUnion1Sdl", 1, 0, "Point");
 	qmlRegisterType<CGeometryObject>("complextestComplexUnion1Sdl", 1, 0, "Geometry");

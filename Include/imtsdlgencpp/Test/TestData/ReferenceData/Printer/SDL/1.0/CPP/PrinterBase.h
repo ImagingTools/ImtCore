@@ -623,7 +623,7 @@ private:
 
 
 #ifdef QT_QML_LIB
-[[maybe_unused]] static void RegisterQmlTypes()
+[[maybe_unused]] static void RegisterPrinterBaseQmlTypes()
 {
 	qmlRegisterType<CPrinterSpecificationBaseObject>("modsdlPrinterBaseSdl", 1, 0, "PrinterSpecificationBase");
 	qmlRegisterType<CLinkObject>("modsdlPrinterBaseSdl", 1, 0, "Link");

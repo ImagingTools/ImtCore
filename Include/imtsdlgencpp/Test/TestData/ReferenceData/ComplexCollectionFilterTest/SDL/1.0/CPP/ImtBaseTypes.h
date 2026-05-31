@@ -2040,7 +2040,7 @@ signals:
 
 
 #ifdef QT_QML_LIB
-[[maybe_unused]] static void RegisterQmlTypes()
+[[maybe_unused]] static void RegisterImtBaseTypesQmlTypes()
 {
 	qmlRegisterType<CTimeRangeObject>("imtbaseImtBaseTypesSdl", 1, 0, "TimeRange");
 	qmlRegisterType<CSdlSizeObject>("imtbaseImtBaseTypesSdl", 1, 0, "SdlSize");

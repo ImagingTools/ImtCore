@@ -2292,7 +2292,7 @@ private:
 
 
 #ifdef QT_QML_LIB
-[[maybe_unused]] static void RegisterQmlTypes()
+[[maybe_unused]] static void RegisterComplexUnion2QmlTypes()
 {
 	qmlRegisterType<CResultObject>("complextestComplexUnion2Sdl", 1, 0, "Result");
 	qmlRegisterType<CAreaObject>("complextestComplexUnion2Sdl", 1, 0, "Area");

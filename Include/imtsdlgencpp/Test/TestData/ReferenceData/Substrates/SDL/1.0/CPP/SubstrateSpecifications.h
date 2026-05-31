@@ -1427,7 +1427,7 @@ private:
 
 
 #ifdef QT_QML_LIB
-[[maybe_unused]] static void RegisterQmlTypes()
+[[maybe_unused]] static void RegisterSubstrateSpecificationsQmlTypes()
 {
 	qmlRegisterType<CInputIdObject>("substrateSubstrateSpecificationsSdl", 1, 0, "InputId");
 	qmlRegisterType<CCollectionViewParamsTestObject>("substrateSubstrateSpecificationsSdl", 1, 0, "CollectionViewParamsTest");

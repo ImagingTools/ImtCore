@@ -236,7 +236,7 @@ signals:
 
 
 #ifdef QT_QML_LIB
-[[maybe_unused]] static void RegisterQmlTypes()
+[[maybe_unused]] static void RegisterDigitalPrinterQmlTypes()
 {
 	qmlRegisterType<CDigitalPrinterSpecificationObject>("modsdlDigitalPrinterSdl", 1, 0, "DigitalPrinterSpecification");
 	qmlRegisterType<CDigitalPrinterObject>("modsdlDigitalPrinterSdl", 1, 0, "DigitalPrinter");

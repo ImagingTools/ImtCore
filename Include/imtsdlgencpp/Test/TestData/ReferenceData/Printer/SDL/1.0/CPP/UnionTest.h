@@ -539,7 +539,7 @@ private:
 
 
 #ifdef QT_QML_LIB
-[[maybe_unused]] static void RegisterQmlTypes()
+[[maybe_unused]] static void RegisterUnionTestQmlTypes()
 {
 	qmlRegisterType<CCoordsObject>("modsdlUnionTestSdl", 1, 0, "Coords");
 	qmlRegisterType<CPrinterSpecificationBaseObject>("modsdlUnionTestSdl", 1, 0, "PrinterSpecificationBase");
