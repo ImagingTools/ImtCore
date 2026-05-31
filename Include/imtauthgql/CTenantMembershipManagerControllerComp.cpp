@@ -122,8 +122,8 @@ sdl::V1_0::imtauth::CGetMembershipsByTenantPayload CTenantMembershipManagerContr
 
 	QByteArray tenantId;
 	sdl::V1_0::imtauth::GetMembershipsByTenantRequestArguments arguments = request.GetRequestedArguments();
-	if (arguments.input.tenantId){
-		tenantId = *arguments.input.tenantId;
+	if (arguments.input && arguments.input->tenantId){
+		tenantId = *arguments.input->tenantId;
 	}
 
 	QByteArrayList ids = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
@@ -150,8 +150,8 @@ sdl::V1_0::imtauth::CGetMembershipsByUserPayload CTenantMembershipManagerControl
 
 	QByteArray userId;
 	sdl::V1_0::imtauth::GetMembershipsByUserRequestArguments arguments = request.GetRequestedArguments();
-	if (arguments.input.userId){
-		userId = *arguments.input.userId;
+	if (arguments.input && arguments.input->userId){
+		userId = *arguments.input->userId;
 	}
 
 	QByteArrayList ids = m_membershipManagerCompPtr->GetMembershipsByUser(userId);
@@ -178,8 +178,8 @@ sdl::V1_0::imtauth::CGetMembershipPayload CTenantMembershipManagerControllerComp
 
 	QByteArray membershipId;
 	sdl::V1_0::imtauth::GetMembershipRequestArguments arguments = request.GetRequestedArguments();
-	if (arguments.input.membershipId){
-		membershipId = *arguments.input.membershipId;
+	if (arguments.input && arguments.input->membershipId){
+		membershipId = *arguments.input->membershipId;
 	}
 
 	imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
@@ -219,11 +219,11 @@ sdl::V1_0::imtauth::CFindMembershipPayload CTenantMembershipManagerControllerCom
 	QByteArray userId;
 	QByteArray tenantId;
 	sdl::V1_0::imtauth::FindMembershipRequestArguments arguments = request.GetRequestedArguments();
-	if (arguments.input.userId){
-		userId = *arguments.input.userId;
+	if (arguments.input && arguments.input->userId){
+		userId = *arguments.input->userId;
 	}
-	if (arguments.input.tenantId){
-		tenantId = *arguments.input.tenantId;
+	if (arguments.input && arguments.input->tenantId){
+		tenantId = *arguments.input->tenantId;
 	}
 
 	imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->FindMembership(userId, tenantId);
@@ -263,11 +263,11 @@ sdl::V1_0::imtauth::CIsMemberPayload CTenantMembershipManagerControllerComp::OnI
 	QByteArray userId;
 	QByteArray tenantId;
 	sdl::V1_0::imtauth::IsMemberRequestArguments arguments = request.GetRequestedArguments();
-	if (arguments.input.userId){
-		userId = *arguments.input.userId;
+	if (arguments.input && arguments.input->userId){
+		userId = *arguments.input->userId;
 	}
-	if (arguments.input.tenantId){
-		tenantId = *arguments.input.tenantId;
+	if (arguments.input && arguments.input->tenantId){
+		tenantId = *arguments.input->tenantId;
 	}
 
 	response.isMember = m_membershipManagerCompPtr->IsMember(userId, tenantId);
@@ -291,16 +291,16 @@ sdl::V1_0::imtauth::CHasMinimumRolePayload CTenantMembershipManagerControllerCom
 	QByteArray userId;
 	QByteArray tenantId;
 	sdl::V1_0::imtauth::HasMinimumRoleRequestArguments arguments = request.GetRequestedArguments();
-	if (arguments.input.userId){
-		userId = *arguments.input.userId;
+	if (arguments.input && arguments.input->userId){
+		userId = *arguments.input->userId;
 	}
-	if (arguments.input.tenantId){
-		tenantId = *arguments.input.tenantId;
+	if (arguments.input && arguments.input->tenantId){
+		tenantId = *arguments.input->tenantId;
 	}
 
 	QByteArray minimumRoleId;
-	if (arguments.input.minimumRole){
-		minimumRoleId = (*arguments.input.minimumRole);
+	if (arguments.input && arguments.input->minimumRole){
+		minimumRoleId = (*arguments.input->minimumRole);
 	}
 
 	response.hasRole = m_membershipManagerCompPtr->HasMinimumRole(userId, tenantId, minimumRoleId);
@@ -323,11 +323,11 @@ sdl::V1_0::imtauth::CGetTenantInvitationsPayload CTenantMembershipManagerControl
 	QByteArray tenantId;
 	imtauth::ITenantInvitationManager::Statuses statuses;
 	sdl::V1_0::imtauth::GetTenantInvitationsRequestArguments arguments = request.GetRequestedArguments();
-	if (arguments.input.tenantId){
-		tenantId = *arguments.input.tenantId;
+	if (arguments.input && arguments.input->tenantId){
+		tenantId = *arguments.input->tenantId;
 	}
-	if (arguments.input.statuses){
-		for (const auto& status : *arguments.input.statuses){
+	if (arguments.input && arguments.input->statuses){
+		for (const auto& status : *arguments.input->statuses){
 			statuses.append(static_cast<imtauth::ITenantInvitation::TenantInvitationStatus>(*status));
 		}
 	}
@@ -369,8 +369,8 @@ sdl::V1_0::imtauth::CGetMyTenantInvitationsPayload CTenantMembershipManagerContr
 
 	imtauth::ITenantInvitationManager::Statuses statuses;
 	sdl::V1_0::imtauth::GetMyTenantInvitationsRequestArguments arguments = request.GetRequestedArguments();
-	if (arguments.input.statuses){
-		for (const auto& status : *arguments.input.statuses){
+	if (arguments.input && arguments.input->statuses){
+		for (const auto& status : *arguments.input->statuses){
 			statuses.append(static_cast<imtauth::ITenantInvitation::TenantInvitationStatus>(*status));
 		}
 	}
@@ -410,14 +410,14 @@ sdl::V1_0::imtauth::CAddMembershipPayload CTenantMembershipManagerControllerComp
 	QByteArray tenantId;
 	QByteArray roleId;
 	sdl::V1_0::imtauth::AddMembershipRequestArguments arguments = request.GetRequestedArguments();
-	if (arguments.input.userId){
-		userId = *arguments.input.userId;
+	if (arguments.input && arguments.input->userId){
+		userId = *arguments.input->userId;
 	}
-	if (arguments.input.tenantId){
-		tenantId = *arguments.input.tenantId;
+	if (arguments.input && arguments.input->tenantId){
+		tenantId = *arguments.input->tenantId;
 	}
-	if (arguments.input.role){
-		roleId = (*arguments.input.role);
+	if (arguments.input && arguments.input->role){
+		roleId = (*arguments.input->role);
 	}
 
 	QByteArray contextUserId = ContextUserId(gqlRequest);
@@ -459,8 +459,8 @@ sdl::V1_0::imtauth::CRemoveMembershipPayload CTenantMembershipManagerControllerC
 
 	QByteArray membershipId;
 	sdl::V1_0::imtauth::RemoveMembershipRequestArguments arguments = request.GetRequestedArguments();
-	if (arguments.input.membershipId){
-		membershipId = *arguments.input.membershipId;
+	if (arguments.input && arguments.input && arguments.input->membershipId){
+		membershipId = *arguments.input->membershipId;
 	}
 
 	// Resolve tenant from membership for permission check
@@ -508,14 +508,14 @@ sdl::V1_0::imtauth::CCreateTenantInvitationPayload CTenantMembershipManagerContr
 	QByteArray tenantId;
 	QByteArray roleId;
 	sdl::V1_0::imtauth::CreateTenantInvitationRequestArguments arguments = request.GetRequestedArguments();
-	if (arguments.input.userId){
-		userId = *arguments.input.userId;
+	if (arguments.input && arguments.input->userId){
+		userId = *arguments.input->userId;
 	}
-	if (arguments.input.tenantId){
-		tenantId = *arguments.input.tenantId;
+	if (arguments.input && arguments.input->tenantId){
+		tenantId = *arguments.input->tenantId;
 	}
-	if (arguments.input.role){
-		roleId = (*arguments.input.role);
+	if (arguments.input && arguments.input->role){
+		roleId = (*arguments.input->role);
 	}
 
 	QByteArray contextUserId = ContextUserId(gqlRequest);
@@ -556,8 +556,8 @@ sdl::V1_0::imtauth::CAcceptTenantInvitationPayload CTenantMembershipManagerContr
 
 	QByteArray invitationId;
 	sdl::V1_0::imtauth::AcceptTenantInvitationRequestArguments arguments = request.GetRequestedArguments();
-	if (arguments.input.invitationId){
-		invitationId = *arguments.input.invitationId;
+	if (arguments.input && arguments.input->invitationId){
+		invitationId = *arguments.input->invitationId;
 	}
 
 	QByteArray membershipId = m_invitationManagerCompPtr->AcceptInvitation(invitationId, ContextUserId(gqlRequest));
@@ -580,8 +580,8 @@ sdl::V1_0::imtauth::CRejectTenantInvitationPayload CTenantMembershipManagerContr
 	sdl::V1_0::imtauth::CRejectTenantInvitationPayload response;
 	QByteArray invitationId;
 	sdl::V1_0::imtauth::RejectTenantInvitationRequestArguments arguments = request.GetRequestedArguments();
-	if (arguments.input.invitationId){
-		invitationId = *arguments.input.invitationId;
+	if (arguments.input && arguments.input->invitationId){
+		invitationId = *arguments.input->invitationId;
 	}
 
 	bool success = m_invitationManagerCompPtr.IsValid() && m_invitationManagerCompPtr->RejectInvitation(invitationId, ContextUserId(gqlRequest));
@@ -607,8 +607,8 @@ sdl::V1_0::imtauth::CRevokeTenantInvitationPayload CTenantMembershipManagerContr
 
 	QByteArray invitationId;
 	sdl::V1_0::imtauth::RevokeTenantInvitationRequestArguments arguments = request.GetRequestedArguments();
-	if (arguments.input.invitationId){
-		invitationId = *arguments.input.invitationId;
+	if (arguments.input && arguments.input->invitationId){
+		invitationId = *arguments.input->invitationId;
 	}
 
 	imtauth::ITenantInvitationUniquePtr invitationPtr = m_invitationManagerCompPtr->GetInvitation(invitationId);
@@ -642,8 +642,8 @@ sdl::V1_0::imtauth::CResendTenantInvitationPayload CTenantMembershipManagerContr
 
 	QByteArray invitationId;
 	sdl::V1_0::imtauth::ResendTenantInvitationRequestArguments arguments = request.GetRequestedArguments();
-	if (arguments.input.invitationId){
-		invitationId = *arguments.input.invitationId;
+	if (arguments.input && arguments.input->invitationId){
+		invitationId = *arguments.input->invitationId;
 	}
 
 	imtauth::ITenantInvitationUniquePtr invitationPtr = m_invitationManagerCompPtr->GetInvitation(invitationId);
@@ -677,11 +677,11 @@ sdl::V1_0::imtauth::CUpdateMembershipRolePayload CTenantMembershipManagerControl
 	QByteArray membershipId;
 	QByteArray roleId;
 	sdl::V1_0::imtauth::UpdateMembershipRoleRequestArguments arguments = request.GetRequestedArguments();
-	if (arguments.input.membershipId){
-		membershipId = *arguments.input.membershipId;
+	if (arguments.input && arguments.input->membershipId){
+		membershipId = *arguments.input->membershipId;
 	}
-	if (arguments.input.role){
-		roleId = (*arguments.input.role);
+	if (arguments.input && arguments.input->role){
+		roleId = (*arguments.input->role);
 	}
 
 	// Resolve tenant from membership for permission check and owner guard
@@ -743,11 +743,11 @@ sdl::V1_0::imtauth::CTransferTenantOwnershipPayload CTenantMembershipManagerCont
 	QByteArray tenantId;
 	QByteArray newOwnerId;
 	sdl::V1_0::imtauth::TransferTenantOwnershipRequestArguments arguments = request.GetRequestedArguments();
-	if (arguments.input.tenantId){
-		tenantId = *arguments.input.tenantId;
+	if (arguments.input && arguments.input->tenantId){
+		tenantId = *arguments.input->tenantId;
 	}
-	if (arguments.input.newOwnerId){
-		newOwnerId = *arguments.input.newOwnerId;
+	if (arguments.input && arguments.input->newOwnerId){
+		newOwnerId = *arguments.input->newOwnerId;
 	}
 
 	if (tenantId.isEmpty() || newOwnerId.isEmpty()){

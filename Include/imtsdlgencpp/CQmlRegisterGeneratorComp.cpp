@@ -85,7 +85,7 @@ bool CQmlRegisterGeneratorComp::ProcessEntry (
 	Q_ASSERT(m_customSchemaParamsCompPtr.IsValid());
 	Q_ASSERT(m_dependentSchemaListCompPtr.IsValid());
 
-	if (headerDevicePtr == nullptr || sourceDevicePtr == nullptr){
+	if (headerDevicePtr == nullptr){
 		// nothing todo
 		return true;
 	}

@@ -15,7 +15,8 @@ QByteArrayList CClientRequestManagerCompBase::GetElementIds(const QByteArray& co
 	namespace imtcollection = sdl::V1_0::imtbase;
 
 	imtcollection::GetElementIdsRequestArguments arguments;
-	arguments.input.collectionId = collectionId;
+	arguments.input.emplace();
+	arguments.input->collectionId = collectionId;
 
 	imtcollection::CGetElementIdsPayload payload;
 	bool ok = SendModelRequestInternal<imtcollection::GetElementIdsRequestArguments, imtcollection::CGetElementIdsPayload, imtcollection::CGetElementIdsGqlRequest>(arguments, payload);
@@ -36,9 +37,10 @@ bool CClientRequestManagerCompBase::RemoveElements(const QByteArray& collectionI
 	namespace imtcollection = sdl::V1_0::imtbase;
 
 	imtcollection::RemoveElementsRequestArguments arguments;
-	arguments.input.elementIds.Emplace();
-	arguments.input.elementIds->FromList(elementIds);
-	arguments.input.collectionId = collectionId;
+	arguments.input.emplace();
+	arguments.input->elementIds.Emplace();
+	arguments.input->elementIds->FromList(elementIds);
+	arguments.input->collectionId = collectionId;
 
 	imtcollection::CRemoveElementsPayload payload;
 	bool ok = SendModelRequestInternal<imtcollection::RemoveElementsRequestArguments, imtcollection::CRemoveElementsPayload, imtcollection::CRemoveElementsGqlRequest>(arguments, payload);

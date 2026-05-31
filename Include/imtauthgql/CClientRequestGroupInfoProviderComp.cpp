@@ -39,14 +39,15 @@ imtauth::IUserGroupInfoSharedPtr CClientRequestGroupInfoProviderComp::GetUserGro
 	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::GroupItemRequestArguments arguments;
-	arguments.input.id = groupId;
+	arguments.input.emplace();
+	arguments.input->id = groupId;
 
 	QByteArray productId;
 	if (m_applicationInfoCompPtr.IsValid()){
 		productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
 
-	arguments.input.productId = productId;
+	arguments.input->productId = productId;
 
 	imtgql::CGqlRequest gqlRequest;
 	if (!userssdl::CGroupItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){

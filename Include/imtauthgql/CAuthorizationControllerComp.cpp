@@ -178,20 +178,25 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 		return sdl::V1_0::imtauth::CAuthorizationPayload();
 	}
 
-	sdl::V1_0::imtauth::CAuthorizationInput inputArgument = authorizationRequest.GetRequestedArguments().input;
+	istd::TSharedNullable<sdl::V1_0::imtauth::CAuthorizationInput> inputArgument = *authorizationRequest.GetRequestedArguments().input;
+	if (!inputArgument.has_value()){
+		Q_ASSERT(false);
+		return sdl::V1_0::imtauth::CAuthorizationPayload();
+	}
+
 	QByteArray login;
-	if (inputArgument.login){
-		login = inputArgument.login->toUtf8();
+	if (inputArgument->login){
+		login = inputArgument->login->toUtf8();
 	}
 
 	QByteArray productId;
-	if (inputArgument.productId){
-		productId = *inputArgument.productId;
+	if (inputArgument->productId){
+		productId = *inputArgument->productId;
 	}
 
 	QByteArray password;
-	if (inputArgument.password){
-		password = inputArgument.password->toUtf8();
+	if (inputArgument->password){
+		password = inputArgument->password->toUtf8();
 	}
 
 	QByteArray userObjectId = GetUserObjectId(login);
@@ -239,20 +244,25 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserTo
 		return sdl::V1_0::imtauth::CAuthorizationPayload();
 	}
 
-	sdl::V1_0::imtauth::CAuthorizationInput inputArgument = userTokenRequest.GetRequestedArguments().input;
+	istd::TSharedNullable<sdl::V1_0::imtauth::CAuthorizationInput> inputArgument = userTokenRequest.GetRequestedArguments().input;
+	if (!inputArgument.has_value()){
+		Q_ASSERT(false);
+		return sdl::V1_0::imtauth::CAuthorizationPayload();
+	}
+
 	QByteArray login;
-	if (inputArgument.login){
-		login = inputArgument.login->toUtf8();
+	if (inputArgument->login){
+		login = inputArgument->login->toUtf8();
 	}
 	
 	QByteArray productId;
-	if (inputArgument.productId){
-		productId = *inputArgument.productId;
+	if (inputArgument->productId){
+		productId = *inputArgument->productId;
 	}
 	
 	QByteArray password;
-	if (inputArgument.password){
-		password = inputArgument.password->toUtf8();
+	if (inputArgument->password){
+		password = inputArgument->password->toUtf8();
 	}
 
 	QByteArray userObjectId = GetUserObjectId(login);
@@ -303,8 +313,6 @@ sdl::V1_0::imtauth::CLogoutPayload CAuthorizationControllerComp::OnLogout(
 		return response;
 	}
 
-	sdl::V1_0::imtauth::CTokenInput arguments = logoutRequest.GetRequestedArguments().input;
-
 	QByteArray accessToken = gqlContextPtr->GetToken();
 	if (m_jwtSessionControllerCompPtr.IsValid()){
 		QByteArray sessionId = m_jwtSessionControllerCompPtr->GetSessionFromJwt(accessToken);
@@ -337,11 +345,15 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 		return response;
 	}
 
-	sdl::V1_0::imtauth::CTokenInput arguments = getPermissionsRequest.GetRequestedArguments().input;
+	istd::TSharedNullable<sdl::V1_0::imtauth::CTokenInput> arguments = getPermissionsRequest.GetRequestedArguments().input;
+	if (!arguments.HasValue()){
+		Q_ASSERT(false);
+		return response;
+	}
 
 	QByteArray token;
-	if (arguments.accessToken.HasValue()){
-		token = *arguments.accessToken;
+	if (arguments->accessToken.HasValue()){
+		token = *arguments->accessToken;
 	}
 
 	QByteArray userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);

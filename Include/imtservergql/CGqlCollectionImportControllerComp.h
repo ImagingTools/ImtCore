@@ -8,7 +8,7 @@
 // ImtCore includes
 #include <imtservergql/ICollectionImportController.h>
 #include <imthype/IJobQueueManager.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/CollectionImport_fwd.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/CollectionImport.h>
 
 
 namespace imtservergql
@@ -60,31 +60,37 @@ bool CGqlCollectionImportControllerComp::FillSessionInfo(
 	QString& errorMessage)
 {
 	auto sdlImportParams = request.GetRequestedArguments().input;
-	auto sdlImportParamsV1_0 = sdlImportParams;
 
-	if (sdlImportParamsV1_0.sessionId && sdlImportParamsV1_0.collectionId && sdlImportParamsV1_0.fileList && sdlImportParamsV1_0.fileList->count() > 0){
-		sessionInfo.sessionId = *sdlImportParamsV1_0.sessionId;
-		sessionInfo.collectionId = *sdlImportParamsV1_0.collectionId;
+	if (sdlImportParams){
+		auto sdlImportParamsV1_0 = *sdlImportParams;
 
-		for (const auto& fileInfo : *sdlImportParamsV1_0.fileList){
-			if (!fileInfo.HasValue()){
-				continue;
-			}
-			if (fileInfo->fileId && fileInfo->fileName && fileInfo->fileSize && fileInfo->objectTypeId){
-				sessionInfo.files.emplace_back();
-				sessionInfo.files.back().id = *fileInfo->fileId;
-				sessionInfo.files.back().name = *fileInfo->fileName;
-				sessionInfo.files.back().size = *fileInfo->fileSize;
-				sessionInfo.files.back().objectTypeId = *fileInfo->objectTypeId;
-			}
-			else{
-				errorMessage = tr("Invalid file info in the request");
+		if (sdlImportParamsV1_0.sessionId && sdlImportParamsV1_0.collectionId && sdlImportParamsV1_0.fileList && sdlImportParamsV1_0.fileList->count() > 0){
+			sessionInfo.sessionId = *sdlImportParamsV1_0.sessionId;
+			sessionInfo.collectionId = *sdlImportParamsV1_0.collectionId;
 
-				return false;
+			for (const auto& fileInfo : *sdlImportParamsV1_0.fileList){
+				if (!fileInfo.HasValue()){
+					continue;
+				}
+				if (fileInfo->fileId && fileInfo->fileName && fileInfo->fileSize && fileInfo->objectTypeId){
+					sessionInfo.files.emplace_back();
+					sessionInfo.files.back().id = *fileInfo->fileId;
+					sessionInfo.files.back().name = *fileInfo->fileName;
+					sessionInfo.files.back().size = *fileInfo->fileSize;
+					sessionInfo.files.back().objectTypeId = *fileInfo->objectTypeId;
+				}
+				else{
+					errorMessage = tr("Invalid file info in the request");
+
+					return false;
+				}
 			}
+
+			return true;
 		}
-
-		return true;
+		else{
+			errorMessage = tr("Invalid import request");
+		}
 	}
 	else{
 		errorMessage = tr("Invalid import request");
@@ -99,8 +105,8 @@ QByteArray CGqlCollectionImportControllerComp::GetCancelSessionId(
 	const GqlRequest& request)
 {
 	auto sdlSessionId = request.GetRequestedArguments().input;
-	if (sdlSessionId.sessionId){
-		QByteArray sessionId = *sdlSessionId.sessionId;
+	if (sdlSessionId && sdlSessionId->sessionId){
+		QByteArray sessionId = *sdlSessionId->sessionId;
 
 		return sessionId;
 	}

@@ -64,7 +64,7 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnCreateNewDocument
 	const auto& arguments = createNewDocumentRequest.GetRequestedArguments();
 
 	auto documentTypeId = arguments.input;
-	if (!documentTypeId.typeId){
+	if (!documentTypeId->typeId){
 		errorMessage = "Invalid GraphQL request params";
 
 		return retVal;
@@ -76,12 +76,12 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnCreateNewDocument
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
-		const QByteArray proposedSourceDocumentId = documentTypeId.proposedSourceDocumentId
-			? *documentTypeId.proposedSourceDocumentId
+		const QByteArray proposedSourceDocumentId = documentTypeId->proposedSourceDocumentId
+			? *documentTypeId->proposedSourceDocumentId
 			: QByteArray();
 		imtdoc::IDocumentService::TaskParams taskParams;
 		taskParams.userId = userId;
-		taskParams.documentTypeId = *documentTypeId.typeId;
+		taskParams.documentTypeId = *documentTypeId->typeId;
 		taskParams.proposedSourceDocumentId = proposedSourceDocumentId;
 		QByteArray taskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_NEW, taskParams);
 		imtdoc::IDocumentService::TaskResult taskResult = m_documentManagerCompPtr->WaitForTaskFinished(taskId);
@@ -97,7 +97,7 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnCreateNewDocument
 
 		retVal.documentId = documentId;
 		retVal.documentName = documentName;
-		retVal.objectTypeId = *documentTypeId.typeId;
+		retVal.objectTypeId = *documentTypeId->typeId;
 		retVal.objectId = QByteArray();
 		retVal.isDirty = false;
 		retVal.hasNameProvider = false;
@@ -124,9 +124,13 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnOpenDocument(
 	CDM::CDocumentInfo retVal;
 
 	const auto& arguments = openDocumentRequest.GetRequestedArguments();
+	if (!arguments.input.has_value()){
+		Q_ASSERT(false);
+		return retVal;
+	}
 
 	auto objectId = arguments.input;
-	if (!objectId.id){
+	if (!objectId->id){
 		errorMessage = "Invalid GraphQL request params";
 
 		return retVal;
@@ -137,7 +141,7 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnOpenDocument(
 		SendWarningMessage(0, "Unable to get user-ID from context");
 	}
 
-	QUrl url(QString("collection:///%1").arg(*objectId.id));
+	QUrl url(QString("collection:///%1").arg(*objectId->id));
 
 	if (m_documentManagerCompPtr.IsValid()) {
 		imtdoc::IDocumentService::TaskParams taskParams;
@@ -153,7 +157,7 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnOpenDocument(
 		}
 
 		retVal.documentId = documentId;
-		retVal.objectId = *objectId.id;
+		retVal.objectId = *objectId->id;
 		retVal.isDirty = false;
 		retVal.hasNameProvider = false;
 		retVal.isLoading = true;
@@ -182,9 +186,13 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnGetDocumentName(
 	CDM::CDocumentInfo retVal;
 
 	const auto& arguments = getDocumentNameRequest.GetRequestedArguments();
+	if (!arguments.input.has_value()){
+		Q_ASSERT(false);
+		return retVal;
+	}
 
 	auto documentId = arguments.input;
-	if (!documentId.id){
+	if (!documentId->id){
 		errorMessage = "Invalid GraphQL request params";
 
 		return retVal;
@@ -197,11 +205,11 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnGetDocumentName(
 
 	if (m_documentManagerCompPtr.IsValid()) {
 		QString name;
-		imtdoc::IDocumentService::OperationStatus status = m_documentManagerCompPtr->GetDocumentName(userId, *documentId.id, name);
+		imtdoc::IDocumentService::OperationStatus status = m_documentManagerCompPtr->GetDocumentName(userId, *documentId->id, name);
 
 		switch (status){
 		case imtdoc::IDocumentService::OS_OK:{
-			retVal.documentId = *documentId.id;
+			retVal.documentId = *documentId->id;
 			retVal.documentName = name;
 			break;
 		}
@@ -231,9 +239,12 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSetDoc
 	CDM::CDocumentOperationStatus retVal;
 
 	const auto& arguments = setDocumentNameRequest.GetRequestedArguments();
-
+	if (!arguments.input.has_value()){
+		Q_ASSERT(false);
+		return retVal;
+	}
 	auto documentId = arguments.input;
-	if (!documentId.documentId || !documentId.documentName){
+	if (!documentId->documentId || !documentId->documentName){
 		errorMessage = "Invalid GraphQL request params";
 
 		return retVal;
@@ -245,7 +256,7 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSetDoc
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
-		imtdoc::IDocumentService::OperationStatus status = m_documentManagerCompPtr->SetDocumentName(userId, *documentId.documentId, *documentId.documentName);
+		imtdoc::IDocumentService::OperationStatus status = m_documentManagerCompPtr->SetDocumentName(userId, *documentId->documentId, *documentId->documentName);
 		switch (status){
 		case imtdoc::IDocumentService::OS_OK:
 			retVal.status = CDM::EDocumentOperationStatus::Success;
@@ -280,9 +291,12 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSaveDo
 	CDM::CDocumentOperationStatus retVal;
 
 	const auto& arguments = saveDocumentRequest.GetRequestedArguments();
-
+	if (!arguments.input.has_value()){
+		Q_ASSERT(false);
+		return retVal;
+	}
 	auto saveDocumentInput = arguments.input;
-	if (!saveDocumentInput.documentId || !saveDocumentInput.documentName){
+	if (!saveDocumentInput->documentId || !saveDocumentInput->documentName){
 		errorMessage = "Invalid GraphQL request params";
 
 		return retVal;
@@ -299,8 +313,8 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSaveDo
 
 		imtdoc::IDocumentService::TaskParams taskParams;
 		taskParams.userId = userId;
-		taskParams.documentId = *saveDocumentInput.documentId;
-		taskParams.documentName = *saveDocumentInput.documentName;
+		taskParams.documentId = *saveDocumentInput->documentId;
+		taskParams.documentName = *saveDocumentInput->documentName;
 		taskParams.operationContextPtr = operationContextPtr.GetPtr();
 		QByteArray taskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_SAVE, taskParams);
 		imtdoc::IDocumentService::TaskResult taskResult = m_documentManagerCompPtr->WaitForTaskFinished(taskId);
@@ -312,7 +326,7 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnSaveDo
 			retVal.status = CDM::EDocumentOperationStatus::Success;
 			{
 				QString resolvedName;
-				if (m_documentManagerCompPtr->GetDocumentName(userId, *saveDocumentInput.documentId, resolvedName) == imtdoc::IDocumentService::OS_OK){
+				if (m_documentManagerCompPtr->GetDocumentName(userId, *saveDocumentInput->documentId, resolvedName) == imtdoc::IDocumentService::OS_OK){
 					retVal.documentName = resolvedName;
 				}
 			}
@@ -354,9 +368,12 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnCloseD
 	CDM::CDocumentOperationStatus retVal;
 
 	const auto& arguments = closeDocumentRequest.GetRequestedArguments();
-
+	if (!arguments.input.has_value()){
+		Q_ASSERT(false);
+		return retVal;
+	}
 	auto documentId = arguments.input;
-	if (!documentId.id){
+	if (!documentId->id){
 		errorMessage = "Invalid GraphQL request params";
 
 		return retVal;
@@ -370,7 +387,7 @@ CDM::CDocumentOperationStatus CCollectionDocumentServiceControllerComp::OnCloseD
 	if (m_documentManagerCompPtr.IsValid()) {
 		imtdoc::IDocumentService::TaskParams taskParams;
 		taskParams.userId = userId;
-		taskParams.documentId = *documentId.id;
+		taskParams.documentId = *documentId->id;
 		QByteArray taskId = m_documentManagerCompPtr->BeginDocumentTask(imtdoc::IDocumentService::TT_CLOSE, taskParams);
 		imtdoc::IDocumentService::TaskResult taskResult = m_documentManagerCompPtr->WaitForTaskFinished(taskId);
 		imtdoc::IDocumentService::OperationStatus status = taskResult.status;
@@ -405,9 +422,12 @@ sdl::V1_0::imtbase::CUndoInfo CCollectionDocumentServiceControllerComp::OnGetUnd
 	retVal.status.emplace();
 
 	const auto& arguments = getUndoInfoRequest.GetRequestedArguments();
-
+	if (!arguments.input.has_value()){
+		Q_ASSERT(false);
+		return retVal;
+	}
 	auto documentId = arguments.input;
-	if (!documentId.id){
+	if (!documentId->id){
 		errorMessage = "Invalid GraphQL request params";
 
 		retVal.status->status = sdl::V1_0::imtbase::EUndoStatus::Failed;
@@ -415,7 +435,7 @@ sdl::V1_0::imtbase::CUndoInfo CCollectionDocumentServiceControllerComp::OnGetUnd
 		return retVal;
 	}
 
-	retVal.documentId = documentId.id;
+	retVal.documentId = documentId->id;
 
 	QByteArray userId = GetUserId(gqlRequest);
 	if (userId.isEmpty()){
@@ -424,7 +444,7 @@ sdl::V1_0::imtbase::CUndoInfo CCollectionDocumentServiceControllerComp::OnGetUnd
 
 	if (m_documentManagerCompPtr.IsValid()) {
 		idoc::IUndoManager* undoManagerPtr = nullptr;
-		if (m_documentManagerCompPtr-> GetDocumentUndoManager(userId, *documentId.id, undoManagerPtr) != imtdoc::IDocumentService::OS_OK){
+		if (m_documentManagerCompPtr-> GetDocumentUndoManager(userId, *documentId->id, undoManagerPtr) != imtdoc::IDocumentService::OS_OK){
 			errorMessage = "Undo manager not available";
 
 			retVal.status->status = sdl::V1_0::imtbase::EUndoStatus::Failed;
@@ -603,9 +623,12 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnRese
 	retVal.status.emplace();
 
 	const auto& arguments = resetUndoRequest.GetRequestedArguments();
-
+	if (!arguments.input.has_value()){
+		Q_ASSERT(false);
+		return retVal;
+	}
 	auto documentId = arguments.input;
-	if (!documentId.id){
+	if (!documentId->id){
 		errorMessage = "Invalid GraphQL request params";
 
 		retVal.status = sdl::V1_0::imtbase::EUndoStatus::InvalidDocumentId;
@@ -621,7 +644,7 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnRese
 
 	if (m_documentManagerCompPtr.IsValid()) {
 		idoc::IUndoManager* undoManagerPtr = nullptr;
-		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, *documentId.id, undoManagerPtr) != imtdoc::IDocumentService::OS_OK) {
+		if (m_documentManagerCompPtr->GetDocumentUndoManager(userId, *documentId->id, undoManagerPtr) != imtdoc::IDocumentService::OS_OK) {
 			errorMessage = "Undo manager not available";
 
 			retVal.status = sdl::V1_0::imtbase::EUndoStatus::Failed;

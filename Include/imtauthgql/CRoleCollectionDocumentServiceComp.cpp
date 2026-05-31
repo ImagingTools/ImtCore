@@ -26,8 +26,8 @@ sdl::V1_0::imtauth::CRoleData CRoleCollectionDocumentServiceComp::OnGetRoleRepre
 	QByteArray userId = GetUserId(gqlRequest);
 
 	QByteArray objectId;
-	if (arguments.input.id){
-		objectId = *arguments.input.id;
+	if (arguments.input && arguments.input->id){
+		objectId = *arguments.input->id;
 	}
 
 	if (objectId.isEmpty()){
@@ -83,8 +83,8 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CRoleCollectionDocumentServiceComp:
 	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
 
 	QByteArray documentId;
-	if (arguments.input.documentId){
-		documentId = *arguments.input.documentId;
+	if (arguments.input->documentId){
+		documentId = *arguments.input->documentId;
 	}
 
 	if (documentId.isEmpty()){
@@ -108,8 +108,8 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CRoleCollectionDocumentServiceComp:
 	}
 
 	sdl::V1_0::imtauth::CRoleData roleData;
-	if (arguments.input.role){
-		roleData = *arguments.input.role;
+	if (arguments.input->role){
+		roleData = *arguments.input->role;
 	}
 
 	if (roleData.id){

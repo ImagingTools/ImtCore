@@ -23,9 +23,14 @@ sdl::V1_0::imtbase::CSearchResults CGqlSearchControllerComp::OnSearch(
 	sdl::V1_0::imtbase::CSearchResults response;
 
 	sdl::V1_0::imtbase::SearchRequestArguments arguments = searchRequest.GetRequestedArguments();
+	if (!arguments.input.has_value()){
+		Q_ASSERT(false);
+		return response;
+	}
+
 	QString text;
-	if (arguments.input.text){
-		text = *arguments.input.text;
+	if (arguments.input->text){
+		text = *arguments.input->text;
 	}
 
 	imtsdl::TElementList<sdl::V1_0::imtbase::CSearchResult> searchResultList;

@@ -27,12 +27,12 @@ sdl::V1_0::imtbase::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
 	sdl::V1_0::imtbase::CSetSettingsPayload response;
 	
 	sdl::V1_0::imtbase::SetSettingsRequestArguments arguments = setSettingsRequest.GetRequestedArguments();
-	if (!arguments.input.userId.has_value()){
+	if (!arguments.input || !arguments.input->userId.has_value()){
 		Q_ASSERT(false);
 		return response;
 	}
 	
-	QByteArray userId = *arguments.input.userId;
+	QByteArray userId = *arguments.input->userId;
 
 	if (userId.isEmpty()){
 		errorMessage = QString("Unable to set settings. User-ID is empty!");
@@ -40,12 +40,12 @@ sdl::V1_0::imtbase::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
 		return response;
 	}
 
-	if (!arguments.input.settings.has_value()){
+	if (!arguments.input->settings.has_value()){
 		Q_ASSERT(false);
 		return response;
 	}
 	
-	QString settings = *arguments.input.settings;
+	QString settings = *arguments.input->settings;
 	
 	response.ok = false;
 
@@ -113,9 +113,14 @@ sdl::V1_0::imtbase::CParamsSet CSettingsControllerComp::OnGetSettings(
 	}
 	
 	sdl::V1_0::imtbase::GetSettingsRequestArguments arguments = getSettingsRequest.GetRequestedArguments();
+	if (!arguments.input.has_value()){
+		Q_ASSERT(false);
+		return response;
+	}
+
 	QByteArray userId;
-	if (arguments.input.userId){
-		userId = *arguments.input.userId;
+	if (arguments.input->userId){
+		userId = *arguments.input->userId;
 	}
 
 	if (userId.isEmpty()){
@@ -175,9 +180,14 @@ sdl::V1_0::imtbase::CStyleData CSettingsControllerComp::OnGetStyleData(
 	sdl::V1_0::imtbase::CStyleData response;
 	
 	sdl::V1_0::imtbase::GetStyleDataRequestArguments arguments = getStyleRequest.GetRequestedArguments();
+	if (!arguments.input.has_value()){
+		Q_ASSERT(false);
+		return response;
+	}
+
 	QByteArray schemeId;
-	if (arguments.input.schemeId){
-		schemeId = *arguments.input.schemeId;
+	if (arguments.input->schemeId){
+		schemeId = *arguments.input->schemeId;
 	}
 	
 	if(schemeId.isEmpty()){

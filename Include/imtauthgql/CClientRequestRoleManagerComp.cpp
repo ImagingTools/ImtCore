@@ -81,11 +81,12 @@ QByteArray CClientRequestRoleManagerComp::CreateRole(
 	namespace rolessdl = sdl::V1_0::imtauth;
 
 	rolessdl::RoleAddRequestArguments arguments;
-	arguments.input.id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-	arguments.input.typeId = QByteArrayLiteral("Role");
-	arguments.input.productId = productId;
-	arguments.input.name = roleName;
-	arguments.input.description = roleDescription;
+	arguments.input.emplace();
+	arguments.input->id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+	arguments.input->typeId = QByteArrayLiteral("Role");
+	arguments.input->productId = productId;
+	arguments.input->name = roleName;
+	arguments.input->description = roleDescription;
 
 	rolessdl::CRoleData roleData;
 
@@ -101,7 +102,7 @@ QByteArray CClientRequestRoleManagerComp::CreateRole(
 		roleData.permissions = permissions.join(';');
 	}
 
-	arguments.input.item = roleData;
+	arguments.input->item = roleData;
 
 	sdl::V1_0::imtbase::CAddedNotificationPayload payload;
 	bool ok = SendModelRequestInternal<rolessdl::RoleAddRequestArguments, sdl::V1_0::imtbase::CAddedNotificationPayload, rolessdl::CRoleAddGqlRequest>(arguments, payload);
@@ -207,8 +208,9 @@ bool CClientRequestRoleManagerComp::GetRoleDataSdl(const QByteArray& roleId, sdl
 	namespace rolessdl = sdl::V1_0::imtauth;
 
 	rolessdl::RoleItemRequestArguments arguments;
-	arguments.input.id = roleId;
-	arguments.input.productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+	arguments.input.emplace();
+	arguments.input->id = roleId;
+	arguments.input->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 
 	rolessdl::CRoleData payload;
 	bool ok = SendModelRequestInternal<rolessdl::RoleItemRequestArguments, rolessdl::CRoleData, rolessdl::CRoleItemGqlRequest>(arguments, payload);
@@ -231,10 +233,11 @@ bool CClientRequestRoleManagerComp::SetRoleDataSdl(const QByteArray& roleId, con
 	namespace rolessdl = sdl::V1_0::imtauth;
 
 	rolessdl::RoleUpdateRequestArguments arguments;
-	arguments.input.id = roleId;
-	arguments.input.typeId = QByteArray("Role");
-	arguments.input.productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
-	arguments.input.item = roleData;
+	arguments.input.emplace();
+	arguments.input->id = roleId;
+	arguments.input->typeId = QByteArray("Role");
+	arguments.input->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+	arguments.input->item = roleData;
 
 	rolessdl::CRoleData payload;
 	bool ok = SendModelRequestInternal<rolessdl::RoleUpdateRequestArguments, rolessdl::CRoleData, rolessdl::CRoleUpdateGqlRequest>(arguments, payload);

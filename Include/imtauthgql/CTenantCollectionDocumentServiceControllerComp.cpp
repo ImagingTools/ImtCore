@@ -84,8 +84,13 @@ CDM::CDocumentInfo CTenantCollectionDocumentServiceControllerComp::OnOpenDocumen
 
 		// Extract the objectId (tenantId) being opened from the request arguments
 		const auto& arguments = openDocumentRequest.GetRequestedArguments();
-		if (arguments.input.id){
-			QByteArray requestedTenantId = *arguments.input.id;
+		if (!arguments.input.has_value()){
+			Q_ASSERT(false);
+			return CDM::CDocumentInfo();
+		}
+
+		if (arguments.input->id){
+			QByteArray requestedTenantId = *arguments.input->id;
 			if (!requestedTenantId.isEmpty() && requestedTenantId != sessionTenantId){
 				errorMessage = QStringLiteral("Cannot edit a tenant you are not currently switched to. Please switch to this organization first.");
 				return CDM::CDocumentInfo();

@@ -35,10 +35,11 @@ imtauth::IUserInfoUniquePtr CClientRequestUserInfoProviderComp::GetUser(const QB
 	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::UserItemRequestArguments arguments;
-	arguments.input.id = userId;
+	arguments.input.emplace();
+	arguments.input->id = userId;
 
 	if (m_applicationInfoCompPtr.IsValid()){
-		arguments.input.productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+		arguments.input->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
 
 	imtgql::CGqlRequest gqlRequest;

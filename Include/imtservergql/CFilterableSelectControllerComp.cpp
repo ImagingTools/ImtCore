@@ -73,8 +73,8 @@ sdl::V1_0::imtbase::CGetSelectableItemsPayload CFilterableSelectControllerComp::
 	}
 
 	// Exclude selected IDs: create CDocumentIdFilter with CT_NOT_IN
-	if (arguments.input.excludeIds && !arguments.input.excludeIds->empty()){
-		const auto& excludeIdsList = *arguments.input.excludeIds;
+	if (arguments.input && arguments.input->excludeIds && !arguments.input->excludeIds->empty()){
+		const auto& excludeIdsList = *arguments.input->excludeIds;
 		QByteArrayList documentIds;
 		for (size_t i = 0; i < excludeIdsList.size(); ++i){
 			QByteArray docId = *excludeIdsList[i];
@@ -90,8 +90,8 @@ sdl::V1_0::imtbase::CGetSelectableItemsPayload CFilterableSelectControllerComp::
 		}
 	}
 
-	if (arguments.input.viewParams){
-		auto& viewParams = *arguments.input.viewParams;
+	if (arguments.input && arguments.input->viewParams){
+		auto& viewParams = *arguments.input->viewParams;
 		if (viewParams.offset){
 			offset = *viewParams.offset;
 		}

@@ -28,20 +28,21 @@ imtauth::IPersonalAccessTokenManager::TokenCreationResult CClientRequestPersonal
 	namespace tokensdl = sdl::V1_0::imtauth;
 
 	tokensdl::CreateTokenRequestArguments arguments;
-	arguments.input.userId = userId;
-	arguments.input.name = name;
+	arguments.input.emplace();
+	arguments.input->userId = userId;
+	arguments.input->name = name;
 	
 	if (!description.isEmpty()){
-		arguments.input.description = description;
+		arguments.input->description = description;
 	}
 	
 	if (!scopes.isEmpty()){
-		arguments.input.scopes.Emplace();
-		arguments.input.scopes->FromList(scopes);
+		arguments.input->scopes.Emplace();
+		arguments.input->scopes->FromList(scopes);
 	}
 	
 	if (expiresAt.isValid()){
-		arguments.input.expiresAt = expiresAt.toUTC().toString(Qt::ISODate);
+		arguments.input->expiresAt = expiresAt.toUTC().toString(Qt::ISODate);
 	}
 
 	tokensdl::CCreateTokenPayload payload;
@@ -78,7 +79,8 @@ bool CClientRequestPersonalAccessTokenManagerComp::ValidateToken(const QByteArra
 	namespace tokensdl = sdl::V1_0::imtauth;
 
 	tokensdl::ValidateTokenRequestArguments arguments;
-	arguments.input.token = rawToken;
+	arguments.input.emplace();
+	arguments.input->token = rawToken;
 
 	tokensdl::CValidateTokenPayload payload;
 	bool ok = SendModelRequestInternal<tokensdl::ValidateTokenRequestArguments, tokensdl::CValidateTokenPayload, tokensdl::CValidateTokenGqlRequest>(arguments, payload);
@@ -113,7 +115,8 @@ QByteArrayList CClientRequestPersonalAccessTokenManagerComp::GetTokenIds(const Q
 	namespace tokensdl = sdl::V1_0::imtauth;
 
 	tokensdl::GetTokenListRequestArguments arguments;
-	arguments.input.userId = userId;
+	arguments.input.emplace();
+	arguments.input->userId = userId;
 
 	tokensdl::CPersonalAccessTokenList payload;
 	bool ok = SendModelRequestInternal<tokensdl::GetTokenListRequestArguments, tokensdl::CPersonalAccessTokenList, tokensdl::CGetTokenListGqlRequest>(arguments, payload);
@@ -146,7 +149,8 @@ imtauth::IPersonalAccessTokenSharedPtr CClientRequestPersonalAccessTokenManagerC
 	namespace tokensdl = sdl::V1_0::imtauth;
 
 	tokensdl::GetTokenRequestArguments arguments;
-	arguments.input.id = tokenId;
+	arguments.input.emplace();
+	arguments.input->id = tokenId;
 
 	tokensdl::CPersonalAccessToken payload;
 	bool ok = SendModelRequestInternal<tokensdl::GetTokenRequestArguments, tokensdl::CPersonalAccessToken, tokensdl::CGetTokenGqlRequest>(arguments, payload);
@@ -212,7 +216,8 @@ bool CClientRequestPersonalAccessTokenManagerComp::RevokeToken(const QByteArray&
 	namespace tokensdl = sdl::V1_0::imtauth;
 
 	tokensdl::RevokeTokenRequestArguments arguments;
-	arguments.input.id = tokenId;
+	arguments.input.emplace();
+	arguments.input->id = tokenId;
 
 	tokensdl::CRevokeTokenPayload payload;
 	bool ok = SendModelRequestInternal<tokensdl::RevokeTokenRequestArguments, tokensdl::CRevokeTokenPayload, tokensdl::CRevokeTokenGqlRequest>(arguments, payload);
@@ -258,7 +263,8 @@ bool CClientRequestPersonalAccessTokenManagerComp::DeleteToken(const QByteArray&
 	namespace tokensdl = sdl::V1_0::imtauth;
 
 	tokensdl::DeleteTokenRequestArguments arguments;
-	arguments.input.id = tokenId;
+	arguments.input.emplace();
+	arguments.input->id = tokenId;
 
 	tokensdl::CDeleteTokenPayload payload;
 	bool ok = SendModelRequestInternal<tokensdl::DeleteTokenRequestArguments, tokensdl::CDeleteTokenPayload, tokensdl::CDeleteTokenGqlRequest>(arguments, payload);

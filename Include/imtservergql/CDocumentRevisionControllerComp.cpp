@@ -68,14 +68,18 @@ sdl::V1_0::imtbase::CRevisionInfoList CDocumentRevisionControllerComp::OnGetRevi
 	sdl::V1_0::imtbase::CRevisionInfoList response;
 	
 	sdl::V1_0::imtbase::GetRevisionInfoListRequestArguments arguments = getRevisionInfoListRequest.GetRequestedArguments();
+	if (!arguments.input.has_value()){
+		errorMessage = QString("Unable to get revision list. Error: Request invalid");
+		return  sdl::V1_0::imtbase::CRevisionInfoList();
+	}
 	QByteArray documentId;
-	if (arguments.input.documentId){
-		documentId = *arguments.input.documentId;
+	if (arguments.input->documentId){
+		documentId = *arguments.input->documentId;
 	}
 
 	QByteArray collectionId;
-	if (arguments.input.collectionId){
-		collectionId = *arguments.input.collectionId;
+	if (arguments.input->collectionId){
+		collectionId = *arguments.input->collectionId;
 	}
 
 	if (!IsCollectionSupported(collectionId)){
@@ -155,19 +159,24 @@ sdl::V1_0::imtbase::CRestoreRevisionResponse CDocumentRevisionControllerComp::On
 	sdl::V1_0::imtbase::CRestoreRevisionResponse response;
 	
 	sdl::V1_0::imtbase::RestoreRevisionRequestArguments arguments = restoreRevisionRequest.GetRequestedArguments();
+	if (!arguments.input.has_value()){
+		errorMessage = QString("Unable to restore revision. Error: Request invalid");
+		return sdl::V1_0::imtbase::CRestoreRevisionResponse();
+	}
+
 	QByteArray documentId;
-	if (arguments.input.objectId){
-		documentId = *arguments.input.objectId;
+	if (arguments.input->objectId){
+		documentId = *arguments.input->objectId;
 	}
 	
 	int revisionNumber = -1;
-	if (arguments.input.revision){
-		revisionNumber = *arguments.input.revision;
+	if (arguments.input->revision){
+		revisionNumber = *arguments.input->revision;
 	}
 	
 	QByteArray collectionId;
-	if (arguments.input.collectionId){
-		collectionId = *arguments.input.collectionId;
+	if (arguments.input->collectionId){
+		collectionId = *arguments.input->collectionId;
 	}
 	
 	if (!IsCollectionSupported(collectionId)){
@@ -224,19 +233,25 @@ sdl::V1_0::imtbase::CDeleteRevisionResponse CDocumentRevisionControllerComp::OnD
 	}
 	
 	sdl::V1_0::imtbase::DeleteRevisionRequestArguments arguments = deleteRevisionRequest.GetRequestedArguments();
+	if (!arguments.input.has_value()){
+		errorMessage = QString("Unable to delete revision. Error: Request invalid");
+		return sdl::V1_0::imtbase::CDeleteRevisionResponse();
+	}
+
 	QByteArray documentId;
-	if (arguments.input.objectId){
-		documentId = *arguments.input.objectId;
+	if (arguments.input->objectId){
+		documentId = *arguments.input->objectId;
 	}
 	
 	int revisionNumber = -1;
-	if (arguments.input.revision){
-		revisionNumber = *arguments.input.revision;
+	if (arguments.input->revision){
+		revisionNumber = *arguments.input->revision;
 	}
 	
+
 	QByteArray collectionId;
-	if (arguments.input.collectionId){
-		collectionId = *arguments.input.collectionId;
+	if (arguments.input->collectionId){
+		collectionId = *arguments.input->collectionId;
 	}
 
 	if (!IsCollectionSupported(collectionId)){

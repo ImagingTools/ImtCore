@@ -19,7 +19,8 @@ const QByteArrayList CTokenBasedPermissionsProviderComp::GetPermissions(const QB
 	namespace authsdl = sdl::V1_0::imtauth;
 
 	authsdl::GetPermissionsRequestArguments arguments;
-	arguments.input.accessToken = token;
+	arguments.input.emplace();
+	arguments.input->accessToken = token;
 
 	imtgql::CGqlRequest gqlRequest;
 	if (!authsdl::CGetPermissionsGqlRequest::SetupGqlRequest(gqlRequest, arguments)){

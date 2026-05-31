@@ -33,8 +33,13 @@ sdl::V1_0::imtauth::CValidateSessionPayload CGqlJwtSessionControllerComp::OnVali
 
 	QByteArray sessionId;
 	sdl::V1_0::imtauth::ValidateSessionRequestArguments arguments = validateSessionRequest.GetRequestedArguments();
-	if (arguments.input.sessionId){
-		sessionId = *arguments.input.sessionId;
+	if (!arguments.input.has_value()){
+		Q_ASSERT(false);
+		return response;
+	}
+
+	if (arguments.input->sessionId){
+		sessionId = *arguments.input->sessionId;
 	}
 
 	response.isValid = m_jwtSessionControllerCompPtr->ValidateSession(sessionId);
@@ -57,8 +62,13 @@ sdl::V1_0::imtauth::CValidateJwtPayload CGqlJwtSessionControllerComp::OnValidate
 
 	QString jwt;
 	sdl::V1_0::imtauth::ValidateJwtRequestArguments arguments = validateJwtRequest.GetRequestedArguments();
-	if (arguments.input.jwt){
-		jwt = *arguments.input.jwt;
+	if (!arguments.input.has_value()){
+		Q_ASSERT(false);
+		return response;
+	}
+
+	if (arguments.input->jwt){
+		jwt = *arguments.input->jwt;
 	}
 
 	imtauth::IJwtSessionController::JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(jwt.toUtf8());
@@ -93,8 +103,13 @@ sdl::V1_0::imtauth::CGetSessionPayload CGqlJwtSessionControllerComp::OnGetSessio
 
 	QByteArray sessionId;
 	sdl::V1_0::imtauth::GetSessionRequestArguments arguments = getSessionRequest.GetRequestedArguments();
-	if (arguments.input.sessionId){
-		sessionId = *arguments.input.sessionId;
+	if (!arguments.input.has_value()){
+		Q_ASSERT(false);
+		return response;
+	}
+
+	if (arguments.input->sessionId){
+		sessionId = *arguments.input->sessionId;
 	}
 
 	imtauth::ISessionSharedPtr sessionInfoPtr = m_jwtSessionControllerCompPtr->GetSession(sessionId);
@@ -134,8 +149,13 @@ sdl::V1_0::imtauth::CRefreshTokenPayload CGqlJwtSessionControllerComp::OnRefresh
 
 	QByteArray refreshToken;
 	sdl::V1_0::imtauth::RefreshTokenRequestArguments arguments = refreshTokenRequest.GetRequestedArguments();
-	if (arguments.input.refreshToken){
-		refreshToken = *arguments.input.refreshToken;
+	if (!arguments.input.has_value()){
+		Q_ASSERT(false);
+		return response;
+	}
+
+	if (arguments.input->refreshToken){
+		refreshToken = *arguments.input->refreshToken;
 	}
 
 	imtauth::IJwtSessionController::UserSession userSession;
@@ -163,11 +183,16 @@ sdl::V1_0::imtauth::CCreateNewSessionPayload CGqlJwtSessionControllerComp::OnCre
 	QByteArray userId;
 	QByteArray tenantId;
 	sdl::V1_0::imtauth::CreateNewSessionRequestArguments arguments = createNewSessionRequest.GetRequestedArguments();
-	if (arguments.input.userId){
-		userId = *arguments.input.userId;
+	if (!arguments.input.has_value()){
+		Q_ASSERT(false);
+		return response;
 	}
-	if (arguments.input.tenantId){
-		tenantId = *arguments.input.tenantId;
+
+	if (arguments.input->userId){
+		userId = *arguments.input->userId;
+	}
+	if (arguments.input->tenantId){
+		tenantId = *arguments.input->tenantId;
 	}
 
 	if (!tenantId.isEmpty()){
@@ -226,8 +251,12 @@ sdl::V1_0::imtauth::CSelectTenantPayload CGqlJwtSessionControllerComp::OnSelectT
 
 	QByteArray tenantId;
 	sdl::V1_0::imtauth::SelectTenantRequestArguments arguments = selectTenantRequest.GetRequestedArguments();
-	if (arguments.input.tenantId){
-		tenantId = *arguments.input.tenantId;
+	if (!arguments.input.has_value()){
+		Q_ASSERT(false);
+		return response;
+	}
+	if (arguments.input->tenantId){
+		tenantId = *arguments.input->tenantId;
 	}
 
 	if (!tenantId.isEmpty()){
@@ -285,8 +314,12 @@ sdl::V1_0::imtauth::CRemoveSessionPayload CGqlJwtSessionControllerComp::OnRemove
 
 	QByteArray sessionId;
 	sdl::V1_0::imtauth::RemoveSessionRequestArguments arguments = removeSessionRequest.GetRequestedArguments();
-	if (arguments.input.sessionId){
-		sessionId = *arguments.input.sessionId;
+	if (!arguments.input.has_value()){
+		Q_ASSERT(false);
+		return response;
+	}
+	if (arguments.input->sessionId){
+		sessionId = *arguments.input->sessionId;
 	}
 
 	response.ok = m_jwtSessionControllerCompPtr->RemoveSession(sessionId);
@@ -309,8 +342,12 @@ sdl::V1_0::imtauth::CGetUserFromJwtPayload CGqlJwtSessionControllerComp::OnGetUs
 
 	QString jwt;
 	sdl::V1_0::imtauth::GetUserFromJwtRequestArguments arguments = getUserFromJwtRequest.GetRequestedArguments();
-	if (arguments.input.jwt){
-		jwt = *arguments.input.jwt;
+	if (!arguments.input.has_value()){
+		Q_ASSERT(false);
+		return response;
+	}
+	if (arguments.input->jwt){
+		jwt = *arguments.input->jwt;
 	}
 
 	response.userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(jwt.toUtf8());
@@ -333,8 +370,12 @@ sdl::V1_0::imtauth::CGetTenantFromJwtPayload CGqlJwtSessionControllerComp::OnGet
 
 	QString jwt;
 	sdl::V1_0::imtauth::GetTenantFromJwtRequestArguments arguments = getTenantFromJwtRequest.GetRequestedArguments();
-	if (arguments.input.jwt){
-		jwt = *arguments.input.jwt;
+	if (!arguments.input.has_value()){
+		Q_ASSERT(false);
+		return response;
+	}
+	if (arguments.input->jwt){
+		jwt = *arguments.input->jwt;
 	}
 
 	response.tenantId = m_jwtSessionControllerCompPtr->GetTenantFromJwt(jwt.toUtf8());

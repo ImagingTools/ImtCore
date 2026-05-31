@@ -32,8 +32,13 @@ bool CCommandsControllerComp::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 	if (!getCommandsGqlRequest.IsValid()){
 		return false;
 	}
+
+	if (!arguments.input.has_value()){
+		Q_ASSERT(false);
+		return false;
+	}
 	
-	const QByteArray& typeId = arguments.input.typeId.value_or(QByteArray());
+	const QByteArray& typeId = arguments.input->typeId.value_or(QByteArray());
 	if (!typeId.isEmpty()){
 		return *m_typeIdAttrPtr == typeId;
 	}
@@ -55,9 +60,13 @@ sdl::V1_0::imtbase::CGuiElementContainer CCommandsControllerComp::OnGetCommands(
 	}
 	
 	sdl::V1_0::imtbase::GetCommandsRequestArguments arguments = getCommandsRequest.GetRequestedArguments();
+	if (!arguments.input.has_value()){
+		Q_ASSERT(false);
+		return sdl::V1_0::imtbase::CGuiElementContainer();;
+	}
 	QByteArray typeId;
-	if (arguments.input.typeId){
-		typeId = *arguments.input.typeId;
+	if (arguments.input->typeId){
+		typeId = *arguments.input->typeId;
 	}
 
 	const imtauth::IUserInfo* userInfoPtr = nullptr;
