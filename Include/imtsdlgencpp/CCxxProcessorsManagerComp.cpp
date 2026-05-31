@@ -8,6 +8,7 @@
 // Qt includes
 #include <QtCore/QTemporaryDir>
 #include <QtCore/QLockFile>
+#include <QtCore/QFileInfo>
 
 // ACF includes
 #include <istd/CSystem.h>
@@ -765,7 +766,20 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 	FeedStream(stream, 2, false);
 
 	// generate enum classes
+	const QString schemaBaseName = QFileInfo(m_argumentParserCompPtr->GetSchemaFilePath()).baseName();
 	if (hasEnums){
+		// The enums together with their Q_NAMESPACE/Q_ENUM_NS registrations are
+		// wrapped in a schema-unique inline namespace. Multiple schemas can
+		// contribute to the same C++ namespace (e.g. sdl::V1_0::imtbase), and
+		// emitting Q_NAMESPACE in each of them would generate colliding
+		// definitions of the namespace staticMetaObject. The inline namespace
+		// keeps the enums and the EnumXxx wrapper classes accessible from the
+		// parent namespace while giving each schema its own meta object.
+		stream << QStringLiteral("inline namespace ") << schemaBaseName << QStringLiteral("SdlEnums");
+		FeedStream(stream, 1, false);
+		stream << '{';
+		FeedStream(stream, 2, false);
+
 		stream << QStringLiteral("Q_NAMESPACE");
 		FeedStream(stream, 2, false);
 
@@ -791,6 +805,12 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 
 	// re-create stream after enum processors may have written to the file
 	QTextStream fwdStream(fwdFilePtr.get());
+
+	// close the schema-unique inline namespace that wraps the enums
+	if (hasEnums){
+		fwdStream << QStringLiteral("} // inline namespace ") << schemaBaseName << QStringLiteral("SdlEnums");
+		FeedStream(fwdStream, 2, false);
+	}
 
 	// forward declare all types
 	if (m_sdlTypeListCompPtr.IsValid()){

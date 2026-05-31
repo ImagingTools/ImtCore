@@ -9,6 +9,9 @@
 namespace sdl::V1_0::modsdl
 {
 
+inline namespace UnionTestSdlEnums
+{
+
 Q_NAMESPACE
 
 enum class LinkStatus {
@@ -34,6 +37,8 @@ signals:
 	void CLOSEChanged();
 };
 
+
+} // inline namespace UnionTestSdlEnums
 
 // type forward declarations
 class CCoords;

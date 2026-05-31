@@ -11,6 +11,9 @@
 namespace sdl::V1_0::imtbase
 {
 
+inline namespace ComplexCollectionFilterSdlEnums
+{
+
 Q_NAMESPACE
 
 enum class ValueType {
@@ -104,6 +107,8 @@ signals:
 	void OrChanged();
 };
 
+
+} // inline namespace ComplexCollectionFilterSdlEnums
 
 // type forward declarations
 class CTimeFilter;

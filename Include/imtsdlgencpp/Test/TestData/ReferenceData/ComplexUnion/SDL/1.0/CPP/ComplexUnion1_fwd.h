@@ -7,6 +7,9 @@
 namespace sdl::V1_0::complextest
 {
 
+inline namespace ComplexUnion1SdlEnums
+{
+
 Q_NAMESPACE
 
 enum class StatusCode {
@@ -384,6 +387,8 @@ void POLYGONChanged();
 void CIRCLEChanged();
 };
 
+
+} // inline namespace ComplexUnion1SdlEnums
 
 // type forward declarations
 class CPoint;

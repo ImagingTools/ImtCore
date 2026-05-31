@@ -11,6 +11,9 @@
 namespace sdl::V1_0::modsdl
 {
 
+inline namespace DigitalPrinterSdlEnums
+{
+
 Q_NAMESPACE
 
 enum class PrintingTechnology {
@@ -36,6 +39,8 @@ signals:
 	void TonerChanged();
 };
 
+
+} // inline namespace DigitalPrinterSdlEnums
 
 // type forward declarations
 class CDigitalPrinterSpecification;
