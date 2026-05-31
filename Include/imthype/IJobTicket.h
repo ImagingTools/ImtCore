@@ -49,6 +49,9 @@ public:
 	virtual IJobQueueManager::ProcessingStatus GetProcessingStatus() const = 0;
 	virtual void SetProcessingStatus(IJobQueueManager::ProcessingStatus status) = 0;
 
+	/**
+		Get/set the job progress in the normalized range [0.0 ... 1.0].
+	*/
 	virtual double GetProgress() const = 0;
 	virtual void SetProgress(double progress) = 0;
 
@@ -57,7 +60,6 @@ public:
 
 	virtual const imtbase::IReferenceCollection* GetInput() const = 0;
 	virtual void SetInput(const imtbase::IReferenceCollection& input) = 0;
-	// JobStatus - Progress, ProcassingStatus, MessageContainer log
 
 	virtual void SetParamsFactory(const ParamsFactoryFunction& factory) = 0;
 };

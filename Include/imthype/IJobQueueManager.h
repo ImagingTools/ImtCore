@@ -58,7 +58,7 @@ public:
 		PS_WAITING_FOR_ACCEPTING,
 
 		/**
-			JoB was accepted by the job dispatcher and now wating for its execution.
+			Job was accepted by the job dispatcher and now waiting for its execution.
 		*/
 		PS_WAITING_FOR_PROCESSING,
 
@@ -73,7 +73,7 @@ public:
 		PS_CANCELING,
 
 		/**
-			Job results are beeing transported to the job requester.
+			Job results are being transported to the job requester.
 		*/
 		PS_RETRIEVING_RESULTS,
 
@@ -151,7 +151,7 @@ public:
 		You can use the returned UUID for controlling the job execution and retrieving results.
 		\param contextId					ID of the job context.
 		\param typeId						Type-ID for the job. Will be used for pairing the corresponding job worker.
-		\param input						List of job inputs given as a collection of object links. Each input object should be persistency placed into a storage (IObjectCollection) bevor call this method.
+		\param input						List of job inputs given as a collection of object links. Each input object should be persistently placed into a storage (IObjectCollection) before calling this method.
 		\param jobProcessingParamsPtr		Processing parameters for the job (so called job ticket).
 		\param schedulerParamsPtr			Parameters of the job scheduler (optional).
 		\param logPtr						Job related log.
@@ -206,12 +206,12 @@ public:
 	virtual bool SetProcessingStatus(const QByteArray& jobId, ProcessingStatus status) = 0;
 	
 	/**
-		Get progress of the runnung job.
+		Get progress of the running job in the normalized range [0.0 ... 1.0].
 	*/
 	virtual double GetProgress(const QByteArray& jobId) const = 0;
 
 	/**
-		Set progress of the runnung job.
+		Set progress of the running job in the normalized range [0.0 ... 1.0].
 	*/
 	virtual bool SetProgress(const QByteArray& jobId, double progress) = 0;
 
