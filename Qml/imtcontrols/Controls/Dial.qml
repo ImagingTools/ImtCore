@@ -81,9 +81,15 @@ Item {
     }
 
     // Repaint whenever the value changes.
-    onValueChanged: track.requestPaint()
-    onWidthChanged: track.requestPaint()
-    onHeightChanged: track.requestPaint()
+    onValueChanged: {
+        track.requestPaint()
+    }
+    onWidthChanged: {
+        track.requestPaint()
+    }
+    onHeightChanged: {
+        track.requestPaint()
+    }
 
     // Handle.
     Rectangle {
@@ -105,9 +111,16 @@ Item {
         anchors.fill: parent
         enabled: control.enabled
         property bool dragging: false
-        onPressed: { dragging = true; _updateFromPoint(mouse.x, mouse.y); }
-        onReleased: dragging = false
-        onPositionChanged: { if (dragging) _updateFromPoint(mouse.x, mouse.y); }
+        onPressed: {
+            dragging = true
+            _updateFromPoint(mouse.x, mouse.y)
+        }
+        onReleased: {
+            dragging = false
+        }
+        onPositionChanged: {
+            if (dragging) _updateFromPoint(mouse.x, mouse.y)
+        }
 
         function _updateFromPoint(px, py) {
             var dx = px - control.width / 2;

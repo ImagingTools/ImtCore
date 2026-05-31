@@ -61,7 +61,6 @@ Control {
         color: Style.backgroundColor
         border.width: Style.buttonBorderWidth
         border.color: input.activeFocus ? Style.imaginToolsAccentColor : Style.borderColor
-        Behavior on border.color { ColorAnimation { duration: 120 } }
     }
 
     contentItem: Item {
@@ -80,8 +79,12 @@ Control {
             selectedTextColor: "#ffffff"
             font.family: Style.fontFamily
             font.pixelSize: Style.fontSizeM
-            onAccepted: control.accepted()
-            onEditingFinished: control.editingFinished()
+            onAccepted: {
+                control.accepted()
+            }
+            onEditingFinished: {
+                control.editingFinished()
+            }
 
             Text {
                 anchors.fill: parent

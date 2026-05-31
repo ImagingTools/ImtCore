@@ -34,11 +34,21 @@ Container {
 
     clip: true
 
-    onCurrentIndexChanged: _layout()
-    onWidthChanged: _layout()
-    onHeightChanged: _layout()
-    onCountChanged: _layout()
-    Component.onCompleted: _layout()
+    onCurrentIndexChanged: {
+        _layout()
+    }
+    onWidthChanged: {
+        _layout()
+    }
+    onHeightChanged: {
+        _layout()
+    }
+    onCountChanged: {
+        _layout()
+    }
+    Component.onCompleted: {
+        _layout()
+    }
 
     function _layout() {
         for (var i = 0; i < count; ++i) {

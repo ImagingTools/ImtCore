@@ -78,10 +78,6 @@ Item {
             drawer.closed();
     }
 
-    Behavior on position {
-        NumberAnimation { duration: 220; easing.type: Easing.OutCubic }
-    }
-
     // Dim / modal layer behind the panel.
     Rectangle {
         id: dim
@@ -93,7 +89,9 @@ Item {
         MouseArea {
             anchors.fill: parent
             enabled: drawer.modal && drawer.position > 0
-            onClicked: drawer.close()
+            onClicked: {
+                drawer.close()
+            }
         }
     }
 

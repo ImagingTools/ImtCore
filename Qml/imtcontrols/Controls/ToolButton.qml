@@ -46,7 +46,6 @@ AbstractButton {
                : control.hovered ? Style.buttonHoverColor
                : control.highlighted ? Style.imaginToolsAccentColor
                : "transparent"
-        Behavior on color { ColorAnimation { duration: 100 } }
     }
 
     contentItem: Text {

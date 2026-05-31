@@ -66,7 +66,9 @@ Item {
                 hoverEnabled: true
                 cursorShape: split.horizontal ? Qt.SplitHCursor : Qt.SplitVCursor
                 property real pressPos: 0
-                onPressed: pressPos = split.horizontal
+                onPressed: {
+                    pressPos = split.horizontal
+                }
                     ? mapToItem(split, mouse.x, mouse.y).x
                     : mapToItem(split, mouse.x, mouse.y).y
                 onPositionChanged: {
@@ -82,9 +84,15 @@ Item {
         }
     }
 
-    Component.onCompleted: _rebuild()
-    onWidthChanged: _relayout()
-    onHeightChanged: _relayout()
+    Component.onCompleted: {
+        _rebuild()
+    }
+    onWidthChanged: {
+        _relayout()
+    }
+    onHeightChanged: {
+        _relayout()
+    }
 
     function _rebuild() {
         for (var h = 0; h < _handles.length; ++h) {

@@ -263,10 +263,11 @@ The internal `Flickable` is exposed as `flickable`; `contentWidth` /
 
 ### ApplicationWindow
 
-A `Window` that adds the conventional application layout: an optional
-`header` docked at the top, an optional `footer` docked at the bottom and the
-page content (its default children) in between. The window background is
-themed through `Style`.
+An `Item`-based application surface (no `QtQuick.Window` dependency) that adds
+the conventional application layout: an optional `header` docked at the top, an
+optional `footer` docked at the bottom and the page content (its default
+children) in between. It can be hosted inside any window surface provided by the
+application, and its background is themed through `Style`.
 
 | Property | Type | Description                              |
 |----------|------|------------------------------------------|

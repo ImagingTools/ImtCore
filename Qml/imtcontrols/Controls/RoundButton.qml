@@ -45,7 +45,6 @@ AbstractButton {
                : Style.buttonColor
         border.width: Style.buttonBorderWidth
         border.color: Style.buttonBorderColor
-        Behavior on color { ColorAnimation { duration: 100 } }
     }
 
     contentItem: Text {

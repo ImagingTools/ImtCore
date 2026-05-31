@@ -53,7 +53,6 @@ Control {
         color: Style.backgroundColor
         border.width: Style.buttonBorderWidth
         border.color: edit.activeFocus ? Style.imaginToolsAccentColor : Style.borderColor
-        Behavior on border.color { ColorAnimation { duration: 120 } }
     }
 
     contentItem: Item {

@@ -50,9 +50,16 @@ Item {
         color: Style.backgroundColor2
     }
 
-    onHeaderChanged: _placeHeader()
-    onFooterChanged: _placeFooter()
-    Component.onCompleted: { _placeHeader(); _placeFooter(); }
+    onHeaderChanged: {
+        _placeHeader()
+    }
+    onFooterChanged: {
+        _placeFooter()
+    }
+    Component.onCompleted: {
+        _placeHeader()
+        _placeFooter()
+    }
 
     function _placeHeader() {
         if (!header)

@@ -54,7 +54,6 @@ AbstractButton {
                 color: control.checked ? Style.imaginToolsAccentColor
                                        : Style.buttonInactiveColor
                 opacity: control.enabled ? 1.0 : 0.5
-                Behavior on color { ColorAnimation { duration: 120 } }
             }
 
             Rectangle {
@@ -67,7 +66,6 @@ AbstractButton {
                 color: "#ffffff"
                 border.width: Style.buttonBorderWidth
                 border.color: Style.borderColor
-                Behavior on x { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
             }
         }
 

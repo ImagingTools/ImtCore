@@ -59,12 +59,13 @@ Item {
                 color: index === control.currentIndex
                        ? Style.imaginToolsAccentColor : Style.borderColor2
                 opacity: index === control.currentIndex ? 1.0 : 0.6
-                Behavior on opacity { NumberAnimation { duration: 100 } }
 
                 MouseArea {
                     anchors.fill: parent
                     enabled: control.interactive
-                    onClicked: control.currentIndex = index
+                    onClicked: {
+                        control.currentIndex = index
+                    }
                 }
             }
         }

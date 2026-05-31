@@ -74,7 +74,9 @@ Popup {
     Timer {
         id: hideTimer
         interval: toolTip.timeout
-        onTriggered: toolTip.close()
+        onTriggered: {
+            toolTip.close()
+        }
     }
 
     background: Rectangle {

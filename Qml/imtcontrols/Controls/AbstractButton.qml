@@ -114,7 +114,9 @@ Control {
         // Let the base Control hover handler (below) track `hovered`;
         // a hoverEnabled MouseArea on top would otherwise swallow hover.
         hoverEnabled: false
-        onPressed: d.pressed = true
+        onPressed: {
+            d.pressed = true
+        }
         onReleased: {
             if (d.pressed) {
                 d.pressed = false;
@@ -127,7 +129,11 @@ Control {
                 button.canceled();
             }
         }
-        onClicked: button.toggle()
-        onDoubleClicked: button.doubleClicked()
+        onClicked: {
+            button.toggle()
+        }
+        onDoubleClicked: {
+            button.doubleClicked()
+        }
     }
 }

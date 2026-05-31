@@ -32,7 +32,6 @@ Control {
     implicitHeight: Style.controlHeightL
 
     opacity: running ? 1.0 : 0.0
-    Behavior on opacity { NumberAnimation { duration: 150 } }
 
     contentItem: Item {
         implicitWidth:  Style.controlHeightL

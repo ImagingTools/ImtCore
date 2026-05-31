@@ -1,5 +1,4 @@
 import QtQuick 2.12
-import QtQuick.Window 2.1
 import Acf 1.0
 import imtcontrols 1.0
 
@@ -7,14 +6,15 @@ import imtcontrols 1.0
     \qmltype ApplicationWindow
     \inqmlmodule imtcontrols
 
-    Top-level application window, API-compatible with Qt Quick Controls
+    Top-level application surface, API-compatible with Qt Quick Controls
     \c ApplicationWindow.
 
-    ApplicationWindow is a \c Window that adds the conventional application
-    layout: an optional \l header docked at the top, an optional \l footer
-    docked at the bottom and the page content (its default children) in
-    between. The window background is themed through the application
-    \c Style singleton.
+    ApplicationWindow provides the conventional application layout: an
+    optional \l header docked at the top, an optional \l footer docked at the
+    bottom and the page content (its default children) in between. It is built
+    from a plain \c Item (no \c QtQuick.Window dependency) so it can be hosted
+    inside any window surface provided by the application. The background is
+    themed through the application \c Style singleton.
 
     \qml
     ApplicationWindow {
@@ -26,7 +26,7 @@ import imtcontrols 1.0
 
     \sa Page, ToolBar
 */
-Window {
+Item {
     id: appWindow
     objectName: "ImtControlsApplicationWindow"
 
@@ -35,18 +35,31 @@ Window {
     /*! Item docked at the bottom of the window (e.g. a \l ToolBar footer). */
     property Item footer: null
 
+    /*! Surface background color, themed through the \c Style singleton. */
+    property color color: Style.backgroundColor2
+
     /*! User content placed in the central area between header and footer. */
     default property alias contentData: contentHolder.data
 
     width: Style.startWindowWidth
     height: Style.startWindowHeight
-    color: Style.backgroundColor2
 
-    onHeaderChanged: _placeHeader()
-    onFooterChanged: _placeFooter()
+    onHeaderChanged: {
+        _placeHeader()
+    }
+    onFooterChanged: {
+        _placeFooter()
+    }
     Component.onCompleted: {
         _placeHeader();
         _placeFooter();
+    }
+
+    Rectangle {
+        id: surface
+        anchors.fill: parent
+        color: appWindow.color
+        z: -1
     }
 
     function _placeHeader() {

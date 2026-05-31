@@ -64,8 +64,12 @@ Item {
     // arbitrary marker properties, so we keep the set here).
     property var _wiredItems: []
 
-    onCurrentIndexChanged: _syncChecked()
-    Component.onCompleted: _wireUp()
+    onCurrentIndexChanged: {
+        _syncChecked()
+    }
+    Component.onCompleted: {
+        _wireUp()
+    }
 
     Connections {
         target: tabRow

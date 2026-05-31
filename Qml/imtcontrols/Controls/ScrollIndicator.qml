@@ -44,7 +44,6 @@ Item {
     height: vertical ? 200 : Style.spacingS
 
     opacity: active ? 0.75 : 0.0
-    Behavior on opacity { NumberAnimation { duration: 250 } }
 
     Rectangle {
         id: handle
@@ -59,7 +58,9 @@ Item {
         y: control.vertical ? control.position * (control.height - height) : 0
     }
 
-    onFlickableChanged: _syncFromFlickable()
+    onFlickableChanged: {
+        _syncFromFlickable()
+    }
 
     function _syncFromFlickable() {
         if (!flickable)

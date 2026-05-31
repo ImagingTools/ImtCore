@@ -49,7 +49,6 @@ AbstractButton {
             opacity: control.enabled ? 1.0 : 0.5
             border.width: Style.buttonBorderWidth
             border.color: control.checked ? Style.imaginToolsAccentColor : Style.borderColor
-            Behavior on border.color { ColorAnimation { duration: 100 } }
 
             Rectangle {
                 anchors.centerIn: parent

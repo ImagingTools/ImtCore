@@ -40,7 +40,9 @@ AbstractButton {
     padding: 0
     background: null
 
-    onCheckStateChanged: checked = (checkState !== Qt.Unchecked)
+    onCheckStateChanged: {
+        checked = (checkState !== Qt.Unchecked)
+    }
     onCheckedChanged: {
         if (!tristate)
             checkState = checked ? Qt.Checked : Qt.Unchecked;
@@ -62,7 +64,6 @@ AbstractButton {
             border.width: Style.buttonBorderWidth
             border.color: control.checkState !== Qt.Unchecked ? Style.imaginToolsAccentColor
                                                               : Style.borderColor
-            Behavior on color { ColorAnimation { duration: 100 } }
 
             // Check mark.
             Text {

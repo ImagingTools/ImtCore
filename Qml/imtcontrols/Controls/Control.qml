@@ -145,8 +145,12 @@ Item {
         anchors.fill: parent
     }
 
-    onBackgroundChanged: _placeBackground()
-    onContentItemChanged: _placeContent()
+    onBackgroundChanged: {
+        _placeBackground()
+    }
+    onContentItemChanged: {
+        _placeContent()
+    }
     Component.onCompleted: {
         _placeBackground();
         _placeContent();

@@ -56,7 +56,6 @@ Item {
         radius: width < height ? width / 2 : height / 2
         color: Style.backgroundColor
         opacity: control.active ? 0.6 : 0.3
-        Behavior on opacity { NumberAnimation { duration: 120 } }
     }
 
     // Handle.
@@ -109,7 +108,9 @@ Item {
 
     // ---- Flickable integration -----------------------------------------
 
-    onFlickableChanged: _bindFlickable()
+    onFlickableChanged: {
+        _bindFlickable()
+    }
 
     function _bindFlickable() {
         if (!flickable)

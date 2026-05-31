@@ -72,7 +72,9 @@ Control {
             height: parent.height
             text: "-"
             enabled: control.enabled && control.value > control.from
-            onClicked: control.decrease()
+            onClicked: {
+                control.decrease()
+            }
         }
 
         TextInput {
@@ -90,7 +92,9 @@ Control {
             font.family: Style.fontFamily
             font.pixelSize: Style.fontSizeM
             validator: IntValidator { bottom: control.from; top: control.to }
-            onEditingFinished: control._apply(parseInt(text, 10))
+            onEditingFinished: {
+                control._apply(parseInt(text, 10))
+            }
         }
 
         ToolButton {
@@ -101,7 +105,9 @@ Control {
             height: parent.height
             text: "+"
             enabled: control.enabled && control.value < control.to
-            onClicked: control.increase()
+            onClicked: {
+                control.increase()
+            }
         }
     }
 }

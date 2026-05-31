@@ -62,7 +62,6 @@ Control {
                 height: parent.height
                 radius: parent.radius
                 color: Style.imaginToolsAccentColor
-                Behavior on width { NumberAnimation { duration: 120 } }
             }
 
             // Indeterminate sweep.
