@@ -7,12 +7,25 @@ QML, styled through the application `Style` singleton (module `Acf`), and
 API-compatible with their Qt counterparts so existing Qt knowledge and code
 transfer directly.
 
-All types live in the `imtcontrols` module and are imported together with the
-rest of the library:
+These types form the **imtcontrols 2.0 control system** — a complete,
+from-scratch re-implementation of *every* type in the
+[Qt Quick Controls](https://doc.qt.io/qt-6/qtquickcontrols-index.html) index
+(the **Delegate Controls** section is intentionally excluded). Every type is
+provided here even when a same-named control already exists elsewhere in
+`imtcontrols` (for example `Button`, `ComboBox`, `Slider`, `Menu`): the
+re-implementations that would otherwise collide with a legacy `1.0` type are
+registered at **version `2.0`**, so the two sets coexist. Opt in to the new
+controls with a versioned import:
 
 ```qml
-import imtcontrols 1.0
+import imtcontrols 2.0
 ```
+
+A `2.0` import still sees every `1.0` type, so the foundation types
+(`Control`, `AbstractButton`, `Container`, `Pane`, ...) and the rest of the
+library remain available alongside the new `2.0` controls. Legacy code that
+uses `import imtcontrols 1.0` keeps resolving to the original controls and is
+unaffected.
 
 > **Why re-implement Qt Quick Controls?**
 > These types reproduce Qt's API and visuals while drawing entirely from the
@@ -49,6 +62,22 @@ import imtcontrols 1.0
 | [`DelayButton`](#delaybutton)        | `DelayButton`     | button          | Press-and-hold activation button.                  |
 | [`Tumbler`](#tumbler)            | `Tumbler`         | input           | Spinnable wheel of items.                          |
 | [`Drawer`](#drawer)             | `Drawer`          | navigation      | Edge panel that slides into view.                  |
+| [`Button`](#button)             | `Button`          | button (2.0)    | Standard labelled command button.                  |
+| [`ToolButton`](#toolbutton)        | `ToolButton`      | button (2.0)    | Borderless button for tool bars.                   |
+| [`CheckBox`](#checkbox)           | `CheckBox`        | button (2.0)    | Checkable (optionally tri-state) option box.       |
+| [`RadioButton`](#radiobutton)        | `RadioButton`     | button (2.0)    | Exclusive option button.                           |
+| [`BusyIndicator`](#busyindicator)      | `BusyIndicator`   | indicator (2.0) | Animated activity spinner.                         |
+| [`ProgressBar`](#progressbar)        | `ProgressBar`     | indicator (2.0) | Determinate / indeterminate progress fill.         |
+| [`ScrollIndicator`](#scrollindicator)    | `ScrollIndicator` | indicator (2.0) | Non-interactive scroll position indicator.         |
+| [`Slider`](#slider)             | `Slider`          | input (2.0)     | Single-value slider.                               |
+| [`RangeSlider`](#rangeslider)        | `RangeSlider`     | input (2.0)     | Two-handle range slider.                           |
+| [`SpinBox`](#spinbox)            | `SpinBox`         | input (2.0)     | Numeric up/down spin box.                          |
+| [`TextField`](#textfield)          | `TextField`       | input (2.0)     | Single-line text input.                            |
+| [`TextArea`](#textarea)           | `TextArea`        | input (2.0)     | Multi-line text input.                             |
+| [`ComboBox`](#combobox)           | `ComboBox`        | input (2.0)     | Drop-down selector.                                |
+| [`StackView`](#stackview)          | `StackView`       | navigation (2.0)| Push/pop page stack.                               |
+| [`SwipeView`](#swipeview)          | `SwipeView`       | navigation (2.0)| Side-by-side paged container.                      |
+| [`SplitView`](#splitview)          | `SplitView`       | container (2.0) | Resizable split layout with drag handles.          |
 
 ---
 
@@ -510,6 +539,171 @@ Flickable {
 
 Use `orientation: Qt.Horizontal` for a horizontal bar; `increase()` /
 `decrease()` step by `stepSize`.
+
+---
+
+## imtcontrols 2.0 controls
+
+The following types extend the Qt Quick Controls set and are registered at
+version `2.0` (use `import imtcontrols 2.0`). The `Popup` and `Menu` families
+already exist in the module and are reused as-is.
+
+### Button
+
+Standard command button. Set `highlighted` to mark the default action and
+`flat` to drop the permanent fill until hovered/pressed.
+
+```qml
+Button {
+    text: qsTr("Apply")
+    highlighted: true
+    onClicked: form.apply()
+}
+```
+
+### ToolButton
+
+A `Button` variant for `ToolBar`: no permanent border or fill, only a subtle
+highlight on hover/press/check.
+
+### CheckBox
+
+Checkable option box with an optional label. Set `tristate: true` to enable
+the partially-checked `checkState`.
+
+```qml
+CheckBox { text: qsTr("Enable notifications"); checked: true }
+```
+
+### RadioButton
+
+Exclusive option button. Radio buttons sharing a parent are auto-exclusive,
+so checking one unchecks the others.
+
+```qml
+Column {
+    RadioButton { text: qsTr("Small"); checked: true }
+    RadioButton { text: qsTr("Large") }
+}
+```
+
+### BusyIndicator
+
+Animated spinner shown while `running` is `true`.
+
+```qml
+BusyIndicator { running: loader.status === Loader.Loading }
+```
+
+### ProgressBar
+
+Horizontal progress fill between `from` and `to`. Set `indeterminate: true`
+for an animated sweep when the duration is unknown.
+
+```qml
+ProgressBar { from: 0; to: 100; value: download.percent }
+```
+
+### ScrollIndicator
+
+Non-interactive companion to `ScrollBar` that only reports the scrolled
+position of a `Flickable` and fades out when idle. Bind it through the
+`flickable` property.
+
+### Slider
+
+Single-value slider over `[from, to]`. `stepSize` snaps to discrete values;
+`orientation` switches between horizontal and vertical. Emits `moved()` on
+user changes.
+
+```qml
+Slider { from: 0; to: 100; value: 30; onMoved: brightness = value }
+```
+
+### RangeSlider
+
+Two-handle range selector exposing `first` and `second` nodes, each with its
+own `value`, `position` and `moved()` signal.
+
+```qml
+RangeSlider { from: 0; to: 100; first.value: 20; second.value: 80 }
+```
+
+### SpinBox
+
+Integer spin box with up/down buttons and an editable field. `stepSize`
+controls the increment; `valueModified()` fires on every change.
+
+```qml
+SpinBox { from: 0; to: 100; value: 50; stepSize: 5 }
+```
+
+### TextField
+
+Themed single-line editor with `placeholderText` and a focus-aware border.
+Emits `accepted()` (Enter) and `editingFinished()`.
+
+```qml
+TextField { placeholderText: qsTr("Search..."); onAccepted: model.filter(text) }
+```
+
+### TextArea
+
+Themed multi-line editor that wraps by default. Wrap it in a `ScrollView` for
+long documents.
+
+```qml
+ScrollView {
+    TextArea { placeholderText: qsTr("Description...") }
+}
+```
+
+### ComboBox
+
+Drop-down selector. Clicking opens the `imtcontrols` `Popup` listing the
+`model`; selecting an entry updates `currentIndex` / `currentText` and emits
+`activated()`. Use `textRole` for object models.
+
+```qml
+ComboBox {
+    model: [ qsTr("Low"), qsTr("Medium"), qsTr("High") ]
+    onActivated: priority = currentText
+}
+```
+
+### StackView
+
+A last-in/first-out stack of pages. `push()` adds a page, `pop()` removes the
+top one, `replace()` swaps it and `clear()` empties the stack; `currentItem`
+is the visible page. Pages may be a `Component`, an `Item` or a source URL.
+
+```qml
+StackView { id: stack; initialItem: homePage }
+Button { text: qsTr("Details"); onClicked: stack.push(detailsPage) }
+```
+
+### SwipeView
+
+A `Container` that lays out its pages side by side and shows one at a time via
+`currentIndex`. Pair it with a `PageIndicator`.
+
+```qml
+SwipeView { id: view; Page { } Page { } }
+PageIndicator { count: view.count; currentIndex: view.currentIndex }
+```
+
+### SplitView
+
+Arranges its children in a row or column separated by draggable handles that
+redistribute space between the adjacent panes.
+
+```qml
+SplitView {
+    orientation: Qt.Horizontal
+    Rectangle { color: "#eee" }
+    Rectangle { color: "#ddd" }
+}
+```
 
 ---
 

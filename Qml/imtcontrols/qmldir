@@ -292,3 +292,28 @@ ApplicationWindow 1.0 ./Controls/ApplicationWindow.qml
 DelayButton 1.0 ./Controls/DelayButton.qml
 Tumbler 1.0 ./Controls/Tumbler.qml
 Drawer 1.0 ./Controls/Drawer.qml
+
+# -------------------------------------------------------------------------
+# imtcontrols 2.0 control system. Faithful, from-scratch re-implementations
+# of the Qt Quick Controls types, registered at version 2.0 so they coexist
+# with the legacy 1.0 controls. Import with `import imtcontrols 2.0` to opt in
+# to the new set. The Popup and Menu families already exist in the module
+# (see ./Popup and ./Menu) and are reused as-is. Delegate Controls excluded.
+# See Controls/README.md.
+# -------------------------------------------------------------------------
+Button 2.0 ./Controls/Button.qml
+ToolButton 2.0 ./Controls/ToolButton.qml
+CheckBox 2.0 ./Controls/CheckBox.qml
+RadioButton 2.0 ./Controls/RadioButton.qml
+BusyIndicator 2.0 ./Controls/BusyIndicator.qml
+ProgressBar 2.0 ./Controls/ProgressBar.qml
+ScrollIndicator 2.0 ./Controls/ScrollIndicator.qml
+Slider 2.0 ./Controls/Slider.qml
+RangeSlider 2.0 ./Controls/RangeSlider.qml
+SpinBox 2.0 ./Controls/SpinBox.qml
+TextField 2.0 ./Controls/TextField.qml
+TextArea 2.0 ./Controls/TextArea.qml
+ComboBox 2.0 ./Controls/ComboBox.qml
+StackView 2.0 ./Controls/StackView.qml
+SwipeView 2.0 ./Controls/SwipeView.qml
+SplitView 2.0 ./Controls/SplitView.qml

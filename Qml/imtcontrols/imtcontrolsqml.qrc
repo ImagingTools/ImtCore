@@ -281,6 +281,23 @@
                 <file alias="imtcontrols/Controls/DelayButton.qml">Controls/DelayButton.qml</file>
                 <file alias="imtcontrols/Controls/Tumbler.qml">Controls/Tumbler.qml</file>
                 <file alias="imtcontrols/Controls/Drawer.qml">Controls/Drawer.qml</file>
+                <!-- imtcontrols 2.0 control system. See Controls/README.md. -->
+                <file alias="imtcontrols/Controls/Button.qml">Controls/Button.qml</file>
+                <file alias="imtcontrols/Controls/ToolButton.qml">Controls/ToolButton.qml</file>
+                <file alias="imtcontrols/Controls/CheckBox.qml">Controls/CheckBox.qml</file>
+                <file alias="imtcontrols/Controls/RadioButton.qml">Controls/RadioButton.qml</file>
+                <file alias="imtcontrols/Controls/BusyIndicator.qml">Controls/BusyIndicator.qml</file>
+                <file alias="imtcontrols/Controls/ProgressBar.qml">Controls/ProgressBar.qml</file>
+                <file alias="imtcontrols/Controls/ScrollIndicator.qml">Controls/ScrollIndicator.qml</file>
+                <file alias="imtcontrols/Controls/Slider.qml">Controls/Slider.qml</file>
+                <file alias="imtcontrols/Controls/RangeSlider.qml">Controls/RangeSlider.qml</file>
+                <file alias="imtcontrols/Controls/SpinBox.qml">Controls/SpinBox.qml</file>
+                <file alias="imtcontrols/Controls/TextField.qml">Controls/TextField.qml</file>
+                <file alias="imtcontrols/Controls/TextArea.qml">Controls/TextArea.qml</file>
+                <file alias="imtcontrols/Controls/ComboBox.qml">Controls/ComboBox.qml</file>
+                <file alias="imtcontrols/Controls/StackView.qml">Controls/StackView.qml</file>
+                <file alias="imtcontrols/Controls/SwipeView.qml">Controls/SwipeView.qml</file>
+                <file alias="imtcontrols/Controls/SplitView.qml">Controls/SplitView.qml</file>
         </qresource>
         <qresource prefix="/" />
 </RCC>
