@@ -30,7 +30,8 @@ Item {
 
     /*! Fraction of the content that is visible, in [0, 1]. */
     property real size: 0
-    /*! Scroll position of the top/left of the visible area, in [0, 1]. */
+    /*! Scrolled fraction of the scrollable distance, in [0, 1]: \c 0 is the
+        top/left, \c 1 is the bottom/right. */
     property real position: 0
     /*! Step taken by \l increase() / \l decrease(). */
     property real stepSize: 0.1
@@ -101,7 +102,7 @@ Item {
     function decrease() { setPosition(position - stepSize); }
 
     function setPosition(p) {
-        position = Math.max(0, Math.min(1 - size, p));
+        position = Math.max(0, Math.min(1, p));
         if (flickable)
             _applyToFlickable();
     }
@@ -121,17 +122,18 @@ Item {
             return;
         if (vertical) {
             var h = flickable.contentHeight;
+            var vh = flickable.height;
             if (h > 0) {
-                size = Math.min(1, flickable.height / h);
-                position = h > flickable.height
-                        ? flickable.contentY / h : 0;
+                size = Math.min(1, vh / h);
+                // position is the fraction of the scrollable distance.
+                position = h > vh ? flickable.contentY / (h - vh) : 0;
             }
         } else {
             var w = flickable.contentWidth;
+            var vw = flickable.width;
             if (w > 0) {
-                size = Math.min(1, flickable.width / w);
-                position = w > flickable.width
-                        ? flickable.contentX / w : 0;
+                size = Math.min(1, vw / w);
+                position = w > vw ? flickable.contentX / (w - vw) : 0;
             }
         }
     }
@@ -140,9 +142,9 @@ Item {
         if (!flickable)
             return;
         if (vertical)
-            flickable.contentY = position * flickable.contentHeight;
+            flickable.contentY = position * Math.max(0, flickable.contentHeight - flickable.height);
         else
-            flickable.contentX = position * flickable.contentWidth;
+            flickable.contentX = position * Math.max(0, flickable.contentWidth - flickable.width);
     }
 
     Connections {
