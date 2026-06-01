@@ -66,6 +66,15 @@ QSet<QString> CSqlDatabaseDocumentDelegateComp::s_filterableColumns ={
 
 // public methods
 
+// reimplemented (icomp::CComponentBase)
+
+void CSqlDatabaseDocumentDelegateComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+	EnsureTenantBindingTableExists();
+}
+
+
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
 QByteArray CSqlDatabaseDocumentDelegateComp::GetCountQuery(const iprm::IParamsSet* paramsPtr) const
@@ -1137,45 +1146,30 @@ QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingTableName() const
 
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingTableInitializationQuery() const
 {
-	const QByteArray databaseDriverId = m_databaseEngineCompPtr.IsValid() ? m_databaseEngineCompPtr->GetDatabaseDriverId() : QByteArray();
-	const bool isSqlite = databaseDriverId.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
-	const QString bindingsTableName = CreateTenantBindingTableName();
-
-	if (isSqlite){
-		return QString(
-					"CREATE TABLE IF NOT EXISTS %1 "
-					"(\"Id\" TEXT PRIMARY KEY, "
-					"\"TenantId\" TEXT NOT NULL, "
-					"\"EntityType\" TEXT NOT NULL, "
-					"\"EntityId\" TEXT NOT NULL, "
-					"\"CreatedAt\" TEXT NOT NULL, "
-					"\"CreatedByUserId\" TEXT, "
-					"\"Scope\" TEXT, "
-					"UNIQUE (\"TenantId\", \"EntityType\", \"EntityId\"));"
-					"CREATE INDEX IF NOT EXISTS \"IX_TenantEntityBindings_TenantId\" "
-					"ON %1 (\"TenantId\");"
-					"CREATE INDEX IF NOT EXISTS \"IX_TenantEntityBindings_Entity\" "
-					"ON %1 (\"EntityType\", \"EntityId\");")
-				.arg(bindingsTableName)
-				.toUtf8();
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return QByteArray();
 	}
 
-	return QString(
-				"CREATE TABLE IF NOT EXISTS %1 "
-				"(\"Id\" TEXT PRIMARY KEY, "
-				"\"TenantId\" TEXT NOT NULL, "
-				"\"EntityType\" TEXT NOT NULL, "
-				"\"EntityId\" TEXT NOT NULL, "
-				"\"CreatedAt\" timestamp without time zone NOT NULL, "
-				"\"CreatedByUserId\" TEXT, "
-				"\"Scope\" TEXT, "
-				"CONSTRAINT \"UQ_TenantEntityBindings_Tenant_Entity\" UNIQUE (\"TenantId\", \"EntityType\", \"EntityId\"));"
-				"CREATE INDEX IF NOT EXISTS \"IX_TenantEntityBindings_TenantId\" "
-				"ON %1 (\"TenantId\");"
-				"CREATE INDEX IF NOT EXISTS \"IX_TenantEntityBindings_Entity\" "
-				"ON %1 (\"EntityType\", \"EntityId\");")
-			.arg(bindingsTableName)
-			.toUtf8();
+	const QString scriptPath = GetSqlResourcePath(*m_databaseEngineCompPtr, QStringLiteral("CreateTenantEntityBindingsTable.sql"));
+	QFile scriptFile(scriptPath);
+	if (!scriptFile.open(QFile::ReadOnly)){
+		qWarning() << __FILE__ << __LINE__
+				   << "\n\t| CreateTenantEntityBindingsTable.sql could not be loaded from" << scriptPath;
+		return QByteArray();
+	}
+
+	QByteArray createTableQuery = scriptFile.readAll();
+	scriptFile.close();
+
+	const QByteArray tableScheme = GetTableScheme();
+	if (!tableScheme.isEmpty()){
+		createTableQuery.replace("${TableScheme}", tableScheme);
+	}
+	else{
+		createTableQuery.replace("${TableScheme}", "public");
+	}
+
+	return createTableQuery;
 }
 
 

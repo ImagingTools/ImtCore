@@ -63,6 +63,9 @@ public:
 		I_ASSIGN(m_sqlJsonXPathExtractorCompPtr, "SqlJsonXPathExtractor", "SQL json X-Path extractor", false, "SqlJsonXPathExtractor");
 	I_END_COMPONENT
 
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 	virtual QByteArray GetCountQuery(const iprm::IParamsSet* paramsPtr = nullptr) const override;
 	virtual QByteArray GetObjectIdFromRecord(const QSqlRecord& record) const override;

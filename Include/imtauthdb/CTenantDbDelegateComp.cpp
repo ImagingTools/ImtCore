@@ -43,6 +43,20 @@ void CTenantDbDelegateComp::OnComponentCreated()
 	if (!CreatePermissionsTableIfNeeded()){
 		qWarning() << "CTenantDbDelegateComp: TenantPermissions table auto-creation failed";
 	}
+
+	const QByteArray membershipsScriptPath = m_createMembershipsTableScriptPathAttrPtr.IsValid()
+			? *m_createMembershipsTableScriptPathAttrPtr : QByteArray();
+	const bool autoCreateMemberships = m_autoCreateMembershipsTableAttrPtr.IsValid() && *m_autoCreateMembershipsTableAttrPtr;
+	if (!CreateAuxTableIfNeeded(autoCreateMemberships, QStringLiteral("TenantMemberships"), membershipsScriptPath)){
+		qWarning() << "CTenantDbDelegateComp: TenantMemberships table auto-creation failed";
+	}
+
+	const QByteArray invitationsScriptPath = m_createInvitationsTableScriptPathAttrPtr.IsValid()
+			? *m_createInvitationsTableScriptPathAttrPtr : QByteArray();
+	const bool autoCreateInvitations = m_autoCreateInvitationsTableAttrPtr.IsValid() && *m_autoCreateInvitationsTableAttrPtr;
+	if (!CreateAuxTableIfNeeded(autoCreateInvitations, QStringLiteral("TenantInvitations"), invitationsScriptPath)){
+		qWarning() << "CTenantDbDelegateComp: TenantInvitations table auto-creation failed";
+	}
 }
 
 
@@ -453,9 +467,8 @@ QByteArray CTenantDbDelegateComp::GetProductId() const
 }
 
 
-bool CTenantDbDelegateComp::CreatePermissionsTableIfNeeded()
+bool CTenantDbDelegateComp::CreateAuxTableIfNeeded(bool autoCreate, const QString& tableName, const QByteArray& scriptPath)
 {
-	const bool autoCreate = m_autoCreatePermissionsTableAttrPtr.IsValid() ? *m_autoCreatePermissionsTableAttrPtr : false;
 	if (!autoCreate){
 		return true;
 	}
@@ -464,18 +477,12 @@ bool CTenantDbDelegateComp::CreatePermissionsTableIfNeeded()
 		return false;
 	}
 
-	const QString permissionsTableName = QString::fromUtf8(*m_permissionsTableNameAttrPtr);
-	if (permissionsTableName.isEmpty()){
+	if (tableName.isEmpty() || scriptPath.isEmpty()){
 		return false;
 	}
 
-	if (TableExists(permissionsTableName)){
+	if (TableExists(tableName)){
 		return true;
-	}
-
-	const QByteArray scriptPath = m_createPermissionsTableScriptPathAttrPtr.IsValid() ? *m_createPermissionsTableScriptPathAttrPtr : QByteArray();
-	if (scriptPath.isEmpty()){
-		return false;
 	}
 
 	QString resourcePath = QString::fromUtf8(scriptPath);
@@ -485,7 +492,7 @@ bool CTenantDbDelegateComp::CreatePermissionsTableIfNeeded()
 
 	QFile scriptFile(resourcePath);
 	if (!scriptFile.open(QFile::ReadOnly)){
-		qWarning() << "CTenantDbDelegateComp: TenantPermissions table creation script" << scriptFile.fileName() << "could not be loaded";
+		qWarning() << "CTenantDbDelegateComp: table creation script" << scriptFile.fileName() << "could not be loaded";
 		return false;
 	}
 
@@ -504,13 +511,22 @@ bool CTenantDbDelegateComp::CreatePermissionsTableIfNeeded()
 	m_databaseEngineCompPtr->ExecSqlQuery(createTableQuery, &sqlError);
 
 	if (sqlError.type() != QSqlError::NoError){
-		qCritical() << "CTenantDbDelegateComp: TenantPermissions table could not be created."
+		qCritical() << "CTenantDbDelegateComp: table" << tableName << "could not be created."
 					<< "Error:" << sqlError
 					<< "Query:" << createTableQuery;
 		return false;
 	}
 
 	return true;
+}
+
+
+bool CTenantDbDelegateComp::CreatePermissionsTableIfNeeded()
+{
+	const bool autoCreate = m_autoCreatePermissionsTableAttrPtr.IsValid() ? *m_autoCreatePermissionsTableAttrPtr : false;
+	const QByteArray scriptPath = m_createPermissionsTableScriptPathAttrPtr.IsValid() ? *m_createPermissionsTableScriptPathAttrPtr : QByteArray();
+	const QString permissionsTableName = m_permissionsTableNameAttrPtr.IsValid() ? QString::fromUtf8(*m_permissionsTableNameAttrPtr) : QString();
+	return CreateAuxTableIfNeeded(autoCreate, permissionsTableName, scriptPath);
 }
 
 
