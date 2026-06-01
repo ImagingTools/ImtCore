@@ -264,3 +264,56 @@ MenuItem 1.0 ./Menu/MenuItem.qml
 MenuSeparator 1.0 ./Menu/MenuSeparator.qml
 MenuBar 1.0 ./Menu/MenuBar.qml
 MenuBarItem 1.0 ./Menu/MenuBarItem.qml
+
+# -------------------------------------------------------------------------
+# Qt Quick Controls analogues (faithful re-implementations following the
+# Popup / Menu approach). See Controls/README.md for full documentation.
+# -------------------------------------------------------------------------
+Control 1.0 ./Controls/Control.qml
+AbstractButton 1.0 ./Controls/AbstractButton.qml
+Pane 1.0 ./Controls/Pane.qml
+Frame 1.0 ./Controls/Frame.qml
+GroupBox 1.0 ./Controls/GroupBox.qml
+Label 1.0 ./Controls/Label.qml
+Page 1.0 ./Controls/Page.qml
+ToolBar 1.0 ./Controls/ToolBar.qml
+ToolSeparator 1.0 ./Controls/ToolSeparator.qml
+Switch 1.0 ./Controls/Switch.qml
+RoundButton 1.0 ./Controls/RoundButton.qml
+TabBar 1.0 ./Controls/TabBar.qml
+TabButton 1.0 ./Controls/TabButton.qml
+PageIndicator 1.0 ./Controls/PageIndicator.qml
+ToolTip 1.0 ./Controls/ToolTip.qml
+ScrollBar 1.0 ./Controls/ScrollBar.qml
+ScrollView 1.0 ./Controls/ScrollView.qml
+Dial 1.0 ./Controls/Dial.qml
+Container 1.0 ./Controls/Container.qml
+ApplicationWindow 1.0 ./Controls/ApplicationWindow.qml
+DelayButton 1.0 ./Controls/DelayButton.qml
+Tumbler 1.0 ./Controls/Tumbler.qml
+Drawer 1.0 ./Controls/Drawer.qml
+
+# -------------------------------------------------------------------------
+# imtcontrols 2.0 control system. Faithful, from-scratch re-implementations
+# of the Qt Quick Controls types, registered at version 2.0 so they coexist
+# with the legacy 1.0 controls. Import with `import imtcontrols 2.0` to opt in
+# to the new set. The Popup and Menu families already exist in the module
+# (see ./Popup and ./Menu) and are reused as-is. Delegate Controls excluded.
+# See Controls/README.md.
+# -------------------------------------------------------------------------
+Button 2.0 ./Controls/Button.qml
+ToolButton 2.0 ./Controls/ToolButton.qml
+CheckBox 2.0 ./Controls/CheckBox.qml
+RadioButton 2.0 ./Controls/RadioButton.qml
+BusyIndicator 2.0 ./Controls/BusyIndicator.qml
+ProgressBar 2.0 ./Controls/ProgressBar.qml
+ScrollIndicator 2.0 ./Controls/ScrollIndicator.qml
+Slider 2.0 ./Controls/Slider.qml
+RangeSlider 2.0 ./Controls/RangeSlider.qml
+SpinBox 2.0 ./Controls/SpinBox.qml
+TextField 2.0 ./Controls/TextField.qml
+TextArea 2.0 ./Controls/TextArea.qml
+ComboBox 2.0 ./Controls/ComboBox.qml
+StackView 2.0 ./Controls/StackView.qml
+SwipeView 2.0 ./Controls/SwipeView.qml
+SplitView 2.0 ./Controls/SplitView.qml

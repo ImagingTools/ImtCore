@@ -256,6 +256,48 @@
                 <file alias="imtcontrols/Menu/MenuBar.qml">Menu/MenuBar.qml</file>
                 <file alias="imtcontrols/Menu/MenuBarItem.qml">Menu/MenuBarItem.qml</file>
                 <file alias="imtcontrols/Menu/Internal/MenuItemDelegate.qml">Menu/Internal/MenuItemDelegate.qml</file>
+
+                <!-- Qt Quick Controls analogues. See Controls/README.md. -->
+                <file alias="imtcontrols/Controls/Control.qml">Controls/Control.qml</file>
+                <file alias="imtcontrols/Controls/AbstractButton.qml">Controls/AbstractButton.qml</file>
+                <file alias="imtcontrols/Controls/Pane.qml">Controls/Pane.qml</file>
+                <file alias="imtcontrols/Controls/Frame.qml">Controls/Frame.qml</file>
+                <file alias="imtcontrols/Controls/GroupBox.qml">Controls/GroupBox.qml</file>
+                <file alias="imtcontrols/Controls/Label.qml">Controls/Label.qml</file>
+                <file alias="imtcontrols/Controls/Page.qml">Controls/Page.qml</file>
+                <file alias="imtcontrols/Controls/ToolBar.qml">Controls/ToolBar.qml</file>
+                <file alias="imtcontrols/Controls/ToolSeparator.qml">Controls/ToolSeparator.qml</file>
+                <file alias="imtcontrols/Controls/Switch.qml">Controls/Switch.qml</file>
+                <file alias="imtcontrols/Controls/RoundButton.qml">Controls/RoundButton.qml</file>
+                <file alias="imtcontrols/Controls/TabBar.qml">Controls/TabBar.qml</file>
+                <file alias="imtcontrols/Controls/TabButton.qml">Controls/TabButton.qml</file>
+                <file alias="imtcontrols/Controls/PageIndicator.qml">Controls/PageIndicator.qml</file>
+                <file alias="imtcontrols/Controls/ToolTip.qml">Controls/ToolTip.qml</file>
+                <file alias="imtcontrols/Controls/ScrollBar.qml">Controls/ScrollBar.qml</file>
+                <file alias="imtcontrols/Controls/ScrollView.qml">Controls/ScrollView.qml</file>
+                <file alias="imtcontrols/Controls/Dial.qml">Controls/Dial.qml</file>
+                <file alias="imtcontrols/Controls/Container.qml">Controls/Container.qml</file>
+                <file alias="imtcontrols/Controls/ApplicationWindow.qml">Controls/ApplicationWindow.qml</file>
+                <file alias="imtcontrols/Controls/DelayButton.qml">Controls/DelayButton.qml</file>
+                <file alias="imtcontrols/Controls/Tumbler.qml">Controls/Tumbler.qml</file>
+                <file alias="imtcontrols/Controls/Drawer.qml">Controls/Drawer.qml</file>
+                <!-- imtcontrols 2.0 control system. See Controls/README.md. -->
+                <file alias="imtcontrols/Controls/Button.qml">Controls/Button.qml</file>
+                <file alias="imtcontrols/Controls/ToolButton.qml">Controls/ToolButton.qml</file>
+                <file alias="imtcontrols/Controls/CheckBox.qml">Controls/CheckBox.qml</file>
+                <file alias="imtcontrols/Controls/RadioButton.qml">Controls/RadioButton.qml</file>
+                <file alias="imtcontrols/Controls/BusyIndicator.qml">Controls/BusyIndicator.qml</file>
+                <file alias="imtcontrols/Controls/ProgressBar.qml">Controls/ProgressBar.qml</file>
+                <file alias="imtcontrols/Controls/ScrollIndicator.qml">Controls/ScrollIndicator.qml</file>
+                <file alias="imtcontrols/Controls/Slider.qml">Controls/Slider.qml</file>
+                <file alias="imtcontrols/Controls/RangeSlider.qml">Controls/RangeSlider.qml</file>
+                <file alias="imtcontrols/Controls/SpinBox.qml">Controls/SpinBox.qml</file>
+                <file alias="imtcontrols/Controls/TextField.qml">Controls/TextField.qml</file>
+                <file alias="imtcontrols/Controls/TextArea.qml">Controls/TextArea.qml</file>
+                <file alias="imtcontrols/Controls/ComboBox.qml">Controls/ComboBox.qml</file>
+                <file alias="imtcontrols/Controls/StackView.qml">Controls/StackView.qml</file>
+                <file alias="imtcontrols/Controls/SwipeView.qml">Controls/SwipeView.qml</file>
+                <file alias="imtcontrols/Controls/SplitView.qml">Controls/SplitView.qml</file>
         </qresource>
         <qresource prefix="/" />
 </RCC>
