@@ -638,7 +638,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 			FeedStream(stream, 1, false);
 
 			FeedStreamHorizontally(stream, 2);
-			stream << QStringLiteral("istd::TSharedNullable<") << convertedType;
+			stream << QStringLiteral("istd::TNullableValue<") << convertedType;
 			if (field.GetType() == "ID"){
 				stream << QStringLiteral("> value(tempValue.toUtf8());");
 			}

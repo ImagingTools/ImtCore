@@ -408,7 +408,7 @@ bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl:
 		const imtsdl::TElementList<ImtPayV1::CPayment::V1_0> receiptPaymentList = *receipt.payments;
 		iprm::IParamsManager* paymentsManagerParamsPtr = dynamic_cast<iprm::IParamsManager*>(params.GetEditableParameter(ReceiptParamKeys::Payments));
 		if (!receiptPaymentList.isEmpty() && paymentsManagerParamsPtr != nullptr){
-			for (const istd::TSharedNullable<ImtPayV1::CPayment::V1_0>& receiptPayment: receiptPaymentList){
+			for (const istd::TNullableValue<ImtPayV1::CPayment::V1_0>& receiptPayment: receiptPaymentList){
 				const int insertedParamsIndex = paymentsManagerParamsPtr->InsertParamsSet();
 				Q_ASSERT(insertedParamsIndex >= 0);
 
@@ -462,7 +462,7 @@ bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl:
 	const imtsdl::TElementList<ImtPayV1::CClient::V1_0> receiptClientList = *receipt.clients;
 	iprm::IParamsManager* clientsParamsManagerPtr = dynamic_cast<iprm::IParamsManager*>(params.GetEditableParameter(ReceiptParamKeys::Clients));
 	if (!receiptClientList.isEmpty() && clientsParamsManagerPtr != nullptr){
-		for (const istd::TSharedNullable<ImtPayV1::CClient::V1_0>& receiptClient: receiptClientList){
+		for (const istd::TNullableValue<ImtPayV1::CClient::V1_0>& receiptClient: receiptClientList){
 			const int insertedParamsIndex = clientsParamsManagerPtr->InsertParamsSet();
 			Q_ASSERT(insertedParamsIndex >= 0);
 
@@ -490,7 +490,7 @@ bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl:
 	const imtsdl::TElementList<ImtPayV1::CItem::V1_0> receiptItemList = *receipt.items;
 	iprm::IParamsManager* itemsParamsManagerPtr = dynamic_cast<iprm::IParamsManager*>(params.GetEditableParameter(ReceiptParamKeys::Items));
 	if (!receiptItemList.isEmpty() && itemsParamsManagerPtr != nullptr){
-		for (const istd::TSharedNullable<ImtPayV1::CItem::V1_0>& receiptItem: receiptItemList){
+		for (const istd::TNullableValue<ImtPayV1::CItem::V1_0>& receiptItem: receiptItemList){
 			const int insertedParamsIndex = itemsParamsManagerPtr->InsertParamsSet();
 			Q_ASSERT(insertedParamsIndex >= 0);
 

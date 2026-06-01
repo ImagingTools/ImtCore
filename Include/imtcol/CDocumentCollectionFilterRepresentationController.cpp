@@ -20,7 +20,7 @@ bool CDocumentCollectionFilterRepresentationController::DocumentCollectionFilter
 
 	if (filterRepresentaion.documentStates.has_value()){
 		imtsdl::TElementList<Filter::DocumentState> documentStates = *filterRepresentaion.documentStates;
-		for (const istd::TSharedNullable<Filter::DocumentState>& state : documentStates){
+		for (const istd::TNullableValue<Filter::DocumentState>& state : documentStates){
 			switch (*state){
 			case Filter::DocumentState::ACTIVE:
 				filterModel.AddDocumentState(IDocumentCollectionFilter::DS_ACTIVE);

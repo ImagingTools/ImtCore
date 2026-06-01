@@ -127,7 +127,7 @@ bool CParamSetRepresentationController::GetDataModelFromSdlRepresentation(
 
 	imtsdl::TElementList<sdl::imtbase::ImtBaseTypes::CParameter::V1_0> parameters = *sdlRepresentation.parameters;
 
-	for (const istd::TSharedNullable<sdl::imtbase::ImtBaseTypes::CParameter::V1_0>& parameter : parameters){
+	for (const istd::TNullableValue<sdl::imtbase::ImtBaseTypes::CParameter::V1_0>& parameter : parameters){
 		if (!parameter->id){
 			continue;
 		}

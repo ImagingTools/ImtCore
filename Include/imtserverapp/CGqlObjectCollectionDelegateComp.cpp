@@ -555,7 +555,7 @@ imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
 	if (createSubCollectionPayload.ReadFromJsonObject(responseData.data)){
 		if (createSubCollectionPayload.items){
 			imtsdl::TElementList<sdl::imtbase::ImtCollection::CSubCollectionItem::V1_0> subCollectionItems = *createSubCollectionPayload.items;
-			for (const istd::TSharedNullable<sdl::imtbase::ImtCollection::CSubCollectionItem::V1_0>& subCollectionItem : subCollectionItems){
+			for (const istd::TNullableValue<sdl::imtbase::ImtCollection::CSubCollectionItem::V1_0>& subCollectionItem : subCollectionItems){
 				QByteArray objectId = *subCollectionItem->itemInfo->id;
 				QByteArray objectTypeId = *subCollectionItem->itemInfo->typeId;
 				QString name = *subCollectionItem->itemInfo->name;
