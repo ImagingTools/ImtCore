@@ -408,7 +408,7 @@ void CSdlClassCodeGeneratorComp::GenerateVersionStruct(
 			nullptr,
 			nullptr);
 		FeedStreamHorizontally(stream, indents + 1);
-		stream << QStringLiteral("istd::TSharedNullable<");
+		stream << QStringLiteral("istd::TNullableValue<");
 		stream << convertedType;
 		stream << QStringLiteral("> ");
 		stream << field.GetId() << ';';
@@ -553,7 +553,7 @@ void CSdlClassCodeGeneratorComp::GenerateVersionMemberDeclaration(
 			int versionIndex) const
 {
 	if (optWrap){
-		stream << QStringLiteral("istd::TSharedNullable<");
+		stream << QStringLiteral("istd::TNullableValue<");
 	}
 	stream << GetSdlEntryVersion(sdlType);
 	if (optWrap){

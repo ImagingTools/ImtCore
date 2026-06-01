@@ -479,7 +479,7 @@ sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentServiceControllerComp:
 
 	const auto& arguments = doUndoRequest.GetRequestedArguments();
 
-	istd::TSharedNullable<CDM::CCollectionUndoRedoInput::V1_0> collectionUndoRedoInput = arguments.input.Version_1_0;
+	istd::TNullableValue<CDM::CCollectionUndoRedoInput::V1_0> collectionUndoRedoInput = arguments.input.Version_1_0;
 
 	if (!collectionUndoRedoInput || !collectionUndoRedoInput->undoRedoInput){
 		errorMessage = "Invalid GraphQL request params";
@@ -487,7 +487,7 @@ sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentServiceControllerComp:
 		return retVal;
 	}
 
-	istd::TSharedNullable<sdl::imtbase::UndoManager::CUndoRedoInput::V1_0> undoRedoInput = collectionUndoRedoInput->undoRedoInput;
+	istd::TNullableValue<sdl::imtbase::UndoManager::CUndoRedoInput::V1_0> undoRedoInput = collectionUndoRedoInput->undoRedoInput;
 
 	if (!undoRedoInput || !undoRedoInput->documentId || !undoRedoInput->steps){
 		errorMessage = "Invalid GraphQL request params";
@@ -548,7 +548,7 @@ sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentServiceControllerComp:
 
 	const auto& arguments = doRedoRequest.GetRequestedArguments();
 
-	istd::TSharedNullable<CDM::CCollectionUndoRedoInput::V1_0> collectionUndoRedoInput = arguments.input.Version_1_0;
+	istd::TNullableValue<CDM::CCollectionUndoRedoInput::V1_0> collectionUndoRedoInput = arguments.input.Version_1_0;
 
 	if (!collectionUndoRedoInput || !collectionUndoRedoInput->undoRedoInput){
 		errorMessage = "Invalid GraphQL request params";
@@ -556,7 +556,7 @@ sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentServiceControllerComp:
 		return retVal;
 	}
 
-	istd::TSharedNullable<sdl::imtbase::UndoManager::CUndoRedoInput::V1_0> undoRedoInput = collectionUndoRedoInput->undoRedoInput;
+	istd::TNullableValue<sdl::imtbase::UndoManager::CUndoRedoInput::V1_0> undoRedoInput = collectionUndoRedoInput->undoRedoInput;
 
 	if (!undoRedoInput || !undoRedoInput->documentId || !undoRedoInput->steps){
 		errorMessage = "Invalid GraphQL request params";

@@ -590,7 +590,7 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 	const auto& arguments = doUndoRequest.GetRequestedArguments();
 	const auto& info = doUndoRequest.GetRequestInfo();
 
-	istd::TSharedNullable<UM::CUndoRedoInput::V1_0> undoRedoInput = arguments.input.Version_1_0;
+	istd::TNullableValue<UM::CUndoRedoInput::V1_0> undoRedoInput = arguments.input.Version_1_0;
 	if (!undoRedoInput || !undoRedoInput->documentId || !undoRedoInput->steps) {
 		errorMessage = "Invalid GQL request params";
 
@@ -658,7 +658,7 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 	const auto& arguments = doRedoRequest.GetRequestedArguments();
 	const auto& info = doRedoRequest.GetRequestInfo();
 
-	istd::TSharedNullable<UM::CUndoRedoInput::V1_0> undoRedoInput = arguments.input.Version_1_0;
+	istd::TNullableValue<UM::CUndoRedoInput::V1_0> undoRedoInput = arguments.input.Version_1_0;
 	if (!undoRedoInput || !undoRedoInput->documentId || !undoRedoInput->steps) {
 		errorMessage = "Invalid GQL request params";
 
