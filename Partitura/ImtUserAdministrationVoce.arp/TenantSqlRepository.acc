@@ -86,8 +86,20 @@
                     <AttributeInfo Id="AutoCreateTable" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="AutoCreateMembershipsTable" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AutoCreateInvitationsTable" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CreatePermissionsTableScriptPath" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value=":/SQL/Postgres/CreateTenantPermissionsTable.sql"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CreateMembershipsTableScriptPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value=":/SQL/Postgres/CreateTenantMembershipsTable.sql"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CreateInvitationsTableScriptPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value=":/SQL/Postgres/CreateTenantInvitationsTable.sql"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CreateTableScriptPath" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value=":/SQL/Postgres/CreateTenantsTable.sql"/>

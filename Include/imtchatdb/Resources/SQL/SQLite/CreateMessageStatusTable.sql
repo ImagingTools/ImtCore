@@ -6,4 +6,3 @@ CREATE TABLE IF NOT EXISTS "MessageStatus"
     "Status"     INTEGER NOT NULL DEFAULT 0,
     "UpdatedAt"  TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-CREATE UNIQUE INDEX IF NOT EXISTS "UIX_MessageStatus_MessageUser" ON "MessageStatus" ("MessageId", "UserId");

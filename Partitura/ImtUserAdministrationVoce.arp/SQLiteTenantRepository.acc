@@ -86,8 +86,20 @@
                     <AttributeInfo Id="AutoCreateTable" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="AutoCreateMembershipsTable" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AutoCreateInvitationsTable" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CreatePermissionsTableScriptPath" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value=":/SQL/SQLite/CreateTenantPermissionsTable.sql"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CreateMembershipsTableScriptPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value=":/SQL/SQLite/CreateTenantMembershipsTable.sql"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CreateInvitationsTableScriptPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value=":/SQL/SQLite/CreateTenantInvitationsTable.sql"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CreateTableScriptPath" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value=":/SQL/SQLite/CreateTenantsTable.sql"/>

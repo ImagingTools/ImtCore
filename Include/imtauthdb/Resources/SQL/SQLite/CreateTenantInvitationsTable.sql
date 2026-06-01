@@ -14,8 +14,3 @@ CREATE TABLE IF NOT EXISTS "TenantInvitations" (
 	"RevokedByUserId" TEXT,
 	"LastSentAt" TEXT
 );
-
-CREATE INDEX IF NOT EXISTS "IdxTenantInvitationsTenantId" ON "TenantInvitations" ("TenantId");
-CREATE INDEX IF NOT EXISTS "IdxTenantInvitationsUserId" ON "TenantInvitations" ("UserId");
-CREATE UNIQUE INDEX IF NOT EXISTS "UqTenantInvitationsPending" ON "TenantInvitations" ("TenantId", "UserId") WHERE "Status" = 0;
-
