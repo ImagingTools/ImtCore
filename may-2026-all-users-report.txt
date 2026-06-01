@@ -1,0 +1,955 @@
+Report Mai 2026 - alle Benutzer, gruppiert nach Tagen
+Repos: ImagingTools/Acf, ImagingTools/AcfSln, ImagingTools/ImtCore, ImagingTools/Agentino
+
+2026-05-01 (1 Commits)
+- [ImagingTools/ImtCore] ff12962 | kucherenkord-cyber | Merge pull request #439 from ImagingTools/JQ-update
+
+2026-05-04 (29 Commits)
+- [ImagingTools/Acf] 0a3f5b1 | lmoragmg | Add CCurrentPageStackedWidget and use it
+- [ImagingTools/Acf] 0adf453 | lmoragmg | Add spacing above dialog buttons
+- [ImagingTools/Acf] 1c0e873 | oleksiigmg | fix TDeviceBasedSerializerComp interface registration
+- [ImagingTools/Acf] 8a1765c | lmoragmg | Fix issue with stackwidget container sizing follows the active page content (#202)
+- [ImagingTools/ImtCore] 0450d2d | lmoragmg | Add VAO support and HiDPI viewport fixes
+- [ImagingTools/ImtCore] 05e156b | Copilot | Add client request tenant manager and info provider for remote tenant CRUD operations
+- [ImagingTools/ImtCore] 0b5da6c | Copilot | Add tenant management infrastructure: ITenantInfo, ITenantManager, ITenantInfoProvider, CTenantInfo, SDL schema, and GraphQL controller
+- [ImagingTools/ImtCore] 1147058 | Copilot | Add TODO comment for remote tenant forwarding limitation
+- [ImagingTools/ImtCore] 13363c6 | Copilot | Rename to ICollectionFilterFiller pattern, register component in Pck CPP
+- [ImagingTools/ImtCore] 138dfe2 | Copilot | Add Tenant management files: SDL, DB, GQL handler, and QML view
+- [ImagingTools/ImtCore] 163ce60 | Copilot | Simplify Tenants.sdl: remove TenantItem query, rename TenantsList to GetTenantList, update all references
+- [ImagingTools/ImtCore] 1c4e956 | kucherenkord-cyber | Merge branch 'main' into copilot/add-additional-filters-to-filterparams
+- [ImagingTools/ImtCore] 295610f | lmoragmg | Enable antialiasing and macOS-safe line draw
+- [ImagingTools/ImtCore] 2e3b69d | lmoragmg | Support thick screen-space lines in vshader
+- [ImagingTools/ImtCore] 4e0a21d | Copilot | Fix TenantEditor tab navigation to include all three fields
+- [ImagingTools/ImtCore] 5351c45 | Copilot | Update collection controller to use createdAt/updatedAt from tenant model instead of collection metadata
+- [ImagingTools/ImtCore] 5dea27f | Copilot | Rename CUserGroupFilterFillerComp → CUserGroupParamsSetJoinerComp to match IParamsSetJoiner interface naming
+- [ImagingTools/ImtCore] 6cf7872 | Copilot | Integrate TenantCollectionView into AdministrationView with TenantEditor
+- [ImagingTools/ImtCore] 79c8bf6 | Copilot | Add SingleDocumentCollectionView and GqlSingleDocCollectionPageView components
+- [ImagingTools/ImtCore] 7f9c9a4 | lmoragmg | Merge pull request #441 from ImagingTools/measure-uistyles-fixes
+- [ImagingTools/ImtCore] 9bcdbaf | kucherenkord-cyber | Build fixed
+- [ImagingTools/ImtCore] b668e50 | lmoragmg | Merge pull request #443 from ImagingTools/3dGraph-MacSupport
+- [ImagingTools/ImtCore] bee9e16 | Copilot | Rename to generic ICollectionFilterProvider, add CUserGroupFilterProviderComp
+- [ImagingTools/ImtCore] bfb723d | Copilot | Revert changes to Include/imtcore/Version.h - this file must not be modified
+- [ImagingTools/ImtCore] c34f109 | kucherenkord-cyber | Merge pull request #440 from ImagingTools/copilot/add-additional-filters-to-filterparams
+- [ImagingTools/ImtCore] c4b33cb | Copilot | Add multi-tenant architecture: tenantId in sessions, JWT, GraphQL context, and operation context
+- [ImagingTools/ImtCore] de5f7a4 | Copilot | Rename ICollectionFilterFiller -> IParamsSetJoiner with method JoinParamsSet
+- [ImagingTools/ImtCore] e973ac8 | Copilot | Fix I_MULTIREF usage: use I_ASSIGN_MULTI_0 inside component block, I_MULTIREF as member
+- [ImagingTools/ImtCore] fc76613 | lmoragmg | dark mode improvements
+
+2026-05-05 (34 Commits)
+- [ImagingTools/ImtCore] 019324c | Copilot | Add CCollectionDocumentManagerSubscriberComp and CCollectionDocumentManagerNotificationProxyComp for proxying tenant document manager notifications from Puma to ProLife
+- [ImagingTools/ImtCore] 0a4e2ae | ShcherbinaVA | Merge branch 'main' into csocket_thread_affinity_destruction
+- [ImagingTools/ImtCore] 1ba2c0c | kucherenkord-cyber | Merge branch 'main' into copilot/propose-multi-tenant-architecture
+- [ImagingTools/ImtCore] 1d955b6 | Copilot | Add CTenantManagerComp implementing ITenantManager with IObjectCollection
+- [ImagingTools/ImtCore] 2090a7d | Copilot | Fix Bool to Boolean in Tenants.sdl for consistency with ImtDesk.sdl
+- [ImagingTools/ImtCore] 396bbd1 | Copilot | Simplify CPublisherSubscriberBridgeComp: inherit IGqlSubscriptionClient directly instead of inner class
+- [ImagingTools/ImtCore] 3b22e91 | Copilot | Add Organization.svg icon and ACC files for Tenant entity
+- [ImagingTools/ImtCore] 3ba0967 | Copilot | Refactor CRemoteTenantControllerComp following CRemoteJwtSessionControllerComp pattern
+- [ImagingTools/ImtCore] 3bd81e6 | kucherenkord-cyber | Build fixed
+- [ImagingTools/ImtCore] 425e57e | kucherenkord-cyber | Build fixed
+- [ImagingTools/ImtCore] 437f2f5 | kucherenkord-cyber | Partitura corrected
+- [ImagingTools/ImtCore] 535ae15 | Copilot | Add SQLite partitura for TenantRepository
+- [ImagingTools/ImtCore] 5831188 | Copilot | Revert WebCompiler.cmake, remove ITenantInfoProvider, add CRemoteTenantControllerComp, fix CTenantCollectionDocumentManagerComp, simplify CTenantCollectionControllerComp
+- [ImagingTools/ImtCore] 597f9fe | Copilot | Add CTenantManagerControllerComp - server-side controller with I_REF ITenantManager
+- [ImagingTools/ImtCore] 5cbb146 | kucherenkord-cyber | Build fixed
+- [ImagingTools/ImtCore] 628472f | Copilot | Add CPublisherSubscriberBridgeComp — single component combining CGqlPublisherCompBase + private IGqlSubscriptionClient inner class
+- [ImagingTools/ImtCore] 7956578 | Copilot | Fix CTenantManagerControllerComp.cpp following CGqlJwtSessionControllerComp pattern
+- [ImagingTools/ImtCore] 7d7cc45 | Copilot | Add CRemoteCollectionDocumentManagerControllerComp with multi attr CollectionIds and IsRequestSupported
+- [ImagingTools/ImtCore] 8b60c64 | kucherenkord-cyber | QML corrected
+- [ImagingTools/ImtCore] 968fafc | kucherenkord-cyber | Delegate corrected
+- [ImagingTools/ImtCore] a46b097 | Copilot | Fix double-wrapping in CPublisherSubscriberBridgeComp: extract inner payload before re-publishing
+- [ImagingTools/ImtCore] a9a1463 | ShcherbinaVA | Merge pull request #445 from ImagingTools/csocket_thread_affinity_destruction
+- [ImagingTools/ImtCore] b016df0 | Copilot | Register all tenant components in Pck files (ImtAuthPck, ImtAuthGqlPck, ImtAuthDbPck)
+- [ImagingTools/ImtCore] b3abe7b | kucherenkord-cyber | Partitura corrected
+- [ImagingTools/ImtCore] b6e70af | Copilot | Add TenantRelationshipRole enum and relationship methods to ITenantInfo
+- [ImagingTools/ImtCore] cbb72be | VekhterAleksandr | QML. TableHeaderDelegate corrected
+- [ImagingTools/ImtCore] d84b604 | Copilot | Refactor: move auto-table-creation logic to CSqlDatabaseObjectDelegateCompBase
+- [ImagingTools/ImtCore] db5c6b5 | kucherenkord-cyber | Build fixed
+- [ImagingTools/ImtCore] deabc23 | Copilot | Add updatedAt to TenantItemData and Tenant Relationships with roles enum
+- [ImagingTools/ImtCore] e7f24aa | kucherenkord-cyber | Partitura corrected
+- [ImagingTools/ImtCore] ef41e85 | kucherenkord-cyber | Merge branch 'copilot/propose-multi-tenant-architecture' of https://github.com/ImagingTools/ImtCore into copilot/propose-multi-tenant-architecture
+- [ImagingTools/ImtCore] f05009a | kucherenkord-cyber | Build fixed
+- [ImagingTools/ImtCore] f465192 | Copilot | Revert CRemoteTenantControllerComp to SDL handler pattern, add GetTenantIds to SDL, fix argument passing
+- [ImagingTools/ImtCore] f68c1e6 | kucherenkord-cyber | Cleanup
+
+2026-05-06 (54 Commits)
+- [ImagingTools/ImtCore] 0160bfc | Copilot | Add TenantMemberships.sdl to CMakeLists.txt (was missing from build configuration)
+- [ImagingTools/ImtCore] 0a20a40 | Copilot | Add tenant owner and invitation workflow
+- [ImagingTools/ImtCore] 0a5f8da | Copilot | Fix TenantEditor to resolve member IDs to display names using FilterableSelectGqlDataProvider
+- [ImagingTools/ImtCore] 0d3eab9 | Copilot | Add inline documentation comments to TeamMemberRole enum values
+- [ImagingTools/ImtCore] 0d8b813 | kucherenkord-cyber | Cosmetics
+- [ImagingTools/ImtCore] 140195f | Copilot | Add Members section to TenantEditor with FilterableSelectPopup and membersCount column to TenantCollectionView
+- [ImagingTools/ImtCore] 14435a3 | Copilot | Fix Qt.rgba usage in MemberSelectElementView and move members into TenantData
+- [ImagingTools/ImtCore] 150917b | Copilot | Harden empty tenant visibility filter
+- [ImagingTools/ImtCore] 173266d | kucherenkord-cyber | Code corrected
+- [ImagingTools/ImtCore] 195c966 | kucherenkord-cyber | Code corrected
+- [ImagingTools/ImtCore] 1b7d7b1 | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] 1fb6219 | kucherenkord-cyber | Cosmetics
+- [ImagingTools/ImtCore] 27169dc | Copilot | Add CTenantMembership and CTenantMembershipManagerComp classes
+- [ImagingTools/ImtCore] 2e8a1c3 | Copilot | Generalize MemberSelectElementView into ItemSelectElementView — rename to generic properties (items, itemRemoved, etc.) for reuse with any entity type
+- [ImagingTools/ImtCore] 3b30419 | kucherenkord-cyber | Code corrected
+- [ImagingTools/ImtCore] 3f5f2a4 | Copilot | Add TenantMemberships SQL scripts and SDL schema
+- [ImagingTools/ImtCore] 4211424 | kucherenkord-cyber | Code corrected
+- [ImagingTools/ImtCore] 454c25a | Copilot | Add TenantMembership full-stack: SQL schema, SDL, C++ components (entity, manager, DB delegate, GQL controller), ACC configs, Pck registration
+- [ImagingTools/ImtCore] 472bfa9 | Copilot | Add initial GitHub-like authorization interfaces: ITenantMembership, ITenantMembershipManager, IResourcePermission, ITeamPermission
+- [ImagingTools/ImtCore] 575c8e8 | Copilot | Refactor TenantMemberRole: move inside ITenantMembership, ALL UPPERCASE values, I_DECLARE_ENUM, I_SERIALIZE_ENUM
+- [ImagingTools/ImtCore] 5a74c6b | Copilot | Add universal multi-tenant data filtering infrastructure
+- [ImagingTools/ImtCore] 5eea17f | kucherenkord-cyber | Build fixed
+- [ImagingTools/ImtCore] 61c047d | Copilot | Extract member selection UI into reusable MemberSelectElementView.qml component
+- [ImagingTools/ImtCore] 630c1d0 | Copilot | Add server-side memberIds population and sync in CTenantManagerControllerComp
+- [ImagingTools/ImtCore] 7472500 | kucherenkord-cyber | Cosmetics
+- [ImagingTools/ImtCore] 77be560 | Copilot | Refactor: move name resolution into ItemSelectElementView, add showCount property
+- [ImagingTools/ImtCore] 7a00382 | Copilot | Move UtcNow/EscapeSql utility functions to imtdb.h and remove duplicates from delegates
+- [ImagingTools/ImtCore] 8307d16 | Copilot | fix: prevent empty TenantId in membership operations by falling back to documentId
+- [ImagingTools/ImtCore] 8902947 | Copilot | Add CTenantMembershipDbDelegateComp database delegate files
+- [ImagingTools/ImtCore] 918e2f4 | Copilot | Wire TenantMembershipRepository into ACC configuration files
+- [ImagingTools/ImtCore] 91a4593 | kucherenkord-cyber | Code corrected
+- [ImagingTools/ImtCore] 9545ebe | Copilot | Refactor tenant collection filtering: move visibility logic from controller to DB delegate
+- [ImagingTools/ImtCore] 9aa5b67 | Copilot | TenantEditor: remove Members header, simplify pendingMemberIds extraction
+- [ImagingTools/ImtCore] 9b541f2 | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] 9b576f1 | Copilot | Address tenant visibility review feedback
+- [ImagingTools/ImtCore] 9ccd2e6 | Copilot | Refactor ITenantMembershipManager: use ITenantMembershipUniquePtr instead of raw pointers
+- [ImagingTools/ImtCore] 9fa5501 | Copilot | Use constants for tenant filter sentinels
+- [ImagingTools/ImtCore] ac66b7c | Copilot | Refactor TeamMemberRole: UPPERCASE (TMR_MAINTAINER/TMR_MEMBER), move inside ITeamPermission, I_DECLARE_ENUM; add detailed component descriptions in Pck files
+- [ImagingTools/ImtCore] b0cfac5 | Copilot | Refactor CTenantMembershipPublisherComp to observe ITenantMembershipManager (CTicketAssigneeNotifierComp pattern)
+- [ImagingTools/ImtCore] b45ecf7 | Copilot | Fix code review issues: use configurable UserIdColumn in DocumentOwner strategy, fix doc reference
+- [ImagingTools/ImtCore] b5e56bc | Copilot | Remove default collectionId from ItemSelectElementView — force consumers to set explicitly
+- [ImagingTools/ImtCore] c959940 | Copilot | Fix: add updatedAt field to ITenantMembership interface, entity, DB delegate, and GQL controller responses
+- [ImagingTools/ImtCore] cc2c31c | Copilot | Clarify tenant member scope filtering
+- [ImagingTools/ImtCore] ce9f3cf | Copilot | Fix: add re-entry guard to prevent infinite loop in name resolution
+- [ImagingTools/ImtCore] d2de724 | kucherenkord-cyber | Code corrected
+- [ImagingTools/ImtCore] de3f62f | Copilot | Add TenantMembership publisher and subscription client for invitation notifications
+- [ImagingTools/ImtCore] e2320fb | Copilot | Set ownerId on first save (immutable), auto-SaveDocument for existing tenants, hide Members for new tenants
+- [ImagingTools/ImtCore] ea122b0 | Copilot | Fix MemberSelectElementView: remove unused signal, add popupClosed for deferred sync
+- [ImagingTools/ImtCore] ea8a74f | kucherenkord-cyber | Merge branch 'copilot/propose-multi-tenant-architecture' of https://github.com/ImagingTools/ImtCore into copilot/propose-multi-tenant-architecture
+- [ImagingTools/ImtCore] ea94675 | Copilot | Refactor tenant filter: replace strategy components with serializable CTenantFilterParam model
+- [ImagingTools/ImtCore] f17ba04 | Copilot | Use tenant relation scope filter
+- [ImagingTools/ImtCore] f359ffb | Copilot | Add CTenantDocumentNameProviderComp (by analogy with CTicketDocumentNameProviderComp)
+- [ImagingTools/ImtCore] f932fea | Copilot | Fix review issues: track membershipId vs userId, only add new members in sync
+- [ImagingTools/ImtCore] ff697ef | Copilot | Remove redundant static_cast in CTenantMembershipPublisherComp
+
+2026-05-07 (37 Commits)
+- [ImagingTools/ImtCore] 0f8a211 | Copilot | Add CJwtSessionControllerProxyComp component
+- [ImagingTools/ImtCore] 18a8317 | Copilot | Add Organizations section to ProfileView with tenant switching, allow empty tenantId in SelectTenant for default scope
+- [ImagingTools/ImtCore] 1976ccc | kucherenkord-cyber | Corrected
+- [ImagingTools/ImtCore] 295d890 | Copilot | Simplify TenantEditor: use TenantData.memberRoles instead of separate GQL requests
+- [ImagingTools/ImtCore] 29840e9 | Copilot | Simplify profile tenant role mapping
+- [ImagingTools/ImtCore] 3697190 | Copilot | Unify profile tenant role assignment
+- [ImagingTools/ImtCore] 3fd45ec | Copilot | Expose profile tenant organizations
+- [ImagingTools/ImtCore] 485892a | Artur1309 | update mouse event, Row/Column, model/view
+- [ImagingTools/ImtCore] 4c0fbd4 | Copilot | Make TenantId column conditional in PrepareInsertNewObjectQuery - only include when operationContextPtr has non-empty TenantId
+- [ImagingTools/ImtCore] 4d7af9d | Copilot | Add TenantId column support: migration controller, SQL scripts, and document delegate filter integration
+- [ImagingTools/ImtCore] 5752e6f | Copilot | Replace Organizations buttons with TableElementView in ProfileView.qml
+- [ImagingTools/ImtCore] 5982164 | kucherenkord-cyber | Merge branch 'main' into copilot/propose-multi-tenant-architecture
+- [ImagingTools/ImtCore] 68245be | Copilot | Replace Label+text:{} with description property and helper function in ProfileView.qml
+- [ImagingTools/ImtCore] 6a16ae1 | Copilot | Fix trailing blank lines in tenant filter files
+- [ImagingTools/ImtCore] 6c10f59 | Copilot | Add tenant selection session flow
+- [ImagingTools/ImtCore] 71e9727 | Copilot | Fix TenantEditor members not updating locally after add/remove
+- [ImagingTools/ImtCore] 75754a2 | Copilot | Refactor: extract isDefaultTenant property for consistency in ProfileView
+- [ImagingTools/ImtCore] 78dc43f | Copilot | Add dynamic TenantId column migration in CUsersSessionsDatabaseDelegateComp::OnComponentCreated
+- [ImagingTools/ImtCore] 7cafe88 | Copilot | Address profile tenant role review
+- [ImagingTools/ImtCore] 7f1b11b | Copilot | Reset __membersModifiedLocally flag in onPopupClosed after doUpdateModel
+- [ImagingTools/ImtCore] 84f1c47 | Copilot | Fix ItemSelectElementView: emit selectionChanged after chip removal so consumers stay in sync
+- [ImagingTools/ImtCore] 8fb1969 | Copilot | Move TenantFilter logic from CreateAdditionalFiltersQuery to CreateFilterQuery in CSqlDatabaseDocumentDelegateComp
+- [ImagingTools/ImtCore] 91c254f | Copilot | Add CRemoteProfileControllerComp following CRemoteTenantControllerComp pattern
+- [ImagingTools/ImtCore] 933bfbf | Copilot | Set fallback profile tenant role
+- [ImagingTools/ImtCore] 96d241c | Copilot | Add GetTenantFromJwt to Sessions.sdl and implement handlers in controllers
+- [ImagingTools/ImtCore] a20e25f | Copilot | Simplify tenant filter params
+- [ImagingTools/ImtCore] a635802 | Copilot | Add Default Tenant (empty tenantId) to GetProfile organizations list
+- [ImagingTools/ImtCore] b020d89 | kucherenkord-cyber | Code corrected
+- [ImagingTools/ImtCore] b595917 | Artur1309 | Merge pull request #447 from ImagingTools/JQ-update
+- [ImagingTools/ImtCore] c2318e5 | Copilot | Address code review feedback: use defaultRole constant, fix counter edge case
+- [ImagingTools/ImtCore] c5b37aa | Copilot | Refactor CTenantFilterParam: simplify model, move helper to imtservergql, integrate into base controller
+- [ImagingTools/ImtCore] cd6bc70 | kucherenkord-cyber | Code corrected
+- [ImagingTools/ImtCore] d1cf8d2 | Copilot | Move ITenantFilterParam/CTenantFilterParam from imtdb to imtauth namespace
+- [ImagingTools/ImtCore] d55ae58 | Copilot | Fix ItemSelectElementView to update items locally after selection/removal actions
+- [ImagingTools/ImtCore] d576a58 | Copilot | Clarify tenant owner role precedence
+- [ImagingTools/ImtCore] d81c785 | kucherenkord-cyber | Partitura corrected
+- [ImagingTools/ImtCore] f876572 | Copilot | Add updateAllModels on tenant switch and member roles editor in TenantEditor
+
+2026-05-08 (28 Commits)
+- [ImagingTools/ImtCore] 01dd261 | Copilot | Fix TenantEditor role model and members write path
+- [ImagingTools/ImtCore] 0349ca9 | Copilot | Address final invitation review feedback
+- [ImagingTools/ImtCore] 038be46 | Copilot | Guard TenantEditor role model lookup
+- [ImagingTools/ImtCore] 0d4e3df | Copilot | Refine invitation UI and timestamps
+- [ImagingTools/ImtCore] 16014ff | Copilot | Add tenant invitation flow foundation
+- [ImagingTools/ImtCore] 18379bb | kucherenkord-cyber | COde corrected
+- [ImagingTools/ImtCore] 20a0eed | Copilot | Refactor: extract role population into loop, cache __getAvailableRoleNames in ComboBox
+- [ImagingTools/ImtCore] 22e7730 | Copilot | Clarify TenantEditor doubled margins
+- [ImagingTools/ImtCore] 2bcaa7c | Copilot | Add availableRoles to TenantData SDL, populate memberRoles and availableRoles from server, update TenantEditor to use server-provided roles
+- [ImagingTools/ImtCore] 3baeb83 | Copilot | Remove collection document manager notification components
+- [ImagingTools/ImtCore] 3fd0495 | kucherenkord-cyber | Code corrected
+- [ImagingTools/ImtCore] 4da2393 | Copilot | Polish TenantEditor role layout helpers
+- [ImagingTools/ImtCore] 721fd9f | Copilot | Clarify TenantEditor role helper names
+- [ImagingTools/ImtCore] 9229024 | Copilot | Polish tenant invitation handling
+- [ImagingTools/ImtCore] 940162a | kucherenkord-cyber | Code fix
+- [ImagingTools/ImtCore] a4d9388 | Copilot | Address TenantEditor role review feedback
+- [ImagingTools/ImtCore] a7cbc25 | Copilot | Clarify tenant binding table initialization
+- [ImagingTools/ImtCore] af7b866 | Copilot | Use clear for TenantEditor SDL role lists
+- [ImagingTools/ImtCore] b209bca | Copilot | Address invitation validation feedback
+- [ImagingTools/ImtCore] bc754ab | Copilot | Ensure tenant binding table exists before inserts
+- [ImagingTools/ImtCore] d432a1a | Copilot | Replace document tenant columns with bindings
+- [ImagingTools/ImtCore] db2f657 | Copilot | Remove tenant binding migration code
+- [ImagingTools/ImtCore] db46a7b | Copilot | Extract TenantEditor role row margins
+- [ImagingTools/ImtCore] de0531d | kucherenkord-cyber | Merge pull request #442 from ImagingTools/copilot/propose-multi-tenant-architecture
+- [ImagingTools/ImtCore] f753f43 | Copilot | Fix members/roles display: use SDL list API for structured types, add memberIds for write path
+- [ImagingTools/ImtCore] f917ab0 | Copilot | Optimize TenantEditor member list refresh
+- [ImagingTools/ImtCore] fbe761b | Copilot | Replace memberIds with members (id, name) in TenantData SDL; remove role fallbacks from TenantEditor
+- [ImagingTools/ImtCore] fd34418 | kucherenkord-cyber | COsmetics
+
+2026-05-09 (1 Commits)
+- [ImagingTools/ImtCore] 1215bfb | Copilot | Add 3D visualization with Three.js web backend and QtQuick3D desktop backend (#425)
+
+2026-05-10 (3 Commits)
+- [ImagingTools/Acf] 630d7cf | dependabot[bot] | ci(deps): bump aquasecurity/trivy-action from 0.35.0 to 0.36.0
+- [ImagingTools/Acf] f37eca9 | dependabot[bot] | ci(deps): bump actions/upload-pages-artifact from 4 to 5
+- [ImagingTools/ImtCore] 6a796aa | Copilot | Fix TenantEntityBindings table not created before filter/selection queries
+
+2026-05-11 (24 Commits)
+- [ImagingTools/Acf] 66bca8b | dependabot[bot] | ci(deps): bump actions/dependency-review-action from 4 to 5
+- [ImagingTools/ImtCore] 0322515 | Copilot | Run RegisterSubscription asynchronously via QtConcurrent
+- [ImagingTools/ImtCore] 1ae4347 | Copilot | Store async subscription futures and keep const-safe guards
+- [ImagingTools/ImtCore] 2876a6e | Copilot | Adapt imt3dgui CMake to compile RHI shaders like QMake (qsb + rcc)
+- [ImagingTools/ImtCore] 30f9e6c | 0x435641 | Merge pull request #451 from ImagingTools/copilot/expand-createdocument-with-parameter
+- [ImagingTools/ImtCore] 343e0e4 | ExternalVladimirCherepanov | CCollectionDocumentManagerBase corrected
+- [ImagingTools/ImtCore] 3a66250 | Copilot | fix: clarify mutex protection for proposedSourceDocumentIds map access in SaveDocument
+- [ImagingTools/ImtCore] 4531cf6 | Copilot | Fix malformed subscription error message format
+- [ImagingTools/ImtCore] 4caf553 | Copilot | Add RequestManager dependency and dispatch RegisterSubscription responses
+- [ImagingTools/ImtCore] 50bf9ff | Copilot | Fix MSVC build error in async QPointer guards
+- [ImagingTools/ImtCore] 53ba4d3 | Copilot | Refine async future cleanup to avoid repeated removals
+- [ImagingTools/ImtCore] 62fe66c | Copilot | Fix: make rcc dependency on .qsb files unconditional
+- [ImagingTools/ImtCore] 6693080 | Copilot | Avoid fallback return when RequestManager send fails
+- [ImagingTools/ImtCore] 6bba059 | Copilot | Fix CMake: remove GuiPrivate from find_package (not a component, target is auto-available)
+- [ImagingTools/ImtCore] 703e59f | 0x435641 | Merge pull request #453 from ImagingTools/copilot/adapt-cmake-to-qmake
+- [ImagingTools/ImtCore] 74c8b6f | Copilot | Generate pre-compiled .qsb shader files for RHI rendering
+- [ImagingTools/ImtCore] 855a744 | Copilot | feat: CCollectionDocumentManagerBase uses proposedSourceDocumentId when adding document to collection
+- [ImagingTools/ImtCore] 8ae897b | Copilot | Replace magic number in async future cleanup
+- [ImagingTools/ImtCore] ac0463e | Copilot | Reduce async future cleanup overhead
+- [ImagingTools/ImtCore] b351dba | Copilot | Handle missing RequestManager in subscription response dispatch
+- [ImagingTools/ImtCore] b8f6e17 | Copilot | Add Qt::GuiPrivate, Qt::OpenGL, Qt::OpenGLWidgets to CMake (fixes QRhi header not found)
+- [ImagingTools/ImtCore] d6fc83d | Copilot | Align QMake build with CMake: add missing modules (#450)
+- [ImagingTools/ImtCore] d960eb8 | Copilot | Polish lambda pointer constness in QPointer fix
+- [ImagingTools/ImtCore] f5b597e | Copilot | Extend CreateNewDocument with optional proposed source id
+
+2026-05-12 (54 Commits)
+- [ImagingTools/ImtCore] 05c1406 | Copilot | Remove node_modules additions from PR — restore to origin/main state
+- [ImagingTools/ImtCore] 05c59a9 | kucherenkord-cyber | Code corrected
+- [ImagingTools/ImtCore] 0b27cf6 | kucherenkord-cyber | WebCompiler.cmake QML module path fix
+- [ImagingTools/ImtCore] 0c371e3 | Copilot | Remove node_modules additions from PR
+- [ImagingTools/ImtCore] 11b27de | 0x435641 | Merge pull request #458 from ImagingTools/copilot/replace-qt-gui-private-linkage
+- [ImagingTools/ImtCore] 12871ef | Copilot | Tenant creator gets ADMIN role (immutable) + JQML v2 Menu components
+- [ImagingTools/ImtCore] 1bf818d | Copilot | Include invited tenants in GetTenantList via DB delegate, add "I am invited" filter, remove old panel
+- [ImagingTools/ImtCore] 1fe50db | Copilot | Fix popup closePolicy: use CloseOnPressOutside for proper dismiss behavior
+- [ImagingTools/ImtCore] 201c6bb | Copilot | Refactor CTenantDbDelegateComp: remove mutable state, override GetSelectionQuery/GetCountQuery directly
+- [ImagingTools/ImtCore] 27a40b9 | Copilot | Fix "Cannot redefine property: pressed" — remove pressed from Overlay defaultSignals since it conflicts with pressed in defaultProperties, rebuild main.js
+- [ImagingTools/ImtCore] 29519ee | ExternalVladimirCherepanov | imt3dgui cmake fixed
+- [ImagingTools/ImtCore] 2b059c6 | Copilot | Replace Qt::GuiPrivate linkage with target_include_directories for Qt 6.8+
+- [ImagingTools/ImtCore] 2e25f82 | Copilot | Improve empty filter check: use regex to handle whitespace variations in empty parens
+- [ImagingTools/ImtCore] 2f14c90 | kucherenkord-cyber | Merge branch 'copilot/add-cremote-tenant-membership-manager-controller-c' of https://github.com/ImagingTools/ImtCore into copilot/add-cremote-tenant-membership-manager-controller-c
+- [ImagingTools/ImtCore] 38498f1 | Copilot | Fix: remove invitations from UI only after server confirms success
+- [ImagingTools/ImtCore] 48a3f9b | Copilot | Remove accidentally added node_modules files
+- [ImagingTools/ImtCore] 4c5421c | Copilot | Add TenantInvitation ACC files for Postgres and SQLite repositories
+- [ImagingTools/ImtCore] 4edda38 | kucherenkord-cyber | Partitura corrected
+- [ImagingTools/ImtCore] 51b7d98 | Copilot | Remove node_modules additions from PR changes
+- [ImagingTools/ImtCore] 626d4b5 | Copilot | Fix #include error: use target_link_libraries Qt::Gui instead of target_include_directories genex
+- [ImagingTools/ImtCore] 62e5622 | Copilot | Auto-create OWNER membership for tenant creator in CTenantCollectionDocumentManagerComp
+- [ImagingTools/ImtCore] 63e78be | Copilot | Revert node_modules to match origin/main — remove from PR changes
+- [ImagingTools/ImtCore] 73554dc | Copilot | Refactor tenantRelationScope column: show text with popup on hover for Invited
+- [ImagingTools/ImtCore] 7612303 | kucherenkord-cyber | Merge branch 'main' into copilot/review-tenant-entity-bindings-logic
+- [ImagingTools/ImtCore] 7e7ec97 | kucherenkord-cyber | Merge branch 'main' into webcompiler-fix
+- [ImagingTools/ImtCore] 7f5421c | Copilot | Use Qt::Gui instead of Qt::GuiPrivate for include directories lookup
+- [ImagingTools/ImtCore] 8169891 | Copilot | Fix Popup geometry: use explicit null checks for x/y/w/h (avoid falsy 0 bug)
+- [ImagingTools/ImtCore] 879964a | Artur1309 | Merge pull request #460 from ImagingTools/JQ-update
+- [ImagingTools/ImtCore] 8c39979 | SERZSH1909 | Add ImtCoreQtRhiCompat.cmake for Qt 6.8+ compatibility and update conanfile.py
+- [ImagingTools/ImtCore] 90ad902 | Copilot | Fix SQL errors and add Owner protection in GUI
+- [ImagingTools/ImtCore] 93d49b0 | 0x435641 | Merge pull request #455 from ImagingTools/TestFixes
+- [ImagingTools/ImtCore] 9d917d9 | Artur1309 | update tests
+- [ImagingTools/ImtCore] 9d96aaa | Copilot | Address code review: use named constants for TenantRelationScope and invitation status
+- [ImagingTools/ImtCore] 9d998f1 | kucherenkord-cyber | Merge branch 'main' into copilot/review-tenant-entity-bindings-logic
+- [ImagingTools/ImtCore] 9e34131 | Copilot | Add JQML v2 Popup, Overlay, Dialog, ToolTip, Drawer components
+- [ImagingTools/ImtCore] b06213f | kucherenkord-cyber | Merge pull request #449 from ImagingTools/copilot/review-tenant-entity-bindings-logic
+- [ImagingTools/ImtCore] b580892 | Copilot | Fix GuiPrivate include dirs: use generator expression instead of get_target_property
+- [ImagingTools/ImtCore] b8c0567 | Copilot | Refactor: add TenantRelationScope as computed column via GetBaseSelectionQuery
+- [ImagingTools/ImtCore] ba2f6c4 | ShcherbinaVA | Merge branch 'main' into copilot/add-i-ref-to-cwebsocketservletcomp
+- [ImagingTools/ImtCore] bb3048a | Copilot | Update core.js and rebuild main.js: register Popup/Dialog/ToolTip/Drawer/Overlay under QtQuick_Controls and ColumnLayout under QtQuick_Layouts in JQModules
+- [ImagingTools/ImtCore] bf7257f | kucherenkord-cyber | Merge pull request #456 from ImagingTools/webcompiler-fix
+- [ImagingTools/ImtCore] c4eb760 | Copilot | Fix "Cannot redefine property: pressed" — remove pressed from Overlay defaultSignals, patch main.js
+- [ImagingTools/ImtCore] c9d4695 | Copilot | Remove Dialog.js from JQML v2: delete file, unregister from list.js and core.js, patch main.js
+- [ImagingTools/ImtCore] cb7ea81 | Copilot | Fix "Cannot redefine property: opened" — remove opened from Popup defaultSignals (conflicts with opened property)
+- [ImagingTools/ImtCore] cc357ac | Copilot | Add Accept/Reject buttons for Invited tenants in TenantCollectionView
+- [ImagingTools/ImtCore] ccf6f8f | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] d6cb4e7 | Copilot | Replace GetElementInfo for InvitationId/InvitedByName with ITenantInvitationManager lookup
+- [ImagingTools/ImtCore] da2157e | Copilot | Add CRemoteTenantMembershipManagerControllerComp
+- [ImagingTools/ImtCore] e1559d1 | kucherenkord-cyber | Merge branch 'main' into copilot/add-cremote-tenant-membership-manager-controller-c
+- [ImagingTools/ImtCore] e62591d | Copilot | Fix SQL error for admin users: always use TenantRelationScope subquery
+- [ImagingTools/ImtCore] f33a417 | Copilot | Show pending invitations in TenantCollectionView with Accept/Reject buttons
+- [ImagingTools/ImtCore] f535897 | Copilot | Remove duplicate SDL operations: InviteTenantMember, AcceptTenantMembershipInvitation, RejectTenantMembershipInvitation
+- [ImagingTools/ImtCore] fcc8059 | kucherenkord-cyber | Partitura corrected
+- [ImagingTools/ImtCore] fcdb3d1 | ExternalVladimirCherepanov | CCollectionDocumentManagerTest fixes
+
+2026-05-13 (50 Commits)
+- [ImagingTools/Agentino] 826fb83 | Copilot | Add OnComponentDestroyed to CServiceControllerComp to stop managed services on shutdown
+- [ImagingTools/Agentino] dd1bfd1 | Copilot | Add error logging for StopService failures during shutdown
+- [ImagingTools/ImtCore] 02e923d | Artur1309 | update tests
+- [ImagingTools/ImtCore] 07bba48 | Copilot | Refactor CreateDeleteObjectsQuery to reuse CreatePermissionsDeleteQuery helper
+- [ImagingTools/ImtCore] 0b2c412 | Artur1309 | Merge pull request #463 from ImagingTools/JQ-update
+- [ImagingTools/ImtCore] 0e9cf8e | Copilot | Add missing QMake projects to match CMake, fix EagleView CMake (#469)
+- [ImagingTools/ImtCore] 15e04c9 | kucherenkord-cyber | Cosmetics
+- [ImagingTools/ImtCore] 1d854b0 | Copilot | Add TenantPermissions SQL table with auto-creation and CRUD in CTenantDbDelegateComp
+- [ImagingTools/ImtCore] 22056d1 | Copilot | Implement GetTenantPermissions/SetTenantPermissions in CTenantInfo
+- [ImagingTools/ImtCore] 23304e5 | Copilot | Log invalid WebSocket request in RegisterSubscription
+- [ImagingTools/ImtCore] 326f4d7 | Copilot | Add allProductPermissions field with IFeatureInfoProvider for Permissions page data
+- [ImagingTools/ImtCore] 35feab0 | Copilot | Change RegisterSubscriptionImpl to void return type
+- [ImagingTools/ImtCore] 38e902a | Copilot | Fix review comments: use qsTr for localized format string, add comment for refresh logic
+- [ImagingTools/ImtCore] 3f95eb3 | Copilot | Replace IFeatureInfoProvider with IProductInfo in CTenantCollectionDocumentManagerComp
+- [ImagingTools/ImtCore] 4dcecb6 | kucherenkord-cyber | Merge branch 'main' into copilot/add-cremote-tenant-membership-manager-controller-c
+- [ImagingTools/ImtCore] 52a3cc1 | Copilot | Fix QML style: access delegate properties via id, replace text:{} blocks with ternary/helper
+- [ImagingTools/ImtCore] 5c6e07a | kucherenkord-cyber | Merge pull request #457 from ImagingTools/copilot/add-cremote-tenant-membership-manager-controller-c
+- [ImagingTools/ImtCore] 6124317 | kirill-lepski | Login fixed (#470)
+- [ImagingTools/ImtCore] 6b958fc | Copilot | Add TransferTenantOwnership mutation and tenant-scoped roles to SDL and server-side
+- [ImagingTools/ImtCore] 7716dde | Copilot | Optimize: check Owner role string before map lookup to avoid unnecessary conversion
+- [ImagingTools/ImtCore] 7975e1d | Copilot | Change tenantPermissions from QString to QByteArrayList ([ID] in SDL)
+- [ImagingTools/ImtCore] 79a166b | Copilot | Fix: consistent action column width in Members table — ComboBoxes aligned, Leave button constrained
+- [ImagingTools/ImtCore] 7ee3350 | Copilot | Add rollback logic to TransferTenantOwnership for consistency on partial failures
+- [ImagingTools/ImtCore] 7f502ea | victorscherbina | WebSocketServletComp corrected
+- [ImagingTools/ImtCore] 7f70702 | Artur1309 | Merge branch 'main' into JQ-update
+- [ImagingTools/ImtCore] 808c865 | Copilot | Fix Members/Permissions pages never appearing by reacting to isNewTenant changes
+- [ImagingTools/ImtCore] 80e92cc | Copilot | Protect owner from being removed on server side
+- [ImagingTools/ImtCore] 8158b19 | Copilot | Fix: Owner row shows static "Owner" text instead of empty ComboBox
+- [ImagingTools/ImtCore] 8c0ac67 | Copilot | Prevent invited users from editing Tenant (GUI + server)
+- [ImagingTools/ImtCore] 9007731 | kucherenkord-cyber | Merge branch 'main' into copilot/add-cremote-tenant-membership-manager-controller-c
+- [ImagingTools/ImtCore] 950c6c7 | Copilot | Simplify __currentUserRole ternary: use !m_currentUserId instead of !(x || "")
+- [ImagingTools/ImtCore] 9acae78 | kucherenkord-cyber | Popup corrected
+- [ImagingTools/ImtCore] b541ba4 | Artur1309 | Merge pull request #462 from ImagingTools/JQ-update
+- [ImagingTools/ImtCore] b9e0a77 | Artur1309 | revert gitignore
+- [ImagingTools/ImtCore] ba21a40 | Artur1309 | add new tests
+- [ImagingTools/ImtCore] be93090 | Artur1309 | Merge pull request #466 from ImagingTools/JQ-update
+- [ImagingTools/ImtCore] c00a767 | SERZSH1909 | Simplify ImtCoreQtRhiCompat.cmake by removing redundant checks and comments
+- [ImagingTools/ImtCore] c268d0b | kucherenkord-cyber | Partitura corrected | Menu/Popup visual fixed
+- [ImagingTools/ImtCore] c81732a | Copilot | Remove Owner from assignable roles, fix role change detection bug
+- [ImagingTools/ImtCore] c8d7ef3 | Copilot | Refactor TenantEditor.qml to MultiPageView with General, Members, and Roles pages
+- [ImagingTools/ImtCore] c9630e4 | Copilot | Merge Members + Member Roles into unified editor, add invitation expiration display
+- [ImagingTools/ImtCore] cc88b45 | Copilot | Fix trailing whitespace in TenantEditor.qml
+- [ImagingTools/ImtCore] ccaad8e | kucherenkord-cyber | Build fixed
+- [ImagingTools/ImtCore] d5e0b41 | Artur1309 | add TestCase
+- [ImagingTools/ImtCore] de1a0ad | Copilot | Merge Members+Invitations into unified table, refresh after invite, Owner role protection (GUI+server), role-based access control
+- [ImagingTools/ImtCore] e214e9f | VekhterAleksandr | qml. ButtonDecorator improved
+- [ImagingTools/ImtCore] e413788 | Copilot | Add Leave button for members, fix Owner role protection in ComboBox, allow self-removal on server
+- [ImagingTools/ImtCore] e708cd3 | Copilot | Replace ITenantRole with IRole pattern: remove ITenantRole.h, replace Roles page with Permissions page using TreeView permission selector, replace tenantRoles SDL field with tenantPermissions string
+- [ImagingTools/ImtCore] ee6c7d9 | kucherenkord-cyber | Cosmetics
+- [ImagingTools/ImtCore] fa64cc7 | kucherenkord-cyber | Partitura corrected
+
+2026-05-14 (35 Commits)
+- [ImagingTools/ImtCore] 0170d0b | kucherenkord-cyber | Code corrected
+- [ImagingTools/ImtCore] 067dbfb | Artur1309 | update Controls and add new tests
+- [ImagingTools/ImtCore] 0c4e359 | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] 0ceef42 | Copilot | Move Transfer Ownership from General page dialog to per-member button in Members page
+- [ImagingTools/ImtCore] 0db736b | Artur1309 | add new tests
+- [ImagingTools/ImtCore] 137a4d6 | Copilot | Replace prop: {} block syntax with ternary operators, revert main.js changes
+- [ImagingTools/ImtCore] 1f396af | Copilot | Rewrite BasicTreeView.qml to inherit from JQML2 TreeView with built-in tristate, filter, and delegate; simplify TreeViewElementView.qml
+- [ImagingTools/ImtCore] 1f8dc45 | kucherenkord-cyber | QML cosmetics\Partitura corrected
+- [ImagingTools/ImtCore] 3bf62e5 | Copilot | Fix roleCollectionDataProvider.collectionModel usage: use TreeItemModel API (getData/getItemsCount/containsKey) instead of BaseModel patterns
+- [ImagingTools/ImtCore] 624363d | Copilot | Replace BasicTreeView internals in TreeViewElementView.qml with ListView-based tree + SearchTextInput filter
+- [ImagingTools/ImtCore] 645bde8 | Copilot | SQL: change Role column from INTEGER to TEXT in TenantMemberships and TenantInvitations tables (Postgres + SQLite)
+- [ImagingTools/ImtCore] 690e4a6 | Copilot | Replace BasicTreeView in TreeViewElementView with standard QML TreeView + text filter
+- [ImagingTools/ImtCore] 6b6b15c | Copilot | Load roles via RoleCollectionDataProvider, fix self-transfer in GUI with empty-list message
+- [ImagingTools/ImtCore] 72768d4 | Artur1309 | Merge pull request #478 from ImagingTools/JQ-update
+- [ImagingTools/ImtCore] 72e8979 | Artur1309 | Merge pull request #477 from ImagingTools/JQ-update
+- [ImagingTools/ImtCore] 757566e | Copilot | Rewrite TreeViewElementView.qml — remove addRow/insertRow/removeRow/getRow/setRow, clean QML solution
+- [ImagingTools/ImtCore] 7a5ee7a | Copilot | Rewrite TreeViewElementView.qml to use JQML2 TreeView instead of custom ListView implementation
+- [ImagingTools/ImtCore] 7df4e5c | Artur1309 | add new tests
+- [ImagingTools/ImtCore] 7fc9718 | kucherenkord-cyber | JQML2 new components added
+- [ImagingTools/ImtCore] 8d55389 | Copilot | Remove ITenantMembership::TenantMemberRole enum — role is now QByteArray; simplify ComboBox currentIndex to use roleCombo.currentIndex
+- [ImagingTools/ImtCore] a1675c4 | Copilot | Fix Members display by using explicit property for Repeater model; redesign MultiPageView with GitHub Settings-style left sidebar
+- [ImagingTools/ImtCore] a529d32 | Copilot | Fix code review feedback: use named constants for indent/prefix widths, fix ChildModel parent
+- [ImagingTools/ImtCore] a8d048a | Artur1309 | Merge pull request #471 from ImagingTools/JQ-update
+- [ImagingTools/ImtCore] a8d4f77 | Artur1309 | update Text, readonly property(bug)
+- [ImagingTools/ImtCore] ab0719b | Copilot | Move allProductPermissions to ProLife-side CRemoteTenantCollectionDocumentManagerControllerComp with leaf-only permissions
+- [ImagingTools/ImtCore] b0298c5 | Copilot | Fix TreeItemModel API: use lowercase getData/getItemsCount from TreeItemModel.js
+- [ImagingTools/ImtCore] b2a00f6 | Copilot | Extract GetProductId() helper in CTenantDbDelegateComp to reduce duplication
+- [ImagingTools/ImtCore] b33b601 | Copilot | Fix CollectLeafPermissions to use TElementList directly, avoiding intermediate allocations
+- [ImagingTools/ImtCore] ba4e3c8 | Artur1309 | Merge pull request #472 from ImagingTools/JQ-update
+- [ImagingTools/ImtCore] bb1b443 | Artur1309 | Merge branch 'main' into JQ-update
+- [ImagingTools/ImtCore] c1f591c | Copilot | Fix containsKey TypeError: use GetData directly instead of containsKey for role model access
+- [ImagingTools/ImtCore] d01eda1 | kucherenkord-cyber | Merge branch 'copilot/add-tenant-owner-transfer' of https://github.com/ImagingTools/ImtCore into copilot/add-tenant-owner-transfer
+- [ImagingTools/ImtCore] e22701c | Copilot | Fix code review: simplify Image visibility to use boolean directly
+- [ImagingTools/ImtCore] f0fd18d | Copilot | Remove static roles, add ProductId to TenantPermissions, filter CPermissionsProviderComp by tenant, prevent self-transfer
+- [ImagingTools/ImtCore] ff06419 | Copilot | Create CheckableTreeView reusable component; revert BasicTreeView to original; simplify TreeViewElementView
+
+2026-05-15 (50 Commits)
+- [ImagingTools/ImtCore] 0433b12 | kucherenkord-cyber | Cosmetics
+- [ImagingTools/ImtCore] 0a31ab6 | victorscherbina | WebSocket partitura corrected
+- [ImagingTools/ImtCore] 10fb4e8 | Copilot | BasicTreeView: use Style colors, remove borders, remove displayValue, add keyboard navigation, remove console.log
+- [ImagingTools/ImtCore] 1131c53 | Copilot | Merge origin/main — resolve conflict in main.js (accept main's version)
+- [ImagingTools/ImtCore] 17edb56 | Copilot | Delete CheckableTreeView, move TreeView.qml code into BasicTreeView, add new QML to qrc
+- [ImagingTools/ImtCore] 1908a09 | Copilot | TreeViewElementView: pin filter at top with 350px max scroll region, anchor BasicTreeView to fill remaining space
+- [ImagingTools/ImtCore] 1934c09 | kucherenkord-cyber | Merge branch 'copilot/add-tenant-owner-transfer' of https://github.com/ImagingTools/ImtCore into copilot/add-tenant-owner-transfer
+- [ImagingTools/ImtCore] 1d9ef9c | Copilot | BasicTreeView: restore selected text color distinction
+- [ImagingTools/ImtCore] 201c2f5 | kucherenkord-cyber | Merge branch 'main' into copilot/fix-tabs-collection-view-logic
+- [ImagingTools/ImtCore] 27b5875 | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] 310d482 | Copilot | Simplify TreeModelBuilder, add filtering/tristate to BasicTreeView, rewrite TreeViewElementView bridge
+- [ImagingTools/ImtCore] 3390abf | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] 3c1a5d6 | kucherenkord-cyber | Merge pull request #482 from ImagingTools/copilot/fix-tabs-collection-view-logic
+- [ImagingTools/ImtCore] 41f2b33 | Copilot | TreeViewElementView: extract maxTreeHeight property (350) from hardcoded value
+- [ImagingTools/ImtCore] 4a33c00 | Artur1309 | Merge pull request #486 from ImagingTools/JQ-update
+- [ImagingTools/ImtCore] 4ad9030 | Artur1309 | add new tests. fix compiler
+- [ImagingTools/ImtCore] 4cb21f2 | kucherenkord-cyber | Merge branch 'copilot/add-tenant-owner-transfer' of https://github.com/ImagingTools/ImtCore into copilot/add-tenant-owner-transfer
+- [ImagingTools/ImtCore] 4f81299 | Copilot | Simplify collectionTabId check in onTabLoaded
+- [ImagingTools/ImtCore] 5777643 | VekhterAleksandr | Qml. MultiDocumentCollection view, tab visibility
+- [ImagingTools/ImtCore] 5943b9d | kucherenkord-cyber | index on copilot/add-tenant-owner-transfer: a97d10185f Fix BasicTreeView delegate: use explicit model properties for JQML compatibility
+- [ImagingTools/ImtCore] 5e06617 | Artur1309 | fix 3d (demo test)
+- [ImagingTools/ImtCore] 62c173e | Copilot | Remove duplicate checkedItemsChanged emissions from checkItem/uncheckItem
+- [ImagingTools/ImtCore] 677cd96 | kucherenkord-cyber | Cosmetics
+- [ImagingTools/ImtCore] 6844c48 | Copilot | Fix: allow negative values in IntegerInputElementView by checking acceptableInput (#476)
+- [ImagingTools/ImtCore] 7004968 | Copilot | Remove permissionsModel TreeItemModel conversion — use m_allProductPermissions directly via TreeModelBuilder.fromListModel; add implicitHeight to BasicTreeView
+- [ImagingTools/ImtCore] 7806b6d | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] 78ee306 | Copilot | Fix QMake linker errors: missing library deps in ImtChatGqlPck and ImtDeskGqlPck (#483)
+- [ImagingTools/ImtCore] 8427b4f | kucherenkord-cyber | On copilot/add-tenant-owner-transfer: test
+- [ImagingTools/ImtCore] 8818043 | Copilot | Optimize QML: use Style.spacingXS in sidebar, extract contentWidth property, remove z:5
+- [ImagingTools/ImtCore] 889069f | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] 8a13603 | Artur1309 | Merge pull request #481 from ImagingTools/JQML2-3D-fix
+- [ImagingTools/ImtCore] 8f5a5a5 | Copilot | BasicTreeView: make filterDebounceInterval configurable, clean up matchMap literal
+- [ImagingTools/ImtCore] 96c67fc | Copilot | Fix tab component logic: use pinned property instead of hardcoded index===0
+- [ImagingTools/ImtCore] 9919fd6 | Copilot | BasicTreeView: fix hover index bug, add filter debounce, optimize DFS filtering
+- [ImagingTools/ImtCore] 9fa3e89 | Copilot | Fix BasicTreeView: tristate checkbox at delegate start, full-row hover, single column full width, scrollable tree with pinned filter
+- [ImagingTools/ImtCore] a97d101 | Copilot | Fix BasicTreeView delegate: use explicit model properties for JQML compatibility
+- [ImagingTools/ImtCore] b4bd2fa | Artur1309 | Merge branch 'main' into JQ-update
+- [ImagingTools/ImtCore] b769843 | ShcherbinaVA | Merge branch 'main' into copilot/add-i-ref-to-cwebsocketservletcomp
+- [ImagingTools/ImtCore] c2d171e | Artur1309 | Merge pull request #479 from ImagingTools/JQ-update
+- [ImagingTools/ImtCore] c56e63a | Copilot | Fix TenantPermissions.h doc: ManageMembers covers AddMembership too
+- [ImagingTools/ImtCore] c66c3d6 | Copilot | Fix Invitation logic: Owner bypasses permission checks; define tenant permission constants (tenant.invite, tenant.view_members, tenant.manage_members, tenant.manage_invitations)
+- [ImagingTools/ImtCore] d653f28 | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] e22687f | Artur1309 | add new tests
+- [ImagingTools/ImtCore] e5d3a5e | Copilot | Fix tristate checkbox: disable CheckBox internal click, wire MouseArea to toggleCheckState for tree propagation
+- [ImagingTools/ImtCore] e97fc0c | Copilot | Restore http_parser.c compilation in imtrest QMake build (#484)
+- [ImagingTools/ImtCore] ed80c83 | Copilot | BasicTreeView: add toolbar with Expand All / Collapse All / Check All / Uncheck All buttons
+- [ImagingTools/ImtCore] f1926fe | Copilot | Remove bridge from TreeViewElementView — use BasicTreeView directly; update TenantEditor and RoleView to use TreeModelBuilder + native BasicTreeView API
+- [ImagingTools/ImtCore] f46e65f | kucherenkord-cyber | COsmetics
+- [ImagingTools/ImtCore] f489035 | Copilot | Make allProductPermissions a tree structure in SDL and server logic
+- [ImagingTools/ImtCore] f8b1602 | kucherenkord-cyber | Add editable TreeView components
+
+2026-05-16 (7 Commits)
+- [ImagingTools/ImtCore] 208aa1e | Copilot | Fix tree display, owner-only editing, Permissions tab for owner, org submenu in UserPanel, current tenant display
+- [ImagingTools/ImtCore] 3a8cbe9 | Copilot | Fix tree display, clean up Invitation from ITenantMembershipManager, delete TenantPermissions.h
+- [ImagingTools/ImtCore] 77df643 | Copilot | Add comment for temporarily hidden role ComboBox
+- [ImagingTools/ImtCore] 82b5d6d | Copilot | Encrypt database password in XML configuration files (#488)
+- [ImagingTools/ImtCore] 90022f6 | Copilot | Fix Permissions page visibility for Owner, remove role display, improve Members list
+- [ImagingTools/ImtCore] c6aeace | Copilot | Rename imtdoc::IDocumentManager → IDocumentService (#487)
+- [ImagingTools/ImtCore] da5e4f3 | Copilot | Remove all contents from Install directory - nothing to install currently (#489)
+
+2026-05-17 (9 Commits)
+- [ImagingTools/ImtCore] 108355e | Copilot | Remove all role logic from TenantEditor QML — owner-only editing, no role display or management
+- [ImagingTools/ImtCore] 1b62a9b | Copilot | Optimize BasicTreeView: skip writeBackNode in expandAll/collapseAll, avoid full rebuild in checkAll/uncheckAll; add ScrollBar to TreeViewElementView
+- [ImagingTools/ImtCore] 2280fcf | Copilot | Merge remote-tracking branch 'origin/main' into copilot/add-tenant-owner-transfer
+- [ImagingTools/ImtCore] 3e5b1fd | kucherenkord-cyber | Cosmetics
+- [ImagingTools/ImtCore] 4fcf124 | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] bd84e98 | kucherenkord-cyber | Merge branch 'copilot/add-tenant-owner-transfer' of https://github.com/ImagingTools/ImtCore into copilot/add-tenant-owner-transfer
+- [ImagingTools/ImtCore] e1ad04c | Copilot | Fix TreeViewElementView: remove Flickable wrapper, pin filter/toolbar, add CustomScrollbar on ListView; add tooltips to Members buttons
+- [ImagingTools/ImtCore] e338955 | kucherenkord-cyber | QML bugs fixing
+- [ImagingTools/ImtCore] f5a88aa | kucherenkord-cyber | QML cosmetics
+
+2026-05-18 (25 Commits)
+- [ImagingTools/Agentino] 444998d | kirill-lepski | Merge pull request #30 from ImagingTools/copilot/extend-agentinoagent-service-termination
+- [ImagingTools/Agentino] 6b7d860 | kirill-lepski | Merge pull request #32 from ImagingTools/copilot/update-directory-structure-installers
+- [ImagingTools/Agentino] a10fece | Copilot | Restructure installer directories under Install
+- [ImagingTools/Agentino] b5b0388 | Copilot | Remove legacy installer scripts from Install root
+- [ImagingTools/ImtCore] 0194c38 | kucherenkord-cyber | Merge pull request #491 from ImagingTools/qml-corrected
+- [ImagingTools/ImtCore] 03dd5f2 | Copilot | Revert "Merge branch 'copilot/add-i-ref-to-cwebsocketservletcomp' of https://github.com/ImagingTools/ImtCore into qml-cosmetics"
+- [ImagingTools/ImtCore] 1be5f05 | Copilot | fix: editNextCell defaults to column 0 instead of 1
+- [ImagingTools/ImtCore] 1f2a2df | Copilot | Fix OnMembershipNotification: enable JWT/PAT auth in WebSocket subscriptions
+- [ImagingTools/ImtCore] 4406b1b | Copilot | Remove organizations from ProfileData SDL, add GetUserOrganizations query, fix Sessions.sdl line endings
+- [ImagingTools/ImtCore] 464ebcb | kucherenkord-cyber | Syntax corrected
+- [ImagingTools/ImtCore] 563f2b1 | kucherenkord-cyber | Partitura corrected
+- [ImagingTools/ImtCore] 6930b5e | Copilot | fix: account for BasicTreeView y-offset in Flickable scroll calculation
+- [ImagingTools/ImtCore] 71913ad | kucherenkord-cyber | Merge pull request #467 from ImagingTools/copilot/add-tenant-owner-transfer
+- [ImagingTools/ImtCore] 72a4454 | kucherenkord-cyber | QML corrected
+- [ImagingTools/ImtCore] 8be8a24 | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] 9512e51 | Copilot | fix: scroll external Flickable on keyboard navigation in BasicTreeView
+- [ImagingTools/ImtCore] a092e57 | Copilot | Merge branch 'copilot/add-i-ref-to-cwebsocketservletcomp' of https://github.com/ImagingTools/ImtCore into qml-cosmetics
+- [ImagingTools/ImtCore] bb91b69 | Copilot | Merge branch 'copilot/fix-tenant-undo-changed-data' of https://github.com/ImagingTools/ImtCore into qml-cosmetics
+- [ImagingTools/ImtCore] bc82843 | kucherenkord-cyber | Build fixed
+- [ImagingTools/ImtCore] cae1ba3 | Copilot | Rename CRemoteTenantCollectionDocumentManagerControllerComp → CRemoteTenantCollectionDocumentServiceControllerComp per PR #487 naming convention
+- [ImagingTools/ImtCore] cbea6b6 | kucherenkord-cyber | Merge branch 'main' into copilot/add-i-ref-to-cwebsocketservletcomp
+- [ImagingTools/ImtCore] dc45e1b | kucherenkord-cyber | QML fixing
+- [ImagingTools/ImtCore] dda9968 | Copilot | Fix GetUndoManagerNextModelId to check all users and shared documents for modelId collisions
+- [ImagingTools/ImtCore] ebe90a2 | Copilot | feat: simplify TreeModelBuilder API, add inline editing to BasicTreeView, integrate membership subscriptions
+- [ImagingTools/ImtCore] fd571de | Copilot | Remove organizations from ProfileView, fix currentTenantName persistence, fix TreeModelBuilder child model API casing
+
+2026-05-19 (50 Commits)
+- [ImagingTools/Agentino] 0824d91 | Copilot | Adapt code to ImtCore PR #487: Rename DocumentManager → DocumentService
+- [ImagingTools/Agentino] 0e23a82 | kucherenkord-cyber | QML corrected
+- [ImagingTools/Agentino] 81818bd | kucherenkord-cyber | Merge branch 'main' of https://github.com/ImagingTools/Agentino
+- [ImagingTools/Agentino] c8467ae | kucherenkord-cyber | Merge pull request #33 from ImagingTools/copilot/adapt-code-to-changes-487
+- [ImagingTools/ImtCore] 100e4e3 | kucherenkord-cyber | Gallery files updated
+- [ImagingTools/ImtCore] 12eb193 | kucherenkord-cyber | Merge branch 'main' into copilot/refactor-tenant-membership-subscription
+- [ImagingTools/ImtCore] 1b9d89a | ShcherbinaVA | Merge branch 'main' into NewWebSocket
+- [ImagingTools/ImtCore] 288a40c | victorscherbina | Partitura corrected
+- [ImagingTools/ImtCore] 28b76b1 | kucherenkord-cyber | Merge pull request #495 from ImagingTools/copilot/refactor-tenant-membership-subscription
+- [ImagingTools/ImtCore] 2a0d46c | Copilot | feat: replace ♛ symbol with Crown.svg icon as Image element
+- [ImagingTools/ImtCore] 2fb0b85 | Copilot | fix: replace static colors with Style properties and simplify JS block syntax
+- [ImagingTools/ImtCore] 3827ec7 | kucherenkord-cyber | Merge branch 'main' into copilot/analyze-user-settings-issue
+- [ImagingTools/ImtCore] 3f09e78 | ShcherbinaVA | Merge branch 'main' into NewWebSocket
+- [ImagingTools/ImtCore] 4163992 | kucherenkord-cyber | Merge pull request #497 from ImagingTools/gallery-fixed
+- [ImagingTools/ImtCore] 421cb72 | Copilot | Generalize TenantMembershipSubscriptionClient to handle ownership transfer notifications
+- [ImagingTools/ImtCore] 42486ff | Copilot | Add JQML v3 QML-to-Web compiler documentation (#263)
+- [ImagingTools/ImtCore] 43f522b | ShcherbinaVA | Merge branch 'main' into NewWebSocket
+- [ImagingTools/ImtCore] 4bad89e | kucherenkord-cyber | QML corrected
+- [ImagingTools/ImtCore] 4c9684f | kucherenkord-cyber | Merge branch 'main' into gallery-fixed
+- [ImagingTools/ImtCore] 4e46c1f | ShcherbinaVA | Merge branch 'main' into NewWebSocket
+- [ImagingTools/ImtCore] 4f214a3 | kucherenkord-cyber | Merge pull request #496 from ImagingTools/qml-cleanup
+- [ImagingTools/ImtCore] 545eede | Copilot | fix: use QByteArrayLiteral for role string comparisons
+- [ImagingTools/ImtCore] 5e29f00 | Copilot | fix: restore FilterableSelectPopup invite, remove UUID, use QML Menu for actions
+- [ImagingTools/ImtCore] 62f630a | Copilot | refactor: implement full Members Management GUI for TenantEditor
+- [ImagingTools/ImtCore] 695019a | kucherenkord-cyber | Merge branch 'main' into NewWebSocket
+- [ImagingTools/ImtCore] 6cd8585 | Copilot | Add comprehensive Ticket/Tenant test suite (135 tests across 7 projects)
+- [ImagingTools/ImtCore] 7356239 | Copilot | refactor: remove redundant __getMemberRole wrapper, use __getUserRole directly
+- [ImagingTools/ImtCore] 78a7fba | kucherenkord-cyber | Merge branch 'main' into copilot/analyze-user-settings-issue
+- [ImagingTools/ImtCore] 797be02 | Copilot | Fix empty UserId being saved to UserSettings database table
+- [ImagingTools/ImtCore] 79d12eb | VekhterAleksandr | Qml. GraphicsView components improved
+- [ImagingTools/ImtCore] 7a42999 | Copilot | Make CTenantMembershipPublisherComp thread-safe with QRecursiveMutex
+- [ImagingTools/ImtCore] 7d7a0ef | Copilot | feat(server): implement environment roles (Creator/Owner/Admin/Member) with creatorId, role-based access control, and proper memberRoles population
+- [ImagingTools/ImtCore] 83cf3b4 | Copilot | fix: address code review feedback - remove Layout.fillWidth in Row, extract invite logic
+- [ImagingTools/ImtCore] 8abd8f8 | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] 8ed8489 | kucherenkord-cyber | Merge pull request #494 from ImagingTools/NewWebSocket
+- [ImagingTools/ImtCore] 915d09d | Copilot | Merge branch 'copilot/add-i-ref-to-cwebsocketservletcomp' into NewWebSocket
+- [ImagingTools/ImtCore] 97deb4b | kucherenkord-cyber | Merge pull request #498 from ImagingTools/copilot/analyze-user-settings-issue
+- [ImagingTools/ImtCore] 9c90dad | Copilot | fix: remove unused __pendingMenuActions property
+- [ImagingTools/ImtCore] 9e49a21 | kucherenkord-cyber | Merge branch 'main' into copilot/analyze-user-settings-issue
+- [ImagingTools/ImtCore] a44b3f4 | kucherenkord-cyber | Merge branch 'main' into copilot/implement-ticket-tenant-tests
+- [ImagingTools/ImtCore] a7889b7 | kucherenkord-cyber | Merge branch 'main' into copilot/fix-gui-for-tenant-editor
+- [ImagingTools/ImtCore] ab8d2e4 | kucherenkord-cyber | Merge pull request #492 from ImagingTools/qml-cosmetics
+- [ImagingTools/ImtCore] b50a6ec | Copilot | feat: add section separators, fix pending invitations style, Row badges, environment roles (Creator/Owner/Admin/Member), Roles/Groups pages
+- [ImagingTools/ImtCore] bdf30a2 | kucherenkord-cyber | QML cleanup
+- [ImagingTools/ImtCore] c490ffc | Copilot | refactor: introduce TenantEnvironmentRole C++ enum (TER_MEMBER/TER_ADMIN/TER_OWNER/TER_CREATOR) in ITenantMembership, replace string-based role storage with enum-based
+- [ImagingTools/ImtCore] da3a746 | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] e708bd4 | Copilot | fix: simplify members summary text binding to ternary expression
+- [ImagingTools/ImtCore] e768f05 | Copilot | fix: TElementList::FromList explicitly constructs non-null TSharedNullable elements to prevent crash in generated serialization code
+- [ImagingTools/ImtCore] e85a2d8 | kucherenkord-cyber | Merge branch 'main' into copilot/implement-ticket-tenant-tests
+- [ImagingTools/ImtCore] e90baa1 | kucherenkord-cyber | Merge pull request #499 from ImagingTools/copilot/implement-ticket-tenant-tests
+
+2026-05-20 (41 Commits)
+- [ImagingTools/AcfSln] 1947c8e | 0x435641 | CLinearlyScaledNumericParamComp corrected (#47)
+- [ImagingTools/AcfSln] 42cab40 | 0x435641 | imeas::CLinearlyScaledNumericParamComp added (#44)
+- [ImagingTools/ImtCore] 0302823 | kirill-lepski | SID-based login implemented. Bug fixing and small improvements (#506)
+- [ImagingTools/ImtCore] 0c9821d | Copilot | Sync qmake `.depends` in ImtCoreAll.pro with CMake link dependencies (#512)
+- [ImagingTools/ImtCore] 1064256 | Copilot | Merge origin/main into copilot/fix-gui-for-tenant-editor - resolve conflict in JQML bundle
+- [ImagingTools/ImtCore] 1511450 | Copilot | feat: revamp TenantEditor pages — fix empty state, StackView roles/groups, fixed-header Permissions, General header, role assignment menu
+- [ImagingTools/ImtCore] 187909a | Copilot | refactor(TenantEditor): inject GqlBasedTenantMembershipApiClient from TenantCollectionView
+- [ImagingTools/ImtCore] 2205998 | Copilot | Move Create button to StackViewHeader level, add GetObjectData for edit, show item name in header
+- [ImagingTools/ImtCore] 31c45b6 | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] 33c6678 | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] 34311ec | Copilot | Refactor Roles/Groups pages: use ListView via TenantCollectionListView, add editing, add Description column to permissions tree, move env roles above filter
+- [ImagingTools/ImtCore] 3dbd3c8 | VekhterAleksandr | Jqml v2 fixed (SplitView removed from list)
+- [ImagingTools/ImtCore] 43adc8d | Copilot | Add detailed QML & JQML documentation and tutorials (#507)
+- [ImagingTools/ImtCore] 4531135 | VekhterAleksandr | Qml. base controls corrected
+- [ImagingTools/ImtCore] 48d0333 | Copilot | fix: add CStandardDocumentMetaInfo.cpp to imtdoc to resolve undefined linker symbols
+- [ImagingTools/ImtCore] 4a26a8b | Copilot | Fix BasicTreeView header panel: distinct color from hover, increased height, separator line, and fix delegate reuse issue
+- [ImagingTools/ImtCore] 5a51f46 | kucherenkord-cyber | Merge branch 'copilot/fix-gui-for-tenant-editor' of https://github.com/ImagingTools/ImtCore into copilot/fix-gui-for-tenant-editor
+- [ImagingTools/ImtCore] 5f264b7 | Copilot | fix: link imtbase against idoc for Linux TeamCity builds
+- [ImagingTools/ImtCore] 7bf3b20 | Copilot | Move CRemoteFilterableSelectControllerComp to imtclientgql and register in ImtClientGqlPck
+- [ImagingTools/ImtCore] 83621bd | Copilot | Fix width calculations in role/group delegates after avatar removal
+- [ImagingTools/ImtCore] 86c1fb5 | Copilot | refactor: decompose TenantEditor.qml into SOLID layered QML architecture
+- [ImagingTools/ImtCore] 8e66126 | kirill-lepski | Merge fixes (#508)
+- [ImagingTools/ImtCore] 8f1e155 | VekhterAleksandr | Qml. MultiDocumentCollectionView corrected (#509)
+- [ImagingTools/ImtCore] 9001f76 | Copilot | refactor(TenantEditor): inherit pages from ViewBase, propagate model + use doUpdateGui/doUpdateModel
+- [ImagingTools/ImtCore] 93ca494 | Copilot | Use imtcontrols StackView/StackViewHeader on Roles/Groups pages, remove Permissions border, add CRemoteFilterableSelectControllerComp
+- [ImagingTools/ImtCore] a603c73 | Copilot | Fix env roles horizontal layout, add page titles with descriptions, static delegate height, fix BasicTreeView column widths
+- [ImagingTools/ImtCore] b339a81 | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] ca8bb10 | Copilot | feat(TenantCollectionListView): add selection (single/multi) and 3-dot menu button
+- [ImagingTools/ImtCore] cd995b4 | kucherenkord-cyber | Merge pull request #501 from ImagingTools/copilot/fix-gui-for-tenant-editor
+- [ImagingTools/ImtCore] cf274a1 | Copilot | fix: keep TeamCity linker fix minimal
+- [ImagingTools/ImtCore] d0c1390 | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] d71fee4 | Copilot | Fix BasicTreeView headers stretch, remove env roles from Roles page, restore bold titles, fix duplicate titles, use RoleView/UserGroupView editors with double-click
+- [ImagingTools/ImtCore] d8f0bc0 | kucherenkord-cyber | CRemoteFilterableSelectControllerComp corrected
+- [ImagingTools/ImtCore] d9ac87d | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] e3eb50c | Copilot | Refactor TenantMembersPage: use TenantCollectionListView + UserView, add user CRUD to API client
+- [ImagingTools/ImtCore] e468b6c | Copilot | feat: separate Tenant Environment Roles and Global Roles in TenantEditor Roles page
+- [ImagingTools/ImtCore] e4c69ff | Copilot | Refactor CRemoteFilterableSelectControllerComp to use TClientRequestManagerCompWrap pattern (like CRemoteTenantControllerComp)
+- [ImagingTools/ImtCore] f10bb1e | Copilot | Refactor Roles/Groups pages: remove model:{} syntax, use FilterableSelectGqlDataProvider, compact env roles, remove SuperAdmin/User
+- [ImagingTools/ImtCore] f6580a5 | Copilot | Enhance Permissions page with CustomScrollbar, text filter, Check/Uncheck All; update Roles/Groups with icons, remove avatars/badges, add delete with confirmation dialog, implement add/remove via ImtCollection.sdl
+- [ImagingTools/ImtCore] fe01207 | Copilot | Fix: restore page descriptions, increase delegate height, fix BasicTreeView header scroll, fix editor reuse bug
+- [ImagingTools/ImtCore] fe150d2 | Copilot | Replace TreeViewElementView with BasicTreeView on Permissions page
+
+2026-05-21 (56 Commits)
+- [ImagingTools/Acf] 0547ec4 | Copilot | Add package meta-info cache: CCachedAttributeStaticInfo, CCachedComponentStaticInfo, CPackageMetaInfoCache, integrate into CPackagesLoaderComp
+- [ImagingTools/Acf] 28c09f7 | Copilot | Extend TQtDocumentManagerWrap to use ifile::IFileNameParam for last directory persistence
+- [ImagingTools/Acf] 2a1c7f7 | Copilot | Optimize TryLoadFromCache: combine validate+load, binary format, cache canonicalFilePath, filesystem pre-check
+- [ImagingTools/Acf] 8374ffa | Copilot | Fix redundant GetRelatedMetaIds calls in SerializeAttribute
+- [ImagingTools/Acf] 9b1eefb | Copilot | Optimize TryLoadFromCache: combine validate+load, binary format, cache canonicalFilePath, filesystem pre-check
+- [ImagingTools/Acf] abd6bbb | Copilot | Refactor TQtDocumentManagerWrap: replace GetLastDirectoryParam with virtual GetLastDirectory/SetLastDirectory
+- [ImagingTools/Acf] ba015e1 | Copilot | Replace NULL with nullptr in fixed code
+- [ImagingTools/Acf] c7bdffc | Copilot | Fix settings archives to accept QSettings providers
+- [ImagingTools/Acf] cb3fec2 | Copilot | Address review: eliminate fragile NULL placeholders by pre-filtering valid entries
+- [ImagingTools/Acf] d07f3ed | Copilot | Address review: eliminate fragile NULL placeholders by pre-filtering valid entries
+- [ImagingTools/Acf] d27556a | 0x435641 | Fix TQtDocumentManagerWrap: move component REF to descendants (#211)
+- [ImagingTools/Acf] d7277eb | Copilot | Store cache files in .acf.cache subdirectory by default
+- [ImagingTools/Acf] da22db2 | Copilot | Store cache files in .acf.cache subdirectory by default
+- [ImagingTools/Acf] dff16e1 | Copilot | Fix: move I_REF from template to descendant components, use virtual GetLastDirectoryParam()
+- [ImagingTools/ImtCore] 0823b3c | kirill-lepski | Merge pull request #516 from ImagingTools/copilot/add-async-communication-interface
+- [ImagingTools/ImtCore] 0a75977 | Copilot | Fix include path for TSharedInterfacePtr
+- [ImagingTools/ImtCore] 0c2a130 | Copilot | feat: pass roleData/groupData/userData SDL objects via m_item in insert and update methods
+- [ImagingTools/ImtCore] 1eb02da | Copilot | fix: copy list fields (roles/groups/users/parentRoles/parentGroups) from received data in edit views; add SubscriptionClient to TenantCollectionListView; fix empty state height to match delegate height
+- [ImagingTools/ImtCore] 23459f5 | kirill-lepski | Fixed assertion due the wrong init sequence (#513)
+- [ImagingTools/ImtCore] 23b2b11 | Copilot | feat: generate _fwd.h forward declaration files and refactor PCK headers
+- [ImagingTools/ImtCore] 2cc9c58 | Copilot | Rename RequestState enum values to use RS_ prefix
+- [ImagingTools/ImtCore] 2ecb275 | Copilot | Adopt repo doxygen convention for new interface headers
+- [ImagingTools/ImtCore] 4087bb8 | Copilot | fix: widen tables to 1000px, align titles to table width, fix tristate checkbox click behavior
+- [ImagingTools/ImtCore] 42da03e | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] 4b16c48 | Copilot | fix: add scrollbar, fix deletion/edit serialization, add member checkboxes, remove Cancel buttons, fix empty menu for owner/creator
+- [ImagingTools/ImtCore] 4bc75da | Copilot | fix: correct indentation in RoleView.qml updateGui
+- [ImagingTools/ImtCore] 4d58561 | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] 4d71f63 | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] 4f74479 | Copilot | fix: empty state text, member delegate layout, breadcrumb hover, description font, role editor width, membership operations, user editor
+- [ImagingTools/ImtCore] 520e48a | Copilot | feat: redesign Tenant tabs — 800px centered table with border, checkbox selection, invited users, avatars
+- [ImagingTools/ImtCore] 541d980 | legend-of-today | Updated RU translations, added KZ
+- [ImagingTools/ImtCore] 583625f | legend-of-today | Merge pull request #517 from ImagingTools/translations_ru_kz
+- [ImagingTools/ImtCore] 595342d | kucherenkord-cyber | Merge branch 'main' into copilot/fix-gui-for-tenant-editor
+- [ImagingTools/ImtCore] 5abdb8e | Copilot | Address review: capitalize lambdas; rename State to RequestState
+- [ImagingTools/ImtCore] 61474ac | kucherenkord-cyber | Merge branch 'main' into copilot/fix-gui-for-tenant-editor
+- [ImagingTools/ImtCore] 65c035e | Copilot | Refactor IDocumentService: task-based async API + fix CChangeNotifier two-phase pattern + fix WaitForTaskFinished hang (#490)
+- [ImagingTools/ImtCore] 68a57d2 | kucherenkord-cyber | Merge pull request #514 from ImagingTools/copilot/fix-gui-for-tenant-editor
+- [ImagingTools/ImtCore] 7039b24 | Copilot | fix: selection reactivity via array reassignment, bottom margin, Edit/Remove buttons
+- [ImagingTools/ImtCore] 749443b | Copilot | fix: prevent owner from seeing Leave Workspace option
+- [ImagingTools/ImtCore] 7709c42 | Copilot | Revert PR #408: revert font and overflow changes that worsened the situation
+- [ImagingTools/ImtCore] 80a7862 | kucherenkord-cyber | Merge branch 'main' into copilot/fix-gui-for-tenant-editor
+- [ImagingTools/ImtCore] 823892f | Copilot | refactor: migrate GqlBasedTenantMembershipApiClient to use specific SDL types (RoleItem/RoleAdd/RoleUpdate, UserItem/UserAdd/UserUpdate, GroupItem/GroupAdd/GroupUpdate) and move Invited Members above active members in TenantMembersPage
+- [ImagingTools/ImtCore] 93618e6 | VekhterAleksandr | Qml. CheckboxMenu corrected
+- [ImagingTools/ImtCore] 9840501 | Copilot | Add async GraphQL client interfaces, components and PCK registration
+- [ImagingTools/ImtCore] 9c10a66 | kirill-lepski | Merge pull request #519 from ImagingTools/copilot/revert-pull-408-changes
+- [ImagingTools/ImtCore] a49000e | kucherenkord-cyber | QML fixed
+- [ImagingTools/ImtCore] a5c89a6 | Copilot | fix: full-width separators, checkbox-only selection, taller header, fix select all, member separators, left-align titles, center more icon, content-height tables, fix editor centering
+- [ImagingTools/ImtCore] b58fa8d | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] b9941d6 | Copilot | fix: align insertGroup/setGroupData and insertUser/setUserData with insertRole/setRoleData pattern; replace SelectableCollectionEditor with ItemSelectElementView; handle onInvitationRevoked
+- [ImagingTools/ImtCore] ce9f108 | Copilot | Expand single-line getters in CCapturingHandler
+- [ImagingTools/ImtCore] d9a6eb0 | Copilot | fix: expose isNewTenant on TenantEditor so commandsPanelVisible binding works in TenantCollectionView
+- [ImagingTools/ImtCore] e1388eb | Copilot | revert: restore original PCK headers with full #includes
+- [ImagingTools/ImtCore] f3429b8 | kucherenkord-cyber | Merge pull request #520 from ImagingTools/copilot/fix-gui-for-tenant-editor
+- [ImagingTools/ImtCore] f4e48fd | Copilot | fix: correct user description mapping and simplify filter conditions
+- [ImagingTools/ImtCore] f56b704 | Copilot | fix: move filter above table, increase delegate height/font, unified border, center editors
+- [ImagingTools/ImtCore] f7f4a5c | kucherenkord-cyber | Merge branch 'copilot/fix-gui-for-tenant-editor' of https://github.com/ImagingTools/ImtCore into copilot/fix-gui-for-tenant-editor
+
+2026-05-22 (56 Commits)
+- [ImagingTools/Acf] 0af49e4 | Copilot | Fix package cache to serialize/deserialize subelement info and embedded registries
+- [ImagingTools/Acf] 2190922 | kirilllepski | Build fixed
+- [ImagingTools/Acf] ac8aca5 | Copilot | Merge origin/main into Branch_copilot/optimize-tryloadfromcache
+- [ImagingTools/Acf] b161991 | kirill-lepski | Disable component cache as default setting (#214)
+- [ImagingTools/AcfSln] 1384592 | kirill-lepski | Merge pull request #49 from ImagingTools/copilot/fix-embedded-registries-attributes
+- [ImagingTools/AcfSln] 17664d7 | kirilllepski | Build fixed
+- [ImagingTools/AcfSln] 21796b6 | kirill-lepski | Merge pull request #48 from ImagingTools/Buildfix2205
+- [ImagingTools/AcfSln] c062166 | Copilot | Fix: Handle embedded registry components in Compositor attribute editor
+- [ImagingTools/AcfSln] f5ded71 | Copilot | Remove redundant else-if fallback in attribute selection handler
+- [ImagingTools/ImtCore] 00dd33c | Copilot | fix tenant editor creation and commands
+- [ImagingTools/ImtCore] 02731ee | Copilot | Only show TenantCollectionListView empty-state header when list is empty
+- [ImagingTools/ImtCore] 0f1c8d3 | Copilot | Fix formatting: add proper tab indentation to CAuthenticationManagerComp .h and .cpp
+- [ImagingTools/ImtCore] 149a6cd | kucherenkord-cyber | Merge branch 'copilot/update-gql-based-tenant-membership-api' of https://github.com/ImagingTools/ImtCore into copilot/update-gql-based-tenant-membership-api
+- [ImagingTools/ImtCore] 180e9bd | Copilot | Record merge with main
+- [ImagingTools/ImtCore] 1d5b91e | Copilot | Move CSystemStatusComp and ISystemStatus from imtbase to imtserverapp
+- [ImagingTools/ImtCore] 1f3d1f4 | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] 20b9433 | kucherenkord-cyber | Bug fix
+- [ImagingTools/ImtCore] 24870e0 | Copilot | Move IParamsSetPlugin and TParamsSetPluginComponentImpl from imtbase to imtserverapp
+- [ImagingTools/ImtCore] 290dee4 | Copilot | Revert "Revert copilot changes, restore original PR #521 commits"
+- [ImagingTools/ImtCore] 2e2bba4 | Copilot | Address code review: fix redundant check order, rename variable for clarity
+- [ImagingTools/ImtCore] 33e36d5 | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] 361bb91 | Copilot | Merge main and resolve GraphQL context conflicts
+- [ImagingTools/ImtCore] 39cfc00 | Copilot | Address PR feedback: remove Default org, hide DocumentHistoryPanel by default, filter Creator on Members page, Creator edit rights, loading state in TenantCollectionListView, tenantId from edited tenant
+- [ImagingTools/ImtCore] 4327fc7 | Copilot | Implement variant B: extend CTenantFilterParam with Mode field (Include/Exclude) for invitation user filtering
+- [ImagingTools/ImtCore] 446cbf6 | kucherenkord-cyber | Merge branch 'main' into copilot/update-gql-based-tenant-membership-api
+- [ImagingTools/ImtCore] 464bf1a | Copilot | Rename productId → tenantId in GqlBasedTenantMembershipApiClient and all references; add GitHub font to TenantEditor
+- [ImagingTools/ImtCore] 49dd31d | Copilot | Remove extra blank line and commented-out code block in CWebSocketServletComp.cpp
+- [ImagingTools/ImtCore] 4a69ba0 | Copilot | Rename CGqlContextCreatorComp to CAuthenticationManagerComp, implement IJwtSessionController with cache-based delegation
+- [ImagingTools/ImtCore] 4db1a6d | Copilot | Extract CreateTenantFilterParam to imtauthgql.h; use in CFilterableSelectControllerComp
+- [ImagingTools/ImtCore] 6069313 | Copilot | Revert TenantExclusionFilter handler and remove CTenantExclusionParamsSetJoinerComp
+- [ImagingTools/ImtCore] 6a9fef2 | Copilot | refactor: address code review - remove redundant enabled, extract subscription helper
+- [ImagingTools/ImtCore] 6bfc3ef | Copilot | Fix build: remove stale m_jwtSessionControllerCompPtr/accessToken references in CHttpGraphQLServletComp.cpp
+- [ImagingTools/ImtCore] 6c6d340 | kucherenkord-cyber | Code corrected
+- [ImagingTools/ImtCore] 7033bcf | Copilot | Fix empty table display, move data factories to apiClient, fix ACC Switch command, add tenant filter to CFilterableSelectControllerComp, add server-side tenant access control
+- [ImagingTools/ImtCore] 719b9f9 | kucherenkord-cyber | Bug fixing
+- [ImagingTools/ImtCore] 73744e5 | Copilot | Fix stale imtrest::IRepresentationController comment references in imtserverapp
+- [ImagingTools/ImtCore] 73a7bdc | kucherenkord-cyber | Cosmetics
+- [ImagingTools/ImtCore] 75faec7 | Copilot | Move components with imtserverapp deps from basic libs (imtqml, imtauth, imtclientgql, imtservice) to imtserverapp
+- [ImagingTools/ImtCore] 79e9c50 | Copilot | Make "No organization" always enabled and checkable in UserPanel.qml
+- [ImagingTools/ImtCore] 819579e | Copilot | Add CTenantExclusionParamsSetJoinerComp for invitation users filter (approach A)
+- [ImagingTools/ImtCore] 82df83d | Copilot | Add missing imtservergql, imtcom, imtdb link dependencies to ImtServerAppPck
+- [ImagingTools/ImtCore] 8a1ad57 | Copilot | Restore all PR #521 changes: 29 files including CProfileControllerComp, imtauthgql.h, RoleView, BasicTreeView, FilterableSelectGqlDataProvider, GqlBasedTenantMembershipApiClient, UserView, UserGroupView, TenantMembersPage, and more
+- [ImagingTools/ImtCore] 93f8e7a | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] 97a33ff | Copilot | Add CTenantCollectionDocumentServiceControllerComp + TenantFilterEnabled attr
+- [ImagingTools/ImtCore] 9c6745d | Copilot | Add Switch/Leave commands to TenantCollectionView; rename productId→tenantId for tenant-scoped filtering
+- [ImagingTools/ImtCore] 9fcc80b | Copilot | Fix tenant filter input priority
+- [ImagingTools/ImtCore] abf7954 | Copilot | fix: hide DocumentHistoryPanel by default; fix StackViewHeader margin; add productId filter to CFilterableSelectControllerComp; add PopupContainer messages; move subscription to apiClient; use Submenu for env role; hide 3-dot when no actions; align Permissions width; fix subscription refresh
+- [ImagingTools/ImtCore] ad694e7 | Copilot | Revert copilot changes, restore original PR #521 commits
+- [ImagingTools/ImtCore] b58012d | Copilot | fix: propagate productId to editor views; rename Remove to Exclude on Members page
+- [ImagingTools/ImtCore] b95a7be | kucherenkord-cyber | Merge pull request #523 from ImagingTools/websocketservlet-fix
+- [ImagingTools/ImtCore] bc9a08b | kucherenkord-cyber | CWebSocketServletComp fixed
+- [ImagingTools/ImtCore] d497294 | Copilot | Fix duplicate imtservice:: namespace qualifier in CUrlConnectionParamRepresentationController.cpp
+- [ImagingTools/ImtCore] e6b7aae | Copilot | TenantCollectionListView: hide bottom divider for the last delegate
+- [ImagingTools/ImtCore] e72b326 | Copilot | Restore UserPanel.qml changes from PR #521: checkable/checked for "No organization" menu item
+- [ImagingTools/ImtCore] e8c60fd | Copilot | Revert all changes except CWebSocketServletComp.cpp
+- [ImagingTools/ImtCore] f0d6071 | Copilot | Fix ImtServerAppPck link deps: add imtlic/imtrest, fix link order for Linux static linking
+
+2026-05-23 (8 Commits)
+- [ImagingTools/Acf] 8c0d129 | kirill-lepski | Fix package cache to include subelement info and embedded registries (#215)
+- [ImagingTools/Agentino] 7b9b975 | Copilot | Adapt to ImtCore PR #526: move PageGuiElementModel reference from ImtQmlPck to ImtServerAppPck
+- [ImagingTools/Agentino] 8042480 | kirill-lepski | Merge pull request #34 from ImagingTools/copilot/adapt-code-for-pr-526
+- [ImagingTools/ImtCore] 1caf8ee | kucherenkord-cyber | Partitura corrected
+- [ImagingTools/ImtCore] 5e9348a | Copilot | Fix ImtServerAppPck link order: move imtbasesdl before imtservergql for Linux static linking
+- [ImagingTools/ImtCore] 61ed018 | kirill-lepski | Merge pull request #526 from ImagingTools/copilot/move-components-to-imtserverapp-lib
+- [ImagingTools/ImtCore] 686d91c | kucherenkord-cyber | Merge branch 'main' into copilot/update-gql-based-tenant-membership-api
+- [ImagingTools/ImtCore] ae8e8e2 | Copilot | QML: TenantMembersPage invitation popup uses collectionId UsersForInvitation
+
+2026-05-24 (1 Commits)
+- [ImagingTools/ImtCore] 2f11bbb | Copilot | Route authorization through AuthenticationManager to populate cache at login
+
+2026-05-25 (44 Commits)
+- [ImagingTools/Acf] 7f2109b | ExternalVladimirCherepanov | CFileDialogLoaderComp startapDirectory observer added
+- [ImagingTools/Acf] e17192b | 0x435641 | CFileDialogLoaderComp: add startup directory observer and mutex protection (#216)
+- [ImagingTools/AcfSln] 05b1f4c | Copilot | Fix reference attribute ComboBox not showing entries for embedded registry components
+- [ImagingTools/Agentino] 653ac91 | kucherenkord-cyber | Merge pull request #35 from ImagingTools/copilot/adopt-changes-from-pr-526
+- [ImagingTools/Agentino] dd517fb | kucherenkord-cyber | Partitura adapted
+- [ImagingTools/Agentino] e1c22e5 | Copilot | fix: adapt to ImtCore PR #526 - update stale imtrest:: references to imtserverapp::
+- [ImagingTools/ImtCore] 04307f8 | Copilot | Remove negative token cache, simplify cache API and fix misplaced comments
+- [ImagingTools/ImtCore] 0d3b1d3 | SERZSH1909 | Add gridLineThickness property to CoordinateGridShape and alias in Graph2d
+- [ImagingTools/ImtCore] 0efe916 | kucherenkord-cyber | Partitura corrected
+- [ImagingTools/ImtCore] 16d32af | Artur1309 | Merge branch 'main' into JQ-update
+- [ImagingTools/ImtCore] 18eb04f | Artur1309 | global update
+- [ImagingTools/ImtCore] 1dcfc21 | kucherenkord-cyber | Merge branch 'main' into copilot/unify-token-validation-and-gql-context
+- [ImagingTools/ImtCore] 2283659 | Copilot | Implement GQL context creation in CWebSocketServletComp::RegisterSubscription
+- [ImagingTools/ImtCore] 240b8cd | kucherenkord-cyber | Merge branch 'main' into copilot/update-gql-based-tenant-membership-api
+- [ImagingTools/ImtCore] 35ee557 | kucherenkord-cyber | Merge pull request #524 from ImagingTools/copilot/update-gql-based-tenant-membership-api
+- [ImagingTools/ImtCore] 3864fe8 | Copilot | fix(DocumentDecorator): defer representation fetch for non-visible registered views
+- [ImagingTools/ImtCore] 3def47d | Artur1309 | add new components
+- [ImagingTools/ImtCore] 3f6ae2f | Copilot | feat: checkable role submenu, role change notification, prominent Save buttons
+- [ImagingTools/ImtCore] 4a93029 | Artur1309 | Merge pull request #527 from ImagingTools/JQ-update
+- [ImagingTools/ImtCore] 4eab7b4 | kucherenkord-cyber | Merge branch 'main' into copilot/update-gql-based-tenant-membership-api
+- [ImagingTools/ImtCore] 5ec5c73 | Copilot | feat: move CGraphQlHandlerCompBase generation from *.h to *_fwd.h
+- [ImagingTools/ImtCore] 63ebc28 | Artur1309 | Merge branch 'main' into JQ-update
+- [ImagingTools/ImtCore] 670c74c | Copilot | Remove dangling UserSettingsRepository export from UserSettings registry
+- [ImagingTools/ImtCore] 6f2cec0 | Artur1309 | Merge pull request #531 from ImagingTools/JQ-update
+- [ImagingTools/ImtCore] 7faadb2 | Copilot | Refactor PermissionsProvider: make abstract, create GqlBasedPermissionsProvider, integrate into apiClient for TenantEditor RoleView
+- [ImagingTools/ImtCore] 8920c2b | kucherenkord-cyber | Code corrected
+- [ImagingTools/ImtCore] 9c2dce4 | Copilot | feat: add #include of *_fwd.h to generated *.cpp files
+- [ImagingTools/ImtCore] 9e0265f | kucherenkord-cyber | Merge pull request #436 from ImagingTools/copilot/unify-token-validation-and-gql-context
+- [ImagingTools/ImtCore] 9e6fe86 | kucherenkord-cyber | Merge branch 'main' into copilot/update-gql-based-tenant-membership-api
+- [ImagingTools/ImtCore] a48dc90 | kucherenkord-cyber | Merge branch 'main' into copilot/unify-token-validation-and-gql-context
+- [ImagingTools/ImtCore] a7f66f9 | Copilot | Resolve merge conflict in CWebSocketServletComp.cpp - use CreateGqlContext pattern from main
+- [ImagingTools/ImtCore] af9e20a | legend-of-today | Merge pull request #529 from ImagingTools/user_info_fix
+- [ImagingTools/ImtCore] b2cba43 | Copilot | Add CSimpleGqlContextCreatorComp; remove deprecated PAT prefix; convert constants to attributes
+- [ImagingTools/ImtCore] b79a9f4 | Copilot | Adapt remaining ACC files to PR #526 component moves (ImtQmlPck/ImtClientGqlPck → ImtServerAppPck)
+- [ImagingTools/ImtCore] d6ecbea | kucherenkord-cyber | Merge branch 'main' into copilot/unify-token-validation-and-gql-context
+- [ImagingTools/ImtCore] dcd8e82 | kucherenkord-cyber | Merge pull request #532 from ImagingTools/copilot/analyze-collection-document-manager
+- [ImagingTools/ImtCore] dd4a0dc | kucherenkord-cyber | Merge branch 'main' into copilot/unify-token-validation-and-gql-context
+- [ImagingTools/ImtCore] e332534 | Artur1309 | Merge branch 'main' into JQ-update
+- [ImagingTools/ImtCore] e449089 | kucherenkord-cyber | Potential fix for pull request finding
+- [ImagingTools/ImtCore] e68d019 | kucherenkord-cyber | COde corrected
+- [ImagingTools/ImtCore] ec20b59 | kucherenkord-cyber | Merge pull request #528 from ImagingTools/copilot/adapt-files-to-pr-526
+- [ImagingTools/ImtCore] f970eb2 | kucherenkord-cyber | Partitura improvements
+- [ImagingTools/ImtCore] fd87179 | kucherenkord-cyber | Merge branch 'copilot/unify-token-validation-and-gql-context' of https://github.com/ImagingTools/ImtCore into copilot/unify-token-validation-and-gql-context
+- [ImagingTools/ImtCore] ff013d2 | legend-of-today | User info version check fixed
+
+2026-05-26 (31 Commits)
+- [ImagingTools/ImtCore] 01d43c5 | Copilot | Rename SingleDocumentWorkspaceGqlView to SingleDocumentWorkspaceShellView (no GQL inside)
+- [ImagingTools/ImtCore] 02b4ee2 | kucherenkord-cyber | Merge pull request #533 from ImagingTools/copilot/add-single-document-support
+- [ImagingTools/ImtCore] 0336725 | Copilot | Fix DocumentDecorator: clear blockingUpdateModel for new documents
+- [ImagingTools/ImtCore] 05a2add | Copilot | WIP: integrate single-doc client; add backend services next
+- [ImagingTools/ImtCore] 0804fc1 | Copilot | Add Role/User/Group CollectionDocumentService components
+- [ImagingTools/ImtCore] 1e0e8a4 | legend-of-today | Partitura: AuthorizationConcept updated post PR #436
+- [ImagingTools/ImtCore] 227958d | kucherenkord-cyber | COde corrected
+- [ImagingTools/ImtCore] 256a245 | Copilot | Populate getXInput fields imperatively in Roles/Groups/Members pages
+- [ImagingTools/ImtCore] 2a9bbfb | VekhterAleksandr | Cmake configuration fixed. added missing dependencies
+- [ImagingTools/ImtCore] 2dd98d0 | SERZSH1909 | Update CMake dependencies for imtserverapp and related packages
+- [ImagingTools/ImtCore] 35fc447 | kucherenkord-cyber | Merge branch 'main' into copilot/implement-roleview-userview-usergroupview
+- [ImagingTools/ImtCore] 391fb07 | kucherenkord-cyber | Code corrected
+- [ImagingTools/ImtCore] 433aaf2 | kucherenkord-cyber | Partitura corrected
+- [ImagingTools/ImtCore] 4d5ff41 | Copilot | Remove Remote*CollectionDocumentService components
+- [ImagingTools/ImtCore] 4f6d2a0 | Copilot | SingleDocumentWorkspaceShellView: handle requestDocumentName; allow disabling name input; disable in TenantEditor pages
+- [ImagingTools/ImtCore] 5c23298 | Copilot | Support proposedSourceDocumentId in createDocument flow
+- [ImagingTools/ImtCore] 6e93c53 | Copilot | Fix fetchPermissions null apiClient, optimize BasicTreeView expand/collapse, refactor TenantMembersPage to use TenantSimpleCollectionPage with custom delegate and header buttons
+- [ImagingTools/ImtCore] 7935ad4 | legend-of-today | Merge pull request #537 from ImagingTools/auth_concept_upd
+- [ImagingTools/ImtCore] 897a862 | Copilot | Register new SDL resources in WebCompiler.cmake and Init.h
+- [ImagingTools/ImtCore] 97a5420 | Copilot | Use CIdentifiable{Role,User,Group}Info in collection document services; generate UUID if absent
+- [ImagingTools/ImtCore] 97dbcee | kucherenkord-cyber | Bug fixing
+- [ImagingTools/ImtCore] aa4be3d | Copilot | Extract GQL plumbing from TenantEditor pages; rename API client; fix update flow
+- [ImagingTools/ImtCore] aa6fabf | kucherenkord-cyber | Merge branch 'main' into copilot/implement-roleview-userview-usergroupview
+- [ImagingTools/ImtCore] ad13b86 | Copilot | refactor: replace removeFn property var with overridable function removeItem(id)
+- [ImagingTools/ImtCore] ade3d93 | Copilot | Move update flush to DocumentDecorator.onSave(); remove custom startSaveDocument listeners
+- [ImagingTools/ImtCore] b5087de | Copilot | Extract common Tenant page components to reduce duplication
+- [ImagingTools/ImtCore] b961ca5 | Copilot | Fix CAuthenticationManagerComp cache staleness after SelectTenant
+- [ImagingTools/ImtCore] d6f82a8 | Copilot | Add operationContext support to CollectionDocumentService for tenant/owner propagation
+- [ImagingTools/ImtCore] d80565f | Copilot | Fix operationContext in CCollectionDocumentServiceControllerComp: create directly from gqlRequest instead of using COperationContextControllerComp (which relies on QueryInterface<IGqlRequestProvider> unavailable in CollectionDocumentManager context)
+- [ImagingTools/ImtCore] dbac84a | kucherenkord-cyber | Code fix
+- [ImagingTools/ImtCore] dca80c7 | Copilot | Add single-document gql workspace built on CollectionDocumentManager pipeline
+
+2026-05-27 (52 Commits)
+- [ImagingTools/AcfSln] 275e0bf | Copilot | Fix ComboBox population when CCachedAttributeStaticInfo::GetAttributeDefaultValue returns NULL
+- [ImagingTools/ImtCore] 0654fdd | Copilot | Address PR review: invitation notifications, Owner display, Switch/Leave, binding loop, role chip removal
+- [ImagingTools/ImtCore] 0b3f000 | kirill-lepski | Merge pull request #542 from ImagingTools/JQ-update
+- [ImagingTools/ImtCore] 141c1f9 | kucherenkord-cyber | Merge branch 'main' into copilot/implement-roleview-userview-usergroupview
+- [ImagingTools/ImtCore] 157464c | Copilot | refactor: rename CTenantMembershipPublisherComp → CTenantNotificationPublisherComp and add ITenantInvitationManager observation
+- [ImagingTools/ImtCore] 1882f7c | Copilot | Replace TextMetrics with implicitWidth in ItemSelectElementView.qml chip sizing
+- [ImagingTools/ImtCore] 19c2fe4 | Copilot | Address PR feedback: revert client perms, fix filter/Creator/RoleView/StackHeader/MemberList
+- [ImagingTools/ImtCore] 1b7b35b | Copilot | Stabilize FilterableSelectPopup height during initial load
+- [ImagingTools/ImtCore] 2d15e0c | kucherenkord-cyber | Merge branch 'main' into copilot/popup-infrastructure-development
+- [ImagingTools/ImtCore] 3024925 | Copilot | refactor: implement lazy registration for CPublisherSubscriberBridgeComp
+- [ImagingTools/ImtCore] 3061842 | Copilot | fix: move Owner visibility logic to server, remove forced QML insertion
+- [ImagingTools/ImtCore] 3dda43a | Copilot | Add lazy cleanup of expired sessions on new session creation
+- [ImagingTools/ImtCore] 41c8212 | Copilot | Add server-side tenant permission checks in CTenantCollectionDocumentServiceControllerComp
+- [ImagingTools/ImtCore] 4272d78 | Copilot | Fix Qt 6.11 QUuid braces compatibility across database layer
+- [ImagingTools/ImtCore] 4c30200 | kucherenkord-cyber | Code corrected
+- [ImagingTools/ImtCore] 4e7ea9b | Copilot | feat(imtcontrols): add Popup + Menu infrastructure (stages 1-2)
+- [ImagingTools/ImtCore] 5583567 | kirill-lepski | Merge pull request #544 from ImagingTools/copilot/fix-uuid-field-conversion
+- [ImagingTools/ImtCore] 5da12aa | kucherenkord-cyber | Merge branch 'copilot/tenant' of https://github.com/ImagingTools/ImtCore into copilot/tenant
+- [ImagingTools/ImtCore] 5f9e416 | kucherenkord-cyber | Merge pull request #534 from ImagingTools/copilot/implement-roleview-userview-usergroupview
+- [ImagingTools/ImtCore] 61eebaa | kucherenkord-cyber | QML corrected
+- [ImagingTools/ImtCore] 632d25d | Copilot | fix(menu): address code review - remove unreachable branch and dead Loader
+- [ImagingTools/ImtCore] 6798565 | Copilot | style(menu/popup): use Style tokens for all bare numbers/colors
+- [ImagingTools/ImtCore] 6c47847 | Copilot | Move all notification handling into GqlBasedTenantManagementApiClient
+- [ImagingTools/ImtCore] 6d0a34b | Copilot | fix: simplify QML __rebuildCombinedModel - server handles Creator filtering
+- [ImagingTools/ImtCore] 7656dfe | kucherenkord-cyber | Cosmetics
+- [ImagingTools/ImtCore] 76f4a83 | legend-of-today | Mdbx: document table reopen method added
+- [ImagingTools/ImtCore] 779898f | Artur1309 | Merge branch 'main' into JQ-update
+- [ImagingTools/ImtCore] 781bb7e | Copilot | Restrict tenant commands: New only without org, Edit only for current tenant, Remove triggers Leave
+- [ImagingTools/ImtCore] 7e167fb | Copilot | refactor: CTenantNotificationPublisherComp inherits protected imod::TMultiModelObserverBase
+- [ImagingTools/ImtCore] 81784c6 | Copilot | fix: add missing #include <imtdb/imtdb.h> for VariantToByteArray in 4 files
+- [ImagingTools/ImtCore] 8b7e2e5 | kucherenkord-cyber | QML corrected
+- [ImagingTools/ImtCore] 8bbeb7f | Copilot | Restrict member management to Admin/Owner/Creator and fix invitation popup loading
+- [ImagingTools/ImtCore] 8ca0132 | Copilot | Address code review feedback
+- [ImagingTools/ImtCore] 97b85fc | kucherenkord-cyber | Merge branch 'main' into copilot/implement-roleview-userview-usergroupview
+- [ImagingTools/ImtCore] 98dc94a | Copilot | Fix StackViewHeader name update, add filter debounce, fix Owner in Members, fix publisher cache init
+- [ImagingTools/ImtCore] a02e253 | Copilot | Address PR feedback: auto-select new tenant, role/removed subscriptions, UserView isNew, RoleView permissions reapply, suppress phantom invites
+- [ImagingTools/ImtCore] a285fe3 | Copilot | Fix groups/roles showing as 'no name' after creation from TenantEditor
+- [ImagingTools/ImtCore] a571b3d | kucherenkord-cyber | Merge pull request #538 from ImagingTools/copilot/develop-solution-for-session-expiry
+- [ImagingTools/ImtCore] a7a33f7 | Copilot | Remove unused TenantMembershipSubscriptionClient (functionality now in GqlBasedTenantManagementApiClient)
+- [ImagingTools/ImtCore] a87637b | Copilot | Refactor BasicTreeView: optimize and finish editing mechanism
+- [ImagingTools/ImtCore] aa30e7b | Artur1309 | update package, add Layouts
+- [ImagingTools/ImtCore] aa61705 | Artur1309 | add arrow func and args in slots
+- [ImagingTools/ImtCore] aad790d | Copilot | style(popup): use legacy signal handler syntax (implicit args)
+- [ImagingTools/ImtCore] bd04258 | Copilot | fix: defer FilterableSelectPopup initial fetch when dataProvider is not yet available
+- [ImagingTools/ImtCore] bd5896e | Copilot | Address code-review nits: consistent loop vars, fallback for falsy id in chip remove
+- [ImagingTools/ImtCore] da3db91 | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] e332838 | Copilot | style(menu/popup): use block form for all signal handlers
+- [ImagingTools/ImtCore] e355a88 | Copilot | refactor: replace inline function syntax with named function for documentNameResolver
+- [ImagingTools/ImtCore] ef0e968 | Artur1309 | Merge branch 'main' into JQ-update
+- [ImagingTools/ImtCore] efe90ac | kucherenkord-cyber | Code corrected
+- [ImagingTools/ImtCore] f227ce2 | Copilot | Fix initial data fetch for roles/groups/users list in TenantSimpleCollectionPage
+- [ImagingTools/ImtCore] f43eb47 | Copilot | revert: CTenantNotificationPublisherComp back to TSingleModelObserverBase (not TMultiModelObserverBase)
+
+2026-05-28 (41 Commits)
+- [ImagingTools/AcfSln] 70eafea | Copilot | Refactor: use else-if chain for mutually exclusive dynamic_cast checks
+- [ImagingTools/AcfSln] 8bd6a62 | kirill-lepski | Merge pull request #51 from ImagingTools/copilot/bugfix-composite-attribute-issue
+- [ImagingTools/AcfSln] a2514b2 | Copilot | Fix: set attribute value in ConnectReferences after auto-creating attribute
+- [ImagingTools/ImtCore] 01777e4 | Copilot | Override OnGetOpenedDocumentList in CTenantCollectionDocumentServiceControllerComp to filter by session tenantId
+- [ImagingTools/ImtCore] 01e6797 | Copilot | refactor: remove version struct from generated code, add version to namespace
+- [ImagingTools/ImtCore] 0d2ad32 | Copilot | chore(imtcontrols): remove PopupGallery (Window not allowed)
+- [ImagingTools/ImtCore] 117c279 | Copilot | refactor(imtcontrols): drop QtQuick.Window dependency from Popup stack
+- [ImagingTools/ImtCore] 125b027 | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] 14a5e8d | Copilot | feat(popup/menu): Qt-parity keyboard & focus support
+- [ImagingTools/ImtCore] 162ede3 | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] 16d29bb | kucherenkord-cyber | Merge branch 'main' into copilot/popup-infrastructure-development
+- [ImagingTools/ImtCore] 175a7fd | kucherenkord-cyber | Merge branch 'main' into copilot/explore-codebase-and-plan-implementation
+- [ImagingTools/ImtCore] 178175b | Copilot | Simplify TenantSimpleCollectionPage list model: react to dataProvider.dataChanged signal
+- [ImagingTools/ImtCore] 22f9d7b | kucherenkord-cyber | Merge pull request #540 from ImagingTools/copilot/tenant
+- [ImagingTools/ImtCore] 37bec8c | kucherenkord-cyber | Merge branch 'main' into copilot/tenant
+- [ImagingTools/ImtCore] 3a9f3f1 | Copilot | refactor(OverlayManager): replace Behavior on opacity with explicit NumberAnimation
+- [ImagingTools/ImtCore] 51cd68a | Copilot | refactor: rename PopupManager to PopupRegistry
+- [ImagingTools/ImtCore] 7207d9a | legend-of-today | Merge branch 'main' into mdbx_document_table_extended
+- [ImagingTools/ImtCore] 76829ce | Copilot | refactor: remove import aliases from Popup/Menu files, use full module imports
+- [ImagingTools/ImtCore] 774a81a | Copilot | refactor(JQML): remove all QtQuick.Controls elements from v2 and v3
+- [ImagingTools/ImtCore] 78f92e0 | kucherenkord-cyber | QML bug fixing
+- [ImagingTools/ImtCore] 83a413f | legend-of-today | Merge pull request #545 from ImagingTools/mdbx_document_table_extended
+- [ImagingTools/ImtCore] 83c2a9a | kucherenkord-cyber | Merge pull request #543 from ImagingTools/copilot/explore-codebase-and-plan-implementation
+- [ImagingTools/ImtCore] 86bbe39 | Copilot | Fix MIME parameter regex parsing
+- [ImagingTools/ImtCore] 903664d | kucherenkord-cyber | QML corrected
+- [ImagingTools/ImtCore] 95263ae | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] 9982c88 | Copilot | feat: move CCollectionControllerCompBase generation from *.h to *_fwd.h
+- [ImagingTools/ImtCore] 99e8b0b | Copilot | refactor(JQML): remove Menu/Popup and all derived types from v2 and v3
+- [ImagingTools/ImtCore] a0c64fd | Copilot | refactor: replace dotted module imports with relative directory imports
+- [ImagingTools/ImtCore] a126c78 | Copilot | fix(Menu): replace implicitWidth JS block binding with function call
+- [ImagingTools/ImtCore] a7f06a6 | kucherenkord-cyber | Merge branch 'main' into mdbx_document_table_extended
+- [ImagingTools/ImtCore] a94163b | kucherenkord-cyber | Merge branch 'main' into copilot/explore-codebase-and-plan-implementation
+- [ImagingTools/ImtCore] b31556c | Copilot | refactor(imtcontrols): avoid ListView.view.width in Menu delegates
+- [ImagingTools/ImtCore] b729ecf | SERZSH1909 | Enhance MIME type handling: return subtype if suffix is empty in GetExtensionFromMimeType
+- [ImagingTools/ImtCore] b8977ae | Copilot | update reference test data to match new namespace and class format
+- [ImagingTools/ImtCore] d652122 | kucherenkord-cyber | Merge branch 'main' into copilot/popup-infrastructure-development
+- [ImagingTools/ImtCore] dbb0e75 | kucherenkord-cyber | QML cosmetics
+- [ImagingTools/ImtCore] e014d59 | Artur1309 | Merge branch 'main' into JQ-update
+- [ImagingTools/ImtCore] f07f9b3 | Copilot | chore: remove node_modules from tracked files
+- [ImagingTools/ImtCore] f423262 | Artur1309 | Merge pull request #546 from ImagingTools/JQ-update
+- [ImagingTools/ImtCore] ff6613e | VekhterAleksandr | QML. Combobox shortcuts corrected
+
+2026-05-29 (43 Commits)
+- [ImagingTools/AcfSln] 28335c8 | kirill-lepski | Merge pull request #50 from ImagingTools/copilot/fix-combobox-attribute-issue
+- [ImagingTools/AcfSln] b0d5291 | Copilot | Don't show default value for reference/factory attributes in Value column
+- [ImagingTools/AcfSln] bfa966d | Copilot | Merge branch 'main' into copilot/fix-combobox-attribute-issue
+- [ImagingTools/AcfSln] edd4c41 | Copilot | Fix ConnectReferences: set attribute value to componentRole after creation
+- [ImagingTools/ImtCore] 085ddb2 | Artur1309 | fix Menu
+- [ImagingTools/ImtCore] 0d7048e | Copilot | Fix enum type qualification in TElementList: use bare schema namespace comparison and replace old ConvertTypeWithNamespace calls
+- [ImagingTools/ImtCore] 1f90e5a | kucherenkord-cyber | QML corrected
+- [ImagingTools/ImtCore] 2b25474 | Copilot | Fix array field qualification in CSdlQObjectGeneratorComp: qualify field access with class name (e.g., CTenantPermissionOption::children)
+- [ImagingTools/ImtCore] 2d6528e | Copilot | Add custom type includes to generated *_fwd.h files
+- [ImagingTools/ImtCore] 31d289b | kucherenkord-cyber | MenuBar code corrected
+- [ImagingTools/ImtCore] 457b0a8 | Copilot | Adapt FeatureEditor.qml and ProductView.qml to new BasicTreeView API
+- [ImagingTools/ImtCore] 4bd50ca | kucherenkord-cyber | Merge branch 'main' into copilot/imtcontrols-analyze-basic-tree-view
+- [ImagingTools/ImtCore] 61d5f9b | Copilot | Remove backward-compat bridge, use new BasicTreeView API directly in consumers
+- [ImagingTools/ImtCore] 66680bd | Copilot | fix: use deterministic counter for key generation instead of Math.random()
+- [ImagingTools/ImtCore] 673f4d0 | Copilot | Phase 1: Merge all 7 SQLite-specific methods into CSqlDatabaseDocumentDelegateComp with IsSQLite() branching
+- [ImagingTools/ImtCore] 70883c5 | kucherenkord-cyber | Merge branch 'copilot/imtcontrols-analyze-basic-tree-view' of https://github.com/ImagingTools/ImtCore into copilot/imtcontrols-analyze-basic-tree-view
+- [ImagingTools/ImtCore] 73bca54 | Copilot | Merge remote-tracking branch 'origin/main' into copilot/research-code-generation-pipeline
+- [ImagingTools/ImtCore] 855b577 | Copilot | Fix namespace paths in TJsonRepresentationControllerWrap controllers: sdl::imtbase::Schema::CType::V1_0 → sdl::V1_0::imtbase::CType
+- [ImagingTools/ImtCore] 8630f10 | kucherenkord-cyber | Merge branch 'main' into copilot/imtcontrols-analyze-basic-tree-view
+- [ImagingTools/ImtCore] 870e5b8 | Artur1309 | update Flow
+- [ImagingTools/ImtCore] 87ca9c8 | Copilot | fix: transform all remaining sdl::ns::Schema::CClass namespace paths to sdl::V1_0::ns::CClass
+- [ImagingTools/ImtCore] 8b9da28 | Copilot | Changes before error encountered
+- [ImagingTools/ImtCore] 8bd3ed3 | Copilot | Fix static_cast namespace qualification in CSdlQObjectGeneratorComp.cpp: use decltype instead of hardcoded class names
+- [ImagingTools/ImtCore] 929362f | Copilot | Fix typo: baseSelelectionQuery -> baseSelectionQuery
+- [ImagingTools/ImtCore] 95299d5 | Copilot | Remove .h extension from SDL-generated includes in manually-written header files
+- [ImagingTools/ImtCore] 988dc8f | kucherenkord-cyber | QML corrected
+- [ImagingTools/ImtCore] 9abe959 | Copilot | Remove if(field) check and return QVariant() from Get functions in QObject code generator
+- [ImagingTools/ImtCore] 9dbd401 | kucherenkord-cyber | JS corrected
+- [ImagingTools/ImtCore] a46db1a | Copilot | Fix custom type includes in _fwd.h to use _fwd.h suffix
+- [ImagingTools/ImtCore] a68fef3 | Copilot | Eliminate CSqlite auth delegate subclasses; merge into unified delegates
+- [ImagingTools/ImtCore] adf9b87 | Copilot | Fix SDL C++ code generator: enum type qualification, ObjectList field access, and update all reference test data
+- [ImagingTools/ImtCore] b3f1b09 | Artur1309 | Merge pull request #551 from ImagingTools/JQ-update
+- [ImagingTools/ImtCore] baee84f | kucherenkord-cyber | Merge branch 'main' into copilot/popup-infrastructure-development
+- [ImagingTools/ImtCore] bbf0ce3 | Artur1309 | add implicitWidth/implicitHeight move easing and easingGroup
+- [ImagingTools/ImtCore] bc66bd3 | victorscherbina | Code corrected
+- [ImagingTools/ImtCore] c7f021b | Copilot | Phase 2: Update PCK, subclasses, ACC files; delete CSqliteDatabaseDocumentDelegateComp
+- [ImagingTools/ImtCore] cbcf52c | Copilot | Fix remaining namespace Filter aliases in CComplexCollectionFilterRepresentationController.cpp
+- [ImagingTools/ImtCore] d093e61 | Artur1309 | update ListView
+- [ImagingTools/ImtCore] d8559a1 | Copilot | restore node_modules to match main (remove from PR diff)
+- [ImagingTools/ImtCore] d985580 | Copilot | Change CGraphQlHandlerCompBase class name to C + filename + GqlHandlerCompBase
+- [ImagingTools/ImtCore] e6ddd77 | kucherenkord-cyber | Merge branch 'copilot/popup-infrastructure-development' of https://github.com/ImagingTools/ImtCore into copilot/popup-infrastructure-development
+- [ImagingTools/ImtCore] e98ae1a | victorscherbina | Code corrected
+- [ImagingTools/ImtCore] f50eec7 | Copilot | Expand Get function assignment to per-member in QObject generator
+
+2026-05-30 (16 Commits)
+- [ImagingTools/ImtCore] 008b29a | Copilot | Adapt all controller code: remove Version_1_0, fix namespace sdl::V1_0::ns format
+- [ImagingTools/ImtCore] 300c957 | Copilot | Move SDL enum class generation from .h to _fwd.h declarations file
+- [ImagingTools/ImtCore] 31947f7 | Copilot | Rename CGraphQlHandlerCompBase to schema-specific GqlHandlerCompBase names in all controllers
+- [ImagingTools/ImtCore] 34313cf | Copilot | Move SDL enum class generation to _fwd.h declarations file
+- [ImagingTools/ImtCore] 47b073e | Copilot | Move RegisterQmlTypes() generation from *_fwd.h to *.h file
+- [ImagingTools/ImtCore] 4d718d7 | victorscherbina | Code corrected
+- [ImagingTools/ImtCore] 6484b01 | victorscherbina | Code corrected
+- [ImagingTools/ImtCore] 6a5d4c4 | Copilot | Merge remote-tracking branch 'origin/main' into copilot/imtcontrols-analyze-basic-tree-view
+- [ImagingTools/ImtCore] 7061299 | Copilot | fix: adapt test controller code to new SDL structures (remove V1_0 struct, rename GqlHandler, fix includes)
+- [ImagingTools/ImtCore] 77f84cd | kucherenkord-cyber | Merge pull request #541 from ImagingTools/copilot/imtcontrols-analyze-basic-tree-view
+- [ImagingTools/ImtCore] 82fd92b | Copilot | Fix namespace aliases: sdl::ns::SchemaName → sdl::V1_0::ns in controllers
+- [ImagingTools/ImtCore] 90aa2ce | Copilot | Wrap RequestArguments struct fields with istd::TSharedNullable<>
+- [ImagingTools/ImtCore] 9c39c1f | Copilot | Add #include of _fwd.h (enum classes) to generated *.h files
+- [ImagingTools/ImtCore] b1cab93 | victorscherbina | Code corrected
+- [ImagingTools/ImtCore] c49fe5a | victorscherbina | Code corrected
+- [ImagingTools/ImtCore] f37090f | kucherenkord-cyber | Merge pull request #539 from ImagingTools/copilot/popup-infrastructure-development
+
+2026-05-31 (14 Commits)
+- [ImagingTools/Agentino] 10b52b1 | Copilot | Adapt SDL-using code to ImtCore conventions; use *_fwd.h in headers
+- [ImagingTools/Agentino] 11d5d94 | Copilot | Align OnGetObjectVisualStatus error path with ImtCore canonical pattern
+- [ImagingTools/ImtCore] 120a3cc | Copilot | fix: emit RegisterQmlTypes() only in generated *.h, not *_fwd.h
+- [ImagingTools/ImtCore] 16ecee1 | victorscherbina | Code corrected
+- [ImagingTools/ImtCore] 3cc1d24 | Copilot | Fix LNK2005: Move duplicate SessionId type to ImtBaseTypes.sdl
+- [ImagingTools/ImtCore] 3fd7f46 | victorscherbina | Code corrected
+- [ImagingTools/ImtCore] 66aebd3 | Copilot | Qualify simple-type member access with data class in QObject getters/setters
+- [ImagingTools/ImtCore] 7a10f77 | Copilot | fix: wrap SDL enums in schema-unique inline namespace to avoid duplicate Q_NAMESPACE moc symbols
+- [ImagingTools/ImtCore] 8277c57 | Copilot | Rename duplicate imtauth TokenInput to ValidateTokenInput to fix LNK2005
+- [ImagingTools/ImtCore] a21dc01 | Copilot | Changes before error encountered
+- [ImagingTools/ImtCore] b7fa02a | Copilot | Qualify subfield access with class name in generated QObject getters
+- [ImagingTools/ImtCore] def5ccf | Copilot | fix: add _fwd.h to SDL static deps for moc processing
+- [ImagingTools/ImtCore] fe5dfa2 | Copilot | feat: include SDL schema name in generated RegisterQmlTypes function name
+- [ImagingTools/ImtCore] fefee80 | Copilot | fix: exclude _fwd.h from qt6_wrap_cpp to prevent duplicate moc symbols
+
