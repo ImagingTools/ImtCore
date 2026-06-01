@@ -111,7 +111,7 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlRe
 		CStructNamespaceConverter structNameConverter(sdlField, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 
 		FeedStreamHorizontally(ifStream, 1);
-		ifStream << QStringLiteral("istd::TSharedNullable<");
+		ifStream << QStringLiteral("istd::TNullableValue<");
 		ifStream << structNameConverter.GetString();
 		ifStream << QStringLiteral("> ") << sdlField.GetId() << ';';
 		FeedStream(ifStream, 1, false);

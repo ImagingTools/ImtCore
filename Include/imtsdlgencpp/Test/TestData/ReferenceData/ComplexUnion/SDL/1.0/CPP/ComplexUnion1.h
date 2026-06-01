@@ -15,7 +15,7 @@
 #include <QtCore/QMetaEnum>
 
 // ACF includes
-#include <istd/TSharedNullable.h>
+#include <istd/TNullableValue.h>
 
 // ImtCore includes
 #include <imtbase/CItemModelBase.h>
@@ -39,8 +39,8 @@ public:
 		static const inline QString Y = "Y";
 	};
 
-	istd::TSharedNullable<double> X;
-	istd::TSharedNullable<double> Y;
+	istd::TNullableValue<double> X;
+	istd::TNullableValue<double> Y;
 
 	static QByteArray GetVersionId();
 
@@ -71,11 +71,11 @@ public:
 		static const inline QString OptionalPoints = "OptionalPoints";
 	};
 
-	istd::TSharedNullable<GeometryType> GeometryType;
-	istd::TSharedNullable<double> Radius;
-	istd::TSharedNullable<imtsdl::TElementList<CPoint>> Points;
-	istd::TSharedNullable<imtsdl::TElementList<CPoint>> RequiredPoints;
-	istd::TSharedNullable<imtsdl::TElementList<CPoint>> OptionalPoints;
+	istd::TNullableValue<GeometryType> GeometryType;
+	istd::TNullableValue<double> Radius;
+	istd::TNullableValue<imtsdl::TElementList<CPoint>> Points;
+	istd::TNullableValue<imtsdl::TElementList<CPoint>> RequiredPoints;
+	istd::TNullableValue<imtsdl::TElementList<CPoint>> OptionalPoints;
 
 	static QByteArray GetVersionId();
 

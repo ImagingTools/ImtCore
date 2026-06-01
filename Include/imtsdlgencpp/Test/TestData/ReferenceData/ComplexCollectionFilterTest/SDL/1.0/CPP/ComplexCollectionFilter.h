@@ -15,7 +15,7 @@
 #include <QtCore/QMetaEnum>
 
 // ACF includes
-#include <istd/TSharedNullable.h>
+#include <istd/TNullableValue.h>
 
 // ImtCore includes
 #include <imtbase/CItemModelBase.h>
@@ -44,10 +44,10 @@ public:
 		static const inline QString UnitMultiplier = "unitMultiplier";
 	};
 
-	istd::TSharedNullable<CTimeRange> timeRange;
-	istd::TSharedNullable<QString> timeUnit;
-	istd::TSharedNullable<QString> interpretationMode;
-	istd::TSharedNullable<int> unitMultiplier;
+	istd::TNullableValue<CTimeRange> timeRange;
+	istd::TNullableValue<QString> timeUnit;
+	istd::TNullableValue<QString> interpretationMode;
+	istd::TNullableValue<int> unitMultiplier;
 
 	static QByteArray GetVersionId();
 
@@ -75,8 +75,8 @@ public:
 		static const inline QString SortingOrder = "sortingOrder";
 	};
 
-	istd::TSharedNullable<QString> fieldId;
-	istd::TSharedNullable<QString> sortingOrder;
+	istd::TNullableValue<QString> fieldId;
+	istd::TNullableValue<QString> sortingOrder;
 
 	static QByteArray GetVersionId();
 
@@ -106,10 +106,10 @@ public:
 		static const inline QString FilterOperations = "filterOperations";
 	};
 
-	istd::TSharedNullable<QByteArray> fieldId;
-	istd::TSharedNullable<QString> filterValue;
-	istd::TSharedNullable<ValueType> filterValueType;
-	istd::TSharedNullable<imtsdl::TElementList<FilterOperation>> filterOperations;
+	istd::TNullableValue<QByteArray> fieldId;
+	istd::TNullableValue<QString> filterValue;
+	istd::TNullableValue<ValueType> filterValueType;
+	istd::TNullableValue<imtsdl::TElementList<FilterOperation>> filterOperations;
 
 	static QByteArray GetVersionId();
 
@@ -138,9 +138,9 @@ public:
 		static const inline QString LogicalOperation = "logicalOperation";
 	};
 
-	istd::TSharedNullable<imtsdl::TElementList<CFieldFilter>> fieldFilters;
-	istd::TSharedNullable<imtsdl::TElementList<CGroupFilter>> groupFilters;
-	istd::TSharedNullable<LogicalOperation> logicalOperation;
+	istd::TNullableValue<imtsdl::TElementList<CFieldFilter>> fieldFilters;
+	istd::TNullableValue<imtsdl::TElementList<CGroupFilter>> groupFilters;
+	istd::TNullableValue<LogicalOperation> logicalOperation;
 
 	static QByteArray GetVersionId();
 
@@ -170,10 +170,10 @@ public:
 		static const inline QString DistinctFields = "distinctFields";
 	};
 
-	istd::TSharedNullable<imtsdl::TElementList<CFieldSortingInfo>> sortingInfo;
-	istd::TSharedNullable<CGroupFilter> fieldsFilter;
-	istd::TSharedNullable<CTimeFilter> timeFilter;
-	istd::TSharedNullable<imtsdl::TElementList<QByteArray>> distinctFields;
+	istd::TNullableValue<imtsdl::TElementList<CFieldSortingInfo>> sortingInfo;
+	istd::TNullableValue<CGroupFilter> fieldsFilter;
+	istd::TNullableValue<CTimeFilter> timeFilter;
+	istd::TNullableValue<imtsdl::TElementList<QByteArray>> distinctFields;
 
 	static QByteArray GetVersionId();
 

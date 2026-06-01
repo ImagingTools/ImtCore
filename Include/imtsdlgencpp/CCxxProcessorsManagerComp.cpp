@@ -90,7 +90,7 @@ void CreateBaseDirectives(QList<imtsdl::IncludeDirective>& output)
 	static QList<imtsdl::IncludeDirective> baseDirectives = {
 		imtsdl::CSdlTools::CreateQtDirective("<QtCore/QObject>"),
 		imtsdl::CSdlTools::CreateQtDirective("<QtCore/QVariant>"),
-		imtsdl::CSdlTools::CreateAcfDirective("<istd/TSharedNullable.h>"),
+		imtsdl::CSdlTools::CreateAcfDirective("<istd/TNullableValue.h>"),
 	};
 
 	output += baseDirectives;

@@ -488,7 +488,7 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnDoUn
 
 	const auto& arguments = doUndoRequest.GetRequestedArguments();
 
-	istd::TSharedNullable<CDM::CCollectionUndoRedoInput> collectionUndoRedoInput = arguments.input;
+	istd::TNullableValue<CDM::CCollectionUndoRedoInput> collectionUndoRedoInput = arguments.input;
 
 	if (!collectionUndoRedoInput || !collectionUndoRedoInput->undoRedoInput){
 		errorMessage = "Invalid GraphQL request params";
@@ -496,7 +496,7 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnDoUn
 		return retVal;
 	}
 
-	istd::TSharedNullable<sdl::V1_0::imtbase::CUndoRedoInput> undoRedoInput = collectionUndoRedoInput->undoRedoInput;
+	istd::TNullableValue<sdl::V1_0::imtbase::CUndoRedoInput> undoRedoInput = collectionUndoRedoInput->undoRedoInput;
 
 	if (!undoRedoInput || !undoRedoInput->documentId || !undoRedoInput->steps){
 		errorMessage = "Invalid GraphQL request params";
@@ -556,7 +556,7 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnDoRe
 
 	const auto& arguments = doRedoRequest.GetRequestedArguments();
 
-	istd::TSharedNullable<CDM::CCollectionUndoRedoInput> collectionUndoRedoInput = arguments.input;
+	istd::TNullableValue<CDM::CCollectionUndoRedoInput> collectionUndoRedoInput = arguments.input;
 
 	if (!collectionUndoRedoInput || !collectionUndoRedoInput->undoRedoInput){
 		errorMessage = "Invalid GraphQL request params";
@@ -564,7 +564,7 @@ sdl::V1_0::imtbase::CUndoStatus CCollectionDocumentServiceControllerComp::OnDoRe
 		return retVal;
 	}
 
-	istd::TSharedNullable<sdl::V1_0::imtbase::CUndoRedoInput> undoRedoInput = collectionUndoRedoInput->undoRedoInput;
+	istd::TNullableValue<sdl::V1_0::imtbase::CUndoRedoInput> undoRedoInput = collectionUndoRedoInput->undoRedoInput;
 
 	if (!undoRedoInput || !undoRedoInput->documentId || !undoRedoInput->steps){
 		errorMessage = "Invalid GraphQL request params";

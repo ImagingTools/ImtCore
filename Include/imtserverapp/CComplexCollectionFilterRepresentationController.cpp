@@ -181,7 +181,7 @@ bool CComplexCollectionFilterRepresentationController::GetDataModelFromSdlRepres
 		}
 	}
 
-	for (const istd::TSharedNullable<Filter::CFieldSortingInfo>& sourceSortingItem  : std::as_const(sourceSorting)){
+	for (const istd::TNullableValue<Filter::CFieldSortingInfo>& sourceSortingItem  : std::as_const(sourceSorting)){
 		if (sourceSortingItem->fieldId && !sourceSortingItem->fieldId->isEmpty()){
 			QByteArray fieldId = sourceSortingItem->fieldId->toUtf8();
 			if (sourceSortingItem->sortingOrder){
@@ -436,7 +436,7 @@ bool CComplexCollectionFilterRepresentationController::GetGroupFilterFromSdlRepr
 	QVector<imtbase::IComplexCollectionFilter::FieldFilter> targetFieldSubFilters;
 	QVector<imtbase::IComplexCollectionFilter::FilterExpression> targetGroupSubFilters;
 
-	for (const istd::TSharedNullable<Filter::FieldFilterUnion>& sourceFieldSubFilter : std::as_const(sourceFieldSubFilters)){
+	for (const istd::TNullableValue<Filter::FieldFilterUnion>& sourceFieldSubFilter : std::as_const(sourceFieldSubFilters)){
 		imtbase::IComplexCollectionFilter::FieldFilter targetFieldSubFilter;
 
 		if (!GetFieldFilterFromSdlRepresentation(*sourceFieldSubFilter, targetFieldSubFilter)){
@@ -446,7 +446,7 @@ bool CComplexCollectionFilterRepresentationController::GetGroupFilterFromSdlRepr
 		targetFieldSubFilters.append(targetFieldSubFilter);
 	}
 
-	for (const istd::TSharedNullable<Filter::CGroupFilter>& sourceGroupSubFilter : std::as_const(sourceGroupSubFilters)){
+	for (const istd::TNullableValue<Filter::CGroupFilter>& sourceGroupSubFilter : std::as_const(sourceGroupSubFilters)){
 		imtbase::IComplexCollectionFilter::FilterExpression targetGroupSubFilter;
 
 		if (!GetGroupFilterFromSdlRepresentation(*sourceGroupSubFilter, targetGroupSubFilter)){

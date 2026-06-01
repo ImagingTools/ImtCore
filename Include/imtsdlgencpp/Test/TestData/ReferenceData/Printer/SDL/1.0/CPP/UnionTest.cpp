@@ -2797,23 +2797,23 @@ void CPrinterSpecificationObjectList::append(QVariant item)
 	if (item.canConvert<CPrinterSpecificationBaseObject*>()){
 		CPrinterSpecificationBaseObject* val = item.value<CPrinterSpecificationBaseObject*>();
 		CPrinterSpecificationBase* newItemPtr = dynamic_cast<CPrinterSpecificationBase*>(val);
-		append(istd::TSharedNullable<PrinterSpecification>(*newItemPtr));
+		append(istd::TNullableValue<PrinterSpecification>(*newItemPtr));
 	}
 
 	if (item.canConvert<CLinkObject*>()){
 		CLinkObject* val = item.value<CLinkObject*>();
 		CLink* newItemPtr = dynamic_cast<CLink*>(val);
-		append(istd::TSharedNullable<PrinterSpecification>(*newItemPtr));
+		append(istd::TNullableValue<PrinterSpecification>(*newItemPtr));
 	}
 
 	if (item.canConvert<QString>()){
 		QString val = item.value<QString>();
-		append(istd::TSharedNullable<PrinterSpecification>(val));
+		append(istd::TNullableValue<PrinterSpecification>(val));
 	}
 
 	if (item.canConvert<double>()){
 		double val = item.value<double>();
-		append(istd::TSharedNullable<PrinterSpecification>(val));
+		append(istd::TNullableValue<PrinterSpecification>(val));
 	}
 
 	ClearCache();
@@ -2973,23 +2973,23 @@ void CPrinterSpecificationObjectList::insert(int index, QVariant item)
 	if (item.canConvert<CPrinterSpecificationBaseObject*>()){
 		CPrinterSpecificationBaseObject* val = item.value<CPrinterSpecificationBaseObject*>();
 		CPrinterSpecificationBase* newItemPtr = dynamic_cast<CPrinterSpecificationBase*>(val);
-		append(istd::TSharedNullable<PrinterSpecification>(*newItemPtr));
+		append(istd::TNullableValue<PrinterSpecification>(*newItemPtr));
 	}
 
 	if (item.canConvert<CLinkObject*>()){
 		CLinkObject* val = item.value<CLinkObject*>();
 		CLink* newItemPtr = dynamic_cast<CLink*>(val);
-		append(istd::TSharedNullable<PrinterSpecification>(*newItemPtr));
+		append(istd::TNullableValue<PrinterSpecification>(*newItemPtr));
 	}
 
 	if (item.canConvert<QString>()){
 		QString val = item.value<QString>();
-		append(istd::TSharedNullable<PrinterSpecification>(val));
+		append(istd::TNullableValue<PrinterSpecification>(val));
 	}
 
 	if (item.canConvert<double>()){
 		double val = item.value<double>();
-		append(istd::TSharedNullable<PrinterSpecification>(val));
+		append(istd::TNullableValue<PrinterSpecification>(val));
 	}
 
 	ClearCache();

@@ -15,7 +15,7 @@
 #include <QtCore/QMetaEnum>
 
 // ACF includes
-#include <istd/TSharedNullable.h>
+#include <istd/TNullableValue.h>
 
 // ImtCore includes
 #include <imtbase/CItemModelBase.h>
@@ -44,8 +44,8 @@ public:
 		static const inline QString Y = "Y";
 	};
 
-	istd::TSharedNullable<double> X;
-	istd::TSharedNullable<double> Y;
+	istd::TNullableValue<double> X;
+	istd::TNullableValue<double> Y;
 
 	static QByteArray GetVersionId();
 
@@ -72,7 +72,7 @@ public:
 		static const inline QString Name = "name";
 	};
 
-	istd::TSharedNullable<QString> name;
+	istd::TNullableValue<QString> name;
 
 	static QByteArray GetVersionId();
 
@@ -101,9 +101,9 @@ public:
 		static const inline QString StatusList = "statusList";
 	};
 
-	istd::TSharedNullable<QByteArray> link;
-	istd::TSharedNullable<LinkStatus> status;
-	istd::TSharedNullable<imtsdl::TElementList<LinkStatus>> statusList;
+	istd::TNullableValue<QByteArray> link;
+	istd::TNullableValue<LinkStatus> status;
+	istd::TNullableValue<imtsdl::TElementList<LinkStatus>> statusList;
 
 	static QByteArray GetVersionId();
 
@@ -133,10 +133,10 @@ public:
 		static const inline QString SpecificationList = "specificationList";
 	};
 
-	istd::TSharedNullable<QString> name;
-	istd::TSharedNullable<imtsdl::TElementList<CLink>> linkList;
-	istd::TSharedNullable<PrinterSpecification> specification;
-	istd::TSharedNullable<imtsdl::TElementList<PrinterSpecification>> specificationList;
+	istd::TNullableValue<QString> name;
+	istd::TNullableValue<imtsdl::TElementList<CLink>> linkList;
+	istd::TNullableValue<PrinterSpecification> specification;
+	istd::TNullableValue<imtsdl::TElementList<PrinterSpecification>> specificationList;
 
 	static QByteArray GetVersionId();
 
@@ -510,7 +510,7 @@ struct GetSpecificationsRequestInfo
 
 struct GetSpecificationsRequestArguments
 {
-	istd::TSharedNullable<CLink> input;
+	istd::TNullableValue<CLink> input;
 };
 
 

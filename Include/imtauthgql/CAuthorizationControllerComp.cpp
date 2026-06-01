@@ -178,7 +178,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnAuthor
 		return sdl::V1_0::imtauth::CAuthorizationPayload();
 	}
 
-	istd::TSharedNullable<sdl::V1_0::imtauth::CAuthorizationInput> inputArgument = *authorizationRequest.GetRequestedArguments().input;
+	istd::TNullableValue<sdl::V1_0::imtauth::CAuthorizationInput> inputArgument = *authorizationRequest.GetRequestedArguments().input;
 	if (!inputArgument.has_value()){
 		Q_ASSERT(false);
 		return sdl::V1_0::imtauth::CAuthorizationPayload();
@@ -244,7 +244,7 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::OnUserTo
 		return sdl::V1_0::imtauth::CAuthorizationPayload();
 	}
 
-	istd::TSharedNullable<sdl::V1_0::imtauth::CAuthorizationInput> inputArgument = userTokenRequest.GetRequestedArguments().input;
+	istd::TNullableValue<sdl::V1_0::imtauth::CAuthorizationInput> inputArgument = userTokenRequest.GetRequestedArguments().input;
 	if (!inputArgument.has_value()){
 		Q_ASSERT(false);
 		return sdl::V1_0::imtauth::CAuthorizationPayload();
@@ -345,7 +345,7 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 		return response;
 	}
 
-	istd::TSharedNullable<sdl::V1_0::imtauth::CTokenInput> arguments = getPermissionsRequest.GetRequestedArguments().input;
+	istd::TNullableValue<sdl::V1_0::imtauth::CTokenInput> arguments = getPermissionsRequest.GetRequestedArguments().input;
 	if (!arguments.HasValue()){
 		Q_ASSERT(false);
 		return response;

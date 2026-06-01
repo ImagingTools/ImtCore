@@ -15,7 +15,7 @@
 #include <QtCore/QMetaEnum>
 
 // ACF includes
-#include <istd/TSharedNullable.h>
+#include <istd/TNullableValue.h>
 
 // ImtCore includes
 #include <imtbase/CItemModelBase.h>
@@ -42,8 +42,8 @@ public:
 		static const inline QString PrintingTechnology = "printingTechnology";
 	};
 
-	istd::TSharedNullable<CPrinterSpecificationBase> base;
-	istd::TSharedNullable<PrintingTechnology> printingTechnology;
+	istd::TNullableValue<CPrinterSpecificationBase> base;
+	istd::TNullableValue<PrintingTechnology> printingTechnology;
 
 	static QByteArray GetVersionId();
 
@@ -71,8 +71,8 @@ public:
 		static const inline QString PrintingTechnology = "printingTechnology";
 	};
 
-	istd::TSharedNullable<CPrinterBase> base;
-	istd::TSharedNullable<PrintingTechnology> printingTechnology;
+	istd::TNullableValue<CPrinterBase> base;
+	istd::TNullableValue<PrintingTechnology> printingTechnology;
 
 	static QByteArray GetVersionId();
 

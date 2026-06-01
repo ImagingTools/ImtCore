@@ -15888,7 +15888,7 @@ void CCDMResultVarStringObject::SetResultContent(const QVariant& v)
 		CCDMResultVarString::resultContent->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TSharedNullable<QString> value(tempValue);
+		istd::TNullableValue<QString> value(tempValue);
 		CCDMResultVarString::resultContent->append(value);
 	}
 
@@ -17067,22 +17067,22 @@ void CExtendedMetaDataUnionTypeObjectList::append(QVariant item)
 	if (item.canConvert<CCoordinatesObject*>()){
 		CCoordinatesObject* val = item.value<CCoordinatesObject*>();
 		CCoordinates* newItemPtr = dynamic_cast<CCoordinates*>(val);
-		append(istd::TSharedNullable<ExtendedMetaDataUnionType>(*newItemPtr));
+		append(istd::TNullableValue<ExtendedMetaDataUnionType>(*newItemPtr));
 	}
 
 	if (item.canConvert<double>()){
 		double val = item.value<double>();
-		append(istd::TSharedNullable<ExtendedMetaDataUnionType>(val));
+		append(istd::TNullableValue<ExtendedMetaDataUnionType>(val));
 	}
 
 	if (item.canConvert<bool>()){
 		bool val = item.value<bool>();
-		append(istd::TSharedNullable<ExtendedMetaDataUnionType>(val));
+		append(istd::TNullableValue<ExtendedMetaDataUnionType>(val));
 	}
 
 	if (item.canConvert<QString>()){
 		QString val = item.value<QString>();
-		append(istd::TSharedNullable<ExtendedMetaDataUnionType>(val));
+		append(istd::TNullableValue<ExtendedMetaDataUnionType>(val));
 	}
 
 	ClearCache();
@@ -17242,22 +17242,22 @@ void CExtendedMetaDataUnionTypeObjectList::insert(int index, QVariant item)
 	if (item.canConvert<CCoordinatesObject*>()){
 		CCoordinatesObject* val = item.value<CCoordinatesObject*>();
 		CCoordinates* newItemPtr = dynamic_cast<CCoordinates*>(val);
-		append(istd::TSharedNullable<ExtendedMetaDataUnionType>(*newItemPtr));
+		append(istd::TNullableValue<ExtendedMetaDataUnionType>(*newItemPtr));
 	}
 
 	if (item.canConvert<double>()){
 		double val = item.value<double>();
-		append(istd::TSharedNullable<ExtendedMetaDataUnionType>(val));
+		append(istd::TNullableValue<ExtendedMetaDataUnionType>(val));
 	}
 
 	if (item.canConvert<bool>()){
 		bool val = item.value<bool>();
-		append(istd::TSharedNullable<ExtendedMetaDataUnionType>(val));
+		append(istd::TNullableValue<ExtendedMetaDataUnionType>(val));
 	}
 
 	if (item.canConvert<QString>()){
 		QString val = item.value<QString>();
-		append(istd::TSharedNullable<ExtendedMetaDataUnionType>(val));
+		append(istd::TNullableValue<ExtendedMetaDataUnionType>(val));
 	}
 
 	ClearCache();
@@ -17337,17 +17337,17 @@ void CExtendedMetaDataUnionSimpleTypeObjectList::append(QVariant item)
 
 	if (item.canConvert<double>()){
 		double val = item.value<double>();
-		append(istd::TSharedNullable<ExtendedMetaDataUnionSimpleType>(val));
+		append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(val));
 	}
 
 	if (item.canConvert<bool>()){
 		bool val = item.value<bool>();
-		append(istd::TSharedNullable<ExtendedMetaDataUnionSimpleType>(val));
+		append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(val));
 	}
 
 	if (item.canConvert<QString>()){
 		QString val = item.value<QString>();
-		append(istd::TSharedNullable<ExtendedMetaDataUnionSimpleType>(val));
+		append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(val));
 	}
 
 	ClearCache();
@@ -17491,17 +17491,17 @@ void CExtendedMetaDataUnionSimpleTypeObjectList::insert(int index, QVariant item
 
 	if (item.canConvert<double>()){
 		double val = item.value<double>();
-		append(istd::TSharedNullable<ExtendedMetaDataUnionSimpleType>(val));
+		append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(val));
 	}
 
 	if (item.canConvert<bool>()){
 		bool val = item.value<bool>();
-		append(istd::TSharedNullable<ExtendedMetaDataUnionSimpleType>(val));
+		append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(val));
 	}
 
 	if (item.canConvert<QString>()){
 		QString val = item.value<QString>();
-		append(istd::TSharedNullable<ExtendedMetaDataUnionSimpleType>(val));
+		append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(val));
 	}
 
 	ClearCache();
@@ -17582,13 +17582,13 @@ void CCDMResultUnionTypeObjectList::append(QVariant item)
 	if (item.canConvert<CCDMResultVarStringObject*>()){
 		CCDMResultVarStringObject* val = item.value<CCDMResultVarStringObject*>();
 		CCDMResultVarString* newItemPtr = dynamic_cast<CCDMResultVarString*>(val);
-		append(istd::TSharedNullable<CDMResultUnionType>(*newItemPtr));
+		append(istd::TNullableValue<CDMResultUnionType>(*newItemPtr));
 	}
 
 	if (item.canConvert<CCDMResultVarRecursiveObject*>()){
 		CCDMResultVarRecursiveObject* val = item.value<CCDMResultVarRecursiveObject*>();
 		CCDMResultVarRecursive* newItemPtr = dynamic_cast<CCDMResultVarRecursive*>(val);
-		append(istd::TSharedNullable<CDMResultUnionType>(*newItemPtr));
+		append(istd::TNullableValue<CDMResultUnionType>(*newItemPtr));
 	}
 
 	ClearCache();
@@ -17718,13 +17718,13 @@ void CCDMResultUnionTypeObjectList::insert(int index, QVariant item)
 	if (item.canConvert<CCDMResultVarStringObject*>()){
 		CCDMResultVarStringObject* val = item.value<CCDMResultVarStringObject*>();
 		CCDMResultVarString* newItemPtr = dynamic_cast<CCDMResultVarString*>(val);
-		append(istd::TSharedNullable<CDMResultUnionType>(*newItemPtr));
+		append(istd::TNullableValue<CDMResultUnionType>(*newItemPtr));
 	}
 
 	if (item.canConvert<CCDMResultVarRecursiveObject*>()){
 		CCDMResultVarRecursiveObject* val = item.value<CCDMResultVarRecursiveObject*>();
 		CCDMResultVarRecursive* newItemPtr = dynamic_cast<CCDMResultVarRecursive*>(val);
-		append(istd::TSharedNullable<CDMResultUnionType>(*newItemPtr));
+		append(istd::TNullableValue<CDMResultUnionType>(*newItemPtr));
 	}
 
 	ClearCache();

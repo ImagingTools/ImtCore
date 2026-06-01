@@ -8715,7 +8715,7 @@ void CParamsSetObject::SetParamIds(const QVariant& v)
 		CParamsSet::paramIds->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TSharedNullable<QByteArray> value(tempValue.toUtf8());
+		istd::TNullableValue<QByteArray> value(tempValue.toUtf8());
 		CParamsSet::paramIds->append(value);
 	}
 
@@ -8749,7 +8749,7 @@ void CParamsSetObject::SetParamTypeIds(const QVariant& v)
 		CParamsSet::paramTypeIds->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TSharedNullable<QByteArray> value(tempValue.toUtf8());
+		istd::TNullableValue<QByteArray> value(tempValue.toUtf8());
 		CParamsSet::paramTypeIds->append(value);
 	}
 
@@ -8783,7 +8783,7 @@ void CParamsSetObject::SetParamNames(const QVariant& v)
 		CParamsSet::paramNames->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TSharedNullable<QString> value(tempValue);
+		istd::TNullableValue<QString> value(tempValue);
 		CParamsSet::paramNames->append(value);
 	}
 
@@ -8817,7 +8817,7 @@ void CParamsSetObject::SetParamDescriptions(const QVariant& v)
 		CParamsSet::paramDescriptions->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TSharedNullable<QString> value(tempValue);
+		istd::TNullableValue<QString> value(tempValue);
 		CParamsSet::paramDescriptions->append(value);
 	}
 
@@ -8851,7 +8851,7 @@ void CParamsSetObject::SetParameters(const QVariant& v)
 		CParamsSet::parameters->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TSharedNullable<QString> value(tempValue);
+		istd::TNullableValue<QString> value(tempValue);
 		CParamsSet::parameters->append(value);
 	}
 
@@ -9099,7 +9099,7 @@ void CMimeTypeObject::SetTree(const QVariant& v)
 		CMimeType::tree->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TSharedNullable<QString> value(tempValue);
+		istd::TNullableValue<QString> value(tempValue);
 		CMimeType::tree->append(value);
 	}
 
@@ -9173,7 +9173,7 @@ void CMimeTypeObject::SetParameters(const QVariant& v)
 		CMimeType::parameters->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TSharedNullable<QString> value(tempValue);
+		istd::TNullableValue<QString> value(tempValue);
 		CMimeType::parameters->append(value);
 	}
 

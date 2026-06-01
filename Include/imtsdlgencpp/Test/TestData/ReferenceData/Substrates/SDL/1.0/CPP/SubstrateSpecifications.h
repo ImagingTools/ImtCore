@@ -15,7 +15,7 @@
 #include <QtCore/QMetaEnum>
 
 // ACF includes
-#include <istd/TSharedNullable.h>
+#include <istd/TNullableValue.h>
 
 // ImtCore includes
 #include <imtbase/CItemModelBase.h>
@@ -46,7 +46,7 @@ public:
 		static const inline QString Id = "id";
 	};
 
-	istd::TSharedNullable<QByteArray> id;
+	istd::TNullableValue<QByteArray> id;
 
 	static QByteArray GetVersionId();
 
@@ -74,8 +74,8 @@ public:
 		static const inline QString Offset = "offset";
 	};
 
-	istd::TSharedNullable<int> count;
-	istd::TSharedNullable<int> offset;
+	istd::TNullableValue<int> count;
+	istd::TNullableValue<int> offset;
 
 	static QByteArray GetVersionId();
 
@@ -104,9 +104,9 @@ public:
 		static const inline QString FilmID = "FilmID";
 	};
 
-	istd::TSharedNullable<QByteArray> PaperID;
-	istd::TSharedNullable<QByteArray> CardboardID;
-	istd::TSharedNullable<QByteArray> FilmID;
+	istd::TNullableValue<QByteArray> PaperID;
+	istd::TNullableValue<QByteArray> CardboardID;
+	istd::TNullableValue<QByteArray> FilmID;
 
 	static QByteArray GetVersionId();
 
@@ -133,7 +133,7 @@ public:
 		static const inline QString ViewParams = "viewParams";
 	};
 
-	istd::TSharedNullable<CCollectionViewParamsTest> viewParams;
+	istd::TNullableValue<CCollectionViewParamsTest> viewParams;
 
 	static QByteArray GetVersionId();
 
@@ -167,14 +167,14 @@ public:
 		static const inline QString ColorPreview = "colorPreview";
 	};
 
-	istd::TSharedNullable<QByteArray> id;
-	istd::TSharedNullable<QByteArray> typeId;
-	istd::TSharedNullable<QString> name;
-	istd::TSharedNullable<QByteArray> materialId;
-	istd::TSharedNullable<QString> materialName;
-	istd::TSharedNullable<QString> added;
-	istd::TSharedNullable<QString> timeStamp;
-	istd::TSharedNullable<QString> colorPreview;
+	istd::TNullableValue<QByteArray> id;
+	istd::TNullableValue<QByteArray> typeId;
+	istd::TNullableValue<QString> name;
+	istd::TNullableValue<QByteArray> materialId;
+	istd::TNullableValue<QString> materialName;
+	istd::TNullableValue<QString> added;
+	istd::TNullableValue<QString> timeStamp;
+	istd::TNullableValue<QString> colorPreview;
 
 	static QByteArray GetVersionId();
 
@@ -201,7 +201,7 @@ public:
 		static const inline QString Items = "items";
 	};
 
-	istd::TSharedNullable<imtsdl::TElementList<CSubstrateSpecificationListItem>> items;
+	istd::TNullableValue<imtsdl::TElementList<CSubstrateSpecificationListItem>> items;
 
 	static QByteArray GetVersionId();
 
@@ -229,8 +229,8 @@ public:
 		static const inline QString Grammage = "grammage";
 	};
 
-	istd::TSharedNullable<QString> color;
-	istd::TSharedNullable<double> grammage;
+	istd::TNullableValue<QString> color;
+	istd::TNullableValue<double> grammage;
 
 	static QByteArray GetVersionId();
 
@@ -259,9 +259,9 @@ public:
 		static const inline QString CoatType = "coatType";
 	};
 
-	istd::TSharedNullable<double> grammage;
-	istd::TSharedNullable<QString> color;
-	istd::TSharedNullable<QString> coatType;
+	istd::TNullableValue<double> grammage;
+	istd::TNullableValue<QString> color;
+	istd::TNullableValue<QString> coatType;
 
 	static QByteArray GetVersionId();
 
@@ -290,9 +290,9 @@ public:
 		static const inline QString Material = "material";
 	};
 
-	istd::TSharedNullable<double> transparency;
-	istd::TSharedNullable<QString> color;
-	istd::TSharedNullable<QString> material;
+	istd::TNullableValue<double> transparency;
+	istd::TNullableValue<QString> color;
+	istd::TNullableValue<QString> material;
 
 	static QByteArray GetVersionId();
 
@@ -323,11 +323,11 @@ public:
 		static const inline QString TypeId = "typeId";
 	};
 
-	istd::TSharedNullable<QByteArray> id;
-	istd::TSharedNullable<QString> name;
-	istd::TSharedNullable<QString> description;
-	istd::TSharedNullable<SubstrateSpecificationDocument> item;
-	istd::TSharedNullable<QByteArray> typeId;
+	istd::TNullableValue<QByteArray> id;
+	istd::TNullableValue<QString> name;
+	istd::TNullableValue<QString> description;
+	istd::TNullableValue<SubstrateSpecificationDocument> item;
+	istd::TNullableValue<QByteArray> typeId;
 
 	static QByteArray GetVersionId();
 
@@ -355,8 +355,8 @@ public:
 		static const inline QString Lab = "lab";
 	};
 
-	istd::TSharedNullable<QByteArray> materialId;
-	istd::TSharedNullable<QString> lab;
+	istd::TNullableValue<QByteArray> materialId;
+	istd::TNullableValue<QString> lab;
 
 	static QByteArray GetVersionId();
 
@@ -1250,7 +1250,7 @@ struct GetSubstrateSpecificationListRequestInfo
 
 struct GetSubstrateSpecificationListRequestArguments
 {
-	istd::TSharedNullable<CSubstrateSpecificationListInput> input;
+	istd::TNullableValue<CSubstrateSpecificationListInput> input;
 };
 
 
@@ -1284,7 +1284,7 @@ struct GetSubstrateSpecificationRequestInfo
 
 struct GetSubstrateSpecificationRequestArguments
 {
-	istd::TSharedNullable<CInputId> input;
+	istd::TNullableValue<CInputId> input;
 };
 
 
@@ -1328,7 +1328,7 @@ struct GetOptionsListRequestInfo
 
 struct GetOptionsListRequestArguments
 {
-	istd::TSharedNullable<CCollectionViewParamsTest> input;
+	istd::TNullableValue<CCollectionViewParamsTest> input;
 };
 
 
@@ -1363,7 +1363,7 @@ struct InsertSubstrateSpecificationRequestInfo
 
 struct InsertSubstrateSpecificationRequestArguments
 {
-	istd::TSharedNullable<CSubstrateSpecificationInput> input;
+	istd::TNullableValue<CSubstrateSpecificationInput> input;
 };
 
 
@@ -1398,7 +1398,7 @@ struct UpdateSubstrateSpecificationRequestInfo
 
 struct UpdateSubstrateSpecificationRequestArguments
 {
-	istd::TSharedNullable<CSubstrateSpecificationInput> input;
+	istd::TNullableValue<CSubstrateSpecificationInput> input;
 };
 
 

@@ -2155,13 +2155,13 @@ void CPrinterSpecificationObjectList::append(QVariant item)
 	if (item.canConvert<CPrinterSpecificationBaseObject*>()){
 		CPrinterSpecificationBaseObject* val = item.value<CPrinterSpecificationBaseObject*>();
 		CPrinterSpecificationBase* newItemPtr = dynamic_cast<CPrinterSpecificationBase*>(val);
-		append(istd::TSharedNullable<PrinterSpecification>(*newItemPtr));
+		append(istd::TNullableValue<PrinterSpecification>(*newItemPtr));
 	}
 
 	if (item.canConvert<CLinkObject*>()){
 		CLinkObject* val = item.value<CLinkObject*>();
 		CLink* newItemPtr = dynamic_cast<CLink*>(val);
-		append(istd::TSharedNullable<PrinterSpecification>(*newItemPtr));
+		append(istd::TNullableValue<PrinterSpecification>(*newItemPtr));
 	}
 
 	ClearCache();
@@ -2291,13 +2291,13 @@ void CPrinterSpecificationObjectList::insert(int index, QVariant item)
 	if (item.canConvert<CPrinterSpecificationBaseObject*>()){
 		CPrinterSpecificationBaseObject* val = item.value<CPrinterSpecificationBaseObject*>();
 		CPrinterSpecificationBase* newItemPtr = dynamic_cast<CPrinterSpecificationBase*>(val);
-		append(istd::TSharedNullable<PrinterSpecification>(*newItemPtr));
+		append(istd::TNullableValue<PrinterSpecification>(*newItemPtr));
 	}
 
 	if (item.canConvert<CLinkObject*>()){
 		CLinkObject* val = item.value<CLinkObject*>();
 		CLink* newItemPtr = dynamic_cast<CLink*>(val);
-		append(istd::TSharedNullable<PrinterSpecification>(*newItemPtr));
+		append(istd::TNullableValue<PrinterSpecification>(*newItemPtr));
 	}
 
 	ClearCache();
@@ -2373,12 +2373,12 @@ void CSimpleUnionObjectList::append(QVariant item)
 
 	if (item.canConvert<QString>()){
 		QString val = item.value<QString>();
-		append(istd::TSharedNullable<SimpleUnion>(val));
+		append(istd::TNullableValue<SimpleUnion>(val));
 	}
 
 	if (item.canConvert<double>()){
 		double val = item.value<double>();
-		append(istd::TSharedNullable<SimpleUnion>(val));
+		append(istd::TNullableValue<SimpleUnion>(val));
 	}
 
 	ClearCache();
@@ -2507,12 +2507,12 @@ void CSimpleUnionObjectList::insert(int index, QVariant item)
 
 	if (item.canConvert<QString>()){
 		QString val = item.value<QString>();
-		append(istd::TSharedNullable<SimpleUnion>(val));
+		append(istd::TNullableValue<SimpleUnion>(val));
 	}
 
 	if (item.canConvert<double>()){
 		double val = item.value<double>();
-		append(istd::TSharedNullable<SimpleUnion>(val));
+		append(istd::TNullableValue<SimpleUnion>(val));
 	}
 
 	ClearCache();
@@ -2590,13 +2590,13 @@ void CMixedUnionObjectList::append(QVariant item)
 
 	if (item.canConvert<QString>()){
 		QString val = item.value<QString>();
-		append(istd::TSharedNullable<MixedUnion>(val));
+		append(istd::TNullableValue<MixedUnion>(val));
 	}
 
 	if (item.canConvert<CLinkObject*>()){
 		CLinkObject* val = item.value<CLinkObject*>();
 		CLink* newItemPtr = dynamic_cast<CLink*>(val);
-		append(istd::TSharedNullable<MixedUnion>(*newItemPtr));
+		append(istd::TNullableValue<MixedUnion>(*newItemPtr));
 	}
 
 	ClearCache();
@@ -2725,13 +2725,13 @@ void CMixedUnionObjectList::insert(int index, QVariant item)
 
 	if (item.canConvert<QString>()){
 		QString val = item.value<QString>();
-		append(istd::TSharedNullable<MixedUnion>(val));
+		append(istd::TNullableValue<MixedUnion>(val));
 	}
 
 	if (item.canConvert<CLinkObject*>()){
 		CLinkObject* val = item.value<CLinkObject*>();
 		CLink* newItemPtr = dynamic_cast<CLink*>(val);
-		append(istd::TSharedNullable<MixedUnion>(*newItemPtr));
+		append(istd::TNullableValue<MixedUnion>(*newItemPtr));
 	}
 
 	ClearCache();

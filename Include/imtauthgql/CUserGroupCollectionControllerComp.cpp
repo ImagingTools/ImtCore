@@ -406,7 +406,7 @@ bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 {
 	sdl::V1_0::imtauth::CGroupData representation;
 	
-	istd::TSharedNullable<sdl::V1_0::imtauth::CGroupDataInput> input = groupUpdateRequest.GetRequestedArguments().input;
+	istd::TNullableValue<sdl::V1_0::imtauth::CGroupDataInput> input = groupUpdateRequest.GetRequestedArguments().input;
 	if (input && input->item){
 		representation = *input->item;
 	}

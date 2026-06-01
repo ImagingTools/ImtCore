@@ -15,7 +15,7 @@
 #include <QtCore/QMetaEnum>
 
 // ACF includes
-#include <istd/TSharedNullable.h>
+#include <istd/TNullableValue.h>
 
 // ImtCore includes
 #include <imtbase/CItemModelBase.h>
@@ -65,18 +65,18 @@ public:
 		static const inline QString Geometry = "Geometry";
 	};
 
-	istd::TSharedNullable<StatusCode> AreaResult;
-	istd::TSharedNullable<double> ExpectedMinValue;
-	istd::TSharedNullable<double> ExpectedMaxValue;
-	istd::TSharedNullable<double> MeasuredValue;
-	istd::TSharedNullable<double> MinMeasuredValue;
-	istd::TSharedNullable<double> MaxMeasuredValue;
-	istd::TSharedNullable<double> MeanMeasuredValue;
-	istd::TSharedNullable<MeasurementType> MeasurementType;
-	istd::TSharedNullable<MeasurementUnit> MeasurementUnit;
-	istd::TSharedNullable<double> Length;
-	istd::TSharedNullable<ErrorCode> ErrorType;
-	istd::TSharedNullable<CGeometry> Geometry;
+	istd::TNullableValue<StatusCode> AreaResult;
+	istd::TNullableValue<double> ExpectedMinValue;
+	istd::TNullableValue<double> ExpectedMaxValue;
+	istd::TNullableValue<double> MeasuredValue;
+	istd::TNullableValue<double> MinMeasuredValue;
+	istd::TNullableValue<double> MaxMeasuredValue;
+	istd::TNullableValue<double> MeanMeasuredValue;
+	istd::TNullableValue<MeasurementType> MeasurementType;
+	istd::TNullableValue<MeasurementUnit> MeasurementUnit;
+	istd::TNullableValue<double> Length;
+	istd::TNullableValue<ErrorCode> ErrorType;
+	istd::TNullableValue<CGeometry> Geometry;
 
 	static QByteArray GetVersionId();
 
@@ -107,11 +107,11 @@ public:
 		static const inline QString Results = "Results";
 	};
 
-	istd::TSharedNullable<QString> AreaName;
-	istd::TSharedNullable<StatusCode> Status;
-	istd::TSharedNullable<CPoint> IconPosition;
-	istd::TSharedNullable<ErrorCode> ErrorType;
-	istd::TSharedNullable<imtsdl::TElementList<CResult>> Results;
+	istd::TNullableValue<QString> AreaName;
+	istd::TNullableValue<StatusCode> Status;
+	istd::TNullableValue<CPoint> IconPosition;
+	istd::TNullableValue<ErrorCode> ErrorType;
+	istd::TNullableValue<imtsdl::TElementList<CResult>> Results;
 
 	static QByteArray GetVersionId();
 
@@ -140,9 +140,9 @@ public:
 		static const inline QString Areas = "Areas";
 	};
 
-	istd::TSharedNullable<QString> AnalyzerName;
-	istd::TSharedNullable<StatusCode> AnalyzerResult;
-	istd::TSharedNullable<imtsdl::TElementList<CArea>> Areas;
+	istd::TNullableValue<QString> AnalyzerName;
+	istd::TNullableValue<StatusCode> AnalyzerResult;
+	istd::TNullableValue<imtsdl::TElementList<CArea>> Areas;
 
 	static QByteArray GetVersionId();
 
@@ -173,11 +173,11 @@ public:
 		static const inline QString Analyzers = "Analyzers";
 	};
 
-	istd::TSharedNullable<QString> ID;
-	istd::TSharedNullable<QString> TypeID;
-	istd::TSharedNullable<QString> Name;
-	istd::TSharedNullable<StatusCode> Status;
-	istd::TSharedNullable<imtsdl::TElementList<CAnalyzer>> Analyzers;
+	istd::TNullableValue<QString> ID;
+	istd::TNullableValue<QString> TypeID;
+	istd::TNullableValue<QString> Name;
+	istd::TNullableValue<StatusCode> Status;
+	istd::TNullableValue<imtsdl::TElementList<CAnalyzer>> Analyzers;
 
 	static QByteArray GetVersionId();
 
@@ -210,13 +210,13 @@ public:
 		static const inline QString Inspections = "Inspections";
 	};
 
-	istd::TSharedNullable<int> ProductID;
-	istd::TSharedNullable<QString> Name;
-	istd::TSharedNullable<StatusCode> Status;
-	istd::TSharedNullable<QString> PartSerialNumber;
-	istd::TSharedNullable<QString> Timestamp;
-	istd::TSharedNullable<QString> ProductImage;
-	istd::TSharedNullable<imtsdl::TElementList<CInspection>> Inspections;
+	istd::TNullableValue<int> ProductID;
+	istd::TNullableValue<QString> Name;
+	istd::TNullableValue<StatusCode> Status;
+	istd::TNullableValue<QString> PartSerialNumber;
+	istd::TNullableValue<QString> Timestamp;
+	istd::TNullableValue<QString> ProductImage;
+	istd::TNullableValue<imtsdl::TElementList<CInspection>> Inspections;
 
 	static QByteArray GetVersionId();
 
@@ -244,8 +244,8 @@ public:
 		static const inline QString Locale = "locale";
 	};
 
-	istd::TSharedNullable<QString> text;
-	istd::TSharedNullable<QString> locale;
+	istd::TNullableValue<QString> text;
+	istd::TNullableValue<QString> locale;
 
 	static QByteArray GetVersionId();
 
@@ -274,9 +274,9 @@ public:
 		static const inline QString Z = "z";
 	};
 
-	istd::TSharedNullable<double> x;
-	istd::TSharedNullable<double> y;
-	istd::TSharedNullable<double> z;
+	istd::TNullableValue<double> x;
+	istd::TNullableValue<double> y;
+	istd::TNullableValue<double> z;
 
 	static QByteArray GetVersionId();
 
@@ -304,8 +304,8 @@ public:
 		static const inline QString Value = "value";
 	};
 
-	istd::TSharedNullable<QString> key;
-	istd::TSharedNullable<ExtendedMetaDataUnionType> value;
+	istd::TNullableValue<QString> key;
+	istd::TNullableValue<ExtendedMetaDataUnionType> value;
 
 	static QByteArray GetVersionId();
 
@@ -339,14 +339,14 @@ public:
 		static const inline QString ExtendedMetaData = "extendedMetaData";
 	};
 
-	istd::TSharedNullable<QByteArray> resultId;
-	istd::TSharedNullable<QString> creationTime;
-	istd::TSharedNullable<QString> partId;
-	istd::TSharedNullable<QString> productId;
-	istd::TSharedNullable<QString> name;
-	istd::TSharedNullable<int> classification;
-	istd::TSharedNullable<CLocalizedText> description;
-	istd::TSharedNullable<imtsdl::TElementList<CExtendedMetaData>> extendedMetaData;
+	istd::TNullableValue<QByteArray> resultId;
+	istd::TNullableValue<QString> creationTime;
+	istd::TNullableValue<QString> partId;
+	istd::TNullableValue<QString> productId;
+	istd::TNullableValue<QString> name;
+	istd::TNullableValue<int> classification;
+	istd::TNullableValue<CLocalizedText> description;
+	istd::TNullableValue<imtsdl::TElementList<CExtendedMetaData>> extendedMetaData;
 
 	static QByteArray GetVersionId();
 
@@ -377,11 +377,11 @@ public:
 		static const inline QString HighLimit = "highLimit";
 	};
 
-	istd::TSharedNullable<QString> name;
-	istd::TSharedNullable<QString> valueId;
-	istd::TSharedNullable<double> measuredValue;
-	istd::TSharedNullable<double> lowLimit;
-	istd::TSharedNullable<double> highLimit;
+	istd::TNullableValue<QString> name;
+	istd::TNullableValue<QString> valueId;
+	istd::TNullableValue<double> measuredValue;
+	istd::TNullableValue<double> lowLimit;
+	istd::TNullableValue<double> highLimit;
 
 	static QByteArray GetVersionId();
 
@@ -410,9 +410,9 @@ public:
 		static const inline QString MixedUnion = "mixedUnion";
 	};
 
-	istd::TSharedNullable<ExtendedMetaDataUnionSimpleType> simpleUnion;
-	istd::TSharedNullable<CDMResultUnionType> complexUnion;
-	istd::TSharedNullable<ExtendedMetaDataUnionType> mixedUnion;
+	istd::TNullableValue<ExtendedMetaDataUnionSimpleType> simpleUnion;
+	istd::TNullableValue<CDMResultUnionType> complexUnion;
+	istd::TNullableValue<ExtendedMetaDataUnionType> mixedUnion;
 
 	static QByteArray GetVersionId();
 
@@ -443,11 +443,11 @@ public:
 		static const inline QString OverallResultValues = "overallResultValues";
 	};
 
-	istd::TSharedNullable<QString> dataModelTitle;
-	istd::TSharedNullable<QString> dataModelVersion;
-	istd::TSharedNullable<CResultMetaData> resultMetaData;
-	istd::TSharedNullable<imtsdl::TElementList<CDMResultUnionType>> resultContent;
-	istd::TSharedNullable<imtsdl::TElementList<COverallResultValues>> overallResultValues;
+	istd::TNullableValue<QString> dataModelTitle;
+	istd::TNullableValue<QString> dataModelVersion;
+	istd::TNullableValue<CResultMetaData> resultMetaData;
+	istd::TNullableValue<imtsdl::TElementList<CDMResultUnionType>> resultContent;
+	istd::TNullableValue<imtsdl::TElementList<COverallResultValues>> overallResultValues;
 
 	static QByteArray GetVersionId();
 
@@ -478,11 +478,11 @@ public:
 		static const inline QString OverallResultValues = "overallResultValues";
 	};
 
-	istd::TSharedNullable<QString> dataModelTitle;
-	istd::TSharedNullable<QString> dataModelVersion;
-	istd::TSharedNullable<CResultMetaData> resultMetaData;
-	istd::TSharedNullable<imtsdl::TElementList<QString>> resultContent;
-	istd::TSharedNullable<imtsdl::TElementList<COverallResultValues>> overallResultValues;
+	istd::TNullableValue<QString> dataModelTitle;
+	istd::TNullableValue<QString> dataModelVersion;
+	istd::TNullableValue<CResultMetaData> resultMetaData;
+	istd::TNullableValue<imtsdl::TElementList<QString>> resultContent;
+	istd::TNullableValue<imtsdl::TElementList<COverallResultValues>> overallResultValues;
 
 	static QByteArray GetVersionId();
 
@@ -513,11 +513,11 @@ public:
 		static const inline QString OverallResultValues = "overallResultValues";
 	};
 
-	istd::TSharedNullable<QString> dataModelTitle;
-	istd::TSharedNullable<QString> dataModelVersion;
-	istd::TSharedNullable<CResultMetaData> resultMetaData;
-	istd::TSharedNullable<imtsdl::TElementList<CDMResultUnionType>> resultContent;
-	istd::TSharedNullable<imtsdl::TElementList<COverallResultValues>> overallResultValues;
+	istd::TNullableValue<QString> dataModelTitle;
+	istd::TNullableValue<QString> dataModelVersion;
+	istd::TNullableValue<CResultMetaData> resultMetaData;
+	istd::TNullableValue<imtsdl::TElementList<CDMResultUnionType>> resultContent;
+	istd::TNullableValue<imtsdl::TElementList<COverallResultValues>> overallResultValues;
 
 	static QByteArray GetVersionId();
 
@@ -544,7 +544,7 @@ public:
 		static const inline QString PointAsCoordinates = "pointAsCoordinates";
 	};
 
-	istd::TSharedNullable<bool> pointAsCoordinates;
+	istd::TNullableValue<bool> pointAsCoordinates;
 
 	static QByteArray GetVersionId();
 
@@ -573,9 +573,9 @@ public:
 		static const inline QString FilterModel = "filterModel";
 	};
 
-	istd::TSharedNullable<int> count;
-	istd::TSharedNullable<int> offset;
-	istd::TSharedNullable<sdl::V1_0::imtbase::CComplexCollectionFilter> filterModel;
+	istd::TNullableValue<int> count;
+	istd::TNullableValue<int> offset;
+	istd::TNullableValue<sdl::V1_0::imtbase::CComplexCollectionFilter> filterModel;
 
 	static QByteArray GetVersionId();
 
@@ -2264,7 +2264,7 @@ struct GetLastProductionResultsCDMRequestInfo
 
 struct GetLastProductionResultsCDMRequestArguments
 {
-	istd::TSharedNullable<CPointsInCoordinateFormat> pointAsCoordinates;
+	istd::TNullableValue<CPointsInCoordinateFormat> pointAsCoordinates;
 };
 
 

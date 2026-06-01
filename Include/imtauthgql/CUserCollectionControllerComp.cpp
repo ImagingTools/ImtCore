@@ -107,7 +107,7 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 		userInfoPtr->AddToSystem(systemInfo);
 	}
 	else{
-		for (const istd::TSharedNullable<sdl::V1_0::imtauth::CSystemInfo>& sdlSystemInfo : systemInfos){
+		for (const istd::TNullableValue<sdl::V1_0::imtauth::CSystemInfo>& sdlSystemInfo : systemInfos){
 			QByteArray systemId;
 			if (!sdlSystemInfo.HasValue()){
 				continue;

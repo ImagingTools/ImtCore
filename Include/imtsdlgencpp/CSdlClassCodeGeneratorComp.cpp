@@ -137,7 +137,7 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 			nullptr,
 			nullptr);
 		FeedStreamHorizontally(stream);
-		stream << QStringLiteral("istd::TSharedNullable<");
+		stream << QStringLiteral("istd::TNullableValue<");
 		stream << convertedType;
 		stream << QStringLiteral("> ");
 		stream << field.GetId() << ';';

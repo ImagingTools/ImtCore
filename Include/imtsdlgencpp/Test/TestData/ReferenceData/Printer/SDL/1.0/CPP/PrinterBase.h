@@ -15,7 +15,7 @@
 #include <QtCore/QMetaEnum>
 
 // ACF includes
-#include <istd/TSharedNullable.h>
+#include <istd/TNullableValue.h>
 
 // ImtCore includes
 #include <imtbase/CItemModelBase.h>
@@ -49,7 +49,7 @@ public:
 		static const inline QString Name = "name";
 	};
 
-	istd::TSharedNullable<QString> name;
+	istd::TNullableValue<QString> name;
 
 	static QByteArray GetVersionId();
 
@@ -76,7 +76,7 @@ public:
 		static const inline QString Link = "link";
 	};
 
-	istd::TSharedNullable<QByteArray> link;
+	istd::TNullableValue<QByteArray> link;
 
 	static QByteArray GetVersionId();
 
@@ -106,10 +106,10 @@ public:
 		static const inline QString MixedTest = "mixedTest";
 	};
 
-	istd::TSharedNullable<QString> name;
-	istd::TSharedNullable<PrinterSpecification> specification;
-	istd::TSharedNullable<SimpleUnion> simpleTest;
-	istd::TSharedNullable<MixedUnion> mixedTest;
+	istd::TNullableValue<QString> name;
+	istd::TNullableValue<PrinterSpecification> specification;
+	istd::TNullableValue<SimpleUnion> simpleTest;
+	istd::TNullableValue<MixedUnion> mixedTest;
 
 	static QByteArray GetVersionId();
 
@@ -136,7 +136,7 @@ public:
 		static const inline QString Data = "data";
 	};
 
-	istd::TSharedNullable<imtsdl::TElementList<CPrinterBase>> data;
+	istd::TNullableValue<imtsdl::TElementList<CPrinterBase>> data;
 
 	static QByteArray GetVersionId();
 

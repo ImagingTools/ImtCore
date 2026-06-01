@@ -15,7 +15,7 @@
 #include <QtCore/QMetaEnum>
 
 // ACF includes
-#include <istd/TSharedNullable.h>
+#include <istd/TNullableValue.h>
 
 // ImtCore includes
 #include <imtbase/CItemModelBase.h>
@@ -39,8 +39,8 @@ public:
 		static const inline QString End = "End";
 	};
 
-	istd::TSharedNullable<QString> Begin;
-	istd::TSharedNullable<QString> End;
+	istd::TNullableValue<QString> Begin;
+	istd::TNullableValue<QString> End;
 
 	static QByteArray GetVersionId();
 
@@ -68,8 +68,8 @@ public:
 		static const inline QString Height = "height";
 	};
 
-	istd::TSharedNullable<double> width;
-	istd::TSharedNullable<double> height;
+	istd::TNullableValue<double> width;
+	istd::TNullableValue<double> height;
 
 	static QByteArray GetVersionId();
 
@@ -97,8 +97,8 @@ public:
 		static const inline QString Y = "y";
 	};
 
-	istd::TSharedNullable<double> x;
-	istd::TSharedNullable<double> y;
+	istd::TNullableValue<double> x;
+	istd::TNullableValue<double> y;
 
 	static QByteArray GetVersionId();
 
@@ -138,20 +138,20 @@ public:
 		static const inline QString EnableableParam = "EnableableParam";
 	};
 
-	istd::TSharedNullable<QByteArray> UrlParam;
-	istd::TSharedNullable<QByteArray> IdParam;
-	istd::TSharedNullable<QByteArray> TextParam;
-	istd::TSharedNullable<QByteArray> TextView;
-	istd::TSharedNullable<QByteArray> SelectionParam;
-	istd::TSharedNullable<QByteArray> SchedulerParam;
-	istd::TSharedNullable<QByteArray> BackupSettings;
-	istd::TSharedNullable<QByteArray> DatabaseAccessSettings;
-	istd::TSharedNullable<QByteArray> ParamsSet;
-	istd::TSharedNullable<QByteArray> FileNameParam;
-	istd::TSharedNullable<QByteArray> IntegerParam;
-	istd::TSharedNullable<QByteArray> DoubleParam;
-	istd::TSharedNullable<QByteArray> PasswordParam;
-	istd::TSharedNullable<QByteArray> EnableableParam;
+	istd::TNullableValue<QByteArray> UrlParam;
+	istd::TNullableValue<QByteArray> IdParam;
+	istd::TNullableValue<QByteArray> TextParam;
+	istd::TNullableValue<QByteArray> TextView;
+	istd::TNullableValue<QByteArray> SelectionParam;
+	istd::TNullableValue<QByteArray> SchedulerParam;
+	istd::TNullableValue<QByteArray> BackupSettings;
+	istd::TNullableValue<QByteArray> DatabaseAccessSettings;
+	istd::TNullableValue<QByteArray> ParamsSet;
+	istd::TNullableValue<QByteArray> FileNameParam;
+	istd::TNullableValue<QByteArray> IntegerParam;
+	istd::TNullableValue<QByteArray> DoubleParam;
+	istd::TNullableValue<QByteArray> PasswordParam;
+	istd::TNullableValue<QByteArray> EnableableParam;
 
 	static QByteArray GetVersionId();
 
@@ -181,10 +181,10 @@ public:
 		static const inline QString Path = "path";
 	};
 
-	istd::TSharedNullable<QString> scheme;
-	istd::TSharedNullable<QString> host;
-	istd::TSharedNullable<int> port;
-	istd::TSharedNullable<QString> path;
+	istd::TNullableValue<QString> scheme;
+	istd::TNullableValue<QString> host;
+	istd::TNullableValue<int> port;
+	istd::TNullableValue<QString> path;
 
 	static QByteArray GetVersionId();
 
@@ -211,7 +211,7 @@ public:
 		static const inline QString Id = "id";
 	};
 
-	istd::TSharedNullable<QByteArray> id;
+	istd::TNullableValue<QByteArray> id;
 
 	static QByteArray GetVersionId();
 
@@ -238,7 +238,7 @@ public:
 		static const inline QString Text = "text";
 	};
 
-	istd::TSharedNullable<QString> text;
+	istd::TNullableValue<QString> text;
 
 	static QByteArray GetVersionId();
 
@@ -265,7 +265,7 @@ public:
 		static const inline QString Value = "value";
 	};
 
-	istd::TSharedNullable<bool> value;
+	istd::TNullableValue<bool> value;
 
 	static QByteArray GetVersionId();
 
@@ -292,7 +292,7 @@ public:
 		static const inline QString Value = "value";
 	};
 
-	istd::TSharedNullable<int> value;
+	istd::TNullableValue<int> value;
 
 	static QByteArray GetVersionId();
 
@@ -319,7 +319,7 @@ public:
 		static const inline QString Value = "value";
 	};
 
-	istd::TSharedNullable<double> value;
+	istd::TNullableValue<double> value;
 
 	static QByteArray GetVersionId();
 
@@ -349,10 +349,10 @@ public:
 		static const inline QString Enabled = "enabled";
 	};
 
-	istd::TSharedNullable<QByteArray> id;
-	istd::TSharedNullable<QString> name;
-	istd::TSharedNullable<QString> description;
-	istd::TSharedNullable<bool> enabled;
+	istd::TNullableValue<QByteArray> id;
+	istd::TNullableValue<QString> name;
+	istd::TNullableValue<QString> description;
+	istd::TNullableValue<bool> enabled;
 
 	static QByteArray GetVersionId();
 
@@ -381,9 +381,9 @@ public:
 		static const inline QString Options = "options";
 	};
 
-	istd::TSharedNullable<int> totalCount;
-	istd::TSharedNullable<int> offset;
-	istd::TSharedNullable<imtsdl::TElementList<COption>> options;
+	istd::TNullableValue<int> totalCount;
+	istd::TNullableValue<int> offset;
+	istd::TNullableValue<imtsdl::TElementList<COption>> options;
 
 	static QByteArray GetVersionId();
 
@@ -411,8 +411,8 @@ public:
 		static const inline QString Constraints = "constraints";
 	};
 
-	istd::TSharedNullable<int> selectedIndex;
-	istd::TSharedNullable<COptionsList> constraints;
+	istd::TNullableValue<int> selectedIndex;
+	istd::TNullableValue<COptionsList> constraints;
 
 	static QByteArray GetVersionId();
 
@@ -440,8 +440,8 @@ public:
 		static const inline QString Interval = "interval";
 	};
 
-	istd::TSharedNullable<QString> startTime;
-	istd::TSharedNullable<int> interval;
+	istd::TNullableValue<QString> startTime;
+	istd::TNullableValue<int> interval;
 
 	static QByteArray GetVersionId();
 
@@ -469,8 +469,8 @@ public:
 		static const inline QString FolderPath = "folderPath";
 	};
 
-	istd::TSharedNullable<CSchedulerParam> schedulerParam;
-	istd::TSharedNullable<QString> folderPath;
+	istd::TNullableValue<CSchedulerParam> schedulerParam;
+	istd::TNullableValue<QString> folderPath;
 
 	static QByteArray GetVersionId();
 
@@ -502,12 +502,12 @@ public:
 		static const inline QString Password = "password";
 	};
 
-	istd::TSharedNullable<QString> dbName;
-	istd::TSharedNullable<QString> host;
-	istd::TSharedNullable<int> port;
-	istd::TSharedNullable<QString> dbPath;
-	istd::TSharedNullable<QString> username;
-	istd::TSharedNullable<QString> password;
+	istd::TNullableValue<QString> dbName;
+	istd::TNullableValue<QString> host;
+	istd::TNullableValue<int> port;
+	istd::TNullableValue<QString> dbPath;
+	istd::TNullableValue<QString> username;
+	istd::TNullableValue<QString> password;
 
 	static QByteArray GetVersionId();
 
@@ -535,8 +535,8 @@ public:
 		static const inline QString Path = "path";
 	};
 
-	istd::TSharedNullable<int> pathType;
-	istd::TSharedNullable<QString> path;
+	istd::TNullableValue<int> pathType;
+	istd::TNullableValue<QString> path;
 
 	static QByteArray GetVersionId();
 
@@ -567,11 +567,11 @@ public:
 		static const inline QString Parameters = "parameters";
 	};
 
-	istd::TSharedNullable<imtsdl::TElementList<QByteArray>> paramIds;
-	istd::TSharedNullable<imtsdl::TElementList<QByteArray>> paramTypeIds;
-	istd::TSharedNullable<imtsdl::TElementList<QString>> paramNames;
-	istd::TSharedNullable<imtsdl::TElementList<QString>> paramDescriptions;
-	istd::TSharedNullable<imtsdl::TElementList<QString>> parameters;
+	istd::TNullableValue<imtsdl::TElementList<QByteArray>> paramIds;
+	istd::TNullableValue<imtsdl::TElementList<QByteArray>> paramTypeIds;
+	istd::TNullableValue<imtsdl::TElementList<QString>> paramNames;
+	istd::TNullableValue<imtsdl::TElementList<QString>> paramDescriptions;
+	istd::TNullableValue<imtsdl::TElementList<QString>> parameters;
 
 	static QByteArray GetVersionId();
 
@@ -602,11 +602,11 @@ public:
 		static const inline QString Parameters = "parameters";
 	};
 
-	istd::TSharedNullable<QString> type;
-	istd::TSharedNullable<imtsdl::TElementList<QString>> tree;
-	istd::TSharedNullable<QString> subType;
-	istd::TSharedNullable<QString> suffix;
-	istd::TSharedNullable<imtsdl::TElementList<QString>> parameters;
+	istd::TNullableValue<QString> type;
+	istd::TNullableValue<imtsdl::TElementList<QString>> tree;
+	istd::TNullableValue<QString> subType;
+	istd::TNullableValue<QString> suffix;
+	istd::TNullableValue<imtsdl::TElementList<QString>> parameters;
 
 	static QByteArray GetVersionId();
 

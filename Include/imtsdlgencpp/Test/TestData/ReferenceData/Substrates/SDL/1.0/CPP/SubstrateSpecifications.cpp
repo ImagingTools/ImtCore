@@ -5348,19 +5348,19 @@ void CSubstrateSpecificationDocumentObjectList::append(QVariant item)
 	if (item.canConvert<CCardboardSubstrateSpecificationObject*>()){
 		CCardboardSubstrateSpecificationObject* val = item.value<CCardboardSubstrateSpecificationObject*>();
 		CCardboardSubstrateSpecification* newItemPtr = dynamic_cast<CCardboardSubstrateSpecification*>(val);
-		append(istd::TSharedNullable<SubstrateSpecificationDocument>(*newItemPtr));
+		append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
 	}
 
 	if (item.canConvert<CPaperSubstrateSpecificationObject*>()){
 		CPaperSubstrateSpecificationObject* val = item.value<CPaperSubstrateSpecificationObject*>();
 		CPaperSubstrateSpecification* newItemPtr = dynamic_cast<CPaperSubstrateSpecification*>(val);
-		append(istd::TSharedNullable<SubstrateSpecificationDocument>(*newItemPtr));
+		append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
 	}
 
 	if (item.canConvert<CFilmSubstrateSpecificationObject*>()){
 		CFilmSubstrateSpecificationObject* val = item.value<CFilmSubstrateSpecificationObject*>();
 		CFilmSubstrateSpecification* newItemPtr = dynamic_cast<CFilmSubstrateSpecification*>(val);
-		append(istd::TSharedNullable<SubstrateSpecificationDocument>(*newItemPtr));
+		append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
 	}
 
 	ClearCache();
@@ -5505,19 +5505,19 @@ void CSubstrateSpecificationDocumentObjectList::insert(int index, QVariant item)
 	if (item.canConvert<CCardboardSubstrateSpecificationObject*>()){
 		CCardboardSubstrateSpecificationObject* val = item.value<CCardboardSubstrateSpecificationObject*>();
 		CCardboardSubstrateSpecification* newItemPtr = dynamic_cast<CCardboardSubstrateSpecification*>(val);
-		append(istd::TSharedNullable<SubstrateSpecificationDocument>(*newItemPtr));
+		append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
 	}
 
 	if (item.canConvert<CPaperSubstrateSpecificationObject*>()){
 		CPaperSubstrateSpecificationObject* val = item.value<CPaperSubstrateSpecificationObject*>();
 		CPaperSubstrateSpecification* newItemPtr = dynamic_cast<CPaperSubstrateSpecification*>(val);
-		append(istd::TSharedNullable<SubstrateSpecificationDocument>(*newItemPtr));
+		append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
 	}
 
 	if (item.canConvert<CFilmSubstrateSpecificationObject*>()){
 		CFilmSubstrateSpecificationObject* val = item.value<CFilmSubstrateSpecificationObject*>();
 		CFilmSubstrateSpecification* newItemPtr = dynamic_cast<CFilmSubstrateSpecification*>(val);
-		append(istd::TSharedNullable<SubstrateSpecificationDocument>(*newItemPtr));
+		append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
 	}
 
 	ClearCache();

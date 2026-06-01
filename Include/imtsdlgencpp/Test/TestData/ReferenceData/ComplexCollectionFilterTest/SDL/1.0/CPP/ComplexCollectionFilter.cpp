@@ -3523,7 +3523,7 @@ void CComplexCollectionFilterObject::SetDistinctFields(const QVariant& v)
 		CComplexCollectionFilter::distinctFields->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TSharedNullable<QByteArray> value(tempValue.toUtf8());
+		istd::TNullableValue<QByteArray> value(tempValue.toUtf8());
 		CComplexCollectionFilter::distinctFields->append(value);
 	}
 
