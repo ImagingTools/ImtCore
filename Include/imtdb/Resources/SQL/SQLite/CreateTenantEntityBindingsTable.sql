@@ -9,7 +9,3 @@ CREATE TABLE IF NOT EXISTS "TenantEntityBindings"
     "Scope"           TEXT,
     UNIQUE ("TenantId", "EntityType", "EntityId")
 );
-CREATE INDEX IF NOT EXISTS "IX_TenantEntityBindings_TenantId"
-    ON "TenantEntityBindings" ("TenantId");
-CREATE INDEX IF NOT EXISTS "IX_TenantEntityBindings_Entity"
-    ON "TenantEntityBindings" ("EntityType", "EntityId");
