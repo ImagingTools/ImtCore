@@ -313,50 +313,53 @@ QByteArray CTenantDbDelegateComp::ExtractUserId(const iprm::IParamsSet* paramsPt
 QString CTenantDbDelegateComp::GetTenantRelationScopeSubquery(const QByteArray& userId) const
 {
 	QString tableName = qPrintable(*m_tableNameAttrPtr);
-
-	// For admin users (no userId), add NULL column so filters referencing it don't cause SQL errors
 	if (userId.isEmpty()){
 		return QString("SELECT *, NULL AS \"TenantRelationScope\" FROM \"%1\"").arg(tableName);
 	}
 
 	QString escapedUserId = imtdb::EscapeSql(QString::fromUtf8(userId));
+	const QByteArray driverId = m_databaseEngineCompPtr->GetDatabaseDriverId();
+	const bool isSQLite = (driverId == "QSQLITE");
+
+	// "TenantId"::uuid — PostgreSQL-only cast, SQLite stores UUID as TEXT
+	const QString tenantIdCast = isSQLite
+								 ? QString("\"TenantId\"")
+								 : QString("\"TenantId\"::uuid");
 
 	return QString(
-		"SELECT *, "
-		"CASE "
-		"WHEN \"CreatorId\"='%1' THEN 'Creator' "
-		"WHEN \"OwnerId\"='%1' THEN 'Owner' "
-		"WHEN \"Id\" IN (SELECT \"TenantId\" FROM \"TenantMemberships\" WHERE \"UserId\"='%1' AND \"IsActive\"=true) THEN 'Member' "
-		"WHEN \"Id\" IN (SELECT \"TenantId\"::uuid FROM \"TenantInvitations\" WHERE \"UserId\"='%1' AND \"Status\"=%2) THEN 'Invited' "
-		"ELSE NULL "
-		"END AS \"TenantRelationScope\" "
-		"FROM \"%3\"")
-		.arg(escapedUserId)
-		.arg(s_invitationStatusPending)
-		.arg(tableName);
+				"SELECT *, "
+				"CASE "
+				"WHEN \"CreatorId\"='%1' THEN 'Creator' "
+				"WHEN \"OwnerId\"='%1' THEN 'Owner' "
+				"WHEN \"Id\" IN (SELECT \"TenantId\" FROM \"TenantMemberships\" WHERE \"UserId\"='%1' AND \"IsActive\"=true) THEN 'Member' "
+				"WHEN \"Id\" IN (SELECT %2 FROM \"TenantInvitations\" WHERE \"UserId\"='%1' AND \"Status\"=%3) THEN 'Invited' "
+				"ELSE NULL "
+				"END AS \"TenantRelationScope\" "
+				"FROM \"%4\"")
+			.arg(escapedUserId)
+			.arg(tenantIdCast)
+			.arg(s_invitationStatusPending)
+			.arg(tableName);
 }
 
 
 QByteArray CTenantDbDelegateComp::GetSelectionQuery(
-		const QByteArray& objectId,
-		int offset,
-		int count,
-		const iprm::IParamsSet* paramsPtr) const
+			const QByteArray& objectId,
+			int offset,
+			int count,
+			const iprm::IParamsSet* paramsPtr) const
 {
-	// Single-object selection does not need the computed column
 	if (!objectId.isEmpty()){
 		return BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
 	}
 
 	QByteArray userId = ExtractUserId(paramsPtr);
-
 	if (count == 0){
 		return QByteArray();
 	}
 
 	QString sortQuery;
 	QString filterQuery;
-
 	istd::TOptDelPtr<const iprm::IParamsSet> selectionParamsPtr;
 	if (paramsPtr != nullptr){
 		selectionParamsPtr.SetPtr(paramsPtr, false);
@@ -391,12 +394,23 @@ QByteArray CTenantDbDelegateComp::GetSelectionQuery(
 	}
 
 	QString baseQuery = QString("SELECT * FROM (%1) AS _t").arg(GetTenantRelationScopeSubquery(userId));
-
-	// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
-	QString retVal = "(" + baseQuery;
-	retVal += QString(" ") + filterQuery;
-	retVal += QString(" ") + qPrintable(paginationQuery) + ")";
-	retVal += QString(" ") + sortQuery;
+	const QByteArray driverId = m_databaseEngineCompPtr->GetDatabaseDriverId();
+	const bool isSQLite = (driverId == "QSQLITE");
+	QString retVal;
+	if (isSQLite){
+		// SQLite does not support parentheses around a top-level SELECT statement
+		retVal = baseQuery;
+		retVal += QString(" ") + filterQuery;
+		retVal += QString(" ") + sortQuery;
+		retVal += QString(" ") + qPrintable(paginationQuery);
+	}
+	else{
+		// PostgreSQL: wrap in parens as workaround for Qt bug with '%<NUMBER>%' pattern
+		retVal = "(" + baseQuery;
+		retVal += QString(" ") + filterQuery;
+		retVal += QString(" ") + qPrintable(paginationQuery) + ")";
+		retVal += QString(" ") + sortQuery;
+	}
 
 	return retVal.toUtf8();
 }

@@ -9,7 +9,3 @@ CREATE TABLE IF NOT EXISTS "TenantMemberships"
     "UpdatedAt"   TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY ("TenantId") REFERENCES "Tenants" ("Id") ON DELETE CASCADE
 );
-CREATE UNIQUE INDEX IF NOT EXISTS "UQ_TenantMemberships_User_Tenant" ON "TenantMemberships" ("UserId", "TenantId");
-CREATE INDEX IF NOT EXISTS "IX_TenantMemberships_UserId" ON "TenantMemberships" ("UserId");
-CREATE INDEX IF NOT EXISTS "IX_TenantMemberships_TenantId" ON "TenantMemberships" ("TenantId");
-CREATE INDEX IF NOT EXISTS "IX_TenantMemberships_Role" ON "TenantMemberships" ("Role");
