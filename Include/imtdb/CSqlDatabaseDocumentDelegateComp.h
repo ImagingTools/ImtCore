@@ -63,6 +63,9 @@ public:
 		I_ASSIGN(m_sqlJsonXPathExtractorCompPtr, "SqlJsonXPathExtractor", "SQL json X-Path extractor", false, "SqlJsonXPathExtractor");
 	I_END_COMPONENT
 
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 	virtual QByteArray GetCountQuery(const iprm::IParamsSet* paramsPtr = nullptr) const override;
 	virtual QByteArray GetObjectIdFromRecord(const QSqlRecord& record) const override;
@@ -167,6 +170,7 @@ protected:
 	virtual QString GetBaseSelectionQuery() const override;
 	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const override;
 	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
+	virtual bool CreatePaginationQuery(int offset, int count, QByteArray& paginationQuery) const override;
 	virtual bool CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 	virtual bool CreateSortQuery(const imtbase::ICollectionFilter& collectionFilter, QString& sortQuery) const override;
 	virtual bool CreateSortQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& sortQuery) const override;
@@ -185,6 +189,7 @@ protected:
 	virtual bool CreateDocumentCollectionFilterQuery(const imtcol::IDocumentCollectionFilter& documentCollectionFilter, QString& documentFilterQuery) const;
 	virtual bool CreateDocumentIdFilterQuery(const imtcol::IDocumentIdFilter& documentIdFilter, QString& documentIdFilterQuery) const;
 	bool IsArrayOperation(const QString& query, const QString& field) const;
+	bool IsSQLite() const;
 
 protected:
 	I_ATTR(bool, m_useDataMetaInfoAttrPtr);
