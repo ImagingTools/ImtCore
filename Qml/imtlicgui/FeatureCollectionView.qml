@@ -51,48 +51,7 @@ RemoteCollectionView {
 					typeId: "Feature";
 				}
 			}
-			
-			commandsDelegateComp: Component {ViewCommandsDelegateBase {
-					view: featureEditor;
-					onCommandActivated: {
-						let selectedIndex = null;
-						if (featureEditor.tableView.tableSelection.items.length > 0){
-							selectedIndex = featureEditor.tableView.tableSelection.items[0];
-						}
-						
-						if (commandId === "InsertFeature"){
-							if (!featureEditor.featureData.hasSubFeatures()){
-								featureEditor.featureData.emplaceSubFeatures()
-							}
-
-							let childModel = featureEditor.featureData.m_subFeatures;
-							if (selectedIndex != null){
-								if (!selectedIndex.itemData.hasSubFeatures()){
-									selectedIndex.itemData.emplaceSubFeatures()
-								}
-								childModel = selectedIndex.itemData.m_subFeatures;
-							}
-							let newFeatureData = featureDataComp.createObject(childModel)
-							newFeatureData.m_isPermission = true;
-							newFeatureData.m_featureName = qsTr("Feature Name");
-							childModel.addElement(newFeatureData)
-							featureEditor.model.modelChanged([])
-						}
-						else if (commandId === "RemoveFeature"){
-							if (selectedIndex != null){
-								let parentModel = featureEditor.featureData.m_subFeatures;
-								if (selectedIndex.parentIndex != null){
-									parentModel = selectedIndex.parentIndex.itemData.m_subFeatures;
-								}
-								
-								parentModel.remove(selectedIndex.index);
-								
-								featureEditor.model.modelChanged([])
-							}
-						}
-					}
-				}
-			}
+			// commandsDelegateComp is now defined inside FeatureEditor itself.
 		}
 	}
 	

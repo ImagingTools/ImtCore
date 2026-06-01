@@ -5,10 +5,16 @@ import com.imtcore.imtqml 1.0
 Rectangle{
     id: scrollContainer;
 
-    height: targetItem && vertical ? targetItem.height : !decorator_ ? secondSize : secondSizeDecorator;
-    width: targetItem && !vertical ? targetItem.width : !decorator_ ? secondSize : secondSizeDecorator;
+    height: targetItem && vertical ? targetItem.height : _crossSize;
+    width: targetItem && !vertical ? targetItem.width : _crossSize;
     color: backgroundColor;
 	radius: Style.radiusXS;
+
+    // Cross-axis size: use decorator's implicit size (not its actual size
+    // which would loop through parent binding). Falls back to secondSize.
+    property real _crossSize: !decorator_ ? secondSize
+                              : (vertical ? (decorator_.implicitWidth > 0 ? decorator_.implicitWidth : secondSize)
+                                          : (decorator_.implicitHeight > 0 ? decorator_.implicitHeight : secondSize))
 
 	visible: vertical ? targetItem.contentHeight - allowableGapVert > scrollContainer.height : targetItem.contentWidth - allowableGapHor > scrollContainer.width;
 

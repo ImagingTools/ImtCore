@@ -43,28 +43,58 @@ ViewBase {
     }
 
     function updateHeaders(){
-        productViewContainer.softwareHeadersModel.clear();
-
-        let index = productViewContainer.softwareHeadersModel.insertNewItem();
-        productViewContainer.softwareHeadersModel.setData("id", "featureName", index);
-        productViewContainer.softwareHeadersModel.setData("name", qsTr("Feature Name"), index);
-
-        index = productViewContainer.softwareHeadersModel.insertNewItem();
-        productViewContainer.softwareHeadersModel.setData("id", "featureId", index);
-        productViewContainer.softwareHeadersModel.setData("name", qsTr("Feature-ID"), index);
-
-        index = productViewContainer.softwareHeadersModel.insertNewItem();
-        productViewContainer.softwareHeadersModel.setData("id", "featureDescription", index);
-        productViewContainer.softwareHeadersModel.setData("name", qsTr("Description"), index);
-
-        productViewContainer.softwareHeadersModel.refresh();
-
-        tableView_.columnModel = productViewContainer.softwareHeadersModel;
+        tableView_.columns = __buildColumns();
     }
 
-    property TreeItemModel softwareHeadersModel: TreeItemModel {
-        Component.onCompleted: {
-            productViewContainer.updateHeaders();
+    function __buildColumns() {
+        return [
+            { id: "featureName", name: qsTr("Feature Name"), tree: true, editable: false },
+            { id: "featureId", name: qsTr("Feature-ID"), tree: false, editable: false },
+            { id: "description", name: qsTr("Description"), tree: false, editable: false }
+        ]
+    }
+
+    function __buildFeaturesTreeModel() {
+        if (!productViewContainer.productFeaturesViewModel)
+            return [];
+
+        return TreeModelBuilder.fromTreeItemModelByFields(productViewContainer.productFeaturesViewModel, {
+            key: FeatureItemTypeMetaInfo.s_id,
+            children: FeatureItemTypeMetaInfo.s_subFeatures,
+            checkable: FeatureItemTypeMetaInfo.s_optional,
+            columns: {
+                id: FeatureItemTypeMetaInfo.s_id,
+                featureName: FeatureItemTypeMetaInfo.s_featureName,
+                featureId: FeatureItemTypeMetaInfo.s_featureId,
+                description: FeatureItemTypeMetaInfo.s_description,
+                optional: FeatureItemTypeMetaInfo.s_optional
+            }
+        });
+    }
+
+    // Initializes the check state of optional feature nodes from the product's
+    // stored composite ids ("<rootFeatureUuid>/<featureId>").
+    function __applyOptionalSelection() {
+        let nodes = tableView_.allNodes();
+        for (let i = 0; i < nodes.length; ++i) {
+            let node = nodes[i];
+            if (!node.data || node.data[FeatureItemTypeMetaInfo.s_optional] !== true)
+                continue;
+
+            let rootKey = node.key;
+            let parentKey = node.parentKey;
+            while (parentKey && parentKey !== "") {
+                rootKey = parentKey;
+                let parentNode = tableView_.nodeForKey(parentKey);
+                parentKey = parentNode ? parentNode.parentKey || "" : "";
+            }
+
+            let rootNode = tableView_.nodeForKey(rootKey);
+            let rootUuid = rootNode && rootNode.data ? rootNode.data[FeatureItemTypeMetaInfo.s_id] || "" : "";
+            let compositeId = rootUuid + "/" + (node.data[FeatureItemTypeMetaInfo.s_featureId] || "");
+
+            let checked = tableView_.selectedOptionalFeatures.indexOf(compositeId) >= 0;
+            tableView_.setCheckStateSilent(node.key, checked ? Qt.Checked : Qt.Unchecked);
         }
     }
 
@@ -100,15 +130,15 @@ ViewBase {
 
     function updateFeaturesGui(){
         productViewContainer.productFeaturesViewModel.clear();
+        tableView_.selectedOptionalFeatures = [];
 
         let features = productData.m_features;
         if (!features){
+            tableView_.model = [];
             return;
         }
 
         let featureIds = features.split(';')
-
-        tableView_.selectedOptionalFeatures = [];
 
         for (let featureId of featureIds){
             if (featureId.includes('/')){
@@ -125,8 +155,9 @@ ViewBase {
             }
         }
 
-        tableView_.rowModel = 0;
-        tableView_.rowModel = productViewContainer.productFeaturesViewModel;
+        tableView_.model = __buildFeaturesTreeModel();
+        tableView_.expandAll();
+        __applyOptionalSelection();
     }
 
     function addFeature(featureId){
@@ -269,65 +300,67 @@ ViewBase {
         anchors.top: headerPanel.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left;
-        anchors.right: parent.right;
-
-        // readOnly: productViewContainer.readOnly;
+        anchors.right: scrollbar_.left;
 
         tristate: true;
+
+        columns: productViewContainer.__buildColumns()
 
         property var selectedOptionalFeatures: [];
 
         Component.onCompleted: {
             let ok = PermissionsController.checkPermission("ChangeProduct");
-            tableView_.readOnly = !ok;
+            tableView_.editable = ok;
         }
 
-        // rowDelegate: Component {
-        //     TreeViewItemDelegateBase {
-        //         id: delegate;
-        //         root: tableView_;
-        //         isCheckable: model.Optional ? model.Optional : false;
-        //         childModelKey: FeatureItemTypeMetaInfo.s_subFeatures;
+        onCheckStateChanged: {
+            let node = index;
+            if (!node || !node.data) return;
 
-        //         onRootDelegateChanged: {
-        //             if (delegate.rootDelegate !== null){
-        //                 let featureId = model.FeatureId;
-        //                 let rootFeatureUuid = delegate.rootDelegate.itemData.id;
+            let featureId = node.data[FeatureItemTypeMetaInfo.s_featureId] || "";
+            if (featureId === "") return;
 
-        //                 let id = rootFeatureUuid + "/" + featureId;
+            // Resolve the top-level ancestor's uuid to build the composite id.
+            let rootKey = node.key;
+            let parentKey = node.parentKey;
+            while (parentKey && parentKey !== "") {
+                rootKey = parentKey;
+                let parentNode = tableView_.nodeForKey(parentKey);
+                parentKey = parentNode ? parentNode.parentKey || "" : "";
+            }
 
-        //                 if (tableView_.selectedOptionalFeatures.includes(id)){
-        //                     delegate.checkState = Qt.Checked;
-        //                 }
-        //             }
-        //         }
+            let rootNode = tableView_.nodeForKey(rootKey);
+            let rootFeatureUuid = rootNode && rootNode.data ? rootNode.data[FeatureItemTypeMetaInfo.s_id] || "" : "";
 
-        //         onCheckStateChanged: {
-        //             let featureId = model.FeatureId;
-        //             let rootFeatureUuid = delegate.rootDelegate.itemData.id;
+            let compositeId = rootFeatureUuid + "/" + featureId;
 
-        //             let id = rootFeatureUuid + "/" + featureId;
+            // Read the current state live so check/uncheck stays consistent
+            // even when selectedOptionalFeatures has not been rebuilt yet.
+            let features = productViewContainer.productData.m_features;
+            let featureIds = features !== "" ? features.split(';') : [];
 
-        //             let features = productViewContainer.productData.m_features;
+            if (state === Qt.Checked) {
+                if (!featureIds.includes(compositeId))
+                    productViewContainer.addFeature(compositeId);
+            } else if (state === Qt.Unchecked) {
+                if (featureIds.includes(compositeId))
+                    productViewContainer.removeFeature(compositeId);
+            }
 
-        //             let featureIds = []
-        //             if (features !== ""){
-        //                 featureIds = features.split(';')
-        //             }
+            tableView_.selectedOptionalFeatures =
+                productViewContainer.productData.m_features !== ""
+                    ? productViewContainer.productData.m_features.split(';')
+                    : [];
+        }
+    }
 
-        //             if (checkState == Qt.Checked){
-        //                 if (!featureIds.includes(id)){
-        //                     productViewContainer.addFeature(id);
-        //                 }
-
-        //             }
-        //             else if (checkState == Qt.Unchecked){
-        //                 if (featureIds.includes(id)){
-        //                     productViewContainer.removeFeature(id);
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+    CustomScrollbar {
+        id: scrollbar_;
+        z: parent.z + 1;
+        anchors.right: parent.right;
+        anchors.top: tableView_.top;
+        anchors.bottom: tableView_.bottom;
+        secondSize: Style.marginM;
+        targetItem: tableView_.contentListView;
     }
 }

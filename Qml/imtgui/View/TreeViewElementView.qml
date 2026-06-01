@@ -107,26 +107,17 @@ ElementView {
             Item {
                 id: treeContainer
                 width: parent.width
-                height: Math.min(checkableTree.height, root.maxTreeHeight)
+                height: Math.min(checkableTree.contentHeight, root.maxTreeHeight)
 
-                Flickable {
-                    id: flickable
+                BasicTreeView {
+                    id: checkableTree
                     anchors.fill: parent
+                    anchors.rightMargin: scrollbar.visible ? scrollbar.width : 0
 
-                    contentWidth: width
-                    contentHeight: checkableTree.height
-                    clip: true
-
-                    BasicTreeView {
-                        id: checkableTree
-                        width: flickable.width - (scrollbar.visible ? scrollbar.width : 0)
-
-                        flickable: flickable
-                        showHeader: false
-                        tristate: true
-                        Component.onCompleted: {
-                            root.treeView = checkableTree
-                        }
+                    showHeader: false
+                    tristate: true
+                    Component.onCompleted: {
+                        root.treeView = checkableTree
                     }
                 }
 
@@ -137,7 +128,7 @@ ElementView {
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
                     secondSize: Style.marginM
-                    targetItem: flickable
+                    targetItem: checkableTree.contentListView
                     radius: Style.radiusS
                 }
             }

@@ -89,13 +89,13 @@ class ListView extends Flickable {
     }
 
     itemAtIndex(index) {
-        return index >= 0 && index < this.__items.length.get() ? this.__items[index] : undefined
+        return index >= 0 && index < this.__items.length ? this.__items[index] : undefined
     }
     positionViewAtBeginning() {
         this.positionViewAtIndex(0, ListView.Beginning)
     }
     positionViewAtEnd() {
-        this.positionViewAtIndex(this.__items.length.get() - 1, ListView.Beginning)
+        this.positionViewAtIndex(this.__items.length - 1, ListView.Beginning)
 
 
     }

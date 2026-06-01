@@ -227,7 +227,7 @@ RemoteCollectionView {
 				y: scopeLabel.y + scopeLabel.height + Style.spacingS
 				width: invitationPopupContent.width + 2 * Style.marginL
 				height: invitationPopupContent.height + 2 * Style.marginL
-				closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+				closePolicy: Enums.popupCloseOnEscape | Enums.popupCloseOnPressOutside
 
 				background: Rectangle {
 					color: Style.baseColor
