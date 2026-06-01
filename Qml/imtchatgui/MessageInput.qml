@@ -98,11 +98,11 @@ Rectangle {
 					}
 
 					// Check for @ or # trigger
-					let cursor = text.lastIndexOf('@', cursorPosition - 1);
-					let hashCursor = text.lastIndexOf('#', cursorPosition - 1);
+					let cursor = text.lastIndexOf('@', textField.cursorPosition - 1);
+					let hashCursor = text.lastIndexOf('#', textField.cursorPosition - 1);
 					let triggerPos = Math.max(cursor, hashCursor);
-					if (triggerPos >= 0 && cursorPosition - triggerPos <= 20) {
-						entitySearchPopup.searchQuery = text.substring(triggerPos + 1, cursorPosition);
+					if (triggerPos >= 0 && textField.cursorPosition - triggerPos <= 20) {
+						entitySearchPopup.searchQuery = text.substring(triggerPos + 1, textField.cursorPosition);
 						entitySearchPopup.triggerChar = text[triggerPos];
 						entitySearchPopup.triggerPos = triggerPos;
 						entitySearchPopup.open();

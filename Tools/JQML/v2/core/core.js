@@ -373,16 +373,6 @@ global.JQModules = {
         TextEdit: __components.TextEdit,
     },
     QtQuick_Controls: {
-        Action: __components.Action,
-        Menu: __components.Menu,
-        MenuItem: __components.MenuItem,
-        MenuSeparator: __components.MenuSeparator,
-        MenuBar: __components.MenuBar,
-        MenuBarItem: __components.MenuBarItem,
-        Popup: __components.Popup,
-        Overlay: __components.Overlay,
-        ToolTip: __components.ToolTip,
-        Drawer: __components.Drawer,
     },
     QtQuick_Layouts: {
         ColumnLayout: __components.ColumnLayout,

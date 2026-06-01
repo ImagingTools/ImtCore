@@ -1,5 +1,4 @@
 import QtQuick 2.12
-import QtQuick.Controls
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
@@ -147,26 +146,25 @@ Item {
 		}
 	}
 
+
+	
 	Menu {
 		id: menu
 		x: loginButton.x - menu.width
 		y: loginButton.y + loginButton.height + Style.spacingM
-		closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
-		font.pixelSize: Style.fontSizeM
-		font.family: Style.fontFamily
+		closePolicy: Enums.popupCloseOnEscape | Enums.popupCloseOnPressOutsideParent
+
 		MenuItem {
+			id: profileItem
 			text: qsTr("Profile")
-			icon.source: "qrc:/" + Style.getIconPath("Icons/Account", Icon.State.On, Icon.Mode.Normal)
+			iconSource: "qrc:/" + Style.getIconPath("Icons/Account", Icon.State.On, Icon.Mode.Normal)
 			onTriggered: {
 				ModalDialogManager.openDialog(profileViewComp, {})
 			}
 		}
-
 		Menu {
 			id: organizationsSubmenu
 			title: qsTr("Organization")
-			font.pixelSize: Style.fontSizeM
-			font.family: Style.fontFamily
 			Instantiator {
 				model: root.__organizationsList.length
 
@@ -205,7 +203,7 @@ Item {
 		MenuSeparator {}
 		MenuItem {
 			text: qsTr("Logout")
-			icon.source: "qrc:/" + Style.getIconPath("Icons/Exit", Icon.State.On, Icon.Mode.Normal)
+			iconSource: "qrc:/" + Style.getIconPath("Icons/Exit", Icon.State.On, Icon.Mode.Normal)
 			onTriggered: {
 				AuthorizationController.logout()
 			}

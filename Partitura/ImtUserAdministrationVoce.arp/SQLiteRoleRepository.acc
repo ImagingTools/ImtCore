@@ -49,7 +49,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="RoleDatabaseDelegate" PackageId="ImtAuthDbPck" ComponentId="SqliteJsonRoleDatabaseDelegate">
+        <Element Id="RoleDatabaseDelegate" PackageId="ImtAuthDbPck" ComponentId="SqlJsonRoleDatabaseDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="AutoCreateTable" Type="Boolean" ExportId="">

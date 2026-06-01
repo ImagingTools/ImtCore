@@ -33,10 +33,13 @@ ViewBase {
 				return {
 					key: perm ? (perm.m_id || "") : "",
 					text: perm ? (perm.m_name || "") : "",
-					description: perm ? (perm.m_description || "") : "",
 					checkable: true,
 					expanded: true,
-					data: { FeatureId: perm ? (perm.m_id || "") : "" }
+					data: {
+						FeatureId: perm ? (perm.m_id || "") : "",
+						name: perm ? (perm.m_name || "") : "",
+						description: perm ? (perm.m_description || "") : ""
+					}
 				}
 			},
 			function(item, index) {
@@ -237,9 +240,10 @@ ViewBase {
 		anchors.rightMargin: Style.marginXL
 		showHeader: true
 		columns: [
-			{ name: "name", title: qsTr("Permission"), display: "text", tree: true },
-			{ name: "description", title: qsTr("Description"), display: "description", tree: false }
+			{ id: "name", name: qsTr("Permission"), tree: true },
+			{ id: "description", name: qsTr("Description"), tree: false }
 		]
+		filterRole: ["name", "description"]
 
 		onCheckedItemsChanged: permissionsPage.doUpdateModel()
 	}

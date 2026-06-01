@@ -173,7 +173,7 @@ Rectangle {
 					spacing: Style.paddingL
 					Text { text: qsTr("Type:"); font.pixelSize: Style.fontSizeXS; color: Style.textSecondaryColor; width: 100 }
 					Text {
-						text: ticketTypeLabel(ticketViewRoot.ticketType)
+						text: ticketViewRoot.ticketTypeLabel(ticketViewRoot.ticketType)
 						font.pixelSize: Style.fontSizeXS
 						color: Style.textPrimaryColor
 					}
