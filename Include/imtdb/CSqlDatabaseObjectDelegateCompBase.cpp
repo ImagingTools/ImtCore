@@ -159,11 +159,25 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 
 	QString baseSelelectionQuery = GetBaseSelectionQuery();
 
-	// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
-	QString retVal = "(" + baseSelelectionQuery;
-	retVal += QString(" ") + filterQuery;
-	retVal += QString(" ") + qPrintable(paginationQuery) + ")";
-	retVal += QString(" ") + sortQuery;
+	// SQLite does not support a top-level parenthesized SELECT statement, so skip the
+	// Qt '%<NUMBER>%' bug workaround wrapping on SQLite — it only affects Postgres drivers.
+	const bool isSQLite = m_databaseEngineCompPtr.IsValid() &&
+						  m_databaseEngineCompPtr->GetDatabaseDriverId() == "QSQLITE";
+
+	QString retVal;
+	if (isSQLite){
+		retVal = baseSelelectionQuery;
+		retVal += QString(" ") + filterQuery;
+		retVal += QString(" ") + sortQuery;
+		retVal += QString(" ") + qPrintable(paginationQuery);
+	}
+	else{
+		// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
+		retVal = "(" + baseSelelectionQuery;
+		retVal += QString(" ") + filterQuery;
+		retVal += QString(" ") + qPrintable(paginationQuery) + ")";
+		retVal += QString(" ") + sortQuery;
+	}
 
 	return retVal.toUtf8();
 }
@@ -399,7 +413,14 @@ bool CSqlDatabaseObjectDelegateCompBase::CreatePaginationQuery(int offset, int c
 	paginationQuery.clear();
 
 	if (offset >= 0 && count > 0){
-		paginationQuery = QStringLiteral("OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY").arg(offset).arg(count).toUtf8();
+		const bool isSQLite = m_databaseEngineCompPtr.IsValid() &&
+							  m_databaseEngineCompPtr->GetDatabaseDriverId() == "QSQLITE";
+		if (isSQLite){
+			paginationQuery = QString("LIMIT %1 OFFSET %2").arg(count).arg(offset).toUtf8();
+		}
+		else{
+			paginationQuery = QStringLiteral("OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY").arg(offset).arg(count).toUtf8();
+		}
 	}
 
 	return true;
