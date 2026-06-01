@@ -16,19 +16,19 @@
 namespace imtqml2d
 {
 
-class CQmlRectangleShape: public sdl::imtsdl2d::imt2d::CRectangle2d, public imod::TSingleModelObserverBase<i2d::CRectangle>
+class CQmlRectangleShape: public sdl::V1_0::imtsdl2d::CRectangle2d, public imod::TSingleModelObserverBase<i2d::CRectangle>
 {
 	Q_OBJECT
 
 public:
 	typedef imod::CSingleModelObserverBase BaseClass;
-	typedef sdl::imtsdl2d::imt2d::CRectangle2d BaseClass2;
+	typedef sdl::V1_0::imtsdl2d::CRectangle2d BaseClass2;
 
 	[[nodiscard]] bool IsValid() const;
 
 public:
-	virtual void SetTopLeft(sdl::imtsdl2d::imt2d::CPoint2d newTopLeft) override;
-	virtual void SetBottomRight(sdl::imtsdl2d::imt2d::CPoint2d newBottomRight) override;
+	virtual void SetTopLeft(sdl::V1_0::imtsdl2d::CPoint2d newTopLeft) override;
+	virtual void SetBottomRight(sdl::V1_0::imtsdl2d::CPoint2d newBottomRight) override;
 
 protected:
 	// reimplemented (imod::TSingleModelObserverBase)

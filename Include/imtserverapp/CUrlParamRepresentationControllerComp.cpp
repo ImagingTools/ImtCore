@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtserverapp/CUrlParamRepresentationControllerComp.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Settings.h>
 
 
 // ImtCore includes
@@ -12,11 +13,11 @@ namespace imtserverapp
 
 // protected methods
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CUrlParam::V1_0>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CUrlParam>)
 
 QByteArray CUrlParamRepresentationControllerComp::GetTypeId() const
 {
-	return sdl::imtbase::ImtBaseTypes::CParamTypeIds::V1_0::ParamTypeIdsFields::UrlParam.toUtf8();
+	return sdl::V1_0::imtbase::CParamTypeIds::ParamTypeIdsFields::UrlParam.toUtf8();
 }
 
 
@@ -28,7 +29,7 @@ bool CUrlParamRepresentationControllerComp::IsModelSupported(const istd::IChange
 
 
 bool CUrlParamRepresentationControllerComp::GetSdlRepresentationFromDataModel(
-			sdl::imtbase::ImtBaseTypes::CUrlParam::V1_0& sdlRepresentation,
+			sdl::V1_0::imtbase::CUrlParam& sdlRepresentation,
 			const istd::IChangeable& dataModel,
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
@@ -51,7 +52,7 @@ bool CUrlParamRepresentationControllerComp::GetSdlRepresentationFromDataModel(
 
 bool CUrlParamRepresentationControllerComp::GetDataModelFromSdlRepresentation(
 			istd::IChangeable& dataModel,
-			const sdl::imtbase::ImtBaseTypes::CUrlParam::V1_0& sdlRepresentation) const
+			const sdl::V1_0::imtbase::CUrlParam& sdlRepresentation) const
 {
 	imtbase::IUrlParam* urlParamPtr = dynamic_cast<imtbase::IUrlParam*>(&dataModel);
 	Q_ASSERT(urlParamPtr != nullptr);

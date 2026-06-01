@@ -38,8 +38,8 @@ public:
 	virtual bool GetUserAuthSystem(const QByteArray& login, imtauth::IUserInfo::SystemInfo& systemInfo) const override;
 
 private:
-	bool GetUserDataSdl(const QByteArray& userId, sdl::imtauth::Users::CUserData::V1_0& userData) const;
-	bool SetUserDataSdl(const QByteArray& userId, const sdl::imtauth::Users::CUserData::V1_0& userData) const;
+	bool GetUserDataSdl(const QByteArray& userId, sdl::V1_0::imtauth::CUserData& userData) const;
+	bool SetUserDataSdl(const QByteArray& userId, const sdl::V1_0::imtauth::CUserData& userData) const;
 
 private:
 	I_FACT(imtauth::IUserInfo, m_userFactoryCompPtr);

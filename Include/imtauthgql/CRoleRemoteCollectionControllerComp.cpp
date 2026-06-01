@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtlic/IFeatureInfo.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 
 
 namespace imtauthgql
@@ -50,25 +51,20 @@ QString CRoleRemoteCollectionControllerComp::GetPermissionName(const QByteArray&
 
 // reimplemented (imtclientgql::CRemoteObjectCollectionControllerComp)
 
-sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CRoleRemoteCollectionControllerComp::OnGetElementMetaInfo(
-			const sdl::imtbase::ImtCollection::CGetElementMetaInfoGqlRequest& getElementMetaInfoRequest,
+sdl::V1_0::imtbase::CGetElementMetaInfoPayload CRoleRemoteCollectionControllerComp::OnGetElementMetaInfo(
+			const sdl::V1_0::imtbase::CGetElementMetaInfoGqlRequest& getElementMetaInfoRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload payload = BaseClass::OnGetElementMetaInfo(getElementMetaInfoRequest, gqlRequest, errorMessage);
+	sdl::V1_0::imtbase::CGetElementMetaInfoPayload payload = BaseClass::OnGetElementMetaInfo(getElementMetaInfoRequest, gqlRequest, errorMessage);
 	if (!errorMessage.isEmpty()){
 		return payload;
 	}
 
-	if (!payload.Version_1_0.HasValue()){
-		Q_ASSERT(false);
-		return payload;
-	}
-
-	if (payload.Version_1_0->elementMetaInfo.HasValue() && payload.Version_1_0->elementMetaInfo->infoParams.HasValue()){
-		imtsdl::TElementList<sdl::imtbase::ImtBaseTypes::CParameter::V1_0> infoParams = *payload.Version_1_0->elementMetaInfo->infoParams;
-		QList<sdl::imtbase::ImtBaseTypes::CParameter::V1_0> paramList = infoParams.ToList();
-		for (sdl::imtbase::ImtBaseTypes::CParameter::V1_0& parameter : paramList){
+	if (payload.elementMetaInfo.HasValue() && payload.elementMetaInfo->infoParams.HasValue()){
+		imtsdl::TElementList<sdl::V1_0::imtbase::CParameter> infoParams = *payload.elementMetaInfo->infoParams;
+		QList<sdl::V1_0::imtbase::CParameter> paramList = infoParams.ToList();
+		for (sdl::V1_0::imtbase::CParameter& parameter : paramList){
 			if (parameter.id == QByteArrayLiteral("Permissions")){
 				QString newData;
 				QString data = *parameter.data;

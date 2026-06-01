@@ -15,89 +15,76 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (CGraphQlHandlerCompBase)
+// reimplemented (CRoleCollectionDocumentServiceGqlHandlerCompBase)
 
-sdl::imtauth::Roles::CRoleData CRoleCollectionDocumentServiceComp::OnGetRoleRepresentation(
-		const sdl::imtauth::RoleCollectionDocumentService::CGetRoleRepresentationGqlRequest& getRoleRepresentationRequest,
+sdl::V1_0::imtauth::CRoleData CRoleCollectionDocumentServiceComp::OnGetRoleRepresentation(
+		const sdl::V1_0::imtauth::CGetRoleRepresentationGqlRequest& getRoleRepresentationRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
-	sdl::imtauth::RoleCollectionDocumentService::GetRoleRepresentationRequestArguments arguments = getRoleRepresentationRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtauth::Roles::CRoleData();
-	}
-
+	sdl::V1_0::imtauth::GetRoleRepresentationRequestArguments arguments = getRoleRepresentationRequest.GetRequestedArguments();
 	QByteArray userId = GetUserId(gqlRequest);
 
 	QByteArray objectId;
-	if (arguments.input.Version_1_0->id){
-		objectId = *arguments.input.Version_1_0->id;
+	if (arguments.input && arguments.input->id){
+		objectId = *arguments.input->id;
 	}
 
 	if (objectId.isEmpty()){
 		errorMessage = QStringLiteral("Missing document ID");
-		return sdl::imtauth::Roles::CRoleData();
+		return sdl::V1_0::imtauth::CRoleData();
 	}
 
 	istd::IChangeableSharedPtr documentPtr;
 	m_documentManagerCompPtr->GetDocumentData(userId, objectId, documentPtr);
 	if (!documentPtr.IsValid()){
 		errorMessage = QStringLiteral("Document not found");
-		return sdl::imtauth::Roles::CRoleData();
+		return sdl::V1_0::imtauth::CRoleData();
 	}
 
 	const imtauth::CIdentifiableRoleInfo* rolePtr = dynamic_cast<const imtauth::CIdentifiableRoleInfo*>(documentPtr.GetPtr());
 	if (rolePtr == nullptr){
 		errorMessage = QStringLiteral("Invalid document type");
-		return sdl::imtauth::Roles::CRoleData();
+		return sdl::V1_0::imtauth::CRoleData();
 	}
 
-	sdl::imtauth::Roles::CRoleData response;
-	response.Version_1_0.Emplace();
+	sdl::V1_0::imtauth::CRoleData response;
+	response.id = rolePtr->GetObjectUuid();
+	response.name = rolePtr->GetRoleName();
+	response.description = rolePtr->GetRoleDescription();
+	response.roleId = rolePtr->GetRoleId();
+	response.productId = rolePtr->GetProductId();
+	response.isDefault = rolePtr->IsDefault();
+	response.isGuest = rolePtr->IsGuest();
 
-	response.Version_1_0->id = rolePtr->GetObjectUuid();
-	response.Version_1_0->name = rolePtr->GetRoleName();
-	response.Version_1_0->description = rolePtr->GetRoleDescription();
-	response.Version_1_0->roleId = rolePtr->GetRoleId();
-	response.Version_1_0->productId = rolePtr->GetProductId();
-	response.Version_1_0->isDefault = rolePtr->IsDefault();
-	response.Version_1_0->isGuest = rolePtr->IsGuest();
-
-	response.Version_1_0->parentRoles.Emplace();
+	response.parentRoles.Emplace();
 	QByteArrayList includedRoles = rolePtr->GetIncludedRoles();
 	for (const QByteArray& parentRoleId : includedRoles){
-		response.Version_1_0->parentRoles->push_back(parentRoleId);
+		response.parentRoles->push_back(parentRoleId);
 	}
 
 	// permissions is a flat ID-list of local permissions joined with the
 	// schema-defined separator (kept as a single string field for parity
 	// with the existing RoleData representation).
 	QByteArrayList localPermissions = rolePtr->GetLocalPermissions();
-	response.Version_1_0->permissions = localPermissions.join(';');
+	response.permissions = localPermissions.join(';');
 
 	return response;
 }
 
 
-sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CRoleCollectionDocumentServiceComp::OnUpdateRoleFromRepresentation(
-		const sdl::imtauth::RoleCollectionDocumentService::CUpdateRoleFromRepresentationGqlRequest& updateRoleFromRepresentationRequest,
+sdl::V1_0::imtbase::CDocumentOperationStatus CRoleCollectionDocumentServiceComp::OnUpdateRoleFromRepresentation(
+		const sdl::V1_0::imtauth::CUpdateRoleFromRepresentationGqlRequest& updateRoleFromRepresentationRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
-	sdl::imtauth::RoleCollectionDocumentService::UpdateRoleFromRepresentationRequestArguments arguments = updateRoleFromRepresentationRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus();
-	}
-
-	sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus response;
-	response.Version_1_0.Emplace();
-	response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::Failed;
+	sdl::V1_0::imtauth::UpdateRoleFromRepresentationRequestArguments arguments = updateRoleFromRepresentationRequest.GetRequestedArguments();
+	sdl::V1_0::imtbase::CDocumentOperationStatus response;
+	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
 
 	QByteArray documentId;
-	if (arguments.input.Version_1_0->documentId){
-		documentId = *arguments.input.Version_1_0->documentId;
+	if (arguments.input->documentId){
+		documentId = *arguments.input->documentId;
 	}
 
 	if (documentId.isEmpty()){
@@ -110,19 +97,19 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CRoleCollectio
 	istd::IChangeableSharedPtr documentPtr;
 	m_documentManagerCompPtr->GetDocumentData(userLogin, documentId, documentPtr);
 	if (!documentPtr.IsValid()){
-		response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::InvalidDocumentId;
+		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
 
 	imtauth::CIdentifiableRoleInfo* rolePtr = dynamic_cast<imtauth::CIdentifiableRoleInfo*>(documentPtr.GetPtr());
 	if (rolePtr == nullptr){
-		response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::InvalidDocumentId;
+		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
 
-	sdl::imtauth::Roles::CRoleData::V1_0 roleData;
-	if (arguments.input.Version_1_0->role){
-		roleData = *arguments.input.Version_1_0->role;
+	sdl::V1_0::imtauth::CRoleData roleData;
+	if (arguments.input->role){
+		roleData = *arguments.input->role;
 	}
 
 	if (roleData.id){
@@ -172,7 +159,7 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CRoleCollectio
 
 	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr);
 
-	response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::Success;
+	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 
 	return response;
 }

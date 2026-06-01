@@ -5,7 +5,7 @@
 // ImtCore includes
 #include <imtauth/IRoleManager.h>
 #include <imtauthgql/CClientRequestManagerCompBase.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Roles.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Roles_fwd.h>
 
 
 namespace imtauthgql
@@ -38,8 +38,8 @@ public:
 	virtual bool RemovePermissionsFromRole(const QByteArray& roleId, const QByteArrayList& permissions) override;
 
 private:
-	bool GetRoleDataSdl(const QByteArray& roleId, sdl::imtauth::Roles::CRoleData::V1_0& roleData) const;
-	bool SetRoleDataSdl(const QByteArray& roleId, const sdl::imtauth::Roles::CRoleData::V1_0& roleData) const;
+	bool GetRoleDataSdl(const QByteArray& roleId, sdl::V1_0::imtauth::CRoleData& roleData) const;
+	bool SetRoleDataSdl(const QByteArray& roleId, const sdl::V1_0::imtauth::CRoleData& roleData) const;
 
 private:
 	I_FACT(imtauth::IRole, m_roleFactoryCompPtr);

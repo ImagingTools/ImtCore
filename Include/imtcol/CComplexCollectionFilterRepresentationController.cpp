@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtbase/CTimeFilterParam.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
 
 
 namespace imtcol
@@ -37,7 +38,7 @@ QString CComplexCollectionFilterRepresentationController::GetFlagsAsString(int /
 
 
 bool CComplexCollectionFilterRepresentationController::ProcessFieldFilter(
-			const sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0& /* source */,
+			const sdl::V1_0::imtbase::CFieldFilter& /* source */,
 			imtbase::IComplexCollectionFilter::FieldFilter& /* target */,
 			ilog::IMessageConsumer* /* messageConsumerPtr */)
 {
@@ -46,7 +47,7 @@ bool CComplexCollectionFilterRepresentationController::ProcessFieldFilter(
 
 
 bool CComplexCollectionFilterRepresentationController::ProcessGroupFilter(
-			const sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0& /* source */,
+			const sdl::V1_0::imtbase::CGroupFilter& /* source */,
 			imtbase::IComplexCollectionFilter::FilterExpression& /* target */,
 			ilog::IMessageConsumer* /* messageConsumerPtr */)
 {
@@ -55,7 +56,7 @@ bool CComplexCollectionFilterRepresentationController::ProcessGroupFilter(
 
 
 bool CComplexCollectionFilterRepresentationController::ComplexCollectionFilterRepresentationToModel(
-	sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0& /* filterRepresentaion */,
+	sdl::V1_0::imtbase::CComplexCollectionFilter& /* filterRepresentaion */,
 	imtbase::IComplexCollectionFilter& /* filter */,
 	ilog::IMessageConsumer* /* messageConsumerPtr */)
 {

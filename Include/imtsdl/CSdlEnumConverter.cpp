@@ -125,20 +125,26 @@ void CSdlEnumConverter::WriteConversionFromEnum(
 			const QString& relatedNamespace,
 			uint hIndents)
 {
-	QString typeNamespace = CSdlTools::BuildNamespaceFromParams(sdlEnum.GetSchemaParams(), false, true);
-	if (typeNamespace != relatedNamespace){
-		while (!typeNamespace.endsWith(QStringLiteral("::"))){
-			typeNamespace.append(':');
+	// Compare using old-style namespace to detect same-schema references (which
+	// have identical schema names and therefore match). Cross-schema references
+	// will differ here even when they share the same schema namespace.
+	const QString oldStyleTypeNamespace = CSdlTools::BuildNamespaceFromParams(sdlEnum.GetSchemaParams(), false, true);
+	QString completeTypeName;
+	if (oldStyleTypeNamespace != relatedNamespace){
+		// Use the new V1_0-style namespace (without schema file name) for the prefix,
+		// matching the refactored sdl::V1_0::<ns> C++ namespace layout.
+		QString typeNamespace = CSdlTools::BuildNamespaceStructFromParams(sdlEnum.GetSchemaParams());
+		if (!typeNamespace.endsWith(QStringLiteral("::"))){
+			typeNamespace.append(QStringLiteral("::"));
 		}
-		// use global namespace
 		if (!typeNamespace.startsWith(QStringLiteral("::"))){
 			typeNamespace.prepend(QStringLiteral("::"));
 		}
+		completeTypeName = typeNamespace + sdlEnum.GetName();
 	}
 	else {
-		typeNamespace.clear();
+		completeTypeName = sdlEnum.GetName();
 	}
-	const QString completeTypeName = typeNamespace + sdlEnum.GetName();
 
 	CSdlTools::FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("switch (");
@@ -192,20 +198,23 @@ void CSdlEnumConverter::WriteEnumConversionFromString(
 			const QString& relatedNamespace,
 			uint hIndents)
 {
-	QString typeNamespace = CSdlTools::BuildNamespaceFromParams(sdlEnum.GetSchemaParams(), false, true);
-	if (typeNamespace != relatedNamespace){
-		while (!typeNamespace.endsWith(QStringLiteral("::"))){
-			typeNamespace.append(':');
+	// Compare using old-style namespace to detect same-schema references.
+	const QString oldStyleTypeNamespace = CSdlTools::BuildNamespaceFromParams(sdlEnum.GetSchemaParams(), false, true);
+	QString completeTypeName;
+	if (oldStyleTypeNamespace != relatedNamespace){
+		// Use new V1_0-style namespace (without schema file name) for the prefix.
+		QString typeNamespace = CSdlTools::BuildNamespaceStructFromParams(sdlEnum.GetSchemaParams());
+		if (!typeNamespace.endsWith(QStringLiteral("::"))){
+			typeNamespace.append(QStringLiteral("::"));
 		}
-		// use global namespace
 		if (!typeNamespace.startsWith(QStringLiteral("::"))){
 			typeNamespace.prepend(QStringLiteral("::"));
 		}
+		completeTypeName = typeNamespace + sdlEnum.GetName();
 	}
 	else {
-		typeNamespace.clear();
+		completeTypeName = sdlEnum.GetName();
 	}
-	const QString completeTypeName = typeNamespace + sdlEnum.GetName();
 
 	bool isFirstIteration = true;
 	for (const auto& enumValue: sdlEnum.GetValues()){

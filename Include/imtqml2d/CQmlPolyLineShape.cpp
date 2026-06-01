@@ -43,7 +43,7 @@ void CQmlPolyLineShape::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet
 	}
 }
 
-void imtqml2d::CQmlPolyLineShape::SetPoints(const QList<sdl::imtsdl2d::imt2d::CPoint2d>& newPoints)
+void imtqml2d::CQmlPolyLineShape::SetPoints(const QList<sdl::V1_0::imtsdl2d::CPoint2d>& newPoints)
 {
 	BaseClass2::SetPoints(newPoints);
 	i2d::CPolyline* objectPtr = GetObjectPtr();
@@ -55,7 +55,7 @@ void imtqml2d::CQmlPolyLineShape::SetPoints(const QList<sdl::imtsdl2d::imt2d::CP
 	
 	objectPtr->SetNodesCount(newPoints.size());
 	for (int i = 0; i < newPoints.size(); ++i){
-		const sdl::imtsdl2d::imt2d::CPoint2d& currentPoint = newPoints[i];
+		const sdl::V1_0::imtsdl2d::CPoint2d& currentPoint = newPoints[i];
 		objectPtr->SetNodePos(i, i2d::CVector2d(currentPoint.GetX(), currentPoint.GetY()));
 	}
 }

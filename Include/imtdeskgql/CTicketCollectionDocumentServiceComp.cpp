@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtdeskgql/CTicketCollectionDocumentServiceComp.h>
+#include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/TicketCollectionDocumentService.h>
 
 
 // ACF includes
@@ -30,75 +31,68 @@ namespace imtdeskgql
 
 // protected methods
 
-// reimplemented (CGraphQlHandlerCompBase)
+// reimplemented (CTicketCollectionDocumentServiceGqlHandlerCompBase)
 
-sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentServiceComp::OnGetTicketRepresentation(
-			const sdl::imtdesk::TicketCollectionDocumentService::CGetTicketRepresentationGqlRequest& getTicketRepresentationRequest,
+sdl::V1_0::imtdesk::CTicketData CTicketCollectionDocumentServiceComp::OnGetTicketRepresentation(
+			const sdl::V1_0::imtdesk::CGetTicketRepresentationGqlRequest& getTicketRepresentationRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtdesk::TicketCollectionDocumentService::GetTicketRepresentationRequestArguments arguments = getTicketRepresentationRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtdesk::ImtDesk::CTicketData();
-	}
-
+	sdl::V1_0::imtdesk::GetTicketRepresentationRequestArguments arguments = getTicketRepresentationRequest.GetRequestedArguments();
 	QByteArray userId = GetUserId(gqlRequest);
 
 	QByteArray objectId;
 	istd::IChangeableSharedPtr documentPtr;
-	if (arguments.input.Version_1_0->id){
-		objectId = *arguments.input.Version_1_0->id;
+	if (arguments.input->id){
+		objectId = *arguments.input->id;
 
 		m_documentManagerCompPtr->GetDocumentData(userId, objectId, documentPtr);
 	}
 
 	if (!documentPtr.IsValid()){
-		return sdl::imtdesk::ImtDesk::CTicketData();
+		return sdl::V1_0::imtdesk::CTicketData();
 	}
 
 	imtdesk::ISupportTicket* ticketPtr = dynamic_cast<imtdesk::ISupportTicket*>(documentPtr.GetPtr());
 	if (ticketPtr == nullptr){
-		return sdl::imtdesk::ImtDesk::CTicketData();
+		return sdl::V1_0::imtdesk::CTicketData();
 	}
 
-	sdl::imtdesk::ImtDesk::CTicketData response;
-	response.Version_1_0.Emplace();
-
-	response.Version_1_0->id = ticketPtr->GetId();
-	response.Version_1_0->number = ticketPtr->GetNumber();
-	response.Version_1_0->title = ticketPtr->GetTitle();
-	response.Version_1_0->description = ticketPtr->GetDescription();
-	response.Version_1_0->assigneeIds.Emplace().FromList(ticketPtr->GetAssigneeIds());
-	response.Version_1_0->reporterId = ticketPtr->GetReporterId();
-	response.Version_1_0->conversationId = ticketPtr->GetConversationId();
-	response.Version_1_0->messageId = ticketPtr->GetMessageId();
-	response.Version_1_0->labelIds.Emplace().FromList(ticketPtr->GetLabelIds());
-	response.Version_1_0->locked = ticketPtr->IsLocked();
-	response.Version_1_0->lockReason = ticketPtr->GetLockReason();
-	response.Version_1_0->createdAt = ticketPtr->GetCreatedAt();
-	response.Version_1_0->updatedAt = ticketPtr->GetUpdatedAt();
-	response.Version_1_0->closedAt = ticketPtr->GetClosedAt();
-	response.Version_1_0->resolvedAt = ticketPtr->GetResolvedAt();
-	response.Version_1_0->ticketType = imtdeskgql::GetSdlTypeFromTicketType(ticketPtr->GetTicketType());
-	response.Version_1_0->priority = imtdeskgql::GetSdlTypeFromPriorityType(ticketPtr->GetPriority());
-	response.Version_1_0->status = imtdeskgql::GetSdlTypeFromStatusType(ticketPtr->GetStatus());
-	response.Version_1_0->stateReason = imtdeskgql::GetSdlTypeFromStateReason(ticketPtr->GetStateReason());
+	sdl::V1_0::imtdesk::CTicketData response;
+	response.id = ticketPtr->GetId();
+	response.number = ticketPtr->GetNumber();
+	response.title = ticketPtr->GetTitle();
+	response.description = ticketPtr->GetDescription();
+	response.assigneeIds.Emplace().FromList(ticketPtr->GetAssigneeIds());
+	response.reporterId = ticketPtr->GetReporterId();
+	response.conversationId = ticketPtr->GetConversationId();
+	response.messageId = ticketPtr->GetMessageId();
+	response.labelIds.Emplace().FromList(ticketPtr->GetLabelIds());
+	response.locked = ticketPtr->IsLocked();
+	response.lockReason = ticketPtr->GetLockReason();
+	response.createdAt = ticketPtr->GetCreatedAt();
+	response.updatedAt = ticketPtr->GetUpdatedAt();
+	response.closedAt = ticketPtr->GetClosedAt();
+	response.resolvedAt = ticketPtr->GetResolvedAt();
+	response.ticketType = imtdeskgql::GetSdlTypeFromTicketType(ticketPtr->GetTicketType());
+	response.priority = imtdeskgql::GetSdlTypeFromPriorityType(ticketPtr->GetPriority());
+	response.status = imtdeskgql::GetSdlTypeFromStatusType(ticketPtr->GetStatus());
+	response.stateReason = imtdeskgql::GetSdlTypeFromStateReason(ticketPtr->GetStateReason());
 
 	// Permissions: visibility (admin / reporter / assignee / same-group as reporter).
 	if (!HasTicketVisibility(gqlRequest.GetRequestContext(), ticketPtr, m_userCollectionCompPtr.GetPtr(), m_userGroupInfoProviderCompPtr.GetPtr())){
 		errorMessage = QStringLiteral("Permission denied: you do not have access to this ticket");
-		return sdl::imtdesk::ImtDesk::CTicketData();
+		return sdl::V1_0::imtdesk::CTicketData();
 	}
 
-	response.Version_1_0->accessLevel = GetTicketAccessLevel(
+	response.accessLevel = GetTicketAccessLevel(
 			gqlRequest.GetRequestContext(), ticketPtr, m_userCollectionCompPtr.GetPtr(), m_userGroupInfoProviderCompPtr.GetPtr());
 
 	// Load entity references by IDs from the EntityReferences table via IEntityReferenceStorage
 	QByteArrayList entityRefIds = ticketPtr->GetEntityReferences();
 	if (!entityRefIds.isEmpty() && m_entityReferenceStorageCompPtr.IsValid()){
-		response.Version_1_0->entityReferences.Emplace();
-		QList<sdl::imtdesk::ImtDesk::CEntityReference::V1_0> refList;
+		response.entityReferences.Emplace();
+		QList<sdl::V1_0::imtdesk::CEntityReference> refList;
 
 		QString applicationId;
 		if (m_applicationInfoCompPtr.IsValid()){
@@ -115,13 +109,13 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentServiceComp::OnGetTi
 				continue;
 			}
 
-			sdl::imtdesk::ImtDesk::CEntityReference::V1_0 ref;
+			sdl::V1_0::imtdesk::CEntityReference ref;
 			ref.entityType = entityType;
 			ref.entityId = entityId;
 			ref.displayName = displayName;
 
 			// Build ObjectLink for navigation
-			sdl::imtbase::ImtBaseTypes::CObjectLink::V1_0 entityLink;
+			sdl::V1_0::imtbase::CObjectLink entityLink;
 			entityLink.id = ref.entityId;
 			entityLink.name = displayName;
 
@@ -133,7 +127,7 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentServiceComp::OnGetTi
 				entityLink.typeId = entityType.toUtf8();
 			}
 
-			sdl::imtbase::ImtBaseTypes::CUrlParam::V1_0 urlParam;
+			sdl::V1_0::imtbase::CUrlParam urlParam;
 			urlParam.scheme = QStringLiteral("applink");
 			urlParam.host = applicationId;
 			urlParam.path = entityUrl;
@@ -142,24 +136,24 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentServiceComp::OnGetTi
 			ref.entityLink = entityLink;
 			refList << ref;
 		}
-		response.Version_1_0->entityReferences->FromList(refList);
-		if (response.Version_1_0->entityReferences->isEmpty()){
-			response.Version_1_0->entityReferences.Reset();
+		response.entityReferences->FromList(refList);
+		if (response.entityReferences->isEmpty()){
+			response.entityReferences.Reset();
 		}
 	}
 
 	if (m_entityTypeProvidersCompPtr.IsValid()){
 		// Populate available entity types from registered providers (I_MULTIREF)
 		// EntityTypeId also serves as the collectionId for browsing entities
-		response.Version_1_0->entityTypes.Emplace();
-		QList<sdl::imtdesk::ImtDesk::CEntityType::V1_0> typeList;
+		response.entityTypes.Emplace();
+		QList<sdl::V1_0::imtdesk::CEntityType> typeList;
 		for (int i = 0; i < m_entityTypeProvidersCompPtr.GetCount(); ++i){
-			sdl::imtdesk::ImtDesk::CEntityType::V1_0 et;
+			sdl::V1_0::imtdesk::CEntityType et;
 			et.id = m_entityTypeProvidersCompPtr[i]->GetEntityTypeId();
 			et.name = m_entityTypeProvidersCompPtr[i]->GetEntityTypeName();
 			typeList << et;
 		}
-		response.Version_1_0->entityTypes->FromList(typeList);
+		response.entityTypes->FromList(typeList);
 	}
 
 	// Load messages from the Messages collection filtered by ConversationId
@@ -179,16 +173,16 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentServiceComp::OnGetTi
 					m_messageCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, &paramsSet));
 
 		if (iteratorPtr.IsValid()){
-			response.Version_1_0->comments.Emplace();
+			response.comments.Emplace();
 
-			QList<sdl::imtdesk::ImtDesk::CTicketComment::V1_0> itemList;
+			QList<sdl::V1_0::imtdesk::CTicketComment> itemList;
 
 			while (iteratorPtr->Next()){
 				imtbase::IObjectCollection::DataPtr dataPtr;
 				if (iteratorPtr->GetObjectData(dataPtr)){
 					const imtchat::IChatMessage* msgPtr = dynamic_cast<const imtchat::IChatMessage*>(dataPtr.GetPtr());
 					if (msgPtr != nullptr){
-						sdl::imtdesk::ImtDesk::CTicketComment::V1_0 itemData;
+						sdl::V1_0::imtdesk::CTicketComment itemData;
 						itemData.id = msgPtr->GetId();
 						itemData.userId = msgPtr->GetSenderId();
 
@@ -218,9 +212,9 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentServiceComp::OnGetTi
 						QByteArrayList attachmentIds = msgPtr->GetAttachmentIds();
 						if (!attachmentIds.isEmpty()){
 							itemData.attachments.Emplace();
-							QList<sdl::imtdesk::ImtDesk::CAttachment::V1_0> attachmentList;
+							QList<sdl::V1_0::imtdesk::CAttachment> attachmentList;
 							for (const QByteArray& aid : std::as_const(attachmentIds)){
-								sdl::imtdesk::ImtDesk::CAttachment::V1_0 att;
+								sdl::V1_0::imtdesk::CAttachment att;
 								att.id = aid;
 								// Build HTTP download URL — aid is a pure UUID from the DB.
 								// Append file extension so the GET endpoint returns the correct MIME type.
@@ -279,10 +273,10 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentServiceComp::OnGetTi
 				}
 			}
 
-			response.Version_1_0->comments->FromList(itemList);
+			response.comments->FromList(itemList);
 
-			if (response.Version_1_0->comments->isEmpty()){
-				response.Version_1_0->comments.Reset();
+			if (response.comments->isEmpty()){
+				response.comments.Reset();
 			}
 		}
 	}
@@ -291,29 +285,23 @@ sdl::imtdesk::ImtDesk::CTicketData CTicketCollectionDocumentServiceComp::OnGetTi
 }
 
 
-sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CTicketCollectionDocumentServiceComp::OnUpdateTicketFromRepresentation(
-			const sdl::imtdesk::TicketCollectionDocumentService::CUpdateTicketFromRepresentationGqlRequest& updateTicketFromRepresentationRequest,
+sdl::V1_0::imtbase::CDocumentOperationStatus CTicketCollectionDocumentServiceComp::OnUpdateTicketFromRepresentation(
+			const sdl::V1_0::imtdesk::CUpdateTicketFromRepresentationGqlRequest& updateTicketFromRepresentationRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtdesk::TicketCollectionDocumentService::UpdateTicketFromRepresentationRequestArguments arguments = updateTicketFromRepresentationRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus();
-	}
-
-	sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus response;
-	response.Version_1_0.Emplace();
-	response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::Failed;
+	sdl::V1_0::imtdesk::UpdateTicketFromRepresentationRequestArguments arguments = updateTicketFromRepresentationRequest.GetRequestedArguments();
+	sdl::V1_0::imtbase::CDocumentOperationStatus response;
+	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
 
 	QByteArray documentId;
-	if (arguments.input.Version_1_0->documentId){
-		documentId = *arguments.input.Version_1_0->documentId;
+	if (arguments.input->documentId){
+		documentId = *arguments.input->documentId;
 	}
 
-	sdl::imtdesk::ImtDesk::CTicketData::V1_0 ticketInfo;
-	if (arguments.input.Version_1_0->ticket){
-		ticketInfo = *arguments.input.Version_1_0->ticket;
+	sdl::V1_0::imtdesk::CTicketData ticketInfo;
+	if (arguments.input->ticket){
+		ticketInfo = *arguments.input->ticket;
 	}
 
 	QByteArray userId;
@@ -327,20 +315,20 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CTicketCollect
 	istd::IChangeableSharedPtr documentPtr;
 	m_documentManagerCompPtr->GetDocumentData(userLogin, documentId, documentPtr);
 	if (!documentPtr.IsValid()){
-		response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::InvalidDocumentId;
+		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
 
 	imtdesk::ISupportTicket* ticketPtr = dynamic_cast<imtdesk::ISupportTicket*>(documentPtr.GetPtr());
 	if (ticketPtr == nullptr){
-		response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::InvalidDocumentId;
+		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
 
 	// Permission check: only admin, reporter, or assignee can edit
 	if (!CanEditTicket(gqlRequest.GetRequestContext(), ticketPtr)){
 		errorMessage = QStringLiteral("Permission denied: you cannot edit this ticket");
-		response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::Failed;
+		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
 		return response;
 	}
 
@@ -348,7 +336,7 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CTicketCollect
 	if (ticketInfo.locked){
 		if (*ticketInfo.locked != ticketPtr->IsLocked() && !CanLockTicket(gqlRequest.GetRequestContext(), ticketPtr)){
 			errorMessage = QStringLiteral("Permission denied: only the reporter can lock/unlock this ticket");
-			response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::Failed;
+			response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
 			return response;
 		}
 	}
@@ -364,7 +352,7 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CTicketCollect
 			&& imtdeskgql::GetPriorityTypeFromSdlType(*ticketInfo.priority) != ticketPtr->GetPriority();
 	if ((titleChanged || descriptionChanged || assigneesChanged || ticketTypeChanged || priorityChanged) && !canEditCoreFields){
 		errorMessage = QStringLiteral("Permission denied: only reporter or admin can edit ticket fields");
-		response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::Failed;
+		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
 		return response;
 	}
 
@@ -586,7 +574,7 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CTicketCollect
 		m_documentManagerCompPtr->WaitForTaskFinished(saveTaskId);
 	}
 
-	response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::Success;
+	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 
 	return response;
 }

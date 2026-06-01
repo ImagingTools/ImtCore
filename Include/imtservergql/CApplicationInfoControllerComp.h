@@ -6,18 +6,18 @@
 #include <ibase/IApplicationInfo.h>
 
 // ImtCore includes
-#include <GeneratedFiles/imtappsdl/SDL/1.0/CPP/Application.h>
+#include <GeneratedFiles/imtappsdl/SDL/1.0/CPP/Application_fwd.h>
 
 
 namespace imtservergql
 {
 
 
-class CApplicationInfoControllerComp: public sdl::imtapp::Application::CGraphQlHandlerCompBase
+class CApplicationInfoControllerComp: public sdl::V1_0::imtapp::CApplicationGqlHandlerCompBase
 {
 public:
-	using BaseClass = sdl::imtapp::Application::CGraphQlHandlerCompBase;
-	using ApplicationInfo = sdl::imtapp::Application::CApplicationInfo;
+	using BaseClass = sdl::V1_0::imtapp::CApplicationGqlHandlerCompBase;
+	using ApplicationInfo = sdl::V1_0::imtapp::CApplicationInfo;
 
 	I_BEGIN_COMPONENT(CApplicationInfoControllerComp);
 		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application data info", true, "ApplicationInfo");
@@ -25,9 +25,9 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtapp::Application::CGraphQlHandlerCompBase)
+	// reimplemented (sdl::V1_0::imtapp::CApplicationGqlHandlerCompBase)
 	virtual ApplicationInfo OnGetApplicationInfo(
-				const sdl::imtapp::Application::CGetApplicationInfoGqlRequest& getApplicationInfoRequest,
+				const sdl::V1_0::imtapp::CGetApplicationInfoGqlRequest& getApplicationInfoRequest,
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 

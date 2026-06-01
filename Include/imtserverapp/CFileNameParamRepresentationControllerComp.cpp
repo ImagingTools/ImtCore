@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtserverapp/CFileNameParamRepresentationControllerComp.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Settings.h>
 
 
 // ACF includes
@@ -12,7 +13,7 @@ namespace imtserverapp
 
 // protected methods
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CFileNameParam::V1_0>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CFileNameParam>)
 
 QByteArray CFileNameParamRepresentationControllerComp::GetTypeId() const
 {
@@ -29,7 +30,7 @@ bool CFileNameParamRepresentationControllerComp::IsModelSupported(const istd::IC
 
 
 bool CFileNameParamRepresentationControllerComp::GetSdlRepresentationFromDataModel(
-			sdl::imtbase::ImtBaseTypes::CFileNameParam::V1_0& sdlRepresentation,
+			sdl::V1_0::imtbase::CFileNameParam& sdlRepresentation,
 			const istd::IChangeable& dataModel,
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
@@ -51,7 +52,7 @@ bool CFileNameParamRepresentationControllerComp::GetSdlRepresentationFromDataMod
 
 bool CFileNameParamRepresentationControllerComp::GetDataModelFromSdlRepresentation(
 			istd::IChangeable& dataModel,
-			const sdl::imtbase::ImtBaseTypes::CFileNameParam::V1_0& sdlRepresentation) const
+			const sdl::V1_0::imtbase::CFileNameParam& sdlRepresentation) const
 {
 	ifile::IFileNameParam* fileNameParamPtr = dynamic_cast<ifile::IFileNameParam*>(&dataModel);
 	Q_ASSERT(fileNameParamPtr != nullptr);

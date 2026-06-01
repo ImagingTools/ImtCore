@@ -49,7 +49,7 @@ bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const imtsdl::CSd
 
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 	CStructNamespaceConverter structNameConverter(sdlType, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
-	structNameConverter.addVersion = true;
+	structNameConverter.addVersion = false;
 
 	// add method implementation
 	ofStream << QStringLiteral("bool ");
@@ -324,12 +324,13 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(
 	bool isCustom = false;
 	bool isEnum = false;
 	bool isUnion = false;
-	const QString convertedType = ConvertTypeWithNamespace(
+	const QString convertedType = OptListConvertTypeWithNamespaceStruct(
 		field,
 		m_originalSchemaNamespaceCompPtr->GetText(),
 		*m_sdlTypeListCompPtr,
 		*m_sdlEnumListCompPtr,
 		*m_sdlUnionListCompPtr,
+		true,
 		&isCustom,
 		nullptr,
 		&isArray,
@@ -667,7 +668,7 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadFromModelImplCode(
 	FeedStreamHorizontally(stream, hIndents);
 	stream << variableName;
 	stream << QStringLiteral(" = ");
-	structNameConverter.addVersion = true;
+	structNameConverter.addVersion = false;
 	stream << structNameConverter.GetString();
 	stream << QStringLiteral("();");
 	FeedStream(stream, 1, false);
@@ -926,7 +927,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 
 	// declare temp list var
 	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, true);
-	structNameConverter.addVersion = true;
+	structNameConverter.addVersion = false;
 
 	const QString listVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("List");
 	FeedStreamHorizontally(stream, hIndents);
@@ -934,7 +935,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 		stream << structNameConverter.GetString();
 	}
 	else{
-		stream << ConvertTypeWithNamespace(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr);
+		stream << OptListConvertTypeWithNamespaceStruct(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, true);
 	}
 	stream << ' ' << listVariableName << ';';
 	FeedStream(stream, 1, false);
@@ -1018,7 +1019,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 			field.GetId());
 	}
 	else{
-		stream << OptListConvertTypeWithNamespace(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
+		stream << OptListConvertTypeWithNamespaceStruct(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 		stream << ' ' << variableName;
 		stream << QStringLiteral(" = ");
 		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model->GetData(QByteArray(), ");
@@ -1197,7 +1198,7 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldReadFromModelImplCod
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
-	structNameConverter.addVersion = true;
+	structNameConverter.addVersion = false;
 	structNameConverter.listWrap = true;
 
 	FeedStreamHorizontally(stream, hIndents);

@@ -10,16 +10,16 @@
 #include <imtbase/IObjectCollection.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtdoc/TCollectionDocumentServiceWrap.h>
-#include <imtbasesdl/SDL/1.0/CPP/DocumentService.h>
-#include <imtbasesdl/SDL/1.0/CPP/UndoManager.h>
+#include <imtbasesdl/SDL/1.0/CPP/DocumentService_fwd.h>
+#include <imtbasesdl/SDL/1.0/CPP/UndoManager_fwd.h>
 
 
 namespace imtservergql
 {
 
 
-namespace CDM = sdl::imtbase::DocumentService;
-namespace UM = sdl::imtbase::UndoManager;
+namespace CDM = sdl::V1_0::imtbase;
+namespace UM = sdl::V1_0::imtbase;
 
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
@@ -46,7 +46,7 @@ public:
 	void OnComponentCreated() override;
 
 protected:
-	// reimplemented (CGraphQlHandlerCompBase)
+	// reimplemented (CCollectionDocumentServiceGqlHandlerCompBase)
 	CDM::CDocumentList OnGetOpenedDocumentList(
 				const typename Defs::GetOpenedDocumentListGqlRequest& getDocumentListRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
@@ -221,7 +221,7 @@ inline bool TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServ
 }
 
 
-// reimplemented (CGraphQlHandlerCompBase)
+// reimplemented (CCollectionDocumentServiceGqlHandlerCompBase)
 
 template<class Base, class ColorCollectionDocumentServiceDefs>
 inline CDM::CDocumentList TCollectionDocumentServiceCompBase<Base, ColorCollectionDocumentServiceDefs>::
@@ -231,8 +231,7 @@ inline CDM::CDocumentList TCollectionDocumentServiceCompBase<Base, ColorCollecti
 				QString& errorMessage) const
 {
 	CDM::CDocumentList retVal;
-	retVal.Version_1_0.emplace();
-	retVal.Version_1_0->documentList.emplace();
+	retVal.documentList.emplace();
 
 	QByteArray userId = GetUserId(gqlRequest);
 
@@ -240,13 +239,11 @@ inline CDM::CDocumentList TCollectionDocumentServiceCompBase<Base, ColorCollecti
 		DocumentList list = BaseClass::GetOpenedDocumentList(userId);
 		for (const DocumentInfo& info : list) {
 			CDM::CDocumentInfo sdlInfo;
-			sdlInfo.Version_1_0.emplace();
+			sdlInfo.documentId = info.documentId;
+			sdlInfo.objectId = info.objectId;
+			sdlInfo.hasChanges = info.hasChanges;
 
-			sdlInfo.Version_1_0->documentId = info.documentId;
-			sdlInfo.Version_1_0->objectId = info.objectId;
-			sdlInfo.Version_1_0->hasChanges = info.hasChanges;
-
-			retVal.Version_1_0->documentList->append(sdlInfo.Version_1_0);
+			retVal.documentList->append(sdlInfo);
 		}
 	}
 
@@ -265,7 +262,7 @@ inline CDM::CDocumentInfo TCollectionDocumentServiceCompBase<Base, ColorCollecti
 	const auto& arguments = createDocumentRequest.GetRequestedArguments();
 	const auto& info = createDocumentRequest.GetRequestInfo();
 
-	auto documentTypeId = arguments.input.Version_1_0;
+	auto documentTypeId = arguments.input;
 	if (!documentTypeId || documentTypeId->typeId) {
 		errorMessage = "Invalid GQL request params";
 
@@ -293,19 +290,18 @@ inline CDM::CDocumentInfo TCollectionDocumentServiceCompBase<Base, ColorCollecti
 		return retVal;
 	}
 
-	retVal.Version_1_0.emplace();
-	retVal.Version_1_0->documentId = documentId;
-	retVal.Version_1_0->objectTypeId = *documentTypeId->typeId;
-	retVal.Version_1_0->objectId = QByteArray();
-	retVal.Version_1_0->isDirty = false;
-	retVal.Version_1_0->hasNameProvider = false;
-	retVal.Version_1_0->isLoading = false;
+	retVal.documentId = documentId;
+	retVal.objectTypeId = *documentTypeId->typeId;
+	retVal.objectId = QByteArray();
+	retVal.isDirty = false;
+	retVal.hasNameProvider = false;
+	retVal.isLoading = false;
 
 	DocumentList list = BaseClass::GetOpenedDocumentList(userId);
 	for (const DocumentListItem& docInfo : list) {
 		if (docInfo.documentId == documentId) {
-			retVal.Version_1_0->documentName = docInfo.name;
-			retVal.Version_1_0->hasNameProvider = docInfo.hasNameProvider;
+			retVal.documentName = docInfo.name;
+			retVal.hasNameProvider = docInfo.hasNameProvider;
 			break;
 		}
 	}
@@ -325,7 +321,7 @@ inline CDM::CDocumentInfo TCollectionDocumentServiceCompBase<Base, ColorCollecti
 	const auto& arguments = openDocumentRequest.GetRequestedArguments();
 	const auto& info = openDocumentRequest.GetRequestInfo();
 
-	auto objectId = arguments.input.Version_1_0;
+	auto objectId = arguments.input;
 	if (!objectId || objectId->id) {
 		errorMessage = "Invalid GQL request params";
 
@@ -353,20 +349,19 @@ inline CDM::CDocumentInfo TCollectionDocumentServiceCompBase<Base, ColorCollecti
 		return retVal;
 	}
 
-	retVal.Version_1_0.emplace();
-	retVal.Version_1_0->documentId = documentId;
-	retVal.Version_1_0->objectId = *objectId->id;
-	retVal.Version_1_0->isDirty = false;
-	retVal.Version_1_0->hasNameProvider = false;
-	retVal.Version_1_0->isLoading = true;
+	retVal.documentId = documentId;
+	retVal.objectId = *objectId->id;
+	retVal.isDirty = false;
+	retVal.hasNameProvider = false;
+	retVal.isLoading = true;
 
 	DocumentList list = BaseClass::GetOpenedDocumentList(userId);
 	for (const DocumentListItem& docInfo : list) {
 		if (docInfo.documentId == documentId) {
-			retVal.Version_1_0->documentName = docInfo.name;
-			retVal.Version_1_0->objectTypeId = docInfo.typeId;
-			retVal.Version_1_0->hasNameProvider = docInfo.hasNameProvider;
-			retVal.Version_1_0->isLoading = docInfo.isLoading;
+			retVal.documentName = docInfo.name;
+			retVal.objectTypeId = docInfo.typeId;
+			retVal.hasNameProvider = docInfo.hasNameProvider;
+			retVal.isLoading = docInfo.isLoading;
 			break;
 		}
 	}
@@ -386,7 +381,7 @@ inline CDM::CDocumentOperationStatus TCollectionDocumentServiceCompBase<Base, Co
 	const auto& arguments = saveDocumentRequest.GetRequestedArguments();
 	const auto& info = saveDocumentRequest.GetRequestInfo();
 
-	auto documentId = arguments.input.Version_1_0;
+	auto documentId = arguments.input;
 	if (!documentId || !documentId->id) {
 		errorMessage = "Invalid GQL request params";
 
@@ -400,8 +395,6 @@ inline CDM::CDocumentOperationStatus TCollectionDocumentServiceCompBase<Base, Co
 		return retVal;
 	}
 
-	retVal.Version_1_0.emplace();
-
 	typename BaseClass::TaskParams taskParams;
 	taskParams.userId = userId;
 	taskParams.documentId = *documentId->id;
@@ -412,25 +405,25 @@ inline CDM::CDocumentOperationStatus TCollectionDocumentServiceCompBase<Base, Co
 	OperationStatus status = taskResult.status;
 	switch (status) {
 	case imtdoc::ICollectionDocumentService::OS_OK:
-		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;
+		retVal.status = CDM::EDocumentOperationStatus::Success;
 		{
 			QString resolvedName;
 			if (GetNonConstThis()->GetDocumentName(userId, *documentId->id, resolvedName) == OperationStatus::OS_OK){
-				retVal.Version_1_0->documentName = resolvedName;
+				retVal.documentName = resolvedName;
 			}
 		}
 		break;
 	case imtdoc::ICollectionDocumentService::OS_INVALID_USER_ID:
-		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidUserId;
+		retVal.status = CDM::EDocumentOperationStatus::InvalidUserId;
 		break;
 	case imtdoc::ICollectionDocumentService::OS_INVALID_DOCUMENT_ID:
-		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentId;
+		retVal.status = CDM::EDocumentOperationStatus::InvalidDocumentId;
 		break;
 	case imtdoc::ICollectionDocumentService::OS_INVALID_DOCUMENT_DATA:
-		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentData;
+		retVal.status = CDM::EDocumentOperationStatus::InvalidDocumentData;
 		break;
 	case imtdoc::ICollectionDocumentService::OS_FAILED:
-		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Failed;
+		retVal.status = CDM::EDocumentOperationStatus::Failed;
 		break;
 	default:
 		break;
@@ -455,7 +448,7 @@ inline CDM::CDocumentOperationStatus TCollectionDocumentServiceCompBase<Base, Co
 			break;
 		}
 		if (!responseMessage.isEmpty()) {
-			retVal.Version_1_0->message = responseMessage;
+			retVal.message = responseMessage;
 			errorMessage = responseMessage;
 		}
 	}
@@ -476,7 +469,7 @@ inline CDM::CDocumentOperationStatus TCollectionDocumentServiceCompBase<Base, Co
 	const auto& arguments = closeDocumentRequest.GetRequestedArguments();
 	const auto& info = closeDocumentRequest.GetRequestInfo();
 
-	auto documentId = arguments.input.Version_1_0;
+	auto documentId = arguments.input;
 	if (!documentId || !documentId->id) {
 		errorMessage = "Invalid GQL request params";
 
@@ -490,8 +483,6 @@ inline CDM::CDocumentOperationStatus TCollectionDocumentServiceCompBase<Base, Co
 		return retVal;
 	}
 
-	retVal.Version_1_0.emplace();
-
 	typename BaseClass::TaskParams taskParams;
 	taskParams.userId = userId;
 	taskParams.documentId = *documentId->id;
@@ -500,16 +491,16 @@ inline CDM::CDocumentOperationStatus TCollectionDocumentServiceCompBase<Base, Co
 	OperationStatus status = taskResult.status;
 	switch (status) {
 	case imtdoc::ICollectionDocumentService::OS_OK:
-		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;
+		retVal.status = CDM::EDocumentOperationStatus::Success;
 		break;
 	case imtdoc::ICollectionDocumentService::OS_INVALID_USER_ID:
-		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidUserId;
+		retVal.status = CDM::EDocumentOperationStatus::InvalidUserId;
 		break;
 	case imtdoc::ICollectionDocumentService::OS_INVALID_DOCUMENT_ID:
-		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentId;
+		retVal.status = CDM::EDocumentOperationStatus::InvalidDocumentId;
 		break;
 	case imtdoc::ICollectionDocumentService::OS_FAILED:
-		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Failed;
+		retVal.status = CDM::EDocumentOperationStatus::Failed;
 		break;
 	default:
 		break;
@@ -526,17 +517,16 @@ inline UM::CUndoInfo TCollectionDocumentServiceCompBase<Base, ColorCollectionDoc
 			QString& errorMessage) const
 {
 	UM::CUndoInfo retVal;
-	retVal.Version_1_0.emplace();
-	retVal.Version_1_0->status.emplace();
+	retVal.status.emplace();
 
 	const auto& arguments = getUndoInfoRequest.GetRequestedArguments();
 	const auto& info = getUndoInfoRequest.GetRequestInfo();
 
-	auto documentId = arguments.input.Version_1_0;
+	auto documentId = arguments.input;
 	if (!documentId || !documentId->id) {
 		errorMessage = "Invalid GQL request params";
 
-		retVal.Version_1_0->status->status = UM::EUndoStatus::InvalidDocumentId;
+		retVal.status->status = UM::EUndoStatus::InvalidDocumentId;
 
 		return retVal;
 	}
@@ -545,7 +535,7 @@ inline UM::CUndoInfo TCollectionDocumentServiceCompBase<Base, ColorCollectionDoc
 	if (userId.isEmpty()) {
 		errorMessage = "Unable to get user ID from context";
 
-		retVal.Version_1_0->status->status = UM::EUndoStatus::InvalidUserId;
+		retVal.status->status = UM::EUndoStatus::InvalidUserId;
 
 		return retVal;
 	}
@@ -555,23 +545,23 @@ inline UM::CUndoInfo TCollectionDocumentServiceCompBase<Base, ColorCollectionDoc
 		idoc::IUndoManager* undoManagerPtr = m_userDocuments[userId][*documentId->id].undoManagerPtr.GetPtr();
 
 		int count = undoManagerPtr->GetAvailableUndoSteps();
-		retVal.Version_1_0->availableUndoSteps = count;
-		retVal.Version_1_0->undoLevelDescriptions.emplace();
+		retVal.availableUndoSteps = count;
+		retVal.undoLevelDescriptions.emplace();
 		for (int i = 0; i < count; i++) {
 			QString description = undoManagerPtr->GetUndoLevelDescription(i);
-			retVal.Version_1_0->undoLevelDescriptions->append(description);
+			retVal.undoLevelDescriptions->append(description);
 		}
 
 		count = undoManagerPtr->GetAvailableRedoSteps();
-		retVal.Version_1_0->availableRedoSteps = count;
-		retVal.Version_1_0->redoLevelDescriptions.emplace();
+		retVal.availableRedoSteps = count;
+		retVal.redoLevelDescriptions.emplace();
 		for (int i = 0; i < count; i++) {
 			QString description = undoManagerPtr->GetRedoLevelDescription(i);
-			retVal.Version_1_0->redoLevelDescriptions->append(description);
+			retVal.redoLevelDescriptions->append(description);
 		}
 	}
 
-	retVal.Version_1_0->status->status = UM::EUndoStatus::Success;
+	retVal.status->status = UM::EUndoStatus::Success;
 
 	return retVal;
 }
@@ -584,17 +574,16 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 			QString& errorMessage) const
 {
 	UM::CUndoStatus retVal;
-	retVal.Version_1_0.emplace();
-	retVal.Version_1_0->status.emplace();
+	retVal.status.emplace();
 
 	const auto& arguments = doUndoRequest.GetRequestedArguments();
 	const auto& info = doUndoRequest.GetRequestInfo();
 
-	istd::TNullableValue<UM::CUndoRedoInput::V1_0> undoRedoInput = arguments.input.Version_1_0;
+	istd::TNullableValue<UM::CUndoRedoInput> undoRedoInput = arguments.input;
 	if (!undoRedoInput || !undoRedoInput->documentId || !undoRedoInput->steps) {
 		errorMessage = "Invalid GQL request params";
 
-		retVal.Version_1_0->status = UM::EUndoStatus::InvalidDocumentId;
+		retVal.status = UM::EUndoStatus::InvalidDocumentId;
 
 		return retVal;
 	}
@@ -605,7 +594,7 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 	if (userId.isEmpty()) {
 		errorMessage = "Unable to get user ID from context";
 
-		retVal.Version_1_0->status = UM::EUndoStatus::InvalidUserId;
+		retVal.status = UM::EUndoStatus::InvalidUserId;
 
 		return retVal;
 	}
@@ -616,7 +605,7 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 	if (!m_userDocuments.contains(userId) || !m_userDocuments[userId].contains(documentId)) {
 		errorMessage = "Undo operation failed";
 
-		retVal.Version_1_0->status = UM::EUndoStatus::Failed;
+		retVal.status = UM::EUndoStatus::Failed;
 
 		return retVal;
 	}
@@ -626,7 +615,7 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 	if (undoManagerPtr->GetAvailableUndoSteps() < *undoRedoInput->steps) {
 		errorMessage = "The number of available undo steps is less than requested";
 
-		retVal.Version_1_0->status = UM::EUndoStatus::InvalidStepCount;
+		retVal.status = UM::EUndoStatus::InvalidStepCount;
 
 		return retVal;
 	}
@@ -634,12 +623,12 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 	if (!undoManagerPtr->DoUndo(*undoRedoInput->steps)) {
 		errorMessage = "Undo operation failed";
 
-		retVal.Version_1_0->status = UM::EUndoStatus::Failed;
+		retVal.status = UM::EUndoStatus::Failed;
 
 		return retVal;
 	}
 
-	retVal.Version_1_0->status = UM::EUndoStatus::Success;
+	retVal.status = UM::EUndoStatus::Success;
 
 	return retVal;
 }
@@ -652,17 +641,16 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 			QString& errorMessage) const
 {
 	UM::CUndoStatus retVal;
-	retVal.Version_1_0.emplace();
-	retVal.Version_1_0->status.emplace();
+	retVal.status.emplace();
 
 	const auto& arguments = doRedoRequest.GetRequestedArguments();
 	const auto& info = doRedoRequest.GetRequestInfo();
 
-	istd::TNullableValue<UM::CUndoRedoInput::V1_0> undoRedoInput = arguments.input.Version_1_0;
+	istd::TNullableValue<UM::CUndoRedoInput> undoRedoInput = arguments.input;
 	if (!undoRedoInput || !undoRedoInput->documentId || !undoRedoInput->steps) {
 		errorMessage = "Invalid GQL request params";
 
-		retVal.Version_1_0->status = UM::EUndoStatus::InvalidDocumentId;
+		retVal.status = UM::EUndoStatus::InvalidDocumentId;
 
 		return retVal;
 	}
@@ -673,7 +661,7 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 	if (userId.isEmpty()) {
 		errorMessage = "Unable to get user ID from context";
 
-		retVal.Version_1_0->status = UM::EUndoStatus::InvalidUserId;
+		retVal.status = UM::EUndoStatus::InvalidUserId;
 
 		return retVal;
 	}
@@ -684,7 +672,7 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 	if (!m_userDocuments.contains(userId) || !m_userDocuments[userId].contains(documentId)) {
 		errorMessage = "Redo operation failed";
 
-		retVal.Version_1_0->status = UM::EUndoStatus::Failed;
+		retVal.status = UM::EUndoStatus::Failed;
 
 		return retVal;
 	}
@@ -694,7 +682,7 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 	if (undoManagerPtr->GetAvailableRedoSteps() < *undoRedoInput->steps) {
 		errorMessage = "The number of available redo steps is less than requested";
 
-		retVal.Version_1_0->status = UM::EUndoStatus::InvalidStepCount;
+		retVal.status = UM::EUndoStatus::InvalidStepCount;
 
 		return retVal;
 	}
@@ -702,12 +690,12 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 	if (!undoManagerPtr->DoRedo(*undoRedoInput->steps)) {
 		errorMessage = "Redo operation failed";
 
-		retVal.Version_1_0->status = UM::EUndoStatus::Failed;
+		retVal.status = UM::EUndoStatus::Failed;
 
 		return retVal;
 	}
 
-	retVal.Version_1_0->status = UM::EUndoStatus::Success;
+	retVal.status = UM::EUndoStatus::Success;
 
 	return retVal;
 }
@@ -720,17 +708,16 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 			QString& errorMessage) const
 {
 	UM::CUndoStatus retVal;
-	retVal.Version_1_0.emplace();
-	retVal.Version_1_0->status.emplace();
+	retVal.status.emplace();
 
 	const auto& arguments = resetUndoRequest.GetRequestedArguments();
 	const auto& info = resetUndoRequest.GetRequestInfo();
 
-	auto documentId = arguments.input.Version_1_0;
+	auto documentId = arguments.input;
 	if (!documentId || !documentId->id) {
 		errorMessage = "Invalid GQL request params";
 
-		retVal.Version_1_0->status = UM::EUndoStatus::InvalidDocumentId;
+		retVal.status = UM::EUndoStatus::InvalidDocumentId;
 
 		return retVal;
 	}
@@ -740,7 +727,7 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 	if (userId.isEmpty()) {
 		errorMessage = "Unable to get user ID from context";
 
-		retVal.Version_1_0->status = UM::EUndoStatus::InvalidUserId;
+		retVal.status = UM::EUndoStatus::InvalidUserId;
 
 		return retVal;
 	}
@@ -751,7 +738,7 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 	if (!m_userDocuments.contains(userId) || !m_userDocuments[userId].contains(*documentId->id)) {
 		errorMessage = "Reset undo operation failed";
 
-		retVal.Version_1_0->status = UM::EUndoStatus::Failed;
+		retVal.status = UM::EUndoStatus::Failed;
 
 		return retVal;
 	}
@@ -759,7 +746,7 @@ inline UM::CUndoStatus TCollectionDocumentServiceCompBase<Base, ColorCollectionD
 	undoManagerPtr = m_userDocuments[userId][*documentId->id].undoManagerPtr.GetPtr();
 	undoManagerPtr->ResetUndo();
 
-	retVal.Version_1_0->status = UM::EUndoStatus::Success;
+	retVal.status = UM::EUndoStatus::Success;
 
 	return retVal;
 }

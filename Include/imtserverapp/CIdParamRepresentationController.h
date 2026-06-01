@@ -11,21 +11,21 @@ namespace imtserverapp
 {
 
 
-class CIdParamRepresentationController: public imtserverapp::TJsonRepresentationControllerWrap<sdl::imtbase::ImtBaseTypes::CIdParam::V1_0>
+class CIdParamRepresentationController: public imtserverapp::TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CIdParam>
 {
 public:
 	CIdParamRepresentationController(QByteArray modelId, QString name = QString(), QString description = QString());
 
-	// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CParamsSet>)
+	// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CParamsSet>)
 	virtual QByteArray GetTypeId() const override;
 	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;
 	virtual bool GetSdlRepresentationFromDataModel(
-				sdl::imtbase::ImtBaseTypes::CIdParam::V1_0& sdlRepresentation,
+				sdl::V1_0::imtbase::CIdParam& sdlRepresentation,
 				const istd::IChangeable& dataModel,
 				const iprm::IParamsSet* paramsPtr = nullptr) const override;
 	virtual bool GetDataModelFromSdlRepresentation(
 				istd::IChangeable& dataModel,
-				const sdl::imtbase::ImtBaseTypes::CIdParam::V1_0& sdlRepresentation) const override;
+				const sdl::V1_0::imtbase::CIdParam& sdlRepresentation) const override;
 };
 
 

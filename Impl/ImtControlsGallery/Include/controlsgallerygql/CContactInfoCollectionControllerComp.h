@@ -10,51 +10,51 @@
 #include <imtauth/IJwtSessionController.h>
 
 // ControlsGallery includes
-#include <GeneratedFiles/controlsgallerysdl/SDL/1.0/CPP/ContactInfos.h>
+#include <GeneratedFiles/controlsgallerysdl/SDL/1.0/CPP/ContactInfos_fwd.h>
 
 
 namespace controlsgallerygql
 {
 
 
-class CContactInfoCollectionControllerComp: public sdl::controlsgallery::ContactInfos::CContactInfoCollectionControllerCompBase
+class CContactInfoCollectionControllerComp: public sdl::V1_0::controlsgallery::CContactInfoCollectionControllerCompBase
 {
 public:
-	typedef sdl::controlsgallery::ContactInfos::CContactInfoCollectionControllerCompBase BaseClass;
+	typedef sdl::V1_0::controlsgallery::CContactInfoCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CContactInfoCollectionControllerComp);
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase)
-	virtual sdl::imtbase::ImtCollection::CVisualStatus OnGetObjectVisualStatus(
-				const sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
+	// reimplemented (sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase)
+	virtual sdl::V1_0::imtbase::CVisualStatus OnGetObjectVisualStatus(
+				const sdl::V1_0::imtbase::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
-	// reimplemented (sdl::controlsgallery::ContactInfos::CContactInfoCollectionControllerCompBase)
+	// reimplemented (sdl::V1_0::controlsgallery::CContactInfoCollectionControllerCompBase)
 	virtual bool CreateRepresentationFromObject(
 				const ::imtbase::IObjectCollectionIterator& objectCollectionIterator,
-				const sdl::controlsgallery::ContactInfos::CContactInfoListGqlRequest& contactInfoListRequest,
-				sdl::controlsgallery::ContactInfos::CContactInfoItemData::V1_0& representationObject,
+				const sdl::V1_0::controlsgallery::CContactInfoListGqlRequest& contactInfoListRequest,
+				sdl::V1_0::controlsgallery::CContactInfoItemData& representationObject,
 				QString& errorMessage) const override;
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
-				const sdl::controlsgallery::ContactInfos::CGetContactInfoGqlRequest& getContactInfoRequest,
-				sdl::controlsgallery::ContactInfos::CContactInfoData::V1_0& representationPayload,
+				const sdl::V1_0::controlsgallery::CGetContactInfoGqlRequest& getContactInfoRequest,
+				sdl::V1_0::controlsgallery::CContactInfoData& representationPayload,
 				QString& errorMessage) const override;
 	virtual istd::IChangeableUniquePtr CreateObjectFromRepresentation(
-				const sdl::controlsgallery::ContactInfos::CContactInfoData::V1_0& contactInfoDataRepresentation,
+				const sdl::V1_0::controlsgallery::CContactInfoData& contactInfoDataRepresentation,
 				QByteArray& newObjectId,
 				QString& errorMessage) const override;
 	virtual bool UpdateObjectFromRepresentationRequest(
 				const ::imtgql::CGqlRequest& rawGqlRequest,
-				const sdl::controlsgallery::ContactInfos::CUpdateContactInfoGqlRequest& updateContactInfoRequest,
+				const sdl::V1_0::controlsgallery::CUpdateContactInfoGqlRequest& updateContactInfoRequest,
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
 private:
 	bool FillObjectFromRepresentation(
-				const sdl::controlsgallery::ContactInfos::CContactInfoData::V1_0& representation,
+				const sdl::V1_0::controlsgallery::CContactInfoData& representation,
 				istd::IChangeable& object,
 				QByteArray& objectId,
 				QString& errorMessage) const;

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CTenantCollectionControllerComp.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
 
 
 // ACF includes
@@ -17,12 +18,12 @@ namespace imtauthgql
 {
 
 
-// reimplemented (sdl::imtauth::Tenants::CTenantCollectionControllerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CTenantCollectionControllerCompBase)
 
 bool CTenantCollectionControllerComp::CreateRepresentationFromObject(
 			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-			const sdl::imtauth::Tenants::CGetTenantListGqlRequest& getTenantListRequest,
-			sdl::imtauth::Tenants::CTenantItemData::V1_0& representationObject,
+			const sdl::V1_0::imtauth::CGetTenantListGqlRequest& getTenantListRequest,
+			sdl::V1_0::imtauth::CTenantItemData& representationObject,
 			QString& errorMessage) const
 {
 	QByteArray objectId = objectCollectionIterator.GetObjectId();
@@ -40,7 +41,7 @@ bool CTenantCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	sdl::imtauth::Tenants::GetTenantListRequestInfo requestInfo = getTenantListRequest.GetRequestInfo();
+	sdl::V1_0::imtauth::GetTenantListRequestInfo requestInfo = getTenantListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
 		representationObject.id = QByteArray(objectId);

@@ -111,8 +111,9 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlRe
 		CStructNamespaceConverter structNameConverter(sdlField, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 
 		FeedStreamHorizontally(ifStream, 1);
+		ifStream << QStringLiteral("istd::TNullableValue<");
 		ifStream << structNameConverter.GetString();
-		ifStream << ' ' << sdlField.GetId() << ';';
+		ifStream << QStringLiteral("> ") << sdlField.GetId() << ';';
 		FeedStream(ifStream, 1, false);
 	}
 
@@ -375,11 +376,6 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestParsing(
 	// Get context
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("m_gqlContextPtr = gqlRequest.GetRequestContext();");
-	FeedStream(stream, 2, false);
-
-	// declare and read gql protocol version
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("const QByteArray protocolVersion = gqlRequest.GetProtocolVersion();");
 	FeedStream(stream, 2, false);
 
 	FeedStreamHorizontally(stream, hIndents);
@@ -847,7 +843,7 @@ void CGqlWrapClassCodeGeneratorComp::AddCustomFieldWriteToRequestCode(QTextStrea
 	stream << QStringLiteral("if (!");
 	stream << QStringLiteral("requestArguments.");
 	stream << field.GetId();
-	stream << (".WriteToGraphQlObject(");
+	stream << QStringLiteral("->WriteToGraphQlObject(");
 	stream << dataObjectVariableName;
 	stream << QStringLiteral(")){");
 	FeedStream(stream, 1, false);
@@ -956,76 +952,7 @@ void CGqlWrapClassCodeGeneratorComp::AddCheckCustomRequiredValueCode(QTextStream
 
 void CGqlWrapClassCodeGeneratorComp::AddSetCustomValueToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents) const
 {
-	// check if a protocol is acceptable
-	stream << QStringLiteral("if (!protocolVersion.isEmpty()){");
-	FeedStream(stream, 1, false);
-
-	imtsdl::CSdlType foundType;
-	[[maybe_unused]]const bool isTypeFound = GetSdlTypeForField(
-		field,
-		m_sdlTypeListCompPtr->GetSdlTypes(false),
-		foundType);
-	Q_ASSERT(isTypeFound);
-
-	/// \todo check all versions
-	const QString fieldVersion = GetTypeVersion(foundType);
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("if (protocolVersion == \"");
-	stream << fieldVersion;
-	stream << QStringLiteral("\"){");
-	FeedStream(stream, 1, false);
-
-	/// \todo do this for all versions
-	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(
-		foundType,
-		sdlNamespace,
-		*m_sdlTypeListCompPtr,
-		*m_sdlEnumListCompPtr,
-		*m_sdlUnionListCompPtr,
-		false);
-
-	QString typeVersion = structNameConverter.GetString();
-	typeVersion += QStringLiteral("::PV_");
-	typeVersion += GetSdlEntryVersion(foundType, false);
-	AddSetCustomValueToObjectCodeImpl(stream, field, typeVersion, hIndents + 1);
-
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << '}';
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("else {");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, hIndents + 2);
-	stream << QStringLiteral("qWarning() << QString(\"Bad request. Version %1 is not supported\").arg(qPrintable(protocolVersion));");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, hIndents + 2);
-	stream << QStringLiteral("m_isValid = false;");
-	FeedStream(stream, 2, false);
-
-	FeedStreamHorizontally(stream, hIndents + 2);
-	stream << QStringLiteral("return;");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << '}';
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, hIndents);
-	stream << '}';
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("else {");
-	FeedStream(stream, 1, false);
-
 	AddSetCustomValueToObjectCodeImpl(stream, field, QString(), hIndents);
-
-	FeedStreamHorizontally(stream, hIndents);
-	stream << '}';
 }
 
 void CGqlWrapClassCodeGeneratorComp::AddSetCustomValueToObjectCodeImpl(
@@ -1097,7 +1024,7 @@ void CGqlWrapClassCodeGeneratorComp::AddReadFromRequestCode(
 	stream << readVariableName;
 	stream << QStringLiteral(" = ");
 	stream << QStringLiteral("m_requestedArguments.") << field.GetId();
-	stream << '.';
+	stream << QStringLiteral(".emplace().");
 	if (optRead){
 		stream << QStringLiteral("Opt");
 	}

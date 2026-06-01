@@ -333,8 +333,8 @@ bool CSdlUnionObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& strea
 				stream << convertedType << QStringLiteral("Object();");
 				FeedStream(stream, 1, false);
 
-				FeedStreamHorizontally(stream, 3);
-				stream << QStringLiteral("newObjectPtr->Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral(" = val->Version_") << GetSdlEntryVersion(*entryField, false) << QStringLiteral(";");
+					FeedStreamHorizontally(stream, 3);
+				stream << QStringLiteral("static_cast<") << convertedType << QStringLiteral("&>(*newObjectPtr) = *val;");
 				FeedStream(stream, 1, false);
 				FeedStreamHorizontally(stream, 3);
 				stream << QStringLiteral("retVal = QVariant::fromValue(newObjectPtr);");

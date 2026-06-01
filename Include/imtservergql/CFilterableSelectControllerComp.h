@@ -5,7 +5,7 @@
 #include <imtbase/IObjectCollection.h>
 #include <imtserverapp/CComplexCollectionFilterRepresentationController.h>
 #include <imtservergql/IParamsSetJoiner.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/FilterableSelect.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/FilterableSelect_fwd.h>
 
 
 namespace imtservergql
@@ -13,10 +13,10 @@ namespace imtservergql
 
 
 class CFilterableSelectControllerComp:
-		public sdl::imtbase::FilterableSelect::CGraphQlHandlerCompBase
+		public sdl::V1_0::imtbase::CFilterableSelectGqlHandlerCompBase
 {
 public:
-	typedef sdl::imtbase::FilterableSelect::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtbase::CFilterableSelectGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CFilterableSelectControllerComp);
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection ID to match incoming requests", true, "");
@@ -29,9 +29,9 @@ public:
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 
 protected:
-	// reimplemented (sdl::imtbase::FilterableSelect::CGraphQlHandlerCompBase)
-	virtual sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload OnGetSelectableItems(
-				const sdl::imtbase::FilterableSelect::CGetSelectableItemsGqlRequest& getSelectableItemsRequest,
+	// reimplemented (sdl::V1_0::imtbase::CFilterableSelectGqlHandlerCompBase)
+	virtual sdl::V1_0::imtbase::CGetSelectableItemsPayload OnGetSelectableItems(
+				const sdl::V1_0::imtbase::CGetSelectableItemsGqlRequest& getSelectableItemsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
