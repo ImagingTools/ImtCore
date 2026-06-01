@@ -31,17 +31,17 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (CGraphQlHandlerCompBase)
-	virtual sdl::imtbase::CollectionDocumentService::CDocumentList OnGetOpenedDocumentList(
-		const sdl::imtbase::CollectionDocumentService::CGetOpenedDocumentListGqlRequest& getOpenedDocumentListRequest,
+	// reimplemented (CTenantCollectionDocumentServiceGqlHandlerCompBase)
+	virtual sdl::V1_0::imtbase::CDocumentList OnGetOpenedDocumentList(
+		const sdl::V1_0::imtbase::CGetOpenedDocumentListGqlRequest& getOpenedDocumentListRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtbase::CollectionDocumentService::CDocumentInfo OnCreateNewDocument(
-		const sdl::imtbase::CollectionDocumentService::CCreateNewDocumentGqlRequest& createNewDocumentRequest,
+	virtual sdl::V1_0::imtbase::CDocumentInfo OnCreateNewDocument(
+		const sdl::V1_0::imtbase::CCreateNewDocumentGqlRequest& createNewDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual sdl::imtbase::CollectionDocumentService::CDocumentInfo OnOpenDocument(
-		const sdl::imtbase::CollectionDocumentService::COpenDocumentGqlRequest& openDocumentRequest,
+	virtual sdl::V1_0::imtbase::CDocumentInfo OnOpenDocument(
+		const sdl::V1_0::imtbase::COpenDocumentGqlRequest& openDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
 };

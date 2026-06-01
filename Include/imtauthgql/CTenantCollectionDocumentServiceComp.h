@@ -11,7 +11,7 @@
 #include <imtdoc/IDocumentServiceEventHandler.h>
 
 // Generated includes
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantCollectionDocumentService.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantCollectionDocumentService_fwd.h>
 
 
 namespace imtauthgql
@@ -19,11 +19,11 @@ namespace imtauthgql
 
 
 class CTenantCollectionDocumentServiceComp:
-			public sdl::imtauth::TenantCollectionDocumentService::CGraphQlHandlerCompBase,
+			public sdl::V1_0::imtauth::CTenantCollectionDocumentServiceGqlHandlerCompBase,
 			virtual public imtdoc::IDocumentServiceEventHandler
 {
 public:
-	typedef sdl::imtauth::TenantCollectionDocumentService::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtauth::CTenantCollectionDocumentServiceGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CTenantCollectionDocumentServiceComp)
 		I_REGISTER_INTERFACE(imtdoc::IDocumentServiceEventHandler)
@@ -34,13 +34,13 @@ public:
 	I_END_COMPONENT
 
 protected:
-	// reimplemented (CGraphQlHandlerCompBase)
-	virtual sdl::imtauth::Tenants::CTenantData OnGetTenantRepresentation(
-				const sdl::imtauth::TenantCollectionDocumentService::CGetTenantRepresentationGqlRequest& getTenantRepresentationRequest,
+	// reimplemented (CTenantCollectionDocumentServiceGqlHandlerCompBase)
+	virtual sdl::V1_0::imtauth::CTenantData OnGetTenantRepresentation(
+				const sdl::V1_0::imtauth::CGetTenantRepresentationGqlRequest& getTenantRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus OnUpdateTenantFromRepresentation(
-				const sdl::imtauth::TenantCollectionDocumentService::CUpdateTenantFromRepresentationGqlRequest& updateTenantFromRepresentationRequest,
+	virtual sdl::V1_0::imtbase::CDocumentOperationStatus OnUpdateTenantFromRepresentation(
+				const sdl::V1_0::imtauth::CUpdateTenantFromRepresentationGqlRequest& updateTenantFromRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 

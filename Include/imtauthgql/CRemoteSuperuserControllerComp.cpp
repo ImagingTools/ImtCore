@@ -22,18 +22,18 @@ bool CRemoteSuperuserControllerComp::SetSuperuserPassword(const QByteArray& pass
 		return false;
 	}
 
-	namespace userssdl = sdl::imtauth::Users;
+	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::CreateSuperuserRequestArguments arguments;
-	arguments.input.Version_1_0 = userssdl::CCreateSuperuserInput::V1_0();
 
 	QString superuserName = m_superuserNameAttrPtr.IsValid() ? *m_superuserNameAttrPtr : QStringLiteral("superuser");
-	arguments.input.Version_1_0->name = superuserName;
+	arguments.input.emplace();
+	arguments.input->name = superuserName;
 
 	QString superuserMail = m_superuserMailAttrPtr.IsValid() ? *m_superuserMailAttrPtr : QStringLiteral("superuser");
-	arguments.input.Version_1_0->mail = superuserMail;
+	arguments.input->mail = superuserMail;
 
-	arguments.input.Version_1_0->password = password;
+	arguments.input->password = password;
 
 	imtgql::CGqlRequest gqlRequest;
 	if (userssdl::CCreateSuperuserGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
@@ -45,12 +45,8 @@ bool CRemoteSuperuserControllerComp::SetSuperuserPassword(const QByteArray& pass
 			return false;
 		}
 
-		if (!response.Version_1_0){
-			return false;
-		}
-
-		if (response.Version_1_0->success.has_value()){
-			return *response.Version_1_0->success;
+		if (response.success.has_value()){
+			return *response.success;
 		}
 	}
 

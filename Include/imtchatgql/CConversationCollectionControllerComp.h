@@ -3,7 +3,7 @@
 
 // ImtCore includes
 #include <imtchat/IConversation.h>
-#include <GeneratedFiles/imtchatsdl/SDL/1.0/CPP/ImtChat.h>
+#include <GeneratedFiles/imtchatsdl/SDL/1.0/CPP/ImtChat_fwd.h>
 
 
 namespace imtchatgql
@@ -11,40 +11,40 @@ namespace imtchatgql
 
 
 class CConversationCollectionControllerComp:
-		public sdl::imtchat::ImtChat::CConversationCollectionControllerCompBase
+		public sdl::V1_0::imtchat::CConversationCollectionControllerCompBase
 {
 public:
-	typedef sdl::imtchat::ImtChat::CConversationCollectionControllerCompBase BaseClass;
+	typedef sdl::V1_0::imtchat::CConversationCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CConversationCollectionControllerComp);
 		I_ASSIGN(m_conversationFactCompPtr, "ConversationFactory", "Factory for creating conversation instances", true, "ConversationFactory");
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtchat::ImtChat::CConversationCollectionControllerCompBase)
+	// reimplemented (sdl::V1_0::imtchat::CConversationCollectionControllerCompBase)
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-				const sdl::imtchat::ImtChat::CConversationsListGqlRequest& listRequest,
-				sdl::imtchat::ImtChat::CConversationItemData::V1_0& representationObject,
+				const sdl::V1_0::imtchat::CConversationsListGqlRequest& listRequest,
+				sdl::V1_0::imtchat::CConversationItemData& representationObject,
 				QString& errorMessage) const override;
 	virtual istd::IChangeableUniquePtr CreateObjectFromRepresentation(
-				const sdl::imtchat::ImtChat::CConversationData::V1_0& dataRepresentation,
+				const sdl::V1_0::imtchat::CConversationData& dataRepresentation,
 				QByteArray& newObjectId,
 				QString& errorMessage) const override;
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
-				const sdl::imtchat::ImtChat::CConversationItemGqlRequest& itemRequest,
-				sdl::imtchat::ImtChat::CConversationData::V1_0& representationPayload,
+				const sdl::V1_0::imtchat::CConversationItemGqlRequest& itemRequest,
+				sdl::V1_0::imtchat::CConversationData& representationPayload,
 				QString& errorMessage) const override;
 	virtual bool UpdateObjectFromRepresentationRequest(
 				const imtgql::CGqlRequest& rawGqlRequest,
-				const sdl::imtchat::ImtChat::CConversationUpdateGqlRequest& updateRequest,
+				const sdl::V1_0::imtchat::CConversationUpdateGqlRequest& updateRequest,
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
 
 private:
 	bool FillObjectFromRepresentation(
-				const sdl::imtchat::ImtChat::CConversationData::V1_0& representation,
+				const sdl::V1_0::imtchat::CConversationData& representation,
 				istd::IChangeable& object,
 				QByteArray& objectId,
 				QString& errorMessage) const;

@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtclientgql/CRemoteCollectionDocumentServiceControllerComp.h>
+#include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService.h>
+#include <imtbasesdl/SDL/1.0/CPP/UndoManager.h>
 
 
 namespace imtclientgql
@@ -8,104 +10,104 @@ namespace imtclientgql
 
 // protected methods
 
-// reimplemented (sdl::imtbase::CollectionDocumentService::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CCollectionDocumentServiceGqlHandlerCompBase)
 
-sdl::imtbase::CollectionDocumentService::CDocumentList CRemoteCollectionDocumentServiceControllerComp::OnGetOpenedDocumentList(
-			const sdl::imtbase::CollectionDocumentService::CGetOpenedDocumentListGqlRequest& /*getOpenedDocumentListRequest*/,
+sdl::V1_0::imtbase::CDocumentList CRemoteCollectionDocumentServiceControllerComp::OnGetOpenedDocumentList(
+			const sdl::V1_0::imtbase::CGetOpenedDocumentListGqlRequest& /*getOpenedDocumentListRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::CollectionDocumentService::CDocumentList>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CDocumentList>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::CollectionDocumentService::CDocumentInfo CRemoteCollectionDocumentServiceControllerComp::OnCreateNewDocument(
-			const sdl::imtbase::CollectionDocumentService::CCreateNewDocumentGqlRequest& /*createNewDocumentRequest*/,
+sdl::V1_0::imtbase::CDocumentInfo CRemoteCollectionDocumentServiceControllerComp::OnCreateNewDocument(
+			const sdl::V1_0::imtbase::CCreateNewDocumentGqlRequest& /*createNewDocumentRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::CollectionDocumentService::CDocumentInfo>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CDocumentInfo>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::CollectionDocumentService::CDocumentInfo CRemoteCollectionDocumentServiceControllerComp::OnOpenDocument(
-			const sdl::imtbase::CollectionDocumentService::COpenDocumentGqlRequest& /*openDocumentRequest*/,
+sdl::V1_0::imtbase::CDocumentInfo CRemoteCollectionDocumentServiceControllerComp::OnOpenDocument(
+			const sdl::V1_0::imtbase::COpenDocumentGqlRequest& /*openDocumentRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::CollectionDocumentService::CDocumentInfo>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CDocumentInfo>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::CollectionDocumentService::CDocumentInfo CRemoteCollectionDocumentServiceControllerComp::OnGetDocumentName(
-			const sdl::imtbase::CollectionDocumentService::CGetDocumentNameGqlRequest& /*getDocumentNameRequest*/,
+sdl::V1_0::imtbase::CDocumentInfo CRemoteCollectionDocumentServiceControllerComp::OnGetDocumentName(
+			const sdl::V1_0::imtbase::CGetDocumentNameGqlRequest& /*getDocumentNameRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::CollectionDocumentService::CDocumentInfo>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CDocumentInfo>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CRemoteCollectionDocumentServiceControllerComp::OnSetDocumentName(
-			const sdl::imtbase::CollectionDocumentService::CSetDocumentNameGqlRequest& /*setDocumentNameRequest*/,
+sdl::V1_0::imtbase::CDocumentOperationStatus CRemoteCollectionDocumentServiceControllerComp::OnSetDocumentName(
+			const sdl::V1_0::imtbase::CSetDocumentNameGqlRequest& /*setDocumentNameRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CDocumentOperationStatus>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CRemoteCollectionDocumentServiceControllerComp::OnSaveDocument(
-			const sdl::imtbase::CollectionDocumentService::CSaveDocumentGqlRequest& /*saveDocumentRequest*/,
+sdl::V1_0::imtbase::CDocumentOperationStatus CRemoteCollectionDocumentServiceControllerComp::OnSaveDocument(
+			const sdl::V1_0::imtbase::CSaveDocumentGqlRequest& /*saveDocumentRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CDocumentOperationStatus>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CRemoteCollectionDocumentServiceControllerComp::OnCloseDocument(
-			const sdl::imtbase::CollectionDocumentService::CCloseDocumentGqlRequest& /*closeDocumentRequest*/,
+sdl::V1_0::imtbase::CDocumentOperationStatus CRemoteCollectionDocumentServiceControllerComp::OnCloseDocument(
+			const sdl::V1_0::imtbase::CCloseDocumentGqlRequest& /*closeDocumentRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CDocumentOperationStatus>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::UndoManager::CUndoInfo CRemoteCollectionDocumentServiceControllerComp::OnGetUndoInfo(
-			const sdl::imtbase::CollectionDocumentService::CGetUndoInfoGqlRequest& /*getUndoInfoRequest*/,
+sdl::V1_0::imtbase::CUndoInfo CRemoteCollectionDocumentServiceControllerComp::OnGetUndoInfo(
+			const sdl::V1_0::imtbase::CGetUndoInfoGqlRequest& /*getUndoInfoRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::UndoManager::CUndoInfo>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CUndoInfo>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::UndoManager::CUndoStatus CRemoteCollectionDocumentServiceControllerComp::OnDoUndo(
-			const sdl::imtbase::CollectionDocumentService::CDoUndoGqlRequest& /*doUndoRequest*/,
+sdl::V1_0::imtbase::CUndoStatus CRemoteCollectionDocumentServiceControllerComp::OnDoUndo(
+			const sdl::V1_0::imtbase::CDoUndoGqlRequest& /*doUndoRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::UndoManager::CUndoStatus>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CUndoStatus>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::UndoManager::CUndoStatus CRemoteCollectionDocumentServiceControllerComp::OnDoRedo(
-			const sdl::imtbase::CollectionDocumentService::CDoRedoGqlRequest& /*doRedoRequest*/,
+sdl::V1_0::imtbase::CUndoStatus CRemoteCollectionDocumentServiceControllerComp::OnDoRedo(
+			const sdl::V1_0::imtbase::CDoRedoGqlRequest& /*doRedoRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::UndoManager::CUndoStatus>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CUndoStatus>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtbase::UndoManager::CUndoStatus CRemoteCollectionDocumentServiceControllerComp::OnResetUndo(
-			const sdl::imtbase::CollectionDocumentService::CResetUndoGqlRequest& /*resetUndoRequest*/,
+sdl::V1_0::imtbase::CUndoStatus CRemoteCollectionDocumentServiceControllerComp::OnResetUndo(
+			const sdl::V1_0::imtbase::CResetUndoGqlRequest& /*resetUndoRequest*/,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::UndoManager::CUndoStatus>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CUndoStatus>(gqlRequest, errorMessage);
 }
 
 

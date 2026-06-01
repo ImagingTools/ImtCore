@@ -88,6 +88,7 @@ macro(ImtCoreGetStaticCppDeps)
 	get_filename_component(SDL_SCHEMA_NAME ${ARG_INPUT} NAME_WE)
 	set(SDL_DEPS_VAR)
 	list(APPEND SDL_DEPS_VAR "${ARG_OUT_DIR}/${PROJECT_NAME}/SDL/${ARG_VERSION}/CPP/${SDL_SCHEMA_NAME}.h")
+	list(APPEND SDL_DEPS_VAR "${ARG_OUT_DIR}/${PROJECT_NAME}/SDL/${ARG_VERSION}/CPP/${SDL_SCHEMA_NAME}_fwd.h")
 	list(APPEND SDL_DEPS_VAR "${ARG_OUT_DIR}/${PROJECT_NAME}/SDL/${ARG_VERSION}/CPP/${SDL_SCHEMA_NAME}.cpp")
 
 	set(${ARG_RESULT_VARIABLE} ${SDL_DEPS_VAR})
@@ -234,8 +235,9 @@ macro (ImtCoreCustomConfigureSdlCpp)
 
 	foreach(SDL_HEADER ${FOUND_DEPS})
 		string(FIND "${SDL_HEADER}" ".h" matchres)
+		string(FIND "${SDL_HEADER}" "_fwd.h" matchres_fwd)
 
-		if (${matchres} GREATER  -1)
+		if (${matchres} GREATER -1 AND ${matchres_fwd} EQUAL -1)
 			LIST(APPEND HEADER_FILES ${SDL_HEADER})
 		endif ()
 	endforeach()

@@ -202,4 +202,8 @@ type CollectionImportParam {
 	fileImportInfos: [FileImportInfo]
 }
 
+type SessionId {
+	sessionId: ID!
+}
+
 

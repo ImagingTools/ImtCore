@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CSettingsControllerComp.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Settings.h>
 
 
 // Qt includes
@@ -16,27 +17,22 @@ namespace imtservergql
 
 // protected methods
 
-// reimplemented (sdl::imtbase::Settings::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CSettingsGqlHandlerCompBase)
 
-sdl::imtbase::Settings::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
-			const sdl::imtbase::Settings::CSetSettingsGqlRequest& setSettingsRequest,
+sdl::V1_0::imtbase::CSetSettingsPayload CSettingsControllerComp::OnSetSettings(
+			const sdl::V1_0::imtbase::CSetSettingsGqlRequest& setSettingsRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtbase::Settings::CSetSettingsPayload response;
+	sdl::V1_0::imtbase::CSetSettingsPayload response;
 	
-	sdl::imtbase::Settings::SetSettingsRequestArguments arguments = setSettingsRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.has_value()){
+	sdl::V1_0::imtbase::SetSettingsRequestArguments arguments = setSettingsRequest.GetRequestedArguments();
+	if (!arguments.input || !arguments.input->userId.has_value()){
 		Q_ASSERT(false);
 		return response;
 	}
 	
-	if (!arguments.input.Version_1_0->userId.has_value()){
-		Q_ASSERT(false);
-		return response;
-	}
-	
-	QByteArray userId = *arguments.input.Version_1_0->userId;
+	QByteArray userId = *arguments.input->userId;
 
 	if (userId.isEmpty()){
 		errorMessage = QString("Unable to set settings. User-ID is empty!");
@@ -44,15 +40,14 @@ sdl::imtbase::Settings::CSetSettingsPayload CSettingsControllerComp::OnSetSettin
 		return response;
 	}
 
-	if (!arguments.input.Version_1_0->settings.has_value()){
+	if (!arguments.input->settings.has_value()){
 		Q_ASSERT(false);
 		return response;
 	}
 	
-	QString settings = *arguments.input.Version_1_0->settings;
+	QString settings = *arguments.input->settings;
 	
-	response.Version_1_0.emplace();
-	response.Version_1_0->ok = false;
+	response.ok = false;
 
 	imtauth::IUserSettingsSharedPtr userSettingsPtr = GetOrCreateUserSettings(userId);
 	if (!userSettingsPtr.IsValid()){
@@ -89,18 +84,18 @@ sdl::imtbase::Settings::CSetSettingsPayload CSettingsControllerComp::OnSetSettin
 		return response;
 	}
 
-	response.Version_1_0->ok = true;
+	response.ok = true;
 	
 	return response;
 }
 
 
-sdl::imtbase::ImtBaseTypes::CParamsSet CSettingsControllerComp::OnGetSettings(
-			const sdl::imtbase::Settings::CGetSettingsGqlRequest& getSettingsRequest,
+sdl::V1_0::imtbase::CParamsSet CSettingsControllerComp::OnGetSettings(
+			const sdl::V1_0::imtbase::CGetSettingsGqlRequest& getSettingsRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::ImtBaseTypes::CParamsSet response;
+	sdl::V1_0::imtbase::CParamsSet response;
 	
 	if (!m_userSettingsCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserSettingsCollection' was not set", "CSettingsControllerComp");
@@ -117,15 +112,15 @@ sdl::imtbase::ImtBaseTypes::CParamsSet CSettingsControllerComp::OnGetSettings(
 		return response;
 	}
 	
-	sdl::imtbase::Settings::GetSettingsRequestArguments arguments = getSettingsRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.has_value()){
+	sdl::V1_0::imtbase::GetSettingsRequestArguments arguments = getSettingsRequest.GetRequestedArguments();
+	if (!arguments.input.has_value()){
 		Q_ASSERT(false);
 		return response;
 	}
-	
+
 	QByteArray userId;
-	if (arguments.input.Version_1_0->userId){
-		userId = *arguments.input.Version_1_0->userId;
+	if (arguments.input->userId){
+		userId = *arguments.input->userId;
 	}
 
 	if (userId.isEmpty()){
@@ -167,9 +162,7 @@ sdl::imtbase::ImtBaseTypes::CParamsSet CSettingsControllerComp::OnGetSettings(
 		return response;
 	}
 	
-	response.Version_1_0.emplace();
-	
-	if (!response.Version_1_0->ReadFromJsonObject(representationObject)){
+	if (!response.ReadFromJsonObject(representationObject)){
 		errorMessage = QString("Unable to get settings for user '%1'. Error: Read from Json object failed").arg(qPrintable(userId));
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
 		return response;
@@ -179,22 +172,22 @@ sdl::imtbase::ImtBaseTypes::CParamsSet CSettingsControllerComp::OnGetSettings(
 }
 
 
-sdl::imtbase::Settings::CStyleData CSettingsControllerComp::OnGetStyleData(
-			const sdl::imtbase::Settings::CGetStyleDataGqlRequest& getStyleRequest,
+sdl::V1_0::imtbase::CStyleData CSettingsControllerComp::OnGetStyleData(
+			const sdl::V1_0::imtbase::CGetStyleDataGqlRequest& getStyleRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtbase::Settings::CStyleData response;
+	sdl::V1_0::imtbase::CStyleData response;
 	
-	sdl::imtbase::Settings::GetStyleDataRequestArguments arguments = getStyleRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.has_value()){
+	sdl::V1_0::imtbase::GetStyleDataRequestArguments arguments = getStyleRequest.GetRequestedArguments();
+	if (!arguments.input.has_value()){
 		Q_ASSERT(false);
 		return response;
 	}
-	
+
 	QByteArray schemeId;
-	if (arguments.input.Version_1_0->schemeId){
-		schemeId = *arguments.input.Version_1_0->schemeId;
+	if (arguments.input->schemeId){
+		schemeId = *arguments.input->schemeId;
 	}
 	
 	if(schemeId.isEmpty()){
@@ -216,40 +209,37 @@ sdl::imtbase::Settings::CStyleData CSettingsControllerComp::OnGetStyleData(
 		return response;
 	}
 	
-	response.Version_1_0.emplace();
-	response.Version_1_0->data = resource.readAll();
+	response.data = resource.readAll();
 	resource.close();
 	
 	return response;
 }
 
 
-sdl::imtbase::ImtBaseTypes::CUrlParam CSettingsControllerComp::OnGetWebSocketUrl(
-			const sdl::imtbase::Settings::CGetWebSocketUrlGqlRequest& /*getWebSocketUrlRequest*/,
+sdl::V1_0::imtbase::CUrlParam CSettingsControllerComp::OnGetWebSocketUrl(
+			const sdl::V1_0::imtbase::CGetWebSocketUrlGqlRequest& /*getWebSocketUrlRequest*/,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
 	if (!m_serverInterfaceCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'WebSocketUrlParam' was not set", "CSettingsControllerComp");
-		return sdl::imtbase::ImtBaseTypes::CUrlParam();
+		return sdl::V1_0::imtbase::CUrlParam();
 	}
 	
-	sdl::imtbase::ImtBaseTypes::CUrlParam response;
-	response.Version_1_0.emplace();
-	
+	sdl::V1_0::imtbase::CUrlParam response;
 	QUrl url;
 	
 	if (m_serverInterfaceCompPtr->GetUrl(imtcom::IServerConnectionInterface::PT_WEBSOCKET, url)){
-		response.Version_1_0->host = url.host();
-		response.Version_1_0->port = url.port();
-		response.Version_1_0->scheme = url.scheme();
+		response.host = url.host();
+		response.port = url.port();
+		response.scheme = url.scheme();
 
 		return response;
 	}
 
 	errorMessage = "Websocket URL could not be provided";
 
-	return sdl::imtbase::ImtBaseTypes::CUrlParam();
+	return sdl::V1_0::imtbase::CUrlParam();
 }
 
 

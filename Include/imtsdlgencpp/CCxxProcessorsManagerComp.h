@@ -116,6 +116,13 @@ private:
 				const iprm::IParamsSet* paramsPtr) const;
 
 	/**
+		Generates a forward declaration header file containing forward declarations
+		for all generated classes (types, unions, document types).
+		This enables consumers to use forward declarations instead of heavy full includes.
+	*/
+	[[nodiscard]] bool GenerateForwardDeclarationFile(const iprm::IParamsSet* paramsPtr) const;
+
+	/**
 		Creates files for all types if split doesn't enabled, key[EntryName] will be empty, and only one pointer will be created and returned
 		\warning all files will be opened!
 		\note all file pointers MUST NOT be NULL

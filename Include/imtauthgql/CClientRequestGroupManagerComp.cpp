@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CClientRequestGroupManagerComp.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Groups.h>
 
 
 namespace imtauthgql
@@ -18,39 +19,39 @@ QByteArrayList CClientRequestGroupManagerComp::GetGroupIds() const
 
 QByteArray CClientRequestGroupManagerComp::CreateGroup(const QString& groupName, const QString& description)
 {
-	namespace groupssdl = sdl::imtauth::Groups;
+	namespace groupssdl = sdl::V1_0::imtauth;
 
 	groupssdl::GroupAddRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-	arguments.input.Version_1_0->typeId = QByteArrayLiteral("Group");
-	arguments.input.Version_1_0->name = groupName;
-	arguments.input.Version_1_0->description = description;
+	arguments.input.emplace();
+	arguments.input->id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+	arguments.input->typeId = QByteArrayLiteral("Group");
+	arguments.input->name = groupName;
+	arguments.input->description = description;
 
 	QByteArray productId;
 	if (m_applicationInfoCompPtr.IsValid()){
 		productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
-	arguments.input.Version_1_0->productId = productId;
+	arguments.input->productId = productId;
 
-	groupssdl::CGroupData::V1_0 groupData;
+	groupssdl::CGroupData groupData;
 	groupData.description = description;
 	groupData.name = groupName;
 	groupData.productId = productId;
 
-	arguments.input.Version_1_0->item = groupData;
+	arguments.input->item = groupData;
 
-	sdl::imtbase::ImtCollection::CAddedNotificationPayload payload;
-	bool ok = SendModelRequestInternal<groupssdl::GroupAddRequestArguments, sdl::imtbase::ImtCollection::CAddedNotificationPayload, groupssdl::CGroupAddGqlRequest>(arguments, payload);
+	sdl::V1_0::imtbase::CAddedNotificationPayload payload;
+	bool ok = SendModelRequestInternal<groupssdl::GroupAddRequestArguments, sdl::V1_0::imtbase::CAddedNotificationPayload, groupssdl::CGroupAddGqlRequest>(arguments, payload);
 	if (!ok){
 		return QByteArray();
 	}
 
-	if (!payload.Version_1_0->id.HasValue()){
+	if (!payload.id.HasValue()){
 		return QByteArray();
 	}
 
-	return *payload.Version_1_0->id;
+	return *payload.id;
 }
 
 
@@ -66,7 +67,7 @@ imtauth::IUserGroupInfoUniquePtr CClientRequestGroupManagerComp::GetGroup(const 
 		return nullptr;
 	}
 
-	sdl::imtauth::Groups::CGroupData::V1_0 groupData;
+	sdl::V1_0::imtauth::CGroupData groupData;
 	bool ok = GetGroupDataSdl(groupId, groupData);
 	if (!ok){
 		return nullptr;
@@ -112,7 +113,7 @@ bool CClientRequestGroupManagerComp::AddUsersToGroup(const QByteArray& groupId, 
 		return false;
 	}
 
-	sdl::imtauth::Groups::CGroupData::V1_0 groupData;
+	sdl::V1_0::imtauth::CGroupData groupData;
 	bool ok = GetGroupDataSdl(groupId, groupData);
 	if (!ok){
 		return false;
@@ -143,7 +144,7 @@ bool CClientRequestGroupManagerComp::RemoveUsersFromGroup(const QByteArray& grou
 		return false;
 	}
 
-	sdl::imtauth::Groups::CGroupData::V1_0 groupData;
+	sdl::V1_0::imtauth::CGroupData groupData;
 	bool ok = GetGroupDataSdl(groupId, groupData);
 	if (!ok){
 		return false;
@@ -174,7 +175,7 @@ bool CClientRequestGroupManagerComp::AddRolesToGroup(const QByteArray& groupId, 
 		return false;
 	}
 
-	sdl::imtauth::Groups::CGroupData::V1_0 groupData;
+	sdl::V1_0::imtauth::CGroupData groupData;
 	bool ok = GetGroupDataSdl(groupId, groupData);
 	if (!ok){
 		return false;
@@ -205,7 +206,7 @@ bool CClientRequestGroupManagerComp::RemoveRolesFromGroup(const QByteArray& grou
 		return false;
 	}
 
-	sdl::imtauth::Groups::CGroupData::V1_0 groupData;
+	sdl::V1_0::imtauth::CGroupData groupData;
 	bool ok = GetGroupDataSdl(groupId, groupData);
 	if (!ok){
 		return false;
@@ -232,16 +233,16 @@ bool CClientRequestGroupManagerComp::RemoveRolesFromGroup(const QByteArray& grou
 
 // private methods
 
-bool CClientRequestGroupManagerComp::GetGroupDataSdl(const QByteArray& groupId, sdl::imtauth::Groups::CGroupData::V1_0& groupData) const
+bool CClientRequestGroupManagerComp::GetGroupDataSdl(const QByteArray& groupId, sdl::V1_0::imtauth::CGroupData& groupData) const
 {
-	namespace groupssdl = sdl::imtauth::Groups;
+	namespace groupssdl = sdl::V1_0::imtauth;
 
 	groupssdl::GroupItemRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->id = groupId;
+	arguments.input.emplace();
+	arguments.input->id = groupId;
 
 	if (m_applicationInfoCompPtr.IsValid()){
-		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+		arguments.input->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
 
 	groupssdl::CGroupData payload;
@@ -250,37 +251,37 @@ bool CClientRequestGroupManagerComp::GetGroupDataSdl(const QByteArray& groupId, 
 		return false;
 	}
 
-	groupData = *payload.Version_1_0;
+	groupData = payload;
 
 	return true;
 }
 
 
-bool CClientRequestGroupManagerComp::SetGroupDataSdl(const QByteArray& groupId, const sdl::imtauth::Groups::CGroupData::V1_0& groupData) const
+bool CClientRequestGroupManagerComp::SetGroupDataSdl(const QByteArray& groupId, const sdl::V1_0::imtauth::CGroupData& groupData) const
 {
-	namespace groupssdl = sdl::imtauth::Groups;
+	namespace groupssdl = sdl::V1_0::imtauth;
 
 	groupssdl::GroupUpdateRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->id = groupId;
-	arguments.input.Version_1_0->typeId = QByteArray("Group");
-	arguments.input.Version_1_0->item = groupData;
+	arguments.input.emplace();
+	arguments.input->id = groupId;
+	arguments.input->typeId = QByteArray("Group");
+	arguments.input->item = groupData;
 
 	if (m_applicationInfoCompPtr.IsValid()){
-		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+		arguments.input->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
 
-	sdl::imtbase::ImtCollection::CUpdatedNotificationPayload payload;
-	bool ok = SendModelRequestInternal<groupssdl::GroupUpdateRequestArguments, sdl::imtbase::ImtCollection::CUpdatedNotificationPayload, groupssdl::CGroupUpdateGqlRequest>(arguments, payload);
+	sdl::V1_0::imtbase::CUpdatedNotificationPayload payload;
+	bool ok = SendModelRequestInternal<groupssdl::GroupUpdateRequestArguments, sdl::V1_0::imtbase::CUpdatedNotificationPayload, groupssdl::CGroupUpdateGqlRequest>(arguments, payload);
 	if (!ok){
 		return false;
 	}
 
-	if (!payload.Version_1_0->id){
+	if (!payload.id){
 		return false;
 	}
 
-	return !payload.Version_1_0->id->isEmpty();
+	return !payload.id->isEmpty();
 }
 
 

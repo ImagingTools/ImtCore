@@ -5,14 +5,14 @@
 // ImtCore includes
 #include <imtbase/ISearchController.h>
 #include <imtservergql/CGqlRequestHandlerCompBase.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Search.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Search_fwd.h>
 
 
 namespace imtservergql
 {
 
 
-class CGqlSearchControllerComp: public sdl::imtbase::Search::CGraphQlHandlerCompBase
+class CGqlSearchControllerComp: public sdl::V1_0::imtbase::CSearchGqlHandlerCompBase
 {
 public:
 	typedef imtservergql::CGqlRequestHandlerCompBase BaseClass;
@@ -22,9 +22,9 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtbase::Search::CGraphQlHandlerCompBase)
-	virtual sdl::imtbase::Search::CSearchResults OnSearch(
-				const sdl::imtbase::Search::CSearchGqlRequest& searchRequest,
+	// reimplemented (sdl::V1_0::imtbase::CSearchGqlHandlerCompBase)
+	virtual sdl::V1_0::imtbase::CSearchResults OnSearch(
+				const sdl::V1_0::imtbase::CSearchGqlRequest& searchRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 

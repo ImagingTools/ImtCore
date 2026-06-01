@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtserverapp/CCollectionImportParamRepresentationControllerComp.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Settings.h>
 
 
 // ImtCore includes
@@ -12,11 +13,11 @@ namespace imtserverapp
 
 // protected methods
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CCollectionImportParam::V1_0>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CCollectionImportParam>)
 
 QByteArray CCollectionImportParamRepresentationControllerComp::GetTypeId() const
 {
-	return sdl::imtbase::ImtBaseTypes::CParamTypeIds::V1_0::ParamTypeIdsFields::CollectionImportParam.toUtf8();
+	return sdl::V1_0::imtbase::CParamTypeIds::ParamTypeIdsFields::CollectionImportParam.toUtf8();
 }
 
 
@@ -29,7 +30,7 @@ bool CCollectionImportParamRepresentationControllerComp::IsModelSupported(const 
 
 
 bool CCollectionImportParamRepresentationControllerComp::GetSdlRepresentationFromDataModel(
-			sdl::imtbase::ImtBaseTypes::CCollectionImportParam::V1_0& sdlRepresentation,
+			sdl::V1_0::imtbase::CCollectionImportParam& sdlRepresentation,
 			const istd::IChangeable& dataModel,
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
@@ -41,12 +42,12 @@ bool CCollectionImportParamRepresentationControllerComp::GetSdlRepresentationFro
 
 	sdlRepresentation.collectionId = collectionImportParamPtr->GetCollectionId();
 
-	imtsdl::TElementList<sdl::imtbase::ImtBaseTypes::CFileImportInfo::V1_0> sdlFileImportInfos;
+	imtsdl::TElementList<sdl::V1_0::imtbase::CFileImportInfo> sdlFileImportInfos;
 	int count = collectionImportParamPtr->GetFileCount();
 	for (int i = 0; i < count; ++i){
 		imtcol::ICollectionImportParam::FileImportInfo* fileImportInfoPtr = collectionImportParamPtr->GetFileImportInfo(i);
 		if (fileImportInfoPtr != nullptr){
-			sdl::imtbase::ImtBaseTypes::CFileImportInfo::V1_0 sdlFileImportInfo;
+			sdl::V1_0::imtbase::CFileImportInfo sdlFileImportInfo;
 			sdlFileImportInfo.filePath = fileImportInfoPtr->filePath;
 			sdlFileImportInfo.objectTypeId = fileImportInfoPtr->objectTypeId;
 			sdlFileImportInfo.proposedId = fileImportInfoPtr->proposedId;
@@ -62,7 +63,7 @@ bool CCollectionImportParamRepresentationControllerComp::GetSdlRepresentationFro
 
 bool CCollectionImportParamRepresentationControllerComp::GetDataModelFromSdlRepresentation(
 			istd::IChangeable& dataModel,
-			const sdl::imtbase::ImtBaseTypes::CCollectionImportParam::V1_0& sdlRepresentation) const
+			const sdl::V1_0::imtbase::CCollectionImportParam& sdlRepresentation) const
 {
 	imtcol::ICollectionImportParam* collectionImportParamPtr = dynamic_cast<imtcol::ICollectionImportParam*>(&dataModel);
 	Q_ASSERT(collectionImportParamPtr != nullptr);
@@ -75,7 +76,7 @@ bool CCollectionImportParamRepresentationControllerComp::GetDataModelFromSdlRepr
 	}
 
 	if (sdlRepresentation.fileImportInfos){
-		const imtsdl::TElementList<sdl::imtbase::ImtBaseTypes::CFileImportInfo::V1_0>& sdlFileImportInfos = *sdlRepresentation.fileImportInfos;
+		const imtsdl::TElementList<sdl::V1_0::imtbase::CFileImportInfo>& sdlFileImportInfos = *sdlRepresentation.fileImportInfos;
 		for (int i = 0; i < sdlFileImportInfos.size(); ++i){
 			auto sdlFileImportInfo = sdlFileImportInfos[i];
 			if (sdlFileImportInfo){

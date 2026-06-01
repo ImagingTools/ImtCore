@@ -43,7 +43,7 @@ void CQmlRectangleShape::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSe
 	}
 }
 
-void CQmlRectangleShape::SetTopLeft(sdl::imtsdl2d::imt2d::CPoint2d newTopLeft)
+void CQmlRectangleShape::SetTopLeft(sdl::V1_0::imtsdl2d::CPoint2d newTopLeft)
 {
 	BaseClass2::SetTopLeft(newTopLeft);
 	i2d::CRectangle* objectPtr = GetObjectPtr();
@@ -56,7 +56,7 @@ void CQmlRectangleShape::SetTopLeft(sdl::imtsdl2d::imt2d::CPoint2d newTopLeft)
 	objectPtr->SetTopLeft(i2d::CVector2d(newTopLeft.GetX(),newTopLeft.GetY()));
 }
 
-void CQmlRectangleShape::SetBottomRight(sdl::imtsdl2d::imt2d::CPoint2d newBottomRight)
+void CQmlRectangleShape::SetBottomRight(sdl::V1_0::imtsdl2d::CPoint2d newBottomRight)
 {
 	BaseClass2::SetBottomRight(newBottomRight);
 	i2d::CRectangle* objectPtr = GetObjectPtr();

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtcol/CDocumentCollectionFilterRepresentationController.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentCollectionFilter.h>
 
 
 namespace imtcol
@@ -7,11 +8,11 @@ namespace imtcol
 
 
 bool CDocumentCollectionFilterRepresentationController::DocumentCollectionFilterRepresentationToModel(
-			const sdl::imtbase::DocumentCollectionFilter::CDocumentCollectionFilter::V1_0& filterRepresentaion,
+			const sdl::V1_0::imtbase::CDocumentCollectionFilter& filterRepresentaion,
 			IDocumentCollectionFilter& filterModel,
 			ilog::IMessageConsumer* /*messageConsumerPtr*/)
 {
-	namespace Filter = sdl::imtbase::DocumentCollectionFilter;
+	namespace Filter = sdl::V1_0::imtbase;
 
 	if (filterRepresentaion.documentId.has_value()){
 		QByteArray documentId = *filterRepresentaion.documentId;

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtclientgql/CRemoteFilterableSelectControllerComp.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/FilterableSelect.h>
 
 
 namespace imtclientgql
@@ -27,14 +28,14 @@ bool CRemoteFilterableSelectControllerComp::IsRequestSupported(const imtgql::CGq
 }
 
 
-// reimplemented (sdl::imtbase::FilterableSelect::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CFilterableSelectGqlHandlerCompBase)
 
-sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload CRemoteFilterableSelectControllerComp::OnGetSelectableItems(
-			const sdl::imtbase::FilterableSelect::CGetSelectableItemsGqlRequest& /*getSelectableItemsRequest*/,
+sdl::V1_0::imtbase::CGetSelectableItemsPayload CRemoteFilterableSelectControllerComp::OnGetSelectableItems(
+			const sdl::V1_0::imtbase::CGetSelectableItemsGqlRequest& /*getSelectableItemsRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtbase::FilterableSelect::CGetSelectableItemsPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtbase::CGetSelectableItemsPayload>(gqlRequest, errorMessage);
 }
 
 

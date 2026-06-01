@@ -878,6 +878,36 @@ QString CSdlTools::BuildNamespaceFromParams(const iprm::IParamsSet& schemaParams
 }
 
 
+QString CSdlTools::BuildNamespaceStructFromParams(const iprm::IParamsSet& schemaParams, const QString& prefix)
+{
+	QString retVal;
+
+	if (!prefix.isEmpty()){
+		retVal = prefix;
+		retVal += QStringLiteral("::");
+	}
+
+	// Add version formatted as V<major>_<minor> (e.g. "1.0" -> "V1_0")
+	iprm::TParamsPtr<iprm::ITextParam> versionNameParamPtr(&schemaParams, SdlCustomSchemaKeys::VersionName.toUtf8(), false);
+	if (versionNameParamPtr.IsValid()){
+		QString versionName = versionNameParamPtr->GetText();
+		static QRegularExpression nonWordRegexp(QStringLiteral("[^\\w]"));
+		versionName.replace(nonWordRegexp, QStringLiteral("_"));
+		retVal += QStringLiteral("V");
+		retVal += versionName;
+		retVal += QStringLiteral("::");
+	}
+
+	// Add schema namespace (but NOT the schema file name)
+	iprm::TParamsPtr<iprm::ITextParam> namespaceParamPtr(&schemaParams, SdlCustomSchemaKeys::SchemaNamespace.toUtf8(), false);
+	if (namespaceParamPtr.IsValid()){
+		retVal += namespaceParamPtr->GetText();
+	}
+
+	return GetNamespaceAcceptableString(retVal);
+}
+
+
 QString CSdlTools::BuildQmlImportDeclarationFromParams(const iprm::IParamsSet& schemaParams, const QString& suffix, bool addVersion)
 {
 	QString retVal;

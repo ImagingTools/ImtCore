@@ -4,32 +4,32 @@
 
 // ImtCore includes
 #include <imtserverapp/TJsonRepresentationControllerCompWrap.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Settings.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Settings_fwd.h>
 
 
 namespace imtserverapp
 {
 
 
-class CDoubleParamRepresentationControllerComp: public imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CDoubleParam::V1_0>
+class CDoubleParamRepresentationControllerComp: public imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CDoubleParam>
 {
 public:
-	typedef imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CDoubleParam::V1_0> BaseClass;
+	typedef imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CDoubleParam> BaseClass;
 
 	I_BEGIN_COMPONENT(CDoubleParamRepresentationControllerComp)
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CDoubleParam::V1_0>)
+	// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CDoubleParam>)
 	virtual QByteArray GetTypeId() const override;
 	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;
 	virtual bool GetSdlRepresentationFromDataModel(
-				sdl::imtbase::ImtBaseTypes::CDoubleParam::V1_0& sdlRepresentation,
+				sdl::V1_0::imtbase::CDoubleParam& sdlRepresentation,
 				const istd::IChangeable& dataModel,
 				const iprm::IParamsSet* paramsPtr = nullptr) const override;
 	virtual bool GetDataModelFromSdlRepresentation(
 				istd::IChangeable& dataModel,
-				const sdl::imtbase::ImtBaseTypes::CDoubleParam::V1_0& sdlRepresentation) const override;
+				const sdl::V1_0::imtbase::CDoubleParam& sdlRepresentation) const override;
 };
 
 

@@ -11,10 +11,10 @@ namespace controlsgallerygql
 
 // protected methods
 
-// reimplemented (imtdbgql::TSdlBasedMetaInfoDelegate<sdl::controlsgallery::ContactInfos::CContactInfoItemData::V1_0>)
+// reimplemented (imtdbgql::TSdlBasedMetaInfoDelegate<sdl::V1_0::controlsgallery::CContactInfoItemData>)
 
 bool CContactInfoMetaInfoDelegateComp::FillRepresentation(
-			sdl::controlsgallery::ContactInfos::CContactInfoItemData::V1_0& metaInfoRepresentation,
+			sdl::V1_0::controlsgallery::CContactInfoItemData& metaInfoRepresentation,
 			const idoc::IDocumentMetaInfo& metaInfo,
 			const QByteArray& /*typeId*/) const
 {
@@ -33,7 +33,7 @@ bool CContactInfoMetaInfoDelegateComp::FillRepresentation(
 
 bool CContactInfoMetaInfoDelegateComp::FillMetaInfo(
 			idoc::IDocumentMetaInfo& metaInfo,
-			const sdl::controlsgallery::ContactInfos::CContactInfoItemData::V1_0& metaInfoRepresentation,
+			const sdl::V1_0::controlsgallery::CContactInfoItemData& metaInfoRepresentation,
 			const QByteArray& /*typeId*/) const
 {
 	if (metaInfoRepresentation.firstName){

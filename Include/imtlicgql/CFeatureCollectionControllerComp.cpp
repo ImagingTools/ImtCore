@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtlicgql/CFeatureCollectionControllerComp.h>
+#include <GeneratedFiles/imtlicsdl/SDL/1.0/CPP/Features.h>
 
 
 // ACF includes
@@ -20,7 +21,7 @@ namespace imtlicgql
 // protected methods
 
 bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
-			const sdl::imtlic::Features::CFeatureData::V1_0& featureRepresentationData,
+			const sdl::V1_0::imtlic::CFeatureData& featureRepresentationData,
 			const QByteArray& rootFeatureId,
 			imtlic::CFeatureInfo& featureInfo,
 			QString& errorMessage) const
@@ -84,11 +85,11 @@ bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
 	bool isPermission = bool(featureRepresentationData.isPermission && *featureRepresentationData.isPermission);
 	featureInfo.SetIsPermission(isPermission);
 
-	imtsdl::TElementList<sdl::imtlic::Features::CFeatureData::V1_0> subFeatureDataList;
+	imtsdl::TElementList<sdl::V1_0::imtlic::CFeatureData> subFeatureDataList;
 	if (featureRepresentationData.subFeatures){
 		subFeatureDataList = *featureRepresentationData.subFeatures;
 	}
-	for (const istd::TNullableValue<sdl::imtlic::Features::CFeatureData::V1_0>& subFeatureData : subFeatureDataList){
+	for (const istd::TNullableValue<sdl::V1_0::imtlic::CFeatureData>& subFeatureData : subFeatureDataList){
 		if (!subFeatureData.HasValue()){
 			continue;
 		}
@@ -109,7 +110,7 @@ bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
 
 bool CFeatureCollectionControllerComp::CreateRepresentationModelFromFeatureInfo(
 			const imtlic::CFeatureInfo& featureInfo,
-			sdl::imtlic::Features::CFeatureData::V1_0& featureRepresentationData,
+			sdl::V1_0::imtlic::CFeatureData& featureRepresentationData,
 			QString& errorMessage) const
 {
 	QByteArray featureId = featureInfo.GetFeatureId();
@@ -132,7 +133,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationModelFromFeatureInfo(
 	bool isPermission = featureInfo.IsPermission();
 	featureRepresentationData.isPermission = isPermission;
 
-	imtsdl::TElementList<sdl::imtlic::Features::CFeatureData::V1_0> subFeatureDataList;
+	imtsdl::TElementList<sdl::V1_0::imtlic::CFeatureData> subFeatureDataList;
 	const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
 	if (!subFeatures.isEmpty()){
 		for (int i = 0; i < subFeatures.count(); i++){
@@ -144,7 +145,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationModelFromFeatureInfo(
 			const imtlic::CFeatureInfo* subFeatureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(featureInfoPtr.GetPtr());
 			Q_ASSERT(subFeatureInfoPtr != nullptr);
 
-			sdl::imtlic::Features::CFeatureData::V1_0 subfeatureData;
+			sdl::V1_0::imtlic::CFeatureData subfeatureData;
 			imtbase::CTreeItemModel subFeatureRepresentationModel;
 			bool ok = CreateRepresentationModelFromFeatureInfo(*subFeatureInfoPtr, subfeatureData, errorMessage);
 			if (!ok){
@@ -161,7 +162,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationModelFromFeatureInfo(
 }
 
 
-// reimplemented (sdl::imtlic::Features::CFeatureCollectionControllerCompBase)
+// reimplemented (sdl::V1_0::imtlic::CFeatureCollectionControllerCompBase)
 
 void CFeatureCollectionControllerComp::OnAfterRemoveElements(const QByteArrayList& elementIds, const imtgql::CGqlRequest& /*gqlRequest*/) const
 {
@@ -174,8 +175,8 @@ void CFeatureCollectionControllerComp::OnAfterRemoveElements(const QByteArrayLis
 
 bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-			const sdl::imtlic::Features::CFeaturesListGqlRequest& featuresListRequest,
-			sdl::imtlic::Features::CFeatureItem::V1_0& representationObject,
+			const sdl::V1_0::imtlic::CFeaturesListGqlRequest& featuresListRequest,
+			sdl::V1_0::imtlic::CFeatureItem& representationObject,
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
@@ -202,7 +203,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 
 	idoc::MetaInfoPtr metaInfo = objectCollectionIterator.GetDataMetaInfo();
 
-	sdl::imtlic::Features::FeaturesListRequestInfo requestInfo = featuresListRequest.GetRequestInfo();
+	sdl::V1_0::imtlic::FeaturesListRequestInfo requestInfo = featuresListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
 		representationObject.id = objectId;
@@ -244,7 +245,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isSubFeaturesRequested){
-		sdl::imtlic::Features::CFeatureData::V1_0 featureData;
+		sdl::V1_0::imtlic::CFeatureData featureData;
 		bool ok = CreateRepresentationModelFromFeatureInfo(*featureInfoPtr, featureData, errorMessage);
 		if (ok){
 			representationObject.subFeatures = *featureData.subFeatures;
@@ -269,7 +270,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 
 
 istd::IChangeableUniquePtr CFeatureCollectionControllerComp::CreateObjectFromRepresentation(
-			const sdl::imtlic::Features::CFeatureData::V1_0& featureDataRepresentation,
+			const sdl::V1_0::imtlic::CFeatureData& featureDataRepresentation,
 			QByteArray& newObjectId,
 			QString& errorMessage) const
 {
@@ -330,8 +331,8 @@ istd::IChangeableUniquePtr CFeatureCollectionControllerComp::CreateObjectFromRep
 
 bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 			const istd::IChangeable& data,
-			const sdl::imtlic::Features::CGetFeatureItemGqlRequest& featureItemRequest,
-			sdl::imtlic::Features::CFeatureData::V1_0& representationPayload,
+			const sdl::V1_0::imtlic::CGetFeatureItemGqlRequest& featureItemRequest,
+			sdl::V1_0::imtlic::CFeatureData& representationPayload,
 			QString& errorMessage) const
 {
 	const imtlic::CIdentifiableFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::CIdentifiableFeatureInfo*>(&data);
@@ -342,15 +343,10 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 		return false;
 	}
 
-	sdl::imtlic::Features::GetFeatureItemRequestArguments arguments = featureItemRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.has_value()){
-		I_CRITICAL();
-		return false;
-	}
-	
+	sdl::V1_0::imtlic::GetFeatureItemRequestArguments arguments = featureItemRequest.GetRequestedArguments();
 	QByteArray id;
-	if (arguments.input.Version_1_0->id){
-		id = *arguments.input.Version_1_0->id;
+	if (arguments.input->id){
+		id = *arguments.input->id;
 	}
 	representationPayload.id = std::move(id);
 
@@ -368,7 +364,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 
 bool CFeatureCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 			const imtgql::CGqlRequest& /*rawGqlRequest*/,
-			const sdl::imtlic::Features::CUpdateFeatureGqlRequest& updateFeatureRequest,
+			const sdl::V1_0::imtlic::CUpdateFeatureGqlRequest& updateFeatureRequest,
 			istd::IChangeable& object,
 			QString& errorMessage) const
 {
@@ -380,28 +376,23 @@ bool CFeatureCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 		return false;
 	}
 	
-	sdl::imtlic::Features::UpdateFeatureRequestArguments arguments = updateFeatureRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.has_value()){
+	sdl::V1_0::imtlic::UpdateFeatureRequestArguments arguments = updateFeatureRequest.GetRequestedArguments();
+	if (!arguments.input->id.has_value()){
 		I_CRITICAL();
 		return false;
 	}
 	
-	if (!arguments.input.Version_1_0->id.has_value()){
-		I_CRITICAL();
-		return false;
-	}
-	
-	if (!arguments.input.Version_1_0->item.has_value()){
+	if (!arguments.input->item.has_value()){
 		I_CRITICAL();
 		return false;
 	}
 
-	QByteArray featureId = *arguments.input.Version_1_0->id;
+	QByteArray featureId = *arguments.input->id;
 
 	featureInfoPtr->ResetData();
 
 	featureInfoPtr->SetObjectUuid(featureId);
-	sdl::imtlic::Features::CFeatureData::V1_0 featureData = *arguments.input.Version_1_0->item;
+	sdl::V1_0::imtlic::CFeatureData featureData = *arguments.input->item;
 
 	bool ok = CreateFeatureFromRepresentationModel(featureData, featureId, *featureInfoPtr, errorMessage);
 	if (!ok){

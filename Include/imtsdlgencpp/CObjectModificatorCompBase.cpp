@@ -81,7 +81,7 @@ bool CObjectModificatorCompBase::ProcessHeaderClassFile(const imtsdl::CSdlType& 
 
 	// add method definitions
 	// write
-	FeedStreamHorizontally(ofStream, 2);
+	FeedStreamHorizontally(ofStream, 1);
 	ofStream << QStringLiteral("[[nodiscard]] bool ");
 	WriteMethodCall(ofStream, MT_WRITE);
 	ofStream << '(';
@@ -92,7 +92,7 @@ bool CObjectModificatorCompBase::ProcessHeaderClassFile(const imtsdl::CSdlType& 
 	FeedStream(ofStream, 1, false);
 
 	// read
-	FeedStreamHorizontally(ofStream, 2);
+	FeedStreamHorizontally(ofStream, 1);
 	ofStream << QStringLiteral("[[nodiscard]] bool ");
 	WriteMethodCall(ofStream, MT_READ);
 	ofStream << QStringLiteral("(const ");
@@ -103,7 +103,7 @@ bool CObjectModificatorCompBase::ProcessHeaderClassFile(const imtsdl::CSdlType& 
 	FeedStream(ofStream, 1);
 
 	// opt read
-	FeedStreamHorizontally(ofStream, 2);
+	FeedStreamHorizontally(ofStream, 1);
 	ofStream << QStringLiteral("[[nodiscard]] bool ");
 	WriteMethodCall(ofStream, MT_OPT_READ);
 	ofStream << QStringLiteral("(const ");
@@ -129,7 +129,7 @@ bool CObjectModificatorCompBase::ProcessSourceClassFile(const imtsdl::CSdlType& 
 
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 	CStructNamespaceConverter structNameConverter(sdlType, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
-	structNameConverter.addVersion = true;
+	structNameConverter.addVersion = false;
 
 	// add method implementation
 
@@ -867,7 +867,7 @@ void CObjectModificatorCompBase::AddCustomFieldReadFromObjectImplCode(
 	FeedStreamHorizontally(stream, hIndents);
 	stream << variableName;
 	stream << QStringLiteral(" = ");
-	structNameConverter.addVersion = true;
+	structNameConverter.addVersion = false;
 	stream << structNameConverter.GetString();
 	stream << QStringLiteral("();");
 	FeedStream(stream, 1, false);
@@ -970,7 +970,7 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 	FeedStreamHorizontally(stream, hIndents);
 	stream << field.GetId();
 	stream << ' ' << '=' << ' ';
-	stream << ConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr);
+	stream << OptListConvertTypeWithNamespaceStruct(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, true);
 	stream << '(' << ')' << ';';
 	FeedStream(stream, 1, false);
 
@@ -999,7 +999,7 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 		stream << QStringLiteral("const ") << GetUnionListElementType(forScalar);
 	}
 	else{
-		stream << OptListConvertTypeWithNamespace(field, QString(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr);
+		stream << OptListConvertTypeWithNamespaceStruct(field, QString(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr);
 	}
 	if(result.customListAccessCode.isEmpty()){
 		stream << QStringLiteral(" temp") << GetCapitalizedValue(field.GetId());
@@ -1030,7 +1030,7 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 		Q_ASSERT(found);
 
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr);
+		stream << OptListConvertTypeWithNamespaceStruct(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr);
 		stream << ' ' << dataVarName << ';';
 		FeedStream(stream, 1, false);
 
@@ -1052,7 +1052,7 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 		Q_ASSERT(found);
 
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << OptListConvertTypeWithNamespace(field,
+		stream << OptListConvertTypeWithNamespaceStruct(field,
 			m_originalSchemaNamespaceCompPtr->GetText(),
 			*m_sdlTypeListCompPtr,
 			*m_sdlEnumListCompPtr,
@@ -1162,7 +1162,7 @@ void CObjectModificatorCompBase:: AddCustomArrayFieldReadToObjectImplCode(
 
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
-	structNameConverter.addVersion = true;
+	structNameConverter.addVersion = false;
 	structNameConverter.listWrap = true;
 
 	// reset a list value

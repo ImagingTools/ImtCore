@@ -220,27 +220,26 @@ const imtbase::ISearchResults* CObjectCollectionControllerCompBase::Search(const
 
 	typename imtcol::ICollectionHeadersProvider::HeaderIds headerIds = m_headersProviderCompPtr->GetHeaderIds();
 
-	sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0 complexFilter;
+	sdl::V1_0::imtbase::CComplexCollectionFilter complexFilter;
 
-	sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0 groupFilter;
-	groupFilter.logicalOperation = sdl::imtbase::ComplexCollectionFilter::LogicalOperation::Or;
+	sdl::V1_0::imtbase::CGroupFilter groupFilter;
+	groupFilter.logicalOperation = sdl::V1_0::imtbase::LogicalOperation::Or;
 
-	QList<sdl::imtbase::ComplexCollectionFilter::FieldFilterUnion> fieldList;
+	QList<sdl::V1_0::imtbase::FieldFilterUnion> fieldList;
 	for (const QByteArray& headerId : headerIds){
 		typename imtcol::ICollectionHeadersProvider::HeaderInfo headerInfo;
 		if (m_headersProviderCompPtr->GetHeaderInfo(headerId, headerInfo)){
 			if (headerInfo.filterable){
-				sdl::imtbase::ComplexCollectionFilter::CFieldFilter fieldFilter;
-				fieldFilter.Version_1_0.Emplace();
-				fieldFilter.Version_1_0->fieldId = headerInfo.headerId;
-				fieldFilter.Version_1_0->filterValue = text;
-				fieldFilter.Version_1_0->filterValueType = sdl::imtbase::ComplexCollectionFilter::ValueType::String;
+				sdl::V1_0::imtbase::CFieldFilter fieldFilter;
+				fieldFilter.fieldId = headerInfo.headerId;
+				fieldFilter.filterValue = text;
+				fieldFilter.filterValueType = sdl::V1_0::imtbase::ValueType::String;
 
-				imtsdl::TElementList<sdl::imtbase::ComplexCollectionFilter::FilterOperation> filterOperations;
-				filterOperations << sdl::imtbase::ComplexCollectionFilter::FilterOperation::Contains;
-				fieldFilter.Version_1_0->filterOperations = filterOperations;
+				imtsdl::TElementList<sdl::V1_0::imtbase::FilterOperation> filterOperations;
+				filterOperations << sdl::V1_0::imtbase::FilterOperation::Contains;
+				fieldFilter.filterOperations = filterOperations;
 
-				fieldList << sdl::imtbase::ComplexCollectionFilter::FieldFilterUnion(fieldFilter);
+				fieldList << sdl::V1_0::imtbase::FieldFilterUnion(fieldFilter);
 			}
 		}
 	}
@@ -334,34 +333,29 @@ void CObjectCollectionControllerCompBase::OnComponentCreated()
 }
 
 
-// reimplemented (sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CImtCollectionGqlHandlerCompBase)
 
-sdl::imtbase::ImtCollection::CDuplicateElementsPayload CObjectCollectionControllerCompBase::OnDuplicateElements(
-			const sdl::imtbase::ImtCollection::CDuplicateElementsGqlRequest& duplicateElementsRequest,
+sdl::V1_0::imtbase::CDuplicateElementsPayload CObjectCollectionControllerCompBase::OnDuplicateElements(
+			const sdl::V1_0::imtbase::CDuplicateElementsGqlRequest& duplicateElementsRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtbase::ImtCollection::CDuplicateElementsPayload response;
+	sdl::V1_0::imtbase::CDuplicateElementsPayload response;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
 		return response;
 	}
 
-	sdl::imtbase::ImtCollection::DuplicateElementsRequestArguments arguments = duplicateElementsRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return response;
-	}
-
+	sdl::V1_0::imtbase::DuplicateElementsRequestArguments arguments = duplicateElementsRequest.GetRequestedArguments();
 	QByteArrayList elementIds;
-	if (arguments.input.Version_1_0->elementIds.HasValue()){
-		elementIds = arguments.input.Version_1_0->elementIds->ToList();
+	if (arguments.input->elementIds.HasValue()){
+		elementIds = arguments.input->elementIds->ToList();
 	}
 
 	QString name;
-	if (arguments.input.Version_1_0->name.HasValue()){
-		name = *arguments.input.Version_1_0->name;
+	if (arguments.input->name.HasValue()){
+		name = *arguments.input->name;
 	}
 
 	if (elementIds.isEmpty()){
@@ -369,8 +363,7 @@ sdl::imtbase::ImtCollection::CDuplicateElementsPayload CObjectCollectionControll
 		return response;
 	}
 
-	response.Version_1_0.Emplace();
-	response.Version_1_0->success = false;
+	response.success = false;
 
 	istd::CChangeGroup changeGroup(m_objectCollectionCompPtr.GetPtr());
 
@@ -396,32 +389,28 @@ sdl::imtbase::ImtCollection::CDuplicateElementsPayload CObjectCollectionControll
 		}
 	}
 
-	response.Version_1_0->success = true;
+	response.success = true;
 
 	return response;
 }
 
 
-sdl::imtbase::ImtCollection::CVisualStatus CObjectCollectionControllerCompBase::OnGetObjectVisualStatus(
-			const sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
+sdl::V1_0::imtbase::CVisualStatus CObjectCollectionControllerCompBase::OnGetObjectVisualStatus(
+			const sdl::V1_0::imtbase::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	sdl::imtbase::ImtCollection::CVisualStatus::V1_0 response;
+	sdl::V1_0::imtbase::CVisualStatus response;
 
-	sdl::imtbase::ImtCollection::GetObjectVisualStatusRequestArguments arguments = getObjectVisualStatusRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		return sdl::imtbase::ImtCollection::CVisualStatus();
-	}
-
+	sdl::V1_0::imtbase::GetObjectVisualStatusRequestArguments arguments = getObjectVisualStatusRequest.GetRequestedArguments();
 	QByteArray objectId;
-	if (arguments.input.Version_1_0->objectId){
-		objectId = *arguments.input.Version_1_0->objectId;
+	if (arguments.input->objectId){
+		objectId = *arguments.input->objectId;
 	}
 
 	QByteArray typeId;
-	if (arguments.input.Version_1_0->typeId){
-		typeId = *arguments.input.Version_1_0->typeId;
+	if (arguments.input->typeId){
+		typeId = *arguments.input->typeId;
 	}
 
 	QString name = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
@@ -441,38 +430,31 @@ sdl::imtbase::ImtCollection::CVisualStatus CObjectCollectionControllerCompBase::
 	response.text = name;
 	response.description = description;
 
-	sdl::imtbase::ImtCollection::CVisualStatus retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 
-sdl::imtbase::ImtCollection::CRemoveElementsPayload CObjectCollectionControllerCompBase::OnRemoveElements(
-			const sdl::imtbase::ImtCollection::CRemoveElementsGqlRequest& removeElementsRequest,
+sdl::V1_0::imtbase::CRemoveElementsPayload CObjectCollectionControllerCompBase::OnRemoveElements(
+			const sdl::V1_0::imtbase::CRemoveElementsGqlRequest& removeElementsRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::ImtCollection::CRemoveElementsPayload::V1_0 response;
+	sdl::V1_0::imtbase::CRemoveElementsPayload response;
 
-	sdl::imtbase::ImtCollection::RemoveElementsRequestArguments arguments = removeElementsRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		return sdl::imtbase::ImtCollection::CRemoveElementsPayload();
-	}
-
+	sdl::V1_0::imtbase::RemoveElementsRequestArguments arguments = removeElementsRequest.GetRequestedArguments();
 	QByteArray collectionId;
-	if (arguments.input.Version_1_0->collectionId.has_value()){
-		collectionId = *arguments.input.Version_1_0->collectionId;
+	if (arguments.input->collectionId.has_value()){
+		collectionId = *arguments.input->collectionId;
 	}
 
 	QByteArrayList elementIds;
-	if (arguments.input.Version_1_0->elementIds.has_value()){
-		elementIds = arguments.input.Version_1_0->elementIds->ToList();
+	if (arguments.input->elementIds.has_value()){
+		elementIds = arguments.input->elementIds->ToList();
 	}
 
 	if (elementIds.isEmpty()){
 		errorMessage = QString("Unable to remove elements for collection: '%1'. Error: Element-IDs not provided").arg(QString::fromUtf8(collectionId));
-		return sdl::imtbase::ImtCollection::CRemoveElementsPayload();
+		return sdl::V1_0::imtbase::CRemoveElementsPayload();
 	}
 
 	imtbase::ICollectionInfo::Ids allElementIds = m_objectCollectionCompPtr->GetElementIds();
@@ -480,12 +462,12 @@ sdl::imtbase::ImtCollection::CRemoveElementsPayload CObjectCollectionControllerC
 		if (!allElementIds.contains(elementId)){
 			errorMessage = QString("Unable to delete object. Object with ID '%1' does not exists").arg(QString(elementId));
 			SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-			return sdl::imtbase::ImtCollection::CRemoveElementsPayload();
+			return sdl::V1_0::imtbase::CRemoveElementsPayload();
 		}
 	}
 
 	if (!OnBeforeRemoveElements(elementIds, gqlRequest, errorMessage)){
-		return sdl::imtbase::ImtCollection::CRemoveElementsPayload();
+		return sdl::V1_0::imtbase::CRemoveElementsPayload();
 	}
 
 	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(elementIds[0]);
@@ -503,39 +485,32 @@ sdl::imtbase::ImtCollection::CRemoveElementsPayload CObjectCollectionControllerC
 
 	response.success = ok;
 
-	sdl::imtbase::ImtCollection::CRemoveElementsPayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 
-sdl::imtbase::ImtCollection::CRemoveElementSetPayload CObjectCollectionControllerCompBase::OnRemoveElementSet(
-			const sdl::imtbase::ImtCollection::CRemoveElementSetGqlRequest& removeElementSetRequest,
+sdl::V1_0::imtbase::CRemoveElementSetPayload CObjectCollectionControllerCompBase::OnRemoveElementSet(
+			const sdl::V1_0::imtbase::CRemoveElementSetGqlRequest& removeElementSetRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::ImtCollection::CRemoveElementSetPayload::V1_0 response;
+	sdl::V1_0::imtbase::CRemoveElementSetPayload response;
 
-	sdl::imtbase::ImtCollection::RemoveElementSetRequestArguments arguments = removeElementSetRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		return sdl::imtbase::ImtCollection::CRemoveElementSetPayload();
-	}
-
+	sdl::V1_0::imtbase::RemoveElementSetRequestArguments arguments = removeElementSetRequest.GetRequestedArguments();
 	iprm::CParamsSet filterParams;
-	if (arguments.input.Version_1_0->selectionParams){
+	if (arguments.input->selectionParams){
 		if (filterParams.CopyFrom(m_selectionParams)){
-			sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 paramsSet = *arguments.input.Version_1_0->selectionParams;
+			sdl::V1_0::imtbase::CParamsSet paramsSet = *arguments.input->selectionParams;
 			if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
 				errorMessage = QString("Unable to remove element set for collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
-				return sdl::imtbase::ImtCollection::CRemoveElementSetPayload();
+				return sdl::V1_0::imtbase::CRemoveElementSetPayload();
 			}
 		}
 	}
 
 	imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParams);
 	if (!OnBeforeRemoveElements(elementIds, gqlRequest, errorMessage)){
-		return sdl::imtbase::ImtCollection::CRemoveElementSetPayload();
+		return sdl::V1_0::imtbase::CRemoveElementSetPayload();
 	}
 
 	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(elementIds[0]);
@@ -553,28 +528,21 @@ sdl::imtbase::ImtCollection::CRemoveElementSetPayload CObjectCollectionControlle
 
 	response.success = ok;
 
-	sdl::imtbase::ImtCollection::CRemoveElementSetPayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 
-sdl::imtbase::ImtCollection::CRestoreObjectsPayload CObjectCollectionControllerCompBase::OnRestoreObjects(
-			const sdl::imtbase::ImtCollection::CRestoreObjectsGqlRequest& restoreObjectsRequest,
+sdl::V1_0::imtbase::CRestoreObjectsPayload CObjectCollectionControllerCompBase::OnRestoreObjects(
+			const sdl::V1_0::imtbase::CRestoreObjectsGqlRequest& restoreObjectsRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	sdl::imtbase::ImtCollection::CRestoreObjectsPayload::V1_0 response;
+	sdl::V1_0::imtbase::CRestoreObjectsPayload response;
 
-	sdl::imtbase::ImtCollection::RestoreObjectsRequestArguments arguments = restoreObjectsRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		return sdl::imtbase::ImtCollection::CRestoreObjectsPayload();
-	}
-
+	sdl::V1_0::imtbase::RestoreObjectsRequestArguments arguments = restoreObjectsRequest.GetRequestedArguments();
 	QByteArrayList objectIds;
-	if (arguments.input.Version_1_0->objectIds){
-		objectIds = arguments.input.Version_1_0->objectIds->ToList();
+	if (arguments.input->objectIds){
+		objectIds = arguments.input->objectIds->ToList();
 	}
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
@@ -584,32 +552,25 @@ sdl::imtbase::ImtCollection::CRestoreObjectsPayload CObjectCollectionControllerC
 
 	response.success = m_objectCollectionCompPtr->RestoreObjects(imtbase::ICollectionInfo::Ids(objectIds.constBegin(), objectIds.constEnd()), operationContextPtr.GetPtr());
 
-	sdl::imtbase::ImtCollection::CRestoreObjectsPayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 
-sdl::imtbase::ImtCollection::CRestoreObjectSetPayload CObjectCollectionControllerCompBase::OnRestoreObjectSet(
-			const sdl::imtbase::ImtCollection::CRestoreObjectSetGqlRequest& restoreObjectSetRequest,
+sdl::V1_0::imtbase::CRestoreObjectSetPayload CObjectCollectionControllerCompBase::OnRestoreObjectSet(
+			const sdl::V1_0::imtbase::CRestoreObjectSetGqlRequest& restoreObjectSetRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtbase::ImtCollection::CRestoreObjectSetPayload::V1_0 response;
+	sdl::V1_0::imtbase::CRestoreObjectSetPayload response;
 
-	sdl::imtbase::ImtCollection::RestoreObjectSetRequestArguments arguments = restoreObjectSetRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		return sdl::imtbase::ImtCollection::CRestoreObjectSetPayload();
-	}
-
+	sdl::V1_0::imtbase::RestoreObjectSetRequestArguments arguments = restoreObjectSetRequest.GetRequestedArguments();
 	iprm::CParamsSet filterParams;
-	if (arguments.input.Version_1_0->selectionParams){
+	if (arguments.input->selectionParams){
 		if (filterParams.CopyFrom(m_selectionParams)){
-			sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 paramsSet = *arguments.input.Version_1_0->selectionParams;
+			sdl::V1_0::imtbase::CParamsSet paramsSet = *arguments.input->selectionParams;
 			if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
 				errorMessage = QString("Unable to restore object set for collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
-				return sdl::imtbase::ImtCollection::CRestoreObjectSetPayload();
+				return sdl::V1_0::imtbase::CRestoreObjectSetPayload();
 			}
 		}
 	}
@@ -623,87 +584,74 @@ sdl::imtbase::ImtCollection::CRestoreObjectSetPayload CObjectCollectionControlle
 
 	response.success = m_objectCollectionCompPtr->RestoreObjectSet(&filterParams, operationContextPtr.GetPtr());
 
-	sdl::imtbase::ImtCollection::CRestoreObjectSetPayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 
-sdl::imtbase::ImtCollection::CSetObjectNamePayload CObjectCollectionControllerCompBase::OnSetObjectName(
-			const sdl::imtbase::ImtCollection::CSetObjectNameGqlRequest& setObjectNameRequest,
+sdl::V1_0::imtbase::CSetObjectNamePayload CObjectCollectionControllerCompBase::OnSetObjectName(
+			const sdl::V1_0::imtbase::CSetObjectNameGqlRequest& setObjectNameRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::ImtCollection::CSetObjectNamePayload::V1_0 response;
+	sdl::V1_0::imtbase::CSetObjectNamePayload response;
 	response.success = false;
 
-	sdl::imtbase::ImtCollection::SetObjectNameRequestArguments arguments = setObjectNameRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtbase::ImtCollection::CSetObjectNamePayload();
-	}
-
+	sdl::V1_0::imtbase::SetObjectNameRequestArguments arguments = setObjectNameRequest.GetRequestedArguments();
 	QByteArray objectId;
-	if (arguments.input.Version_1_0->objectId){
-		objectId = *arguments.input.Version_1_0->objectId;
+	if (arguments.input->objectId){
+		objectId = *arguments.input->objectId;
 	}
 
 	QString newName;
-	if (arguments.input.Version_1_0->name){
-		newName = *arguments.input.Version_1_0->name;
+	if (arguments.input->name){
+		newName = *arguments.input->name;
 	}
 
 	if (!OnBeforeSetObjectName(objectId, newName, gqlRequest, errorMessage)){
-		return sdl::imtbase::ImtCollection::CSetObjectNamePayload();
+		return sdl::V1_0::imtbase::CSetObjectNamePayload();
 	}
 
 	QString oldName = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 
 	if (!m_objectCollectionCompPtr->SetElementName(objectId, newName)){
 		errorMessage = QString("Unable to set name '%1' for element with ID: '%2'").arg(newName, QString::fromUtf8(objectId));
-		return sdl::imtbase::ImtCollection::CSetObjectNamePayload();
+		return sdl::V1_0::imtbase::CSetObjectNamePayload();
 	}
 
 	OnAfterSetObjectName(objectId, oldName, newName, gqlRequest);
 
-	sdl::imtbase::ImtCollection::CSetObjectNamePayload retVal;
-	retVal.Version_1_0 = std::move(response);
+	sdl::V1_0::imtbase::CSetObjectNamePayload retVal;
+	retVal = std::move(response);
 
-	retVal.Version_1_0->objectId = objectId;
-	retVal.Version_1_0->name = newName;
-	retVal.Version_1_0->success = true;
+	retVal.objectId = objectId;
+	retVal.name = newName;
+	retVal.success = true;
 
 	return retVal;
 }
 
 
-sdl::imtbase::ImtCollection::CSetObjectDescriptionPayload CObjectCollectionControllerCompBase::OnSetObjectDescription(
-			const sdl::imtbase::ImtCollection::CSetObjectDescriptionGqlRequest& setObjectDescriptionRequest,
+sdl::V1_0::imtbase::CSetObjectDescriptionPayload CObjectCollectionControllerCompBase::OnSetObjectDescription(
+			const sdl::V1_0::imtbase::CSetObjectDescriptionGqlRequest& setObjectDescriptionRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::ImtCollection::CSetObjectDescriptionPayload::V1_0 response;
+	sdl::V1_0::imtbase::CSetObjectDescriptionPayload response;
 	response.success = false;
 
-	sdl::imtbase::ImtCollection::SetObjectDescriptionRequestArguments arguments = setObjectDescriptionRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtbase::ImtCollection::CSetObjectDescriptionPayload();
-	}
-
+	sdl::V1_0::imtbase::SetObjectDescriptionRequestArguments arguments = setObjectDescriptionRequest.GetRequestedArguments();
 	QByteArray objectId;
-	if (arguments.input.Version_1_0->objectId){
-		objectId = *arguments.input.Version_1_0->objectId;
+	if (arguments.input->objectId){
+		objectId = *arguments.input->objectId;
 	}
 
 	QString description;
-	if (arguments.input.Version_1_0->description){
-		description = *arguments.input.Version_1_0->description;
+	if (arguments.input->description){
+		description = *arguments.input->description;
 	}
 
 	if (!OnBeforeSetObjectDescription(objectId, description, gqlRequest, errorMessage)){
-		return sdl::imtbase::ImtCollection::CSetObjectDescriptionPayload();
+		return sdl::V1_0::imtbase::CSetObjectDescriptionPayload();
 	}
 
 	istd::CChangeGroup changeGroup(m_objectCollectionCompPtr.GetPtr());
@@ -711,81 +659,76 @@ sdl::imtbase::ImtCollection::CSetObjectDescriptionPayload CObjectCollectionContr
 		changeGroup.Reset();
 
 		errorMessage = QString("Unable to set description '%1' for element with ID: '%2'").arg(description, QString::fromUtf8(objectId));
-		return sdl::imtbase::ImtCollection::CSetObjectDescriptionPayload();
+		return sdl::V1_0::imtbase::CSetObjectDescriptionPayload();
 	}
 
 	OnAfterSetObjectDescription(objectId, description, gqlRequest);
 
-	sdl::imtbase::ImtCollection::CSetObjectDescriptionPayload retVal;
-	retVal.Version_1_0 = std::move(response);
+	sdl::V1_0::imtbase::CSetObjectDescriptionPayload retVal;
+	retVal = std::move(response);
 
-	retVal.Version_1_0->objectId = objectId;
-	retVal.Version_1_0->description = description;
-	retVal.Version_1_0->success = true;
+	retVal.objectId = objectId;
+	retVal.description = description;
+	retVal.success = true;
 
 	return retVal;
 }
 
 
-sdl::imtbase::ImtCollection::CExportObjectPayload CObjectCollectionControllerCompBase::OnExportObject(
-			const sdl::imtbase::ImtCollection::CExportObjectGqlRequest& exportObjectRequest,
+sdl::V1_0::imtbase::CExportObjectPayload CObjectCollectionControllerCompBase::OnExportObject(
+			const sdl::V1_0::imtbase::CExportObjectGqlRequest& exportObjectRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtbase::ImtCollection::CExportObjectPayload::V1_0 response;
+	sdl::V1_0::imtbase::CExportObjectPayload response;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
-		return sdl::imtbase::ImtCollection::CExportObjectPayload();
+		return sdl::V1_0::imtbase::CExportObjectPayload();
 	}
 
-	sdl::imtbase::ImtCollection::ExportObjectRequestArguments arguments = exportObjectRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtbase::ImtCollection::CExportObjectPayload();
-	}
-
+	sdl::V1_0::imtbase::ExportObjectRequestArguments arguments = exportObjectRequest.GetRequestedArguments();
 	QByteArray objectId;
-	if (arguments.input.Version_1_0->objectId){
-		objectId = *arguments.input.Version_1_0->objectId;
+	if (arguments.input->objectId){
+		objectId = *arguments.input->objectId;
 	}
 
 	QString mimeType;
-	if (arguments.input.Version_1_0->mimeType){
-		mimeType = *arguments.input.Version_1_0->mimeType;
+	if (arguments.input->mimeType){
+		mimeType = *arguments.input->mimeType;
 	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Object does not exists").arg(qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-		return sdl::imtbase::ImtCollection::CExportObjectPayload();
+		return sdl::V1_0::imtbase::CExportObjectPayload();
 	}
 
 	int index = GetMimeTypeIndex(mimeType);
 	if (index < 0){
 		errorMessage = "Mime type is invalid";
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-		return sdl::imtbase::ImtCollection::CExportObjectPayload();
+		return sdl::V1_0::imtbase::CExportObjectPayload();
 	}
 
 	if (index >= m_importExportObjectFactCompPtr.GetCount()){
 		errorMessage = "Import/Export object factory index out of range";
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-		return sdl::imtbase::ImtCollection::CExportObjectPayload();
+		return sdl::V1_0::imtbase::CExportObjectPayload();
 	}
 
 	if (index >= m_filePersistenceCompPtr.GetCount()){
 		errorMessage = "File persistence index out of range";
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-		return sdl::imtbase::ImtCollection::CExportObjectPayload();
+		return sdl::V1_0::imtbase::CExportObjectPayload();
 	}
 
 	imtbase::CMimeType mime;
 	if (!mime.FromString(mimeType)){
 		errorMessage = QString("Unable to parse mime type");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-		return sdl::imtbase::ImtCollection::CExportObjectPayload();
+		return sdl::V1_0::imtbase::CExportObjectPayload();
 	}
 
 	QString extension = GetExtensionFromMimeType(mime);
@@ -799,17 +742,17 @@ sdl::imtbase::ImtCollection::CExportObjectPayload CObjectCollectionControllerCom
 	if (!objectPersistenceInstancePtr.IsValid()){
 		errorMessage = QString("Unable to import object to the collection. Error: Object persistence instance is invalid");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-		return sdl::imtbase::ImtCollection::CExportObjectPayload();
+		return sdl::V1_0::imtbase::CExportObjectPayload();
 	}
 
 	if (!ConvertObject(*dataPtr.GetPtr(), *objectPersistenceInstancePtr.GetPtr())){
-		return sdl::imtbase::ImtCollection::CExportObjectPayload();
+		return sdl::V1_0::imtbase::CExportObjectPayload();
 	}
 
 	if (m_filePersistenceCompPtr[index]->SaveToFile(*objectPersistenceInstancePtr.GetPtr(), filePathTmp) != ifile::IFilePersistence::OS_OK){
 		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Saving data to the file '%1' failed").arg(qPrintable(objectId), filePathTmp);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-		return sdl::imtbase::ImtCollection::CExportObjectPayload();
+		return sdl::V1_0::imtbase::CExportObjectPayload();
 	}
 
 	QFile file(filePathTmp);
@@ -817,7 +760,7 @@ sdl::imtbase::ImtCollection::CExportObjectPayload CObjectCollectionControllerCom
 		errorMessage = QString("Unable to export the object with ID: '%1'. Error: Unable to open file with name '%1'").arg(qPrintable(objectId), filePathTmp);
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
-		return sdl::imtbase::ImtCollection::CExportObjectPayload();
+		return sdl::V1_0::imtbase::CExportObjectPayload();
 	}
 
 	QByteArray data = file.readAll();
@@ -829,74 +772,66 @@ sdl::imtbase::ImtCollection::CExportObjectPayload CObjectCollectionControllerCom
 
 	QFile::remove(filePathTmp);
 
-	sdl::imtbase::ImtCollection::CExportObjectPayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 
-sdl::imtbase::ImtCollection::CImportObjectPayload CObjectCollectionControllerCompBase::OnImportObject(
-			const sdl::imtbase::ImtCollection::CImportObjectGqlRequest& importObjectRequest,
+sdl::V1_0::imtbase::CImportObjectPayload CObjectCollectionControllerCompBase::OnImportObject(
+			const sdl::V1_0::imtbase::CImportObjectGqlRequest& importObjectRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtbase::ImtCollection::CImportObjectPayload::V1_0 response;
+	sdl::V1_0::imtbase::CImportObjectPayload response;
 	response.success = false;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
-		return sdl::imtbase::ImtCollection::CImportObjectPayload();
+		return sdl::V1_0::imtbase::CImportObjectPayload();
 	}
 
-	sdl::imtbase::ImtCollection::ImportObjectRequestArguments arguments = importObjectRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtbase::ImtCollection::CImportObjectPayload();
-	}
-
+	sdl::V1_0::imtbase::ImportObjectRequestArguments arguments = importObjectRequest.GetRequestedArguments();
 	QByteArray objectData;
-	if (arguments.input.Version_1_0->fileData){
-		objectData = *arguments.input.Version_1_0->fileData;
+	if (arguments.input->fileData){
+		objectData = *arguments.input->fileData;
 	}
 
 	QByteArray data = QByteArray::fromBase64(objectData);
 
 	QByteArray typeId;
-	if (arguments.input.Version_1_0->typeId){
-		typeId = *arguments.input.Version_1_0->typeId;
+	if (arguments.input->typeId){
+		typeId = *arguments.input->typeId;
 	}
 
 	QString mimeType;
-	if (arguments.input.Version_1_0->mimeType){
-		mimeType = *arguments.input.Version_1_0->mimeType;
+	if (arguments.input->mimeType){
+		mimeType = *arguments.input->mimeType;
 	}
 
 	QString name;
-	if (arguments.input.Version_1_0->name){
-		name = *arguments.input.Version_1_0->name;
+	if (arguments.input->name){
+		name = *arguments.input->name;
 	}
 
 	QString description;
-	if (arguments.input.Version_1_0->description){
-		description = *arguments.input.Version_1_0->description;
+	if (arguments.input->description){
+		description = *arguments.input->description;
 	}
 
 	int index = GetMimeTypeIndex(mimeType);
 	if (index < 0){
 		errorMessage = "Mime type is invalid";
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-		return sdl::imtbase::ImtCollection::CImportObjectPayload();
+		return sdl::V1_0::imtbase::CImportObjectPayload();
 	}
 	if (index >= m_importExportObjectFactCompPtr.GetCount()){
 		errorMessage = "Import/Export object factory index out of range";
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-		return sdl::imtbase::ImtCollection::CImportObjectPayload();
+		return sdl::V1_0::imtbase::CImportObjectPayload();
 	}
 	if (index >= m_filePersistenceCompPtr.GetCount()){
 		errorMessage = "File persistence index out of range";
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-		return sdl::imtbase::ImtCollection::CImportObjectPayload();
+		return sdl::V1_0::imtbase::CImportObjectPayload();
 	}
 
 	istd::IChangeableUniquePtr objectPersistenceInstancePtr = m_importExportObjectFactCompPtr.CreateInstance(index);
@@ -904,7 +839,7 @@ sdl::imtbase::ImtCollection::CImportObjectPayload CObjectCollectionControllerCom
 		errorMessage = QString("Unable to import object to the collection. Error: Object instance is invalid");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
-		return sdl::imtbase::ImtCollection::CImportObjectPayload();
+		return sdl::V1_0::imtbase::CImportObjectPayload();
 	}
 
 	imtbase::CMimeType mime;
@@ -912,7 +847,7 @@ sdl::imtbase::ImtCollection::CImportObjectPayload CObjectCollectionControllerCom
 		errorMessage = QString("Unable to parse mime type");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
-		return sdl::imtbase::ImtCollection::CImportObjectPayload();
+		return sdl::V1_0::imtbase::CImportObjectPayload();
 	}
 
 	QString extension = GetExtensionFromMimeType(mime);
@@ -923,7 +858,7 @@ sdl::imtbase::ImtCollection::CImportObjectPayload CObjectCollectionControllerCom
 	QFile file(filePathTmp);
 	if (!file.open(QIODevice::WriteOnly)){
 		SendErrorMessage(0, QString("Unable to open file with name '%1'").arg(filePathTmp), "CObjectCollectionControllerCompBase");
-		return sdl::imtbase::ImtCollection::CImportObjectPayload();
+		return sdl::V1_0::imtbase::CImportObjectPayload();
 	}
 
 	file.write(data);
@@ -934,7 +869,7 @@ sdl::imtbase::ImtCollection::CImportObjectPayload CObjectCollectionControllerCom
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
 
-		return sdl::imtbase::ImtCollection::CImportObjectPayload();
+		return sdl::V1_0::imtbase::CImportObjectPayload();
 	}
 
 	QByteArray objectUuid = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
@@ -948,7 +883,7 @@ sdl::imtbase::ImtCollection::CImportObjectPayload CObjectCollectionControllerCom
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
 
-		return sdl::imtbase::ImtCollection::CImportObjectPayload();
+		return sdl::V1_0::imtbase::CImportObjectPayload();
 	}
 
 	int typeIdIndex = GetObjectTypeIdIndex(typeId);
@@ -958,11 +893,11 @@ sdl::imtbase::ImtCollection::CImportObjectPayload CObjectCollectionControllerCom
 	if (!collectionObjectInstancePtr.IsValid()){
 		errorMessage = QString("Unable to import object to the collection. Error: Object instance is invalid");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-		return sdl::imtbase::ImtCollection::CImportObjectPayload();
+		return sdl::V1_0::imtbase::CImportObjectPayload();
 	}
 
 	if (!ConvertObject(*objectPersistenceInstancePtr.GetPtr(), *collectionObjectInstancePtr.GetPtr())){
-		return sdl::imtbase::ImtCollection::CImportObjectPayload();
+		return sdl::V1_0::imtbase::CImportObjectPayload();
 	}
 
 	QByteArray insertRetVal = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, collectionObjectInstancePtr.GetPtr(), objectUuid);
@@ -970,69 +905,58 @@ sdl::imtbase::ImtCollection::CImportObjectPayload CObjectCollectionControllerCom
 		errorMessage = QString("Unable to import object with ID: '%1' to the collection. Error: The object could not be inserted into the collection").arg(qPrintable(objectUuid));
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		QFile::remove(filePathTmp);
-		return sdl::imtbase::ImtCollection::CImportObjectPayload();
+		return sdl::V1_0::imtbase::CImportObjectPayload();
 	}
 
 	response.objectId = objectUuid;
 	response.success = true;
 	QFile::remove(filePathTmp);
 
-	sdl::imtbase::ImtCollection::CImportObjectPayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 
-sdl::imtbase::ImtCollection::CGetObjectTypeIdPayload CObjectCollectionControllerCompBase::OnGetObjectTypeId(
-			const sdl::imtbase::ImtCollection::CGetObjectTypeIdGqlRequest& getObjectTypeIdRequest,
+sdl::V1_0::imtbase::CGetObjectTypeIdPayload CObjectCollectionControllerCompBase::OnGetObjectTypeId(
+			const sdl::V1_0::imtbase::CGetObjectTypeIdGqlRequest& getObjectTypeIdRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
-		return sdl::imtbase::ImtCollection::CGetObjectTypeIdPayload();
+		return sdl::V1_0::imtbase::CGetObjectTypeIdPayload();
 	}
 
-	sdl::imtbase::ImtCollection::GetObjectTypeIdRequestArguments arguments = getObjectTypeIdRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtbase::ImtCollection::CGetObjectTypeIdPayload();
-	}
-
+	sdl::V1_0::imtbase::GetObjectTypeIdRequestArguments arguments = getObjectTypeIdRequest.GetRequestedArguments();
 	QByteArray objectId;
-	if (arguments.input.Version_1_0->objectId){
-		objectId = *arguments.input.Version_1_0->objectId;
+	if (arguments.input->objectId){
+		objectId = *arguments.input->objectId;
 	}
 
-	sdl::imtbase::ImtCollection::CGetObjectTypeIdPayload::V1_0 response;
+	sdl::V1_0::imtbase::CGetObjectTypeIdPayload response;
 
 	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
 	response.typeId = typeId;
 
-	sdl::imtbase::ImtCollection::CGetObjectTypeIdPayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 
-sdl::imtbase::ImtCollection::CGetCollectionHeadersPayload CObjectCollectionControllerCompBase::OnGetCollectionHeaders(
-			const sdl::imtbase::ImtCollection::CGetCollectionHeadersGqlRequest& /*getCollectionHeadersRequest*/,
+sdl::V1_0::imtbase::CGetCollectionHeadersPayload CObjectCollectionControllerCompBase::OnGetCollectionHeaders(
+			const sdl::V1_0::imtbase::CGetCollectionHeadersGqlRequest& /*getCollectionHeadersRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::ImtCollection::CGetCollectionHeadersPayload::V1_0 response;
+	sdl::V1_0::imtbase::CGetCollectionHeadersPayload response;
 
 	if (!m_headersProviderCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'HeadersProvider' was not set", "CObjectCollectionControllerCompBase");
-		return sdl::imtbase::ImtCollection::CGetCollectionHeadersPayload();
+		return sdl::V1_0::imtbase::CGetCollectionHeadersPayload();
 	}
 
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr == nullptr){
 		errorMessage = QString("Unable to get collection headers. Error: GraphQL context is invalid");
-		return sdl::imtbase::ImtCollection::CGetCollectionHeadersPayload();
+		return sdl::V1_0::imtbase::CGetCollectionHeadersPayload();
 	}
 
 	QByteArrayList userPermissions;
@@ -1043,7 +967,7 @@ sdl::imtbase::ImtCollection::CGetCollectionHeadersPayload CObjectCollectionContr
 
 	QByteArray languageId = gqlContextPtr->GetLanguageId();
 
-	QList<sdl::imtbase::ImtCollection::CHeaderInfo::V1_0> headersRepresentationList;
+	QList<sdl::V1_0::imtbase::CHeaderInfo> headersRepresentationList;
 	imtcol::ICollectionHeadersProvider::HeaderIds headerIds = m_headersProviderCompPtr->GetHeaderIds();
 	for (const QByteArray& headerId : headerIds){
 		imtcol::ICollectionHeadersProvider::HeaderInfo headerInfo;
@@ -1056,7 +980,7 @@ sdl::imtbase::ImtCollection::CGetCollectionHeadersPayload CObjectCollectionContr
 				}
 			}
 
-			sdl::imtbase::ImtCollection::CHeaderInfo::V1_0 headerRepresentation;
+			sdl::V1_0::imtbase::CHeaderInfo headerRepresentation;
 			headerRepresentation.id = headerInfo.headerId;
 			headerRepresentation.filterable = headerInfo.filterable;
 			headerRepresentation.sortable = headerInfo.sortable;
@@ -1074,86 +998,70 @@ sdl::imtbase::ImtCollection::CGetCollectionHeadersPayload CObjectCollectionContr
 	response.headers.Emplace();
 	response.headers->FromList(headersRepresentationList);
 
-	sdl::imtbase::ImtCollection::CGetCollectionHeadersPayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 
-sdl::imtbase::ImtCollection::CGetElementsCountPayload CObjectCollectionControllerCompBase::OnGetElementsCount(
-			const sdl::imtbase::ImtCollection::CGetElementsCountGqlRequest& getElementsCountRequest,
+sdl::V1_0::imtbase::CGetElementsCountPayload CObjectCollectionControllerCompBase::OnGetElementsCount(
+			const sdl::V1_0::imtbase::CGetElementsCountGqlRequest& getElementsCountRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtbase::ImtCollection::CGetElementsCountPayload::V1_0 response;
+	sdl::V1_0::imtbase::CGetElementsCountPayload response;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
-		return sdl::imtbase::ImtCollection::CGetElementsCountPayload();
+		return sdl::V1_0::imtbase::CGetElementsCountPayload();
 	}
 
-	sdl::imtbase::ImtCollection::GetElementsCountRequestArguments arguments = getElementsCountRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtbase::ImtCollection::CGetElementsCountPayload();
-	}
-
+	sdl::V1_0::imtbase::GetElementsCountRequestArguments arguments = getElementsCountRequest.GetRequestedArguments();
 	iprm::CParamsSet filterParams;
-	if (arguments.input.Version_1_0->selectionParams){
+	if (arguments.input->selectionParams){
 		if (filterParams.CopyFrom(m_selectionParams)){
-			sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 paramsSet = *arguments.input.Version_1_0->selectionParams;
+			sdl::V1_0::imtbase::CParamsSet paramsSet = *arguments.input->selectionParams;
 			if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
 				errorMessage = QString("Unable to get elements count for collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
-				return sdl::imtbase::ImtCollection::CGetElementsCountPayload();
+				return sdl::V1_0::imtbase::CGetElementsCountPayload();
 			}
 		}
 	}
 
 	response.count = m_objectCollectionCompPtr->GetElementsCount(&filterParams);
 
-	sdl::imtbase::ImtCollection::CGetElementsCountPayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 
-sdl::imtbase::ImtCollection::CGetElementIdsPayload CObjectCollectionControllerCompBase::OnGetElementIds(
-			const sdl::imtbase::ImtCollection::CGetElementIdsGqlRequest& getElementIdsRequest,
+sdl::V1_0::imtbase::CGetElementIdsPayload CObjectCollectionControllerCompBase::OnGetElementIds(
+			const sdl::V1_0::imtbase::CGetElementIdsGqlRequest& getElementIdsRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtbase::ImtCollection::CGetElementIdsPayload::V1_0 response;
+	sdl::V1_0::imtbase::CGetElementIdsPayload response;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
-		return sdl::imtbase::ImtCollection::CGetElementIdsPayload();
+		return sdl::V1_0::imtbase::CGetElementIdsPayload();
 	}
 
-	sdl::imtbase::ImtCollection::GetElementIdsRequestArguments arguments = getElementIdsRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtbase::ImtCollection::CGetElementIdsPayload();
-	}
-
+	sdl::V1_0::imtbase::GetElementIdsRequestArguments arguments = getElementIdsRequest.GetRequestedArguments();
 	int offset = 0;
-	if (arguments.input.Version_1_0->offset){
-		offset = *arguments.input.Version_1_0->offset;
+	if (arguments.input->offset){
+		offset = *arguments.input->offset;
 	}
 
 	int count = -1;
-	if (arguments.input.Version_1_0->count){
-		count = *arguments.input.Version_1_0->count;
+	if (arguments.input->count){
+		count = *arguments.input->count;
 	}
 
 	iprm::CParamsSet filterParams;
-	if (arguments.input.Version_1_0->selectionParams){
+	if (arguments.input->selectionParams){
 		if (filterParams.CopyFrom(m_selectionParams)){
-			sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 paramsSet = *arguments.input.Version_1_0->selectionParams;
+			sdl::V1_0::imtbase::CParamsSet paramsSet = *arguments.input->selectionParams;
 			if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
 				errorMessage = QString("Unable to get element IDs for collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
-				return sdl::imtbase::ImtCollection::CGetElementIdsPayload();
+				return sdl::V1_0::imtbase::CGetElementIdsPayload();
 			}
 		}
 	}
@@ -1162,53 +1070,46 @@ sdl::imtbase::ImtCollection::CGetElementIdsPayload CObjectCollectionControllerCo
 	response.elementIds.Emplace();
 	response.elementIds->FromList(ids);
 
-	sdl::imtbase::ImtCollection::CGetElementIdsPayload retVal;
-	retVal.Version_1_0 = std::move(response);
-	return retVal;
+	return response;
 }
 
 
-sdl::imtbase::ImtCollection::CInsertNewObjectPayload CObjectCollectionControllerCompBase::OnInsertNewObject(
-			const sdl::imtbase::ImtCollection::CInsertNewObjectGqlRequest& insertNewObjectRequest,
+sdl::V1_0::imtbase::CInsertNewObjectPayload CObjectCollectionControllerCompBase::OnInsertNewObject(
+			const sdl::V1_0::imtbase::CInsertNewObjectGqlRequest& insertNewObjectRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::ImtCollection::CInsertNewObjectPayload::V1_0 response;
+	sdl::V1_0::imtbase::CInsertNewObjectPayload response;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
-		return sdl::imtbase::ImtCollection::CInsertNewObjectPayload();
+		return sdl::V1_0::imtbase::CInsertNewObjectPayload();
 	}
 
-	sdl::imtbase::ImtCollection::InsertNewObjectRequestArguments arguments = insertNewObjectRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtbase::ImtCollection::CInsertNewObjectPayload();
-	}
-
+	sdl::V1_0::imtbase::InsertNewObjectRequestArguments arguments = insertNewObjectRequest.GetRequestedArguments();
 	QByteArray objectId;
-	if (arguments.input.Version_1_0->proposedObjectId){
-		objectId = *arguments.input.Version_1_0->proposedObjectId;
+	if (arguments.input->proposedObjectId){
+		objectId = *arguments.input->proposedObjectId;
 	}
 
 	QByteArray typeId;
-	if (arguments.input.Version_1_0->typeId){
-		typeId = *arguments.input.Version_1_0->typeId;
+	if (arguments.input->typeId){
+		typeId = *arguments.input->typeId;
 	}
 
 	QString name;
-	if (arguments.input.Version_1_0->name){
-		name = *arguments.input.Version_1_0->name;
+	if (arguments.input->name){
+		name = *arguments.input->name;
 	}
 
 	QString description;
-	if (arguments.input.Version_1_0->description){
-		description = *arguments.input.Version_1_0->description;
+	if (arguments.input->description){
+		description = *arguments.input->description;
 	}
 
 	QByteArray objectData;
-	if (arguments.input.Version_1_0->objectData){
-		objectData = (*arguments.input.Version_1_0->objectData).toUtf8();
+	if (arguments.input->objectData){
+		objectData = (*arguments.input->objectData).toUtf8();
 	}
 
 	istd::IChangeableUniquePtr objectPtr = nullptr;
@@ -1216,7 +1117,7 @@ sdl::imtbase::ImtCollection::CInsertNewObjectPayload CObjectCollectionController
 		objectPtr = CreateObject(typeId);
 		if (!DeSerializeObject(*objectPtr.GetPtr(), objectData)){
 			errorMessage = QString("Unable to insert new object to collection '%1'. Error: Object serialization failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
-			return sdl::imtbase::ImtCollection::CInsertNewObjectPayload();
+			return sdl::V1_0::imtbase::CInsertNewObjectPayload();
 		}
 	}
 
@@ -1228,45 +1129,37 @@ sdl::imtbase::ImtCollection::CInsertNewObjectPayload CObjectCollectionController
 	QByteArray result = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, objectPtr.GetPtr(), objectId, nullptr, nullptr, operationContextPtr.GetPtr());
 	if (result.isEmpty()){
 		errorMessage = QString("Unable to insert new object to collection '%1'").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
-		return sdl::imtbase::ImtCollection::CInsertNewObjectPayload();
+		return sdl::V1_0::imtbase::CInsertNewObjectPayload();
 	}
 
 	CreateUserActionLog(objectId, typeId, "Create", gqlRequest);
 	response.objectId = objectId;
 
-	sdl::imtbase::ImtCollection::CInsertNewObjectPayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 
-sdl::imtbase::ImtCollection::CSetObjectDataPayload CObjectCollectionControllerCompBase::OnSetObjectData(
-			const sdl::imtbase::ImtCollection::CSetObjectDataGqlRequest& setObjectDataRequest,
+sdl::V1_0::imtbase::CSetObjectDataPayload CObjectCollectionControllerCompBase::OnSetObjectData(
+			const sdl::V1_0::imtbase::CSetObjectDataGqlRequest& setObjectDataRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::ImtCollection::CSetObjectDataPayload::V1_0 response;
+	sdl::V1_0::imtbase::CSetObjectDataPayload response;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
-		return sdl::imtbase::ImtCollection::CSetObjectDataPayload();
+		return sdl::V1_0::imtbase::CSetObjectDataPayload();
 	}
 
-	sdl::imtbase::ImtCollection::SetObjectDataRequestArguments arguments = setObjectDataRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtbase::ImtCollection::CSetObjectDataPayload();
-	}
-
+	sdl::V1_0::imtbase::SetObjectDataRequestArguments arguments = setObjectDataRequest.GetRequestedArguments();
 	QByteArray objectId;
-	if (arguments.input.Version_1_0->objectId){
-		objectId = *arguments.input.Version_1_0->objectId;
+	if (arguments.input->objectId){
+		objectId = *arguments.input->objectId;
 	}
 
 	QByteArray objectData;
-	if (arguments.input.Version_1_0->objectData){
-		objectData = (*arguments.input.Version_1_0->objectData).toUtf8();
+	if (arguments.input->objectData){
+		objectData = (*arguments.input->objectData).toUtf8();
 	}
 
 	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
@@ -1276,7 +1169,7 @@ sdl::imtbase::ImtCollection::CSetObjectDataPayload CObjectCollectionControllerCo
 		objectPtr = CreateObject(typeId);
 		if (!DeSerializeObject(*objectPtr.GetPtr(), objectData)){
 			errorMessage = QString("Unable to set object data to collection '%1'. Error: Object serialization failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
-			return sdl::imtbase::ImtCollection::CSetObjectDataPayload();
+			return sdl::V1_0::imtbase::CSetObjectDataPayload();
 		}
 	}
 
@@ -1292,120 +1185,96 @@ sdl::imtbase::ImtCollection::CSetObjectDataPayload CObjectCollectionControllerCo
 
 	response.success = ok;
 
-	sdl::imtbase::ImtCollection::CSetObjectDataPayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 
-sdl::imtbase::ImtCollection::CGetObjectDataPayload CObjectCollectionControllerCompBase::OnGetObjectData(
-			const sdl::imtbase::ImtCollection::CGetObjectDataGqlRequest& getObjectDataRequest,
+sdl::V1_0::imtbase::CGetObjectDataPayload CObjectCollectionControllerCompBase::OnGetObjectData(
+			const sdl::V1_0::imtbase::CGetObjectDataGqlRequest& getObjectDataRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtbase::ImtCollection::CGetObjectDataPayload::V1_0 response;
+	sdl::V1_0::imtbase::CGetObjectDataPayload response;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
-		return sdl::imtbase::ImtCollection::CGetObjectDataPayload();
+		return sdl::V1_0::imtbase::CGetObjectDataPayload();
 	}
 
-	sdl::imtbase::ImtCollection::GetObjectDataRequestArguments arguments = getObjectDataRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtbase::ImtCollection::CGetObjectDataPayload();
-	}
-
+	sdl::V1_0::imtbase::GetObjectDataRequestArguments arguments = getObjectDataRequest.GetRequestedArguments();
 	QByteArray objectId;
-	if (arguments.input.Version_1_0->objectId){
-		objectId = *arguments.input.Version_1_0->objectId;
+	if (arguments.input->objectId){
+		objectId = *arguments.input->objectId;
 	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 		errorMessage = QString("Unable to get object data '%1'. Error: Object does not exists").arg(QString::fromUtf8(objectId));
-		return sdl::imtbase::ImtCollection::CGetObjectDataPayload();
+		return sdl::V1_0::imtbase::CGetObjectDataPayload();
 	}
 
 	QByteArray objectData;
 	if (!SerializeObject(*dataPtr.GetPtr(), objectData)){
 		errorMessage = QString("Unable to get object data '%1'. Error: Object serializaion failed").arg(QString::fromUtf8(objectId));
-		return sdl::imtbase::ImtCollection::CGetObjectDataPayload();
+		return sdl::V1_0::imtbase::CGetObjectDataPayload();
 	}
 
 	response.objectData = objectData;
 
-	sdl::imtbase::ImtCollection::CGetObjectDataPayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 
-sdl::imtbase::ImtCollection::CGetDataMetaInfoPayload CObjectCollectionControllerCompBase::OnGetDataMetaInfo(
-			const sdl::imtbase::ImtCollection::CGetDataMetaInfoGqlRequest& getDataMetaInfoRequest,
+sdl::V1_0::imtbase::CGetDataMetaInfoPayload CObjectCollectionControllerCompBase::OnGetDataMetaInfo(
+			const sdl::V1_0::imtbase::CGetDataMetaInfoGqlRequest& getDataMetaInfoRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtbase::ImtCollection::CGetDataMetaInfoPayload::V1_0 response;
+	sdl::V1_0::imtbase::CGetDataMetaInfoPayload response;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
-		return sdl::imtbase::ImtCollection::CGetDataMetaInfoPayload();
+		return sdl::V1_0::imtbase::CGetDataMetaInfoPayload();
 	}
 
-	sdl::imtbase::ImtCollection::GetDataMetaInfoRequestArguments arguments = getDataMetaInfoRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtbase::ImtCollection::CGetDataMetaInfoPayload();
-	}
-
+	sdl::V1_0::imtbase::GetDataMetaInfoRequestArguments arguments = getDataMetaInfoRequest.GetRequestedArguments();
 	QByteArray objectId;
-	if (arguments.input.Version_1_0->objectId){
-		objectId = *arguments.input.Version_1_0->objectId;
+	if (arguments.input->objectId){
+		objectId = *arguments.input->objectId;
 	}
 
 	QByteArray metaInfoData;
 	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
 	if (!SerializeObject(*metaInfo.GetPtr(), metaInfoData)){
 		errorMessage = QString("Unable to get data meta info for object '%1'. Error: Meta Info serializaion failed").arg(QString::fromUtf8(objectId));
-		return sdl::imtbase::ImtCollection::CGetDataMetaInfoPayload();
+		return sdl::V1_0::imtbase::CGetDataMetaInfoPayload();
 	}
 
 	response.metaInfoData = metaInfoData;
 
-	sdl::imtbase::ImtCollection::CGetDataMetaInfoPayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 
-sdl::imtbase::ImtCollection::CGetElementInfoPayload CObjectCollectionControllerCompBase::OnGetElementInfo(
-			const sdl::imtbase::ImtCollection::CGetElementInfoGqlRequest& getElementInfoRequest,
+sdl::V1_0::imtbase::CGetElementInfoPayload CObjectCollectionControllerCompBase::OnGetElementInfo(
+			const sdl::V1_0::imtbase::CGetElementInfoGqlRequest& getElementInfoRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	sdl::imtbase::ImtCollection::CGetElementInfoPayload::V1_0 response;
+	sdl::V1_0::imtbase::CGetElementInfoPayload response;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
-		return sdl::imtbase::ImtCollection::CGetElementInfoPayload();
+		return sdl::V1_0::imtbase::CGetElementInfoPayload();
 	}
 
-	sdl::imtbase::ImtCollection::GetElementInfoRequestArguments arguments = getElementInfoRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtbase::ImtCollection::CGetElementInfoPayload();
-	}
-
+	sdl::V1_0::imtbase::GetElementInfoRequestArguments arguments = getElementInfoRequest.GetRequestedArguments();
 	QByteArray objectId;
-	if (arguments.input.Version_1_0->elementId){
-		objectId = *arguments.input.Version_1_0->elementId;
+	if (arguments.input->elementId){
+		objectId = *arguments.input->elementId;
 	}
 
-	sdl::imtbase::ImtBaseTypes::CParameter::V1_0 parameterInfo;
+	sdl::V1_0::imtbase::CParameter parameterInfo;
 	parameterInfo.id = objectId;
 
 	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
@@ -1422,46 +1291,38 @@ sdl::imtbase::ImtCollection::CGetElementInfoPayload CObjectCollectionControllerC
 
 	response.elementInfo = parameterInfo;
 
-	sdl::imtbase::ImtCollection::CGetElementInfoPayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 
-sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CObjectCollectionControllerCompBase::OnGetElementMetaInfo(
-			const sdl::imtbase::ImtCollection::CGetElementMetaInfoGqlRequest& getElementMetaInfoRequest,
+sdl::V1_0::imtbase::CGetElementMetaInfoPayload CObjectCollectionControllerCompBase::OnGetElementMetaInfo(
+			const sdl::V1_0::imtbase::CGetElementMetaInfoGqlRequest& getElementMetaInfoRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload::V1_0 response;
+	sdl::V1_0::imtbase::CGetElementMetaInfoPayload response;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
-		return sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload();
+		return sdl::V1_0::imtbase::CGetElementMetaInfoPayload();
 	}
 
-	sdl::imtbase::ImtCollection::GetElementMetaInfoRequestArguments arguments = getElementMetaInfoRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload();
-	}
-
+	sdl::V1_0::imtbase::GetElementMetaInfoRequestArguments arguments = getElementMetaInfoRequest.GetRequestedArguments();
 	QByteArray objectId;
-	if (arguments.input.Version_1_0->elementId){
-		objectId = *arguments.input.Version_1_0->elementId;
+	if (arguments.input->elementId){
+		objectId = *arguments.input->elementId;
 	}
 
 	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(objectId);
 	if (!metaInfo.IsValid()){
 		errorMessage = QString("Unable to get element meta info for object '%1'. Error: Meta Info is invalid").arg(QString::fromUtf8(objectId));
-		return sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload();
+		return sdl::V1_0::imtbase::CGetElementMetaInfoPayload();
 	}
 
-	QList<sdl::imtbase::ImtBaseTypes::CParameter::V1_0> parameterInfos;
+	QList<sdl::V1_0::imtbase::CParameter> parameterInfos;
 	idoc::IDocumentMetaInfo::MetaInfoTypes metaInfoTypes = metaInfo->GetMetaInfoTypes();
 	for (const int& infoType : metaInfoTypes){
-		sdl::imtbase::ImtBaseTypes::CParameter::V1_0 parameterInfo;
+		sdl::V1_0::imtbase::CParameter parameterInfo;
 		parameterInfo.id = metaInfo->GetMetaInfoId(infoType);
 		parameterInfo.name = metaInfo->GetMetaInfoName(infoType);
 		parameterInfo.description = metaInfo->GetMetaInfoDescription(infoType);
@@ -1473,67 +1334,59 @@ sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CObjectCollectionControl
 		parameterInfos << parameterInfo;
 	}
 
-	sdl::imtbase::ImtCollection::CElementMetaInfo::V1_0 elementMetaInfo;
+	sdl::V1_0::imtbase::CElementMetaInfo elementMetaInfo;
 	elementMetaInfo.infoParams.Emplace();
 	elementMetaInfo.infoParams->FromList(parameterInfos);
 	response.elementMetaInfo = elementMetaInfo;
 
-	sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 
-sdl::imtbase::ImtCollection::CCreateSubCollectionPayload CObjectCollectionControllerCompBase::OnCreateSubCollection(
-			const sdl::imtbase::ImtCollection::CCreateSubCollectionGqlRequest& createSubCollectionRequest,
+sdl::V1_0::imtbase::CCreateSubCollectionPayload CObjectCollectionControllerCompBase::OnCreateSubCollection(
+			const sdl::V1_0::imtbase::CCreateSubCollectionGqlRequest& createSubCollectionRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::imtbase::ImtCollection::CCreateSubCollectionPayload::V1_0 response;
+	sdl::V1_0::imtbase::CCreateSubCollectionPayload response;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
-		return sdl::imtbase::ImtCollection::CCreateSubCollectionPayload();
+		return sdl::V1_0::imtbase::CCreateSubCollectionPayload();
 	}
 
-	sdl::imtbase::ImtCollection::CreateSubCollectionRequestInfo requestInfo = createSubCollectionRequest.GetRequestInfo();
+	sdl::V1_0::imtbase::CreateSubCollectionRequestInfo requestInfo = createSubCollectionRequest.GetRequestInfo();
 
-	sdl::imtbase::ImtCollection::CreateSubCollectionRequestArguments arguments = createSubCollectionRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtbase::ImtCollection::CCreateSubCollectionPayload();
-	}
-
+	sdl::V1_0::imtbase::CreateSubCollectionRequestArguments arguments = createSubCollectionRequest.GetRequestedArguments();
 	int offset = 0;
-	if (arguments.input.Version_1_0->offset){
-		offset = *arguments.input.Version_1_0->offset;
+	if (arguments.input->offset){
+		offset = *arguments.input->offset;
 	}
 
 	int count = -1;
-	if (arguments.input.Version_1_0->count){
-		count = *arguments.input.Version_1_0->count;
+	if (arguments.input->count){
+		count = *arguments.input->count;
 	}
 
 	iprm::CParamsSet filterParams;
-	if (arguments.input.Version_1_0->selectionParams){
+	if (arguments.input->selectionParams){
 		if (filterParams.CopyFrom(m_selectionParams)){
-			sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 paramsSet = *arguments.input.Version_1_0->selectionParams;
+			sdl::V1_0::imtbase::CParamsSet paramsSet = *arguments.input->selectionParams;
 			if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
 				errorMessage = QString("Unable to create sub collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
-				return sdl::imtbase::ImtCollection::CCreateSubCollectionPayload();
+				return sdl::V1_0::imtbase::CCreateSubCollectionPayload();
 			}
 		}
 	}
 
 	if (requestInfo.isItemsRequested){
-		imtsdl::TElementList<sdl::imtbase::ImtCollection::CSubCollectionItem::V1_0> collectionItems;
+		imtsdl::TElementList<sdl::V1_0::imtbase::CSubCollectionItem> collectionItems;
 		imtbase::ICollectionInfo::Ids ids = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
 		for (const imtbase::ICollectionInfo::Id& id: ids){
-			sdl::imtbase::ImtCollection::CSubCollectionItem::V1_0 collectionItem;
+			sdl::V1_0::imtbase::CSubCollectionItem collectionItem;
 
 			if (requestInfo.items.isItemInfoRequested){
-				sdl::imtbase::ImtBaseTypes::CParameter::V1_0 parameterInfo;
+				sdl::V1_0::imtbase::CParameter parameterInfo;
 
 				if (requestInfo.items.itemInfo.isIdRequested){
 					parameterInfo.id = id;
@@ -1580,10 +1433,7 @@ sdl::imtbase::ImtCollection::CCreateSubCollectionPayload CObjectCollectionContro
 		response.items = collectionItems;
 	}
 
-	sdl::imtbase::ImtCollection::CCreateSubCollectionPayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return response;
 }
 
 
@@ -1879,7 +1729,7 @@ QJsonObject CObjectCollectionControllerCompBase::InsertObject(
 
 	CreateUserActionLog(objectId, typeId, "Create", gqlRequest);
 
-	sdl::imtbase::ImtCollection::CAddedNotificationPayload::V1_0 response;
+	sdl::V1_0::imtbase::CAddedNotificationPayload response;
 	response.id = newObjectId;
 
 	QJsonObject rootObj;
@@ -1969,7 +1819,7 @@ QJsonObject CObjectCollectionControllerCompBase::UpdateObject(
 	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
 	CreateUserActionLog(objectId, typeId, "Update", gqlRequest);
 
-	sdl::imtbase::ImtCollection::CUpdatedNotificationPayload::V1_0 response;
+	sdl::V1_0::imtbase::CUpdatedNotificationPayload response;
 	response.id = objectId;
 
 	QJsonObject rootObj;
@@ -2230,7 +2080,7 @@ QJsonObject CObjectCollectionControllerCompBase::DeleteObject(
 		return QJsonObject();
 	}
 
-	sdl::imtbase::ImtCollection::CRemovedNotificationPayload::V1_0 response;
+	sdl::V1_0::imtbase::CRemovedNotificationPayload response;
 	response.elementIds.Emplace();
 	response.elementIds->FromList(objectIds);
 
@@ -2608,7 +2458,7 @@ imtbase::ICollectionInfo::Ids CObjectCollectionControllerCompBase::ExtractObject
 		return retVal;
 	}
 
-	sdl::imtbase::ImtCollection::CRemoveElementsInput::V1_0 removeElementsInput;
+	sdl::V1_0::imtbase::CRemoveElementsInput removeElementsInput;
 	if (!removeElementsInput.ReadFromGraphQlObject(*inputParamPtr)){
 		errorMessage = QString("Failed to delete objects: unable to parse 'input' parameters.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
@@ -2841,9 +2691,9 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 	const imtgql::CGqlParamObject* complexFilterModelPtr = inputParamsGql.GetParamArgumentObjectPtr("filterModel");
 	const imtgql::CGqlParamObject* documentFilterModelPtr = inputParamsGql.GetParamArgumentObjectPtr("documentFilterModel");
 
-	sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 paramsSet;
+	sdl::V1_0::imtbase::CParamsSet paramsSet;
 	if (inputParamsGql.ContainsParam("parameters") && paramsSet.ReadFromGraphQlObject(inputParamsGql)){
-		for (sdl::imtbase::ImtBaseTypes::CParameter::V1_0 parameter: paramsSet.parameters->ToList()){
+		for (sdl::V1_0::imtbase::CParameter parameter: paramsSet.parameters->ToList()){
 			if (parameter.id){
 				QByteArray parameterId = *parameter.id;
 				const iser::ISerializable* parameterPtr = m_selectionParams.GetParameter(parameterId);
@@ -2870,7 +2720,7 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 	}
 
 	if (complexFilterModelPtr != nullptr){
-		sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0 complexFilterSdl;
+		sdl::V1_0::imtbase::CComplexCollectionFilter complexFilterSdl;
 		bool isComplexFilterOk = complexFilterSdl.ReadFromGraphQlObject(*complexFilterModelPtr);
 		if (isComplexFilterOk){
 			istd::TDelPtr<imtbase::CComplexCollectionFilter> complexFilterPtr = new imtbase::CComplexCollectionFilter();
@@ -2890,7 +2740,7 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 	}
 
 	if (documentFilterModelPtr != nullptr){
-		sdl::imtbase::DocumentCollectionFilter::CDocumentCollectionFilter::V1_0 documentFilterSdl;
+		sdl::V1_0::imtbase::CDocumentCollectionFilter documentFilterSdl;
 		bool isDocumentFilterOk = documentFilterSdl.ReadFromGraphQlObject(*documentFilterModelPtr);
 		if (isDocumentFilterOk){
 			istd::TDelPtr<imtcol::CDocumentCollectionFilter> documentFilterPtr = new imtcol::CDocumentCollectionFilter();
@@ -2944,7 +2794,7 @@ QString CObjectCollectionControllerCompBase::GetObjectNameFromRequest(const imtg
 
 
 bool CObjectCollectionControllerCompBase::CreateCollectionFilterFromViewParamsSdl(
-			const sdl::imtbase::ImtCollection::CCollectionViewParams::V1_0& viewParams,
+			const sdl::V1_0::imtbase::CCollectionViewParams& viewParams,
 			int& offset,
 			int& count,
 			iprm::CParamsSet& filterParams) const
@@ -2960,14 +2810,14 @@ bool CObjectCollectionControllerCompBase::CreateCollectionFilterFromViewParamsSd
 	}
 
 	if (viewParams.filterModel){
-		sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0 sdlFilter = *viewParams.filterModel;
+		sdl::V1_0::imtbase::CComplexCollectionFilter sdlFilter = *viewParams.filterModel;
 		if (!CreateCollectionFilterFromSdl(sdlFilter, filterParams)){
 			return false;
 		}
 	}
 
 	if (viewParams.documentFilterModel){
-		sdl::imtbase::DocumentCollectionFilter::CDocumentCollectionFilter::V1_0 documentFilterModel = *viewParams.documentFilterModel;
+		sdl::V1_0::imtbase::CDocumentCollectionFilter documentFilterModel = *viewParams.documentFilterModel;
 		if (!CreateDocumentFilterFromSdl(documentFilterModel, filterParams)){
 			return false;
 		}
@@ -2978,7 +2828,7 @@ bool CObjectCollectionControllerCompBase::CreateCollectionFilterFromViewParamsSd
 
 
 bool CObjectCollectionControllerCompBase::CreateCollectionFilterFromSdl(
-			sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0& collectionFilter,
+			sdl::V1_0::imtbase::CComplexCollectionFilter& collectionFilter,
 			iprm::CParamsSet& filterParams) const
 {
 	istd::TDelPtr<imtbase::CComplexCollectionFilter> complexFilterPtr = new imtbase::CComplexCollectionFilter();
@@ -2994,7 +2844,7 @@ bool CObjectCollectionControllerCompBase::CreateCollectionFilterFromSdl(
 
 
 bool CObjectCollectionControllerCompBase::CreateDocumentFilterFromSdl(
-			sdl::imtbase::DocumentCollectionFilter::CDocumentCollectionFilter::V1_0& documentFilter,
+			sdl::V1_0::imtbase::CDocumentCollectionFilter& documentFilter,
 			iprm::CParamsSet& filterParams) const
 {
 	istd::TDelPtr<imtcol::CDocumentCollectionFilter> documentFilterPtr = new imtcol::CDocumentCollectionFilter();
@@ -3063,7 +2913,7 @@ bool CObjectCollectionControllerCompBase::DoUpdateObjectFromRequest(
 }
 
 
-bool CObjectCollectionControllerCompBase::GetParamsSetFromRepresentation(sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0& representation, iprm::IParamsSet& paramsSet) const
+bool CObjectCollectionControllerCompBase::GetParamsSetFromRepresentation(sdl::V1_0::imtbase::CParamsSet& representation, iprm::IParamsSet& paramsSet) const
 {
 	QJsonObject jsonObject;
 	if (!representation.WriteToJsonObject(jsonObject)){
@@ -3153,13 +3003,11 @@ void CObjectCollectionControllerCompBase::OnAfterSetObjectDescription(
 
 QByteArray CObjectCollectionControllerCompBase::ExtractObjectIdFromGetObjectTypeIdGqlRequest(const imtgql::CGqlRequest& gqlRequest) const
 {
-	sdl::imtbase::ImtCollection::CGetObjectTypeIdGqlRequest getObjectTypeIdGqlRequest(gqlRequest, false);
+	sdl::V1_0::imtbase::CGetObjectTypeIdGqlRequest getObjectTypeIdGqlRequest(gqlRequest, false);
 	if (getObjectTypeIdGqlRequest.IsValid()){
 		auto arguments = getObjectTypeIdGqlRequest.GetRequestedArguments();
-		if (arguments.input.Version_1_0.HasValue()){
-			if (arguments.input.Version_1_0->objectId.HasValue()){
-				return *arguments.input.Version_1_0->objectId;
-			}
+		if (arguments.input->objectId.HasValue()){
+			return *arguments.input->objectId;
 		}
 	}
 
@@ -3169,13 +3017,11 @@ QByteArray CObjectCollectionControllerCompBase::ExtractObjectIdFromGetObjectType
 
 QByteArray CObjectCollectionControllerCompBase::ExtractObjectIdFromGetObjectDataGqlRequest(const imtgql::CGqlRequest& gqlRequest) const
 {
-	sdl::imtbase::ImtCollection::CGetObjectDataGqlRequest getObjectDataGqlRequest(gqlRequest, false);
+	sdl::V1_0::imtbase::CGetObjectDataGqlRequest getObjectDataGqlRequest(gqlRequest, false);
 	if (getObjectDataGqlRequest.IsValid()){
 		auto arguments = getObjectDataGqlRequest.GetRequestedArguments();
-		if (arguments.input.Version_1_0.HasValue()){
-			if (arguments.input.Version_1_0->objectId.HasValue()){
-				return *arguments.input.Version_1_0->objectId;
-			}
+		if (arguments.input->objectId.HasValue()){
+			return *arguments.input->objectId;
 		}
 	}
 
