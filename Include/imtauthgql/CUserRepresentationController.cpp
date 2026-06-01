@@ -101,7 +101,7 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 		userInfoPtr->AddToSystem(systemInfo);
 	}
 	else{
-		for (const istd::TSharedNullable<sdl::imtauth::Users::CSystemInfo::V1_0>& sdlSystemInfo : systemInfos){
+		for (const istd::TNullableValue<sdl::imtauth::Users::CSystemInfo::V1_0>& sdlSystemInfo : systemInfos){
 			QByteArray systemId;
 			if (!sdlSystemInfo.HasValue()){
 				continue;

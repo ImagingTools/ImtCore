@@ -138,7 +138,7 @@ bool CCommandsControllerComp::GetRepresentationFromGuiElementContainer(
 				}
 				
 				imtsdl::TElementList<sdl::imtbase::Commands::CGuiElementModel::V1_0> subElementList;
-				for (const istd::TSharedNullable<sdl::imtbase::Commands::CGuiElementModel::V1_0>& subElement : *subElements.elements){
+				for (const istd::TNullableValue<sdl::imtbase::Commands::CGuiElementModel::V1_0>& subElement : *subElements.elements){
 					subElementList << *subElement;
 				}
 

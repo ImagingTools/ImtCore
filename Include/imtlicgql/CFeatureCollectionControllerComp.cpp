@@ -88,7 +88,7 @@ bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
 	if (featureRepresentationData.subFeatures){
 		subFeatureDataList = *featureRepresentationData.subFeatures;
 	}
-	for (const istd::TSharedNullable<sdl::imtlic::Features::CFeatureData::V1_0>& subFeatureData : subFeatureDataList){
+	for (const istd::TNullableValue<sdl::imtlic::Features::CFeatureData::V1_0>& subFeatureData : subFeatureDataList){
 		if (!subFeatureData.HasValue()){
 			continue;
 		}

@@ -40,7 +40,7 @@ CApplicationInfoControllerComp::ApplicationInfo CApplicationInfoControllerComp::
 	}
 
 	using AppAttribute = ibase::IApplicationInfo::ApplicationAttribute;
-	using AppInfoMember = istd::TSharedNullable<QString> ApplicationInfo::V1_0::*;
+	using AppInfoMember = istd::TNullableValue<QString> ApplicationInfo::V1_0::*;
 
 	const QHash<AppAttribute, QPair<QByteArray, AppInfoMember>> attributeHash = {
 		{ AppAttribute::AA_APPLICATION_ID,	 { QByteArrayLiteral("ApplicationInfo/ApplicationId"),	 &ApplicationInfo::V1_0::applicationId	 } },

@@ -6,14 +6,14 @@ namespace imtdbgql
 {
 
 
-void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TSharedNullable<bool>& output)
+void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TNullableValue<bool>& output)
 {
 	bool metaInfoValue = metaInfoData.toBool();
 	output = metaInfoValue;
 }
 
 
-void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TSharedNullable<int>& output)
+void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TNullableValue<int>& output)
 {
 	bool ok = false;
 	int metaInfoValue = metaInfoData.toInt(&ok);
@@ -23,7 +23,7 @@ void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TSharedN
 }
 
 
-void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TSharedNullable<long>& output)
+void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TNullableValue<long>& output)
 {
 	bool ok = false;
 	long metaInfoValue = metaInfoData.toLongLong(&ok);
@@ -33,7 +33,7 @@ void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TSharedN
 }
 
 
-void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TSharedNullable<long long>& output)
+void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TNullableValue<long long>& output)
 {
 	bool ok = false;
 	long long metaInfoValue = metaInfoData.toLongLong(&ok);
@@ -43,7 +43,7 @@ void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TSharedN
 }
 
 
-void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TSharedNullable<float>& output)
+void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TNullableValue<float>& output)
 {
 	bool ok = false;
 	float metaInfoValue = metaInfoData.toFloat(&ok);
@@ -53,7 +53,7 @@ void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TSharedN
 }
 
 
-void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TSharedNullable<double>& output)
+void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TNullableValue<double>& output)
 {
 	bool ok = false;
 	double metaInfoValue = metaInfoData.toDouble(&ok);
@@ -63,14 +63,14 @@ void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TSharedN
 }
 
 
-void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TSharedNullable<QString>& output)
+void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TNullableValue<QString>& output)
 {
 	QString metaInfoValue = metaInfoData.toString();
 	output = std::move(metaInfoValue);
 }
 
 
-void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TSharedNullable<QByteArray>& output)
+void CSdlMetaInfoTools::GetMetaInfo(const QVariant& metaInfoData, istd::TNullableValue<QByteArray>& output)
 {
 	QByteArray metaInfoValue = metaInfoData.toByteArray();
 	output = std::move(metaInfoValue);

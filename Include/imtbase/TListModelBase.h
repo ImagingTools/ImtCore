@@ -5,7 +5,7 @@
 #include <QtCore/QAbstractListModel>
 
 // ACF includes
-#include <istd/TSharedNullable.h>
+#include <istd/TNullableValue.h>
 
 
 namespace imtbase
@@ -30,7 +30,7 @@ protected:
 public:
 	// std::optional<QList<ModelDataType>>& m_modelData;
 	// available version members
-	istd::TSharedNullable<QList<ModelDataType>> Version_1_0;
+	istd::TNullableValue<QList<ModelDataType>> Version_1_0;
 	mutable QMap<int, ModelObjectDataType*> m_objectDataTypeMap;
 };
 

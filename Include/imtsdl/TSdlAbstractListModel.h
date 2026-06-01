@@ -5,7 +5,7 @@
 #include <QtCore/QAbstractListModel>
 
 // ACF includes
-#include <istd/TSharedNullable.h>
+#include <istd/TNullableValue.h>
 
 // ImtCore includes
 #include <imtsdl/TElementList.h>
@@ -37,7 +37,7 @@ protected:
 
 public:
 	// available version members
-	istd::TSharedNullable<imtsdl::TElementList<ModelDataType>> Version_1_0;
+	istd::TNullableValue<imtsdl::TElementList<ModelDataType>> Version_1_0;
 	mutable QMap<int, QVariant> m_objectDataTypeMap;
 };
 
@@ -159,7 +159,7 @@ bool TSdlAbstractListModel<ModelDataType, ModelObjectDataType>::
 	}
 
 	ModelDataType* newItemPtr = value.value<ModelDataType*>();
-	istd::TSharedNullable<ModelDataType> newItem = *newItemPtr;
+	istd::TNullableValue<ModelDataType> newItem = *newItemPtr;
 	Version_1_0->insert(row, newItem);
 
 	return true;
