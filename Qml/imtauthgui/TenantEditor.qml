@@ -80,6 +80,7 @@ DocumentViewBase {
 	MultiPageView {
 		id: multiPageView
 		anchors.fill: parent
+		panelWidth: Style.sizeHintXXS
 
 		function updatePages() {
 			multiPageView.clear()
@@ -103,7 +104,7 @@ DocumentViewBase {
 			multiPageView.currentIndex = 0
 		}
 
-		Component.onCompleted: {
+		Component.onCompleted: { 
 			multiPageView.updatePages()
 		}
 	}
