@@ -15,4 +15,3 @@ CREATE TABLE IF NOT EXISTS "TicketActions"
     "Timestamp"               TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "ActionData"              TEXT
 );
-CREATE INDEX IF NOT EXISTS "IX_TicketActions_TicketId" ON "TicketActions" ("TicketId");

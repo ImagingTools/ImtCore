@@ -5,4 +5,3 @@ CREATE TABLE IF NOT EXISTS "TicketEntityReferences"
     "EntityReferenceId" TEXT NOT NULL,
     "CreatedAt"         TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-CREATE UNIQUE INDEX IF NOT EXISTS "UX_TicketEntityReferences" ON "TicketEntityReferences" ("TicketId", "EntityReferenceId");

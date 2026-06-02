@@ -16,100 +16,87 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (CGraphQlHandlerCompBase)
+// reimplemented (CUserCollectionDocumentServiceGqlHandlerCompBase)
 
-sdl::imtauth::Users::CUserData CUserCollectionDocumentServiceComp::OnGetUserRepresentation(
-		const sdl::imtauth::UserCollectionDocumentService::CGetUserRepresentationGqlRequest& getUserRepresentationRequest,
+sdl::V1_0::imtauth::CUserData CUserCollectionDocumentServiceComp::OnGetUserRepresentation(
+		const sdl::V1_0::imtauth::CGetUserRepresentationGqlRequest& getUserRepresentationRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
-	sdl::imtauth::UserCollectionDocumentService::GetUserRepresentationRequestArguments arguments = getUserRepresentationRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtauth::Users::CUserData();
-	}
-
+	sdl::V1_0::imtauth::GetUserRepresentationRequestArguments arguments = getUserRepresentationRequest.GetRequestedArguments();
 	QByteArray userId = GetUserId(gqlRequest);
 
 	QByteArray objectId;
-	if (arguments.input.Version_1_0->id){
-		objectId = *arguments.input.Version_1_0->id;
+	if (arguments.input->id){
+		objectId = *arguments.input->id;
 	}
 
 	if (objectId.isEmpty()){
 		errorMessage = QStringLiteral("Missing document ID");
-		return sdl::imtauth::Users::CUserData();
+		return sdl::V1_0::imtauth::CUserData();
 	}
 
 	istd::IChangeableSharedPtr documentPtr;
 	m_documentManagerCompPtr->GetDocumentData(userId, objectId, documentPtr);
 	if (!documentPtr.IsValid()){
 		errorMessage = QStringLiteral("Document not found");
-		return sdl::imtauth::Users::CUserData();
+		return sdl::V1_0::imtauth::CUserData();
 	}
 
 	const imtauth::CIdentifiableUserInfo* userPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(documentPtr.GetPtr());
 	if (userPtr == nullptr){
 		errorMessage = QStringLiteral("Invalid document type");
-		return sdl::imtauth::Users::CUserData();
+		return sdl::V1_0::imtauth::CUserData();
 	}
 
-	sdl::imtauth::Users::CUserData response;
-	response.Version_1_0.Emplace();
+	sdl::V1_0::imtauth::CUserData response;
+	response.id = userPtr->GetObjectUuid();
+	response.name = userPtr->GetName();
+	response.username = userPtr->GetId();
+	response.email = userPtr->GetMail();
 
-	response.Version_1_0->id = userPtr->GetObjectUuid();
-	response.Version_1_0->name = userPtr->GetName();
-	response.Version_1_0->username = userPtr->GetId();
-	response.Version_1_0->email = userPtr->GetMail();
-
-	response.Version_1_0->groups.Emplace();
+	response.groups.Emplace();
 	for (const QByteArray& groupId : userPtr->GetGroups()){
-		response.Version_1_0->groups->push_back(groupId);
+		response.groups->push_back(groupId);
 	}
 
 	// Roles and permissions across all products this user has any role in.
-	response.Version_1_0->roles.Emplace();
-	response.Version_1_0->permissions.Emplace();
+	response.roles.Emplace();
+	response.permissions.Emplace();
 	for (const QByteArray& productId : userPtr->GetProducts()){
 		for (const QByteArray& roleId : userPtr->GetRoles(productId)){
-			response.Version_1_0->roles->push_back(roleId);
+			response.roles->push_back(roleId);
 		}
 		for (const QByteArray& permissionId : userPtr->GetLocalPermissions(productId)){
-			response.Version_1_0->permissions->push_back(permissionId);
+			response.permissions->push_back(permissionId);
 		}
 	}
 
-	response.Version_1_0->systemInfos.Emplace();
+	response.systemInfos.Emplace();
 	for (const imtauth::IUserInfo::SystemInfo& systemInfo : userPtr->GetSystemInfos()){
-		sdl::imtauth::Users::CSystemInfo::V1_0 systemEntry;
+		sdl::V1_0::imtauth::CSystemInfo systemEntry;
 		systemEntry.id = systemInfo.systemId;
 		systemEntry.name = systemInfo.systemName;
 		systemEntry.enabled = systemInfo.enabled;
-		response.Version_1_0->systemInfos->push_back(systemEntry);
+		response.systemInfos->push_back(systemEntry);
 	}
 
 	return response;
 }
 
 
-sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CUserCollectionDocumentServiceComp::OnUpdateUserFromRepresentation(
-		const sdl::imtauth::UserCollectionDocumentService::CUpdateUserFromRepresentationGqlRequest& updateUserFromRepresentationRequest,
+sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp::OnUpdateUserFromRepresentation(
+		const sdl::V1_0::imtauth::CUpdateUserFromRepresentationGqlRequest& updateUserFromRepresentationRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
-	sdl::imtauth::UserCollectionDocumentService::UpdateUserFromRepresentationRequestArguments arguments = updateUserFromRepresentationRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus();
-	}
-
-	sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus response;
-	response.Version_1_0.Emplace();
-	response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::Failed;
+	sdl::V1_0::imtauth::UpdateUserFromRepresentationRequestArguments arguments = updateUserFromRepresentationRequest.GetRequestedArguments();
+	sdl::V1_0::imtbase::CDocumentOperationStatus response;
+	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
 
 	QByteArray documentId;
-	if (arguments.input.Version_1_0->documentId){
-		documentId = *arguments.input.Version_1_0->documentId;
+	if (arguments.input->documentId){
+		documentId = *arguments.input->documentId;
 	}
 
 	if (documentId.isEmpty()){
@@ -122,19 +109,19 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CUserCollectio
 	istd::IChangeableSharedPtr documentPtr;
 	m_documentManagerCompPtr->GetDocumentData(userLogin, documentId, documentPtr);
 	if (!documentPtr.IsValid()){
-		response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::InvalidDocumentId;
+		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
 
 	imtauth::CIdentifiableUserInfo* userPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(documentPtr.GetPtr());
 	if (userPtr == nullptr){
-		response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::InvalidDocumentId;
+		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
 
-	sdl::imtauth::Users::CUserData::V1_0 userData;
-	if (arguments.input.Version_1_0->user){
-		userData = *arguments.input.Version_1_0->user;
+	sdl::V1_0::imtauth::CUserData userData;
+	if (arguments.input->user){
+		userData = *arguments.input->user;
 	}
 
 	if (userData.id){
@@ -195,7 +182,7 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CUserCollectio
 
 	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr);
 
-	response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::Success;
+	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 
 	return response;
 }

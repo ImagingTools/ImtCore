@@ -16,7 +16,7 @@ namespace imtdeskgql
 
 
 /**
-	Ticket access level enum (mirrors sdl::imtdesk::ImtDesk::TicketAccessLevel).
+	Ticket access level enum (mirrors sdl::V1_0::imtdesk::TicketAccessLevel).
 */
 enum TicketAccessLevel
 {

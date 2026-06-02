@@ -1,91 +1,92 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CJwtSessionControllerProxyComp.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Sessions.h>
 
 
 namespace imtauthgql
 {
 
 
-// reimplemented (sdl::imtauth::Sessions::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CSessionsGqlHandlerCompBase)
 
-sdl::imtauth::Sessions::CValidateSessionPayload CJwtSessionControllerProxyComp::OnValidateSession(
-			const sdl::imtauth::Sessions::CValidateSessionGqlRequest& /*validateSessionRequest*/,
+sdl::V1_0::imtauth::CValidateSessionPayload CJwtSessionControllerProxyComp::OnValidateSession(
+			const sdl::V1_0::imtauth::CValidateSessionGqlRequest& /*validateSessionRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtauth::Sessions::CValidateSessionPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtauth::CValidateSessionPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtauth::Sessions::CValidateJwtPayload CJwtSessionControllerProxyComp::OnValidateJwt(
-			const sdl::imtauth::Sessions::CValidateJwtGqlRequest& /*validateJwtRequest*/,
+sdl::V1_0::imtauth::CValidateJwtPayload CJwtSessionControllerProxyComp::OnValidateJwt(
+			const sdl::V1_0::imtauth::CValidateJwtGqlRequest& /*validateJwtRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtauth::Sessions::CValidateJwtPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtauth::CValidateJwtPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtauth::Sessions::CGetSessionPayload CJwtSessionControllerProxyComp::OnGetSession(
-			const sdl::imtauth::Sessions::CGetSessionGqlRequest& /*getSessionRequest*/,
+sdl::V1_0::imtauth::CGetSessionPayload CJwtSessionControllerProxyComp::OnGetSession(
+			const sdl::V1_0::imtauth::CGetSessionGqlRequest& /*getSessionRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtauth::Sessions::CGetSessionPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtauth::CGetSessionPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtauth::Sessions::CRefreshTokenPayload CJwtSessionControllerProxyComp::OnRefreshToken(
-			const sdl::imtauth::Sessions::CRefreshTokenGqlRequest& /*refreshTokenRequest*/,
+sdl::V1_0::imtauth::CRefreshTokenPayload CJwtSessionControllerProxyComp::OnRefreshToken(
+			const sdl::V1_0::imtauth::CRefreshTokenGqlRequest& /*refreshTokenRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtauth::Sessions::CRefreshTokenPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtauth::CRefreshTokenPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtauth::Sessions::CCreateNewSessionPayload CJwtSessionControllerProxyComp::OnCreateNewSession(
-			const sdl::imtauth::Sessions::CCreateNewSessionGqlRequest& /*createNewSessionRequest*/,
+sdl::V1_0::imtauth::CCreateNewSessionPayload CJwtSessionControllerProxyComp::OnCreateNewSession(
+			const sdl::V1_0::imtauth::CCreateNewSessionGqlRequest& /*createNewSessionRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtauth::Sessions::CCreateNewSessionPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtauth::CCreateNewSessionPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtauth::Sessions::CSelectTenantPayload CJwtSessionControllerProxyComp::OnSelectTenant(
-			const sdl::imtauth::Sessions::CSelectTenantGqlRequest& /*selectTenantRequest*/,
+sdl::V1_0::imtauth::CSelectTenantPayload CJwtSessionControllerProxyComp::OnSelectTenant(
+			const sdl::V1_0::imtauth::CSelectTenantGqlRequest& /*selectTenantRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtauth::Sessions::CSelectTenantPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtauth::CSelectTenantPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtauth::Sessions::CRemoveSessionPayload CJwtSessionControllerProxyComp::OnRemoveSession(
-			const sdl::imtauth::Sessions::CRemoveSessionGqlRequest& /*removeSessionRequest*/,
+sdl::V1_0::imtauth::CRemoveSessionPayload CJwtSessionControllerProxyComp::OnRemoveSession(
+			const sdl::V1_0::imtauth::CRemoveSessionGqlRequest& /*removeSessionRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtauth::Sessions::CRemoveSessionPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtauth::CRemoveSessionPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtauth::Sessions::CGetUserFromJwtPayload CJwtSessionControllerProxyComp::OnGetUserFromJwt(
-			const sdl::imtauth::Sessions::CGetUserFromJwtGqlRequest& /*getUserFromJwtRequest*/,
+sdl::V1_0::imtauth::CGetUserFromJwtPayload CJwtSessionControllerProxyComp::OnGetUserFromJwt(
+			const sdl::V1_0::imtauth::CGetUserFromJwtGqlRequest& /*getUserFromJwtRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtauth::Sessions::CGetUserFromJwtPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtauth::CGetUserFromJwtPayload>(gqlRequest, errorMessage);
 }
 
 
-sdl::imtauth::Sessions::CGetTenantFromJwtPayload CJwtSessionControllerProxyComp::OnGetTenantFromJwt(
-			const sdl::imtauth::Sessions::CGetTenantFromJwtGqlRequest& /*getTenantFromJwtRequest*/,
+sdl::V1_0::imtauth::CGetTenantFromJwtPayload CJwtSessionControllerProxyComp::OnGetTenantFromJwt(
+			const sdl::V1_0::imtauth::CGetTenantFromJwtGqlRequest& /*getTenantFromJwtRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	return SendModelRequest<sdl::imtauth::Sessions::CGetTenantFromJwtPayload>(gqlRequest, errorMessage);
+	return SendModelRequest<sdl::V1_0::imtauth::CGetTenantFromJwtPayload>(gqlRequest, errorMessage);
 }
 
 

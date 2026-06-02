@@ -1,24 +1,25 @@
 #include "SubstrateSpecifications.h"
+#include "SubstrateSpecifications_fwd.h"
 
 
-namespace sdl::substrate::SubstrateSpecifications
+namespace sdl::V1_0::V1_0
 {
 
 
-QByteArray CInputId::V1_0::GetVersionId()
+QByteArray CInputId::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CInputId::V1_0::operator==(const V1_0& other) const
+bool CInputId::operator==(const CInputId& other) const
 {
 	return 
 				id == other.id;
 }
 
 
-bool CInputId::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CInputId::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "InputId", modelIndex);
 
@@ -34,7 +35,7 @@ bool CInputId::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelInd
 }
 
 
-bool CInputId::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CInputId::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant idData = model.GetData("id", modelIndex);
 	if (idData.isNull()){
@@ -48,7 +49,7 @@ bool CInputId::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int m
 }
 
 
-bool CInputId::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CInputId::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant idData = model.GetData("id", modelIndex);
 	if (!idData.isNull()){
@@ -59,7 +60,7 @@ bool CInputId::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, in
 }
 
 
-bool CInputId::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CInputId::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!id){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
@@ -74,7 +75,7 @@ bool CInputId::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) 
 }
 
 
-bool CInputId::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CInputId::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("id") || (gqlObject["id"].userType() != QMetaType::QString && gqlObject["id"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
@@ -87,7 +88,7 @@ bool CInputId::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 }
 
 
-bool CInputId::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CInputId::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("id") && (gqlObject["id"].userType() == QMetaType::QString || gqlObject["id"].userType() == QMetaType::QByteArray)){
 		id = gqlObject["id"].toByteArray();
@@ -97,7 +98,7 @@ bool CInputId::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 }
 
 
-bool CInputId::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CInputId::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!id){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
@@ -112,7 +113,7 @@ bool CInputId::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CInputId::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CInputId::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("id") || ! jsonObject["id"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
@@ -125,7 +126,7 @@ bool CInputId::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CInputId::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CInputId::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("id") && jsonObject["id"].isString()){
 		id = jsonObject["id"].toString().toUtf8();
@@ -137,243 +138,13 @@ bool CInputId::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CInputId::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CInputId::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CInputId::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CInputId::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CInputId::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CInputId::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CInputId::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CInputId::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CInputId::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CCollectionViewParamsTest::V1_0::GetVersionId()
+QByteArray CCollectionViewParamsTest::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CCollectionViewParamsTest::V1_0::operator==(const V1_0& other) const
+bool CCollectionViewParamsTest::operator==(const CCollectionViewParamsTest& other) const
 {
 	return 
 				count == other.count &&
@@ -381,7 +152,7 @@ bool CCollectionViewParamsTest::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CCollectionViewParamsTest::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CCollectionViewParamsTest::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "CollectionViewParamsTest", modelIndex);
 
@@ -398,7 +169,7 @@ bool CCollectionViewParamsTest::V1_0::WriteToModel(::imtbase::CTreeItemModel& mo
 }
 
 
-bool CCollectionViewParamsTest::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CCollectionViewParamsTest::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant countData = model.GetData("count", modelIndex);
 	if (!countData.isNull()){
@@ -414,7 +185,7 @@ bool CCollectionViewParamsTest::V1_0::ReadFromModel(const ::imtbase::CTreeItemMo
 }
 
 
-bool CCollectionViewParamsTest::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CCollectionViewParamsTest::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant countData = model.GetData("count", modelIndex);
 	if (!countData.isNull()){
@@ -430,7 +201,7 @@ bool CCollectionViewParamsTest::V1_0::OptReadFromModel(const ::imtbase::CTreeIte
 }
 
 
-bool CCollectionViewParamsTest::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CCollectionViewParamsTest::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (count){
 		gqlObject.InsertParam("count", QVariant(*count));
@@ -446,7 +217,7 @@ bool CCollectionViewParamsTest::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamOb
 }
 
 
-bool CCollectionViewParamsTest::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CCollectionViewParamsTest::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("count") && (gqlObject["count"].userType() == QMetaType::Int || gqlObject["count"].userType() == QMetaType::UInt || gqlObject["count"].userType() == QMetaType::LongLong || gqlObject["count"].userType() == QMetaType::ULongLong || gqlObject["count"].userType() == QMetaType::Long || gqlObject["count"].userType() == QMetaType::Short || gqlObject["count"].userType() == QMetaType::ULong || gqlObject["count"].userType() == QMetaType::UShort || gqlObject["count"].userType() == QMetaType::UChar)){
 		count = gqlObject["count"].toInt();
@@ -460,7 +231,7 @@ bool CCollectionViewParamsTest::V1_0::ReadFromGraphQlObject(const ::imtgql::CGql
 }
 
 
-bool CCollectionViewParamsTest::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CCollectionViewParamsTest::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("count") && (gqlObject["count"].userType() == QMetaType::Int || gqlObject["count"].userType() == QMetaType::UInt || gqlObject["count"].userType() == QMetaType::LongLong || gqlObject["count"].userType() == QMetaType::ULongLong || gqlObject["count"].userType() == QMetaType::Long || gqlObject["count"].userType() == QMetaType::Short || gqlObject["count"].userType() == QMetaType::ULong || gqlObject["count"].userType() == QMetaType::UShort || gqlObject["count"].userType() == QMetaType::UChar)){
 		count = gqlObject["count"].toInt();
@@ -474,7 +245,7 @@ bool CCollectionViewParamsTest::V1_0::OptReadFromGraphQlObject(const ::imtgql::C
 }
 
 
-bool CCollectionViewParamsTest::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CCollectionViewParamsTest::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (count){
 		jsonObject["count"] = QJsonValue::fromVariant(*count);
@@ -490,7 +261,7 @@ bool CCollectionViewParamsTest::V1_0::WriteToJsonObject(QJsonObject& jsonObject)
 }
 
 
-bool CCollectionViewParamsTest::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CCollectionViewParamsTest::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("count") && jsonObject["count"].isDouble()){
 		count = jsonObject["count"].toInt();
@@ -504,7 +275,7 @@ bool CCollectionViewParamsTest::V1_0::ReadFromJsonObject(const QJsonObject& json
 }
 
 
-bool CCollectionViewParamsTest::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CCollectionViewParamsTest::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("count") && jsonObject["count"].isDouble()){
 		count = jsonObject["count"].toInt();
@@ -520,243 +291,13 @@ bool CCollectionViewParamsTest::V1_0::OptReadFromJsonObject(const QJsonObject& j
 
 // serialize methods
 
-bool CCollectionViewParamsTest::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCollectionViewParamsTest::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCollectionViewParamsTest::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCollectionViewParamsTest::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCollectionViewParamsTest::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCollectionViewParamsTest::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCollectionViewParamsTest::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCollectionViewParamsTest::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCollectionViewParamsTest::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CSubstrateSpecificationDocumentTypeIds::V1_0::GetVersionId()
+QByteArray CSubstrateSpecificationDocumentTypeIds::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CSubstrateSpecificationDocumentTypeIds::V1_0::operator==(const V1_0& other) const
+bool CSubstrateSpecificationDocumentTypeIds::operator==(const CSubstrateSpecificationDocumentTypeIds& other) const
 {
 	return 
 				PaperID == other.PaperID &&
@@ -765,7 +306,7 @@ bool CSubstrateSpecificationDocumentTypeIds::V1_0::operator==(const V1_0& other)
 }
 
 
-bool CSubstrateSpecificationDocumentTypeIds::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CSubstrateSpecificationDocumentTypeIds::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "SubstrateSpecificationDocumentTypeIds", modelIndex);
 
@@ -786,7 +327,7 @@ bool CSubstrateSpecificationDocumentTypeIds::V1_0::WriteToModel(::imtbase::CTree
 }
 
 
-bool CSubstrateSpecificationDocumentTypeIds::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CSubstrateSpecificationDocumentTypeIds::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant paperIDData = model.GetData("PaperID", modelIndex);
 	if (!paperIDData.isNull()){
@@ -807,7 +348,7 @@ bool CSubstrateSpecificationDocumentTypeIds::V1_0::ReadFromModel(const ::imtbase
 }
 
 
-bool CSubstrateSpecificationDocumentTypeIds::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CSubstrateSpecificationDocumentTypeIds::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant paperIDData = model.GetData("PaperID", modelIndex);
 	if (!paperIDData.isNull()){
@@ -828,7 +369,7 @@ bool CSubstrateSpecificationDocumentTypeIds::V1_0::OptReadFromModel(const ::imtb
 }
 
 
-bool CSubstrateSpecificationDocumentTypeIds::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CSubstrateSpecificationDocumentTypeIds::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (PaperID){
 		gqlObject.InsertParam("PaperID", QVariant(*PaperID));
@@ -848,7 +389,7 @@ bool CSubstrateSpecificationDocumentTypeIds::V1_0::WriteToGraphQlObject(::imtgql
 }
 
 
-bool CSubstrateSpecificationDocumentTypeIds::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CSubstrateSpecificationDocumentTypeIds::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("PaperID") && (gqlObject["PaperID"].userType() == QMetaType::QString || gqlObject["PaperID"].userType() == QMetaType::QByteArray)){
 		PaperID = gqlObject["PaperID"].toByteArray();
@@ -866,7 +407,7 @@ bool CSubstrateSpecificationDocumentTypeIds::V1_0::ReadFromGraphQlObject(const :
 }
 
 
-bool CSubstrateSpecificationDocumentTypeIds::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CSubstrateSpecificationDocumentTypeIds::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("PaperID") && (gqlObject["PaperID"].userType() == QMetaType::QString || gqlObject["PaperID"].userType() == QMetaType::QByteArray)){
 		PaperID = gqlObject["PaperID"].toByteArray();
@@ -884,7 +425,7 @@ bool CSubstrateSpecificationDocumentTypeIds::V1_0::OptReadFromGraphQlObject(cons
 }
 
 
-bool CSubstrateSpecificationDocumentTypeIds::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CSubstrateSpecificationDocumentTypeIds::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (PaperID){
 		jsonObject["PaperID"] = QString::fromUtf8(*PaperID);
@@ -904,7 +445,7 @@ bool CSubstrateSpecificationDocumentTypeIds::V1_0::WriteToJsonObject(QJsonObject
 }
 
 
-bool CSubstrateSpecificationDocumentTypeIds::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CSubstrateSpecificationDocumentTypeIds::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("PaperID") && jsonObject["PaperID"].isString()){
 		PaperID = jsonObject["PaperID"].toString().toUtf8();
@@ -922,7 +463,7 @@ bool CSubstrateSpecificationDocumentTypeIds::V1_0::ReadFromJsonObject(const QJso
 }
 
 
-bool CSubstrateSpecificationDocumentTypeIds::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CSubstrateSpecificationDocumentTypeIds::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("PaperID") && jsonObject["PaperID"].isString()){
 		PaperID = jsonObject["PaperID"].toString().toUtf8();
@@ -942,250 +483,20 @@ bool CSubstrateSpecificationDocumentTypeIds::V1_0::OptReadFromJsonObject(const Q
 
 // serialize methods
 
-bool CSubstrateSpecificationDocumentTypeIds::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationDocumentTypeIds::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationDocumentTypeIds::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationDocumentTypeIds::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationDocumentTypeIds::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationDocumentTypeIds::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationDocumentTypeIds::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationDocumentTypeIds::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationDocumentTypeIds::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CSubstrateSpecificationListInput::V1_0::GetVersionId()
+QByteArray CSubstrateSpecificationListInput::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CSubstrateSpecificationListInput::V1_0::operator==(const V1_0& other) const
+bool CSubstrateSpecificationListInput::operator==(const CSubstrateSpecificationListInput& other) const
 {
 	return 
 				viewParams == other.viewParams;
 }
 
 
-bool CSubstrateSpecificationListInput::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CSubstrateSpecificationListInput::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "SubstrateSpecificationListInput", modelIndex);
 
@@ -1205,11 +516,11 @@ bool CSubstrateSpecificationListInput::V1_0::WriteToModel(::imtbase::CTreeItemMo
 }
 
 
-bool CSubstrateSpecificationListInput::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CSubstrateSpecificationListInput::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* viewParamsDataModelPtr = model.GetTreeItemModel("viewParams", modelIndex);
 	if (viewParamsDataModelPtr != nullptr){
-		viewParams = CCollectionViewParamsTest::V1_0();
+		viewParams = CCollectionViewParamsTest();
 		const bool isViewParamsRead = viewParams->ReadFromModel(*viewParamsDataModelPtr, modelIndex);
 		if (!isViewParamsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
@@ -1222,11 +533,11 @@ bool CSubstrateSpecificationListInput::V1_0::ReadFromModel(const ::imtbase::CTre
 }
 
 
-bool CSubstrateSpecificationListInput::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CSubstrateSpecificationListInput::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* viewParamsDataModelPtr = model.GetTreeItemModel("viewParams", modelIndex);
 	if (viewParamsDataModelPtr != nullptr){
-		viewParams = CCollectionViewParamsTest::V1_0();
+		viewParams = CCollectionViewParamsTest();
 		const bool isViewParamsRead = viewParams->ReadFromModel(*viewParamsDataModelPtr, modelIndex);
 		if (!isViewParamsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
@@ -1239,7 +550,7 @@ bool CSubstrateSpecificationListInput::V1_0::OptReadFromModel(const ::imtbase::C
 }
 
 
-bool CSubstrateSpecificationListInput::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CSubstrateSpecificationListInput::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (viewParams){
 		::imtgql::CGqlParamObject viewParamsGqlObject;
@@ -1258,10 +569,10 @@ bool CSubstrateSpecificationListInput::V1_0::WriteToGraphQlObject(::imtgql::CGql
 }
 
 
-bool CSubstrateSpecificationListInput::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CSubstrateSpecificationListInput::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("viewParams") && (gqlObject.GetParamArgumentObjectPtr("viewParams") != nullptr)){
-		viewParams = CCollectionViewParamsTest::V1_0();
+		viewParams = CCollectionViewParamsTest();
 		const bool isViewParamsRead = viewParams->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("viewParams"));
 		if (!isViewParamsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
@@ -1274,10 +585,10 @@ bool CSubstrateSpecificationListInput::V1_0::ReadFromGraphQlObject(const ::imtgq
 }
 
 
-bool CSubstrateSpecificationListInput::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CSubstrateSpecificationListInput::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("viewParams") && (gqlObject.GetParamArgumentObjectPtr("viewParams") != nullptr)){
-		viewParams = CCollectionViewParamsTest::V1_0();
+		viewParams = CCollectionViewParamsTest();
 		const bool isViewParamsRead = viewParams->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("viewParams"));
 		if (!isViewParamsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
@@ -1290,7 +601,7 @@ bool CSubstrateSpecificationListInput::V1_0::OptReadFromGraphQlObject(const ::im
 }
 
 
-bool CSubstrateSpecificationListInput::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CSubstrateSpecificationListInput::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (viewParams){
 		QJsonObject viewParamsJsonObject;
@@ -1309,10 +620,10 @@ bool CSubstrateSpecificationListInput::V1_0::WriteToJsonObject(QJsonObject& json
 }
 
 
-bool CSubstrateSpecificationListInput::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CSubstrateSpecificationListInput::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("viewParams") && jsonObject["viewParams"].isObject()){
-		viewParams = CCollectionViewParamsTest::V1_0();
+		viewParams = CCollectionViewParamsTest();
 		const bool isViewParamsRead = viewParams->ReadFromJsonObject(jsonObject["viewParams"].toObject());
 		if (!isViewParamsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
@@ -1325,10 +636,10 @@ bool CSubstrateSpecificationListInput::V1_0::ReadFromJsonObject(const QJsonObjec
 }
 
 
-bool CSubstrateSpecificationListInput::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CSubstrateSpecificationListInput::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("viewParams") && jsonObject["viewParams"].isObject()){
-		viewParams = CCollectionViewParamsTest::V1_0();
+		viewParams = CCollectionViewParamsTest();
 		const bool isViewParamsRead = viewParams->OptReadFromJsonObject(jsonObject["viewParams"].toObject());
 		if (!isViewParamsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
@@ -1343,243 +654,13 @@ bool CSubstrateSpecificationListInput::V1_0::OptReadFromJsonObject(const QJsonOb
 
 // serialize methods
 
-bool CSubstrateSpecificationListInput::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationListInput::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationListInput::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationListInput::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationListInput::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationListInput::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationListInput::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationListInput::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationListInput::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CSubstrateSpecificationListItem::V1_0::GetVersionId()
+QByteArray CSubstrateSpecificationListItem::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CSubstrateSpecificationListItem::V1_0::operator==(const V1_0& other) const
+bool CSubstrateSpecificationListItem::operator==(const CSubstrateSpecificationListItem& other) const
 {
 	return 
 				id == other.id &&
@@ -1593,7 +674,7 @@ bool CSubstrateSpecificationListItem::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CSubstrateSpecificationListItem::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CSubstrateSpecificationListItem::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "SubstrateSpecificationListItem", modelIndex);
 
@@ -1643,7 +724,7 @@ bool CSubstrateSpecificationListItem::V1_0::WriteToModel(::imtbase::CTreeItemMod
 }
 
 
-bool CSubstrateSpecificationListItem::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CSubstrateSpecificationListItem::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant idData = model.GetData("id", modelIndex);
 	if (idData.isNull()){
@@ -1698,7 +779,7 @@ bool CSubstrateSpecificationListItem::V1_0::ReadFromModel(const ::imtbase::CTree
 }
 
 
-bool CSubstrateSpecificationListItem::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CSubstrateSpecificationListItem::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant idData = model.GetData("id", modelIndex);
 	if (!idData.isNull()){
@@ -1744,7 +825,7 @@ bool CSubstrateSpecificationListItem::V1_0::OptReadFromModel(const ::imtbase::CT
 }
 
 
-bool CSubstrateSpecificationListItem::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CSubstrateSpecificationListItem::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!id){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
@@ -1793,7 +874,7 @@ bool CSubstrateSpecificationListItem::V1_0::WriteToGraphQlObject(::imtgql::CGqlP
 }
 
 
-bool CSubstrateSpecificationListItem::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CSubstrateSpecificationListItem::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("id") || (gqlObject["id"].userType() != QMetaType::QString && gqlObject["id"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
@@ -1840,7 +921,7 @@ bool CSubstrateSpecificationListItem::V1_0::ReadFromGraphQlObject(const ::imtgql
 }
 
 
-bool CSubstrateSpecificationListItem::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CSubstrateSpecificationListItem::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("id") && (gqlObject["id"].userType() == QMetaType::QString || gqlObject["id"].userType() == QMetaType::QByteArray)){
 		id = gqlObject["id"].toByteArray();
@@ -1878,7 +959,7 @@ bool CSubstrateSpecificationListItem::V1_0::OptReadFromGraphQlObject(const ::imt
 }
 
 
-bool CSubstrateSpecificationListItem::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CSubstrateSpecificationListItem::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!id){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
@@ -1927,7 +1008,7 @@ bool CSubstrateSpecificationListItem::V1_0::WriteToJsonObject(QJsonObject& jsonO
 }
 
 
-bool CSubstrateSpecificationListItem::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CSubstrateSpecificationListItem::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("id") || ! jsonObject["id"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
@@ -1974,7 +1055,7 @@ bool CSubstrateSpecificationListItem::V1_0::ReadFromJsonObject(const QJsonObject
 }
 
 
-bool CSubstrateSpecificationListItem::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CSubstrateSpecificationListItem::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("id") && jsonObject["id"].isString()){
 		id = jsonObject["id"].toString().toUtf8();
@@ -2014,250 +1095,20 @@ bool CSubstrateSpecificationListItem::V1_0::OptReadFromJsonObject(const QJsonObj
 
 // serialize methods
 
-bool CSubstrateSpecificationListItem::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationListItem::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationListItem::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationListItem::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationListItem::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationListItem::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationListItem::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationListItem::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationListItem::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CSubstrateSpecificationListResponse::V1_0::GetVersionId()
+QByteArray CSubstrateSpecificationListResponse::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CSubstrateSpecificationListResponse::V1_0::operator==(const V1_0& other) const
+bool CSubstrateSpecificationListResponse::operator==(const CSubstrateSpecificationListResponse& other) const
 {
 	return 
 				items == other.items;
 }
 
 
-bool CSubstrateSpecificationListResponse::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CSubstrateSpecificationListResponse::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "SubstrateSpecificationListResponse", modelIndex);
 
@@ -2278,14 +1129,14 @@ bool CSubstrateSpecificationListResponse::V1_0::WriteToModel(::imtbase::CTreeIte
 }
 
 
-bool CSubstrateSpecificationListResponse::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CSubstrateSpecificationListResponse::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* itemsModel = model.GetTreeItemModel("items", modelIndex);
 	if (itemsModel != nullptr){
 		int itemsCount = itemsModel->GetItemsCount();
-		imtsdl::TElementList<CSubstrateSpecificationListItem::V1_0> itemsList;
+		imtsdl::TElementList<CSubstrateSpecificationListItem> itemsList;
 		for (int itemsIndex = 0; itemsIndex < itemsCount; ++itemsIndex){
-			CSubstrateSpecificationListItem::V1_0 t_items;
+			CSubstrateSpecificationListItem t_items;
 			if (!t_items.ReadFromModel(*itemsModel, itemsIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
@@ -2301,14 +1152,14 @@ bool CSubstrateSpecificationListResponse::V1_0::ReadFromModel(const ::imtbase::C
 }
 
 
-bool CSubstrateSpecificationListResponse::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CSubstrateSpecificationListResponse::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* itemsModel = model.GetTreeItemModel("items", modelIndex);
 	if (itemsModel != nullptr){
 		int itemsCount = itemsModel->GetItemsCount();
-		imtsdl::TElementList<CSubstrateSpecificationListItem::V1_0> itemsList;
+		imtsdl::TElementList<CSubstrateSpecificationListItem> itemsList;
 		for (int itemsIndex = 0; itemsIndex < itemsCount; ++itemsIndex){
-			CSubstrateSpecificationListItem::V1_0 t_items;
+			CSubstrateSpecificationListItem t_items;
 			if (!t_items.OptReadFromModel(*itemsModel, itemsIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
@@ -2324,7 +1175,7 @@ bool CSubstrateSpecificationListResponse::V1_0::OptReadFromModel(const ::imtbase
 }
 
 
-bool CSubstrateSpecificationListResponse::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CSubstrateSpecificationListResponse::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (items){
 		QList<::imtgql::CGqlParamObject> itemsDataObjectList;
@@ -2346,21 +1197,21 @@ bool CSubstrateSpecificationListResponse::V1_0::WriteToGraphQlObject(::imtgql::C
 }
 
 
-bool CSubstrateSpecificationListResponse::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CSubstrateSpecificationListResponse::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("items")){
 		items.emplace();
 	}
 	if (gqlObject.ContainsParam("items") && (gqlObject.GetObjectsCount("items") > 0)){
 		const qsizetype itemsElementsCount = gqlObject.GetObjectsCount("items");
-		items = imtsdl::TElementList<CSubstrateSpecificationListItem::V1_0>();
+		items = imtsdl::TElementList<CSubstrateSpecificationListItem>();
 		for (qsizetype itemsIndex = 0; itemsIndex < itemsElementsCount; ++itemsIndex){
 			const ::imtgql::CGqlParamObject* itemsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("items", itemsIndex);
 			if (itemsDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << itemsDataObjectPtr;
 				return false;
 			}
-			CSubstrateSpecificationListItem::V1_0 tempItems;
+			CSubstrateSpecificationListItem tempItems;
 			if (!tempItems.ReadFromGraphQlObject(*itemsDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
@@ -2374,21 +1225,21 @@ bool CSubstrateSpecificationListResponse::V1_0::ReadFromGraphQlObject(const ::im
 }
 
 
-bool CSubstrateSpecificationListResponse::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CSubstrateSpecificationListResponse::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("items")){
 		items.emplace();
 	}
 	if (gqlObject.ContainsParam("items") && (gqlObject.GetObjectsCount("items") > 0)){
 		const qsizetype itemsElementsCount = gqlObject.GetObjectsCount("items");
-		items = imtsdl::TElementList<CSubstrateSpecificationListItem::V1_0>();
+		items = imtsdl::TElementList<CSubstrateSpecificationListItem>();
 		for (qsizetype itemsIndex = 0; itemsIndex < itemsElementsCount; ++itemsIndex){
 			const ::imtgql::CGqlParamObject* itemsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("items", itemsIndex);
 			if (itemsDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << itemsDataObjectPtr;
 				return false;
 			}
-			CSubstrateSpecificationListItem::V1_0 tempItems;
+			CSubstrateSpecificationListItem tempItems;
 			if (!tempItems.OptReadFromGraphQlObject(*itemsDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
@@ -2402,7 +1253,7 @@ bool CSubstrateSpecificationListResponse::V1_0::OptReadFromGraphQlObject(const :
 }
 
 
-bool CSubstrateSpecificationListResponse::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CSubstrateSpecificationListResponse::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (items){
 		QJsonArray newItemsArray;
@@ -2424,14 +1275,14 @@ bool CSubstrateSpecificationListResponse::V1_0::WriteToJsonObject(QJsonObject& j
 }
 
 
-bool CSubstrateSpecificationListResponse::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CSubstrateSpecificationListResponse::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("items") && jsonObject["items"].isArray()){
 		const QJsonArray itemsJsonArray = jsonObject["items"].toArray();
 		const qsizetype itemsArrayCount = itemsJsonArray.size();
-		items = imtsdl::TElementList<CSubstrateSpecificationListItem::V1_0>();
+		items = imtsdl::TElementList<CSubstrateSpecificationListItem>();
 		for (qsizetype itemsIndex = 0; itemsIndex < itemsArrayCount; ++itemsIndex){
-			CSubstrateSpecificationListItem::V1_0 tempItems;
+			CSubstrateSpecificationListItem tempItems;
 			if (!tempItems.ReadFromJsonObject(itemsJsonArray[itemsIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
@@ -2445,14 +1296,14 @@ bool CSubstrateSpecificationListResponse::V1_0::ReadFromJsonObject(const QJsonOb
 }
 
 
-bool CSubstrateSpecificationListResponse::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CSubstrateSpecificationListResponse::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("items") && jsonObject["items"].isArray()){
 		const QJsonArray itemsJsonArray = jsonObject["items"].toArray();
 		const qsizetype itemsArrayCount = itemsJsonArray.size();
-		items = imtsdl::TElementList<CSubstrateSpecificationListItem::V1_0>();
+		items = imtsdl::TElementList<CSubstrateSpecificationListItem>();
 		for (qsizetype itemsIndex = 0; itemsIndex < itemsArrayCount; ++itemsIndex){
-			CSubstrateSpecificationListItem::V1_0 tempItems;
+			CSubstrateSpecificationListItem tempItems;
 			if (!tempItems.OptReadFromJsonObject(itemsJsonArray[itemsIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
@@ -2468,243 +1319,13 @@ bool CSubstrateSpecificationListResponse::V1_0::OptReadFromJsonObject(const QJso
 
 // serialize methods
 
-bool CSubstrateSpecificationListResponse::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationListResponse::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationListResponse::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationListResponse::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationListResponse::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationListResponse::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationListResponse::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationListResponse::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationListResponse::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CCardboardSubstrateSpecification::V1_0::GetVersionId()
+QByteArray CCardboardSubstrateSpecification::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CCardboardSubstrateSpecification::V1_0::operator==(const V1_0& other) const
+bool CCardboardSubstrateSpecification::operator==(const CCardboardSubstrateSpecification& other) const
 {
 	return 
 				color == other.color &&
@@ -2714,7 +1335,7 @@ bool CCardboardSubstrateSpecification::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CCardboardSubstrateSpecification::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CCardboardSubstrateSpecification::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "CardboardSubstrateSpecification", modelIndex);
 
@@ -2731,7 +1352,7 @@ bool CCardboardSubstrateSpecification::V1_0::WriteToModel(::imtbase::CTreeItemMo
 }
 
 
-bool CCardboardSubstrateSpecification::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CCardboardSubstrateSpecification::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant colorData = model.GetData("color", modelIndex);
 	if (!colorData.isNull()){
@@ -2747,7 +1368,7 @@ bool CCardboardSubstrateSpecification::V1_0::ReadFromModel(const ::imtbase::CTre
 }
 
 
-bool CCardboardSubstrateSpecification::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CCardboardSubstrateSpecification::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant colorData = model.GetData("color", modelIndex);
 	if (!colorData.isNull()){
@@ -2763,7 +1384,7 @@ bool CCardboardSubstrateSpecification::V1_0::OptReadFromModel(const ::imtbase::C
 }
 
 
-bool CCardboardSubstrateSpecification::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CCardboardSubstrateSpecification::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (color){
 		gqlObject.InsertParam("color", QVariant(*color));
@@ -2779,7 +1400,7 @@ bool CCardboardSubstrateSpecification::V1_0::WriteToGraphQlObject(::imtgql::CGql
 }
 
 
-bool CCardboardSubstrateSpecification::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CCardboardSubstrateSpecification::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("color") && (gqlObject["color"].userType() == QMetaType::QString || gqlObject["color"].userType() == QMetaType::QByteArray)){
 		color = gqlObject["color"].toString();
@@ -2793,7 +1414,7 @@ bool CCardboardSubstrateSpecification::V1_0::ReadFromGraphQlObject(const ::imtgq
 }
 
 
-bool CCardboardSubstrateSpecification::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CCardboardSubstrateSpecification::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("color") && (gqlObject["color"].userType() == QMetaType::QString || gqlObject["color"].userType() == QMetaType::QByteArray)){
 		color = gqlObject["color"].toString();
@@ -2807,7 +1428,7 @@ bool CCardboardSubstrateSpecification::V1_0::OptReadFromGraphQlObject(const ::im
 }
 
 
-bool CCardboardSubstrateSpecification::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CCardboardSubstrateSpecification::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (color){
 		jsonObject["color"] = QJsonValue::fromVariant(*color);
@@ -2823,7 +1444,7 @@ bool CCardboardSubstrateSpecification::V1_0::WriteToJsonObject(QJsonObject& json
 }
 
 
-bool CCardboardSubstrateSpecification::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CCardboardSubstrateSpecification::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("color") && jsonObject["color"].isString()){
 		color = jsonObject["color"].toString();
@@ -2837,7 +1458,7 @@ bool CCardboardSubstrateSpecification::V1_0::ReadFromJsonObject(const QJsonObjec
 }
 
 
-bool CCardboardSubstrateSpecification::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CCardboardSubstrateSpecification::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("color") && jsonObject["color"].isString()){
 		color = jsonObject["color"].toString();
@@ -2853,243 +1474,13 @@ bool CCardboardSubstrateSpecification::V1_0::OptReadFromJsonObject(const QJsonOb
 
 // serialize methods
 
-bool CCardboardSubstrateSpecification::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCardboardSubstrateSpecification::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCardboardSubstrateSpecification::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCardboardSubstrateSpecification::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCardboardSubstrateSpecification::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCardboardSubstrateSpecification::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCardboardSubstrateSpecification::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCardboardSubstrateSpecification::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCardboardSubstrateSpecification::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CPaperSubstrateSpecification::V1_0::GetVersionId()
+QByteArray CPaperSubstrateSpecification::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CPaperSubstrateSpecification::V1_0::operator==(const V1_0& other) const
+bool CPaperSubstrateSpecification::operator==(const CPaperSubstrateSpecification& other) const
 {
 	return 
 				grammage.has_value() == other.grammage.has_value() &&
@@ -3100,7 +1491,7 @@ bool CPaperSubstrateSpecification::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CPaperSubstrateSpecification::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CPaperSubstrateSpecification::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "PaperSubstrateSpecification", modelIndex);
 
@@ -3121,7 +1512,7 @@ bool CPaperSubstrateSpecification::V1_0::WriteToModel(::imtbase::CTreeItemModel&
 }
 
 
-bool CPaperSubstrateSpecification::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CPaperSubstrateSpecification::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant grammageData = model.GetData("grammage", modelIndex);
 	if (!grammageData.isNull()){
@@ -3142,7 +1533,7 @@ bool CPaperSubstrateSpecification::V1_0::ReadFromModel(const ::imtbase::CTreeIte
 }
 
 
-bool CPaperSubstrateSpecification::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CPaperSubstrateSpecification::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant grammageData = model.GetData("grammage", modelIndex);
 	if (!grammageData.isNull()){
@@ -3163,7 +1554,7 @@ bool CPaperSubstrateSpecification::V1_0::OptReadFromModel(const ::imtbase::CTree
 }
 
 
-bool CPaperSubstrateSpecification::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CPaperSubstrateSpecification::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (grammage){
 		gqlObject.InsertParam("grammage", QVariant(*grammage));
@@ -3183,7 +1574,7 @@ bool CPaperSubstrateSpecification::V1_0::WriteToGraphQlObject(::imtgql::CGqlPara
 }
 
 
-bool CPaperSubstrateSpecification::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CPaperSubstrateSpecification::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("grammage") && (gqlObject["grammage"].userType() == QMetaType::Float || gqlObject["grammage"].userType() == QMetaType::Double || gqlObject["grammage"].userType() == QMetaType::Int || gqlObject["grammage"].userType() == QMetaType::UInt || gqlObject["grammage"].userType() == QMetaType::LongLong || gqlObject["grammage"].userType() == QMetaType::ULongLong || gqlObject["grammage"].userType() == QMetaType::Long || gqlObject["grammage"].userType() == QMetaType::Short || gqlObject["grammage"].userType() == QMetaType::ULong || gqlObject["grammage"].userType() == QMetaType::UShort || gqlObject["grammage"].userType() == QMetaType::UChar)){
 		grammage = gqlObject["grammage"].toDouble();
@@ -3201,7 +1592,7 @@ bool CPaperSubstrateSpecification::V1_0::ReadFromGraphQlObject(const ::imtgql::C
 }
 
 
-bool CPaperSubstrateSpecification::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CPaperSubstrateSpecification::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("grammage") && (gqlObject["grammage"].userType() == QMetaType::Float || gqlObject["grammage"].userType() == QMetaType::Double || gqlObject["grammage"].userType() == QMetaType::Int || gqlObject["grammage"].userType() == QMetaType::UInt || gqlObject["grammage"].userType() == QMetaType::LongLong || gqlObject["grammage"].userType() == QMetaType::ULongLong || gqlObject["grammage"].userType() == QMetaType::Long || gqlObject["grammage"].userType() == QMetaType::Short || gqlObject["grammage"].userType() == QMetaType::ULong || gqlObject["grammage"].userType() == QMetaType::UShort || gqlObject["grammage"].userType() == QMetaType::UChar)){
 		grammage = gqlObject["grammage"].toDouble();
@@ -3219,7 +1610,7 @@ bool CPaperSubstrateSpecification::V1_0::OptReadFromGraphQlObject(const ::imtgql
 }
 
 
-bool CPaperSubstrateSpecification::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CPaperSubstrateSpecification::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (grammage){
 		jsonObject["grammage"] = QJsonValue::fromVariant(*grammage);
@@ -3239,7 +1630,7 @@ bool CPaperSubstrateSpecification::V1_0::WriteToJsonObject(QJsonObject& jsonObje
 }
 
 
-bool CPaperSubstrateSpecification::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CPaperSubstrateSpecification::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("grammage") && jsonObject["grammage"].isDouble()){
 		grammage = jsonObject["grammage"].toDouble();
@@ -3257,7 +1648,7 @@ bool CPaperSubstrateSpecification::V1_0::ReadFromJsonObject(const QJsonObject& j
 }
 
 
-bool CPaperSubstrateSpecification::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CPaperSubstrateSpecification::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("grammage") && jsonObject["grammage"].isDouble()){
 		grammage = jsonObject["grammage"].toDouble();
@@ -3277,243 +1668,13 @@ bool CPaperSubstrateSpecification::V1_0::OptReadFromJsonObject(const QJsonObject
 
 // serialize methods
 
-bool CPaperSubstrateSpecification::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPaperSubstrateSpecification::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPaperSubstrateSpecification::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPaperSubstrateSpecification::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPaperSubstrateSpecification::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPaperSubstrateSpecification::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPaperSubstrateSpecification::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPaperSubstrateSpecification::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPaperSubstrateSpecification::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CFilmSubstrateSpecification::V1_0::GetVersionId()
+QByteArray CFilmSubstrateSpecification::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CFilmSubstrateSpecification::V1_0::operator==(const V1_0& other) const
+bool CFilmSubstrateSpecification::operator==(const CFilmSubstrateSpecification& other) const
 {
 	return 
 				transparency.has_value() == other.transparency.has_value() &&
@@ -3524,7 +1685,7 @@ bool CFilmSubstrateSpecification::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CFilmSubstrateSpecification::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CFilmSubstrateSpecification::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "FilmSubstrateSpecification", modelIndex);
 
@@ -3545,7 +1706,7 @@ bool CFilmSubstrateSpecification::V1_0::WriteToModel(::imtbase::CTreeItemModel& 
 }
 
 
-bool CFilmSubstrateSpecification::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CFilmSubstrateSpecification::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant transparencyData = model.GetData("transparency", modelIndex);
 	if (!transparencyData.isNull()){
@@ -3566,7 +1727,7 @@ bool CFilmSubstrateSpecification::V1_0::ReadFromModel(const ::imtbase::CTreeItem
 }
 
 
-bool CFilmSubstrateSpecification::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CFilmSubstrateSpecification::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant transparencyData = model.GetData("transparency", modelIndex);
 	if (!transparencyData.isNull()){
@@ -3587,7 +1748,7 @@ bool CFilmSubstrateSpecification::V1_0::OptReadFromModel(const ::imtbase::CTreeI
 }
 
 
-bool CFilmSubstrateSpecification::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CFilmSubstrateSpecification::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (transparency){
 		gqlObject.InsertParam("transparency", QVariant(*transparency));
@@ -3607,7 +1768,7 @@ bool CFilmSubstrateSpecification::V1_0::WriteToGraphQlObject(::imtgql::CGqlParam
 }
 
 
-bool CFilmSubstrateSpecification::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CFilmSubstrateSpecification::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("transparency") && (gqlObject["transparency"].userType() == QMetaType::Float || gqlObject["transparency"].userType() == QMetaType::Double || gqlObject["transparency"].userType() == QMetaType::Int || gqlObject["transparency"].userType() == QMetaType::UInt || gqlObject["transparency"].userType() == QMetaType::LongLong || gqlObject["transparency"].userType() == QMetaType::ULongLong || gqlObject["transparency"].userType() == QMetaType::Long || gqlObject["transparency"].userType() == QMetaType::Short || gqlObject["transparency"].userType() == QMetaType::ULong || gqlObject["transparency"].userType() == QMetaType::UShort || gqlObject["transparency"].userType() == QMetaType::UChar)){
 		transparency = gqlObject["transparency"].toDouble();
@@ -3625,7 +1786,7 @@ bool CFilmSubstrateSpecification::V1_0::ReadFromGraphQlObject(const ::imtgql::CG
 }
 
 
-bool CFilmSubstrateSpecification::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CFilmSubstrateSpecification::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("transparency") && (gqlObject["transparency"].userType() == QMetaType::Float || gqlObject["transparency"].userType() == QMetaType::Double || gqlObject["transparency"].userType() == QMetaType::Int || gqlObject["transparency"].userType() == QMetaType::UInt || gqlObject["transparency"].userType() == QMetaType::LongLong || gqlObject["transparency"].userType() == QMetaType::ULongLong || gqlObject["transparency"].userType() == QMetaType::Long || gqlObject["transparency"].userType() == QMetaType::Short || gqlObject["transparency"].userType() == QMetaType::ULong || gqlObject["transparency"].userType() == QMetaType::UShort || gqlObject["transparency"].userType() == QMetaType::UChar)){
 		transparency = gqlObject["transparency"].toDouble();
@@ -3643,7 +1804,7 @@ bool CFilmSubstrateSpecification::V1_0::OptReadFromGraphQlObject(const ::imtgql:
 }
 
 
-bool CFilmSubstrateSpecification::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CFilmSubstrateSpecification::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (transparency){
 		jsonObject["transparency"] = QJsonValue::fromVariant(*transparency);
@@ -3663,7 +1824,7 @@ bool CFilmSubstrateSpecification::V1_0::WriteToJsonObject(QJsonObject& jsonObjec
 }
 
 
-bool CFilmSubstrateSpecification::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CFilmSubstrateSpecification::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("transparency") && jsonObject["transparency"].isDouble()){
 		transparency = jsonObject["transparency"].toDouble();
@@ -3681,7 +1842,7 @@ bool CFilmSubstrateSpecification::V1_0::ReadFromJsonObject(const QJsonObject& js
 }
 
 
-bool CFilmSubstrateSpecification::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CFilmSubstrateSpecification::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("transparency") && jsonObject["transparency"].isDouble()){
 		transparency = jsonObject["transparency"].toDouble();
@@ -3701,243 +1862,13 @@ bool CFilmSubstrateSpecification::V1_0::OptReadFromJsonObject(const QJsonObject&
 
 // serialize methods
 
-bool CFilmSubstrateSpecification::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFilmSubstrateSpecification::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFilmSubstrateSpecification::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFilmSubstrateSpecification::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFilmSubstrateSpecification::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFilmSubstrateSpecification::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFilmSubstrateSpecification::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFilmSubstrateSpecification::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CFilmSubstrateSpecification::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CSubstrateSpecificationInput::V1_0::GetVersionId()
+QByteArray CSubstrateSpecificationInput::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CSubstrateSpecificationInput::V1_0::operator==(const V1_0& other) const
+bool CSubstrateSpecificationInput::operator==(const CSubstrateSpecificationInput& other) const
 {
 	return 
 				id == other.id &&
@@ -3948,7 +1879,7 @@ bool CSubstrateSpecificationInput::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CSubstrateSpecificationInput::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CSubstrateSpecificationInput::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "SubstrateSpecificationInput", modelIndex);
 
@@ -4011,7 +1942,7 @@ bool CSubstrateSpecificationInput::V1_0::WriteToModel(::imtbase::CTreeItemModel&
 }
 
 
-bool CSubstrateSpecificationInput::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CSubstrateSpecificationInput::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant idData = model.GetData("id", modelIndex);
 	if (idData.isNull()){
@@ -4075,7 +2006,7 @@ bool CSubstrateSpecificationInput::V1_0::ReadFromModel(const ::imtbase::CTreeIte
 }
 
 
-bool CSubstrateSpecificationInput::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CSubstrateSpecificationInput::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant idData = model.GetData("id", modelIndex);
 	if (!idData.isNull()){
@@ -4130,7 +2061,7 @@ bool CSubstrateSpecificationInput::V1_0::OptReadFromModel(const ::imtbase::CTree
 }
 
 
-bool CSubstrateSpecificationInput::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CSubstrateSpecificationInput::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!id){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
@@ -4186,7 +2117,7 @@ bool CSubstrateSpecificationInput::V1_0::WriteToGraphQlObject(::imtgql::CGqlPara
 }
 
 
-bool CSubstrateSpecificationInput::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CSubstrateSpecificationInput::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("id") || (gqlObject["id"].userType() != QMetaType::QString && gqlObject["id"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
@@ -4251,7 +2182,7 @@ bool CSubstrateSpecificationInput::V1_0::ReadFromGraphQlObject(const ::imtgql::C
 }
 
 
-bool CSubstrateSpecificationInput::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CSubstrateSpecificationInput::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("id") && (gqlObject["id"].userType() == QMetaType::QString || gqlObject["id"].userType() == QMetaType::QByteArray)){
 		id = gqlObject["id"].toByteArray();
@@ -4307,7 +2238,7 @@ bool CSubstrateSpecificationInput::V1_0::OptReadFromGraphQlObject(const ::imtgql
 }
 
 
-bool CSubstrateSpecificationInput::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CSubstrateSpecificationInput::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!id){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
@@ -4371,7 +2302,7 @@ bool CSubstrateSpecificationInput::V1_0::WriteToJsonObject(QJsonObject& jsonObje
 }
 
 
-bool CSubstrateSpecificationInput::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CSubstrateSpecificationInput::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("id") || ! jsonObject["id"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
@@ -4436,7 +2367,7 @@ bool CSubstrateSpecificationInput::V1_0::ReadFromJsonObject(const QJsonObject& j
 }
 
 
-bool CSubstrateSpecificationInput::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CSubstrateSpecificationInput::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("id") && jsonObject["id"].isString()){
 		id = jsonObject["id"].toString().toUtf8();
@@ -4494,243 +2425,13 @@ bool CSubstrateSpecificationInput::V1_0::OptReadFromJsonObject(const QJsonObject
 
 // serialize methods
 
-bool CSubstrateSpecificationInput::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationInput::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationInput::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationInput::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationInput::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationInput::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationInput::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationInput::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationInput::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CSubstrateSpecificationDocumentMetaInfo::V1_0::GetVersionId()
+QByteArray CSubstrateSpecificationDocumentMetaInfo::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CSubstrateSpecificationDocumentMetaInfo::V1_0::operator==(const V1_0& other) const
+bool CSubstrateSpecificationDocumentMetaInfo::operator==(const CSubstrateSpecificationDocumentMetaInfo& other) const
 {
 	return 
 				materialId == other.materialId &&
@@ -4738,7 +2439,7 @@ bool CSubstrateSpecificationDocumentMetaInfo::V1_0::operator==(const V1_0& other
 }
 
 
-bool CSubstrateSpecificationDocumentMetaInfo::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CSubstrateSpecificationDocumentMetaInfo::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "SubstrateSpecificationDocumentMetaInfo", modelIndex);
 
@@ -4755,7 +2456,7 @@ bool CSubstrateSpecificationDocumentMetaInfo::V1_0::WriteToModel(::imtbase::CTre
 }
 
 
-bool CSubstrateSpecificationDocumentMetaInfo::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CSubstrateSpecificationDocumentMetaInfo::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant materialIdData = model.GetData("materialId", modelIndex);
 	if (!materialIdData.isNull()){
@@ -4771,7 +2472,7 @@ bool CSubstrateSpecificationDocumentMetaInfo::V1_0::ReadFromModel(const ::imtbas
 }
 
 
-bool CSubstrateSpecificationDocumentMetaInfo::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CSubstrateSpecificationDocumentMetaInfo::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant materialIdData = model.GetData("materialId", modelIndex);
 	if (!materialIdData.isNull()){
@@ -4787,7 +2488,7 @@ bool CSubstrateSpecificationDocumentMetaInfo::V1_0::OptReadFromModel(const ::imt
 }
 
 
-bool CSubstrateSpecificationDocumentMetaInfo::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CSubstrateSpecificationDocumentMetaInfo::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (materialId){
 		gqlObject.InsertParam("materialId", QVariant(*materialId));
@@ -4803,7 +2504,7 @@ bool CSubstrateSpecificationDocumentMetaInfo::V1_0::WriteToGraphQlObject(::imtgq
 }
 
 
-bool CSubstrateSpecificationDocumentMetaInfo::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CSubstrateSpecificationDocumentMetaInfo::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("materialId") && (gqlObject["materialId"].userType() == QMetaType::QString || gqlObject["materialId"].userType() == QMetaType::QByteArray)){
 		materialId = gqlObject["materialId"].toByteArray();
@@ -4817,7 +2518,7 @@ bool CSubstrateSpecificationDocumentMetaInfo::V1_0::ReadFromGraphQlObject(const 
 }
 
 
-bool CSubstrateSpecificationDocumentMetaInfo::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CSubstrateSpecificationDocumentMetaInfo::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("materialId") && (gqlObject["materialId"].userType() == QMetaType::QString || gqlObject["materialId"].userType() == QMetaType::QByteArray)){
 		materialId = gqlObject["materialId"].toByteArray();
@@ -4831,7 +2532,7 @@ bool CSubstrateSpecificationDocumentMetaInfo::V1_0::OptReadFromGraphQlObject(con
 }
 
 
-bool CSubstrateSpecificationDocumentMetaInfo::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CSubstrateSpecificationDocumentMetaInfo::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (materialId){
 		jsonObject["materialId"] = QString::fromUtf8(*materialId);
@@ -4847,7 +2548,7 @@ bool CSubstrateSpecificationDocumentMetaInfo::V1_0::WriteToJsonObject(QJsonObjec
 }
 
 
-bool CSubstrateSpecificationDocumentMetaInfo::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CSubstrateSpecificationDocumentMetaInfo::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("materialId") && jsonObject["materialId"].isString()){
 		materialId = jsonObject["materialId"].toString().toUtf8();
@@ -4861,7 +2562,7 @@ bool CSubstrateSpecificationDocumentMetaInfo::V1_0::ReadFromJsonObject(const QJs
 }
 
 
-bool CSubstrateSpecificationDocumentMetaInfo::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CSubstrateSpecificationDocumentMetaInfo::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("materialId") && jsonObject["materialId"].isString()){
 		materialId = jsonObject["materialId"].toString().toUtf8();
@@ -4877,238 +2578,7 @@ bool CSubstrateSpecificationDocumentMetaInfo::V1_0::OptReadFromJsonObject(const 
 
 // serialize methods
 
-bool CSubstrateSpecificationDocumentMetaInfo::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationDocumentMetaInfo::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationDocumentMetaInfo::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationDocumentMetaInfo::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationDocumentMetaInfo::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationDocumentMetaInfo::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationDocumentMetaInfo::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationDocumentMetaInfo::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CSubstrateSpecificationDocumentMetaInfo::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
 CInputIdObject::CInputIdObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CInputIdObject::idChanged, this, &CItemModelBase::OnInternalModelChanged);
 }
@@ -5116,28 +2586,21 @@ CInputIdObject::CInputIdObject(QObject* parent): ::imtbase::CItemModelBase(paren
 
 QVariant CInputIdObject::GetId()
 {
-	if (Version_1_0 && Version_1_0->id){
-		return Version_1_0->id.value();
-	}
-
-	return QVariant();
+	return CInputId::id.value();
 }
 
 
 void CInputIdObject::SetId(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->id = v.value<QString>().toUtf8();
+	CInputId::id = v.value<QString>().toUtf8();
 	idChanged();
 }
 
 
 bool CInputIdObject::hasId()
 {
-	 return Version_1_0 && Version_1_0->id.HasValue();
+	 return CInputId::id.HasValue();
 }
 
 
@@ -5223,86 +2686,85 @@ QVariantMap CInputIdObjectList::get(int row) const
 }
 
 
-void CInputIdObjectList::append(sdl::substrate::SubstrateSpecifications::CInputIdObject* item)
+void CInputIdObjectList::append(sdl::V1_0::V1_0::CInputIdObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::substrate::SubstrateSpecifications::CInputIdObjectList* sdl::substrate::SubstrateSpecifications::CInputIdObjectList::copyMe()
+sdl::V1_0::V1_0::CInputIdObjectList* sdl::V1_0::V1_0::CInputIdObjectList::copyMe()
 {
-	sdl::substrate::SubstrateSpecifications::CInputIdObjectList* retVal = new sdl::substrate::SubstrateSpecifications::CInputIdObjectList();
+	sdl::V1_0::V1_0::CInputIdObjectList* retVal = new sdl::V1_0::V1_0::CInputIdObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::substrate::SubstrateSpecifications::CInputIdObjectList::toJson()
+QString sdl::V1_0::V1_0::CInputIdObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::substrate::SubstrateSpecifications::CInputIdObjectList::toGraphQL()
+QString sdl::V1_0::V1_0::CInputIdObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CInputIdObjectList::addElement(sdl::substrate::SubstrateSpecifications::CInputIdObject* item)
+void sdl::V1_0::V1_0::CInputIdObjectList::addElement(sdl::V1_0::V1_0::CInputIdObject* item)
 {
 	append(item);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CInputIdObjectList::removeElement(int index)
+void sdl::V1_0::V1_0::CInputIdObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::substrate::SubstrateSpecifications::CInputIdObjectList::isEqualWithModel(sdl::substrate::SubstrateSpecifications::CInputIdObjectList* otherModelPtr)
+bool sdl::V1_0::V1_0::CInputIdObjectList::isEqualWithModel(sdl::V1_0::V1_0::CInputIdObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CInputIdObjectList::insert(int index, sdl::substrate::SubstrateSpecifications::CInputIdObject* item)
+void sdl::V1_0::V1_0::CInputIdObjectList::insert(int index, sdl::V1_0::V1_0::CInputIdObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CInputIdObjectList::remove(int index)
+void sdl::V1_0::V1_0::CInputIdObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CInputIdObjectList::clear()
+void sdl::V1_0::V1_0::CInputIdObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::substrate::SubstrateSpecifications::CInputIdObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::V1_0::CInputIdObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::substrate::SubstrateSpecifications::CInputIdObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::V1_0::CInputIdObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_id"){
-		return QVariant::fromValue(Version_1_0->at(index)->id.value());
+		return QVariant::fromValue(at(index)->id.value());
 	}
 
 	return QVariant();
 }
 CCollectionViewParamsTestObject::CCollectionViewParamsTestObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CCollectionViewParamsTestObject::countChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CCollectionViewParamsTestObject::offsetChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -5311,55 +2773,41 @@ CCollectionViewParamsTestObject::CCollectionViewParamsTestObject(QObject* parent
 
 QVariant CCollectionViewParamsTestObject::GetCount()
 {
-	if (Version_1_0 && Version_1_0->count){
-		return Version_1_0->count.value();
-	}
-
-	return QVariant();
+	return CCollectionViewParamsTest::count.value();
 }
 
 
 void CCollectionViewParamsTestObject::SetCount(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->count = v.value<int>();
+	CCollectionViewParamsTest::count = v.value<int>();
 	countChanged();
 }
 
 
 bool CCollectionViewParamsTestObject::hasCount()
 {
-	 return Version_1_0 && Version_1_0->count.HasValue();
+	 return CCollectionViewParamsTest::count.HasValue();
 }
 
 
 QVariant CCollectionViewParamsTestObject::GetOffset()
 {
-	if (Version_1_0 && Version_1_0->offset){
-		return Version_1_0->offset.value();
-	}
-
-	return QVariant();
+	return CCollectionViewParamsTest::offset.value();
 }
 
 
 void CCollectionViewParamsTestObject::SetOffset(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->offset = v.value<int>();
+	CCollectionViewParamsTest::offset = v.value<int>();
 	offsetChanged();
 }
 
 
 bool CCollectionViewParamsTestObject::hasOffset()
 {
-	 return Version_1_0 && Version_1_0->offset.HasValue();
+	 return CCollectionViewParamsTest::offset.HasValue();
 }
 
 
@@ -5448,89 +2896,88 @@ QVariantMap CCollectionViewParamsTestObjectList::get(int row) const
 }
 
 
-void CCollectionViewParamsTestObjectList::append(sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObject* item)
+void CCollectionViewParamsTestObjectList::append(sdl::V1_0::V1_0::CCollectionViewParamsTestObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObjectList* sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObjectList::copyMe()
+sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList* sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList::copyMe()
 {
-	sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObjectList* retVal = new sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObjectList();
+	sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList* retVal = new sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObjectList::toJson()
+QString sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObjectList::toGraphQL()
+QString sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObjectList::addElement(sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObject* item)
+void sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList::addElement(sdl::V1_0::V1_0::CCollectionViewParamsTestObject* item)
 {
 	append(item);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObjectList::removeElement(int index)
+void sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObjectList::isEqualWithModel(sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObjectList* otherModelPtr)
+bool sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList::isEqualWithModel(sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObjectList::insert(int index, sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObject* item)
+void sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList::insert(int index, sdl::V1_0::V1_0::CCollectionViewParamsTestObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObjectList::remove(int index)
+void sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObjectList::clear()
+void sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::V1_0::CCollectionViewParamsTestObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_count"){
-		return QVariant::fromValue(Version_1_0->at(index)->count.value());
+		return QVariant::fromValue(at(index)->count.value());
 	}
 	if (nameId == "m_offset"){
-		return QVariant::fromValue(Version_1_0->at(index)->offset.value());
+		return QVariant::fromValue(at(index)->offset.value());
 	}
 
 	return QVariant();
 }
 CSubstrateSpecificationDocumentTypeIdsObject::CSubstrateSpecificationDocumentTypeIdsObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CSubstrateSpecificationDocumentTypeIdsObject::paperIDChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CSubstrateSpecificationDocumentTypeIdsObject::cardboardIDChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -5540,82 +2987,61 @@ CSubstrateSpecificationDocumentTypeIdsObject::CSubstrateSpecificationDocumentTyp
 
 QVariant CSubstrateSpecificationDocumentTypeIdsObject::GetPaperID()
 {
-	if (Version_1_0 && Version_1_0->PaperID){
-		return Version_1_0->PaperID.value();
-	}
-
-	return QVariant();
+	return CSubstrateSpecificationDocumentTypeIds::PaperID.value();
 }
 
 
 void CSubstrateSpecificationDocumentTypeIdsObject::SetPaperID(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->PaperID = v.value<QString>().toUtf8();
+	CSubstrateSpecificationDocumentTypeIds::PaperID = v.value<QString>().toUtf8();
 	paperIDChanged();
 }
 
 
 bool CSubstrateSpecificationDocumentTypeIdsObject::hasPaperID()
 {
-	 return Version_1_0 && Version_1_0->PaperID.HasValue();
+	 return CSubstrateSpecificationDocumentTypeIds::PaperID.HasValue();
 }
 
 
 QVariant CSubstrateSpecificationDocumentTypeIdsObject::GetCardboardID()
 {
-	if (Version_1_0 && Version_1_0->CardboardID){
-		return Version_1_0->CardboardID.value();
-	}
-
-	return QVariant();
+	return CSubstrateSpecificationDocumentTypeIds::CardboardID.value();
 }
 
 
 void CSubstrateSpecificationDocumentTypeIdsObject::SetCardboardID(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->CardboardID = v.value<QString>().toUtf8();
+	CSubstrateSpecificationDocumentTypeIds::CardboardID = v.value<QString>().toUtf8();
 	cardboardIDChanged();
 }
 
 
 bool CSubstrateSpecificationDocumentTypeIdsObject::hasCardboardID()
 {
-	 return Version_1_0 && Version_1_0->CardboardID.HasValue();
+	 return CSubstrateSpecificationDocumentTypeIds::CardboardID.HasValue();
 }
 
 
 QVariant CSubstrateSpecificationDocumentTypeIdsObject::GetFilmID()
 {
-	if (Version_1_0 && Version_1_0->FilmID){
-		return Version_1_0->FilmID.value();
-	}
-
-	return QVariant();
+	return CSubstrateSpecificationDocumentTypeIds::FilmID.value();
 }
 
 
 void CSubstrateSpecificationDocumentTypeIdsObject::SetFilmID(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->FilmID = v.value<QString>().toUtf8();
+	CSubstrateSpecificationDocumentTypeIds::FilmID = v.value<QString>().toUtf8();
 	filmIDChanged();
 }
 
 
 bool CSubstrateSpecificationDocumentTypeIdsObject::hasFilmID()
 {
-	 return Version_1_0 && Version_1_0->FilmID.HasValue();
+	 return CSubstrateSpecificationDocumentTypeIds::FilmID.HasValue();
 }
 
 
@@ -5707,92 +3133,91 @@ QVariantMap CSubstrateSpecificationDocumentTypeIdsObjectList::get(int row) const
 }
 
 
-void CSubstrateSpecificationDocumentTypeIdsObjectList::append(sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentTypeIdsObject* item)
+void CSubstrateSpecificationDocumentTypeIdsObjectList::append(sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentTypeIdsObjectList* sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentTypeIdsObjectList::copyMe()
+sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList* sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList::copyMe()
 {
-	sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentTypeIdsObjectList* retVal = new sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentTypeIdsObjectList();
+	sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList* retVal = new sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentTypeIdsObjectList::toJson()
+QString sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentTypeIdsObjectList::toGraphQL()
+QString sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentTypeIdsObjectList::addElement(sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentTypeIdsObject* item)
+void sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList::addElement(sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObject* item)
 {
 	append(item);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentTypeIdsObjectList::removeElement(int index)
+void sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentTypeIdsObjectList::isEqualWithModel(sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentTypeIdsObjectList* otherModelPtr)
+bool sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList::isEqualWithModel(sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentTypeIdsObjectList::insert(int index, sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentTypeIdsObject* item)
+void sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList::insert(int index, sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentTypeIdsObjectList::remove(int index)
+void sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentTypeIdsObjectList::clear()
+void sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentTypeIdsObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentTypeIdsObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_paperID"){
-		return QVariant::fromValue(Version_1_0->at(index)->PaperID.value());
+		return QVariant::fromValue(at(index)->PaperID.value());
 	}
 	if (nameId == "m_cardboardID"){
-		return QVariant::fromValue(Version_1_0->at(index)->CardboardID.value());
+		return QVariant::fromValue(at(index)->CardboardID.value());
 	}
 	if (nameId == "m_filmID"){
-		return QVariant::fromValue(Version_1_0->at(index)->FilmID.value());
+		return QVariant::fromValue(at(index)->FilmID.value());
 	}
 
 	return QVariant();
 }
 CSubstrateSpecificationListInputObject::CSubstrateSpecificationListInputObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CSubstrateSpecificationListInputObject::viewParamsChanged, this, &CItemModelBase::OnInternalModelChanged);
 }
@@ -5800,31 +3225,27 @@ CSubstrateSpecificationListInputObject::CSubstrateSpecificationListInputObject(Q
 
 QVariant CSubstrateSpecificationListInputObject::GetViewParams()
 {
-	if (Version_1_0 && Version_1_0->viewParams){
-		if (!m_viewParamsQObjectPtr.isValid()){
-			m_viewParamsQObjectPtr = CreateObject("viewParams");
-			auto itemPtr = m_viewParamsQObjectPtr.value<sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObject*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->viewParams;
+	if (!m_viewParamsQObjectPtr.isValid()){
+		m_viewParamsQObjectPtr = CreateObject("viewParams");
+		auto itemPtr = m_viewParamsQObjectPtr.value<sdl::V1_0::V1_0::CCollectionViewParamsTestObject*>();
+		if (itemPtr != nullptr) {
+			itemPtr->CCollectionViewParamsTest::count = viewParams->CCollectionViewParamsTest::count;
+			itemPtr->CCollectionViewParamsTest::offset = viewParams->CCollectionViewParamsTest::offset;
 		}
-		return m_viewParamsQObjectPtr;
 	}
-
-	return QVariant();
+	return m_viewParamsQObjectPtr;
 }
 
 
 void CSubstrateSpecificationListInputObject::SetViewParams(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObject* itemPtr = v.value<sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObject*>();
-		if (itemPtr != nullptr)  Version_1_0->viewParams = itemPtr->Version_1_0;
+		sdl::V1_0::V1_0::CCollectionViewParamsTestObject* itemPtr = v.value<sdl::V1_0::V1_0::CCollectionViewParamsTestObject*>();
+		if (itemPtr != nullptr)  viewParams = static_cast<const decltype(viewParams)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->viewParams = nullptr;
+		CSubstrateSpecificationListInput::viewParams = nullptr;
 	}
 	m_viewParamsQObjectPtr = v;
 
@@ -5834,17 +3255,14 @@ void CSubstrateSpecificationListInputObject::SetViewParams(const QVariant& v)
 
 bool CSubstrateSpecificationListInputObject::hasViewParams()
 {
-	 return Version_1_0 && Version_1_0->viewParams.HasValue();
+	 return CSubstrateSpecificationListInput::viewParams.HasValue();
 }
 
 
 void CSubstrateSpecificationListInputObject::emplaceViewParams()
 {
 	ResetViewParams();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->viewParams.emplace();
+	CSubstrateSpecificationListInput::viewParams.emplace();
 }
 
 
@@ -5906,7 +3324,7 @@ QString CSubstrateSpecificationListInputObject::toGraphQL() const
 QVariant CSubstrateSpecificationListInputObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "viewParams"){
-		return QVariant::fromValue(new sdl::substrate::SubstrateSpecifications::CCollectionViewParamsTestObject(this));
+		return QVariant::fromValue(new sdl::V1_0::V1_0::CCollectionViewParamsTestObject(this));
 	}
 	return QVariant();
 }
@@ -5943,76 +3361,76 @@ QVariantMap CSubstrateSpecificationListInputObjectList::get(int row) const
 }
 
 
-void CSubstrateSpecificationListInputObjectList::append(sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListInputObject* item)
+void CSubstrateSpecificationListInputObjectList::append(sdl::V1_0::V1_0::CSubstrateSpecificationListInputObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListInputObjectList* sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListInputObjectList::copyMe()
+sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList* sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList::copyMe()
 {
-	sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListInputObjectList* retVal = new sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListInputObjectList();
+	sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList* retVal = new sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListInputObjectList::toJson()
+QString sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListInputObjectList::toGraphQL()
+QString sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListInputObjectList::addElement(sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListInputObject* item)
+void sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList::addElement(sdl::V1_0::V1_0::CSubstrateSpecificationListInputObject* item)
 {
 	append(item);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListInputObjectList::removeElement(int index)
+void sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListInputObjectList::isEqualWithModel(sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListInputObjectList* otherModelPtr)
+bool sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList::isEqualWithModel(sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListInputObjectList::insert(int index, sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListInputObject* item)
+void sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList::insert(int index, sdl::V1_0::V1_0::CSubstrateSpecificationListInputObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListInputObjectList::remove(int index)
+void sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListInputObjectList::clear()
+void sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListInputObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListInputObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::V1_0::CSubstrateSpecificationListInputObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_viewParams"){
@@ -6022,7 +3440,6 @@ QVariant sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListInp
 	return QVariant();
 }
 CSubstrateSpecificationListItemObject::CSubstrateSpecificationListItemObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CSubstrateSpecificationListItemObject::idChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CSubstrateSpecificationListItemObject::typeIdChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -6037,217 +3454,161 @@ CSubstrateSpecificationListItemObject::CSubstrateSpecificationListItemObject(QOb
 
 QVariant CSubstrateSpecificationListItemObject::GetId()
 {
-	if (Version_1_0 && Version_1_0->id){
-		return Version_1_0->id.value();
-	}
-
-	return QVariant();
+	return CSubstrateSpecificationListItem::id.value();
 }
 
 
 void CSubstrateSpecificationListItemObject::SetId(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->id = v.value<QString>().toUtf8();
+	CSubstrateSpecificationListItem::id = v.value<QString>().toUtf8();
 	idChanged();
 }
 
 
 bool CSubstrateSpecificationListItemObject::hasId()
 {
-	 return Version_1_0 && Version_1_0->id.HasValue();
+	 return CSubstrateSpecificationListItem::id.HasValue();
 }
 
 
 QVariant CSubstrateSpecificationListItemObject::GetTypeId()
 {
-	if (Version_1_0 && Version_1_0->typeId){
-		return Version_1_0->typeId.value();
-	}
-
-	return QVariant();
+	return CSubstrateSpecificationListItem::typeId.value();
 }
 
 
 void CSubstrateSpecificationListItemObject::SetTypeId(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->typeId = v.value<QString>().toUtf8();
+	CSubstrateSpecificationListItem::typeId = v.value<QString>().toUtf8();
 	typeIdChanged();
 }
 
 
 bool CSubstrateSpecificationListItemObject::hasTypeId()
 {
-	 return Version_1_0 && Version_1_0->typeId.HasValue();
+	 return CSubstrateSpecificationListItem::typeId.HasValue();
 }
 
 
 QVariant CSubstrateSpecificationListItemObject::GetName()
 {
-	if (Version_1_0 && Version_1_0->name){
-		return Version_1_0->name.value();
-	}
-
-	return QVariant();
+	return CSubstrateSpecificationListItem::name.value();
 }
 
 
 void CSubstrateSpecificationListItemObject::SetName(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->name = v.value<QString>();
+	CSubstrateSpecificationListItem::name = v.value<QString>();
 	nameChanged();
 }
 
 
 bool CSubstrateSpecificationListItemObject::hasName()
 {
-	 return Version_1_0 && Version_1_0->name.HasValue();
+	 return CSubstrateSpecificationListItem::name.HasValue();
 }
 
 
 QVariant CSubstrateSpecificationListItemObject::GetMaterialId()
 {
-	if (Version_1_0 && Version_1_0->materialId){
-		return Version_1_0->materialId.value();
-	}
-
-	return QVariant();
+	return CSubstrateSpecificationListItem::materialId.value();
 }
 
 
 void CSubstrateSpecificationListItemObject::SetMaterialId(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->materialId = v.value<QString>().toUtf8();
+	CSubstrateSpecificationListItem::materialId = v.value<QString>().toUtf8();
 	materialIdChanged();
 }
 
 
 bool CSubstrateSpecificationListItemObject::hasMaterialId()
 {
-	 return Version_1_0 && Version_1_0->materialId.HasValue();
+	 return CSubstrateSpecificationListItem::materialId.HasValue();
 }
 
 
 QVariant CSubstrateSpecificationListItemObject::GetMaterialName()
 {
-	if (Version_1_0 && Version_1_0->materialName){
-		return Version_1_0->materialName.value();
-	}
-
-	return QVariant();
+	return CSubstrateSpecificationListItem::materialName.value();
 }
 
 
 void CSubstrateSpecificationListItemObject::SetMaterialName(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->materialName = v.value<QString>();
+	CSubstrateSpecificationListItem::materialName = v.value<QString>();
 	materialNameChanged();
 }
 
 
 bool CSubstrateSpecificationListItemObject::hasMaterialName()
 {
-	 return Version_1_0 && Version_1_0->materialName.HasValue();
+	 return CSubstrateSpecificationListItem::materialName.HasValue();
 }
 
 
 QVariant CSubstrateSpecificationListItemObject::GetAdded()
 {
-	if (Version_1_0 && Version_1_0->added){
-		return Version_1_0->added.value();
-	}
-
-	return QVariant();
+	return CSubstrateSpecificationListItem::added.value();
 }
 
 
 void CSubstrateSpecificationListItemObject::SetAdded(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->added = v.value<QString>();
+	CSubstrateSpecificationListItem::added = v.value<QString>();
 	addedChanged();
 }
 
 
 bool CSubstrateSpecificationListItemObject::hasAdded()
 {
-	 return Version_1_0 && Version_1_0->added.HasValue();
+	 return CSubstrateSpecificationListItem::added.HasValue();
 }
 
 
 QVariant CSubstrateSpecificationListItemObject::GetTimeStamp()
 {
-	if (Version_1_0 && Version_1_0->timeStamp){
-		return Version_1_0->timeStamp.value();
-	}
-
-	return QVariant();
+	return CSubstrateSpecificationListItem::timeStamp.value();
 }
 
 
 void CSubstrateSpecificationListItemObject::SetTimeStamp(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->timeStamp = v.value<QString>();
+	CSubstrateSpecificationListItem::timeStamp = v.value<QString>();
 	timeStampChanged();
 }
 
 
 bool CSubstrateSpecificationListItemObject::hasTimeStamp()
 {
-	 return Version_1_0 && Version_1_0->timeStamp.HasValue();
+	 return CSubstrateSpecificationListItem::timeStamp.HasValue();
 }
 
 
 QVariant CSubstrateSpecificationListItemObject::GetColorPreview()
 {
-	if (Version_1_0 && Version_1_0->colorPreview){
-		return Version_1_0->colorPreview.value();
-	}
-
-	return QVariant();
+	return CSubstrateSpecificationListItem::colorPreview.value();
 }
 
 
 void CSubstrateSpecificationListItemObject::SetColorPreview(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->colorPreview = v.value<QString>();
+	CSubstrateSpecificationListItem::colorPreview = v.value<QString>();
 	colorPreviewChanged();
 }
 
 
 bool CSubstrateSpecificationListItemObject::hasColorPreview()
 {
-	 return Version_1_0 && Version_1_0->colorPreview.HasValue();
+	 return CSubstrateSpecificationListItem::colorPreview.HasValue();
 }
 
 
@@ -6354,107 +3715,106 @@ QVariantMap CSubstrateSpecificationListItemObjectList::get(int row) const
 }
 
 
-void CSubstrateSpecificationListItemObjectList::append(sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObject* item)
+void CSubstrateSpecificationListItemObjectList::append(sdl::V1_0::V1_0::CSubstrateSpecificationListItemObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObjectList* sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObjectList::copyMe()
+sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList* sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList::copyMe()
 {
-	sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObjectList* retVal = new sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObjectList();
+	sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList* retVal = new sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObjectList::toJson()
+QString sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObjectList::toGraphQL()
+QString sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObjectList::addElement(sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObject* item)
+void sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList::addElement(sdl::V1_0::V1_0::CSubstrateSpecificationListItemObject* item)
 {
 	append(item);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObjectList::removeElement(int index)
+void sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObjectList::isEqualWithModel(sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObjectList* otherModelPtr)
+bool sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList::isEqualWithModel(sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObjectList::insert(int index, sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObject* item)
+void sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList::insert(int index, sdl::V1_0::V1_0::CSubstrateSpecificationListItemObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObjectList::remove(int index)
+void sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObjectList::clear()
+void sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::V1_0::CSubstrateSpecificationListItemObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_id"){
-		return QVariant::fromValue(Version_1_0->at(index)->id.value());
+		return QVariant::fromValue(at(index)->id.value());
 	}
 	if (nameId == "m_typeId"){
-		return QVariant::fromValue(Version_1_0->at(index)->typeId.value());
+		return QVariant::fromValue(at(index)->typeId.value());
 	}
 	if (nameId == "m_name"){
-		return QVariant::fromValue(Version_1_0->at(index)->name.value());
+		return QVariant::fromValue(at(index)->name.value());
 	}
 	if (nameId == "m_materialId"){
-		return QVariant::fromValue(Version_1_0->at(index)->materialId.value());
+		return QVariant::fromValue(at(index)->materialId.value());
 	}
 	if (nameId == "m_materialName"){
-		return QVariant::fromValue(Version_1_0->at(index)->materialName.value());
+		return QVariant::fromValue(at(index)->materialName.value());
 	}
 	if (nameId == "m_added"){
-		return QVariant::fromValue(Version_1_0->at(index)->added.value());
+		return QVariant::fromValue(at(index)->added.value());
 	}
 	if (nameId == "m_timeStamp"){
-		return QVariant::fromValue(Version_1_0->at(index)->timeStamp.value());
+		return QVariant::fromValue(at(index)->timeStamp.value());
 	}
 	if (nameId == "m_colorPreview"){
-		return QVariant::fromValue(Version_1_0->at(index)->colorPreview.value());
+		return QVariant::fromValue(at(index)->colorPreview.value());
 	}
 
 	return QVariant();
 }
 CSubstrateSpecificationListResponseObject::CSubstrateSpecificationListResponseObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CSubstrateSpecificationListResponseObject::itemsChanged, this, &CItemModelBase::OnInternalModelChanged);
 }
@@ -6462,31 +3822,24 @@ CSubstrateSpecificationListResponseObject::CSubstrateSpecificationListResponseOb
 
 QVariant CSubstrateSpecificationListResponseObject::GetItems()
 {
-	if (Version_1_0 && Version_1_0->items){
-		if (!m_itemsQObjectPtr.isValid()){
-			m_itemsQObjectPtr = CreateObject("items");
-			auto itemPtr = m_itemsQObjectPtr.value<sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->items;
-		}
-		return m_itemsQObjectPtr;
+	if (!m_itemsQObjectPtr.isValid()){
+		m_itemsQObjectPtr = CreateObject("items");
+		auto itemPtr = m_itemsQObjectPtr.value<sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList*>();
+		if (itemPtr != nullptr) itemPtr->items = items;
 	}
-
-	return QVariant();
+	return m_itemsQObjectPtr;
 }
 
 
 void CSubstrateSpecificationListResponseObject::SetItems(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObjectList* itemPtr = v.value<sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObjectList*>();
-		if (itemPtr != nullptr)  Version_1_0->items = itemPtr->Version_1_0;
+		sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList* itemPtr = v.value<sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList*>();
+		if (itemPtr != nullptr)  items = static_cast<const decltype(items)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->items = nullptr;
+		CSubstrateSpecificationListResponse::items = nullptr;
 	}
 	m_itemsQObjectPtr = v;
 
@@ -6496,17 +3849,14 @@ void CSubstrateSpecificationListResponseObject::SetItems(const QVariant& v)
 
 bool CSubstrateSpecificationListResponseObject::hasItems()
 {
-	 return Version_1_0 && Version_1_0->items.HasValue();
+	 return CSubstrateSpecificationListResponse::items.HasValue();
 }
 
 
 void CSubstrateSpecificationListResponseObject::emplaceItems()
 {
 	ResetItems();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->items.emplace();
+	CSubstrateSpecificationListResponse::items.emplace();
 }
 
 
@@ -6523,7 +3873,7 @@ void CSubstrateSpecificationListResponseObject::ResetItems()
 QVariant CSubstrateSpecificationListResponseObject::createItemsArrayElement(const QVariant& v)
 {
 	Q_UNUSED(v);
-	return QVariant::fromValue(new sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObject());
+	return QVariant::fromValue(new sdl::V1_0::V1_0::CSubstrateSpecificationListItemObject());
 }
 
 
@@ -6575,7 +3925,7 @@ QString CSubstrateSpecificationListResponseObject::toGraphQL() const
 QVariant CSubstrateSpecificationListResponseObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "items"){
-		return QVariant::fromValue(new sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListItemObjectList(this));
+		return QVariant::fromValue(new sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList(this));
 	}
 	return QVariant();
 }
@@ -6612,76 +3962,76 @@ QVariantMap CSubstrateSpecificationListResponseObjectList::get(int row) const
 }
 
 
-void CSubstrateSpecificationListResponseObjectList::append(sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListResponseObject* item)
+void CSubstrateSpecificationListResponseObjectList::append(sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListResponseObjectList* sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListResponseObjectList::copyMe()
+sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList* sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList::copyMe()
 {
-	sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListResponseObjectList* retVal = new sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListResponseObjectList();
+	sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList* retVal = new sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListResponseObjectList::toJson()
+QString sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListResponseObjectList::toGraphQL()
+QString sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListResponseObjectList::addElement(sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListResponseObject* item)
+void sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList::addElement(sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObject* item)
 {
 	append(item);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListResponseObjectList::removeElement(int index)
+void sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListResponseObjectList::isEqualWithModel(sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListResponseObjectList* otherModelPtr)
+bool sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList::isEqualWithModel(sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListResponseObjectList::insert(int index, sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListResponseObject* item)
+void sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList::insert(int index, sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListResponseObjectList::remove(int index)
+void sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListResponseObjectList::clear()
+void sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListResponseObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListResponseObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_items"){
@@ -6691,7 +4041,6 @@ QVariant sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationListRes
 	return QVariant();
 }
 CCardboardSubstrateSpecificationObject::CCardboardSubstrateSpecificationObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CCardboardSubstrateSpecificationObject::colorChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CCardboardSubstrateSpecificationObject::grammageChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -6700,55 +4049,41 @@ CCardboardSubstrateSpecificationObject::CCardboardSubstrateSpecificationObject(Q
 
 QVariant CCardboardSubstrateSpecificationObject::GetColor()
 {
-	if (Version_1_0 && Version_1_0->color){
-		return Version_1_0->color.value();
-	}
-
-	return QVariant();
+	return CCardboardSubstrateSpecification::color.value();
 }
 
 
 void CCardboardSubstrateSpecificationObject::SetColor(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->color = v.value<QString>();
+	CCardboardSubstrateSpecification::color = v.value<QString>();
 	colorChanged();
 }
 
 
 bool CCardboardSubstrateSpecificationObject::hasColor()
 {
-	 return Version_1_0 && Version_1_0->color.HasValue();
+	 return CCardboardSubstrateSpecification::color.HasValue();
 }
 
 
 QVariant CCardboardSubstrateSpecificationObject::GetGrammage()
 {
-	if (Version_1_0 && Version_1_0->grammage){
-		return Version_1_0->grammage.value();
-	}
-
-	return QVariant();
+	return CCardboardSubstrateSpecification::grammage.value();
 }
 
 
 void CCardboardSubstrateSpecificationObject::SetGrammage(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->grammage = v.value<double>();
+	CCardboardSubstrateSpecification::grammage = v.value<double>();
 	grammageChanged();
 }
 
 
 bool CCardboardSubstrateSpecificationObject::hasGrammage()
 {
-	 return Version_1_0 && Version_1_0->grammage.HasValue();
+	 return CCardboardSubstrateSpecification::grammage.HasValue();
 }
 
 
@@ -6837,89 +4172,88 @@ QVariantMap CCardboardSubstrateSpecificationObjectList::get(int row) const
 }
 
 
-void CCardboardSubstrateSpecificationObjectList::append(sdl::substrate::SubstrateSpecifications::CCardboardSubstrateSpecificationObject* item)
+void CCardboardSubstrateSpecificationObjectList::append(sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::substrate::SubstrateSpecifications::CCardboardSubstrateSpecificationObjectList* sdl::substrate::SubstrateSpecifications::CCardboardSubstrateSpecificationObjectList::copyMe()
+sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList* sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList::copyMe()
 {
-	sdl::substrate::SubstrateSpecifications::CCardboardSubstrateSpecificationObjectList* retVal = new sdl::substrate::SubstrateSpecifications::CCardboardSubstrateSpecificationObjectList();
+	sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList* retVal = new sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::substrate::SubstrateSpecifications::CCardboardSubstrateSpecificationObjectList::toJson()
+QString sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::substrate::SubstrateSpecifications::CCardboardSubstrateSpecificationObjectList::toGraphQL()
+QString sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CCardboardSubstrateSpecificationObjectList::addElement(sdl::substrate::SubstrateSpecifications::CCardboardSubstrateSpecificationObject* item)
+void sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList::addElement(sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObject* item)
 {
 	append(item);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CCardboardSubstrateSpecificationObjectList::removeElement(int index)
+void sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::substrate::SubstrateSpecifications::CCardboardSubstrateSpecificationObjectList::isEqualWithModel(sdl::substrate::SubstrateSpecifications::CCardboardSubstrateSpecificationObjectList* otherModelPtr)
+bool sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList::isEqualWithModel(sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CCardboardSubstrateSpecificationObjectList::insert(int index, sdl::substrate::SubstrateSpecifications::CCardboardSubstrateSpecificationObject* item)
+void sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList::insert(int index, sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CCardboardSubstrateSpecificationObjectList::remove(int index)
+void sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CCardboardSubstrateSpecificationObjectList::clear()
+void sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::substrate::SubstrateSpecifications::CCardboardSubstrateSpecificationObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::substrate::SubstrateSpecifications::CCardboardSubstrateSpecificationObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_color"){
-		return QVariant::fromValue(Version_1_0->at(index)->color.value());
+		return QVariant::fromValue(at(index)->color.value());
 	}
 	if (nameId == "m_grammage"){
-		return QVariant::fromValue(Version_1_0->at(index)->grammage.value());
+		return QVariant::fromValue(at(index)->grammage.value());
 	}
 
 	return QVariant();
 }
 CPaperSubstrateSpecificationObject::CPaperSubstrateSpecificationObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CPaperSubstrateSpecificationObject::grammageChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CPaperSubstrateSpecificationObject::colorChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -6929,82 +4263,61 @@ CPaperSubstrateSpecificationObject::CPaperSubstrateSpecificationObject(QObject* 
 
 QVariant CPaperSubstrateSpecificationObject::GetGrammage()
 {
-	if (Version_1_0 && Version_1_0->grammage){
-		return Version_1_0->grammage.value();
-	}
-
-	return QVariant();
+	return CPaperSubstrateSpecification::grammage.value();
 }
 
 
 void CPaperSubstrateSpecificationObject::SetGrammage(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->grammage = v.value<double>();
+	CPaperSubstrateSpecification::grammage = v.value<double>();
 	grammageChanged();
 }
 
 
 bool CPaperSubstrateSpecificationObject::hasGrammage()
 {
-	 return Version_1_0 && Version_1_0->grammage.HasValue();
+	 return CPaperSubstrateSpecification::grammage.HasValue();
 }
 
 
 QVariant CPaperSubstrateSpecificationObject::GetColor()
 {
-	if (Version_1_0 && Version_1_0->color){
-		return Version_1_0->color.value();
-	}
-
-	return QVariant();
+	return CPaperSubstrateSpecification::color.value();
 }
 
 
 void CPaperSubstrateSpecificationObject::SetColor(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->color = v.value<QString>();
+	CPaperSubstrateSpecification::color = v.value<QString>();
 	colorChanged();
 }
 
 
 bool CPaperSubstrateSpecificationObject::hasColor()
 {
-	 return Version_1_0 && Version_1_0->color.HasValue();
+	 return CPaperSubstrateSpecification::color.HasValue();
 }
 
 
 QVariant CPaperSubstrateSpecificationObject::GetCoatType()
 {
-	if (Version_1_0 && Version_1_0->coatType){
-		return Version_1_0->coatType.value();
-	}
-
-	return QVariant();
+	return CPaperSubstrateSpecification::coatType.value();
 }
 
 
 void CPaperSubstrateSpecificationObject::SetCoatType(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->coatType = v.value<QString>();
+	CPaperSubstrateSpecification::coatType = v.value<QString>();
 	coatTypeChanged();
 }
 
 
 bool CPaperSubstrateSpecificationObject::hasCoatType()
 {
-	 return Version_1_0 && Version_1_0->coatType.HasValue();
+	 return CPaperSubstrateSpecification::coatType.HasValue();
 }
 
 
@@ -7096,92 +4409,91 @@ QVariantMap CPaperSubstrateSpecificationObjectList::get(int row) const
 }
 
 
-void CPaperSubstrateSpecificationObjectList::append(sdl::substrate::SubstrateSpecifications::CPaperSubstrateSpecificationObject* item)
+void CPaperSubstrateSpecificationObjectList::append(sdl::V1_0::V1_0::CPaperSubstrateSpecificationObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::substrate::SubstrateSpecifications::CPaperSubstrateSpecificationObjectList* sdl::substrate::SubstrateSpecifications::CPaperSubstrateSpecificationObjectList::copyMe()
+sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList* sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList::copyMe()
 {
-	sdl::substrate::SubstrateSpecifications::CPaperSubstrateSpecificationObjectList* retVal = new sdl::substrate::SubstrateSpecifications::CPaperSubstrateSpecificationObjectList();
+	sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList* retVal = new sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::substrate::SubstrateSpecifications::CPaperSubstrateSpecificationObjectList::toJson()
+QString sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::substrate::SubstrateSpecifications::CPaperSubstrateSpecificationObjectList::toGraphQL()
+QString sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CPaperSubstrateSpecificationObjectList::addElement(sdl::substrate::SubstrateSpecifications::CPaperSubstrateSpecificationObject* item)
+void sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList::addElement(sdl::V1_0::V1_0::CPaperSubstrateSpecificationObject* item)
 {
 	append(item);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CPaperSubstrateSpecificationObjectList::removeElement(int index)
+void sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::substrate::SubstrateSpecifications::CPaperSubstrateSpecificationObjectList::isEqualWithModel(sdl::substrate::SubstrateSpecifications::CPaperSubstrateSpecificationObjectList* otherModelPtr)
+bool sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList::isEqualWithModel(sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CPaperSubstrateSpecificationObjectList::insert(int index, sdl::substrate::SubstrateSpecifications::CPaperSubstrateSpecificationObject* item)
+void sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList::insert(int index, sdl::V1_0::V1_0::CPaperSubstrateSpecificationObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CPaperSubstrateSpecificationObjectList::remove(int index)
+void sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CPaperSubstrateSpecificationObjectList::clear()
+void sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::substrate::SubstrateSpecifications::CPaperSubstrateSpecificationObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::substrate::SubstrateSpecifications::CPaperSubstrateSpecificationObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::V1_0::CPaperSubstrateSpecificationObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_grammage"){
-		return QVariant::fromValue(Version_1_0->at(index)->grammage.value());
+		return QVariant::fromValue(at(index)->grammage.value());
 	}
 	if (nameId == "m_color"){
-		return QVariant::fromValue(Version_1_0->at(index)->color.value());
+		return QVariant::fromValue(at(index)->color.value());
 	}
 	if (nameId == "m_coatType"){
-		return QVariant::fromValue(Version_1_0->at(index)->coatType.value());
+		return QVariant::fromValue(at(index)->coatType.value());
 	}
 
 	return QVariant();
 }
 CFilmSubstrateSpecificationObject::CFilmSubstrateSpecificationObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CFilmSubstrateSpecificationObject::transparencyChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CFilmSubstrateSpecificationObject::colorChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -7191,82 +4503,61 @@ CFilmSubstrateSpecificationObject::CFilmSubstrateSpecificationObject(QObject* pa
 
 QVariant CFilmSubstrateSpecificationObject::GetTransparency()
 {
-	if (Version_1_0 && Version_1_0->transparency){
-		return Version_1_0->transparency.value();
-	}
-
-	return QVariant();
+	return CFilmSubstrateSpecification::transparency.value();
 }
 
 
 void CFilmSubstrateSpecificationObject::SetTransparency(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->transparency = v.value<double>();
+	CFilmSubstrateSpecification::transparency = v.value<double>();
 	transparencyChanged();
 }
 
 
 bool CFilmSubstrateSpecificationObject::hasTransparency()
 {
-	 return Version_1_0 && Version_1_0->transparency.HasValue();
+	 return CFilmSubstrateSpecification::transparency.HasValue();
 }
 
 
 QVariant CFilmSubstrateSpecificationObject::GetColor()
 {
-	if (Version_1_0 && Version_1_0->color){
-		return Version_1_0->color.value();
-	}
-
-	return QVariant();
+	return CFilmSubstrateSpecification::color.value();
 }
 
 
 void CFilmSubstrateSpecificationObject::SetColor(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->color = v.value<QString>();
+	CFilmSubstrateSpecification::color = v.value<QString>();
 	colorChanged();
 }
 
 
 bool CFilmSubstrateSpecificationObject::hasColor()
 {
-	 return Version_1_0 && Version_1_0->color.HasValue();
+	 return CFilmSubstrateSpecification::color.HasValue();
 }
 
 
 QVariant CFilmSubstrateSpecificationObject::GetMaterial()
 {
-	if (Version_1_0 && Version_1_0->material){
-		return Version_1_0->material.value();
-	}
-
-	return QVariant();
+	return CFilmSubstrateSpecification::material.value();
 }
 
 
 void CFilmSubstrateSpecificationObject::SetMaterial(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->material = v.value<QString>();
+	CFilmSubstrateSpecification::material = v.value<QString>();
 	materialChanged();
 }
 
 
 bool CFilmSubstrateSpecificationObject::hasMaterial()
 {
-	 return Version_1_0 && Version_1_0->material.HasValue();
+	 return CFilmSubstrateSpecification::material.HasValue();
 }
 
 
@@ -7358,92 +4649,91 @@ QVariantMap CFilmSubstrateSpecificationObjectList::get(int row) const
 }
 
 
-void CFilmSubstrateSpecificationObjectList::append(sdl::substrate::SubstrateSpecifications::CFilmSubstrateSpecificationObject* item)
+void CFilmSubstrateSpecificationObjectList::append(sdl::V1_0::V1_0::CFilmSubstrateSpecificationObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::substrate::SubstrateSpecifications::CFilmSubstrateSpecificationObjectList* sdl::substrate::SubstrateSpecifications::CFilmSubstrateSpecificationObjectList::copyMe()
+sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList* sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList::copyMe()
 {
-	sdl::substrate::SubstrateSpecifications::CFilmSubstrateSpecificationObjectList* retVal = new sdl::substrate::SubstrateSpecifications::CFilmSubstrateSpecificationObjectList();
+	sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList* retVal = new sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::substrate::SubstrateSpecifications::CFilmSubstrateSpecificationObjectList::toJson()
+QString sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::substrate::SubstrateSpecifications::CFilmSubstrateSpecificationObjectList::toGraphQL()
+QString sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CFilmSubstrateSpecificationObjectList::addElement(sdl::substrate::SubstrateSpecifications::CFilmSubstrateSpecificationObject* item)
+void sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList::addElement(sdl::V1_0::V1_0::CFilmSubstrateSpecificationObject* item)
 {
 	append(item);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CFilmSubstrateSpecificationObjectList::removeElement(int index)
+void sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::substrate::SubstrateSpecifications::CFilmSubstrateSpecificationObjectList::isEqualWithModel(sdl::substrate::SubstrateSpecifications::CFilmSubstrateSpecificationObjectList* otherModelPtr)
+bool sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList::isEqualWithModel(sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CFilmSubstrateSpecificationObjectList::insert(int index, sdl::substrate::SubstrateSpecifications::CFilmSubstrateSpecificationObject* item)
+void sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList::insert(int index, sdl::V1_0::V1_0::CFilmSubstrateSpecificationObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CFilmSubstrateSpecificationObjectList::remove(int index)
+void sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CFilmSubstrateSpecificationObjectList::clear()
+void sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::substrate::SubstrateSpecifications::CFilmSubstrateSpecificationObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::substrate::SubstrateSpecifications::CFilmSubstrateSpecificationObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::V1_0::CFilmSubstrateSpecificationObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_transparency"){
-		return QVariant::fromValue(Version_1_0->at(index)->transparency.value());
+		return QVariant::fromValue(at(index)->transparency.value());
 	}
 	if (nameId == "m_color"){
-		return QVariant::fromValue(Version_1_0->at(index)->color.value());
+		return QVariant::fromValue(at(index)->color.value());
 	}
 	if (nameId == "m_material"){
-		return QVariant::fromValue(Version_1_0->at(index)->material.value());
+		return QVariant::fromValue(at(index)->material.value());
 	}
 
 	return QVariant();
 }
 CSubstrateSpecificationInputObject::CSubstrateSpecificationInputObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CSubstrateSpecificationInputObject::idChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CSubstrateSpecificationInputObject::nameChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -7455,131 +4745,103 @@ CSubstrateSpecificationInputObject::CSubstrateSpecificationInputObject(QObject* 
 
 QVariant CSubstrateSpecificationInputObject::GetId()
 {
-	if (Version_1_0 && Version_1_0->id){
-		return Version_1_0->id.value();
-	}
-
-	return QVariant();
+	return CSubstrateSpecificationInput::id.value();
 }
 
 
 void CSubstrateSpecificationInputObject::SetId(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->id = v.value<QString>().toUtf8();
+	CSubstrateSpecificationInput::id = v.value<QString>().toUtf8();
 	idChanged();
 }
 
 
 bool CSubstrateSpecificationInputObject::hasId()
 {
-	 return Version_1_0 && Version_1_0->id.HasValue();
+	 return CSubstrateSpecificationInput::id.HasValue();
 }
 
 
 QVariant CSubstrateSpecificationInputObject::GetName()
 {
-	if (Version_1_0 && Version_1_0->name){
-		return Version_1_0->name.value();
-	}
-
-	return QVariant();
+	return CSubstrateSpecificationInput::name.value();
 }
 
 
 void CSubstrateSpecificationInputObject::SetName(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->name = v.value<QString>();
+	CSubstrateSpecificationInput::name = v.value<QString>();
 	nameChanged();
 }
 
 
 bool CSubstrateSpecificationInputObject::hasName()
 {
-	 return Version_1_0 && Version_1_0->name.HasValue();
+	 return CSubstrateSpecificationInput::name.HasValue();
 }
 
 
 QVariant CSubstrateSpecificationInputObject::GetDescription()
 {
-	if (Version_1_0 && Version_1_0->description){
-		return Version_1_0->description.value();
-	}
-
-	return QVariant();
+	return CSubstrateSpecificationInput::description.value();
 }
 
 
 void CSubstrateSpecificationInputObject::SetDescription(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->description = v.value<QString>();
+	CSubstrateSpecificationInput::description = v.value<QString>();
 	descriptionChanged();
 }
 
 
 bool CSubstrateSpecificationInputObject::hasDescription()
 {
-	 return Version_1_0 && Version_1_0->description.HasValue();
+	 return CSubstrateSpecificationInput::description.HasValue();
 }
 
 
 QVariant CSubstrateSpecificationInputObject::GetItem()
 {
-	if (Version_1_0 && Version_1_0->item){
-		if (m_itemQObjectPtr.isValid()){
-			if (const CCardboardSubstrateSpecification* val = std::get_if<CCardboardSubstrateSpecification>((Version_1_0->item).GetPtr())){
-				CCardboardSubstrateSpecificationObject *newObjectPtr = new CCardboardSubstrateSpecificationObject(this);
-				newObjectPtr->Version_1_0 = val->Version_1_0;
-				m_itemQObjectPtr = QVariant::fromValue(newObjectPtr);
-			}
-			if (const CPaperSubstrateSpecification* val = std::get_if<CPaperSubstrateSpecification>((Version_1_0->item).GetPtr())){
-				CPaperSubstrateSpecificationObject *newObjectPtr = new CPaperSubstrateSpecificationObject(this);
-				newObjectPtr->Version_1_0 = val->Version_1_0;
-				m_itemQObjectPtr = QVariant::fromValue(newObjectPtr);
-			}
-			if (const CFilmSubstrateSpecification* val = std::get_if<CFilmSubstrateSpecification>((Version_1_0->item).GetPtr())){
-				CFilmSubstrateSpecificationObject *newObjectPtr = new CFilmSubstrateSpecificationObject(this);
-				newObjectPtr->Version_1_0 = val->Version_1_0;
-				m_itemQObjectPtr = QVariant::fromValue(newObjectPtr);
-			}
+	if (m_itemQObjectPtr.isValid()){
+		if (const CCardboardSubstrateSpecification* val = std::get_if<CCardboardSubstrateSpecification>((CSubstrateSpecificationInput::item).GetPtr())){
+			CCardboardSubstrateSpecificationObject *newObjectPtr = new CCardboardSubstrateSpecificationObject(this);
+			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			m_itemQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
-		return m_itemQObjectPtr;
+		if (const CPaperSubstrateSpecification* val = std::get_if<CPaperSubstrateSpecification>((CSubstrateSpecificationInput::item).GetPtr())){
+			CPaperSubstrateSpecificationObject *newObjectPtr = new CPaperSubstrateSpecificationObject(this);
+			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			m_itemQObjectPtr = QVariant::fromValue(newObjectPtr);
+		}
+		if (const CFilmSubstrateSpecification* val = std::get_if<CFilmSubstrateSpecification>((CSubstrateSpecificationInput::item).GetPtr())){
+			CFilmSubstrateSpecificationObject *newObjectPtr = new CFilmSubstrateSpecificationObject(this);
+			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			m_itemQObjectPtr = QVariant::fromValue(newObjectPtr);
+		}
 	}
-
-	return QVariant();
+	return m_itemQObjectPtr;
 }
 
 
 void CSubstrateSpecificationInputObject::SetItem(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
 		if (const CCardboardSubstrateSpecificationObject* val = v.value<const CCardboardSubstrateSpecificationObject*>()){
-			*Version_1_0->item = *val;
+			*item = *val;
 		}
 		if (const CPaperSubstrateSpecificationObject* val = v.value<const CPaperSubstrateSpecificationObject*>()){
-			*Version_1_0->item = *val;
+			*item = *val;
 		}
 		if (const CFilmSubstrateSpecificationObject* val = v.value<const CFilmSubstrateSpecificationObject*>()){
-			*Version_1_0->item = *val;
+			*item = *val;
 		}
 	}
 	else {
-		Version_1_0->item = nullptr;
+		CSubstrateSpecificationInput::item = nullptr;
 	}
 	m_itemQObjectPtr = v;
 
@@ -7589,17 +4851,14 @@ void CSubstrateSpecificationInputObject::SetItem(const QVariant& v)
 
 bool CSubstrateSpecificationInputObject::hasItem()
 {
-	 return Version_1_0 && Version_1_0->item.HasValue();
+	 return CSubstrateSpecificationInput::item.HasValue();
 }
 
 
 void CSubstrateSpecificationInputObject::emplaceItem()
 {
 	ResetItem();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->item.emplace();
+	CSubstrateSpecificationInput::item.emplace();
 }
 
 
@@ -7615,28 +4874,21 @@ void CSubstrateSpecificationInputObject::ResetItem()
 
 QVariant CSubstrateSpecificationInputObject::GetTypeId()
 {
-	if (Version_1_0 && Version_1_0->typeId){
-		return Version_1_0->typeId.value();
-	}
-
-	return QVariant();
+	return CSubstrateSpecificationInput::typeId.value();
 }
 
 
 void CSubstrateSpecificationInputObject::SetTypeId(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->typeId = v.value<QString>().toUtf8();
+	CSubstrateSpecificationInput::typeId = v.value<QString>().toUtf8();
 	typeIdChanged();
 }
 
 
 bool CSubstrateSpecificationInputObject::hasTypeId()
 {
-	 return Version_1_0 && Version_1_0->typeId.HasValue();
+	 return CSubstrateSpecificationInput::typeId.HasValue();
 }
 
 
@@ -7734,98 +4986,97 @@ QVariantMap CSubstrateSpecificationInputObjectList::get(int row) const
 }
 
 
-void CSubstrateSpecificationInputObjectList::append(sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationInputObject* item)
+void CSubstrateSpecificationInputObjectList::append(sdl::V1_0::V1_0::CSubstrateSpecificationInputObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationInputObjectList* sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationInputObjectList::copyMe()
+sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList* sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList::copyMe()
 {
-	sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationInputObjectList* retVal = new sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationInputObjectList();
+	sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList* retVal = new sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationInputObjectList::toJson()
+QString sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationInputObjectList::toGraphQL()
+QString sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationInputObjectList::addElement(sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationInputObject* item)
+void sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList::addElement(sdl::V1_0::V1_0::CSubstrateSpecificationInputObject* item)
 {
 	append(item);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationInputObjectList::removeElement(int index)
+void sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationInputObjectList::isEqualWithModel(sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationInputObjectList* otherModelPtr)
+bool sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList::isEqualWithModel(sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationInputObjectList::insert(int index, sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationInputObject* item)
+void sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList::insert(int index, sdl::V1_0::V1_0::CSubstrateSpecificationInputObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationInputObjectList::remove(int index)
+void sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationInputObjectList::clear()
+void sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationInputObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationInputObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::V1_0::CSubstrateSpecificationInputObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_id"){
-		return QVariant::fromValue(Version_1_0->at(index)->id.value());
+		return QVariant::fromValue(at(index)->id.value());
 	}
 	if (nameId == "m_name"){
-		return QVariant::fromValue(Version_1_0->at(index)->name.value());
+		return QVariant::fromValue(at(index)->name.value());
 	}
 	if (nameId == "m_description"){
-		return QVariant::fromValue(Version_1_0->at(index)->description.value());
+		return QVariant::fromValue(at(index)->description.value());
 	}
 	if (nameId == "m_item"){
 		return itemPtr->GetItem();
 	}
 	if (nameId == "m_typeId"){
-		return QVariant::fromValue(Version_1_0->at(index)->typeId.value());
+		return QVariant::fromValue(at(index)->typeId.value());
 	}
 
 	return QVariant();
 }
 CSubstrateSpecificationDocumentMetaInfoObject::CSubstrateSpecificationDocumentMetaInfoObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CSubstrateSpecificationDocumentMetaInfoObject::materialIdChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CSubstrateSpecificationDocumentMetaInfoObject::labChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -7834,55 +5085,41 @@ CSubstrateSpecificationDocumentMetaInfoObject::CSubstrateSpecificationDocumentMe
 
 QVariant CSubstrateSpecificationDocumentMetaInfoObject::GetMaterialId()
 {
-	if (Version_1_0 && Version_1_0->materialId){
-		return Version_1_0->materialId.value();
-	}
-
-	return QVariant();
+	return CSubstrateSpecificationDocumentMetaInfo::materialId.value();
 }
 
 
 void CSubstrateSpecificationDocumentMetaInfoObject::SetMaterialId(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->materialId = v.value<QString>().toUtf8();
+	CSubstrateSpecificationDocumentMetaInfo::materialId = v.value<QString>().toUtf8();
 	materialIdChanged();
 }
 
 
 bool CSubstrateSpecificationDocumentMetaInfoObject::hasMaterialId()
 {
-	 return Version_1_0 && Version_1_0->materialId.HasValue();
+	 return CSubstrateSpecificationDocumentMetaInfo::materialId.HasValue();
 }
 
 
 QVariant CSubstrateSpecificationDocumentMetaInfoObject::GetLab()
 {
-	if (Version_1_0 && Version_1_0->lab){
-		return Version_1_0->lab.value();
-	}
-
-	return QVariant();
+	return CSubstrateSpecificationDocumentMetaInfo::lab.value();
 }
 
 
 void CSubstrateSpecificationDocumentMetaInfoObject::SetLab(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->lab = v.value<QString>();
+	CSubstrateSpecificationDocumentMetaInfo::lab = v.value<QString>();
 	labChanged();
 }
 
 
 bool CSubstrateSpecificationDocumentMetaInfoObject::hasLab()
 {
-	 return Version_1_0 && Version_1_0->lab.HasValue();
+	 return CSubstrateSpecificationDocumentMetaInfo::lab.HasValue();
 }
 
 
@@ -7971,83 +5208,83 @@ QVariantMap CSubstrateSpecificationDocumentMetaInfoObjectList::get(int row) cons
 }
 
 
-void CSubstrateSpecificationDocumentMetaInfoObjectList::append(sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentMetaInfoObject* item)
+void CSubstrateSpecificationDocumentMetaInfoObjectList::append(sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentMetaInfoObjectList* sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentMetaInfoObjectList::copyMe()
+sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList* sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList::copyMe()
 {
-	sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentMetaInfoObjectList* retVal = new sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentMetaInfoObjectList();
+	sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList* retVal = new sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentMetaInfoObjectList::toJson()
+QString sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentMetaInfoObjectList::toGraphQL()
+QString sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentMetaInfoObjectList::addElement(sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentMetaInfoObject* item)
+void sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList::addElement(sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObject* item)
 {
 	append(item);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentMetaInfoObjectList::removeElement(int index)
+void sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentMetaInfoObjectList::isEqualWithModel(sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentMetaInfoObjectList* otherModelPtr)
+bool sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList::isEqualWithModel(sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentMetaInfoObjectList::insert(int index, sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentMetaInfoObject* item)
+void sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList::insert(int index, sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentMetaInfoObjectList::remove(int index)
+void sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentMetaInfoObjectList::clear()
+void sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentMetaInfoObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentMetaInfoObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_materialId"){
-		return QVariant::fromValue(Version_1_0->at(index)->materialId.value());
+		return QVariant::fromValue(at(index)->materialId.value());
 	}
 	if (nameId == "m_lab"){
-		return QVariant::fromValue(Version_1_0->at(index)->lab.value());
+		return QVariant::fromValue(at(index)->lab.value());
 	}
 
 	return QVariant();
@@ -8062,21 +5299,21 @@ QVariant CSubstrateSpecificationDocumentObjectList::GetOrCreateCachedObject(int 
 		retVal = this->m_objectDataTypeMap[index];
 	}
 	else{
-		if (const CCardboardSubstrateSpecification* val = std::get_if<CCardboardSubstrateSpecification>(this->Version_1_0->at(index).GetPtr())){
+		if (const CCardboardSubstrateSpecification* val = std::get_if<CCardboardSubstrateSpecification>(this->at(index).GetPtr())){
 			CCardboardSubstrateSpecificationObject *newObjectPtr = new CCardboardSubstrateSpecificationObject();
-			newObjectPtr->Version_1_0 = val->Version_1_0;
+			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
-		if (const CPaperSubstrateSpecification* val = std::get_if<CPaperSubstrateSpecification>(this->Version_1_0->at(index).GetPtr())){
+		if (const CPaperSubstrateSpecification* val = std::get_if<CPaperSubstrateSpecification>(this->at(index).GetPtr())){
 			CPaperSubstrateSpecificationObject *newObjectPtr = new CPaperSubstrateSpecificationObject();
-			newObjectPtr->Version_1_0 = val->Version_1_0;
+			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
-		if (const CFilmSubstrateSpecification* val = std::get_if<CFilmSubstrateSpecification>(this->Version_1_0->at(index).GetPtr())){
+		if (const CFilmSubstrateSpecification* val = std::get_if<CFilmSubstrateSpecification>(this->at(index).GetPtr())){
 			CFilmSubstrateSpecificationObject *newObjectPtr = new CFilmSubstrateSpecificationObject();
-			newObjectPtr->Version_1_0 = val->Version_1_0;
+			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
@@ -8106,24 +5343,24 @@ QVariantMap CSubstrateSpecificationDocumentObjectList::get(int row) const
 
 void CSubstrateSpecificationDocumentObjectList::append(QVariant item)
 {
-	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
+	beginInsertRows(QModelIndex(), count(), 0);
 
 	if (item.canConvert<CCardboardSubstrateSpecificationObject*>()){
 		CCardboardSubstrateSpecificationObject* val = item.value<CCardboardSubstrateSpecificationObject*>();
 		CCardboardSubstrateSpecification* newItemPtr = dynamic_cast<CCardboardSubstrateSpecification*>(val);
-		Version_1_0->append(istd::TSharedNullable<SubstrateSpecificationDocument>(*newItemPtr));
+		append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
 	}
 
 	if (item.canConvert<CPaperSubstrateSpecificationObject*>()){
 		CPaperSubstrateSpecificationObject* val = item.value<CPaperSubstrateSpecificationObject*>();
 		CPaperSubstrateSpecification* newItemPtr = dynamic_cast<CPaperSubstrateSpecification*>(val);
-		Version_1_0->append(istd::TSharedNullable<SubstrateSpecificationDocument>(*newItemPtr));
+		append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
 	}
 
 	if (item.canConvert<CFilmSubstrateSpecificationObject*>()){
 		CFilmSubstrateSpecificationObject* val = item.value<CFilmSubstrateSpecificationObject*>();
 		CFilmSubstrateSpecification* newItemPtr = dynamic_cast<CFilmSubstrateSpecification*>(val);
-		Version_1_0->append(istd::TSharedNullable<SubstrateSpecificationDocument>(*newItemPtr));
+		append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
 	}
 
 	ClearCache();
@@ -8131,9 +5368,9 @@ void CSubstrateSpecificationDocumentObjectList::append(QVariant item)
 }
 
 
-sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentObjectList* CSubstrateSpecificationDocumentObjectList::copyMe()
+sdl::V1_0::V1_0::CSubstrateSpecificationDocumentObjectList* CSubstrateSpecificationDocumentObjectList::copyMe()
 {
-	sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentObjectList* objectListPtr = new sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentObjectList();
+	sdl::V1_0::V1_0::CSubstrateSpecificationDocumentObjectList* objectListPtr = new sdl::V1_0::V1_0::CSubstrateSpecificationDocumentObjectList();
 
 	for (int i = 0; i < this->rowCount(); i++){
 		QVariant item = this->getData("item", i);
@@ -8233,7 +5470,7 @@ void CSubstrateSpecificationDocumentObjectList::removeElement(int index)
 	remove(index);
 }
 
-bool CSubstrateSpecificationDocumentObjectList::isEqualWithModel(sdl::substrate::SubstrateSpecifications::CSubstrateSpecificationDocumentObjectList* otherModelPtr)
+bool CSubstrateSpecificationDocumentObjectList::isEqualWithModel(sdl::V1_0::V1_0::CSubstrateSpecificationDocumentObjectList* otherModelPtr)
 {
 	if (otherModelPtr == nullptr){
 		return false;
@@ -8262,25 +5499,25 @@ bool CSubstrateSpecificationDocumentObjectList::isEqualWithModel(sdl::substrate:
 
 void CSubstrateSpecificationDocumentObjectList::insert(int index, QVariant item)
 {
-	if (index < 0 || index > Version_1_0->size()) return;
-	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
+	if (index < 0 || index > size()) return;
+	beginInsertRows(QModelIndex(), count(), 0);
 
 	if (item.canConvert<CCardboardSubstrateSpecificationObject*>()){
 		CCardboardSubstrateSpecificationObject* val = item.value<CCardboardSubstrateSpecificationObject*>();
 		CCardboardSubstrateSpecification* newItemPtr = dynamic_cast<CCardboardSubstrateSpecification*>(val);
-		Version_1_0->append(istd::TSharedNullable<SubstrateSpecificationDocument>(*newItemPtr));
+		append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
 	}
 
 	if (item.canConvert<CPaperSubstrateSpecificationObject*>()){
 		CPaperSubstrateSpecificationObject* val = item.value<CPaperSubstrateSpecificationObject*>();
 		CPaperSubstrateSpecification* newItemPtr = dynamic_cast<CPaperSubstrateSpecification*>(val);
-		Version_1_0->append(istd::TSharedNullable<SubstrateSpecificationDocument>(*newItemPtr));
+		append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
 	}
 
 	if (item.canConvert<CFilmSubstrateSpecificationObject*>()){
 		CFilmSubstrateSpecificationObject* val = item.value<CFilmSubstrateSpecificationObject*>();
 		CFilmSubstrateSpecification* newItemPtr = dynamic_cast<CFilmSubstrateSpecification*>(val);
-		Version_1_0->append(istd::TSharedNullable<SubstrateSpecificationDocument>(*newItemPtr));
+		append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
 	}
 
 	ClearCache();
@@ -8302,7 +5539,7 @@ void CSubstrateSpecificationDocumentObjectList::clear()
 
 QVariant CSubstrateSpecificationDocumentObjectList::getData(const QString& nameId, int index)
 {
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		QVariant retVal = GetOrCreateCachedObject(index);
 		return retVal;
 	}
@@ -8322,7 +5559,7 @@ bool CGetSubstrateSpecificationListGqlRequest::SetupGqlRequest(::imtgql::CGqlReq
 
 	// writting input arguments
 	::imtgql::CGqlParamObject inputDataObject;
-	if (!requestArguments.input.WriteToGraphQlObject(inputDataObject)){
+	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 		return false;
@@ -8347,10 +5584,10 @@ CGetSubstrateSpecificationListGqlRequest::CGetSubstrateSpecificationListGqlReque
 			if (protocolVersion == "1.0"){
 				bool isInputRead;
 				if (optRead){
-					isInputRead = m_requestedArguments.input.OptReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationListInput::PV_1_0);
+					isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationListInput::PV_1_0);
 				}
 				else {
-					isInputRead = m_requestedArguments.input.ReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationListInput::PV_1_0);
+					isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationListInput::PV_1_0);
 				}
 				m_isValid = isInputRead;
 				if (!isInputRead){
@@ -8367,10 +5604,10 @@ CGetSubstrateSpecificationListGqlRequest::CGetSubstrateSpecificationListGqlReque
 		else {
 			bool isInputRead;
 			if (optRead){
-				isInputRead = m_requestedArguments.input.OptReadFromGraphQlObject(*inputDataObjectPtr);
+				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
 			}
 			else {
-				isInputRead = m_requestedArguments.input.ReadFromGraphQlObject(*inputDataObjectPtr);
+				isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr);
 			}
 			m_isValid = isInputRead;
 			if (!isInputRead){
@@ -8443,7 +5680,7 @@ bool CGetSubstrateSpecificationGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest
 
 	// writting input arguments
 	::imtgql::CGqlParamObject inputDataObject;
-	if (!requestArguments.input.WriteToGraphQlObject(inputDataObject)){
+	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 		return false;
@@ -8468,10 +5705,10 @@ CGetSubstrateSpecificationGqlRequest::CGetSubstrateSpecificationGqlRequest(const
 			if (protocolVersion == "1.0"){
 				bool isInputRead;
 				if (optRead){
-					isInputRead = m_requestedArguments.input.OptReadFromGraphQlObject(*inputDataObjectPtr, CInputId::PV_1_0);
+					isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr, CInputId::PV_1_0);
 				}
 				else {
-					isInputRead = m_requestedArguments.input.ReadFromGraphQlObject(*inputDataObjectPtr, CInputId::PV_1_0);
+					isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr, CInputId::PV_1_0);
 				}
 				m_isValid = isInputRead;
 				if (!isInputRead){
@@ -8488,10 +5725,10 @@ CGetSubstrateSpecificationGqlRequest::CGetSubstrateSpecificationGqlRequest(const
 		else {
 			bool isInputRead;
 			if (optRead){
-				isInputRead = m_requestedArguments.input.OptReadFromGraphQlObject(*inputDataObjectPtr);
+				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
 			}
 			else {
-				isInputRead = m_requestedArguments.input.ReadFromGraphQlObject(*inputDataObjectPtr);
+				isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr);
 			}
 			m_isValid = isInputRead;
 			if (!isInputRead){
@@ -8547,7 +5784,7 @@ bool CGetOptionsListGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest& gqlReques
 
 	// writting input arguments
 	::imtgql::CGqlParamObject inputDataObject;
-	if (!requestArguments.input.WriteToGraphQlObject(inputDataObject)){
+	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 		return false;
@@ -8572,10 +5809,10 @@ CGetOptionsListGqlRequest::CGetOptionsListGqlRequest(const ::imtgql::CGqlRequest
 			if (protocolVersion == "1.0"){
 				bool isInputRead;
 				if (optRead){
-					isInputRead = m_requestedArguments.input.OptReadFromGraphQlObject(*inputDataObjectPtr, CCollectionViewParamsTest::PV_1_0);
+					isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr, CCollectionViewParamsTest::PV_1_0);
 				}
 				else {
-					isInputRead = m_requestedArguments.input.ReadFromGraphQlObject(*inputDataObjectPtr, CCollectionViewParamsTest::PV_1_0);
+					isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr, CCollectionViewParamsTest::PV_1_0);
 				}
 				m_isValid = isInputRead;
 				if (!isInputRead){
@@ -8592,10 +5829,10 @@ CGetOptionsListGqlRequest::CGetOptionsListGqlRequest(const ::imtgql::CGqlRequest
 		else {
 			bool isInputRead;
 			if (optRead){
-				isInputRead = m_requestedArguments.input.OptReadFromGraphQlObject(*inputDataObjectPtr);
+				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
 			}
 			else {
-				isInputRead = m_requestedArguments.input.ReadFromGraphQlObject(*inputDataObjectPtr);
+				isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr);
 			}
 			m_isValid = isInputRead;
 			if (!isInputRead){
@@ -8666,7 +5903,7 @@ bool CInsertSubstrateSpecificationGqlRequest::SetupGqlRequest(::imtgql::CGqlRequ
 
 	// writting input arguments
 	::imtgql::CGqlParamObject inputDataObject;
-	if (!requestArguments.input.WriteToGraphQlObject(inputDataObject)){
+	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 		return false;
@@ -8691,10 +5928,10 @@ CInsertSubstrateSpecificationGqlRequest::CInsertSubstrateSpecificationGqlRequest
 			if (protocolVersion == "1.0"){
 				bool isInputRead;
 				if (optRead){
-					isInputRead = m_requestedArguments.input.OptReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationInput::PV_1_0);
+					isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationInput::PV_1_0);
 				}
 				else {
-					isInputRead = m_requestedArguments.input.ReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationInput::PV_1_0);
+					isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationInput::PV_1_0);
 				}
 				m_isValid = isInputRead;
 				if (!isInputRead){
@@ -8711,10 +5948,10 @@ CInsertSubstrateSpecificationGqlRequest::CInsertSubstrateSpecificationGqlRequest
 		else {
 			bool isInputRead;
 			if (optRead){
-				isInputRead = m_requestedArguments.input.OptReadFromGraphQlObject(*inputDataObjectPtr);
+				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
 			}
 			else {
-				isInputRead = m_requestedArguments.input.ReadFromGraphQlObject(*inputDataObjectPtr);
+				isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr);
 			}
 			m_isValid = isInputRead;
 			if (!isInputRead){
@@ -8773,7 +6010,7 @@ bool CUpdateSubstrateSpecificationGqlRequest::SetupGqlRequest(::imtgql::CGqlRequ
 
 	// writting input arguments
 	::imtgql::CGqlParamObject inputDataObject;
-	if (!requestArguments.input.WriteToGraphQlObject(inputDataObject)){
+	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 		return false;
@@ -8798,10 +6035,10 @@ CUpdateSubstrateSpecificationGqlRequest::CUpdateSubstrateSpecificationGqlRequest
 			if (protocolVersion == "1.0"){
 				bool isInputRead;
 				if (optRead){
-					isInputRead = m_requestedArguments.input.OptReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationInput::PV_1_0);
+					isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationInput::PV_1_0);
 				}
 				else {
-					isInputRead = m_requestedArguments.input.ReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationInput::PV_1_0);
+					isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationInput::PV_1_0);
 				}
 				m_isValid = isInputRead;
 				if (!isInputRead){
@@ -8818,10 +6055,10 @@ CUpdateSubstrateSpecificationGqlRequest::CUpdateSubstrateSpecificationGqlRequest
 		else {
 			bool isInputRead;
 			if (optRead){
-				isInputRead = m_requestedArguments.input.OptReadFromGraphQlObject(*inputDataObjectPtr);
+				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
 			}
 			else {
-				isInputRead = m_requestedArguments.input.ReadFromGraphQlObject(*inputDataObjectPtr);
+				isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr);
 			}
 			m_isValid = isInputRead;
 			if (!isInputRead){
@@ -8999,7 +6236,7 @@ istd::IChangeableUniquePtr CSubstrateSpecificationCollectionControllerCompBase::
 			return nullptr;
 		}
 
-		return CreateObjectFromRepresentation(*insertSubstrateSpecificationGqlRequest.GetRequestedArguments().input.Version_1_0->item, newObjectId, errorMessage);
+		return CreateObjectFromRepresentation(*insertSubstrateSpecificationGqlRequest.GetRequestedArguments().input.item, newObjectId, errorMessage);
 	}
 
 	errorMessage = QString("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
@@ -9060,7 +6297,7 @@ I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create object iterator.
 	}
 
 	//GetSubstrateSpecificationList
-	CSubstrateSpecificationListItem::V1_0 representationObject;
+	CSubstrateSpecificationListItem representationObject;
 	const bool isRepresentationCreated = CreateRepresentationFromObject(*objectCollectionIterator, *typedSetupContext, representationObject, errorMessage);
 	if (!isRepresentationCreated){
 	I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create representation").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
@@ -9095,7 +6332,7 @@ I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create object iterator.
 			return nullptr;
 		}
 
-		imtbase::ImtBaseTypes::COptionsList replyPayload = OnGetOptionsList(getOptionsListGqlRequest, errorMessage);
+		sdl::V1_0::imtbase::COptionsList replyPayload = OnGetOptionsList(getOptionsListGqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
 			SendErrorMessage(0, QString("The derived call [OnGetOptionsList] returned an error: %1").arg(errorMessage));
 
@@ -9117,7 +6354,7 @@ I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create object iterator.
 }
 
 
-bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+bool CSubstrateSpecificationsGqlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
 	const QByteArray commandId = gqlRequest.GetCommandId();
 	if (commandId == CGetSubstrateSpecificationListGqlRequest::GetCommandId()){
@@ -9140,7 +6377,7 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 }
 
 
-::imtbase::CTreeItemModel* CGraphQlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+::imtbase::CTreeItemModel* CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	const QByteArray commandId = gqlRequest.GetCommandId();
 	istd::TDelPtr<::imtbase::CTreeItemModel> modelPtr(new ::imtbase::CTreeItemModel);
@@ -9228,7 +6465,7 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 			return nullptr;
 		}
 
-		imtbase::ImtBaseTypes::COptionsList replyPayload = OnGetOptionsList(getOptionsListGqlRequest, gqlRequest, errorMessage);
+		sdl::V1_0::imtbase::COptionsList replyPayload = OnGetOptionsList(getOptionsListGqlRequest, gqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
 			SendErrorMessage(0, QString("The derived call [OnGetOptionsList] returned an error: %1").arg(errorMessage));
 
@@ -9309,4 +6546,4 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 }
 
 
-} // namespace sdl::substrate::SubstrateSpecifications
+} // namespace sdl::V1_0::V1_0

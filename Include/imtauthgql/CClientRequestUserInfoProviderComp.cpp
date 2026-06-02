@@ -32,14 +32,14 @@ const imtbase::ICollectionInfo& CClientRequestUserInfoProviderComp::GetUserList(
 
 imtauth::IUserInfoUniquePtr CClientRequestUserInfoProviderComp::GetUser(const QByteArray& userId, const iprm::IParamsSet* /*paramsPtr*/) const
 {
-	namespace userssdl = sdl::imtauth::Users;
+	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::UserItemRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->id = userId;
+	arguments.input.emplace();
+	arguments.input->id = userId;
 
 	if (m_applicationInfoCompPtr.IsValid()){
-		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+		arguments.input->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
 
 	imtgql::CGqlRequest gqlRequest;
@@ -62,16 +62,12 @@ imtauth::IUserInfoUniquePtr CClientRequestUserInfoProviderComp::GetUser(const QB
 		return nullptr;
 	}
 
-	if (!payload.Version_1_0.HasValue()){
-		return nullptr;
-	}
-
 	imtauth::IUserInfoUniquePtr userInfoPtr = m_userFactoryCompPtr.CreateInstance();
 	if (!userInfoPtr.IsValid()){
 		return nullptr;
 	}
 
-	if (!m_userRepresentationController.FillUserInfoFromRepresentation(*payload.Version_1_0, *userInfoPtr, nullptr, userId, errorMessage)){
+	if (!m_userRepresentationController.FillUserInfoFromRepresentation(payload, *userInfoPtr, nullptr, userId, errorMessage)){
 		return nullptr;
 	}
 

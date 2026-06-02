@@ -12,21 +12,21 @@ namespace imtserverapp
 
 
 class CDocumentIdFilterRepresentationController:
-			public imtserverapp::TJsonRepresentationControllerWrap<sdl::imtbase::DocumentIdFilter::CDocumentIdFilter::V1_0>
+			public imtserverapp::TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CDocumentIdFilter>
 {
 public:
 	CDocumentIdFilterRepresentationController();
 
-	// reimplemented (imtserverapp::TJsonRepresentationControllerWrap<Filter::CDocumentIdFilter::V1_0>)
+	// reimplemented (imtserverapp::TJsonRepresentationControllerWrap<Filter::CDocumentIdFilter>)
 	virtual QByteArray GetTypeId() const override;
 	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;
 	virtual bool GetSdlRepresentationFromDataModel(
-				sdl::imtbase::DocumentIdFilter::CDocumentIdFilter::V1_0& sdlRepresentation,
+				sdl::V1_0::imtbase::CDocumentIdFilter& sdlRepresentation,
 				const istd::IChangeable& dataModel,
 				const iprm::IParamsSet* paramsPtr = nullptr) const override;
 	virtual bool GetDataModelFromSdlRepresentation(
 				istd::IChangeable& dataModel,
-				const sdl::imtbase::DocumentIdFilter::CDocumentIdFilter::V1_0& sdlRepresentation) const override;
+				const sdl::V1_0::imtbase::CDocumentIdFilter& sdlRepresentation) const override;
 };
 
 

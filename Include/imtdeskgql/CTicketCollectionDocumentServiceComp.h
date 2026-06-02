@@ -18,7 +18,7 @@
 #include <imtauth/IUserGroupInfoProvider.h>
 
 // Generated includes
-#include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/TicketCollectionDocumentService.h>
+#include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/TicketCollectionDocumentService_fwd.h>
 
 
 namespace imtdeskgql
@@ -26,11 +26,11 @@ namespace imtdeskgql
 
 
 class CTicketCollectionDocumentServiceComp: 
-			public sdl::imtdesk::TicketCollectionDocumentService::CGraphQlHandlerCompBase,
+			public sdl::V1_0::imtdesk::CTicketCollectionDocumentServiceGqlHandlerCompBase,
 			virtual public imtdoc::IDocumentServiceEventHandler
 {
 public:
-	typedef sdl::imtdesk::TicketCollectionDocumentService::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtdesk::CTicketCollectionDocumentServiceGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CTicketCollectionDocumentServiceComp)
 		I_REGISTER_INTERFACE(imtdoc::IDocumentServiceEventHandler)
@@ -47,12 +47,12 @@ public:
 	I_END_COMPONENT
 
 protected:
-	virtual sdl::imtdesk::ImtDesk::CTicketData OnGetTicketRepresentation(
-				const sdl::imtdesk::TicketCollectionDocumentService::CGetTicketRepresentationGqlRequest& getTicketRepresentationRequest,
+	virtual sdl::V1_0::imtdesk::CTicketData OnGetTicketRepresentation(
+				const sdl::V1_0::imtdesk::CGetTicketRepresentationGqlRequest& getTicketRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus OnUpdateTicketFromRepresentation(
-				const sdl::imtdesk::TicketCollectionDocumentService::CUpdateTicketFromRepresentationGqlRequest& updateTicketFromRepresentationRequest,
+	virtual sdl::V1_0::imtbase::CDocumentOperationStatus OnUpdateTicketFromRepresentation(
+				const sdl::V1_0::imtdesk::CUpdateTicketFromRepresentationGqlRequest& updateTicketFromRepresentationRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 

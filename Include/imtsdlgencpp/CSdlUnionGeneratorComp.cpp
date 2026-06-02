@@ -232,7 +232,7 @@ bool CSdlUnionGeneratorComp::ProcessEntry(
 	// FeedStream(stream, 1, false);
 
 	// FeedStreamHorizontally(stream, 1);
-	// stream << QStringLiteral("istd::TSharedNullable<std::shared_ptr<%1>> Version_1_0;").arg(sdlUnion->GetName());
+	// stream << QStringLiteral("istd::TNullableValue<std::shared_ptr<%1>> Version_1_0;").arg(sdlUnion->GetName());
 	// FeedStream(stream, 1, false);
 
 	// FeedStreamHorizontally(stream, 1);

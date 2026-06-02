@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtserverapp/CDatabaseAccessSettingsRepresentationControllerComp.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Settings.h>
 
 
 // ImtCore includes
@@ -12,11 +13,11 @@ namespace imtserverapp
 
 // public methods
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CSchedulerParam::V1_0>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CSchedulerParam>)
 
 QByteArray CDatabaseAccessSettingsRepresentationControllerComp::GetTypeId() const
 {
-	return sdl::imtbase::ImtBaseTypes::CParamTypeIds::V1_0::ParamTypeIdsFields::DatabaseAccessSettings.toUtf8();
+	return sdl::V1_0::imtbase::CParamTypeIds::ParamTypeIdsFields::DatabaseAccessSettings.toUtf8();
 }
 
 
@@ -29,7 +30,7 @@ bool CDatabaseAccessSettingsRepresentationControllerComp::IsModelSupported(const
 
 
 bool CDatabaseAccessSettingsRepresentationControllerComp::GetSdlRepresentationFromDataModel(
-			sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettings::V1_0& sdlRepresentation,
+			sdl::V1_0::imtbase::CDatabaseAccessSettings& sdlRepresentation,
 			const istd::IChangeable& dataModel,
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
@@ -65,7 +66,7 @@ bool CDatabaseAccessSettingsRepresentationControllerComp::GetSdlRepresentationFr
 
 bool CDatabaseAccessSettingsRepresentationControllerComp::GetDataModelFromSdlRepresentation(
 			istd::IChangeable& dataModel,
-			const sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettings::V1_0& sdlRepresentation) const
+			const sdl::V1_0::imtbase::CDatabaseAccessSettings& sdlRepresentation) const
 {
 	imtdb::IDatabaseLoginSettings* databaseLoginSettingsPtr = dynamic_cast<imtdb::IDatabaseLoginSettings*>(&dataModel);
 	Q_ASSERT(databaseLoginSettingsPtr != nullptr);

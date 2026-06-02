@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtserverapp/CEnableableParamRepresentationControllerComp.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Settings.h>
 
 
 // ACF includes
@@ -12,11 +13,11 @@ namespace imtserverapp
 
 // protected methods
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CEnableableParam::V1_0>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CEnableableParam>)
 
 QByteArray CEnableableParamRepresentationControllerComp::GetTypeId() const
 {
-	return sdl::imtbase::ImtBaseTypes::CParamTypeIds::V1_0::ParamTypeIdsFields::EnableableParam.toUtf8();
+	return sdl::V1_0::imtbase::CParamTypeIds::ParamTypeIdsFields::EnableableParam.toUtf8();
 }
 
 
@@ -29,7 +30,7 @@ bool CEnableableParamRepresentationControllerComp::IsModelSupported(const istd::
 
 
 bool CEnableableParamRepresentationControllerComp::GetSdlRepresentationFromDataModel(
-			sdl::imtbase::ImtBaseTypes::CEnableableParam::V1_0& sdlRepresentation,
+			sdl::V1_0::imtbase::CEnableableParam& sdlRepresentation,
 			const istd::IChangeable& dataModel,
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
@@ -48,7 +49,7 @@ bool CEnableableParamRepresentationControllerComp::GetSdlRepresentationFromDataM
 
 bool CEnableableParamRepresentationControllerComp::GetDataModelFromSdlRepresentation(
 			istd::IChangeable& dataModel,
-			const sdl::imtbase::ImtBaseTypes::CEnableableParam::V1_0& sdlRepresentation) const
+			const sdl::V1_0::imtbase::CEnableableParam& sdlRepresentation) const
 {
 	iprm::IEnableableParam* enableableParamPtr = dynamic_cast<iprm::IEnableableParam*>(&dataModel);
 	Q_ASSERT(enableableParamPtr != nullptr);

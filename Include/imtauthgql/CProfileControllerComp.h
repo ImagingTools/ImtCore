@@ -8,17 +8,18 @@
 #include <imtauth/ITenantMembership.h>
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/ITenantManager.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Profile.h>
+#include <imtsdl/TElementList.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Profile_fwd.h>
 
 
 namespace imtauthgql
 {
 
 
-class CProfileControllerComp: public sdl::imtauth::Profile::CGraphQlHandlerCompBase
+class CProfileControllerComp: public sdl::V1_0::imtauth::CProfileGqlHandlerCompBase
 {
 public:
-	typedef sdl::imtauth::Profile::CGraphQlHandlerCompBase BaseClass;
+	typedef sdl::V1_0::imtauth::CProfileGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CProfileControllerComp);
 		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection", false, "UserCollection");
@@ -29,21 +30,21 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (sdl::imtauth::Profile::CGraphQlHandlerCompBase)
-	virtual sdl::imtauth::Profile::CProfileData OnGetProfile(
-				const sdl::imtauth::Profile::CGetProfileGqlRequest& getProfileRequest,
+	// reimplemented (sdl::V1_0::imtauth::CProfileGqlHandlerCompBase)
+	virtual sdl::V1_0::imtauth::CProfileData OnGetProfile(
+				const sdl::V1_0::imtauth::CGetProfileGqlRequest& getProfileRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Profile::CSetProfileResponse OnSetProfile(
-				const sdl::imtauth::Profile::CSetProfileGqlRequest& setProfileRequest,
+	virtual sdl::V1_0::imtauth::CSetProfileResponse OnSetProfile(
+				const sdl::V1_0::imtauth::CSetProfileGqlRequest& setProfileRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Profile::CGetUserOrganizationsPayload OnGetUserOrganizations(
-				const sdl::imtauth::Profile::CGetUserOrganizationsGqlRequest& getUserOrganizationsRequest,
+	virtual sdl::V1_0::imtauth::CGetUserOrganizationsPayload OnGetUserOrganizations(
+				const sdl::V1_0::imtauth::CGetUserOrganizationsGqlRequest& getUserOrganizationsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 private:
-	imtsdl::TElementList<sdl::imtauth::Profile::CProfileTenantInfo::V1_0> CreateOrganizationList(
+	imtsdl::TElementList<sdl::V1_0::imtauth::CProfileTenantInfo> CreateOrganizationList(
 				const QByteArray& userId) const;
 	QString TenantMembershipRoleToString(const QByteArray& roleId) const;
 protected:

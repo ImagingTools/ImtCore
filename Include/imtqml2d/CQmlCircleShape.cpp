@@ -43,7 +43,7 @@ void CQmlCircleShape::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/
 	}
 }
 
-void imtqml2d::CQmlCircleShape::SetCenter(sdl::imtsdl2d::imt2d::CPoint2d newCenter)
+void imtqml2d::CQmlCircleShape::SetCenter(sdl::V1_0::imtsdl2d::CPoint2d newCenter)
 {
 	BaseClass2::SetCenter(newCenter);
 	i2d::CCircle* objectPtr = GetObjectPtr();
