@@ -146,6 +146,9 @@ QtObject {
 	// Model holding the cross-org grants for the current tenant (see
 	// crossOrgGrantsReceived for the raw payload).
 	property var crossOrgGrantsModel: null
+	// List data providers for filterable entity selectors
+	property var tenantsListDataProvider: null
+	property var tenantRelationshipsListDataProvider: null
 	function fetchCrossOrgGrants(tenantId) {}
 	function createCrossOrgGrant(sourceTenantId, targetTenantId, relationshipId, accessLevel, resourceScope, targetTeamId, description, expiresAt) {}
 	function revokeCrossOrgGrant(grantId) {}

@@ -835,6 +835,7 @@ QtObject {
 				if (!grant)
 					continue
 				root.crossOrgGrantsModel.append({
+					"id": grant.m_id || "",
 					"grantId": grant.m_id || "",
 					"sourceTenantId": grant.m_sourceTenantId || "",
 					"targetTenantId": grant.m_targetTenantId || "",
@@ -967,6 +968,7 @@ QtObject {
 				if (!contract)
 					continue
 				root.contractsModel.append({
+					"id": contract.m_id || "",
 					"contractId": contract.m_id || "",
 					"relationshipId": contract.m_relationshipId || "",
 					"sourceTenantId": contract.m_sourceTenantId || "",
@@ -1087,6 +1089,7 @@ QtObject {
 				if (!rel)
 					continue
 				root.tenantRelationshipsModel.append({
+					"id": rel.m_id || "",
 					"relationshipId": rel.m_id || "",
 					"sourceTenantId": rel.m_sourceTenantId || "",
 					"targetTenantId": rel.m_targetTenantId || "",
@@ -1282,6 +1285,7 @@ QtObject {
 				if (!req)
 					continue
 				root.connectionRequestsModel.append({
+					"id": req.m_id || "",
 					"requestId": req.m_id || "",
 					"sourceTenantId": req.m_sourceTenantId || "",
 					"targetTenantId": req.m_targetTenantId || "",
@@ -1420,6 +1424,7 @@ QtObject {
 				if (!msg)
 					continue
 				root.crossTenantMessagesModel.append({
+					"id": msg.m_id || "",
 					"messageId": msg.m_id || "",
 					"sourceTenantId": msg.m_sourceTenantId || "",
 					"targetTenantId": msg.m_targetTenantId || "",
@@ -1608,7 +1613,7 @@ QtObject {
 	}
 
 	// =========================================================================
-	// List data providers (Roles / Groups / invitable Users)
+	// List data providers (Roles / Groups / invitable Users / Tenants / TenantRelationships)
 	// =========================================================================
 
 	property FilterableSelectGqlDataProvider roleListDataProvider: FilterableSelectGqlDataProvider {
@@ -1624,6 +1629,16 @@ QtObject {
 	property FilterableSelectGqlDataProvider invitableUsersListDataProvider: FilterableSelectGqlDataProvider {
 		collectionId: "UsersForInvitation"
 		multiSelect: true
+	}
+
+	property FilterableSelectGqlDataProvider tenantsListDataProvider: FilterableSelectGqlDataProvider {
+		collectionId: "Tenants"
+		pageSize: 50
+	}
+
+	property FilterableSelectGqlDataProvider tenantRelationshipsListDataProvider: FilterableSelectGqlDataProvider {
+		collectionId: "TenantRelationships"
+		pageSize: 50
 	}
 
 	// =========================================================================

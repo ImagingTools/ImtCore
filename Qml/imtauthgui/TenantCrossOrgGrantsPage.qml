@@ -4,6 +4,8 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
+import imtcolgui 1.0
+import imtguigql 1.0
 import imtauthgui 1.0
 
 /**
@@ -11,291 +13,375 @@ import imtauthgui 1.0
  *
  * Cross-Org Grants tab of the TenantEditor.
  *
- * Lets a tenant creator/owner delegate scoped access from the current
- * (source) tenant to another (target) tenant via the ICrossOrgGrant
- * mechanism. Grants are listed, created and revoked through the abstract
- * TenantManagementApiClient contract (no direct SDL dependency here).
+ * Displays the list of grants via TenantSimpleCollectionPage and opens a
+ * dedicated create form (customEditorComponent) when the user clicks "Create".
+ * Grants are immutable once created — revocation is performed per-item in the
+ * list delegate.
  */
-ViewBase {
-	id: grantsPage
+TenantSimpleCollectionPage {
+id: grantsPage
 
-	commandsPanelVisible: false
-	contentColor: Style.baseColor
+entityName: qsTr("Grant")
+entityNamePlural: qsTr("Cross-Org Grants")
+descriptionText: qsTr("Delegate scoped access from this tenant to another tenant.")
 
-	readonly property var tenantData: grantsPage.model
-	property var stateManager: null
-	property var apiClient: null
+listModel: apiClient ? apiClient.crossOrgGrantsModel : null
 
-	readonly property bool __canManage: grantsPage.stateManager
-		&& (grantsPage.stateManager.isCreator || grantsPage.stateManager.isOwner)
+customEditorComponent: createGrantComp
 
-	// Access level options. Index maps to the SDL CrossOrgAccessLevel tokens.
-	readonly property var __accessLevelTokens: ["None", "Read", "Write", "Admin"]
+// Revocation goes through the item delegate, not through the list Remove button.
+headerButtonsComponent: headerBtnsComp
 
-	function updateGui() {
-		grantsPage.__refreshGrants()
-	}
+function updateGui() {
+if (apiClient && tenantData && tenantData.m_id)
+apiClient.fetchCrossOrgGrants(tenantData.m_id)
+}
 
-	function __refreshGrants() {
-		if (grantsPage.apiClient && grantsPage.tenantData && grantsPage.tenantData.m_id)
-			grantsPage.apiClient.fetchCrossOrgGrants(grantsPage.tenantData.m_id)
-	}
+Component.onCompleted: {
+if (apiClient && tenantData && tenantData.m_id)
+apiClient.fetchCrossOrgGrants(tenantData.m_id)
+}
 
-	function __clearForm() {
-		targetTenantInput.text = ""
-		relationshipInput.text = ""
-		resourceScopeInput.text = ""
-		descriptionInput.text = ""
-		expiresInput.text = ""
-		accessLevelInput.currentIndex = 1
-	}
+onVisibleChanged: {
+if (visible && apiClient && tenantData && tenantData.m_id)
+apiClient.fetchCrossOrgGrants(tenantData.m_id)
+}
 
-	function __createGrant() {
-		if (!grantsPage.apiClient || !grantsPage.tenantData)
-			return
-		var targetTenantId = targetTenantInput.text.trim()
-		var relationshipId = relationshipInput.text.trim()
-		if (targetTenantId === "" || relationshipId === "") {
-			ModalDialogManager.showInfoDialog(qsTr("Target tenant and relationship are required."))
-			return
-		}
-		var levelIndex = accessLevelInput.currentIndex >= 0 ? accessLevelInput.currentIndex : 1
-		var accessLevel = grantsPage.__accessLevelTokens[levelIndex]
-		grantsPage.apiClient.createCrossOrgGrant(
-			grantsPage.tenantData.m_id,
-			targetTenantId,
-			relationshipId,
-			accessLevel,
-			resourceScopeInput.text.trim(),
-			"",
-			descriptionInput.text.trim(),
-			expiresInput.text.trim())
-	}
+Connections {
+target: grantsPage.apiClient
 
-	onVisibleChanged: {
-		if (grantsPage.visible)
-			grantsPage.__refreshGrants()
-	}
+function onCrossOrgGrantCreated(grantId) {
+PopupManager.addSuccessMessage(qsTr("Cross-org grant created successfully"), true)
+grantsPage.popEditor()
+if (grantsPage.apiClient && grantsPage.tenantData && grantsPage.tenantData.m_id)
+grantsPage.apiClient.fetchCrossOrgGrants(grantsPage.tenantData.m_id)
+}
 
-	Component.onCompleted: grantsPage.__refreshGrants()
+function onCrossOrgGrantRevoked(grantId) {
+PopupManager.addSuccessMessage(qsTr("Cross-org grant revoked"), true)
+if (grantsPage.apiClient && grantsPage.tenantData && grantsPage.tenantData.m_id)
+grantsPage.apiClient.fetchCrossOrgGrants(grantsPage.tenantData.m_id)
+}
+}
 
-	Connections {
-		target: grantsPage.apiClient
+// --- Custom header: only show "+ Create Grant" (no Edit / Remove) ---
+Component {
+id: headerBtnsComp
 
-		function onCrossOrgGrantCreated(grantId) {
-			PopupManager.addSuccessMessage(qsTr("Cross-org grant created successfully"), true)
-			grantsPage.__clearForm()
-			grantsPage.__refreshGrants()
-		}
+Text {
+text: qsTr("+ Create Grant")
+font.pixelSize: Style.fontSizeM
+font.bold: true
+color: (grantsPage.stateManager && (grantsPage.stateManager.isCreator || grantsPage.stateManager.isOwner))
+   ? Style.linkColor : Style.inactiveTextColor
 
-		function onCrossOrgGrantRevoked(grantId) {
-			PopupManager.addSuccessMessage(qsTr("Cross-org grant revoked"), true)
-			grantsPage.__refreshGrants()
-		}
-	}
+MouseArea {
+anchors.fill: parent
+hoverEnabled: true
+cursorShape: Qt.PointingHandCursor
+enabled: grantsPage.stateManager && (grantsPage.stateManager.isCreator || grantsPage.stateManager.isOwner)
+onClicked: { grantsPage.openCreate() }
+}
+}
+}
 
-	CustomScrollbar {
-		id: grantsScrollbar
-		z: parent.z + 1
-		anchors.right: parent.right
-		anchors.top: grantsFlickable.top
-		anchors.bottom: grantsFlickable.bottom
-		secondSize: Style.marginM
-		targetItem: grantsFlickable
-	}
+// --- Custom list delegate ---
+delegateComponent: Component {
+Rectangle {
+id: grantDelegate
+width: parent ? parent.width : 0
+height: grantDelegateContent.height + 2 * Style.marginM
+color: Style.alternateBaseColor
+radius: Style.radiusS
+border.color: Style.borderColor
+border.width: 1
 
-	Flickable {
-		id: grantsFlickable
-		anchors.top: parent.top
-		anchors.topMargin: Style.marginXL
-		anchors.bottom: parent.bottom
-		anchors.bottomMargin: Style.marginXL
-		anchors.left: parent.left
-		anchors.leftMargin: Style.marginXL
-		anchors.right: parent.right
-		anchors.rightMargin: Style.marginXL
-		contentHeight: grantsColumn.height + 2 * Style.marginXL
-		clip: true
+readonly property var __grant: modelData
+readonly property bool __canRevoke: grantsPage.stateManager
+&& (grantsPage.stateManager.isCreator || grantsPage.stateManager.isOwner)
+&& (__grant.isActive === undefined || __grant.isActive)
 
-		Column {
-			id: grantsColumn
-			width: Style.sizeHintXXL
-			spacing: Style.marginXL
+Row {
+id: grantDelegateContent
+anchors.left: parent.left
+anchors.right: parent.right
+anchors.top: parent.top
+anchors.margins: Style.marginM
+spacing: Style.marginM
 
-			Column {
-				width: parent.width
-				spacing: Style.marginXS
+Column {
+width: parent.width - (revokeBtn.visible ? revokeBtn.width + Style.marginM : 0)
+spacing: Style.marginXS
 
-				BaseText {
-					text: qsTr("Cross-Org Grants")
-					font.pixelSize: Style.fontSizeXL
-					font.bold: true
-					color: Style.textColor
-				}
+BaseText {
+width: parent.width
+elide: Text.ElideRight
+text: qsTr("Target: %1").arg(__grant.targetTenantId || "")
+font.pixelSize: Style.fontSizeM
+color: Style.textColor
+}
 
-				BaseText {
-					width: parent.width
-					wrapMode: Text.WordWrap
-					text: qsTr("Delegate scoped access from this tenant to another tenant. Access must be explicitly granted; parent tenants do not get implicit access.")
-					font.pixelSize: Style.fontSizeS
-					color: Style.inactiveTextColor
-				}
-			}
+BaseText {
+width: parent.width
+elide: Text.ElideRight
+text: qsTr("Level: %1   Scope: %2")
+.arg(__grant.accessLevel || qsTr("None"))
+.arg((__grant.resourceScope && __grant.resourceScope !== "") ? __grant.resourceScope : qsTr("All"))
+font.pixelSize: Style.fontSizeS
+color: Style.inactiveTextColor
+}
 
-			Rectangle {
-				width: parent.width
-				height: 1
-				color: Style.borderColor
-			}
+BaseText {
+width: parent.width
+visible: __grant.relationshipId && __grant.relationshipId !== ""
+elide: Text.ElideRight
+text: qsTr("Relationship: %1").arg(__grant.relationshipId || "")
+font.pixelSize: Style.fontSizeS
+color: Style.inactiveTextColor
+}
 
-			// --- Create grant form ---
-			GroupElementView {
-				id: createGroup
-				width: parent.width
-				visible: grantsPage.__canManage
+BaseText {
+width: parent.width
+visible: __grant.description && __grant.description !== ""
+elide: Text.ElideRight
+text: __grant.description || ""
+font.pixelSize: Style.fontSizeS
+color: Style.inactiveTextColor
+}
 
-				TextInputElementView {
-					id: targetTenantInput
-					name: qsTr("Target Tenant ID")
-					placeHolderText: qsTr("Tenant receiving access")
-				}
+BaseText {
+width: parent.width
+visible: __grant.expiresAt && __grant.expiresAt !== ""
+elide: Text.ElideRight
+text: qsTr("Expires: %1").arg(__grant.expiresAt || "")
+font.pixelSize: Style.fontSizeS
+color: Style.inactiveTextColor
+}
+}
 
-				TextInputElementView {
-					id: relationshipInput
-					name: qsTr("Relationship ID")
-					placeHolderText: qsTr("Associated tenant relationship")
-				}
+Button {
+id: revokeBtn
+anchors.verticalCenter: undefined
+visible: __canRevoke
+text: qsTr("Revoke")
+onClicked: {
+if (grantsPage.apiClient)
+grantsPage.apiClient.revokeCrossOrgGrant(__grant.grantId || "")
+}
+}
+}
+}
+}
 
-				ComboBoxElementView {
-					id: accessLevelInput
-					name: qsTr("Access Level")
-					currentIndex: 1
-					model: accessLevelModel
-				}
+// --- Create grant form ---
+Component {
+id: createGrantComp
 
-				TextInputElementView {
-					id: resourceScopeInput
-					name: qsTr("Resource Scope")
-					placeHolderText: qsTr("Optional — empty grants all resources")
-				}
+Item {
+id: createGrantForm
 
-				TextInputElementView {
-					id: descriptionInput
-					name: qsTr("Description")
-					placeHolderText: qsTr("Optional description")
-				}
+property string __selectedTargetTenantId: ""
+property string __selectedTargetTenantName: ""
+property string __selectedRelationshipId: ""
+property string __selectedRelationshipName: ""
 
-				TextInputElementView {
-					id: expiresInput
-					name: qsTr("Expires At")
-					placeHolderText: qsTr("Optional ISO timestamp — empty for no expiry")
-				}
+CustomScrollbar {
+z: parent.z + 1
+anchors.right: parent.right
+anchors.top: createGrantFlickable.top
+anchors.bottom: createGrantFlickable.bottom
+secondSize: Style.marginM
+targetItem: createGrantFlickable
+}
 
-				Button {
-					text: qsTr("Create Grant")
-					onClicked: grantsPage.__createGrant()
-				}
-			}
+Flickable {
+id: createGrantFlickable
+anchors.fill: parent
+anchors.margins: Style.marginXL
+contentHeight: createGrantColumn.height + 2 * Style.marginXL
+clip: true
 
-			// --- Existing grants ---
-			BaseText {
-				text: qsTr("Active Grants")
-				font.pixelSize: Style.fontSizeL
-				font.bold: true
-				color: Style.textColor
-			}
+Column {
+id: createGrantColumn
+width: Style.sizeHintXXL
+spacing: Style.marginL
 
-			BaseText {
-				width: parent.width
-				visible: !grantsList.count
-				text: qsTr("No cross-org grants for this tenant.")
-				font.pixelSize: Style.fontSizeS
-				color: Style.inactiveTextColor
-			}
+GroupElementView {
+width: parent.width
 
-			Column {
-				id: grantsList
-				width: parent.width
-				spacing: Style.marginM
+// --- Target Tenant selector ---
+ElementView {
+name: qsTr("Target Tenant")
 
-				property int count: grantsPage.apiClient && grantsPage.apiClient.crossOrgGrantsModel
-					? grantsPage.apiClient.crossOrgGrantsModel.count
-					: 0
+controlComp: Component {
+Row {
+spacing: Style.marginM
 
-				Repeater {
-					model: grantsPage.apiClient ? grantsPage.apiClient.crossOrgGrantsModel : null
+BaseText {
+anchors.verticalCenter: parent.verticalCenter
+text: createGrantForm.__selectedTargetTenantName
+  || createGrantForm.__selectedTargetTenantId
+  || qsTr("Select tenant...")
+color: createGrantForm.__selectedTargetTenantId
+   ? Style.textColor : Style.inactiveTextColor
+font.pixelSize: Style.fontSizeM
+}
 
-					delegate: Rectangle {
-						width: grantsList.width
-						height: grantRow.height + 2 * Style.marginM
-						color: Style.alternateBaseColor
-						radius: Style.radiusS
-						border.color: Style.borderColor
-						border.width: 1
+Button {
+text: qsTr("Select")
+onClicked: {
+ModalDialogManager.openDialog(tenantSelectComp, {})
+}
+}
+}
+}
+}
 
-						Row {
-							id: grantRow
-							anchors.left: parent.left
-							anchors.right: parent.right
-							anchors.verticalCenter: parent.verticalCenter
-							anchors.leftMargin: Style.marginM
-							anchors.rightMargin: Style.marginM
-							spacing: Style.marginM
+// --- Relationship selector ---
+ElementView {
+name: qsTr("Relationship")
 
-							Column {
-								width: parent.width - revokeButton.width - Style.marginM
-								spacing: Style.marginXS
+controlComp: Component {
+Row {
+spacing: Style.marginM
 
-								BaseText {
-									width: parent.width
-									elide: Text.ElideRight
-									text: qsTr("Target: %1").arg(model.targetTenantId || "")
-									font.pixelSize: Style.fontSizeM
-									color: Style.textColor
-								}
+BaseText {
+anchors.verticalCenter: parent.verticalCenter
+text: createGrantForm.__selectedRelationshipName
+  || createGrantForm.__selectedRelationshipId
+  || qsTr("Select relationship...")
+color: createGrantForm.__selectedRelationshipId
+   ? Style.textColor : Style.inactiveTextColor
+font.pixelSize: Style.fontSizeM
+}
 
-								BaseText {
-									width: parent.width
-									elide: Text.ElideRight
-									text: qsTr("Level: %1   Scope: %2")
-										.arg(model.accessLevel || qsTr("None"))
-										.arg((model.resourceScope && model.resourceScope !== "") ? model.resourceScope : qsTr("All"))
-									font.pixelSize: Style.fontSizeS
-									color: Style.inactiveTextColor
-								}
+Button {
+text: qsTr("Select")
+onClicked: {
+ModalDialogManager.openDialog(relationshipSelectComp, {})
+}
+}
+}
+}
+}
 
-								BaseText {
-									width: parent.width
-									visible: model.description && model.description !== ""
-									elide: Text.ElideRight
-									text: model.description || ""
-									font.pixelSize: Style.fontSizeS
-									color: Style.inactiveTextColor
-								}
-							}
+// --- Access Level ---
+ComboBoxElementView {
+id: accessLevelCB
+name: qsTr("Access Level")
+model: accessLevelModel
+currentIndex: 1
+}
 
-							Button {
-								id: revokeButton
-								anchors.verticalCenter: parent.verticalCenter
-								visible: grantsPage.__canManage && (model.isActive === undefined || model.isActive)
-								text: qsTr("Revoke")
-								onClicked: {
-									if (grantsPage.apiClient)
-										grantsPage.apiClient.revokeCrossOrgGrant(model.grantId || "")
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+// --- Resource Scope ---
+TextInputElementView {
+id: resourceScopeInput
+name: qsTr("Resource Scope")
+placeHolderText: qsTr("Optional — empty grants all resources")
+}
 
-	ListModel {
-		id: accessLevelModel
-		ListElement { name: "None" }
-		ListElement { name: "Read" }
-		ListElement { name: "Write" }
-		ListElement { name: "Admin" }
-	}
+// --- Description ---
+TextInputElementView {
+id: grantDescriptionInput
+name: qsTr("Description")
+placeHolderText: qsTr("Optional description")
+}
+
+// --- Expires At ---
+DateTimePickerElementView {
+id: expiresAtPicker
+name: qsTr("Expires At")
+}
+
+// --- Actions ---
+Row {
+spacing: Style.marginM
+
+Button {
+text: qsTr("Create Grant")
+onClicked: {
+if (!createGrantForm.__selectedTargetTenantId || !createGrantForm.__selectedRelationshipId) {
+ModalDialogManager.showInfoDialog(qsTr("Target tenant and relationship are required."))
+return
+}
+var levelIndex = accessLevelCB.currentIndex >= 0 ? accessLevelCB.currentIndex : 1
+var levelTokens = ["None", "Read", "Write", "Admin"]
+var accessLevel = levelTokens[levelIndex]
+grantsPage.apiClient.createCrossOrgGrant(
+grantsPage.tenantData ? grantsPage.tenantData.m_id : "",
+createGrantForm.__selectedTargetTenantId,
+createGrantForm.__selectedRelationshipId,
+accessLevel,
+resourceScopeInput.text.trim(),
+"",
+grantDescriptionInput.text.trim(),
+expiresAtPicker.getDateAsString())
+}
+}
+
+Button {
+text: qsTr("Cancel")
+onClicked: { grantsPage.popEditor() }
+}
+}
+}
+}
+}
+
+// --- Tenant selector popup ---
+Component {
+id: tenantSelectComp
+
+FilterableSelectPopup {
+dataProvider: FilterableSelectGqlDataProvider {
+collectionId: "Tenants"
+multiSelect: false
+}
+filterPlaceholder: qsTr("Select tenant...")
+preselectedIds: createGrantForm.__selectedTargetTenantId
+? [createGrantForm.__selectedTargetTenantId] : []
+
+onItemSelected: function(itemId, index) {
+createGrantForm.__selectedTargetTenantId = itemId
+createGrantForm.__selectedTargetTenantName = dataProvider
+? dataProvider.getSelectedItemText(itemId) : ""
+}
+}
+}
+
+// --- Relationship selector popup ---
+Component {
+id: relationshipSelectComp
+
+FilterableSelectPopup {
+dataProvider: FilterableSelectGqlDataProvider {
+collectionId: "TenantRelationships"
+multiSelect: false
+}
+filterPlaceholder: qsTr("Select relationship...")
+preselectedIds: createGrantForm.__selectedRelationshipId
+? [createGrantForm.__selectedRelationshipId] : []
+
+onItemSelected: function(itemId, index) {
+createGrantForm.__selectedRelationshipId = itemId
+createGrantForm.__selectedRelationshipName = dataProvider
+? dataProvider.getSelectedItemText(itemId) : ""
+}
+}
+}
+
+// --- Access level model ---
+TreeItemModel {
+id: accessLevelModel
+Component.onCompleted: {
+var levels = ["None", "Read", "Write", "Admin"]
+for (var i = 0; i < levels.length; i++) {
+var idx = insertNewItem()
+setData("id", levels[i], idx)
+setData("name", levels[i], idx)
+}
+}
+}
+}
+}
 }

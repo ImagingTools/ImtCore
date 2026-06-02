@@ -4,6 +4,8 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
+import imtcolgui 1.0
+import imtguigql 1.0
 import imtauthgui 1.0
 
 /**
@@ -11,388 +13,361 @@ import imtauthgui 1.0
  *
  * Connections tab of the TenantEditor.
  *
- * Implements the tenant discovery / bootstrap workflow: a creator/owner can
- * send a connection request to another tenant (by external identifier),
- * generate a one-time connect code that any tenant can redeem, redeem a code
- * received out-of-band, and accept / reject / revoke pending requests. On
- * acceptance an asymmetric relationship is established between both tenants.
- * All operations go through the abstract TenantManagementApiClient contract.
+ * Displays connection requests via TenantSimpleCollectionPage. The create
+ * editor supports sending requests by identifier, generating connect codes,
+ * and redeeming received codes. Per-item actions (Accept / Reject / Revoke)
+ * appear in the list delegate.
  */
-ViewBase {
-	id: connectionsPage
+TenantSimpleCollectionPage {
+id: connectionsPage
 
-	commandsPanelVisible: false
-	contentColor: Style.baseColor
+entityName: qsTr("Connection")
+entityNamePlural: qsTr("Connections")
+descriptionText: qsTr("Discover and connect with other tenants via requests or one-time connect codes.")
 
-	readonly property var tenantData: connectionsPage.model
-	property var stateManager: null
-	property var apiClient: null
+listModel: apiClient ? apiClient.connectionRequestsModel : null
 
-	readonly property bool __canManage: connectionsPage.stateManager
-		&& (connectionsPage.stateManager.isCreator || connectionsPage.stateManager.isOwner)
+customEditorComponent: createConnectionComp
 
-	// Role options. Index maps to the SDL TenantRelationshipRole tokens.
-	readonly property var __roleTokens: ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
+headerButtonsComponent: headerBtnsComp
 
-	function updateGui() {
-		connectionsPage.__refresh()
-	}
+function updateGui() {
+if (apiClient && tenantData && tenantData.m_id)
+apiClient.fetchConnectionRequests(tenantData.m_id)
+}
 
-	function __refresh() {
-		if (connectionsPage.apiClient && connectionsPage.tenantData && connectionsPage.tenantData.m_id)
-			connectionsPage.apiClient.fetchConnectionRequests(connectionsPage.tenantData.m_id)
-	}
+Component.onCompleted: {
+if (apiClient && tenantData && tenantData.m_id)
+apiClient.fetchConnectionRequests(tenantData.m_id)
+}
 
-	function __clearForm() {
-		targetIdentifierInput.text = ""
-		messageInput.text = ""
-		expiresInput.text = ""
-		sourceRoleInput.currentIndex = 2
-		targetRoleInput.currentIndex = 2
-	}
+onVisibleChanged: {
+if (visible && apiClient && tenantData && tenantData.m_id)
+apiClient.fetchConnectionRequests(tenantData.m_id)
+}
 
-	function __createRequest() {
-		if (!connectionsPage.apiClient || !connectionsPage.tenantData)
-			return
-		var targetIdentifier = targetIdentifierInput.text.trim()
-		if (targetIdentifier === "") {
-			ModalDialogManager.showInfoDialog(qsTr("Target identifier is required."))
-			return
-		}
-		var sourceIndex = sourceRoleInput.currentIndex >= 0 ? sourceRoleInput.currentIndex : 2
-		var targetIndex = targetRoleInput.currentIndex >= 0 ? targetRoleInput.currentIndex : 2
-		connectionsPage.apiClient.createConnectionRequest(
-			connectionsPage.tenantData.m_id,
-			targetIdentifier,
-			connectionsPage.__roleTokens[sourceIndex],
-			connectionsPage.__roleTokens[targetIndex],
-			messageInput.text.trim(),
-			expiresInput.text.trim())
-	}
+Connections {
+target: connectionsPage.apiClient
 
-	function __createCode() {
-		if (!connectionsPage.apiClient || !connectionsPage.tenantData)
-			return
-		var sourceIndex = sourceRoleInput.currentIndex >= 0 ? sourceRoleInput.currentIndex : 2
-		var targetIndex = targetRoleInput.currentIndex >= 0 ? targetRoleInput.currentIndex : 2
-		connectionsPage.apiClient.createConnectCode(
-			connectionsPage.tenantData.m_id,
-			connectionsPage.__roleTokens[sourceIndex],
-			connectionsPage.__roleTokens[targetIndex],
-			messageInput.text.trim(),
-			expiresInput.text.trim())
-	}
+function onConnectionRequestCreated(requestId) {
+PopupManager.addSuccessMessage(qsTr("Connection request sent"), true)
+connectionsPage.popEditor()
+if (connectionsPage.apiClient && connectionsPage.tenantData && connectionsPage.tenantData.m_id)
+connectionsPage.apiClient.fetchConnectionRequests(connectionsPage.tenantData.m_id)
+}
 
-	function __redeemCode() {
-		if (!connectionsPage.apiClient || !connectionsPage.tenantData)
-			return
-		var code = redeemCodeInput.text.trim()
-		if (code === "") {
-			ModalDialogManager.showInfoDialog(qsTr("Connect code is required."))
-			return
-		}
-		connectionsPage.apiClient.acceptConnectCode(code, connectionsPage.tenantData.m_id)
-	}
+function onConnectCodeCreated(requestId, connectCode) {
+ModalDialogManager.showInfoDialog(qsTr("Connect code created: %1").arg(connectCode))
+connectionsPage.popEditor()
+if (connectionsPage.apiClient && connectionsPage.tenantData && connectionsPage.tenantData.m_id)
+connectionsPage.apiClient.fetchConnectionRequests(connectionsPage.tenantData.m_id)
+}
 
-	onVisibleChanged: {
-		if (connectionsPage.visible)
-			connectionsPage.__refresh()
-	}
+function onConnectionRequestAccepted(requestId) {
+PopupManager.addSuccessMessage(qsTr("Connection request accepted"), true)
+if (connectionsPage.apiClient && connectionsPage.tenantData && connectionsPage.tenantData.m_id)
+connectionsPage.apiClient.fetchConnectionRequests(connectionsPage.tenantData.m_id)
+}
 
-	Component.onCompleted: connectionsPage.__refresh()
+function onConnectionRequestRejected(requestId) {
+PopupManager.addSuccessMessage(qsTr("Connection request rejected"), true)
+if (connectionsPage.apiClient && connectionsPage.tenantData && connectionsPage.tenantData.m_id)
+connectionsPage.apiClient.fetchConnectionRequests(connectionsPage.tenantData.m_id)
+}
 
-	Connections {
-		target: connectionsPage.apiClient
+function onConnectionRequestRevoked(requestId) {
+PopupManager.addSuccessMessage(qsTr("Connection request revoked"), true)
+if (connectionsPage.apiClient && connectionsPage.tenantData && connectionsPage.tenantData.m_id)
+connectionsPage.apiClient.fetchConnectionRequests(connectionsPage.tenantData.m_id)
+}
+}
 
-		function onConnectionRequestCreated(requestId) {
-			PopupManager.addSuccessMessage(qsTr("Connection request sent"), true)
-			connectionsPage.__clearForm()
-			connectionsPage.__refresh()
-		}
+// --- Custom header ---
+Component {
+id: headerBtnsComp
 
-		function onConnectCodeCreated(requestId, connectCode) {
-			ModalDialogManager.showInfoDialog(qsTr("Connect code created: %1").arg(connectCode))
-			connectionsPage.__clearForm()
-			connectionsPage.__refresh()
-		}
+Text {
+text: qsTr("+ New Connection")
+font.pixelSize: Style.fontSizeM
+font.bold: true
+color: (connectionsPage.stateManager && (connectionsPage.stateManager.isCreator || connectionsPage.stateManager.isOwner))
+   ? Style.linkColor : Style.inactiveTextColor
 
-		function onConnectionRequestAccepted(requestId) {
-			PopupManager.addSuccessMessage(qsTr("Connection request accepted"), true)
-			redeemCodeInput.text = ""
-			connectionsPage.__refresh()
-		}
+MouseArea {
+anchors.fill: parent
+hoverEnabled: true
+cursorShape: Qt.PointingHandCursor
+enabled: connectionsPage.stateManager && (connectionsPage.stateManager.isCreator || connectionsPage.stateManager.isOwner)
+onClicked: { connectionsPage.openCreate() }
+}
+}
+}
 
-		function onConnectionRequestRejected(requestId) {
-			PopupManager.addSuccessMessage(qsTr("Connection request rejected"), true)
-			connectionsPage.__refresh()
-		}
+// --- Custom list delegate ---
+delegateComponent: Component {
+Rectangle {
+id: connDelegate
+width: parent ? parent.width : 0
+height: connDelegateContent.height + 2 * Style.marginM
+color: Style.alternateBaseColor
+radius: Style.radiusS
+border.color: Style.borderColor
+border.width: 1
 
-		function onConnectionRequestRevoked(requestId) {
-			PopupManager.addSuccessMessage(qsTr("Connection request revoked"), true)
-			connectionsPage.__refresh()
-		}
-	}
+readonly property var __req: modelData
+readonly property bool __isOutgoing: connectionsPage.tenantData
+&& __req.sourceTenantId === connectionsPage.tenantData.m_id
+readonly property bool __isPending: (__req.status || "") === "Pending"
+readonly property bool __canManage: connectionsPage.stateManager
+&& (connectionsPage.stateManager.isCreator || connectionsPage.stateManager.isOwner)
 
-	CustomScrollbar {
-		id: connectionsScrollbar
-		z: parent.z + 1
-		anchors.right: parent.right
-		anchors.top: connectionsFlickable.top
-		anchors.bottom: connectionsFlickable.bottom
-		secondSize: Style.marginM
-		targetItem: connectionsFlickable
-	}
+Column {
+id: connDelegateContent
+anchors.left: parent.left
+anchors.right: parent.right
+anchors.top: parent.top
+anchors.margins: Style.marginM
+spacing: Style.marginXS
 
-	Flickable {
-		id: connectionsFlickable
-		anchors.top: parent.top
-		anchors.topMargin: Style.marginXL
-		anchors.bottom: parent.bottom
-		anchors.bottomMargin: Style.marginXL
-		anchors.left: parent.left
-		anchors.leftMargin: Style.marginXL
-		anchors.right: parent.right
-		anchors.rightMargin: Style.marginXL
-		contentHeight: connectionsColumn.height + 2 * Style.marginXL
-		clip: true
+BaseText {
+width: parent.width
+elide: Text.ElideRight
+text: __isOutgoing
+? qsTr("To: %1").arg((__req.targetIdentifier && __req.targetIdentifier !== "")
+? __req.targetIdentifier
+: (__req.targetTenantId || qsTr("(connect code)")))
+: qsTr("From: %1").arg(__req.sourceTenantId || "")
+font.pixelSize: Style.fontSizeM
+color: Style.textColor
+}
 
-		Column {
-			id: connectionsColumn
-			width: Style.sizeHintXXL
-			spacing: Style.marginXL
+BaseText {
+width: parent.width
+elide: Text.ElideRight
+text: qsTr("Status: %1   Roles: %2 / %3")
+.arg(__req.status || qsTr("Pending"))
+.arg(__req.proposedSourceRole || qsTr("Partner"))
+.arg(__req.proposedTargetRole || qsTr("Partner"))
+font.pixelSize: Style.fontSizeS
+color: Style.inactiveTextColor
+}
 
-			Column {
-				width: parent.width
-				spacing: Style.marginXS
+BaseText {
+width: parent.width
+visible: __req.connectCode && __req.connectCode !== ""
+elide: Text.ElideRight
+text: qsTr("Connect code: %1").arg(__req.connectCode || "")
+font.pixelSize: Style.fontSizeS
+color: Style.inactiveTextColor
+}
 
-				BaseText {
-					text: qsTr("Tenant Connections")
-					font.pixelSize: Style.fontSizeXL
-					font.bold: true
-					color: Style.textColor
-				}
+BaseText {
+width: parent.width
+visible: __req.message && __req.message !== ""
+wrapMode: Text.WordWrap
+text: __req.message || ""
+font.pixelSize: Style.fontSizeS
+color: Style.inactiveTextColor
+}
 
-				BaseText {
-					width: parent.width
-					wrapMode: Text.WordWrap
-					text: qsTr("Discover and connect with other tenants. Send a connection request by identifier, share a one-time connect code, or redeem a code you received. Accepting a request establishes an asymmetric relationship between both tenants.")
-					font.pixelSize: Style.fontSizeS
-					color: Style.inactiveTextColor
-				}
-			}
+Row {
+spacing: Style.marginM
+visible: __canManage && __isPending
 
-			Rectangle {
-				width: parent.width
-				height: 1
-				color: Style.borderColor
-			}
+Button {
+visible: !__isOutgoing
+text: qsTr("Accept")
+onClicked: {
+if (connectionsPage.apiClient)
+connectionsPage.apiClient.acceptConnectionRequest(
+__req.requestId || "",
+connectionsPage.tenantData ? connectionsPage.tenantData.m_id : "")
+}
+}
 
-			// --- Create request / code form ---
-			GroupElementView {
-				id: createGroup
-				width: parent.width
-				visible: connectionsPage.__canManage
+Button {
+visible: !__isOutgoing
+text: qsTr("Reject")
+onClicked: {
+if (connectionsPage.apiClient)
+connectionsPage.apiClient.rejectConnectionRequest(__req.requestId || "")
+}
+}
 
-				TextInputElementView {
-					id: targetIdentifierInput
-					name: qsTr("Target Identifier")
-					placeHolderText: qsTr("E-mail or slug of the tenant to invite")
-				}
+Button {
+visible: __isOutgoing
+text: qsTr("Revoke")
+onClicked: {
+if (connectionsPage.apiClient)
+connectionsPage.apiClient.revokeConnectionRequest(__req.requestId || "")
+}
+}
+}
+}
+}
+}
 
-				ComboBoxElementView {
-					id: sourceRoleInput
-					name: qsTr("Proposed Source Role")
-					currentIndex: 2
-					model: roleModel
-				}
+// --- Create connection / redeem code form ---
+Component {
+id: createConnectionComp
 
-				ComboBoxElementView {
-					id: targetRoleInput
-					name: qsTr("Proposed Target Role")
-					currentIndex: 2
-					model: roleModel
-				}
+Item {
+id: createConnForm
 
-				TextInputElementView {
-					id: messageInput
-					name: qsTr("Message")
-					placeHolderText: qsTr("Optional message")
-				}
+CustomScrollbar {
+z: parent.z + 1
+anchors.right: parent.right
+anchors.top: createConnFlickable.top
+anchors.bottom: createConnFlickable.bottom
+secondSize: Style.marginM
+targetItem: createConnFlickable
+}
 
-				TextInputElementView {
-					id: expiresInput
-					name: qsTr("Expires At")
-					placeHolderText: qsTr("Optional ISO timestamp — empty for no expiry")
-				}
+Flickable {
+id: createConnFlickable
+anchors.fill: parent
+anchors.margins: Style.marginXL
+contentHeight: createConnColumn.height + 2 * Style.marginXL
+clip: true
 
-				Row {
-					spacing: Style.marginM
+Column {
+id: createConnColumn
+width: Style.sizeHintXXL
+spacing: Style.marginL
 
-					Button {
-						text: qsTr("Send Request")
-						onClicked: connectionsPage.__createRequest()
-					}
+// --- Send request / create code ---
+GroupElementView {
+width: parent.width
 
-					Button {
-						text: qsTr("Create Connect Code")
-						onClicked: connectionsPage.__createCode()
-					}
-				}
-			}
+GroupHeaderView {
+width: parent.width
+title: qsTr("Send Request or Create Connect Code")
+}
 
-			// --- Redeem code ---
-			GroupElementView {
-				id: redeemGroup
-				width: parent.width
-				visible: connectionsPage.__canManage
+TextInputElementView {
+id: targetIdentifierInput
+name: qsTr("Target Identifier")
+placeHolderText: qsTr("E-mail or slug of the tenant to invite")
+}
 
-				TextInputElementView {
-					id: redeemCodeInput
-					name: qsTr("Redeem Connect Code")
-					placeHolderText: qsTr("Paste a connect code to connect")
-				}
+ComboBoxElementView {
+id: connSourceRoleCB
+name: qsTr("Proposed Source Role")
+model: connRoleModel
+currentIndex: 2
+}
 
-				Button {
-					text: qsTr("Redeem Code")
-					onClicked: connectionsPage.__redeemCode()
-				}
-			}
+ComboBoxElementView {
+id: connTargetRoleCB
+name: qsTr("Proposed Target Role")
+model: connRoleModel
+currentIndex: 2
+}
 
-			// --- Existing requests ---
-			BaseText {
-				text: qsTr("Connection Requests")
-				font.pixelSize: Style.fontSizeL
-				font.bold: true
-				color: Style.textColor
-			}
+TextInputElementView {
+id: connMessageInput
+name: qsTr("Message")
+placeHolderText: qsTr("Optional message")
+}
 
-			BaseText {
-				width: parent.width
-				visible: !requestsList.count
-				text: qsTr("No connection requests for this tenant.")
-				font.pixelSize: Style.fontSizeS
-				color: Style.inactiveTextColor
-			}
+DateTimePickerElementView {
+id: connExpiresAtPicker
+name: qsTr("Expires At")
+}
 
-			Column {
-				id: requestsList
-				width: parent.width
-				spacing: Style.marginM
+Row {
+spacing: Style.marginM
 
-				property int count: connectionsPage.apiClient && connectionsPage.apiClient.connectionRequestsModel
-					? connectionsPage.apiClient.connectionRequestsModel.count
-					: 0
+Button {
+text: qsTr("Send Request")
+onClicked: {
+var target = targetIdentifierInput.text.trim()
+if (target === "") {
+ModalDialogManager.showInfoDialog(qsTr("Target identifier is required."))
+return
+}
+var roleTokens = ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
+var srcIdx = connSourceRoleCB.currentIndex >= 0 ? connSourceRoleCB.currentIndex : 2
+var tgtIdx = connTargetRoleCB.currentIndex >= 0 ? connTargetRoleCB.currentIndex : 2
+connectionsPage.apiClient.createConnectionRequest(
+connectionsPage.tenantData ? connectionsPage.tenantData.m_id : "",
+target,
+roleTokens[srcIdx],
+roleTokens[tgtIdx],
+connMessageInput.text.trim(),
+connExpiresAtPicker.getDateAsString())
+}
+}
 
-				Repeater {
-					model: connectionsPage.apiClient ? connectionsPage.apiClient.connectionRequestsModel : null
+Button {
+text: qsTr("Create Connect Code")
+onClicked: {
+var roleTokens = ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
+var srcIdx = connSourceRoleCB.currentIndex >= 0 ? connSourceRoleCB.currentIndex : 2
+var tgtIdx = connTargetRoleCB.currentIndex >= 0 ? connTargetRoleCB.currentIndex : 2
+connectionsPage.apiClient.createConnectCode(
+connectionsPage.tenantData ? connectionsPage.tenantData.m_id : "",
+roleTokens[srcIdx],
+roleTokens[tgtIdx],
+connMessageInput.text.trim(),
+connExpiresAtPicker.getDateAsString())
+}
+}
+}
+}
 
-					delegate: Rectangle {
-						width: requestsList.width
-						height: requestColumn.height + 2 * Style.marginM
-						color: Style.alternateBaseColor
-						radius: Style.radiusS
-						border.color: Style.borderColor
-						border.width: 1
+// --- Redeem code ---
+GroupElementView {
+width: parent.width
 
-						readonly property bool __isOutgoing: connectionsPage.tenantData
-							&& model.sourceTenantId === connectionsPage.tenantData.m_id
-						readonly property bool __isPending: (model.status || "") === "Pending"
+GroupHeaderView {
+width: parent.width
+title: qsTr("Redeem a Connect Code")
+}
 
-						Column {
-							id: requestColumn
-							anchors.left: parent.left
-							anchors.right: parent.right
-							anchors.verticalCenter: parent.verticalCenter
-							anchors.leftMargin: Style.marginM
-							anchors.rightMargin: Style.marginM
-							spacing: Style.marginXS
+TextInputElementView {
+id: redeemCodeInput
+name: qsTr("Connect Code")
+placeHolderText: qsTr("Paste a connect code to connect")
+}
 
-							BaseText {
-								width: parent.width
-								elide: Text.ElideRight
-								text: __isOutgoing
-									? qsTr("To: %1").arg((model.targetIdentifier && model.targetIdentifier !== "") ? model.targetIdentifier : (model.targetTenantId || qsTr("(connect code)")))
-									: qsTr("From: %1").arg(model.sourceTenantId || "")
-								font.pixelSize: Style.fontSizeM
-								color: Style.textColor
-							}
+Row {
+spacing: Style.marginM
 
-							BaseText {
-								width: parent.width
-								elide: Text.ElideRight
-								text: qsTr("Status: %1   Roles: %2 / %3")
-									.arg(model.status || qsTr("Pending"))
-									.arg(model.proposedSourceRole || qsTr("Partner"))
-									.arg(model.proposedTargetRole || qsTr("Partner"))
-								font.pixelSize: Style.fontSizeS
-								color: Style.inactiveTextColor
-							}
+Button {
+text: qsTr("Redeem Code")
+onClicked: {
+var code = redeemCodeInput.text.trim()
+if (code === "") {
+ModalDialogManager.showInfoDialog(qsTr("Connect code is required."))
+return
+}
+connectionsPage.apiClient.acceptConnectCode(
+code,
+connectionsPage.tenantData ? connectionsPage.tenantData.m_id : "")
+}
+}
 
-							BaseText {
-								width: parent.width
-								visible: model.connectCode && model.connectCode !== ""
-								elide: Text.ElideRight
-								text: qsTr("Connect code: %1").arg(model.connectCode || "")
-								font.pixelSize: Style.fontSizeS
-								color: Style.inactiveTextColor
-							}
+Button {
+text: qsTr("Cancel")
+onClicked: { connectionsPage.popEditor() }
+}
+}
+}
+}
+}
 
-							BaseText {
-								width: parent.width
-								visible: model.message && model.message !== ""
-								wrapMode: Text.WordWrap
-								text: model.message || ""
-								font.pixelSize: Style.fontSizeS
-								color: Style.inactiveTextColor
-							}
-
-							Row {
-								spacing: Style.marginM
-								visible: connectionsPage.__canManage && __isPending
-
-								Button {
-									visible: !__isOutgoing
-									text: qsTr("Accept")
-									onClicked: {
-										if (connectionsPage.apiClient)
-											connectionsPage.apiClient.acceptConnectionRequest(
-												model.requestId || "",
-												connectionsPage.tenantData ? connectionsPage.tenantData.m_id : "")
-									}
-								}
-
-								Button {
-									visible: !__isOutgoing
-									text: qsTr("Reject")
-									onClicked: {
-										if (connectionsPage.apiClient)
-											connectionsPage.apiClient.rejectConnectionRequest(model.requestId || "")
-									}
-								}
-
-								Button {
-									visible: __isOutgoing
-									text: qsTr("Revoke")
-									onClicked: {
-										if (connectionsPage.apiClient)
-											connectionsPage.apiClient.revokeConnectionRequest(model.requestId || "")
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	ListModel {
-		id: roleModel
-		ListElement { name: "Parent" }
-		ListElement { name: "Child" }
-		ListElement { name: "Partner" }
-		ListElement { name: "Supplier" }
-		ListElement { name: "Customer" }
-		ListElement { name: "Affiliate" }
-	}
+TreeItemModel {
+id: connRoleModel
+Component.onCompleted: {
+var roles = ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
+for (var i = 0; i < roles.length; i++) {
+var idx = insertNewItem()
+setData("id", roles[i], idx)
+setData("name", roles[i], idx)
+}
+}
+}
+}
+}
 }

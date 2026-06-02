@@ -4,6 +4,8 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
+import imtcolgui 1.0
+import imtguigql 1.0
 import imtauthgui 1.0
 
 /**
@@ -11,318 +13,372 @@ import imtauthgui 1.0
  *
  * Cooperation Contracts tab of the TenantEditor.
  *
- * A contract is the bilateral terms/governance layer that sits between a
- * tenant relationship (identity/trust) and the concrete cross-org grants.
- * It references a relationship (mandatory) and has its own lifecycle
- * (Draft/Active/Expired/Terminated/Renewed). Contracts are listed, created,
- * status-updated and terminated through the abstract TenantManagementApiClient
- * contract (no direct SDL dependency here).
+ * Displays contracts via TenantSimpleCollectionPage and opens a dedicated
+ * create form. Status changes (Activate / Terminate) are per-item in the
+ * list delegate.
  */
-ViewBase {
-	id: contractsPage
+TenantSimpleCollectionPage {
+id: contractsPage
 
-	commandsPanelVisible: false
-	contentColor: Style.baseColor
+entityName: qsTr("Contract")
+entityNamePlural: qsTr("Cooperation Contracts")
+descriptionText: qsTr("Manage bilateral cooperation agreements with partner tenants.")
 
-	readonly property var tenantData: contractsPage.model
-	property var stateManager: null
-	property var apiClient: null
+listModel: apiClient ? apiClient.contractsModel : null
 
-	readonly property bool __canManage: contractsPage.stateManager
-		&& (contractsPage.stateManager.isCreator || contractsPage.stateManager.isOwner)
+customEditorComponent: createContractComp
 
-	// Status options. Index maps to the SDL ContractStatus tokens.
-	readonly property var __statusTokens: ["Draft", "Active", "Expired", "Terminated", "Renewed"]
+headerButtonsComponent: headerBtnsComp
 
-	function updateGui() {
-		contractsPage.__refreshContracts()
-	}
+function updateGui() {
+if (apiClient && tenantData && tenantData.m_id)
+apiClient.fetchContracts(tenantData.m_id)
+}
 
-	function __refreshContracts() {
-		if (contractsPage.apiClient && contractsPage.tenantData && contractsPage.tenantData.m_id)
-			contractsPage.apiClient.fetchContracts(contractsPage.tenantData.m_id)
-	}
+Component.onCompleted: {
+if (apiClient && tenantData && tenantData.m_id)
+apiClient.fetchContracts(tenantData.m_id)
+}
 
-	function __clearForm() {
-		relationshipInput.text = ""
-		targetTenantInput.text = ""
-		scopeInput.text = ""
-		validFromInput.text = ""
-		validUntilInput.text = ""
-		descriptionInput.text = ""
-		termsInput.text = ""
-	}
+onVisibleChanged: {
+if (visible && apiClient && tenantData && tenantData.m_id)
+apiClient.fetchContracts(tenantData.m_id)
+}
 
-	function __createContract() {
-		if (!contractsPage.apiClient || !contractsPage.tenantData)
-			return
-		var relationshipId = relationshipInput.text.trim()
-		var targetTenantId = targetTenantInput.text.trim()
-		if (relationshipId === "" || targetTenantId === "") {
-			ModalDialogManager.showInfoDialog(qsTr("Relationship and target tenant are required."))
-			return
-		}
-		contractsPage.apiClient.createContract(
-			relationshipId,
-			contractsPage.tenantData.m_id,
-			targetTenantId,
-			scopeInput.text.trim(),
-			validFromInput.text.trim(),
-			validUntilInput.text.trim(),
-			descriptionInput.text.trim(),
-			termsInput.text.trim())
-	}
+Connections {
+target: contractsPage.apiClient
 
-	onVisibleChanged: {
-		if (contractsPage.visible)
-			contractsPage.__refreshContracts()
-	}
+function onContractCreated(contractId) {
+PopupManager.addSuccessMessage(qsTr("Contract created successfully"), true)
+contractsPage.popEditor()
+if (contractsPage.apiClient && contractsPage.tenantData && contractsPage.tenantData.m_id)
+contractsPage.apiClient.fetchContracts(contractsPage.tenantData.m_id)
+}
 
-	Component.onCompleted: contractsPage.__refreshContracts()
+function onContractStatusUpdated(contractId) {
+PopupManager.addSuccessMessage(qsTr("Contract status updated"), true)
+if (contractsPage.apiClient && contractsPage.tenantData && contractsPage.tenantData.m_id)
+contractsPage.apiClient.fetchContracts(contractsPage.tenantData.m_id)
+}
 
-	Connections {
-		target: contractsPage.apiClient
+function onContractTerminated(contractId) {
+PopupManager.addSuccessMessage(qsTr("Contract terminated"), true)
+if (contractsPage.apiClient && contractsPage.tenantData && contractsPage.tenantData.m_id)
+contractsPage.apiClient.fetchContracts(contractsPage.tenantData.m_id)
+}
+}
 
-		function onContractCreated(contractId) {
-			PopupManager.addSuccessMessage(qsTr("Contract created successfully"), true)
-			contractsPage.__clearForm()
-			contractsPage.__refreshContracts()
-		}
+// --- Custom header ---
+Component {
+id: headerBtnsComp
 
-		function onContractStatusUpdated(contractId) {
-			PopupManager.addSuccessMessage(qsTr("Contract status updated"), true)
-			contractsPage.__refreshContracts()
-		}
+Text {
+text: qsTr("+ Create Contract")
+font.pixelSize: Style.fontSizeM
+font.bold: true
+color: (contractsPage.stateManager && (contractsPage.stateManager.isCreator || contractsPage.stateManager.isOwner))
+   ? Style.linkColor : Style.inactiveTextColor
 
-		function onContractTerminated(contractId) {
-			PopupManager.addSuccessMessage(qsTr("Contract terminated"), true)
-			contractsPage.__refreshContracts()
-		}
-	}
+MouseArea {
+anchors.fill: parent
+hoverEnabled: true
+cursorShape: Qt.PointingHandCursor
+enabled: contractsPage.stateManager && (contractsPage.stateManager.isCreator || contractsPage.stateManager.isOwner)
+onClicked: { contractsPage.openCreate() }
+}
+}
+}
 
-	CustomScrollbar {
-		id: contractsScrollbar
-		z: parent.z + 1
-		anchors.right: parent.right
-		anchors.top: contractsFlickable.top
-		anchors.bottom: contractsFlickable.bottom
-		secondSize: Style.marginM
-		targetItem: contractsFlickable
-	}
+// --- Custom list delegate ---
+delegateComponent: Component {
+Rectangle {
+id: contractDelegate
+width: parent ? parent.width : 0
+height: contractDelegateContent.height + 2 * Style.marginM
+color: Style.alternateBaseColor
+radius: Style.radiusS
+border.color: Style.borderColor
+border.width: 1
 
-	Flickable {
-		id: contractsFlickable
-		anchors.top: parent.top
-		anchors.topMargin: Style.marginXL
-		anchors.bottom: parent.bottom
-		anchors.bottomMargin: Style.marginXL
-		anchors.left: parent.left
-		anchors.leftMargin: Style.marginXL
-		anchors.right: parent.right
-		anchors.rightMargin: Style.marginXL
-		contentHeight: contractsColumn.height + 2 * Style.marginXL
-		clip: true
+readonly property var __contract: modelData
+readonly property bool __canManage: contractsPage.stateManager
+&& (contractsPage.stateManager.isCreator || contractsPage.stateManager.isOwner)
 
-		Column {
-			id: contractsColumn
-			width: Style.sizeHintXXL
-			spacing: Style.marginXL
+Row {
+id: contractDelegateContent
+anchors.left: parent.left
+anchors.right: parent.right
+anchors.top: parent.top
+anchors.margins: Style.marginM
+spacing: Style.marginM
 
-			Column {
-				width: parent.width
-				spacing: Style.marginXS
+Column {
+width: parent.width - (contractActions.visible ? contractActions.width + Style.marginM : 0)
+spacing: Style.marginXS
 
-				BaseText {
-					text: qsTr("Cooperation Contracts")
-					font.pixelSize: Style.fontSizeXL
-					font.bold: true
-					color: Style.textColor
-				}
+BaseText {
+width: parent.width
+elide: Text.ElideRight
+text: qsTr("Target: %1").arg(__contract.targetTenantId || "")
+font.pixelSize: Style.fontSizeM
+color: Style.textColor
+}
 
-				BaseText {
-					width: parent.width
-					wrapMode: Text.WordWrap
-					text: qsTr("A contract captures the agreed terms of a cooperation between two tenants. It references a tenant relationship and governs the cross-org grants issued under it.")
-					font.pixelSize: Style.fontSizeS
-					color: Style.inactiveTextColor
-				}
-			}
+BaseText {
+width: parent.width
+elide: Text.ElideRight
+text: qsTr("Status: %1   Scope: %2")
+.arg(__contract.status || qsTr("Draft"))
+.arg((__contract.scope && __contract.scope !== "") ? __contract.scope : qsTr("All"))
+font.pixelSize: Style.fontSizeS
+color: Style.inactiveTextColor
+}
 
-			Rectangle {
-				width: parent.width
-				height: 1
-				color: Style.borderColor
-			}
+BaseText {
+width: parent.width
+visible: (__contract.validFrom && __contract.validFrom !== "")
+     || (__contract.validUntil && __contract.validUntil !== "")
+elide: Text.ElideRight
+text: qsTr("Valid: %1 – %2")
+.arg((__contract.validFrom && __contract.validFrom !== "") ? __contract.validFrom : qsTr("now"))
+.arg((__contract.validUntil && __contract.validUntil !== "") ? __contract.validUntil : qsTr("open"))
+font.pixelSize: Style.fontSizeS
+color: Style.inactiveTextColor
+}
 
-			// --- Create contract form ---
-			GroupElementView {
-				id: createGroup
-				width: parent.width
-				visible: contractsPage.__canManage
+BaseText {
+width: parent.width
+visible: __contract.description && __contract.description !== ""
+elide: Text.ElideRight
+text: __contract.description || ""
+font.pixelSize: Style.fontSizeS
+color: Style.inactiveTextColor
+}
+}
 
-				TextInputElementView {
-					id: relationshipInput
-					name: qsTr("Relationship ID")
-					placeHolderText: qsTr("Associated tenant relationship")
-				}
+Column {
+id: contractActions
+visible: __canManage
+spacing: Style.marginXS
 
-				TextInputElementView {
-					id: targetTenantInput
-					name: qsTr("Target Tenant ID")
-					placeHolderText: qsTr("Counterparty tenant")
-				}
+Button {
+visible: __contract.status === "Draft"
+text: qsTr("Activate")
+onClicked: {
+if (contractsPage.apiClient)
+contractsPage.apiClient.updateContractStatus(__contract.contractId || "", "Active")
+}
+}
 
-				TextInputElementView {
-					id: scopeInput
-					name: qsTr("Scope")
-					placeHolderText: qsTr("Optional — agreed scope of cooperation")
-				}
+Button {
+visible: __contract.status !== "Terminated"
+text: qsTr("Terminate")
+onClicked: {
+if (contractsPage.apiClient)
+contractsPage.apiClient.terminateContract(__contract.contractId || "")
+}
+}
+}
+}
+}
+}
 
-				TextInputElementView {
-					id: validFromInput
-					name: qsTr("Valid From")
-					placeHolderText: qsTr("Optional ISO timestamp")
-				}
+// --- Create contract form ---
+Component {
+id: createContractComp
 
-				TextInputElementView {
-					id: validUntilInput
-					name: qsTr("Valid Until")
-					placeHolderText: qsTr("Optional ISO timestamp — empty for open-ended")
-				}
+Item {
+id: createContractForm
 
-				TextInputElementView {
-					id: descriptionInput
-					name: qsTr("Description")
-					placeHolderText: qsTr("Optional description")
-				}
+property string __selectedRelationshipId: ""
+property string __selectedRelationshipName: ""
+property string __selectedTargetTenantId: ""
+property string __selectedTargetTenantName: ""
 
-				TextInputElementView {
-					id: termsInput
-					name: qsTr("Terms")
-					placeHolderText: qsTr("Optional free-form terms metadata")
-				}
+CustomScrollbar {
+z: parent.z + 1
+anchors.right: parent.right
+anchors.top: createContractFlickable.top
+anchors.bottom: createContractFlickable.bottom
+secondSize: Style.marginM
+targetItem: createContractFlickable
+}
 
-				Button {
-					text: qsTr("Create Contract")
-					onClicked: contractsPage.__createContract()
-				}
-			}
+Flickable {
+id: createContractFlickable
+anchors.fill: parent
+anchors.margins: Style.marginXL
+contentHeight: createContractColumn.height + 2 * Style.marginXL
+clip: true
 
-			// --- Existing contracts ---
-			BaseText {
-				text: qsTr("Contracts")
-				font.pixelSize: Style.fontSizeL
-				font.bold: true
-				color: Style.textColor
-			}
+Column {
+id: createContractColumn
+width: Style.sizeHintXXL
+spacing: Style.marginL
 
-			BaseText {
-				width: parent.width
-				visible: !contractsList.count
-				text: qsTr("No contracts for this tenant.")
-				font.pixelSize: Style.fontSizeS
-				color: Style.inactiveTextColor
-			}
+GroupElementView {
+width: parent.width
 
-			Column {
-				id: contractsList
-				width: parent.width
-				spacing: Style.marginM
+// --- Relationship selector ---
+ElementView {
+name: qsTr("Relationship")
 
-				property int count: contractsPage.apiClient && contractsPage.apiClient.contractsModel
-					? contractsPage.apiClient.contractsModel.count
-					: 0
+controlComp: Component {
+Row {
+spacing: Style.marginM
 
-				Repeater {
-					model: contractsPage.apiClient ? contractsPage.apiClient.contractsModel : null
+BaseText {
+anchors.verticalCenter: parent.verticalCenter
+text: createContractForm.__selectedRelationshipName
+  || createContractForm.__selectedRelationshipId
+  || qsTr("Select relationship...")
+color: createContractForm.__selectedRelationshipId
+   ? Style.textColor : Style.inactiveTextColor
+font.pixelSize: Style.fontSizeM
+}
 
-					delegate: Rectangle {
-						width: contractsList.width
-						height: contractColumn.height + 2 * Style.marginM
-						color: Style.alternateBaseColor
-						radius: Style.radiusS
-						border.color: Style.borderColor
-						border.width: 1
+Button {
+text: qsTr("Select")
+onClicked: {
+ModalDialogManager.openDialog(relationshipSelectComp, {})
+}
+}
+}
+}
+}
 
-						Row {
-							anchors.left: parent.left
-							anchors.right: parent.right
-							anchors.verticalCenter: parent.verticalCenter
-							anchors.leftMargin: Style.marginM
-							anchors.rightMargin: Style.marginM
-							spacing: Style.marginM
+// --- Target Tenant selector ---
+ElementView {
+name: qsTr("Counterparty Tenant")
 
-							Column {
-								id: contractColumn
-								width: parent.width - contractActions.width - Style.marginM
-								spacing: Style.marginXS
+controlComp: Component {
+Row {
+spacing: Style.marginM
 
-								BaseText {
-									width: parent.width
-									elide: Text.ElideRight
-									text: qsTr("Target: %1").arg(model.targetTenantId || "")
-									font.pixelSize: Style.fontSizeM
-									color: Style.textColor
-								}
+BaseText {
+anchors.verticalCenter: parent.verticalCenter
+text: createContractForm.__selectedTargetTenantName
+  || createContractForm.__selectedTargetTenantId
+  || qsTr("Select tenant...")
+color: createContractForm.__selectedTargetTenantId
+   ? Style.textColor : Style.inactiveTextColor
+font.pixelSize: Style.fontSizeM
+}
 
-								BaseText {
-									width: parent.width
-									elide: Text.ElideRight
-									text: qsTr("Status: %1   Scope: %2")
-										.arg(model.status || qsTr("Draft"))
-										.arg((model.scope && model.scope !== "") ? model.scope : qsTr("All"))
-									font.pixelSize: Style.fontSizeS
-									color: Style.inactiveTextColor
-								}
+Button {
+text: qsTr("Select")
+onClicked: {
+ModalDialogManager.openDialog(tenantSelectComp, {})
+}
+}
+}
+}
+}
 
-								BaseText {
-									width: parent.width
-									visible: (model.validFrom && model.validFrom !== "") || (model.validUntil && model.validUntil !== "")
-									elide: Text.ElideRight
-									text: qsTr("Valid: %1 – %2")
-										.arg((model.validFrom && model.validFrom !== "") ? model.validFrom : qsTr("now"))
-										.arg((model.validUntil && model.validUntil !== "") ? model.validUntil : qsTr("open"))
-									font.pixelSize: Style.fontSizeS
-									color: Style.inactiveTextColor
-								}
+// --- Scope ---
+TextInputElementView {
+id: contractScopeInput
+name: qsTr("Scope")
+placeHolderText: qsTr("Optional — agreed scope of cooperation")
+}
 
-								BaseText {
-									width: parent.width
-									visible: model.description && model.description !== ""
-									elide: Text.ElideRight
-									text: model.description || ""
-									font.pixelSize: Style.fontSizeS
-									color: Style.inactiveTextColor
-								}
-							}
+// --- Valid From ---
+DateTimePickerElementView {
+id: validFromPicker
+name: qsTr("Valid From")
+}
 
-							Column {
-								id: contractActions
-								anchors.verticalCenter: parent.verticalCenter
-								spacing: Style.marginXS
+// --- Valid Until ---
+DateTimePickerElementView {
+id: validUntilPicker
+name: qsTr("Valid Until")
+}
 
-								Button {
-									visible: contractsPage.__canManage && model.status === "Draft"
-									text: qsTr("Activate")
-									onClicked: {
-										if (contractsPage.apiClient)
-											contractsPage.apiClient.updateContractStatus(model.contractId || "", "Active")
-									}
-								}
+// --- Description ---
+TextInputElementView {
+id: contractDescriptionInput
+name: qsTr("Description")
+placeHolderText: qsTr("Optional description")
+}
 
-								Button {
-									visible: contractsPage.__canManage && model.status !== "Terminated"
-									text: qsTr("Terminate")
-									onClicked: {
-										if (contractsPage.apiClient)
-											contractsPage.apiClient.terminateContract(model.contractId || "")
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+// --- Terms ---
+TextInputElementView {
+id: contractTermsInput
+name: qsTr("Terms")
+placeHolderText: qsTr("Optional free-form terms metadata")
+}
+
+// --- Actions ---
+Row {
+spacing: Style.marginM
+
+Button {
+text: qsTr("Create Contract")
+onClicked: {
+if (!createContractForm.__selectedRelationshipId || !createContractForm.__selectedTargetTenantId) {
+ModalDialogManager.showInfoDialog(qsTr("Relationship and counterparty tenant are required."))
+return
+}
+contractsPage.apiClient.createContract(
+createContractForm.__selectedRelationshipId,
+contractsPage.tenantData ? contractsPage.tenantData.m_id : "",
+createContractForm.__selectedTargetTenantId,
+contractScopeInput.text.trim(),
+validFromPicker.getDateAsString(),
+validUntilPicker.getDateAsString(),
+contractDescriptionInput.text.trim(),
+contractTermsInput.text.trim())
+}
+}
+
+Button {
+text: qsTr("Cancel")
+onClicked: { contractsPage.popEditor() }
+}
+}
+}
+}
+}
+
+Component {
+id: tenantSelectComp
+
+FilterableSelectPopup {
+dataProvider: FilterableSelectGqlDataProvider {
+collectionId: "Tenants"
+multiSelect: false
+}
+filterPlaceholder: qsTr("Select tenant...")
+preselectedIds: createContractForm.__selectedTargetTenantId
+? [createContractForm.__selectedTargetTenantId] : []
+
+onItemSelected: function(itemId, index) {
+createContractForm.__selectedTargetTenantId = itemId
+createContractForm.__selectedTargetTenantName = dataProvider
+? dataProvider.getSelectedItemText(itemId) : ""
+}
+}
+}
+
+Component {
+id: relationshipSelectComp
+
+FilterableSelectPopup {
+dataProvider: FilterableSelectGqlDataProvider {
+collectionId: "TenantRelationships"
+multiSelect: false
+}
+filterPlaceholder: qsTr("Select relationship...")
+preselectedIds: createContractForm.__selectedRelationshipId
+? [createContractForm.__selectedRelationshipId] : []
+
+onItemSelected: function(itemId, index) {
+createContractForm.__selectedRelationshipId = itemId
+createContractForm.__selectedRelationshipName = dataProvider
+? dataProvider.getSelectedItemText(itemId) : ""
+}
+}
+}
+}
+}
 }

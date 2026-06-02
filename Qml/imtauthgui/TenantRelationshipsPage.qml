@@ -4,6 +4,8 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
+import imtcolgui 1.0
+import imtguigql 1.0
 import imtauthgui 1.0
 
 /**
@@ -11,312 +13,324 @@ import imtauthgui 1.0
  *
  * Relationships tab of the TenantEditor.
  *
- * Lets a tenant creator/owner manage asymmetric relationships between the
- * current (source) tenant and other tenants. Each relationship carries a
- * distinct role for the source and the target side, an optional resource
- * scope and a validity window. Relationships are listed, created and removed
- * through the abstract TenantManagementApiClient contract.
+ * Displays tenant relationships via TenantSimpleCollectionPage with a
+ * dedicated create form. Removal is done per-item in the list delegate.
  */
-ViewBase {
-	id: relationshipsPage
+TenantSimpleCollectionPage {
+id: relationshipsPage
 
-	commandsPanelVisible: false
-	contentColor: Style.baseColor
+entityName: qsTr("Relationship")
+entityNamePlural: qsTr("Tenant Relationships")
+descriptionText: qsTr("Define asymmetric relationships between this tenant and others.")
 
-	readonly property var tenantData: relationshipsPage.model
-	property var stateManager: null
-	property var apiClient: null
+listModel: apiClient ? apiClient.tenantRelationshipsModel : null
 
-	readonly property bool __canManage: relationshipsPage.stateManager
-		&& (relationshipsPage.stateManager.isCreator || relationshipsPage.stateManager.isOwner)
+customEditorComponent: createRelationshipComp
 
-	// Role options. Index maps to the SDL TenantRelationshipRole tokens.
-	readonly property var __roleTokens: ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
+headerButtonsComponent: headerBtnsComp
 
-	function updateGui() {
-		relationshipsPage.__refresh()
-	}
+function updateGui() {
+if (apiClient && tenantData && tenantData.m_id)
+apiClient.fetchTenantRelationships(tenantData.m_id)
+}
 
-	function __refresh() {
-		if (relationshipsPage.apiClient && relationshipsPage.tenantData && relationshipsPage.tenantData.m_id)
-			relationshipsPage.apiClient.fetchTenantRelationships(relationshipsPage.tenantData.m_id)
-	}
+Component.onCompleted: {
+if (apiClient && tenantData && tenantData.m_id)
+apiClient.fetchTenantRelationships(tenantData.m_id)
+}
 
-	function __clearForm() {
-		targetTenantInput.text = ""
-		scopeInput.text = ""
-		validFromInput.text = ""
-		validUntilInput.text = ""
-		descriptionInput.text = ""
-		sourceRoleInput.currentIndex = 2
-		targetRoleInput.currentIndex = 2
-	}
+onVisibleChanged: {
+if (visible && apiClient && tenantData && tenantData.m_id)
+apiClient.fetchTenantRelationships(tenantData.m_id)
+}
 
-	function __createRelationship() {
-		if (!relationshipsPage.apiClient || !relationshipsPage.tenantData)
-			return
-		var targetTenantId = targetTenantInput.text.trim()
-		if (targetTenantId === "") {
-			ModalDialogManager.showInfoDialog(qsTr("Target tenant is required."))
-			return
-		}
-		var sourceIndex = sourceRoleInput.currentIndex >= 0 ? sourceRoleInput.currentIndex : 2
-		var targetIndex = targetRoleInput.currentIndex >= 0 ? targetRoleInput.currentIndex : 2
-		relationshipsPage.apiClient.addTenantRelationship(
-			relationshipsPage.tenantData.m_id,
-			targetTenantId,
-			relationshipsPage.__roleTokens[sourceIndex],
-			relationshipsPage.__roleTokens[targetIndex],
-			scopeInput.text.trim(),
-			validFromInput.text.trim(),
-			validUntilInput.text.trim(),
-			descriptionInput.text.trim())
-	}
+Connections {
+target: relationshipsPage.apiClient
 
-	onVisibleChanged: {
-		if (relationshipsPage.visible)
-			relationshipsPage.__refresh()
-	}
+function onTenantRelationshipAdded(relationshipId) {
+PopupManager.addSuccessMessage(qsTr("Relationship created successfully"), true)
+relationshipsPage.popEditor()
+if (relationshipsPage.apiClient && relationshipsPage.tenantData && relationshipsPage.tenantData.m_id)
+relationshipsPage.apiClient.fetchTenantRelationships(relationshipsPage.tenantData.m_id)
+}
 
-	Component.onCompleted: relationshipsPage.__refresh()
+function onTenantRelationshipRemoved(relationshipId) {
+PopupManager.addSuccessMessage(qsTr("Relationship removed"), true)
+if (relationshipsPage.apiClient && relationshipsPage.tenantData && relationshipsPage.tenantData.m_id)
+relationshipsPage.apiClient.fetchTenantRelationships(relationshipsPage.tenantData.m_id)
+}
+}
 
-	Connections {
-		target: relationshipsPage.apiClient
+// --- Custom header ---
+Component {
+id: headerBtnsComp
 
-		function onTenantRelationshipAdded(relationshipId) {
-			PopupManager.addSuccessMessage(qsTr("Relationship created successfully"), true)
-			relationshipsPage.__clearForm()
-			relationshipsPage.__refresh()
-		}
+Text {
+text: qsTr("+ Create Relationship")
+font.pixelSize: Style.fontSizeM
+font.bold: true
+color: (relationshipsPage.stateManager && (relationshipsPage.stateManager.isCreator || relationshipsPage.stateManager.isOwner))
+   ? Style.linkColor : Style.inactiveTextColor
 
-		function onTenantRelationshipRemoved(relationshipId) {
-			PopupManager.addSuccessMessage(qsTr("Relationship removed"), true)
-			relationshipsPage.__refresh()
-		}
-	}
+MouseArea {
+anchors.fill: parent
+hoverEnabled: true
+cursorShape: Qt.PointingHandCursor
+enabled: relationshipsPage.stateManager && (relationshipsPage.stateManager.isCreator || relationshipsPage.stateManager.isOwner)
+onClicked: { relationshipsPage.openCreate() }
+}
+}
+}
 
-	CustomScrollbar {
-		id: relationshipsScrollbar
-		z: parent.z + 1
-		anchors.right: parent.right
-		anchors.top: relationshipsFlickable.top
-		anchors.bottom: relationshipsFlickable.bottom
-		secondSize: Style.marginM
-		targetItem: relationshipsFlickable
-	}
+// --- Custom list delegate ---
+delegateComponent: Component {
+Rectangle {
+id: relDelegate
+width: parent ? parent.width : 0
+height: relDelegateContent.height + 2 * Style.marginM
+color: Style.alternateBaseColor
+radius: Style.radiusS
+border.color: Style.borderColor
+border.width: 1
 
-	Flickable {
-		id: relationshipsFlickable
-		anchors.top: parent.top
-		anchors.topMargin: Style.marginXL
-		anchors.bottom: parent.bottom
-		anchors.bottomMargin: Style.marginXL
-		anchors.left: parent.left
-		anchors.leftMargin: Style.marginXL
-		anchors.right: parent.right
-		anchors.rightMargin: Style.marginXL
-		contentHeight: relationshipsColumn.height + 2 * Style.marginXL
-		clip: true
+readonly property var __rel: modelData
+readonly property bool __canManage: relationshipsPage.stateManager
+&& (relationshipsPage.stateManager.isCreator || relationshipsPage.stateManager.isOwner)
 
-		Column {
-			id: relationshipsColumn
-			width: Style.sizeHintXXL
-			spacing: Style.marginXL
+Row {
+id: relDelegateContent
+anchors.left: parent.left
+anchors.right: parent.right
+anchors.top: parent.top
+anchors.margins: Style.marginM
+spacing: Style.marginM
 
-			Column {
-				width: parent.width
-				spacing: Style.marginXS
+Column {
+width: parent.width - (removeRelBtn.visible ? removeRelBtn.width + Style.marginM : 0)
+spacing: Style.marginXS
 
-				BaseText {
-					text: qsTr("Tenant Relationships")
-					font.pixelSize: Style.fontSizeXL
-					font.bold: true
-					color: Style.textColor
-				}
+BaseText {
+width: parent.width
+elide: Text.ElideRight
+text: qsTr("Target: %1").arg(__rel.targetTenantId || "")
+font.pixelSize: Style.fontSizeM
+color: Style.textColor
+}
 
-				BaseText {
-					width: parent.width
-					wrapMode: Text.WordWrap
-					text: qsTr("Define asymmetric relationships between this tenant and others. Each side has its own role, with an optional scope and validity window.")
-					font.pixelSize: Style.fontSizeS
-					color: Style.inactiveTextColor
-				}
-			}
+BaseText {
+width: parent.width
+elide: Text.ElideRight
+text: qsTr("Source role: %1   Target role: %2")
+.arg(__rel.sourceRole || __rel.role || qsTr("Partner"))
+.arg(__rel.targetRole || qsTr("Partner"))
+font.pixelSize: Style.fontSizeS
+color: Style.inactiveTextColor
+}
 
-			Rectangle {
-				width: parent.width
-				height: 1
-				color: Style.borderColor
-			}
+BaseText {
+width: parent.width
+visible: __rel.scope && __rel.scope !== ""
+elide: Text.ElideRight
+text: qsTr("Scope: %1").arg(__rel.scope || "")
+font.pixelSize: Style.fontSizeS
+color: Style.inactiveTextColor
+}
 
-			// --- Create relationship form ---
-			GroupElementView {
-				id: createGroup
-				width: parent.width
-				visible: relationshipsPage.__canManage
+BaseText {
+width: parent.width
+visible: __rel.description && __rel.description !== ""
+elide: Text.ElideRight
+text: __rel.description || ""
+font.pixelSize: Style.fontSizeS
+color: Style.inactiveTextColor
+}
+}
 
-				TextInputElementView {
-					id: targetTenantInput
-					name: qsTr("Target Tenant ID")
-					placeHolderText: qsTr("Tenant on the other side")
-				}
+Button {
+id: removeRelBtn
+visible: __canManage
+text: qsTr("Remove")
+onClicked: {
+if (relationshipsPage.apiClient)
+relationshipsPage.apiClient.removeTenantRelationship(
+relationshipsPage.tenantData ? relationshipsPage.tenantData.m_id : "",
+__rel.relationshipId || "")
+}
+}
+}
+}
+}
 
-				ComboBoxElementView {
-					id: sourceRoleInput
-					name: qsTr("Source Role")
-					currentIndex: 2
-					model: roleModel
-				}
+// --- Create relationship form ---
+Component {
+id: createRelationshipComp
 
-				ComboBoxElementView {
-					id: targetRoleInput
-					name: qsTr("Target Role")
-					currentIndex: 2
-					model: roleModel
-				}
+Item {
+id: createRelationshipForm
 
-				TextInputElementView {
-					id: scopeInput
-					name: qsTr("Scope")
-					placeHolderText: qsTr("Optional — empty applies to all resources")
-				}
+property string __selectedTargetTenantId: ""
+property string __selectedTargetTenantName: ""
 
-				TextInputElementView {
-					id: validFromInput
-					name: qsTr("Valid From")
-					placeHolderText: qsTr("Optional ISO timestamp")
-				}
+CustomScrollbar {
+z: parent.z + 1
+anchors.right: parent.right
+anchors.top: createRelFlickable.top
+anchors.bottom: createRelFlickable.bottom
+secondSize: Style.marginM
+targetItem: createRelFlickable
+}
 
-				TextInputElementView {
-					id: validUntilInput
-					name: qsTr("Valid Until")
-					placeHolderText: qsTr("Optional ISO timestamp — empty for no expiry")
-				}
+Flickable {
+id: createRelFlickable
+anchors.fill: parent
+anchors.margins: Style.marginXL
+contentHeight: createRelColumn.height + 2 * Style.marginXL
+clip: true
 
-				TextInputElementView {
-					id: descriptionInput
-					name: qsTr("Description")
-					placeHolderText: qsTr("Optional description")
-				}
+Column {
+id: createRelColumn
+width: Style.sizeHintXXL
+spacing: Style.marginL
 
-				Button {
-					text: qsTr("Create Relationship")
-					onClicked: relationshipsPage.__createRelationship()
-				}
-			}
+GroupElementView {
+width: parent.width
 
-			// --- Existing relationships ---
-			BaseText {
-				text: qsTr("Active Relationships")
-				font.pixelSize: Style.fontSizeL
-				font.bold: true
-				color: Style.textColor
-			}
+// --- Target Tenant selector ---
+ElementView {
+name: qsTr("Target Tenant")
 
-			BaseText {
-				width: parent.width
-				visible: !relationshipsList.count
-				text: qsTr("No relationships for this tenant.")
-				font.pixelSize: Style.fontSizeS
-				color: Style.inactiveTextColor
-			}
+controlComp: Component {
+Row {
+spacing: Style.marginM
 
-			Column {
-				id: relationshipsList
-				width: parent.width
-				spacing: Style.marginM
+BaseText {
+anchors.verticalCenter: parent.verticalCenter
+text: createRelationshipForm.__selectedTargetTenantName
+  || createRelationshipForm.__selectedTargetTenantId
+  || qsTr("Select tenant...")
+color: createRelationshipForm.__selectedTargetTenantId
+   ? Style.textColor : Style.inactiveTextColor
+font.pixelSize: Style.fontSizeM
+}
 
-				property int count: relationshipsPage.apiClient && relationshipsPage.apiClient.tenantRelationshipsModel
-					? relationshipsPage.apiClient.tenantRelationshipsModel.count
-					: 0
+Button {
+text: qsTr("Select")
+onClicked: {
+ModalDialogManager.openDialog(tenantSelectComp, {})
+}
+}
+}
+}
+}
 
-				Repeater {
-					model: relationshipsPage.apiClient ? relationshipsPage.apiClient.tenantRelationshipsModel : null
+// --- Source Role ---
+ComboBoxElementView {
+id: sourceRoleCB
+name: qsTr("Source Role")
+model: roleModel
+currentIndex: 2
+}
 
-					delegate: Rectangle {
-						width: relationshipsList.width
-						height: relationshipRow.height + 2 * Style.marginM
-						color: Style.alternateBaseColor
-						radius: Style.radiusS
-						border.color: Style.borderColor
-						border.width: 1
+// --- Target Role ---
+ComboBoxElementView {
+id: targetRoleCB
+name: qsTr("Target Role")
+model: roleModel
+currentIndex: 2
+}
 
-						Row {
-							id: relationshipRow
-							anchors.left: parent.left
-							anchors.right: parent.right
-							anchors.verticalCenter: parent.verticalCenter
-							anchors.leftMargin: Style.marginM
-							anchors.rightMargin: Style.marginM
-							spacing: Style.marginM
+// --- Scope ---
+TextInputElementView {
+id: relScopeInput
+name: qsTr("Scope")
+placeHolderText: qsTr("Optional — empty applies to all resources")
+}
 
-							Column {
-								width: parent.width - removeButton.width - Style.marginM
-								spacing: Style.marginXS
+// --- Valid From ---
+DateTimePickerElementView {
+id: relValidFromPicker
+name: qsTr("Valid From")
+}
 
-								BaseText {
-									width: parent.width
-									elide: Text.ElideRight
-									text: qsTr("Target: %1").arg(model.targetTenantId || "")
-									font.pixelSize: Style.fontSizeM
-									color: Style.textColor
-								}
+// --- Valid Until ---
+DateTimePickerElementView {
+id: relValidUntilPicker
+name: qsTr("Valid Until")
+}
 
-								BaseText {
-									width: parent.width
-									elide: Text.ElideRight
-									text: qsTr("Source role: %1   Target role: %2")
-										.arg(model.sourceRole || model.role || qsTr("Partner"))
-										.arg(model.targetRole || qsTr("Partner"))
-									font.pixelSize: Style.fontSizeS
-									color: Style.inactiveTextColor
-								}
+// --- Description ---
+TextInputElementView {
+id: relDescriptionInput
+name: qsTr("Description")
+placeHolderText: qsTr("Optional description")
+}
 
-								BaseText {
-									width: parent.width
-									elide: Text.ElideRight
-									text: qsTr("Scope: %1")
-										.arg((model.scope && model.scope !== "") ? model.scope : qsTr("All"))
-									font.pixelSize: Style.fontSizeS
-									color: Style.inactiveTextColor
-								}
+// --- Actions ---
+Row {
+spacing: Style.marginM
 
-								BaseText {
-									width: parent.width
-									visible: model.description && model.description !== ""
-									elide: Text.ElideRight
-									text: model.description || ""
-									font.pixelSize: Style.fontSizeS
-									color: Style.inactiveTextColor
-								}
-							}
+Button {
+text: qsTr("Create Relationship")
+onClicked: {
+if (!createRelationshipForm.__selectedTargetTenantId) {
+ModalDialogManager.showInfoDialog(qsTr("Target tenant is required."))
+return
+}
+var roleTokens = ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
+var srcIdx = sourceRoleCB.currentIndex >= 0 ? sourceRoleCB.currentIndex : 2
+var tgtIdx = targetRoleCB.currentIndex >= 0 ? targetRoleCB.currentIndex : 2
+relationshipsPage.apiClient.addTenantRelationship(
+relationshipsPage.tenantData ? relationshipsPage.tenantData.m_id : "",
+createRelationshipForm.__selectedTargetTenantId,
+roleTokens[srcIdx],
+roleTokens[tgtIdx],
+relScopeInput.text.trim(),
+relValidFromPicker.getDateAsString(),
+relValidUntilPicker.getDateAsString(),
+relDescriptionInput.text.trim())
+}
+}
 
-							Button {
-								id: removeButton
-								anchors.verticalCenter: parent.verticalCenter
-								visible: relationshipsPage.__canManage
-								text: qsTr("Remove")
-								onClicked: {
-									if (relationshipsPage.apiClient)
-										relationshipsPage.apiClient.removeTenantRelationship(
-											relationshipsPage.tenantData ? relationshipsPage.tenantData.m_id : "",
-											model.relationshipId || "")
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+Button {
+text: qsTr("Cancel")
+onClicked: { relationshipsPage.popEditor() }
+}
+}
+}
+}
+}
 
-	ListModel {
-		id: roleModel
-		ListElement { name: "Parent" }
-		ListElement { name: "Child" }
-		ListElement { name: "Partner" }
-		ListElement { name: "Supplier" }
-		ListElement { name: "Customer" }
-		ListElement { name: "Affiliate" }
-	}
+Component {
+id: tenantSelectComp
+
+FilterableSelectPopup {
+dataProvider: FilterableSelectGqlDataProvider {
+collectionId: "Tenants"
+multiSelect: false
+}
+filterPlaceholder: qsTr("Select tenant...")
+preselectedIds: createRelationshipForm.__selectedTargetTenantId
+? [createRelationshipForm.__selectedTargetTenantId] : []
+
+onItemSelected: function(itemId, index) {
+createRelationshipForm.__selectedTargetTenantId = itemId
+createRelationshipForm.__selectedTargetTenantName = dataProvider
+? dataProvider.getSelectedItemText(itemId) : ""
+}
+}
+}
+
+TreeItemModel {
+id: roleModel
+Component.onCompleted: {
+var roles = ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
+for (var i = 0; i < roles.length; i++) {
+var idx = insertNewItem()
+setData("id", roles[i], idx)
+setData("name", roles[i], idx)
+}
+}
+}
+}
+}
 }

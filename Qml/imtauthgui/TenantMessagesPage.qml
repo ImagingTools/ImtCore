@@ -4,181 +4,136 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
+import imtcolgui 1.0
+import imtguigql 1.0
 import imtauthgui 1.0
 
 /**
  * TenantMessagesPage
  *
- * Cross-tenant messages tab of the TenantEditor (RFC phase 2, §10/§13).
+ * Cross-Tenant Messages tab of the TenantEditor.
  *
- * Read-only inbox/outbox view of the cross-tenant messages exchanged through
- * the broker for the current tenant. Each message records the domain type, the
- * lifecycle status and the source/target tenants. The data is fetched through
- * the abstract TenantManagementApiClient contract.
+ * Read-only list; no create/edit/remove buttons.
+ * Custom delegate shows message type, status, direction, and timestamps.
  */
-ViewBase {
-	id: messagesPage
+TenantSimpleCollectionPage {
+id: messagesPage
 
-	commandsPanelVisible: false
-	contentColor: Style.baseColor
+entityName: qsTr("Message")
+entityNamePlural: qsTr("Cross-Tenant Messages")
+descriptionText: qsTr("Incoming and outgoing cross-tenant protocol messages.")
 
-	readonly property var tenantData: messagesPage.model
-	property var stateManager: null
-	property var apiClient: null
+listModel: apiClient ? apiClient.crossTenantMessagesModel : null
 
-	function updateGui() {
-		messagesPage.__refresh()
-	}
+headerButtonsComponent: emptyHeaderComp
 
-	function __refresh() {
-		if (messagesPage.apiClient && messagesPage.tenantData && messagesPage.tenantData.m_id)
-			messagesPage.apiClient.fetchCrossTenantMessages(messagesPage.tenantData.m_id, "")
-	}
+delegateComponent: messageDelegateComp
 
-	onVisibleChanged: {
-		if (messagesPage.visible)
-			messagesPage.__refresh()
-	}
+function updateGui() {
+if (apiClient && tenantData && tenantData.m_id)
+apiClient.fetchCrossTenantMessages(tenantData.m_id)
+}
 
-	Component.onCompleted: messagesPage.__refresh()
+Component.onCompleted: {
+if (apiClient && tenantData && tenantData.m_id)
+apiClient.fetchCrossTenantMessages(tenantData.m_id)
+}
 
-	CustomScrollbar {
-		id: messagesScrollbar
-		z: parent.z + 1
-		anchors.right: parent.right
-		anchors.top: messagesFlickable.top
-		anchors.bottom: messagesFlickable.bottom
-		secondSize: Style.marginM
-		targetItem: messagesFlickable
-	}
+onVisibleChanged: {
+if (visible && apiClient && tenantData && tenantData.m_id)
+apiClient.fetchCrossTenantMessages(tenantData.m_id)
+}
 
-	Flickable {
-		id: messagesFlickable
-		anchors.top: parent.top
-		anchors.topMargin: Style.marginXL
-		anchors.bottom: parent.bottom
-		anchors.bottomMargin: Style.marginXL
-		anchors.left: parent.left
-		anchors.leftMargin: Style.marginXL
-		anchors.right: parent.right
-		anchors.rightMargin: Style.marginXL
-		contentHeight: messagesColumn.height + 2 * Style.marginXL
-		clip: true
+// --- No header buttons (read-only page) ---
+Component {
+id: emptyHeaderComp
+Item {}
+}
 
-		Column {
-			id: messagesColumn
-			width: Style.sizeHintXXL
-			spacing: Style.marginXL
+// --- Message delegate ---
+Component {
+id: messageDelegateComp
 
-			Column {
-				width: parent.width
-				spacing: Style.marginXS
+Rectangle {
+id: msgDelegate
+width: parent ? parent.width : 0
+height: msgDelegateContent.height + 2 * Style.marginM
+color: Style.alternateBaseColor
+radius: Style.radiusS
+border.color: Style.borderColor
+border.width: 1
 
-				BaseText {
-					text: qsTr("Cross-Tenant Messages")
-					font.pixelSize: Style.fontSizeXL
-					font.bold: true
-					color: Style.textColor
-				}
+readonly property var __msg: modelData
+readonly property bool __isOutgoing: messagesPage.tenantData
+&& __msg.sourceTenantId === messagesPage.tenantData.m_id
 
-				BaseText {
-					width: parent.width
-					wrapMode: Text.WordWrap
-					text: qsTr("Messages exchanged with partner tenants through the cross-tenant message broker. The broker only ever propagates a projected payload — never direct access to another tenant's data.")
-					font.pixelSize: Style.fontSizeS
-					color: Style.inactiveTextColor
-				}
-			}
+Column {
+id: msgDelegateContent
+anchors.left: parent.left
+anchors.right: parent.right
+anchors.top: parent.top
+anchors.margins: Style.marginM
+spacing: Style.marginXS
 
-			Rectangle {
-				width: parent.width
-				height: 1
-				color: Style.borderColor
-			}
+Row {
+spacing: Style.marginS
 
-			Button {
-				text: qsTr("Refresh")
-				onClicked: messagesPage.__refresh()
-			}
+BaseText {
+anchors.verticalCenter: parent.verticalCenter
+text: __isOutgoing ? qsTr("▶ Outgoing") : qsTr("◀ Incoming")
+font.pixelSize: Style.fontSizeS
+font.bold: true
+color: __isOutgoing ? Style.linkColor : Style.textColor
+}
 
-			BaseText {
-				width: parent.width
-				visible: !messagesList.count
-				text: qsTr("No cross-tenant messages for this tenant.")
-				font.pixelSize: Style.fontSizeS
-				color: Style.inactiveTextColor
-			}
+BaseText {
+anchors.verticalCenter: parent.verticalCenter
+visible: (__msg.messageType && __msg.messageType !== "")
+text: qsTr("· %1").arg(__msg.messageType || "")
+font.pixelSize: Style.fontSizeS
+color: Style.inactiveTextColor
+}
 
-			Column {
-				id: messagesList
-				width: parent.width
-				spacing: Style.marginM
+BaseText {
+anchors.verticalCenter: parent.verticalCenter
+visible: (__msg.status && __msg.status !== "")
+text: qsTr("· %1").arg(__msg.status || "")
+font.pixelSize: Style.fontSizeS
+color: Style.inactiveTextColor
+}
+}
 
-				property int count: messagesPage.apiClient && messagesPage.apiClient.crossTenantMessagesModel
-					? messagesPage.apiClient.crossTenantMessagesModel.count
-					: 0
+BaseText {
+width: parent.width
+elide: Text.ElideRight
+text: __isOutgoing
+? qsTr("To: %1").arg(__msg.targetTenantId || "")
+: qsTr("From: %1").arg(__msg.sourceTenantId || "")
+font.pixelSize: Style.fontSizeM
+color: Style.textColor
+}
 
-				Repeater {
-					model: messagesPage.apiClient ? messagesPage.apiClient.crossTenantMessagesModel : null
+BaseText {
+width: parent.width
+visible: __msg.payload && __msg.payload !== ""
+wrapMode: Text.WordWrap
+text: __msg.payload || ""
+font.pixelSize: Style.fontSizeS
+color: Style.inactiveTextColor
+}
 
-					delegate: Rectangle {
-						width: messagesList.width
-						height: messageColumn.height + 2 * Style.marginM
-						color: Style.alternateBaseColor
-						radius: Style.radiusS
-						border.color: Style.borderColor
-						border.width: 1
-
-						Column {
-							id: messageColumn
-							anchors.left: parent.left
-							anchors.right: parent.right
-							anchors.verticalCenter: parent.verticalCenter
-							anchors.leftMargin: Style.marginM
-							anchors.rightMargin: Style.marginM
-							spacing: Style.marginXS
-
-							BaseText {
-								width: parent.width
-								elide: Text.ElideRight
-								text: qsTr("Type: %1   Status: %2")
-									.arg(model.messageType || qsTr("Custom"))
-									.arg(model.status || qsTr("Created"))
-								font.pixelSize: Style.fontSizeM
-								color: Style.textColor
-							}
-
-							BaseText {
-								width: parent.width
-								elide: Text.ElideRight
-								text: qsTr("From: %1   To: %2")
-									.arg(model.sourceTenantId || "")
-									.arg(model.targetTenantId || "")
-								font.pixelSize: Style.fontSizeS
-								color: Style.inactiveTextColor
-							}
-
-							BaseText {
-								width: parent.width
-								visible: model.errorMessage && model.errorMessage !== ""
-								wrapMode: Text.WordWrap
-								text: qsTr("Error: %1").arg(model.errorMessage || "")
-								font.pixelSize: Style.fontSizeS
-								color: Style.errorColor
-							}
-
-							BaseText {
-								width: parent.width
-								visible: model.createdAt && model.createdAt !== ""
-								elide: Text.ElideRight
-								text: qsTr("Created: %1").arg(model.createdAt || "")
-								font.pixelSize: Style.fontSizeS
-								color: Style.inactiveTextColor
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+BaseText {
+width: parent.width
+visible: (__msg.createdAt && __msg.createdAt !== "")
+     || (__msg.processedAt && __msg.processedAt !== "")
+elide: Text.ElideRight
+text: qsTr("Sent: %1  Processed: %2")
+.arg((__msg.createdAt && __msg.createdAt !== "") ? __msg.createdAt : qsTr("—"))
+.arg((__msg.processedAt && __msg.processedAt !== "") ? __msg.processedAt : qsTr("—"))
+font.pixelSize: Style.fontSizeS
+color: Style.inactiveTextColor
+}
+}
+}
+}
 }
