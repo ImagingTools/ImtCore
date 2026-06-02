@@ -4808,17 +4808,17 @@ QVariant CSubstrateSpecificationInputObject::GetItem()
 	if (m_itemQObjectPtr.isValid()){
 		if (const CCardboardSubstrateSpecification* val = std::get_if<CCardboardSubstrateSpecification>((CSubstrateSpecificationInput::item).GetPtr())){
 			CCardboardSubstrateSpecificationObject *newObjectPtr = new CCardboardSubstrateSpecificationObject(this);
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			static_cast<CCardboardSubstrateSpecification&>(*newObjectPtr) = *val;
 			m_itemQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
 		if (const CPaperSubstrateSpecification* val = std::get_if<CPaperSubstrateSpecification>((CSubstrateSpecificationInput::item).GetPtr())){
 			CPaperSubstrateSpecificationObject *newObjectPtr = new CPaperSubstrateSpecificationObject(this);
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			static_cast<CPaperSubstrateSpecification&>(*newObjectPtr) = *val;
 			m_itemQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
 		if (const CFilmSubstrateSpecification* val = std::get_if<CFilmSubstrateSpecification>((CSubstrateSpecificationInput::item).GetPtr())){
 			CFilmSubstrateSpecificationObject *newObjectPtr = new CFilmSubstrateSpecificationObject(this);
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			static_cast<CFilmSubstrateSpecification&>(*newObjectPtr) = *val;
 			m_itemQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
 	}
@@ -5301,19 +5301,19 @@ QVariant CSubstrateSpecificationDocumentObjectList::GetOrCreateCachedObject(int 
 	else{
 		if (const CCardboardSubstrateSpecification* val = std::get_if<CCardboardSubstrateSpecification>(this->at(index).GetPtr())){
 			CCardboardSubstrateSpecificationObject *newObjectPtr = new CCardboardSubstrateSpecificationObject();
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			static_cast<CCardboardSubstrateSpecification&>(*newObjectPtr) = *val;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
 		if (const CPaperSubstrateSpecification* val = std::get_if<CPaperSubstrateSpecification>(this->at(index).GetPtr())){
 			CPaperSubstrateSpecificationObject *newObjectPtr = new CPaperSubstrateSpecificationObject();
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			static_cast<CPaperSubstrateSpecification&>(*newObjectPtr) = *val;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
 		if (const CFilmSubstrateSpecification* val = std::get_if<CFilmSubstrateSpecification>(this->at(index).GetPtr())){
 			CFilmSubstrateSpecificationObject *newObjectPtr = new CFilmSubstrateSpecificationObject();
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			static_cast<CFilmSubstrateSpecification&>(*newObjectPtr) = *val;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 

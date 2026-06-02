@@ -14019,7 +14019,7 @@ QVariant CExtendedMetaDataObject::GetValue()
 	if (m_valueQObjectPtr.isValid()){
 		if (const CCoordinates* val = std::get_if<CCoordinates>((CExtendedMetaData::value).GetPtr())){
 			CCoordinatesObject *newObjectPtr = new CCoordinatesObject(this);
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			static_cast<CCoordinates&>(*newObjectPtr) = *val;
 			m_valueQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
 		if (const double* val = std::get_if<double>((CExtendedMetaData::value).GetPtr())){
@@ -15069,12 +15069,12 @@ QVariant CUnionTestingTypeObject::GetComplexUnion()
 	if (m_complexUnionQObjectPtr.isValid()){
 		if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>((CUnionTestingType::complexUnion).GetPtr())){
 			CCDMResultVarStringObject *newObjectPtr = new CCDMResultVarStringObject(this);
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			static_cast<CCDMResultVarString&>(*newObjectPtr) = *val;
 			m_complexUnionQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
 		if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>((CUnionTestingType::complexUnion).GetPtr())){
 			CCDMResultVarRecursiveObject *newObjectPtr = new CCDMResultVarRecursiveObject(this);
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			static_cast<CCDMResultVarRecursive&>(*newObjectPtr) = *val;
 			m_complexUnionQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
 	}
@@ -15130,7 +15130,7 @@ QVariant CUnionTestingTypeObject::GetMixedUnion()
 	if (m_mixedUnionQObjectPtr.isValid()){
 		if (const CCoordinates* val = std::get_if<CCoordinates>((CUnionTestingType::mixedUnion).GetPtr())){
 			CCoordinatesObject *newObjectPtr = new CCoordinatesObject(this);
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			static_cast<CCoordinates&>(*newObjectPtr) = *val;
 			m_mixedUnionQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
 		if (const double* val = std::get_if<double>((CUnionTestingType::mixedUnion).GetPtr())){
@@ -17020,7 +17020,7 @@ QVariant CExtendedMetaDataUnionTypeObjectList::GetOrCreateCachedObject(int index
 	else{
 		if (const CCoordinates* val = std::get_if<CCoordinates>(this->at(index).GetPtr())){
 			CCoordinatesObject *newObjectPtr = new CCoordinatesObject();
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			static_cast<CCoordinates&>(*newObjectPtr) = *val;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
@@ -17541,13 +17541,13 @@ QVariant CCDMResultUnionTypeObjectList::GetOrCreateCachedObject(int index) const
 	else{
 		if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>(this->at(index).GetPtr())){
 			CCDMResultVarStringObject *newObjectPtr = new CCDMResultVarStringObject();
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			static_cast<CCDMResultVarString&>(*newObjectPtr) = *val;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
 		if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>(this->at(index).GetPtr())){
 			CCDMResultVarRecursiveObject *newObjectPtr = new CCDMResultVarRecursiveObject();
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			static_cast<CCDMResultVarRecursive&>(*newObjectPtr) = *val;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 

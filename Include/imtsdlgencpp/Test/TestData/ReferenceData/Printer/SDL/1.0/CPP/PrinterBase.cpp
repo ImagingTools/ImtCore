@@ -1526,12 +1526,12 @@ QVariant CPrinterBaseObject::GetSpecification()
 	if (m_specificationQObjectPtr.isValid()){
 		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>((CPrinterBase::specification).GetPtr())){
 			CPrinterSpecificationBaseObject *newObjectPtr = new CPrinterSpecificationBaseObject(this);
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			static_cast<CPrinterSpecificationBase&>(*newObjectPtr) = *val;
 			m_specificationQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
 		if (const CLink* val = std::get_if<CLink>((CPrinterBase::specification).GetPtr())){
 			CLinkObject *newObjectPtr = new CLinkObject(this);
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			static_cast<CLink&>(*newObjectPtr) = *val;
 			m_specificationQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
 	}
@@ -1647,7 +1647,7 @@ QVariant CPrinterBaseObject::GetMixedTest()
 		}
 		if (const CLink* val = std::get_if<CLink>((CPrinterBase::mixedTest).GetPtr())){
 			CLinkObject *newObjectPtr = new CLinkObject(this);
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			static_cast<CLink&>(*newObjectPtr) = *val;
 			m_mixedTestQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
 	}
@@ -2114,13 +2114,13 @@ QVariant CPrinterSpecificationObjectList::GetOrCreateCachedObject(int index) con
 	else{
 		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(this->at(index).GetPtr())){
 			CPrinterSpecificationBaseObject *newObjectPtr = new CPrinterSpecificationBaseObject();
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			static_cast<CPrinterSpecificationBase&>(*newObjectPtr) = *val;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
 		if (const CLink* val = std::get_if<CLink>(this->at(index).GetPtr())){
 			CLinkObject *newObjectPtr = new CLinkObject();
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			static_cast<CLink&>(*newObjectPtr) = *val;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
@@ -2556,7 +2556,7 @@ QVariant CMixedUnionObjectList::GetOrCreateCachedObject(int index) const
 
 		if (const CLink* val = std::get_if<CLink>(this->at(index).GetPtr())){
 			CLinkObject *newObjectPtr = new CLinkObject();
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			static_cast<CLink&>(*newObjectPtr) = *val;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 

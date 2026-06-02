@@ -506,7 +506,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 								FeedStream(stream, 1, false);
 
 								FeedStreamHorizontally(stream, 3);
-								stream << QStringLiteral("static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;");
+								stream << QStringLiteral("static_cast<") << convertedType << QStringLiteral("&>(*newObjectPtr) = *val;");
 								FeedStream(stream, 1, false);
 								FeedStreamHorizontally(stream, 3);
 								stream << QStringLiteral("m_") << GetDecapitalizedValue(field.GetId());
