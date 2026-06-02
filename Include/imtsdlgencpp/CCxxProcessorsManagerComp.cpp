@@ -708,7 +708,13 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 		FeedStream(stream, 1, false);
 	}
 
-	if (hasEnums || hasDocumentTypes){
+	// add include for GqlHandlerCompBase base class if we have requests
+	if (hasRequests){
+		stream << QStringLiteral("#include <imtservergql/CPermissibleGqlRequestHandlerComp.h>");
+		FeedStream(stream, 1, false);
+	}
+
+	if (hasEnums || hasDocumentTypes || hasRequests){
 		FeedStream(stream, 2, false);
 	}
 
