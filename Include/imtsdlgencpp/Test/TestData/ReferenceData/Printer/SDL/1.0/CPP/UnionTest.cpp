@@ -2434,12 +2434,14 @@ QVariant CPrinterBaseObject::GetSpecification()
 	if (m_specificationQObjectPtr.isValid()){
 		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>((CPrinterBase::specification).GetPtr())){
 			CPrinterSpecificationBaseObject *newObjectPtr = new CPrinterSpecificationBaseObject(this);
-			static_cast<CPrinterSpecificationBase&>(*newObjectPtr) = *val;
+			newObjectPtr->CPrinterSpecificationBase::name = val->CPrinterSpecificationBase::name;
 			m_specificationQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
 		if (const CLink* val = std::get_if<CLink>((CPrinterBase::specification).GetPtr())){
 			CLinkObject *newObjectPtr = new CLinkObject(this);
-			static_cast<CLink&>(*newObjectPtr) = *val;
+			newObjectPtr->CLink::link = val->CLink::link;
+			newObjectPtr->CLink::status = val->CLink::status;
+			newObjectPtr->CLink::statusList = val->CLink::statusList;
 			m_specificationQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
 		if (const QString* val = std::get_if<QString>((CPrinterBase::specification).GetPtr())){
@@ -2748,13 +2750,15 @@ QVariant CPrinterSpecificationObjectList::GetOrCreateCachedObject(int index) con
 	else{
 		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(this->at(index).GetPtr())){
 			CPrinterSpecificationBaseObject *newObjectPtr = new CPrinterSpecificationBaseObject();
-			static_cast<CPrinterSpecificationBase&>(*newObjectPtr) = *val;
+			newObjectPtr->CPrinterSpecificationBase::name = val->CPrinterSpecificationBase::name;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
 		if (const CLink* val = std::get_if<CLink>(this->at(index).GetPtr())){
 			CLinkObject *newObjectPtr = new CLinkObject();
-			static_cast<CLink&>(*newObjectPtr) = *val;
+			newObjectPtr->CLink::link = val->CLink::link;
+			newObjectPtr->CLink::status = val->CLink::status;
+			newObjectPtr->CLink::statusList = val->CLink::statusList;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 

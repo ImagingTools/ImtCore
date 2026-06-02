@@ -505,9 +505,16 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 								stream << convertedType << QStringLiteral("Object(this);");
 								FeedStream(stream, 1, false);
 
-								FeedStreamHorizontally(stream, 3);
-								stream << QStringLiteral("static_cast<") << convertedType << QStringLiteral("&>(*newObjectPtr) = *val;");
-								FeedStream(stream, 1, false);
+								const auto* sdlTypeField = dynamic_cast<const imtsdl::CSdlType*>(foundType.get());
+								if (sdlTypeField != nullptr){
+									const QString subFieldClassName = QStringLiteral("C") + sdlTypeField->GetName();
+									const imtsdl::SdlFieldList subFields = sdlTypeField->GetFields();
+									for (const imtsdl::CSdlField& subField: subFields){
+										FeedStreamHorizontally(stream, 3);
+										stream << QStringLiteral("newObjectPtr->") << subFieldClassName << QStringLiteral("::") << subField.GetId() << QStringLiteral(" = val->") << subFieldClassName << QStringLiteral("::") << subField.GetId() << ';';
+										FeedStream(stream, 1, false);
+									}
+								}
 								FeedStreamHorizontally(stream, 3);
 								stream << QStringLiteral("m_") << GetDecapitalizedValue(field.GetId());
 								stream << QStringLiteral("QObjectPtr = QVariant::fromValue(newObjectPtr);");

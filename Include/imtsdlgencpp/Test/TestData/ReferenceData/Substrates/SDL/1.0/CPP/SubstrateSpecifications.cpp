@@ -4808,17 +4808,22 @@ QVariant CSubstrateSpecificationInputObject::GetItem()
 	if (m_itemQObjectPtr.isValid()){
 		if (const CCardboardSubstrateSpecification* val = std::get_if<CCardboardSubstrateSpecification>((CSubstrateSpecificationInput::item).GetPtr())){
 			CCardboardSubstrateSpecificationObject *newObjectPtr = new CCardboardSubstrateSpecificationObject(this);
-			static_cast<CCardboardSubstrateSpecification&>(*newObjectPtr) = *val;
+			newObjectPtr->CCardboardSubstrateSpecification::color = val->CCardboardSubstrateSpecification::color;
+			newObjectPtr->CCardboardSubstrateSpecification::grammage = val->CCardboardSubstrateSpecification::grammage;
 			m_itemQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
 		if (const CPaperSubstrateSpecification* val = std::get_if<CPaperSubstrateSpecification>((CSubstrateSpecificationInput::item).GetPtr())){
 			CPaperSubstrateSpecificationObject *newObjectPtr = new CPaperSubstrateSpecificationObject(this);
-			static_cast<CPaperSubstrateSpecification&>(*newObjectPtr) = *val;
+			newObjectPtr->CPaperSubstrateSpecification::grammage = val->CPaperSubstrateSpecification::grammage;
+			newObjectPtr->CPaperSubstrateSpecification::color = val->CPaperSubstrateSpecification::color;
+			newObjectPtr->CPaperSubstrateSpecification::coatType = val->CPaperSubstrateSpecification::coatType;
 			m_itemQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
 		if (const CFilmSubstrateSpecification* val = std::get_if<CFilmSubstrateSpecification>((CSubstrateSpecificationInput::item).GetPtr())){
 			CFilmSubstrateSpecificationObject *newObjectPtr = new CFilmSubstrateSpecificationObject(this);
-			static_cast<CFilmSubstrateSpecification&>(*newObjectPtr) = *val;
+			newObjectPtr->CFilmSubstrateSpecification::transparency = val->CFilmSubstrateSpecification::transparency;
+			newObjectPtr->CFilmSubstrateSpecification::color = val->CFilmSubstrateSpecification::color;
+			newObjectPtr->CFilmSubstrateSpecification::material = val->CFilmSubstrateSpecification::material;
 			m_itemQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
 	}
@@ -5301,19 +5306,24 @@ QVariant CSubstrateSpecificationDocumentObjectList::GetOrCreateCachedObject(int 
 	else{
 		if (const CCardboardSubstrateSpecification* val = std::get_if<CCardboardSubstrateSpecification>(this->at(index).GetPtr())){
 			CCardboardSubstrateSpecificationObject *newObjectPtr = new CCardboardSubstrateSpecificationObject();
-			static_cast<CCardboardSubstrateSpecification&>(*newObjectPtr) = *val;
+			newObjectPtr->CCardboardSubstrateSpecification::color = val->CCardboardSubstrateSpecification::color;
+			newObjectPtr->CCardboardSubstrateSpecification::grammage = val->CCardboardSubstrateSpecification::grammage;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
 		if (const CPaperSubstrateSpecification* val = std::get_if<CPaperSubstrateSpecification>(this->at(index).GetPtr())){
 			CPaperSubstrateSpecificationObject *newObjectPtr = new CPaperSubstrateSpecificationObject();
-			static_cast<CPaperSubstrateSpecification&>(*newObjectPtr) = *val;
+			newObjectPtr->CPaperSubstrateSpecification::grammage = val->CPaperSubstrateSpecification::grammage;
+			newObjectPtr->CPaperSubstrateSpecification::color = val->CPaperSubstrateSpecification::color;
+			newObjectPtr->CPaperSubstrateSpecification::coatType = val->CPaperSubstrateSpecification::coatType;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
 		if (const CFilmSubstrateSpecification* val = std::get_if<CFilmSubstrateSpecification>(this->at(index).GetPtr())){
 			CFilmSubstrateSpecificationObject *newObjectPtr = new CFilmSubstrateSpecificationObject();
-			static_cast<CFilmSubstrateSpecification&>(*newObjectPtr) = *val;
+			newObjectPtr->CFilmSubstrateSpecification::transparency = val->CFilmSubstrateSpecification::transparency;
+			newObjectPtr->CFilmSubstrateSpecification::color = val->CFilmSubstrateSpecification::color;
+			newObjectPtr->CFilmSubstrateSpecification::material = val->CFilmSubstrateSpecification::material;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
