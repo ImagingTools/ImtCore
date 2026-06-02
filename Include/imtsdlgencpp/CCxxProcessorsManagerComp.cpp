@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtsdlgencpp/CCxxProcessorsManagerComp.h>
 
-
 // C includes
 #include <iostream>
 
@@ -16,11 +15,11 @@
 #include <iprm/CParamsSet.h>
 
 // ImtCore includes
-#include<imtsdl/CSdlTools.h>
-#include<imtsdl/CSdlType.h>
-#include<imtsdl/CSdlEnum.h>
-#include<imtsdl/CSdlDocumentType.h>
-#include<imtsdl/CSdlRequest.h>
+#include <imtsdl/CSdlTools.h>
+#include <imtsdl/CSdlType.h>
+#include <imtsdl/CSdlEnum.h>
+#include <imtsdl/CSdlDocumentType.h>
+#include <imtsdl/CSdlRequest.h>
 
 
 namespace imtsdlgencpp

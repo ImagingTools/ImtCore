@@ -1,9 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-
-
 #include <imtservergql/CObjectCollectionControllerCompBase.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
-
 
 // std includes
 #include <cmath>
@@ -29,6 +25,7 @@
 #include <iqt/iqt.h>
 
 // ImtCore includes
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 #include <imtbase/imtbase.h>
 #include <imtbase/CSearchResults.h>
 #include <imtbase/IIdentifiable.h>

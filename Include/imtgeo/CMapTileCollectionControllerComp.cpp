@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtgeo/CMapTileCollectionControllerComp.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
-
 
 // Qt includes
 #include <QJsonArray>
@@ -10,6 +8,9 @@
 // ACF includes
 #include <idoc/IDocumentMetaInfo.h>
 #include <iprm/CParamsSet.h>
+
+// ImtCore includes
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 
 
 namespace imtgeo
