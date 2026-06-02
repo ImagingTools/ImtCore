@@ -82,7 +82,7 @@ bool CSdlUnionObjectGeneratorComp::ProcessHeaderClassFile(QTextStream& stream, c
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, 1);
-	stream << QStringLiteral("istd::TSharedNullable<%1> Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral(";").arg(sdlUnion->GetName());
+	stream << QStringLiteral("istd::TNullableValue<%1> Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral(";").arg(sdlUnion->GetName());
 	FeedStream(stream, 1, false);
 
 
@@ -333,8 +333,8 @@ bool CSdlUnionObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& strea
 				stream << convertedType << QStringLiteral("Object();");
 				FeedStream(stream, 1, false);
 
-				FeedStreamHorizontally(stream, 3);
-				stream << QStringLiteral("newObjectPtr->Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral(" = val->Version_") << GetSdlEntryVersion(*entryField, false) << QStringLiteral(";");
+					FeedStreamHorizontally(stream, 3);
+				stream << QStringLiteral("static_cast<") << convertedType << QStringLiteral("&>(*newObjectPtr) = *val;");
 				FeedStream(stream, 1, false);
 				FeedStreamHorizontally(stream, 3);
 				stream << QStringLiteral("retVal = QVariant::fromValue(newObjectPtr);");
@@ -749,12 +749,12 @@ bool CSdlUnionObjectGeneratorComp::ProcessInsertToList(QTextStream& stream, cons
 			FeedStream(stream, 1, false);
 
 			FeedStreamHorizontally(stream, 2);
-			stream << QStringLiteral("Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->append(istd::TSharedNullable<") << sdlUnion->GetName() << QStringLiteral(">(*newItemPtr));");
+			stream << QStringLiteral("Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->append(istd::TNullableValue<") << sdlUnion->GetName() << QStringLiteral(">(*newItemPtr));");
 			FeedStream(stream, 1, false);
 		}
 		else{
 			FeedStreamHorizontally(stream, 2);
-			stream << QStringLiteral("Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->append(istd::TSharedNullable<") << sdlUnion->GetName() << QStringLiteral(">(val));");
+			stream << QStringLiteral("Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->append(istd::TNullableValue<") << sdlUnion->GetName() << QStringLiteral(">(val));");
 			FeedStream(stream, 1, false);
 		}
 

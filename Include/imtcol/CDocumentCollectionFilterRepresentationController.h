@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <imtcol/IDocumentCollectionFilter.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentCollectionFilter.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentCollectionFilter_fwd.h>
 
 
 namespace imtcol
@@ -18,7 +18,7 @@ class CDocumentCollectionFilterRepresentationController
 {
 public:
 	static bool DocumentCollectionFilterRepresentationToModel(
-				const sdl::imtbase::DocumentCollectionFilter::CDocumentCollectionFilter::V1_0& filterRepresentaion,
+				const sdl::V1_0::imtbase::CDocumentCollectionFilter& filterRepresentaion,
 				IDocumentCollectionFilter& filterModel,
 				ilog::IMessageConsumer* messageConsumerPtr);
 };

@@ -14,7 +14,7 @@ namespace imtserverapp
 
 QByteArray CPasswordParamRepresentationControllerComp::GetTypeId() const
 {
-	return sdl::imtbase::ImtBaseTypes::CParamTypeIds::V1_0::ParamTypeIdsFields::PasswordParam.toUtf8();
+	return sdl::V1_0::imtbase::CParamTypeIds::ParamTypeIdsFields::PasswordParam.toUtf8();
 }
 
 

@@ -39,7 +39,7 @@ TListModelBase<ModelDataType, ModelObjectDataType>::TListModelBase(QObject* pare
 template <class ModelDataType, class ModelObjectDataType>
 void TListModelBase<ModelDataType, ModelObjectDataType>::append(ModelObjectDataType* item){
 	this->beginInsertRows(QModelIndex(), this->rowCount(), this->rowCount());
-	this->Version_1_0->append(*item->Version_1_0);
+	this->Version_1_0->append(static_cast<const ModelDataType&>(*item));
 	this->ClearCache();
 	this->endInsertRows();
 }
@@ -171,7 +171,7 @@ void TListModelBase<ModelDataType, ModelObjectDataType>::insert(int index, Model
 		return;
 	}
 	this->beginInsertRows(QModelIndex(), index, index);
-	this->Version_1_0->insert(index, *item->Version_1_0);
+	this->Version_1_0->insert(index, static_cast<const ModelDataType&>(*item));
 	this->ClearCache();
 	this->endInsertRows();
 }
@@ -189,7 +189,7 @@ QVariant TListModelBase<ModelDataType, ModelObjectDataType>::GetOrCreateCachedOb
 	}
 	else{
 		auto* newItem = new ModelObjectDataType();
-		newItem->Version_1_0 = this->Version_1_0->at(index);
+		static_cast<ModelDataType&>(*newItem) = *(this->Version_1_0->at(index));
 		this->m_objectDataTypeMap.insert(index, QVariant::fromValue(newItem));
 		retVal = QVariant::fromValue(newItem);
 	}

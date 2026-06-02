@@ -17,13 +17,13 @@ namespace imtqml2d
 {
 
 
-class CQmlPointShape: public sdl::imtsdl2d::imt2d::CPoint2d, public imod::TSingleModelObserverBase<i2d::CVector2d>
+class CQmlPointShape: public sdl::V1_0::imtsdl2d::CPoint2d, public imod::TSingleModelObserverBase<i2d::CVector2d>
 {
 	Q_OBJECT
 
 public:
 	typedef imod::CSingleModelObserverBase BaseClass;
-	typedef sdl::imtsdl2d::imt2d::CPoint2d BaseClass2;
+	typedef sdl::V1_0::imtsdl2d::CPoint2d BaseClass2;
 
 	[[nodiscard]] bool IsValid() const;
 

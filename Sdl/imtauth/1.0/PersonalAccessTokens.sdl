@@ -29,7 +29,7 @@ type PersonalAccessTokenList
 	tokens: [PersonalAccessToken]
 }
 
-input TokenInput {
+input ValidateTokenInput {
 	token: ID!
 }
 
@@ -73,7 +73,7 @@ type ValidateTokenPayload
 type Query {
 	GetTokenList (input: UserIdInput): PersonalAccessTokenList!
 	GetToken (input: InputId): PersonalAccessToken!
-	ValidateToken (input: TokenInput): ValidateTokenPayload!
+	ValidateToken (input: ValidateTokenInput): ValidateTokenPayload!
 }
 
 type Mutation {

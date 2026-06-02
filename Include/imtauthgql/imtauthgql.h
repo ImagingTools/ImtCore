@@ -295,7 +295,7 @@
 	**Register New User:**
 	\code{.cpp}
 	// Prepare registration request
-	sdl::imtauth::Users::CRegisterUserGqlRequest request;
+	sdl::V1_0::imtauth::CRegisterUserGqlRequest request;
 	request.SetEmail("newuser@example.com");
 	request.SetPassword("SecurePassword123!");
 	request.SetName("John Doe");
@@ -319,7 +319,7 @@
 	**Change User Password:**
 	\code{.cpp}
 	// Prepare change password request
-	sdl::imtauth::Users::CChangePasswordGqlRequest request;
+	sdl::V1_0::imtauth::CChangePasswordGqlRequest request;
 	request.SetOldPassword("OldPassword123");
 	request.SetNewPassword("NewSecurePassword456!");
 	
@@ -373,7 +373,7 @@
 	                             clientRequestManager.get());
 	
 	// Generate token
-	sdl::imtauth::Tokens::CGenerateTokenGqlRequest request;
+	sdl::V1_0::imtauth::CGenerateTokenGqlRequest request;
 	request.SetName("API Access Token");
 	request.SetExpiresIn(2592000); // 30 days
 	
@@ -450,7 +450,7 @@
 	        }
 	        
 	        // Prepare GraphQL request
-	        sdl::imtauth::Users::CLoginGqlRequest request;
+	        sdl::V1_0::imtauth::CLoginGqlRequest request;
 	        request.SetEmail(email);
 	        request.SetPassword(password);
 	        

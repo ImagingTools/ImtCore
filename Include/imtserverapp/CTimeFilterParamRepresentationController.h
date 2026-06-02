@@ -12,22 +12,22 @@ namespace imtserverapp
 
 
 class CTimeFilterParamRepresentationController:
-			public TJsonRepresentationControllerWrap<sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0>
+			public TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CTimeFilter>
 {
 public:
 	CTimeFilterParamRepresentationController();
 	CTimeFilterParamRepresentationController(const QByteArray& filterId, const QString& filterName = QString(), const QString& filterDescription = QString());
 
-	// reimplemented (imtserverapp::TJsonRepresentationControllerWrap<sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0>)
+	// reimplemented (imtserverapp::TJsonRepresentationControllerWrap<sdl::V1_0::imtbase::CTimeFilter>)
 	virtual QByteArray GetTypeId() const override;
 	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;
 	virtual bool GetSdlRepresentationFromDataModel(
-				sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0& sdlRepresentation,
+				sdl::V1_0::imtbase::CTimeFilter& sdlRepresentation,
 				const istd::IChangeable& dataModel,
 				const iprm::IParamsSet* paramsPtr = nullptr) const override;
 	virtual bool GetDataModelFromSdlRepresentation(
 				istd::IChangeable& dataModel,
-				const sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0& sdlRepresentation) const override;
+				const sdl::V1_0::imtbase::CTimeFilter& sdlRepresentation) const override;
 };
 
 

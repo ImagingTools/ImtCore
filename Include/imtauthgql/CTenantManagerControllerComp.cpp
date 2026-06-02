@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CTenantManagerControllerComp.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
 
 
 // Qt includes
@@ -118,30 +119,36 @@ sdl::imtauth::Tenants::CTenantConnectionRequest::V1_0 ConnectionRequestToData(co
 
 // protected methods
 
-// reimplemented (sdl::imtauth::Tenants::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtauth::CTenantsGqlHandlerCompBase)
 
-sdl::imtauth::Tenants::CGetTenantIdsPayload CTenantManagerControllerComp::OnGetTenantIds(
-			const sdl::imtauth::Tenants::CGetTenantIdsGqlRequest& /*getTenantIdsRequest*/,
+sdl::V1_0::imtauth::CGetTenantIdsPayload CTenantManagerControllerComp::OnGetTenantIds(
+			const sdl::V1_0::imtauth::CGetTenantIdsGqlRequest& /*getTenantIdsRequest*/,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	sdl::imtauth::Tenants::CGetTenantIdsPayload response;
+	sdl::V1_0::imtauth::CGetTenantIdsPayload response;
 
 	if (!m_tenantManagerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'TenantManager' was not set", "CTenantManagerControllerComp");
 		return response;
 	}
 
-	response.Version_1_0.emplace();
-
 	QByteArrayList ids = m_tenantManagerCompPtr->GetTenantIds();
 
+<<<<<<< HEAD
 	response.Version_1_0->tenantIds.Emplace().FromList(ids);
+=======
+	response.tenantIds.Emplace().FromList(ids);
+	for (const auto& id : ids){
+		response.tenantIds->push_back(id);
+	}
+>>>>>>> origin/main
 
 	return response;
 }
 
 
+<<<<<<< HEAD
 sdl::imtauth::Tenants::CGetTenantRelationshipsPayload CTenantManagerControllerComp::OnGetTenantRelationships(
 			const sdl::imtauth::Tenants::CGetTenantRelationshipsGqlRequest& getTenantRelationshipsRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
@@ -180,38 +187,44 @@ sdl::imtauth::Tenants::CGetTenantRelationshipsPayload CTenantManagerControllerCo
 		response.Version_1_0->relationships->push_back(RelationshipToData(tenantId, relationship));
 	}
 
+=======
+sdl::V1_0::imtauth::CGetTenantRelationshipsPayload CTenantManagerControllerComp::OnGetTenantRelationships(
+			const sdl::V1_0::imtauth::CGetTenantRelationshipsGqlRequest& /*getTenantRelationshipsRequest*/,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
+{
+	sdl::V1_0::imtauth::CGetTenantRelationshipsPayload response;
+>>>>>>> origin/main
 	return response;
 }
 
 
-sdl::imtauth::Tenants::CGetTenantPayload CTenantManagerControllerComp::OnGetTenant(
-			const sdl::imtauth::Tenants::CGetTenantGqlRequest& getTenantRequest,
+sdl::V1_0::imtauth::CGetTenantPayload CTenantManagerControllerComp::OnGetTenant(
+			const sdl::V1_0::imtauth::CGetTenantGqlRequest& getTenantRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	sdl::imtauth::Tenants::CGetTenantPayload response;
+	sdl::V1_0::imtauth::CGetTenantPayload response;
 
 	if (!m_tenantManagerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'TenantManager' was not set", "CTenantManagerControllerComp");
 		return response;
 	}
 
-	response.Version_1_0.emplace();
-
 	QByteArray tenantId;
-	sdl::imtauth::Tenants::GetTenantRequestArguments arguments = getTenantRequest.GetRequestedArguments();
-	if (arguments.input.Version_1_0->tenantId){
-		tenantId = *arguments.input.Version_1_0->tenantId;
+	sdl::V1_0::imtauth::GetTenantRequestArguments arguments = getTenantRequest.GetRequestedArguments();
+	if (arguments.input->tenantId){
+		tenantId = *arguments.input->tenantId;
 	}
 
 	imtauth::ITenantInfoUniquePtr tenantInfoPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
 
 	if (!tenantInfoPtr.IsValid()){
-		response.Version_1_0->errorMessage = QStringLiteral("Tenant not found");
+		response.errorMessage = QStringLiteral("Tenant not found");
 		return response;
 	}
 
-	sdl::imtauth::Tenants::CTenantData::V1_0 tenantData;
+	sdl::V1_0::imtauth::CTenantData tenantData;
 	tenantData.id = tenantInfoPtr->GetTenantId();
 	tenantData.name = tenantInfoPtr->GetTenantName();
 	tenantData.description = tenantInfoPtr->GetTenantDescription();
@@ -232,7 +245,7 @@ sdl::imtauth::Tenants::CGetTenantPayload CTenantManagerControllerComp::OnGetTena
 			imtauth::ITenantMembershipUniquePtr msPtr = m_membershipManagerCompPtr->GetMembership(msId);
 			if (msPtr.IsValid() && msPtr->IsActive()){
 				QByteArray userId = msPtr->GetUserId();
-				sdl::imtauth::Tenants::CTenantMemberEntry::V1_0 memberEntry;
+				sdl::V1_0::imtauth::CTenantMemberEntry memberEntry;
 				memberEntry.id = userId;
 
 				if (m_userCollectionCompPtr.IsValid()){
@@ -244,39 +257,43 @@ sdl::imtauth::Tenants::CGetTenantPayload CTenantManagerControllerComp::OnGetTena
 		}
 	}
 
-	response.Version_1_0->tenant = tenantData;
+	response.tenant = tenantData;
 
 	return response;
 }
 
 
-sdl::imtauth::Tenants::CCreateTenantPayload CTenantManagerControllerComp::OnCreateTenant(
-			const sdl::imtauth::Tenants::CCreateTenantGqlRequest& createTenantRequest,
+sdl::V1_0::imtauth::CCreateTenantPayload CTenantManagerControllerComp::OnCreateTenant(
+			const sdl::V1_0::imtauth::CCreateTenantGqlRequest& createTenantRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& /*errorMessage*/) const
 {
-	sdl::imtauth::Tenants::CCreateTenantPayload response;
+	sdl::V1_0::imtauth::CCreateTenantPayload response;
 
 	if (!m_tenantManagerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'TenantManager' was not set", "CTenantManagerControllerComp");
 		return response;
 	}
 
-	response.Version_1_0.emplace();
-
 	QString name;
 	QString description;
 	QByteArray ownerId = GetUserId(gqlRequest);
+<<<<<<< HEAD
 	QByteArray parentTenantId;
 	sdl::imtauth::Tenants::CreateTenantRequestArguments arguments = createTenantRequest.GetRequestedArguments();
 	if (arguments.input.Version_1_0->name){
 		name = *arguments.input.Version_1_0->name;
+=======
+	sdl::V1_0::imtauth::CreateTenantRequestArguments arguments = createTenantRequest.GetRequestedArguments();
+	if (arguments.input->name){
+		name = *arguments.input->name;
+>>>>>>> origin/main
 	}
-	if (arguments.input.Version_1_0->description){
-		description = *arguments.input.Version_1_0->description;
+	if (arguments.input->description){
+		description = *arguments.input->description;
 	}
-	if (arguments.input.Version_1_0->ownerId){
-		ownerId = *arguments.input.Version_1_0->ownerId;
+	if (arguments.input->ownerId){
+		ownerId = *arguments.input->ownerId;
 	}
 	if (arguments.input.Version_1_0->parentTenantId){
 		parentTenantId = *arguments.input.Version_1_0->parentTenantId;
@@ -285,7 +302,7 @@ sdl::imtauth::Tenants::CCreateTenantPayload CTenantManagerControllerComp::OnCrea
 	QByteArray tenantId = m_tenantManagerCompPtr->CreateTenant(name, description, ownerId);
 
 	if (tenantId.isEmpty()){
-		response.Version_1_0->errorMessage = QStringLiteral("Failed to create tenant");
+		response.errorMessage = QStringLiteral("Failed to create tenant");
 		return response;
 	}
 
@@ -298,79 +315,75 @@ sdl::imtauth::Tenants::CCreateTenantPayload CTenantManagerControllerComp::OnCrea
 		m_membershipManagerCompPtr->AddMembership(ownerId, tenantId, QByteArray());
 	}
 
-	response.Version_1_0->tenantId = tenantId;
+	response.tenantId = tenantId;
 
 	return response;
 }
 
 
-sdl::imtauth::Tenants::CRemoveTenantPayload CTenantManagerControllerComp::OnRemoveTenant(
-	const sdl::imtauth::Tenants::CRemoveTenantGqlRequest& removeTenantRequest,
+sdl::V1_0::imtauth::CRemoveTenantPayload CTenantManagerControllerComp::OnRemoveTenant(
+	const sdl::V1_0::imtauth::CRemoveTenantGqlRequest& removeTenantRequest,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::Tenants::CRemoveTenantPayload response;
+	sdl::V1_0::imtauth::CRemoveTenantPayload response;
 
 	if (!m_tenantManagerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'TenantManager' was not set", "CTenantManagerControllerComp");
 		return response;
 	}
 
-	response.Version_1_0.emplace();
-
 	QByteArray tenantId;
-	sdl::imtauth::Tenants::RemoveTenantRequestArguments arguments = removeTenantRequest.GetRequestedArguments();
-	if (arguments.input.Version_1_0->tenantId){
-		tenantId = *arguments.input.Version_1_0->tenantId;
+	sdl::V1_0::imtauth::RemoveTenantRequestArguments arguments = removeTenantRequest.GetRequestedArguments();
+	if (arguments.input->tenantId){
+		tenantId = *arguments.input->tenantId;
 	}
 
 	bool success = m_tenantManagerCompPtr->RemoveTenant(tenantId);
 
-	response.Version_1_0->success = success;
+	response.success = success;
 	if (!success){
-		response.Version_1_0->errorMessage = QStringLiteral("Failed to remove tenant");
+		response.errorMessage = QStringLiteral("Failed to remove tenant");
 	}
 
 	return response;
 }
 
 
-sdl::imtauth::Tenants::CUpdateTenantPayload CTenantManagerControllerComp::OnUpdateTenant(
-	const sdl::imtauth::Tenants::CUpdateTenantGqlRequest& updateTenantRequest,
+sdl::V1_0::imtauth::CUpdateTenantPayload CTenantManagerControllerComp::OnUpdateTenant(
+	const sdl::V1_0::imtauth::CUpdateTenantGqlRequest& updateTenantRequest,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::Tenants::CUpdateTenantPayload response;
+	sdl::V1_0::imtauth::CUpdateTenantPayload response;
 
 	if (!m_tenantManagerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'TenantManager' was not set", "CTenantManagerControllerComp");
 		return response;
 	}
-
-	response.Version_1_0.emplace();
 
 	QByteArray tenantId;
 	QString name;
 	QString description;
 	QByteArray ownerId;
-	sdl::imtauth::Tenants::UpdateTenantRequestArguments arguments = updateTenantRequest.GetRequestedArguments();
-	if (arguments.input.Version_1_0->tenantId){
-		tenantId = *arguments.input.Version_1_0->tenantId;
+	sdl::V1_0::imtauth::UpdateTenantRequestArguments arguments = updateTenantRequest.GetRequestedArguments();
+	if (arguments.input->tenantId){
+		tenantId = *arguments.input->tenantId;
 	}
-	if (arguments.input.Version_1_0->name){
-		name = *arguments.input.Version_1_0->name;
+	if (arguments.input->name){
+		name = *arguments.input->name;
 	}
-	if (arguments.input.Version_1_0->description){
-		description = *arguments.input.Version_1_0->description;
+	if (arguments.input->description){
+		description = *arguments.input->description;
 	}
-	if (arguments.input.Version_1_0->ownerId){
-		ownerId = *arguments.input.Version_1_0->ownerId;
+	if (arguments.input->ownerId){
+		ownerId = *arguments.input->ownerId;
 	}
 
-	bool success = m_tenantManagerCompPtr->UpdateTenant(tenantId, name, description, ownerId, bool(arguments.input.Version_1_0->ownerId));
+	bool success = m_tenantManagerCompPtr->UpdateTenant(tenantId, name, description, ownerId, bool(arguments.input->ownerId));
 
 	// Sync members with TenantMemberships
-	if (success && m_membershipManagerCompPtr.IsValid() && arguments.input.Version_1_0->members){
+	if (success && m_membershipManagerCompPtr.IsValid() && arguments.input->members){
 		// Get current member user IDs
 		QByteArrayList currentMembershipIds = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
 		QSet<QByteArray> currentUserIds;
@@ -385,7 +398,7 @@ sdl::imtauth::Tenants::CUpdateTenantPayload CTenantManagerControllerComp::OnUpda
 
 		// Build new set
 		QSet<QByteArray> newUserIds;
-		for (const auto& member : *arguments.input.Version_1_0->members){
+		for (const auto& member : *arguments.input->members){
 			if (member->id){
 				newUserIds << *member->id;
 			}
@@ -406,50 +419,49 @@ sdl::imtauth::Tenants::CUpdateTenantPayload CTenantManagerControllerComp::OnUpda
 		}
 	}
 
-	response.Version_1_0->success = success;
+	response.success = success;
 	if (!success){
-		response.Version_1_0->errorMessage = QStringLiteral("Failed to update tenant");
+		response.errorMessage = QStringLiteral("Failed to update tenant");
 	}
 
 	return response;
 }
 
 
-sdl::imtauth::Tenants::CSetTenantActivePayload CTenantManagerControllerComp::OnSetTenantActive(
-	const sdl::imtauth::Tenants::CSetTenantActiveGqlRequest& setTenantActiveRequest,
+sdl::V1_0::imtauth::CSetTenantActivePayload CTenantManagerControllerComp::OnSetTenantActive(
+	const sdl::V1_0::imtauth::CSetTenantActiveGqlRequest& setTenantActiveRequest,
 	const ::imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	sdl::imtauth::Tenants::CSetTenantActivePayload response;
+	sdl::V1_0::imtauth::CSetTenantActivePayload response;
 
 	if (!m_tenantManagerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'TenantManager' was not set", "CTenantManagerControllerComp");
 		return response;
 	}
 
-	response.Version_1_0.emplace();
-
 	QByteArray tenantId;
 	bool isActive = false;
-	sdl::imtauth::Tenants::SetTenantActiveRequestArguments arguments = setTenantActiveRequest.GetRequestedArguments();
-	if (arguments.input.Version_1_0->tenantId){
-		tenantId = *arguments.input.Version_1_0->tenantId;
+	sdl::V1_0::imtauth::SetTenantActiveRequestArguments arguments = setTenantActiveRequest.GetRequestedArguments();
+	if (arguments.input->tenantId){
+		tenantId = *arguments.input->tenantId;
 	}
-	if (arguments.input.Version_1_0->isActive){
-		isActive = *arguments.input.Version_1_0->isActive;
+	if (arguments.input->isActive){
+		isActive = *arguments.input->isActive;
 	}
 
 	bool success = m_tenantManagerCompPtr->SetTenantActive(tenantId, isActive);
 
-	response.Version_1_0->success = success;
+	response.success = success;
 	if (!success){
-		response.Version_1_0->errorMessage = QStringLiteral("Failed to set tenant active state");
+		response.errorMessage = QStringLiteral("Failed to set tenant active state");
 	}
 
 	return response;
 }
 
 
+<<<<<<< HEAD
 sdl::imtauth::Tenants::CAddTenantRelationshipPayload CTenantManagerControllerComp::OnAddTenantRelationship(
 			const sdl::imtauth::Tenants::CAddTenantRelationshipGqlRequest& addTenantRelationshipRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
@@ -522,10 +534,19 @@ sdl::imtauth::Tenants::CAddTenantRelationshipPayload CTenantManagerControllerCom
 
 	response.Version_1_0->relationshipId = relationshipId;
 
+=======
+sdl::V1_0::imtauth::CAddTenantRelationshipPayload CTenantManagerControllerComp::OnAddTenantRelationship(
+			const sdl::V1_0::imtauth::CAddTenantRelationshipGqlRequest& /*addTenantRelationshipRequest*/,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
+{
+	sdl::V1_0::imtauth::CAddTenantRelationshipPayload response;
+>>>>>>> origin/main
 	return response;
 }
 
 
+<<<<<<< HEAD
 sdl::imtauth::Tenants::CRemoveTenantRelationshipPayload CTenantManagerControllerComp::OnRemoveTenantRelationship(
 			const sdl::imtauth::Tenants::CRemoveTenantRelationshipGqlRequest& removeTenantRelationshipRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
@@ -557,6 +578,14 @@ sdl::imtauth::Tenants::CRemoveTenantRelationshipPayload CTenantManagerController
 		response.Version_1_0->errorMessage = QStringLiteral("Failed to remove tenant relationship");
 	}
 
+=======
+sdl::V1_0::imtauth::CRemoveTenantRelationshipPayload CTenantManagerControllerComp::OnRemoveTenantRelationship(
+			const sdl::V1_0::imtauth::CRemoveTenantRelationshipGqlRequest& /*removeTenantRelationshipRequest*/,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
+{
+	sdl::V1_0::imtauth::CRemoveTenantRelationshipPayload response;
+>>>>>>> origin/main
 	return response;
 }
 

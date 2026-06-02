@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CUserRepresentationController.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
 
 
 // ACF includes
@@ -16,7 +17,7 @@ namespace imtauthgql
 
 
 bool CUserRepresentationController::FillUserInfoFromRepresentation(
-			const sdl::imtauth::Users::CUserData::V1_0& representation,
+			const sdl::V1_0::imtauth::CUserData& representation,
 			istd::IChangeable& userObject,
 			imtbase::IObjectCollection* userCollectionPtr,
 			const QByteArray& userId,
@@ -91,7 +92,7 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 
 	userInfoPtr->SetName(name);
 
-	imtsdl::TElementList<sdl::imtauth::Users::CSystemInfo::V1_0> systemInfos;
+	imtsdl::TElementList<sdl::V1_0::imtauth::CSystemInfo> systemInfos;
 	if (representation.systemInfos){
 		systemInfos = *representation.systemInfos;
 	}
@@ -101,7 +102,7 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 		userInfoPtr->AddToSystem(systemInfo);
 	}
 	else{
-		for (const istd::TSharedNullable<sdl::imtauth::Users::CSystemInfo::V1_0>& sdlSystemInfo : systemInfos){
+		for (const istd::TNullableValue<sdl::V1_0::imtauth::CSystemInfo>& sdlSystemInfo : systemInfos){
 			QByteArray systemId;
 			if (!sdlSystemInfo.HasValue()){
 				continue;

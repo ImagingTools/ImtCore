@@ -19,6 +19,7 @@
 #include <imtauth/CUserInfo.h>
 #include <imtauth/CLdapUserCollectionControllerComp.h>
 #include <imtbase/CComplexCollectionFilter.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
 
 
 namespace imtauthgql
@@ -176,8 +177,8 @@ QByteArray CLdapAuthorizationControllerComp::GetUserObjectIdBySid(const QByteArr
 }
 
 
-sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAuthorization(
-			const sdl::imtauth::Authorization::CAuthorizationGqlRequest& authorizationRequest,
+sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAuthorization(
+			const sdl::V1_0::imtauth::CAuthorizationGqlRequest& authorizationRequest,
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
@@ -185,13 +186,13 @@ sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerC
 		bool enabled = m_enableableParamCompPtr->IsEnabled();
 		if (enabled){
 
-			sdl::imtauth::Authorization::AuthorizationRequestArguments arguments = authorizationRequest.GetRequestedArguments();
-			if (!arguments.input.Version_1_0.has_value()){
+			sdl::V1_0::imtauth::AuthorizationRequestArguments arguments = authorizationRequest.GetRequestedArguments();
+			if (!arguments.input.has_value()){
 				Q_ASSERT(false);
-				return sdl::imtauth::Authorization::CAuthorizationPayload();
+				return sdl::V1_0::imtauth::CAuthorizationPayload();
 			}
 
-			sdl::imtauth::Authorization::CAuthorizationInput::V1_0 inputArgument = *arguments.input.Version_1_0;
+			sdl::V1_0::imtauth::CAuthorizationInput inputArgument = *arguments.input;
 
 			QByteArray login;
 			if (inputArgument.login){
@@ -259,7 +260,7 @@ sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerC
 					QByteArray retVal = m_userCollectionCompPtr->InsertNewObject("User", userInfoPtr->GetName(), "", userInfoPtr.GetPtr(), userObjectId);
 					if (retVal.isEmpty()){
 						errorMessage = QString("Unable to insert LDAP user to the collection");
-						return sdl::imtauth::Authorization::CAuthorizationPayload();
+						return sdl::V1_0::imtauth::CAuthorizationPayload();
 					}
 				}
 				else{
@@ -311,13 +312,13 @@ sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerC
 
 				if (userInfoPtr.IsValid()){
 					userInfoPtr->SetId(login);
-					sdl::imtauth::Authorization::CAuthorizationPayload retVal;
+					sdl::V1_0::imtauth::CAuthorizationPayload retVal;
 					retVal = CreateAuthorizationSuccessfulResponse(*userInfoPtr.GetPtr(), *m_systemIdAttrPtr, productId, errorMessage);
 
 					return retVal;
 				}
 
-				sdl::imtauth::Authorization::CAuthorizationPayload retVal;
+				sdl::V1_0::imtauth::CAuthorizationPayload retVal;
 				retVal = CreateInvalidLoginOrPasswordResponse(login, errorMessage);
 
 				return retVal;

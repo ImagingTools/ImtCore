@@ -95,20 +95,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessEntry (
 
 QList<imtsdl::IncludeDirective> CGqlCollectionControllerBaseClassGeneratorComp::GetIncludeDirectives() const
 {
-	if (!m_sdlRequestListCompPtr.IsValid()){
-		return {};
-	}
-
-	imtsdl::SdlDocumentTypeList list = m_sdlDocumentListCompPtr->GetDocumentTypes(true);
-	if (list.isEmpty()){
-		return {};
-	}
-
-	static QList retVal = {
-		CreateImtDirective("<imtservergql/CObjectCollectionControllerCompBase.h>")
-	};
-
-	return retVal;
+	return {};
 }
 
 
@@ -482,7 +469,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(
 	structNameConverter.typeListProviderPtr = &*m_sdlTypeListCompPtr;
 	structNameConverter.enumListProviderPtr = &*m_sdlEnumListCompPtr;
 	structNameConverter.unionListProviderPtr = &*m_sdlUnionListCompPtr;
-	structNameConverter.addVersion = true;
+	structNameConverter.addVersion = false;
 
 	imtsdl::SdlTypeList typeList = m_sdlTypeListCompPtr->GetSdlTypes(false);
 	imtsdl::SdlUnionList unionList = m_sdlUnionListCompPtr->GetUnions(false);
@@ -1429,7 +1416,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 		*m_sdlEnumListCompPtr,
 		*m_sdlUnionListCompPtr,
 		false);
-	structNameConverter.addVersion = true;
+	structNameConverter.addVersion = false;
 
 	imtsdl::CSdlField outputArgument = sdlRequestInfo.request.GetOutputArgument();
 	CStructNamespaceConverter getStructNameConverter(
@@ -1439,7 +1426,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 		*m_sdlEnumListCompPtr,
 		*m_sdlUnionListCompPtr,
 		false);
-	getStructNameConverter.addVersion = true;
+	getStructNameConverter.addVersion = false;
 
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '/' << '/' << sdlRequestInfo.request.GetName();
@@ -1631,7 +1618,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 		stream << GetInputExtractionStringForTypeName(
 			sdlRequestInfo.request,
 			sdlRequestInfo.containerClassName,
-			QStringLiteral("Version_") + GetSdlEntryVersion(*referenceType, false),& isCorrect);
+			QString(),& isCorrect);
 		stream << QStringLiteral(", newObjectId, errorMessage);");
 		FeedStream(stream, 1, false);
 		if (!isCorrect){
@@ -1667,13 +1654,8 @@ QString CGqlCollectionControllerBaseClassGeneratorComp::GetInputExtractionString
 		QString callChain;
 		if (FindCallChainForField(sdlField, typeName, callChain)){
 			retVal.append(sdlField.GetId());
-			retVal.append('.');
-			if (!version.isEmpty()){
-				retVal.append(version);
-			}
 			if (!callChain.isEmpty()){
-				retVal.append('-');
-				retVal.append('>');
+				retVal.append("->");
 				retVal.append(callChain);
 			}
 

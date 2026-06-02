@@ -5,7 +5,7 @@
 // ImtCore includes
 #include <imtauth/IUserGroupManager.h>
 #include <imtauthgql/CClientRequestManagerCompBase.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Groups.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Groups_fwd.h>
 
 
 namespace imtauthgql
@@ -35,8 +35,8 @@ public:
 	virtual bool RemoveRolesFromGroup(const QByteArray& groupId, const QByteArrayList& roleIds) override;
 
 private:
-	bool GetGroupDataSdl(const QByteArray& groupId, sdl::imtauth::Groups::CGroupData::V1_0& groupData) const;
-	bool SetGroupDataSdl(const QByteArray& groupId, const sdl::imtauth::Groups::CGroupData::V1_0& groupData) const;
+	bool GetGroupDataSdl(const QByteArray& groupId, sdl::V1_0::imtauth::CGroupData& groupData) const;
+	bool SetGroupDataSdl(const QByteArray& groupId, const sdl::V1_0::imtauth::CGroupData& groupData) const;
 
 private:
 	I_FACT(imtauth::IUserGroupInfo, m_userGroupFactoryCompPtr);

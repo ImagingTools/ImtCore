@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CGqlCollectionImportControllerComp.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/CollectionImport.h>
 
 
 namespace imtservergql
@@ -8,7 +9,7 @@ namespace imtservergql
 
 // protected methods
 
-// reimplemented (sdl::imtbase::CollectionImport::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtbase::CCollectionImportGqlHandlerCompBase)
 
 collectionImport::CSessionStatus CGqlCollectionImportControllerComp::OnBeginCollectionImportSession(
 	const collectionImport::CBeginCollectionImportSessionGqlRequest& request,
@@ -24,13 +25,12 @@ collectionImport::CSessionStatus CGqlCollectionImportControllerComp::OnBeginColl
 		return retVal;
 	}
 
-	retVal.Version_1_0.emplace();
-	retVal.Version_1_0->status = collectionImport::Status::Failed;
+	retVal.status = collectionImport::Status::Failed;
 
 	imtservergql::ICollectionImportController::SessionInfo sessionInfo;
 	if (FillSessionInfo(request, sessionInfo, errorMessage)){
 		if (m_collectionImportControllerCompPtr->BeginCollectionImportSession(sessionInfo, errorMessage)){
-			retVal.Version_1_0->status = collectionImport::Status::Success;
+			retVal.status = collectionImport::Status::Success;
 		}
 	}
 
@@ -52,13 +52,12 @@ collectionImport::CSessionStatus CGqlCollectionImportControllerComp::OnCancelCol
 		return retVal;
 	}
 
-	retVal.Version_1_0.emplace();
-	retVal.Version_1_0->status = collectionImport::Status::Failed;
+	retVal.status = collectionImport::Status::Failed;
 
 	QByteArray sessionId = GetCancelSessionId(request);
 	if (!sessionId.isEmpty()){
 		if (m_collectionImportControllerCompPtr->CancelCollectionImportSession(sessionId, errorMessage)){
-			retVal.Version_1_0->status = collectionImport::Status::Success;
+			retVal.status = collectionImport::Status::Success;
 		}
 	}
 	else{

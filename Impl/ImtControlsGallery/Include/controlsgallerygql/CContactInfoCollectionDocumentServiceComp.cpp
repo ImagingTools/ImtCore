@@ -15,82 +15,70 @@ namespace controlsgallerygql
 
 // protected methods
 
-// reimplemented (CGraphQlHandlerCompBase)
+// reimplemented (CContactInfoCollectionDocumentServiceGqlHandlerCompBase)
 
-sdl::controlsgallery::ContactInfos::CContactInfoData CContactInfoCollectionDocumentServiceComp::OnGetContactInfoRepresentation(
-			const sdl::controlsgallery::ContactInfoCollectionDocumentService::CGetContactInfoRepresentationGqlRequest& getContactInfoRepresentationRequest,
+sdl::V1_0::controlsgallery::CContactInfoData CContactInfoCollectionDocumentServiceComp::OnGetContactInfoRepresentation(
+			const sdl::V1_0::controlsgallery::CGetContactInfoRepresentationGqlRequest& getContactInfoRepresentationRequest,
 			const::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::controlsgallery::ContactInfoCollectionDocumentService::GetContactInfoRepresentationRequestArguments arguments = getContactInfoRepresentationRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::controlsgallery::ContactInfos::CContactInfoData();
-	}
-
+	sdl::V1_0::controlsgallery::GetContactInfoRepresentationRequestArguments arguments = getContactInfoRepresentationRequest.GetRequestedArguments();
 	QByteArray objectId;
 	istd::IChangeableSharedPtr documentPtr;
-	if (arguments.input.Version_1_0->id){
-		objectId = *arguments.input.Version_1_0->id;
+	if (arguments.input.id){
+		objectId = *arguments.input.id;
 
 		m_documentManagerCompPtr->GetDocumentData("", objectId, documentPtr);
 	}
 
 	if (!documentPtr.IsValid()){
-		return sdl::controlsgallery::ContactInfos::CContactInfoData();
+		return sdl::V1_0::controlsgallery::CContactInfoData();
 	}
 
 	imtauth::IContactInfo* contactInfoPtr = dynamic_cast<imtauth::IContactInfo*>(documentPtr.GetPtr());
 	if (contactInfoPtr == nullptr){
-		return sdl::controlsgallery::ContactInfos::CContactInfoData();
+		return sdl::V1_0::controlsgallery::CContactInfoData();
 	}
 
-	sdl::controlsgallery::ContactInfos::CContactInfoData response;
-	response.Version_1_0.Emplace();
+	sdl::V1_0::controlsgallery::CContactInfoData response;
 
-	response.Version_1_0->firstName = contactInfoPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME);
-	response.Version_1_0->lastName = contactInfoPtr->GetNameField(imtauth::IContactInfo::NFT_LAST_NAME);
-	response.Version_1_0->email = contactInfoPtr->GetEmail();
+	response.firstName = contactInfoPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME);
+	response.lastName = contactInfoPtr->GetNameField(imtauth::IContactInfo::NFT_LAST_NAME);
+	response.email = contactInfoPtr->GetEmail();
 
 	return response;
 }
 
 
-sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CContactInfoCollectionDocumentServiceComp::OnUpdateContactInfoFromRepresentation(
-			const sdl::controlsgallery::ContactInfoCollectionDocumentService::CUpdateContactInfoFromRepresentationGqlRequest& updateContactInfoFromRepresentationRequest,
+sdl::V1_0::imtbase::CDocumentOperationStatus CContactInfoCollectionDocumentServiceComp::OnUpdateContactInfoFromRepresentation(
+			const sdl::V1_0::controlsgallery::CUpdateContactInfoFromRepresentationGqlRequest& updateContactInfoFromRepresentationRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
-	sdl::controlsgallery::ContactInfoCollectionDocumentService::UpdateContactInfoFromRepresentationRequestArguments arguments = updateContactInfoFromRepresentationRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus();
-	}
-
-	sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus response;
-	response.Version_1_0.Emplace();
-	response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::Failed;
+	sdl::V1_0::controlsgallery::UpdateContactInfoFromRepresentationRequestArguments arguments = updateContactInfoFromRepresentationRequest.GetRequestedArguments();
+	sdl::V1_0::imtbase::CDocumentOperationStatus response;
+	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
 
 	QByteArray documentId;
-	if (arguments.input.Version_1_0->documentId){
-		documentId = *arguments.input.Version_1_0->documentId;
+	if (arguments.input.documentId){
+		documentId = *arguments.input.documentId;
 	}
 
-	sdl::controlsgallery::ContactInfos::CContactInfoData::V1_0 contactInfo;
-	if (arguments.input.Version_1_0->contactInfo){
-		contactInfo = *arguments.input.Version_1_0->contactInfo;
+	sdl::V1_0::controlsgallery::CContactInfoData contactInfo;
+	if (arguments.input.contactInfo){
+		contactInfo = *arguments.input.contactInfo;
 	}
 
 	istd::IChangeableSharedPtr documentPtr;
 	m_documentManagerCompPtr->GetDocumentData("", documentId, documentPtr);
 	if (!documentPtr.IsValid()){
-		response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::InvalidDocumentId;
+		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
 
 	imtauth::IContactInfo* contactInfoPtr = dynamic_cast<imtauth::IContactInfo*>(documentPtr.GetPtr());
 	if (contactInfoPtr == nullptr){
-		response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::InvalidDocumentId;
+		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
 
@@ -110,28 +98,23 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CContactInfoCo
 
 	m_documentManagerCompPtr->SetDocumentData("", documentId, *contactInfoPtr);
 
-	response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::Success;
+	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 
 	return response;
 }
 
 
-sdl::controlsgallery::ContactInfoCollectionDocumentService::CEmailData CContactInfoCollectionDocumentServiceComp::OnGetContactInfoEmailRepresentation(
-			const sdl::controlsgallery::ContactInfoCollectionDocumentService::CGetContactInfoEmailRepresentationGqlRequest& getContactInfoEmailRepresentationRequest,
+sdl::V1_0::controlsgallery::CEmailData CContactInfoCollectionDocumentServiceComp::OnGetContactInfoEmailRepresentation(
+			const sdl::V1_0::controlsgallery::CGetContactInfoEmailRepresentationGqlRequest& getContactInfoEmailRepresentationRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
-	sdl::controlsgallery::ContactInfoCollectionDocumentService::CEmailData response;
-	sdl::controlsgallery::ContactInfoCollectionDocumentService::GetContactInfoEmailRepresentationRequestArguments arguments = getContactInfoEmailRepresentationRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return response;
-	}
-
+	sdl::V1_0::controlsgallery::CEmailData response;
+	sdl::V1_0::controlsgallery::GetContactInfoEmailRepresentationRequestArguments arguments = getContactInfoEmailRepresentationRequest.GetRequestedArguments();
 	QByteArray objectId;
 	istd::IChangeableSharedPtr documentPtr;
-	if (arguments.input.Version_1_0->id){
-		objectId = *arguments.input.Version_1_0->id;
+	if (arguments.input.id){
+		objectId = *arguments.input.id;
 		m_documentManagerCompPtr->GetDocumentData("", objectId, documentPtr);
 	}
 
@@ -144,48 +127,41 @@ sdl::controlsgallery::ContactInfoCollectionDocumentService::CEmailData CContactI
 		return response;
 	}
 
-	response.Version_1_0.Emplace();
-	response.Version_1_0->email = contactInfoPtr->GetEmail();
+	response.email = contactInfoPtr->GetEmail();
 
 	return response;
 }
 
 
-sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CContactInfoCollectionDocumentServiceComp::OnUpdateContactInfoEmailFromRepresentation(
-			const sdl::controlsgallery::ContactInfoCollectionDocumentService::CUpdateContactInfoEmailFromRepresentationGqlRequest& updateContactInfoEmailFromRepresentationRequest,
+sdl::V1_0::imtbase::CDocumentOperationStatus CContactInfoCollectionDocumentServiceComp::OnUpdateContactInfoEmailFromRepresentation(
+			const sdl::V1_0::controlsgallery::CUpdateContactInfoEmailFromRepresentationGqlRequest& updateContactInfoEmailFromRepresentationRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::controlsgallery::ContactInfoCollectionDocumentService::UpdateContactInfoEmailFromRepresentationRequestArguments arguments = updateContactInfoEmailFromRepresentationRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus();
-	}
-
-	sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus response;
-	response.Version_1_0.Emplace();
-	response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::Failed;
+	sdl::V1_0::controlsgallery::UpdateContactInfoEmailFromRepresentationRequestArguments arguments = updateContactInfoEmailFromRepresentationRequest.GetRequestedArguments();
+	sdl::V1_0::imtbase::CDocumentOperationStatus response;
+	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
 
 	QByteArray documentId;
-	if (arguments.input.Version_1_0->documentId){
-		documentId = *arguments.input.Version_1_0->documentId;
+	if (arguments.input.documentId){
+		documentId = *arguments.input.documentId;
 	}
 
-	sdl::controlsgallery::ContactInfoCollectionDocumentService::CEmailData::V1_0 emailInfo;
-	if (arguments.input.Version_1_0->email){
-		emailInfo = *arguments.input.Version_1_0->email;
+	sdl::V1_0::controlsgallery::CEmailData emailInfo;
+	if (arguments.input.email){
+		emailInfo = *arguments.input.email;
 	}
 
 	istd::IChangeableSharedPtr documentPtr;
 	m_documentManagerCompPtr->GetDocumentData("", documentId, documentPtr);
 	if (!documentPtr.IsValid()){
-		response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::InvalidDocumentId;
+		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
 
 	imtauth::IContactInfo* contactInfoPtr = dynamic_cast<imtauth::IContactInfo*>(documentPtr.GetPtr());
 	if (contactInfoPtr == nullptr){
-		response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::InvalidDocumentId;
+		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
 
@@ -197,7 +173,7 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CContactInfoCo
 
 	m_documentManagerCompPtr->SetDocumentData("", documentId, *contactInfoPtr);
 
-	response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::Success;
+	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 
 	return response;
 }

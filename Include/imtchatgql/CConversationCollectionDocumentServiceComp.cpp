@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtchatgql/CConversationCollectionDocumentServiceComp.h>
+#include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService.h>
+#include <GeneratedFiles/imtchatsdl/SDL/1.0/CPP/ConversationCollectionDocumentService.h>
 
 
 // ACF includes
@@ -15,74 +17,61 @@ namespace imtchatgql
 
 // protected methods
 
-// reimplemented (CGraphQlHandlerCompBase)
+// reimplemented (CConversationCollectionDocumentServiceGqlHandlerCompBase)
 
-sdl::imtchat::ImtChat::CConversationData CConversationCollectionDocumentServiceComp::OnGetConversationRepresentation(
-			const sdl::imtchat::ConversationCollectionDocumentService::CGetConversationRepresentationGqlRequest& getConversationRepresentationRequest,
+sdl::V1_0::imtchat::CConversationData CConversationCollectionDocumentServiceComp::OnGetConversationRepresentation(
+			const sdl::V1_0::imtchat::CGetConversationRepresentationGqlRequest& getConversationRepresentationRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtchat::ConversationCollectionDocumentService::GetConversationRepresentationRequestArguments arguments = getConversationRepresentationRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtchat::ImtChat::CConversationData();
-	}
-
+	sdl::V1_0::imtchat::GetConversationRepresentationRequestArguments arguments = getConversationRepresentationRequest.GetRequestedArguments();
 	QByteArray userId = GetUserId(gqlRequest);
 
 	QByteArray objectId;
 	istd::IChangeableSharedPtr documentPtr;
-	if (arguments.input.Version_1_0->id){
-		objectId = *arguments.input.Version_1_0->id;
+	if (arguments.input->id){
+		objectId = *arguments.input->id;
 
 		m_documentManagerCompPtr->GetDocumentData(userId, objectId, documentPtr);
 	}
 
 	if (!documentPtr.IsValid()){
-		return sdl::imtchat::ImtChat::CConversationData();
+		return sdl::V1_0::imtchat::CConversationData();
 	}
 
 	imtchat::IConversation* convPtr = dynamic_cast<imtchat::IConversation*>(documentPtr.GetPtr());
 	if (convPtr == nullptr){
-		return sdl::imtchat::ImtChat::CConversationData();
+		return sdl::V1_0::imtchat::CConversationData();
 	}
 
-	sdl::imtchat::ImtChat::CConversationData response;
-	response.Version_1_0.Emplace();
-
-	response.Version_1_0->id = convPtr->GetId();
-	response.Version_1_0->name = convPtr->GetName();
-	response.Version_1_0->createdAt = convPtr->GetCreatedAt();
-	response.Version_1_0->updatedAt = convPtr->GetUpdatedAt();
-	response.Version_1_0->metadata = convPtr->GetMetadata();
+	sdl::V1_0::imtchat::CConversationData response;
+	response.id = convPtr->GetId();
+	response.name = convPtr->GetName();
+	response.createdAt = convPtr->GetCreatedAt();
+	response.updatedAt = convPtr->GetUpdatedAt();
+	response.metadata = convPtr->GetMetadata();
 
 	return response;
 }
 
 
-sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CConversationCollectionDocumentServiceComp::OnUpdateConversationFromRepresentation(
-			const sdl::imtchat::ConversationCollectionDocumentService::CUpdateConversationFromRepresentationGqlRequest& updateConversationFromRepresentationRequest,
+sdl::V1_0::imtbase::CDocumentOperationStatus CConversationCollectionDocumentServiceComp::OnUpdateConversationFromRepresentation(
+			const sdl::V1_0::imtchat::CUpdateConversationFromRepresentationGqlRequest& updateConversationFromRepresentationRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtchat::ConversationCollectionDocumentService::UpdateConversationFromRepresentationRequestArguments arguments = updateConversationFromRepresentationRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0){
-		Q_ASSERT(false);
-		return sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus();
-	}
-
-	sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus response;
-	response.Version_1_0.Emplace();
-	response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::Failed;
+	sdl::V1_0::imtchat::UpdateConversationFromRepresentationRequestArguments arguments = updateConversationFromRepresentationRequest.GetRequestedArguments();
+	sdl::V1_0::imtbase::CDocumentOperationStatus response;
+	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
 
 	QByteArray documentId;
-	if (arguments.input.Version_1_0->documentId){
-		documentId = *arguments.input.Version_1_0->documentId;
+	if (arguments.input->documentId){
+		documentId = *arguments.input->documentId;
 	}
 
-	sdl::imtchat::ImtChat::CConversationData::V1_0 convInfo;
-	if (arguments.input.Version_1_0->conversation){
-		convInfo = *arguments.input.Version_1_0->conversation;
+	sdl::V1_0::imtchat::CConversationData convInfo;
+	if (arguments.input->conversation){
+		convInfo = *arguments.input->conversation;
 	}
 
 	QByteArray userId = GetUserId(gqlRequest);
@@ -90,13 +79,13 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CConversationC
 	istd::IChangeableSharedPtr documentPtr;
 	m_documentManagerCompPtr->GetDocumentData(userId, documentId, documentPtr);
 	if (!documentPtr.IsValid()){
-		response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::InvalidDocumentId;
+		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
 
 	imtchat::IConversation* convPtr = dynamic_cast<imtchat::IConversation*>(documentPtr.GetPtr());
 	if (convPtr == nullptr){
-		response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::InvalidDocumentId;
+		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
 		return response;
 	}
 
@@ -120,7 +109,7 @@ sdl::imtbase::CollectionDocumentService::CDocumentOperationStatus CConversationC
 
 	m_documentManagerCompPtr->SetDocumentData(userId, documentId, *convPtr);
 
-	response.Version_1_0->status = sdl::imtbase::CollectionDocumentService::EDocumentOperationStatus::Success;
+	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 
 	return response;
 }

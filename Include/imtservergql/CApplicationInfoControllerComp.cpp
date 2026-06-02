@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CApplicationInfoControllerComp.h>
+#include <GeneratedFiles/imtappsdl/SDL/1.0/CPP/Application.h>
 
 
 // ACF includes
@@ -13,10 +14,10 @@ namespace imtservergql
 
 // protected methods
 
-// reimplemented (sdl::imtapp::Application::CGraphQlHandlerCompBase)
+// reimplemented (sdl::V1_0::imtapp::CApplicationGqlHandlerCompBase)
 
 CApplicationInfoControllerComp::ApplicationInfo CApplicationInfoControllerComp::OnGetApplicationInfo(
-			const sdl::imtapp::Application::CGetApplicationInfoGqlRequest& /*getApplicationInfoRequest*/,
+			const sdl::V1_0::imtapp::CGetApplicationInfoGqlRequest& /*getApplicationInfoRequest*/,
 			const imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
@@ -27,8 +28,7 @@ CApplicationInfoControllerComp::ApplicationInfo CApplicationInfoControllerComp::
 		return {};
 	}
 
-	ApplicationInfo retVal;
-	ApplicationInfo::V1_0& applicationInfo = retVal.Version_1_0.Emplace();
+	ApplicationInfo applicationInfo;
 
 	const iser::IVersionInfo& versionInfo = m_applicationInfoCompPtr->GetVersionInfo();
 	int mainVersion = m_applicationInfoCompPtr->GetMainVersionId();
@@ -40,14 +40,14 @@ CApplicationInfoControllerComp::ApplicationInfo CApplicationInfoControllerComp::
 	}
 
 	using AppAttribute = ibase::IApplicationInfo::ApplicationAttribute;
-	using AppInfoMember = istd::TSharedNullable<QString> ApplicationInfo::V1_0::*;
+	using AppInfoMember = istd::TNullableValue<QString> ApplicationInfo::*;
 
 	const QHash<AppAttribute, QPair<QByteArray, AppInfoMember>> attributeHash = {
-		{ AppAttribute::AA_APPLICATION_ID,	 { QByteArrayLiteral("ApplicationInfo/ApplicationId"),	 &ApplicationInfo::V1_0::applicationId	 } },
-		{ AppAttribute::AA_APPLICATION_NAME, { QByteArrayLiteral("ApplicationInfo/ApplicationName"), &ApplicationInfo::V1_0::applicationName } },
-		{ AppAttribute::AA_APPLICATION_TYPE, { QByteArrayLiteral("ApplicationInfo/ApplicationType"), &ApplicationInfo::V1_0::applicationType } },
-		{ AppAttribute::AA_COMPANY_NAME,	 { QByteArrayLiteral("ApplicationInfo/CompanyName"),	 &ApplicationInfo::V1_0::companyName	 } },
-		{ AppAttribute::AA_PRODUCT_NAME,	 { QByteArrayLiteral("ApplicationInfo/ProductName"),	 &ApplicationInfo::V1_0::productName	 } },
+		{ AppAttribute::AA_APPLICATION_ID,	 { QByteArrayLiteral("ApplicationInfo/ApplicationId"),	 &ApplicationInfo::applicationId	 } },
+		{ AppAttribute::AA_APPLICATION_NAME, { QByteArrayLiteral("ApplicationInfo/ApplicationName"), &ApplicationInfo::applicationName } },
+		{ AppAttribute::AA_APPLICATION_TYPE, { QByteArrayLiteral("ApplicationInfo/ApplicationType"), &ApplicationInfo::applicationType } },
+		{ AppAttribute::AA_COMPANY_NAME,	 { QByteArrayLiteral("ApplicationInfo/CompanyName"),	 &ApplicationInfo::companyName	 } },
+		{ AppAttribute::AA_PRODUCT_NAME,	 { QByteArrayLiteral("ApplicationInfo/ProductName"),	 &ApplicationInfo::productName	 } },
 	};
 
 	for (auto it = attributeHash.constBegin(); it != attributeHash.constEnd(); ++it) {
@@ -79,7 +79,7 @@ CApplicationInfoControllerComp::ApplicationInfo CApplicationInfoControllerComp::
 		applicationInfo.logoIconName = logoIconNameParamPtr->GetText();
 	}
 
-	return retVal;
+	return applicationInfo;
 }
 
 

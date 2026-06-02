@@ -109,6 +109,9 @@ public:
 	[[nodiscard]] static QString GetFileSystemAcceptableEntryPath(const QString& originalText);
 	[[nodiscard]] static QString BuildNamespaceFromComponents(const QString& schemaNamespace, const QString& schemaName, const QString& versionName);
 	[[nodiscard]] static QString BuildNamespaceFromParams(const iprm::IParamsSet& schemaParams, bool addVersion = true, bool addPrefix = false);
+	/// \brief Builds a V1_0-style namespace: \c prefix::V<version>::<schemaNamespace> (no schema file name).
+	/// Matches the format produced by \c imtsdlgencpp::CSdlGenTools::GetNamespaceFromSchemaParams.
+	[[nodiscard]] static QString BuildNamespaceStructFromParams(const iprm::IParamsSet& schemaParams, const QString& prefix = QStringLiteral("sdl"));
 	[[nodiscard]] static QString BuildQmlImportDeclarationFromParams(const iprm::IParamsSet& schemaParams, const QString& suffix, bool addVersion = true);
 	[[nodiscard]] static QString GetNamespaceFromParamsOrArguments(
 				const SchemaParamsCompPtr& schemaParamsCompPtr,

@@ -2,12 +2,13 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6390" Description="ACF"/>
-            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="DatabaseUserSettings" X="1050" Y="525" Note=""/>
         <Element ComponentName="SQLiteRoleRepository" X="250" Y="125" Note=""/>
         <Element ComponentName="SQLiteTenantInvitationRepository" X="675" Y="475" Note=""/>
         <Element ComponentName="SQLiteTenantMembershipRepository" X="700" Y="775" Note=""/>

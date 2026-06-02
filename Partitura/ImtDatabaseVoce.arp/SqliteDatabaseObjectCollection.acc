@@ -46,7 +46,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SqlDatabaseDocumentDelegate" PackageId="ImtDatabasePck" ComponentId="SQLiteDatabaseDocumentDelegate">
+        <Element Id="SqlDatabaseDocumentDelegate" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseDocumentDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="AutoCreateTable" Type="Boolean" ExportId="AutoCreateTable">

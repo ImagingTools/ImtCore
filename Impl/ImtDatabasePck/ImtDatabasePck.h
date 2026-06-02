@@ -24,7 +24,6 @@
 #include <imtdb/CObjectCollectionMigrationControllerComp.h>
 #include <imtdb/CDatabaseConnectorComp.h>
 #include <imtdb/CDependentTableMetaInfoControllerComp.h>
-#include <imtdb/CSqliteDatabaseDocumentDelegateComp.h>
 #include <imtdb/CPostgresXPathExtractorComp.h>
 #include <imtdb/CSqliteXPathExtractorComp.h>
 #include <imtdb/CSqlDatabaseTransactionManagerComp.h>
@@ -49,13 +48,13 @@ typedef imtdb::CDatabaseAutomaticBackupComp DatabaseAutomaticBackup;
 typedef imtdb::CRestoringDatabaseControllerComp RestoringDatabaseController;
 typedef imtdb::CSqlStructureDelegateComp SqlStructureDelegate;
 typedef imtdb::CSqliteJsonDatabaseDelegateComp SqliteJsonDatabaseDelegate;
-typedef imtdb::TMessageDatabaseDelegateComp<imtdb::CSqliteDatabaseDocumentDelegateComp> SqliteJsonMessageDatabaseDelegate;
+typedef imtdb::TMessageDatabaseDelegateComp<imtdb::CSqlDatabaseDocumentDelegateComp> SqliteJsonMessageDatabaseDelegate;
 typedef imtdb::CMigrationControllerComp MigrationController;
 typedef imtdb::CCompositeMigrationControllerComp CompositeMigrationController;
 typedef imtdb::CObjectCollectionMigrationControllerComp ObjectCollectionMigrationController;
 typedef imtdb::CDatabaseConnectorComp DatabaseConnector;
 typedef imtdb::CDependentTableMetaInfoControllerComp DependentTableMetaInfoController;
-typedef imtdb::CSqliteDatabaseDocumentDelegateComp SQLiteDatabaseDocumentDelegate;
+typedef imtdb::CSqlDatabaseDocumentDelegateComp SQLiteDatabaseDocumentDelegate;
 typedef imtdb::CPostgresXPathExtractorComp PostgresXPathExtractor;
 typedef imtdb::CSqliteXPathExtractorComp SqliteXPathExtractor;
 typedef imtdb::CSqlDatabaseTransactionManagerComp SqlDatabaseTransactionManager;

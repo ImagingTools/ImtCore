@@ -201,7 +201,7 @@ inline bool CCollectionRepresentationConverter::CheckArgumentsId(
 			const Interface& arguments,
 			QString& errorMessage)
 {
-	if (!arguments.input.Version_1_0 || !arguments.input.Version_1_0->id) {
+	if (!arguments.input || !arguments.input->id) {
 		errorMessage = QObject::tr("Version 1.0 of the GQL request arguments is missing");
 
 		return false;
