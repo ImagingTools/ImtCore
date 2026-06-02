@@ -2,9 +2,6 @@
 #pragma once
 
 
-// SDL schema includes (for GqlHandlerCompBase definitions)
-#include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService.h>
-
 // ImtCore includes
 #include <imtchatgql/CConversationCollectionControllerComp.h>
 #include <imtchatgql/CConversationCollectionDocumentServiceComp.h>

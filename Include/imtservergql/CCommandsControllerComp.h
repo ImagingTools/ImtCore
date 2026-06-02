@@ -4,7 +4,7 @@
 
 // ImtCore includes
 #include <imtserverapp/IGuiElementContainer.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Commands_fwd.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Commands.h>
 
 
 namespace imtservergql

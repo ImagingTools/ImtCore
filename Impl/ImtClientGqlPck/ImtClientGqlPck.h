@@ -6,13 +6,6 @@
 #include <icomp/TModelCompWrap.h>
 #include <icomp/TMakeComponentWrap.h>
 
-// SDL schema includes (for GqlHandlerCompBase definitions)
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Commands.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentRevision.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/FilterableSelect.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
-#include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService.h>
-
 // ImtCore includes
 #include <imtclientgql/CApiClientComp.h>
 #include <imtclientgql/CAsyncApiClientComp.h>
