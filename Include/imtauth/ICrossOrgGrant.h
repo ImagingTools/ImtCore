@@ -2,13 +2,13 @@
 #pragma once
 
 
-// ACF includes
-#include <istd/IChangeable.h>
-
 // Qt includes
 #include <QByteArray>
 #include <QString>
 #include <QList>
+
+// ACF includes
+#include <istd/IChangeable.h>
 
 
 namespace imtauth

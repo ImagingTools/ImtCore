@@ -9,6 +9,7 @@
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/IGqlContext.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
 
 
 namespace imtauthgql
@@ -19,44 +20,44 @@ namespace
 {
 
 
-sdl::imtauth::Tenants::CrossTenantMessageType ToSdlMessageType(imtauth::CrossTenantMessageType type)
+sdl::V1_0::imtauth::CrossTenantMessageType ToSdlMessageType(imtauth::CrossTenantMessageType type)
 {
 	switch (type){
 	case imtauth::CTMT_ORDER_REQUEST:
-		return sdl::imtauth::Tenants::CrossTenantMessageType::OrderRequest;
+		return sdl::V1_0::imtauth::CrossTenantMessageType::OrderRequest;
 	case imtauth::CTMT_ORDER_CONFIRMATION:
-		return sdl::imtauth::Tenants::CrossTenantMessageType::OrderConfirmation;
+		return sdl::V1_0::imtauth::CrossTenantMessageType::OrderConfirmation;
 	case imtauth::CTMT_ORDER_REJECTION:
-		return sdl::imtauth::Tenants::CrossTenantMessageType::OrderRejection;
+		return sdl::V1_0::imtauth::CrossTenantMessageType::OrderRejection;
 	case imtauth::CTMT_ORDER_STATUS_UPDATE:
-		return sdl::imtauth::Tenants::CrossTenantMessageType::OrderStatusUpdate;
+		return sdl::V1_0::imtauth::CrossTenantMessageType::OrderStatusUpdate;
 	case imtauth::CTMT_ORDER_CANCELLATION:
-		return sdl::imtauth::Tenants::CrossTenantMessageType::OrderCancellation;
+		return sdl::V1_0::imtauth::CrossTenantMessageType::OrderCancellation;
 	case imtauth::CTMT_DOCUMENT_SHARE:
-		return sdl::imtauth::Tenants::CrossTenantMessageType::DocumentShare;
+		return sdl::V1_0::imtauth::CrossTenantMessageType::DocumentShare;
 	default:
-		return sdl::imtauth::Tenants::CrossTenantMessageType::Custom;
+		return sdl::V1_0::imtauth::CrossTenantMessageType::Custom;
 	}
 }
 
 
-sdl::imtauth::Tenants::CrossTenantMessageStatus ToSdlMessageStatus(imtauth::CrossTenantMessageStatus status)
+sdl::V1_0::imtauth::CrossTenantMessageStatus ToSdlMessageStatus(imtauth::CrossTenantMessageStatus status)
 {
 	switch (status){
 	case imtauth::CTMS_VALIDATED:
-		return sdl::imtauth::Tenants::CrossTenantMessageStatus::Validated;
+		return sdl::V1_0::imtauth::CrossTenantMessageStatus::Validated;
 	case imtauth::CTMS_DELIVERED:
-		return sdl::imtauth::Tenants::CrossTenantMessageStatus::Delivered;
+		return sdl::V1_0::imtauth::CrossTenantMessageStatus::Delivered;
 	case imtauth::CTMS_ACKNOWLEDGED:
-		return sdl::imtauth::Tenants::CrossTenantMessageStatus::Acknowledged;
+		return sdl::V1_0::imtauth::CrossTenantMessageStatus::Acknowledged;
 	case imtauth::CTMS_PROCESSED:
-		return sdl::imtauth::Tenants::CrossTenantMessageStatus::Processed;
+		return sdl::V1_0::imtauth::CrossTenantMessageStatus::Processed;
 	case imtauth::CTMS_FAILED:
-		return sdl::imtauth::Tenants::CrossTenantMessageStatus::Failed;
+		return sdl::V1_0::imtauth::CrossTenantMessageStatus::Failed;
 	case imtauth::CTMS_EXPIRED:
-		return sdl::imtauth::Tenants::CrossTenantMessageStatus::Expired;
+		return sdl::V1_0::imtauth::CrossTenantMessageStatus::Expired;
 	default:
-		return sdl::imtauth::Tenants::CrossTenantMessageStatus::Created;
+		return sdl::V1_0::imtauth::CrossTenantMessageStatus::Created;
 	}
 }
 
@@ -124,7 +125,7 @@ void CCrossTenantMessageNotificationPublisherComp::OnModelChanged(int /*modelId*
 	struct PendingNotification
 	{
 		QByteArray targetUserId;
-		sdl::imtauth::Tenants::ECrossTenantMessageNotificationType notificationType;
+		sdl::V1_0::imtauth::ECrossTenantMessageNotificationType notificationType;
 		imtauth::CrossTenantMessageInfo message;
 		QString tenantName;
 	};
@@ -150,7 +151,7 @@ void CCrossTenantMessageNotificationPublisherComp::OnModelChanged(int /*modelId*
 					if (!ownerUserId.isEmpty()){
 						pendingNotifications.append({
 							ownerUserId,
-							sdl::imtauth::Tenants::ECrossTenantMessageNotificationType::MessageReceived,
+							sdl::V1_0::imtauth::ECrossTenantMessageNotificationType::MessageReceived,
 							message,
 							FindTenantName(message.sourceTenantId)});
 					}
@@ -163,7 +164,7 @@ void CCrossTenantMessageNotificationPublisherComp::OnModelChanged(int /*modelId*
 					if (!ownerUserId.isEmpty()){
 						pendingNotifications.append({
 							ownerUserId,
-							sdl::imtauth::Tenants::ECrossTenantMessageNotificationType::MessageStatusChanged,
+							sdl::V1_0::imtauth::ECrossTenantMessageNotificationType::MessageStatusChanged,
 							message,
 							FindTenantName(message.targetTenantId)});
 					}
@@ -189,21 +190,20 @@ void CCrossTenantMessageNotificationPublisherComp::OnModelChanged(int /*modelId*
 // private methods
 
 void CCrossTenantMessageNotificationPublisherComp::PublishNotification(
-	const QByteArray& targetUserId,
-	sdl::imtauth::Tenants::ECrossTenantMessageNotificationType notificationType,
-	const imtauth::CrossTenantMessageInfo& message,
-	const QString& tenantName) const
+			const QByteArray& targetUserId,
+			sdl::V1_0::imtauth::ECrossTenantMessageNotificationType notificationType,
+			const imtauth::CrossTenantMessageInfo& message,
+			const QString& tenantName) const
 {
-	sdl::imtauth::Tenants::CCrossTenantMessageNotification notification;
-	notification.Version_1_0.emplace();
-	notification.Version_1_0->notificationType = notificationType;
-	notification.Version_1_0->messageId = message.messageId;
-	notification.Version_1_0->sourceTenantId = message.sourceTenantId;
-	notification.Version_1_0->targetTenantId = message.targetTenantId;
-	notification.Version_1_0->relationshipId = message.relationshipId;
-	notification.Version_1_0->messageType = ToSdlMessageType(message.messageType);
-	notification.Version_1_0->status = ToSdlMessageStatus(message.status);
-	notification.Version_1_0->tenantName = tenantName;
+	sdl::V1_0::imtauth::CCrossTenantMessageNotification notification;
+	notification.notificationType = notificationType;
+	notification.messageId = message.messageId;
+	notification.sourceTenantId = message.sourceTenantId;
+	notification.targetTenantId = message.targetTenantId;
+	notification.relationshipId = message.relationshipId;
+	notification.messageType = ToSdlMessageType(message.messageType);
+	notification.status = ToSdlMessageStatus(message.status);
+	notification.tenantName = tenantName;
 
 	QJsonObject jsonObject;
 	if (!notification.WriteToJsonObject(jsonObject)){

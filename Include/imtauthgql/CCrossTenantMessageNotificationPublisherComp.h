@@ -14,7 +14,7 @@
 #include <imtauth/ICrossTenantMessage.h>
 #include <imtauth/ITenantManager.h>
 #include <imtservergql/CGqlPublisherCompBase.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants_fwd.h>
 
 
 namespace imtauthgql
@@ -72,7 +72,7 @@ protected:
 private:
 	void PublishNotification(
 		const QByteArray& targetUserId,
-		sdl::imtauth::Tenants::ECrossTenantMessageNotificationType notificationType,
+		sdl::V1_0::imtauth::ECrossTenantMessageNotificationType notificationType,
 		const imtauth::CrossTenantMessageInfo& message,
 		const QString& tenantName) const;
 

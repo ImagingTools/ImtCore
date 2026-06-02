@@ -1,6 +1,7 @@
 schema {
 	query: Query
 	mutation: Mutation
+	subscription: Subscription
 	namespace: imtauth
 	version: 1.0
 }
@@ -353,6 +354,10 @@ input GetContractsInput {
 	tenantId: ID!
 }
 
+input EnsureSystemTenantInput {
+	tenantId: ID
+}
+
 type GetContractsPayload {
 	contracts: [Contract]
 	errorMessage: String
@@ -683,7 +688,7 @@ type Mutation {
 	CreateContract (input: CreateContractInput): CreateContractPayload!
 	UpdateContractStatus (input: UpdateContractStatusInput): UpdateContractStatusPayload!
 	TerminateContract (input: TerminateContractInput): TerminateContractPayload!
-	EnsureSystemTenant: EnsureSystemTenantPayload!
+	EnsureSystemTenant (input: EnsureSystemTenantInput): EnsureSystemTenantPayload!
 	CreateTenantConnectionRequest (input: CreateTenantConnectionRequestInput): CreateTenantConnectionRequestPayload!
 	CreateTenantConnectCode (input: CreateTenantConnectCodeInput): CreateTenantConnectCodePayload!
 	AcceptTenantConnectionRequest (input: AcceptTenantConnectionRequestInput): AcceptTenantConnectionRequestPayload!

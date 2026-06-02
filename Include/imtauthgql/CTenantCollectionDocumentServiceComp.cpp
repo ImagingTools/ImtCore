@@ -215,8 +215,8 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 	response.tenantPermissions.Emplace().FromList(tenantPtr->GetTenantPermissions());
 
 	// Hierarchy fields
-	response.Version_1_0->parentTenantId = tenantPtr->GetParentTenantId();
-	response.Version_1_0->isSystemTenant = (tenantPtr->GetTenantId() == imtauth::GetSystemTenantId());
+	response.parentTenantId = tenantPtr->GetParentTenantId();
+	response.isSystemTenant = (tenantPtr->GetTenantId() == imtauth::GetSystemTenantId());
 
 	return response;
 }
