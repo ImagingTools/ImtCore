@@ -2,6 +2,10 @@
 #pragma once
 
 
+// SDL schema includes (for GqlHandlerCompBase definitions)
+#include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/ImtDesk.h>
+#include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/TicketCollectionDocumentService.h>
+
 // ImtCore includes
 #include <imtdeskgql/CTicketCollectionControllerComp.h>
 #include <imtdeskgql/CTicketCollectionDocumentServiceComp.h>

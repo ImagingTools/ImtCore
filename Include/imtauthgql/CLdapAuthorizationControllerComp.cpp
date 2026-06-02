@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
 #include <imtauthgql/CLdapAuthorizationControllerComp.h>
 
 
@@ -19,7 +20,6 @@
 #include <imtauth/CUserInfo.h>
 #include <imtauth/CLdapUserCollectionControllerComp.h>
 #include <imtbase/CComplexCollectionFilter.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
 
 
 namespace imtauthgql

@@ -6,6 +6,19 @@
 #include <icomp/TMakeComponentWrap.h>
 #include <icomp/TModelCompWrap.h>
 
+// SDL schema includes (for GqlHandlerCompBase definitions)
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/AuthorizationOptions.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/PersonalAccessTokens.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Profile.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Sessions.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantCollectionDocumentService.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantMemberships.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
+#include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService.h>
+
 // ImtCore includes
 #include <imtauthgql/CAuthorizationControllerComp.h>
 #include <imtauthgql/CRoleCollectionControllerComp.h>

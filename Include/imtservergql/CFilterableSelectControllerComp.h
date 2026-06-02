@@ -5,7 +5,7 @@
 #include <imtbase/IObjectCollection.h>
 #include <imtserverapp/CComplexCollectionFilterRepresentationController.h>
 #include <imtservergql/IParamsSetJoiner.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/FilterableSelect.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/FilterableSelect_fwd.h>
 
 
 namespace imtservergql

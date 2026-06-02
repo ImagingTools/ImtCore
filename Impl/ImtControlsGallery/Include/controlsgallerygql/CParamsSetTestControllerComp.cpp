@@ -1,3 +1,4 @@
+#include <GeneratedFiles/controlsgallerysdl/SDL/1.0/CPP/ParamsSetTest.h>
 #include <controlsgallerygql/CParamsSetTestControllerComp.h>
 
 

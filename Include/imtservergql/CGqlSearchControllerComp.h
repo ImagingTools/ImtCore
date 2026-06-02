@@ -5,7 +5,7 @@
 // ImtCore includes
 #include <imtbase/ISearchController.h>
 #include <imtservergql/CGqlRequestHandlerCompBase.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Search.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Search_fwd.h>
 
 
 namespace imtservergql

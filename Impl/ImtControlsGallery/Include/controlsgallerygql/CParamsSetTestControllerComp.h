@@ -2,7 +2,7 @@
 
 
 // ControlsGallery includes
-#include <GeneratedFiles/controlsgallerysdl/SDL/1.0/CPP/ParamsSetTest.h>
+#include <GeneratedFiles/controlsgallerysdl/SDL/1.0/CPP/ParamsSetTest_fwd.h>
 
 
 namespace controlsgallerygql

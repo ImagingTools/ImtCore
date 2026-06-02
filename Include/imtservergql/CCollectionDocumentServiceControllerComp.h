@@ -9,7 +9,7 @@
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IOperationContext.h>
 #include <imtdoc/IDocumentService.h>
-#include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService.h>
+#include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService_fwd.h>
 #include <imtbasesdl/SDL/1.0/CPP/UndoManager_fwd.h>
 
 

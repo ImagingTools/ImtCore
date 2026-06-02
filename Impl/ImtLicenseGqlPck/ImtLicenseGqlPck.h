@@ -6,6 +6,9 @@
 #include <icomp/TMakeComponentWrap.h>
 #include <icomp/TModelCompWrap.h>
 
+// SDL schema includes (for GqlHandlerCompBase definitions)
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
+
 // ImtCore includes
 #include <imtlicgql/CProductCollectionControllerComp.h>
 #include <imtlicgql/CProductControllerComp.h>
