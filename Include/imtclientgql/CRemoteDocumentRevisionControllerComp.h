@@ -4,7 +4,7 @@
 
 // ImtCore includes
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentRevision_fwd.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentRevision.h>
 
 
 namespace imtclientgql

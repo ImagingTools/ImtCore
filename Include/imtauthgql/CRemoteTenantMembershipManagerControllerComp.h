@@ -4,7 +4,7 @@
 
 // ImtCore includes
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantMemberships_fwd.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantMemberships.h>
 
 
 namespace imtauthgql
