@@ -6,7 +6,7 @@
 #include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService_fwd.h>
 
 // ControlsGallery includes
-#include <controlsgallerysdl/SDL/1.0/CPP/ContactInfoCollectionDocumentService.h>
+#include <controlsgallerysdl/SDL/1.0/CPP/ContactInfoCollectionDocumentService_fwd.h>
 
 
 

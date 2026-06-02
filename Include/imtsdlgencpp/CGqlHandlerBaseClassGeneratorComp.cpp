@@ -43,7 +43,7 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessEntry(
 	}
 
 	bool retVal = true;
-	if (headerDevicePtr != nullptr && sourceDevicePtr != nullptr){
+	if (headerDevicePtr != nullptr && sourceDevicePtr == nullptr){
 		retVal = retVal && ProcessHeaderClassFile(sdlEntry, headerDevicePtr);
 	}
 	if (sourceDevicePtr != nullptr){
@@ -416,4 +416,3 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 
 
 } // namespace imtsdlgencpp
-

@@ -1,6 +1,9 @@
 #pragma once
 
 
+#include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
+
+
 // custom types includes
 #include <complextestsdl/SDL/1.0/CPP/ComplexUnion1_fwd.h>
 #include <imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter_fwd.h>
@@ -43,7 +46,25 @@ class CCDMResultUnionTypeObjectList;
 class CGetLastProductionResultsGqlRequest;
 class CGetLastProductionResultsCDMGqlRequest;
 
-// GqlHandlerCompBase forward declaration
-class CComplexUnion2GqlHandlerCompBase;
+class CComplexUnion2GqlHandlerCompBase: public ::imtservergql::CPermissibleGqlRequestHandlerComp
+{
+
+public:
+	typedef ::imtservergql::CPermissibleGqlRequestHandlerComp BaseClass;
+
+	I_BEGIN_BASE_COMPONENT(CComplexUnion2GqlHandlerCompBase)
+	I_END_COMPONENT
+
+	// reimplemented (::imtservergql::CPermissibleGqlRequestHandlerComp)
+	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
+	virtual QJsonObject CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+
+protected:
+	// abstract methods
+	virtual CProductOverview OnGetLastProductionResults(const CGetLastProductionResultsGqlRequest& getLastProductionResultsRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
+	virtual CCDMResult OnGetLastProductionResultsCDM(const CGetLastProductionResultsCDMGqlRequest& getLastProductionResultsCDMRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
+};
+
+
 
 } // namespace sdl::V1_0::complextest

@@ -869,12 +869,21 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 		}
 	}
 
-	// forward declare GqlHandlerCompBase class
-	if (hasRequests){
-		fwdStream << QStringLiteral("// GqlHandlerCompBase forward declaration");
-		FeedStream(fwdStream, 1, false);
-		fwdStream << QStringLiteral("class C") << schemaBaseName << QStringLiteral("GqlHandlerCompBase;");
-		FeedStream(fwdStream, 2, false);
+	// generate GqlHandlerCompBase class definition (moved from .h)
+	if (hasRequests && m_autoProcessorCompListPtr.IsValid()){
+		// flush the stream before passing the device to auto processors
+		fwdStream.flush();
+
+		const int processorsCount = m_autoProcessorCompListPtr.GetCount();
+		imtsdl::CSdlType dummyType;
+		for (int i = 0; i < processorsCount; ++i){
+			ICxxFileProcessor* processorPtr = m_autoProcessorCompListPtr[i];
+			Q_ASSERT(processorPtr != nullptr);
+			const bool ok = processorPtr->ProcessEntry(dummyType, fwdFilePtr.get(), nullptr, paramsPtr);
+			if (!ok){
+				return false;
+			}
+		}
 	}
 
 
@@ -964,4 +973,3 @@ CCxxProcessorsManagerComp::FilePtr CCxxProcessorsManagerComp::CreateFile(const Q
 
 
 } // namespace imtsdlgencpp
-

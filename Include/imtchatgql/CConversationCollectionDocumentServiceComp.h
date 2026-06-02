@@ -7,7 +7,7 @@
 #include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService_fwd.h>
 
 // Generated includes
-#include <GeneratedFiles/imtchatsdl/SDL/1.0/CPP/ConversationCollectionDocumentService.h>
+#include <GeneratedFiles/imtchatsdl/SDL/1.0/CPP/ConversationCollectionDocumentService_fwd.h>
 
 
 namespace imtchatgql
