@@ -621,6 +621,26 @@ private:
 
 
 
+class CPrinterBaseGqlHandlerCompBase: public ::imtservergql::CPermissibleGqlRequestHandlerComp
+{
+
+public:
+	typedef ::imtservergql::CPermissibleGqlRequestHandlerComp BaseClass;
+
+	I_BEGIN_BASE_COMPONENT(CPrinterBaseGqlHandlerCompBase)
+	I_END_COMPONENT
+
+	// reimplemented (::imtservergql::CPermissibleGqlRequestHandlerComp)
+	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
+	virtual QJsonObject CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+
+protected:
+	// abstract methods
+	virtual CPrinterList OnGetPrinters(const CGetPrintersGqlRequest& getPrintersRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
+};
+
+
+
 
 #ifdef QT_QML_LIB
 [[maybe_unused]] static void RegisterPrinterBaseQmlTypes()

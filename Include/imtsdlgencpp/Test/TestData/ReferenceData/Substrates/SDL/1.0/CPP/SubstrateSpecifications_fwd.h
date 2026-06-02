@@ -2,7 +2,6 @@
 
 
 #include <imtservergql/CObjectCollectionControllerCompBase.h>
-#include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
 
 
 // custom types includes
@@ -86,28 +85,7 @@ protected:
 
 };
 
-class CSubstrateSpecificationsGqlHandlerCompBase: public ::imtservergql::CPermissibleGqlRequestHandlerComp
-{
-
-public:
-	typedef ::imtservergql::CPermissibleGqlRequestHandlerComp BaseClass;
-
-	I_BEGIN_BASE_COMPONENT(CSubstrateSpecificationsGqlHandlerCompBase)
-	I_END_COMPONENT
-
-	// reimplemented (::imtservergql::CPermissibleGqlRequestHandlerComp)
-	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
-	virtual ::imtbase::CTreeItemModel* CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-
-protected:
-	// abstract methods
-	virtual CSubstrateSpecificationListResponse OnGetSubstrateSpecificationList(const CGetSubstrateSpecificationListGqlRequest& getSubstrateSpecificationListRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
-	virtual SubstrateSpecificationDocument OnGetSubstrateSpecification(const CGetSubstrateSpecificationGqlRequest& getSubstrateSpecificationRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
-	virtual sdl::V1_0::imtbase::COptionsList OnGetOptionsList(const CGetOptionsListGqlRequest& getOptionsListRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
-	virtual CInputId OnInsertSubstrateSpecification(const CInsertSubstrateSpecificationGqlRequest& insertSubstrateSpecificationRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
-	virtual CInputId OnUpdateSubstrateSpecification(const CUpdateSubstrateSpecificationGqlRequest& updateSubstrateSpecificationRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
-};
-
-
+// GqlHandlerCompBase forward declaration
+class CSubstrateSpecificationsGqlHandlerCompBase;
 
 } // namespace sdl::V1_0::V1_0

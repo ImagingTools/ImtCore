@@ -3,7 +3,6 @@
 
 #include <QtCore/QObject>
 #include <imtservergql/CObjectCollectionControllerCompBase.h>
-#include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
 
 
 namespace sdl::V1_0::modsdl
@@ -81,24 +80,7 @@ protected:
 
 };
 
-class CUnionTestGqlHandlerCompBase: public ::imtservergql::CPermissibleGqlRequestHandlerComp
-{
-
-public:
-	typedef ::imtservergql::CPermissibleGqlRequestHandlerComp BaseClass;
-
-	I_BEGIN_BASE_COMPONENT(CUnionTestGqlHandlerCompBase)
-	I_END_COMPONENT
-
-	// reimplemented (::imtservergql::CPermissibleGqlRequestHandlerComp)
-	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
-	virtual QJsonObject CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-
-protected:
-	// abstract methods
-	virtual PrinterSpecification OnGetSpecifications(const CGetSpecificationsGqlRequest& getSpecificationsRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
-};
-
-
+// GqlHandlerCompBase forward declaration
+class CUnionTestGqlHandlerCompBase;
 
 } // namespace sdl::V1_0::modsdl

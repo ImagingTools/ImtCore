@@ -682,7 +682,7 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 		hasEnums = !enumList.isEmpty();
 	}
 
-	// check if we have requests (need include for base class)
+	// check if we have requests (need forward declaration for GqlHandlerCompBase)
 	bool hasRequests = false;
 	if (m_requestsProviderListCompPtr.IsValid()){
 		const imtsdl::SdlRequestList requestsList = m_requestsProviderListCompPtr->GetRequests(true);
@@ -708,13 +708,7 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 		FeedStream(stream, 1, false);
 	}
 
-	// add include for CPermissibleGqlRequestHandlerComp if we have requests
-	if (hasRequests){
-		stream << QStringLiteral("#include <imtservergql/CPermissibleGqlRequestHandlerComp.h>");
-		FeedStream(stream, 1, false);
-	}
-
-	if (hasEnums || hasDocumentTypes || hasRequests){
+	if (hasEnums || hasDocumentTypes){
 		FeedStream(stream, 2, false);
 	}
 
@@ -875,21 +869,12 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 		}
 	}
 
-	// generate GqlHandlerCompBase class definition (moved from .h)
-	if (hasRequests && m_autoProcessorCompListPtr.IsValid()){
-		// flush the stream before passing the device to auto processors
-		fwdStream.flush();
-
-		const int processorsCount = m_autoProcessorCompListPtr.GetCount();
-		imtsdl::CSdlType dummyType;
-		for (int i = 0; i < processorsCount; ++i){
-			ICxxFileProcessor* processorPtr = m_autoProcessorCompListPtr[i];
-			Q_ASSERT(processorPtr != nullptr);
-			const bool ok = processorPtr->ProcessEntry(dummyType, fwdFilePtr.get(), nullptr, paramsPtr);
-			if (!ok){
-				return false;
-			}
-		}
+	// forward declare GqlHandlerCompBase class
+	if (hasRequests){
+		fwdStream << QStringLiteral("// GqlHandlerCompBase forward declaration");
+		FeedStream(fwdStream, 1, false);
+		fwdStream << QStringLiteral("class C") << schemaBaseName << QStringLiteral("GqlHandlerCompBase;");
+		FeedStream(fwdStream, 2, false);
 	}
 
 
