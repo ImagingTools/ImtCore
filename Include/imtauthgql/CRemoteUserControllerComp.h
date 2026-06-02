@@ -5,7 +5,7 @@
 // ImtCore includes
 #include <imtauth/ISuperuserProvider.h>
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users_fwd.h>
 
 
 namespace imtauthgql
@@ -15,10 +15,10 @@ namespace imtauthgql
 class CRemoteUserControllerComp:
 			virtual public imtauth::ISuperuserProvider,
 			public imtclientgql::TClientRequestManagerCompWrap<
-						sdl::imtauth::Users::CGraphQlHandlerCompBase>
+						sdl::V1_0::imtauth::CUsersGqlHandlerCompBase>
 {
 public:
-	typedef imtclientgql::TClientRequestManagerCompWrap<sdl::imtauth::Users::CGraphQlHandlerCompBase> BaseClass;
+	typedef imtclientgql::TClientRequestManagerCompWrap<sdl::V1_0::imtauth::CUsersGqlHandlerCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CRemoteUserControllerComp);
 	I_END_COMPONENT;
@@ -28,37 +28,37 @@ protected:
 	virtual ExistsStatus SuperuserExists(QString& errorMessage) const override;
 	virtual QByteArray GetSuperuserId() const override;
 
-	// reimplemented (sdl::imtauth::Users::CGraphQlHandlerCompBase)
-	virtual sdl::imtauth::Users::CChangePasswordPayload OnChangePassword(
-				const sdl::imtauth::Users::CChangePasswordGqlRequest& changePasswordRequest,
+	// reimplemented (sdl::V1_0::imtauth::CUsersGqlHandlerCompBase)
+	virtual sdl::V1_0::imtauth::CChangePasswordPayload OnChangePassword(
+				const sdl::V1_0::imtauth::CChangePasswordGqlRequest& changePasswordRequest,
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Users::CRegisterUserPayload OnRegisterUser(
-				const sdl::imtauth::Users::CRegisterUserGqlRequest& registerUserRequest,
+	virtual sdl::V1_0::imtauth::CRegisterUserPayload OnRegisterUser(
+				const sdl::V1_0::imtauth::CRegisterUserGqlRequest& registerUserRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Users::CCheckEmailPayload OnCheckEmail(
-				const sdl::imtauth::Users::CCheckEmailGqlRequest& checkEmailRequest,
+	virtual sdl::V1_0::imtauth::CCheckEmailPayload OnCheckEmail(
+				const sdl::V1_0::imtauth::CCheckEmailGqlRequest& checkEmailRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Users::CSendEmailCodePayload OnSendEmailCode(
-				const sdl::imtauth::Users::CSendEmailCodeGqlRequest& sendEmailCodeRequest,
+	virtual sdl::V1_0::imtauth::CSendEmailCodePayload OnSendEmailCode(
+				const sdl::V1_0::imtauth::CSendEmailCodeGqlRequest& sendEmailCodeRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Users::CCheckEmailCodePayload OnCheckEmailCode(
-				const sdl::imtauth::Users::CCheckEmailCodeGqlRequest& checkEmailCodeRequest,
+	virtual sdl::V1_0::imtauth::CCheckEmailCodePayload OnCheckEmailCode(
+				const sdl::V1_0::imtauth::CCheckEmailCodeGqlRequest& checkEmailCodeRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Users::CCheckSuperuserPayload OnCheckSuperuserExists(
-				const sdl::imtauth::Users::CCheckSuperuserExistsGqlRequest& checkSuperuserExistsRequest,
+	virtual sdl::V1_0::imtauth::CCheckSuperuserPayload OnCheckSuperuserExists(
+				const sdl::V1_0::imtauth::CCheckSuperuserExistsGqlRequest& checkSuperuserExistsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Users::CCreateSuperuserPayload OnCreateSuperuser(
-				const sdl::imtauth::Users::CCreateSuperuserGqlRequest& createSuperuserRequest,
+	virtual sdl::V1_0::imtauth::CCreateSuperuserPayload OnCreateSuperuser(
+				const sdl::V1_0::imtauth::CCreateSuperuserGqlRequest& createSuperuserRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Users::CUserObjectId OnGetUserObjectId(
-				const sdl::imtauth::Users::CGetUserObjectIdGqlRequest& getUserObjectIdRequest,
+	virtual sdl::V1_0::imtauth::CUserObjectId OnGetUserObjectId(
+				const sdl::V1_0::imtauth::CGetUserObjectIdGqlRequest& getUserObjectIdRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 };

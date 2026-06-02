@@ -76,7 +76,7 @@ bool CProgressManagerPublisherComp::CancelProgressSession(const QByteArray& sess
 
 bool CProgressManagerPublisherComp::PublishSession(const QByteArray& sessionId)
 {
-	sdl::imtbase::ProgressManager::CTaskProgress::V1_0 mainTask;
+	sdl::V1_0::imtbase::CTaskProgress mainTask;
 
 	QByteArray commandId;
 	const imtrest::IRequest* requestPtr = nullptr;

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtserverapp/CDoubleParamRepresentationControllerComp.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Settings.h>
 
 
 // ACF includes
@@ -12,11 +13,11 @@ namespace imtserverapp
 
 // protected methods
 
-// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CDoubleParam::V1_0>)
+// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CDoubleParam>)
 
 QByteArray CDoubleParamRepresentationControllerComp::GetTypeId() const
 {
-	return sdl::imtbase::ImtBaseTypes::CParamTypeIds::V1_0::ParamTypeIdsFields::DoubleParam.toUtf8();
+	return sdl::V1_0::imtbase::CParamTypeIds::ParamTypeIdsFields::DoubleParam.toUtf8();
 }
 
 
@@ -29,7 +30,7 @@ bool CDoubleParamRepresentationControllerComp::IsModelSupported(const istd::ICha
 
 
 bool CDoubleParamRepresentationControllerComp::GetSdlRepresentationFromDataModel(
-			sdl::imtbase::ImtBaseTypes::CDoubleParam::V1_0& sdlRepresentation,
+			sdl::V1_0::imtbase::CDoubleParam& sdlRepresentation,
 			const istd::IChangeable& dataModel,
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
@@ -50,7 +51,7 @@ bool CDoubleParamRepresentationControllerComp::GetSdlRepresentationFromDataModel
 
 bool CDoubleParamRepresentationControllerComp::GetDataModelFromSdlRepresentation(
 			istd::IChangeable& dataModel,
-			const sdl::imtbase::ImtBaseTypes::CDoubleParam::V1_0& sdlRepresentation) const
+			const sdl::V1_0::imtbase::CDoubleParam& sdlRepresentation) const
 {
 	iprm::ITextParam* textParamPtr = dynamic_cast<iprm::ITextParam*>(&dataModel);
 	Q_ASSERT(textParamPtr != nullptr);

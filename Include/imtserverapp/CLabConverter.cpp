@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtserverapp/CLabConverter.h>
+#include <GeneratedFiles/imtcolorsdl/SDL/1.0/CPP/Lab.h>
 
 
 // ACF includes
@@ -10,7 +11,7 @@ namespace imtserverapp
 {
 
 
-bool CLabConverter::ConvertRepresentationToModel(const sdl::imtcolor::Lab::CLab::V1_0& sdlStruct, icmm::CLab& lab)
+bool CLabConverter::ConvertRepresentationToModel(const sdl::V1_0::imtcolor::CLab& sdlStruct, icmm::CLab& lab)
 {
 	if (!sdlStruct.L){
 		qWarning() << qPrintable(__FILE__) << __LINE__ << "L is missing, but required";
@@ -36,7 +37,7 @@ bool CLabConverter::ConvertRepresentationToModel(const sdl::imtcolor::Lab::CLab:
 }
 
 
-bool CLabConverter::ConvertModelToRepresentation(const icmm::CLab& lab, sdl::imtcolor::Lab::CLab::V1_0& sdlStruct)
+bool CLabConverter::ConvertModelToRepresentation(const icmm::CLab& lab, sdl::V1_0::imtcolor::CLab& sdlStruct)
 {
 	sdlStruct.a.Emplace() = lab.GetA();
 	sdlStruct.b.Emplace() = lab.GetB();

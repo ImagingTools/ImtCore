@@ -4,33 +4,33 @@
 
 // ImtCore includes
 #include <imtserverapp/TJsonRepresentationControllerCompWrap.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Settings.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Settings_fwd.h>
 
 
 namespace imtserverapp
 {
 
 
-class CDatabaseAccessSettingsRepresentationControllerComp: public imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettings::V1_0>
+class CDatabaseAccessSettingsRepresentationControllerComp: public imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CDatabaseAccessSettings>
 {
 public:
-	typedef imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettings::V1_0> BaseClass;
+	typedef imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CDatabaseAccessSettings> BaseClass;
 
 	I_BEGIN_COMPONENT(CDatabaseAccessSettingsRepresentationControllerComp)
 		I_ASSIGN(m_canBackupRestoreAttrPtr, "CanBackupRestore", "Can backup restore in editor", false, true);
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CSchedulerParam::V1_0>)
+	// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::V1_0::imtbase::CSchedulerParam>)
 	virtual QByteArray GetTypeId() const override;
 	virtual bool IsModelSupported(const istd::IChangeable &dataModel) const override;
 	virtual bool GetSdlRepresentationFromDataModel(
-				sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettings::V1_0& sdlRepresentation,
+				sdl::V1_0::imtbase::CDatabaseAccessSettings& sdlRepresentation,
 				const istd::IChangeable& dataModel,
 				const iprm::IParamsSet* paramsPtr = nullptr) const override;
 	virtual bool GetDataModelFromSdlRepresentation(
 				istd::IChangeable& dataModel,
-				const sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettings::V1_0& sdlRepresentation) const override;
+				const sdl::V1_0::imtbase::CDatabaseAccessSettings& sdlRepresentation) const override;
 protected:
 	I_ATTR(bool, m_canBackupRestoreAttrPtr);
 };

@@ -1,17 +1,18 @@
 #include "UnionTest.h"
+#include "UnionTest_fwd.h"
 
 
-namespace sdl::modsdl::UnionTest
+namespace sdl::V1_0::modsdl
 {
 
 
-QByteArray CCoords::V1_0::GetVersionId()
+QByteArray CCoords::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CCoords::V1_0::operator==(const V1_0& other) const
+bool CCoords::operator==(const CCoords& other) const
 {
 	return 
 				X.has_value() == other.X.has_value() &&
@@ -23,7 +24,7 @@ bool CCoords::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CCoords::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CCoords::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "Coords", modelIndex);
 
@@ -46,7 +47,7 @@ bool CCoords::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelInde
 }
 
 
-bool CCoords::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CCoords::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant xData = model.GetData("X", modelIndex);
 	if (xData.isNull()){
@@ -68,7 +69,7 @@ bool CCoords::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mo
 }
 
 
-bool CCoords::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CCoords::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant xData = model.GetData("X", modelIndex);
 	if (!xData.isNull()){
@@ -84,7 +85,7 @@ bool CCoords::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int
 }
 
 
-bool CCoords::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CCoords::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!X){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "X").toLocal8Bit().constData();)
@@ -106,7 +107,7 @@ bool CCoords::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) c
 }
 
 
-bool CCoords::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CCoords::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("X") || (gqlObject["X"].userType() != QMetaType::Float && gqlObject["X"].userType() != QMetaType::Double && gqlObject["X"].userType() != QMetaType::Int && gqlObject["X"].userType() != QMetaType::UInt && gqlObject["X"].userType() != QMetaType::LongLong && gqlObject["X"].userType() != QMetaType::ULongLong && gqlObject["X"].userType() != QMetaType::Long && gqlObject["X"].userType() != QMetaType::Short && gqlObject["X"].userType() != QMetaType::ULong && gqlObject["X"].userType() != QMetaType::UShort && gqlObject["X"].userType() != QMetaType::UChar)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "X").toLocal8Bit().constData();)
@@ -126,7 +127,7 @@ bool CCoords::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 }
 
 
-bool CCoords::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CCoords::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("X") && (gqlObject["X"].userType() == QMetaType::Float || gqlObject["X"].userType() == QMetaType::Double || gqlObject["X"].userType() == QMetaType::Int || gqlObject["X"].userType() == QMetaType::UInt || gqlObject["X"].userType() == QMetaType::LongLong || gqlObject["X"].userType() == QMetaType::ULongLong || gqlObject["X"].userType() == QMetaType::Long || gqlObject["X"].userType() == QMetaType::Short || gqlObject["X"].userType() == QMetaType::ULong || gqlObject["X"].userType() == QMetaType::UShort || gqlObject["X"].userType() == QMetaType::UChar)){
 		X = gqlObject["X"].toDouble();
@@ -140,7 +141,7 @@ bool CCoords::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 }
 
 
-bool CCoords::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CCoords::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!X){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "X").toLocal8Bit().constData();)
@@ -162,7 +163,7 @@ bool CCoords::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CCoords::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CCoords::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("X") || ! jsonObject["X"].isDouble()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "X").toLocal8Bit().constData();)
@@ -182,7 +183,7 @@ bool CCoords::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CCoords::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CCoords::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("X") && jsonObject["X"].isDouble()){
 		X = jsonObject["X"].toDouble();
@@ -198,250 +199,20 @@ bool CCoords::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CCoords::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCoords::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCoords::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCoords::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCoords::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCoords::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCoords::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCoords::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CCoords::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CPrinterSpecificationBase::V1_0::GetVersionId()
+QByteArray CPrinterSpecificationBase::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CPrinterSpecificationBase::V1_0::operator==(const V1_0& other) const
+bool CPrinterSpecificationBase::operator==(const CPrinterSpecificationBase& other) const
 {
 	return 
 				name == other.name;
 }
 
 
-bool CPrinterSpecificationBase::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CPrinterSpecificationBase::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "PrinterSpecificationBase", modelIndex);
 
@@ -454,7 +225,7 @@ bool CPrinterSpecificationBase::V1_0::WriteToModel(::imtbase::CTreeItemModel& mo
 }
 
 
-bool CPrinterSpecificationBase::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CPrinterSpecificationBase::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant nameData = model.GetData("name", modelIndex);
 	if (!nameData.isNull()){
@@ -465,7 +236,7 @@ bool CPrinterSpecificationBase::V1_0::ReadFromModel(const ::imtbase::CTreeItemMo
 }
 
 
-bool CPrinterSpecificationBase::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CPrinterSpecificationBase::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant nameData = model.GetData("name", modelIndex);
 	if (!nameData.isNull()){
@@ -476,7 +247,7 @@ bool CPrinterSpecificationBase::V1_0::OptReadFromModel(const ::imtbase::CTreeIte
 }
 
 
-bool CPrinterSpecificationBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CPrinterSpecificationBase::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (name){
 		gqlObject.InsertParam("name", QVariant(*name));
@@ -488,7 +259,7 @@ bool CPrinterSpecificationBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamOb
 }
 
 
-bool CPrinterSpecificationBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CPrinterSpecificationBase::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("name") && (gqlObject["name"].userType() == QMetaType::QString || gqlObject["name"].userType() == QMetaType::QByteArray)){
 		name = gqlObject["name"].toString();
@@ -498,7 +269,7 @@ bool CPrinterSpecificationBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGql
 }
 
 
-bool CPrinterSpecificationBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CPrinterSpecificationBase::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("name") && (gqlObject["name"].userType() == QMetaType::QString || gqlObject["name"].userType() == QMetaType::QByteArray)){
 		name = gqlObject["name"].toString();
@@ -508,7 +279,7 @@ bool CPrinterSpecificationBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::C
 }
 
 
-bool CPrinterSpecificationBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CPrinterSpecificationBase::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (name){
 		jsonObject["name"] = QJsonValue::fromVariant(*name);
@@ -520,7 +291,7 @@ bool CPrinterSpecificationBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject)
 }
 
 
-bool CPrinterSpecificationBase::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CPrinterSpecificationBase::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("name") && jsonObject["name"].isString()){
 		name = jsonObject["name"].toString();
@@ -530,7 +301,7 @@ bool CPrinterSpecificationBase::V1_0::ReadFromJsonObject(const QJsonObject& json
 }
 
 
-bool CPrinterSpecificationBase::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CPrinterSpecificationBase::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("name") && jsonObject["name"].isString()){
 		name = jsonObject["name"].toString();
@@ -542,243 +313,13 @@ bool CPrinterSpecificationBase::V1_0::OptReadFromJsonObject(const QJsonObject& j
 
 // serialize methods
 
-bool CPrinterSpecificationBase::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPrinterSpecificationBase::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPrinterSpecificationBase::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPrinterSpecificationBase::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPrinterSpecificationBase::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPrinterSpecificationBase::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPrinterSpecificationBase::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPrinterSpecificationBase::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPrinterSpecificationBase::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CLink::V1_0::GetVersionId()
+QByteArray CLink::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CLink::V1_0::operator==(const V1_0& other) const
+bool CLink::operator==(const CLink& other) const
 {
 	return 
 				link == other.link &&
@@ -787,7 +328,7 @@ bool CLink::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CLink::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CLink::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "Link", modelIndex);
 
@@ -840,7 +381,7 @@ bool CLink::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex)
 }
 
 
-bool CLink::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CLink::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant linkData = model.GetData("link", modelIndex);
 	if (linkData.isNull()){
@@ -895,7 +436,7 @@ bool CLink::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mode
 }
 
 
-bool CLink::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CLink::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant linkData = model.GetData("link", modelIndex);
 	if (!linkData.isNull()){
@@ -947,7 +488,7 @@ bool CLink::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int m
 }
 
 
-bool CLink::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CLink::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!link){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "link").toLocal8Bit().constData();)
@@ -998,7 +539,7 @@ bool CLink::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) con
 }
 
 
-bool CLink::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CLink::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("link") || (gqlObject["link"].userType() != QMetaType::QString && gqlObject["link"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "link").toLocal8Bit().constData();)
@@ -1052,7 +593,7 @@ bool CLink::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObje
 }
 
 
-bool CLink::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CLink::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("link") && (gqlObject["link"].userType() == QMetaType::QString || gqlObject["link"].userType() == QMetaType::QByteArray)){
 		link = gqlObject["link"].toByteArray();
@@ -1103,7 +644,7 @@ bool CLink::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 }
 
 
-bool CLink::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CLink::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!link){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "link").toLocal8Bit().constData();)
@@ -1154,7 +695,7 @@ bool CLink::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CLink::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CLink::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("link") || ! jsonObject["link"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "link").toLocal8Bit().constData();)
@@ -1204,7 +745,7 @@ bool CLink::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CLink::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CLink::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("link") && jsonObject["link"].isString()){
 		link = jsonObject["link"].toString().toUtf8();
@@ -1253,243 +794,13 @@ bool CLink::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CLink::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CLink::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CLink::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CLink::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CLink::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CLink::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CLink::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CLink::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CLink::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
-QByteArray CPrinterBase::V1_0::GetVersionId()
+QByteArray CPrinterBase::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
 }
 
 
-bool CPrinterBase::V1_0::operator==(const V1_0& other) const
+bool CPrinterBase::operator==(const CPrinterBase& other) const
 {
 	return 
 				name == other.name &&
@@ -1499,7 +810,7 @@ bool CPrinterBase::V1_0::operator==(const V1_0& other) const
 }
 
 
-bool CPrinterBase::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool CPrinterBase::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "PrinterBase", modelIndex);
 
@@ -1585,7 +896,7 @@ bool CPrinterBase::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 }
 
 
-bool CPrinterBase::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CPrinterBase::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant nameData = model.GetData("name", modelIndex);
 	if (!nameData.isNull()){
@@ -1599,9 +910,9 @@ bool CPrinterBase::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 		return false;
 	}
 	int linkListCount = linkListModel->GetItemsCount();
-	imtsdl::TElementList<CLink::V1_0> linkListList;
+	imtsdl::TElementList<CLink> linkListList;
 	for (int linkListIndex = 0; linkListIndex < linkListCount; ++linkListIndex){
-		CLink::V1_0 t_linkList;
+		CLink t_linkList;
 		if (!t_linkList.ReadFromModel(*linkListModel, linkListIndex)){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "linkList").toLocal8Bit().constData();)
 
@@ -1688,7 +999,7 @@ bool CPrinterBase::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 }
 
 
-bool CPrinterBase::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool CPrinterBase::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant nameData = model.GetData("name", modelIndex);
 	if (!nameData.isNull()){
@@ -1698,9 +1009,9 @@ bool CPrinterBase::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 	::imtbase::CTreeItemModel* linkListModel = model.GetTreeItemModel("linkList", modelIndex);
 	if (linkListModel != nullptr){
 		int linkListCount = linkListModel->GetItemsCount();
-		imtsdl::TElementList<CLink::V1_0> linkListList;
+		imtsdl::TElementList<CLink> linkListList;
 		for (int linkListIndex = 0; linkListIndex < linkListCount; ++linkListIndex){
-			CLink::V1_0 t_linkList;
+			CLink t_linkList;
 			if (!t_linkList.OptReadFromModel(*linkListModel, linkListIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "linkList").toLocal8Bit().constData();)
 
@@ -1783,7 +1094,7 @@ bool CPrinterBase::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 }
 
 
-bool CPrinterBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool CPrinterBase::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (name){
 		gqlObject.InsertParam("name", QVariant(*name));
@@ -1863,7 +1174,7 @@ bool CPrinterBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 }
 
 
-bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CPrinterBase::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("name") && (gqlObject["name"].userType() == QMetaType::QString || gqlObject["name"].userType() == QMetaType::QByteArray)){
 		name = gqlObject["name"].toString();
@@ -1875,14 +1186,14 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		return false;
 	}
 	const qsizetype linkListElementsCount = gqlObject.GetObjectsCount("linkList");
-	linkList = imtsdl::TElementList<CLink::V1_0>();
+	linkList = imtsdl::TElementList<CLink>();
 	for (qsizetype linkListIndex = 0; linkListIndex < linkListElementsCount; ++linkListIndex){
 		const ::imtgql::CGqlParamObject* linkListDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("linkList", linkListIndex);
 		if (linkListDataObjectPtr == nullptr){
 			qDebug() << "invalid type" << linkListDataObjectPtr;
 			return false;
 		}
-		CLink::V1_0 tempLinkList;
+		CLink tempLinkList;
 		if (!tempLinkList.ReadFromGraphQlObject(*linkListDataObjectPtr)){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "linkList").toLocal8Bit().constData();)
 
@@ -1974,7 +1285,7 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 }
 
 
-bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool CPrinterBase::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("name") && (gqlObject["name"].userType() == QMetaType::QString || gqlObject["name"].userType() == QMetaType::QByteArray)){
 		name = gqlObject["name"].toString();
@@ -1985,14 +1296,14 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 	}
 	if (gqlObject.ContainsParam("linkList") && (gqlObject.GetObjectsCount("linkList") > 0)){
 		const qsizetype linkListElementsCount = gqlObject.GetObjectsCount("linkList");
-		linkList = imtsdl::TElementList<CLink::V1_0>();
+		linkList = imtsdl::TElementList<CLink>();
 		for (qsizetype linkListIndex = 0; linkListIndex < linkListElementsCount; ++linkListIndex){
 			const ::imtgql::CGqlParamObject* linkListDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("linkList", linkListIndex);
 			if (linkListDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << linkListDataObjectPtr;
 				return false;
 			}
-			CLink::V1_0 tempLinkList;
+			CLink tempLinkList;
 			if (!tempLinkList.OptReadFromGraphQlObject(*linkListDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "linkList").toLocal8Bit().constData();)
 
@@ -2082,7 +1393,7 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 }
 
 
-bool CPrinterBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+bool CPrinterBase::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (name){
 		jsonObject["name"] = QJsonValue::fromVariant(*name);
@@ -2183,7 +1494,7 @@ bool CPrinterBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CPrinterBase::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool CPrinterBase::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("name") && jsonObject["name"].isString()){
 		name = jsonObject["name"].toString();
@@ -2196,9 +1507,9 @@ bool CPrinterBase::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 	const QJsonArray linkListJsonArray = jsonObject["linkList"].toArray();
 	const qsizetype linkListArrayCount = linkListJsonArray.size();
-	linkList = imtsdl::TElementList<CLink::V1_0>();
+	linkList = imtsdl::TElementList<CLink>();
 	for (qsizetype linkListIndex = 0; linkListIndex < linkListArrayCount; ++linkListIndex){
-		CLink::V1_0 tempLinkList;
+		CLink tempLinkList;
 		if (!tempLinkList.ReadFromJsonObject(linkListJsonArray[linkListIndex].toObject())){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "linkList").toLocal8Bit().constData();)
 
@@ -2287,7 +1598,7 @@ bool CPrinterBase::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CPrinterBase::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool CPrinterBase::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("name") && jsonObject["name"].isString()){
 		name = jsonObject["name"].toString();
@@ -2296,9 +1607,9 @@ bool CPrinterBase::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("linkList") && jsonObject["linkList"].isArray()){
 		const QJsonArray linkListJsonArray = jsonObject["linkList"].toArray();
 		const qsizetype linkListArrayCount = linkListJsonArray.size();
-		linkList = imtsdl::TElementList<CLink::V1_0>();
+		linkList = imtsdl::TElementList<CLink>();
 		for (qsizetype linkListIndex = 0; linkListIndex < linkListArrayCount; ++linkListIndex){
-			CLink::V1_0 tempLinkList;
+			CLink tempLinkList;
 			if (!tempLinkList.OptReadFromJsonObject(linkListJsonArray[linkListIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "linkList").toLocal8Bit().constData();)
 
@@ -2384,238 +1695,7 @@ bool CPrinterBase::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 // serialize methods
 
-bool CPrinterBase::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToModel(model, modelIndex);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPrinterBase::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPrinterBase::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromModel(model, modelIndex);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPrinterBase::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToGraphQlObject(gqlObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPrinterBase::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPrinterBase::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPrinterBase::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
-{
-	if (version == PV_AUTO){
-		if (Version_1_0){
-			return Version_1_0->WriteToJsonObject(jsonObject);
-		}
-		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
-
-			return false;
-		}
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			qCritical() << "Uninitialized version member";
-			Q_ASSERT_X(false, __func__, "Uninitialized version member");
-
-			return false;
-		}
-
-		return Version_1_0->WriteToJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPrinterBase::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->ReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-bool CPrinterBase::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
-{
-	if (version == PV_AUTO){
-		qCritical() << "AUTO protocol is NOT supported for read methods!";
-		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
-
-		return false;
-	}
-	else if (version == PV_1_0){
-		if (!Version_1_0){
-			Version_1_0 = V1_0();
-		}
-
-		return Version_1_0->OptReadFromJsonObject(jsonObject);
-	}
-
-	qCritical() << "Invalid version";
-	Q_ASSERT_X(false, __func__, "Invalid version");
-
-	return false;
-}
-
-
-
-
 CCoordsObject::CCoordsObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CCoordsObject::xChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CCoordsObject::yChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -2624,55 +1704,41 @@ CCoordsObject::CCoordsObject(QObject* parent): ::imtbase::CItemModelBase(parent)
 
 QVariant CCoordsObject::GetX()
 {
-	if (Version_1_0 && Version_1_0->X){
-		return Version_1_0->X.value();
-	}
-
-	return QVariant();
+	return CCoords::X.value();
 }
 
 
 void CCoordsObject::SetX(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->X = v.value<double>();
+	CCoords::X = v.value<double>();
 	xChanged();
 }
 
 
 bool CCoordsObject::hasX()
 {
-	 return Version_1_0 && Version_1_0->X.HasValue();
+	 return CCoords::X.HasValue();
 }
 
 
 QVariant CCoordsObject::GetY()
 {
-	if (Version_1_0 && Version_1_0->Y){
-		return Version_1_0->Y.value();
-	}
-
-	return QVariant();
+	return CCoords::Y.value();
 }
 
 
 void CCoordsObject::SetY(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->Y = v.value<double>();
+	CCoords::Y = v.value<double>();
 	yChanged();
 }
 
 
 bool CCoordsObject::hasY()
 {
-	 return Version_1_0 && Version_1_0->Y.HasValue();
+	 return CCoords::Y.HasValue();
 }
 
 
@@ -2761,89 +1827,88 @@ QVariantMap CCoordsObjectList::get(int row) const
 }
 
 
-void CCoordsObjectList::append(sdl::modsdl::UnionTest::CCoordsObject* item)
+void CCoordsObjectList::append(sdl::V1_0::modsdl::CCoordsObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::modsdl::UnionTest::CCoordsObjectList* sdl::modsdl::UnionTest::CCoordsObjectList::copyMe()
+sdl::V1_0::modsdl::CCoordsObjectList* sdl::V1_0::modsdl::CCoordsObjectList::copyMe()
 {
-	sdl::modsdl::UnionTest::CCoordsObjectList* retVal = new sdl::modsdl::UnionTest::CCoordsObjectList();
+	sdl::V1_0::modsdl::CCoordsObjectList* retVal = new sdl::V1_0::modsdl::CCoordsObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::modsdl::UnionTest::CCoordsObjectList::toJson()
+QString sdl::V1_0::modsdl::CCoordsObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::modsdl::UnionTest::CCoordsObjectList::toGraphQL()
+QString sdl::V1_0::modsdl::CCoordsObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::modsdl::UnionTest::CCoordsObjectList::addElement(sdl::modsdl::UnionTest::CCoordsObject* item)
+void sdl::V1_0::modsdl::CCoordsObjectList::addElement(sdl::V1_0::modsdl::CCoordsObject* item)
 {
 	append(item);
 }
 
 
-void sdl::modsdl::UnionTest::CCoordsObjectList::removeElement(int index)
+void sdl::V1_0::modsdl::CCoordsObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::modsdl::UnionTest::CCoordsObjectList::isEqualWithModel(sdl::modsdl::UnionTest::CCoordsObjectList* otherModelPtr)
+bool sdl::V1_0::modsdl::CCoordsObjectList::isEqualWithModel(sdl::V1_0::modsdl::CCoordsObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::modsdl::UnionTest::CCoordsObjectList::insert(int index, sdl::modsdl::UnionTest::CCoordsObject* item)
+void sdl::V1_0::modsdl::CCoordsObjectList::insert(int index, sdl::V1_0::modsdl::CCoordsObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::modsdl::UnionTest::CCoordsObjectList::remove(int index)
+void sdl::V1_0::modsdl::CCoordsObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::modsdl::UnionTest::CCoordsObjectList::clear()
+void sdl::V1_0::modsdl::CCoordsObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::modsdl::UnionTest::CCoordsObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::modsdl::CCoordsObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::modsdl::UnionTest::CCoordsObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::modsdl::CCoordsObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_x"){
-		return QVariant::fromValue(Version_1_0->at(index)->X.value());
+		return QVariant::fromValue(at(index)->X.value());
 	}
 	if (nameId == "m_y"){
-		return QVariant::fromValue(Version_1_0->at(index)->Y.value());
+		return QVariant::fromValue(at(index)->Y.value());
 	}
 
 	return QVariant();
 }
 CPrinterSpecificationBaseObject::CPrinterSpecificationBaseObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CPrinterSpecificationBaseObject::nameChanged, this, &CItemModelBase::OnInternalModelChanged);
 }
@@ -2851,28 +1916,21 @@ CPrinterSpecificationBaseObject::CPrinterSpecificationBaseObject(QObject* parent
 
 QVariant CPrinterSpecificationBaseObject::GetName()
 {
-	if (Version_1_0 && Version_1_0->name){
-		return Version_1_0->name.value();
-	}
-
-	return QVariant();
+	return CPrinterSpecificationBase::name.value();
 }
 
 
 void CPrinterSpecificationBaseObject::SetName(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->name = v.value<QString>();
+	CPrinterSpecificationBase::name = v.value<QString>();
 	nameChanged();
 }
 
 
 bool CPrinterSpecificationBaseObject::hasName()
 {
-	 return Version_1_0 && Version_1_0->name.HasValue();
+	 return CPrinterSpecificationBase::name.HasValue();
 }
 
 
@@ -2958,86 +2016,85 @@ QVariantMap CPrinterSpecificationBaseObjectList::get(int row) const
 }
 
 
-void CPrinterSpecificationBaseObjectList::append(sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject* item)
+void CPrinterSpecificationBaseObjectList::append(sdl::V1_0::modsdl::CPrinterSpecificationBaseObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::modsdl::UnionTest::CPrinterSpecificationBaseObjectList* sdl::modsdl::UnionTest::CPrinterSpecificationBaseObjectList::copyMe()
+sdl::V1_0::modsdl::CPrinterSpecificationBaseObjectList* sdl::V1_0::modsdl::CPrinterSpecificationBaseObjectList::copyMe()
 {
-	sdl::modsdl::UnionTest::CPrinterSpecificationBaseObjectList* retVal = new sdl::modsdl::UnionTest::CPrinterSpecificationBaseObjectList();
+	sdl::V1_0::modsdl::CPrinterSpecificationBaseObjectList* retVal = new sdl::V1_0::modsdl::CPrinterSpecificationBaseObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::modsdl::UnionTest::CPrinterSpecificationBaseObjectList::toJson()
+QString sdl::V1_0::modsdl::CPrinterSpecificationBaseObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::modsdl::UnionTest::CPrinterSpecificationBaseObjectList::toGraphQL()
+QString sdl::V1_0::modsdl::CPrinterSpecificationBaseObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::modsdl::UnionTest::CPrinterSpecificationBaseObjectList::addElement(sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject* item)
+void sdl::V1_0::modsdl::CPrinterSpecificationBaseObjectList::addElement(sdl::V1_0::modsdl::CPrinterSpecificationBaseObject* item)
 {
 	append(item);
 }
 
 
-void sdl::modsdl::UnionTest::CPrinterSpecificationBaseObjectList::removeElement(int index)
+void sdl::V1_0::modsdl::CPrinterSpecificationBaseObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::modsdl::UnionTest::CPrinterSpecificationBaseObjectList::isEqualWithModel(sdl::modsdl::UnionTest::CPrinterSpecificationBaseObjectList* otherModelPtr)
+bool sdl::V1_0::modsdl::CPrinterSpecificationBaseObjectList::isEqualWithModel(sdl::V1_0::modsdl::CPrinterSpecificationBaseObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::modsdl::UnionTest::CPrinterSpecificationBaseObjectList::insert(int index, sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject* item)
+void sdl::V1_0::modsdl::CPrinterSpecificationBaseObjectList::insert(int index, sdl::V1_0::modsdl::CPrinterSpecificationBaseObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::modsdl::UnionTest::CPrinterSpecificationBaseObjectList::remove(int index)
+void sdl::V1_0::modsdl::CPrinterSpecificationBaseObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::modsdl::UnionTest::CPrinterSpecificationBaseObjectList::clear()
+void sdl::V1_0::modsdl::CPrinterSpecificationBaseObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::modsdl::UnionTest::CPrinterSpecificationBaseObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::modsdl::CPrinterSpecificationBaseObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::modsdl::CPrinterSpecificationBaseObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_name"){
-		return QVariant::fromValue(Version_1_0->at(index)->name.value());
+		return QVariant::fromValue(at(index)->name.value());
 	}
 
 	return QVariant();
 }
 CLinkObject::CLinkObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CLinkObject::linkChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CLinkObject::statusChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -3047,56 +2104,42 @@ CLinkObject::CLinkObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
 QVariant CLinkObject::GetLink()
 {
-	if (Version_1_0 && Version_1_0->link){
-		return Version_1_0->link.value();
-	}
-
-	return QVariant();
+	return CLink::link.value();
 }
 
 
 void CLinkObject::SetLink(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->link = v.value<QString>().toUtf8();
+	CLink::link = v.value<QString>().toUtf8();
 	linkChanged();
 }
 
 
 bool CLinkObject::hasLink()
 {
-	 return Version_1_0 && Version_1_0->link.HasValue();
+	 return CLink::link.HasValue();
 }
 
 
 QVariant CLinkObject::GetStatus()
 {
-	if (Version_1_0 && Version_1_0->status){
-		sdl::modsdl::UnionTest::LinkStatus valueType = Version_1_0->status.value();
-		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::modsdl::UnionTest::LinkStatus>();
-		QString retval = metaEnum.valueToKey((int)valueType);
+	sdl::V1_0::modsdl::LinkStatus valueType = CLink::status.value();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::modsdl::LinkStatus>();
+	QString retval = metaEnum.valueToKey((int)valueType);
 
-		return retval;
-	}
-
-	return QVariant();
+	return retval;
 }
 
 
 void CLinkObject::SetStatus(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->status.emplace();
-	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::modsdl::UnionTest::LinkStatus>();
+	CLink::status.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::modsdl::LinkStatus>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
-		Version_1_0->status = (sdl::modsdl::UnionTest::LinkStatus)key;
+		CLink::status = (sdl::V1_0::modsdl::LinkStatus)key;
 	}
 	statusChanged();
 }
@@ -3104,25 +2147,18 @@ void CLinkObject::SetStatus(const QVariant& v)
 
 bool CLinkObject::hasStatus()
 {
-	 return Version_1_0 && Version_1_0->status.HasValue();
+	 return CLink::status.HasValue();
 }
 
 
 QVariant CLinkObject::GetStatusList()
 {
-	if (Version_1_0 && Version_1_0->statusList){
-		
-	}
-
-	return QVariant();
+	
 }
 
 
 void CLinkObject::SetStatusList(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	
 	statusListChanged();
@@ -3131,7 +2167,7 @@ void CLinkObject::SetStatusList(const QVariant& v)
 
 bool CLinkObject::hasStatusList()
 {
-	 return Version_1_0 && Version_1_0->statusList.HasValue();
+	 return CLink::statusList.HasValue();
 }
 
 
@@ -3223,92 +2259,91 @@ QVariantMap CLinkObjectList::get(int row) const
 }
 
 
-void CLinkObjectList::append(sdl::modsdl::UnionTest::CLinkObject* item)
+void CLinkObjectList::append(sdl::V1_0::modsdl::CLinkObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::modsdl::UnionTest::CLinkObjectList* sdl::modsdl::UnionTest::CLinkObjectList::copyMe()
+sdl::V1_0::modsdl::CLinkObjectList* sdl::V1_0::modsdl::CLinkObjectList::copyMe()
 {
-	sdl::modsdl::UnionTest::CLinkObjectList* retVal = new sdl::modsdl::UnionTest::CLinkObjectList();
+	sdl::V1_0::modsdl::CLinkObjectList* retVal = new sdl::V1_0::modsdl::CLinkObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::modsdl::UnionTest::CLinkObjectList::toJson()
+QString sdl::V1_0::modsdl::CLinkObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::modsdl::UnionTest::CLinkObjectList::toGraphQL()
+QString sdl::V1_0::modsdl::CLinkObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::modsdl::UnionTest::CLinkObjectList::addElement(sdl::modsdl::UnionTest::CLinkObject* item)
+void sdl::V1_0::modsdl::CLinkObjectList::addElement(sdl::V1_0::modsdl::CLinkObject* item)
 {
 	append(item);
 }
 
 
-void sdl::modsdl::UnionTest::CLinkObjectList::removeElement(int index)
+void sdl::V1_0::modsdl::CLinkObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::modsdl::UnionTest::CLinkObjectList::isEqualWithModel(sdl::modsdl::UnionTest::CLinkObjectList* otherModelPtr)
+bool sdl::V1_0::modsdl::CLinkObjectList::isEqualWithModel(sdl::V1_0::modsdl::CLinkObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::modsdl::UnionTest::CLinkObjectList::insert(int index, sdl::modsdl::UnionTest::CLinkObject* item)
+void sdl::V1_0::modsdl::CLinkObjectList::insert(int index, sdl::V1_0::modsdl::CLinkObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::modsdl::UnionTest::CLinkObjectList::remove(int index)
+void sdl::V1_0::modsdl::CLinkObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::modsdl::UnionTest::CLinkObjectList::clear()
+void sdl::V1_0::modsdl::CLinkObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::modsdl::UnionTest::CLinkObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::modsdl::CLinkObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::modsdl::UnionTest::CLinkObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::modsdl::CLinkObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_link"){
-		return QVariant::fromValue(Version_1_0->at(index)->link.value());
+		return QVariant::fromValue(at(index)->link.value());
 	}
 	if (nameId == "m_status"){
-		return QVariant::fromValue(Version_1_0->at(index)->status.value());
+		return QVariant::fromValue(at(index)->status.value());
 	}
 	if (nameId == "m_statusList"){
-		return QVariant::fromValue(Version_1_0->at(index)->statusList.value());
+		return QVariant::fromValue(at(index)->statusList.value());
 	}
 
 	return QVariant();
 }
 CPrinterBaseObject::CPrinterBaseObject(QObject* parent): ::imtbase::CItemModelBase(parent){
-	Version_1_0.emplace();
 
 	QObject::connect(this, &CPrinterBaseObject::nameChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CPrinterBaseObject::linkListChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -3319,58 +2354,44 @@ CPrinterBaseObject::CPrinterBaseObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CPrinterBaseObject::GetName()
 {
-	if (Version_1_0 && Version_1_0->name){
-		return Version_1_0->name.value();
-	}
-
-	return QVariant();
+	return CPrinterBase::name.value();
 }
 
 
 void CPrinterBaseObject::SetName(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
-	Version_1_0->name = v.value<QString>();
+	CPrinterBase::name = v.value<QString>();
 	nameChanged();
 }
 
 
 bool CPrinterBaseObject::hasName()
 {
-	 return Version_1_0 && Version_1_0->name.HasValue();
+	 return CPrinterBase::name.HasValue();
 }
 
 
 QVariant CPrinterBaseObject::GetLinkList()
 {
-	if (Version_1_0 && Version_1_0->linkList){
-		if (!m_linkListQObjectPtr.isValid()){
-			m_linkListQObjectPtr = CreateObject("linkList");
-			auto itemPtr = m_linkListQObjectPtr.value<sdl::modsdl::UnionTest::CLinkObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->linkList;
-		}
-		return m_linkListQObjectPtr;
+	if (!m_linkListQObjectPtr.isValid()){
+		m_linkListQObjectPtr = CreateObject("linkList");
+		auto itemPtr = m_linkListQObjectPtr.value<sdl::V1_0::modsdl::CLinkObjectList*>();
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = CPrinterBase::linkList;
 	}
-
-	return QVariant();
+	return m_linkListQObjectPtr;
 }
 
 
 void CPrinterBaseObject::SetLinkList(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::modsdl::UnionTest::CLinkObjectList* itemPtr = v.value<sdl::modsdl::UnionTest::CLinkObjectList*>();
-		if (itemPtr != nullptr)  Version_1_0->linkList = itemPtr->Version_1_0;
+		sdl::V1_0::modsdl::CLinkObjectList* itemPtr = v.value<sdl::V1_0::modsdl::CLinkObjectList*>();
+		if (itemPtr != nullptr)  linkList = static_cast<const decltype(linkList)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->linkList = nullptr;
+		CPrinterBase::linkList = nullptr;
 	}
 	m_linkListQObjectPtr = v;
 
@@ -3380,17 +2401,14 @@ void CPrinterBaseObject::SetLinkList(const QVariant& v)
 
 bool CPrinterBaseObject::hasLinkList()
 {
-	 return Version_1_0 && Version_1_0->linkList.HasValue();
+	 return CPrinterBase::linkList.HasValue();
 }
 
 
 void CPrinterBaseObject::emplaceLinkList()
 {
 	ResetLinkList();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->linkList.emplace();
+	CPrinterBase::linkList.emplace();
 }
 
 
@@ -3407,60 +2425,53 @@ void CPrinterBaseObject::ResetLinkList()
 QVariant CPrinterBaseObject::createLinkListArrayElement(const QVariant& v)
 {
 	Q_UNUSED(v);
-	return QVariant::fromValue(new sdl::modsdl::UnionTest::CLinkObject());
+	return QVariant::fromValue(new sdl::V1_0::modsdl::CLinkObject());
 }
 
 
 QVariant CPrinterBaseObject::GetSpecification()
 {
-	if (Version_1_0 && Version_1_0->specification){
-		if (m_specificationQObjectPtr.isValid()){
-			if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>((Version_1_0->specification).GetPtr())){
-				CPrinterSpecificationBaseObject *newObjectPtr = new CPrinterSpecificationBaseObject(this);
-				newObjectPtr->Version_1_0 = val->Version_1_0;
-				m_specificationQObjectPtr = QVariant::fromValue(newObjectPtr);
-			}
-			if (const CLink* val = std::get_if<CLink>((Version_1_0->specification).GetPtr())){
-				CLinkObject *newObjectPtr = new CLinkObject(this);
-				newObjectPtr->Version_1_0 = val->Version_1_0;
-				m_specificationQObjectPtr = QVariant::fromValue(newObjectPtr);
-			}
-			if (const QString* val = std::get_if<QString>((Version_1_0->specification).GetPtr())){
-				m_specificationQObjectPtr = QVariant::fromValue(val);
-			}
-			if (const double* val = std::get_if<double>((Version_1_0->specification).GetPtr())){
-				m_specificationQObjectPtr = QVariant::fromValue(val);
-			}
+	if (m_specificationQObjectPtr.isValid()){
+		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>((CPrinterBase::specification).GetPtr())){
+			CPrinterSpecificationBaseObject *newObjectPtr = new CPrinterSpecificationBaseObject(this);
+			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			m_specificationQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
-		return m_specificationQObjectPtr;
+		if (const CLink* val = std::get_if<CLink>((CPrinterBase::specification).GetPtr())){
+			CLinkObject *newObjectPtr = new CLinkObject(this);
+			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			m_specificationQObjectPtr = QVariant::fromValue(newObjectPtr);
+		}
+		if (const QString* val = std::get_if<QString>((CPrinterBase::specification).GetPtr())){
+			m_specificationQObjectPtr = QVariant::fromValue(val);
+		}
+		if (const double* val = std::get_if<double>((CPrinterBase::specification).GetPtr())){
+			m_specificationQObjectPtr = QVariant::fromValue(val);
+		}
 	}
-
-	return QVariant();
+	return m_specificationQObjectPtr;
 }
 
 
 void CPrinterBaseObject::SetSpecification(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
 		if (const CPrinterSpecificationBaseObject* val = v.value<const CPrinterSpecificationBaseObject*>()){
-			*Version_1_0->specification = *val;
+			*specification = *val;
 		}
 		if (const CLinkObject* val = v.value<const CLinkObject*>()){
-			*Version_1_0->specification = *val;
+			*specification = *val;
 		}
 		if (const QString* val = v.value<const QString*>()){
-			*Version_1_0->specification = *val;
+			*specification = *val;
 		}
 		if (const double* val = v.value<const double*>()){
-			*Version_1_0->specification = *val;
+			*specification = *val;
 		}
 	}
 	else {
-		Version_1_0->specification = nullptr;
+		CPrinterBase::specification = nullptr;
 	}
 	m_specificationQObjectPtr = v;
 
@@ -3470,17 +2481,14 @@ void CPrinterBaseObject::SetSpecification(const QVariant& v)
 
 bool CPrinterBaseObject::hasSpecification()
 {
-	 return Version_1_0 && Version_1_0->specification.HasValue();
+	 return CPrinterBase::specification.HasValue();
 }
 
 
 void CPrinterBaseObject::emplaceSpecification()
 {
 	ResetSpecification();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->specification.emplace();
+	CPrinterBase::specification.emplace();
 }
 
 
@@ -3496,31 +2504,24 @@ void CPrinterBaseObject::ResetSpecification()
 
 QVariant CPrinterBaseObject::GetSpecificationList()
 {
-	if (Version_1_0 && Version_1_0->specificationList){
-		if (!m_specificationListQObjectPtr.isValid()){
-			m_specificationListQObjectPtr = CreateObject("specificationList");
-			auto itemPtr = m_specificationListQObjectPtr.value<sdl::modsdl::UnionTest::CPrinterSpecificationObjectList*>();
-			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->specificationList;
-		}
-		return m_specificationListQObjectPtr;
+	if (!m_specificationListQObjectPtr.isValid()){
+		m_specificationListQObjectPtr = CreateObject("specificationList");
+		auto itemPtr = m_specificationListQObjectPtr.value<sdl::V1_0::modsdl::CPrinterSpecificationObjectList*>();
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = CPrinterBase::specificationList;
 	}
-
-	return QVariant();
+	return m_specificationListQObjectPtr;
 }
 
 
 void CPrinterBaseObject::SetSpecificationList(const QVariant& v)
 {
-	if (!Version_1_0){
-		Version_1_0.emplace();
-	}
 
 	if (v.isValid()){
-		sdl::modsdl::UnionTest::CPrinterSpecificationObjectList* itemPtr = v.value<sdl::modsdl::UnionTest::CPrinterSpecificationObjectList*>();
-		if (itemPtr != nullptr)  Version_1_0->specificationList = itemPtr->Version_1_0;
+		sdl::V1_0::modsdl::CPrinterSpecificationObjectList* itemPtr = v.value<sdl::V1_0::modsdl::CPrinterSpecificationObjectList*>();
+		if (itemPtr != nullptr)  specificationList = static_cast<const decltype(specificationList)::value_type&>(*itemPtr);
 	}
 	else {
-		Version_1_0->specificationList = nullptr;
+		CPrinterBase::specificationList = nullptr;
 	}
 	m_specificationListQObjectPtr = v;
 
@@ -3530,17 +2531,14 @@ void CPrinterBaseObject::SetSpecificationList(const QVariant& v)
 
 bool CPrinterBaseObject::hasSpecificationList()
 {
-	 return Version_1_0 && Version_1_0->specificationList.HasValue();
+	 return CPrinterBase::specificationList.HasValue();
 }
 
 
 void CPrinterBaseObject::emplaceSpecificationList()
 {
 	ResetSpecificationList();
-	if(!Version_1_0){
-		Version_1_0.emplace();
-	}
-	Version_1_0->specificationList.emplace();
+	CPrinterBase::specificationList.emplace();
 }
 
 
@@ -3602,10 +2600,10 @@ QString CPrinterBaseObject::toGraphQL() const
 QVariant CPrinterBaseObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "linkList"){
-		return QVariant::fromValue(new sdl::modsdl::UnionTest::CLinkObjectList(this));
+		return QVariant::fromValue(new sdl::V1_0::modsdl::CLinkObjectList(this));
 	}
 	if (key == "specificationList"){
-		return QVariant::fromValue(new sdl::modsdl::UnionTest::CPrinterSpecificationObjectList(this));
+		return QVariant::fromValue(new sdl::V1_0::modsdl::CPrinterSpecificationObjectList(this));
 	}
 	return QVariant();
 }
@@ -3651,80 +2649,80 @@ QVariantMap CPrinterBaseObjectList::get(int row) const
 }
 
 
-void CPrinterBaseObjectList::append(sdl::modsdl::UnionTest::CPrinterBaseObject* item)
+void CPrinterBaseObjectList::append(sdl::V1_0::modsdl::CPrinterBaseObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::modsdl::UnionTest::CPrinterBaseObjectList* sdl::modsdl::UnionTest::CPrinterBaseObjectList::copyMe()
+sdl::V1_0::modsdl::CPrinterBaseObjectList* sdl::V1_0::modsdl::CPrinterBaseObjectList::copyMe()
 {
-	sdl::modsdl::UnionTest::CPrinterBaseObjectList* retVal = new sdl::modsdl::UnionTest::CPrinterBaseObjectList();
+	sdl::V1_0::modsdl::CPrinterBaseObjectList* retVal = new sdl::V1_0::modsdl::CPrinterBaseObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::modsdl::UnionTest::CPrinterBaseObjectList::toJson()
+QString sdl::V1_0::modsdl::CPrinterBaseObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::modsdl::UnionTest::CPrinterBaseObjectList::toGraphQL()
+QString sdl::V1_0::modsdl::CPrinterBaseObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::modsdl::UnionTest::CPrinterBaseObjectList::addElement(sdl::modsdl::UnionTest::CPrinterBaseObject* item)
+void sdl::V1_0::modsdl::CPrinterBaseObjectList::addElement(sdl::V1_0::modsdl::CPrinterBaseObject* item)
 {
 	append(item);
 }
 
 
-void sdl::modsdl::UnionTest::CPrinterBaseObjectList::removeElement(int index)
+void sdl::V1_0::modsdl::CPrinterBaseObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::modsdl::UnionTest::CPrinterBaseObjectList::isEqualWithModel(sdl::modsdl::UnionTest::CPrinterBaseObjectList* otherModelPtr)
+bool sdl::V1_0::modsdl::CPrinterBaseObjectList::isEqualWithModel(sdl::V1_0::modsdl::CPrinterBaseObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::modsdl::UnionTest::CPrinterBaseObjectList::insert(int index, sdl::modsdl::UnionTest::CPrinterBaseObject* item)
+void sdl::V1_0::modsdl::CPrinterBaseObjectList::insert(int index, sdl::V1_0::modsdl::CPrinterBaseObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::modsdl::UnionTest::CPrinterBaseObjectList::remove(int index)
+void sdl::V1_0::modsdl::CPrinterBaseObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::modsdl::UnionTest::CPrinterBaseObjectList::clear()
+void sdl::V1_0::modsdl::CPrinterBaseObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::modsdl::UnionTest::CPrinterBaseObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::modsdl::CPrinterBaseObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::modsdl::UnionTest::CPrinterBaseObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::modsdl::CPrinterBaseObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_name"){
-		return QVariant::fromValue(Version_1_0->at(index)->name.value());
+		return QVariant::fromValue(at(index)->name.value());
 	}
 	if (nameId == "m_linkList"){
 		return itemPtr->GetLinkList();
@@ -3748,23 +2746,23 @@ QVariant CPrinterSpecificationObjectList::GetOrCreateCachedObject(int index) con
 		retVal = this->m_objectDataTypeMap[index];
 	}
 	else{
-		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(this->Version_1_0->at(index).GetPtr())){
+		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(this->at(index).GetPtr())){
 			CPrinterSpecificationBaseObject *newObjectPtr = new CPrinterSpecificationBaseObject();
-			newObjectPtr->Version_1_0 = val->Version_1_0;
+			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
-		if (const CLink* val = std::get_if<CLink>(this->Version_1_0->at(index).GetPtr())){
+		if (const CLink* val = std::get_if<CLink>(this->at(index).GetPtr())){
 			CLinkObject *newObjectPtr = new CLinkObject();
-			newObjectPtr->Version_1_0 = val->Version_1_0;
+			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
-		if (const QString* val = std::get_if<QString>(this->Version_1_0->at(index).GetPtr())){
+		if (const QString* val = std::get_if<QString>(this->at(index).GetPtr())){
 			retVal =  QVariant::fromValue(val);
 		}
 
-		if (const double* val = std::get_if<double>(this->Version_1_0->at(index).GetPtr())){
+		if (const double* val = std::get_if<double>(this->at(index).GetPtr())){
 			retVal =  QVariant::fromValue(val);
 		}
 
@@ -3794,28 +2792,28 @@ QVariantMap CPrinterSpecificationObjectList::get(int row) const
 
 void CPrinterSpecificationObjectList::append(QVariant item)
 {
-	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
+	beginInsertRows(QModelIndex(), count(), 0);
 
 	if (item.canConvert<CPrinterSpecificationBaseObject*>()){
 		CPrinterSpecificationBaseObject* val = item.value<CPrinterSpecificationBaseObject*>();
 		CPrinterSpecificationBase* newItemPtr = dynamic_cast<CPrinterSpecificationBase*>(val);
-		Version_1_0->append(istd::TSharedNullable<PrinterSpecification>(*newItemPtr));
+		append(istd::TNullableValue<PrinterSpecification>(*newItemPtr));
 	}
 
 	if (item.canConvert<CLinkObject*>()){
 		CLinkObject* val = item.value<CLinkObject*>();
 		CLink* newItemPtr = dynamic_cast<CLink*>(val);
-		Version_1_0->append(istd::TSharedNullable<PrinterSpecification>(*newItemPtr));
+		append(istd::TNullableValue<PrinterSpecification>(*newItemPtr));
 	}
 
 	if (item.canConvert<QString>()){
 		QString val = item.value<QString>();
-		Version_1_0->append(istd::TSharedNullable<PrinterSpecification>(val));
+		append(istd::TNullableValue<PrinterSpecification>(val));
 	}
 
 	if (item.canConvert<double>()){
 		double val = item.value<double>();
-		Version_1_0->append(istd::TSharedNullable<PrinterSpecification>(val));
+		append(istd::TNullableValue<PrinterSpecification>(val));
 	}
 
 	ClearCache();
@@ -3823,9 +2821,9 @@ void CPrinterSpecificationObjectList::append(QVariant item)
 }
 
 
-sdl::modsdl::UnionTest::CPrinterSpecificationObjectList* CPrinterSpecificationObjectList::copyMe()
+sdl::V1_0::modsdl::CPrinterSpecificationObjectList* CPrinterSpecificationObjectList::copyMe()
 {
-	sdl::modsdl::UnionTest::CPrinterSpecificationObjectList* objectListPtr = new sdl::modsdl::UnionTest::CPrinterSpecificationObjectList();
+	sdl::V1_0::modsdl::CPrinterSpecificationObjectList* objectListPtr = new sdl::V1_0::modsdl::CPrinterSpecificationObjectList();
 
 	for (int i = 0; i < this->rowCount(); i++){
 		QVariant item = this->getData("item", i);
@@ -3940,7 +2938,7 @@ void CPrinterSpecificationObjectList::removeElement(int index)
 	remove(index);
 }
 
-bool CPrinterSpecificationObjectList::isEqualWithModel(sdl::modsdl::UnionTest::CPrinterSpecificationObjectList* otherModelPtr)
+bool CPrinterSpecificationObjectList::isEqualWithModel(sdl::V1_0::modsdl::CPrinterSpecificationObjectList* otherModelPtr)
 {
 	if (otherModelPtr == nullptr){
 		return false;
@@ -3969,29 +2967,29 @@ bool CPrinterSpecificationObjectList::isEqualWithModel(sdl::modsdl::UnionTest::C
 
 void CPrinterSpecificationObjectList::insert(int index, QVariant item)
 {
-	if (index < 0 || index > Version_1_0->size()) return;
-	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
+	if (index < 0 || index > size()) return;
+	beginInsertRows(QModelIndex(), count(), 0);
 
 	if (item.canConvert<CPrinterSpecificationBaseObject*>()){
 		CPrinterSpecificationBaseObject* val = item.value<CPrinterSpecificationBaseObject*>();
 		CPrinterSpecificationBase* newItemPtr = dynamic_cast<CPrinterSpecificationBase*>(val);
-		Version_1_0->append(istd::TSharedNullable<PrinterSpecification>(*newItemPtr));
+		append(istd::TNullableValue<PrinterSpecification>(*newItemPtr));
 	}
 
 	if (item.canConvert<CLinkObject*>()){
 		CLinkObject* val = item.value<CLinkObject*>();
 		CLink* newItemPtr = dynamic_cast<CLink*>(val);
-		Version_1_0->append(istd::TSharedNullable<PrinterSpecification>(*newItemPtr));
+		append(istd::TNullableValue<PrinterSpecification>(*newItemPtr));
 	}
 
 	if (item.canConvert<QString>()){
 		QString val = item.value<QString>();
-		Version_1_0->append(istd::TSharedNullable<PrinterSpecification>(val));
+		append(istd::TNullableValue<PrinterSpecification>(val));
 	}
 
 	if (item.canConvert<double>()){
 		double val = item.value<double>();
-		Version_1_0->append(istd::TSharedNullable<PrinterSpecification>(val));
+		append(istd::TNullableValue<PrinterSpecification>(val));
 	}
 
 	ClearCache();
@@ -4013,7 +3011,7 @@ void CPrinterSpecificationObjectList::clear()
 
 QVariant CPrinterSpecificationObjectList::getData(const QString& nameId, int index)
 {
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
 		QVariant retVal = GetOrCreateCachedObject(index);
 		return retVal;
 	}
@@ -4033,7 +3031,7 @@ bool CGetSpecificationsGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest& gqlReq
 
 	// writting input arguments
 	::imtgql::CGqlParamObject inputDataObject;
-	if (!requestArguments.input.WriteToGraphQlObject(inputDataObject)){
+	if (!requestArguments.input->WriteToGraphQlObject(inputDataObject)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create GQL Object").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 		return false;
@@ -4058,10 +3056,10 @@ CGetSpecificationsGqlRequest::CGetSpecificationsGqlRequest(const ::imtgql::CGqlR
 			if (protocolVersion == "1.0"){
 				bool isInputRead;
 				if (optRead){
-					isInputRead = m_requestedArguments.input.OptReadFromGraphQlObject(*inputDataObjectPtr, CLink::PV_1_0);
+					isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr, CLink::PV_1_0);
 				}
 				else {
-					isInputRead = m_requestedArguments.input.ReadFromGraphQlObject(*inputDataObjectPtr, CLink::PV_1_0);
+					isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr, CLink::PV_1_0);
 				}
 				m_isValid = isInputRead;
 				if (!isInputRead){
@@ -4078,10 +3076,10 @@ CGetSpecificationsGqlRequest::CGetSpecificationsGqlRequest(const ::imtgql::CGqlR
 		else {
 			bool isInputRead;
 			if (optRead){
-				isInputRead = m_requestedArguments.input.OptReadFromGraphQlObject(*inputDataObjectPtr);
+				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
 			}
 			else {
-				isInputRead = m_requestedArguments.input.ReadFromGraphQlObject(*inputDataObjectPtr);
+				isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr);
 			}
 			m_isValid = isInputRead;
 			if (!isInputRead){
@@ -4207,7 +3205,7 @@ bool CPrinterCollectionControllerCompBase::CreateRepresentationFromObject(const 
 }
 
 
-bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+bool CUnionTestGqlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
 	const QByteArray commandId = gqlRequest.GetCommandId();
 	if (commandId == CGetSpecificationsGqlRequest::GetCommandId()){
@@ -4218,7 +3216,7 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 }
 
 
-QJsonObject CGraphQlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CUnionTestGqlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	const QByteArray commandId = gqlRequest.GetCommandId();
 	QJsonObject modelObj;
@@ -4271,4 +3269,4 @@ QJsonObject CGraphQlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGql
 }
 
 
-} // namespace sdl::modsdl::UnionTest
+} // namespace sdl::V1_0::modsdl

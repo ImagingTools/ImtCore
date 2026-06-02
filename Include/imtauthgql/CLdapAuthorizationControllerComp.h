@@ -43,8 +43,8 @@ protected:
 	QByteArray GetUserObjectIdBySid(const QByteArray& sid) const;
 
 	// reimplemented (CAuthorizationControllerComp)
-	virtual sdl::imtauth::Authorization::CAuthorizationPayload OnAuthorization(
-				const sdl::imtauth::Authorization::CAuthorizationGqlRequest& authorizationRequest,
+	virtual sdl::V1_0::imtauth::CAuthorizationPayload OnAuthorization(
+				const sdl::V1_0::imtauth::CAuthorizationGqlRequest& authorizationRequest,
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 

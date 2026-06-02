@@ -17,7 +17,7 @@ namespace imtqml2d
 {
 
 
-class CQmlCircleShape: public sdl::imtsdl2d::imt2d::CCircle, public imod::TSingleModelObserverBase<i2d::CCircle>
+class CQmlCircleShape: public sdl::V1_0::imtsdl2d::CCircle, public imod::TSingleModelObserverBase<i2d::CCircle>
 {
 	Q_OBJECT
 
@@ -33,7 +33,7 @@ public:
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
 	// reimplemented CCircle
-	virtual void SetCenter(sdl::imtsdl2d::imt2d::CPoint2d newCenter) override;
+	virtual void SetCenter(sdl::V1_0::imtsdl2d::CPoint2d newCenter) override;
 	virtual void SetRadius(double newRadius) override;
 };
 

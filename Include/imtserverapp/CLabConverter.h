@@ -3,7 +3,7 @@
 
 
 // Generated includes
-#include <GeneratedFiles/imtcolorsdl/SDL/1.0/CPP/Lab.h>
+#include <GeneratedFiles/imtcolorsdl/SDL/1.0/CPP/Lab_fwd.h>
 
 
 namespace icmm
@@ -19,8 +19,8 @@ namespace imtserverapp
 class CLabConverter
 {
 public:
-	static bool ConvertRepresentationToModel(const sdl::imtcolor::Lab::CLab::V1_0& sdlStruct, icmm::CLab& lab);
-	static bool ConvertModelToRepresentation(const icmm::CLab& lab, sdl::imtcolor::Lab::CLab::V1_0& sdlStruct);
+	static bool ConvertRepresentationToModel(const sdl::V1_0::imtcolor::CLab& sdlStruct, icmm::CLab& lab);
+	static bool ConvertModelToRepresentation(const icmm::CLab& lab, sdl::V1_0::imtcolor::CLab& sdlStruct);
 };
 
 

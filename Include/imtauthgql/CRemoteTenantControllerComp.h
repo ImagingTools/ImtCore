@@ -5,7 +5,7 @@
 // ImtCore includes
 #include <imtauth/ITenantManager.h>
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants_fwd.h>
 
 
 namespace imtauthgql
@@ -15,10 +15,10 @@ namespace imtauthgql
 class CRemoteTenantControllerComp:
 			virtual public imtauth::ITenantManager,
 			public imtclientgql::TClientRequestManagerCompWrap<
-							sdl::imtauth::Tenants::CGraphQlHandlerCompBase>
+							sdl::V1_0::imtauth::CTenantsGqlHandlerCompBase>
 {
 public:
-	typedef imtclientgql::TClientRequestManagerCompWrap<sdl::imtauth::Tenants::CGraphQlHandlerCompBase> BaseClass;
+	typedef imtclientgql::TClientRequestManagerCompWrap<sdl::V1_0::imtauth::CTenantsGqlHandlerCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CRemoteTenantControllerComp);
 		I_REGISTER_INTERFACE(imtauth::ITenantManager);
@@ -34,41 +34,41 @@ public:
 	virtual bool SetTenantActive(const QByteArray& tenantId, bool isActive) override;
 
 protected:
-	// reimplemented (sdl::imtauth::Tenants::CGraphQlHandlerCompBase)
-	virtual sdl::imtauth::Tenants::CGetTenantIdsPayload OnGetTenantIds(
-				const sdl::imtauth::Tenants::CGetTenantIdsGqlRequest& getTenantIdsRequest,
+	// reimplemented (sdl::V1_0::imtauth::CTenantsGqlHandlerCompBase)
+	virtual sdl::V1_0::imtauth::CGetTenantIdsPayload OnGetTenantIds(
+				const sdl::V1_0::imtauth::CGetTenantIdsGqlRequest& getTenantIdsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Tenants::CGetTenantRelationshipsPayload OnGetTenantRelationships(
-				const sdl::imtauth::Tenants::CGetTenantRelationshipsGqlRequest& getTenantRelationshipsRequest,
+	virtual sdl::V1_0::imtauth::CGetTenantRelationshipsPayload OnGetTenantRelationships(
+				const sdl::V1_0::imtauth::CGetTenantRelationshipsGqlRequest& getTenantRelationshipsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Tenants::CGetTenantPayload OnGetTenant(
-				const sdl::imtauth::Tenants::CGetTenantGqlRequest& getTenantRequest,
+	virtual sdl::V1_0::imtauth::CGetTenantPayload OnGetTenant(
+				const sdl::V1_0::imtauth::CGetTenantGqlRequest& getTenantRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Tenants::CCreateTenantPayload OnCreateTenant(
-				const sdl::imtauth::Tenants::CCreateTenantGqlRequest& createTenantRequest,
+	virtual sdl::V1_0::imtauth::CCreateTenantPayload OnCreateTenant(
+				const sdl::V1_0::imtauth::CCreateTenantGqlRequest& createTenantRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Tenants::CRemoveTenantPayload OnRemoveTenant(
-				const sdl::imtauth::Tenants::CRemoveTenantGqlRequest& removeTenantRequest,
+	virtual sdl::V1_0::imtauth::CRemoveTenantPayload OnRemoveTenant(
+				const sdl::V1_0::imtauth::CRemoveTenantGqlRequest& removeTenantRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Tenants::CUpdateTenantPayload OnUpdateTenant(
-				const sdl::imtauth::Tenants::CUpdateTenantGqlRequest& updateTenantRequest,
+	virtual sdl::V1_0::imtauth::CUpdateTenantPayload OnUpdateTenant(
+				const sdl::V1_0::imtauth::CUpdateTenantGqlRequest& updateTenantRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Tenants::CSetTenantActivePayload OnSetTenantActive(
-				const sdl::imtauth::Tenants::CSetTenantActiveGqlRequest& setTenantActiveRequest,
+	virtual sdl::V1_0::imtauth::CSetTenantActivePayload OnSetTenantActive(
+				const sdl::V1_0::imtauth::CSetTenantActiveGqlRequest& setTenantActiveRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Tenants::CAddTenantRelationshipPayload OnAddTenantRelationship(
-				const sdl::imtauth::Tenants::CAddTenantRelationshipGqlRequest& addTenantRelationshipRequest,
+	virtual sdl::V1_0::imtauth::CAddTenantRelationshipPayload OnAddTenantRelationship(
+				const sdl::V1_0::imtauth::CAddTenantRelationshipGqlRequest& addTenantRelationshipRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Tenants::CRemoveTenantRelationshipPayload OnRemoveTenantRelationship(
-				const sdl::imtauth::Tenants::CRemoveTenantRelationshipGqlRequest& removeTenantRelationshipRequest,
+	virtual sdl::V1_0::imtauth::CRemoveTenantRelationshipPayload OnRemoveTenantRelationship(
+				const sdl::V1_0::imtauth::CRemoveTenantRelationshipGqlRequest& removeTenantRelationshipRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 

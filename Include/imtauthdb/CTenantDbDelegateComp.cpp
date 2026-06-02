@@ -43,6 +43,20 @@ void CTenantDbDelegateComp::OnComponentCreated()
 	if (!CreatePermissionsTableIfNeeded()){
 		qWarning() << "CTenantDbDelegateComp: TenantPermissions table auto-creation failed";
 	}
+
+	const QByteArray membershipsScriptPath = m_createMembershipsTableScriptPathAttrPtr.IsValid()
+			? *m_createMembershipsTableScriptPathAttrPtr : QByteArray();
+	const bool autoCreateMemberships = m_autoCreateMembershipsTableAttrPtr.IsValid() && *m_autoCreateMembershipsTableAttrPtr;
+	if (!CreateAuxTableIfNeeded(autoCreateMemberships, QStringLiteral("TenantMemberships"), membershipsScriptPath)){
+		qWarning() << "CTenantDbDelegateComp: TenantMemberships table auto-creation failed";
+	}
+
+	const QByteArray invitationsScriptPath = m_createInvitationsTableScriptPathAttrPtr.IsValid()
+			? *m_createInvitationsTableScriptPathAttrPtr : QByteArray();
+	const bool autoCreateInvitations = m_autoCreateInvitationsTableAttrPtr.IsValid() && *m_autoCreateInvitationsTableAttrPtr;
+	if (!CreateAuxTableIfNeeded(autoCreateInvitations, QStringLiteral("TenantInvitations"), invitationsScriptPath)){
+		qWarning() << "CTenantDbDelegateComp: TenantInvitations table auto-creation failed";
+	}
 }
 
 
@@ -313,50 +327,53 @@ QByteArray CTenantDbDelegateComp::ExtractUserId(const iprm::IParamsSet* paramsPt
 QString CTenantDbDelegateComp::GetTenantRelationScopeSubquery(const QByteArray& userId) const
 {
 	QString tableName = qPrintable(*m_tableNameAttrPtr);
-
-	// For admin users (no userId), add NULL column so filters referencing it don't cause SQL errors
 	if (userId.isEmpty()){
 		return QString("SELECT *, NULL AS \"TenantRelationScope\" FROM \"%1\"").arg(tableName);
 	}
 
 	QString escapedUserId = imtdb::EscapeSql(QString::fromUtf8(userId));
+	const QByteArray driverId = m_databaseEngineCompPtr->GetDatabaseDriverId();
+	const bool isSQLite = (driverId == "QSQLITE");
+
+	// "TenantId"::uuid — PostgreSQL-only cast, SQLite stores UUID as TEXT
+	const QString tenantIdCast = isSQLite
+								 ? QString("\"TenantId\"")
+								 : QString("\"TenantId\"::uuid");
 
 	return QString(
-		"SELECT *, "
-		"CASE "
-		"WHEN \"CreatorId\"='%1' THEN 'Creator' "
-		"WHEN \"OwnerId\"='%1' THEN 'Owner' "
-		"WHEN \"Id\" IN (SELECT \"TenantId\" FROM \"TenantMemberships\" WHERE \"UserId\"='%1' AND \"IsActive\"=true) THEN 'Member' "
-		"WHEN \"Id\" IN (SELECT \"TenantId\"::uuid FROM \"TenantInvitations\" WHERE \"UserId\"='%1' AND \"Status\"=%2) THEN 'Invited' "
-		"ELSE NULL "
-		"END AS \"TenantRelationScope\" "
-		"FROM \"%3\"")
-		.arg(escapedUserId)
-		.arg(s_invitationStatusPending)
-		.arg(tableName);
+				"SELECT *, "
+				"CASE "
+				"WHEN \"CreatorId\"='%1' THEN 'Creator' "
+				"WHEN \"OwnerId\"='%1' THEN 'Owner' "
+				"WHEN \"Id\" IN (SELECT \"TenantId\" FROM \"TenantMemberships\" WHERE \"UserId\"='%1' AND \"IsActive\"=true) THEN 'Member' "
+				"WHEN \"Id\" IN (SELECT %2 FROM \"TenantInvitations\" WHERE \"UserId\"='%1' AND \"Status\"=%3) THEN 'Invited' "
+				"ELSE NULL "
+				"END AS \"TenantRelationScope\" "
+				"FROM \"%4\"")
+			.arg(escapedUserId)
+			.arg(tenantIdCast)
+			.arg(s_invitationStatusPending)
+			.arg(tableName);
 }
 
 
 QByteArray CTenantDbDelegateComp::GetSelectionQuery(
-		const QByteArray& objectId,
-		int offset,
-		int count,
-		const iprm::IParamsSet* paramsPtr) const
+			const QByteArray& objectId,
+			int offset,
+			int count,
+			const iprm::IParamsSet* paramsPtr) const
 {
-	// Single-object selection does not need the computed column
 	if (!objectId.isEmpty()){
 		return BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
 	}
 
 	QByteArray userId = ExtractUserId(paramsPtr);
-
 	if (count == 0){
 		return QByteArray();
 	}
 
 	QString sortQuery;
 	QString filterQuery;
-
 	istd::TOptDelPtr<const iprm::IParamsSet> selectionParamsPtr;
 	if (paramsPtr != nullptr){
 		selectionParamsPtr.SetPtr(paramsPtr, false);
@@ -391,12 +408,23 @@ QByteArray CTenantDbDelegateComp::GetSelectionQuery(
 	}
 
 	QString baseQuery = QString("SELECT * FROM (%1) AS _t").arg(GetTenantRelationScopeSubquery(userId));
-
-	// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
-	QString retVal = "(" + baseQuery;
-	retVal += QString(" ") + filterQuery;
-	retVal += QString(" ") + qPrintable(paginationQuery) + ")";
-	retVal += QString(" ") + sortQuery;
+	const QByteArray driverId = m_databaseEngineCompPtr->GetDatabaseDriverId();
+	const bool isSQLite = (driverId == "QSQLITE");
+	QString retVal;
+	if (isSQLite){
+		// SQLite does not support parentheses around a top-level SELECT statement
+		retVal = baseQuery;
+		retVal += QString(" ") + filterQuery;
+		retVal += QString(" ") + sortQuery;
+		retVal += QString(" ") + qPrintable(paginationQuery);
+	}
+	else{
+		// PostgreSQL: wrap in parens as workaround for Qt bug with '%<NUMBER>%' pattern
+		retVal = "(" + baseQuery;
+		retVal += QString(" ") + filterQuery;
+		retVal += QString(" ") + qPrintable(paginationQuery) + ")";
+		retVal += QString(" ") + sortQuery;
+	}
 
 	return retVal.toUtf8();
 }
@@ -439,9 +467,8 @@ QByteArray CTenantDbDelegateComp::GetProductId() const
 }
 
 
-bool CTenantDbDelegateComp::CreatePermissionsTableIfNeeded()
+bool CTenantDbDelegateComp::CreateAuxTableIfNeeded(bool autoCreate, const QString& tableName, const QByteArray& scriptPath)
 {
-	const bool autoCreate = m_autoCreatePermissionsTableAttrPtr.IsValid() ? *m_autoCreatePermissionsTableAttrPtr : false;
 	if (!autoCreate){
 		return true;
 	}
@@ -450,18 +477,12 @@ bool CTenantDbDelegateComp::CreatePermissionsTableIfNeeded()
 		return false;
 	}
 
-	const QString permissionsTableName = QString::fromUtf8(*m_permissionsTableNameAttrPtr);
-	if (permissionsTableName.isEmpty()){
+	if (tableName.isEmpty() || scriptPath.isEmpty()){
 		return false;
 	}
 
-	if (TableExists(permissionsTableName)){
+	if (TableExists(tableName)){
 		return true;
-	}
-
-	const QByteArray scriptPath = m_createPermissionsTableScriptPathAttrPtr.IsValid() ? *m_createPermissionsTableScriptPathAttrPtr : QByteArray();
-	if (scriptPath.isEmpty()){
-		return false;
 	}
 
 	QString resourcePath = QString::fromUtf8(scriptPath);
@@ -471,7 +492,7 @@ bool CTenantDbDelegateComp::CreatePermissionsTableIfNeeded()
 
 	QFile scriptFile(resourcePath);
 	if (!scriptFile.open(QFile::ReadOnly)){
-		qWarning() << "CTenantDbDelegateComp: TenantPermissions table creation script" << scriptFile.fileName() << "could not be loaded";
+		qWarning() << "CTenantDbDelegateComp: table creation script" << scriptFile.fileName() << "could not be loaded";
 		return false;
 	}
 
@@ -490,13 +511,22 @@ bool CTenantDbDelegateComp::CreatePermissionsTableIfNeeded()
 	m_databaseEngineCompPtr->ExecSqlQuery(createTableQuery, &sqlError);
 
 	if (sqlError.type() != QSqlError::NoError){
-		qCritical() << "CTenantDbDelegateComp: TenantPermissions table could not be created."
+		qCritical() << "CTenantDbDelegateComp: table" << tableName << "could not be created."
 					<< "Error:" << sqlError
 					<< "Query:" << createTableQuery;
 		return false;
 	}
 
 	return true;
+}
+
+
+bool CTenantDbDelegateComp::CreatePermissionsTableIfNeeded()
+{
+	const bool autoCreate = m_autoCreatePermissionsTableAttrPtr.IsValid() ? *m_autoCreatePermissionsTableAttrPtr : false;
+	const QByteArray scriptPath = m_createPermissionsTableScriptPathAttrPtr.IsValid() ? *m_createPermissionsTableScriptPathAttrPtr : QByteArray();
+	const QString permissionsTableName = m_permissionsTableNameAttrPtr.IsValid() ? QString::fromUtf8(*m_permissionsTableNameAttrPtr) : QString();
+	return CreateAuxTableIfNeeded(autoCreate, permissionsTableName, scriptPath);
 }
 
 

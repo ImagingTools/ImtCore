@@ -17,7 +17,7 @@ namespace imtqml2d
 {
 
 
-class CQmlLineShape: public sdl::imtsdl2d::imt2d::CLine2d, public imod::TSingleModelObserverBase<i2d::CLine2d>
+class CQmlLineShape: public sdl::V1_0::imtsdl2d::CLine2d, public imod::TSingleModelObserverBase<i2d::CLine2d>
 {
 	Q_OBJECT
 
@@ -33,8 +33,8 @@ public:
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
 	// reimplemented CLine2d
-	virtual void SetPoint1(sdl::imtsdl2d::imt2d::CPoint2d newPoint1) override;
-	virtual void SetPoint2(sdl::imtsdl2d::imt2d::CPoint2d newPoint2) override;
+	virtual void SetPoint1(sdl::V1_0::imtsdl2d::CPoint2d newPoint1) override;
+	virtual void SetPoint2(sdl::V1_0::imtsdl2d::CPoint2d newPoint2) override;
 };
 
 

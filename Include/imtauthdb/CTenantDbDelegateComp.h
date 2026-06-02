@@ -20,6 +20,10 @@ public:
 		I_ASSIGN(m_permissionsTableNameAttrPtr, "PermissionsTableName", "Name of the TenantPermissions table", false, "TenantPermissions");
 		I_ASSIGN(m_autoCreatePermissionsTableAttrPtr, "AutoCreatePermissionsTable", "Auto-create TenantPermissions table if not exists", false, true);
 		I_ASSIGN(m_createPermissionsTableScriptPathAttrPtr, "CreatePermissionsTableScriptPath", "SQL script path for TenantPermissions table creation", false, "CreateTenantPermissionsTable.sql");
+		I_ASSIGN(m_autoCreateMembershipsTableAttrPtr, "AutoCreateMembershipsTable", "Auto-create TenantMemberships table if not exists", false, false);
+		I_ASSIGN(m_createMembershipsTableScriptPathAttrPtr, "CreateMembershipsTableScriptPath", "SQL script path for TenantMemberships table creation", false, "CreateTenantMembershipsTable.sql");
+		I_ASSIGN(m_autoCreateInvitationsTableAttrPtr, "AutoCreateInvitationsTable", "Auto-create TenantInvitations table if not exists", false, false);
+		I_ASSIGN(m_createInvitationsTableScriptPathAttrPtr, "CreateInvitationsTableScriptPath", "SQL script path for TenantInvitations table creation", false, "CreateTenantInvitationsTable.sql");
 		I_ASSIGN(m_productIdAttrPtr, "ProductId", "Product ID used when storing permissions (scoped per product)", false, "");
 	I_END_COMPONENT
 
@@ -86,6 +90,7 @@ private:
 	QString GetTenantRelationScopeSubquery(const QByteArray& userId) const;
 	QByteArray GetProductId() const;
 	bool CreatePermissionsTableIfNeeded();
+	bool CreateAuxTableIfNeeded(bool autoCreate, const QString& tableName, const QByteArray& scriptPath);
 	QByteArrayList LoadTenantPermissions(const QByteArray& tenantId) const;
 	QByteArray CreatePermissionsInsertQuery(const QByteArray& tenantId, const QByteArrayList& permissions) const;
 	QByteArray CreatePermissionsDeleteQuery(const QByteArray& tenantId) const;
@@ -94,6 +99,10 @@ private:
 	I_ATTR(QByteArray, m_permissionsTableNameAttrPtr);
 	I_ATTR(bool, m_autoCreatePermissionsTableAttrPtr);
 	I_ATTR(QByteArray, m_createPermissionsTableScriptPathAttrPtr);
+	I_ATTR(bool, m_autoCreateMembershipsTableAttrPtr);
+	I_ATTR(QByteArray, m_createMembershipsTableScriptPathAttrPtr);
+	I_ATTR(bool, m_autoCreateInvitationsTableAttrPtr);
+	I_ATTR(QByteArray, m_createInvitationsTableScriptPathAttrPtr);
 	I_ATTR(QByteArray, m_productIdAttrPtr);
 };
 

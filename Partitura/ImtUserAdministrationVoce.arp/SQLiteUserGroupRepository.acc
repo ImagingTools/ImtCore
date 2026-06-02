@@ -56,7 +56,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="UserGroupDatabaseDelegate" PackageId="ImtAuthDbPck" ComponentId="SqliteUserGroupDatabaseDelegate">
+        <Element Id="UserGroupDatabaseDelegate" PackageId="ImtAuthDbPck" ComponentId="UserGroupDatabaseDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="AutoCreateTable" Type="Boolean" ExportId="">
