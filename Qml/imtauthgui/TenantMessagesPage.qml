@@ -13,8 +13,8 @@ import imtauthgui 1.0
  *
  * Cross-Tenant Messages tab of the TenantEditor.
  *
- * Read-only list; no create/edit/remove buttons.
- * Custom delegate shows message type, status, direction, and timestamps.
+ * Read-only list of protocol messages. Clicking a message opens a
+ * MessageView (ViewBase) with GqlBasedCommandsController for detail view.
  */
 TenantSimpleCollectionPage {
 id: messagesPage
@@ -30,18 +30,37 @@ headerButtonsComponent: emptyHeaderComp
 delegateComponent: messageDelegateComp
 
 function updateGui() {
-if (apiClient && tenantData && tenantData.m_id)
+if (apiClient && tenantData && tenantData.m_id) {
 apiClient.fetchCrossTenantMessages(tenantData.m_id)
+}
 }
 
 Component.onCompleted: {
-if (apiClient && tenantData && tenantData.m_id)
+if (apiClient && tenantData && tenantData.m_id) {
 apiClient.fetchCrossTenantMessages(tenantData.m_id)
+}
 }
 
 onVisibleChanged: {
-if (visible && apiClient && tenantData && tenantData.m_id)
+if (visible && apiClient && tenantData && tenantData.m_id) {
 apiClient.fetchCrossTenantMessages(tenantData.m_id)
+}
+}
+
+Connections {
+target: messagesPage.apiClient
+
+function onSubscriptionCrossTenantMessageReceived(notification) {
+if (messagesPage.visible && messagesPage.apiClient && messagesPage.tenantData && messagesPage.tenantData.m_id) {
+messagesPage.apiClient.fetchCrossTenantMessages(messagesPage.tenantData.m_id)
+}
+}
+
+function onSubscriptionCrossTenantMessageStatusChanged(notification) {
+if (messagesPage.visible && messagesPage.apiClient && messagesPage.tenantData && messagesPage.tenantData.m_id) {
+messagesPage.apiClient.fetchCrossTenantMessages(messagesPage.tenantData.m_id)
+}
+}
 }
 
 // --- No header buttons (read-only page) ---

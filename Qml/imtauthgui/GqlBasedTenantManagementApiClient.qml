@@ -50,6 +50,10 @@ QtObject {
 	property string roleObjectTypeId: "Role"
 	property string groupObjectTypeId: "Group"
 	property string userObjectTypeId: "User"
+	property string crossOrgGrantObjectTypeId: "CrossOrgGrant"
+	property string contractObjectTypeId: "Contract"
+	property string relationshipObjectTypeId: "TenantRelationship"
+	property string crossTenantMessageObjectTypeId: "CrossTenantMessage"
 
 	readonly property var roleDocumentManager: __roleDocumentService
 	readonly property var groupDocumentManager: __groupDocumentService

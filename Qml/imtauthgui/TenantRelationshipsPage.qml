@@ -13,8 +13,9 @@ import imtauthgui 1.0
  *
  * Relationships tab of the TenantEditor.
  *
- * Displays tenant relationships via TenantSimpleCollectionPage with a
- * dedicated create form. Removal is done per-item in the list delegate.
+ * Displays tenant relationships via TenantSimpleCollectionPage. Create opens
+ * a separate RelationshipView editor (ViewBase) with GqlBasedCommandsController.
+ * Removal is done per-item in the list delegate.
  */
 TenantSimpleCollectionPage {
 id: relationshipsPage
@@ -30,18 +31,21 @@ customEditorComponent: createRelationshipComp
 headerButtonsComponent: headerBtnsComp
 
 function updateGui() {
-if (apiClient && tenantData && tenantData.m_id)
+if (apiClient && tenantData && tenantData.m_id) {
 apiClient.fetchTenantRelationships(tenantData.m_id)
+}
 }
 
 Component.onCompleted: {
-if (apiClient && tenantData && tenantData.m_id)
+if (apiClient && tenantData && tenantData.m_id) {
 apiClient.fetchTenantRelationships(tenantData.m_id)
+}
 }
 
 onVisibleChanged: {
-if (visible && apiClient && tenantData && tenantData.m_id)
+if (visible && apiClient && tenantData && tenantData.m_id) {
 apiClient.fetchTenantRelationships(tenantData.m_id)
+}
 }
 
 Connections {
@@ -50,14 +54,16 @@ target: relationshipsPage.apiClient
 function onTenantRelationshipAdded(relationshipId) {
 PopupManager.addSuccessMessage(qsTr("Relationship created successfully"), true)
 relationshipsPage.popEditor()
-if (relationshipsPage.apiClient && relationshipsPage.tenantData && relationshipsPage.tenantData.m_id)
+if (relationshipsPage.apiClient && relationshipsPage.tenantData && relationshipsPage.tenantData.m_id) {
 relationshipsPage.apiClient.fetchTenantRelationships(relationshipsPage.tenantData.m_id)
+}
 }
 
 function onTenantRelationshipRemoved(relationshipId) {
 PopupManager.addSuccessMessage(qsTr("Relationship removed"), true)
-if (relationshipsPage.apiClient && relationshipsPage.tenantData && relationshipsPage.tenantData.m_id)
+if (relationshipsPage.apiClient && relationshipsPage.tenantData && relationshipsPage.tenantData.m_id) {
 relationshipsPage.apiClient.fetchTenantRelationships(relationshipsPage.tenantData.m_id)
+}
 }
 }
 
@@ -151,7 +157,7 @@ id: removeRelBtn
 visible: __canManage
 text: qsTr("Remove")
 onClicked: {
-if (relationshipsPage.apiClient)
+if (relationshipsPage.apiClient) {
 relationshipsPage.apiClient.removeTenantRelationship(
 relationshipsPage.tenantData ? relationshipsPage.tenantData.m_id : "",
 __rel.relationshipId || "")
@@ -160,175 +166,24 @@ __rel.relationshipId || "")
 }
 }
 }
+}
 
-// --- Create relationship form ---
+// --- Create relationship editor (ViewBase with GqlBasedCommandsController) ---
 Component {
 id: createRelationshipComp
 
-Item {
-id: createRelationshipForm
-
-property string __selectedTargetTenantId: ""
-property string __selectedTargetTenantName: ""
-
-CustomScrollbar {
-z: parent.z + 1
-anchors.right: parent.right
-anchors.top: createRelFlickable.top
-anchors.bottom: createRelFlickable.bottom
-secondSize: Style.marginM
-targetItem: createRelFlickable
-}
-
-Flickable {
-id: createRelFlickable
-anchors.fill: parent
-anchors.margins: Style.marginXL
-contentHeight: createRelColumn.height + 2 * Style.marginXL
-clip: true
-
-Column {
-id: createRelColumn
-width: Style.sizeHintXXL
-spacing: Style.marginL
-
-GroupElementView {
-width: parent.width
-
-// --- Target Tenant selector ---
-ElementView {
-name: qsTr("Target Tenant")
-
-controlComp: Component {
-Row {
-spacing: Style.marginM
-
-BaseText {
-anchors.verticalCenter: parent.verticalCenter
-text: createRelationshipForm.__selectedTargetTenantName
-  || createRelationshipForm.__selectedTargetTenantId
-  || qsTr("Select tenant...")
-color: createRelationshipForm.__selectedTargetTenantId
-   ? Style.textColor : Style.inactiveTextColor
-font.pixelSize: Style.fontSizeM
-}
-
-Button {
-text: qsTr("Select")
-onClicked: {
-ModalDialogManager.openDialog(tenantSelectComp, {})
-}
-}
-}
+RelationshipView {
+apiClient: relationshipsPage.apiClient
+tenantData: relationshipsPage.tenantData
+commandsControllerComp: Component {
+GqlBasedCommandsController {
+typeId: relationshipsPage.apiClient ? relationshipsPage.apiClient.relationshipObjectTypeId : ""
 }
 }
 
-// --- Source Role ---
-ComboBoxElementView {
-id: sourceRoleCB
-name: qsTr("Source Role")
-model: roleModel
-currentIndex: 2
-}
-
-// --- Target Role ---
-ComboBoxElementView {
-id: targetRoleCB
-name: qsTr("Target Role")
-model: roleModel
-currentIndex: 2
-}
-
-// --- Scope ---
-TextInputElementView {
-id: relScopeInput
-name: qsTr("Scope")
-placeHolderText: qsTr("Optional — empty applies to all resources")
-}
-
-// --- Valid From ---
-DateTimePickerElementView {
-id: relValidFromPicker
-name: qsTr("Valid From")
-}
-
-// --- Valid Until ---
-DateTimePickerElementView {
-id: relValidUntilPicker
-name: qsTr("Valid Until")
-}
-
-// --- Description ---
-TextInputElementView {
-id: relDescriptionInput
-name: qsTr("Description")
-placeHolderText: qsTr("Optional description")
-}
-
-// --- Actions ---
-Row {
-spacing: Style.marginM
-
-Button {
-text: qsTr("Create Relationship")
-onClicked: {
-if (!createRelationshipForm.__selectedTargetTenantId) {
-ModalDialogManager.showInfoDialog(qsTr("Target tenant is required."))
-return
-}
-var roleTokens = ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
-var srcIdx = sourceRoleCB.currentIndex >= 0 ? sourceRoleCB.currentIndex : 2
-var tgtIdx = targetRoleCB.currentIndex >= 0 ? targetRoleCB.currentIndex : 2
-relationshipsPage.apiClient.addTenantRelationship(
-relationshipsPage.tenantData ? relationshipsPage.tenantData.m_id : "",
-createRelationshipForm.__selectedTargetTenantId,
-roleTokens[srcIdx],
-roleTokens[tgtIdx],
-relScopeInput.text.trim(),
-relValidFromPicker.getDateAsString(),
-relValidUntilPicker.getDateAsString(),
-relDescriptionInput.text.trim())
-}
-}
-
-Button {
-text: qsTr("Cancel")
-onClicked: { relationshipsPage.popEditor() }
-}
-}
-}
-}
-}
-
-Component {
-id: tenantSelectComp
-
-FilterableSelectPopup {
-dataProvider: FilterableSelectGqlDataProvider {
-collectionId: "Tenants"
-multiSelect: false
-}
-filterPlaceholder: qsTr("Select tenant...")
-preselectedIds: createRelationshipForm.__selectedTargetTenantId
-? [createRelationshipForm.__selectedTargetTenantId] : []
-
-onItemSelected: function(itemId, index) {
-createRelationshipForm.__selectedTargetTenantId = itemId
-createRelationshipForm.__selectedTargetTenantName = dataProvider
-? dataProvider.getSelectedItemText(itemId) : ""
-}
-}
-}
-
-TreeItemModel {
-id: roleModel
-Component.onCompleted: {
-var roles = ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
-for (var i = 0; i < roles.length; i++) {
-var idx = insertNewItem()
-setData("id", roles[i], idx)
-setData("name", roles[i], idx)
-}
+onCommandActivated: function(commandId) {
+if (commandId === "save" || commandId === "create") {
+submitRelationship()
 }
 }
 }
