@@ -8,8 +8,9 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="TenantConnectionRequestInfo" X="550" Y="350" Note=""/>
-        <Element ComponentName="TenantConnectionRequestManager" X="550" Y="125" Note=""/>
+        <Element ComponentName="ConnectionCodesNotificationPublisher" X="550" Y="100" Note=""/>
+        <Element ComponentName="TenantConnectionRequestInfo" X="550" Y="525" Note=""/>
+        <Element ComponentName="TenantConnectionRequestManager" X="550" Y="325" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

@@ -162,6 +162,20 @@ public:
 	virtual bool RevokeConnectionRequest(const QByteArray& requestId) = 0;
 
 	/**
+		Delete (physically remove) a connect code request by its ID.
+		Typically used by the originating tenant to revoke and remove the code
+		from history.
+		\return true if the request was removed.
+	*/
+	virtual bool DeleteConnectCode(const QByteArray& requestId) = 0;
+
+	/**
+		Purge expired connect-code requests for the specified source tenant.
+		\return Number of removed expired requests.
+	*/
+	virtual int PurgeExpiredConnectCodes(const QByteArray& sourceTenantId) = 0;
+
+	/**
 		Get a specific connection request by its ID.
 	*/
 	virtual TenantConnectionRequestInfo GetConnectionRequest(const QByteArray& requestId) const = 0;

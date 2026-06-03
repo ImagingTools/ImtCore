@@ -52,6 +52,10 @@ ViewBase {
 		function onConnectionRequestAccepted(requestId) {
 			connectionsView.__refreshData()
 		}
+
+		function onConnectCodeCreated(requestId, connectCode) {
+			connectionsView.__refreshData()
+		}
 		
 		function onSubscriptionCrossTenantMessageReceived(notification) {
 			if (connectionsView.visible) {
@@ -64,6 +68,12 @@ ViewBase {
 				connectionsView.__refreshData()
 			}
 		}
+
+		function onConnectionRequestsReceived(forTenantId, requests) {
+			if (!connectionsView.tenantData || forTenantId !== connectionsView.tenantData.m_id)
+				return
+			connectionsView.__rebuildActiveConnections()
+		}
 	}
 	
 	function __refreshData() {
@@ -71,20 +81,34 @@ ViewBase {
 			connectionsView.apiClient.fetchConnectionRequests(connectionsView.tenantData.m_id)
 		}
 	}
-	
-	function __getActiveConnections() {
-		var result = []
+
+	ListModel {
+		id: activeConnectionsModel
+	}
+
+	function __rebuildActiveConnections() {
+		activeConnectionsModel.clear()
 		if (!connectionsView.apiClient || !connectionsView.apiClient.connectionRequestsModel) {
-			return result
+			return
 		}
 		var mdl = connectionsView.apiClient.connectionRequestsModel
 		for (var i = 0; i < mdl.count; i++) {
 			var req = mdl.get(i)
 			if (req.status === "Accepted") {
-				result.push(req)
+				activeConnectionsModel.append({
+					"id": req.id || "",
+					"sourceTenantId": req.sourceTenantId || "",
+					"sourceTenantName": req.sourceTenantName || "",
+					"targetTenantId": req.targetTenantId || "",
+					"targetTenantName": req.targetTenantName || "",
+					"targetIdentifier": req.targetIdentifier || "",
+					"proposedSourceRole": req.proposedSourceRole || "",
+					"proposedTargetRole": req.proposedTargetRole || "",
+					"message": req.message || "",
+					"respondedAt": req.respondedAt || ""
+				})
 			}
 		}
-		return result
 	}
 	
 	CustomScrollbar {
@@ -125,7 +149,7 @@ ViewBase {
 			
 			BaseText {
 				width: mainColumn.width
-				visible: activeRepeater.count === 0
+				visible: activeConnectionsModel.count === 0
 				text: qsTr("No active connections yet. Send or accept a connection request to establish your first connection.")
 				font.pixelSize: Style.fontSizeM
 				color: Style.inactiveTextColor
@@ -138,7 +162,7 @@ ViewBase {
 				
 				Repeater {
 					id: activeRepeater
-					model: connectionsView.__getActiveConnections()
+					model: activeConnectionsModel
 					
 					delegate: Rectangle {
 						id: connectionDelegate
@@ -149,11 +173,10 @@ ViewBase {
 						border.color: Style.borderColor
 						border.width: 1
 						
-						readonly property var __conn: modelData
-						readonly property bool __isOutgoing: connectionDelegate.__conn.sourceTenantId === (connectionsView.tenantData ? connectionsView.tenantData.m_id : "")
-						readonly property string __partnerTenantId: connectionDelegate.__isOutgoing
-																	? (connectionDelegate.__conn.targetTenantId || connectionDelegate.__conn.targetIdentifier || "")
-																	: (connectionDelegate.__conn.sourceTenantId || "")
+						readonly property bool __isOutgoing: model.sourceTenantId === (connectionsView.tenantData ? connectionsView.tenantData.m_id : "")
+						readonly property string __partnerTenantName: connectionDelegate.__isOutgoing
+																	? (model.targetTenantName || model.targetIdentifier || model.targetTenantId || "")
+																	: (model.sourceTenantName || model.sourceTenantId || "")
 						
 						Column {
 							id: connContent
@@ -170,7 +193,7 @@ ViewBase {
 								BaseText {
 									width: parent.width - connStatusBadge.width - Style.marginM
 									elide: Text.ElideRight
-									text: connectionDelegate.__partnerTenantId
+									text: connectionDelegate.__partnerTenantName
 									font.pixelSize: Style.fontSizeM
 									font.bold: true
 									color: Style.textColor
@@ -188,17 +211,17 @@ ViewBase {
 								width: connContent.width
 								elide: Text.ElideRight
 								text: qsTr("Roles: %1 → %2")
-								.arg(connectionDelegate.__conn.proposedSourceRole || "")
-								.arg(connectionDelegate.__conn.proposedTargetRole || "")
+								.arg(model.proposedSourceRole || "")
+								.arg(model.proposedTargetRole || "")
 								font.pixelSize: Style.fontSizeS
 								color: Style.inactiveTextColor
 							}
 							
 							BaseText {
 								width: connContent.width
-								visible: connectionDelegate.__conn.respondedAt && connectionDelegate.__conn.respondedAt !== ""
+								visible: model.respondedAt && model.respondedAt !== ""
 								elide: Text.ElideRight
-								text: qsTr("Connected since: %1").arg(connectionDelegate.__conn.respondedAt || "")
+								text: qsTr("Connected since: %1").arg(model.respondedAt || "")
 								font.pixelSize: Style.fontSizeS
 								color: Style.inactiveTextColor
 							}

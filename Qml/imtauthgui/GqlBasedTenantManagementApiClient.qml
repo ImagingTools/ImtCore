@@ -101,7 +101,7 @@ QtObject {
 	signal connectionRequestAccepted(string requestId)
 	signal connectionRequestRejected(string requestId)
 	signal connectionRequestRevoked(string requestId)
-	signal connectionRequestsReceived(var requests)
+	signal connectionRequestsReceived(string forTenantId, var requests)
 
 	signal requestFailed(string message)
 
@@ -160,6 +160,7 @@ QtObject {
 	// --- Real-time cross-tenant message subscription notifications ---
 	signal subscriptionCrossTenantMessageReceived(var notification)
 	signal subscriptionCrossTenantMessageStatusChanged(var notification)
+	signal subscriptionConnectionCodesChanged(var notification)
 
 	// --- Subscription client for cross-tenant message notifications ---
 	property SubscriptionClient __crossTenantMessageSubscription: SubscriptionClient {
@@ -190,6 +191,22 @@ QtObject {
 			} else if (notificationType === "MessageStatusChanged" || notificationType === 1) {
 				root.subscriptionCrossTenantMessageStatusChanged(notification)
 			}
+		}
+	}
+
+	property SubscriptionClient __connectionCodesSubscription: SubscriptionClient {
+		gqlCommandId: "OnConnectionCodesNotification"
+
+		function getHeaders() { return {} }
+
+		onMessageReceived: {
+			if (!data) return
+			var notification = {
+				"notificationType": data.containsKey("notificationType") ? data.getData("notificationType") : "",
+				"tenantId": data.containsKey("tenantId") ? data.getData("tenantId") : "",
+				"requestId": data.containsKey("requestId") ? data.getData("requestId") : ""
+			}
+			root.subscriptionConnectionCodesChanged(notification)
 		}
 	}
 
@@ -1275,6 +1292,7 @@ QtObject {
 						ModalDialogManager.showInfoDialog(m_errorMessage)
 						root.requestFailed(m_errorMessage)
 					} else {
+						console.log("GetTenantConnectionRequestsPayload", m_requests.toJson())
 						root.__populateConnectionRequestsModel(m_requests)
 					}
 				}
@@ -1283,10 +1301,11 @@ QtObject {
 	}
 
 	function __populateConnectionRequestsModel(requests) {
+		var forTenantId = root.__getConnectionRequestsInput.m_tenantId || ""
 		root.connectionRequestsModel.clear()
 		if (requests) {
-			for (var i = 0; i < requests.length; ++i) {
-				var req = requests[i]
+			for (var i = 0; i < requests.count; ++i) {
+				var req = requests.get(i).item
 				if (!req)
 					continue
 				root.connectionRequestsModel.append({
@@ -1302,11 +1321,13 @@ QtObject {
 					"status": req.m_status || TenantConnectionStatusEnum.s_pending,
 					"createdAt": req.m_createdAt || "",
 					"expiresAt": req.m_expiresAt || "",
-					"respondedAt": req.m_respondedAt || ""
+					"respondedAt": req.m_respondedAt || "",
+					"sourceTenantName": req.m_sourceTenantName || "",
+					"targetTenantName": req.m_targetTenantName || ""
 				})
 			}
 		}
-		root.connectionRequestsReceived(requests || [])
+		root.connectionRequestsReceived(forTenantId, requests || [])
 	}
 
 	function fetchConnectionRequests(tenantId) {
@@ -1427,7 +1448,9 @@ QtObject {
 		}
 	}
 
-	property GetCrossTenantMessagesInput __getMessagesInput: GetCrossTenantMessagesInput {}
+	property GetCrossTenantMessagesInput __getMessagesInput: GetCrossTenantMessagesInput {
+		m_direction: "Incoming"
+	}
 	property GqlSdlRequestSender __getMessagesSender: GqlSdlRequestSender {
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_getCrossTenantMessages
 

@@ -71,6 +71,10 @@ ViewBase {
 			redeemCodeView.__preview = null
 			redeemCodeInput.text = ""
 			PopupManager.addSuccessMessage(qsTr("Connect code successfully redeemed! Connection established."), true)
+			// Refresh connection requests so Active Connections picks up the new connection
+			if (redeemCodeView.apiClient && redeemCodeView.tenantData && redeemCodeView.tenantData.m_id) {
+				redeemCodeView.apiClient.fetchConnectionRequests(redeemCodeView.tenantData.m_id)
+			}
 		}
 
 		function onConnectionRequestRejected(requestId) {
@@ -217,10 +221,9 @@ ViewBase {
 								if (!p)
 									return ""
 								var tName = p.sourceTenantName || ""
-								var tId = p.sourceTenantId || ""
-								if (tName !== "" && tId !== "")
-									return tName + " (" + tId + ")"
-								return tName !== "" ? tName : tId
+								if (tName !== "")
+									return tName
+								return p.sourceTenantId || ""
 							}
 						}
 

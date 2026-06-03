@@ -13,6 +13,8 @@
         <Element ComponentName="TenantCollectionController" X="200" Y="75" Note=""/>
         <Element ComponentName="TenantCollectionDocumentService" X="200" Y="425" Note=""/>
         <Element ComponentName="TenantConnectionManager" X="975" Y="525" Note=""/>
+        <Element ComponentName="TenantContractManager" X="625" Y="600" Note=""/>
+        <Element ComponentName="TenantGrantManager" X="250" Y="600" Note=""/>
         <Element ComponentName="TenantManager" X="600" Y="300" Note=""/>
         <Element ComponentName="TenantMembershipManager" X="1000" Y="300" Note=""/>
         <Element ComponentName="UserFilterableSelectController" X="1000" Y="75" Note=""/>

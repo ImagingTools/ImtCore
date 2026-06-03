@@ -20,6 +20,12 @@ ViewBase {
 	readonly property bool __canManage: connectCodesView.stateManager
 		&& (connectCodesView.stateManager.isCreator || connectCodesView.stateManager.isOwner)
 
+	onApiClientChanged: {
+		if (apiClient){
+			connectCodesView.__fetchExistingCodes()
+		}
+	}
+
 	// =========================================================
 	// Clipboard helper
 	// =========================================================
@@ -43,7 +49,15 @@ ViewBase {
 	}
 
 	function updateGui() {}
+
 	function updateModel() {}
+
+	// Fetch existing codes from server on load
+	function __fetchExistingCodes() {
+		if (connectCodesView.apiClient && connectCodesView.tenantData && connectCodesView.tenantData.m_id) {
+			connectCodesView.apiClient.fetchConnectionRequests(connectCodesView.tenantData.m_id)
+		}
+	}
 
 	// =========================================================
 	// API events
@@ -52,20 +66,85 @@ ViewBase {
 		target: connectCodesView.apiClient
 
 		function onConnectCodeCreated(requestId, connectCode) {
-			generatedCodeText.text = connectCode
-			generatedCodeCard.visible = true
-
-			generatedCodesHistory.append({
-				"code": connectCode,
-				"requestId": requestId,
-				"createdAt": new Date().toLocaleString()
-			})
-
 			PopupManager.addSuccessMessage(
 				qsTr("Connect code generated successfully"),
 				true
 			)
+			// Server notification will trigger the list refresh automatically
 		}
+
+		function onConnectionRequestsReceived(forTenantId, requests) {
+			if (!connectCodesView.tenantData || forTenantId !== connectCodesView.tenantData.m_id)
+				return
+			connectCodesView.__populateFromServerData()
+		}
+
+		function onConnectionRequestRevoked(requestId) {
+			PopupManager.addSuccessMessage(
+				qsTr("Connect code revoked"),
+				true
+			)
+
+			for (let i = 0; i < generatedCodesHistory.count; ++i){
+				if (generatedCodesHistory.get(i).requestId === requestId){
+					generatedCodesHistory.remove(i)
+					return
+				}
+			}
+		}
+
+		function onSubscriptionConnectionCodesChanged(notification) {
+			if (!notification || !connectCodesView.tenantData)
+				return
+			// Only refresh if the notification is for our tenant
+			if (notification.tenantId === connectCodesView.tenantData.m_id) {
+				connectCodesView.__fetchExistingCodes()
+			}
+		}
+	}
+
+	function __populateFromServerData() {
+		if (!connectCodesView.apiClient || !connectCodesView.apiClient.connectionRequestsModel) {
+			return
+		}
+		generatedCodesHistory.clear()
+		var mdl = connectCodesView.apiClient.connectionRequestsModel
+		for (var i = 0; i < mdl.count; i++) {
+			var req = mdl.get(i)
+			console.log("req", JSON.stringify(req))
+			if (!req || !req.connectCode || req.connectCode === "") {
+				continue
+			}
+			// Only show pending codes (not accepted/rejected/revoked/expired)
+			if (req.status && req.status !== "Pending" && req.status !== 0) {
+				continue
+			}
+			generatedCodesHistory.append({
+				"code": req.connectCode,
+				"requestId": req.requestId || req.id || "",
+				"sourceRole": req.proposedSourceRole || "",
+				"targetRole": req.proposedTargetRole || "",
+				"message": req.message || "",
+				"expiresAt": req.expiresAt || "",
+				"createdAt": req.createdAt || ""
+			})
+		}
+	}
+
+	function __computeExpirationISO() {
+		var now = new Date()
+		var idx = codeExpirationCB.currentIndex
+		if (idx === 0) {
+			now.setDate(now.getDate() + 1)
+		} else if (idx === 1) {
+			now.setDate(now.getDate() + 7)
+		} else if (idx === 2) {
+			now.setMonth(now.getMonth() + 1)
+		} else {
+			// No expiration - return empty string
+			return ""
+		}
+		return now.toISOString()
 	}
 
 	ListModel {
@@ -117,7 +196,7 @@ ViewBase {
 			}
 
 			// =====================================================
-			// Generate card (FIXED)
+			// Generate card
 			// =====================================================
 			Rectangle {
 				id: generateCard
@@ -168,9 +247,11 @@ ViewBase {
 							placeHolderText: qsTr("Optional message to include")
 						}
 
-						DateTimePickerElementView {
-							id: codeExpiresAtPicker
-							name: qsTr("Expires At")
+						ComboBoxElementView {
+							id: codeExpirationCB
+							name: qsTr("Expiration")
+							model: expirationModel
+							currentIndex: 0
 						}
 					}
 
@@ -189,85 +270,9 @@ ViewBase {
 								roleTokens[srcIdx],
 								roleTokens[tgtIdx],
 								codeMessageInput.text.trim(),
-								codeExpiresAtPicker.datePicker.selectedDate.toISOString()
+								connectCodesView.__computeExpirationISO()
 							)
 						}
-					}
-				}
-			}
-
-			// =====================================================
-			// Generated code card (FIXED)
-			// =====================================================
-			Rectangle {
-				id: generatedCodeCard
-
-				visible: false
-				width: parent.width
-
-				radius: Style.radiusS
-				color: Style.alternateBaseColor
-				border.color: Style.linkColor
-				border.width: 2
-
-				readonly property int _pad: Style.marginL
-
-				height: generatedCodeContent.implicitHeight + _pad * 2
-
-				Column {
-					id: generatedCodeContent
-
-					width: parent.width - generatedCodeCard._pad * 2
-
-					anchors.top: parent.top
-					anchors.left: parent.left
-					anchors.right: parent.right
-					anchors.margins: generatedCodeCard._pad
-
-					spacing: Style.marginM
-
-					BaseText {
-						text: qsTr("Your Connect Code:")
-						font.pixelSize: Style.fontSizeM
-						font.bold: true
-						color: Style.textColor
-					}
-
-					BaseText {
-						id: generatedCodeText
-						font.pixelSize: Style.fontSizeL
-						font.bold: true
-						color: Style.linkColor
-						wrapMode: Text.WrapAnywhere
-						text: ""
-					}
-
-					BaseText {
-						text: qsTr("Share this code with the tenant you want to connect with. The code can only be used once.")
-						font.pixelSize: Style.fontSizeS
-						color: Style.inactiveTextColor
-						wrapMode: Text.WordWrap
-					}
-				}
-
-				ToolButton {
-					z: 10
-
-					anchors.top: parent.top
-					anchors.right: parent.right
-					anchors.topMargin: Style.marginM
-					anchors.rightMargin: Style.marginM
-
-					width: Style.buttonWidthM
-					height: width
-
-					iconSource: "../../../" +
-						Style.getIconPath("Icons/Copy", Icon.State.On, Icon.Mode.Normal)
-
-					tooltipText: qsTr("Copy code")
-
-					onClicked: {
-						connectCodesView.copyToClipboard(generatedCodeText.text)
 					}
 				}
 			}
@@ -276,7 +281,7 @@ ViewBase {
 			GroupHeaderView {
 				width: parent.width
 				visible: generatedCodesHistory.count > 0
-				title: qsTr("Generated Codes (this session)")
+				title: qsTr("Generated Codes")
 			}
 
 			Column {
@@ -303,7 +308,7 @@ ViewBase {
 
 						height: historyContent.implicitHeight + _pad * 2
 
-						Item {
+						Column {
 							id: historyContent
 
 							width: parent.width - historyDelegate._pad * 2
@@ -313,53 +318,100 @@ ViewBase {
 							anchors.right: parent.right
 							anchors.margins: historyDelegate._pad
 
-							BaseText {
-								id: historyText
+							spacing: Style.marginXS
 
-								anchors.left: parent.left
-								anchors.verticalCenter: parent.verticalCenter
-								anchors.right: historyTimestamp.left
-								anchors.rightMargin: Style.marginM
+							Row {
+								width: historyContent.width
+								spacing: Style.marginM
 
-								elide: Text.ElideMiddle
-								text: historyDelegate.__item.code || ""
+								BaseText {
+									id: historyText
+									anchors.verticalCenter: parent.verticalCenter
+									width: parent.width - copyButton.width - revokeButton.width - parent.spacing * 2
 
-								font.pixelSize: Style.fontSizeM
-								color: Style.linkColor
+									elide: Text.ElideMiddle
+									text: historyDelegate.__item.code || ""
+
+									font.pixelSize: Style.fontSizeM
+									font.bold: true
+									color: Style.linkColor
+								}
+
+								ToolButton {
+									id: copyButton
+									anchors.verticalCenter: parent.verticalCenter
+
+									width: Style.buttonWidthM
+									height: width
+
+									iconSource: "../../../" +
+										Style.getIconPath("Icons/Copy", Icon.State.On, Icon.Mode.Normal)
+
+									tooltipText: qsTr("Copy code")
+
+									onClicked: {
+										connectCodesView.copyToClipboard(
+											historyDelegate.__item.code || ""
+										)
+									}
+								}
+
+								ToolButton {
+									id: revokeButton
+									anchors.verticalCenter: parent.verticalCenter
+									visible: connectCodesView.__canManage
+
+									width: Style.buttonWidthM
+									height: width
+
+									iconSource: "../../../" +
+										Style.getIconPath("Icons/Delete", Icon.State.On, Icon.Mode.Normal)
+
+									tooltipText: qsTr("Revoke code")
+
+									onClicked: {
+										var reqId = historyDelegate.__item.requestId || ""
+										if (reqId && connectCodesView.apiClient) {
+											connectCodesView.apiClient.revokeConnectionRequest(reqId)
+										}
+									}
+								}
 							}
 
 							BaseText {
-								id: historyTimestamp
-
-								anchors.right: copyButton.left
-								anchors.rightMargin: Style.marginM
-								anchors.verticalCenter: parent.verticalCenter
-
-								text: historyDelegate.__item.createdAt || ""
-
+								width: historyContent.width
+								visible: (historyDelegate.__item.sourceRole || "") !== "" || (historyDelegate.__item.targetRole || "") !== ""
+								text: qsTr("Roles: %1 → %2").arg(historyDelegate.__item.sourceRole || "").arg(historyDelegate.__item.targetRole || "")
 								font.pixelSize: Style.fontSizeS
 								color: Style.inactiveTextColor
+								elide: Text.ElideRight
 							}
 
-							ToolButton {
-								id: copyButton
+							BaseText {
+								width: historyContent.width
+								visible: (historyDelegate.__item.message || "") !== ""
+								text: qsTr("Message: %1").arg(historyDelegate.__item.message || "")
+								font.pixelSize: Style.fontSizeS
+								color: Style.inactiveTextColor
+								elide: Text.ElideRight
+							}
 
-								anchors.right: parent.right
-								anchors.verticalCenter: parent.verticalCenter
+							BaseText {
+								width: historyContent.width
+								visible: (historyDelegate.__item.expiresAt || "") !== ""
+								text: qsTr("Expires: %1").arg(historyDelegate.__item.expiresAt || "")
+								font.pixelSize: Style.fontSizeS
+								color: Style.inactiveTextColor
+								elide: Text.ElideRight
+							}
 
-								width: Style.buttonWidthM
-								height: width
-
-								iconSource: "../../../" +
-									Style.getIconPath("Icons/Copy", Icon.State.On, Icon.Mode.Normal)
-
-								tooltipText: qsTr("Copy code")
-
-								onClicked: {
-									connectCodesView.copyToClipboard(
-										historyDelegate.__item.code || ""
-									)
-								}
+							BaseText {
+								width: historyContent.width
+								visible: (historyDelegate.__item.createdAt || "") !== ""
+								text: qsTr("Created: %1").arg(historyDelegate.__item.createdAt || "")
+								font.pixelSize: Style.fontSizeS
+								color: Style.inactiveTextColor
+								elide: Text.ElideRight
 							}
 						}
 					}
@@ -378,6 +430,25 @@ ViewBase {
 				var idx = connRoleModel.insertNewItem()
 				connRoleModel.setData("id", roles[i], idx)
 				connRoleModel.setData("name", roles[i], idx)
+			}
+		}
+	}
+
+	TreeItemModel {
+		id: expirationModel
+
+		Component.onCompleted: {
+			var options = [
+				{"id": "day", "name": qsTr("1 Day")},
+				{"id": "week", "name": qsTr("1 Week")},
+				{"id": "month", "name": qsTr("1 Month")},
+				{"id": "never", "name": qsTr("No expiration")}
+			]
+
+			for (var i = 0; i < options.length; i++) {
+				var idx = expirationModel.insertNewItem()
+				expirationModel.setData("id", options[i].id, idx)
+				expirationModel.setData("name", options[i].name, idx)
 			}
 		}
 	}

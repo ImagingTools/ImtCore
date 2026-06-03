@@ -283,6 +283,73 @@ bool CTenantConnectionRequestManagerComp::RevokeConnectionRequest(const QByteArr
 }
 
 
+bool CTenantConnectionRequestManagerComp::DeleteConnectCode(const QByteArray& requestId)
+{
+	if (!m_requestCollectionCompPtr.IsValid() || requestId.isEmpty()){
+		return false;
+	}
+
+	TenantConnectionRequestInfo info = GetConnectionRequest(requestId);
+	if (info.requestId.isEmpty() || info.connectCode.isEmpty()){
+		return false;
+	}
+
+	istd::CChangeNotifier changeNotifier(this);
+
+	imtbase::IObjectCollection::Ids ids;
+	ids.append(requestId);
+	return m_requestCollectionCompPtr->RemoveElements(ids);
+}
+
+
+int CTenantConnectionRequestManagerComp::PurgeExpiredConnectCodes(const QByteArray& sourceTenantId)
+{
+	if (!m_requestCollectionCompPtr.IsValid() || sourceTenantId.isEmpty()){
+		return 0;
+	}
+
+	const QDateTime nowUtc = QDateTime::currentDateTimeUtc();
+	imtbase::IObjectCollection::Ids idsToRemove;
+
+	for (const QByteArray& id : m_requestCollectionCompPtr->GetElementIds()){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (!m_requestCollectionCompPtr->GetObjectData(id, dataPtr)){
+			continue;
+		}
+
+		const ITenantConnectionRequestData* requestPtr = dynamic_cast<const ITenantConnectionRequestData*>(dataPtr.GetPtr());
+		if (requestPtr == nullptr){
+			continue;
+		}
+
+		const TenantConnectionRequestInfo info = requestPtr->GetRequestInfo();
+		if (info.sourceTenantId != sourceTenantId || info.connectCode.isEmpty()){
+			continue;
+		}
+
+		if (info.expiresAt.isEmpty()){
+			continue;
+		}
+
+		QDateTime expiresAt = QDateTime::fromString(info.expiresAt, Qt::ISODateWithMs);
+		if (expiresAt.isValid() && expiresAt < nowUtc){
+			idsToRemove.append(id);
+		}
+	}
+
+	if (idsToRemove.isEmpty()){
+		return 0;
+	}
+
+	istd::CChangeNotifier changeNotifier(this);
+	if (!m_requestCollectionCompPtr->RemoveElements(idsToRemove)){
+		return 0;
+	}
+
+	return idsToRemove.count();
+}
+
+
 TenantConnectionRequestInfo CTenantConnectionRequestManagerComp::GetConnectionRequest(const QByteArray& requestId) const
 {
 	if (!m_requestCollectionCompPtr.IsValid()){

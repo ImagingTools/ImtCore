@@ -9,7 +9,7 @@
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="ContractInfo" X="575" Y="400" Note=""/>
-        <Element ComponentName="ContractManager" X="575" Y="125" Note=""/>
+        <Element ComponentName="ContractManager" X="575" Y="175" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
