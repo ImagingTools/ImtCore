@@ -1175,7 +1175,12 @@ function compile(options){
                             if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.SDLObject)) {
                                 meta.push(`${defineProperty.name}:{type:JQModules.QtQml.SDLProperty, modifiers: ${JSON.stringify(defineProperty.modifiers)}},`)
                             } else {
-                                meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, modifiers: ${JSON.stringify(defineProperty.modifiers)}},`)
+                                if (typeof defineProperty.value === 'object' && defineProperty.value !== null) {
+                                    meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, modifiers: ${JSON.stringify(defineProperty.modifiers)}},`)
+                                } else {
+                                    meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, value:${defineProperty.value}, modifiers: ${JSON.stringify(defineProperty.modifiers)}},`)
+                                }
+                                
                             }
                             
                         }

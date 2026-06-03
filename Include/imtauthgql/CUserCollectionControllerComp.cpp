@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CUserCollectionControllerComp.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
-
 
 // ACF includes
 #include <iprm/CTextParam.h>
@@ -9,6 +7,8 @@
 #include <iqt/iqt.h>
 
 // ImtCore includes
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtauth/CUserInfo.h>
 

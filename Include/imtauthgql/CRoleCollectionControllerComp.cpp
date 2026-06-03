@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CRoleCollectionControllerComp.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Roles.h>
-
 
 // ACF includes
 #include <iqt/iqt.h>
 #include <iprm/CTextParam.h>
 
 // ImtCore includes
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Roles.h>
 #include <imtbase/CComplexCollectionFilterHelper.h>
 #include <imtauth/CRole.h>
 

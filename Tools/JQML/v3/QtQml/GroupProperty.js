@@ -31,7 +31,10 @@ class GroupProperty extends QBaseObject {
             target.__proxy[name][key] = _value[key]
         }
 
-        // if(target['SLOT_' + name + 'Changed']) target['SLOT_' + name + 'Changed'](target[name], target[name])
+        let signal = Signal.get(target, name + 'Changed')
+        if(signal){
+            signal()
+        }
         
         return true
     }
