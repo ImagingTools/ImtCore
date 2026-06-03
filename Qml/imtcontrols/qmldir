@@ -207,6 +207,8 @@ TableHeaderDelegate 1.0 ./Views/TableHeaderDelegate.qml
 TableRowCanvasViewer 1.0 ./Views/TableRowCanvasViewer.qml
 BarChartSimple 1.0 ./Views/BarChartSimple.qml
 
+ReorderableListDelegate 1.0 ./Views/ReorderableListDelegate.qml
+ReorderListQmlManager 1.0 ./Views/ReorderListQmlManager.qml
 
 GraphicsView 1.0 ./GraphicsView/GraphicsView.qml
 GraphicsLayer 1.0 ./GraphicsView/GraphicsLayer.qml

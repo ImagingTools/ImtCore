@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CGqlJwtSessionControllerComp.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Sessions.h>
 
 
 // ACF includes
@@ -9,6 +8,7 @@
 // ImtCore includes
 #include <imtauth/ITenantInfo.h>
 #include <imtgql/IGqlContext.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Sessions.h>
 
 
 namespace imtauthgql
@@ -98,21 +98,28 @@ sdl::V1_0::imtauth::CGetSessionPayload CGqlJwtSessionControllerComp::OnGetSessio
 
 	if (!m_jwtSessionControllerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'JwtSessionController' was not set", "CGqlJwtSessionControllerComp");
+
+		return response;
+	}
+
+	sdl::V1_0::imtauth::GetSessionRequestArguments arguments = getSessionRequest.GetRequestedArguments();
+	if (!arguments.input.has_value()){
+		Q_ASSERT(false);
+
 		return response;
 	}
 
 	QByteArray sessionId;
-	sdl::V1_0::imtauth::GetSessionRequestArguments arguments = getSessionRequest.GetRequestedArguments();
-	if (!arguments.input.has_value()){
-		Q_ASSERT(false);
-		return response;
-	}
-
 	if (arguments.input->sessionId){
 		sessionId = *arguments.input->sessionId;
 	}
 
 	imtauth::ISessionSharedPtr sessionInfoPtr = m_jwtSessionControllerCompPtr->GetSession(sessionId);
+	if (!sessionInfoPtr.IsValid()){
+		SendErrorMessage(0, QStringLiteral("Unable to get session '%1'. Error: Session not found").arg(sessionId));
+
+		return response;
+	}
 
 	istd::TDelPtr<iser::CMemoryWriteArchive> archivePtr;
 	if (m_versionInfoCompPtr.IsValid()){
@@ -123,7 +130,8 @@ sdl::V1_0::imtauth::CGetSessionPayload CGqlJwtSessionControllerComp::OnGetSessio
 	}
 
 	if (!sessionInfoPtr->Serialize(*archivePtr.GetPtr())){
-		SendErrorMessage(0, QString("Unable to serialize object. Error: Serialization failed"));
+		SendErrorMessage(0, QStringLiteral("Unable to serialize object. Error: Serialization failed"));
+
 		return response;
 	}
 
