@@ -316,7 +316,7 @@ module.exports = {
                 font-size: 14px;
                 font-family: 'Segoe UI';
             }
-            .TextInput .impl, .TextEdit .impl {
+            .TextInput > .impl, .TextEdit > .impl {
                 display: flex;
                 width: 100%;
                 height: 100%;
