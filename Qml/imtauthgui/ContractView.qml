@@ -189,7 +189,7 @@ ViewBase {
 			preselectedIds: container.__selectedTargetTenantId
 				? [container.__selectedTargetTenantId] : []
 
-			onItemSelected: function(itemId, index) {
+			onItemSelected: {
 				container.__selectedTargetTenantId = itemId
 				container.__selectedTargetTenantName = dataProvider
 					? dataProvider.getSelectedItemText(itemId) : ""
@@ -209,7 +209,7 @@ ViewBase {
 			preselectedIds: container.__selectedRelationshipId
 				? [container.__selectedRelationshipId] : []
 
-			onItemSelected: function(itemId, index) {
+			onItemSelected: {
 				container.__selectedRelationshipId = itemId
 				container.__selectedRelationshipName = dataProvider
 					? dataProvider.getSelectedItemText(itemId) : ""

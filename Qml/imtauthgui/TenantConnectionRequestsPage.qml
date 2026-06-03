@@ -35,8 +35,8 @@ readonly property bool __canManage: connectionsPage.stateManager
 && (connectionsPage.stateManager.isCreator || connectionsPage.stateManager.isOwner)
 
 function updateGui() {
-if (apiClient && tenantData && tenantData.m_id) {
-apiClient.fetchConnectionRequests(tenantData.m_id)
+if (connectionsPage.apiClient && connectionsPage.tenantData && connectionsPage.tenantData.m_id) {
+connectionsPage.apiClient.fetchConnectionRequests(connectionsPage.tenantData.m_id)
 }
 }
 
@@ -44,14 +44,14 @@ function updateModel() {
 }
 
 Component.onCompleted: {
-if (apiClient && tenantData && tenantData.m_id) {
-apiClient.fetchConnectionRequests(tenantData.m_id)
+if (connectionsPage.apiClient && connectionsPage.tenantData && connectionsPage.tenantData.m_id) {
+connectionsPage.apiClient.fetchConnectionRequests(connectionsPage.tenantData.m_id)
 }
 }
 
 onVisibleChanged: {
-if (visible && apiClient && tenantData && tenantData.m_id) {
-apiClient.fetchConnectionRequests(tenantData.m_id)
+if (connectionsPage.visible && connectionsPage.apiClient && connectionsPage.tenantData && connectionsPage.tenantData.m_id) {
+connectionsPage.apiClient.fetchConnectionRequests(connectionsPage.tenantData.m_id)
 }
 }
 
@@ -61,41 +61,41 @@ target: connectionsPage.apiClient
 
 function onConnectionRequestCreated(requestId) {
 PopupManager.addSuccessMessage(qsTr("Connection request sent"), true)
-__refreshList()
+connectionsPage.__refreshList()
 }
 
 function onConnectCodeCreated(requestId, connectCode) {
 generatedCodeText.text = connectCode
 generatedCodeText.visible = true
 PopupManager.addSuccessMessage(qsTr("Connect code generated: %1").arg(connectCode), true)
-__refreshList()
+connectionsPage.__refreshList()
 }
 
 function onConnectionRequestAccepted(requestId) {
 PopupManager.addSuccessMessage(qsTr("Connection request accepted"), true)
-__refreshList()
+connectionsPage.__refreshList()
 }
 
 function onConnectionRequestRejected(requestId) {
 PopupManager.addSuccessMessage(qsTr("Connection request rejected"), true)
-__refreshList()
+connectionsPage.__refreshList()
 }
 
 function onConnectionRequestRevoked(requestId) {
 PopupManager.addSuccessMessage(qsTr("Connection request revoked"), true)
-__refreshList()
+connectionsPage.__refreshList()
 }
 
 // --- Subscription-driven real-time updates ---
 function onSubscriptionCrossTenantMessageReceived(notification) {
 if (connectionsPage.visible) {
-__refreshList()
+connectionsPage.__refreshList()
 }
 }
 
 function onSubscriptionCrossTenantMessageStatusChanged(notification) {
 if (connectionsPage.visible) {
-__refreshList()
+connectionsPage.__refreshList()
 }
 }
 }
@@ -108,7 +108,7 @@ connectionsPage.apiClient.fetchConnectionRequests(connectionsPage.tenantData.m_i
 
 CustomScrollbar {
 id: scrollbar
-z: parent.z + 1
+z: connectionsPage.z + 1
 anchors.right: parent.right
 anchors.top: mainFlickable.top
 anchors.bottom: mainFlickable.bottom
@@ -131,20 +131,20 @@ clip: true
 
 Column {
 id: mainColumn
-width: parent.width
+width: mainFlickable.width
 spacing: Style.marginXL
 
-// =================================================================
+// =============================================================
 // SECTION: Send Connection Request by Email / Identifier
-// =================================================================
+// =============================================================
 GroupHeaderView {
-width: parent.width
+width: mainColumn.width
 title: qsTr("Send Connection Request")
 }
 
 GroupElementView {
 id: sendRequestGroup
-width: parent.width
+width: mainColumn.width
 
 TextInputElementView {
 id: targetIdentifierInput
@@ -224,24 +224,24 @@ connExpiresAtPicker.getDateAsString())
 BaseText {
 id: generatedCodeText
 visible: false
-width: parent.width
+width: mainColumn.width
 font.pixelSize: Style.fontSizeL
 font.bold: true
 color: Style.linkColor
 wrapMode: Text.WrapAnywhere
 }
 
-// =================================================================
+// =============================================================
 // SECTION: Redeem a Connect Code
-// =================================================================
+// =============================================================
 GroupHeaderView {
-width: parent.width
+width: mainColumn.width
 title: qsTr("Redeem a Connect Code")
 }
 
 GroupElementView {
 id: redeemGroup
-width: parent.width
+width: mainColumn.width
 
 TextInputElementView {
 id: redeemCodeInput
@@ -265,16 +265,16 @@ connectionsPage.tenantData ? connectionsPage.tenantData.m_id : "")
 }
 }
 
-// =================================================================
+// =============================================================
 // SECTION: Connection Requests List (real-time)
-// =================================================================
+// =============================================================
 GroupHeaderView {
-width: parent.width
+width: mainColumn.width
 title: qsTr("Connection Requests")
 }
 
 BaseText {
-width: parent.width
+width: mainColumn.width
 visible: !requestsRepeater.model || requestsRepeater.model.count === 0
 text: qsTr("No connection requests yet.")
 font.pixelSize: Style.fontSizeM
@@ -282,15 +282,16 @@ color: Style.inactiveTextColor
 }
 
 Column {
-width: parent.width
+width: mainColumn.width
 spacing: Style.marginM
 
 Repeater {
 id: requestsRepeater
 model: connectionsPage.apiClient ? connectionsPage.apiClient.connectionRequestsModel : null
 
-Rectangle {
-width: parent ? parent.width : 0
+delegate: Rectangle {
+id: requestDelegate
+width: mainColumn.width
 height: reqContent.height + 2 * Style.marginM
 color: Style.alternateBaseColor
 radius: Style.radiusS
@@ -299,64 +300,64 @@ border.width: 1
 
 readonly property var __req: model
 readonly property bool __isOutgoing: connectionsPage.tenantData
-&& __req.sourceTenantId === connectionsPage.tenantData.m_id
-readonly property bool __isPending: (__req.status || "") === "Pending"
+&& requestDelegate.__req.sourceTenantId === connectionsPage.tenantData.m_id
+readonly property bool __isPending: (requestDelegate.__req.status || "") === "Pending"
 
 Column {
 id: reqContent
-anchors.left: parent.left
-anchors.right: parent.right
-anchors.top: parent.top
+anchors.left: requestDelegate.left
+anchors.right: requestDelegate.right
+anchors.top: requestDelegate.top
 anchors.margins: Style.marginM
 spacing: Style.marginXS
 
 BaseText {
-width: parent.width
+width: reqContent.width
 elide: Text.ElideRight
-text: __isOutgoing
-? qsTr("▶ To: %1").arg((__req.targetIdentifier && __req.targetIdentifier !== "")
-? __req.targetIdentifier
-: (__req.targetTenantId || qsTr("(connect code)")))
-: qsTr("◀ From: %1").arg(__req.sourceTenantId || "")
+text: requestDelegate.__isOutgoing
+? qsTr("▶ To: %1").arg((requestDelegate.__req.targetIdentifier && requestDelegate.__req.targetIdentifier !== "")
+? requestDelegate.__req.targetIdentifier
+: (requestDelegate.__req.targetTenantId || qsTr("(connect code)")))
+: qsTr("◀ From: %1").arg(requestDelegate.__req.sourceTenantId || "")
 font.pixelSize: Style.fontSizeM
 font.bold: true
 color: Style.textColor
 }
 
 BaseText {
-width: parent.width
+width: reqContent.width
 elide: Text.ElideRight
 text: qsTr("Status: %1   Roles: %2 / %3")
-.arg(__req.status || qsTr("Pending"))
-.arg(__req.proposedSourceRole || qsTr("Partner"))
-.arg(__req.proposedTargetRole || qsTr("Partner"))
+.arg(requestDelegate.__req.status || qsTr("Pending"))
+.arg(requestDelegate.__req.proposedSourceRole || qsTr("Partner"))
+.arg(requestDelegate.__req.proposedTargetRole || qsTr("Partner"))
 font.pixelSize: Style.fontSizeS
 color: Style.inactiveTextColor
 }
 
 BaseText {
-width: parent.width
-visible: __req.connectCode && __req.connectCode !== ""
+width: reqContent.width
+visible: requestDelegate.__req.connectCode && requestDelegate.__req.connectCode !== ""
 elide: Text.ElideRight
-text: qsTr("Connect code: %1").arg(__req.connectCode || "")
+text: qsTr("Connect code: %1").arg(requestDelegate.__req.connectCode || "")
 font.pixelSize: Style.fontSizeS
 color: Style.inactiveTextColor
 }
 
 BaseText {
-width: parent.width
-visible: __req.message && __req.message !== ""
+width: reqContent.width
+visible: requestDelegate.__req.message && requestDelegate.__req.message !== ""
 wrapMode: Text.WordWrap
-text: __req.message || ""
+text: requestDelegate.__req.message || ""
 font.pixelSize: Style.fontSizeS
 color: Style.inactiveTextColor
 }
 
 BaseText {
-width: parent.width
-visible: __req.createdAt && __req.createdAt !== ""
+width: reqContent.width
+visible: requestDelegate.__req.createdAt && requestDelegate.__req.createdAt !== ""
 elide: Text.ElideRight
-text: qsTr("Created: %1").arg(__req.createdAt || "")
+text: qsTr("Created: %1").arg(requestDelegate.__req.createdAt || "")
 font.pixelSize: Style.fontSizeS
 color: Style.inactiveTextColor
 }
@@ -364,36 +365,36 @@ color: Style.inactiveTextColor
 // --- Action buttons ---
 Row {
 spacing: Style.marginM
-visible: connectionsPage.__canManage && __isPending
+visible: connectionsPage.__canManage && requestDelegate.__isPending
 
 Button {
-visible: !__isOutgoing
+visible: !requestDelegate.__isOutgoing
 text: qsTr("Accept")
 onClicked: {
 if (connectionsPage.apiClient) {
 connectionsPage.apiClient.acceptConnectionRequest(
-__req.requestId || "",
+requestDelegate.__req.requestId || "",
 connectionsPage.tenantData ? connectionsPage.tenantData.m_id : "")
 }
 }
 }
 
 Button {
-visible: !__isOutgoing
+visible: !requestDelegate.__isOutgoing
 text: qsTr("Reject")
 onClicked: {
 if (connectionsPage.apiClient) {
-connectionsPage.apiClient.rejectConnectionRequest(__req.requestId || "")
+connectionsPage.apiClient.rejectConnectionRequest(requestDelegate.__req.requestId || "")
 }
 }
 }
 
 Button {
-visible: __isOutgoing
+visible: requestDelegate.__isOutgoing
 text: qsTr("Revoke")
 onClicked: {
 if (connectionsPage.apiClient) {
-connectionsPage.apiClient.revokeConnectionRequest(__req.requestId || "")
+connectionsPage.apiClient.revokeConnectionRequest(requestDelegate.__req.requestId || "")
 }
 }
 }
@@ -410,9 +411,9 @@ id: connRoleModel
 Component.onCompleted: {
 var roles = ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
 for (var i = 0; i < roles.length; i++) {
-var idx = insertNewItem()
-setData("id", roles[i], idx)
-setData("name", roles[i], idx)
+var idx = connRoleModel.insertNewItem()
+connRoleModel.setData("id", roles[i], idx)
+connRoleModel.setData("name", roles[i], idx)
 }
 }
 }

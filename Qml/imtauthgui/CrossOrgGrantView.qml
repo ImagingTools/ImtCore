@@ -188,7 +188,7 @@ ViewBase {
 			preselectedIds: container.__selectedTargetTenantId
 				? [container.__selectedTargetTenantId] : []
 
-			onItemSelected: function(itemId, index) {
+			onItemSelected: {
 				container.__selectedTargetTenantId = itemId
 				container.__selectedTargetTenantName = dataProvider
 					? dataProvider.getSelectedItemText(itemId) : ""
@@ -208,7 +208,7 @@ ViewBase {
 			preselectedIds: container.__selectedRelationshipId
 				? [container.__selectedRelationshipId] : []
 
-			onItemSelected: function(itemId, index) {
+			onItemSelected: {
 				container.__selectedRelationshipId = itemId
 				container.__selectedRelationshipName = dataProvider
 					? dataProvider.getSelectedItemText(itemId) : ""
@@ -221,9 +221,9 @@ ViewBase {
 		Component.onCompleted: {
 			var levels = ["None", "Read", "Write", "Admin"]
 			for (var i = 0; i < levels.length; i++) {
-				var idx = insertNewItem()
-				setData("id", levels[i], idx)
-				setData("name", levels[i], idx)
+				var idx = accessLevelModel.insertNewItem()
+				accessLevelModel.setData("id", levels[i], idx)
+				accessLevelModel.setData("name", levels[i], idx)
 			}
 		}
 	}

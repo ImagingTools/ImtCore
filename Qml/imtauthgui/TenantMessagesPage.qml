@@ -30,20 +30,20 @@ headerButtonsComponent: emptyHeaderComp
 delegateComponent: messageDelegateComp
 
 function updateGui() {
-if (apiClient && tenantData && tenantData.m_id) {
-apiClient.fetchCrossTenantMessages(tenantData.m_id)
+if (messagesPage.apiClient && messagesPage.tenantData && messagesPage.tenantData.m_id) {
+messagesPage.apiClient.fetchCrossTenantMessages(messagesPage.tenantData.m_id)
 }
 }
 
 Component.onCompleted: {
-if (apiClient && tenantData && tenantData.m_id) {
-apiClient.fetchCrossTenantMessages(tenantData.m_id)
+if (messagesPage.apiClient && messagesPage.tenantData && messagesPage.tenantData.m_id) {
+messagesPage.apiClient.fetchCrossTenantMessages(messagesPage.tenantData.m_id)
 }
 }
 
 onVisibleChanged: {
-if (visible && apiClient && tenantData && tenantData.m_id) {
-apiClient.fetchCrossTenantMessages(tenantData.m_id)
+if (messagesPage.visible && messagesPage.apiClient && messagesPage.tenantData && messagesPage.tenantData.m_id) {
+messagesPage.apiClient.fetchCrossTenantMessages(messagesPage.tenantData.m_id)
 }
 }
 
@@ -75,7 +75,7 @@ id: messageDelegateComp
 
 Rectangle {
 id: msgDelegate
-width: parent ? parent.width : 0
+width: msgDelegate.parent ? msgDelegate.parent.width : 0
 height: msgDelegateContent.height + 2 * Style.marginM
 color: Style.alternateBaseColor
 radius: Style.radiusS
@@ -84,13 +84,13 @@ border.width: 1
 
 readonly property var __msg: modelData
 readonly property bool __isOutgoing: messagesPage.tenantData
-&& __msg.sourceTenantId === messagesPage.tenantData.m_id
+&& msgDelegate.__msg.sourceTenantId === messagesPage.tenantData.m_id
 
 Column {
 id: msgDelegateContent
-anchors.left: parent.left
-anchors.right: parent.right
-anchors.top: parent.top
+anchors.left: msgDelegate.left
+anchors.right: msgDelegate.right
+anchors.top: msgDelegate.top
 anchors.margins: Style.marginM
 spacing: Style.marginXS
 
@@ -99,56 +99,56 @@ spacing: Style.marginS
 
 BaseText {
 anchors.verticalCenter: parent.verticalCenter
-text: __isOutgoing ? qsTr("▶ Outgoing") : qsTr("◀ Incoming")
+text: msgDelegate.__isOutgoing ? qsTr("▶ Outgoing") : qsTr("◀ Incoming")
 font.pixelSize: Style.fontSizeS
 font.bold: true
-color: __isOutgoing ? Style.linkColor : Style.textColor
+color: msgDelegate.__isOutgoing ? Style.linkColor : Style.textColor
 }
 
 BaseText {
 anchors.verticalCenter: parent.verticalCenter
-visible: (__msg.messageType && __msg.messageType !== "")
-text: qsTr("· %1").arg(__msg.messageType || "")
+visible: (msgDelegate.__msg.messageType && msgDelegate.__msg.messageType !== "")
+text: qsTr("· %1").arg(msgDelegate.__msg.messageType || "")
 font.pixelSize: Style.fontSizeS
 color: Style.inactiveTextColor
 }
 
 BaseText {
 anchors.verticalCenter: parent.verticalCenter
-visible: (__msg.status && __msg.status !== "")
-text: qsTr("· %1").arg(__msg.status || "")
+visible: (msgDelegate.__msg.status && msgDelegate.__msg.status !== "")
+text: qsTr("· %1").arg(msgDelegate.__msg.status || "")
 font.pixelSize: Style.fontSizeS
 color: Style.inactiveTextColor
 }
 }
 
 BaseText {
-width: parent.width
+width: msgDelegateContent.width
 elide: Text.ElideRight
-text: __isOutgoing
-? qsTr("To: %1").arg(__msg.targetTenantId || "")
-: qsTr("From: %1").arg(__msg.sourceTenantId || "")
+text: msgDelegate.__isOutgoing
+? qsTr("To: %1").arg(msgDelegate.__msg.targetTenantId || "")
+: qsTr("From: %1").arg(msgDelegate.__msg.sourceTenantId || "")
 font.pixelSize: Style.fontSizeM
 color: Style.textColor
 }
 
 BaseText {
-width: parent.width
-visible: __msg.payload && __msg.payload !== ""
+width: msgDelegateContent.width
+visible: msgDelegate.__msg.payload && msgDelegate.__msg.payload !== ""
 wrapMode: Text.WordWrap
-text: __msg.payload || ""
+text: msgDelegate.__msg.payload || ""
 font.pixelSize: Style.fontSizeS
 color: Style.inactiveTextColor
 }
 
 BaseText {
-width: parent.width
-visible: (__msg.createdAt && __msg.createdAt !== "")
-     || (__msg.processedAt && __msg.processedAt !== "")
+width: msgDelegateContent.width
+visible: (msgDelegate.__msg.createdAt && msgDelegate.__msg.createdAt !== "")
+|| (msgDelegate.__msg.processedAt && msgDelegate.__msg.processedAt !== "")
 elide: Text.ElideRight
 text: qsTr("Sent: %1  Processed: %2")
-.arg((__msg.createdAt && __msg.createdAt !== "") ? __msg.createdAt : qsTr("—"))
-.arg((__msg.processedAt && __msg.processedAt !== "") ? __msg.processedAt : qsTr("—"))
+.arg((msgDelegate.__msg.createdAt && msgDelegate.__msg.createdAt !== "") ? msgDelegate.__msg.createdAt : qsTr("—"))
+.arg((msgDelegate.__msg.processedAt && msgDelegate.__msg.processedAt !== "") ? msgDelegate.__msg.processedAt : qsTr("—"))
 font.pixelSize: Style.fontSizeS
 color: Style.inactiveTextColor
 }

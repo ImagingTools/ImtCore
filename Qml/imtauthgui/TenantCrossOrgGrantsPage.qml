@@ -31,20 +31,20 @@ customEditorComponent: createGrantComp
 headerButtonsComponent: headerBtnsComp
 
 function updateGui() {
-if (apiClient && tenantData && tenantData.m_id) {
-apiClient.fetchCrossOrgGrants(tenantData.m_id)
+if (grantsPage.apiClient && grantsPage.tenantData && grantsPage.tenantData.m_id) {
+grantsPage.apiClient.fetchCrossOrgGrants(grantsPage.tenantData.m_id)
 }
 }
 
 Component.onCompleted: {
-if (apiClient && tenantData && tenantData.m_id) {
-apiClient.fetchCrossOrgGrants(tenantData.m_id)
+if (grantsPage.apiClient && grantsPage.tenantData && grantsPage.tenantData.m_id) {
+grantsPage.apiClient.fetchCrossOrgGrants(grantsPage.tenantData.m_id)
 }
 }
 
 onVisibleChanged: {
-if (visible && apiClient && tenantData && tenantData.m_id) {
-apiClient.fetchCrossOrgGrants(tenantData.m_id)
+if (grantsPage.visible && grantsPage.apiClient && grantsPage.tenantData && grantsPage.tenantData.m_id) {
+grantsPage.apiClient.fetchCrossOrgGrants(grantsPage.tenantData.m_id)
 }
 }
 
@@ -76,14 +76,16 @@ text: qsTr("+ Create Grant")
 font.pixelSize: Style.fontSizeM
 font.bold: true
 color: (grantsPage.stateManager && (grantsPage.stateManager.isCreator || grantsPage.stateManager.isOwner))
-   ? Style.linkColor : Style.inactiveTextColor
+? Style.linkColor : Style.inactiveTextColor
 
 MouseArea {
 anchors.fill: parent
 hoverEnabled: true
 cursorShape: Qt.PointingHandCursor
 enabled: grantsPage.stateManager && (grantsPage.stateManager.isCreator || grantsPage.stateManager.isOwner)
-onClicked: { grantsPage.openCreate() }
+onClicked: {
+grantsPage.openCreate()
+}
 }
 }
 }
@@ -92,7 +94,7 @@ onClicked: { grantsPage.openCreate() }
 delegateComponent: Component {
 Rectangle {
 id: grantDelegate
-width: parent ? parent.width : 0
+width: grantDelegate.parent ? grantDelegate.parent.width : 0
 height: grantDelegateContent.height + 2 * Style.marginM
 color: Style.alternateBaseColor
 radius: Style.radiusS
@@ -102,24 +104,24 @@ border.width: 1
 readonly property var __grant: modelData
 readonly property bool __canRevoke: grantsPage.stateManager
 && (grantsPage.stateManager.isCreator || grantsPage.stateManager.isOwner)
-&& (__grant.isActive === undefined || __grant.isActive)
+&& (grantDelegate.__grant.isActive === undefined || grantDelegate.__grant.isActive)
 
 Row {
 id: grantDelegateContent
-anchors.left: parent.left
-anchors.right: parent.right
-anchors.top: parent.top
+anchors.left: grantDelegate.left
+anchors.right: grantDelegate.right
+anchors.top: grantDelegate.top
 anchors.margins: Style.marginM
 spacing: Style.marginM
 
 Column {
-width: parent.width - (revokeBtn.visible ? revokeBtn.width + Style.marginM : 0)
+width: grantDelegateContent.width - (revokeBtn.visible ? revokeBtn.width + Style.marginM : 0)
 spacing: Style.marginXS
 
 BaseText {
 width: parent.width
 elide: Text.ElideRight
-text: qsTr("Target: %1").arg(__grant.targetTenantId || "")
+text: qsTr("Target: %1").arg(grantDelegate.__grant.targetTenantId || "")
 font.pixelSize: Style.fontSizeM
 color: Style.textColor
 }
@@ -128,35 +130,35 @@ BaseText {
 width: parent.width
 elide: Text.ElideRight
 text: qsTr("Level: %1   Scope: %2")
-.arg(__grant.accessLevel || qsTr("None"))
-.arg((__grant.resourceScope && __grant.resourceScope !== "") ? __grant.resourceScope : qsTr("All"))
+.arg(grantDelegate.__grant.accessLevel || qsTr("None"))
+.arg((grantDelegate.__grant.resourceScope && grantDelegate.__grant.resourceScope !== "") ? grantDelegate.__grant.resourceScope : qsTr("All"))
 font.pixelSize: Style.fontSizeS
 color: Style.inactiveTextColor
 }
 
 BaseText {
 width: parent.width
-visible: __grant.relationshipId && __grant.relationshipId !== ""
+visible: grantDelegate.__grant.relationshipId && grantDelegate.__grant.relationshipId !== ""
 elide: Text.ElideRight
-text: qsTr("Relationship: %1").arg(__grant.relationshipId || "")
+text: qsTr("Relationship: %1").arg(grantDelegate.__grant.relationshipId || "")
 font.pixelSize: Style.fontSizeS
 color: Style.inactiveTextColor
 }
 
 BaseText {
 width: parent.width
-visible: __grant.description && __grant.description !== ""
+visible: grantDelegate.__grant.description && grantDelegate.__grant.description !== ""
 elide: Text.ElideRight
-text: __grant.description || ""
+text: grantDelegate.__grant.description || ""
 font.pixelSize: Style.fontSizeS
 color: Style.inactiveTextColor
 }
 
 BaseText {
 width: parent.width
-visible: __grant.expiresAt && __grant.expiresAt !== ""
+visible: grantDelegate.__grant.expiresAt && grantDelegate.__grant.expiresAt !== ""
 elide: Text.ElideRight
-text: qsTr("Expires: %1").arg(__grant.expiresAt || "")
+text: qsTr("Expires: %1").arg(grantDelegate.__grant.expiresAt || "")
 font.pixelSize: Style.fontSizeS
 color: Style.inactiveTextColor
 }
@@ -164,12 +166,11 @@ color: Style.inactiveTextColor
 
 Button {
 id: revokeBtn
-anchors.verticalCenter: undefined
-visible: __canRevoke
+visible: grantDelegate.__canRevoke
 text: qsTr("Revoke")
 onClicked: {
 if (grantsPage.apiClient) {
-grantsPage.apiClient.revokeCrossOrgGrant(__grant.grantId || "")
+grantsPage.apiClient.revokeCrossOrgGrant(grantDelegate.__grant.grantId || "")
 }
 }
 }
@@ -190,7 +191,7 @@ typeId: grantsPage.apiClient ? grantsPage.apiClient.crossOrgGrantObjectTypeId : 
 }
 }
 
-onCommandActivated: function(commandId) {
+onCommandActivated: {
 if (commandId === "save" || commandId === "create") {
 submitGrant()
 }

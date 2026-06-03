@@ -31,20 +31,20 @@ customEditorComponent: createContractComp
 headerButtonsComponent: headerBtnsComp
 
 function updateGui() {
-if (apiClient && tenantData && tenantData.m_id) {
-apiClient.fetchContracts(tenantData.m_id)
+if (contractsPage.apiClient && contractsPage.tenantData && contractsPage.tenantData.m_id) {
+contractsPage.apiClient.fetchContracts(contractsPage.tenantData.m_id)
 }
 }
 
 Component.onCompleted: {
-if (apiClient && tenantData && tenantData.m_id) {
-apiClient.fetchContracts(tenantData.m_id)
+if (contractsPage.apiClient && contractsPage.tenantData && contractsPage.tenantData.m_id) {
+contractsPage.apiClient.fetchContracts(contractsPage.tenantData.m_id)
 }
 }
 
 onVisibleChanged: {
-if (visible && apiClient && tenantData && tenantData.m_id) {
-apiClient.fetchContracts(tenantData.m_id)
+if (contractsPage.visible && contractsPage.apiClient && contractsPage.tenantData && contractsPage.tenantData.m_id) {
+contractsPage.apiClient.fetchContracts(contractsPage.tenantData.m_id)
 }
 }
 
@@ -83,14 +83,16 @@ text: qsTr("+ Create Contract")
 font.pixelSize: Style.fontSizeM
 font.bold: true
 color: (contractsPage.stateManager && (contractsPage.stateManager.isCreator || contractsPage.stateManager.isOwner))
-   ? Style.linkColor : Style.inactiveTextColor
+? Style.linkColor : Style.inactiveTextColor
 
 MouseArea {
 anchors.fill: parent
 hoverEnabled: true
 cursorShape: Qt.PointingHandCursor
 enabled: contractsPage.stateManager && (contractsPage.stateManager.isCreator || contractsPage.stateManager.isOwner)
-onClicked: { contractsPage.openCreate() }
+onClicked: {
+contractsPage.openCreate()
+}
 }
 }
 }
@@ -99,7 +101,7 @@ onClicked: { contractsPage.openCreate() }
 delegateComponent: Component {
 Rectangle {
 id: contractDelegate
-width: parent ? parent.width : 0
+width: contractDelegate.parent ? contractDelegate.parent.width : 0
 height: contractDelegateContent.height + 2 * Style.marginM
 color: Style.alternateBaseColor
 radius: Style.radiusS
@@ -110,79 +112,74 @@ readonly property var __contract: modelData
 readonly property bool __canManage: contractsPage.stateManager
 && (contractsPage.stateManager.isCreator || contractsPage.stateManager.isOwner)
 
-Row {
-id: contractDelegateContent
-anchors.left: parent.left
-anchors.right: parent.right
-anchors.top: parent.top
-anchors.margins: Style.marginM
-spacing: Style.marginM
-
 Column {
-width: parent.width - (contractActions.visible ? contractActions.width + Style.marginM : 0)
+id: contractDelegateContent
+anchors.left: contractDelegate.left
+anchors.right: contractDelegate.right
+anchors.top: contractDelegate.top
+anchors.margins: Style.marginM
 spacing: Style.marginXS
 
 BaseText {
-width: parent.width
+width: contractDelegateContent.width
 elide: Text.ElideRight
-text: qsTr("Target: %1").arg(__contract.targetTenantId || "")
+text: qsTr("Target: %1").arg(contractDelegate.__contract.targetTenantId || "")
 font.pixelSize: Style.fontSizeM
 color: Style.textColor
 }
 
 BaseText {
-width: parent.width
+width: contractDelegateContent.width
 elide: Text.ElideRight
 text: qsTr("Status: %1   Scope: %2")
-.arg(__contract.status || qsTr("Draft"))
-.arg((__contract.scope && __contract.scope !== "") ? __contract.scope : qsTr("All"))
+.arg(contractDelegate.__contract.status || qsTr("Draft"))
+.arg((contractDelegate.__contract.scope && contractDelegate.__contract.scope !== "") ? contractDelegate.__contract.scope : qsTr("All"))
 font.pixelSize: Style.fontSizeS
 color: Style.inactiveTextColor
 }
 
 BaseText {
-width: parent.width
-visible: (__contract.validFrom && __contract.validFrom !== "")
-     || (__contract.validUntil && __contract.validUntil !== "")
+width: contractDelegateContent.width
+visible: (contractDelegate.__contract.validFrom && contractDelegate.__contract.validFrom !== "")
+|| (contractDelegate.__contract.validUntil && contractDelegate.__contract.validUntil !== "")
 elide: Text.ElideRight
 text: qsTr("Valid: %1 – %2")
-.arg((__contract.validFrom && __contract.validFrom !== "") ? __contract.validFrom : qsTr("now"))
-.arg((__contract.validUntil && __contract.validUntil !== "") ? __contract.validUntil : qsTr("open"))
+.arg((contractDelegate.__contract.validFrom && contractDelegate.__contract.validFrom !== "") ? contractDelegate.__contract.validFrom : qsTr("now"))
+.arg((contractDelegate.__contract.validUntil && contractDelegate.__contract.validUntil !== "") ? contractDelegate.__contract.validUntil : qsTr("open"))
 font.pixelSize: Style.fontSizeS
 color: Style.inactiveTextColor
 }
 
 BaseText {
-width: parent.width
-visible: __contract.description && __contract.description !== ""
+width: contractDelegateContent.width
+visible: contractDelegate.__contract.description && contractDelegate.__contract.description !== ""
 elide: Text.ElideRight
-text: __contract.description || ""
+text: contractDelegate.__contract.description || ""
 font.pixelSize: Style.fontSizeS
 color: Style.inactiveTextColor
 }
-}
 
-Column {
-id: contractActions
-visible: __canManage
-spacing: Style.marginXS
+// --- Action buttons ---
+Row {
+spacing: Style.marginM
+visible: contractDelegate.__canManage
 
 Button {
-visible: __contract.status === "Draft"
+visible: contractDelegate.__contract.status === "Draft"
 text: qsTr("Activate")
 onClicked: {
 if (contractsPage.apiClient) {
-contractsPage.apiClient.updateContractStatus(__contract.contractId || "", "Active")
+contractsPage.apiClient.updateContractStatus(contractDelegate.__contract.contractId || "", "Active")
 }
 }
 }
 
 Button {
-visible: __contract.status !== "Terminated"
+visible: contractDelegate.__contract.status !== "Terminated"
 text: qsTr("Terminate")
 onClicked: {
 if (contractsPage.apiClient) {
-contractsPage.apiClient.terminateContract(__contract.contractId || "")
+contractsPage.apiClient.terminateContract(contractDelegate.__contract.contractId || "")
 }
 }
 }
@@ -204,7 +201,7 @@ typeId: contractsPage.apiClient ? contractsPage.apiClient.contractObjectTypeId :
 }
 }
 
-onCommandActivated: function(commandId) {
+onCommandActivated: {
 if (commandId === "save" || commandId === "create") {
 submitContract()
 }

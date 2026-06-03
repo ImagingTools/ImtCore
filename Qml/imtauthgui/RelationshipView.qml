@@ -171,7 +171,7 @@ ViewBase {
 			preselectedIds: container.__selectedTargetTenantId
 				? [container.__selectedTargetTenantId] : []
 
-			onItemSelected: function(itemId, index) {
+			onItemSelected: {
 				container.__selectedTargetTenantId = itemId
 				container.__selectedTargetTenantName = dataProvider
 					? dataProvider.getSelectedItemText(itemId) : ""
@@ -184,9 +184,9 @@ ViewBase {
 		Component.onCompleted: {
 			var roles = ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
 			for (var i = 0; i < roles.length; i++) {
-				var idx = insertNewItem()
-				setData("id", roles[i], idx)
-				setData("name", roles[i], idx)
+				var idx = roleModel.insertNewItem()
+				roleModel.setData("id", roles[i], idx)
+				roleModel.setData("name", roles[i], idx)
 			}
 		}
 	}

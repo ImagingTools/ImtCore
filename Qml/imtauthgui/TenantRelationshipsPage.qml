@@ -31,20 +31,20 @@ customEditorComponent: createRelationshipComp
 headerButtonsComponent: headerBtnsComp
 
 function updateGui() {
-if (apiClient && tenantData && tenantData.m_id) {
-apiClient.fetchTenantRelationships(tenantData.m_id)
+if (relationshipsPage.apiClient && relationshipsPage.tenantData && relationshipsPage.tenantData.m_id) {
+relationshipsPage.apiClient.fetchTenantRelationships(relationshipsPage.tenantData.m_id)
 }
 }
 
 Component.onCompleted: {
-if (apiClient && tenantData && tenantData.m_id) {
-apiClient.fetchTenantRelationships(tenantData.m_id)
+if (relationshipsPage.apiClient && relationshipsPage.tenantData && relationshipsPage.tenantData.m_id) {
+relationshipsPage.apiClient.fetchTenantRelationships(relationshipsPage.tenantData.m_id)
 }
 }
 
 onVisibleChanged: {
-if (visible && apiClient && tenantData && tenantData.m_id) {
-apiClient.fetchTenantRelationships(tenantData.m_id)
+if (relationshipsPage.visible && relationshipsPage.apiClient && relationshipsPage.tenantData && relationshipsPage.tenantData.m_id) {
+relationshipsPage.apiClient.fetchTenantRelationships(relationshipsPage.tenantData.m_id)
 }
 }
 
@@ -76,14 +76,16 @@ text: qsTr("+ Create Relationship")
 font.pixelSize: Style.fontSizeM
 font.bold: true
 color: (relationshipsPage.stateManager && (relationshipsPage.stateManager.isCreator || relationshipsPage.stateManager.isOwner))
-   ? Style.linkColor : Style.inactiveTextColor
+? Style.linkColor : Style.inactiveTextColor
 
 MouseArea {
 anchors.fill: parent
 hoverEnabled: true
 cursorShape: Qt.PointingHandCursor
 enabled: relationshipsPage.stateManager && (relationshipsPage.stateManager.isCreator || relationshipsPage.stateManager.isOwner)
-onClicked: { relationshipsPage.openCreate() }
+onClicked: {
+relationshipsPage.openCreate()
+}
 }
 }
 }
@@ -92,7 +94,7 @@ onClicked: { relationshipsPage.openCreate() }
 delegateComponent: Component {
 Rectangle {
 id: relDelegate
-width: parent ? parent.width : 0
+width: relDelegate.parent ? relDelegate.parent.width : 0
 height: relDelegateContent.height + 2 * Style.marginM
 color: Style.alternateBaseColor
 radius: Style.radiusS
@@ -103,64 +105,63 @@ readonly property var __rel: modelData
 readonly property bool __canManage: relationshipsPage.stateManager
 && (relationshipsPage.stateManager.isCreator || relationshipsPage.stateManager.isOwner)
 
-Row {
-id: relDelegateContent
-anchors.left: parent.left
-anchors.right: parent.right
-anchors.top: parent.top
-anchors.margins: Style.marginM
-spacing: Style.marginM
-
 Column {
-width: parent.width - (removeRelBtn.visible ? removeRelBtn.width + Style.marginM : 0)
+id: relDelegateContent
+anchors.left: relDelegate.left
+anchors.right: relDelegate.right
+anchors.top: relDelegate.top
+anchors.margins: Style.marginM
 spacing: Style.marginXS
 
 BaseText {
-width: parent.width
+width: relDelegateContent.width
 elide: Text.ElideRight
-text: qsTr("Target: %1").arg(__rel.targetTenantId || "")
+text: qsTr("Target: %1").arg(relDelegate.__rel.targetTenantId || "")
 font.pixelSize: Style.fontSizeM
 color: Style.textColor
 }
 
 BaseText {
-width: parent.width
+width: relDelegateContent.width
 elide: Text.ElideRight
 text: qsTr("Source role: %1   Target role: %2")
-.arg(__rel.sourceRole || __rel.role || qsTr("Partner"))
-.arg(__rel.targetRole || qsTr("Partner"))
+.arg(relDelegate.__rel.sourceRole || relDelegate.__rel.role || qsTr("Partner"))
+.arg(relDelegate.__rel.targetRole || qsTr("Partner"))
 font.pixelSize: Style.fontSizeS
 color: Style.inactiveTextColor
 }
 
 BaseText {
-width: parent.width
-visible: __rel.scope && __rel.scope !== ""
+width: relDelegateContent.width
+visible: relDelegate.__rel.scope && relDelegate.__rel.scope !== ""
 elide: Text.ElideRight
-text: qsTr("Scope: %1").arg(__rel.scope || "")
+text: qsTr("Scope: %1").arg(relDelegate.__rel.scope || "")
 font.pixelSize: Style.fontSizeS
 color: Style.inactiveTextColor
 }
 
 BaseText {
-width: parent.width
-visible: __rel.description && __rel.description !== ""
+width: relDelegateContent.width
+visible: relDelegate.__rel.description && relDelegate.__rel.description !== ""
 elide: Text.ElideRight
-text: __rel.description || ""
+text: relDelegate.__rel.description || ""
 font.pixelSize: Style.fontSizeS
 color: Style.inactiveTextColor
 }
-}
+
+// --- Action button ---
+Row {
+spacing: Style.marginM
+visible: relDelegate.__canManage
 
 Button {
-id: removeRelBtn
-visible: __canManage
 text: qsTr("Remove")
 onClicked: {
 if (relationshipsPage.apiClient) {
 relationshipsPage.apiClient.removeTenantRelationship(
 relationshipsPage.tenantData ? relationshipsPage.tenantData.m_id : "",
-__rel.relationshipId || "")
+relDelegate.__rel.relationshipId || "")
+}
 }
 }
 }
@@ -181,7 +182,7 @@ typeId: relationshipsPage.apiClient ? relationshipsPage.apiClient.relationshipOb
 }
 }
 
-onCommandActivated: function(commandId) {
+onCommandActivated: {
 if (commandId === "save" || commandId === "create") {
 submitRelationship()
 }
