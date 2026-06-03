@@ -1107,7 +1107,7 @@ sdl::V1_0::imtauth::CGetTenantConnectCodeDetailsPayload CTenantManagerController
 		}
 	}
 
-	response.preview.Emplace(std::move(preview));
+	response.preview = preview;
 
 	return response;
 }

@@ -368,6 +368,15 @@ sdl::V1_0::imtauth::CGetTenantConnectionRequestsPayload CRemoteTenantControllerC
 }
 
 
+sdl::V1_0::imtauth::CGetTenantConnectCodeDetailsPayload CRemoteTenantControllerComp::OnGetTenantConnectCodeDetails(
+			const sdl::V1_0::imtauth::CGetTenantConnectCodeDetailsGqlRequest& /*getTenantConnectCodeDetailsRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CGetTenantConnectCodeDetailsPayload>(gqlRequest, errorMessage);
+}
+
+
 sdl::V1_0::imtauth::CCreateTenantConnectionRequestPayload CRemoteTenantControllerComp::OnCreateTenantConnectionRequest(
 			const sdl::V1_0::imtauth::CCreateTenantConnectionRequestGqlRequest& /*createTenantConnectionRequestRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
