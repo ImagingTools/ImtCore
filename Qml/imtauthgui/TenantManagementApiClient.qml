@@ -85,7 +85,7 @@ QtObject {
 	signal connectionRequestAccepted(string requestId)
 	signal connectionRequestRejected(string requestId)
 	signal connectionRequestRevoked(string requestId)
-	signal connectionRequestsReceived(var requests)
+	signal connectionRequestsReceived(string forTenantId, var requests)
 
 	// --- Cross-tenant messages (phase 2) ---
 	signal crossTenantMessageSent(string messageId)

@@ -221,10 +221,9 @@ ViewBase {
 								if (!p)
 									return ""
 								var tName = p.sourceTenantName || ""
-								var tId = p.sourceTenantId || ""
-								if (tName !== "" && tId !== "")
-									return tName + " (" + tId + ")"
-								return tName !== "" ? tName : tId
+								if (tName !== "")
+									return tName
+								return p.sourceTenantId || ""
 							}
 						}
 

@@ -22,7 +22,7 @@ ViewBase {
 
 	onApiClientChanged: {
 		if (apiClient){
-			connectCodesView.__populateFromServerData()
+			connectCodesView.__fetchExistingCodes()
 		}
 	}
 
@@ -48,9 +48,7 @@ ViewBase {
 		)
 	}
 
-	function updateGui() {
-		connectCodesView.__fetchExistingCodes()
-	}
+	function updateGui() {}
 
 	function updateModel() {}
 
@@ -58,16 +56,6 @@ ViewBase {
 	function __fetchExistingCodes() {
 		if (connectCodesView.apiClient && connectCodesView.tenantData && connectCodesView.tenantData.m_id) {
 			connectCodesView.apiClient.fetchConnectionRequests(connectCodesView.tenantData.m_id)
-		}
-	}
-
-	Component.onCompleted: {
-		connectCodesView.__fetchExistingCodes()
-	}
-
-	onVisibleChanged: {
-		if (connectCodesView.visible) {
-			connectCodesView.__fetchExistingCodes()
 		}
 	}
 
@@ -85,7 +73,9 @@ ViewBase {
 			// Server notification will trigger the list refresh automatically
 		}
 
-		function onConnectionRequestsReceived(requests) {
+		function onConnectionRequestsReceived(forTenantId, requests) {
+			if (!connectCodesView.tenantData || forTenantId !== connectCodesView.tenantData.m_id)
+				return
 			connectCodesView.__populateFromServerData()
 		}
 
@@ -94,6 +84,13 @@ ViewBase {
 				qsTr("Connect code revoked"),
 				true
 			)
+
+			for (let i = 0; i < generatedCodesHistory.count; ++i){
+				if (generatedCodesHistory.get(i).requestId === requestId){
+					generatedCodesHistory.remove(i)
+					return
+				}
+			}
 		}
 
 		function onSubscriptionConnectionCodesChanged(notification) {
@@ -107,7 +104,6 @@ ViewBase {
 	}
 
 	function __populateFromServerData() {
-		console.log("__populateFromServerData", connectCodesView.apiClient, connectCodesView.apiClient)
 		if (!connectCodesView.apiClient || !connectCodesView.apiClient.connectionRequestsModel) {
 			return
 		}
@@ -115,6 +111,7 @@ ViewBase {
 		var mdl = connectCodesView.apiClient.connectionRequestsModel
 		for (var i = 0; i < mdl.count; i++) {
 			var req = mdl.get(i)
+			console.log("req", JSON.stringify(req))
 			if (!req || !req.connectCode || req.connectCode === "") {
 				continue
 			}
@@ -131,7 +128,6 @@ ViewBase {
 				"expiresAt": req.expiresAt || "",
 				"createdAt": req.createdAt || ""
 			})
-			console.log("generatedCodesHistory", req.connectCode, req.requestId)
 		}
 	}
 

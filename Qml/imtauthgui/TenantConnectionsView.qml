@@ -69,7 +69,9 @@ ViewBase {
 			}
 		}
 
-		function onConnectionRequestsReceived(requests) {
+		function onConnectionRequestsReceived(forTenantId, requests) {
+			if (!connectionsView.tenantData || forTenantId !== connectionsView.tenantData.m_id)
+				return
 			connectionsView.__rebuildActiveConnections()
 		}
 	}
@@ -96,7 +98,9 @@ ViewBase {
 				activeConnectionsModel.append({
 					"id": req.id || "",
 					"sourceTenantId": req.sourceTenantId || "",
+					"sourceTenantName": req.sourceTenantName || "",
 					"targetTenantId": req.targetTenantId || "",
+					"targetTenantName": req.targetTenantName || "",
 					"targetIdentifier": req.targetIdentifier || "",
 					"proposedSourceRole": req.proposedSourceRole || "",
 					"proposedTargetRole": req.proposedTargetRole || "",
@@ -170,9 +174,9 @@ ViewBase {
 						border.width: 1
 						
 						readonly property bool __isOutgoing: model.sourceTenantId === (connectionsView.tenantData ? connectionsView.tenantData.m_id : "")
-						readonly property string __partnerTenantId: connectionDelegate.__isOutgoing
-																	? (model.targetTenantId || model.targetIdentifier || "")
-																	: (model.sourceTenantId || "")
+						readonly property string __partnerTenantName: connectionDelegate.__isOutgoing
+																	? (model.targetTenantName || model.targetIdentifier || model.targetTenantId || "")
+																	: (model.sourceTenantName || model.sourceTenantId || "")
 						
 						Column {
 							id: connContent
@@ -189,7 +193,7 @@ ViewBase {
 								BaseText {
 									width: parent.width - connStatusBadge.width - Style.marginM
 									elide: Text.ElideRight
-									text: connectionDelegate.__partnerTenantId
+									text: connectionDelegate.__partnerTenantName
 									font.pixelSize: Style.fontSizeM
 									font.bold: true
 									color: Style.textColor

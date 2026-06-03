@@ -187,6 +187,8 @@ protected:
 				QString& errorMessage) const override;
 
 private:
+	bool HasAcceptedConnection(const QByteArray& tenantIdA, const QByteArray& tenantIdB) const;
+
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);

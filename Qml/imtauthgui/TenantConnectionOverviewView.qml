@@ -58,7 +58,9 @@ ViewBase {
 	Connections {
 		target: overviewView.apiClient
 
-		function onConnectionRequestsReceived(requests) {
+		function onConnectionRequestsReceived(forTenantId, requests) {
+			if (!overviewView.tenantData || forTenantId !== overviewView.tenantData.m_id)
+				return
 			overviewView.__rebuildRecentActivity()
 		}
 

@@ -117,6 +117,35 @@ sdl::V1_0::imtauth::CTenantConnectionRequest ConnectionRequestToData(const imtau
 } // anonymous namespace
 
 
+// private methods
+
+bool CTenantManagerControllerComp::HasAcceptedConnection(const QByteArray& tenantIdA, const QByteArray& tenantIdB) const
+{
+	if (tenantIdA.isEmpty() || tenantIdB.isEmpty()){
+		return false;
+	}
+	if (!m_connectionRequestManagerCompPtr.IsValid()){
+		return false;
+	}
+
+	const imtauth::TenantConnectionRequests outgoing = m_connectionRequestManagerCompPtr->GetOutgoingRequests(tenantIdA);
+	for (const imtauth::TenantConnectionRequestInfo& info : outgoing){
+		if (info.status == imtauth::TCS_ACCEPTED && info.targetTenantId == tenantIdB){
+			return true;
+		}
+	}
+
+	const imtauth::TenantConnectionRequests incoming = m_connectionRequestManagerCompPtr->GetIncomingRequests(tenantIdA);
+	for (const imtauth::TenantConnectionRequestInfo& info : incoming){
+		if (info.status == imtauth::TCS_ACCEPTED && info.sourceTenantId == tenantIdB){
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
 // protected methods
 
 // reimplemented (sdl::V1_0::imtauth::CTenantsGqlHandlerCompBase)
@@ -489,6 +518,12 @@ sdl::V1_0::imtauth::CAddTenantRelationshipPayload CTenantManagerControllerComp::
 	}
 	if (arguments.input->description){
 		description = *arguments.input->description;
+	}
+
+	// Validate that an accepted connection exists between the two tenants
+	if (!HasAcceptedConnection(sourceTenantId, targetTenantId)){
+		response.errorMessage = QStringLiteral("Cannot create relationship: no accepted connection exists between these tenants");
+		return response;
 	}
 
 	QByteArray relationshipId = m_tenantManagerCompPtr->AddTenantRelationship(
@@ -902,6 +937,14 @@ sdl::V1_0::imtauth::CCreateContractPayload CTenantManagerControllerComp::OnCreat
 		terms = *arguments.input->terms;
 	}
 
+	// Validate that an accepted connection exists between the two tenants
+	if (!sourceTenantId.isEmpty() && !targetTenantId.isEmpty()){
+		if (!HasAcceptedConnection(sourceTenantId, targetTenantId)){
+			response.errorMessage = QStringLiteral("Cannot create contract: no accepted connection exists between these tenants");
+			return response;
+		}
+	}
+
 	QByteArray contractId = m_contractManagerCompPtr->CreateContract(
 				relationshipId,
 				sourceTenantId,
@@ -1053,6 +1096,28 @@ sdl::V1_0::imtauth::CGetTenantConnectionRequestsPayload CTenantManagerController
 		if (!seenIds.contains(info.requestId)){
 			seenIds.insert(info.requestId);
 			response.requests->push_back(ConnectionRequestToData(info));
+		}
+	}
+
+	// Resolve tenant names
+	if (m_tenantManagerCompPtr.IsValid()){
+		for (auto& req : *response.requests){
+			if (req == nullptr){
+				continue;
+			}
+
+			if (req->sourceTenantId){
+				const auto tenantPtr = m_tenantManagerCompPtr->GetTenant(*req->sourceTenantId);
+				if (tenantPtr){
+					req->sourceTenantName = tenantPtr->GetTenantName();
+				}
+			}
+			if (req->targetTenantId){
+				const auto tenantPtr = m_tenantManagerCompPtr->GetTenant(*req->targetTenantId);
+				if (tenantPtr){
+					req->targetTenantName = tenantPtr->GetTenantName();
+				}
+			}
 		}
 	}
 

@@ -384,7 +384,9 @@ enum TenantConnectionStatus {
 type TenantConnectionRequest {
 	id: ID!
 	sourceTenantId: ID!
+	sourceTenantName: String
 	targetTenantId: ID
+	targetTenantName: String
 	targetIdentifier: String
 	connectCode: String
 	proposedSourceRole: TenantRelationshipRole!
