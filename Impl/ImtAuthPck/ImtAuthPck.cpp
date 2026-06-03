@@ -262,6 +262,61 @@ I_EXPORT_COMPONENT(
 			"Tenant Invitation Manager");
 
 I_EXPORT_COMPONENT(
+			CrossOrgGrantInfo,
+			"Entity representing a cross-org grant delegating access between tenants",
+			"Cross Org Grant Info");
+
+I_EXPORT_COMPONENT(
+			CrossOrgGrantManager,
+			"Manager for cross-org grants (create/revoke/query access delegation)",
+			"Cross Org Grant Manager");
+
+I_EXPORT_COMPONENT(
+			ContractInfo,
+			"Entity representing a cooperation contract between two tenants",
+			"Contract Info");
+
+I_EXPORT_COMPONENT(
+			ContractManager,
+			"Manager for cooperation contracts (create/update-status/terminate/query)",
+			"Contract Manager");
+
+I_EXPORT_COMPONENT(
+			TenantConnectionRequestInfo,
+			"Entity representing a tenant connection request used for discovery/bootstrap",
+			"Tenant Connection Request Info");
+
+I_EXPORT_COMPONENT(
+			TenantConnectionRequestManager,
+			"Manager for tenant connection requests and connect codes (create/accept/reject/revoke)",
+			"Tenant Connection Request Manager");
+
+I_EXPORT_COMPONENT(
+			CrossTenantMessageInfo,
+			"Entity representing a cross-tenant message exchanged through the messaging pipeline",
+			"Cross Tenant Message Info");
+
+I_EXPORT_COMPONENT(
+			CrossTenantMessageProjection,
+			"Projection applying field whitelist/blacklist to cross-tenant payloads",
+			"Cross Tenant Message Projection");
+
+I_EXPORT_COMPONENT(
+			CrossTenantMessageBroker,
+			"Broker validating, projecting, storing and dispatching cross-tenant messages",
+			"Cross Tenant Message Broker");
+
+I_EXPORT_COMPONENT(
+			OrderRequestInfo,
+			"Entity representing an order request materialized inside the target tenant (Order -> OrderRequest)",
+			"Order Request Info");
+
+I_EXPORT_COMPONENT(
+			OrderRequestHandler,
+			"Domain handler materializing order requests and reporting status feedback to the source tenant",
+			"Order Request Handler");
+
+I_EXPORT_COMPONENT(
 			TenantDocumentNameProvider,
 			"Provides default document name from tenant name",
 			"Tenant Document Name Provider");

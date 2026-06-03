@@ -215,3 +215,90 @@ void CTenantManagerTest::testRemoveTenant_CascadesPermissions()
 	QCOMPARE(m_managerPtr->m_permissions.size(), 1);
 	QCOMPARE(m_managerPtr->m_permissions[0].tenantId, otherTenantId);
 }
+
+
+// System-Tenant tests
+
+void CTenantManagerTest::testEnsureSystemTenant_CreatesOnFirstCall()
+{
+	QVERIFY(m_managerPtr->EnsureSystemTenant());
+	QByteArray systemId = m_managerPtr->GetSystemTenantId();
+	QVERIFY(!systemId.isEmpty());
+	QCOMPARE(systemId, imtauth::GetSystemTenantId());
+	auto tenant = m_managerPtr->GetTenant(systemId);
+	QVERIFY(tenant != nullptr);
+	QCOMPARE(tenant->name, QStringLiteral("System"));
+	QVERIFY(tenant->id == imtauth::GetSystemTenantId());
+}
+
+
+void CTenantManagerTest::testEnsureSystemTenant_Idempotent()
+{
+	QVERIFY(m_managerPtr->EnsureSystemTenant());
+	QVERIFY(m_managerPtr->EnsureSystemTenant());
+	QCOMPARE(m_managerPtr->GetTenantIds().size(), 1);
+}
+
+
+void CTenantManagerTest::testSystemTenant_HasCorrectProperties()
+{
+	QVERIFY(m_managerPtr->EnsureSystemTenant());
+	auto tenant = m_managerPtr->GetTenant(imtauth::GetSystemTenantId());
+	QVERIFY(tenant != nullptr);
+	QVERIFY(tenant->isActive);
+	QVERIFY(tenant->id == imtauth::GetSystemTenantId());
+	QVERIFY(tenant->parentTenantId.isEmpty());
+}
+
+
+// Hierarchy tests
+
+void CTenantManagerTest::testCreateChildTenant_SetsParentAndDepth()
+{
+	QByteArray parentId = m_managerPtr->CreateTenant("Parent", "Parent org", "owner1");
+	QByteArray childId = m_managerPtr->CreateChildTenant("Child", parentId, "Child org", "owner2");
+
+	QVERIFY(!childId.isEmpty());
+	auto child = m_managerPtr->GetTenant(childId);
+	QVERIFY(child != nullptr);
+	QCOMPARE(child->parentTenantId, parentId);
+}
+
+
+void CTenantManagerTest::testCreateChildTenant_CalculatesMaterializedPath()
+{
+	QByteArray parentId = m_managerPtr->CreateTenant("Parent", "", "owner1");
+
+	QByteArray childId = m_managerPtr->CreateChildTenant("Child", parentId, "", "owner2");
+
+	auto child = m_managerPtr->GetTenant(childId);
+	QVERIFY(child != nullptr);
+	QCOMPARE(child->parentTenantId, parentId);
+}
+
+
+void CTenantManagerTest::testCreateChildTenant_InvalidParent_Fails()
+{
+	QByteArray fakeParentId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+	QByteArray childId = m_managerPtr->CreateChildTenant("Child", fakeParentId, "", "owner1");
+	QVERIFY(childId.isEmpty());
+}
+
+
+void CTenantManagerTest::testHierarchy_MultiLevel()
+{
+	QVERIFY(m_managerPtr->EnsureSystemTenant());
+
+	QByteArray level1 = m_managerPtr->CreateTenant("Level1", "", "owner1");
+
+	QByteArray level2 = m_managerPtr->CreateChildTenant("Level2", level1, "", "owner2");
+	QByteArray level3 = m_managerPtr->CreateChildTenant("Level3", level2, "", "owner3");
+
+	auto t1 = m_managerPtr->GetTenant(level1);
+	auto t2 = m_managerPtr->GetTenant(level2);
+	auto t3 = m_managerPtr->GetTenant(level3);
+
+	QVERIFY(t1->parentTenantId.isEmpty());
+	QVERIFY(t2->parentTenantId == level1);
+	QVERIFY(t3->parentTenantId == level2);
+}

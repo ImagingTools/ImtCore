@@ -287,4 +287,229 @@ sdl::V1_0::imtauth::CRemoveTenantRelationshipPayload CRemoteTenantControllerComp
 }
 
 
+sdl::V1_0::imtauth::CGetCrossOrgGrantsPayload CRemoteTenantControllerComp::OnGetCrossOrgGrants(
+			const sdl::V1_0::imtauth::CGetCrossOrgGrantsGqlRequest& /*getCrossOrgGrantsRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CGetCrossOrgGrantsPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CCreateCrossOrgGrantPayload CRemoteTenantControllerComp::OnCreateCrossOrgGrant(
+			const sdl::V1_0::imtauth::CCreateCrossOrgGrantGqlRequest& /*createCrossOrgGrantRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CCreateCrossOrgGrantPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CRevokeCrossOrgGrantPayload CRemoteTenantControllerComp::OnRevokeCrossOrgGrant(
+			const sdl::V1_0::imtauth::CRevokeCrossOrgGrantGqlRequest& /*revokeCrossOrgGrantRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CRevokeCrossOrgGrantPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CGetContractsPayload CRemoteTenantControllerComp::OnGetContracts(
+			const sdl::V1_0::imtauth::CGetContractsGqlRequest& /*getContractsRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CGetContractsPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CCreateContractPayload CRemoteTenantControllerComp::OnCreateContract(
+			const sdl::V1_0::imtauth::CCreateContractGqlRequest& /*createContractRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CCreateContractPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CUpdateContractStatusPayload CRemoteTenantControllerComp::OnUpdateContractStatus(
+			const sdl::V1_0::imtauth::CUpdateContractStatusGqlRequest& /*updateContractStatusRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CUpdateContractStatusPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CTerminateContractPayload CRemoteTenantControllerComp::OnTerminateContract(
+			const sdl::V1_0::imtauth::CTerminateContractGqlRequest& /*terminateContractRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CTerminateContractPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CEnsureSystemTenantPayload CRemoteTenantControllerComp::OnEnsureSystemTenant(
+			const sdl::V1_0::imtauth::CEnsureSystemTenantGqlRequest& /*ensureSystemTenantRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CEnsureSystemTenantPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CGetTenantConnectionRequestsPayload CRemoteTenantControllerComp::OnGetTenantConnectionRequests(
+			const sdl::V1_0::imtauth::CGetTenantConnectionRequestsGqlRequest& /*getTenantConnectionRequestsRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CGetTenantConnectionRequestsPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CGetTenantConnectCodeDetailsPayload CRemoteTenantControllerComp::OnGetTenantConnectCodeDetails(
+			const sdl::V1_0::imtauth::CGetTenantConnectCodeDetailsGqlRequest& /*getTenantConnectCodeDetailsRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CGetTenantConnectCodeDetailsPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CCreateTenantConnectionRequestPayload CRemoteTenantControllerComp::OnCreateTenantConnectionRequest(
+			const sdl::V1_0::imtauth::CCreateTenantConnectionRequestGqlRequest& /*createTenantConnectionRequestRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CCreateTenantConnectionRequestPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CCreateTenantConnectCodePayload CRemoteTenantControllerComp::OnCreateTenantConnectCode(
+			const sdl::V1_0::imtauth::CCreateTenantConnectCodeGqlRequest& /*createTenantConnectCodeRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CCreateTenantConnectCodePayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CAcceptTenantConnectionRequestPayload CRemoteTenantControllerComp::OnAcceptTenantConnectionRequest(
+			const sdl::V1_0::imtauth::CAcceptTenantConnectionRequestGqlRequest& /*acceptTenantConnectionRequestRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CAcceptTenantConnectionRequestPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CAcceptTenantConnectCodePayload CRemoteTenantControllerComp::OnAcceptTenantConnectCode(
+			const sdl::V1_0::imtauth::CAcceptTenantConnectCodeGqlRequest& /*acceptTenantConnectCodeRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CAcceptTenantConnectCodePayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CRejectTenantConnectionRequestPayload CRemoteTenantControllerComp::OnRejectTenantConnectionRequest(
+			const sdl::V1_0::imtauth::CRejectTenantConnectionRequestGqlRequest& /*rejectTenantConnectionRequestRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CRejectTenantConnectionRequestPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CRevokeTenantConnectionRequestPayload CRemoteTenantControllerComp::OnRevokeTenantConnectionRequest(
+			const sdl::V1_0::imtauth::CRevokeTenantConnectionRequestGqlRequest& /*revokeTenantConnectionRequestRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CRevokeTenantConnectionRequestPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CGetCrossTenantMessagePayload CRemoteTenantControllerComp::OnGetCrossTenantMessage(
+			const sdl::V1_0::imtauth::CGetCrossTenantMessageGqlRequest& /*getCrossTenantMessageRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CGetCrossTenantMessagePayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CGetCrossTenantMessagesPayload CRemoteTenantControllerComp::OnGetCrossTenantMessages(
+			const sdl::V1_0::imtauth::CGetCrossTenantMessagesGqlRequest& /*getCrossTenantMessagesRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CGetCrossTenantMessagesPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CSendCrossTenantMessagePayload CRemoteTenantControllerComp::OnSendCrossTenantMessage(
+			const sdl::V1_0::imtauth::CSendCrossTenantMessageGqlRequest& /*sendCrossTenantMessageRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CSendCrossTenantMessagePayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CUpdateCrossTenantMessageStatusPayload CRemoteTenantControllerComp::OnUpdateCrossTenantMessageStatus(
+			const sdl::V1_0::imtauth::CUpdateCrossTenantMessageStatusGqlRequest& /*updateCrossTenantMessageStatusRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CUpdateCrossTenantMessageStatusPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CGetOrderRequestPayload CRemoteTenantControllerComp::OnGetOrderRequest(
+			const sdl::V1_0::imtauth::CGetOrderRequestGqlRequest& /*getOrderRequestRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CGetOrderRequestPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CGetOrderRequestsPayload CRemoteTenantControllerComp::OnGetOrderRequests(
+			const sdl::V1_0::imtauth::CGetOrderRequestsGqlRequest& /*getOrderRequestsRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CGetOrderRequestsPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CConfirmOrderRequestPayload CRemoteTenantControllerComp::OnConfirmOrderRequest(
+			const sdl::V1_0::imtauth::CConfirmOrderRequestGqlRequest& /*confirmOrderRequestRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CConfirmOrderRequestPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CRejectOrderRequestPayload CRemoteTenantControllerComp::OnRejectOrderRequest(
+			const sdl::V1_0::imtauth::CRejectOrderRequestGqlRequest& /*rejectOrderRequestRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CRejectOrderRequestPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CUpdateOrderRequestStatusPayload CRemoteTenantControllerComp::OnUpdateOrderRequestStatus(
+			const sdl::V1_0::imtauth::CUpdateOrderRequestStatusGqlRequest& /*updateOrderRequestStatusRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CUpdateOrderRequestStatusPayload>(gqlRequest, errorMessage);
+}
+
+
 } // namespace imtauthgql

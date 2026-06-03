@@ -1,0 +1,154 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <imtauth/CCrossOrgGrant.h>
+
+
+// ACF includes
+#include <istd/CChangeNotifier.h>
+#include <iser/IArchive.h>
+#include <iser/CArchiveTag.h>
+#include <iser/CPrimitiveTypesSerializer.h>
+
+
+namespace imtauth
+{
+
+
+CCrossOrgGrant::CCrossOrgGrant()
+{
+	m_info.accessLevel = COAL_NONE;
+	m_info.isActive = true;
+}
+
+
+CrossOrgGrantInfo CCrossOrgGrant::GetGrantInfo() const
+{
+	return m_info;
+}
+
+
+void CCrossOrgGrant::SetGrantInfo(const CrossOrgGrantInfo& grantInfo)
+{
+	if (m_info != grantInfo){
+		istd::CChangeNotifier notifier(this);
+		m_info = grantInfo;
+	}
+}
+
+
+QByteArray CCrossOrgGrant::GetGrantId() const
+{
+	return m_info.grantId;
+}
+
+
+bool CCrossOrgGrant::Serialize(iser::IArchive& archive)
+{
+	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
+
+	bool retVal = true;
+
+	iser::CArchiveTag idTag("Id", "Id", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(idTag);
+	retVal = retVal && archive.Process(m_info.grantId);
+	retVal = retVal && archive.EndTag(idTag);
+
+	iser::CArchiveTag sourceTag("SourceTenantId", "Source tenant ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(sourceTag);
+	retVal = retVal && archive.Process(m_info.sourceTenantId);
+	retVal = retVal && archive.EndTag(sourceTag);
+
+	iser::CArchiveTag targetTag("TargetTenantId", "Target tenant ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(targetTag);
+	retVal = retVal && archive.Process(m_info.targetTenantId);
+	retVal = retVal && archive.EndTag(targetTag);
+
+	iser::CArchiveTag relationshipTag("RelationshipId", "Relationship ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(relationshipTag);
+	retVal = retVal && archive.Process(m_info.relationshipId);
+	retVal = retVal && archive.EndTag(relationshipTag);
+
+	iser::CArchiveTag contractTag("ContractId", "Contract ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(contractTag);
+	retVal = retVal && archive.Process(m_info.contractId);
+	retVal = retVal && archive.EndTag(contractTag);
+
+	iser::CArchiveTag teamTag("TargetTeamId", "Target team ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(teamTag);
+	retVal = retVal && archive.Process(m_info.targetTeamId);
+	retVal = retVal && archive.EndTag(teamTag);
+
+	iser::CArchiveTag accessLevelTag("AccessLevel", "Access level", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(accessLevelTag);
+	int accessLevel = static_cast<int>(m_info.accessLevel);
+	retVal = retVal && archive.Process(accessLevel);
+	m_info.accessLevel = static_cast<CrossOrgAccessLevel>(accessLevel);
+	retVal = retVal && archive.EndTag(accessLevelTag);
+
+	iser::CArchiveTag scopeTag("ResourceScope", "Resource scope", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(scopeTag);
+	retVal = retVal && archive.Process(m_info.resourceScope);
+	retVal = retVal && archive.EndTag(scopeTag);
+
+	iser::CArchiveTag descriptionTag("Description", "Description", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(descriptionTag);
+	retVal = retVal && archive.Process(m_info.description);
+	retVal = retVal && archive.EndTag(descriptionTag);
+
+	iser::CArchiveTag createdAtTag("CreatedAt", "Created at", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(createdAtTag);
+	retVal = retVal && archive.Process(m_info.createdAt);
+	retVal = retVal && archive.EndTag(createdAtTag);
+
+	iser::CArchiveTag expiresAtTag("ExpiresAt", "Expires at", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(expiresAtTag);
+	retVal = retVal && archive.Process(m_info.expiresAt);
+	retVal = retVal && archive.EndTag(expiresAtTag);
+
+	iser::CArchiveTag isActiveTag("IsActive", "Is active", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(isActiveTag);
+	retVal = retVal && archive.Process(m_info.isActive);
+	retVal = retVal && archive.EndTag(isActiveTag);
+
+	return retVal;
+}
+
+
+bool CCrossOrgGrant::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
+{
+	const CCrossOrgGrant* sourcePtr = dynamic_cast<const CCrossOrgGrant*>(&object);
+	if (sourcePtr == nullptr){
+		return false;
+	}
+
+	istd::CChangeNotifier notifier(this);
+
+	m_info = sourcePtr->m_info;
+
+	return true;
+}
+
+
+istd::IChangeableUniquePtr CCrossOrgGrant::CloneMe(CompatibilityMode mode) const
+{
+	istd::IChangeableUniquePtr clonePtr(new CCrossOrgGrant);
+	if (clonePtr->CopyFrom(*this, mode)){
+		return clonePtr;
+	}
+
+	return nullptr;
+}
+
+
+bool CCrossOrgGrant::ResetData(CompatibilityMode /*mode*/)
+{
+	istd::CChangeNotifier notifier(this);
+
+	m_info = CrossOrgGrantInfo();
+	m_info.accessLevel = COAL_NONE;
+	m_info.isActive = true;
+
+	return true;
+}
+
+
+} // namespace imtauth

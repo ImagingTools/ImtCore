@@ -80,6 +80,7 @@ DocumentViewBase {
 	MultiPageView {
 		id: multiPageView
 		anchors.fill: parent
+		panelWidth: Style.sizeHintXXS
 
 		function updatePages() {
 			multiPageView.clear()
@@ -88,16 +89,21 @@ DocumentViewBase {
 				multiPageView.addPage("Members", qsTr("Members"), membersPageComp, "Icons/MultipleUser")
 				if (stateManager_.canManageMembers) {
 					multiPageView.addPage("Roles", qsTr("Roles"), rolesPageComp, "Icons/Role")
-					multiPageView.addPage("Groups", qsTr("Groups"), groupsPageComp, "Icons/MultipleUser")
+					multiPageView.addPage("Groups", qsTr("Groups"), groupsPageComp, "Icons/Organization")
 				}
-				if (stateManager_.isCreator) {
-					multiPageView.addPage("Permissions", qsTr("Permissions"), permissionsPageComp, "Icons/Role")
-				}
+					if (stateManager_.isCreator) {
+					multiPageView.addPage("Permissions", qsTr("Permissions"), permissionsPageComp, "Icons/Key")
+						multiPageView.addPage("CrossOrgGrants", qsTr("Cross-Org Grants"), crossOrgGrantsPageComp, "Icons/Crown")
+						multiPageView.addPage("Contracts", qsTr("Contracts"), contractsPageComp, "Icons/Assignment")
+						multiPageView.addPage("Relationships", qsTr("Relationships"), relationshipsPageComp, "Icons/Participant")
+						multiPageView.addPage("Connections", qsTr("Connections"), connectionRequestsPageComp, "Icons/Communication")
+						multiPageView.addPage("Messages", qsTr("Messages"), messagesPageComp, "Icons/Message")
+					}
 			}
 			multiPageView.currentIndex = 0
 		}
 
-		Component.onCompleted: {
+		Component.onCompleted: { 
 			multiPageView.updatePages()
 		}
 	}
@@ -278,6 +284,56 @@ DocumentViewBase {
 
 		TenantPermissionsPage {
 			model: container.tenantData
+		}
+	}
+
+	Component {
+		id: crossOrgGrantsPageComp
+
+		TenantCrossOrgGrantsPage {
+			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
+		}
+	}
+
+	Component {
+		id: contractsPageComp
+
+		TenantContractsPage {
+			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
+		}
+	}
+
+	Component {
+		id: relationshipsPageComp
+
+		TenantRelationshipsPage {
+			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
+		}
+	}
+
+	Component {
+		id: connectionRequestsPageComp
+
+		TenantConnectionRequestsPage {
+			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
+		}
+	}
+
+	Component {
+		id: messagesPageComp
+
+		TenantMessagesPage {
+			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
 		}
 	}
 }

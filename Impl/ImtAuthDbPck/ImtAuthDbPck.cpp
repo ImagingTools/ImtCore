@@ -96,5 +96,30 @@ I_EXPORT_COMPONENT(
 			"SQL delegate for tenant invitations (hydration, INSERT/UPDATE/DELETE)",
 			"Tenant Invitation Database Delegate");
 
+I_EXPORT_COMPONENT(
+			CrossOrgGrantDatabaseDelegate,
+			"SQL delegate for cross-org grants (hydration, INSERT/UPDATE/DELETE)",
+			"Cross Org Grant Database Delegate");
+
+I_EXPORT_COMPONENT(
+			ContractDatabaseDelegate,
+			"SQL delegate for cooperation contracts (hydration, INSERT/UPDATE/DELETE)",
+			"Contract Database Delegate");
+
+I_EXPORT_COMPONENT(
+			TenantConnectionRequestDatabaseDelegate,
+			"SQL delegate for tenant connection requests (hydration, INSERT/UPDATE/DELETE)",
+			"Tenant Connection Request Database Delegate");
+
+I_EXPORT_COMPONENT(
+			CrossTenantMessageDatabaseDelegate,
+			"SQL delegate for cross-tenant messages (hydration, INSERT/UPDATE/DELETE)",
+			"Cross Tenant Message Database Delegate");
+
+I_EXPORT_COMPONENT(
+			OrderRequestDatabaseDelegate,
+			"SQL delegate for order requests (hydration, INSERT/UPDATE/DELETE)",
+			"Order Request Database Delegate");
+
 } // namespace ImtAuthDbPck
 

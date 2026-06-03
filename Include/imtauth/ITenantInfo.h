@@ -19,6 +19,17 @@ namespace imtauth
 	Interface for describing a tenant.
 	\ingroup Tenant
 */
+/**
+	Get the well-known System-Tenant ID.
+	The System-Tenant is the root tenant that is automatically created at server startup.
+	All users implicitly belong to the System-Tenant.
+*/
+inline const QByteArray& GetSystemTenantId()
+{
+	static const QByteArray s_id = QByteArrayLiteral("00000000-0000-0000-0000-000000000001");
+	return s_id;
+}
+
 class ITenantInfo: virtual public iser::IObject
 {
 public:
@@ -28,7 +39,8 @@ public:
 		MIT_TENANT_NAME,
 		MIT_TENANT_DESCRIPTION,
 		MIT_TENANT_IS_ACTIVE,
-		MIT_TENANT_OWNER_ID
+		MIT_TENANT_OWNER_ID,
+		MIT_PARENT_TENANT_ID
 	};
 
 	/**
@@ -46,12 +58,27 @@ public:
 
 	/**
 		Structure describing a relationship between tenants.
+
+		Relationships are direction-aware and asymmetric: \a sourceRole describes
+		the role of the tenant owning this relationship entry, while \a targetRole
+		describes the role of the \a targetTenantId. For example a Customer→Supplier
+		relationship stored on the customer tenant has sourceRole = Customer and
+		targetRole = Supplier.
+
+		The legacy \a role field is kept for backward compatibility and mirrors
+		\a targetRole (the role of the target tenant).
 	*/
 	struct TenantRelationship
 	{
 		QByteArray relationshipId;
 		QByteArray targetTenantId;
-		TenantRelationshipRole role;
+		TenantRelationshipRole role = Partner;
+		TenantRelationshipRole sourceRole = Partner;
+		TenantRelationshipRole targetRole = Partner;
+		QString scope;
+		QString validFrom;
+		QString validUntil;
+		bool isActive = true;
 		QString description;
 		QString createdAt;
 
@@ -60,6 +87,12 @@ public:
 			return relationshipId == other.relationshipId
 				&& targetTenantId == other.targetTenantId
 				&& role == other.role
+				&& sourceRole == other.sourceRole
+				&& targetRole == other.targetRole
+				&& scope == other.scope
+				&& validFrom == other.validFrom
+				&& validUntil == other.validUntil
+				&& isActive == other.isActive
 				&& description == other.description
 				&& createdAt == other.createdAt;
 		}
@@ -183,6 +216,17 @@ public:
 		Set the list of permissions available for this tenant.
 	*/
 	virtual void SetTenantPermissions(const QByteArrayList& permissions) = 0;
+
+	/**
+		Get parent tenant ID.
+		Empty if this is a top-level tenant or the System-Tenant.
+	*/
+	virtual QByteArray GetParentTenantId() const = 0;
+
+	/**
+		Set parent tenant ID.
+	*/
+	virtual void SetParentTenantId(const QByteArray& parentTenantId) = 0;
 };
 
 

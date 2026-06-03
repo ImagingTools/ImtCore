@@ -509,7 +509,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 								if (sdlTypeField != nullptr){
 									const QString subFieldClassName = QStringLiteral("C") + sdlTypeField->GetName();
 									const imtsdl::SdlFieldList subFields = sdlTypeField->GetFields();
-									for (const imtsdl::CSdlField& subField: subFields){
+									for (const imtsdl::CSdlField& subField : subFields){
 										FeedStreamHorizontally(stream, 3);
 										stream << QStringLiteral("newObjectPtr->") << subFieldClassName << QStringLiteral("::") << subField.GetId() << QStringLiteral(" = val->") << subFieldClassName << QStringLiteral("::") << subField.GetId() << ';';
 										FeedStream(stream, 1, false);

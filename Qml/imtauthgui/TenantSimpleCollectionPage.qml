@@ -59,6 +59,7 @@ ViewBase {
 	property var listModel: null                       // alternative to dataProviderComp: direct model for the list
 	property Component delegateComponent: null         // custom delegate (receives modelData, selectionManager, collectionPage)
 	property Component headerButtonsComponent: null    // custom header buttons placed at right of stackViewHeader
+	property Component customEditorComponent: null     // custom create/edit form used when documentManager is null
 	function removeItem(id) {}                        // override in subcomponents
 
 	function updateGui() {}
@@ -75,6 +76,15 @@ ViewBase {
 		if (view && view.model && view.model.m_name)
 			return view.model.m_name
 		return ""
+	}
+
+	/** Navigate back from a custom editor to the list. */
+	function popEditor() {
+		stackViewHeader.popHeader()
+		collectionStackView.previous()
+		while (collectionStackView.count > 1)
+			collectionStackView.removePage(collectionStackView.count - 1)
+		collectionPage.__activeShellView = null
 	}
 
 	property string __editItemId: ""
@@ -108,7 +118,11 @@ ViewBase {
 			collectionStackView.removePage(collectionStackView.count - 1)
 		collectionPage.__isCreating = true
 		stackViewHeader.addHeader("create", qsTr("Create New %1").arg(collectionPage.entityName))
-		collectionStackView.addPage(createEditorView)
+		if (collectionPage.documentManager) {
+			collectionStackView.addPage(createEditorView)
+		} else if (collectionPage.customEditorComponent) {
+			collectionStackView.addPage(collectionPage.customEditorComponent)
+		}
 		collectionStackView.next()
 	}
 
@@ -548,7 +562,11 @@ ViewBase {
 		while (collectionStackView.count > 1)
 			collectionStackView.removePage(collectionStackView.count - 1)
 		stackViewHeader.addHeader("edit", itemName || qsTr("Edit %1").arg(collectionPage.entityName))
-		collectionStackView.addPage(editEditorView)
+		if (collectionPage.documentManager) {
+			collectionStackView.addPage(editEditorView)
+		} else if (collectionPage.customEditorComponent) {
+			collectionStackView.addPage(collectionPage.customEditorComponent)
+		}
 		collectionStackView.next()
 	}
 

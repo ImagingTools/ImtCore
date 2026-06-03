@@ -175,7 +175,7 @@ iproc::IProcessor::TaskState CQmlCodeRequestGeneratorComp::DoProcessing(
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream, 1);
-		stream << QStringLiteral("gqlCommandId: \"") << sdlRequest.GetName() << QStringLiteral("\"");
+		stream << QStringLiteral("getCommandId: \"") << sdlRequest.GetName() << QStringLiteral("\"");
 		FeedStream(stream, 1, false);
 
 		if (!inputArguments.isEmpty()){
@@ -216,7 +216,7 @@ iproc::IProcessor::TaskState CQmlCodeRequestGeneratorComp::DoProcessing(
 		}
 
 		FeedStreamHorizontally(stream, 2);
-		stream << functionName << QStringLiteral("Base()");
+		stream << functionName << QStringLiteral("()");
 		FeedStream(stream, 1, false);
 		FeedStreamHorizontally(stream, 1);
 		stream << QStringLiteral("}");
