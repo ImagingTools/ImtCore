@@ -11,11 +11,8 @@ import imtauthgui 1.0
 /**
  * TenantConnectionsView
  *
- * Page for viewing established tenant relationships/connections.
- * 
- * TODO: Implement actual connections display when API is available.
- * Currently this is a placeholder that will be updated when the backend
- * provides a proper API for fetching established connections.
+ * Page for viewing established (active) tenant connections.
+ * Shows accepted connection requests as active connections with details.
  */
 ViewBase {
 	id: connectionsView
@@ -27,11 +24,67 @@ ViewBase {
 	property var apiClient: null
 	
 	function updateGui() {
-		// TODO: Implement when API for fetching connections is available
+		if (connectionsView.apiClient && connectionsView.tenantData && connectionsView.tenantData.m_id) {
+			connectionsView.apiClient.fetchConnectionRequests(connectionsView.tenantData.m_id)
+		}
 	}
 	
 	function updateModel() {
 		// No model updates needed for this view
+	}
+	
+	Component.onCompleted: {
+		if (connectionsView.apiClient && connectionsView.tenantData && connectionsView.tenantData.m_id) {
+			connectionsView.apiClient.fetchConnectionRequests(connectionsView.tenantData.m_id)
+		}
+	}
+	
+	onVisibleChanged: {
+		if (connectionsView.visible && connectionsView.apiClient && connectionsView.tenantData && connectionsView.tenantData.m_id) {
+			connectionsView.apiClient.fetchConnectionRequests(connectionsView.tenantData.m_id)
+		}
+	}
+	
+	// --- Real-time updates ---
+	Connections {
+		target: connectionsView.apiClient
+		
+		function onConnectionRequestAccepted(requestId) {
+			connectionsView.__refreshData()
+		}
+		
+		function onSubscriptionCrossTenantMessageReceived(notification) {
+			if (connectionsView.visible) {
+				connectionsView.__refreshData()
+			}
+		}
+		
+		function onSubscriptionCrossTenantMessageStatusChanged(notification) {
+			if (connectionsView.visible) {
+				connectionsView.__refreshData()
+			}
+		}
+	}
+	
+	function __refreshData() {
+		if (connectionsView.apiClient && connectionsView.tenantData && connectionsView.tenantData.m_id) {
+			connectionsView.apiClient.fetchConnectionRequests(connectionsView.tenantData.m_id)
+		}
+	}
+	
+	function __getActiveConnections() {
+		var result = []
+		if (!connectionsView.apiClient || !connectionsView.apiClient.connectionRequestsModel) {
+			return result
+		}
+		var mdl = connectionsView.apiClient.connectionRequestsModel
+		for (var i = 0; i < mdl.count; i++) {
+			var req = mdl.get(i)
+			if (req.status === "Accepted") {
+				result.push(req)
+			}
+		}
+		return result
 	}
 	
 	CustomScrollbar {
@@ -63,32 +116,103 @@ ViewBase {
 			spacing: Style.marginXL
 			
 			// =============================================================
-			// SECTION: Established Connections
+			// SECTION: Active Connections
 			// =============================================================
 			GroupHeaderView {
 				width: mainColumn.width
-				title: qsTr("Established Connections")
+				title: qsTr("Active Connections")
 			}
 			
 			BaseText {
 				width: mainColumn.width
-				wrapMode: Text.WordWrap
-				text: qsTr("This page will display your established tenant connections. Currently, this functionality requires backend API support that is not yet implemented.")
+				visible: activeRepeater.count === 0
+				text: qsTr("No active connections yet. Send or accept a connection request to establish your first connection.")
 				font.pixelSize: Style.fontSizeM
-				color: Style.textColor
+				color: Style.inactiveTextColor
+				wrapMode: Text.WordWrap
 			}
 			
-			// TODO: When API is ready, implement the following sections:
-			// - List of established connections
-			// - Connection details (roles, status, etc.)
-			// - Connection management actions
-			
-			BaseText {
+			Column {
 				width: mainColumn.width
-				wrapMode: Text.WordWrap
-				text: qsTr("When implemented, this page will show:nnu2022 Active tenant relationshipsnu2022 Connection roles and permissionsnu2022 Connection status and historynu2022 Management actions for connections")
-				font.pixelSize: Style.fontSizeS
-				color: Style.inactiveTextColor
+				spacing: Style.marginM
+				
+				Repeater {
+					id: activeRepeater
+					model: connectionsView.__getActiveConnections()
+					
+					delegate: Rectangle {
+						id: connectionDelegate
+						width: mainColumn.width
+						height: connContent.height + 2 * Style.marginM
+						radius: Style.radiusS
+						color: Style.alternateBaseColor
+						border.color: Style.borderColor
+						border.width: 1
+						
+						readonly property var __conn: modelData
+						readonly property bool __isOutgoing: connectionDelegate.__conn.sourceTenantId === (connectionsView.tenantData ? connectionsView.tenantData.m_id : "")
+						readonly property string __partnerTenantId: connectionDelegate.__isOutgoing
+																	? (connectionDelegate.__conn.targetTenantId || connectionDelegate.__conn.targetIdentifier || "")
+																	: (connectionDelegate.__conn.sourceTenantId || "")
+						
+						Column {
+							id: connContent
+							anchors.left: connectionDelegate.left
+							anchors.right: connectionDelegate.right
+							anchors.top: connectionDelegate.top
+							anchors.margins: Style.marginM
+							spacing: Style.marginXS
+							
+							Row {
+								width: connContent.width
+								spacing: Style.marginM
+								
+								BaseText {
+									width: parent.width - connStatusBadge.width - Style.marginM
+									elide: Text.ElideRight
+									text: connectionDelegate.__partnerTenantId
+									font.pixelSize: Style.fontSizeM
+									font.bold: true
+									color: Style.textColor
+								}
+								
+								StatusBadge {
+									id: connStatusBadge
+									text: qsTr("Active")
+									badgeColor: Style.linkColor
+									textColor: Style.baseColor
+								}
+							}
+							
+							BaseText {
+								width: connContent.width
+								elide: Text.ElideRight
+								text: qsTr("Roles: %1 → %2")
+								.arg(connectionDelegate.__conn.proposedSourceRole || "")
+								.arg(connectionDelegate.__conn.proposedTargetRole || "")
+								font.pixelSize: Style.fontSizeS
+								color: Style.inactiveTextColor
+							}
+							
+							BaseText {
+								width: connContent.width
+								visible: connectionDelegate.__conn.respondedAt && connectionDelegate.__conn.respondedAt !== ""
+								elide: Text.ElideRight
+								text: qsTr("Connected since: %1").arg(connectionDelegate.__conn.respondedAt || "")
+								font.pixelSize: Style.fontSizeS
+								color: Style.inactiveTextColor
+							}
+							
+							BaseText {
+								width: connContent.width
+								elide: Text.ElideRight
+								text: connectionDelegate.__isOutgoing ? qsTr("Direction: Outgoing") : qsTr("Direction: Incoming")
+								font.pixelSize: Style.fontSizeS
+								color: Style.inactiveTextColor
+							}
+						}
+					}
+				}
 			}
 		}
 	}

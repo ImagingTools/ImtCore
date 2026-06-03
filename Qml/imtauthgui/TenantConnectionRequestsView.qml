@@ -12,9 +12,9 @@ import imtauthgui 1.0
  * TenantConnectionRequestsView
  *
  * Page for managing connection requests:
- *   - Create new connection requests
- *   - View incoming requests with Accept/Reject actions
- *   - View outgoing requests with Revoke action
+ *   - Create new connection requests (top card)
+ *   - View incoming requests with Accept/Reject actions (separate section)
+ *   - View outgoing requests with Revoke action (separate section)
  */
 ViewBase {
 	id: requestsView
@@ -55,6 +55,7 @@ ViewBase {
 		
 		function onConnectionRequestCreated(requestId) {
 			PopupManager.addSuccessMessage(qsTr("Connection request sent"), true)
+			requestsView.__clearCreateForm()
 			requestsView.__refreshList()
 		}
 		
@@ -93,6 +94,44 @@ ViewBase {
 		}
 	}
 	
+	function __clearCreateForm() {
+		targetIdentifierInput.text = ""
+		connSourceRoleCB.currentIndex = 2
+		connTargetRoleCB.currentIndex = 2
+		connMessageInput.text = ""
+	}
+	
+	// --- Filtered models ---
+	function __getIncomingRequests() {
+		var result = []
+		if (!requestsView.apiClient || !requestsView.apiClient.connectionRequestsModel || !requestsView.tenantData) {
+			return result
+		}
+		var mdl = requestsView.apiClient.connectionRequestsModel
+		for (var i = 0; i < mdl.count; i++) {
+			var req = mdl.get(i)
+			if (req.targetTenantId === requestsView.tenantData.m_id) {
+				result.push(req)
+			}
+		}
+		return result
+	}
+	
+	function __getOutgoingRequests() {
+		var result = []
+		if (!requestsView.apiClient || !requestsView.apiClient.connectionRequestsModel || !requestsView.tenantData) {
+			return result
+		}
+		var mdl = requestsView.apiClient.connectionRequestsModel
+		for (var i = 0; i < mdl.count; i++) {
+			var req = mdl.get(i)
+			if (req.sourceTenantId === requestsView.tenantData.m_id) {
+				result.push(req)
+			}
+		}
+		return result
+	}
+	
 	CustomScrollbar {
 		id: scrollbar
 		z: requestsView.z + 1
@@ -122,80 +161,93 @@ ViewBase {
 			spacing: Style.marginXL
 			
 			// =============================================================
-			// SECTION: Send Connection Request by Email / Identifier
+			// SECTION: Create Request (card)
 			// =============================================================
 			GroupHeaderView {
 				width: mainColumn.width
-				title: qsTr("Send Connection Request")
+				title: qsTr("Create Request")
 			}
 			
-			GroupElementView {
-				id: sendRequestGroup
+			Rectangle {
+				id: createRequestCard
 				width: mainColumn.width
+				height: createRequestContent.height + 2 * Style.marginL
+				radius: Style.radiusS
+				color: Style.alternateBaseColor
+				border.color: Style.borderColor
+				border.width: 1
 				
-				TextInputElementView {
-					id: targetIdentifierInput
-					name: qsTr("Target Identifier")
-					placeHolderText: qsTr("E-mail or slug of the tenant to invite")
-				}
-				
-				ComboBoxElementView {
-					id: connSourceRoleCB
-					name: qsTr("Proposed Source Role")
-					model: connRoleModel
-					currentIndex: 2
-				}
-				
-				ComboBoxElementView {
-					id: connTargetRoleCB
-					name: qsTr("Proposed Target Role")
-					model: connRoleModel
-					currentIndex: 2
-				}
-				
-				TextInputElementView {
-					id: connMessageInput
-					name: qsTr("Message")
-					placeHolderText: qsTr("Optional message to include")
-				}
-				
-				DateTimePickerElementView {
-					id: connExpiresAtPicker
-					name: qsTr("Expires At")
-				}
-			}
-			
-			Button {
-				enabled: requestsView.__canManage
-				text: qsTr("Send Request")
-				onClicked: {
-					var target = targetIdentifierInput.text.trim()
-					if (target === "") {
-						ModalDialogManager.showInfoDialog(qsTr("Target identifier is required."))
-						return
+				Column {
+					id: createRequestContent
+					anchors.left: createRequestCard.left
+					anchors.right: createRequestCard.right
+					anchors.top: createRequestCard.top
+					anchors.margins: Style.marginL
+					spacing: Style.marginM
+					
+					GroupElementView {
+						id: sendRequestGroup
+						width: createRequestContent.width
+						
+						TextInputElementView {
+							id: targetIdentifierInput
+							name: qsTr("Target Identifier")
+							placeHolderText: qsTr("E-mail or slug of the tenant to invite")
+						}
+						
+						ComboBoxElementView {
+							id: connSourceRoleCB
+							name: qsTr("Source Role")
+							model: connRoleModel
+							currentIndex: 2
+						}
+						
+						ComboBoxElementView {
+							id: connTargetRoleCB
+							name: qsTr("Target Role")
+							model: connRoleModel
+							currentIndex: 2
+						}
+						
+						TextInputElementView {
+							id: connMessageInput
+							name: qsTr("Message")
+							placeHolderText: qsTr("Optional message to include")
+						}
+						
+						DateTimePickerElementView {
+							id: connExpiresAtPicker
+							name: qsTr("Expiration Date")
+						}
 					}
-					var roleTokens = ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
-					var srcIdx = connSourceRoleCB.currentIndex >= 0 ? connSourceRoleCB.currentIndex : 2
-					var tgtIdx = connTargetRoleCB.currentIndex >= 0 ? connTargetRoleCB.currentIndex : 2
-					requestsView.apiClient.createConnectionRequest(
-								requestsView.tenantData ? requestsView.tenantData.m_id : "",
-								target,
-								roleTokens[srcIdx],
-								roleTokens[tgtIdx],
-								connMessageInput.text.trim(),
-								connExpiresAtPicker.getDateAsString())
+					
+					Button {
+						enabled: requestsView.__canManage
+						text: qsTr("Send Request")
+						onClicked: {
+							var target = targetIdentifierInput.text.trim()
+							if (target === "") {
+								ModalDialogManager.showInfoDialog(qsTr("Target identifier is required."))
+								return
+							}
+							var roleTokens = ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
+							var srcIdx = connSourceRoleCB.currentIndex >= 0 ? connSourceRoleCB.currentIndex : 2
+							var tgtIdx = connTargetRoleCB.currentIndex >= 0 ? connTargetRoleCB.currentIndex : 2
+							requestsView.apiClient.createConnectionRequest(
+										requestsView.tenantData ? requestsView.tenantData.m_id : "",
+										target,
+										roleTokens[srcIdx],
+										roleTokens[tgtIdx],
+										connMessageInput.text.trim(),
+										connExpiresAtPicker.getDateAsString())
+						}
+					}
 				}
 			}
 			
 			// =============================================================
-			// SECTION: Connection Requests List (real-time)
+			// SECTION: Incoming Requests
 			// =============================================================
-			GroupHeaderView {
-				width: mainColumn.width
-				title: qsTr("Connection Requests")
-			}
-			
-			// --- Incoming Requests Section ---
 			GroupHeaderView {
 				width: mainColumn.width
 				title: qsTr("Incoming Requests")
@@ -203,8 +255,8 @@ ViewBase {
 			
 			BaseText {
 				width: mainColumn.width
-				visible: !incomingRepeater.model || incomingRepeater.model.count === 0
-				text: qsTr("No incoming connection requests yet.")
+				visible: incomingRepeater.count === 0
+				text: qsTr("No incoming connection requests.")
 				font.pixelSize: Style.fontSizeM
 				color: Style.inactiveTextColor
 			}
@@ -215,42 +267,53 @@ ViewBase {
 				
 				Repeater {
 					id: incomingRepeater
-					model: requestsView.apiClient ? requestsView.__getIncomingRequestsModel() : null
+					model: requestsView.__getIncomingRequests()
 					
 					delegate: Rectangle {
 						id: incomingRequestDelegate
 						width: mainColumn.width
-						height: reqContent.height + 2 * Style.marginM
+						height: inReqContent.height + 2 * Style.marginM
 						color: Style.alternateBaseColor
 						radius: Style.radiusS
 						border.color: Style.borderColor
 						border.width: 1
 						
-						readonly property var __req: model
+						readonly property var __req: modelData
 						readonly property bool __isPending: (incomingRequestDelegate.__req.status || "") === "Pending"
 						
 						Column {
-							id: reqContent
+							id: inReqContent
 							anchors.left: incomingRequestDelegate.left
 							anchors.right: incomingRequestDelegate.right
 							anchors.top: incomingRequestDelegate.top
 							anchors.margins: Style.marginM
 							spacing: Style.marginXS
 							
-							BaseText {
-								width: reqContent.width
-								elide: Text.ElideRight
-								text: qsTr("◀ From: %1").arg(incomingRequestDelegate.__req.sourceTenantId || "")
-								font.pixelSize: Style.fontSizeM
-								font.bold: true
-								color: Style.textColor
+							Row {
+								width: inReqContent.width
+								spacing: Style.marginM
+								
+								BaseText {
+									elide: Text.ElideRight
+									width: parent.width - inStatusBadge.width - Style.marginM
+									text: qsTr("From: %1").arg(incomingRequestDelegate.__req.sourceTenantId || "")
+									font.pixelSize: Style.fontSizeM
+									font.bold: true
+									color: Style.textColor
+								}
+								
+								StatusBadge {
+									id: inStatusBadge
+									text: incomingRequestDelegate.__req.status || qsTr("Pending")
+									badgeColor: incomingRequestDelegate.__isPending ? Style.warningColor : Style.baseColor
+									textColor: incomingRequestDelegate.__isPending ? Style.baseColor : Style.textColor
+								}
 							}
 							
 							BaseText {
-								width: reqContent.width
+								width: inReqContent.width
 								elide: Text.ElideRight
-								text: qsTr("Status: %1   Roles: %2 / %3")
-								.arg(incomingRequestDelegate.__req.status || qsTr("Pending"))
+								text: qsTr("Roles: %1 → %2")
 								.arg(incomingRequestDelegate.__req.proposedSourceRole || qsTr("Partner"))
 								.arg(incomingRequestDelegate.__req.proposedTargetRole || qsTr("Partner"))
 								font.pixelSize: Style.fontSizeS
@@ -258,7 +321,7 @@ ViewBase {
 							}
 							
 							BaseText {
-								width: reqContent.width
+								width: inReqContent.width
 								visible: incomingRequestDelegate.__req.message && incomingRequestDelegate.__req.message !== ""
 								wrapMode: Text.WordWrap
 								text: incomingRequestDelegate.__req.message || ""
@@ -267,7 +330,7 @@ ViewBase {
 							}
 							
 							BaseText {
-								width: reqContent.width
+								width: inReqContent.width
 								visible: incomingRequestDelegate.__req.createdAt && incomingRequestDelegate.__req.createdAt !== ""
 								elide: Text.ElideRight
 								text: qsTr("Created: %1").arg(incomingRequestDelegate.__req.createdAt || "")
@@ -305,7 +368,9 @@ ViewBase {
 				}
 			}
 			
-			// --- Outgoing Requests Section ---
+			// =============================================================
+			// SECTION: Outgoing Requests
+			// =============================================================
 			GroupHeaderView {
 				width: mainColumn.width
 				title: qsTr("Outgoing Requests")
@@ -313,8 +378,8 @@ ViewBase {
 			
 			BaseText {
 				width: mainColumn.width
-				visible: !outgoingRepeater.model || outgoingRepeater.model.count === 0
-				text: qsTr("No outgoing connection requests yet.")
+				visible: outgoingRepeater.count === 0
+				text: qsTr("No outgoing connection requests.")
 				font.pixelSize: Style.fontSizeM
 				color: Style.inactiveTextColor
 			}
@@ -325,44 +390,55 @@ ViewBase {
 				
 				Repeater {
 					id: outgoingRepeater
-					model: requestsView.apiClient ? requestsView.__getOutgoingRequestsModel() : null
+					model: requestsView.__getOutgoingRequests()
 					
 					delegate: Rectangle {
 						id: outgoingRequestDelegate
 						width: mainColumn.width
-						height: reqContent2.height + 2 * Style.marginM
+						height: outReqContent.height + 2 * Style.marginM
 						color: Style.alternateBaseColor
 						radius: Style.radiusS
 						border.color: Style.borderColor
 						border.width: 1
 						
-						readonly property var __req: model
+						readonly property var __req: modelData
 						readonly property bool __isPending: (outgoingRequestDelegate.__req.status || "") === "Pending"
 						
 						Column {
-							id: reqContent2
+							id: outReqContent
 							anchors.left: outgoingRequestDelegate.left
 							anchors.right: outgoingRequestDelegate.right
 							anchors.top: outgoingRequestDelegate.top
 							anchors.margins: Style.marginM
 							spacing: Style.marginXS
 							
-							BaseText {
-								width: parent.width
-								elide: Text.ElideRight
-								text: qsTr("▶ To: %1").arg((outgoingRequestDelegate.__req.targetIdentifier && outgoingRequestDelegate.__req.targetIdentifier !== "")
-															 ? outgoingRequestDelegate.__req.targetIdentifier
-															 : (outgoingRequestDelegate.__req.targetTenantId || qsTr("(connect code)")))
-								font.pixelSize: Style.fontSizeM
-								font.bold: true
-								color: Style.textColor
+							Row {
+								width: outReqContent.width
+								spacing: Style.marginM
+								
+								BaseText {
+									elide: Text.ElideRight
+									width: parent.width - outStatusBadge.width - Style.marginM
+									text: qsTr("To: %1").arg((outgoingRequestDelegate.__req.targetIdentifier && outgoingRequestDelegate.__req.targetIdentifier !== "")
+																 ? outgoingRequestDelegate.__req.targetIdentifier
+																 : (outgoingRequestDelegate.__req.targetTenantId || qsTr("(connect code)")))
+									font.pixelSize: Style.fontSizeM
+									font.bold: true
+									color: Style.textColor
+								}
+								
+								StatusBadge {
+									id: outStatusBadge
+									text: outgoingRequestDelegate.__req.status || qsTr("Pending")
+									badgeColor: outgoingRequestDelegate.__isPending ? Style.warningColor : Style.baseColor
+									textColor: outgoingRequestDelegate.__isPending ? Style.baseColor : Style.textColor
+								}
 							}
 							
 							BaseText {
-								width: parent.width
+								width: outReqContent.width
 								elide: Text.ElideRight
-								text: qsTr("Status: %1   Roles: %2 / %3")
-								.arg(outgoingRequestDelegate.__req.status || qsTr("Pending"))
+								text: qsTr("Roles: %1 → %2")
 								.arg(outgoingRequestDelegate.__req.proposedSourceRole || qsTr("Partner"))
 								.arg(outgoingRequestDelegate.__req.proposedTargetRole || qsTr("Partner"))
 								font.pixelSize: Style.fontSizeS
@@ -370,16 +446,16 @@ ViewBase {
 							}
 							
 							BaseText {
-								width: parent.width
+								width: outReqContent.width
 								visible: outgoingRequestDelegate.__req.connectCode && outgoingRequestDelegate.__req.connectCode !== ""
 								elide: Text.ElideRight
 								text: qsTr("Connect code: %1").arg(outgoingRequestDelegate.__req.connectCode || "")
 								font.pixelSize: Style.fontSizeS
-								color: Style.inactiveTextColor
+								color: Style.linkColor
 							}
 							
 							BaseText {
-								width: parent.width
+								width: outReqContent.width
 								visible: outgoingRequestDelegate.__req.message && outgoingRequestDelegate.__req.message !== ""
 								wrapMode: Text.WordWrap
 								text: outgoingRequestDelegate.__req.message || ""
@@ -388,7 +464,7 @@ ViewBase {
 							}
 							
 							BaseText {
-								width: parent.width
+								width: outReqContent.width
 								visible: outgoingRequestDelegate.__req.createdAt && outgoingRequestDelegate.__req.createdAt !== ""
 								elide: Text.ElideRight
 								text: qsTr("Created: %1").arg(outgoingRequestDelegate.__req.createdAt || "")
@@ -415,45 +491,6 @@ ViewBase {
 				}
 			}
 		}
-	}
-	
-	// --- Helper functions for filtering requests ---
-	function __getIncomingRequestsModel() {
-		if (!requestsView.apiClient || !requestsView.apiClient.connectionRequestsModel || !requestsView.tenantData) {
-			return null
-		}
-		
-		var model = requestsView.apiClient.connectionRequestsModel
-		var filteredModel = []
-		
-		for (var i = 0; i < model.count; i++) {
-			var req = model.get(i)
-			// Incoming requests are those where the current tenant is the target
-			if (req.targetTenantId === requestsView.tenantData.m_id) {
-				filteredModel.push(req)
-			}
-		}
-		
-		return filteredModel
-	}
-	
-	function __getOutgoingRequestsModel() {
-		if (!requestsView.apiClient || !requestsView.apiClient.connectionRequestsModel || !requestsView.tenantData) {
-			return null
-		}
-		
-		var model = requestsView.apiClient.connectionRequestsModel
-		var filteredModel = []
-		
-		for (var i = 0; i < model.count; i++) {
-			var req = model.get(i)
-			// Outgoing requests are those where the current tenant is the source
-			if (req.sourceTenantId === requestsView.tenantData.m_id) {
-				filteredModel.push(req)
-			}
-		}
-		
-		return filteredModel
 	}
 	
 	TreeItemModel {

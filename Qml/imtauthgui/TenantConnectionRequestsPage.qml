@@ -14,10 +14,11 @@ import imtauthgui 1.0
  * Container page for connection requests functionality using MultiPageView.
  * 
  * This page hosts multiple sub-pages for different connection scenarios:
+ *   - Overview: Dashboard with statistics, recent activity, and attention-required items
  *   - Requests: Create and manage connection requests
  *   - Connect Codes: Generate and manage one-time connect codes
  *   - Redeem Code: Activate received connect codes
- *   - Connections: View established tenant relationships
+ *   - Active Connections: View established tenant relationships
  */
 ViewBase {
 	id: connectionsPage
@@ -58,15 +59,26 @@ ViewBase {
 		
 		function updatePages() {
 			multiPageView.clear()
+			multiPageView.addPage("Overview", qsTr("Overview"), overviewPageComp, "Icons/Dashboard")
 			multiPageView.addPage("Requests", qsTr("Requests"), requestsPageComp, "Icons/Link")
 			multiPageView.addPage("ConnectCodes", qsTr("Connect Codes"), connectCodesPageComp, "Icons/Code")
 			multiPageView.addPage("RedeemCode", qsTr("Redeem Code"), redeemCodePageComp, "Icons/Unlock")
-			multiPageView.addPage("Connections", qsTr("Connections"), connectionsPageComp, "Icons/Network")
+			multiPageView.addPage("ActiveConnections", qsTr("Active Connections"), connectionsPageComp, "Icons/Network")
 			multiPageView.currentIndex = 0
 		}
 	}
 	
 	// --- Page Components ---
+	Component {
+		id: overviewPageComp
+		
+		TenantConnectionOverviewView {
+			model: connectionsPage.tenantData
+			stateManager: connectionsPage.stateManager
+			apiClient: connectionsPage.apiClient
+		}
+	}
+	
 	Component {
 		id: requestsPageComp
 		

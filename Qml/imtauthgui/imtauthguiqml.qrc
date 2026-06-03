@@ -50,6 +50,7 @@
 	<file alias="imtauthgui/TenantRelationshipsPage.qml">TenantRelationshipsPage.qml</file>
 	<file alias="imtauthgui/TenantConnectionRequestsPage.qml">TenantConnectionRequestsPage.qml</file>
 	<file alias="imtauthgui/TenantConnectionRequestsView.qml">TenantConnectionRequestsView.qml</file>
+	<file alias="imtauthgui/TenantConnectionOverviewView.qml">TenantConnectionOverviewView.qml</file>
 	<file alias="imtauthgui/TenantConnectCodesView.qml">TenantConnectCodesView.qml</file>
 	<file alias="imtauthgui/TenantRedeemCodeView.qml">TenantRedeemCodeView.qml</file>
 	<file alias="imtauthgui/TenantConnectionsView.qml">TenantConnectionsView.qml</file>

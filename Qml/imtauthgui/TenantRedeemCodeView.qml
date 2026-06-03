@@ -12,6 +12,7 @@ import imtauthgui 1.0
  * TenantRedeemCodeView
  *
  * Page for activating received connect codes.
+ * Card-based layout with clear instructions and feedback.
  */
 ViewBase {
 	id: redeemCodeView
@@ -38,13 +39,13 @@ ViewBase {
 		target: redeemCodeView.apiClient
 		
 		function onConnectionRequestAccepted(requestId) {
-			PopupManager.addSuccessMessage(qsTr("Connect code successfully redeemed"), true)
-			// Clear the input field after successful redemption
+			PopupManager.addSuccessMessage(qsTr("Connect code successfully redeemed! Connection established."), true)
 			redeemCodeInput.text = ""
+			successCard.visible = true
 		}
 		
 		function onConnectionRequestRejected(requestId) {
-			PopupManager.addErrorMessage(qsTr("Failed to redeem connect code"), true)
+			PopupManager.addErrorMessage(qsTr("Failed to redeem connect code. The code may be expired or invalid."), true)
 		}
 	}
 	
@@ -84,39 +85,137 @@ ViewBase {
 				title: qsTr("Redeem a Connect Code")
 			}
 			
-			GroupElementView {
-				id: redeemGroup
-				width: mainColumn.width
-				
-				TextInputElementView {
-					id: redeemCodeInput
-					name: qsTr("Connect Code")
-					placeHolderText: qsTr("Paste a connect code to establish connection")
-				}
-			}
-			
-			Button {
-				enabled: redeemCodeView.__canManage && redeemCodeInput.text.trim() !== ""
-				text: qsTr("Redeem Code")
-				onClicked: {
-					var code = redeemCodeInput.text.trim()
-					if (code === "") {
-						ModalDialogManager.showInfoDialog(qsTr("Connect code is required."))
-						return
-					}
-					redeemCodeView.apiClient.acceptConnectCode(
-								code,
-								redeemCodeView.tenantData ? redeemCodeView.tenantData.m_id : "")
-				}
-			}
-			
-			// --- Instructions ---
 			BaseText {
 				width: mainColumn.width
 				wrapMode: Text.WordWrap
 				text: qsTr("Enter a connect code you received from another tenant to establish a connection. The code will be consumed after successful redemption.")
 				font.pixelSize: Style.fontSizeS
 				color: Style.inactiveTextColor
+			}
+			
+			Rectangle {
+				id: redeemCard
+				width: mainColumn.width
+				height: redeemContent.height + 2 * Style.marginL
+				radius: Style.radiusS
+				color: Style.alternateBaseColor
+				border.color: Style.borderColor
+				border.width: 1
+				
+				Column {
+					id: redeemContent
+					anchors.left: redeemCard.left
+					anchors.right: redeemCard.right
+					anchors.top: redeemCard.top
+					anchors.margins: Style.marginL
+					spacing: Style.marginM
+					
+					GroupElementView {
+						id: redeemGroup
+						width: redeemContent.width
+						
+						TextInputElementView {
+							id: redeemCodeInput
+							name: qsTr("Connect Code")
+							placeHolderText: qsTr("Paste the connect code here")
+						}
+					}
+					
+					Button {
+						enabled: redeemCodeView.__canManage && redeemCodeInput.text.trim() !== ""
+						text: qsTr("Redeem Code")
+						onClicked: {
+							var code = redeemCodeInput.text.trim()
+							if (code === "") {
+								ModalDialogManager.showInfoDialog(qsTr("Connect code is required."))
+								return
+							}
+							redeemCodeView.apiClient.acceptConnectCode(
+										code,
+										redeemCodeView.tenantData ? redeemCodeView.tenantData.m_id : "")
+						}
+					}
+				}
+			}
+			
+			// --- Success feedback card ---
+			Rectangle {
+				id: successCard
+				visible: false
+				width: mainColumn.width
+				height: successContent.height + 2 * Style.marginL
+				radius: Style.radiusS
+				color: Style.alternateBaseColor
+				border.color: Style.linkColor
+				border.width: 2
+				
+				Column {
+					id: successContent
+					anchors.left: successCard.left
+					anchors.right: successCard.right
+					anchors.top: successCard.top
+					anchors.margins: Style.marginL
+					spacing: Style.marginS
+					
+					BaseText {
+						width: successContent.width
+						text: qsTr("Connection Established!")
+						font.pixelSize: Style.fontSizeM
+						font.bold: true
+						color: Style.linkColor
+					}
+					
+					BaseText {
+						width: successContent.width
+						wrapMode: Text.WordWrap
+						text: qsTr("The connect code was redeemed successfully. You can view the new connection in the Active Connections page.")
+						font.pixelSize: Style.fontSizeS
+						color: Style.inactiveTextColor
+					}
+				}
+			}
+			
+			// --- Instructions ---
+			GroupHeaderView {
+				width: mainColumn.width
+				title: qsTr("How it works")
+			}
+			
+			Column {
+				width: mainColumn.width
+				spacing: Style.marginS
+				
+				BaseText {
+					width: mainColumn.width
+					wrapMode: Text.WordWrap
+					text: qsTr("1. Receive a connect code from another tenant")
+					font.pixelSize: Style.fontSizeS
+					color: Style.textColor
+				}
+				
+				BaseText {
+					width: mainColumn.width
+					wrapMode: Text.WordWrap
+					text: qsTr("2. Paste the code in the field above")
+					font.pixelSize: Style.fontSizeS
+					color: Style.textColor
+				}
+				
+				BaseText {
+					width: mainColumn.width
+					wrapMode: Text.WordWrap
+					text: qsTr("3. Click \"Redeem Code\" to establish the connection")
+					font.pixelSize: Style.fontSizeS
+					color: Style.textColor
+				}
+				
+				BaseText {
+					width: mainColumn.width
+					wrapMode: Text.WordWrap
+					text: qsTr("4. The connection will appear in Active Connections")
+					font.pixelSize: Style.fontSizeS
+					color: Style.textColor
+				}
 			}
 		}
 	}

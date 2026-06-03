@@ -53,6 +53,7 @@ TenantContractsPage 1.0 TenantContractsPage.qml
 TenantRelationshipsPage 1.0 TenantRelationshipsPage.qml
 TenantConnectionRequestsPage 1.0 TenantConnectionRequestsPage.qml
 TenantConnectionRequestsView 1.0 TenantConnectionRequestsView.qml
+TenantConnectionOverviewView 1.0 TenantConnectionOverviewView.qml
 TenantConnectCodesView 1.0 TenantConnectCodesView.qml
 TenantRedeemCodeView 1.0 TenantRedeemCodeView.qml
 TenantConnectionsView 1.0 TenantConnectionsView.qml
