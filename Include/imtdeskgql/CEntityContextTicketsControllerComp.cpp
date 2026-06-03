@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtdeskgql/CEntityContextTicketsControllerComp.h>
-#include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/ImtDesk.h>
 
 // Qt includes
 #include <QtCore/QUuid>
@@ -10,6 +9,7 @@
 #include <istd/TDelPtr.h>
 
 // ImtCore includes
+#include <GeneratedFiles/imtdesksdl/SDL/1.0/CPP/ImtDesk.h>
 #include <imtauth/imtauth.h>
 #include <imtdeskgql/imtdeskgql.h>
 #include <imtdeskgql/TicketPermissions.h>

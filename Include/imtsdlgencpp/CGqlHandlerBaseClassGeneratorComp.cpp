@@ -1,13 +1,11 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtsdlgencpp/CGqlHandlerBaseClassGeneratorComp.h>
 
-
 // Qt includes
 #include <QtCore/QFileInfo>
 #include <QtCore/QTextStream>
 
-
-//Acf includes
+// ACF includes
 #include <istd/CSystem.h>
 #include <iprm/CParamsSet.h>
 #include <iprm/COptionsManager.h>
@@ -416,4 +414,3 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 
 
 } // namespace imtsdlgencpp
-

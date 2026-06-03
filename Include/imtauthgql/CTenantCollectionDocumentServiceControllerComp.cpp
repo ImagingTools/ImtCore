@@ -2,8 +2,8 @@
 #include <imtauthgql/CTenantCollectionDocumentServiceControllerComp.h>
 
 // ImtCore includes
-#include <imtgql/IGqlContext.h>
 #include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService.h>
+#include <imtgql/IGqlContext.h>
 #include <imtbasesdl/SDL/1.0/CPP/UndoManager.h>
 
 
