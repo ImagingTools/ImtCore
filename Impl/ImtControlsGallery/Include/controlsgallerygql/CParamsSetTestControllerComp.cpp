@@ -1,5 +1,8 @@
 #include <controlsgallerygql/CParamsSetTestControllerComp.h>
 
+// ImtCore includes
+#include <GeneratedFiles/controlsgallerysdl/SDL/1.0/CPP/ParamsSetTest.h>
+
 
 namespace controlsgallerygql
 {

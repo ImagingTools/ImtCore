@@ -1,10 +1,10 @@
 #include <controlsgallerygql/CContactInfoCollectionDocumentServiceComp.h>
 
-
 // ACF includes
 #include <istd/CChangeGroup.h>
 
 // ImtCore includes
+#include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentService.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtauth/IContactInfo.h>
 
