@@ -16,6 +16,7 @@ Rectangle {
 	property Item list
 	property var reorderManager
 	property Item dragTarget: content
+	property Item zTarget: dragTarget.parent
 	property alias dragArea: da
 	property alias contentContainer: content
 
@@ -60,7 +61,7 @@ Rectangle {
 			deleg.pressed()
 			deleg.reorderManager.selectedId = model[deleg.idRole] !== undefined ? model[deleg.idRole] : model.item[deleg.sdlVarPrefix + deleg.idRole]
 			held = true
-			deleg.dragTarget.parent.z = 100
+			deleg.zTarget.z = 100
 			deleg.reorderManager.fromIndex = model.index
 			deleg.reorderManager.toIndex = -1
 			deleg.dragTarget.anchors.verticalCenter = undefined
@@ -68,7 +69,7 @@ Rectangle {
 
 		onReleased: {
 			deleg.released()
-			deleg.dragTarget.parent.z = 0
+			deleg.zTarget.z = 0
 			let hasToIndex = deleg.reorderManager.toIndex < 0 ? false : deleg.reorderManager.enteredInfo[deleg.reorderManager.toIndex]
 			held = false
 			if(hasToIndex){
