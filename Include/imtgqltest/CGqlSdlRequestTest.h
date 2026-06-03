@@ -21,7 +21,7 @@ class CGqlSdlRequestTest: public QObject
 	Q_OBJECT
 protected:
 	template <class  Request, class  Arguments, class  ResponseData>
-	bool SendRequest(Arguments arguments, class ResponseData::V1_0& response) const
+	bool SendRequest(Arguments arguments, ResponseData& response) const
 	{
 		imtgql::CGqlRequest gqlRequest;
 

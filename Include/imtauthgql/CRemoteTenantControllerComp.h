@@ -71,6 +71,106 @@ protected:
 				const sdl::V1_0::imtauth::CRemoveTenantRelationshipGqlRequest& removeTenantRelationshipRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CGetCrossOrgGrantsPayload OnGetCrossOrgGrants(
+				const sdl::V1_0::imtauth::CGetCrossOrgGrantsGqlRequest& getCrossOrgGrantsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CCreateCrossOrgGrantPayload OnCreateCrossOrgGrant(
+				const sdl::V1_0::imtauth::CCreateCrossOrgGrantGqlRequest& createCrossOrgGrantRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CRevokeCrossOrgGrantPayload OnRevokeCrossOrgGrant(
+				const sdl::V1_0::imtauth::CRevokeCrossOrgGrantGqlRequest& revokeCrossOrgGrantRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CGetContractsPayload OnGetContracts(
+				const sdl::V1_0::imtauth::CGetContractsGqlRequest& getContractsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CCreateContractPayload OnCreateContract(
+				const sdl::V1_0::imtauth::CCreateContractGqlRequest& createContractRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CUpdateContractStatusPayload OnUpdateContractStatus(
+				const sdl::V1_0::imtauth::CUpdateContractStatusGqlRequest& updateContractStatusRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CTerminateContractPayload OnTerminateContract(
+				const sdl::V1_0::imtauth::CTerminateContractGqlRequest& terminateContractRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CEnsureSystemTenantPayload OnEnsureSystemTenant(
+				const sdl::V1_0::imtauth::CEnsureSystemTenantGqlRequest& ensureSystemTenantRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CGetTenantConnectionRequestsPayload OnGetTenantConnectionRequests(
+				const sdl::V1_0::imtauth::CGetTenantConnectionRequestsGqlRequest& getTenantConnectionRequestsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CGetTenantConnectCodeDetailsPayload OnGetTenantConnectCodeDetails(
+				const sdl::V1_0::imtauth::CGetTenantConnectCodeDetailsGqlRequest& getTenantConnectCodeDetailsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CCreateTenantConnectionRequestPayload OnCreateTenantConnectionRequest(
+				const sdl::V1_0::imtauth::CCreateTenantConnectionRequestGqlRequest& createTenantConnectionRequestRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CCreateTenantConnectCodePayload OnCreateTenantConnectCode(
+				const sdl::V1_0::imtauth::CCreateTenantConnectCodeGqlRequest& createTenantConnectCodeRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CAcceptTenantConnectionRequestPayload OnAcceptTenantConnectionRequest(
+				const sdl::V1_0::imtauth::CAcceptTenantConnectionRequestGqlRequest& acceptTenantConnectionRequestRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CAcceptTenantConnectCodePayload OnAcceptTenantConnectCode(
+				const sdl::V1_0::imtauth::CAcceptTenantConnectCodeGqlRequest& acceptTenantConnectCodeRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CRejectTenantConnectionRequestPayload OnRejectTenantConnectionRequest(
+				const sdl::V1_0::imtauth::CRejectTenantConnectionRequestGqlRequest& rejectTenantConnectionRequestRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CRevokeTenantConnectionRequestPayload OnRevokeTenantConnectionRequest(
+				const sdl::V1_0::imtauth::CRevokeTenantConnectionRequestGqlRequest& revokeTenantConnectionRequestRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CGetCrossTenantMessagePayload OnGetCrossTenantMessage(
+				const sdl::V1_0::imtauth::CGetCrossTenantMessageGqlRequest& getCrossTenantMessageRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CGetCrossTenantMessagesPayload OnGetCrossTenantMessages(
+				const sdl::V1_0::imtauth::CGetCrossTenantMessagesGqlRequest& getCrossTenantMessagesRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CSendCrossTenantMessagePayload OnSendCrossTenantMessage(
+				const sdl::V1_0::imtauth::CSendCrossTenantMessageGqlRequest& sendCrossTenantMessageRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CUpdateCrossTenantMessageStatusPayload OnUpdateCrossTenantMessageStatus(
+				const sdl::V1_0::imtauth::CUpdateCrossTenantMessageStatusGqlRequest& updateCrossTenantMessageStatusRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CGetOrderRequestPayload OnGetOrderRequest(
+				const sdl::V1_0::imtauth::CGetOrderRequestGqlRequest& getOrderRequestRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CGetOrderRequestsPayload OnGetOrderRequests(
+				const sdl::V1_0::imtauth::CGetOrderRequestsGqlRequest& getOrderRequestsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CConfirmOrderRequestPayload OnConfirmOrderRequest(
+				const sdl::V1_0::imtauth::CConfirmOrderRequestGqlRequest& confirmOrderRequestRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CRejectOrderRequestPayload OnRejectOrderRequest(
+				const sdl::V1_0::imtauth::CRejectOrderRequestGqlRequest& rejectOrderRequestRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CUpdateOrderRequestStatusPayload OnUpdateOrderRequestStatus(
+				const sdl::V1_0::imtauth::CUpdateOrderRequestStatusGqlRequest& updateOrderRequestStatusRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 
 private:
 	I_FACT(imtauth::ITenantInfo, m_tenantFactoryCompPtr);

@@ -63,6 +63,41 @@ QtObject {
 	signal userUpdated(string userId)
 	signal userDataReceived(var data)
 
+	// --- Cross-org grants ---
+	signal crossOrgGrantCreated(string grantId)
+	signal crossOrgGrantRevoked(string grantId)
+	signal crossOrgGrantsReceived(var grants)
+
+	// --- Cooperation contracts ---
+	signal contractCreated(string contractId)
+	signal contractStatusUpdated(string contractId)
+	signal contractTerminated(string contractId)
+	signal contractsReceived(var contracts)
+
+	// --- Tenant relationships (asymmetric) ---
+	signal tenantRelationshipAdded(string relationshipId)
+	signal tenantRelationshipRemoved(string relationshipId)
+	signal tenantRelationshipsReceived(var relationships)
+
+	// --- Tenant connection requests (discovery) ---
+	signal connectionRequestCreated(string requestId)
+	signal connectCodeCreated(string requestId, string connectCode)
+	signal connectionRequestAccepted(string requestId)
+	signal connectionRequestRejected(string requestId)
+	signal connectionRequestRevoked(string requestId)
+	signal connectionRequestsReceived(var requests)
+
+	// --- Cross-tenant messages (phase 2) ---
+	signal crossTenantMessageSent(string messageId)
+	signal crossTenantMessageStatusUpdated(string messageId)
+	signal crossTenantMessagesReceived(var messages)
+
+	// --- Order requests (phase 3) ---
+	signal orderRequestConfirmed(string orderRequestId)
+	signal orderRequestRejected(string orderRequestId)
+	signal orderRequestStatusUpdated(string orderRequestId)
+	signal orderRequestsReceived(var orderRequests)
+
 	// --- Generic error ---
 	signal requestFailed(string message)
 
@@ -71,6 +106,10 @@ QtObject {
 	signal subscriptionInvitationAccepted(var notification)
 	signal subscriptionInvitationRejected(var notification)
 	signal subscriptionOwnershipTransferred(var notification)
+
+	// --- Real-time cross-tenant message subscription notifications ---
+	signal subscriptionCrossTenantMessageReceived(var notification)
+	signal subscriptionCrossTenantMessageStatusChanged(var notification)
 
 	// --- Stub methods (overridden by concrete implementations) ---
 	function createInvitation(tenantId, userId, role) {}
@@ -102,4 +141,61 @@ QtObject {
 	// --- Permissions ---
 	property var permissionsModel: null
 	function fetchPermissions() {}
+
+	// --- Cross-org grants ---
+	// Model holding the cross-org grants for the current tenant (see
+	// crossOrgGrantsReceived for the raw payload).
+	property var crossOrgGrantsModel: null
+	// List data providers for filterable entity selectors
+	property var tenantsListDataProvider: null
+	property var tenantRelationshipsListDataProvider: null
+	function fetchCrossOrgGrants(tenantId) {}
+	function createCrossOrgGrant(sourceTenantId, targetTenantId, relationshipId, accessLevel, resourceScope, targetTeamId, description, expiresAt) {}
+	function revokeCrossOrgGrant(grantId) {}
+
+	// --- Cooperation contracts ---
+	// Model holding the contracts for the current tenant (see
+	// contractsReceived for the raw payload).
+	property var contractsModel: null
+	function fetchContracts(tenantId) {}
+	function createContract(relationshipId, sourceTenantId, targetTenantId, scope, validFrom, validUntil, description, terms) {}
+	function updateContractStatus(contractId, status) {}
+	function terminateContract(contractId) {}
+
+	// --- Tenant relationships (asymmetric) ---
+	// Model holding the relationships for the current tenant (see
+	// tenantRelationshipsReceived for the raw payload).
+	property var tenantRelationshipsModel: null
+	function fetchTenantRelationships(tenantId) {}
+	function addTenantRelationship(sourceTenantId, targetTenantId, sourceRole, targetRole, scope, validFrom, validUntil, description) {}
+	function removeTenantRelationship(tenantId, relationshipId) {}
+
+	// --- Tenant connection requests (discovery) ---
+	// Model holding the connection requests for the current tenant (see
+	// connectionRequestsReceived for the raw payload).
+	property var connectionRequestsModel: null
+	function fetchConnectionRequests(tenantId) {}
+	function createConnectionRequest(sourceTenantId, targetIdentifier, proposedSourceRole, proposedTargetRole, message, expiresAt) {}
+	function createConnectCode(sourceTenantId, proposedSourceRole, proposedTargetRole, message, expiresAt) {}
+	function acceptConnectionRequest(requestId, acceptingTenantId) {}
+	function acceptConnectCode(connectCode, acceptingTenantId) {}
+	function rejectConnectionRequest(requestId) {}
+	function revokeConnectionRequest(requestId) {}
+
+	// --- Cross-tenant messages (phase 2) ---
+	// Model holding the cross-tenant messages for the current tenant (see
+	// crossTenantMessagesReceived for the raw payload).
+	property var crossTenantMessagesModel: null
+	function fetchCrossTenantMessages(tenantId, direction) {}
+	function sendCrossTenantMessage(sourceTenantId, targetTenantId, relationshipId, messageType, payload, sourceObjectId, customType, expiresAt) {}
+	function updateCrossTenantMessageStatus(messageId, status, errorMessage) {}
+
+	// --- Order requests (phase 3) ---
+	// Model holding the order requests for the current tenant (see
+	// orderRequestsReceived for the raw payload).
+	property var orderRequestsModel: null
+	function fetchOrderRequests(tenantId) {}
+	function confirmOrderRequest(orderRequestId, note) {}
+	function rejectOrderRequest(orderRequestId, reason) {}
+	function updateOrderRequestStatus(orderRequestId, status, note) {}
 }

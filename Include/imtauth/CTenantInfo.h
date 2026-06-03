@@ -39,6 +39,15 @@ public:
 	virtual bool RemoveRelationship(const QByteArray& relationshipId) override;
 	virtual QByteArrayList GetTenantPermissions() const override;
 	virtual void SetTenantPermissions(const QByteArrayList& permissions) override;
+	virtual QByteArray GetParentTenantId() const override;
+	virtual void SetParentTenantId(const QByteArray& parentTenantId) override;
+
+	// Hierarchy fields (internal, for DB/serialization)
+	int GetDepth() const;
+	void SetDepth(int depth);
+	QString GetMaterializedPath() const;
+	void SetMaterializedPath(const QString& path);
+	bool IsSystemTenant() const;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -59,6 +68,9 @@ protected:
 	QString m_updatedAt;
 	TenantRelationships m_relationships;
 	QByteArrayList m_tenantPermissions;
+	QByteArray m_parentTenantId;
+	int m_depth;
+	QString m_materializedPath;
 };
 
 
