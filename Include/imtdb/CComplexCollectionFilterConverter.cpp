@@ -33,12 +33,13 @@ QMap<imtbase::IComplexCollectionFilter::FieldOperation, QString> boolOperations(
 
 QSet<int> dateTypes({ QMetaType::QDateTime, QMetaType::QDate });
 QMap<imtbase::IComplexCollectionFilter::FieldOperation, QString> dateOperations({
-	{imtbase::IComplexCollectionFilter::FO_EQUAL, "="},
-	{imtbase::IComplexCollectionFilter::FO_NOT_EQUAL, "!="},
-	{imtbase::IComplexCollectionFilter::FO_LESS, "<"},
-	{imtbase::IComplexCollectionFilter::FO_GREATER, ">"},
-	{imtbase::IComplexCollectionFilter::FO_NOT_LESS, ">="},
-	{imtbase::IComplexCollectionFilter::FO_NOT_GREATER, "<="}});
+	{ imtbase::IComplexCollectionFilter::FO_EQUAL,		 QStringLiteral("=")	},
+	{ imtbase::IComplexCollectionFilter::FO_NOT_EQUAL,	 QStringLiteral("!=")	},
+	{ imtbase::IComplexCollectionFilter::FO_LESS,		 QStringLiteral("<")	},
+	{ imtbase::IComplexCollectionFilter::FO_GREATER,	 QStringLiteral(">")	},
+	{ imtbase::IComplexCollectionFilter::FO_NOT_LESS,	 QStringLiteral(">=")	},
+	{ imtbase::IComplexCollectionFilter::FO_NOT_GREATER, QStringLiteral("<=")	}
+});
 
 QSet<imtbase::IComplexCollectionFilter::FieldOperation> arrayOperations({
 	imtbase::IComplexCollectionFilter::FO_ARRAY_HAS_ANY,
