@@ -96,7 +96,10 @@ DocumentViewBase {
 						multiPageView.addPage("CrossOrgGrants", qsTr("Cross-Org Grants"), crossOrgGrantsPageComp, "Icons/Crown")
 						multiPageView.addPage("Contracts", qsTr("Contracts"), contractsPageComp, "Icons/Assignment")
 						multiPageView.addPage("Relationships", qsTr("Relationships"), relationshipsPageComp, "Icons/Participant")
-						multiPageView.addPage("Connections", qsTr("Connections"), connectionRequestsPageComp, "Icons/Communication")
+						multiPageView.addPage("Connections", qsTr("Connections"), connectionOverviewPageComp, "Icons/Communication")
+						multiPageView.addSubPage("Connections", "ConnectCodes", qsTr("Connect Codes"), connectCodesPageComp, "Icons/Key")
+						multiPageView.addSubPage("Connections", "RedeemCode", qsTr("Redeem Code"), redeemCodePageComp, "Icons/Unlock")
+						multiPageView.addSubPage("Connections", "ActiveConnections", qsTr("Active Connections"), activeConnectionsPageComp, "Icons/Online")
 						multiPageView.addPage("Messages", qsTr("Messages"), messagesPageComp, "Icons/Message")
 					}
 			}
@@ -318,9 +321,39 @@ DocumentViewBase {
 	}
 
 	Component {
-		id: connectionRequestsPageComp
+		id: connectionOverviewPageComp
 
-		TenantConnectionRequestsPage {
+		TenantConnectionOverviewView {
+			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
+		}
+	}
+
+	Component {
+		id: connectCodesPageComp
+
+		TenantConnectCodesView {
+			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
+		}
+	}
+
+	Component {
+		id: redeemCodePageComp
+
+		TenantRedeemCodeView {
+			model: container.tenantData
+			stateManager: stateManager_
+			apiClient: container.apiClient
+		}
+	}
+
+	Component {
+		id: activeConnectionsPageComp
+
+		TenantConnectionsView {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient

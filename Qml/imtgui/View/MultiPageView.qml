@@ -22,11 +22,36 @@ Item {
     }
 
     function addPage(pageId, pageName, pageComp, icon){
-        pagesModel.append({id: pageId, name: pageName, SourceComponent: pageComp, icon: icon})
+        pagesModel.append({id: pageId, name: pageName, SourceComponent: pageComp, icon: icon, parentId: "", isSubpage: false, expanded: false})
+    }
+
+    function addSubPage(parentId, pageId, pageName, pageComp, icon){
+        var parentIndex = getIndexById(parentId)
+        if (parentIndex < 0) {
+            return
+        }
+        // Mark parent as having subpages
+        pagesModel.setProperty(parentIndex, "expanded", true)
+        // Find insertion point (after parent and existing subpages of this parent)
+        var insertAt = parentIndex + 1
+        while (insertAt < pagesModel.count) {
+            var item = pagesModel.get(insertAt)
+            if (item.parentId !== parentId) {
+                break
+            }
+            insertAt++
+        }
+        pagesModel.insert(insertAt, {id: pageId, name: pageName, SourceComponent: pageComp, icon: icon, parentId: parentId, isSubpage: true, expanded: false})
     }
 
     function removePage(pageId){
-        let index = getIndexById(pageId);
+        // Remove subpages first
+        for (var i = pagesModel.count - 1; i >= 0; i--) {
+            if (pagesModel.get(i).parentId === pageId) {
+                pagesModel.remove(i)
+            }
+        }
+        var index = getIndexById(pageId);
         if (index >= 0){
             pagesModel.remove(index);
         }
@@ -61,6 +86,31 @@ Item {
         return -1;
     }
 
+    function hasSubPages(pageId) {
+        for (var i = 0; i < pagesModel.count; i++) {
+            if (pagesModel.get(i).parentId === pageId) {
+                return true
+            }
+        }
+        return false
+    }
+
+    function toggleExpanded(pageId) {
+        var idx = getIndexById(pageId)
+        if (idx >= 0) {
+            var current = pagesModel.get(idx).expanded
+            pagesModel.setProperty(idx, "expanded", !current)
+        }
+    }
+
+    function isExpanded(pageId) {
+        var idx = getIndexById(pageId)
+        if (idx >= 0) {
+            return pagesModel.get(idx).expanded
+        }
+        return false
+    }
+
     // --- Left sidebar ---
     Item {
         id: sidebarPanel;
@@ -89,8 +139,14 @@ Item {
                 delegate: Rectangle {
                     id: navItem;
 
+                    readonly property bool __isParentWithSubs: root.hasSubPages(model.id)
+                    readonly property bool __isSubpage: model.isSubpage
+                    readonly property string __parentId: model.parentId || ""
+                    readonly property bool __parentExpanded: __isSubpage ? root.isExpanded(__parentId) : true
+
+                    visible: !__isSubpage || __parentExpanded
                     width: sidebarColumn.width;
-                    height: Style.controlHeightM;
+                    height: visible ? Style.controlHeightM : 0;
                     radius: Style.marginS;
                     color: root.currentIndex === model.index
                         ? Style.selectedColor
@@ -98,9 +154,22 @@ Item {
 
                     Row {
                         anchors.fill: parent;
-                        anchors.leftMargin: Style.marginM;
+                        anchors.leftMargin: navItem.__isSubpage ? Style.marginM + Style.marginL : Style.marginM;
                         anchors.rightMargin: Style.marginM;
                         spacing: Style.marginS;
+
+                        // Expand/collapse arrow for parents with subpages
+                        Image {
+                            visible: navItem.__isParentWithSubs
+                            anchors.verticalCenter: parent.verticalCenter;
+                            width: Style.iconSizeXS;
+                            height: Style.iconSizeXS;
+                            source: root.isExpanded(model.id)
+                                ? "qrc:/" + Style.getIconPath("Icons/ArrowDown", Icon.State.On, Icon.Mode.Normal)
+                                : "qrc:/" + Style.getIconPath("Icons/ArrowRight", Icon.State.On, Icon.Mode.Normal)
+                            sourceSize.width: width
+                            sourceSize.height: height
+                        }
 
                         Image {
                             visible: model.icon
@@ -118,11 +187,13 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter;
                             text: model.name;
                             font.family: Style.fontFamily;
-                            font.pixelSize: Style.fontSizeM;
+                            font.pixelSize: navItem.__isSubpage ? Style.fontSizeS : Style.fontSizeM;
                             font.bold: root.currentIndex === model.index;
                             color: root.currentIndex === model.index ? Style.textSelectedColor : Style.textColor;
                             elide: Text.ElideRight;
-                            width: parent.width - parent.anchors.leftMargin - parent.anchors.rightMargin - (model.icon ? Style.iconSizeS + parent.spacing : 0);
+                            width: parent.width - parent.anchors.leftMargin - parent.anchors.rightMargin
+                                - (model.icon ? Style.iconSizeS + parent.spacing : 0)
+                                - (navItem.__isParentWithSubs ? Style.iconSizeXS + parent.spacing : 0);
                         }
                     }
 
@@ -134,6 +205,9 @@ Item {
                         cursorShape: Qt.PointingHandCursor;
 
                         onClicked: {
+                            if (navItem.__isParentWithSubs) {
+                                root.toggleExpanded(model.id)
+                            }
                             root.currentIndex = model.index;
                         }
                     }

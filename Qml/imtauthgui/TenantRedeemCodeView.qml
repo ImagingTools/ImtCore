@@ -71,6 +71,10 @@ ViewBase {
 			redeemCodeView.__preview = null
 			redeemCodeInput.text = ""
 			PopupManager.addSuccessMessage(qsTr("Connect code successfully redeemed! Connection established."), true)
+			// Refresh connection requests so Active Connections picks up the new connection
+			if (redeemCodeView.apiClient && redeemCodeView.tenantData && redeemCodeView.tenantData.m_id) {
+				redeemCodeView.apiClient.fetchConnectionRequests(redeemCodeView.tenantData.m_id)
+			}
 		}
 
 		function onConnectionRequestRejected(requestId) {
