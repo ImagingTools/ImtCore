@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="CrossOrgGrantInfo" X="125" Y="125" Note=""/>
+        <Element ComponentName="CrossOrgGrantManager" X="600" Y="125" Note=""/>
+        <Element ComponentName="CrossTenantMessageBroker" X="575" Y="325" Note=""/>
+        <Element ComponentName="CrossTenantMessageInfo" X="900" Y="500" Note=""/>
+        <Element ComponentName="CrossTenantMessageNotificationPublisher" X="550" Y="750" Note=""/>
+        <Element ComponentName="CrossTenantMessageProjection" X="225" Y="475" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

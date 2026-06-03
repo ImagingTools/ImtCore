@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="TenantInvitationInfo" X="1000" Y="350" Note=""/>
+        <Element ComponentName="TenantInvitationManager" X="725" Y="150" Note=""/>
+        <Element ComponentName="TenantMembershipInfo" X="125" Y="400" Note=""/>
+        <Element ComponentName="TenantMembershipManager" X="400" Y="150" Note=""/>
+        <Element ComponentName="TenantMembershipManagerController" X="525" Y="525" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>
