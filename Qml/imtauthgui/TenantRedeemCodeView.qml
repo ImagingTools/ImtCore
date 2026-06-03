@@ -11,8 +11,10 @@ import imtauthgui 1.0
 /**
  * TenantRedeemCodeView
  *
- * Page for activating received connect codes.
- * Card-based layout with clear instructions and feedback.
+ * Two-step page for activating received connect codes:
+ *   Step 1 — Enter the code and click "Check Code" to see a preview.
+ *   Step 2 — Review the preview (source tenant, relationship, message) and
+ *             click "Confirm Connection" to complete, or "Cancel" to go back.
  */
 ViewBase {
 	id: redeemCodeView
@@ -22,33 +24,60 @@ ViewBase {
 	readonly property var tenantData: redeemCodeView.model
 	property var stateManager: null
 	property var apiClient: null
-	
+
 	readonly property bool __canManage: redeemCodeView.stateManager
 										&& (redeemCodeView.stateManager.isCreator || redeemCodeView.stateManager.isOwner)
-	
+
+	// Preview state
+	property var __preview: null
+	property bool __showPreview: redeemCodeView.__preview !== null
+	property bool __redeemed: false
+
 	function updateGui() {
 		// No specific GUI updates needed for this view
 	}
-	
+
 	function updateModel() {
 		// No model updates needed for this view
 	}
-	
-	// --- Real-time subscription-based updates ---
+
+	function __reset() {
+		redeemCodeView.__preview = null
+		redeemCodeView.__redeemed = false
+		redeemCodeInput.text = ""
+	}
+
+	// --- Subscription-based updates ---
 	Connections {
 		target: redeemCodeView.apiClient
-		
-		function onConnectionRequestAccepted(requestId) {
-			PopupManager.addSuccessMessage(qsTr("Connect code successfully redeemed! Connection established."), true)
-			redeemCodeInput.text = ""
-			successCard.visible = true
+
+		function onConnectCodeDetailsReceived(preview) {
+			if (!preview) {
+				ModalDialogManager.showInfoDialog(qsTr("Connect code not found or already used."))
+				return
+			}
+			redeemCodeView.__preview = {
+				"sourceTenantId":    preview.m_sourceTenantId    || "",
+				"sourceTenantName":  preview.m_sourceTenantName  || "",
+				"proposedSourceRole": preview.m_proposedSourceRole || "",
+				"proposedTargetRole": preview.m_proposedTargetRole || "",
+				"message":           preview.m_message            || "",
+				"expiresAt":         preview.m_expiresAt          || ""
+			}
 		}
-		
+
+		function onConnectionRequestAccepted(requestId) {
+			redeemCodeView.__redeemed = true
+			redeemCodeView.__preview = null
+			redeemCodeInput.text = ""
+			PopupManager.addSuccessMessage(qsTr("Connect code successfully redeemed! Connection established."), true)
+		}
+
 		function onConnectionRequestRejected(requestId) {
 			PopupManager.addErrorMessage(qsTr("Failed to redeem connect code. The code may be expired or invalid."), true)
 		}
 	}
-	
+
 	CustomScrollbar {
 		id: scrollbar
 		z: redeemCodeView.z + 1
@@ -58,7 +87,7 @@ ViewBase {
 		secondSize: Style.marginM
 		targetItem: mainFlickable
 	}
-	
+
 	Flickable {
 		id: mainFlickable
 		anchors.top: parent.top
@@ -71,37 +100,40 @@ ViewBase {
 		contentHeight: mainColumn.height + 2 * Style.marginXL
 		boundsBehavior: Flickable.StopAtBounds
 		clip: true
-		
+
 		Column {
 			id: mainColumn
 			width: mainFlickable.width
 			spacing: Style.marginXL
-			
-			// =============================================================
-			// SECTION: Redeem a Connect Code
-			// =============================================================
+
+			// ================================================================
+			// SECTION: Redeem a Connect Code (step 1 — enter code)
+			// ================================================================
 			GroupHeaderView {
 				width: mainColumn.width
 				title: qsTr("Redeem a Connect Code")
+				visible: !redeemCodeView.__showPreview && !redeemCodeView.__redeemed
 			}
-			
+
 			BaseText {
 				width: mainColumn.width
+				visible: !redeemCodeView.__showPreview && !redeemCodeView.__redeemed
 				wrapMode: Text.WordWrap
-				text: qsTr("Enter a connect code you received from another tenant to establish a connection. The code will be consumed after successful redemption.")
+				text: qsTr("Paste a connect code received from another tenant. Click \"Check Code\" to preview the connection details before confirming.")
 				font.pixelSize: Style.fontSizeS
 				color: Style.inactiveTextColor
 			}
-			
+
 			Rectangle {
 				id: redeemCard
+				visible: !redeemCodeView.__showPreview && !redeemCodeView.__redeemed
 				width: mainColumn.width
 				height: redeemContent.height + 2 * Style.marginL
 				radius: Style.radiusS
 				color: Style.alternateBaseColor
 				border.color: Style.borderColor
 				border.width: 1
-				
+
 				Column {
 					id: redeemContent
 					anchors.left: redeemCard.left
@@ -109,46 +141,160 @@ ViewBase {
 					anchors.top: redeemCard.top
 					anchors.margins: Style.marginL
 					spacing: Style.marginM
-					
+
 					GroupElementView {
 						id: redeemGroup
 						width: redeemContent.width
-						
+
 						TextInputElementView {
 							id: redeemCodeInput
 							name: qsTr("Connect Code")
 							placeHolderText: qsTr("Paste the connect code here")
 						}
 					}
-					
+
 					Button {
 						enabled: redeemCodeView.__canManage && redeemCodeInput.text.trim() !== ""
-						text: qsTr("Redeem Code")
+						text: qsTr("Check Code")
 						onClicked: {
 							var code = redeemCodeInput.text.trim()
 							if (code === "") {
 								ModalDialogManager.showInfoDialog(qsTr("Connect code is required."))
 								return
 							}
-							redeemCodeView.apiClient.acceptConnectCode(
-										code,
-										redeemCodeView.tenantData ? redeemCodeView.tenantData.m_id : "")
+							if (redeemCodeView.apiClient) {
+								redeemCodeView.apiClient.getConnectCodeDetails(code)
+							}
 						}
 					}
 				}
 			}
-			
-			// --- Success feedback card ---
+
+			// ================================================================
+			// SECTION: Connection Preview (step 2 — confirm or cancel)
+			// ================================================================
+			GroupHeaderView {
+				width: mainColumn.width
+				visible: redeemCodeView.__showPreview
+				title: qsTr("Connection Preview")
+			}
+
+			BaseText {
+				width: mainColumn.width
+				visible: redeemCodeView.__showPreview
+				wrapMode: Text.WordWrap
+				text: qsTr("Review the connection details below. Click \"Confirm Connection\" to establish the connection, or \"Cancel\" to go back.")
+				font.pixelSize: Style.fontSizeS
+				color: Style.inactiveTextColor
+			}
+
+			Rectangle {
+				id: previewCard
+				visible: redeemCodeView.__showPreview
+				width: mainColumn.width
+				height: previewContent.height + 2 * Style.marginL
+				radius: Style.radiusS
+				color: Style.alternateBaseColor
+				border.color: Style.linkColor
+				border.width: 2
+
+				Column {
+					id: previewContent
+					anchors.left: previewCard.left
+					anchors.right: previewCard.right
+					anchors.top: previewCard.top
+					anchors.margins: Style.marginL
+					spacing: Style.marginS
+
+					GroupElementView {
+						width: previewContent.width
+
+						TextInputElementView {
+							name: qsTr("Source Tenant")
+							readOnly: true
+							text: {
+								var p = redeemCodeView.__preview
+								if (!p)
+									return ""
+								var tName = p.sourceTenantName || ""
+								var tId = p.sourceTenantId || ""
+								if (tName !== "" && tId !== "")
+									return tName + " (" + tId + ")"
+								return tName !== "" ? tName : tId
+							}
+						}
+
+						TextInputElementView {
+							name: qsTr("Relationship")
+							readOnly: true
+							text: {
+								var p = redeemCodeView.__preview
+								if (!p)
+									return ""
+								return (p.proposedSourceRole || qsTr("Partner"))
+									+ " → "
+									+ (p.proposedTargetRole || qsTr("Partner"))
+							}
+						}
+
+						TextInputElementView {
+							name: qsTr("Message")
+							readOnly: true
+							visible: redeemCodeView.__preview && redeemCodeView.__preview.message !== ""
+							text: redeemCodeView.__preview ? (redeemCodeView.__preview.message || "") : ""
+						}
+
+						TextInputElementView {
+							name: qsTr("Expires")
+							readOnly: true
+							visible: redeemCodeView.__preview && redeemCodeView.__preview.expiresAt !== ""
+							text: redeemCodeView.__preview ? (redeemCodeView.__preview.expiresAt || "") : ""
+						}
+					}
+
+					Row {
+						spacing: Style.marginM
+
+						Button {
+							enabled: redeemCodeView.__canManage
+							text: qsTr("Confirm Connection")
+							onClicked: {
+								var code = redeemCodeInput.text.trim()
+								if (code === "") {
+									ModalDialogManager.showInfoDialog(qsTr("Connect code is required."))
+									return
+								}
+								if (redeemCodeView.apiClient) {
+									redeemCodeView.apiClient.acceptConnectCode(
+										code,
+										redeemCodeView.tenantData ? redeemCodeView.tenantData.m_id : "")
+								}
+							}
+						}
+
+						Button {
+							text: qsTr("Cancel")
+							onClicked: {
+								redeemCodeView.__preview = null
+							}
+						}
+					}
+				}
+			}
+
+			// ================================================================
+			// SECTION: Success feedback
+			// ================================================================
 			Rectangle {
 				id: successCard
-				visible: false
+				visible: redeemCodeView.__redeemed
 				width: mainColumn.width
 				height: successContent.height + 2 * Style.marginL
 				radius: Style.radiusS
 				color: Style.alternateBaseColor
 				border.color: Style.linkColor
 				border.width: 2
-				
+
 				Column {
 					id: successContent
 					anchors.left: successCard.left
@@ -156,7 +302,7 @@ ViewBase {
 					anchors.top: successCard.top
 					anchors.margins: Style.marginL
 					spacing: Style.marginS
-					
+
 					BaseText {
 						width: successContent.width
 						text: qsTr("Connection Established!")
@@ -164,7 +310,7 @@ ViewBase {
 						font.bold: true
 						color: Style.linkColor
 					}
-					
+
 					BaseText {
 						width: successContent.width
 						wrapMode: Text.WordWrap
@@ -172,19 +318,30 @@ ViewBase {
 						font.pixelSize: Style.fontSizeS
 						color: Style.inactiveTextColor
 					}
+
+					Button {
+						text: qsTr("Redeem Another Code")
+						onClicked: {
+							redeemCodeView.__reset()
+						}
+					}
 				}
 			}
-			
-			// --- Instructions ---
+
+			// ================================================================
+			// SECTION: How it works (always visible)
+			// ================================================================
 			GroupHeaderView {
 				width: mainColumn.width
+				visible: !redeemCodeView.__redeemed
 				title: qsTr("How it works")
 			}
-			
+
 			Column {
 				width: mainColumn.width
+				visible: !redeemCodeView.__redeemed
 				spacing: Style.marginS
-				
+
 				BaseText {
 					width: mainColumn.width
 					wrapMode: Text.WordWrap
@@ -192,23 +349,23 @@ ViewBase {
 					font.pixelSize: Style.fontSizeS
 					color: Style.textColor
 				}
-				
+
 				BaseText {
 					width: mainColumn.width
 					wrapMode: Text.WordWrap
-					text: qsTr("2. Paste the code in the field above")
+					text: qsTr("2. Paste the code and click \"Check Code\" to preview connection details")
 					font.pixelSize: Style.fontSizeS
 					color: Style.textColor
 				}
-				
+
 				BaseText {
 					width: mainColumn.width
 					wrapMode: Text.WordWrap
-					text: qsTr("3. Click \"Redeem Code\" to establish the connection")
+					text: qsTr("3. Review the preview and click \"Confirm Connection\" to establish the connection")
 					font.pixelSize: Style.fontSizeS
 					color: Style.textColor
 				}
-				
+
 				BaseText {
 					width: mainColumn.width
 					wrapMode: Text.WordWrap

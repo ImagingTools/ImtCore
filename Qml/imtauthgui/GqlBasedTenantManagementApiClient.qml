@@ -97,6 +97,7 @@ QtObject {
 
 	signal connectionRequestCreated(string requestId)
 	signal connectCodeCreated(string requestId, string connectCode)
+	signal connectCodeDetailsReceived(var preview)
 	signal connectionRequestAccepted(string requestId)
 	signal connectionRequestRejected(string requestId)
 	signal connectionRequestRevoked(string requestId)
@@ -1311,6 +1312,30 @@ QtObject {
 	function fetchConnectionRequests(tenantId) {
 		root.__getConnectionRequestsInput.m_tenantId = tenantId || root.tenantId || ""
 		root.__getConnectionRequestsSender.send(root.__getConnectionRequestsInput)
+	}
+
+	property GetTenantConnectCodeDetailsInput __getConnectCodeDetailsInput: GetTenantConnectCodeDetailsInput {}
+	property GqlSdlRequestSender __getConnectCodeDetailsSender: GqlSdlRequestSender {
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_getTenantConnectCodeDetails
+
+		sdlObjectComp: Component {
+			GetTenantConnectCodeDetailsPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						var preview = m_preview
+						root.connectCodeDetailsReceived(preview)
+					}
+				}
+			}
+		}
+	}
+
+	function getConnectCodeDetails(connectCode) {
+		root.__getConnectCodeDetailsInput.m_connectCode = connectCode || ""
+		root.__getConnectCodeDetailsSender.send(root.__getConnectCodeDetailsInput)
 	}
 
 	function createConnectionRequest(sourceTenantId, targetIdentifier, proposedSourceRole, proposedTargetRole, message, expiresAt) {

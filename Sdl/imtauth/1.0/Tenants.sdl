@@ -471,6 +471,24 @@ type GetTenantConnectionRequestsPayload {
 	errorMessage: String
 }
 
+input GetTenantConnectCodeDetailsInput {
+	connectCode: String!
+}
+
+type TenantConnectCodePreview {
+	sourceTenantId: ID
+	sourceTenantName: String
+	proposedSourceRole: TenantRelationshipRole
+	proposedTargetRole: TenantRelationshipRole
+	message: String
+	expiresAt: String
+}
+
+type GetTenantConnectCodeDetailsPayload {
+	preview: TenantConnectCodePreview
+	errorMessage: String
+}
+
 # --- Cross-Tenant Messages (phase 2) ---
 
 enum CrossTenantMessageType {
@@ -670,6 +688,7 @@ type Query {
 	GetCrossOrgGrants (input: GetCrossOrgGrantsInput): GetCrossOrgGrantsPayload!
 	GetContracts (input: GetContractsInput): GetContractsPayload!
 	GetTenantConnectionRequests (input: GetTenantConnectionRequestsInput): GetTenantConnectionRequestsPayload!
+	GetTenantConnectCodeDetails (input: GetTenantConnectCodeDetailsInput): GetTenantConnectCodeDetailsPayload!
 	GetCrossTenantMessage (input: GetCrossTenantMessageInput): GetCrossTenantMessagePayload!
 	GetCrossTenantMessages (input: GetCrossTenantMessagesInput): GetCrossTenantMessagesPayload!
 	GetOrderRequest (input: GetOrderRequestInput): GetOrderRequestPayload!

@@ -1060,6 +1060,59 @@ sdl::V1_0::imtauth::CGetTenantConnectionRequestsPayload CTenantManagerController
 }
 
 
+sdl::V1_0::imtauth::CGetTenantConnectCodeDetailsPayload CTenantManagerControllerComp::OnGetTenantConnectCodeDetails(
+		const sdl::V1_0::imtauth::CGetTenantConnectCodeDetailsGqlRequest& getTenantConnectCodeDetailsRequest,
+		const ::imtgql::CGqlRequest& /*gqlRequest*/,
+		QString& /*errorMessage*/) const
+{
+	sdl::V1_0::imtauth::CGetTenantConnectCodeDetailsPayload response;
+
+	if (!m_connectionRequestManagerCompPtr.IsValid()){
+		response.errorMessage = QStringLiteral("Tenant connection request manager is not configured");
+		return response;
+	}
+
+	QString connectCode;
+	sdl::V1_0::imtauth::GetTenantConnectCodeDetailsRequestArguments arguments = getTenantConnectCodeDetailsRequest.GetRequestedArguments();
+	if (arguments.input->connectCode){
+		connectCode = *arguments.input->connectCode;
+	}
+
+	if (connectCode.isEmpty()){
+		response.errorMessage = QStringLiteral("Connect code is required");
+		return response;
+	}
+
+	const imtauth::TenantConnectionRequestInfo info = m_connectionRequestManagerCompPtr->GetRequestByCode(connectCode);
+	if (info.requestId.isEmpty()){
+		response.errorMessage = QStringLiteral("Connect code not found or already used");
+		return response;
+	}
+
+	sdl::V1_0::imtauth::CTenantConnectCodePreview preview;
+	preview.sourceTenantId = info.sourceTenantId;
+	preview.proposedSourceRole = ToSdlRelationshipRole(info.proposedSourceRole);
+	preview.proposedTargetRole = ToSdlRelationshipRole(info.proposedTargetRole);
+	if (!info.message.isEmpty()){
+		preview.message = info.message;
+	}
+	if (!info.expiresAt.isEmpty()){
+		preview.expiresAt = info.expiresAt;
+	}
+
+	if (m_tenantManagerCompPtr.IsValid()){
+		const auto tenantPtr = m_tenantManagerCompPtr->GetTenant(info.sourceTenantId);
+		if (tenantPtr){
+			preview.sourceTenantName = tenantPtr->GetTenantName();
+		}
+	}
+
+	response.preview.Emplace(std::move(preview));
+
+	return response;
+}
+
+
 sdl::V1_0::imtauth::CCreateTenantConnectionRequestPayload CTenantManagerControllerComp::OnCreateTenantConnectionRequest(
 			const sdl::V1_0::imtauth::CCreateTenantConnectionRequestGqlRequest& createTenantConnectionRequestRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,

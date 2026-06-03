@@ -60,10 +60,10 @@ ViewBase {
 		function updatePages() {
 			multiPageView.clear()
 			multiPageView.addPage("Overview", qsTr("Overview"), overviewPageComp, "Icons/Dashboard")
-			multiPageView.addPage("Requests", qsTr("Requests"), requestsPageComp, "Icons/Link")
-			multiPageView.addPage("ConnectCodes", qsTr("Connect Codes"), connectCodesPageComp, "Icons/Code")
+			multiPageView.addPage("Requests", qsTr("Requests"), requestsPageComp, "Icons/ChatBubble")
+			multiPageView.addPage("ConnectCodes", qsTr("Connect Codes"), connectCodesPageComp, "Icons/Key")
 			multiPageView.addPage("RedeemCode", qsTr("Redeem Code"), redeemCodePageComp, "Icons/Unlock")
-			multiPageView.addPage("ActiveConnections", qsTr("Active Connections"), connectionsPageComp, "Icons/Network")
+			multiPageView.addPage("ActiveConnections", qsTr("Active Connections"), connectionsPageComp, "Icons/Online")
 			multiPageView.currentIndex = 0
 		}
 	}

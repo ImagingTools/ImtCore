@@ -113,6 +113,10 @@ protected:
 				const sdl::V1_0::imtauth::CGetTenantConnectionRequestsGqlRequest& getTenantConnectionRequestsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CGetTenantConnectCodeDetailsPayload OnGetTenantConnectCodeDetails(
+				const sdl::V1_0::imtauth::CGetTenantConnectCodeDetailsGqlRequest& getTenantConnectCodeDetailsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtauth::CCreateTenantConnectionRequestPayload OnCreateTenantConnectionRequest(
 				const sdl::V1_0::imtauth::CCreateTenantConnectionRequestGqlRequest& createTenantConnectionRequestRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
