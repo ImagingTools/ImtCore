@@ -267,6 +267,11 @@ I_EXPORT_COMPONENT(
 			"Cross-Tenant Message Notification Publisher");
 
 I_EXPORT_COMPONENT(
+			ConnectionCodesNotificationPublisher,
+			"Publisher for tenant connection codes notifications (created, revoked, expired) via WebSocket",
+			"Connection Codes Notification Publisher");
+
+I_EXPORT_COMPONENT(
 			RemoteTenantCollectionDocumentService,
 			"Remote tenant collection document service with product permissions enrichment",
 			"Remote Tenant Collection Document Service");

@@ -10,6 +10,34 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="ConnectionCodesNotificationPublisher" PackageId="ImtAuthGqlPck" ComponentId="ConnectionCodesNotificationPublisher">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>OnConnectionCodesNotification</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ConnectionRequestManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantConnectionRequestManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="TenantManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="TenantConnectionRequestInfo" PackageId="ImtAuthPck" ComponentId="TenantConnectionRequestInfo">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap/>
@@ -38,7 +66,9 @@
         </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
-    <ExportedInterfaces/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="ConnectionCodesNotificationPublisher"/>
+    </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="TenantConnectionRequestManager" ComponentId="TenantConnectionRequestManager"/>
     </ExportedComponents>

@@ -680,6 +680,47 @@ input CrossTenantMessageSubscriptionInput {
 	userId: ID!
 }
 
+# --- Connection codes change notifications ---
+
+enum EConnectionCodesNotificationType {
+	CodeCreated
+	CodeRevoked
+	CodeExpired
+}
+
+type ConnectionCodesNotification {
+	notificationType: EConnectionCodesNotificationType!
+	tenantId: ID!
+	requestId: ID
+}
+
+input ConnectionCodesSubscriptionInput {
+	userId: ID!
+}
+
+# --- Delete (remove from DB) a connect code ---
+
+input DeleteTenantConnectCodeInput {
+	requestId: ID!
+	tenantId: ID!
+}
+
+type DeleteTenantConnectCodePayload {
+	success: Boolean
+	errorMessage: String
+}
+
+# --- Purge expired connect codes ---
+
+input PurgeExpiredConnectCodesInput {
+	tenantId: ID!
+}
+
+type PurgeExpiredConnectCodesPayload {
+	purgedCount: Int
+	errorMessage: String
+}
+
 type Query {
 	GetTenantList (input: GetTenantListInput): GetTenantListPayload!
 	GetTenant (input: GetTenantInput): GetTenantPayload!
@@ -714,6 +755,8 @@ type Mutation {
 	AcceptTenantConnectCode (input: AcceptTenantConnectCodeInput): AcceptTenantConnectCodePayload!
 	RejectTenantConnectionRequest (input: RejectTenantConnectionRequestInput): RejectTenantConnectionRequestPayload!
 	RevokeTenantConnectionRequest (input: RevokeTenantConnectionRequestInput): RevokeTenantConnectionRequestPayload!
+	DeleteTenantConnectCode (input: DeleteTenantConnectCodeInput): DeleteTenantConnectCodePayload!
+	PurgeExpiredConnectCodes (input: PurgeExpiredConnectCodesInput): PurgeExpiredConnectCodesPayload!
 	SendCrossTenantMessage (input: SendCrossTenantMessageInput): SendCrossTenantMessagePayload!
 	UpdateCrossTenantMessageStatus (input: UpdateCrossTenantMessageStatusInput): UpdateCrossTenantMessageStatusPayload!
 	ConfirmOrderRequest (input: ConfirmOrderRequestInput): ConfirmOrderRequestPayload!
@@ -723,6 +766,7 @@ type Mutation {
 
 type Subscription {
 	OnCrossTenantMessageNotification (input: CrossTenantMessageSubscriptionInput): CrossTenantMessageNotification!
+	OnConnectionCodesNotification (input: ConnectionCodesSubscriptionInput): ConnectionCodesNotification!
 }
 
 collectionSchema {

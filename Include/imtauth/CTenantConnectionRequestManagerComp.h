@@ -51,6 +51,8 @@ public:
 	virtual QByteArray AcceptConnectCode(const QString& connectCode, const QByteArray& acceptingTenantId) override;
 	virtual bool RejectConnectionRequest(const QByteArray& requestId) override;
 	virtual bool RevokeConnectionRequest(const QByteArray& requestId) override;
+	virtual bool DeleteConnectCode(const QByteArray& requestId) override;
+	virtual int PurgeExpiredConnectCodes(const QByteArray& sourceTenantId) override;
 	virtual TenantConnectionRequestInfo GetConnectionRequest(const QByteArray& requestId) const override;
 	virtual TenantConnectionRequests GetOutgoingRequests(const QByteArray& sourceTenantId) const override;
 	virtual TenantConnectionRequests GetIncomingRequests(

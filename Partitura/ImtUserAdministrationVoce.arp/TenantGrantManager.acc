@@ -100,5 +100,9 @@
     <ExportedInterfaces>
         <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="CrossTenantMessageNotificationPublisher"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="CrossOrgGrantManager" ComponentId="CrossOrgGrantManager"/>
+        <Component ExportedId="CrossTenantMessageBroker" ComponentId="CrossTenantMessageBroker"/>
+        <Component ExportedId="CrossTenantMessageProjection" ComponentId="CrossTenantMessageProjection"/>
+    </ExportedComponents>
 </Acf>

@@ -20,6 +20,12 @@ ViewBase {
 	readonly property bool __canManage: connectCodesView.stateManager
 		&& (connectCodesView.stateManager.isCreator || connectCodesView.stateManager.isOwner)
 
+	onApiClientChanged: {
+		if (apiClient){
+			connectCodesView.__populateFromServerData()
+		}
+	}
+
 	// =========================================================
 	// Clipboard helper
 	// =========================================================
@@ -72,39 +78,36 @@ ViewBase {
 		target: connectCodesView.apiClient
 
 		function onConnectCodeCreated(requestId, connectCode) {
-			generatedCodeText.text = connectCode
-			generatedCodeCard.visible = true
-
-			// Store code info along with the creation parameters
-			var roleTokens = ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
-			var srcIdx = codeSourceRoleCB.currentIndex >= 0 ? codeSourceRoleCB.currentIndex : 2
-			var tgtIdx = codeTargetRoleCB.currentIndex >= 0 ? codeTargetRoleCB.currentIndex : 2
-
-			generatedCodesHistory.append({
-				"code": connectCode,
-				"requestId": requestId,
-				"sourceRole": roleTokens[srcIdx],
-				"targetRole": roleTokens[tgtIdx],
-				"message": codeMessageInput.text.trim(),
-				"expiresAt": connectCodesView.__getExpirationLabel(),
-				"createdAt": new Date().toLocaleString()
-			})
-
 			PopupManager.addSuccessMessage(
 				qsTr("Connect code generated successfully"),
 				true
 			)
-
-			// Refresh from server to persist
-			connectCodesView.__fetchExistingCodes()
+			// Server notification will trigger the list refresh automatically
 		}
 
 		function onConnectionRequestsReceived(requests) {
 			connectCodesView.__populateFromServerData()
 		}
+
+		function onConnectionRequestRevoked(requestId) {
+			PopupManager.addSuccessMessage(
+				qsTr("Connect code revoked"),
+				true
+			)
+		}
+
+		function onSubscriptionConnectionCodesChanged(notification) {
+			if (!notification || !connectCodesView.tenantData)
+				return
+			// Only refresh if the notification is for our tenant
+			if (notification.tenantId === connectCodesView.tenantData.m_id) {
+				connectCodesView.__fetchExistingCodes()
+			}
+		}
 	}
 
 	function __populateFromServerData() {
+		console.log("__populateFromServerData", connectCodesView.apiClient, connectCodesView.apiClient)
 		if (!connectCodesView.apiClient || !connectCodesView.apiClient.connectionRequestsModel) {
 			return
 		}
@@ -113,6 +116,10 @@ ViewBase {
 		for (var i = 0; i < mdl.count; i++) {
 			var req = mdl.get(i)
 			if (!req || !req.connectCode || req.connectCode === "") {
+				continue
+			}
+			// Only show pending codes (not accepted/rejected/revoked/expired)
+			if (req.status && req.status !== "Pending" && req.status !== 0) {
 				continue
 			}
 			generatedCodesHistory.append({
@@ -124,21 +131,8 @@ ViewBase {
 				"expiresAt": req.expiresAt || "",
 				"createdAt": req.createdAt || ""
 			})
+			console.log("generatedCodesHistory", req.connectCode, req.requestId)
 		}
-	}
-
-	function __getExpirationLabel() {
-		var idx = codeExpirationCB.currentIndex
-		if (idx === 0) {
-			return qsTr("1 Day")
-		}
-		if (idx === 1) {
-			return qsTr("1 Week")
-		}
-		if (idx === 2) {
-			return qsTr("1 Month")
-		}
-		return qsTr("No expiration")
 	}
 
 	function __computeExpirationISO() {
@@ -206,7 +200,7 @@ ViewBase {
 			}
 
 			// =====================================================
-			// Generate card (FIXED)
+			// Generate card
 			// =====================================================
 			Rectangle {
 				id: generateCard
@@ -288,82 +282,6 @@ ViewBase {
 			}
 
 			// =====================================================
-			// Generated code card (FIXED)
-			// =====================================================
-			Rectangle {
-				id: generatedCodeCard
-
-				visible: false
-				width: parent.width
-
-				radius: Style.radiusS
-				color: Style.alternateBaseColor
-				border.color: Style.linkColor
-				border.width: 2
-
-				readonly property int _pad: Style.marginL
-
-				height: generatedCodeContent.implicitHeight + _pad * 2
-
-				Column {
-					id: generatedCodeContent
-
-					width: parent.width - generatedCodeCard._pad * 2
-
-					anchors.top: parent.top
-					anchors.left: parent.left
-					anchors.right: parent.right
-					anchors.margins: generatedCodeCard._pad
-
-					spacing: Style.marginM
-
-					BaseText {
-						text: qsTr("Your Connect Code:")
-						font.pixelSize: Style.fontSizeM
-						font.bold: true
-						color: Style.textColor
-					}
-
-					BaseText {
-						id: generatedCodeText
-						font.pixelSize: Style.fontSizeL
-						font.bold: true
-						color: Style.linkColor
-						wrapMode: Text.WrapAnywhere
-						text: ""
-					}
-
-					BaseText {
-						text: qsTr("Share this code with the tenant you want to connect with. The code can only be used once.")
-						font.pixelSize: Style.fontSizeS
-						color: Style.inactiveTextColor
-						wrapMode: Text.WordWrap
-					}
-				}
-
-				ToolButton {
-					z: 10
-
-					anchors.top: parent.top
-					anchors.right: parent.right
-					anchors.topMargin: Style.marginM
-					anchors.rightMargin: Style.marginM
-
-					width: Style.buttonWidthM
-					height: width
-
-					iconSource: "../../../" +
-						Style.getIconPath("Icons/Copy", Icon.State.On, Icon.Mode.Normal)
-
-					tooltipText: qsTr("Copy code")
-
-					onClicked: {
-						connectCodesView.copyToClipboard(generatedCodeText.text)
-					}
-				}
-			}
-
-			// =====================================================
 			GroupHeaderView {
 				width: parent.width
 				visible: generatedCodesHistory.count > 0
@@ -413,7 +331,7 @@ ViewBase {
 								BaseText {
 									id: historyText
 									anchors.verticalCenter: parent.verticalCenter
-									width: parent.width - copyButton.width - Style.marginM
+									width: parent.width - copyButton.width - revokeButton.width - parent.spacing * 2
 
 									elide: Text.ElideMiddle
 									text: historyDelegate.__item.code || ""
@@ -439,6 +357,27 @@ ViewBase {
 										connectCodesView.copyToClipboard(
 											historyDelegate.__item.code || ""
 										)
+									}
+								}
+
+								ToolButton {
+									id: revokeButton
+									anchors.verticalCenter: parent.verticalCenter
+									visible: connectCodesView.__canManage
+
+									width: Style.buttonWidthM
+									height: width
+
+									iconSource: "../../../" +
+										Style.getIconPath("Icons/Delete", Icon.State.On, Icon.Mode.Normal)
+
+									tooltipText: qsTr("Revoke code")
+
+									onClicked: {
+										var reqId = historyDelegate.__item.requestId || ""
+										if (reqId && connectCodesView.apiClient) {
+											connectCodesView.apiClient.revokeConnectionRequest(reqId)
+										}
 									}
 								}
 							}

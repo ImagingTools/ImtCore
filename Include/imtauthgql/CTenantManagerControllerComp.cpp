@@ -1573,7 +1573,6 @@ sdl::V1_0::imtauth::CGetCrossTenantMessagesPayload CTenantManagerControllerComp:
 {
 	sdl::V1_0::imtauth::CGetCrossTenantMessagesPayload response;
 
-
 	if (!m_messageBrokerCompPtr.IsValid()){
 		response.errorMessage = QStringLiteral("Cross-tenant message broker is not configured");
 		return response;
@@ -1911,6 +1910,83 @@ sdl::V1_0::imtauth::CUpdateOrderRequestStatusPayload CTenantManagerControllerCom
 	if (!success){
 		response.errorMessage = QStringLiteral("Failed to update order request status");
 	}
+
+	return response;
+}
+
+
+sdl::V1_0::imtauth::CDeleteTenantConnectCodePayload CTenantManagerControllerComp::OnDeleteTenantConnectCode(
+			const sdl::V1_0::imtauth::CDeleteTenantConnectCodeGqlRequest& deleteTenantConnectCodeRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
+{
+	sdl::V1_0::imtauth::CDeleteTenantConnectCodePayload response;
+
+	if (!m_connectionRequestManagerCompPtr.IsValid()){
+		response.success = false;
+		response.errorMessage = QStringLiteral("Tenant connection request manager is not configured");
+		return response;
+	}
+
+	QByteArray requestId;
+	QByteArray tenantId;
+	sdl::V1_0::imtauth::DeleteTenantConnectCodeRequestArguments arguments = deleteTenantConnectCodeRequest.GetRequestedArguments();
+	if (arguments.input->requestId){
+		requestId = *arguments.input->requestId;
+	}
+	if (arguments.input->tenantId){
+		tenantId = *arguments.input->tenantId;
+	}
+
+	if (requestId.isEmpty() || tenantId.isEmpty()){
+		response.success = false;
+		response.errorMessage = QStringLiteral("Request ID and tenant ID are required");
+		return response;
+	}
+
+	// Verify the request belongs to this tenant before allowing deletion
+	imtauth::TenantConnectionRequestInfo requestInfo = m_connectionRequestManagerCompPtr->GetConnectionRequest(requestId);
+	if (requestInfo.sourceTenantId != tenantId){
+		response.success = false;
+		response.errorMessage = QStringLiteral("Only the originating tenant can delete a connect code");
+		return response;
+	}
+
+	bool success = m_connectionRequestManagerCompPtr->DeleteConnectCode(requestId);
+	response.success = success;
+	if (!success){
+		response.errorMessage = QStringLiteral("Failed to delete connect code");
+	}
+
+	return response;
+}
+
+
+sdl::V1_0::imtauth::CPurgeExpiredConnectCodesPayload CTenantManagerControllerComp::OnPurgeExpiredConnectCodes(
+			const sdl::V1_0::imtauth::CPurgeExpiredConnectCodesGqlRequest& purgeExpiredConnectCodesRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
+{
+	sdl::V1_0::imtauth::CPurgeExpiredConnectCodesPayload response;
+
+	if (!m_connectionRequestManagerCompPtr.IsValid()){
+		response.errorMessage = QStringLiteral("Tenant connection request manager is not configured");
+		return response;
+	}
+
+	QByteArray tenantId;
+	sdl::V1_0::imtauth::PurgeExpiredConnectCodesRequestArguments arguments = purgeExpiredConnectCodesRequest.GetRequestedArguments();
+	if (arguments.input->tenantId){
+		tenantId = *arguments.input->tenantId;
+	}
+
+	if (tenantId.isEmpty()){
+		response.errorMessage = QStringLiteral("Tenant ID is required");
+		return response;
+	}
+
+	int purgedCount = m_connectionRequestManagerCompPtr->PurgeExpiredConnectCodes(tenantId);
+	response.purgedCount = purgedCount;
 
 	return response;
 }

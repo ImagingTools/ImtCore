@@ -512,4 +512,24 @@ sdl::V1_0::imtauth::CUpdateOrderRequestStatusPayload CRemoteTenantControllerComp
 }
 
 
+sdl::V1_0::imtauth::CDeleteTenantConnectCodePayload CRemoteTenantControllerComp::OnDeleteTenantConnectCode(
+			const sdl::V1_0::imtauth::CDeleteTenantConnectCodeGqlRequest& /*deleteTenantConnectCodeRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CDeleteTenantConnectCodePayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CPurgeExpiredConnectCodesPayload CRemoteTenantControllerComp::OnPurgeExpiredConnectCodes(
+			const sdl::V1_0::imtauth::CPurgeExpiredConnectCodesGqlRequest& /*purgeExpiredConnectCodesRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CPurgeExpiredConnectCodesPayload>(gqlRequest, errorMessage);
+}
+
+
 } // namespace imtauthgql
+
+

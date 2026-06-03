@@ -96,10 +96,10 @@ DocumentViewBase {
 						multiPageView.addPage("CrossOrgGrants", qsTr("Cross-Org Grants"), crossOrgGrantsPageComp, "Icons/Crown")
 						multiPageView.addPage("Contracts", qsTr("Contracts"), contractsPageComp, "Icons/Assignment")
 						multiPageView.addPage("Relationships", qsTr("Relationships"), relationshipsPageComp, "Icons/Participant")
-						multiPageView.addPage("Connections", qsTr("Connections"), connectionOverviewPageComp, "Icons/Communication")
-						multiPageView.addSubPage("Connections", "ConnectCodes", qsTr("Connect Codes"), connectCodesPageComp, "Icons/Key")
-						multiPageView.addSubPage("Connections", "RedeemCode", qsTr("Redeem Code"), redeemCodePageComp, "Icons/Unlock")
-						multiPageView.addSubPage("Connections", "ActiveConnections", qsTr("Active Connections"), activeConnectionsPageComp, "Icons/Online")
+						multiPageView.addPage("Connections", qsTr("Connections"), null, "Icons/Communication")
+						multiPageView.addSubPage("Connections", "ConnectCodes", qsTr("Connect Codes"), connectCodesPageComp)
+						multiPageView.addSubPage("Connections", "RedeemCode", qsTr("Redeem Code"), redeemCodePageComp)
+						multiPageView.addSubPage("Connections", "ActiveConnections", qsTr("Active Connections"), activeConnectionsPageComp)
 						multiPageView.addPage("Messages", qsTr("Messages"), messagesPageComp, "Icons/Message")
 					}
 			}
@@ -314,16 +314,6 @@ DocumentViewBase {
 		id: relationshipsPageComp
 
 		TenantRelationshipsPage {
-			model: container.tenantData
-			stateManager: stateManager_
-			apiClient: container.apiClient
-		}
-	}
-
-	Component {
-		id: connectionOverviewPageComp
-
-		TenantConnectionOverviewView {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient

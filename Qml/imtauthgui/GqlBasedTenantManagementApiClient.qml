@@ -193,6 +193,16 @@ QtObject {
 		}
 	}
 
+	property SubscriptionClient __connectionCodesSubscription: SubscriptionClient {
+		gqlCommandId: "OnConnectionCodesNotification"
+
+		function getHeaders() { return {} }
+
+		onMessageReceived: {
+			console.log("onMessageReceived", data.toJson())
+		}
+	}
+
 	// =========================================================================
 	// GQL implementation
 	// =========================================================================
@@ -1275,6 +1285,7 @@ QtObject {
 						ModalDialogManager.showInfoDialog(m_errorMessage)
 						root.requestFailed(m_errorMessage)
 					} else {
+						console.log("GetTenantConnectionRequestsPayload", m_requests.toJson())
 						root.__populateConnectionRequestsModel(m_requests)
 					}
 				}
@@ -1427,7 +1438,9 @@ QtObject {
 		}
 	}
 
-	property GetCrossTenantMessagesInput __getMessagesInput: GetCrossTenantMessagesInput {}
+	property GetCrossTenantMessagesInput __getMessagesInput: GetCrossTenantMessagesInput {
+		m_direction: "Incoming"
+	}
 	property GqlSdlRequestSender __getMessagesSender: GqlSdlRequestSender {
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_getCrossTenantMessages
 

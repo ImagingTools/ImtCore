@@ -141,6 +141,14 @@ protected:
 				const sdl::V1_0::imtauth::CRevokeTenantConnectionRequestGqlRequest& revokeTenantConnectionRequestRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CDeleteTenantConnectCodePayload OnDeleteTenantConnectCode(
+				const sdl::V1_0::imtauth::CDeleteTenantConnectCodeGqlRequest& deleteTenantConnectCodeRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CPurgeExpiredConnectCodesPayload OnPurgeExpiredConnectCodes(
+				const sdl::V1_0::imtauth::CPurgeExpiredConnectCodesGqlRequest& purgeExpiredConnectCodesRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtauth::CGetCrossTenantMessagePayload OnGetCrossTenantMessage(
 				const sdl::V1_0::imtauth::CGetCrossTenantMessageGqlRequest& getCrossTenantMessageRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
