@@ -497,8 +497,6 @@ FocusScope{
 
             hoverEnabled: true;
 
-            cursorShape: checkBoxMenu.changeable ? Qt.PointingHandCursor : Qt.ArrowCursor;
-
             onClicked: {
                 checkBoxMenu.focus = true
 

@@ -44,7 +44,7 @@ Item {
         radius: Style.buttonRadius
         border.width: (item.menuBar && item.menuBar.activeFocus
                        && item.menuBar.focusedIndex === item.barIndex
-                       && !(menu && menu.opened))
+                       && !(item.menu && item.menu.opened))
                       ? Style.buttonBorderWidth : 0
         border.color: Style.buttonBorderFocusColor
     }

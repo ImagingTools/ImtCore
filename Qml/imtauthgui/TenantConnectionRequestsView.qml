@@ -305,7 +305,7 @@ ViewBase {
 								StatusBadge {
 									id: inStatusBadge
 									text: incomingRequestDelegate.__req.status || qsTr("Pending")
-									badgeColor: incomingRequestDelegate.__isPending ? Style.warningColor : Style.baseColor
+									badgeColor: incomingRequestDelegate.__isPending ? Style.errorColor : Style.baseColor
 									textColor: incomingRequestDelegate.__isPending ? Style.baseColor : Style.textColor
 								}
 							}
@@ -430,7 +430,7 @@ ViewBase {
 								StatusBadge {
 									id: outStatusBadge
 									text: outgoingRequestDelegate.__req.status || qsTr("Pending")
-									badgeColor: outgoingRequestDelegate.__isPending ? Style.warningColor : Style.baseColor
+									badgeColor: outgoingRequestDelegate.__isPending ? Style.errorColor : Style.baseColor
 									textColor: outgoingRequestDelegate.__isPending ? Style.baseColor : Style.textColor
 								}
 							}

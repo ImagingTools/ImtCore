@@ -943,7 +943,7 @@ DocumentViewBase {
 									width: visible ? 28 : 0
 									height: width
 									radius: width/2
-									color: titleCloseBtn.containsMouse ? "#E6F4EA" : "#F0F2F5"
+									color: titleCloseBtnMa.containsMouse ? "#E6F4EA" : "#F0F2F5"
 									anchors.verticalCenter: parent.verticalCenter
 									
 									Image {

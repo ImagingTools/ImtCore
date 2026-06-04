@@ -23,8 +23,8 @@ Rectangle {
 		// Header row
 		Rectangle {
 			width: parent.width
-			height: Style.sizeS
-			color: Style.panelHeaderColor
+			height: Style.buttonHeightS
+			color: Style.borderColor2
 
 			Row {
 				anchors.left: parent.left
@@ -37,7 +37,7 @@ Rectangle {
 					text: qsTr("Chats")
 					font.pixelSize: Style.fontSizeM
 					font.bold: true
-					color: Style.textPrimaryColor
+					color: Style.imaginToolsAccentColor
 					anchors.verticalCenter: parent.verticalCenter
 					width: parent.width - newConvButton.width
 				}
@@ -53,7 +53,7 @@ Rectangle {
 						anchors.centerIn: parent
 						text: "+"
 						font.pixelSize: Style.fontSizeL
-						color: Style.accentColor
+						color: Style.imaginToolsAccentColor
 					}
 
 					MouseArea {
@@ -70,35 +70,29 @@ Rectangle {
 		ChatSearchBar {
 			id: searchBar
 			width: parent.width
-			height: Style.inputHeightS
+			height: Style.buttonHeightM
 			placeholderText: qsTr("Search conversations...")
-			onSearchTextChanged: {
-				if (chatPanelContainer.conversationsModel) {
-					chatPanelContainer.conversationsModel.filterText = text;
-				}
-			}
 		}
 
 		// Conversation list
 		ListView {
 			id: conversationListView
 			width: parent.width
-			height: parent.height - Style.sizeS - searchBar.height
+			height: parent.height - Style.buttonHeightS - searchBar.height
 			clip: true
 			model: chatPanelContainer.conversationsModel
 
 			delegate: Rectangle {
 				width: conversationListView.width
-				height: Style.listItemHeight
 				color: model.id === chatPanelContainer.currentConversationId
-					? Style.selectedItemColor
+					? Style.selectedColor
 					: "transparent"
 
 				Rectangle {
 					anchors.bottom: parent.bottom
 					width: parent.width
 					height: 1
-					color: Style.separatorColor
+					color: Style.borderColor2
 					opacity: 0.5
 				}
 
@@ -112,10 +106,10 @@ Rectangle {
 
 					// Avatar placeholder
 					Rectangle {
-						width: Style.avatarSizeS
-						height: Style.avatarSizeS
-						radius: Style.avatarSizeS / 2
-						color: Style.accentColor
+						width: Style.controlHeightL
+						height: Style.controlHeightL
+						radius: Style.controlHeightL / 2
+						color: Style.imaginToolsAccentColor
 						anchors.verticalCenter: parent.verticalCenter
 
 						Text {
@@ -129,13 +123,13 @@ Rectangle {
 
 					Column {
 						anchors.verticalCenter: parent.verticalCenter
-						width: parent.width - Style.avatarSizeS - Style.paddingS
+						width: parent.width - Style.controlHeightL - Style.paddingS
 
 						Text {
 							text: model.name || ""
 							font.pixelSize: Style.fontSizeS
 							font.bold: true
-							color: Style.textPrimaryColor
+							color: Style.imaginToolsAccentColor
 							elide: Text.ElideRight
 							width: parent.width
 						}
@@ -143,7 +137,7 @@ Rectangle {
 						Text {
 							text: model.lastMessage || ""
 							font.pixelSize: Style.fontSizeXS
-							color: Style.textSecondaryColor
+							color: Style.buttonInactiveTextColor
 							elide: Text.ElideRight
 							width: parent.width
 						}
@@ -156,10 +150,10 @@ Rectangle {
 					anchors.right: parent.right
 					anchors.rightMargin: Style.paddingS
 					anchors.verticalCenter: parent.verticalCenter
-					width: Style.badgeSizeMin
-					height: Style.badgeSizeMin
+					width: Style.sizeHintL
+					height: Style.sizeHintL
 					radius: height / 2
-					color: Style.accentColor
+					color: Style.imaginToolsAccentColor
 
 					Text {
 						id: unreadText

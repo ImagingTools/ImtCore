@@ -33,7 +33,7 @@ Rectangle {
 	Rectangle {
 		id: dialogCard
 		anchors.centerIn: parent
-		width: Math.min(parent.width * 0.9, Style.dialogWidthM)
+		width: Math.min(parent.width * 0.9, Style.sizeHintL)
 		height: dialogColumn.height + Style.paddingL * 2
 		radius: Style.radiusM
 		color: Style.backgroundColor
@@ -50,40 +50,37 @@ Rectangle {
 				text: qsTr("New Conversation")
 				font.pixelSize: Style.fontSizeL
 				font.bold: true
-				color: Style.textPrimaryColor
+				color: Style.imaginToolsAccentColor
 			}
 
 			// Name field
 			Column {
 				width: parent.width
-				spacing: Style.paddingXS
+				spacing: Style.paddingS
 
 				Text {
 					text: qsTr("Name *")
 					font.pixelSize: Style.fontSizeXS
-					color: Style.textSecondaryColor
+					color: Style.buttonInactiveTextColor
 				}
 
 				Rectangle {
 					width: parent.width
-					height: Style.inputHeightM
 					radius: Style.radiusS
-					color: Style.inputBackgroundColor
-					border.color: nameField.activeFocus ? Style.accentColor : Style.separatorColor
+					border.color: nameField.activeFocus ? Style.imaginToolsAccentColor : Style.borderColor2
 
 					TextInput {
 						id: nameField
 						anchors.fill: parent
 						anchors.margins: Style.paddingS
 						font.pixelSize: Style.fontSizeS
-						color: Style.textPrimaryColor
+						color: Style.imaginToolsAccentColor
 						clip: true
 						verticalAlignment: TextInput.AlignVCenter
 
 						Text {
 							anchors.fill: parent
 							text: qsTr("Conversation name")
-							color: Style.textPlaceholderColor
 							font.pixelSize: Style.fontSizeS
 							verticalAlignment: Text.AlignVCenter
 							visible: nameField.text.length === 0
@@ -95,12 +92,12 @@ Rectangle {
 			// Type selection
 			Column {
 				width: parent.width
-				spacing: Style.paddingXS
+				spacing: Style.paddingS
 
 				Text {
 					text: qsTr("Type")
 					font.pixelSize: Style.fontSizeXS
-					color: Style.textSecondaryColor
+					color: Style.buttonInactiveTextColor
 				}
 
 				ComboBox {
@@ -126,13 +123,13 @@ Rectangle {
 					height: Style.buttonHeightM
 					radius: Style.radiusS
 					color: "transparent"
-					border.color: Style.separatorColor
+					border.color: Style.borderColor2
 
 					Text {
 						anchors.centerIn: parent
 						text: qsTr("Cancel")
 						font.pixelSize: Style.fontSizeS
-						color: Style.textPrimaryColor
+						color: Style.imaginToolsAccentColor
 					}
 
 					MouseArea {
@@ -147,7 +144,6 @@ Rectangle {
 					width: Style.buttonWidthM
 					height: Style.buttonHeightM
 					radius: Style.radiusS
-					color: nameField.text.trim().length > 0 ? Style.accentColor : Style.disabledColor
 
 					Text {
 						anchors.centerIn: parent
