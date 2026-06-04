@@ -537,16 +537,18 @@ sdl::V1_0::imtauth::CAddTenantRelationshipPayload CTenantManagerControllerComp::
 		return response;
 	}
 
+	imtauth::ITenantInfo::TenantRelationship relationship;
+	relationship.targetTenantId = targetTenantId;
+	relationship.sourceRole = sourceRole;
+	relationship.targetRole = targetRole;
+	relationship.scope = scope;
+	relationship.validFrom = validFrom;
+	relationship.validUntil = validUntil;
+	relationship.description = description;
+
 	QByteArray relationshipId = m_tenantManagerCompPtr->AddTenantRelationship(
 				sourceTenantId,
-				targetTenantId,
-				role,
-				sourceRole,
-				targetRole,
-				scope,
-				validFrom,
-				validUntil,
-				description);
+				relationship);
 
 	if (relationshipId.isEmpty()){
 		response.errorMessage = QStringLiteral("Failed to add tenant relationship");

@@ -310,77 +310,103 @@ bool CTenantInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_updatedAt);
 	retVal = retVal && archive.EndTag(updatedAtTag);
 
-	iser::CArchiveTag relationshipsTag("Relationships", "Relationships", iser::CArchiveTag::TT_GROUP);
-	if (archive.BeginTag(relationshipsTag)){
-		int count = m_relationships.size();
-		retVal = retVal && archive.Process(count);
+	iser::CArchiveTag relationshipsTag("Relationships", "Relationships", iser::CArchiveTag::TT_MULTIPLE);
+	iser::CArchiveTag relTag("Relationship", "Relationship", iser::CArchiveTag::TT_GROUP, &relationshipsTag);
+
+	int count = m_relationships.size();
+	retVal = retVal && archive.BeginMultiTag(relationshipsTag, relTag, count);
+
+	if (!archive.IsStoring()){
+		m_relationships.clear();
+	}
+
+	for (int i = 0; i < count; ++i){
+		retVal = retVal && archive.BeginTag(relTag);
+
+		TenantRelationship rel;
 
 		if (archive.IsStoring()){
-			for (int i = 0; i < count; ++i){
-				iser::CArchiveTag relTag("Relationship", "Relationship", iser::CArchiveTag::TT_GROUP);
-				retVal = retVal && archive.BeginTag(relTag);
-
-				QByteArray relId = m_relationships[i].relationshipId;
-				QByteArray targetId = m_relationships[i].targetTenantId;
-				int role = static_cast<int>(m_relationships[i].role);
-				QString desc = m_relationships[i].description;
-				QString created = m_relationships[i].createdAt;
-				int sourceRole = static_cast<int>(m_relationships[i].sourceRole);
-				int targetRole = static_cast<int>(m_relationships[i].targetRole);
-				QString scope = m_relationships[i].scope;
-				QString validFrom = m_relationships[i].validFrom;
-				QString validUntil = m_relationships[i].validUntil;
-				bool isActive = m_relationships[i].isActive;
-
-				retVal = retVal && archive.Process(relId);
-				retVal = retVal && archive.Process(targetId);
-				retVal = retVal && archive.Process(role);
-				retVal = retVal && archive.Process(desc);
-				retVal = retVal && archive.Process(created);
-				retVal = retVal && archive.Process(sourceRole);
-				retVal = retVal && archive.Process(targetRole);
-				retVal = retVal && archive.Process(scope);
-				retVal = retVal && archive.Process(validFrom);
-				retVal = retVal && archive.Process(validUntil);
-				retVal = retVal && archive.Process(isActive);
-
-				retVal = retVal && archive.EndTag(relTag);
-			}
-		}
-		else{
-			m_relationships.clear();
-			for (int i = 0; i < count; ++i){
-				iser::CArchiveTag relTag("Relationship", "Relationship", iser::CArchiveTag::TT_GROUP);
-				retVal = retVal && archive.BeginTag(relTag);
-
-				TenantRelationship rel;
-				int role = 0;
-				int sourceRole = 0;
-				int targetRole = 0;
-
-				retVal = retVal && archive.Process(rel.relationshipId);
-				retVal = retVal && archive.Process(rel.targetTenantId);
-				retVal = retVal && archive.Process(role);
-				retVal = retVal && archive.Process(rel.description);
-				retVal = retVal && archive.Process(rel.createdAt);
-				retVal = retVal && archive.Process(sourceRole);
-				retVal = retVal && archive.Process(targetRole);
-				retVal = retVal && archive.Process(rel.scope);
-				retVal = retVal && archive.Process(rel.validFrom);
-				retVal = retVal && archive.Process(rel.validUntil);
-				retVal = retVal && archive.Process(rel.isActive);
-
-				rel.role = static_cast<TenantRelationshipRole>(role);
-				rel.sourceRole = static_cast<TenantRelationshipRole>(sourceRole);
-				rel.targetRole = static_cast<TenantRelationshipRole>(targetRole);
-				m_relationships.append(rel);
-
-				retVal = retVal && archive.EndTag(relTag);
-			}
+			rel = m_relationships[i];
 		}
 
-		retVal = retVal && archive.EndTag(relationshipsTag);
+		int sourceRole = static_cast<int>(rel.sourceRole);
+		int targetRole = static_cast<int>(rel.targetRole);
+
+		iser::CArchiveTag relIdTag("RelationshipId", "Relationship ID", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(relIdTag);
+		retVal = retVal && archive.Process(rel.relationshipId);
+		retVal = retVal && archive.EndTag(relIdTag);
+
+		iser::CArchiveTag connectionIdTag("ConnectionId", "Connection ID", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(connectionIdTag);
+		retVal = retVal && archive.Process(rel.connectionId);
+		retVal = retVal && archive.EndTag(connectionIdTag);
+
+		iser::CArchiveTag sourceTenantIdTag("SourceTenantId", "Source Tenant ID", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(sourceTenantIdTag);
+		retVal = retVal && archive.Process(rel.sourceTenantId);
+		retVal = retVal && archive.EndTag(sourceTenantIdTag);
+
+		iser::CArchiveTag targetTenantIdTag("TargetTenantId", "Target Tenant ID", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(targetTenantIdTag);
+		retVal = retVal && archive.Process(rel.targetTenantId);
+		retVal = retVal && archive.EndTag(targetTenantIdTag);
+
+		iser::CArchiveTag sourceRoleTag("SourceRole", "Source Role", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(sourceRoleTag);
+		retVal = retVal && archive.Process(sourceRole);
+		retVal = retVal && archive.EndTag(sourceRoleTag);
+
+		iser::CArchiveTag targetRoleTag("TargetRole", "Target Role", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(targetRoleTag);
+		retVal = retVal && archive.Process(targetRole);
+		retVal = retVal && archive.EndTag(targetRoleTag);
+
+		iser::CArchiveTag scopeTag("Scope", "Scope", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(scopeTag);
+		retVal = retVal && archive.Process(rel.scope);
+		retVal = retVal && archive.EndTag(scopeTag);
+
+		iser::CArchiveTag validFromTag("ValidFrom", "Valid From", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(validFromTag);
+		retVal = retVal && archive.Process(rel.validFrom);
+		retVal = retVal && archive.EndTag(validFromTag);
+
+		iser::CArchiveTag validUntilTag("ValidUntil", "Valid Until", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(validUntilTag);
+		retVal = retVal && archive.Process(rel.validUntil);
+		retVal = retVal && archive.EndTag(validUntilTag);
+
+		iser::CArchiveTag statusTag("Status", "Status", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(statusTag);
+		retVal = retVal && archive.Process(rel.status);
+		retVal = retVal && archive.EndTag(statusTag);
+
+		iser::CArchiveTag descriptionTag("Description", "Description", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(descriptionTag);
+		retVal = retVal && archive.Process(rel.description);
+		retVal = retVal && archive.EndTag(descriptionTag);
+
+		iser::CArchiveTag createdAtRelTag("CreatedAt", "Created At", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(createdAtRelTag);
+		retVal = retVal && archive.Process(rel.createdAt);
+		retVal = retVal && archive.EndTag(createdAtRelTag);
+
+		iser::CArchiveTag updatedAtRelTag("UpdatedAt", "Updated At", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(updatedAtRelTag);
+		retVal = retVal && archive.Process(rel.updatedAt);
+		retVal = retVal && archive.EndTag(updatedAtRelTag);
+
+		if (!archive.IsStoring()){
+			rel.sourceRole = static_cast<TenantRelationshipRole>(sourceRole);
+			rel.targetRole = static_cast<TenantRelationshipRole>(targetRole);
+			m_relationships.append(rel);
+		}
+
+		retVal = retVal && archive.EndTag(relTag);
 	}
+
+	retVal = retVal && archive.EndTag(relationshipsTag);
 
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_tenantPermissions, "TenantPermissions", "TenantPermission");
 

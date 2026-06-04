@@ -47,34 +47,16 @@ public:
 	virtual bool EnsureSystemTenant() { return false; }
 
 	/**
-		Add an asymmetric relationship to a tenant.
-		The relationship is direction-aware: \a sourceRole is the role of \a tenantId,
-		\a targetRole is the role of \a targetTenantId.
+		Add a relationship to a tenant.
 		\param tenantId The tenant that owns this relationship entry.
-		\param targetTenantId The related tenant.
-		\param role Legacy role of the target tenant (kept for backward compatibility).
-		\param sourceRole Role of the owning tenant in this relationship.
-		\param targetRole Role of the target tenant in this relationship.
-		\param scope Optional scope limiting the relationship.
-		\param validFrom Optional validity start timestamp.
-		\param validUntil Optional validity end timestamp.
-		\param description Human-readable description.
+		\param relationship The relationship struct to add.
 		\return The new relationship ID, or empty on failure.
 	*/
 	virtual QByteArray AddTenantRelationship(
 				const QByteArray& tenantId,
-				const QByteArray& targetTenantId,
-				ITenantInfo::TenantRelationshipRole role,
-				ITenantInfo::TenantRelationshipRole sourceRole,
-				ITenantInfo::TenantRelationshipRole targetRole,
-				const QString& scope = QString(),
-				const QString& validFrom = QString(),
-				const QString& validUntil = QString(),
-				const QString& description = QString())
+				const ITenantInfo::TenantRelationship& relationship)
 	{
-		Q_UNUSED(tenantId); Q_UNUSED(targetTenantId); Q_UNUSED(role);
-		Q_UNUSED(sourceRole); Q_UNUSED(targetRole); Q_UNUSED(scope);
-		Q_UNUSED(validFrom); Q_UNUSED(validUntil); Q_UNUSED(description);
+		Q_UNUSED(tenantId); Q_UNUSED(relationship);
 		return QByteArray();
 	}
 

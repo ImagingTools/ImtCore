@@ -38,14 +38,7 @@ public:
 	virtual bool EnsureSystemTenant() override;
 	virtual QByteArray AddTenantRelationship(
 				const QByteArray& tenantId,
-				const QByteArray& targetTenantId,
-				ITenantInfo::TenantRelationshipRole role,
-				ITenantInfo::TenantRelationshipRole sourceRole,
-				ITenantInfo::TenantRelationshipRole targetRole,
-				const QString& scope = QString(),
-				const QString& validFrom = QString(),
-				const QString& validUntil = QString(),
-				const QString& description = QString()) override;
+				const ITenantInfo::TenantRelationship& relationship) override;
 	virtual bool RemoveTenantRelationship(const QByteArray& tenantId, const QByteArray& relationshipId) override;
 
 private:

@@ -283,26 +283,19 @@ bool CTenantManagerComp::EnsureSystemTenant()
 
 QByteArray CTenantManagerComp::AddTenantRelationship(
 		const QByteArray& tenantId,
-		const QByteArray& targetTenantId,
-		ITenantInfo::TenantRelationshipRole role,
-		ITenantInfo::TenantRelationshipRole sourceRole,
-		ITenantInfo::TenantRelationshipRole targetRole,
-		const QString& scope,
-		const QString& validFrom,
-		const QString& validUntil,
-		const QString& description)
+		const ITenantInfo::TenantRelationship& relationship)
 {
 	if (!m_tenantCollectionCompPtr.IsValid()){
 		SendErrorMessage(0, "Tenant collection not configured", "CTenantManagerComp");
 		return QByteArray();
 	}
 
-	if (tenantId.isEmpty() || targetTenantId.isEmpty()){
+	if (tenantId.isEmpty() || relationship.targetTenantId.isEmpty()){
 		SendErrorMessage(0, "Source and target tenant are required", "CTenantManagerComp");
 		return QByteArray();
 	}
 
-	if (tenantId == targetTenantId){
+	if (tenantId == relationship.targetTenantId){
 		SendErrorMessage(0, "A tenant cannot have a relationship with itself", "CTenantManagerComp");
 		return QByteArray();
 	}
@@ -321,20 +314,15 @@ QByteArray CTenantManagerComp::AddTenantRelationship(
 
 	istd::CChangeNotifier changeNotifier(this);
 
-	ITenantInfo::TenantRelationship relationship;
-	relationship.relationshipId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-	relationship.targetTenantId = targetTenantId;
-	relationship.role = role;
-	relationship.sourceRole = sourceRole;
-	relationship.targetRole = targetRole;
-	relationship.scope = scope;
-	relationship.validFrom = validFrom;
-	relationship.validUntil = validUntil;
-	relationship.isActive = true;
-	relationship.description = description;
-	relationship.createdAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+	ITenantInfo::TenantRelationship rel = relationship;
+	if (rel.relationshipId.isEmpty()){
+		rel.relationshipId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+	}
+	if (rel.createdAt.isEmpty()){
+		rel.createdAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+	}
 
-	tenantPtr->AddRelationship(relationship);
+	tenantPtr->AddRelationship(rel);
 	tenantPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
 
 	if (!m_tenantCollectionCompPtr->SetObjectData(tenantId, *tenantPtr)){
@@ -344,7 +332,7 @@ QByteArray CTenantManagerComp::AddTenantRelationship(
 
 	SendInfoMessage(0, QString("Added relationship to tenant '%1'").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
 
-	return relationship.relationshipId;
+	return rel.relationshipId;
 }
 
 
