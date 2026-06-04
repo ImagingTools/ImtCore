@@ -59,40 +59,39 @@ public:
 	/**
 		Structure describing a relationship between tenants.
 
-		Relationships are direction-aware and asymmetric: \a sourceRole describes
-		the role of the tenant owning this relationship entry, while \a targetRole
-		describes the role of the \a targetTenantId. For example a Customer→Supplier
-		relationship stored on the customer tenant has sourceRole = Customer and
-		targetRole = Supplier.
-
-		The legacy \a role field is kept for backward compatibility and mirrors
-		\a targetRole (the role of the target tenant).
+		Relationships are built on top of a Connection and require bilateral
+		approval (via RelationshipProposal). They are direction-aware:
+		\a sourceRole describes the role of the source tenant, while
+		\a targetRole describes the role of the target tenant.
 	*/
 	struct TenantRelationship
 	{
 		QByteArray relationshipId;
+		QByteArray connectionId;
+		QByteArray sourceTenantId;
 		QByteArray targetTenantId;
-		TenantRelationshipRole role = Partner;
 		TenantRelationshipRole sourceRole = Partner;
 		TenantRelationshipRole targetRole = Partner;
 		QString scope;
 		QString validFrom;
 		QString validUntil;
-		bool isActive = true;
+		int status = 0; // 0=Active, 1=Archived, 2=PendingApproval
 		QString description;
 		QString createdAt;
+		QString updatedAt;
 
 		bool operator==(const TenantRelationship& other) const
 		{
 			return relationshipId == other.relationshipId
+				&& connectionId == other.connectionId
+				&& sourceTenantId == other.sourceTenantId
 				&& targetTenantId == other.targetTenantId
-				&& role == other.role
 				&& sourceRole == other.sourceRole
 				&& targetRole == other.targetRole
 				&& scope == other.scope
 				&& validFrom == other.validFrom
 				&& validUntil == other.validUntil
-				&& isActive == other.isActive
+				&& status == other.status
 				&& description == other.description
 				&& createdAt == other.createdAt;
 		}

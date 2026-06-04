@@ -19,184 +19,228 @@ namespace imtauth
 
 
 /**
-	Lifecycle status of a tenant connection request.
+Status of a connection request.
 */
-enum TenantConnectionStatus
+enum ConnectionRequestStatus
 {
-	TCS_PENDING = 0,
-	TCS_ACCEPTED,
-	TCS_REJECTED,
-	TCS_EXPIRED,
-	TCS_REVOKED
+CRS_PENDING = 0,
+CRS_APPROVED,
+CRS_REJECTED,
+CRS_CANCELED
 };
 
 
 /**
-	Structure describing a tenant connection request.
-
-	Connection requests implement the discovery/bootstrap workflow that lets two
-	otherwise isolated tenants establish their first contact. A request can be
-	addressed directly to another tenant (via \a targetIdentifier, e.g. an
-	e-mail or slug) or distributed out-of-band as a one-time \a connectCode.
-
-	When the request is accepted an asymmetric relationship is established
-	between the source and the accepting tenant using \a proposedSourceRole and
-	\a proposedTargetRole.
+Status of a confirmed connection between two tenants.
 */
-struct TenantConnectionRequestInfo
+enum ConnectionStatus
 {
-	QByteArray requestId;
-	QByteArray sourceTenantId;
-	QByteArray targetTenantId;
-	QString targetIdentifier;
-	QString connectCode;
-	ITenantInfo::TenantRelationshipRole proposedSourceRole = ITenantInfo::Partner;
-	ITenantInfo::TenantRelationshipRole proposedTargetRole = ITenantInfo::Partner;
-	QString message;
-	TenantConnectionStatus status = TCS_PENDING;
-	QString createdAt;
-	QString expiresAt;
-	QString respondedAt;
-
-	bool operator==(const TenantConnectionRequestInfo& other) const
-	{
-		return requestId == other.requestId
-			&& sourceTenantId == other.sourceTenantId
-			&& targetTenantId == other.targetTenantId
-			&& targetIdentifier == other.targetIdentifier
-			&& connectCode == other.connectCode
-			&& proposedSourceRole == other.proposedSourceRole
-			&& proposedTargetRole == other.proposedTargetRole
-			&& message == other.message
-			&& status == other.status
-			&& createdAt == other.createdAt
-			&& expiresAt == other.expiresAt
-			&& respondedAt == other.respondedAt;
-	}
-
-	bool operator!=(const TenantConnectionRequestInfo& other) const
-	{
-		return !(*this == other);
-	}
+CS_ACTIVE = 0,
+CS_REMOVED,
+CS_SUSPENDED
 };
-
-typedef QList<TenantConnectionRequestInfo> TenantConnectionRequests;
 
 
 /**
-	Interface for managing tenant connection requests (discovery workflow).
+Status of a relationship.
+*/
+enum RelationshipStatus
+{
+RS_ACTIVE = 0,
+RS_ARCHIVED,
+RS_PENDING_APPROVAL
+};
 
-	Provides the mechanism for tenants to find each other and establish a first
-	relationship through explicit requests or one-time connect codes. Accepting a
-	request creates an asymmetric tenant relationship between the two parties.
 
-	\ingroup Tenant
+/**
+Type of relationship proposal.
+*/
+enum RelationshipProposalType
+{
+RPT_CREATE = 0,
+RPT_UPDATE,
+RPT_DELETE
+};
+
+
+/**
+Status of a relationship proposal.
+*/
+enum RelationshipProposalStatus
+{
+RPS_PENDING = 0,
+RPS_APPROVED_BY_INITIATOR,
+RPS_APPROVED_BY_COUNTERPARTY,
+RPS_REJECTED,
+RPS_CANCELED,
+RPS_EXPIRED,
+RPS_APPLIED
+};
+
+
+/**
+Connection code info for a tenant.
+*/
+struct TenantConnectionCodeInfo
+{
+QByteArray tenantId;
+QString connectionCode;
+bool allowConnectionsByCode = true;
+QString createdAt;
+};
+
+
+/**
+Structure describing a connection request between two tenants.
+*/
+struct ConnectionRequestInfo
+{
+QByteArray requestId;
+QByteArray sourceTenantId;
+QByteArray targetTenantId;
+QString connectionCode;
+QString message;
+ConnectionRequestStatus status = CRS_PENDING;
+QString createdAt;
+QString respondedAt;
+QString sourceTenantName;
+QString targetTenantName;
+
+bool operator==(const ConnectionRequestInfo& other) const
+{
+return requestId == other.requestId
+&& sourceTenantId == other.sourceTenantId
+&& targetTenantId == other.targetTenantId
+&& connectionCode == other.connectionCode
+&& message == other.message
+&& status == other.status
+&& createdAt == other.createdAt
+&& respondedAt == other.respondedAt;
+}
+
+bool operator!=(const ConnectionRequestInfo& other) const
+{
+return !(*this == other);
+}
+};
+
+typedef QList<ConnectionRequestInfo> ConnectionRequests;
+
+
+/**
+Structure describing a confirmed connection between two tenants.
+*/
+struct TenantConnectionInfo
+{
+QByteArray connectionId;
+QByteArray tenantAId;
+QByteArray tenantBId;
+ConnectionStatus status = CS_ACTIVE;
+QString createdAt;
+QString updatedAt;
+
+bool operator==(const TenantConnectionInfo& other) const
+{
+return connectionId == other.connectionId
+&& tenantAId == other.tenantAId
+&& tenantBId == other.tenantBId
+&& status == other.status;
+}
+
+bool operator!=(const TenantConnectionInfo& other) const
+{
+return !(*this == other);
+}
+};
+
+typedef QList<TenantConnectionInfo> TenantConnections;
+
+
+/**
+Structure describing a relationship proposal.
+*/
+struct RelationshipProposalInfo
+{
+QByteArray proposalId;
+QByteArray connectionId;
+QByteArray existingRelationshipId;
+RelationshipProposalType proposalType = RPT_CREATE;
+QByteArray initiatorTenantId;
+QByteArray counterpartyTenantId;
+ITenantInfo::TenantRelationshipRole proposedSourceRole = ITenantInfo::Partner;
+ITenantInfo::TenantRelationshipRole proposedTargetRole = ITenantInfo::Partner;
+QString proposedScope;
+QString proposedDescription;
+QString proposedValidFrom;
+QString proposedValidUntil;
+RelationshipProposalStatus status = RPS_PENDING;
+QString message;
+QString createdAt;
+QString updatedAt;
+
+bool operator==(const RelationshipProposalInfo& other) const
+{
+return proposalId == other.proposalId
+&& connectionId == other.connectionId
+&& proposalType == other.proposalType
+&& status == other.status;
+}
+
+bool operator!=(const RelationshipProposalInfo& other) const
+{
+return !(*this == other);
+}
+};
+
+typedef QList<RelationshipProposalInfo> RelationshipProposals;
+
+
+/**
+Interface for managing the corporate connection and relationship workflow.
+
+Covers: Connection Codes, Connection Requests, Connections, Relationships,
+and Relationship Proposals.
+
+\ingroup Tenant
 */
 class ITenantConnectionRequest: virtual public istd::IChangeable
 {
 public:
-	/**
-		Create a connection request addressed to another tenant.
-		\param sourceTenantId Tenant initiating the request.
-		\param targetIdentifier External identifier of the target tenant (e-mail/slug).
-		\param proposedSourceRole Role of the source tenant in the resulting relationship.
-		\param proposedTargetRole Role of the target tenant in the resulting relationship.
-		\param message Optional human-readable message.
-		\param expiresAt Optional expiry timestamp (empty for no expiry).
-		\return Request ID if successful, empty if failed.
-	*/
-	virtual QByteArray CreateConnectionRequest(
-				const QByteArray& sourceTenantId,
-				const QString& targetIdentifier,
-				ITenantInfo::TenantRelationshipRole proposedSourceRole,
-				ITenantInfo::TenantRelationshipRole proposedTargetRole,
-				const QString& message = QString(),
-				const QString& expiresAt = QString()) = 0;
+// --- Connection Code ---
 
-	/**
-		Create a one-time connect code that any tenant can redeem to connect.
-		\param sourceTenantId Tenant generating the code.
-		\param proposedSourceRole Role of the source tenant in the resulting relationship.
-		\param proposedTargetRole Role of the redeeming tenant in the resulting relationship.
-		\param message Optional human-readable message.
-		\param expiresAt Optional expiry timestamp (empty for no expiry).
-		\param generatedCode Output parameter receiving the generated connect code.
-		\return Request ID if successful, empty if failed.
-	*/
-	virtual QByteArray CreateConnectCode(
-				const QByteArray& sourceTenantId,
-				ITenantInfo::TenantRelationshipRole proposedSourceRole,
-				ITenantInfo::TenantRelationshipRole proposedTargetRole,
-				const QString& message,
-				const QString& expiresAt,
-				QString& generatedCode) = 0;
+virtual TenantConnectionCodeInfo GetConnectionCode(const QByteArray& tenantId) = 0;
+virtual QString RegenerateConnectionCode(const QByteArray& tenantId) = 0;
+virtual bool SetAllowConnectionsByCode(const QByteArray& tenantId, bool allow) = 0;
 
-	/**
-		Accept a pending connection request by its ID.
-		Establishes the asymmetric relationship between the source and the
-		accepting tenant.
-		\param requestId The request to accept.
-		\param acceptingTenantId The tenant accepting the request.
-		\return true if accepted successfully.
-	*/
-	virtual bool AcceptConnectionRequest(const QByteArray& requestId, const QByteArray& acceptingTenantId) = 0;
+// --- Connection Requests ---
 
-	/**
-		Accept a pending connection request by its connect code.
-		\param connectCode The connect code to redeem.
-		\param acceptingTenantId The tenant redeeming the code.
-		\return The accepted request ID, or empty on failure.
-	*/
-	virtual QByteArray AcceptConnectCode(const QString& connectCode, const QByteArray& acceptingTenantId) = 0;
+virtual QByteArray CreateConnectionRequest(
+const QByteArray& sourceTenantId,
+const QString& connectionCode,
+const QString& message = QString()) = 0;
 
-	/**
-		Reject a pending connection request.
-		\return true if rejected successfully.
-	*/
-	virtual bool RejectConnectionRequest(const QByteArray& requestId) = 0;
+virtual QByteArray ApproveConnectionRequest(const QByteArray& requestId, const QByteArray& approvingTenantId) = 0;
+virtual bool RejectConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId) = 0;
+virtual bool CancelConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId) = 0;
+virtual ConnectionRequests GetConnectionRequests(const QByteArray& tenantId) const = 0;
 
-	/**
-		Revoke a connection request issued by the source tenant.
-		\return true if revoked successfully.
-	*/
-	virtual bool RevokeConnectionRequest(const QByteArray& requestId) = 0;
+// --- Connections ---
 
-	/**
-		Delete (physically remove) a connect code request by its ID.
-		Typically used by the originating tenant to revoke and remove the code
-		from history.
-		\return true if the request was removed.
-	*/
-	virtual bool DeleteConnectCode(const QByteArray& requestId) = 0;
+virtual TenantConnections GetConnections(const QByteArray& tenantId) const = 0;
+virtual bool RemoveConnection(const QByteArray& connectionId, const QByteArray& tenantId) = 0;
 
-	/**
-		Purge expired connect-code requests for the specified source tenant.
-		\return Number of removed expired requests.
-	*/
-	virtual int PurgeExpiredConnectCodes(const QByteArray& sourceTenantId) = 0;
+// --- Relationship Proposals ---
 
-	/**
-		Get a specific connection request by its ID.
-	*/
-	virtual TenantConnectionRequestInfo GetConnectionRequest(const QByteArray& requestId) const = 0;
+virtual QByteArray CreateRelationshipProposal(const RelationshipProposalInfo& proposal) = 0;
+virtual QByteArray ApproveRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) = 0;
+virtual bool RejectRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) = 0;
+virtual bool CancelRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) = 0;
+virtual RelationshipProposals GetRelationshipProposals(const QByteArray& tenantId) const = 0;
 
-	/**
-		Get all connection requests issued by the specified source tenant.
-	*/
-	virtual TenantConnectionRequests GetOutgoingRequests(const QByteArray& sourceTenantId) const = 0;
+// --- Relationships ---
 
-	/**
-		Get all connection requests addressed to the specified target tenant
-		(either resolved by ID or by its external identifier).
-	*/
-	virtual TenantConnectionRequests GetIncomingRequests(
-				const QByteArray& targetTenantId,
-				const QString& targetIdentifier = QString()) const = 0;
-
-	/**
-		Get a pending connection request by its connect code.
-	*/
-	virtual TenantConnectionRequestInfo GetRequestByCode(const QString& connectCode) const = 0;
+virtual ITenantInfo::TenantRelationships GetTenantRelationships(const QByteArray& tenantId) const = 0;
+virtual bool RemoveTenantRelationship(const QByteArray& tenantId, const QByteArray& relationshipId) = 0;
 };
 
 

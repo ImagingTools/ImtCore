@@ -86,10 +86,9 @@ istd::IChangeableUniquePtr CTenantConnectionRequestDbDelegateComp::CreateObjectF
 		info.message = record.value("Message").toString();
 	}
 	if (record.contains("Status")){
-		info.status = static_cast<imtauth::TenantConnectionStatus>(record.value("Status").toInt());
+		info.status = static_cast<imtauth::ConnectionRequestStatus>(record.value("Status").toInt());
 	}
 	info.createdAt = RecordDateTimeToString(record, "CreatedAt");
-	info.expiresAt = RecordDateTimeToString(record, "ExpiresAt");
 	info.respondedAt = RecordDateTimeToString(record, "RespondedAt");
 
 	requestPtr->SetRequestInfo(info);

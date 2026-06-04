@@ -11,83 +11,262 @@ import imtauthgui 1.0
 /**
  * TenantRelationshipsPage
  *
- * Relationships tab of the TenantEditor.
- *
- * Displays tenant relationships using the standard TenantSimpleCollectionPage
- * mechanism (FilterableSelectGqlDataProvider + default list delegate), following
- * the same pattern as TenantRolesPage.
- *
- * Relationships are established automatically when connections are accepted;
- * therefore the Create button is hidden.  Remove and Edit are available via
- * the standard header buttons and the per-item context menu.
+ * Displays active relationships and pending relationship proposals.
+ * Relationships are created via the Relationship Proposal flow (two-sided approval).
+ * Remove is available for active relationships.
  */
-TenantSimpleCollectionPage {
+ViewBase {
 	id: relationshipsPage
 
-	entityName: qsTr("Relationship")
-	entityNamePlural: qsTr("Tenant Relationships")
-	descriptionText: qsTr("Relationships are established automatically when connections are accepted.")
-	emptyText: qsTr("No relationships found. Establish a connection to create a relationship.")
+	anchors.fill: parent
+	commandsPanelVisible: false
+	contentColor: Style.baseColor
 
-	dataProvider: apiClient ? apiClient.tenantRelationshipsListDataProvider : null
-	showCreateButton: false
+	readonly property var tenantData: relationshipsPage.model
+	property var stateManager: null
+	property var apiClient: null
 
-	function removeItem(id) {
-		if (relationshipsPage.apiClient && relationshipsPage.tenantData)
-			relationshipsPage.apiClient.removeTenantRelationship(
-				relationshipsPage.tenantData.m_id, id)
-	}
-
-	// Populate the full-data model used by RelationshipView for edit pre-population
 	function updateGui() {
 		if (relationshipsPage.apiClient && relationshipsPage.tenantData
 				&& relationshipsPage.tenantData.m_id) {
-			relationshipsPage.apiClient.fetchTenantRelationships(
-				relationshipsPage.tenantData.m_id)
+			relationshipsPage.apiClient.fetchTenantRelationships(relationshipsPage.tenantData.m_id)
+			relationshipsPage.apiClient.fetchRelationshipProposals(relationshipsPage.tenantData.m_id)
 		}
 	}
 
-	onVisibleChanged: {
-		if (relationshipsPage.visible && relationshipsPage.apiClient
-				&& relationshipsPage.tenantData && relationshipsPage.tenantData.m_id) {
-			relationshipsPage.apiClient.fetchTenantRelationships(
-				relationshipsPage.tenantData.m_id)
-		}
+	Component.onCompleted: {
+		updateGui()
 	}
 
 	Connections {
 		target: relationshipsPage.apiClient
 
-		function onTenantRelationshipRemoved(relationshipId) {
-			PopupManager.addSuccessMessage(qsTr("Relationship removed"), true)
-			relationshipsPage.refresh()
-			if (relationshipsPage.apiClient && relationshipsPage.tenantData
-					&& relationshipsPage.tenantData.m_id) {
-				relationshipsPage.apiClient.fetchTenantRelationships(
-					relationshipsPage.tenantData.m_id)
-			}
+		function onTenantRelationshipsReceived() {
+			relationshipsList.model = relationshipsPage.apiClient.tenantRelationshipsModel
 		}
 
-		function onTenantRelationshipAdded(relationshipId) {
-			relationshipsPage.refresh()
-			if (relationshipsPage.apiClient && relationshipsPage.tenantData
-					&& relationshipsPage.tenantData.m_id) {
-				relationshipsPage.apiClient.fetchTenantRelationships(
-					relationshipsPage.tenantData.m_id)
-			}
+		function onRelationshipProposalsReceived() {
+			proposalsList.model = relationshipsPage.apiClient.relationshipProposalsModel
+		}
+
+		function onTenantRelationshipRemoved() {
+			PopupManager.addSuccessMessage(qsTr("Relationship removed"), true)
+			updateGui()
+		}
+
+		function onRelationshipProposalCreated() {
+			PopupManager.addSuccessMessage(qsTr("Relationship proposal sent"), true)
+			updateGui()
+		}
+
+		function onRelationshipProposalApproved(relationshipId) {
+			PopupManager.addSuccessMessage(
+				relationshipId ? qsTr("Relationship established") : qsTr("Proposal approved (awaiting counterparty)"), true)
+			updateGui()
+		}
+
+		function onRelationshipProposalRejected() {
+			PopupManager.addSuccessMessage(qsTr("Proposal rejected"), true)
+			updateGui()
 		}
 	}
 
-	customEditorComponent: Component {
-		RelationshipView {
-			apiClient: relationshipsPage.apiClient
-			tenantData: relationshipsPage.tenantData
-			editRelationshipId: relationshipsPage.__editItemId
+	Column {
+		anchors.fill: parent
+		anchors.margins: Style.marginL
+		spacing: Style.marginL
 
-			onRelationshipCreated: {
-				relationshipsPage.popEditor()
-				relationshipsPage.refresh()
+		Text {
+			text: qsTr("Relationships")
+			font.pixelSize: Style.fontSizeH2
+			font.bold: true
+			color: Style.textColor
+		}
+
+		Text {
+			text: qsTr("Business relationships with connected organizations. Creating or modifying a relationship requires approval from both parties.")
+			font.pixelSize: Style.fontSizeDefault
+			color: Style.textSecondaryColor
+			wrapMode: Text.WordWrap
+			width: parent.width
+		}
+
+		// --- Pending Proposals Section ---
+		Text {
+			visible: proposalsList.count > 0
+			text: qsTr("Pending Proposals")
+			font.pixelSize: Style.fontSizeH3
+			font.bold: true
+			color: Style.textColor
+		}
+
+		ListView {
+			id: proposalsList
+			width: parent.width
+			height: Math.min(contentHeight, 200)
+			clip: true
+			spacing: Style.marginS
+			visible: count > 0
+
+			delegate: Rectangle {
+				width: proposalsList.width
+				height: proposalCol.height + Style.marginM * 2
+				color: Style.highlightPanelColor
+				radius: Style.radiusS
+
+				Column {
+					id: proposalCol
+					anchors.left: parent.left
+					anchors.right: proposalActions.left
+					anchors.margins: Style.marginM
+					anchors.verticalCenter: parent.verticalCenter
+					spacing: Style.marginXS
+
+					Text {
+						text: {
+							var typeStr = modelData.proposalType === "Create" ? qsTr("New Relationship")
+								: modelData.proposalType === "Update" ? qsTr("Update Relationship")
+								: qsTr("Remove Relationship")
+							return typeStr + " — " + (modelData.counterpartyName || modelData.counterpartyTenantId || "")
+						}
+						font.pixelSize: Style.fontSizeDefault
+						font.bold: true
+						color: Style.textColor
+					}
+
+					Text {
+						text: qsTr("Status: %1").arg(modelData.status || "")
+						font.pixelSize: Style.fontSizeSmall
+						color: Style.textSecondaryColor
+					}
+
+					Text {
+						visible: modelData.message && modelData.message !== ""
+						text: modelData.message || ""
+						font.pixelSize: Style.fontSizeSmall
+						color: Style.textSecondaryColor
+					}
+				}
+
+				Row {
+					id: proposalActions
+					anchors.right: parent.right
+					anchors.rightMargin: Style.marginM
+					anchors.verticalCenter: parent.verticalCenter
+					spacing: Style.marginS
+
+					Button {
+						text: qsTr("Approve")
+						visible: modelData.counterpartyTenantId === (relationshipsPage.tenantData ? relationshipsPage.tenantData.m_id : "")
+							&& modelData.status === "ApprovedByInitiator"
+						onClicked: {
+							if (relationshipsPage.apiClient && relationshipsPage.tenantData) {
+								relationshipsPage.apiClient.approveRelationshipProposal(
+									modelData.id, relationshipsPage.tenantData.m_id)
+							}
+						}
+					}
+
+					Button {
+						text: qsTr("Reject")
+						visible: modelData.status !== "Applied" && modelData.status !== "Rejected" && modelData.status !== "Canceled"
+						onClicked: {
+							if (relationshipsPage.apiClient && relationshipsPage.tenantData) {
+								relationshipsPage.apiClient.rejectRelationshipProposal(
+									modelData.id, relationshipsPage.tenantData.m_id)
+							}
+						}
+					}
+				}
+			}
+		}
+
+		// --- Active Relationships Section ---
+		Text {
+			text: qsTr("Active Relationships")
+			font.pixelSize: Style.fontSizeH3
+			font.bold: true
+			color: Style.textColor
+		}
+
+		Button {
+			text: qsTr("+ Create Relationship Proposal")
+			visible: relationshipsPage.apiClient
+				&& relationshipsPage.apiClient.connectionsModel
+				&& relationshipsPage.apiClient.connectionsModel.count > 0
+			onClicked: {
+				proposalCreator.visible = true
+			}
+		}
+
+		ListView {
+			id: relationshipsList
+			width: parent.width
+			height: parent.height - y - Style.marginL
+			clip: true
+			spacing: Style.marginS
+
+			delegate: Rectangle {
+				width: relationshipsList.width
+				height: relCol.height + Style.marginM * 2
+				color: Style.panelColor
+				radius: Style.radiusS
+
+				Column {
+					id: relCol
+					anchors.left: parent.left
+					anchors.right: relRemoveBtn.left
+					anchors.margins: Style.marginM
+					anchors.verticalCenter: parent.verticalCenter
+					spacing: Style.marginXS
+
+					Text {
+						text: (modelData.targetTenantName || modelData.targetTenantId || "") +
+							" — " + (modelData.sourceRole || "") + " / " + (modelData.targetRole || "")
+						font.pixelSize: Style.fontSizeDefault
+						font.bold: true
+						color: Style.textColor
+					}
+
+					Text {
+						visible: modelData.description && modelData.description !== ""
+						text: modelData.description || ""
+						font.pixelSize: Style.fontSizeSmall
+						color: Style.textSecondaryColor
+					}
+
+					Text {
+						text: qsTr("Since: %1").arg(
+							modelData.createdAt ? new Date(modelData.createdAt).toLocaleDateString() : "—")
+						font.pixelSize: Style.fontSizeSmall
+						color: Style.textSecondaryColor
+					}
+				}
+
+				Button {
+					id: relRemoveBtn
+					text: qsTr("Remove")
+					anchors.right: parent.right
+					anchors.rightMargin: Style.marginM
+					anchors.verticalCenter: parent.verticalCenter
+					onClicked: {
+						if (relationshipsPage.apiClient && relationshipsPage.tenantData) {
+							relationshipsPage.apiClient.removeTenantRelationship(
+								relationshipsPage.tenantData.m_id, modelData.id)
+						}
+					}
+				}
+			}
+
+			Text {
+				visible: relationshipsList.count === 0
+				text: qsTr("No active relationships. Create a relationship proposal to establish one with a connected organization.")
+				font.pixelSize: Style.fontSizeDefault
+				color: Style.textSecondaryColor
+				anchors.centerIn: parent
+				wrapMode: Text.WordWrap
 			}
 		}
 	}
 }
+

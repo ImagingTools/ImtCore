@@ -5,6 +5,7 @@
 // Qt includes
 #include <QtCore/QDateTime>
 #include <QtCore/QUuid>
+#include <QtCore/QCryptographicHash>
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
@@ -14,426 +15,521 @@ namespace imtauth
 {
 
 
-namespace
-{
+// --- Helpers ---
 
-
-QString GenerateConnectCode()
+QString CTenantConnectionRequestManagerComp::GenerateConnectionCode() const
 {
-	// A reasonably short, human-transferable one-time code.
-	QByteArray raw = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-	QByteArray compact = raw.replace('-', "").left(12).toUpper();
-	return QString::fromUtf8(compact);
+// Generate a short, human-readable code (12 chars uppercase alphanumeric)
+QByteArray raw = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+QByteArray hash = QCryptographicHash::hash(raw, QCryptographicHash::Sha256).toHex().left(12).toUpper();
+return QString::fromUtf8(hash);
 }
 
 
-} // anonymous namespace
-
-
-QByteArray CTenantConnectionRequestManagerComp::StoreRequest(const TenantConnectionRequestInfo& info)
+QByteArray CTenantConnectionRequestManagerComp::FindTenantByConnectionCode(const QString& connectionCode) const
 {
-	if (!m_requestCollectionCompPtr.IsValid() || !m_requestFactoryCompPtr.IsValid()){
-		SendErrorMessage(0, "Connection request collection or factory not configured", "CTenantConnectionRequestManagerComp");
-		return QByteArray();
-	}
-
-	ITenantConnectionRequestDataUniquePtr requestPtr = m_requestFactoryCompPtr.CreateInstance();
-	if (!requestPtr.IsValid()){
-		return QByteArray();
-	}
-
-	istd::CChangeNotifier changeNotifier(this);
-
-	requestPtr->SetRequestInfo(info);
-
-	QByteArray storedId = m_requestCollectionCompPtr->InsertNewObject(
-				"TenantConnectionRequest", QString(), QString(), requestPtr.GetPtr(), info.requestId);
-
-	return storedId.isEmpty() ? QByteArray() : info.requestId;
+for (auto it = m_connectionCodes.constBegin(); it != m_connectionCodes.constEnd(); ++it){
+if (it.value().connectionCode == connectionCode){
+return it.key();
+}
+}
+return QByteArray();
 }
 
+
+bool CTenantConnectionRequestManagerComp::ConnectionExists(const QByteArray& tenantAId, const QByteArray& tenantBId) const
+{
+for (const TenantConnectionInfo& conn : m_connections){
+if (conn.status != CS_ACTIVE){
+continue;
+}
+if ((conn.tenantAId == tenantAId && conn.tenantBId == tenantBId)
+|| (conn.tenantAId == tenantBId && conn.tenantBId == tenantAId)){
+return true;
+}
+}
+return false;
+}
+
+
+QByteArray CTenantConnectionRequestManagerComp::CreateConnection(const QByteArray& tenantAId, const QByteArray& tenantBId)
+{
+if (ConnectionExists(tenantAId, tenantBId)){
+return QByteArray();
+}
+
+TenantConnectionInfo conn;
+conn.connectionId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+// Store in canonical order (smaller ID first)
+if (tenantAId < tenantBId){
+conn.tenantAId = tenantAId;
+conn.tenantBId = tenantBId;
+} else {
+conn.tenantAId = tenantBId;
+conn.tenantBId = tenantAId;
+}
+conn.status = CS_ACTIVE;
+conn.createdAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
+conn.updatedAt = conn.createdAt;
+
+m_connections.append(conn);
+return conn.connectionId;
+}
+
+
+void CTenantConnectionRequestManagerComp::ArchiveRelationshipsForConnection(const QByteArray& connectionId)
+{
+for (int i = 0; i < m_relationships.size(); ++i){
+if (m_relationships[i].connectionId == connectionId){
+m_relationships[i].status = RS_ARCHIVED;
+}
+}
+}
+
+
+bool CTenantConnectionRequestManagerComp::ApplyRelationshipProposal(const RelationshipProposalInfo& proposal)
+{
+if (proposal.proposalType == RPT_CREATE){
+ITenantInfo::TenantRelationship rel;
+rel.relationshipId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+rel.connectionId = proposal.connectionId;
+rel.sourceTenantId = proposal.initiatorTenantId;
+rel.targetTenantId = proposal.counterpartyTenantId;
+rel.sourceRole = proposal.proposedSourceRole;
+rel.targetRole = proposal.proposedTargetRole;
+rel.scope = proposal.proposedScope;
+rel.description = proposal.proposedDescription;
+rel.validFrom = proposal.proposedValidFrom;
+rel.validUntil = proposal.proposedValidUntil;
+rel.status = RS_ACTIVE;
+rel.createdAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
+m_relationships.append(rel);
+return true;
+}
+else if (proposal.proposalType == RPT_UPDATE){
+for (int i = 0; i < m_relationships.size(); ++i){
+if (m_relationships[i].relationshipId == proposal.existingRelationshipId){
+m_relationships[i].sourceRole = proposal.proposedSourceRole;
+m_relationships[i].targetRole = proposal.proposedTargetRole;
+m_relationships[i].scope = proposal.proposedScope;
+m_relationships[i].description = proposal.proposedDescription;
+m_relationships[i].validFrom = proposal.proposedValidFrom;
+m_relationships[i].validUntil = proposal.proposedValidUntil;
+m_relationships[i].updatedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
+return true;
+}
+}
+return false;
+}
+else if (proposal.proposalType == RPT_DELETE){
+for (int i = 0; i < m_relationships.size(); ++i){
+if (m_relationships[i].relationshipId == proposal.existingRelationshipId){
+m_relationships[i].status = RS_ARCHIVED;
+m_relationships[i].updatedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
+return true;
+}
+}
+return false;
+}
+return false;
+}
+
+
+// --- Connection Code ---
+
+TenantConnectionCodeInfo CTenantConnectionRequestManagerComp::GetConnectionCode(const QByteArray& tenantId)
+{
+if (tenantId.isEmpty()){
+return TenantConnectionCodeInfo();
+}
+
+auto it = m_connectionCodes.find(tenantId);
+if (it != m_connectionCodes.end()){
+return it.value();
+}
+
+// Auto-create connection code for this tenant
+TenantConnectionCodeInfo info;
+info.tenantId = tenantId;
+info.connectionCode = GenerateConnectionCode();
+info.allowConnectionsByCode = true;
+info.createdAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
+m_connectionCodes.insert(tenantId, info);
+return info;
+}
+
+
+QString CTenantConnectionRequestManagerComp::RegenerateConnectionCode(const QByteArray& tenantId)
+{
+if (tenantId.isEmpty()){
+return QString();
+}
+
+istd::CChangeNotifier changeNotifier(this);
+
+QString newCode = GenerateConnectionCode();
+auto it = m_connectionCodes.find(tenantId);
+if (it != m_connectionCodes.end()){
+it.value().connectionCode = newCode;
+} else {
+TenantConnectionCodeInfo info;
+info.tenantId = tenantId;
+info.connectionCode = newCode;
+info.allowConnectionsByCode = true;
+info.createdAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
+m_connectionCodes.insert(tenantId, info);
+}
+return newCode;
+}
+
+
+bool CTenantConnectionRequestManagerComp::SetAllowConnectionsByCode(const QByteArray& tenantId, bool allow)
+{
+if (tenantId.isEmpty()){
+return false;
+}
+
+istd::CChangeNotifier changeNotifier(this);
+
+// Ensure code exists
+GetConnectionCode(tenantId);
+m_connectionCodes[tenantId].allowConnectionsByCode = allow;
+return true;
+}
+
+
+// --- Connection Requests ---
 
 QByteArray CTenantConnectionRequestManagerComp::CreateConnectionRequest(
-		const QByteArray& sourceTenantId,
-		const QString& targetIdentifier,
-		ITenantInfo::TenantRelationshipRole proposedSourceRole,
-		ITenantInfo::TenantRelationshipRole proposedTargetRole,
-		const QString& message,
-		const QString& expiresAt)
+const QByteArray& sourceTenantId,
+const QString& connectionCode,
+const QString& message)
 {
-	if (sourceTenantId.isEmpty()){
-		SendErrorMessage(0, "Source tenant is required", "CTenantConnectionRequestManagerComp");
-		return QByteArray();
-	}
+if (sourceTenantId.isEmpty() || connectionCode.isEmpty()){
+SendErrorMessage(0, "Source tenant and connection code are required", "CTenantConnectionRequestManagerComp");
+return QByteArray();
+}
 
-	if (targetIdentifier.isEmpty()){
-		SendErrorMessage(0, "Target identifier is required", "CTenantConnectionRequestManagerComp");
-		return QByteArray();
-	}
+// Find target tenant by connection code
+QByteArray targetTenantId = FindTenantByConnectionCode(connectionCode);
+if (targetTenantId.isEmpty()){
+SendErrorMessage(0, "Invalid connection code", "CTenantConnectionRequestManagerComp");
+return QByteArray();
+}
 
-	TenantConnectionRequestInfo info;
-	info.requestId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-	info.sourceTenantId = sourceTenantId;
-	info.targetIdentifier = targetIdentifier;
-	info.proposedSourceRole = proposedSourceRole;
-	info.proposedTargetRole = proposedTargetRole;
-	info.message = message;
-	info.status = TCS_PENDING;
-	info.createdAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
-	info.expiresAt = expiresAt;
+// Cannot connect to self
+if (targetTenantId == sourceTenantId){
+SendErrorMessage(0, "Cannot create connection request to own organization", "CTenantConnectionRequestManagerComp");
+return QByteArray();
+}
 
-	return StoreRequest(info);
+// Check if target allows connections by code
+auto it = m_connectionCodes.constFind(targetTenantId);
+if (it != m_connectionCodes.constEnd() && !it.value().allowConnectionsByCode){
+SendErrorMessage(0, "Target organization has disabled connections by code", "CTenantConnectionRequestManagerComp");
+return QByteArray();
+}
+
+// Check if connection already exists
+if (ConnectionExists(sourceTenantId, targetTenantId)){
+SendErrorMessage(0, "Connection already exists between these organizations", "CTenantConnectionRequestManagerComp");
+return QByteArray();
+}
+
+istd::CChangeNotifier changeNotifier(this);
+
+ConnectionRequestInfo info;
+info.requestId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+info.sourceTenantId = sourceTenantId;
+info.targetTenantId = targetTenantId;
+info.connectionCode = connectionCode;
+info.message = message;
+info.status = CRS_PENDING;
+info.createdAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
+
+m_requests.append(info);
+return info.requestId;
 }
 
 
-QByteArray CTenantConnectionRequestManagerComp::CreateConnectCode(
-		const QByteArray& sourceTenantId,
-		ITenantInfo::TenantRelationshipRole proposedSourceRole,
-		ITenantInfo::TenantRelationshipRole proposedTargetRole,
-		const QString& message,
-		const QString& expiresAt,
-		QString& generatedCode)
+QByteArray CTenantConnectionRequestManagerComp::ApproveConnectionRequest(const QByteArray& requestId, const QByteArray& approvingTenantId)
 {
-	if (sourceTenantId.isEmpty()){
-		SendErrorMessage(0, "Source tenant is required", "CTenantConnectionRequestManagerComp");
-		return QByteArray();
-	}
+if (requestId.isEmpty() || approvingTenantId.isEmpty()){
+return QByteArray();
+}
 
-	generatedCode = GenerateConnectCode();
+for (int i = 0; i < m_requests.size(); ++i){
+if (m_requests[i].requestId == requestId){
+if (m_requests[i].status != CRS_PENDING){
+SendErrorMessage(0, "Request is not in pending state", "CTenantConnectionRequestManagerComp");
+return QByteArray();
+}
+if (m_requests[i].targetTenantId != approvingTenantId){
+SendErrorMessage(0, "Only the target tenant can approve this request", "CTenantConnectionRequestManagerComp");
+return QByteArray();
+}
 
-	TenantConnectionRequestInfo info;
-	info.requestId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-	info.sourceTenantId = sourceTenantId;
-	info.connectCode = generatedCode;
-	info.proposedSourceRole = proposedSourceRole;
-	info.proposedTargetRole = proposedTargetRole;
-	info.message = message;
-	info.status = TCS_PENDING;
-	info.createdAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
-	info.expiresAt = expiresAt;
+istd::CChangeNotifier changeNotifier(this);
 
-	QByteArray storedId = StoreRequest(info);
-	if (storedId.isEmpty()){
-		generatedCode.clear();
-	}
+m_requests[i].status = CRS_APPROVED;
+m_requests[i].respondedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 
-	return storedId;
+// Create the connection
+QByteArray connectionId = CreateConnection(m_requests[i].sourceTenantId, m_requests[i].targetTenantId);
+return connectionId;
+}
+}
+return QByteArray();
 }
 
 
-bool CTenantConnectionRequestManagerComp::IsRequestPending(const TenantConnectionRequestInfo& info) const
+bool CTenantConnectionRequestManagerComp::RejectConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId)
 {
-	if (info.status != TCS_PENDING){
-		return false;
-	}
-
-	if (!info.expiresAt.isEmpty()){
-		QDateTime expiresAt = QDateTime::fromString(info.expiresAt, Qt::ISODateWithMs);
-		if (expiresAt.isValid() && expiresAt < QDateTime::currentDateTimeUtc()){
-			return false;
-		}
-	}
-
-	return true;
+for (int i = 0; i < m_requests.size(); ++i){
+if (m_requests[i].requestId == requestId && m_requests[i].targetTenantId == tenantId){
+if (m_requests[i].status != CRS_PENDING){
+return false;
+}
+istd::CChangeNotifier changeNotifier(this);
+m_requests[i].status = CRS_REJECTED;
+m_requests[i].respondedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
+return true;
+}
+}
+return false;
 }
 
 
-bool CTenantConnectionRequestManagerComp::EstablishRelationship(
-		const TenantConnectionRequestInfo& info,
-		const QByteArray& acceptingTenantId)
+bool CTenantConnectionRequestManagerComp::CancelConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId)
 {
-	if (!m_tenantManagerCompPtr.IsValid()){
-		// Relationship creation is optional: the request can still be marked accepted.
-		return true;
-	}
-
-	if (info.sourceTenantId.isEmpty() || acceptingTenantId.isEmpty()){
-		return false;
-	}
-
-	// Source tenant keeps a relationship pointing at the accepting tenant.
-	// The legacy 'role' argument mirrors 'targetRole' (the counterparty's role),
-	// matching the convention used in OnAddTenantRelationship where role -> targetRole.
-	QByteArray sourceRel = m_tenantManagerCompPtr->AddTenantRelationship(
-				info.sourceTenantId,
-				acceptingTenantId,
-				info.proposedTargetRole, // role == targetRole
-				info.proposedSourceRole,
-				info.proposedTargetRole,
-				QString(),
-				info.createdAt,
-				QString(),
-				info.message);
-
-	// ... and the accepting tenant gets the mirror entry with swapped roles.
-	QByteArray targetRel = m_tenantManagerCompPtr->AddTenantRelationship(
-				acceptingTenantId,
-				info.sourceTenantId,
-				info.proposedSourceRole, // role == targetRole
-				info.proposedTargetRole,
-				info.proposedSourceRole,
-				QString(),
-				info.createdAt,
-				QString(),
-				info.message);
-
-	return !sourceRel.isEmpty() && !targetRel.isEmpty();
+for (int i = 0; i < m_requests.size(); ++i){
+if (m_requests[i].requestId == requestId && m_requests[i].sourceTenantId == tenantId){
+if (m_requests[i].status != CRS_PENDING){
+return false;
+}
+istd::CChangeNotifier changeNotifier(this);
+m_requests[i].status = CRS_CANCELED;
+m_requests[i].respondedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
+return true;
+}
+}
+return false;
 }
 
 
-bool CTenantConnectionRequestManagerComp::AcceptConnectionRequest(const QByteArray& requestId, const QByteArray& acceptingTenantId)
+ConnectionRequests CTenantConnectionRequestManagerComp::GetConnectionRequests(const QByteArray& tenantId) const
 {
-	if (!m_requestCollectionCompPtr.IsValid()){
-		return false;
-	}
-
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (!m_requestCollectionCompPtr->GetObjectData(requestId, dataPtr)){
-		return false;
-	}
-
-	ITenantConnectionRequestData* requestPtr = dynamic_cast<ITenantConnectionRequestData*>(dataPtr.GetPtr());
-	if (requestPtr == nullptr){
-		return false;
-	}
-
-	TenantConnectionRequestInfo info = requestPtr->GetRequestInfo();
-	if (!IsRequestPending(info)){
-		return false;
-	}
-
-	if (acceptingTenantId.isEmpty() || acceptingTenantId == info.sourceTenantId){
-		return false;
-	}
-
-	if (!EstablishRelationship(info, acceptingTenantId)){
-		return false;
-	}
-
-	istd::CChangeNotifier changeNotifier(this);
-
-	info.status = TCS_ACCEPTED;
-	info.targetTenantId = acceptingTenantId;
-	info.respondedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
-	requestPtr->SetRequestInfo(info);
-
-	return m_requestCollectionCompPtr->SetObjectData(requestId, *requestPtr);
+ConnectionRequests result;
+for (const ConnectionRequestInfo& req : m_requests){
+if (req.sourceTenantId == tenantId || req.targetTenantId == tenantId){
+result.append(req);
+}
+}
+return result;
 }
 
 
-QByteArray CTenantConnectionRequestManagerComp::AcceptConnectCode(const QString& connectCode, const QByteArray& acceptingTenantId)
+// --- Connections ---
+
+TenantConnections CTenantConnectionRequestManagerComp::GetConnections(const QByteArray& tenantId) const
 {
-	if (connectCode.isEmpty()){
-		return QByteArray();
-	}
-
-	TenantConnectionRequestInfo info = GetRequestByCode(connectCode);
-	if (info.requestId.isEmpty()){
-		return QByteArray();
-	}
-
-	if (!AcceptConnectionRequest(info.requestId, acceptingTenantId)){
-		return QByteArray();
-	}
-
-	return info.requestId;
+TenantConnections result;
+for (const TenantConnectionInfo& conn : m_connections){
+if (conn.status == CS_ACTIVE && (conn.tenantAId == tenantId || conn.tenantBId == tenantId)){
+result.append(conn);
+}
+}
+return result;
 }
 
 
-bool CTenantConnectionRequestManagerComp::UpdateRequestStatus(const QByteArray& requestId, TenantConnectionStatus status)
+bool CTenantConnectionRequestManagerComp::RemoveConnection(const QByteArray& connectionId, const QByteArray& tenantId)
 {
-	if (!m_requestCollectionCompPtr.IsValid()){
-		return false;
-	}
+for (int i = 0; i < m_connections.size(); ++i){
+if (m_connections[i].connectionId == connectionId){
+if (m_connections[i].tenantAId != tenantId && m_connections[i].tenantBId != tenantId){
+return false;
+}
+if (m_connections[i].status != CS_ACTIVE){
+return false;
+}
 
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (!m_requestCollectionCompPtr->GetObjectData(requestId, dataPtr)){
-		return false;
-	}
+istd::CChangeNotifier changeNotifier(this);
 
-	ITenantConnectionRequestData* requestPtr = dynamic_cast<ITenantConnectionRequestData*>(dataPtr.GetPtr());
-	if (requestPtr == nullptr){
-		return false;
-	}
+m_connections[i].status = CS_REMOVED;
+m_connections[i].updatedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 
-	TenantConnectionRequestInfo info = requestPtr->GetRequestInfo();
-	if (info.status != TCS_PENDING){
-		return false;
-	}
-
-	istd::CChangeNotifier changeNotifier(this);
-
-	info.status = status;
-	info.respondedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
-	requestPtr->SetRequestInfo(info);
-
-	return m_requestCollectionCompPtr->SetObjectData(requestId, *requestPtr);
+// Cascade: archive all relationships for this connection
+ArchiveRelationshipsForConnection(connectionId);
+return true;
+}
+}
+return false;
 }
 
 
-bool CTenantConnectionRequestManagerComp::RejectConnectionRequest(const QByteArray& requestId)
+// --- Relationship Proposals ---
+
+QByteArray CTenantConnectionRequestManagerComp::CreateRelationshipProposal(const RelationshipProposalInfo& proposal)
 {
-	return UpdateRequestStatus(requestId, TCS_REJECTED);
+if (proposal.connectionId.isEmpty() || proposal.initiatorTenantId.isEmpty() || proposal.counterpartyTenantId.isEmpty()){
+SendErrorMessage(0, "Connection ID and both tenant IDs are required", "CTenantConnectionRequestManagerComp");
+return QByteArray();
+}
+
+// Verify connection exists and is active
+bool connectionValid = false;
+for (const TenantConnectionInfo& conn : m_connections){
+if (conn.connectionId == proposal.connectionId && conn.status == CS_ACTIVE){
+connectionValid = true;
+break;
+}
+}
+if (!connectionValid){
+SendErrorMessage(0, "No active connection found", "CTenantConnectionRequestManagerComp");
+return QByteArray();
+}
+
+istd::CChangeNotifier changeNotifier(this);
+
+RelationshipProposalInfo newProposal = proposal;
+newProposal.proposalId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+newProposal.status = RPS_APPROVED_BY_INITIATOR; // Initiator auto-approves
+newProposal.createdAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
+newProposal.updatedAt = newProposal.createdAt;
+
+m_proposals.append(newProposal);
+return newProposal.proposalId;
 }
 
 
-bool CTenantConnectionRequestManagerComp::RevokeConnectionRequest(const QByteArray& requestId)
+QByteArray CTenantConnectionRequestManagerComp::ApproveRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId)
 {
-	return UpdateRequestStatus(requestId, TCS_REVOKED);
+for (int i = 0; i < m_proposals.size(); ++i){
+if (m_proposals[i].proposalId != proposalId){
+continue;
+}
+
+RelationshipProposalInfo& p = m_proposals[i];
+
+// The counterparty approves
+if (p.counterpartyTenantId == tenantId && p.status == RPS_APPROVED_BY_INITIATOR){
+istd::CChangeNotifier changeNotifier(this);
+p.status = RPS_APPLIED;
+p.updatedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
+if (ApplyRelationshipProposal(p)){
+// Return the relationship ID (last added)
+if (!m_relationships.isEmpty()){
+return m_relationships.last().relationshipId;
+}
+}
+return QByteArray();
+}
+
+// The initiator approves (when counterparty already approved)
+if (p.initiatorTenantId == tenantId && p.status == RPS_APPROVED_BY_COUNTERPARTY){
+istd::CChangeNotifier changeNotifier(this);
+p.status = RPS_APPLIED;
+p.updatedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
+if (ApplyRelationshipProposal(p)){
+if (!m_relationships.isEmpty()){
+return m_relationships.last().relationshipId;
+}
+}
+return QByteArray();
+}
+
+// If initiator hasn't approved yet but counterparty is approving
+if (p.counterpartyTenantId == tenantId && p.status == RPS_PENDING){
+istd::CChangeNotifier changeNotifier(this);
+p.status = RPS_APPROVED_BY_COUNTERPARTY;
+p.updatedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
+return QByteArray();
+}
+
+return QByteArray();
+}
+return QByteArray();
 }
 
 
-bool CTenantConnectionRequestManagerComp::DeleteConnectCode(const QByteArray& requestId)
+bool CTenantConnectionRequestManagerComp::RejectRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId)
 {
-	if (!m_requestCollectionCompPtr.IsValid() || requestId.isEmpty()){
-		return false;
-	}
-
-	TenantConnectionRequestInfo info = GetConnectionRequest(requestId);
-	if (info.requestId.isEmpty() || info.connectCode.isEmpty()){
-		return false;
-	}
-
-	istd::CChangeNotifier changeNotifier(this);
-
-	imtbase::IObjectCollection::Ids ids;
-	ids.append(requestId);
-	return m_requestCollectionCompPtr->RemoveElements(ids);
+for (int i = 0; i < m_proposals.size(); ++i){
+if (m_proposals[i].proposalId == proposalId){
+if (m_proposals[i].initiatorTenantId != tenantId && m_proposals[i].counterpartyTenantId != tenantId){
+return false;
+}
+if (m_proposals[i].status == RPS_APPLIED || m_proposals[i].status == RPS_REJECTED || m_proposals[i].status == RPS_CANCELED){
+return false;
+}
+istd::CChangeNotifier changeNotifier(this);
+m_proposals[i].status = RPS_REJECTED;
+m_proposals[i].updatedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
+return true;
+}
+}
+return false;
 }
 
 
-int CTenantConnectionRequestManagerComp::PurgeExpiredConnectCodes(const QByteArray& sourceTenantId)
+bool CTenantConnectionRequestManagerComp::CancelRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId)
 {
-	if (!m_requestCollectionCompPtr.IsValid() || sourceTenantId.isEmpty()){
-		return 0;
-	}
-
-	const QDateTime nowUtc = QDateTime::currentDateTimeUtc();
-	imtbase::IObjectCollection::Ids idsToRemove;
-
-	for (const QByteArray& id : m_requestCollectionCompPtr->GetElementIds()){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (!m_requestCollectionCompPtr->GetObjectData(id, dataPtr)){
-			continue;
-		}
-
-		const ITenantConnectionRequestData* requestPtr = dynamic_cast<const ITenantConnectionRequestData*>(dataPtr.GetPtr());
-		if (requestPtr == nullptr){
-			continue;
-		}
-
-		const TenantConnectionRequestInfo info = requestPtr->GetRequestInfo();
-		if (info.sourceTenantId != sourceTenantId || info.connectCode.isEmpty()){
-			continue;
-		}
-
-		if (info.expiresAt.isEmpty()){
-			continue;
-		}
-
-		QDateTime expiresAt = QDateTime::fromString(info.expiresAt, Qt::ISODateWithMs);
-		if (expiresAt.isValid() && expiresAt < nowUtc){
-			idsToRemove.append(id);
-		}
-	}
-
-	if (idsToRemove.isEmpty()){
-		return 0;
-	}
-
-	istd::CChangeNotifier changeNotifier(this);
-	if (!m_requestCollectionCompPtr->RemoveElements(idsToRemove)){
-		return 0;
-	}
-
-	return idsToRemove.count();
+for (int i = 0; i < m_proposals.size(); ++i){
+if (m_proposals[i].proposalId == proposalId && m_proposals[i].initiatorTenantId == tenantId){
+if (m_proposals[i].status == RPS_APPLIED || m_proposals[i].status == RPS_CANCELED){
+return false;
+}
+istd::CChangeNotifier changeNotifier(this);
+m_proposals[i].status = RPS_CANCELED;
+m_proposals[i].updatedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
+return true;
+}
+}
+return false;
 }
 
 
-TenantConnectionRequestInfo CTenantConnectionRequestManagerComp::GetConnectionRequest(const QByteArray& requestId) const
+RelationshipProposals CTenantConnectionRequestManagerComp::GetRelationshipProposals(const QByteArray& tenantId) const
 {
-	if (!m_requestCollectionCompPtr.IsValid()){
-		return TenantConnectionRequestInfo();
-	}
-
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (!m_requestCollectionCompPtr->GetObjectData(requestId, dataPtr)){
-		return TenantConnectionRequestInfo();
-	}
-
-	const ITenantConnectionRequestData* requestPtr = dynamic_cast<const ITenantConnectionRequestData*>(dataPtr.GetPtr());
-	if (requestPtr == nullptr){
-		return TenantConnectionRequestInfo();
-	}
-
-	return requestPtr->GetRequestInfo();
+RelationshipProposals result;
+for (const RelationshipProposalInfo& p : m_proposals){
+if (p.initiatorTenantId == tenantId || p.counterpartyTenantId == tenantId){
+result.append(p);
+}
+}
+return result;
 }
 
 
-TenantConnectionRequests CTenantConnectionRequestManagerComp::CollectRequests(
-		const std::function<bool(const TenantConnectionRequestInfo&)>& predicate) const
+// --- Relationships ---
+
+ITenantInfo::TenantRelationships CTenantConnectionRequestManagerComp::GetTenantRelationships(const QByteArray& tenantId) const
 {
-	TenantConnectionRequests result;
-	if (!m_requestCollectionCompPtr.IsValid()){
-		return result;
-	}
-
-	for (const QByteArray& id : m_requestCollectionCompPtr->GetElementIds()){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_requestCollectionCompPtr->GetObjectData(id, dataPtr)){
-			const ITenantConnectionRequestData* requestPtr = dynamic_cast<const ITenantConnectionRequestData*>(dataPtr.GetPtr());
-			if (requestPtr != nullptr){
-				TenantConnectionRequestInfo info = requestPtr->GetRequestInfo();
-				if (predicate(info)){
-					result.append(info);
-				}
-			}
-		}
-	}
-
-	return result;
+ITenantInfo::TenantRelationships result;
+for (const ITenantInfo::TenantRelationship& rel : m_relationships){
+if (rel.status == RS_ACTIVE && (rel.sourceTenantId == tenantId || rel.targetTenantId == tenantId)){
+result.append(rel);
+}
+}
+return result;
 }
 
 
-TenantConnectionRequests CTenantConnectionRequestManagerComp::GetOutgoingRequests(const QByteArray& sourceTenantId) const
+bool CTenantConnectionRequestManagerComp::RemoveTenantRelationship(const QByteArray& tenantId, const QByteArray& relationshipId)
 {
-	return CollectRequests([&sourceTenantId](const TenantConnectionRequestInfo& info){
-		return info.sourceTenantId == sourceTenantId;
-	});
+for (int i = 0; i < m_relationships.size(); ++i){
+if (m_relationships[i].relationshipId == relationshipId){
+if (m_relationships[i].sourceTenantId != tenantId && m_relationships[i].targetTenantId != tenantId){
+return false;
 }
-
-
-TenantConnectionRequests CTenantConnectionRequestManagerComp::GetIncomingRequests(
-		const QByteArray& targetTenantId,
-		const QString& targetIdentifier) const
-{
-	return CollectRequests([&targetTenantId, &targetIdentifier](const TenantConnectionRequestInfo& info){
-		if (!targetTenantId.isEmpty() && info.targetTenantId == targetTenantId){
-			return true;
-		}
-		if (!targetIdentifier.isEmpty() && info.targetIdentifier == targetIdentifier){
-			return true;
-		}
-		return false;
-	});
+istd::CChangeNotifier changeNotifier(this);
+m_relationships[i].status = RS_ARCHIVED;
+m_relationships[i].updatedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
+return true;
 }
-
-
-TenantConnectionRequestInfo CTenantConnectionRequestManagerComp::GetRequestByCode(const QString& connectCode) const
-{
-	if (connectCode.isEmpty()){
-		return TenantConnectionRequestInfo();
-	}
-
-	const TenantConnectionRequests requests = CollectRequests([&connectCode](const TenantConnectionRequestInfo& info){
-		return !info.connectCode.isEmpty() && info.connectCode == connectCode;
-	});
-
-	if (requests.isEmpty()){
-		return TenantConnectionRequestInfo();
-	}
-
-	return requests.first();
+}
+return false;
 }
 
 

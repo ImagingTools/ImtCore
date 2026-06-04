@@ -29,46 +29,61 @@ public:
 	I_BEGIN_COMPONENT(CTenantConnectionRequestManagerComp);
 		I_REGISTER_INTERFACE(imtauth::ITenantConnectionRequest);
 		I_ASSIGN(m_requestCollectionCompPtr, "RequestCollection", "Connection request collection", false, "RequestCollection");
+		I_ASSIGN(m_connectionCollectionCompPtr, "ConnectionCollection", "Connections collection", false, "ConnectionCollection");
+		I_ASSIGN(m_proposalCollectionCompPtr, "ProposalCollection", "Relationship proposals collection", false, "ProposalCollection");
 		I_ASSIGN(m_requestFactoryCompPtr, "RequestFactory", "Connection request factory", false, "TenantConnectionRequestInfo");
-		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager used to create relationships on accept", false, "TenantManager");
+		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager", false, "TenantManager");
 	I_END_COMPONENT;
 
+	// ITenantConnectionRequest - Connection Code
+	virtual TenantConnectionCodeInfo GetConnectionCode(const QByteArray& tenantId) override;
+	virtual QString RegenerateConnectionCode(const QByteArray& tenantId) override;
+	virtual bool SetAllowConnectionsByCode(const QByteArray& tenantId, bool allow) override;
+
+	// ITenantConnectionRequest - Connection Requests
 	virtual QByteArray CreateConnectionRequest(
 				const QByteArray& sourceTenantId,
-				const QString& targetIdentifier,
-				ITenantInfo::TenantRelationshipRole proposedSourceRole,
-				ITenantInfo::TenantRelationshipRole proposedTargetRole,
-				const QString& message = QString(),
-				const QString& expiresAt = QString()) override;
-	virtual QByteArray CreateConnectCode(
-				const QByteArray& sourceTenantId,
-				ITenantInfo::TenantRelationshipRole proposedSourceRole,
-				ITenantInfo::TenantRelationshipRole proposedTargetRole,
-				const QString& message,
-				const QString& expiresAt,
-				QString& generatedCode) override;
-	virtual bool AcceptConnectionRequest(const QByteArray& requestId, const QByteArray& acceptingTenantId) override;
-	virtual QByteArray AcceptConnectCode(const QString& connectCode, const QByteArray& acceptingTenantId) override;
-	virtual bool RejectConnectionRequest(const QByteArray& requestId) override;
-	virtual bool RevokeConnectionRequest(const QByteArray& requestId) override;
-	virtual bool DeleteConnectCode(const QByteArray& requestId) override;
-	virtual int PurgeExpiredConnectCodes(const QByteArray& sourceTenantId) override;
-	virtual TenantConnectionRequestInfo GetConnectionRequest(const QByteArray& requestId) const override;
-	virtual TenantConnectionRequests GetOutgoingRequests(const QByteArray& sourceTenantId) const override;
-	virtual TenantConnectionRequests GetIncomingRequests(
-				const QByteArray& targetTenantId,
-				const QString& targetIdentifier = QString()) const override;
-	virtual TenantConnectionRequestInfo GetRequestByCode(const QString& connectCode) const override;
+				const QString& connectionCode,
+				const QString& message = QString()) override;
+	virtual QByteArray ApproveConnectionRequest(const QByteArray& requestId, const QByteArray& approvingTenantId) override;
+	virtual bool RejectConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId) override;
+	virtual bool CancelConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId) override;
+	virtual ConnectionRequests GetConnectionRequests(const QByteArray& tenantId) const override;
+
+	// ITenantConnectionRequest - Connections
+	virtual TenantConnections GetConnections(const QByteArray& tenantId) const override;
+	virtual bool RemoveConnection(const QByteArray& connectionId, const QByteArray& tenantId) override;
+
+	// ITenantConnectionRequest - Relationship Proposals
+	virtual QByteArray CreateRelationshipProposal(const RelationshipProposalInfo& proposal) override;
+	virtual QByteArray ApproveRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) override;
+	virtual bool RejectRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) override;
+	virtual bool CancelRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) override;
+	virtual RelationshipProposals GetRelationshipProposals(const QByteArray& tenantId) const override;
+
+	// ITenantConnectionRequest - Relationships
+	virtual ITenantInfo::TenantRelationships GetTenantRelationships(const QByteArray& tenantId) const override;
+	virtual bool RemoveTenantRelationship(const QByteArray& tenantId, const QByteArray& relationshipId) override;
 
 private:
-	QByteArray StoreRequest(const TenantConnectionRequestInfo& info);
-	TenantConnectionRequests CollectRequests(const std::function<bool(const TenantConnectionRequestInfo&)>& predicate) const;
-	bool UpdateRequestStatus(const QByteArray& requestId, TenantConnectionStatus status);
-	bool IsRequestPending(const TenantConnectionRequestInfo& info) const;
-	bool EstablishRelationship(const TenantConnectionRequestInfo& info, const QByteArray& acceptingTenantId);
+	QString GenerateConnectionCode() const;
+	QByteArray FindTenantByConnectionCode(const QString& connectionCode) const;
+	bool ConnectionExists(const QByteArray& tenantAId, const QByteArray& tenantBId) const;
+	QByteArray CreateConnection(const QByteArray& tenantAId, const QByteArray& tenantBId);
+	bool ApplyRelationshipProposal(const RelationshipProposalInfo& proposal);
+	void ArchiveRelationshipsForConnection(const QByteArray& connectionId);
+
+	// In-memory storage for connection codes (persisted via DB delegate)
+	mutable QMap<QByteArray, TenantConnectionCodeInfo> m_connectionCodes;
+	mutable QList<ConnectionRequestInfo> m_requests;
+	mutable QList<TenantConnectionInfo> m_connections;
+	mutable QList<RelationshipProposalInfo> m_proposals;
+	mutable ITenantInfo::TenantRelationships m_relationships;
 
 private:
 	I_REF(imtbase::IObjectCollection, m_requestCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_connectionCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_proposalCollectionCompPtr);
 	I_FACT(imtauth::ITenantConnectionRequestData, m_requestFactoryCompPtr);
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 };

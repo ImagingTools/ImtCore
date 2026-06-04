@@ -15,28 +15,16 @@ namespace imtauth
 
 
 /**
-	Serializable data holder for a single tenant connection request.
-	Used as the stored representation of a TenantConnectionRequestInfo inside an
-	object collection (e.g. an SQL-backed repository).
+Serializable data holder for a single connection request.
+Used as the stored representation inside an object collection
+(e.g. an SQL-backed repository).
 */
 class ITenantConnectionRequestData: virtual public iser::IObject
 {
 public:
-	/**
-		Get the full connection request description.
-	*/
-	virtual TenantConnectionRequestInfo GetRequestInfo() const = 0;
-
-	/**
-		Set the full connection request description.
-	*/
-	virtual void SetRequestInfo(const TenantConnectionRequestInfo& requestInfo) = 0;
-
-	/**
-		Convenience accessor for the request ID, which is used as the
-		collection element key.
-	*/
-	virtual QByteArray GetRequestId() const = 0;
+virtual ConnectionRequestInfo GetRequestInfo() const = 0;
+virtual void SetRequestInfo(const ConnectionRequestInfo& requestInfo) = 0;
+virtual QByteArray GetRequestId() const = 0;
 };
 
 

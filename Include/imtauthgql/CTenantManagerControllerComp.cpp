@@ -78,72 +78,83 @@ sdl::V1_0::imtauth::CTenantRelationship RelationshipToData(
 }
 
 
-sdl::V1_0::imtauth::TenantConnectionStatus ToSdlConnectionStatus(imtauth::TenantConnectionStatus status)
+sdl::V1_0::imtauth::ConnectionRequestStatus ToSdlConnectionRequestStatus(imtauth::ConnectionRequestStatus status)
 {
 	switch (status){
-	case imtauth::TCS_ACCEPTED:
-		return sdl::V1_0::imtauth::TenantConnectionStatus::Accepted;
-	case imtauth::TCS_REJECTED:
-		return sdl::V1_0::imtauth::TenantConnectionStatus::Rejected;
-	case imtauth::TCS_EXPIRED:
-		return sdl::V1_0::imtauth::TenantConnectionStatus::Expired;
-	case imtauth::TCS_REVOKED:
-		return sdl::V1_0::imtauth::TenantConnectionStatus::Revoked;
+	case imtauth::CRS_APPROVED:
+		return sdl::V1_0::imtauth::ConnectionRequestStatus::Approved;
+	case imtauth::CRS_REJECTED:
+		return sdl::V1_0::imtauth::ConnectionRequestStatus::Rejected;
+	case imtauth::CRS_CANCELED:
+		return sdl::V1_0::imtauth::ConnectionRequestStatus::Canceled;
 	default:
-		return sdl::V1_0::imtauth::TenantConnectionStatus::Pending;
+		return sdl::V1_0::imtauth::ConnectionRequestStatus::Pending;
 	}
 }
 
 
-sdl::V1_0::imtauth::CTenantConnectionRequest ConnectionRequestToData(const imtauth::TenantConnectionRequestInfo& info)
+sdl::V1_0::imtauth::ConnectionStatus ToSdlConnectionStatus(imtauth::ConnectionStatus status)
 {
-	sdl::V1_0::imtauth::CTenantConnectionRequest data;
-	data.id = info.requestId;
-	data.sourceTenantId = info.sourceTenantId;
-	data.targetTenantId = info.targetTenantId;
-	data.targetIdentifier = info.targetIdentifier;
-	data.connectCode = info.connectCode;
-	data.proposedSourceRole = ToSdlRelationshipRole(info.proposedSourceRole);
-	data.proposedTargetRole = ToSdlRelationshipRole(info.proposedTargetRole);
-	data.message = info.message;
-	data.status = ToSdlConnectionStatus(info.status);
-	data.createdAt = info.createdAt;
-	data.expiresAt = info.expiresAt;
-	data.respondedAt = info.respondedAt;
-	return data;
+	switch (status){
+	case imtauth::CS_REMOVED:
+		return sdl::V1_0::imtauth::ConnectionStatus::Removed;
+	case imtauth::CS_SUSPENDED:
+		return sdl::V1_0::imtauth::ConnectionStatus::Suspended;
+	default:
+		return sdl::V1_0::imtauth::ConnectionStatus::Active;
+	}
+}
+
+
+sdl::V1_0::imtauth::RelationshipStatus ToSdlRelationshipStatus(imtauth::RelationshipStatus status)
+{
+	switch (status){
+	case imtauth::RS_ARCHIVED:
+		return sdl::V1_0::imtauth::RelationshipStatus::Archived;
+	case imtauth::RS_PENDING_APPROVAL:
+		return sdl::V1_0::imtauth::RelationshipStatus::PendingApproval;
+	default:
+		return sdl::V1_0::imtauth::RelationshipStatus::Active;
+	}
+}
+
+
+sdl::V1_0::imtauth::RelationshipProposalType ToSdlProposalType(imtauth::RelationshipProposalType type)
+{
+	switch (type){
+	case imtauth::RPT_UPDATE:
+		return sdl::V1_0::imtauth::RelationshipProposalType::Update;
+	case imtauth::RPT_DELETE:
+		return sdl::V1_0::imtauth::RelationshipProposalType::Delete;
+	default:
+		return sdl::V1_0::imtauth::RelationshipProposalType::Create;
+	}
+}
+
+
+sdl::V1_0::imtauth::RelationshipProposalStatus ToSdlProposalStatus(imtauth::RelationshipProposalStatus status)
+{
+	switch (status){
+	case imtauth::RPS_APPROVED_BY_INITIATOR:
+		return sdl::V1_0::imtauth::RelationshipProposalStatus::ApprovedByInitiator;
+	case imtauth::RPS_APPROVED_BY_COUNTERPARTY:
+		return sdl::V1_0::imtauth::RelationshipProposalStatus::ApprovedByCounterparty;
+	case imtauth::RPS_REJECTED:
+		return sdl::V1_0::imtauth::RelationshipProposalStatus::Rejected;
+	case imtauth::RPS_CANCELED:
+		return sdl::V1_0::imtauth::RelationshipProposalStatus::Canceled;
+	case imtauth::RPS_EXPIRED:
+		return sdl::V1_0::imtauth::RelationshipProposalStatus::Expired;
+	case imtauth::RPS_APPLIED:
+		return sdl::V1_0::imtauth::RelationshipProposalStatus::Applied;
+	default:
+		return sdl::V1_0::imtauth::RelationshipProposalStatus::Pending;
+	}
 }
 
 
 } // anonymous namespace
 
-
-// private methods
-
-bool CTenantManagerControllerComp::HasAcceptedConnection(const QByteArray& tenantIdA, const QByteArray& tenantIdB) const
-{
-	if (tenantIdA.isEmpty() || tenantIdB.isEmpty()){
-		return false;
-	}
-	if (!m_connectionRequestManagerCompPtr.IsValid()){
-		return false;
-	}
-
-	const imtauth::TenantConnectionRequests outgoing = m_connectionRequestManagerCompPtr->GetOutgoingRequests(tenantIdA);
-	for (const imtauth::TenantConnectionRequestInfo& info : outgoing){
-		if (info.status == imtauth::TCS_ACCEPTED && info.targetTenantId == tenantIdB){
-			return true;
-		}
-	}
-
-	const imtauth::TenantConnectionRequests incoming = m_connectionRequestManagerCompPtr->GetIncomingRequests(tenantIdA);
-	for (const imtauth::TenantConnectionRequestInfo& info : incoming){
-		if (info.status == imtauth::TCS_ACCEPTED && info.sourceTenantId == tenantIdB){
-			return true;
-		}
-	}
-
-	return false;
-}
 
 
 // protected methods
@@ -1056,371 +1067,658 @@ sdl::V1_0::imtauth::CEnsureSystemTenantPayload CTenantManagerControllerComp::OnE
 }
 
 
-sdl::V1_0::imtauth::CGetTenantConnectionRequestsPayload CTenantManagerControllerComp::OnGetTenantConnectionRequests(
-			const sdl::V1_0::imtauth::CGetTenantConnectionRequestsGqlRequest& getTenantConnectionRequestsRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& /*errorMessage*/) const
+sdl::V1_0::imtauth::CGetConnectionCodePayload CTenantManagerControllerComp::OnGetConnectionCode(
+const sdl::V1_0::imtauth::CGetConnectionCodeGqlRequest& request,
+const ::imtgql::CGqlRequest& /*gqlRequest*/,
+QString& /*errorMessage*/) const
 {
-	sdl::V1_0::imtauth::CGetTenantConnectionRequestsPayload response;
+sdl::V1_0::imtauth::CGetConnectionCodePayload response;
 
+if (!m_connectionRequestManagerCompPtr.IsValid()){
+response.errorMessage = QStringLiteral("Connection manager is not configured");
+return response;
+}
 
-	if (!m_connectionRequestManagerCompPtr.IsValid()){
-		response.errorMessage = QStringLiteral("Tenant connection request manager is not configured");
-		return response;
-	}
+sdl::V1_0::imtauth::GetConnectionCodeRequestArguments arguments = request.GetRequestedArguments();
+QByteArray tenantId;
+if (arguments.input->tenantId){
+tenantId = *arguments.input->tenantId;
+}
+if (tenantId.isEmpty()){
+response.errorMessage = QStringLiteral("Tenant ID is required");
+return response;
+}
 
-	QByteArray tenantId;
-	sdl::V1_0::imtauth::GetTenantConnectionRequestsRequestArguments arguments = getTenantConnectionRequestsRequest.GetRequestedArguments();
-	if (arguments.input->tenantId){
-		tenantId = *arguments.input->tenantId;
-	}
+imtauth::TenantConnectionCodeInfo codeInfo = m_connectionRequestManagerCompPtr->GetConnectionCode(tenantId);
+response.connectionCode.Emplace();
+response.connectionCode->connectionCode = codeInfo.connectionCode;
+response.connectionCode->allowConnectionsByCode = codeInfo.allowConnectionsByCode;
+response.connectionCode->tenantId = codeInfo.tenantId;
+response.connectionCode->createdAt = codeInfo.createdAt;
 
-	if (tenantId.isEmpty()){
-		response.errorMessage = QStringLiteral("Tenant ID is required");
-		return response;
-	}
-
-	response.requests.Emplace();
-
-	QSet<QByteArray> seenIds;
-	const imtauth::TenantConnectionRequests outgoing = m_connectionRequestManagerCompPtr->GetOutgoingRequests(tenantId);
-	for (const imtauth::TenantConnectionRequestInfo& info : outgoing){
-		if (!seenIds.contains(info.requestId)){
-			seenIds.insert(info.requestId);
-			response.requests->push_back(ConnectionRequestToData(info));
-		}
-	}
-
-	const imtauth::TenantConnectionRequests incoming = m_connectionRequestManagerCompPtr->GetIncomingRequests(tenantId);
-	for (const imtauth::TenantConnectionRequestInfo& info : incoming){
-		if (!seenIds.contains(info.requestId)){
-			seenIds.insert(info.requestId);
-			response.requests->push_back(ConnectionRequestToData(info));
-		}
-	}
-
-	// Resolve tenant names
-	if (m_tenantManagerCompPtr.IsValid()){
-		for (auto& req : *response.requests){
-			if (req == nullptr){
-				continue;
-			}
-
-			if (req->sourceTenantId){
-				const auto tenantPtr = m_tenantManagerCompPtr->GetTenant(*req->sourceTenantId);
-				if (tenantPtr){
-					req->sourceTenantName = tenantPtr->GetTenantName();
-				}
-			}
-			if (req->targetTenantId){
-				const auto tenantPtr = m_tenantManagerCompPtr->GetTenant(*req->targetTenantId);
-				if (tenantPtr){
-					req->targetTenantName = tenantPtr->GetTenantName();
-				}
-			}
-		}
-	}
-
-	return response;
+return response;
 }
 
 
-sdl::V1_0::imtauth::CGetTenantConnectCodeDetailsPayload CTenantManagerControllerComp::OnGetTenantConnectCodeDetails(
-		const sdl::V1_0::imtauth::CGetTenantConnectCodeDetailsGqlRequest& getTenantConnectCodeDetailsRequest,
-		const ::imtgql::CGqlRequest& /*gqlRequest*/,
-		QString& /*errorMessage*/) const
+sdl::V1_0::imtauth::CRegenerateConnectionCodePayload CTenantManagerControllerComp::OnRegenerateConnectionCode(
+const sdl::V1_0::imtauth::CRegenerateConnectionCodeGqlRequest& request,
+const ::imtgql::CGqlRequest& /*gqlRequest*/,
+QString& /*errorMessage*/) const
 {
-	sdl::V1_0::imtauth::CGetTenantConnectCodeDetailsPayload response;
+sdl::V1_0::imtauth::CRegenerateConnectionCodePayload response;
 
-	if (!m_connectionRequestManagerCompPtr.IsValid()){
-		response.errorMessage = QStringLiteral("Tenant connection request manager is not configured");
-		return response;
-	}
+if (!m_connectionRequestManagerCompPtr.IsValid()){
+response.errorMessage = QStringLiteral("Connection manager is not configured");
+return response;
+}
 
-	QString connectCode;
-	sdl::V1_0::imtauth::GetTenantConnectCodeDetailsRequestArguments arguments = getTenantConnectCodeDetailsRequest.GetRequestedArguments();
-	if (arguments.input->connectCode){
-		connectCode = *arguments.input->connectCode;
-	}
+sdl::V1_0::imtauth::RegenerateConnectionCodeRequestArguments arguments = request.GetRequestedArguments();
+QByteArray tenantId;
+if (arguments.input->tenantId){
+tenantId = *arguments.input->tenantId;
+}
+if (tenantId.isEmpty()){
+response.errorMessage = QStringLiteral("Tenant ID is required");
+return response;
+}
 
-	if (connectCode.isEmpty()){
-		response.errorMessage = QStringLiteral("Connect code is required");
-		return response;
-	}
+QString newCode = m_connectionRequestManagerCompPtr->RegenerateConnectionCode(tenantId);
+if (newCode.isEmpty()){
+response.errorMessage = QStringLiteral("Failed to regenerate connection code");
+} else {
+response.connectionCode = newCode;
+}
 
-	const imtauth::TenantConnectionRequestInfo info = m_connectionRequestManagerCompPtr->GetRequestByCode(connectCode);
-	if (info.requestId.isEmpty()){
-		response.errorMessage = QStringLiteral("Connect code not found or already used");
-		return response;
-	}
-
-	sdl::V1_0::imtauth::CTenantConnectCodePreview preview;
-	preview.sourceTenantId = info.sourceTenantId;
-	preview.proposedSourceRole = ToSdlRelationshipRole(info.proposedSourceRole);
-	preview.proposedTargetRole = ToSdlRelationshipRole(info.proposedTargetRole);
-	if (!info.message.isEmpty()){
-		preview.message = info.message;
-	}
-	if (!info.expiresAt.isEmpty()){
-		preview.expiresAt = info.expiresAt;
-	}
-
-	if (m_tenantManagerCompPtr.IsValid()){
-		const auto tenantPtr = m_tenantManagerCompPtr->GetTenant(info.sourceTenantId);
-		if (tenantPtr){
-			preview.sourceTenantName = tenantPtr->GetTenantName();
-		}
-	}
-
-	response.preview = preview;
-
-	return response;
+return response;
 }
 
 
-sdl::V1_0::imtauth::CCreateTenantConnectionRequestPayload CTenantManagerControllerComp::OnCreateTenantConnectionRequest(
-			const sdl::V1_0::imtauth::CCreateTenantConnectionRequestGqlRequest& createTenantConnectionRequestRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& /*errorMessage*/) const
+sdl::V1_0::imtauth::CSetAllowConnectionsByCodePayload CTenantManagerControllerComp::OnSetAllowConnectionsByCode(
+const sdl::V1_0::imtauth::CSetAllowConnectionsByCodeGqlRequest& request,
+const ::imtgql::CGqlRequest& /*gqlRequest*/,
+QString& /*errorMessage*/) const
 {
-	sdl::V1_0::imtauth::CCreateTenantConnectionRequestPayload response;
+sdl::V1_0::imtauth::CSetAllowConnectionsByCodePayload response;
 
+if (!m_connectionRequestManagerCompPtr.IsValid()){
+response.errorMessage = QStringLiteral("Connection manager is not configured");
+return response;
+}
 
-	if (!m_connectionRequestManagerCompPtr.IsValid()){
-		response.errorMessage = QStringLiteral("Tenant connection request manager is not configured");
-		return response;
-	}
+sdl::V1_0::imtauth::SetAllowConnectionsByCodeRequestArguments arguments = request.GetRequestedArguments();
+QByteArray tenantId;
+bool allow = true;
+if (arguments.input->tenantId){
+tenantId = *arguments.input->tenantId;
+}
+if (arguments.input->allow){
+allow = *arguments.input->allow;
+}
+if (tenantId.isEmpty()){
+response.errorMessage = QStringLiteral("Tenant ID is required");
+return response;
+}
 
-	QByteArray sourceTenantId;
-	QString targetIdentifier;
-	imtauth::ITenantInfo::TenantRelationshipRole proposedSourceRole = imtauth::ITenantInfo::Partner;
-	imtauth::ITenantInfo::TenantRelationshipRole proposedTargetRole = imtauth::ITenantInfo::Partner;
-	QString message;
-	QString expiresAt;
+bool success = m_connectionRequestManagerCompPtr->SetAllowConnectionsByCode(tenantId, allow);
+response.success = success;
+if (!success){
+response.errorMessage = QStringLiteral("Failed to update allow connections setting");
+}
 
-	sdl::V1_0::imtauth::CreateTenantConnectionRequestRequestArguments arguments = createTenantConnectionRequestRequest.GetRequestedArguments();
-	if (arguments.input->sourceTenantId){
-		sourceTenantId = *arguments.input->sourceTenantId;
-	}
-	if (arguments.input->targetIdentifier){
-		targetIdentifier = *arguments.input->targetIdentifier;
-	}
-	if (arguments.input->proposedSourceRole){
-		proposedSourceRole = FromSdlRelationshipRole(*arguments.input->proposedSourceRole);
-	}
-	if (arguments.input->proposedTargetRole){
-		proposedTargetRole = FromSdlRelationshipRole(*arguments.input->proposedTargetRole);
-	}
-	if (arguments.input->message){
-		message = *arguments.input->message;
-	}
-	if (arguments.input->expiresAt){
-		expiresAt = *arguments.input->expiresAt;
-	}
-
-	QByteArray requestId = m_connectionRequestManagerCompPtr->CreateConnectionRequest(
-				sourceTenantId,
-				targetIdentifier,
-				proposedSourceRole,
-				proposedTargetRole,
-				message,
-				expiresAt);
-
-	if (requestId.isEmpty()){
-		response.errorMessage = QStringLiteral("Failed to create tenant connection request");
-		return response;
-	}
-
-	response.requestId = requestId;
-
-	return response;
+return response;
 }
 
 
-sdl::V1_0::imtauth::CCreateTenantConnectCodePayload CTenantManagerControllerComp::OnCreateTenantConnectCode(
-			const sdl::V1_0::imtauth::CCreateTenantConnectCodeGqlRequest& createTenantConnectCodeRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& /*errorMessage*/) const
+sdl::V1_0::imtauth::CGetConnectionRequestsPayload CTenantManagerControllerComp::OnGetConnectionRequests(
+const sdl::V1_0::imtauth::CGetConnectionRequestsGqlRequest& request,
+const ::imtgql::CGqlRequest& /*gqlRequest*/,
+QString& /*errorMessage*/) const
 {
-	sdl::V1_0::imtauth::CCreateTenantConnectCodePayload response;
+sdl::V1_0::imtauth::CGetConnectionRequestsPayload response;
 
+if (!m_connectionRequestManagerCompPtr.IsValid()){
+response.errorMessage = QStringLiteral("Connection manager is not configured");
+return response;
+}
 
-	if (!m_connectionRequestManagerCompPtr.IsValid()){
-		response.errorMessage = QStringLiteral("Tenant connection request manager is not configured");
-		return response;
-	}
+sdl::V1_0::imtauth::GetConnectionRequestsRequestArguments arguments = request.GetRequestedArguments();
+QByteArray tenantId;
+if (arguments.input->tenantId){
+tenantId = *arguments.input->tenantId;
+}
+if (tenantId.isEmpty()){
+response.errorMessage = QStringLiteral("Tenant ID is required");
+return response;
+}
 
-	QByteArray sourceTenantId;
-	imtauth::ITenantInfo::TenantRelationshipRole proposedSourceRole = imtauth::ITenantInfo::Partner;
-	imtauth::ITenantInfo::TenantRelationshipRole proposedTargetRole = imtauth::ITenantInfo::Partner;
-	QString message;
-	QString expiresAt;
+imtauth::ConnectionRequests requests = m_connectionRequestManagerCompPtr->GetConnectionRequests(tenantId);
+response.requests.Emplace();
+for (const imtauth::ConnectionRequestInfo& info : requests){
+sdl::V1_0::imtauth::CConnectionRequest data;
+data.id = info.requestId;
+data.sourceTenantId = info.sourceTenantId;
+data.targetTenantId = info.targetTenantId;
+data.connectionCode = info.connectionCode;
+data.message = info.message;
+data.status = ToSdlConnectionRequestStatus(info.status);
+data.createdAt = info.createdAt;
+data.respondedAt = info.respondedAt;
+data.sourceTenantName = info.sourceTenantName;
+data.targetTenantName = info.targetTenantName;
+response.requests->push_back(data);
+}
 
-	sdl::V1_0::imtauth::CreateTenantConnectCodeRequestArguments arguments = createTenantConnectCodeRequest.GetRequestedArguments();
-	if (arguments.input->sourceTenantId){
-		sourceTenantId = *arguments.input->sourceTenantId;
-	}
-	if (arguments.input->proposedSourceRole){
-		proposedSourceRole = FromSdlRelationshipRole(*arguments.input->proposedSourceRole);
-	}
-	if (arguments.input->proposedTargetRole){
-		proposedTargetRole = FromSdlRelationshipRole(*arguments.input->proposedTargetRole);
-	}
-	if (arguments.input->message){
-		message = *arguments.input->message;
-	}
-	if (arguments.input->expiresAt){
-		expiresAt = *arguments.input->expiresAt;
-	}
-
-	QString generatedCode;
-	QByteArray requestId = m_connectionRequestManagerCompPtr->CreateConnectCode(
-				sourceTenantId,
-				proposedSourceRole,
-				proposedTargetRole,
-				message,
-				expiresAt,
-				generatedCode);
-
-	if (requestId.isEmpty()){
-		response.errorMessage = QStringLiteral("Failed to create tenant connect code");
-		return response;
-	}
-
-	response.requestId = requestId;
-	response.connectCode = generatedCode;
-
-	return response;
+return response;
 }
 
 
-sdl::V1_0::imtauth::CAcceptTenantConnectionRequestPayload CTenantManagerControllerComp::OnAcceptTenantConnectionRequest(
-			const sdl::V1_0::imtauth::CAcceptTenantConnectionRequestGqlRequest& acceptTenantConnectionRequestRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& /*errorMessage*/) const
+sdl::V1_0::imtauth::CCreateConnectionRequestPayload CTenantManagerControllerComp::OnCreateConnectionRequest(
+const sdl::V1_0::imtauth::CCreateConnectionRequestGqlRequest& request,
+const ::imtgql::CGqlRequest& /*gqlRequest*/,
+QString& /*errorMessage*/) const
 {
-	sdl::V1_0::imtauth::CAcceptTenantConnectionRequestPayload response;
+sdl::V1_0::imtauth::CCreateConnectionRequestPayload response;
 
+if (!m_connectionRequestManagerCompPtr.IsValid()){
+response.errorMessage = QStringLiteral("Connection manager is not configured");
+return response;
+}
 
-	if (!m_connectionRequestManagerCompPtr.IsValid()){
-		response.success = false;
-		response.errorMessage = QStringLiteral("Tenant connection request manager is not configured");
-		return response;
-	}
+sdl::V1_0::imtauth::CreateConnectionRequestRequestArguments arguments = request.GetRequestedArguments();
+QByteArray sourceTenantId;
+QString connectionCode;
+QString message;
+if (arguments.input->sourceTenantId){
+sourceTenantId = *arguments.input->sourceTenantId;
+}
+if (arguments.input->connectionCode){
+connectionCode = *arguments.input->connectionCode;
+}
+if (arguments.input->message){
+message = *arguments.input->message;
+}
 
-	QByteArray requestId;
-	QByteArray acceptingTenantId;
-	sdl::V1_0::imtauth::AcceptTenantConnectionRequestRequestArguments arguments = acceptTenantConnectionRequestRequest.GetRequestedArguments();
-	if (arguments.input->requestId){
-		requestId = *arguments.input->requestId;
-	}
-	if (arguments.input->acceptingTenantId){
-		acceptingTenantId = *arguments.input->acceptingTenantId;
-	}
+QByteArray requestId = m_connectionRequestManagerCompPtr->CreateConnectionRequest(sourceTenantId, connectionCode, message);
+if (requestId.isEmpty()){
+response.errorMessage = QStringLiteral("Failed to create connection request. The target organization may have disabled connections by code, or a connection already exists.");
+} else {
+response.requestId = requestId;
+}
 
-	bool success = m_connectionRequestManagerCompPtr->AcceptConnectionRequest(requestId, acceptingTenantId);
-	response.success = success;
-	if (!success){
-		response.errorMessage = QStringLiteral("Failed to accept tenant connection request");
-	}
-
-	return response;
+return response;
 }
 
 
-sdl::V1_0::imtauth::CAcceptTenantConnectCodePayload CTenantManagerControllerComp::OnAcceptTenantConnectCode(
-			const sdl::V1_0::imtauth::CAcceptTenantConnectCodeGqlRequest& acceptTenantConnectCodeRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& /*errorMessage*/) const
+sdl::V1_0::imtauth::CApproveConnectionRequestPayload CTenantManagerControllerComp::OnApproveConnectionRequest(
+const sdl::V1_0::imtauth::CApproveConnectionRequestGqlRequest& request,
+const ::imtgql::CGqlRequest& /*gqlRequest*/,
+QString& /*errorMessage*/) const
 {
-	sdl::V1_0::imtauth::CAcceptTenantConnectCodePayload response;
+sdl::V1_0::imtauth::CApproveConnectionRequestPayload response;
 
+if (!m_connectionRequestManagerCompPtr.IsValid()){
+response.errorMessage = QStringLiteral("Connection manager is not configured");
+return response;
+}
 
-	if (!m_connectionRequestManagerCompPtr.IsValid()){
-		response.errorMessage = QStringLiteral("Tenant connection request manager is not configured");
-		return response;
-	}
+sdl::V1_0::imtauth::ApproveConnectionRequestRequestArguments arguments = request.GetRequestedArguments();
+QByteArray requestId;
+QByteArray tenantId;
+if (arguments.input->requestId){
+requestId = *arguments.input->requestId;
+}
+if (arguments.input->tenantId){
+tenantId = *arguments.input->tenantId;
+}
 
-	QString connectCode;
-	QByteArray acceptingTenantId;
-	sdl::V1_0::imtauth::AcceptTenantConnectCodeRequestArguments arguments = acceptTenantConnectCodeRequest.GetRequestedArguments();
-	if (arguments.input->connectCode){
-		connectCode = *arguments.input->connectCode;
-	}
-	if (arguments.input->acceptingTenantId){
-		acceptingTenantId = *arguments.input->acceptingTenantId;
-	}
+QByteArray connectionId = m_connectionRequestManagerCompPtr->ApproveConnectionRequest(requestId, tenantId);
+if (connectionId.isEmpty()){
+response.errorMessage = QStringLiteral("Failed to approve connection request");
+} else {
+response.connectionId = connectionId;
+}
 
-	QByteArray requestId = m_connectionRequestManagerCompPtr->AcceptConnectCode(connectCode, acceptingTenantId);
-	if (requestId.isEmpty()){
-		response.errorMessage = QStringLiteral("Failed to accept tenant connect code");
-		return response;
-	}
-
-	response.requestId = requestId;
-
-	return response;
+return response;
 }
 
 
-sdl::V1_0::imtauth::CRejectTenantConnectionRequestPayload CTenantManagerControllerComp::OnRejectTenantConnectionRequest(
-			const sdl::V1_0::imtauth::CRejectTenantConnectionRequestGqlRequest& rejectTenantConnectionRequestRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& /*errorMessage*/) const
+sdl::V1_0::imtauth::CRejectConnectionRequestPayload CTenantManagerControllerComp::OnRejectConnectionRequest(
+const sdl::V1_0::imtauth::CRejectConnectionRequestGqlRequest& request,
+const ::imtgql::CGqlRequest& /*gqlRequest*/,
+QString& /*errorMessage*/) const
 {
-	sdl::V1_0::imtauth::CRejectTenantConnectionRequestPayload response;
+sdl::V1_0::imtauth::CRejectConnectionRequestPayload response;
 
+if (!m_connectionRequestManagerCompPtr.IsValid()){
+response.errorMessage = QStringLiteral("Connection manager is not configured");
+return response;
+}
 
-	if (!m_connectionRequestManagerCompPtr.IsValid()){
-		response.success = false;
-		response.errorMessage = QStringLiteral("Tenant connection request manager is not configured");
-		return response;
-	}
+sdl::V1_0::imtauth::RejectConnectionRequestRequestArguments arguments = request.GetRequestedArguments();
+QByteArray requestId;
+QByteArray tenantId;
+if (arguments.input->requestId){
+requestId = *arguments.input->requestId;
+}
+if (arguments.input->tenantId){
+tenantId = *arguments.input->tenantId;
+}
 
-	QByteArray requestId;
-	sdl::V1_0::imtauth::RejectTenantConnectionRequestRequestArguments arguments = rejectTenantConnectionRequestRequest.GetRequestedArguments();
-	if (arguments.input->requestId){
-		requestId = *arguments.input->requestId;
-	}
+bool success = m_connectionRequestManagerCompPtr->RejectConnectionRequest(requestId, tenantId);
+response.success = success;
+if (!success){
+response.errorMessage = QStringLiteral("Failed to reject connection request");
+}
 
-	bool success = m_connectionRequestManagerCompPtr->RejectConnectionRequest(requestId);
-	response.success = success;
-	if (!success){
-		response.errorMessage = QStringLiteral("Failed to reject tenant connection request");
-	}
-
-	return response;
+return response;
 }
 
 
-sdl::V1_0::imtauth::CRevokeTenantConnectionRequestPayload CTenantManagerControllerComp::OnRevokeTenantConnectionRequest(
-			const sdl::V1_0::imtauth::CRevokeTenantConnectionRequestGqlRequest& revokeTenantConnectionRequestRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& /*errorMessage*/) const
+sdl::V1_0::imtauth::CCancelConnectionRequestPayload CTenantManagerControllerComp::OnCancelConnectionRequest(
+const sdl::V1_0::imtauth::CCancelConnectionRequestGqlRequest& request,
+const ::imtgql::CGqlRequest& /*gqlRequest*/,
+QString& /*errorMessage*/) const
 {
-	sdl::V1_0::imtauth::CRevokeTenantConnectionRequestPayload response;
+sdl::V1_0::imtauth::CCancelConnectionRequestPayload response;
 
-
-	if (!m_connectionRequestManagerCompPtr.IsValid()){
-		response.success = false;
-		response.errorMessage = QStringLiteral("Tenant connection request manager is not configured");
-		return response;
-	}
-
-	QByteArray requestId;
-	sdl::V1_0::imtauth::RevokeTenantConnectionRequestRequestArguments arguments = revokeTenantConnectionRequestRequest.GetRequestedArguments();
-	if (arguments.input->requestId){
-		requestId = *arguments.input->requestId;
-	}
-
-	bool success = m_connectionRequestManagerCompPtr->RevokeConnectionRequest(requestId);
-	response.success = success;
-	if (!success){
-		response.errorMessage = QStringLiteral("Failed to revoke tenant connection request");
-	}
-
-	return response;
+if (!m_connectionRequestManagerCompPtr.IsValid()){
+response.errorMessage = QStringLiteral("Connection manager is not configured");
+return response;
 }
+
+sdl::V1_0::imtauth::CancelConnectionRequestRequestArguments arguments = request.GetRequestedArguments();
+QByteArray requestId;
+QByteArray tenantId;
+if (arguments.input->requestId){
+requestId = *arguments.input->requestId;
+}
+if (arguments.input->tenantId){
+tenantId = *arguments.input->tenantId;
+}
+
+bool success = m_connectionRequestManagerCompPtr->CancelConnectionRequest(requestId, tenantId);
+response.success = success;
+if (!success){
+response.errorMessage = QStringLiteral("Failed to cancel connection request");
+}
+
+return response;
+}
+
+
+sdl::V1_0::imtauth::CGetConnectionsPayload CTenantManagerControllerComp::OnGetConnections(
+const sdl::V1_0::imtauth::CGetConnectionsGqlRequest& request,
+const ::imtgql::CGqlRequest& /*gqlRequest*/,
+QString& /*errorMessage*/) const
+{
+sdl::V1_0::imtauth::CGetConnectionsPayload response;
+
+if (!m_connectionRequestManagerCompPtr.IsValid()){
+response.errorMessage = QStringLiteral("Connection manager is not configured");
+return response;
+}
+
+sdl::V1_0::imtauth::GetConnectionsRequestArguments arguments = request.GetRequestedArguments();
+QByteArray tenantId;
+if (arguments.input->tenantId){
+tenantId = *arguments.input->tenantId;
+}
+if (tenantId.isEmpty()){
+response.errorMessage = QStringLiteral("Tenant ID is required");
+return response;
+}
+
+imtauth::TenantConnections connections = m_connectionRequestManagerCompPtr->GetConnections(tenantId);
+response.connections.Emplace();
+for (const imtauth::TenantConnectionInfo& info : connections){
+sdl::V1_0::imtauth::CConnection data;
+data.id = info.connectionId;
+data.tenantAId = info.tenantAId;
+data.tenantBId = info.tenantBId;
+data.status = ToSdlConnectionStatus(info.status);
+data.createdAt = info.createdAt;
+data.updatedAt = info.updatedAt;
+
+if (m_tenantManagerCompPtr.IsValid()){
+auto tenantAPtr = m_tenantManagerCompPtr->GetTenant(info.tenantAId);
+if (tenantAPtr){
+data.tenantAName = tenantAPtr->GetTenantName();
+}
+auto tenantBPtr = m_tenantManagerCompPtr->GetTenant(info.tenantBId);
+if (tenantBPtr){
+data.tenantBName = tenantBPtr->GetTenantName();
+}
+}
+
+response.connections->push_back(data);
+}
+
+return response;
+}
+
+
+sdl::V1_0::imtauth::CRemoveConnectionPayload CTenantManagerControllerComp::OnRemoveConnection(
+const sdl::V1_0::imtauth::CRemoveConnectionGqlRequest& request,
+const ::imtgql::CGqlRequest& /*gqlRequest*/,
+QString& /*errorMessage*/) const
+{
+sdl::V1_0::imtauth::CRemoveConnectionPayload response;
+
+if (!m_connectionRequestManagerCompPtr.IsValid()){
+response.errorMessage = QStringLiteral("Connection manager is not configured");
+return response;
+}
+
+sdl::V1_0::imtauth::RemoveConnectionRequestArguments arguments = request.GetRequestedArguments();
+QByteArray connectionId;
+QByteArray tenantId;
+if (arguments.input->connectionId){
+connectionId = *arguments.input->connectionId;
+}
+if (arguments.input->tenantId){
+tenantId = *arguments.input->tenantId;
+}
+
+bool success = m_connectionRequestManagerCompPtr->RemoveConnection(connectionId, tenantId);
+response.success = success;
+if (!success){
+response.errorMessage = QStringLiteral("Failed to remove connection");
+}
+
+return response;
+}
+
+
+sdl::V1_0::imtauth::CGetTenantRelationshipsPayload CTenantManagerControllerComp::OnGetTenantRelationships(
+const sdl::V1_0::imtauth::CGetTenantRelationshipsGqlRequest& request,
+const ::imtgql::CGqlRequest& /*gqlRequest*/,
+QString& /*errorMessage*/) const
+{
+sdl::V1_0::imtauth::CGetTenantRelationshipsPayload response;
+
+if (!m_connectionRequestManagerCompPtr.IsValid()){
+response.errorMessage = QStringLiteral("Connection manager is not configured");
+return response;
+}
+
+sdl::V1_0::imtauth::GetTenantRelationshipsRequestArguments arguments = request.GetRequestedArguments();
+QByteArray tenantId;
+if (arguments.input->tenantId){
+tenantId = *arguments.input->tenantId;
+}
+if (tenantId.isEmpty()){
+response.errorMessage = QStringLiteral("Tenant ID is required");
+return response;
+}
+
+imtauth::ITenantInfo::TenantRelationships relationships = m_connectionRequestManagerCompPtr->GetTenantRelationships(tenantId);
+response.relationships.Emplace();
+for (const imtauth::ITenantInfo::TenantRelationship& rel : relationships){
+sdl::V1_0::imtauth::CTenantRelationship data;
+data.id = rel.relationshipId;
+data.connectionId = rel.connectionId;
+data.sourceTenantId = rel.sourceTenantId;
+data.targetTenantId = rel.targetTenantId;
+data.sourceRole = ToSdlRelationshipRole(rel.sourceRole);
+data.targetRole = ToSdlRelationshipRole(rel.targetRole);
+data.scope = rel.scope;
+data.validFrom = rel.validFrom;
+data.validUntil = rel.validUntil;
+data.status = ToSdlRelationshipStatus(static_cast<imtauth::RelationshipStatus>(rel.status));
+data.description = rel.description;
+data.createdAt = rel.createdAt;
+data.updatedAt = rel.updatedAt;
+response.relationships->push_back(data);
+}
+
+return response;
+}
+
+
+sdl::V1_0::imtauth::CRemoveTenantRelationshipPayload CTenantManagerControllerComp::OnRemoveTenantRelationship(
+const sdl::V1_0::imtauth::CRemoveTenantRelationshipGqlRequest& request,
+const ::imtgql::CGqlRequest& /*gqlRequest*/,
+QString& /*errorMessage*/) const
+{
+sdl::V1_0::imtauth::CRemoveTenantRelationshipPayload response;
+
+if (!m_connectionRequestManagerCompPtr.IsValid()){
+response.errorMessage = QStringLiteral("Connection manager is not configured");
+return response;
+}
+
+sdl::V1_0::imtauth::RemoveTenantRelationshipRequestArguments arguments = request.GetRequestedArguments();
+QByteArray tenantId;
+QByteArray relationshipId;
+if (arguments.input->tenantId){
+tenantId = *arguments.input->tenantId;
+}
+if (arguments.input->relationshipId){
+relationshipId = *arguments.input->relationshipId;
+}
+
+bool success = m_connectionRequestManagerCompPtr->RemoveTenantRelationship(tenantId, relationshipId);
+response.success = success;
+if (!success){
+response.errorMessage = QStringLiteral("Failed to remove relationship");
+}
+
+return response;
+}
+
+
+sdl::V1_0::imtauth::CGetRelationshipProposalsPayload CTenantManagerControllerComp::OnGetRelationshipProposals(
+const sdl::V1_0::imtauth::CGetRelationshipProposalsGqlRequest& request,
+const ::imtgql::CGqlRequest& /*gqlRequest*/,
+QString& /*errorMessage*/) const
+{
+sdl::V1_0::imtauth::CGetRelationshipProposalsPayload response;
+
+if (!m_connectionRequestManagerCompPtr.IsValid()){
+response.errorMessage = QStringLiteral("Connection manager is not configured");
+return response;
+}
+
+sdl::V1_0::imtauth::GetRelationshipProposalsRequestArguments arguments = request.GetRequestedArguments();
+QByteArray tenantId;
+if (arguments.input->tenantId){
+tenantId = *arguments.input->tenantId;
+}
+if (tenantId.isEmpty()){
+response.errorMessage = QStringLiteral("Tenant ID is required");
+return response;
+}
+
+imtauth::RelationshipProposals proposals = m_connectionRequestManagerCompPtr->GetRelationshipProposals(tenantId);
+response.proposals.Emplace();
+for (const imtauth::RelationshipProposalInfo& p : proposals){
+sdl::V1_0::imtauth::CRelationshipProposal data;
+data.id = p.proposalId;
+data.connectionId = p.connectionId;
+data.existingRelationshipId = p.existingRelationshipId;
+data.proposalType = ToSdlProposalType(p.proposalType);
+data.initiatorTenantId = p.initiatorTenantId;
+data.counterpartyTenantId = p.counterpartyTenantId;
+data.proposedSourceRole = ToSdlRelationshipRole(p.proposedSourceRole);
+data.proposedTargetRole = ToSdlRelationshipRole(p.proposedTargetRole);
+data.proposedScope = p.proposedScope;
+data.proposedDescription = p.proposedDescription;
+data.message = p.message;
+data.status = ToSdlProposalStatus(p.status);
+data.createdAt = p.createdAt;
+data.updatedAt = p.updatedAt;
+response.proposals->push_back(data);
+}
+
+return response;
+}
+
+
+sdl::V1_0::imtauth::CCreateRelationshipProposalPayload CTenantManagerControllerComp::OnCreateRelationshipProposal(
+const sdl::V1_0::imtauth::CCreateRelationshipProposalGqlRequest& request,
+const ::imtgql::CGqlRequest& /*gqlRequest*/,
+QString& /*errorMessage*/) const
+{
+sdl::V1_0::imtauth::CCreateRelationshipProposalPayload response;
+
+if (!m_connectionRequestManagerCompPtr.IsValid()){
+response.errorMessage = QStringLiteral("Connection manager is not configured");
+return response;
+}
+
+sdl::V1_0::imtauth::CreateRelationshipProposalRequestArguments arguments = request.GetRequestedArguments();
+
+imtauth::RelationshipProposalInfo proposal;
+if (arguments.input->connectionId){
+proposal.connectionId = *arguments.input->connectionId;
+}
+if (arguments.input->initiatorTenantId){
+proposal.initiatorTenantId = *arguments.input->initiatorTenantId;
+}
+if (arguments.input->proposalType){
+QString typeStr = *arguments.input->proposalType;
+if (typeStr == QStringLiteral("update")){
+proposal.proposalType = imtauth::RPT_UPDATE;
+} else if (typeStr == QStringLiteral("delete")){
+proposal.proposalType = imtauth::RPT_DELETE;
+} else {
+proposal.proposalType = imtauth::RPT_CREATE;
+}
+}
+if (arguments.input->proposedSourceRole){
+QString role = *arguments.input->proposedSourceRole;
+proposal.proposedSourceRole = imtauth::ITenantInfo::Partner;
+if (role == QStringLiteral("supplier")){
+proposal.proposedSourceRole = imtauth::ITenantInfo::Supplier;
+} else if (role == QStringLiteral("customer")){
+proposal.proposedSourceRole = imtauth::ITenantInfo::Customer;
+}
+}
+if (arguments.input->proposedTargetRole){
+QString role = *arguments.input->proposedTargetRole;
+proposal.proposedTargetRole = imtauth::ITenantInfo::Partner;
+if (role == QStringLiteral("supplier")){
+proposal.proposedTargetRole = imtauth::ITenantInfo::Supplier;
+} else if (role == QStringLiteral("customer")){
+proposal.proposedTargetRole = imtauth::ITenantInfo::Customer;
+}
+}
+if (arguments.input->proposedScope){
+proposal.proposedScope = *arguments.input->proposedScope;
+}
+if (arguments.input->proposedDescription){
+proposal.proposedDescription = *arguments.input->proposedDescription;
+}
+if (arguments.input->message){
+proposal.message = *arguments.input->message;
+}
+
+QByteArray proposalId = m_connectionRequestManagerCompPtr->CreateRelationshipProposal(proposal);
+if (proposalId.isEmpty()){
+response.errorMessage = QStringLiteral("Failed to create relationship proposal. A valid connection is required.");
+} else {
+response.proposalId = proposalId;
+}
+
+return response;
+}
+
+
+sdl::V1_0::imtauth::CApproveRelationshipProposalPayload CTenantManagerControllerComp::OnApproveRelationshipProposal(
+const sdl::V1_0::imtauth::CApproveRelationshipProposalGqlRequest& request,
+const ::imtgql::CGqlRequest& /*gqlRequest*/,
+QString& /*errorMessage*/) const
+{
+sdl::V1_0::imtauth::CApproveRelationshipProposalPayload response;
+
+if (!m_connectionRequestManagerCompPtr.IsValid()){
+response.errorMessage = QStringLiteral("Connection manager is not configured");
+return response;
+}
+
+sdl::V1_0::imtauth::ApproveRelationshipProposalRequestArguments arguments = request.GetRequestedArguments();
+QByteArray proposalId;
+QByteArray tenantId;
+if (arguments.input->proposalId){
+proposalId = *arguments.input->proposalId;
+}
+if (arguments.input->tenantId){
+tenantId = *arguments.input->tenantId;
+}
+
+QByteArray relationshipId = m_connectionRequestManagerCompPtr->ApproveRelationshipProposal(proposalId, tenantId);
+response.success = true;
+if (!relationshipId.isEmpty()){
+response.relationshipId = relationshipId;
+}
+
+return response;
+}
+
+
+sdl::V1_0::imtauth::CRejectRelationshipProposalPayload CTenantManagerControllerComp::OnRejectRelationshipProposal(
+const sdl::V1_0::imtauth::CRejectRelationshipProposalGqlRequest& request,
+const ::imtgql::CGqlRequest& /*gqlRequest*/,
+QString& /*errorMessage*/) const
+{
+sdl::V1_0::imtauth::CRejectRelationshipProposalPayload response;
+
+if (!m_connectionRequestManagerCompPtr.IsValid()){
+response.errorMessage = QStringLiteral("Connection manager is not configured");
+return response;
+}
+
+sdl::V1_0::imtauth::RejectRelationshipProposalRequestArguments arguments = request.GetRequestedArguments();
+QByteArray proposalId;
+QByteArray tenantId;
+if (arguments.input->proposalId){
+proposalId = *arguments.input->proposalId;
+}
+if (arguments.input->tenantId){
+tenantId = *arguments.input->tenantId;
+}
+
+bool success = m_connectionRequestManagerCompPtr->RejectRelationshipProposal(proposalId, tenantId);
+response.success = success;
+if (!success){
+response.errorMessage = QStringLiteral("Failed to reject relationship proposal");
+}
+
+return response;
+}
+
+
+sdl::V1_0::imtauth::CCancelRelationshipProposalPayload CTenantManagerControllerComp::OnCancelRelationshipProposal(
+const sdl::V1_0::imtauth::CCancelRelationshipProposalGqlRequest& request,
+const ::imtgql::CGqlRequest& /*gqlRequest*/,
+QString& /*errorMessage*/) const
+{
+sdl::V1_0::imtauth::CCancelRelationshipProposalPayload response;
+
+if (!m_connectionRequestManagerCompPtr.IsValid()){
+response.errorMessage = QStringLiteral("Connection manager is not configured");
+return response;
+}
+
+sdl::V1_0::imtauth::CancelRelationshipProposalRequestArguments arguments = request.GetRequestedArguments();
+QByteArray proposalId;
+QByteArray tenantId;
+if (arguments.input->proposalId){
+proposalId = *arguments.input->proposalId;
+}
+if (arguments.input->tenantId){
+tenantId = *arguments.input->tenantId;
+}
+
+bool success = m_connectionRequestManagerCompPtr->CancelRelationshipProposal(proposalId, tenantId);
+response.success = success;
+if (!success){
+response.errorMessage = QStringLiteral("Failed to cancel relationship proposal");
+}
+
+return response;
+}
+
 
 
 namespace
@@ -1979,82 +2277,6 @@ sdl::V1_0::imtauth::CUpdateOrderRequestStatusPayload CTenantManagerControllerCom
 	return response;
 }
 
-
-sdl::V1_0::imtauth::CDeleteTenantConnectCodePayload CTenantManagerControllerComp::OnDeleteTenantConnectCode(
-			const sdl::V1_0::imtauth::CDeleteTenantConnectCodeGqlRequest& deleteTenantConnectCodeRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& /*errorMessage*/) const
-{
-	sdl::V1_0::imtauth::CDeleteTenantConnectCodePayload response;
-
-	if (!m_connectionRequestManagerCompPtr.IsValid()){
-		response.success = false;
-		response.errorMessage = QStringLiteral("Tenant connection request manager is not configured");
-		return response;
-	}
-
-	QByteArray requestId;
-	QByteArray tenantId;
-	sdl::V1_0::imtauth::DeleteTenantConnectCodeRequestArguments arguments = deleteTenantConnectCodeRequest.GetRequestedArguments();
-	if (arguments.input->requestId){
-		requestId = *arguments.input->requestId;
-	}
-	if (arguments.input->tenantId){
-		tenantId = *arguments.input->tenantId;
-	}
-
-	if (requestId.isEmpty() || tenantId.isEmpty()){
-		response.success = false;
-		response.errorMessage = QStringLiteral("Request ID and tenant ID are required");
-		return response;
-	}
-
-	// Verify the request belongs to this tenant before allowing deletion
-	imtauth::TenantConnectionRequestInfo requestInfo = m_connectionRequestManagerCompPtr->GetConnectionRequest(requestId);
-	if (requestInfo.sourceTenantId != tenantId){
-		response.success = false;
-		response.errorMessage = QStringLiteral("Only the originating tenant can delete a connect code");
-		return response;
-	}
-
-	bool success = m_connectionRequestManagerCompPtr->DeleteConnectCode(requestId);
-	response.success = success;
-	if (!success){
-		response.errorMessage = QStringLiteral("Failed to delete connect code");
-	}
-
-	return response;
-}
-
-
-sdl::V1_0::imtauth::CPurgeExpiredConnectCodesPayload CTenantManagerControllerComp::OnPurgeExpiredConnectCodes(
-			const sdl::V1_0::imtauth::CPurgeExpiredConnectCodesGqlRequest& purgeExpiredConnectCodesRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& /*errorMessage*/) const
-{
-	sdl::V1_0::imtauth::CPurgeExpiredConnectCodesPayload response;
-
-	if (!m_connectionRequestManagerCompPtr.IsValid()){
-		response.errorMessage = QStringLiteral("Tenant connection request manager is not configured");
-		return response;
-	}
-
-	QByteArray tenantId;
-	sdl::V1_0::imtauth::PurgeExpiredConnectCodesRequestArguments arguments = purgeExpiredConnectCodesRequest.GetRequestedArguments();
-	if (arguments.input->tenantId){
-		tenantId = *arguments.input->tenantId;
-	}
-
-	if (tenantId.isEmpty()){
-		response.errorMessage = QStringLiteral("Tenant ID is required");
-		return response;
-	}
-
-	int purgedCount = m_connectionRequestManagerCompPtr->PurgeExpiredConnectCodes(tenantId);
-	response.purgedCount = purgedCount;
-
-	return response;
-}
 
 
 } // namespace imtauthgql

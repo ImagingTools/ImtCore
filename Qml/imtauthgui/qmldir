@@ -51,12 +51,10 @@ TenantPermissionsPage 1.0 TenantPermissionsPage.qml
 TenantCrossOrgGrantsPage 1.0 TenantCrossOrgGrantsPage.qml
 TenantContractsPage 1.0 TenantContractsPage.qml
 TenantRelationshipsPage 1.0 TenantRelationshipsPage.qml
-TenantConnectionRequestsPage 1.0 TenantConnectionRequestsPage.qml
-TenantConnectionRequestsView 1.0 TenantConnectionRequestsView.qml
-TenantConnectionOverviewView 1.0 TenantConnectionOverviewView.qml
-TenantConnectCodesView 1.0 TenantConnectCodesView.qml
-TenantRedeemCodeView 1.0 TenantRedeemCodeView.qml
-TenantConnectionsView 1.0 TenantConnectionsView.qml
+TenantConnectionCodePage 1.0 TenantConnectionCodePage.qml
+TenantConnectOrganizationPage 1.0 TenantConnectOrganizationPage.qml
+TenantMyConnectionsPage 1.0 TenantMyConnectionsPage.qml
+TenantIncomingRequestsPage 1.0 TenantIncomingRequestsPage.qml
 TenantMessagesPage 1.0 TenantMessagesPage.qml
 TenantSimpleCollectionPage 1.0 TenantSimpleCollectionPage.qml
 TenantDocumentEditorShell 1.0 TenantDocumentEditorShell.qml
