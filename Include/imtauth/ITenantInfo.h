@@ -48,13 +48,25 @@ public:
 	*/
 	enum TenantRelationshipRole
 	{
-		Parent = 0,
-		Child,
-		Partner,
-		Supplier,
-		Customer,
-		Affiliate
+		TRR_PARENT,
+		TRR_CHILD,
+		TRR_PARTNER,
+		TRR_SUPPLIER,
+		TRR_CUSTOMER,
+		TRR_AFFILIATE
 	};
+	I_DECLARE_ENUM(TenantRelationshipRole, TRR_PARENT, TRR_CHILD, TRR_PARTNER, TRR_SUPPLIER, TRR_CUSTOMER, TRR_AFFILIATE);
+
+	/**
+		Tenant relationship status.
+	*/
+	enum TenantRelationshipStatus
+	{
+		TRS_ACTIVE,
+		TRS_ARCHIVED,
+		TRS_PENDING_APPROVED
+	};
+	I_DECLARE_ENUM(TenantRelationshipStatus, TRS_ACTIVE, TRS_ARCHIVED, TRS_PENDING_APPROVED);
 
 	/**
 		Structure describing a relationship between tenants.
@@ -70,12 +82,12 @@ public:
 		QByteArray connectionId;
 		QByteArray sourceTenantId;
 		QByteArray targetTenantId;
-		TenantRelationshipRole sourceRole = Partner;
-		TenantRelationshipRole targetRole = Partner;
+		TenantRelationshipRole sourceRole = TRR_PARTNER;
+		TenantRelationshipRole targetRole = TRR_PARTNER;
 		QString scope;
 		QString validFrom;
 		QString validUntil;
-		int status = 0; // 0=Active, 1=Archived, 2=PendingApproval
+		TenantRelationshipStatus status = TRS_ACTIVE;
 		QString description;
 		QString createdAt;
 		QString updatedAt;

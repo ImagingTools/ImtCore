@@ -59,7 +59,7 @@ bool CCrossTenantMessageBrokerComp::ValidateRelationship(
 		if (relationship.targetTenantId != targetTenantId){
 			continue;
 		}
-		if (!relationship.isActive){
+		if (relationship.status != 0){
 			continue;
 		}
 		if (!IsWithinValidityWindow(relationship.validFrom, relationship.validUntil)){

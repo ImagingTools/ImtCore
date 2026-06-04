@@ -329,9 +329,6 @@ bool CTenantInfo::Serialize(iser::IArchive& archive)
 			rel = m_relationships[i];
 		}
 
-		int sourceRole = static_cast<int>(rel.sourceRole);
-		int targetRole = static_cast<int>(rel.targetRole);
-
 		iser::CArchiveTag relIdTag("RelationshipId", "Relationship ID", iser::CArchiveTag::TT_LEAF);
 		retVal = retVal && archive.BeginTag(relIdTag);
 		retVal = retVal && archive.Process(rel.relationshipId);
@@ -354,12 +351,12 @@ bool CTenantInfo::Serialize(iser::IArchive& archive)
 
 		iser::CArchiveTag sourceRoleTag("SourceRole", "Source Role", iser::CArchiveTag::TT_LEAF);
 		retVal = retVal && archive.BeginTag(sourceRoleTag);
-		retVal = retVal && archive.Process(sourceRole);
+		retVal = retVal && I_SERIALIZE_ENUM(TenantRelationshipRole, archive, rel.sourceRole);
 		retVal = retVal && archive.EndTag(sourceRoleTag);
 
 		iser::CArchiveTag targetRoleTag("TargetRole", "Target Role", iser::CArchiveTag::TT_LEAF);
 		retVal = retVal && archive.BeginTag(targetRoleTag);
-		retVal = retVal && archive.Process(targetRole);
+		retVal = retVal && I_SERIALIZE_ENUM(TenantRelationshipRole, archive, rel.targetRole);
 		retVal = retVal && archive.EndTag(targetRoleTag);
 
 		iser::CArchiveTag scopeTag("Scope", "Scope", iser::CArchiveTag::TT_LEAF);
@@ -379,7 +376,7 @@ bool CTenantInfo::Serialize(iser::IArchive& archive)
 
 		iser::CArchiveTag statusTag("Status", "Status", iser::CArchiveTag::TT_LEAF);
 		retVal = retVal && archive.BeginTag(statusTag);
-		retVal = retVal && archive.Process(rel.status);
+		retVal = retVal && I_SERIALIZE_ENUM(TenantRelationshipStatus, archive, rel.status);
 		retVal = retVal && archive.EndTag(statusTag);
 
 		iser::CArchiveTag descriptionTag("Description", "Description", iser::CArchiveTag::TT_LEAF);
@@ -398,8 +395,6 @@ bool CTenantInfo::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.EndTag(updatedAtRelTag);
 
 		if (!archive.IsStoring()){
-			rel.sourceRole = static_cast<TenantRelationshipRole>(sourceRole);
-			rel.targetRole = static_cast<TenantRelationshipRole>(targetRole);
 			m_relationships.append(rel);
 		}
 

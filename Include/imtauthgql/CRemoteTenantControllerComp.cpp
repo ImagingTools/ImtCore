@@ -215,15 +215,6 @@ sdl::V1_0::imtauth::CGetTenantIdsPayload CRemoteTenantControllerComp::OnGetTenan
 }
 
 
-sdl::V1_0::imtauth::CGetTenantRelationshipsPayload CRemoteTenantControllerComp::OnGetTenantRelationships(
-			const sdl::V1_0::imtauth::CGetTenantRelationshipsGqlRequest& /*getTenantRelationshipsRequest*/,
-			const ::imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
-{
-	return SendModelRequest<sdl::V1_0::imtauth::CGetTenantRelationshipsPayload>(gqlRequest, errorMessage);
-}
-
-
 sdl::V1_0::imtauth::CGetTenantPayload CRemoteTenantControllerComp::OnGetTenant(
 			const sdl::V1_0::imtauth::CGetTenantGqlRequest& /*getTenantRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
@@ -266,24 +257,6 @@ sdl::V1_0::imtauth::CSetTenantActivePayload CRemoteTenantControllerComp::OnSetTe
 			QString& errorMessage) const
 {
 	return SendModelRequest<sdl::V1_0::imtauth::CSetTenantActivePayload>(gqlRequest, errorMessage);
-}
-
-
-sdl::V1_0::imtauth::CAddTenantRelationshipPayload CRemoteTenantControllerComp::OnAddTenantRelationship(
-			const sdl::V1_0::imtauth::CAddTenantRelationshipGqlRequest& /*addTenantRelationshipRequest*/,
-			const ::imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
-{
-	return SendModelRequest<sdl::V1_0::imtauth::CAddTenantRelationshipPayload>(gqlRequest, errorMessage);
-}
-
-
-sdl::V1_0::imtauth::CRemoveTenantRelationshipPayload CRemoteTenantControllerComp::OnRemoveTenantRelationship(
-			const sdl::V1_0::imtauth::CRemoveTenantRelationshipGqlRequest& /*removeTenantRelationshipRequest*/,
-			const ::imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
-{
-	return SendModelRequest<sdl::V1_0::imtauth::CRemoveTenantRelationshipPayload>(gqlRequest, errorMessage);
 }
 
 

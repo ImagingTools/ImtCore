@@ -659,7 +659,7 @@ imtauth::ITenantInfo::TenantRelationships CTenantDbDelegateComp::LoadTenantRelat
 			rel.scope = record.value("Scope").toString();
 			rel.validFrom = record.value("ValidFrom").toString();
 			rel.validUntil = record.value("ValidUntil").toString();
-			rel.status = record.value("Status").toInt();
+			rel.status = static_cast<imtauth::ITenantInfo::TenantRelationshipStatus>(record.value("Status").toInt());
 			rel.description = record.value("Description").toString();
 			rel.createdAt = record.value("CreatedAt").toString();
 			rel.updatedAt = record.value("UpdatedAt").toString();

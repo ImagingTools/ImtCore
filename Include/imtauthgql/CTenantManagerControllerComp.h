@@ -43,12 +43,6 @@ protected:
 				const sdl::V1_0::imtauth::CGetTenantIdsGqlRequest& getTenantIdsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtauth::CGetTenantRelationshipsPayload OnGetTenantRelationships(
-				const sdl::V1_0::imtauth::CGetTenantRelationshipsGqlRequest& getTenantRelationshipsRequest,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
-	void extracted(sdl::V1_0::imtauth::CTenantData &tenantData,
-				   QByteArrayList &membershipIds) const;
 	virtual sdl::V1_0::imtauth::CGetTenantPayload OnGetTenant(
 			const sdl::V1_0::imtauth::CGetTenantGqlRequest &getTenantRequest,
 			const ::imtgql::CGqlRequest &gqlRequest,
@@ -67,14 +61,6 @@ protected:
 				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtauth::CSetTenantActivePayload OnSetTenantActive(
 				const sdl::V1_0::imtauth::CSetTenantActiveGqlRequest& setTenantActiveRequest,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtauth::CAddTenantRelationshipPayload OnAddTenantRelationship(
-				const sdl::V1_0::imtauth::CAddTenantRelationshipGqlRequest& addTenantRelationshipRequest,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
-	virtual sdl::V1_0::imtauth::CRemoveTenantRelationshipPayload OnRemoveTenantRelationship(
-				const sdl::V1_0::imtauth::CRemoveTenantRelationshipGqlRequest& removeTenantRelationshipRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtauth::CGetCrossOrgGrantsPayload OnGetCrossOrgGrants(
