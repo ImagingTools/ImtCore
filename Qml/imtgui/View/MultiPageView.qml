@@ -329,7 +329,7 @@ Item {
                                     root.toggleExpanded(model.id)
 
                                     if (!wasExpanded) {
-                                        var targetSubIndex = pagesModel.get(model.index).submenuVisited
+                                        var targetSubIndex = root.pagesModel.get(model.index).submenuVisited
                                             ? root.getLastSubPageIndex(model.id)
                                             : root.getFirstSubPageIndex(model.id)
 

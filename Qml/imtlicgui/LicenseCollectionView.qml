@@ -27,7 +27,7 @@ RemoteCollectionView {
 	}
 	
 	Component.onCompleted: {
-		collectionFilter.setSortingInfo(LicenseItemTypeMetaInfo.s_lastModified, "DESC");
+		collectionFilter.setSortingInfo(LicenseItemTypeMetaInfo.s_timeStamp, "DESC");
 	}
 	
 	Component {

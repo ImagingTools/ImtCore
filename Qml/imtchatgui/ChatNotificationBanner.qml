@@ -9,8 +9,8 @@ Rectangle {
 	id: chatNotificationBannerRoot
 	objectName: "ChatNotificationBanner"
 	visible: false
-	height: visible ? Style.sizeS : 0
-	color: Style.accentColor
+	height: visible ? Style.buttonHeightS : 0
+	color: Style.imaginToolsAccentColor
 	radius: Style.radiusS
 
 	property string senderName: ""
@@ -30,8 +30,8 @@ Rectangle {
 
 		// Avatar
 		Rectangle {
-			width: Style.avatarSizeXS
-			height: Style.avatarSizeXS
+			width: Style.controlHeightL
+			height: Style.controlHeightL
 			radius: width / 2
 			color: "white"
 			opacity: 0.3
@@ -48,7 +48,7 @@ Rectangle {
 
 		Column {
 			anchors.verticalCenter: parent.verticalCenter
-			width: parent.width - Style.avatarSizeXS - Style.paddingS - dismissBtn.width - Style.paddingXS
+			width: parent.width - Style.controlHeightL - Style.paddingS - dismissBtn.width - Style.paddingS
 
 			Text {
 				text: chatNotificationBannerRoot.senderName

@@ -23,13 +23,13 @@ Rectangle {
 		anchors.right: parent.right
 		anchors.top: parent.top
 		anchors.margins: Style.paddingS
-		spacing: Style.paddingXS
+		spacing: Style.paddingS
 
 		// Entity reference chips row
 		Row {
 			id: entityRefChips
 			width: parent.width
-			spacing: Style.paddingXS
+			spacing: Style.paddingS
 			visible: messageInputRoot.pendingEntityRefs.length > 0
 
 			Repeater {
@@ -51,16 +51,16 @@ Rectangle {
 		Row {
 			id: inputRow
 			width: parent.width
-			spacing: Style.paddingXS
+			spacing: Style.paddingS
 
 			TextInput {
 				id: textField
-				width: parent.width - sendButton.width - Style.paddingXS
+				width: parent.width - sendButton.width - Style.paddingS
 				height: Style.inputHeightM
 				verticalAlignment: TextInput.AlignVCenter
 				font.pixelSize: Style.fontSizeS
-				color: Style.textPrimaryColor
-				selectionColor: Style.accentColor
+				color: Style.imaginToolsAccentColor
+				selectionColor: Style.imaginToolsAccentColor
 				clip: true
 
 				property bool _typing: false
@@ -127,9 +127,8 @@ Rectangle {
 			Rectangle {
 				id: sendButton
 				width: Style.buttonHeightM
-				height: Style.inputHeightM
 				radius: Style.radiusS
-				color: textField.text.trim().length > 0 ? Style.accentColor : Style.disabledColor
+				color: textField.text.trim().length > 0 ? Style.imaginToolsAccentColor : Style.disabledColor
 
 				Text {
 					anchors.centerIn: parent

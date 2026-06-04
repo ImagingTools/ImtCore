@@ -9,11 +9,9 @@ Rectangle {
 	id: entitySearchPopupRoot
 	objectName: "EntitySearchPopup"
 	visible: false
-	color: Style.surfaceColor
-	border.color: Style.separatorColor
+	border.color: Style.borderColor2
 	border.width: 1
 	radius: Style.radiusS
-	height: Math.min(resultsListView.contentHeight + Style.paddingS * 2, Style.popupMaxHeight)
 	clip: true
 
 	property string searchQuery: ""
@@ -55,7 +53,7 @@ Rectangle {
 		anchors.left: parent.left
 		anchors.right: parent.right
 		anchors.top: parent.top
-		anchors.margins: Style.paddingXS
+		anchors.margins: Style.paddingS
 		height: contentHeight
 		model: entitySearchPopupRoot.searchResults
 		spacing: 2
@@ -85,13 +83,13 @@ Rectangle {
 					Text {
 						text: modelData.displayName || modelData.entityId
 						font.pixelSize: Style.fontSizeS
-						color: Style.textPrimaryColor
+						color: Style.imaginToolsAccentColor
 					}
 
 					Text {
 						text: modelData.entityType || ""
 						font.pixelSize: Style.fontSizeXS
-						color: Style.textSecondaryColor
+						color: Style.buttonInactiveTextColor
 					}
 				}
 			}
@@ -116,7 +114,7 @@ Rectangle {
 			anchors.centerIn: parent
 			text: qsTr("No results for \"%1\"").arg(entitySearchPopupRoot.searchQuery)
 			font.pixelSize: Style.fontSizeXS
-			color: Style.textSecondaryColor
+			color: Style.buttonInactiveTextColor
 		}
 	}
 }

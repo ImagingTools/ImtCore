@@ -17,11 +17,8 @@ Rectangle {
 
 	signal removeRequested()
 
-	width: compact ? Style.chipWidth : Style.cardWidth
-	height: compact ? Style.chipHeight : Style.cardHeight
 	radius: Style.radiusS
-	color: Style.accentColorLight
-	border.color: Style.accentColor
+	border.color: Style.imaginToolsAccentColor
 	border.width: 1
 
 	// Compact chip mode (used inside MessageInput)
@@ -29,19 +26,19 @@ Rectangle {
 		id: compactRow
 		visible: entityRefCardRoot.compact
 		anchors.centerIn: parent
-		spacing: Style.paddingXS
+		spacing: Style.paddingS
 
 		Text {
 			text: entityRefCardRoot.entityTypeIcon(entityRefCardRoot.entityType)
 			font.pixelSize: Style.fontSizeXS
-			color: Style.accentColor
+			color: Style.imaginToolsAccentColor
 			anchors.verticalCenter: parent.verticalCenter
 		}
 
 		Text {
 			text: entityRefCardRoot.displayName || entityRefCardRoot.entityId
 			font.pixelSize: Style.fontSizeXS
-			color: Style.textPrimaryColor
+			color: Style.imaginToolsAccentColor
 			anchors.verticalCenter: parent.verticalCenter
 			elide: Text.ElideRight
 			maximumLineCount: 1
@@ -50,7 +47,7 @@ Rectangle {
 		Text {
 			text: "×"
 			font.pixelSize: Style.fontSizeS
-			color: Style.textSecondaryColor
+			color: Style.buttonInactiveTextColor
 			anchors.verticalCenter: parent.verticalCenter
 
 			MouseArea {
@@ -69,21 +66,21 @@ Rectangle {
 		anchors.right: parent.right
 		anchors.top: parent.top
 		anchors.margins: Style.paddingS
-		spacing: Style.paddingXS
+		spacing: Style.paddingS
 
 		Row {
-			spacing: Style.paddingXS
+			spacing: Style.paddingS
 
 			Text {
 				text: entityRefCardRoot.entityTypeIcon(entityRefCardRoot.entityType)
 				font.pixelSize: Style.fontSizeM
-				color: Style.accentColor
+				color: Style.imaginToolsAccentColor
 			}
 
 			Text {
 				text: entityRefCardRoot.entityType
 				font.pixelSize: Style.fontSizeXS
-				color: Style.textSecondaryColor
+				color: Style.buttonInactiveTextColor
 				anchors.verticalCenter: parent.verticalCenter
 			}
 		}
@@ -92,7 +89,7 @@ Rectangle {
 			text: entityRefCardRoot.displayName || entityRefCardRoot.entityId
 			font.pixelSize: Style.fontSizeS
 			font.bold: true
-			color: Style.textPrimaryColor
+			color: Style.imaginToolsAccentColor
 			elide: Text.ElideRight
 			width: parent.width
 		}
@@ -101,7 +98,7 @@ Rectangle {
 			visible: entityRefCardRoot.previewData.length > 0
 			text: entityRefCardRoot.previewData
 			font.pixelSize: Style.fontSizeXS
-			color: Style.textSecondaryColor
+			color: Style.buttonInactiveTextColor
 			wrapMode: Text.Wrap
 			width: parent.width
 			maximumLineCount: 2

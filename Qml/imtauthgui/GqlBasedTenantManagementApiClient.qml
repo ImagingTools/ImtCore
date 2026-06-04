@@ -113,6 +113,12 @@ QtObject {
 	signal subscriptionMembershipRoleChanged(var notification)
 	signal subscriptionMembershipRemoved(var notification)
 
+	signal crossTenantMessageSent(string messageId)
+	signal crossTenantMessageStatusUpdated(string messageId)
+	signal orderRequestConfirmed(string requestId)
+	signal orderRequestRejected(string requestId)
+	signal orderRequestStatusUpdated(string requestId)
+
 	// --- Subscription client for membership notifications ---
 	property SubscriptionClient __membershipSubscription: SubscriptionClient {
 		gqlCommandId: "OnMembershipNotification"

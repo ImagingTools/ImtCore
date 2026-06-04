@@ -32,8 +32,8 @@ Item {
 		anchors.leftMargin: messageBubbleRoot.isOwn ? 0 : Style.paddingM
 		anchors.rightMargin: messageBubbleRoot.isOwn ? Style.paddingM : 0
 		anchors.top: parent.top
-		anchors.topMargin: Style.paddingXS
-		spacing: Style.paddingXS
+		anchors.topMargin: Style.paddingS
+		spacing: Style.paddingS
 		width: parent.width * 0.75
 
 		// Sender name (only for received messages)
@@ -42,7 +42,7 @@ Item {
 			text: messageBubbleRoot.senderName
 			font.pixelSize: Style.fontSizeXS
 			font.bold: true
-			color: Style.accentColor
+			color: Style.imaginToolsAccentColor
 		}
 
 		// Message bubble
@@ -51,7 +51,7 @@ Item {
 			width: bubbleColumn.width
 			height: contentText.height + Style.paddingS * 2
 			radius: Style.radiusS
-			color: messageBubbleRoot.isOwn ? Style.accentColor : Style.surfaceColor
+			color: messageBubbleRoot.isOwn ? Style.imaginToolsAccentColor : Style.surfaceColor
 
 			Text {
 				id: contentText
@@ -61,7 +61,7 @@ Item {
 				anchors.margins: Style.paddingM
 				text: messageBubbleRoot.content
 				font.pixelSize: Style.fontSizeS
-				color: messageBubbleRoot.isOwn ? "white" : Style.textPrimaryColor
+				color: messageBubbleRoot.isOwn ? "white" : Style.imaginToolsAccentColor
 				wrapMode: Text.Wrap
 			}
 		}
@@ -69,7 +69,7 @@ Item {
 		// Reactions row (like GitHub comment reactions: 👍 👎 ❤️ 🚀 etc.)
 		Row {
 			visible: messageBubbleRoot.reactions.length > 0
-			spacing: Style.paddingXS
+			spacing: Style.paddingS
 
 			Repeater {
 				model: messageBubbleRoot.reactions
@@ -79,7 +79,7 @@ Item {
 					width: reactionText.width + Style.paddingS * 2
 					radius: height / 2
 					color: Style.surfaceColor
-					border.color: Style.separatorColor
+					border.color: Style.borderColor2
 
 					Text {
 						id: reactionText
@@ -95,12 +95,12 @@ Item {
 		Row {
 			anchors.right: messageBubbleRoot.isOwn ? bubbleColumn.right : undefined
 			anchors.left: messageBubbleRoot.isOwn ? undefined : bubbleColumn.left
-			spacing: Style.paddingXS
+			spacing: Style.paddingS
 
 			Text {
 				text: messageBubbleRoot.timestamp
 				font.pixelSize: Style.fontSizeXS
-				color: Style.textSecondaryColor
+				color: Style.buttonInactiveTextColor
 				anchors.verticalCenter: parent.verticalCenter
 			}
 
@@ -111,7 +111,7 @@ Item {
 					: messageBubbleRoot.status === 1 ? "✓✓"
 					: "✓"
 				font.pixelSize: Style.fontSizeXS
-				color: messageBubbleRoot.status === 2 ? Style.accentColor : Style.textSecondaryColor
+				color: messageBubbleRoot.status === 2 ? Style.imaginToolsAccentColor : Style.buttonInactiveTextColor
 				anchors.verticalCenter: parent.verticalCenter
 			}
 		}
