@@ -415,6 +415,9 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 				stream << QStringLiteral("return QVariant();");
 			}
 			else{
+				stream << QStringLiteral("if (!") << dataClassName << QStringLiteral("::") << field.GetId() << QStringLiteral(".HasValue()) return QVariant();");
+				FeedStream(stream, 1, false);
+				FeedStreamHorizontally(stream);
 				stream << fieldNameSpace << QStringLiteral("::") << field.GetType() << QStringLiteral(" valueType = ");
 				stream << dataClassName << QStringLiteral("::") << field.GetId() << QStringLiteral(".value();");
 				FeedStream(stream, 1, false);
@@ -432,6 +435,9 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 		else {
 			if (!isCustom){
 				if (isArray){
+					stream << QStringLiteral("if (!") << dataClassName << QStringLiteral("::") << field.GetId() << QStringLiteral(".HasValue()) return QVariant();");
+					FeedStream(stream, 1, false);
+					FeedStreamHorizontally(stream);
 					QString tempVariableName = QStringLiteral("temp") + GetCapitalizedValue(field.GetId()) + QStringLiteral("List");
 
 					stream << typeName << ' ' << tempVariableName << ';';
@@ -454,13 +460,16 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 					stream << QStringLiteral("return QVariant::fromValue(") << tempVariableName << QStringLiteral(");");
 				}
 				else {
+					stream << QStringLiteral("if (!") << dataClassName << QStringLiteral("::") << field.GetId() << QStringLiteral(".HasValue()) return QVariant();");
+					FeedStream(stream, 1, false);
+					FeedStreamHorizontally(stream);
 					stream << QStringLiteral("return ") << dataClassName << QStringLiteral("::") << field.GetId() << QStringLiteral(".value();");
 				}
 			}
 			else{
 				if (isUnion && !isArray){
-					stream << QStringLiteral("if (m_") << GetDecapitalizedValue(field.GetId());
-					stream << QStringLiteral("QObjectPtr.isValid()){");
+					stream << QStringLiteral("if (!m_") << GetDecapitalizedValue(field.GetId());
+					stream << QStringLiteral("QObjectPtr.isValid() && ") << dataClassName << QStringLiteral("::") << field.GetId() << QStringLiteral(".HasValue()){");
 					FeedStream(stream, 1, false);
 					const auto* sdlUnion = dynamic_cast<const imtsdl::CSdlUnion*>(sdlEntryField.get());
 
@@ -540,7 +549,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 				}
 				else{
 					stream << QStringLiteral("if (!m_") << GetDecapitalizedValue(field.GetId());
-					stream << QStringLiteral("QObjectPtr.isValid()){");
+					stream << QStringLiteral("QObjectPtr.isValid() && ") << dataClassName << QStringLiteral("::") << field.GetId() << QStringLiteral(".HasValue()){");
 					FeedStream(stream, 1, false);
 					FeedStreamHorizontally(stream, 2);
 					stream << QStringLiteral("m_") << GetDecapitalizedValue(field.GetId());
@@ -1324,6 +1333,10 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& stream, c
 		FeedStream(stream, 1, false);
 
 		if (!isCustom || isEnum){
+			FeedStreamHorizontally(stream, 2);
+			stream << QStringLiteral("if (!Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->at(index)->");
+			stream << field.GetId() << QStringLiteral(".HasValue()) return QVariant();");
+			FeedStream(stream, 1, false);
 			FeedStreamHorizontally(stream, 2);
 			stream << QStringLiteral("return QVariant::fromValue(Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->at(index)->");
 			stream << field.GetId() << QStringLiteral(".value());");

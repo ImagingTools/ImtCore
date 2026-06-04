@@ -2586,6 +2586,7 @@ CInputIdObject::CInputIdObject(QObject* parent): ::imtbase::CItemModelBase(paren
 
 QVariant CInputIdObject::GetId()
 {
+	if (!CInputId::id.HasValue()) return QVariant();
 	return CInputId::id.value();
 }
 
@@ -2759,6 +2760,7 @@ QVariant sdl::V1_0::V1_0::CInputIdObjectList::getData(const QString& nameId, int
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_id"){
+		if (!at(index)->id.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->id.value());
 	}
 
@@ -2773,6 +2775,7 @@ CCollectionViewParamsTestObject::CCollectionViewParamsTestObject(QObject* parent
 
 QVariant CCollectionViewParamsTestObject::GetCount()
 {
+	if (!CCollectionViewParamsTest::count.HasValue()) return QVariant();
 	return CCollectionViewParamsTest::count.value();
 }
 
@@ -2793,6 +2796,7 @@ bool CCollectionViewParamsTestObject::hasCount()
 
 QVariant CCollectionViewParamsTestObject::GetOffset()
 {
+	if (!CCollectionViewParamsTest::offset.HasValue()) return QVariant();
 	return CCollectionViewParamsTest::offset.value();
 }
 
@@ -2969,9 +2973,11 @@ QVariant sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList::getData(const QSt
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_count"){
+		if (!at(index)->count.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->count.value());
 	}
 	if (nameId == "m_offset"){
+		if (!at(index)->offset.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->offset.value());
 	}
 
@@ -2987,6 +2993,7 @@ CSubstrateSpecificationDocumentTypeIdsObject::CSubstrateSpecificationDocumentTyp
 
 QVariant CSubstrateSpecificationDocumentTypeIdsObject::GetPaperID()
 {
+	if (!CSubstrateSpecificationDocumentTypeIds::PaperID.HasValue()) return QVariant();
 	return CSubstrateSpecificationDocumentTypeIds::PaperID.value();
 }
 
@@ -3007,6 +3014,7 @@ bool CSubstrateSpecificationDocumentTypeIdsObject::hasPaperID()
 
 QVariant CSubstrateSpecificationDocumentTypeIdsObject::GetCardboardID()
 {
+	if (!CSubstrateSpecificationDocumentTypeIds::CardboardID.HasValue()) return QVariant();
 	return CSubstrateSpecificationDocumentTypeIds::CardboardID.value();
 }
 
@@ -3027,6 +3035,7 @@ bool CSubstrateSpecificationDocumentTypeIdsObject::hasCardboardID()
 
 QVariant CSubstrateSpecificationDocumentTypeIdsObject::GetFilmID()
 {
+	if (!CSubstrateSpecificationDocumentTypeIds::FilmID.HasValue()) return QVariant();
 	return CSubstrateSpecificationDocumentTypeIds::FilmID.value();
 }
 
@@ -3206,12 +3215,15 @@ QVariant sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList::getD
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_paperID"){
+		if (!at(index)->PaperID.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->PaperID.value());
 	}
 	if (nameId == "m_cardboardID"){
+		if (!at(index)->CardboardID.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->CardboardID.value());
 	}
 	if (nameId == "m_filmID"){
+		if (!at(index)->FilmID.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->FilmID.value());
 	}
 
@@ -3225,7 +3237,7 @@ CSubstrateSpecificationListInputObject::CSubstrateSpecificationListInputObject(Q
 
 QVariant CSubstrateSpecificationListInputObject::GetViewParams()
 {
-	if (!m_viewParamsQObjectPtr.isValid()){
+	if (!m_viewParamsQObjectPtr.isValid() && CSubstrateSpecificationListInput::viewParams.HasValue()){
 		m_viewParamsQObjectPtr = CreateObject("viewParams");
 		auto itemPtr = m_viewParamsQObjectPtr.value<sdl::V1_0::V1_0::CCollectionViewParamsTestObject*>();
 		if (itemPtr != nullptr) {
@@ -3454,6 +3466,7 @@ CSubstrateSpecificationListItemObject::CSubstrateSpecificationListItemObject(QOb
 
 QVariant CSubstrateSpecificationListItemObject::GetId()
 {
+	if (!CSubstrateSpecificationListItem::id.HasValue()) return QVariant();
 	return CSubstrateSpecificationListItem::id.value();
 }
 
@@ -3474,6 +3487,7 @@ bool CSubstrateSpecificationListItemObject::hasId()
 
 QVariant CSubstrateSpecificationListItemObject::GetTypeId()
 {
+	if (!CSubstrateSpecificationListItem::typeId.HasValue()) return QVariant();
 	return CSubstrateSpecificationListItem::typeId.value();
 }
 
@@ -3494,6 +3508,7 @@ bool CSubstrateSpecificationListItemObject::hasTypeId()
 
 QVariant CSubstrateSpecificationListItemObject::GetName()
 {
+	if (!CSubstrateSpecificationListItem::name.HasValue()) return QVariant();
 	return CSubstrateSpecificationListItem::name.value();
 }
 
@@ -3514,6 +3529,7 @@ bool CSubstrateSpecificationListItemObject::hasName()
 
 QVariant CSubstrateSpecificationListItemObject::GetMaterialId()
 {
+	if (!CSubstrateSpecificationListItem::materialId.HasValue()) return QVariant();
 	return CSubstrateSpecificationListItem::materialId.value();
 }
 
@@ -3534,6 +3550,7 @@ bool CSubstrateSpecificationListItemObject::hasMaterialId()
 
 QVariant CSubstrateSpecificationListItemObject::GetMaterialName()
 {
+	if (!CSubstrateSpecificationListItem::materialName.HasValue()) return QVariant();
 	return CSubstrateSpecificationListItem::materialName.value();
 }
 
@@ -3554,6 +3571,7 @@ bool CSubstrateSpecificationListItemObject::hasMaterialName()
 
 QVariant CSubstrateSpecificationListItemObject::GetAdded()
 {
+	if (!CSubstrateSpecificationListItem::added.HasValue()) return QVariant();
 	return CSubstrateSpecificationListItem::added.value();
 }
 
@@ -3574,6 +3592,7 @@ bool CSubstrateSpecificationListItemObject::hasAdded()
 
 QVariant CSubstrateSpecificationListItemObject::GetTimeStamp()
 {
+	if (!CSubstrateSpecificationListItem::timeStamp.HasValue()) return QVariant();
 	return CSubstrateSpecificationListItem::timeStamp.value();
 }
 
@@ -3594,6 +3613,7 @@ bool CSubstrateSpecificationListItemObject::hasTimeStamp()
 
 QVariant CSubstrateSpecificationListItemObject::GetColorPreview()
 {
+	if (!CSubstrateSpecificationListItem::colorPreview.HasValue()) return QVariant();
 	return CSubstrateSpecificationListItem::colorPreview.value();
 }
 
@@ -3788,27 +3808,35 @@ QVariant sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList::getData(con
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_id"){
+		if (!at(index)->id.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->id.value());
 	}
 	if (nameId == "m_typeId"){
+		if (!at(index)->typeId.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->typeId.value());
 	}
 	if (nameId == "m_name"){
+		if (!at(index)->name.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->name.value());
 	}
 	if (nameId == "m_materialId"){
+		if (!at(index)->materialId.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->materialId.value());
 	}
 	if (nameId == "m_materialName"){
+		if (!at(index)->materialName.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->materialName.value());
 	}
 	if (nameId == "m_added"){
+		if (!at(index)->added.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->added.value());
 	}
 	if (nameId == "m_timeStamp"){
+		if (!at(index)->timeStamp.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->timeStamp.value());
 	}
 	if (nameId == "m_colorPreview"){
+		if (!at(index)->colorPreview.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->colorPreview.value());
 	}
 
@@ -3822,7 +3850,7 @@ CSubstrateSpecificationListResponseObject::CSubstrateSpecificationListResponseOb
 
 QVariant CSubstrateSpecificationListResponseObject::GetItems()
 {
-	if (!m_itemsQObjectPtr.isValid()){
+	if (!m_itemsQObjectPtr.isValid() && CSubstrateSpecificationListResponse::items.HasValue()){
 		m_itemsQObjectPtr = CreateObject("items");
 		auto itemPtr = m_itemsQObjectPtr.value<sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList*>();
 		if (itemPtr != nullptr) itemPtr->items = items;
@@ -4049,6 +4077,7 @@ CCardboardSubstrateSpecificationObject::CCardboardSubstrateSpecificationObject(Q
 
 QVariant CCardboardSubstrateSpecificationObject::GetColor()
 {
+	if (!CCardboardSubstrateSpecification::color.HasValue()) return QVariant();
 	return CCardboardSubstrateSpecification::color.value();
 }
 
@@ -4069,6 +4098,7 @@ bool CCardboardSubstrateSpecificationObject::hasColor()
 
 QVariant CCardboardSubstrateSpecificationObject::GetGrammage()
 {
+	if (!CCardboardSubstrateSpecification::grammage.HasValue()) return QVariant();
 	return CCardboardSubstrateSpecification::grammage.value();
 }
 
@@ -4245,9 +4275,11 @@ QVariant sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList::getData(co
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_color"){
+		if (!at(index)->color.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->color.value());
 	}
 	if (nameId == "m_grammage"){
+		if (!at(index)->grammage.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->grammage.value());
 	}
 
@@ -4263,6 +4295,7 @@ CPaperSubstrateSpecificationObject::CPaperSubstrateSpecificationObject(QObject* 
 
 QVariant CPaperSubstrateSpecificationObject::GetGrammage()
 {
+	if (!CPaperSubstrateSpecification::grammage.HasValue()) return QVariant();
 	return CPaperSubstrateSpecification::grammage.value();
 }
 
@@ -4283,6 +4316,7 @@ bool CPaperSubstrateSpecificationObject::hasGrammage()
 
 QVariant CPaperSubstrateSpecificationObject::GetColor()
 {
+	if (!CPaperSubstrateSpecification::color.HasValue()) return QVariant();
 	return CPaperSubstrateSpecification::color.value();
 }
 
@@ -4303,6 +4337,7 @@ bool CPaperSubstrateSpecificationObject::hasColor()
 
 QVariant CPaperSubstrateSpecificationObject::GetCoatType()
 {
+	if (!CPaperSubstrateSpecification::coatType.HasValue()) return QVariant();
 	return CPaperSubstrateSpecification::coatType.value();
 }
 
@@ -4482,12 +4517,15 @@ QVariant sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList::getData(const 
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_grammage"){
+		if (!at(index)->grammage.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->grammage.value());
 	}
 	if (nameId == "m_color"){
+		if (!at(index)->color.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->color.value());
 	}
 	if (nameId == "m_coatType"){
+		if (!at(index)->coatType.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->coatType.value());
 	}
 
@@ -4503,6 +4541,7 @@ CFilmSubstrateSpecificationObject::CFilmSubstrateSpecificationObject(QObject* pa
 
 QVariant CFilmSubstrateSpecificationObject::GetTransparency()
 {
+	if (!CFilmSubstrateSpecification::transparency.HasValue()) return QVariant();
 	return CFilmSubstrateSpecification::transparency.value();
 }
 
@@ -4523,6 +4562,7 @@ bool CFilmSubstrateSpecificationObject::hasTransparency()
 
 QVariant CFilmSubstrateSpecificationObject::GetColor()
 {
+	if (!CFilmSubstrateSpecification::color.HasValue()) return QVariant();
 	return CFilmSubstrateSpecification::color.value();
 }
 
@@ -4543,6 +4583,7 @@ bool CFilmSubstrateSpecificationObject::hasColor()
 
 QVariant CFilmSubstrateSpecificationObject::GetMaterial()
 {
+	if (!CFilmSubstrateSpecification::material.HasValue()) return QVariant();
 	return CFilmSubstrateSpecification::material.value();
 }
 
@@ -4722,12 +4763,15 @@ QVariant sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList::getData(const Q
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_transparency"){
+		if (!at(index)->transparency.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->transparency.value());
 	}
 	if (nameId == "m_color"){
+		if (!at(index)->color.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->color.value());
 	}
 	if (nameId == "m_material"){
+		if (!at(index)->material.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->material.value());
 	}
 
@@ -4745,6 +4789,7 @@ CSubstrateSpecificationInputObject::CSubstrateSpecificationInputObject(QObject* 
 
 QVariant CSubstrateSpecificationInputObject::GetId()
 {
+	if (!CSubstrateSpecificationInput::id.HasValue()) return QVariant();
 	return CSubstrateSpecificationInput::id.value();
 }
 
@@ -4765,6 +4810,7 @@ bool CSubstrateSpecificationInputObject::hasId()
 
 QVariant CSubstrateSpecificationInputObject::GetName()
 {
+	if (!CSubstrateSpecificationInput::name.HasValue()) return QVariant();
 	return CSubstrateSpecificationInput::name.value();
 }
 
@@ -4785,6 +4831,7 @@ bool CSubstrateSpecificationInputObject::hasName()
 
 QVariant CSubstrateSpecificationInputObject::GetDescription()
 {
+	if (!CSubstrateSpecificationInput::description.HasValue()) return QVariant();
 	return CSubstrateSpecificationInput::description.value();
 }
 
@@ -4805,7 +4852,7 @@ bool CSubstrateSpecificationInputObject::hasDescription()
 
 QVariant CSubstrateSpecificationInputObject::GetItem()
 {
-	if (m_itemQObjectPtr.isValid()){
+	if (!m_itemQObjectPtr.isValid() && CSubstrateSpecificationInput::item.HasValue()){
 		if (const CCardboardSubstrateSpecification* val = std::get_if<CCardboardSubstrateSpecification>((CSubstrateSpecificationInput::item).GetPtr())){
 			CCardboardSubstrateSpecificationObject *newObjectPtr = new CCardboardSubstrateSpecificationObject(this);
 			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
@@ -4874,6 +4921,7 @@ void CSubstrateSpecificationInputObject::ResetItem()
 
 QVariant CSubstrateSpecificationInputObject::GetTypeId()
 {
+	if (!CSubstrateSpecificationInput::typeId.HasValue()) return QVariant();
 	return CSubstrateSpecificationInput::typeId.value();
 }
 
@@ -5059,18 +5107,22 @@ QVariant sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList::getData(const 
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_id"){
+		if (!at(index)->id.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->id.value());
 	}
 	if (nameId == "m_name"){
+		if (!at(index)->name.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->name.value());
 	}
 	if (nameId == "m_description"){
+		if (!at(index)->description.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->description.value());
 	}
 	if (nameId == "m_item"){
 		return itemPtr->GetItem();
 	}
 	if (nameId == "m_typeId"){
+		if (!at(index)->typeId.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->typeId.value());
 	}
 
@@ -5085,6 +5137,7 @@ CSubstrateSpecificationDocumentMetaInfoObject::CSubstrateSpecificationDocumentMe
 
 QVariant CSubstrateSpecificationDocumentMetaInfoObject::GetMaterialId()
 {
+	if (!CSubstrateSpecificationDocumentMetaInfo::materialId.HasValue()) return QVariant();
 	return CSubstrateSpecificationDocumentMetaInfo::materialId.value();
 }
 
@@ -5105,6 +5158,7 @@ bool CSubstrateSpecificationDocumentMetaInfoObject::hasMaterialId()
 
 QVariant CSubstrateSpecificationDocumentMetaInfoObject::GetLab()
 {
+	if (!CSubstrateSpecificationDocumentMetaInfo::lab.HasValue()) return QVariant();
 	return CSubstrateSpecificationDocumentMetaInfo::lab.value();
 }
 
@@ -5281,9 +5335,11 @@ QVariant sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList::get
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_materialId"){
+		if (!at(index)->materialId.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->materialId.value());
 	}
 	if (nameId == "m_lab"){
+		if (!at(index)->lab.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->lab.value());
 	}
 

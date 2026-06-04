@@ -639,7 +639,7 @@ CDigitalPrinterSpecificationObject::CDigitalPrinterSpecificationObject(QObject* 
 
 QVariant CDigitalPrinterSpecificationObject::GetBase()
 {
-	if (!m_baseQObjectPtr.isValid()){
+	if (!m_baseQObjectPtr.isValid() && CDigitalPrinterSpecification::base.HasValue()){
 		m_baseQObjectPtr = CreateObject("base");
 		auto itemPtr = m_baseQObjectPtr.value<sdl::V1_0::modsdl::CPrinterSpecificationBaseObject*>();
 		if (itemPtr != nullptr) itemPtr->Version_1_0 = CDigitalPrinterSpecification::base;
@@ -689,6 +689,7 @@ void CDigitalPrinterSpecificationObject::ResetBase()
 
 QVariant CDigitalPrinterSpecificationObject::GetPrintingTechnology()
 {
+	if (!CDigitalPrinterSpecification::printingTechnology.HasValue()) return QVariant();
 	sdl::V1_0::modsdl::PrintingTechnology valueType = CDigitalPrinterSpecification::printingTechnology.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::modsdl::PrintingTechnology>();
 	QString retval = metaEnum.valueToKey((int)valueType);
@@ -880,6 +881,7 @@ QVariant sdl::V1_0::modsdl::CDigitalPrinterSpecificationObjectList::getData(cons
 		return itemPtr->GetBase();
 	}
 	if (nameId == "m_printingTechnology"){
+		if (!at(index)->printingTechnology.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->printingTechnology.value());
 	}
 
@@ -894,7 +896,7 @@ CDigitalPrinterObject::CDigitalPrinterObject(QObject* parent): ::imtbase::CItemM
 
 QVariant CDigitalPrinterObject::GetBase()
 {
-	if (!m_baseQObjectPtr.isValid()){
+	if (!m_baseQObjectPtr.isValid() && CDigitalPrinter::base.HasValue()){
 		m_baseQObjectPtr = CreateObject("base");
 		auto itemPtr = m_baseQObjectPtr.value<sdl::V1_0::modsdl::CPrinterBaseObject*>();
 		if (itemPtr != nullptr) itemPtr->Version_1_0 = CDigitalPrinter::base;
@@ -944,6 +946,7 @@ void CDigitalPrinterObject::ResetBase()
 
 QVariant CDigitalPrinterObject::GetPrintingTechnology()
 {
+	if (!CDigitalPrinter::printingTechnology.HasValue()) return QVariant();
 	sdl::V1_0::modsdl::PrintingTechnology valueType = CDigitalPrinter::printingTechnology.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::modsdl::PrintingTechnology>();
 	QString retval = metaEnum.valueToKey((int)valueType);
@@ -1135,6 +1138,7 @@ QVariant sdl::V1_0::modsdl::CDigitalPrinterObjectList::getData(const QString& na
 		return itemPtr->GetBase();
 	}
 	if (nameId == "m_printingTechnology"){
+		if (!at(index)->printingTechnology.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->printingTechnology.value());
 	}
 

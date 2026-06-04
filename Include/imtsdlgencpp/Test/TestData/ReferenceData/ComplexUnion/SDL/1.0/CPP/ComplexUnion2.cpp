@@ -11587,6 +11587,7 @@ CResultObject::CResultObject(QObject* parent): ::imtbase::CItemModelBase(parent)
 
 QVariant CResultObject::GetAreaResult()
 {
+	if (!CResult::AreaResult.HasValue()) return QVariant();
 	sdl::V1_0::complextest::StatusCode valueType = CResult::AreaResult.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	QString retval = metaEnum.valueToKey((int)valueType);
@@ -11616,6 +11617,7 @@ bool CResultObject::hasAreaResult()
 
 QVariant CResultObject::GetExpectedMinValue()
 {
+	if (!CResult::ExpectedMinValue.HasValue()) return QVariant();
 	return CResult::ExpectedMinValue.value();
 }
 
@@ -11636,6 +11638,7 @@ bool CResultObject::hasExpectedMinValue()
 
 QVariant CResultObject::GetExpectedMaxValue()
 {
+	if (!CResult::ExpectedMaxValue.HasValue()) return QVariant();
 	return CResult::ExpectedMaxValue.value();
 }
 
@@ -11656,6 +11659,7 @@ bool CResultObject::hasExpectedMaxValue()
 
 QVariant CResultObject::GetMeasuredValue()
 {
+	if (!CResult::MeasuredValue.HasValue()) return QVariant();
 	return CResult::MeasuredValue.value();
 }
 
@@ -11676,6 +11680,7 @@ bool CResultObject::hasMeasuredValue()
 
 QVariant CResultObject::GetMinMeasuredValue()
 {
+	if (!CResult::MinMeasuredValue.HasValue()) return QVariant();
 	return CResult::MinMeasuredValue.value();
 }
 
@@ -11696,6 +11701,7 @@ bool CResultObject::hasMinMeasuredValue()
 
 QVariant CResultObject::GetMaxMeasuredValue()
 {
+	if (!CResult::MaxMeasuredValue.HasValue()) return QVariant();
 	return CResult::MaxMeasuredValue.value();
 }
 
@@ -11716,6 +11722,7 @@ bool CResultObject::hasMaxMeasuredValue()
 
 QVariant CResultObject::GetMeanMeasuredValue()
 {
+	if (!CResult::MeanMeasuredValue.HasValue()) return QVariant();
 	return CResult::MeanMeasuredValue.value();
 }
 
@@ -11736,6 +11743,7 @@ bool CResultObject::hasMeanMeasuredValue()
 
 QVariant CResultObject::GetMeasurementType()
 {
+	if (!CResult::MeasurementType.HasValue()) return QVariant();
 	sdl::V1_0::complextest::MeasurementType valueType = CResult::MeasurementType.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::MeasurementType>();
 	QString retval = metaEnum.valueToKey((int)valueType);
@@ -11765,6 +11773,7 @@ bool CResultObject::hasMeasurementType()
 
 QVariant CResultObject::GetMeasurementUnit()
 {
+	if (!CResult::MeasurementUnit.HasValue()) return QVariant();
 	sdl::V1_0::complextest::MeasurementUnit valueType = CResult::MeasurementUnit.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::MeasurementUnit>();
 	QString retval = metaEnum.valueToKey((int)valueType);
@@ -11794,6 +11803,7 @@ bool CResultObject::hasMeasurementUnit()
 
 QVariant CResultObject::GetLength()
 {
+	if (!CResult::Length.HasValue()) return QVariant();
 	return CResult::Length.value();
 }
 
@@ -11814,6 +11824,7 @@ bool CResultObject::hasLength()
 
 QVariant CResultObject::GetErrorType()
 {
+	if (!CResult::ErrorType.HasValue()) return QVariant();
 	sdl::V1_0::complextest::ErrorCode valueType = CResult::ErrorType.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::ErrorCode>();
 	QString retval = metaEnum.valueToKey((int)valueType);
@@ -11843,7 +11854,7 @@ bool CResultObject::hasErrorType()
 
 QVariant CResultObject::GetGeometry()
 {
-	if (!m_geometryQObjectPtr.isValid()){
+	if (!m_geometryQObjectPtr.isValid() && CResult::geometry.HasValue()){
 		m_geometryQObjectPtr = CreateObject("Geometry");
 		auto itemPtr = m_geometryQObjectPtr.value<sdl::V1_0::complextest::CGeometryObject*>();
 		if (itemPtr != nullptr) itemPtr->Version_1_0 = CResult::Geometry;
@@ -12082,36 +12093,47 @@ QVariant sdl::V1_0::complextest::CResultObjectList::getData(const QString& nameI
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_areaResult"){
+		if (!at(index)->AreaResult.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->AreaResult.value());
 	}
 	if (nameId == "m_expectedMinValue"){
+		if (!at(index)->ExpectedMinValue.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->ExpectedMinValue.value());
 	}
 	if (nameId == "m_expectedMaxValue"){
+		if (!at(index)->ExpectedMaxValue.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->ExpectedMaxValue.value());
 	}
 	if (nameId == "m_measuredValue"){
+		if (!at(index)->MeasuredValue.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->MeasuredValue.value());
 	}
 	if (nameId == "m_minMeasuredValue"){
+		if (!at(index)->MinMeasuredValue.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->MinMeasuredValue.value());
 	}
 	if (nameId == "m_maxMeasuredValue"){
+		if (!at(index)->MaxMeasuredValue.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->MaxMeasuredValue.value());
 	}
 	if (nameId == "m_meanMeasuredValue"){
+		if (!at(index)->MeanMeasuredValue.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->MeanMeasuredValue.value());
 	}
 	if (nameId == "m_measurementType"){
+		if (!at(index)->MeasurementType.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->MeasurementType.value());
 	}
 	if (nameId == "m_measurementUnit"){
+		if (!at(index)->MeasurementUnit.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->MeasurementUnit.value());
 	}
 	if (nameId == "m_length"){
+		if (!at(index)->Length.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->Length.value());
 	}
 	if (nameId == "m_errorType"){
+		if (!at(index)->ErrorType.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->ErrorType.value());
 	}
 	if (nameId == "m_geometry"){
@@ -12132,6 +12154,7 @@ CAreaObject::CAreaObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
 QVariant CAreaObject::GetAreaName()
 {
+	if (!CArea::AreaName.HasValue()) return QVariant();
 	return CArea::AreaName.value();
 }
 
@@ -12152,6 +12175,7 @@ bool CAreaObject::hasAreaName()
 
 QVariant CAreaObject::GetStatus()
 {
+	if (!CArea::Status.HasValue()) return QVariant();
 	sdl::V1_0::complextest::StatusCode valueType = CArea::Status.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	QString retval = metaEnum.valueToKey((int)valueType);
@@ -12181,7 +12205,7 @@ bool CAreaObject::hasStatus()
 
 QVariant CAreaObject::GetIconPosition()
 {
-	if (!m_iconPositionQObjectPtr.isValid()){
+	if (!m_iconPositionQObjectPtr.isValid() && CArea::iconPosition.HasValue()){
 		m_iconPositionQObjectPtr = CreateObject("IconPosition");
 		auto itemPtr = m_iconPositionQObjectPtr.value<sdl::V1_0::complextest::CPointObject*>();
 		if (itemPtr != nullptr) itemPtr->Version_1_0 = CArea::IconPosition;
@@ -12231,6 +12255,7 @@ void CAreaObject::ResetIconPosition()
 
 QVariant CAreaObject::GetErrorType()
 {
+	if (!CArea::ErrorType.HasValue()) return QVariant();
 	sdl::V1_0::complextest::ErrorCode valueType = CArea::ErrorType.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::ErrorCode>();
 	QString retval = metaEnum.valueToKey((int)valueType);
@@ -12260,7 +12285,7 @@ bool CAreaObject::hasErrorType()
 
 QVariant CAreaObject::GetResults()
 {
-	if (!m_resultsQObjectPtr.isValid()){
+	if (!m_resultsQObjectPtr.isValid() && CArea::results.HasValue()){
 		m_resultsQObjectPtr = CreateObject("Results");
 		auto itemPtr = m_resultsQObjectPtr.value<sdl::V1_0::complextest::CResultObjectList*>();
 		if (itemPtr != nullptr) itemPtr->Version_1_0 = CArea::Results;
@@ -12488,15 +12513,18 @@ QVariant sdl::V1_0::complextest::CAreaObjectList::getData(const QString& nameId,
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_areaName"){
+		if (!at(index)->AreaName.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->AreaName.value());
 	}
 	if (nameId == "m_status"){
+		if (!at(index)->Status.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->Status.value());
 	}
 	if (nameId == "m_iconPosition"){
 		return itemPtr->GetIconPosition();
 	}
 	if (nameId == "m_errorType"){
+		if (!at(index)->ErrorType.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->ErrorType.value());
 	}
 	if (nameId == "m_results"){
@@ -12515,6 +12543,7 @@ CAnalyzerObject::CAnalyzerObject(QObject* parent): ::imtbase::CItemModelBase(par
 
 QVariant CAnalyzerObject::GetAnalyzerName()
 {
+	if (!CAnalyzer::AnalyzerName.HasValue()) return QVariant();
 	return CAnalyzer::AnalyzerName.value();
 }
 
@@ -12535,6 +12564,7 @@ bool CAnalyzerObject::hasAnalyzerName()
 
 QVariant CAnalyzerObject::GetAnalyzerResult()
 {
+	if (!CAnalyzer::AnalyzerResult.HasValue()) return QVariant();
 	sdl::V1_0::complextest::StatusCode valueType = CAnalyzer::AnalyzerResult.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	QString retval = metaEnum.valueToKey((int)valueType);
@@ -12564,7 +12594,7 @@ bool CAnalyzerObject::hasAnalyzerResult()
 
 QVariant CAnalyzerObject::GetAreas()
 {
-	if (!m_areasQObjectPtr.isValid()){
+	if (!m_areasQObjectPtr.isValid() && CAnalyzer::areas.HasValue()){
 		m_areasQObjectPtr = CreateObject("Areas");
 		auto itemPtr = m_areasQObjectPtr.value<sdl::V1_0::complextest::CAreaObjectList*>();
 		if (itemPtr != nullptr) itemPtr->Version_1_0 = CAnalyzer::Areas;
@@ -12783,9 +12813,11 @@ QVariant sdl::V1_0::complextest::CAnalyzerObjectList::getData(const QString& nam
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_analyzerName"){
+		if (!at(index)->AnalyzerName.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->AnalyzerName.value());
 	}
 	if (nameId == "m_analyzerResult"){
+		if (!at(index)->AnalyzerResult.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->AnalyzerResult.value());
 	}
 	if (nameId == "m_areas"){
@@ -12806,6 +12838,7 @@ CInspectionObject::CInspectionObject(QObject* parent): ::imtbase::CItemModelBase
 
 QVariant CInspectionObject::GetID()
 {
+	if (!CInspection::ID.HasValue()) return QVariant();
 	return CInspection::ID.value();
 }
 
@@ -12826,6 +12859,7 @@ bool CInspectionObject::hasID()
 
 QVariant CInspectionObject::GetTypeID()
 {
+	if (!CInspection::TypeID.HasValue()) return QVariant();
 	return CInspection::TypeID.value();
 }
 
@@ -12846,6 +12880,7 @@ bool CInspectionObject::hasTypeID()
 
 QVariant CInspectionObject::GetName()
 {
+	if (!CInspection::Name.HasValue()) return QVariant();
 	return CInspection::Name.value();
 }
 
@@ -12866,6 +12901,7 @@ bool CInspectionObject::hasName()
 
 QVariant CInspectionObject::GetStatus()
 {
+	if (!CInspection::Status.HasValue()) return QVariant();
 	sdl::V1_0::complextest::StatusCode valueType = CInspection::Status.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	QString retval = metaEnum.valueToKey((int)valueType);
@@ -12895,7 +12931,7 @@ bool CInspectionObject::hasStatus()
 
 QVariant CInspectionObject::GetAnalyzers()
 {
-	if (!m_analyzersQObjectPtr.isValid()){
+	if (!m_analyzersQObjectPtr.isValid() && CInspection::analyzers.HasValue()){
 		m_analyzersQObjectPtr = CreateObject("Analyzers");
 		auto itemPtr = m_analyzersQObjectPtr.value<sdl::V1_0::complextest::CAnalyzerObjectList*>();
 		if (itemPtr != nullptr) itemPtr->Version_1_0 = CInspection::Analyzers;
@@ -13120,15 +13156,19 @@ QVariant sdl::V1_0::complextest::CInspectionObjectList::getData(const QString& n
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_iD"){
+		if (!at(index)->ID.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->ID.value());
 	}
 	if (nameId == "m_typeID"){
+		if (!at(index)->TypeID.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->TypeID.value());
 	}
 	if (nameId == "m_name"){
+		if (!at(index)->Name.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->Name.value());
 	}
 	if (nameId == "m_status"){
+		if (!at(index)->Status.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->Status.value());
 	}
 	if (nameId == "m_analyzers"){
@@ -13151,6 +13191,7 @@ CProductOverviewObject::CProductOverviewObject(QObject* parent): ::imtbase::CIte
 
 QVariant CProductOverviewObject::GetProductID()
 {
+	if (!CProductOverview::ProductID.HasValue()) return QVariant();
 	return CProductOverview::ProductID.value();
 }
 
@@ -13171,6 +13212,7 @@ bool CProductOverviewObject::hasProductID()
 
 QVariant CProductOverviewObject::GetName()
 {
+	if (!CProductOverview::Name.HasValue()) return QVariant();
 	return CProductOverview::Name.value();
 }
 
@@ -13191,6 +13233,7 @@ bool CProductOverviewObject::hasName()
 
 QVariant CProductOverviewObject::GetStatus()
 {
+	if (!CProductOverview::Status.HasValue()) return QVariant();
 	sdl::V1_0::complextest::StatusCode valueType = CProductOverview::Status.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	QString retval = metaEnum.valueToKey((int)valueType);
@@ -13220,6 +13263,7 @@ bool CProductOverviewObject::hasStatus()
 
 QVariant CProductOverviewObject::GetPartSerialNumber()
 {
+	if (!CProductOverview::PartSerialNumber.HasValue()) return QVariant();
 	return CProductOverview::PartSerialNumber.value();
 }
 
@@ -13240,6 +13284,7 @@ bool CProductOverviewObject::hasPartSerialNumber()
 
 QVariant CProductOverviewObject::GetTimestamp()
 {
+	if (!CProductOverview::Timestamp.HasValue()) return QVariant();
 	return CProductOverview::Timestamp.value();
 }
 
@@ -13260,6 +13305,7 @@ bool CProductOverviewObject::hasTimestamp()
 
 QVariant CProductOverviewObject::GetProductImage()
 {
+	if (!CProductOverview::ProductImage.HasValue()) return QVariant();
 	return CProductOverview::ProductImage.value();
 }
 
@@ -13280,7 +13326,7 @@ bool CProductOverviewObject::hasProductImage()
 
 QVariant CProductOverviewObject::GetInspections()
 {
-	if (!m_inspectionsQObjectPtr.isValid()){
+	if (!m_inspectionsQObjectPtr.isValid() && CProductOverview::inspections.HasValue()){
 		m_inspectionsQObjectPtr = CreateObject("Inspections");
 		auto itemPtr = m_inspectionsQObjectPtr.value<sdl::V1_0::complextest::CInspectionObjectList*>();
 		if (itemPtr != nullptr) itemPtr->Version_1_0 = CProductOverview::Inspections;
@@ -13511,21 +13557,27 @@ QVariant sdl::V1_0::complextest::CProductOverviewObjectList::getData(const QStri
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_productID"){
+		if (!at(index)->ProductID.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->ProductID.value());
 	}
 	if (nameId == "m_name"){
+		if (!at(index)->Name.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->Name.value());
 	}
 	if (nameId == "m_status"){
+		if (!at(index)->Status.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->Status.value());
 	}
 	if (nameId == "m_partSerialNumber"){
+		if (!at(index)->PartSerialNumber.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->PartSerialNumber.value());
 	}
 	if (nameId == "m_timestamp"){
+		if (!at(index)->Timestamp.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->Timestamp.value());
 	}
 	if (nameId == "m_productImage"){
+		if (!at(index)->ProductImage.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->ProductImage.value());
 	}
 	if (nameId == "m_inspections"){
@@ -13543,6 +13595,7 @@ CLocalizedTextObject::CLocalizedTextObject(QObject* parent): ::imtbase::CItemMod
 
 QVariant CLocalizedTextObject::GetText()
 {
+	if (!CLocalizedText::text.HasValue()) return QVariant();
 	return CLocalizedText::text.value();
 }
 
@@ -13563,6 +13616,7 @@ bool CLocalizedTextObject::hasText()
 
 QVariant CLocalizedTextObject::GetLocale()
 {
+	if (!CLocalizedText::locale.HasValue()) return QVariant();
 	return CLocalizedText::locale.value();
 }
 
@@ -13739,9 +13793,11 @@ QVariant sdl::V1_0::complextest::CLocalizedTextObjectList::getData(const QString
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_text"){
+		if (!at(index)->text.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->text.value());
 	}
 	if (nameId == "m_locale"){
+		if (!at(index)->locale.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->locale.value());
 	}
 
@@ -13757,6 +13813,7 @@ CCoordinatesObject::CCoordinatesObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CCoordinatesObject::GetX()
 {
+	if (!CCoordinates::x.HasValue()) return QVariant();
 	return CCoordinates::x.value();
 }
 
@@ -13777,6 +13834,7 @@ bool CCoordinatesObject::hasX()
 
 QVariant CCoordinatesObject::GetY()
 {
+	if (!CCoordinates::y.HasValue()) return QVariant();
 	return CCoordinates::y.value();
 }
 
@@ -13797,6 +13855,7 @@ bool CCoordinatesObject::hasY()
 
 QVariant CCoordinatesObject::GetZ()
 {
+	if (!CCoordinates::z.HasValue()) return QVariant();
 	return CCoordinates::z.value();
 }
 
@@ -13976,12 +14035,15 @@ QVariant sdl::V1_0::complextest::CCoordinatesObjectList::getData(const QString& 
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_x"){
+		if (!at(index)->x.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->x.value());
 	}
 	if (nameId == "m_y"){
+		if (!at(index)->y.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->y.value());
 	}
 	if (nameId == "m_z"){
+		if (!at(index)->z.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->z.value());
 	}
 
@@ -13996,6 +14058,7 @@ CExtendedMetaDataObject::CExtendedMetaDataObject(QObject* parent): ::imtbase::CI
 
 QVariant CExtendedMetaDataObject::GetKey()
 {
+	if (!CExtendedMetaData::key.HasValue()) return QVariant();
 	return CExtendedMetaData::key.value();
 }
 
@@ -14016,7 +14079,7 @@ bool CExtendedMetaDataObject::hasKey()
 
 QVariant CExtendedMetaDataObject::GetValue()
 {
-	if (m_valueQObjectPtr.isValid()){
+	if (!m_valueQObjectPtr.isValid() && CExtendedMetaData::value.HasValue()){
 		if (const CCoordinates* val = std::get_if<CCoordinates>((CExtendedMetaData::value).GetPtr())){
 			CCoordinatesObject *newObjectPtr = new CCoordinatesObject(this);
 			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
@@ -14243,6 +14306,7 @@ QVariant sdl::V1_0::complextest::CExtendedMetaDataObjectList::getData(const QStr
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_key"){
+		if (!at(index)->key.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->key.value());
 	}
 	if (nameId == "m_value"){
@@ -14266,6 +14330,7 @@ CResultMetaDataObject::CResultMetaDataObject(QObject* parent): ::imtbase::CItemM
 
 QVariant CResultMetaDataObject::GetResultId()
 {
+	if (!CResultMetaData::resultId.HasValue()) return QVariant();
 	return CResultMetaData::resultId.value();
 }
 
@@ -14286,6 +14351,7 @@ bool CResultMetaDataObject::hasResultId()
 
 QVariant CResultMetaDataObject::GetCreationTime()
 {
+	if (!CResultMetaData::creationTime.HasValue()) return QVariant();
 	return CResultMetaData::creationTime.value();
 }
 
@@ -14306,6 +14372,7 @@ bool CResultMetaDataObject::hasCreationTime()
 
 QVariant CResultMetaDataObject::GetPartId()
 {
+	if (!CResultMetaData::partId.HasValue()) return QVariant();
 	return CResultMetaData::partId.value();
 }
 
@@ -14326,6 +14393,7 @@ bool CResultMetaDataObject::hasPartId()
 
 QVariant CResultMetaDataObject::GetProductId()
 {
+	if (!CResultMetaData::productId.HasValue()) return QVariant();
 	return CResultMetaData::productId.value();
 }
 
@@ -14346,6 +14414,7 @@ bool CResultMetaDataObject::hasProductId()
 
 QVariant CResultMetaDataObject::GetName()
 {
+	if (!CResultMetaData::name.HasValue()) return QVariant();
 	return CResultMetaData::name.value();
 }
 
@@ -14366,6 +14435,7 @@ bool CResultMetaDataObject::hasName()
 
 QVariant CResultMetaDataObject::GetClassification()
 {
+	if (!CResultMetaData::classification.HasValue()) return QVariant();
 	return CResultMetaData::classification.value();
 }
 
@@ -14386,7 +14456,7 @@ bool CResultMetaDataObject::hasClassification()
 
 QVariant CResultMetaDataObject::GetDescription()
 {
-	if (!m_descriptionQObjectPtr.isValid()){
+	if (!m_descriptionQObjectPtr.isValid() && CResultMetaData::description.HasValue()){
 		m_descriptionQObjectPtr = CreateObject("description");
 		auto itemPtr = m_descriptionQObjectPtr.value<sdl::V1_0::complextest::CLocalizedTextObject*>();
 		if (itemPtr != nullptr) itemPtr->Version_1_0 = CResultMetaData::description;
@@ -14436,7 +14506,7 @@ void CResultMetaDataObject::ResetDescription()
 
 QVariant CResultMetaDataObject::GetExtendedMetaData()
 {
-	if (!m_extendedMetaDataQObjectPtr.isValid()){
+	if (!m_extendedMetaDataQObjectPtr.isValid() && CResultMetaData::extendedMetaData.HasValue()){
 		m_extendedMetaDataQObjectPtr = CreateObject("extendedMetaData");
 		auto itemPtr = m_extendedMetaDataQObjectPtr.value<sdl::V1_0::complextest::CExtendedMetaDataObjectList*>();
 		if (itemPtr != nullptr) itemPtr->Version_1_0 = CResultMetaData::extendedMetaData;
@@ -14673,21 +14743,27 @@ QVariant sdl::V1_0::complextest::CResultMetaDataObjectList::getData(const QStrin
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_resultId"){
+		if (!at(index)->resultId.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->resultId.value());
 	}
 	if (nameId == "m_creationTime"){
+		if (!at(index)->creationTime.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->creationTime.value());
 	}
 	if (nameId == "m_partId"){
+		if (!at(index)->partId.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->partId.value());
 	}
 	if (nameId == "m_productId"){
+		if (!at(index)->productId.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->productId.value());
 	}
 	if (nameId == "m_name"){
+		if (!at(index)->name.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->name.value());
 	}
 	if (nameId == "m_classification"){
+		if (!at(index)->classification.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->classification.value());
 	}
 	if (nameId == "m_description"){
@@ -14711,6 +14787,7 @@ COverallResultValuesObject::COverallResultValuesObject(QObject* parent): ::imtba
 
 QVariant COverallResultValuesObject::GetName()
 {
+	if (!COverallResultValues::name.HasValue()) return QVariant();
 	return COverallResultValues::name.value();
 }
 
@@ -14731,6 +14808,7 @@ bool COverallResultValuesObject::hasName()
 
 QVariant COverallResultValuesObject::GetValueId()
 {
+	if (!COverallResultValues::valueId.HasValue()) return QVariant();
 	return COverallResultValues::valueId.value();
 }
 
@@ -14751,6 +14829,7 @@ bool COverallResultValuesObject::hasValueId()
 
 QVariant COverallResultValuesObject::GetMeasuredValue()
 {
+	if (!COverallResultValues::measuredValue.HasValue()) return QVariant();
 	return COverallResultValues::measuredValue.value();
 }
 
@@ -14771,6 +14850,7 @@ bool COverallResultValuesObject::hasMeasuredValue()
 
 QVariant COverallResultValuesObject::GetLowLimit()
 {
+	if (!COverallResultValues::lowLimit.HasValue()) return QVariant();
 	return COverallResultValues::lowLimit.value();
 }
 
@@ -14791,6 +14871,7 @@ bool COverallResultValuesObject::hasLowLimit()
 
 QVariant COverallResultValuesObject::GetHighLimit()
 {
+	if (!COverallResultValues::highLimit.HasValue()) return QVariant();
 	return COverallResultValues::highLimit.value();
 }
 
@@ -14976,18 +15057,23 @@ QVariant sdl::V1_0::complextest::COverallResultValuesObjectList::getData(const Q
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_name"){
+		if (!at(index)->name.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->name.value());
 	}
 	if (nameId == "m_valueId"){
+		if (!at(index)->valueId.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->valueId.value());
 	}
 	if (nameId == "m_measuredValue"){
+		if (!at(index)->measuredValue.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->measuredValue.value());
 	}
 	if (nameId == "m_lowLimit"){
+		if (!at(index)->lowLimit.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->lowLimit.value());
 	}
 	if (nameId == "m_highLimit"){
+		if (!at(index)->highLimit.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->highLimit.value());
 	}
 
@@ -15003,7 +15089,7 @@ CUnionTestingTypeObject::CUnionTestingTypeObject(QObject* parent): ::imtbase::CI
 
 QVariant CUnionTestingTypeObject::GetSimpleUnion()
 {
-	if (m_simpleUnionQObjectPtr.isValid()){
+	if (!m_simpleUnionQObjectPtr.isValid() && CUnionTestingType::simpleUnion.HasValue()){
 		if (const double* val = std::get_if<double>((CUnionTestingType::simpleUnion).GetPtr())){
 			m_simpleUnionQObjectPtr = QVariant::fromValue(val);
 		}
@@ -15066,7 +15152,7 @@ void CUnionTestingTypeObject::ResetSimpleUnion()
 
 QVariant CUnionTestingTypeObject::GetComplexUnion()
 {
-	if (m_complexUnionQObjectPtr.isValid()){
+	if (!m_complexUnionQObjectPtr.isValid() && CUnionTestingType::complexUnion.HasValue()){
 		if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>((CUnionTestingType::complexUnion).GetPtr())){
 			CCDMResultVarStringObject *newObjectPtr = new CCDMResultVarStringObject(this);
 			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
@@ -15127,7 +15213,7 @@ void CUnionTestingTypeObject::ResetComplexUnion()
 
 QVariant CUnionTestingTypeObject::GetMixedUnion()
 {
-	if (m_mixedUnionQObjectPtr.isValid()){
+	if (!m_mixedUnionQObjectPtr.isValid() && CUnionTestingType::mixedUnion.HasValue()){
 		if (const CCoordinates* val = std::get_if<CCoordinates>((CUnionTestingType::mixedUnion).GetPtr())){
 			CCoordinatesObject *newObjectPtr = new CCoordinatesObject(this);
 			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
@@ -15380,6 +15466,7 @@ CCDMResultVarRecursiveObject::CCDMResultVarRecursiveObject(QObject* parent): ::i
 
 QVariant CCDMResultVarRecursiveObject::GetDataModelTitle()
 {
+	if (!CCDMResultVarRecursive::dataModelTitle.HasValue()) return QVariant();
 	return CCDMResultVarRecursive::dataModelTitle.value();
 }
 
@@ -15400,6 +15487,7 @@ bool CCDMResultVarRecursiveObject::hasDataModelTitle()
 
 QVariant CCDMResultVarRecursiveObject::GetDataModelVersion()
 {
+	if (!CCDMResultVarRecursive::dataModelVersion.HasValue()) return QVariant();
 	return CCDMResultVarRecursive::dataModelVersion.value();
 }
 
@@ -15420,7 +15508,7 @@ bool CCDMResultVarRecursiveObject::hasDataModelVersion()
 
 QVariant CCDMResultVarRecursiveObject::GetResultMetaData()
 {
-	if (!m_resultMetaDataQObjectPtr.isValid()){
+	if (!m_resultMetaDataQObjectPtr.isValid() && CCDMResultVarRecursive::resultMetaData.HasValue()){
 		m_resultMetaDataQObjectPtr = CreateObject("resultMetaData");
 		auto itemPtr = m_resultMetaDataQObjectPtr.value<sdl::V1_0::complextest::CResultMetaDataObject*>();
 		if (itemPtr != nullptr) itemPtr->Version_1_0 = CCDMResultVarRecursive::resultMetaData;
@@ -15470,7 +15558,7 @@ void CCDMResultVarRecursiveObject::ResetResultMetaData()
 
 QVariant CCDMResultVarRecursiveObject::GetResultContent()
 {
-	if (!m_resultContentQObjectPtr.isValid()){
+	if (!m_resultContentQObjectPtr.isValid() && CCDMResultVarRecursive::resultContent.HasValue()){
 		m_resultContentQObjectPtr = CreateObject("resultContent");
 		auto itemPtr = m_resultContentQObjectPtr.value<sdl::V1_0::complextest::CCDMResultUnionTypeObjectList*>();
 		if (itemPtr != nullptr) itemPtr->Version_1_0 = CCDMResultVarRecursive::resultContent;
@@ -15520,7 +15608,7 @@ void CCDMResultVarRecursiveObject::ResetResultContent()
 
 QVariant CCDMResultVarRecursiveObject::GetOverallResultValues()
 {
-	if (!m_overallResultValuesQObjectPtr.isValid()){
+	if (!m_overallResultValuesQObjectPtr.isValid() && CCDMResultVarRecursive::overallResultValues.HasValue()){
 		m_overallResultValuesQObjectPtr = CreateObject("overallResultValues");
 		auto itemPtr = m_overallResultValuesQObjectPtr.value<sdl::V1_0::complextest::COverallResultValuesObjectList*>();
 		if (itemPtr != nullptr) itemPtr->Version_1_0 = CCDMResultVarRecursive::overallResultValues;
@@ -15751,9 +15839,11 @@ QVariant sdl::V1_0::complextest::CCDMResultVarRecursiveObjectList::getData(const
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_dataModelTitle"){
+		if (!at(index)->dataModelTitle.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->dataModelTitle.value());
 	}
 	if (nameId == "m_dataModelVersion"){
+		if (!at(index)->dataModelVersion.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->dataModelVersion.value());
 	}
 	if (nameId == "m_resultMetaData"){
@@ -15780,6 +15870,7 @@ CCDMResultVarStringObject::CCDMResultVarStringObject(QObject* parent): ::imtbase
 
 QVariant CCDMResultVarStringObject::GetDataModelTitle()
 {
+	if (!CCDMResultVarString::dataModelTitle.HasValue()) return QVariant();
 	return CCDMResultVarString::dataModelTitle.value();
 }
 
@@ -15800,6 +15891,7 @@ bool CCDMResultVarStringObject::hasDataModelTitle()
 
 QVariant CCDMResultVarStringObject::GetDataModelVersion()
 {
+	if (!CCDMResultVarString::dataModelVersion.HasValue()) return QVariant();
 	return CCDMResultVarString::dataModelVersion.value();
 }
 
@@ -15820,7 +15912,7 @@ bool CCDMResultVarStringObject::hasDataModelVersion()
 
 QVariant CCDMResultVarStringObject::GetResultMetaData()
 {
-	if (!m_resultMetaDataQObjectPtr.isValid()){
+	if (!m_resultMetaDataQObjectPtr.isValid() && CCDMResultVarString::resultMetaData.HasValue()){
 		m_resultMetaDataQObjectPtr = CreateObject("resultMetaData");
 		auto itemPtr = m_resultMetaDataQObjectPtr.value<sdl::V1_0::complextest::CResultMetaDataObject*>();
 		if (itemPtr != nullptr) itemPtr->Version_1_0 = CCDMResultVarString::resultMetaData;
@@ -15870,6 +15962,7 @@ void CCDMResultVarStringObject::ResetResultMetaData()
 
 QVariant CCDMResultVarStringObject::GetResultContent()
 {
+	if (!CCDMResultVarString::resultContent.HasValue()) return QVariant();
 	QList<QString> tempResultContentList;
 	for (const auto& tempValue: CCDMResultVarString::resultContent.value()){
 		tempResultContentList << *tempValue;
@@ -15904,7 +15997,7 @@ bool CCDMResultVarStringObject::hasResultContent()
 
 QVariant CCDMResultVarStringObject::GetOverallResultValues()
 {
-	if (!m_overallResultValuesQObjectPtr.isValid()){
+	if (!m_overallResultValuesQObjectPtr.isValid() && CCDMResultVarString::overallResultValues.HasValue()){
 		m_overallResultValuesQObjectPtr = CreateObject("overallResultValues");
 		auto itemPtr = m_overallResultValuesQObjectPtr.value<sdl::V1_0::complextest::COverallResultValuesObjectList*>();
 		if (itemPtr != nullptr) itemPtr->Version_1_0 = CCDMResultVarString::overallResultValues;
@@ -16132,15 +16225,18 @@ QVariant sdl::V1_0::complextest::CCDMResultVarStringObjectList::getData(const QS
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_dataModelTitle"){
+		if (!at(index)->dataModelTitle.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->dataModelTitle.value());
 	}
 	if (nameId == "m_dataModelVersion"){
+		if (!at(index)->dataModelVersion.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->dataModelVersion.value());
 	}
 	if (nameId == "m_resultMetaData"){
 		return itemPtr->GetResultMetaData();
 	}
 	if (nameId == "m_resultContent"){
+		if (!at(index)->resultContent.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->resultContent.value());
 	}
 	if (nameId == "m_overallResultValues"){
@@ -16161,6 +16257,7 @@ CCDMResultObject::CCDMResultObject(QObject* parent): ::imtbase::CItemModelBase(p
 
 QVariant CCDMResultObject::GetDataModelTitle()
 {
+	if (!CCDMResult::dataModelTitle.HasValue()) return QVariant();
 	return CCDMResult::dataModelTitle.value();
 }
 
@@ -16181,6 +16278,7 @@ bool CCDMResultObject::hasDataModelTitle()
 
 QVariant CCDMResultObject::GetDataModelVersion()
 {
+	if (!CCDMResult::dataModelVersion.HasValue()) return QVariant();
 	return CCDMResult::dataModelVersion.value();
 }
 
@@ -16201,7 +16299,7 @@ bool CCDMResultObject::hasDataModelVersion()
 
 QVariant CCDMResultObject::GetResultMetaData()
 {
-	if (!m_resultMetaDataQObjectPtr.isValid()){
+	if (!m_resultMetaDataQObjectPtr.isValid() && CCDMResult::resultMetaData.HasValue()){
 		m_resultMetaDataQObjectPtr = CreateObject("resultMetaData");
 		auto itemPtr = m_resultMetaDataQObjectPtr.value<sdl::V1_0::complextest::CResultMetaDataObject*>();
 		if (itemPtr != nullptr) itemPtr->Version_1_0 = CCDMResult::resultMetaData;
@@ -16251,7 +16349,7 @@ void CCDMResultObject::ResetResultMetaData()
 
 QVariant CCDMResultObject::GetResultContent()
 {
-	if (!m_resultContentQObjectPtr.isValid()){
+	if (!m_resultContentQObjectPtr.isValid() && CCDMResult::resultContent.HasValue()){
 		m_resultContentQObjectPtr = CreateObject("resultContent");
 		auto itemPtr = m_resultContentQObjectPtr.value<sdl::V1_0::complextest::CCDMResultUnionTypeObjectList*>();
 		if (itemPtr != nullptr) itemPtr->Version_1_0 = CCDMResult::resultContent;
@@ -16301,7 +16399,7 @@ void CCDMResultObject::ResetResultContent()
 
 QVariant CCDMResultObject::GetOverallResultValues()
 {
-	if (!m_overallResultValuesQObjectPtr.isValid()){
+	if (!m_overallResultValuesQObjectPtr.isValid() && CCDMResult::overallResultValues.HasValue()){
 		m_overallResultValuesQObjectPtr = CreateObject("overallResultValues");
 		auto itemPtr = m_overallResultValuesQObjectPtr.value<sdl::V1_0::complextest::COverallResultValuesObjectList*>();
 		if (itemPtr != nullptr) itemPtr->Version_1_0 = CCDMResult::overallResultValues;
@@ -16532,9 +16630,11 @@ QVariant sdl::V1_0::complextest::CCDMResultObjectList::getData(const QString& na
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_dataModelTitle"){
+		if (!at(index)->dataModelTitle.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->dataModelTitle.value());
 	}
 	if (nameId == "m_dataModelVersion"){
+		if (!at(index)->dataModelVersion.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->dataModelVersion.value());
 	}
 	if (nameId == "m_resultMetaData"){
@@ -16557,6 +16657,7 @@ CPointsInCoordinateFormatObject::CPointsInCoordinateFormatObject(QObject* parent
 
 QVariant CPointsInCoordinateFormatObject::GetPointAsCoordinates()
 {
+	if (!CPointsInCoordinateFormat::pointAsCoordinates.HasValue()) return QVariant();
 	return CPointsInCoordinateFormat::pointAsCoordinates.value();
 }
 
@@ -16730,6 +16831,7 @@ QVariant sdl::V1_0::complextest::CPointsInCoordinateFormatObjectList::getData(co
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_pointAsCoordinates"){
+		if (!at(index)->pointAsCoordinates.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->pointAsCoordinates.value());
 	}
 
@@ -16745,6 +16847,7 @@ CCollectionViewParamsTestObject::CCollectionViewParamsTestObject(QObject* parent
 
 QVariant CCollectionViewParamsTestObject::GetCount()
 {
+	if (!CCollectionViewParamsTest::count.HasValue()) return QVariant();
 	return CCollectionViewParamsTest::count.value();
 }
 
@@ -16765,6 +16868,7 @@ bool CCollectionViewParamsTestObject::hasCount()
 
 QVariant CCollectionViewParamsTestObject::GetOffset()
 {
+	if (!CCollectionViewParamsTest::offset.HasValue()) return QVariant();
 	return CCollectionViewParamsTest::offset.value();
 }
 
@@ -16785,7 +16889,7 @@ bool CCollectionViewParamsTestObject::hasOffset()
 
 QVariant CCollectionViewParamsTestObject::GetFilterModel()
 {
-	if (!m_filterModelQObjectPtr.isValid()){
+	if (!m_filterModelQObjectPtr.isValid() && CCollectionViewParamsTest::filterModel.HasValue()){
 		m_filterModelQObjectPtr = CreateObject("filterModel");
 		auto itemPtr = m_filterModelQObjectPtr.value<sdl::V1_0::imtbase::CComplexCollectionFilterObject*>();
 		if (itemPtr != nullptr) itemPtr->Version_1_0 = CCollectionViewParamsTest::filterModel;
@@ -16997,9 +17101,11 @@ QVariant sdl::V1_0::complextest::CCollectionViewParamsTestObjectList::getData(co
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_count"){
+		if (!at(index)->count.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->count.value());
 	}
 	if (nameId == "m_offset"){
+		if (!at(index)->offset.HasValue()) return QVariant();
 		return QVariant::fromValue(at(index)->offset.value());
 	}
 	if (nameId == "m_filterModel"){
