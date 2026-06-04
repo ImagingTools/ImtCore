@@ -44,7 +44,7 @@ bool CResult::operator==(const CResult& other) const
 }
 
 
-bool CResult::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::complextest::CResult::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "Result", modelIndex);
 
@@ -381,7 +381,7 @@ bool CResult::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) con
 }
 
 
-bool CResult::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CResult::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant areaResultData = model.GetData("AreaResult", modelIndex);
 	if (areaResultData.isNull()){
@@ -710,7 +710,7 @@ bool CResult::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelInd
 
 		return false;
 	}
-	Geometry = CGeometry();
+	Geometry = V1_0::complextest::CGeometry();
 	const bool isGeometryRead = Geometry->ReadFromModel(*geometryDataModelPtr, modelIndex);
 	if (!isGeometryRead){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Geometry").toLocal8Bit().constData();)
@@ -723,7 +723,7 @@ bool CResult::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelInd
 }
 
 
-bool CResult::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CResult::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant areaResultData = model.GetData("AreaResult", modelIndex);
 	if (!areaResultData.isNull()){
@@ -1015,7 +1015,7 @@ bool CResult::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int model
 
 	::imtbase::CTreeItemModel* geometryDataModelPtr = model.GetTreeItemModel("Geometry", modelIndex);
 	if (geometryDataModelPtr != nullptr){
-		Geometry = CGeometry();
+		Geometry = V1_0::complextest::CGeometry();
 		const bool isGeometryRead = Geometry->ReadFromModel(*geometryDataModelPtr, modelIndex);
 		if (!isGeometryRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Geometry").toLocal8Bit().constData();)
@@ -1028,7 +1028,7 @@ bool CResult::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int model
 }
 
 
-bool CResult::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::complextest::CResult::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!AreaResult){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AreaResult").toLocal8Bit().constData();)
@@ -1362,7 +1362,7 @@ bool CResult::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 }
 
 
-bool CResult::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CResult::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("AreaResult") || (gqlObject["AreaResult"].userType() != QMetaType::QString && gqlObject["AreaResult"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AreaResult").toLocal8Bit().constData();)
@@ -1679,7 +1679,7 @@ bool CResult::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 
 		return false;
 	}
-	Geometry = CGeometry();
+	Geometry = V1_0::complextest::CGeometry();
 	const bool isGeometryRead = Geometry->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("Geometry"));
 	if (!isGeometryRead){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "Geometry").toLocal8Bit().constData();)
@@ -1691,7 +1691,7 @@ bool CResult::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 }
 
 
-bool CResult::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CResult::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("AreaResult") && (gqlObject["AreaResult"].userType() == QMetaType::QString || gqlObject["AreaResult"].userType() == QMetaType::QByteArray)){
 		const QString areaResultStringValue = gqlObject["AreaResult"].toString();
@@ -1971,7 +1971,7 @@ bool CResult::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObjec
 	}
 
 	if (gqlObject.ContainsParam("Geometry") && (gqlObject.GetParamArgumentObjectPtr("Geometry") != nullptr)){
-		Geometry = CGeometry();
+		Geometry = V1_0::complextest::CGeometry();
 		const bool isGeometryRead = Geometry->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("Geometry"));
 		if (!isGeometryRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "Geometry").toLocal8Bit().constData();)
@@ -1984,7 +1984,7 @@ bool CResult::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObjec
 }
 
 
-bool CResult::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::complextest::CResult::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!AreaResult){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AreaResult").toLocal8Bit().constData();)
@@ -2318,7 +2318,7 @@ bool CResult::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CResult::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CResult::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("AreaResult") || ! jsonObject["AreaResult"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AreaResult").toLocal8Bit().constData();)
@@ -2635,7 +2635,7 @@ bool CResult::ReadFromJsonObject(const QJsonObject& jsonObject)
 
 		return false;
 	}
-	Geometry = CGeometry();
+	Geometry = V1_0::complextest::CGeometry();
 	const bool isGeometryRead = Geometry->ReadFromJsonObject(jsonObject["Geometry"].toObject());
 	if (!isGeometryRead){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "Geometry").toLocal8Bit().constData();)
@@ -2647,7 +2647,7 @@ bool CResult::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CResult::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CResult::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("AreaResult") && jsonObject["AreaResult"].isString()){
 		const QString areaResultStringValue = jsonObject["AreaResult"].toString();
@@ -2927,7 +2927,7 @@ bool CResult::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("Geometry") && jsonObject["Geometry"].isObject()){
-		Geometry = CGeometry();
+		Geometry = V1_0::complextest::CGeometry();
 		const bool isGeometryRead = Geometry->OptReadFromJsonObject(jsonObject["Geometry"].toObject());
 		if (!isGeometryRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "Geometry").toLocal8Bit().constData();)
@@ -2940,7 +2940,7 @@ bool CResult::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CArea::GetVersionId()
 {
@@ -2959,7 +2959,7 @@ bool CArea::operator==(const CArea& other) const
 }
 
 
-bool CArea::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::complextest::CArea::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "Area", modelIndex);
 
@@ -3195,7 +3195,7 @@ bool CArea::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 }
 
 
-bool CArea::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CArea::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant areaNameData = model.GetData("AreaName", modelIndex);
 	if (areaNameData.isNull()){
@@ -3239,7 +3239,7 @@ bool CArea::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex
 
 		return false;
 	}
-	IconPosition = CPoint();
+	IconPosition = V1_0::complextest::CPoint();
 	const bool isIconPositionRead = IconPosition->ReadFromModel(*iconPositionDataModelPtr, modelIndex);
 	if (!isIconPositionRead){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "IconPosition").toLocal8Bit().constData();)
@@ -3418,9 +3418,9 @@ bool CArea::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex
 		return false;
 	}
 	int resultsCount = resultsModel->GetItemsCount();
-	imtsdl::TElementList<CResult> resultsList;
+	imtsdl::TElementList<V1_0::complextest::CResult> resultsList;
 	for (int resultsIndex = 0; resultsIndex < resultsCount; ++resultsIndex){
-		CResult t_results;
+		V1_0::complextest::CResult t_results;
 		if (!t_results.ReadFromModel(*resultsModel, resultsIndex)){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Results").toLocal8Bit().constData();)
 
@@ -3435,7 +3435,7 @@ bool CArea::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex
 }
 
 
-bool CArea::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CArea::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant areaNameData = model.GetData("AreaName", modelIndex);
 	if (!areaNameData.isNull()){
@@ -3469,7 +3469,7 @@ bool CArea::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIn
 
 	::imtbase::CTreeItemModel* iconPositionDataModelPtr = model.GetTreeItemModel("IconPosition", modelIndex);
 	if (iconPositionDataModelPtr != nullptr){
-		IconPosition = CPoint();
+		IconPosition = V1_0::complextest::CPoint();
 		const bool isIconPositionRead = IconPosition->ReadFromModel(*iconPositionDataModelPtr, modelIndex);
 		if (!isIconPositionRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "IconPosition").toLocal8Bit().constData();)
@@ -3641,9 +3641,9 @@ bool CArea::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIn
 	::imtbase::CTreeItemModel* resultsModel = model.GetTreeItemModel("Results", modelIndex);
 	if (resultsModel != nullptr){
 		int resultsCount = resultsModel->GetItemsCount();
-		imtsdl::TElementList<CResult> resultsList;
+		imtsdl::TElementList<V1_0::complextest::CResult> resultsList;
 		for (int resultsIndex = 0; resultsIndex < resultsCount; ++resultsIndex){
-			CResult t_results;
+			V1_0::complextest::CResult t_results;
 			if (!t_results.OptReadFromModel(*resultsModel, resultsIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Results").toLocal8Bit().constData();)
 
@@ -3659,7 +3659,7 @@ bool CArea::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIn
 }
 
 
-bool CArea::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::complextest::CArea::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!AreaName){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AreaName").toLocal8Bit().constData();)
@@ -3894,7 +3894,7 @@ bool CArea::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 }
 
 
-bool CArea::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CArea::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("AreaName") || (gqlObject["AreaName"].userType() != QMetaType::QString && gqlObject["AreaName"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AreaName").toLocal8Bit().constData();)
@@ -3935,7 +3935,7 @@ bool CArea::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 
 		return false;
 	}
-	IconPosition = CPoint();
+	IconPosition = V1_0::complextest::CPoint();
 	const bool isIconPositionRead = IconPosition->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("IconPosition"));
 	if (!isIconPositionRead){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "IconPosition").toLocal8Bit().constData();)
@@ -4111,14 +4111,14 @@ bool CArea::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 		return false;
 	}
 	const qsizetype resultsElementsCount = gqlObject.GetObjectsCount("Results");
-	Results = imtsdl::TElementList<CResult>();
+	Results = imtsdl::TElementList<V1_0::complextest::CResult>();
 	for (qsizetype resultsIndex = 0; resultsIndex < resultsElementsCount; ++resultsIndex){
 		const ::imtgql::CGqlParamObject* resultsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Results", resultsIndex);
 		if (resultsDataObjectPtr == nullptr){
 			qDebug() << "invalid type" << resultsDataObjectPtr;
 			return false;
 		}
-		CResult tempResults;
+		V1_0::complextest::CResult tempResults;
 		if (!tempResults.ReadFromGraphQlObject(*resultsDataObjectPtr)){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Results").toLocal8Bit().constData();)
 
@@ -4131,7 +4131,7 @@ bool CArea::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 }
 
 
-bool CArea::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CArea::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("AreaName") && (gqlObject["AreaName"].userType() == QMetaType::QString || gqlObject["AreaName"].userType() == QMetaType::QByteArray)){
 		AreaName = gqlObject["AreaName"].toString();
@@ -4162,7 +4162,7 @@ bool CArea::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 	}
 
 	if (gqlObject.ContainsParam("IconPosition") && (gqlObject.GetParamArgumentObjectPtr("IconPosition") != nullptr)){
-		IconPosition = CPoint();
+		IconPosition = V1_0::complextest::CPoint();
 		const bool isIconPositionRead = IconPosition->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("IconPosition"));
 		if (!isIconPositionRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "IconPosition").toLocal8Bit().constData();)
@@ -4335,14 +4335,14 @@ bool CArea::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 	}
 	if (gqlObject.ContainsParam("Results") && (gqlObject.GetObjectsCount("Results") > 0)){
 		const qsizetype resultsElementsCount = gqlObject.GetObjectsCount("Results");
-		Results = imtsdl::TElementList<CResult>();
+		Results = imtsdl::TElementList<V1_0::complextest::CResult>();
 		for (qsizetype resultsIndex = 0; resultsIndex < resultsElementsCount; ++resultsIndex){
 			const ::imtgql::CGqlParamObject* resultsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Results", resultsIndex);
 			if (resultsDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << resultsDataObjectPtr;
 				return false;
 			}
-			CResult tempResults;
+			V1_0::complextest::CResult tempResults;
 			if (!tempResults.OptReadFromGraphQlObject(*resultsDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Results").toLocal8Bit().constData();)
 
@@ -4356,7 +4356,7 @@ bool CArea::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 }
 
 
-bool CArea::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::complextest::CArea::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!AreaName){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AreaName").toLocal8Bit().constData();)
@@ -4591,7 +4591,7 @@ bool CArea::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CArea::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CArea::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("AreaName") || ! jsonObject["AreaName"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AreaName").toLocal8Bit().constData();)
@@ -4632,7 +4632,7 @@ bool CArea::ReadFromJsonObject(const QJsonObject& jsonObject)
 
 		return false;
 	}
-	IconPosition = CPoint();
+	IconPosition = V1_0::complextest::CPoint();
 	const bool isIconPositionRead = IconPosition->ReadFromJsonObject(jsonObject["IconPosition"].toObject());
 	if (!isIconPositionRead){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "IconPosition").toLocal8Bit().constData();)
@@ -4809,9 +4809,9 @@ bool CArea::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 	const QJsonArray resultsJsonArray = jsonObject["Results"].toArray();
 	const qsizetype resultsArrayCount = resultsJsonArray.size();
-	Results = imtsdl::TElementList<CResult>();
+	Results = imtsdl::TElementList<V1_0::complextest::CResult>();
 	for (qsizetype resultsIndex = 0; resultsIndex < resultsArrayCount; ++resultsIndex){
-		CResult tempResults;
+		V1_0::complextest::CResult tempResults;
 		if (!tempResults.ReadFromJsonObject(resultsJsonArray[resultsIndex].toObject())){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Results").toLocal8Bit().constData();)
 
@@ -4824,7 +4824,7 @@ bool CArea::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CArea::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CArea::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("AreaName") && jsonObject["AreaName"].isString()){
 		AreaName = jsonObject["AreaName"].toString();
@@ -4855,7 +4855,7 @@ bool CArea::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("IconPosition") && jsonObject["IconPosition"].isObject()){
-		IconPosition = CPoint();
+		IconPosition = V1_0::complextest::CPoint();
 		const bool isIconPositionRead = IconPosition->OptReadFromJsonObject(jsonObject["IconPosition"].toObject());
 		if (!isIconPositionRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "IconPosition").toLocal8Bit().constData();)
@@ -5026,9 +5026,9 @@ bool CArea::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("Results") && jsonObject["Results"].isArray()){
 		const QJsonArray resultsJsonArray = jsonObject["Results"].toArray();
 		const qsizetype resultsArrayCount = resultsJsonArray.size();
-		Results = imtsdl::TElementList<CResult>();
+		Results = imtsdl::TElementList<V1_0::complextest::CResult>();
 		for (qsizetype resultsIndex = 0; resultsIndex < resultsArrayCount; ++resultsIndex){
-			CResult tempResults;
+			V1_0::complextest::CResult tempResults;
 			if (!tempResults.OptReadFromJsonObject(resultsJsonArray[resultsIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Results").toLocal8Bit().constData();)
 
@@ -5042,7 +5042,7 @@ bool CArea::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CAnalyzer::GetVersionId()
 {
@@ -5059,7 +5059,7 @@ bool CAnalyzer::operator==(const CAnalyzer& other) const
 }
 
 
-bool CAnalyzer::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::complextest::CAnalyzer::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "Analyzer", modelIndex);
 
@@ -5115,7 +5115,7 @@ bool CAnalyzer::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) c
 }
 
 
-bool CAnalyzer::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CAnalyzer::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant analyzerNameData = model.GetData("AnalyzerName", modelIndex);
 	if (analyzerNameData.isNull()){
@@ -5156,9 +5156,9 @@ bool CAnalyzer::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelI
 	::imtbase::CTreeItemModel* areasModel = model.GetTreeItemModel("Areas", modelIndex);
 	if (areasModel != nullptr){
 		int areasCount = areasModel->GetItemsCount();
-		imtsdl::TElementList<CArea> areasList;
+		imtsdl::TElementList<V1_0::complextest::CArea> areasList;
 		for (int areasIndex = 0; areasIndex < areasCount; ++areasIndex){
-			CArea t_areas;
+			V1_0::complextest::CArea t_areas;
 			if (!t_areas.ReadFromModel(*areasModel, areasIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Areas").toLocal8Bit().constData();)
 
@@ -5174,7 +5174,7 @@ bool CAnalyzer::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelI
 }
 
 
-bool CAnalyzer::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CAnalyzer::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant analyzerNameData = model.GetData("AnalyzerName", modelIndex);
 	if (!analyzerNameData.isNull()){
@@ -5209,9 +5209,9 @@ bool CAnalyzer::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int mod
 	::imtbase::CTreeItemModel* areasModel = model.GetTreeItemModel("Areas", modelIndex);
 	if (areasModel != nullptr){
 		int areasCount = areasModel->GetItemsCount();
-		imtsdl::TElementList<CArea> areasList;
+		imtsdl::TElementList<V1_0::complextest::CArea> areasList;
 		for (int areasIndex = 0; areasIndex < areasCount; ++areasIndex){
-			CArea t_areas;
+			V1_0::complextest::CArea t_areas;
 			if (!t_areas.OptReadFromModel(*areasModel, areasIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Areas").toLocal8Bit().constData();)
 
@@ -5227,7 +5227,7 @@ bool CAnalyzer::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int mod
 }
 
 
-bool CAnalyzer::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::complextest::CAnalyzer::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!AnalyzerName){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AnalyzerName").toLocal8Bit().constData();)
@@ -5284,7 +5284,7 @@ bool CAnalyzer::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 }
 
 
-bool CAnalyzer::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CAnalyzer::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("AnalyzerName") || (gqlObject["AnalyzerName"].userType() != QMetaType::QString && gqlObject["AnalyzerName"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AnalyzerName").toLocal8Bit().constData();)
@@ -5325,14 +5325,14 @@ bool CAnalyzer::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject
 	}
 	if (gqlObject.ContainsParam("Areas") && (gqlObject.GetObjectsCount("Areas") > 0)){
 		const qsizetype areasElementsCount = gqlObject.GetObjectsCount("Areas");
-		Areas = imtsdl::TElementList<CArea>();
+		Areas = imtsdl::TElementList<V1_0::complextest::CArea>();
 		for (qsizetype areasIndex = 0; areasIndex < areasElementsCount; ++areasIndex){
 			const ::imtgql::CGqlParamObject* areasDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Areas", areasIndex);
 			if (areasDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << areasDataObjectPtr;
 				return false;
 			}
-			CArea tempAreas;
+			V1_0::complextest::CArea tempAreas;
 			if (!tempAreas.ReadFromGraphQlObject(*areasDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Areas").toLocal8Bit().constData();)
 
@@ -5346,7 +5346,7 @@ bool CAnalyzer::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject
 }
 
 
-bool CAnalyzer::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CAnalyzer::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("AnalyzerName") && (gqlObject["AnalyzerName"].userType() == QMetaType::QString || gqlObject["AnalyzerName"].userType() == QMetaType::QByteArray)){
 		AnalyzerName = gqlObject["AnalyzerName"].toString();
@@ -5381,14 +5381,14 @@ bool CAnalyzer::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObj
 	}
 	if (gqlObject.ContainsParam("Areas") && (gqlObject.GetObjectsCount("Areas") > 0)){
 		const qsizetype areasElementsCount = gqlObject.GetObjectsCount("Areas");
-		Areas = imtsdl::TElementList<CArea>();
+		Areas = imtsdl::TElementList<V1_0::complextest::CArea>();
 		for (qsizetype areasIndex = 0; areasIndex < areasElementsCount; ++areasIndex){
 			const ::imtgql::CGqlParamObject* areasDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Areas", areasIndex);
 			if (areasDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << areasDataObjectPtr;
 				return false;
 			}
-			CArea tempAreas;
+			V1_0::complextest::CArea tempAreas;
 			if (!tempAreas.OptReadFromGraphQlObject(*areasDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Areas").toLocal8Bit().constData();)
 
@@ -5402,7 +5402,7 @@ bool CAnalyzer::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObj
 }
 
 
-bool CAnalyzer::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::complextest::CAnalyzer::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!AnalyzerName){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AnalyzerName").toLocal8Bit().constData();)
@@ -5459,7 +5459,7 @@ bool CAnalyzer::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CAnalyzer::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CAnalyzer::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("AnalyzerName") || ! jsonObject["AnalyzerName"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "AnalyzerName").toLocal8Bit().constData();)
@@ -5498,9 +5498,9 @@ bool CAnalyzer::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("Areas") && jsonObject["Areas"].isArray()){
 		const QJsonArray areasJsonArray = jsonObject["Areas"].toArray();
 		const qsizetype areasArrayCount = areasJsonArray.size();
-		Areas = imtsdl::TElementList<CArea>();
+		Areas = imtsdl::TElementList<V1_0::complextest::CArea>();
 		for (qsizetype areasIndex = 0; areasIndex < areasArrayCount; ++areasIndex){
-			CArea tempAreas;
+			V1_0::complextest::CArea tempAreas;
 			if (!tempAreas.ReadFromJsonObject(areasJsonArray[areasIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Areas").toLocal8Bit().constData();)
 
@@ -5514,7 +5514,7 @@ bool CAnalyzer::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CAnalyzer::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CAnalyzer::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("AnalyzerName") && jsonObject["AnalyzerName"].isString()){
 		AnalyzerName = jsonObject["AnalyzerName"].toString();
@@ -5547,9 +5547,9 @@ bool CAnalyzer::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("Areas") && jsonObject["Areas"].isArray()){
 		const QJsonArray areasJsonArray = jsonObject["Areas"].toArray();
 		const qsizetype areasArrayCount = areasJsonArray.size();
-		Areas = imtsdl::TElementList<CArea>();
+		Areas = imtsdl::TElementList<V1_0::complextest::CArea>();
 		for (qsizetype areasIndex = 0; areasIndex < areasArrayCount; ++areasIndex){
-			CArea tempAreas;
+			V1_0::complextest::CArea tempAreas;
 			if (!tempAreas.OptReadFromJsonObject(areasJsonArray[areasIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Areas").toLocal8Bit().constData();)
 
@@ -5563,7 +5563,7 @@ bool CAnalyzer::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CInspection::GetVersionId()
 {
@@ -5582,7 +5582,7 @@ bool CInspection::operator==(const CInspection& other) const
 }
 
 
-bool CInspection::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::complextest::CInspection::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "Inspection", modelIndex);
 
@@ -5652,7 +5652,7 @@ bool CInspection::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex)
 }
 
 
-bool CInspection::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CInspection::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant iDData = model.GetData("ID", modelIndex);
 	if (iDData.isNull()){
@@ -5709,9 +5709,9 @@ bool CInspection::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mode
 	::imtbase::CTreeItemModel* analyzersModel = model.GetTreeItemModel("Analyzers", modelIndex);
 	if (analyzersModel != nullptr){
 		int analyzersCount = analyzersModel->GetItemsCount();
-		imtsdl::TElementList<CAnalyzer> analyzersList;
+		imtsdl::TElementList<V1_0::complextest::CAnalyzer> analyzersList;
 		for (int analyzersIndex = 0; analyzersIndex < analyzersCount; ++analyzersIndex){
-			CAnalyzer t_analyzers;
+			V1_0::complextest::CAnalyzer t_analyzers;
 			if (!t_analyzers.ReadFromModel(*analyzersModel, analyzersIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Analyzers").toLocal8Bit().constData();)
 
@@ -5727,7 +5727,7 @@ bool CInspection::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mode
 }
 
 
-bool CInspection::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CInspection::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant iDData = model.GetData("ID", modelIndex);
 	if (!iDData.isNull()){
@@ -5772,9 +5772,9 @@ bool CInspection::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int m
 	::imtbase::CTreeItemModel* analyzersModel = model.GetTreeItemModel("Analyzers", modelIndex);
 	if (analyzersModel != nullptr){
 		int analyzersCount = analyzersModel->GetItemsCount();
-		imtsdl::TElementList<CAnalyzer> analyzersList;
+		imtsdl::TElementList<V1_0::complextest::CAnalyzer> analyzersList;
 		for (int analyzersIndex = 0; analyzersIndex < analyzersCount; ++analyzersIndex){
-			CAnalyzer t_analyzers;
+			V1_0::complextest::CAnalyzer t_analyzers;
 			if (!t_analyzers.OptReadFromModel(*analyzersModel, analyzersIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Analyzers").toLocal8Bit().constData();)
 
@@ -5790,7 +5790,7 @@ bool CInspection::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int m
 }
 
 
-bool CInspection::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::complextest::CInspection::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!ID){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "ID").toLocal8Bit().constData();)
@@ -5861,7 +5861,7 @@ bool CInspection::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) con
 }
 
 
-bool CInspection::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CInspection::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("ID") || (gqlObject["ID"].userType() != QMetaType::QString && gqlObject["ID"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "ID").toLocal8Bit().constData();)
@@ -5916,14 +5916,14 @@ bool CInspection::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObje
 	}
 	if (gqlObject.ContainsParam("Analyzers") && (gqlObject.GetObjectsCount("Analyzers") > 0)){
 		const qsizetype analyzersElementsCount = gqlObject.GetObjectsCount("Analyzers");
-		Analyzers = imtsdl::TElementList<CAnalyzer>();
+		Analyzers = imtsdl::TElementList<V1_0::complextest::CAnalyzer>();
 		for (qsizetype analyzersIndex = 0; analyzersIndex < analyzersElementsCount; ++analyzersIndex){
 			const ::imtgql::CGqlParamObject* analyzersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Analyzers", analyzersIndex);
 			if (analyzersDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << analyzersDataObjectPtr;
 				return false;
 			}
-			CAnalyzer tempAnalyzers;
+			V1_0::complextest::CAnalyzer tempAnalyzers;
 			if (!tempAnalyzers.ReadFromGraphQlObject(*analyzersDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Analyzers").toLocal8Bit().constData();)
 
@@ -5937,7 +5937,7 @@ bool CInspection::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObje
 }
 
 
-bool CInspection::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CInspection::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("ID") && (gqlObject["ID"].userType() == QMetaType::QString || gqlObject["ID"].userType() == QMetaType::QByteArray)){
 		ID = gqlObject["ID"].toString();
@@ -5980,14 +5980,14 @@ bool CInspection::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 	}
 	if (gqlObject.ContainsParam("Analyzers") && (gqlObject.GetObjectsCount("Analyzers") > 0)){
 		const qsizetype analyzersElementsCount = gqlObject.GetObjectsCount("Analyzers");
-		Analyzers = imtsdl::TElementList<CAnalyzer>();
+		Analyzers = imtsdl::TElementList<V1_0::complextest::CAnalyzer>();
 		for (qsizetype analyzersIndex = 0; analyzersIndex < analyzersElementsCount; ++analyzersIndex){
 			const ::imtgql::CGqlParamObject* analyzersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Analyzers", analyzersIndex);
 			if (analyzersDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << analyzersDataObjectPtr;
 				return false;
 			}
-			CAnalyzer tempAnalyzers;
+			V1_0::complextest::CAnalyzer tempAnalyzers;
 			if (!tempAnalyzers.OptReadFromGraphQlObject(*analyzersDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Analyzers").toLocal8Bit().constData();)
 
@@ -6001,7 +6001,7 @@ bool CInspection::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 }
 
 
-bool CInspection::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::complextest::CInspection::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!ID){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "ID").toLocal8Bit().constData();)
@@ -6072,7 +6072,7 @@ bool CInspection::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CInspection::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CInspection::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("ID") || ! jsonObject["ID"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "ID").toLocal8Bit().constData();)
@@ -6125,9 +6125,9 @@ bool CInspection::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("Analyzers") && jsonObject["Analyzers"].isArray()){
 		const QJsonArray analyzersJsonArray = jsonObject["Analyzers"].toArray();
 		const qsizetype analyzersArrayCount = analyzersJsonArray.size();
-		Analyzers = imtsdl::TElementList<CAnalyzer>();
+		Analyzers = imtsdl::TElementList<V1_0::complextest::CAnalyzer>();
 		for (qsizetype analyzersIndex = 0; analyzersIndex < analyzersArrayCount; ++analyzersIndex){
-			CAnalyzer tempAnalyzers;
+			V1_0::complextest::CAnalyzer tempAnalyzers;
 			if (!tempAnalyzers.ReadFromJsonObject(analyzersJsonArray[analyzersIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Analyzers").toLocal8Bit().constData();)
 
@@ -6141,7 +6141,7 @@ bool CInspection::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CInspection::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CInspection::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("ID") && jsonObject["ID"].isString()){
 		ID = jsonObject["ID"].toString();
@@ -6182,9 +6182,9 @@ bool CInspection::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("Analyzers") && jsonObject["Analyzers"].isArray()){
 		const QJsonArray analyzersJsonArray = jsonObject["Analyzers"].toArray();
 		const qsizetype analyzersArrayCount = analyzersJsonArray.size();
-		Analyzers = imtsdl::TElementList<CAnalyzer>();
+		Analyzers = imtsdl::TElementList<V1_0::complextest::CAnalyzer>();
 		for (qsizetype analyzersIndex = 0; analyzersIndex < analyzersArrayCount; ++analyzersIndex){
-			CAnalyzer tempAnalyzers;
+			V1_0::complextest::CAnalyzer tempAnalyzers;
 			if (!tempAnalyzers.OptReadFromJsonObject(analyzersJsonArray[analyzersIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Analyzers").toLocal8Bit().constData();)
 
@@ -6198,7 +6198,7 @@ bool CInspection::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CProductOverview::GetVersionId()
 {
@@ -6219,7 +6219,7 @@ bool CProductOverview::operator==(const CProductOverview& other) const
 }
 
 
-bool CProductOverview::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::complextest::CProductOverview::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "ProductOverview", modelIndex);
 
@@ -6303,7 +6303,7 @@ bool CProductOverview::WriteToModel(::imtbase::CTreeItemModel& model, int modelI
 }
 
 
-bool CProductOverview::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CProductOverview::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant productIDData = model.GetData("ProductID", modelIndex);
 	if (productIDData.isNull()){
@@ -6376,9 +6376,9 @@ bool CProductOverview::ReadFromModel(const ::imtbase::CTreeItemModel& model, int
 	::imtbase::CTreeItemModel* inspectionsModel = model.GetTreeItemModel("Inspections", modelIndex);
 	if (inspectionsModel != nullptr){
 		int inspectionsCount = inspectionsModel->GetItemsCount();
-		imtsdl::TElementList<CInspection> inspectionsList;
+		imtsdl::TElementList<V1_0::complextest::CInspection> inspectionsList;
 		for (int inspectionsIndex = 0; inspectionsIndex < inspectionsCount; ++inspectionsIndex){
-			CInspection t_inspections;
+			V1_0::complextest::CInspection t_inspections;
 			if (!t_inspections.ReadFromModel(*inspectionsModel, inspectionsIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Inspections").toLocal8Bit().constData();)
 
@@ -6394,7 +6394,7 @@ bool CProductOverview::ReadFromModel(const ::imtbase::CTreeItemModel& model, int
 }
 
 
-bool CProductOverview::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CProductOverview::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant productIDData = model.GetData("ProductID", modelIndex);
 	if (!productIDData.isNull()){
@@ -6449,9 +6449,9 @@ bool CProductOverview::OptReadFromModel(const ::imtbase::CTreeItemModel& model, 
 	::imtbase::CTreeItemModel* inspectionsModel = model.GetTreeItemModel("Inspections", modelIndex);
 	if (inspectionsModel != nullptr){
 		int inspectionsCount = inspectionsModel->GetItemsCount();
-		imtsdl::TElementList<CInspection> inspectionsList;
+		imtsdl::TElementList<V1_0::complextest::CInspection> inspectionsList;
 		for (int inspectionsIndex = 0; inspectionsIndex < inspectionsCount; ++inspectionsIndex){
-			CInspection t_inspections;
+			V1_0::complextest::CInspection t_inspections;
 			if (!t_inspections.OptReadFromModel(*inspectionsModel, inspectionsIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Inspections").toLocal8Bit().constData();)
 
@@ -6467,7 +6467,7 @@ bool CProductOverview::OptReadFromModel(const ::imtbase::CTreeItemModel& model, 
 }
 
 
-bool CProductOverview::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::complextest::CProductOverview::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!ProductID){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "ProductID").toLocal8Bit().constData();)
@@ -6552,7 +6552,7 @@ bool CProductOverview::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject
 }
 
 
-bool CProductOverview::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CProductOverview::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("ProductID") || (gqlObject["ProductID"].userType() != QMetaType::Int && gqlObject["ProductID"].userType() != QMetaType::UInt && gqlObject["ProductID"].userType() != QMetaType::LongLong && gqlObject["ProductID"].userType() != QMetaType::ULongLong && gqlObject["ProductID"].userType() != QMetaType::Long && gqlObject["ProductID"].userType() != QMetaType::Short && gqlObject["ProductID"].userType() != QMetaType::ULong && gqlObject["ProductID"].userType() != QMetaType::UShort && gqlObject["ProductID"].userType() != QMetaType::UChar)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "ProductID").toLocal8Bit().constData();)
@@ -6621,14 +6621,14 @@ bool CProductOverview::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 	}
 	if (gqlObject.ContainsParam("Inspections") && (gqlObject.GetObjectsCount("Inspections") > 0)){
 		const qsizetype inspectionsElementsCount = gqlObject.GetObjectsCount("Inspections");
-		Inspections = imtsdl::TElementList<CInspection>();
+		Inspections = imtsdl::TElementList<V1_0::complextest::CInspection>();
 		for (qsizetype inspectionsIndex = 0; inspectionsIndex < inspectionsElementsCount; ++inspectionsIndex){
 			const ::imtgql::CGqlParamObject* inspectionsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Inspections", inspectionsIndex);
 			if (inspectionsDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << inspectionsDataObjectPtr;
 				return false;
 			}
-			CInspection tempInspections;
+			V1_0::complextest::CInspection tempInspections;
 			if (!tempInspections.ReadFromGraphQlObject(*inspectionsDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Inspections").toLocal8Bit().constData();)
 
@@ -6642,7 +6642,7 @@ bool CProductOverview::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 }
 
 
-bool CProductOverview::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CProductOverview::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("ProductID") && (gqlObject["ProductID"].userType() == QMetaType::Int || gqlObject["ProductID"].userType() == QMetaType::UInt || gqlObject["ProductID"].userType() == QMetaType::LongLong || gqlObject["ProductID"].userType() == QMetaType::ULongLong || gqlObject["ProductID"].userType() == QMetaType::Long || gqlObject["ProductID"].userType() == QMetaType::Short || gqlObject["ProductID"].userType() == QMetaType::ULong || gqlObject["ProductID"].userType() == QMetaType::UShort || gqlObject["ProductID"].userType() == QMetaType::UChar)){
 		ProductID = gqlObject["ProductID"].toInt();
@@ -6693,14 +6693,14 @@ bool CProductOverview::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 	}
 	if (gqlObject.ContainsParam("Inspections") && (gqlObject.GetObjectsCount("Inspections") > 0)){
 		const qsizetype inspectionsElementsCount = gqlObject.GetObjectsCount("Inspections");
-		Inspections = imtsdl::TElementList<CInspection>();
+		Inspections = imtsdl::TElementList<V1_0::complextest::CInspection>();
 		for (qsizetype inspectionsIndex = 0; inspectionsIndex < inspectionsElementsCount; ++inspectionsIndex){
 			const ::imtgql::CGqlParamObject* inspectionsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Inspections", inspectionsIndex);
 			if (inspectionsDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << inspectionsDataObjectPtr;
 				return false;
 			}
-			CInspection tempInspections;
+			V1_0::complextest::CInspection tempInspections;
 			if (!tempInspections.OptReadFromGraphQlObject(*inspectionsDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Inspections").toLocal8Bit().constData();)
 
@@ -6714,7 +6714,7 @@ bool CProductOverview::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 }
 
 
-bool CProductOverview::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::complextest::CProductOverview::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!ProductID){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "ProductID").toLocal8Bit().constData();)
@@ -6799,7 +6799,7 @@ bool CProductOverview::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CProductOverview::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CProductOverview::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("ProductID") || ! jsonObject["ProductID"].isDouble()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "ProductID").toLocal8Bit().constData();)
@@ -6866,9 +6866,9 @@ bool CProductOverview::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("Inspections") && jsonObject["Inspections"].isArray()){
 		const QJsonArray inspectionsJsonArray = jsonObject["Inspections"].toArray();
 		const qsizetype inspectionsArrayCount = inspectionsJsonArray.size();
-		Inspections = imtsdl::TElementList<CInspection>();
+		Inspections = imtsdl::TElementList<V1_0::complextest::CInspection>();
 		for (qsizetype inspectionsIndex = 0; inspectionsIndex < inspectionsArrayCount; ++inspectionsIndex){
-			CInspection tempInspections;
+			V1_0::complextest::CInspection tempInspections;
 			if (!tempInspections.ReadFromJsonObject(inspectionsJsonArray[inspectionsIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Inspections").toLocal8Bit().constData();)
 
@@ -6882,7 +6882,7 @@ bool CProductOverview::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CProductOverview::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CProductOverview::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("ProductID") && jsonObject["ProductID"].isDouble()){
 		ProductID = jsonObject["ProductID"].toInt();
@@ -6931,9 +6931,9 @@ bool CProductOverview::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("Inspections") && jsonObject["Inspections"].isArray()){
 		const QJsonArray inspectionsJsonArray = jsonObject["Inspections"].toArray();
 		const qsizetype inspectionsArrayCount = inspectionsJsonArray.size();
-		Inspections = imtsdl::TElementList<CInspection>();
+		Inspections = imtsdl::TElementList<V1_0::complextest::CInspection>();
 		for (qsizetype inspectionsIndex = 0; inspectionsIndex < inspectionsArrayCount; ++inspectionsIndex){
-			CInspection tempInspections;
+			V1_0::complextest::CInspection tempInspections;
 			if (!tempInspections.OptReadFromJsonObject(inspectionsJsonArray[inspectionsIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Inspections").toLocal8Bit().constData();)
 
@@ -6947,7 +6947,7 @@ bool CProductOverview::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CLocalizedText::GetVersionId()
 {
@@ -6963,7 +6963,7 @@ bool CLocalizedText::operator==(const CLocalizedText& other) const
 }
 
 
-bool CLocalizedText::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::complextest::CLocalizedText::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "LocalizedText", modelIndex);
 
@@ -6986,7 +6986,7 @@ bool CLocalizedText::WriteToModel(::imtbase::CTreeItemModel& model, int modelInd
 }
 
 
-bool CLocalizedText::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CLocalizedText::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant textData = model.GetData("text", modelIndex);
 	if (textData.isNull()){
@@ -7008,7 +7008,7 @@ bool CLocalizedText::ReadFromModel(const ::imtbase::CTreeItemModel& model, int m
 }
 
 
-bool CLocalizedText::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CLocalizedText::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant textData = model.GetData("text", modelIndex);
 	if (!textData.isNull()){
@@ -7024,7 +7024,7 @@ bool CLocalizedText::OptReadFromModel(const ::imtbase::CTreeItemModel& model, in
 }
 
 
-bool CLocalizedText::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::complextest::CLocalizedText::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!text){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "text").toLocal8Bit().constData();)
@@ -7046,7 +7046,7 @@ bool CLocalizedText::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) 
 }
 
 
-bool CLocalizedText::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CLocalizedText::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("text") || (gqlObject["text"].userType() != QMetaType::QString && gqlObject["text"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "text").toLocal8Bit().constData();)
@@ -7066,7 +7066,7 @@ bool CLocalizedText::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 }
 
 
-bool CLocalizedText::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CLocalizedText::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("text") && (gqlObject["text"].userType() == QMetaType::QString || gqlObject["text"].userType() == QMetaType::QByteArray)){
 		text = gqlObject["text"].toString();
@@ -7080,7 +7080,7 @@ bool CLocalizedText::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 }
 
 
-bool CLocalizedText::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::complextest::CLocalizedText::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!text){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "text").toLocal8Bit().constData();)
@@ -7102,7 +7102,7 @@ bool CLocalizedText::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CLocalizedText::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CLocalizedText::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("text") || ! jsonObject["text"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "text").toLocal8Bit().constData();)
@@ -7122,7 +7122,7 @@ bool CLocalizedText::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CLocalizedText::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CLocalizedText::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("text") && jsonObject["text"].isString()){
 		text = jsonObject["text"].toString();
@@ -7136,7 +7136,7 @@ bool CLocalizedText::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CCoordinates::GetVersionId()
 {
@@ -7159,7 +7159,7 @@ bool CCoordinates::operator==(const CCoordinates& other) const
 }
 
 
-bool CCoordinates::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::complextest::CCoordinates::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "Coordinates", modelIndex);
 
@@ -7189,7 +7189,7 @@ bool CCoordinates::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex
 }
 
 
-bool CCoordinates::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CCoordinates::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant xData = model.GetData("x", modelIndex);
 	if (xData.isNull()){
@@ -7219,7 +7219,7 @@ bool CCoordinates::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mod
 }
 
 
-bool CCoordinates::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CCoordinates::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant xData = model.GetData("x", modelIndex);
 	if (!xData.isNull()){
@@ -7240,7 +7240,7 @@ bool CCoordinates::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 }
 
 
-bool CCoordinates::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::complextest::CCoordinates::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!x){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x").toLocal8Bit().constData();)
@@ -7269,7 +7269,7 @@ bool CCoordinates::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) co
 }
 
 
-bool CCoordinates::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CCoordinates::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("x") || (gqlObject["x"].userType() != QMetaType::Float && gqlObject["x"].userType() != QMetaType::Double && gqlObject["x"].userType() != QMetaType::Int && gqlObject["x"].userType() != QMetaType::UInt && gqlObject["x"].userType() != QMetaType::LongLong && gqlObject["x"].userType() != QMetaType::ULongLong && gqlObject["x"].userType() != QMetaType::Long && gqlObject["x"].userType() != QMetaType::Short && gqlObject["x"].userType() != QMetaType::ULong && gqlObject["x"].userType() != QMetaType::UShort && gqlObject["x"].userType() != QMetaType::UChar)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x").toLocal8Bit().constData();)
@@ -7296,7 +7296,7 @@ bool CCoordinates::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObj
 }
 
 
-bool CCoordinates::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CCoordinates::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("x") && (gqlObject["x"].userType() == QMetaType::Float || gqlObject["x"].userType() == QMetaType::Double || gqlObject["x"].userType() == QMetaType::Int || gqlObject["x"].userType() == QMetaType::UInt || gqlObject["x"].userType() == QMetaType::LongLong || gqlObject["x"].userType() == QMetaType::ULongLong || gqlObject["x"].userType() == QMetaType::Long || gqlObject["x"].userType() == QMetaType::Short || gqlObject["x"].userType() == QMetaType::ULong || gqlObject["x"].userType() == QMetaType::UShort || gqlObject["x"].userType() == QMetaType::UChar)){
 		x = gqlObject["x"].toDouble();
@@ -7314,7 +7314,7 @@ bool CCoordinates::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 }
 
 
-bool CCoordinates::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::complextest::CCoordinates::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!x){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x").toLocal8Bit().constData();)
@@ -7343,7 +7343,7 @@ bool CCoordinates::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CCoordinates::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CCoordinates::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("x") || ! jsonObject["x"].isDouble()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x").toLocal8Bit().constData();)
@@ -7370,7 +7370,7 @@ bool CCoordinates::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CCoordinates::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CCoordinates::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("x") && jsonObject["x"].isDouble()){
 		x = jsonObject["x"].toDouble();
@@ -7388,7 +7388,7 @@ bool CCoordinates::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CExtendedMetaData::GetVersionId()
 {
@@ -7404,7 +7404,7 @@ bool CExtendedMetaData::operator==(const CExtendedMetaData& other) const
 }
 
 
-bool CExtendedMetaData::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::complextest::CExtendedMetaData::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "ExtendedMetaData", modelIndex);
 
@@ -7414,7 +7414,7 @@ bool CExtendedMetaData::WriteToModel(::imtbase::CTreeItemModel& model, int model
 
 	if (value){
 		QVariant valueVariantValue;
-		if (const CCoordinates* coordinatesVal = std::get_if<CCoordinates>(value.GetPtr())){
+		if (const V1_0::complextest::CCoordinates* coordinatesVal = std::get_if<V1_0::complextest::CCoordinates>(value.GetPtr())){
 			if (!coordinatesVal->WriteToModel(*(model.AddTreeModel("value", modelIndex)), 0)){
 				return false;
 			}
@@ -7422,8 +7422,8 @@ bool CExtendedMetaData::WriteToModel(::imtbase::CTreeItemModel& model, int model
 				model.GetTreeItemModel("value", modelIndex)->SetData("__typename", "Coordinates", 0);
 			}
 		}
-		else if (const double* doubleVal = std::get_if<double>(value.GetPtr())){
-			model.SetData("", *doubleVal);
+		else if (const double* floatVal = std::get_if<double>(value.GetPtr())){
+			model.SetData("", *floatVal);
 		}
 		else if (const bool* booleanVal = std::get_if<bool>(value.GetPtr())){
 			model.SetData("", *booleanVal);
@@ -7439,7 +7439,7 @@ bool CExtendedMetaData::WriteToModel(::imtbase::CTreeItemModel& model, int model
 }
 
 
-bool CExtendedMetaData::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CExtendedMetaData::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant keyData = model.GetData("key", modelIndex);
 	if (!keyData.isNull()){
@@ -7450,7 +7450,7 @@ bool CExtendedMetaData::ReadFromModel(const ::imtbase::CTreeItemModel& model, in
 	if (!valueData.isNull()){
 		QString valueTypename = model.GetTreeItemModel("value", modelIndex)->GetData("__typename").toString();
 		if (valueTypename == "Coordinates") {
-			CCoordinates valueConvert;
+			V1_0::complextest::CCoordinates valueConvert;
 			const bool isvalueRead = valueConvert.ReadFromModel(*model.GetTreeItemModel("value", modelIndex)); 
 			if (!isvalueRead){
 				return false;
@@ -7472,7 +7472,7 @@ bool CExtendedMetaData::ReadFromModel(const ::imtbase::CTreeItemModel& model, in
 }
 
 
-bool CExtendedMetaData::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CExtendedMetaData::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant keyData = model.GetData("key", modelIndex);
 	if (!keyData.isNull()){
@@ -7483,7 +7483,7 @@ bool CExtendedMetaData::OptReadFromModel(const ::imtbase::CTreeItemModel& model,
 	if (!valueData.isNull()){
 		QString valueTypename = model.GetTreeItemModel("value", modelIndex)->GetData("__typename").toString();
 		if (valueTypename == "Coordinates") {
-			CCoordinates valueConvert;
+			V1_0::complextest::CCoordinates valueConvert;
 			const bool isvalueRead = valueConvert.ReadFromModel(*model.GetTreeItemModel("value", modelIndex)); 
 			if (!isvalueRead){
 				return false;
@@ -7505,7 +7505,7 @@ bool CExtendedMetaData::OptReadFromModel(const ::imtbase::CTreeItemModel& model,
 }
 
 
-bool CExtendedMetaData::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::complextest::CExtendedMetaData::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (key){
 		gqlObject.InsertParam("key", QVariant(*key));
@@ -7513,14 +7513,14 @@ bool CExtendedMetaData::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObjec
 
 	if (value){
 		::imtgql::CGqlParamObject valueDataObject;
-		if (const CCoordinates* coordinatesVal = std::get_if<CCoordinates>(value.GetPtr())){
+		if (const V1_0::complextest::CCoordinates* coordinatesVal = std::get_if<V1_0::complextest::CCoordinates>(value.GetPtr())){
 			if (!coordinatesVal->WriteToGraphQlObject(valueDataObject)){
 				return false;
 			}
 			valueDataObject.InsertParam("__typename", QVariant("Coordinates"));
 		}
-		else if (const double* doubleVal = std::get_if<double>(value.GetPtr())){
-			valueDataObject.InsertParam("value", *doubleVal);
+		else if (const double* floatVal = std::get_if<double>(value.GetPtr())){
+			valueDataObject.InsertParam("value", *floatVal);
 		}
 		else if (const bool* booleanVal = std::get_if<bool>(value.GetPtr())){
 			valueDataObject.InsertParam("value", *booleanVal);
@@ -7537,7 +7537,7 @@ bool CExtendedMetaData::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObjec
 }
 
 
-bool CExtendedMetaData::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CExtendedMetaData::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("key") && (gqlObject["key"].userType() == QMetaType::QString || gqlObject["key"].userType() == QMetaType::QByteArray)){
 		key = gqlObject["key"].toString();
@@ -7553,7 +7553,7 @@ bool CExtendedMetaData::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 		QString valueTypename = valueDataObjectPtr->GetParamArgumentValue("__typename").toString();
 		QVariant valueVariantValue = gqlObject["value"];
 		if (valueTypename == "Coordinates") {
-			CCoordinates valueConvert;
+			V1_0::complextest::CCoordinates valueConvert;
 			const bool isValueRead = valueConvert.ReadFromGraphQlObject(*valueDataObjectPtr);
 			if (!isValueRead){
 				return false;
@@ -7575,7 +7575,7 @@ bool CExtendedMetaData::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 }
 
 
-bool CExtendedMetaData::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CExtendedMetaData::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("key") && (gqlObject["key"].userType() == QMetaType::QString || gqlObject["key"].userType() == QMetaType::QByteArray)){
 		key = gqlObject["key"].toString();
@@ -7591,7 +7591,7 @@ bool CExtendedMetaData::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject
 		QString valueTypename = valueDataObjectPtr->GetParamArgumentValue("__typename").toString();
 		QVariant valueVariantValue = gqlObject["value"];
 		if (valueTypename == "Coordinates") {
-			CCoordinates valueConvert;
+			V1_0::complextest::CCoordinates valueConvert;
 			const bool isValueRead = valueConvert.ReadFromGraphQlObject(*valueDataObjectPtr);
 			if (!isValueRead){
 				return false;
@@ -7613,14 +7613,14 @@ bool CExtendedMetaData::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject
 }
 
 
-bool CExtendedMetaData::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::complextest::CExtendedMetaData::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (key){
 		jsonObject["key"] = QJsonValue::fromVariant(*key);
 	}
 
 	if (value){
-		if (const CCoordinates* coordinatesVal = std::get_if<CCoordinates>(value.GetPtr())){
+		if (const V1_0::complextest::CCoordinates* coordinatesVal = std::get_if<V1_0::complextest::CCoordinates>(value.GetPtr())){
 			QJsonObject valueJsonObject;
 			const bool isvalueAdded = coordinatesVal->WriteToJsonObject(valueJsonObject);
 			if (!isvalueAdded){
@@ -7629,11 +7629,11 @@ bool CExtendedMetaData::WriteToJsonObject(QJsonObject& jsonObject) const
 			valueJsonObject["__typename"] = "Coordinates";
 			jsonObject["value"] = valueJsonObject;
 		}
-		else if (const double* doubleVal = std::get_if<double>(value.GetPtr())){
+		else if (const double* floatVal = std::get_if<double>(value.GetPtr())){
 			if (!value){
 				return false;
 			}
-			jsonObject["value"] = QJsonValue::fromVariant(*doubleVal);
+			jsonObject["value"] = QJsonValue::fromVariant(*floatVal);
 		}
 		else if (const bool* booleanVal = std::get_if<bool>(value.GetPtr())){
 			if (!value){
@@ -7656,7 +7656,7 @@ bool CExtendedMetaData::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CExtendedMetaData::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CExtendedMetaData::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("key") && jsonObject["key"].isString()){
 		key = jsonObject["key"].toString();
@@ -7672,7 +7672,7 @@ bool CExtendedMetaData::ReadFromJsonObject(const QJsonObject& jsonObject)
 		QString valueTypename = valueObject.value("__typename").toString();
 		QVariant valueVariantValue = jsonObject["value"].toVariant();
 		if (valueTypename == "Coordinates") {
-			CCoordinates valueConvert;
+			V1_0::complextest::CCoordinates valueConvert;
 			const bool isvalueRead = valueConvert.ReadFromJsonObject(jsonObject["value"].toObject());
 			if (!isvalueRead){
 				return false;
@@ -7694,7 +7694,7 @@ bool CExtendedMetaData::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CExtendedMetaData::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CExtendedMetaData::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("key") && jsonObject["key"].isString()){
 		key = jsonObject["key"].toString();
@@ -7710,7 +7710,7 @@ bool CExtendedMetaData::OptReadFromJsonObject(const QJsonObject& jsonObject)
 		QString valueTypename = valueObject.value("__typename").toString();
 		QVariant valueVariantValue = jsonObject["value"].toVariant();
 		if (valueTypename == "Coordinates") {
-			CCoordinates valueConvert;
+			V1_0::complextest::CCoordinates valueConvert;
 			const bool isvalueRead = valueConvert.ReadFromJsonObject(jsonObject["value"].toObject());
 			if (!isvalueRead){
 				return false;
@@ -7732,7 +7732,7 @@ bool CExtendedMetaData::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CResultMetaData::GetVersionId()
 {
@@ -7754,7 +7754,7 @@ bool CResultMetaData::operator==(const CResultMetaData& other) const
 }
 
 
-bool CResultMetaData::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::complextest::CResultMetaData::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "ResultMetaData", modelIndex);
 
@@ -7813,7 +7813,7 @@ bool CResultMetaData::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 }
 
 
-bool CResultMetaData::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CResultMetaData::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant resultIdData = model.GetData("resultId", modelIndex);
 	if (resultIdData.isNull()){
@@ -7850,7 +7850,7 @@ bool CResultMetaData::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 
 	::imtbase::CTreeItemModel* descriptionDataModelPtr = model.GetTreeItemModel("description", modelIndex);
 	if (descriptionDataModelPtr != nullptr){
-		description = CLocalizedText();
+		description = V1_0::complextest::CLocalizedText();
 		const bool isDescriptionRead = description->ReadFromModel(*descriptionDataModelPtr, modelIndex);
 		if (!isDescriptionRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "description").toLocal8Bit().constData();)
@@ -7862,9 +7862,9 @@ bool CResultMetaData::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 	::imtbase::CTreeItemModel* extendedMetaDataModel = model.GetTreeItemModel("extendedMetaData", modelIndex);
 	if (extendedMetaDataModel != nullptr){
 		int extendedMetaDataCount = extendedMetaDataModel->GetItemsCount();
-		imtsdl::TElementList<CExtendedMetaData> extendedMetaDataList;
+		imtsdl::TElementList<V1_0::complextest::CExtendedMetaData> extendedMetaDataList;
 		for (int extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataCount; ++extendedMetaDataIndex){
-			CExtendedMetaData t_extendedMetaData;
+			V1_0::complextest::CExtendedMetaData t_extendedMetaData;
 			if (!t_extendedMetaData.ReadFromModel(*extendedMetaDataModel, extendedMetaDataIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "extendedMetaData").toLocal8Bit().constData();)
 
@@ -7880,7 +7880,7 @@ bool CResultMetaData::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 }
 
 
-bool CResultMetaData::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CResultMetaData::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant resultIdData = model.GetData("resultId", modelIndex);
 	if (!resultIdData.isNull()){
@@ -7914,7 +7914,7 @@ bool CResultMetaData::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 
 	::imtbase::CTreeItemModel* descriptionDataModelPtr = model.GetTreeItemModel("description", modelIndex);
 	if (descriptionDataModelPtr != nullptr){
-		description = CLocalizedText();
+		description = V1_0::complextest::CLocalizedText();
 		const bool isDescriptionRead = description->ReadFromModel(*descriptionDataModelPtr, modelIndex);
 		if (!isDescriptionRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "description").toLocal8Bit().constData();)
@@ -7926,9 +7926,9 @@ bool CResultMetaData::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 	::imtbase::CTreeItemModel* extendedMetaDataModel = model.GetTreeItemModel("extendedMetaData", modelIndex);
 	if (extendedMetaDataModel != nullptr){
 		int extendedMetaDataCount = extendedMetaDataModel->GetItemsCount();
-		imtsdl::TElementList<CExtendedMetaData> extendedMetaDataList;
+		imtsdl::TElementList<V1_0::complextest::CExtendedMetaData> extendedMetaDataList;
 		for (int extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataCount; ++extendedMetaDataIndex){
-			CExtendedMetaData t_extendedMetaData;
+			V1_0::complextest::CExtendedMetaData t_extendedMetaData;
 			if (!t_extendedMetaData.OptReadFromModel(*extendedMetaDataModel, extendedMetaDataIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "extendedMetaData").toLocal8Bit().constData();)
 
@@ -7944,7 +7944,7 @@ bool CResultMetaData::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 }
 
 
-bool CResultMetaData::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::complextest::CResultMetaData::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!resultId){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "resultId").toLocal8Bit().constData();)
@@ -8004,7 +8004,7 @@ bool CResultMetaData::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 }
 
 
-bool CResultMetaData::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CResultMetaData::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("resultId") || (gqlObject["resultId"].userType() != QMetaType::QString && gqlObject["resultId"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "resultId").toLocal8Bit().constData();)
@@ -8034,7 +8034,7 @@ bool CResultMetaData::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 	}
 
 	if (gqlObject.ContainsParam("description") && (gqlObject.GetParamArgumentObjectPtr("description") != nullptr)){
-		description = CLocalizedText();
+		description = V1_0::complextest::CLocalizedText();
 		const bool isDescriptionRead = description->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("description"));
 		if (!isDescriptionRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "description").toLocal8Bit().constData();)
@@ -8048,14 +8048,14 @@ bool CResultMetaData::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 	}
 	if (gqlObject.ContainsParam("extendedMetaData") && (gqlObject.GetObjectsCount("extendedMetaData") > 0)){
 		const qsizetype extendedMetaDataElementsCount = gqlObject.GetObjectsCount("extendedMetaData");
-		extendedMetaData = imtsdl::TElementList<CExtendedMetaData>();
+		extendedMetaData = imtsdl::TElementList<V1_0::complextest::CExtendedMetaData>();
 		for (qsizetype extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataElementsCount; ++extendedMetaDataIndex){
 			const ::imtgql::CGqlParamObject* extendedMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("extendedMetaData", extendedMetaDataIndex);
 			if (extendedMetaDataDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << extendedMetaDataDataObjectPtr;
 				return false;
 			}
-			CExtendedMetaData tempExtendedMetaData;
+			V1_0::complextest::CExtendedMetaData tempExtendedMetaData;
 			if (!tempExtendedMetaData.ReadFromGraphQlObject(*extendedMetaDataDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "extendedMetaData").toLocal8Bit().constData();)
 
@@ -8069,7 +8069,7 @@ bool CResultMetaData::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 }
 
 
-bool CResultMetaData::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CResultMetaData::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("resultId") && (gqlObject["resultId"].userType() == QMetaType::QString || gqlObject["resultId"].userType() == QMetaType::QByteArray)){
 		resultId = gqlObject["resultId"].toByteArray();
@@ -8096,7 +8096,7 @@ bool CResultMetaData::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 	}
 
 	if (gqlObject.ContainsParam("description") && (gqlObject.GetParamArgumentObjectPtr("description") != nullptr)){
-		description = CLocalizedText();
+		description = V1_0::complextest::CLocalizedText();
 		const bool isDescriptionRead = description->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("description"));
 		if (!isDescriptionRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "description").toLocal8Bit().constData();)
@@ -8110,14 +8110,14 @@ bool CResultMetaData::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 	}
 	if (gqlObject.ContainsParam("extendedMetaData") && (gqlObject.GetObjectsCount("extendedMetaData") > 0)){
 		const qsizetype extendedMetaDataElementsCount = gqlObject.GetObjectsCount("extendedMetaData");
-		extendedMetaData = imtsdl::TElementList<CExtendedMetaData>();
+		extendedMetaData = imtsdl::TElementList<V1_0::complextest::CExtendedMetaData>();
 		for (qsizetype extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataElementsCount; ++extendedMetaDataIndex){
 			const ::imtgql::CGqlParamObject* extendedMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("extendedMetaData", extendedMetaDataIndex);
 			if (extendedMetaDataDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << extendedMetaDataDataObjectPtr;
 				return false;
 			}
-			CExtendedMetaData tempExtendedMetaData;
+			V1_0::complextest::CExtendedMetaData tempExtendedMetaData;
 			if (!tempExtendedMetaData.OptReadFromGraphQlObject(*extendedMetaDataDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "extendedMetaData").toLocal8Bit().constData();)
 
@@ -8131,7 +8131,7 @@ bool CResultMetaData::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 }
 
 
-bool CResultMetaData::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::complextest::CResultMetaData::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!resultId){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "resultId").toLocal8Bit().constData();)
@@ -8191,7 +8191,7 @@ bool CResultMetaData::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CResultMetaData::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CResultMetaData::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("resultId") || ! jsonObject["resultId"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "resultId").toLocal8Bit().constData();)
@@ -8221,7 +8221,7 @@ bool CResultMetaData::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("description") && jsonObject["description"].isObject()){
-		description = CLocalizedText();
+		description = V1_0::complextest::CLocalizedText();
 		const bool isDescriptionRead = description->ReadFromJsonObject(jsonObject["description"].toObject());
 		if (!isDescriptionRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "description").toLocal8Bit().constData();)
@@ -8233,9 +8233,9 @@ bool CResultMetaData::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("extendedMetaData") && jsonObject["extendedMetaData"].isArray()){
 		const QJsonArray extendedMetaDataJsonArray = jsonObject["extendedMetaData"].toArray();
 		const qsizetype extendedMetaDataArrayCount = extendedMetaDataJsonArray.size();
-		extendedMetaData = imtsdl::TElementList<CExtendedMetaData>();
+		extendedMetaData = imtsdl::TElementList<V1_0::complextest::CExtendedMetaData>();
 		for (qsizetype extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataArrayCount; ++extendedMetaDataIndex){
-			CExtendedMetaData tempExtendedMetaData;
+			V1_0::complextest::CExtendedMetaData tempExtendedMetaData;
 			if (!tempExtendedMetaData.ReadFromJsonObject(extendedMetaDataJsonArray[extendedMetaDataIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "extendedMetaData").toLocal8Bit().constData();)
 
@@ -8249,7 +8249,7 @@ bool CResultMetaData::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CResultMetaData::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CResultMetaData::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("resultId") && jsonObject["resultId"].isString()){
 		resultId = jsonObject["resultId"].toString().toUtf8();
@@ -8276,7 +8276,7 @@ bool CResultMetaData::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("description") && jsonObject["description"].isObject()){
-		description = CLocalizedText();
+		description = V1_0::complextest::CLocalizedText();
 		const bool isDescriptionRead = description->OptReadFromJsonObject(jsonObject["description"].toObject());
 		if (!isDescriptionRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "description").toLocal8Bit().constData();)
@@ -8288,9 +8288,9 @@ bool CResultMetaData::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("extendedMetaData") && jsonObject["extendedMetaData"].isArray()){
 		const QJsonArray extendedMetaDataJsonArray = jsonObject["extendedMetaData"].toArray();
 		const qsizetype extendedMetaDataArrayCount = extendedMetaDataJsonArray.size();
-		extendedMetaData = imtsdl::TElementList<CExtendedMetaData>();
+		extendedMetaData = imtsdl::TElementList<V1_0::complextest::CExtendedMetaData>();
 		for (qsizetype extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataArrayCount; ++extendedMetaDataIndex){
-			CExtendedMetaData tempExtendedMetaData;
+			V1_0::complextest::CExtendedMetaData tempExtendedMetaData;
 			if (!tempExtendedMetaData.OptReadFromJsonObject(extendedMetaDataJsonArray[extendedMetaDataIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "extendedMetaData").toLocal8Bit().constData();)
 
@@ -8304,7 +8304,7 @@ bool CResultMetaData::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray COverallResultValues::GetVersionId()
 {
@@ -8329,7 +8329,7 @@ bool COverallResultValues::operator==(const COverallResultValues& other) const
 }
 
 
-bool COverallResultValues::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::complextest::COverallResultValues::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "OverallResultValues", modelIndex);
 
@@ -8364,7 +8364,7 @@ bool COverallResultValues::WriteToModel(::imtbase::CTreeItemModel& model, int mo
 }
 
 
-bool COverallResultValues::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::COverallResultValues::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant nameData = model.GetData("name", modelIndex);
 	if (!nameData.isNull()){
@@ -8401,7 +8401,7 @@ bool COverallResultValues::ReadFromModel(const ::imtbase::CTreeItemModel& model,
 }
 
 
-bool COverallResultValues::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::COverallResultValues::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant nameData = model.GetData("name", modelIndex);
 	if (!nameData.isNull()){
@@ -8432,7 +8432,7 @@ bool COverallResultValues::OptReadFromModel(const ::imtbase::CTreeItemModel& mod
 }
 
 
-bool COverallResultValues::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::complextest::COverallResultValues::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (name){
 		gqlObject.InsertParam("name", QVariant(*name));
@@ -8466,7 +8466,7 @@ bool COverallResultValues::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlOb
 }
 
 
-bool COverallResultValues::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::COverallResultValues::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("name") && (gqlObject["name"].userType() == QMetaType::QString || gqlObject["name"].userType() == QMetaType::QByteArray)){
 		name = gqlObject["name"].toString();
@@ -8498,7 +8498,7 @@ bool COverallResultValues::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject
 }
 
 
-bool COverallResultValues::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::COverallResultValues::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("name") && (gqlObject["name"].userType() == QMetaType::QString || gqlObject["name"].userType() == QMetaType::QByteArray)){
 		name = gqlObject["name"].toString();
@@ -8524,7 +8524,7 @@ bool COverallResultValues::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObj
 }
 
 
-bool COverallResultValues::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::complextest::COverallResultValues::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (name){
 		jsonObject["name"] = QJsonValue::fromVariant(*name);
@@ -8558,7 +8558,7 @@ bool COverallResultValues::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool COverallResultValues::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::COverallResultValues::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("name") && jsonObject["name"].isString()){
 		name = jsonObject["name"].toString();
@@ -8590,7 +8590,7 @@ bool COverallResultValues::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool COverallResultValues::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::COverallResultValues::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("name") && jsonObject["name"].isString()){
 		name = jsonObject["name"].toString();
@@ -8616,7 +8616,7 @@ bool COverallResultValues::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CUnionTestingType::GetVersionId()
 {
@@ -8633,14 +8633,14 @@ bool CUnionTestingType::operator==(const CUnionTestingType& other) const
 }
 
 
-bool CUnionTestingType::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::complextest::CUnionTestingType::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "UnionTestingType", modelIndex);
 
 	if (simpleUnion){
 		QVariant simpleUnionVariantValue;
-		if (const double* doubleVal = std::get_if<double>(simpleUnion.GetPtr())){
-			model.SetData("", *doubleVal);
+		if (const double* floatVal = std::get_if<double>(simpleUnion.GetPtr())){
+			model.SetData("", *floatVal);
 		}
 		else if (const bool* booleanVal = std::get_if<bool>(simpleUnion.GetPtr())){
 			model.SetData("", *booleanVal);
@@ -8653,7 +8653,7 @@ bool CUnionTestingType::WriteToModel(::imtbase::CTreeItemModel& model, int model
 
 	if (complexUnion){
 		QVariant complexUnionVariantValue;
-		if (const CCDMResultVarString* cDMResultVarStringVal = std::get_if<CCDMResultVarString>(complexUnion.GetPtr())){
+		if (const V1_0::complextest::CCDMResultVarString* cDMResultVarStringVal = std::get_if<V1_0::complextest::CCDMResultVarString>(complexUnion.GetPtr())){
 			if (!cDMResultVarStringVal->WriteToModel(*(model.AddTreeModel("complexUnion", modelIndex)), 0)){
 				return false;
 			}
@@ -8661,7 +8661,7 @@ bool CUnionTestingType::WriteToModel(::imtbase::CTreeItemModel& model, int model
 				model.GetTreeItemModel("complexUnion", modelIndex)->SetData("__typename", "CDMResultVarString", 0);
 			}
 		}
-		else if (const CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<CCDMResultVarRecursive>(complexUnion.GetPtr())){
+		else if (const V1_0::complextest::CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<V1_0::complextest::CCDMResultVarRecursive>(complexUnion.GetPtr())){
 			if (!cDMResultVarRecursiveVal->WriteToModel(*(model.AddTreeModel("complexUnion", modelIndex)), 0)){
 				return false;
 			}
@@ -8674,7 +8674,7 @@ bool CUnionTestingType::WriteToModel(::imtbase::CTreeItemModel& model, int model
 
 	if (mixedUnion){
 		QVariant mixedUnionVariantValue;
-		if (const CCoordinates* coordinatesVal = std::get_if<CCoordinates>(mixedUnion.GetPtr())){
+		if (const V1_0::complextest::CCoordinates* coordinatesVal = std::get_if<V1_0::complextest::CCoordinates>(mixedUnion.GetPtr())){
 			if (!coordinatesVal->WriteToModel(*(model.AddTreeModel("mixedUnion", modelIndex)), 0)){
 				return false;
 			}
@@ -8682,8 +8682,8 @@ bool CUnionTestingType::WriteToModel(::imtbase::CTreeItemModel& model, int model
 				model.GetTreeItemModel("mixedUnion", modelIndex)->SetData("__typename", "Coordinates", 0);
 			}
 		}
-		else if (const double* doubleVal = std::get_if<double>(mixedUnion.GetPtr())){
-			model.SetData("", *doubleVal);
+		else if (const double* floatVal = std::get_if<double>(mixedUnion.GetPtr())){
+			model.SetData("", *floatVal);
 		}
 		else if (const bool* booleanVal = std::get_if<bool>(mixedUnion.GetPtr())){
 			model.SetData("", *booleanVal);
@@ -8699,7 +8699,7 @@ bool CUnionTestingType::WriteToModel(::imtbase::CTreeItemModel& model, int model
 }
 
 
-bool CUnionTestingType::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CUnionTestingType::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant simpleUnionData = model.GetData("simpleUnion", modelIndex);
 	if (!simpleUnionData.isNull()){
@@ -8718,7 +8718,7 @@ bool CUnionTestingType::ReadFromModel(const ::imtbase::CTreeItemModel& model, in
 	if (!complexUnionData.isNull()){
 		QString complexUnionTypename = model.GetTreeItemModel("complexUnion", modelIndex)->GetData("__typename").toString();
 		if (complexUnionTypename == "CDMResultVarString") {
-			CCDMResultVarString complexUnionConvert;
+			V1_0::complextest::CCDMResultVarString complexUnionConvert;
 			const bool iscomplexUnionRead = complexUnionConvert.ReadFromModel(*model.GetTreeItemModel("complexUnion", modelIndex)); 
 			if (!iscomplexUnionRead){
 				return false;
@@ -8726,7 +8726,7 @@ bool CUnionTestingType::ReadFromModel(const ::imtbase::CTreeItemModel& model, in
 			complexUnion = CDMResultUnionType(complexUnionConvert);
 		}
 		else if (complexUnionTypename == "CDMResultVarRecursive") {
-			CCDMResultVarRecursive complexUnionConvert;
+			V1_0::complextest::CCDMResultVarRecursive complexUnionConvert;
 			const bool iscomplexUnionRead = complexUnionConvert.ReadFromModel(*model.GetTreeItemModel("complexUnion", modelIndex)); 
 			if (!iscomplexUnionRead){
 				return false;
@@ -8739,7 +8739,7 @@ bool CUnionTestingType::ReadFromModel(const ::imtbase::CTreeItemModel& model, in
 	if (!mixedUnionData.isNull()){
 		QString mixedUnionTypename = model.GetTreeItemModel("mixedUnion", modelIndex)->GetData("__typename").toString();
 		if (mixedUnionTypename == "Coordinates") {
-			CCoordinates mixedUnionConvert;
+			V1_0::complextest::CCoordinates mixedUnionConvert;
 			const bool ismixedUnionRead = mixedUnionConvert.ReadFromModel(*model.GetTreeItemModel("mixedUnion", modelIndex)); 
 			if (!ismixedUnionRead){
 				return false;
@@ -8761,7 +8761,7 @@ bool CUnionTestingType::ReadFromModel(const ::imtbase::CTreeItemModel& model, in
 }
 
 
-bool CUnionTestingType::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CUnionTestingType::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant simpleUnionData = model.GetData("simpleUnion", modelIndex);
 	if (!simpleUnionData.isNull()){
@@ -8780,7 +8780,7 @@ bool CUnionTestingType::OptReadFromModel(const ::imtbase::CTreeItemModel& model,
 	if (!complexUnionData.isNull()){
 		QString complexUnionTypename = model.GetTreeItemModel("complexUnion", modelIndex)->GetData("__typename").toString();
 		if (complexUnionTypename == "CDMResultVarString") {
-			CCDMResultVarString complexUnionConvert;
+			V1_0::complextest::CCDMResultVarString complexUnionConvert;
 			const bool iscomplexUnionRead = complexUnionConvert.ReadFromModel(*model.GetTreeItemModel("complexUnion", modelIndex)); 
 			if (!iscomplexUnionRead){
 				return false;
@@ -8788,7 +8788,7 @@ bool CUnionTestingType::OptReadFromModel(const ::imtbase::CTreeItemModel& model,
 			complexUnion = CDMResultUnionType(complexUnionConvert);
 		}
 		else if (complexUnionTypename == "CDMResultVarRecursive") {
-			CCDMResultVarRecursive complexUnionConvert;
+			V1_0::complextest::CCDMResultVarRecursive complexUnionConvert;
 			const bool iscomplexUnionRead = complexUnionConvert.ReadFromModel(*model.GetTreeItemModel("complexUnion", modelIndex)); 
 			if (!iscomplexUnionRead){
 				return false;
@@ -8801,7 +8801,7 @@ bool CUnionTestingType::OptReadFromModel(const ::imtbase::CTreeItemModel& model,
 	if (!mixedUnionData.isNull()){
 		QString mixedUnionTypename = model.GetTreeItemModel("mixedUnion", modelIndex)->GetData("__typename").toString();
 		if (mixedUnionTypename == "Coordinates") {
-			CCoordinates mixedUnionConvert;
+			V1_0::complextest::CCoordinates mixedUnionConvert;
 			const bool ismixedUnionRead = mixedUnionConvert.ReadFromModel(*model.GetTreeItemModel("mixedUnion", modelIndex)); 
 			if (!ismixedUnionRead){
 				return false;
@@ -8823,12 +8823,12 @@ bool CUnionTestingType::OptReadFromModel(const ::imtbase::CTreeItemModel& model,
 }
 
 
-bool CUnionTestingType::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::complextest::CUnionTestingType::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (simpleUnion){
 		::imtgql::CGqlParamObject simpleUnionDataObject;
-		if (const double* doubleVal = std::get_if<double>(simpleUnion.GetPtr())){
-			simpleUnionDataObject.InsertParam("simpleUnion", *doubleVal);
+		if (const double* floatVal = std::get_if<double>(simpleUnion.GetPtr())){
+			simpleUnionDataObject.InsertParam("simpleUnion", *floatVal);
 		}
 		else if (const bool* booleanVal = std::get_if<bool>(simpleUnion.GetPtr())){
 			simpleUnionDataObject.InsertParam("simpleUnion", *booleanVal);
@@ -8841,13 +8841,13 @@ bool CUnionTestingType::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObjec
 
 	if (complexUnion){
 		::imtgql::CGqlParamObject complexUnionDataObject;
-		if (const CCDMResultVarString* cDMResultVarStringVal = std::get_if<CCDMResultVarString>(complexUnion.GetPtr())){
+		if (const V1_0::complextest::CCDMResultVarString* cDMResultVarStringVal = std::get_if<V1_0::complextest::CCDMResultVarString>(complexUnion.GetPtr())){
 			if (!cDMResultVarStringVal->WriteToGraphQlObject(complexUnionDataObject)){
 				return false;
 			}
 			complexUnionDataObject.InsertParam("__typename", QVariant("CDMResultVarString"));
 		}
-		else if (const CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<CCDMResultVarRecursive>(complexUnion.GetPtr())){
+		else if (const V1_0::complextest::CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<V1_0::complextest::CCDMResultVarRecursive>(complexUnion.GetPtr())){
 			if (!cDMResultVarRecursiveVal->WriteToGraphQlObject(complexUnionDataObject)){
 				return false;
 			}
@@ -8858,14 +8858,14 @@ bool CUnionTestingType::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObjec
 
 	if (mixedUnion){
 		::imtgql::CGqlParamObject mixedUnionDataObject;
-		if (const CCoordinates* coordinatesVal = std::get_if<CCoordinates>(mixedUnion.GetPtr())){
+		if (const V1_0::complextest::CCoordinates* coordinatesVal = std::get_if<V1_0::complextest::CCoordinates>(mixedUnion.GetPtr())){
 			if (!coordinatesVal->WriteToGraphQlObject(mixedUnionDataObject)){
 				return false;
 			}
 			mixedUnionDataObject.InsertParam("__typename", QVariant("Coordinates"));
 		}
-		else if (const double* doubleVal = std::get_if<double>(mixedUnion.GetPtr())){
-			mixedUnionDataObject.InsertParam("mixedUnion", *doubleVal);
+		else if (const double* floatVal = std::get_if<double>(mixedUnion.GetPtr())){
+			mixedUnionDataObject.InsertParam("mixedUnion", *floatVal);
 		}
 		else if (const bool* booleanVal = std::get_if<bool>(mixedUnion.GetPtr())){
 			mixedUnionDataObject.InsertParam("mixedUnion", *booleanVal);
@@ -8882,7 +8882,7 @@ bool CUnionTestingType::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObjec
 }
 
 
-bool CUnionTestingType::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CUnionTestingType::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("simpleUnion")){
 		QVariant simpleUnionVariantValue = gqlObject["simpleUnion"];
@@ -8906,7 +8906,7 @@ bool CUnionTestingType::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 		}
 		QString complexUnionTypename = complexUnionDataObjectPtr->GetParamArgumentValue("__typename").toString();
 		if (complexUnionTypename == "CDMResultVarString") {
-			CCDMResultVarString complexUnionConvert;
+			V1_0::complextest::CCDMResultVarString complexUnionConvert;
 			const bool isComplexUnionRead = complexUnionConvert.ReadFromGraphQlObject(*complexUnionDataObjectPtr);
 			if (!isComplexUnionRead){
 				return false;
@@ -8914,7 +8914,7 @@ bool CUnionTestingType::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 			complexUnion = CDMResultUnionType(complexUnionConvert);
 		}
 		else if (complexUnionTypename == "CDMResultVarRecursive") {
-			CCDMResultVarRecursive complexUnionConvert;
+			V1_0::complextest::CCDMResultVarRecursive complexUnionConvert;
 			const bool isComplexUnionRead = complexUnionConvert.ReadFromGraphQlObject(*complexUnionDataObjectPtr);
 			if (!isComplexUnionRead){
 				return false;
@@ -8933,7 +8933,7 @@ bool CUnionTestingType::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 		QString mixedUnionTypename = mixedUnionDataObjectPtr->GetParamArgumentValue("__typename").toString();
 		QVariant mixedUnionVariantValue = gqlObject["mixedUnion"];
 		if (mixedUnionTypename == "Coordinates") {
-			CCoordinates mixedUnionConvert;
+			V1_0::complextest::CCoordinates mixedUnionConvert;
 			const bool isMixedUnionRead = mixedUnionConvert.ReadFromGraphQlObject(*mixedUnionDataObjectPtr);
 			if (!isMixedUnionRead){
 				return false;
@@ -8955,7 +8955,7 @@ bool CUnionTestingType::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 }
 
 
-bool CUnionTestingType::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CUnionTestingType::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("simpleUnion")){
 		QVariant simpleUnionVariantValue = gqlObject["simpleUnion"];
@@ -8979,7 +8979,7 @@ bool CUnionTestingType::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject
 		}
 		QString complexUnionTypename = complexUnionDataObjectPtr->GetParamArgumentValue("__typename").toString();
 		if (complexUnionTypename == "CDMResultVarString") {
-			CCDMResultVarString complexUnionConvert;
+			V1_0::complextest::CCDMResultVarString complexUnionConvert;
 			const bool isComplexUnionRead = complexUnionConvert.ReadFromGraphQlObject(*complexUnionDataObjectPtr);
 			if (!isComplexUnionRead){
 				return false;
@@ -8987,7 +8987,7 @@ bool CUnionTestingType::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject
 			complexUnion = CDMResultUnionType(complexUnionConvert);
 		}
 		else if (complexUnionTypename == "CDMResultVarRecursive") {
-			CCDMResultVarRecursive complexUnionConvert;
+			V1_0::complextest::CCDMResultVarRecursive complexUnionConvert;
 			const bool isComplexUnionRead = complexUnionConvert.ReadFromGraphQlObject(*complexUnionDataObjectPtr);
 			if (!isComplexUnionRead){
 				return false;
@@ -9006,7 +9006,7 @@ bool CUnionTestingType::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject
 		QString mixedUnionTypename = mixedUnionDataObjectPtr->GetParamArgumentValue("__typename").toString();
 		QVariant mixedUnionVariantValue = gqlObject["mixedUnion"];
 		if (mixedUnionTypename == "Coordinates") {
-			CCoordinates mixedUnionConvert;
+			V1_0::complextest::CCoordinates mixedUnionConvert;
 			const bool isMixedUnionRead = mixedUnionConvert.ReadFromGraphQlObject(*mixedUnionDataObjectPtr);
 			if (!isMixedUnionRead){
 				return false;
@@ -9028,14 +9028,14 @@ bool CUnionTestingType::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject
 }
 
 
-bool CUnionTestingType::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::complextest::CUnionTestingType::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (simpleUnion){
-		if (const double* doubleVal = std::get_if<double>(simpleUnion.GetPtr())){
+		if (const double* floatVal = std::get_if<double>(simpleUnion.GetPtr())){
 			if (!simpleUnion){
 				return false;
 			}
-			jsonObject["simpleUnion"] = QJsonValue::fromVariant(*doubleVal);
+			jsonObject["simpleUnion"] = QJsonValue::fromVariant(*floatVal);
 		}
 		else if (const bool* booleanVal = std::get_if<bool>(simpleUnion.GetPtr())){
 			if (!simpleUnion){
@@ -9053,7 +9053,7 @@ bool CUnionTestingType::WriteToJsonObject(QJsonObject& jsonObject) const
 	}
 
 	if (complexUnion){
-		if (const CCDMResultVarString* cDMResultVarStringVal = std::get_if<CCDMResultVarString>(complexUnion.GetPtr())){
+		if (const V1_0::complextest::CCDMResultVarString* cDMResultVarStringVal = std::get_if<V1_0::complextest::CCDMResultVarString>(complexUnion.GetPtr())){
 			QJsonObject complexUnionJsonObject;
 			const bool iscomplexUnionAdded = cDMResultVarStringVal->WriteToJsonObject(complexUnionJsonObject);
 			if (!iscomplexUnionAdded){
@@ -9062,7 +9062,7 @@ bool CUnionTestingType::WriteToJsonObject(QJsonObject& jsonObject) const
 			complexUnionJsonObject["__typename"] = "CDMResultVarString";
 			jsonObject["complexUnion"] = complexUnionJsonObject;
 		}
-		else if (const CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<CCDMResultVarRecursive>(complexUnion.GetPtr())){
+		else if (const V1_0::complextest::CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<V1_0::complextest::CCDMResultVarRecursive>(complexUnion.GetPtr())){
 			QJsonObject complexUnionJsonObject;
 			const bool iscomplexUnionAdded = cDMResultVarRecursiveVal->WriteToJsonObject(complexUnionJsonObject);
 			if (!iscomplexUnionAdded){
@@ -9075,7 +9075,7 @@ bool CUnionTestingType::WriteToJsonObject(QJsonObject& jsonObject) const
 	}
 
 	if (mixedUnion){
-		if (const CCoordinates* coordinatesVal = std::get_if<CCoordinates>(mixedUnion.GetPtr())){
+		if (const V1_0::complextest::CCoordinates* coordinatesVal = std::get_if<V1_0::complextest::CCoordinates>(mixedUnion.GetPtr())){
 			QJsonObject mixedUnionJsonObject;
 			const bool ismixedUnionAdded = coordinatesVal->WriteToJsonObject(mixedUnionJsonObject);
 			if (!ismixedUnionAdded){
@@ -9084,11 +9084,11 @@ bool CUnionTestingType::WriteToJsonObject(QJsonObject& jsonObject) const
 			mixedUnionJsonObject["__typename"] = "Coordinates";
 			jsonObject["mixedUnion"] = mixedUnionJsonObject;
 		}
-		else if (const double* doubleVal = std::get_if<double>(mixedUnion.GetPtr())){
+		else if (const double* floatVal = std::get_if<double>(mixedUnion.GetPtr())){
 			if (!mixedUnion){
 				return false;
 			}
-			jsonObject["mixedUnion"] = QJsonValue::fromVariant(*doubleVal);
+			jsonObject["mixedUnion"] = QJsonValue::fromVariant(*floatVal);
 		}
 		else if (const bool* booleanVal = std::get_if<bool>(mixedUnion.GetPtr())){
 			if (!mixedUnion){
@@ -9111,7 +9111,7 @@ bool CUnionTestingType::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CUnionTestingType::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CUnionTestingType::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("simpleUnion")){
 		QVariant simpleUnionVariantValue = jsonObject["simpleUnion"].toVariant();
@@ -9135,7 +9135,7 @@ bool CUnionTestingType::ReadFromJsonObject(const QJsonObject& jsonObject)
 		}
 		QString complexUnionTypename = complexUnionObject.value("__typename").toString();
 		if (complexUnionTypename == "CDMResultVarString") {
-			CCDMResultVarString complexUnionConvert;
+			V1_0::complextest::CCDMResultVarString complexUnionConvert;
 			const bool iscomplexUnionRead = complexUnionConvert.ReadFromJsonObject(jsonObject["complexUnion"].toObject());
 			if (!iscomplexUnionRead){
 				return false;
@@ -9143,7 +9143,7 @@ bool CUnionTestingType::ReadFromJsonObject(const QJsonObject& jsonObject)
 			complexUnion = CDMResultUnionType(complexUnionConvert);
 		}
 		else if (complexUnionTypename == "CDMResultVarRecursive") {
-			CCDMResultVarRecursive complexUnionConvert;
+			V1_0::complextest::CCDMResultVarRecursive complexUnionConvert;
 			const bool iscomplexUnionRead = complexUnionConvert.ReadFromJsonObject(jsonObject["complexUnion"].toObject());
 			if (!iscomplexUnionRead){
 				return false;
@@ -9162,7 +9162,7 @@ bool CUnionTestingType::ReadFromJsonObject(const QJsonObject& jsonObject)
 		QString mixedUnionTypename = mixedUnionObject.value("__typename").toString();
 		QVariant mixedUnionVariantValue = jsonObject["mixedUnion"].toVariant();
 		if (mixedUnionTypename == "Coordinates") {
-			CCoordinates mixedUnionConvert;
+			V1_0::complextest::CCoordinates mixedUnionConvert;
 			const bool ismixedUnionRead = mixedUnionConvert.ReadFromJsonObject(jsonObject["mixedUnion"].toObject());
 			if (!ismixedUnionRead){
 				return false;
@@ -9184,7 +9184,7 @@ bool CUnionTestingType::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CUnionTestingType::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CUnionTestingType::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("simpleUnion")){
 		QVariant simpleUnionVariantValue = jsonObject["simpleUnion"].toVariant();
@@ -9208,7 +9208,7 @@ bool CUnionTestingType::OptReadFromJsonObject(const QJsonObject& jsonObject)
 		}
 		QString complexUnionTypename = complexUnionObject.value("__typename").toString();
 		if (complexUnionTypename == "CDMResultVarString") {
-			CCDMResultVarString complexUnionConvert;
+			V1_0::complextest::CCDMResultVarString complexUnionConvert;
 			const bool iscomplexUnionRead = complexUnionConvert.ReadFromJsonObject(jsonObject["complexUnion"].toObject());
 			if (!iscomplexUnionRead){
 				return false;
@@ -9216,7 +9216,7 @@ bool CUnionTestingType::OptReadFromJsonObject(const QJsonObject& jsonObject)
 			complexUnion = CDMResultUnionType(complexUnionConvert);
 		}
 		else if (complexUnionTypename == "CDMResultVarRecursive") {
-			CCDMResultVarRecursive complexUnionConvert;
+			V1_0::complextest::CCDMResultVarRecursive complexUnionConvert;
 			const bool iscomplexUnionRead = complexUnionConvert.ReadFromJsonObject(jsonObject["complexUnion"].toObject());
 			if (!iscomplexUnionRead){
 				return false;
@@ -9235,7 +9235,7 @@ bool CUnionTestingType::OptReadFromJsonObject(const QJsonObject& jsonObject)
 		QString mixedUnionTypename = mixedUnionObject.value("__typename").toString();
 		QVariant mixedUnionVariantValue = jsonObject["mixedUnion"].toVariant();
 		if (mixedUnionTypename == "Coordinates") {
-			CCoordinates mixedUnionConvert;
+			V1_0::complextest::CCoordinates mixedUnionConvert;
 			const bool ismixedUnionRead = mixedUnionConvert.ReadFromJsonObject(jsonObject["mixedUnion"].toObject());
 			if (!ismixedUnionRead){
 				return false;
@@ -9257,7 +9257,7 @@ bool CUnionTestingType::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CCDMResultVarRecursive::GetVersionId()
 {
@@ -9276,7 +9276,7 @@ bool CCDMResultVarRecursive::operator==(const CCDMResultVarRecursive& other) con
 }
 
 
-bool CCDMResultVarRecursive::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::complextest::CCDMResultVarRecursive::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "CDMResultVarRecursive", modelIndex);
 
@@ -9310,14 +9310,14 @@ bool CCDMResultVarRecursive::WriteToModel(::imtbase::CTreeItemModel& model, int 
 		newResultContentModelPtr->setIsArray(true);
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContent->size(); ++resultContentIndex){
 			QVariant resultContentVariantValue;
-			if (const CCDMResultVarString* cDMResultVarStringVal = std::get_if<CCDMResultVarString>(resultContent->at(resultContentIndex).GetPtr())){
+			if (const V1_0::complextest::CCDMResultVarString* cDMResultVarStringVal = std::get_if<V1_0::complextest::CCDMResultVarString>(resultContent->at(resultContentIndex).GetPtr())){
 				newResultContentModelPtr->InsertNewItem();
 				if(!cDMResultVarStringVal->WriteToModel(*newResultContentModelPtr, resultContentIndex)){
 					return false;
 				}
 				newResultContentModelPtr->SetData("__typename", "CDMResultVarString", resultContentIndex);
 			}
-			else if (const CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
+			else if (const V1_0::complextest::CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<V1_0::complextest::CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
 				newResultContentModelPtr->InsertNewItem();
 				if(!cDMResultVarRecursiveVal->WriteToModel(*newResultContentModelPtr, resultContentIndex)){
 					return false;
@@ -9344,7 +9344,7 @@ bool CCDMResultVarRecursive::WriteToModel(::imtbase::CTreeItemModel& model, int 
 }
 
 
-bool CCDMResultVarRecursive::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CCDMResultVarRecursive::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant dataModelTitleData = model.GetData("dataModelTitle", modelIndex);
 	if (dataModelTitleData.isNull()){
@@ -9364,7 +9364,7 @@ bool CCDMResultVarRecursive::ReadFromModel(const ::imtbase::CTreeItemModel& mode
 
 	::imtbase::CTreeItemModel* resultMetaDataDataModelPtr = model.GetTreeItemModel("resultMetaData", modelIndex);
 	if (resultMetaDataDataModelPtr != nullptr){
-		resultMetaData = CResultMetaData();
+		resultMetaData = V1_0::complextest::CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromModel(*resultMetaDataDataModelPtr, modelIndex);
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -9376,13 +9376,13 @@ bool CCDMResultVarRecursive::ReadFromModel(const ::imtbase::CTreeItemModel& mode
 	::imtbase::CTreeItemModel* resultContentModel = model.GetTreeItemModel("resultContent", modelIndex);
 	if (resultContentModel != nullptr){
 		int resultContentCount = resultContentModel->GetItemsCount();
-		imtsdl::TElementList<CDMResultUnionType> resultContentList;
+		imtsdl::TElementList<V1_0::complextest::CDMResultUnionType> resultContentList;
 		for (int resultContentIndex = 0; resultContentIndex < resultContentCount; ++resultContentIndex){
-			CDMResultUnionType resultContentData;
+			V1_0::complextest::CDMResultUnionType resultContentData;
 			QVariant resultContentVariantValue = resultContentModel->GetData(QByteArray(), resultContentIndex);
 			QString resultContentDataTypename = resultContentModel->GetData("__typename", resultContentIndex).toString();
 			if (resultContentDataTypename == "CDMResultVarString") {
-				CCDMResultVarString resultContentDataConvert;
+				V1_0::complextest::CCDMResultVarString resultContentDataConvert;
 				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
 				if (!isresultContentDataRead){
 					return false;
@@ -9390,7 +9390,7 @@ bool CCDMResultVarRecursive::ReadFromModel(const ::imtbase::CTreeItemModel& mode
 				resultContentData = CDMResultUnionType(resultContentDataConvert);
 			}
 			else if (resultContentDataTypename == "CDMResultVarRecursive") {
-				CCDMResultVarRecursive resultContentDataConvert;
+				V1_0::complextest::CCDMResultVarRecursive resultContentDataConvert;
 				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
 				if (!isresultContentDataRead){
 					return false;
@@ -9410,9 +9410,9 @@ bool CCDMResultVarRecursive::ReadFromModel(const ::imtbase::CTreeItemModel& mode
 	::imtbase::CTreeItemModel* overallResultValuesModel = model.GetTreeItemModel("overallResultValues", modelIndex);
 	if (overallResultValuesModel != nullptr){
 		int overallResultValuesCount = overallResultValuesModel->GetItemsCount();
-		imtsdl::TElementList<COverallResultValues> overallResultValuesList;
+		imtsdl::TElementList<V1_0::complextest::COverallResultValues> overallResultValuesList;
 		for (int overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesCount; ++overallResultValuesIndex){
-			COverallResultValues t_overallResultValues;
+			V1_0::complextest::COverallResultValues t_overallResultValues;
 			if (!t_overallResultValues.ReadFromModel(*overallResultValuesModel, overallResultValuesIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -9428,7 +9428,7 @@ bool CCDMResultVarRecursive::ReadFromModel(const ::imtbase::CTreeItemModel& mode
 }
 
 
-bool CCDMResultVarRecursive::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CCDMResultVarRecursive::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant dataModelTitleData = model.GetData("dataModelTitle", modelIndex);
 	if (!dataModelTitleData.isNull()){
@@ -9442,7 +9442,7 @@ bool CCDMResultVarRecursive::OptReadFromModel(const ::imtbase::CTreeItemModel& m
 
 	::imtbase::CTreeItemModel* resultMetaDataDataModelPtr = model.GetTreeItemModel("resultMetaData", modelIndex);
 	if (resultMetaDataDataModelPtr != nullptr){
-		resultMetaData = CResultMetaData();
+		resultMetaData = V1_0::complextest::CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromModel(*resultMetaDataDataModelPtr, modelIndex);
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -9454,13 +9454,13 @@ bool CCDMResultVarRecursive::OptReadFromModel(const ::imtbase::CTreeItemModel& m
 	::imtbase::CTreeItemModel* resultContentModel = model.GetTreeItemModel("resultContent", modelIndex);
 	if (resultContentModel != nullptr){
 		int resultContentCount = resultContentModel->GetItemsCount();
-		imtsdl::TElementList<CDMResultUnionType> resultContentList;
+		imtsdl::TElementList<V1_0::complextest::CDMResultUnionType> resultContentList;
 		for (int resultContentIndex = 0; resultContentIndex < resultContentCount; ++resultContentIndex){
-			CDMResultUnionType resultContentData;
+			V1_0::complextest::CDMResultUnionType resultContentData;
 			QVariant resultContentVariantValue = resultContentModel->GetData(QByteArray(), resultContentIndex);
 			QString resultContentDataTypename = resultContentModel->GetData("__typename", resultContentIndex).toString();
 			if (resultContentDataTypename == "CDMResultVarString") {
-				CCDMResultVarString resultContentDataConvert;
+				V1_0::complextest::CCDMResultVarString resultContentDataConvert;
 				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
 				if (!isresultContentDataRead){
 					return false;
@@ -9468,7 +9468,7 @@ bool CCDMResultVarRecursive::OptReadFromModel(const ::imtbase::CTreeItemModel& m
 				resultContentData = CDMResultUnionType(resultContentDataConvert);
 			}
 			else if (resultContentDataTypename == "CDMResultVarRecursive") {
-				CCDMResultVarRecursive resultContentDataConvert;
+				V1_0::complextest::CCDMResultVarRecursive resultContentDataConvert;
 				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
 				if (!isresultContentDataRead){
 					return false;
@@ -9488,9 +9488,9 @@ bool CCDMResultVarRecursive::OptReadFromModel(const ::imtbase::CTreeItemModel& m
 	::imtbase::CTreeItemModel* overallResultValuesModel = model.GetTreeItemModel("overallResultValues", modelIndex);
 	if (overallResultValuesModel != nullptr){
 		int overallResultValuesCount = overallResultValuesModel->GetItemsCount();
-		imtsdl::TElementList<COverallResultValues> overallResultValuesList;
+		imtsdl::TElementList<V1_0::complextest::COverallResultValues> overallResultValuesList;
 		for (int overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesCount; ++overallResultValuesIndex){
-			COverallResultValues t_overallResultValues;
+			V1_0::complextest::COverallResultValues t_overallResultValues;
 			if (!t_overallResultValues.OptReadFromModel(*overallResultValuesModel, overallResultValuesIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -9506,7 +9506,7 @@ bool CCDMResultVarRecursive::OptReadFromModel(const ::imtbase::CTreeItemModel& m
 }
 
 
-bool CCDMResultVarRecursive::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::complextest::CCDMResultVarRecursive::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!dataModelTitle){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
@@ -9537,13 +9537,13 @@ bool CCDMResultVarRecursive::WriteToGraphQlObject(::imtgql::CGqlParamObject& gql
 		QList<::imtgql::CGqlParamObject> resultContentDataObjectList;
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContent->size(); ++resultContentIndex){
 			::imtgql::CGqlParamObject resultContentDataObject;
-			if (const CCDMResultVarString* cDMResultVarStringVal = std::get_if<CCDMResultVarString>(resultContent->at(resultContentIndex).GetPtr())){
+			if (const V1_0::complextest::CCDMResultVarString* cDMResultVarStringVal = std::get_if<V1_0::complextest::CCDMResultVarString>(resultContent->at(resultContentIndex).GetPtr())){
 				if (!cDMResultVarStringVal->WriteToGraphQlObject(resultContentDataObject)){
 					return false;
 				}
 				resultContentDataObject.InsertParam("__typename", QVariant("CDMResultVarString"));
 			}
-			else if (const CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
+			else if (const V1_0::complextest::CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<V1_0::complextest::CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
 				if (!cDMResultVarRecursiveVal->WriteToGraphQlObject(resultContentDataObject)){
 					return false;
 				}
@@ -9574,7 +9574,7 @@ bool CCDMResultVarRecursive::WriteToGraphQlObject(::imtgql::CGqlParamObject& gql
 }
 
 
-bool CCDMResultVarRecursive::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CCDMResultVarRecursive::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("dataModelTitle") || (gqlObject["dataModelTitle"].userType() != QMetaType::QString && gqlObject["dataModelTitle"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
@@ -9591,7 +9591,7 @@ bool CCDMResultVarRecursive::ReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 	dataModelVersion = gqlObject["dataModelVersion"].toString();
 
 	if (gqlObject.ContainsParam("resultMetaData") && (gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr)){
-		resultMetaData = CResultMetaData();
+		resultMetaData = V1_0::complextest::CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -9606,16 +9606,16 @@ bool CCDMResultVarRecursive::ReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 	if (gqlObject.ContainsParam("resultContent")){
 		const QList<const ::imtgql::CGqlParamObject*> resultContentDataList = gqlObject.GetParamArgumentObjectPtrList("resultContent");
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
-		resultContent = imtsdl::TElementList<CDMResultUnionType>();
+		resultContent = imtsdl::TElementList<V1_0::complextest::CDMResultUnionType>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
 			const ::imtgql::CGqlParamObject* tempResultContent = resultContentDataList[resultContentIndex];
 			if (tempResultContent == nullptr){
 				return false;
 			}
 			QString resultContentDataValueTypename = tempResultContent->GetParamArgumentValue("__typename").toString();
-			CDMResultUnionType resultContentDataValue;
+			V1_0::complextest::CDMResultUnionType resultContentDataValue;
 			if (resultContentDataValueTypename == "CDMResultVarString") {
-				CCDMResultVarString resultContentDataValueConvert;
+				V1_0::complextest::CCDMResultVarString resultContentDataValueConvert;
 				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*tempResultContent);
 				if (!isResultContentRead){
 					return false;
@@ -9623,7 +9623,7 @@ bool CCDMResultVarRecursive::ReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 				resultContentDataValue = CDMResultUnionType(resultContentDataValueConvert);
 			}
 			else if (resultContentDataValueTypename == "CDMResultVarRecursive") {
-				CCDMResultVarRecursive resultContentDataValueConvert;
+				V1_0::complextest::CCDMResultVarRecursive resultContentDataValueConvert;
 				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*tempResultContent);
 				if (!isResultContentRead){
 					return false;
@@ -9642,14 +9642,14 @@ bool CCDMResultVarRecursive::ReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 	}
 	if (gqlObject.ContainsParam("overallResultValues") && (gqlObject.GetObjectsCount("overallResultValues") > 0)){
 		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
-		overallResultValues = imtsdl::TElementList<COverallResultValues>();
+		overallResultValues = imtsdl::TElementList<V1_0::complextest::COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
 			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
 			if (overallResultValuesDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << overallResultValuesDataObjectPtr;
 				return false;
 			}
-			COverallResultValues tempOverallResultValues;
+			V1_0::complextest::COverallResultValues tempOverallResultValues;
 			if (!tempOverallResultValues.ReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -9663,7 +9663,7 @@ bool CCDMResultVarRecursive::ReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 }
 
 
-bool CCDMResultVarRecursive::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CCDMResultVarRecursive::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("dataModelTitle") && (gqlObject["dataModelTitle"].userType() == QMetaType::QString || gqlObject["dataModelTitle"].userType() == QMetaType::QByteArray)){
 		dataModelTitle = gqlObject["dataModelTitle"].toString();
@@ -9674,7 +9674,7 @@ bool CCDMResultVarRecursive::OptReadFromGraphQlObject(const ::imtgql::CGqlParamO
 	}
 
 	if (gqlObject.ContainsParam("resultMetaData") && (gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr)){
-		resultMetaData = CResultMetaData();
+		resultMetaData = V1_0::complextest::CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -9689,16 +9689,16 @@ bool CCDMResultVarRecursive::OptReadFromGraphQlObject(const ::imtgql::CGqlParamO
 	if (gqlObject.ContainsParam("resultContent")){
 		const QList<const ::imtgql::CGqlParamObject*> resultContentDataList = gqlObject.GetParamArgumentObjectPtrList("resultContent");
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
-		resultContent = imtsdl::TElementList<CDMResultUnionType>();
+		resultContent = imtsdl::TElementList<V1_0::complextest::CDMResultUnionType>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
 			const ::imtgql::CGqlParamObject* tempResultContent = resultContentDataList[resultContentIndex];
 			if (tempResultContent == nullptr){
 				return false;
 			}
 			QString resultContentDataValueTypename = tempResultContent->GetParamArgumentValue("__typename").toString();
-			CDMResultUnionType resultContentDataValue;
+			V1_0::complextest::CDMResultUnionType resultContentDataValue;
 			if (resultContentDataValueTypename == "CDMResultVarString") {
-				CCDMResultVarString resultContentDataValueConvert;
+				V1_0::complextest::CCDMResultVarString resultContentDataValueConvert;
 				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*tempResultContent);
 				if (!isResultContentRead){
 					return false;
@@ -9706,7 +9706,7 @@ bool CCDMResultVarRecursive::OptReadFromGraphQlObject(const ::imtgql::CGqlParamO
 				resultContentDataValue = CDMResultUnionType(resultContentDataValueConvert);
 			}
 			else if (resultContentDataValueTypename == "CDMResultVarRecursive") {
-				CCDMResultVarRecursive resultContentDataValueConvert;
+				V1_0::complextest::CCDMResultVarRecursive resultContentDataValueConvert;
 				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*tempResultContent);
 				if (!isResultContentRead){
 					return false;
@@ -9725,14 +9725,14 @@ bool CCDMResultVarRecursive::OptReadFromGraphQlObject(const ::imtgql::CGqlParamO
 	}
 	if (gqlObject.ContainsParam("overallResultValues") && (gqlObject.GetObjectsCount("overallResultValues") > 0)){
 		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
-		overallResultValues = imtsdl::TElementList<COverallResultValues>();
+		overallResultValues = imtsdl::TElementList<V1_0::complextest::COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
 			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
 			if (overallResultValuesDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << overallResultValuesDataObjectPtr;
 				return false;
 			}
-			COverallResultValues tempOverallResultValues;
+			V1_0::complextest::COverallResultValues tempOverallResultValues;
 			if (!tempOverallResultValues.OptReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -9746,7 +9746,7 @@ bool CCDMResultVarRecursive::OptReadFromGraphQlObject(const ::imtgql::CGqlParamO
 }
 
 
-bool CCDMResultVarRecursive::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::complextest::CCDMResultVarRecursive::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!dataModelTitle){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
@@ -9776,7 +9776,7 @@ bool CCDMResultVarRecursive::WriteToJsonObject(QJsonObject& jsonObject) const
 	if (resultContent){
 		QJsonArray newResultContentArray;
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContent->size(); ++resultContentIndex){
-			if (const CCDMResultVarString* cDMResultVarStringVal = std::get_if<CCDMResultVarString>(resultContent->at(resultContentIndex).GetPtr())){
+			if (const V1_0::complextest::CCDMResultVarString* cDMResultVarStringVal = std::get_if<V1_0::complextest::CCDMResultVarString>(resultContent->at(resultContentIndex).GetPtr())){
 				QJsonObject resultContentJsonObject;
 				const bool isresultContentAdded = cDMResultVarStringVal->WriteToJsonObject(resultContentJsonObject);
 				if (!isresultContentAdded){
@@ -9785,7 +9785,7 @@ bool CCDMResultVarRecursive::WriteToJsonObject(QJsonObject& jsonObject) const
 				resultContentJsonObject["__typename"] = "CDMResultVarString";
 				newResultContentArray << resultContentJsonObject;
 			}
-			else if (const CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
+			else if (const V1_0::complextest::CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<V1_0::complextest::CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
 				QJsonObject resultContentJsonObject;
 				const bool isresultContentAdded = cDMResultVarRecursiveVal->WriteToJsonObject(resultContentJsonObject);
 				if (!isresultContentAdded){
@@ -9818,7 +9818,7 @@ bool CCDMResultVarRecursive::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CCDMResultVarRecursive::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CCDMResultVarRecursive::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("dataModelTitle") || ! jsonObject["dataModelTitle"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
@@ -9835,7 +9835,7 @@ bool CCDMResultVarRecursive::ReadFromJsonObject(const QJsonObject& jsonObject)
 	dataModelVersion = jsonObject["dataModelVersion"].toString();
 
 	if (jsonObject.contains("resultMetaData") && jsonObject["resultMetaData"].isObject()){
-		resultMetaData = CResultMetaData();
+		resultMetaData = V1_0::complextest::CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromJsonObject(jsonObject["resultMetaData"].toObject());
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -9847,13 +9847,13 @@ bool CCDMResultVarRecursive::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("resultContent")){
 		const QJsonArray resultContentJsonArray = jsonObject["resultContent"].toArray();
 		const qsizetype resultContentArrayCount = resultContentJsonArray.size();
-		resultContent = imtsdl::TElementList<CDMResultUnionType>();
+		resultContent = imtsdl::TElementList<V1_0::complextest::CDMResultUnionType>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
 			const QVariant tempResultContent = resultContentJsonArray[resultContentIndex].toVariant();
 			QString resultContentDataValueTypename = resultContentJsonArray[resultContentIndex].toObject().value("__typename").toString();
-			CDMResultUnionType resultContentDataValue;
+			V1_0::complextest::CDMResultUnionType resultContentDataValue;
 			if (resultContentDataValueTypename == "CDMResultVarString") {
-				CCDMResultVarString resultContentDataValueConvert;
+				V1_0::complextest::CCDMResultVarString resultContentDataValueConvert;
 				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
 				if (!isresultContentDataValueRead){
 					return false;
@@ -9861,7 +9861,7 @@ bool CCDMResultVarRecursive::ReadFromJsonObject(const QJsonObject& jsonObject)
 				resultContentDataValue = CDMResultUnionType(resultContentDataValueConvert);
 			}
 			else if (resultContentDataValueTypename == "CDMResultVarRecursive") {
-				CCDMResultVarRecursive resultContentDataValueConvert;
+				V1_0::complextest::CCDMResultVarRecursive resultContentDataValueConvert;
 				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
 				if (!isresultContentDataValueRead){
 					return false;
@@ -9878,9 +9878,9 @@ bool CCDMResultVarRecursive::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("overallResultValues") && jsonObject["overallResultValues"].isArray()){
 		const QJsonArray overallResultValuesJsonArray = jsonObject["overallResultValues"].toArray();
 		const qsizetype overallResultValuesArrayCount = overallResultValuesJsonArray.size();
-		overallResultValues = imtsdl::TElementList<COverallResultValues>();
+		overallResultValues = imtsdl::TElementList<V1_0::complextest::COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesArrayCount; ++overallResultValuesIndex){
-			COverallResultValues tempOverallResultValues;
+			V1_0::complextest::COverallResultValues tempOverallResultValues;
 			if (!tempOverallResultValues.ReadFromJsonObject(overallResultValuesJsonArray[overallResultValuesIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -9894,7 +9894,7 @@ bool CCDMResultVarRecursive::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CCDMResultVarRecursive::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CCDMResultVarRecursive::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("dataModelTitle") && jsonObject["dataModelTitle"].isString()){
 		dataModelTitle = jsonObject["dataModelTitle"].toString();
@@ -9905,7 +9905,7 @@ bool CCDMResultVarRecursive::OptReadFromJsonObject(const QJsonObject& jsonObject
 	}
 
 	if (jsonObject.contains("resultMetaData") && jsonObject["resultMetaData"].isObject()){
-		resultMetaData = CResultMetaData();
+		resultMetaData = V1_0::complextest::CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->OptReadFromJsonObject(jsonObject["resultMetaData"].toObject());
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -9917,13 +9917,13 @@ bool CCDMResultVarRecursive::OptReadFromJsonObject(const QJsonObject& jsonObject
 	if (jsonObject.contains("resultContent")){
 		const QJsonArray resultContentJsonArray = jsonObject["resultContent"].toArray();
 		const qsizetype resultContentArrayCount = resultContentJsonArray.size();
-		resultContent = imtsdl::TElementList<CDMResultUnionType>();
+		resultContent = imtsdl::TElementList<V1_0::complextest::CDMResultUnionType>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
 			const QVariant tempResultContent = resultContentJsonArray[resultContentIndex].toVariant();
 			QString resultContentDataValueTypename = resultContentJsonArray[resultContentIndex].toObject().value("__typename").toString();
-			CDMResultUnionType resultContentDataValue;
+			V1_0::complextest::CDMResultUnionType resultContentDataValue;
 			if (resultContentDataValueTypename == "CDMResultVarString") {
-				CCDMResultVarString resultContentDataValueConvert;
+				V1_0::complextest::CCDMResultVarString resultContentDataValueConvert;
 				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
 				if (!isresultContentDataValueRead){
 					return false;
@@ -9931,7 +9931,7 @@ bool CCDMResultVarRecursive::OptReadFromJsonObject(const QJsonObject& jsonObject
 				resultContentDataValue = CDMResultUnionType(resultContentDataValueConvert);
 			}
 			else if (resultContentDataValueTypename == "CDMResultVarRecursive") {
-				CCDMResultVarRecursive resultContentDataValueConvert;
+				V1_0::complextest::CCDMResultVarRecursive resultContentDataValueConvert;
 				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
 				if (!isresultContentDataValueRead){
 					return false;
@@ -9948,9 +9948,9 @@ bool CCDMResultVarRecursive::OptReadFromJsonObject(const QJsonObject& jsonObject
 	if (jsonObject.contains("overallResultValues") && jsonObject["overallResultValues"].isArray()){
 		const QJsonArray overallResultValuesJsonArray = jsonObject["overallResultValues"].toArray();
 		const qsizetype overallResultValuesArrayCount = overallResultValuesJsonArray.size();
-		overallResultValues = imtsdl::TElementList<COverallResultValues>();
+		overallResultValues = imtsdl::TElementList<V1_0::complextest::COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesArrayCount; ++overallResultValuesIndex){
-			COverallResultValues tempOverallResultValues;
+			V1_0::complextest::COverallResultValues tempOverallResultValues;
 			if (!tempOverallResultValues.OptReadFromJsonObject(overallResultValuesJsonArray[overallResultValuesIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -9964,7 +9964,7 @@ bool CCDMResultVarRecursive::OptReadFromJsonObject(const QJsonObject& jsonObject
 }
 
 
-// serialize methods
+
 
 QByteArray CCDMResultVarString::GetVersionId()
 {
@@ -9983,7 +9983,7 @@ bool CCDMResultVarString::operator==(const CCDMResultVarString& other) const
 }
 
 
-bool CCDMResultVarString::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::complextest::CCDMResultVarString::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "CDMResultVarString", modelIndex);
 
@@ -10038,7 +10038,7 @@ bool CCDMResultVarString::WriteToModel(::imtbase::CTreeItemModel& model, int mod
 }
 
 
-bool CCDMResultVarString::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CCDMResultVarString::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant dataModelTitleData = model.GetData("dataModelTitle", modelIndex);
 	if (dataModelTitleData.isNull()){
@@ -10058,7 +10058,7 @@ bool CCDMResultVarString::ReadFromModel(const ::imtbase::CTreeItemModel& model, 
 
 	::imtbase::CTreeItemModel* resultMetaDataDataModelPtr = model.GetTreeItemModel("resultMetaData", modelIndex);
 	if (resultMetaDataDataModelPtr != nullptr){
-		resultMetaData = CResultMetaData();
+		resultMetaData = V1_0::complextest::CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromModel(*resultMetaDataDataModelPtr, modelIndex);
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -10082,9 +10082,9 @@ bool CCDMResultVarString::ReadFromModel(const ::imtbase::CTreeItemModel& model, 
 	::imtbase::CTreeItemModel* overallResultValuesModel = model.GetTreeItemModel("overallResultValues", modelIndex);
 	if (overallResultValuesModel != nullptr){
 		int overallResultValuesCount = overallResultValuesModel->GetItemsCount();
-		imtsdl::TElementList<COverallResultValues> overallResultValuesList;
+		imtsdl::TElementList<V1_0::complextest::COverallResultValues> overallResultValuesList;
 		for (int overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesCount; ++overallResultValuesIndex){
-			COverallResultValues t_overallResultValues;
+			V1_0::complextest::COverallResultValues t_overallResultValues;
 			if (!t_overallResultValues.ReadFromModel(*overallResultValuesModel, overallResultValuesIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -10100,7 +10100,7 @@ bool CCDMResultVarString::ReadFromModel(const ::imtbase::CTreeItemModel& model, 
 }
 
 
-bool CCDMResultVarString::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CCDMResultVarString::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant dataModelTitleData = model.GetData("dataModelTitle", modelIndex);
 	if (!dataModelTitleData.isNull()){
@@ -10114,7 +10114,7 @@ bool CCDMResultVarString::OptReadFromModel(const ::imtbase::CTreeItemModel& mode
 
 	::imtbase::CTreeItemModel* resultMetaDataDataModelPtr = model.GetTreeItemModel("resultMetaData", modelIndex);
 	if (resultMetaDataDataModelPtr != nullptr){
-		resultMetaData = CResultMetaData();
+		resultMetaData = V1_0::complextest::CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromModel(*resultMetaDataDataModelPtr, modelIndex);
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -10138,9 +10138,9 @@ bool CCDMResultVarString::OptReadFromModel(const ::imtbase::CTreeItemModel& mode
 	::imtbase::CTreeItemModel* overallResultValuesModel = model.GetTreeItemModel("overallResultValues", modelIndex);
 	if (overallResultValuesModel != nullptr){
 		int overallResultValuesCount = overallResultValuesModel->GetItemsCount();
-		imtsdl::TElementList<COverallResultValues> overallResultValuesList;
+		imtsdl::TElementList<V1_0::complextest::COverallResultValues> overallResultValuesList;
 		for (int overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesCount; ++overallResultValuesIndex){
-			COverallResultValues t_overallResultValues;
+			V1_0::complextest::COverallResultValues t_overallResultValues;
 			if (!t_overallResultValues.OptReadFromModel(*overallResultValuesModel, overallResultValuesIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -10156,7 +10156,7 @@ bool CCDMResultVarString::OptReadFromModel(const ::imtbase::CTreeItemModel& mode
 }
 
 
-bool CCDMResultVarString::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::complextest::CCDMResultVarString::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!dataModelTitle){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
@@ -10211,7 +10211,7 @@ bool CCDMResultVarString::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObj
 }
 
 
-bool CCDMResultVarString::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CCDMResultVarString::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("dataModelTitle") || (gqlObject["dataModelTitle"].userType() != QMetaType::QString && gqlObject["dataModelTitle"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
@@ -10228,7 +10228,7 @@ bool CCDMResultVarString::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 	dataModelVersion = gqlObject["dataModelVersion"].toString();
 
 	if (gqlObject.ContainsParam("resultMetaData") && (gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr)){
-		resultMetaData = CResultMetaData();
+		resultMetaData = V1_0::complextest::CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -10256,14 +10256,14 @@ bool CCDMResultVarString::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 	}
 	if (gqlObject.ContainsParam("overallResultValues") && (gqlObject.GetObjectsCount("overallResultValues") > 0)){
 		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
-		overallResultValues = imtsdl::TElementList<COverallResultValues>();
+		overallResultValues = imtsdl::TElementList<V1_0::complextest::COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
 			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
 			if (overallResultValuesDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << overallResultValuesDataObjectPtr;
 				return false;
 			}
-			COverallResultValues tempOverallResultValues;
+			V1_0::complextest::COverallResultValues tempOverallResultValues;
 			if (!tempOverallResultValues.ReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -10277,7 +10277,7 @@ bool CCDMResultVarString::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 }
 
 
-bool CCDMResultVarString::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CCDMResultVarString::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("dataModelTitle") && (gqlObject["dataModelTitle"].userType() == QMetaType::QString || gqlObject["dataModelTitle"].userType() == QMetaType::QByteArray)){
 		dataModelTitle = gqlObject["dataModelTitle"].toString();
@@ -10288,7 +10288,7 @@ bool CCDMResultVarString::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 	}
 
 	if (gqlObject.ContainsParam("resultMetaData") && (gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr)){
-		resultMetaData = CResultMetaData();
+		resultMetaData = V1_0::complextest::CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -10316,14 +10316,14 @@ bool CCDMResultVarString::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 	}
 	if (gqlObject.ContainsParam("overallResultValues") && (gqlObject.GetObjectsCount("overallResultValues") > 0)){
 		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
-		overallResultValues = imtsdl::TElementList<COverallResultValues>();
+		overallResultValues = imtsdl::TElementList<V1_0::complextest::COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
 			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
 			if (overallResultValuesDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << overallResultValuesDataObjectPtr;
 				return false;
 			}
-			COverallResultValues tempOverallResultValues;
+			V1_0::complextest::COverallResultValues tempOverallResultValues;
 			if (!tempOverallResultValues.OptReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -10337,7 +10337,7 @@ bool CCDMResultVarString::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 }
 
 
-bool CCDMResultVarString::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::complextest::CCDMResultVarString::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!dataModelTitle){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
@@ -10392,7 +10392,7 @@ bool CCDMResultVarString::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CCDMResultVarString::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CCDMResultVarString::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("dataModelTitle") || ! jsonObject["dataModelTitle"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
@@ -10409,7 +10409,7 @@ bool CCDMResultVarString::ReadFromJsonObject(const QJsonObject& jsonObject)
 	dataModelVersion = jsonObject["dataModelVersion"].toString();
 
 	if (jsonObject.contains("resultMetaData") && jsonObject["resultMetaData"].isObject()){
-		resultMetaData = CResultMetaData();
+		resultMetaData = V1_0::complextest::CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromJsonObject(jsonObject["resultMetaData"].toObject());
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -10431,9 +10431,9 @@ bool CCDMResultVarString::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("overallResultValues") && jsonObject["overallResultValues"].isArray()){
 		const QJsonArray overallResultValuesJsonArray = jsonObject["overallResultValues"].toArray();
 		const qsizetype overallResultValuesArrayCount = overallResultValuesJsonArray.size();
-		overallResultValues = imtsdl::TElementList<COverallResultValues>();
+		overallResultValues = imtsdl::TElementList<V1_0::complextest::COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesArrayCount; ++overallResultValuesIndex){
-			COverallResultValues tempOverallResultValues;
+			V1_0::complextest::COverallResultValues tempOverallResultValues;
 			if (!tempOverallResultValues.ReadFromJsonObject(overallResultValuesJsonArray[overallResultValuesIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -10447,7 +10447,7 @@ bool CCDMResultVarString::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CCDMResultVarString::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CCDMResultVarString::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("dataModelTitle") && jsonObject["dataModelTitle"].isString()){
 		dataModelTitle = jsonObject["dataModelTitle"].toString();
@@ -10458,7 +10458,7 @@ bool CCDMResultVarString::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("resultMetaData") && jsonObject["resultMetaData"].isObject()){
-		resultMetaData = CResultMetaData();
+		resultMetaData = V1_0::complextest::CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->OptReadFromJsonObject(jsonObject["resultMetaData"].toObject());
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -10480,9 +10480,9 @@ bool CCDMResultVarString::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("overallResultValues") && jsonObject["overallResultValues"].isArray()){
 		const QJsonArray overallResultValuesJsonArray = jsonObject["overallResultValues"].toArray();
 		const qsizetype overallResultValuesArrayCount = overallResultValuesJsonArray.size();
-		overallResultValues = imtsdl::TElementList<COverallResultValues>();
+		overallResultValues = imtsdl::TElementList<V1_0::complextest::COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesArrayCount; ++overallResultValuesIndex){
-			COverallResultValues tempOverallResultValues;
+			V1_0::complextest::COverallResultValues tempOverallResultValues;
 			if (!tempOverallResultValues.OptReadFromJsonObject(overallResultValuesJsonArray[overallResultValuesIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -10496,7 +10496,7 @@ bool CCDMResultVarString::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CCDMResult::GetVersionId()
 {
@@ -10515,7 +10515,7 @@ bool CCDMResult::operator==(const CCDMResult& other) const
 }
 
 
-bool CCDMResult::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::complextest::CCDMResult::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "CDMResult", modelIndex);
 
@@ -10549,14 +10549,14 @@ bool CCDMResult::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) 
 		newResultContentModelPtr->setIsArray(true);
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContent->size(); ++resultContentIndex){
 			QVariant resultContentVariantValue;
-			if (const CCDMResultVarString* cDMResultVarStringVal = std::get_if<CCDMResultVarString>(resultContent->at(resultContentIndex).GetPtr())){
+			if (const V1_0::complextest::CCDMResultVarString* cDMResultVarStringVal = std::get_if<V1_0::complextest::CCDMResultVarString>(resultContent->at(resultContentIndex).GetPtr())){
 				newResultContentModelPtr->InsertNewItem();
 				if(!cDMResultVarStringVal->WriteToModel(*newResultContentModelPtr, resultContentIndex)){
 					return false;
 				}
 				newResultContentModelPtr->SetData("__typename", "CDMResultVarString", resultContentIndex);
 			}
-			else if (const CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
+			else if (const V1_0::complextest::CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<V1_0::complextest::CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
 				newResultContentModelPtr->InsertNewItem();
 				if(!cDMResultVarRecursiveVal->WriteToModel(*newResultContentModelPtr, resultContentIndex)){
 					return false;
@@ -10583,7 +10583,7 @@ bool CCDMResult::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) 
 }
 
 
-bool CCDMResult::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CCDMResult::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant dataModelTitleData = model.GetData("dataModelTitle", modelIndex);
 	if (dataModelTitleData.isNull()){
@@ -10603,7 +10603,7 @@ bool CCDMResult::ReadFromModel(const ::imtbase::CTreeItemModel& model, int model
 
 	::imtbase::CTreeItemModel* resultMetaDataDataModelPtr = model.GetTreeItemModel("resultMetaData", modelIndex);
 	if (resultMetaDataDataModelPtr != nullptr){
-		resultMetaData = CResultMetaData();
+		resultMetaData = V1_0::complextest::CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromModel(*resultMetaDataDataModelPtr, modelIndex);
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -10615,13 +10615,13 @@ bool CCDMResult::ReadFromModel(const ::imtbase::CTreeItemModel& model, int model
 	::imtbase::CTreeItemModel* resultContentModel = model.GetTreeItemModel("resultContent", modelIndex);
 	if (resultContentModel != nullptr){
 		int resultContentCount = resultContentModel->GetItemsCount();
-		imtsdl::TElementList<CDMResultUnionType> resultContentList;
+		imtsdl::TElementList<V1_0::complextest::CDMResultUnionType> resultContentList;
 		for (int resultContentIndex = 0; resultContentIndex < resultContentCount; ++resultContentIndex){
-			CDMResultUnionType resultContentData;
+			V1_0::complextest::CDMResultUnionType resultContentData;
 			QVariant resultContentVariantValue = resultContentModel->GetData(QByteArray(), resultContentIndex);
 			QString resultContentDataTypename = resultContentModel->GetData("__typename", resultContentIndex).toString();
 			if (resultContentDataTypename == "CDMResultVarString") {
-				CCDMResultVarString resultContentDataConvert;
+				V1_0::complextest::CCDMResultVarString resultContentDataConvert;
 				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
 				if (!isresultContentDataRead){
 					return false;
@@ -10629,7 +10629,7 @@ bool CCDMResult::ReadFromModel(const ::imtbase::CTreeItemModel& model, int model
 				resultContentData = CDMResultUnionType(resultContentDataConvert);
 			}
 			else if (resultContentDataTypename == "CDMResultVarRecursive") {
-				CCDMResultVarRecursive resultContentDataConvert;
+				V1_0::complextest::CCDMResultVarRecursive resultContentDataConvert;
 				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
 				if (!isresultContentDataRead){
 					return false;
@@ -10649,9 +10649,9 @@ bool CCDMResult::ReadFromModel(const ::imtbase::CTreeItemModel& model, int model
 	::imtbase::CTreeItemModel* overallResultValuesModel = model.GetTreeItemModel("overallResultValues", modelIndex);
 	if (overallResultValuesModel != nullptr){
 		int overallResultValuesCount = overallResultValuesModel->GetItemsCount();
-		imtsdl::TElementList<COverallResultValues> overallResultValuesList;
+		imtsdl::TElementList<V1_0::complextest::COverallResultValues> overallResultValuesList;
 		for (int overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesCount; ++overallResultValuesIndex){
-			COverallResultValues t_overallResultValues;
+			V1_0::complextest::COverallResultValues t_overallResultValues;
 			if (!t_overallResultValues.ReadFromModel(*overallResultValuesModel, overallResultValuesIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -10667,7 +10667,7 @@ bool CCDMResult::ReadFromModel(const ::imtbase::CTreeItemModel& model, int model
 }
 
 
-bool CCDMResult::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CCDMResult::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant dataModelTitleData = model.GetData("dataModelTitle", modelIndex);
 	if (!dataModelTitleData.isNull()){
@@ -10681,7 +10681,7 @@ bool CCDMResult::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int mo
 
 	::imtbase::CTreeItemModel* resultMetaDataDataModelPtr = model.GetTreeItemModel("resultMetaData", modelIndex);
 	if (resultMetaDataDataModelPtr != nullptr){
-		resultMetaData = CResultMetaData();
+		resultMetaData = V1_0::complextest::CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromModel(*resultMetaDataDataModelPtr, modelIndex);
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -10693,13 +10693,13 @@ bool CCDMResult::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int mo
 	::imtbase::CTreeItemModel* resultContentModel = model.GetTreeItemModel("resultContent", modelIndex);
 	if (resultContentModel != nullptr){
 		int resultContentCount = resultContentModel->GetItemsCount();
-		imtsdl::TElementList<CDMResultUnionType> resultContentList;
+		imtsdl::TElementList<V1_0::complextest::CDMResultUnionType> resultContentList;
 		for (int resultContentIndex = 0; resultContentIndex < resultContentCount; ++resultContentIndex){
-			CDMResultUnionType resultContentData;
+			V1_0::complextest::CDMResultUnionType resultContentData;
 			QVariant resultContentVariantValue = resultContentModel->GetData(QByteArray(), resultContentIndex);
 			QString resultContentDataTypename = resultContentModel->GetData("__typename", resultContentIndex).toString();
 			if (resultContentDataTypename == "CDMResultVarString") {
-				CCDMResultVarString resultContentDataConvert;
+				V1_0::complextest::CCDMResultVarString resultContentDataConvert;
 				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
 				if (!isresultContentDataRead){
 					return false;
@@ -10707,7 +10707,7 @@ bool CCDMResult::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int mo
 				resultContentData = CDMResultUnionType(resultContentDataConvert);
 			}
 			else if (resultContentDataTypename == "CDMResultVarRecursive") {
-				CCDMResultVarRecursive resultContentDataConvert;
+				V1_0::complextest::CCDMResultVarRecursive resultContentDataConvert;
 				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
 				if (!isresultContentDataRead){
 					return false;
@@ -10727,9 +10727,9 @@ bool CCDMResult::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int mo
 	::imtbase::CTreeItemModel* overallResultValuesModel = model.GetTreeItemModel("overallResultValues", modelIndex);
 	if (overallResultValuesModel != nullptr){
 		int overallResultValuesCount = overallResultValuesModel->GetItemsCount();
-		imtsdl::TElementList<COverallResultValues> overallResultValuesList;
+		imtsdl::TElementList<V1_0::complextest::COverallResultValues> overallResultValuesList;
 		for (int overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesCount; ++overallResultValuesIndex){
-			COverallResultValues t_overallResultValues;
+			V1_0::complextest::COverallResultValues t_overallResultValues;
 			if (!t_overallResultValues.OptReadFromModel(*overallResultValuesModel, overallResultValuesIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -10745,7 +10745,7 @@ bool CCDMResult::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int mo
 }
 
 
-bool CCDMResult::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::complextest::CCDMResult::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!dataModelTitle){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
@@ -10776,13 +10776,13 @@ bool CCDMResult::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) cons
 		QList<::imtgql::CGqlParamObject> resultContentDataObjectList;
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContent->size(); ++resultContentIndex){
 			::imtgql::CGqlParamObject resultContentDataObject;
-			if (const CCDMResultVarString* cDMResultVarStringVal = std::get_if<CCDMResultVarString>(resultContent->at(resultContentIndex).GetPtr())){
+			if (const V1_0::complextest::CCDMResultVarString* cDMResultVarStringVal = std::get_if<V1_0::complextest::CCDMResultVarString>(resultContent->at(resultContentIndex).GetPtr())){
 				if (!cDMResultVarStringVal->WriteToGraphQlObject(resultContentDataObject)){
 					return false;
 				}
 				resultContentDataObject.InsertParam("__typename", QVariant("CDMResultVarString"));
 			}
-			else if (const CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
+			else if (const V1_0::complextest::CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<V1_0::complextest::CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
 				if (!cDMResultVarRecursiveVal->WriteToGraphQlObject(resultContentDataObject)){
 					return false;
 				}
@@ -10813,7 +10813,7 @@ bool CCDMResult::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) cons
 }
 
 
-bool CCDMResult::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CCDMResult::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("dataModelTitle") || (gqlObject["dataModelTitle"].userType() != QMetaType::QString && gqlObject["dataModelTitle"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
@@ -10830,7 +10830,7 @@ bool CCDMResult::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObjec
 	dataModelVersion = gqlObject["dataModelVersion"].toString();
 
 	if (gqlObject.ContainsParam("resultMetaData") && (gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr)){
-		resultMetaData = CResultMetaData();
+		resultMetaData = V1_0::complextest::CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -10845,16 +10845,16 @@ bool CCDMResult::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObjec
 	if (gqlObject.ContainsParam("resultContent")){
 		const QList<const ::imtgql::CGqlParamObject*> resultContentDataList = gqlObject.GetParamArgumentObjectPtrList("resultContent");
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
-		resultContent = imtsdl::TElementList<CDMResultUnionType>();
+		resultContent = imtsdl::TElementList<V1_0::complextest::CDMResultUnionType>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
 			const ::imtgql::CGqlParamObject* tempResultContent = resultContentDataList[resultContentIndex];
 			if (tempResultContent == nullptr){
 				return false;
 			}
 			QString resultContentDataValueTypename = tempResultContent->GetParamArgumentValue("__typename").toString();
-			CDMResultUnionType resultContentDataValue;
+			V1_0::complextest::CDMResultUnionType resultContentDataValue;
 			if (resultContentDataValueTypename == "CDMResultVarString") {
-				CCDMResultVarString resultContentDataValueConvert;
+				V1_0::complextest::CCDMResultVarString resultContentDataValueConvert;
 				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*tempResultContent);
 				if (!isResultContentRead){
 					return false;
@@ -10862,7 +10862,7 @@ bool CCDMResult::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObjec
 				resultContentDataValue = CDMResultUnionType(resultContentDataValueConvert);
 			}
 			else if (resultContentDataValueTypename == "CDMResultVarRecursive") {
-				CCDMResultVarRecursive resultContentDataValueConvert;
+				V1_0::complextest::CCDMResultVarRecursive resultContentDataValueConvert;
 				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*tempResultContent);
 				if (!isResultContentRead){
 					return false;
@@ -10881,14 +10881,14 @@ bool CCDMResult::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObjec
 	}
 	if (gqlObject.ContainsParam("overallResultValues") && (gqlObject.GetObjectsCount("overallResultValues") > 0)){
 		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
-		overallResultValues = imtsdl::TElementList<COverallResultValues>();
+		overallResultValues = imtsdl::TElementList<V1_0::complextest::COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
 			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
 			if (overallResultValuesDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << overallResultValuesDataObjectPtr;
 				return false;
 			}
-			COverallResultValues tempOverallResultValues;
+			V1_0::complextest::COverallResultValues tempOverallResultValues;
 			if (!tempOverallResultValues.ReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -10902,7 +10902,7 @@ bool CCDMResult::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObjec
 }
 
 
-bool CCDMResult::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CCDMResult::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("dataModelTitle") && (gqlObject["dataModelTitle"].userType() == QMetaType::QString || gqlObject["dataModelTitle"].userType() == QMetaType::QByteArray)){
 		dataModelTitle = gqlObject["dataModelTitle"].toString();
@@ -10913,7 +10913,7 @@ bool CCDMResult::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 	}
 
 	if (gqlObject.ContainsParam("resultMetaData") && (gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr)){
-		resultMetaData = CResultMetaData();
+		resultMetaData = V1_0::complextest::CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -10928,16 +10928,16 @@ bool CCDMResult::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 	if (gqlObject.ContainsParam("resultContent")){
 		const QList<const ::imtgql::CGqlParamObject*> resultContentDataList = gqlObject.GetParamArgumentObjectPtrList("resultContent");
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
-		resultContent = imtsdl::TElementList<CDMResultUnionType>();
+		resultContent = imtsdl::TElementList<V1_0::complextest::CDMResultUnionType>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
 			const ::imtgql::CGqlParamObject* tempResultContent = resultContentDataList[resultContentIndex];
 			if (tempResultContent == nullptr){
 				return false;
 			}
 			QString resultContentDataValueTypename = tempResultContent->GetParamArgumentValue("__typename").toString();
-			CDMResultUnionType resultContentDataValue;
+			V1_0::complextest::CDMResultUnionType resultContentDataValue;
 			if (resultContentDataValueTypename == "CDMResultVarString") {
-				CCDMResultVarString resultContentDataValueConvert;
+				V1_0::complextest::CCDMResultVarString resultContentDataValueConvert;
 				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*tempResultContent);
 				if (!isResultContentRead){
 					return false;
@@ -10945,7 +10945,7 @@ bool CCDMResult::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 				resultContentDataValue = CDMResultUnionType(resultContentDataValueConvert);
 			}
 			else if (resultContentDataValueTypename == "CDMResultVarRecursive") {
-				CCDMResultVarRecursive resultContentDataValueConvert;
+				V1_0::complextest::CCDMResultVarRecursive resultContentDataValueConvert;
 				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*tempResultContent);
 				if (!isResultContentRead){
 					return false;
@@ -10964,14 +10964,14 @@ bool CCDMResult::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 	}
 	if (gqlObject.ContainsParam("overallResultValues") && (gqlObject.GetObjectsCount("overallResultValues") > 0)){
 		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
-		overallResultValues = imtsdl::TElementList<COverallResultValues>();
+		overallResultValues = imtsdl::TElementList<V1_0::complextest::COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
 			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
 			if (overallResultValuesDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << overallResultValuesDataObjectPtr;
 				return false;
 			}
-			COverallResultValues tempOverallResultValues;
+			V1_0::complextest::COverallResultValues tempOverallResultValues;
 			if (!tempOverallResultValues.OptReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -10985,7 +10985,7 @@ bool CCDMResult::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 }
 
 
-bool CCDMResult::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::complextest::CCDMResult::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!dataModelTitle){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
@@ -11015,7 +11015,7 @@ bool CCDMResult::WriteToJsonObject(QJsonObject& jsonObject) const
 	if (resultContent){
 		QJsonArray newResultContentArray;
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContent->size(); ++resultContentIndex){
-			if (const CCDMResultVarString* cDMResultVarStringVal = std::get_if<CCDMResultVarString>(resultContent->at(resultContentIndex).GetPtr())){
+			if (const V1_0::complextest::CCDMResultVarString* cDMResultVarStringVal = std::get_if<V1_0::complextest::CCDMResultVarString>(resultContent->at(resultContentIndex).GetPtr())){
 				QJsonObject resultContentJsonObject;
 				const bool isresultContentAdded = cDMResultVarStringVal->WriteToJsonObject(resultContentJsonObject);
 				if (!isresultContentAdded){
@@ -11024,7 +11024,7 @@ bool CCDMResult::WriteToJsonObject(QJsonObject& jsonObject) const
 				resultContentJsonObject["__typename"] = "CDMResultVarString";
 				newResultContentArray << resultContentJsonObject;
 			}
-			else if (const CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
+			else if (const V1_0::complextest::CCDMResultVarRecursive* cDMResultVarRecursiveVal = std::get_if<V1_0::complextest::CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
 				QJsonObject resultContentJsonObject;
 				const bool isresultContentAdded = cDMResultVarRecursiveVal->WriteToJsonObject(resultContentJsonObject);
 				if (!isresultContentAdded){
@@ -11057,7 +11057,7 @@ bool CCDMResult::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CCDMResult::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CCDMResult::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("dataModelTitle") || ! jsonObject["dataModelTitle"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "dataModelTitle").toLocal8Bit().constData();)
@@ -11074,7 +11074,7 @@ bool CCDMResult::ReadFromJsonObject(const QJsonObject& jsonObject)
 	dataModelVersion = jsonObject["dataModelVersion"].toString();
 
 	if (jsonObject.contains("resultMetaData") && jsonObject["resultMetaData"].isObject()){
-		resultMetaData = CResultMetaData();
+		resultMetaData = V1_0::complextest::CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromJsonObject(jsonObject["resultMetaData"].toObject());
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -11086,13 +11086,13 @@ bool CCDMResult::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("resultContent")){
 		const QJsonArray resultContentJsonArray = jsonObject["resultContent"].toArray();
 		const qsizetype resultContentArrayCount = resultContentJsonArray.size();
-		resultContent = imtsdl::TElementList<CDMResultUnionType>();
+		resultContent = imtsdl::TElementList<V1_0::complextest::CDMResultUnionType>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
 			const QVariant tempResultContent = resultContentJsonArray[resultContentIndex].toVariant();
 			QString resultContentDataValueTypename = resultContentJsonArray[resultContentIndex].toObject().value("__typename").toString();
-			CDMResultUnionType resultContentDataValue;
+			V1_0::complextest::CDMResultUnionType resultContentDataValue;
 			if (resultContentDataValueTypename == "CDMResultVarString") {
-				CCDMResultVarString resultContentDataValueConvert;
+				V1_0::complextest::CCDMResultVarString resultContentDataValueConvert;
 				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
 				if (!isresultContentDataValueRead){
 					return false;
@@ -11100,7 +11100,7 @@ bool CCDMResult::ReadFromJsonObject(const QJsonObject& jsonObject)
 				resultContentDataValue = CDMResultUnionType(resultContentDataValueConvert);
 			}
 			else if (resultContentDataValueTypename == "CDMResultVarRecursive") {
-				CCDMResultVarRecursive resultContentDataValueConvert;
+				V1_0::complextest::CCDMResultVarRecursive resultContentDataValueConvert;
 				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
 				if (!isresultContentDataValueRead){
 					return false;
@@ -11117,9 +11117,9 @@ bool CCDMResult::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("overallResultValues") && jsonObject["overallResultValues"].isArray()){
 		const QJsonArray overallResultValuesJsonArray = jsonObject["overallResultValues"].toArray();
 		const qsizetype overallResultValuesArrayCount = overallResultValuesJsonArray.size();
-		overallResultValues = imtsdl::TElementList<COverallResultValues>();
+		overallResultValues = imtsdl::TElementList<V1_0::complextest::COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesArrayCount; ++overallResultValuesIndex){
-			COverallResultValues tempOverallResultValues;
+			V1_0::complextest::COverallResultValues tempOverallResultValues;
 			if (!tempOverallResultValues.ReadFromJsonObject(overallResultValuesJsonArray[overallResultValuesIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -11133,7 +11133,7 @@ bool CCDMResult::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CCDMResult::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CCDMResult::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("dataModelTitle") && jsonObject["dataModelTitle"].isString()){
 		dataModelTitle = jsonObject["dataModelTitle"].toString();
@@ -11144,7 +11144,7 @@ bool CCDMResult::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("resultMetaData") && jsonObject["resultMetaData"].isObject()){
-		resultMetaData = CResultMetaData();
+		resultMetaData = V1_0::complextest::CResultMetaData();
 		const bool isResultMetaDataRead = resultMetaData->OptReadFromJsonObject(jsonObject["resultMetaData"].toObject());
 		if (!isResultMetaDataRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "resultMetaData").toLocal8Bit().constData();)
@@ -11156,13 +11156,13 @@ bool CCDMResult::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("resultContent")){
 		const QJsonArray resultContentJsonArray = jsonObject["resultContent"].toArray();
 		const qsizetype resultContentArrayCount = resultContentJsonArray.size();
-		resultContent = imtsdl::TElementList<CDMResultUnionType>();
+		resultContent = imtsdl::TElementList<V1_0::complextest::CDMResultUnionType>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
 			const QVariant tempResultContent = resultContentJsonArray[resultContentIndex].toVariant();
 			QString resultContentDataValueTypename = resultContentJsonArray[resultContentIndex].toObject().value("__typename").toString();
-			CDMResultUnionType resultContentDataValue;
+			V1_0::complextest::CDMResultUnionType resultContentDataValue;
 			if (resultContentDataValueTypename == "CDMResultVarString") {
-				CCDMResultVarString resultContentDataValueConvert;
+				V1_0::complextest::CCDMResultVarString resultContentDataValueConvert;
 				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
 				if (!isresultContentDataValueRead){
 					return false;
@@ -11170,7 +11170,7 @@ bool CCDMResult::OptReadFromJsonObject(const QJsonObject& jsonObject)
 				resultContentDataValue = CDMResultUnionType(resultContentDataValueConvert);
 			}
 			else if (resultContentDataValueTypename == "CDMResultVarRecursive") {
-				CCDMResultVarRecursive resultContentDataValueConvert;
+				V1_0::complextest::CCDMResultVarRecursive resultContentDataValueConvert;
 				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
 				if (!isresultContentDataValueRead){
 					return false;
@@ -11187,9 +11187,9 @@ bool CCDMResult::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("overallResultValues") && jsonObject["overallResultValues"].isArray()){
 		const QJsonArray overallResultValuesJsonArray = jsonObject["overallResultValues"].toArray();
 		const qsizetype overallResultValuesArrayCount = overallResultValuesJsonArray.size();
-		overallResultValues = imtsdl::TElementList<COverallResultValues>();
+		overallResultValues = imtsdl::TElementList<V1_0::complextest::COverallResultValues>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesArrayCount; ++overallResultValuesIndex){
-			COverallResultValues tempOverallResultValues;
+			V1_0::complextest::COverallResultValues tempOverallResultValues;
 			if (!tempOverallResultValues.OptReadFromJsonObject(overallResultValuesJsonArray[overallResultValuesIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "overallResultValues").toLocal8Bit().constData();)
 
@@ -11203,7 +11203,7 @@ bool CCDMResult::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CPointsInCoordinateFormat::GetVersionId()
 {
@@ -11218,7 +11218,7 @@ bool CPointsInCoordinateFormat::operator==(const CPointsInCoordinateFormat& othe
 }
 
 
-bool CPointsInCoordinateFormat::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::complextest::CPointsInCoordinateFormat::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "PointsInCoordinateFormat", modelIndex);
 
@@ -11231,7 +11231,7 @@ bool CPointsInCoordinateFormat::WriteToModel(::imtbase::CTreeItemModel& model, i
 }
 
 
-bool CPointsInCoordinateFormat::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CPointsInCoordinateFormat::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant pointAsCoordinatesData = model.GetData("pointAsCoordinates", modelIndex);
 	if (!pointAsCoordinatesData.isNull()){
@@ -11242,7 +11242,7 @@ bool CPointsInCoordinateFormat::ReadFromModel(const ::imtbase::CTreeItemModel& m
 }
 
 
-bool CPointsInCoordinateFormat::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CPointsInCoordinateFormat::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant pointAsCoordinatesData = model.GetData("pointAsCoordinates", modelIndex);
 	if (!pointAsCoordinatesData.isNull()){
@@ -11253,7 +11253,7 @@ bool CPointsInCoordinateFormat::OptReadFromModel(const ::imtbase::CTreeItemModel
 }
 
 
-bool CPointsInCoordinateFormat::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::complextest::CPointsInCoordinateFormat::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (pointAsCoordinates){
 		gqlObject.InsertParam("pointAsCoordinates", QVariant(*pointAsCoordinates));
@@ -11265,7 +11265,7 @@ bool CPointsInCoordinateFormat::WriteToGraphQlObject(::imtgql::CGqlParamObject& 
 }
 
 
-bool CPointsInCoordinateFormat::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CPointsInCoordinateFormat::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("pointAsCoordinates") && (gqlObject["pointAsCoordinates"].userType() == QMetaType::Bool)){
 		pointAsCoordinates = gqlObject["pointAsCoordinates"].toBool();
@@ -11275,7 +11275,7 @@ bool CPointsInCoordinateFormat::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 }
 
 
-bool CPointsInCoordinateFormat::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CPointsInCoordinateFormat::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("pointAsCoordinates") && (gqlObject["pointAsCoordinates"].userType() == QMetaType::Bool)){
 		pointAsCoordinates = gqlObject["pointAsCoordinates"].toBool();
@@ -11285,7 +11285,7 @@ bool CPointsInCoordinateFormat::OptReadFromGraphQlObject(const ::imtgql::CGqlPar
 }
 
 
-bool CPointsInCoordinateFormat::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::complextest::CPointsInCoordinateFormat::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (pointAsCoordinates){
 		jsonObject["pointAsCoordinates"] = QJsonValue::fromVariant(*pointAsCoordinates);
@@ -11297,7 +11297,7 @@ bool CPointsInCoordinateFormat::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CPointsInCoordinateFormat::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CPointsInCoordinateFormat::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("pointAsCoordinates") && jsonObject["pointAsCoordinates"].isBool()){
 		pointAsCoordinates = jsonObject["pointAsCoordinates"].toBool();
@@ -11307,7 +11307,7 @@ bool CPointsInCoordinateFormat::ReadFromJsonObject(const QJsonObject& jsonObject
 }
 
 
-bool CPointsInCoordinateFormat::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CPointsInCoordinateFormat::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("pointAsCoordinates") && jsonObject["pointAsCoordinates"].isBool()){
 		pointAsCoordinates = jsonObject["pointAsCoordinates"].toBool();
@@ -11317,7 +11317,7 @@ bool CPointsInCoordinateFormat::OptReadFromJsonObject(const QJsonObject& jsonObj
 }
 
 
-// serialize methods
+
 
 QByteArray CCollectionViewParamsTest::GetVersionId()
 {
@@ -11334,7 +11334,7 @@ bool CCollectionViewParamsTest::operator==(const CCollectionViewParamsTest& othe
 }
 
 
-bool CCollectionViewParamsTest::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::complextest::CCollectionViewParamsTest::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "CollectionViewParamsTest", modelIndex);
 
@@ -11362,7 +11362,7 @@ bool CCollectionViewParamsTest::WriteToModel(::imtbase::CTreeItemModel& model, i
 }
 
 
-bool CCollectionViewParamsTest::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CCollectionViewParamsTest::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant countData = model.GetData("count", modelIndex);
 	if (!countData.isNull()){
@@ -11376,7 +11376,7 @@ bool CCollectionViewParamsTest::ReadFromModel(const ::imtbase::CTreeItemModel& m
 
 	::imtbase::CTreeItemModel* filterModelDataModelPtr = model.GetTreeItemModel("filterModel", modelIndex);
 	if (filterModelDataModelPtr != nullptr){
-		filterModel = sdl::V1_0::imtbase::CComplexCollectionFilter();
+		filterModel = V1_0::imtbase::CComplexCollectionFilter();
 		const bool isFilterModelRead = filterModel->ReadFromModel(*filterModelDataModelPtr, modelIndex);
 		if (!isFilterModelRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "filterModel").toLocal8Bit().constData();)
@@ -11389,7 +11389,7 @@ bool CCollectionViewParamsTest::ReadFromModel(const ::imtbase::CTreeItemModel& m
 }
 
 
-bool CCollectionViewParamsTest::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::complextest::CCollectionViewParamsTest::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant countData = model.GetData("count", modelIndex);
 	if (!countData.isNull()){
@@ -11403,7 +11403,7 @@ bool CCollectionViewParamsTest::OptReadFromModel(const ::imtbase::CTreeItemModel
 
 	::imtbase::CTreeItemModel* filterModelDataModelPtr = model.GetTreeItemModel("filterModel", modelIndex);
 	if (filterModelDataModelPtr != nullptr){
-		filterModel = sdl::V1_0::imtbase::CComplexCollectionFilter();
+		filterModel = V1_0::imtbase::CComplexCollectionFilter();
 		const bool isFilterModelRead = filterModel->ReadFromModel(*filterModelDataModelPtr, modelIndex);
 		if (!isFilterModelRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "filterModel").toLocal8Bit().constData();)
@@ -11416,7 +11416,7 @@ bool CCollectionViewParamsTest::OptReadFromModel(const ::imtbase::CTreeItemModel
 }
 
 
-bool CCollectionViewParamsTest::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::complextest::CCollectionViewParamsTest::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (count){
 		gqlObject.InsertParam("count", QVariant(*count));
@@ -11443,7 +11443,7 @@ bool CCollectionViewParamsTest::WriteToGraphQlObject(::imtgql::CGqlParamObject& 
 }
 
 
-bool CCollectionViewParamsTest::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CCollectionViewParamsTest::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("count") && (gqlObject["count"].userType() == QMetaType::Int || gqlObject["count"].userType() == QMetaType::UInt || gqlObject["count"].userType() == QMetaType::LongLong || gqlObject["count"].userType() == QMetaType::ULongLong || gqlObject["count"].userType() == QMetaType::Long || gqlObject["count"].userType() == QMetaType::Short || gqlObject["count"].userType() == QMetaType::ULong || gqlObject["count"].userType() == QMetaType::UShort || gqlObject["count"].userType() == QMetaType::UChar)){
 		count = gqlObject["count"].toInt();
@@ -11454,7 +11454,7 @@ bool CCollectionViewParamsTest::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 	}
 
 	if (gqlObject.ContainsParam("filterModel") && (gqlObject.GetParamArgumentObjectPtr("filterModel") != nullptr)){
-		filterModel = sdl::V1_0::imtbase::CComplexCollectionFilter();
+		filterModel = V1_0::imtbase::CComplexCollectionFilter();
 		const bool isFilterModelRead = filterModel->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("filterModel"));
 		if (!isFilterModelRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "filterModel").toLocal8Bit().constData();)
@@ -11467,7 +11467,7 @@ bool CCollectionViewParamsTest::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 }
 
 
-bool CCollectionViewParamsTest::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::complextest::CCollectionViewParamsTest::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("count") && (gqlObject["count"].userType() == QMetaType::Int || gqlObject["count"].userType() == QMetaType::UInt || gqlObject["count"].userType() == QMetaType::LongLong || gqlObject["count"].userType() == QMetaType::ULongLong || gqlObject["count"].userType() == QMetaType::Long || gqlObject["count"].userType() == QMetaType::Short || gqlObject["count"].userType() == QMetaType::ULong || gqlObject["count"].userType() == QMetaType::UShort || gqlObject["count"].userType() == QMetaType::UChar)){
 		count = gqlObject["count"].toInt();
@@ -11478,7 +11478,7 @@ bool CCollectionViewParamsTest::OptReadFromGraphQlObject(const ::imtgql::CGqlPar
 	}
 
 	if (gqlObject.ContainsParam("filterModel") && (gqlObject.GetParamArgumentObjectPtr("filterModel") != nullptr)){
-		filterModel = sdl::V1_0::imtbase::CComplexCollectionFilter();
+		filterModel = V1_0::imtbase::CComplexCollectionFilter();
 		const bool isFilterModelRead = filterModel->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("filterModel"));
 		if (!isFilterModelRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "filterModel").toLocal8Bit().constData();)
@@ -11491,7 +11491,7 @@ bool CCollectionViewParamsTest::OptReadFromGraphQlObject(const ::imtgql::CGqlPar
 }
 
 
-bool CCollectionViewParamsTest::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::complextest::CCollectionViewParamsTest::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (count){
 		jsonObject["count"] = QJsonValue::fromVariant(*count);
@@ -11518,7 +11518,7 @@ bool CCollectionViewParamsTest::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CCollectionViewParamsTest::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CCollectionViewParamsTest::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("count") && jsonObject["count"].isDouble()){
 		count = jsonObject["count"].toInt();
@@ -11529,7 +11529,7 @@ bool CCollectionViewParamsTest::ReadFromJsonObject(const QJsonObject& jsonObject
 	}
 
 	if (jsonObject.contains("filterModel") && jsonObject["filterModel"].isObject()){
-		filterModel = sdl::V1_0::imtbase::CComplexCollectionFilter();
+		filterModel = V1_0::imtbase::CComplexCollectionFilter();
 		const bool isFilterModelRead = filterModel->ReadFromJsonObject(jsonObject["filterModel"].toObject());
 		if (!isFilterModelRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "filterModel").toLocal8Bit().constData();)
@@ -11542,7 +11542,7 @@ bool CCollectionViewParamsTest::ReadFromJsonObject(const QJsonObject& jsonObject
 }
 
 
-bool CCollectionViewParamsTest::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::complextest::CCollectionViewParamsTest::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("count") && jsonObject["count"].isDouble()){
 		count = jsonObject["count"].toInt();
@@ -11553,7 +11553,7 @@ bool CCollectionViewParamsTest::OptReadFromJsonObject(const QJsonObject& jsonObj
 	}
 
 	if (jsonObject.contains("filterModel") && jsonObject["filterModel"].isObject()){
-		filterModel = sdl::V1_0::imtbase::CComplexCollectionFilter();
+		filterModel = V1_0::imtbase::CComplexCollectionFilter();
 		const bool isFilterModelRead = filterModel->OptReadFromJsonObject(jsonObject["filterModel"].toObject());
 		if (!isFilterModelRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "filterModel").toLocal8Bit().constData();)
@@ -11566,7 +11566,7 @@ bool CCollectionViewParamsTest::OptReadFromJsonObject(const QJsonObject& jsonObj
 }
 
 
-// serialize methods
+
 
 CResultObject::CResultObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
@@ -11587,6 +11587,7 @@ CResultObject::CResultObject(QObject* parent): ::imtbase::CItemModelBase(parent)
 
 QVariant CResultObject::GetAreaResult()
 {
+	if (!AreaResult) {return {};}
 	sdl::V1_0::complextest::StatusCode valueType = CResult::AreaResult.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	QString retval = metaEnum.valueToKey((int)valueType);
@@ -11597,7 +11598,6 @@ QVariant CResultObject::GetAreaResult()
 
 void CResultObject::SetAreaResult(const QVariant& v)
 {
-
 	CResult::AreaResult.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
@@ -11616,13 +11616,12 @@ bool CResultObject::hasAreaResult()
 
 QVariant CResultObject::GetExpectedMinValue()
 {
-	return CResult::ExpectedMinValue.value();
+	return CResult::ExpectedMinValue ? CResult::ExpectedMinValue.value() : QVariant();
 }
 
 
 void CResultObject::SetExpectedMinValue(const QVariant& v)
 {
-
 	CResult::ExpectedMinValue = v.value<double>();
 	expectedMinValueChanged();
 }
@@ -11636,13 +11635,12 @@ bool CResultObject::hasExpectedMinValue()
 
 QVariant CResultObject::GetExpectedMaxValue()
 {
-	return CResult::ExpectedMaxValue.value();
+	return CResult::ExpectedMaxValue ? CResult::ExpectedMaxValue.value() : QVariant();
 }
 
 
 void CResultObject::SetExpectedMaxValue(const QVariant& v)
 {
-
 	CResult::ExpectedMaxValue = v.value<double>();
 	expectedMaxValueChanged();
 }
@@ -11656,13 +11654,12 @@ bool CResultObject::hasExpectedMaxValue()
 
 QVariant CResultObject::GetMeasuredValue()
 {
-	return CResult::MeasuredValue.value();
+	return CResult::MeasuredValue ? CResult::MeasuredValue.value() : QVariant();
 }
 
 
 void CResultObject::SetMeasuredValue(const QVariant& v)
 {
-
 	CResult::MeasuredValue = v.value<double>();
 	measuredValueChanged();
 }
@@ -11676,13 +11673,12 @@ bool CResultObject::hasMeasuredValue()
 
 QVariant CResultObject::GetMinMeasuredValue()
 {
-	return CResult::MinMeasuredValue.value();
+	return CResult::MinMeasuredValue ? CResult::MinMeasuredValue.value() : QVariant();
 }
 
 
 void CResultObject::SetMinMeasuredValue(const QVariant& v)
 {
-
 	CResult::MinMeasuredValue = v.value<double>();
 	minMeasuredValueChanged();
 }
@@ -11696,13 +11692,12 @@ bool CResultObject::hasMinMeasuredValue()
 
 QVariant CResultObject::GetMaxMeasuredValue()
 {
-	return CResult::MaxMeasuredValue.value();
+	return CResult::MaxMeasuredValue ? CResult::MaxMeasuredValue.value() : QVariant();
 }
 
 
 void CResultObject::SetMaxMeasuredValue(const QVariant& v)
 {
-
 	CResult::MaxMeasuredValue = v.value<double>();
 	maxMeasuredValueChanged();
 }
@@ -11716,13 +11711,12 @@ bool CResultObject::hasMaxMeasuredValue()
 
 QVariant CResultObject::GetMeanMeasuredValue()
 {
-	return CResult::MeanMeasuredValue.value();
+	return CResult::MeanMeasuredValue ? CResult::MeanMeasuredValue.value() : QVariant();
 }
 
 
 void CResultObject::SetMeanMeasuredValue(const QVariant& v)
 {
-
 	CResult::MeanMeasuredValue = v.value<double>();
 	meanMeasuredValueChanged();
 }
@@ -11736,6 +11730,7 @@ bool CResultObject::hasMeanMeasuredValue()
 
 QVariant CResultObject::GetMeasurementType()
 {
+	if (!MeasurementType) {return {};}
 	sdl::V1_0::complextest::MeasurementType valueType = CResult::MeasurementType.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::MeasurementType>();
 	QString retval = metaEnum.valueToKey((int)valueType);
@@ -11746,7 +11741,6 @@ QVariant CResultObject::GetMeasurementType()
 
 void CResultObject::SetMeasurementType(const QVariant& v)
 {
-
 	CResult::MeasurementType.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::MeasurementType>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
@@ -11765,6 +11759,7 @@ bool CResultObject::hasMeasurementType()
 
 QVariant CResultObject::GetMeasurementUnit()
 {
+	if (!MeasurementUnit) {return {};}
 	sdl::V1_0::complextest::MeasurementUnit valueType = CResult::MeasurementUnit.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::MeasurementUnit>();
 	QString retval = metaEnum.valueToKey((int)valueType);
@@ -11775,7 +11770,6 @@ QVariant CResultObject::GetMeasurementUnit()
 
 void CResultObject::SetMeasurementUnit(const QVariant& v)
 {
-
 	CResult::MeasurementUnit.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::MeasurementUnit>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
@@ -11794,13 +11788,12 @@ bool CResultObject::hasMeasurementUnit()
 
 QVariant CResultObject::GetLength()
 {
-	return CResult::Length.value();
+	return CResult::Length ? CResult::Length.value() : QVariant();
 }
 
 
 void CResultObject::SetLength(const QVariant& v)
 {
-
 	CResult::Length = v.value<double>();
 	lengthChanged();
 }
@@ -11814,6 +11807,7 @@ bool CResultObject::hasLength()
 
 QVariant CResultObject::GetErrorType()
 {
+	if (!ErrorType) {return {};}
 	sdl::V1_0::complextest::ErrorCode valueType = CResult::ErrorType.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::ErrorCode>();
 	QString retval = metaEnum.valueToKey((int)valueType);
@@ -11824,7 +11818,6 @@ QVariant CResultObject::GetErrorType()
 
 void CResultObject::SetErrorType(const QVariant& v)
 {
-
 	CResult::ErrorType.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::ErrorCode>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
@@ -11843,10 +11836,18 @@ bool CResultObject::hasErrorType()
 
 QVariant CResultObject::GetGeometry()
 {
+	if (!Geometry) {return {};}
+	
 	if (!m_geometryQObjectPtr.isValid()){
 		m_geometryQObjectPtr = CreateObject("Geometry");
 		auto itemPtr = m_geometryQObjectPtr.value<sdl::V1_0::complextest::CGeometryObject*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = CResult::Geometry;
+		if (itemPtr != nullptr) {
+			itemPtr->GeometryType = Geometry->GeometryType;
+			itemPtr->Radius = Geometry->Radius;
+			itemPtr->Points = Geometry->Points;
+			itemPtr->RequiredPoints = Geometry->RequiredPoints;
+			itemPtr->OptionalPoints = Geometry->OptionalPoints;
+		}
 	}
 	return m_geometryQObjectPtr;
 }
@@ -11854,10 +11855,9 @@ QVariant CResultObject::GetGeometry()
 
 void CResultObject::SetGeometry(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::complextest::CGeometryObject* itemPtr = v.value<sdl::V1_0::complextest::CGeometryObject*>();
-		if (itemPtr != nullptr)  Geometry = static_cast<const decltype(Geometry)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr) CResult::Geometry = (*itemPtr);
 	}
 	else {
 		CResult::Geometry = nullptr;
@@ -12078,41 +12078,41 @@ QVariant sdl::V1_0::complextest::CResultObjectList::getData(const QString& nameI
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_areaResult"){
-		return QVariant::fromValue(at(index)->AreaResult.value());
+		return Version_1_0->at(index)->AreaResult ? QVariant::fromValue(Version_1_0->at(index)->AreaResult.value()) : QVariant();
 	}
 	if (nameId == "m_expectedMinValue"){
-		return QVariant::fromValue(at(index)->ExpectedMinValue.value());
+		return Version_1_0->at(index)->ExpectedMinValue ? QVariant::fromValue(Version_1_0->at(index)->ExpectedMinValue.value()) : QVariant();
 	}
 	if (nameId == "m_expectedMaxValue"){
-		return QVariant::fromValue(at(index)->ExpectedMaxValue.value());
+		return Version_1_0->at(index)->ExpectedMaxValue ? QVariant::fromValue(Version_1_0->at(index)->ExpectedMaxValue.value()) : QVariant();
 	}
 	if (nameId == "m_measuredValue"){
-		return QVariant::fromValue(at(index)->MeasuredValue.value());
+		return Version_1_0->at(index)->MeasuredValue ? QVariant::fromValue(Version_1_0->at(index)->MeasuredValue.value()) : QVariant();
 	}
 	if (nameId == "m_minMeasuredValue"){
-		return QVariant::fromValue(at(index)->MinMeasuredValue.value());
+		return Version_1_0->at(index)->MinMeasuredValue ? QVariant::fromValue(Version_1_0->at(index)->MinMeasuredValue.value()) : QVariant();
 	}
 	if (nameId == "m_maxMeasuredValue"){
-		return QVariant::fromValue(at(index)->MaxMeasuredValue.value());
+		return Version_1_0->at(index)->MaxMeasuredValue ? QVariant::fromValue(Version_1_0->at(index)->MaxMeasuredValue.value()) : QVariant();
 	}
 	if (nameId == "m_meanMeasuredValue"){
-		return QVariant::fromValue(at(index)->MeanMeasuredValue.value());
+		return Version_1_0->at(index)->MeanMeasuredValue ? QVariant::fromValue(Version_1_0->at(index)->MeanMeasuredValue.value()) : QVariant();
 	}
 	if (nameId == "m_measurementType"){
-		return QVariant::fromValue(at(index)->MeasurementType.value());
+		return Version_1_0->at(index)->MeasurementType ? QVariant::fromValue(Version_1_0->at(index)->MeasurementType.value()) : QVariant();
 	}
 	if (nameId == "m_measurementUnit"){
-		return QVariant::fromValue(at(index)->MeasurementUnit.value());
+		return Version_1_0->at(index)->MeasurementUnit ? QVariant::fromValue(Version_1_0->at(index)->MeasurementUnit.value()) : QVariant();
 	}
 	if (nameId == "m_length"){
-		return QVariant::fromValue(at(index)->Length.value());
+		return Version_1_0->at(index)->Length ? QVariant::fromValue(Version_1_0->at(index)->Length.value()) : QVariant();
 	}
 	if (nameId == "m_errorType"){
-		return QVariant::fromValue(at(index)->ErrorType.value());
+		return Version_1_0->at(index)->ErrorType ? QVariant::fromValue(Version_1_0->at(index)->ErrorType.value()) : QVariant();
 	}
 	if (nameId == "m_geometry"){
 		return itemPtr->GetGeometry();
@@ -12132,13 +12132,12 @@ CAreaObject::CAreaObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
 QVariant CAreaObject::GetAreaName()
 {
-	return CArea::AreaName.value();
+	return CArea::AreaName ? CArea::AreaName.value() : QVariant();
 }
 
 
 void CAreaObject::SetAreaName(const QVariant& v)
 {
-
 	CArea::AreaName = v.value<QString>();
 	areaNameChanged();
 }
@@ -12152,6 +12151,7 @@ bool CAreaObject::hasAreaName()
 
 QVariant CAreaObject::GetStatus()
 {
+	if (!Status) {return {};}
 	sdl::V1_0::complextest::StatusCode valueType = CArea::Status.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	QString retval = metaEnum.valueToKey((int)valueType);
@@ -12162,7 +12162,6 @@ QVariant CAreaObject::GetStatus()
 
 void CAreaObject::SetStatus(const QVariant& v)
 {
-
 	CArea::Status.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
@@ -12181,10 +12180,15 @@ bool CAreaObject::hasStatus()
 
 QVariant CAreaObject::GetIconPosition()
 {
+	if (!IconPosition) {return {};}
+	
 	if (!m_iconPositionQObjectPtr.isValid()){
 		m_iconPositionQObjectPtr = CreateObject("IconPosition");
 		auto itemPtr = m_iconPositionQObjectPtr.value<sdl::V1_0::complextest::CPointObject*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = CArea::IconPosition;
+		if (itemPtr != nullptr) {
+			itemPtr->X = IconPosition->X;
+			itemPtr->Y = IconPosition->Y;
+		}
 	}
 	return m_iconPositionQObjectPtr;
 }
@@ -12192,10 +12196,9 @@ QVariant CAreaObject::GetIconPosition()
 
 void CAreaObject::SetIconPosition(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::complextest::CPointObject* itemPtr = v.value<sdl::V1_0::complextest::CPointObject*>();
-		if (itemPtr != nullptr)  IconPosition = static_cast<const decltype(IconPosition)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr) CArea::IconPosition = (*itemPtr);
 	}
 	else {
 		CArea::IconPosition = nullptr;
@@ -12231,6 +12234,7 @@ void CAreaObject::ResetIconPosition()
 
 QVariant CAreaObject::GetErrorType()
 {
+	if (!ErrorType) {return {};}
 	sdl::V1_0::complextest::ErrorCode valueType = CArea::ErrorType.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::ErrorCode>();
 	QString retval = metaEnum.valueToKey((int)valueType);
@@ -12241,7 +12245,6 @@ QVariant CAreaObject::GetErrorType()
 
 void CAreaObject::SetErrorType(const QVariant& v)
 {
-
 	CArea::ErrorType.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::ErrorCode>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
@@ -12271,10 +12274,9 @@ QVariant CAreaObject::GetResults()
 
 void CAreaObject::SetResults(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::complextest::CResultObjectList* itemPtr = v.value<sdl::V1_0::complextest::CResultObjectList*>();
-		if (itemPtr != nullptr)  Results = static_cast<const decltype(Results)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr) CArea::Results = itemPtr->Version_1_0;
 	}
 	else {
 		CArea::Results = nullptr;
@@ -12484,20 +12486,20 @@ QVariant sdl::V1_0::complextest::CAreaObjectList::getData(const QString& nameId,
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_areaName"){
-		return QVariant::fromValue(at(index)->AreaName.value());
+		return Version_1_0->at(index)->AreaName ? QVariant::fromValue(Version_1_0->at(index)->AreaName.value()) : QVariant();
 	}
 	if (nameId == "m_status"){
-		return QVariant::fromValue(at(index)->Status.value());
+		return Version_1_0->at(index)->Status ? QVariant::fromValue(Version_1_0->at(index)->Status.value()) : QVariant();
 	}
 	if (nameId == "m_iconPosition"){
 		return itemPtr->GetIconPosition();
 	}
 	if (nameId == "m_errorType"){
-		return QVariant::fromValue(at(index)->ErrorType.value());
+		return Version_1_0->at(index)->ErrorType ? QVariant::fromValue(Version_1_0->at(index)->ErrorType.value()) : QVariant();
 	}
 	if (nameId == "m_results"){
 		return itemPtr->GetResults();
@@ -12515,13 +12517,12 @@ CAnalyzerObject::CAnalyzerObject(QObject* parent): ::imtbase::CItemModelBase(par
 
 QVariant CAnalyzerObject::GetAnalyzerName()
 {
-	return CAnalyzer::AnalyzerName.value();
+	return CAnalyzer::AnalyzerName ? CAnalyzer::AnalyzerName.value() : QVariant();
 }
 
 
 void CAnalyzerObject::SetAnalyzerName(const QVariant& v)
 {
-
 	CAnalyzer::AnalyzerName = v.value<QString>();
 	analyzerNameChanged();
 }
@@ -12535,6 +12536,7 @@ bool CAnalyzerObject::hasAnalyzerName()
 
 QVariant CAnalyzerObject::GetAnalyzerResult()
 {
+	if (!AnalyzerResult) {return {};}
 	sdl::V1_0::complextest::StatusCode valueType = CAnalyzer::AnalyzerResult.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	QString retval = metaEnum.valueToKey((int)valueType);
@@ -12545,7 +12547,6 @@ QVariant CAnalyzerObject::GetAnalyzerResult()
 
 void CAnalyzerObject::SetAnalyzerResult(const QVariant& v)
 {
-
 	CAnalyzer::AnalyzerResult.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
@@ -12575,10 +12576,9 @@ QVariant CAnalyzerObject::GetAreas()
 
 void CAnalyzerObject::SetAreas(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::complextest::CAreaObjectList* itemPtr = v.value<sdl::V1_0::complextest::CAreaObjectList*>();
-		if (itemPtr != nullptr)  Areas = static_cast<const decltype(Areas)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr) CAnalyzer::Areas = itemPtr->Version_1_0;
 	}
 	else {
 		CAnalyzer::Areas = nullptr;
@@ -12779,14 +12779,14 @@ QVariant sdl::V1_0::complextest::CAnalyzerObjectList::getData(const QString& nam
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_analyzerName"){
-		return QVariant::fromValue(at(index)->AnalyzerName.value());
+		return Version_1_0->at(index)->AnalyzerName ? QVariant::fromValue(Version_1_0->at(index)->AnalyzerName.value()) : QVariant();
 	}
 	if (nameId == "m_analyzerResult"){
-		return QVariant::fromValue(at(index)->AnalyzerResult.value());
+		return Version_1_0->at(index)->AnalyzerResult ? QVariant::fromValue(Version_1_0->at(index)->AnalyzerResult.value()) : QVariant();
 	}
 	if (nameId == "m_areas"){
 		return itemPtr->GetAreas();
@@ -12806,13 +12806,12 @@ CInspectionObject::CInspectionObject(QObject* parent): ::imtbase::CItemModelBase
 
 QVariant CInspectionObject::GetID()
 {
-	return CInspection::ID.value();
+	return CInspection::ID ? CInspection::ID.value() : QVariant();
 }
 
 
 void CInspectionObject::SetID(const QVariant& v)
 {
-
 	CInspection::ID = v.value<QString>();
 	iDChanged();
 }
@@ -12826,13 +12825,12 @@ bool CInspectionObject::hasID()
 
 QVariant CInspectionObject::GetTypeID()
 {
-	return CInspection::TypeID.value();
+	return CInspection::TypeID ? CInspection::TypeID.value() : QVariant();
 }
 
 
 void CInspectionObject::SetTypeID(const QVariant& v)
 {
-
 	CInspection::TypeID = v.value<QString>();
 	typeIDChanged();
 }
@@ -12846,13 +12844,12 @@ bool CInspectionObject::hasTypeID()
 
 QVariant CInspectionObject::GetName()
 {
-	return CInspection::Name.value();
+	return CInspection::Name ? CInspection::Name.value() : QVariant();
 }
 
 
 void CInspectionObject::SetName(const QVariant& v)
 {
-
 	CInspection::Name = v.value<QString>();
 	nameChanged();
 }
@@ -12866,6 +12863,7 @@ bool CInspectionObject::hasName()
 
 QVariant CInspectionObject::GetStatus()
 {
+	if (!Status) {return {};}
 	sdl::V1_0::complextest::StatusCode valueType = CInspection::Status.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	QString retval = metaEnum.valueToKey((int)valueType);
@@ -12876,7 +12874,6 @@ QVariant CInspectionObject::GetStatus()
 
 void CInspectionObject::SetStatus(const QVariant& v)
 {
-
 	CInspection::Status.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
@@ -12906,10 +12903,9 @@ QVariant CInspectionObject::GetAnalyzers()
 
 void CInspectionObject::SetAnalyzers(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::complextest::CAnalyzerObjectList* itemPtr = v.value<sdl::V1_0::complextest::CAnalyzerObjectList*>();
-		if (itemPtr != nullptr)  Analyzers = static_cast<const decltype(Analyzers)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr) CInspection::Analyzers = itemPtr->Version_1_0;
 	}
 	else {
 		CInspection::Analyzers = nullptr;
@@ -13116,20 +13112,20 @@ QVariant sdl::V1_0::complextest::CInspectionObjectList::getData(const QString& n
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_iD"){
-		return QVariant::fromValue(at(index)->ID.value());
+		return Version_1_0->at(index)->ID ? QVariant::fromValue(Version_1_0->at(index)->ID.value()) : QVariant();
 	}
 	if (nameId == "m_typeID"){
-		return QVariant::fromValue(at(index)->TypeID.value());
+		return Version_1_0->at(index)->TypeID ? QVariant::fromValue(Version_1_0->at(index)->TypeID.value()) : QVariant();
 	}
 	if (nameId == "m_name"){
-		return QVariant::fromValue(at(index)->Name.value());
+		return Version_1_0->at(index)->Name ? QVariant::fromValue(Version_1_0->at(index)->Name.value()) : QVariant();
 	}
 	if (nameId == "m_status"){
-		return QVariant::fromValue(at(index)->Status.value());
+		return Version_1_0->at(index)->Status ? QVariant::fromValue(Version_1_0->at(index)->Status.value()) : QVariant();
 	}
 	if (nameId == "m_analyzers"){
 		return itemPtr->GetAnalyzers();
@@ -13151,13 +13147,12 @@ CProductOverviewObject::CProductOverviewObject(QObject* parent): ::imtbase::CIte
 
 QVariant CProductOverviewObject::GetProductID()
 {
-	return CProductOverview::ProductID.value();
+	return CProductOverview::ProductID ? CProductOverview::ProductID.value() : QVariant();
 }
 
 
 void CProductOverviewObject::SetProductID(const QVariant& v)
 {
-
 	CProductOverview::ProductID = v.value<int>();
 	productIDChanged();
 }
@@ -13171,13 +13166,12 @@ bool CProductOverviewObject::hasProductID()
 
 QVariant CProductOverviewObject::GetName()
 {
-	return CProductOverview::Name.value();
+	return CProductOverview::Name ? CProductOverview::Name.value() : QVariant();
 }
 
 
 void CProductOverviewObject::SetName(const QVariant& v)
 {
-
 	CProductOverview::Name = v.value<QString>();
 	nameChanged();
 }
@@ -13191,6 +13185,7 @@ bool CProductOverviewObject::hasName()
 
 QVariant CProductOverviewObject::GetStatus()
 {
+	if (!Status) {return {};}
 	sdl::V1_0::complextest::StatusCode valueType = CProductOverview::Status.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	QString retval = metaEnum.valueToKey((int)valueType);
@@ -13201,7 +13196,6 @@ QVariant CProductOverviewObject::GetStatus()
 
 void CProductOverviewObject::SetStatus(const QVariant& v)
 {
-
 	CProductOverview::Status.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::complextest::StatusCode>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
@@ -13220,13 +13214,12 @@ bool CProductOverviewObject::hasStatus()
 
 QVariant CProductOverviewObject::GetPartSerialNumber()
 {
-	return CProductOverview::PartSerialNumber.value();
+	return CProductOverview::PartSerialNumber ? CProductOverview::PartSerialNumber.value() : QVariant();
 }
 
 
 void CProductOverviewObject::SetPartSerialNumber(const QVariant& v)
 {
-
 	CProductOverview::PartSerialNumber = v.value<QString>();
 	partSerialNumberChanged();
 }
@@ -13240,13 +13233,12 @@ bool CProductOverviewObject::hasPartSerialNumber()
 
 QVariant CProductOverviewObject::GetTimestamp()
 {
-	return CProductOverview::Timestamp.value();
+	return CProductOverview::Timestamp ? CProductOverview::Timestamp.value() : QVariant();
 }
 
 
 void CProductOverviewObject::SetTimestamp(const QVariant& v)
 {
-
 	CProductOverview::Timestamp = v.value<QString>();
 	timestampChanged();
 }
@@ -13260,13 +13252,12 @@ bool CProductOverviewObject::hasTimestamp()
 
 QVariant CProductOverviewObject::GetProductImage()
 {
-	return CProductOverview::ProductImage.value();
+	return CProductOverview::ProductImage ? CProductOverview::ProductImage.value() : QVariant();
 }
 
 
 void CProductOverviewObject::SetProductImage(const QVariant& v)
 {
-
 	CProductOverview::ProductImage = v.value<QString>();
 	productImageChanged();
 }
@@ -13291,10 +13282,9 @@ QVariant CProductOverviewObject::GetInspections()
 
 void CProductOverviewObject::SetInspections(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::complextest::CInspectionObjectList* itemPtr = v.value<sdl::V1_0::complextest::CInspectionObjectList*>();
-		if (itemPtr != nullptr)  Inspections = static_cast<const decltype(Inspections)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr) CProductOverview::Inspections = itemPtr->Version_1_0;
 	}
 	else {
 		CProductOverview::Inspections = nullptr;
@@ -13507,26 +13497,26 @@ QVariant sdl::V1_0::complextest::CProductOverviewObjectList::getData(const QStri
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_productID"){
-		return QVariant::fromValue(at(index)->ProductID.value());
+		return Version_1_0->at(index)->ProductID ? QVariant::fromValue(Version_1_0->at(index)->ProductID.value()) : QVariant();
 	}
 	if (nameId == "m_name"){
-		return QVariant::fromValue(at(index)->Name.value());
+		return Version_1_0->at(index)->Name ? QVariant::fromValue(Version_1_0->at(index)->Name.value()) : QVariant();
 	}
 	if (nameId == "m_status"){
-		return QVariant::fromValue(at(index)->Status.value());
+		return Version_1_0->at(index)->Status ? QVariant::fromValue(Version_1_0->at(index)->Status.value()) : QVariant();
 	}
 	if (nameId == "m_partSerialNumber"){
-		return QVariant::fromValue(at(index)->PartSerialNumber.value());
+		return Version_1_0->at(index)->PartSerialNumber ? QVariant::fromValue(Version_1_0->at(index)->PartSerialNumber.value()) : QVariant();
 	}
 	if (nameId == "m_timestamp"){
-		return QVariant::fromValue(at(index)->Timestamp.value());
+		return Version_1_0->at(index)->Timestamp ? QVariant::fromValue(Version_1_0->at(index)->Timestamp.value()) : QVariant();
 	}
 	if (nameId == "m_productImage"){
-		return QVariant::fromValue(at(index)->ProductImage.value());
+		return Version_1_0->at(index)->ProductImage ? QVariant::fromValue(Version_1_0->at(index)->ProductImage.value()) : QVariant();
 	}
 	if (nameId == "m_inspections"){
 		return itemPtr->GetInspections();
@@ -13543,13 +13533,12 @@ CLocalizedTextObject::CLocalizedTextObject(QObject* parent): ::imtbase::CItemMod
 
 QVariant CLocalizedTextObject::GetText()
 {
-	return CLocalizedText::text.value();
+	return CLocalizedText::text ? CLocalizedText::text.value() : QVariant();
 }
 
 
 void CLocalizedTextObject::SetText(const QVariant& v)
 {
-
 	CLocalizedText::text = v.value<QString>();
 	textChanged();
 }
@@ -13563,13 +13552,12 @@ bool CLocalizedTextObject::hasText()
 
 QVariant CLocalizedTextObject::GetLocale()
 {
-	return CLocalizedText::locale.value();
+	return CLocalizedText::locale ? CLocalizedText::locale.value() : QVariant();
 }
 
 
 void CLocalizedTextObject::SetLocale(const QVariant& v)
 {
-
 	CLocalizedText::locale = v.value<QString>();
 	localeChanged();
 }
@@ -13735,14 +13723,14 @@ QVariant sdl::V1_0::complextest::CLocalizedTextObjectList::getData(const QString
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_text"){
-		return QVariant::fromValue(at(index)->text.value());
+		return Version_1_0->at(index)->text ? QVariant::fromValue(Version_1_0->at(index)->text.value()) : QVariant();
 	}
 	if (nameId == "m_locale"){
-		return QVariant::fromValue(at(index)->locale.value());
+		return Version_1_0->at(index)->locale ? QVariant::fromValue(Version_1_0->at(index)->locale.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -13757,13 +13745,12 @@ CCoordinatesObject::CCoordinatesObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CCoordinatesObject::GetX()
 {
-	return CCoordinates::x.value();
+	return CCoordinates::x ? CCoordinates::x.value() : QVariant();
 }
 
 
 void CCoordinatesObject::SetX(const QVariant& v)
 {
-
 	CCoordinates::x = v.value<double>();
 	xChanged();
 }
@@ -13777,13 +13764,12 @@ bool CCoordinatesObject::hasX()
 
 QVariant CCoordinatesObject::GetY()
 {
-	return CCoordinates::y.value();
+	return CCoordinates::y ? CCoordinates::y.value() : QVariant();
 }
 
 
 void CCoordinatesObject::SetY(const QVariant& v)
 {
-
 	CCoordinates::y = v.value<double>();
 	yChanged();
 }
@@ -13797,13 +13783,12 @@ bool CCoordinatesObject::hasY()
 
 QVariant CCoordinatesObject::GetZ()
 {
-	return CCoordinates::z.value();
+	return CCoordinates::z ? CCoordinates::z.value() : QVariant();
 }
 
 
 void CCoordinatesObject::SetZ(const QVariant& v)
 {
-
 	CCoordinates::z = v.value<double>();
 	zChanged();
 }
@@ -13972,17 +13957,17 @@ QVariant sdl::V1_0::complextest::CCoordinatesObjectList::getData(const QString& 
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_x"){
-		return QVariant::fromValue(at(index)->x.value());
+		return Version_1_0->at(index)->x ? QVariant::fromValue(Version_1_0->at(index)->x.value()) : QVariant();
 	}
 	if (nameId == "m_y"){
-		return QVariant::fromValue(at(index)->y.value());
+		return Version_1_0->at(index)->y ? QVariant::fromValue(Version_1_0->at(index)->y.value()) : QVariant();
 	}
 	if (nameId == "m_z"){
-		return QVariant::fromValue(at(index)->z.value());
+		return Version_1_0->at(index)->z ? QVariant::fromValue(Version_1_0->at(index)->z.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -13996,13 +13981,12 @@ CExtendedMetaDataObject::CExtendedMetaDataObject(QObject* parent): ::imtbase::CI
 
 QVariant CExtendedMetaDataObject::GetKey()
 {
-	return CExtendedMetaData::key.value();
+	return CExtendedMetaData::key ? CExtendedMetaData::key.value() : QVariant();
 }
 
 
 void CExtendedMetaDataObject::SetKey(const QVariant& v)
 {
-
 	CExtendedMetaData::key = v.value<QString>();
 	keyChanged();
 }
@@ -14019,7 +14003,10 @@ QVariant CExtendedMetaDataObject::GetValue()
 	if (m_valueQObjectPtr.isValid()){
 		if (const CCoordinates* val = std::get_if<CCoordinates>((CExtendedMetaData::value).GetPtr())){
 			CCoordinatesObject *newObjectPtr = new CCoordinatesObject(this);
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+						newObjectPtr->CCoordinates::x = val->CCoordinates::x;
+			newObjectPtr->CCoordinates::y = val->CCoordinates::y;
+			newObjectPtr->CCoordinates::z = val->CCoordinates::z;
+
 			m_valueQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
 		if (const double* val = std::get_if<double>((CExtendedMetaData::value).GetPtr())){
@@ -14038,19 +14025,18 @@ QVariant CExtendedMetaDataObject::GetValue()
 
 void CExtendedMetaDataObject::SetValue(const QVariant& v)
 {
-
 	if (v.isValid()){
 		if (const CCoordinatesObject* val = v.value<const CCoordinatesObject*>()){
-			*value = *val;
+			CExtendedMetaData::value = *val;
 		}
 		if (const double* val = v.value<const double*>()){
-			*value = *val;
+			CExtendedMetaData::value = *val;
 		}
 		if (const bool* val = v.value<const bool*>()){
-			*value = *val;
+			CExtendedMetaData::value = *val;
 		}
 		if (const QString* val = v.value<const QString*>()){
-			*value = *val;
+			CExtendedMetaData::value = *val;
 		}
 	}
 	else {
@@ -14239,11 +14225,11 @@ QVariant sdl::V1_0::complextest::CExtendedMetaDataObjectList::getData(const QStr
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_key"){
-		return QVariant::fromValue(at(index)->key.value());
+		return Version_1_0->at(index)->key ? QVariant::fromValue(Version_1_0->at(index)->key.value()) : QVariant();
 	}
 	if (nameId == "m_value"){
 		return itemPtr->GetValue();
@@ -14266,13 +14252,12 @@ CResultMetaDataObject::CResultMetaDataObject(QObject* parent): ::imtbase::CItemM
 
 QVariant CResultMetaDataObject::GetResultId()
 {
-	return CResultMetaData::resultId.value();
+	return CResultMetaData::resultId ? CResultMetaData::resultId.value() : QVariant();
 }
 
 
 void CResultMetaDataObject::SetResultId(const QVariant& v)
 {
-
 	CResultMetaData::resultId = v.value<QString>().toUtf8();
 	resultIdChanged();
 }
@@ -14286,13 +14271,12 @@ bool CResultMetaDataObject::hasResultId()
 
 QVariant CResultMetaDataObject::GetCreationTime()
 {
-	return CResultMetaData::creationTime.value();
+	return CResultMetaData::creationTime ? CResultMetaData::creationTime.value() : QVariant();
 }
 
 
 void CResultMetaDataObject::SetCreationTime(const QVariant& v)
 {
-
 	CResultMetaData::creationTime = v.value<QString>();
 	creationTimeChanged();
 }
@@ -14306,13 +14290,12 @@ bool CResultMetaDataObject::hasCreationTime()
 
 QVariant CResultMetaDataObject::GetPartId()
 {
-	return CResultMetaData::partId.value();
+	return CResultMetaData::partId ? CResultMetaData::partId.value() : QVariant();
 }
 
 
 void CResultMetaDataObject::SetPartId(const QVariant& v)
 {
-
 	CResultMetaData::partId = v.value<QString>();
 	partIdChanged();
 }
@@ -14326,13 +14309,12 @@ bool CResultMetaDataObject::hasPartId()
 
 QVariant CResultMetaDataObject::GetProductId()
 {
-	return CResultMetaData::productId.value();
+	return CResultMetaData::productId ? CResultMetaData::productId.value() : QVariant();
 }
 
 
 void CResultMetaDataObject::SetProductId(const QVariant& v)
 {
-
 	CResultMetaData::productId = v.value<QString>();
 	productIdChanged();
 }
@@ -14346,13 +14328,12 @@ bool CResultMetaDataObject::hasProductId()
 
 QVariant CResultMetaDataObject::GetName()
 {
-	return CResultMetaData::name.value();
+	return CResultMetaData::name ? CResultMetaData::name.value() : QVariant();
 }
 
 
 void CResultMetaDataObject::SetName(const QVariant& v)
 {
-
 	CResultMetaData::name = v.value<QString>();
 	nameChanged();
 }
@@ -14366,13 +14347,12 @@ bool CResultMetaDataObject::hasName()
 
 QVariant CResultMetaDataObject::GetClassification()
 {
-	return CResultMetaData::classification.value();
+	return CResultMetaData::classification ? CResultMetaData::classification.value() : QVariant();
 }
 
 
 void CResultMetaDataObject::SetClassification(const QVariant& v)
 {
-
 	CResultMetaData::classification = v.value<int>();
 	classificationChanged();
 }
@@ -14386,10 +14366,15 @@ bool CResultMetaDataObject::hasClassification()
 
 QVariant CResultMetaDataObject::GetDescription()
 {
+	if (!description) {return {};}
+	
 	if (!m_descriptionQObjectPtr.isValid()){
 		m_descriptionQObjectPtr = CreateObject("description");
 		auto itemPtr = m_descriptionQObjectPtr.value<sdl::V1_0::complextest::CLocalizedTextObject*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = CResultMetaData::description;
+		if (itemPtr != nullptr) {
+			itemPtr->text = description->text;
+			itemPtr->locale = description->locale;
+		}
 	}
 	return m_descriptionQObjectPtr;
 }
@@ -14397,10 +14382,9 @@ QVariant CResultMetaDataObject::GetDescription()
 
 void CResultMetaDataObject::SetDescription(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::complextest::CLocalizedTextObject* itemPtr = v.value<sdl::V1_0::complextest::CLocalizedTextObject*>();
-		if (itemPtr != nullptr)  description = static_cast<const decltype(description)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr) CResultMetaData::description = (*itemPtr);
 	}
 	else {
 		CResultMetaData::description = nullptr;
@@ -14447,10 +14431,9 @@ QVariant CResultMetaDataObject::GetExtendedMetaData()
 
 void CResultMetaDataObject::SetExtendedMetaData(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::complextest::CExtendedMetaDataObjectList* itemPtr = v.value<sdl::V1_0::complextest::CExtendedMetaDataObjectList*>();
-		if (itemPtr != nullptr)  extendedMetaData = static_cast<const decltype(extendedMetaData)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr) CResultMetaData::extendedMetaData = itemPtr->Version_1_0;
 	}
 	else {
 		CResultMetaData::extendedMetaData = nullptr;
@@ -14669,26 +14652,26 @@ QVariant sdl::V1_0::complextest::CResultMetaDataObjectList::getData(const QStrin
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_resultId"){
-		return QVariant::fromValue(at(index)->resultId.value());
+		return Version_1_0->at(index)->resultId ? QVariant::fromValue(Version_1_0->at(index)->resultId.value()) : QVariant();
 	}
 	if (nameId == "m_creationTime"){
-		return QVariant::fromValue(at(index)->creationTime.value());
+		return Version_1_0->at(index)->creationTime ? QVariant::fromValue(Version_1_0->at(index)->creationTime.value()) : QVariant();
 	}
 	if (nameId == "m_partId"){
-		return QVariant::fromValue(at(index)->partId.value());
+		return Version_1_0->at(index)->partId ? QVariant::fromValue(Version_1_0->at(index)->partId.value()) : QVariant();
 	}
 	if (nameId == "m_productId"){
-		return QVariant::fromValue(at(index)->productId.value());
+		return Version_1_0->at(index)->productId ? QVariant::fromValue(Version_1_0->at(index)->productId.value()) : QVariant();
 	}
 	if (nameId == "m_name"){
-		return QVariant::fromValue(at(index)->name.value());
+		return Version_1_0->at(index)->name ? QVariant::fromValue(Version_1_0->at(index)->name.value()) : QVariant();
 	}
 	if (nameId == "m_classification"){
-		return QVariant::fromValue(at(index)->classification.value());
+		return Version_1_0->at(index)->classification ? QVariant::fromValue(Version_1_0->at(index)->classification.value()) : QVariant();
 	}
 	if (nameId == "m_description"){
 		return itemPtr->GetDescription();
@@ -14711,13 +14694,12 @@ COverallResultValuesObject::COverallResultValuesObject(QObject* parent): ::imtba
 
 QVariant COverallResultValuesObject::GetName()
 {
-	return COverallResultValues::name.value();
+	return COverallResultValues::name ? COverallResultValues::name.value() : QVariant();
 }
 
 
 void COverallResultValuesObject::SetName(const QVariant& v)
 {
-
 	COverallResultValues::name = v.value<QString>();
 	nameChanged();
 }
@@ -14731,13 +14713,12 @@ bool COverallResultValuesObject::hasName()
 
 QVariant COverallResultValuesObject::GetValueId()
 {
-	return COverallResultValues::valueId.value();
+	return COverallResultValues::valueId ? COverallResultValues::valueId.value() : QVariant();
 }
 
 
 void COverallResultValuesObject::SetValueId(const QVariant& v)
 {
-
 	COverallResultValues::valueId = v.value<QString>();
 	valueIdChanged();
 }
@@ -14751,13 +14732,12 @@ bool COverallResultValuesObject::hasValueId()
 
 QVariant COverallResultValuesObject::GetMeasuredValue()
 {
-	return COverallResultValues::measuredValue.value();
+	return COverallResultValues::measuredValue ? COverallResultValues::measuredValue.value() : QVariant();
 }
 
 
 void COverallResultValuesObject::SetMeasuredValue(const QVariant& v)
 {
-
 	COverallResultValues::measuredValue = v.value<double>();
 	measuredValueChanged();
 }
@@ -14771,13 +14751,12 @@ bool COverallResultValuesObject::hasMeasuredValue()
 
 QVariant COverallResultValuesObject::GetLowLimit()
 {
-	return COverallResultValues::lowLimit.value();
+	return COverallResultValues::lowLimit ? COverallResultValues::lowLimit.value() : QVariant();
 }
 
 
 void COverallResultValuesObject::SetLowLimit(const QVariant& v)
 {
-
 	COverallResultValues::lowLimit = v.value<double>();
 	lowLimitChanged();
 }
@@ -14791,13 +14770,12 @@ bool COverallResultValuesObject::hasLowLimit()
 
 QVariant COverallResultValuesObject::GetHighLimit()
 {
-	return COverallResultValues::highLimit.value();
+	return COverallResultValues::highLimit ? COverallResultValues::highLimit.value() : QVariant();
 }
 
 
 void COverallResultValuesObject::SetHighLimit(const QVariant& v)
 {
-
 	COverallResultValues::highLimit = v.value<double>();
 	highLimitChanged();
 }
@@ -14972,23 +14950,23 @@ QVariant sdl::V1_0::complextest::COverallResultValuesObjectList::getData(const Q
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_name"){
-		return QVariant::fromValue(at(index)->name.value());
+		return Version_1_0->at(index)->name ? QVariant::fromValue(Version_1_0->at(index)->name.value()) : QVariant();
 	}
 	if (nameId == "m_valueId"){
-		return QVariant::fromValue(at(index)->valueId.value());
+		return Version_1_0->at(index)->valueId ? QVariant::fromValue(Version_1_0->at(index)->valueId.value()) : QVariant();
 	}
 	if (nameId == "m_measuredValue"){
-		return QVariant::fromValue(at(index)->measuredValue.value());
+		return Version_1_0->at(index)->measuredValue ? QVariant::fromValue(Version_1_0->at(index)->measuredValue.value()) : QVariant();
 	}
 	if (nameId == "m_lowLimit"){
-		return QVariant::fromValue(at(index)->lowLimit.value());
+		return Version_1_0->at(index)->lowLimit ? QVariant::fromValue(Version_1_0->at(index)->lowLimit.value()) : QVariant();
 	}
 	if (nameId == "m_highLimit"){
-		return QVariant::fromValue(at(index)->highLimit.value());
+		return Version_1_0->at(index)->highLimit ? QVariant::fromValue(Version_1_0->at(index)->highLimit.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -15020,16 +14998,15 @@ QVariant CUnionTestingTypeObject::GetSimpleUnion()
 
 void CUnionTestingTypeObject::SetSimpleUnion(const QVariant& v)
 {
-
 	if (v.isValid()){
 		if (const double* val = v.value<const double*>()){
-			*simpleUnion = *val;
+			CUnionTestingType::simpleUnion = *val;
 		}
 		if (const bool* val = v.value<const bool*>()){
-			*simpleUnion = *val;
+			CUnionTestingType::simpleUnion = *val;
 		}
 		if (const QString* val = v.value<const QString*>()){
-			*simpleUnion = *val;
+			CUnionTestingType::simpleUnion = *val;
 		}
 	}
 	else {
@@ -15069,12 +15046,22 @@ QVariant CUnionTestingTypeObject::GetComplexUnion()
 	if (m_complexUnionQObjectPtr.isValid()){
 		if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>((CUnionTestingType::complexUnion).GetPtr())){
 			CCDMResultVarStringObject *newObjectPtr = new CCDMResultVarStringObject(this);
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+						newObjectPtr->CCDMResultVarString::dataModelTitle = val->CCDMResultVarString::dataModelTitle;
+			newObjectPtr->CCDMResultVarString::dataModelVersion = val->CCDMResultVarString::dataModelVersion;
+			newObjectPtr->CCDMResultVarString::resultMetaData = val->CCDMResultVarString::resultMetaData;
+			newObjectPtr->CCDMResultVarString::resultContent = val->CCDMResultVarString::resultContent;
+			newObjectPtr->CCDMResultVarString::overallResultValues = val->CCDMResultVarString::overallResultValues;
+
 			m_complexUnionQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
 		if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>((CUnionTestingType::complexUnion).GetPtr())){
 			CCDMResultVarRecursiveObject *newObjectPtr = new CCDMResultVarRecursiveObject(this);
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+						newObjectPtr->CCDMResultVarRecursive::dataModelTitle = val->CCDMResultVarRecursive::dataModelTitle;
+			newObjectPtr->CCDMResultVarRecursive::dataModelVersion = val->CCDMResultVarRecursive::dataModelVersion;
+			newObjectPtr->CCDMResultVarRecursive::resultMetaData = val->CCDMResultVarRecursive::resultMetaData;
+			newObjectPtr->CCDMResultVarRecursive::resultContent = val->CCDMResultVarRecursive::resultContent;
+			newObjectPtr->CCDMResultVarRecursive::overallResultValues = val->CCDMResultVarRecursive::overallResultValues;
+
 			m_complexUnionQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
 	}
@@ -15084,13 +15071,12 @@ QVariant CUnionTestingTypeObject::GetComplexUnion()
 
 void CUnionTestingTypeObject::SetComplexUnion(const QVariant& v)
 {
-
 	if (v.isValid()){
 		if (const CCDMResultVarStringObject* val = v.value<const CCDMResultVarStringObject*>()){
-			*complexUnion = *val;
+			CUnionTestingType::complexUnion = *val;
 		}
 		if (const CCDMResultVarRecursiveObject* val = v.value<const CCDMResultVarRecursiveObject*>()){
-			*complexUnion = *val;
+			CUnionTestingType::complexUnion = *val;
 		}
 	}
 	else {
@@ -15130,7 +15116,10 @@ QVariant CUnionTestingTypeObject::GetMixedUnion()
 	if (m_mixedUnionQObjectPtr.isValid()){
 		if (const CCoordinates* val = std::get_if<CCoordinates>((CUnionTestingType::mixedUnion).GetPtr())){
 			CCoordinatesObject *newObjectPtr = new CCoordinatesObject(this);
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+						newObjectPtr->CCoordinates::x = val->CCoordinates::x;
+			newObjectPtr->CCoordinates::y = val->CCoordinates::y;
+			newObjectPtr->CCoordinates::z = val->CCoordinates::z;
+
 			m_mixedUnionQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
 		if (const double* val = std::get_if<double>((CUnionTestingType::mixedUnion).GetPtr())){
@@ -15149,19 +15138,18 @@ QVariant CUnionTestingTypeObject::GetMixedUnion()
 
 void CUnionTestingTypeObject::SetMixedUnion(const QVariant& v)
 {
-
 	if (v.isValid()){
 		if (const CCoordinatesObject* val = v.value<const CCoordinatesObject*>()){
-			*mixedUnion = *val;
+			CUnionTestingType::mixedUnion = *val;
 		}
 		if (const double* val = v.value<const double*>()){
-			*mixedUnion = *val;
+			CUnionTestingType::mixedUnion = *val;
 		}
 		if (const bool* val = v.value<const bool*>()){
-			*mixedUnion = *val;
+			CUnionTestingType::mixedUnion = *val;
 		}
 		if (const QString* val = v.value<const QString*>()){
-			*mixedUnion = *val;
+			CUnionTestingType::mixedUnion = *val;
 		}
 	}
 	else {
@@ -15353,7 +15341,7 @@ QVariant sdl::V1_0::complextest::CUnionTestingTypeObjectList::getData(const QStr
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_simpleUnion"){
@@ -15380,13 +15368,12 @@ CCDMResultVarRecursiveObject::CCDMResultVarRecursiveObject(QObject* parent): ::i
 
 QVariant CCDMResultVarRecursiveObject::GetDataModelTitle()
 {
-	return CCDMResultVarRecursive::dataModelTitle.value();
+	return CCDMResultVarRecursive::dataModelTitle ? CCDMResultVarRecursive::dataModelTitle.value() : QVariant();
 }
 
 
 void CCDMResultVarRecursiveObject::SetDataModelTitle(const QVariant& v)
 {
-
 	CCDMResultVarRecursive::dataModelTitle = v.value<QString>();
 	dataModelTitleChanged();
 }
@@ -15400,13 +15387,12 @@ bool CCDMResultVarRecursiveObject::hasDataModelTitle()
 
 QVariant CCDMResultVarRecursiveObject::GetDataModelVersion()
 {
-	return CCDMResultVarRecursive::dataModelVersion.value();
+	return CCDMResultVarRecursive::dataModelVersion ? CCDMResultVarRecursive::dataModelVersion.value() : QVariant();
 }
 
 
 void CCDMResultVarRecursiveObject::SetDataModelVersion(const QVariant& v)
 {
-
 	CCDMResultVarRecursive::dataModelVersion = v.value<QString>();
 	dataModelVersionChanged();
 }
@@ -15420,10 +15406,21 @@ bool CCDMResultVarRecursiveObject::hasDataModelVersion()
 
 QVariant CCDMResultVarRecursiveObject::GetResultMetaData()
 {
+	if (!resultMetaData) {return {};}
+	
 	if (!m_resultMetaDataQObjectPtr.isValid()){
 		m_resultMetaDataQObjectPtr = CreateObject("resultMetaData");
 		auto itemPtr = m_resultMetaDataQObjectPtr.value<sdl::V1_0::complextest::CResultMetaDataObject*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = CCDMResultVarRecursive::resultMetaData;
+		if (itemPtr != nullptr) {
+			itemPtr->resultId = resultMetaData->resultId;
+			itemPtr->creationTime = resultMetaData->creationTime;
+			itemPtr->partId = resultMetaData->partId;
+			itemPtr->productId = resultMetaData->productId;
+			itemPtr->name = resultMetaData->name;
+			itemPtr->classification = resultMetaData->classification;
+			itemPtr->description = resultMetaData->description;
+			itemPtr->extendedMetaData = resultMetaData->extendedMetaData;
+		}
 	}
 	return m_resultMetaDataQObjectPtr;
 }
@@ -15431,10 +15428,9 @@ QVariant CCDMResultVarRecursiveObject::GetResultMetaData()
 
 void CCDMResultVarRecursiveObject::SetResultMetaData(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::complextest::CResultMetaDataObject* itemPtr = v.value<sdl::V1_0::complextest::CResultMetaDataObject*>();
-		if (itemPtr != nullptr)  resultMetaData = static_cast<const decltype(resultMetaData)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr) CCDMResultVarRecursive::resultMetaData = (*itemPtr);
 	}
 	else {
 		CCDMResultVarRecursive::resultMetaData = nullptr;
@@ -15481,10 +15477,9 @@ QVariant CCDMResultVarRecursiveObject::GetResultContent()
 
 void CCDMResultVarRecursiveObject::SetResultContent(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::complextest::CCDMResultUnionTypeObjectList* itemPtr = v.value<sdl::V1_0::complextest::CCDMResultUnionTypeObjectList*>();
-		if (itemPtr != nullptr)  resultContent = static_cast<const decltype(resultContent)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr) CCDMResultVarRecursive::resultContent = itemPtr->Version_1_0;
 	}
 	else {
 		CCDMResultVarRecursive::resultContent = nullptr;
@@ -15531,10 +15526,9 @@ QVariant CCDMResultVarRecursiveObject::GetOverallResultValues()
 
 void CCDMResultVarRecursiveObject::SetOverallResultValues(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::complextest::COverallResultValuesObjectList* itemPtr = v.value<sdl::V1_0::complextest::COverallResultValuesObjectList*>();
-		if (itemPtr != nullptr)  overallResultValues = static_cast<const decltype(overallResultValues)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr) CCDMResultVarRecursive::overallResultValues = itemPtr->Version_1_0;
 	}
 	else {
 		CCDMResultVarRecursive::overallResultValues = nullptr;
@@ -15747,14 +15741,14 @@ QVariant sdl::V1_0::complextest::CCDMResultVarRecursiveObjectList::getData(const
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_dataModelTitle"){
-		return QVariant::fromValue(at(index)->dataModelTitle.value());
+		return Version_1_0->at(index)->dataModelTitle ? QVariant::fromValue(Version_1_0->at(index)->dataModelTitle.value()) : QVariant();
 	}
 	if (nameId == "m_dataModelVersion"){
-		return QVariant::fromValue(at(index)->dataModelVersion.value());
+		return Version_1_0->at(index)->dataModelVersion ? QVariant::fromValue(Version_1_0->at(index)->dataModelVersion.value()) : QVariant();
 	}
 	if (nameId == "m_resultMetaData"){
 		return itemPtr->GetResultMetaData();
@@ -15780,13 +15774,12 @@ CCDMResultVarStringObject::CCDMResultVarStringObject(QObject* parent): ::imtbase
 
 QVariant CCDMResultVarStringObject::GetDataModelTitle()
 {
-	return CCDMResultVarString::dataModelTitle.value();
+	return CCDMResultVarString::dataModelTitle ? CCDMResultVarString::dataModelTitle.value() : QVariant();
 }
 
 
 void CCDMResultVarStringObject::SetDataModelTitle(const QVariant& v)
 {
-
 	CCDMResultVarString::dataModelTitle = v.value<QString>();
 	dataModelTitleChanged();
 }
@@ -15800,13 +15793,12 @@ bool CCDMResultVarStringObject::hasDataModelTitle()
 
 QVariant CCDMResultVarStringObject::GetDataModelVersion()
 {
-	return CCDMResultVarString::dataModelVersion.value();
+	return CCDMResultVarString::dataModelVersion ? CCDMResultVarString::dataModelVersion.value() : QVariant();
 }
 
 
 void CCDMResultVarStringObject::SetDataModelVersion(const QVariant& v)
 {
-
 	CCDMResultVarString::dataModelVersion = v.value<QString>();
 	dataModelVersionChanged();
 }
@@ -15820,10 +15812,21 @@ bool CCDMResultVarStringObject::hasDataModelVersion()
 
 QVariant CCDMResultVarStringObject::GetResultMetaData()
 {
+	if (!resultMetaData) {return {};}
+	
 	if (!m_resultMetaDataQObjectPtr.isValid()){
 		m_resultMetaDataQObjectPtr = CreateObject("resultMetaData");
 		auto itemPtr = m_resultMetaDataQObjectPtr.value<sdl::V1_0::complextest::CResultMetaDataObject*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = CCDMResultVarString::resultMetaData;
+		if (itemPtr != nullptr) {
+			itemPtr->resultId = resultMetaData->resultId;
+			itemPtr->creationTime = resultMetaData->creationTime;
+			itemPtr->partId = resultMetaData->partId;
+			itemPtr->productId = resultMetaData->productId;
+			itemPtr->name = resultMetaData->name;
+			itemPtr->classification = resultMetaData->classification;
+			itemPtr->description = resultMetaData->description;
+			itemPtr->extendedMetaData = resultMetaData->extendedMetaData;
+		}
 	}
 	return m_resultMetaDataQObjectPtr;
 }
@@ -15831,10 +15834,9 @@ QVariant CCDMResultVarStringObject::GetResultMetaData()
 
 void CCDMResultVarStringObject::SetResultMetaData(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::complextest::CResultMetaDataObject* itemPtr = v.value<sdl::V1_0::complextest::CResultMetaDataObject*>();
-		if (itemPtr != nullptr)  resultMetaData = static_cast<const decltype(resultMetaData)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr) CCDMResultVarString::resultMetaData = (*itemPtr);
 	}
 	else {
 		CCDMResultVarString::resultMetaData = nullptr;
@@ -15870,17 +15872,19 @@ void CCDMResultVarStringObject::ResetResultMetaData()
 
 QVariant CCDMResultVarStringObject::GetResultContent()
 {
+	if (!resultContent ){return {};}
+
 	QList<QString> tempResultContentList;
-	for (const auto& tempValue: CCDMResultVarString::resultContent.value()){
+	for (const auto& tempValue: resultContent.value()){
 		tempResultContentList << *tempValue;
 	}
+
 	return QVariant::fromValue(tempResultContentList);
 }
 
 
 void CCDMResultVarStringObject::SetResultContent(const QVariant& v)
 {
-
 	if (!CCDMResultVarString::resultContent){
 		CCDMResultVarString::resultContent.emplace();
 	}
@@ -15915,10 +15919,9 @@ QVariant CCDMResultVarStringObject::GetOverallResultValues()
 
 void CCDMResultVarStringObject::SetOverallResultValues(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::complextest::COverallResultValuesObjectList* itemPtr = v.value<sdl::V1_0::complextest::COverallResultValuesObjectList*>();
-		if (itemPtr != nullptr)  overallResultValues = static_cast<const decltype(overallResultValues)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr) CCDMResultVarString::overallResultValues = itemPtr->Version_1_0;
 	}
 	else {
 		CCDMResultVarString::overallResultValues = nullptr;
@@ -16128,20 +16131,20 @@ QVariant sdl::V1_0::complextest::CCDMResultVarStringObjectList::getData(const QS
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_dataModelTitle"){
-		return QVariant::fromValue(at(index)->dataModelTitle.value());
+		return Version_1_0->at(index)->dataModelTitle ? QVariant::fromValue(Version_1_0->at(index)->dataModelTitle.value()) : QVariant();
 	}
 	if (nameId == "m_dataModelVersion"){
-		return QVariant::fromValue(at(index)->dataModelVersion.value());
+		return Version_1_0->at(index)->dataModelVersion ? QVariant::fromValue(Version_1_0->at(index)->dataModelVersion.value()) : QVariant();
 	}
 	if (nameId == "m_resultMetaData"){
 		return itemPtr->GetResultMetaData();
 	}
 	if (nameId == "m_resultContent"){
-		return QVariant::fromValue(at(index)->resultContent.value());
+		return Version_1_0->at(index)->resultContent ? QVariant::fromValue(Version_1_0->at(index)->resultContent.value()) : QVariant();
 	}
 	if (nameId == "m_overallResultValues"){
 		return itemPtr->GetOverallResultValues();
@@ -16161,13 +16164,12 @@ CCDMResultObject::CCDMResultObject(QObject* parent): ::imtbase::CItemModelBase(p
 
 QVariant CCDMResultObject::GetDataModelTitle()
 {
-	return CCDMResult::dataModelTitle.value();
+	return CCDMResult::dataModelTitle ? CCDMResult::dataModelTitle.value() : QVariant();
 }
 
 
 void CCDMResultObject::SetDataModelTitle(const QVariant& v)
 {
-
 	CCDMResult::dataModelTitle = v.value<QString>();
 	dataModelTitleChanged();
 }
@@ -16181,13 +16183,12 @@ bool CCDMResultObject::hasDataModelTitle()
 
 QVariant CCDMResultObject::GetDataModelVersion()
 {
-	return CCDMResult::dataModelVersion.value();
+	return CCDMResult::dataModelVersion ? CCDMResult::dataModelVersion.value() : QVariant();
 }
 
 
 void CCDMResultObject::SetDataModelVersion(const QVariant& v)
 {
-
 	CCDMResult::dataModelVersion = v.value<QString>();
 	dataModelVersionChanged();
 }
@@ -16201,10 +16202,21 @@ bool CCDMResultObject::hasDataModelVersion()
 
 QVariant CCDMResultObject::GetResultMetaData()
 {
+	if (!resultMetaData) {return {};}
+	
 	if (!m_resultMetaDataQObjectPtr.isValid()){
 		m_resultMetaDataQObjectPtr = CreateObject("resultMetaData");
 		auto itemPtr = m_resultMetaDataQObjectPtr.value<sdl::V1_0::complextest::CResultMetaDataObject*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = CCDMResult::resultMetaData;
+		if (itemPtr != nullptr) {
+			itemPtr->resultId = resultMetaData->resultId;
+			itemPtr->creationTime = resultMetaData->creationTime;
+			itemPtr->partId = resultMetaData->partId;
+			itemPtr->productId = resultMetaData->productId;
+			itemPtr->name = resultMetaData->name;
+			itemPtr->classification = resultMetaData->classification;
+			itemPtr->description = resultMetaData->description;
+			itemPtr->extendedMetaData = resultMetaData->extendedMetaData;
+		}
 	}
 	return m_resultMetaDataQObjectPtr;
 }
@@ -16212,10 +16224,9 @@ QVariant CCDMResultObject::GetResultMetaData()
 
 void CCDMResultObject::SetResultMetaData(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::complextest::CResultMetaDataObject* itemPtr = v.value<sdl::V1_0::complextest::CResultMetaDataObject*>();
-		if (itemPtr != nullptr)  resultMetaData = static_cast<const decltype(resultMetaData)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr) CCDMResult::resultMetaData = (*itemPtr);
 	}
 	else {
 		CCDMResult::resultMetaData = nullptr;
@@ -16262,10 +16273,9 @@ QVariant CCDMResultObject::GetResultContent()
 
 void CCDMResultObject::SetResultContent(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::complextest::CCDMResultUnionTypeObjectList* itemPtr = v.value<sdl::V1_0::complextest::CCDMResultUnionTypeObjectList*>();
-		if (itemPtr != nullptr)  resultContent = static_cast<const decltype(resultContent)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr) CCDMResult::resultContent = itemPtr->Version_1_0;
 	}
 	else {
 		CCDMResult::resultContent = nullptr;
@@ -16312,10 +16322,9 @@ QVariant CCDMResultObject::GetOverallResultValues()
 
 void CCDMResultObject::SetOverallResultValues(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::complextest::COverallResultValuesObjectList* itemPtr = v.value<sdl::V1_0::complextest::COverallResultValuesObjectList*>();
-		if (itemPtr != nullptr)  overallResultValues = static_cast<const decltype(overallResultValues)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr) CCDMResult::overallResultValues = itemPtr->Version_1_0;
 	}
 	else {
 		CCDMResult::overallResultValues = nullptr;
@@ -16528,14 +16537,14 @@ QVariant sdl::V1_0::complextest::CCDMResultObjectList::getData(const QString& na
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_dataModelTitle"){
-		return QVariant::fromValue(at(index)->dataModelTitle.value());
+		return Version_1_0->at(index)->dataModelTitle ? QVariant::fromValue(Version_1_0->at(index)->dataModelTitle.value()) : QVariant();
 	}
 	if (nameId == "m_dataModelVersion"){
-		return QVariant::fromValue(at(index)->dataModelVersion.value());
+		return Version_1_0->at(index)->dataModelVersion ? QVariant::fromValue(Version_1_0->at(index)->dataModelVersion.value()) : QVariant();
 	}
 	if (nameId == "m_resultMetaData"){
 		return itemPtr->GetResultMetaData();
@@ -16557,13 +16566,12 @@ CPointsInCoordinateFormatObject::CPointsInCoordinateFormatObject(QObject* parent
 
 QVariant CPointsInCoordinateFormatObject::GetPointAsCoordinates()
 {
-	return CPointsInCoordinateFormat::pointAsCoordinates.value();
+	return CPointsInCoordinateFormat::pointAsCoordinates ? CPointsInCoordinateFormat::pointAsCoordinates.value() : QVariant();
 }
 
 
 void CPointsInCoordinateFormatObject::SetPointAsCoordinates(const QVariant& v)
 {
-
 	CPointsInCoordinateFormat::pointAsCoordinates = v.value<bool>();
 	pointAsCoordinatesChanged();
 }
@@ -16726,11 +16734,11 @@ QVariant sdl::V1_0::complextest::CPointsInCoordinateFormatObjectList::getData(co
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_pointAsCoordinates"){
-		return QVariant::fromValue(at(index)->pointAsCoordinates.value());
+		return Version_1_0->at(index)->pointAsCoordinates ? QVariant::fromValue(Version_1_0->at(index)->pointAsCoordinates.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -16745,13 +16753,12 @@ CCollectionViewParamsTestObject::CCollectionViewParamsTestObject(QObject* parent
 
 QVariant CCollectionViewParamsTestObject::GetCount()
 {
-	return CCollectionViewParamsTest::count.value();
+	return CCollectionViewParamsTest::count ? CCollectionViewParamsTest::count.value() : QVariant();
 }
 
 
 void CCollectionViewParamsTestObject::SetCount(const QVariant& v)
 {
-
 	CCollectionViewParamsTest::count = v.value<int>();
 	countChanged();
 }
@@ -16765,13 +16772,12 @@ bool CCollectionViewParamsTestObject::hasCount()
 
 QVariant CCollectionViewParamsTestObject::GetOffset()
 {
-	return CCollectionViewParamsTest::offset.value();
+	return CCollectionViewParamsTest::offset ? CCollectionViewParamsTest::offset.value() : QVariant();
 }
 
 
 void CCollectionViewParamsTestObject::SetOffset(const QVariant& v)
 {
-
 	CCollectionViewParamsTest::offset = v.value<int>();
 	offsetChanged();
 }
@@ -16785,10 +16791,17 @@ bool CCollectionViewParamsTestObject::hasOffset()
 
 QVariant CCollectionViewParamsTestObject::GetFilterModel()
 {
+	if (!filterModel) {return {};}
+	
 	if (!m_filterModelQObjectPtr.isValid()){
 		m_filterModelQObjectPtr = CreateObject("filterModel");
 		auto itemPtr = m_filterModelQObjectPtr.value<sdl::V1_0::imtbase::CComplexCollectionFilterObject*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = CCollectionViewParamsTest::filterModel;
+		if (itemPtr != nullptr) {
+			itemPtr->sortingInfo = filterModel->sortingInfo;
+			itemPtr->fieldsFilter = filterModel->fieldsFilter;
+			itemPtr->timeFilter = filterModel->timeFilter;
+			itemPtr->distinctFields = filterModel->distinctFields;
+		}
 	}
 	return m_filterModelQObjectPtr;
 }
@@ -16796,10 +16809,9 @@ QVariant CCollectionViewParamsTestObject::GetFilterModel()
 
 void CCollectionViewParamsTestObject::SetFilterModel(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::imtbase::CComplexCollectionFilterObject* itemPtr = v.value<sdl::V1_0::imtbase::CComplexCollectionFilterObject*>();
-		if (itemPtr != nullptr)  filterModel = static_cast<const decltype(filterModel)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr) CCollectionViewParamsTest::filterModel = (*itemPtr);
 	}
 	else {
 		CCollectionViewParamsTest::filterModel = nullptr;
@@ -16993,14 +17005,14 @@ QVariant sdl::V1_0::complextest::CCollectionViewParamsTestObjectList::getData(co
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_count"){
-		return QVariant::fromValue(at(index)->count.value());
+		return Version_1_0->at(index)->count ? QVariant::fromValue(Version_1_0->at(index)->count.value()) : QVariant();
 	}
 	if (nameId == "m_offset"){
-		return QVariant::fromValue(at(index)->offset.value());
+		return Version_1_0->at(index)->offset ? QVariant::fromValue(Version_1_0->at(index)->offset.value()) : QVariant();
 	}
 	if (nameId == "m_filterModel"){
 		return itemPtr->GetFilterModel();
@@ -17018,21 +17030,21 @@ QVariant CExtendedMetaDataUnionTypeObjectList::GetOrCreateCachedObject(int index
 		retVal = this->m_objectDataTypeMap[index];
 	}
 	else{
-		if (const CCoordinates* val = std::get_if<CCoordinates>(this->at(index).GetPtr())){
+		if (const CCoordinates* val = std::get_if<CCoordinates>(this->Version_1_0->at(index).GetPtr())){
 			CCoordinatesObject *newObjectPtr = new CCoordinatesObject();
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			static_cast<CCoordinates&>(*newObjectPtr) = *val;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
-		if (const double* val = std::get_if<double>(this->at(index).GetPtr())){
+		if (const double* val = std::get_if<double>(this->Version_1_0->at(index).GetPtr())){
 			retVal =  QVariant::fromValue(val);
 		}
 
-		if (const bool* val = std::get_if<bool>(this->at(index).GetPtr())){
+		if (const bool* val = std::get_if<bool>(this->Version_1_0->at(index).GetPtr())){
 			retVal =  QVariant::fromValue(val);
 		}
 
-		if (const QString* val = std::get_if<QString>(this->at(index).GetPtr())){
+		if (const QString* val = std::get_if<QString>(this->Version_1_0->at(index).GetPtr())){
 			retVal =  QVariant::fromValue(val);
 		}
 
@@ -17062,27 +17074,27 @@ QVariantMap CExtendedMetaDataUnionTypeObjectList::get(int row) const
 
 void CExtendedMetaDataUnionTypeObjectList::append(QVariant item)
 {
-	beginInsertRows(QModelIndex(), count(), 0);
+	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
 
 	if (item.canConvert<CCoordinatesObject*>()){
 		CCoordinatesObject* val = item.value<CCoordinatesObject*>();
 		CCoordinates* newItemPtr = dynamic_cast<CCoordinates*>(val);
-		append(istd::TNullableValue<ExtendedMetaDataUnionType>(*newItemPtr));
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionType>(*newItemPtr));
 	}
 
 	if (item.canConvert<double>()){
 		double val = item.value<double>();
-		append(istd::TNullableValue<ExtendedMetaDataUnionType>(val));
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionType>(val));
 	}
 
 	if (item.canConvert<bool>()){
 		bool val = item.value<bool>();
-		append(istd::TNullableValue<ExtendedMetaDataUnionType>(val));
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionType>(val));
 	}
 
 	if (item.canConvert<QString>()){
 		QString val = item.value<QString>();
-		append(istd::TNullableValue<ExtendedMetaDataUnionType>(val));
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionType>(val));
 	}
 
 	ClearCache();
@@ -17236,28 +17248,28 @@ bool CExtendedMetaDataUnionTypeObjectList::isEqualWithModel(sdl::V1_0::complexte
 
 void CExtendedMetaDataUnionTypeObjectList::insert(int index, QVariant item)
 {
-	if (index < 0 || index > size()) return;
-	beginInsertRows(QModelIndex(), count(), 0);
+	if (index < 0 || index > Version_1_0->size()) return;
+	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
 
 	if (item.canConvert<CCoordinatesObject*>()){
 		CCoordinatesObject* val = item.value<CCoordinatesObject*>();
 		CCoordinates* newItemPtr = dynamic_cast<CCoordinates*>(val);
-		append(istd::TNullableValue<ExtendedMetaDataUnionType>(*newItemPtr));
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionType>(*newItemPtr));
 	}
 
 	if (item.canConvert<double>()){
 		double val = item.value<double>();
-		append(istd::TNullableValue<ExtendedMetaDataUnionType>(val));
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionType>(val));
 	}
 
 	if (item.canConvert<bool>()){
 		bool val = item.value<bool>();
-		append(istd::TNullableValue<ExtendedMetaDataUnionType>(val));
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionType>(val));
 	}
 
 	if (item.canConvert<QString>()){
 		QString val = item.value<QString>();
-		append(istd::TNullableValue<ExtendedMetaDataUnionType>(val));
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionType>(val));
 	}
 
 	ClearCache();
@@ -17279,7 +17291,7 @@ void CExtendedMetaDataUnionTypeObjectList::clear()
 
 QVariant CExtendedMetaDataUnionTypeObjectList::getData(const QString& nameId, int index)
 {
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		QVariant retVal = GetOrCreateCachedObject(index);
 		return retVal;
 	}
@@ -17295,15 +17307,15 @@ QVariant CExtendedMetaDataUnionSimpleTypeObjectList::GetOrCreateCachedObject(int
 		retVal = this->m_objectDataTypeMap[index];
 	}
 	else{
-		if (const double* val = std::get_if<double>(this->at(index).GetPtr())){
+		if (const double* val = std::get_if<double>(this->Version_1_0->at(index).GetPtr())){
 			retVal =  QVariant::fromValue(val);
 		}
 
-		if (const bool* val = std::get_if<bool>(this->at(index).GetPtr())){
+		if (const bool* val = std::get_if<bool>(this->Version_1_0->at(index).GetPtr())){
 			retVal =  QVariant::fromValue(val);
 		}
 
-		if (const QString* val = std::get_if<QString>(this->at(index).GetPtr())){
+		if (const QString* val = std::get_if<QString>(this->Version_1_0->at(index).GetPtr())){
 			retVal =  QVariant::fromValue(val);
 		}
 
@@ -17333,21 +17345,21 @@ QVariantMap CExtendedMetaDataUnionSimpleTypeObjectList::get(int row) const
 
 void CExtendedMetaDataUnionSimpleTypeObjectList::append(QVariant item)
 {
-	beginInsertRows(QModelIndex(), count(), 0);
+	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
 
 	if (item.canConvert<double>()){
 		double val = item.value<double>();
-		append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(val));
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(val));
 	}
 
 	if (item.canConvert<bool>()){
 		bool val = item.value<bool>();
-		append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(val));
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(val));
 	}
 
 	if (item.canConvert<QString>()){
 		QString val = item.value<QString>();
-		append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(val));
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(val));
 	}
 
 	ClearCache();
@@ -17486,22 +17498,22 @@ bool CExtendedMetaDataUnionSimpleTypeObjectList::isEqualWithModel(sdl::V1_0::com
 
 void CExtendedMetaDataUnionSimpleTypeObjectList::insert(int index, QVariant item)
 {
-	if (index < 0 || index > size()) return;
-	beginInsertRows(QModelIndex(), count(), 0);
+	if (index < 0 || index > Version_1_0->size()) return;
+	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
 
 	if (item.canConvert<double>()){
 		double val = item.value<double>();
-		append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(val));
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(val));
 	}
 
 	if (item.canConvert<bool>()){
 		bool val = item.value<bool>();
-		append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(val));
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(val));
 	}
 
 	if (item.canConvert<QString>()){
 		QString val = item.value<QString>();
-		append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(val));
+		Version_1_0->append(istd::TNullableValue<ExtendedMetaDataUnionSimpleType>(val));
 	}
 
 	ClearCache();
@@ -17523,7 +17535,7 @@ void CExtendedMetaDataUnionSimpleTypeObjectList::clear()
 
 QVariant CExtendedMetaDataUnionSimpleTypeObjectList::getData(const QString& nameId, int index)
 {
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		QVariant retVal = GetOrCreateCachedObject(index);
 		return retVal;
 	}
@@ -17539,15 +17551,15 @@ QVariant CCDMResultUnionTypeObjectList::GetOrCreateCachedObject(int index) const
 		retVal = this->m_objectDataTypeMap[index];
 	}
 	else{
-		if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>(this->at(index).GetPtr())){
+		if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>(this->Version_1_0->at(index).GetPtr())){
 			CCDMResultVarStringObject *newObjectPtr = new CCDMResultVarStringObject();
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			static_cast<CCDMResultVarString&>(*newObjectPtr) = *val;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
-		if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>(this->at(index).GetPtr())){
+		if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>(this->Version_1_0->at(index).GetPtr())){
 			CCDMResultVarRecursiveObject *newObjectPtr = new CCDMResultVarRecursiveObject();
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			static_cast<CCDMResultVarRecursive&>(*newObjectPtr) = *val;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
@@ -17577,18 +17589,18 @@ QVariantMap CCDMResultUnionTypeObjectList::get(int row) const
 
 void CCDMResultUnionTypeObjectList::append(QVariant item)
 {
-	beginInsertRows(QModelIndex(), count(), 0);
+	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
 
 	if (item.canConvert<CCDMResultVarStringObject*>()){
 		CCDMResultVarStringObject* val = item.value<CCDMResultVarStringObject*>();
 		CCDMResultVarString* newItemPtr = dynamic_cast<CCDMResultVarString*>(val);
-		append(istd::TNullableValue<CDMResultUnionType>(*newItemPtr));
+		Version_1_0->append(istd::TNullableValue<CDMResultUnionType>(*newItemPtr));
 	}
 
 	if (item.canConvert<CCDMResultVarRecursiveObject*>()){
 		CCDMResultVarRecursiveObject* val = item.value<CCDMResultVarRecursiveObject*>();
 		CCDMResultVarRecursive* newItemPtr = dynamic_cast<CCDMResultVarRecursive*>(val);
-		append(istd::TNullableValue<CDMResultUnionType>(*newItemPtr));
+		Version_1_0->append(istd::TNullableValue<CDMResultUnionType>(*newItemPtr));
 	}
 
 	ClearCache();
@@ -17712,19 +17724,19 @@ bool CCDMResultUnionTypeObjectList::isEqualWithModel(sdl::V1_0::complextest::CCD
 
 void CCDMResultUnionTypeObjectList::insert(int index, QVariant item)
 {
-	if (index < 0 || index > size()) return;
-	beginInsertRows(QModelIndex(), count(), 0);
+	if (index < 0 || index > Version_1_0->size()) return;
+	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
 
 	if (item.canConvert<CCDMResultVarStringObject*>()){
 		CCDMResultVarStringObject* val = item.value<CCDMResultVarStringObject*>();
 		CCDMResultVarString* newItemPtr = dynamic_cast<CCDMResultVarString*>(val);
-		append(istd::TNullableValue<CDMResultUnionType>(*newItemPtr));
+		Version_1_0->append(istd::TNullableValue<CDMResultUnionType>(*newItemPtr));
 	}
 
 	if (item.canConvert<CCDMResultVarRecursiveObject*>()){
 		CCDMResultVarRecursiveObject* val = item.value<CCDMResultVarRecursiveObject*>();
 		CCDMResultVarRecursive* newItemPtr = dynamic_cast<CCDMResultVarRecursive*>(val);
-		append(istd::TNullableValue<CDMResultUnionType>(*newItemPtr));
+		Version_1_0->append(istd::TNullableValue<CDMResultUnionType>(*newItemPtr));
 	}
 
 	ClearCache();
@@ -17746,7 +17758,7 @@ void CCDMResultUnionTypeObjectList::clear()
 
 QVariant CCDMResultUnionTypeObjectList::getData(const QString& nameId, int index)
 {
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		QVariant retVal = GetOrCreateCachedObject(index);
 		return retVal;
 	}
@@ -17776,8 +17788,6 @@ CGetLastProductionResultsGqlRequest::CGetLastProductionResultsGqlRequest(const :
 	Q_UNUSED(optRead)
 	m_isValid = true;
 	m_gqlContextPtr = gqlRequest.GetRequestContext();
-
-	const QByteArray protocolVersion = gqlRequest.GetProtocolVersion();
 
 	// reading input arguments
 
@@ -17945,34 +17955,10 @@ CGetLastProductionResultsCDMGqlRequest::CGetLastProductionResultsCDMGqlRequest(c
 {
 	m_gqlContextPtr = gqlRequest.GetRequestContext();
 
-	const QByteArray protocolVersion = gqlRequest.GetProtocolVersion();
-
 	// reading input arguments
 	const ::imtgql::CGqlParamObject* pointAsCoordinatesDataObjectPtr = gqlRequest.GetParamObject("pointAsCoordinates");
 	if (pointAsCoordinatesDataObjectPtr != nullptr){
-		if (!protocolVersion.isEmpty()){
-			if (protocolVersion == "1.0"){
-				bool isPointAsCoordinatesRead;
-				if (optRead){
-					isPointAsCoordinatesRead = m_requestedArguments.pointAsCoordinates.emplace().OptReadFromGraphQlObject(*pointAsCoordinatesDataObjectPtr, CPointsInCoordinateFormat::PV_1_0);
-				}
-				else {
-					isPointAsCoordinatesRead = m_requestedArguments.pointAsCoordinates.emplace().ReadFromGraphQlObject(*pointAsCoordinatesDataObjectPtr, CPointsInCoordinateFormat::PV_1_0);
-				}
-				m_isValid = isPointAsCoordinatesRead;
-				if (!isPointAsCoordinatesRead){
-					return;
-				}
-			}
-			else {
-				qWarning() << QString("Bad request. Version %1 is not supported").arg(qPrintable(protocolVersion));
-				m_isValid = false;
-
-				return;
-			}
-		}
-		else {
-			bool isPointAsCoordinatesRead;
+					bool isPointAsCoordinatesRead;
 			if (optRead){
 				isPointAsCoordinatesRead = m_requestedArguments.pointAsCoordinates.emplace().OptReadFromGraphQlObject(*pointAsCoordinatesDataObjectPtr);
 			}
@@ -17983,7 +17969,7 @@ CGetLastProductionResultsCDMGqlRequest::CGetLastProductionResultsCDMGqlRequest(c
 			if (!isPointAsCoordinatesRead){
 				return;
 			}
-		}
+
 	}
 
 	// reading requested fields
@@ -18097,7 +18083,7 @@ QJsonObject CComplexUnion2GqlHandlerCompBase::CreateInternalResponse(const ::imt
 			return QJsonObject();
 		}
 
-		CProductOverview replyPayload = OnGetLastProductionResults(getLastProductionResultsGqlRequest, gqlRequest, errorMessage);
+		V1_0::complextest::CProductOverview replyPayload = OnGetLastProductionResults(getLastProductionResultsGqlRequest, gqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
 			SendErrorMessage(0, QString("The derived call [OnGetLastProductionResults] returned an error: %1").arg(errorMessage));
 
@@ -18125,7 +18111,7 @@ QJsonObject CComplexUnion2GqlHandlerCompBase::CreateInternalResponse(const ::imt
 			return QJsonObject();
 		}
 
-		CCDMResult replyPayload = OnGetLastProductionResultsCDM(getLastProductionResultsCDMGqlRequest, gqlRequest, errorMessage);
+		V1_0::complextest::CCDMResult replyPayload = OnGetLastProductionResultsCDM(getLastProductionResultsCDMGqlRequest, gqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
 			SendErrorMessage(0, QString("The derived call [OnGetLastProductionResultsCDM] returned an error: %1").arg(errorMessage));
 

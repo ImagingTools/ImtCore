@@ -2,7 +2,7 @@
 #include "SubstrateSpecifications_fwd.h"
 
 
-namespace sdl::V1_0::V1_0
+namespace sdl::V1_0::substrate
 {
 
 
@@ -19,7 +19,7 @@ bool CInputId::operator==(const CInputId& other) const
 }
 
 
-bool CInputId::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::substrate::CInputId::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "InputId", modelIndex);
 
@@ -35,7 +35,7 @@ bool CInputId::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) co
 }
 
 
-bool CInputId::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::substrate::CInputId::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant idData = model.GetData("id", modelIndex);
 	if (idData.isNull()){
@@ -49,7 +49,7 @@ bool CInputId::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIn
 }
 
 
-bool CInputId::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::substrate::CInputId::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant idData = model.GetData("id", modelIndex);
 	if (!idData.isNull()){
@@ -60,7 +60,7 @@ bool CInputId::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int mode
 }
 
 
-bool CInputId::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::substrate::CInputId::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!id){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
@@ -75,7 +75,7 @@ bool CInputId::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 }
 
 
-bool CInputId::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::substrate::CInputId::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("id") || (gqlObject["id"].userType() != QMetaType::QString && gqlObject["id"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
@@ -88,7 +88,7 @@ bool CInputId::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 }
 
 
-bool CInputId::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::substrate::CInputId::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("id") && (gqlObject["id"].userType() == QMetaType::QString || gqlObject["id"].userType() == QMetaType::QByteArray)){
 		id = gqlObject["id"].toByteArray();
@@ -98,7 +98,7 @@ bool CInputId::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObje
 }
 
 
-bool CInputId::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::substrate::CInputId::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!id){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
@@ -113,7 +113,7 @@ bool CInputId::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CInputId::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::substrate::CInputId::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("id") || ! jsonObject["id"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
@@ -126,7 +126,7 @@ bool CInputId::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CInputId::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::substrate::CInputId::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("id") && jsonObject["id"].isString()){
 		id = jsonObject["id"].toString().toUtf8();
@@ -136,7 +136,7 @@ bool CInputId::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CCollectionViewParamsTest::GetVersionId()
 {
@@ -152,7 +152,7 @@ bool CCollectionViewParamsTest::operator==(const CCollectionViewParamsTest& othe
 }
 
 
-bool CCollectionViewParamsTest::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::substrate::CCollectionViewParamsTest::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "CollectionViewParamsTest", modelIndex);
 
@@ -169,7 +169,7 @@ bool CCollectionViewParamsTest::WriteToModel(::imtbase::CTreeItemModel& model, i
 }
 
 
-bool CCollectionViewParamsTest::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::substrate::CCollectionViewParamsTest::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant countData = model.GetData("count", modelIndex);
 	if (!countData.isNull()){
@@ -185,7 +185,7 @@ bool CCollectionViewParamsTest::ReadFromModel(const ::imtbase::CTreeItemModel& m
 }
 
 
-bool CCollectionViewParamsTest::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::substrate::CCollectionViewParamsTest::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant countData = model.GetData("count", modelIndex);
 	if (!countData.isNull()){
@@ -201,7 +201,7 @@ bool CCollectionViewParamsTest::OptReadFromModel(const ::imtbase::CTreeItemModel
 }
 
 
-bool CCollectionViewParamsTest::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::substrate::CCollectionViewParamsTest::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (count){
 		gqlObject.InsertParam("count", QVariant(*count));
@@ -217,7 +217,7 @@ bool CCollectionViewParamsTest::WriteToGraphQlObject(::imtgql::CGqlParamObject& 
 }
 
 
-bool CCollectionViewParamsTest::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::substrate::CCollectionViewParamsTest::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("count") && (gqlObject["count"].userType() == QMetaType::Int || gqlObject["count"].userType() == QMetaType::UInt || gqlObject["count"].userType() == QMetaType::LongLong || gqlObject["count"].userType() == QMetaType::ULongLong || gqlObject["count"].userType() == QMetaType::Long || gqlObject["count"].userType() == QMetaType::Short || gqlObject["count"].userType() == QMetaType::ULong || gqlObject["count"].userType() == QMetaType::UShort || gqlObject["count"].userType() == QMetaType::UChar)){
 		count = gqlObject["count"].toInt();
@@ -231,7 +231,7 @@ bool CCollectionViewParamsTest::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 }
 
 
-bool CCollectionViewParamsTest::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::substrate::CCollectionViewParamsTest::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("count") && (gqlObject["count"].userType() == QMetaType::Int || gqlObject["count"].userType() == QMetaType::UInt || gqlObject["count"].userType() == QMetaType::LongLong || gqlObject["count"].userType() == QMetaType::ULongLong || gqlObject["count"].userType() == QMetaType::Long || gqlObject["count"].userType() == QMetaType::Short || gqlObject["count"].userType() == QMetaType::ULong || gqlObject["count"].userType() == QMetaType::UShort || gqlObject["count"].userType() == QMetaType::UChar)){
 		count = gqlObject["count"].toInt();
@@ -245,7 +245,7 @@ bool CCollectionViewParamsTest::OptReadFromGraphQlObject(const ::imtgql::CGqlPar
 }
 
 
-bool CCollectionViewParamsTest::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::substrate::CCollectionViewParamsTest::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (count){
 		jsonObject["count"] = QJsonValue::fromVariant(*count);
@@ -261,7 +261,7 @@ bool CCollectionViewParamsTest::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CCollectionViewParamsTest::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::substrate::CCollectionViewParamsTest::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("count") && jsonObject["count"].isDouble()){
 		count = jsonObject["count"].toInt();
@@ -275,7 +275,7 @@ bool CCollectionViewParamsTest::ReadFromJsonObject(const QJsonObject& jsonObject
 }
 
 
-bool CCollectionViewParamsTest::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::substrate::CCollectionViewParamsTest::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("count") && jsonObject["count"].isDouble()){
 		count = jsonObject["count"].toInt();
@@ -289,7 +289,7 @@ bool CCollectionViewParamsTest::OptReadFromJsonObject(const QJsonObject& jsonObj
 }
 
 
-// serialize methods
+
 
 QByteArray CSubstrateSpecificationDocumentTypeIds::GetVersionId()
 {
@@ -306,7 +306,7 @@ bool CSubstrateSpecificationDocumentTypeIds::operator==(const CSubstrateSpecific
 }
 
 
-bool CSubstrateSpecificationDocumentTypeIds::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::substrate::CSubstrateSpecificationDocumentTypeIds::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "SubstrateSpecificationDocumentTypeIds", modelIndex);
 
@@ -327,7 +327,7 @@ bool CSubstrateSpecificationDocumentTypeIds::WriteToModel(::imtbase::CTreeItemMo
 }
 
 
-bool CSubstrateSpecificationDocumentTypeIds::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::substrate::CSubstrateSpecificationDocumentTypeIds::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant paperIDData = model.GetData("PaperID", modelIndex);
 	if (!paperIDData.isNull()){
@@ -348,7 +348,7 @@ bool CSubstrateSpecificationDocumentTypeIds::ReadFromModel(const ::imtbase::CTre
 }
 
 
-bool CSubstrateSpecificationDocumentTypeIds::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::substrate::CSubstrateSpecificationDocumentTypeIds::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant paperIDData = model.GetData("PaperID", modelIndex);
 	if (!paperIDData.isNull()){
@@ -369,7 +369,7 @@ bool CSubstrateSpecificationDocumentTypeIds::OptReadFromModel(const ::imtbase::C
 }
 
 
-bool CSubstrateSpecificationDocumentTypeIds::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::substrate::CSubstrateSpecificationDocumentTypeIds::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (PaperID){
 		gqlObject.InsertParam("PaperID", QVariant(*PaperID));
@@ -389,7 +389,7 @@ bool CSubstrateSpecificationDocumentTypeIds::WriteToGraphQlObject(::imtgql::CGql
 }
 
 
-bool CSubstrateSpecificationDocumentTypeIds::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::substrate::CSubstrateSpecificationDocumentTypeIds::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("PaperID") && (gqlObject["PaperID"].userType() == QMetaType::QString || gqlObject["PaperID"].userType() == QMetaType::QByteArray)){
 		PaperID = gqlObject["PaperID"].toByteArray();
@@ -407,7 +407,7 @@ bool CSubstrateSpecificationDocumentTypeIds::ReadFromGraphQlObject(const ::imtgq
 }
 
 
-bool CSubstrateSpecificationDocumentTypeIds::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::substrate::CSubstrateSpecificationDocumentTypeIds::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("PaperID") && (gqlObject["PaperID"].userType() == QMetaType::QString || gqlObject["PaperID"].userType() == QMetaType::QByteArray)){
 		PaperID = gqlObject["PaperID"].toByteArray();
@@ -425,7 +425,7 @@ bool CSubstrateSpecificationDocumentTypeIds::OptReadFromGraphQlObject(const ::im
 }
 
 
-bool CSubstrateSpecificationDocumentTypeIds::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::substrate::CSubstrateSpecificationDocumentTypeIds::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (PaperID){
 		jsonObject["PaperID"] = QString::fromUtf8(*PaperID);
@@ -445,7 +445,7 @@ bool CSubstrateSpecificationDocumentTypeIds::WriteToJsonObject(QJsonObject& json
 }
 
 
-bool CSubstrateSpecificationDocumentTypeIds::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::substrate::CSubstrateSpecificationDocumentTypeIds::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("PaperID") && jsonObject["PaperID"].isString()){
 		PaperID = jsonObject["PaperID"].toString().toUtf8();
@@ -463,7 +463,7 @@ bool CSubstrateSpecificationDocumentTypeIds::ReadFromJsonObject(const QJsonObjec
 }
 
 
-bool CSubstrateSpecificationDocumentTypeIds::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::substrate::CSubstrateSpecificationDocumentTypeIds::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("PaperID") && jsonObject["PaperID"].isString()){
 		PaperID = jsonObject["PaperID"].toString().toUtf8();
@@ -481,7 +481,7 @@ bool CSubstrateSpecificationDocumentTypeIds::OptReadFromJsonObject(const QJsonOb
 }
 
 
-// serialize methods
+
 
 QByteArray CSubstrateSpecificationListInput::GetVersionId()
 {
@@ -496,7 +496,7 @@ bool CSubstrateSpecificationListInput::operator==(const CSubstrateSpecificationL
 }
 
 
-bool CSubstrateSpecificationListInput::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::substrate::CSubstrateSpecificationListInput::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "SubstrateSpecificationListInput", modelIndex);
 
@@ -516,11 +516,11 @@ bool CSubstrateSpecificationListInput::WriteToModel(::imtbase::CTreeItemModel& m
 }
 
 
-bool CSubstrateSpecificationListInput::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::substrate::CSubstrateSpecificationListInput::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* viewParamsDataModelPtr = model.GetTreeItemModel("viewParams", modelIndex);
 	if (viewParamsDataModelPtr != nullptr){
-		viewParams = CCollectionViewParamsTest();
+		viewParams = V1_0::substrate::CCollectionViewParamsTest();
 		const bool isViewParamsRead = viewParams->ReadFromModel(*viewParamsDataModelPtr, modelIndex);
 		if (!isViewParamsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
@@ -533,11 +533,11 @@ bool CSubstrateSpecificationListInput::ReadFromModel(const ::imtbase::CTreeItemM
 }
 
 
-bool CSubstrateSpecificationListInput::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::substrate::CSubstrateSpecificationListInput::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* viewParamsDataModelPtr = model.GetTreeItemModel("viewParams", modelIndex);
 	if (viewParamsDataModelPtr != nullptr){
-		viewParams = CCollectionViewParamsTest();
+		viewParams = V1_0::substrate::CCollectionViewParamsTest();
 		const bool isViewParamsRead = viewParams->ReadFromModel(*viewParamsDataModelPtr, modelIndex);
 		if (!isViewParamsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
@@ -550,7 +550,7 @@ bool CSubstrateSpecificationListInput::OptReadFromModel(const ::imtbase::CTreeIt
 }
 
 
-bool CSubstrateSpecificationListInput::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::substrate::CSubstrateSpecificationListInput::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (viewParams){
 		::imtgql::CGqlParamObject viewParamsGqlObject;
@@ -569,10 +569,10 @@ bool CSubstrateSpecificationListInput::WriteToGraphQlObject(::imtgql::CGqlParamO
 }
 
 
-bool CSubstrateSpecificationListInput::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::substrate::CSubstrateSpecificationListInput::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("viewParams") && (gqlObject.GetParamArgumentObjectPtr("viewParams") != nullptr)){
-		viewParams = CCollectionViewParamsTest();
+		viewParams = V1_0::substrate::CCollectionViewParamsTest();
 		const bool isViewParamsRead = viewParams->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("viewParams"));
 		if (!isViewParamsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
@@ -585,10 +585,10 @@ bool CSubstrateSpecificationListInput::ReadFromGraphQlObject(const ::imtgql::CGq
 }
 
 
-bool CSubstrateSpecificationListInput::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::substrate::CSubstrateSpecificationListInput::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("viewParams") && (gqlObject.GetParamArgumentObjectPtr("viewParams") != nullptr)){
-		viewParams = CCollectionViewParamsTest();
+		viewParams = V1_0::substrate::CCollectionViewParamsTest();
 		const bool isViewParamsRead = viewParams->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("viewParams"));
 		if (!isViewParamsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
@@ -601,7 +601,7 @@ bool CSubstrateSpecificationListInput::OptReadFromGraphQlObject(const ::imtgql::
 }
 
 
-bool CSubstrateSpecificationListInput::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::substrate::CSubstrateSpecificationListInput::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (viewParams){
 		QJsonObject viewParamsJsonObject;
@@ -620,10 +620,10 @@ bool CSubstrateSpecificationListInput::WriteToJsonObject(QJsonObject& jsonObject
 }
 
 
-bool CSubstrateSpecificationListInput::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::substrate::CSubstrateSpecificationListInput::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("viewParams") && jsonObject["viewParams"].isObject()){
-		viewParams = CCollectionViewParamsTest();
+		viewParams = V1_0::substrate::CCollectionViewParamsTest();
 		const bool isViewParamsRead = viewParams->ReadFromJsonObject(jsonObject["viewParams"].toObject());
 		if (!isViewParamsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
@@ -636,10 +636,10 @@ bool CSubstrateSpecificationListInput::ReadFromJsonObject(const QJsonObject& jso
 }
 
 
-bool CSubstrateSpecificationListInput::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::substrate::CSubstrateSpecificationListInput::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("viewParams") && jsonObject["viewParams"].isObject()){
-		viewParams = CCollectionViewParamsTest();
+		viewParams = V1_0::substrate::CCollectionViewParamsTest();
 		const bool isViewParamsRead = viewParams->OptReadFromJsonObject(jsonObject["viewParams"].toObject());
 		if (!isViewParamsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "viewParams").toLocal8Bit().constData();)
@@ -652,7 +652,7 @@ bool CSubstrateSpecificationListInput::OptReadFromJsonObject(const QJsonObject& 
 }
 
 
-// serialize methods
+
 
 QByteArray CSubstrateSpecificationListItem::GetVersionId()
 {
@@ -674,7 +674,7 @@ bool CSubstrateSpecificationListItem::operator==(const CSubstrateSpecificationLi
 }
 
 
-bool CSubstrateSpecificationListItem::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::substrate::CSubstrateSpecificationListItem::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "SubstrateSpecificationListItem", modelIndex);
 
@@ -724,7 +724,7 @@ bool CSubstrateSpecificationListItem::WriteToModel(::imtbase::CTreeItemModel& mo
 }
 
 
-bool CSubstrateSpecificationListItem::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::substrate::CSubstrateSpecificationListItem::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant idData = model.GetData("id", modelIndex);
 	if (idData.isNull()){
@@ -779,7 +779,7 @@ bool CSubstrateSpecificationListItem::ReadFromModel(const ::imtbase::CTreeItemMo
 }
 
 
-bool CSubstrateSpecificationListItem::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::substrate::CSubstrateSpecificationListItem::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant idData = model.GetData("id", modelIndex);
 	if (!idData.isNull()){
@@ -825,7 +825,7 @@ bool CSubstrateSpecificationListItem::OptReadFromModel(const ::imtbase::CTreeIte
 }
 
 
-bool CSubstrateSpecificationListItem::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::substrate::CSubstrateSpecificationListItem::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!id){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
@@ -874,7 +874,7 @@ bool CSubstrateSpecificationListItem::WriteToGraphQlObject(::imtgql::CGqlParamOb
 }
 
 
-bool CSubstrateSpecificationListItem::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::substrate::CSubstrateSpecificationListItem::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("id") || (gqlObject["id"].userType() != QMetaType::QString && gqlObject["id"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
@@ -921,7 +921,7 @@ bool CSubstrateSpecificationListItem::ReadFromGraphQlObject(const ::imtgql::CGql
 }
 
 
-bool CSubstrateSpecificationListItem::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::substrate::CSubstrateSpecificationListItem::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("id") && (gqlObject["id"].userType() == QMetaType::QString || gqlObject["id"].userType() == QMetaType::QByteArray)){
 		id = gqlObject["id"].toByteArray();
@@ -959,7 +959,7 @@ bool CSubstrateSpecificationListItem::OptReadFromGraphQlObject(const ::imtgql::C
 }
 
 
-bool CSubstrateSpecificationListItem::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::substrate::CSubstrateSpecificationListItem::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!id){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
@@ -1008,7 +1008,7 @@ bool CSubstrateSpecificationListItem::WriteToJsonObject(QJsonObject& jsonObject)
 }
 
 
-bool CSubstrateSpecificationListItem::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::substrate::CSubstrateSpecificationListItem::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("id") || ! jsonObject["id"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
@@ -1055,7 +1055,7 @@ bool CSubstrateSpecificationListItem::ReadFromJsonObject(const QJsonObject& json
 }
 
 
-bool CSubstrateSpecificationListItem::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::substrate::CSubstrateSpecificationListItem::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("id") && jsonObject["id"].isString()){
 		id = jsonObject["id"].toString().toUtf8();
@@ -1093,7 +1093,7 @@ bool CSubstrateSpecificationListItem::OptReadFromJsonObject(const QJsonObject& j
 }
 
 
-// serialize methods
+
 
 QByteArray CSubstrateSpecificationListResponse::GetVersionId()
 {
@@ -1108,7 +1108,7 @@ bool CSubstrateSpecificationListResponse::operator==(const CSubstrateSpecificati
 }
 
 
-bool CSubstrateSpecificationListResponse::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::substrate::CSubstrateSpecificationListResponse::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "SubstrateSpecificationListResponse", modelIndex);
 
@@ -1129,14 +1129,14 @@ bool CSubstrateSpecificationListResponse::WriteToModel(::imtbase::CTreeItemModel
 }
 
 
-bool CSubstrateSpecificationListResponse::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::substrate::CSubstrateSpecificationListResponse::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* itemsModel = model.GetTreeItemModel("items", modelIndex);
 	if (itemsModel != nullptr){
 		int itemsCount = itemsModel->GetItemsCount();
-		imtsdl::TElementList<CSubstrateSpecificationListItem> itemsList;
+		imtsdl::TElementList<V1_0::substrate::CSubstrateSpecificationListItem> itemsList;
 		for (int itemsIndex = 0; itemsIndex < itemsCount; ++itemsIndex){
-			CSubstrateSpecificationListItem t_items;
+			V1_0::substrate::CSubstrateSpecificationListItem t_items;
 			if (!t_items.ReadFromModel(*itemsModel, itemsIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
@@ -1152,14 +1152,14 @@ bool CSubstrateSpecificationListResponse::ReadFromModel(const ::imtbase::CTreeIt
 }
 
 
-bool CSubstrateSpecificationListResponse::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::substrate::CSubstrateSpecificationListResponse::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* itemsModel = model.GetTreeItemModel("items", modelIndex);
 	if (itemsModel != nullptr){
 		int itemsCount = itemsModel->GetItemsCount();
-		imtsdl::TElementList<CSubstrateSpecificationListItem> itemsList;
+		imtsdl::TElementList<V1_0::substrate::CSubstrateSpecificationListItem> itemsList;
 		for (int itemsIndex = 0; itemsIndex < itemsCount; ++itemsIndex){
-			CSubstrateSpecificationListItem t_items;
+			V1_0::substrate::CSubstrateSpecificationListItem t_items;
 			if (!t_items.OptReadFromModel(*itemsModel, itemsIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
@@ -1175,7 +1175,7 @@ bool CSubstrateSpecificationListResponse::OptReadFromModel(const ::imtbase::CTre
 }
 
 
-bool CSubstrateSpecificationListResponse::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::substrate::CSubstrateSpecificationListResponse::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (items){
 		QList<::imtgql::CGqlParamObject> itemsDataObjectList;
@@ -1197,21 +1197,21 @@ bool CSubstrateSpecificationListResponse::WriteToGraphQlObject(::imtgql::CGqlPar
 }
 
 
-bool CSubstrateSpecificationListResponse::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::substrate::CSubstrateSpecificationListResponse::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("items")){
 		items.emplace();
 	}
 	if (gqlObject.ContainsParam("items") && (gqlObject.GetObjectsCount("items") > 0)){
 		const qsizetype itemsElementsCount = gqlObject.GetObjectsCount("items");
-		items = imtsdl::TElementList<CSubstrateSpecificationListItem>();
+		items = imtsdl::TElementList<V1_0::substrate::CSubstrateSpecificationListItem>();
 		for (qsizetype itemsIndex = 0; itemsIndex < itemsElementsCount; ++itemsIndex){
 			const ::imtgql::CGqlParamObject* itemsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("items", itemsIndex);
 			if (itemsDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << itemsDataObjectPtr;
 				return false;
 			}
-			CSubstrateSpecificationListItem tempItems;
+			V1_0::substrate::CSubstrateSpecificationListItem tempItems;
 			if (!tempItems.ReadFromGraphQlObject(*itemsDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
@@ -1225,21 +1225,21 @@ bool CSubstrateSpecificationListResponse::ReadFromGraphQlObject(const ::imtgql::
 }
 
 
-bool CSubstrateSpecificationListResponse::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::substrate::CSubstrateSpecificationListResponse::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("items")){
 		items.emplace();
 	}
 	if (gqlObject.ContainsParam("items") && (gqlObject.GetObjectsCount("items") > 0)){
 		const qsizetype itemsElementsCount = gqlObject.GetObjectsCount("items");
-		items = imtsdl::TElementList<CSubstrateSpecificationListItem>();
+		items = imtsdl::TElementList<V1_0::substrate::CSubstrateSpecificationListItem>();
 		for (qsizetype itemsIndex = 0; itemsIndex < itemsElementsCount; ++itemsIndex){
 			const ::imtgql::CGqlParamObject* itemsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("items", itemsIndex);
 			if (itemsDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << itemsDataObjectPtr;
 				return false;
 			}
-			CSubstrateSpecificationListItem tempItems;
+			V1_0::substrate::CSubstrateSpecificationListItem tempItems;
 			if (!tempItems.OptReadFromGraphQlObject(*itemsDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
@@ -1253,7 +1253,7 @@ bool CSubstrateSpecificationListResponse::OptReadFromGraphQlObject(const ::imtgq
 }
 
 
-bool CSubstrateSpecificationListResponse::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::substrate::CSubstrateSpecificationListResponse::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (items){
 		QJsonArray newItemsArray;
@@ -1275,14 +1275,14 @@ bool CSubstrateSpecificationListResponse::WriteToJsonObject(QJsonObject& jsonObj
 }
 
 
-bool CSubstrateSpecificationListResponse::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::substrate::CSubstrateSpecificationListResponse::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("items") && jsonObject["items"].isArray()){
 		const QJsonArray itemsJsonArray = jsonObject["items"].toArray();
 		const qsizetype itemsArrayCount = itemsJsonArray.size();
-		items = imtsdl::TElementList<CSubstrateSpecificationListItem>();
+		items = imtsdl::TElementList<V1_0::substrate::CSubstrateSpecificationListItem>();
 		for (qsizetype itemsIndex = 0; itemsIndex < itemsArrayCount; ++itemsIndex){
-			CSubstrateSpecificationListItem tempItems;
+			V1_0::substrate::CSubstrateSpecificationListItem tempItems;
 			if (!tempItems.ReadFromJsonObject(itemsJsonArray[itemsIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
@@ -1296,14 +1296,14 @@ bool CSubstrateSpecificationListResponse::ReadFromJsonObject(const QJsonObject& 
 }
 
 
-bool CSubstrateSpecificationListResponse::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::substrate::CSubstrateSpecificationListResponse::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("items") && jsonObject["items"].isArray()){
 		const QJsonArray itemsJsonArray = jsonObject["items"].toArray();
 		const qsizetype itemsArrayCount = itemsJsonArray.size();
-		items = imtsdl::TElementList<CSubstrateSpecificationListItem>();
+		items = imtsdl::TElementList<V1_0::substrate::CSubstrateSpecificationListItem>();
 		for (qsizetype itemsIndex = 0; itemsIndex < itemsArrayCount; ++itemsIndex){
-			CSubstrateSpecificationListItem tempItems;
+			V1_0::substrate::CSubstrateSpecificationListItem tempItems;
 			if (!tempItems.OptReadFromJsonObject(itemsJsonArray[itemsIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "items").toLocal8Bit().constData();)
 
@@ -1317,7 +1317,7 @@ bool CSubstrateSpecificationListResponse::OptReadFromJsonObject(const QJsonObjec
 }
 
 
-// serialize methods
+
 
 QByteArray CCardboardSubstrateSpecification::GetVersionId()
 {
@@ -1335,7 +1335,7 @@ bool CCardboardSubstrateSpecification::operator==(const CCardboardSubstrateSpeci
 }
 
 
-bool CCardboardSubstrateSpecification::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::substrate::CCardboardSubstrateSpecification::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "CardboardSubstrateSpecification", modelIndex);
 
@@ -1352,7 +1352,7 @@ bool CCardboardSubstrateSpecification::WriteToModel(::imtbase::CTreeItemModel& m
 }
 
 
-bool CCardboardSubstrateSpecification::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::substrate::CCardboardSubstrateSpecification::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant colorData = model.GetData("color", modelIndex);
 	if (!colorData.isNull()){
@@ -1368,7 +1368,7 @@ bool CCardboardSubstrateSpecification::ReadFromModel(const ::imtbase::CTreeItemM
 }
 
 
-bool CCardboardSubstrateSpecification::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::substrate::CCardboardSubstrateSpecification::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant colorData = model.GetData("color", modelIndex);
 	if (!colorData.isNull()){
@@ -1384,7 +1384,7 @@ bool CCardboardSubstrateSpecification::OptReadFromModel(const ::imtbase::CTreeIt
 }
 
 
-bool CCardboardSubstrateSpecification::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::substrate::CCardboardSubstrateSpecification::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (color){
 		gqlObject.InsertParam("color", QVariant(*color));
@@ -1400,7 +1400,7 @@ bool CCardboardSubstrateSpecification::WriteToGraphQlObject(::imtgql::CGqlParamO
 }
 
 
-bool CCardboardSubstrateSpecification::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::substrate::CCardboardSubstrateSpecification::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("color") && (gqlObject["color"].userType() == QMetaType::QString || gqlObject["color"].userType() == QMetaType::QByteArray)){
 		color = gqlObject["color"].toString();
@@ -1414,7 +1414,7 @@ bool CCardboardSubstrateSpecification::ReadFromGraphQlObject(const ::imtgql::CGq
 }
 
 
-bool CCardboardSubstrateSpecification::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::substrate::CCardboardSubstrateSpecification::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("color") && (gqlObject["color"].userType() == QMetaType::QString || gqlObject["color"].userType() == QMetaType::QByteArray)){
 		color = gqlObject["color"].toString();
@@ -1428,7 +1428,7 @@ bool CCardboardSubstrateSpecification::OptReadFromGraphQlObject(const ::imtgql::
 }
 
 
-bool CCardboardSubstrateSpecification::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::substrate::CCardboardSubstrateSpecification::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (color){
 		jsonObject["color"] = QJsonValue::fromVariant(*color);
@@ -1444,7 +1444,7 @@ bool CCardboardSubstrateSpecification::WriteToJsonObject(QJsonObject& jsonObject
 }
 
 
-bool CCardboardSubstrateSpecification::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::substrate::CCardboardSubstrateSpecification::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("color") && jsonObject["color"].isString()){
 		color = jsonObject["color"].toString();
@@ -1458,7 +1458,7 @@ bool CCardboardSubstrateSpecification::ReadFromJsonObject(const QJsonObject& jso
 }
 
 
-bool CCardboardSubstrateSpecification::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::substrate::CCardboardSubstrateSpecification::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("color") && jsonObject["color"].isString()){
 		color = jsonObject["color"].toString();
@@ -1472,7 +1472,7 @@ bool CCardboardSubstrateSpecification::OptReadFromJsonObject(const QJsonObject& 
 }
 
 
-// serialize methods
+
 
 QByteArray CPaperSubstrateSpecification::GetVersionId()
 {
@@ -1491,7 +1491,7 @@ bool CPaperSubstrateSpecification::operator==(const CPaperSubstrateSpecification
 }
 
 
-bool CPaperSubstrateSpecification::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::substrate::CPaperSubstrateSpecification::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "PaperSubstrateSpecification", modelIndex);
 
@@ -1512,7 +1512,7 @@ bool CPaperSubstrateSpecification::WriteToModel(::imtbase::CTreeItemModel& model
 }
 
 
-bool CPaperSubstrateSpecification::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::substrate::CPaperSubstrateSpecification::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant grammageData = model.GetData("grammage", modelIndex);
 	if (!grammageData.isNull()){
@@ -1533,7 +1533,7 @@ bool CPaperSubstrateSpecification::ReadFromModel(const ::imtbase::CTreeItemModel
 }
 
 
-bool CPaperSubstrateSpecification::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::substrate::CPaperSubstrateSpecification::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant grammageData = model.GetData("grammage", modelIndex);
 	if (!grammageData.isNull()){
@@ -1554,7 +1554,7 @@ bool CPaperSubstrateSpecification::OptReadFromModel(const ::imtbase::CTreeItemMo
 }
 
 
-bool CPaperSubstrateSpecification::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::substrate::CPaperSubstrateSpecification::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (grammage){
 		gqlObject.InsertParam("grammage", QVariant(*grammage));
@@ -1574,7 +1574,7 @@ bool CPaperSubstrateSpecification::WriteToGraphQlObject(::imtgql::CGqlParamObjec
 }
 
 
-bool CPaperSubstrateSpecification::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::substrate::CPaperSubstrateSpecification::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("grammage") && (gqlObject["grammage"].userType() == QMetaType::Float || gqlObject["grammage"].userType() == QMetaType::Double || gqlObject["grammage"].userType() == QMetaType::Int || gqlObject["grammage"].userType() == QMetaType::UInt || gqlObject["grammage"].userType() == QMetaType::LongLong || gqlObject["grammage"].userType() == QMetaType::ULongLong || gqlObject["grammage"].userType() == QMetaType::Long || gqlObject["grammage"].userType() == QMetaType::Short || gqlObject["grammage"].userType() == QMetaType::ULong || gqlObject["grammage"].userType() == QMetaType::UShort || gqlObject["grammage"].userType() == QMetaType::UChar)){
 		grammage = gqlObject["grammage"].toDouble();
@@ -1592,7 +1592,7 @@ bool CPaperSubstrateSpecification::ReadFromGraphQlObject(const ::imtgql::CGqlPar
 }
 
 
-bool CPaperSubstrateSpecification::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::substrate::CPaperSubstrateSpecification::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("grammage") && (gqlObject["grammage"].userType() == QMetaType::Float || gqlObject["grammage"].userType() == QMetaType::Double || gqlObject["grammage"].userType() == QMetaType::Int || gqlObject["grammage"].userType() == QMetaType::UInt || gqlObject["grammage"].userType() == QMetaType::LongLong || gqlObject["grammage"].userType() == QMetaType::ULongLong || gqlObject["grammage"].userType() == QMetaType::Long || gqlObject["grammage"].userType() == QMetaType::Short || gqlObject["grammage"].userType() == QMetaType::ULong || gqlObject["grammage"].userType() == QMetaType::UShort || gqlObject["grammage"].userType() == QMetaType::UChar)){
 		grammage = gqlObject["grammage"].toDouble();
@@ -1610,7 +1610,7 @@ bool CPaperSubstrateSpecification::OptReadFromGraphQlObject(const ::imtgql::CGql
 }
 
 
-bool CPaperSubstrateSpecification::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::substrate::CPaperSubstrateSpecification::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (grammage){
 		jsonObject["grammage"] = QJsonValue::fromVariant(*grammage);
@@ -1630,7 +1630,7 @@ bool CPaperSubstrateSpecification::WriteToJsonObject(QJsonObject& jsonObject) co
 }
 
 
-bool CPaperSubstrateSpecification::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::substrate::CPaperSubstrateSpecification::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("grammage") && jsonObject["grammage"].isDouble()){
 		grammage = jsonObject["grammage"].toDouble();
@@ -1648,7 +1648,7 @@ bool CPaperSubstrateSpecification::ReadFromJsonObject(const QJsonObject& jsonObj
 }
 
 
-bool CPaperSubstrateSpecification::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::substrate::CPaperSubstrateSpecification::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("grammage") && jsonObject["grammage"].isDouble()){
 		grammage = jsonObject["grammage"].toDouble();
@@ -1666,7 +1666,7 @@ bool CPaperSubstrateSpecification::OptReadFromJsonObject(const QJsonObject& json
 }
 
 
-// serialize methods
+
 
 QByteArray CFilmSubstrateSpecification::GetVersionId()
 {
@@ -1685,7 +1685,7 @@ bool CFilmSubstrateSpecification::operator==(const CFilmSubstrateSpecification& 
 }
 
 
-bool CFilmSubstrateSpecification::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::substrate::CFilmSubstrateSpecification::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "FilmSubstrateSpecification", modelIndex);
 
@@ -1706,7 +1706,7 @@ bool CFilmSubstrateSpecification::WriteToModel(::imtbase::CTreeItemModel& model,
 }
 
 
-bool CFilmSubstrateSpecification::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::substrate::CFilmSubstrateSpecification::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant transparencyData = model.GetData("transparency", modelIndex);
 	if (!transparencyData.isNull()){
@@ -1727,7 +1727,7 @@ bool CFilmSubstrateSpecification::ReadFromModel(const ::imtbase::CTreeItemModel&
 }
 
 
-bool CFilmSubstrateSpecification::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::substrate::CFilmSubstrateSpecification::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant transparencyData = model.GetData("transparency", modelIndex);
 	if (!transparencyData.isNull()){
@@ -1748,7 +1748,7 @@ bool CFilmSubstrateSpecification::OptReadFromModel(const ::imtbase::CTreeItemMod
 }
 
 
-bool CFilmSubstrateSpecification::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::substrate::CFilmSubstrateSpecification::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (transparency){
 		gqlObject.InsertParam("transparency", QVariant(*transparency));
@@ -1768,7 +1768,7 @@ bool CFilmSubstrateSpecification::WriteToGraphQlObject(::imtgql::CGqlParamObject
 }
 
 
-bool CFilmSubstrateSpecification::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::substrate::CFilmSubstrateSpecification::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("transparency") && (gqlObject["transparency"].userType() == QMetaType::Float || gqlObject["transparency"].userType() == QMetaType::Double || gqlObject["transparency"].userType() == QMetaType::Int || gqlObject["transparency"].userType() == QMetaType::UInt || gqlObject["transparency"].userType() == QMetaType::LongLong || gqlObject["transparency"].userType() == QMetaType::ULongLong || gqlObject["transparency"].userType() == QMetaType::Long || gqlObject["transparency"].userType() == QMetaType::Short || gqlObject["transparency"].userType() == QMetaType::ULong || gqlObject["transparency"].userType() == QMetaType::UShort || gqlObject["transparency"].userType() == QMetaType::UChar)){
 		transparency = gqlObject["transparency"].toDouble();
@@ -1786,7 +1786,7 @@ bool CFilmSubstrateSpecification::ReadFromGraphQlObject(const ::imtgql::CGqlPara
 }
 
 
-bool CFilmSubstrateSpecification::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::substrate::CFilmSubstrateSpecification::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("transparency") && (gqlObject["transparency"].userType() == QMetaType::Float || gqlObject["transparency"].userType() == QMetaType::Double || gqlObject["transparency"].userType() == QMetaType::Int || gqlObject["transparency"].userType() == QMetaType::UInt || gqlObject["transparency"].userType() == QMetaType::LongLong || gqlObject["transparency"].userType() == QMetaType::ULongLong || gqlObject["transparency"].userType() == QMetaType::Long || gqlObject["transparency"].userType() == QMetaType::Short || gqlObject["transparency"].userType() == QMetaType::ULong || gqlObject["transparency"].userType() == QMetaType::UShort || gqlObject["transparency"].userType() == QMetaType::UChar)){
 		transparency = gqlObject["transparency"].toDouble();
@@ -1804,7 +1804,7 @@ bool CFilmSubstrateSpecification::OptReadFromGraphQlObject(const ::imtgql::CGqlP
 }
 
 
-bool CFilmSubstrateSpecification::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::substrate::CFilmSubstrateSpecification::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (transparency){
 		jsonObject["transparency"] = QJsonValue::fromVariant(*transparency);
@@ -1824,7 +1824,7 @@ bool CFilmSubstrateSpecification::WriteToJsonObject(QJsonObject& jsonObject) con
 }
 
 
-bool CFilmSubstrateSpecification::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::substrate::CFilmSubstrateSpecification::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("transparency") && jsonObject["transparency"].isDouble()){
 		transparency = jsonObject["transparency"].toDouble();
@@ -1842,7 +1842,7 @@ bool CFilmSubstrateSpecification::ReadFromJsonObject(const QJsonObject& jsonObje
 }
 
 
-bool CFilmSubstrateSpecification::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::substrate::CFilmSubstrateSpecification::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("transparency") && jsonObject["transparency"].isDouble()){
 		transparency = jsonObject["transparency"].toDouble();
@@ -1860,7 +1860,7 @@ bool CFilmSubstrateSpecification::OptReadFromJsonObject(const QJsonObject& jsonO
 }
 
 
-// serialize methods
+
 
 QByteArray CSubstrateSpecificationInput::GetVersionId()
 {
@@ -1879,7 +1879,7 @@ bool CSubstrateSpecificationInput::operator==(const CSubstrateSpecificationInput
 }
 
 
-bool CSubstrateSpecificationInput::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::substrate::CSubstrateSpecificationInput::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "SubstrateSpecificationInput", modelIndex);
 
@@ -1904,7 +1904,7 @@ bool CSubstrateSpecificationInput::WriteToModel(::imtbase::CTreeItemModel& model
 		return false;
 	}
 	QVariant itemVariantValue;
-		if (const CCardboardSubstrateSpecification* cardboardSubstrateSpecificationVal = std::get_if<CCardboardSubstrateSpecification>(item.GetPtr())){
+		if (const V1_0::substrate::CCardboardSubstrateSpecification* cardboardSubstrateSpecificationVal = std::get_if<V1_0::substrate::CCardboardSubstrateSpecification>(item.GetPtr())){
 			if (!cardboardSubstrateSpecificationVal->WriteToModel(*(model.AddTreeModel("item", modelIndex)), 0)){
 				return false;
 			}
@@ -1912,7 +1912,7 @@ bool CSubstrateSpecificationInput::WriteToModel(::imtbase::CTreeItemModel& model
 				model.GetTreeItemModel("item", modelIndex)->SetData("__typename", "CardboardSubstrateSpecification", 0);
 			}
 		}
-		else if (const CPaperSubstrateSpecification* paperSubstrateSpecificationVal = std::get_if<CPaperSubstrateSpecification>(item.GetPtr())){
+		else if (const V1_0::substrate::CPaperSubstrateSpecification* paperSubstrateSpecificationVal = std::get_if<V1_0::substrate::CPaperSubstrateSpecification>(item.GetPtr())){
 			if (!paperSubstrateSpecificationVal->WriteToModel(*(model.AddTreeModel("item", modelIndex)), 0)){
 				return false;
 			}
@@ -1920,7 +1920,7 @@ bool CSubstrateSpecificationInput::WriteToModel(::imtbase::CTreeItemModel& model
 				model.GetTreeItemModel("item", modelIndex)->SetData("__typename", "PaperSubstrateSpecification", 0);
 			}
 		}
-		else if (const CFilmSubstrateSpecification* filmSubstrateSpecificationVal = std::get_if<CFilmSubstrateSpecification>(item.GetPtr())){
+		else if (const V1_0::substrate::CFilmSubstrateSpecification* filmSubstrateSpecificationVal = std::get_if<V1_0::substrate::CFilmSubstrateSpecification>(item.GetPtr())){
 			if (!filmSubstrateSpecificationVal->WriteToModel(*(model.AddTreeModel("item", modelIndex)), 0)){
 				return false;
 			}
@@ -1942,7 +1942,7 @@ bool CSubstrateSpecificationInput::WriteToModel(::imtbase::CTreeItemModel& model
 }
 
 
-bool CSubstrateSpecificationInput::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::substrate::CSubstrateSpecificationInput::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant idData = model.GetData("id", modelIndex);
 	if (idData.isNull()){
@@ -1970,7 +1970,7 @@ bool CSubstrateSpecificationInput::ReadFromModel(const ::imtbase::CTreeItemModel
 	}
 	QString itemTypename = model.GetTreeItemModel("item", modelIndex)->GetData("__typename").toString();
 	if (itemTypename == "CardboardSubstrateSpecification") {
-		CCardboardSubstrateSpecification itemConvert;
+		V1_0::substrate::CCardboardSubstrateSpecification itemConvert;
 		const bool isitemRead = itemConvert.ReadFromModel(*model.GetTreeItemModel("item", modelIndex)); 
 		if (!isitemRead){
 			return false;
@@ -1978,7 +1978,7 @@ bool CSubstrateSpecificationInput::ReadFromModel(const ::imtbase::CTreeItemModel
 		item = SubstrateSpecificationDocument(itemConvert);
 	}
 	else if (itemTypename == "PaperSubstrateSpecification") {
-		CPaperSubstrateSpecification itemConvert;
+		V1_0::substrate::CPaperSubstrateSpecification itemConvert;
 		const bool isitemRead = itemConvert.ReadFromModel(*model.GetTreeItemModel("item", modelIndex)); 
 		if (!isitemRead){
 			return false;
@@ -1986,7 +1986,7 @@ bool CSubstrateSpecificationInput::ReadFromModel(const ::imtbase::CTreeItemModel
 		item = SubstrateSpecificationDocument(itemConvert);
 	}
 	else if (itemTypename == "FilmSubstrateSpecification") {
-		CFilmSubstrateSpecification itemConvert;
+		V1_0::substrate::CFilmSubstrateSpecification itemConvert;
 		const bool isitemRead = itemConvert.ReadFromModel(*model.GetTreeItemModel("item", modelIndex)); 
 		if (!isitemRead){
 			return false;
@@ -2006,7 +2006,7 @@ bool CSubstrateSpecificationInput::ReadFromModel(const ::imtbase::CTreeItemModel
 }
 
 
-bool CSubstrateSpecificationInput::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::substrate::CSubstrateSpecificationInput::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant idData = model.GetData("id", modelIndex);
 	if (!idData.isNull()){
@@ -2027,7 +2027,7 @@ bool CSubstrateSpecificationInput::OptReadFromModel(const ::imtbase::CTreeItemMo
 	if (!itemData.isNull()){
 		QString itemTypename = model.GetTreeItemModel("item", modelIndex)->GetData("__typename").toString();
 		if (itemTypename == "CardboardSubstrateSpecification") {
-			CCardboardSubstrateSpecification itemConvert;
+			V1_0::substrate::CCardboardSubstrateSpecification itemConvert;
 			const bool isitemRead = itemConvert.ReadFromModel(*model.GetTreeItemModel("item", modelIndex)); 
 			if (!isitemRead){
 				return false;
@@ -2035,7 +2035,7 @@ bool CSubstrateSpecificationInput::OptReadFromModel(const ::imtbase::CTreeItemMo
 			item = SubstrateSpecificationDocument(itemConvert);
 		}
 		else if (itemTypename == "PaperSubstrateSpecification") {
-			CPaperSubstrateSpecification itemConvert;
+			V1_0::substrate::CPaperSubstrateSpecification itemConvert;
 			const bool isitemRead = itemConvert.ReadFromModel(*model.GetTreeItemModel("item", modelIndex)); 
 			if (!isitemRead){
 				return false;
@@ -2043,7 +2043,7 @@ bool CSubstrateSpecificationInput::OptReadFromModel(const ::imtbase::CTreeItemMo
 			item = SubstrateSpecificationDocument(itemConvert);
 		}
 		else if (itemTypename == "FilmSubstrateSpecification") {
-			CFilmSubstrateSpecification itemConvert;
+			V1_0::substrate::CFilmSubstrateSpecification itemConvert;
 			const bool isitemRead = itemConvert.ReadFromModel(*model.GetTreeItemModel("item", modelIndex)); 
 			if (!isitemRead){
 				return false;
@@ -2061,7 +2061,7 @@ bool CSubstrateSpecificationInput::OptReadFromModel(const ::imtbase::CTreeItemMo
 }
 
 
-bool CSubstrateSpecificationInput::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::substrate::CSubstrateSpecificationInput::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!id){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
@@ -2084,19 +2084,19 @@ bool CSubstrateSpecificationInput::WriteToGraphQlObject(::imtgql::CGqlParamObjec
 		return false;
 	}
 	::imtgql::CGqlParamObject itemDataObject;
-	if (const CCardboardSubstrateSpecification* cardboardSubstrateSpecificationVal = std::get_if<CCardboardSubstrateSpecification>(item.GetPtr())){
+	if (const V1_0::substrate::CCardboardSubstrateSpecification* cardboardSubstrateSpecificationVal = std::get_if<V1_0::substrate::CCardboardSubstrateSpecification>(item.GetPtr())){
 		if (!cardboardSubstrateSpecificationVal->WriteToGraphQlObject(itemDataObject)){
 			return false;
 		}
 		itemDataObject.InsertParam("__typename", QVariant("CardboardSubstrateSpecification"));
 	}
-	else if (const CPaperSubstrateSpecification* paperSubstrateSpecificationVal = std::get_if<CPaperSubstrateSpecification>(item.GetPtr())){
+	else if (const V1_0::substrate::CPaperSubstrateSpecification* paperSubstrateSpecificationVal = std::get_if<V1_0::substrate::CPaperSubstrateSpecification>(item.GetPtr())){
 		if (!paperSubstrateSpecificationVal->WriteToGraphQlObject(itemDataObject)){
 			return false;
 		}
 		itemDataObject.InsertParam("__typename", QVariant("PaperSubstrateSpecification"));
 	}
-	else if (const CFilmSubstrateSpecification* filmSubstrateSpecificationVal = std::get_if<CFilmSubstrateSpecification>(item.GetPtr())){
+	else if (const V1_0::substrate::CFilmSubstrateSpecification* filmSubstrateSpecificationVal = std::get_if<V1_0::substrate::CFilmSubstrateSpecification>(item.GetPtr())){
 		if (!filmSubstrateSpecificationVal->WriteToGraphQlObject(itemDataObject)){
 			return false;
 		}
@@ -2117,7 +2117,7 @@ bool CSubstrateSpecificationInput::WriteToGraphQlObject(::imtgql::CGqlParamObjec
 }
 
 
-bool CSubstrateSpecificationInput::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::substrate::CSubstrateSpecificationInput::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("id") || (gqlObject["id"].userType() != QMetaType::QString && gqlObject["id"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
@@ -2147,7 +2147,7 @@ bool CSubstrateSpecificationInput::ReadFromGraphQlObject(const ::imtgql::CGqlPar
 	}
 	QString itemTypename = itemDataObjectPtr->GetParamArgumentValue("__typename").toString();
 	if (itemTypename == "CardboardSubstrateSpecification") {
-		CCardboardSubstrateSpecification itemConvert;
+		V1_0::substrate::CCardboardSubstrateSpecification itemConvert;
 		const bool isItemRead = itemConvert.ReadFromGraphQlObject(*itemDataObjectPtr);
 		if (!isItemRead){
 			return false;
@@ -2155,7 +2155,7 @@ bool CSubstrateSpecificationInput::ReadFromGraphQlObject(const ::imtgql::CGqlPar
 		item = SubstrateSpecificationDocument(itemConvert);
 	}
 	else if (itemTypename == "PaperSubstrateSpecification") {
-		CPaperSubstrateSpecification itemConvert;
+		V1_0::substrate::CPaperSubstrateSpecification itemConvert;
 		const bool isItemRead = itemConvert.ReadFromGraphQlObject(*itemDataObjectPtr);
 		if (!isItemRead){
 			return false;
@@ -2163,7 +2163,7 @@ bool CSubstrateSpecificationInput::ReadFromGraphQlObject(const ::imtgql::CGqlPar
 		item = SubstrateSpecificationDocument(itemConvert);
 	}
 	else if (itemTypename == "FilmSubstrateSpecification") {
-		CFilmSubstrateSpecification itemConvert;
+		V1_0::substrate::CFilmSubstrateSpecification itemConvert;
 		const bool isItemRead = itemConvert.ReadFromGraphQlObject(*itemDataObjectPtr);
 		if (!isItemRead){
 			return false;
@@ -2182,7 +2182,7 @@ bool CSubstrateSpecificationInput::ReadFromGraphQlObject(const ::imtgql::CGqlPar
 }
 
 
-bool CSubstrateSpecificationInput::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::substrate::CSubstrateSpecificationInput::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("id") && (gqlObject["id"].userType() == QMetaType::QString || gqlObject["id"].userType() == QMetaType::QByteArray)){
 		id = gqlObject["id"].toByteArray();
@@ -2205,7 +2205,7 @@ bool CSubstrateSpecificationInput::OptReadFromGraphQlObject(const ::imtgql::CGql
 		}
 		QString itemTypename = itemDataObjectPtr->GetParamArgumentValue("__typename").toString();
 		if (itemTypename == "CardboardSubstrateSpecification") {
-			CCardboardSubstrateSpecification itemConvert;
+			V1_0::substrate::CCardboardSubstrateSpecification itemConvert;
 			const bool isItemRead = itemConvert.ReadFromGraphQlObject(*itemDataObjectPtr);
 			if (!isItemRead){
 				return false;
@@ -2213,7 +2213,7 @@ bool CSubstrateSpecificationInput::OptReadFromGraphQlObject(const ::imtgql::CGql
 			item = SubstrateSpecificationDocument(itemConvert);
 		}
 		else if (itemTypename == "PaperSubstrateSpecification") {
-			CPaperSubstrateSpecification itemConvert;
+			V1_0::substrate::CPaperSubstrateSpecification itemConvert;
 			const bool isItemRead = itemConvert.ReadFromGraphQlObject(*itemDataObjectPtr);
 			if (!isItemRead){
 				return false;
@@ -2221,7 +2221,7 @@ bool CSubstrateSpecificationInput::OptReadFromGraphQlObject(const ::imtgql::CGql
 			item = SubstrateSpecificationDocument(itemConvert);
 		}
 		else if (itemTypename == "FilmSubstrateSpecification") {
-			CFilmSubstrateSpecification itemConvert;
+			V1_0::substrate::CFilmSubstrateSpecification itemConvert;
 			const bool isItemRead = itemConvert.ReadFromGraphQlObject(*itemDataObjectPtr);
 			if (!isItemRead){
 				return false;
@@ -2238,7 +2238,7 @@ bool CSubstrateSpecificationInput::OptReadFromGraphQlObject(const ::imtgql::CGql
 }
 
 
-bool CSubstrateSpecificationInput::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::substrate::CSubstrateSpecificationInput::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!id){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
@@ -2260,7 +2260,7 @@ bool CSubstrateSpecificationInput::WriteToJsonObject(QJsonObject& jsonObject) co
 
 		return false;
 	}
-	if (const CCardboardSubstrateSpecification* cardboardSubstrateSpecificationVal = std::get_if<CCardboardSubstrateSpecification>(item.GetPtr())){
+	if (const V1_0::substrate::CCardboardSubstrateSpecification* cardboardSubstrateSpecificationVal = std::get_if<V1_0::substrate::CCardboardSubstrateSpecification>(item.GetPtr())){
 		QJsonObject itemJsonObject;
 		const bool isitemAdded = cardboardSubstrateSpecificationVal->WriteToJsonObject(itemJsonObject);
 		if (!isitemAdded){
@@ -2269,7 +2269,7 @@ bool CSubstrateSpecificationInput::WriteToJsonObject(QJsonObject& jsonObject) co
 		itemJsonObject["__typename"] = "CardboardSubstrateSpecification";
 		jsonObject["item"] = itemJsonObject;
 	}
-	else if (const CPaperSubstrateSpecification* paperSubstrateSpecificationVal = std::get_if<CPaperSubstrateSpecification>(item.GetPtr())){
+	else if (const V1_0::substrate::CPaperSubstrateSpecification* paperSubstrateSpecificationVal = std::get_if<V1_0::substrate::CPaperSubstrateSpecification>(item.GetPtr())){
 		QJsonObject itemJsonObject;
 		const bool isitemAdded = paperSubstrateSpecificationVal->WriteToJsonObject(itemJsonObject);
 		if (!isitemAdded){
@@ -2278,7 +2278,7 @@ bool CSubstrateSpecificationInput::WriteToJsonObject(QJsonObject& jsonObject) co
 		itemJsonObject["__typename"] = "PaperSubstrateSpecification";
 		jsonObject["item"] = itemJsonObject;
 	}
-	else if (const CFilmSubstrateSpecification* filmSubstrateSpecificationVal = std::get_if<CFilmSubstrateSpecification>(item.GetPtr())){
+	else if (const V1_0::substrate::CFilmSubstrateSpecification* filmSubstrateSpecificationVal = std::get_if<V1_0::substrate::CFilmSubstrateSpecification>(item.GetPtr())){
 		QJsonObject itemJsonObject;
 		const bool isitemAdded = filmSubstrateSpecificationVal->WriteToJsonObject(itemJsonObject);
 		if (!isitemAdded){
@@ -2302,7 +2302,7 @@ bool CSubstrateSpecificationInput::WriteToJsonObject(QJsonObject& jsonObject) co
 }
 
 
-bool CSubstrateSpecificationInput::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::substrate::CSubstrateSpecificationInput::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("id") || ! jsonObject["id"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "id").toLocal8Bit().constData();)
@@ -2332,7 +2332,7 @@ bool CSubstrateSpecificationInput::ReadFromJsonObject(const QJsonObject& jsonObj
 	}
 	QString itemTypename = itemObject.value("__typename").toString();
 	if (itemTypename == "CardboardSubstrateSpecification") {
-		CCardboardSubstrateSpecification itemConvert;
+		V1_0::substrate::CCardboardSubstrateSpecification itemConvert;
 		const bool isitemRead = itemConvert.ReadFromJsonObject(jsonObject["item"].toObject());
 		if (!isitemRead){
 			return false;
@@ -2340,7 +2340,7 @@ bool CSubstrateSpecificationInput::ReadFromJsonObject(const QJsonObject& jsonObj
 		item = SubstrateSpecificationDocument(itemConvert);
 	}
 	else if (itemTypename == "PaperSubstrateSpecification") {
-		CPaperSubstrateSpecification itemConvert;
+		V1_0::substrate::CPaperSubstrateSpecification itemConvert;
 		const bool isitemRead = itemConvert.ReadFromJsonObject(jsonObject["item"].toObject());
 		if (!isitemRead){
 			return false;
@@ -2348,7 +2348,7 @@ bool CSubstrateSpecificationInput::ReadFromJsonObject(const QJsonObject& jsonObj
 		item = SubstrateSpecificationDocument(itemConvert);
 	}
 	else if (itemTypename == "FilmSubstrateSpecification") {
-		CFilmSubstrateSpecification itemConvert;
+		V1_0::substrate::CFilmSubstrateSpecification itemConvert;
 		const bool isitemRead = itemConvert.ReadFromJsonObject(jsonObject["item"].toObject());
 		if (!isitemRead){
 			return false;
@@ -2367,7 +2367,7 @@ bool CSubstrateSpecificationInput::ReadFromJsonObject(const QJsonObject& jsonObj
 }
 
 
-bool CSubstrateSpecificationInput::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::substrate::CSubstrateSpecificationInput::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("id") && jsonObject["id"].isString()){
 		id = jsonObject["id"].toString().toUtf8();
@@ -2390,7 +2390,7 @@ bool CSubstrateSpecificationInput::OptReadFromJsonObject(const QJsonObject& json
 		}
 		QString itemTypename = itemObject.value("__typename").toString();
 		if (itemTypename == "CardboardSubstrateSpecification") {
-			CCardboardSubstrateSpecification itemConvert;
+			V1_0::substrate::CCardboardSubstrateSpecification itemConvert;
 			const bool isitemRead = itemConvert.ReadFromJsonObject(jsonObject["item"].toObject());
 			if (!isitemRead){
 				return false;
@@ -2398,7 +2398,7 @@ bool CSubstrateSpecificationInput::OptReadFromJsonObject(const QJsonObject& json
 			item = SubstrateSpecificationDocument(itemConvert);
 		}
 		else if (itemTypename == "PaperSubstrateSpecification") {
-			CPaperSubstrateSpecification itemConvert;
+			V1_0::substrate::CPaperSubstrateSpecification itemConvert;
 			const bool isitemRead = itemConvert.ReadFromJsonObject(jsonObject["item"].toObject());
 			if (!isitemRead){
 				return false;
@@ -2406,7 +2406,7 @@ bool CSubstrateSpecificationInput::OptReadFromJsonObject(const QJsonObject& json
 			item = SubstrateSpecificationDocument(itemConvert);
 		}
 		else if (itemTypename == "FilmSubstrateSpecification") {
-			CFilmSubstrateSpecification itemConvert;
+			V1_0::substrate::CFilmSubstrateSpecification itemConvert;
 			const bool isitemRead = itemConvert.ReadFromJsonObject(jsonObject["item"].toObject());
 			if (!isitemRead){
 				return false;
@@ -2423,7 +2423,7 @@ bool CSubstrateSpecificationInput::OptReadFromJsonObject(const QJsonObject& json
 }
 
 
-// serialize methods
+
 
 QByteArray CSubstrateSpecificationDocumentMetaInfo::GetVersionId()
 {
@@ -2439,7 +2439,7 @@ bool CSubstrateSpecificationDocumentMetaInfo::operator==(const CSubstrateSpecifi
 }
 
 
-bool CSubstrateSpecificationDocumentMetaInfo::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::substrate::CSubstrateSpecificationDocumentMetaInfo::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "SubstrateSpecificationDocumentMetaInfo", modelIndex);
 
@@ -2456,7 +2456,7 @@ bool CSubstrateSpecificationDocumentMetaInfo::WriteToModel(::imtbase::CTreeItemM
 }
 
 
-bool CSubstrateSpecificationDocumentMetaInfo::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::substrate::CSubstrateSpecificationDocumentMetaInfo::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant materialIdData = model.GetData("materialId", modelIndex);
 	if (!materialIdData.isNull()){
@@ -2472,7 +2472,7 @@ bool CSubstrateSpecificationDocumentMetaInfo::ReadFromModel(const ::imtbase::CTr
 }
 
 
-bool CSubstrateSpecificationDocumentMetaInfo::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::substrate::CSubstrateSpecificationDocumentMetaInfo::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant materialIdData = model.GetData("materialId", modelIndex);
 	if (!materialIdData.isNull()){
@@ -2488,7 +2488,7 @@ bool CSubstrateSpecificationDocumentMetaInfo::OptReadFromModel(const ::imtbase::
 }
 
 
-bool CSubstrateSpecificationDocumentMetaInfo::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::substrate::CSubstrateSpecificationDocumentMetaInfo::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (materialId){
 		gqlObject.InsertParam("materialId", QVariant(*materialId));
@@ -2504,7 +2504,7 @@ bool CSubstrateSpecificationDocumentMetaInfo::WriteToGraphQlObject(::imtgql::CGq
 }
 
 
-bool CSubstrateSpecificationDocumentMetaInfo::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::substrate::CSubstrateSpecificationDocumentMetaInfo::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("materialId") && (gqlObject["materialId"].userType() == QMetaType::QString || gqlObject["materialId"].userType() == QMetaType::QByteArray)){
 		materialId = gqlObject["materialId"].toByteArray();
@@ -2518,7 +2518,7 @@ bool CSubstrateSpecificationDocumentMetaInfo::ReadFromGraphQlObject(const ::imtg
 }
 
 
-bool CSubstrateSpecificationDocumentMetaInfo::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::substrate::CSubstrateSpecificationDocumentMetaInfo::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("materialId") && (gqlObject["materialId"].userType() == QMetaType::QString || gqlObject["materialId"].userType() == QMetaType::QByteArray)){
 		materialId = gqlObject["materialId"].toByteArray();
@@ -2532,7 +2532,7 @@ bool CSubstrateSpecificationDocumentMetaInfo::OptReadFromGraphQlObject(const ::i
 }
 
 
-bool CSubstrateSpecificationDocumentMetaInfo::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::substrate::CSubstrateSpecificationDocumentMetaInfo::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (materialId){
 		jsonObject["materialId"] = QString::fromUtf8(*materialId);
@@ -2548,7 +2548,7 @@ bool CSubstrateSpecificationDocumentMetaInfo::WriteToJsonObject(QJsonObject& jso
 }
 
 
-bool CSubstrateSpecificationDocumentMetaInfo::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::substrate::CSubstrateSpecificationDocumentMetaInfo::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("materialId") && jsonObject["materialId"].isString()){
 		materialId = jsonObject["materialId"].toString().toUtf8();
@@ -2562,7 +2562,7 @@ bool CSubstrateSpecificationDocumentMetaInfo::ReadFromJsonObject(const QJsonObje
 }
 
 
-bool CSubstrateSpecificationDocumentMetaInfo::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::substrate::CSubstrateSpecificationDocumentMetaInfo::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("materialId") && jsonObject["materialId"].isString()){
 		materialId = jsonObject["materialId"].toString().toUtf8();
@@ -2576,7 +2576,7 @@ bool CSubstrateSpecificationDocumentMetaInfo::OptReadFromJsonObject(const QJsonO
 }
 
 
-// serialize methods
+
 
 CInputIdObject::CInputIdObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
@@ -2586,13 +2586,12 @@ CInputIdObject::CInputIdObject(QObject* parent): ::imtbase::CItemModelBase(paren
 
 QVariant CInputIdObject::GetId()
 {
-	return CInputId::id.value();
+	return CInputId::id ? CInputId::id.value() : QVariant();
 }
 
 
 void CInputIdObject::SetId(const QVariant& v)
 {
-
 	CInputId::id = v.value<QString>().toUtf8();
 	idChanged();
 }
@@ -2686,80 +2685,80 @@ QVariantMap CInputIdObjectList::get(int row) const
 }
 
 
-void CInputIdObjectList::append(sdl::V1_0::V1_0::CInputIdObject* item)
+void CInputIdObjectList::append(sdl::V1_0::substrate::CInputIdObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::V1_0::V1_0::CInputIdObjectList* sdl::V1_0::V1_0::CInputIdObjectList::copyMe()
+sdl::V1_0::substrate::CInputIdObjectList* sdl::V1_0::substrate::CInputIdObjectList::copyMe()
 {
-	sdl::V1_0::V1_0::CInputIdObjectList* retVal = new sdl::V1_0::V1_0::CInputIdObjectList();
+	sdl::V1_0::substrate::CInputIdObjectList* retVal = new sdl::V1_0::substrate::CInputIdObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::V1_0::V1_0::CInputIdObjectList::toJson()
+QString sdl::V1_0::substrate::CInputIdObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::V1_0::V1_0::CInputIdObjectList::toGraphQL()
+QString sdl::V1_0::substrate::CInputIdObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::V1_0::V1_0::CInputIdObjectList::addElement(sdl::V1_0::V1_0::CInputIdObject* item)
+void sdl::V1_0::substrate::CInputIdObjectList::addElement(sdl::V1_0::substrate::CInputIdObject* item)
 {
 	append(item);
 }
 
 
-void sdl::V1_0::V1_0::CInputIdObjectList::removeElement(int index)
+void sdl::V1_0::substrate::CInputIdObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::V1_0::V1_0::CInputIdObjectList::isEqualWithModel(sdl::V1_0::V1_0::CInputIdObjectList* otherModelPtr)
+bool sdl::V1_0::substrate::CInputIdObjectList::isEqualWithModel(sdl::V1_0::substrate::CInputIdObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::V1_0::V1_0::CInputIdObjectList::insert(int index, sdl::V1_0::V1_0::CInputIdObject* item)
+void sdl::V1_0::substrate::CInputIdObjectList::insert(int index, sdl::V1_0::substrate::CInputIdObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::V1_0::V1_0::CInputIdObjectList::remove(int index)
+void sdl::V1_0::substrate::CInputIdObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::V1_0::V1_0::CInputIdObjectList::clear()
+void sdl::V1_0::substrate::CInputIdObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::V1_0::V1_0::CInputIdObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::substrate::CInputIdObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::V1_0::V1_0::CInputIdObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::substrate::CInputIdObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_id"){
-		return QVariant::fromValue(at(index)->id.value());
+		return Version_1_0->at(index)->id ? QVariant::fromValue(Version_1_0->at(index)->id.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -2773,13 +2772,12 @@ CCollectionViewParamsTestObject::CCollectionViewParamsTestObject(QObject* parent
 
 QVariant CCollectionViewParamsTestObject::GetCount()
 {
-	return CCollectionViewParamsTest::count.value();
+	return CCollectionViewParamsTest::count ? CCollectionViewParamsTest::count.value() : QVariant();
 }
 
 
 void CCollectionViewParamsTestObject::SetCount(const QVariant& v)
 {
-
 	CCollectionViewParamsTest::count = v.value<int>();
 	countChanged();
 }
@@ -2793,13 +2791,12 @@ bool CCollectionViewParamsTestObject::hasCount()
 
 QVariant CCollectionViewParamsTestObject::GetOffset()
 {
-	return CCollectionViewParamsTest::offset.value();
+	return CCollectionViewParamsTest::offset ? CCollectionViewParamsTest::offset.value() : QVariant();
 }
 
 
 void CCollectionViewParamsTestObject::SetOffset(const QVariant& v)
 {
-
 	CCollectionViewParamsTest::offset = v.value<int>();
 	offsetChanged();
 }
@@ -2896,83 +2893,83 @@ QVariantMap CCollectionViewParamsTestObjectList::get(int row) const
 }
 
 
-void CCollectionViewParamsTestObjectList::append(sdl::V1_0::V1_0::CCollectionViewParamsTestObject* item)
+void CCollectionViewParamsTestObjectList::append(sdl::V1_0::substrate::CCollectionViewParamsTestObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList* sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList::copyMe()
+sdl::V1_0::substrate::CCollectionViewParamsTestObjectList* sdl::V1_0::substrate::CCollectionViewParamsTestObjectList::copyMe()
 {
-	sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList* retVal = new sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList();
+	sdl::V1_0::substrate::CCollectionViewParamsTestObjectList* retVal = new sdl::V1_0::substrate::CCollectionViewParamsTestObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList::toJson()
+QString sdl::V1_0::substrate::CCollectionViewParamsTestObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList::toGraphQL()
+QString sdl::V1_0::substrate::CCollectionViewParamsTestObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList::addElement(sdl::V1_0::V1_0::CCollectionViewParamsTestObject* item)
+void sdl::V1_0::substrate::CCollectionViewParamsTestObjectList::addElement(sdl::V1_0::substrate::CCollectionViewParamsTestObject* item)
 {
 	append(item);
 }
 
 
-void sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList::removeElement(int index)
+void sdl::V1_0::substrate::CCollectionViewParamsTestObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList::isEqualWithModel(sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList* otherModelPtr)
+bool sdl::V1_0::substrate::CCollectionViewParamsTestObjectList::isEqualWithModel(sdl::V1_0::substrate::CCollectionViewParamsTestObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList::insert(int index, sdl::V1_0::V1_0::CCollectionViewParamsTestObject* item)
+void sdl::V1_0::substrate::CCollectionViewParamsTestObjectList::insert(int index, sdl::V1_0::substrate::CCollectionViewParamsTestObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList::remove(int index)
+void sdl::V1_0::substrate::CCollectionViewParamsTestObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList::clear()
+void sdl::V1_0::substrate::CCollectionViewParamsTestObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::substrate::CCollectionViewParamsTestObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::V1_0::V1_0::CCollectionViewParamsTestObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::substrate::CCollectionViewParamsTestObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_count"){
-		return QVariant::fromValue(at(index)->count.value());
+		return Version_1_0->at(index)->count ? QVariant::fromValue(Version_1_0->at(index)->count.value()) : QVariant();
 	}
 	if (nameId == "m_offset"){
-		return QVariant::fromValue(at(index)->offset.value());
+		return Version_1_0->at(index)->offset ? QVariant::fromValue(Version_1_0->at(index)->offset.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -2987,13 +2984,12 @@ CSubstrateSpecificationDocumentTypeIdsObject::CSubstrateSpecificationDocumentTyp
 
 QVariant CSubstrateSpecificationDocumentTypeIdsObject::GetPaperID()
 {
-	return CSubstrateSpecificationDocumentTypeIds::PaperID.value();
+	return CSubstrateSpecificationDocumentTypeIds::PaperID ? CSubstrateSpecificationDocumentTypeIds::PaperID.value() : QVariant();
 }
 
 
 void CSubstrateSpecificationDocumentTypeIdsObject::SetPaperID(const QVariant& v)
 {
-
 	CSubstrateSpecificationDocumentTypeIds::PaperID = v.value<QString>().toUtf8();
 	paperIDChanged();
 }
@@ -3007,13 +3003,12 @@ bool CSubstrateSpecificationDocumentTypeIdsObject::hasPaperID()
 
 QVariant CSubstrateSpecificationDocumentTypeIdsObject::GetCardboardID()
 {
-	return CSubstrateSpecificationDocumentTypeIds::CardboardID.value();
+	return CSubstrateSpecificationDocumentTypeIds::CardboardID ? CSubstrateSpecificationDocumentTypeIds::CardboardID.value() : QVariant();
 }
 
 
 void CSubstrateSpecificationDocumentTypeIdsObject::SetCardboardID(const QVariant& v)
 {
-
 	CSubstrateSpecificationDocumentTypeIds::CardboardID = v.value<QString>().toUtf8();
 	cardboardIDChanged();
 }
@@ -3027,13 +3022,12 @@ bool CSubstrateSpecificationDocumentTypeIdsObject::hasCardboardID()
 
 QVariant CSubstrateSpecificationDocumentTypeIdsObject::GetFilmID()
 {
-	return CSubstrateSpecificationDocumentTypeIds::FilmID.value();
+	return CSubstrateSpecificationDocumentTypeIds::FilmID ? CSubstrateSpecificationDocumentTypeIds::FilmID.value() : QVariant();
 }
 
 
 void CSubstrateSpecificationDocumentTypeIdsObject::SetFilmID(const QVariant& v)
 {
-
 	CSubstrateSpecificationDocumentTypeIds::FilmID = v.value<QString>().toUtf8();
 	filmIDChanged();
 }
@@ -3133,86 +3127,86 @@ QVariantMap CSubstrateSpecificationDocumentTypeIdsObjectList::get(int row) const
 }
 
 
-void CSubstrateSpecificationDocumentTypeIdsObjectList::append(sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObject* item)
+void CSubstrateSpecificationDocumentTypeIdsObjectList::append(sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList* sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList::copyMe()
+sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObjectList* sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObjectList::copyMe()
 {
-	sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList* retVal = new sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList();
+	sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObjectList* retVal = new sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList::toJson()
+QString sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList::toGraphQL()
+QString sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList::addElement(sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObject* item)
+void sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObjectList::addElement(sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObject* item)
 {
 	append(item);
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList::removeElement(int index)
+void sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList::isEqualWithModel(sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList* otherModelPtr)
+bool sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObjectList::isEqualWithModel(sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList::insert(int index, sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObject* item)
+void sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObjectList::insert(int index, sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList::remove(int index)
+void sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList::clear()
+void sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_paperID"){
-		return QVariant::fromValue(at(index)->PaperID.value());
+		return Version_1_0->at(index)->PaperID ? QVariant::fromValue(Version_1_0->at(index)->PaperID.value()) : QVariant();
 	}
 	if (nameId == "m_cardboardID"){
-		return QVariant::fromValue(at(index)->CardboardID.value());
+		return Version_1_0->at(index)->CardboardID ? QVariant::fromValue(Version_1_0->at(index)->CardboardID.value()) : QVariant();
 	}
 	if (nameId == "m_filmID"){
-		return QVariant::fromValue(at(index)->FilmID.value());
+		return Version_1_0->at(index)->FilmID ? QVariant::fromValue(Version_1_0->at(index)->FilmID.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -3225,12 +3219,14 @@ CSubstrateSpecificationListInputObject::CSubstrateSpecificationListInputObject(Q
 
 QVariant CSubstrateSpecificationListInputObject::GetViewParams()
 {
+	if (!viewParams) {return {};}
+	
 	if (!m_viewParamsQObjectPtr.isValid()){
 		m_viewParamsQObjectPtr = CreateObject("viewParams");
-		auto itemPtr = m_viewParamsQObjectPtr.value<sdl::V1_0::V1_0::CCollectionViewParamsTestObject*>();
+		auto itemPtr = m_viewParamsQObjectPtr.value<sdl::V1_0::substrate::CCollectionViewParamsTestObject*>();
 		if (itemPtr != nullptr) {
-			itemPtr->CCollectionViewParamsTest::count = viewParams->CCollectionViewParamsTest::count;
-			itemPtr->CCollectionViewParamsTest::offset = viewParams->CCollectionViewParamsTest::offset;
+			itemPtr->count = viewParams->count;
+			itemPtr->offset = viewParams->offset;
 		}
 	}
 	return m_viewParamsQObjectPtr;
@@ -3239,10 +3235,9 @@ QVariant CSubstrateSpecificationListInputObject::GetViewParams()
 
 void CSubstrateSpecificationListInputObject::SetViewParams(const QVariant& v)
 {
-
 	if (v.isValid()){
-		sdl::V1_0::V1_0::CCollectionViewParamsTestObject* itemPtr = v.value<sdl::V1_0::V1_0::CCollectionViewParamsTestObject*>();
-		if (itemPtr != nullptr)  viewParams = static_cast<const decltype(viewParams)::value_type&>(*itemPtr);
+		sdl::V1_0::substrate::CCollectionViewParamsTestObject* itemPtr = v.value<sdl::V1_0::substrate::CCollectionViewParamsTestObject*>();
+		if (itemPtr != nullptr) CSubstrateSpecificationListInput::viewParams = (*itemPtr);
 	}
 	else {
 		CSubstrateSpecificationListInput::viewParams = nullptr;
@@ -3324,7 +3319,7 @@ QString CSubstrateSpecificationListInputObject::toGraphQL() const
 QVariant CSubstrateSpecificationListInputObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "viewParams"){
-		return QVariant::fromValue(new sdl::V1_0::V1_0::CCollectionViewParamsTestObject(this));
+		return QVariant::fromValue(new sdl::V1_0::substrate::CCollectionViewParamsTestObject(this));
 	}
 	return QVariant();
 }
@@ -3361,76 +3356,76 @@ QVariantMap CSubstrateSpecificationListInputObjectList::get(int row) const
 }
 
 
-void CSubstrateSpecificationListInputObjectList::append(sdl::V1_0::V1_0::CSubstrateSpecificationListInputObject* item)
+void CSubstrateSpecificationListInputObjectList::append(sdl::V1_0::substrate::CSubstrateSpecificationListInputObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList* sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList::copyMe()
+sdl::V1_0::substrate::CSubstrateSpecificationListInputObjectList* sdl::V1_0::substrate::CSubstrateSpecificationListInputObjectList::copyMe()
 {
-	sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList* retVal = new sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList();
+	sdl::V1_0::substrate::CSubstrateSpecificationListInputObjectList* retVal = new sdl::V1_0::substrate::CSubstrateSpecificationListInputObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList::toJson()
+QString sdl::V1_0::substrate::CSubstrateSpecificationListInputObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList::toGraphQL()
+QString sdl::V1_0::substrate::CSubstrateSpecificationListInputObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList::addElement(sdl::V1_0::V1_0::CSubstrateSpecificationListInputObject* item)
+void sdl::V1_0::substrate::CSubstrateSpecificationListInputObjectList::addElement(sdl::V1_0::substrate::CSubstrateSpecificationListInputObject* item)
 {
 	append(item);
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList::removeElement(int index)
+void sdl::V1_0::substrate::CSubstrateSpecificationListInputObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList::isEqualWithModel(sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList* otherModelPtr)
+bool sdl::V1_0::substrate::CSubstrateSpecificationListInputObjectList::isEqualWithModel(sdl::V1_0::substrate::CSubstrateSpecificationListInputObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList::insert(int index, sdl::V1_0::V1_0::CSubstrateSpecificationListInputObject* item)
+void sdl::V1_0::substrate::CSubstrateSpecificationListInputObjectList::insert(int index, sdl::V1_0::substrate::CSubstrateSpecificationListInputObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList::remove(int index)
+void sdl::V1_0::substrate::CSubstrateSpecificationListInputObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList::clear()
+void sdl::V1_0::substrate::CSubstrateSpecificationListInputObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::substrate::CSubstrateSpecificationListInputObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::V1_0::V1_0::CSubstrateSpecificationListInputObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::substrate::CSubstrateSpecificationListInputObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_viewParams"){
@@ -3454,13 +3449,12 @@ CSubstrateSpecificationListItemObject::CSubstrateSpecificationListItemObject(QOb
 
 QVariant CSubstrateSpecificationListItemObject::GetId()
 {
-	return CSubstrateSpecificationListItem::id.value();
+	return CSubstrateSpecificationListItem::id ? CSubstrateSpecificationListItem::id.value() : QVariant();
 }
 
 
 void CSubstrateSpecificationListItemObject::SetId(const QVariant& v)
 {
-
 	CSubstrateSpecificationListItem::id = v.value<QString>().toUtf8();
 	idChanged();
 }
@@ -3474,13 +3468,12 @@ bool CSubstrateSpecificationListItemObject::hasId()
 
 QVariant CSubstrateSpecificationListItemObject::GetTypeId()
 {
-	return CSubstrateSpecificationListItem::typeId.value();
+	return CSubstrateSpecificationListItem::typeId ? CSubstrateSpecificationListItem::typeId.value() : QVariant();
 }
 
 
 void CSubstrateSpecificationListItemObject::SetTypeId(const QVariant& v)
 {
-
 	CSubstrateSpecificationListItem::typeId = v.value<QString>().toUtf8();
 	typeIdChanged();
 }
@@ -3494,13 +3487,12 @@ bool CSubstrateSpecificationListItemObject::hasTypeId()
 
 QVariant CSubstrateSpecificationListItemObject::GetName()
 {
-	return CSubstrateSpecificationListItem::name.value();
+	return CSubstrateSpecificationListItem::name ? CSubstrateSpecificationListItem::name.value() : QVariant();
 }
 
 
 void CSubstrateSpecificationListItemObject::SetName(const QVariant& v)
 {
-
 	CSubstrateSpecificationListItem::name = v.value<QString>();
 	nameChanged();
 }
@@ -3514,13 +3506,12 @@ bool CSubstrateSpecificationListItemObject::hasName()
 
 QVariant CSubstrateSpecificationListItemObject::GetMaterialId()
 {
-	return CSubstrateSpecificationListItem::materialId.value();
+	return CSubstrateSpecificationListItem::materialId ? CSubstrateSpecificationListItem::materialId.value() : QVariant();
 }
 
 
 void CSubstrateSpecificationListItemObject::SetMaterialId(const QVariant& v)
 {
-
 	CSubstrateSpecificationListItem::materialId = v.value<QString>().toUtf8();
 	materialIdChanged();
 }
@@ -3534,13 +3525,12 @@ bool CSubstrateSpecificationListItemObject::hasMaterialId()
 
 QVariant CSubstrateSpecificationListItemObject::GetMaterialName()
 {
-	return CSubstrateSpecificationListItem::materialName.value();
+	return CSubstrateSpecificationListItem::materialName ? CSubstrateSpecificationListItem::materialName.value() : QVariant();
 }
 
 
 void CSubstrateSpecificationListItemObject::SetMaterialName(const QVariant& v)
 {
-
 	CSubstrateSpecificationListItem::materialName = v.value<QString>();
 	materialNameChanged();
 }
@@ -3554,13 +3544,12 @@ bool CSubstrateSpecificationListItemObject::hasMaterialName()
 
 QVariant CSubstrateSpecificationListItemObject::GetAdded()
 {
-	return CSubstrateSpecificationListItem::added.value();
+	return CSubstrateSpecificationListItem::added ? CSubstrateSpecificationListItem::added.value() : QVariant();
 }
 
 
 void CSubstrateSpecificationListItemObject::SetAdded(const QVariant& v)
 {
-
 	CSubstrateSpecificationListItem::added = v.value<QString>();
 	addedChanged();
 }
@@ -3574,13 +3563,12 @@ bool CSubstrateSpecificationListItemObject::hasAdded()
 
 QVariant CSubstrateSpecificationListItemObject::GetTimeStamp()
 {
-	return CSubstrateSpecificationListItem::timeStamp.value();
+	return CSubstrateSpecificationListItem::timeStamp ? CSubstrateSpecificationListItem::timeStamp.value() : QVariant();
 }
 
 
 void CSubstrateSpecificationListItemObject::SetTimeStamp(const QVariant& v)
 {
-
 	CSubstrateSpecificationListItem::timeStamp = v.value<QString>();
 	timeStampChanged();
 }
@@ -3594,13 +3582,12 @@ bool CSubstrateSpecificationListItemObject::hasTimeStamp()
 
 QVariant CSubstrateSpecificationListItemObject::GetColorPreview()
 {
-	return CSubstrateSpecificationListItem::colorPreview.value();
+	return CSubstrateSpecificationListItem::colorPreview ? CSubstrateSpecificationListItem::colorPreview.value() : QVariant();
 }
 
 
 void CSubstrateSpecificationListItemObject::SetColorPreview(const QVariant& v)
 {
-
 	CSubstrateSpecificationListItem::colorPreview = v.value<QString>();
 	colorPreviewChanged();
 }
@@ -3715,101 +3702,101 @@ QVariantMap CSubstrateSpecificationListItemObjectList::get(int row) const
 }
 
 
-void CSubstrateSpecificationListItemObjectList::append(sdl::V1_0::V1_0::CSubstrateSpecificationListItemObject* item)
+void CSubstrateSpecificationListItemObjectList::append(sdl::V1_0::substrate::CSubstrateSpecificationListItemObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList* sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList::copyMe()
+sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList* sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList::copyMe()
 {
-	sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList* retVal = new sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList();
+	sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList* retVal = new sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList::toJson()
+QString sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList::toGraphQL()
+QString sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList::addElement(sdl::V1_0::V1_0::CSubstrateSpecificationListItemObject* item)
+void sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList::addElement(sdl::V1_0::substrate::CSubstrateSpecificationListItemObject* item)
 {
 	append(item);
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList::removeElement(int index)
+void sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList::isEqualWithModel(sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList* otherModelPtr)
+bool sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList::isEqualWithModel(sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList::insert(int index, sdl::V1_0::V1_0::CSubstrateSpecificationListItemObject* item)
+void sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList::insert(int index, sdl::V1_0::substrate::CSubstrateSpecificationListItemObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList::remove(int index)
+void sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList::clear()
+void sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::V1_0::V1_0::CSubstrateSpecificationListItemObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::substrate::CSubstrateSpecificationListItemObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_id"){
-		return QVariant::fromValue(at(index)->id.value());
+		return Version_1_0->at(index)->id ? QVariant::fromValue(Version_1_0->at(index)->id.value()) : QVariant();
 	}
 	if (nameId == "m_typeId"){
-		return QVariant::fromValue(at(index)->typeId.value());
+		return Version_1_0->at(index)->typeId ? QVariant::fromValue(Version_1_0->at(index)->typeId.value()) : QVariant();
 	}
 	if (nameId == "m_name"){
-		return QVariant::fromValue(at(index)->name.value());
+		return Version_1_0->at(index)->name ? QVariant::fromValue(Version_1_0->at(index)->name.value()) : QVariant();
 	}
 	if (nameId == "m_materialId"){
-		return QVariant::fromValue(at(index)->materialId.value());
+		return Version_1_0->at(index)->materialId ? QVariant::fromValue(Version_1_0->at(index)->materialId.value()) : QVariant();
 	}
 	if (nameId == "m_materialName"){
-		return QVariant::fromValue(at(index)->materialName.value());
+		return Version_1_0->at(index)->materialName ? QVariant::fromValue(Version_1_0->at(index)->materialName.value()) : QVariant();
 	}
 	if (nameId == "m_added"){
-		return QVariant::fromValue(at(index)->added.value());
+		return Version_1_0->at(index)->added ? QVariant::fromValue(Version_1_0->at(index)->added.value()) : QVariant();
 	}
 	if (nameId == "m_timeStamp"){
-		return QVariant::fromValue(at(index)->timeStamp.value());
+		return Version_1_0->at(index)->timeStamp ? QVariant::fromValue(Version_1_0->at(index)->timeStamp.value()) : QVariant();
 	}
 	if (nameId == "m_colorPreview"){
-		return QVariant::fromValue(at(index)->colorPreview.value());
+		return Version_1_0->at(index)->colorPreview ? QVariant::fromValue(Version_1_0->at(index)->colorPreview.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -3824,8 +3811,8 @@ QVariant CSubstrateSpecificationListResponseObject::GetItems()
 {
 	if (!m_itemsQObjectPtr.isValid()){
 		m_itemsQObjectPtr = CreateObject("items");
-		auto itemPtr = m_itemsQObjectPtr.value<sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList*>();
-		if (itemPtr != nullptr) itemPtr->items = items;
+		auto itemPtr = m_itemsQObjectPtr.value<sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList*>();
+		if (itemPtr != nullptr) itemPtr->Version_1_0 = CSubstrateSpecificationListResponse::items;
 	}
 	return m_itemsQObjectPtr;
 }
@@ -3833,10 +3820,9 @@ QVariant CSubstrateSpecificationListResponseObject::GetItems()
 
 void CSubstrateSpecificationListResponseObject::SetItems(const QVariant& v)
 {
-
 	if (v.isValid()){
-		sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList* itemPtr = v.value<sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList*>();
-		if (itemPtr != nullptr)  items = static_cast<const decltype(items)::value_type&>(*itemPtr);
+		sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList* itemPtr = v.value<sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList*>();
+		if (itemPtr != nullptr) CSubstrateSpecificationListResponse::items = itemPtr->Version_1_0;
 	}
 	else {
 		CSubstrateSpecificationListResponse::items = nullptr;
@@ -3873,7 +3859,7 @@ void CSubstrateSpecificationListResponseObject::ResetItems()
 QVariant CSubstrateSpecificationListResponseObject::createItemsArrayElement(const QVariant& v)
 {
 	Q_UNUSED(v);
-	return QVariant::fromValue(new sdl::V1_0::V1_0::CSubstrateSpecificationListItemObject());
+	return QVariant::fromValue(new sdl::V1_0::substrate::CSubstrateSpecificationListItemObject());
 }
 
 
@@ -3925,7 +3911,7 @@ QString CSubstrateSpecificationListResponseObject::toGraphQL() const
 QVariant CSubstrateSpecificationListResponseObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "items"){
-		return QVariant::fromValue(new sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList(this));
+		return QVariant::fromValue(new sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList(this));
 	}
 	return QVariant();
 }
@@ -3962,76 +3948,76 @@ QVariantMap CSubstrateSpecificationListResponseObjectList::get(int row) const
 }
 
 
-void CSubstrateSpecificationListResponseObjectList::append(sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObject* item)
+void CSubstrateSpecificationListResponseObjectList::append(sdl::V1_0::substrate::CSubstrateSpecificationListResponseObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList* sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList::copyMe()
+sdl::V1_0::substrate::CSubstrateSpecificationListResponseObjectList* sdl::V1_0::substrate::CSubstrateSpecificationListResponseObjectList::copyMe()
 {
-	sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList* retVal = new sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList();
+	sdl::V1_0::substrate::CSubstrateSpecificationListResponseObjectList* retVal = new sdl::V1_0::substrate::CSubstrateSpecificationListResponseObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList::toJson()
+QString sdl::V1_0::substrate::CSubstrateSpecificationListResponseObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList::toGraphQL()
+QString sdl::V1_0::substrate::CSubstrateSpecificationListResponseObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList::addElement(sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObject* item)
+void sdl::V1_0::substrate::CSubstrateSpecificationListResponseObjectList::addElement(sdl::V1_0::substrate::CSubstrateSpecificationListResponseObject* item)
 {
 	append(item);
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList::removeElement(int index)
+void sdl::V1_0::substrate::CSubstrateSpecificationListResponseObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList::isEqualWithModel(sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList* otherModelPtr)
+bool sdl::V1_0::substrate::CSubstrateSpecificationListResponseObjectList::isEqualWithModel(sdl::V1_0::substrate::CSubstrateSpecificationListResponseObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList::insert(int index, sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObject* item)
+void sdl::V1_0::substrate::CSubstrateSpecificationListResponseObjectList::insert(int index, sdl::V1_0::substrate::CSubstrateSpecificationListResponseObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList::remove(int index)
+void sdl::V1_0::substrate::CSubstrateSpecificationListResponseObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList::clear()
+void sdl::V1_0::substrate::CSubstrateSpecificationListResponseObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::substrate::CSubstrateSpecificationListResponseObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::substrate::CSubstrateSpecificationListResponseObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_items"){
@@ -4049,13 +4035,12 @@ CCardboardSubstrateSpecificationObject::CCardboardSubstrateSpecificationObject(Q
 
 QVariant CCardboardSubstrateSpecificationObject::GetColor()
 {
-	return CCardboardSubstrateSpecification::color.value();
+	return CCardboardSubstrateSpecification::color ? CCardboardSubstrateSpecification::color.value() : QVariant();
 }
 
 
 void CCardboardSubstrateSpecificationObject::SetColor(const QVariant& v)
 {
-
 	CCardboardSubstrateSpecification::color = v.value<QString>();
 	colorChanged();
 }
@@ -4069,13 +4054,12 @@ bool CCardboardSubstrateSpecificationObject::hasColor()
 
 QVariant CCardboardSubstrateSpecificationObject::GetGrammage()
 {
-	return CCardboardSubstrateSpecification::grammage.value();
+	return CCardboardSubstrateSpecification::grammage ? CCardboardSubstrateSpecification::grammage.value() : QVariant();
 }
 
 
 void CCardboardSubstrateSpecificationObject::SetGrammage(const QVariant& v)
 {
-
 	CCardboardSubstrateSpecification::grammage = v.value<double>();
 	grammageChanged();
 }
@@ -4172,83 +4156,83 @@ QVariantMap CCardboardSubstrateSpecificationObjectList::get(int row) const
 }
 
 
-void CCardboardSubstrateSpecificationObjectList::append(sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObject* item)
+void CCardboardSubstrateSpecificationObjectList::append(sdl::V1_0::substrate::CCardboardSubstrateSpecificationObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList* sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList::copyMe()
+sdl::V1_0::substrate::CCardboardSubstrateSpecificationObjectList* sdl::V1_0::substrate::CCardboardSubstrateSpecificationObjectList::copyMe()
 {
-	sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList* retVal = new sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList();
+	sdl::V1_0::substrate::CCardboardSubstrateSpecificationObjectList* retVal = new sdl::V1_0::substrate::CCardboardSubstrateSpecificationObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList::toJson()
+QString sdl::V1_0::substrate::CCardboardSubstrateSpecificationObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList::toGraphQL()
+QString sdl::V1_0::substrate::CCardboardSubstrateSpecificationObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList::addElement(sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObject* item)
+void sdl::V1_0::substrate::CCardboardSubstrateSpecificationObjectList::addElement(sdl::V1_0::substrate::CCardboardSubstrateSpecificationObject* item)
 {
 	append(item);
 }
 
 
-void sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList::removeElement(int index)
+void sdl::V1_0::substrate::CCardboardSubstrateSpecificationObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList::isEqualWithModel(sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList* otherModelPtr)
+bool sdl::V1_0::substrate::CCardboardSubstrateSpecificationObjectList::isEqualWithModel(sdl::V1_0::substrate::CCardboardSubstrateSpecificationObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList::insert(int index, sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObject* item)
+void sdl::V1_0::substrate::CCardboardSubstrateSpecificationObjectList::insert(int index, sdl::V1_0::substrate::CCardboardSubstrateSpecificationObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList::remove(int index)
+void sdl::V1_0::substrate::CCardboardSubstrateSpecificationObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList::clear()
+void sdl::V1_0::substrate::CCardboardSubstrateSpecificationObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::substrate::CCardboardSubstrateSpecificationObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::substrate::CCardboardSubstrateSpecificationObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_color"){
-		return QVariant::fromValue(at(index)->color.value());
+		return Version_1_0->at(index)->color ? QVariant::fromValue(Version_1_0->at(index)->color.value()) : QVariant();
 	}
 	if (nameId == "m_grammage"){
-		return QVariant::fromValue(at(index)->grammage.value());
+		return Version_1_0->at(index)->grammage ? QVariant::fromValue(Version_1_0->at(index)->grammage.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -4263,13 +4247,12 @@ CPaperSubstrateSpecificationObject::CPaperSubstrateSpecificationObject(QObject* 
 
 QVariant CPaperSubstrateSpecificationObject::GetGrammage()
 {
-	return CPaperSubstrateSpecification::grammage.value();
+	return CPaperSubstrateSpecification::grammage ? CPaperSubstrateSpecification::grammage.value() : QVariant();
 }
 
 
 void CPaperSubstrateSpecificationObject::SetGrammage(const QVariant& v)
 {
-
 	CPaperSubstrateSpecification::grammage = v.value<double>();
 	grammageChanged();
 }
@@ -4283,13 +4266,12 @@ bool CPaperSubstrateSpecificationObject::hasGrammage()
 
 QVariant CPaperSubstrateSpecificationObject::GetColor()
 {
-	return CPaperSubstrateSpecification::color.value();
+	return CPaperSubstrateSpecification::color ? CPaperSubstrateSpecification::color.value() : QVariant();
 }
 
 
 void CPaperSubstrateSpecificationObject::SetColor(const QVariant& v)
 {
-
 	CPaperSubstrateSpecification::color = v.value<QString>();
 	colorChanged();
 }
@@ -4303,13 +4285,12 @@ bool CPaperSubstrateSpecificationObject::hasColor()
 
 QVariant CPaperSubstrateSpecificationObject::GetCoatType()
 {
-	return CPaperSubstrateSpecification::coatType.value();
+	return CPaperSubstrateSpecification::coatType ? CPaperSubstrateSpecification::coatType.value() : QVariant();
 }
 
 
 void CPaperSubstrateSpecificationObject::SetCoatType(const QVariant& v)
 {
-
 	CPaperSubstrateSpecification::coatType = v.value<QString>();
 	coatTypeChanged();
 }
@@ -4409,86 +4390,86 @@ QVariantMap CPaperSubstrateSpecificationObjectList::get(int row) const
 }
 
 
-void CPaperSubstrateSpecificationObjectList::append(sdl::V1_0::V1_0::CPaperSubstrateSpecificationObject* item)
+void CPaperSubstrateSpecificationObjectList::append(sdl::V1_0::substrate::CPaperSubstrateSpecificationObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList* sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList::copyMe()
+sdl::V1_0::substrate::CPaperSubstrateSpecificationObjectList* sdl::V1_0::substrate::CPaperSubstrateSpecificationObjectList::copyMe()
 {
-	sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList* retVal = new sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList();
+	sdl::V1_0::substrate::CPaperSubstrateSpecificationObjectList* retVal = new sdl::V1_0::substrate::CPaperSubstrateSpecificationObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList::toJson()
+QString sdl::V1_0::substrate::CPaperSubstrateSpecificationObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList::toGraphQL()
+QString sdl::V1_0::substrate::CPaperSubstrateSpecificationObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList::addElement(sdl::V1_0::V1_0::CPaperSubstrateSpecificationObject* item)
+void sdl::V1_0::substrate::CPaperSubstrateSpecificationObjectList::addElement(sdl::V1_0::substrate::CPaperSubstrateSpecificationObject* item)
 {
 	append(item);
 }
 
 
-void sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList::removeElement(int index)
+void sdl::V1_0::substrate::CPaperSubstrateSpecificationObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList::isEqualWithModel(sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList* otherModelPtr)
+bool sdl::V1_0::substrate::CPaperSubstrateSpecificationObjectList::isEqualWithModel(sdl::V1_0::substrate::CPaperSubstrateSpecificationObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList::insert(int index, sdl::V1_0::V1_0::CPaperSubstrateSpecificationObject* item)
+void sdl::V1_0::substrate::CPaperSubstrateSpecificationObjectList::insert(int index, sdl::V1_0::substrate::CPaperSubstrateSpecificationObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList::remove(int index)
+void sdl::V1_0::substrate::CPaperSubstrateSpecificationObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList::clear()
+void sdl::V1_0::substrate::CPaperSubstrateSpecificationObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::substrate::CPaperSubstrateSpecificationObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::V1_0::V1_0::CPaperSubstrateSpecificationObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::substrate::CPaperSubstrateSpecificationObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_grammage"){
-		return QVariant::fromValue(at(index)->grammage.value());
+		return Version_1_0->at(index)->grammage ? QVariant::fromValue(Version_1_0->at(index)->grammage.value()) : QVariant();
 	}
 	if (nameId == "m_color"){
-		return QVariant::fromValue(at(index)->color.value());
+		return Version_1_0->at(index)->color ? QVariant::fromValue(Version_1_0->at(index)->color.value()) : QVariant();
 	}
 	if (nameId == "m_coatType"){
-		return QVariant::fromValue(at(index)->coatType.value());
+		return Version_1_0->at(index)->coatType ? QVariant::fromValue(Version_1_0->at(index)->coatType.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -4503,13 +4484,12 @@ CFilmSubstrateSpecificationObject::CFilmSubstrateSpecificationObject(QObject* pa
 
 QVariant CFilmSubstrateSpecificationObject::GetTransparency()
 {
-	return CFilmSubstrateSpecification::transparency.value();
+	return CFilmSubstrateSpecification::transparency ? CFilmSubstrateSpecification::transparency.value() : QVariant();
 }
 
 
 void CFilmSubstrateSpecificationObject::SetTransparency(const QVariant& v)
 {
-
 	CFilmSubstrateSpecification::transparency = v.value<double>();
 	transparencyChanged();
 }
@@ -4523,13 +4503,12 @@ bool CFilmSubstrateSpecificationObject::hasTransparency()
 
 QVariant CFilmSubstrateSpecificationObject::GetColor()
 {
-	return CFilmSubstrateSpecification::color.value();
+	return CFilmSubstrateSpecification::color ? CFilmSubstrateSpecification::color.value() : QVariant();
 }
 
 
 void CFilmSubstrateSpecificationObject::SetColor(const QVariant& v)
 {
-
 	CFilmSubstrateSpecification::color = v.value<QString>();
 	colorChanged();
 }
@@ -4543,13 +4522,12 @@ bool CFilmSubstrateSpecificationObject::hasColor()
 
 QVariant CFilmSubstrateSpecificationObject::GetMaterial()
 {
-	return CFilmSubstrateSpecification::material.value();
+	return CFilmSubstrateSpecification::material ? CFilmSubstrateSpecification::material.value() : QVariant();
 }
 
 
 void CFilmSubstrateSpecificationObject::SetMaterial(const QVariant& v)
 {
-
 	CFilmSubstrateSpecification::material = v.value<QString>();
 	materialChanged();
 }
@@ -4649,86 +4627,86 @@ QVariantMap CFilmSubstrateSpecificationObjectList::get(int row) const
 }
 
 
-void CFilmSubstrateSpecificationObjectList::append(sdl::V1_0::V1_0::CFilmSubstrateSpecificationObject* item)
+void CFilmSubstrateSpecificationObjectList::append(sdl::V1_0::substrate::CFilmSubstrateSpecificationObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList* sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList::copyMe()
+sdl::V1_0::substrate::CFilmSubstrateSpecificationObjectList* sdl::V1_0::substrate::CFilmSubstrateSpecificationObjectList::copyMe()
 {
-	sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList* retVal = new sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList();
+	sdl::V1_0::substrate::CFilmSubstrateSpecificationObjectList* retVal = new sdl::V1_0::substrate::CFilmSubstrateSpecificationObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList::toJson()
+QString sdl::V1_0::substrate::CFilmSubstrateSpecificationObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList::toGraphQL()
+QString sdl::V1_0::substrate::CFilmSubstrateSpecificationObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList::addElement(sdl::V1_0::V1_0::CFilmSubstrateSpecificationObject* item)
+void sdl::V1_0::substrate::CFilmSubstrateSpecificationObjectList::addElement(sdl::V1_0::substrate::CFilmSubstrateSpecificationObject* item)
 {
 	append(item);
 }
 
 
-void sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList::removeElement(int index)
+void sdl::V1_0::substrate::CFilmSubstrateSpecificationObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList::isEqualWithModel(sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList* otherModelPtr)
+bool sdl::V1_0::substrate::CFilmSubstrateSpecificationObjectList::isEqualWithModel(sdl::V1_0::substrate::CFilmSubstrateSpecificationObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList::insert(int index, sdl::V1_0::V1_0::CFilmSubstrateSpecificationObject* item)
+void sdl::V1_0::substrate::CFilmSubstrateSpecificationObjectList::insert(int index, sdl::V1_0::substrate::CFilmSubstrateSpecificationObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList::remove(int index)
+void sdl::V1_0::substrate::CFilmSubstrateSpecificationObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList::clear()
+void sdl::V1_0::substrate::CFilmSubstrateSpecificationObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::substrate::CFilmSubstrateSpecificationObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::V1_0::V1_0::CFilmSubstrateSpecificationObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::substrate::CFilmSubstrateSpecificationObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_transparency"){
-		return QVariant::fromValue(at(index)->transparency.value());
+		return Version_1_0->at(index)->transparency ? QVariant::fromValue(Version_1_0->at(index)->transparency.value()) : QVariant();
 	}
 	if (nameId == "m_color"){
-		return QVariant::fromValue(at(index)->color.value());
+		return Version_1_0->at(index)->color ? QVariant::fromValue(Version_1_0->at(index)->color.value()) : QVariant();
 	}
 	if (nameId == "m_material"){
-		return QVariant::fromValue(at(index)->material.value());
+		return Version_1_0->at(index)->material ? QVariant::fromValue(Version_1_0->at(index)->material.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -4745,13 +4723,12 @@ CSubstrateSpecificationInputObject::CSubstrateSpecificationInputObject(QObject* 
 
 QVariant CSubstrateSpecificationInputObject::GetId()
 {
-	return CSubstrateSpecificationInput::id.value();
+	return CSubstrateSpecificationInput::id ? CSubstrateSpecificationInput::id.value() : QVariant();
 }
 
 
 void CSubstrateSpecificationInputObject::SetId(const QVariant& v)
 {
-
 	CSubstrateSpecificationInput::id = v.value<QString>().toUtf8();
 	idChanged();
 }
@@ -4765,13 +4742,12 @@ bool CSubstrateSpecificationInputObject::hasId()
 
 QVariant CSubstrateSpecificationInputObject::GetName()
 {
-	return CSubstrateSpecificationInput::name.value();
+	return CSubstrateSpecificationInput::name ? CSubstrateSpecificationInput::name.value() : QVariant();
 }
 
 
 void CSubstrateSpecificationInputObject::SetName(const QVariant& v)
 {
-
 	CSubstrateSpecificationInput::name = v.value<QString>();
 	nameChanged();
 }
@@ -4785,13 +4761,12 @@ bool CSubstrateSpecificationInputObject::hasName()
 
 QVariant CSubstrateSpecificationInputObject::GetDescription()
 {
-	return CSubstrateSpecificationInput::description.value();
+	return CSubstrateSpecificationInput::description ? CSubstrateSpecificationInput::description.value() : QVariant();
 }
 
 
 void CSubstrateSpecificationInputObject::SetDescription(const QVariant& v)
 {
-
 	CSubstrateSpecificationInput::description = v.value<QString>();
 	descriptionChanged();
 }
@@ -4808,17 +4783,25 @@ QVariant CSubstrateSpecificationInputObject::GetItem()
 	if (m_itemQObjectPtr.isValid()){
 		if (const CCardboardSubstrateSpecification* val = std::get_if<CCardboardSubstrateSpecification>((CSubstrateSpecificationInput::item).GetPtr())){
 			CCardboardSubstrateSpecificationObject *newObjectPtr = new CCardboardSubstrateSpecificationObject(this);
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+						newObjectPtr->CCardboardSubstrateSpecification::color = val->CCardboardSubstrateSpecification::color;
+			newObjectPtr->CCardboardSubstrateSpecification::grammage = val->CCardboardSubstrateSpecification::grammage;
+
 			m_itemQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
 		if (const CPaperSubstrateSpecification* val = std::get_if<CPaperSubstrateSpecification>((CSubstrateSpecificationInput::item).GetPtr())){
 			CPaperSubstrateSpecificationObject *newObjectPtr = new CPaperSubstrateSpecificationObject(this);
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+						newObjectPtr->CPaperSubstrateSpecification::grammage = val->CPaperSubstrateSpecification::grammage;
+			newObjectPtr->CPaperSubstrateSpecification::color = val->CPaperSubstrateSpecification::color;
+			newObjectPtr->CPaperSubstrateSpecification::coatType = val->CPaperSubstrateSpecification::coatType;
+
 			m_itemQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
 		if (const CFilmSubstrateSpecification* val = std::get_if<CFilmSubstrateSpecification>((CSubstrateSpecificationInput::item).GetPtr())){
 			CFilmSubstrateSpecificationObject *newObjectPtr = new CFilmSubstrateSpecificationObject(this);
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+						newObjectPtr->CFilmSubstrateSpecification::transparency = val->CFilmSubstrateSpecification::transparency;
+			newObjectPtr->CFilmSubstrateSpecification::color = val->CFilmSubstrateSpecification::color;
+			newObjectPtr->CFilmSubstrateSpecification::material = val->CFilmSubstrateSpecification::material;
+
 			m_itemQObjectPtr = QVariant::fromValue(newObjectPtr);
 		}
 	}
@@ -4828,16 +4811,15 @@ QVariant CSubstrateSpecificationInputObject::GetItem()
 
 void CSubstrateSpecificationInputObject::SetItem(const QVariant& v)
 {
-
 	if (v.isValid()){
 		if (const CCardboardSubstrateSpecificationObject* val = v.value<const CCardboardSubstrateSpecificationObject*>()){
-			*item = *val;
+			CSubstrateSpecificationInput::item = *val;
 		}
 		if (const CPaperSubstrateSpecificationObject* val = v.value<const CPaperSubstrateSpecificationObject*>()){
-			*item = *val;
+			CSubstrateSpecificationInput::item = *val;
 		}
 		if (const CFilmSubstrateSpecificationObject* val = v.value<const CFilmSubstrateSpecificationObject*>()){
-			*item = *val;
+			CSubstrateSpecificationInput::item = *val;
 		}
 	}
 	else {
@@ -4874,13 +4856,12 @@ void CSubstrateSpecificationInputObject::ResetItem()
 
 QVariant CSubstrateSpecificationInputObject::GetTypeId()
 {
-	return CSubstrateSpecificationInput::typeId.value();
+	return CSubstrateSpecificationInput::typeId ? CSubstrateSpecificationInput::typeId.value() : QVariant();
 }
 
 
 void CSubstrateSpecificationInputObject::SetTypeId(const QVariant& v)
 {
-
 	CSubstrateSpecificationInput::typeId = v.value<QString>().toUtf8();
 	typeIdChanged();
 }
@@ -4986,92 +4967,92 @@ QVariantMap CSubstrateSpecificationInputObjectList::get(int row) const
 }
 
 
-void CSubstrateSpecificationInputObjectList::append(sdl::V1_0::V1_0::CSubstrateSpecificationInputObject* item)
+void CSubstrateSpecificationInputObjectList::append(sdl::V1_0::substrate::CSubstrateSpecificationInputObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList* sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList::copyMe()
+sdl::V1_0::substrate::CSubstrateSpecificationInputObjectList* sdl::V1_0::substrate::CSubstrateSpecificationInputObjectList::copyMe()
 {
-	sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList* retVal = new sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList();
+	sdl::V1_0::substrate::CSubstrateSpecificationInputObjectList* retVal = new sdl::V1_0::substrate::CSubstrateSpecificationInputObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList::toJson()
+QString sdl::V1_0::substrate::CSubstrateSpecificationInputObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList::toGraphQL()
+QString sdl::V1_0::substrate::CSubstrateSpecificationInputObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList::addElement(sdl::V1_0::V1_0::CSubstrateSpecificationInputObject* item)
+void sdl::V1_0::substrate::CSubstrateSpecificationInputObjectList::addElement(sdl::V1_0::substrate::CSubstrateSpecificationInputObject* item)
 {
 	append(item);
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList::removeElement(int index)
+void sdl::V1_0::substrate::CSubstrateSpecificationInputObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList::isEqualWithModel(sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList* otherModelPtr)
+bool sdl::V1_0::substrate::CSubstrateSpecificationInputObjectList::isEqualWithModel(sdl::V1_0::substrate::CSubstrateSpecificationInputObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList::insert(int index, sdl::V1_0::V1_0::CSubstrateSpecificationInputObject* item)
+void sdl::V1_0::substrate::CSubstrateSpecificationInputObjectList::insert(int index, sdl::V1_0::substrate::CSubstrateSpecificationInputObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList::remove(int index)
+void sdl::V1_0::substrate::CSubstrateSpecificationInputObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList::clear()
+void sdl::V1_0::substrate::CSubstrateSpecificationInputObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::substrate::CSubstrateSpecificationInputObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::V1_0::V1_0::CSubstrateSpecificationInputObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::substrate::CSubstrateSpecificationInputObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_id"){
-		return QVariant::fromValue(at(index)->id.value());
+		return Version_1_0->at(index)->id ? QVariant::fromValue(Version_1_0->at(index)->id.value()) : QVariant();
 	}
 	if (nameId == "m_name"){
-		return QVariant::fromValue(at(index)->name.value());
+		return Version_1_0->at(index)->name ? QVariant::fromValue(Version_1_0->at(index)->name.value()) : QVariant();
 	}
 	if (nameId == "m_description"){
-		return QVariant::fromValue(at(index)->description.value());
+		return Version_1_0->at(index)->description ? QVariant::fromValue(Version_1_0->at(index)->description.value()) : QVariant();
 	}
 	if (nameId == "m_item"){
 		return itemPtr->GetItem();
 	}
 	if (nameId == "m_typeId"){
-		return QVariant::fromValue(at(index)->typeId.value());
+		return Version_1_0->at(index)->typeId ? QVariant::fromValue(Version_1_0->at(index)->typeId.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -5085,13 +5066,12 @@ CSubstrateSpecificationDocumentMetaInfoObject::CSubstrateSpecificationDocumentMe
 
 QVariant CSubstrateSpecificationDocumentMetaInfoObject::GetMaterialId()
 {
-	return CSubstrateSpecificationDocumentMetaInfo::materialId.value();
+	return CSubstrateSpecificationDocumentMetaInfo::materialId ? CSubstrateSpecificationDocumentMetaInfo::materialId.value() : QVariant();
 }
 
 
 void CSubstrateSpecificationDocumentMetaInfoObject::SetMaterialId(const QVariant& v)
 {
-
 	CSubstrateSpecificationDocumentMetaInfo::materialId = v.value<QString>().toUtf8();
 	materialIdChanged();
 }
@@ -5105,13 +5085,12 @@ bool CSubstrateSpecificationDocumentMetaInfoObject::hasMaterialId()
 
 QVariant CSubstrateSpecificationDocumentMetaInfoObject::GetLab()
 {
-	return CSubstrateSpecificationDocumentMetaInfo::lab.value();
+	return CSubstrateSpecificationDocumentMetaInfo::lab ? CSubstrateSpecificationDocumentMetaInfo::lab.value() : QVariant();
 }
 
 
 void CSubstrateSpecificationDocumentMetaInfoObject::SetLab(const QVariant& v)
 {
-
 	CSubstrateSpecificationDocumentMetaInfo::lab = v.value<QString>();
 	labChanged();
 }
@@ -5208,83 +5187,83 @@ QVariantMap CSubstrateSpecificationDocumentMetaInfoObjectList::get(int row) cons
 }
 
 
-void CSubstrateSpecificationDocumentMetaInfoObjectList::append(sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObject* item)
+void CSubstrateSpecificationDocumentMetaInfoObjectList::append(sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObject* item)
 {
 	BaseClass::append(item);
 }
 
 
-sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList* sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList::copyMe()
+sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObjectList* sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObjectList::copyMe()
 {
-	sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList* retVal = new sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList();
+	sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObjectList* retVal = new sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObjectList();
 	BaseClass::fromMe(retVal);
 	return retVal;
 }
 
 
-QString sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList::toJson()
+QString sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObjectList::toJson()
 {
 	return BaseClass::toJson();
 }
 
 
-QString sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList::toGraphQL()
+QString sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObjectList::toGraphQL()
 {
 	return BaseClass::toGraphQL();
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList::addElement(sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObject* item)
+void sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObjectList::addElement(sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObject* item)
 {
 	append(item);
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList::removeElement(int index)
+void sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObjectList::removeElement(int index)
 {
 	remove(index);
 }
 
 
-bool sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList::isEqualWithModel(sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList* otherModelPtr)
+bool sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObjectList::isEqualWithModel(sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObjectList* otherModelPtr)
 {
 	return BaseClass::isEqualWithModel(otherModelPtr);
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList::insert(int index, sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObject* item)
+void sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObjectList::insert(int index, sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObject* item)
 {
 	return BaseClass::insert(index, item);
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList::remove(int index)
+void sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObjectList::remove(int index)
 {
 	return BaseClass::remove(index);
 }
 
 
-void sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList::clear()
+void sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObjectList::clear()
 {
 	return BaseClass::clear();
 }
 
 
-QVariant sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList::getData(const QString& nameId, int index)
+QVariant sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	auto* itemPtr = item.value<sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObject*>();
+	auto* itemPtr = item.value<sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObject*>();
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_materialId"){
-		return QVariant::fromValue(at(index)->materialId.value());
+		return Version_1_0->at(index)->materialId ? QVariant::fromValue(Version_1_0->at(index)->materialId.value()) : QVariant();
 	}
 	if (nameId == "m_lab"){
-		return QVariant::fromValue(at(index)->lab.value());
+		return Version_1_0->at(index)->lab ? QVariant::fromValue(Version_1_0->at(index)->lab.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -5299,21 +5278,21 @@ QVariant CSubstrateSpecificationDocumentObjectList::GetOrCreateCachedObject(int 
 		retVal = this->m_objectDataTypeMap[index];
 	}
 	else{
-		if (const CCardboardSubstrateSpecification* val = std::get_if<CCardboardSubstrateSpecification>(this->at(index).GetPtr())){
+		if (const CCardboardSubstrateSpecification* val = std::get_if<CCardboardSubstrateSpecification>(this->Version_1_0->at(index).GetPtr())){
 			CCardboardSubstrateSpecificationObject *newObjectPtr = new CCardboardSubstrateSpecificationObject();
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			static_cast<CCardboardSubstrateSpecification&>(*newObjectPtr) = *val;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
-		if (const CPaperSubstrateSpecification* val = std::get_if<CPaperSubstrateSpecification>(this->at(index).GetPtr())){
+		if (const CPaperSubstrateSpecification* val = std::get_if<CPaperSubstrateSpecification>(this->Version_1_0->at(index).GetPtr())){
 			CPaperSubstrateSpecificationObject *newObjectPtr = new CPaperSubstrateSpecificationObject();
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			static_cast<CPaperSubstrateSpecification&>(*newObjectPtr) = *val;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
-		if (const CFilmSubstrateSpecification* val = std::get_if<CFilmSubstrateSpecification>(this->at(index).GetPtr())){
+		if (const CFilmSubstrateSpecification* val = std::get_if<CFilmSubstrateSpecification>(this->Version_1_0->at(index).GetPtr())){
 			CFilmSubstrateSpecificationObject *newObjectPtr = new CFilmSubstrateSpecificationObject();
-			static_cast<decltype(*newObjectPtr)&>(*newObjectPtr) = *val;
+			static_cast<CFilmSubstrateSpecification&>(*newObjectPtr) = *val;
 			retVal = QVariant::fromValue(newObjectPtr);
 		}
 
@@ -5343,24 +5322,24 @@ QVariantMap CSubstrateSpecificationDocumentObjectList::get(int row) const
 
 void CSubstrateSpecificationDocumentObjectList::append(QVariant item)
 {
-	beginInsertRows(QModelIndex(), count(), 0);
+	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
 
 	if (item.canConvert<CCardboardSubstrateSpecificationObject*>()){
 		CCardboardSubstrateSpecificationObject* val = item.value<CCardboardSubstrateSpecificationObject*>();
 		CCardboardSubstrateSpecification* newItemPtr = dynamic_cast<CCardboardSubstrateSpecification*>(val);
-		append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
+		Version_1_0->append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
 	}
 
 	if (item.canConvert<CPaperSubstrateSpecificationObject*>()){
 		CPaperSubstrateSpecificationObject* val = item.value<CPaperSubstrateSpecificationObject*>();
 		CPaperSubstrateSpecification* newItemPtr = dynamic_cast<CPaperSubstrateSpecification*>(val);
-		append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
+		Version_1_0->append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
 	}
 
 	if (item.canConvert<CFilmSubstrateSpecificationObject*>()){
 		CFilmSubstrateSpecificationObject* val = item.value<CFilmSubstrateSpecificationObject*>();
 		CFilmSubstrateSpecification* newItemPtr = dynamic_cast<CFilmSubstrateSpecification*>(val);
-		append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
+		Version_1_0->append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
 	}
 
 	ClearCache();
@@ -5368,9 +5347,9 @@ void CSubstrateSpecificationDocumentObjectList::append(QVariant item)
 }
 
 
-sdl::V1_0::V1_0::CSubstrateSpecificationDocumentObjectList* CSubstrateSpecificationDocumentObjectList::copyMe()
+sdl::V1_0::substrate::CSubstrateSpecificationDocumentObjectList* CSubstrateSpecificationDocumentObjectList::copyMe()
 {
-	sdl::V1_0::V1_0::CSubstrateSpecificationDocumentObjectList* objectListPtr = new sdl::V1_0::V1_0::CSubstrateSpecificationDocumentObjectList();
+	sdl::V1_0::substrate::CSubstrateSpecificationDocumentObjectList* objectListPtr = new sdl::V1_0::substrate::CSubstrateSpecificationDocumentObjectList();
 
 	for (int i = 0; i < this->rowCount(); i++){
 		QVariant item = this->getData("item", i);
@@ -5470,7 +5449,7 @@ void CSubstrateSpecificationDocumentObjectList::removeElement(int index)
 	remove(index);
 }
 
-bool CSubstrateSpecificationDocumentObjectList::isEqualWithModel(sdl::V1_0::V1_0::CSubstrateSpecificationDocumentObjectList* otherModelPtr)
+bool CSubstrateSpecificationDocumentObjectList::isEqualWithModel(sdl::V1_0::substrate::CSubstrateSpecificationDocumentObjectList* otherModelPtr)
 {
 	if (otherModelPtr == nullptr){
 		return false;
@@ -5499,25 +5478,25 @@ bool CSubstrateSpecificationDocumentObjectList::isEqualWithModel(sdl::V1_0::V1_0
 
 void CSubstrateSpecificationDocumentObjectList::insert(int index, QVariant item)
 {
-	if (index < 0 || index > size()) return;
-	beginInsertRows(QModelIndex(), count(), 0);
+	if (index < 0 || index > Version_1_0->size()) return;
+	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
 
 	if (item.canConvert<CCardboardSubstrateSpecificationObject*>()){
 		CCardboardSubstrateSpecificationObject* val = item.value<CCardboardSubstrateSpecificationObject*>();
 		CCardboardSubstrateSpecification* newItemPtr = dynamic_cast<CCardboardSubstrateSpecification*>(val);
-		append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
+		Version_1_0->append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
 	}
 
 	if (item.canConvert<CPaperSubstrateSpecificationObject*>()){
 		CPaperSubstrateSpecificationObject* val = item.value<CPaperSubstrateSpecificationObject*>();
 		CPaperSubstrateSpecification* newItemPtr = dynamic_cast<CPaperSubstrateSpecification*>(val);
-		append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
+		Version_1_0->append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
 	}
 
 	if (item.canConvert<CFilmSubstrateSpecificationObject*>()){
 		CFilmSubstrateSpecificationObject* val = item.value<CFilmSubstrateSpecificationObject*>();
 		CFilmSubstrateSpecification* newItemPtr = dynamic_cast<CFilmSubstrateSpecification*>(val);
-		append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
+		Version_1_0->append(istd::TNullableValue<SubstrateSpecificationDocument>(*newItemPtr));
 	}
 
 	ClearCache();
@@ -5539,7 +5518,7 @@ void CSubstrateSpecificationDocumentObjectList::clear()
 
 QVariant CSubstrateSpecificationDocumentObjectList::getData(const QString& nameId, int index)
 {
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		QVariant retVal = GetOrCreateCachedObject(index);
 		return retVal;
 	}
@@ -5575,34 +5554,10 @@ CGetSubstrateSpecificationListGqlRequest::CGetSubstrateSpecificationListGqlReque
 {
 	m_gqlContextPtr = gqlRequest.GetRequestContext();
 
-	const QByteArray protocolVersion = gqlRequest.GetProtocolVersion();
-
 	// reading input arguments
 	const ::imtgql::CGqlParamObject* inputDataObjectPtr = gqlRequest.GetParamObject("input");
 	if (inputDataObjectPtr != nullptr){
-		if (!protocolVersion.isEmpty()){
-			if (protocolVersion == "1.0"){
-				bool isInputRead;
-				if (optRead){
-					isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationListInput::PV_1_0);
-				}
-				else {
-					isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationListInput::PV_1_0);
-				}
-				m_isValid = isInputRead;
-				if (!isInputRead){
-					return;
-				}
-			}
-			else {
-				qWarning() << QString("Bad request. Version %1 is not supported").arg(qPrintable(protocolVersion));
-				m_isValid = false;
-
-				return;
-			}
-		}
-		else {
-			bool isInputRead;
+					bool isInputRead;
 			if (optRead){
 				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
 			}
@@ -5613,7 +5568,7 @@ CGetSubstrateSpecificationListGqlRequest::CGetSubstrateSpecificationListGqlReque
 			if (!isInputRead){
 				return;
 			}
-		}
+
 	}
 
 	// reading requested fields
@@ -5696,34 +5651,10 @@ CGetSubstrateSpecificationGqlRequest::CGetSubstrateSpecificationGqlRequest(const
 {
 	m_gqlContextPtr = gqlRequest.GetRequestContext();
 
-	const QByteArray protocolVersion = gqlRequest.GetProtocolVersion();
-
 	// reading input arguments
 	const ::imtgql::CGqlParamObject* inputDataObjectPtr = gqlRequest.GetParamObject("input");
 	if (inputDataObjectPtr != nullptr){
-		if (!protocolVersion.isEmpty()){
-			if (protocolVersion == "1.0"){
-				bool isInputRead;
-				if (optRead){
-					isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr, CInputId::PV_1_0);
-				}
-				else {
-					isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr, CInputId::PV_1_0);
-				}
-				m_isValid = isInputRead;
-				if (!isInputRead){
-					return;
-				}
-			}
-			else {
-				qWarning() << QString("Bad request. Version %1 is not supported").arg(qPrintable(protocolVersion));
-				m_isValid = false;
-
-				return;
-			}
-		}
-		else {
-			bool isInputRead;
+					bool isInputRead;
 			if (optRead){
 				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
 			}
@@ -5734,7 +5665,7 @@ CGetSubstrateSpecificationGqlRequest::CGetSubstrateSpecificationGqlRequest(const
 			if (!isInputRead){
 				return;
 			}
-		}
+
 	}
 
 	// reading requested fields
@@ -5800,34 +5731,10 @@ CGetOptionsListGqlRequest::CGetOptionsListGqlRequest(const ::imtgql::CGqlRequest
 {
 	m_gqlContextPtr = gqlRequest.GetRequestContext();
 
-	const QByteArray protocolVersion = gqlRequest.GetProtocolVersion();
-
 	// reading input arguments
 	const ::imtgql::CGqlParamObject* inputDataObjectPtr = gqlRequest.GetParamObject("input");
 	if (inputDataObjectPtr != nullptr){
-		if (!protocolVersion.isEmpty()){
-			if (protocolVersion == "1.0"){
-				bool isInputRead;
-				if (optRead){
-					isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr, CCollectionViewParamsTest::PV_1_0);
-				}
-				else {
-					isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr, CCollectionViewParamsTest::PV_1_0);
-				}
-				m_isValid = isInputRead;
-				if (!isInputRead){
-					return;
-				}
-			}
-			else {
-				qWarning() << QString("Bad request. Version %1 is not supported").arg(qPrintable(protocolVersion));
-				m_isValid = false;
-
-				return;
-			}
-		}
-		else {
-			bool isInputRead;
+					bool isInputRead;
 			if (optRead){
 				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
 			}
@@ -5838,7 +5745,7 @@ CGetOptionsListGqlRequest::CGetOptionsListGqlRequest(const ::imtgql::CGqlRequest
 			if (!isInputRead){
 				return;
 			}
-		}
+
 	}
 
 	// reading requested fields
@@ -5919,34 +5826,10 @@ CInsertSubstrateSpecificationGqlRequest::CInsertSubstrateSpecificationGqlRequest
 {
 	m_gqlContextPtr = gqlRequest.GetRequestContext();
 
-	const QByteArray protocolVersion = gqlRequest.GetProtocolVersion();
-
 	// reading input arguments
 	const ::imtgql::CGqlParamObject* inputDataObjectPtr = gqlRequest.GetParamObject("input");
 	if (inputDataObjectPtr != nullptr){
-		if (!protocolVersion.isEmpty()){
-			if (protocolVersion == "1.0"){
-				bool isInputRead;
-				if (optRead){
-					isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationInput::PV_1_0);
-				}
-				else {
-					isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationInput::PV_1_0);
-				}
-				m_isValid = isInputRead;
-				if (!isInputRead){
-					return;
-				}
-			}
-			else {
-				qWarning() << QString("Bad request. Version %1 is not supported").arg(qPrintable(protocolVersion));
-				m_isValid = false;
-
-				return;
-			}
-		}
-		else {
-			bool isInputRead;
+					bool isInputRead;
 			if (optRead){
 				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
 			}
@@ -5957,7 +5840,7 @@ CInsertSubstrateSpecificationGqlRequest::CInsertSubstrateSpecificationGqlRequest
 			if (!isInputRead){
 				return;
 			}
-		}
+
 	}
 
 	// reading requested fields
@@ -6026,34 +5909,10 @@ CUpdateSubstrateSpecificationGqlRequest::CUpdateSubstrateSpecificationGqlRequest
 {
 	m_gqlContextPtr = gqlRequest.GetRequestContext();
 
-	const QByteArray protocolVersion = gqlRequest.GetProtocolVersion();
-
 	// reading input arguments
 	const ::imtgql::CGqlParamObject* inputDataObjectPtr = gqlRequest.GetParamObject("input");
 	if (inputDataObjectPtr != nullptr){
-		if (!protocolVersion.isEmpty()){
-			if (protocolVersion == "1.0"){
-				bool isInputRead;
-				if (optRead){
-					isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationInput::PV_1_0);
-				}
-				else {
-					isInputRead = m_requestedArguments.input.emplace().ReadFromGraphQlObject(*inputDataObjectPtr, CSubstrateSpecificationInput::PV_1_0);
-				}
-				m_isValid = isInputRead;
-				if (!isInputRead){
-					return;
-				}
-			}
-			else {
-				qWarning() << QString("Bad request. Version %1 is not supported").arg(qPrintable(protocolVersion));
-				m_isValid = false;
-
-				return;
-			}
-		}
-		else {
-			bool isInputRead;
+					bool isInputRead;
 			if (optRead){
 				isInputRead = m_requestedArguments.input.emplace().OptReadFromGraphQlObject(*inputDataObjectPtr);
 			}
@@ -6064,7 +5923,7 @@ CUpdateSubstrateSpecificationGqlRequest::CUpdateSubstrateSpecificationGqlRequest
 			if (!isInputRead){
 				return;
 			}
-		}
+
 	}
 
 	// reading requested fields
@@ -6175,7 +6034,7 @@ bool CSubstrateSpecificationCollectionControllerCompBase::GetOperationFromReques
 }
 
 
-bool CSubstrateSpecificationCollectionControllerCompBase::CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const ::imtgql::CGqlRequest& gqlRequest, ::imtbase::CTreeItemModel& dataModel, QString& errorMessage) const
+bool CSubstrateSpecificationCollectionControllerCompBase::CreateRepresentationFromObject(const istd::IChangeable& data, const QByteArray& objectTypeId, const ::imtgql::CGqlRequest& gqlRequest, QJsonObject& dataObj, QString& errorMessage) const
 {
 	Q_UNUSED(objectTypeId);
 
@@ -6184,31 +6043,34 @@ bool CSubstrateSpecificationCollectionControllerCompBase::CreateRepresentationFr
 	//GetSubstrateSpecification
 	if (commandId == CGetSubstrateSpecificationGqlRequest::GetCommandId()){
 		CGetSubstrateSpecificationGqlRequest getSubstrateSpecificationGqlRequest(gqlRequest, false);
-		SubstrateSpecificationDocument representationObject;
+		V1_0::substrate::SubstrateSpecificationDocument representationObject;
 		const bool isRepresentationCreated = CreateRepresentationFromObject(data, getSubstrateSpecificationGqlRequest, representationObject, errorMessage);
 		if (!isRepresentationCreated){
-	I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create representation").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create representation").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
 
-		if (const CCardboardSubstrateSpecification* cardboardSubstrateSpecificationVal = std::get_if<CCardboardSubstrateSpecification>(&representationObject)){
-			if (!cardboardSubstrateSpecificationVal->WriteToModel(dataModel)){
+		if (const V1_0::substrate::CCardboardSubstrateSpecification* cardboardSubstrateSpecificationVal = std::get_if<V1_0::substrate::CCardboardSubstrateSpecification>(&representationObject)){
+			const bool isAdded = cardboardSubstrateSpecificationVal->WriteToJsonObject(dataObj);
+			if (!isAdded){
 				return false;
 			}
-			dataModel.SetData("__typename", "CardboardSubstrateSpecification", 0);
+			dataObj["__typename"] = "CardboardSubstrateSpecification";
 		}
-		else if (const CPaperSubstrateSpecification* paperSubstrateSpecificationVal = std::get_if<CPaperSubstrateSpecification>(&representationObject)){
-			if (!paperSubstrateSpecificationVal->WriteToModel(dataModel)){
+		else if (const V1_0::substrate::CPaperSubstrateSpecification* paperSubstrateSpecificationVal = std::get_if<V1_0::substrate::CPaperSubstrateSpecification>(&representationObject)){
+			const bool isAdded = paperSubstrateSpecificationVal->WriteToJsonObject(dataObj);
+			if (!isAdded){
 				return false;
 			}
-			dataModel.SetData("__typename", "PaperSubstrateSpecification", 0);
+			dataObj["__typename"] = "PaperSubstrateSpecification";
 		}
-		else if (const CFilmSubstrateSpecification* filmSubstrateSpecificationVal = std::get_if<CFilmSubstrateSpecification>(&representationObject)){
-			if (!filmSubstrateSpecificationVal->WriteToModel(dataModel)){
+		else if (const V1_0::substrate::CFilmSubstrateSpecification* filmSubstrateSpecificationVal = std::get_if<V1_0::substrate::CFilmSubstrateSpecification>(&representationObject)){
+			const bool isAdded = filmSubstrateSpecificationVal->WriteToJsonObject(dataObj);
+			if (!isAdded){
 				return false;
 			}
-			dataModel.SetData("__typename", "FilmSubstrateSpecification", 0);
+			dataObj["__typename"] = "FilmSubstrateSpecification";
 		}
 
 		return true;
@@ -6236,7 +6098,7 @@ istd::IChangeableUniquePtr CSubstrateSpecificationCollectionControllerCompBase::
 			return nullptr;
 		}
 
-		return CreateObjectFromRepresentation(*insertSubstrateSpecificationGqlRequest.GetRequestedArguments().input.item, newObjectId, errorMessage);
+		return CreateObjectFromRepresentation(*insertSubstrateSpecificationGqlRequest.GetRequestedArguments().input->item, newObjectId, errorMessage);
 	}
 
 	errorMessage = QString("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
@@ -6278,7 +6140,7 @@ bool CSubstrateSpecificationCollectionControllerCompBase::UpdateObjectFromReques
 }
 
 
-bool CSubstrateSpecificationCollectionControllerCompBase::SetupGqlItemWithContext(const ::imtgql::CGqlRequest& gqlRequest, const ::imtservergql::CObjectCollectionControllerCompBase::GqlItemSetupContext& setupContext, ::imtbase::CTreeItemModel& dataModel, int itemIndex,const ::imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const
+bool CSubstrateSpecificationCollectionControllerCompBase::SetupGqlItemWithContext(const ::imtgql::CGqlRequest& gqlRequest, const ::imtservergql::CObjectCollectionControllerCompBase::GqlItemSetupContext& setupContext, QJsonObject& itemObj, const ::imtbase::IObjectCollectionIterator* objectCollectionIterator, QString& errorMessage) const
 {
 	Q_UNUSED(gqlRequest);
 
@@ -6297,7 +6159,7 @@ I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create object iterator.
 	}
 
 	//GetSubstrateSpecificationList
-	CSubstrateSpecificationListItem representationObject;
+	V1_0::substrate::CSubstrateSpecificationListItem representationObject;
 	const bool isRepresentationCreated = CreateRepresentationFromObject(*objectCollectionIterator, *typedSetupContext, representationObject, errorMessage);
 	if (!isRepresentationCreated){
 	I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create representation").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
@@ -6305,7 +6167,7 @@ I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create object iterator.
 		return false;
 	}
 
-	const bool isRepresentationWritten = representationObject.WriteToModel(dataModel, itemIndex);
+	const bool isRepresentationWritten = representationObject.WriteToJsonObject(itemObj);
 	if (!isRepresentationWritten){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to Write TreeModel").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
@@ -6313,14 +6175,15 @@ I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create object iterator.
 	}
 
 	return true;
+
 }
 
 
-::imtbase::CTreeItemModel* CSubstrateSpecificationCollectionControllerCompBase::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CSubstrateSpecificationCollectionControllerCompBase::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	const QString commandId = gqlRequest.GetCommandId();
-	istd::TDelPtr<::imtbase::CTreeItemModel> modelPtr(new ::imtbase::CTreeItemModel);
-	::imtbase::CTreeItemModel* dataModelPtr = modelPtr->AddTreeModel("data");
+	QJsonObject modelObj;
+	QJsonObject dataModelObj;
 
 	// GetOptionsList
 	if (commandId == CGetOptionsListGqlRequest::GetCommandId()){
@@ -6329,25 +6192,25 @@ I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to create object iterator.
 			errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
 			SendErrorMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		sdl::V1_0::imtbase::COptionsList replyPayload = OnGetOptionsList(getOptionsListGqlRequest, errorMessage);
+		V1_0::imtbase::COptionsList replyPayload = OnGetOptionsList(getOptionsListGqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
 			SendErrorMessage(0, QString("The derived call [OnGetOptionsList] returned an error: %1").arg(errorMessage));
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		const bool isModelCreated = replyPayload.WriteToModel(*dataModelPtr);
+		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
 		if (!isModelCreated){
 			errorMessage = QString("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
 			SendCriticalMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		return modelPtr.PopPtr();
+		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
 	}
 
 	return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
@@ -6377,11 +6240,11 @@ bool CSubstrateSpecificationsGqlHandlerCompBase::IsRequestSupported(const imtgql
 }
 
 
-::imtbase::CTreeItemModel* CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+QJsonObject CSubstrateSpecificationsGqlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	const QByteArray commandId = gqlRequest.GetCommandId();
-	istd::TDelPtr<::imtbase::CTreeItemModel> modelPtr(new ::imtbase::CTreeItemModel);
-	::imtbase::CTreeItemModel* dataModelPtr = modelPtr->AddTreeModel("data");
+	QJsonObject modelObj;
+	QJsonObject dataModelObj;
 
 	// GetSubstrateSpecificationList
 	if (commandId == CGetSubstrateSpecificationListGqlRequest::GetCommandId()){
@@ -6390,25 +6253,25 @@ bool CSubstrateSpecificationsGqlHandlerCompBase::IsRequestSupported(const imtgql
 			errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
 			SendErrorMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		CSubstrateSpecificationListResponse replyPayload = OnGetSubstrateSpecificationList(getSubstrateSpecificationListGqlRequest, gqlRequest, errorMessage);
+		V1_0::substrate::CSubstrateSpecificationListResponse replyPayload = OnGetSubstrateSpecificationList(getSubstrateSpecificationListGqlRequest, gqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
 			SendErrorMessage(0, QString("The derived call [OnGetSubstrateSpecificationList] returned an error: %1").arg(errorMessage));
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		const bool isModelCreated = replyPayload.WriteToModel(*dataModelPtr);
+		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
 		if (!isModelCreated){
 			errorMessage = QString("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
 			SendCriticalMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		return modelPtr.PopPtr();
+		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
 	}
 
 	// GetSubstrateSpecification
@@ -6418,41 +6281,38 @@ bool CSubstrateSpecificationsGqlHandlerCompBase::IsRequestSupported(const imtgql
 			errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
 			SendErrorMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		SubstrateSpecificationDocument replyPayload = OnGetSubstrateSpecification(getSubstrateSpecificationGqlRequest, gqlRequest, errorMessage);
+		V1_0::substrate::SubstrateSpecificationDocument replyPayload = OnGetSubstrateSpecification(getSubstrateSpecificationGqlRequest, gqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
 			SendErrorMessage(0, QString("The derived call [OnGetSubstrateSpecification] returned an error: %1").arg(errorMessage));
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		if (const CCardboardSubstrateSpecification* cardboardSubstrateSpecificationVal = std::get_if<CCardboardSubstrateSpecification>(&replyPayload)){
-			if (!cardboardSubstrateSpecificationVal->WriteToModel(*dataModelPtr)){
-				return nullptr;
+		if (const V1_0::substrate::CCardboardSubstrateSpecification* cardboardSubstrateSpecificationVal = std::get_if<V1_0::substrate::CCardboardSubstrateSpecification>(&replyPayload)){
+			const bool isAdded = cardboardSubstrateSpecificationVal->WriteToJsonObject(dataModelObj);
+			if (!isAdded){
+				return QJsonObject();
 			}
-			if(dataModelPtr != nullptr){
-				dataModelPtr->SetData("__typename", "CardboardSubstrateSpecification", 0);
-			}
+			dataModelObj["__typename"] = "CardboardSubstrateSpecification";
 		}
-		else if (const CPaperSubstrateSpecification* paperSubstrateSpecificationVal = std::get_if<CPaperSubstrateSpecification>(&replyPayload)){
-			if (!paperSubstrateSpecificationVal->WriteToModel(*dataModelPtr)){
-				return nullptr;
+		else if (const V1_0::substrate::CPaperSubstrateSpecification* paperSubstrateSpecificationVal = std::get_if<V1_0::substrate::CPaperSubstrateSpecification>(&replyPayload)){
+			const bool isAdded = paperSubstrateSpecificationVal->WriteToJsonObject(dataModelObj);
+			if (!isAdded){
+				return QJsonObject();
 			}
-			if(dataModelPtr != nullptr){
-				dataModelPtr->SetData("__typename", "PaperSubstrateSpecification", 0);
-			}
+			dataModelObj["__typename"] = "PaperSubstrateSpecification";
 		}
-		else if (const CFilmSubstrateSpecification* filmSubstrateSpecificationVal = std::get_if<CFilmSubstrateSpecification>(&replyPayload)){
-			if (!filmSubstrateSpecificationVal->WriteToModel(*dataModelPtr)){
-				return nullptr;
+		else if (const V1_0::substrate::CFilmSubstrateSpecification* filmSubstrateSpecificationVal = std::get_if<V1_0::substrate::CFilmSubstrateSpecification>(&replyPayload)){
+			const bool isAdded = filmSubstrateSpecificationVal->WriteToJsonObject(dataModelObj);
+			if (!isAdded){
+				return QJsonObject();
 			}
-			if(dataModelPtr != nullptr){
-				dataModelPtr->SetData("__typename", "FilmSubstrateSpecification", 0);
-			}
+			dataModelObj["__typename"] = "FilmSubstrateSpecification";
 		}
-		return modelPtr.PopPtr();
+		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
 	}
 
 	// GetOptionsList
@@ -6462,25 +6322,25 @@ bool CSubstrateSpecificationsGqlHandlerCompBase::IsRequestSupported(const imtgql
 			errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
 			SendErrorMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		sdl::V1_0::imtbase::COptionsList replyPayload = OnGetOptionsList(getOptionsListGqlRequest, gqlRequest, errorMessage);
+		V1_0::imtbase::COptionsList replyPayload = OnGetOptionsList(getOptionsListGqlRequest, gqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
 			SendErrorMessage(0, QString("The derived call [OnGetOptionsList] returned an error: %1").arg(errorMessage));
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		const bool isModelCreated = replyPayload.WriteToModel(*dataModelPtr);
+		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
 		if (!isModelCreated){
 			errorMessage = QString("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
 			SendCriticalMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		return modelPtr.PopPtr();
+		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
 	}
 
 	// InsertSubstrateSpecification
@@ -6490,25 +6350,25 @@ bool CSubstrateSpecificationsGqlHandlerCompBase::IsRequestSupported(const imtgql
 			errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
 			SendErrorMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		CInputId replyPayload = OnInsertSubstrateSpecification(insertSubstrateSpecificationGqlRequest, gqlRequest, errorMessage);
+		V1_0::substrate::CInputId replyPayload = OnInsertSubstrateSpecification(insertSubstrateSpecificationGqlRequest, gqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
 			SendErrorMessage(0, QString("The derived call [OnInsertSubstrateSpecification] returned an error: %1").arg(errorMessage));
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		const bool isModelCreated = replyPayload.WriteToModel(*dataModelPtr);
+		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
 		if (!isModelCreated){
 			errorMessage = QString("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
 			SendCriticalMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		return modelPtr.PopPtr();
+		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
 	}
 
 	// UpdateSubstrateSpecification
@@ -6518,32 +6378,32 @@ bool CSubstrateSpecificationsGqlHandlerCompBase::IsRequestSupported(const imtgql
 			errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
 			SendErrorMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		CInputId replyPayload = OnUpdateSubstrateSpecification(updateSubstrateSpecificationGqlRequest, gqlRequest, errorMessage);
+		V1_0::substrate::CInputId replyPayload = OnUpdateSubstrateSpecification(updateSubstrateSpecificationGqlRequest, gqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
 			SendErrorMessage(0, QString("The derived call [OnUpdateSubstrateSpecification] returned an error: %1").arg(errorMessage));
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		const bool isModelCreated = replyPayload.WriteToModel(*dataModelPtr);
+		const bool isModelCreated = replyPayload.WriteToJsonObject(dataModelObj);
 		if (!isModelCreated){
 			errorMessage = QString("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
 			SendCriticalMessage(0, errorMessage);
 
-			return nullptr;
+			return QJsonObject();
 		}
 
-		return modelPtr.PopPtr();
+		modelObj.insert(QStringLiteral("data"), dataModelObj); return modelObj;
 	}
 
 	errorMessage = QString("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
 	SendErrorMessage(0, errorMessage);
 
-	return nullptr;
+	return QJsonObject();
 }
 
 
-} // namespace sdl::V1_0::V1_0
+} // namespace sdl::V1_0::substrate

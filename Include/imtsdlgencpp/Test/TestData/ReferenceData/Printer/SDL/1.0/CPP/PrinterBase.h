@@ -55,17 +55,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CPrinterSpecificationBase& other) const;
 	[[nodiscard]] bool operator!=(const CPrinterSpecificationBase& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CLink
@@ -82,17 +80,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CLink& other) const;
 	[[nodiscard]] bool operator!=(const CLink& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CPrinterBase
@@ -115,17 +111,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CPrinterBase& other) const;
 	[[nodiscard]] bool operator!=(const CPrinterBase& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CPrinterList
@@ -142,17 +136,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CPrinterList& other) const;
 	[[nodiscard]] bool operator!=(const CPrinterList& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 
@@ -635,7 +627,7 @@ private:
 } // namespace sdl::V1_0::modsdl
 
 
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CPrinterSpecificationBase);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CLink);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CPrinterBase);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CPrinterList);
+Q_DECLARE_METATYPE(sdl::V1_0::modsdl::CPrinterSpecificationBase);
+Q_DECLARE_METATYPE(sdl::V1_0::modsdl::CLink);
+Q_DECLARE_METATYPE(sdl::V1_0::modsdl::CPrinterBase);
+Q_DECLARE_METATYPE(sdl::V1_0::modsdl::CPrinterList);
