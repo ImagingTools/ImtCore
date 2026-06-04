@@ -24,8 +24,8 @@ Rectangle {
 		// Panel header
 		Rectangle {
 			width: parent.width
-			height: Style.sizeS
-			color: Style.panelHeaderColor
+			height: Style.controlHeightS
+			color: Style.alternateBaseColor
 
 			Row {
 				anchors.left: parent.left
@@ -38,7 +38,7 @@ Rectangle {
 					text: qsTr("Tickets")
 					font.pixelSize: Style.fontSizeM
 					font.bold: true
-					color: Style.textPrimaryColor
+					color: Style.imaginToolsAccentColor
 					width: parent.width - newTicketBtn.width
 					anchors.verticalCenter: parent.verticalCenter
 				}
@@ -54,7 +54,7 @@ Rectangle {
 						anchors.centerIn: parent
 						text: "+"
 						font.pixelSize: Style.fontSizeL
-						color: Style.accentColor
+						color: Style.imaginToolsAccentColor
 					}
 
 					MouseArea {
@@ -70,7 +70,7 @@ Rectangle {
 		// Status filter tabs — GitHub Issues style: Open / Closed
 		Row {
 			width: parent.width
-			height: Style.tabBarHeight
+			height: Style.buttonHeightM
 
 			Repeater {
 				model: [
@@ -81,14 +81,14 @@ Rectangle {
 
 				Rectangle {
 					width: parent.width / 3
-					height: Style.tabBarHeight
+					height: Style.buttonHeightM
 					color: "transparent"
 
 					Rectangle {
 						anchors.bottom: parent.bottom
 						width: parent.width
 						height: 2
-						color: Style.accentColor
+						color: Style.imaginToolsAccentColor
 						visible: ticketListPanelRoot.statusFilter === modelData.value
 					}
 
@@ -97,8 +97,8 @@ Rectangle {
 						text: modelData.label
 						font.pixelSize: Style.fontSizeXS
 						color: ticketListPanelRoot.statusFilter === modelData.value
-							? Style.accentColor
-							: Style.textSecondaryColor
+							? Style.imaginToolsAccentColor
+							: Style.buttonInactiveTextColor
 						font.bold: ticketListPanelRoot.statusFilter === modelData.value
 					}
 
@@ -119,7 +119,6 @@ Rectangle {
 		ListView {
 			id: ticketListView
 			width: parent.width
-			height: parent.height - Style.sizeS - Style.tabBarHeight
 			clip: true
 			model: ticketListPanelRoot.ticketsModel
 			spacing: 1
@@ -127,9 +126,6 @@ Rectangle {
 			delegate: Rectangle {
 				width: ticketListView.width
 				height: ticketItemContent.height + Style.paddingS * 2
-				color: model.id === ticketListPanelRoot.currentTicketId
-					? Style.selectedItemColor
-					: "transparent"
 
 				Column {
 					id: ticketItemContent
@@ -138,11 +134,11 @@ Rectangle {
 					anchors.verticalCenter: parent.verticalCenter
 					anchors.leftMargin: Style.paddingM
 					anchors.rightMargin: Style.paddingS
-					spacing: Style.paddingXS
+					spacing: Style.paddingS
 
 					Row {
 						width: parent.width
-						spacing: Style.paddingXS
+						spacing: Style.paddingS
 
 						// Status icon (colored dot)
 						Rectangle {
@@ -157,7 +153,7 @@ Rectangle {
 						Text {
 							text: "#" + (model.number || "")
 							font.pixelSize: Style.fontSizeXS
-							color: Style.textSecondaryColor
+							color: Style.buttonInactiveTextColor
 							anchors.verticalCenter: parent.verticalCenter
 							visible: (model.number || 0) > 0
 						}
@@ -166,9 +162,9 @@ Rectangle {
 							text: model.title || ""
 							font.pixelSize: Style.fontSizeS
 							font.bold: true
-							color: Style.textPrimaryColor
+							color: Style.imaginToolsAccentColor
 							elide: Text.ElideRight
-							width: parent.width - priorityBadge.width - Style.paddingXS * 4 - 30
+							width: parent.width - priorityBadge.width - Style.paddingS * 4 - 30
 							anchors.verticalCenter: parent.verticalCenter
 						}
 
@@ -183,7 +179,7 @@ Rectangle {
 					Text {
 						text: model.createdAt || ""
 						font.pixelSize: Style.fontSizeXS
-						color: Style.textSecondaryColor
+						color: Style.buttonInactiveTextColor
 					}
 				}
 
@@ -191,7 +187,7 @@ Rectangle {
 					anchors.bottom: parent.bottom
 					width: parent.width
 					height: 1
-					color: Style.separatorColor
+					color: Style.borderColor2
 					opacity: 0.5
 				}
 

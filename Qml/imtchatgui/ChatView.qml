@@ -27,8 +27,8 @@ Rectangle {
 		Rectangle {
 			id: chatHeader
 			width: parent.width
-			height: Style.sizeS
-			color: Style.panelHeaderColor
+			height: Style.buttonHeightS
+			color: Style.buttonHeightM
 
 			Row {
 				anchors.left: parent.left
@@ -39,10 +39,10 @@ Rectangle {
 				spacing: Style.paddingS
 
 				Rectangle {
-					width: Style.avatarSizeS
-					height: Style.avatarSizeS
-					radius: Style.avatarSizeS / 2
-					color: Style.accentColor
+					width: Style.controlHeightL
+					height: Style.controlHeightL
+					radius: Style.controlHeightL / 2
+					color: Style.imaginToolsAccentColor
 					anchors.verticalCenter: parent.verticalCenter
 
 					Text {
@@ -58,7 +58,7 @@ Rectangle {
 					text: chatViewContainer.conversationName
 					font.pixelSize: Style.fontSizeM
 					font.bold: true
-					color: Style.textPrimaryColor
+					color: Style.imaginToolsAccentColor
 					anchors.verticalCenter: parent.verticalCenter
 				}
 			}
@@ -71,7 +71,7 @@ Rectangle {
 			height: parent.height - chatHeader.height - messageInput.height
 			clip: true
 			model: chatViewContainer.messagesModel
-			spacing: Style.paddingXS
+			spacing: Style.paddingS
 			verticalLayoutDirection: ListView.BottomToTop
 
 			delegate: MessageBubble {

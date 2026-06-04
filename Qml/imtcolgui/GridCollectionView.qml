@@ -92,8 +92,6 @@ Item {
 	onCommandsIdChanged: {
 		gridCollectionViewBase.commandsId = commandsId;
 
-		collectionMetaInfo.gqlModelMetaInfo = commandsId + "MetaInfo";
-
 		if (commandsLoader.item){
 			commandsLoader.item.commandId = commandsId;
 		}

@@ -364,25 +364,6 @@ Item {
             collectionStructureContainer.filterDecoratorLoaded();
         }
 
-        onSelectionChanged: {
-            if (collectionMetaInfo.visible){
-                if (selection.length === 1){
-                    let itemIds = collectionStructureContainer.getSelectedIds();
-                    let itemNames = collectionStructureContainer.getSelectedNames();
-
-                    if (itemIds.length > 0){
-                        let itemId = itemIds[0];
-                        collectionMetaInfo.getMetaInfo(itemId);
-                    }
-
-                    collectionMetaInfo.contentVisible = true;
-                }
-                else{
-                    collectionMetaInfo.contentVisible = false
-                }
-            }
-        }
-
         onSelectedItem: {
             console.log("collectionStructureBase onItemSelected", commandsDelegateLoader, commandsDelegateLoader.item);
 

@@ -204,7 +204,7 @@ RemoteCollectionView {
 				anchors.left: parent.left
 				anchors.leftMargin: Style.marginM
 				font.pixelSize: Style.fontSizeM
-				color: tenantRelationScopeDelegate.scopeValue === "Invited" ? Style.accentColor : Style.textColor
+				color: tenantRelationScopeDelegate.scopeValue === "Invited" ? Style.imaginToolsAccentColor : Style.textColor
 				text: tenantRelationScopeDelegate.scopeValue
 				font.underline: tenantRelationScopeDelegate.scopeValue === "Invited"
 

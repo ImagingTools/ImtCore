@@ -247,7 +247,7 @@ ViewBase {
 				Rectangle {
 					id: incomingCard
 					width: (mainColumn.width - 3 * Style.marginM) / 4
-					height: Style.controlHeightXL + Style.marginXL
+					height: Style.controlHeightL + Style.marginXL
 					radius: Style.radiusS
 					color: Style.alternateBaseColor
 					border.color: Style.borderColor
@@ -278,7 +278,7 @@ ViewBase {
 				Rectangle {
 					id: outgoingCard
 					width: (mainColumn.width - 3 * Style.marginM) / 4
-					height: Style.controlHeightXL + Style.marginXL
+					height: Style.controlHeightL + Style.marginXL
 					radius: Style.radiusS
 					color: Style.alternateBaseColor
 					border.color: Style.borderColor
@@ -309,7 +309,7 @@ ViewBase {
 				Rectangle {
 					id: activeCard
 					width: (mainColumn.width - 3 * Style.marginM) / 4
-					height: Style.controlHeightXL + Style.marginXL
+					height: Style.controlHeightL + Style.marginXL
 					radius: Style.radiusS
 					color: Style.alternateBaseColor
 					border.color: Style.borderColor
@@ -340,7 +340,7 @@ ViewBase {
 				Rectangle {
 					id: pendingCard
 					width: (mainColumn.width - 3 * Style.marginM) / 4
-					height: Style.controlHeightXL + Style.marginXL
+					height: Style.controlHeightL + Style.marginXL
 					radius: Style.radiusS
 					color: Style.alternateBaseColor
 					border.color: Style.borderColor

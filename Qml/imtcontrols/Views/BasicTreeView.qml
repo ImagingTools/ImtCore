@@ -484,17 +484,12 @@ Item {
                                 visible: cellRoot.isEditingHere
                                 active: cellRoot.isEditingHere
 
-                                sourceComponent: {
-                                    switch (cellRoot.editorType) {
-                                    case "string":     return textEditorComponent
-                                    case "number":     return textEditorComponent
-                                    case "bool":       return boolEditorComponent
-                                    case "checkState": return boolEditorComponent
-                                    case "combo":      return comboEditorComponent
-                                    case "custom":     return cellRoot.column.editor
-                                    }
-                                    return null
-                                }
+                                sourceComponent: cellRoot.editorType === "string" ? textEditorComponent :
+                                                 cellRoot.editorType === "number" ? textEditorComponent :
+                                                 cellRoot.editorType === "bool" ? boolEditorComponent :
+                                                 cellRoot.editorType === "checkState" ? boolEditorComponent :
+                                                 cellRoot.editorType === "combo" ? comboEditorComponent :
+                                                 cellRoot.editorType === "custom" ? cellRoot.column.editor : null
 
                                 property var __commitHandler: null
                                 property var __cancelHandler: null

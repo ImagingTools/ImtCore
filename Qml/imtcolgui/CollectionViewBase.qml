@@ -147,7 +147,6 @@ ViewBase {
 		anchors.bottom: paginationObj.top;
 		width: tableInternal.minWidth * tableInternal.columnCount < parent.width ? tableInternal.minWidth * tableInternal.columnCount : parent.width;
 		color: Style.baseColor;
-		radius: Style.size_mainCornerRadius !== undefined ? Style.size_mainCornerRadius: 0;
 		
 		TreeItemModel{
 			id: tableDecoratorModel;

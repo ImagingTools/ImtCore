@@ -27,13 +27,13 @@ Item {
 		anchors.left: parent.left
 		anchors.verticalCenter: parent.verticalCenter
 		anchors.leftMargin: Style.paddingM
-		spacing: Style.paddingXS
+		spacing: Style.paddingS
 
 		Text {
 			visible: typingIndicatorRoot.userName.length > 0
 			text: typingIndicatorRoot.userName + " " + qsTr("is typing") + typingIndicatorRoot.dots
 			font.pixelSize: Style.fontSizeXS
-			color: Style.textSecondaryColor
+			color: Style.buttonInactiveTextColor
 			font.italic: true
 			anchors.verticalCenter: parent.verticalCenter
 		}
@@ -42,7 +42,7 @@ Item {
 			visible: typingIndicatorRoot.userName.length === 0
 			text: qsTr("typing") + typingIndicatorRoot.dots
 			font.pixelSize: Style.fontSizeXS
-			color: Style.textSecondaryColor
+			color: Style.buttonInactiveTextColor
 			font.italic: true
 			anchors.verticalCenter: parent.verticalCenter
 		}

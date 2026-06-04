@@ -32,7 +32,7 @@ Rectangle {
 
 	readonly property string badgeColor: badgeType === "label" ? labelColor
 		: (_colorMap[badgeType] && value >= 0 && value < _colorMap[badgeType].length)
-			? _colorMap[badgeType][value] : Style.textSecondaryColor
+			? _colorMap[badgeType][value] : Style.buttonInactiveTextColor
 
 	readonly property string badgeLabel: badgeType === "label" ? labelName
 		: (_labelMap[badgeType] && value >= 0 && value < _labelMap[badgeType].length)
