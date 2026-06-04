@@ -82,17 +82,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CResult& other) const;
 	[[nodiscard]] bool operator!=(const CResult& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CArea
@@ -117,17 +115,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CArea& other) const;
 	[[nodiscard]] bool operator!=(const CArea& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CAnalyzer
@@ -148,17 +144,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CAnalyzer& other) const;
 	[[nodiscard]] bool operator!=(const CAnalyzer& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CInspection
@@ -183,17 +177,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CInspection& other) const;
 	[[nodiscard]] bool operator!=(const CInspection& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CProductOverview
@@ -222,17 +214,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CProductOverview& other) const;
 	[[nodiscard]] bool operator!=(const CProductOverview& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CLocalizedText
@@ -251,17 +241,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CLocalizedText& other) const;
 	[[nodiscard]] bool operator!=(const CLocalizedText& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CCoordinates
@@ -282,17 +270,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CCoordinates& other) const;
 	[[nodiscard]] bool operator!=(const CCoordinates& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CExtendedMetaData
@@ -311,17 +297,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CExtendedMetaData& other) const;
 	[[nodiscard]] bool operator!=(const CExtendedMetaData& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CResultMetaData
@@ -352,17 +336,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CResultMetaData& other) const;
 	[[nodiscard]] bool operator!=(const CResultMetaData& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class COverallResultValues
@@ -387,17 +369,15 @@ public:
 
 	[[nodiscard]] bool operator==(const COverallResultValues& other) const;
 	[[nodiscard]] bool operator!=(const COverallResultValues& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CUnionTestingType
@@ -418,17 +398,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CUnionTestingType& other) const;
 	[[nodiscard]] bool operator!=(const CUnionTestingType& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CCDMResultVarRecursive
@@ -453,17 +431,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CCDMResultVarRecursive& other) const;
 	[[nodiscard]] bool operator!=(const CCDMResultVarRecursive& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CCDMResultVarString
@@ -488,17 +464,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CCDMResultVarString& other) const;
 	[[nodiscard]] bool operator!=(const CCDMResultVarString& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CCDMResult
@@ -523,17 +497,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CCDMResult& other) const;
 	[[nodiscard]] bool operator!=(const CCDMResult& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CPointsInCoordinateFormat
@@ -550,17 +522,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CPointsInCoordinateFormat& other) const;
 	[[nodiscard]] bool operator!=(const CPointsInCoordinateFormat& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CCollectionViewParamsTest
@@ -575,23 +545,21 @@ public:
 
 	istd::TNullableValue<int> count;
 	istd::TNullableValue<int> offset;
-	istd::TNullableValue<sdl::V1_0::imtbase::CComplexCollectionFilter> filterModel;
+	istd::TNullableValue<imtbase::CComplexCollectionFilter> filterModel;
 
 	static QByteArray GetVersionId();
 
 	[[nodiscard]] bool operator==(const CCollectionViewParamsTest& other) const;
 	[[nodiscard]] bool operator!=(const CCollectionViewParamsTest& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 
@@ -2264,7 +2232,7 @@ struct GetLastProductionResultsCDMRequestInfo
 
 struct GetLastProductionResultsCDMRequestArguments
 {
-	istd::TNullableValue<CPointsInCoordinateFormat> pointAsCoordinates;
+	istd::TNullableValue<V1_0::complextest::CPointsInCoordinateFormat> pointAsCoordinates;
 };
 
 
@@ -2316,19 +2284,19 @@ private:
 } // namespace sdl::V1_0::complextest
 
 
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CResult);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CArea);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CAnalyzer);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CInspection);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CProductOverview);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CLocalizedText);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CCoordinates);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CExtendedMetaData);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CResultMetaData);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::COverallResultValues);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CUnionTestingType);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CCDMResultVarRecursive);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CCDMResultVarString);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CCDMResult);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CPointsInCoordinateFormat);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CCollectionViewParamsTest);
+Q_DECLARE_METATYPE(sdl::V1_0::complextest::CResult);
+Q_DECLARE_METATYPE(sdl::V1_0::complextest::CArea);
+Q_DECLARE_METATYPE(sdl::V1_0::complextest::CAnalyzer);
+Q_DECLARE_METATYPE(sdl::V1_0::complextest::CInspection);
+Q_DECLARE_METATYPE(sdl::V1_0::complextest::CProductOverview);
+Q_DECLARE_METATYPE(sdl::V1_0::complextest::CLocalizedText);
+Q_DECLARE_METATYPE(sdl::V1_0::complextest::CCoordinates);
+Q_DECLARE_METATYPE(sdl::V1_0::complextest::CExtendedMetaData);
+Q_DECLARE_METATYPE(sdl::V1_0::complextest::CResultMetaData);
+Q_DECLARE_METATYPE(sdl::V1_0::complextest::COverallResultValues);
+Q_DECLARE_METATYPE(sdl::V1_0::complextest::CUnionTestingType);
+Q_DECLARE_METATYPE(sdl::V1_0::complextest::CCDMResultVarRecursive);
+Q_DECLARE_METATYPE(sdl::V1_0::complextest::CCDMResultVarString);
+Q_DECLARE_METATYPE(sdl::V1_0::complextest::CCDMResult);
+Q_DECLARE_METATYPE(sdl::V1_0::complextest::CPointsInCoordinateFormat);
+Q_DECLARE_METATYPE(sdl::V1_0::complextest::CCollectionViewParamsTest);
