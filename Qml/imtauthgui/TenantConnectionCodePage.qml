@@ -61,11 +61,13 @@ ViewBase {
 	}
 
 	Column {
-		anchors.fill: parent
-		anchors.margins: Style.marginL
+		anchors.top: parent.top
+		anchors.topMargin: Style.marginL
+		anchors.horizontalCenter: parent.horizontalCenter
+		width: Math.min(parent.width - Style.marginXL * 2, 1000)
 		spacing: Style.marginL
 
-		BaseText {
+		Text {
 			text: qsTr("Connection Code")
 			font.pixelSize: Style.fontSizeXL
 			font.bold: true
@@ -75,7 +77,7 @@ ViewBase {
 		Text {
 			text: qsTr("Share this code with other organizations so they can send you a connection request.")
 			font.pixelSize: Style.fontSizeM
-			color: Style.textColor
+			color: Style.inactiveTextColor
 			wrapMode: Text.WordWrap
 			width: parent.width
 		}
@@ -83,18 +85,18 @@ ViewBase {
 		Rectangle {
 			width: parent.width
 			height: codeRow.height + Style.marginL * 2
-			color: Style.baseColor
-			radius: Style.radiusS
+			color: Style.backgroundColor2
+			radius: Style.radiusL
 
 			Row {
 				id: codeRow
 				anchors.centerIn: parent
 				spacing: Style.marginM
 
-				BaseText {
+				Text {
 					id: codeText
-					text: connectionCodePage.connectionCode || qsTr("Loading...")
-					font.pixelSize: Style.fontSizeXL
+					text: connectionCodePage.connectionCode ? connectionCodePage.connectionCode : qsTr("Loading...")
+					font.pixelSize: Style.fontSizeXXL
 					color: Style.textColor
 					anchors.verticalCenter: parent.verticalCenter
 				}
@@ -125,7 +127,7 @@ ViewBase {
 
 		Item {
 			width: parent.width
-			height: Style.marginL
+			height: Style.marginM
 		}
 
 		Row {
@@ -144,7 +146,7 @@ ViewBase {
 
 			Text {
 				text: qsTr("Allow other organizations to connect by code")
-				font.pixelSize: Style.fontSizeDefault
+				font.pixelSize: Style.fontSizeM
 				color: Style.textColor
 				anchors.verticalCenter: parent.verticalCenter
 			}
@@ -153,8 +155,8 @@ ViewBase {
 		Text {
 			visible: !connectionCodePage.allowConnectionsByCode
 			text: qsTr("Connection requests by code are currently disabled. Other organizations will not be able to connect to you using your code.")
-			font.pixelSize: Style.fontSizeXSmall
-			color: Style.textColor
+			font.pixelSize: Style.fontSizeXS
+			color: Style.inactiveTextColor
 			wrapMode: Text.WordWrap
 			width: parent.width
 		}

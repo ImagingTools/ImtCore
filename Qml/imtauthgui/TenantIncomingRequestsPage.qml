@@ -37,17 +37,17 @@ ViewBase {
 		target: incomingPage.apiClient
 
 		function onConnectionRequestsReceived() {
-			refreshList()
+			incomingPage.refreshList()
 		}
 
 		function onConnectionRequestApproved(connectionId) {
 			PopupManager.addSuccessMessage(qsTr("Connection request approved"), true)
-			updateGui()
+			incomingPage.updateGui()
 		}
 
 		function onConnectionRequestRejected() {
 			PopupManager.addSuccessMessage(qsTr("Connection request rejected"), true)
-			updateGui()
+			incomingPage.updateGui()
 		}
 	}
 
@@ -67,21 +67,23 @@ ViewBase {
 	}
 
 	Column {
-		anchors.fill: parent
-		anchors.margins: Style.marginL
+		anchors.top: parent.top
+		anchors.topMargin: Style.marginL
+		anchors.horizontalCenter: parent.horizontalCenter
+		width: Math.min(parent.width - Style.marginXL * 2, 1000)
 		spacing: Style.marginL
 
 		Text {
 			text: qsTr("Incoming Requests")
-			font.pixelSize: Style.fontSizeH2
+			font.pixelSize: Style.fontSizeXL
 			font.bold: true
 			color: Style.textColor
 		}
 
 		Text {
 			text: qsTr("Pending connection requests from other organizations.")
-			font.pixelSize: Style.fontSizeDefault
-			color: Style.textSecondaryColor
+			font.pixelSize: Style.fontSizeM
+			color: Style.inactiveTextColor
 			wrapMode: Text.WordWrap
 			width: parent.width
 		}
@@ -89,50 +91,50 @@ ViewBase {
 		ListView {
 			id: requestsList
 			width: parent.width
-			height: parent.height - y
+			height: incomingPage.height - y - Style.marginXL * 2
 			clip: true
 			spacing: Style.marginS
 
 			delegate: Rectangle {
 				width: requestsList.width
 				height: requestRow.height + Style.marginM * 2
-				color: Style.panelColor
-				radius: Style.radiusS
+				color: Style.backgroundColor2
+				radius: Style.radiusL
 
 				Column {
 					id: requestRow
 					anchors.left: parent.left
 					anchors.right: actionsRow.left
-					anchors.margins: Style.marginM
+					anchors.margins: Style.marginL
 					anchors.verticalCenter: parent.verticalCenter
 					spacing: Style.marginXS
 
 					Text {
-						text: modelData.sourceTenantName || modelData.sourceTenantId || ""
-						font.pixelSize: Style.fontSizeDefault
+						text: modelData.sourceTenantName ? modelData.sourceTenantName : (modelData.sourceTenantId ? modelData.sourceTenantId : "")
+						font.pixelSize: Style.fontSizeL
 						font.bold: true
 						color: Style.textColor
 					}
 
 					Text {
-						visible: modelData.message && modelData.message !== ""
-						text: modelData.message || ""
-						font.pixelSize: Style.fontSizeSmall
-						color: Style.textSecondaryColor
+						visible: modelData.message ? modelData.message !== "" : false
+						text: modelData.message ? modelData.message : ""
+						font.pixelSize: Style.fontSizeM
+						color: Style.inactiveTextColor
 					}
 
 					Text {
 						text: qsTr("Received: %1").arg(
 							modelData.createdAt ? new Date(modelData.createdAt).toLocaleDateString() : "—")
-						font.pixelSize: Style.fontSizeSmall
-						color: Style.textSecondaryColor
+						font.pixelSize: Style.fontSizeS
+						color: Style.inactiveTextColor
 					}
 				}
 
 				Row {
 					id: actionsRow
 					anchors.right: parent.right
-					anchors.rightMargin: Style.marginM
+					anchors.rightMargin: Style.marginL
 					anchors.verticalCenter: parent.verticalCenter
 					spacing: Style.marginS
 
@@ -161,8 +163,8 @@ ViewBase {
 			Text {
 				visible: requestsList.count === 0
 				text: qsTr("No incoming connection requests.")
-				font.pixelSize: Style.fontSizeDefault
-				color: Style.textSecondaryColor
+				font.pixelSize: Style.fontSizeM
+				color: Style.inactiveTextColor
 				anchors.centerIn: parent
 			}
 		}

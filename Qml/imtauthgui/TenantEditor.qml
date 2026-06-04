@@ -100,7 +100,6 @@ DocumentViewBase {
 					multiPageView.addSubPage("Relationships", "ConnectOrganization", qsTr("Connect Organization"), connectOrganizationPageComp)
 					multiPageView.addSubPage("Relationships", "MyConnections", qsTr("My Connections"), myConnectionsPageComp)
 					multiPageView.addSubPage("Relationships", "IncomingRequests", qsTr("Incoming Requests"), incomingRequestsPageComp)
-					multiPageView.addSubPage("Relationships", "RelationshipsList", qsTr("Relationships"), relationshipsListPageComp)
 					multiPageView.addPage("Messages", qsTr("Messages"), messagesPageComp, "Icons/Message")
 				}
 			}
@@ -345,16 +344,6 @@ DocumentViewBase {
 		id: incomingRequestsPageComp
 
 		TenantIncomingRequestsPage {
-			model: container.tenantData
-			stateManager: stateManager_
-			apiClient: container.apiClient
-		}
-	}
-
-	Component {
-		id: relationshipsListPageComp
-
-		TenantRelationshipsPage {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient

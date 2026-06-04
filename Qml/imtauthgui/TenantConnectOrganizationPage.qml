@@ -44,39 +44,41 @@ ViewBase {
 	}
 
 	Column {
-		anchors.fill: parent
-		anchors.margins: Style.marginL
+		anchors.top: parent.top
+		anchors.topMargin: Style.marginL
+		anchors.horizontalCenter: parent.horizontalCenter
+		width: Math.min(parent.width - Style.marginXL * 2, 1000)
 		spacing: Style.marginL
 
 		Text {
 			text: qsTr("Connect Organization")
-			font.pixelSize: Style.fontSizeH2
+			font.pixelSize: Style.fontSizeXL
 			font.bold: true
 			color: Style.textColor
 		}
 
 		Text {
 			text: qsTr("Enter the Connection Code of the organization you want to connect with.")
-			font.pixelSize: Style.fontSizeDefault
-			color: Style.textSecondaryColor
+			font.pixelSize: Style.fontSizeM
+			color: Style.inactiveTextColor
 			wrapMode: Text.WordWrap
 			width: parent.width
 		}
 
 		Column {
 			width: parent.width
-			spacing: Style.marginM
+			spacing: Style.marginS
 
 			Text {
 				text: qsTr("Connection Code")
-				font.pixelSize: Style.fontSizeSmall
-				color: Style.textSecondaryColor
+				font.pixelSize: Style.fontSizeS
+				color: Style.inactiveTextColor
 			}
 
 			TextInput {
 				id: codeInput
 				width: parent.width
-				font.pixelSize: Style.fontSizeDefault
+				font.pixelSize: Style.fontSizeM
 				font.family: "monospace"
 				color: Style.textColor
 				clip: true
@@ -91,18 +93,18 @@ ViewBase {
 
 		Column {
 			width: parent.width
-			spacing: Style.marginM
+			spacing: Style.marginS
 
 			Text {
 				text: qsTr("Message (optional)")
-				font.pixelSize: Style.fontSizeSmall
-				color: Style.textSecondaryColor
+				font.pixelSize: Style.fontSizeS
+				color: Style.inactiveTextColor
 			}
 
 			TextInput {
 				id: messageInput
 				width: parent.width
-				font.pixelSize: Style.fontSizeDefault
+				font.pixelSize: Style.fontSizeM
 				color: Style.textColor
 				clip: true
 			}
@@ -117,7 +119,7 @@ ViewBase {
 		Text {
 			visible: connectPage.lastError !== ""
 			text: connectPage.lastError
-			font.pixelSize: Style.fontSizeSmall
+			font.pixelSize: Style.fontSizeS
 			color: Style.errorColor
 			wrapMode: Text.WordWrap
 			width: parent.width
