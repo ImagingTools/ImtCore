@@ -852,8 +852,8 @@ QtObject {
 	function __populateCrossOrgGrantsModel(grants) {
 		root.crossOrgGrantsModel.clear()
 		if (grants) {
-			for (var i = 0; i < grants.length; ++i) {
-				var grant = grants[i]
+			for (var i = 0; i < grants.count; ++i) {
+				var grant = grants.get(i).item
 				if (!grant)
 					continue
 				root.crossOrgGrantsModel.append({
@@ -985,8 +985,8 @@ QtObject {
 	function __populateContractsModel(contracts) {
 		root.contractsModel.clear()
 		if (contracts) {
-			for (var i = 0; i < contracts.length; ++i) {
-				var contract = contracts[i]
+			for (var i = 0; i < contracts.count; ++i) {
+				var contract = contracts.get(i).item
 				if (!contract)
 					continue
 				root.contractsModel.append({
@@ -1106,8 +1106,8 @@ QtObject {
 	function __populateTenantRelationshipsModel(relationships) {
 		root.tenantRelationshipsModel.clear()
 		if (relationships) {
-			for (var i = 0; i < relationships.length; ++i) {
-				var rel = relationships[i]
+			for (var i = 0; i < relationships.count; ++i) {
+				var rel = relationships.get(i).item
 				if (!rel)
 					continue
 				root.tenantRelationshipsModel.append({
@@ -1471,8 +1471,8 @@ QtObject {
 	function __populateCrossTenantMessagesModel(messages) {
 		root.crossTenantMessagesModel.clear()
 		if (messages) {
-			for (var i = 0; i < messages.length; ++i) {
-				var msg = messages[i]
+			for (var i = 0; i < messages.count; ++i) {
+				var msg = messages.get(i).item
 				if (!msg)
 					continue
 				root.crossTenantMessagesModel.append({
@@ -1612,8 +1612,8 @@ QtObject {
 	function __populateOrderRequestsModel(orderRequests) {
 		root.orderRequestsModel.clear()
 		if (orderRequests) {
-			for (var i = 0; i < orderRequests.length; ++i) {
-				var ord = orderRequests[i]
+			for (var i = 0; i < orderRequests.count; ++i) {
+				var ord = orderRequests.get(i).item
 				if (!ord)
 					continue
 				root.orderRequestsModel.append({

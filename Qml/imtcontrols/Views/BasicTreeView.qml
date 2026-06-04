@@ -872,7 +872,6 @@ Item {
     // ═══════════════════════════════════════════════════════════════════════
 
     function buildVisibleTree() {
-        var t0 = Date.now()
         var items = []
         __visibleKeys = []
         __visibleRowsByKey = ({})
@@ -892,7 +891,6 @@ Item {
         visibleModel.clear()
         if (items.length > 0)
             visibleModel.append(items)
-         console.log("buildVisibleTree:", Date.now() - t0, "ms, rows:", items.length)
     }
 
     function __appendBranchIterative(rootKey, items) {
@@ -1424,7 +1422,6 @@ Item {
     }
 
     function expandAll() {
-        var t0 = Date.now()
         for (var key in __nodes) {
             var n = __nodes[key]
             if (n && n.childrenKeys.length > 0 && !n.expanded) {
@@ -1434,7 +1431,6 @@ Item {
             }
         }
         buildVisibleTree()
-        console.log("expandAll:", Date.now() - t0, "ms")
     }
 
     function collapseAll() {

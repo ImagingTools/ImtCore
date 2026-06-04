@@ -218,7 +218,6 @@ CollectionViewCommandsDelegateBase{
 			onFinished:{
 				if (buttonId === Enums.ok){
 					if (selectedDocumentTypeId !== ""){
-						console.log("onFinished selectedDocumentTypeId", selectedDocumentTypeId)
 						commandsDelegate.documentManager.createDocument(selectedDocumentTypeId)
 					}
 					else{

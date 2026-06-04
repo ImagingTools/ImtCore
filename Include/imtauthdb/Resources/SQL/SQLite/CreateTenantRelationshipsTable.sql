@@ -12,6 +12,3 @@ CREATE TABLE IF NOT EXISTS "TenantRelationships" (
 	"Description" TEXT,
 	"CreatedAt" TEXT NOT NULL
 );
-
-CREATE INDEX IF NOT EXISTS "IdxTenantRelationshipsTenantId" ON "TenantRelationships" ("TenantId");
-CREATE INDEX IF NOT EXISTS "IdxTenantRelationshipsTargetTenantId" ON "TenantRelationships" ("TargetTenantId");
