@@ -65,17 +65,17 @@ ViewBase {
 		anchors.margins: Style.marginL
 		spacing: Style.marginL
 
-		Text {
+		BaseText {
 			text: qsTr("Connection Code")
-			font.pixelSize: Style.fontSizeH2
+			font.pixelSize: Style.fontSizeXL
 			font.bold: true
 			color: Style.textColor
 		}
 
 		Text {
 			text: qsTr("Share this code with other organizations so they can send you a connection request.")
-			font.pixelSize: Style.fontSizeDefault
-			color: Style.textSecondaryColor
+			font.pixelSize: Style.fontSizeM
+			color: Style.textColor
 			wrapMode: Text.WordWrap
 			width: parent.width
 		}
@@ -83,7 +83,7 @@ ViewBase {
 		Rectangle {
 			width: parent.width
 			height: codeRow.height + Style.marginL * 2
-			color: Style.panelColor
+			color: Style.baseColor
 			radius: Style.radiusS
 
 			Row {
@@ -91,12 +91,10 @@ ViewBase {
 				anchors.centerIn: parent
 				spacing: Style.marginM
 
-				Text {
+				BaseText {
 					id: codeText
 					text: connectionCodePage.connectionCode || qsTr("Loading...")
-					font.pixelSize: Style.fontSizeH1
-					font.family: "monospace"
-					font.bold: true
+					font.pixelSize: Style.fontSizeXL
 					color: Style.textColor
 					anchors.verticalCenter: parent.verticalCenter
 				}
@@ -106,8 +104,8 @@ ViewBase {
 					anchors.verticalCenter: parent.verticalCenter
 					onClicked: {
 						if (connectionCodePage.connectionCode) {
-							ClipboardHelper.setText(connectionCodePage.connectionCode)
-							PopupManager.addSuccessMessage(qsTr("Code copied to clipboard"), true)
+							// ClipboardHelper.setText(connectionCodePage.connectionCode)
+							// PopupManager.addSuccessMessage(qsTr("Code copied to clipboard"), true)
 						}
 					}
 				}
@@ -133,10 +131,10 @@ ViewBase {
 		Row {
 			spacing: Style.marginM
 
-			Switch {
+			SwitchCustom {
 				id: allowSwitch
 				checked: connectionCodePage.allowConnectionsByCode
-				onToggled: {
+				onCheckedChanged: {
 					if (connectionCodePage.apiClient && connectionCodePage.tenantData) {
 						connectionCodePage.apiClient.setAllowConnectionsByCode(
 							connectionCodePage.tenantData.m_id, allowSwitch.checked)
@@ -154,9 +152,9 @@ ViewBase {
 
 		Text {
 			visible: !connectionCodePage.allowConnectionsByCode
-			text: qsTr("⚠ Connection requests by code are currently disabled. Other organizations will not be able to connect to you using your code.")
-			font.pixelSize: Style.fontSizeSmall
-			color: Style.warningColor
+			text: qsTr("Connection requests by code are currently disabled. Other organizations will not be able to connect to you using your code.")
+			font.pixelSize: Style.fontSizeXSmall
+			color: Style.textColor
 			wrapMode: Text.WordWrap
 			width: parent.width
 		}

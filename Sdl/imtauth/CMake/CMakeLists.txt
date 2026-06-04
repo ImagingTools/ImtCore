@@ -16,6 +16,7 @@ add_custom_target(${PROJECT_NAME}-SDL-related-files SOURCES
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/PersonalAccessTokens.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/Tenants.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/TenantCollectionDocumentService.sdl
+			${CMAKE_CURRENT_LIST_DIR}/../1.0/RelationshipCollectionDocumentService.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/TenantMemberships.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/RoleCollectionDocumentService.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/GroupCollectionDocumentService.sdl
@@ -64,6 +65,10 @@ ImtCoreCustomConfigureSdlCppQml(CXX QML
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
 			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/TenantCollectionDocumentService.sdl"
+			VERSION		"1.0")
+
+ImtCoreCustomConfigureSdlCppQml(CXX QML
+			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/RelationshipCollectionDocumentService.sdl"
 			VERSION		"1.0")
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
