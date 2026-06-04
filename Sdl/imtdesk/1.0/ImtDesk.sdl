@@ -7,11 +7,11 @@ schema {
 }
 
 import {
-	"../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
-	"../../../../ImtCore/Sdl/imtbase/1.0/ImtBaseTypes.sdl"
+	"../../imtbase/1.0/ImtCollection.sdl"
+	"../../imtbase/1.0/ImtBaseTypes.sdl"
 }
 
-# --- Enums ---
+# --- Enums ---_
 
 enum TicketType {
 	AccessRequest
