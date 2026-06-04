@@ -60,7 +60,7 @@ istd::IChangeableUniquePtr CTenantConnectionRequestDbDelegateComp::CreateObjectF
 		return nullptr;
 	}
 
-	imtauth::TenantConnectionRequestInfo info;
+	imtauth::ConnectionRequestInfo info;
 	if (record.contains("Id")){
 		info.requestId = imtdb::VariantToByteArray(record.value("Id"));
 	}
@@ -70,17 +70,8 @@ istd::IChangeableUniquePtr CTenantConnectionRequestDbDelegateComp::CreateObjectF
 	if (record.contains("TargetTenantId")){
 		info.targetTenantId = imtdb::VariantToByteArray(record.value("TargetTenantId"));
 	}
-	if (record.contains("TargetIdentifier")){
-		info.targetIdentifier = record.value("TargetIdentifier").toString();
-	}
-	if (record.contains("ConnectCode")){
-		info.connectCode = record.value("ConnectCode").toString();
-	}
-	if (record.contains("ProposedSourceRole")){
-		info.proposedSourceRole = static_cast<imtauth::ITenantInfo::TenantRelationshipRole>(record.value("ProposedSourceRole").toInt());
-	}
-	if (record.contains("ProposedTargetRole")){
-		info.proposedTargetRole = static_cast<imtauth::ITenantInfo::TenantRelationshipRole>(record.value("ProposedTargetRole").toInt());
+	if (record.contains("ConnectionCode")){
+		info.connectionCode = record.value("ConnectionCode").toString();
 	}
 	if (record.contains("Message")){
 		info.message = record.value("Message").toString();
@@ -112,36 +103,28 @@ CTenantConnectionRequestDbDelegateComp::NewObjectQuery CTenantConnectionRequestD
 		return result;
 	}
 
-	imtauth::TenantConnectionRequestInfo info = requestPtr->GetRequestInfo();
+	imtauth::ConnectionRequestInfo info = requestPtr->GetRequestInfo();
 
 	QString id = imtdb::EscapeSql(QString::fromUtf8(!proposedObjectId.isEmpty() ? proposedObjectId : info.requestId));
 	QString sourceTenantId = imtdb::EscapeSql(QString::fromUtf8(info.sourceTenantId));
 	QString targetTenantId = NullableSqlText(QString::fromUtf8(info.targetTenantId));
-	QString targetIdentifier = NullableSqlText(info.targetIdentifier);
-	QString connectCode = NullableSqlText(info.connectCode);
-	int proposedSourceRole = static_cast<int>(info.proposedSourceRole);
-	int proposedTargetRole = static_cast<int>(info.proposedTargetRole);
+	QString connectionCode = NullableSqlText(info.connectionCode);
 	QString message = NullableSqlText(info.message);
 	int status = static_cast<int>(info.status);
 	QString createdAt = !info.createdAt.isEmpty() ? imtdb::EscapeSql(info.createdAt) : imtdb::UtcNow();
-	QString expiresAt = NullableSqlDateTime(info.expiresAt);
 	QString respondedAt = NullableSqlDateTime(info.respondedAt);
 
 	result.query = QString(
-		"INSERT INTO \"%1\" (\"Id\", \"SourceTenantId\", \"TargetTenantId\", \"TargetIdentifier\", \"ConnectCode\", \"ProposedSourceRole\", \"ProposedTargetRole\", \"Message\", \"Status\", \"CreatedAt\", \"ExpiresAt\", \"RespondedAt\") "
-		"VALUES ('%2', '%3', %4, %5, %6, %7, %8, %9, %10, '%11', %12, %13);")
+		"INSERT INTO \"%1\" (\"Id\", \"SourceTenantId\", \"TargetTenantId\", \"ConnectionCode\", \"Message\", \"Status\", \"CreatedAt\", \"RespondedAt\") "
+		"VALUES ('%2', '%3', %4, %5, %6, %7, '%8', %9);")
 		.arg(*m_tableNameAttrPtr)
 		.arg(id)
 		.arg(sourceTenantId)
 		.arg(targetTenantId)
-		.arg(targetIdentifier)
-		.arg(connectCode)
-		.arg(QString::number(proposedSourceRole))
-		.arg(QString::number(proposedTargetRole))
+		.arg(connectionCode)
 		.arg(message)
 		.arg(QString::number(status))
 		.arg(createdAt)
-		.arg(expiresAt)
 		.arg(respondedAt).toUtf8();
 
 	return result;
@@ -160,21 +143,19 @@ QByteArray CTenantConnectionRequestDbDelegateComp::CreateUpdateObjectQuery(
 		return QByteArray();
 	}
 
-	imtauth::TenantConnectionRequestInfo info = requestPtr->GetRequestInfo();
+	imtauth::ConnectionRequestInfo info = requestPtr->GetRequestInfo();
 
 	return QString(
 		"UPDATE \"%1\" SET "
 		"\"TargetTenantId\"=%2, "
 		"\"Status\"=%3, "
 		"\"Message\"=%4, "
-		"\"ExpiresAt\"=%5, "
-		"\"RespondedAt\"=%6 "
-		"WHERE \"Id\"='%7';")
+		"\"RespondedAt\"=%5 "
+		"WHERE \"Id\"='%6';")
 		.arg(*m_tableNameAttrPtr)
 		.arg(NullableSqlText(QString::fromUtf8(info.targetTenantId)))
 		.arg(QString::number(static_cast<int>(info.status)))
 		.arg(NullableSqlText(info.message))
-		.arg(NullableSqlDateTime(info.expiresAt))
 		.arg(NullableSqlDateTime(info.respondedAt))
 		.arg(imtdb::EscapeSql(QString::fromUtf8(objectId))).toUtf8();
 }
