@@ -13,22 +13,19 @@ import imtauthgui 1.0
  *
  * Relationships tab of the TenantEditor.
  *
- * Displays tenant relationships via TenantSimpleCollectionPage. Create opens
- * a separate RelationshipView editor (ViewBase) with GqlBasedCommandsController.
- * Removal is done per-item in the list delegate.
+ * Displays tenant relationships obtained from connections via TenantSimpleCollectionPage.
+ * Relationships are created automatically when a connection is established.
+ * Removal of a relationship equals removal of the underlying connection.
  */
 TenantSimpleCollectionPage {
 id: relationshipsPage
 
 entityName: qsTr("Relationship")
 entityNamePlural: qsTr("Tenant Relationships")
-descriptionText: qsTr("Define asymmetric relationships between this tenant and others.")
+descriptionText: qsTr("Relationships are established automatically when connections are accepted.")
+emptyText: qsTr("No relationships found. Establish a connection to create a relationship.")
 
 listModel: apiClient ? apiClient.tenantRelationshipsModel : null
-
-customEditorComponent: createRelationshipComp
-
-headerButtonsComponent: headerBtnsComp
 
 function updateGui() {
 if (relationshipsPage.apiClient && relationshipsPage.tenantData && relationshipsPage.tenantData.m_id) {
@@ -51,41 +48,10 @@ relationshipsPage.apiClient.fetchTenantRelationships(relationshipsPage.tenantDat
 Connections {
 target: relationshipsPage.apiClient
 
-function onTenantRelationshipAdded(relationshipId) {
-PopupManager.addSuccessMessage(qsTr("Relationship created successfully"), true)
-relationshipsPage.popEditor()
-if (relationshipsPage.apiClient && relationshipsPage.tenantData && relationshipsPage.tenantData.m_id) {
-relationshipsPage.apiClient.fetchTenantRelationships(relationshipsPage.tenantData.m_id)
-}
-}
-
 function onTenantRelationshipRemoved(relationshipId) {
 PopupManager.addSuccessMessage(qsTr("Relationship removed"), true)
 if (relationshipsPage.apiClient && relationshipsPage.tenantData && relationshipsPage.tenantData.m_id) {
 relationshipsPage.apiClient.fetchTenantRelationships(relationshipsPage.tenantData.m_id)
-}
-}
-}
-
-// --- Custom header ---
-Component {
-id: headerBtnsComp
-
-Text {
-text: qsTr("+ Create Relationship")
-font.pixelSize: Style.fontSizeM
-font.bold: true
-color: (relationshipsPage.stateManager && (relationshipsPage.stateManager.isCreator || relationshipsPage.stateManager.isOwner))
-? Style.linkColor : Style.inactiveTextColor
-
-MouseArea {
-anchors.fill: parent
-hoverEnabled: true
-cursorShape: Qt.PointingHandCursor
-enabled: relationshipsPage.stateManager && (relationshipsPage.stateManager.isCreator || relationshipsPage.stateManager.isOwner)
-onClicked: {
-relationshipsPage.openCreate()
-}
 }
 }
 }
@@ -116,7 +82,15 @@ spacing: Style.marginXS
 BaseText {
 width: relDelegateContent.width
 elide: Text.ElideRight
-text: qsTr("Target: %1").arg(relDelegate.__rel.targetTenantId || "")
+text: qsTr("Source Tenant: %1").arg(relationshipsPage.tenantData ? relationshipsPage.tenantData.m_id : "")
+font.pixelSize: Style.fontSizeM
+color: Style.textColor
+}
+
+BaseText {
+width: relDelegateContent.width
+elide: Text.ElideRight
+text: qsTr("Target Tenant: %1").arg(relDelegate.__rel.targetTenantId || "")
 font.pixelSize: Style.fontSizeM
 color: Style.textColor
 }
@@ -155,7 +129,7 @@ spacing: Style.marginM
 visible: relDelegate.__canManage
 
 Button {
-text: qsTr("Remove")
+text: qsTr("Remove Connection")
 onClicked: {
 if (relationshipsPage.apiClient) {
 relationshipsPage.apiClient.removeTenantRelationship(
@@ -164,27 +138,6 @@ relDelegate.__rel.relationshipId || "")
 }
 }
 }
-}
-}
-}
-}
-
-// --- Create relationship editor (ViewBase with GqlBasedCommandsController) ---
-Component {
-id: createRelationshipComp
-
-RelationshipView {
-apiClient: relationshipsPage.apiClient
-tenantData: relationshipsPage.tenantData
-commandsControllerComp: Component {
-GqlBasedCommandsController {
-typeId: relationshipsPage.apiClient ? relationshipsPage.apiClient.relationshipObjectTypeId : ""
-}
-}
-
-onCommandActivated: {
-if (commandId === "save" || commandId === "create") {
-submitRelationship()
 }
 }
 }

@@ -11,6 +11,7 @@
 	<file alias="CreateTenantConnectionRequestsTable.sql">Resources/SQL/Postgres/CreateTenantConnectionRequestsTable.sql</file>
 	<file alias="CreateCrossTenantMessagesTable.sql">Resources/SQL/Postgres/CreateCrossTenantMessagesTable.sql</file>
 	<file alias="CreateOrderRequestsTable.sql">Resources/SQL/Postgres/CreateOrderRequestsTable.sql</file>
+	<file alias="CreateTenantRelationshipsTable.sql">Resources/SQL/Postgres/CreateTenantRelationshipsTable.sql</file>
     </qresource>
     <qresource prefix="/SQL/SQLite">
         <file alias="CreatePersonalAccessTokenTable.sql">Resources/SQL/SQLite/CreatePersonalAccessTokenTable.sql</file>
@@ -24,5 +25,6 @@
 	<file alias="CreateTenantConnectionRequestsTable.sql">Resources/SQL/SQLite/CreateTenantConnectionRequestsTable.sql</file>
 	<file alias="CreateCrossTenantMessagesTable.sql">Resources/SQL/SQLite/CreateCrossTenantMessagesTable.sql</file>
 	<file alias="CreateOrderRequestsTable.sql">Resources/SQL/SQLite/CreateOrderRequestsTable.sql</file>
+	<file alias="CreateTenantRelationshipsTable.sql">Resources/SQL/SQLite/CreateTenantRelationshipsTable.sql</file>
     </qresource>
 </RCC>

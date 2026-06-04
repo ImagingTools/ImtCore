@@ -24,6 +24,9 @@ public:
 		I_ASSIGN(m_createMembershipsTableScriptPathAttrPtr, "CreateMembershipsTableScriptPath", "SQL script path for TenantMemberships table creation", false, "CreateTenantMembershipsTable.sql");
 		I_ASSIGN(m_autoCreateInvitationsTableAttrPtr, "AutoCreateInvitationsTable", "Auto-create TenantInvitations table if not exists", false, false);
 		I_ASSIGN(m_createInvitationsTableScriptPathAttrPtr, "CreateInvitationsTableScriptPath", "SQL script path for TenantInvitations table creation", false, "CreateTenantInvitationsTable.sql");
+		I_ASSIGN(m_autoCreateRelationshipsTableAttrPtr, "AutoCreateRelationshipsTable", "Auto-create TenantRelationships table if not exists", false, true);
+		I_ASSIGN(m_createRelationshipsTableScriptPathAttrPtr, "CreateRelationshipsTableScriptPath", "SQL script path for TenantRelationships table creation", false, "CreateTenantRelationshipsTable.sql");
+		I_ASSIGN(m_relationshipsTableNameAttrPtr, "RelationshipsTableName", "Name of the TenantRelationships table", false, "TenantRelationships");
 		I_ASSIGN(m_productIdAttrPtr, "ProductId", "Product ID used when storing permissions (scoped per product)", false, "");
 	I_END_COMPONENT
 
@@ -94,6 +97,9 @@ private:
 	QByteArrayList LoadTenantPermissions(const QByteArray& tenantId) const;
 	QByteArray CreatePermissionsInsertQuery(const QByteArray& tenantId, const QByteArrayList& permissions) const;
 	QByteArray CreatePermissionsDeleteQuery(const QByteArray& tenantId) const;
+	imtauth::ITenantInfo::TenantRelationships LoadTenantRelationships(const QByteArray& tenantId) const;
+	QByteArray CreateRelationshipsInsertQuery(const QByteArray& tenantId, const imtauth::ITenantInfo::TenantRelationships& relationships) const;
+	QByteArray CreateRelationshipsDeleteQuery(const QByteArray& tenantId) const;
 
 	I_FACT(imtauth::ITenantInfo, m_tenantFactCompPtr);
 	I_ATTR(QByteArray, m_permissionsTableNameAttrPtr);
@@ -103,6 +109,9 @@ private:
 	I_ATTR(QByteArray, m_createMembershipsTableScriptPathAttrPtr);
 	I_ATTR(bool, m_autoCreateInvitationsTableAttrPtr);
 	I_ATTR(QByteArray, m_createInvitationsTableScriptPathAttrPtr);
+	I_ATTR(bool, m_autoCreateRelationshipsTableAttrPtr);
+	I_ATTR(QByteArray, m_createRelationshipsTableScriptPathAttrPtr);
+	I_ATTR(QByteArray, m_relationshipsTableNameAttrPtr);
 	I_ATTR(QByteArray, m_productIdAttrPtr);
 };
 

@@ -314,6 +314,18 @@ ViewBase {
 		Item {
 			id: listViewItem
 			readonly property var effectiveModel: collectionPage.listModel ? collectionPage.listModel : collectionPage.__listItems
+			readonly property int effectiveCount: {
+				if (!effectiveModel) {
+					return 0
+				}
+				if (typeof effectiveModel.count !== "undefined") {
+					return effectiveModel.count
+				}
+				if (typeof effectiveModel.length !== "undefined") {
+					return effectiveModel.length
+				}
+				return 0
+			}
 
 			SearchTextInput {
 				id: filterInput
@@ -384,7 +396,7 @@ ViewBase {
 
 				Item {
 					id: emptyState
-					visible: !listViewItem.effectiveModel || listViewItem.effectiveModel.length === 0
+					visible: listViewItem.effectiveCount === 0
 					anchors.top: tableHeader.bottom
 					anchors.left: parent.left
 					anchors.right: parent.right
