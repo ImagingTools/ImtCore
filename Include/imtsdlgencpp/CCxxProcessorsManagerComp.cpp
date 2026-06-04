@@ -190,10 +190,13 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 		return TS_INVALID;
 	}
 
-	if (!ProcessDocumentTypes(headerFiles, sourceFiles, paramsPtr)){
-		SendErrorMessage(0, "Unable to process document types");
+	imtsdl::ISdlProcessArgumentsParser::CppGenerationMode mode = m_argumentParserCompPtr->GetCppGenerationMode();
+	if (mode != imtsdl::ISdlProcessArgumentsParser::CGM_HEADER_ONLY) {
+		if (!ProcessDocumentTypes(headerFiles, sourceFiles, paramsPtr)) {
+			SendErrorMessage(0, "Unable to process document types");
 
-		return TS_INVALID;
+			return TS_INVALID;
+		}
 	}
 
 	if (m_autoProcessorCompListPtr.IsValid()){
