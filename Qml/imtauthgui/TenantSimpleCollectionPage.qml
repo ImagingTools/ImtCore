@@ -60,6 +60,7 @@ ViewBase {
 	property Component delegateComponent: null         // custom delegate (receives modelData, selectionManager, collectionPage)
 	property Component headerButtonsComponent: null    // custom header buttons placed at right of stackViewHeader
 	property Component customEditorComponent: null     // custom create/edit form used when documentManager is null
+	property bool showCreateButton: true               // set to false to hide the Create button (e.g. read-only collections)
 	function removeItem(id) {}                        // override in subcomponents
 
 	function updateGui() {}
@@ -193,7 +194,7 @@ ViewBase {
 
 	Text {
 		id: createBtn
-		visible: collectionPage.__canManage && collectionStackView.currentIndex === 0 && !collectionPage.headerButtonsComponent
+		visible: collectionPage.showCreateButton && collectionPage.__canManage && collectionStackView.currentIndex === 0 && !collectionPage.headerButtonsComponent
 		anchors.right: stackViewHeader.right
 		anchors.verticalCenter: stackViewHeader.verticalCenter
 		text: collectionPage.__createBtnText

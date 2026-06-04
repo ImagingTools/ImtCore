@@ -11,9 +11,14 @@ import imtauthgui 1.0
 /**
  * RelationshipView
  *
- * ViewBase-inherited editor for creating tenant relationships.
- * Follows the RoleView / UserGroupView pattern with GqlBasedCommandsController.
- * The commands controller provides the Save button at the top.
+ * ViewBase-inherited editor for creating or editing tenant relationships.
+ * Follows the RoleView / UserGroupView pattern.
+ *
+ * When `editRelationshipId` is non-empty the view operates in edit mode:
+ * it pre-populates fields from `apiClient.tenantRelationshipsModel` and on
+ * submit removes the old relationship then adds a new one with the updated
+ * values.  In create mode (editRelationshipId is empty) only AddTenantRelationship
+ * is called.
  */
 ViewBase {
 	id: container
@@ -23,6 +28,11 @@ ViewBase {
 
 	property var apiClient: null
 	property var tenantData: null
+
+	// Edit-mode: set to the ID of the relationship to edit (empty = create mode)
+	property string editRelationshipId: ""
+
+	readonly property bool __isEditMode: container.editRelationshipId !== ""
 
 	property string __selectedTargetTenantId: ""
 	property string __selectedTargetTenantName: ""
@@ -35,6 +45,28 @@ ViewBase {
 	function updateModel() {
 	}
 
+	// Pre-populate fields when entering edit mode
+	Component.onCompleted: {
+		if (container.__isEditMode && container.apiClient) {
+			var model = container.apiClient.tenantRelationshipsModel
+			for (var i = 0; i < model.count; i++) {
+				var item = model.get(i)
+				if (item.id === container.editRelationshipId) {
+					container.__selectedTargetTenantId = item.targetTenantId || ""
+					container.__selectedTargetTenantName = item.targetTenantId || ""
+					var roles = ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
+					var srcIdx = roles.indexOf(item.sourceRole)
+					var tgtIdx = roles.indexOf(item.targetRole)
+					sourceRoleCB.currentIndex = srcIdx >= 0 ? srcIdx : 2
+					targetRoleCB.currentIndex = tgtIdx >= 0 ? tgtIdx : 2
+					relScopeInput.text = item.scope || ""
+					relDescriptionInput.text = item.description || ""
+					break
+				}
+			}
+		}
+	}
+
 	function submitRelationship() {
 		if (!container.__selectedTargetTenantId) {
 			ModalDialogManager.showInfoDialog(qsTr("Target tenant is required."))
@@ -43,6 +75,10 @@ ViewBase {
 		var roleTokens = ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
 		var srcIdx = sourceRoleCB.currentIndex >= 0 ? sourceRoleCB.currentIndex : 2
 		var tgtIdx = targetRoleCB.currentIndex >= 0 ? targetRoleCB.currentIndex : 2
+		if (container.__isEditMode && container.apiClient && container.tenantData) {
+			container.apiClient.removeTenantRelationship(
+				container.tenantData.m_id, container.editRelationshipId)
+		}
 		if (container.apiClient) {
 			container.apiClient.addTenantRelationship(
 				container.tenantData ? container.tenantData.m_id : "",
@@ -50,10 +86,11 @@ ViewBase {
 				roleTokens[srcIdx],
 				roleTokens[tgtIdx],
 				relScopeInput.text.trim(),
-				relValidFromPicker.getDateAsString(),
-				relValidUntilPicker.getDateAsString(),
+				"",
+				"",
 				relDescriptionInput.text.trim())
 		}
+		container.relationshipCreated()
 	}
 
 	CustomScrollbar {
@@ -86,7 +123,7 @@ ViewBase {
 
 			GroupHeaderView {
 				width: parent.width
-				title: qsTr("Tenant Relationship")
+				title: container.__isEditMode ? qsTr("Edit Relationship") : qsTr("Tenant Relationship")
 			}
 
 			GroupElementView {
@@ -140,20 +177,19 @@ ViewBase {
 					placeHolderText: qsTr("Optional — empty applies to all resources")
 				}
 
-				DateTimePickerElementView {
-					id: relValidFromPicker
-					name: qsTr("Valid From")
-				}
-
-				DateTimePickerElementView {
-					id: relValidUntilPicker
-					name: qsTr("Valid Until")
-				}
-
 				TextInputElementView {
 					id: relDescriptionInput
 					name: qsTr("Description")
 					placeHolderText: qsTr("Optional description")
+				}
+			}
+
+			Row {
+				spacing: Style.marginM
+
+				Button {
+					text: container.__isEditMode ? qsTr("Save Changes") : qsTr("Create Relationship")
+					onClicked: { container.submitRelationship() }
 				}
 			}
 		}
