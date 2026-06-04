@@ -16,6 +16,7 @@ import imtauthUsersSdl 1.0
 import imtauthRoleCollectionDocumentServiceSdl 1.0
 import imtauthGroupCollectionDocumentServiceSdl 1.0
 import imtauthUserCollectionDocumentServiceSdl 1.0
+import imtauthRelationshipCollectionDocumentServiceSdl 1.0
 import imtauthgui 1.0
 
 /**
@@ -58,6 +59,7 @@ QtObject {
 	readonly property var roleDocumentManager: __roleDocumentService
 	readonly property var groupDocumentManager: __groupDocumentService
 	readonly property var userDocumentManager: __userDocumentService
+	readonly property var relationshipDocumentManager: __relationshipDocumentService
 
 	signal invitationCreated()
 	signal invitationRevoked(string invitationId)
@@ -1879,6 +1881,10 @@ QtObject {
 		collectionId: "Users"
 	}
 
+	property GqlBasedCollectionDocumentService __relationshipDocumentService: GqlBasedCollectionDocumentService {
+		collectionId: "TenantRelationships"
+	}
+
 	// --- Role editor + representation controller ---
 	property Component __roleEditorComp: Component {
 		RoleView {
@@ -2126,6 +2132,82 @@ QtObject {
 		}
 	}
 
+	// --- Relationship editor + representation controller ---
+	property Component __relationshipEditorComp: Component {
+		RelationshipView {
+			commandsControllerComp: Component {
+				GqlBasedCommandsController {
+					typeId: root.relationshipObjectTypeId
+				}
+			}
+		}
+	}
+
+	property Component __relationshipControllerComp: Component {
+		DocumentRepresentationController {
+			id: relationshipReprController
+
+			representationModel: TenantRelationship {
+				m_id: UuidGenerator.generateUUID()
+			}
+
+			function updateRepresentationFromDocument(){
+				startUpdateRepresentation(documentId, representationModel)
+
+				getRelationshipInput.m_id = documentId
+				getRelationshipInput.m_collectionId = "TenantRelationships"
+				getRelationshipRequest.send(getRelationshipInput)
+			}
+
+			function updateDocumentFromRepresentation(){
+				startUpdateDocument(documentId)
+
+				updateRelationshipInput.m_documentId = documentId
+				updateRelationshipInput.m_relationship = representationModel
+				updateRelationshipRequest.send(updateRelationshipInput)
+			}
+
+			property DocumentId getRelationshipInput: DocumentId {}
+			property UpdateRelationshipFromRepresentationInput updateRelationshipInput: UpdateRelationshipFromRepresentationInput {}
+
+			property GqlSdlRequestSender getRelationshipRequest: GqlSdlRequestSender {
+				gqlCommandId: ImtauthRelationshipCollectionDocumentServiceSdlCommandIds.s_getRelationshipRepresentation
+				sdlObjectComp: Component {
+					TenantRelationship {
+						onFinished: {
+							relationshipReprController.representationModel.copyFrom(this)
+							relationshipReprController.representationUpdated(
+								relationshipReprController.documentId,
+								relationshipReprController.representationModel)
+						}
+					}
+				}
+
+				function onError(message, type){
+					relationshipReprController.updateRepresentationFailed(relationshipReprController.documentId, message)
+				}
+			}
+
+			property GqlSdlRequestSender updateRelationshipRequest: GqlSdlRequestSender {
+				gqlCommandId: ImtauthRelationshipCollectionDocumentServiceSdlCommandIds.s_updateRelationshipFromRepresentation
+				requestType: 1
+				sdlObjectComp: Component {
+					DocumentOperationStatus {
+						onFinished: {
+							if (m_status === "Success"){
+								relationshipReprController.documentUpdated(relationshipReprController.documentId)
+							}
+						}
+					}
+				}
+
+				function onError(message, type){
+					relationshipReprController.updateDocumentFailed(relationshipReprController.documentId, message)
+				}
+			}
+		}
+	}
+
 	// Register each editor + controller pair with its document service so that
 	// pages only need to bind to the abstract `xDocumentManager` / `xObjectTypeId`.
 	Component.onCompleted: {
@@ -2135,5 +2217,7 @@ QtObject {
 			root.groupObjectTypeId, "Editor", root.__groupEditorComp, root.__groupControllerComp)
 		root.__userDocumentService.registerDocumentViewData(
 			root.userObjectTypeId, "Editor", root.__userEditorComp, root.__userControllerComp)
+		root.__relationshipDocumentService.registerDocumentViewData(
+			root.relationshipObjectTypeId, "Editor", root.__relationshipEditorComp, root.__relationshipControllerComp)
 	}
 }

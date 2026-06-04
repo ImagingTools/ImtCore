@@ -5,6 +5,7 @@
 // Qt includes
 #include <QRecursiveMutex>
 #include <QMap>
+#include <QList>
 
 // ACF includes
 #include <imod/CMultiModelDispatcherBase.h>
@@ -28,6 +29,17 @@ namespace imtauthgql
 	The component observes the connection request manager
 	(imtauth::ITenantConnectionRequest) and publishes ConnectionNotification
 	events to subscribed clients.
+
+	The component observes:
+	- imtauth::ITenantConnectionRequest — connection request lifecycle
+	  (new request = ConnectionRequestReceived, approval = ConnectionRequestApproved,
+	  rejection = ConnectionRequestRejected)
+	- Connection removals (ConnectionRemoved)
+	- Relationship proposal lifecycle (RelationshipProposalReceived,
+	  RelationshipProposalApproved, RelationshipProposalRejected)
+
+	Notifications are delivered only to subscribers whose authenticated user
+	matches the target userId (tenant owner).
 */
 class CConnectionCodesNotificationPublisherComp:
 			public imtservergql::CGqlPublisherCompBase,
@@ -60,6 +72,28 @@ protected:
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 
 private:
+	struct CachedConnectionRequest
+	{
+		QByteArray sourceTenantId;
+		QByteArray targetTenantId;
+		imtauth::ConnectionRequestStatus status;
+	};
+
+	struct CachedConnection
+	{
+		QByteArray tenantAId;
+		QByteArray tenantBId;
+		imtauth::ConnectionStatus status;
+	};
+
+	struct CachedRelationshipProposal
+	{
+		QByteArray initiatorTenantId;
+		QByteArray counterpartyTenantId;
+		QByteArray connectionId;
+		imtauth::RelationshipProposalStatus status;
+	};
+
 	void PublishNotification(
 				const QByteArray& targetUserId,
 				sdl::V1_0::imtauth::EConnectionNotificationType notificationType,
@@ -68,6 +102,13 @@ private:
 
 	QByteArray FindTenantOwnerUserId(const QByteArray& tenantId) const;
 
+	// Cache of requestId → state for change detection.
+	mutable QMap<QByteArray, CachedConnectionRequest> m_cachedRequests;
+	// Cache of connectionId → state for connection removal detection.
+	mutable QMap<QByteArray, CachedConnection> m_cachedConnections;
+	// Cache of proposalId → state for proposal lifecycle detection.
+	mutable QMap<QByteArray, CachedRelationshipProposal> m_cachedProposals;
+	// Protects all caches from concurrent access.
 	mutable QRecursiveMutex m_cacheMutex;
 };
 
