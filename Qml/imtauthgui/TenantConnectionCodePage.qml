@@ -26,6 +26,7 @@ ViewBase {
 	property string connectionCode: ""
 	property bool allowConnectionsByCode: true
 	property bool loading: false
+	property bool __ready: false
 
 	function updateGui() {
 		if (connectionCodePage.apiClient && connectionCodePage.tenantData
@@ -36,7 +37,7 @@ ViewBase {
 	}
 
 	Component.onCompleted: {
-		updateGui()
+		connectionCodePage.updateGui()
 	}
 
 	Connections {
@@ -46,6 +47,7 @@ ViewBase {
 			connectionCodePage.connectionCode = code
 			connectionCodePage.allowConnectionsByCode = allowByCode
 			connectionCodePage.loading = false
+			connectionCodePage.__ready = true
 		}
 
 		function onConnectionCodeRegenerated(newCode) {
@@ -60,12 +62,18 @@ ViewBase {
 		}
 	}
 
+	TextEdit {
+		id: clipboardHelper
+		visible: false
+		text: connectionCodePage.connectionCode
+	}
+
 	Column {
 		anchors.top: parent.top
-		anchors.topMargin: Style.marginL
+		anchors.topMargin: Style.marginXL
 		anchors.horizontalCenter: parent.horizontalCenter
-		width: Math.min(parent.width - Style.marginXL * 2, 1000)
-		spacing: Style.marginL
+		width: Math.min(parent.width - Style.marginXL * 2, 600)
+		spacing: Style.marginXL
 
 		Text {
 			text: qsTr("Connection Code")
@@ -84,50 +92,70 @@ ViewBase {
 
 		Rectangle {
 			width: parent.width
-			height: codeRow.height + Style.marginL * 2
+			height: Style.controlHeightL * 2
 			color: Style.backgroundColor2
 			radius: Style.radiusL
+			border.width: 1
+			border.color: Style.borderColor
 
 			Row {
-				id: codeRow
 				anchors.centerIn: parent
-				spacing: Style.marginM
+				spacing: Style.marginL
 
 				Text {
-					id: codeText
 					text: connectionCodePage.connectionCode ? connectionCodePage.connectionCode : qsTr("Loading...")
 					font.pixelSize: Style.fontSizeXXL
-					color: Style.textColor
+					font.bold: true
+					color: Style.titleColor
 					anchors.verticalCenter: parent.verticalCenter
 				}
 
-				Button {
-					text: qsTr("Copy")
+				ToolButton {
+					id: copyButton
 					anchors.verticalCenter: parent.verticalCenter
+					width: Style.buttonWidthL
+					height: Style.buttonWidthL
+					iconSource: copyButton.__copied
+						? "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal)
+						: "../../../" + Style.getIconPath("Icons/Copy", Icon.State.On, Icon.Mode.Normal)
+					tooltipText: copyButton.__copied ? qsTr("Copied!") : qsTr("Copy code")
+					enabled: connectionCodePage.connectionCode !== ""
+
+					property bool __copied: false
+
 					onClicked: {
-						if (connectionCodePage.connectionCode) {
-							// ClipboardHelper.setText(connectionCodePage.connectionCode)
-							// PopupManager.addSuccessMessage(qsTr("Code copied to clipboard"), true)
-						}
+						clipboardHelper.selectAll()
+						clipboardHelper.copy()
+						copyButton.__copied = true
+						PopupManager.addSuccessMessage(qsTr("Code copied to clipboard"), true)
+						copyResetTimer.restart()
 					}
-				}
 
-				Button {
-					text: qsTr("Regenerate")
-					anchors.verticalCenter: parent.verticalCenter
-					onClicked: {
-						if (connectionCodePage.apiClient && connectionCodePage.tenantData) {
-							connectionCodePage.apiClient.regenerateConnectionCode(
-								connectionCodePage.tenantData.m_id)
+					Timer {
+						id: copyResetTimer
+						interval: 2000
+						onTriggered: {
+							copyButton.__copied = false
 						}
 					}
 				}
 			}
 		}
 
-		Item {
+		Button {
+			text: qsTr("Regenerate Code")
+			onClicked: {
+				if (connectionCodePage.apiClient && connectionCodePage.tenantData) {
+					connectionCodePage.apiClient.regenerateConnectionCode(
+						connectionCodePage.tenantData.m_id)
+				}
+			}
+		}
+
+		Rectangle {
 			width: parent.width
-			height: Style.marginM
+			height: 1
+			color: Style.borderColor
 		}
 
 		Row {
@@ -137,6 +165,9 @@ ViewBase {
 				id: allowSwitch
 				checked: connectionCodePage.allowConnectionsByCode
 				onCheckedChanged: {
+					if (!connectionCodePage.__ready) {
+						return
+					}
 					if (connectionCodePage.apiClient && connectionCodePage.tenantData) {
 						connectionCodePage.apiClient.setAllowConnectionsByCode(
 							connectionCodePage.tenantData.m_id, allowSwitch.checked)
@@ -154,8 +185,8 @@ ViewBase {
 
 		Text {
 			visible: !connectionCodePage.allowConnectionsByCode
-			text: qsTr("Connection requests by code are currently disabled. Other organizations will not be able to connect to you using your code.")
-			font.pixelSize: Style.fontSizeXS
+			text: qsTr("When disabled, other organizations cannot send you connection requests using your code.")
+			font.pixelSize: Style.fontSizeS
 			color: Style.inactiveTextColor
 			wrapMode: Text.WordWrap
 			width: parent.width

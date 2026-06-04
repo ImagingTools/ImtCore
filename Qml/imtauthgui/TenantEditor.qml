@@ -99,7 +99,6 @@ DocumentViewBase {
 					multiPageView.addSubPage("Relationships", "ConnectionCode", qsTr("Connection Code"), connectionCodePageComp)
 					multiPageView.addSubPage("Relationships", "ConnectOrganization", qsTr("Connect Organization"), connectOrganizationPageComp)
 					multiPageView.addSubPage("Relationships", "MyConnections", qsTr("My Connections"), myConnectionsPageComp)
-					multiPageView.addSubPage("Relationships", "IncomingRequests", qsTr("Incoming Requests"), incomingRequestsPageComp)
 					multiPageView.addPage("Messages", qsTr("Messages"), messagesPageComp, "Icons/Message")
 				}
 			}
@@ -334,16 +333,6 @@ DocumentViewBase {
 		id: myConnectionsPageComp
 
 		TenantMyConnectionsPage {
-			model: container.tenantData
-			stateManager: stateManager_
-			apiClient: container.apiClient
-		}
-	}
-
-	Component {
-		id: incomingRequestsPageComp
-
-		TenantIncomingRequestsPage {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient

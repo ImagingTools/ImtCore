@@ -53,7 +53,6 @@ TenantContractsPage 1.0 TenantContractsPage.qml
 TenantConnectionCodePage 1.0 TenantConnectionCodePage.qml
 TenantConnectOrganizationPage 1.0 TenantConnectOrganizationPage.qml
 TenantMyConnectionsPage 1.0 TenantMyConnectionsPage.qml
-TenantIncomingRequestsPage 1.0 TenantIncomingRequestsPage.qml
 TenantMessagesPage 1.0 TenantMessagesPage.qml
 TenantSimpleCollectionPage 1.0 TenantSimpleCollectionPage.qml
 TenantDocumentEditorShell 1.0 TenantDocumentEditorShell.qml

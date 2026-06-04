@@ -10,7 +10,8 @@ import imtauthgui 1.0
  * TenantConnectOrganizationPage
  *
  * Allows the user to enter another organization's Connection Code to
- * send a connection request.
+ * send a connection request. Also displays incoming requests with
+ * Approve/Reject actions.
  */
 ViewBase {
 	id: connectPage
@@ -25,6 +26,17 @@ ViewBase {
 
 	property bool sending: false
 	property string lastError: ""
+
+	function updateGui() {
+		if (connectPage.apiClient && connectPage.tenantData
+				&& connectPage.tenantData.m_id) {
+			connectPage.apiClient.fetchConnectionRequests(connectPage.tenantData.m_id)
+		}
+	}
+
+	Component.onCompleted: {
+		connectPage.updateGui()
+	}
 
 	Connections {
 		target: connectPage.apiClient
@@ -41,47 +53,142 @@ ViewBase {
 			connectPage.sending = false
 			connectPage.lastError = errorMessage
 		}
+
+		function onConnectionRequestsReceived() {
+			connectPage.refreshIncomingList()
+		}
+
+		function onConnectionRequestApproved(connectionId) {
+			PopupManager.addSuccessMessage(qsTr("Connection request approved"), true)
+			connectPage.updateGui()
+		}
+
+		function onConnectionRequestRejected() {
+			PopupManager.addSuccessMessage(qsTr("Connection request rejected"), true)
+			connectPage.updateGui()
+		}
 	}
 
-	Column {
-		anchors.top: parent.top
-		anchors.topMargin: Style.marginL
-		anchors.horizontalCenter: parent.horizontalCenter
-		width: Math.min(parent.width - Style.marginXL * 2, 1000)
-		spacing: Style.marginL
-
-		Text {
-			text: qsTr("Connect Organization")
-			font.pixelSize: Style.fontSizeXL
-			font.bold: true
-			color: Style.textColor
+	function refreshIncomingList() {
+		var allRequests = connectPage.apiClient ? connectPage.apiClient.connectionRequestsModel : null
+		var incoming = []
+		if (allRequests && connectPage.tenantData) {
+			for (var i = 0; i < allRequests.count; ++i) {
+				var req = allRequests.get(i)
+				if (req.targetTenantId === connectPage.tenantData.m_id
+						&& req.status === "Pending") {
+					incoming.push(req)
+				}
+			}
 		}
+		requestsList.model = incoming
+	}
 
-		Text {
-			text: qsTr("Enter the Connection Code of the organization you want to connect with.")
-			font.pixelSize: Style.fontSizeM
-			color: Style.inactiveTextColor
-			wrapMode: Text.WordWrap
-			width: parent.width
-		}
+	Flickable {
+		anchors.fill: parent
+		anchors.topMargin: Style.marginXL
+		contentHeight: mainColumn.height + Style.marginXL
+		clip: true
 
 		Column {
-			width: parent.width
-			spacing: Style.marginS
+			id: mainColumn
+			anchors.horizontalCenter: parent.horizontalCenter
+			width: Math.min(parent.width - Style.marginXL * 2, 600)
+			spacing: Style.marginXL
 
 			Text {
-				text: qsTr("Connection Code")
-				font.pixelSize: Style.fontSizeS
-				color: Style.inactiveTextColor
+				text: qsTr("Connect Organization")
+				font.pixelSize: Style.fontSizeXL
+				font.bold: true
+				color: Style.textColor
 			}
 
-			TextInput {
-				id: codeInput
-				width: parent.width
+			Text {
+				text: qsTr("Enter the Connection Code of the organization you want to connect with.")
 				font.pixelSize: Style.fontSizeM
-				font.family: "monospace"
-				color: Style.textColor
-				clip: true
+				color: Style.inactiveTextColor
+				wrapMode: Text.WordWrap
+				width: parent.width
+			}
+
+			Rectangle {
+				width: parent.width
+				height: sendColumn.height + Style.marginL * 2
+				color: Style.backgroundColor2
+				radius: Style.radiusL
+				border.width: 1
+				border.color: Style.borderColor
+
+				Column {
+					id: sendColumn
+					anchors.left: parent.left
+					anchors.right: parent.right
+					anchors.verticalCenter: parent.verticalCenter
+					anchors.margins: Style.marginL
+					spacing: Style.marginM
+
+					Column {
+						width: parent.width
+						spacing: Style.marginXS
+
+						Text {
+							text: qsTr("Connection Code")
+							font.pixelSize: Style.fontSizeS
+							color: Style.inactiveTextColor
+						}
+
+						CustomTextField {
+							id: codeInput
+							width: parent.width
+							height: Style.controlHeightM
+							textSize: Style.fontSizeM
+							placeHolderText: qsTr("Enter code...")
+						}
+					}
+
+					Column {
+						width: parent.width
+						spacing: Style.marginXS
+
+						Text {
+							text: qsTr("Message (optional)")
+							font.pixelSize: Style.fontSizeS
+							color: Style.inactiveTextColor
+						}
+
+						CustomTextField {
+							id: messageInput
+							width: parent.width
+							height: Style.controlHeightM
+							textSize: Style.fontSizeM
+							placeHolderText: qsTr("Add a message...")
+						}
+					}
+
+					Text {
+						visible: connectPage.lastError !== ""
+						text: connectPage.lastError
+						font.pixelSize: Style.fontSizeS
+						color: Style.errorColor
+						wrapMode: Text.WordWrap
+						width: parent.width
+					}
+
+					Button {
+						text: connectPage.sending ? qsTr("Sending...") : qsTr("Send Request")
+						enabled: codeInput.text.trim().length > 0 && !connectPage.sending
+						onClicked: {
+							if (connectPage.apiClient && connectPage.tenantData) {
+								connectPage.sending = true
+								connectPage.lastError = ""
+								connectPage.apiClient.createConnectionRequest(
+									connectPage.tenantData.m_id,
+									codeInput.text.trim(),
+									messageInput.text.trim())
+							}
+						}
+					}
+				}
 			}
 
 			Rectangle {
@@ -89,53 +196,94 @@ ViewBase {
 				height: 1
 				color: Style.borderColor
 			}
-		}
-
-		Column {
-			width: parent.width
-			spacing: Style.marginS
 
 			Text {
-				text: qsTr("Message (optional)")
-				font.pixelSize: Style.fontSizeS
+				text: qsTr("Incoming Requests")
+				font.pixelSize: Style.fontSizeL
+				font.bold: true
+				color: Style.textColor
+			}
+
+			Text {
+				visible: requestsList.count === 0
+				text: qsTr("No pending incoming requests.")
+				font.pixelSize: Style.fontSizeM
 				color: Style.inactiveTextColor
 			}
 
-			TextInput {
-				id: messageInput
+			ListView {
+				id: requestsList
 				width: parent.width
-				font.pixelSize: Style.fontSizeM
-				color: Style.textColor
-				clip: true
-			}
+				height: requestsList.contentHeight
+				interactive: false
+				spacing: Style.marginS
 
-			Rectangle {
-				width: parent.width
-				height: 1
-				color: Style.borderColor
-			}
-		}
+				delegate: Rectangle {
+					width: requestsList.width
+					height: requestContent.height + Style.marginL * 2
+					color: Style.backgroundColor2
+					radius: Style.radiusL
+					border.width: 1
+					border.color: Style.borderColor
 
-		Text {
-			visible: connectPage.lastError !== ""
-			text: connectPage.lastError
-			font.pixelSize: Style.fontSizeS
-			color: Style.errorColor
-			wrapMode: Text.WordWrap
-			width: parent.width
-		}
+					Column {
+						id: requestContent
+						anchors.left: parent.left
+						anchors.right: requestActions.left
+						anchors.leftMargin: Style.marginL
+						anchors.rightMargin: Style.marginS
+						anchors.verticalCenter: parent.verticalCenter
+						spacing: Style.marginXS
 
-		Button {
-			text: connectPage.sending ? qsTr("Sending...") : qsTr("Send Connection Request")
-			enabled: codeInput.text.trim().length > 0 && !connectPage.sending
-			onClicked: {
-				if (connectPage.apiClient && connectPage.tenantData) {
-					connectPage.sending = true
-					connectPage.lastError = ""
-					connectPage.apiClient.createConnectionRequest(
-						connectPage.tenantData.m_id,
-						codeInput.text.trim(),
-						messageInput.text.trim())
+						Text {
+							text: modelData.sourceTenantName ? modelData.sourceTenantName : (modelData.sourceTenantId ? modelData.sourceTenantId : "")
+							font.pixelSize: Style.fontSizeM
+							font.bold: true
+							color: Style.textColor
+						}
+
+						Text {
+							visible: modelData.message ? modelData.message !== "" : false
+							text: modelData.message ? modelData.message : ""
+							font.pixelSize: Style.fontSizeS
+							color: Style.inactiveTextColor
+						}
+
+						Text {
+							text: qsTr("Received: %1").arg(
+								modelData.createdAt ? new Date(modelData.createdAt).toLocaleDateString() : "—")
+							font.pixelSize: Style.fontSizeXS
+							color: Style.inactiveTextColor
+						}
+					}
+
+					Row {
+						id: requestActions
+						anchors.right: parent.right
+						anchors.rightMargin: Style.marginL
+						anchors.verticalCenter: parent.verticalCenter
+						spacing: Style.marginS
+
+						Button {
+							text: qsTr("Approve")
+							onClicked: {
+								if (connectPage.apiClient && connectPage.tenantData) {
+									connectPage.apiClient.approveConnectionRequest(
+										modelData.id, connectPage.tenantData.m_id)
+								}
+							}
+						}
+
+						Button {
+							text: qsTr("Reject")
+							onClicked: {
+								if (connectPage.apiClient && connectPage.tenantData) {
+									connectPage.apiClient.rejectConnectionRequest(
+										modelData.id, connectPage.tenantData.m_id)
+								}
+							}
+						}
+					}
 				}
 			}
 		}
