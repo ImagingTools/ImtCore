@@ -123,7 +123,7 @@ istd::IChangeableUniquePtr CTenantDbDelegateComp::CreateObjectFromRecord(
 
 	// Load relationships from the TenantRelationships table
 	if (record.contains("Id")){
-		ITenantInfo::TenantRelationships relationships = LoadTenantRelationships(imtdb::VariantToByteArray(record.value("Id")));
+		imtauth::ITenantInfo::TenantRelationships relationships = LoadTenantRelationships(imtdb::VariantToByteArray(record.value("Id")));
 		tenantPtr->SetRelationships(relationships);
 	}
 
@@ -180,7 +180,7 @@ CTenantDbDelegateComp::NewObjectQuery CTenantDbDelegateComp::CreateNewObjectQuer
 		if (!permissions.isEmpty()){
 			result.query += CreatePermissionsInsertQuery(id.toUtf8(), permissions);
 		}
-		ITenantInfo::TenantRelationships relationships = tenantPtr->GetRelationships();
+		imtauth::ITenantInfo::TenantRelationships relationships = tenantPtr->GetRelationships();
 		if (!relationships.isEmpty()){
 			result.query += CreateRelationshipsInsertQuery(id.toUtf8(), relationships);
 		}
