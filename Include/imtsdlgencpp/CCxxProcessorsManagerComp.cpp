@@ -172,6 +172,15 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 	}
 
 	// process
+
+
+
+	if (!ProcessEnums(headerFiles, sourceFiles, paramsPtr)){
+		SendErrorMessage(0, "Unable to process enums");
+
+		return TS_INVALID;
+	}
+
 	if (!ProcessTypes(headerFiles, sourceFiles, paramsPtr)){
 		SendErrorMessage(0, "Unable to process types");
 
@@ -470,19 +479,54 @@ bool CCxxProcessorsManagerComp::ProcessEnums(
 
 	const imtsdl::SdlEnumList enumList = m_sdlEnumListCompPtr->GetEnums(true);
 	const int enumProcessorsCount = m_enumProcessorCompListPtr.GetCount();
-	for (int i = 0; i < enumProcessorsCount; ++i){
-		ICxxFileProcessor* enumProcessorPtr = m_enumProcessorCompListPtr[i];
-		Q_ASSERT(enumProcessorPtr != nullptr);
-		for (const imtsdl::CSdlEnum& sdlEnum: enumList){
-			FilePtr headerFilePtr = GetFilePtrForEntry(sdlEnum, headerFiles);
-			Q_ASSERT(headerFilePtr);
-			const bool ok = enumProcessorPtr->ProcessEntry(sdlEnum, headerFilePtr.get(), nullptr, paramsPtr);
-			if (!ok){
-				SendErrorMessage(0, QString("Unable to process enum '%1'").arg(sdlEnum.GetName()));
 
-				return false;
+	// The enums together with their Q_NAMESPACE/Q_ENUM_NS registrations are
+	// wrapped in a schema-unique inline namespace. Multiple schemas can
+	// contribute to the same C++ namespace (e.g. sdl::V1_0::imtbase), and
+	// emitting Q_NAMESPACE in each of them would generate colliding
+	// definitions of the namespace staticMetaObject. The inline namespace
+	// keeps the enums and the EnumXxx wrapper classes accessible from the
+	// parent namespace while giving each schema its own meta object.
+	if (enumProcessorsCount > 0){
+		const QString headerFilePath = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsCompPtr, *m_argumentParserCompPtr)[imtsdl::ISdlProcessArgumentsParser::s_headerFileType];
+
+		FilePtr enumFilePtr = headerFiles.first(); // CreateFile(headerFilePath);
+		if (!enumFilePtr){
+			return TS_INVALID;
+		}
+
+		const QString schemaBaseName = QFileInfo(m_argumentParserCompPtr->GetSchemaFilePath()).baseName();
+
+		QTextStream stream(enumFilePtr.get());
+		stream << QStringLiteral("inline namespace ") << schemaBaseName << QStringLiteral("SdlEnums");
+		FeedStream(stream, 1, false);
+		stream << '{';
+		FeedStream(stream, 2, false);
+		FeedStream(stream, 2, false);
+
+		stream << QStringLiteral("Q_NAMESPACE");
+		FeedStream(stream, 2, false);
+		stream.flush();
+
+		for (int i = 0; i < enumProcessorsCount; ++i){
+			ICxxFileProcessor* enumProcessorPtr = m_enumProcessorCompListPtr[i];
+			Q_ASSERT(enumProcessorPtr != nullptr);
+			for (const imtsdl::CSdlEnum& sdlEnum: enumList){
+				FilePtr headerFilePtr = GetFilePtrForEntry(sdlEnum, headerFiles);
+				Q_ASSERT(headerFilePtr);
+				const bool ok = enumProcessorPtr->ProcessEntry(sdlEnum, headerFilePtr.get(), nullptr, paramsPtr);
+				if (!ok){
+					SendErrorMessage(0, QString("Unable to process enum '%1'").arg(sdlEnum.GetName()));
+
+					return false;
+				}
 			}
 		}
+
+		FeedStream(stream, 1, false);
+		stream << QStringLiteral("} // inline namespace ") << schemaBaseName << QStringLiteral("SdlEnums");
+		FeedStream(stream, 2, false);
+		stream.flush();
 	}
 
 	return true;
@@ -703,12 +747,6 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 		hasDocumentTypes = !documentTypesList.isEmpty();
 	}
 
-	// add include for QObject if we have enums (needed for EnumXxx wrapper classes)
-	if (hasEnums){
-		stream << QStringLiteral("#include <QtCore/QObject>");
-		FeedStream(stream, 1, false);
-	}
-
 	// add include for CObjectCollectionControllerCompBase if we have document types
 	if (hasDocumentTypes){
 		stream << QStringLiteral("#include <imtservergql/CObjectCollectionControllerCompBase.h>");
@@ -774,6 +812,7 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 
 	// generate enum classes
 	const QString schemaBaseName = QFileInfo(m_argumentParserCompPtr->GetSchemaFilePath()).baseName();
+
 	if (hasEnums){
 		// The enums together with their Q_NAMESPACE/Q_ENUM_NS registrations are
 		// wrapped in a schema-unique inline namespace. Multiple schemas can
@@ -782,42 +821,31 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 		// definitions of the namespace staticMetaObject. The inline namespace
 		// keeps the enums and the EnumXxx wrapper classes accessible from the
 		// parent namespace while giving each schema its own meta object.
+
 		stream << QStringLiteral("inline namespace ") << schemaBaseName << QStringLiteral("SdlEnums");
 		FeedStream(stream, 1, false);
 		stream << '{';
-		FeedStream(stream, 2, false);
-
-		stream << QStringLiteral("Q_NAMESPACE");
 		FeedStream(stream, 2, false);
 
 		// flush the stream before passing the device to enum processors
 		stream.flush();
 
 		const imtsdl::SdlEnumList enumList = m_sdlEnumListCompPtr->GetEnums(true);
-		const int enumProcessorsCount = m_enumProcessorCompListPtr.GetCount();
-		for (int i = 0; i < enumProcessorsCount; ++i){
-			ICxxFileProcessor* enumProcessorPtr = m_enumProcessorCompListPtr[i];
-			Q_ASSERT(enumProcessorPtr != nullptr);
-			for (const imtsdl::CSdlEnum& sdlEnum: enumList){
-				const bool ok = enumProcessorPtr->ProcessEntry(sdlEnum, fwdFilePtr.get(), nullptr, paramsPtr);
-				if (!ok){
-					return false;
-				}
-			}
+		FeedStream(stream, 1, false);
+		for (const imtsdl::CSdlEnum& sdlEnum: enumList){
+			stream <<  QStringLiteral("enum class ") << sdlEnum.GetName() << ';';
+			FeedStream(stream, 1, false);
 		}
+
+		FeedStream(stream, 2, false);
+		stream << QStringLiteral("} // inline namespace ") << schemaBaseName << QStringLiteral("SdlEnums");
+		FeedStream(stream, 2, false);
 	}
-	else{
-		stream.flush();
-	}
+
+	stream.flush();
 
 	// re-create stream after enum processors may have written to the file
 	QTextStream fwdStream(fwdFilePtr.get());
-
-	// close the schema-unique inline namespace that wraps the enums
-	if (hasEnums){
-		fwdStream << QStringLiteral("} // inline namespace ") << schemaBaseName << QStringLiteral("SdlEnums");
-		FeedStream(fwdStream, 2, false);
-	}
 
 	// forward declare all types
 	if (m_sdlTypeListCompPtr.IsValid()){

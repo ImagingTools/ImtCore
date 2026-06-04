@@ -544,26 +544,9 @@ SUBDIRS += ImtGeoPck
 ImtGeoPck.file = ../../Impl/ImtGeoPck/QMake/ImtGeoPck.pro
 ImtGeoPck.depends = imtgeo imtguigql imtservergql imtserverapp imtdb
 
-SUBDIRS += ImtEjPck
-ImtEjPck.file = ../../Impl/ImtEjPck/QMake/ImtEjPck.pro
-ImtEjPck.depends = imtej imtbase
-
-SUBDIRS += ImtMongoPck
-ImtMongoPck.file = ../../Impl/ImtMongoPck/QMake/ImtMongoPck.pro
-ImtMongoPck.depends = imtmongo imtbase imtdb
-
-SUBDIRS += ImtMdbxPck
-ImtMdbxPck.file = ../../Impl/ImtMdbxPck/QMake/ImtMdbxPck.pro
-ImtMdbxPck.depends = imtmdbx
-
 SUBDIRS += ImtTestPck
 ImtTestPck.file = ../../Impl/ImtTestPck/QMake/ImtTestPck.pro
 ImtTestPck.depends = imttest imtdb imtbase
-
-# SUBDIRS += ImtControlsGallery
-# ImtControlsGallery.file = ../../Impl/ImtControlsGallery/QMake/ImtControlsGallery.pro
-# ImtControlsGallery.depends = imtgui imtqml imtstyle imtstylecontrolsqml
-
 
 ######### Test projects
 SUBDIRS += imtbasetest
@@ -573,18 +556,6 @@ imtbasetest.depends = imtbase
 SUBDIRS += imtgqltest
 imtgqltest.file = ../../Include/imtgql/Test/QMake/imtgqltest.pro
 imtgqltest.depends = imtgql imtbase
-
-SUBDIRS += imtmdbxtest
-imtmdbxtest.file = ../../Include/imtmdbx/Test/QMake/imtmdbxtest.pro
-imtmdbxtest.depends = imtbase
-
-SUBDIRS += imtsdlgencpptest
-imtsdlgencpptest.file = ../../Include/imtsdlgencpp/Test/QMake/imtsdlgencpptest.pro
-imtsdlgencpptest.depends = imtsdlgencpp imtsdl imtbase
-
-SUBDIRS += imtsdlgenqmltest
-imtsdlgenqmltest.file = ../../Include/imtsdlgenqml/Test/QMake/imtsdlgenqmltest.pro
-imtsdlgenqmltest.depends = imtsdlgenqml imtsdl imtbase
 
 SUBDIRS += imt3dtest
 imt3dtest.file = ../../Include/imt3d/Test/QMake/imt3dTest.pro
@@ -602,14 +573,7 @@ SUBDIRS += ImtCoreObjectCollectionTest
 ImtCoreObjectCollectionTest.file = ../../Tests/ObjectCollectionTest/QMake/ImtCoreObjectCollectionTest.pro
 ImtCoreObjectCollectionTest.depends = imtbase imtauth imtdb imttest
 
-SUBDIRS += PersonalAccessTokenTest
-PersonalAccessTokenTest.file = ../../Tests/PersonalAccessTokenTest/QMake/PersonalAccessTokenTest.pro
-PersonalAccessTokenTest.depends = imtbase imtauth
 
-SUBDIRS += ImtCoreRevisionControllerTest
-ImtCoreRevisionControllerTest.file = ../../Tests/RevisionControllerTest/QMake/ImtCoreRevisionControllerTest.pro
-ImtCoreRevisionControllerTest.depends = imtbase imtauth
 
-SUBDIRS += StructureTest
-StructureTest.file = ../../Tests/StructureTest/QMake/StructureTest.pro
-StructureTest.depends = imtbase imtauth imtdb imttest
+
+
