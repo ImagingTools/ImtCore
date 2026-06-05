@@ -29,6 +29,9 @@ class CTenantConnectionRequestManagerComp:
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
+	typedef ITenantRelationshipProposalData::RelationshipProposalInfo RelationshipProposalInfo;
+	typedef ITenantRelationshipProposalData::RelationshipProposalType RelationshipProposalType;
+	typedef ITenantRelationshipProposalData::RelationshipProposalStatus RelationshipProposalStatus;
 
 	I_BEGIN_COMPONENT(CTenantConnectionRequestManagerComp);
 		I_REGISTER_INTERFACE(imtauth::ITenantConnectionRequest);
@@ -65,14 +68,14 @@ public:
 	virtual bool RemoveConnection(const QByteArray& connectionId, const QByteArray& tenantId) override;
 
 	// ITenantConnectionRequest - Relationship Proposals
-	virtual QByteArray CreateRelationshipProposal(const RelationshipProposalInfo& proposal) override;
+	virtual QByteArray CreateRelationshipProposal(const QByteArray& proposalId, const QByteArray& connectionId, const QByteArray& initiatorTenantId, const QByteArray& counterpartyTenantId) override;
 	virtual QByteArray ApproveRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) override;
 	virtual bool RejectRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) override;
 	virtual bool CancelRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) override;
-	virtual RelationshipProposals GetRelationshipProposals(const QByteArray& tenantId) const override;
+	virtual QByteArrayList GetRelationshipProposalIds(const QByteArray& tenantId) const override;
 
 	// ITenantConnectionRequest - Relationships
-	virtual ITenantInfo::TenantRelationships GetTenantRelationships(const QByteArray& tenantId) const override;
+	virtual QByteArrayList GetTenantRelationshipIds(const QByteArray& tenantId) const override;
 	virtual bool RemoveTenantRelationship(const QByteArray& tenantId, const QByteArray& relationshipId) override;
 
 private:
@@ -88,7 +91,6 @@ private:
 	bool StoreConnectionRequest(const QByteArray& requestId, const ConnectionRequestInfo& info);
 	bool StoreConnection(const QByteArray& connectionId, const TenantConnectionInfo& info);
 	bool StoreProposal(const QByteArray& proposalId, const RelationshipProposalInfo& info);
-	bool StoreRelationship(const QByteArray& relationshipId, const ITenantInfo::TenantRelationship& rel);
 
 private:
 	I_REF(imtbase::IObjectCollection, m_requestCollectionCompPtr);

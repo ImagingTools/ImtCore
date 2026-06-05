@@ -121,10 +121,10 @@ istd::IChangeableUniquePtr CTenantDbDelegateComp::CreateObjectFromRecord(
 		tenantPtr->SetParentTenantId(imtdb::VariantToByteArray(record.value("ParentTenantId")));
 	}
 
-	// Load relationships from the TenantRelationships table
+	// Load relationship IDs from the TenantRelationships table
 	if (record.contains("Id")){
-		imtauth::ITenantInfo::TenantRelationships relationships = LoadTenantRelationships(imtdb::VariantToByteArray(record.value("Id")));
-		tenantPtr->SetRelationships(relationships);
+		QByteArrayList relationshipIds = LoadTenantRelationshipIds(imtdb::VariantToByteArray(record.value("Id")));
+		tenantPtr->SetRelationshipIds(relationshipIds);
 	}
 
 	return tenantPtr;
@@ -180,9 +180,9 @@ CTenantDbDelegateComp::NewObjectQuery CTenantDbDelegateComp::CreateNewObjectQuer
 		if (!permissions.isEmpty()){
 			result.query += CreatePermissionsInsertQuery(id.toUtf8(), permissions);
 		}
-		imtauth::ITenantInfo::TenantRelationships relationships = tenantPtr->GetRelationships();
-		if (!relationships.isEmpty()){
-			result.query += CreateRelationshipsInsertQuery(id.toUtf8(), relationships);
+		QByteArrayList relationshipIds = tenantPtr->GetRelationshipIds();
+		if (!relationshipIds.isEmpty()){
+			result.query += CreateRelationshipIdsInsertQuery(id.toUtf8(), relationshipIds);
 		}
 	}
 
@@ -226,8 +226,8 @@ QByteArray CTenantDbDelegateComp::CreateUpdateObjectQuery(
 		.arg(escapedId).toUtf8()
 		+ CreatePermissionsDeleteQuery(objectId)
 		+ CreatePermissionsInsertQuery(objectId, tenantPtr->GetTenantPermissions())
-		+ CreateRelationshipsDeleteQuery(objectId)
-		+ CreateRelationshipsInsertQuery(objectId, tenantPtr->GetRelationships());
+		+ CreateRelationshipIdsDeleteQuery(objectId)
+		+ CreateRelationshipIdsInsertQuery(objectId, tenantPtr->GetRelationshipIds());
 }
 
 
@@ -251,7 +251,7 @@ QByteArray CTenantDbDelegateComp::CreateDeleteObjectsQuery(
 	// Delete permissions first (explicit for DBs where FK CASCADE may not be enforced)
 	for (const QByteArray& id : objectIds){
 		result += CreatePermissionsDeleteQuery(id);
-		result += CreateRelationshipsDeleteQuery(id);
+		result += CreateRelationshipIdsDeleteQuery(id);
 	}
 
 	result += QString("DELETE FROM \"%1\" WHERE \"Id\" IN (%2);")
@@ -630,18 +630,18 @@ QByteArray CTenantDbDelegateComp::CreatePermissionsDeleteQuery(const QByteArray&
 }
 
 
-imtauth::ITenantInfo::TenantRelationships CTenantDbDelegateComp::LoadTenantRelationships(const QByteArray& tenantId) const
+QByteArrayList CTenantDbDelegateComp::LoadTenantRelationshipIds(const QByteArray& tenantId) const
 {
-	imtauth::ITenantInfo::TenantRelationships result;
+	QByteArrayList result;
 	if (!m_databaseEngineCompPtr.IsValid() || tenantId.isEmpty()){
 		return result;
 	}
 
 	QString relationshipsTableName = m_relationshipsTableNameAttrPtr.IsValid()
-			? QString::fromUtf8(*m_relationshipsTableNameAttrPtr) : QStringLiteral("TenantRelationships");
+			? QString::fromUtf8(*m_relationshipsTableNameAttrPtr) : QStringLiteral("TenantRelationshipIds");
 	QString escapedTenantId = imtdb::EscapeSql(QString::fromUtf8(tenantId));
 
-	QString queryStr = QString("SELECT * FROM \"%1\" WHERE \"SourceTenantId\"='%2' OR \"TargetTenantId\"='%2';")
+	QString queryStr = QString("SELECT \"RelationshipId\" FROM \"%1\" WHERE \"TenantId\"='%2';")
 			.arg(relationshipsTableName, escapedTenantId);
 
 	QSqlError sqlError;
@@ -649,21 +649,7 @@ imtauth::ITenantInfo::TenantRelationships CTenantDbDelegateComp::LoadTenantRelat
 	if (sqlError.type() == QSqlError::NoError){
 		while (sqlQuery.next()){
 			QSqlRecord record = sqlQuery.record();
-			imtauth::ITenantInfo::TenantRelationship rel;
-			rel.relationshipId = imtdb::VariantToByteArray(record.value("Id"));
-			rel.connectionId = imtdb::VariantToByteArray(record.value("ConnectionId"));
-			rel.sourceTenantId = imtdb::VariantToByteArray(record.value("SourceTenantId"));
-			rel.targetTenantId = imtdb::VariantToByteArray(record.value("TargetTenantId"));
-			rel.sourceRole = static_cast<imtauth::ITenantInfo::TenantRelationshipRole>(record.value("SourceRole").toInt());
-			rel.targetRole = static_cast<imtauth::ITenantInfo::TenantRelationshipRole>(record.value("TargetRole").toInt());
-			rel.scope = record.value("Scope").toString();
-			rel.validFrom = record.value("ValidFrom").toString();
-			rel.validUntil = record.value("ValidUntil").toString();
-			rel.status = static_cast<imtauth::ITenantInfo::TenantRelationshipStatus>(record.value("Status").toInt());
-			rel.description = record.value("Description").toString();
-			rel.createdAt = record.value("CreatedAt").toString();
-			rel.updatedAt = record.value("UpdatedAt").toString();
-			result.append(rel);
+			result.append(imtdb::VariantToByteArray(record.value("RelationshipId")));
 		}
 	}
 
@@ -671,61 +657,34 @@ imtauth::ITenantInfo::TenantRelationships CTenantDbDelegateComp::LoadTenantRelat
 }
 
 
-QByteArray CTenantDbDelegateComp::CreateRelationshipsInsertQuery(const QByteArray& tenantId, const imtauth::ITenantInfo::TenantRelationships& relationships) const
+QByteArray CTenantDbDelegateComp::CreateRelationshipIdsInsertQuery(const QByteArray& tenantId, const QByteArrayList& relationshipIds) const
 {
-	Q_UNUSED(tenantId);
-	if (relationships.isEmpty()){
+	if (relationshipIds.isEmpty()){
 		return QByteArray();
 	}
 
 	QString relationshipsTableName = m_relationshipsTableNameAttrPtr.IsValid()
-			? QString::fromUtf8(*m_relationshipsTableNameAttrPtr) : QStringLiteral("TenantRelationships");
+			? QString::fromUtf8(*m_relationshipsTableNameAttrPtr) : QStringLiteral("TenantRelationshipIds");
+	QString escapedTenantId = imtdb::EscapeSql(QString::fromUtf8(tenantId));
 
 	QByteArray result;
-	for (const imtauth::ITenantInfo::TenantRelationship& rel : relationships){
-		QString id = imtdb::EscapeSql(QString::fromUtf8(rel.relationshipId));
-		QString connectionId = imtdb::EscapeSql(QString::fromUtf8(rel.connectionId));
-		QString sourceTenantId = imtdb::EscapeSql(QString::fromUtf8(rel.sourceTenantId));
-		QString targetTenantId = imtdb::EscapeSql(QString::fromUtf8(rel.targetTenantId));
-		int sourceRole = static_cast<int>(rel.sourceRole);
-		int targetRole = static_cast<int>(rel.targetRole);
-		QString scope = rel.scope.isEmpty() ? QStringLiteral("NULL") : QString("'%1'").arg(imtdb::EscapeSql(rel.scope));
-		QString validFrom = rel.validFrom.isEmpty() ? QStringLiteral("NULL") : QString("'%1'").arg(imtdb::EscapeSql(rel.validFrom));
-		QString validUntil = rel.validUntil.isEmpty() ? QStringLiteral("NULL") : QString("'%1'").arg(imtdb::EscapeSql(rel.validUntil));
-		QString description = rel.description.isEmpty() ? QStringLiteral("NULL") : QString("'%1'").arg(imtdb::EscapeSql(rel.description));
-		QString createdAt = rel.createdAt.isEmpty() ? QString("'%1'").arg(imtdb::UtcNow()) : QString("'%1'").arg(imtdb::EscapeSql(rel.createdAt));
-		QString updatedAt = rel.updatedAt.isEmpty() ? QStringLiteral("NULL") : QString("'%1'").arg(imtdb::EscapeSql(rel.updatedAt));
-
-		result += QString(
-			"INSERT INTO \"%1\" (\"Id\", \"ConnectionId\", \"SourceTenantId\", \"TargetTenantId\", \"SourceRole\", \"TargetRole\", \"Scope\", \"ValidFrom\", \"ValidUntil\", \"Status\", \"Description\", \"CreatedAt\", \"UpdatedAt\") "
-			"VALUES ('%2', '%3', '%4', '%5', %6, %7, %8, %9, %10, %11, %12, %13, %14);")
-			.arg(relationshipsTableName)
-			.arg(id)
-			.arg(connectionId)
-			.arg(sourceTenantId)
-			.arg(targetTenantId)
-			.arg(QString::number(sourceRole))
-			.arg(QString::number(targetRole))
-			.arg(scope)
-			.arg(validFrom)
-			.arg(validUntil)
-			.arg(QString::number(rel.status))
-			.arg(description)
-			.arg(createdAt)
-			.arg(updatedAt).toUtf8();
+	for (const QByteArray& relId : relationshipIds){
+		QString escapedRelId = imtdb::EscapeSql(QString::fromUtf8(relId));
+		result += QString("INSERT INTO \"%1\" (\"TenantId\", \"RelationshipId\") VALUES ('%2', '%3');")
+				.arg(relationshipsTableName, escapedTenantId, escapedRelId).toUtf8();
 	}
 
 	return result;
 }
 
 
-QByteArray CTenantDbDelegateComp::CreateRelationshipsDeleteQuery(const QByteArray& tenantId) const
+QByteArray CTenantDbDelegateComp::CreateRelationshipIdsDeleteQuery(const QByteArray& tenantId) const
 {
 	QString relationshipsTableName = m_relationshipsTableNameAttrPtr.IsValid()
-			? QString::fromUtf8(*m_relationshipsTableNameAttrPtr) : QStringLiteral("TenantRelationships");
+			? QString::fromUtf8(*m_relationshipsTableNameAttrPtr) : QStringLiteral("TenantRelationshipIds");
 	QString escapedTenantId = imtdb::EscapeSql(QString::fromUtf8(tenantId));
 
-	return QString("DELETE FROM \"%1\" WHERE \"SourceTenantId\"='%2' OR \"TargetTenantId\"='%2';")
+	return QString("DELETE FROM \"%1\" WHERE \"TenantId\"='%2';")
 			.arg(relationshipsTableName, escapedTenantId).toUtf8();
 }
 

@@ -60,7 +60,7 @@ istd::IChangeableUniquePtr CTenantRelationshipProposalDbDelegateComp::CreateObje
 		return nullptr;
 	}
 
-	imtauth::RelationshipProposalInfo info;
+	imtauth::ITenantRelationshipProposalData::RelationshipProposalInfo info;
 	if (record.contains("Id")){
 		info.proposalId = imtdb::VariantToByteArray(record.value("Id"));
 	}
@@ -71,7 +71,7 @@ istd::IChangeableUniquePtr CTenantRelationshipProposalDbDelegateComp::CreateObje
 		info.existingRelationshipId = imtdb::VariantToByteArray(record.value("ExistingRelationshipId"));
 	}
 	if (record.contains("ProposalType")){
-		info.proposalType = static_cast<imtauth::RelationshipProposalType>(record.value("ProposalType").toInt());
+		info.proposalType = static_cast<imtauth::ITenantRelationshipProposalData::RelationshipProposalType>(record.value("ProposalType").toInt());
 	}
 	if (record.contains("InitiatorTenantId")){
 		info.initiatorTenantId = imtdb::VariantToByteArray(record.value("InitiatorTenantId"));
@@ -80,10 +80,10 @@ istd::IChangeableUniquePtr CTenantRelationshipProposalDbDelegateComp::CreateObje
 		info.counterpartyTenantId = imtdb::VariantToByteArray(record.value("CounterpartyTenantId"));
 	}
 	if (record.contains("ProposedSourceRole")){
-		info.proposedSourceRole = static_cast<imtauth::ITenantInfo::TenantRelationshipRole>(record.value("ProposedSourceRole").toInt());
+		info.proposedSourceRole = static_cast<imtauth::ITenantRelationshipInfo::TenantRelationshipRole>(record.value("ProposedSourceRole").toInt());
 	}
 	if (record.contains("ProposedTargetRole")){
-		info.proposedTargetRole = static_cast<imtauth::ITenantInfo::TenantRelationshipRole>(record.value("ProposedTargetRole").toInt());
+		info.proposedTargetRole = static_cast<imtauth::ITenantRelationshipInfo::TenantRelationshipRole>(record.value("ProposedTargetRole").toInt());
 	}
 	if (record.contains("ProposedScope")){
 		info.proposedScope = record.value("ProposedScope").toString();
@@ -98,7 +98,7 @@ istd::IChangeableUniquePtr CTenantRelationshipProposalDbDelegateComp::CreateObje
 		info.proposedValidUntil = record.value("ProposedValidUntil").toString();
 	}
 	if (record.contains("Status")){
-		info.status = static_cast<imtauth::RelationshipProposalStatus>(record.value("Status").toInt());
+		info.status = static_cast<imtauth::ITenantRelationshipProposalData::RelationshipProposalStatus>(record.value("Status").toInt());
 	}
 	if (record.contains("Message")){
 		info.message = record.value("Message").toString();
@@ -127,7 +127,7 @@ CTenantRelationshipProposalDbDelegateComp::NewObjectQuery CTenantRelationshipPro
 		return result;
 	}
 
-	imtauth::RelationshipProposalInfo info = proposalPtr->GetProposalInfo();
+	imtauth::ITenantRelationshipProposalData::RelationshipProposalInfo info = proposalPtr->GetProposalInfo();
 
 	QString id = imtdb::EscapeSql(QString::fromUtf8(!proposedObjectId.isEmpty() ? proposedObjectId : info.proposalId));
 	QString connectionId = imtdb::EscapeSql(QString::fromUtf8(info.connectionId));
@@ -186,7 +186,7 @@ QByteArray CTenantRelationshipProposalDbDelegateComp::CreateUpdateObjectQuery(
 		return QByteArray();
 	}
 
-	imtauth::RelationshipProposalInfo info = proposalPtr->GetProposalInfo();
+	imtauth::ITenantRelationshipProposalData::RelationshipProposalInfo info = proposalPtr->GetProposalInfo();
 
 	return QString(
 		"UPDATE \"%1\" SET "

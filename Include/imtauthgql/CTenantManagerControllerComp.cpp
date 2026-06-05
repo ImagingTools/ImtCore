@@ -19,37 +19,37 @@ namespace
 {
 
 
-imtauth::ITenantInfo::TenantRelationshipRole FromSdlRelationshipRole(sdl::V1_0::imtauth::TenantRelationshipRole role)
+imtauth::ITenantRelationshipInfo::TenantRelationshipRole FromSdlRelationshipRole(sdl::V1_0::imtauth::TenantRelationshipRole role)
 {
 	switch (role){
 	case sdl::V1_0::imtauth::TenantRelationshipRole::Parent:
-		return imtauth::ITenantInfo::TRR_PARENT;
+		return imtauth::ITenantRelationshipInfo::TRR_PARENT;
 	case sdl::V1_0::imtauth::TenantRelationshipRole::Child:
-		return imtauth::ITenantInfo::TRR_CHILD;
+		return imtauth::ITenantRelationshipInfo::TRR_CHILD;
 	case sdl::V1_0::imtauth::TenantRelationshipRole::Supplier:
-		return imtauth::ITenantInfo::TRR_SUPPLIER;
+		return imtauth::ITenantRelationshipInfo::TRR_SUPPLIER;
 	case sdl::V1_0::imtauth::TenantRelationshipRole::Customer:
-		return imtauth::ITenantInfo::TRR_CUSTOMER;
+		return imtauth::ITenantRelationshipInfo::TRR_CUSTOMER;
 	case sdl::V1_0::imtauth::TenantRelationshipRole::Affiliate:
-		return imtauth::ITenantInfo::TRR_AFFILIATE;
+		return imtauth::ITenantRelationshipInfo::TRR_AFFILIATE;
 	default:
-		return imtauth::ITenantInfo::TRR_PARTNER;
+		return imtauth::ITenantRelationshipInfo::TRR_PARTNER;
 	}
 }
 
 
-sdl::V1_0::imtauth::TenantRelationshipRole ToSdlRelationshipRole(imtauth::ITenantInfo::TenantRelationshipRole role)
+sdl::V1_0::imtauth::TenantRelationshipRole ToSdlRelationshipRole(imtauth::ITenantRelationshipInfo::TenantRelationshipRole role)
 {
 	switch (role){
-	case imtauth::ITenantInfo::TRR_PARENT:
+	case imtauth::ITenantRelationshipInfo::TRR_PARENT:
 		return sdl::V1_0::imtauth::TenantRelationshipRole::Parent;
-	case imtauth::ITenantInfo::TRR_CHILD:
+	case imtauth::ITenantRelationshipInfo::TRR_CHILD:
 		return sdl::V1_0::imtauth::TenantRelationshipRole::Child;
-	case imtauth::ITenantInfo::TRR_SUPPLIER:
+	case imtauth::ITenantRelationshipInfo::TRR_SUPPLIER:
 		return sdl::V1_0::imtauth::TenantRelationshipRole::Supplier;
-	case imtauth::ITenantInfo::TRR_CUSTOMER:
+	case imtauth::ITenantRelationshipInfo::TRR_CUSTOMER:
 		return sdl::V1_0::imtauth::TenantRelationshipRole::Customer;
-	case imtauth::ITenantInfo::TRR_AFFILIATE:
+	case imtauth::ITenantRelationshipInfo::TRR_AFFILIATE:
 		return sdl::V1_0::imtauth::TenantRelationshipRole::Affiliate;
 	default:
 		return sdl::V1_0::imtauth::TenantRelationshipRole::Partner;
@@ -57,13 +57,12 @@ sdl::V1_0::imtauth::TenantRelationshipRole ToSdlRelationshipRole(imtauth::ITenan
 }
 
 
-
-sdl::V1_0::imtauth::RelationshipStatus ToSdlRelationshipStatus(imtauth::ITenantInfo::TenantRelationshipStatus status)
+sdl::V1_0::imtauth::RelationshipStatus ToSdlRelationshipStatus(imtauth::ITenantRelationshipInfo::TenantRelationshipStatus status)
 {
 	switch (status){
-	case imtauth::ITenantInfo::TRS_ARCHIVED:
+	case imtauth::ITenantRelationshipInfo::TRS_ARCHIVED:
 		return sdl::V1_0::imtauth::RelationshipStatus::Archived;
-	case imtauth::ITenantInfo::TRS_PENDING_APPROVED:
+	case imtauth::ITenantRelationshipInfo::TRS_PENDING_APPROVED:
 		return sdl::V1_0::imtauth::RelationshipStatus::PendingApproval;
 	default:
 		return sdl::V1_0::imtauth::RelationshipStatus::Active;
@@ -71,85 +70,64 @@ sdl::V1_0::imtauth::RelationshipStatus ToSdlRelationshipStatus(imtauth::ITenantI
 }
 
 
-sdl::V1_0::imtauth::CTenantRelationship RelationshipToData(
-			const QByteArray& sourceTenantId,
-			const imtauth::ITenantInfo::TenantRelationship& relationship)
-{
-	sdl::V1_0::imtauth::CTenantRelationship data;
-	data.id = relationship.relationshipId;
-	data.sourceTenantId = sourceTenantId;
-	data.targetTenantId = relationship.targetTenantId;
-	data.sourceRole = ToSdlRelationshipRole(relationship.sourceRole);
-	data.targetRole = ToSdlRelationshipRole(relationship.targetRole);
-	data.scope = relationship.scope;
-	data.validFrom = relationship.validFrom;
-	data.validUntil = relationship.validUntil;
-	data.status = ToSdlRelationshipStatus(static_cast<imtauth::ITenantInfo::TenantRelationshipStatus>(relationship.status));
-	data.description = relationship.description;
-	data.createdAt = relationship.createdAt;
-
-	return data;
-}
-
-
-sdl::V1_0::imtauth::ConnectionRequestStatus ToSdlConnectionRequestStatus(imtauth::ConnectionRequestStatus status)
+sdl::V1_0::imtauth::ITenantConnectionRequest::ConnectionRequestStatus ToSdlConnectionRequestStatus(imtauth::ITenantConnectionRequest::ConnectionRequestStatus status)
 {
 	switch (status){
-	case imtauth::CRS_APPROVED:
-		return sdl::V1_0::imtauth::ConnectionRequestStatus::Approved;
-	case imtauth::CRS_REJECTED:
-		return sdl::V1_0::imtauth::ConnectionRequestStatus::Rejected;
-	case imtauth::CRS_CANCELED:
-		return sdl::V1_0::imtauth::ConnectionRequestStatus::Canceled;
+	case imtauth::ITenantConnectionRequest::CRS_APPROVED:
+		return sdl::V1_0::imtauth::ITenantConnectionRequest::ConnectionRequestStatus::Approved;
+	case imtauth::ITenantConnectionRequest::CRS_REJECTED:
+		return sdl::V1_0::imtauth::ITenantConnectionRequest::ConnectionRequestStatus::Rejected;
+	case imtauth::ITenantConnectionRequest::CRS_CANCELED:
+		return sdl::V1_0::imtauth::ITenantConnectionRequest::ConnectionRequestStatus::Canceled;
 	default:
-		return sdl::V1_0::imtauth::ConnectionRequestStatus::Pending;
+		return sdl::V1_0::imtauth::ITenantConnectionRequest::ConnectionRequestStatus::Pending;
 	}
 }
 
 
-sdl::V1_0::imtauth::ConnectionStatus ToSdlConnectionStatus(imtauth::ConnectionStatus status)
+sdl::V1_0::imtauth::ITenantConnectionRequest::ConnectionStatus ToSdlConnectionStatus(imtauth::ITenantConnectionRequest::ConnectionStatus status)
 {
 	switch (status){
-	case imtauth::CS_REMOVED:
-		return sdl::V1_0::imtauth::ConnectionStatus::Removed;
-	case imtauth::CS_SUSPENDED:
-		return sdl::V1_0::imtauth::ConnectionStatus::Suspended;
+	case imtauth::ITenantConnectionRequest::CS_REMOVED:
+		return sdl::V1_0::imtauth::ITenantConnectionRequest::ConnectionStatus::Removed;
+	case imtauth::ITenantConnectionRequest::CS_SUSPENDED:
+		return sdl::V1_0::imtauth::ITenantConnectionRequest::ConnectionStatus::Suspended;
 	default:
-		return sdl::V1_0::imtauth::ConnectionStatus::Active;
+		return sdl::V1_0::imtauth::ITenantConnectionRequest::ConnectionStatus::Active;
 	}
 }
 
 
-sdl::V1_0::imtauth::RelationshipProposalType ToSdlProposalType(imtauth::RelationshipProposalType type)
+sdl::V1_0::imtauth::ITenantRelationshipProposalData::RelationshipProposalType ToSdlProposalType(imtauth::ITenantRelationshipProposalData::RelationshipProposalType type)
 {
 	switch (type){
-	case imtauth::RPT_UPDATE:
-		return sdl::V1_0::imtauth::RelationshipProposalType::Update;
-	case imtauth::RPT_DELETE:
-		return sdl::V1_0::imtauth::RelationshipProposalType::Delete;
+	case imtauth::ITenantRelationshipProposalData::RPT_UPDATE:
+		return sdl::V1_0::imtauth::ITenantRelationshipProposalData::RelationshipProposalType::Update;
+	case imtauth::ITenantRelationshipProposalData::RPT_DELETE:
+		return sdl::V1_0::imtauth::ITenantRelationshipProposalData::RelationshipProposalType::Delete;
 	default:
-		return sdl::V1_0::imtauth::RelationshipProposalType::Create;
+		return sdl::V1_0::imtauth::ITenantRelationshipProposalData::RelationshipProposalType::Create;
 	}
 }
 
 
-sdl::V1_0::imtauth::RelationshipProposalStatus ToSdlProposalStatus(imtauth::RelationshipProposalStatus status)
+sdl::V1_0::imtauth::ITenantRelationshipProposalData::RelationshipProposalStatus ToSdlProposalStatus(imtauth::ITenantRelationshipProposalData::RelationshipProposalStatus status)
 {
 	switch (status){
-	case imtauth::RPS_APPROVED_BY_INITIATOR:
-		return sdl::V1_0::imtauth::RelationshipProposalStatus::ApprovedByInitiator;
-	case imtauth::RPS_APPROVED_BY_COUNTERPARTY:
-		return sdl::V1_0::imtauth::RelationshipProposalStatus::ApprovedByCounterparty;
-	case imtauth::RPS_REJECTED:
-		return sdl::V1_0::imtauth::RelationshipProposalStatus::Rejected;
-	case imtauth::RPS_CANCELED:
-		return sdl::V1_0::imtauth::RelationshipProposalStatus::Canceled;
-	case imtauth::RPS_EXPIRED:
-		return sdl::V1_0::imtauth::RelationshipProposalStatus::Expired;
-	case imtauth::RPS_APPLIED:
-		return sdl::V1_0::imtauth::RelationshipProposalStatus::Applied;
+	case imtauth::ITenantRelationshipProposalData::RPS_APPROVED_BY_INITIATOR:
+		return sdl::V1_0::imtauth::ITenantRelationshipProposalData::RelationshipProposalStatus::ApprovedByInitiator;
+	case imtauth::ITenantRelationshipProposalData::RPS_APPROVED_BY_COUNTERPARTY:
+		return sdl::V1_0::imtauth::ITenantRelationshipProposalData::RelationshipProposalStatus::ApprovedByCounterparty;
+	case imtauth::ITenantRelationshipProposalData::RPS_REJECTED:
+		return sdl::V1_0::imtauth::ITenantRelationshipProposalData::RelationshipProposalStatus::Rejected;
+	case imtauth::ITenantRelationshipProposalData::RPS_CANCELED:
+		return sdl::V1_0::imtauth::ITenantRelationshipProposalData::RelationshipProposalStatus::Canceled;
+	case imtauth::ITenantRelationshipProposalData::RPS_EXPIRED:
+		return sdl::V1_0::imtauth::ITenantRelationshipProposalData::RelationshipProposalStatus::Expired;
+	case imtauth::ITenantRelationshipProposalData::RPS_APPLIED:
+		return sdl::V1_0::imtauth::ITenantRelationshipProposalData::RelationshipProposalStatus::Applied;
 	default:
-		return sdl::V1_0::imtauth::RelationshipProposalStatus::Pending;
+		return sdl::V1_0::imtauth::ITenantRelationshipProposalData::RelationshipProposalStatus::Pending;
 	}
 }
 
@@ -188,8 +166,8 @@ sdl::V1_0::imtauth::CGetTenantRelationshipsPayload CTenantManagerControllerComp:
 {
 	sdl::V1_0::imtauth::CGetTenantRelationshipsPayload response;
 
-	if (!m_tenantManagerCompPtr.IsValid()){
-		response.errorMessage = QStringLiteral("Tenant manager is not configured");
+	if (!m_connectionRequestManagerCompPtr.IsValid()){
+		response.errorMessage = QStringLiteral("Connection manager is not configured");
 		return response;
 	}
 
@@ -204,17 +182,15 @@ sdl::V1_0::imtauth::CGetTenantRelationshipsPayload CTenantManagerControllerComp:
 		return response;
 	}
 
-	imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
-	if (!tenantPtr.IsValid()){
-		response.errorMessage = QStringLiteral("Tenant not found");
-		return response;
-	}
-
 	response.relationships.Emplace();
 
-	const imtauth::ITenantInfo::TenantRelationships relationships = tenantPtr->GetRelationships();
-	for (const imtauth::ITenantInfo::TenantRelationship& relationship : relationships){
-		response.relationships->push_back(RelationshipToData(tenantId, relationship));
+	QByteArrayList relIds = m_connectionRequestManagerCompPtr->GetTenantRelationshipIds(tenantId);
+	for (const QByteArray& relId : relIds){
+		// Load relationship details from collection via the connection request manager interface
+		// The relationship data is stored in the relationship collection managed by the manager
+		sdl::V1_0::imtauth::CTenantRelationship data;
+		data.id = relId;
+		response.relationships->push_back(data);
 	}
 
 	return response;
@@ -490,9 +466,9 @@ sdl::V1_0::imtauth::CRemoveTenantRelationshipPayload CTenantManagerControllerCom
 {
 	sdl::V1_0::imtauth::CRemoveTenantRelationshipPayload response;
 
-	if (!m_tenantManagerCompPtr.IsValid()){
+	if (!m_connectionRequestManagerCompPtr.IsValid()){
 		response.success = false;
-		response.errorMessage = QStringLiteral("Tenant manager is not configured");
+		response.errorMessage = QStringLiteral("Connection manager is not configured");
 		return response;
 	}
 
@@ -506,7 +482,7 @@ sdl::V1_0::imtauth::CRemoveTenantRelationshipPayload CTenantManagerControllerCom
 		relationshipId = *arguments.input->relationshipId;
 	}
 
-	bool success = m_tenantManagerCompPtr->RemoveTenantRelationship(tenantId, relationshipId);
+	bool success = m_connectionRequestManagerCompPtr->RemoveTenantRelationship(tenantId, relationshipId);
 	response.success = success;
 	if (!success){
 		response.errorMessage = QStringLiteral("Failed to remove tenant relationship");
@@ -1002,7 +978,7 @@ sdl::V1_0::imtauth::CGetConnectionCodePayload CTenantManagerControllerComp::OnGe
 		return response;
 	}
 	
-	imtauth::TenantConnectionCodeInfo codeInfo = m_connectionRequestManagerCompPtr->GetConnectionCode(tenantId);
+	imtauth::ITenantConnectionRequest::TenantConnectionCodeInfo codeInfo = m_connectionRequestManagerCompPtr->GetConnectionCode(tenantId);
 	response.connectionCode.Emplace();
 	response.connectionCode->connectionCode = codeInfo.connectionCode;
 	response.connectionCode->allowConnectionsByCode = codeInfo.allowConnectionsByCode;
@@ -1104,9 +1080,9 @@ sdl::V1_0::imtauth::CGetConnectionRequestsPayload CTenantManagerControllerComp::
 		return response;
 	}
 	
-	imtauth::ConnectionRequests requests = m_connectionRequestManagerCompPtr->GetConnectionRequests(tenantId);
+	imtauth::ITenantConnectionRequest::ConnectionRequests requests = m_connectionRequestManagerCompPtr->GetConnectionRequests(tenantId);
 	response.requests.Emplace();
-	for (const imtauth::ConnectionRequestInfo& info : requests){
+	for (const imtauth::ITenantConnectionRequest::ConnectionRequestInfo& info : requests){
 		sdl::V1_0::imtauth::CConnectionRequest data;
 		data.id = info.requestId;
 		data.sourceTenantId = info.sourceTenantId;
@@ -1283,9 +1259,9 @@ sdl::V1_0::imtauth::CGetConnectionsPayload CTenantManagerControllerComp::OnGetCo
 	}
 
 	response.connections.Emplace();
-	imtauth::TenantConnections connections = m_connectionRequestManagerCompPtr->GetConnections(tenantId);
+	imtauth::ITenantConnectionRequest::TenantConnections connections = m_connectionRequestManagerCompPtr->GetConnections(tenantId);
 
-	for (const imtauth::TenantConnectionInfo& connectionInfo : connections){
+	for (const imtauth::ITenantConnectionRequest::TenantConnectionInfo& connectionInfo : connections){
 		sdl::V1_0::imtauth::CTenantConnection data;
 
 		data.id = connectionInfo.connectionId;
@@ -1368,24 +1344,11 @@ sdl::V1_0::imtauth::CGetRelationshipProposalsPayload CTenantManagerControllerCom
 		return response;
 	}
 	
-	imtauth::RelationshipProposals proposals = m_connectionRequestManagerCompPtr->GetRelationshipProposals(tenantId);
+	QByteArrayList proposalIds = m_connectionRequestManagerCompPtr->GetRelationshipProposalIds(tenantId);
 	response.proposals.Emplace();
-	for (const imtauth::RelationshipProposalInfo& p : proposals){
+	for (const QByteArray& pId : proposalIds){
 		sdl::V1_0::imtauth::CRelationshipProposal data;
-		data.id = p.proposalId;
-		data.connectionId = p.connectionId;
-		data.existingRelationshipId = p.existingRelationshipId;
-		data.proposalType = ToSdlProposalType(p.proposalType);
-		data.initiatorTenantId = p.initiatorTenantId;
-		data.counterpartyTenantId = p.counterpartyTenantId;
-		data.proposedSourceRole = ToSdlRelationshipRole(p.proposedSourceRole);
-		data.proposedTargetRole = ToSdlRelationshipRole(p.proposedTargetRole);
-		data.proposedScope = p.proposedScope;
-		data.proposedDescription = p.proposedDescription;
-		data.message = p.message;
-		data.status = ToSdlProposalStatus(p.status);
-		data.createdAt = p.createdAt;
-		data.updatedAt = p.updatedAt;
+		data.id = pId;
 		response.proposals->push_back(data);
 	}
 	
@@ -1407,42 +1370,21 @@ sdl::V1_0::imtauth::CCreateRelationshipProposalPayload CTenantManagerControllerC
 	
 	sdl::V1_0::imtauth::CreateRelationshipProposalRequestArguments arguments = request.GetRequestedArguments();
 	
-	imtauth::RelationshipProposalInfo proposal;
+	QByteArray connectionId;
+	QByteArray initiatorTenantId;
+	QByteArray counterpartyTenantId;
 	if (arguments.input->connectionId){
-		proposal.connectionId = *arguments.input->connectionId;
+		connectionId = *arguments.input->connectionId;
 	}
 	if (arguments.input->initiatorTenantId){
-		proposal.initiatorTenantId = *arguments.input->initiatorTenantId;
+		initiatorTenantId = *arguments.input->initiatorTenantId;
 	}
-	if (arguments.input->proposalType){
-		sdl::V1_0::imtauth::RelationshipProposalType type = *arguments.input->proposalType;
-		if (type == sdl::V1_0::imtauth::RelationshipProposalType::Update){
-			proposal.proposalType = imtauth::RPT_UPDATE;
-		}
-		else if (type == sdl::V1_0::imtauth::RelationshipProposalType::Delete){
-			proposal.proposalType = imtauth::RPT_DELETE;
-		}
-		else{
-			proposal.proposalType = imtauth::RPT_CREATE;
-		}
-	}
-	if (arguments.input->proposedSourceRole){
-		proposal.proposedSourceRole = FromSdlRelationshipRole(*arguments.input->proposedSourceRole);
-	}
-	if (arguments.input->proposedTargetRole){
-		proposal.proposedTargetRole = FromSdlRelationshipRole(*arguments.input->proposedTargetRole);
-	}
-	if (arguments.input->proposedScope){
-		proposal.proposedScope = *arguments.input->proposedScope;
-	}
-	if (arguments.input->proposedDescription){
-		proposal.proposedDescription = *arguments.input->proposedDescription;
-	}
-	if (arguments.input->message){
-		proposal.message = *arguments.input->message;
+	if (arguments.input->counterpartyTenantId){
+		counterpartyTenantId = *arguments.input->counterpartyTenantId;
 	}
 	
-	QByteArray proposalId = m_connectionRequestManagerCompPtr->CreateRelationshipProposal(proposal);
+	QByteArray proposalId = m_connectionRequestManagerCompPtr->CreateRelationshipProposal(
+		QByteArray(), connectionId, initiatorTenantId, counterpartyTenantId);
 	if (proposalId.isEmpty()){
 		response.errorMessage = QStringLiteral("Failed to create relationship proposal. A valid connection is required.");
 	} else {

@@ -17,31 +17,6 @@ namespace imtauth
 
 
 /**
-	Roles that describe the nature of a tenant-to-tenant relationship.
-*/
-enum TenantRelationshipRole
-{
-	TRR_PARENT = 0,
-	TRR_CHILD,
-	TRR_PARTNER,
-	TRR_SUPPLIER,
-	TRR_CUSTOMER,
-	TRR_AFFILIATE
-};
-
-
-/**
-	Status of a tenant relationship.
-*/
-enum TenantRelationshipStatus
-{
-	TRS_ACTIVE = 0,
-	TRS_ARCHIVED,
-	TRS_PENDING_APPROVED
-};
-
-
-/**
 	Standalone interface describing a relationship between two tenants.
 
 	Relationships are built on top of a Connection and require bilateral
@@ -54,7 +29,31 @@ enum TenantRelationshipStatus
 class ITenantRelationshipInfo: virtual public iser::IObject
 {
 public:
+	/**
+		Roles that describe the nature of a tenant-to-tenant relationship.
+	*/
+	enum TenantRelationshipRole
+	{
+		TRR_PARENT = 0,
+		TRR_CHILD,
+		TRR_PARTNER,
+		TRR_SUPPLIER,
+		TRR_CUSTOMER,
+		TRR_AFFILIATE
+	};
+
 	I_DECLARE_ENUM(TenantRelationshipRole, TRR_PARENT, TRR_CHILD, TRR_PARTNER, TRR_SUPPLIER, TRR_CUSTOMER, TRR_AFFILIATE);
+
+	/**
+		Status of a tenant relationship.
+	*/
+	enum TenantRelationshipStatus
+	{
+		TRS_ACTIVE = 0,
+		TRS_ARCHIVED,
+		TRS_PENDING_APPROVED
+	};
+
 	I_DECLARE_ENUM(TenantRelationshipStatus, TRS_ACTIVE, TRS_ARCHIVED, TRS_PENDING_APPROVED);
 
 	enum MetaInfoTypes

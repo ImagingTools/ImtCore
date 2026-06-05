@@ -97,9 +97,9 @@ private:
 	QByteArrayList LoadTenantPermissions(const QByteArray& tenantId) const;
 	QByteArray CreatePermissionsInsertQuery(const QByteArray& tenantId, const QByteArrayList& permissions) const;
 	QByteArray CreatePermissionsDeleteQuery(const QByteArray& tenantId) const;
-	imtauth::ITenantInfo::TenantRelationships LoadTenantRelationships(const QByteArray& tenantId) const;
-	QByteArray CreateRelationshipsInsertQuery(const QByteArray& tenantId, const imtauth::ITenantInfo::TenantRelationships& relationships) const;
-	QByteArray CreateRelationshipsDeleteQuery(const QByteArray& tenantId) const;
+	QByteArrayList LoadTenantRelationshipIds(const QByteArray& tenantId) const;
+	QByteArray CreateRelationshipIdsInsertQuery(const QByteArray& tenantId, const QByteArrayList& relationshipIds) const;
+	QByteArray CreateRelationshipIdsDeleteQuery(const QByteArray& tenantId) const;
 
 	I_FACT(imtauth::ITenantInfo, m_tenantFactCompPtr);
 	I_ATTR(QByteArray, m_permissionsTableNameAttrPtr);

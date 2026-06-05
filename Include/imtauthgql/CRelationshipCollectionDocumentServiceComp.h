@@ -19,7 +19,7 @@ namespace imtauthgql
  * Server-side handler for the Relationship collection's per-document representation
  * GraphQL endpoints (analogous to CRoleCollectionDocumentServiceComp).
  *
- * Reads/writes the ITenantInfo::TenantRelationship working copy that the server-side
+ * Reads/writes the ITenantRelationshipInfo working copy that the server-side
  * CollectionDocumentManager holds for a given documentId.
  */
 class CRelationshipCollectionDocumentServiceComp:

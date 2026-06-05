@@ -6,7 +6,7 @@
 #include <QUuid>
 
 // ImtCore includes
-#include <imtauth/ITenantInfo.h>
+#include <imtauth/ITenantRelationshipInfo.h>
 #include <imtgql/IGqlContext.h>
 
 // Generated includes
@@ -17,54 +17,35 @@ namespace
 {
 
 
-sdl::V1_0::imtauth::TenantRelationshipRole ToSdlRelationshipRole(imtauth::ITenantInfo::TenantRelationshipRole role)
+sdl::V1_0::imtauth::TenantRelationshipRole ToSdlRelationshipRole(imtauth::ITenantRelationshipInfo::TenantRelationshipRole role)
 {
-	switch (role){
-	case imtauth::ITenantInfo::TRR_PARENT:
-		return sdl::V1_0::imtauth::TenantRelationshipRole::Parent;
-	case imtauth::ITenantInfo::TRR_CHILD:
-		return sdl::V1_0::imtauth::TenantRelationshipRole::Child;
-	case imtauth::ITenantInfo::TRR_SUPPLIER:
-		return sdl::V1_0::imtauth::TenantRelationshipRole::Supplier;
-	case imtauth::ITenantInfo::TRR_CUSTOMER:
-		return sdl::V1_0::imtauth::TenantRelationshipRole::Customer;
-	case imtauth::ITenantInfo::TRR_AFFILIATE:
-		return sdl::V1_0::imtauth::TenantRelationshipRole::Affiliate;
-	default:
-		return sdl::V1_0::imtauth::TenantRelationshipRole::Partner;
-	}
+switch (role){
+case imtauth::ITenantRelationshipInfo::TRR_PARENT:
+return sdl::V1_0::imtauth::TenantRelationshipRole::Parent;
+case imtauth::ITenantRelationshipInfo::TRR_CHILD:
+return sdl::V1_0::imtauth::TenantRelationshipRole::Child;
+case imtauth::ITenantRelationshipInfo::TRR_SUPPLIER:
+return sdl::V1_0::imtauth::TenantRelationshipRole::Supplier;
+case imtauth::ITenantRelationshipInfo::TRR_CUSTOMER:
+return sdl::V1_0::imtauth::TenantRelationshipRole::Customer;
+case imtauth::ITenantRelationshipInfo::TRR_AFFILIATE:
+return sdl::V1_0::imtauth::TenantRelationshipRole::Affiliate;
+default:
+return sdl::V1_0::imtauth::TenantRelationshipRole::Partner;
+}
 }
 
 
-imtauth::ITenantInfo::TenantRelationshipRole FromSdlRelationshipRole(sdl::V1_0::imtauth::TenantRelationshipRole role)
+sdl::V1_0::imtauth::RelationshipStatus ToSdlRelationshipStatus(imtauth::ITenantRelationshipInfo::TenantRelationshipStatus status)
 {
-	switch (role){
-	case sdl::V1_0::imtauth::TenantRelationshipRole::Parent:
-		return imtauth::ITenantInfo::TRR_PARENT;
-	case sdl::V1_0::imtauth::TenantRelationshipRole::Child:
-		return imtauth::ITenantInfo::TRR_CHILD;
-	case sdl::V1_0::imtauth::TenantRelationshipRole::Supplier:
-		return imtauth::ITenantInfo::TRR_SUPPLIER;
-	case sdl::V1_0::imtauth::TenantRelationshipRole::Customer:
-		return imtauth::ITenantInfo::TRR_CUSTOMER;
-	case sdl::V1_0::imtauth::TenantRelationshipRole::Affiliate:
-		return imtauth::ITenantInfo::TRR_AFFILIATE;
-	default:
-		return imtauth::ITenantInfo::TRR_PARTNER;
-	}
+switch (status){
+case imtauth::ITenantRelationshipInfo::TRS_ARCHIVED:
+return sdl::V1_0::imtauth::RelationshipStatus::Archived;
+case imtauth::ITenantRelationshipInfo::TRS_PENDING_APPROVED:
+return sdl::V1_0::imtauth::RelationshipStatus::PendingApproval;
+default:
+return sdl::V1_0::imtauth::RelationshipStatus::Active;
 }
-
-
-sdl::V1_0::imtauth::RelationshipStatus ToSdlRelationshipStatus(imtauth::ITenantInfo::TenantRelationshipStatus status)
-{
-	switch (status){
-	case imtauth::ITenantInfo::TRS_ARCHIVED:
-		return sdl::V1_0::imtauth::RelationshipStatus::Archived;
-	case imtauth::ITenantInfo::TRS_PENDING_APPROVED:
-		return sdl::V1_0::imtauth::RelationshipStatus::PendingApproval;
-	default:
-		return sdl::V1_0::imtauth::RelationshipStatus::Active;
-	}
 }
 
 
@@ -80,195 +61,128 @@ namespace imtauthgql
 // reimplemented (CRelationshipCollectionDocumentServiceGqlHandlerCompBase)
 
 sdl::V1_0::imtauth::CTenantRelationship CRelationshipCollectionDocumentServiceComp::OnGetRelationshipRepresentation(
-		const sdl::V1_0::imtauth::CGetRelationshipRepresentationGqlRequest& getRelationshipRepresentationRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const
+const sdl::V1_0::imtauth::CGetRelationshipRepresentationGqlRequest& getRelationshipRepresentationRequest,
+const ::imtgql::CGqlRequest& gqlRequest,
+QString& errorMessage) const
 {
-	sdl::V1_0::imtauth::GetRelationshipRepresentationRequestArguments arguments = getRelationshipRepresentationRequest.GetRequestedArguments();
-	QByteArray userId = GetUserId(gqlRequest);
+sdl::V1_0::imtauth::GetRelationshipRepresentationRequestArguments arguments = getRelationshipRepresentationRequest.GetRequestedArguments();
+Q_UNUSED(gqlRequest);
 
-	QByteArray objectId;
-	if (arguments.input && arguments.input->id){
-		objectId = *arguments.input->id;
-	}
+QByteArray objectId;
+if (arguments.input && arguments.input->id){
+objectId = *arguments.input->id;
+}
 
-	if (objectId.isEmpty()){
-		errorMessage = QStringLiteral("Missing document ID");
-		return sdl::V1_0::imtauth::CTenantRelationship();
-	}
+if (objectId.isEmpty()){
+errorMessage = QStringLiteral("Missing relationship ID");
+return sdl::V1_0::imtauth::CTenantRelationship();
+}
 
-	istd::IChangeableSharedPtr documentPtr;
-	m_documentManagerCompPtr->GetDocumentData(userId, objectId, documentPtr);
-	if (!documentPtr.IsValid()){
-		errorMessage = QStringLiteral("Document not found");
-		return sdl::V1_0::imtauth::CTenantRelationship();
-	}
+if (!m_documentManagerCompPtr.IsValid()){
+errorMessage = QStringLiteral("Document service not configured");
+return sdl::V1_0::imtauth::CTenantRelationship();
+}
 
-	const imtauth::ITenantInfo* tenantPtr = dynamic_cast<const imtauth::ITenantInfo*>(documentPtr.GetPtr());
-	if (tenantPtr == nullptr){
-		errorMessage = QStringLiteral("Invalid document type");
-		return sdl::V1_0::imtauth::CTenantRelationship();
-	}
+QByteArray userLogin = GetUserId(gqlRequest);
+istd::IChangeableSharedPtr documentPtr;
+m_documentManagerCompPtr->GetDocumentData(userLogin, objectId, documentPtr);
 
-	// Find the relationship within the tenant's relationships list.
-	// The objectId here is the relationship ID.
-	QByteArray tenantId = tenantPtr->GetTenantId();
-	imtauth::ITenantInfo::TenantRelationships relationships = tenantPtr->GetRelationships();
+if (documentPtr.IsValid()){
+const imtauth::ITenantRelationshipInfo* relPtr = dynamic_cast<const imtauth::ITenantRelationshipInfo*>(documentPtr.GetPtr());
+if (relPtr != nullptr){
+sdl::V1_0::imtauth::CTenantRelationship response;
+response.id = relPtr->GetRelationshipId();
+response.connectionId = relPtr->GetConnectionId();
+response.sourceTenantId = relPtr->GetSourceTenantId();
+response.targetTenantId = relPtr->GetTargetTenantId();
+response.sourceRole = ToSdlRelationshipRole(relPtr->GetSourceRole());
+response.targetRole = ToSdlRelationshipRole(relPtr->GetTargetRole());
+response.scope = relPtr->GetScope();
+response.validFrom = relPtr->GetValidFrom();
+response.validUntil = relPtr->GetValidUntil();
+response.status = ToSdlRelationshipStatus(relPtr->GetStatus());
+response.description = relPtr->GetDescription();
+response.createdAt = relPtr->GetCreatedAt();
+response.updatedAt = relPtr->GetUpdatedAt();
+return response;
+}
+}
 
-	for (const imtauth::ITenantInfo::TenantRelationship& rel : relationships){
-		if (rel.relationshipId == objectId){
-			sdl::V1_0::imtauth::CTenantRelationship response;
-			response.id = rel.relationshipId;
-			response.connectionId = rel.connectionId;
-			response.sourceTenantId = rel.sourceTenantId;
-			response.targetTenantId = rel.targetTenantId;
-			response.sourceRole = ToSdlRelationshipRole(rel.sourceRole);
-			response.targetRole = ToSdlRelationshipRole(rel.targetRole);
-			response.scope = rel.scope;
-			response.validFrom = rel.validFrom;
-			response.validUntil = rel.validUntil;
-			response.status = ToSdlRelationshipStatus(rel.status);
-			response.description = rel.description;
-			response.createdAt = rel.createdAt;
-			response.updatedAt = rel.updatedAt;
-			return response;
-		}
-	}
-
-	// If not found in local tenant relationships, try via the connection request manager
-	if (m_connectionRequestManagerCompPtr.IsValid()){
-		imtauth::ITenantInfo::TenantRelationships allRelationships =
-			m_connectionRequestManagerCompPtr->GetTenantRelationships(tenantId);
-		for (const imtauth::ITenantInfo::TenantRelationship& rel : allRelationships){
-			if (rel.relationshipId == objectId){
-				sdl::V1_0::imtauth::CTenantRelationship response;
-				response.id = rel.relationshipId;
-				response.connectionId = rel.connectionId;
-				response.sourceTenantId = rel.sourceTenantId;
-				response.targetTenantId = rel.targetTenantId;
-				response.sourceRole = ToSdlRelationshipRole(rel.sourceRole);
-				response.targetRole = ToSdlRelationshipRole(rel.targetRole);
-				response.scope = rel.scope;
-				response.validFrom = rel.validFrom;
-				response.validUntil = rel.validUntil;
-				response.status = ToSdlRelationshipStatus(rel.status);
-				response.description = rel.description;
-				response.createdAt = rel.createdAt;
-				response.updatedAt = rel.updatedAt;
-				return response;
-			}
-		}
-	}
-
-	errorMessage = QStringLiteral("Relationship not found");
-	return sdl::V1_0::imtauth::CTenantRelationship();
+errorMessage = QStringLiteral("Relationship not found");
+return sdl::V1_0::imtauth::CTenantRelationship();
 }
 
 
 sdl::V1_0::imtbase::CDocumentOperationStatus CRelationshipCollectionDocumentServiceComp::OnUpdateRelationshipFromRepresentation(
-		const sdl::V1_0::imtauth::CUpdateRelationshipFromRepresentationGqlRequest& updateRelationshipFromRepresentationRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const
+const sdl::V1_0::imtauth::CUpdateRelationshipFromRepresentationGqlRequest& updateRelationshipFromRepresentationRequest,
+const ::imtgql::CGqlRequest& gqlRequest,
+QString& errorMessage) const
 {
-	sdl::V1_0::imtauth::UpdateRelationshipFromRepresentationRequestArguments arguments = updateRelationshipFromRepresentationRequest.GetRequestedArguments();
-	sdl::V1_0::imtbase::CDocumentOperationStatus response;
-	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
+sdl::V1_0::imtauth::UpdateRelationshipFromRepresentationRequestArguments arguments = updateRelationshipFromRepresentationRequest.GetRequestedArguments();
+sdl::V1_0::imtbase::CDocumentOperationStatus response;
+response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Failed;
 
-	QByteArray documentId;
-	if (arguments.input->documentId){
-		documentId = *arguments.input->documentId;
-	}
+QByteArray documentId;
+if (arguments.input->documentId){
+documentId = *arguments.input->documentId;
+}
 
-	if (documentId.isEmpty()){
-		errorMessage = QStringLiteral("Missing document ID");
-		return response;
-	}
+if (documentId.isEmpty()){
+errorMessage = QStringLiteral("Missing document ID");
+return response;
+}
 
-	QByteArray userLogin = GetUserId(gqlRequest);
+if (!m_documentManagerCompPtr.IsValid()){
+errorMessage = QStringLiteral("Document service not configured");
+return response;
+}
 
-	istd::IChangeableSharedPtr documentPtr;
-	m_documentManagerCompPtr->GetDocumentData(userLogin, documentId, documentPtr);
-	if (!documentPtr.IsValid()){
-		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
-		return response;
-	}
+QByteArray userLogin = GetUserId(gqlRequest);
 
-	imtauth::ITenantInfo* tenantPtr = dynamic_cast<imtauth::ITenantInfo*>(documentPtr.GetPtr());
-	if (tenantPtr == nullptr){
-		response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
-		return response;
-	}
+istd::IChangeableSharedPtr documentPtr;
+m_documentManagerCompPtr->GetDocumentData(userLogin, documentId, documentPtr);
+if (!documentPtr.IsValid()){
+response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::InvalidDocumentId;
+return response;
+}
 
-	sdl::V1_0::imtauth::CTenantRelationship relData;
-	if (arguments.input->relationship){
-		relData = *arguments.input->relationship;
-	}
+// The update is handled via bilateral proposal mechanism
+// through the connection request manager, not direct modification
+if (!m_connectionRequestManagerCompPtr.IsValid()){
+errorMessage = QStringLiteral("Connection request manager not configured");
+return response;
+}
 
-	// Build the domain relationship struct from the SDL data
-	imtauth::ITenantInfo::TenantRelationship relationship;
+// Extract tenant IDs from the relationship SDL input to create a proposal
+sdl::V1_0::imtauth::CTenantRelationship relData;
+if (arguments.input->relationship){
+relData = *arguments.input->relationship;
+}
 
-	if (relData.id){
-		relationship.relationshipId = *relData.id;
-	}
-	if (relData.connectionId){
-		relationship.connectionId = *relData.connectionId;
-	}
-	if (relData.sourceTenantId){
-		relationship.sourceTenantId = *relData.sourceTenantId;
-	}
-	if (relData.targetTenantId){
-		relationship.targetTenantId = *relData.targetTenantId;
-	}
-	if (relData.sourceRole){
-		relationship.sourceRole = FromSdlRelationshipRole(*relData.sourceRole);
-	}
-	if (relData.targetRole){
-		relationship.targetRole = FromSdlRelationshipRole(*relData.targetRole);
-	}
-	if (relData.scope){
-		relationship.scope = *relData.scope;
-	}
-	if (relData.validFrom){
-		relationship.validFrom = *relData.validFrom;
-	}
-	if (relData.validUntil){
-		relationship.validUntil = *relData.validUntil;
-	}
-	if (relData.description){
-		relationship.description = *relData.description;
-	}
-	if (relData.createdAt){
-		relationship.createdAt = *relData.createdAt;
-	}
-	if (relData.updatedAt){
-		relationship.updatedAt = *relData.updatedAt;
-	}
+QByteArray connectionId;
+QByteArray initiatorTenantId;
+QByteArray counterpartyTenantId;
+if (relData.connectionId){
+connectionId = *relData.connectionId;
+}
+if (relData.sourceTenantId){
+initiatorTenantId = *relData.sourceTenantId;
+}
+if (relData.targetTenantId){
+counterpartyTenantId = *relData.targetTenantId;
+}
 
-	// Find and update the relationship in the tenant's list
-	QByteArray tenantId = tenantPtr->GetTenantId();
-	imtauth::ITenantInfo::TenantRelationships relationships = tenantPtr->GetRelationships();
-	bool found = false;
+QByteArray proposalId = m_connectionRequestManagerCompPtr->CreateRelationshipProposal(
+QByteArray(), connectionId, initiatorTenantId, counterpartyTenantId);
+if (proposalId.isEmpty()){
+errorMessage = QStringLiteral("Failed to create relationship proposal");
+return response;
+}
 
-	for (int i = 0; i < relationships.size(); ++i){
-		if (relationships[i].relationshipId == relationship.relationshipId){
-			relationships[i] = relationship;
-			found = true;
-			break;
-		}
-	}
+m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr);
+response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 
-	if (!found){
-		// If the relationship is new (not found), add it
-		relationships.append(relationship);
-	}
-
-	tenantPtr->SetRelationships(relationships);
-
-	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr);
-
-	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
-
-	return response;
+return response;
 }
 
 

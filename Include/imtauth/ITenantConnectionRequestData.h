@@ -22,9 +22,9 @@ Used as the stored representation inside an object collection
 class ITenantConnectionRequestData: virtual public iser::IObject
 {
 public:
-virtual ConnectionRequestInfo GetRequestInfo() const = 0;
-virtual void SetRequestInfo(const ConnectionRequestInfo& requestInfo) = 0;
-virtual QByteArray GetRequestId() const = 0;
+	virtual ITenantConnectionRequest::ConnectionRequestInfo GetRequestInfo() const = 0;
+	virtual void SetRequestInfo(const ITenantConnectionRequest::ConnectionRequestInfo& requestInfo) = 0;
+	virtual QByteArray GetRequestId() const = 0;
 };
 
 

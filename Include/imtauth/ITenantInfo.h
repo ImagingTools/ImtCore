@@ -10,9 +10,6 @@
 // Qt includes
 #include <QList>
 
-// ImtCore includes
-#include <imtauth/ITenantRelationshipInfo.h>
-
 
 namespace imtauth
 {
@@ -45,75 +42,6 @@ public:
 		MIT_TENANT_OWNER_ID,
 		MIT_PARENT_TENANT_ID
 	};
-
-	/**
-		Tenant relationship roles.
-		\note These are aliases for the standalone imtauth::TenantRelationshipRole enum.
-	*/
-	typedef imtauth::TenantRelationshipRole TenantRelationshipRole;
-	static const TenantRelationshipRole TRR_PARENT = imtauth::TRR_PARENT;
-	static const TenantRelationshipRole TRR_CHILD = imtauth::TRR_CHILD;
-	static const TenantRelationshipRole TRR_PARTNER = imtauth::TRR_PARTNER;
-	static const TenantRelationshipRole TRR_SUPPLIER = imtauth::TRR_SUPPLIER;
-	static const TenantRelationshipRole TRR_CUSTOMER = imtauth::TRR_CUSTOMER;
-	static const TenantRelationshipRole TRR_AFFILIATE = imtauth::TRR_AFFILIATE;
-
-	/**
-		Tenant relationship status.
-		\note These are aliases for the standalone imtauth::TenantRelationshipStatus enum.
-	*/
-	typedef imtauth::TenantRelationshipStatus TenantRelationshipStatus;
-	static const TenantRelationshipStatus TRS_ACTIVE = imtauth::TRS_ACTIVE;
-	static const TenantRelationshipStatus TRS_ARCHIVED = imtauth::TRS_ARCHIVED;
-	static const TenantRelationshipStatus TRS_PENDING_APPROVED = imtauth::TRS_PENDING_APPROVED;
-
-	/**
-		Structure describing a relationship between tenants.
-
-		Relationships are built on top of a Connection and require bilateral
-		approval (via RelationshipProposal). They are direction-aware:
-		\a sourceRole describes the role of the source tenant, while
-		\a targetRole describes the role of the target tenant.
-	*/
-	struct TenantRelationship
-	{
-		QByteArray relationshipId;
-		QByteArray connectionId;
-		QByteArray sourceTenantId;
-		QByteArray targetTenantId;
-		TenantRelationshipRole sourceRole = TRR_PARTNER;
-		TenantRelationshipRole targetRole = TRR_PARTNER;
-		QString scope;
-		QString validFrom;
-		QString validUntil;
-		TenantRelationshipStatus status = TRS_ACTIVE;
-		QString description;
-		QString createdAt;
-		QString updatedAt;
-
-		bool operator==(const TenantRelationship& other) const
-		{
-			return relationshipId == other.relationshipId
-				&& connectionId == other.connectionId
-				&& sourceTenantId == other.sourceTenantId
-				&& targetTenantId == other.targetTenantId
-				&& sourceRole == other.sourceRole
-				&& targetRole == other.targetRole
-				&& scope == other.scope
-				&& validFrom == other.validFrom
-				&& validUntil == other.validUntil
-				&& status == other.status
-				&& description == other.description
-				&& createdAt == other.createdAt;
-		}
-
-		bool operator!=(const TenantRelationship& other) const
-		{
-			return !(*this == other);
-		}
-	};
-
-	typedef QList<TenantRelationship> TenantRelationships;
 
 	/**
 		Get tenant ID.
@@ -198,24 +126,24 @@ public:
 	virtual void SetUpdatedAt(const QString& updatedAt) = 0;
 
 	/**
-		Get all relationships for this tenant.
+		Get relationship IDs associated with this tenant.
 	*/
-	virtual TenantRelationships GetRelationships() const = 0;
+	virtual QByteArrayList GetRelationshipIds() const = 0;
 
 	/**
-		Set relationships for this tenant.
+		Set relationship IDs for this tenant.
 	*/
-	virtual void SetRelationships(const TenantRelationships& relationships) = 0;
+	virtual void SetRelationshipIds(const QByteArrayList& relationshipIds) = 0;
 
 	/**
-		Add a relationship to this tenant.
+		Add a relationship ID to this tenant.
 	*/
-	virtual void AddRelationship(const TenantRelationship& relationship) = 0;
+	virtual void AddRelationshipId(const QByteArray& relationshipId) = 0;
 
 	/**
-		Remove a relationship by its ID.
+		Remove a relationship ID from this tenant.
 	*/
-	virtual bool RemoveRelationship(const QByteArray& relationshipId) = 0;
+	virtual bool RemoveRelationshipId(const QByteArray& relationshipId) = 0;
 
 	/**
 		Get the list of permissions available for this tenant.

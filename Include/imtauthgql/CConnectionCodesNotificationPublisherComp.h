@@ -13,6 +13,7 @@
 
 // ImtCore includes
 #include <imtauth/ITenantConnectionRequest.h>
+#include <imtauth/ITenantRelationshipProposalData.h>
 #include <imtauth/ITenantManager.h>
 #include <imtservergql/CGqlPublisherCompBase.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants_fwd.h>
@@ -76,14 +77,14 @@ private:
 	{
 		QByteArray sourceTenantId;
 		QByteArray targetTenantId;
-		imtauth::ConnectionRequestStatus status;
+		imtauth::ITenantConnectionRequest::ConnectionRequestStatus status;
 	};
 
 	struct CachedConnection
 	{
 		QByteArray tenantAId;
 		QByteArray tenantBId;
-		imtauth::ConnectionStatus status;
+		imtauth::ITenantConnectionRequest::ConnectionStatus status;
 	};
 
 	struct CachedRelationshipProposal
@@ -91,7 +92,7 @@ private:
 		QByteArray initiatorTenantId;
 		QByteArray counterpartyTenantId;
 		QByteArray connectionId;
-		imtauth::RelationshipProposalStatus status;
+		imtauth::ITenantRelationshipProposalData::RelationshipProposalStatus status;
 	};
 
 	void PublishNotification(

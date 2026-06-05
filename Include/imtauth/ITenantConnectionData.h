@@ -22,8 +22,8 @@ Used as the stored representation inside an object collection
 class ITenantConnectionData: virtual public iser::IObject
 {
 public:
-	virtual TenantConnectionInfo GetConnectionInfo() const = 0;
-	virtual void SetConnectionInfo(const TenantConnectionInfo& connectionInfo) = 0;
+	virtual ITenantConnectionRequest::TenantConnectionInfo GetConnectionInfo() const = 0;
+	virtual void SetConnectionInfo(const ITenantConnectionRequest::TenantConnectionInfo& connectionInfo) = 0;
 	virtual QByteArray GetConnectionId() const = 0;
 };
 

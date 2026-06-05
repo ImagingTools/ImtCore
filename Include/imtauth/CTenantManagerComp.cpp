@@ -242,7 +242,7 @@ bool CTenantManagerComp::EnsureSystemTenant()
 		return false;
 	}
 
-	QByteArray systemTenantId = GetSystemTenantId();
+	QByteArray systemTenantId = imtauth::GetSystemTenantId();
 
 	// Check if System-Tenant already exists
 	ITenantInfoUniquePtr existingTenant = GetTenant(systemTenantId);
@@ -281,97 +281,9 @@ bool CTenantManagerComp::EnsureSystemTenant()
 }
 
 
-QByteArray CTenantManagerComp::AddTenantRelationship(
-		const QByteArray& tenantId,
-		const ITenantInfo::TenantRelationship& relationship)
+QByteArray CTenantManagerComp::GetSystemTenantId() const
 {
-	if (!m_tenantCollectionCompPtr.IsValid()){
-		SendErrorMessage(0, "Tenant collection not configured", "CTenantManagerComp");
-		return QByteArray();
-	}
-
-	if (tenantId.isEmpty() || relationship.targetTenantId.isEmpty()){
-		SendErrorMessage(0, "Source and target tenant are required", "CTenantManagerComp");
-		return QByteArray();
-	}
-
-	if (tenantId == relationship.targetTenantId){
-		SendErrorMessage(0, "A tenant cannot have a relationship with itself", "CTenantManagerComp");
-		return QByteArray();
-	}
-
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (!m_tenantCollectionCompPtr->GetObjectData(tenantId, dataPtr)){
-		SendErrorMessage(0, QString("Tenant '%1' not found").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
-		return QByteArray();
-	}
-
-	ITenantInfo* tenantPtr = dynamic_cast<ITenantInfo*>(dataPtr.GetPtr());
-	if (tenantPtr == nullptr){
-		SendErrorMessage(0, "Invalid tenant object", "CTenantManagerComp");
-		return QByteArray();
-	}
-
-	istd::CChangeNotifier changeNotifier(this);
-
-	ITenantInfo::TenantRelationship rel = relationship;
-	if (rel.relationshipId.isEmpty()){
-		rel.relationshipId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-	}
-	if (rel.createdAt.isEmpty()){
-		rel.createdAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
-	}
-
-	tenantPtr->AddRelationship(rel);
-	tenantPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
-
-	if (!m_tenantCollectionCompPtr->SetObjectData(tenantId, *tenantPtr)){
-		SendErrorMessage(0, QString("Failed to add relationship to tenant '%1'").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
-		return QByteArray();
-	}
-
-	SendInfoMessage(0, QString("Added relationship to tenant '%1'").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
-
-	return rel.relationshipId;
-}
-
-
-bool CTenantManagerComp::RemoveTenantRelationship(const QByteArray& tenantId, const QByteArray& relationshipId)
-{
-	if (!m_tenantCollectionCompPtr.IsValid()){
-		SendErrorMessage(0, "Tenant collection not configured", "CTenantManagerComp");
-		return false;
-	}
-
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (!m_tenantCollectionCompPtr->GetObjectData(tenantId, dataPtr)){
-		SendErrorMessage(0, QString("Tenant '%1' not found").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
-		return false;
-	}
-
-	ITenantInfo* tenantPtr = dynamic_cast<ITenantInfo*>(dataPtr.GetPtr());
-	if (tenantPtr == nullptr){
-		SendErrorMessage(0, "Invalid tenant object", "CTenantManagerComp");
-		return false;
-	}
-
-	istd::CChangeNotifier changeNotifier(this);
-
-	if (!tenantPtr->RemoveRelationship(relationshipId)){
-		SendErrorMessage(0, QString("Relationship '%1' not found").arg(QString::fromUtf8(relationshipId)), "CTenantManagerComp");
-		return false;
-	}
-
-	tenantPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
-
-	if (!m_tenantCollectionCompPtr->SetObjectData(tenantId, *tenantPtr)){
-		SendErrorMessage(0, QString("Failed to remove relationship from tenant '%1'").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
-		return false;
-	}
-
-	SendInfoMessage(0, QString("Removed relationship '%1' from tenant '%2'").arg(QString::fromUtf8(relationshipId), QString::fromUtf8(tenantId)), "CTenantManagerComp");
-
-	return true;
+	return imtauth::GetSystemTenantId();
 }
 
 

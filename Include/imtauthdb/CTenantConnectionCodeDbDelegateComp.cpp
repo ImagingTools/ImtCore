@@ -28,7 +28,7 @@ istd::IChangeableUniquePtr CTenantConnectionCodeDbDelegateComp::CreateObjectFrom
 		return nullptr;
 	}
 
-	imtauth::TenantConnectionCodeInfo info;
+	imtauth::ITenantConnectionRequest::TenantConnectionCodeInfo info;
 	if (record.contains("Id")){
 		info.tenantId = imtdb::VariantToByteArray(record.value("Id"));
 	}
@@ -64,7 +64,7 @@ CTenantConnectionCodeDbDelegateComp::NewObjectQuery CTenantConnectionCodeDbDeleg
 		return result;
 	}
 
-	imtauth::TenantConnectionCodeInfo info = codePtr->GetCodeInfo();
+	imtauth::ITenantConnectionRequest::TenantConnectionCodeInfo info = codePtr->GetCodeInfo();
 
 	QString id = imtdb::EscapeSql(QString::fromUtf8(!proposedObjectId.isEmpty() ? proposedObjectId : info.tenantId));
 	QString connectionCode = imtdb::EscapeSql(info.connectionCode);
@@ -96,7 +96,7 @@ QByteArray CTenantConnectionCodeDbDelegateComp::CreateUpdateObjectQuery(
 		return QByteArray();
 	}
 
-	imtauth::TenantConnectionCodeInfo info = codePtr->GetCodeInfo();
+	imtauth::ITenantConnectionRequest::TenantConnectionCodeInfo info = codePtr->GetCodeInfo();
 
 	return QString(
 		"UPDATE \"%1\" SET "

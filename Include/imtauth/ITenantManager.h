@@ -30,13 +30,13 @@ public:
 		\param parentTenantId The parent tenant ID (empty to make top-level).
 		\return true if hierarchy was set successfully.
 	*/
-	virtual bool SetTenantHierarchy(const QByteArray& tenantId, const QByteArray& parentTenantId) { Q_UNUSED(tenantId); Q_UNUSED(parentTenantId); return false; }
+	virtual bool SetTenantHierarchy(const QByteArray& tenantId, const QByteArray& parentTenantId) = 0;
 
 	/**
 		Get the System-Tenant ID.
 		Returns the well-known System-Tenant ID constant.
 	*/
-	virtual QByteArray GetSystemTenantId() const { return imtauth::GetSystemTenantId(); }
+	virtual QByteArray GetSystemTenantId() const = 0;
 
 	/**
 		Ensure the System-Tenant exists.
@@ -44,31 +44,7 @@ public:
 		Should be called during server bootstrap/initialization.
 		\return true if the System-Tenant exists or was successfully created.
 	*/
-	virtual bool EnsureSystemTenant() { return false; }
-
-	/**
-		Add a relationship to a tenant.
-		\param tenantId The tenant that owns this relationship entry.
-		\param relationship The relationship struct to add.
-		\return The new relationship ID, or empty on failure.
-	*/
-	virtual QByteArray AddTenantRelationship(
-				const QByteArray& tenantId,
-				const ITenantInfo::TenantRelationship& relationship)
-	{
-		Q_UNUSED(tenantId); Q_UNUSED(relationship);
-		return QByteArray();
-	}
-
-	/**
-		Remove a relationship from a tenant by relationship ID.
-		\return true if removed successfully.
-	*/
-	virtual bool RemoveTenantRelationship(const QByteArray& tenantId, const QByteArray& relationshipId)
-	{
-		Q_UNUSED(tenantId); Q_UNUSED(relationshipId);
-		return false;
-	}
+	virtual bool EnsureSystemTenant() = 0;
 };
 
 

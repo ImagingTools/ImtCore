@@ -83,14 +83,14 @@ bool CTenantRelationshipProposal::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.BeginTag(sourceRoleTag);
 	int sourceRole = static_cast<int>(m_info.proposedSourceRole);
 	retVal = retVal && archive.Process(sourceRole);
-	m_info.proposedSourceRole = static_cast<ITenantInfo::TenantRelationshipRole>(sourceRole);
+	m_info.proposedSourceRole = static_cast<ITenantRelationshipInfo::TenantRelationshipRole>(sourceRole);
 	retVal = retVal && archive.EndTag(sourceRoleTag);
 
 	iser::CArchiveTag targetRoleTag("ProposedTargetRole", "Proposed target role", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(targetRoleTag);
 	int targetRole = static_cast<int>(m_info.proposedTargetRole);
 	retVal = retVal && archive.Process(targetRole);
-	m_info.proposedTargetRole = static_cast<ITenantInfo::TenantRelationshipRole>(targetRole);
+	m_info.proposedTargetRole = static_cast<ITenantRelationshipInfo::TenantRelationshipRole>(targetRole);
 	retVal = retVal && archive.EndTag(targetRoleTag);
 
 	iser::CArchiveTag scopeTag("ProposedScope", "Proposed scope", iser::CArchiveTag::TT_LEAF);
