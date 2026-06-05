@@ -70,20 +70,14 @@ istd::IChangeableUniquePtr CCrossOrgGrantDbDelegateComp::CreateObjectFromRecord(
 	if (record.contains("TargetTenantId")){
 		info.targetTenantId = imtdb::VariantToByteArray(record.value("TargetTenantId"));
 	}
-	if (record.contains("RelationshipId")){
-		info.relationshipId = imtdb::VariantToByteArray(record.value("RelationshipId"));
-	}
-	if (record.contains("ContractId")){
-		info.contractId = imtdb::VariantToByteArray(record.value("ContractId"));
-	}
-	if (record.contains("TargetTeamId")){
-		info.targetTeamId = imtdb::VariantToByteArray(record.value("TargetTeamId"));
-	}
-	if (record.contains("AccessLevel")){
-		info.accessLevel = static_cast<imtauth::CrossOrgAccessLevel>(record.value("AccessLevel").toInt());
-	}
-	if (record.contains("ResourceScope")){
-		info.resourceScope = record.value("ResourceScope").toString();
+	if (record.contains("RoleIds")){
+		QString roleIdsStr = record.value("RoleIds").toString();
+		if (!roleIdsStr.isEmpty()){
+			QStringList parts = roleIdsStr.split(';', Qt::SkipEmptyParts);
+			for (const QString& part : parts){
+				info.roleIds.append(part.trimmed().toUtf8());
+			}
+		}
 	}
 	if (record.contains("Description")){
 		info.description = record.value("Description").toString();
@@ -118,28 +112,20 @@ CCrossOrgGrantDbDelegateComp::NewObjectQuery CCrossOrgGrantDbDelegateComp::Creat
 	QString id = imtdb::EscapeSql(QString::fromUtf8(!proposedObjectId.isEmpty() ? proposedObjectId : info.grantId));
 	QString sourceTenantId = imtdb::EscapeSql(QString::fromUtf8(info.sourceTenantId));
 	QString targetTenantId = imtdb::EscapeSql(QString::fromUtf8(info.targetTenantId));
-	QString relationshipId = imtdb::EscapeSql(QString::fromUtf8(info.relationshipId));
-	QString contractId = NullableSqlText(QString::fromUtf8(info.contractId));
-	QString targetTeamId = NullableSqlText(QString::fromUtf8(info.targetTeamId));
-	int accessLevel = static_cast<int>(info.accessLevel);
-	QString resourceScope = NullableSqlText(info.resourceScope);
+	QString roleIdsStr = NullableSqlText(QString::fromUtf8(info.roleIds.join(';')));
 	QString description = NullableSqlText(info.description);
 	QString createdAt = !info.createdAt.isEmpty() ? imtdb::EscapeSql(info.createdAt) : imtdb::UtcNow();
 	QString expiresAt = NullableSqlDateTime(info.expiresAt);
 	int isActive = info.isActive ? 1 : 0;
 
 	result.query = QString(
-		"INSERT INTO \"%1\" (\"Id\", \"SourceTenantId\", \"TargetTenantId\", \"RelationshipId\", \"ContractId\", \"TargetTeamId\", \"AccessLevel\", \"ResourceScope\", \"Description\", \"CreatedAt\", \"ExpiresAt\", \"IsActive\") "
-		"VALUES ('%2', '%3', '%4', '%5', %6, %7, %8, %9, %10, '%11', %12, %13);")
+		"INSERT INTO \"%1\" (\"Id\", \"SourceTenantId\", \"TargetTenantId\", \"RoleIds\", \"Description\", \"CreatedAt\", \"ExpiresAt\", \"IsActive\") "
+		"VALUES ('%2', '%3', '%4', %5, %6, '%7', %8, %9);")
 		.arg(*m_tableNameAttrPtr)
 		.arg(id)
 		.arg(sourceTenantId)
 		.arg(targetTenantId)
-		.arg(relationshipId)
-		.arg(contractId)
-		.arg(targetTeamId)
-		.arg(QString::number(accessLevel))
-		.arg(resourceScope)
+		.arg(roleIdsStr)
 		.arg(description)
 		.arg(createdAt)
 		.arg(expiresAt)
@@ -165,19 +151,13 @@ QByteArray CCrossOrgGrantDbDelegateComp::CreateUpdateObjectQuery(
 
 	return QString(
 		"UPDATE \"%1\" SET "
-		"\"ContractId\"=%2, "
-		"\"TargetTeamId\"=%3, "
-		"\"AccessLevel\"=%4, "
-		"\"ResourceScope\"=%5, "
-		"\"Description\"=%6, "
-		"\"ExpiresAt\"=%7, "
-		"\"IsActive\"=%8 "
-		"WHERE \"Id\"='%9';")
+		"\"RoleIds\"=%2, "
+		"\"Description\"=%3, "
+		"\"ExpiresAt\"=%4, "
+		"\"IsActive\"=%5 "
+		"WHERE \"Id\"='%6';")
 		.arg(*m_tableNameAttrPtr)
-		.arg(NullableSqlText(QString::fromUtf8(info.contractId)))
-		.arg(NullableSqlText(QString::fromUtf8(info.targetTeamId)))
-		.arg(QString::number(static_cast<int>(info.accessLevel)))
-		.arg(NullableSqlText(info.resourceScope))
+		.arg(NullableSqlText(QString::fromUtf8(info.roleIds.join(';'))))
 		.arg(NullableSqlText(info.description))
 		.arg(NullableSqlDateTime(info.expiresAt))
 		.arg(QString::number(info.isActive ? 1 : 0))

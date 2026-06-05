@@ -129,18 +129,8 @@ color: Style.textColor
 BaseText {
 width: parent.width
 elide: Text.ElideRight
-text: qsTr("Level: %1   Scope: %2")
-.arg(grantDelegate.__grant.accessLevel || qsTr("None"))
-.arg((grantDelegate.__grant.resourceScope && grantDelegate.__grant.resourceScope !== "") ? grantDelegate.__grant.resourceScope : qsTr("All"))
-font.pixelSize: Style.fontSizeS
-color: Style.inactiveTextColor
-}
-
-BaseText {
-width: parent.width
-visible: grantDelegate.__grant.relationshipId && grantDelegate.__grant.relationshipId !== ""
-elide: Text.ElideRight
-text: qsTr("Relationship: %1").arg(grantDelegate.__grant.relationshipId || "")
+visible: grantDelegate.__grant.roleIds && grantDelegate.__grant.roleIds !== ""
+text: qsTr("Roles: %1").arg(grantDelegate.__grant.roleIds || "")
 font.pixelSize: Style.fontSizeS
 color: Style.inactiveTextColor
 }

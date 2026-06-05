@@ -388,11 +388,7 @@ sdl::V1_0::imtauth::CCrossOrgGrant GrantInfoToData(const imtauth::CrossOrgGrantI
 	data.id = info.grantId;
 	data.sourceTenantId = info.sourceTenantId;
 	data.targetTenantId = info.targetTenantId;
-	data.relationshipId = info.relationshipId;
-	data.contractId = info.contractId;
-	data.targetTeamId = info.targetTeamId;
-	data.accessLevel = imtauthgql::ToSdlAccessLevel(info.accessLevel);
-	data.resourceScope = info.resourceScope;
+	data.roleIds = info.roleIds.join(';');
 	data.description = info.description;
 	data.createdAt = info.createdAt;
 	data.expiresAt = info.expiresAt;
@@ -487,11 +483,7 @@ sdl::V1_0::imtauth::CCreateCrossOrgGrantPayload CTenantManagerControllerComp::On
 
 	QByteArray sourceTenantId;
 	QByteArray targetTenantId;
-	QByteArray relationshipId;
-	QByteArray contractId;
-	QByteArray targetTeamId;
-	imtauth::CrossOrgAccessLevel accessLevel = imtauth::COAL_NONE;
-	QString resourceScope;
+	QByteArrayList roleIds;
 	QString description;
 	QString expiresAt;
 
@@ -502,20 +494,14 @@ sdl::V1_0::imtauth::CCreateCrossOrgGrantPayload CTenantManagerControllerComp::On
 	if (arguments.input->targetTenantId){
 		targetTenantId = *arguments.input->targetTenantId;
 	}
-	if (arguments.input->relationshipId){
-		relationshipId = *arguments.input->relationshipId;
-	}
-	if (arguments.input->contractId){
-		contractId = *arguments.input->contractId;
-	}
-	if (arguments.input->accessLevel){
-		accessLevel = FromSdlAccessLevel(*arguments.input->accessLevel);
-	}
-	if (arguments.input->resourceScope){
-		resourceScope = *arguments.input->resourceScope;
-	}
-	if (arguments.input->targetTeamId){
-		targetTeamId = *arguments.input->targetTeamId;
+	if (arguments.input->roleIds){
+		QString roleIdsStr = *arguments.input->roleIds;
+		if (!roleIdsStr.isEmpty()){
+			QStringList parts = roleIdsStr.split(';', Qt::SkipEmptyParts);
+			for (const QString& part : parts){
+				roleIds.append(part.trimmed().toUtf8());
+			}
+		}
 	}
 	if (arguments.input->description){
 		description = *arguments.input->description;
@@ -527,13 +513,9 @@ sdl::V1_0::imtauth::CCreateCrossOrgGrantPayload CTenantManagerControllerComp::On
 	QByteArray grantId = m_grantManagerCompPtr->CreateGrant(
 							 sourceTenantId,
 							 targetTenantId,
-							 relationshipId,
-							 accessLevel,
-							 resourceScope,
-							 targetTeamId,
+							 roleIds,
 							 description,
-							 expiresAt,
-							 contractId);
+							 expiresAt);
 	
 	if (grantId.isEmpty()){
 		response.errorMessage = QStringLiteral("Failed to create cross-org grant");
@@ -1124,11 +1106,23 @@ sdl::V1_0::imtauth::CGetConnectionsPayload CTenantManagerControllerComp::OnGetCo
 				imtauth::ITenantInfoUniquePtr tenant1Ptr = m_tenantManagerCompPtr->GetTenant(connPtr->GetTenantAId());
 				if (tenant1Ptr.IsValid()){
 					data.tenantAName = tenant1Ptr->GetTenantName();
+					if (m_userCollectionCompPtr.IsValid()){
+						QByteArray ownerId = tenant1Ptr->GetOwnerId();
+						if (!ownerId.isEmpty()){
+							data.tenantAOwnerName = imtauth::GetUserName(*m_userCollectionCompPtr, ownerId);
+						}
+					}
 				}
 
 				imtauth::ITenantInfoUniquePtr tenant2Ptr = m_tenantManagerCompPtr->GetTenant(connPtr->GetTenantBId());
 				if (tenant2Ptr.IsValid()){
 					data.tenantBName = tenant2Ptr->GetTenantName();
+					if (m_userCollectionCompPtr.IsValid()){
+						QByteArray ownerId = tenant2Ptr->GetOwnerId();
+						if (!ownerId.isEmpty()){
+							data.tenantBOwnerName = imtauth::GetUserName(*m_userCollectionCompPtr, ownerId);
+						}
+					}
 				}
 			}
 

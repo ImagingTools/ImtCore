@@ -788,38 +788,6 @@ inline sdl::V1_0::imtauth::RelationshipProposalStatus ToSdlProposalStatus(imtaut
 }
 
 
-// Cross-Org Access Level
-
-inline imtauth::CrossOrgAccessLevel FromSdlAccessLevel(sdl::V1_0::imtauth::CrossOrgAccessLevel level)
-{
-	switch (level){
-	case sdl::V1_0::imtauth::CrossOrgAccessLevel::Read:
-		return imtauth::COAL_READ;
-	case sdl::V1_0::imtauth::CrossOrgAccessLevel::Write:
-		return imtauth::COAL_WRITE;
-	case sdl::V1_0::imtauth::CrossOrgAccessLevel::Admin:
-		return imtauth::COAL_ADMIN;
-	default:
-		return imtauth::COAL_NONE;
-	}
-}
-
-
-inline sdl::V1_0::imtauth::CrossOrgAccessLevel ToSdlAccessLevel(imtauth::CrossOrgAccessLevel level)
-{
-	switch (level){
-	case imtauth::COAL_READ:
-		return sdl::V1_0::imtauth::CrossOrgAccessLevel::Read;
-	case imtauth::COAL_WRITE:
-		return sdl::V1_0::imtauth::CrossOrgAccessLevel::Write;
-	case imtauth::COAL_ADMIN:
-		return sdl::V1_0::imtauth::CrossOrgAccessLevel::Admin;
-	default:
-		return sdl::V1_0::imtauth::CrossOrgAccessLevel::None;
-	}
-}
-
-
 // Contract Status
 
 inline imtauth::ContractStatus FromSdlContractStatus(sdl::V1_0::imtauth::ContractStatus status)

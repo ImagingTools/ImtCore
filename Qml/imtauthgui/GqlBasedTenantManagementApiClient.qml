@@ -857,10 +857,7 @@ QtObject {
 					"grantId": grant.m_id || "",
 					"sourceTenantId": grant.m_sourceTenantId || "",
 					"targetTenantId": grant.m_targetTenantId || "",
-					"relationshipId": grant.m_relationshipId || "",
-					"targetTeamId": grant.m_targetTeamId || "",
-					"accessLevel": grant.m_accessLevel || CrossOrgAccessLevelEnum.s_none,
-					"resourceScope": grant.m_resourceScope || "",
+					"roleIds": grant.m_roleIds || "",
 					"description": grant.m_description || "",
 					"createdAt": grant.m_createdAt || "",
 					"expiresAt": grant.m_expiresAt || "",
@@ -876,13 +873,10 @@ QtObject {
 		root.__getCrossOrgGrantsSender.send(root.__getCrossOrgGrantsInput)
 	}
 
-	function createCrossOrgGrant(sourceTenantId, targetTenantId, relationshipId, accessLevel, resourceScope, targetTeamId, description, expiresAt) {
+	function createCrossOrgGrant(sourceTenantId, targetTenantId, roleIds, description, expiresAt) {
 		root.__createCrossOrgGrantInput.m_sourceTenantId = sourceTenantId || ""
 		root.__createCrossOrgGrantInput.m_targetTenantId = targetTenantId || ""
-		root.__createCrossOrgGrantInput.m_relationshipId = relationshipId || ""
-		root.__createCrossOrgGrantInput.m_accessLevel = accessLevel || CrossOrgAccessLevelEnum.s_read
-		root.__createCrossOrgGrantInput.m_resourceScope = resourceScope || ""
-		root.__createCrossOrgGrantInput.m_targetTeamId = targetTeamId || ""
+		root.__createCrossOrgGrantInput.m_roleIds = roleIds || ""
 		root.__createCrossOrgGrantInput.m_description = description || ""
 		root.__createCrossOrgGrantInput.m_expiresAt = expiresAt || ""
 		root.__createCrossOrgGrantSender.send(root.__createCrossOrgGrantInput)
@@ -1322,13 +1316,16 @@ QtObject {
 					"id": conn.m_id || "",
 					"tenantAId": conn.m_tenantAId || "",
 					"tenantAName": conn.m_tenantAName || "",
+					"tenantAOwnerName": conn.m_tenantAOwnerName || "",
 					"tenantBId": conn.m_tenantBId || "",
 					"tenantBName": conn.m_tenantBName || "",
+					"tenantBOwnerName": conn.m_tenantBOwnerName || "",
 					"status": conn.m_status || ConnectionStatusEnum.s_active,
 					"createdAt": conn.m_createdAt || "",
 					"updatedAt": conn.m_updatedAt || "",
 					"partnerId": (conn.m_tenantAId === root.tenantId) ? conn.m_tenantBId : conn.m_tenantAId,
-					"partnerName": (conn.m_tenantAId === root.tenantId) ? (conn.m_tenantBName || conn.m_tenantBId) : (conn.m_tenantAName || conn.m_tenantAId)
+					"partnerName": (conn.m_tenantAId === root.tenantId) ? (conn.m_tenantBName || conn.m_tenantBId) : (conn.m_tenantAName || conn.m_tenantAId),
+					"partnerOwnerName": (conn.m_tenantAId === root.tenantId) ? (conn.m_tenantBOwnerName || "") : (conn.m_tenantAOwnerName || "")
 				})
 			}
 		}

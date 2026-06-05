@@ -34,23 +34,17 @@ public:
 	virtual QByteArray CreateGrant(
 				const QByteArray& sourceTenantId,
 				const QByteArray& targetTenantId,
-				const QByteArray& relationshipId,
-				CrossOrgAccessLevel accessLevel,
-				const QString& resourceScope = QString(),
-				const QByteArray& targetTeamId = QByteArray(),
+				const QByteArrayList& roleIds,
 				const QString& description = QString(),
-				const QString& expiresAt = QString(),
-				const QByteArray& contractId = QByteArray()) override;
+				const QString& expiresAt = QString()) override;
 	virtual bool RevokeGrant(const QByteArray& grantId) override;
 	virtual CrossOrgGrantInfo GetGrant(const QByteArray& grantId) const override;
 	virtual CrossOrgGrants GetGrantsBySourceTenant(const QByteArray& sourceTenantId) const override;
 	virtual CrossOrgGrants GetGrantsByTargetTenant(const QByteArray& targetTenantId) const override;
-	virtual CrossOrgGrants GetGrantsByRelationship(const QByteArray& relationshipId) const override;
 	virtual bool HasAccess(
 				const QByteArray& sourceTenantId,
 				const QByteArray& targetTenantId,
-				const QString& resourceScope,
-				CrossOrgAccessLevel requiredLevel) const override;
+				const QByteArray& roleId) const override;
 
 private:
 	CrossOrgGrants CollectGrants(const std::function<bool(const CrossOrgGrantInfo&)>& predicate) const;

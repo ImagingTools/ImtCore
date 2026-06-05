@@ -515,6 +515,13 @@ ViewBase {
 						}
 
 						Text {
+							visible: modelData.partnerOwnerName ? modelData.partnerOwnerName !== "" : false
+							text: qsTr("Owner: %1").arg(modelData.partnerOwnerName || "")
+							font.pixelSize: Style.fontSizeS
+							color: Style.inactiveTextColor
+						}
+
+						Text {
 							text: qsTr("Connected since: %1").arg(
 								modelData.createdAt ? new Date(modelData.createdAt).toLocaleDateString() : "—")
 							font.pixelSize: Style.fontSizeXS

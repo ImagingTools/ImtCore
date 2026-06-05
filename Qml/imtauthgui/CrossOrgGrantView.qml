@@ -12,8 +12,7 @@ import imtauthgui 1.0
  * CrossOrgGrantView
  *
  * ViewBase-inherited editor for creating cross-org grants.
- * Follows the RoleView / UserGroupView pattern with GqlBasedCommandsController.
- * The commands controller provides the Save button at the top.
+ * Simplified model: TargetTenant, Roles (multi-select), Description, Expires.
  */
 ViewBase {
 	id: container
@@ -26,8 +25,8 @@ ViewBase {
 
 	property string __selectedTargetTenantId: ""
 	property string __selectedTargetTenantName: ""
-	property string __selectedRelationshipId: ""
-	property string __selectedRelationshipName: ""
+	property var __selectedRoleIds: []
+	property string __selectedRoleNames: ""
 
 	signal grantCreated()
 
@@ -38,21 +37,20 @@ ViewBase {
 	}
 
 	function submitGrant() {
-		if (!container.__selectedTargetTenantId || !container.__selectedRelationshipId) {
-			ModalDialogManager.showInfoDialog(qsTr("Target tenant and relationship are required."))
+		if (!container.__selectedTargetTenantId) {
+			ModalDialogManager.showInfoDialog(qsTr("Target tenant is required."))
 			return
 		}
-		var levelIndex = accessLevelCB.currentIndex >= 0 ? accessLevelCB.currentIndex : 1
-		var levelTokens = ["None", "Read", "Write", "Admin"]
-		var accessLevel = levelTokens[levelIndex]
+		if (container.__selectedRoleIds.length === 0) {
+			ModalDialogManager.showInfoDialog(qsTr("At least one role must be selected."))
+			return
+		}
+		var roleIdsStr = container.__selectedRoleIds.join(";")
 		if (container.apiClient) {
 			container.apiClient.createCrossOrgGrant(
 				container.tenantData ? container.tenantData.m_id : "",
 				container.__selectedTargetTenantId,
-				container.__selectedRelationshipId,
-				accessLevel,
-				resourceScopeInput.text.trim(),
-				"",
+				roleIdsStr,
 				grantDescriptionInput.text.trim(),
 				expiresAtPicker.getDateAsString())
 		}
@@ -123,7 +121,7 @@ ViewBase {
 				}
 
 				ElementView {
-					name: qsTr("Relationship")
+					name: qsTr("Roles")
 
 					controlComp: Component {
 						Row {
@@ -131,10 +129,9 @@ ViewBase {
 
 							BaseText {
 								anchors.verticalCenter: parent.verticalCenter
-								text: container.__selectedRelationshipName
-								  || container.__selectedRelationshipId
-								  || qsTr("Select relationship...")
-								color: container.__selectedRelationshipId
+								text: container.__selectedRoleNames
+								  || qsTr("Select roles...")
+								color: container.__selectedRoleIds.length > 0
 								   ? Style.textColor : Style.inactiveTextColor
 								font.pixelSize: Style.fontSizeM
 							}
@@ -142,24 +139,11 @@ ViewBase {
 							Button {
 								text: qsTr("Select")
 								onClicked: {
-									ModalDialogManager.openDialog(relationshipSelectComp, {})
+									ModalDialogManager.openDialog(roleSelectComp, {})
 								}
 							}
 						}
 					}
-				}
-
-				ComboBoxElementView {
-					id: accessLevelCB
-					name: qsTr("Access Level")
-					model: accessLevelModel
-					currentIndex: 1
-				}
-
-				TextInputElementView {
-					id: resourceScopeInput
-					name: qsTr("Resource Scope")
-					placeHolderText: qsTr("Optional — empty grants all resources")
 				}
 
 				TextInputElementView {
@@ -197,33 +181,26 @@ ViewBase {
 	}
 
 	Component {
-		id: relationshipSelectComp
+		id: roleSelectComp
 
 		FilterableSelectPopup {
 			dataProvider: FilterableSelectGqlDataProvider {
-				collectionId: "TenantRelationships"
-				multiSelect: false
+				collectionId: "Roles"
+				multiSelect: true
 			}
-			filterPlaceholder: qsTr("Select relationship...")
-			preselectedIds: container.__selectedRelationshipId
-				? [container.__selectedRelationshipId] : []
+			filterPlaceholder: qsTr("Select roles...")
+			preselectedIds: container.__selectedRoleIds
 
-			onItemSelected: {
-				container.__selectedRelationshipId = itemId
-				container.__selectedRelationshipName = dataProvider
-					? dataProvider.getSelectedItemText(itemId) : ""
-			}
-		}
-	}
-
-	TreeItemModel {
-		id: accessLevelModel
-		Component.onCompleted: {
-			var levels = ["None", "Read", "Write", "Admin"]
-			for (var i = 0; i < levels.length; i++) {
-				var idx = accessLevelModel.insertNewItem()
-				accessLevelModel.setData("id", levels[i], idx)
-				accessLevelModel.setData("name", levels[i], idx)
+			onSelectionConfirmed: {
+				container.__selectedRoleIds = selectedIds || []
+				var names = []
+				if (dataProvider) {
+					for (var i = 0; i < container.__selectedRoleIds.length; ++i) {
+						var n = dataProvider.getSelectedItemText(container.__selectedRoleIds[i])
+						if (n) names.push(n)
+					}
+				}
+				container.__selectedRoleNames = names.join(", ")
 			}
 		}
 	}
