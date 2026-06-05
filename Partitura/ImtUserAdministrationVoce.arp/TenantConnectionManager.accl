@@ -9,8 +9,12 @@
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="ConnectionCodesNotificationPublisher" X="550" Y="100" Note=""/>
+        <Element ComponentName="TenantConnectionCodeInfo" X="975" Y="325" Note=""/>
+        <Element ComponentName="TenantConnectionInfo" X="150" Y="425" Note=""/>
         <Element ComponentName="TenantConnectionRequestInfo" X="550" Y="525" Note=""/>
         <Element ComponentName="TenantConnectionRequestManager" X="550" Y="325" Note=""/>
+        <Element ComponentName="TenantRelationshipInfo" X="175" Y="525" Note=""/>
+        <Element ComponentName="TenantRelationshipProposalInfo" X="200" Y="200" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

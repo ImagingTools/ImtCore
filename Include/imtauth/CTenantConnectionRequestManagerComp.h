@@ -64,11 +64,11 @@ public:
 	virtual bool RejectConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId) override;
 	virtual bool CancelConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId) override;
 	virtual QByteArrayList GetConnectionRequestIds(const QByteArray& tenantId) const override;
-	virtual const ITenantConnectionRequestInfo* GetConnectionRequest(const QByteArray& requestId) const override;
+	virtual ITenantConnectionRequestInfoUniquePtr GetConnectionRequest(const QByteArray& requestId) const override;
 
 	// ITenantConnectionRequestManager - Connections
 	virtual QByteArrayList GetConnectionIds(const QByteArray& tenantId) const override;
-	virtual const ITenantConnectionInfo* GetConnection(const QByteArray& connectionId) const override;
+	virtual ITenantConnectionInfoUniquePtr GetConnection(const QByteArray& connectionId) const override;
 	virtual bool RemoveConnection(const QByteArray& connectionId, const QByteArray& tenantId) override;
 
 	// ITenantConnectionRequestManager - Relationship Proposals

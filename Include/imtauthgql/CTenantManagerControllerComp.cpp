@@ -910,9 +910,8 @@ sdl::V1_0::imtauth::CGetConnectionRequestsPayload CTenantManagerControllerComp::
 	response.requests.Emplace();
 
 	for (const QByteArray& requestId : requestIds){
-		const imtauth::ITenantConnectionRequestInfo* reqPtr =
-			m_connectionRequestManagerCompPtr->GetConnectionRequest(requestId);
-		if (reqPtr != nullptr){
+		imtauth::ITenantConnectionRequestInfoUniquePtr reqPtr = m_connectionRequestManagerCompPtr->GetConnectionRequest(requestId);
+		if (reqPtr.IsValid()){
 			sdl::V1_0::imtauth::CConnectionRequest data;
 			data.id = reqPtr->GetRequestId();
 			data.sourceTenantId = reqPtr->GetSourceTenantId();
@@ -1093,9 +1092,8 @@ sdl::V1_0::imtauth::CGetConnectionsPayload CTenantManagerControllerComp::OnGetCo
 	QByteArrayList connectionIds = m_connectionRequestManagerCompPtr->GetConnectionIds(tenantId);
 
 	for (const QByteArray& connectionId : connectionIds){
-		const imtauth::ITenantConnectionInfo* connPtr =
-			m_connectionRequestManagerCompPtr->GetConnection(connectionId);
-		if (connPtr != nullptr){
+		imtauth::ITenantConnectionInfoUniquePtr connPtr = m_connectionRequestManagerCompPtr->GetConnection(connectionId);
+		if (connPtr.IsValid()){
 			sdl::V1_0::imtauth::CTenantConnection data;
 
 			data.id = connPtr->GetConnectionId();

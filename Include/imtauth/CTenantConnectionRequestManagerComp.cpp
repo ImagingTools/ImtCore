@@ -675,17 +675,32 @@ QByteArrayList CTenantConnectionRequestManagerComp::GetConnectionRequestIds(cons
 
 // --- Connections ---
 
-const ITenantConnectionRequestInfo* CTenantConnectionRequestManagerComp::GetConnectionRequest(const QByteArray& requestId) const
+ITenantConnectionRequestInfoUniquePtr CTenantConnectionRequestManagerComp::GetConnectionRequest(const QByteArray& requestId) const
 {
 	if (!m_requestCollectionCompPtr.IsValid() || requestId.isEmpty()){
 		return nullptr;
 	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (m_requestCollectionCompPtr->GetObjectData(requestId, dataPtr)){
-		return dynamic_cast<const ITenantConnectionRequestInfo*>(dataPtr.GetPtr());
+	if (!m_requestCollectionCompPtr->GetObjectData(requestId, dataPtr)){
+		return nullptr;
 	}
-	return nullptr;
+
+	const ITenantConnectionRequestInfo* tenantConnectionRequestInfoPtr = dynamic_cast<const ITenantConnectionRequestInfo*>(dataPtr.GetPtr());
+	if (tenantConnectionRequestInfoPtr == nullptr){
+		return nullptr;
+	}
+
+	ITenantConnectionRequestInfoUniquePtr clonedConnectionRequestInfo = m_requestFactoryCompPtr.CreateInstance();
+	if (!clonedConnectionRequestInfo.IsValid()){
+		return nullptr;
+	}
+
+	if (!clonedConnectionRequestInfo->CopyFrom(*tenantConnectionRequestInfoPtr)){
+		return nullptr;
+	}
+
+	return clonedConnectionRequestInfo;
 }
 
 
@@ -706,21 +721,37 @@ QByteArrayList CTenantConnectionRequestManagerComp::GetConnectionIds(const QByte
 			}
 		}
 	}
+
 	return result;
 }
 
 
-const ITenantConnectionInfo* CTenantConnectionRequestManagerComp::GetConnection(const QByteArray& connectionId) const
+ITenantConnectionInfoUniquePtr CTenantConnectionRequestManagerComp::GetConnection(const QByteArray& connectionId) const
 {
 	if (!m_connectionCollectionCompPtr.IsValid() || connectionId.isEmpty()){
 		return nullptr;
 	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (m_connectionCollectionCompPtr->GetObjectData(connectionId, dataPtr)){
-		return dynamic_cast<const ITenantConnectionInfo*>(dataPtr.GetPtr());
+	if (!m_connectionCollectionCompPtr->GetObjectData(connectionId, dataPtr)){
+		return nullptr;
 	}
-	return nullptr;
+
+	const ITenantConnectionInfo* tenantConnectionInfoPtr = dynamic_cast<const ITenantConnectionInfo*>(dataPtr.GetPtr());
+	if (tenantConnectionInfoPtr == nullptr){
+		return nullptr;
+	}
+
+	ITenantConnectionInfoUniquePtr clonedConnectionInfo = m_connectionFactoryCompPtr.CreateInstance();
+	if (!clonedConnectionInfo.IsValid()){
+		return nullptr;
+	}
+
+	if (!clonedConnectionInfo->CopyFrom(*tenantConnectionInfoPtr)){
+		return nullptr;
+	}
+
+	return clonedConnectionInfo;
 }
 
 

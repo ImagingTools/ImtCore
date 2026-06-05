@@ -20,19 +20,20 @@
         <Element ComponentName="UserFilterableSelectController" X="1000" Y="75" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
+        <EmbededRegistry Id="UserFilterableSelectController">
+            <PositionMap>
+                <Element ComponentName="TenantExclusionParamsSetJoiner" X="625" Y="350" Note=""/>
+                <Element ComponentName="UserFilterableSelectController" X="600" Y="100" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
         <EmbededRegistry Id="TenantManager">
             <PositionMap>
                 <Element ComponentName="TenantInfo" X="250" Y="550" Note=""/>
                 <Element ComponentName="TenantManager" X="600" Y="350" Note=""/>
                 <Element ComponentName="TenantManagerController" X="950" Y="550" Note=""/>
                 <Element ComponentName="TenantNotificationPublisher" X="600" Y="125" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
-        <EmbededRegistry Id="UserFilterableSelectController">
-            <PositionMap>
-                <Element ComponentName="TenantExclusionParamsSetJoiner" X="625" Y="350" Note=""/>
-                <Element ComponentName="UserFilterableSelectController" X="600" Y="100" Note=""/>
+                <Element ComponentName="TenantRelationshipProposalInfo" X="1025" Y="400" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
