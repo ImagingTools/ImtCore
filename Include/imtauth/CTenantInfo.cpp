@@ -152,40 +152,41 @@ void CTenantInfo::SetUpdatedAt(const QString& updatedAt)
 }
 
 
-ITenantInfo::TenantRelationships CTenantInfo::GetRelationships() const
+QByteArrayList CTenantInfo::GetRelationshipIds() const
 {
-	return m_relationships;
+	return m_relationshipIds;
 }
 
 
-void CTenantInfo::SetRelationships(const TenantRelationships& relationships)
+void CTenantInfo::SetRelationshipIds(const QByteArrayList& relationshipIds)
 {
-	if (m_relationships != relationships){
+	if (m_relationshipIds != relationshipIds){
 		istd::CChangeNotifier notifier(this);
 
-		m_relationships = relationships;
+		m_relationshipIds = relationshipIds;
 	}
 }
 
 
-void CTenantInfo::AddRelationship(const TenantRelationship& relationship)
+void CTenantInfo::AddRelationshipId(const QByteArray& relationshipId)
 {
-	istd::CChangeNotifier notifier(this);
+	if (!m_relationshipIds.contains(relationshipId)){
+		istd::CChangeNotifier notifier(this);
 
-	m_relationships.append(relationship);
+		m_relationshipIds.append(relationshipId);
+	}
 }
 
 
-bool CTenantInfo::RemoveRelationship(const QByteArray& relationshipId)
+bool CTenantInfo::RemoveRelationshipId(const QByteArray& relationshipId)
 {
-	for (int i = 0; i < m_relationships.size(); ++i){
-		if (m_relationships[i].relationshipId == relationshipId){
-			istd::CChangeNotifier notifier(this);
+	int idx = m_relationshipIds.indexOf(relationshipId);
+	if (idx >= 0){
+		istd::CChangeNotifier notifier(this);
 
-			m_relationships.removeAt(i);
+		m_relationshipIds.removeAt(idx);
 
-			return true;
-		}
+		return true;
 	}
 
 	return false;
@@ -310,77 +311,7 @@ bool CTenantInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_updatedAt);
 	retVal = retVal && archive.EndTag(updatedAtTag);
 
-	iser::CArchiveTag relationshipsTag("Relationships", "Relationships", iser::CArchiveTag::TT_GROUP);
-	if (archive.BeginTag(relationshipsTag)){
-		int count = m_relationships.size();
-		retVal = retVal && archive.Process(count);
-
-		if (archive.IsStoring()){
-			for (int i = 0; i < count; ++i){
-				iser::CArchiveTag relTag("Relationship", "Relationship", iser::CArchiveTag::TT_GROUP);
-				retVal = retVal && archive.BeginTag(relTag);
-
-				QByteArray relId = m_relationships[i].relationshipId;
-				QByteArray targetId = m_relationships[i].targetTenantId;
-				int role = static_cast<int>(m_relationships[i].role);
-				QString desc = m_relationships[i].description;
-				QString created = m_relationships[i].createdAt;
-				int sourceRole = static_cast<int>(m_relationships[i].sourceRole);
-				int targetRole = static_cast<int>(m_relationships[i].targetRole);
-				QString scope = m_relationships[i].scope;
-				QString validFrom = m_relationships[i].validFrom;
-				QString validUntil = m_relationships[i].validUntil;
-				bool isActive = m_relationships[i].isActive;
-
-				retVal = retVal && archive.Process(relId);
-				retVal = retVal && archive.Process(targetId);
-				retVal = retVal && archive.Process(role);
-				retVal = retVal && archive.Process(desc);
-				retVal = retVal && archive.Process(created);
-				retVal = retVal && archive.Process(sourceRole);
-				retVal = retVal && archive.Process(targetRole);
-				retVal = retVal && archive.Process(scope);
-				retVal = retVal && archive.Process(validFrom);
-				retVal = retVal && archive.Process(validUntil);
-				retVal = retVal && archive.Process(isActive);
-
-				retVal = retVal && archive.EndTag(relTag);
-			}
-		}
-		else{
-			m_relationships.clear();
-			for (int i = 0; i < count; ++i){
-				iser::CArchiveTag relTag("Relationship", "Relationship", iser::CArchiveTag::TT_GROUP);
-				retVal = retVal && archive.BeginTag(relTag);
-
-				TenantRelationship rel;
-				int role = 0;
-				int sourceRole = 0;
-				int targetRole = 0;
-
-				retVal = retVal && archive.Process(rel.relationshipId);
-				retVal = retVal && archive.Process(rel.targetTenantId);
-				retVal = retVal && archive.Process(role);
-				retVal = retVal && archive.Process(rel.description);
-				retVal = retVal && archive.Process(rel.createdAt);
-				retVal = retVal && archive.Process(sourceRole);
-				retVal = retVal && archive.Process(targetRole);
-				retVal = retVal && archive.Process(rel.scope);
-				retVal = retVal && archive.Process(rel.validFrom);
-				retVal = retVal && archive.Process(rel.validUntil);
-				retVal = retVal && archive.Process(rel.isActive);
-
-				rel.role = static_cast<TenantRelationshipRole>(role);
-				rel.sourceRole = static_cast<TenantRelationshipRole>(sourceRole);
-				rel.targetRole = static_cast<TenantRelationshipRole>(targetRole);
-				m_relationships.append(rel);
-
-				retVal = retVal && archive.EndTag(relTag);
-			}
-		}
-
-		retVal = retVal && archive.EndTag(relationshipsTag);
-	}
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_relationshipIds, "RelationshipIds", "RelationshipId");
 
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_tenantPermissions, "TenantPermissions", "TenantPermission");
 
@@ -419,7 +350,7 @@ bool CTenantInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/
 		m_isActive = sourcePtr->m_isActive;
 		m_createdAt = sourcePtr->m_createdAt;
 		m_updatedAt = sourcePtr->m_updatedAt;
-		m_relationships = sourcePtr->m_relationships;
+		m_relationshipIds = sourcePtr->m_relationshipIds;
 		m_tenantPermissions = sourcePtr->m_tenantPermissions;
 		m_parentTenantId = sourcePtr->m_parentTenantId;
 		m_depth = sourcePtr->m_depth;
@@ -455,7 +386,7 @@ bool CTenantInfo::ResetData(CompatibilityMode /*mode*/)
 	m_isActive = true;
 	m_createdAt.clear();
 	m_updatedAt.clear();
-	m_relationships.clear();
+	m_relationshipIds.clear();
 	m_tenantPermissions.clear();
 	m_parentTenantId.clear();
 	m_depth = 0;

@@ -60,6 +60,7 @@ ViewBase {
 	property Component delegateComponent: null         // custom delegate (receives modelData, selectionManager, collectionPage)
 	property Component headerButtonsComponent: null    // custom header buttons placed at right of stackViewHeader
 	property Component customEditorComponent: null     // custom create/edit form used when documentManager is null
+	property bool showCreateButton: true               // set to false to hide the Create button (e.g. read-only collections)
 	function removeItem(id) {}                        // override in subcomponents
 
 	function updateGui() {}
@@ -193,7 +194,7 @@ ViewBase {
 
 	Text {
 		id: createBtn
-		visible: collectionPage.__canManage && collectionStackView.currentIndex === 0 && !collectionPage.headerButtonsComponent
+		visible: collectionPage.showCreateButton && collectionPage.__canManage && collectionStackView.currentIndex === 0 && !collectionPage.headerButtonsComponent
 		anchors.right: stackViewHeader.right
 		anchors.verticalCenter: stackViewHeader.verticalCenter
 		text: collectionPage.__createBtnText
@@ -314,6 +315,18 @@ ViewBase {
 		Item {
 			id: listViewItem
 			readonly property var effectiveModel: collectionPage.listModel ? collectionPage.listModel : collectionPage.__listItems
+			readonly property int effectiveCount: {
+				if (!effectiveModel) {
+					return 0
+				}
+				if (typeof effectiveModel.count !== "undefined") {
+					return effectiveModel.count
+				}
+				if (typeof effectiveModel.length !== "undefined") {
+					return effectiveModel.length
+				}
+				return 0
+			}
 
 			SearchTextInput {
 				id: filterInput
@@ -384,7 +397,7 @@ ViewBase {
 
 				Item {
 					id: emptyState
-					visible: !listViewItem.effectiveModel || listViewItem.effectiveModel.length === 0
+					visible: listViewItem.effectiveCount === 0
 					anchors.top: tableHeader.bottom
 					anchors.left: parent.left
 					anchors.right: parent.right

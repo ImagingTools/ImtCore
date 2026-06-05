@@ -178,7 +178,6 @@ Popup {
         // parents children directly onto the Menu itself (menu.data). We scan
         // both locations to stay compatible with both runtimes.
         var arr = menu.contentData;
-        console.log("_ingestDeclaredChildren", arr)
         if (!arr || arr.length === 0) arr = menu.data;
         if (!arr) return;
 
@@ -477,8 +476,6 @@ Popup {
             property var menuItemData: modelData
 
             onLoaded: {
-                console.log("onLoaded", item, menuItemData)
-                console.log("menu", menu.x, menu.y, menu.width, menu.height)
                 if (item) {
                     item.menu = menu;
                     item.menuItem = modelData;

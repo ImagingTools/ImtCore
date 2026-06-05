@@ -322,7 +322,6 @@ FocusScope {
         }
 
         function _open() {
-            console.log("_open")
             popup.aboutToShow();
             targetRoot = resolveRoot();
             if (!targetRoot) {
@@ -457,10 +456,6 @@ FocusScope {
             }
             property alias contentSlot: contentSlot_
 
-            Component.onCompleted: {
-                console.log("contentRootComponent onCompleted")
-            }
-
             // Eat presses so they don't reach the outside-click catcher,
             // and use them as "raise + collapse chain above me" signals.
             MouseArea {
@@ -518,7 +513,6 @@ FocusScope {
         duration: 120
         easing.type: Easing.OutQuad
         onStopped: {
-            console.log("NumberAnimation onStopped", d.opening, d.contentRoot)
             if (d.opening) {
                 d.opening = false;
                 d.opened = true;

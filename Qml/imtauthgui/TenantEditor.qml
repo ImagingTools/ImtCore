@@ -91,17 +91,16 @@ DocumentViewBase {
 					multiPageView.addPage("Roles", qsTr("Roles"), rolesPageComp, "Icons/Role")
 					multiPageView.addPage("Groups", qsTr("Groups"), groupsPageComp, "Icons/Organization")
 				}
-					if (stateManager_.isCreator) {
+				if (stateManager_.isCreator) {
 					multiPageView.addPage("Permissions", qsTr("Permissions"), permissionsPageComp, "Icons/Key")
-						multiPageView.addPage("CrossOrgGrants", qsTr("Cross-Org Grants"), crossOrgGrantsPageComp, "Icons/Crown")
-						multiPageView.addPage("Contracts", qsTr("Contracts"), contractsPageComp, "Icons/Assignment")
-						multiPageView.addPage("Relationships", qsTr("Relationships"), relationshipsPageComp, "Icons/Participant")
-						multiPageView.addPage("Connections", qsTr("Connections"), null, "Icons/Communication")
-						multiPageView.addSubPage("Connections", "ConnectCodes", qsTr("Connect Codes"), connectCodesPageComp)
-						multiPageView.addSubPage("Connections", "RedeemCode", qsTr("Redeem Code"), redeemCodePageComp)
-						multiPageView.addSubPage("Connections", "ActiveConnections", qsTr("Active Connections"), activeConnectionsPageComp)
-						multiPageView.addPage("Messages", qsTr("Messages"), messagesPageComp, "Icons/Message")
-					}
+					multiPageView.addPage("CrossOrgGrants", qsTr("Cross-Org Grants"), crossOrgGrantsPageComp, "Icons/Crown")
+					multiPageView.addPage("Contracts", qsTr("Contracts"), contractsPageComp, "Icons/Assignment")
+					multiPageView.addPage("Relationships", qsTr("Relationships"), null, "Icons/Participant")
+					multiPageView.addSubPage("Relationships", "ConnectionCode", qsTr("Connection Code"), connectionCodePageComp)
+					multiPageView.addSubPage("Relationships", "ConnectOrganization", qsTr("Connect Organization"), connectOrganizationPageComp)
+					multiPageView.addSubPage("Relationships", "MyConnections", qsTr("My Connections"), myConnectionsPageComp)
+					multiPageView.addPage("Messages", qsTr("Messages"), messagesPageComp, "Icons/Message")
+				}
 			}
 			multiPageView.currentIndex = 0
 		}
@@ -311,9 +310,9 @@ DocumentViewBase {
 	}
 
 	Component {
-		id: relationshipsPageComp
+		id: connectionCodePageComp
 
-		TenantRelationshipsPage {
+		TenantConnectionCodePage {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
@@ -321,9 +320,9 @@ DocumentViewBase {
 	}
 
 	Component {
-		id: connectCodesPageComp
+		id: connectOrganizationPageComp
 
-		TenantConnectCodesView {
+		TenantConnectOrganizationPage {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient
@@ -331,19 +330,9 @@ DocumentViewBase {
 	}
 
 	Component {
-		id: redeemCodePageComp
+		id: myConnectionsPageComp
 
-		TenantRedeemCodeView {
-			model: container.tenantData
-			stateManager: stateManager_
-			apiClient: container.apiClient
-		}
-	}
-
-	Component {
-		id: activeConnectionsPageComp
-
-		TenantConnectionsView {
+		TenantMyConnectionsPage {
 			model: container.tenantData
 			stateManager: stateManager_
 			apiClient: container.apiClient

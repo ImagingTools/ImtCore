@@ -43,11 +43,55 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
+        <Element Id="TenantConnectionCodeInfo" PackageId="ImtAuthPck" ComponentId="TenantConnectionCodeInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="TenantConnectionInfo" PackageId="ImtAuthPck" ComponentId="TenantConnectionInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="TenantRelationshipProposalInfo" PackageId="ImtAuthPck" ComponentId="TenantRelationshipProposalInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="TenantRelationshipInfo" PackageId="ImtAuthPck" ComponentId="TenantRelationshipInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="TenantConnectionRequestManager" PackageId="ImtAuthPck" ComponentId="TenantConnectionRequestManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ConnectionCodeCollection" Type="Reference" ExportId="TenantConnectionCodeRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ConnectionCodeFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="TenantConnectionCodeInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ConnectionCollection" Type="Reference" ExportId="TenantConnectionRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ConnectionFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="TenantConnectionInfo"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProposalCollection" Type="Reference" ExportId="TenantRelationshipProposalRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProposalFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="TenantRelationshipProposalInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RelationshipCollection" Type="Reference" ExportId="TenantRelationshipRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RelationshipFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="TenantRelationshipInfo"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RequestCollection" Type="Reference" ExportId="TenantConnectionRequestRepository">
                         <Data IsEnabled="false"/>

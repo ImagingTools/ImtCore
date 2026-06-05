@@ -60,6 +60,7 @@
 #include <imtauthgql/CConnectionCodesNotificationPublisherComp.h>
 #include <imtauthgql/CRemoteTenantCollectionDocumentServiceControllerComp.h>
 #include <imtauthgql/CRoleCollectionDocumentServiceComp.h>
+#include <imtauthgql/CRelationshipCollectionDocumentServiceComp.h>
 #include <imtauthgql/CGroupCollectionDocumentServiceComp.h>
 #include <imtauthgql/CUserCollectionDocumentServiceComp.h>
 
@@ -124,6 +125,7 @@ typedef imtauthgql::CCrossTenantMessageNotificationPublisherComp CrossTenantMess
 typedef imtauthgql::CConnectionCodesNotificationPublisherComp ConnectionCodesNotificationPublisher;
 typedef imtauthgql::CRemoteTenantCollectionDocumentServiceControllerComp RemoteTenantCollectionDocumentService;
 typedef imtauthgql::CRoleCollectionDocumentServiceComp RoleCollectionDocumentService;
+typedef imtauthgql::CRelationshipCollectionDocumentServiceComp RelationshipCollectionDocumentService;
 typedef imtauthgql::CGroupCollectionDocumentServiceComp GroupCollectionDocumentService;
 typedef imtauthgql::CUserCollectionDocumentServiceComp UserCollectionDocumentService;
 

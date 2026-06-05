@@ -282,6 +282,11 @@ I_EXPORT_COMPONENT(
 			"Role Collection Document Service");
 
 I_EXPORT_COMPONENT(
+			RelationshipCollectionDocumentService,
+			"Relationship collection document service: GetRelationshipRepresentation / UpdateRelationshipFromRepresentation",
+			"Relationship Collection Document Service");
+
+I_EXPORT_COMPONENT(
 			GroupCollectionDocumentService,
 			"Group collection document service: GetGroupRepresentation / UpdateGroupFromRepresentation",
 			"Group Collection Document Service");

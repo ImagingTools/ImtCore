@@ -35,18 +35,8 @@ public:
 	virtual bool UpdateTenant(const QByteArray& tenantId, const QString& tenantName, const QString& description, const QByteArray& ownerId = QByteArray(), bool updateOwner = false) override;
 	virtual bool SetTenantActive(const QByteArray& tenantId, bool isActive) override;
 	virtual bool SetTenantHierarchy(const QByteArray& tenantId, const QByteArray& parentTenantId) override;
+	virtual QByteArray GetSystemTenantId() const override;
 	virtual bool EnsureSystemTenant() override;
-	virtual QByteArray AddTenantRelationship(
-				const QByteArray& tenantId,
-				const QByteArray& targetTenantId,
-				ITenantInfo::TenantRelationshipRole role,
-				ITenantInfo::TenantRelationshipRole sourceRole,
-				ITenantInfo::TenantRelationshipRole targetRole,
-				const QString& scope = QString(),
-				const QString& validFrom = QString(),
-				const QString& validUntil = QString(),
-				const QString& description = QString()) override;
-	virtual bool RemoveTenantRelationship(const QByteArray& tenantId, const QByteArray& relationshipId) override;
 
 private:
 	I_REF(imtbase::IObjectCollection, m_tenantCollectionCompPtr);

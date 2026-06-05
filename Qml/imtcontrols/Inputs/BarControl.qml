@@ -93,7 +93,6 @@ Item {
 
             if(barControl.value !== val && val >= 0){
                 barControl.value = val
-                //console.log(barControl.value)
             }
             ma.startPoint = Qt.point(mouse.x, mouse.y);
         }
