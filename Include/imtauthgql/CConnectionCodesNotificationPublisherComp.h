@@ -12,9 +12,12 @@
 #include <imod/IModel.h>
 
 // ImtCore includes
-#include <imtauth/ITenantConnectionRequest.h>
+#include <imtauth/ITenantConnectionRequestManager.h>
+#include <imtauth/ITenantConnectionRequestInfo.h>
+#include <imtauth/ITenantConnectionInfo.h>
 #include <imtauth/ITenantRelationshipProposalInfo.h>
 #include <imtauth/ITenantManager.h>
+#include <imtbase/IObjectCollection.h>
 #include <imtservergql/CGqlPublisherCompBase.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants_fwd.h>
 
@@ -28,11 +31,11 @@ namespace imtauthgql
 	events occur (request created, approved, rejected, connection removed, etc.).
 
 	The component observes the connection request manager
-	(imtauth::ITenantConnectionRequest) and publishes ConnectionNotification
+	(imtauth::ITenantConnectionRequestManager) and publishes ConnectionNotification
 	events to subscribed clients.
 
 	The component observes:
-	- imtauth::ITenantConnectionRequest — connection request lifecycle
+	- imtauth::ITenantConnectionRequestManager — connection request lifecycle
 	  (new request = ConnectionRequestReceived, approval = ConnectionRequestApproved,
 	  rejection = ConnectionRequestRejected)
 	- Connection removals (ConnectionRemoved)
@@ -54,6 +57,8 @@ public:
 		I_ASSIGN(m_connectionRequestManagerCompPtr, "ConnectionRequestManager", "Connection request manager to observe", true, "TenantConnectionRequestManager");
 		I_ASSIGN_TO(m_connectionRequestManagerModelCompPtr, m_connectionRequestManagerCompPtr, true);
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager for resolving tenant owners", true, "TenantManager");
+		I_ASSIGN(m_requestCollectionCompPtr, "RequestCollection", "Connection request collection for reading request data", true, "RequestCollection");
+		I_ASSIGN(m_connectionCollectionCompPtr, "ConnectionCollection", "Connections collection for reading connection data", true, "ConnectionCollection");
 	I_END_COMPONENT;
 
 protected:
@@ -68,23 +73,25 @@ protected:
 	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
 protected:
-	I_REF(imtauth::ITenantConnectionRequest, m_connectionRequestManagerCompPtr);
+	I_REF(imtauth::ITenantConnectionRequestManager, m_connectionRequestManagerCompPtr);
 	I_REF(imod::IModel, m_connectionRequestManagerModelCompPtr);
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
+	I_REF(imtbase::IObjectCollection, m_requestCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_connectionCollectionCompPtr);
 
 private:
 	struct CachedConnectionRequest
 	{
 		QByteArray sourceTenantId;
 		QByteArray targetTenantId;
-		imtauth::ITenantConnectionRequest::ConnectionRequestStatus status;
+		imtauth::ITenantConnectionRequestInfo::ConnectionRequestStatus status;
 	};
 
 	struct CachedConnection
 	{
 		QByteArray tenantAId;
 		QByteArray tenantBId;
-		imtauth::ITenantConnectionRequest::ConnectionStatus status;
+		imtauth::ITenantConnectionInfo::ConnectionStatus status;
 	};
 
 	struct CachedRelationshipProposal
@@ -115,5 +122,4 @@ private:
 
 
 } // namespace imtauthgql
-
 

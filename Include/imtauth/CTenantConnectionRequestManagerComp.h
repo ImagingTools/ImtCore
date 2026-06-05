@@ -9,8 +9,8 @@
 #include <functional>
 
 // ImtCore includes
-#include <imtauth/ITenantConnectionRequest.h>
-#include <imtauth/ITenantConnectionRequestData.h>
+#include <imtauth/ITenantConnectionRequestManager.h>
+#include <imtauth/ITenantConnectionRequestInfo.h>
 #include <imtauth/ITenantConnectionCodeInfo.h>
 #include <imtauth/ITenantConnectionInfo.h>
 #include <imtauth/ITenantRelationshipProposalInfo.h>
@@ -25,15 +25,17 @@ namespace imtauth
 
 class CTenantConnectionRequestManagerComp:
 			public ilog::CLoggerComponentBase,
-			virtual public imtauth::ITenantConnectionRequest
+			virtual public imtauth::ITenantConnectionRequestManager
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 	typedef ITenantRelationshipProposalInfo::RelationshipProposalType RelationshipProposalType;
 	typedef ITenantRelationshipProposalInfo::RelationshipProposalStatus RelationshipProposalStatus;
+	typedef ITenantConnectionRequestInfo::ConnectionRequestStatus ConnectionRequestStatus;
+	typedef ITenantConnectionInfo::ConnectionStatus ConnectionStatus;
 
 	I_BEGIN_COMPONENT(CTenantConnectionRequestManagerComp);
-		I_REGISTER_INTERFACE(imtauth::ITenantConnectionRequest);
+		I_REGISTER_INTERFACE(imtauth::ITenantConnectionRequestManager);
 		I_ASSIGN(m_requestCollectionCompPtr, "RequestCollection", "Connection request collection", true, "RequestCollection");
 		I_ASSIGN(m_connectionCodeCollectionCompPtr, "ConnectionCodeCollection", "Connection code collection", true, "ConnectionCodeCollection");
 		I_ASSIGN(m_connectionCollectionCompPtr, "ConnectionCollection", "Connections collection", true, "ConnectionCollection");
@@ -47,13 +49,13 @@ public:
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager", false, "TenantManager");
 	I_END_COMPONENT;
 
-	// ITenantConnectionRequest - Connection Code
+	// ITenantConnectionRequestManager - Connection Code
 	virtual QString GetConnectionCode(const QByteArray& tenantId) override;
 	virtual bool GetAllowConnectionsByCode(const QByteArray& tenantId) override;
 	virtual QString RegenerateConnectionCode(const QByteArray& tenantId) override;
 	virtual bool SetAllowConnectionsByCode(const QByteArray& tenantId, bool allow) override;
 
-	// ITenantConnectionRequest - Connection Requests
+	// ITenantConnectionRequestManager - Connection Requests
 	virtual QByteArray CreateConnectionRequest(
 				const QByteArray& sourceTenantId,
 				const QString& connectionCode,
@@ -61,20 +63,20 @@ public:
 	virtual QByteArray ApproveConnectionRequest(const QByteArray& requestId, const QByteArray& approvingTenantId) override;
 	virtual bool RejectConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId) override;
 	virtual bool CancelConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId) override;
-	virtual ConnectionRequests GetConnectionRequests(const QByteArray& tenantId) const override;
+	virtual QByteArrayList GetConnectionRequestIds(const QByteArray& tenantId) const override;
 
-	// ITenantConnectionRequest - Connections
-	virtual TenantConnections GetConnections(const QByteArray& tenantId) const override;
+	// ITenantConnectionRequestManager - Connections
+	virtual QByteArrayList GetConnectionIds(const QByteArray& tenantId) const override;
 	virtual bool RemoveConnection(const QByteArray& connectionId, const QByteArray& tenantId) override;
 
-	// ITenantConnectionRequest - Relationship Proposals
+	// ITenantConnectionRequestManager - Relationship Proposals
 	virtual QByteArray CreateRelationshipProposal(const QByteArray& proposalId, const QByteArray& connectionId, const QByteArray& initiatorTenantId, const QByteArray& counterpartyTenantId) override;
 	virtual QByteArray ApproveRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) override;
 	virtual bool RejectRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) override;
 	virtual bool CancelRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) override;
 	virtual QByteArrayList GetRelationshipProposalIds(const QByteArray& tenantId) const override;
 
-	// ITenantConnectionRequest - Relationships
+	// ITenantConnectionRequestManager - Relationships
 	virtual QByteArrayList GetTenantRelationshipIds(const QByteArray& tenantId) const override;
 	virtual bool RemoveTenantRelationship(const QByteArray& tenantId, const QByteArray& relationshipId) override;
 
@@ -88,8 +90,8 @@ private:
 
 	// DB helper methods
 	bool StoreConnectionCode(const QByteArray& tenantId, const ITenantConnectionCodeInfo& codeInfo);
-	bool StoreConnectionRequest(const QByteArray& requestId, const ConnectionRequestInfo& info);
-	bool StoreConnection(const QByteArray& connectionId, const TenantConnectionInfo& info);
+	bool StoreConnectionRequest(const ITenantConnectionRequestInfo& requestInfo);
+	bool StoreConnection(const ITenantConnectionInfo& connectionInfo);
 	bool StoreProposal(const QByteArray& proposalId, const ITenantRelationshipProposalInfo& proposalInfo);
 
 	// Helper to get code object from collection
@@ -102,7 +104,7 @@ private:
 	I_REF(imtbase::IObjectCollection, m_connectionCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_proposalCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_relationshipCollectionCompPtr);
-	I_FACT(imtauth::ITenantConnectionRequestData, m_requestFactoryCompPtr);
+	I_FACT(imtauth::ITenantConnectionRequestInfo, m_requestFactoryCompPtr);
 	I_FACT(imtauth::ITenantConnectionCodeInfo, m_connectionCodeFactoryCompPtr);
 	I_FACT(imtauth::ITenantConnectionInfo, m_connectionFactoryCompPtr);
 	I_FACT(imtauth::ITenantRelationshipProposalInfo, m_proposalFactoryCompPtr);

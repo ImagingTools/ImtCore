@@ -70,30 +70,30 @@ sdl::V1_0::imtauth::RelationshipStatus ToSdlRelationshipStatus(imtauth::ITenantR
 }
 
 
-sdl::V1_0::imtauth::ITenantConnectionRequest::ConnectionRequestStatus ToSdlConnectionRequestStatus(imtauth::ITenantConnectionRequest::ConnectionRequestStatus status)
+sdl::V1_0::imtauth::EConnectionRequestStatus ToSdlConnectionRequestStatus(imtauth::ITenantConnectionRequestInfo::ConnectionRequestStatus status)
 {
 	switch (status){
-	case imtauth::ITenantConnectionRequest::CRS_APPROVED:
-		return sdl::V1_0::imtauth::ITenantConnectionRequest::ConnectionRequestStatus::Approved;
-	case imtauth::ITenantConnectionRequest::CRS_REJECTED:
-		return sdl::V1_0::imtauth::ITenantConnectionRequest::ConnectionRequestStatus::Rejected;
-	case imtauth::ITenantConnectionRequest::CRS_CANCELED:
-		return sdl::V1_0::imtauth::ITenantConnectionRequest::ConnectionRequestStatus::Canceled;
+	case imtauth::ITenantConnectionRequestInfo::CRS_APPROVED:
+		return sdl::V1_0::imtauth::EConnectionRequestStatus::Approved;
+	case imtauth::ITenantConnectionRequestInfo::CRS_REJECTED:
+		return sdl::V1_0::imtauth::EConnectionRequestStatus::Rejected;
+	case imtauth::ITenantConnectionRequestInfo::CRS_CANCELED:
+		return sdl::V1_0::imtauth::EConnectionRequestStatus::Canceled;
 	default:
-		return sdl::V1_0::imtauth::ITenantConnectionRequest::ConnectionRequestStatus::Pending;
+		return sdl::V1_0::imtauth::EConnectionRequestStatus::Pending;
 	}
 }
 
 
-sdl::V1_0::imtauth::ITenantConnectionRequest::ConnectionStatus ToSdlConnectionStatus(imtauth::ITenantConnectionRequest::ConnectionStatus status)
+sdl::V1_0::imtauth::EConnectionStatus ToSdlConnectionStatus(imtauth::ITenantConnectionInfo::ConnectionStatus status)
 {
 	switch (status){
-	case imtauth::ITenantConnectionRequest::CS_REMOVED:
-		return sdl::V1_0::imtauth::ITenantConnectionRequest::ConnectionStatus::Removed;
-	case imtauth::ITenantConnectionRequest::CS_SUSPENDED:
-		return sdl::V1_0::imtauth::ITenantConnectionRequest::ConnectionStatus::Suspended;
+	case imtauth::ITenantConnectionInfo::CS_REMOVED:
+		return sdl::V1_0::imtauth::EConnectionStatus::Removed;
+	case imtauth::ITenantConnectionInfo::CS_SUSPENDED:
+		return sdl::V1_0::imtauth::EConnectionStatus::Suspended;
 	default:
-		return sdl::V1_0::imtauth::ITenantConnectionRequest::ConnectionStatus::Active;
+		return sdl::V1_0::imtauth::EConnectionStatus::Active;
 	}
 }
 
@@ -1080,21 +1080,31 @@ sdl::V1_0::imtauth::CGetConnectionRequestsPayload CTenantManagerControllerComp::
 		return response;
 	}
 	
-	imtauth::ITenantConnectionRequest::ConnectionRequests requests = m_connectionRequestManagerCompPtr->GetConnectionRequests(tenantId);
+	QByteArrayList requestIds = m_connectionRequestManagerCompPtr->GetConnectionRequestIds(tenantId);
 	response.requests.Emplace();
-	for (const imtauth::ITenantConnectionRequest::ConnectionRequestInfo& info : requests){
-		sdl::V1_0::imtauth::CConnectionRequest data;
-		data.id = info.requestId;
-		data.sourceTenantId = info.sourceTenantId;
-		data.targetTenantId = info.targetTenantId;
-		data.connectionCode = info.connectionCode;
-		data.message = info.message;
-		data.status = ToSdlConnectionRequestStatus(info.status);
-		data.createdAt = info.createdAt;
-		data.respondedAt = info.respondedAt;
-		data.sourceTenantName = info.sourceTenantName;
-		data.targetTenantName = info.targetTenantName;
-		response.requests->push_back(data);
+
+	if (m_requestCollectionCompPtr.IsValid()){
+		for (const QByteArray& requestId : requestIds){
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			if (m_requestCollectionCompPtr->GetObjectData(requestId, dataPtr)){
+				const imtauth::ITenantConnectionRequestInfo* reqPtr =
+					dynamic_cast<const imtauth::ITenantConnectionRequestInfo*>(dataPtr.GetPtr());
+				if (reqPtr != nullptr){
+					sdl::V1_0::imtauth::CConnectionRequest data;
+					data.id = reqPtr->GetRequestId();
+					data.sourceTenantId = reqPtr->GetSourceTenantId();
+					data.targetTenantId = reqPtr->GetTargetTenantId();
+					data.connectionCode = reqPtr->GetConnectionCode();
+					data.message = reqPtr->GetMessage();
+					data.status = ToSdlConnectionRequestStatus(reqPtr->GetStatus());
+					data.createdAt = reqPtr->GetCreatedAt();
+					data.respondedAt = reqPtr->GetRespondedAt();
+					data.sourceTenantName = reqPtr->GetSourceTenantName();
+					data.targetTenantName = reqPtr->GetTargetTenantName();
+					response.requests->push_back(data);
+				}
+			}
+		}
 	}
 	
 	return response;
@@ -1259,31 +1269,40 @@ sdl::V1_0::imtauth::CGetConnectionsPayload CTenantManagerControllerComp::OnGetCo
 	}
 
 	response.connections.Emplace();
-	imtauth::ITenantConnectionRequest::TenantConnections connections = m_connectionRequestManagerCompPtr->GetConnections(tenantId);
+	QByteArrayList connectionIds = m_connectionRequestManagerCompPtr->GetConnectionIds(tenantId);
 
-	for (const imtauth::ITenantConnectionRequest::TenantConnectionInfo& connectionInfo : connections){
-		sdl::V1_0::imtauth::CTenantConnection data;
+	if (m_connectionCollectionCompPtr.IsValid()){
+		for (const QByteArray& connectionId : connectionIds){
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			if (m_connectionCollectionCompPtr->GetObjectData(connectionId, dataPtr)){
+				const imtauth::ITenantConnectionInfo* connPtr =
+					dynamic_cast<const imtauth::ITenantConnectionInfo*>(dataPtr.GetPtr());
+				if (connPtr != nullptr){
+					sdl::V1_0::imtauth::CTenantConnection data;
 
-		data.id = connectionInfo.connectionId;
-		data.tenantAId = connectionInfo.tenantAId;
-		data.tenantBId = connectionInfo.tenantBId;
-		data.status = ToSdlConnectionStatus(connectionInfo.status);
-		data.createdAt = connectionInfo.createdAt;
-		data.updatedAt = connectionInfo.updatedAt;
+					data.id = connPtr->GetConnectionId();
+					data.tenantAId = connPtr->GetTenantAId();
+					data.tenantBId = connPtr->GetTenantBId();
+					data.status = ToSdlConnectionStatus(connPtr->GetStatus());
+					data.createdAt = connPtr->GetCreatedAt();
+					data.updatedAt = connPtr->GetUpdatedAt();
 
-		if (m_tenantManagerCompPtr.IsValid()){
-			imtauth::ITenantInfoUniquePtr tenant1Ptr = m_tenantManagerCompPtr->GetTenant(connectionInfo.tenantAId);
-			if (tenant1Ptr.IsValid()){
-				data.tenantAName = tenant1Ptr->GetTenantName();
-			}
+					if (m_tenantManagerCompPtr.IsValid()){
+						imtauth::ITenantInfoUniquePtr tenant1Ptr = m_tenantManagerCompPtr->GetTenant(connPtr->GetTenantAId());
+						if (tenant1Ptr.IsValid()){
+							data.tenantAName = tenant1Ptr->GetTenantName();
+						}
 
-			imtauth::ITenantInfoUniquePtr tenant2Ptr = m_tenantManagerCompPtr->GetTenant(connectionInfo.tenantBId);
-			if (tenant2Ptr.IsValid()){
-				data.tenantBName = tenant2Ptr->GetTenantName();
+						imtauth::ITenantInfoUniquePtr tenant2Ptr = m_tenantManagerCompPtr->GetTenant(connPtr->GetTenantBId());
+						if (tenant2Ptr.IsValid()){
+							data.tenantBName = tenant2Ptr->GetTenantName();
+						}
+					}
+
+					response.connections->push_back(data);
+				}
 			}
 		}
-
-		response.connections->push_back(data);
 	}
 
 	return response;

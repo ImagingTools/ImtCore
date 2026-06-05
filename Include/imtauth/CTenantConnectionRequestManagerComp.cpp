@@ -44,17 +44,28 @@ return !storedId.isEmpty();
 }
 
 
-bool CTenantConnectionRequestManagerComp::StoreConnectionRequest(const QByteArray& requestId, const ConnectionRequestInfo& info)
+bool CTenantConnectionRequestManagerComp::StoreConnectionRequest(const ITenantConnectionRequestInfo& requestInfo)
 {
 if (!m_requestCollectionCompPtr.IsValid() || !m_requestFactoryCompPtr.IsValid()){
 return false;
 }
 
-ITenantConnectionRequestDataUniquePtr dataPtr = m_requestFactoryCompPtr.CreateInstance();
+ITenantConnectionRequestInfoUniquePtr dataPtr = m_requestFactoryCompPtr.CreateInstance();
 if (!dataPtr.IsValid()){
 return false;
 }
-dataPtr->SetRequestInfo(info);
+dataPtr->SetRequestId(requestInfo.GetRequestId());
+dataPtr->SetSourceTenantId(requestInfo.GetSourceTenantId());
+dataPtr->SetTargetTenantId(requestInfo.GetTargetTenantId());
+dataPtr->SetConnectionCode(requestInfo.GetConnectionCode());
+dataPtr->SetMessage(requestInfo.GetMessage());
+dataPtr->SetStatus(requestInfo.GetStatus());
+dataPtr->SetCreatedAt(requestInfo.GetCreatedAt());
+dataPtr->SetRespondedAt(requestInfo.GetRespondedAt());
+dataPtr->SetSourceTenantName(requestInfo.GetSourceTenantName());
+dataPtr->SetTargetTenantName(requestInfo.GetTargetTenantName());
+
+QByteArray requestId = requestInfo.GetRequestId();
 
 // Try update first
 imtbase::IObjectCollection::DataPtr existingPtr;
@@ -68,7 +79,7 @@ return !storedId.isEmpty();
 }
 
 
-bool CTenantConnectionRequestManagerComp::StoreConnection(const QByteArray& connectionId, const TenantConnectionInfo& info)
+bool CTenantConnectionRequestManagerComp::StoreConnection(const ITenantConnectionInfo& connectionInfo)
 {
 if (!m_connectionCollectionCompPtr.IsValid() || !m_connectionFactoryCompPtr.IsValid()){
 return false;
@@ -78,7 +89,14 @@ ITenantConnectionInfoUniquePtr dataPtr = m_connectionFactoryCompPtr.CreateInstan
 if (!dataPtr.IsValid()){
 return false;
 }
-dataPtr->SetConnectionInfo(info);
+dataPtr->SetConnectionId(connectionInfo.GetConnectionId());
+dataPtr->SetTenantAId(connectionInfo.GetTenantAId());
+dataPtr->SetTenantBId(connectionInfo.GetTenantBId());
+dataPtr->SetStatus(connectionInfo.GetStatus());
+dataPtr->SetCreatedAt(connectionInfo.GetCreatedAt());
+dataPtr->SetUpdatedAt(connectionInfo.GetUpdatedAt());
+
+QByteArray connectionId = connectionInfo.GetConnectionId();
 
 // Try update first
 imtbase::IObjectCollection::DataPtr existingPtr;
@@ -174,12 +192,11 @@ const ITenantConnectionInfo* connPtr = dynamic_cast<const ITenantConnectionInfo*
 if (connPtr == nullptr){
 continue;
 }
-TenantConnectionInfo info = connPtr->GetConnectionInfo();
-if (info.status != CS_ACTIVE){
+if (connPtr->GetStatus() != ITenantConnectionInfo::CS_ACTIVE){
 continue;
 }
-if ((info.tenantAId == tenantAId && info.tenantBId == tenantBId)
-|| (info.tenantAId == tenantBId && info.tenantBId == tenantAId)){
+if ((connPtr->GetTenantAId() == tenantAId && connPtr->GetTenantBId() == tenantBId)
+|| (connPtr->GetTenantAId() == tenantBId && connPtr->GetTenantBId() == tenantAId)){
 return true;
 }
 }
@@ -194,22 +211,28 @@ if (ConnectionExists(tenantAId, tenantBId)){
 return QByteArray();
 }
 
-TenantConnectionInfo conn;
-conn.connectionId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+ITenantConnectionInfoUniquePtr connPtr = m_connectionFactoryCompPtr.CreateInstance();
+if (!connPtr.IsValid()){
+return QByteArray();
+}
+
+QByteArray connectionId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+connPtr->SetConnectionId(connectionId);
 // Store in canonical order (smaller ID first)
 if (tenantAId < tenantBId){
-conn.tenantAId = tenantAId;
-conn.tenantBId = tenantBId;
+connPtr->SetTenantAId(tenantAId);
+connPtr->SetTenantBId(tenantBId);
 } else {
-conn.tenantAId = tenantBId;
-conn.tenantBId = tenantAId;
+connPtr->SetTenantAId(tenantBId);
+connPtr->SetTenantBId(tenantAId);
 }
-conn.status = CS_ACTIVE;
-conn.createdAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
-conn.updatedAt = conn.createdAt;
+connPtr->SetStatus(ITenantConnectionInfo::CS_ACTIVE);
+QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
+connPtr->SetCreatedAt(now);
+connPtr->SetUpdatedAt(now);
 
-if (StoreConnection(conn.connectionId, conn)){
-return conn.connectionId;
+if (StoreConnection(*connPtr)){
+return connectionId;
 }
 return QByteArray();
 }
@@ -489,17 +512,22 @@ return QByteArray();
 
 istd::CChangeNotifier changeNotifier(this);
 
-ConnectionRequestInfo info;
-info.requestId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-info.sourceTenantId = sourceTenantId;
-info.targetTenantId = targetTenantId;
-info.connectionCode = connectionCode;
-info.message = message;
-info.status = CRS_PENDING;
-info.createdAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
+ITenantConnectionRequestInfoUniquePtr reqPtr = m_requestFactoryCompPtr.CreateInstance();
+if (!reqPtr.IsValid()){
+return QByteArray();
+}
 
-if (StoreConnectionRequest(info.requestId, info)){
-return info.requestId;
+QByteArray requestId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+reqPtr->SetRequestId(requestId);
+reqPtr->SetSourceTenantId(sourceTenantId);
+reqPtr->SetTargetTenantId(targetTenantId);
+reqPtr->SetConnectionCode(connectionCode);
+reqPtr->SetMessage(message);
+reqPtr->SetStatus(ITenantConnectionRequestInfo::CRS_PENDING);
+reqPtr->SetCreatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs));
+
+if (StoreConnectionRequest(*reqPtr)){
+return requestId;
 }
 return QByteArray();
 }
@@ -516,29 +544,34 @@ if (!m_requestCollectionCompPtr->GetObjectData(requestId, dataPtr)){
 return QByteArray();
 }
 
-const ITenantConnectionRequestData* reqPtr = dynamic_cast<const ITenantConnectionRequestData*>(dataPtr.GetPtr());
+const ITenantConnectionRequestInfo* reqPtr = dynamic_cast<const ITenantConnectionRequestInfo*>(dataPtr.GetPtr());
 if (reqPtr == nullptr){
 return QByteArray();
 }
 
-ConnectionRequestInfo info = reqPtr->GetRequestInfo();
-if (info.status != CRS_PENDING){
+if (reqPtr->GetStatus() != ITenantConnectionRequestInfo::CRS_PENDING){
 SendErrorMessage(0, "Request is not in pending state", "CTenantConnectionRequestManagerComp");
 return QByteArray();
 }
-if (info.targetTenantId != approvingTenantId){
+if (reqPtr->GetTargetTenantId() != approvingTenantId){
 SendErrorMessage(0, "Only the target tenant can approve this request", "CTenantConnectionRequestManagerComp");
 return QByteArray();
 }
 
 istd::CChangeNotifier changeNotifier(this);
 
-info.status = CRS_APPROVED;
-info.respondedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
-StoreConnectionRequest(requestId, info);
+// Update the request status
+ITenantConnectionRequestInfoUniquePtr updatedReqPtr = m_requestFactoryCompPtr.CreateInstance();
+if (!updatedReqPtr.IsValid()){
+return QByteArray();
+}
+updatedReqPtr->CopyFrom(*reqPtr);
+updatedReqPtr->SetStatus(ITenantConnectionRequestInfo::CRS_APPROVED);
+updatedReqPtr->SetRespondedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs));
+StoreConnectionRequest(*updatedReqPtr);
 
 // Create the connection
-QByteArray connectionId = CreateConnection(info.sourceTenantId, info.targetTenantId);
+QByteArray connectionId = CreateConnection(reqPtr->GetSourceTenantId(), reqPtr->GetTargetTenantId());
 return connectionId;
 }
 
@@ -554,21 +587,25 @@ if (!m_requestCollectionCompPtr->GetObjectData(requestId, dataPtr)){
 return false;
 }
 
-const ITenantConnectionRequestData* reqPtr = dynamic_cast<const ITenantConnectionRequestData*>(dataPtr.GetPtr());
+const ITenantConnectionRequestInfo* reqPtr = dynamic_cast<const ITenantConnectionRequestInfo*>(dataPtr.GetPtr());
 if (reqPtr == nullptr){
 return false;
 }
 
-ConnectionRequestInfo info = reqPtr->GetRequestInfo();
-if (info.targetTenantId != tenantId || info.status != CRS_PENDING){
+if (reqPtr->GetTargetTenantId() != tenantId || reqPtr->GetStatus() != ITenantConnectionRequestInfo::CRS_PENDING){
 return false;
 }
 
 istd::CChangeNotifier changeNotifier(this);
 
-info.status = CRS_REJECTED;
-info.respondedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
-return StoreConnectionRequest(requestId, info);
+ITenantConnectionRequestInfoUniquePtr updatedReqPtr = m_requestFactoryCompPtr.CreateInstance();
+if (!updatedReqPtr.IsValid()){
+return false;
+}
+updatedReqPtr->CopyFrom(*reqPtr);
+updatedReqPtr->SetStatus(ITenantConnectionRequestInfo::CRS_REJECTED);
+updatedReqPtr->SetRespondedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs));
+return StoreConnectionRequest(*updatedReqPtr);
 }
 
 
@@ -583,27 +620,31 @@ if (!m_requestCollectionCompPtr->GetObjectData(requestId, dataPtr)){
 return false;
 }
 
-const ITenantConnectionRequestData* reqPtr = dynamic_cast<const ITenantConnectionRequestData*>(dataPtr.GetPtr());
+const ITenantConnectionRequestInfo* reqPtr = dynamic_cast<const ITenantConnectionRequestInfo*>(dataPtr.GetPtr());
 if (reqPtr == nullptr){
 return false;
 }
 
-ConnectionRequestInfo info = reqPtr->GetRequestInfo();
-if (info.sourceTenantId != tenantId || info.status != CRS_PENDING){
+if (reqPtr->GetSourceTenantId() != tenantId || reqPtr->GetStatus() != ITenantConnectionRequestInfo::CRS_PENDING){
 return false;
 }
 
 istd::CChangeNotifier changeNotifier(this);
 
-info.status = CRS_CANCELED;
-info.respondedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
-return StoreConnectionRequest(requestId, info);
+ITenantConnectionRequestInfoUniquePtr updatedReqPtr = m_requestFactoryCompPtr.CreateInstance();
+if (!updatedReqPtr.IsValid()){
+return false;
+}
+updatedReqPtr->CopyFrom(*reqPtr);
+updatedReqPtr->SetStatus(ITenantConnectionRequestInfo::CRS_CANCELED);
+updatedReqPtr->SetRespondedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs));
+return StoreConnectionRequest(*updatedReqPtr);
 }
 
 
-ITenantConnectionRequest::ConnectionRequests CTenantConnectionRequestManagerComp::GetConnectionRequests(const QByteArray& tenantId) const
+QByteArrayList CTenantConnectionRequestManagerComp::GetConnectionRequestIds(const QByteArray& tenantId) const
 {
-ConnectionRequests result;
+QByteArrayList result;
 if (!m_requestCollectionCompPtr.IsValid()){
 return result;
 }
@@ -611,11 +652,10 @@ return result;
 for (const QByteArray& id : m_requestCollectionCompPtr->GetElementIds()){
 imtbase::IObjectCollection::DataPtr dataPtr;
 if (m_requestCollectionCompPtr->GetObjectData(id, dataPtr)){
-const ITenantConnectionRequestData* reqPtr = dynamic_cast<const ITenantConnectionRequestData*>(dataPtr.GetPtr());
+const ITenantConnectionRequestInfo* reqPtr = dynamic_cast<const ITenantConnectionRequestInfo*>(dataPtr.GetPtr());
 if (reqPtr != nullptr){
-ConnectionRequestInfo info = reqPtr->GetRequestInfo();
-if (info.sourceTenantId == tenantId || info.targetTenantId == tenantId){
-result.append(info);
+if (reqPtr->GetSourceTenantId() == tenantId || reqPtr->GetTargetTenantId() == tenantId){
+result.append(reqPtr->GetRequestId());
 }
 }
 }
@@ -626,9 +666,9 @@ return result;
 
 // --- Connections ---
 
-ITenantConnectionRequest::TenantConnections CTenantConnectionRequestManagerComp::GetConnections(const QByteArray& tenantId) const
+QByteArrayList CTenantConnectionRequestManagerComp::GetConnectionIds(const QByteArray& tenantId) const
 {
-TenantConnections result;
+QByteArrayList result;
 if (!m_connectionCollectionCompPtr.IsValid()){
 return result;
 }
@@ -637,11 +677,9 @@ for (const QByteArray& id : m_connectionCollectionCompPtr->GetElementIds()){
 imtbase::IObjectCollection::DataPtr dataPtr;
 if (m_connectionCollectionCompPtr->GetObjectData(id, dataPtr)){
 const ITenantConnectionInfo* connPtr = dynamic_cast<const ITenantConnectionInfo*>(dataPtr.GetPtr());
-if (connPtr != nullptr){
-TenantConnectionInfo info = connPtr->GetConnectionInfo();
-if (info.status == CS_ACTIVE && (info.tenantAId == tenantId || info.tenantBId == tenantId)){
-result.append(info);
-}
+if (connPtr != nullptr && connPtr->GetStatus() == ITenantConnectionInfo::CS_ACTIVE
+&& (connPtr->GetTenantAId() == tenantId || connPtr->GetTenantBId() == tenantId)){
+result.append(connPtr->GetConnectionId());
 }
 }
 }
@@ -665,19 +703,23 @@ if (connPtr == nullptr){
 return false;
 }
 
-TenantConnectionInfo info = connPtr->GetConnectionInfo();
-if (info.tenantAId != tenantId && info.tenantBId != tenantId){
+if (connPtr->GetTenantAId() != tenantId && connPtr->GetTenantBId() != tenantId){
 return false;
 }
-if (info.status != CS_ACTIVE){
+if (connPtr->GetStatus() != ITenantConnectionInfo::CS_ACTIVE){
 return false;
 }
 
 istd::CChangeNotifier changeNotifier(this);
 
-info.status = CS_REMOVED;
-info.updatedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
-StoreConnection(connectionId, info);
+ITenantConnectionInfoUniquePtr updatedConnPtr = m_connectionFactoryCompPtr.CreateInstance();
+if (!updatedConnPtr.IsValid()){
+return false;
+}
+updatedConnPtr->CopyFrom(*connPtr);
+updatedConnPtr->SetStatus(ITenantConnectionInfo::CS_REMOVED);
+updatedConnPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs));
+StoreConnection(*updatedConnPtr);
 
 // Cascade: archive all relationships for this connection
 ArchiveRelationshipsForConnection(connectionId);
@@ -704,7 +746,7 @@ if (m_connectionCollectionCompPtr.IsValid()){
 imtbase::IObjectCollection::DataPtr dataPtr;
 if (m_connectionCollectionCompPtr->GetObjectData(connectionId, dataPtr)){
 const ITenantConnectionInfo* connPtr = dynamic_cast<const ITenantConnectionInfo*>(dataPtr.GetPtr());
-if (connPtr != nullptr && connPtr->GetConnectionInfo().status == CS_ACTIVE){
+if (connPtr != nullptr && connPtr->GetStatus() == ITenantConnectionInfo::CS_ACTIVE){
 connectionValid = true;
 }
 }

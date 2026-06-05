@@ -14,19 +14,37 @@ namespace imtauth
 class CTenantConnection: virtual public ITenantConnectionInfo, virtual public iser::ISerializable
 {
 public:
-	CTenantConnection();
+CTenantConnection();
 
-	virtual TenantConnectionInfo GetConnectionInfo() const override;
-	virtual void SetConnectionInfo(const TenantConnectionInfo& connectionInfo) override;
-	virtual QByteArray GetConnectionId() const override;
+// reimplemented (ITenantConnectionInfo)
+virtual QByteArray GetConnectionId() const override;
+virtual void SetConnectionId(const QByteArray& connectionId) override;
+virtual QByteArray GetTenantAId() const override;
+virtual void SetTenantAId(const QByteArray& tenantAId) override;
+virtual QByteArray GetTenantBId() const override;
+virtual void SetTenantBId(const QByteArray& tenantBId) override;
+virtual ConnectionStatus GetStatus() const override;
+virtual void SetStatus(ConnectionStatus status) override;
+virtual QString GetCreatedAt() const override;
+virtual void SetCreatedAt(const QString& createdAt) override;
+virtual QString GetUpdatedAt() const override;
+virtual void SetUpdatedAt(const QString& updatedAt) override;
 
-	virtual bool Serialize(iser::IArchive& archive) override;
-	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
-	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
+// reimplemented (iser::ISerializable)
+virtual bool Serialize(iser::IArchive& archive) override;
+
+// reimplemented (istd::IChangeable)
+virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	TenantConnectionInfo m_info;
+QByteArray m_connectionId;
+QByteArray m_tenantAId;
+QByteArray m_tenantBId;
+ConnectionStatus m_status;
+QString m_createdAt;
+QString m_updatedAt;
 };
 
 

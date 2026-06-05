@@ -50,23 +50,20 @@ istd::IChangeableUniquePtr CTenantConnectionDbDelegateComp::CreateObjectFromReco
 		return nullptr;
 	}
 
-	imtauth::ITenantConnectionRequest::TenantConnectionInfo info;
 	if (record.contains("Id")){
-		info.connectionId = imtdb::VariantToByteArray(record.value("Id"));
+		connPtr->SetConnectionId(imtdb::VariantToByteArray(record.value("Id")));
 	}
 	if (record.contains("TenantAId")){
-		info.tenantAId = imtdb::VariantToByteArray(record.value("TenantAId"));
+		connPtr->SetTenantAId(imtdb::VariantToByteArray(record.value("TenantAId")));
 	}
 	if (record.contains("TenantBId")){
-		info.tenantBId = imtdb::VariantToByteArray(record.value("TenantBId"));
+		connPtr->SetTenantBId(imtdb::VariantToByteArray(record.value("TenantBId")));
 	}
 	if (record.contains("Status")){
-		info.status = static_cast<imtauth::ITenantConnectionRequest::ConnectionStatus>(record.value("Status").toInt());
+		connPtr->SetStatus(static_cast<imtauth::ITenantConnectionInfo::ConnectionStatus>(record.value("Status").toInt()));
 	}
-	info.createdAt = RecordDateTimeToString(record, "CreatedAt");
-	info.updatedAt = RecordDateTimeToString(record, "UpdatedAt");
-
-	connPtr->SetConnectionInfo(info);
+	connPtr->SetCreatedAt(RecordDateTimeToString(record, "CreatedAt"));
+	connPtr->SetUpdatedAt(RecordDateTimeToString(record, "UpdatedAt"));
 
 	return connPtr;
 }
@@ -87,14 +84,12 @@ CTenantConnectionDbDelegateComp::NewObjectQuery CTenantConnectionDbDelegateComp:
 		return result;
 	}
 
-	imtauth::ITenantConnectionRequest::TenantConnectionInfo info = connPtr->GetConnectionInfo();
-
-	QString id = imtdb::EscapeSql(QString::fromUtf8(!proposedObjectId.isEmpty() ? proposedObjectId : info.connectionId));
-	QString tenantAId = imtdb::EscapeSql(QString::fromUtf8(info.tenantAId));
-	QString tenantBId = imtdb::EscapeSql(QString::fromUtf8(info.tenantBId));
-	int status = static_cast<int>(info.status);
-	QString createdAt = !info.createdAt.isEmpty() ? imtdb::EscapeSql(info.createdAt) : imtdb::UtcNow();
-	QString updatedAt = NullableSqlDateTime(info.updatedAt);
+	QString id = imtdb::EscapeSql(QString::fromUtf8(!proposedObjectId.isEmpty() ? proposedObjectId : connPtr->GetConnectionId()));
+	QString tenantAId = imtdb::EscapeSql(QString::fromUtf8(connPtr->GetTenantAId()));
+	QString tenantBId = imtdb::EscapeSql(QString::fromUtf8(connPtr->GetTenantBId()));
+	int status = static_cast<int>(connPtr->GetStatus());
+	QString createdAt = !connPtr->GetCreatedAt().isEmpty() ? imtdb::EscapeSql(connPtr->GetCreatedAt()) : imtdb::UtcNow();
+	QString updatedAt = NullableSqlDateTime(connPtr->GetUpdatedAt());
 
 	result.query = QString(
 		"INSERT INTO \"%1\" (\"Id\", \"TenantAId\", \"TenantBId\", \"Status\", \"CreatedAt\", \"UpdatedAt\") "
@@ -123,16 +118,14 @@ QByteArray CTenantConnectionDbDelegateComp::CreateUpdateObjectQuery(
 		return QByteArray();
 	}
 
-	imtauth::ITenantConnectionRequest::TenantConnectionInfo info = connPtr->GetConnectionInfo();
-
 	return QString(
 		"UPDATE \"%1\" SET "
 		"\"Status\"=%2, "
 		"\"UpdatedAt\"=%3 "
 		"WHERE \"Id\"='%4';")
 		.arg(*m_tableNameAttrPtr)
-		.arg(QString::number(static_cast<int>(info.status)))
-		.arg(NullableSqlDateTime(info.updatedAt))
+		.arg(QString::number(static_cast<int>(connPtr->GetStatus())))
+		.arg(NullableSqlDateTime(connPtr->GetUpdatedAt()))
 		.arg(imtdb::EscapeSql(QString::fromUtf8(objectId))).toUtf8();
 }
 

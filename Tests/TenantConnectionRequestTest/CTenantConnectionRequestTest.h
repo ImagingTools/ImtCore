@@ -9,7 +9,8 @@
 #include <QtTest/QtTest>
 
 // ImtCore includes
-#include <imtauth/ITenantConnectionRequest.h>
+#include <imtauth/ITenantConnectionRequestInfo.h>
+#include <imtauth/ITenantConnectionInfo.h>
 #include <imtauth/ITenantRelationshipProposalInfo.h>
 #include <imtauth/ITenantRelationshipInfo.h>
 
@@ -28,31 +29,51 @@ Relationships, and Relationship Proposals.
 class CMockConnectionManager
 {
 public:
-typedef ITenantConnectionRequest::ConnectionRequestInfo ConnectionRequestInfo;
-typedef ITenantConnectionRequest::ConnectionRequests ConnectionRequests;
-typedef ITenantConnectionRequest::TenantConnectionInfo TenantConnectionInfo;
-typedef ITenantConnectionRequest::TenantConnections TenantConnections;
+typedef ITenantConnectionRequestInfo::ConnectionRequestStatus ConnectionRequestStatus;
+typedef ITenantConnectionInfo::ConnectionStatus ConnectionStatus;
 typedef ITenantRelationshipProposalInfo::RelationshipProposalStatus RelationshipProposalStatus;
 typedef ITenantRelationshipProposalInfo::RelationshipProposalType RelationshipProposalType;
 
 struct MockConnectionCodeInfo
 {
-	QByteArray tenantId;
-	QString connectionCode;
-	bool allowConnectionsByCode = true;
-	QString createdAt;
+QByteArray tenantId;
+QString connectionCode;
+bool allowConnectionsByCode = true;
+QString createdAt;
+};
+
+struct MockConnectionRequestInfo
+{
+QByteArray requestId;
+QByteArray sourceTenantId;
+QByteArray targetTenantId;
+QString connectionCode;
+QString message;
+ConnectionRequestStatus status = ITenantConnectionRequestInfo::CRS_PENDING;
+QString createdAt;
+QString respondedAt;
+};
+
+struct MockConnectionInfo
+{
+QByteArray connectionId;
+QByteArray tenantAId;
+QByteArray tenantBId;
+ConnectionStatus status = ITenantConnectionInfo::CS_ACTIVE;
+QString createdAt;
+QString updatedAt;
 };
 
 struct MockProposalInfo
 {
-	QByteArray proposalId;
-	QByteArray connectionId;
-	QByteArray initiatorTenantId;
-	QByteArray counterpartyTenantId;
-	RelationshipProposalType proposalType = ITenantRelationshipProposalInfo::RPT_CREATE;
-	RelationshipProposalStatus status = ITenantRelationshipProposalInfo::RPS_PENDING;
-	QString createdAt;
-	QString updatedAt;
+QByteArray proposalId;
+QByteArray connectionId;
+QByteArray initiatorTenantId;
+QByteArray counterpartyTenantId;
+RelationshipProposalType proposalType = ITenantRelationshipProposalInfo::RPT_CREATE;
+RelationshipProposalStatus status = ITenantRelationshipProposalInfo::RPS_PENDING;
+QString createdAt;
+QString updatedAt;
 };
 
 // --- Connection Code ---
@@ -130,8 +151,8 @@ if (sourceTenantId == targetTenantId){
 return QByteArray();
 }
 
-for (const TenantConnectionInfo& conn : m_connections){
-if (conn.status == ITenantConnectionRequest::CS_ACTIVE){
+for (const MockConnectionInfo& conn : m_connections){
+if (conn.status == ITenantConnectionInfo::CS_ACTIVE){
 if ((conn.tenantAId == sourceTenantId && conn.tenantBId == targetTenantId)
 || (conn.tenantAId == targetTenantId && conn.tenantBId == sourceTenantId)){
 return QByteArray();
@@ -139,13 +160,13 @@ return QByteArray();
 }
 }
 
-ConnectionRequestInfo info;
+MockConnectionRequestInfo info;
 info.requestId = QByteArray::number(++m_counter);
 info.sourceTenantId = sourceTenantId;
 info.targetTenantId = targetTenantId;
 info.connectionCode = connectionCode;
 info.message = message;
-info.status = ITenantConnectionRequest::CRS_PENDING;
+info.status = ITenantConnectionRequestInfo::CRS_PENDING;
 info.createdAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 
 m_requests.append(info);
@@ -154,21 +175,21 @@ return info.requestId;
 
 QByteArray ApproveConnectionRequest(const QByteArray& requestId, const QByteArray& approvingTenantId)
 {
-for (ConnectionRequestInfo& info : m_requests){
+for (MockConnectionRequestInfo& info : m_requests){
 if (info.requestId != requestId){
 continue;
 }
-if (info.status != ITenantConnectionRequest::CRS_PENDING){
+if (info.status != ITenantConnectionRequestInfo::CRS_PENDING){
 return QByteArray();
 }
 if (info.targetTenantId != approvingTenantId){
 return QByteArray();
 }
 
-info.status = ITenantConnectionRequest::CRS_APPROVED;
+info.status = ITenantConnectionRequestInfo::CRS_APPROVED;
 info.respondedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 
-TenantConnectionInfo conn;
+MockConnectionInfo conn;
 conn.connectionId = QByteArray::number(++m_counter);
 if (info.sourceTenantId < info.targetTenantId){
 conn.tenantAId = info.sourceTenantId;
@@ -177,7 +198,7 @@ conn.tenantBId = info.targetTenantId;
 conn.tenantAId = info.targetTenantId;
 conn.tenantBId = info.sourceTenantId;
 }
-conn.status = ITenantConnectionRequest::CS_ACTIVE;
+conn.status = ITenantConnectionInfo::CS_ACTIVE;
 conn.createdAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 m_connections.append(conn);
 return conn.connectionId;
@@ -187,10 +208,10 @@ return QByteArray();
 
 bool RejectConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId)
 {
-for (ConnectionRequestInfo& info : m_requests){
+for (MockConnectionRequestInfo& info : m_requests){
 if (info.requestId == requestId && info.targetTenantId == tenantId
-&& info.status == ITenantConnectionRequest::CRS_PENDING){
-info.status = ITenantConnectionRequest::CRS_REJECTED;
+&& info.status == ITenantConnectionRequestInfo::CRS_PENDING){
+info.status = ITenantConnectionRequestInfo::CRS_REJECTED;
 info.respondedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 return true;
 }
@@ -200,10 +221,10 @@ return false;
 
 bool CancelConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId)
 {
-for (ConnectionRequestInfo& info : m_requests){
+for (MockConnectionRequestInfo& info : m_requests){
 if (info.requestId == requestId && info.sourceTenantId == tenantId
-&& info.status == ITenantConnectionRequest::CRS_PENDING){
-info.status = ITenantConnectionRequest::CRS_CANCELED;
+&& info.status == ITenantConnectionRequestInfo::CRS_PENDING){
+info.status = ITenantConnectionRequestInfo::CRS_CANCELED;
 info.respondedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 return true;
 }
@@ -211,12 +232,12 @@ return true;
 return false;
 }
 
-ConnectionRequests GetConnectionRequests(const QByteArray& tenantId) const
+QByteArrayList GetConnectionRequestIds(const QByteArray& tenantId) const
 {
-ConnectionRequests result;
-for (const ConnectionRequestInfo& info : m_requests){
+QByteArrayList result;
+for (const MockConnectionRequestInfo& info : m_requests){
 if (info.sourceTenantId == tenantId || info.targetTenantId == tenantId){
-result.append(info);
+result.append(info.requestId);
 }
 }
 return result;
@@ -224,13 +245,13 @@ return result;
 
 // --- Connections ---
 
-TenantConnections GetConnections(const QByteArray& tenantId) const
+QByteArrayList GetConnectionIds(const QByteArray& tenantId) const
 {
-TenantConnections result;
-for (const TenantConnectionInfo& conn : m_connections){
-if (conn.status == ITenantConnectionRequest::CS_ACTIVE
+QByteArrayList result;
+for (const MockConnectionInfo& conn : m_connections){
+if (conn.status == ITenantConnectionInfo::CS_ACTIVE
 && (conn.tenantAId == tenantId || conn.tenantBId == tenantId)){
-result.append(conn);
+result.append(conn.connectionId);
 }
 }
 return result;
@@ -238,9 +259,9 @@ return result;
 
 bool RemoveConnection(const QByteArray& connectionId, const QByteArray& /*tenantId*/)
 {
-for (TenantConnectionInfo& conn : m_connections){
-if (conn.connectionId == connectionId && conn.status == ITenantConnectionRequest::CS_ACTIVE){
-conn.status = ITenantConnectionRequest::CS_REMOVED;
+for (MockConnectionInfo& conn : m_connections){
+if (conn.connectionId == connectionId && conn.status == ITenantConnectionInfo::CS_ACTIVE){
+conn.status = ITenantConnectionInfo::CS_REMOVED;
 conn.updatedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 // Archive related relationships
 for (int i = 0; i < m_relationshipIds.size(); ++i){
@@ -266,8 +287,8 @@ if (connectionId.isEmpty() || initiatorTenantId.isEmpty()){
 return QByteArray();
 }
 bool found = false;
-for (const TenantConnectionInfo& conn : m_connections){
-if (conn.connectionId == connectionId && conn.status == ITenantConnectionRequest::CS_ACTIVE){
+for (const MockConnectionInfo& conn : m_connections){
+if (conn.connectionId == connectionId && conn.status == ITenantConnectionInfo::CS_ACTIVE){
 found = true;
 break;
 }
@@ -379,8 +400,8 @@ return false;
 
 // --- Internal data ---
 QList<MockConnectionCodeInfo> m_codes;
-QList<ConnectionRequestInfo> m_requests;
-QList<TenantConnectionInfo> m_connections;
+QList<MockConnectionRequestInfo> m_requests;
+QList<MockConnectionInfo> m_connections;
 QList<MockProposalInfo> m_proposals;
 QByteArrayList m_relationshipIds;
 QByteArrayList m_archivedRelationshipIds;

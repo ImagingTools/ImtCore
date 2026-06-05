@@ -4,7 +4,7 @@
 
 // ImtCore includes
 #include <imtdoc/IDocumentService.h>
-#include <imtauth/ITenantConnectionRequest.h>
+#include <imtauth/ITenantConnectionRequestManager.h>
 #include <imtauth/ITenantManager.h>
 
 // Generated includes
@@ -47,7 +47,7 @@ protected:
 
 private:
 	I_REF(imtdoc::IDocumentService, m_documentManagerCompPtr);
-	I_REF(imtauth::ITenantConnectionRequest, m_connectionRequestManagerCompPtr);
+	I_REF(imtauth::ITenantConnectionRequestManager, m_connectionRequestManagerCompPtr);
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 };
 

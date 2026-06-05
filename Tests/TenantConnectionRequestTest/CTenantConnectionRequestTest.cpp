@@ -5,28 +5,6 @@
 #include <imtauth/CTenantConnectionRequest.h>
 
 
-namespace
-{
-
-
-imtauth::ITenantConnectionRequest::ConnectionRequestInfo MakeSampleInfo()
-{
-imtauth::ITenantConnectionRequest::ConnectionRequestInfo info;
-info.requestId = "request-1";
-info.sourceTenantId = "tenantA";
-info.targetTenantId = "tenantB";
-info.connectionCode = "ABCD1234";
-info.message = "Let's connect";
-info.status = imtauth::ITenantConnectionRequest::CRS_PENDING;
-info.createdAt = "2026-01-01T00:00:00.000Z";
-info.respondedAt = "";
-return info;
-}
-
-
-} // anonymous namespace
-
-
 void CTenantConnectionRequestTest::init()
 {
 m_managerPtr = new imtauth::CMockConnectionManager();
@@ -45,46 +23,50 @@ m_managerPtr = nullptr;
 void CTenantConnectionRequestTest::testRequestInfo_RoundTrip()
 {
 imtauth::CTenantConnectionRequest data;
-auto info = MakeSampleInfo();
-data.SetRequestInfo(info);
+data.SetRequestId("request-1");
+data.SetSourceTenantId("tenantA");
+data.SetTargetTenantId("tenantB");
+data.SetConnectionCode("ABCD1234");
+data.SetMessage("Let's connect");
+data.SetStatus(imtauth::ITenantConnectionRequestInfo::CRS_PENDING);
+data.SetCreatedAt("2026-01-01T00:00:00.000Z");
 
-auto retrieved = data.GetRequestInfo();
-QCOMPARE(retrieved.requestId, info.requestId);
-QCOMPARE(retrieved.sourceTenantId, info.sourceTenantId);
-QCOMPARE(retrieved.targetTenantId, info.targetTenantId);
-QCOMPARE(retrieved.connectionCode, info.connectionCode);
-QCOMPARE(retrieved.message, info.message);
-QCOMPARE(retrieved.status, info.status);
-QCOMPARE(retrieved.createdAt, info.createdAt);
+QCOMPARE(data.GetRequestId(), QByteArray("request-1"));
+QCOMPARE(data.GetSourceTenantId(), QByteArray("tenantA"));
+QCOMPARE(data.GetTargetTenantId(), QByteArray("tenantB"));
+QCOMPARE(data.GetConnectionCode(), QString("ABCD1234"));
+QCOMPARE(data.GetMessage(), QString("Let's connect"));
+QCOMPARE(data.GetStatus(), imtauth::ITenantConnectionRequestInfo::CRS_PENDING);
+QCOMPARE(data.GetCreatedAt(), QString("2026-01-01T00:00:00.000Z"));
 }
 
 
 void CTenantConnectionRequestTest::testRequestInfo_CopyFromAndClone()
 {
 imtauth::CTenantConnectionRequest data;
-auto info = MakeSampleInfo();
-data.SetRequestInfo(info);
+data.SetRequestId("request-1");
+data.SetSourceTenantId("tenantA");
+data.SetStatus(imtauth::ITenantConnectionRequestInfo::CRS_PENDING);
 
 imtauth::CTenantConnectionRequest copy;
 copy.CopyFrom(data);
-auto retrieved = copy.GetRequestInfo();
-QCOMPARE(retrieved.requestId, info.requestId);
-QCOMPARE(retrieved.sourceTenantId, info.sourceTenantId);
-QCOMPARE(retrieved.status, info.status);
+QCOMPARE(copy.GetRequestId(), QByteArray("request-1"));
+QCOMPARE(copy.GetSourceTenantId(), QByteArray("tenantA"));
+QCOMPARE(copy.GetStatus(), imtauth::ITenantConnectionRequestInfo::CRS_PENDING);
 }
 
 
 void CTenantConnectionRequestTest::testRequestInfo_ResetDataDefaults()
 {
 imtauth::CTenantConnectionRequest data;
-auto info = MakeSampleInfo();
-data.SetRequestInfo(info);
+data.SetRequestId("request-1");
+data.SetSourceTenantId("tenantA");
+data.SetStatus(imtauth::ITenantConnectionRequestInfo::CRS_APPROVED);
 data.ResetData();
 
-auto retrieved = data.GetRequestInfo();
-QVERIFY(retrieved.requestId.isEmpty());
-QVERIFY(retrieved.sourceTenantId.isEmpty());
-QCOMPARE(retrieved.status, imtauth::ITenantConnectionRequest::CRS_PENDING);
+QVERIFY(data.GetRequestId().isEmpty());
+QVERIFY(data.GetSourceTenantId().isEmpty());
+QCOMPARE(data.GetStatus(), imtauth::ITenantConnectionRequestInfo::CRS_PENDING);
 }
 
 
@@ -128,7 +110,7 @@ auto codeB = m_managerPtr->GetConnectionCode("tenantB");
 QByteArray requestId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode, "Hello");
 QVERIFY(!requestId.isEmpty());
 QCOMPARE(m_managerPtr->m_requests.size(), 1);
-QCOMPARE(m_managerPtr->m_requests.first().status, imtauth::ITenantConnectionRequest::CRS_PENDING);
+QCOMPARE(m_managerPtr->m_requests.first().status, imtauth::ITenantConnectionRequestInfo::CRS_PENDING);
 }
 
 
@@ -176,9 +158,9 @@ QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connec
 
 QByteArray connId = m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
 QVERIFY(!connId.isEmpty());
-QCOMPARE(m_managerPtr->m_requests.first().status, imtauth::ITenantConnectionRequest::CRS_APPROVED);
+QCOMPARE(m_managerPtr->m_requests.first().status, imtauth::ITenantConnectionRequestInfo::CRS_APPROVED);
 QCOMPARE(m_managerPtr->m_connections.size(), 1);
-QCOMPARE(m_managerPtr->m_connections.first().status, imtauth::ITenantConnectionRequest::CS_ACTIVE);
+QCOMPARE(m_managerPtr->m_connections.first().status, imtauth::ITenantConnectionInfo::CS_ACTIVE);
 }
 
 
@@ -188,7 +170,7 @@ auto codeB = m_managerPtr->GetConnectionCode("tenantB");
 QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
 
 QVERIFY(m_managerPtr->RejectConnectionRequest(reqId, "tenantB"));
-QCOMPARE(m_managerPtr->m_requests.first().status, imtauth::ITenantConnectionRequest::CRS_REJECTED);
+QCOMPARE(m_managerPtr->m_requests.first().status, imtauth::ITenantConnectionRequestInfo::CRS_REJECTED);
 }
 
 
@@ -198,7 +180,7 @@ auto codeB = m_managerPtr->GetConnectionCode("tenantB");
 QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
 
 QVERIFY(m_managerPtr->CancelConnectionRequest(reqId, "tenantA"));
-QCOMPARE(m_managerPtr->m_requests.first().status, imtauth::ITenantConnectionRequest::CRS_CANCELED);
+QCOMPARE(m_managerPtr->m_requests.first().status, imtauth::ITenantConnectionRequestInfo::CRS_CANCELED);
 }
 
 
@@ -231,12 +213,12 @@ auto codeB = m_managerPtr->GetConnectionCode("tenantB");
 QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
 m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
 
-auto connections = m_managerPtr->GetConnections("tenantA");
-QCOMPARE(connections.size(), 1);
-connections = m_managerPtr->GetConnections("tenantB");
-QCOMPARE(connections.size(), 1);
-connections = m_managerPtr->GetConnections("tenantC");
-QCOMPARE(connections.size(), 0);
+auto connectionsA = m_managerPtr->GetConnectionIds("tenantA");
+QCOMPARE(connectionsA.size(), 1);
+auto connectionsB = m_managerPtr->GetConnectionIds("tenantB");
+QCOMPARE(connectionsB.size(), 1);
+auto connectionsC = m_managerPtr->GetConnectionIds("tenantC");
+QCOMPARE(connectionsC.size(), 0);
 }
 
 
@@ -254,7 +236,7 @@ QCOMPARE(m_managerPtr->GetTenantRelationshipIds("tenantA").size(), 1);
 
 // Remove connection - should cascade
 QVERIFY(m_managerPtr->RemoveConnection(connId, "tenantA"));
-QCOMPARE(m_managerPtr->m_connections.first().status, imtauth::ITenantConnectionRequest::CS_REMOVED);
+QCOMPARE(m_managerPtr->m_connections.first().status, imtauth::ITenantConnectionInfo::CS_REMOVED);
 QCOMPARE(m_managerPtr->GetTenantRelationshipIds("tenantA").size(), 0);
 }
 
