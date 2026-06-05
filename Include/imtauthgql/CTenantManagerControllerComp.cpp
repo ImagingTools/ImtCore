@@ -909,27 +909,22 @@ sdl::V1_0::imtauth::CGetConnectionRequestsPayload CTenantManagerControllerComp::
 	QByteArrayList requestIds = m_connectionRequestManagerCompPtr->GetConnectionRequestIds(tenantId);
 	response.requests.Emplace();
 
-	if (m_requestCollectionCompPtr.IsValid()){
-		for (const QByteArray& requestId : requestIds){
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (m_requestCollectionCompPtr->GetObjectData(requestId, dataPtr)){
-				const imtauth::ITenantConnectionRequestInfo* reqPtr =
-					dynamic_cast<const imtauth::ITenantConnectionRequestInfo*>(dataPtr.GetPtr());
-				if (reqPtr != nullptr){
-					sdl::V1_0::imtauth::CConnectionRequest data;
-					data.id = reqPtr->GetRequestId();
-					data.sourceTenantId = reqPtr->GetSourceTenantId();
-					data.targetTenantId = reqPtr->GetTargetTenantId();
-					data.connectionCode = reqPtr->GetConnectionCode();
-					data.message = reqPtr->GetMessage();
-					data.status = ToSdlConnectionRequestStatus(reqPtr->GetStatus());
-					data.createdAt = reqPtr->GetCreatedAt();
-					data.respondedAt = reqPtr->GetRespondedAt();
-					data.sourceTenantName = reqPtr->GetSourceTenantName();
-					data.targetTenantName = reqPtr->GetTargetTenantName();
-					response.requests->push_back(data);
-				}
-			}
+	for (const QByteArray& requestId : requestIds){
+		const imtauth::ITenantConnectionRequestInfo* reqPtr =
+			m_connectionRequestManagerCompPtr->GetConnectionRequest(requestId);
+		if (reqPtr != nullptr){
+			sdl::V1_0::imtauth::CConnectionRequest data;
+			data.id = reqPtr->GetRequestId();
+			data.sourceTenantId = reqPtr->GetSourceTenantId();
+			data.targetTenantId = reqPtr->GetTargetTenantId();
+			data.connectionCode = reqPtr->GetConnectionCode();
+			data.message = reqPtr->GetMessage();
+			data.status = ToSdlConnectionRequestStatus(reqPtr->GetStatus());
+			data.createdAt = reqPtr->GetCreatedAt();
+			data.respondedAt = reqPtr->GetRespondedAt();
+			data.sourceTenantName = reqPtr->GetSourceTenantName();
+			data.targetTenantName = reqPtr->GetTargetTenantName();
+			response.requests->push_back(data);
 		}
 	}
 	
@@ -1097,37 +1092,32 @@ sdl::V1_0::imtauth::CGetConnectionsPayload CTenantManagerControllerComp::OnGetCo
 	response.connections.Emplace();
 	QByteArrayList connectionIds = m_connectionRequestManagerCompPtr->GetConnectionIds(tenantId);
 
-	if (m_connectionCollectionCompPtr.IsValid()){
-		for (const QByteArray& connectionId : connectionIds){
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (m_connectionCollectionCompPtr->GetObjectData(connectionId, dataPtr)){
-				const imtauth::ITenantConnectionInfo* connPtr =
-					dynamic_cast<const imtauth::ITenantConnectionInfo*>(dataPtr.GetPtr());
-				if (connPtr != nullptr){
-					sdl::V1_0::imtauth::CTenantConnection data;
+	for (const QByteArray& connectionId : connectionIds){
+		const imtauth::ITenantConnectionInfo* connPtr =
+			m_connectionRequestManagerCompPtr->GetConnection(connectionId);
+		if (connPtr != nullptr){
+			sdl::V1_0::imtauth::CTenantConnection data;
 
-					data.id = connPtr->GetConnectionId();
-					data.tenantAId = connPtr->GetTenantAId();
-					data.tenantBId = connPtr->GetTenantBId();
-					data.status = ToSdlConnectionStatus(connPtr->GetStatus());
-					data.createdAt = connPtr->GetCreatedAt();
-					data.updatedAt = connPtr->GetUpdatedAt();
+			data.id = connPtr->GetConnectionId();
+			data.tenantAId = connPtr->GetTenantAId();
+			data.tenantBId = connPtr->GetTenantBId();
+			data.status = ToSdlConnectionStatus(connPtr->GetStatus());
+			data.createdAt = connPtr->GetCreatedAt();
+			data.updatedAt = connPtr->GetUpdatedAt();
 
-					if (m_tenantManagerCompPtr.IsValid()){
-						imtauth::ITenantInfoUniquePtr tenant1Ptr = m_tenantManagerCompPtr->GetTenant(connPtr->GetTenantAId());
-						if (tenant1Ptr.IsValid()){
-							data.tenantAName = tenant1Ptr->GetTenantName();
-						}
+			if (m_tenantManagerCompPtr.IsValid()){
+				imtauth::ITenantInfoUniquePtr tenant1Ptr = m_tenantManagerCompPtr->GetTenant(connPtr->GetTenantAId());
+				if (tenant1Ptr.IsValid()){
+					data.tenantAName = tenant1Ptr->GetTenantName();
+				}
 
-						imtauth::ITenantInfoUniquePtr tenant2Ptr = m_tenantManagerCompPtr->GetTenant(connPtr->GetTenantBId());
-						if (tenant2Ptr.IsValid()){
-							data.tenantBName = tenant2Ptr->GetTenantName();
-						}
-					}
-
-					response.connections->push_back(data);
+				imtauth::ITenantInfoUniquePtr tenant2Ptr = m_tenantManagerCompPtr->GetTenant(connPtr->GetTenantBId());
+				if (tenant2Ptr.IsValid()){
+					data.tenantBName = tenant2Ptr->GetTenantName();
 				}
 			}
+
+			response.connections->push_back(data);
 		}
 	}
 

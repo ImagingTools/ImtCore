@@ -41,9 +41,11 @@ public:
 	virtual bool RejectConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId) = 0;
 	virtual bool CancelConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId) = 0;
 	virtual QByteArrayList GetConnectionRequestIds(const QByteArray& tenantId) const = 0;
+	virtual const ITenantConnectionRequestInfo* GetConnectionRequest(const QByteArray& requestId) const = 0;
 
 	// --- Connections ---
 	virtual QByteArrayList GetConnectionIds(const QByteArray& tenantId) const = 0;
+	virtual const ITenantConnectionInfo* GetConnection(const QByteArray& connectionId) const = 0;
 	virtual bool RemoveConnection(const QByteArray& connectionId, const QByteArray& tenantId) = 0;
 
 	// --- Relationship Proposals ---
