@@ -464,6 +464,46 @@ RemoteCollectionView {
 		}
 	}
 
+	onDoubleClicked: function(id, index) {
+		if (id && id !== AuthorizationController.currentTenantId) {
+			var tenantName = container.table.elements.getData("name", index) || id
+			ModalDialogManager.openDialog(switchOnDoubleClickDialogComp,
+				{"tenantId": id, "tenantName": tenantName})
+		}
+	}
+
+	Component {
+		id: switchOnDoubleClickDialogComp
+		MessageDialog {
+			property string tenantId: ""
+			property string tenantName: ""
+			width: Style.sizeHintM
+			title: qsTr("Switch organization")
+			message: qsTr("Do you want to switch to \"%1\"?").arg(tenantName)
+			onFinished: {
+				if (buttonId == Enums.yes) {
+					container.switchToTenant(tenantId)
+				}
+			}
+		}
+	}
+
+	Component {
+		id: switchToNewTenantDialogComp
+		MessageDialog {
+			property string tenantId: ""
+			property string tenantName: ""
+			width: Style.sizeHintM
+			title: qsTr("Switch to new organization")
+			message: qsTr("Organization \"%1\" has been created. Do you want to switch to it?").arg(tenantName)
+			onFinished: {
+				if (buttonId == Enums.yes) {
+					container.switchToTenant(tenantId)
+				}
+			}
+		}
+	}
+
 	// --- Leave organization ---
 	function leaveTenant(tenantId) {
 		if (!tenantId) return
@@ -567,16 +607,11 @@ RemoteCollectionView {
 							if (tenantEditor.representationController){
 								tenantEditor.representationController.updateRepresentationFromDocument()
 							}
-							// Automatically switch to the newly created organization
-							// so the user immediately operates in its context. Inform
-							// the user that the active organization has changed.
 							var newTenantId = tenantEditor.tenantData ? tenantEditor.tenantData.m_id : ""
 							var newTenantName = (tenantEditor.tenantData && tenantEditor.tenantData.m_name) || newTenantId
 							if (newTenantId && newTenantId !== AuthorizationController.currentTenantId){
-								AuthorizationController.selectTenant(newTenantId)
-								ModalDialogManager.showInfoDialog(
-									qsTr("You have been switched to the newly created organization \"%1\".")
-									.arg(newTenantName))
+								ModalDialogManager.openDialog(switchToNewTenantDialogComp,
+									{"tenantId": newTenantId, "tenantName": newTenantName})
 							}
 						}
 					}

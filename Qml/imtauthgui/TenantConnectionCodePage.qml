@@ -52,13 +52,10 @@ ViewBase {
 
 		function onConnectionCodeRegenerated(newCode) {
 			connectionCodePage.connectionCode = newCode
-			PopupManager.addSuccessMessage(qsTr("Connection code regenerated"), true)
 		}
 
 		function onAllowConnectionsByCodeChanged(allow) {
 			connectionCodePage.allowConnectionsByCode = allow
-			PopupManager.addSuccessMessage(
-				allow ? qsTr("Connections by code enabled") : qsTr("Connections by code disabled"), true)
 		}
 	}
 
@@ -127,7 +124,7 @@ ViewBase {
 						clipboardHelper.selectAll()
 						clipboardHelper.copy()
 						copyButton.__copied = true
-						PopupManager.addSuccessMessage(qsTr("Code copied to clipboard"), true)
+						copiedPopup.open()
 						copyResetTimer.restart()
 					}
 
@@ -136,6 +133,31 @@ ViewBase {
 						interval: 2000
 						onTriggered: {
 							copyButton.__copied = false
+							copiedPopup.close()
+						}
+					}
+
+					Popup {
+						id: copiedPopup
+						x: -copiedPopup.width / 2 + copyButton.width / 2
+						y: copyButton.height + Style.marginS
+						width: copiedPopupLabel.contentWidth + Style.marginL * 2
+						height: copiedPopupLabel.contentHeight + Style.marginM * 2
+						closePolicy: Enums.popupCloseOnEscape | Enums.popupCloseOnPressOutside
+
+						background: Rectangle {
+							color: Style.baseColor
+							border.color: Style.borderColor
+							border.width: 1
+							radius: Style.radiusM
+						}
+
+						Text {
+							id: copiedPopupLabel
+							anchors.centerIn: parent
+							text: qsTr("Copied!")
+							font.pixelSize: Style.fontSizeS
+							color: Style.textColor
 						}
 					}
 				}

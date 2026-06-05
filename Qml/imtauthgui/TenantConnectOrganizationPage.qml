@@ -47,6 +47,7 @@ ViewBase {
 			codeInput.text = ""
 			messageInput.text = ""
 			PopupManager.addSuccessMessage(qsTr("Connection request sent successfully"), true)
+			connectPage.updateGui()
 		}
 
 		function onConnectionRequestError(errorMessage) {
@@ -67,11 +68,17 @@ ViewBase {
 			PopupManager.addSuccessMessage(qsTr("Connection request rejected"), true)
 			connectPage.updateGui()
 		}
+
+		function onConnectionRequestCanceled() {
+			PopupManager.addSuccessMessage(qsTr("Connection request canceled"), true)
+			connectPage.updateGui()
+		}
 	}
 
 	function refreshIncomingList() {
 		var allRequests = connectPage.apiClient ? connectPage.apiClient.connectionRequestsModel : null
 		var incoming = []
+		var outgoing = []
 		if (allRequests && connectPage.tenantData) {
 			for (var i = 0; i < allRequests.count; ++i) {
 				var req = allRequests.get(i)
@@ -79,9 +86,14 @@ ViewBase {
 						&& req.status === "Pending") {
 					incoming.push(req)
 				}
+				if (req.sourceTenantId === connectPage.tenantData.m_id
+						&& req.status === "Pending") {
+					outgoing.push(req)
+				}
 			}
 		}
 		requestsList.model = incoming
+		sentRequestsList.model = outgoing
 	}
 
 	Flickable {
@@ -220,23 +232,23 @@ ViewBase {
 
 				delegate: Rectangle {
 					width: requestsList.width
-					height: requestContent.height + Style.marginL * 2
+					height: incomingContent.height + Style.marginL * 2
 					color: Style.backgroundColor2
 					radius: Style.radiusL
 					border.width: 1
 					border.color: Style.borderColor
 
 					Column {
-						id: requestContent
+						id: incomingContent
 						anchors.left: parent.left
-						anchors.right: requestActions.left
+						anchors.right: incomingActions.left
 						anchors.leftMargin: Style.marginL
 						anchors.rightMargin: Style.marginS
 						anchors.verticalCenter: parent.verticalCenter
 						spacing: Style.marginXS
 
 						Text {
-							text: modelData.sourceTenantName ? modelData.sourceTenantName : (modelData.sourceTenantId ? modelData.sourceTenantId : "")
+							text: modelData.sourceTenantName ? modelData.sourceTenantName : qsTr("Unknown Organization")
 							font.pixelSize: Style.fontSizeM
 							font.bold: true
 							color: Style.textColor
@@ -258,28 +270,162 @@ ViewBase {
 					}
 
 					Row {
-						id: requestActions
+						id: incomingActions
 						anchors.right: parent.right
 						anchors.rightMargin: Style.marginL
 						anchors.verticalCenter: parent.verticalCenter
 						spacing: Style.marginS
 
-						Button {
-							text: qsTr("Approve")
-							onClicked: {
-								if (connectPage.apiClient && connectPage.tenantData) {
-									connectPage.apiClient.approveConnectionRequest(
-										modelData.id, connectPage.tenantData.m_id)
+						Rectangle {
+							width: approveBtnText.contentWidth + Style.marginL * 2
+							height: Style.controlHeightS
+							radius: Style.radiusM
+							color: "#3FB950"
+
+							Text {
+								id: approveBtnText
+								anchors.centerIn: parent
+								text: qsTr("Approve")
+								font.pixelSize: Style.fontSizeS
+								color: "#FFFFFF"
+							}
+
+							MouseArea {
+								anchors.fill: parent
+								cursorShape: Qt.PointingHandCursor
+								onClicked: {
+									if (connectPage.apiClient && connectPage.tenantData) {
+										connectPage.apiClient.approveConnectionRequest(
+											modelData.id, connectPage.tenantData.m_id)
+									}
 								}
 							}
 						}
 
-						Button {
-							text: qsTr("Reject")
-							onClicked: {
-								if (connectPage.apiClient && connectPage.tenantData) {
-									connectPage.apiClient.rejectConnectionRequest(
-										modelData.id, connectPage.tenantData.m_id)
+						Rectangle {
+							width: rejectBtnText.contentWidth + Style.marginL * 2
+							height: Style.controlHeightS
+							radius: Style.radiusM
+							color: "#DA3633"
+
+							Text {
+								id: rejectBtnText
+								anchors.centerIn: parent
+								text: qsTr("Reject")
+								font.pixelSize: Style.fontSizeS
+								color: "#FFFFFF"
+							}
+
+							MouseArea {
+								anchors.fill: parent
+								cursorShape: Qt.PointingHandCursor
+								onClicked: {
+									if (connectPage.apiClient && connectPage.tenantData) {
+										connectPage.apiClient.rejectConnectionRequest(
+											modelData.id, connectPage.tenantData.m_id)
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			Rectangle {
+				width: parent.width
+				height: 1
+				color: Style.borderColor
+			}
+
+			Text {
+				text: qsTr("Sent Requests")
+				font.pixelSize: Style.fontSizeL
+				font.bold: true
+				color: Style.textColor
+			}
+
+			Text {
+				visible: sentRequestsList.count === 0
+				text: qsTr("No pending sent requests.")
+				font.pixelSize: Style.fontSizeM
+				color: Style.inactiveTextColor
+			}
+
+			ListView {
+				id: sentRequestsList
+				width: parent.width
+				height: sentRequestsList.contentHeight
+				interactive: false
+				spacing: Style.marginS
+
+				delegate: Rectangle {
+					width: sentRequestsList.width
+					height: sentContent.height + Style.marginL * 2
+					color: Style.backgroundColor2
+					radius: Style.radiusL
+					border.width: 1
+					border.color: Style.borderColor
+
+					Column {
+						id: sentContent
+						anchors.left: parent.left
+						anchors.right: sentActions.left
+						anchors.leftMargin: Style.marginL
+						anchors.rightMargin: Style.marginS
+						anchors.verticalCenter: parent.verticalCenter
+						spacing: Style.marginXS
+
+						Text {
+							text: modelData.targetTenantName ? modelData.targetTenantName : qsTr("Unknown Organization")
+							font.pixelSize: Style.fontSizeM
+							font.bold: true
+							color: Style.textColor
+						}
+
+						Text {
+							visible: modelData.message ? modelData.message !== "" : false
+							text: modelData.message ? modelData.message : ""
+							font.pixelSize: Style.fontSizeS
+							color: Style.inactiveTextColor
+						}
+
+						Text {
+							text: qsTr("Sent: %1").arg(
+								modelData.createdAt ? new Date(modelData.createdAt).toLocaleDateString() : "—")
+							font.pixelSize: Style.fontSizeXS
+							color: Style.inactiveTextColor
+						}
+					}
+
+					Row {
+						id: sentActions
+						anchors.right: parent.right
+						anchors.rightMargin: Style.marginL
+						anchors.verticalCenter: parent.verticalCenter
+						spacing: Style.marginS
+
+						Rectangle {
+							width: cancelBtnText.contentWidth + Style.marginL * 2
+							height: Style.controlHeightS
+							radius: Style.radiusM
+							color: Style.inactiveTextColor
+
+							Text {
+								id: cancelBtnText
+								anchors.centerIn: parent
+								text: qsTr("Cancel")
+								font.pixelSize: Style.fontSizeS
+								color: "#FFFFFF"
+							}
+
+							MouseArea {
+								anchors.fill: parent
+								cursorShape: Qt.PointingHandCursor
+								onClicked: {
+									if (connectPage.apiClient && connectPage.tenantData) {
+										connectPage.apiClient.cancelConnectionRequest(
+											modelData.id, connectPage.tenantData.m_id)
+									}
 								}
 							}
 						}
