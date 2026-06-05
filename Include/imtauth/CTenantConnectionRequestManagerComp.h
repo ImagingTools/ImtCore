@@ -97,7 +97,7 @@ private:
 	bool StoreProposal(const QByteArray& proposalId, const ITenantRelationshipProposalInfo& proposalInfo);
 
 	// Helper to get code object from collection
-	const ITenantConnectionCodeInfo* GetConnectionCodeObject(const QByteArray& tenantId);
+	ITenantConnectionCodeInfoUniquePtr GetConnectionCodeObject(const QByteArray& tenantId);
 	void EnsureConnectionCode(const QByteArray& tenantId);
 
 private:

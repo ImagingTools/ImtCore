@@ -19,7 +19,11 @@ namespace imtauth
 
 bool CTenantConnectionRequestManagerComp::StoreConnectionCode(const QByteArray& tenantId, const ITenantConnectionCodeInfo& codeInfo)
 {
-	if (!m_connectionCodeCollectionCompPtr.IsValid() || !m_connectionCodeFactoryCompPtr.IsValid()){
+	if (!m_connectionCodeCollectionCompPtr.IsValid()){
+		return false;
+	}
+
+	if (!m_connectionCodeFactoryCompPtr.IsValid()){
 		return false;
 	}
 
@@ -27,14 +31,14 @@ bool CTenantConnectionRequestManagerComp::StoreConnectionCode(const QByteArray& 
 	if (!dataPtr.IsValid()){
 		return false;
 	}
+
 	dataPtr->SetTenantId(codeInfo.GetTenantId());
 	dataPtr->SetConnectionCode(codeInfo.GetConnectionCode());
 	dataPtr->SetAllowConnectionsByCode(codeInfo.GetAllowConnectionsByCode());
 	dataPtr->SetCreatedAt(codeInfo.GetCreatedAt());
 
-	// Try update first, if object exists
-	imtbase::IObjectCollection::DataPtr existingPtr;
-	if (m_connectionCodeCollectionCompPtr->GetObjectData(tenantId, existingPtr)){
+	const QByteArrayList elementIds = m_connectionCodeCollectionCompPtr->GetElementIds();
+	if (elementIds.contains(tenantId)){
 		return m_connectionCodeCollectionCompPtr->SetObjectData(tenantId, *dataPtr);
 	}
 
@@ -345,29 +349,51 @@ QByteArray CTenantConnectionRequestManagerComp::ApplyRelationshipProposal(const 
 }
 
 
-const ITenantConnectionCodeInfo* CTenantConnectionRequestManagerComp::GetConnectionCodeObject(const QByteArray& tenantId)
+ITenantConnectionCodeInfoUniquePtr CTenantConnectionRequestManagerComp::GetConnectionCodeObject(const QByteArray& tenantId)
 {
 	if (!m_connectionCodeCollectionCompPtr.IsValid()){
 		return nullptr;
 	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (m_connectionCodeCollectionCompPtr->GetObjectData(tenantId, dataPtr)){
-		return dynamic_cast<const ITenantConnectionCodeInfo*>(dataPtr.GetPtr());
+	if (!m_connectionCodeCollectionCompPtr->GetObjectData(tenantId, dataPtr)){
+		return nullptr;
 	}
 
-	return nullptr;
+	const ITenantConnectionCodeInfo* tenantCodePtr = dynamic_cast<const ITenantConnectionCodeInfo*>(dataPtr.GetPtr());
+	if (tenantCodePtr == nullptr){
+		return nullptr;
+	}
+
+	ITenantConnectionCodeInfoUniquePtr clonedTenant = m_connectionCodeFactoryCompPtr.CreateInstance();
+	if (!clonedTenant.IsValid()){
+		return nullptr;
+	}
+
+	if (!clonedTenant->CopyFrom(*tenantCodePtr)){
+		return nullptr;
+	}
+
+	return clonedTenant;
 }
 
 
 void CTenantConnectionRequestManagerComp::EnsureConnectionCode(const QByteArray& tenantId)
 {
-	if (tenantId.isEmpty() || !m_connectionCodeCollectionCompPtr.IsValid() || !m_connectionCodeFactoryCompPtr.IsValid()){
+	if (!m_connectionCodeCollectionCompPtr.IsValid()){
 		return;
 	}
 
-	imtbase::IObjectCollection::DataPtr existingPtr;
-	if (m_connectionCodeCollectionCompPtr->GetObjectData(tenantId, existingPtr)){
+	if (!m_connectionCodeFactoryCompPtr.IsValid()){
+		return;
+	}
+
+	if (tenantId.isEmpty()){
+		return;
+	}
+
+	QByteArrayList elementIds = m_connectionCodeCollectionCompPtr->GetElementIds();
+	if (elementIds.contains(tenantId)){
 		return; // Already exists
 	}
 
@@ -376,6 +402,7 @@ void CTenantConnectionRequestManagerComp::EnsureConnectionCode(const QByteArray&
 	if (!codePtr.IsValid()){
 		return;
 	}
+
 	codePtr->SetTenantId(tenantId);
 	codePtr->SetConnectionCode(GenerateConnectionCode());
 	codePtr->SetAllowConnectionsByCode(true);
@@ -395,10 +422,11 @@ QString CTenantConnectionRequestManagerComp::GetConnectionCode(const QByteArray&
 
 	EnsureConnectionCode(tenantId);
 
-	const ITenantConnectionCodeInfo* codePtr = GetConnectionCodeObject(tenantId);
+	ITenantConnectionCodeInfoUniquePtr codePtr = GetConnectionCodeObject(tenantId);
 	if (codePtr != nullptr){
 		return codePtr->GetConnectionCode();
 	}
+
 	return QString();
 }
 
@@ -411,7 +439,7 @@ bool CTenantConnectionRequestManagerComp::GetAllowConnectionsByCode(const QByteA
 
 	EnsureConnectionCode(tenantId);
 
-	const ITenantConnectionCodeInfo* codePtr = GetConnectionCodeObject(tenantId);
+	ITenantConnectionCodeInfoUniquePtr codePtr = GetConnectionCodeObject(tenantId);
 	if (codePtr != nullptr){
 		return codePtr->GetAllowConnectionsByCode();
 	}
@@ -434,12 +462,13 @@ QString CTenantConnectionRequestManagerComp::RegenerateConnectionCode(const QByt
 		return QString();
 	}
 
-	const ITenantConnectionCodeInfo* existingPtr = GetConnectionCodeObject(tenantId);
-	if (existingPtr != nullptr){
+	ITenantConnectionCodeInfoUniquePtr existingPtr = GetConnectionCodeObject(tenantId);
+	if (existingPtr.IsValid()){
 		codePtr->SetTenantId(existingPtr->GetTenantId());
 		codePtr->SetAllowConnectionsByCode(existingPtr->GetAllowConnectionsByCode());
 		codePtr->SetCreatedAt(existingPtr->GetCreatedAt());
-	} else {
+	}
+	else{
 		codePtr->SetTenantId(tenantId);
 		codePtr->SetAllowConnectionsByCode(true);
 		codePtr->SetCreatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs));
@@ -447,6 +476,7 @@ QString CTenantConnectionRequestManagerComp::RegenerateConnectionCode(const QByt
 	codePtr->SetConnectionCode(GenerateConnectionCode());
 
 	StoreConnectionCode(tenantId, *codePtr);
+
 	return codePtr->GetConnectionCode();
 }
 
@@ -466,12 +496,13 @@ bool CTenantConnectionRequestManagerComp::SetAllowConnectionsByCode(const QByteA
 		return false;
 	}
 
-	const ITenantConnectionCodeInfo* existingPtr = GetConnectionCodeObject(tenantId);
-	if (existingPtr != nullptr){
+	ITenantConnectionCodeInfoUniquePtr existingPtr = GetConnectionCodeObject(tenantId);
+	if (existingPtr.IsValid()){
 		codePtr->SetTenantId(existingPtr->GetTenantId());
 		codePtr->SetConnectionCode(existingPtr->GetConnectionCode());
 		codePtr->SetCreatedAt(existingPtr->GetCreatedAt());
-	} else {
+	}
+	else{
 		codePtr->SetTenantId(tenantId);
 		codePtr->SetConnectionCode(GenerateConnectionCode());
 		codePtr->SetCreatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs));
