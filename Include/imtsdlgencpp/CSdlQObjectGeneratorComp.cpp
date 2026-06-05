@@ -651,15 +651,15 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 			FeedStreamHorizontally(stream, 2);
 			stream << QStringLiteral("istd::TNullableValue<") << convertedType;
 			if (field.GetType() == "ID"){
-				stream << QStringLiteral("> value(tempValue.toUtf8());");
+				stream << QStringLiteral("> tempItem(tempValue.toUtf8());");
 			}
 			else{
-				stream << QStringLiteral("> value(tempValue);");
+				stream << QStringLiteral("> tempItem(tempValue);");
 			}
 			FeedStream(stream, 1, false);
 
 			FeedStreamHorizontally(stream, 2);
-			stream << dataClassName << QStringLiteral("::") << field.GetId() << QStringLiteral("->append(value);");
+			stream << dataClassName << QStringLiteral("::") << field.GetId() << QStringLiteral("->append(tempItem);");
 			FeedStream(stream, 1, false);
 
 			FeedStreamHorizontally(stream);

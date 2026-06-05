@@ -35,6 +35,16 @@ namespace sdl::V1_0::complextest
 {
 
 
+inline namespace ComplexUnion2SdlEnums
+{
+
+
+
+Q_NAMESPACE
+
+
+} // inline namespace ComplexUnion2SdlEnums
+
 // forward declaration for union types
 class ExtendedMetaDataUnionType;
 class CExtendedMetaDataUnionTypeObject;
