@@ -1,4 +1,0 @@
--- Legacy TenantConnectionRequests table kept for migration reference.
--- New schema uses tables in CreateTenantRelationshipsTable.sql:
---   TenantConnectionCodes, TenantConnectionRequests, TenantConnections,
---   TenantRelationships, TenantRelationshipProposals.

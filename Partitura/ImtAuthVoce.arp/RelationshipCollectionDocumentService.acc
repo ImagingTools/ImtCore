@@ -13,7 +13,7 @@
         <Element Id="CollectionDocumentService" PackageId="ImtCollectionVoce" ComponentId="CollectionDocumentService">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="Collection" Type="Reference" ExportId="TenantRepository">
+                    <AttributeInfo Id="Collection" Type="Reference" ExportId="TenantRelationshipRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
@@ -28,7 +28,7 @@
                     <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>TenantInfo</Value>
+                                <Value>TenantRelationshipInfo</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -93,6 +93,11 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TenantRelationshipInfo" PackageId="ImtAuthPck" ComponentId="TenantRelationshipInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
             </Data>
         </Element>
     </ElementsList>

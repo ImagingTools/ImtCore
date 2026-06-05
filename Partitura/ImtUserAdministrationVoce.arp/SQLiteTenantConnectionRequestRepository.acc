@@ -81,7 +81,7 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CreateTableScriptPath" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value=":/SQL/SQLite/CreateTenantConnectionRequestsTable.sql"/>
+                        <Data IsEnabled="true" Value=":/SQL/SQLite/CreateTenantRelationshipsTable.sql"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>

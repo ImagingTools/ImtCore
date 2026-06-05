@@ -292,6 +292,11 @@ I_EXPORT_COMPONENT(
 			"Tenant Connection Request Manager");
 
 I_EXPORT_COMPONENT(
+			TenantRelationshipInfo,
+			"Entity representing a directional relationship between two connected tenants",
+			"Tenant Relationship Info");
+
+I_EXPORT_COMPONENT(
 			CrossTenantMessageInfo,
 			"Entity representing a cross-tenant message exchanged through the messaging pipeline",
 			"Cross Tenant Message Info");

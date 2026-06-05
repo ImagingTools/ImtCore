@@ -112,6 +112,11 @@ I_EXPORT_COMPONENT(
 			"Tenant Connection Request Database Delegate");
 
 I_EXPORT_COMPONENT(
+			TenantRelationshipDatabaseDelegate,
+			"SQL delegate for tenant relationships (hydration, INSERT/UPDATE/DELETE)",
+			"Tenant Relationship Database Delegate");
+
+I_EXPORT_COMPONENT(
 			CrossTenantMessageDatabaseDelegate,
 			"SQL delegate for cross-tenant messages (hydration, INSERT/UPDATE/DELETE)",
 			"Cross Tenant Message Database Delegate");

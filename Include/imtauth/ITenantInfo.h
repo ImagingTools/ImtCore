@@ -10,6 +10,9 @@
 // Qt includes
 #include <QList>
 
+// ImtCore includes
+#include <imtauth/ITenantRelationshipInfo.h>
+
 
 namespace imtauth
 {
@@ -45,28 +48,24 @@ public:
 
 	/**
 		Tenant relationship roles.
+		\note These are aliases for the standalone imtauth::TenantRelationshipRole enum.
 	*/
-	enum TenantRelationshipRole
-	{
-		TRR_PARENT,
-		TRR_CHILD,
-		TRR_PARTNER,
-		TRR_SUPPLIER,
-		TRR_CUSTOMER,
-		TRR_AFFILIATE
-	};
-	I_DECLARE_ENUM(TenantRelationshipRole, TRR_PARENT, TRR_CHILD, TRR_PARTNER, TRR_SUPPLIER, TRR_CUSTOMER, TRR_AFFILIATE);
+	typedef imtauth::TenantRelationshipRole TenantRelationshipRole;
+	static const TenantRelationshipRole TRR_PARENT = imtauth::TRR_PARENT;
+	static const TenantRelationshipRole TRR_CHILD = imtauth::TRR_CHILD;
+	static const TenantRelationshipRole TRR_PARTNER = imtauth::TRR_PARTNER;
+	static const TenantRelationshipRole TRR_SUPPLIER = imtauth::TRR_SUPPLIER;
+	static const TenantRelationshipRole TRR_CUSTOMER = imtauth::TRR_CUSTOMER;
+	static const TenantRelationshipRole TRR_AFFILIATE = imtauth::TRR_AFFILIATE;
 
 	/**
 		Tenant relationship status.
+		\note These are aliases for the standalone imtauth::TenantRelationshipStatus enum.
 	*/
-	enum TenantRelationshipStatus
-	{
-		TRS_ACTIVE,
-		TRS_ARCHIVED,
-		TRS_PENDING_APPROVED
-	};
-	I_DECLARE_ENUM(TenantRelationshipStatus, TRS_ACTIVE, TRS_ARCHIVED, TRS_PENDING_APPROVED);
+	typedef imtauth::TenantRelationshipStatus TenantRelationshipStatus;
+	static const TenantRelationshipStatus TRS_ACTIVE = imtauth::TRS_ACTIVE;
+	static const TenantRelationshipStatus TRS_ARCHIVED = imtauth::TRS_ARCHIVED;
+	static const TenantRelationshipStatus TRS_PENDING_APPROVED = imtauth::TRS_PENDING_APPROVED;
 
 	/**
 		Structure describing a relationship between tenants.

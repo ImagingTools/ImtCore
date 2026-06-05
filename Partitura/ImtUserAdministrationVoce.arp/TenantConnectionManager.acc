@@ -43,10 +43,21 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
+        <Element Id="TenantRelationshipInfo" PackageId="ImtAuthPck" ComponentId="TenantRelationshipInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="TenantConnectionRequestManager" PackageId="ImtAuthPck" ComponentId="TenantConnectionRequestManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ConnectionCollection" Type="Reference" ExportId="TenantConnectionRequestRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProposalCollection" Type="Reference" ExportId="TenantConnectionRequestRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RequestCollection" Type="Reference" ExportId="TenantConnectionRequestRepository">

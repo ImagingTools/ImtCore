@@ -18,6 +18,7 @@
 #include <imtauthdb/CCrossOrgGrantDbDelegateComp.h>
 #include <imtauthdb/CContractDbDelegateComp.h>
 #include <imtauthdb/CTenantConnectionRequestDbDelegateComp.h>
+#include <imtauthdb/CTenantRelationshipDbDelegateComp.h>
 #include <imtauthdb/CCrossTenantMessageDbDelegateComp.h>
 #include <imtauthdb/COrderRequestDbDelegateComp.h>
 
@@ -47,6 +48,7 @@ typedef imtauthdb::CTenantInvitationDbDelegateComp TenantInvitationDatabaseDeleg
 typedef imtauthdb::CCrossOrgGrantDbDelegateComp CrossOrgGrantDatabaseDelegate;
 typedef imtauthdb::CContractDbDelegateComp ContractDatabaseDelegate;
 typedef imtauthdb::CTenantConnectionRequestDbDelegateComp TenantConnectionRequestDatabaseDelegate;
+typedef imtauthdb::CTenantRelationshipDbDelegateComp TenantRelationshipDatabaseDelegate;
 typedef imtauthdb::CCrossTenantMessageDbDelegateComp CrossTenantMessageDatabaseDelegate;
 typedef imtauthdb::COrderRequestDbDelegateComp OrderRequestDatabaseDelegate;
 

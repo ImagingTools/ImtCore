@@ -25,7 +25,7 @@
                     <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>TenantConnectionRequestInfo</Value>
+                                <Value>TenantRelationshipInfo</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -39,14 +39,14 @@
                     <AttributeInfo Id="TypeIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>TenantConnectionRequest</Value>
+                                <Value>TenantRelationship</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="TypeNames" Type="Text[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>TenantConnectionRequest</Value>
+                                <Value>TenantRelationship</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -69,7 +69,7 @@
                         <Data IsEnabled="true" Value="ObjectCollection"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectDelegate" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TenantConnectionRequestDatabaseDelegate"/>
+                        <Data IsEnabled="true" Value="TenantRelationshipDatabaseDelegate"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
@@ -77,7 +77,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="TenantConnectionRequestDatabaseDelegate" PackageId="ImtAuthDbPck" ComponentId="TenantConnectionRequestDatabaseDelegate">
+        <Element Id="TenantRelationshipDatabaseDelegate" PackageId="ImtAuthDbPck" ComponentId="TenantRelationshipDatabaseDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="AutoCreateTable" Type="Boolean" ExportId="">
@@ -92,14 +92,14 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="RequestFactory" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="TenantConnectionRequestInfo"/>
+                    <AttributeInfo Id="RelationshipFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="TenantRelationshipInfo"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectTypes" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Types"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TableName" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="TenantConnectionRequests"/>
+                        <Data IsEnabled="true" Value="TenantRelationships"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
@@ -107,7 +107,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="TenantConnectionRequestInfo" PackageId="ImtAuthPck" ComponentId="TenantConnectionRequestInfo">
+        <Element Id="TenantRelationshipInfo" PackageId="ImtAuthPck" ComponentId="TenantRelationshipInfo">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap/>
             </Data>
@@ -118,14 +118,14 @@
                     <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>TenantConnectionRequest</Value>
+                                <Value>TenantRelationship</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>TenantConnectionRequest</Value>
+                                <Value>TenantRelationship</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -139,11 +139,11 @@
         <Interface InterfaceId="imtbase::ICollectionInfo" ComponentId="Repository"/>
         <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="Repository"/>
         <Interface InterfaceId="imtdb::ISqlDatabaseObjectCollection" ComponentId="Repository"/>
-        <Interface InterfaceId="imtdb::ISqlDatabaseObjectDelegate" ComponentId="TenantConnectionRequestDatabaseDelegate"/>
+        <Interface InterfaceId="imtdb::ISqlDatabaseObjectDelegate" ComponentId="TenantRelationshipDatabaseDelegate"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="Repository"/>
     </ExportedInterfaces>
     <ExportedComponents>
-        <Component ExportedId="TenantConnectionRequestDatabaseDelegate" ComponentId="TenantConnectionRequestDatabaseDelegate"/>
-        <Component ExportedId="TenantConnectionRequestRepository" ComponentId="Repository"/>
+        <Component ExportedId="TenantRelationshipDatabaseDelegate" ComponentId="TenantRelationshipDatabaseDelegate"/>
+        <Component ExportedId="TenantRelationshipRepository" ComponentId="Repository"/>
     </ExportedComponents>
 </Acf>
