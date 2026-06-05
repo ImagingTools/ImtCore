@@ -95,6 +95,9 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ObjectIdColumn" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="TenantId"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ObjectTypes" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Types"/>
                     </AttributeInfo>
