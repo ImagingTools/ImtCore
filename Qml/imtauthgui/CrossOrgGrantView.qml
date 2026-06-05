@@ -191,7 +191,7 @@ ViewBase {
 			filterPlaceholder: qsTr("Select roles...")
 			preselectedIds: container.__selectedRoleIds
 
-			onSelectionConfirmed: {
+			onItemSelected: {
 				container.__selectedRoleIds = selectedIds || []
 				var names = []
 				if (dataProvider) {

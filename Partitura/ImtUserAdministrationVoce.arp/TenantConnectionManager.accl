@@ -8,13 +8,18 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ConnectionCodesNotificationPublisher" X="550" Y="100" Note=""/>
-        <Element ComponentName="TenantConnectionCodeInfo" X="975" Y="325" Note=""/>
-        <Element ComponentName="TenantConnectionInfo" X="150" Y="425" Note=""/>
-        <Element ComponentName="TenantConnectionRequestInfo" X="550" Y="525" Note=""/>
-        <Element ComponentName="TenantConnectionRequestManager" X="550" Y="325" Note=""/>
-        <Element ComponentName="TenantRelationshipInfo" X="175" Y="525" Note=""/>
-        <Element ComponentName="TenantRelationshipProposalInfo" X="200" Y="200" Note=""/>
+        <Element ComponentName="CollectionDocumentService" X="450" Y="550" Note=""/>
+        <Element ComponentName="ConnectionCodesNotificationPublisher" X="900" Y="450" Note=""/>
+        <Element ComponentName="Demultiplexer" X="300" Y="700" Note=""/>
+        <Element ComponentName="DocumentCommandsController" X="575" Y="325" Note=""/>
+        <Element ComponentName="RelationshipCollectionDocumentService" X="900" Y="600" Note=""/>
+        <Element ComponentName="SlaveSubscriberController" X="625" Y="700" Note=""/>
+        <Element ComponentName="TenantConnectionCodeInfo" X="1025" Y="200" Note=""/>
+        <Element ComponentName="TenantConnectionInfo" X="425" Y="200" Note=""/>
+        <Element ComponentName="TenantConnectionRequestInfo" X="700" Y="200" Note=""/>
+        <Element ComponentName="TenantConnectionRequestManager" X="600" Y="75" Note=""/>
+        <Element ComponentName="TenantRelationshipInfo" X="275" Y="425" Note=""/>
+        <Element ComponentName="TenantRelationshipProposalInfo" X="150" Y="200" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

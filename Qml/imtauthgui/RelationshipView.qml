@@ -5,8 +5,6 @@ import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 import imtcolgui 1.0
-import imtguigql 1.0
-import imtauthTenantsSdl 1.0
 import imtauthgui 1.0
 
 /**
@@ -27,7 +25,8 @@ ViewBase {
 	anchors.fill: parent
 	contentColor: Style.baseColor
 
-	property TenantRelationship relationshipData: model
+	property var relationshipData: model
+	property var apiClient: null
 
 	property string __selectedTargetTenantId: ""
 	property string __selectedTargetTenantName: ""
@@ -158,10 +157,7 @@ ViewBase {
 		id: tenantSelectComp
 
 		FilterableSelectPopup {
-			dataProvider: FilterableSelectGqlDataProvider {
-				collectionId: "Tenants"
-				multiSelect: false
-			}
+			dataProvider: container.apiClient ? container.apiClient.connectionsDataProvider : null
 			filterPlaceholder: qsTr("Select tenant...")
 			preselectedIds: container.__selectedTargetTenantId
 				? [container.__selectedTargetTenantId] : []

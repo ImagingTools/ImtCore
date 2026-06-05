@@ -599,7 +599,7 @@ RemoteCollectionView {
 							if (tenantEditor.representationController){
 								tenantEditor.representationController.updateRepresentationFromDocument()
 							}
-							container.doUpdateGui()
+
 							var newTenantId = tenantEditor.tenantData ? tenantEditor.tenantData.m_id : ""
 							var newTenantName = (tenantEditor.tenantData && tenantEditor.tenantData.m_name) || newTenantId
 							if (newTenantId && newTenantId !== AuthorizationController.currentTenantId){

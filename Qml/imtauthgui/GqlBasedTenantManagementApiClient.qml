@@ -38,6 +38,7 @@ QtObject {
 	// =========================================================================
 
 	property string productId: AuthorizationController.productId
+	property string tenantId: AuthorizationController.currentTenantId
 
 	property Component __roleDataComp: Component { RoleData {} }
 	property Component __groupDataComp: Component { GroupData {} }
@@ -2134,12 +2135,18 @@ QtObject {
 	// --- Relationship editor + representation controller ---
 	property Component __relationshipEditorComp: Component {
 		RelationshipView {
+			apiClient: root
 			commandsControllerComp: Component {
 				GqlBasedCommandsController {
 					typeId: root.relationshipObjectTypeId
 				}
 			}
 		}
+	}
+
+	property FilterableSelectGqlDataProvider connectionsDataProvider: FilterableSelectGqlDataProvider{
+		collectionId: "TenantConnections"
+		multiSelect: false
 	}
 
 	property Component __relationshipControllerComp: Component {
