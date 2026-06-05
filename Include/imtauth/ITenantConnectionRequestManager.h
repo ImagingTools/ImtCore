@@ -10,6 +10,9 @@
 // ACF includes
 #include <istd/IChangeable.h>
 
+// ImtCore includes
+#include <imtauth/ITenantRelationshipProposalInfo.h>
+
 
 namespace imtauth
 {
@@ -44,7 +47,7 @@ public:
 	virtual bool RemoveConnection(const QByteArray& connectionId, const QByteArray& tenantId) = 0;
 
 	// --- Relationship Proposals ---
-	virtual QByteArray CreateRelationshipProposal(const QByteArray& proposalId, const QByteArray& connectionId, const QByteArray& initiatorTenantId, const QByteArray& counterpartyTenantId) = 0;
+	virtual QByteArray CreateRelationshipProposal(const ITenantRelationshipProposalInfo& proposalInfo) = 0;
 	virtual QByteArray ApproveRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) = 0;
 	virtual bool RejectRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) = 0;
 	virtual bool CancelRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) = 0;

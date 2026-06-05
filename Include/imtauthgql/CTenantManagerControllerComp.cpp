@@ -1215,21 +1215,58 @@ sdl::V1_0::imtauth::CCreateRelationshipProposalPayload CTenantManagerControllerC
 	
 	sdl::V1_0::imtauth::CreateRelationshipProposalRequestArguments arguments = request.GetRequestedArguments();
 	
-	QByteArray connectionId;
-	QByteArray initiatorTenantId;
-	QByteArray counterpartyTenantId;
-	if (arguments.input->connectionId){
-		connectionId = *arguments.input->connectionId;
-	}
-	if (arguments.input->initiatorTenantId){
-		initiatorTenantId = *arguments.input->initiatorTenantId;
-	}
-	if (arguments.input->counterpartyTenantId){
-		counterpartyTenantId = *arguments.input->counterpartyTenantId;
+	if (!arguments.input->proposal){
+		response.errorMessage = QStringLiteral("Proposal data is required");
+		return response;
 	}
 	
-	QByteArray proposalId = m_connectionRequestManagerCompPtr->CreateRelationshipProposal(
-		QByteArray(), connectionId, initiatorTenantId, counterpartyTenantId);
+	auto& proposal = *arguments.input->proposal;
+	
+	// Build a proposal info object from the SDL data
+	imtauth::ITenantRelationshipProposalInfoUniquePtr proposalInfo = m_proposalFactoryCompPtr.CreateInstance();
+	if (!proposalInfo.IsValid()){
+		response.errorMessage = QStringLiteral("Failed to create proposal info instance");
+		return response;
+	}
+	
+	if (proposal.connectionId){
+		proposalInfo->SetConnectionId(*proposal.connectionId);
+	}
+	if (proposal.initiatorTenantId){
+		proposalInfo->SetInitiatorTenantId(*proposal.initiatorTenantId);
+	}
+	if (proposal.counterpartyTenantId){
+		proposalInfo->SetCounterpartyTenantId(*proposal.counterpartyTenantId);
+	}
+	if (proposal.proposalType){
+		proposalInfo->SetProposalType(imtauthgql::FromSdlProposalType(*proposal.proposalType));
+	}
+	if (proposal.existingRelationshipId){
+		proposalInfo->SetExistingRelationshipId(*proposal.existingRelationshipId);
+	}
+	if (proposal.proposedSourceRole){
+		proposalInfo->SetProposedSourceRole(imtauthgql::FromSdlRelationshipRole(*proposal.proposedSourceRole));
+	}
+	if (proposal.proposedTargetRole){
+		proposalInfo->SetProposedTargetRole(imtauthgql::FromSdlRelationshipRole(*proposal.proposedTargetRole));
+	}
+	if (proposal.proposedScope){
+		proposalInfo->SetProposedScope(*proposal.proposedScope);
+	}
+	if (proposal.proposedDescription){
+		proposalInfo->SetProposedDescription(*proposal.proposedDescription);
+	}
+	if (proposal.proposedValidFrom){
+		proposalInfo->SetProposedValidFrom(*proposal.proposedValidFrom);
+	}
+	if (proposal.proposedValidUntil){
+		proposalInfo->SetProposedValidUntil(*proposal.proposedValidUntil);
+	}
+	if (proposal.message){
+		proposalInfo->SetMessage(*proposal.message);
+	}
+	
+	QByteArray proposalId = m_connectionRequestManagerCompPtr->CreateRelationshipProposal(*proposalInfo);
 	if (proposalId.isEmpty()){
 		response.errorMessage = QStringLiteral("Failed to create relationship proposal. A valid connection is required.");
 	} else {

@@ -277,12 +277,12 @@ return false;
 
 // --- Relationship Proposals ---
 
-QByteArray CreateRelationshipProposal(
-const QByteArray& /*proposalId*/,
-const QByteArray& connectionId,
-const QByteArray& initiatorTenantId,
-const QByteArray& counterpartyTenantId)
+QByteArray CreateRelationshipProposal(const imtauth::ITenantRelationshipProposalInfo& proposalInfo)
 {
+QByteArray connectionId = proposalInfo.GetConnectionId();
+QByteArray initiatorTenantId = proposalInfo.GetInitiatorTenantId();
+QByteArray counterpartyTenantId = proposalInfo.GetCounterpartyTenantId();
+
 if (connectionId.isEmpty() || initiatorTenantId.isEmpty()){
 return QByteArray();
 }
@@ -302,7 +302,7 @@ stored.proposalId = QByteArray::number(++m_counter);
 stored.connectionId = connectionId;
 stored.initiatorTenantId = initiatorTenantId;
 stored.counterpartyTenantId = counterpartyTenantId;
-stored.proposalType = ITenantRelationshipProposalInfo::RPT_CREATE;
+stored.proposalType = proposalInfo.GetProposalType();
 stored.status = ITenantRelationshipProposalInfo::RPS_APPROVED_BY_INITIATOR;
 stored.createdAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 m_proposals.append(stored);

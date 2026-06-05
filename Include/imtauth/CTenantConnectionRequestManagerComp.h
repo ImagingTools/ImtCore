@@ -70,7 +70,7 @@ public:
 	virtual bool RemoveConnection(const QByteArray& connectionId, const QByteArray& tenantId) override;
 
 	// ITenantConnectionRequestManager - Relationship Proposals
-	virtual QByteArray CreateRelationshipProposal(const QByteArray& proposalId, const QByteArray& connectionId, const QByteArray& initiatorTenantId, const QByteArray& counterpartyTenantId) override;
+	virtual QByteArray CreateRelationshipProposal(const ITenantRelationshipProposalInfo& proposalInfo) override;
 	virtual QByteArray ApproveRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) override;
 	virtual bool RejectRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) override;
 	virtual bool CancelRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) override;

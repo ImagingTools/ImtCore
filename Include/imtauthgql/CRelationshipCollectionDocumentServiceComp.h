@@ -32,6 +32,7 @@ public:
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentService", "Collection document manager", false, "CollectionDocumentService");
 		I_ASSIGN(m_connectionRequestManagerCompPtr, "ConnectionRequestManager", "Connection request manager for relationship data", false, "TenantConnectionRequestManager");
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager for relationship updates", false, "TenantManager");
+		I_ASSIGN(m_proposalFactoryCompPtr, "ProposalFactory", "Relationship proposal factory", false, "TenantRelationshipProposalInfo");
 	I_END_COMPONENT
 
 protected:
@@ -49,6 +50,7 @@ private:
 	I_REF(imtdoc::IDocumentService, m_documentManagerCompPtr);
 	I_REF(imtauth::ITenantConnectionRequestManager, m_connectionRequestManagerCompPtr);
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
+	I_FACT(imtauth::ITenantRelationshipProposalInfo, m_proposalFactoryCompPtr);
 };
 
 

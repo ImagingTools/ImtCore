@@ -1437,6 +1437,7 @@ QtObject {
 	}
 
 	property CreateRelationshipProposalInput __createRelationshipProposalInput: CreateRelationshipProposalInput {}
+	property RelationshipProposal __createRelationshipProposalData: RelationshipProposal {}
 	property GqlSdlRequestSender __createRelationshipProposalSender: GqlSdlRequestSender {
 		requestType: 1
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_createRelationshipProposal
@@ -1539,14 +1540,15 @@ QtObject {
 	}
 
 	function createRelationshipProposal(connectionId, initiatorTenantId, proposalType, proposedSourceRole, proposedTargetRole, proposedScope, proposedDescription, message) {
-		root.__createRelationshipProposalInput.m_connectionId = connectionId || ""
-		root.__createRelationshipProposalInput.m_initiatorTenantId = initiatorTenantId || root.tenantId || ""
-		root.__createRelationshipProposalInput.m_proposalType = proposalType || RelationshipProposalTypeEnum.s_create
-		root.__createRelationshipProposalInput.m_proposedSourceRole = proposedSourceRole || TenantRelationshipRoleEnum.s_partner
-		root.__createRelationshipProposalInput.m_proposedTargetRole = proposedTargetRole || TenantRelationshipRoleEnum.s_partner
-		root.__createRelationshipProposalInput.m_proposedScope = proposedScope || ""
-		root.__createRelationshipProposalInput.m_proposedDescription = proposedDescription || ""
-		root.__createRelationshipProposalInput.m_message = message || ""
+		root.__createRelationshipProposalData.m_connectionId = connectionId || ""
+		root.__createRelationshipProposalData.m_initiatorTenantId = initiatorTenantId || root.tenantId || ""
+		root.__createRelationshipProposalData.m_proposalType = proposalType || RelationshipProposalTypeEnum.s_create
+		root.__createRelationshipProposalData.m_proposedSourceRole = proposedSourceRole || TenantRelationshipRoleEnum.s_partner
+		root.__createRelationshipProposalData.m_proposedTargetRole = proposedTargetRole || TenantRelationshipRoleEnum.s_partner
+		root.__createRelationshipProposalData.m_proposedScope = proposedScope || ""
+		root.__createRelationshipProposalData.m_proposedDescription = proposedDescription || ""
+		root.__createRelationshipProposalData.m_message = message || ""
+		root.__createRelationshipProposalInput.m_proposal = root.__createRelationshipProposalData
 		root.__createRelationshipProposalSender.send(root.__createRelationshipProposalInput)
 	}
 

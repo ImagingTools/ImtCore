@@ -406,17 +406,7 @@ type RelationshipProposal {
 }
 
 input CreateRelationshipProposalInput {
-	connectionId: ID!
-	initiatorTenantId: ID!
-	proposalType: RelationshipProposalType!
-	existingRelationshipId: ID
-	proposedSourceRole: TenantRelationshipRole!
-	proposedTargetRole: TenantRelationshipRole!
-	proposedScope: String
-	proposedDescription: String
-	proposedValidFrom: String
-	proposedValidUntil: String
-	message: String
+	proposal: RelationshipProposal!
 }
 
 type CreateRelationshipProposalPayload {

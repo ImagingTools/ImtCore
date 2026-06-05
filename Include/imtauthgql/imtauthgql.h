@@ -752,6 +752,19 @@ inline sdl::V1_0::imtauth::RelationshipProposalType ToSdlProposalType(imtauth::I
 }
 
 
+inline imtauth::ITenantRelationshipProposalInfo::RelationshipProposalType FromSdlProposalType(sdl::V1_0::imtauth::RelationshipProposalType type)
+{
+	switch (type){
+	case sdl::V1_0::imtauth::RelationshipProposalType::Update:
+		return imtauth::ITenantRelationshipProposalInfo::RPT_UPDATE;
+	case sdl::V1_0::imtauth::RelationshipProposalType::Delete:
+		return imtauth::ITenantRelationshipProposalInfo::RPT_DELETE;
+	default:
+		return imtauth::ITenantRelationshipProposalInfo::RPT_CREATE;
+	}
+}
+
+
 // Relationship Proposal Status
 
 inline sdl::V1_0::imtauth::RelationshipProposalStatus ToSdlProposalStatus(imtauth::ITenantRelationshipProposalInfo::RelationshipProposalStatus status)

@@ -730,11 +730,12 @@ return true;
 // --- Relationship Proposals ---
 
 QByteArray CTenantConnectionRequestManagerComp::CreateRelationshipProposal(
-const QByteArray& /*proposalId*/,
-const QByteArray& connectionId,
-const QByteArray& initiatorTenantId,
-const QByteArray& counterpartyTenantId)
+const ITenantRelationshipProposalInfo& proposalInfo)
 {
+QByteArray connectionId = proposalInfo.GetConnectionId();
+QByteArray initiatorTenantId = proposalInfo.GetInitiatorTenantId();
+QByteArray counterpartyTenantId = proposalInfo.GetCounterpartyTenantId();
+
 if (connectionId.isEmpty() || initiatorTenantId.isEmpty() || counterpartyTenantId.isEmpty()){
 SendErrorMessage(0, "Connection ID and both tenant IDs are required", "CTenantConnectionRequestManagerComp");
 return QByteArray();
@@ -767,7 +768,17 @@ newProposal->SetProposalId(newProposalId);
 newProposal->SetConnectionId(connectionId);
 newProposal->SetInitiatorTenantId(initiatorTenantId);
 newProposal->SetCounterpartyTenantId(counterpartyTenantId);
-newProposal->SetProposalType(ITenantRelationshipProposalInfo::RPT_CREATE);
+newProposal->SetProposalType(proposalInfo.GetProposalType());
+newProposal->SetProposedSourceRole(proposalInfo.GetProposedSourceRole());
+newProposal->SetProposedTargetRole(proposalInfo.GetProposedTargetRole());
+newProposal->SetProposedScope(proposalInfo.GetProposedScope());
+newProposal->SetProposedDescription(proposalInfo.GetProposedDescription());
+newProposal->SetProposedValidFrom(proposalInfo.GetProposedValidFrom());
+newProposal->SetProposedValidUntil(proposalInfo.GetProposedValidUntil());
+newProposal->SetMessage(proposalInfo.GetMessage());
+if (!proposalInfo.GetExistingRelationshipId().isEmpty()){
+newProposal->SetExistingRelationshipId(proposalInfo.GetExistingRelationshipId());
+}
 newProposal->SetStatus(ITenantRelationshipProposalInfo::RPS_APPROVED_BY_INITIATOR); // Initiator auto-approves
 QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 newProposal->SetCreatedAt(now);

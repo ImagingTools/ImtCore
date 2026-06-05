@@ -40,6 +40,7 @@ public:
 		I_ASSIGN(m_connectionCollectionCompPtr, "ConnectionCollection", "Connections collection", false, "ConnectionCollection");
 		I_ASSIGN(m_messageBrokerCompPtr, "CrossTenantMessageBroker", "Broker for cross-tenant messages", false, "CrossTenantMessageBroker");
 		I_ASSIGN(m_orderRequestManagerCompPtr, "OrderRequestManager", "Manager for order requests", false, "OrderRequestManager");
+		I_ASSIGN(m_proposalFactoryCompPtr, "ProposalFactory", "Relationship proposal factory", false, "TenantRelationshipProposalInfo");
 	I_END_COMPONENT;
 
 protected:
@@ -227,6 +228,7 @@ private:
 	I_REF(imtbase::IObjectCollection, m_connectionCollectionCompPtr);
 	I_REF(imtauth::ICrossTenantMessage, m_messageBrokerCompPtr);
 	I_REF(imtauth::IOrderRequest, m_orderRequestManagerCompPtr);
+	I_FACT(imtauth::ITenantRelationshipProposalInfo, m_proposalFactoryCompPtr);
 };
 
 

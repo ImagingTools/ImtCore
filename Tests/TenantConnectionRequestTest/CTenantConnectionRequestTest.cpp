@@ -3,6 +3,27 @@
 
 // ImtCore includes
 #include <imtauth/CTenantConnectionRequest.h>
+#include <imtauth/CTenantRelationshipProposal.h>
+
+
+namespace {
+
+imtauth::CTenantRelationshipProposal createProposalInfo(
+const QByteArray& connectionId,
+const QByteArray& initiatorTenantId,
+const QByteArray& counterpartyTenantId)
+{
+imtauth::CTenantRelationshipProposal proposal;
+proposal.SetConnectionId(connectionId);
+proposal.SetInitiatorTenantId(initiatorTenantId);
+proposal.SetCounterpartyTenantId(counterpartyTenantId);
+proposal.SetProposalType(imtauth::ITenantRelationshipProposalInfo::RPT_CREATE);
+proposal.SetProposedSourceRole(imtauth::ITenantRelationshipInfo::TRR_PARTNER);
+proposal.SetProposedTargetRole(imtauth::ITenantRelationshipInfo::TRR_PARTNER);
+return proposal;
+}
+
+} // anonymous namespace
 
 
 void CTenantConnectionRequestTest::init()
@@ -229,7 +250,7 @@ QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connec
 QByteArray connId = m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
 
 // Create a relationship via proposal
-QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(QByteArray(), connId, "tenantA", "tenantB");
+QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(createProposalInfo(connId, "tenantA", "tenantB"));
 m_managerPtr->ApproveRelationshipProposal(proposalId, "tenantB");
 
 QCOMPARE(m_managerPtr->GetTenantRelationshipIds("tenantA").size(), 1);
@@ -249,7 +270,7 @@ auto codeB = m_managerPtr->GetConnectionCode("tenantB");
 QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
 QByteArray connId = m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
 
-QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(QByteArray(), connId, "tenantA", "tenantB");
+QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(createProposalInfo(connId, "tenantA", "tenantB"));
 QVERIFY(!proposalId.isEmpty());
 QCOMPARE(m_managerPtr->m_proposals.size(), 1);
 QCOMPARE(m_managerPtr->m_proposals.first().status, imtauth::ITenantRelationshipProposalInfo::RPS_APPROVED_BY_INITIATOR);
@@ -258,7 +279,7 @@ QCOMPARE(m_managerPtr->m_proposals.first().status, imtauth::ITenantRelationshipP
 
 void CTenantConnectionRequestTest::testCreateRelationshipProposal_NoConnection_Fails()
 {
-QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(QByteArray(), "nonexistent-conn", "tenantA", "tenantB");
+QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(createProposalInfo("nonexistent-conn", "tenantA", "tenantB"));
 QVERIFY(proposalId.isEmpty());
 }
 
@@ -269,7 +290,7 @@ auto codeB = m_managerPtr->GetConnectionCode("tenantB");
 QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
 QByteArray connId = m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
 
-QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(QByteArray(), connId, "tenantA", "tenantB");
+QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(createProposalInfo(connId, "tenantA", "tenantB"));
 QByteArray relId = m_managerPtr->ApproveRelationshipProposal(proposalId, "tenantB");
 QVERIFY(!relId.isEmpty());
 QCOMPARE(m_managerPtr->m_proposals.first().status, imtauth::ITenantRelationshipProposalInfo::RPS_APPLIED);
@@ -286,7 +307,7 @@ auto codeB = m_managerPtr->GetConnectionCode("tenantB");
 QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
 QByteArray connId = m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
 
-QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(QByteArray(), connId, "tenantA", "tenantB");
+QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(createProposalInfo(connId, "tenantA", "tenantB"));
 QVERIFY(m_managerPtr->RejectRelationshipProposal(proposalId, "tenantB"));
 QCOMPARE(m_managerPtr->m_proposals.first().status, imtauth::ITenantRelationshipProposalInfo::RPS_REJECTED);
 }
@@ -298,7 +319,7 @@ auto codeB = m_managerPtr->GetConnectionCode("tenantB");
 QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
 QByteArray connId = m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
 
-QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(QByteArray(), connId, "tenantA", "tenantB");
+QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(createProposalInfo(connId, "tenantA", "tenantB"));
 QVERIFY(m_managerPtr->CancelRelationshipProposal(proposalId, "tenantA"));
 QCOMPARE(m_managerPtr->m_proposals.first().status, imtauth::ITenantRelationshipProposalInfo::RPS_CANCELED);
 }
@@ -310,7 +331,7 @@ auto codeB = m_managerPtr->GetConnectionCode("tenantB");
 QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
 QByteArray connId = m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
 
-QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(QByteArray(), connId, "tenantA", "tenantB");
+QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(createProposalInfo(connId, "tenantA", "tenantB"));
 // TenantA is initiator, not counterparty
 QByteArray relId = m_managerPtr->ApproveRelationshipProposal(proposalId, "tenantA");
 QVERIFY(relId.isEmpty());
@@ -325,7 +346,7 @@ auto codeB = m_managerPtr->GetConnectionCode("tenantB");
 QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
 QByteArray connId = m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
 
-QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(QByteArray(), connId, "tenantA", "tenantB");
+QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(createProposalInfo(connId, "tenantA", "tenantB"));
 m_managerPtr->ApproveRelationshipProposal(proposalId, "tenantB");
 
 QByteArrayList relsA = m_managerPtr->GetTenantRelationshipIds("tenantA");
@@ -342,7 +363,7 @@ auto codeB = m_managerPtr->GetConnectionCode("tenantB");
 QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
 QByteArray connId = m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
 
-QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(QByteArray(), connId, "tenantA", "tenantB");
+QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(createProposalInfo(connId, "tenantA", "tenantB"));
 QByteArray relationshipId = m_managerPtr->ApproveRelationshipProposal(proposalId, "tenantB");
 
 QVERIFY(m_managerPtr->RemoveTenantRelationship("tenantA", relationshipId));

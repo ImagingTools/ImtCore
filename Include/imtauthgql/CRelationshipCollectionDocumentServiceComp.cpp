@@ -121,21 +121,43 @@ if (arguments.input->relationship){
 relData = *arguments.input->relationship;
 }
 
-QByteArray connectionId;
-QByteArray initiatorTenantId;
-QByteArray counterpartyTenantId;
-if (relData.connectionId){
-connectionId = *relData.connectionId;
-}
-if (relData.sourceTenantId){
-initiatorTenantId = *relData.sourceTenantId;
-}
-if (relData.targetTenantId){
-counterpartyTenantId = *relData.targetTenantId;
+// Build a proposal info from the relationship data
+imtauth::ITenantRelationshipProposalInfoUniquePtr proposalInfo = m_proposalFactoryCompPtr.CreateInstance();
+if (!proposalInfo.IsValid()){
+errorMessage = QStringLiteral("Failed to create proposal info instance");
+return response;
 }
 
-QByteArray proposalId = m_connectionRequestManagerCompPtr->CreateRelationshipProposal(
-QByteArray(), connectionId, initiatorTenantId, counterpartyTenantId);
+if (relData.connectionId){
+proposalInfo->SetConnectionId(*relData.connectionId);
+}
+if (relData.sourceTenantId){
+proposalInfo->SetInitiatorTenantId(*relData.sourceTenantId);
+}
+if (relData.targetTenantId){
+proposalInfo->SetCounterpartyTenantId(*relData.targetTenantId);
+}
+if (relData.sourceRole){
+proposalInfo->SetProposedSourceRole(imtauthgql::FromSdlRelationshipRole(*relData.sourceRole));
+}
+if (relData.targetRole){
+proposalInfo->SetProposedTargetRole(imtauthgql::FromSdlRelationshipRole(*relData.targetRole));
+}
+if (relData.scope){
+proposalInfo->SetProposedScope(*relData.scope);
+}
+if (relData.description){
+proposalInfo->SetProposedDescription(*relData.description);
+}
+if (relData.validFrom){
+proposalInfo->SetProposedValidFrom(*relData.validFrom);
+}
+if (relData.validUntil){
+proposalInfo->SetProposedValidUntil(*relData.validUntil);
+}
+proposalInfo->SetProposalType(imtauth::ITenantRelationshipProposalInfo::RPT_UPDATE);
+
+QByteArray proposalId = m_connectionRequestManagerCompPtr->CreateRelationshipProposal(*proposalInfo);
 if (proposalId.isEmpty()){
 errorMessage = QStringLiteral("Failed to create relationship proposal");
 return response;
