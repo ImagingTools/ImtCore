@@ -98,36 +98,36 @@ sdl::V1_0::imtauth::ITenantConnectionRequest::ConnectionStatus ToSdlConnectionSt
 }
 
 
-sdl::V1_0::imtauth::ITenantRelationshipProposalData::RelationshipProposalType ToSdlProposalType(imtauth::ITenantRelationshipProposalData::RelationshipProposalType type)
+sdl::V1_0::imtauth::ITenantRelationshipProposalInfo::RelationshipProposalType ToSdlProposalType(imtauth::ITenantRelationshipProposalInfo::RelationshipProposalType type)
 {
 	switch (type){
-	case imtauth::ITenantRelationshipProposalData::RPT_UPDATE:
-		return sdl::V1_0::imtauth::ITenantRelationshipProposalData::RelationshipProposalType::Update;
-	case imtauth::ITenantRelationshipProposalData::RPT_DELETE:
-		return sdl::V1_0::imtauth::ITenantRelationshipProposalData::RelationshipProposalType::Delete;
+	case imtauth::ITenantRelationshipProposalInfo::RPT_UPDATE:
+		return sdl::V1_0::imtauth::ITenantRelationshipProposalInfo::RelationshipProposalType::Update;
+	case imtauth::ITenantRelationshipProposalInfo::RPT_DELETE:
+		return sdl::V1_0::imtauth::ITenantRelationshipProposalInfo::RelationshipProposalType::Delete;
 	default:
-		return sdl::V1_0::imtauth::ITenantRelationshipProposalData::RelationshipProposalType::Create;
+		return sdl::V1_0::imtauth::ITenantRelationshipProposalInfo::RelationshipProposalType::Create;
 	}
 }
 
 
-sdl::V1_0::imtauth::ITenantRelationshipProposalData::RelationshipProposalStatus ToSdlProposalStatus(imtauth::ITenantRelationshipProposalData::RelationshipProposalStatus status)
+sdl::V1_0::imtauth::ITenantRelationshipProposalInfo::RelationshipProposalStatus ToSdlProposalStatus(imtauth::ITenantRelationshipProposalInfo::RelationshipProposalStatus status)
 {
 	switch (status){
-	case imtauth::ITenantRelationshipProposalData::RPS_APPROVED_BY_INITIATOR:
-		return sdl::V1_0::imtauth::ITenantRelationshipProposalData::RelationshipProposalStatus::ApprovedByInitiator;
-	case imtauth::ITenantRelationshipProposalData::RPS_APPROVED_BY_COUNTERPARTY:
-		return sdl::V1_0::imtauth::ITenantRelationshipProposalData::RelationshipProposalStatus::ApprovedByCounterparty;
-	case imtauth::ITenantRelationshipProposalData::RPS_REJECTED:
-		return sdl::V1_0::imtauth::ITenantRelationshipProposalData::RelationshipProposalStatus::Rejected;
-	case imtauth::ITenantRelationshipProposalData::RPS_CANCELED:
-		return sdl::V1_0::imtauth::ITenantRelationshipProposalData::RelationshipProposalStatus::Canceled;
-	case imtauth::ITenantRelationshipProposalData::RPS_EXPIRED:
-		return sdl::V1_0::imtauth::ITenantRelationshipProposalData::RelationshipProposalStatus::Expired;
-	case imtauth::ITenantRelationshipProposalData::RPS_APPLIED:
-		return sdl::V1_0::imtauth::ITenantRelationshipProposalData::RelationshipProposalStatus::Applied;
+	case imtauth::ITenantRelationshipProposalInfo::RPS_APPROVED_BY_INITIATOR:
+		return sdl::V1_0::imtauth::ITenantRelationshipProposalInfo::RelationshipProposalStatus::ApprovedByInitiator;
+	case imtauth::ITenantRelationshipProposalInfo::RPS_APPROVED_BY_COUNTERPARTY:
+		return sdl::V1_0::imtauth::ITenantRelationshipProposalInfo::RelationshipProposalStatus::ApprovedByCounterparty;
+	case imtauth::ITenantRelationshipProposalInfo::RPS_REJECTED:
+		return sdl::V1_0::imtauth::ITenantRelationshipProposalInfo::RelationshipProposalStatus::Rejected;
+	case imtauth::ITenantRelationshipProposalInfo::RPS_CANCELED:
+		return sdl::V1_0::imtauth::ITenantRelationshipProposalInfo::RelationshipProposalStatus::Canceled;
+	case imtauth::ITenantRelationshipProposalInfo::RPS_EXPIRED:
+		return sdl::V1_0::imtauth::ITenantRelationshipProposalInfo::RelationshipProposalStatus::Expired;
+	case imtauth::ITenantRelationshipProposalInfo::RPS_APPLIED:
+		return sdl::V1_0::imtauth::ITenantRelationshipProposalInfo::RelationshipProposalStatus::Applied;
 	default:
-		return sdl::V1_0::imtauth::ITenantRelationshipProposalData::RelationshipProposalStatus::Pending;
+		return sdl::V1_0::imtauth::ITenantRelationshipProposalInfo::RelationshipProposalStatus::Pending;
 	}
 }
 

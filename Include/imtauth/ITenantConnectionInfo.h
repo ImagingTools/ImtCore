@@ -19,7 +19,7 @@ Serializable data holder for a tenant connection.
 Used as the stored representation inside an object collection
 (e.g. an SQL-backed repository).
 */
-class ITenantConnectionData: virtual public iser::IObject
+class ITenantConnectionInfo: virtual public iser::IObject
 {
 public:
 	virtual ITenantConnectionRequest::TenantConnectionInfo GetConnectionInfo() const = 0;
@@ -28,8 +28,8 @@ public:
 };
 
 
-typedef istd::TUniqueInterfacePtr<ITenantConnectionData> ITenantConnectionDataUniquePtr;
-typedef istd::TSharedInterfacePtr<ITenantConnectionData> ITenantConnectionDataSharedPtr;
+typedef istd::TUniqueInterfacePtr<ITenantConnectionInfo> ITenantConnectionInfoUniquePtr;
+typedef istd::TSharedInterfacePtr<ITenantConnectionInfo> ITenantConnectionInfoSharedPtr;
 
 
 } // namespace imtauth

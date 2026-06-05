@@ -23,7 +23,7 @@ if (!m_connectionCodeCollectionCompPtr.IsValid() || !m_connectionCodeFactoryComp
 return false;
 }
 
-ITenantConnectionCodeDataUniquePtr dataPtr = m_connectionCodeFactoryCompPtr.CreateInstance();
+ITenantConnectionCodeInfoUniquePtr dataPtr = m_connectionCodeFactoryCompPtr.CreateInstance();
 if (!dataPtr.IsValid()){
 return false;
 }
@@ -71,7 +71,7 @@ if (!m_connectionCollectionCompPtr.IsValid() || !m_connectionFactoryCompPtr.IsVa
 return false;
 }
 
-ITenantConnectionDataUniquePtr dataPtr = m_connectionFactoryCompPtr.CreateInstance();
+ITenantConnectionInfoUniquePtr dataPtr = m_connectionFactoryCompPtr.CreateInstance();
 if (!dataPtr.IsValid()){
 return false;
 }
@@ -95,7 +95,7 @@ if (!m_proposalCollectionCompPtr.IsValid() || !m_proposalFactoryCompPtr.IsValid(
 return false;
 }
 
-ITenantRelationshipProposalDataUniquePtr dataPtr = m_proposalFactoryCompPtr.CreateInstance();
+ITenantRelationshipProposalInfoUniquePtr dataPtr = m_proposalFactoryCompPtr.CreateInstance();
 if (!dataPtr.IsValid()){
 return false;
 }
@@ -133,7 +133,7 @@ return QByteArray();
 for (const QByteArray& id : m_connectionCodeCollectionCompPtr->GetElementIds()){
 imtbase::IObjectCollection::DataPtr dataPtr;
 if (m_connectionCodeCollectionCompPtr->GetObjectData(id, dataPtr)){
-const ITenantConnectionCodeData* codePtr = dynamic_cast<const ITenantConnectionCodeData*>(dataPtr.GetPtr());
+const ITenantConnectionCodeInfo* codePtr = dynamic_cast<const ITenantConnectionCodeInfo*>(dataPtr.GetPtr());
 if (codePtr != nullptr && codePtr->GetCodeInfo().connectionCode == connectionCode){
 return id;
 }
@@ -152,7 +152,7 @@ return false;
 for (const QByteArray& id : m_connectionCollectionCompPtr->GetElementIds()){
 imtbase::IObjectCollection::DataPtr dataPtr;
 if (m_connectionCollectionCompPtr->GetObjectData(id, dataPtr)){
-const ITenantConnectionData* connPtr = dynamic_cast<const ITenantConnectionData*>(dataPtr.GetPtr());
+const ITenantConnectionInfo* connPtr = dynamic_cast<const ITenantConnectionInfo*>(dataPtr.GetPtr());
 if (connPtr == nullptr){
 continue;
 }
@@ -228,7 +228,7 @@ if (!m_relationshipCollectionCompPtr.IsValid() || !m_relationshipFactoryCompPtr.
 return false;
 }
 
-if (proposal.proposalType == ITenantRelationshipProposalData::RPT_CREATE){
+if (proposal.proposalType == ITenantRelationshipProposalInfo::RPT_CREATE){
 istd::TUniqueInterfacePtr<ITenantRelationshipInfo> relPtr = m_relationshipFactoryCompPtr.CreateInstance();
 if (!relPtr.IsValid()){
 return false;
@@ -250,7 +250,7 @@ relPtr->SetCreatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs)
 QByteArray storedId = m_relationshipCollectionCompPtr->InsertNewObject("TenantRelationship", QString(), QString(), relPtr.GetPtr(), relId);
 return !storedId.isEmpty();
 }
-else if (proposal.proposalType == ITenantRelationshipProposalData::RPT_UPDATE){
+else if (proposal.proposalType == ITenantRelationshipProposalInfo::RPT_UPDATE){
 imtbase::IObjectCollection::DataPtr dataPtr;
 if (!m_relationshipCollectionCompPtr->GetObjectData(proposal.existingRelationshipId, dataPtr)){
 return false;
@@ -273,7 +273,7 @@ updatedPtr->SetValidUntil(proposal.proposedValidUntil);
 updatedPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs));
 return m_relationshipCollectionCompPtr->SetObjectData(proposal.existingRelationshipId, *updatedPtr);
 }
-else if (proposal.proposalType == ITenantRelationshipProposalData::RPT_DELETE){
+else if (proposal.proposalType == ITenantRelationshipProposalInfo::RPT_DELETE){
 imtbase::IObjectCollection::DataPtr dataPtr;
 if (!m_relationshipCollectionCompPtr->GetObjectData(proposal.existingRelationshipId, dataPtr)){
 return false;
@@ -306,7 +306,7 @@ return TenantConnectionCodeInfo();
 if (m_connectionCodeCollectionCompPtr.IsValid()){
 imtbase::IObjectCollection::DataPtr dataPtr;
 if (m_connectionCodeCollectionCompPtr->GetObjectData(tenantId, dataPtr)){
-const ITenantConnectionCodeData* codePtr = dynamic_cast<const ITenantConnectionCodeData*>(dataPtr.GetPtr());
+const ITenantConnectionCodeInfo* codePtr = dynamic_cast<const ITenantConnectionCodeInfo*>(dataPtr.GetPtr());
 if (codePtr != nullptr){
 return codePtr->GetCodeInfo();
 }
@@ -543,7 +543,7 @@ return result;
 for (const QByteArray& id : m_connectionCollectionCompPtr->GetElementIds()){
 imtbase::IObjectCollection::DataPtr dataPtr;
 if (m_connectionCollectionCompPtr->GetObjectData(id, dataPtr)){
-const ITenantConnectionData* connPtr = dynamic_cast<const ITenantConnectionData*>(dataPtr.GetPtr());
+const ITenantConnectionInfo* connPtr = dynamic_cast<const ITenantConnectionInfo*>(dataPtr.GetPtr());
 if (connPtr != nullptr){
 TenantConnectionInfo info = connPtr->GetConnectionInfo();
 if (info.status == CS_ACTIVE && (info.tenantAId == tenantId || info.tenantBId == tenantId)){
@@ -567,7 +567,7 @@ if (!m_connectionCollectionCompPtr->GetObjectData(connectionId, dataPtr)){
 return false;
 }
 
-const ITenantConnectionData* connPtr = dynamic_cast<const ITenantConnectionData*>(dataPtr.GetPtr());
+const ITenantConnectionInfo* connPtr = dynamic_cast<const ITenantConnectionInfo*>(dataPtr.GetPtr());
 if (connPtr == nullptr){
 return false;
 }
@@ -610,7 +610,7 @@ bool connectionValid = false;
 if (m_connectionCollectionCompPtr.IsValid()){
 imtbase::IObjectCollection::DataPtr dataPtr;
 if (m_connectionCollectionCompPtr->GetObjectData(connectionId, dataPtr)){
-const ITenantConnectionData* connPtr = dynamic_cast<const ITenantConnectionData*>(dataPtr.GetPtr());
+const ITenantConnectionInfo* connPtr = dynamic_cast<const ITenantConnectionInfo*>(dataPtr.GetPtr());
 if (connPtr != nullptr && connPtr->GetConnectionInfo().status == CS_ACTIVE){
 connectionValid = true;
 }
@@ -628,8 +628,8 @@ newProposal.proposalId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 newProposal.connectionId = connectionId;
 newProposal.initiatorTenantId = initiatorTenantId;
 newProposal.counterpartyTenantId = counterpartyTenantId;
-newProposal.proposalType = ITenantRelationshipProposalData::RPT_CREATE;
-newProposal.status = ITenantRelationshipProposalData::RPS_APPROVED_BY_INITIATOR; // Initiator auto-approves
+newProposal.proposalType = ITenantRelationshipProposalInfo::RPT_CREATE;
+newProposal.status = ITenantRelationshipProposalInfo::RPS_APPROVED_BY_INITIATOR; // Initiator auto-approves
 newProposal.createdAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 newProposal.updatedAt = newProposal.createdAt;
 
@@ -651,7 +651,7 @@ if (!m_proposalCollectionCompPtr->GetObjectData(proposalId, dataPtr)){
 return QByteArray();
 }
 
-const ITenantRelationshipProposalData* proposalPtr = dynamic_cast<const ITenantRelationshipProposalData*>(dataPtr.GetPtr());
+const ITenantRelationshipProposalInfo* proposalPtr = dynamic_cast<const ITenantRelationshipProposalInfo*>(dataPtr.GetPtr());
 if (proposalPtr == nullptr){
 return QByteArray();
 }
@@ -659,9 +659,9 @@ return QByteArray();
 RelationshipProposalInfo p = proposalPtr->GetProposalInfo();
 
 // The counterparty approves
-if (p.counterpartyTenantId == tenantId && p.status == ITenantRelationshipProposalData::RPS_APPROVED_BY_INITIATOR){
+if (p.counterpartyTenantId == tenantId && p.status == ITenantRelationshipProposalInfo::RPS_APPROVED_BY_INITIATOR){
 istd::CChangeNotifier changeNotifier(this);
-p.status = ITenantRelationshipProposalData::RPS_APPLIED;
+p.status = ITenantRelationshipProposalInfo::RPS_APPLIED;
 p.updatedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 StoreProposal(proposalId, p);
 if (ApplyRelationshipProposal(p)){
@@ -677,9 +677,9 @@ return QByteArray();
 }
 
 // The initiator approves (when counterparty already approved)
-if (p.initiatorTenantId == tenantId && p.status == ITenantRelationshipProposalData::RPS_APPROVED_BY_COUNTERPARTY){
+if (p.initiatorTenantId == tenantId && p.status == ITenantRelationshipProposalInfo::RPS_APPROVED_BY_COUNTERPARTY){
 istd::CChangeNotifier changeNotifier(this);
-p.status = ITenantRelationshipProposalData::RPS_APPLIED;
+p.status = ITenantRelationshipProposalInfo::RPS_APPLIED;
 p.updatedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 StoreProposal(proposalId, p);
 if (ApplyRelationshipProposal(p)){
@@ -694,9 +694,9 @@ return QByteArray();
 }
 
 // If initiator hasn't approved yet but counterparty is approving
-if (p.counterpartyTenantId == tenantId && p.status == ITenantRelationshipProposalData::RPS_PENDING){
+if (p.counterpartyTenantId == tenantId && p.status == ITenantRelationshipProposalInfo::RPS_PENDING){
 istd::CChangeNotifier changeNotifier(this);
-p.status = ITenantRelationshipProposalData::RPS_APPROVED_BY_COUNTERPARTY;
+p.status = ITenantRelationshipProposalInfo::RPS_APPROVED_BY_COUNTERPARTY;
 p.updatedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 StoreProposal(proposalId, p);
 return QByteArray();
@@ -717,7 +717,7 @@ if (!m_proposalCollectionCompPtr->GetObjectData(proposalId, dataPtr)){
 return false;
 }
 
-const ITenantRelationshipProposalData* proposalPtr = dynamic_cast<const ITenantRelationshipProposalData*>(dataPtr.GetPtr());
+const ITenantRelationshipProposalInfo* proposalPtr = dynamic_cast<const ITenantRelationshipProposalInfo*>(dataPtr.GetPtr());
 if (proposalPtr == nullptr){
 return false;
 }
@@ -726,12 +726,12 @@ RelationshipProposalInfo p = proposalPtr->GetProposalInfo();
 if (p.initiatorTenantId != tenantId && p.counterpartyTenantId != tenantId){
 return false;
 }
-if (p.status == ITenantRelationshipProposalData::RPS_APPLIED || p.status == ITenantRelationshipProposalData::RPS_REJECTED || p.status == ITenantRelationshipProposalData::RPS_CANCELED){
+if (p.status == ITenantRelationshipProposalInfo::RPS_APPLIED || p.status == ITenantRelationshipProposalInfo::RPS_REJECTED || p.status == ITenantRelationshipProposalInfo::RPS_CANCELED){
 return false;
 }
 
 istd::CChangeNotifier changeNotifier(this);
-p.status = ITenantRelationshipProposalData::RPS_REJECTED;
+p.status = ITenantRelationshipProposalInfo::RPS_REJECTED;
 p.updatedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 return StoreProposal(proposalId, p);
 }
@@ -748,7 +748,7 @@ if (!m_proposalCollectionCompPtr->GetObjectData(proposalId, dataPtr)){
 return false;
 }
 
-const ITenantRelationshipProposalData* proposalPtr = dynamic_cast<const ITenantRelationshipProposalData*>(dataPtr.GetPtr());
+const ITenantRelationshipProposalInfo* proposalPtr = dynamic_cast<const ITenantRelationshipProposalInfo*>(dataPtr.GetPtr());
 if (proposalPtr == nullptr){
 return false;
 }
@@ -757,12 +757,12 @@ RelationshipProposalInfo p = proposalPtr->GetProposalInfo();
 if (p.initiatorTenantId != tenantId){
 return false;
 }
-if (p.status == ITenantRelationshipProposalData::RPS_APPLIED || p.status == ITenantRelationshipProposalData::RPS_CANCELED){
+if (p.status == ITenantRelationshipProposalInfo::RPS_APPLIED || p.status == ITenantRelationshipProposalInfo::RPS_CANCELED){
 return false;
 }
 
 istd::CChangeNotifier changeNotifier(this);
-p.status = ITenantRelationshipProposalData::RPS_CANCELED;
+p.status = ITenantRelationshipProposalInfo::RPS_CANCELED;
 p.updatedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 return StoreProposal(proposalId, p);
 }
@@ -778,7 +778,7 @@ return result;
 for (const QByteArray& id : m_proposalCollectionCompPtr->GetElementIds()){
 imtbase::IObjectCollection::DataPtr dataPtr;
 if (m_proposalCollectionCompPtr->GetObjectData(id, dataPtr)){
-const ITenantRelationshipProposalData* proposalPtr = dynamic_cast<const ITenantRelationshipProposalData*>(dataPtr.GetPtr());
+const ITenantRelationshipProposalInfo* proposalPtr = dynamic_cast<const ITenantRelationshipProposalInfo*>(dataPtr.GetPtr());
 if (proposalPtr != nullptr){
 RelationshipProposalInfo info = proposalPtr->GetProposalInfo();
 if (info.initiatorTenantId == tenantId || info.counterpartyTenantId == tenantId){

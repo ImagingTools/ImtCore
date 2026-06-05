@@ -20,7 +20,7 @@ public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CTenantConnectionComp);
-		I_REGISTER_INTERFACE(ITenantConnectionData);
+		I_REGISTER_INTERFACE(ITenantConnectionInfo);
 		I_REGISTER_INTERFACE(iser::ISerializable);
 	I_END_COMPONENT;
 };

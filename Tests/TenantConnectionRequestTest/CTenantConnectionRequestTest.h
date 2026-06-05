@@ -10,7 +10,7 @@
 
 // ImtCore includes
 #include <imtauth/ITenantConnectionRequest.h>
-#include <imtauth/ITenantRelationshipProposalData.h>
+#include <imtauth/ITenantRelationshipProposalInfo.h>
 #include <imtauth/ITenantRelationshipInfo.h>
 
 
@@ -33,9 +33,9 @@ typedef ITenantConnectionRequest::ConnectionRequestInfo ConnectionRequestInfo;
 typedef ITenantConnectionRequest::ConnectionRequests ConnectionRequests;
 typedef ITenantConnectionRequest::TenantConnectionInfo TenantConnectionInfo;
 typedef ITenantConnectionRequest::TenantConnections TenantConnections;
-typedef ITenantRelationshipProposalData::RelationshipProposalInfo RelationshipProposalInfo;
-typedef ITenantRelationshipProposalData::RelationshipProposalStatus RelationshipProposalStatus;
-typedef ITenantRelationshipProposalData::RelationshipProposalType RelationshipProposalType;
+typedef ITenantRelationshipProposalInfo::RelationshipProposalInfo RelationshipProposalInfo;
+typedef ITenantRelationshipProposalInfo::RelationshipProposalStatus RelationshipProposalStatus;
+typedef ITenantRelationshipProposalInfo::RelationshipProposalType RelationshipProposalType;
 
 // --- Connection Code ---
 
@@ -263,8 +263,8 @@ stored.proposalId = QByteArray::number(++m_counter);
 stored.connectionId = connectionId;
 stored.initiatorTenantId = initiatorTenantId;
 stored.counterpartyTenantId = counterpartyTenantId;
-stored.proposalType = ITenantRelationshipProposalData::RPT_CREATE;
-stored.status = ITenantRelationshipProposalData::RPS_APPROVED_BY_INITIATOR;
+stored.proposalType = ITenantRelationshipProposalInfo::RPT_CREATE;
+stored.status = ITenantRelationshipProposalInfo::RPS_APPROVED_BY_INITIATOR;
 stored.createdAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 m_proposals.append(stored);
 return stored.proposalId;
@@ -279,10 +279,10 @@ continue;
 if (p.counterpartyTenantId != tenantId){
 return QByteArray();
 }
-if (p.status != ITenantRelationshipProposalData::RPS_APPROVED_BY_INITIATOR){
+if (p.status != ITenantRelationshipProposalInfo::RPS_APPROVED_BY_INITIATOR){
 return QByteArray();
 }
-p.status = ITenantRelationshipProposalData::RPS_APPLIED;
+p.status = ITenantRelationshipProposalInfo::RPS_APPLIED;
 p.updatedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 
 // Create relationship ID
@@ -299,8 +299,8 @@ bool RejectRelationshipProposal(const QByteArray& proposalId, const QByteArray& 
 {
 for (RelationshipProposalInfo& p : m_proposals){
 if (p.proposalId == proposalId && p.counterpartyTenantId == tenantId
-&& p.status == ITenantRelationshipProposalData::RPS_APPROVED_BY_INITIATOR){
-p.status = ITenantRelationshipProposalData::RPS_REJECTED;
+&& p.status == ITenantRelationshipProposalInfo::RPS_APPROVED_BY_INITIATOR){
+p.status = ITenantRelationshipProposalInfo::RPS_REJECTED;
 p.updatedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 return true;
 }
@@ -312,9 +312,9 @@ bool CancelRelationshipProposal(const QByteArray& proposalId, const QByteArray& 
 {
 for (RelationshipProposalInfo& p : m_proposals){
 if (p.proposalId == proposalId && p.initiatorTenantId == tenantId
-&& (p.status == ITenantRelationshipProposalData::RPS_PENDING
-|| p.status == ITenantRelationshipProposalData::RPS_APPROVED_BY_INITIATOR)){
-p.status = ITenantRelationshipProposalData::RPS_CANCELED;
+&& (p.status == ITenantRelationshipProposalInfo::RPS_PENDING
+|| p.status == ITenantRelationshipProposalInfo::RPS_APPROVED_BY_INITIATOR)){
+p.status = ITenantRelationshipProposalInfo::RPS_CANCELED;
 p.updatedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 return true;
 }

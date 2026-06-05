@@ -23,7 +23,7 @@ istd::IChangeableUniquePtr CTenantConnectionCodeDbDelegateComp::CreateObjectFrom
 		return nullptr;
 	}
 
-	istd::TUniqueInterfacePtr<imtauth::ITenantConnectionCodeData> codePtr = m_codeFactCompPtr.CreateInstance();
+	istd::TUniqueInterfacePtr<imtauth::ITenantConnectionCodeInfo> codePtr = m_codeFactCompPtr.CreateInstance();
 	if (!codePtr.IsValid()){
 		return nullptr;
 	}
@@ -59,7 +59,7 @@ CTenantConnectionCodeDbDelegateComp::NewObjectQuery CTenantConnectionCodeDbDeleg
 {
 	NewObjectQuery result;
 
-	const imtauth::ITenantConnectionCodeData* codePtr = dynamic_cast<const imtauth::ITenantConnectionCodeData*>(valuePtr);
+	const imtauth::ITenantConnectionCodeInfo* codePtr = dynamic_cast<const imtauth::ITenantConnectionCodeInfo*>(valuePtr);
 	if (codePtr == nullptr){
 		return result;
 	}
@@ -91,7 +91,7 @@ QByteArray CTenantConnectionCodeDbDelegateComp::CreateUpdateObjectQuery(
 		const imtbase::IOperationContext* /*operationContextPtr*/,
 		bool /*useExternDelegate*/) const
 {
-	const imtauth::ITenantConnectionCodeData* codePtr = dynamic_cast<const imtauth::ITenantConnectionCodeData*>(&object);
+	const imtauth::ITenantConnectionCodeInfo* codePtr = dynamic_cast<const imtauth::ITenantConnectionCodeInfo*>(&object);
 	if (codePtr == nullptr){
 		return QByteArray();
 	}

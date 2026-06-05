@@ -4,14 +4,14 @@
 
 // ImtCore includes
 #include <imtbase/TIdentifiableWrap.h>
-#include <imtauth/ITenantConnectionCodeData.h>
+#include <imtauth/ITenantConnectionCodeInfo.h>
 
 
 namespace imtauth
 {
 
 
-class CTenantConnectionCode: virtual public ITenantConnectionCodeData, virtual public iser::ISerializable
+class CTenantConnectionCode: virtual public ITenantConnectionCodeInfo, virtual public iser::ISerializable
 {
 public:
 	CTenantConnectionCode();

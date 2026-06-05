@@ -88,7 +88,7 @@ Serializable data holder for a relationship proposal.
 Used as the stored representation inside an object collection
 (e.g. an SQL-backed repository).
 */
-class ITenantRelationshipProposalData: virtual public iser::IObject
+class ITenantRelationshipProposalInfo: virtual public iser::IObject
 {
 public:
 	I_DECLARE_ENUM(RelationshipProposalType, RPT_CREATE, RPT_UPDATE, RPT_DELETE);
@@ -100,8 +100,8 @@ public:
 };
 
 
-typedef istd::TUniqueInterfacePtr<ITenantRelationshipProposalData> ITenantRelationshipProposalDataUniquePtr;
-typedef istd::TSharedInterfacePtr<ITenantRelationshipProposalData> ITenantRelationshipProposalDataSharedPtr;
+typedef istd::TUniqueInterfacePtr<ITenantRelationshipProposalInfo> ITenantRelationshipProposalInfoUniquePtr;
+typedef istd::TSharedInterfacePtr<ITenantRelationshipProposalInfo> ITenantRelationshipProposalInfoSharedPtr;
 
 
 } // namespace imtauth

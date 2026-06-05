@@ -3,7 +3,7 @@
 
 
 // ImtCore includes
-#include <imtauth/ITenantRelationshipProposalData.h>
+#include <imtauth/ITenantRelationshipProposalInfo.h>
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
 
 
@@ -63,7 +63,7 @@ protected:
 	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
 
 private:
-	I_FACT(imtauth::ITenantRelationshipProposalData, m_proposalFactCompPtr);
+	I_FACT(imtauth::ITenantRelationshipProposalInfo, m_proposalFactCompPtr);
 };
 
 

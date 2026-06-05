@@ -4,14 +4,14 @@
 
 // ImtCore includes
 #include <imtbase/TIdentifiableWrap.h>
-#include <imtauth/ITenantRelationshipProposalData.h>
+#include <imtauth/ITenantRelationshipProposalInfo.h>
 
 
 namespace imtauth
 {
 
 
-class CTenantRelationshipProposal: virtual public ITenantRelationshipProposalData, virtual public iser::ISerializable
+class CTenantRelationshipProposal: virtual public ITenantRelationshipProposalInfo, virtual public iser::ISerializable
 {
 public:
 	CTenantRelationshipProposal();

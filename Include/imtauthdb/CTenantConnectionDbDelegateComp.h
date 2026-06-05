@@ -3,7 +3,7 @@
 
 
 // ImtCore includes
-#include <imtauth/ITenantConnectionData.h>
+#include <imtauth/ITenantConnectionInfo.h>
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
 
 
@@ -63,7 +63,7 @@ protected:
 	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
 
 private:
-	I_FACT(imtauth::ITenantConnectionData, m_connectionFactCompPtr);
+	I_FACT(imtauth::ITenantConnectionInfo, m_connectionFactCompPtr);
 };
 
 

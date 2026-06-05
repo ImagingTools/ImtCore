@@ -75,7 +75,7 @@ void CConnectionCodesNotificationPublisherComp::OnComponentCreated()
 				entry.initiatorTenantId = tenantId;
 				entry.counterpartyTenantId = QByteArray();
 				entry.connectionId = QByteArray();
-				entry.status = imtauth::ITenantRelationshipProposalData::RPS_PENDING;
+				entry.status = imtauth::ITenantRelationshipProposalInfo::RPS_PENDING;
 				m_cachedProposals.insert(proposalId, entry);
 			}
 		}
@@ -248,7 +248,7 @@ void CConnectionCodesNotificationPublisherComp::OnModelChanged(int /*modelId*/, 
 					entry.initiatorTenantId = tenantId;
 					entry.counterpartyTenantId = QByteArray();
 					entry.connectionId = QByteArray();
-					entry.status = imtauth::ITenantRelationshipProposalData::RPS_PENDING;
+					entry.status = imtauth::ITenantRelationshipProposalInfo::RPS_PENDING;
 					currentProposals.insert(proposalId, entry);
 				}
 			}

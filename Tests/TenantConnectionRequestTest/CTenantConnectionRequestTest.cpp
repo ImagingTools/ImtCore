@@ -270,7 +270,7 @@ QByteArray connId = m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
 QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(QByteArray(), connId, "tenantA", "tenantB");
 QVERIFY(!proposalId.isEmpty());
 QCOMPARE(m_managerPtr->m_proposals.size(), 1);
-QCOMPARE(m_managerPtr->m_proposals.first().status, imtauth::ITenantRelationshipProposalData::RPS_APPROVED_BY_INITIATOR);
+QCOMPARE(m_managerPtr->m_proposals.first().status, imtauth::ITenantRelationshipProposalInfo::RPS_APPROVED_BY_INITIATOR);
 }
 
 
@@ -290,7 +290,7 @@ QByteArray connId = m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
 QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(QByteArray(), connId, "tenantA", "tenantB");
 QByteArray relId = m_managerPtr->ApproveRelationshipProposal(proposalId, "tenantB");
 QVERIFY(!relId.isEmpty());
-QCOMPARE(m_managerPtr->m_proposals.first().status, imtauth::ITenantRelationshipProposalData::RPS_APPLIED);
+QCOMPARE(m_managerPtr->m_proposals.first().status, imtauth::ITenantRelationshipProposalInfo::RPS_APPLIED);
 
 QByteArrayList relIds = m_managerPtr->GetTenantRelationshipIds("tenantA");
 QCOMPARE(relIds.size(), 1);
@@ -306,7 +306,7 @@ QByteArray connId = m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
 
 QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(QByteArray(), connId, "tenantA", "tenantB");
 QVERIFY(m_managerPtr->RejectRelationshipProposal(proposalId, "tenantB"));
-QCOMPARE(m_managerPtr->m_proposals.first().status, imtauth::ITenantRelationshipProposalData::RPS_REJECTED);
+QCOMPARE(m_managerPtr->m_proposals.first().status, imtauth::ITenantRelationshipProposalInfo::RPS_REJECTED);
 }
 
 
@@ -318,7 +318,7 @@ QByteArray connId = m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
 
 QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(QByteArray(), connId, "tenantA", "tenantB");
 QVERIFY(m_managerPtr->CancelRelationshipProposal(proposalId, "tenantA"));
-QCOMPARE(m_managerPtr->m_proposals.first().status, imtauth::ITenantRelationshipProposalData::RPS_CANCELED);
+QCOMPARE(m_managerPtr->m_proposals.first().status, imtauth::ITenantRelationshipProposalInfo::RPS_CANCELED);
 }
 
 

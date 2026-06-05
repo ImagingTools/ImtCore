@@ -11,9 +11,9 @@
 // ImtCore includes
 #include <imtauth/ITenantConnectionRequest.h>
 #include <imtauth/ITenantConnectionRequestData.h>
-#include <imtauth/ITenantConnectionCodeData.h>
-#include <imtauth/ITenantConnectionData.h>
-#include <imtauth/ITenantRelationshipProposalData.h>
+#include <imtauth/ITenantConnectionCodeInfo.h>
+#include <imtauth/ITenantConnectionInfo.h>
+#include <imtauth/ITenantRelationshipProposalInfo.h>
 #include <imtauth/ITenantRelationshipInfo.h>
 #include <imtauth/ITenantManager.h>
 #include <imtbase/IObjectCollection.h>
@@ -29,9 +29,9 @@ class CTenantConnectionRequestManagerComp:
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
-	typedef ITenantRelationshipProposalData::RelationshipProposalInfo RelationshipProposalInfo;
-	typedef ITenantRelationshipProposalData::RelationshipProposalType RelationshipProposalType;
-	typedef ITenantRelationshipProposalData::RelationshipProposalStatus RelationshipProposalStatus;
+	typedef ITenantRelationshipProposalInfo::RelationshipProposalInfo RelationshipProposalInfo;
+	typedef ITenantRelationshipProposalInfo::RelationshipProposalType RelationshipProposalType;
+	typedef ITenantRelationshipProposalInfo::RelationshipProposalStatus RelationshipProposalStatus;
 
 	I_BEGIN_COMPONENT(CTenantConnectionRequestManagerComp);
 		I_REGISTER_INTERFACE(imtauth::ITenantConnectionRequest);
@@ -99,9 +99,9 @@ private:
 	I_REF(imtbase::IObjectCollection, m_proposalCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_relationshipCollectionCompPtr);
 	I_FACT(imtauth::ITenantConnectionRequestData, m_requestFactoryCompPtr);
-	I_FACT(imtauth::ITenantConnectionCodeData, m_connectionCodeFactoryCompPtr);
-	I_FACT(imtauth::ITenantConnectionData, m_connectionFactoryCompPtr);
-	I_FACT(imtauth::ITenantRelationshipProposalData, m_proposalFactoryCompPtr);
+	I_FACT(imtauth::ITenantConnectionCodeInfo, m_connectionCodeFactoryCompPtr);
+	I_FACT(imtauth::ITenantConnectionInfo, m_connectionFactoryCompPtr);
+	I_FACT(imtauth::ITenantRelationshipProposalInfo, m_proposalFactoryCompPtr);
 	I_FACT(imtauth::ITenantRelationshipInfo, m_relationshipFactoryCompPtr);
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 };

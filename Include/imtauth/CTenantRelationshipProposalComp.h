@@ -20,7 +20,7 @@ public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CTenantRelationshipProposalComp);
-		I_REGISTER_INTERFACE(ITenantRelationshipProposalData);
+		I_REGISTER_INTERFACE(ITenantRelationshipProposalInfo);
 		I_REGISTER_INTERFACE(iser::ISerializable);
 	I_END_COMPONENT;
 };
