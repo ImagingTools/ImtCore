@@ -102,18 +102,12 @@ type Mutation {
 
 collectionSchema {
 	type SubstrateSpecification {
-		ref: SubstrateSpecificationListItem
 		operations {
 			list: GetSubstrateSpecificationList
 			getView: GetOptionsList
-		}
-		subtype SubstrateSpecification {
-			ref: SubstrateSpecificationDocument
-			operations {
-				get: GetSubstrateSpecification
-				update: UpdateSubstrateSpecification
-				insert: InsertSubstrateSpecification
-			}
+			get: GetSubstrateSpecification
+			update: UpdateSubstrateSpecification
+			insert: InsertSubstrateSpecification
 		}
 	}
 }

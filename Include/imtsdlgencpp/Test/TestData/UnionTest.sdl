@@ -39,7 +39,6 @@ type Query {
 
 collectionSchema {
 	type Printer {
-		ref: PrinterSpecification
 		operations {
 			get: GetSpecifications
 		}

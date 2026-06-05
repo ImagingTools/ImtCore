@@ -62,14 +62,6 @@ protected:
 protected:
 	// SubstrateSpecification methods
 	virtual bool CreateRepresentationFromObject(
-				const ::imtbase::IObjectCollectionIterator& objectCollectionIterator,
-				const CGetSubstrateSpecificationListGqlRequest& getSubstrateSpecificationListRequest,
-				V1_0::substrate::CSubstrateSpecificationListItem& representationObject,
-				QString& errorMessage) const = 0;
-	virtual V1_0::imtbase::COptionsList  OnGetOptionsList(const CGetOptionsListGqlRequest& getOptionsListGqlRequest, QString& errorMessage) const = 0;
-
-	// SubstrateSpecification methods
-	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
 				const CGetSubstrateSpecificationGqlRequest& getSubstrateSpecificationRequest,
 				V1_0::substrate::SubstrateSpecificationDocument& representationPayload,
@@ -83,6 +75,12 @@ protected:
 				const CUpdateSubstrateSpecificationGqlRequest& updateSubstrateSpecificationRequest,
 				istd::IChangeable& object,
 				QString& errorMessage) const = 0;
+	virtual bool CreateRepresentationFromObject(
+				const ::imtbase::IObjectCollectionIterator& objectCollectionIterator,
+				const CGetSubstrateSpecificationListGqlRequest& getSubstrateSpecificationListRequest,
+				V1_0::substrate::CSubstrateSpecificationListItem& representationObject,
+				QString& errorMessage) const = 0;
+	virtual V1_0::imtbase::COptionsList  OnGetOptionsList(const CGetOptionsListGqlRequest& getOptionsListGqlRequest, QString& errorMessage) const = 0;
 
 };
 

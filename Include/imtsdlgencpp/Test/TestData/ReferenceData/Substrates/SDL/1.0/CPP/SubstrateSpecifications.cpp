@@ -5965,10 +5965,10 @@ UpdateSubstrateSpecificationRequestInfo CUpdateSubstrateSpecificationGqlRequest:
 QMap<int, QByteArray> CSubstrateSpecificationCollectionControllerCompBase::GetSupportedCommandIds() const
 {
 	static QMap<int, QByteArray> retVal = {
-		std::make_pair(OT_LIST, CGetSubstrateSpecificationListGqlRequest::GetCommandId()),
 		std::make_pair(OT_GET, CGetSubstrateSpecificationGqlRequest::GetCommandId()),
 		std::make_pair(OT_NEW, CInsertSubstrateSpecificationGqlRequest::GetCommandId()),
 		std::make_pair(OT_UPDATE, CUpdateSubstrateSpecificationGqlRequest::GetCommandId()),
+		std::make_pair(OT_LIST, CGetSubstrateSpecificationListGqlRequest::GetCommandId()),
 	};
 
 	return retVal;
@@ -5978,19 +5978,19 @@ QMap<int, QByteArray> CSubstrateSpecificationCollectionControllerCompBase::GetSu
 bool CSubstrateSpecificationCollectionControllerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
 	const QByteArray commandId = gqlRequest.GetCommandId();
-	if (commandId == CGetSubstrateSpecificationListGqlRequest::GetCommandId()){
-		return true;
-	}
-	else if (commandId == CGetOptionsListGqlRequest::GetCommandId()){
-		return true;
-	}
-	else if (commandId == CGetSubstrateSpecificationGqlRequest::GetCommandId()){
+	if (commandId == CGetSubstrateSpecificationGqlRequest::GetCommandId()){
 		return true;
 	}
 	else if (commandId == CInsertSubstrateSpecificationGqlRequest::GetCommandId()){
 		return true;
 	}
 	else if (commandId == CUpdateSubstrateSpecificationGqlRequest::GetCommandId()){
+		return true;
+	}
+	else if (commandId == CGetSubstrateSpecificationListGqlRequest::GetCommandId()){
+		return true;
+	}
+	else if (commandId == CGetOptionsListGqlRequest::GetCommandId()){
 		return true;
 	}
 
@@ -6001,16 +6001,6 @@ bool CSubstrateSpecificationCollectionControllerCompBase::IsRequestSupported(con
 bool CSubstrateSpecificationCollectionControllerCompBase::GetOperationFromRequest(const ::imtgql::CGqlRequest& gqlRequest, ::imtgql::CGqlParamObject& gqlObject, QString& errorMessage, int& operationType) const
 {
 	const QByteArray commandId = gqlRequest.GetCommandId();
-
-	if (commandId == CGetSubstrateSpecificationListGqlRequest::GetCommandId()){
-		operationType =  OT_LIST;
-
-		return true;
-	}
-
-	if (commandId == CGetOptionsListGqlRequest::GetCommandId()){
-		return true;
-	}
 
 	if (commandId == CGetSubstrateSpecificationGqlRequest::GetCommandId()){
 		operationType =  OT_GET;
@@ -6027,6 +6017,16 @@ bool CSubstrateSpecificationCollectionControllerCompBase::GetOperationFromReques
 	if (commandId == CUpdateSubstrateSpecificationGqlRequest::GetCommandId()){
 		operationType =  OT_UPDATE;
 
+		return true;
+	}
+
+	if (commandId == CGetSubstrateSpecificationListGqlRequest::GetCommandId()){
+		operationType =  OT_LIST;
+
+		return true;
+	}
+
+	if (commandId == CGetOptionsListGqlRequest::GetCommandId()){
 		return true;
 	}
 

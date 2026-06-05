@@ -33,6 +33,16 @@ namespace sdl::V1_0::substrate
 {
 
 
+inline namespace SubstrateSpecificationsSdlEnums
+{
+
+
+
+Q_NAMESPACE
+
+
+} // inline namespace SubstrateSpecificationsSdlEnums
+
 // forward declaration for union types
 class SubstrateSpecificationDocument;
 class CSubstrateSpecificationDocumentObject;

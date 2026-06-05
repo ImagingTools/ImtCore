@@ -30,6 +30,40 @@ namespace sdl::V1_0::modsdl
 {
 
 
+inline namespace UnionTestSdlEnums
+{
+
+
+
+Q_NAMESPACE
+
+enum class LinkStatus {
+	OPEN,
+	CLOSE,
+};
+
+Q_ENUM_NS(LinkStatus)
+
+
+class EnumLinkStatus: public QObject
+{
+	Q_OBJECT
+	Q_PROPERTY(QString OPEN READ GetOPEN NOTIFY OPENChanged)
+	Q_PROPERTY(QString CLOSE READ GetCLOSE NOTIFY CLOSEChanged)
+
+protected:
+	static QString GetOPEN() { return "OPEN"; }
+	static QString GetCLOSE() { return "CLOSE"; }
+
+signals:
+	void OPENChanged();
+	void CLOSEChanged();
+};
+
+
+
+} // inline namespace UnionTestSdlEnums
+
 // forward declaration for union types
 class PrinterSpecification;
 class CPrinterSpecificationObject;
