@@ -11,6 +11,10 @@
 // ImtCore includes
 #include <imtauth/ITenantConnectionRequest.h>
 #include <imtauth/ITenantConnectionRequestData.h>
+#include <imtauth/ITenantConnectionCodeData.h>
+#include <imtauth/ITenantConnectionData.h>
+#include <imtauth/ITenantRelationshipProposalData.h>
+#include <imtauth/ITenantRelationshipInfo.h>
 #include <imtauth/ITenantManager.h>
 #include <imtbase/IObjectCollection.h>
 
@@ -28,10 +32,16 @@ public:
 
 	I_BEGIN_COMPONENT(CTenantConnectionRequestManagerComp);
 		I_REGISTER_INTERFACE(imtauth::ITenantConnectionRequest);
-		I_ASSIGN(m_requestCollectionCompPtr, "RequestCollection", "Connection request collection", false, "RequestCollection");
-		I_ASSIGN(m_connectionCollectionCompPtr, "ConnectionCollection", "Connections collection", false, "ConnectionCollection");
-		I_ASSIGN(m_proposalCollectionCompPtr, "ProposalCollection", "Relationship proposals collection", false, "ProposalCollection");
+		I_ASSIGN(m_requestCollectionCompPtr, "RequestCollection", "Connection request collection", true, "RequestCollection");
+		I_ASSIGN(m_connectionCodeCollectionCompPtr, "ConnectionCodeCollection", "Connection code collection", true, "ConnectionCodeCollection");
+		I_ASSIGN(m_connectionCollectionCompPtr, "ConnectionCollection", "Connections collection", true, "ConnectionCollection");
+		I_ASSIGN(m_proposalCollectionCompPtr, "ProposalCollection", "Relationship proposals collection", true, "ProposalCollection");
+		I_ASSIGN(m_relationshipCollectionCompPtr, "RelationshipCollection", "Relationships collection", true, "RelationshipCollection");
 		I_ASSIGN(m_requestFactoryCompPtr, "RequestFactory", "Connection request factory", false, "TenantConnectionRequestInfo");
+		I_ASSIGN(m_connectionCodeFactoryCompPtr, "ConnectionCodeFactory", "Connection code factory", false, "TenantConnectionCodeInfo");
+		I_ASSIGN(m_connectionFactoryCompPtr, "ConnectionFactory", "Connection factory", false, "TenantConnectionInfo");
+		I_ASSIGN(m_proposalFactoryCompPtr, "ProposalFactory", "Relationship proposal factory", false, "TenantRelationshipProposalInfo");
+		I_ASSIGN(m_relationshipFactoryCompPtr, "RelationshipFactory", "Relationship factory", false, "TenantRelationshipInfo");
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager", false, "TenantManager");
 	I_END_COMPONENT;
 
@@ -73,18 +83,24 @@ private:
 	bool ApplyRelationshipProposal(const RelationshipProposalInfo& proposal);
 	void ArchiveRelationshipsForConnection(const QByteArray& connectionId);
 
-	// In-memory storage for connection codes (persisted via DB delegate)
-	mutable QMap<QByteArray, TenantConnectionCodeInfo> m_connectionCodes;
-	mutable QList<ConnectionRequestInfo> m_requests;
-	mutable QList<TenantConnectionInfo> m_connections;
-	mutable QList<RelationshipProposalInfo> m_proposals;
-	mutable ITenantInfo::TenantRelationships m_relationships;
+	// DB helper methods
+	bool StoreConnectionCode(const QByteArray& tenantId, const TenantConnectionCodeInfo& info);
+	bool StoreConnectionRequest(const QByteArray& requestId, const ConnectionRequestInfo& info);
+	bool StoreConnection(const QByteArray& connectionId, const TenantConnectionInfo& info);
+	bool StoreProposal(const QByteArray& proposalId, const RelationshipProposalInfo& info);
+	bool StoreRelationship(const QByteArray& relationshipId, const ITenantInfo::TenantRelationship& rel);
 
 private:
 	I_REF(imtbase::IObjectCollection, m_requestCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_connectionCodeCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_connectionCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_proposalCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_relationshipCollectionCompPtr);
 	I_FACT(imtauth::ITenantConnectionRequestData, m_requestFactoryCompPtr);
+	I_FACT(imtauth::ITenantConnectionCodeData, m_connectionCodeFactoryCompPtr);
+	I_FACT(imtauth::ITenantConnectionData, m_connectionFactoryCompPtr);
+	I_FACT(imtauth::ITenantRelationshipProposalData, m_proposalFactoryCompPtr);
+	I_FACT(imtauth::ITenantRelationshipInfo, m_relationshipFactoryCompPtr);
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 };
 

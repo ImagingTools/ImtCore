@@ -292,6 +292,21 @@ I_EXPORT_COMPONENT(
 			"Tenant Connection Request Manager");
 
 I_EXPORT_COMPONENT(
+			TenantConnectionCodeInfo,
+			"Entity representing a tenant connection code for organization discovery",
+			"Tenant Connection Code Info");
+
+I_EXPORT_COMPONENT(
+			TenantConnectionInfo,
+			"Entity representing an active connection between two tenants",
+			"Tenant Connection Info");
+
+I_EXPORT_COMPONENT(
+			TenantRelationshipProposalInfo,
+			"Entity representing a bilateral relationship proposal between connected tenants",
+			"Tenant Relationship Proposal Info");
+
+I_EXPORT_COMPONENT(
 			TenantRelationshipInfo,
 			"Entity representing a directional relationship between two connected tenants",
 			"Tenant Relationship Info");

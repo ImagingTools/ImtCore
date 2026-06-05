@@ -63,6 +63,9 @@
 #include <imtauth/CTenantRelationshipInfoComp.h>
 #include <imtauth/CTenantConnectionRequestComp.h>
 #include <imtauth/CTenantConnectionRequestManagerComp.h>
+#include <imtauth/CTenantConnectionCodeComp.h>
+#include <imtauth/CTenantConnectionComp.h>
+#include <imtauth/CTenantRelationshipProposalComp.h>
 #include <imtauth/CCrossTenantMessageComp.h>
 #include <imtauth/CCrossTenantMessageProjectionComp.h>
 #include <imtauth/CCrossTenantMessageBrokerComp.h>
@@ -170,6 +173,9 @@ typedef icomp::TModelCompWrap<imtauth::CContractComp> ContractInfo;
 typedef icomp::TModelCompWrap<imtauth::CContractManagerComp> ContractManager;
 typedef icomp::TModelCompWrap<imtauth::CTenantConnectionRequestComp> TenantConnectionRequestInfo;
 typedef icomp::TModelCompWrap<imtauth::CTenantConnectionRequestManagerComp> TenantConnectionRequestManager;
+typedef icomp::TModelCompWrap<imtauth::CTenantConnectionCodeComp> TenantConnectionCodeInfo;
+typedef icomp::TModelCompWrap<imtauth::CTenantConnectionComp> TenantConnectionInfo;
+typedef icomp::TModelCompWrap<imtauth::CTenantRelationshipProposalComp> TenantRelationshipProposalInfo;
 typedef icomp::TModelCompWrap<imtauth::CTenantRelationshipInfoComp> TenantRelationshipInfo;
 typedef icomp::TModelCompWrap<imtauth::CCrossTenantMessageComp> CrossTenantMessageInfo;
 typedef imtauth::CCrossTenantMessageProjectionComp CrossTenantMessageProjection;

@@ -76,6 +76,18 @@ struct TenantConnectionCodeInfo
 	QString connectionCode;
 	bool allowConnectionsByCode = true;
 	QString createdAt;
+
+	bool operator==(const TenantConnectionCodeInfo& other) const
+	{
+		return tenantId == other.tenantId
+				&& connectionCode == other.connectionCode
+				&& allowConnectionsByCode == other.allowConnectionsByCode
+				&& createdAt == other.createdAt;
+	}
+	bool operator!=(const TenantConnectionCodeInfo& other) const
+	{
+		return !(*this == other);
+	}
 };
 
 
