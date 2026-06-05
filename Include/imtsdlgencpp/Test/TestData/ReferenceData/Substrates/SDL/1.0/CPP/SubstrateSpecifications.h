@@ -29,7 +29,7 @@
 #include <imtbasesdl/SDL/1.0/CPP/ImtBaseTypes.h>
 
 
-namespace sdl::V1_0::V1_0
+namespace sdl::V1_0::substrate
 {
 
 
@@ -52,17 +52,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CInputId& other) const;
 	[[nodiscard]] bool operator!=(const CInputId& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CCollectionViewParamsTest
@@ -81,17 +79,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CCollectionViewParamsTest& other) const;
 	[[nodiscard]] bool operator!=(const CCollectionViewParamsTest& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CSubstrateSpecificationDocumentTypeIds
@@ -112,17 +108,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CSubstrateSpecificationDocumentTypeIds& other) const;
 	[[nodiscard]] bool operator!=(const CSubstrateSpecificationDocumentTypeIds& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CSubstrateSpecificationListInput
@@ -139,17 +133,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CSubstrateSpecificationListInput& other) const;
 	[[nodiscard]] bool operator!=(const CSubstrateSpecificationListInput& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CSubstrateSpecificationListItem
@@ -180,17 +172,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CSubstrateSpecificationListItem& other) const;
 	[[nodiscard]] bool operator!=(const CSubstrateSpecificationListItem& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CSubstrateSpecificationListResponse
@@ -207,17 +197,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CSubstrateSpecificationListResponse& other) const;
 	[[nodiscard]] bool operator!=(const CSubstrateSpecificationListResponse& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CCardboardSubstrateSpecification
@@ -236,17 +224,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CCardboardSubstrateSpecification& other) const;
 	[[nodiscard]] bool operator!=(const CCardboardSubstrateSpecification& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CPaperSubstrateSpecification
@@ -267,17 +253,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CPaperSubstrateSpecification& other) const;
 	[[nodiscard]] bool operator!=(const CPaperSubstrateSpecification& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CFilmSubstrateSpecification
@@ -298,17 +282,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CFilmSubstrateSpecification& other) const;
 	[[nodiscard]] bool operator!=(const CFilmSubstrateSpecification& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CSubstrateSpecificationInput
@@ -333,17 +315,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CSubstrateSpecificationInput& other) const;
 	[[nodiscard]] bool operator!=(const CSubstrateSpecificationInput& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CSubstrateSpecificationDocumentMetaInfo
@@ -362,17 +342,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CSubstrateSpecificationDocumentMetaInfo& other) const;
 	[[nodiscard]] bool operator!=(const CSubstrateSpecificationDocumentMetaInfo& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 
@@ -411,26 +389,26 @@ protected:
 
 
 
-class CInputIdObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::V1_0::CInputId, sdl::V1_0::V1_0::CInputIdObject>
+class CInputIdObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::substrate::CInputId, sdl::V1_0::substrate::CInputIdObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::V1_0::V1_0::CInputId, sdl::V1_0::V1_0::CInputIdObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::substrate::CInputId, sdl::V1_0::substrate::CInputIdObject> BaseClass;
 
 	explicit CInputIdObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::V1_0::V1_0::CInputIdObject* item);
-	Q_INVOKABLE sdl::V1_0::V1_0::CInputIdObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::substrate::CInputIdObject* item);
+	Q_INVOKABLE sdl::V1_0::substrate::CInputIdObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::V1_0::V1_0::CInputIdObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::substrate::CInputIdObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::V1_0::CInputIdObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::V1_0::V1_0::CInputIdObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::substrate::CInputIdObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::substrate::CInputIdObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -479,26 +457,26 @@ protected:
 
 
 
-class CCollectionViewParamsTestObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::V1_0::CCollectionViewParamsTest, sdl::V1_0::V1_0::CCollectionViewParamsTestObject>
+class CCollectionViewParamsTestObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::substrate::CCollectionViewParamsTest, sdl::V1_0::substrate::CCollectionViewParamsTestObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::V1_0::V1_0::CCollectionViewParamsTest, sdl::V1_0::V1_0::CCollectionViewParamsTestObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::substrate::CCollectionViewParamsTest, sdl::V1_0::substrate::CCollectionViewParamsTestObject> BaseClass;
 
 	explicit CCollectionViewParamsTestObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::V1_0::V1_0::CCollectionViewParamsTestObject* item);
-	Q_INVOKABLE sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::substrate::CCollectionViewParamsTestObject* item);
+	Q_INVOKABLE sdl::V1_0::substrate::CCollectionViewParamsTestObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::V1_0::V1_0::CCollectionViewParamsTestObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::substrate::CCollectionViewParamsTestObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::V1_0::CCollectionViewParamsTestObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::V1_0::V1_0::CCollectionViewParamsTestObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::substrate::CCollectionViewParamsTestObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::substrate::CCollectionViewParamsTestObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -552,26 +530,26 @@ protected:
 
 
 
-class CSubstrateSpecificationDocumentTypeIdsObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIds, sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObject>
+class CSubstrateSpecificationDocumentTypeIdsObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIds, sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIds, sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIds, sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObject> BaseClass;
 
 	explicit CSubstrateSpecificationDocumentTypeIdsObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObject* item);
-	Q_INVOKABLE sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObject* item);
+	Q_INVOKABLE sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIdsObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIdsObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -618,26 +596,26 @@ protected:
 
 
 
-class CSubstrateSpecificationListInputObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::V1_0::CSubstrateSpecificationListInput, sdl::V1_0::V1_0::CSubstrateSpecificationListInputObject>
+class CSubstrateSpecificationListInputObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::substrate::CSubstrateSpecificationListInput, sdl::V1_0::substrate::CSubstrateSpecificationListInputObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::V1_0::V1_0::CSubstrateSpecificationListInput, sdl::V1_0::V1_0::CSubstrateSpecificationListInputObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::substrate::CSubstrateSpecificationListInput, sdl::V1_0::substrate::CSubstrateSpecificationListInputObject> BaseClass;
 
 	explicit CSubstrateSpecificationListInputObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::V1_0::V1_0::CSubstrateSpecificationListInputObject* item);
-	Q_INVOKABLE sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::substrate::CSubstrateSpecificationListInputObject* item);
+	Q_INVOKABLE sdl::V1_0::substrate::CSubstrateSpecificationListInputObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::V1_0::V1_0::CSubstrateSpecificationListInputObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::substrate::CSubstrateSpecificationListInputObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::V1_0::CSubstrateSpecificationListInputObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::V1_0::V1_0::CSubstrateSpecificationListInputObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::substrate::CSubstrateSpecificationListInputObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::substrate::CSubstrateSpecificationListInputObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -716,26 +694,26 @@ protected:
 
 
 
-class CSubstrateSpecificationListItemObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::V1_0::CSubstrateSpecificationListItem, sdl::V1_0::V1_0::CSubstrateSpecificationListItemObject>
+class CSubstrateSpecificationListItemObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::substrate::CSubstrateSpecificationListItem, sdl::V1_0::substrate::CSubstrateSpecificationListItemObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::V1_0::V1_0::CSubstrateSpecificationListItem, sdl::V1_0::V1_0::CSubstrateSpecificationListItemObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::substrate::CSubstrateSpecificationListItem, sdl::V1_0::substrate::CSubstrateSpecificationListItemObject> BaseClass;
 
 	explicit CSubstrateSpecificationListItemObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::V1_0::V1_0::CSubstrateSpecificationListItemObject* item);
-	Q_INVOKABLE sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::substrate::CSubstrateSpecificationListItemObject* item);
+	Q_INVOKABLE sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::V1_0::V1_0::CSubstrateSpecificationListItemObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::substrate::CSubstrateSpecificationListItemObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::V1_0::CSubstrateSpecificationListItemObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::V1_0::V1_0::CSubstrateSpecificationListItemObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::substrate::CSubstrateSpecificationListItemObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::substrate::CSubstrateSpecificationListItemObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -783,26 +761,26 @@ protected:
 
 
 
-class CSubstrateSpecificationListResponseObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::V1_0::CSubstrateSpecificationListResponse, sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObject>
+class CSubstrateSpecificationListResponseObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::substrate::CSubstrateSpecificationListResponse, sdl::V1_0::substrate::CSubstrateSpecificationListResponseObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::V1_0::V1_0::CSubstrateSpecificationListResponse, sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::substrate::CSubstrateSpecificationListResponse, sdl::V1_0::substrate::CSubstrateSpecificationListResponseObject> BaseClass;
 
 	explicit CSubstrateSpecificationListResponseObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObject* item);
-	Q_INVOKABLE sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::substrate::CSubstrateSpecificationListResponseObject* item);
+	Q_INVOKABLE sdl::V1_0::substrate::CSubstrateSpecificationListResponseObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::substrate::CSubstrateSpecificationListResponseObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::V1_0::V1_0::CSubstrateSpecificationListResponseObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::substrate::CSubstrateSpecificationListResponseObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::substrate::CSubstrateSpecificationListResponseObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -851,26 +829,26 @@ protected:
 
 
 
-class CCardboardSubstrateSpecificationObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::V1_0::CCardboardSubstrateSpecification, sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObject>
+class CCardboardSubstrateSpecificationObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::substrate::CCardboardSubstrateSpecification, sdl::V1_0::substrate::CCardboardSubstrateSpecificationObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::V1_0::V1_0::CCardboardSubstrateSpecification, sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::substrate::CCardboardSubstrateSpecification, sdl::V1_0::substrate::CCardboardSubstrateSpecificationObject> BaseClass;
 
 	explicit CCardboardSubstrateSpecificationObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObject* item);
-	Q_INVOKABLE sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::substrate::CCardboardSubstrateSpecificationObject* item);
+	Q_INVOKABLE sdl::V1_0::substrate::CCardboardSubstrateSpecificationObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::substrate::CCardboardSubstrateSpecificationObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::V1_0::V1_0::CCardboardSubstrateSpecificationObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::substrate::CCardboardSubstrateSpecificationObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::substrate::CCardboardSubstrateSpecificationObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -924,26 +902,26 @@ protected:
 
 
 
-class CPaperSubstrateSpecificationObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::V1_0::CPaperSubstrateSpecification, sdl::V1_0::V1_0::CPaperSubstrateSpecificationObject>
+class CPaperSubstrateSpecificationObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::substrate::CPaperSubstrateSpecification, sdl::V1_0::substrate::CPaperSubstrateSpecificationObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::V1_0::V1_0::CPaperSubstrateSpecification, sdl::V1_0::V1_0::CPaperSubstrateSpecificationObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::substrate::CPaperSubstrateSpecification, sdl::V1_0::substrate::CPaperSubstrateSpecificationObject> BaseClass;
 
 	explicit CPaperSubstrateSpecificationObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::V1_0::V1_0::CPaperSubstrateSpecificationObject* item);
-	Q_INVOKABLE sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::substrate::CPaperSubstrateSpecificationObject* item);
+	Q_INVOKABLE sdl::V1_0::substrate::CPaperSubstrateSpecificationObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::V1_0::V1_0::CPaperSubstrateSpecificationObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::substrate::CPaperSubstrateSpecificationObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::V1_0::CPaperSubstrateSpecificationObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::V1_0::V1_0::CPaperSubstrateSpecificationObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::substrate::CPaperSubstrateSpecificationObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::substrate::CPaperSubstrateSpecificationObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -997,26 +975,26 @@ protected:
 
 
 
-class CFilmSubstrateSpecificationObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::V1_0::CFilmSubstrateSpecification, sdl::V1_0::V1_0::CFilmSubstrateSpecificationObject>
+class CFilmSubstrateSpecificationObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::substrate::CFilmSubstrateSpecification, sdl::V1_0::substrate::CFilmSubstrateSpecificationObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::V1_0::V1_0::CFilmSubstrateSpecification, sdl::V1_0::V1_0::CFilmSubstrateSpecificationObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::substrate::CFilmSubstrateSpecification, sdl::V1_0::substrate::CFilmSubstrateSpecificationObject> BaseClass;
 
 	explicit CFilmSubstrateSpecificationObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::V1_0::V1_0::CFilmSubstrateSpecificationObject* item);
-	Q_INVOKABLE sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::substrate::CFilmSubstrateSpecificationObject* item);
+	Q_INVOKABLE sdl::V1_0::substrate::CFilmSubstrateSpecificationObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::V1_0::V1_0::CFilmSubstrateSpecificationObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::substrate::CFilmSubstrateSpecificationObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::V1_0::CFilmSubstrateSpecificationObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::V1_0::V1_0::CFilmSubstrateSpecificationObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::substrate::CFilmSubstrateSpecificationObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::substrate::CFilmSubstrateSpecificationObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -1083,26 +1061,26 @@ protected:
 
 
 
-class CSubstrateSpecificationInputObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::V1_0::CSubstrateSpecificationInput, sdl::V1_0::V1_0::CSubstrateSpecificationInputObject>
+class CSubstrateSpecificationInputObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::substrate::CSubstrateSpecificationInput, sdl::V1_0::substrate::CSubstrateSpecificationInputObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::V1_0::V1_0::CSubstrateSpecificationInput, sdl::V1_0::V1_0::CSubstrateSpecificationInputObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::substrate::CSubstrateSpecificationInput, sdl::V1_0::substrate::CSubstrateSpecificationInputObject> BaseClass;
 
 	explicit CSubstrateSpecificationInputObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::V1_0::V1_0::CSubstrateSpecificationInputObject* item);
-	Q_INVOKABLE sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::substrate::CSubstrateSpecificationInputObject* item);
+	Q_INVOKABLE sdl::V1_0::substrate::CSubstrateSpecificationInputObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::V1_0::V1_0::CSubstrateSpecificationInputObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::substrate::CSubstrateSpecificationInputObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::V1_0::CSubstrateSpecificationInputObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::V1_0::V1_0::CSubstrateSpecificationInputObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::substrate::CSubstrateSpecificationInputObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::substrate::CSubstrateSpecificationInputObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -1151,26 +1129,26 @@ protected:
 
 
 
-class CSubstrateSpecificationDocumentMetaInfoObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfo, sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObject>
+class CSubstrateSpecificationDocumentMetaInfoObjectList: public ::imtsdl::TListModelBase<sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfo, sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TListModelBase<sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfo, sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfo, sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObject> BaseClass;
 
 	explicit CSubstrateSpecificationDocumentMetaInfoObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
 	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
 	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
-	Q_INVOKABLE void append(sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObject* item);
-	Q_INVOKABLE sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList* copyMe();
+	Q_INVOKABLE void append(sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObject* item);
+	Q_INVOKABLE sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
-	Q_INVOKABLE void addElement(sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObject* item);
+	Q_INVOKABLE void addElement(sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObject* item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObjectList* otherModelPtr);
-	Q_INVOKABLE void insert(int index, sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfoObject* item);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfoObject* item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
@@ -1201,12 +1179,12 @@ public:
 
 
 
-class CSubstrateSpecificationDocumentObjectList: public ::imtsdl::TSdlAbstractListModel<sdl::V1_0::V1_0::SubstrateSpecificationDocument, QVariant>
+class CSubstrateSpecificationDocumentObjectList: public ::imtsdl::TSdlAbstractListModel<sdl::V1_0::substrate::SubstrateSpecificationDocument, QVariant>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtsdl::TSdlAbstractListModel<sdl::V1_0::V1_0::SubstrateSpecificationDocument, QVariant> BaseClass;
+	typedef ::imtsdl::TSdlAbstractListModel<sdl::V1_0::substrate::SubstrateSpecificationDocument, QVariant> BaseClass;
 
 	CSubstrateSpecificationDocumentObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
@@ -1216,12 +1194,12 @@ public:
 	Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(QVariant item);
-	Q_INVOKABLE sdl::V1_0::V1_0::CSubstrateSpecificationDocumentObjectList* copyMe();
+	Q_INVOKABLE sdl::V1_0::substrate::CSubstrateSpecificationDocumentObjectList* copyMe();
 	Q_INVOKABLE QString toJson();
 	Q_INVOKABLE QString toGraphQL();
 	Q_INVOKABLE void addElement(QVariant item);
 	Q_INVOKABLE void removeElement(int index);
-	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::V1_0::CSubstrateSpecificationDocumentObjectList* otherModelPtr);
+	Q_INVOKABLE bool isEqualWithModel(sdl::V1_0::substrate::CSubstrateSpecificationDocumentObjectList* otherModelPtr);
 	Q_INVOKABLE void insert(int index, QVariant item);
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
@@ -1250,7 +1228,7 @@ struct GetSubstrateSpecificationListRequestInfo
 
 struct GetSubstrateSpecificationListRequestArguments
 {
-	istd::TNullableValue<CSubstrateSpecificationListInput> input;
+	istd::TNullableValue<V1_0::substrate::CSubstrateSpecificationListInput> input;
 };
 
 
@@ -1284,7 +1262,7 @@ struct GetSubstrateSpecificationRequestInfo
 
 struct GetSubstrateSpecificationRequestArguments
 {
-	istd::TNullableValue<CInputId> input;
+	istd::TNullableValue<V1_0::substrate::CInputId> input;
 };
 
 
@@ -1328,7 +1306,7 @@ struct GetOptionsListRequestInfo
 
 struct GetOptionsListRequestArguments
 {
-	istd::TNullableValue<CCollectionViewParamsTest> input;
+	istd::TNullableValue<V1_0::substrate::CCollectionViewParamsTest> input;
 };
 
 
@@ -1363,7 +1341,7 @@ struct InsertSubstrateSpecificationRequestInfo
 
 struct InsertSubstrateSpecificationRequestArguments
 {
-	istd::TNullableValue<CSubstrateSpecificationInput> input;
+	istd::TNullableValue<V1_0::substrate::CSubstrateSpecificationInput> input;
 };
 
 
@@ -1398,7 +1376,7 @@ struct UpdateSubstrateSpecificationRequestInfo
 
 struct UpdateSubstrateSpecificationRequestArguments
 {
-	istd::TNullableValue<CSubstrateSpecificationInput> input;
+	istd::TNullableValue<V1_0::substrate::CSubstrateSpecificationInput> input;
 };
 
 
@@ -1425,7 +1403,6 @@ private:
 
 
 
-
 #ifdef QT_QML_LIB
 [[maybe_unused]] static void RegisterSubstrateSpecificationsQmlTypes()
 {
@@ -1446,14 +1423,14 @@ private:
 } // namespace sdl::V1_0::substrate
 
 
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CInputId);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CCollectionViewParamsTest);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CSubstrateSpecificationDocumentTypeIds);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CSubstrateSpecificationListInput);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CSubstrateSpecificationListItem);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CSubstrateSpecificationListResponse);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CCardboardSubstrateSpecification);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CPaperSubstrateSpecification);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CFilmSubstrateSpecification);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CSubstrateSpecificationInput);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CSubstrateSpecificationDocumentMetaInfo);
+Q_DECLARE_METATYPE(sdl::V1_0::substrate::CInputId);
+Q_DECLARE_METATYPE(sdl::V1_0::substrate::CCollectionViewParamsTest);
+Q_DECLARE_METATYPE(sdl::V1_0::substrate::CSubstrateSpecificationDocumentTypeIds);
+Q_DECLARE_METATYPE(sdl::V1_0::substrate::CSubstrateSpecificationListInput);
+Q_DECLARE_METATYPE(sdl::V1_0::substrate::CSubstrateSpecificationListItem);
+Q_DECLARE_METATYPE(sdl::V1_0::substrate::CSubstrateSpecificationListResponse);
+Q_DECLARE_METATYPE(sdl::V1_0::substrate::CCardboardSubstrateSpecification);
+Q_DECLARE_METATYPE(sdl::V1_0::substrate::CPaperSubstrateSpecification);
+Q_DECLARE_METATYPE(sdl::V1_0::substrate::CFilmSubstrateSpecification);
+Q_DECLARE_METATYPE(sdl::V1_0::substrate::CSubstrateSpecificationInput);
+Q_DECLARE_METATYPE(sdl::V1_0::substrate::CSubstrateSpecificationDocumentMetaInfo);

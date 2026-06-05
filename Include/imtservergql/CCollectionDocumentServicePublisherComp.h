@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QJsonDocument>
+
 // ImtCore includes
 #include <imtdoc/IDocumentService.h>
 #include <imtdoc/IDocumentServiceEventHandler.h>

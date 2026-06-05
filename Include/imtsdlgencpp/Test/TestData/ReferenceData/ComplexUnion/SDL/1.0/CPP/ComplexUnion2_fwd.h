@@ -6,8 +6,8 @@
 
 // custom types includes
 #include <complextestsdl/SDL/1.0/CPP/ComplexUnion1_fwd.h>
-#include <imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter_fwd.h>
 #include <imtbasesdl/SDL/1.0/CPP/ImtBaseTypes_fwd.h>
+#include <imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter_fwd.h>
 
 
 namespace sdl::V1_0::complextest
@@ -61,10 +61,9 @@ public:
 
 protected:
 	// abstract methods
-	virtual CProductOverview OnGetLastProductionResults(const CGetLastProductionResultsGqlRequest& getLastProductionResultsRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
-	virtual CCDMResult OnGetLastProductionResultsCDM(const CGetLastProductionResultsCDMGqlRequest& getLastProductionResultsCDMRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
+	virtual V1_0::complextest::CProductOverview OnGetLastProductionResults(const CGetLastProductionResultsGqlRequest& getLastProductionResultsRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
+	virtual V1_0::complextest::CCDMResult OnGetLastProductionResultsCDM(const CGetLastProductionResultsCDMGqlRequest& getLastProductionResultsCDMRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
 };
-
 
 
 } // namespace sdl::V1_0::complextest

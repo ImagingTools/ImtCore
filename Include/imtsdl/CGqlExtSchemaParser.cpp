@@ -132,14 +132,14 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 
 		keyword = keyword.trimmed();
 
-		// notify, that the reference type doesn't supported yet
+		// notify, that the reference type doesn't supported now
 		if (keyword == QByteArrayLiteral("ref")){
 			QByteArray typeRefName;
 			retVal = retVal && MoveToNextReadableSymbol() && ReadToDelimeterOrSpace("", typeRefName);
 			SendLogMessage(
 						istd::IInformationProvider::IC_WARNING,
 						0,
-						QString("Reference is not supported yet; it will be ignored and removed in the next version. Found for '%1' at %2").arg(documentType.GetName(), QString::number(m_lastReadLine + 1)),
+						QString("Reference is not supported now; it will be ignored and removed in the next version. Found for '%1' at %2").arg(documentType.GetName(), QString::number(m_lastReadLine + 1)),
 						__func__);
 		}
 		// extract operations

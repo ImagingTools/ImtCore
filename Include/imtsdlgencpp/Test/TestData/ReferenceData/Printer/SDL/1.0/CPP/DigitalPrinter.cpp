@@ -20,7 +20,7 @@ bool CDigitalPrinterSpecification::operator==(const CDigitalPrinterSpecification
 }
 
 
-bool CDigitalPrinterSpecification::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::modsdl::CDigitalPrinterSpecification::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "DigitalPrinterSpecification", modelIndex);
 
@@ -56,11 +56,11 @@ bool CDigitalPrinterSpecification::WriteToModel(::imtbase::CTreeItemModel& model
 }
 
 
-bool CDigitalPrinterSpecification::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::modsdl::CDigitalPrinterSpecification::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* baseDataModelPtr = model.GetTreeItemModel("base", modelIndex);
 	if (baseDataModelPtr != nullptr){
-		base = CPrinterSpecificationBase();
+		base = V1_0::modsdl::CPrinterSpecificationBase();
 		const bool isBaseRead = base->ReadFromModel(*baseDataModelPtr, modelIndex);
 		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
@@ -89,11 +89,11 @@ bool CDigitalPrinterSpecification::ReadFromModel(const ::imtbase::CTreeItemModel
 }
 
 
-bool CDigitalPrinterSpecification::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::modsdl::CDigitalPrinterSpecification::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* baseDataModelPtr = model.GetTreeItemModel("base", modelIndex);
 	if (baseDataModelPtr != nullptr){
-		base = CPrinterSpecificationBase();
+		base = V1_0::modsdl::CPrinterSpecificationBase();
 		const bool isBaseRead = base->ReadFromModel(*baseDataModelPtr, modelIndex);
 		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
@@ -122,7 +122,7 @@ bool CDigitalPrinterSpecification::OptReadFromModel(const ::imtbase::CTreeItemMo
 }
 
 
-bool CDigitalPrinterSpecification::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::modsdl::CDigitalPrinterSpecification::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (base){
 		::imtgql::CGqlParamObject baseGqlObject;
@@ -157,10 +157,10 @@ bool CDigitalPrinterSpecification::WriteToGraphQlObject(::imtgql::CGqlParamObjec
 }
 
 
-bool CDigitalPrinterSpecification::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::modsdl::CDigitalPrinterSpecification::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("base") && (gqlObject.GetParamArgumentObjectPtr("base") != nullptr)){
-		base = CPrinterSpecificationBase();
+		base = V1_0::modsdl::CPrinterSpecificationBase();
 		const bool isBaseRead = base->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("base"));
 		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
@@ -188,10 +188,10 @@ bool CDigitalPrinterSpecification::ReadFromGraphQlObject(const ::imtgql::CGqlPar
 }
 
 
-bool CDigitalPrinterSpecification::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::modsdl::CDigitalPrinterSpecification::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("base") && (gqlObject.GetParamArgumentObjectPtr("base") != nullptr)){
-		base = CPrinterSpecificationBase();
+		base = V1_0::modsdl::CPrinterSpecificationBase();
 		const bool isBaseRead = base->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("base"));
 		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
@@ -219,7 +219,7 @@ bool CDigitalPrinterSpecification::OptReadFromGraphQlObject(const ::imtgql::CGql
 }
 
 
-bool CDigitalPrinterSpecification::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::modsdl::CDigitalPrinterSpecification::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (base){
 		QJsonObject baseJsonObject;
@@ -254,10 +254,10 @@ bool CDigitalPrinterSpecification::WriteToJsonObject(QJsonObject& jsonObject) co
 }
 
 
-bool CDigitalPrinterSpecification::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::modsdl::CDigitalPrinterSpecification::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("base") && jsonObject["base"].isObject()){
-		base = CPrinterSpecificationBase();
+		base = V1_0::modsdl::CPrinterSpecificationBase();
 		const bool isBaseRead = base->ReadFromJsonObject(jsonObject["base"].toObject());
 		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
@@ -285,10 +285,10 @@ bool CDigitalPrinterSpecification::ReadFromJsonObject(const QJsonObject& jsonObj
 }
 
 
-bool CDigitalPrinterSpecification::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::modsdl::CDigitalPrinterSpecification::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("base") && jsonObject["base"].isObject()){
-		base = CPrinterSpecificationBase();
+		base = V1_0::modsdl::CPrinterSpecificationBase();
 		const bool isBaseRead = base->OptReadFromJsonObject(jsonObject["base"].toObject());
 		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
@@ -316,7 +316,7 @@ bool CDigitalPrinterSpecification::OptReadFromJsonObject(const QJsonObject& json
 }
 
 
-// serialize methods
+
 
 QByteArray CDigitalPrinter::GetVersionId()
 {
@@ -332,7 +332,7 @@ bool CDigitalPrinter::operator==(const CDigitalPrinter& other) const
 }
 
 
-bool CDigitalPrinter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::modsdl::CDigitalPrinter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "DigitalPrinter", modelIndex);
 
@@ -368,11 +368,11 @@ bool CDigitalPrinter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 }
 
 
-bool CDigitalPrinter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::modsdl::CDigitalPrinter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* baseDataModelPtr = model.GetTreeItemModel("base", modelIndex);
 	if (baseDataModelPtr != nullptr){
-		base = CPrinterBase();
+		base = V1_0::modsdl::CPrinterBase();
 		const bool isBaseRead = base->ReadFromModel(*baseDataModelPtr, modelIndex);
 		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
@@ -401,11 +401,11 @@ bool CDigitalPrinter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 }
 
 
-bool CDigitalPrinter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::modsdl::CDigitalPrinter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* baseDataModelPtr = model.GetTreeItemModel("base", modelIndex);
 	if (baseDataModelPtr != nullptr){
-		base = CPrinterBase();
+		base = V1_0::modsdl::CPrinterBase();
 		const bool isBaseRead = base->ReadFromModel(*baseDataModelPtr, modelIndex);
 		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
@@ -434,7 +434,7 @@ bool CDigitalPrinter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 }
 
 
-bool CDigitalPrinter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::modsdl::CDigitalPrinter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (base){
 		::imtgql::CGqlParamObject baseGqlObject;
@@ -469,10 +469,10 @@ bool CDigitalPrinter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 }
 
 
-bool CDigitalPrinter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::modsdl::CDigitalPrinter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("base") && (gqlObject.GetParamArgumentObjectPtr("base") != nullptr)){
-		base = CPrinterBase();
+		base = V1_0::modsdl::CPrinterBase();
 		const bool isBaseRead = base->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("base"));
 		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
@@ -500,10 +500,10 @@ bool CDigitalPrinter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 }
 
 
-bool CDigitalPrinter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::modsdl::CDigitalPrinter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("base") && (gqlObject.GetParamArgumentObjectPtr("base") != nullptr)){
-		base = CPrinterBase();
+		base = V1_0::modsdl::CPrinterBase();
 		const bool isBaseRead = base->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("base"));
 		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
@@ -531,7 +531,7 @@ bool CDigitalPrinter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 }
 
 
-bool CDigitalPrinter::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::modsdl::CDigitalPrinter::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (base){
 		QJsonObject baseJsonObject;
@@ -566,10 +566,10 @@ bool CDigitalPrinter::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CDigitalPrinter::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::modsdl::CDigitalPrinter::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("base") && jsonObject["base"].isObject()){
-		base = CPrinterBase();
+		base = V1_0::modsdl::CPrinterBase();
 		const bool isBaseRead = base->ReadFromJsonObject(jsonObject["base"].toObject());
 		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
@@ -597,10 +597,10 @@ bool CDigitalPrinter::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CDigitalPrinter::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::modsdl::CDigitalPrinter::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("base") && jsonObject["base"].isObject()){
-		base = CPrinterBase();
+		base = V1_0::modsdl::CPrinterBase();
 		const bool isBaseRead = base->OptReadFromJsonObject(jsonObject["base"].toObject());
 		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
@@ -628,7 +628,7 @@ bool CDigitalPrinter::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 CDigitalPrinterSpecificationObject::CDigitalPrinterSpecificationObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
@@ -639,10 +639,14 @@ CDigitalPrinterSpecificationObject::CDigitalPrinterSpecificationObject(QObject* 
 
 QVariant CDigitalPrinterSpecificationObject::GetBase()
 {
+	if (!base) {return {};}
+	
 	if (!m_baseQObjectPtr.isValid()){
 		m_baseQObjectPtr = CreateObject("base");
 		auto itemPtr = m_baseQObjectPtr.value<sdl::V1_0::modsdl::CPrinterSpecificationBaseObject*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = CDigitalPrinterSpecification::base;
+		if (itemPtr != nullptr) {
+			itemPtr->name = base->name;
+		}
 	}
 	return m_baseQObjectPtr;
 }
@@ -650,10 +654,9 @@ QVariant CDigitalPrinterSpecificationObject::GetBase()
 
 void CDigitalPrinterSpecificationObject::SetBase(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::modsdl::CPrinterSpecificationBaseObject* itemPtr = v.value<sdl::V1_0::modsdl::CPrinterSpecificationBaseObject*>();
-		if (itemPtr != nullptr)  base = static_cast<const decltype(base)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr) CDigitalPrinterSpecification::base = (*itemPtr);
 	}
 	else {
 		CDigitalPrinterSpecification::base = nullptr;
@@ -689,6 +692,7 @@ void CDigitalPrinterSpecificationObject::ResetBase()
 
 QVariant CDigitalPrinterSpecificationObject::GetPrintingTechnology()
 {
+	if (!printingTechnology) {return {};}
 	sdl::V1_0::modsdl::PrintingTechnology valueType = CDigitalPrinterSpecification::printingTechnology.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::modsdl::PrintingTechnology>();
 	QString retval = metaEnum.valueToKey((int)valueType);
@@ -699,7 +703,6 @@ QVariant CDigitalPrinterSpecificationObject::GetPrintingTechnology()
 
 void CDigitalPrinterSpecificationObject::SetPrintingTechnology(const QVariant& v)
 {
-
 	CDigitalPrinterSpecification::printingTechnology.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::modsdl::PrintingTechnology>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
@@ -873,14 +876,14 @@ QVariant sdl::V1_0::modsdl::CDigitalPrinterSpecificationObjectList::getData(cons
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_base"){
 		return itemPtr->GetBase();
 	}
 	if (nameId == "m_printingTechnology"){
-		return QVariant::fromValue(at(index)->printingTechnology.value());
+		return Version_1_0->at(index)->printingTechnology ? QVariant::fromValue(Version_1_0->at(index)->printingTechnology.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -894,10 +897,17 @@ CDigitalPrinterObject::CDigitalPrinterObject(QObject* parent): ::imtbase::CItemM
 
 QVariant CDigitalPrinterObject::GetBase()
 {
+	if (!base) {return {};}
+	
 	if (!m_baseQObjectPtr.isValid()){
 		m_baseQObjectPtr = CreateObject("base");
 		auto itemPtr = m_baseQObjectPtr.value<sdl::V1_0::modsdl::CPrinterBaseObject*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = CDigitalPrinter::base;
+		if (itemPtr != nullptr) {
+			itemPtr->name = base->name;
+			itemPtr->specification = base->specification;
+			itemPtr->simpleTest = base->simpleTest;
+			itemPtr->mixedTest = base->mixedTest;
+		}
 	}
 	return m_baseQObjectPtr;
 }
@@ -905,10 +915,9 @@ QVariant CDigitalPrinterObject::GetBase()
 
 void CDigitalPrinterObject::SetBase(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::modsdl::CPrinterBaseObject* itemPtr = v.value<sdl::V1_0::modsdl::CPrinterBaseObject*>();
-		if (itemPtr != nullptr)  base = static_cast<const decltype(base)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr) CDigitalPrinter::base = (*itemPtr);
 	}
 	else {
 		CDigitalPrinter::base = nullptr;
@@ -944,6 +953,7 @@ void CDigitalPrinterObject::ResetBase()
 
 QVariant CDigitalPrinterObject::GetPrintingTechnology()
 {
+	if (!printingTechnology) {return {};}
 	sdl::V1_0::modsdl::PrintingTechnology valueType = CDigitalPrinter::printingTechnology.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::modsdl::PrintingTechnology>();
 	QString retval = metaEnum.valueToKey((int)valueType);
@@ -954,7 +964,6 @@ QVariant CDigitalPrinterObject::GetPrintingTechnology()
 
 void CDigitalPrinterObject::SetPrintingTechnology(const QVariant& v)
 {
-
 	CDigitalPrinter::printingTechnology.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::modsdl::PrintingTechnology>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
@@ -1128,14 +1137,14 @@ QVariant sdl::V1_0::modsdl::CDigitalPrinterObjectList::getData(const QString& na
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_base"){
 		return itemPtr->GetBase();
 	}
 	if (nameId == "m_printingTechnology"){
-		return QVariant::fromValue(at(index)->printingTechnology.value());
+		return Version_1_0->at(index)->printingTechnology ? QVariant::fromValue(Version_1_0->at(index)->printingTechnology.value()) : QVariant();
 	}
 
 	return QVariant();

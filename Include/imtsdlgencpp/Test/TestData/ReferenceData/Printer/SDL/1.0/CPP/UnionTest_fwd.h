@@ -76,10 +76,11 @@ protected:
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
 				const CGetSpecificationsGqlRequest& getSpecificationsRequest,
-				PrinterSpecification& representationPayload,
+				V1_0::modsdl::PrinterSpecification& representationPayload,
 				QString& errorMessage) const = 0;
 
 };
+
 
 class CUnionTestGqlHandlerCompBase: public ::imtservergql::CPermissibleGqlRequestHandlerComp
 {
@@ -96,9 +97,8 @@ public:
 
 protected:
 	// abstract methods
-	virtual PrinterSpecification OnGetSpecifications(const CGetSpecificationsGqlRequest& getSpecificationsRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
+	virtual V1_0::modsdl::PrinterSpecification OnGetSpecifications(const CGetSpecificationsGqlRequest& getSpecificationsRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
 };
-
 
 
 } // namespace sdl::V1_0::modsdl
