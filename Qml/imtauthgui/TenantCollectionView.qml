@@ -464,14 +464,6 @@ RemoteCollectionView {
 		}
 	}
 
-	onDoubleClicked: function(id, index) {
-		if (id && id !== AuthorizationController.currentTenantId) {
-			var tenantName = container.table.elements.getData("name", index) || id
-			ModalDialogManager.openDialog(switchOnDoubleClickDialogComp,
-				{"tenantId": id, "tenantName": tenantName})
-		}
-	}
-
 	Component {
 		id: switchOnDoubleClickDialogComp
 		MessageDialog {

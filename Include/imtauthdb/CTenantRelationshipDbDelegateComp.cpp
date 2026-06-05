@@ -54,17 +54,17 @@ istd::IChangeableUniquePtr CTenantRelationshipDbDelegateComp::CreateObjectFromRe
 	relPtr->SetConnectionId(imtdb::VariantToByteArray(record.value("ConnectionId")));
 	relPtr->SetSourceTenantId(imtdb::VariantToByteArray(record.value("SourceTenantId")));
 	relPtr->SetTargetTenantId(imtdb::VariantToByteArray(record.value("TargetTenantId")));
-	relPtr->SetSourceRole(static_cast<imtauth::TenantRelationshipRole>(record.value("SourceRole").toInt()));
-	relPtr->SetTargetRole(static_cast<imtauth::TenantRelationshipRole>(record.value("TargetRole").toInt()));
+	relPtr->SetSourceRole(static_cast<imtauth::ITenantRelationshipInfo::TenantRelationshipRole>(record.value("SourceRole").toInt()));
+	relPtr->SetTargetRole(static_cast<imtauth::ITenantRelationshipInfo::TenantRelationshipRole>(record.value("TargetRole").toInt()));
 	relPtr->SetScope(record.value("Scope").toString());
 	relPtr->SetValidFrom(record.value("ValidFrom").toString());
 	relPtr->SetValidUntil(record.value("ValidUntil").toString());
-	relPtr->SetStatus(static_cast<imtauth::TenantRelationshipStatus>(record.value("Status").toInt()));
+	relPtr->SetStatus(static_cast<imtauth::ITenantRelationshipInfo::TenantRelationshipStatus>(record.value("Status").toInt()));
 	relPtr->SetDescription(record.value("Description").toString());
 	relPtr->SetCreatedAt(RecordDateTimeToString(record, "CreatedAt"));
 	relPtr->SetUpdatedAt(RecordDateTimeToString(record, "UpdatedAt"));
 
-	return relPtr.staticCast<istd::IChangeable>();
+	return relPtr;
 }
 
 
@@ -113,7 +113,6 @@ imtdb::ISqlDatabaseObjectDelegate::NewObjectQuery CTenantRelationshipDbDelegateC
 		.arg(imtdb::EscapeSql(now))
 		.toUtf8();
 
-	result.objectId = objectId;
 	result.query = query;
 
 	return result;
@@ -239,38 +238,10 @@ idoc::MetaInfoPtr CTenantRelationshipDbDelegateComp::CreateObjectMetaInfo(const 
 
 
 bool CTenantRelationshipDbDelegateComp::SetObjectMetaInfoFromRecord(
-		const QSqlRecord& record,
-		idoc::IDocumentMetaInfo& metaInfo) const
+		const QSqlRecord& /*record*/,
+		idoc::IDocumentMetaInfo& /*metaInfo*/) const
 {
-	metaInfo.SetMetaInfoValue(
-		imtauth::ITenantRelationshipInfo::MIT_RELATIONSHIP_ID,
-		imtdb::VariantToByteArray(record.value("Id")));
-
-	if (record.contains("ConnectionId")){
-		metaInfo.SetMetaInfoValue(
-			imtauth::ITenantRelationshipInfo::MIT_RELATIONSHIP_CONNECTION_ID,
-			imtdb::VariantToByteArray(record.value("ConnectionId")));
-	}
-
-	if (record.contains("SourceTenantId")){
-		metaInfo.SetMetaInfoValue(
-			imtauth::ITenantRelationshipInfo::MIT_RELATIONSHIP_SOURCE_TENANT_ID,
-			imtdb::VariantToByteArray(record.value("SourceTenantId")));
-	}
-
-	if (record.contains("TargetTenantId")){
-		metaInfo.SetMetaInfoValue(
-			imtauth::ITenantRelationshipInfo::MIT_RELATIONSHIP_TARGET_TENANT_ID,
-			imtdb::VariantToByteArray(record.value("TargetTenantId")));
-	}
-
-	if (record.contains("Status")){
-		metaInfo.SetMetaInfoValue(
-			imtauth::ITenantRelationshipInfo::MIT_RELATIONSHIP_STATUS,
-			record.value("Status").toInt());
-	}
-
-	return true;
+	return false;
 }
 
 

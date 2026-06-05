@@ -9,6 +9,9 @@
 
 // ImtCore includes
 #include <imtauth/imtauth.h>
+#include <imtauth/ITenantRelationshipInfo.h>
+#include <imtauth/ITenantRelationshipProposalInfo.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
 
 
 namespace imtauthgql
@@ -70,35 +73,35 @@ sdl::V1_0::imtauth::RelationshipStatus ToSdlRelationshipStatus(imtauth::ITenantR
 }
 
 
-sdl::V1_0::imtauth::EConnectionRequestStatus ToSdlConnectionRequestStatus(imtauth::ITenantConnectionRequestInfo::ConnectionRequestStatus status)
+sdl::V1_0::imtauth::ConnectionRequestStatus ToSdlConnectionRequestStatus(imtauth::ITenantConnectionRequestInfo::ConnectionRequestStatus status)
 {
 	switch (status){
 	case imtauth::ITenantConnectionRequestInfo::CRS_APPROVED:
-		return sdl::V1_0::imtauth::EConnectionRequestStatus::Approved;
+		return sdl::V1_0::imtauth::ConnectionRequestStatus::Approved;
 	case imtauth::ITenantConnectionRequestInfo::CRS_REJECTED:
-		return sdl::V1_0::imtauth::EConnectionRequestStatus::Rejected;
+		return sdl::V1_0::imtauth::ConnectionRequestStatus::Rejected;
 	case imtauth::ITenantConnectionRequestInfo::CRS_CANCELED:
-		return sdl::V1_0::imtauth::EConnectionRequestStatus::Canceled;
+		return sdl::V1_0::imtauth::ConnectionRequestStatus::Canceled;
 	default:
-		return sdl::V1_0::imtauth::EConnectionRequestStatus::Pending;
+		return sdl::V1_0::imtauth::ConnectionRequestStatus::Pending;
 	}
 }
 
 
-sdl::V1_0::imtauth::EConnectionStatus ToSdlConnectionStatus(imtauth::ITenantConnectionInfo::ConnectionStatus status)
+sdl::V1_0::imtauth::ConnectionStatus ToSdlConnectionStatus(imtauth::ITenantConnectionInfo::ConnectionStatus status)
 {
 	switch (status){
 	case imtauth::ITenantConnectionInfo::CS_REMOVED:
-		return sdl::V1_0::imtauth::EConnectionStatus::Removed;
+		return sdl::V1_0::imtauth::ConnectionStatus::Removed;
 	case imtauth::ITenantConnectionInfo::CS_SUSPENDED:
-		return sdl::V1_0::imtauth::EConnectionStatus::Suspended;
+		return sdl::V1_0::imtauth::ConnectionStatus::Suspended;
 	default:
-		return sdl::V1_0::imtauth::EConnectionStatus::Active;
+		return sdl::V1_0::imtauth::ConnectionStatus::Active;
 	}
 }
 
 
-sdl::V1_0::imtauth::ITenantRelationshipProposalInfo::RelationshipProposalType ToSdlProposalType(imtauth::ITenantRelationshipProposalInfo::RelationshipProposalType type)
+sdl::V1_0::imtauth::TenantRelationshipProposalInfo::RelationshipProposalType ToSdlProposalType(imtauth::ITenantRelationshipProposalInfo::RelationshipProposalType type)
 {
 	switch (type){
 	case imtauth::ITenantRelationshipProposalInfo::RPT_UPDATE:

@@ -115,8 +115,7 @@ ViewBase {
 					iconSource: copyButton.__copied
 						? "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal)
 						: "../../../" + Style.getIconPath("Icons/Copy", Icon.State.On, Icon.Mode.Normal)
-					tooltipText: copyButton.__copied ? qsTr("Copied!") : qsTr("Copy code")
-					enabled: connectionCodePage.connectionCode !== ""
+					enabled: !copyButton.__copied && connectionCodePage.connectionCode !== ""
 
 					property bool __copied: false
 

@@ -6,6 +6,7 @@
 #include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
+#include <iser/CPrimitiveTypesSerializer.h>
 
 
 namespace imtauth
@@ -38,7 +39,7 @@ IMT_REL_GET_SET(QString, UpdatedAt, m_updatedAt)
 #undef IMT_REL_GET_SET
 
 
-TenantRelationshipRole CTenantRelationshipInfo::GetSourceRole() const
+ITenantRelationshipInfo::TenantRelationshipRole CTenantRelationshipInfo::GetSourceRole() const
 {
 	return m_sourceRole;
 }
@@ -53,7 +54,7 @@ void CTenantRelationshipInfo::SetSourceRole(TenantRelationshipRole role)
 }
 
 
-TenantRelationshipRole CTenantRelationshipInfo::GetTargetRole() const
+ITenantRelationshipInfo::TenantRelationshipRole CTenantRelationshipInfo::GetTargetRole() const
 {
 	return m_targetRole;
 }
@@ -68,7 +69,7 @@ void CTenantRelationshipInfo::SetTargetRole(TenantRelationshipRole role)
 }
 
 
-TenantRelationshipStatus CTenantRelationshipInfo::GetStatus() const
+ITenantRelationshipInfo::TenantRelationshipStatus CTenantRelationshipInfo::GetStatus() const
 {
 	return m_status;
 }
