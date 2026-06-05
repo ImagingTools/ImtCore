@@ -204,6 +204,36 @@ bool CRemoteTenantControllerComp::SetTenantActive(const QByteArray& tenantId, bo
 }
 
 
+bool CRemoteTenantControllerComp::SetTenantHierarchy(const QByteArray& /*tenantId*/, const QByteArray& /*parentTenantId*/)
+{
+	// Hierarchy operations are not supported via remote controller
+	return false;
+}
+
+
+QByteArray CRemoteTenantControllerComp::GetSystemTenantId() const
+{
+	return QByteArrayLiteral("system-tenant");
+}
+
+
+bool CRemoteTenantControllerComp::EnsureSystemTenant()
+{
+	namespace tenantsdl = sdl::V1_0::imtauth;
+
+	imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_MUTATION, tenantsdl::CEnsureSystemTenantGqlRequest::GetCommandId());
+	tenantsdl::CEnsureSystemTenantGqlRequest ensureRequest(gqlRequest, false);
+
+	QString errorMessage;
+	tenantsdl::CEnsureSystemTenantPayload payload = OnEnsureSystemTenant(ensureRequest, gqlRequest, errorMessage);
+	if (!payload.success.has_value()){
+		return false;
+	}
+
+	return *payload.success;
+}
+
+
 // reimplemented (sdl::V1_0::imtauth::CTenantsGqlHandlerCompBase)
 
 sdl::V1_0::imtauth::CGetTenantIdsPayload CRemoteTenantControllerComp::OnGetTenantIds(

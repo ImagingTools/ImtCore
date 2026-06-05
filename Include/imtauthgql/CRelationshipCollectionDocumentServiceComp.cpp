@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CRelationshipCollectionDocumentServiceComp.h>
+#include <imtauthgql/imtauthgql.h>
 
 
 // Qt includes
@@ -11,45 +12,6 @@
 
 // Generated includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/RelationshipCollectionDocumentService.h>
-
-
-namespace
-{
-
-
-sdl::V1_0::imtauth::TenantRelationshipRole ToSdlRelationshipRole(imtauth::ITenantRelationshipInfo::TenantRelationshipRole role)
-{
-switch (role){
-case imtauth::ITenantRelationshipInfo::TRR_PARENT:
-return sdl::V1_0::imtauth::TenantRelationshipRole::Parent;
-case imtauth::ITenantRelationshipInfo::TRR_CHILD:
-return sdl::V1_0::imtauth::TenantRelationshipRole::Child;
-case imtauth::ITenantRelationshipInfo::TRR_SUPPLIER:
-return sdl::V1_0::imtauth::TenantRelationshipRole::Supplier;
-case imtauth::ITenantRelationshipInfo::TRR_CUSTOMER:
-return sdl::V1_0::imtauth::TenantRelationshipRole::Customer;
-case imtauth::ITenantRelationshipInfo::TRR_AFFILIATE:
-return sdl::V1_0::imtauth::TenantRelationshipRole::Affiliate;
-default:
-return sdl::V1_0::imtauth::TenantRelationshipRole::Partner;
-}
-}
-
-
-sdl::V1_0::imtauth::RelationshipStatus ToSdlRelationshipStatus(imtauth::ITenantRelationshipInfo::TenantRelationshipStatus status)
-{
-switch (status){
-case imtauth::ITenantRelationshipInfo::TRS_ARCHIVED:
-return sdl::V1_0::imtauth::RelationshipStatus::Archived;
-case imtauth::ITenantRelationshipInfo::TRS_PENDING_APPROVED:
-return sdl::V1_0::imtauth::RelationshipStatus::PendingApproval;
-default:
-return sdl::V1_0::imtauth::RelationshipStatus::Active;
-}
-}
-
-
-} // anonymous namespace
 
 
 namespace imtauthgql
