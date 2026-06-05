@@ -31,6 +31,7 @@ ViewBase {
 		if (connectPage.apiClient && connectPage.tenantData
 				&& connectPage.tenantData.m_id) {
 			connectPage.apiClient.fetchConnectionRequests(connectPage.tenantData.m_id)
+			connectPage.apiClient.fetchConnections(connectPage.tenantData.m_id)
 		}
 	}
 
@@ -73,6 +74,15 @@ ViewBase {
 			PopupManager.addSuccessMessage(qsTr("Connection request canceled"), true)
 			connectPage.updateGui()
 		}
+
+		function onConnectionsReceived() {
+			connectPage.refreshConnectionsList()
+		}
+
+		function onConnectionRemoved(connectionId) {
+			PopupManager.addSuccessMessage(qsTr("Connection removed"), true)
+			connectPage.updateGui()
+		}
 	}
 
 	function refreshIncomingList() {
@@ -94,6 +104,20 @@ ViewBase {
 		}
 		requestsList.model = incoming
 		sentRequestsList.model = outgoing
+	}
+
+	function refreshConnectionsList() {
+		var allConnections = connectPage.apiClient ? connectPage.apiClient.connectionsModel : null
+		var connections = []
+		if (allConnections) {
+			for (var i = 0; i < allConnections.count; ++i) {
+				var conn = allConnections.get(i)
+				if (conn.status === "Active") {
+					connections.push(conn)
+				}
+			}
+		}
+		connectionsList.model = connections
 	}
 
 	Flickable {
@@ -424,6 +448,107 @@ ViewBase {
 								onClicked: {
 									if (connectPage.apiClient && connectPage.tenantData) {
 										connectPage.apiClient.cancelConnectionRequest(
+											modelData.id, connectPage.tenantData.m_id)
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			Rectangle {
+				width: parent.width
+				height: 1
+				color: Style.borderColor
+			}
+
+			Text {
+				text: qsTr("Established Connections")
+				font.pixelSize: Style.fontSizeL
+				font.bold: true
+				color: Style.textColor
+			}
+
+			Text {
+				text: qsTr("Organizations you are connected with.")
+				font.pixelSize: Style.fontSizeS
+				color: Style.inactiveTextColor
+			}
+
+			Text {
+				visible: connectionsList.count === 0
+				text: qsTr("No established connections yet.")
+				font.pixelSize: Style.fontSizeM
+				color: Style.inactiveTextColor
+			}
+
+			ListView {
+				id: connectionsList
+				width: parent.width
+				height: connectionsList.contentHeight
+				interactive: false
+				spacing: Style.marginS
+
+				delegate: Rectangle {
+					width: connectionsList.width
+					height: connContent.height + Style.marginL * 2
+					color: Style.backgroundColor2
+					radius: Style.radiusL
+					border.width: 1
+					border.color: Style.borderColor
+
+					Column {
+						id: connContent
+						anchors.left: parent.left
+						anchors.right: connActions.left
+						anchors.leftMargin: Style.marginL
+						anchors.rightMargin: Style.marginS
+						anchors.verticalCenter: parent.verticalCenter
+						spacing: Style.marginXS
+
+						Text {
+							text: modelData.partnerName ? modelData.partnerName : qsTr("Unknown Organization")
+							font.pixelSize: Style.fontSizeM
+							font.bold: true
+							color: Style.textColor
+						}
+
+						Text {
+							text: qsTr("Connected since: %1").arg(
+								modelData.createdAt ? new Date(modelData.createdAt).toLocaleDateString() : "—")
+							font.pixelSize: Style.fontSizeXS
+							color: Style.inactiveTextColor
+						}
+					}
+
+					Row {
+						id: connActions
+						anchors.right: parent.right
+						anchors.rightMargin: Style.marginL
+						anchors.verticalCenter: parent.verticalCenter
+						spacing: Style.marginS
+
+						Rectangle {
+							width: removeBtnText.contentWidth + Style.marginL * 2
+							height: Style.controlHeightS
+							radius: Style.radiusM
+							color: "#DA3633"
+
+							Text {
+								id: removeBtnText
+								anchors.centerIn: parent
+								text: qsTr("Remove")
+								font.pixelSize: Style.fontSizeS
+								color: "#FFFFFF"
+							}
+
+							MouseArea {
+								anchors.fill: parent
+								cursorShape: Qt.PointingHandCursor
+								onClicked: {
+									if (connectPage.apiClient && connectPage.tenantData) {
+										connectPage.apiClient.removeConnection(
 											modelData.id, connectPage.tenantData.m_id)
 									}
 								}

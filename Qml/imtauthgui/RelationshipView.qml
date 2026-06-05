@@ -6,6 +6,7 @@ import imtgui 1.0
 import imtcontrols 1.0
 import imtcolgui 1.0
 import imtguigql 1.0
+import imtauthTenantsSdl 1.0
 import imtauthgui 1.0
 
 /**
@@ -14,11 +15,11 @@ import imtauthgui 1.0
  * ViewBase-inherited editor for creating or editing tenant relationships.
  * Follows the RoleView / UserGroupView pattern.
  *
- * When `editRelationshipId` is non-empty the view operates in edit mode:
- * it pre-populates fields from `apiClient.tenantRelationshipsModel` and on
- * submit removes the old relationship then adds a new one with the updated
- * values.  In create mode (editRelationshipId is empty) only AddTenantRelationship
- * is called.
+ * Used inside the document service flow (TenantDocumentEditorShell).
+ * The document framework calls updateGui() to populate the form from
+ * the representationModel and updateModel() to write form values back.
+ * Saving is handled by the shell's Save button which triggers the
+ * bilateral proposal flow via CRelationshipCollectionDocumentServiceComp.
  */
 ViewBase {
 	id: container
@@ -26,71 +27,38 @@ ViewBase {
 	anchors.fill: parent
 	contentColor: Style.baseColor
 
-	property var apiClient: null
-	property var tenantData: null
-
-	// Edit-mode: set to the ID of the relationship to edit (empty = create mode)
-	property string editRelationshipId: ""
-
-	readonly property bool __isEditMode: container.editRelationshipId !== ""
+	property TenantRelationship relationshipData: model
 
 	property string __selectedTargetTenantId: ""
 	property string __selectedTargetTenantName: ""
 
-	signal relationshipCreated()
-
 	function updateGui() {
+		if (!container.relationshipData) {
+			return
+		}
+		container.__selectedTargetTenantId = container.relationshipData.m_targetTenantId || ""
+		container.__selectedTargetTenantName = container.relationshipData.m_targetTenantId || ""
+		var roles = ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
+		var srcIdx = roles.indexOf(container.relationshipData.m_sourceRole || "")
+		var tgtIdx = roles.indexOf(container.relationshipData.m_targetRole || "")
+		sourceRoleCB.currentIndex = srcIdx >= 0 ? srcIdx : 2
+		targetRoleCB.currentIndex = tgtIdx >= 0 ? tgtIdx : 2
+		relScopeInput.text = container.relationshipData.m_scope || ""
+		relDescriptionInput.text = container.relationshipData.m_description || ""
 	}
 
 	function updateModel() {
-	}
-
-	// Pre-populate fields when entering edit mode
-	Component.onCompleted: {
-		if (container.__isEditMode && container.apiClient) {
-			var model = container.apiClient.tenantRelationshipsModel
-			for (var i = 0; i < model.count; i++) {
-				var item = model.get(i)
-				if (item.id === container.editRelationshipId) {
-					container.__selectedTargetTenantId = item.targetTenantId || ""
-					container.__selectedTargetTenantName = item.targetTenantId || ""
-					var roles = ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
-					var srcIdx = roles.indexOf(item.sourceRole)
-					var tgtIdx = roles.indexOf(item.targetRole)
-					sourceRoleCB.currentIndex = srcIdx >= 0 ? srcIdx : 2
-					targetRoleCB.currentIndex = tgtIdx >= 0 ? tgtIdx : 2
-					relScopeInput.text = item.scope || ""
-					relDescriptionInput.text = item.description || ""
-					break
-				}
-			}
-		}
-	}
-
-	function submitRelationship() {
-		if (!container.__selectedTargetTenantId) {
-			ModalDialogManager.showInfoDialog(qsTr("Target tenant is required."))
+		if (!container.relationshipData) {
 			return
 		}
+		container.relationshipData.m_targetTenantId = container.__selectedTargetTenantId || ""
 		var roleTokens = ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
 		var srcIdx = sourceRoleCB.currentIndex >= 0 ? sourceRoleCB.currentIndex : 2
 		var tgtIdx = targetRoleCB.currentIndex >= 0 ? targetRoleCB.currentIndex : 2
-		if (container.__isEditMode && container.apiClient && container.tenantData) {
-			container.apiClient.removeTenantRelationship(
-				container.tenantData.m_id, container.editRelationshipId)
-		}
-		if (container.apiClient) {
-			container.apiClient.addTenantRelationship(
-				container.tenantData ? container.tenantData.m_id : "",
-				container.__selectedTargetTenantId,
-				roleTokens[srcIdx],
-				roleTokens[tgtIdx],
-				relScopeInput.text.trim(),
-				"",
-				"",
-				relDescriptionInput.text.trim())
-		}
-		container.relationshipCreated()
+		container.relationshipData.m_sourceRole = roleTokens[srcIdx]
+		container.relationshipData.m_targetRole = roleTokens[tgtIdx]
+		container.relationshipData.m_scope = relScopeInput.text.trim()
+		container.relationshipData.m_description = relDescriptionInput.text.trim()
 	}
 
 	CustomScrollbar {
@@ -123,7 +91,7 @@ ViewBase {
 
 			GroupHeaderView {
 				width: parent.width
-				title: container.__isEditMode ? qsTr("Edit Relationship") : qsTr("Tenant Relationship")
+				title: qsTr("Tenant Relationship")
 			}
 
 			GroupElementView {
@@ -181,15 +149,6 @@ ViewBase {
 					id: relDescriptionInput
 					name: qsTr("Description")
 					placeHolderText: qsTr("Optional description")
-				}
-			}
-
-			Row {
-				spacing: Style.marginM
-
-				Button {
-					text: container.__isEditMode ? qsTr("Save Changes") : qsTr("Create Relationship")
-					onClicked: { container.submitRelationship() }
 				}
 			}
 		}

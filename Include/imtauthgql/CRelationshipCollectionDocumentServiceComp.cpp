@@ -155,7 +155,17 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CRelationshipCollectionDocumentServ
 	if (relData.validUntil){
 		proposalInfo->SetProposedValidUntil(*relData.validUntil);
 	}
-	proposalInfo->SetProposalType(imtauth::ITenantRelationshipProposalInfo::RPT_UPDATE);
+	// Determine proposal type: if the document is a new/empty relationship, use RPT_CREATE;
+	// if it has an existing relationship ID, use RPT_UPDATE
+	const imtauth::ITenantRelationshipInfo* existingRelPtr = dynamic_cast<const imtauth::ITenantRelationshipInfo*>(documentPtr.GetPtr());
+	bool isNewRelationship = (existingRelPtr == nullptr || existingRelPtr->GetRelationshipId().isEmpty());
+
+	if (isNewRelationship){
+		proposalInfo->SetProposalType(imtauth::ITenantRelationshipProposalInfo::RPT_CREATE);
+	} else {
+		proposalInfo->SetProposalType(imtauth::ITenantRelationshipProposalInfo::RPT_UPDATE);
+		proposalInfo->SetExistingRelationshipId(existingRelPtr->GetRelationshipId());
+	}
 
 	QByteArray proposalId = m_connectionRequestManagerCompPtr->CreateRelationshipProposal(*proposalInfo);
 	if (proposalId.isEmpty()){

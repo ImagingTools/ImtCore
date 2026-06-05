@@ -923,6 +923,23 @@ sdl::V1_0::imtauth::CGetConnectionRequestsPayload CTenantManagerControllerComp::
 			data.respondedAt = reqPtr->GetRespondedAt();
 			data.sourceTenantName = reqPtr->GetSourceTenantName();
 			data.targetTenantName = reqPtr->GetTargetTenantName();
+
+			// Resolve tenant names from tenant manager (handles legacy data where names were not stored)
+			if (m_tenantManagerCompPtr.IsValid()){
+				if (reqPtr->GetSourceTenantName().isEmpty()){
+					imtauth::ITenantInfoUniquePtr srcTenantPtr = m_tenantManagerCompPtr->GetTenant(reqPtr->GetSourceTenantId());
+					if (srcTenantPtr.IsValid()){
+						data.sourceTenantName = srcTenantPtr->GetTenantName();
+					}
+				}
+				if (reqPtr->GetTargetTenantName().isEmpty()){
+					imtauth::ITenantInfoUniquePtr tgtTenantPtr = m_tenantManagerCompPtr->GetTenant(reqPtr->GetTargetTenantId());
+					if (tgtTenantPtr.IsValid()){
+						data.targetTenantName = tgtTenantPtr->GetTenantName();
+					}
+				}
+			}
+
 			response.requests->push_back(data);
 		}
 	}

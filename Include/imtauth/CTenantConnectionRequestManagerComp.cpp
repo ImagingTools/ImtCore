@@ -209,6 +209,32 @@ bool CTenantConnectionRequestManagerComp::ConnectionExists(const QByteArray& ten
 }
 
 
+bool CTenantConnectionRequestManagerComp::PendingRequestExists(const QByteArray& tenantAId, const QByteArray& tenantBId) const
+{
+	if (!m_requestCollectionCompPtr.IsValid()){
+		return false;
+	}
+
+	for (const QByteArray& id : m_requestCollectionCompPtr->GetElementIds()){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_requestCollectionCompPtr->GetObjectData(id, dataPtr)){
+			const ITenantConnectionRequestInfo* reqPtr = dynamic_cast<const ITenantConnectionRequestInfo*>(dataPtr.GetPtr());
+			if (reqPtr == nullptr){
+				continue;
+			}
+			if (reqPtr->GetStatus() != ITenantConnectionRequestInfo::CRS_PENDING){
+				continue;
+			}
+			if ((reqPtr->GetSourceTenantId() == tenantAId && reqPtr->GetTargetTenantId() == tenantBId)
+			|| (reqPtr->GetSourceTenantId() == tenantBId && reqPtr->GetTargetTenantId() == tenantAId)){
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+
 QByteArray CTenantConnectionRequestManagerComp::CreateConnection(const QByteArray& tenantAId, const QByteArray& tenantBId)
 {
 	if (ConnectionExists(tenantAId, tenantBId)){
@@ -550,6 +576,12 @@ QByteArray CTenantConnectionRequestManagerComp::CreateConnectionRequest(
 		return QByteArray();
 	}
 
+	// Check if a pending request already exists between these tenants (in either direction)
+	if (PendingRequestExists(sourceTenantId, targetTenantId)){
+		SendErrorMessage(0, "A pending connection request already exists between these organizations", "CTenantConnectionRequestManagerComp");
+		return QByteArray();
+	}
+
 	istd::CChangeNotifier changeNotifier(this);
 
 	ITenantConnectionRequestInfoUniquePtr reqPtr = m_requestFactoryCompPtr.CreateInstance();
@@ -565,6 +597,18 @@ QByteArray CTenantConnectionRequestManagerComp::CreateConnectionRequest(
 	reqPtr->SetMessage(message);
 	reqPtr->SetStatus(ITenantConnectionRequestInfo::CRS_PENDING);
 	reqPtr->SetCreatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs));
+
+	// Resolve tenant names so they display correctly in the UI
+	if (m_tenantManagerCompPtr.IsValid()){
+		ITenantInfoUniquePtr sourceTenantPtr = m_tenantManagerCompPtr->GetTenant(sourceTenantId);
+		if (sourceTenantPtr.IsValid()){
+			reqPtr->SetSourceTenantName(sourceTenantPtr->GetTenantName());
+		}
+		ITenantInfoUniquePtr targetTenantPtr = m_tenantManagerCompPtr->GetTenant(targetTenantId);
+		if (targetTenantPtr.IsValid()){
+			reqPtr->SetTargetTenantName(targetTenantPtr->GetTenantName());
+		}
+	}
 
 	if (StoreConnectionRequest(*reqPtr)){
 		return requestId;

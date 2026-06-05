@@ -86,6 +86,7 @@ private:
 	QString GenerateConnectionCode() const;
 	QByteArray FindTenantByConnectionCode(const QString& connectionCode) const;
 	bool ConnectionExists(const QByteArray& tenantAId, const QByteArray& tenantBId) const;
+	bool PendingRequestExists(const QByteArray& tenantAId, const QByteArray& tenantBId) const;
 	QByteArray CreateConnection(const QByteArray& tenantAId, const QByteArray& tenantBId);
 	QByteArray ApplyRelationshipProposal(const ITenantRelationshipProposalInfo* proposalPtr);
 	void ArchiveRelationshipsForConnection(const QByteArray& connectionId);
