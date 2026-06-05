@@ -15892,8 +15892,8 @@ void CCDMResultVarStringObject::SetResultContent(const QVariant& v)
 		CCDMResultVarString::resultContent->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TNullableValue<QString> value(tempValue);
-		CCDMResultVarString::resultContent->append(value);
+		istd::TNullableValue<QString> tempItem(tempValue);
+		CCDMResultVarString::resultContent->append(tempItem);
 	}
 
 	resultContentChanged();

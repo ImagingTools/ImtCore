@@ -30,6 +30,16 @@ namespace sdl::V1_0::modsdl
 {
 
 
+inline namespace PrinterBaseSdlEnums
+{
+
+
+
+Q_NAMESPACE
+
+
+} // inline namespace PrinterBaseSdlEnums
+
 // forward declaration for union types
 class PrinterSpecification;
 class CPrinterSpecificationObject;

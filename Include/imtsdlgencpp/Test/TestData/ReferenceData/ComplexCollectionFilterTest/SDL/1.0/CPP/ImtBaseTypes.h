@@ -30,6 +30,16 @@ namespace sdl::V1_0::imtbase
 {
 
 
+inline namespace ImtBaseTypesSdlEnums
+{
+
+
+
+Q_NAMESPACE
+
+
+} // inline namespace ImtBaseTypesSdlEnums
+
 
 class CTimeRange
 {
