@@ -28,25 +28,43 @@ Relationships, and Relationship Proposals.
 class CMockConnectionManager
 {
 public:
-typedef ITenantConnectionRequest::TenantConnectionCodeInfo TenantConnectionCodeInfo;
 typedef ITenantConnectionRequest::ConnectionRequestInfo ConnectionRequestInfo;
 typedef ITenantConnectionRequest::ConnectionRequests ConnectionRequests;
 typedef ITenantConnectionRequest::TenantConnectionInfo TenantConnectionInfo;
 typedef ITenantConnectionRequest::TenantConnections TenantConnections;
-typedef ITenantRelationshipProposalInfo::RelationshipProposalInfo RelationshipProposalInfo;
 typedef ITenantRelationshipProposalInfo::RelationshipProposalStatus RelationshipProposalStatus;
 typedef ITenantRelationshipProposalInfo::RelationshipProposalType RelationshipProposalType;
 
+struct MockConnectionCodeInfo
+{
+	QByteArray tenantId;
+	QString connectionCode;
+	bool allowConnectionsByCode = true;
+	QString createdAt;
+};
+
+struct MockProposalInfo
+{
+	QByteArray proposalId;
+	QByteArray connectionId;
+	QByteArray initiatorTenantId;
+	QByteArray counterpartyTenantId;
+	RelationshipProposalType proposalType = ITenantRelationshipProposalInfo::RPT_CREATE;
+	RelationshipProposalStatus status = ITenantRelationshipProposalInfo::RPS_PENDING;
+	QString createdAt;
+	QString updatedAt;
+};
+
 // --- Connection Code ---
 
-TenantConnectionCodeInfo GetConnectionCode(const QByteArray& tenantId)
+MockConnectionCodeInfo GetConnectionCode(const QByteArray& tenantId)
 {
-for (const TenantConnectionCodeInfo& code : m_codes){
+for (const MockConnectionCodeInfo& code : m_codes){
 if (code.tenantId == tenantId){
 return code;
 }
 }
-TenantConnectionCodeInfo newCode;
+MockConnectionCodeInfo newCode;
 newCode.tenantId = tenantId;
 newCode.connectionCode = GenerateCode();
 newCode.allowConnectionsByCode = true;
@@ -57,13 +75,13 @@ return newCode;
 
 QString RegenerateConnectionCode(const QByteArray& tenantId)
 {
-for (TenantConnectionCodeInfo& code : m_codes){
+for (MockConnectionCodeInfo& code : m_codes){
 if (code.tenantId == tenantId){
 code.connectionCode = GenerateCode();
 return code.connectionCode;
 }
 }
-TenantConnectionCodeInfo newCode;
+MockConnectionCodeInfo newCode;
 newCode.tenantId = tenantId;
 newCode.connectionCode = GenerateCode();
 newCode.allowConnectionsByCode = true;
@@ -74,7 +92,7 @@ return newCode.connectionCode;
 
 bool SetAllowConnectionsByCode(const QByteArray& tenantId, bool allow)
 {
-for (TenantConnectionCodeInfo& code : m_codes){
+for (MockConnectionCodeInfo& code : m_codes){
 if (code.tenantId == tenantId){
 code.allowConnectionsByCode = allow;
 return true;
@@ -95,7 +113,7 @@ return QByteArray();
 }
 
 QByteArray targetTenantId;
-for (const TenantConnectionCodeInfo& code : m_codes){
+for (const MockConnectionCodeInfo& code : m_codes){
 if (code.connectionCode == connectionCode){
 if (!code.allowConnectionsByCode){
 return QByteArray();
@@ -258,7 +276,7 @@ if (!found){
 return QByteArray();
 }
 
-RelationshipProposalInfo stored;
+MockProposalInfo stored;
 stored.proposalId = QByteArray::number(++m_counter);
 stored.connectionId = connectionId;
 stored.initiatorTenantId = initiatorTenantId;
@@ -272,7 +290,7 @@ return stored.proposalId;
 
 QByteArray ApproveRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId)
 {
-for (RelationshipProposalInfo& p : m_proposals){
+for (MockProposalInfo& p : m_proposals){
 if (p.proposalId != proposalId){
 continue;
 }
@@ -297,7 +315,7 @@ return QByteArray();
 
 bool RejectRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId)
 {
-for (RelationshipProposalInfo& p : m_proposals){
+for (MockProposalInfo& p : m_proposals){
 if (p.proposalId == proposalId && p.counterpartyTenantId == tenantId
 && p.status == ITenantRelationshipProposalInfo::RPS_APPROVED_BY_INITIATOR){
 p.status = ITenantRelationshipProposalInfo::RPS_REJECTED;
@@ -310,7 +328,7 @@ return false;
 
 bool CancelRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId)
 {
-for (RelationshipProposalInfo& p : m_proposals){
+for (MockProposalInfo& p : m_proposals){
 if (p.proposalId == proposalId && p.initiatorTenantId == tenantId
 && (p.status == ITenantRelationshipProposalInfo::RPS_PENDING
 || p.status == ITenantRelationshipProposalInfo::RPS_APPROVED_BY_INITIATOR)){
@@ -325,7 +343,7 @@ return false;
 QByteArrayList GetRelationshipProposalIds(const QByteArray& tenantId) const
 {
 QByteArrayList result;
-for (const RelationshipProposalInfo& p : m_proposals){
+for (const MockProposalInfo& p : m_proposals){
 if (p.initiatorTenantId == tenantId || p.counterpartyTenantId == tenantId){
 result.append(p.proposalId);
 }
@@ -360,10 +378,10 @@ return false;
 }
 
 // --- Internal data ---
-QList<TenantConnectionCodeInfo> m_codes;
+QList<MockConnectionCodeInfo> m_codes;
 QList<ConnectionRequestInfo> m_requests;
 QList<TenantConnectionInfo> m_connections;
-QList<RelationshipProposalInfo> m_proposals;
+QList<MockProposalInfo> m_proposals;
 QByteArrayList m_relationshipIds;
 QByteArrayList m_archivedRelationshipIds;
 QMap<QByteArray, QByteArray> m_relationshipConnectionIds;

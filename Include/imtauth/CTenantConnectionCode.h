@@ -14,19 +14,30 @@ namespace imtauth
 class CTenantConnectionCode: virtual public ITenantConnectionCodeInfo, virtual public iser::ISerializable
 {
 public:
-	CTenantConnectionCode();
+CTenantConnectionCode();
 
-	virtual TenantConnectionCodeInfo GetCodeInfo() const override;
-	virtual void SetCodeInfo(const TenantConnectionCodeInfo& codeInfo) override;
-	virtual QByteArray GetTenantId() const override;
+virtual QByteArray GetTenantId() const override;
+virtual void SetTenantId(const QByteArray& tenantId) override;
 
-	virtual bool Serialize(iser::IArchive& archive) override;
-	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
-	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
+virtual QString GetConnectionCode() const override;
+virtual void SetConnectionCode(const QString& connectionCode) override;
+
+virtual bool GetAllowConnectionsByCode() const override;
+virtual void SetAllowConnectionsByCode(bool allow) override;
+
+virtual QString GetCreatedAt() const override;
+virtual void SetCreatedAt(const QString& createdAt) override;
+
+virtual bool Serialize(iser::IArchive& archive) override;
+virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	TenantConnectionCodeInfo m_info;
+QByteArray m_tenantId;
+QString m_connectionCode;
+bool m_allowConnectionsByCode;
+QString m_createdAt;
 };
 
 

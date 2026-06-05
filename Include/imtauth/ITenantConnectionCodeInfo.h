@@ -6,8 +6,9 @@
 #include <iser/IObject.h>
 #include <istd/TSmartPtr.h>
 
-// ImtCore includes
-#include <imtauth/ITenantConnectionRequest.h>
+// Qt includes
+#include <QtCore/QByteArray>
+#include <QtCore/QString>
 
 
 namespace imtauth
@@ -15,16 +16,26 @@ namespace imtauth
 
 
 /**
-Serializable data holder for a tenant connection code.
-Used as the stored representation inside an object collection
-(e.g. an SQL-backed repository).
+Standalone data model for a tenant connection code.
+Each tenant has a unique connection code used for discovery and
+initiating connection requests.
+
+\ingroup Tenant
 */
 class ITenantConnectionCodeInfo: virtual public iser::IObject
 {
 public:
-	virtual ITenantConnectionRequest::TenantConnectionCodeInfo GetCodeInfo() const = 0;
-	virtual void SetCodeInfo(const ITenantConnectionRequest::TenantConnectionCodeInfo& codeInfo) = 0;
-	virtual QByteArray GetTenantId() const = 0;
+virtual QByteArray GetTenantId() const = 0;
+virtual void SetTenantId(const QByteArray& tenantId) = 0;
+
+virtual QString GetConnectionCode() const = 0;
+virtual void SetConnectionCode(const QString& connectionCode) = 0;
+
+virtual bool GetAllowConnectionsByCode() const = 0;
+virtual void SetAllowConnectionsByCode(bool allow) = 0;
+
+virtual QString GetCreatedAt() const = 0;
+virtual void SetCreatedAt(const QString& createdAt) = 0;
 };
 
 

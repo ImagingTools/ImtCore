@@ -29,7 +29,6 @@ class CTenantConnectionRequestManagerComp:
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
-	typedef ITenantRelationshipProposalInfo::RelationshipProposalInfo RelationshipProposalInfo;
 	typedef ITenantRelationshipProposalInfo::RelationshipProposalType RelationshipProposalType;
 	typedef ITenantRelationshipProposalInfo::RelationshipProposalStatus RelationshipProposalStatus;
 
@@ -49,7 +48,8 @@ public:
 	I_END_COMPONENT;
 
 	// ITenantConnectionRequest - Connection Code
-	virtual TenantConnectionCodeInfo GetConnectionCode(const QByteArray& tenantId) override;
+	virtual QString GetConnectionCode(const QByteArray& tenantId) override;
+	virtual bool GetAllowConnectionsByCode(const QByteArray& tenantId) override;
 	virtual QString RegenerateConnectionCode(const QByteArray& tenantId) override;
 	virtual bool SetAllowConnectionsByCode(const QByteArray& tenantId, bool allow) override;
 
@@ -83,14 +83,18 @@ private:
 	QByteArray FindTenantByConnectionCode(const QString& connectionCode) const;
 	bool ConnectionExists(const QByteArray& tenantAId, const QByteArray& tenantBId) const;
 	QByteArray CreateConnection(const QByteArray& tenantAId, const QByteArray& tenantBId);
-	bool ApplyRelationshipProposal(const RelationshipProposalInfo& proposal);
+	bool ApplyRelationshipProposal(const ITenantRelationshipProposalInfo* proposalPtr);
 	void ArchiveRelationshipsForConnection(const QByteArray& connectionId);
 
 	// DB helper methods
-	bool StoreConnectionCode(const QByteArray& tenantId, const TenantConnectionCodeInfo& info);
+	bool StoreConnectionCode(const QByteArray& tenantId, const ITenantConnectionCodeInfo& codeInfo);
 	bool StoreConnectionRequest(const QByteArray& requestId, const ConnectionRequestInfo& info);
 	bool StoreConnection(const QByteArray& connectionId, const TenantConnectionInfo& info);
-	bool StoreProposal(const QByteArray& proposalId, const RelationshipProposalInfo& info);
+	bool StoreProposal(const QByteArray& proposalId, const ITenantRelationshipProposalInfo& proposalInfo);
+
+	// Helper to get code object from collection
+	const ITenantConnectionCodeInfo* GetConnectionCodeObject(const QByteArray& tenantId);
+	void EnsureConnectionCode(const QByteArray& tenantId);
 
 private:
 	I_REF(imtbase::IObjectCollection, m_requestCollectionCompPtr);

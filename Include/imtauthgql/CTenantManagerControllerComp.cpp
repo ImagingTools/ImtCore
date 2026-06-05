@@ -978,12 +978,12 @@ sdl::V1_0::imtauth::CGetConnectionCodePayload CTenantManagerControllerComp::OnGe
 		return response;
 	}
 	
-	imtauth::ITenantConnectionRequest::TenantConnectionCodeInfo codeInfo = m_connectionRequestManagerCompPtr->GetConnectionCode(tenantId);
+	QString connectionCode = m_connectionRequestManagerCompPtr->GetConnectionCode(tenantId);
+	bool allowByCode = m_connectionRequestManagerCompPtr->GetAllowConnectionsByCode(tenantId);
 	response.connectionCode.Emplace();
-	response.connectionCode->connectionCode = codeInfo.connectionCode;
-	response.connectionCode->allowConnectionsByCode = codeInfo.allowConnectionsByCode;
-	response.connectionCode->tenantId = codeInfo.tenantId;
-	response.connectionCode->createdAt = codeInfo.createdAt;
+	response.connectionCode->connectionCode = connectionCode;
+	response.connectionCode->allowConnectionsByCode = allowByCode;
+	response.connectionCode->tenantId = tenantId;
 	
 	return response;
 }

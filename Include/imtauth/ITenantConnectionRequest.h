@@ -52,29 +52,6 @@ public:
 	I_DECLARE_ENUM(ConnectionStatus, CS_ACTIVE, CS_REMOVED, CS_SUSPENDED);
 
 	/**
-		Connection code info for a tenant.
-	*/
-	struct TenantConnectionCodeInfo
-	{
-		QByteArray tenantId;
-		QString connectionCode;
-		bool allowConnectionsByCode = true;
-		QString createdAt;
-
-		bool operator==(const TenantConnectionCodeInfo& other) const
-		{
-			return tenantId == other.tenantId
-					&& connectionCode == other.connectionCode
-					&& allowConnectionsByCode == other.allowConnectionsByCode
-					&& createdAt == other.createdAt;
-		}
-		bool operator!=(const TenantConnectionCodeInfo& other) const
-		{
-			return !(*this == other);
-		}
-	};
-
-	/**
 		Structure describing a connection request between two tenants.
 	*/
 	struct ConnectionRequestInfo
@@ -138,7 +115,8 @@ public:
 
 	typedef QList<TenantConnectionInfo> TenantConnections;
 
-	virtual TenantConnectionCodeInfo GetConnectionCode(const QByteArray& tenantId) = 0;
+	virtual QString GetConnectionCode(const QByteArray& tenantId) = 0;
+	virtual bool GetAllowConnectionsByCode(const QByteArray& tenantId) = 0;
 	virtual QString RegenerateConnectionCode(const QByteArray& tenantId) = 0;
 	virtual bool SetAllowConnectionsByCode(const QByteArray& tenantId, bool allow) = 0;
 	virtual QByteArray CreateConnectionRequest(const QByteArray& sourceTenantId, const QString& connectionCode, const QString& message = QString()) = 0;
