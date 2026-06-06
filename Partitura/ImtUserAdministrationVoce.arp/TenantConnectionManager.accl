@@ -8,7 +8,6 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="CollectionDocumentService" X="450" Y="550" Note=""/>
         <Element ComponentName="ConnectionCodesNotificationPublisher" X="900" Y="450" Note=""/>
         <Element ComponentName="Demultiplexer" X="300" Y="700" Note=""/>
         <Element ComponentName="DocumentCommandsController" X="575" Y="325" Note=""/>
@@ -18,8 +17,11 @@
         <Element ComponentName="TenantConnectionInfo" X="425" Y="200" Note=""/>
         <Element ComponentName="TenantConnectionRequestInfo" X="700" Y="200" Note=""/>
         <Element ComponentName="TenantConnectionRequestManager" X="600" Y="75" Note=""/>
+        <Element ComponentName="TenantConnectionsSelectController" X="973" Y="728" Note=""/>
         <Element ComponentName="TenantRelationshipInfo" X="275" Y="425" Note=""/>
         <Element ComponentName="TenantRelationshipProposalInfo" X="150" Y="200" Note=""/>
+        <Element ComponentName="TenantRelationshipsDocumentService" X="450" Y="550" Note=""/>
+        <Element ComponentName="TenantRelationshipsSelectController" X="975" Y="350" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

@@ -102,6 +102,7 @@ ViewBase {
 
 					controlComp: Component {
 						Row {
+							id: targetTenantRole
 							spacing: Style.marginM
 
 							BaseText {
@@ -117,7 +118,11 @@ ViewBase {
 							Button {
 								text: qsTr("Select")
 								onClicked: {
-									ModalDialogManager.openDialog(tenantSelectComp, {})
+									var point = targetTenantRole.mapToItem(null, 0, targetTenantRole.height)
+									ModalDialogManager.openDialog(tenantSelectComp, {
+																	  "x": point.x,
+																	  "y": point.y
+																  })
 								}
 							}
 						}
@@ -129,6 +134,9 @@ ViewBase {
 					name: qsTr("Source Role")
 					model: roleModel
 					currentIndex: 2
+					onCurrentIndexChanged: {
+						container.doUpdateModel()
+					}
 				}
 
 				ComboBoxElementView {
@@ -136,18 +144,27 @@ ViewBase {
 					name: qsTr("Target Role")
 					model: roleModel
 					currentIndex: 2
+					onCurrentIndexChanged: {
+						container.doUpdateModel()
+					}
 				}
 
 				TextInputElementView {
 					id: relScopeInput
 					name: qsTr("Scope")
 					placeHolderText: qsTr("Optional — empty applies to all resources")
+					onEditingFinished: {
+						container.doUpdateModel()
+					}
 				}
 
 				TextInputElementView {
 					id: relDescriptionInput
 					name: qsTr("Description")
 					placeHolderText: qsTr("Optional description")
+					onEditingFinished: {
+						container.doUpdateModel()
+					}
 				}
 			}
 		}
@@ -166,6 +183,7 @@ ViewBase {
 				container.__selectedTargetTenantId = itemId
 				container.__selectedTargetTenantName = dataProvider
 					? dataProvider.getSelectedItemText(itemId) : ""
+				container.doUpdateModel()
 			}
 		}
 	}

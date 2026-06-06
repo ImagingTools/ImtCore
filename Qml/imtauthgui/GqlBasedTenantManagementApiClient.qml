@@ -2155,6 +2155,9 @@ QtObject {
 
 			representationModel: TenantRelationship {
 				m_id: UuidGenerator.generateUUID()
+				m_status: "Active"
+				m_sourceRole: "Partner"
+				m_targetRole: "Partner"
 			}
 
 			function updateRepresentationFromDocument(){

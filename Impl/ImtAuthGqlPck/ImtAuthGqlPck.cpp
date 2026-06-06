@@ -272,6 +272,16 @@ I_EXPORT_COMPONENT(
 			"Connection Codes Notification Publisher");
 
 I_EXPORT_COMPONENT(
+			TenantConnectionsSelectController,
+			"Tenant connections select controller",
+			"Tenant Connections Select Controller");
+
+I_EXPORT_COMPONENT(
+			TenantRelationshipsSelectController,
+			"Tenant relationships select controller",
+			"Tenant Relationships Select Controller");
+
+I_EXPORT_COMPONENT(
 			RemoteTenantCollectionDocumentService,
 			"Remote tenant collection document service with product permissions enrichment",
 			"Remote Tenant Collection Document Service");

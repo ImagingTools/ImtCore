@@ -1,12 +1,12 @@
-// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtauthgql/CTenantConnectionsSelectControllerComp.h>
+ // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include <imtauthgql/CTenantRelationshipsSelectControllerComp.h>
 
 
 // Qt includes
 #include <QSet>
 
 // ImtCore includes
-#include <imtauth/ITenantConnectionInfo.h>
+#include <imtauth/ITenantRelationshipInfo.h>
 #include "imtbasesdl/SDL/1.0/CPP/FilterableSelect.h"
 
 
@@ -17,12 +17,12 @@ namespace imtauthgql
 // reimplemented (imtgql::IGqlRequestHandler)
 
 
-sdl::V1_0::imtbase::CGetSelectableItemsPayload CTenantConnectionsSelectControllerComp::OnGetSelectableItems(
+sdl::V1_0::imtbase::CGetSelectableItemsPayload CTenantRelationshipsSelectControllerComp::OnGetSelectableItems(
 			const sdl::V1_0::imtbase::CGetSelectableItemsGqlRequest& getSelectableItemsRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	if (!m_tenantConnectionCollectionCompPtr.IsValid()){
+	if (!m_tenantRelationshipCollectionCompPtr.IsValid()){
 		return sdl::V1_0::imtbase::CGetSelectableItemsPayload();
 	}
 
@@ -42,29 +42,29 @@ sdl::V1_0::imtbase::CGetSelectableItemsPayload CTenantConnectionsSelectControlle
 		return payload;
 	}
 
-	QSet<QByteArray> connectedTenantIds;
-	for (const QByteArray& connectionId : m_tenantConnectionCollectionCompPtr->GetElementIds()){
+	QSet<QByteArray> relatedTenantIds;
+	for (const QByteArray& relationshipObjectId : m_tenantRelationshipCollectionCompPtr->GetElementIds()){
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (!m_tenantConnectionCollectionCompPtr->GetObjectData(connectionId, dataPtr)){
+		if (!m_tenantRelationshipCollectionCompPtr->GetObjectData(relationshipObjectId, dataPtr)){
 			continue;
 		}
 
-		const imtauth::ITenantConnectionInfo* connectionInfoPtr = dynamic_cast<const imtauth::ITenantConnectionInfo*>(dataPtr.GetPtr());
-		if (connectionInfoPtr == nullptr || connectionInfoPtr->GetStatus() != imtauth::ITenantConnectionInfo::CS_ACTIVE){
+		const imtauth::ITenantRelationshipInfo* relationshipInfoPtr = dynamic_cast<const imtauth::ITenantRelationshipInfo*>(dataPtr.GetPtr());
+		if (relationshipInfoPtr == nullptr){
 			continue;
 		}
 
-		if (connectionInfoPtr->GetTenantAId() == currentTenantId){
-			connectedTenantIds.insert(connectionInfoPtr->GetTenantBId());
+		if (relationshipInfoPtr->GetSourceTenantId() == currentTenantId && !relationshipInfoPtr->GetTargetTenantId().isEmpty()){
+			relatedTenantIds.insert(relationshipInfoPtr->GetTargetTenantId());
 		}
-		else if (connectionInfoPtr->GetTenantBId() == currentTenantId){
-			connectedTenantIds.insert(connectionInfoPtr->GetTenantAId());
+		else if (relationshipInfoPtr->GetTargetTenantId() == currentTenantId && !relationshipInfoPtr->GetSourceTenantId().isEmpty()){
+			relatedTenantIds.insert(relationshipInfoPtr->GetSourceTenantId());
 		}
 	}
 
 	imtsdl::TElementList<sdl::V1_0::imtbase::CSelectableItemData> filteredItems;
 	for (const auto& item : payload.items->ToList()){
-		if (item.id && connectedTenantIds.contains(*item.id)){
+		if (item.id && relatedTenantIds.contains(*item.id)){
 			filteredItems << item;
 		}
 	}
@@ -80,4 +80,3 @@ sdl::V1_0::imtbase::CGetSelectableItemsPayload CTenantConnectionsSelectControlle
 
 
 } // imtauthgql
-

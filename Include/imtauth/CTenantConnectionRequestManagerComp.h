@@ -5,9 +5,6 @@
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 
-// Qt includes
-#include <functional>
-
 // ImtCore includes
 #include <imtauth/ITenantConnectionRequestManager.h>
 #include <imtauth/ITenantConnectionRequestInfo.h>
