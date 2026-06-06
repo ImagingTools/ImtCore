@@ -19,6 +19,7 @@ public:
 
 	I_BEGIN_COMPONENT(CTenantRelationshipsSelectControllerComp);
 		I_ASSIGN(m_tenantRelationshipCollectionCompPtr, "RelationshipCollection", "Tenant relationships collection", true, "Relationships");
+		I_ASSIGN(m_tenantCollectionCompPtr, "TenantCollection", "Tenant collection for name resolution", false, "TenantCollection");
 	I_END_COMPONENT;
 
 protected:
@@ -30,6 +31,7 @@ protected:
 
 private:
 	I_REF(imtbase::IObjectCollection, m_tenantRelationshipCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_tenantCollectionCompPtr);
 };
 
 

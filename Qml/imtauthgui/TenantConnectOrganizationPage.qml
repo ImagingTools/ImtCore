@@ -555,13 +555,32 @@ ViewBase {
 								cursorShape: Qt.PointingHandCursor
 								onClicked: {
 									if (connectPage.apiClient && connectPage.tenantData) {
-										connectPage.apiClient.removeConnection(
-											modelData.id, connectPage.tenantData.m_id)
+										connectPage.__connectionToRemoveId = modelData.id
+										connectPage.__connectionToRemoveName = modelData.partnerName || qsTr("Unknown Organization")
+										ModalDialogManager.openDialog(removeConnectionConfirmDialogComp)
 									}
 								}
 							}
 						}
 					}
+				}
+			}
+		}
+	}
+
+	property string __connectionToRemoveId: ""
+	property string __connectionToRemoveName: ""
+
+	Component {
+		id: removeConnectionConfirmDialogComp
+		MessageDialog {
+			width: Style.sizeHintM
+			title: qsTr("Remove connection")
+			message: qsTr("Are you sure you want to remove the connection with \"%1\"?\n\nAll relationships with this organization will also be removed.").arg(connectPage.__connectionToRemoveName)
+			onFinished: {
+				if (buttonId == Enums.yes) {
+					connectPage.apiClient.removeConnection(
+						connectPage.__connectionToRemoveId, connectPage.tenantData.m_id)
 				}
 			}
 		}

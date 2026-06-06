@@ -2,11 +2,9 @@
 #include <imtauthgql/CTenantRelationshipsSelectControllerComp.h>
 
 
-// Qt includes
-#include <QSet>
-
 // ImtCore includes
 #include <imtauth/ITenantRelationshipInfo.h>
+#include <imtbase/ICollectionInfo.h>
 #include "imtbasesdl/SDL/1.0/CPP/FilterableSelect.h"
 
 
@@ -22,30 +20,24 @@ sdl::V1_0::imtbase::CGetSelectableItemsPayload CTenantRelationshipsSelectControl
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
+	sdl::V1_0::imtbase::CGetSelectableItemsPayload payload;
+
 	if (!m_tenantRelationshipCollectionCompPtr.IsValid()){
-		return sdl::V1_0::imtbase::CGetSelectableItemsPayload();
+		return payload;
 	}
 
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr == nullptr || gqlContextPtr->GetTenantId().isEmpty()){
-		return sdl::V1_0::imtbase::CGetSelectableItemsPayload();
+		return payload;
 	}
 
 	const QByteArray currentTenantId = gqlContextPtr->GetTenantId();
 
-	sdl::V1_0::imtbase::CGetSelectableItemsPayload payload = BaseClass::OnGetSelectableItems(getSelectableItemsRequest, gqlRequest, errorMessage);
-	if (!errorMessage.isEmpty()){
-		return sdl::V1_0::imtbase::CGetSelectableItemsPayload();
-	}
+	imtsdl::TElementList<sdl::V1_0::imtbase::CSelectableItemData> itemsList;
 
-	if (!payload.items.HasValue()){
-		return payload;
-	}
-
-	QSet<QByteArray> relatedTenantIds;
-	for (const QByteArray& relationshipObjectId : m_tenantRelationshipCollectionCompPtr->GetElementIds()){
+	for (const QByteArray& objectId : m_tenantRelationshipCollectionCompPtr->GetElementIds()){
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (!m_tenantRelationshipCollectionCompPtr->GetObjectData(relationshipObjectId, dataPtr)){
+		if (!m_tenantRelationshipCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 			continue;
 		}
 
@@ -54,26 +46,49 @@ sdl::V1_0::imtbase::CGetSelectableItemsPayload CTenantRelationshipsSelectControl
 			continue;
 		}
 
-		if (relationshipInfoPtr->GetSourceTenantId() == currentTenantId && !relationshipInfoPtr->GetTargetTenantId().isEmpty()){
-			relatedTenantIds.insert(relationshipInfoPtr->GetTargetTenantId());
+		if (relationshipInfoPtr->GetStatus() != imtauth::ITenantRelationshipInfo::TRS_ACTIVE){
+			continue;
 		}
-		else if (relationshipInfoPtr->GetTargetTenantId() == currentTenantId && !relationshipInfoPtr->GetSourceTenantId().isEmpty()){
-			relatedTenantIds.insert(relationshipInfoPtr->GetSourceTenantId());
+
+		QByteArray partnerTenantId;
+		if (relationshipInfoPtr->GetSourceTenantId() == currentTenantId){
+			partnerTenantId = relationshipInfoPtr->GetTargetTenantId();
 		}
+		else if (relationshipInfoPtr->GetTargetTenantId() == currentTenantId){
+			partnerTenantId = relationshipInfoPtr->GetSourceTenantId();
+		}
+		else{
+			continue;
+		}
+
+		sdl::V1_0::imtbase::CSelectableItemData item;
+		item.id = objectId;
+
+		QString name = m_tenantRelationshipCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+		if (name.isEmpty()){
+			if (m_tenantCollectionCompPtr.IsValid()){
+				name = m_tenantCollectionCompPtr->GetElementInfo(partnerTenantId, imtbase::ICollectionInfo::EIT_NAME).toString();
+			}
+			if (name.isEmpty()){
+				name = QString::fromUtf8(partnerTenantId);
+			}
+		}
+		item.name = name;
+
+		QString description = relationshipInfoPtr->GetDescription();
+		if (!description.isEmpty()){
+			item.description = description;
+		}
+
+		itemsList << item;
 	}
 
-	imtsdl::TElementList<sdl::V1_0::imtbase::CSelectableItemData> filteredItems;
-	for (const auto& item : payload.items->ToList()){
-		if (item.id && relatedTenantIds.contains(*item.id)){
-			filteredItems << item;
-		}
-	}
+	payload.items = itemsList;
 
-	payload.items = filteredItems;
-	if (payload.notification.HasValue()){
-		payload.notification->totalCount = filteredItems.size();
-		payload.notification->pagesCount = 1;
-	}
+	sdl::V1_0::imtbase::CNotificationItem notification;
+	notification.pagesCount = 1;
+	notification.totalCount = itemsList.size();
+	payload.notification = notification;
 
 	return payload;
 }

@@ -1122,13 +1122,37 @@ bool CTenantConnectionRequestManagerComp::RemoveTenantRelationship(const QByteAr
 		return false;
 	}
 
+	// Find the relationship by iterating collection - the relationshipId may be either
+	// the collection object key or the internal GetRelationshipId() value
+	QByteArray collectionKey;
+	const ITenantRelationshipInfo* relPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (!m_relationshipCollectionCompPtr->GetObjectData(relationshipId, dataPtr)){
-		return false;
+
+	// First try direct lookup (relationshipId == collection key)
+	if (m_relationshipCollectionCompPtr->GetObjectData(relationshipId, dataPtr)){
+		relPtr = dynamic_cast<const ITenantRelationshipInfo*>(dataPtr.GetPtr());
+		if (relPtr != nullptr){
+			collectionKey = relationshipId;
+		}
 	}
 
-	const ITenantRelationshipInfo* relPtr = dynamic_cast<const ITenantRelationshipInfo*>(dataPtr.GetPtr());
+	// If direct lookup failed, iterate to find by GetRelationshipId()
 	if (relPtr == nullptr){
+		for (const QByteArray& id : m_relationshipCollectionCompPtr->GetElementIds()){
+			imtbase::IObjectCollection::DataPtr iterDataPtr;
+			if (m_relationshipCollectionCompPtr->GetObjectData(id, iterDataPtr)){
+				const ITenantRelationshipInfo* iterRelPtr = dynamic_cast<const ITenantRelationshipInfo*>(iterDataPtr.GetPtr());
+				if (iterRelPtr != nullptr && iterRelPtr->GetRelationshipId() == relationshipId){
+					relPtr = iterRelPtr;
+					collectionKey = id;
+					dataPtr = iterDataPtr;
+					break;
+				}
+			}
+		}
+	}
+
+	if (relPtr == nullptr || collectionKey.isEmpty()){
 		return false;
 	}
 	if (relPtr->GetSourceTenantId() != tenantId && relPtr->GetTargetTenantId() != tenantId){
@@ -1144,7 +1168,7 @@ bool CTenantConnectionRequestManagerComp::RemoveTenantRelationship(const QByteAr
 	updatedPtr->CopyFrom(*relPtr);
 	updatedPtr->SetStatus(ITenantRelationshipInfo::TRS_ARCHIVED);
 	updatedPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs));
-	return m_relationshipCollectionCompPtr->SetObjectData(relationshipId, *updatedPtr);
+	return m_relationshipCollectionCompPtr->SetObjectData(collectionKey, *updatedPtr);
 }
 
 

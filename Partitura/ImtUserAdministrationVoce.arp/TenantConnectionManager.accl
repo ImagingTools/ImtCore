@@ -22,6 +22,7 @@
         <Element ComponentName="TenantRelationshipProposalInfo" X="150" Y="200" Note=""/>
         <Element ComponentName="TenantRelationshipsDocumentService" X="450" Y="550" Note=""/>
         <Element ComponentName="TenantRelationshipsSelectController" X="975" Y="350" Note=""/>
+        <Element ComponentName="SerializedUndoManager" X="450" Y="425" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
