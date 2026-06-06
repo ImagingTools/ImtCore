@@ -10,6 +10,8 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
 
+#undef GetMessage
+
 
 namespace imtauth
 {
