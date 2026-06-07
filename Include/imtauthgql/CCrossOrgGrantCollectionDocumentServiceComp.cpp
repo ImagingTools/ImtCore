@@ -54,7 +54,7 @@ sdl::V1_0::imtauth::CCrossOrgGrant CCrossOrgGrantCollectionDocumentServiceComp::
 			response.id = info.grantId;
 			response.sourceTenantId = info.sourceTenantId;
 			response.targetTenantId = info.targetTenantId;
-			response.roleIds = info.roleIds.join(";");
+			response.roleIds.Emplace().FromList(info.roleIds);
 			response.description = info.description;
 			response.createdAt = info.createdAt;
 			response.expiresAt = info.expiresAt;
@@ -62,11 +62,7 @@ sdl::V1_0::imtauth::CCrossOrgGrant CCrossOrgGrantCollectionDocumentServiceComp::
 
 			// Resolve target tenant name
 			if (m_tenantCollectionCompPtr.IsValid() && !info.targetTenantId.isEmpty()){
-				const imtbase::ICollectionInfo* tenantInfo =
-					dynamic_cast<const imtbase::ICollectionInfo*>(m_tenantCollectionCompPtr->GetElement(info.targetTenantId));
-				if (tenantInfo != nullptr){
-					response.targetTenantName = tenantInfo->GetName();
-				}
+				response.targetTenantName = m_tenantCollectionCompPtr->GetElementInfo(info.targetTenantId, imtbase::ICollectionInfo::EIT_NAME).toString();
 			}
 
 			return response;
@@ -145,7 +141,7 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CCrossOrgGrantCollectionDocumentSer
 		info.targetTenantId = *grantRepresentation.targetTenantId;
 	}
 	if (grantRepresentation.roleIds){
-		info.roleIds = grantRepresentation.roleIds->split(';', Qt::SkipEmptyParts);
+		info.roleIds = grantRepresentation.roleIds->ToList();
 	}
 	if (grantRepresentation.description){
 		info.description = *grantRepresentation.description;

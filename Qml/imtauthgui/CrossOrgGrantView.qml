@@ -36,12 +36,8 @@ ViewBase {
 		}
 		container.__selectedTargetTenantId = container.grantData.m_targetTenantId || ""
 		container.__selectedTargetTenantName = container.grantData.m_targetTenantName || container.grantData.m_targetTenantId || ""
-		var roleIdsStr = container.grantData.m_roleIds || ""
-		if (roleIdsStr.length > 0) {
-			container.__selectedRoleIds = roleIdsStr.split(";")
-		} else {
-			container.__selectedRoleIds = []
-		}
+		var roleIds = container.grantData.m_roleIds
+		container.__selectedRoleIds = roleIds
 		container.__selectedRoleNames = container.__selectedRoleIds.join(", ")
 		grantDescriptionInput.text = container.grantData.m_description || ""
 		expiresAtPicker.setDateFromString(container.grantData.m_expiresAt || "")
@@ -52,7 +48,7 @@ ViewBase {
 			return
 		}
 		container.grantData.m_targetTenantId = container.__selectedTargetTenantId || ""
-		container.grantData.m_roleIds = container.__selectedRoleIds.join(";")
+		container.grantData.m_roleIds = container.__selectedRoleIds
 		container.grantData.m_description = grantDescriptionInput.text.trim()
 		container.grantData.m_expiresAt = expiresAtPicker.getDateAsString()
 	}

@@ -65,6 +65,7 @@
 #include <imtauthgql/CRelationshipCollectionDocumentServiceComp.h>
 #include <imtauthgql/CGroupCollectionDocumentServiceComp.h>
 #include <imtauthgql/CUserCollectionDocumentServiceComp.h>
+#include <imtauthgql/CCrossOrgGrantCollectionDocumentServiceComp.h>
 
 
 /**
@@ -132,6 +133,7 @@ typedef imtauthgql::CRoleCollectionDocumentServiceComp RoleCollectionDocumentSer
 typedef imtauthgql::CRelationshipCollectionDocumentServiceComp RelationshipCollectionDocumentService;
 typedef imtauthgql::CGroupCollectionDocumentServiceComp GroupCollectionDocumentService;
 typedef imtauthgql::CUserCollectionDocumentServiceComp UserCollectionDocumentService;
+typedef imtauthgql::CCrossOrgGrantCollectionDocumentServiceComp CrossOrgGrantCollectionDocumentService;
 
 
 } // namespace ImtAuthGqlPck

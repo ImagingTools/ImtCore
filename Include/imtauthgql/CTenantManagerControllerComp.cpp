@@ -388,7 +388,7 @@ sdl::V1_0::imtauth::CCrossOrgGrant GrantInfoToData(const imtauth::CrossOrgGrantI
 	data.id = info.grantId;
 	data.sourceTenantId = info.sourceTenantId;
 	data.targetTenantId = info.targetTenantId;
-	data.roleIds = info.roleIds.join(';');
+	data.roleIds.Emplace().FromList(info.roleIds);
 	data.description = info.description;
 	data.createdAt = info.createdAt;
 	data.expiresAt = info.expiresAt;
@@ -495,13 +495,7 @@ sdl::V1_0::imtauth::CCreateCrossOrgGrantPayload CTenantManagerControllerComp::On
 		targetTenantId = *arguments.input->targetTenantId;
 	}
 	if (arguments.input->roleIds){
-		QString roleIdsStr = *arguments.input->roleIds;
-		if (!roleIdsStr.isEmpty()){
-			QStringList parts = roleIdsStr.split(';', Qt::SkipEmptyParts);
-			for (const QString& part : parts){
-				roleIds.append(part.trimmed().toUtf8());
-			}
-		}
+		roleIds = arguments.input->roleIds->ToList();
 	}
 	if (arguments.input->description){
 		description = *arguments.input->description;

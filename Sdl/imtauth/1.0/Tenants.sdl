@@ -464,7 +464,7 @@ type CrossOrgGrant {
 	sourceTenantId: ID!
 	targetTenantId: ID!
 	targetTenantName: String
-	roleIds: String
+	roleIds: [ID]
 	description: String
 	createdAt: String
 	expiresAt: String
@@ -474,7 +474,7 @@ type CrossOrgGrant {
 input CreateCrossOrgGrantInput {
 	sourceTenantId: ID!
 	targetTenantId: ID!
-	roleIds: String
+	roleIds: [ID]
 	description: String
 	expiresAt: String
 }

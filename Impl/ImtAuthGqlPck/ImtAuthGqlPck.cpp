@@ -306,6 +306,11 @@ I_EXPORT_COMPONENT(
 			"User collection document service: GetUserRepresentation / UpdateUserFromRepresentation",
 			"User Collection Document Service");
 
+I_EXPORT_COMPONENT(
+			CrossOrgGrantCollectionDocumentService,
+			"Cross Org Grant collection document service",
+			"Cross Org Grant Collection Document Service");
+
 
 } // namespace ImtAuthGqlPck
 
