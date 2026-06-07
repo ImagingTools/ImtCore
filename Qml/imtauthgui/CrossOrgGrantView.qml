@@ -11,7 +11,8 @@ import imtauthgui 1.0
 /**
  * CrossOrgGrantView
  *
- * ViewBase-inherited editor for creating cross-org grants.
+ * ViewBase-inherited editor for creating/editing cross-org grants.
+ * Follows the document service pattern (updateGui/updateModel).
  * Simplified model: TargetTenant, Roles (multi-select), Description, Expires.
  */
 ViewBase {
@@ -20,6 +21,7 @@ ViewBase {
 	anchors.fill: parent
 	contentColor: Style.baseColor
 
+	property var grantData: model
 	property var apiClient: null
 	property var tenantData: null
 
@@ -28,32 +30,31 @@ ViewBase {
 	property var __selectedRoleIds: []
 	property string __selectedRoleNames: ""
 
-	signal grantCreated()
-
 	function updateGui() {
+		if (!container.grantData) {
+			return
+		}
+		container.__selectedTargetTenantId = container.grantData.m_targetTenantId || ""
+		container.__selectedTargetTenantName = container.grantData.m_targetTenantName || container.grantData.m_targetTenantId || ""
+		var roleIdsStr = container.grantData.m_roleIds || ""
+		if (roleIdsStr.length > 0) {
+			container.__selectedRoleIds = roleIdsStr.split(";")
+		} else {
+			container.__selectedRoleIds = []
+		}
+		container.__selectedRoleNames = container.__selectedRoleIds.join(", ")
+		grantDescriptionInput.text = container.grantData.m_description || ""
+		expiresAtPicker.setDateFromString(container.grantData.m_expiresAt || "")
 	}
 
 	function updateModel() {
-	}
-
-	function submitGrant() {
-		if (!container.__selectedTargetTenantId) {
-			ModalDialogManager.showInfoDialog(qsTr("Target tenant is required."))
+		if (!container.grantData) {
 			return
 		}
-		if (container.__selectedRoleIds.length === 0) {
-			ModalDialogManager.showInfoDialog(qsTr("At least one role must be selected."))
-			return
-		}
-		var roleIdsStr = container.__selectedRoleIds.join(";")
-		if (container.apiClient) {
-			container.apiClient.createCrossOrgGrant(
-				container.tenantData ? container.tenantData.m_id : "",
-				container.__selectedTargetTenantId,
-				roleIdsStr,
-				grantDescriptionInput.text.trim(),
-				expiresAtPicker.getDateAsString())
-		}
+		container.grantData.m_targetTenantId = container.__selectedTargetTenantId || ""
+		container.grantData.m_roleIds = container.__selectedRoleIds.join(";")
+		container.grantData.m_description = grantDescriptionInput.text.trim()
+		container.grantData.m_expiresAt = expiresAtPicker.getDateAsString()
 	}
 
 	CustomScrollbar {
@@ -98,6 +99,7 @@ ViewBase {
 
 					controlComp: Component {
 						Row {
+							id: targetTenantRow
 							spacing: Style.marginM
 
 							BaseText {
@@ -113,7 +115,11 @@ ViewBase {
 							Button {
 								text: qsTr("Select")
 								onClicked: {
-									ModalDialogManager.openDialog(tenantSelectComp, {})
+									var point = targetTenantRow.mapToItem(null, 0, targetTenantRow.height)
+									ModalDialogManager.openDialog(tenantSelectComp, {
+																	  "x": point.x,
+																	  "y": point.y
+																  })
 								}
 							}
 						}
@@ -150,11 +156,17 @@ ViewBase {
 					id: grantDescriptionInput
 					name: qsTr("Description")
 					placeHolderText: qsTr("Optional description")
+					onEditingFinished: {
+						container.doUpdateModel()
+					}
 				}
 
 				DateTimePickerElementView {
 					id: expiresAtPicker
 					name: qsTr("Expires At")
+					onDateChanged: {
+						container.doUpdateModel()
+					}
 				}
 			}
 		}
@@ -164,10 +176,7 @@ ViewBase {
 		id: tenantSelectComp
 
 		FilterableSelectPopup {
-			dataProvider: FilterableSelectGqlDataProvider {
-				collectionId: "Tenants"
-				multiSelect: false
-			}
+			dataProvider: container.apiClient ? container.apiClient.connectionsDataProvider : null
 			filterPlaceholder: qsTr("Select tenant...")
 			preselectedIds: container.__selectedTargetTenantId
 				? [container.__selectedTargetTenantId] : []
@@ -176,6 +185,7 @@ ViewBase {
 				container.__selectedTargetTenantId = itemId
 				container.__selectedTargetTenantName = dataProvider
 					? dataProvider.getSelectedItemText(itemId) : ""
+				container.doUpdateModel()
 			}
 		}
 	}
@@ -201,6 +211,7 @@ ViewBase {
 					}
 				}
 				container.__selectedRoleNames = names.join(", ")
+				container.doUpdateModel()
 			}
 		}
 	}

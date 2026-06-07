@@ -30,6 +30,7 @@ public:
 	I_BEGIN_COMPONENT(CRelationshipCollectionDocumentServiceComp)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentService", "Collection document manager", true, "CollectionDocumentService");
 		I_ASSIGN(m_connectionCollectionCompPtr, "ConnectionCollection", "Tenant connections collection", true, "ConnectionCollection");
+		I_ASSIGN(m_tenantCollectionCompPtr, "TenantCollection", "Tenant collection for name resolution", false, "TenantCollection");
 	I_END_COMPONENT
 
 protected:
@@ -46,6 +47,7 @@ protected:
 private:
 	I_REF(imtdoc::IDocumentService, m_documentManagerCompPtr);
 	I_REF(imtbase::IObjectCollection, m_connectionCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_tenantCollectionCompPtr);
 };
 
 

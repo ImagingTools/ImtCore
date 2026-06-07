@@ -158,6 +158,8 @@ QtObject {
 
 	// --- Cross-org grants ---
 	property var crossOrgGrantsModel: null
+	property var crossOrgGrantDocumentManager: null
+	property var crossOrgGrantsListDataProvider: null
 	property var tenantsListDataProvider: null
 	property var tenantRelationshipsListDataProvider: null
 	function fetchCrossOrgGrants(tenantId) {}

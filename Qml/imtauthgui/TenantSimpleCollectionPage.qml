@@ -74,8 +74,12 @@ ViewBase {
 
 	function resolveDocumentName(documentId) {
 		var view = collectionPage.documentManager.getDocumentViewInstance(documentId, "")
-		if (view && view.model && view.model.m_name)
-			return view.model.m_name
+		if (view && view.model) {
+			if (view.model.m_name)
+				return view.model.m_name
+			if (view.model.m_targetTenantName)
+				return view.model.m_targetTenantName
+		}
 		return ""
 	}
 

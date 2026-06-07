@@ -36,7 +36,7 @@ ViewBase {
 			return
 		}
 		container.__selectedTargetTenantId = container.relationshipData.m_targetTenantId || ""
-		container.__selectedTargetTenantName = container.relationshipData.m_targetTenantId || ""
+		container.__selectedTargetTenantName = container.relationshipData.m_targetTenantName || ""
 		var roles = ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
 		var srcIdx = roles.indexOf(container.relationshipData.m_sourceRole || "")
 		var tgtIdx = roles.indexOf(container.relationshipData.m_targetRole || "")

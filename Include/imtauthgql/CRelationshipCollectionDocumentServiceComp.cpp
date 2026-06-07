@@ -6,6 +6,7 @@
 #include <imtauth/ITenantConnectionInfo.h>
 #include <imtauth/ITenantRelationshipInfo.h>
 #include <imtauthgql/imtauthgql.h>
+#include <imtbase/ICollectionInfo.h>
 #include <imtgql/IGqlContext.h>
 
 // Generated includes
@@ -64,6 +65,14 @@ sdl::V1_0::imtauth::CTenantRelationship CRelationshipCollectionDocumentServiceCo
 			response.description = relPtr->GetDescription();
 			response.createdAt = relPtr->GetCreatedAt();
 			response.updatedAt = relPtr->GetUpdatedAt();
+
+			// Resolve target tenant name
+			if (m_tenantCollectionCompPtr.IsValid() && !relPtr->GetTargetTenantId().isEmpty()){
+				QString tenantName = m_tenantCollectionCompPtr->GetElementInfo(relPtr->GetTargetTenantId(), imtbase::ICollectionInfo::EIT_NAME).toString();
+				if (!tenantName.isEmpty()){
+					response.targetTenantName = tenantName;
+				}
+			}
 
 			return response;
 		}

@@ -33,6 +33,16 @@ sdl::V1_0::imtbase::CGetSelectableItemsPayload CTenantRelationshipsSelectControl
 
 	const QByteArray currentTenantId = gqlContextPtr->GetTenantId();
 
+	// Extract filter text from request arguments
+	QString filterText;
+	sdl::V1_0::imtbase::GetSelectableItemsRequestArguments arguments = getSelectableItemsRequest.GetRequestedArguments();
+	if (arguments.input && arguments.input->viewParams && arguments.input->viewParams->filterModel){
+		auto& filterModel = *arguments.input->viewParams->filterModel;
+		if (filterModel.textFilter && filterModel.textFilter->text){
+			filterText = *filterModel.textFilter->text;
+		}
+	}
+
 	imtsdl::TElementList<sdl::V1_0::imtbase::CSelectableItemData> itemsList;
 
 	for (const QByteArray& objectId : m_tenantRelationshipCollectionCompPtr->GetElementIds()){
@@ -78,6 +88,15 @@ sdl::V1_0::imtbase::CGetSelectableItemsPayload CTenantRelationshipsSelectControl
 		QString description = relationshipInfoPtr->GetDescription();
 		if (!description.isEmpty()){
 			item.description = description;
+		}
+
+		// Apply text filter
+		if (!filterText.isEmpty()){
+			bool matchesFilter = name.contains(filterText, Qt::CaseInsensitive)
+				|| description.contains(filterText, Qt::CaseInsensitive);
+			if (!matchesFilter){
+				continue;
+			}
 		}
 
 		itemsList << item;

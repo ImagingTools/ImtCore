@@ -340,6 +340,7 @@ type TenantRelationship {
 	connectionId: ID!
 	sourceTenantId: ID!
 	targetTenantId: ID!
+	targetTenantName: String
 	sourceRole: TenantRelationshipRole!
 	targetRole: TenantRelationshipRole!
 	scope: String
@@ -462,6 +463,7 @@ type CrossOrgGrant {
 	id: ID!
 	sourceTenantId: ID!
 	targetTenantId: ID!
+	targetTenantName: String
 	roleIds: String
 	description: String
 	createdAt: String

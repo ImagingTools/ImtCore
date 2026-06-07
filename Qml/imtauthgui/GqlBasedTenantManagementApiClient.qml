@@ -1885,6 +1885,16 @@ QtObject {
 		collectionId: "TenantRelationships"
 	}
 
+	property GqlBasedCollectionDocumentService __crossOrgGrantDocumentService: GqlBasedCollectionDocumentService {
+		collectionId: "CrossOrgGrants"
+	}
+
+	readonly property var crossOrgGrantDocumentManager: __crossOrgGrantDocumentService
+
+	property FilterableSelectGqlDataProvider crossOrgGrantsListDataProvider: FilterableSelectGqlDataProvider {
+		collectionId: "CrossOrgGrants"
+	}
+
 	// --- Role editor + representation controller ---
 	property Component __roleEditorComp: Component {
 		RoleView {
