@@ -14,10 +14,12 @@
         <Element ComponentName="CrossOrgGrantsDocumentService" X="400" Y="525" Note=""/>
         <Element ComponentName="CrossTenantMessageBroker" X="600" Y="350" Note=""/>
         <Element ComponentName="CrossTenantMessageInfo" X="975" Y="350" Note=""/>
-        <Element ComponentName="CrossTenantMessageNotificationPublisher" X="1000" Y="550" Note=""/>
+        <Element ComponentName="CrossTenantMessageNotificationPublisher" X="975" Y="450" Note=""/>
         <Element ComponentName="CrossTenantMessageProjection" X="200" Y="350" Note=""/>
+        <Element ComponentName="FilterableSelectController" X="925" Y="50" Note=""/>
         <Element ComponentName="GrantCommandsController" X="225" Y="100" Note=""/>
         <Element ComponentName="GrantDemultiplexer" X="600" Y="100" Note=""/>
+        <Element ComponentName="SlaveSubscriberController" X="750" Y="625" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

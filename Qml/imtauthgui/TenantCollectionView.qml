@@ -21,7 +21,13 @@ RemoteCollectionView {
 	collectionId: "Tenants"
 	gqlGetListCommandId: ImtauthTenantsSdlCommandIds.s_getTenantList
 	documentCollectionFilter: null
-	additionalFieldIds: ["id", "name", TenantItemDataTypeMetaInfo.s_tenantRelationScope, TenantItemDataTypeMetaInfo.s_invitationId, TenantItemDataTypeMetaInfo.s_invitedByName]
+	additionalFieldIds: [
+		TenantItemDataTypeMetaInfo.s_id,
+		TenantItemDataTypeMetaInfo.s_name,
+		TenantItemDataTypeMetaInfo.s_tenantRelationScope,
+		TenantItemDataTypeMetaInfo.s_invitationId,
+		TenantItemDataTypeMetaInfo.s_invitedByName
+	]
 
 	Component.onCompleted: {
 		table.setSortingInfo(TenantItemDataTypeMetaInfo.s_createdAt, "DESC")

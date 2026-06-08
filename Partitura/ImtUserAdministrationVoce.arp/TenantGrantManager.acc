@@ -157,6 +157,30 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
+        <Element Id="FilterableSelectController" PackageId="ImtServerGqlPck" ComponentId="FilterableSelectController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="CrossOrgGrants"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="CrossOrgGrantRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantFilterEnabled" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="GrantCommandsController" PackageId="ImtGraphQlVoce" ComponentId="StandardDocumentCommandsController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -184,6 +208,7 @@
                                 <Value>CrossOrgGrantsDocumentService</Value>
                                 <Value>CrossOrgGrantCollectionDocumentService</Value>
                                 <Value>GrantCommandsController</Value>
+                                <Value>FilterableSelectController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -199,11 +224,31 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="SlaveSubscriberController" PackageId="ImtServerGqlPck" ComponentId="SlaveSubscriberController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubscriberController" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>CrossOrgGrantsDocumentService</Value>
+                                <Value>CrossTenantMessageNotificationPublisher</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="GrantDemultiplexer"/>
-        <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="CrossTenantMessageNotificationPublisher"/>
+        <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="SlaveSubscriberController"/>
         <Interface InterfaceId="imtserverapp::IGuiElementContainer" ComponentId="GrantCommandsController"/>
         <Interface InterfaceId="imtserverapp::IRepresentationController" ComponentId="GrantCommandsController"/>
     </ExportedInterfaces>

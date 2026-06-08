@@ -53,6 +53,9 @@
                                 <Value>OnConnectionCodesNotification</Value>
                                 <Value>OnTenantRelationshipsDocumentChanged</Value>
                                 <Value>OnTenantRelationshipsUndoChanged</Value>
+                                <Value>OnCrossOrgGrantsUndoChanged</Value>
+                                <Value>OnCrossOrgGrantsDocumentChanged</Value>
+                                <Value>OnCrossTenantMessageNotification</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -198,6 +201,7 @@
                                 <Value>UsersForInvitation</Value>
                                 <Value>TenantConnections</Value>
                                 <Value>TenantRelationships</Value>
+                                <Value>CrossOrgGrants</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -293,6 +297,8 @@
                                 <Value>GetTenantList</Value>
                                 <Value>UpdateRelationshipFromRepresentation</Value>
                                 <Value>GetRelationshipRepresentation</Value>
+                                <Value>UpdateGrantFromRepresentation</Value>
+                                <Value>GetGrantRepresentation</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

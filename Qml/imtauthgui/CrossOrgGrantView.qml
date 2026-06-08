@@ -40,7 +40,7 @@ ViewBase {
 		rolesSelectEditor.items = arr
 
 		grantDescriptionInput.text = container.grantData.m_description || ""
-		expiresAtPicker.setDateFromString(container.grantData.m_expiresAt || "")
+		expiresAtPicker.setDateAsString(container.grantData.m_expiresAt || "")
 	}
 
 	function updateModel() {

@@ -2260,12 +2260,12 @@ QtObject {
 				startUpdateDocument(documentId)
 
 				updateCrossOrgGrantInputInput.m_documentId = documentId
-				updateCrossOrgGrantInputInput.m_relationship = representationModel
+				updateCrossOrgGrantInputInput.m_grant = representationModel
 				updateCrossOrgGrantRequest.send(updateCrossOrgGrantInputInput)
 			}
 
 			property DocumentId getCrossOrgGrantInput: DocumentId {}
-			property UpdateRelationshipFromRepresentationInput updateCrossOrgGrantInputInput: UpdateRelationshipFromRepresentationInput {}
+			property UpdateGrantFromRepresentationInput updateCrossOrgGrantInputInput: UpdateGrantFromRepresentationInput {}
 
 			property GqlSdlRequestSender getCrossOrgGrantInputRequest: GqlSdlRequestSender {
 				gqlCommandId: ImtauthCrossOrgGrantCollectionDocumentServiceSdlCommandIds.s_getGrantRepresentation
