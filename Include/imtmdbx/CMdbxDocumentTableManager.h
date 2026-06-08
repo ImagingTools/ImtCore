@@ -32,20 +32,9 @@ public:
 			: keyMode(keyMode), valueMode(valueMode), hasIndex(hasIndex) {}
 	};
 
-	CMdbxDocumentTableManager(mdbx::txn_managed& txn, const QHash<QString/*tableName*/, DocumentTableConfig>& tableConfigHash = {});
+	CMdbxDocumentTableManager(mdbx::txn_managed& txn, const QHash<QString/*tableName*/, DocumentTableConfig>& tableConfigHash);
 
 public:
-	/**
-		\brief Get hash with table configuration. Access to configuration parameters for each table.
-		\return Hash with table name as key and \sa DocumentTableConfig as value.
-	*/
-	const QHash<QString/*tableName*/, DocumentTableConfig>& GetTableConfigHash() const;
-	/**
-		\brief Set hash with table configuration. Access to configuration parameters for each table.
-		\param tableConfigHash - hash with table name as key and \sa DocumentTableConfig as value.
-	*/
-	void SetTableConfigHash(const QHash<QString/*tableName*/, DocumentTableConfig>& tableConfigHash);
-
 	/**
 		\brief Try to find initialized table in \sa m_initializedTableHash.
 				If it is not found, try to initialize it if configuration exists in \sa m_tableConfigHash.
@@ -65,6 +54,11 @@ public:
 		\return Hash with table name as key and \sa DocumentTableConfig as value.
 	*/
 	const QHash<QString/*tableName*/, DocumentTableConfig>& getTableConfigHash() const;
+	/**
+		\brief Set hash with table configuration. Access to configuration parameters for each table.
+		\param tableConfigHash - hash with table name as key and \sa DocumentTableConfig as value.
+	*/
+	void setTableConfigHash(const QHash<QString/*tableName*/, DocumentTableConfig>& tableConfigHash);
 	/**
 		\brief Check if all of \sa imtmdbx::IDocumentTable shared pointer references in \sa m_initializedTableHash are valid.
 		\return True if all are valid, otherwise false.

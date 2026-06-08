@@ -14,18 +14,6 @@ CMdbxDocumentTableManager::CMdbxDocumentTableManager(mdbx::txn_managed& txn, con
 }
 
 
-const QHash<QString/*tableName*/, CMdbxDocumentTableManager::DocumentTableConfig>& CMdbxDocumentTableManager::GetTableConfigHash() const
-{
-	return m_tableConfigHash;
-}
-
-
-void CMdbxDocumentTableManager::SetTableConfigHash(const QHash<QString/*tableName*/, DocumentTableConfig>& tableConfigHash)
-{
-	m_tableConfigHash = tableConfigHash;
-}
-
-
 DocumentTablePtr CMdbxDocumentTableManager::get(const QString& tableId)
 {
 	auto it = m_initializedTableHash.find(tableId);
@@ -82,6 +70,12 @@ bool CMdbxDocumentTableManager::AreInitTablesValid() const{
 const QHash<QString/*tableName*/, CMdbxDocumentTableManager::DocumentTableConfig>& CMdbxDocumentTableManager::getTableConfigHash() const
 {
 	return m_tableConfigHash;
+}
+
+
+void CMdbxDocumentTableManager::setTableConfigHash(const QHash<QString/*tableName*/, DocumentTableConfig>& tableConfigHash)
+{
+	m_tableConfigHash = tableConfigHash;
 }
 
 
