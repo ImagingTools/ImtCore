@@ -17,6 +17,7 @@ Item {
     property bool hiddenBackground: true;
     property bool noMouseArea: false;
     property bool forceFocus: true;
+	property bool escapeEnabled: false;
 
     Component.onCompleted: {
         Events.subscribeEvent("AppSizeChanged", onAppSizeChanged);
