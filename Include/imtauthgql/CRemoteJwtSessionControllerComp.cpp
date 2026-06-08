@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <imtauth/ISession.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Sessions.h>
+#include <imtauthsdl/SDL/1.0/CPP/Sessions.h>
 
 
 namespace imtauthgql

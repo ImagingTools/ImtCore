@@ -15,7 +15,7 @@
 #include <iprm/CEnableableParam.h>
 
 // ImtCore includes
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
+#include <imtauthsdl/SDL/1.0/CPP/Authorization.h>
 #include <imtauth/CUserInfo.h>
 #include <imtauth/CLdapUserCollectionControllerComp.h>
 #include <imtbase/CComplexCollectionFilter.h>

@@ -5,7 +5,7 @@
 // ImtCore includes
 #include <imtauth/ITenantManager.h>
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants_fwd.h>
+#include <imtauthsdl/SDL/1.0/CPP/Tenants_fwd.h>
 
 
 namespace imtauthgql

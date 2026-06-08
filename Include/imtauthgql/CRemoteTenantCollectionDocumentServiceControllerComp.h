@@ -6,7 +6,7 @@
 #include <imtlic/IProductInfo.h>
 #include <imtsdl/TElementList.h>
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantCollectionDocumentService_fwd.h>
+#include <imtauthsdl/SDL/1.0/CPP/TenantCollectionDocumentService_fwd.h>
 
 
 namespace imtauthgql

@@ -4,7 +4,7 @@
 
 // ImtCore includes
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Sessions_fwd.h>
+#include <imtauthsdl/SDL/1.0/CPP/Sessions_fwd.h>
 
 
 namespace imtauthgql

@@ -6,7 +6,7 @@
 #include <imtdoc/IDocumentService.h>
 
 // Generated includes
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/RoleCollectionDocumentService.h>
+#include <imtauthsdl/SDL/1.0/CPP/RoleCollectionDocumentService.h>
 
 
 namespace imtauthgql

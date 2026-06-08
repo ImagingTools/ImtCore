@@ -10,9 +10,9 @@
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/CGqlContext.h>
 #include <imtqml/CGqlModel.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Sessions.h>
+#include <imtauthsdl/SDL/1.0/CPP/Authorization.h>
+#include <imtauthsdl/SDL/1.0/CPP/Users.h>
+#include <imtauthsdl/SDL/1.0/CPP/Sessions.h>
 #include <imtgql/CGqlRequestContextManager.h>
 
 

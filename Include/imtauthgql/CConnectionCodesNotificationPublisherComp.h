@@ -19,7 +19,7 @@
 #include <imtauth/ITenantManager.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtservergql/CGqlPublisherCompBase.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants_fwd.h>
+#include <imtauthsdl/SDL/1.0/CPP/Tenants_fwd.h>
 
 
 namespace imtauthgql

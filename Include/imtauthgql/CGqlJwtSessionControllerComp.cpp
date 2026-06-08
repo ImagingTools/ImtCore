@@ -5,7 +5,7 @@
 #include <iser/CMemoryWriteArchive.h>
 
 // ImtCore includes
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Sessions.h>
+#include <imtauthsdl/SDL/1.0/CPP/Sessions.h>
 #include <imtauth/ITenantInfo.h>
 #include <imtgql/IGqlContext.h>
 

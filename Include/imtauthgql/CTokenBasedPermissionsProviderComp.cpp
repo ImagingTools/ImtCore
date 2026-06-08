@@ -3,7 +3,7 @@
 
 
 // ImtCore includes
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
+#include <imtauthsdl/SDL/1.0/CPP/Authorization.h>
 
 
 namespace imtauthgql

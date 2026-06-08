@@ -13,7 +13,7 @@
 #include <imtauth/ICrossTenantMessage.h>
 #include <imtauth/IOrderRequest.h>
 #include <imtgql/CGqlRequest.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
+#include <imtauthsdl/SDL/1.0/CPP/Tenants.h>
 
 
 /**

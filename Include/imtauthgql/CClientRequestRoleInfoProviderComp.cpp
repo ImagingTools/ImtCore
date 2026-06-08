@@ -5,7 +5,7 @@
 // ImtCore includes
 #include <imtbase/CCollectionInfo.h>
 #include <imtgql/CGqlRequestContextManager.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Roles.h>
+#include <imtauthsdl/SDL/1.0/CPP/Roles.h>
 
 
 namespace imtauthgql

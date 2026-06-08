@@ -6,7 +6,7 @@
 #include <ibase/IApplicationInfo.h>
 
 // ImtCore includes
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/UserActions_fwd.h>
+#include <imtauthsdl/SDL/1.0/CPP/UserActions_fwd.h>
 
 
 namespace imtauthgql

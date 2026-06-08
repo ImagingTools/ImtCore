@@ -10,7 +10,7 @@
 #include <imtauth/CRole.h>
 #include <imtservergql/CObjectCollectionControllerCompBase.h>
 #include <imtgql/IGqlRequestProvider.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Roles_fwd.h>
+#include <imtauthsdl/SDL/1.0/CPP/Roles_fwd.h>
 
 
 namespace imtauthgql

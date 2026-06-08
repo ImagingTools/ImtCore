@@ -8,7 +8,7 @@
 
 // ImtCore includes
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
-#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
+#include <imtauthsdl/SDL/1.0/CPP/Users.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtauth/CUserInfo.h>
 
