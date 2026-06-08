@@ -22,7 +22,6 @@ ViewBase {
 
 	property var grantData: model
 	property var apiClient: null
-	property var tenantData: null
 
 	property string __selectedTargetTenantId: ""
 	property string __selectedTargetTenantName: ""

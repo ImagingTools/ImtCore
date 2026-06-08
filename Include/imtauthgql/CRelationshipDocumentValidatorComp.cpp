@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+#include "imtauthgql/CRelationshipDocumentValidatorComp.h"
 
-#include <imtauthgql/CRelationshipDocumentValidatorComp.h>
 
+// ImtCore includes
 #include <imtauth/ITenantRelationshipInfo.h>
-
-#include <QString>
 
 
 namespace imtauthgql
@@ -12,9 +11,9 @@ namespace imtauthgql
 
 
 bool CRelationshipDocumentValidatorComp::ValidateDocumentData(
-	const QByteArray& /*objectId*/,
-	const istd::IChangeable& document,
-	QString& errorMessage) const
+			const QByteArray& /*objectId*/,
+			const istd::IChangeable& document,
+			QString& errorMessage) const
 {
 	const imtauth::ITenantRelationshipInfo* relInfo = dynamic_cast<const imtauth::ITenantRelationshipInfo*>(&document);
 	if (relInfo == nullptr){

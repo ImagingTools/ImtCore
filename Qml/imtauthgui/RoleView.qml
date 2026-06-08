@@ -214,6 +214,16 @@ ViewBase {
 						permissionsGroup.treeView.tristate = true;
 					}
 					
+					onTreeViewChanged: {
+						if (treeView){
+							treeView.filterRole = ["name", "description"]
+							treeView.columns = [
+										{ id: "name", name: qsTr("Permission"), tree: true },
+										{ id: "description", name: qsTr("Description"), tree: false }
+									]
+						}
+					}
+
 					function buildPermissionsModel() {
 						if (!container.permissionsModel)
 							return;
@@ -227,8 +237,9 @@ ViewBase {
 									checkable: true,
 									expanded: true,
 									data: {
-										FeatureId: wrapper.data("FeatureId", ""),
-										FeatureName: wrapper.data("FeatureName", "")
+										id: wrapper.data("FeatureId", ""),
+										name: wrapper.data("FeatureName", ""),
+										description: wrapper.data("FeatureDescription", "")
 									}
 								};
 							},
@@ -257,7 +268,7 @@ ViewBase {
 							let nodeChildren = nodeIdx.item && nodeIdx.item.children ? nodeIdx.item.children : [];
 							if (nodeChildren.length === 0){
 								let nodeData = nodeIdx.data || {};
-								let id = nodeData.FeatureId;
+								let id = nodeData.id;
 								
 								if (selectedPermissionsIds.includes(id)){
 									permissionsGroup.treeView.checkItem(nodeIdx.key);
@@ -274,7 +285,7 @@ ViewBase {
 							let nodeChildren = nodeIdx.item && nodeIdx.item.children ? nodeIdx.item.children : [];
 							if (nodeChildren.length === 0){
 								let nodeData = nodeIdx.data || {};
-								let id = nodeData.FeatureId;
+								let id = nodeData.id;
 								selectedPermissionIds.push(id);
 							}
 						}

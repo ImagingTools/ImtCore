@@ -105,7 +105,7 @@ DocumentViewBase {
 			multiPageView.currentIndex = 0
 		}
 
-		Component.onCompleted: { 
+		Component.onCompleted: {
 			multiPageView.updatePages()
 		}
 	}

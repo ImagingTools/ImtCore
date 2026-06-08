@@ -2270,7 +2270,7 @@ QtObject {
 			property GqlSdlRequestSender getCrossOrgGrantInputRequest: GqlSdlRequestSender {
 				gqlCommandId: ImtauthCrossOrgGrantCollectionDocumentServiceSdlCommandIds.s_getGrantRepresentation
 				sdlObjectComp: Component {
-					TenantRelationship {
+					CrossOrgGrant {
 						onFinished: {
 							crossOrgGrantReprController.representationModel.copyFrom(this)
 							crossOrgGrantReprController.representationUpdated(

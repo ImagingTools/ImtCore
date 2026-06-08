@@ -22,7 +22,10 @@ class CCrossOrgGrantDocumentValidatorComp:
 			virtual public imtdoc::IDocumentValidator
 {
 public:
+	typedef icomp::CComponentBase BaseClass;
+
 	I_BEGIN_COMPONENT(CCrossOrgGrantDocumentValidatorComp)
+		I_REGISTER_INTERFACE(imtdoc::IDocumentValidator)
 	I_END_COMPONENT
 
 	// imtdoc::IDocumentValidator
