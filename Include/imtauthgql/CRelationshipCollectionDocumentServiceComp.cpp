@@ -17,31 +17,6 @@ namespace imtauthgql
 {
 
 
-namespace
-{
-
-
-QByteArray GetCounterpartyTenantId(const QByteArray& sourceTenantId, const QByteArray& targetTenantId, const QByteArray& contextTenantId)
-{
-	if (contextTenantId.isEmpty()){
-		return QByteArray();
-	}
-
-	if (sourceTenantId == contextTenantId){
-		return targetTenantId;
-	}
-
-	if (targetTenantId == contextTenantId){
-		return sourceTenantId;
-	}
-
-	return QByteArray();
-}
-
-
-} // namespace
-
-
 // protected methods
 
 // reimplemented (CRelationshipCollectionDocumentServiceGqlHandlerCompBase)
@@ -52,12 +27,6 @@ sdl::V1_0::imtauth::CTenantRelationship CRelationshipCollectionDocumentServiceCo
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::GetRelationshipRepresentationRequestArguments arguments = getRelationshipRepresentationRequest.GetRequestedArguments();
-
-	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	QByteArray contextTenantId;
-	if (gqlContextPtr != nullptr){
-		contextTenantId = gqlContextPtr->GetTenantId();
-	}
 
 	QByteArray objectId;
 	if (arguments.input && arguments.input->id){
@@ -83,11 +52,6 @@ sdl::V1_0::imtauth::CTenantRelationship CRelationshipCollectionDocumentServiceCo
 		if (relPtr != nullptr){
 			QByteArray sourceTenantId = relPtr->GetSourceTenantId();
 			QByteArray targetTenantId = relPtr->GetTargetTenantId();
-			QByteArray counterpartyTenantId = GetCounterpartyTenantId(sourceTenantId, targetTenantId, contextTenantId);
-			if (!counterpartyTenantId.isEmpty()){
-				sourceTenantId = contextTenantId;
-				targetTenantId = counterpartyTenantId;
-			}
 
 			sdl::V1_0::imtauth::CTenantRelationship response;
 			response.id = relPtr->GetRelationshipId();
@@ -109,6 +73,13 @@ sdl::V1_0::imtauth::CTenantRelationship CRelationshipCollectionDocumentServiceCo
 				QString tenantName = m_tenantCollectionCompPtr->GetElementInfo(targetTenantId, imtbase::ICollectionInfo::EIT_NAME).toString();
 				if (!tenantName.isEmpty()){
 					response.targetTenantName = tenantName;
+				}
+			}
+
+			if (m_tenantCollectionCompPtr.IsValid() && !sourceTenantId.isEmpty()){
+				QString tenantName = m_tenantCollectionCompPtr->GetElementInfo(sourceTenantId, imtbase::ICollectionInfo::EIT_NAME).toString();
+				if (!tenantName.isEmpty()){
+					response.sourceTenantName = tenantName;
 				}
 			}
 
@@ -176,24 +147,22 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CRelationshipCollectionDocumentServ
 
 	QByteArray sourceTenantId = relationshipPtr->GetSourceTenantId();
 	QByteArray targetTenantId = relationshipPtr->GetTargetTenantId();
+	const bool hasPersistentPair = !sourceTenantId.isEmpty() && !targetTenantId.isEmpty();
 
-	if (!contextTenantId.isEmpty()){
-		sourceTenantId = contextTenantId;
-
-		QByteArray requestedTargetTenantId;
-		if (relData.targetTenantId && !relData.targetTenantId->isEmpty()){
-			requestedTargetTenantId = *relData.targetTenantId;
+	if (hasPersistentPair){
+		if (!contextTenantId.isEmpty() && sourceTenantId != contextTenantId && targetTenantId != contextTenantId){
+			errorMessage = QStringLiteral("Tenant context is not a participant of the relationship");
+			return response;
 		}
 
-		if (!requestedTargetTenantId.isEmpty() && requestedTargetTenantId != contextTenantId){
-			targetTenantId = requestedTargetTenantId;
-		} else {
-			QByteArray counterpartyTenantId = GetCounterpartyTenantId(relationshipPtr->GetSourceTenantId(), relationshipPtr->GetTargetTenantId(), contextTenantId);
-			if (!counterpartyTenantId.isEmpty()){
-				targetTenantId = counterpartyTenantId;
-			} else if (relData.sourceTenantId && !relData.sourceTenantId->isEmpty() && *relData.sourceTenantId != contextTenantId){
-				targetTenantId = *relData.sourceTenantId;
-			}
+		if (relData.sourceTenantId && !relData.sourceTenantId->isEmpty() && *relData.sourceTenantId != sourceTenantId){
+			errorMessage = QStringLiteral("Relationship partner cannot be changed after creation");
+			return response;
+		}
+
+		if (relData.targetTenantId && !relData.targetTenantId->isEmpty() && *relData.targetTenantId != targetTenantId){
+			errorMessage = QStringLiteral("Relationship partner cannot be changed after creation");
+			return response;
 		}
 	} else {
 		if (relData.sourceTenantId && !relData.sourceTenantId->isEmpty()){
@@ -201,6 +170,15 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CRelationshipCollectionDocumentServ
 		}
 		if (relData.targetTenantId && !relData.targetTenantId->isEmpty()){
 			targetTenantId = *relData.targetTenantId;
+		}
+
+		if (!contextTenantId.isEmpty()){
+			if (sourceTenantId.isEmpty()){
+				sourceTenantId = contextTenantId;
+			}
+			if (sourceTenantId == contextTenantId && targetTenantId.isEmpty() && relData.sourceTenantId && *relData.sourceTenantId != contextTenantId){
+				targetTenantId = *relData.sourceTenantId;
+			}
 		}
 	}
 

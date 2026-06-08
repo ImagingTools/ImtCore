@@ -39,6 +39,9 @@ ViewBase {
 	property string __selectedPartnerTenantName: ""
 	// Whether the current tenant is the "source" in the underlying model
 	property bool __isSource: true
+	readonly property bool __isExistingRelationship: (relationshipData
+		&& relationshipData.m_sourceTenantId
+		&& relationshipData.m_targetTenantId)
 
 	// Resolve the current tenant ID from tenantData or AuthorizationController
 	readonly property string __currentTenantId: container.tenantData
@@ -55,7 +58,7 @@ ViewBase {
 		var sourceTenantId = container.relationshipData.m_sourceTenantId || ""
 		var targetTenantId = container.relationshipData.m_targetTenantId || ""
 
-		if (sourceTenantId && currentTenantId && sourceTenantId !== currentTenantId) {
+		if (targetTenantId && currentTenantId && targetTenantId === currentTenantId && sourceTenantId !== "") {
 			// Current tenant is the target → swap perspective
 			container.__isSource = false
 			container.__selectedPartnerTenantId = sourceTenantId
@@ -87,12 +90,20 @@ ViewBase {
 		if (!container.relationshipData) {
 			return
 		}
-		container.relationshipData.m_targetTenantId = container.__isSource
-			? (container.__selectedPartnerTenantId || "")
-			: (container.relationshipData.m_targetTenantId || "")
-		container.relationshipData.m_sourceTenantId = container.__isSource
-			? (container.relationshipData.m_sourceTenantId || "")
-			: (container.__selectedPartnerTenantId || "")
+
+		if (!container.__isExistingRelationship) {
+			if (container.__isSource) {
+				if (container.__currentTenantId) {
+					container.relationshipData.m_sourceTenantId = container.__currentTenantId
+				}
+				container.relationshipData.m_targetTenantId = container.__selectedPartnerTenantId || ""
+			} else {
+				container.relationshipData.m_sourceTenantId = container.__selectedPartnerTenantId || ""
+				if (container.__currentTenantId) {
+					container.relationshipData.m_targetTenantId = container.__currentTenantId
+				}
+			}
+		}
 
 		var roleTokens = ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
 		var myIdx = myRoleCB.currentIndex >= 0 ? myRoleCB.currentIndex : 2
@@ -166,6 +177,8 @@ ViewBase {
 
 							Button {
 								text: qsTr("Select")
+								enabled: !container.__isExistingRelationship
+								visible: !container.__isExistingRelationship
 								onClicked: {
 									var point = partnerTenantRow.mapToItem(null, 0, partnerTenantRow.height)
 									ModalDialogManager.openDialog(tenantSelectComp, {
@@ -229,6 +242,14 @@ ViewBase {
 				? [container.__selectedPartnerTenantId] : []
 
 			onItemSelected: {
+				if (container.__isExistingRelationship) {
+					ModalDialogManager.showInfoDialog(qsTr("Partner organization cannot be changed after relationship creation."))
+					return
+				}
+				if (itemId === container.__currentTenantId) {
+					ModalDialogManager.showInfoDialog(qsTr("Choose another organization. Current and partner organizations must be different."))
+					return
+				}
 				container.__selectedPartnerTenantId = itemId
 				container.__selectedPartnerTenantName = dataProvider
 					? dataProvider.getSelectedItemText(itemId) : ""
