@@ -17,6 +17,7 @@ import imtauthRoleCollectionDocumentServiceSdl 1.0
 import imtauthGroupCollectionDocumentServiceSdl 1.0
 import imtauthUserCollectionDocumentServiceSdl 1.0
 import imtauthRelationshipCollectionDocumentServiceSdl 1.0
+import imtauthCrossOrgGrantCollectionDocumentServiceSdl 1.0
 import imtauthgui 1.0
 
 /**
@@ -61,6 +62,7 @@ QtObject {
 	readonly property var groupDocumentManager: __groupDocumentService
 	readonly property var userDocumentManager: __userDocumentService
 	readonly property var relationshipDocumentManager: __relationshipDocumentService
+	readonly property var crossOrgGrantDocumentManager: __crossOrgGrantDocumentService
 
 	signal invitationCreated()
 	signal invitationRevoked(string invitationId)
@@ -1890,8 +1892,6 @@ QtObject {
 		collectionId: "CrossOrgGrants"
 	}
 
-	readonly property var crossOrgGrantDocumentManager: __crossOrgGrantDocumentService
-
 	property FilterableSelectGqlDataProvider crossOrgGrantsListDataProvider: FilterableSelectGqlDataProvider {
 		collectionId: "CrossOrgGrants"
 	}
@@ -2228,9 +2228,88 @@ QtObject {
 		}
 	}
 
+	// --- CrossOrgGrant editor + representation controller ---
+	property Component __crossOrgGrantEditorComp: Component {
+		CrossOrgGrantView {
+			apiClient: root
+			commandsControllerComp: Component {
+				GqlBasedCommandsController {
+					typeId: root.crossOrgGrantObjectTypeId
+				}
+			}
+		}
+	}
+
+	property Component __crossOrgGrantControllerComp: Component {
+		DocumentRepresentationController {
+			id: crossOrgGrantReprController
+
+			representationModel: CrossOrgGrant {
+				m_id: UuidGenerator.generateUUID()
+			}
+
+			function updateRepresentationFromDocument(){
+				startUpdateRepresentation(documentId, representationModel)
+
+				getCrossOrgGrantInput.m_id = documentId
+				getCrossOrgGrantInput.m_collectionId = "CrossOrgGrants"
+				getCrossOrgGrantInputRequest.send(getCrossOrgGrantInput)
+			}
+
+			function updateDocumentFromRepresentation(){
+				startUpdateDocument(documentId)
+
+				updateCrossOrgGrantInputInput.m_documentId = documentId
+				updateCrossOrgGrantInputInput.m_relationship = representationModel
+				updateCrossOrgGrantRequest.send(updateCrossOrgGrantInputInput)
+			}
+
+			property DocumentId getCrossOrgGrantInput: DocumentId {}
+			property UpdateRelationshipFromRepresentationInput updateCrossOrgGrantInputInput: UpdateRelationshipFromRepresentationInput {}
+
+			property GqlSdlRequestSender getCrossOrgGrantInputRequest: GqlSdlRequestSender {
+				gqlCommandId: ImtauthCrossOrgGrantCollectionDocumentServiceSdlCommandIds.s_getGrantRepresentation
+				sdlObjectComp: Component {
+					TenantRelationship {
+						onFinished: {
+							crossOrgGrantReprController.representationModel.copyFrom(this)
+							crossOrgGrantReprController.representationUpdated(
+								crossOrgGrantReprController.documentId,
+								crossOrgGrantReprController.representationModel)
+						}
+					}
+				}
+
+				function onError(message, type){
+					crossOrgGrantReprController.updateRepresentationFailed(crossOrgGrantReprController.documentId, message)
+				}
+			}
+
+			property GqlSdlRequestSender updateCrossOrgGrantRequest: GqlSdlRequestSender {
+				gqlCommandId: ImtauthCrossOrgGrantCollectionDocumentServiceSdlCommandIds.s_updateGrantFromRepresentation
+				requestType: 1
+				sdlObjectComp: Component {
+					DocumentOperationStatus {
+						onFinished: {
+							if (m_status === "Success"){
+								crossOrgGrantReprController.documentUpdated(crossOrgGrantReprController.documentId)
+							}
+						}
+					}
+				}
+
+				function onError(message, type){
+					crossOrgGrantReprController.updateDocumentFailed(crossOrgGrantReprController.documentId, message)
+				}
+			}
+		}
+	}
+
 	// Register each editor + controller pair with its document service so that
 	// pages only need to bind to the abstract `xDocumentManager` / `xObjectTypeId`.
 	Component.onCompleted: {
+		root.__crossOrgGrantDocumentService.registerDocumentViewData(
+			root.crossOrgGrantObjectTypeId, "Editor", root.__crossOrgGrantEditorComp, root.__crossOrgGrantControllerComp)
 		root.__roleDocumentService.registerDocumentViewData(
 			root.roleObjectTypeId, "Editor", root.__roleEditorComp, root.__roleControllerComp)
 		root.__groupDocumentService.registerDocumentViewData(

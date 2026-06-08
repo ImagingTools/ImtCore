@@ -22,6 +22,7 @@
                                 <Value>TenantMembershipManager</Value>
                                 <Value>UserFilterableSelectController</Value>
                                 <Value>TenantConnectionManager</Value>
+                                <Value>TenantGrantManager</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

@@ -28,7 +28,6 @@
                                 <Value>TenantMembershipManagerController</Value>
                                 <Value>RemoteFilterableSelectController</Value>
                                 <Value>RemoteTenantCollectionDocumentService</Value>
-                                <Value>TenantRelationshipsDocumentServiceController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -110,6 +109,8 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Tenants</Value>
+                                <Value>TenantRelationships</Value>
+                                <Value>CrossOrgGrants</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -149,6 +150,8 @@
                                 <Value>Tenant</Value>
                                 <Value>Tenants</Value>
                                 <Value>TenantRelationship</Value>
+                                <Value>CrossOrgGrants</Value>
+                                <Value>CrossOrgGrant</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -262,31 +265,6 @@
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="TenantRelationshipsDocumentServiceController" PackageId="ImtClientGqlPck" ComponentId="RemoteCollectionDocumentServiceController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CollectionIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>TenantRelationships</Value>
-                            </Values>
-                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>

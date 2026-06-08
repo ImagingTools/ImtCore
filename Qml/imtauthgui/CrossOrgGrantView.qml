@@ -28,7 +28,7 @@ ViewBase {
 	property string __selectedTargetTenantId: ""
 	property string __selectedTargetTenantName: ""
 	property var __selectedRoleIds: []
-	property string __selectedRoleNames: ""
+	property var __selectedRoleNames: []
 
 	function updateGui() {
 		if (!container.grantData) {
@@ -38,7 +38,7 @@ ViewBase {
 		container.__selectedTargetTenantName = container.grantData.m_targetTenantName || container.grantData.m_targetTenantId || ""
 		var roleIds = container.grantData.m_roleIds
 		container.__selectedRoleIds = roleIds
-		container.__selectedRoleNames = container.__selectedRoleIds.join(", ")
+		container.__selectedRoleNames = roleIds
 		grantDescriptionInput.text = container.grantData.m_description || ""
 		expiresAtPicker.setDateFromString(container.grantData.m_expiresAt || "")
 	}
@@ -127,11 +127,12 @@ ViewBase {
 
 					controlComp: Component {
 						Row {
+							id: rolesRow
 							spacing: Style.marginM
 
 							BaseText {
 								anchors.verticalCenter: parent.verticalCenter
-								text: container.__selectedRoleNames
+								text: container.__selectedRoleNames.join(' ')
 								  || qsTr("Select roles...")
 								color: container.__selectedRoleIds.length > 0
 								   ? Style.textColor : Style.inactiveTextColor
@@ -141,7 +142,11 @@ ViewBase {
 							Button {
 								text: qsTr("Select")
 								onClicked: {
-									ModalDialogManager.openDialog(roleSelectComp, {})
+									var point = rolesRow.mapToItem(null, 0, rolesRow.height)
+									ModalDialogManager.openDialog(roleSelectComp, {
+																	  "x": point.x,
+																	  "y": point.y
+																  })
 								}
 							}
 						}
@@ -160,7 +165,7 @@ ViewBase {
 				DateTimePickerElementView {
 					id: expiresAtPicker
 					name: qsTr("Expires At")
-					onDateChanged: {
+					onEditingFinished: {
 						container.doUpdateModel()
 					}
 				}
@@ -198,15 +203,9 @@ ViewBase {
 			preselectedIds: container.__selectedRoleIds
 
 			onItemSelected: {
-				container.__selectedRoleIds = selectedIds || []
-				var names = []
-				if (dataProvider) {
-					for (var i = 0; i < container.__selectedRoleIds.length; ++i) {
-						var n = dataProvider.getSelectedItemText(container.__selectedRoleIds[i])
-						if (n) names.push(n)
-					}
-				}
-				container.__selectedRoleNames = names.join(", ")
+				container.__selectedRoleIds.push(itemId)
+				var n = dataProvider.getSelectedItemText(itemId)
+				container.__selectedRoleNames.push(n)
 				container.doUpdateModel()
 			}
 		}
