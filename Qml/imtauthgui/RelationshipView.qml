@@ -18,6 +18,12 @@ import imtauthgui 1.0
  * the representationModel and updateModel() to write form values back.
  * Saving is handled by the shell's Save button which triggers the
  * bilateral proposal flow via CRelationshipCollectionDocumentServiceComp.
+ *
+ * The editor displays fields relative to the current tenant:
+ *   - "Partner Organization" (the other side)
+ *   - "My Role" (role of the current tenant in this relationship)
+ *   - "Partner Role" (role of the partner tenant)
+ * This avoids confusion when both sides can edit the same relationship.
  */
 ViewBase {
 	id: container
@@ -27,21 +33,52 @@ ViewBase {
 
 	property var relationshipData: model
 	property var apiClient: null
+	property var tenantData: null
 
-	property string __selectedTargetTenantId: ""
-	property string __selectedTargetTenantName: ""
+	property string __selectedPartnerTenantId: ""
+	property string __selectedPartnerTenantName: ""
+	// Whether the current tenant is the "source" in the underlying model
+	property bool __isSource: true
+
+	// Resolve the current tenant ID from tenantData or AuthorizationController
+	readonly property string __currentTenantId: container.tenantData
+		? (container.tenantData.m_id || "")
+		: (typeof AuthorizationController !== "undefined" ? AuthorizationController.currentTenantId : "")
 
 	function updateGui() {
 		if (!container.relationshipData) {
 			return
 		}
-		container.__selectedTargetTenantId = container.relationshipData.m_targetTenantId || ""
-		container.__selectedTargetTenantName = container.relationshipData.m_targetTenantName || ""
+		// Determine which side we are: if current tenant is the source,
+		// the partner is target; otherwise, we swap the perspective.
+		var currentTenantId = container.__currentTenantId
+		var sourceTenantId = container.relationshipData.m_sourceTenantId || ""
+		var targetTenantId = container.relationshipData.m_targetTenantId || ""
+
+		if (sourceTenantId && currentTenantId && sourceTenantId !== currentTenantId) {
+			// Current tenant is the target → swap perspective
+			container.__isSource = false
+			container.__selectedPartnerTenantId = sourceTenantId
+			container.__selectedPartnerTenantName = container.relationshipData.m_sourceTenantName || ""
+		} else {
+			// Current tenant is the source (or new relationship)
+			container.__isSource = true
+			container.__selectedPartnerTenantId = targetTenantId
+			container.__selectedPartnerTenantName = container.relationshipData.m_targetTenantName || ""
+		}
+
 		var roles = ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
-		var srcIdx = roles.indexOf(container.relationshipData.m_sourceRole || "")
-		var tgtIdx = roles.indexOf(container.relationshipData.m_targetRole || "")
-		sourceRoleCB.currentIndex = srcIdx >= 0 ? srcIdx : 2
-		targetRoleCB.currentIndex = tgtIdx >= 0 ? tgtIdx : 2
+		var myRoleValue = container.__isSource
+			? (container.relationshipData.m_sourceRole || "")
+			: (container.relationshipData.m_targetRole || "")
+		var partnerRoleValue = container.__isSource
+			? (container.relationshipData.m_targetRole || "")
+			: (container.relationshipData.m_sourceRole || "")
+
+		var myIdx = roles.indexOf(myRoleValue)
+		var partnerIdx = roles.indexOf(partnerRoleValue)
+		myRoleCB.currentIndex = myIdx >= 0 ? myIdx : 2
+		partnerRoleCB.currentIndex = partnerIdx >= 0 ? partnerIdx : 2
 		relScopeInput.text = container.relationshipData.m_scope || ""
 		relDescriptionInput.text = container.relationshipData.m_description || ""
 	}
@@ -50,12 +87,24 @@ ViewBase {
 		if (!container.relationshipData) {
 			return
 		}
-		container.relationshipData.m_targetTenantId = container.__selectedTargetTenantId || ""
+		container.relationshipData.m_targetTenantId = container.__isSource
+			? (container.__selectedPartnerTenantId || "")
+			: (container.relationshipData.m_targetTenantId || "")
+		container.relationshipData.m_sourceTenantId = container.__isSource
+			? (container.relationshipData.m_sourceTenantId || "")
+			: (container.__selectedPartnerTenantId || "")
+
 		var roleTokens = ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
-		var srcIdx = sourceRoleCB.currentIndex >= 0 ? sourceRoleCB.currentIndex : 2
-		var tgtIdx = targetRoleCB.currentIndex >= 0 ? targetRoleCB.currentIndex : 2
-		container.relationshipData.m_sourceRole = roleTokens[srcIdx]
-		container.relationshipData.m_targetRole = roleTokens[tgtIdx]
+		var myIdx = myRoleCB.currentIndex >= 0 ? myRoleCB.currentIndex : 2
+		var partnerIdx = partnerRoleCB.currentIndex >= 0 ? partnerRoleCB.currentIndex : 2
+
+		if (container.__isSource) {
+			container.relationshipData.m_sourceRole = roleTokens[myIdx]
+			container.relationshipData.m_targetRole = roleTokens[partnerIdx]
+		} else {
+			container.relationshipData.m_targetRole = roleTokens[myIdx]
+			container.relationshipData.m_sourceRole = roleTokens[partnerIdx]
+		}
 		container.relationshipData.m_scope = relScopeInput.text.trim()
 		container.relationshipData.m_description = relDescriptionInput.text.trim()
 	}
@@ -98,19 +147,19 @@ ViewBase {
 				width: parent.width
 
 				ElementView {
-					name: qsTr("Target Tenant")
+					name: qsTr("Partner Organization")
 
 					controlComp: Component {
 						Row {
-							id: targetTenantRole
+							id: partnerTenantRow
 							spacing: Style.marginM
 
 							BaseText {
 								anchors.verticalCenter: parent.verticalCenter
-								text: container.__selectedTargetTenantName
-								  || container.__selectedTargetTenantId
-								  || qsTr("Select tenant...")
-								color: container.__selectedTargetTenantId
+								text: container.__selectedPartnerTenantName
+								  || container.__selectedPartnerTenantId
+								  || qsTr("Select organization...")
+								color: container.__selectedPartnerTenantId
 								   ? Style.textColor : Style.inactiveTextColor
 								font.pixelSize: Style.fontSizeM
 							}
@@ -118,7 +167,7 @@ ViewBase {
 							Button {
 								text: qsTr("Select")
 								onClicked: {
-									var point = targetTenantRole.mapToItem(null, 0, targetTenantRole.height)
+									var point = partnerTenantRow.mapToItem(null, 0, partnerTenantRow.height)
 									ModalDialogManager.openDialog(tenantSelectComp, {
 																	  "x": point.x,
 																	  "y": point.y
@@ -130,8 +179,8 @@ ViewBase {
 				}
 
 				ComboBoxElementView {
-					id: sourceRoleCB
-					name: qsTr("Source Role")
+					id: myRoleCB
+					name: qsTr("My Role")
 					model: roleModel
 					currentIndex: 2
 					onCurrentIndexChanged: {
@@ -140,8 +189,8 @@ ViewBase {
 				}
 
 				ComboBoxElementView {
-					id: targetRoleCB
-					name: qsTr("Target Role")
+					id: partnerRoleCB
+					name: qsTr("Partner Role")
 					model: roleModel
 					currentIndex: 2
 					onCurrentIndexChanged: {
@@ -175,13 +224,13 @@ ViewBase {
 
 		FilterableSelectPopup {
 			dataProvider: container.apiClient ? container.apiClient.connectionsDataProvider : null
-			filterPlaceholder: qsTr("Select tenant...")
-			preselectedIds: container.__selectedTargetTenantId
-				? [container.__selectedTargetTenantId] : []
+			filterPlaceholder: qsTr("Select organization...")
+			preselectedIds: container.__selectedPartnerTenantId
+				? [container.__selectedPartnerTenantId] : []
 
 			onItemSelected: {
-				container.__selectedTargetTenantId = itemId
-				container.__selectedTargetTenantName = dataProvider
+				container.__selectedPartnerTenantId = itemId
+				container.__selectedPartnerTenantName = dataProvider
 					? dataProvider.getSelectedItemText(itemId) : ""
 				container.doUpdateModel()
 			}

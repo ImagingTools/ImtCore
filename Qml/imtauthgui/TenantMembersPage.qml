@@ -219,6 +219,13 @@ TenantSimpleCollectionPage {
 						var members = membersPage.stateManager ? membersPage.stateManager.pendingMembers : []
 						for (var i = 0; i < members.length; i++)
 							ids.push(members[i].id)
+						// Also exclude users who already have a pending invitation
+						var invitations = membersPage.stateManager ? membersPage.stateManager.pendingInvitations : []
+						for (var j = 0; j < invitations.length; j++) {
+							var invUserId = invitations[j].userId || ""
+							if (invUserId && ids.indexOf(invUserId) < 0)
+								ids.push(invUserId)
+						}
 						var point = inviteMemberBtn.mapToItem(null, 0, inviteMemberBtn.height)
 						ModalDialogManager.openDialog(membersSelectPopupComp, {
 														  "x": point.x,
@@ -261,7 +268,8 @@ TenantSimpleCollectionPage {
 					else if (menuItems[i].action === "transfer") memberActionMenu.showTransfer = true
 					else if (menuItems[i].action === "leave") memberActionMenu.showLeave = true
 				}
-				memberActionMenu.popup()
+				var localPos = membersPage.mapFromItem(null, menuX, menuY)
+				memberActionMenu.popup(localPos.x, localPos.y)
 			}
 
 			onMemberEditRequested: {
@@ -273,7 +281,8 @@ TenantSimpleCollectionPage {
 				inviteActionMenu.menuItems = menuItems
 				inviteActionMenu.targetInvitationId = invitationId
 				inviteActionMenu.targetUserName = userName
-				inviteActionMenu.popup()
+				var localPos = membersPage.mapFromItem(null, menuX, menuY)
+				inviteActionMenu.popup(localPos.x, localPos.y)
 			}
 		}
 	}

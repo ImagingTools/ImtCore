@@ -158,6 +158,17 @@ DocumentViewBase {
 			if (!stateManager_.isNewTenant && container.representationController)
 				container.representationController.updateRepresentationFromDocument()
 		}
+		function onMemberRemoved(userId) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			// If the current user left/was removed, force-close the editor
+			var currentUserId = container.tenantData.m_currentUserId || ""
+			if (currentUserId && userId === currentUserId) {
+				PopupManager.addInfoMessage(qsTr("You have left this organization. Closing editor."), true)
+				if (container.documentManager && container.documentId)
+					container.documentManager.closeDocument(container.documentId)
+			}
+		}
 		function onSubscriptionInvitationAccepted(notification) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
@@ -198,6 +209,14 @@ DocumentViewBase {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (notification.tenantId === container.tenantData.m_id) {
+				// If the removed member is the current user, force-close the document
+				var currentUserId = container.tenantData.m_currentUserId || ""
+				if (currentUserId && notification.userId === currentUserId) {
+					PopupManager.addInfoMessage(qsTr("You have been removed from this organization. Closing editor."), true)
+					if (container.documentManager && container.documentId)
+						container.documentManager.closeDocument(container.documentId)
+					return
+				}
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}
