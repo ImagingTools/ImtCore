@@ -17,6 +17,31 @@ namespace imtauthgql
 {
 
 
+namespace
+{
+
+
+QByteArray GetCounterpartyTenantId(const QByteArray& sourceTenantId, const QByteArray& targetTenantId, const QByteArray& contextTenantId)
+{
+	if (contextTenantId.isEmpty()){
+		return QByteArray();
+	}
+
+	if (sourceTenantId == contextTenantId){
+		return targetTenantId;
+	}
+
+	if (targetTenantId == contextTenantId){
+		return sourceTenantId;
+	}
+
+	return QByteArray();
+}
+
+
+} // namespace
+
+
 // protected methods
 
 // reimplemented (CRelationshipCollectionDocumentServiceGqlHandlerCompBase)
@@ -27,7 +52,12 @@ sdl::V1_0::imtauth::CTenantRelationship CRelationshipCollectionDocumentServiceCo
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::GetRelationshipRepresentationRequestArguments arguments = getRelationshipRepresentationRequest.GetRequestedArguments();
-	Q_UNUSED(gqlRequest);
+
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	QByteArray contextTenantId;
+	if (gqlContextPtr != nullptr){
+		contextTenantId = gqlContextPtr->GetTenantId();
+	}
 
 	QByteArray objectId;
 	if (arguments.input && arguments.input->id){
@@ -51,10 +81,18 @@ sdl::V1_0::imtauth::CTenantRelationship CRelationshipCollectionDocumentServiceCo
 	if (documentPtr.IsValid()){
 		const imtauth::ITenantRelationshipInfo* relPtr = dynamic_cast<const imtauth::ITenantRelationshipInfo*>(documentPtr.GetPtr());
 		if (relPtr != nullptr){
+			QByteArray sourceTenantId = relPtr->GetSourceTenantId();
+			QByteArray targetTenantId = relPtr->GetTargetTenantId();
+			QByteArray counterpartyTenantId = GetCounterpartyTenantId(sourceTenantId, targetTenantId, contextTenantId);
+			if (!counterpartyTenantId.isEmpty()){
+				sourceTenantId = contextTenantId;
+				targetTenantId = counterpartyTenantId;
+			}
+
 			sdl::V1_0::imtauth::CTenantRelationship response;
 			response.id = relPtr->GetRelationshipId();
-			response.targetTenantId = relPtr->GetTargetTenantId();
-			response.sourceTenantId = relPtr->GetSourceTenantId();
+			response.targetTenantId = targetTenantId;
+			response.sourceTenantId = sourceTenantId;
 			response.connectionId = relPtr->GetConnectionId();
 			response.sourceRole = ToSdlRelationshipRole(relPtr->GetSourceRole());
 			response.targetRole = ToSdlRelationshipRole(relPtr->GetTargetRole());
@@ -67,8 +105,8 @@ sdl::V1_0::imtauth::CTenantRelationship CRelationshipCollectionDocumentServiceCo
 			response.updatedAt = relPtr->GetUpdatedAt();
 
 			// Resolve target tenant name
-			if (m_tenantCollectionCompPtr.IsValid() && !relPtr->GetTargetTenantId().isEmpty()){
-				QString tenantName = m_tenantCollectionCompPtr->GetElementInfo(relPtr->GetTargetTenantId(), imtbase::ICollectionInfo::EIT_NAME).toString();
+			if (m_tenantCollectionCompPtr.IsValid() && !targetTenantId.isEmpty()){
+				QString tenantName = m_tenantCollectionCompPtr->GetElementInfo(targetTenantId, imtbase::ICollectionInfo::EIT_NAME).toString();
 				if (!tenantName.isEmpty()){
 					response.targetTenantName = tenantName;
 				}
@@ -136,25 +174,49 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CRelationshipCollectionDocumentServ
 		contextTenantId = gqlContextPtr->GetTenantId();
 	}
 
-	QByteArray sourceTenantId;
-	if (relData.sourceTenantId && !relData.sourceTenantId->isEmpty()){
-		sourceTenantId = *relData.sourceTenantId;
-		if (!contextTenantId.isEmpty() && sourceTenantId != contextTenantId){
-			errorMessage = QStringLiteral("sourceTenantId does not match tenant context");
-			return response;
+	QByteArray sourceTenantId = relationshipPtr->GetSourceTenantId();
+	QByteArray targetTenantId = relationshipPtr->GetTargetTenantId();
+
+	if (!contextTenantId.isEmpty()){
+		sourceTenantId = contextTenantId;
+
+		QByteArray requestedTargetTenantId;
+		if (relData.targetTenantId && !relData.targetTenantId->isEmpty()){
+			requestedTargetTenantId = *relData.targetTenantId;
+		}
+
+		if (!requestedTargetTenantId.isEmpty() && requestedTargetTenantId != contextTenantId){
+			targetTenantId = requestedTargetTenantId;
+		} else {
+			QByteArray counterpartyTenantId = GetCounterpartyTenantId(relationshipPtr->GetSourceTenantId(), relationshipPtr->GetTargetTenantId(), contextTenantId);
+			if (!counterpartyTenantId.isEmpty()){
+				targetTenantId = counterpartyTenantId;
+			} else if (relData.sourceTenantId && !relData.sourceTenantId->isEmpty() && *relData.sourceTenantId != contextTenantId){
+				targetTenantId = *relData.sourceTenantId;
+			}
 		}
 	} else {
-		sourceTenantId = contextTenantId;
+		if (relData.sourceTenantId && !relData.sourceTenantId->isEmpty()){
+			sourceTenantId = *relData.sourceTenantId;
+		}
+		if (relData.targetTenantId && !relData.targetTenantId->isEmpty()){
+			targetTenantId = *relData.targetTenantId;
+		}
+	}
+
+	if (!contextTenantId.isEmpty() && sourceTenantId != contextTenantId && targetTenantId != contextTenantId){
+		errorMessage = QStringLiteral("Tenant context is not a participant of the relationship");
+		return response;
+	}
+
+	if (!sourceTenantId.isEmpty() && sourceTenantId == targetTenantId){
+		errorMessage = QStringLiteral("Source and target tenants must be different");
+		return response;
 	}
 
 	if (sourceTenantId.isEmpty()){
 		errorMessage = QStringLiteral("Missing source tenant ID");
 		return response;
-	}
-
-	QByteArray targetTenantId = relationshipPtr->GetTargetTenantId();
-	if (relData.targetTenantId){
-		targetTenantId = *relData.targetTenantId;
 	}
 
 	if (targetTenantId.isEmpty()){

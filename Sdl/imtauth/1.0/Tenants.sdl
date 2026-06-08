@@ -340,6 +340,7 @@ type TenantRelationship {
 	connectionId: ID!
 	sourceTenantId: ID!
 	targetTenantId: ID!
+	sourceTenantName: String
 	targetTenantName: String
 	sourceRole: TenantRelationshipRole!
 	targetRole: TenantRelationshipRole!
