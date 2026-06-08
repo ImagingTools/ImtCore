@@ -94,7 +94,6 @@ ComboBoxGqlElementView 1.0 View/ComboBoxGqlElementView.qml
 ComboBoxGqlLegacyElementView 1.0 View/ComboBoxGqlLegacyElementView.qml
 SpinBoxElementView 1.0 View/SpinBoxElementView.qml
 ComboBoxAddressElementView 1.0 View/ComboBoxAddressElementView.qml
-ItemSelectElementView 1.0 View/ItemSelectElementView.qml
 
 singleton PopupManager 1.0 View/PopupManager.qml
 

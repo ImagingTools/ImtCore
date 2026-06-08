@@ -6,7 +6,6 @@ import imtgui 1.0
 import imtcontrols 1.0
 import imtcolgui 1.0
 import imtguigql 1.0
-import imtauthgui 1.0
 
 /**
  * CrossOrgGrantView
@@ -27,8 +26,6 @@ ViewBase {
 
 	property string __selectedTargetTenantId: ""
 	property string __selectedTargetTenantName: ""
-	property var __selectedRoleIds: []
-	property var __selectedRoleNames: []
 
 	function updateGui() {
 		if (!container.grantData) {
@@ -36,9 +33,13 @@ ViewBase {
 		}
 		container.__selectedTargetTenantId = container.grantData.m_targetTenantId || ""
 		container.__selectedTargetTenantName = container.grantData.m_targetTenantName || container.grantData.m_targetTenantId || ""
-		var roleIds = container.grantData.m_roleIds
-		container.__selectedRoleIds = roleIds
-		container.__selectedRoleNames = roleIds
+
+		var roleIds = container.grantData.m_roleIds || []
+		var arr = []
+		for (var i = 0; i < roleIds.length; i++)
+			arr.push({id: roleIds[i], name: roleIds[i]})
+		rolesSelectEditor.items = arr
+
 		grantDescriptionInput.text = container.grantData.m_description || ""
 		expiresAtPicker.setDateFromString(container.grantData.m_expiresAt || "")
 	}
@@ -48,7 +49,12 @@ ViewBase {
 			return
 		}
 		container.grantData.m_targetTenantId = container.__selectedTargetTenantId || ""
-		container.grantData.m_roleIds = container.__selectedRoleIds
+
+		var ids = []
+		for (var i = 0; i < rolesSelectEditor.items.length; i++)
+			ids.push(rolesSelectEditor.items[i].id)
+		container.grantData.m_roleIds = ids
+
 		container.grantData.m_description = grantDescriptionInput.text.trim()
 		container.grantData.m_expiresAt = expiresAtPicker.getDateAsString()
 	}
@@ -118,38 +124,28 @@ ViewBase {
 																  })
 								}
 							}
+
+							Button {
+								text: qsTr("Remove")
+								visible: container.__selectedTargetTenantId !== ""
+								onClicked: {
+									container.__selectedTargetTenantId = ""
+									container.__selectedTargetTenantName = ""
+									container.doUpdateModel()
+								}
+							}
 						}
 					}
 				}
 
-				ElementView {
-					name: qsTr("Roles")
-
-					controlComp: Component {
-						Row {
-							id: rolesRow
-							spacing: Style.marginM
-
-							BaseText {
-								anchors.verticalCenter: parent.verticalCenter
-								text: container.__selectedRoleNames.join(' ')
-								  || qsTr("Select roles...")
-								color: container.__selectedRoleIds.length > 0
-								   ? Style.textColor : Style.inactiveTextColor
-								font.pixelSize: Style.fontSizeM
-							}
-
-							Button {
-								text: qsTr("Select")
-								onClicked: {
-									var point = rolesRow.mapToItem(null, 0, rolesRow.height)
-									ModalDialogManager.openDialog(roleSelectComp, {
-																	  "x": point.x,
-																	  "y": point.y
-																  })
-								}
-							}
-						}
+				GqlBasedItemSelectElementView {
+					id: rolesSelectEditor
+					collectionId: "Roles"
+					label: qsTr("Roles")
+					addButtonText: qsTr("Add Role")
+					showCount: true
+					onSelectionChanged: {
+						container.doUpdateModel()
 					}
 				}
 
@@ -186,26 +182,6 @@ ViewBase {
 				container.__selectedTargetTenantId = itemId
 				container.__selectedTargetTenantName = dataProvider
 					? dataProvider.getSelectedItemText(itemId) : ""
-				container.doUpdateModel()
-			}
-		}
-	}
-
-	Component {
-		id: roleSelectComp
-
-		FilterableSelectPopup {
-			dataProvider: FilterableSelectGqlDataProvider {
-				collectionId: "Roles"
-				multiSelect: true
-			}
-			filterPlaceholder: qsTr("Select roles...")
-			preselectedIds: container.__selectedRoleIds
-
-			onItemSelected: {
-				container.__selectedRoleIds.push(itemId)
-				var n = dataProvider.getSelectedItemText(itemId)
-				container.__selectedRoleNames.push(n)
 				container.doUpdateModel()
 			}
 		}

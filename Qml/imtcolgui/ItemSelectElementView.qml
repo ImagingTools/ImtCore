@@ -4,9 +4,23 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
-import imtcolgui 1.0
-import imtguigql 1.0
 
+/**
+ * ItemSelectElementView
+ *
+ * A reusable ElementView that displays a list of selectable items as chips (tags).
+ * Provides add/remove functionality via a FilterableSelectPopup.
+ *
+ * This base version does NOT perform GQL-based name resolution.
+ * For GQL-based name resolution, use GqlBasedItemSelectElementView from imtguigql.
+ *
+ * Usage:
+ *   ItemSelectElementView {
+ *       label: "Roles"
+ *       items: [{id: "1", name: "Admin"}, {id: "2", name: "Editor"}]
+ *       dataProvider: myFilterableSelectDataProvider
+ *   }
+ */
 ElementView {
 	id: itemSelectElementView
 
@@ -21,15 +35,15 @@ ElementView {
 	// Placeholder for the filter popup
 	property string filterPlaceholder: qsTr("Type or choose an item")
 
+	// Data provider for the select popup (FilterableSelectDataProvider or subclass)
+	property var dataProvider: null
+
 	// Text shown when no items selected
 	property string emptyText: qsTr("No items")
 	// Whether to show selected count next to the label
 	property bool showCount: false
 	// List of item IDs that cannot be removed
 	property var nonRemovableIds: []
-
-	// --- Data Controller (dependency injection) ---
-	property QtObject dataProvider: null
 
 	// Chip colors (matching TicketEditor accent palette)
 	readonly property string accentColor: "#5b8fd6"
@@ -39,6 +53,12 @@ ElementView {
 	signal itemRemoved(int index, var itemData)
 	signal selectionChanged(var selectedItems)
 	signal popupClosed()
+
+	function __applyRemoval(newItems, removedIndex, removedData) {
+		itemSelectElementView.items = newItems
+		itemSelectElementView.itemRemoved(removedIndex, removedData)
+		itemSelectElementView.selectionChanged(newItems)
+	}
 
 	name: itemSelectElementView.showCount && itemSelectElementView.items.length > 0
 		? itemSelectElementView.label + " (" + itemSelectElementView.items.length + ")"
@@ -133,20 +153,15 @@ ElementView {
 								if (removedId) {
 									for (var k = 0; k < itemSelectElementView.items.length; k++) {
 										var it = itemSelectElementView.items[k]
-										// Match by id rather than index — robust against
-										// delegate-context drift when items mutate.
 										if (it && it.id !== removedId)
 											arr.push(it)
 									}
 								} else {
-									// Fallback: id is missing/empty — drop by index.
 									arr = itemSelectElementView.items.slice()
 									if (removedIndex >= 0 && removedIndex < arr.length)
 										arr.splice(removedIndex, 1)
 								}
-								itemSelectElementView.items = arr
-								itemSelectElementView.itemRemoved(removedIndex, removedData)
-								itemSelectElementView.selectionChanged(arr)
+								itemSelectElementView.__applyRemoval(arr, removedIndex, removedData)
 							}
 						}
 					}
@@ -169,7 +184,7 @@ ElementView {
 		id: selectComp
 
 		FilterableSelectPopup {
-			dataProvider: itemSelectElementView.dataProvider
+			dataProvider: itemSelectElementView ? itemSelectElementView.dataProvider : null
 
 			itemWidth: 280
 			showCheckBox: true
@@ -185,7 +200,6 @@ ElementView {
 						selName = selId
 					arr.push({id: selId, name: selName})
 				}
-	
 				itemSelectElementView.items = arr
 				itemSelectElementView.selectionChanged(arr)
 			}

@@ -23,6 +23,7 @@ TenantSimpleCollectionPage {
 	entityNamePlural: qsTr("Cross-Org Grants")
 	descriptionText: qsTr("Delegate scoped access from this tenant to another tenant.")
 	showCreateButton: true
+	documentNameFields: ["m_name", "m_targetTenantName"]
 
 	documentManager: grantsPage.apiClient ? grantsPage.apiClient.crossOrgGrantDocumentManager : null
 	objectTypeId: grantsPage.apiClient ? grantsPage.apiClient.crossOrgGrantObjectTypeId : ""

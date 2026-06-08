@@ -187,6 +187,16 @@ ViewBase {
 																  })
 								}
 							}
+
+							Button {
+								text: qsTr("Remove")
+								visible: !container.__isExistingRelationship && container.__selectedPartnerTenantId !== ""
+								onClicked: {
+									container.__selectedPartnerTenantId = ""
+									container.__selectedPartnerTenantName = ""
+									container.doUpdateModel()
+								}
+							}
 						}
 					}
 				}
