@@ -9,7 +9,7 @@
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/IGqlContext.h>
-#include <imtauthsdl/SDL/1.0/CPP/Tenants.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
 
 
 namespace imtauthgql

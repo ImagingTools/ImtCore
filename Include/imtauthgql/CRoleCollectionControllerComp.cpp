@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
-#include <imtauthsdl/SDL/1.0/CPP/Roles.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Roles.h>
 #include <imtbase/CComplexCollectionFilterHelper.h>
 #include <imtauth/CRole.h>
 

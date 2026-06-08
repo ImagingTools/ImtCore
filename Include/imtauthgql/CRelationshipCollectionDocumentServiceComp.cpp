@@ -11,7 +11,7 @@
 #include <imtgql/IGqlContext.h>
 
 // Generated includes
-#include <imtauthsdl/SDL/1.0/CPP/RelationshipCollectionDocumentService.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/RelationshipCollectionDocumentService.h>
 
 
 namespace imtauthgql

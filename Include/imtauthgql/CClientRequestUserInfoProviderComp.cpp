@@ -11,7 +11,7 @@
 #include <imtbase/CCollectionInfo.h>
 #include <imtgql/CGqlContext.h>
 #include <imtgql/CGqlRequestContextManager.h>
-#include <imtauthsdl/SDL/1.0/CPP/Users.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
 
 
 namespace imtauthgql

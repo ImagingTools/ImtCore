@@ -14,7 +14,7 @@
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/ITenantManager.h>
 #include <imtservergql/CGqlPublisherCompBase.h>
-#include <imtauthsdl/SDL/1.0/CPP/TenantMemberships_fwd.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantMemberships_fwd.h>
 
 
 namespace imtauthgql

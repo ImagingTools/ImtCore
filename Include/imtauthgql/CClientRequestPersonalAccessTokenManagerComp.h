@@ -5,7 +5,7 @@
 // ImtCore includes
 #include <imtauth/IPersonalAccessTokenManager.h>
 #include <imtauthgql/CClientRequestManagerCompBase.h>
-#include <imtauthsdl/SDL/1.0/CPP/PersonalAccessTokens_fwd.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/PersonalAccessTokens_fwd.h>
 
 
 namespace imtauthgql

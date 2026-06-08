@@ -5,7 +5,7 @@
 // ImtCore includes
 #include <imtlic/IProductInfo.h>
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
-#include <imtauthsdl/SDL/1.0/CPP/Profile_fwd.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Profile_fwd.h>
 
 
 namespace imtauthgql

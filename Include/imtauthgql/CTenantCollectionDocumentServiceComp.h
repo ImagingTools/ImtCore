@@ -11,7 +11,7 @@
 #include <imtdoc/IDocumentServiceEventHandler.h>
 
 // Generated includes
-#include <imtauthsdl/SDL/1.0/CPP/TenantCollectionDocumentService_fwd.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantCollectionDocumentService_fwd.h>
 
 
 namespace imtauthgql

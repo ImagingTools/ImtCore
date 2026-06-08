@@ -8,7 +8,7 @@
 #include <imtauth/ITenantManager.h>
 
 // Generated includes
-#include <imtauthsdl/SDL/1.0/CPP/RelationshipCollectionDocumentService_fwd.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/RelationshipCollectionDocumentService_fwd.h>
 
 
 namespace imtauthgql

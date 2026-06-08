@@ -2,7 +2,7 @@
 #include <imtauthgql/CTenantMembershipManagerControllerComp.h>
 
 // ImtCore includes
-#include <imtauthsdl/SDL/1.0/CPP/TenantMemberships.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantMemberships.h>
 #include <imtauth/ITenantInfo.h>
 #include <imtgql/IGqlContext.h>
 

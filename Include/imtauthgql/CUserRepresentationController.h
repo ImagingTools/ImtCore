@@ -7,7 +7,7 @@
 #include <istd/IChangeable.h>
 
 // ImtCore includes
-#include <imtauthsdl/SDL/1.0/CPP/Users_fwd.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users_fwd.h>
 
 
 namespace imtauthgql

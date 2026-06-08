@@ -9,7 +9,7 @@
 #include <imtauth/IJwtSessionController.h>
 #include <imtauth/ITenantManager.h>
 #include <imtauth/ITenantMembershipManager.h>
-#include <imtauthsdl/SDL/1.0/CPP/Sessions_fwd.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Sessions_fwd.h>
 
 
 namespace imtauthgql
