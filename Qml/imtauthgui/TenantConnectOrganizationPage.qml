@@ -26,6 +26,7 @@ ViewBase {
 
 	property bool sending: false
 	property string lastError: ""
+	property string processingRequestId: ""
 
 	function updateGui() {
 		if (connectPage.apiClient && connectPage.tenantData
@@ -53,7 +54,18 @@ ViewBase {
 
 		function onConnectionRequestError(errorMessage) {
 			connectPage.sending = false
+			connectPage.processingRequestId = ""
 			connectPage.lastError = errorMessage
+		}
+
+		function onRequestFailed(message) {
+			connectPage.sending = false
+			connectPage.processingRequestId = ""
+			connectPage.lastError = message || ""
+			if (message && message !== "") {
+				PopupManager.addErrorMessage(message, true)
+			}
+			connectPage.updateGui()
 		}
 
 		function onConnectionRequestsReceived() {
@@ -61,11 +73,13 @@ ViewBase {
 		}
 
 		function onConnectionRequestApproved(connectionId) {
+			connectPage.processingRequestId = ""
 			PopupManager.addSuccessMessage(qsTr("Connection request approved"), true)
 			connectPage.updateGui()
 		}
 
 		function onConnectionRequestRejected() {
+			connectPage.processingRequestId = ""
 			PopupManager.addSuccessMessage(qsTr("Connection request rejected"), true)
 			connectPage.updateGui()
 		}
@@ -104,6 +118,19 @@ ViewBase {
 		}
 		requestsList.model = incoming
 		sentRequestsList.model = outgoing
+
+		if (connectPage.processingRequestId !== "") {
+			var stillPending = false
+			for (var j = 0; j < incoming.length; ++j) {
+				if (incoming[j].id === connectPage.processingRequestId) {
+					stillPending = true
+					break
+				}
+			}
+			if (!stillPending) {
+				connectPage.processingRequestId = ""
+			}
+		}
 	}
 
 	function refreshConnectionsList() {
@@ -304,12 +331,12 @@ ViewBase {
 							width: approveBtnText.contentWidth + Style.marginL * 2
 							height: Style.controlHeightS
 							radius: Style.radiusM
-							color: "#3FB950"
+							color: connectPage.processingRequestId === modelData.id ? Style.inactiveTextColor : "#3FB950"
 
 							Text {
 								id: approveBtnText
 								anchors.centerIn: parent
-								text: qsTr("Approve")
+								text: connectPage.processingRequestId === modelData.id ? qsTr("Approving...") : qsTr("Approve")
 								font.pixelSize: Style.fontSizeS
 								color: "#FFFFFF"
 							}
@@ -317,8 +344,10 @@ ViewBase {
 							MouseArea {
 								anchors.fill: parent
 								cursorShape: Qt.PointingHandCursor
+								enabled: connectPage.processingRequestId === ""
 								onClicked: {
 									if (connectPage.apiClient && connectPage.tenantData) {
+										connectPage.processingRequestId = modelData.id || ""
 										connectPage.apiClient.approveConnectionRequest(
 											modelData.id, connectPage.tenantData.m_id)
 									}
@@ -330,12 +359,12 @@ ViewBase {
 							width: rejectBtnText.contentWidth + Style.marginL * 2
 							height: Style.controlHeightS
 							radius: Style.radiusM
-							color: "#DA3633"
+							color: connectPage.processingRequestId === modelData.id ? Style.inactiveTextColor : "#DA3633"
 
 							Text {
 								id: rejectBtnText
 								anchors.centerIn: parent
-								text: qsTr("Reject")
+								text: connectPage.processingRequestId === modelData.id ? qsTr("Rejecting...") : qsTr("Reject")
 								font.pixelSize: Style.fontSizeS
 								color: "#FFFFFF"
 							}
@@ -343,8 +372,10 @@ ViewBase {
 							MouseArea {
 								anchors.fill: parent
 								cursorShape: Qt.PointingHandCursor
+								enabled: connectPage.processingRequestId === ""
 								onClicked: {
 									if (connectPage.apiClient && connectPage.tenantData) {
+										connectPage.processingRequestId = modelData.id || ""
 										connectPage.apiClient.rejectConnectionRequest(
 											modelData.id, connectPage.tenantData.m_id)
 									}

@@ -237,7 +237,44 @@ bool CTenantConnectionRequestManagerComp::PendingRequestExists(const QByteArray&
 
 QByteArray CTenantConnectionRequestManagerComp::CreateConnection(const QByteArray& tenantAId, const QByteArray& tenantBId)
 {
-	if (ConnectionExists(tenantAId, tenantBId)){
+	if (!m_connectionCollectionCompPtr.IsValid() || !m_connectionFactoryCompPtr.IsValid()){
+		return QByteArray();
+	}
+
+	// Reuse existing pair to avoid violating DB unique constraint on (TenantAId, TenantBId).
+	for (const QByteArray& id : m_connectionCollectionCompPtr->GetElementIds()){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (!m_connectionCollectionCompPtr->GetObjectData(id, dataPtr)){
+			continue;
+		}
+
+		const ITenantConnectionInfo* existingPtr = dynamic_cast<const ITenantConnectionInfo*>(dataPtr.GetPtr());
+		if (existingPtr == nullptr){
+			continue;
+		}
+
+		const bool samePair =
+			(existingPtr->GetTenantAId() == tenantAId && existingPtr->GetTenantBId() == tenantBId)
+			|| (existingPtr->GetTenantAId() == tenantBId && existingPtr->GetTenantBId() == tenantAId);
+		if (!samePair){
+			continue;
+		}
+
+		if (existingPtr->GetStatus() == ITenantConnectionInfo::CS_ACTIVE){
+			return existingPtr->GetConnectionId();
+		}
+
+		ITenantConnectionInfoUniquePtr updatedConnPtr = m_connectionFactoryCompPtr.CreateInstance();
+		if (!updatedConnPtr.IsValid()){
+			return QByteArray();
+		}
+
+		updatedConnPtr->CopyFrom(*existingPtr);
+		updatedConnPtr->SetStatus(ITenantConnectionInfo::CS_ACTIVE);
+		updatedConnPtr->SetUpdatedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs));
+		if (StoreConnection(*updatedConnPtr)){
+			return updatedConnPtr->GetConnectionId();
+		}
 		return QByteArray();
 	}
 
@@ -644,6 +681,41 @@ QByteArray CTenantConnectionRequestManagerComp::ApproveConnectionRequest(const Q
 
 	istd::CChangeNotifier changeNotifier(this);
 
+	QByteArray connectionId;
+
+	// If a connection already exists (e.g. duplicate approve from another client),
+	// reuse it instead of failing the approval flow.
+	if (m_connectionCollectionCompPtr.IsValid()){
+		for (const QByteArray& id : m_connectionCollectionCompPtr->GetElementIds()){
+			imtbase::IObjectCollection::DataPtr connDataPtr;
+			if (!m_connectionCollectionCompPtr->GetObjectData(id, connDataPtr)){
+				continue;
+			}
+
+			const ITenantConnectionInfo* connPtr = dynamic_cast<const ITenantConnectionInfo*>(connDataPtr.GetPtr());
+			if (connPtr == nullptr || connPtr->GetStatus() != ITenantConnectionInfo::CS_ACTIVE){
+				continue;
+			}
+
+			const bool samePair =
+				(connPtr->GetTenantAId() == reqPtr->GetSourceTenantId() && connPtr->GetTenantBId() == reqPtr->GetTargetTenantId())
+				|| (connPtr->GetTenantAId() == reqPtr->GetTargetTenantId() && connPtr->GetTenantBId() == reqPtr->GetSourceTenantId());
+			if (samePair){
+				connectionId = connPtr->GetConnectionId();
+				break;
+			}
+		}
+	}
+
+	if (connectionId.isEmpty()){
+		connectionId = CreateConnection(reqPtr->GetSourceTenantId(), reqPtr->GetTargetTenantId());
+	}
+
+	if (connectionId.isEmpty()){
+		SendErrorMessage(0, "Failed to create or resolve connection for approved request", "CTenantConnectionRequestManagerComp");
+		return QByteArray();
+	}
+
 	// Update the request status
 	ITenantConnectionRequestInfoUniquePtr updatedReqPtr = m_requestFactoryCompPtr.CreateInstance();
 	if (!updatedReqPtr.IsValid()){
@@ -652,10 +724,11 @@ QByteArray CTenantConnectionRequestManagerComp::ApproveConnectionRequest(const Q
 	updatedReqPtr->CopyFrom(*reqPtr);
 	updatedReqPtr->SetStatus(ITenantConnectionRequestInfo::CRS_APPROVED);
 	updatedReqPtr->SetRespondedAt(QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs));
-	StoreConnectionRequest(*updatedReqPtr);
+	if (!StoreConnectionRequest(*updatedReqPtr)){
+		SendErrorMessage(0, "Failed to update request status to approved", "CTenantConnectionRequestManagerComp");
+		return QByteArray();
+	}
 
-	// Create the connection
-	QByteArray connectionId = CreateConnection(reqPtr->GetSourceTenantId(), reqPtr->GetTargetTenantId());
 	return connectionId;
 }
 

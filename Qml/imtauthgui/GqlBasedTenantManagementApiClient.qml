@@ -1157,6 +1157,7 @@ QtObject {
 			ApproveConnectionRequestPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
+							root.connectionRequestError(m_errorMessage)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.connectionRequestApproved(m_connectionId || "")
