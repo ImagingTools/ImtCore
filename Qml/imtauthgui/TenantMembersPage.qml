@@ -298,15 +298,16 @@ TenantSimpleCollectionPage {
 		property bool showTransfer: false
 		property bool showLeave: false
 
+		closePolicy: Enums.popupCloseOnEscape | Enums.popupCloseOnPressOutside
+
 		Menu {
 			id: changeRoleSubmenu
-			title: qsTr("Change Environment Role")
+			title: qsTr("Change Role")
 			visible: memberActionMenu.showChangeRole
 			height: visible ? implicitHeight : 0
 
 			MenuItem {
 				text: qsTr("Member")
-				checkable: true
 				checked: memberActionMenu.targetCurrentRole === "Member"
 				onTriggered: {
 					if (membersPage.apiClient) {
@@ -317,7 +318,6 @@ TenantSimpleCollectionPage {
 			}
 			MenuItem {
 				text: qsTr("Admin")
-				checkable: true
 				checked: memberActionMenu.targetCurrentRole === "Admin"
 				onTriggered: {
 					if (membersPage.apiClient) {

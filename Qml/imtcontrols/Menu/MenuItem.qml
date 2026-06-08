@@ -33,9 +33,6 @@ Item {
     property bool enabled: true
     property bool checkable: false
     property bool checked: false
-    /*! When true, trigger() flips checked for checkable items. Set false
-        when checked is driven by an external binding/state source. */
-    property bool autoToggle: true
     property bool highlighted: false
 
     /*! Bound Action (optional). When set, \l text, \l iconSource,
@@ -62,8 +59,7 @@ Item {
     function trigger() {
         if (!enabled) return;
         if (checkable) {
-            if (autoToggle)
-                checked = !checked;
+            checked = !checked;
             toggled();
             if (action && action.toggle) action.toggle(item);
         }

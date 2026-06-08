@@ -159,16 +159,16 @@ ViewBase {
 					KeyNavigation.backtab: roleIdInput;
 				}
 				
-				ItemSelectElementView {
+				GqlBasedItemSelectElementView {
 					id: roleSelectableCollectionEditor
 					collectionId: "Roles"
-						label: qsTr("Parent Roles")
-						addButtonText: qsTr("Add Parent Role")
-						showCount: true
-						onSelectionChanged: {
-							container.doUpdateModel()
-						}
+					label: qsTr("Parent Roles")
+					addButtonText: qsTr("Add Parent Role")
+					showCount: true
+					onSelectionChanged: {
+						container.doUpdateModel()
 					}
+				}
 
 				function updateGui(){
 					roleIdInput.text = container.roleData.m_roleId;
