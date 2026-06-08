@@ -28,10 +28,10 @@ Item {
 			id: dialogDelegate;
 			
 			anchors.fill: modalDialogs;
-			
+	
 			Rectangle {
 				id: background;
-				
+
 				anchors.fill: parent;
 				
 				color: "gray";
@@ -72,6 +72,14 @@ Item {
 				
 				property real itemWidth: item.width;
 				property real itemHeight: item.height;
+
+				property bool isLast: model.index == modalDialogs.count - 1
+
+				onIsLastChanged: {
+					if(dialogLoader.item && dialogLoader.item.escapeEnabled !==undefined){
+						dialogLoader.item.escapeEnabled = isLast
+					}
+				}
 				
 				clip: false;
 				
@@ -127,6 +135,10 @@ Item {
 					ModalDialogManager.backgroundItem = background;
 					
 					dialogLoader.item.root = ModalDialogManager;
+
+					if(dialogLoader.item.escapeEnabled !==undefined){
+						dialogLoader.item.escapeEnabled = isLast
+					}
 					
 					if (dialogLoader.item.onBackgroundClicked){
 						backgroundArea.clicked.connect(dialogLoader.item.onBackgroundClicked);
