@@ -6,3 +6,6 @@ include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Sql)
 target_link_libraries(${PROJECT_NAME} iauth imtgql imtbase imtauthsdl)
 
+if(TARGET imtauthsdl)
+	add_dependencies(${PROJECT_NAME} imtauthsdl)
+endif()
