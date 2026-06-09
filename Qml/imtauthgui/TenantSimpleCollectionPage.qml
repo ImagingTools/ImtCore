@@ -26,7 +26,7 @@ import imtauthgui 1.0
  *     dialog text, empty-state text, filter placeholder)
  *   - `documentManager` / `objectTypeId` / `dataProviderComp` taken from
  *     the apiClient for the concrete entity type
- *   - `removeItem(id)` — override to handle Remove buttons and
+ *   - `removeItems(ids)` — override to handle Remove buttons and
  *     the per-item Delete menu
  *
  * Parents that need to react to apiClient-level removal signals (e.g.
@@ -61,7 +61,7 @@ ViewBase {
 	property Component headerButtonsComponent: null    // custom header buttons placed at right of stackViewHeader
 	property Component customEditorComponent: null     // custom create/edit form used when documentManager is null
 	property bool showCreateButton: true               // set to false to hide the Create button (e.g. read-only collections)
-	function removeItem(id) {}                        // override in subcomponents
+	function removeItems(ids) {}                        // override in subcomponents
 
 	function updateGui() {}
 	function updateModel() {}
@@ -102,12 +102,10 @@ ViewBase {
 
 	readonly property bool __canManage: collectionPage.stateManager ? collectionPage.stateManager.canManageMembers : false
 
-	property var __selectionManager: null
+	property var selectionManager: null
 	property string __lastFilterText: ""
 	property var __listItems: []
 
-	// Public accessors for subcomponents with custom header buttons
-	readonly property var selectionManager: __selectionManager
 	property var dataProvider: null
 	onDataProviderChanged: {
 		if (dataProvider)
@@ -227,16 +225,16 @@ ViewBase {
 		text: qsTr("Edit")
 		font.pixelSize: Style.fontSizeM
 		font.bold: true
-		color: collectionPage.__selectionManager && collectionPage.__selectionManager.selectedIds.length === 1 ? Style.linkColor : Style.inactiveTextColor
-		opacity: collectionPage.__selectionManager && collectionPage.__selectionManager.selectedIds.length === 1 ? 1.0 : 0.5
+		color: collectionPage.selectionManager && collectionPage.selectionManager.selectedIds.length === 1 ? Style.linkColor : Style.inactiveTextColor
+		opacity: collectionPage.selectionManager && collectionPage.selectionManager.selectedIds.length === 1 ? 1.0 : 0.5
 
 		MouseArea {
 			anchors.fill: parent
 			hoverEnabled: true
-			cursorShape: collectionPage.__selectionManager && collectionPage.__selectionManager.selectedIds.length === 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
-			enabled: collectionPage.__selectionManager && collectionPage.__selectionManager.selectedIds.length === 1
+			cursorShape: collectionPage.selectionManager && collectionPage.selectionManager.selectedIds.length === 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
+			enabled: collectionPage.selectionManager && collectionPage.selectionManager.selectedIds.length === 1
 			onClicked: {
-				var selId = collectionPage.__selectionManager.selectedIds[0]
+				var selId = collectionPage.selectionManager.selectedIds[0]
 				var items = collectionPage.__listItems
 				for (var i = 0; i < items.length; i++) {
 					if (items[i] && items[i].id === selId) {
@@ -257,25 +255,24 @@ ViewBase {
 		text: qsTr("Remove")
 		font.pixelSize: Style.fontSizeM
 		font.bold: true
-		color: collectionPage.__selectionManager && collectionPage.__selectionManager.selectedIds.length > 0 ? Style.errorColor : Style.inactiveTextColor
-		opacity: collectionPage.__selectionManager && collectionPage.__selectionManager.selectedIds.length > 0 ? 1.0 : 0.5
+		color: collectionPage.selectionManager && collectionPage.selectionManager.selectedIds.length > 0 ? Style.errorColor : Style.inactiveTextColor
+		opacity: collectionPage.selectionManager && collectionPage.selectionManager.selectedIds.length > 0 ? 1.0 : 0.5
 
 		MouseArea {
 			anchors.fill: parent
 			hoverEnabled: true
-			cursorShape: collectionPage.__selectionManager && collectionPage.__selectionManager.selectedIds.length > 0 ? Qt.PointingHandCursor : Qt.ArrowCursor
-			enabled: collectionPage.__selectionManager && collectionPage.__selectionManager.selectedIds.length > 0
+			cursorShape: collectionPage.selectionManager && collectionPage.selectionManager.selectedIds.length > 0 ? Qt.PointingHandCursor : Qt.ArrowCursor
+			enabled: collectionPage.selectionManager && collectionPage.selectionManager.selectedIds.length > 0
 			onClicked: {
-				var count = collectionPage.__selectionManager.selectedIds.length
+				var count = collectionPage.selectionManager.selectedIds.length
 				ModalDialogManager.showConfirmationDialog(
 							collectionPage.__deleteMultipleTitle,
 							qsTr("Are you sure you want to delete %1 selected item(s)? This action cannot be undone.").arg(count),
 							function(result) {
 								if (result === Enums.yes) {
-									var ids = collectionPage.__selectionManager.selectedIds.slice()
-									for (var i = 0; i < ids.length; i++)
-										collectionPage.removeItem(ids[i])
-									collectionPage.__selectionManager.clear()
+									var ids = collectionPage.selectionManager.selectedIds.slice()
+									collectionPage.removeItems(ids)
+									collectionPage.selectionManager.clear()
 								}
 							}
 							)
@@ -344,7 +341,7 @@ ViewBase {
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
 				placeHolderText: collectionPage.__filterPlaceholder
 				onTextChanged: {
-					selectionManager.clear()
+					selectionManager_.clear()
 					collectionPage.__lastFilterText = text
 					filterDebounce.restart()
 				}
@@ -367,12 +364,14 @@ ViewBase {
 								 parent.height - filterInput.height - filterInput.anchors.topMargin - Style.marginM - Style.marginL)
 
 				IdSelectionManager {
-					id: selectionManager
+					id: selectionManager_
 					multiSelect: true
-					Component.onCompleted: collectionPage.__selectionManager = selectionManager
+					Component.onCompleted: {
+						collectionPage.selectionManager = selectionManager_
+					}
 					Component.onDestruction: {
 						if (collectionPage)
-							collectionPage.__selectionManager = null
+							collectionPage.selectionManager = null
 					}
 				}
 
@@ -381,16 +380,16 @@ ViewBase {
 					anchors.top: parent.top
 					anchors.left: parent.left
 					anchors.right: parent.right
-					selectedCount: selectionManager.selectedIds.length
+					selectedCount: selectionManager_.selectedIds.length
 					totalCount: itemListView.count
-					checkState: selectionManager.selectedIds.length === 0
+					checkState: selectionManager_.selectedIds.length === 0
 								? Qt.Unchecked
-								: (selectionManager.selectedIds.length === itemListView.count
+								: (selectionManager_.selectedIds.length === itemListView.count
 								   ? Qt.Checked : Qt.PartiallyChecked)
 
 					onSelectAllToggled: {
 						if (checkState === Qt.Checked) {
-							selectionManager.clear()
+							selectionManager_.clear()
 						} else {
 							var allIds = []
 							var items = listViewItem.effectiveModel
@@ -398,7 +397,7 @@ ViewBase {
 								if (items[i] && items[i].id)
 									allIds.push(items[i].id)
 							}
-							selectionManager.selectMultiple(allIds)
+							selectionManager_.selectMultiple(allIds)
 						}
 					}
 				}
@@ -443,7 +442,7 @@ ViewBase {
 						property string itemId: modelData.id || ""
 						property string itemTitle: modelData.title || modelData.id || ""
 						property string itemDescription: modelData.description || ""
-						property bool isSelected: selectionManager.isSelected(itemId)
+						property bool isSelected: selectionManager_.isSelected(itemId)
 
 						color: isSelected ? Style.selectedColor
 										  : itemMouseArea.containsMouse ? Style.buttonHoverColor
@@ -474,9 +473,9 @@ ViewBase {
 								checkState: itemDelegateRoot.isSelected ? Qt.Checked : Qt.Unchecked
 								onCheckStateChanged: {
 									var shouldBeSelected = (checkState === Qt.Checked)
-									var currentlySelected = selectionManager.isSelected(itemDelegateRoot.itemId)
+									var currentlySelected = selectionManager_.isSelected(itemDelegateRoot.itemId)
 									if (shouldBeSelected !== currentlySelected)
-										selectionManager.toggleSelect(itemDelegateRoot.itemId)
+										selectionManager_.toggleSelect(itemDelegateRoot.itemId)
 								}
 							}
 
@@ -548,7 +547,7 @@ ViewBase {
 												qsTr("Are you sure you want to delete \"%1\"? This action cannot be undone.").arg(itemDelegateRoot.itemTitle),
 												function(result) {
 													if (result === Enums.yes)
-														collectionPage.removeItem(itemDelegateRoot.itemId)
+														collectionPage.removeItems([itemDelegateRoot.itemId])
 												}
 												)
 								}

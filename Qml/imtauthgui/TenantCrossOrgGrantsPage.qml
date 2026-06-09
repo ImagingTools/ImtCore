@@ -20,7 +20,7 @@ TenantSimpleCollectionPage {
 	id: grantsPage
 
 	entityName: qsTr("Grant")
-	entityNamePlural: qsTr("Cross-Org Grants")
+	entityNamePlural: qsTr("Cross Organization Grants")
 	descriptionText: qsTr("Delegate scoped access from this tenant to another tenant.")
 	showCreateButton: true
 	documentNameFields: ["m_name", "m_targetTenantName"]
@@ -29,15 +29,15 @@ TenantSimpleCollectionPage {
 	objectTypeId: grantsPage.apiClient ? grantsPage.apiClient.crossOrgGrantObjectTypeId : ""
 	dataProvider: grantsPage.apiClient ? grantsPage.apiClient.crossOrgGrantsListDataProvider : null
 
-	function removeItem(id) {
+	function removeItems(ids) {
 		if (grantsPage.apiClient) {
-			grantsPage.apiClient.revokeCrossOrgGrant(id)
+			grantsPage.apiClient.removeCrossOrgGrants(ids)
 		}
 	}
 
 	Connections {
 		target: grantsPage.apiClient
-		function onCrossOrgGrantRevoked(grantId) {
+		function onCrossOrgGrantsRemoved() {
 			grantsPage.refresh()
 		}
 	}

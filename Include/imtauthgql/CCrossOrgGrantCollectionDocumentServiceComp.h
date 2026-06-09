@@ -5,6 +5,7 @@
 // ImtCore includes
 #include <imtdoc/IDocumentService.h>
 #include <imtbase/IObjectCollection.h>
+#include <imtauth/ICrossOrgGrant.h>
 
 // Generated includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/CrossOrgGrantCollectionDocumentService_fwd.h>
@@ -44,6 +45,8 @@ protected:
 				QString& errorMessage) const override;
 
 private:
+	QString ComposeDefaultGrantName(const imtauth::CrossOrgGrantInfo& info) const;
+
 	I_REF(imtdoc::IDocumentService, m_documentManagerCompPtr);
 	I_REF(imtbase::IObjectCollection, m_tenantCollectionCompPtr);
 };

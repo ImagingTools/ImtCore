@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QDateTime>
+#include <QtCore/QStringList>
 #include <QtCore/QUuid>
 
 // ACF includes
@@ -56,9 +57,25 @@ QByteArray CCrossOrgGrantManagerComp::CreateGrant(
 	info.expiresAt = expiresAt;
 	info.isActive = true;
 
+	// Provide a deterministic fallback name so that repeated saves update the same
+	// record instead of creating duplicates. A friendlier name based on tenant
+	// display names is computed on the service layer when available.
+	if (info.name.isEmpty()){
+		QString targetName = QString::fromUtf8(targetTenantId);
+		QStringList roleNames;
+		for (const QByteArray& roleId : roleIds){
+			if (!roleId.isEmpty()){
+				roleNames << QString::fromUtf8(roleId);
+			}
+		}
+		info.name = roleNames.isEmpty()
+				? targetName
+				: QStringLiteral("%1 (%2)").arg(targetName, roleNames.join(QStringLiteral(", ")));
+	}
+
 	grantPtr->SetGrantInfo(info);
 
-	QByteArray storedId = m_grantCollectionCompPtr->InsertNewObject("CrossOrgGrant", QString(), QString(), grantPtr.GetPtr(), grantId);
+	QByteArray storedId = m_grantCollectionCompPtr->InsertNewObject("CrossOrgGrant", info.name, QString(), grantPtr.GetPtr(), grantId);
 	return storedId.isEmpty() ? QByteArray() : grantId;
 }
 
@@ -90,6 +107,28 @@ bool CCrossOrgGrantManagerComp::RevokeGrant(const QByteArray& grantId)
 	grantPtr->SetGrantInfo(info);
 
 	return m_grantCollectionCompPtr->SetObjectData(grantId, *grantPtr);
+}
+
+
+bool CCrossOrgGrantManagerComp::RemoveGrants(const QByteArrayList& grantIds)
+{
+	if (!m_grantCollectionCompPtr.IsValid() || grantIds.isEmpty()){
+		return false;
+	}
+
+	QByteArrayList filteredIds;
+	for (const QByteArray& grantId : grantIds){
+		if (!grantId.isEmpty()){
+			filteredIds.push_back(grantId);
+		}
+	}
+
+	if (filteredIds.isEmpty()){
+		return false;
+	}
+
+	istd::CChangeNotifier changeNotifier(this);
+	return m_grantCollectionCompPtr->RemoveElements(filteredIds);
 }
 
 
