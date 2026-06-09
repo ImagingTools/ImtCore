@@ -2,6 +2,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QMutex>
+
 // ACF includes
 #include <iprm/IEnableableParam.h>
 
@@ -32,6 +35,15 @@ protected:
 	};
 
 	virtual QByteArray CheckExistsRole(const QByteArray& productId, RoleType roleType) const;
+	//! Atomically ensure that a default/guest role exists for the given product.
+	/*! The check for an existing role and the creation of a missing one are serialized,
+	    so concurrent authorization requests cannot each create a duplicate role. */
+	virtual QByteArray EnsureRoleExists(
+				const QByteArray& productId,
+				RoleType roleType,
+				const QByteArray& roleId,
+				const QString& roleName,
+				const QString& description) const;
 	virtual QByteArray InsertNewIdentifiableRoleInfo(
 				const QByteArray& roleId,
 				const QString& roleName,
@@ -52,6 +64,9 @@ private:
 	I_REF(iprm::IEnableableParam, m_enableableParamCompPtr);
 	I_REF(imtbase::IObjectCollection, m_roleCollectionCompPtr);
 	I_ATTR(QByteArray, m_systemIdAttrPtr);
+
+	//! Serializes ensuring of default/guest roles to prevent duplicate creation on concurrent logins.
+	mutable QMutex m_roleCreationMutex;
 };
 
 
