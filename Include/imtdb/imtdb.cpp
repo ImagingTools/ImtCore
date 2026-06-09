@@ -59,6 +59,7 @@ QString SqlValue(const QString& value, bool useDefaultIfEmpty)
 	if (value.isEmpty()){
 		return useDefaultIfEmpty ? DEFAULT_DATA_LITERAL : NULL_DATA_LITERAL;
 	}
+
 	return SqlEncode(value).prepend('\'').append('\'');
 }
 
@@ -68,6 +69,7 @@ QString SqlValue(int value, bool useDefaultIfEmpty)
 	if (value == 0){
 		return useDefaultIfEmpty ? DEFAULT_DATA_LITERAL : NULL_DATA_LITERAL;
 	}
+
 	return QString::number(value);
 }
 
@@ -77,6 +79,7 @@ QString SqlValue(double value, bool useDefaultIfEmpty)
 	if (value == 0.0){
 		return useDefaultIfEmpty ? DEFAULT_DATA_LITERAL : NULL_DATA_LITERAL;
 	}
+
 	return QString::number(value);
 }
 

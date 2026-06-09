@@ -204,6 +204,7 @@ QString EscapeSql(const QString& value);
  */
 QByteArray VariantToByteArray(const QVariant& value);
 
+
 /**
  * \brief Returns "NULL" if the input string is empty, otherwise returns the string wrapped in single quotes.
  *
@@ -223,6 +224,7 @@ QByteArray VariantToByteArray(const QVariant& value);
  */
 QString SqlValue(const QString& value, bool useDefaultIfEmpty = false);
 
+
 /**
  * \brief Returns "NULL" or "DEFAULT" if the input integer is 0, otherwise returns the number as a string.
  *
@@ -233,6 +235,7 @@ QString SqlValue(const QString& value, bool useDefaultIfEmpty = false);
  * \return "NULL" or "DEFAULT" if the input is 0, otherwise the string representation of the integer.
  */
 QString SqlValue(int value, bool useDefaultIfEmpty = false);
+
 
 /**
  * \brief Returns "NULL" or "DEFAULT" if the input double is 0.0, otherwise returns the number as a string.
