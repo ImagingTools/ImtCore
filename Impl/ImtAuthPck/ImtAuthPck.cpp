@@ -356,6 +356,11 @@ I_EXPORT_COMPONENT(
 			"Relationship document validator",
 			"Relationship Document Validator");
 
+I_EXPORT_COMPONENT(
+			DelegatedAccessResolver,
+			"Resolver composing membership and cross-org grants for delegated access checks",
+			"Delegated Access Resolver");
+
 
 } // namespace ImtAuthPck
 
