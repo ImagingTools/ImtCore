@@ -23,11 +23,30 @@ ViewBase {
 	property var grantData: model
 	property var apiClient: null
 
-		property string __selectedTargetTenantId: ""
+	property string __selectedTargetTenantId: ""
 	property string __selectedTargetTenantName: ""
 	property string __selectedExpiresAt: ""
+	property bool __loadingGui: false
 
-		function updateGui() {
+	function expiresAtToIndex(iso) {
+		if (!iso || iso === "")
+			return 4
+
+		var target = new Date(iso)
+		if (isNaN(target.getTime()))
+			return 4
+
+		var days = (target.getTime() - (new Date()).getTime()) / (24 * 3600 * 1000)
+		if (days <= 15)
+			return 0
+		if (days <= 45)
+			return 1
+		if (days <= 75)
+			return 2
+		return 3
+	}
+
+	function updateGui() {
 		if (!container.grantData) {
 			return
 		}
@@ -44,9 +63,12 @@ ViewBase {
 
 		var exp = container.grantData.m_expiresAt || ""
 		container.__selectedExpiresAt = exp
+		container.__loadingGui = true
+		expirationCb.currentIndex = container.expiresAtToIndex(exp)
+		container.__loadingGui = false
 	}
 
-		function updateModel() {
+	function updateModel() {
 		if (!container.grantData) {
 			return
 		}
@@ -160,31 +182,28 @@ ViewBase {
 					}
 				}
 
-								ComboBoxElementView {
+				ComboBoxElementView {
 					id: expirationCb
 					name: qsTr("Expires At")
 					description: qsTr("The grant will expire on the selected date")
+					nameId: "name"
 					model: expirationModel
-					currentIndex: {
-						// Select index if editing
-						if (container.__selectedExpiresAt === "") return 4
-						return 1 // Default to 30 days if not easily parsable, but let's see
-					}
+
 					TreeItemModel {
 						id: expirationModel
 						Component.onCompleted: {
-							let index = expirationModel.insertNewItem()
+							var index = expirationModel.insertNewItem()
 							expirationModel.setData("id", "7", index)
 							expirationModel.setData("name", qsTr("7 Days"), index)
 
 							index = expirationModel.insertNewItem()
 							expirationModel.setData("id", "30", index)
 							expirationModel.setData("name", qsTr("30 Days"), index)
-							
+
 							index = expirationModel.insertNewItem()
 							expirationModel.setData("id", "60", index)
 							expirationModel.setData("name", qsTr("60 Days"), index)
-							
+
 							index = expirationModel.insertNewItem()
 							expirationModel.setData("id", "90", index)
 							expirationModel.setData("name", qsTr("90 Days"), index)
@@ -196,39 +215,27 @@ ViewBase {
 					}
 
 					function computeExpiresAtIso() {
-						var id = expirationModel.getData("id", currentIndex)
-					
-						if (id === "unlimited")
+						var id = expirationModel.getData("id", expirationCb.currentIndex)
+
+						if (id === "unlimited" || id === "" || id === undefined || id === null)
 							return ""
-					
-						if (id === "" || id === undefined || id === null)
-							return ""
-					
-						let days = Number(id)
+
+						var days = Number(id)
 						if (days <= 0)
 							return ""
-					
-						let d = new Date()
+
+						var d = new Date()
 						d.setDate(d.getDate() + days)
 						return d.toISOString()
 					}
-					
-					onCurrentIndexChanged: {
-						// When user explicitly selects something
-						container.__selectedExpiresAt = computeExpiresAtIso()
-						container.doUpdateModel()
-					}
 
-					Binding {
-						target: expirationCb
-						property: "currentIndex"
-						value: {
-							if (container.__selectedExpiresAt === "") return 4
-							// Approximation. Usually expiresAt will not exactly match 30 days from now
-							// if it was set in the past. But let's show "30 days" as fallback.
-							return 1
-						}
-						restoreMode: Binding.RestoreBinding
+					onCurrentIndexChanged: {
+						// Ignore index changes triggered while loading the model into the GUI.
+						if (container.__loadingGui)
+							return
+
+						container.__selectedExpiresAt = expirationCb.computeExpiresAtIso()
+						container.doUpdateModel()
 					}
 				}
 			}
