@@ -465,6 +465,7 @@ type CrossOrgGrant {
 	sourceTenantId: ID!
 	targetTenantId: ID!
 	targetTenantName: String
+	name: String
 	roleIds: [ID]
 	description: String
 	createdAt: String

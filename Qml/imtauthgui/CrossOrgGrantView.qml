@@ -53,6 +53,8 @@ ViewBase {
 		container.__selectedTargetTenantId = container.grantData.m_targetTenantId || ""
 		container.__selectedTargetTenantName = container.grantData.m_targetTenantName || container.grantData.m_targetTenantId || ""
 
+		grantNameInput.text = container.grantData.m_name || ""
+
 		var roleIds = container.grantData.m_roleIds || []
 		var arr = []
 		for (var i = 0; i < roleIds.length; i++)
@@ -73,6 +75,8 @@ ViewBase {
 			return
 		}
 		container.grantData.m_targetTenantId = container.__selectedTargetTenantId || ""
+
+		container.grantData.m_name = grantNameInput.text.trim()
 
 		var ids = []
 		for (var i = 0; i < rolesSelectEditor.items.length; i++)
@@ -119,6 +123,15 @@ ViewBase {
 			GroupElementView {
 				id: generalGroup
 				width: parent.width
+
+				TextInputElementView {
+					id: grantNameInput
+					name: qsTr("Name")
+					placeHolderText: qsTr("Auto-generated from tenant and roles if left empty")
+					onEditingFinished: {
+						container.doUpdateModel()
+					}
+				}
 
 				ElementView {
 					name: qsTr("Target Tenant")

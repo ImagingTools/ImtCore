@@ -25,6 +25,7 @@ struct CrossOrgGrantInfo
 	QByteArray grantId;
 	QByteArray sourceTenantId;
 	QByteArray targetTenantId;
+	QString name;
 	QByteArrayList roleIds;
 	QString description;
 	QString createdAt;
@@ -36,6 +37,7 @@ struct CrossOrgGrantInfo
 		return grantId == other.grantId
 			&& sourceTenantId == other.sourceTenantId
 			&& targetTenantId == other.targetTenantId
+			&& name == other.name
 			&& roleIds == other.roleIds
 			&& description == other.description
 			&& createdAt == other.createdAt
