@@ -552,6 +552,35 @@ sdl::V1_0::imtauth::CRevokeCrossOrgGrantPayload CTenantManagerControllerComp::On
 }
 
 
+sdl::V1_0::imtauth::CRemoveCrossOrgGrantsPayload CTenantManagerControllerComp::OnRemoveCrossOrgGrants(
+		const sdl::V1_0::imtauth::CRemoveCrossOrgGrantsGqlRequest& removeCrossOrgGrantsRequest,
+		const ::imtgql::CGqlRequest& /*gqlRequest*/,
+		QString& /*errorMessage*/) const
+{
+	sdl::V1_0::imtauth::CRemoveCrossOrgGrantsPayload response;
+
+	if (!m_grantManagerCompPtr.IsValid()){
+		response.errorMessage = QStringLiteral("Cross-org grant manager is not configured");
+		response.success = false;
+		return response;
+	}
+
+	QByteArrayList grantIds;
+	sdl::V1_0::imtauth::RemoveCrossOrgGrantsRequestArguments arguments = removeCrossOrgGrantsRequest.GetRequestedArguments();
+	if (arguments.input->grantIds){
+		grantIds = arguments.input->grantIds->ToList();
+	}
+
+	bool success = m_grantManagerCompPtr->RemoveGrants(grantIds);
+	response.success = success;
+	if (!success){
+		response.errorMessage = QStringLiteral("Failed to remove one or more cross-org grants");
+	}
+
+	return response;
+}
+
+
 sdl::V1_0::imtauth::CGetContractsPayload CTenantManagerControllerComp::OnGetContracts(
 		const sdl::V1_0::imtauth::CGetContractsGqlRequest& getContractsRequest,
 		const ::imtgql::CGqlRequest& /*gqlRequest*/,

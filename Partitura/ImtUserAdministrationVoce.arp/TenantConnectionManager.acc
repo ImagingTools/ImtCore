@@ -121,6 +121,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="RelationshipDocumentValidator" PackageId="ImtAuthPck" ComponentId="RelationshipDocumentValidator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="SlaveSubscriberController" PackageId="ImtServerGqlPck" ComponentId="SlaveSubscriberController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -251,6 +256,13 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>RelationshipDocumentNameProvider</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentValidators" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>RelationshipDocumentValidator</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

@@ -25,6 +25,7 @@ struct CrossOrgGrantInfo
 	QByteArray grantId;
 	QByteArray sourceTenantId;
 	QByteArray targetTenantId;
+	QString name;
 	QByteArrayList roleIds;
 	QString description;
 	QString createdAt;
@@ -36,6 +37,7 @@ struct CrossOrgGrantInfo
 		return grantId == other.grantId
 			&& sourceTenantId == other.sourceTenantId
 			&& targetTenantId == other.targetTenantId
+			&& name == other.name
 			&& roleIds == other.roleIds
 			&& description == other.description
 			&& createdAt == other.createdAt
@@ -87,6 +89,12 @@ public:
 		\return true if removed successfully.
 	*/
 	virtual bool RevokeGrant(const QByteArray& grantId) = 0;
+
+	/**
+		Permanently remove cross-org grants by their IDs.
+		\return true if all requested grants were removed successfully.
+	*/
+	virtual bool RemoveGrants(const QByteArrayList& grantIds) = 0;
 
 	/**
 		Get a specific grant by its ID.

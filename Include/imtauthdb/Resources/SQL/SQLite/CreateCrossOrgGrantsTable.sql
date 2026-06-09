@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS "CrossOrgGrants" (
 	"Id" TEXT PRIMARY KEY,
 	"SourceTenantId" TEXT NOT NULL,
 	"TargetTenantId" TEXT NOT NULL,
+	"Name" TEXT,
 	"RoleIds" TEXT,
 	"Description" TEXT,
 	"CreatedAt" TEXT NOT NULL,

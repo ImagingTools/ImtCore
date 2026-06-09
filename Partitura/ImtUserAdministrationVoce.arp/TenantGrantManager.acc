@@ -31,6 +31,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="CrossOrgGrantDocumentValidator" PackageId="ImtAuthPck" ComponentId="CrossOrgGrantDocumentValidator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="CrossOrgGrantInfo" PackageId="ImtAuthPck" ComponentId="CrossOrgGrantInfo">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap/>
@@ -62,6 +67,13 @@
                     </AttributeInfo>
                     <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="CrossOrgGrants"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentValidators" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>CrossOrgGrantDocumentValidator</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="IsSingleCopyMode" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="false"/>

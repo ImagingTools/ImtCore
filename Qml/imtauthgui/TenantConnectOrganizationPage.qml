@@ -503,7 +503,7 @@ ViewBase {
 
 			Text {
 				text: qsTr("Organizations you are connected with.")
-				font.pixelSize: Style.fontSizeS
+				font.pixelSize: Style.fontSizeM
 				color: Style.inactiveTextColor
 			}
 

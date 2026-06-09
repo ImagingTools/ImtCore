@@ -9,22 +9,22 @@
 #include <imtdoc/IDocumentValidator.h>
 
 
-namespace imtauthgql
+namespace imtauth
 {
 
 
 /**
-	Validates CrossOrgGrant documents before save.
-	Ensures required fields (targetTenantId, roleIds) are present.
+	Validates TenantRelationship documents before save.
+	Ensures required fields (sourceTenantId, targetTenantId) are present.
 */
-class CCrossOrgGrantDocumentValidatorComp:
+class CRelationshipDocumentValidatorComp:
 			public icomp::CComponentBase,
 			virtual public imtdoc::IDocumentValidator
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CCrossOrgGrantDocumentValidatorComp)
+	I_BEGIN_COMPONENT(CRelationshipDocumentValidatorComp)
 		I_REGISTER_INTERFACE(imtdoc::IDocumentValidator)
 	I_END_COMPONENT
 
@@ -33,4 +33,4 @@ public:
 };
 
 
-} // namespace imtauthgql
+} // namespace imtauth

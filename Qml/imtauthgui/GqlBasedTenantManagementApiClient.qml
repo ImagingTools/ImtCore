@@ -41,10 +41,6 @@ QtObject {
 	property string productId: AuthorizationController.productId
 	property string tenantId: AuthorizationController.currentTenantId
 
-	property Component __roleDataComp: Component { RoleData {} }
-	property Component __groupDataComp: Component { GroupData {} }
-	property Component __userDataComp: Component { UserData {} }
-
 	// =========================================================================
 	// Abstract contract (must mirror TenantManagementApiClient.qml)
 	// =========================================================================
@@ -70,26 +66,23 @@ QtObject {
 
 	signal ownershipTransferred()
 	signal memberRoleChanged(string userId, string role)
-	signal memberRemoved(string userId)
+	signal membersRemoved()
 
 	signal roleCreated()
-	signal roleRemoved(string roleId)
+	signal rolesRemoved()
+	signal crossOrgGrantsRemoved()
 	signal roleUpdated(string roleId)
 	signal roleDataReceived(var data)
 
 	signal groupCreated()
-	signal groupRemoved(string groupId)
+	signal groupsRemoved()
 	signal groupUpdated(string groupId)
 	signal groupDataReceived(var data)
 
 	signal userCreated()
-	signal userRemoved(string userId)
+	signal usersRemoved()
 	signal userUpdated(string userId)
 	signal userDataReceived(var data)
-
-	signal crossOrgGrantCreated(string grantId)
-	signal crossOrgGrantRevoked(string grantId)
-	signal crossOrgGrantsReceived(var grants)
 
 	signal contractCreated(string contractId)
 	signal contractStatusUpdated(string contractId)
@@ -264,126 +257,26 @@ QtObject {
 		}
 	}
 
-	// --- Roles (Roles.sdl: RoleItem / RoleAdd / RoleUpdate) ---
-	property RoleDataInput __roleAddInput: RoleDataInput {}
-	property GqlSdlRequestSender __roleAddSender: GqlSdlRequestSender {
-		requestType: 1
-		gqlCommandId: ImtauthRolesSdlCommandIds.s_roleAdd
-
-		sdlObjectComp: Component {
-			AddedNotificationPayload {
-				onFinished: { root.roleCreated() }
-			}
-		}
-	}
-
 	property RemoveElementsInput __removeRoleInput: RemoveElementsInput {}
-	property string __pendingRemoveRoleId: ""
 	property GqlSdlRequestSender __removeRoleSender: GqlSdlRequestSender {
 		requestType: 1
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_removeElements
 
 		sdlObjectComp: Component {
 			RemoveElementsPayload {
-				onFinished: { root.roleRemoved(root.__pendingRemoveRoleId) }
-			}
-		}
-	}
-
-	property RoleDataInput __roleUpdateInput: RoleDataInput {}
-	property string __pendingSetRoleId: ""
-	property GqlSdlRequestSender __roleUpdateSender: GqlSdlRequestSender {
-		requestType: 1
-		gqlCommandId: ImtauthRolesSdlCommandIds.s_roleUpdate
-
-		sdlObjectComp: Component {
-			UpdatedNotificationPayload {
-				onFinished: { root.roleUpdated(root.__pendingSetRoleId) }
-			}
-		}
-	}
-
-	property RoleItemInput __roleItemInput: RoleItemInput {}
-	property GqlSdlRequestSender __roleItemSender: GqlSdlRequestSender {
-		gqlCommandId: ImtauthRolesSdlCommandIds.s_roleItem
-
-		sdlObjectComp: Component {
-			RoleData {
-				onFinished: { root.__handleRoleDataReceived(this) }
-			}
-		}
-	}
-
-	// --- Groups (Groups.sdl: GroupItem / GroupAdd / GroupUpdate) ---
-	property GroupDataInput __groupAddInput: GroupDataInput {}
-	property GqlSdlRequestSender __groupAddSender: GqlSdlRequestSender {
-		requestType: 1
-		gqlCommandId: ImtauthGroupsSdlCommandIds.s_groupAdd
-
-		sdlObjectComp: Component {
-			AddedNotificationPayload {
-				onFinished: { root.groupCreated() }
+				onFinished: { root.rolesRemoved() }
 			}
 		}
 	}
 
 	property RemoveElementsInput __removeGroupInput: RemoveElementsInput {}
-	property string __pendingRemoveGroupId: ""
 	property GqlSdlRequestSender __removeGroupSender: GqlSdlRequestSender {
 		requestType: 1
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_removeElements
 
 		sdlObjectComp: Component {
 			RemoveElementsPayload {
-				onFinished: { root.groupRemoved(root.__pendingRemoveGroupId) }
-			}
-		}
-	}
-
-	property GroupDataInput __groupUpdateInput: GroupDataInput {}
-	property string __pendingSetGroupId: ""
-	property GqlSdlRequestSender __groupUpdateSender: GqlSdlRequestSender {
-		requestType: 1
-		gqlCommandId: ImtauthGroupsSdlCommandIds.s_groupUpdate
-
-		sdlObjectComp: Component {
-			UpdatedNotificationPayload {
-				onFinished: { root.groupUpdated(root.__pendingSetGroupId) }
-			}
-		}
-	}
-
-	property GroupItemInput __groupItemInput: GroupItemInput {}
-	property GqlSdlRequestSender __groupItemSender: GqlSdlRequestSender {
-		gqlCommandId: ImtauthGroupsSdlCommandIds.s_groupItem
-
-		sdlObjectComp: Component {
-			GroupData {
-				onFinished: { root.__handleGroupDataReceived(this) }
-			}
-		}
-	}
-
-	// --- Users (Users.sdl: UserItem / UserAdd / UserUpdate) ---
-	property UserDataInput __userAddInput: UserDataInput {}
-	property string __pendingAddedUserId: ""
-	property GqlSdlRequestSender __userAddSender: GqlSdlRequestSender {
-		requestType: 1
-		gqlCommandId: ImtauthUsersSdlCommandIds.s_userAdd
-
-		sdlObjectComp: Component {
-			AddedNotificationPayload {
-				onFinished: {
-					root.__pendingAddedUserId = m_id || ""
-					if (root.productId !== "" && root.__pendingAddedUserId !== "") {
-						root.__addMembershipInput.m_userId = root.__pendingAddedUserId
-						root.__addMembershipInput.m_tenantId = root.productId
-						root.__addMembershipInput.m_role = "Member"
-						root.__addMembershipSender.send(root.__addMembershipInput)
-					} else {
-						root.userCreated()
-					}
-				}
+				onFinished: { root.groupsRemoved() }
 			}
 		}
 	}
@@ -407,38 +300,13 @@ QtObject {
 	}
 
 	property RemoveElementsInput __removeUserInput: RemoveElementsInput {}
-	property string __pendingRemoveUserId: ""
 	property GqlSdlRequestSender __removeUserSender: GqlSdlRequestSender {
 		requestType: 1
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_removeElements
 
 		sdlObjectComp: Component {
 			RemoveElementsPayload {
-				onFinished: { root.userRemoved(root.__pendingRemoveUserId) }
-			}
-		}
-	}
-
-	property UserDataInput __userUpdateInput: UserDataInput {}
-	property string __pendingSetUserId: ""
-	property GqlSdlRequestSender __userUpdateSender: GqlSdlRequestSender {
-		requestType: 1
-		gqlCommandId: ImtauthUsersSdlCommandIds.s_userUpdate
-
-		sdlObjectComp: Component {
-			UpdatedNotificationPayload {
-				onFinished: { root.userUpdated(root.__pendingSetUserId) }
-			}
-		}
-	}
-
-	property UserItemInput __userItemInput: UserItemInput {}
-	property GqlSdlRequestSender __userItemSender: GqlSdlRequestSender {
-		gqlCommandId: ImtauthUsersSdlCommandIds.s_userItem
-
-		sdlObjectComp: Component {
-			UserData {
-				onFinished: { root.__handleUserDataReceived(this) }
+				onFinished: { root.usersRemoved() }
 			}
 		}
 	}
@@ -474,8 +342,6 @@ QtObject {
 
 	function setMemberRole(tenantId, userId, role) {
 		// First we need to find the membership to get its ID
-		root.__pendingChangeRoleUserId = userId
-		root.__pendingChangeRoleNewRole = role
 		root.__findMembershipForRoleInput.m_userId = userId
 		root.__findMembershipForRoleInput.m_tenantId = tenantId
 		root.__findMembershipForRoleSender.send(root.__findMembershipForRoleInput)
@@ -483,168 +349,24 @@ QtObject {
 
 	function removeMember(tenantId, userId) {
 		// First find the membership to get its ID, then remove it
-		root.__pendingRemoveMemberUserId = userId
 		root.__findMembershipForRemoveInput.m_userId = userId
 		root.__findMembershipForRemoveInput.m_tenantId = tenantId
 		root.__findMembershipForRemoveSender.send(root.__findMembershipForRemoveInput)
 	}
 
-	function createRoleData() {
-		return root.__roleDataComp.createObject(root, {"m_id": UuidGenerator.generateUUID()})
-	}
-
-	function insertRole(roleId, roleData) {
-		if (!roleData){
-			return
-		}
-
-		roleData.m_productId = root.productId
-		root.__roleAddInput.m_id = roleId
-		root.__roleAddInput.m_typeId = "Role"
-		root.__roleAddInput.m_productId = root.productId
-		root.__roleAddInput.m_name = roleData.m_name
-		root.__roleAddInput.m_description = roleData.m_description
-		root.__roleAddInput.m_item = roleData
-
-		root.__roleAddSender.send(root.__roleAddInput)
-	}
-
-	function removeRole(roleId) {
-		root.__pendingRemoveRoleId = roleId || ""
+	function removeRoles(roleIds) {
 		root.__removeRoleInput.m_collectionId = "Roles"
-		root.__removeRoleInput.m_elementIds = [roleId]
+		root.__removeRoleInput.m_elementIds = roleIds
 		root.__removeRoleSender.send(root.__removeRoleInput)
 	}
 
-	function setRoleData(roleId, roleData) {
-		if (!roleData){
-			return
-		}
-
-		roleData.m_productId = root.productId
-		root.__pendingSetRoleId = roleId
-		root.__roleUpdateInput.m_id = roleId || ""
-		root.__roleUpdateInput.m_typeId = "Role"
-		root.__roleUpdateInput.m_productId = root.productId
-		root.__roleUpdateInput.m_name = roleData.m_name
-		root.__roleUpdateInput.m_description = roleData.m_description || ""
-		root.__roleUpdateInput.m_item = roleData
-
-		root.__roleUpdateSender.send(root.__roleUpdateInput)
-	}
-
-	function getRoleData(roleId) {
-		root.__roleItemInput.m_id = roleId || ""
-		root.__roleItemInput.m_productId = root.productId
-		root.__roleItemSender.send(root.__roleItemInput)
-	}
-
-	function createGroupData() {
-		return root.__groupDataComp.createObject(root, {"m_id": UuidGenerator.generateUUID()})
-	}
-
-	function insertGroup(groupId, groupData) {
-		if (!groupData){
-			return
-		}
-
-		groupData.m_productId = root.productId
-		root.__groupAddInput.m_id = groupId
-		root.__groupAddInput.m_typeId = "Group"
-		root.__groupAddInput.m_productId = root.productId
-		root.__groupAddInput.m_name = groupData.m_name
-		root.__groupAddInput.m_description = groupData.m_description
-		root.__groupAddInput.m_item = groupData
-
-		root.__groupAddSender.send(root.__groupAddInput)
-	}
-
-	function removeGroup(groupId) {
-		root.__pendingRemoveGroupId = groupId || ""
+	function removeGroups(groupIds) {
 		root.__removeGroupInput.m_collectionId = "Groups"
-		root.__removeGroupInput.m_elementIds = [groupId]
+		root.__removeGroupInput.m_elementIds = groupIds
 		root.__removeGroupSender.send(root.__removeGroupInput)
 	}
 
-	function setGroupData(groupId, groupData) {
-		if (!groupData){
-			return
-		}
-
-		groupData.m_productId = root.productId
-		root.__pendingSetGroupId = groupId
-		root.__groupUpdateInput.m_id = groupId || ""
-		root.__groupUpdateInput.m_typeId = "Group"
-		root.__groupUpdateInput.m_productId = root.productId
-		root.__groupUpdateInput.m_name = groupData.m_name
-		root.__groupUpdateInput.m_description = groupData.m_description || ""
-		root.__groupUpdateInput.m_item = groupData
-
-		root.__groupUpdateSender.send(root.__groupUpdateInput)
-	}
-
-	function getGroupData(groupId) {
-		root.__groupItemInput.m_id = groupId || ""
-		root.__groupItemInput.m_productId = root.productId
-		root.__groupItemSender.send(root.__groupItemInput)
-	}
-
-	function createUserData() {
-		return root.__userDataComp.createObject(root, {"m_id": UuidGenerator.generateUUID()})
-	}
-
-	function insertUser(userId, userData) {
-		if (!userData){
-			return
-		}
-
-		userData.m_productId = AuthorizationController.productId
-		root.__userAddInput.m_id = userId
-		root.__userAddInput.m_typeId = "User"
-		root.__userAddInput.m_productId = root.productId
-		root.__userAddInput.m_name = userData.m_name
-		root.__userAddInput.m_description = userData.m_description
-		root.__userAddInput.m_item = userData
-
-		root.__userAddSender.send(root.__userAddInput)
-	}
-
-	function removeUser(userId) {
-		root.__pendingRemoveUserId = userId || ""
-		root.__removeUserInput.m_collectionId = "Users"
-		root.__removeUserInput.m_elementIds = [userId]
-		root.__removeUserSender.send(root.__removeUserInput)
-	}
-
-	function setUserData(userId, userData) {
-		if (!userData){
-			return
-		}
-
-		userData.m_productId = root.productId
-		root.__pendingSetUserId = userId
-		root.__userUpdateInput.m_id = userId || ""
-		root.__userUpdateInput.m_typeId = "User"
-		root.__userUpdateInput.m_productId = root.productId
-		root.__userUpdateInput.m_name = userData.m_name
-		root.__userUpdateInput.m_description = userData.m_description || ""
-		root.__userUpdateInput.m_item = userData
-
-		root.__userUpdateSender.send(root.__userUpdateInput)
-	}
-
-	function getUserData(userId) {
-		root.__userItemInput.m_id = userId || ""
-		root.__userItemInput.m_productId = root.productId
-		root.__userItemSender.send(root.__userItemInput)
-	}
-
 	// --- Internal parse helpers ---
-
-	// --- Membership operations (FindMembership → RemoveMembership / UpdateMembershipRole) ---
-	property string __pendingRemoveMemberUserId: ""
-	property string __pendingChangeRoleUserId: ""
-	property string __pendingChangeRoleNewRole: ""
 
 	property FindMembershipInput __findMembershipForRemoveInput: FindMembershipInput {}
 	property GqlSdlRequestSender __findMembershipForRemoveSender: GqlSdlRequestSender {
@@ -697,7 +419,7 @@ QtObject {
 						ModalDialogManager.showInfoDialog(m_errorMessage)
 						root.requestFailed(m_errorMessage)
 					} else {
-						root.memberRemoved(root.__pendingRemoveMemberUserId)
+						root.membersRemoved()
 					}
 				}
 			}
@@ -785,33 +507,15 @@ QtObject {
 	}
 
 	// =========================================================================
-	// Cross-org grants (Tenants.sdl: CreateCrossOrgGrant / RevokeCrossOrgGrant /
-	// GetCrossOrgGrants)
+	// Cross-org grants
+	//
+	// Creation and editing go through the document service
+	// (crossOrgGrantDocumentManager); the list is provided by
+	// crossOrgGrantsListDataProvider. Only revoke is still handled here via the
+	// RevokeCrossOrgGrant mutation (Tenants.sdl).
 	// =========================================================================
 
-	property ListModel crossOrgGrantsModel: ListModel {}
-
-	property CreateCrossOrgGrantInput __createCrossOrgGrantInput: CreateCrossOrgGrantInput {}
-	property GqlSdlRequestSender __createCrossOrgGrantSender: GqlSdlRequestSender {
-		requestType: 1
-		gqlCommandId: ImtauthTenantsSdlCommandIds.s_createCrossOrgGrant
-
-		sdlObjectComp: Component {
-			CreateCrossOrgGrantPayload {
-				onFinished: {
-					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
-						root.requestFailed(m_errorMessage)
-					} else {
-						root.crossOrgGrantCreated(m_grantId || "")
-					}
-				}
-			}
-		}
-	}
-
 	property RevokeCrossOrgGrantInput __revokeCrossOrgGrantInput: RevokeCrossOrgGrantInput {}
-	property string __pendingRevokeGrantId: ""
 	property GqlSdlRequestSender __revokeCrossOrgGrantSender: GqlSdlRequestSender {
 		requestType: 1
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_revokeCrossOrgGrant
@@ -823,72 +527,46 @@ QtObject {
 						ModalDialogManager.showInfoDialog(m_errorMessage)
 						root.requestFailed(m_errorMessage)
 					} else {
-						root.crossOrgGrantRevoked(root.__pendingRevokeGrantId)
+						root.crossOrgGrantsRemoved()
 					}
 				}
 			}
 		}
 	}
 
-	property GetCrossOrgGrantsInput __getCrossOrgGrantsInput: GetCrossOrgGrantsInput {}
-	property GqlSdlRequestSender __getCrossOrgGrantsSender: GqlSdlRequestSender {
-		gqlCommandId: ImtauthTenantsSdlCommandIds.s_getCrossOrgGrants
+	property RemoveCrossOrgGrantsInput __removeCrossOrgGrantsInput: RemoveCrossOrgGrantsInput {}
+	property GqlSdlRequestSender __removeCrossOrgGrantsSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_removeCrossOrgGrants
 
 		sdlObjectComp: Component {
-			GetCrossOrgGrantsPayload {
+			RemoveCrossOrgGrantsPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
 						ModalDialogManager.showInfoDialog(m_errorMessage)
 						root.requestFailed(m_errorMessage)
 					} else {
-						root.__populateCrossOrgGrantsModel(m_grants)
+						root.crossOrgGrantsRemoved()
 					}
 				}
 			}
 		}
 	}
 
-	function __populateCrossOrgGrantsModel(grants) {
-		root.crossOrgGrantsModel.clear()
-		if (grants) {
-			for (var i = 0; i < grants.count; ++i) {
-				var grant = grants.get(i).item
-				if (!grant)
-					continue
-				root.crossOrgGrantsModel.append({
-					"id": grant.m_id || "",
-					"grantId": grant.m_id || "",
-					"sourceTenantId": grant.m_sourceTenantId || "",
-					"targetTenantId": grant.m_targetTenantId || "",
-					"roleIds": grant.m_roleIds || "",
-					"description": grant.m_description || "",
-					"createdAt": grant.m_createdAt || "",
-					"expiresAt": grant.m_expiresAt || "",
-					"isActive": grant.m_isActive === undefined ? true : grant.m_isActive
-				})
-			}
-		}
-		root.crossOrgGrantsReceived(grants || [])
-	}
-
-	function fetchCrossOrgGrants(tenantId) {
-		root.__getCrossOrgGrantsInput.m_tenantId = tenantId || root.tenantId || ""
-		root.__getCrossOrgGrantsSender.send(root.__getCrossOrgGrantsInput)
-	}
-
-	function createCrossOrgGrant(sourceTenantId, targetTenantId, roleIds, description, expiresAt) {
-		root.__createCrossOrgGrantInput.m_sourceTenantId = sourceTenantId || ""
-		root.__createCrossOrgGrantInput.m_targetTenantId = targetTenantId || ""
-		root.__createCrossOrgGrantInput.m_roleIds = roleIds || ""
-		root.__createCrossOrgGrantInput.m_description = description || ""
-		root.__createCrossOrgGrantInput.m_expiresAt = expiresAt || ""
-		root.__createCrossOrgGrantSender.send(root.__createCrossOrgGrantInput)
-	}
-
 	function revokeCrossOrgGrant(grantId) {
-		root.__pendingRevokeGrantId = grantId || ""
 		root.__revokeCrossOrgGrantInput.m_grantId = grantId || ""
 		root.__revokeCrossOrgGrantSender.send(root.__revokeCrossOrgGrantInput)
+	}
+
+	function removeCrossOrgGrants(grantIds) {
+		var ids = []
+		if (Array.isArray(grantIds)) {
+			ids = grantIds
+		} else if (grantIds && grantIds !== "") {
+			ids = [grantIds]
+		}
+		root.__removeCrossOrgGrantsInput.m_grantIds = ids
+		root.__removeCrossOrgGrantsSender.send(root.__removeCrossOrgGrantsInput)
 	}
 
 	// =========================================================================
