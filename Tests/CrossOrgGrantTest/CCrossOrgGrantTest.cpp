@@ -30,6 +30,7 @@ imtauth::CrossOrgGrantInfo MakeSampleInfo()
 void CCrossOrgGrantTest::init()
 {
 	m_managerPtr = new imtauth::CMockCrossOrgGrantManager();
+	m_resolverPtr = new imtauth::CMockDelegatedAccessResolver();
 }
 
 
@@ -37,6 +38,8 @@ void CCrossOrgGrantTest::cleanup()
 {
 	delete m_managerPtr;
 	m_managerPtr = nullptr;
+	delete m_resolverPtr;
+	m_resolverPtr = nullptr;
 }
 
 
@@ -235,4 +238,93 @@ void CCrossOrgGrantTest::testIsDelegatedAccess_ReflectsEffectiveGrant()
 
 	m_managerPtr->RevokeGrant(grantId);
 	QVERIFY(!m_managerPtr->IsDelegatedAccess("tenantA", "tenantB"));
+}
+
+
+void CCrossOrgGrantTest::testResolver_AccessibleTenantsCombineMembershipAndDelegated()
+{
+	// User u1 is a member of B and B2; tenant A delegates to B.
+	m_resolverPtr->AddMembership("u1", "tenantB");
+	m_resolverPtr->AddMembership("u1", "tenantB2");
+	m_resolverPtr->m_grantManager.CreateGrant("tenantA", "tenantB", QByteArrayList{"role-support"});
+	// A grant targeting a different tenant must not leak in.
+	m_resolverPtr->m_grantManager.CreateGrant("tenantX", "tenantOther", QByteArrayList{"role-support"});
+
+	imtauth::TenantAccessList access = m_resolverPtr->GetAccessibleTenants("u1", "tenantB");
+	QCOMPARE(access.size(), 3);
+
+	int membershipCount = 0;
+	bool delegatedA = false;
+	for (const imtauth::TenantAccessInfo& info : access){
+		if (info.accessType == imtauth::TAT_MEMBERSHIP){
+			++membershipCount;
+		}
+		if (info.tenantId == "tenantA"){
+			delegatedA = true;
+			QCOMPARE(info.accessType, imtauth::TAT_DELEGATED);
+			QVERIFY(info.delegatedRoleIds.contains("role-support"));
+		}
+	}
+	QCOMPARE(membershipCount, 2);
+	QVERIFY(delegatedA);
+}
+
+
+void CCrossOrgGrantTest::testResolver_MembershipTakesPrecedenceOverDelegated()
+{
+	// User is both a member of A and reachable to A via a grant: membership wins.
+	m_resolverPtr->AddMembership("u1", "tenantA");
+	m_resolverPtr->m_grantManager.CreateGrant("tenantA", "tenantB", QByteArrayList{"role-support"});
+
+	imtauth::TenantAccessList access = m_resolverPtr->GetAccessibleTenants("u1", "tenantB");
+
+	int countA = 0;
+	for (const imtauth::TenantAccessInfo& info : access){
+		if (info.tenantId == "tenantA"){
+			++countA;
+			QCOMPARE(info.accessType, imtauth::TAT_MEMBERSHIP);
+		}
+	}
+	QCOMPARE(countA, 1);
+}
+
+
+void CCrossOrgGrantTest::testResolver_ResolveTenantAccessTypes()
+{
+	m_resolverPtr->AddMembership("u1", "tenantB");
+	m_resolverPtr->m_grantManager.CreateGrant("tenantA", "tenantB", QByteArrayList{"role-support"});
+
+	// Member of the target.
+	QCOMPARE(m_resolverPtr->ResolveTenantAccess("u1", "tenantB", "tenantB").accessType, imtauth::TAT_MEMBERSHIP);
+
+	// Delegated into the target with granted roles.
+	imtauth::TenantAccessInfo delegated = m_resolverPtr->ResolveTenantAccess("u1", "tenantB", "tenantA");
+	QCOMPARE(delegated.accessType, imtauth::TAT_DELEGATED);
+	QVERIFY(delegated.delegatedRoleIds.contains("role-support"));
+
+	// No relationship at all.
+	QCOMPARE(m_resolverPtr->ResolveTenantAccess("u1", "tenantB", "tenantZ").accessType, imtauth::TAT_NONE);
+}
+
+
+void CCrossOrgGrantTest::testResolver_IsAccessAllowedDelegatedScope()
+{
+	m_resolverPtr->m_grantManager.CreateGrant("tenantA", "tenantB", QByteArrayList{"role-support"});
+
+	// Granted role is allowed, ungranted is denied.
+	QVERIFY(m_resolverPtr->IsAccessAllowed("u1", "tenantB", "tenantA", "role-support"));
+	QVERIFY(!m_resolverPtr->IsAccessAllowed("u1", "tenantB", "tenantA", "role-admin"));
+	// Empty required role is always allowed for delegated access.
+	QVERIFY(m_resolverPtr->IsAccessAllowed("u1", "tenantB", "tenantA", QByteArray()));
+}
+
+
+void CCrossOrgGrantTest::testResolver_IsAccessAllowedMembershipAndNone()
+{
+	m_resolverPtr->AddMembership("u1", "tenantB");
+
+	// Membership access defers to personal rights (allowed).
+	QVERIFY(m_resolverPtr->IsAccessAllowed("u1", "tenantB", "tenantB", "role-anything"));
+	// No access path => denied.
+	QVERIFY(!m_resolverPtr->IsAccessAllowed("u1", "tenantB", "tenantZ", "role-support"));
 }

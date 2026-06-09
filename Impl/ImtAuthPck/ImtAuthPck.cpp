@@ -272,6 +272,11 @@ I_EXPORT_COMPONENT(
 			"Cross Org Grant Manager");
 
 I_EXPORT_COMPONENT(
+			DelegatedAccessResolver,
+			"Resolver combining memberships and cross-org grants for org visibility and delegated permission checks",
+			"Delegated Access Resolver");
+
+I_EXPORT_COMPONENT(
 			ContractInfo,
 			"Entity representing a cooperation contract between two tenants",
 			"Contract Info");

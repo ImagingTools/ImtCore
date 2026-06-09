@@ -30,6 +30,21 @@ UI, navigation, and permission-checking layers consume:
 All helpers ignore revoked and expired grants, so callers never have to repeat
 the active/expiry checks.
 
+## Delegated-access resolver
+
+`IDelegatedAccess` (implemented by `CDelegatedAccessResolverComp`) composes
+`ITenantMembershipManager` and `ICrossOrgGrant` so navigation, context
+switching, and permission checking have a single source of truth instead of
+combining memberships and grants themselves.
+
+| Method | Purpose |
+| --- | --- |
+| `GetAccessibleTenants(userId, currentTenant)` | All tenants the user can operate in from `currentTenant`: own memberships plus delegated source tenants. Each entry is tagged `TAT_MEMBERSHIP` or `TAT_DELEGATED`; delegated entries carry the granted role scope. Membership wins over delegated for the same tenant. |
+| `ResolveTenantAccess(userId, currentTenant, targetTenant)` | How the user reaches `targetTenant`: membership, delegated (with granted roles), or none. |
+| `IsAccessAllowed(userId, currentTenant, targetTenant, requiredRole)` | Membership defers to the user's personal rights (true); delegated is allowed only when `requiredRole` is within the grant scope (empty role always allowed); otherwise false. |
+
+The component is registered in `ImtAuthPck` as `DelegatedAccessResolver`.
+
 ## How the layers use these helpers
 
 ### 1. Organization visibility (switcher)

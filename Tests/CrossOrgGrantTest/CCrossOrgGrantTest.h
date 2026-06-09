@@ -5,10 +5,12 @@
 #include <QtCore/QObject>
 #include <QtCore/QDateTime>
 #include <QtCore/QList>
+#include <QtCore/QPair>
 #include <QtTest/QtTest>
 
 // ImtCore includes
 #include <imtauth/ICrossOrgGrant.h>
+#include <imtauth/IDelegatedAccess.h>
 
 
 namespace imtauth
@@ -166,6 +168,107 @@ public:
 };
 
 
+/**
+	Self-contained mock replicating CDelegatedAccessResolverComp semantics:
+	composes direct memberships (a simple user->tenant list) with the cross-org
+	grant mock to resolve organization visibility and delegated permission
+	checks without bringing up the component framework.
+*/
+class CMockDelegatedAccessResolver
+{
+public:
+	void AddMembership(const QByteArray& userId, const QByteArray& tenantId)
+	{
+		m_memberships.append(qMakePair(userId, tenantId));
+	}
+
+	bool IsMember(const QByteArray& userId, const QByteArray& tenantId) const
+	{
+		for (const auto& membership : m_memberships){
+			if (membership.first == userId && membership.second == tenantId){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	TenantAccessList GetAccessibleTenants(const QByteArray& userId, const QByteArray& currentTenantId) const
+	{
+		TenantAccessList result;
+		QByteArrayList seen;
+
+		for (const auto& membership : m_memberships){
+			if (membership.first != userId){
+				continue;
+			}
+			if (membership.second.isEmpty() || seen.contains(membership.second)){
+				continue;
+			}
+			TenantAccessInfo info;
+			info.tenantId = membership.second;
+			info.accessType = TAT_MEMBERSHIP;
+			result.append(info);
+			seen.append(membership.second);
+		}
+
+		for (const QByteArray& source : m_grantManager.GetDelegatedSourceTenants(currentTenantId)){
+			if (seen.contains(source)){
+				continue;
+			}
+			TenantAccessInfo info;
+			info.tenantId = source;
+			info.accessType = TAT_DELEGATED;
+			info.delegatedRoleIds = m_grantManager.GetGrantedRoles(source, currentTenantId);
+			result.append(info);
+			seen.append(source);
+		}
+
+		return result;
+	}
+
+	TenantAccessInfo ResolveTenantAccess(
+				const QByteArray& userId,
+				const QByteArray& currentTenantId,
+				const QByteArray& targetTenantId) const
+	{
+		TenantAccessInfo info;
+		info.tenantId = targetTenantId;
+
+		if (IsMember(userId, targetTenantId)){
+			info.accessType = TAT_MEMBERSHIP;
+			return info;
+		}
+		if (m_grantManager.IsDelegatedAccess(targetTenantId, currentTenantId)){
+			info.accessType = TAT_DELEGATED;
+			info.delegatedRoleIds = m_grantManager.GetGrantedRoles(targetTenantId, currentTenantId);
+			return info;
+		}
+		return info;
+	}
+
+	bool IsAccessAllowed(
+				const QByteArray& userId,
+				const QByteArray& currentTenantId,
+				const QByteArray& targetTenantId,
+				const QByteArray& requiredRoleId) const
+	{
+		const TenantAccessInfo info = ResolveTenantAccess(userId, currentTenantId, targetTenantId);
+		switch (info.accessType){
+			case TAT_MEMBERSHIP:
+				return true;
+			case TAT_DELEGATED:
+				return requiredRoleId.isEmpty() || info.delegatedRoleIds.contains(requiredRoleId);
+			case TAT_NONE:
+			default:
+				return false;
+		}
+	}
+
+	CMockCrossOrgGrantManager m_grantManager;
+	QList<QPair<QByteArray, QByteArray>> m_memberships;
+};
+
+
 } // namespace imtauth
 
 
@@ -204,6 +307,14 @@ private Q_SLOTS:
 	void testGrantedRoles_WrongSourceEmpty();
 	void testIsDelegatedAccess_ReflectsEffectiveGrant();
 
+	// Delegated-access resolver (membership + grant composition)
+	void testResolver_AccessibleTenantsCombineMembershipAndDelegated();
+	void testResolver_MembershipTakesPrecedenceOverDelegated();
+	void testResolver_ResolveTenantAccessTypes();
+	void testResolver_IsAccessAllowedDelegatedScope();
+	void testResolver_IsAccessAllowedMembershipAndNone();
+
 private:
 	imtauth::CMockCrossOrgGrantManager* m_managerPtr = nullptr;
+	imtauth::CMockDelegatedAccessResolver* m_resolverPtr = nullptr;
 };
