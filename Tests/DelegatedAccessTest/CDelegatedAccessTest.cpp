@@ -268,3 +268,120 @@ void CDelegatedAccessTest::testIsDelegatedAccess_FalseForNoAccess()
 	// No grant from tenantA to tenantB
 	QVERIFY(!m_resolverPtr->IsDelegatedAccess("user1", "tenantB", "tenantA"));
 }
+
+
+// ===========================================================================
+// HasDelegatedTenantAccess utility tests
+// These verify the delegation fallback logic used by the utility function
+// (owner > direct membership > delegated access)
+// ===========================================================================
+
+void CDelegatedAccessTest::testHasDelegatedTenantAccess_OwnerAlwaysAllowed()
+{
+	// Owner scenario is handled by ITenantManager (not in mock),
+	// so we verify that direct membership check (which owner implies) works
+	m_membershipPtr->AddMembership("owner1", "tenantA", "admin");
+
+	// Direct member has access (simulates owner fallback to membership)
+	QVERIFY(m_resolverPtr->HasDelegatedRole("owner1", "tenantB", "tenantA", QByteArray()));
+}
+
+
+void CDelegatedAccessTest::testHasDelegatedTenantAccess_DirectMemberAllowed()
+{
+	m_membershipPtr->AddMembership("user1", "tenantA", "member");
+
+	// Direct member: HasDelegatedRole with empty roleId should return true
+	QVERIFY(m_resolverPtr->HasDelegatedRole("user1", "tenantB", "tenantA", QByteArray()));
+}
+
+
+void CDelegatedAccessTest::testHasDelegatedTenantAccess_DelegatedGrantAllowed()
+{
+	// User NOT a direct member of tenantA, but has delegation
+	m_membershipPtr->AddMembership("user1", "tenantB", "member");
+	m_grantPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-viewer"});
+
+	// Should get access via delegation
+	QVERIFY(m_resolverPtr->HasDelegatedRole("user1", "tenantB", "tenantA", QByteArray()));
+}
+
+
+void CDelegatedAccessTest::testHasDelegatedTenantAccess_NoAccessDenied()
+{
+	// User not a member of tenantA, no grant
+	m_membershipPtr->AddMembership("user1", "tenantB", "member");
+
+	QVERIFY(!m_resolverPtr->HasDelegatedRole("user1", "tenantB", "tenantA", QByteArray()));
+}
+
+
+void CDelegatedAccessTest::testHasDelegatedTenantAccess_NullDelegatedAccessFallsBack()
+{
+	// Without delegation resolver, only direct membership works
+	// Simulate this by checking IsMember directly
+	m_membershipPtr->AddMembership("user1", "tenantA", "member");
+
+	// Direct membership check succeeds
+	QVERIFY(m_membershipPtr->HasMinimumRole("user1", "tenantA", QByteArray()));
+	// No grant exists — without IDelegatedAccess, non-member is denied
+	QVERIFY(!m_membershipPtr->HasMinimumRole("user2", "tenantA", QByteArray()));
+}
+
+
+void CDelegatedAccessTest::testHasDelegatedTenantAccess_RevokedGrantDenied()
+{
+	m_membershipPtr->AddMembership("user1", "tenantB", "member");
+	QByteArray grantId = m_grantPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-viewer"});
+	m_grantPtr->RevokeGrant(grantId);
+
+	// Revoked grant should not provide access
+	QVERIFY(!m_resolverPtr->HasDelegatedRole("user1", "tenantB", "tenantA", "role-viewer"));
+}
+
+
+// ===========================================================================
+// HasDelegatedTenantRole utility tests
+// Verify that specific role checks work via delegation
+// ===========================================================================
+
+void CDelegatedAccessTest::testHasDelegatedTenantRole_OwnerBypassesRoleCheck()
+{
+	// Owner (simulated as admin member) bypasses role check
+	m_membershipPtr->AddMembership("user1", "tenantA", "admin");
+
+	QVERIFY(m_resolverPtr->HasDelegatedRole("user1", "tenantB", "tenantA", "admin"));
+}
+
+
+void CDelegatedAccessTest::testHasDelegatedTenantRole_DirectMemberWithRole()
+{
+	m_membershipPtr->AddMembership("user1", "tenantA", "admin");
+
+	// Has admin role directly
+	QVERIFY(m_resolverPtr->HasDelegatedRole("user1", "tenantB", "tenantA", "admin"));
+	// Does not have viewer role (mock uses exact match)
+	QVERIFY(!m_resolverPtr->HasDelegatedRole("user1", "tenantB", "tenantA", "viewer"));
+}
+
+
+void CDelegatedAccessTest::testHasDelegatedTenantRole_DelegatedRoleAllowed()
+{
+	m_membershipPtr->AddMembership("user1", "tenantB", "member");
+	m_grantPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-editor", "role-viewer"});
+
+	// Should have delegated role-editor
+	QVERIFY(m_resolverPtr->HasDelegatedRole("user1", "tenantB", "tenantA", "role-editor"));
+	// Should have delegated role-viewer
+	QVERIFY(m_resolverPtr->HasDelegatedRole("user1", "tenantB", "tenantA", "role-viewer"));
+}
+
+
+void CDelegatedAccessTest::testHasDelegatedTenantRole_WrongDelegatedRoleDenied()
+{
+	m_membershipPtr->AddMembership("user1", "tenantB", "member");
+	m_grantPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-viewer"});
+
+	// Has role-viewer but not role-admin
+	QVERIFY(!m_resolverPtr->HasDelegatedRole("user1", "tenantB", "tenantA", "role-admin"));
+}

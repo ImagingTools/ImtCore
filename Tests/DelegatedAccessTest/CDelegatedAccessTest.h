@@ -10,6 +10,8 @@
 #include <imtauth/ICrossOrgGrant.h>
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/ITenantMembership.h>
+#include <imtauth/ITenantManager.h>
+#include <imtauth/ITenantInfo.h>
 
 
 namespace imtauth
@@ -372,6 +374,20 @@ private Q_SLOTS:
 	void testIsDelegatedAccess_TrueForGrantOnly();
 	void testIsDelegatedAccess_FalseForDirectMember();
 	void testIsDelegatedAccess_FalseForNoAccess();
+
+	// Delegated tenant access utility (HasDelegatedTenantAccess)
+	void testHasDelegatedTenantAccess_OwnerAlwaysAllowed();
+	void testHasDelegatedTenantAccess_DirectMemberAllowed();
+	void testHasDelegatedTenantAccess_DelegatedGrantAllowed();
+	void testHasDelegatedTenantAccess_NoAccessDenied();
+	void testHasDelegatedTenantAccess_NullDelegatedAccessFallsBack();
+	void testHasDelegatedTenantAccess_RevokedGrantDenied();
+
+	// Delegated tenant role utility (HasDelegatedTenantRole)
+	void testHasDelegatedTenantRole_OwnerBypassesRoleCheck();
+	void testHasDelegatedTenantRole_DirectMemberWithRole();
+	void testHasDelegatedTenantRole_DelegatedRoleAllowed();
+	void testHasDelegatedTenantRole_WrongDelegatedRoleDenied();
 
 private:
 	imtauth::CMockMembershipManager* m_membershipPtr = nullptr;

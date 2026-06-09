@@ -5,6 +5,7 @@
 // ImtCore includes
 #include <imtserverapp/ICommandPermissionsProvider.h>
 #include <imtauth/IPermissionChecker.h>
+#include <imtauth/IDelegatedAccess.h>
 #include <imtservergql/CGqlRequestHandlerCompBase.h>
 
 
@@ -20,6 +21,7 @@ public:
 	I_BEGIN_COMPONENT(CPermissibleGqlRequestHandlerComp);
 		I_ASSIGN(m_commandPermissionsCompPtr, "CommandPermissions", "Command Permissions", false, "Command Permissions");
 		I_ASSIGN(m_checkPermissionCompPtr, "PermissionChecker", "Checker of the permissions", false, "PermissionChecker");
+		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Optional delegated access resolver for cross-org grant permission checks", false, "DelegatedAccessResolver");
 	I_END_COMPONENT;
 
 	// reimplemented (CGqlRequestHandlerCompBase)
@@ -35,6 +37,7 @@ protected:
 protected:
 	I_REF(imtserverapp::ICommandPermissionsProvider, m_commandPermissionsCompPtr);
 	I_REF(imtauth::IPermissionChecker, m_checkPermissionCompPtr);
+	I_REF(imtauth::IDelegatedAccess, m_delegatedAccessCompPtr);
 };
 
 
