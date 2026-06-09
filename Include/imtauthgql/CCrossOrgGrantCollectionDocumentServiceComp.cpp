@@ -2,6 +2,9 @@
 #include <imtauthgql/CCrossOrgGrantCollectionDocumentServiceComp.h>
 
 
+// Qt includes
+#include <QtCore/QStringList>
+
 // ImtCore includes
 #include <imtauth/ICrossOrgGrantData.h>
 #include <imtgql/IGqlContext.h>
@@ -13,6 +16,31 @@
 
 namespace imtauthgql
 {
+
+
+QString CCrossOrgGrantCollectionDocumentServiceComp::ComposeDefaultGrantName(const imtauth::CrossOrgGrantInfo& info) const
+{
+	QString targetName;
+	if (m_tenantCollectionCompPtr.IsValid() && !info.targetTenantId.isEmpty()){
+		targetName = m_tenantCollectionCompPtr->GetElementInfo(info.targetTenantId, imtbase::ICollectionInfo::EIT_NAME).toString();
+	}
+	if (targetName.isEmpty()){
+		targetName = QString::fromUtf8(info.targetTenantId);
+	}
+
+	QStringList roleNames;
+	for (const QByteArray& roleId : info.roleIds){
+		if (!roleId.isEmpty()){
+			roleNames << QString::fromUtf8(roleId);
+		}
+	}
+
+	if (roleNames.isEmpty()){
+		return targetName;
+	}
+
+	return QStringLiteral("%1 (%2)").arg(targetName, roleNames.join(QStringLiteral(", ")));
+}
 
 
 // protected methods
@@ -54,6 +82,7 @@ sdl::V1_0::imtauth::CCrossOrgGrant CCrossOrgGrantCollectionDocumentServiceComp::
 			response.id = info.grantId;
 			response.sourceTenantId = info.sourceTenantId;
 			response.targetTenantId = info.targetTenantId;
+			response.name = info.name;
 			response.roleIds.Emplace().FromList(info.roleIds);
 			response.description = info.description;
 			response.createdAt = info.createdAt;
@@ -132,13 +161,20 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CCrossOrgGrantCollectionDocumentSer
 	if (grantRepresentation.id){
 		info.grantId = *grantRepresentation.id;
 	}
-	if (grantRepresentation.sourceTenantId){
+	// The source tenant is the tenant currently acting (owner of the grant).
+	// The client representation does not provide it, so prefer the request
+	// context and never persist an empty source tenant id.
+	if (grantRepresentation.sourceTenantId && !grantRepresentation.sourceTenantId->isEmpty()){
 		info.sourceTenantId = *grantRepresentation.sourceTenantId;
-	} else if (info.sourceTenantId.isEmpty()){
+	}
+	if (info.sourceTenantId.isEmpty()){
 		info.sourceTenantId = contextTenantId;
 	}
 	if (grantRepresentation.targetTenantId){
 		info.targetTenantId = *grantRepresentation.targetTenantId;
+	}
+	if (grantRepresentation.name && !grantRepresentation.name->isEmpty()){
+		info.name = *grantRepresentation.name;
 	}
 	if (grantRepresentation.roleIds){
 		info.roleIds = grantRepresentation.roleIds->ToList();
@@ -153,6 +189,12 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CCrossOrgGrantCollectionDocumentSer
 		info.isActive = *grantRepresentation.isActive;
 	} else if (!info.isActive){
 		info.isActive = true;
+	}
+
+	// Auto-generate a human-readable name when one was not provided, based on the
+	// target tenant name and the delegated roles.
+	if (info.name.isEmpty()){
+		info.name = ComposeDefaultGrantName(info);
 	}
 
 	grantDataPtr->SetGrantInfo(info);

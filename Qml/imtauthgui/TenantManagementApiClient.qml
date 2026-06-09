@@ -64,9 +64,7 @@ QtObject {
 	signal userDataReceived(var data)
 
 	// --- Cross-org grants ---
-	signal crossOrgGrantCreated(string grantId)
-	signal crossOrgGrantRevoked(string grantId)
-	signal crossOrgGrantsReceived(var grants)
+	signal crossOrgGrantsRemoved()
 
 	// --- Cooperation contracts ---
 	signal contractCreated(string contractId)
@@ -157,14 +155,12 @@ QtObject {
 	function fetchPermissions() {}
 
 	// --- Cross-org grants ---
-	property var crossOrgGrantsModel: null
 	property var crossOrgGrantDocumentManager: null
 	property var crossOrgGrantsListDataProvider: null
 	property var tenantsListDataProvider: null
 	property var tenantRelationshipsListDataProvider: null
-	function fetchCrossOrgGrants(tenantId) {}
-	function createCrossOrgGrant(sourceTenantId, targetTenantId, relationshipId, accessLevel, resourceScope, targetTeamId, description, expiresAt) {}
 	function revokeCrossOrgGrant(grantId) {}
+	function removeCrossOrgGrants(grantIds) {}
 
 	// --- Cooperation contracts ---
 	property var contractsModel: null

@@ -61,6 +61,11 @@ bool CCrossOrgGrant::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_info.targetTenantId);
 	retVal = retVal && archive.EndTag(targetTag);
 
+	iser::CArchiveTag nameTag("Name", "Name", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(nameTag);
+	retVal = retVal && archive.Process(m_info.name);
+	retVal = retVal && archive.EndTag(nameTag);
+
 	iser::CArchiveTag roleIdsTag("RoleIds", "Role IDs (semicolon-separated)", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(roleIdsTag);
 	QString roleIdsStr;

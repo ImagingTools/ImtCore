@@ -25,6 +25,26 @@ ViewBase {
 
 	property string __selectedTargetTenantId: ""
 	property string __selectedTargetTenantName: ""
+	property string __selectedExpiresAt: ""
+	property bool __loadingGui: false
+
+	function expiresAtToIndex(iso) {
+		if (!iso || iso === "")
+			return 4
+
+		var target = new Date(iso)
+		if (isNaN(target.getTime()))
+			return 4
+
+		var days = (target.getTime() - (new Date()).getTime()) / (24 * 3600 * 1000)
+		if (days <= 15)
+			return 0
+		if (days <= 45)
+			return 1
+		if (days <= 75)
+			return 2
+		return 3
+	}
 
 	function updateGui() {
 		if (!container.grantData) {
@@ -33,6 +53,8 @@ ViewBase {
 		container.__selectedTargetTenantId = container.grantData.m_targetTenantId || ""
 		container.__selectedTargetTenantName = container.grantData.m_targetTenantName || container.grantData.m_targetTenantId || ""
 
+		grantNameInput.text = container.grantData.m_name || ""
+
 		var roleIds = container.grantData.m_roleIds || []
 		var arr = []
 		for (var i = 0; i < roleIds.length; i++)
@@ -40,7 +62,12 @@ ViewBase {
 		rolesSelectEditor.items = arr
 
 		grantDescriptionInput.text = container.grantData.m_description || ""
-		expiresAtPicker.setDateAsString(container.grantData.m_expiresAt || "")
+
+		var exp = container.grantData.m_expiresAt || ""
+		container.__selectedExpiresAt = exp
+		container.__loadingGui = true
+		expirationCb.currentIndex = container.expiresAtToIndex(exp)
+		container.__loadingGui = false
 	}
 
 	function updateModel() {
@@ -49,13 +76,15 @@ ViewBase {
 		}
 		container.grantData.m_targetTenantId = container.__selectedTargetTenantId || ""
 
+		container.grantData.m_name = grantNameInput.text.trim()
+
 		var ids = []
 		for (var i = 0; i < rolesSelectEditor.items.length; i++)
 			ids.push(rolesSelectEditor.items[i].id)
 		container.grantData.m_roleIds = ids
 
 		container.grantData.m_description = grantDescriptionInput.text.trim()
-		container.grantData.m_expiresAt = expiresAtPicker.getDateAsString()
+		container.grantData.m_expiresAt = container.__selectedExpiresAt
 	}
 
 	CustomScrollbar {
@@ -94,6 +123,15 @@ ViewBase {
 			GroupElementView {
 				id: generalGroup
 				width: parent.width
+
+				TextInputElementView {
+					id: grantNameInput
+					name: qsTr("Name")
+					placeHolderText: qsTr("Auto-generated from tenant and roles if left empty")
+					onEditingFinished: {
+						container.doUpdateModel()
+					}
+				}
 
 				ElementView {
 					name: qsTr("Target Tenant")
@@ -157,10 +195,59 @@ ViewBase {
 					}
 				}
 
-				DateTimePickerElementView {
-					id: expiresAtPicker
+				ComboBoxElementView {
+					id: expirationCb
 					name: qsTr("Expires At")
-					onEditingFinished: {
+					description: qsTr("The grant will expire on the selected date")
+					nameId: "name"
+					model: expirationModel
+
+					TreeItemModel {
+						id: expirationModel
+						Component.onCompleted: {
+							var index = expirationModel.insertNewItem()
+							expirationModel.setData("id", "7", index)
+							expirationModel.setData("name", qsTr("7 Days"), index)
+
+							index = expirationModel.insertNewItem()
+							expirationModel.setData("id", "30", index)
+							expirationModel.setData("name", qsTr("30 Days"), index)
+
+							index = expirationModel.insertNewItem()
+							expirationModel.setData("id", "60", index)
+							expirationModel.setData("name", qsTr("60 Days"), index)
+
+							index = expirationModel.insertNewItem()
+							expirationModel.setData("id", "90", index)
+							expirationModel.setData("name", qsTr("90 Days"), index)
+
+							index = expirationModel.insertNewItem()
+							expirationModel.setData("id", "unlimited", index)
+							expirationModel.setData("name", qsTr("No Expiration"), index)
+						}
+					}
+
+					function computeExpiresAtIso() {
+						var id = expirationModel.getData("id", expirationCb.currentIndex)
+
+						if (id === "unlimited" || id === "" || id === undefined || id === null)
+							return ""
+
+						var days = Number(id)
+						if (days <= 0)
+							return ""
+
+						var d = new Date()
+						d.setDate(d.getDate() + days)
+						return d.toISOString()
+					}
+
+					onCurrentIndexChanged: {
+						// Ignore index changes triggered while loading the model into the GUI.
+						if (container.__loadingGui)
+							return
+
+						container.__selectedExpiresAt = expirationCb.computeExpiresAtIso()
 						container.doUpdateModel()
 					}
 				}

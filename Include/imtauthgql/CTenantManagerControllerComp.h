@@ -79,6 +79,10 @@ protected:
 				const sdl::V1_0::imtauth::CRevokeCrossOrgGrantGqlRequest& revokeCrossOrgGrantRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CRemoveCrossOrgGrantsPayload OnRemoveCrossOrgGrants(
+				const sdl::V1_0::imtauth::CRemoveCrossOrgGrantsGqlRequest& removeCrossOrgGrantsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtauth::CGetContractsPayload OnGetContracts(
 				const sdl::V1_0::imtauth::CGetContractsGqlRequest& getContractsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

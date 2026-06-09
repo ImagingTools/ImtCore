@@ -12,21 +12,29 @@ import imtcontrols 1.0
  *
  * Inherits ViewBase so that updates flow through the protected
  * doUpdateGui / doUpdateModel wrappers (re-entrance guard).
+ *
+ * Uses the same card-based layout as TenantConnectOrganizationPage and
+ * TenantConnectionCodePage.
  */
 ViewBase {
 	id: generalPage
 
+	anchors.fill: parent
 	commandsPanelVisible: false
 	contentColor: Style.baseColor
+
 	// Backward-compat accessor: pages reference tenantData; ViewBase exposes it as `model`.
 	readonly property var tenantData: generalPage.model
 	property var stateManager: null
+
+	readonly property bool __readOnly: !(generalPage.stateManager
+		&& (generalPage.stateManager.isCreator || generalPage.stateManager.isOwner || generalPage.stateManager.isNewTenant))
 
 	function updateGui() {
 		if (!generalPage.tenantData) return
 		nameInput.text = generalPage.tenantData.m_name || ""
 		descriptionInput.text = generalPage.tenantData.m_description || ""
-		isActiveInput.checked = generalPage.tenantData.m_isActive !== undefined
+		isActiveSwitch.checked = generalPage.tenantData.m_isActive !== undefined
 			? generalPage.tenantData.m_isActive
 			: true
 	}
@@ -35,58 +43,101 @@ ViewBase {
 		if (!generalPage.tenantData) return
 		generalPage.tenantData.m_name = nameInput.text
 		generalPage.tenantData.m_description = descriptionInput.text
-		generalPage.tenantData.m_isActive = isActiveInput.checked
-	}
-
-	readonly property bool __readOnly: !(generalPage.stateManager
-		&& (generalPage.stateManager.isCreator || generalPage.stateManager.isOwner || generalPage.stateManager.isNewTenant))
-
-	CustomScrollbar {
-		id: generalScrollbar
-		z: parent.z + 1
-		anchors.right: parent.right
-		anchors.top: generalFlickable.top
-		anchors.bottom: generalFlickable.bottom
-		secondSize: Style.marginM
-		targetItem: generalFlickable
+		generalPage.tenantData.m_isActive = isActiveSwitch.checked
 	}
 
 	Flickable {
-		id: generalFlickable
-		anchors.top: parent.top
+		anchors.fill: parent
 		anchors.topMargin: Style.marginXL
-		anchors.bottom: parent.bottom
-		anchors.bottomMargin: Style.marginXL
-		anchors.left: parent.left
-		anchors.leftMargin: Style.marginXL
-		anchors.right: generalScrollbar.left
-		anchors.rightMargin: Style.marginXL
-		contentWidth: generalColumn.width
-		contentHeight: generalColumn.height + 2 * Style.marginXL
-
-		boundsBehavior: Flickable.StopAtBounds
+		contentHeight: mainColumn.height + Style.marginXL
 		clip: true
 
 		Column {
-			id: generalColumn
-			width: Style.sizeHintXXL
+			id: mainColumn
+			anchors.horizontalCenter: parent.horizontalCenter
+			width: Math.min(parent.width - Style.marginXL * 2, 600)
 			spacing: Style.marginXL
 
-			Column {
+			Text {
+				text: qsTr("General")
+				font.pixelSize: Style.fontSizeXL
+				font.bold: true
+				color: Style.textColor
+			}
+
+			Text {
+				text: qsTr("Basic workspace settings and configuration.")
+				font.pixelSize: Style.fontSizeM
+				color: Style.inactiveTextColor
+				wrapMode: Text.WordWrap
 				width: parent.width
-				spacing: Style.marginXS
+			}
 
-				BaseText {
-					text: qsTr("General")
-					font.pixelSize: Style.fontSizeXL
-					font.bold: true
-					color: Style.textColor
-				}
+			Rectangle {
+				width: parent.width
+				height: settingsColumn.height + Style.marginL * 2
+				color: Style.backgroundColor2
+				radius: Style.radiusL
+				border.width: 1
+				border.color: Style.borderColor
 
-				BaseText {
-					text: qsTr("Basic workspace settings and configuration.")
-					font.pixelSize: Style.fontSizeS
-					color: Style.inactiveTextColor
+				Column {
+					id: settingsColumn
+					anchors.left: parent.left
+					anchors.right: parent.right
+					anchors.verticalCenter: parent.verticalCenter
+					anchors.margins: Style.marginL
+					spacing: Style.marginM
+
+					Column {
+						width: parent.width
+						spacing: Style.marginXS
+
+						Text {
+							text: qsTr("Tenant Name")
+							font.pixelSize: Style.fontSizeS
+							color: Style.inactiveTextColor
+						}
+
+						CustomTextField {
+							id: nameInput
+							width: parent.width
+							height: Style.controlHeightM
+							textSize: Style.fontSizeM
+							readOnly: generalPage.__readOnly
+							placeHolderText: qsTr("Enter the tenant name")
+
+							onEditingFinished: {
+								if (generalPage.tenantData && generalPage.tenantData.m_name !== nameInput.text)
+									generalPage.doUpdateModel()
+							}
+						}
+					}
+
+					Column {
+						width: parent.width
+						spacing: Style.marginXS
+
+						Text {
+							text: qsTr("Description")
+							font.pixelSize: Style.fontSizeS
+							color: Style.inactiveTextColor
+						}
+
+						CustomTextField {
+							id: descriptionInput
+							width: parent.width
+							height: Style.controlHeightM
+							textSize: Style.fontSizeM
+							readOnly: generalPage.__readOnly
+							placeHolderText: qsTr("Enter the description")
+
+							onEditingFinished: {
+								if (generalPage.tenantData && generalPage.tenantData.m_description !== descriptionInput.text)
+									generalPage.doUpdateModel()
+							}
+						}
+					}
 				}
 			}
 
@@ -96,48 +147,20 @@ ViewBase {
 				color: Style.borderColor
 			}
 
-			GroupElementView {
-				id: generalGroup
-				width: parent.width
+			Row {
+				spacing: Style.marginM
 
-				TextInputElementView {
-					id: nameInput
-					name: qsTr("Tenant Name")
-					placeHolderText: qsTr("Enter the tenant name")
+				SwitchCustom {
+					id: isActiveSwitch
 					readOnly: generalPage.__readOnly
-
-					onEditingFinished: {
-						let oldText = generalPage.tenantData ? generalPage.tenantData.m_name : ""
-						if (oldText !== nameInput.text)
-							generalPage.doUpdateModel()
-					}
-
-					KeyNavigation.tab: descriptionInput
-					KeyNavigation.backtab: isActiveInput
-				}
-
-				TextInputElementView {
-					id: descriptionInput
-					name: qsTr("Description")
-					placeHolderText: qsTr("Enter the description")
-					readOnly: generalPage.__readOnly
-
-					onEditingFinished: {
-						let oldText = generalPage.tenantData ? generalPage.tenantData.m_description : ""
-						if (oldText !== descriptionInput.text)
-							generalPage.doUpdateModel()
-					}
-
-					KeyNavigation.tab: isActiveInput
-					KeyNavigation.backtab: nameInput
-				}
-
-				SwitchElementView {
-					id: isActiveInput
-					name: qsTr("Active")
-					readOnly: generalPage.__readOnly
-
 					onCheckedChanged: generalPage.doUpdateModel()
+				}
+
+				Text {
+					text: qsTr("Active")
+					font.pixelSize: Style.fontSizeM
+					color: Style.textColor
+					anchors.verticalCenter: parent.verticalCenter
 				}
 			}
 		}

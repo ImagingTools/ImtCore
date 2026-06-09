@@ -38,6 +38,7 @@ public:
 				const QString& description = QString(),
 				const QString& expiresAt = QString()) override;
 	virtual bool RevokeGrant(const QByteArray& grantId) override;
+	virtual bool RemoveGrants(const QByteArrayList& grantIds) override;
 	virtual CrossOrgGrantInfo GetGrant(const QByteArray& grantId) const override;
 	virtual CrossOrgGrants GetGrantsBySourceTenant(const QByteArray& sourceTenantId) const override;
 	virtual CrossOrgGrants GetGrantsByTargetTenant(const QByteArray& targetTenantId) const override;

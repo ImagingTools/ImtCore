@@ -13,6 +13,7 @@
         <Element ComponentName="DocumentCommandsController" X="575" Y="325" Note=""/>
         <Element ComponentName="RelationshipCollectionDocumentService" X="900" Y="600" Note=""/>
         <Element ComponentName="RelationshipDocumentNameProvider" X="175" Y="625" Note=""/>
+        <Element ComponentName="RelationshipDocumentValidator" X="148" Y="544" Note=""/>
         <Element ComponentName="SlaveSubscriberController" X="625" Y="700" Note=""/>
         <Element ComponentName="TenantConnectionCodeInfo" X="1025" Y="200" Note=""/>
         <Element ComponentName="TenantConnectionInfo" X="425" Y="200" Note=""/>

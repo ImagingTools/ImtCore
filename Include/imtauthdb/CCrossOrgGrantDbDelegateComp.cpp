@@ -70,6 +70,9 @@ istd::IChangeableUniquePtr CCrossOrgGrantDbDelegateComp::CreateObjectFromRecord(
 	if (record.contains("TargetTenantId")){
 		info.targetTenantId = imtdb::VariantToByteArray(record.value("TargetTenantId"));
 	}
+	if (record.contains("Name")){
+		info.name = record.value("Name").toString();
+	}
 	if (record.contains("RoleIds")){
 		QString roleIdsStr = record.value("RoleIds").toString();
 		if (!roleIdsStr.isEmpty()){
@@ -112,6 +115,7 @@ CCrossOrgGrantDbDelegateComp::NewObjectQuery CCrossOrgGrantDbDelegateComp::Creat
 	QString id = imtdb::EscapeSql(QString::fromUtf8(!proposedObjectId.isEmpty() ? proposedObjectId : info.grantId));
 	QString sourceTenantId = imtdb::EscapeSql(QString::fromUtf8(info.sourceTenantId));
 	QString targetTenantId = imtdb::EscapeSql(QString::fromUtf8(info.targetTenantId));
+	QString name = NullableSqlText(info.name);
 	QString roleIdsStr = NullableSqlText(QString::fromUtf8(info.roleIds.join(';')));
 	QString description = NullableSqlText(info.description);
 	QString createdAt = !info.createdAt.isEmpty() ? imtdb::EscapeSql(info.createdAt) : imtdb::UtcNow();
@@ -119,12 +123,13 @@ CCrossOrgGrantDbDelegateComp::NewObjectQuery CCrossOrgGrantDbDelegateComp::Creat
 	int isActive = info.isActive ? 1 : 0;
 
 	result.query = QString(
-		"INSERT INTO \"%1\" (\"Id\", \"SourceTenantId\", \"TargetTenantId\", \"RoleIds\", \"Description\", \"CreatedAt\", \"ExpiresAt\", \"IsActive\") "
-		"VALUES ('%2', '%3', '%4', %5, %6, '%7', %8, %9);")
+		"INSERT INTO \"%1\" (\"Id\", \"SourceTenantId\", \"TargetTenantId\", \"Name\", \"RoleIds\", \"Description\", \"CreatedAt\", \"ExpiresAt\", \"IsActive\") "
+		"VALUES ('%2', '%3', '%4', %5, %6, %7, '%8', %9, %10);")
 		.arg(*m_tableNameAttrPtr)
 		.arg(id)
 		.arg(sourceTenantId)
 		.arg(targetTenantId)
+		.arg(name)
 		.arg(roleIdsStr)
 		.arg(description)
 		.arg(createdAt)
@@ -151,12 +156,14 @@ QByteArray CCrossOrgGrantDbDelegateComp::CreateUpdateObjectQuery(
 
 	return QString(
 		"UPDATE \"%1\" SET "
-		"\"RoleIds\"=%2, "
-		"\"Description\"=%3, "
-		"\"ExpiresAt\"=%4, "
-		"\"IsActive\"=%5 "
-		"WHERE \"Id\"='%6';")
+		"\"Name\"=%2, "
+		"\"RoleIds\"=%3, "
+		"\"Description\"=%4, "
+		"\"ExpiresAt\"=%5, "
+		"\"IsActive\"=%6 "
+		"WHERE \"Id\"='%7';")
 		.arg(*m_tableNameAttrPtr)
+		.arg(NullableSqlText(info.name))
 		.arg(NullableSqlText(QString::fromUtf8(info.roleIds.join(';'))))
 		.arg(NullableSqlText(info.description))
 		.arg(NullableSqlDateTime(info.expiresAt))
@@ -195,11 +202,18 @@ QByteArray CCrossOrgGrantDbDelegateComp::CreateDeleteObjectSetQuery(
 
 QByteArray CCrossOrgGrantDbDelegateComp::CreateRenameObjectQuery(
 		const imtbase::IObjectCollection& /*collection*/,
-		const QByteArray& /*objectId*/,
-		const QString& /*newObjectName*/,
+		const QByteArray& objectId,
+		const QString& newObjectName,
 		const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	return QByteArray();
+	if (objectId.isEmpty()){
+		return QByteArray();
+	}
+
+	return QString("UPDATE \"%1\" SET \"Name\"=%2 WHERE \"Id\"='%3';")
+			.arg(*m_tableNameAttrPtr)
+			.arg(NullableSqlText(newObjectName))
+			.arg(imtdb::EscapeSql(QString::fromUtf8(objectId))).toUtf8();
 }
 
 
@@ -218,7 +232,24 @@ bool CCrossOrgGrantDbDelegateComp::SetCollectionItemMetaInfoFromRecord(const QSq
 	if (record.contains("CreatedAt")){
 		metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME, record.value("CreatedAt").toDateTime());
 	}
+
+	if (record.contains("Name")){
+		metaInfo.SetMetaInfo(imtbase::ICollectionInfo::EIT_NAME, record.value("Name").toString());
+	}
+
+	if (record.contains("Description")){
+		metaInfo.SetMetaInfo(imtbase::ICollectionInfo::EIT_DESCRIPTION, record.value("Description").toString());
+	}
+
 	return true;
+}
+
+
+QString CCrossOrgGrantDbDelegateComp::GetBaseSelectionQuery() const
+{
+	// The "Name" column is stored directly on the grant (auto-generated from the
+	// target tenant and roles when not set explicitly), so no join is required.
+	return QString("SELECT * FROM \"%1\"").arg(qPrintable(*m_tableNameAttrPtr));
 }
 
 
