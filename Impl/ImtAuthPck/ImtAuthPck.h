@@ -185,6 +185,8 @@ typedef icomp::TModelCompWrap<imtauth::COrderRequestComp> OrderRequestInfo;
 typedef icomp::TModelCompWrap<imtauth::COrderRequestHandlerComp> OrderRequestHandler;
 typedef imtauth::CTenantDocumentNameProviderComp TenantDocumentNameProvider;
 typedef imtauth::CTenantRelationshipDocumentNameProviderComp TenantRelationshipDocumentNameProvider;
+typedef imtauth::CCrossOrgGrantDocumentValidatorComp CrossOrgGrantDocumentValidator;
+typedef imtauth::CRelationshipDocumentValidatorComp RelationshipDocumentValidator;
 
 
 } // namespace ImtAuthPck
