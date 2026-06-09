@@ -10,7 +10,7 @@
 #endif
 
 // Qt includes
-#include <QMutexLocker>
+#include <QtCore/QMutexLocker>
 
 // ACF includes
 #include <iprm/CTextParam.h>
@@ -60,9 +60,10 @@ QByteArray CLdapAuthorizationControllerComp::EnsureRoleExists(
 	const QString& roleName,
 	const QString& description) const
 {
-	// Serialize the check-and-create so two concurrent first-logins cannot both
-	// observe a missing role and each insert a duplicate.
-	QMutexLocker locker(&m_roleCreationMutex);
+	// Guard the lookup and the insert against the role collection as one critical
+	// section, so concurrent first-logins cannot both read a missing role and each
+	// write a duplicate for the same product.
+	QMutexLocker locker(&m_roleCollectionMutex);
 
 	QByteArray existingRoleId = CheckExistsRole(productId, roleType);
 	if (!existingRoleId.isEmpty()){

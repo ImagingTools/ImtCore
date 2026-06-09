@@ -2,11 +2,11 @@
 #pragma once
 
 
-// Qt includes
-#include <QMutex>
-
 // ACF includes
 #include <iprm/IEnableableParam.h>
+
+// Qt includes
+#include <QtCore/QMutex>
 
 // ImtCore includes
 #include <imtauthgql/CAuthorizationControllerComp.h>
@@ -35,9 +35,20 @@ protected:
 	};
 
 	virtual QByteArray CheckExistsRole(const QByteArray& productId, RoleType roleType) const;
-	//! Atomically ensure that a default/guest role exists for the given product.
-	/*! The check for an existing role and the creation of a missing one are serialized,
-	    so concurrent authorization requests cannot each create a duplicate role. */
+	/**
+		Atomically ensure that a default or guest role exists for the given product.
+
+		The check for an existing role and the creation of a missing one are guarded
+		against concurrent access to the role collection, so two concurrent
+		authorization requests cannot each insert a duplicate role.
+
+		\param productId Product the role belongs to.
+		\param roleType Whether a default or guest role is requested.
+		\param roleId Identifier used when a new role has to be created.
+		\param roleName Display name used when a new role has to be created.
+		\param description Description used when a new role has to be created.
+		\return Object ID of the existing or newly created role, empty on failure.
+	*/
 	virtual QByteArray EnsureRoleExists(
 				const QByteArray& productId,
 				RoleType roleType,
@@ -65,8 +76,12 @@ private:
 	I_REF(imtbase::IObjectCollection, m_roleCollectionCompPtr);
 	I_ATTR(QByteArray, m_systemIdAttrPtr);
 
-	//! Serializes ensuring of default/guest roles to prevent duplicate creation on concurrent logins.
-	mutable QMutex m_roleCreationMutex;
+	/**
+		Guards concurrent access to the role collection while a default or guest
+		role is looked up and, if missing, created, so the same role is not
+		written twice for one product.
+	*/
+	mutable QMutex m_roleCollectionMutex;
 };
 
 
