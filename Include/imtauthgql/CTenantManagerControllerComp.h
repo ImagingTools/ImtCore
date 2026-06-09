@@ -36,8 +36,6 @@ public:
 		I_ASSIGN(m_grantManagerCompPtr, "CrossOrgGrantManager", "Manager for cross-org grants", false, "CrossOrgGrantManager");
 		I_ASSIGN(m_contractManagerCompPtr, "ContractManager", "Manager for cooperation contracts", false, "ContractManager");
 		I_ASSIGN(m_connectionRequestManagerCompPtr, "TenantConnectionRequestManager", "Manager for tenant connection requests", false, "TenantConnectionRequestManager");
-		I_ASSIGN(m_requestCollectionCompPtr, "RequestCollection", "Connection request collection", false, "RequestCollection");
-		I_ASSIGN(m_connectionCollectionCompPtr, "ConnectionCollection", "Connections collection", false, "ConnectionCollection");
 		I_ASSIGN(m_messageBrokerCompPtr, "CrossTenantMessageBroker", "Broker for cross-tenant messages", false, "CrossTenantMessageBroker");
 		I_ASSIGN(m_orderRequestManagerCompPtr, "OrderRequestManager", "Manager for order requests", false, "OrderRequestManager");
 		I_ASSIGN(m_proposalFactoryCompPtr, "ProposalFactory", "Relationship proposal factory", false, "TenantRelationshipProposalInfo");
@@ -224,8 +222,6 @@ private:
 	I_REF(imtauth::ICrossOrgGrant, m_grantManagerCompPtr);
 	I_REF(imtauth::IContract, m_contractManagerCompPtr);
 	I_REF(imtauth::ITenantConnectionRequestManager, m_connectionRequestManagerCompPtr);
-	I_REF(imtbase::IObjectCollection, m_requestCollectionCompPtr);
-	I_REF(imtbase::IObjectCollection, m_connectionCollectionCompPtr);
 	I_REF(imtauth::ICrossTenantMessage, m_messageBrokerCompPtr);
 	I_REF(imtauth::IOrderRequest, m_orderRequestManagerCompPtr);
 	I_FACT(imtauth::ITenantRelationshipProposalInfo, m_proposalFactoryCompPtr);

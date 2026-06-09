@@ -6,14 +6,13 @@ import imtgui 1.0
 import imtcontrols 1.0
 import imtcolgui 1.0
 import imtguigql 1.0
-import imtauthgui 1.0
 
 /**
  * CrossOrgGrantView
  *
- * ViewBase-inherited editor for creating cross-org grants.
- * Follows the RoleView / UserGroupView pattern with GqlBasedCommandsController.
- * The commands controller provides the Save button at the top.
+ * ViewBase-inherited editor for creating/editing cross-org grants.
+ * Follows the document service pattern (updateGui/updateModel).
+ * Simplified model: TargetTenant, Roles (multi-select), Description, Expires.
  */
 ViewBase {
 	id: container
@@ -21,41 +20,42 @@ ViewBase {
 	anchors.fill: parent
 	contentColor: Style.baseColor
 
+	property var grantData: model
 	property var apiClient: null
-	property var tenantData: null
 
 	property string __selectedTargetTenantId: ""
 	property string __selectedTargetTenantName: ""
-	property string __selectedRelationshipId: ""
-	property string __selectedRelationshipName: ""
-
-	signal grantCreated()
 
 	function updateGui() {
+		if (!container.grantData) {
+			return
+		}
+		container.__selectedTargetTenantId = container.grantData.m_targetTenantId || ""
+		container.__selectedTargetTenantName = container.grantData.m_targetTenantName || container.grantData.m_targetTenantId || ""
+
+		var roleIds = container.grantData.m_roleIds || []
+		var arr = []
+		for (var i = 0; i < roleIds.length; i++)
+			arr.push({id: roleIds[i], name: roleIds[i]})
+		rolesSelectEditor.items = arr
+
+		grantDescriptionInput.text = container.grantData.m_description || ""
+		expiresAtPicker.setDateAsString(container.grantData.m_expiresAt || "")
 	}
 
 	function updateModel() {
-	}
-
-	function submitGrant() {
-		if (!container.__selectedTargetTenantId || !container.__selectedRelationshipId) {
-			ModalDialogManager.showInfoDialog(qsTr("Target tenant and relationship are required."))
+		if (!container.grantData) {
 			return
 		}
-		var levelIndex = accessLevelCB.currentIndex >= 0 ? accessLevelCB.currentIndex : 1
-		var levelTokens = ["None", "Read", "Write", "Admin"]
-		var accessLevel = levelTokens[levelIndex]
-		if (container.apiClient) {
-			container.apiClient.createCrossOrgGrant(
-				container.tenantData ? container.tenantData.m_id : "",
-				container.__selectedTargetTenantId,
-				container.__selectedRelationshipId,
-				accessLevel,
-				resourceScopeInput.text.trim(),
-				"",
-				grantDescriptionInput.text.trim(),
-				expiresAtPicker.getDateAsString())
-		}
+		container.grantData.m_targetTenantId = container.__selectedTargetTenantId || ""
+
+		var ids = []
+		for (var i = 0; i < rolesSelectEditor.items.length; i++)
+			ids.push(rolesSelectEditor.items[i].id)
+		container.grantData.m_roleIds = ids
+
+		container.grantData.m_description = grantDescriptionInput.text.trim()
+		container.grantData.m_expiresAt = expiresAtPicker.getDateAsString()
 	}
 
 	CustomScrollbar {
@@ -100,6 +100,7 @@ ViewBase {
 
 					controlComp: Component {
 						Row {
+							id: targetTenantRow
 							spacing: Style.marginM
 
 							BaseText {
@@ -115,62 +116,53 @@ ViewBase {
 							Button {
 								text: qsTr("Select")
 								onClicked: {
-									ModalDialogManager.openDialog(tenantSelectComp, {})
+									var point = targetTenantRow.mapToItem(null, 0, targetTenantRow.height)
+									ModalDialogManager.openDialog(tenantSelectComp, {
+																	  "x": point.x,
+																	  "y": point.y
+																  })
 								}
-							}
-						}
-					}
-				}
-
-				ElementView {
-					name: qsTr("Relationship")
-
-					controlComp: Component {
-						Row {
-							spacing: Style.marginM
-
-							BaseText {
-								anchors.verticalCenter: parent.verticalCenter
-								text: container.__selectedRelationshipName
-								  || container.__selectedRelationshipId
-								  || qsTr("Select relationship...")
-								color: container.__selectedRelationshipId
-								   ? Style.textColor : Style.inactiveTextColor
-								font.pixelSize: Style.fontSizeM
 							}
 
 							Button {
-								text: qsTr("Select")
+								text: qsTr("Remove")
+								visible: container.__selectedTargetTenantId !== ""
 								onClicked: {
-									ModalDialogManager.openDialog(relationshipSelectComp, {})
+									container.__selectedTargetTenantId = ""
+									container.__selectedTargetTenantName = ""
+									container.doUpdateModel()
 								}
 							}
 						}
 					}
 				}
 
-				ComboBoxElementView {
-					id: accessLevelCB
-					name: qsTr("Access Level")
-					model: accessLevelModel
-					currentIndex: 1
-				}
-
-				TextInputElementView {
-					id: resourceScopeInput
-					name: qsTr("Resource Scope")
-					placeHolderText: qsTr("Optional — empty grants all resources")
+				GqlBasedItemSelectElementView {
+					id: rolesSelectEditor
+					collectionId: "Roles"
+					label: qsTr("Roles")
+					addButtonText: qsTr("Add Role")
+					showCount: true
+					onSelectionChanged: {
+						container.doUpdateModel()
+					}
 				}
 
 				TextInputElementView {
 					id: grantDescriptionInput
 					name: qsTr("Description")
 					placeHolderText: qsTr("Optional description")
+					onEditingFinished: {
+						container.doUpdateModel()
+					}
 				}
 
 				DateTimePickerElementView {
 					id: expiresAtPicker
 					name: qsTr("Expires At")
+					onEditingFinished: {
+						container.doUpdateModel()
+					}
 				}
 			}
 		}
@@ -180,10 +172,7 @@ ViewBase {
 		id: tenantSelectComp
 
 		FilterableSelectPopup {
-			dataProvider: FilterableSelectGqlDataProvider {
-				collectionId: "Tenants"
-				multiSelect: false
-			}
+			dataProvider: container.apiClient ? container.apiClient.connectionsDataProvider : null
 			filterPlaceholder: qsTr("Select tenant...")
 			preselectedIds: container.__selectedTargetTenantId
 				? [container.__selectedTargetTenantId] : []
@@ -192,38 +181,7 @@ ViewBase {
 				container.__selectedTargetTenantId = itemId
 				container.__selectedTargetTenantName = dataProvider
 					? dataProvider.getSelectedItemText(itemId) : ""
-			}
-		}
-	}
-
-	Component {
-		id: relationshipSelectComp
-
-		FilterableSelectPopup {
-			dataProvider: FilterableSelectGqlDataProvider {
-				collectionId: "TenantRelationships"
-				multiSelect: false
-			}
-			filterPlaceholder: qsTr("Select relationship...")
-			preselectedIds: container.__selectedRelationshipId
-				? [container.__selectedRelationshipId] : []
-
-			onItemSelected: {
-				container.__selectedRelationshipId = itemId
-				container.__selectedRelationshipName = dataProvider
-					? dataProvider.getSelectedItemText(itemId) : ""
-			}
-		}
-	}
-
-	TreeItemModel {
-		id: accessLevelModel
-		Component.onCompleted: {
-			var levels = ["None", "Read", "Write", "Admin"]
-			for (var i = 0; i < levels.length; i++) {
-				var idx = accessLevelModel.insertNewItem()
-				accessLevelModel.setData("id", levels[i], idx)
-				accessLevelModel.setData("name", levels[i], idx)
+				container.doUpdateModel()
 			}
 		}
 	}

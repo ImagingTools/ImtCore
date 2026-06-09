@@ -8,12 +8,18 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="CrossOrgGrantInfo" X="125" Y="125" Note=""/>
-        <Element ComponentName="CrossOrgGrantManager" X="600" Y="125" Note=""/>
-        <Element ComponentName="CrossTenantMessageBroker" X="575" Y="325" Note=""/>
-        <Element ComponentName="CrossTenantMessageInfo" X="900" Y="500" Note=""/>
-        <Element ComponentName="CrossTenantMessageNotificationPublisher" X="550" Y="750" Note=""/>
-        <Element ComponentName="CrossTenantMessageProjection" X="225" Y="475" Note=""/>
+        <Element ComponentName="CrossOrgGrantCollectionDocumentService" X="975" Y="150" Note=""/>
+        <Element ComponentName="CrossOrgGrantInfo" X="400" Y="675" Note=""/>
+        <Element ComponentName="CrossOrgGrantManager" X="400" Y="775" Note=""/>
+        <Element ComponentName="CrossOrgGrantsDocumentService" X="400" Y="525" Note=""/>
+        <Element ComponentName="CrossTenantMessageBroker" X="600" Y="350" Note=""/>
+        <Element ComponentName="CrossTenantMessageInfo" X="975" Y="350" Note=""/>
+        <Element ComponentName="CrossTenantMessageNotificationPublisher" X="975" Y="450" Note=""/>
+        <Element ComponentName="CrossTenantMessageProjection" X="200" Y="350" Note=""/>
+        <Element ComponentName="FilterableSelectController" X="925" Y="50" Note=""/>
+        <Element ComponentName="GrantCommandsController" X="225" Y="100" Note=""/>
+        <Element ComponentName="GrantDemultiplexer" X="600" Y="100" Note=""/>
+        <Element ComponentName="SlaveSubscriberController" X="750" Y="625" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

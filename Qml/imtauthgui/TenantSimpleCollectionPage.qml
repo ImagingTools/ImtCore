@@ -72,10 +72,18 @@ ViewBase {
 			dataProvider.fetch(__lastFilterText)
 	}
 
+	// Override in subcomponents to provide entity-specific document name resolution
+	property var documentNameFields: ["m_name"]
+
 	function resolveDocumentName(documentId) {
 		var view = collectionPage.documentManager.getDocumentViewInstance(documentId, "")
-		if (view && view.model && view.model.m_name)
-			return view.model.m_name
+		if (view && view.model) {
+			for (var i = 0; i < collectionPage.documentNameFields.length; i++) {
+				var field = collectionPage.documentNameFields[i]
+				if (view.model[field])
+					return view.model[field]
+			}
+		}
 		return ""
 	}
 

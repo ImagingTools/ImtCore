@@ -17,6 +17,7 @@ import imtauthRoleCollectionDocumentServiceSdl 1.0
 import imtauthGroupCollectionDocumentServiceSdl 1.0
 import imtauthUserCollectionDocumentServiceSdl 1.0
 import imtauthRelationshipCollectionDocumentServiceSdl 1.0
+import imtauthCrossOrgGrantCollectionDocumentServiceSdl 1.0
 import imtauthgui 1.0
 
 /**
@@ -38,6 +39,7 @@ QtObject {
 	// =========================================================================
 
 	property string productId: AuthorizationController.productId
+	property string tenantId: AuthorizationController.currentTenantId
 
 	property Component __roleDataComp: Component { RoleData {} }
 	property Component __groupDataComp: Component { GroupData {} }
@@ -60,6 +62,7 @@ QtObject {
 	readonly property var groupDocumentManager: __groupDocumentService
 	readonly property var userDocumentManager: __userDocumentService
 	readonly property var relationshipDocumentManager: __relationshipDocumentService
+	readonly property var crossOrgGrantDocumentManager: __crossOrgGrantDocumentService
 
 	signal invitationCreated()
 	signal invitationRevoked(string invitationId)
@@ -857,10 +860,7 @@ QtObject {
 					"grantId": grant.m_id || "",
 					"sourceTenantId": grant.m_sourceTenantId || "",
 					"targetTenantId": grant.m_targetTenantId || "",
-					"relationshipId": grant.m_relationshipId || "",
-					"targetTeamId": grant.m_targetTeamId || "",
-					"accessLevel": grant.m_accessLevel || CrossOrgAccessLevelEnum.s_none,
-					"resourceScope": grant.m_resourceScope || "",
+					"roleIds": grant.m_roleIds || "",
 					"description": grant.m_description || "",
 					"createdAt": grant.m_createdAt || "",
 					"expiresAt": grant.m_expiresAt || "",
@@ -876,13 +876,10 @@ QtObject {
 		root.__getCrossOrgGrantsSender.send(root.__getCrossOrgGrantsInput)
 	}
 
-	function createCrossOrgGrant(sourceTenantId, targetTenantId, relationshipId, accessLevel, resourceScope, targetTeamId, description, expiresAt) {
+	function createCrossOrgGrant(sourceTenantId, targetTenantId, roleIds, description, expiresAt) {
 		root.__createCrossOrgGrantInput.m_sourceTenantId = sourceTenantId || ""
 		root.__createCrossOrgGrantInput.m_targetTenantId = targetTenantId || ""
-		root.__createCrossOrgGrantInput.m_relationshipId = relationshipId || ""
-		root.__createCrossOrgGrantInput.m_accessLevel = accessLevel || CrossOrgAccessLevelEnum.s_read
-		root.__createCrossOrgGrantInput.m_resourceScope = resourceScope || ""
-		root.__createCrossOrgGrantInput.m_targetTeamId = targetTeamId || ""
+		root.__createCrossOrgGrantInput.m_roleIds = roleIds || ""
 		root.__createCrossOrgGrantInput.m_description = description || ""
 		root.__createCrossOrgGrantInput.m_expiresAt = expiresAt || ""
 		root.__createCrossOrgGrantSender.send(root.__createCrossOrgGrantInput)
@@ -1162,6 +1159,7 @@ QtObject {
 			ApproveConnectionRequestPayload {
 				onFinished: {
 					if (m_errorMessage && m_errorMessage !== "") {
+							root.connectionRequestError(m_errorMessage)
 						root.requestFailed(m_errorMessage)
 					} else {
 						root.connectionRequestApproved(m_connectionId || "")
@@ -1322,13 +1320,16 @@ QtObject {
 					"id": conn.m_id || "",
 					"tenantAId": conn.m_tenantAId || "",
 					"tenantAName": conn.m_tenantAName || "",
+					"tenantAOwnerName": conn.m_tenantAOwnerName || "",
 					"tenantBId": conn.m_tenantBId || "",
 					"tenantBName": conn.m_tenantBName || "",
+					"tenantBOwnerName": conn.m_tenantBOwnerName || "",
 					"status": conn.m_status || ConnectionStatusEnum.s_active,
 					"createdAt": conn.m_createdAt || "",
 					"updatedAt": conn.m_updatedAt || "",
 					"partnerId": (conn.m_tenantAId === root.tenantId) ? conn.m_tenantBId : conn.m_tenantAId,
-					"partnerName": (conn.m_tenantAId === root.tenantId) ? (conn.m_tenantBName || conn.m_tenantBId) : (conn.m_tenantAName || conn.m_tenantAId)
+					"partnerName": (conn.m_tenantAId === root.tenantId) ? (conn.m_tenantBName || conn.m_tenantBId) : (conn.m_tenantAName || conn.m_tenantAId),
+					"partnerOwnerName": (conn.m_tenantAId === root.tenantId) ? (conn.m_tenantBOwnerName || "") : (conn.m_tenantAOwnerName || "")
 				})
 			}
 		}
@@ -1887,6 +1888,14 @@ QtObject {
 		collectionId: "TenantRelationships"
 	}
 
+	property GqlBasedCollectionDocumentService __crossOrgGrantDocumentService: GqlBasedCollectionDocumentService {
+		collectionId: "CrossOrgGrants"
+	}
+
+	property FilterableSelectGqlDataProvider crossOrgGrantsListDataProvider: FilterableSelectGqlDataProvider {
+		collectionId: "CrossOrgGrants"
+	}
+
 	// --- Role editor + representation controller ---
 	property Component __roleEditorComp: Component {
 		RoleView {
@@ -2137,6 +2146,7 @@ QtObject {
 	// --- Relationship editor + representation controller ---
 	property Component __relationshipEditorComp: Component {
 		RelationshipView {
+			apiClient: root
 			commandsControllerComp: Component {
 				GqlBasedCommandsController {
 					typeId: root.relationshipObjectTypeId
@@ -2145,12 +2155,20 @@ QtObject {
 		}
 	}
 
+	property FilterableSelectGqlDataProvider connectionsDataProvider: FilterableSelectGqlDataProvider{
+		collectionId: "TenantConnections"
+		multiSelect: false
+	}
+
 	property Component __relationshipControllerComp: Component {
 		DocumentRepresentationController {
 			id: relationshipReprController
 
 			representationModel: TenantRelationship {
 				m_id: UuidGenerator.generateUUID()
+				m_status: "Active"
+				m_sourceRole: "Partner"
+				m_targetRole: "Partner"
 			}
 
 			function updateRepresentationFromDocument(){
@@ -2210,9 +2228,88 @@ QtObject {
 		}
 	}
 
+	// --- CrossOrgGrant editor + representation controller ---
+	property Component __crossOrgGrantEditorComp: Component {
+		CrossOrgGrantView {
+			apiClient: root
+			commandsControllerComp: Component {
+				GqlBasedCommandsController {
+					typeId: root.crossOrgGrantObjectTypeId
+				}
+			}
+		}
+	}
+
+	property Component __crossOrgGrantControllerComp: Component {
+		DocumentRepresentationController {
+			id: crossOrgGrantReprController
+
+			representationModel: CrossOrgGrant {
+				m_id: UuidGenerator.generateUUID()
+			}
+
+			function updateRepresentationFromDocument(){
+				startUpdateRepresentation(documentId, representationModel)
+
+				getCrossOrgGrantInput.m_id = documentId
+				getCrossOrgGrantInput.m_collectionId = "CrossOrgGrants"
+				getCrossOrgGrantInputRequest.send(getCrossOrgGrantInput)
+			}
+
+			function updateDocumentFromRepresentation(){
+				startUpdateDocument(documentId)
+
+				updateCrossOrgGrantInputInput.m_documentId = documentId
+				updateCrossOrgGrantInputInput.m_grant = representationModel
+				updateCrossOrgGrantRequest.send(updateCrossOrgGrantInputInput)
+			}
+
+			property DocumentId getCrossOrgGrantInput: DocumentId {}
+			property UpdateGrantFromRepresentationInput updateCrossOrgGrantInputInput: UpdateGrantFromRepresentationInput {}
+
+			property GqlSdlRequestSender getCrossOrgGrantInputRequest: GqlSdlRequestSender {
+				gqlCommandId: ImtauthCrossOrgGrantCollectionDocumentServiceSdlCommandIds.s_getGrantRepresentation
+				sdlObjectComp: Component {
+					CrossOrgGrant {
+						onFinished: {
+							crossOrgGrantReprController.representationModel.copyFrom(this)
+							crossOrgGrantReprController.representationUpdated(
+								crossOrgGrantReprController.documentId,
+								crossOrgGrantReprController.representationModel)
+						}
+					}
+				}
+
+				function onError(message, type){
+					crossOrgGrantReprController.updateRepresentationFailed(crossOrgGrantReprController.documentId, message)
+				}
+			}
+
+			property GqlSdlRequestSender updateCrossOrgGrantRequest: GqlSdlRequestSender {
+				gqlCommandId: ImtauthCrossOrgGrantCollectionDocumentServiceSdlCommandIds.s_updateGrantFromRepresentation
+				requestType: 1
+				sdlObjectComp: Component {
+					DocumentOperationStatus {
+						onFinished: {
+							if (m_status === "Success"){
+								crossOrgGrantReprController.documentUpdated(crossOrgGrantReprController.documentId)
+							}
+						}
+					}
+				}
+
+				function onError(message, type){
+					crossOrgGrantReprController.updateDocumentFailed(crossOrgGrantReprController.documentId, message)
+				}
+			}
+		}
+	}
+
 	// Register each editor + controller pair with its document service so that
 	// pages only need to bind to the abstract `xDocumentManager` / `xObjectTypeId`.
 	Component.onCompleted: {
+		root.__crossOrgGrantDocumentService.registerDocumentViewData(
+			root.crossOrgGrantObjectTypeId, "Editor", root.__crossOrgGrantEditorComp, root.__crossOrgGrantControllerComp)
 		root.__roleDocumentService.registerDocumentViewData(
 			root.roleObjectTypeId, "Editor", root.__roleEditorComp, root.__roleControllerComp)
 		root.__groupDocumentService.registerDocumentViewData(

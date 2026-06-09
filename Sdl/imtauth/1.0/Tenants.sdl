@@ -290,8 +290,10 @@ type TenantConnection {
 	id: ID!
 	tenantAId: ID!
 	tenantAName: String
+	tenantAOwnerName: String
 	tenantBId: ID!
 	tenantBName: String
+	tenantBOwnerName: String
 	status: ConnectionStatus!
 	createdAt: String
 	updatedAt: String
@@ -338,6 +340,8 @@ type TenantRelationship {
 	connectionId: ID!
 	sourceTenantId: ID!
 	targetTenantId: ID!
+	sourceTenantName: String
+	targetTenantName: String
 	sourceRole: TenantRelationshipRole!
 	targetRole: TenantRelationshipRole!
 	scope: String
@@ -456,22 +460,12 @@ type GetRelationshipProposalsPayload {
 
 # --- Cross-Org Grants ---
 
-enum CrossOrgAccessLevel {
-	None
-	Read
-	Write
-	Admin
-}
-
 type CrossOrgGrant {
 	id: ID!
 	sourceTenantId: ID!
 	targetTenantId: ID!
-	relationshipId: ID!
-	contractId: ID
-	targetTeamId: ID
-	accessLevel: CrossOrgAccessLevel!
-	resourceScope: String
+	targetTenantName: String
+	roleIds: [ID]
 	description: String
 	createdAt: String
 	expiresAt: String
@@ -481,11 +475,7 @@ type CrossOrgGrant {
 input CreateCrossOrgGrantInput {
 	sourceTenantId: ID!
 	targetTenantId: ID!
-	relationshipId: ID!
-	contractId: ID
-	accessLevel: CrossOrgAccessLevel!
-	resourceScope: String
-	targetTeamId: ID
+	roleIds: [ID]
 	description: String
 	expiresAt: String
 }

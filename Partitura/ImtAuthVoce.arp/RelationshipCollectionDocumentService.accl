@@ -11,6 +11,7 @@
         <Element ComponentName="CollectionDocumentService" X="600" Y="200" Note=""/>
         <Element ComponentName="Demultiplexer" X="575" Y="75" Note=""/>
         <Element ComponentName="RelationshipCollectionDocumentService" X="175" Y="200" Note=""/>
+        <Element ComponentName="SerializedUndoManager" X="600" Y="400" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

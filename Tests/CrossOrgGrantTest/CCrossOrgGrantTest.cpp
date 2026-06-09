@@ -15,10 +15,7 @@ imtauth::CrossOrgGrantInfo MakeSampleInfo()
 	info.grantId = "grant-1";
 	info.sourceTenantId = "tenantA";
 	info.targetTenantId = "tenantB";
-	info.relationshipId = "rel-1";
-	info.targetTeamId = "team-1";
-	info.accessLevel = imtauth::COAL_WRITE;
-	info.resourceScope = "documents";
+	info.roleIds = QByteArrayList{"role-read", "role-write"};
 	info.description = "Sample grant";
 	info.createdAt = "2026-01-01T00:00:00.000Z";
 	info.expiresAt = "2030-01-01T00:00:00.000Z";
@@ -82,14 +79,14 @@ void CCrossOrgGrantTest::testGrantInfo_ResetDataDefaults()
 	QVERIFY(info.grantId.isEmpty());
 	QVERIFY(info.sourceTenantId.isEmpty());
 	QVERIFY(info.targetTenantId.isEmpty());
-	QCOMPARE(info.accessLevel, imtauth::COAL_NONE);
+	QVERIFY(info.roleIds.isEmpty());
 	QVERIFY(info.isActive);
 }
 
 
 void CCrossOrgGrantTest::testCreateGrant_Success()
 {
-	QByteArray grantId = m_managerPtr->CreateGrant("tenantA", "tenantB", "rel-1", imtauth::COAL_READ);
+	QByteArray grantId = m_managerPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-read"});
 	QVERIFY(!grantId.isEmpty());
 	QCOMPARE(m_managerPtr->m_grants.size(), 1);
 }
@@ -97,25 +94,24 @@ void CCrossOrgGrantTest::testCreateGrant_Success()
 
 void CCrossOrgGrantTest::testCreateGrant_MissingFields_Fails()
 {
-	QVERIFY(m_managerPtr->CreateGrant("", "tenantB", "rel-1", imtauth::COAL_READ).isEmpty());
-	QVERIFY(m_managerPtr->CreateGrant("tenantA", "", "rel-1", imtauth::COAL_READ).isEmpty());
-	QVERIFY(m_managerPtr->CreateGrant("tenantA", "tenantB", "", imtauth::COAL_READ).isEmpty());
+	QVERIFY(m_managerPtr->CreateGrant("", "tenantB", QByteArrayList{"role-read"}).isEmpty());
+	QVERIFY(m_managerPtr->CreateGrant("tenantA", "", QByteArrayList{"role-read"}).isEmpty());
 	QCOMPARE(m_managerPtr->m_grants.size(), 0);
 }
 
 
 void CCrossOrgGrantTest::testCreateGrant_SameTenant_Fails()
 {
-	QVERIFY(m_managerPtr->CreateGrant("tenantA", "tenantA", "rel-1", imtauth::COAL_READ).isEmpty());
+	QVERIFY(m_managerPtr->CreateGrant("tenantA", "tenantA", QByteArrayList{"role-read"}).isEmpty());
 	QCOMPARE(m_managerPtr->m_grants.size(), 0);
 }
 
 
 void CCrossOrgGrantTest::testRevokeGrant_DeactivatesGrant()
 {
-	QByteArray grantId = m_managerPtr->CreateGrant("tenantA", "tenantB", "rel-1", imtauth::COAL_ADMIN);
+	QByteArray grantId = m_managerPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-admin"});
 	QVERIFY(m_managerPtr->RevokeGrant(grantId));
-	QVERIFY(!m_managerPtr->HasAccess("tenantA", "tenantB", "documents", imtauth::COAL_READ));
+	QVERIFY(!m_managerPtr->HasAccess("tenantA", "tenantB", "role-admin"));
 	// Re-revoking an already inactive grant returns false.
 	QVERIFY(!m_managerPtr->RevokeGrant(grantId));
 }
@@ -129,50 +125,52 @@ void CCrossOrgGrantTest::testRevokeGrant_Unknown_ReturnsFalse()
 
 void CCrossOrgGrantTest::testHasAccess_NoneAlwaysAllowed()
 {
-	QVERIFY(m_managerPtr->HasAccess("tenantA", "tenantB", "documents", imtauth::COAL_NONE));
+	// Empty roleId always returns true.
+	QVERIFY(m_managerPtr->HasAccess("tenantA", "tenantB", QByteArray()));
 }
 
 
 void CCrossOrgGrantTest::testHasAccess_GrantMatrix()
 {
-	m_managerPtr->CreateGrant("tenantA", "tenantB", "rel-1", imtauth::COAL_WRITE);
+	m_managerPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-read", "role-write"});
 
-	// A WRITE grant satisfies READ and WRITE but not ADMIN.
-	QVERIFY(m_managerPtr->HasAccess("tenantA", "tenantB", "documents", imtauth::COAL_READ));
-	QVERIFY(m_managerPtr->HasAccess("tenantA", "tenantB", "documents", imtauth::COAL_WRITE));
-	QVERIFY(!m_managerPtr->HasAccess("tenantA", "tenantB", "documents", imtauth::COAL_ADMIN));
+	// Has the granted roles.
+	QVERIFY(m_managerPtr->HasAccess("tenantA", "tenantB", "role-read"));
+	QVERIFY(m_managerPtr->HasAccess("tenantA", "tenantB", "role-write"));
+	// Does not have a non-granted role.
+	QVERIFY(!m_managerPtr->HasAccess("tenantA", "tenantB", "role-admin"));
 }
 
 
 void CCrossOrgGrantTest::testHasAccess_RevokedDenied()
 {
-	QByteArray grantId = m_managerPtr->CreateGrant("tenantA", "tenantB", "rel-1", imtauth::COAL_ADMIN);
-	QVERIFY(m_managerPtr->HasAccess("tenantA", "tenantB", "documents", imtauth::COAL_ADMIN));
+	QByteArray grantId = m_managerPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-admin"});
+	QVERIFY(m_managerPtr->HasAccess("tenantA", "tenantB", "role-admin"));
 	m_managerPtr->RevokeGrant(grantId);
-	QVERIFY(!m_managerPtr->HasAccess("tenantA", "tenantB", "documents", imtauth::COAL_ADMIN));
+	QVERIFY(!m_managerPtr->HasAccess("tenantA", "tenantB", "role-admin"));
 }
 
 
 void CCrossOrgGrantTest::testHasAccess_ExpiredDenied()
 {
-	m_managerPtr->CreateGrant("tenantA", "tenantB", "rel-1", imtauth::COAL_ADMIN,
-				QString(), QByteArray(), QString(), "2000-01-01T00:00:00.000Z");
-	QVERIFY(!m_managerPtr->HasAccess("tenantA", "tenantB", "documents", imtauth::COAL_READ));
+	m_managerPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-admin"},
+				QString(), "2000-01-01T00:00:00.000Z");
+	QVERIFY(!m_managerPtr->HasAccess("tenantA", "tenantB", "role-admin"));
 }
 
 
 void CCrossOrgGrantTest::testHasAccess_ScopedGrant()
 {
-	m_managerPtr->CreateGrant("tenantA", "tenantB", "rel-1", imtauth::COAL_WRITE, "documents");
+	m_managerPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-docs"});
 
-	// Scoped grant only applies to its resource scope.
-	QVERIFY(m_managerPtr->HasAccess("tenantA", "tenantB", "documents", imtauth::COAL_READ));
-	QVERIFY(!m_managerPtr->HasAccess("tenantA", "tenantB", "billing", imtauth::COAL_READ));
+	// Has only the specific role granted.
+	QVERIFY(m_managerPtr->HasAccess("tenantA", "tenantB", "role-docs"));
+	QVERIFY(!m_managerPtr->HasAccess("tenantA", "tenantB", "role-billing"));
 }
 
 
 void CCrossOrgGrantTest::testHasAccess_WrongSourceDenied()
 {
-	m_managerPtr->CreateGrant("tenantA", "tenantB", "rel-1", imtauth::COAL_ADMIN);
-	QVERIFY(!m_managerPtr->HasAccess("tenantC", "tenantB", "documents", imtauth::COAL_READ));
+	m_managerPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-admin"});
+	QVERIFY(!m_managerPtr->HasAccess("tenantC", "tenantB", "role-admin"));
 }

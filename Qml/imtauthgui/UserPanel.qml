@@ -171,7 +171,6 @@ Item {
 				delegate: MenuItem {
 					property var orgData: root.__organizationsList[index]
 					text: orgData ? orgData.name : ""
-					checkable: true
 					checked: orgData && orgData.id === AuthorizationController.currentTenantId
 					onTriggered: {
 						if (orgData && orgData.id !== AuthorizationController.currentTenantId) {
@@ -190,7 +189,6 @@ Item {
 
 			MenuItem {
 				text: qsTr("No organization")
-				checkable: true
 				checked: AuthorizationController.currentTenantId === ""
 				onTriggered: {
 					if (AuthorizationController.currentTenantId !== "") {

@@ -48,6 +48,16 @@
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="UndoManager" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="SerializedUndoManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentValidators" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>RelationshipDocumentValidator</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -77,7 +87,10 @@
                     <AttributeInfo Id="CollectionDocumentService" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="CollectionDocumentService"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ConnectionRequestManager" Type="Reference" ExportId="TenantConnectionRequestManager">
+                    <AttributeInfo Id="ConnectionCollection" Type="Reference" ExportId="TenantConnectionRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantCollection" Type="Reference" ExportId="TenantRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TenantManager" Type="Reference" ExportId="TenantManager">
@@ -95,8 +108,18 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="SerializedUndoManager" PackageId="BasePck" ComponentId="SerializedUndoManager">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="TenantRelationshipInfo" PackageId="ImtAuthPck" ComponentId="TenantRelationshipInfo">
             <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="RelationshipDocumentValidator" PackageId="ImtAuthGqlPck" ComponentId="RelationshipDocumentValidator">
+            <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
             </Data>
         </Element>

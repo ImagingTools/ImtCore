@@ -13,189 +13,32 @@ import imtauthgui 1.0
  *
  * Cross-Org Grants tab of the TenantEditor.
  *
- * Displays grants via TenantSimpleCollectionPage. Create opens a separate
- * CrossOrgGrantView editor (ViewBase) with GqlBasedCommandsController.
- * Revocation is performed per-item in the list delegate.
+ * Displays grants via TenantSimpleCollectionPage with a document manager
+ * for full Create/Edit/Remove workflow.
  */
 TenantSimpleCollectionPage {
-id: grantsPage
+	id: grantsPage
 
-entityName: qsTr("Grant")
-entityNamePlural: qsTr("Cross-Org Grants")
-descriptionText: qsTr("Delegate scoped access from this tenant to another tenant.")
+	entityName: qsTr("Grant")
+	entityNamePlural: qsTr("Cross-Org Grants")
+	descriptionText: qsTr("Delegate scoped access from this tenant to another tenant.")
+	showCreateButton: true
+	documentNameFields: ["m_name", "m_targetTenantName"]
 
-listModel: apiClient ? apiClient.crossOrgGrantsModel : null
+	documentManager: grantsPage.apiClient ? grantsPage.apiClient.crossOrgGrantDocumentManager : null
+	objectTypeId: grantsPage.apiClient ? grantsPage.apiClient.crossOrgGrantObjectTypeId : ""
+	dataProvider: grantsPage.apiClient ? grantsPage.apiClient.crossOrgGrantsListDataProvider : null
 
-customEditorComponent: createGrantComp
+	function removeItem(id) {
+		if (grantsPage.apiClient) {
+			grantsPage.apiClient.revokeCrossOrgGrant(id)
+		}
+	}
 
-headerButtonsComponent: headerBtnsComp
-
-function updateGui() {
-if (grantsPage.apiClient && grantsPage.tenantData && grantsPage.tenantData.m_id) {
-grantsPage.apiClient.fetchCrossOrgGrants(grantsPage.tenantData.m_id)
-}
-}
-
-Component.onCompleted: {
-if (grantsPage.apiClient && grantsPage.tenantData && grantsPage.tenantData.m_id) {
-grantsPage.apiClient.fetchCrossOrgGrants(grantsPage.tenantData.m_id)
-}
-}
-
-onVisibleChanged: {
-if (grantsPage.visible && grantsPage.apiClient && grantsPage.tenantData && grantsPage.tenantData.m_id) {
-grantsPage.apiClient.fetchCrossOrgGrants(grantsPage.tenantData.m_id)
-}
-}
-
-Connections {
-target: grantsPage.apiClient
-
-function onCrossOrgGrantCreated(grantId) {
-PopupManager.addSuccessMessage(qsTr("Cross-org grant created successfully"), true)
-grantsPage.popEditor()
-if (grantsPage.apiClient && grantsPage.tenantData && grantsPage.tenantData.m_id) {
-grantsPage.apiClient.fetchCrossOrgGrants(grantsPage.tenantData.m_id)
-}
-}
-
-function onCrossOrgGrantRevoked(grantId) {
-PopupManager.addSuccessMessage(qsTr("Cross-org grant revoked"), true)
-if (grantsPage.apiClient && grantsPage.tenantData && grantsPage.tenantData.m_id) {
-grantsPage.apiClient.fetchCrossOrgGrants(grantsPage.tenantData.m_id)
-}
-}
-}
-
-// --- Custom header: only show "+ Create Grant" ---
-Component {
-id: headerBtnsComp
-
-Text {
-text: qsTr("+ Create Grant")
-font.pixelSize: Style.fontSizeM
-font.bold: true
-color: (grantsPage.stateManager && (grantsPage.stateManager.isCreator || grantsPage.stateManager.isOwner))
-? Style.linkColor : Style.inactiveTextColor
-
-MouseArea {
-anchors.fill: parent
-hoverEnabled: true
-cursorShape: Qt.PointingHandCursor
-enabled: grantsPage.stateManager && (grantsPage.stateManager.isCreator || grantsPage.stateManager.isOwner)
-onClicked: {
-grantsPage.openCreate()
-}
-}
-}
-}
-
-// --- Custom list delegate ---
-delegateComponent: Component {
-Rectangle {
-id: grantDelegate
-width: grantDelegate.parent ? grantDelegate.parent.width : 0
-height: grantDelegateContent.height + 2 * Style.marginM
-color: Style.alternateBaseColor
-radius: Style.radiusS
-border.color: Style.borderColor
-border.width: 1
-
-readonly property var __grant: modelData
-readonly property bool __canRevoke: grantsPage.stateManager
-&& (grantsPage.stateManager.isCreator || grantsPage.stateManager.isOwner)
-&& (grantDelegate.__grant.isActive === undefined || grantDelegate.__grant.isActive)
-
-Row {
-id: grantDelegateContent
-anchors.left: grantDelegate.left
-anchors.right: grantDelegate.right
-anchors.top: grantDelegate.top
-anchors.margins: Style.marginM
-spacing: Style.marginM
-
-Column {
-width: grantDelegateContent.width - (revokeBtn.visible ? revokeBtn.width + Style.marginM : 0)
-spacing: Style.marginXS
-
-BaseText {
-width: parent.width
-elide: Text.ElideRight
-text: qsTr("Target: %1").arg(grantDelegate.__grant.targetTenantId || "")
-font.pixelSize: Style.fontSizeM
-color: Style.textColor
-}
-
-BaseText {
-width: parent.width
-elide: Text.ElideRight
-text: qsTr("Level: %1   Scope: %2")
-.arg(grantDelegate.__grant.accessLevel || qsTr("None"))
-.arg((grantDelegate.__grant.resourceScope && grantDelegate.__grant.resourceScope !== "") ? grantDelegate.__grant.resourceScope : qsTr("All"))
-font.pixelSize: Style.fontSizeS
-color: Style.inactiveTextColor
-}
-
-BaseText {
-width: parent.width
-visible: grantDelegate.__grant.relationshipId && grantDelegate.__grant.relationshipId !== ""
-elide: Text.ElideRight
-text: qsTr("Relationship: %1").arg(grantDelegate.__grant.relationshipId || "")
-font.pixelSize: Style.fontSizeS
-color: Style.inactiveTextColor
-}
-
-BaseText {
-width: parent.width
-visible: grantDelegate.__grant.description && grantDelegate.__grant.description !== ""
-elide: Text.ElideRight
-text: grantDelegate.__grant.description || ""
-font.pixelSize: Style.fontSizeS
-color: Style.inactiveTextColor
-}
-
-BaseText {
-width: parent.width
-visible: grantDelegate.__grant.expiresAt && grantDelegate.__grant.expiresAt !== ""
-elide: Text.ElideRight
-text: qsTr("Expires: %1").arg(grantDelegate.__grant.expiresAt || "")
-font.pixelSize: Style.fontSizeS
-color: Style.inactiveTextColor
-}
-}
-
-Button {
-id: revokeBtn
-visible: grantDelegate.__canRevoke
-text: qsTr("Revoke")
-onClicked: {
-if (grantsPage.apiClient) {
-grantsPage.apiClient.revokeCrossOrgGrant(grantDelegate.__grant.grantId || "")
-}
-}
-}
-}
-}
-}
-
-// --- Create grant editor (ViewBase with GqlBasedCommandsController) ---
-Component {
-id: createGrantComp
-
-CrossOrgGrantView {
-apiClient: grantsPage.apiClient
-tenantData: grantsPage.tenantData
-commandsControllerComp: Component {
-GqlBasedCommandsController {
-typeId: grantsPage.apiClient ? grantsPage.apiClient.crossOrgGrantObjectTypeId : ""
-}
-}
-
-onCommandActivated: {
-if (commandId === "save" || commandId === "create") {
-submitGrant()
-}
-}
-}
-}
+	Connections {
+		target: grantsPage.apiClient
+		function onCrossOrgGrantRevoked(grantId) {
+			grantsPage.refresh()
+		}
+	}
 }

@@ -32,8 +32,10 @@ Rectangle {
 
 	// --- Outputs (action requests) ---
 	signal memberActionsRequested(var menuItems, string userId, string userName,
-	                              bool isOwnerTarget, bool isCurrentUserTarget)
-	signal inviteActionsRequested(var menuItems, string invitationId, string userName)
+	                              bool isOwnerTarget, bool isCurrentUserTarget,
+	                              real menuX, real menuY)
+	signal inviteActionsRequested(var menuItems, string invitationId, string userName,
+	                              real menuX, real menuY)
 	signal memberEditRequested(string userId, string userName)
 
 	readonly property bool isMember: row.kind === "member"
@@ -263,6 +265,7 @@ Rectangle {
 				: (row.canManageMembers && row.effectiveStatus === "Pending")
 
 			ToolButton {
+				id: actionsButton
 				visible: actionsItem.__hasActions
 				anchors.centerIn: parent
 				tooltipText: qsTr("Actions")
@@ -275,6 +278,7 @@ Rectangle {
 				}
 
 				onClicked: {
+					var btnPos = actionsButton.mapToItem(null, 0, actionsButton.height)
 					if (row.isMember) {
 						var menuItems = []
 						if (row.canManageMembers && !row.isCurrentUser) {
@@ -294,7 +298,8 @@ Rectangle {
 							row.memberData.id,
 							row.memberData.name || row.memberData.id,
 							row.isMemberOwner,
-							row.isCurrentUser)
+							row.isCurrentUser,
+							btnPos.x, btnPos.y)
 					} else {
 						var inviteMenuItems = [
 							{ text: qsTr("Resend Invitation"), action: "resend" },
@@ -302,7 +307,8 @@ Rectangle {
 						]
 						row.inviteActionsRequested(inviteMenuItems,
 							row.memberData.id,
-							row.memberData.userName || row.memberData.userId || "")
+							row.memberData.userName || row.memberData.userId || "",
+							btnPos.x, btnPos.y)
 					}
 				}
 			}

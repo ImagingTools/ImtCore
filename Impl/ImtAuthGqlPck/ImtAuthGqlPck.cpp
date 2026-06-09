@@ -272,6 +272,16 @@ I_EXPORT_COMPONENT(
 			"Connection Codes Notification Publisher");
 
 I_EXPORT_COMPONENT(
+			TenantConnectionsSelectController,
+			"Tenant connections select controller",
+			"Tenant Connections Select Controller");
+
+I_EXPORT_COMPONENT(
+			TenantRelationshipsSelectController,
+			"Tenant relationships select controller",
+			"Tenant Relationships Select Controller");
+
+I_EXPORT_COMPONENT(
 			RemoteTenantCollectionDocumentService,
 			"Remote tenant collection document service with product permissions enrichment",
 			"Remote Tenant Collection Document Service");
@@ -295,6 +305,21 @@ I_EXPORT_COMPONENT(
 			UserCollectionDocumentService,
 			"User collection document service: GetUserRepresentation / UpdateUserFromRepresentation",
 			"User Collection Document Service");
+
+I_EXPORT_COMPONENT(
+			CrossOrgGrantCollectionDocumentService,
+			"Cross Org Grant collection document service",
+			"Cross Org Grant Collection Document Service");
+
+I_EXPORT_COMPONENT(
+			RelationshipDocumentValidator,
+			"Relationship document validator",
+			"Relationship Document Validator");
+
+I_EXPORT_COMPONENT(
+			CrossOrgGrantDocumentValidator,
+			"Cross-org grant document validator",
+			"Cross Org Grant Document Validator");
 
 
 } // namespace ImtAuthGqlPck

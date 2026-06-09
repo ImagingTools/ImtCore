@@ -72,6 +72,7 @@
 #include <imtauth/COrderRequestComp.h>
 #include <imtauth/COrderRequestHandlerComp.h>
 #include <imtauth/CTenantDocumentNameProviderComp.h>
+#include <imtauth/CTenantRelationshipDocumentNameProviderComp.h>
 
 
 namespace ImtAuthPck
@@ -183,6 +184,7 @@ typedef icomp::TModelCompWrap<imtauth::CCrossTenantMessageBrokerComp> CrossTenan
 typedef icomp::TModelCompWrap<imtauth::COrderRequestComp> OrderRequestInfo;
 typedef icomp::TModelCompWrap<imtauth::COrderRequestHandlerComp> OrderRequestHandler;
 typedef imtauth::CTenantDocumentNameProviderComp TenantDocumentNameProvider;
+typedef imtauth::CTenantRelationshipDocumentNameProviderComp TenantRelationshipDocumentNameProvider;
 
 
 } // namespace ImtAuthPck

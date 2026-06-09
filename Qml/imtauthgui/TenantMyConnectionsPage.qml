@@ -7,36 +7,38 @@ import imtcontrols 1.0
 import imtauthgui 1.0
 
 /**
- * TenantMyConnectionsPage
+ * TenantMyRelationshipsPage
  *
- * Displays confirmed connections and relationships for the tenant.
+ * Displays confirmed relationships for the tenant.
  * Uses standard TenantSimpleCollectionPage with FilterableSelectGqlDataProvider
- * (same mechanism as TenantRolesPage). Supports Remove/Edit.
- * Create is hidden because relationships are created via proposal flow.
+ * (same mechanism as TenantRolesPage). Supports Remove/Edit/Create.
+ * Create opens the RelationshipView which creates a relationship proposal
+ * (bilateral approval required).
  */
 TenantSimpleCollectionPage {
-	id: connectionsPage
+	id: relationshipsPage
 
 	entityName: qsTr("Relationship")
-	entityNamePlural: qsTr("My Connections")
-	descriptionText: qsTr("Confirmed connections and business relationships with other organizations. Removing a relationship requires approval from both parties.")
-	showCreateButton: false
+	entityNamePlural: qsTr("My Relationships")
+	descriptionText: qsTr("Business relationships with other organizations. Creating or modifying a relationship requires approval from both parties.")
+	showCreateButton: true
+	documentNameFields: ["m_name", "m_targetTenantName"]
 
-	documentManager: connectionsPage.apiClient ? connectionsPage.apiClient.relationshipDocumentManager : null
-	objectTypeId: connectionsPage.apiClient ? connectionsPage.apiClient.relationshipObjectTypeId : ""
-	dataProvider: connectionsPage.apiClient ? connectionsPage.apiClient.tenantRelationshipsListDataProvider : null
+	documentManager: relationshipsPage.apiClient ? relationshipsPage.apiClient.relationshipDocumentManager : null
+	objectTypeId: relationshipsPage.apiClient ? relationshipsPage.apiClient.relationshipObjectTypeId : ""
+	dataProvider: relationshipsPage.apiClient ? relationshipsPage.apiClient.tenantRelationshipsListDataProvider : null
 
 	function removeItem(id) {
-		if (connectionsPage.apiClient && connectionsPage.tenantData) {
-			connectionsPage.apiClient.removeTenantRelationship(
-				connectionsPage.tenantData.m_id, id)
+		if (relationshipsPage.apiClient && relationshipsPage.tenantData) {
+			relationshipsPage.apiClient.removeTenantRelationship(
+				relationshipsPage.tenantData.m_id, id)
 		}
 	}
 
 	Connections {
-		target: connectionsPage.apiClient
+		target: relationshipsPage.apiClient
 		function onTenantRelationshipRemoved() {
-			connectionsPage.refresh()
+			relationshipsPage.refresh()
 		}
 	}
 }

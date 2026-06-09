@@ -4,9 +4,23 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
-import imtcolgui 1.0
-import imtguigql 1.0
 
+/**
+ * ItemSelectElementView
+ *
+ * A reusable ElementView that displays a list of selectable items as chips (tags).
+ * Provides add/remove functionality via a FilterableSelectPopup.
+ *
+ * This base version does NOT perform GQL-based name resolution.
+ * For GQL-based name resolution, use GqlBasedItemSelectElementView from imtguigql.
+ *
+ * Usage:
+ *   ItemSelectElementView {
+ *       label: "Roles"
+ *       items: [{id: "1", name: "Admin"}, {id: "2", name: "Editor"}]
+ *       dataProvider: myFilterableSelectDataProvider
+ *   }
+ */
 ElementView {
 	id: itemSelectElementView
 
@@ -20,8 +34,9 @@ ElementView {
 	property string addButtonText: qsTr("Add item")
 	// Placeholder for the filter popup
 	property string filterPlaceholder: qsTr("Type or choose an item")
-	// CollectionId for the data provider
-	property string collectionId: ""
+
+	// Data provider for the select popup (FilterableSelectDataProvider or subclass)
+	property var dataProvider: null
 
 	// Text shown when no items selected
 	property string emptyText: qsTr("No items")
@@ -39,73 +54,15 @@ ElementView {
 	signal selectionChanged(var selectedItems)
 	signal popupClosed()
 
+	function __applyRemoval(newItems, removedIndex, removedData) {
+		itemSelectElementView.items = newItems
+		itemSelectElementView.itemRemoved(removedIndex, removedData)
+		itemSelectElementView.selectionChanged(newItems)
+	}
+
 	name: itemSelectElementView.showCount && itemSelectElementView.items.length > 0
 		? itemSelectElementView.label + " (" + itemSelectElementView.items.length + ")"
 		: itemSelectElementView.label
-
-	// --- Name resolution via FilterableSelectPopup's data provider pattern ---
-	property bool __resolvingNames: false
-
-	FilterableSelectGqlDataProvider {
-		id: nameResolver
-		collectionId: itemSelectElementView.collectionId
-		multiSelect: true
-		pageSize: 100
-
-		onDataChanged: {
-			itemSelectElementView.__resolveItemNames()
-		}
-	}
-
-	onItemsChanged: {
-		if (!itemSelectElementView.__resolvingNames)
-			itemSelectElementView.__triggerResolveIfNeeded()
-	}
-
-	function __triggerResolveIfNeeded() {
-		if (!itemSelectElementView.items || itemSelectElementView.items.length === 0) return
-		var hasUnresolved = false
-		for (var i = 0; i < itemSelectElementView.items.length; i++) {
-			var item = itemSelectElementView.items[i]
-			if (!item.name || item.name === item.id) {
-				hasUnresolved = true
-				break
-			}
-		}
-		if (hasUnresolved) {
-			nameResolver.fetch("")
-		}
-	}
-
-	function __resolveItemNames() {
-		var resolverItems = nameResolver.items
-		if (!resolverItems || resolverItems.length === 0) return
-
-		var nameMap = ({})
-		for (var i = 0; i < resolverItems.length; i++) {
-			var ri = resolverItems[i]
-			if (ri.id && ri.title && ri.title !== "")
-				nameMap[ri.id] = ri.title
-		}
-
-		var updated = false
-		var newItems = []
-		for (var j = 0; j < itemSelectElementView.items.length; j++) {
-			var cur = itemSelectElementView.items[j]
-			var resolved = nameMap[cur.id]
-			if (resolved && cur.name !== resolved) {
-				newItems.push({ id: cur.id, name: resolved })
-				updated = true
-			} else {
-				newItems.push(cur)
-			}
-		}
-		if (updated) {
-			itemSelectElementView.__resolvingNames = true
-			itemSelectElementView.items = newItems
-			itemSelectElementView.__resolvingNames = false
-		}
-	}
 
 	controlComp: Component {
 		Text {
@@ -196,22 +153,15 @@ ElementView {
 								if (removedId) {
 									for (var k = 0; k < itemSelectElementView.items.length; k++) {
 										var it = itemSelectElementView.items[k]
-										// Match by id rather than index — robust against
-										// delegate-context drift when items mutate.
 										if (it && it.id !== removedId)
 											arr.push(it)
 									}
 								} else {
-									// Fallback: id is missing/empty — drop by index.
 									arr = itemSelectElementView.items.slice()
 									if (removedIndex >= 0 && removedIndex < arr.length)
 										arr.splice(removedIndex, 1)
 								}
-								itemSelectElementView.__resolvingNames = true
-								itemSelectElementView.items = arr
-								itemSelectElementView.__resolvingNames = false
-								itemSelectElementView.itemRemoved(removedIndex, removedData)
-								itemSelectElementView.selectionChanged(arr)
+								itemSelectElementView.__applyRemoval(arr, removedIndex, removedData)
 							}
 						}
 					}
@@ -234,10 +184,7 @@ ElementView {
 		id: selectComp
 
 		FilterableSelectPopup {
-			dataProvider: FilterableSelectGqlDataProvider {
-				collectionId: itemSelectElementView ? itemSelectElementView.collectionId : ""
-				multiSelect: true
-			}
+			dataProvider: itemSelectElementView ? itemSelectElementView.dataProvider : null
 
 			itemWidth: 280
 			showCheckBox: true
@@ -253,9 +200,7 @@ ElementView {
 						selName = selId
 					arr.push({id: selId, name: selName})
 				}
-				itemSelectElementView.__resolvingNames = true
 				itemSelectElementView.items = arr
-				itemSelectElementView.__resolvingNames = false
 				itemSelectElementView.selectionChanged(arr)
 			}
 

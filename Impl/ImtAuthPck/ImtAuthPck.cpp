@@ -341,6 +341,11 @@ I_EXPORT_COMPONENT(
 			"Provides default document name from tenant name",
 			"Tenant Document Name Provider");
 
+I_EXPORT_COMPONENT(
+			TenantRelationshipDocumentNameProvider,
+			"Provides default document name from target tenant name",
+			"Tenant Relationship Document Name Provider");
+
 
 } // namespace ImtAuthPck
 

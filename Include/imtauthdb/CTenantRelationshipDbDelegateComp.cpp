@@ -231,6 +231,12 @@ bool CTenantRelationshipDbDelegateComp::SetCollectionItemMetaInfoFromRecord(
 }
 
 
+QByteArray CTenantRelationshipDbDelegateComp::GetObjectTypeId(const QByteArray& /*objectId*/) const
+{
+	return QByteArrayLiteral("TenantRelationship");
+}
+
+
 idoc::MetaInfoPtr CTenantRelationshipDbDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
 {
 	return idoc::MetaInfoPtr(new idoc::CStandardDocumentMetaInfo());
