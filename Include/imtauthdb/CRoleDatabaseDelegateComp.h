@@ -2,11 +2,7 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QSet>
-
 // ImtCore includes
-#include <imtauth/IRole.h>
 #include <imtdb/CSqlDatabaseDocumentDelegateComp.h>
 
 
@@ -29,17 +25,6 @@ public:
 				const imtbase::IOperationContext* operationContextPtr) const override;
 	virtual bool SetCollectionItemMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
 	virtual QString CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const override;
-
-protected:
-	/*!
-		Check whether the collection contains another default/guest role for the same product
-		that is not part of the deletion set. Used to allow removing duplicated default/guest
-		roles while keeping at least one of each per product.
-	*/
-	bool HasOtherSpecialRole(
-				const imtbase::IObjectCollection& collection,
-				const imtauth::IRole& roleToDelete,
-				const QSet<QByteArray>& idsToDelete) const;
 };
 
 
