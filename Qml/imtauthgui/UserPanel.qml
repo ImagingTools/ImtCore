@@ -146,8 +146,6 @@ Item {
 		}
 	}
 
-
-	
 	Menu {
 		id: menu
 		x: loginButton.x - menu.width

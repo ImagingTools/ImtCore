@@ -495,6 +495,15 @@ type RevokeCrossOrgGrantPayload {
 	errorMessage: String
 }
 
+input RemoveCrossOrgGrantsInput {
+	grantIds: [ID]!
+}
+
+type RemoveCrossOrgGrantsPayload {
+	success: Boolean
+	errorMessage: String
+}
+
 input GetCrossOrgGrantsInput {
 	tenantId: ID!
 }
@@ -838,6 +847,7 @@ type Mutation {
 	RemoveTenantRelationship (input: RemoveTenantRelationshipInput): RemoveTenantRelationshipPayload!
 	CreateCrossOrgGrant (input: CreateCrossOrgGrantInput): CreateCrossOrgGrantPayload!
 	RevokeCrossOrgGrant (input: RevokeCrossOrgGrantInput): RevokeCrossOrgGrantPayload!
+	RemoveCrossOrgGrants (input: RemoveCrossOrgGrantsInput): RemoveCrossOrgGrantsPayload!
 	CreateContract (input: CreateContractInput): CreateContractPayload!
 	UpdateContractStatus (input: UpdateContractStatusInput): UpdateContractStatusPayload!
 	TerminateContract (input: TerminateContractInput): TerminateContractPayload!

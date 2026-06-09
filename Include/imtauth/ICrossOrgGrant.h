@@ -91,6 +91,12 @@ public:
 	virtual bool RevokeGrant(const QByteArray& grantId) = 0;
 
 	/**
+		Permanently remove cross-org grants by their IDs.
+		\return true if all requested grants were removed successfully.
+	*/
+	virtual bool RemoveGrants(const QByteArrayList& grantIds) = 0;
+
+	/**
 		Get a specific grant by its ID.
 	*/
 	virtual CrossOrgGrantInfo GetGrant(const QByteArray& grantId) const = 0;

@@ -31,7 +31,7 @@ TenantSimpleCollectionPage {
 
 	function removeItems(ids) {
 		if (grantsPage.apiClient) {
-			grantsPage.apiClient.revokeCrossOrgGrant(ids[0])
+			grantsPage.apiClient.removeCrossOrgGrants(ids)
 		}
 	}
 

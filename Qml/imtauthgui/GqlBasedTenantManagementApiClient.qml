@@ -534,9 +534,39 @@ QtObject {
 		}
 	}
 
+	property RemoveCrossOrgGrantsInput __removeCrossOrgGrantsInput: RemoveCrossOrgGrantsInput {}
+	property GqlSdlRequestSender __removeCrossOrgGrantsSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantsSdlCommandIds.s_removeCrossOrgGrants
+
+		sdlObjectComp: Component {
+			RemoveCrossOrgGrantsPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.crossOrgGrantsRemoved()
+					}
+				}
+			}
+		}
+	}
+
 	function revokeCrossOrgGrant(grantId) {
 		root.__revokeCrossOrgGrantInput.m_grantId = grantId || ""
 		root.__revokeCrossOrgGrantSender.send(root.__revokeCrossOrgGrantInput)
+	}
+
+	function removeCrossOrgGrants(grantIds) {
+		var ids = []
+		if (Array.isArray(grantIds)) {
+			ids = grantIds
+		} else if (grantIds && grantIds !== "") {
+			ids = [grantIds]
+		}
+		root.__removeCrossOrgGrantsInput.m_grantIds = ids
+		root.__removeCrossOrgGrantsSender.send(root.__removeCrossOrgGrantsInput)
 	}
 
 	// =========================================================================

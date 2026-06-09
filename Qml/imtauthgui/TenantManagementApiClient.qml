@@ -160,6 +160,7 @@ QtObject {
 	property var tenantsListDataProvider: null
 	property var tenantRelationshipsListDataProvider: null
 	function revokeCrossOrgGrant(grantId) {}
+	function removeCrossOrgGrants(grantIds) {}
 
 	// --- Cooperation contracts ---
 	property var contractsModel: null

@@ -110,6 +110,28 @@ bool CCrossOrgGrantManagerComp::RevokeGrant(const QByteArray& grantId)
 }
 
 
+bool CCrossOrgGrantManagerComp::RemoveGrants(const QByteArrayList& grantIds)
+{
+	if (!m_grantCollectionCompPtr.IsValid() || grantIds.isEmpty()){
+		return false;
+	}
+
+	QByteArrayList filteredIds;
+	for (const QByteArray& grantId : grantIds){
+		if (!grantId.isEmpty()){
+			filteredIds.push_back(grantId);
+		}
+	}
+
+	if (filteredIds.isEmpty()){
+		return false;
+	}
+
+	istd::CChangeNotifier changeNotifier(this);
+	return m_grantCollectionCompPtr->RemoveElements(filteredIds);
+}
+
+
 CrossOrgGrantInfo CCrossOrgGrantManagerComp::GetGrant(const QByteArray& grantId) const
 {
 	if (!m_grantCollectionCompPtr.IsValid()){

@@ -317,6 +317,15 @@ sdl::V1_0::imtauth::CRevokeCrossOrgGrantPayload CRemoteTenantControllerComp::OnR
 }
 
 
+sdl::V1_0::imtauth::CRemoveCrossOrgGrantsPayload CRemoteTenantControllerComp::OnRemoveCrossOrgGrants(
+			const sdl::V1_0::imtauth::CRemoveCrossOrgGrantsGqlRequest& /*removeCrossOrgGrantsRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CRemoveCrossOrgGrantsPayload>(gqlRequest, errorMessage);
+}
+
+
 sdl::V1_0::imtauth::CGetContractsPayload CRemoteTenantControllerComp::OnGetContracts(
 			const sdl::V1_0::imtauth::CGetContractsGqlRequest& /*getContractsRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
