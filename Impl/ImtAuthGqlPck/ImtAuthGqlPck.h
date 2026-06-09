@@ -136,8 +136,8 @@ typedef imtauthgql::CRelationshipCollectionDocumentServiceComp RelationshipColle
 typedef imtauthgql::CGroupCollectionDocumentServiceComp GroupCollectionDocumentService;
 typedef imtauthgql::CUserCollectionDocumentServiceComp UserCollectionDocumentService;
 typedef imtauthgql::CCrossOrgGrantCollectionDocumentServiceComp CrossOrgGrantCollectionDocumentService;
-typedef imtauthgql::CRelationshipDocumentValidatorComp RelationshipDocumentValidator;
-typedef imtauthgql::CCrossOrgGrantDocumentValidatorComp CrossOrgGrantDocumentValidator;
+typedef imtauth::CRelationshipDocumentValidatorComp RelationshipDocumentValidator;
+typedef imtauth::CCrossOrgGrantDocumentValidatorComp CrossOrgGrantDocumentValidator;
 
 
 } // namespace ImtAuthGqlPck

@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtauthgql/CRelationshipDocumentValidatorComp.h>
+#include <imtauth/CRelationshipDocumentValidatorComp.h>
 
 
 // ImtCore includes
 #include <imtauth/ITenantRelationshipInfo.h>
 
 
-namespace imtauthgql
+namespace imtauth
 {
 
 
@@ -40,4 +40,4 @@ bool CRelationshipDocumentValidatorComp::ValidateDocumentData(
 }
 
 
-} // namespace imtauthgql
+} // namespace imtauth
