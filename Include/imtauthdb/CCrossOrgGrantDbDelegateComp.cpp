@@ -218,7 +218,28 @@ bool CCrossOrgGrantDbDelegateComp::SetCollectionItemMetaInfoFromRecord(const QSq
 	if (record.contains("CreatedAt")){
 		metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME, record.value("CreatedAt").toDateTime());
 	}
+
+	if (record.contains("Name")){
+		metaInfo.SetMetaInfo(imtbase::ICollectionInfo::EIT_NAME, record.value("Name").toString());
+	}
+
+	if (record.contains("Description")){
+		metaInfo.SetMetaInfo(imtbase::ICollectionInfo::EIT_DESCRIPTION, record.value("Description").toString());
+	}
+
 	return true;
+}
+
+
+QString CCrossOrgGrantDbDelegateComp::GetBaseSelectionQuery() const
+{
+	return QString(
+				"SELECT * FROM ("
+				"SELECT \"%1\".*, \"Tenants\".\"Name\" AS \"Name\" "
+				"FROM \"%1\" "
+				"LEFT JOIN \"Tenants\" ON \"Tenants\".\"Id\" = \"%1\".\"TargetTenantId\"::uuid"
+				") AS _inner"
+				).arg(qPrintable(*m_tableNameAttrPtr));
 }
 
 

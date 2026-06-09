@@ -28,10 +28,9 @@ TenantSimpleCollectionPage {
 	objectTypeId: relationshipsPage.apiClient ? relationshipsPage.apiClient.relationshipObjectTypeId : ""
 	dataProvider: relationshipsPage.apiClient ? relationshipsPage.apiClient.tenantRelationshipsListDataProvider : null
 
-	function removeItem(id) {
+	function removeItems(ids) {
 		if (relationshipsPage.apiClient && relationshipsPage.tenantData) {
-			relationshipsPage.apiClient.removeTenantRelationship(
-				relationshipsPage.tenantData.m_id, id)
+			relationshipsPage.apiClient.removeTenantRelationship(relationshipsPage.tenantData.m_id, ids[0])
 		}
 	}
 

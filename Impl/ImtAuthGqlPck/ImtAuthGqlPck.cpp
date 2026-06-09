@@ -311,16 +311,6 @@ I_EXPORT_COMPONENT(
 			"Cross Org Grant collection document service",
 			"Cross Org Grant Collection Document Service");
 
-I_EXPORT_COMPONENT(
-			RelationshipDocumentValidator,
-			"Relationship document validator",
-			"Relationship Document Validator");
-
-I_EXPORT_COMPONENT(
-			CrossOrgGrantDocumentValidator,
-			"Cross-org grant document validator",
-			"Cross Org Grant Document Validator");
-
 
 } // namespace ImtAuthGqlPck
 

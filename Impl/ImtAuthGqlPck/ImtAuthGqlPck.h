@@ -66,8 +66,6 @@
 #include <imtauthgql/CGroupCollectionDocumentServiceComp.h>
 #include <imtauthgql/CUserCollectionDocumentServiceComp.h>
 #include <imtauthgql/CCrossOrgGrantCollectionDocumentServiceComp.h>
-#include <imtauthgql/CCrossOrgGrantDocumentValidatorComp.h>
-#include <imtauthgql/CRelationshipDocumentValidatorComp.h>
 
 
 /**
@@ -136,8 +134,6 @@ typedef imtauthgql::CRelationshipCollectionDocumentServiceComp RelationshipColle
 typedef imtauthgql::CGroupCollectionDocumentServiceComp GroupCollectionDocumentService;
 typedef imtauthgql::CUserCollectionDocumentServiceComp UserCollectionDocumentService;
 typedef imtauthgql::CCrossOrgGrantCollectionDocumentServiceComp CrossOrgGrantCollectionDocumentService;
-typedef imtauth::CRelationshipDocumentValidatorComp RelationshipDocumentValidator;
-typedef imtauth::CCrossOrgGrantDocumentValidatorComp CrossOrgGrantDocumentValidator;
 
 
 } // namespace ImtAuthGqlPck

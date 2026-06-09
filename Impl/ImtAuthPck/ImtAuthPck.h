@@ -73,6 +73,8 @@
 #include <imtauth/COrderRequestHandlerComp.h>
 #include <imtauth/CTenantDocumentNameProviderComp.h>
 #include <imtauth/CTenantRelationshipDocumentNameProviderComp.h>
+#include <imtauth/CRelationshipDocumentValidatorComp.h>
+#include <imtauth/CCrossOrgGrantDocumentValidatorComp.h>
 
 
 namespace ImtAuthPck
