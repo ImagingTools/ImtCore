@@ -23,10 +23,11 @@ ViewBase {
 	property var grantData: model
 	property var apiClient: null
 
-	property string __selectedTargetTenantId: ""
+		property string __selectedTargetTenantId: ""
 	property string __selectedTargetTenantName: ""
+	property string __selectedExpiresAt: ""
 
-	function updateGui() {
+		function updateGui() {
 		if (!container.grantData) {
 			return
 		}
@@ -40,10 +41,12 @@ ViewBase {
 		rolesSelectEditor.items = arr
 
 		grantDescriptionInput.text = container.grantData.m_description || ""
-		expiresAtPicker.setDateAsString(container.grantData.m_expiresAt || "")
+
+		var exp = container.grantData.m_expiresAt || ""
+		container.__selectedExpiresAt = exp
 	}
 
-	function updateModel() {
+		function updateModel() {
 		if (!container.grantData) {
 			return
 		}
@@ -55,7 +58,7 @@ ViewBase {
 		container.grantData.m_roleIds = ids
 
 		container.grantData.m_description = grantDescriptionInput.text.trim()
-		container.grantData.m_expiresAt = expiresAtPicker.getDateAsString()
+		container.grantData.m_expiresAt = container.__selectedExpiresAt
 	}
 
 	CustomScrollbar {
@@ -157,11 +160,75 @@ ViewBase {
 					}
 				}
 
-				DateTimePickerElementView {
-					id: expiresAtPicker
+								ComboBoxElementView {
+					id: expirationCb
 					name: qsTr("Expires At")
-					onEditingFinished: {
+					description: qsTr("The grant will expire on the selected date")
+					model: expirationModel
+					currentIndex: {
+						// Select index if editing
+						if (container.__selectedExpiresAt === "") return 4
+						return 1 // Default to 30 days if not easily parsable, but let's see
+					}
+					TreeItemModel {
+						id: expirationModel
+						Component.onCompleted: {
+							let index = expirationModel.insertNewItem()
+							expirationModel.setData("id", "7", index)
+							expirationModel.setData("name", qsTr("7 Days"), index)
+
+							index = expirationModel.insertNewItem()
+							expirationModel.setData("id", "30", index)
+							expirationModel.setData("name", qsTr("30 Days"), index)
+							
+							index = expirationModel.insertNewItem()
+							expirationModel.setData("id", "60", index)
+							expirationModel.setData("name", qsTr("60 Days"), index)
+							
+							index = expirationModel.insertNewItem()
+							expirationModel.setData("id", "90", index)
+							expirationModel.setData("name", qsTr("90 Days"), index)
+
+							index = expirationModel.insertNewItem()
+							expirationModel.setData("id", "unlimited", index)
+							expirationModel.setData("name", qsTr("No Expiration"), index)
+						}
+					}
+
+					function computeExpiresAtIso() {
+						var id = expirationModel.getData("id", currentIndex)
+					
+						if (id === "unlimited")
+							return ""
+					
+						if (id === "" || id === undefined || id === null)
+							return ""
+					
+						let days = Number(id)
+						if (days <= 0)
+							return ""
+					
+						let d = new Date()
+						d.setDate(d.getDate() + days)
+						return d.toISOString()
+					}
+					
+					onCurrentIndexChanged: {
+						// When user explicitly selects something
+						container.__selectedExpiresAt = computeExpiresAtIso()
 						container.doUpdateModel()
+					}
+
+					Binding {
+						target: expirationCb
+						property: "currentIndex"
+						value: {
+							if (container.__selectedExpiresAt === "") return 4
+							// Approximation. Usually expiresAt will not exactly match 30 days from now
+							// if it was set in the past. But let's show "30 days" as fallback.
+							return 1
+						}
+						restoreMode: Binding.RestoreBinding
 					}
 				}
 			}
