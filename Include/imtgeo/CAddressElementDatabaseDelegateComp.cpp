@@ -9,6 +9,7 @@
 
 // ImtCore includes
 #include <imtdb/imtdb.h>
+#include <imtcol/IDocumentCollectionFilter.h>
 
 
 namespace imtgeo
@@ -22,6 +23,22 @@ namespace imtgeo
 QByteArray CAddressElementDatabaseDelegateComp::GetObjectTypeId(const QByteArray& /*objectId*/) const
 {
 	return QByteArrayLiteral("Address");
+}
+
+
+QByteArray CAddressElementDatabaseDelegateComp::GetSelectionQuery(
+			const QByteArray& objectId,
+			int offset,
+			int count,
+			const iprm::IParamsSet* paramsPtr) const
+{
+	if (!objectId.isEmpty()){
+		const QString sql = GetBaseSelectionQuery() + QStringLiteral(R"sql(WHERE ae."State" = 'Active' AND ae."%1" = '%2')sql").arg(*m_objectIdColumnAttrPtr, objectId);
+
+		return sql.toUtf8();
+	}
+
+	return BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
 }
 
 
@@ -106,6 +123,12 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressElementDatabaseDelegateCo
 			const istd::IChangeable* valuePtr,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
+	if (!m_tableNameAttrPtr.IsValid()){
+		Q_ASSERT_X(false, __func__, "Invalid component configuration: Table name is not set");
+
+		return {};
+	}
+
 	auto adrInfoPtr = dynamic_cast<const IAddressElementInfo*>(valuePtr);
 	if (adrInfoPtr == nullptr){
 		return NewObjectQuery();
@@ -128,8 +151,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressElementDatabaseDelegateCo
 
 	NewObjectQuery retVal;
 	retVal.query = QStringLiteral(R"(
-						INSERT INTO "AddressElements" ("Id", "ParentIds", "Type", "Name", "Description", "Latitude", "Longitude")
-						VALUES ('%1', '%2', '%3', '%4', '%5', '%6', '%7');)")
+						INSERT INTO "%9" ("Id", "ParentIds", "Type", "Name", "Description", "Latitude", "Longitude", "LastModified")
+						VALUES ('%1', '%2', '%3', %4, %5, %6, %7, '%8');)")
 		.arg(
 				/*1*/ proposedObjectId,
 				/*2*/ parentIds,
@@ -137,7 +160,9 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressElementDatabaseDelegateCo
 				/*4*/ imtdb::SqlValue(name),
 				/*5*/ imtdb::SqlValue(description),
 				/*6*/ imtdb::SqlValue(lat),
-				/*7*/ imtdb::SqlValue(lon)
+				/*7*/ imtdb::SqlValue(lon),
+				/*8*/ imtdb::UtcNow(),
+				/*9*/ *m_tableNameAttrPtr
 			)
 		.toUtf8();
 
@@ -147,35 +172,29 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressElementDatabaseDelegateCo
 }
 
 
-QByteArray CAddressElementDatabaseDelegateComp::GetSelectionQuery(
-	const QByteArray& objectId,
-	int offset,
-	int count,
-	const iprm::IParamsSet* paramsPtr) const
-{
-	if (!objectId.isEmpty()){
-		const QString sql = GetBaseSelectionQuery() + QStringLiteral(R"sql(WHERE ae."%1" = '%2')sql").arg(*m_objectIdColumnAttrPtr, objectId);
-
-		return sql.toUtf8();
-	}
-
-	return BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
-}
-
-
 QByteArray CAddressElementDatabaseDelegateComp::CreateDeleteObjectsQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const imtbase::ICollectionInfo::Ids& objectIds,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
+	if (!m_tableNameAttrPtr.IsValid()){
+		Q_ASSERT_X(false, __func__, "Invalid component configuration: Table name is not set");
+
+		return QByteArray();
+	}
+
 	if (objectIds.isEmpty()){
 		return QByteArray();
 	}
 
 	const QString quotedIds = objectIds.join(QByteArrayLiteral("','")).prepend('\'').append('\'');
 
-	QString query = QStringLiteral(R"(DELETE FROM "AddressElements" WHERE "Id" IN (%1);)")
-						.arg(quotedIds);
+	QString query = QStringLiteral(R"(
+								UPDATE "%1"
+								SET "State" = 'Disabled'
+									, "LastModified" = '%2'
+								WHERE "State" = 'Active' AND "Id" IN (%3);)")
+						.arg(*m_tableNameAttrPtr, imtdb::UtcNow(), quotedIds);
 
 	return query.toUtf8();
 }
@@ -199,6 +218,12 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IOperationContext* /*operationContextPtr*/,
 			bool /*useExternDelegate*/) const
 {
+	if (!m_tableNameAttrPtr.IsValid()){
+		Q_ASSERT_X(false, __func__, "Invalid component configuration: Table name is not set");
+
+		return QByteArray();
+	}
+
 	auto adrInfoPtr = dynamic_cast<const IAddressElementInfo*>(&object);
 	if (adrInfoPtr == nullptr || objectId.isEmpty()){
 		return QByteArray();
@@ -231,16 +256,18 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateUpdateObjectQuery(
 	const double lon		= adrInfoPtr->GetLongitude();
 
 	QByteArray retVal = QStringLiteral(R"(
-						UPDATE "AddressElements"
-						SET "Id" = '%1',
-							"ParentIds" = '%2',
-							"Type" = '%3',
-							"Name" = '%4',
-							"FullAddress" = '%5',
-							"Description" = '%6',
-							"Langitude" = '%7',
-							"Latitude" = '%8'
-						WHERE "Id" = '%9';)")
+						UPDATE "%11"
+						SET "Id" = '%1'
+							, "ParentIds" = '%2'
+							, "Type" = '%3'
+							, "Name" = %4
+							, "FullAddress" = %5
+							, "Description" = %6
+							, "Langitude" = %7
+							, "Latitude" = %8
+							, "LastModified" = '%10'
+						WHERE "Id" = '%10'
+							AND "State" = 'Active';)")
 		.arg(
 				/*1*/ adrId,
 				/*2*/ parents,
@@ -250,7 +277,9 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateUpdateObjectQuery(
 				/*6*/ imtdb::SqlValue(description),
 				/*7*/ imtdb::SqlValue(lat),
 				/*8*/ imtdb::SqlValue(lon),
-				/*9*/ objectId
+				/*9*/ imtdb::UtcNow(),
+				/*10*/ objectId,
+				/*11*/ *m_tableNameAttrPtr
 			)
 		.toUtf8();
 
@@ -290,6 +319,12 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateDescriptionObjectQuery(
 
 QString CAddressElementDatabaseDelegateComp::GetBaseSelectionQuery() const
 {
+	if (!m_tableNameAttrPtr.IsValid()){
+		Q_ASSERT_X(false, __func__, "Invalid component configuration: Table name is not set");
+
+		return QString();
+	}
+
 	return QStringLiteral(R"sql(SELECT *, (SELECT get_full_address(ae."ParentIds", ae."Name", ae."Type")) AS "FullAddress" FROM "%1" AS ae )sql")
 				.arg(*m_tableNameAttrPtr);
 }
@@ -299,19 +334,46 @@ QString CAddressElementDatabaseDelegateComp::CreateAdditionalFiltersQuery(const 
 {
 	QString additionalFilterQuery;
 
+	QString documentFilterQuery;
+	iprm::TParamsPtr<imtcol::IDocumentCollectionFilter> documentFilterParamPtr(&filterParams, QByteArrayLiteral("State"));
+	if (!documentFilterParamPtr.IsValid()){
+		documentFilterQuery = QStringLiteral(R"("State" = 'Active')");
+	}
+	else{
+		// Document States
+		QStringList stateConditions;
+		imtcol::IDocumentCollectionFilter::DocumentStates states = documentFilterParamPtr->GetDocumentStates();
+		if (states.contains(imtcol::IDocumentCollectionFilter::DS_ACTIVE)){
+			stateConditions << QStringLiteral(R"("State" = 'Active')");
+		}
+
+		if (states.contains(imtcol::IDocumentCollectionFilter::DS_INACTIVE)){
+			stateConditions << QStringLiteral(R"("State" = 'InActive')");
+		}
+
+		if (states.contains(imtcol::IDocumentCollectionFilter::DS_DISABLED)){
+			stateConditions << QStringLiteral(R"("State" = 'Disabled')");
+		}
+
+		if (!stateConditions.isEmpty()){
+			documentFilterQuery = '(' + stateConditions.join(u" OR ") + ')';
+		}
+	}
+
 	QString parentIdFilterQuery;
 	iprm::TParamsPtr<iprm::ITextParam> parentIdFilterParamPtr(&filterParams, QByteArrayLiteral("ParentId"), false);
 	if (parentIdFilterParamPtr.IsValid()){
 		const QString parentId = imtdb::SqlEncode(parentIdFilterParamPtr->GetText());
 		if(parentId.isEmpty()){
-			parentIdFilterQuery = QStringLiteral(R"(jsonb_array_length("ParentIds") = 0)");
+			parentIdFilterQuery = QStringLiteral(R"(AND jsonb_array_length("ParentIds") = 0)");
 		}
 		else{
-			parentIdFilterQuery = QStringLiteral(R"("ParentIds"->>(jsonb_array_length("ParentIds") - 1) = '%1')")
+			parentIdFilterQuery = QStringLiteral(R"(AND "ParentIds"->>(jsonb_array_length("ParentIds") - 1) = '%1')")
 										.arg(parentId);
 		}
 	}
 
+	additionalFilterQuery += documentFilterQuery;
 	additionalFilterQuery += parentIdFilterQuery;
 
 	return additionalFilterQuery;
