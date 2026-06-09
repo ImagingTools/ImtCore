@@ -132,9 +132,13 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CCrossOrgGrantCollectionDocumentSer
 	if (grantRepresentation.id){
 		info.grantId = *grantRepresentation.id;
 	}
-	if (grantRepresentation.sourceTenantId){
+	// The source tenant is the tenant currently acting (owner of the grant).
+	// The client representation does not provide it, so prefer the request
+	// context and never persist an empty source tenant id.
+	if (grantRepresentation.sourceTenantId && !grantRepresentation.sourceTenantId->isEmpty()){
 		info.sourceTenantId = *grantRepresentation.sourceTenantId;
-	} else if (info.sourceTenantId.isEmpty()){
+	}
+	if (info.sourceTenantId.isEmpty()){
 		info.sourceTenantId = contextTenantId;
 	}
 	if (grantRepresentation.targetTenantId){

@@ -84,10 +84,6 @@ QtObject {
 	signal userUpdated(string userId)
 	signal userDataReceived(var data)
 
-	signal crossOrgGrantCreated(string grantId)
-	signal crossOrgGrantRevoked(string grantId)
-	signal crossOrgGrantsReceived(var grants)
-
 	signal contractCreated(string contractId)
 	signal contractStatusUpdated(string contractId)
 	signal contractTerminated(string contractId)
@@ -511,33 +507,15 @@ QtObject {
 	}
 
 	// =========================================================================
-	// Cross-org grants (Tenants.sdl: CreateCrossOrgGrant / RevokeCrossOrgGrant /
-	// GetCrossOrgGrants)
+	// Cross-org grants
+	//
+	// Creation and editing go through the document service
+	// (crossOrgGrantDocumentManager); the list is provided by
+	// crossOrgGrantsListDataProvider. Only revoke is still handled here via the
+	// RevokeCrossOrgGrant mutation (Tenants.sdl).
 	// =========================================================================
 
-	property ListModel crossOrgGrantsModel: ListModel {}
-
-	property CreateCrossOrgGrantInput __createCrossOrgGrantInput: CreateCrossOrgGrantInput {}
-	property GqlSdlRequestSender __createCrossOrgGrantSender: GqlSdlRequestSender {
-		requestType: 1
-		gqlCommandId: ImtauthTenantsSdlCommandIds.s_createCrossOrgGrant
-
-		sdlObjectComp: Component {
-			CreateCrossOrgGrantPayload {
-				onFinished: {
-					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
-						root.requestFailed(m_errorMessage)
-					} else {
-						root.crossOrgGrantCreated(m_grantId || "")
-					}
-				}
-			}
-		}
-	}
-
 	property RevokeCrossOrgGrantInput __revokeCrossOrgGrantInput: RevokeCrossOrgGrantInput {}
-	property string __pendingRevokeGrantId: ""
 	property GqlSdlRequestSender __revokeCrossOrgGrantSender: GqlSdlRequestSender {
 		requestType: 1
 		gqlCommandId: ImtauthTenantsSdlCommandIds.s_revokeCrossOrgGrant
@@ -549,70 +527,14 @@ QtObject {
 						ModalDialogManager.showInfoDialog(m_errorMessage)
 						root.requestFailed(m_errorMessage)
 					} else {
-						root.crossOrgGrantRevoked(root.__pendingRevokeGrantId)
+						root.crossOrgGrantsRemoved()
 					}
 				}
 			}
 		}
-	}
-
-	property GetCrossOrgGrantsInput __getCrossOrgGrantsInput: GetCrossOrgGrantsInput {}
-	property GqlSdlRequestSender __getCrossOrgGrantsSender: GqlSdlRequestSender {
-		gqlCommandId: ImtauthTenantsSdlCommandIds.s_getCrossOrgGrants
-
-		sdlObjectComp: Component {
-			GetCrossOrgGrantsPayload {
-				onFinished: {
-					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
-						root.requestFailed(m_errorMessage)
-					} else {
-						root.__populateCrossOrgGrantsModel(m_grants)
-					}
-				}
-			}
-		}
-	}
-
-	function __populateCrossOrgGrantsModel(grants) {
-		root.crossOrgGrantsModel.clear()
-		if (grants) {
-			for (var i = 0; i < grants.count; ++i) {
-				var grant = grants.get(i).item
-				if (!grant)
-					continue
-				root.crossOrgGrantsModel.append({
-					"id": grant.m_id || "",
-					"grantId": grant.m_id || "",
-					"sourceTenantId": grant.m_sourceTenantId || "",
-					"targetTenantId": grant.m_targetTenantId || "",
-					"roleIds": grant.m_roleIds || "",
-					"description": grant.m_description || "",
-					"createdAt": grant.m_createdAt || "",
-					"expiresAt": grant.m_expiresAt || "",
-					"isActive": grant.m_isActive === undefined ? true : grant.m_isActive
-				})
-			}
-		}
-		root.crossOrgGrantsReceived(grants || [])
-	}
-
-	function fetchCrossOrgGrants(tenantId) {
-		root.__getCrossOrgGrantsInput.m_tenantId = tenantId || root.tenantId || ""
-		root.__getCrossOrgGrantsSender.send(root.__getCrossOrgGrantsInput)
-	}
-
-	function createCrossOrgGrant(sourceTenantId, targetTenantId, roleIds, description, expiresAt) {
-		root.__createCrossOrgGrantInput.m_sourceTenantId = sourceTenantId || ""
-		root.__createCrossOrgGrantInput.m_targetTenantId = targetTenantId || ""
-		root.__createCrossOrgGrantInput.m_roleIds = roleIds || ""
-		root.__createCrossOrgGrantInput.m_description = description || ""
-		root.__createCrossOrgGrantInput.m_expiresAt = expiresAt || ""
-		root.__createCrossOrgGrantSender.send(root.__createCrossOrgGrantInput)
 	}
 
 	function revokeCrossOrgGrant(grantId) {
-		root.__pendingRevokeGrantId = grantId || ""
 		root.__revokeCrossOrgGrantInput.m_grantId = grantId || ""
 		root.__revokeCrossOrgGrantSender.send(root.__revokeCrossOrgGrantInput)
 	}
