@@ -23,6 +23,8 @@ QByteArray CRoleDatabaseDelegateComp::CreateDeleteObjectsQuery(
 			const imtbase::ICollectionInfo::Ids& objectIds,
 			const imtbase::IOperationContext* operationContextPtr) const
 {
+	const QSet<QByteArray> idsToDelete(objectIds.begin(), objectIds.end());
+
 	for (const imtbase::ICollectionInfo::Id& objectId : objectIds){
 		imtauth::CRole* roleInfoPtr = nullptr;
 		imtbase::IObjectCollection::DataPtr dataPtr;
@@ -34,12 +36,56 @@ QByteArray CRoleDatabaseDelegateComp::CreateDeleteObjectsQuery(
 			return QByteArray();
 		}
 		
+		// A default/guest role can only be removed when it is a duplicate, i.e. when another
+		// role with the same product and the same flag survives the deletion. This still
+		// guarantees that at least one default role and one guest role per product is kept,
+		// while allowing clean-up of duplicated entries (e.g. created on first LDAP login).
 		if (roleInfoPtr->IsDefault() || roleInfoPtr->IsGuest()){
-			return QByteArray();
+			if (!HasOtherSpecialRole(collection, *roleInfoPtr, idsToDelete)){
+				return QByteArray();
+			}
 		}
 	}
 
 	return BaseClass::CreateDeleteObjectsQuery(collection, objectIds, operationContextPtr);
+}
+
+
+bool CRoleDatabaseDelegateComp::HasOtherSpecialRole(
+			const imtbase::IObjectCollection& collection,
+			const imtauth::IRole& roleToDelete,
+			const QSet<QByteArray>& idsToDelete) const
+{
+	const QByteArray productId = roleToDelete.GetProductId();
+	const bool matchDefault = roleToDelete.IsDefault();
+	const bool matchGuest = roleToDelete.IsGuest();
+
+	const imtbase::ICollectionInfo::Ids allIds = collection.GetElementIds();
+	for (const imtbase::ICollectionInfo::Id& candidateId : allIds){
+		if (idsToDelete.contains(candidateId)){
+			continue;
+		}
+
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (!collection.GetObjectData(candidateId, dataPtr)){
+			continue;
+		}
+
+		const imtauth::IRole* candidatePtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
+		if (candidatePtr == nullptr){
+			continue;
+		}
+
+		if (candidatePtr->GetProductId() != productId){
+			continue;
+		}
+
+		if ((matchDefault && candidatePtr->IsDefault()) || (matchGuest && candidatePtr->IsGuest())){
+			return true;
+		}
+	}
+
+	return false;
 }
 
 
