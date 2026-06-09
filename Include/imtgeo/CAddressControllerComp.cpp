@@ -3,150 +3,86 @@
 
 // Qt includes
 #include <QJsonArray>
-#include <QJsonValue>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 // ImtCore includes
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 #include <imtgeo/CAddressTypeInfo.h>
 #include <imtgeo/CAddressElementInfo.h>
-#include <imtbase/CCollectionFilter.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 
 
 namespace imtgeo
 {
 
 
-QJsonObject CAddressControllerComp::GetObject(
-			const imtgql::CGqlRequest& gqlRequest,
+bool CAddressControllerComp::CreateRepresentationFromObject(
+			const istd::IChangeable& data,
+			const QByteArray& /*objectTypeId*/,
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			QJsonObject& dataObj,
 			QString& errorMessage) const
 {
-	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QObject::tr("Internal error").toUtf8();
+	const auto* addressInfoPtr = dynamic_cast<const IAddressElementInfo*>(&data);
+	const auto* addressPosition = dynamic_cast<const CPositionIdentifiable*>(&data);
+	if (!addressInfoPtr || !addressPosition){
+		errorMessage = QObject::tr("Unable to get an address info");
 
-		return QJsonObject();
+		return false;
 	}
 
-	QJsonObject rootObj;
-	QJsonObject dataObj;
+	QByteArray parentId;
+	const QByteArrayList parents = addressInfoPtr->GetParentIds();
+	if (!parents.isEmpty()){
+		parentId = parents.last();
+	}
 
-	QByteArray addressId = GetObjectIdFromInputParams(gqlRequest.GetParams());
-
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (m_objectCollectionCompPtr->GetObjectData(addressId, dataPtr)){
-		const IAddressElementInfo* addressInfoPtr = dynamic_cast<const IAddressElementInfo*>(dataPtr.GetPtr());
-		const CPositionIdentifiable* addressPosition = dynamic_cast<const CPositionIdentifiable*>(dataPtr.GetPtr());
-
-		if (addressInfoPtr == nullptr){
-			errorMessage = QT_TR_NOOP("Unable to get an address info");
-			return QJsonObject();
-		}
-
-		QByteArray id = addressPosition->GetObjectUuid();
-		QByteArray parentId;
-		QList<QByteArray> parents = addressInfoPtr->GetParentIds();
-		if (!parents.isEmpty()){
-			parentId = *(parents.end());
-		}
-		QByteArray typeId = addressInfoPtr->GetAddressTypeId();
-		QString typeName;
-		QString typeShortName;
-		imtbase::IObjectCollection::DataPtr dataTypePtr;
-		if (m_addressTypeCollectionPtr->GetObjectData(typeId, dataTypePtr)){
-			const IAddressTypeInfo* addressTypeInfoPtr =
-				dynamic_cast<const IAddressTypeInfo*>(dataTypePtr.GetPtr());
+	QString typeName;
+	QString typeShortName;
+	imtbase::IObjectCollection::DataPtr dataTypePtr;
+	if (m_addressTypeCollectionPtr.IsValid() && m_addressTypeCollectionPtr->GetObjectData(addressInfoPtr->GetAddressTypeId(), dataTypePtr)){
+		if (const auto* addressTypeInfoPtr = dataTypePtr.GetPtr<const IAddressTypeInfo>()){
 			typeName = addressTypeInfoPtr->GetName();
 			typeShortName = addressTypeInfoPtr->GetShortName();
 		}
-		QString name = addressInfoPtr->GetName();
-		QString address = addressInfoPtr->GetAddress();
-		if (address == QString(""))
-		{
-			for (const QByteArray& elemId: parents)
-			{
-				imtbase::IObjectCollection::DataPtr dataElementPtr;
-				if (m_objectCollectionCompPtr->GetObjectData(elemId, dataElementPtr)){
-					const IAddressElementInfo* parentAddressInfoPtr =
-						dynamic_cast<const IAddressElementInfo*>(dataElementPtr.GetPtr());
-					imtbase::IObjectCollection::DataPtr parentDataTypePtr;
-					if (m_addressTypeCollectionPtr->GetObjectData(parentAddressInfoPtr->GetAddressTypeId(), parentDataTypePtr)){
-						const IAddressTypeInfo* typeInfoPtr =
-							dynamic_cast<const IAddressTypeInfo*>(parentDataTypePtr.GetPtr());
-						QString shortName = typeInfoPtr->GetShortName();
-						QString addressName = parentAddressInfoPtr->GetName();
-						address += shortName + " " + addressName + ",";
-					}
-				}
+	}
+
+	QString address = addressInfoPtr->GetAddress();
+	if (address.isEmpty() && m_addressTypeCollectionPtr.IsValid()){
+		for (const QByteArray& elemId : parents){
+			imtbase::IObjectCollection::DataPtr dataElementPtr;
+			if (!m_objectCollectionCompPtr->GetObjectData(elemId, dataElementPtr)){
+				continue;
 			}
 
-			address += typeShortName + " " + name;
+			const auto* parentAddressInfoPtr = dataElementPtr.GetPtr<const IAddressElementInfo>();
+			if (!parentAddressInfoPtr){
+				continue;
+			}
+
+			imtbase::IObjectCollection::DataPtr parentDataTypePtr;
+			if (!m_addressTypeCollectionPtr->GetObjectData(parentAddressInfoPtr->GetAddressTypeId(), parentDataTypePtr)){
+				continue;
+			}
+
+			if (const auto* typeInfoPtr = parentDataTypePtr.GetPtr<const IAddressTypeInfo>()){
+				address += typeInfoPtr->GetShortName() + QStringLiteral(" ") + parentAddressInfoPtr->GetName() + QStringLiteral(",");
+			}
 		}
-
-		QString description = addressInfoPtr->GetDescription();
-		double lat = addressInfoPtr->GetLatitude();
-		double lon = addressInfoPtr->GetLongitude();
-
-		dataObj.insert(QStringLiteral("AddressId"), QJsonValue::fromVariant(QVariant(id)));
-		dataObj.insert(QStringLiteral("ParentId"), QJsonValue::fromVariant(QVariant(parentId)));
-		dataObj.insert(QStringLiteral("TypeId"), QJsonValue::fromVariant(QVariant(typeId)));
-		dataObj.insert(QStringLiteral("TypeName"), QJsonValue::fromVariant(typeName));
-		dataObj.insert(QStringLiteral("Name"), QJsonValue::fromVariant(name));
-		dataObj.insert(QStringLiteral("Address"), QJsonValue::fromVariant(address));
-		dataObj.insert(QStringLiteral("Description"), QJsonValue::fromVariant(description));
-		dataObj.insert(QStringLiteral("Latitude"), QJsonValue::fromVariant(lat));
-		dataObj.insert(QStringLiteral("Longitude"), QJsonValue::fromVariant(lon));
+		address += typeShortName + QStringLiteral(" ") + addressInfoPtr->GetName();
 	}
 
-	rootObj.insert(QStringLiteral("data"), dataObj);
+	dataObj.insert(QStringLiteral("AddressId"), QString::fromUtf8(addressPosition->GetObjectUuid()));
+	dataObj.insert(QStringLiteral("ParentId"), QString::fromUtf8(parentId));
+	dataObj.insert(QStringLiteral("TypeId"), QString::fromUtf8(addressInfoPtr->GetAddressTypeId()));
+	dataObj.insert(QStringLiteral("TypeName"), typeName);
+	dataObj.insert(QStringLiteral("Name"), addressInfoPtr->GetName());
+	dataObj.insert(QStringLiteral("Address"), address);
+	dataObj.insert(QStringLiteral("Description"), addressInfoPtr->GetDescription());
+	dataObj.insert(QStringLiteral("Latitude"), addressInfoPtr->GetLatitude());
+	dataObj.insert(QStringLiteral("Longitude"), addressInfoPtr->GetLongitude());
 
-	return rootObj;
-}
-
-
-QJsonObject CAddressControllerComp::InsertObject(
-			const imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
-{
-	QJsonObject rootObj;
-	QJsonObject dataObj;
-	QByteArray newObjectId;
-	QString name;
-	QString description;
-
-	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QObject::tr("Internal error").toUtf8();
-	}
-	else{
-		QByteArray objectId;
-
-		istd::IChangeableUniquePtr newObject = CreateObjectFromRequest(gqlRequest, objectId, errorMessage);
-		if (newObject.IsValid()){
-			newObjectId = m_objectCollectionCompPtr->InsertNewObject("", name, description, newObject.GetPtr(), objectId);
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			m_objectCollectionCompPtr->GetObjectData(newObjectId, dataPtr);
-			CAddressElementInfo addressElementInfo;
-			addressElementInfo.CopyFrom(*dataPtr);
-		}
-
-		if (!errorMessage.isEmpty() || newObjectId.isEmpty()){
-			errorMessage = QObject::tr("Can not insert object: %1").arg(qPrintable(objectId));
-		}
-	}
-
-	if (!errorMessage.isEmpty()){
-		QJsonObject errorsObj;
-		errorsObj.insert(QStringLiteral("message"), QJsonValue::fromVariant(errorMessage));
-		rootObj.insert(QStringLiteral("errors"), errorsObj);
-	}
-	else{
-		QJsonObject notificationObj;
-		notificationObj.insert(QStringLiteral("Id"), QJsonValue::fromVariant(QVariant(newObjectId)));
-		notificationObj.insert(QStringLiteral("Name"), QJsonValue::fromVariant(name));
-		dataObj.insert(QStringLiteral("addedNotification"), notificationObj);
-	}
-
-	rootObj.insert(QStringLiteral("data"), dataObj);
-
-	return rootObj;
+	return true;
 }
 
 
@@ -156,155 +92,99 @@ istd::IChangeableUniquePtr CAddressControllerComp::CreateObjectFromRequest(
 			QString& errorMessage) const
 {
 	if (!m_addressInfoFactCompPtr.IsValid()){
-		errorMessage = QObject::tr("Can not create Address: %1").arg(QString(objectId));
+		errorMessage = QObject::tr("Can not create Address: %1").arg(QString::fromUtf8(objectId));
+
 		return nullptr;
 	}
 
-	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject(QByteArrayLiteral("input"));
-	if (inputParamPtr == nullptr){
+	const auto* inputParamPtr = gqlRequest.GetParamObject(QByteArrayLiteral("input"));
+	if (!inputParamPtr){
 		errorMessage = QStringLiteral("Unable to create address object. Error: GraphQL input params is invalid.");
-		SendErrorMessage(0, errorMessage, __FILE__);
+		SendErrorMessage(0, errorMessage, __func__);
 
 		return nullptr;
 	}
 
 	objectId = GetObjectIdFromInputParams(*inputParamPtr);
-
 	if (objectId.isEmpty()){
 		objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 	}
 
-	QByteArray itemData = inputParamPtr->GetParamArgumentValue(QByteArrayLiteral("Item")).toByteArray();
-	if (!itemData.isEmpty()){
-		istd::TDelPtr<CAddressElementInfo> addressInfoPtr = new CAddressElementInfo();
-		if (addressInfoPtr == nullptr){
-			errorMessage = QT_TR_NOOP("Unable to get an address info!");
-			return nullptr;
-		}
+	QByteArray itemData = inputParamPtr->GetParamArgumentValue(QByteArrayLiteral("item")).toByteArray();
+	if (itemData.isEmpty()){
+		errorMessage = QObject::tr("Can not create address: %1").arg(QString::fromUtf8(objectId));
 
-		imtbase::CTreeItemModel itemModel;
-		itemModel.CreateFromJson(itemData);
-		addressInfoPtr->SetObjectUuid(objectId);
+		return nullptr;
+	}
 
-		QByteArray parentId = nullptr;
-		if (itemModel.ContainsKey("ParentId")){
-			parentId = itemModel.GetData("ParentId").toByteArray();
-			imtbase::IObjectCollection::DataPtr adrDataPtr;
-			if (m_objectCollectionCompPtr->GetObjectData(parentId, adrDataPtr)){
-				const IAddressElementInfo* adrInfoPtr = dynamic_cast<const IAddressElementInfo*>(adrDataPtr.GetPtr());
-				QList<QByteArray> parentIds = adrInfoPtr->GetParentIds();
-				parentIds.append((parentId));
+	istd::TDelPtr<CAddressElementInfo> addressInfoPtr = new CAddressElementInfo();
+	if (!addressInfoPtr.IsValid()){
+		errorMessage = QObject::tr("Unable to get an address info!");
+
+		return nullptr;
+	}
+
+	QJsonDocument jsonDoc = QJsonDocument::fromJson(itemData);
+	if (!jsonDoc.isObject()){
+		errorMessage = QObject::tr("Invalid JSON input!");
+
+		return nullptr;
+	}
+
+	QJsonObject itemObj = jsonDoc.object();
+	addressInfoPtr->SetObjectUuid(objectId);
+
+	if (itemObj.contains(QStringLiteral("parentId"))){
+		QByteArray parentId = itemObj.value(QStringLiteral("parentId")).toString().toUtf8();
+
+		imtbase::IObjectCollection::DataPtr adrDataPtr;
+		if (m_objectCollectionCompPtr->GetObjectData(parentId, adrDataPtr)){
+			if (const auto* adrInfoPtr = adrDataPtr.GetPtr<const IAddressElementInfo>()){
+				QByteArrayList parentIds = adrInfoPtr->GetParentIds();
+				parentIds.append(parentId);
 				addressInfoPtr->SetParentIds(parentIds);
 			}
 		}
-
-		if (itemModel.ContainsKey("TypeId")){
-			QByteArray typeId = itemModel.GetData("TypeId").toByteArray();
-			addressInfoPtr->SetAddressTypeId(typeId);
-		}
-
-		if (itemModel.ContainsKey("Name")){
-			QString name = itemModel.GetData("Name").toString();
-			addressInfoPtr->SetName(name);
-		}
-
-		if (itemModel.ContainsKey("Description")){
-			QString description = itemModel.GetData("Description").toString();
-			addressInfoPtr->SetDescription(description);
-		}
-
-		if (itemModel.ContainsKey("Latitude")){
-			double lat = itemModel.GetData("Latitude").toDouble();
-			addressInfoPtr->SetLatitude(lat);
-		}
-
-		if (itemModel.ContainsKey("Longitude")){
-			double lon = itemModel.GetData("Longitude").toDouble();
-			addressInfoPtr->SetLongitude(lon);
-		}
-
-		return addressInfoPtr.PopPtr();
 	}
 
+	if (itemObj.contains(QStringLiteral("typeId"))){
+		addressInfoPtr->SetAddressTypeId(itemObj.value(QStringLiteral("typeId")).toString().toUtf8());
+	}
 
-	errorMessage = QObject::tr("Can not create address: %1").arg(QString(objectId));
+	if (itemObj.contains(QStringLiteral("name"))){
+		addressInfoPtr->SetName(itemObj.value(QStringLiteral("name")).toString());
+	}
 
-	return nullptr;
+	if (itemObj.contains(QStringLiteral("description"))){
+		addressInfoPtr->SetDescription(itemObj.value(QStringLiteral("description")).toString());
+	}
+
+	if (itemObj.contains(QStringLiteral("latitude"))){
+		addressInfoPtr->SetLatitude(itemObj.value(QStringLiteral("latitude")).toDouble());
+	}
+
+	if (itemObj.contains(QStringLiteral("longitude"))){
+		addressInfoPtr->SetLongitude(itemObj.value(QStringLiteral("longitude")).toDouble());
+	}
+
+	return addressInfoPtr.PopPtr();
 }
 
 
-
-QJsonObject CAddressControllerComp::UpdateObject(
+bool CAddressControllerComp::UpdateObjectFromRequest(
 			const imtgql::CGqlRequest& gqlRequest,
+			istd::IChangeable& object,
 			QString& errorMessage) const
 {
-	QJsonObject rootObj;
-	QJsonObject dataObj;
-
-	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject(QByteArrayLiteral("input"));
-	if (inputParamPtr == nullptr){
-		errorMessage = QStringLiteral("Unable to update address object. Error: GraphQL input params is invalid.");
-		SendErrorMessage(0, errorMessage, __FILE__);
-
-		return QJsonObject();
+	QByteArray dummyId;
+	auto tempObject = CreateObjectFromRequest(gqlRequest, dummyId, errorMessage);
+	if (!tempObject.IsValid()){
+		return false;
 	}
 
-	QByteArray oldObjectId = GetObjectIdFromInputParams(*inputParamPtr);
-	QByteArray newObjectId;
-	QString name;
-	QString description;
+	object.CopyFrom(*tempObject);
 
-	QString splitObjectId = oldObjectId;
-
-	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QObject::tr("Internal error").toUtf8();
-	}
-	else{
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_objectCollectionCompPtr->GetObjectData(oldObjectId, dataPtr)){
-			const IAddressElementInfo* addressInfoPtr = dynamic_cast<const IAddressElementInfo*>(dataPtr.GetPtr());
-			QString oldName = addressInfoPtr->GetName();
-
-			imtbase::CCollectionFilter filterOnSerialId;
-			QByteArrayList filteringOnSerialIdInfoIds;
-			filteringOnSerialIdInfoIds << "Indexes";
-			filterOnSerialId.SetFilteringInfoIds(filteringOnSerialIdInfoIds);
-
-			istd::IChangeableUniquePtr savedObject = CreateObjectFromRequest(gqlRequest, newObjectId, errorMessage);
-			if (savedObject.IsValid()){
-				if (!m_objectCollectionCompPtr->SetObjectData(oldObjectId, *savedObject)){
-					errorMessage = QObject::tr("Can not update object: %1").arg(splitObjectId);
-				}
-				else{
-					imtbase::IObjectCollection::DataPtr newDataPtr;
-					m_objectCollectionCompPtr->GetObjectData(oldObjectId, newDataPtr);
-					const IAddressElementInfo* newAddressInfoPtr = dynamic_cast<const IAddressElementInfo*>(newDataPtr.GetPtr());
-
-					QString newName = newAddressInfoPtr->GetName();
-				}
-			}
-			else{
-				if (errorMessage.isEmpty()){
-					errorMessage = QObject::tr("Can not create object for update: %1").arg(splitObjectId);
-				}
-			}
-		}
-	}
-
-	if (!errorMessage.isEmpty()){
-		QJsonObject errorsObj;
-		errorsObj.insert(QStringLiteral("message"), QJsonValue::fromVariant(errorMessage));
-		rootObj.insert(QStringLiteral("errors"), errorsObj);
-	}
-	else{
-		QJsonObject notificationObj;
-		notificationObj.insert(QStringLiteral("Id"), QJsonValue::fromVariant(QVariant(newObjectId)));
-		notificationObj.insert(QStringLiteral("Name"), QJsonValue::fromVariant(name));
-		dataObj.insert(QStringLiteral("updatedNotification"), notificationObj);
-	}
-	rootObj.insert(QStringLiteral("data"), dataObj);
-
-	return rootObj;
+	return true;
 }
 
 
