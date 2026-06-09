@@ -9,6 +9,9 @@
 #pragma comment(lib, "netapi32.lib")
 #endif
 
+// Qt includes
+#include <QtCore/QMutexLocker>
+
 // ACF includes
 #include <iprm/CTextParam.h>
 #include <iprm/CParamsSet.h>
@@ -47,6 +50,33 @@ QByteArray CLdapAuthorizationControllerComp::CheckExistsRole(const QByteArray& p
 	}
 
 	return QByteArray();
+}
+
+
+QByteArray CLdapAuthorizationControllerComp::EnsureRoleExists(
+	const QByteArray& productId,
+	RoleType roleType,
+	const QByteArray& roleId,
+	const QString& roleName,
+	const QString& description) const
+{
+	// Guard the lookup and the insert against the role collection as one critical
+	// section, so concurrent first-logins cannot both read a missing role and each
+	// write a duplicate for the same product.
+	QMutexLocker locker(&m_roleCollectionMutex);
+
+	QByteArray existingRoleId = CheckExistsRole(productId, roleType);
+	if (!existingRoleId.isEmpty()){
+		return existingRoleId;
+	}
+
+	return InsertNewIdentifiableRoleInfo(
+		roleId,
+		roleName,
+		description,
+		productId,
+		roleType == RT_DEFAULT,
+		roleType == RT_GUEST);
 }
 
 
@@ -221,15 +251,9 @@ sdl::V1_0::imtauth::CAuthorizationPayload CLdapAuthorizationControllerComp::OnAu
 
 			bool ok = CheckCredential(*m_systemIdAttrPtr, login, password);
 			if (ok){
-				QByteArray guestRoleId = CheckExistsRole(productId, RT_GUEST);
-				if (guestRoleId.isEmpty()){
-					InsertNewIdentifiableRoleInfo("Guest", "Guest", "Guest role", productId, false, true);
-				}
+				EnsureRoleExists(productId, RT_GUEST, "Guest", "Guest", "Guest role");
 
-				QByteArray defaultRoleId = CheckExistsRole(productId, RT_DEFAULT);
-				if (defaultRoleId.isEmpty()){
-					defaultRoleId = InsertNewIdentifiableRoleInfo("Default", "Default", "Default role", productId, true, false);
-				}
+				QByteArray defaultRoleId = EnsureRoleExists(productId, RT_DEFAULT, "Default", "Default", "Default role");
 
 				istd::TUniqueInterfacePtr<imtauth::CIdentifiableUserInfo> userInfoPtr;
 				if (userObjectId.isEmpty()){
