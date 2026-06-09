@@ -174,3 +174,65 @@ void CCrossOrgGrantTest::testHasAccess_WrongSourceDenied()
 	m_managerPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-admin"});
 	QVERIFY(!m_managerPtr->HasAccess("tenantC", "tenantB", "role-admin"));
 }
+
+
+void CCrossOrgGrantTest::testDelegatedSourceTenants_ListsEffectiveGrantsOnce()
+{
+	m_managerPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-read"});
+	m_managerPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-write"});
+	m_managerPtr->CreateGrant("tenantC", "tenantB", QByteArrayList{"role-read"});
+	// Grant targeting a different tenant must not appear.
+	m_managerPtr->CreateGrant("tenantD", "tenantE", QByteArrayList{"role-read"});
+
+	QByteArrayList sources = m_managerPtr->GetDelegatedSourceTenants("tenantB");
+	QCOMPARE(sources.size(), 2);
+	QVERIFY(sources.contains("tenantA"));
+	QVERIFY(sources.contains("tenantC"));
+	QVERIFY(!sources.contains("tenantD"));
+}
+
+
+void CCrossOrgGrantTest::testDelegatedSourceTenants_ExcludesRevokedAndExpired()
+{
+	QByteArray revoked = m_managerPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-read"});
+	m_managerPtr->CreateGrant("tenantC", "tenantB", QByteArrayList{"role-read"},
+				QString(), "2000-01-01T00:00:00.000Z");
+	m_managerPtr->RevokeGrant(revoked);
+
+	QByteArrayList sources = m_managerPtr->GetDelegatedSourceTenants("tenantB");
+	QVERIFY(sources.isEmpty());
+}
+
+
+void CCrossOrgGrantTest::testGrantedRoles_UnionAcrossGrants()
+{
+	m_managerPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-read", "role-write"});
+	m_managerPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-write", "role-support"});
+
+	QByteArrayList roles = m_managerPtr->GetGrantedRoles("tenantA", "tenantB");
+	QCOMPARE(roles.size(), 3);
+	QVERIFY(roles.contains("role-read"));
+	QVERIFY(roles.contains("role-write"));
+	QVERIFY(roles.contains("role-support"));
+}
+
+
+void CCrossOrgGrantTest::testGrantedRoles_WrongSourceEmpty()
+{
+	m_managerPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-read"});
+	QVERIFY(m_managerPtr->GetGrantedRoles("tenantC", "tenantB").isEmpty());
+}
+
+
+void CCrossOrgGrantTest::testIsDelegatedAccess_ReflectsEffectiveGrant()
+{
+	QVERIFY(!m_managerPtr->IsDelegatedAccess("tenantA", "tenantB"));
+
+	QByteArray grantId = m_managerPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-read"});
+	QVERIFY(m_managerPtr->IsDelegatedAccess("tenantA", "tenantB"));
+	// Wrong source remains delegated-access free.
+	QVERIFY(!m_managerPtr->IsDelegatedAccess("tenantC", "tenantB"));
+
+	m_managerPtr->RevokeGrant(grantId);
+	QVERIFY(!m_managerPtr->IsDelegatedAccess("tenantA", "tenantB"));
+}

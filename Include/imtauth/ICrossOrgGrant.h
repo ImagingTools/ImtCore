@@ -111,6 +111,41 @@ public:
 		const QByteArray& sourceTenantId,
 		const QByteArray& targetTenantId,
 		const QByteArray& roleId) const = 0;
+
+	/**
+		Get the distinct list of source tenants that the specified target
+		tenant can reach through at least one currently effective grant
+		(active and not expired).
+
+		These are the organizations a user of the target tenant should see
+		in the organization switcher in addition to its own memberships.
+		The returned tenants are accessible via delegated access only.
+	*/
+	virtual QByteArrayList GetDelegatedSourceTenants(const QByteArray& targetTenantId) const = 0;
+
+	/**
+		Get the union of all role IDs delegated from the source tenant to the
+		target tenant through currently effective grants (active and not
+		expired). Duplicate roles across multiple grants are returned once.
+
+		These are the roles that are active when the target tenant operates
+		inside the source tenant via delegated access, and define the scope of
+		what such a delegated session is allowed to do.
+	*/
+	virtual QByteArrayList GetGrantedRoles(
+		const QByteArray& sourceTenantId,
+		const QByteArray& targetTenantId) const = 0;
+
+	/**
+		Check whether the target tenant currently has delegated access to the
+		source tenant, i.e. at least one effective grant exists between them.
+
+		Used to distinguish delegated organizations from regular membership
+		organizations in the UI and to validate a delegated context switch.
+	*/
+	virtual bool IsDelegatedAccess(
+		const QByteArray& sourceTenantId,
+		const QByteArray& targetTenantId) const = 0;
 };
 
 

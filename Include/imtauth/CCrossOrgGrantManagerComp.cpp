@@ -196,4 +196,65 @@ bool CCrossOrgGrantManagerComp::HasAccess(
 }
 
 
+QByteArrayList CCrossOrgGrantManagerComp::GetDelegatedSourceTenants(const QByteArray& targetTenantId) const
+{
+	QByteArrayList result;
+
+	const CrossOrgGrants grants = GetGrantsByTargetTenant(targetTenantId);
+	for (const CrossOrgGrantInfo& info : grants){
+		if (!IsGrantEffective(info)){
+			continue;
+		}
+		if (!result.contains(info.sourceTenantId)){
+			result.append(info.sourceTenantId);
+		}
+	}
+
+	return result;
+}
+
+
+QByteArrayList CCrossOrgGrantManagerComp::GetGrantedRoles(
+		const QByteArray& sourceTenantId,
+		const QByteArray& targetTenantId) const
+{
+	QByteArrayList result;
+
+	const CrossOrgGrants grants = GetGrantsByTargetTenant(targetTenantId);
+	for (const CrossOrgGrantInfo& info : grants){
+		if (info.sourceTenantId != sourceTenantId){
+			continue;
+		}
+		if (!IsGrantEffective(info)){
+			continue;
+		}
+		for (const QByteArray& roleId : info.roleIds){
+			if (!result.contains(roleId)){
+				result.append(roleId);
+			}
+		}
+	}
+
+	return result;
+}
+
+
+bool CCrossOrgGrantManagerComp::IsDelegatedAccess(
+		const QByteArray& sourceTenantId,
+		const QByteArray& targetTenantId) const
+{
+	const CrossOrgGrants grants = GetGrantsByTargetTenant(targetTenantId);
+	for (const CrossOrgGrantInfo& info : grants){
+		if (info.sourceTenantId != sourceTenantId){
+			continue;
+		}
+		if (IsGrantEffective(info)){
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
 } // namespace imtauth

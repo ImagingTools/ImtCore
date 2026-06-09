@@ -45,6 +45,13 @@ public:
 				const QByteArray& sourceTenantId,
 				const QByteArray& targetTenantId,
 				const QByteArray& roleId) const override;
+	virtual QByteArrayList GetDelegatedSourceTenants(const QByteArray& targetTenantId) const override;
+	virtual QByteArrayList GetGrantedRoles(
+				const QByteArray& sourceTenantId,
+				const QByteArray& targetTenantId) const override;
+	virtual bool IsDelegatedAccess(
+				const QByteArray& sourceTenantId,
+				const QByteArray& targetTenantId) const override;
 
 private:
 	CrossOrgGrants CollectGrants(const std::function<bool(const CrossOrgGrantInfo&)>& predicate) const;

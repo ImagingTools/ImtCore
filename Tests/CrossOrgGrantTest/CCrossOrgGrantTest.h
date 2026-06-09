@@ -111,6 +111,56 @@ public:
 		return false;
 	}
 
+	QByteArrayList GetDelegatedSourceTenants(const QByteArray& targetTenantId) const
+	{
+		QByteArrayList result;
+		for (const CrossOrgGrantInfo& info : GetGrantsByTargetTenant(targetTenantId)){
+			if (!IsGrantEffective(info)){
+				continue;
+			}
+			if (!result.contains(info.sourceTenantId)){
+				result.append(info.sourceTenantId);
+			}
+		}
+		return result;
+	}
+
+	QByteArrayList GetGrantedRoles(
+				const QByteArray& sourceTenantId,
+				const QByteArray& targetTenantId) const
+	{
+		QByteArrayList result;
+		for (const CrossOrgGrantInfo& info : GetGrantsByTargetTenant(targetTenantId)){
+			if (info.sourceTenantId != sourceTenantId){
+				continue;
+			}
+			if (!IsGrantEffective(info)){
+				continue;
+			}
+			for (const QByteArray& roleId : info.roleIds){
+				if (!result.contains(roleId)){
+					result.append(roleId);
+				}
+			}
+		}
+		return result;
+	}
+
+	bool IsDelegatedAccess(
+				const QByteArray& sourceTenantId,
+				const QByteArray& targetTenantId) const
+	{
+		for (const CrossOrgGrantInfo& info : GetGrantsByTargetTenant(targetTenantId)){
+			if (info.sourceTenantId != sourceTenantId){
+				continue;
+			}
+			if (IsGrantEffective(info)){
+				return true;
+			}
+		}
+		return false;
+	}
+
 	QList<CrossOrgGrantInfo> m_grants;
 	int m_counter = 0;
 };
@@ -146,6 +196,13 @@ private Q_SLOTS:
 	void testHasAccess_ExpiredDenied();
 	void testHasAccess_ScopedGrant();
 	void testHasAccess_WrongSourceDenied();
+
+	// Delegated-access resolution
+	void testDelegatedSourceTenants_ListsEffectiveGrantsOnce();
+	void testDelegatedSourceTenants_ExcludesRevokedAndExpired();
+	void testGrantedRoles_UnionAcrossGrants();
+	void testGrantedRoles_WrongSourceEmpty();
+	void testIsDelegatedAccess_ReflectsEffectiveGrant();
 
 private:
 	imtauth::CMockCrossOrgGrantManager* m_managerPtr = nullptr;
