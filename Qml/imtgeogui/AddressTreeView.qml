@@ -25,9 +25,12 @@ Rectangle{
 	property string parentIdsParam: "parentIds"
 	property string hasChildrenParam: "hasChildren__"
 	property string idsToOpen: "";
-	property var searchFields: [idParam, fullAddressParam,
+	property string textColor: Style.firstColor
+	property var searchFields: [
+		idParam, fullAddressParam,
 		latitudeParam, longitudeParam,
-		typeIdParam, parentIdsParam];
+		typeIdParam, parentIdsParam
+	];
 	property alias searchComp: searchComp
 	property alias searchCompModel: searchComp.model
 	property alias treeViewModel: treeView.model
@@ -44,6 +47,10 @@ Rectangle{
 		property int insertIndex: -1;
 		property TreeItemModel newTreeModel: TreeItemModel{}
 
+		gqlCommandId: "AddressTreeList"
+		inputObjectComp: treeBody.addressTreeInputObjectComp
+		sdlObjectComp: treeBody.addressTreeSdlObjectComp
+
 		function reset(){
 			treeBody.addressTreeRequest.insertIndex = -1;
 			treeBody.addressTreeRequest.parentIds = "";
@@ -58,10 +65,6 @@ Rectangle{
 			send()
 			treeLoading.visible = true;
 		}
-
-		gqlCommandId: "AddressTreeList"
-		inputObjectComp: treeBody.addressTreeInputObjectComp
-		sdlObjectComp: treeBody.addressTreeSdlObjectComp
 	}
 
 	signal searchFinished(string itemId, int index)
@@ -228,7 +231,7 @@ Rectangle{
 		color: Style.color_menu;
 		selectionColor: "lightsteelblue"
 		hoverColor: Style.selectedColor;
-		textColor: Style.firstColor;
+		textColor: treeBody.textColor
 		selectionRadius: 4;
 		scrollIndicatorColor: Style.firstColor;
 		scrollBackgroundColor: "#ffffff";

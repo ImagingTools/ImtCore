@@ -23,8 +23,8 @@ bool CAddressControllerComp::CreateRepresentationFromObject(
 			QJsonObject& dataObj,
 			QString& errorMessage) const
 {
-	const auto* addressInfoPtr = dynamic_cast<const IAddressElementInfo*>(&data);
-	const auto* addressPosition = dynamic_cast<const CPositionIdentifiable*>(&data);
+	const IAddressElementInfo* addressInfoPtr = dynamic_cast<const IAddressElementInfo*>(&data);
+	const CPositionIdentifiable* addressPosition = dynamic_cast<const CPositionIdentifiable*>(&data);
 	if (!addressInfoPtr || !addressPosition){
 		errorMessage = QObject::tr("Unable to get an address info");
 
@@ -55,7 +55,7 @@ bool CAddressControllerComp::CreateRepresentationFromObject(
 				continue;
 			}
 
-			const auto* parentAddressInfoPtr = dataElementPtr.GetPtr<const IAddressElementInfo>();
+			const IAddressElementInfo* parentAddressInfoPtr = dataElementPtr.GetPtr<const IAddressElementInfo>();
 			if (!parentAddressInfoPtr){
 				continue;
 			}
@@ -97,7 +97,7 @@ istd::IChangeableUniquePtr CAddressControllerComp::CreateObjectFromRequest(
 		return nullptr;
 	}
 
-	const auto* inputParamPtr = gqlRequest.GetParamObject(QByteArrayLiteral("input"));
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject(QByteArrayLiteral("input"));
 	if (!inputParamPtr){
 		errorMessage = QStringLiteral("Unable to create address object. Error: GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, __func__);
@@ -135,7 +135,7 @@ istd::IChangeableUniquePtr CAddressControllerComp::CreateObjectFromRequest(
 	addressInfoPtr->SetObjectUuid(objectId);
 
 	if (itemObj.contains(QStringLiteral("parentId"))){
-		QByteArray parentId = itemObj.value(QStringLiteral("parentId")).toString().toUtf8();
+		QByteArray parentId = itemObj.value(QStringLiteral("parentId")).toVariant().toByteArray();
 
 		imtbase::IObjectCollection::DataPtr adrDataPtr;
 		if (m_objectCollectionCompPtr->GetObjectData(parentId, adrDataPtr)){
@@ -148,7 +148,7 @@ istd::IChangeableUniquePtr CAddressControllerComp::CreateObjectFromRequest(
 	}
 
 	if (itemObj.contains(QStringLiteral("typeId"))){
-		addressInfoPtr->SetAddressTypeId(itemObj.value(QStringLiteral("typeId")).toString().toUtf8());
+		addressInfoPtr->SetAddressTypeId(itemObj.value(QStringLiteral("typeId")).toVariant().toByteArray());
 	}
 
 	if (itemObj.contains(QStringLiteral("name"))){
@@ -177,7 +177,7 @@ bool CAddressControllerComp::UpdateObjectFromRequest(
 			QString& errorMessage) const
 {
 	QByteArray dummyId;
-	auto tempObject = CreateObjectFromRequest(gqlRequest, dummyId, errorMessage);
+	istd::IChangeableUniquePtr tempObject = CreateObjectFromRequest(gqlRequest, dummyId, errorMessage);
 	if (!tempObject.IsValid()){
 		return false;
 	}
