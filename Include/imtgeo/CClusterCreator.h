@@ -5,6 +5,7 @@
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
+#include <QtCore/QSharedPointer>
 
 // ACF includes
 #include <istd/IPolymorphic.h>
@@ -29,11 +30,11 @@ protected:
 				const QJsonArray& model,
 				double zoomLevel,
 				double limitInPixels = 50.0) const;
-	QList<CCluster*> createMapClusters(
+	QList<ClusterSharedPtr> createMapClusters(
 				const QList<CPositionIdentifiable*>& objectList,
 				double zoomLevel,
 				double limitInPixels = 50) const;
-	QList<CCluster*> convertToMapClusters(const QList<CPositionIdentifiable*>& objectList, double zoomLevel) const;
+	QList<ClusterSharedPtr> convertToMapClusters(const QList<CPositionIdentifiable*>& objectList, double zoomLevel) const;
 };
 
 

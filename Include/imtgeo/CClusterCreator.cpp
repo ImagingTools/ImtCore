@@ -80,8 +80,8 @@ QJsonArray CClusterCreator::createMapClusterModel(const QJsonArray& model, doubl
 
 	for (const QJsonValue& val : model) {
 		const QJsonObject rawObj = val.toObject();
-		const double lat = rawObj.value(QStringLiteral("Latitude")).toDouble();
-		const double lon = rawObj.value(QStringLiteral("Longitude")).toDouble();
+		const double lat = rawObj.value(QStringLiteral("latitude")).toDouble();
+		const double lon = rawObj.value(QStringLiteral("longitude")).toDouble();
 
 		const QGeoCoordinate coor(lat, lon);
 		const QPair<double, double> mercator = coordToMercator(coor);
@@ -91,7 +91,7 @@ QJsonArray CClusterCreator::createMapClusterModel(const QJsonArray& model, doubl
 		item.y = mercator.second;
 		item.lat = lat;
 		item.lon = lon;
-		item.id = rawObj.value(QStringLiteral("Id")).toVariant().toString();
+		item.id = rawObj.value(QStringLiteral("id")).toVariant().toString();
 		item.originalObj = rawObj;
 		precomputedItems.append(item);
 	}
@@ -153,7 +153,7 @@ QJsonArray CClusterCreator::createMapClusterModel(const QJsonArray& model, doubl
 		}
 	}
 
-	for (auto& cluster : clusters) {
+	for (ClusterData& cluster : clusters) {
 		if (cluster.num > 0) {
 			cluster.clusterState = QStringLiteral("onVis");
 		}
@@ -166,13 +166,13 @@ QJsonArray CClusterCreator::createMapClusterModel(const QJsonArray& model, doubl
 	for (int i = 0; i < itemsCount; ++i) {
 		if (clusterIds.at(i) == 0) {
 			QJsonObject obj = precomputedItems.at(i).originalObj;
-			obj.insert(QStringLiteral("IsCluster"), false);
+			obj.insert(QStringLiteral("isCluster"), false);
 			retModel.append(obj);
 		}
 	}
 
 	// fill the returned model - visible clusters
-	for (const auto& cluster : std::as_const(clusters)) {
+	for (const ClusterData& cluster : std::as_const(clusters)) {
 		if (cluster.clusterState == QStringLiteral("offVis")) {
 			continue;
 		}
@@ -180,12 +180,12 @@ QJsonArray CClusterCreator::createMapClusterModel(const QJsonArray& model, doubl
 		QJsonObject clusterObj;
 		clusterObj.insert(QStringLiteral("tmp"), cluster.tmp);
 		clusterObj.insert(QStringLiteral("num"), cluster.num);
-		clusterObj.insert(QStringLiteral("Latitude"), cluster.latitude);
-		clusterObj.insert(QStringLiteral("Longitude"), cluster.longitude);
+		clusterObj.insert(QStringLiteral("latitude"), cluster.latitude);
+		clusterObj.insert(QStringLiteral("longitude"), cluster.longitude);
 		clusterObj.insert(QStringLiteral("clusterState"), cluster.clusterState);
 		clusterObj.insert(QStringLiteral("numberChilds"), cluster.tmp);
-		clusterObj.insert(QStringLiteral("ObjectIds"), cluster.objectIds.join(','));
-		clusterObj.insert(QStringLiteral("IsCluster"), true);
+		clusterObj.insert(QStringLiteral("objectIds"), cluster.objectIds.join(','));
+		clusterObj.insert(QStringLiteral("isCluster"), true);
 
 		retModel.append(clusterObj);
 	}
@@ -194,9 +194,9 @@ QJsonArray CClusterCreator::createMapClusterModel(const QJsonArray& model, doubl
 }
 
 
-QList<CCluster*> CClusterCreator::createMapClusters(const QList<CPositionIdentifiable*>& objectList, double zoomLevel, double limitInPixels) const
+QList<ClusterSharedPtr> CClusterCreator::createMapClusters(const QList<CPositionIdentifiable*>& objectList, double zoomLevel, double limitInPixels) const
 {
-	QList<CCluster*> clusterList;
+	QList<ClusterSharedPtr> clusterList;
 	if (objectList.isEmpty()) {
 		return clusterList;
 	}
@@ -298,7 +298,7 @@ QList<CCluster*> CClusterCreator::createMapClusters(const QList<CPositionIdentif
 	// fill the returned list - items NOT in clusters
 	for (int i = 0; i < itemsCount; ++i) {
 		if (clusterIds.at(i) == 0) {
-			imtgeo::CCluster* const cluster = new imtgeo::CCluster();
+			ClusterSharedPtr cluster = ClusterSharedPtr::create();
 			cluster->SetLatitude(precomputedItems.at(i).lat);
 			cluster->SetLongitude(precomputedItems.at(i).lon);
 			cluster->SetZoom(zoomLevel);
@@ -308,9 +308,9 @@ QList<CCluster*> CClusterCreator::createMapClusters(const QList<CPositionIdentif
 	}
 
 	// fill the returned list - visible clusters
-	for (const auto& localCluster : std::as_const(localClusters)) {
+	for (const ClusterItemData& localCluster : std::as_const(localClusters)) {
 		if (localCluster.clusterId > 0) {
-			imtgeo::CCluster* const cluster = new imtgeo::CCluster();
+			ClusterSharedPtr cluster = ClusterSharedPtr::create();
 			cluster->SetLatitude(localCluster.latitude);
 			cluster->SetLongitude(localCluster.longitude);
 			cluster->SetZoom(zoomLevel);
@@ -323,13 +323,13 @@ QList<CCluster*> CClusterCreator::createMapClusters(const QList<CPositionIdentif
 }
 
 
-QList<CCluster*> CClusterCreator::convertToMapClusters(const QList<CPositionIdentifiable*>& objectList, double zoomLevel) const
+QList<ClusterSharedPtr> CClusterCreator::convertToMapClusters(const QList<CPositionIdentifiable*>& objectList, double zoomLevel) const
 {
-	QList<CCluster*> clusterList;
+	QList<ClusterSharedPtr> clusterList;
 	clusterList.reserve(objectList.size());
 
 	for (const CPositionIdentifiable* const object : objectList) {
-		imtgeo::CCluster* const cluster = new imtgeo::CCluster();
+		ClusterSharedPtr cluster = ClusterSharedPtr::create();
 		cluster->SetLatitude(object->GetLatitude());
 		cluster->SetLongitude(object->GetLongitude());
 		cluster->SetZoom(zoomLevel);

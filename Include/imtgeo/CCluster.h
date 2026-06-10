@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtPositioning/QGeoCoordinate>
+#include <QtCore/QSharedPointer>
 
 
 // ImtCore includes
@@ -36,6 +37,9 @@ private:
 	QByteArrayList m_childrenIds;
 	double m_zoom;
 };
+
+
+using ClusterSharedPtr = QSharedPointer<CCluster>;
 
 
 } // namespace imtgeo
