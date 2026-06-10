@@ -7,7 +7,7 @@
 // ACF includes
 #include<istd/IPolymorphic.h>
 
-#include <GeneratedFiles/imtpaysdl/SDL/1.0/CPP/ImtPay.h>
+#include <GeneratedFiles/imtpaysdl/SDL/1.0/CPP/ImtPay_fwd.h>
 
 
 namespace iprm

@@ -885,6 +885,9 @@ bool CCxxProcessorsManagerComp::GenerateForwardDeclarationFile(const iprm::IPara
 		fwdStream << QStringLiteral("// request forward declarations");
 		FeedStream(fwdStream, 1, false);
 		for (const imtsdl::CSdlRequest& request: requestsList){
+			fwdStream << QStringLiteral("struct ") << request.GetName() << QStringLiteral("RequestInfo;");
+			FeedStream(fwdStream, 1, false);
+
 			fwdStream << QStringLiteral("class C") << request.GetName() << QStringLiteral("GqlRequest;");
 			FeedStream(fwdStream, 1, false);
 		}
