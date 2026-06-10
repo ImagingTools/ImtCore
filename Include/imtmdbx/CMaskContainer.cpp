@@ -381,7 +381,7 @@ bool CMaskContainer::GetNextItemOffset(quint64& offset, quint64 startOffset)
 }
 
 
-bool CMaskContainer::GetPreviosItemOffset(quint64& offset, quint64 startOffset)
+bool CMaskContainer::GetPreviousItemOffset(quint64& offset, quint64 startOffset)
 {
 	if (m_maskList.isEmpty() && m_maskListInv.isEmpty()){
 		return false;
@@ -393,7 +393,7 @@ bool CMaskContainer::GetPreviosItemOffset(quint64& offset, quint64 startOffset)
 	{
 		for (auto& [maskPtr, nextOffset] : targetList){
 			quint64 currOffset = 0;
-			if (!maskPtr->GetPreviosItemOffset(currOffset, startOffset)) {
+			if (!maskPtr->GetPreviousItemOffset(currOffset, startOffset)) {
 				if (m_operationType == OT_AND){
 					return false;
 				}
@@ -457,10 +457,10 @@ bool CMaskContainer::RemoveLastMask(bool isInversion)
 bool CMaskContainer::RemoveMask(int index, int n, bool isInversion)
 {
 	QList<QPair<IMask*,quint64>>& targetList = isInversion ? m_maskListInv : m_maskList;
-	const bool canRemove = !targetList.isEmpty() && (index + n - 1) < m_maskList.length();
-	if(canRemove){
-		m_maskList.remove(index, n);
-		m_maskList.squeeze();
+	const bool canRemove = !targetList.isEmpty() && (index + n - 1) < targetList.length();
+	if (canRemove) {
+		targetList.remove(index, n);
+		targetList.squeeze();
 	}
 
 	return canRemove;

@@ -132,7 +132,7 @@ bool CMemoryMask::GetNextItemOffset(quint64& offset, quint64 startOffset)
 }
 
 
-bool CMemoryMask::GetPreviosItemOffset(quint64& offset, quint64 startOffset)
+bool CMemoryMask::GetPreviousItemOffset(quint64& offset, quint64 startOffset)
 {
     if(m_cache.isEmpty()){
         return false;

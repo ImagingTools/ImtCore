@@ -6,11 +6,6 @@ namespace imtmdbx
 {
 
 
-// external variables
-
-int getItemCount = 0;
-
-
 // public methods
 
 CMask::CMask(
@@ -73,8 +68,6 @@ bool CMask::SetUnit(quint64 position, bool unit)
 
 bool CMask::GetItem(quint64 offset, quint64& item)
 {
-	getItemCount++;
-
 	mdbx::slice keySlice(&offset, 8);
 	bool found = m_cursor.seek(keySlice);
 	if (found){
@@ -135,7 +128,7 @@ bool CMask::GetNextItemOffset(quint64& offset, quint64 startOffset)
 }
 
 
-bool CMask::GetPreviosItemOffset(quint64& offset, quint64 startOffset)
+bool CMask::GetPreviousItemOffset(quint64& offset, quint64 startOffset)
 {
 	mdbx::slice keySlice(&startOffset, 8);
 	if (m_cursor.seek(keySlice)){
