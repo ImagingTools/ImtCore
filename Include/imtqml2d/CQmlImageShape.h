@@ -10,7 +10,6 @@
 #include <iimg/IBitmap.h>
 #include <imod/TSingleModelObserverBase.h>
 
-/// \todo REMOVWE IT!
 #include "dummy.h"
 
 
@@ -18,7 +17,23 @@ namespace imtqml2d
 {
 
 
-class CQmlImageShape: public sdl::V1_0::imtsdl2d::CImageShape, public imod::TSingleModelObserverBase<iimg::IBitmap>
+class CImageShape
+{
+public:
+	sdl::V1_0::imtsdl2d::CRectangle2d m_rect;
+	QByteArray m_imageData;
+	int m_imageFormat = 0; // 0=PNG, 1=JPEG, 2=SVG
+
+	[[nodiscard]] sdl::V1_0::imtsdl2d::CRectangle2d GetRect() const { return m_rect; }
+	virtual void SetRect(sdl::V1_0::imtsdl2d::CRectangle2d newRect) { m_rect = newRect; }
+	[[nodiscard]] QByteArray GetImageData() const { return m_imageData; }
+	virtual void SetImageData(const QByteArray& newImageData) { m_imageData = newImageData; }
+	[[nodiscard]] int GetImageFormat() const { return m_imageFormat; }
+	virtual void SetImageFormat(int newImageFormat) { m_imageFormat = newImageFormat; }
+};
+
+
+class CQmlImageShape: public CImageShape, public imod::TSingleModelObserverBase<iimg::IBitmap>
 {
 	Q_OBJECT
 
@@ -26,7 +41,7 @@ class CQmlImageShape: public sdl::V1_0::imtsdl2d::CImageShape, public imod::TSin
 
 public:
 	typedef imod::CSingleModelObserverBase BaseClass;
-	typedef sdl::V1_0::imtsdl2d::CImageShape BaseClass2;
+	typedef CImageShape BaseClass2;
 
 	CQmlImageShape();
 	~CQmlImageShape() override;
@@ -48,7 +63,7 @@ Q_SIGNALS:
 	void imageChanged();
 
 public:
-	// reimplemented (sdl::V1_0::imtsdl2d::CImageShape)
+	// reimplemented (imtqml2d::CImageShape)
 	virtual void SetRect(sdl::V1_0::imtsdl2d::CRectangle2d newRect) override;
 	virtual void SetImageData(const QByteArray& newImageData) override;
 	virtual void SetImageFormat(int newImageFormat) override;

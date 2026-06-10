@@ -50,7 +50,7 @@ QString CQmlImageShape::GetImageUrl() const
 }
 
 
-// reimplemented (sdl::V1_0::imtsdl2d::CImageShape)
+// reimplemented (imtqml2d::CImageShape)
 
 void CQmlImageShape::SetRect(sdl::V1_0::imtsdl2d::CRectangle2d newRect)
 {
