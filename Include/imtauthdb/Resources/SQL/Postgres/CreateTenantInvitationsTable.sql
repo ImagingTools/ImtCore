@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS "TenantInvitations" (
 	"RejectedAt" TIMESTAMP,
 	"RevokedAt" TIMESTAMP,
 	"RevokedByUserId" TEXT,
-	"LastSentAt" TIMESTAMP
+	"LastSentAt" TIMESTAMP,
+	CONSTRAINT "FK_TenantInvitations_TenantId" FOREIGN KEY ("TenantId") REFERENCES "Tenants" ("Id") ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS "IdxTenantInvitationsTenantId" ON "TenantInvitations" ("TenantId");

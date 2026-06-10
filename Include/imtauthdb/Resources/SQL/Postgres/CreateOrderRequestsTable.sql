@@ -12,7 +12,11 @@ CREATE TABLE IF NOT EXISTS "OrderRequests" (
 	"Status" INTEGER NOT NULL,
 	"StatusNote" TEXT,
 	"CreatedAt" TIMESTAMP NOT NULL,
-	"UpdatedAt" TIMESTAMP NOT NULL
+	"UpdatedAt" TIMESTAMP NOT NULL,
+	CONSTRAINT "FK_OrderRequests_SourceTenantId" FOREIGN KEY ("SourceTenantId") REFERENCES "Tenants" ("Id") ON DELETE CASCADE,
+	CONSTRAINT "FK_OrderRequests_TargetTenantId" FOREIGN KEY ("TargetTenantId") REFERENCES "Tenants" ("Id") ON DELETE CASCADE,
+	CONSTRAINT "FK_OrderRequests_RelationshipId" FOREIGN KEY ("RelationshipId") REFERENCES "TenantRelationships" ("Id") ON DELETE CASCADE,
+	CONSTRAINT "FK_OrderRequests_ContractId" FOREIGN KEY ("ContractId") REFERENCES "Contracts" ("Id") ON DELETE SET NULL
 );
 
 CREATE INDEX IF NOT EXISTS "IdxOrderRequestsSourceTenantId" ON "OrderRequests" ("SourceTenantId");

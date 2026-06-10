@@ -13,7 +13,11 @@ CREATE TABLE IF NOT EXISTS "CrossTenantMessages" (
 	"ErrorMessage" TEXT,
 	"CreatedAt" TIMESTAMP NOT NULL,
 	"UpdatedAt" TIMESTAMP NOT NULL,
-	"ExpiresAt" TIMESTAMP
+	"ExpiresAt" TIMESTAMP,
+	CONSTRAINT "FK_CrossTenantMessages_SourceTenantId" FOREIGN KEY ("SourceTenantId") REFERENCES "Tenants" ("Id") ON DELETE CASCADE,
+	CONSTRAINT "FK_CrossTenantMessages_TargetTenantId" FOREIGN KEY ("TargetTenantId") REFERENCES "Tenants" ("Id") ON DELETE CASCADE,
+	CONSTRAINT "FK_CrossTenantMessages_RelationshipId" FOREIGN KEY ("RelationshipId") REFERENCES "TenantRelationships" ("Id") ON DELETE CASCADE,
+	CONSTRAINT "FK_CrossTenantMessages_ContractId" FOREIGN KEY ("ContractId") REFERENCES "Contracts" ("Id") ON DELETE SET NULL
 );
 
 CREATE INDEX IF NOT EXISTS "IdxCrossTenantMessagesSourceTenantId" ON "CrossTenantMessages" ("SourceTenantId");

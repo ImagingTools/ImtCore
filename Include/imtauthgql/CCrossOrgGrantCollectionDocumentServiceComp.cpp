@@ -53,7 +53,6 @@ sdl::V1_0::imtauth::CCrossOrgGrant CCrossOrgGrantCollectionDocumentServiceComp::
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::GetGrantRepresentationRequestArguments arguments = getGrantRepresentationRequest.GetRequestedArguments();
-	Q_UNUSED(gqlRequest);
 
 	QByteArray objectId;
 	if (arguments.input && arguments.input->id){
@@ -78,6 +77,20 @@ sdl::V1_0::imtauth::CCrossOrgGrant CCrossOrgGrantCollectionDocumentServiceComp::
 		const imtauth::ICrossOrgGrantData* grantPtr = dynamic_cast<const imtauth::ICrossOrgGrantData*>(documentPtr.GetPtr());
 		if (grantPtr != nullptr){
 			imtauth::CrossOrgGrantInfo info = grantPtr->GetGrantInfo();
+
+			// Enforce tenant isolation: grant must belong to the context tenant
+			const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+			QByteArray contextTenantId;
+			if (gqlContextPtr != nullptr){
+				contextTenantId = gqlContextPtr->GetTenantId();
+			}
+			if (!contextTenantId.isEmpty()
+					&& info.sourceTenantId != contextTenantId
+					&& info.targetTenantId != contextTenantId){
+				errorMessage = QStringLiteral("Access denied: grant does not belong to the current tenant");
+				return sdl::V1_0::imtauth::CCrossOrgGrant();
+			}
+
 			sdl::V1_0::imtauth::CCrossOrgGrant response;
 			response.id = info.grantId;
 			response.sourceTenantId = info.sourceTenantId;
@@ -157,6 +170,14 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CCrossOrgGrantCollectionDocumentSer
 	}
 
 	imtauth::CrossOrgGrantInfo info = grantDataPtr->GetGrantInfo();
+
+	// Enforce tenant isolation: editing is only allowed if the grant belongs to the context tenant
+	if (!contextTenantId.isEmpty() && !info.grantId.isEmpty()){
+		if (info.sourceTenantId != contextTenantId && info.targetTenantId != contextTenantId){
+			errorMessage = QStringLiteral("Access denied: grant does not belong to the current tenant");
+			return response;
+		}
+	}
 
 	if (grantRepresentation.id){
 		info.grantId = *grantRepresentation.id;
