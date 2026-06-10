@@ -15,6 +15,9 @@
 // ImtCore includes
 #include <imtpay/imtpay.h>
 
+// Generated includes
+#include <GeneratedFiles/imtpaysdl/SDL/1.0/CPP/ImtPay.h>
+
 
 
 namespace imtpaysdl
