@@ -28,6 +28,7 @@ ViewBase {
 	property string __selectedTargetTenantName: ""
 	property string __selectedExpiresAt: ""
 	property bool __loadingGui: false
+	property bool isReadOnly: grantData ? (grantData.m_isReadOnly === true) : false
 
 	function expiresAtToIndex(iso) {
 		if (!iso || iso === "")
@@ -116,6 +117,19 @@ ViewBase {
 			width: container.width
 			spacing: Style.marginXL
 
+			// Read-only badge shown when the grant was created for this organization
+			BaseText {
+				visible: container.isReadOnly
+				width: parent.width
+				horizontalAlignment: Text.AlignHCenter
+				text: qsTr("This grant was created for your organization (read-only)")
+				color: Style.inactiveTextColor
+				font.pixelSize: Style.fontSizeM
+				font.italic: true
+				topPadding: Style.marginM
+				bottomPadding: Style.marginM
+			}
+
 			GroupElementView {
 				id: generalGroup
 				width: parent.width
@@ -124,6 +138,7 @@ ViewBase {
 					id: grantNameInput
 					name: qsTr("Name")
 					placeHolderText: qsTr("Auto-generated from tenant and roles if left empty")
+					enabled: !container.isReadOnly
 					onEditingFinished: {
 						container.doUpdateModel()
 					}
@@ -131,6 +146,7 @@ ViewBase {
 
 				ElementView {
 					name: qsTr("Target Tenant")
+					enabled: !container.isReadOnly
 
 					controlComp: Component {
 						Row {
@@ -177,6 +193,7 @@ ViewBase {
 					label: qsTr("Roles")
 					addButtonText: qsTr("Add Role")
 					showCount: true
+					enabled: !container.isReadOnly
 					onSelectionChanged: {
 						container.doUpdateModel()
 					}
@@ -186,6 +203,7 @@ ViewBase {
 					id: grantDescriptionInput
 					name: qsTr("Description")
 					placeHolderText: qsTr("Optional description")
+					enabled: !container.isReadOnly
 					onEditingFinished: {
 						container.doUpdateModel()
 					}
@@ -197,6 +215,7 @@ ViewBase {
 					description: qsTr("The grant will expire on the selected date")
 					nameId: "name"
 					model: expirationModel
+					enabled: !container.isReadOnly
 
 					TreeItemModel {
 						id: expirationModel
