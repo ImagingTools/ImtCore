@@ -324,43 +324,32 @@ Rectangle {
 		hoverEnabled: true;
 		
 		acceptedButtons: Qt.AllButtons;
-		
-		Timer{
-			id:timer
-			interval: 300
-			onTriggered: {
-				ma.clickCount = 0;
-			}
-		}
-		
-		property int clickCount: 0;
+
 		onClicked: {
-			clickCount++;
-			
-			if (ma.clickCount == 1){
-				if (mouse.button === Qt.RightButton){
-					tableDelegateContainer.rightButtonMouseClicked(this.mouseX, this.mouseY);
-				}
-				tableDelegateContainer.clicked();
-				
-				timer.start();
+			if (mouse.button === Qt.RightButton){
+				tableDelegateContainer.rightButtonMouseClicked(this.mouseX, this.mouseY);
 			}
-			
-			if (ma.clickCount == 2){
-				if (mouse.button === Qt.RightButton){
-					return;
-				}
-				
-				tableDelegateContainer.doubleClicked(this.mouseX, this.mouseY);
-				
-				ma.clickCount = 0;
-				timer.stop();
-			}
-			
+			tableDelegateContainer.clicked();
+
 			if (tableDelegateContainer.tableItem.selectable){
 				selectionManager.onMouseEvent(mouse, tableDelegateContainer.rowIndex);
 			}
-			
+
+			tableDelegateContainer.forceActiveFocus();
+			mouse.accepted = false;
+		}
+
+		onDoubleClicked: {
+			if (mouse.button === Qt.RightButton){
+				return;
+			}
+
+			tableDelegateContainer.doubleClicked(this.mouseX, this.mouseY);
+
+			if (tableDelegateContainer.tableItem.selectable){
+				selectionManager.onMouseEvent(mouse, tableDelegateContainer.rowIndex);
+			}
+
 			tableDelegateContainer.forceActiveFocus();
 			mouse.accepted = false;
 		}

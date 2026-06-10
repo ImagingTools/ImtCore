@@ -388,11 +388,7 @@ sdl::V1_0::imtauth::CCrossOrgGrant GrantInfoToData(const imtauth::CrossOrgGrantI
 	data.id = info.grantId;
 	data.sourceTenantId = info.sourceTenantId;
 	data.targetTenantId = info.targetTenantId;
-	data.relationshipId = info.relationshipId;
-	data.contractId = info.contractId;
-	data.targetTeamId = info.targetTeamId;
-	data.accessLevel = imtauthgql::ToSdlAccessLevel(info.accessLevel);
-	data.resourceScope = info.resourceScope;
+	data.roleIds.Emplace().FromList(info.roleIds);
 	data.description = info.description;
 	data.createdAt = info.createdAt;
 	data.expiresAt = info.expiresAt;
@@ -429,7 +425,7 @@ namespace imtauthgql
 
 sdl::V1_0::imtauth::CGetCrossOrgGrantsPayload CTenantManagerControllerComp::OnGetCrossOrgGrants(
 			const sdl::V1_0::imtauth::CGetCrossOrgGrantsGqlRequest& getCrossOrgGrantsRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CGetCrossOrgGrantsPayload response;
@@ -447,6 +443,17 @@ sdl::V1_0::imtauth::CGetCrossOrgGrantsPayload CTenantManagerControllerComp::OnGe
 
 	if (tenantId.isEmpty()){
 		response.errorMessage = QStringLiteral("Tenant ID is required");
+		return response;
+	}
+
+	// Enforce tenant isolation: the requested tenantId must match the context tenant
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	QByteArray contextTenantId;
+	if (gqlContextPtr != nullptr){
+		contextTenantId = gqlContextPtr->GetTenantId();
+	}
+	if (!contextTenantId.isEmpty() && contextTenantId != tenantId){
+		response.errorMessage = QStringLiteral("Access denied: cannot view grants of another tenant");
 		return response;
 	}
 
@@ -475,7 +482,7 @@ sdl::V1_0::imtauth::CGetCrossOrgGrantsPayload CTenantManagerControllerComp::OnGe
 
 sdl::V1_0::imtauth::CCreateCrossOrgGrantPayload CTenantManagerControllerComp::OnCreateCrossOrgGrant(
 			const sdl::V1_0::imtauth::CCreateCrossOrgGrantGqlRequest& createCrossOrgGrantRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CCreateCrossOrgGrantPayload response;
@@ -487,11 +494,7 @@ sdl::V1_0::imtauth::CCreateCrossOrgGrantPayload CTenantManagerControllerComp::On
 
 	QByteArray sourceTenantId;
 	QByteArray targetTenantId;
-	QByteArray relationshipId;
-	QByteArray contractId;
-	QByteArray targetTeamId;
-	imtauth::CrossOrgAccessLevel accessLevel = imtauth::COAL_NONE;
-	QString resourceScope;
+	QByteArrayList roleIds;
 	QString description;
 	QString expiresAt;
 
@@ -502,20 +505,8 @@ sdl::V1_0::imtauth::CCreateCrossOrgGrantPayload CTenantManagerControllerComp::On
 	if (arguments.input->targetTenantId){
 		targetTenantId = *arguments.input->targetTenantId;
 	}
-	if (arguments.input->relationshipId){
-		relationshipId = *arguments.input->relationshipId;
-	}
-	if (arguments.input->contractId){
-		contractId = *arguments.input->contractId;
-	}
-	if (arguments.input->accessLevel){
-		accessLevel = FromSdlAccessLevel(*arguments.input->accessLevel);
-	}
-	if (arguments.input->resourceScope){
-		resourceScope = *arguments.input->resourceScope;
-	}
-	if (arguments.input->targetTeamId){
-		targetTeamId = *arguments.input->targetTeamId;
+	if (arguments.input->roleIds){
+		roleIds = arguments.input->roleIds->ToList();
 	}
 	if (arguments.input->description){
 		description = *arguments.input->description;
@@ -524,16 +515,23 @@ sdl::V1_0::imtauth::CCreateCrossOrgGrantPayload CTenantManagerControllerComp::On
 		expiresAt = *arguments.input->expiresAt;
 	}
 
+	// Enforce tenant isolation: sourceTenantId must match the context tenant
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	QByteArray contextTenantId;
+	if (gqlContextPtr != nullptr){
+		contextTenantId = gqlContextPtr->GetTenantId();
+	}
+	if (!contextTenantId.isEmpty() && contextTenantId != sourceTenantId){
+		response.errorMessage = QStringLiteral("Access denied: source tenant must match the current tenant context");
+		return response;
+	}
+
 	QByteArray grantId = m_grantManagerCompPtr->CreateGrant(
 							 sourceTenantId,
 							 targetTenantId,
-							 relationshipId,
-							 accessLevel,
-							 resourceScope,
-							 targetTeamId,
+							 roleIds,
 							 description,
-							 expiresAt,
-							 contractId);
+							 expiresAt);
 	
 	if (grantId.isEmpty()){
 		response.errorMessage = QStringLiteral("Failed to create cross-org grant");
@@ -548,7 +546,7 @@ sdl::V1_0::imtauth::CCreateCrossOrgGrantPayload CTenantManagerControllerComp::On
 
 sdl::V1_0::imtauth::CRevokeCrossOrgGrantPayload CTenantManagerControllerComp::OnRevokeCrossOrgGrant(
 		const sdl::V1_0::imtauth::CRevokeCrossOrgGrantGqlRequest& revokeCrossOrgGrantRequest,
-		const ::imtgql::CGqlRequest& /*gqlRequest*/,
+		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CRevokeCrossOrgGrantPayload response;
@@ -565,6 +563,21 @@ sdl::V1_0::imtauth::CRevokeCrossOrgGrantPayload CTenantManagerControllerComp::On
 	if (arguments.input->grantId){
 		grantId = *arguments.input->grantId;
 	}
+
+	// Enforce tenant isolation: the grant must belong to the context tenant
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	QByteArray contextTenantId;
+	if (gqlContextPtr != nullptr){
+		contextTenantId = gqlContextPtr->GetTenantId();
+	}
+	if (!contextTenantId.isEmpty()){
+		imtauth::CrossOrgGrantInfo grantInfo = m_grantManagerCompPtr->GetGrant(grantId);
+		if (grantInfo.sourceTenantId != contextTenantId && grantInfo.targetTenantId != contextTenantId){
+			response.errorMessage = QStringLiteral("Access denied: grant does not belong to the current tenant");
+			response.success = false;
+			return response;
+		}
+	}
 	
 	bool success = m_grantManagerCompPtr->RevokeGrant(grantId);
 	response.success = success;
@@ -572,6 +585,55 @@ sdl::V1_0::imtauth::CRevokeCrossOrgGrantPayload CTenantManagerControllerComp::On
 		response.errorMessage = QStringLiteral("Failed to revoke cross-org grant");
 	}
 	
+	return response;
+}
+
+
+sdl::V1_0::imtauth::CRemoveCrossOrgGrantsPayload CTenantManagerControllerComp::OnRemoveCrossOrgGrants(
+		const sdl::V1_0::imtauth::CRemoveCrossOrgGrantsGqlRequest& removeCrossOrgGrantsRequest,
+		const ::imtgql::CGqlRequest& gqlRequest,
+		QString& /*errorMessage*/) const
+{
+	sdl::V1_0::imtauth::CRemoveCrossOrgGrantsPayload response;
+
+	if (!m_grantManagerCompPtr.IsValid()){
+		response.errorMessage = QStringLiteral("Cross-org grant manager is not configured");
+		response.success = false;
+		return response;
+	}
+
+	QByteArrayList grantIds;
+	sdl::V1_0::imtauth::RemoveCrossOrgGrantsRequestArguments arguments = removeCrossOrgGrantsRequest.GetRequestedArguments();
+	if (arguments.input->grantIds){
+		grantIds = arguments.input->grantIds->ToList();
+	}
+
+	// Enforce tenant isolation: all grants must belong to the context tenant
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	QByteArray contextTenantId;
+	if (gqlContextPtr != nullptr){
+		contextTenantId = gqlContextPtr->GetTenantId();
+	}
+	if (!contextTenantId.isEmpty()){
+		for (const QByteArray& grantId : grantIds){
+			if (grantId.isEmpty()){
+				continue;
+			}
+			imtauth::CrossOrgGrantInfo grantInfo = m_grantManagerCompPtr->GetGrant(grantId);
+			if (grantInfo.sourceTenantId != contextTenantId && grantInfo.targetTenantId != contextTenantId){
+				response.errorMessage = QStringLiteral("Access denied: one or more grants do not belong to the current tenant");
+				response.success = false;
+				return response;
+			}
+		}
+	}
+
+	bool success = m_grantManagerCompPtr->RemoveGrants(grantIds);
+	response.success = success;
+	if (!success){
+		response.errorMessage = QStringLiteral("Failed to remove one or more cross-org grants");
+	}
+
 	return response;
 }
 
@@ -909,27 +971,38 @@ sdl::V1_0::imtauth::CGetConnectionRequestsPayload CTenantManagerControllerComp::
 	QByteArrayList requestIds = m_connectionRequestManagerCompPtr->GetConnectionRequestIds(tenantId);
 	response.requests.Emplace();
 
-	if (m_requestCollectionCompPtr.IsValid()){
-		for (const QByteArray& requestId : requestIds){
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (m_requestCollectionCompPtr->GetObjectData(requestId, dataPtr)){
-				const imtauth::ITenantConnectionRequestInfo* reqPtr =
-					dynamic_cast<const imtauth::ITenantConnectionRequestInfo*>(dataPtr.GetPtr());
-				if (reqPtr != nullptr){
-					sdl::V1_0::imtauth::CConnectionRequest data;
-					data.id = reqPtr->GetRequestId();
-					data.sourceTenantId = reqPtr->GetSourceTenantId();
-					data.targetTenantId = reqPtr->GetTargetTenantId();
-					data.connectionCode = reqPtr->GetConnectionCode();
-					data.message = reqPtr->GetMessage();
-					data.status = ToSdlConnectionRequestStatus(reqPtr->GetStatus());
-					data.createdAt = reqPtr->GetCreatedAt();
-					data.respondedAt = reqPtr->GetRespondedAt();
-					data.sourceTenantName = reqPtr->GetSourceTenantName();
-					data.targetTenantName = reqPtr->GetTargetTenantName();
-					response.requests->push_back(data);
+	for (const QByteArray& requestId : requestIds){
+		imtauth::ITenantConnectionRequestInfoUniquePtr reqPtr = m_connectionRequestManagerCompPtr->GetConnectionRequest(requestId);
+		if (reqPtr.IsValid()){
+			sdl::V1_0::imtauth::CConnectionRequest data;
+			data.id = reqPtr->GetRequestId();
+			data.sourceTenantId = reqPtr->GetSourceTenantId();
+			data.targetTenantId = reqPtr->GetTargetTenantId();
+			data.connectionCode = reqPtr->GetConnectionCode();
+			data.message = reqPtr->GetMessage();
+			data.status = ToSdlConnectionRequestStatus(reqPtr->GetStatus());
+			data.createdAt = reqPtr->GetCreatedAt();
+			data.respondedAt = reqPtr->GetRespondedAt();
+			data.sourceTenantName = reqPtr->GetSourceTenantName();
+			data.targetTenantName = reqPtr->GetTargetTenantName();
+
+			// Resolve tenant names from tenant manager (handles legacy data where names were not stored)
+			if (m_tenantManagerCompPtr.IsValid()){
+				if (reqPtr->GetSourceTenantName().isEmpty()){
+					imtauth::ITenantInfoUniquePtr srcTenantPtr = m_tenantManagerCompPtr->GetTenant(reqPtr->GetSourceTenantId());
+					if (srcTenantPtr.IsValid()){
+						data.sourceTenantName = srcTenantPtr->GetTenantName();
+					}
+				}
+				if (reqPtr->GetTargetTenantName().isEmpty()){
+					imtauth::ITenantInfoUniquePtr tgtTenantPtr = m_tenantManagerCompPtr->GetTenant(reqPtr->GetTargetTenantId());
+					if (tgtTenantPtr.IsValid()){
+						data.targetTenantName = tgtTenantPtr->GetTenantName();
+					}
 				}
 			}
+
+			response.requests->push_back(data);
 		}
 	}
 	
@@ -1097,37 +1170,43 @@ sdl::V1_0::imtauth::CGetConnectionsPayload CTenantManagerControllerComp::OnGetCo
 	response.connections.Emplace();
 	QByteArrayList connectionIds = m_connectionRequestManagerCompPtr->GetConnectionIds(tenantId);
 
-	if (m_connectionCollectionCompPtr.IsValid()){
-		for (const QByteArray& connectionId : connectionIds){
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (m_connectionCollectionCompPtr->GetObjectData(connectionId, dataPtr)){
-				const imtauth::ITenantConnectionInfo* connPtr =
-					dynamic_cast<const imtauth::ITenantConnectionInfo*>(dataPtr.GetPtr());
-				if (connPtr != nullptr){
-					sdl::V1_0::imtauth::CTenantConnection data;
+	for (const QByteArray& connectionId : connectionIds){
+		imtauth::ITenantConnectionInfoUniquePtr connPtr = m_connectionRequestManagerCompPtr->GetConnection(connectionId);
+		if (connPtr.IsValid()){
+			sdl::V1_0::imtauth::CTenantConnection data;
 
-					data.id = connPtr->GetConnectionId();
-					data.tenantAId = connPtr->GetTenantAId();
-					data.tenantBId = connPtr->GetTenantBId();
-					data.status = ToSdlConnectionStatus(connPtr->GetStatus());
-					data.createdAt = connPtr->GetCreatedAt();
-					data.updatedAt = connPtr->GetUpdatedAt();
+			data.id = connPtr->GetConnectionId();
+			data.tenantAId = connPtr->GetTenantAId();
+			data.tenantBId = connPtr->GetTenantBId();
+			data.status = ToSdlConnectionStatus(connPtr->GetStatus());
+			data.createdAt = connPtr->GetCreatedAt();
+			data.updatedAt = connPtr->GetUpdatedAt();
 
-					if (m_tenantManagerCompPtr.IsValid()){
-						imtauth::ITenantInfoUniquePtr tenant1Ptr = m_tenantManagerCompPtr->GetTenant(connPtr->GetTenantAId());
-						if (tenant1Ptr.IsValid()){
-							data.tenantAName = tenant1Ptr->GetTenantName();
-						}
-
-						imtauth::ITenantInfoUniquePtr tenant2Ptr = m_tenantManagerCompPtr->GetTenant(connPtr->GetTenantBId());
-						if (tenant2Ptr.IsValid()){
-							data.tenantBName = tenant2Ptr->GetTenantName();
+			if (m_tenantManagerCompPtr.IsValid()){
+				imtauth::ITenantInfoUniquePtr tenant1Ptr = m_tenantManagerCompPtr->GetTenant(connPtr->GetTenantAId());
+				if (tenant1Ptr.IsValid()){
+					data.tenantAName = tenant1Ptr->GetTenantName();
+					if (m_userCollectionCompPtr.IsValid()){
+						QByteArray ownerId = tenant1Ptr->GetOwnerId();
+						if (!ownerId.isEmpty()){
+							data.tenantAOwnerName = imtauth::GetUserName(*m_userCollectionCompPtr, ownerId);
 						}
 					}
+				}
 
-					response.connections->push_back(data);
+				imtauth::ITenantInfoUniquePtr tenant2Ptr = m_tenantManagerCompPtr->GetTenant(connPtr->GetTenantBId());
+				if (tenant2Ptr.IsValid()){
+					data.tenantBName = tenant2Ptr->GetTenantName();
+					if (m_userCollectionCompPtr.IsValid()){
+						QByteArray ownerId = tenant2Ptr->GetOwnerId();
+						if (!ownerId.isEmpty()){
+							data.tenantBOwnerName = imtauth::GetUserName(*m_userCollectionCompPtr, ownerId);
+						}
+					}
 				}
 			}
+
+			response.connections->push_back(data);
 		}
 	}
 

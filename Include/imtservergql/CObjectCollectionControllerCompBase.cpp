@@ -25,7 +25,6 @@
 #include <iqt/iqt.h>
 
 // ImtCore includes
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 #include <imtbase/imtbase.h>
 #include <imtbase/CSearchResults.h>
 #include <imtbase/IIdentifiable.h>
@@ -46,6 +45,7 @@
 #include <imtauthgql/imtauthgql.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentCollectionFilter.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 
 
 namespace imtservergql

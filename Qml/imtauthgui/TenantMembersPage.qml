@@ -219,6 +219,13 @@ TenantSimpleCollectionPage {
 						var members = membersPage.stateManager ? membersPage.stateManager.pendingMembers : []
 						for (var i = 0; i < members.length; i++)
 							ids.push(members[i].id)
+						// Also exclude users who already have a pending invitation
+						var invitations = membersPage.stateManager ? membersPage.stateManager.pendingInvitations : []
+						for (var j = 0; j < invitations.length; j++) {
+							var invUserId = invitations[j].userId || ""
+							if (invUserId && ids.indexOf(invUserId) < 0)
+								ids.push(invUserId)
+						}
 						var point = inviteMemberBtn.mapToItem(null, 0, inviteMemberBtn.height)
 						ModalDialogManager.openDialog(membersSelectPopupComp, {
 														  "x": point.x,
@@ -261,7 +268,8 @@ TenantSimpleCollectionPage {
 					else if (menuItems[i].action === "transfer") memberActionMenu.showTransfer = true
 					else if (menuItems[i].action === "leave") memberActionMenu.showLeave = true
 				}
-				memberActionMenu.popup()
+				var localPos = membersPage.mapFromItem(null, menuX, menuY)
+				memberActionMenu.popup(localPos.x, localPos.y)
 			}
 
 			onMemberEditRequested: {
@@ -273,7 +281,8 @@ TenantSimpleCollectionPage {
 				inviteActionMenu.menuItems = menuItems
 				inviteActionMenu.targetInvitationId = invitationId
 				inviteActionMenu.targetUserName = userName
-				inviteActionMenu.popup()
+				var localPos = membersPage.mapFromItem(null, menuX, menuY)
+				inviteActionMenu.popup(localPos.x, localPos.y)
 			}
 		}
 	}
@@ -289,15 +298,16 @@ TenantSimpleCollectionPage {
 		property bool showTransfer: false
 		property bool showLeave: false
 
+		closePolicy: Enums.popupCloseOnEscape | Enums.popupCloseOnPressOutside
+
 		Menu {
 			id: changeRoleSubmenu
-			title: qsTr("Change Environment Role")
+			title: qsTr("Change Role")
 			visible: memberActionMenu.showChangeRole
 			height: visible ? implicitHeight : 0
 
 			MenuItem {
 				text: qsTr("Member")
-				checkable: true
 				checked: memberActionMenu.targetCurrentRole === "Member"
 				onTriggered: {
 					if (membersPage.apiClient) {
@@ -308,7 +318,6 @@ TenantSimpleCollectionPage {
 			}
 			MenuItem {
 				text: qsTr("Admin")
-				checkable: true
 				checked: memberActionMenu.targetCurrentRole === "Admin"
 				onTriggered: {
 					if (membersPage.apiClient) {

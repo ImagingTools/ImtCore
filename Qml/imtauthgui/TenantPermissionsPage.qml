@@ -19,7 +19,7 @@ ViewBase {
 
 	commandsPanelVisible: false
 	contentColor: Style.baseColor
-	readonly property var tenantData: permissionsPage.model
+	readonly property var tenantData: model
 
 	function updateGui() {
 		if (!permissionsPage.tenantData)
@@ -36,7 +36,7 @@ ViewBase {
 					checkable: true,
 					expanded: true,
 					data: {
-						FeatureId: perm ? (perm.m_id || "") : "",
+						id: perm ? (perm.m_id || "") : "",
 						name: perm ? (perm.m_name || "") : "",
 						description: perm ? (perm.m_description || "") : ""
 					}
@@ -48,6 +48,7 @@ ViewBase {
 				return (children && (children.count || 0) > 0) ? children : null
 			}
 		)
+
 		tenantPermissionsTreeView.model = nodes
 
 		var selectedPermissionsIds = []
@@ -66,7 +67,7 @@ ViewBase {
 			var nodeChildren = nodeObj.children || []
 			if (nodeChildren.length === 0) {
 				var nodeData = nodeObj.data || {}
-				var id = nodeData.FeatureId
+				var id = nodeData.id
 				if (selectedPermissionsIds.includes(id))
 					tenantPermissionsTreeView.checkItem(nodeObj.key)
 			}
@@ -83,7 +84,7 @@ ViewBase {
 			var nodeChildren = nodeObj.children || []
 			if (nodeChildren.length === 0) {
 				var nodeData = nodeObj.data || {}
-				var id = nodeData.FeatureId
+				var id = nodeData.id
 				selectedPermissionIds.push(id)
 			}
 		}

@@ -13,6 +13,7 @@
 #include <istd/TOptDelPtr.h>
 #include <imtauth/ITenantInfo.h>
 #include <iprm/IIdParam.h>
+#include <iprm/ITextParam.h>
 #include <iprm/CParamsSet.h>
 #include <iprm/TParamsPtr.h>
 #include <imtbase/ICollectionFilter.h>
@@ -363,13 +364,6 @@ QString CTenantDbDelegateComp::GetTenantRelationScopeSubquery(const QByteArray& 
 	}
 
 	QString escapedUserId = imtdb::EscapeSql(QString::fromUtf8(userId));
-	const QByteArray driverId = m_databaseEngineCompPtr->GetDatabaseDriverId();
-	const bool isSQLite = (driverId == "QSQLITE");
-
-	// "TenantId"::uuid — PostgreSQL-only cast, SQLite stores UUID as TEXT
-	const QString tenantIdCast = isSQLite
-								 ? QString("\"TenantId\"")
-								 : QString("\"TenantId\"::uuid");
 
 	return QString(
 				"SELECT *, "
@@ -377,12 +371,11 @@ QString CTenantDbDelegateComp::GetTenantRelationScopeSubquery(const QByteArray& 
 				"WHEN \"CreatorId\"='%1' THEN 'Creator' "
 				"WHEN \"OwnerId\"='%1' THEN 'Owner' "
 				"WHEN \"Id\" IN (SELECT \"TenantId\" FROM \"TenantMemberships\" WHERE \"UserId\"='%1' AND \"IsActive\"=true) THEN 'Member' "
-				"WHEN \"Id\" IN (SELECT %2 FROM \"TenantInvitations\" WHERE \"UserId\"='%1' AND \"Status\"=%3) THEN 'Invited' "
+				"WHEN \"Id\" IN (SELECT \"TenantId\" FROM \"TenantInvitations\" WHERE \"UserId\"='%1' AND \"Status\"=%2) THEN 'Invited' "
 				"ELSE NULL "
 				"END AS \"TenantRelationScope\" "
-				"FROM \"%4\"")
+				"FROM \"%3\"")
 			.arg(escapedUserId)
-			.arg(tenantIdCast)
 			.arg(s_invitationStatusPending)
 			.arg(tableName);
 }
@@ -481,14 +474,32 @@ QByteArray CTenantDbDelegateComp::GetCountQuery(const iprm::IParamsSet* paramsPt
 
 QString CTenantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
 {
+	QStringList additionalFilters;
+
 	QByteArray userId = ExtractUserId(&filterParams);
-	if (userId.isEmpty()){
-		return QString();
+	if (!userId.isEmpty()){
+		// With TenantRelationScope as a computed column in the subquery,
+		// only show tenants where the user has a relationship (Owner, Member, or Invited)
+		additionalFilters << QStringLiteral("\"TenantRelationScope\" IS NOT NULL");
 	}
 
-	// With TenantRelationScope as a computed column in the subquery,
-	// only show tenants where the user has a relationship (Owner, Member, or Invited)
-	return QStringLiteral("\"TenantRelationScope\" IS NOT NULL");
+	iprm::TParamsPtr<iprm::ITextParam> tenantNameParamPtr(&filterParams, "TenantName");
+	if (tenantNameParamPtr.IsValid()){
+		const QString tenantName = tenantNameParamPtr->GetText().trimmed();
+		if (!tenantName.isEmpty()){
+			additionalFilters << QString("\"Name\"='%1'").arg(imtdb::EscapeSql(tenantName));
+		}
+	}
+
+	iprm::TParamsPtr<iprm::IIdParam> excludedTenantIdParamPtr(&filterParams, "ExcludedTenantId");
+	if (excludedTenantIdParamPtr.IsValid()){
+		const QByteArray excludedTenantId = excludedTenantIdParamPtr->GetId();
+		if (!excludedTenantId.isEmpty()){
+			additionalFilters << QString("\"Id\"<>'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(excludedTenantId)));
+		}
+	}
+
+	return additionalFilters.join(QStringLiteral(" AND "));
 }
 
 
@@ -638,10 +649,10 @@ QByteArrayList CTenantDbDelegateComp::LoadTenantRelationshipIds(const QByteArray
 	}
 
 	QString relationshipsTableName = m_relationshipsTableNameAttrPtr.IsValid()
-			? QString::fromUtf8(*m_relationshipsTableNameAttrPtr) : QStringLiteral("TenantRelationshipIds");
+			? QString::fromUtf8(*m_relationshipsTableNameAttrPtr) : QStringLiteral("TenantRelationships");
 	QString escapedTenantId = imtdb::EscapeSql(QString::fromUtf8(tenantId));
 
-	QString queryStr = QString("SELECT \"RelationshipId\" FROM \"%1\" WHERE \"TenantId\"='%2';")
+	QString queryStr = QString("SELECT \"Id\" FROM \"%1\" WHERE \"SourceTenantId\"='%2' OR \"TargetTenantId\"='%2';")
 			.arg(relationshipsTableName, escapedTenantId);
 
 	QSqlError sqlError;
@@ -649,7 +660,7 @@ QByteArrayList CTenantDbDelegateComp::LoadTenantRelationshipIds(const QByteArray
 	if (sqlError.type() == QSqlError::NoError){
 		while (sqlQuery.next()){
 			QSqlRecord record = sqlQuery.record();
-			result.append(imtdb::VariantToByteArray(record.value("RelationshipId")));
+			result.append(imtdb::VariantToByteArray(record.value("Id")));
 		}
 	}
 
@@ -659,33 +670,20 @@ QByteArrayList CTenantDbDelegateComp::LoadTenantRelationshipIds(const QByteArray
 
 QByteArray CTenantDbDelegateComp::CreateRelationshipIdsInsertQuery(const QByteArray& tenantId, const QByteArrayList& relationshipIds) const
 {
-	if (relationshipIds.isEmpty()){
-		return QByteArray();
-	}
-
-	QString relationshipsTableName = m_relationshipsTableNameAttrPtr.IsValid()
-			? QString::fromUtf8(*m_relationshipsTableNameAttrPtr) : QStringLiteral("TenantRelationshipIds");
-	QString escapedTenantId = imtdb::EscapeSql(QString::fromUtf8(tenantId));
-
-	QByteArray result;
-	for (const QByteArray& relId : relationshipIds){
-		QString escapedRelId = imtdb::EscapeSql(QString::fromUtf8(relId));
-		result += QString("INSERT INTO \"%1\" (\"TenantId\", \"RelationshipId\") VALUES ('%2', '%3');")
-				.arg(relationshipsTableName, escapedTenantId, escapedRelId).toUtf8();
-	}
-
-	return result;
+	Q_UNUSED(tenantId);
+	Q_UNUSED(relationshipIds);
+	// Relationships are stored in TenantRelationships table with SourceTenantId/TargetTenantId columns.
+	// No separate junction table is needed; this method is kept for interface compatibility.
+	return QByteArray();
 }
 
 
 QByteArray CTenantDbDelegateComp::CreateRelationshipIdsDeleteQuery(const QByteArray& tenantId) const
 {
-	QString relationshipsTableName = m_relationshipsTableNameAttrPtr.IsValid()
-			? QString::fromUtf8(*m_relationshipsTableNameAttrPtr) : QStringLiteral("TenantRelationshipIds");
-	QString escapedTenantId = imtdb::EscapeSql(QString::fromUtf8(tenantId));
-
-	return QString("DELETE FROM \"%1\" WHERE \"TenantId\"='%2';")
-			.arg(relationshipsTableName, escapedTenantId).toUtf8();
+	Q_UNUSED(tenantId);
+	// Relationships are stored in TenantRelationships table with SourceTenantId/TargetTenantId columns.
+	// No separate junction table is needed; this method is kept for interface compatibility.
+	return QByteArray();
 }
 
 

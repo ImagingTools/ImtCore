@@ -138,7 +138,7 @@ ViewBase {
 					KeyNavigation.backtab: nameInput;
 				}
 				
-				ItemSelectElementView {
+				GqlBasedItemSelectElementView {
 					id: groupSelectableCollectionEditor
 					collectionId: "Groups"
 						label: qsTr("Parent Groups")
@@ -174,7 +174,7 @@ ViewBase {
 				
 				width: parent.width;
 				
-				ItemSelectElementView {
+				GqlBasedItemSelectElementView {
 					id: userSelectableCollectionEditor
 					collectionId: "Users"
 						label: qsTr("Users")
@@ -206,7 +206,7 @@ ViewBase {
 				
 				width: parent.width;
 				
-				ItemSelectElementView {
+				GqlBasedItemSelectElementView {
 					id: roleSelectableCollectionEditor
 					collectionId: "Roles"
 						label: qsTr("Roles")

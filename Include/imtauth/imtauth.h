@@ -37,3 +37,7 @@ inline QString GetUserName(const imtbase::IObjectCollection& userCollection, con
 
 } // namespace imtauth
 
+#include <imtauth/CCrossOrgGrantDocumentValidatorComp.h>
+#include <imtauth/CRelationshipDocumentValidatorComp.h>
+#include <imtauth/CTenantDocumentValidatorComp.h>
+

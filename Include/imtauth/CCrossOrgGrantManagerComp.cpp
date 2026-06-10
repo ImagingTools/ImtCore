@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtCore/QDateTime>
+#include <QtCore/QStringList>
 #include <QtCore/QUuid>
 
 // ACF includes
@@ -17,21 +18,17 @@ namespace imtauth
 QByteArray CCrossOrgGrantManagerComp::CreateGrant(
 		const QByteArray& sourceTenantId,
 		const QByteArray& targetTenantId,
-		const QByteArray& relationshipId,
-		CrossOrgAccessLevel accessLevel,
-		const QString& resourceScope,
-		const QByteArray& targetTeamId,
+		const QByteArrayList& roleIds,
 		const QString& description,
-		const QString& expiresAt,
-		const QByteArray& contractId)
+		const QString& expiresAt)
 {
 	if (!m_grantCollectionCompPtr.IsValid() || !m_grantFactoryCompPtr.IsValid()){
 		SendErrorMessage(0, "Grant collection or factory not configured", "CCrossOrgGrantManagerComp");
 		return QByteArray();
 	}
 
-	if (sourceTenantId.isEmpty() || targetTenantId.isEmpty() || relationshipId.isEmpty()){
-		SendErrorMessage(0, "Source tenant, target tenant and relationship are required", "CCrossOrgGrantManagerComp");
+	if (sourceTenantId.isEmpty() || targetTenantId.isEmpty()){
+		SendErrorMessage(0, "Source tenant and target tenant are required", "CCrossOrgGrantManagerComp");
 		return QByteArray();
 	}
 
@@ -54,19 +51,31 @@ QByteArray CCrossOrgGrantManagerComp::CreateGrant(
 	info.grantId = grantId;
 	info.sourceTenantId = sourceTenantId;
 	info.targetTenantId = targetTenantId;
-	info.relationshipId = relationshipId;
-	info.contractId = contractId;
-	info.targetTeamId = targetTeamId;
-	info.accessLevel = accessLevel;
-	info.resourceScope = resourceScope;
+	info.roleIds = roleIds;
 	info.description = description;
 	info.createdAt = now;
 	info.expiresAt = expiresAt;
 	info.isActive = true;
 
+	// Provide a deterministic fallback name so that repeated saves update the same
+	// record instead of creating duplicates. A friendlier name based on tenant
+	// display names is computed on the service layer when available.
+	if (info.name.isEmpty()){
+		QString targetName = QString::fromUtf8(targetTenantId);
+		QStringList roleNames;
+		for (const QByteArray& roleId : roleIds){
+			if (!roleId.isEmpty()){
+				roleNames << QString::fromUtf8(roleId);
+			}
+		}
+		info.name = roleNames.isEmpty()
+				? targetName
+				: QStringLiteral("%1 (%2)").arg(targetName, roleNames.join(QStringLiteral(", ")));
+	}
+
 	grantPtr->SetGrantInfo(info);
 
-	QByteArray storedId = m_grantCollectionCompPtr->InsertNewObject("CrossOrgGrant", QString(), QString(), grantPtr.GetPtr(), grantId);
+	QByteArray storedId = m_grantCollectionCompPtr->InsertNewObject("CrossOrgGrant", info.name, QString(), grantPtr.GetPtr(), grantId);
 	return storedId.isEmpty() ? QByteArray() : grantId;
 }
 
@@ -98,6 +107,28 @@ bool CCrossOrgGrantManagerComp::RevokeGrant(const QByteArray& grantId)
 	grantPtr->SetGrantInfo(info);
 
 	return m_grantCollectionCompPtr->SetObjectData(grantId, *grantPtr);
+}
+
+
+bool CCrossOrgGrantManagerComp::RemoveGrants(const QByteArrayList& grantIds)
+{
+	if (!m_grantCollectionCompPtr.IsValid() || grantIds.isEmpty()){
+		return false;
+	}
+
+	QByteArrayList filteredIds;
+	for (const QByteArray& grantId : grantIds){
+		if (!grantId.isEmpty()){
+			filteredIds.push_back(grantId);
+		}
+	}
+
+	if (filteredIds.isEmpty()){
+		return false;
+	}
+
+	istd::CChangeNotifier changeNotifier(this);
+	return m_grantCollectionCompPtr->RemoveElements(filteredIds);
 }
 
 
@@ -161,14 +192,6 @@ CrossOrgGrants CCrossOrgGrantManagerComp::GetGrantsByTargetTenant(const QByteArr
 }
 
 
-CrossOrgGrants CCrossOrgGrantManagerComp::GetGrantsByRelationship(const QByteArray& relationshipId) const
-{
-	return CollectGrants([&relationshipId](const CrossOrgGrantInfo& info){
-		return info.relationshipId == relationshipId;
-	});
-}
-
-
 bool CCrossOrgGrantManagerComp::IsGrantEffective(const CrossOrgGrantInfo& grantInfo) const
 {
 	if (!grantInfo.isActive){
@@ -189,10 +212,9 @@ bool CCrossOrgGrantManagerComp::IsGrantEffective(const CrossOrgGrantInfo& grantI
 bool CCrossOrgGrantManagerComp::HasAccess(
 		const QByteArray& sourceTenantId,
 		const QByteArray& targetTenantId,
-		const QString& resourceScope,
-		CrossOrgAccessLevel requiredLevel) const
+		const QByteArray& roleId) const
 {
-	if (requiredLevel == COAL_NONE){
+	if (roleId.isEmpty()){
 		return true;
 	}
 
@@ -204,11 +226,7 @@ bool CCrossOrgGrantManagerComp::HasAccess(
 		if (!IsGrantEffective(info)){
 			continue;
 		}
-		// An empty resource scope on the grant applies to all resources.
-		if (!info.resourceScope.isEmpty() && info.resourceScope != resourceScope){
-			continue;
-		}
-		if (info.accessLevel >= requiredLevel){
+		if (info.roleIds.contains(roleId)){
 			return true;
 		}
 	}

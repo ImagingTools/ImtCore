@@ -776,6 +776,9 @@ class KeyboardController {
 
                     let parent = obj
                     while(parent){
+                        if(!parent.$properties){
+                            break
+                        }
                         if(parent.$properties.KeyNavigation){
                     
                             if(event.key === Qt.Key_Shift || event.key === Qt.Key_Control || event.key === Qt.Key_Alt) return

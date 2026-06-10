@@ -21,7 +21,13 @@ RemoteCollectionView {
 	collectionId: "Tenants"
 	gqlGetListCommandId: ImtauthTenantsSdlCommandIds.s_getTenantList
 	documentCollectionFilter: null
-	additionalFieldIds: ["id", "name", TenantItemDataTypeMetaInfo.s_tenantRelationScope, TenantItemDataTypeMetaInfo.s_invitationId, TenantItemDataTypeMetaInfo.s_invitedByName]
+	additionalFieldIds: [
+		TenantItemDataTypeMetaInfo.s_id,
+		TenantItemDataTypeMetaInfo.s_name,
+		TenantItemDataTypeMetaInfo.s_tenantRelationScope,
+		TenantItemDataTypeMetaInfo.s_invitationId,
+		TenantItemDataTypeMetaInfo.s_invitedByName
+	]
 
 	Component.onCompleted: {
 		table.setSortingInfo(TenantItemDataTypeMetaInfo.s_createdAt, "DESC")
@@ -459,8 +465,33 @@ RemoteCollectionView {
 
 	// --- Switch to organization ---
 	function switchToTenant(tenantId) {
-		if (tenantId && tenantId !== AuthorizationController.currentTenantId) {
-			AuthorizationController.selectTenant(tenantId)
+		if (tenantId === AuthorizationController.currentTenantId) {
+			return
+		}
+
+		AuthorizationController.selectTenant(tenantId || "")
+	}
+
+	property string __pendingOpenTenantAfterSwitchId: ""
+	property bool __pendingCreateNewTenantDocumentAfterSwitch: false
+
+	function openTenantDocument(tenantId) {
+		if (!tenantId) return
+		var tenantDocumentService = MainDocumentService.getDocumentService(container.collectionId)
+		if (!tenantDocumentService) {
+			console.error("Unable to open tenant document. Error: Document manager is invalid")
+			return
+		}
+		tenantDocumentService.openDocument("Tenant", tenantId)
+	}
+
+	function requestOpenTenantDocument(tenantId, tenantName) {
+		if (!tenantId) return
+		if (tenantId !== AuthorizationController.currentTenantId) {
+			ModalDialogManager.openDialog(switchOnDoubleClickDialogComp,
+				{"tenantId": tenantId, "tenantName": tenantName || tenantId})
+		} else {
+			openTenantDocument(tenantId)
 		}
 	}
 
@@ -474,7 +505,50 @@ RemoteCollectionView {
 			message: qsTr("Do you want to switch to \"%1\"?").arg(tenantName)
 			onFinished: {
 				if (buttonId == Enums.yes) {
-					container.switchToTenant(tenantId)
+					if (tenantId && tenantId !== AuthorizationController.currentTenantId) {
+						container.__pendingOpenTenantAfterSwitchId = tenantId
+						container.switchToTenant(tenantId)
+					} else {
+						container.openTenantDocument(tenantId)
+					}
+				}
+			}
+		}
+	}
+
+	Connections {
+		target: AuthorizationController
+
+		function onTenantSelected(tenantId) {
+			if (container.__pendingCreateNewTenantDocumentAfterSwitch && tenantId === "") {
+				container.__pendingCreateNewTenantDocumentAfterSwitch = false
+				if (container.commandsDelegate) {
+					container.commandsDelegate.createNewTenantDocument()
+				}
+				return
+			}
+
+			if (container.__pendingOpenTenantAfterSwitchId !== ""
+					&& tenantId === container.__pendingOpenTenantAfterSwitchId) {
+				var pendingTenantId = container.__pendingOpenTenantAfterSwitchId
+				container.__pendingOpenTenantAfterSwitchId = ""
+				container.openTenantDocument(pendingTenantId)
+			}
+		}
+
+		function onTenantSelectionFailed(errorMessage) {
+			if (container.__pendingCreateNewTenantDocumentAfterSwitch) {
+				container.__pendingCreateNewTenantDocumentAfterSwitch = false
+				if (errorMessage && errorMessage !== "") {
+					ModalDialogManager.showInfoDialog(errorMessage)
+				}
+				return
+			}
+
+			if (container.__pendingOpenTenantAfterSwitchId !== "") {
+				container.__pendingOpenTenantAfterSwitchId = ""
+				if (errorMessage && errorMessage !== "") {
+					ModalDialogManager.showInfoDialog(errorMessage)
 				}
 			}
 		}
@@ -491,6 +565,21 @@ RemoteCollectionView {
 			onFinished: {
 				if (buttonId == Enums.yes) {
 					container.switchToTenant(tenantId)
+				}
+			}
+		}
+	}
+
+	Component {
+		id: leaveCurrentTenantForNewDialogComp
+		MessageDialog {
+			width: Style.sizeHintM
+			title: qsTr("Switch current organization")
+			message: qsTr("To create a new organization, switch from the current organization?")
+			onFinished: {
+				if (buttonId == Enums.yes) {
+					container.__pendingCreateNewTenantDocumentAfterSwitch = true
+					container.switchToTenant("")
 				}
 			}
 		}
@@ -560,6 +649,68 @@ RemoteCollectionView {
 			id: tenantCommandsDelegate
 			collectionView: container
 
+			function createNewTenantDocument(){
+				if (!documentManager){
+					console.error("Unable to create object. Error: Document manager is invalid")
+					return
+				}
+
+				documentManager.createDocument("Tenant")
+			}
+
+			function onNew(){
+				if (AuthorizationController.currentTenantId && AuthorizationController.currentTenantId !== "") {
+					ModalDialogManager.openDialog(leaveCurrentTenantForNewDialogComp)
+					return
+				}
+
+				createNewTenantDocument()
+			}
+
+			function onEdit(){
+				if (!collectionView){
+					console.error("Unable to edit element. Error: Collection view is invalid")
+					return
+				}
+
+				if (!documentManager){
+					console.error("Unable to edit elements. Error: Document manager is invalid")
+					return
+				}
+
+				let elementsModel = collectionView.table.elements
+				if (!elementsModel){
+					console.error("Unable to edit document. Error: Elements for collection view is invalid")
+					return
+				}
+
+				let indexes = collectionView.table.getSelectedIndexes()
+				for (let i = 0; i < indexes.length; ++i){
+					let index = indexes[i]
+					if (!elementsModel.containsKey("id", index)){
+						console.error("Unable to edit element. Field: 'id' does not exists in the table model")
+						return
+					}
+
+					if (!elementsModel.containsKey("typeId", index)){
+						console.error("Unable to edit element. Field: 'typeId' does not exists in the table model")
+						return
+					}
+
+					let tenantId = elementsModel.getData("id", index)
+					let typeId = elementsModel.getData("typeId", index)
+					if (tenantId && tenantId !== AuthorizationController.currentTenantId){
+						let tenantName = elementsModel.containsKey("name", index)
+								? elementsModel.getData("name", index)
+								: tenantId
+						container.requestOpenTenantDocument(tenantId, tenantName)
+						return
+					}
+
+					documentManager.openDocument(typeId, tenantId)
+				}
+			}
+
 			function updateStateCustomCommands(selection, commandsController, elementsModel){
 				let singleSelection = selection && selection.length === 1
 				let switchEnabled = false
@@ -599,11 +750,13 @@ RemoteCollectionView {
 							if (tenantEditor.representationController){
 								tenantEditor.representationController.updateRepresentationFromDocument()
 							}
-							var newTenantId = tenantEditor.tenantData ? tenantEditor.tenantData.m_id : ""
-							var newTenantName = (tenantEditor.tenantData && tenantEditor.tenantData.m_name) || newTenantId
-							if (newTenantId && newTenantId !== AuthorizationController.currentTenantId){
-								ModalDialogManager.openDialog(switchToNewTenantDialogComp,
-									{"tenantId": newTenantId, "tenantName": newTenantName})
+						}
+					}
+					onIsNewTenantChanged: {
+						if (!isNewTenant){
+							var tenantId = tenantEditor.tenantData ? tenantEditor.tenantData.m_id : ""
+							if (tenantId && tenantId !== AuthorizationController.currentTenantId){
+								container.switchToTenant(tenantId)
 							}
 						}
 					}

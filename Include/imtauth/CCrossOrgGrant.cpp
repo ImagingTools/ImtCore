@@ -15,7 +15,6 @@ namespace imtauth
 
 CCrossOrgGrant::CCrossOrgGrant()
 {
-	m_info.accessLevel = COAL_NONE;
 	m_info.isActive = true;
 }
 
@@ -62,32 +61,28 @@ bool CCrossOrgGrant::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_info.targetTenantId);
 	retVal = retVal && archive.EndTag(targetTag);
 
-	iser::CArchiveTag relationshipTag("RelationshipId", "Relationship ID", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(relationshipTag);
-	retVal = retVal && archive.Process(m_info.relationshipId);
-	retVal = retVal && archive.EndTag(relationshipTag);
+	iser::CArchiveTag nameTag("Name", "Name", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(nameTag);
+	retVal = retVal && archive.Process(m_info.name);
+	retVal = retVal && archive.EndTag(nameTag);
 
-	iser::CArchiveTag contractTag("ContractId", "Contract ID", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(contractTag);
-	retVal = retVal && archive.Process(m_info.contractId);
-	retVal = retVal && archive.EndTag(contractTag);
-
-	iser::CArchiveTag teamTag("TargetTeamId", "Target team ID", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(teamTag);
-	retVal = retVal && archive.Process(m_info.targetTeamId);
-	retVal = retVal && archive.EndTag(teamTag);
-
-	iser::CArchiveTag accessLevelTag("AccessLevel", "Access level", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(accessLevelTag);
-	int accessLevel = static_cast<int>(m_info.accessLevel);
-	retVal = retVal && archive.Process(accessLevel);
-	m_info.accessLevel = static_cast<CrossOrgAccessLevel>(accessLevel);
-	retVal = retVal && archive.EndTag(accessLevelTag);
-
-	iser::CArchiveTag scopeTag("ResourceScope", "Resource scope", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(scopeTag);
-	retVal = retVal && archive.Process(m_info.resourceScope);
-	retVal = retVal && archive.EndTag(scopeTag);
+	iser::CArchiveTag roleIdsTag("RoleIds", "Role IDs (semicolon-separated)", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(roleIdsTag);
+	QString roleIdsStr;
+	if (archive.IsStoring()){
+		roleIdsStr = QString::fromUtf8(m_info.roleIds.join(';'));
+	}
+	retVal = retVal && archive.Process(roleIdsStr);
+	if (!archive.IsStoring()){
+		m_info.roleIds.clear();
+		if (!roleIdsStr.isEmpty()){
+			QStringList parts = roleIdsStr.split(';', Qt::SkipEmptyParts);
+			for (const QString& part : parts){
+				m_info.roleIds.append(part.trimmed().toUtf8());
+			}
+		}
+	}
+	retVal = retVal && archive.EndTag(roleIdsTag);
 
 	iser::CArchiveTag descriptionTag("Description", "Description", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(descriptionTag);
@@ -144,7 +139,6 @@ bool CCrossOrgGrant::ResetData(CompatibilityMode /*mode*/)
 	istd::CChangeNotifier notifier(this);
 
 	m_info = CrossOrgGrantInfo();
-	m_info.accessLevel = COAL_NONE;
 	m_info.isActive = true;
 
 	return true;

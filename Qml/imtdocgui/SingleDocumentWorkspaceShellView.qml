@@ -85,6 +85,10 @@ Item {
 		property string state: "empty"
 		property string lastErrorMessage: ""
 		property bool requestInFlight: false
+		property string requestedObjectId: ""
+		property string requestedTypeId: ""
+		property bool requestedCreateNew: false
+		property string requestedProposedSourceDocumentId: ""
 	}
 
 	onDocumentManagerChanged: {
@@ -137,6 +141,14 @@ Item {
 			return
 		}
 
+		if (_internal.requestInFlight
+				&& _internal.requestedObjectId === objectId
+				&& _internal.requestedTypeId === objectTypeId
+				&& _internal.requestedCreateNew === createNew
+				&& _internal.requestedProposedSourceDocumentId === proposedSourceDocumentId){
+			return
+		}
+
 		// Reuse already-open document for the same objectId.
 		if (objectId !== ""){
 			let existingDocId = documentManager.getDocumentIdByObjectId(objectId)
@@ -148,6 +160,10 @@ Item {
 		}
 
 		_internal.requestInFlight = true
+		_internal.requestedObjectId = objectId
+		_internal.requestedTypeId = objectTypeId
+		_internal.requestedCreateNew = createNew
+		_internal.requestedProposedSourceDocumentId = proposedSourceDocumentId
 		_internal.state = "loading"
 		_internal.lastErrorMessage = ""
 
@@ -311,7 +327,7 @@ Item {
 
 	Rectangle {
 		anchors.fill: parent
-		color: Style.backgroundColor2
+		color: Style.baseColor
 	}
 
 	// Header bar with document name + close button.

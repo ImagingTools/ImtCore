@@ -113,9 +113,8 @@ ElementView {
                     id: checkableTree
                     anchors.fill: parent
                     anchors.rightMargin: scrollbar.visible ? scrollbar.width : 0
-
-                    showHeader: false
                     tristate: true
+
                     Component.onCompleted: {
                         root.treeView = checkableTree
                     }

@@ -37,3 +37,4 @@ GqlSingleDocumentPageView 1.0 GqlSingleDocumentPageView.qml
 RemoteCollectionViewDialog 1.0 RemoteCollectionViewDialog.qml
 SelectableCollectionEditor 1.0 SelectableCollectionEditor.qml
 FilterableSelectGqlDataProvider 1.0 FilterableSelectGqlDataProvider.qml
+GqlBasedItemSelectElementView 1.0 GqlBasedItemSelectElementView.qml

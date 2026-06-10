@@ -49,6 +49,7 @@ QtObject {
 	signal startUpdateRepresentation(string documentId, var representation)
 	signal documentRepresentationUpdated(string documentId, var representation)
 	signal updateRepresentationFailed(string documentId, string message)
+	signal updateDocumentFailed(string documentId, string message)
 	signal documentGuiUpdated(string documentId, var representation)
 
 	// callback(undefined) - cancel, callback(false) - close, callback(true) - save and close

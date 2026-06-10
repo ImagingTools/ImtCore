@@ -2,7 +2,8 @@ CREATE TABLE IF NOT EXISTS "TenantConnectionCodes" (
 	"TenantId" TEXT PRIMARY KEY,
 	"ConnectionCode" TEXT NOT NULL UNIQUE,
 	"AllowConnectionsByCode" INTEGER NOT NULL DEFAULT 1,
-	"CreatedAt" TEXT NOT NULL
+	"CreatedAt" TEXT NOT NULL,
+	FOREIGN KEY ("TenantId") REFERENCES "Tenants" ("Id") ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS "IdxTenantConnectionCodesCode" ON "TenantConnectionCodes" ("ConnectionCode");
@@ -15,7 +16,9 @@ CREATE TABLE IF NOT EXISTS "TenantConnectionRequests" (
 	"Message" TEXT,
 	"Status" INTEGER NOT NULL DEFAULT 0,
 	"CreatedAt" TEXT NOT NULL,
-	"RespondedAt" TEXT
+	"RespondedAt" TEXT,
+	FOREIGN KEY ("SourceTenantId") REFERENCES "Tenants" ("Id") ON DELETE CASCADE,
+	FOREIGN KEY ("TargetTenantId") REFERENCES "Tenants" ("Id") ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS "IdxTenantConnectionRequestsSourceTenantId" ON "TenantConnectionRequests" ("SourceTenantId");
@@ -28,7 +31,9 @@ CREATE TABLE IF NOT EXISTS "TenantConnections" (
 	"Status" INTEGER NOT NULL DEFAULT 0,
 	"CreatedAt" TEXT NOT NULL,
 	"UpdatedAt" TEXT,
-	UNIQUE ("TenantAId", "TenantBId")
+	UNIQUE ("TenantAId", "TenantBId"),
+	FOREIGN KEY ("TenantAId") REFERENCES "Tenants" ("Id") ON DELETE CASCADE,
+	FOREIGN KEY ("TenantBId") REFERENCES "Tenants" ("Id") ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS "IdxTenantConnectionsTenantAId" ON "TenantConnections" ("TenantAId");
@@ -47,7 +52,10 @@ CREATE TABLE IF NOT EXISTS "TenantRelationships" (
 	"Status" INTEGER NOT NULL DEFAULT 0,
 	"Description" TEXT,
 	"CreatedAt" TEXT NOT NULL,
-	"UpdatedAt" TEXT
+	"UpdatedAt" TEXT,
+	FOREIGN KEY ("ConnectionId") REFERENCES "TenantConnections" ("Id") ON DELETE CASCADE,
+	FOREIGN KEY ("SourceTenantId") REFERENCES "Tenants" ("Id") ON DELETE CASCADE,
+	FOREIGN KEY ("TargetTenantId") REFERENCES "Tenants" ("Id") ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS "IdxTenantRelationshipsConnectionId" ON "TenantRelationships" ("ConnectionId");
@@ -70,7 +78,11 @@ CREATE TABLE IF NOT EXISTS "TenantRelationshipProposals" (
 	"Status" INTEGER NOT NULL DEFAULT 0,
 	"Message" TEXT,
 	"CreatedAt" TEXT NOT NULL,
-	"UpdatedAt" TEXT
+	"UpdatedAt" TEXT,
+	FOREIGN KEY ("ConnectionId") REFERENCES "TenantConnections" ("Id") ON DELETE CASCADE,
+	FOREIGN KEY ("InitiatorTenantId") REFERENCES "Tenants" ("Id") ON DELETE CASCADE,
+	FOREIGN KEY ("CounterpartyTenantId") REFERENCES "Tenants" ("Id") ON DELETE CASCADE,
+	FOREIGN KEY ("ExistingRelationshipId") REFERENCES "TenantRelationships" ("Id") ON DELETE SET NULL
 );
 
 CREATE INDEX IF NOT EXISTS "IdxTenantRelationshipProposalsConnectionId" ON "TenantRelationshipProposals" ("ConnectionId");
