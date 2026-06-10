@@ -39,386 +39,284 @@ double CClusterCreator::getDistanceBetweenObjects(const QGeoCoordinate &coord1, 
 
 double CClusterCreator::getDistanceLimitCoeff(double zoomLevel) const
 {
-	return std::pow(2, 19 - int(zoomLevel)) * 1.0536710607088955e-8 / 2.15;
+	return std::pow(2, 19 - static_cast<int>(zoomLevel)) * 1.0536710607088955e-8 / 2.15;
 }
 
 
-imtbase::CTreeItemModel *CClusterCreator::createMapClusterModel(imtbase::CTreeItemModel *model, double zoomLevel, double limitInPixels) const
+QJsonArray CClusterCreator::createMapClusterModel(const QJsonArray& model, double zoomLevel, double limitInPixels) const
 {
-	imtbase::CTreeItemModel* itemsModel = nullptr;
-	imtbase::CTreeItemModel* clusterModel = nullptr;
-	imtbase::CTreeItemModel* retModel = nullptr;
+	QJsonArray retModel;
 
-	itemsModel = new imtbase::CTreeItemModel();
-	clusterModel = new imtbase::CTreeItemModel();
-	retModel = new imtbase::CTreeItemModel();
-
-	itemsModel->Copy(model);
-
-	for(int i = 0; i < itemsModel->GetItemsCount(); i++){
-
-		int index = clusterModel->InsertNewItem();
-		clusterModel->SetData("tmp", 0, index);
-		clusterModel->SetData("num", 0, index);
-		clusterModel->SetData("numberChilds", 0, index);
-		clusterModel->SetData("clusterState", "offVis", index);
-		clusterModel->SetData("ObjectIds", QStringList(), index);
+	if (model.isEmpty()) {
+		return retModel;
 	}
 
-	double koeff = getDistanceLimitCoeff(zoomLevel);
+	const int itemsCount = model.size();
 
+	// Structures to manage clusters
+	struct ClusterData
+	{
+		int tmp = 0;
+		int num = 0;
+		double latitude = 0.0;
+		double longitude = 0.0;
+		QStringList objectIds;
+		QString clusterState = QStringLiteral("offVis");
+	};
 
-	double x_i;
-	double x_j;
-	double y_i;
-	double y_j;
+	// Struct to hold precomputed/unpacked data for items to maximize inner loop performance
+	struct PrecomputedItem
+	{
+		double x = 0.0;
+		double y = 0.0;
+		double lat = 0.0;
+		double lon = 0.0;
+		QString id;
+		QJsonObject originalObj;
+	};
 
-	double limit = limitInPixels * koeff;
+	QList<PrecomputedItem> precomputedItems;
+	precomputedItems.reserve(itemsCount);
 
-	int numClaster = 0;
+	for (const QJsonValue& val : model) {
+		const QJsonObject rawObj = val.toObject();
+		const double lat = rawObj.value(QStringLiteral("Latitude")).toDouble();
+		const double lon = rawObj.value(QStringLiteral("Longitude")).toDouble();
 
-	for(int i = 0; i < itemsModel->GetItemsCount(); i++){
-		itemsModel->SetData("numClaster", 0, i);
+		const QGeoCoordinate coor(lat, lon);
+		const QPair<double, double> mercator = coordToMercator(coor);
+
+		PrecomputedItem item;
+		item.x = mercator.first;
+		item.y = mercator.second;
+		item.lat = lat;
+		item.lon = lon;
+		item.id = rawObj.value(QStringLiteral("Id")).toVariant().toString();
+		item.originalObj = rawObj;
+		precomputedItems.append(item);
 	}
 
-	for(int i = 0; i < itemsModel->GetItemsCount(); i++){
+	QList<int> clusterIds(itemsCount, 0);
+	QList<ClusterData> clusters(itemsCount);
 
-		for(int j = i+1; j < itemsModel->GetItemsCount(); j++){
+	const double limit = limitInPixels * getDistanceLimitCoeff(zoomLevel);
+	const double limitSq = limit * limit;
+	int clusterCounter = 0;
 
-			double lat_i = itemsModel->GetData("Latitude", i).toDouble();
-			double lat_j = itemsModel->GetData("Latitude", j).toDouble();
-			double lon_i = itemsModel->GetData("Longitude", i).toDouble();
-			double lon_j = itemsModel->GetData("Longitude", j).toDouble();
-
-			QGeoCoordinate coor_i = QGeoCoordinate(lat_i, lon_i);
-			QGeoCoordinate coor_j = QGeoCoordinate(lat_j, lon_j);
-
-			x_i = coordToMercator(coor_i).first;
-			y_i = coordToMercator(coor_i).second;
-			x_j = coordToMercator(coor_j).first;
-			y_j = coordToMercator(coor_j).second;
-
-			int num = itemsModel->GetData("numClaster", i).toInt();
-			double dist = sqrtf((x_i - x_j)*(x_i - x_j) + (y_i - y_j)*(y_i - y_j));
-
-			bool toCluster = std::fabs(dist) < limit;
-
-			if(toCluster){
-
-				if(itemsModel->GetData("numClaster", j).toInt() == 0){
-
-					if(num == 0){
-
-						numClaster++;
-						num = numClaster;
-
-						clusterModel->SetData("tmp", 1, i);
-						clusterModel->SetData("Latitude", itemsModel->GetData("Latitude", i), i);
-						clusterModel->SetData("Longitude", itemsModel->GetData("Longitude", i), i);
-
-					}
-					if(clusterModel->GetData("tmp", i).toInt() > 0){
-
-						itemsModel->SetData("numClaster", num, i);
-						itemsModel->SetData("numClaster", num, j);
-
-						clusterModel->SetData("num", num, i);
-						clusterModel->SetData("tmp", clusterModel->GetData("tmp", i).toInt()+1, i);
-
-					}
-
-					QStringList ids = clusterModel->GetData("ObjectIds",i).toStringList();
-					QString id_i = itemsModel->GetData("Id", i).toString();
-					QString id_j = itemsModel->GetData("Id", j).toString();
-
-					if(!ids.contains(id_i)){
-						ids.append(id_i);
-					}
-					if(!ids.contains(id_j)){
-						ids.append(id_j);
-					}
-
-					clusterModel->SetData("ObjectIds", ids, i);
-				}
-			}
-
-		}
-	}
-
-	for( int i = 0; i < itemsModel->GetItemsCount(); i++){
-
-		if(itemsModel->GetData("numClaster", i).toInt() > 0){
-
-			if(!itemsModel->GetData("isInClaster", i).toBool()){
-				itemsModel->SetData("isInClaster", true, i);
-			}
+	for (int i = 0; i < itemsCount; ++i) {
+		if (clusterIds.at(i) != 0) {
+			continue;
 		}
 
+		const PrecomputedItem& currentItem = precomputedItems.at(i);
+		const double currentX = currentItem.x;
+		const double currentY = currentItem.y;
+
+		for (int j = i + 1; j < itemsCount; ++j) {
+			if (clusterIds.at(j) != 0) {
+				continue;
+			}
+
+			const PrecomputedItem& neighborItem = precomputedItems.at(j);
+			const double dx = currentX - neighborItem.x;
+			const double dy = currentY - neighborItem.y;
+
+			// Optimization: avoid slow square root and std::fabs in inner loop by doing squared check
+			const double distSq = dx * dx + dy * dy;
+			if (distSq >= limitSq) {
+				continue;
+			}
+
+			if (clusterIds.at(i) == 0) {
+				clusterCounter++;
+				clusterIds[i] = clusterCounter;
+
+				clusters[i].num = clusterCounter;
+				clusters[i].tmp = 1;
+				clusters[i].latitude = currentItem.lat;
+				clusters[i].longitude = currentItem.lon;
+			}
+
+			clusterIds[j] = clusterIds.at(i);
+			clusters[i].tmp++;
+
+			const QString& currentId = currentItem.id;
+			const QString& neighborId = neighborItem.id;
+
+			QStringList& cluster_objectIds = clusters[i].objectIds;
+			if (!cluster_objectIds.contains(currentId)) {
+				cluster_objectIds.append(currentId);
+			}
+			if (!cluster_objectIds.contains(neighborId)) {
+				cluster_objectIds.append(neighborId);
+			}
+		}
+	}
+
+	for (auto& cluster : clusters) {
+		if (cluster.num > 0) {
+			cluster.clusterState = QStringLiteral("onVis");
+		}
 		else {
-			if(itemsModel->GetData("isInClaster", i).toBool()){
-				itemsModel->SetData("isInClaster", false, i);
-			}
+			cluster.clusterState = QStringLiteral("offVis");
 		}
 	}
 
-	for( int i = 0; i < clusterModel->GetItemsCount(); i++){
-		if(clusterModel->GetData("num", i).toInt() > 0){
-			if(clusterModel->GetData("clusterState", i).toString() != "onVis"){
-				clusterModel->SetData("clusterState", "onVis", i);
-			}
-			if(clusterModel->GetData("numberChilds", i).toInt() != clusterModel->GetData("tmp", i).toInt()){
-				clusterModel->SetData("numberChilds", clusterModel->GetData("tmp", i).toInt(), i);
-			}
-		}
-
-		else {
-			if(clusterModel->GetData("clusterState", i).toString() != "offVis"){
-				clusterModel->SetData("clusterState", "offVis", i);
-			}
+	// fill the returned model - items NOT in clusters
+	for (int i = 0; i < itemsCount; ++i) {
+		if (clusterIds.at(i) == 0) {
+			QJsonObject obj = precomputedItems.at(i).originalObj;
+			obj.insert(QStringLiteral("IsCluster"), false);
+			retModel.append(obj);
 		}
 	}
 
-	bool noextraItem = false;
-	bool noextraCluster = false;
-
-	//remove elements which in clusters
-	while(!noextraItem){
-		int whileCount = 0;
-		for( int i = 0; i < itemsModel->GetItemsCount(); i++){
-			bool inCluster = itemsModel->GetData("isInClaster", i).toBool();
-			if(inCluster){
-				itemsModel->RemoveItem(i);
-				whileCount = 0;
-				break;
-			}
-			whileCount++;
-		}
-		if(whileCount == itemsModel->GetItemsCount()){
-			noextraItem = true;
+	// fill the returned model - visible clusters
+	for (const auto& cluster : std::as_const(clusters)) {
+		if (cluster.clusterState == QStringLiteral("offVis")) {
+			continue;
 		}
 
-	}
+		QJsonObject clusterObj;
+		clusterObj.insert(QStringLiteral("tmp"), cluster.tmp);
+		clusterObj.insert(QStringLiteral("num"), cluster.num);
+		clusterObj.insert(QStringLiteral("Latitude"), cluster.latitude);
+		clusterObj.insert(QStringLiteral("Longitude"), cluster.longitude);
+		clusterObj.insert(QStringLiteral("clusterState"), cluster.clusterState);
+		clusterObj.insert(QStringLiteral("numberChilds"), cluster.tmp);
+		clusterObj.insert(QStringLiteral("ObjectIds"), cluster.objectIds.join(','));
+		clusterObj.insert(QStringLiteral("IsCluster"), true);
 
-	//remove invisible  clusters
-	while(!noextraCluster){
-		int whileCount = 0;
-		for( int i = 0; i < clusterModel->GetItemsCount(); i++){
-			bool offVis = clusterModel->GetData("clusterState", i).toString() == "offVis";
-			if(offVis){
-				clusterModel->RemoveItem(i);
-				whileCount = 0;
-				break;
-			}
-
-			//change QStringList for QString in the model
-			QString idsString = clusterModel->GetData("ObjectIds",i).toStringList().join(",");
-			clusterModel->SetData("ObjectIds",idsString,i);
-
-			whileCount++;
-
-		}
-		if(whileCount == clusterModel->GetItemsCount()){
-			noextraCluster = true;
-		}
-
-	}
-
-	//fill the returned model
-	for( int i = 0; i < itemsModel->GetItemsCount(); i++){
-		int index = retModel->InsertNewItem();
-		retModel->CopyItemDataFromModel(index, itemsModel, i);
-		retModel->SetData("IsCluster", false, index);
-	}
-
-	for( int i = 0; i < clusterModel->GetItemsCount(); i++){
-		int index = retModel->InsertNewItem();
-		retModel->CopyItemDataFromModel(index, clusterModel, i);
-		retModel->SetData("IsCluster", true,index);
+		retModel.append(clusterObj);
 	}
 
 	return retModel;
 }
 
+
 QList<CCluster*> CClusterCreator::createMapClusters(const QList<CPositionIdentifiable*>& objectList, double zoomLevel, double limitInPixels) const
 {
 	QList<CCluster*> clusterList;
-
-	imtbase::CTreeItemModel* itemsModel = nullptr;
-	imtbase::CTreeItemModel* clusterModel = nullptr;
-
-	itemsModel = new imtbase::CTreeItemModel();
-	clusterModel = new imtbase::CTreeItemModel();
-
-
-	for(int i = 0; i < objectList.length(); i++){
-		CPositionIdentifiable* object = objectList.at(i);
-		double lat = object->GetLatitude();
-		double lon = object->GetLongitude();
-		QByteArray uuid = object->GetObjectUuid();
-
-		int index = itemsModel->InsertNewItem();
-		itemsModel->SetData("Latitude", lat, index);
-		itemsModel->SetData("Longitude", lon, index);
-		itemsModel->SetData("Id", uuid, index);
+	if (objectList.isEmpty()) {
+		return clusterList;
 	}
 
-	for(int i = 0; i < itemsModel->GetItemsCount(); i++){
+	const int itemsCount = objectList.size();
 
-		int index = clusterModel->InsertNewItem();
-		clusterModel->SetData("tmp", 0, index);
-		clusterModel->SetData("num", 0, index);
-		clusterModel->SetData("ObjectIds", QStringList(), index);
+	struct PrecomputedItemData
+	{
+		double x = 0.0;
+		double y = 0.0;
+		double lat = 0.0;
+		double lon = 0.0;
+		QByteArray id;
+	};
+
+	struct ClusterItemData
+	{
+		int clusterId = 0;
+		int childCount = 0;
+		double latitude = 0.0;
+		double longitude = 0.0;
+		QByteArrayList objectIds;
+	};
+
+	QList<PrecomputedItemData> precomputedItems;
+	precomputedItems.reserve(itemsCount);
+
+	for (const CPositionIdentifiable* const object : objectList) {
+		const double lat = object->GetLatitude();
+		const double lon = object->GetLongitude();
+		const auto mercator = coordToMercator(QGeoCoordinate(lat, lon));
+
+		PrecomputedItemData item;
+		item.x = mercator.first;
+		item.y = mercator.second;
+		item.lat = lat;
+		item.lon = lon;
+		item.id = object->GetObjectUuid();
+		precomputedItems.append(item);
 	}
 
-	double koeff = getDistanceLimitCoeff(zoomLevel);
+	QList<int> clusterIds(itemsCount, 0);
+	QList<ClusterItemData> localClusters(itemsCount);
 
-	double x_i;
-	double x_j;
-	double y_i;
-	double y_j;
+	const double limit = limitInPixels * getDistanceLimitCoeff(zoomLevel);
+	const double limitSq = limit * limit;
+	int clusterCounter = 0;
 
+	for (int i = 0; i < itemsCount; ++i) {
+		if (clusterIds.at(i) != 0) {
+			continue;
+		}
 
-	double limit = limitInPixels * koeff;
+		const auto& currentItem = precomputedItems.at(i);
+		const double currentX = currentItem.x;
+		const double currentY = currentItem.y;
 
-	int numClaster = 0;
-
-
-	for(int i = 0; i < itemsModel->GetItemsCount(); i++){
-		itemsModel->SetData("numClaster", 0, i);
-	}
-
-	for(int i = 0; i < itemsModel->GetItemsCount(); i++){
-
-		for(int j = i+1; j < itemsModel->GetItemsCount(); j++){
-
-			double lat_i = itemsModel->GetData("Latitude", i).toDouble();
-			double lat_j = itemsModel->GetData("Latitude", j).toDouble();
-			double lon_i = itemsModel->GetData("Longitude", i).toDouble();
-			double lon_j = itemsModel->GetData("Longitude", j).toDouble();
-
-			QGeoCoordinate coor_i = QGeoCoordinate(lat_i, lon_i);
-			QGeoCoordinate coor_j = QGeoCoordinate(lat_j, lon_j);
-
-			x_i = coordToMercator(coor_i).first;
-			y_i = coordToMercator(coor_i).second;
-			x_j = coordToMercator(coor_j).first;
-			y_j = coordToMercator(coor_j).second;
-
-
-			int num = itemsModel->GetData("numClaster", i).toInt();
-			double dist = sqrtf((x_i - x_j)*(x_i - x_j) + (y_i - y_j)*(y_i - y_j));
-
-			bool toCluster = std::fabs(dist) < limit;
-
-			if(toCluster){
-
-				if(itemsModel->GetData("numClaster", j).toInt() == 0){
-
-					if(num == 0){
-
-						numClaster++;
-						num = numClaster;
-
-						clusterModel->SetData("tmp", 1, i);
-						clusterModel->SetData("Latitude", itemsModel->GetData("Latitude", i), i);
-						clusterModel->SetData("Longitude", itemsModel->GetData("Longitude", i), i);
-
-					}
-					if(clusterModel->GetData("tmp", i).toInt() > 0){
-						itemsModel->SetData("numClaster", num, i);
-						itemsModel->SetData("numClaster", num, j);
-
-						clusterModel->SetData("num", num, i);
-						clusterModel->SetData("tmp", clusterModel->GetData("tmp", i).toInt()+1, i);
-					}
-
-					QStringList ids = clusterModel->GetData("ObjectIds",i).toStringList();
-					QString id_i = itemsModel->GetData("Id", i).toString();
-					QString id_j = itemsModel->GetData("Id", j).toString();
-
-					if(!ids.contains(id_i)){
-						ids.append(id_i);
-					}
-					if(!ids.contains(id_j)){
-						ids.append(id_j);
-					}
-
-					clusterModel->SetData("ObjectIds", ids, i);
-				}
+		for (int j = i + 1; j < itemsCount; ++j) {
+			if (clusterIds.at(j) != 0) {
+				continue;
 			}
 
-		}
+			const auto& neighborItem = precomputedItems.at(j);
+			const double dx = currentX - neighborItem.x;
+			const double dy = currentY - neighborItem.y;
 
-	}// двойной цикл
-
-
-	bool noextraItem = false;
-	bool noextraCluster = false;
-
-	//remove elements which in clusters
-	while(!noextraItem){
-		int whileCount = 0;
-		for( int i = 0; i < itemsModel->GetItemsCount(); i++){
-			bool inCluster = itemsModel->GetData("numClaster", i).toInt() > 0;
-			if(inCluster){
-				itemsModel->RemoveItem(i);
-				whileCount = 0;
-				break;
+			// Optimization: avoid slow square root and std::fabs in inner loop by doing squared check
+			const double distSq = dx * dx + dy * dy;
+			if (distSq >= limitSq) {
+				continue;
 			}
 
-			whileCount++;
-		}
+			if (clusterIds.at(i) == 0) {
+				clusterCounter++;
+				clusterIds[i] = clusterCounter;
 
-		if(whileCount == itemsModel->GetItemsCount()){
-			noextraItem = true;
-		}
-	}
-
-	//remove invisible  clusters
-	while(!noextraCluster){
-		int whileCount = 0;
-		for( int i = 0; i < clusterModel->GetItemsCount(); i++){
-			bool offVis = clusterModel->GetData("num", i).toInt() <= 0;
-			if(offVis){
-				clusterModel->RemoveItem(i);
-				whileCount = 0;
-				break;
+				localClusters[i].clusterId = clusterCounter;
+				localClusters[i].childCount = 1;
+				localClusters[i].latitude = currentItem.lat;
+				localClusters[i].longitude = currentItem.lon;
 			}
 
-			whileCount++;
-		}
+			clusterIds[j] = clusterIds.at(i);
+			localClusters[i].childCount++;
 
-		if(whileCount == clusterModel->GetItemsCount()){
-			noextraCluster = true;
-		}
+			const QByteArray& currentId = currentItem.id;
+			const QByteArray& neighborId = neighborItem.id;
 
+			auto& cluster_objectIds = localClusters[i].objectIds;
+			if (!cluster_objectIds.contains(currentId)) {
+				cluster_objectIds.append(currentId);
+			}
+			if (!cluster_objectIds.contains(neighborId)) {
+				cluster_objectIds.append(neighborId);
+			}
+		}
 	}
 
-	//filling the returned list
-	for( int i = 0; i < itemsModel->GetItemsCount(); i++){
-		imtgeo::CCluster* cluster = new imtgeo::CCluster();
-		cluster->SetLatitude(itemsModel->GetData("Latitude",i).toDouble());
-		cluster->SetLongitude(itemsModel->GetData("Longitude",i).toDouble());
-		cluster->SetZoom(zoomLevel);
-		QByteArray id = itemsModel->GetData("Id", i).toByteArray();
-		QByteArrayList listBA;
-		listBA << id;
-		cluster->SetChildIds(listBA);
-		clusterList.append(cluster);
+	// fill the returned list - items NOT in clusters
+	for (int i = 0; i < itemsCount; ++i) {
+		if (clusterIds.at(i) == 0) {
+			imtgeo::CCluster* const cluster = new imtgeo::CCluster();
+			cluster->SetLatitude(precomputedItems.at(i).lat);
+			cluster->SetLongitude(precomputedItems.at(i).lon);
+			cluster->SetZoom(zoomLevel);
+			cluster->SetChildIds({ precomputedItems.at(i).id });
+			clusterList.append(cluster);
+		}
 	}
 
-	for( int i = 0; i < clusterModel->GetItemsCount(); i++){
-		imtgeo::CCluster* cluster = new imtgeo::CCluster();
-		cluster->SetLatitude(clusterModel->GetData("Latitude",i).toDouble());
-		cluster->SetLongitude(clusterModel->GetData("Longitude",i).toDouble());
-		cluster->SetZoom(zoomLevel);
-		QStringList ids = clusterModel->GetData("ObjectIds", i).toStringList();
-		QByteArrayList idsBA;
-		for(const QString& id: std::as_const(ids)){
-			idsBA.append(id.toUtf8());
+	// fill the returned list - visible clusters
+	for (const auto& localCluster : std::as_const(localClusters)) {
+		if (localCluster.clusterId > 0) {
+			imtgeo::CCluster* const cluster = new imtgeo::CCluster();
+			cluster->SetLatitude(localCluster.latitude);
+			cluster->SetLongitude(localCluster.longitude);
+			cluster->SetZoom(zoomLevel);
+			cluster->SetChildIds(localCluster.objectIds);
+			clusterList.append(cluster);
 		}
-		cluster->SetChildIds(idsBA);
-		clusterList.append(cluster);
 	}
 
 	return clusterList;
@@ -428,17 +326,14 @@ QList<CCluster*> CClusterCreator::createMapClusters(const QList<CPositionIdentif
 QList<CCluster*> CClusterCreator::convertToMapClusters(const QList<CPositionIdentifiable*>& objectList, double zoomLevel) const
 {
 	QList<CCluster*> clusterList;
+	clusterList.reserve(objectList.size());
 
-	for(const CPositionIdentifiable* object : objectList){
-		const QByteArray uuid = object->GetObjectUuid();
-		const double lat = object->GetLatitude();
-		const double lon = object->GetLongitude();
-
-		imtgeo::CCluster* cluster = new imtgeo::CCluster();
-		cluster->SetLatitude(lat);
-		cluster->SetLongitude(lon);
+	for (const CPositionIdentifiable* const object : objectList) {
+		imtgeo::CCluster* const cluster = new imtgeo::CCluster();
+		cluster->SetLatitude(object->GetLatitude());
+		cluster->SetLongitude(object->GetLongitude());
 		cluster->SetZoom(zoomLevel);
-		cluster->SetChildIds({ uuid });
+		cluster->SetChildIds({ object->GetObjectUuid() });
 
 		clusterList.append(cluster);
 	}

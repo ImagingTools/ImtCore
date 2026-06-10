@@ -32,7 +32,7 @@ double CTileProvider::tilex2long(qint64 x, int z) const
 double CTileProvider::tiley2lat(qint64 y, int z) const
 {
 	const double pi = std::acos(-1.0);
-	double n = pi - 2.0 * pi * y / (double)(1 << z);
+	double n = pi - 2.0 * pi * y / static_cast<double>(1 << z);
 
 	return 180.0 / pi * std::atan(0.5 * (std::exp(n) - std::exp(-n)));
 }
@@ -72,14 +72,11 @@ Tile CTileProvider::getTile(const QGeoCoordinate& coord, int z) const
 
 qint64 CTileProvider::getTileNumber(const QGeoCoordinate& coord, int z) const
 {
-	qint64 tileNumber = 0;
-
 	qint64 x = long2tilex(coord.longitude(), z);
 	qint64 y = lat2tiley(coord.latitude(), z);
-
 	qint64 tileCountInRow = (1 << z);
 
-	tileNumber = tileCountInRow * y + x;
+	qint64 tileNumber = tileCountInRow * y + x;
 
 	return tileNumber;
 }
