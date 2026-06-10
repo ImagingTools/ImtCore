@@ -194,7 +194,7 @@ Item {
 																						"../../../../" + Style.getIconPath(element.m_elementItemPath, Icon.State.Off, Icon.Mode.Disabled);
 					decorator: Component {
 						TopButtonDecorator {
-							property string baseColor: !baseElement ? "transparent" : baseElement.checked ? Style.borderColor : baseElement.mouseArea.containsMouse ? Style.baseColor : Style.backgroundColor2
+							property string baseColor: !baseElement ? "transparent" : baseElement.checked ? Style.borderColor : baseElement.mouseArea.containsMouse ? Style.alternateBaseColor : "transparent"
 							property string baseTextColor: !baseElement ? "transparent" : baseElement.enabled ? Style.textColor : Style.inactiveTextColor;
 							color: button.isPositiveAccent ? commandsItem.positiveAccentColor :
 															 button.isNegativeAccent ? commandsItem.negativeAccentColor : baseColor;

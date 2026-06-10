@@ -347,6 +347,11 @@ I_EXPORT_COMPONENT(
 			"Tenant Relationship Document Name Provider");
 
 I_EXPORT_COMPONENT(
+			TenantDocumentValidator,
+			"Tenant document validator",
+			"Tenant Document Validator");
+
+I_EXPORT_COMPONENT(
 			CrossOrgGrantDocumentValidator,
 			"Cross org grant document validator",
 			"Cross Org Grant Document Validator");

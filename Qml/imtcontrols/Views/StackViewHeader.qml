@@ -67,7 +67,7 @@ Item {
 		anchors.verticalCenter: parent.verticalCenter
 		anchors.top: parent.top;
 		anchors.left: parent.left;
-		anchors.leftMargin: visible ? Style.marginM : 0;
+		// anchors.leftMargin: visible ? Style.marginM : 0;
 		width: visible ? closeButton.width: 0;
 		height: headersListView.height;
 		visible: headersModel.count > 1;
@@ -89,6 +89,7 @@ Item {
 		anchors.verticalCenter: parent.verticalCenter
         anchors.top: parent.top;
         anchors.left: buttonPanel.right;
+		anchors.leftMargin: buttonPanel.visible ? Style.marginM : 0;
 		anchors.right: parent.right;
 		height: visible ? Style.controlHeightL : 0;
 		orientation: ListView.Horizontal;

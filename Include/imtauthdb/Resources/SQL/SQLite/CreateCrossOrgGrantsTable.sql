@@ -7,7 +7,9 @@ CREATE TABLE IF NOT EXISTS "CrossOrgGrants" (
 	"Description" TEXT,
 	"CreatedAt" TEXT NOT NULL,
 	"ExpiresAt" TEXT,
-	"IsActive" INTEGER NOT NULL DEFAULT 1
+	"IsActive" INTEGER NOT NULL DEFAULT 1,
+	FOREIGN KEY ("SourceTenantId") REFERENCES "Tenants" ("Id") ON DELETE CASCADE,
+	FOREIGN KEY ("TargetTenantId") REFERENCES "Tenants" ("Id") ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS "IdxCrossOrgGrantsSourceTenantId" ON "CrossOrgGrants" ("SourceTenantId");
