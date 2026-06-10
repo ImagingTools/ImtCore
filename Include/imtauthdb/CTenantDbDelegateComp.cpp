@@ -364,13 +364,6 @@ QString CTenantDbDelegateComp::GetTenantRelationScopeSubquery(const QByteArray& 
 	}
 
 	QString escapedUserId = imtdb::EscapeSql(QString::fromUtf8(userId));
-	const QByteArray driverId = m_databaseEngineCompPtr->GetDatabaseDriverId();
-	const bool isSQLite = (driverId == "QSQLITE");
-
-	// "TenantId"::uuid — PostgreSQL-only cast, SQLite stores UUID as TEXT
-	const QString tenantIdCast = isSQLite
-								 ? QString("\"TenantId\"")
-								 : QString("\"TenantId\"::uuid");
 
 	return QString(
 				"SELECT *, "
@@ -378,12 +371,11 @@ QString CTenantDbDelegateComp::GetTenantRelationScopeSubquery(const QByteArray& 
 				"WHEN \"CreatorId\"='%1' THEN 'Creator' "
 				"WHEN \"OwnerId\"='%1' THEN 'Owner' "
 				"WHEN \"Id\" IN (SELECT \"TenantId\" FROM \"TenantMemberships\" WHERE \"UserId\"='%1' AND \"IsActive\"=true) THEN 'Member' "
-				"WHEN \"Id\" IN (SELECT %2 FROM \"TenantInvitations\" WHERE \"UserId\"='%1' AND \"Status\"=%3) THEN 'Invited' "
+				"WHEN \"Id\" IN (SELECT \"TenantId\" FROM \"TenantInvitations\" WHERE \"UserId\"='%1' AND \"Status\"=%2) THEN 'Invited' "
 				"ELSE NULL "
 				"END AS \"TenantRelationScope\" "
-				"FROM \"%4\"")
+				"FROM \"%3\"")
 			.arg(escapedUserId)
-			.arg(tenantIdCast)
 			.arg(s_invitationStatusPending)
 			.arg(tableName);
 }
