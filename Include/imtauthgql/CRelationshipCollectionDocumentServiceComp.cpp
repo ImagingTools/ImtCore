@@ -287,53 +287,6 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CRelationshipCollectionDocumentServ
 		}
 	}
 
-	// Check for duplicate relationship: same tenant pair with same role combination
-	// (including symmetric/mirror matches) is not allowed.
-	if (m_relationshipCollectionCompPtr.IsValid()){
-		const int srcRole = static_cast<int>(relationshipPtr->GetSourceRole());
-		const int tgtRole = static_cast<int>(relationshipPtr->GetTargetRole());
-
-		for (const QByteArray& existingId : m_relationshipCollectionCompPtr->GetElementIds()){
-			// Skip the document being edited (update case)
-			if (existingId == documentId){
-				continue;
-			}
-
-			imtbase::IObjectCollection::DataPtr existingDataPtr;
-			if (!m_relationshipCollectionCompPtr->GetObjectData(existingId, existingDataPtr)){
-				continue;
-			}
-
-			const imtauth::ITenantRelationshipInfo* existingPtr =
-					dynamic_cast<const imtauth::ITenantRelationshipInfo*>(existingDataPtr.GetPtr());
-			if (existingPtr == nullptr){
-				continue;
-			}
-
-			const int existingSrcRole = static_cast<int>(existingPtr->GetSourceRole());
-			const int existingTgtRole = static_cast<int>(existingPtr->GetTargetRole());
-
-			// Direct match: same source→target with same roles
-			const bool isDirectMatch =
-					existingPtr->GetSourceTenantId() == sourceTenantId
-					&& existingPtr->GetTargetTenantId() == targetTenantId
-					&& existingSrcRole == srcRole
-					&& existingTgtRole == tgtRole;
-
-			// Mirror match: swapped tenants with swapped roles
-			const bool isMirrorMatch =
-					existingPtr->GetSourceTenantId() == targetTenantId
-					&& existingPtr->GetTargetTenantId() == sourceTenantId
-					&& existingSrcRole == tgtRole
-					&& existingTgtRole == srcRole;
-
-			if (isDirectMatch || isMirrorMatch){
-				errorMessage = QStringLiteral("A relationship with these roles already exists between the specified tenants");
-				return response;
-			}
-		}
-	}
-
 	m_documentManagerCompPtr->SetDocumentData(userLogin, documentId, *documentPtr);
 	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 
