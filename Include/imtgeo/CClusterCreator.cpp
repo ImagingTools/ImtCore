@@ -1,36 +1,24 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include "CClusterCreator.h"
+#include <imtgeo/CClusterCreator.h>
 
-
-using namespace std;
 
 namespace imtgeo
 {
 
-// public methods
 
-CClusterCreator::CClusterCreator()
-{
-}
-
-
-CClusterCreator::~CClusterCreator()
-{
-}
-
+// protected methods
 
 QPair<double, double> CClusterCreator::coordToMercator(const QGeoCoordinate &coord) const
 {
 	const double pi = std::acos(-1);
 
+	double lat = coord.latitude();
 	double lon = coord.longitude() / 360.0 + 0.5;
 
-	double lat = coord.latitude();
 	lat = 0.5 - (std::log(std::tan((pi / 4.0) + (pi / 2.0) * lat / 180.0)) / pi) / 2.0;
 	lat = qBound(0.0, lat, 1.0);
 
-	return qMakePair(lon, lat);
-
+	return { lon, lat };
 }
 
 
@@ -43,7 +31,7 @@ double CClusterCreator::getDistanceBetweenObjects(const QGeoCoordinate &coord1, 
 	double x_2 = coordToMercator(coord2).first;
 	double y_2 = coordToMercator(coord2).second;
 
-	dist = sqrtf((x_1 - x_2)*(x_1 - x_2) + (y_1 - y_2)*(y_1 - y_2));
+	dist = std::sqrtf((x_1 - x_2)*(x_1 - x_2) + (y_1 - y_2)*(y_1 - y_2));
 
 	return dist;
 }
@@ -437,23 +425,21 @@ QList<CCluster*> CClusterCreator::createMapClusters(const QList<CPositionIdentif
 }
 
 
-QList<CCluster *> CClusterCreator::convertToMapClusters(const QList<CPositionIdentifiable *> &objectList, double zoomLevel) const
+QList<CCluster*> CClusterCreator::convertToMapClusters(const QList<CPositionIdentifiable*>& objectList, double zoomLevel) const
 {
 	QList<CCluster*> clusterList;
 
-	for(int i = 0; i < objectList.length(); i++){
-		CPositionIdentifiable* object = objectList.at(i);
-		double lat = object->GetLatitude();
-		double lon = object->GetLongitude();
-		QByteArray uuid = object->GetObjectUuid();
+	for(const CPositionIdentifiable* object : objectList){
+		const QByteArray uuid = object->GetObjectUuid();
+		const double lat = object->GetLatitude();
+		const double lon = object->GetLongitude();
 
 		imtgeo::CCluster* cluster = new imtgeo::CCluster();
 		cluster->SetLatitude(lat);
 		cluster->SetLongitude(lon);
 		cluster->SetZoom(zoomLevel);
-		QByteArrayList listBA;
-		listBA << uuid;
-		cluster->SetChildIds(listBA);
+		cluster->SetChildIds({ uuid });
+
 		clusterList.append(cluster);
 	}
 
@@ -461,11 +447,5 @@ QList<CCluster *> CClusterCreator::convertToMapClusters(const QList<CPositionIde
 }
 
 
-// public methods
-
-
-
 } // namespace imtgeo
-
-
 

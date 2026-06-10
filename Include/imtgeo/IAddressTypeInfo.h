@@ -21,37 +21,30 @@ public:
 		Get id of the address type.
 	*/
 	virtual QByteArray GetId() const = 0;
-
 	/**
 		Set id of the address type.
 	*/
 	virtual void SetId(const QByteArray& id) = 0;
-
 	/**
 		Get name of type the address type.
 	*/
 	virtual QString GetName() const = 0;
-
 	/**
 		Set name of type the address type.
 	*/
 	virtual void SetName(const QString& name) = 0;
-
 	/**
 		Get short name of the address type.
 	*/
 	virtual QString GetShortName() const = 0;
-
 	/**
 		Get short name of the address type.
 	*/
 	virtual void SetShortName(const QString& sname) = 0;
-
 	/**
 		Get description of the address type.
 	*/
 	virtual QString GetDescription() const = 0;
-
 	/**
 		Set description of the address type.	m_name.clear();
 	*/

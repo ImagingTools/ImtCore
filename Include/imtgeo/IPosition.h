@@ -19,7 +19,6 @@ public:
 		Get object latitude.
 	*/
 	virtual double GetLatitude() const = 0;
-
 	/**
 		Set object latitude.
 	*/
@@ -28,7 +27,6 @@ public:
 		Get object longitude.
 	*/
 	virtual double GetLongitude() const = 0;
-
 	/**
 		Set object longitude.
 	*/
@@ -37,7 +35,6 @@ public:
 		Get object zoom level.
 	*/
 	virtual int GetZoomLevel() const = 0;
-
 	/**
 		Set object zoom level.
 	*/

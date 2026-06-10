@@ -26,7 +26,6 @@ public:
 		Get ids of parent the address element.
 	*/
 	virtual QByteArrayList GetParentIds() const = 0;
-
 	/**
 		Set ids of parent the address element.
 	*/
@@ -35,37 +34,30 @@ public:
 		Get id address type of element.
 	*/
 	virtual QByteArray GetAddressTypeId() const = 0;
-
 	/**
 		Set id address type of element.
 	*/
 	virtual void SetAddressTypeId(const QByteArray& typeId) = 0;
-
 	/**
 		Get name of the address element.
 	*/
 	virtual QString GetName() const = 0;
-
 	/**
 		Set name of the address element.
 	*/
 	virtual void SetName(const QString& name) = 0;
-
 	/**
 		Get description of the address element.
 	*/
 	virtual QString GetDescription() const = 0;
-
 	/**
 		Set description of the address element.
 	*/
 	virtual void SetDescription(const QString& description) = 0;
-
 	/**
 		Get full address (based on parent id names combined).
 	*/
 	virtual QString GetFullAddress() const = 0;
-
 	/**
 		Set full address (based on parent id names combined).
 	*/
