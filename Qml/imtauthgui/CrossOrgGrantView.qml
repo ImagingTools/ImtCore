@@ -20,6 +20,7 @@ ViewBase {
 	anchors.fill: parent
 	contentColor: Style.baseColor
 	commandsSeparatorVisible: false
+	commandsPanelVisible: !isReadOnly
 
 	property var grantData: model
 	property var apiClient: null
@@ -121,13 +122,10 @@ ViewBase {
 			BaseText {
 				visible: container.isReadOnly
 				width: parent.width
-				horizontalAlignment: Text.AlignHCenter
 				text: qsTr("This grant was created for your organization (read-only)")
 				color: Style.inactiveTextColor
 				font.pixelSize: Style.fontSizeM
 				font.italic: true
-				topPadding: Style.marginM
-				bottomPadding: Style.marginM
 			}
 
 			GroupElementView {
@@ -138,7 +136,7 @@ ViewBase {
 					id: grantNameInput
 					name: qsTr("Name")
 					placeHolderText: qsTr("Auto-generated from tenant and roles if left empty")
-					enabled: !container.isReadOnly
+					readOnly: container.isReadOnly
 					onEditingFinished: {
 						container.doUpdateModel()
 					}
@@ -146,7 +144,6 @@ ViewBase {
 
 				ElementView {
 					name: qsTr("Target Tenant")
-					enabled: !container.isReadOnly
 
 					controlComp: Component {
 						Row {
@@ -165,6 +162,7 @@ ViewBase {
 
 							Button {
 								text: qsTr("Select")
+								visible: !container.isReadOnly
 								onClicked: {
 									var point = targetTenantRow.mapToItem(null, 0, targetTenantRow.height)
 									ModalDialogManager.openDialog(tenantSelectComp, {
@@ -176,7 +174,7 @@ ViewBase {
 
 							Button {
 								text: qsTr("Remove")
-								visible: container.__selectedTargetTenantId !== ""
+								visible: container.__selectedTargetTenantId !== "" && !container.isReadOnly
 								onClicked: {
 									container.__selectedTargetTenantId = ""
 									container.__selectedTargetTenantName = ""
@@ -193,7 +191,7 @@ ViewBase {
 					label: qsTr("Roles")
 					addButtonText: qsTr("Add Role")
 					showCount: true
-					enabled: !container.isReadOnly
+					editable: !container.isReadOnly
 					onSelectionChanged: {
 						container.doUpdateModel()
 					}
@@ -203,7 +201,7 @@ ViewBase {
 					id: grantDescriptionInput
 					name: qsTr("Description")
 					placeHolderText: qsTr("Optional description")
-					enabled: !container.isReadOnly
+					readOnly: container.isReadOnly
 					onEditingFinished: {
 						container.doUpdateModel()
 					}
@@ -215,7 +213,7 @@ ViewBase {
 					description: qsTr("The grant will expire on the selected date")
 					nameId: "name"
 					model: expirationModel
-					enabled: !container.isReadOnly
+					changeable: !container.isReadOnly
 
 					TreeItemModel {
 						id: expirationModel
