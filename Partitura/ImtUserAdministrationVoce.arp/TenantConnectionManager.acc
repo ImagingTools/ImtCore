@@ -123,7 +123,11 @@
         </Element>
         <Element Id="RelationshipDocumentValidator" PackageId="ImtAuthPck" ComponentId="RelationshipDocumentValidator">
             <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
+                <AttributeInfoMap>
+                    <AttributeInfo Id="RelationshipCollection" Type="Reference" ExportId="TenantRelationshipRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="SlaveSubscriberController" PackageId="ImtServerGqlPck" ComponentId="SlaveSubscriberController">
