@@ -16,33 +16,17 @@ namespace imtauth
 
 
 /**
-	Access level for cross-tenant grants.
-	Defines what level of access a grant provides between tenants.
-*/
-enum CrossOrgAccessLevel
-{
-	COAL_NONE = 0,
-	COAL_READ,
-	COAL_WRITE,
-	COAL_ADMIN
-};
-
-
-/**
 	Structure describing a cross-organization grant.
 	Represents a specific permission delegation from one tenant to another,
-	optionally scoped to a team/group and a specific resource scope.
+	scoped by assigned roles with optional expiry.
 */
 struct CrossOrgGrantInfo
 {
 	QByteArray grantId;
 	QByteArray sourceTenantId;
 	QByteArray targetTenantId;
-	QByteArray relationshipId;
-	QByteArray contractId;
-	QByteArray targetTeamId;
-	CrossOrgAccessLevel accessLevel;
-	QString resourceScope;
+	QString name;
+	QByteArrayList roleIds;
 	QString description;
 	QString createdAt;
 	QString expiresAt;
@@ -53,11 +37,8 @@ struct CrossOrgGrantInfo
 		return grantId == other.grantId
 			&& sourceTenantId == other.sourceTenantId
 			&& targetTenantId == other.targetTenantId
-			&& relationshipId == other.relationshipId
-			&& contractId == other.contractId
-			&& targetTeamId == other.targetTeamId
-			&& accessLevel == other.accessLevel
-			&& resourceScope == other.resourceScope
+			&& name == other.name
+			&& roleIds == other.roleIds
 			&& description == other.description
 			&& createdAt == other.createdAt
 			&& expiresAt == other.expiresAt
@@ -78,10 +59,9 @@ typedef QList<CrossOrgGrantInfo> CrossOrgGrants;
 	Provides the mechanism to delegate specific permissions from one tenant
 	to another, supporting B2B collaboration scenarios.
 
-	Grants are always tied to an existing tenant relationship and require
-	explicit delegation from the source tenant. The parent/system tenant
-	does NOT have implicit access to child tenant data — access must be
-	explicitly granted.
+	Grants delegate selected roles from the source tenant to the target
+	tenant. The parent/system tenant does NOT have implicit access to child
+	tenant data — access must be explicitly granted.
 
 	\ingroup Permission
 */
@@ -92,31 +72,29 @@ public:
 		Create a new cross-org grant.
 		\param sourceTenantId Tenant granting access.
 		\param targetTenantId Tenant receiving access.
-		\param relationshipId The relationship that this grant is associated with.
-		\param accessLevel The level of access being granted.
-		\param resourceScope Optional scope limiting the grant to specific resources.
-		\param targetTeamId Optional team in the target tenant that receives the grant.
+		\param roleIds List of role IDs being delegated.
 		\param description Human-readable description of the grant.
 		\param expiresAt Optional expiry timestamp (empty for no expiry).
-		\param contractId Optional contract that governs this grant (empty for ad-hoc grants).
 		\return Grant ID if successful, empty if failed.
 	*/
 	virtual QByteArray CreateGrant(
 		const QByteArray& sourceTenantId,
 		const QByteArray& targetTenantId,
-		const QByteArray& relationshipId,
-		CrossOrgAccessLevel accessLevel,
-		const QString& resourceScope = QString(),
-		const QByteArray& targetTeamId = QByteArray(),
+		const QByteArrayList& roleIds,
 		const QString& description = QString(),
-		const QString& expiresAt = QString(),
-		const QByteArray& contractId = QByteArray()) = 0;
+		const QString& expiresAt = QString()) = 0;
 
 	/**
 		Remove a cross-org grant by its ID.
 		\return true if removed successfully.
 	*/
 	virtual bool RevokeGrant(const QByteArray& grantId) = 0;
+
+	/**
+		Permanently remove cross-org grants by their IDs.
+		\return true if all requested grants were removed successfully.
+	*/
+	virtual bool RemoveGrants(const QByteArrayList& grantIds) = 0;
 
 	/**
 		Get a specific grant by its ID.
@@ -134,19 +112,13 @@ public:
 	virtual CrossOrgGrants GetGrantsByTargetTenant(const QByteArray& targetTenantId) const = 0;
 
 	/**
-		Get all grants associated with a specific relationship.
-	*/
-	virtual CrossOrgGrants GetGrantsByRelationship(const QByteArray& relationshipId) const = 0;
-
-	/**
-		Check if a target tenant has at least the required access level
-		for a given resource scope from the source tenant.
+		Check if a target tenant has at least one of the specified roles
+		granted by the source tenant.
 	*/
 	virtual bool HasAccess(
 		const QByteArray& sourceTenantId,
 		const QByteArray& targetTenantId,
-		const QString& resourceScope,
-		CrossOrgAccessLevel requiredLevel) const = 0;
+		const QByteArray& roleId) const = 0;
 };
 
 

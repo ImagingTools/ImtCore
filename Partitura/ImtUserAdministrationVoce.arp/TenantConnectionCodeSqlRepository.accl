@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Accl>
-    <AcclHeader>
+<Acf>
+    <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6390" Description="ACF"/>
-            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
-    </AcclHeader>
-    <Layouts>
-        <Layout>
-            <Items>
-                <Item Id="JsonSerializer" X="10" Y="10" W="180" H="40"/>
-                <Item Id="ObjectCollection" X="10" Y="70" W="180" H="40"/>
-                <Item Id="Repository" X="10" Y="130" W="180" H="40"/>
-                <Item Id="TenantConnectionCodeDatabaseDelegate" X="10" Y="190" W="250" H="40"/>
-                <Item Id="TenantConnectionCodeInfo" X="10" Y="250" W="180" H="40"/>
-                <Item Id="Types" X="10" Y="310" W="180" H="40"/>
-            </Items>
-        </Layout>
-    </Layouts>
-</Accl>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="JsonSerializer" X="975" Y="150" Note=""/>
+        <Element ComponentName="ObjectCollection" X="650" Y="350" Note=""/>
+        <Element ComponentName="Repository" X="625" Y="550" Note=""/>
+        <Element ComponentName="TenantConnectionCodeDatabaseDelegate" X="550" Y="125" Note=""/>
+        <Element ComponentName="TenantConnectionCodeInfo" X="375" Y="250" Note=""/>
+        <Element ComponentName="Types" X="925" Y="375" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

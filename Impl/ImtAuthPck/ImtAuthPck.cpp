@@ -341,6 +341,21 @@ I_EXPORT_COMPONENT(
 			"Provides default document name from tenant name",
 			"Tenant Document Name Provider");
 
+I_EXPORT_COMPONENT(
+			TenantRelationshipDocumentNameProvider,
+			"Provides default document name from target tenant name",
+			"Tenant Relationship Document Name Provider");
+
+I_EXPORT_COMPONENT(
+			CrossOrgGrantDocumentValidator,
+			"Cross org grant document validator",
+			"Cross Org Grant Document Validator");
+
+I_EXPORT_COMPONENT(
+			RelationshipDocumentValidator,
+			"Relationship document validator",
+			"Relationship Document Validator");
+
 
 } // namespace ImtAuthPck
 

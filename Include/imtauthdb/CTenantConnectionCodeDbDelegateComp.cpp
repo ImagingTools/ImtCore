@@ -28,8 +28,8 @@ istd::IChangeableUniquePtr CTenantConnectionCodeDbDelegateComp::CreateObjectFrom
 		return nullptr;
 	}
 
-	if (record.contains("Id")){
-		codePtr->SetTenantId(imtdb::VariantToByteArray(record.value("Id")));
+	if (record.contains("TenantId")){
+		codePtr->SetTenantId(imtdb::VariantToByteArray(record.value("TenantId")));
 	}
 	if (record.contains("ConnectionCode")){
 		codePtr->SetConnectionCode(record.value("ConnectionCode").toString());
@@ -47,12 +47,12 @@ istd::IChangeableUniquePtr CTenantConnectionCodeDbDelegateComp::CreateObjectFrom
 
 
 CTenantConnectionCodeDbDelegateComp::NewObjectQuery CTenantConnectionCodeDbDelegateComp::CreateNewObjectQuery(
-		const QByteArray& /*typeId*/,
-		const QByteArray& proposedObjectId,
-		const QString& /*objectName*/,
-		const QString& /*objectDescription*/,
-		const istd::IChangeable* valuePtr,
-		const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const QByteArray& /*typeId*/,
+			const QByteArray& proposedObjectId,
+			const QString& /*objectName*/,
+			const QString& /*objectDescription*/,
+			const istd::IChangeable* valuePtr,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	NewObjectQuery result;
 
@@ -64,16 +64,16 @@ CTenantConnectionCodeDbDelegateComp::NewObjectQuery CTenantConnectionCodeDbDeleg
 	QByteArray tenantId = !proposedObjectId.isEmpty() ? proposedObjectId : codePtr->GetTenantId();
 	QString id = imtdb::EscapeSql(QString::fromUtf8(tenantId));
 	QString connectionCode = imtdb::EscapeSql(codePtr->GetConnectionCode());
-	int allowInt = codePtr->GetAllowConnectionsByCode() ? 1 : 0;
+	QString allowBool = codePtr->GetAllowConnectionsByCode() ? "TRUE" : "FALSE";
 	QString createdAt = !codePtr->GetCreatedAt().isEmpty() ? imtdb::EscapeSql(codePtr->GetCreatedAt()) : imtdb::UtcNow();
 
 	result.query = QString(
-	"INSERT INTO \"%1\" (\"Id\", \"ConnectionCode\", \"AllowConnectionsByCode\", \"CreatedAt\") "
+	"INSERT INTO \"%1\" (\"TenantId\", \"ConnectionCode\", \"AllowConnectionsByCode\", \"CreatedAt\") "
 	"VALUES ('%2', '%3', %4, '%5');")
 	.arg(*m_tableNameAttrPtr)
 	.arg(id)
 	.arg(connectionCode)
-	.arg(QString::number(allowInt))
+	.arg(allowBool)
 	.arg(createdAt).toUtf8();
 
 	return result;
@@ -96,10 +96,10 @@ QByteArray CTenantConnectionCodeDbDelegateComp::CreateUpdateObjectQuery(
 	"UPDATE \"%1\" SET "
 	"\"ConnectionCode\"='%2', "
 	"\"AllowConnectionsByCode\"=%3 "
-	"WHERE \"Id\"='%4';")
+	"WHERE \"TenantId\"='%4';")
 	.arg(*m_tableNameAttrPtr)
 	.arg(imtdb::EscapeSql(codePtr->GetConnectionCode()))
-	.arg(QString::number(codePtr->GetAllowConnectionsByCode() ? 1 : 0))
+	.arg(codePtr->GetAllowConnectionsByCode() ? "TRUE" : "FALSE")
 	.arg(imtdb::EscapeSql(QString::fromUtf8(objectId))).toUtf8();
 }
 
@@ -118,7 +118,7 @@ QByteArray CTenantConnectionCodeDbDelegateComp::CreateDeleteObjectsQuery(
 		escapedIds << QString("'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(id)));
 	}
 
-	return QString("DELETE FROM \"%1\" WHERE \"Id\" IN (%2);")
+	return QString("DELETE FROM \"%1\" WHERE \"TenantId\" IN (%2);")
 	.arg(*m_tableNameAttrPtr, escapedIds.join(", ")).toUtf8();
 }
 

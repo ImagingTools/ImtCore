@@ -26,14 +26,11 @@ public:
 	QByteArray CreateGrant(
 				const QByteArray& sourceTenantId,
 				const QByteArray& targetTenantId,
-				const QByteArray& relationshipId,
-				CrossOrgAccessLevel accessLevel,
-				const QString& resourceScope = QString(),
-				const QByteArray& targetTeamId = QByteArray(),
+				const QByteArrayList& roleIds,
 				const QString& description = QString(),
 				const QString& expiresAt = QString())
 	{
-		if (sourceTenantId.isEmpty() || targetTenantId.isEmpty() || relationshipId.isEmpty()){
+		if (sourceTenantId.isEmpty() || targetTenantId.isEmpty()){
 			return QByteArray();
 		}
 		if (sourceTenantId == targetTenantId){
@@ -44,10 +41,7 @@ public:
 		info.grantId = QByteArray::number(++m_counter);
 		info.sourceTenantId = sourceTenantId;
 		info.targetTenantId = targetTenantId;
-		info.relationshipId = relationshipId;
-		info.targetTeamId = targetTeamId;
-		info.accessLevel = accessLevel;
-		info.resourceScope = resourceScope;
+		info.roleIds = roleIds;
 		info.description = description;
 		info.createdAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
 		info.expiresAt = expiresAt;
@@ -96,10 +90,9 @@ public:
 	bool HasAccess(
 				const QByteArray& sourceTenantId,
 				const QByteArray& targetTenantId,
-				const QString& resourceScope,
-				CrossOrgAccessLevel requiredLevel) const
+				const QByteArray& roleId) const
 	{
-		if (requiredLevel == COAL_NONE){
+		if (roleId.isEmpty()){
 			return true;
 		}
 
@@ -110,10 +103,7 @@ public:
 			if (!IsGrantEffective(info)){
 				continue;
 			}
-			if (!info.resourceScope.isEmpty() && info.resourceScope != resourceScope){
-				continue;
-			}
-			if (info.accessLevel >= requiredLevel){
+			if (info.roleIds.contains(roleId)){
 				return true;
 			}
 		}

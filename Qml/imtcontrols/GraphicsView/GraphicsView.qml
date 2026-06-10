@@ -123,6 +123,8 @@ Rectangle {
 	signal mouseReleased(var mouse)
 	signal mouseDoubleClicked(var mouse)
 	signal mousePositionChanged(var mouse)
+	signal mouseEntered()
+	signal mouseExited()
 
 	signal painted()
 	signal imageLoaded()
@@ -923,6 +925,17 @@ Rectangle {
 					}
 				}
 
+			}
+
+			onEntered: {
+				if(graphicsView.receiveMouseEvents){
+					graphicsView.mouseEntered()
+				}
+			}
+			onExited: {
+				if(graphicsView.receiveMouseEvents){
+					graphicsView.mouseExited()
+				}
 			}
 
 			PauseAnimation {

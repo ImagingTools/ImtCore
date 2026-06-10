@@ -26,11 +26,13 @@ ViewBase {
 
 	property bool sending: false
 	property string lastError: ""
+	property string processingRequestId: ""
 
 	function updateGui() {
 		if (connectPage.apiClient && connectPage.tenantData
 				&& connectPage.tenantData.m_id) {
 			connectPage.apiClient.fetchConnectionRequests(connectPage.tenantData.m_id)
+			connectPage.apiClient.fetchConnections(connectPage.tenantData.m_id)
 		}
 	}
 
@@ -52,7 +54,18 @@ ViewBase {
 
 		function onConnectionRequestError(errorMessage) {
 			connectPage.sending = false
+			connectPage.processingRequestId = ""
 			connectPage.lastError = errorMessage
+		}
+
+		function onRequestFailed(message) {
+			connectPage.sending = false
+			connectPage.processingRequestId = ""
+			connectPage.lastError = message || ""
+			if (message && message !== "") {
+				PopupManager.addErrorMessage(message, true)
+			}
+			connectPage.updateGui()
 		}
 
 		function onConnectionRequestsReceived() {
@@ -60,17 +73,28 @@ ViewBase {
 		}
 
 		function onConnectionRequestApproved(connectionId) {
+			connectPage.processingRequestId = ""
 			PopupManager.addSuccessMessage(qsTr("Connection request approved"), true)
 			connectPage.updateGui()
 		}
 
 		function onConnectionRequestRejected() {
+			connectPage.processingRequestId = ""
 			PopupManager.addSuccessMessage(qsTr("Connection request rejected"), true)
 			connectPage.updateGui()
 		}
 
 		function onConnectionRequestCanceled() {
 			PopupManager.addSuccessMessage(qsTr("Connection request canceled"), true)
+			connectPage.updateGui()
+		}
+
+		function onConnectionsReceived() {
+			connectPage.refreshConnectionsList()
+		}
+
+		function onConnectionRemoved(connectionId) {
+			PopupManager.addSuccessMessage(qsTr("Connection removed"), true)
 			connectPage.updateGui()
 		}
 	}
@@ -94,6 +118,33 @@ ViewBase {
 		}
 		requestsList.model = incoming
 		sentRequestsList.model = outgoing
+
+		if (connectPage.processingRequestId !== "") {
+			var stillPending = false
+			for (var j = 0; j < incoming.length; ++j) {
+				if (incoming[j].id === connectPage.processingRequestId) {
+					stillPending = true
+					break
+				}
+			}
+			if (!stillPending) {
+				connectPage.processingRequestId = ""
+			}
+		}
+	}
+
+	function refreshConnectionsList() {
+		var allConnections = connectPage.apiClient ? connectPage.apiClient.connectionsModel : null
+		var connections = []
+		if (allConnections) {
+			for (var i = 0; i < allConnections.count; ++i) {
+				var conn = allConnections.get(i)
+				if (conn.status === "Active") {
+					connections.push(conn)
+				}
+			}
+		}
+		connectionsList.model = connections
 	}
 
 	Flickable {
@@ -280,12 +331,12 @@ ViewBase {
 							width: approveBtnText.contentWidth + Style.marginL * 2
 							height: Style.controlHeightS
 							radius: Style.radiusM
-							color: "#3FB950"
+							color: connectPage.processingRequestId === modelData.id ? Style.inactiveTextColor : "#3FB950"
 
 							Text {
 								id: approveBtnText
 								anchors.centerIn: parent
-								text: qsTr("Approve")
+								text: connectPage.processingRequestId === modelData.id ? qsTr("Approving...") : qsTr("Approve")
 								font.pixelSize: Style.fontSizeS
 								color: "#FFFFFF"
 							}
@@ -293,8 +344,10 @@ ViewBase {
 							MouseArea {
 								anchors.fill: parent
 								cursorShape: Qt.PointingHandCursor
+								enabled: connectPage.processingRequestId === ""
 								onClicked: {
 									if (connectPage.apiClient && connectPage.tenantData) {
+										connectPage.processingRequestId = modelData.id || ""
 										connectPage.apiClient.approveConnectionRequest(
 											modelData.id, connectPage.tenantData.m_id)
 									}
@@ -306,12 +359,12 @@ ViewBase {
 							width: rejectBtnText.contentWidth + Style.marginL * 2
 							height: Style.controlHeightS
 							radius: Style.radiusM
-							color: "#DA3633"
+							color: connectPage.processingRequestId === modelData.id ? Style.inactiveTextColor : "#DA3633"
 
 							Text {
 								id: rejectBtnText
 								anchors.centerIn: parent
-								text: qsTr("Reject")
+								text: connectPage.processingRequestId === modelData.id ? qsTr("Rejecting...") : qsTr("Reject")
 								font.pixelSize: Style.fontSizeS
 								color: "#FFFFFF"
 							}
@@ -319,8 +372,10 @@ ViewBase {
 							MouseArea {
 								anchors.fill: parent
 								cursorShape: Qt.PointingHandCursor
+								enabled: connectPage.processingRequestId === ""
 								onClicked: {
 									if (connectPage.apiClient && connectPage.tenantData) {
+										connectPage.processingRequestId = modelData.id || ""
 										connectPage.apiClient.rejectConnectionRequest(
 											modelData.id, connectPage.tenantData.m_id)
 									}
@@ -430,6 +485,133 @@ ViewBase {
 							}
 						}
 					}
+				}
+			}
+
+			Rectangle {
+				width: parent.width
+				height: 1
+				color: Style.borderColor
+			}
+
+			Text {
+				text: qsTr("Established Connections")
+				font.pixelSize: Style.fontSizeL
+				font.bold: true
+				color: Style.textColor
+			}
+
+			Text {
+				text: qsTr("Organizations you are connected with.")
+				font.pixelSize: Style.fontSizeM
+				color: Style.inactiveTextColor
+			}
+
+			Text {
+				visible: connectionsList.count === 0
+				text: qsTr("No established connections yet.")
+				font.pixelSize: Style.fontSizeM
+				color: Style.inactiveTextColor
+			}
+
+			ListView {
+				id: connectionsList
+				width: parent.width
+				height: connectionsList.contentHeight
+				interactive: false
+				spacing: Style.marginS
+
+				delegate: Rectangle {
+					width: connectionsList.width
+					height: connContent.height + Style.marginL * 2
+					color: Style.backgroundColor2
+					radius: Style.radiusL
+					border.width: 1
+					border.color: Style.borderColor
+
+					Column {
+						id: connContent
+						anchors.left: parent.left
+						anchors.right: connActions.left
+						anchors.leftMargin: Style.marginL
+						anchors.rightMargin: Style.marginS
+						anchors.verticalCenter: parent.verticalCenter
+						spacing: Style.marginXS
+
+						Text {
+							text: modelData.partnerName ? modelData.partnerName : qsTr("Unknown Organization")
+							font.pixelSize: Style.fontSizeM
+							font.bold: true
+							color: Style.textColor
+						}
+
+						Text {
+							visible: modelData.partnerOwnerName ? modelData.partnerOwnerName !== "" : false
+							text: qsTr("Owner: %1").arg(modelData.partnerOwnerName || "")
+							font.pixelSize: Style.fontSizeS
+							color: Style.inactiveTextColor
+						}
+
+						Text {
+							text: qsTr("Connected since: %1").arg(
+								modelData.createdAt ? new Date(modelData.createdAt).toLocaleDateString() : "—")
+							font.pixelSize: Style.fontSizeXS
+							color: Style.inactiveTextColor
+						}
+					}
+
+					Row {
+						id: connActions
+						anchors.right: parent.right
+						anchors.rightMargin: Style.marginL
+						anchors.verticalCenter: parent.verticalCenter
+						spacing: Style.marginS
+
+						Rectangle {
+							width: removeBtnText.contentWidth + Style.marginL * 2
+							height: Style.controlHeightS
+							radius: Style.radiusM
+							color: "#DA3633"
+
+							Text {
+								id: removeBtnText
+								anchors.centerIn: parent
+								text: qsTr("Remove")
+								font.pixelSize: Style.fontSizeS
+								color: "#FFFFFF"
+							}
+
+							MouseArea {
+								anchors.fill: parent
+								cursorShape: Qt.PointingHandCursor
+								onClicked: {
+									if (connectPage.apiClient && connectPage.tenantData) {
+										connectPage.__connectionToRemoveId = modelData.id
+										connectPage.__connectionToRemoveName = modelData.partnerName || qsTr("Unknown Organization")
+										ModalDialogManager.openDialog(removeConnectionConfirmDialogComp)
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	property string __connectionToRemoveId: ""
+	property string __connectionToRemoveName: ""
+
+	Component {
+		id: removeConnectionConfirmDialogComp
+		MessageDialog {
+			width: Style.sizeHintM
+			title: qsTr("Remove connection")
+			message: qsTr("Are you sure you want to remove the connection with \"%1\"?\n\nAll relationships with this organization will also be removed.").arg(connectPage.__connectionToRemoveName)
+			onFinished: {
+				if (buttonId == Enums.yes) {
+					connectPage.apiClient.removeConnection(
+						connectPage.__connectionToRemoveId, connectPage.tenantData.m_id)
 				}
 			}
 		}

@@ -35,9 +35,10 @@ QtObject {
         var policy = popup.closePolicy;
         if (policy === noAutoClose) return false;
         var insideParent = _isInsideParent(popup, mouse);
-        if ((policy & closeOnPressOutside) && !insideParent && !_isInsidePopup(popup, mouse))
+        var insidePopup = _isInsidePopup(popup, mouse);
+        if ((policy & closeOnPressOutside) && !insidePopup)
             return true;
-        if ((policy & closeOnPressOutsideParent) && !insideParent && !_isInsidePopup(popup, mouse))
+        if ((policy & closeOnPressOutsideParent) && !insideParent)
             return true;
         return false;
     }
@@ -48,9 +49,10 @@ QtObject {
         var policy = popup.closePolicy;
         if (policy === noAutoClose) return false;
         var insideParent = _isInsideParent(popup, mouse);
-        if ((policy & closeOnReleaseOutside) && !insideParent && !_isInsidePopup(popup, mouse))
+        var insidePopup = _isInsidePopup(popup, mouse);
+        if ((policy & closeOnReleaseOutside) && !insidePopup)
             return true;
-        if ((policy & closeOnReleaseOutsideParent) && !insideParent && !_isInsidePopup(popup, mouse))
+        if ((policy & closeOnReleaseOutsideParent) && !insideParent)
             return true;
         return false;
     }

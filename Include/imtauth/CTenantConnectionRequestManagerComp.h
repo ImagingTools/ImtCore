@@ -5,9 +5,6 @@
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 
-// Qt includes
-#include <functional>
-
 // ImtCore includes
 #include <imtauth/ITenantConnectionRequestManager.h>
 #include <imtauth/ITenantConnectionRequestInfo.h>
@@ -64,9 +61,11 @@ public:
 	virtual bool RejectConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId) override;
 	virtual bool CancelConnectionRequest(const QByteArray& requestId, const QByteArray& tenantId) override;
 	virtual QByteArrayList GetConnectionRequestIds(const QByteArray& tenantId) const override;
+	virtual ITenantConnectionRequestInfoUniquePtr GetConnectionRequest(const QByteArray& requestId) const override;
 
 	// ITenantConnectionRequestManager - Connections
 	virtual QByteArrayList GetConnectionIds(const QByteArray& tenantId) const override;
+	virtual ITenantConnectionInfoUniquePtr GetConnection(const QByteArray& connectionId) const override;
 	virtual bool RemoveConnection(const QByteArray& connectionId, const QByteArray& tenantId) override;
 
 	// ITenantConnectionRequestManager - Relationship Proposals
@@ -84,8 +83,9 @@ private:
 	QString GenerateConnectionCode() const;
 	QByteArray FindTenantByConnectionCode(const QString& connectionCode) const;
 	bool ConnectionExists(const QByteArray& tenantAId, const QByteArray& tenantBId) const;
+	bool PendingRequestExists(const QByteArray& tenantAId, const QByteArray& tenantBId) const;
 	QByteArray CreateConnection(const QByteArray& tenantAId, const QByteArray& tenantBId);
-	bool ApplyRelationshipProposal(const ITenantRelationshipProposalInfo* proposalPtr);
+	QByteArray ApplyRelationshipProposal(const ITenantRelationshipProposalInfo* proposalPtr);
 	void ArchiveRelationshipsForConnection(const QByteArray& connectionId);
 
 	// DB helper methods
@@ -95,7 +95,7 @@ private:
 	bool StoreProposal(const QByteArray& proposalId, const ITenantRelationshipProposalInfo& proposalInfo);
 
 	// Helper to get code object from collection
-	const ITenantConnectionCodeInfo* GetConnectionCodeObject(const QByteArray& tenantId);
+	ITenantConnectionCodeInfoUniquePtr GetConnectionCodeObject(const QByteArray& tenantId);
 	void EnsureConnectionCode(const QByteArray& tenantId);
 
 private:
