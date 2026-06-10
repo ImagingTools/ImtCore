@@ -134,11 +134,32 @@ Item {
 				AuthorizationController.logout();
 			}
 			else{
-				menu.open()
+				contextMenuModel.fillModel();
+				
+				var point = mapToItem(null, x - width, y + height);
+				point.x = point.x - 200;
+				
+				// menu.open()
+				ModalDialogManager.openDialog(popupMenu, {"x": point.x, "y": point.y, "model": contextMenuModel});
 			}
 		}
 	}
-	
+
+	ListModel {
+		id: contextMenuModel;
+		
+		Component.onCompleted: {
+			fillModel();
+		}
+		
+		function fillModel(){
+			contextMenuModel.clear();
+			contextMenuModel.append({"id": "Profile", "name": qsTr("Profile"), "icon": "Icons/Account", "isEnabled": true});
+			contextMenuModel.append({"id": "", "name": "", "Icon": ""});
+			contextMenuModel.append({"id": "Logout", "name": qsTr("Logout"), "icon": "Icons/Exit", "isEnabled": true});
+		}
+	}
+
 	Component {
 		id: popupMenu;
 		

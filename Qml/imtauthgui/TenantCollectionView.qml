@@ -465,12 +465,15 @@ RemoteCollectionView {
 
 	// --- Switch to organization ---
 	function switchToTenant(tenantId) {
-		if (tenantId && tenantId !== AuthorizationController.currentTenantId) {
-			AuthorizationController.selectTenant(tenantId)
+		if (tenantId === AuthorizationController.currentTenantId) {
+			return
 		}
+
+		AuthorizationController.selectTenant(tenantId || "")
 	}
 
 	property string __pendingOpenTenantAfterSwitchId: ""
+	property bool __pendingCreateNewTenantDocumentAfterSwitch: false
 
 	function openTenantDocument(tenantId) {
 		if (!tenantId) return
@@ -517,6 +520,14 @@ RemoteCollectionView {
 		target: AuthorizationController
 
 		function onTenantSelected(tenantId) {
+			if (container.__pendingCreateNewTenantDocumentAfterSwitch && tenantId === "") {
+				container.__pendingCreateNewTenantDocumentAfterSwitch = false
+				if (container.commandsDelegate) {
+					container.commandsDelegate.createNewTenantDocument()
+				}
+				return
+			}
+
 			if (container.__pendingOpenTenantAfterSwitchId !== ""
 					&& tenantId === container.__pendingOpenTenantAfterSwitchId) {
 				var pendingTenantId = container.__pendingOpenTenantAfterSwitchId
@@ -526,6 +537,14 @@ RemoteCollectionView {
 		}
 
 		function onTenantSelectionFailed(errorMessage) {
+			if (container.__pendingCreateNewTenantDocumentAfterSwitch) {
+				container.__pendingCreateNewTenantDocumentAfterSwitch = false
+				if (errorMessage && errorMessage !== "") {
+					ModalDialogManager.showInfoDialog(errorMessage)
+				}
+				return
+			}
+
 			if (container.__pendingOpenTenantAfterSwitchId !== "") {
 				container.__pendingOpenTenantAfterSwitchId = ""
 				if (errorMessage && errorMessage !== "") {
@@ -546,6 +565,21 @@ RemoteCollectionView {
 			onFinished: {
 				if (buttonId == Enums.yes) {
 					container.switchToTenant(tenantId)
+				}
+			}
+		}
+	}
+
+	Component {
+		id: leaveCurrentTenantForNewDialogComp
+		MessageDialog {
+			width: Style.sizeHintM
+			title: qsTr("Switch current organization")
+			message: qsTr("To create a new organization, switch from the current organization?")
+			onFinished: {
+				if (buttonId == Enums.yes) {
+					container.__pendingCreateNewTenantDocumentAfterSwitch = true
+					container.switchToTenant("")
 				}
 			}
 		}
@@ -614,6 +648,24 @@ RemoteCollectionView {
 		DocCollectionViewDelegate {
 			id: tenantCommandsDelegate
 			collectionView: container
+
+			function createNewTenantDocument(){
+				if (!documentManager){
+					console.error("Unable to create object. Error: Document manager is invalid")
+					return
+				}
+
+				documentManager.createDocument("Tenant")
+			}
+
+			function onNew(){
+				if (AuthorizationController.currentTenantId && AuthorizationController.currentTenantId !== "") {
+					ModalDialogManager.openDialog(leaveCurrentTenantForNewDialogComp)
+					return
+				}
+
+				createNewTenantDocument()
+			}
 
 			function onEdit(){
 				if (!collectionView){
@@ -698,12 +750,13 @@ RemoteCollectionView {
 							if (tenantEditor.representationController){
 								tenantEditor.representationController.updateRepresentationFromDocument()
 							}
-
-							var newTenantId = tenantEditor.tenantData ? tenantEditor.tenantData.m_id : ""
-							var newTenantName = (tenantEditor.tenantData && tenantEditor.tenantData.m_name) || newTenantId
-							if (newTenantId && newTenantId !== AuthorizationController.currentTenantId){
-								ModalDialogManager.openDialog(switchToNewTenantDialogComp,
-									{"tenantId": newTenantId, "tenantName": newTenantName})
+						}
+					}
+					onIsNewTenantChanged: {
+						if (!isNewTenant){
+							var tenantId = tenantEditor.tenantData ? tenantEditor.tenantData.m_id : ""
+							if (tenantId && tenantId !== AuthorizationController.currentTenantId){
+								container.switchToTenant(tenantId)
 							}
 						}
 					}

@@ -30,6 +30,7 @@ ViewBase {
 
 	anchors.fill: parent
 	contentColor: Style.baseColor
+	commandsSeparatorVisible: false
 
 	property var relationshipData: model
 	property var apiClient: null
@@ -137,7 +138,7 @@ ViewBase {
 		anchors.bottom: parent.bottom
 		anchors.bottomMargin: Style.marginXL
 		anchors.horizontalCenter: parent.horizontalCenter
-		width: Math.min(parent.width - Style.marginXL * 2, Style.sizeHintXXL)
+		width: container.width
 		contentWidth: bodyColumn.width
 		contentHeight: bodyColumn.height + 2 * Style.marginXL
 		boundsBehavior: Flickable.StopAtBounds
@@ -145,13 +146,8 @@ ViewBase {
 
 		Column {
 			id: bodyColumn
-			width: Style.sizeHintXXL
+			width: container.width
 			spacing: Style.marginXL
-
-			GroupHeaderView {
-				width: parent.width
-				title: qsTr("Tenant Relationship")
-			}
 
 			GroupElementView {
 				id: generalGroup

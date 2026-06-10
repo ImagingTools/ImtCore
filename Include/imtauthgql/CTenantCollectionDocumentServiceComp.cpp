@@ -19,7 +19,7 @@ namespace
 {
 
 
-QString TenantInvitationStatusToString(imtauth::ITenantInvitation::TenantInvitationStatus status)
+	QString TenantInvitationStatusToString(imtauth::ITenantInvitation::TenantInvitationStatus status)
 {
 	switch (status){
 		case imtauth::ITenantInvitation::TIS_ACCEPTED:
@@ -49,9 +49,9 @@ namespace imtauthgql
 // reimplemented (CTenantCollectionDocumentServiceGqlHandlerCompBase)
 
 sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenantRepresentation(
-		const sdl::V1_0::imtauth::CGetTenantRepresentationGqlRequest& getTenantRepresentationRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const
+			const sdl::V1_0::imtauth::CGetTenantRepresentationGqlRequest& getTenantRepresentationRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::GetTenantRepresentationRequestArguments arguments = getTenantRepresentationRequest.GetRequestedArguments();
 	QByteArray userId = GetUserId(gqlRequest);
@@ -223,9 +223,9 @@ sdl::V1_0::imtauth::CTenantData CTenantCollectionDocumentServiceComp::OnGetTenan
 
 
 sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceComp::OnUpdateTenantFromRepresentation(
-		const sdl::V1_0::imtauth::CUpdateTenantFromRepresentationGqlRequest& updateTenantFromRepresentationRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const
+			const sdl::V1_0::imtauth::CUpdateTenantFromRepresentationGqlRequest& updateTenantFromRepresentationRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::UpdateTenantFromRepresentationRequestArguments arguments = updateTenantFromRepresentationRequest.GetRequestedArguments();
 	sdl::V1_0::imtbase::CDocumentOperationStatus response;

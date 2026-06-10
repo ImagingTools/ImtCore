@@ -154,6 +154,23 @@ Item {
 			if (!contentView.documentManager.documentIsLoading(documentId)){
 				contentView.stopLoading(documentId)
 			}
+
+			if(message !==""){
+				ModalDialogManager.showErrorDialog(message)
+			}
+		}
+
+		function onUpdateDocumentFailed(documentId, message){
+			if (documentId !== contentView.documentId){
+				return
+			}
+			if (!contentView.documentManager.documentIsLoading(documentId)){
+				contentView.stopLoading(documentId)
+			}
+
+			if(message !==""){
+				ModalDialogManager.showErrorDialog(message)
+			}
 		}
 
 		function onStartOpenDocument(documentId, typeId){
@@ -204,6 +221,10 @@ Item {
 				return
 			}
 			contentView.stopLoading(documentId)
+			
+			if(message !==""){
+				ModalDialogManager.showErrorDialog(message)
+			}
 		}
 
 		function onStartUndo(documentId, steps){
@@ -237,7 +258,7 @@ Item {
 
 	Rectangle {
 		anchors.fill: parent
-		color: Style.backgroundColor2
+		color: Style.baseColor
 	}
 
 	Item {

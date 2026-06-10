@@ -518,6 +518,11 @@ void COpenGLWidget::OnCameraPositionAnimation(const QVariant& value)
 
 void COpenGLWidget::PaintGl()
 {
+	// Re-bind the VAO each frame: QPainter (used in paintGL) changes the bound VAO
+	// via Qt's internal GL state, so after beginNativePainting() it is no longer bound.
+	// Core Profile (required on macOS) mandates a VAO be bound for any draw call.
+	glBindVertexArray(m_vao);
+
 	imt3dview::SceneState sceneState = BuildSceneState();
 
 	m_backend.BeginFrame(sceneState);
