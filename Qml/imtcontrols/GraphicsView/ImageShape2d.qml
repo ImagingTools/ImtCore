@@ -9,6 +9,36 @@ BoundingBox {
 
 	property string imageSource: "";
 
+	/*!
+	 * Optional reference to a CQmlImageShape C++ object.
+	 * When set, the image is loaded from the IBitmap-backed image provider.
+	 */
+	property var bitmapShape: null;
+
+	onBitmapShapeChanged: {
+		if(bitmapShape && bitmapShape.imageUrl){
+			imageSource = bitmapShape.imageUrl;
+			if(viewItem){
+				viewItem.loadImage(imageSource);
+				viewItem.requestPaint();
+			}
+		}
+	}
+
+	Connections {
+		target: bitmapShape
+		enabled: bitmapShape !== null
+		function onImageChanged(){
+			if(bitmapShape.imageUrl){
+				imageSource = bitmapShape.imageUrl;
+				if(viewItem){
+					viewItem.loadImage(imageSource);
+					viewItem.requestPaint();
+				}
+			}
+		}
+	}
+
 	function draw(ctx, transformMatrixArg) {
 		let params_ = getParams();
 		if(params_.source !== undefined){

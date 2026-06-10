@@ -106,6 +106,22 @@ public:
 	virtual void SetOuterRadius(double newOuterRadius);
 };
 
+
+class CImageShape
+{
+public:
+	CRectangle2d m_rect;
+	QByteArray m_imageData;
+	int m_imageFormat = 0; // 0=PNG, 1=JPEG, 2=SVG
+
+	[[nodiscard]] CRectangle2d GetRect() const;
+	virtual void SetRect(CRectangle2d newRect);
+	[[nodiscard]] QByteArray GetImageData() const;
+	virtual void SetImageData(const QByteArray& newImageData);
+	[[nodiscard]] int GetImageFormat() const;
+	virtual void SetImageFormat(int newImageFormat);
+};
+
 inline double CPoint2d::GetY() const
 {
 	return m_y;
@@ -244,6 +260,36 @@ inline CPoint2d CAnnulus::GetCenter() const
 inline  void CAnnulus::SetCenter(CPoint2d newCenter)
 {
 	m_center = newCenter;
+}
+
+inline CRectangle2d CImageShape::GetRect() const
+{
+	return m_rect;
+}
+
+inline  void CImageShape::SetRect(CRectangle2d newRect)
+{
+	m_rect = newRect;
+}
+
+inline QByteArray CImageShape::GetImageData() const
+{
+	return m_imageData;
+}
+
+inline  void CImageShape::SetImageData(const QByteArray& newImageData)
+{
+	m_imageData = newImageData;
+}
+
+inline int CImageShape::GetImageFormat() const
+{
+	return m_imageFormat;
+}
+
+inline  void CImageShape::SetImageFormat(int newImageFormat)
+{
+	m_imageFormat = newImageFormat;
 }
 
 
