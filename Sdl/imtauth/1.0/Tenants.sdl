@@ -290,8 +290,10 @@ type TenantConnection {
 	id: ID!
 	tenantAId: ID!
 	tenantAName: String
+	tenantAOwnerName: String
 	tenantBId: ID!
 	tenantBName: String
+	tenantBOwnerName: String
 	status: ConnectionStatus!
 	createdAt: String
 	updatedAt: String
@@ -338,6 +340,8 @@ type TenantRelationship {
 	connectionId: ID!
 	sourceTenantId: ID!
 	targetTenantId: ID!
+	sourceTenantName: String
+	targetTenantName: String
 	sourceRole: TenantRelationshipRole!
 	targetRole: TenantRelationshipRole!
 	scope: String
@@ -456,22 +460,13 @@ type GetRelationshipProposalsPayload {
 
 # --- Cross-Org Grants ---
 
-enum CrossOrgAccessLevel {
-	None
-	Read
-	Write
-	Admin
-}
-
 type CrossOrgGrant {
 	id: ID!
 	sourceTenantId: ID!
 	targetTenantId: ID!
-	relationshipId: ID!
-	contractId: ID
-	targetTeamId: ID
-	accessLevel: CrossOrgAccessLevel!
-	resourceScope: String
+	targetTenantName: String
+	name: String
+	roleIds: [ID]
 	description: String
 	createdAt: String
 	expiresAt: String
@@ -481,11 +476,7 @@ type CrossOrgGrant {
 input CreateCrossOrgGrantInput {
 	sourceTenantId: ID!
 	targetTenantId: ID!
-	relationshipId: ID!
-	contractId: ID
-	accessLevel: CrossOrgAccessLevel!
-	resourceScope: String
-	targetTeamId: ID
+	roleIds: [ID]
 	description: String
 	expiresAt: String
 }
@@ -500,6 +491,15 @@ input RevokeCrossOrgGrantInput {
 }
 
 type RevokeCrossOrgGrantPayload {
+	success: Boolean
+	errorMessage: String
+}
+
+input RemoveCrossOrgGrantsInput {
+	grantIds: [ID]!
+}
+
+type RemoveCrossOrgGrantsPayload {
 	success: Boolean
 	errorMessage: String
 }
@@ -847,6 +847,7 @@ type Mutation {
 	RemoveTenantRelationship (input: RemoveTenantRelationshipInput): RemoveTenantRelationshipPayload!
 	CreateCrossOrgGrant (input: CreateCrossOrgGrantInput): CreateCrossOrgGrantPayload!
 	RevokeCrossOrgGrant (input: RevokeCrossOrgGrantInput): RevokeCrossOrgGrantPayload!
+	RemoveCrossOrgGrants (input: RemoveCrossOrgGrantsInput): RemoveCrossOrgGrantsPayload!
 	CreateContract (input: CreateContractInput): CreateContractPayload!
 	UpdateContractStatus (input: UpdateContractStatusInput): UpdateContractStatusPayload!
 	TerminateContract (input: TerminateContractInput): TerminateContractPayload!

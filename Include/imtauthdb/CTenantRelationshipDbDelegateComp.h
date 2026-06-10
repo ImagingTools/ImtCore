@@ -57,6 +57,7 @@ public:
 	virtual bool SetCollectionItemMetaInfoFromRecord(
 				const QSqlRecord& record,
 				idoc::IDocumentMetaInfo& metaInfo) const override;
+	virtual QByteArray GetObjectTypeId(const QByteArray& objectId) const override;
 
 protected:
 	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const override;

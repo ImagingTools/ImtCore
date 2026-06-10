@@ -319,7 +319,7 @@ ViewBase {
 				
 				width: parent.width;
 
-				ItemSelectElementView {
+				GqlBasedItemSelectElementView {
 					id: roleSelectableCollectionEditor
 					collectionId: "Roles"
 						label: qsTr("Roles")
@@ -358,7 +358,7 @@ ViewBase {
 				
 				width: parent.width;
 
-				ItemSelectElementView {
+				GqlBasedItemSelectElementView {
 					id: groupSelectableCollectionEditor
 					collectionId: "Groups"
 						label: qsTr("Groups")

@@ -4,8 +4,7 @@
 
 // ImtCore includes
 #include <imtdoc/IDocumentService.h>
-#include <imtauth/ITenantConnectionRequestManager.h>
-#include <imtauth/ITenantManager.h>
+#include <imtbase/IObjectCollection.h>
 
 // Generated includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/RelationshipCollectionDocumentService_fwd.h>
@@ -29,10 +28,9 @@ public:
 	typedef sdl::V1_0::imtauth::CRelationshipCollectionDocumentServiceGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CRelationshipCollectionDocumentServiceComp)
-		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentService", "Collection document manager", false, "CollectionDocumentService");
-		I_ASSIGN(m_connectionRequestManagerCompPtr, "ConnectionRequestManager", "Connection request manager for relationship data", false, "TenantConnectionRequestManager");
-		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager for relationship updates", false, "TenantManager");
-		I_ASSIGN(m_proposalFactoryCompPtr, "ProposalFactory", "Relationship proposal factory", false, "TenantRelationshipProposalInfo");
+		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentService", "Collection document manager", true, "CollectionDocumentService");
+		I_ASSIGN(m_connectionCollectionCompPtr, "ConnectionCollection", "Tenant connections collection", true, "ConnectionCollection");
+		I_ASSIGN(m_tenantCollectionCompPtr, "TenantCollection", "Tenant collection for name resolution", false, "TenantCollection");
 	I_END_COMPONENT
 
 protected:
@@ -48,9 +46,8 @@ protected:
 
 private:
 	I_REF(imtdoc::IDocumentService, m_documentManagerCompPtr);
-	I_REF(imtauth::ITenantConnectionRequestManager, m_connectionRequestManagerCompPtr);
-	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
-	I_FACT(imtauth::ITenantRelationshipProposalInfo, m_proposalFactoryCompPtr);
+	I_REF(imtbase::IObjectCollection, m_connectionCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_tenantCollectionCompPtr);
 };
 
 

@@ -32,8 +32,8 @@ public:
 
 	// reimplemented (imtservergql::IParamsSetJoiner)
 	virtual bool JoinParamsSet(
-		const imtgql::CGqlRequest& gqlRequest,
-		iprm::IParamsSet& paramsSet) const override;
+				const imtgql::CGqlRequest& gqlRequest,
+				iprm::IParamsSet& paramsSet) const override;
 };
 
 

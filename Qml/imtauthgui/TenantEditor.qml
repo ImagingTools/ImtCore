@@ -93,19 +93,19 @@ DocumentViewBase {
 				}
 				if (stateManager_.isCreator) {
 					multiPageView.addPage("Permissions", qsTr("Permissions"), permissionsPageComp, "Icons/Key")
-					multiPageView.addPage("CrossOrgGrants", qsTr("Cross-Org Grants"), crossOrgGrantsPageComp, "Icons/Crown")
-					multiPageView.addPage("Contracts", qsTr("Contracts"), contractsPageComp, "Icons/Assignment")
+					multiPageView.addPage("CrossOrgGrants", qsTr("Grants"), crossOrgGrantsPageComp, "Icons/Crown")
+					// multiPageView.addPage("Contracts", qsTr("Contracts"), contractsPageComp, "Icons/Assignment")
 					multiPageView.addPage("Relationships", qsTr("Relationships"), null, "Icons/Participant")
 					multiPageView.addSubPage("Relationships", "ConnectionCode", qsTr("Connection Code"), connectionCodePageComp)
 					multiPageView.addSubPage("Relationships", "ConnectOrganization", qsTr("Connect Organization"), connectOrganizationPageComp)
-					multiPageView.addSubPage("Relationships", "MyConnections", qsTr("My Connections"), myConnectionsPageComp)
-					multiPageView.addPage("Messages", qsTr("Messages"), messagesPageComp, "Icons/Message")
+					multiPageView.addSubPage("Relationships", "MyRelationships", qsTr("My Relationships"), myConnectionsPageComp)
+					// multiPageView.addPage("Messages", qsTr("Messages"), messagesPageComp, "Icons/Message")
 				}
 			}
 			multiPageView.currentIndex = 0
 		}
 
-		Component.onCompleted: { 
+		Component.onCompleted: {
 			multiPageView.updatePages()
 		}
 	}
@@ -158,6 +158,17 @@ DocumentViewBase {
 			if (!stateManager_.isNewTenant && container.representationController)
 				container.representationController.updateRepresentationFromDocument()
 		}
+		function onMemberRemoved(userId) {
+			if (!container.tenantData || stateManager_.isNewTenant)
+				return
+			// If the current user left/was removed, force-close the editor
+			var currentUserId = container.tenantData.m_currentUserId || ""
+			if (currentUserId && userId === currentUserId) {
+				PopupManager.addInfoMessage(qsTr("You have left this organization. Closing editor."), true)
+				if (container.documentManager && container.documentId)
+					container.documentManager.closeDocument(container.documentId)
+			}
+		}
 		function onSubscriptionInvitationAccepted(notification) {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
@@ -198,6 +209,14 @@ DocumentViewBase {
 			if (!container.tenantData || stateManager_.isNewTenant)
 				return
 			if (notification.tenantId === container.tenantData.m_id) {
+				// If the removed member is the current user, force-close the document
+				var currentUserId = container.tenantData.m_currentUserId || ""
+				if (currentUserId && notification.userId === currentUserId) {
+					PopupManager.addInfoMessage(qsTr("You have been removed from this organization. Closing editor."), true)
+					if (container.documentManager && container.documentId)
+						container.documentManager.closeDocument(container.documentId)
+					return
+				}
 				if (container.representationController)
 					container.representationController.updateRepresentationFromDocument()
 			}

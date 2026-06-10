@@ -24,9 +24,9 @@ TenantSimpleCollectionPage {
 	objectTypeId: apiClient ? apiClient.roleObjectTypeId : ""
 	dataProvider: apiClient ? apiClient.roleListDataProvider : null
 
-	function removeItem(id) {
+	function removeItems(ids) {
 		if (rolesPage.apiClient)
-			rolesPage.apiClient.removeRole(id)
+			rolesPage.apiClient.removeRoles((ids))
 	}
 
 	onApiClientChanged: {
@@ -36,7 +36,7 @@ TenantSimpleCollectionPage {
 
 	Connections {
 		target: rolesPage.apiClient
-		function onRoleRemoved(roleId) {
+		function onRolesRemoved() {
 			rolesPage.refresh()
 		}
 	}

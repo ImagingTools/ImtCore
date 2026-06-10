@@ -40,6 +40,10 @@ Item {
 	signal guiUpdated(var view, var model)
 	signal guiVisibleChanged(var view, bool visible)
 
+	onModelChanged: {
+		doUpdateGui()
+	}
+
 	Connections {
 		target: viewBase.model
 		function onModelChanged(){
@@ -190,11 +194,7 @@ Item {
 			}
 		}
 	}
-	
-	function onModelChanged(){
-		doUpdateGui();
-	}
-	
+
 	function setReadOnly(readOnly){
 	}
 	

@@ -1,0 +1,26 @@
+schema {
+	namespace: imtauth
+	version: 1.0
+
+	query: Query
+	mutation: Mutation
+}
+
+import {
+	"Tenants.sdl"
+	"../../imtbase/1.0/CollectionDocumentService.sdl"
+	"../../imtbase/1.0/UndoManager.sdl"
+}
+
+type UpdateGrantFromRepresentationInput {
+	documentId: ID!
+	grant: CrossOrgGrant!
+}
+
+type Query {
+	GetGrantRepresentation(input: DocumentId): CrossOrgGrant!
+}
+
+type Mutation {
+	UpdateGrantFromRepresentation(input: UpdateGrantFromRepresentationInput): DocumentOperationStatus!
+}
