@@ -182,7 +182,7 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateDeleteObjectsQuery(
 		return QByteArray();
 	}
 
-	const QString quotedIds = objectIds.join(QByteArrayLiteral("','")).prepend('\'').append('\'');
+	const QString quotedIds = objectIds.join(u8"','").prepend('\'').append('\'');
 
 	QString query = QStringLiteral(R"(
 								UPDATE "%1"

@@ -415,7 +415,7 @@ QList<CCluster*> CClusterCreator::createMapClusters(const QList<CPositionIdentif
 		QByteArray id = itemsModel->GetData("Id", i).toByteArray();
 		QByteArrayList listBA;
 		listBA << id;
-		cluster->SetChildrenIds(listBA);
+		cluster->SetChildIds(listBA);
 		clusterList.append(cluster);
 	}
 
@@ -429,7 +429,7 @@ QList<CCluster*> CClusterCreator::createMapClusters(const QList<CPositionIdentif
 		for(const QString& id: std::as_const(ids)){
 			idsBA.append(id.toUtf8());
 		}
-		cluster->SetChildrenIds(idsBA);
+		cluster->SetChildIds(idsBA);
 		clusterList.append(cluster);
 	}
 
@@ -453,7 +453,7 @@ QList<CCluster *> CClusterCreator::convertToMapClusters(const QList<CPositionIde
 		cluster->SetZoom(zoomLevel);
 		QByteArrayList listBA;
 		listBA << uuid;
-		cluster->SetChildrenIds(listBA);
+		cluster->SetChildIds(listBA);
 		clusterList.append(cluster);
 	}
 
