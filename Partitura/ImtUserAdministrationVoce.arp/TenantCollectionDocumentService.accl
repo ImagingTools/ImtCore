@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6397" Description="ACF"/>
-            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -15,6 +15,7 @@
         <Element ComponentName="SerializedUndoManager" X="300" Y="600" Note=""/>
         <Element ComponentName="TenantDocumentNameProvider" X="950" Y="300" Note=""/>
         <Element ComponentName="TenantDocumentService" X="200" Y="300" Note=""/>
+        <Element ComponentName="TenantDocumentValidator" X="175" Y="125" Note=""/>
         <Element ComponentName="TenantInfo" X="550" Y="550" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
