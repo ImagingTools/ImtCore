@@ -52,7 +52,7 @@ bool CAddressCollectionControllerComp::SetupGqlItem(
 			elementInformation = QString::fromUtf8(addressPosition->GetObjectUuid());
 		}
 		else if (informationId == QByteArrayLiteral("fullAddress")){
-			elementInformation = addressElementInfoPtr->GetAddress();
+			elementInformation = addressElementInfoPtr->GetFullAddress();
 		}
 		else if (informationId == QByteArrayLiteral("name")){
 			elementInformation = addressElementInfoPtr->GetName();

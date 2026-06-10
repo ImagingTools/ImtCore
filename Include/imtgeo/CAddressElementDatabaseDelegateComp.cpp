@@ -93,12 +93,7 @@ istd::IChangeableUniquePtr CAddressElementDatabaseDelegateComp::CreateObjectFrom
 
 	if (record.contains(QStringLiteral("FullAddress"))){
 		QString address = record.value(QStringLiteral("FullAddress")).toString();
-		adrElementInfoPtr->SetAddress(address);
-	}
-
-	if (record.contains(QStringLiteral("HasChildren"))){
-		bool hasChildren = record.value(QStringLiteral("HasChildren")).toBool();
-		adrElementInfoPtr->SetHasChildren(hasChildren);
+		adrElementInfoPtr->SetFullAddress(address);
 	}
 
 	if (record.contains(QStringLiteral("Latitude"))){
@@ -251,7 +246,7 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateUpdateObjectQuery(
 	const QByteArray parents = QJsonDocument(parentIdJsonArray).toJson(QJsonDocument::Compact);
 
 	const QByteArray typeId	= adrInfoPtr->GetAddressTypeId();
-	const QString address	= adrInfoPtr->GetAddress();
+	const QString address	= adrInfoPtr->GetFullAddress();
 	const double lat		= adrInfoPtr->GetLatitude();
 	const double lon		= adrInfoPtr->GetLongitude();
 

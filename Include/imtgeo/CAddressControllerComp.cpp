@@ -47,7 +47,7 @@ bool CAddressControllerComp::CreateRepresentationFromObject(
 		}
 	}
 
-	QString address = addressInfoPtr->GetAddress();
+	QString address = addressInfoPtr->GetFullAddress();
 	if (address.isEmpty() && m_addressTypeCollectionPtr.IsValid()){
 		for (const QByteArray& elemId : parents){
 			imtbase::IObjectCollection::DataPtr dataElementPtr;

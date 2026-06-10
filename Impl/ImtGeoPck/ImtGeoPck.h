@@ -7,15 +7,14 @@
 #include <icomp/TMakeComponentWrap.h>
 
 // ImtCore includes
-// models
+/// models
 #include <imtgeo/CCluster.h>
 #include <imtgeo/CAddressElementInfo.h>
 #include <imtgeo/CAddressTypeInfo.h>
-// components
+/// components
 #include <imtgeo/CAddressElementDatabaseDelegateComp.h>
 #include <imtgeo/CAddressTypeDatabaseDelegateComp.h>
 #include <imtgeo/CAddressCollectionControllerComp.h>
-#include <imtgeo/CAddressTreeCollectionControllerComp.h>
 #include <imtgeo/CMapTileCollectionControllerComp.h>
 #include <imtgeo/CMapClusterDatabaseDelegateComp.h>
 #include <imtgeo/CAddressControllerComp.h>
@@ -30,46 +29,45 @@ namespace ImtGeoPck
 
 // models
 
-typedef icomp::TModelCompWrap<
+using PositionInfo = icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap <
 						imtgeo::CPositionIdentifiable,
 						imtgeo::IPosition,
 						iser::ISerializable,
-						istd::IChangeable>> PositionInfo;
+						istd::IChangeable>>;
 
-typedef icomp::TModelCompWrap<
+using AddressElementInfo = icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap <
 						imtgeo::CAddressElementInfo,
 						imtgeo::IAddressElementInfo,
 						iser::IObject,
 						iser::ISerializable,
-						istd::IChangeable>> AddressElementInfo;
+						istd::IChangeable>>;
 
-typedef icomp::TModelCompWrap<
+using AddressTypeInfo = icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap <
 						imtgeo::CAddressTypeInfo,
 						imtgeo::IAddressTypeInfo,
 						iser::IObject,
 						iser::ISerializable,
-						istd::IChangeable>> AddressTypeInfo;
+						istd::IChangeable>>;
 
-typedef icomp::TModelCompWrap<
+using ClusterInfo = icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap <
 						imtgeo::CCluster,
 						imtgeo::ICluster,
 						iser::IObject,
 						iser::ISerializable,
-						istd::IChangeable>> ClusterInfo;
+						istd::IChangeable>>;
 
 // components
 
-typedef imtgeo::CAddressTypeDatabaseDelegateComp AddressTypeDatabaseDelegate;
-typedef imtgeo::CAddressElementDatabaseDelegateComp AddressElementDatabaseDelegate;
-typedef imtgeo::CAddressCollectionControllerComp AddressCollectionController;
-typedef imtgeo::CAddressTreeCollectionControllerComp AddressTreeCollectionController;
-typedef imtgeo::CMapTileCollectionControllerComp MapTileCollectionController;
-typedef imtgeo::CMapClusterDatabaseDelegateComp MapClusterDatabaseDelegate;
-typedef imtgeo::CAddressControllerComp AddressController;
+using AddressTypeDatabaseDelegate		= imtgeo::CAddressTypeDatabaseDelegateComp;
+using AddressElementDatabaseDelegate	= imtgeo::CAddressElementDatabaseDelegateComp;
+using AddressCollectionController		= imtgeo::CAddressCollectionControllerComp;
+using MapTileCollectionController		= imtgeo::CMapTileCollectionControllerComp;
+using MapClusterDatabaseDelegate		= imtgeo::CMapClusterDatabaseDelegateComp;
+using AddressController					= imtgeo::CAddressControllerComp;
 
 
 } // namespace ImtGeoPck

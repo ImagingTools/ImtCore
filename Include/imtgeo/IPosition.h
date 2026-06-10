@@ -16,14 +16,14 @@ class IPosition: virtual public iser::ISerializable
 {
 public:
 	/**
-		Get object latitude .
+		Get object latitude.
 	*/
 	virtual double GetLatitude() const = 0;
 
 	/**
 		Set object latitude.
 	*/
-	virtual void SetLatitude(const double& lat) = 0;
+	virtual void SetLatitude(double lat) = 0;
 	/**
 		Get object longitude.
 	*/
@@ -32,7 +32,7 @@ public:
 	/**
 		Set object longitude.
 	*/
-	virtual void SetLongitude(const double& lon) = 0;
+	virtual void SetLongitude(double lon) = 0;
 	/**
 		Get object zoom level.
 	*/
@@ -41,7 +41,7 @@ public:
 	/**
 		Set object zoom level.
 	*/
-	virtual void SetZoomLevel(const double& zoom) = 0;
+	virtual void SetZoomLevel(double zoom) = 0;
 };
 
 

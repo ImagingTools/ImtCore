@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtgeo/IPosition.h>
+#include <imtbase/IIdentifiable.h>
 
 
 namespace imtgeo
@@ -15,19 +16,21 @@ namespace imtgeo
 	Interface for describing an address element object.
 	\ingroup Address
 */
-class IAddressElementInfo: virtual public iser::IObject, virtual public IPosition
+class IAddressElementInfo:
+			virtual public iser::IObject,
+			virtual public IPosition,
+			virtual public imtbase::IIdentifiable
 {
 public:
-
 	/**
 		Get ids of parent the address element.
 	*/
-	virtual QList<QByteArray> GetParentIds() const = 0;
+	virtual QByteArrayList GetParentIds() const = 0;
 
 	/**
 		Set ids of parent the address element.
 	*/
-	virtual void SetParentIds(const QList<QByteArray>& parentId) = 0;
+	virtual void SetParentIds(const QByteArrayList& parentIds) = 0;
 	/**
 		Get id address type of element.
 	*/
@@ -59,25 +62,16 @@ public:
 	virtual void SetDescription(const QString& description) = 0;
 
 	/**
-		Get string address.
+		Get full address (based on parent id names combined).
 	*/
-	virtual QString GetAddress() const = 0;
+	virtual QString GetFullAddress() const = 0;
 
 	/**
-		Set string full address.
+		Set full address (based on parent id names combined).
 	*/
-	virtual void SetAddress(const QString& fullAddress) = 0;
-
-	/**
-		Get has children.
-	*/
-	virtual bool GetHasChildren() const = 0;
-
-	/**
-		Set has children.
-	*/
-	virtual void SetHasChildren(const bool& hasChildren) = 0;
+	virtual void SetFullAddress(const QString& fullAddress) = 0;
 };
+
 
 using IAddressElementInfoUniquePtr = istd::TUniqueInterfacePtr<IAddressElementInfo>;
 using IAddressElementInfoSharedPtr = istd::TSharedInterfacePtr<IAddressElementInfo>;
