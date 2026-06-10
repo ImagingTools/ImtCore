@@ -15,8 +15,6 @@
 #include <imtgeo/CAddressElementDatabaseDelegateComp.h>
 #include <imtgeo/CAddressTypeDatabaseDelegateComp.h>
 #include <imtgeo/CAddressCollectionControllerComp.h>
-#include <imtgeo/CMapTileCollectionControllerComp.h>
-#include <imtgeo/CMapClusterDatabaseDelegateComp.h>
 #include <imtgeo/CAddressControllerComp.h>
 
 
@@ -65,8 +63,6 @@ using ClusterInfo = icomp::TModelCompWrap<
 using AddressTypeDatabaseDelegate		= imtgeo::CAddressTypeDatabaseDelegateComp;
 using AddressElementDatabaseDelegate	= imtgeo::CAddressElementDatabaseDelegateComp;
 using AddressCollectionController		= imtgeo::CAddressCollectionControllerComp;
-using MapTileCollectionController		= imtgeo::CMapTileCollectionControllerComp;
-using MapClusterDatabaseDelegate		= imtgeo::CMapClusterDatabaseDelegateComp;
 using AddressController					= imtgeo::CAddressControllerComp;
 
 

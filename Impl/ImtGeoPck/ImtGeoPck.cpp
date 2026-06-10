@@ -56,16 +56,6 @@ I_EXPORT_COMPONENT(
 			"Address Collection Controller");
 
 I_EXPORT_COMPONENT(
-			MapTileCollectionController,
-			"Map Tile Cluster Collection Controller",
-			"Map Tile Cluster Collection Controller");
-
-I_EXPORT_COMPONENT(
-			MapClusterDatabaseDelegate,
-			"Map Cluster info object for SQL table",
-			"SQL Map Cluster Delegate");
-
-I_EXPORT_COMPONENT(
 			AddressController,
 			"Address Controller",
 			"Address Controller");
