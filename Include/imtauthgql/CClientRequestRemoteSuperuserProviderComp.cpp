@@ -20,6 +20,7 @@ imtauth::ISuperuserProvider::ExistsStatus CClientRequestRemoteSuperuserProviderC
 	namespace userssdl = sdl::V1_0::imtauth;
 
 	userssdl::CheckSuperuserExistsRequestArguments arguments;
+	arguments.input.emplace();
 
 	imtgql::CGqlRequest gqlRequest;
 	if (userssdl::CCheckSuperuserExistsGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
