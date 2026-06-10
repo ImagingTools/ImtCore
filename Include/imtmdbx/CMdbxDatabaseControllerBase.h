@@ -9,8 +9,8 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtdb/IDatabaseEngine.h>
+#include <imtbase/ITransactionManager.h>
 #include <imtmdbx/IMdbxDatabaseEngine.h>
-#include <imtmdbx/IMdbxUpdateController.h>
 #include <imtmdbx/CMdbxDocumentTableManager.h>
 
 
@@ -21,7 +21,7 @@ namespace imtmdbx
 class CMdbxDatabaseControllerBase:
 			public QObject,
 			public ilog::CLoggerComponentBase,
-			virtual public imtmdbx::IMdbxUpdateController
+			virtual public imtbase::ITransactionManager
 {
 	Q_OBJECT
 public:
@@ -29,14 +29,19 @@ public:
 	using DocumentTableConfig	= CMdbxDocumentTableManager::DocumentTableConfig;
 
 	I_BEGIN_BASE_COMPONENT(CMdbxDatabaseControllerBase);
-		I_REGISTER_INTERFACE(IMdbxUpdateController);
-		I_ASSIGN(m_updateIntervalSec, "UpdateIntervalSec", "Interval between database updates in seconds. No automatic updates if disabled.", false, 300); // 5 minutes
+		I_REGISTER_INTERFACE(imtbase::ITransactionManager);
+		I_ASSIGN(m_transactionCountLimitAttr, "TransactionCheckpointInterval", "Max elements to process before performing a transactional checkpoint and reopen (100000000 - for Windows; 1000 - Others)", true, 1000);
 		I_ASSIGN(m_databaseEngineCompPtr, "DatabaseEngine", "Database engine for SQL queries", true, "DatabaseEngine");
 		I_ASSIGN(m_mdbxDatabaseEngineCompPtr, "MdbxDatabaseEngine", "MdbxDatabase engine for analytics data", true, "MdbxDatabaseEngine");
+		I_ASSIGN(m_updateDebounceIntervalMs, "UpdateDebounceIntervalMs", "Delay in milliseconds to debounce database updates triggered by collection changes.", true, 500);
+		I_ASSIGN(m_updateIntervalSec, "UpdateIntervalSec", "Interval between database updates in seconds. No automatic updates if disabled.", false, 300); // 5 minutes
 		I_ASSIGN_MULTI_0(m_collectionListCompPtr, "DatabaseCollections", "Database collections. Connect to trigger MDBX update on every detected collection change", false);
 	I_END_COMPONENT;
 
 	CMdbxDatabaseControllerBase();
+
+	virtual bool Update();
+	virtual void TriggerDebouncedUpdate();
 
 signals:
 	void updateFinished();
@@ -67,9 +72,6 @@ protected:
 	virtual bool StartTransaction() override;
 	virtual bool CancelTransaction() override { return true; }
 	virtual bool EndTransaction() override;
-
-	// reimplemented (imtmdbx::IMdbxUpdateController)
-	virtual bool Update() override;
 
 protected:
 	/**
@@ -112,19 +114,25 @@ private:
 				Attached observer will trigger database update on collection change.
 	*/
 	void AttachCollectionObservers();
+	/**
+		\brief Detach \sa CollectionObserver from all collections in \sa m_collectionListCompPtr.
+	*/
+	void DetachCollectionObservers();
 
 protected:
 	I_ATTR(int, m_updateIntervalSec);
+	I_ATTR(int, m_transactionCountLimitAttr);
+	I_ATTR(int, m_updateDebounceIntervalMs);
 	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
 	I_REF(imtmdbx::IMdbxDatabaseEngine, m_mdbxDatabaseEngineCompPtr);
 	I_MULTIREF(imtbase::IObjectCollection, m_collectionListCompPtr);
 
 protected:
 	QTimer* m_timer;
+	QTimer* m_debounceTimer;
 	QHash<const QString/*tableName*/, DocumentTableConfig/*config*/> m_creationTableParamHash;
 
 	Qt::DateFormat m_dateFormat;
-	Qt::DateFormat m_dateFormatCut;
 
 	bool m_updateIsRunning;
 	bool m_isForcedUpdate;

@@ -8,12 +8,12 @@ namespace imtmdbx
 // public methods
 
 CMdbxDatabaseControllerBase::CMdbxDatabaseControllerBase():
+	m_timer(nullptr),
+	m_debounceTimer(nullptr),
 	m_dateFormat(Qt::ISODateWithMs),
-	m_dateFormatCut(Qt::ISODate),
 	m_updateIsRunning(false),
 	m_isForcedUpdate(false),
 	m_pgChangeCount(0),
-	m_transactionCountLimit(1000), //100000000 - for Windows; 1000 - Others;
 	m_collectionObserver(this)
 {
 	/// MDBX general data tables
@@ -30,6 +30,16 @@ void CMdbxDatabaseControllerBase::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
+	m_debounceTimer = new QTimer(this);
+	m_debounceTimer->setSingleShot(true);
+	m_debounceTimer->setInterval(std::chrono::milliseconds{ m_updateDebounceIntervalMs->GetValue() });
+
+	connect(m_debounceTimer, &QTimer::timeout, this, [this]() {
+		Update();
+	});
+
+	// resize change group list to avoid resizing during update
+	m_changeGroupList.resize(m_collectionListCompPtr.GetCount());
 	AttachCollectionObservers();
 
 	if(!m_updateIntervalSec.IsValid()){
@@ -37,9 +47,6 @@ void CMdbxDatabaseControllerBase::OnComponentCreated()
 	}
 
 	m_timer = new QTimer(this);
-
-	// resize change group list to avoid resizing during update
-	m_changeGroupList.resize(m_collectionListCompPtr.GetCount());
 
 	QTimer::singleShot(std::chrono::seconds{5}, this, [this]() {
 		DataBaseUpdateSlot();
@@ -53,8 +60,16 @@ void CMdbxDatabaseControllerBase::OnComponentCreated()
 
 void CMdbxDatabaseControllerBase::OnComponentDestroyed()
 {
+	DetachCollectionObservers();
+
 	if(m_timer != nullptr){
 		delete m_timer;
+		m_timer = nullptr;
+	}
+
+	if(m_debounceTimer != nullptr){
+		delete m_debounceTimer;
+		m_debounceTimer = nullptr;
 	}
 
 	BaseClass::OnComponentDestroyed();
@@ -100,15 +115,15 @@ bool CMdbxDatabaseControllerBase::EndTransaction()
 }
 
 
-// reimplemented (imtmdbx::IMdbxRevisionController)
+// public methods
 
 bool CMdbxDatabaseControllerBase::Update()
 {
-	qDebug() << "CMdbxDatabaseControllerBase::Update";
-
 	if(m_updateIsRunning){
 		return false;
 	}
+
+	qDebug() << "MDBX:: Forced update called";
 
 	m_isForcedUpdate = true;
 	DataBaseUpdateSlot();
@@ -123,7 +138,7 @@ bool CMdbxDatabaseControllerBase::SetTableCreationTime(imtmdbx::IDocumentTable* 
 		return false;
 	}
 
-	QString creationTimeStr = QDateTime::currentDateTime().toString(m_dateFormat);
+	QString creationTimeStr = QDateTime::currentDateTimeUtc().toString(m_dateFormat);
 
 	infoTable->AddDocument(imtmdbx::MdbxGeneralData::CREATION_TIME.toLocal8Bit(), creationTimeStr.toLocal8Bit());
 
@@ -191,7 +206,7 @@ bool CMdbxDatabaseControllerBase::SetRevisionTime(
 
 QDateTime CMdbxDatabaseControllerBase::GetTableLastUpdateTime(const QString& tableName, mdbx::txn_managed& txn)
 {
-	const QDateTime epochStartDate = QDateTime::fromSecsSinceEpoch(0);
+	const QDateTime epochStartDate = QDateTime::fromMSecsSinceEpoch(0, QTimeZone::utc());
 	const QDateTime revisionTime = GetRevisionTime(tableName, txn);
 
 	return revisionTime.isValid() ? revisionTime : epochStartDate;
@@ -251,19 +266,46 @@ void CMdbxDatabaseControllerBase::AttachCollectionObservers()
 }
 
 
+void CMdbxDatabaseControllerBase::DetachCollectionObservers()
+{
+	if (!m_collectionListCompPtr.IsValid()){
+		return;
+	}
+
+	for (int i = 0; i < m_collectionListCompPtr.GetCount(); i++){
+		if (auto* modelPtr = dynamic_cast<imod::IModel*>(m_collectionListCompPtr[i])){
+			modelPtr->DetachObserver(&m_collectionObserver);
+		}
+	}
+}
+
+
 bool CMdbxDatabaseControllerBase::CheckConfiguration() const
 {
+	bool retVal = true;
 	if (!m_mdbxDatabaseEngineCompPtr.IsValid()){
+		retVal = false;
 		SendCriticalMessage(0, QStringLiteral("Attribute 'MdbxDatabaseEngine' was not set."), __func__);
-		return false;
 	}
 
 	if (!m_databaseEngineCompPtr.IsValid()){
+		retVal = false;
 		SendCriticalMessage(0, QStringLiteral("Attribute 'DatabaseEngine' was not set."), __func__);
-		return false;
 	}
 
-	return true;
+	return retVal;
+}
+
+
+void CMdbxDatabaseControllerBase::TriggerDebouncedUpdate()
+{
+	const int debounceInterval = m_updateDebounceIntervalMs->GetValue();
+	if (m_debounceTimer != nullptr && debounceInterval > 0) {
+		m_debounceTimer->start();
+	}
+	else {
+		Update();
+	}
 }
 
 
@@ -280,7 +322,7 @@ CMdbxDatabaseControllerBase::CollectionObserver::CollectionObserver(CMdbxDatabas
 void CMdbxDatabaseControllerBase::CollectionObserver::OnUpdate(imod::IModel* modelPtr, const ChangeSet& changeSet)
 {
 	if (m_mdbxDatabaseControllerPtr != nullptr){
-		m_mdbxDatabaseControllerPtr->Update();
+		m_mdbxDatabaseControllerPtr->TriggerDebouncedUpdate();
 	}
 }
 
