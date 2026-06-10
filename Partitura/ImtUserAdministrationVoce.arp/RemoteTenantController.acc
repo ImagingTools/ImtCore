@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6397" Description="ACF"/>
-            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -50,6 +50,12 @@
                                 <Value>OnTenantsUndoChanged</Value>
                                 <Value>OnTenantsCollectionChanged</Value>
                                 <Value>OnMembershipNotification</Value>
+                                <Value>OnConnectionCodesNotification</Value>
+                                <Value>OnTenantRelationshipsDocumentChanged</Value>
+                                <Value>OnTenantRelationshipsUndoChanged</Value>
+                                <Value>OnCrossOrgGrantsUndoChanged</Value>
+                                <Value>OnCrossOrgGrantsDocumentChanged</Value>
+                                <Value>OnCrossTenantMessageNotification</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -106,6 +112,8 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Tenants</Value>
+                                <Value>TenantRelationships</Value>
+                                <Value>CrossOrgGrants</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -144,6 +152,9 @@
                             <Values>
                                 <Value>Tenant</Value>
                                 <Value>Tenants</Value>
+                                <Value>TenantRelationship</Value>
+                                <Value>CrossOrgGrants</Value>
+                                <Value>CrossOrgGrant</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -188,6 +199,9 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>UsersForInvitation</Value>
+                                <Value>TenantConnections</Value>
+                                <Value>TenantRelationships</Value>
+                                <Value>CrossOrgGrants</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -281,6 +295,10 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>GetTenantList</Value>
+                                <Value>UpdateRelationshipFromRepresentation</Value>
+                                <Value>GetRelationshipRepresentation</Value>
+                                <Value>UpdateGrantFromRepresentation</Value>
+                                <Value>GetGrantRepresentation</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

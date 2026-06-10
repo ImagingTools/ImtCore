@@ -33,6 +33,41 @@ namespace sdl::V1_0::modsdl
 {
 
 
+inline namespace DigitalPrinterSdlEnums
+{
+
+
+
+Q_NAMESPACE
+
+enum class PrintingTechnology {
+	Inkjet,
+	Toner,
+};
+
+Q_ENUM_NS(PrintingTechnology)
+
+
+class EnumPrintingTechnology: public QObject
+{
+	Q_OBJECT
+	Q_PROPERTY(QString Inkjet READ GetInkjet NOTIFY InkjetChanged)
+	Q_PROPERTY(QString Toner READ GetToner NOTIFY TonerChanged)
+
+protected:
+	static QString GetInkjet() { return "Inkjet"; }
+	static QString GetToner() { return "Toner"; }
+
+signals:
+	void InkjetChanged();
+	void TonerChanged();
+};
+
+
+
+} // inline namespace DigitalPrinterSdlEnums
+
+
 class CDigitalPrinterSpecification
 {
 public:
@@ -49,17 +84,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CDigitalPrinterSpecification& other) const;
 	[[nodiscard]] bool operator!=(const CDigitalPrinterSpecification& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 class CDigitalPrinter
@@ -78,17 +111,15 @@ public:
 
 	[[nodiscard]] bool operator==(const CDigitalPrinter& other) const;
 	[[nodiscard]] bool operator!=(const CDigitalPrinter& other) const {return !(operator==(other));}
-	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
-	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
-
-
 };
 
 
@@ -253,5 +284,5 @@ signals:
 } // namespace sdl::V1_0::modsdl
 
 
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CDigitalPrinterSpecification);
-Q_DECLARE_METATYPE(sdl::V1_0::V1_0::CDigitalPrinter);
+Q_DECLARE_METATYPE(sdl::V1_0::modsdl::CDigitalPrinterSpecification);
+Q_DECLARE_METATYPE(sdl::V1_0::modsdl::CDigitalPrinter);

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Accl>
+    <AcclHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6390" Description="ACF"/>
+            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+        </VersionInfos>
+    </AcclHeader>
+    <Layouts>
+        <Layout>
+            <Items>
+                <Item Id="JsonSerializer" X="10" Y="10" W="180" H="40"/>
+                <Item Id="ObjectCollection" X="10" Y="70" W="180" H="40"/>
+                <Item Id="Repository" X="10" Y="130" W="180" H="40"/>
+                <Item Id="TenantConnectionDatabaseDelegate" X="10" Y="190" W="250" H="40"/>
+                <Item Id="TenantConnectionInfo" X="10" Y="250" W="180" H="40"/>
+                <Item Id="Types" X="10" Y="310" W="180" H="40"/>
+            </Items>
+        </Layout>
+    </Layouts>
+</Accl>

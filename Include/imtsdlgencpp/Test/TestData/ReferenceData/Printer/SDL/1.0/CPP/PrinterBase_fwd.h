@@ -42,9 +42,8 @@ public:
 
 protected:
 	// abstract methods
-	virtual CPrinterList OnGetPrinters(const CGetPrintersGqlRequest& getPrintersRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
+	virtual V1_0::modsdl::CPrinterList OnGetPrinters(const CGetPrintersGqlRequest& getPrintersRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
 };
-
 
 
 } // namespace sdl::V1_0::modsdl

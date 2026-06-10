@@ -155,9 +155,76 @@ Popup {
         return it;
     }
 
-    // Convenience to open a menu at a cursor / item.
-    function popup(parentItem) {
-        if (parentItem) parent = parentItem;
+    // Convenience to open a menu with Qt Quick Controls-like signatures:
+    // popup(), popup(parentItem), popup(x, y), popup(parentItem, x, y),
+    // popup(point), popup(parentItem, point), popup(point, parentItem).
+    function popup() {
+        var resolvedParent = null;
+        var resolvedX = undefined;
+        var resolvedY = undefined;
+
+        let isItem = function(value) {
+            return value && typeof value === "object" && typeof value.mapToItem === "function";
+        }
+
+        let isNumber = function(value) {
+            return typeof value === "number" && isFinite(value);
+        }
+
+        let isPointLike = function(value) {
+            return value && typeof value === "object" && isNumber(value.x) && isNumber(value.y) && !isItem(value);
+        }
+
+        let assignPoint = function(point) {
+            resolvedX = point.x;
+            resolvedY = point.y;
+        }
+
+        if (arguments.length === 1) {
+            var arg0 = arguments[0];
+            if (isItem(arg0)) {
+                resolvedParent = arg0;
+            } else if (isPointLike(arg0)) {
+                assignPoint(arg0);
+            }
+        } else if (arguments.length === 2) {
+            var a0 = arguments[0];
+            var a1 = arguments[1];
+            if (isNumber(a0) && isNumber(a1)) {
+                resolvedX = a0;
+                resolvedY = a1;
+            } else if (isItem(a0) && isPointLike(a1)) {
+                resolvedParent = a0;
+                assignPoint(a1);
+            } else if (isPointLike(a0) && isItem(a1)) {
+                assignPoint(a0);
+                resolvedParent = a1;
+            }
+        } else if (arguments.length >= 3) {
+            var p0 = arguments[0];
+            var p1 = arguments[1];
+            var p2 = arguments[2];
+            if (isItem(p0) && isNumber(p1) && isNumber(p2)) {
+                resolvedParent = p0;
+                resolvedX = p1;
+                resolvedY = p2;
+            } else if (isNumber(p0) && isNumber(p1) && isItem(p2)) {
+                resolvedX = p0;
+                resolvedY = p1;
+                resolvedParent = p2;
+            }
+        }
+
+        if (resolvedParent) {
+            parent = resolvedParent;
+        }
+        if (resolvedX !== undefined) {
+            x = resolvedX;
+        }
+        if (resolvedY !== undefined) {
+            y = resolvedY;
+        }
+
         open();
     }
 
@@ -178,7 +245,6 @@ Popup {
         // parents children directly onto the Menu itself (menu.data). We scan
         // both locations to stay compatible with both runtimes.
         var arr = menu.contentData;
-        console.log("_ingestDeclaredChildren", arr)
         if (!arr || arr.length === 0) arr = menu.data;
         if (!arr) return;
 
@@ -477,8 +543,6 @@ Popup {
             property var menuItemData: modelData
 
             onLoaded: {
-                console.log("onLoaded", item, menuItemData)
-                console.log("menu", menu.x, menu.y, menu.width, menu.height)
                 if (item) {
                     item.menu = menu;
                     item.menuItem = modelData;

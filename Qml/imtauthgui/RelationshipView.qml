@@ -5,15 +5,25 @@ import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 import imtcolgui 1.0
-import imtguigql 1.0
 import imtauthgui 1.0
 
 /**
  * RelationshipView
  *
- * ViewBase-inherited editor for creating tenant relationships.
- * Follows the RoleView / UserGroupView pattern with GqlBasedCommandsController.
- * The commands controller provides the Save button at the top.
+ * ViewBase-inherited editor for creating or editing tenant relationships.
+ * Follows the RoleView / UserGroupView pattern.
+ *
+ * Used inside the document service flow (TenantDocumentEditorShell).
+ * The document framework calls updateGui() to populate the form from
+ * the representationModel and updateModel() to write form values back.
+ * Saving is handled by the shell's Save button which triggers the
+ * bilateral proposal flow via CRelationshipCollectionDocumentServiceComp.
+ *
+ * The editor displays fields relative to the current tenant:
+ *   - "Partner Organization" (the other side)
+ *   - "My Role" (role of the current tenant in this relationship)
+ *   - "Partner Role" (role of the partner tenant)
+ * This avoids confusion when both sides can edit the same relationship.
  */
 ViewBase {
 	id: container
@@ -21,39 +31,93 @@ ViewBase {
 	anchors.fill: parent
 	contentColor: Style.baseColor
 
+	property var relationshipData: model
 	property var apiClient: null
 	property var tenantData: null
 
-	property string __selectedTargetTenantId: ""
-	property string __selectedTargetTenantName: ""
+	property string __selectedPartnerTenantId: ""
+	property string __selectedPartnerTenantName: ""
+	// Whether the current tenant is the "source" in the underlying model
+	property bool __isSource: true
+	readonly property bool __isExistingRelationship: (relationshipData
+		&& relationshipData.m_sourceTenantId
+		&& relationshipData.m_targetTenantId)
 
-	signal relationshipCreated()
+	// Resolve the current tenant ID from tenantData or AuthorizationController
+	readonly property string __currentTenantId: container.tenantData
+		? (container.tenantData.m_id || "")
+		: (typeof AuthorizationController !== "undefined" ? AuthorizationController.currentTenantId : "")
 
 	function updateGui() {
+		if (!container.relationshipData) {
+			return
+		}
+		// Determine which side we are: if current tenant is the source,
+		// the partner is target; otherwise, we swap the perspective.
+		var currentTenantId = container.__currentTenantId
+		var sourceTenantId = container.relationshipData.m_sourceTenantId || ""
+		var targetTenantId = container.relationshipData.m_targetTenantId || ""
+
+		if (targetTenantId && currentTenantId && targetTenantId === currentTenantId && sourceTenantId !== "") {
+			// Current tenant is the target → swap perspective
+			container.__isSource = false
+			container.__selectedPartnerTenantId = sourceTenantId
+			container.__selectedPartnerTenantName = container.relationshipData.m_sourceTenantName || ""
+		} else {
+			// Current tenant is the source (or new relationship)
+			container.__isSource = true
+			container.__selectedPartnerTenantId = targetTenantId
+			container.__selectedPartnerTenantName = container.relationshipData.m_targetTenantName || ""
+		}
+
+		var roles = ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
+		var myRoleValue = container.__isSource
+			? (container.relationshipData.m_sourceRole || "")
+			: (container.relationshipData.m_targetRole || "")
+		var partnerRoleValue = container.__isSource
+			? (container.relationshipData.m_targetRole || "")
+			: (container.relationshipData.m_sourceRole || "")
+
+		var myIdx = roles.indexOf(myRoleValue)
+		var partnerIdx = roles.indexOf(partnerRoleValue)
+		myRoleCB.currentIndex = myIdx >= 0 ? myIdx : 2
+		partnerRoleCB.currentIndex = partnerIdx >= 0 ? partnerIdx : 2
+		relScopeInput.text = container.relationshipData.m_scope || ""
+		relDescriptionInput.text = container.relationshipData.m_description || ""
 	}
 
 	function updateModel() {
-	}
-
-	function submitRelationship() {
-		if (!container.__selectedTargetTenantId) {
-			ModalDialogManager.showInfoDialog(qsTr("Target tenant is required."))
+		if (!container.relationshipData) {
 			return
 		}
-		var roleTokens = ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
-		var srcIdx = sourceRoleCB.currentIndex >= 0 ? sourceRoleCB.currentIndex : 2
-		var tgtIdx = targetRoleCB.currentIndex >= 0 ? targetRoleCB.currentIndex : 2
-		if (container.apiClient) {
-			container.apiClient.addTenantRelationship(
-				container.tenantData ? container.tenantData.m_id : "",
-				container.__selectedTargetTenantId,
-				roleTokens[srcIdx],
-				roleTokens[tgtIdx],
-				relScopeInput.text.trim(),
-				relValidFromPicker.getDateAsString(),
-				relValidUntilPicker.getDateAsString(),
-				relDescriptionInput.text.trim())
+
+		if (!container.__isExistingRelationship) {
+			if (container.__isSource) {
+				if (container.__currentTenantId) {
+					container.relationshipData.m_sourceTenantId = container.__currentTenantId
+				}
+				container.relationshipData.m_targetTenantId = container.__selectedPartnerTenantId || ""
+			} else {
+				container.relationshipData.m_sourceTenantId = container.__selectedPartnerTenantId || ""
+				if (container.__currentTenantId) {
+					container.relationshipData.m_targetTenantId = container.__currentTenantId
+				}
+			}
 		}
+
+		var roleTokens = ["Parent", "Child", "Partner", "Supplier", "Customer", "Affiliate"]
+		var myIdx = myRoleCB.currentIndex >= 0 ? myRoleCB.currentIndex : 2
+		var partnerIdx = partnerRoleCB.currentIndex >= 0 ? partnerRoleCB.currentIndex : 2
+
+		if (container.__isSource) {
+			container.relationshipData.m_sourceRole = roleTokens[myIdx]
+			container.relationshipData.m_targetRole = roleTokens[partnerIdx]
+		} else {
+			container.relationshipData.m_targetRole = roleTokens[myIdx]
+			container.relationshipData.m_sourceRole = roleTokens[partnerIdx]
+		}
+		container.relationshipData.m_scope = relScopeInput.text.trim()
+		container.relationshipData.m_description = relDescriptionInput.text.trim()
 	}
 
 	CustomScrollbar {
@@ -94,26 +158,43 @@ ViewBase {
 				width: parent.width
 
 				ElementView {
-					name: qsTr("Target Tenant")
+					name: qsTr("Partner Organization")
 
 					controlComp: Component {
 						Row {
+							id: partnerTenantRow
 							spacing: Style.marginM
 
 							BaseText {
 								anchors.verticalCenter: parent.verticalCenter
-								text: container.__selectedTargetTenantName
-								  || container.__selectedTargetTenantId
-								  || qsTr("Select tenant...")
-								color: container.__selectedTargetTenantId
+								text: container.__selectedPartnerTenantName
+								  || container.__selectedPartnerTenantId
+								  || qsTr("Select organization...")
+								color: container.__selectedPartnerTenantId
 								   ? Style.textColor : Style.inactiveTextColor
 								font.pixelSize: Style.fontSizeM
 							}
 
 							Button {
 								text: qsTr("Select")
+								enabled: !container.__isExistingRelationship
+								visible: !container.__isExistingRelationship
 								onClicked: {
-									ModalDialogManager.openDialog(tenantSelectComp, {})
+									var point = partnerTenantRow.mapToItem(null, 0, partnerTenantRow.height)
+									ModalDialogManager.openDialog(tenantSelectComp, {
+																	  "x": point.x,
+																	  "y": point.y
+																  })
+								}
+							}
+
+							Button {
+								text: qsTr("Remove")
+								visible: !container.__isExistingRelationship && container.__selectedPartnerTenantId !== ""
+								onClicked: {
+									container.__selectedPartnerTenantId = ""
+									container.__selectedPartnerTenantName = ""
+									container.doUpdateModel()
 								}
 							}
 						}
@@ -121,39 +202,41 @@ ViewBase {
 				}
 
 				ComboBoxElementView {
-					id: sourceRoleCB
-					name: qsTr("Source Role")
+					id: myRoleCB
+					name: qsTr("My Role")
 					model: roleModel
 					currentIndex: 2
+					onCurrentIndexChanged: {
+						container.doUpdateModel()
+					}
 				}
 
 				ComboBoxElementView {
-					id: targetRoleCB
-					name: qsTr("Target Role")
+					id: partnerRoleCB
+					name: qsTr("Partner Role")
 					model: roleModel
 					currentIndex: 2
+					onCurrentIndexChanged: {
+						container.doUpdateModel()
+					}
 				}
 
 				TextInputElementView {
 					id: relScopeInput
 					name: qsTr("Scope")
 					placeHolderText: qsTr("Optional — empty applies to all resources")
-				}
-
-				DateTimePickerElementView {
-					id: relValidFromPicker
-					name: qsTr("Valid From")
-				}
-
-				DateTimePickerElementView {
-					id: relValidUntilPicker
-					name: qsTr("Valid Until")
+					onEditingFinished: {
+						container.doUpdateModel()
+					}
 				}
 
 				TextInputElementView {
 					id: relDescriptionInput
 					name: qsTr("Description")
 					placeHolderText: qsTr("Optional description")
+					onEditingFinished: {
+						container.doUpdateModel()
+					}
 				}
 			}
 		}
@@ -163,18 +246,24 @@ ViewBase {
 		id: tenantSelectComp
 
 		FilterableSelectPopup {
-			dataProvider: FilterableSelectGqlDataProvider {
-				collectionId: "Tenants"
-				multiSelect: false
-			}
-			filterPlaceholder: qsTr("Select tenant...")
-			preselectedIds: container.__selectedTargetTenantId
-				? [container.__selectedTargetTenantId] : []
+			dataProvider: container.apiClient ? container.apiClient.connectionsDataProvider : null
+			filterPlaceholder: qsTr("Select organization...")
+			preselectedIds: container.__selectedPartnerTenantId
+				? [container.__selectedPartnerTenantId] : []
 
 			onItemSelected: {
-				container.__selectedTargetTenantId = itemId
-				container.__selectedTargetTenantName = dataProvider
+				if (container.__isExistingRelationship) {
+					ModalDialogManager.showInfoDialog(qsTr("Partner organization cannot be changed after relationship creation."))
+					return
+				}
+				if (itemId === container.__currentTenantId) {
+					ModalDialogManager.showInfoDialog(qsTr("Choose another organization. Current and partner organizations must be different."))
+					return
+				}
+				container.__selectedPartnerTenantId = itemId
+				container.__selectedPartnerTenantName = dataProvider
 					? dataProvider.getSelectedItemText(itemId) : ""
+				container.doUpdateModel()
 			}
 		}
 	}

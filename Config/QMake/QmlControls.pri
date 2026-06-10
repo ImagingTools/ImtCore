@@ -55,7 +55,9 @@ defineTest(prepareWebQml) {
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthRoleCollectionDocumentServiceSdl, $$buildwebdir/src/imtauthRoleCollectionDocumentServiceSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthGroupCollectionDocumentServiceSdl, $$buildwebdir/src/imtauthGroupCollectionDocumentServiceSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthUserCollectionDocumentServiceSdl, $$buildwebdir/src/imtauthUserCollectionDocumentServiceSdl)
-	
+	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthRelationshipCollectionDocumentServiceSdl, $$buildwebdir/src/imtauthRelationshipCollectionDocumentServiceSdl)
+	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthCrossOrgGrantCollectionDocumentServiceSdl, $$buildwebdir/src/imtauthCrossOrgGrantCollectionDocumentServiceSdl)
+
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtlicsdl/SDL/1.0/QML/imtlicFeaturesSdl, $$buildwebdir/src/imtlicFeaturesSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtlicsdl/SDL/1.0/QML/imtlicProductsSdl, $$buildwebdir/src/imtlicProductsSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtlicsdl/SDL/1.0/QML/imtlicLicensesSdl, $$buildwebdir/src/imtlicLicensesSdl)

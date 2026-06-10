@@ -44,68 +44,6 @@ public:
 	};
 
 	/**
-		Tenant relationship roles.
-	*/
-	enum TenantRelationshipRole
-	{
-		Parent = 0,
-		Child,
-		Partner,
-		Supplier,
-		Customer,
-		Affiliate
-	};
-
-	/**
-		Structure describing a relationship between tenants.
-
-		Relationships are direction-aware and asymmetric: \a sourceRole describes
-		the role of the tenant owning this relationship entry, while \a targetRole
-		describes the role of the \a targetTenantId. For example a Customer→Supplier
-		relationship stored on the customer tenant has sourceRole = Customer and
-		targetRole = Supplier.
-
-		The legacy \a role field is kept for backward compatibility and mirrors
-		\a targetRole (the role of the target tenant).
-	*/
-	struct TenantRelationship
-	{
-		QByteArray relationshipId;
-		QByteArray targetTenantId;
-		TenantRelationshipRole role = Partner;
-		TenantRelationshipRole sourceRole = Partner;
-		TenantRelationshipRole targetRole = Partner;
-		QString scope;
-		QString validFrom;
-		QString validUntil;
-		bool isActive = true;
-		QString description;
-		QString createdAt;
-
-		bool operator==(const TenantRelationship& other) const
-		{
-			return relationshipId == other.relationshipId
-				&& targetTenantId == other.targetTenantId
-				&& role == other.role
-				&& sourceRole == other.sourceRole
-				&& targetRole == other.targetRole
-				&& scope == other.scope
-				&& validFrom == other.validFrom
-				&& validUntil == other.validUntil
-				&& isActive == other.isActive
-				&& description == other.description
-				&& createdAt == other.createdAt;
-		}
-
-		bool operator!=(const TenantRelationship& other) const
-		{
-			return !(*this == other);
-		}
-	};
-
-	typedef QList<TenantRelationship> TenantRelationships;
-
-	/**
 		Get tenant ID.
 	*/
 	virtual QByteArray GetTenantId() const = 0;
@@ -188,24 +126,24 @@ public:
 	virtual void SetUpdatedAt(const QString& updatedAt) = 0;
 
 	/**
-		Get all relationships for this tenant.
+		Get relationship IDs associated with this tenant.
 	*/
-	virtual TenantRelationships GetRelationships() const = 0;
+	virtual QByteArrayList GetRelationshipIds() const = 0;
 
 	/**
-		Set relationships for this tenant.
+		Set relationship IDs for this tenant.
 	*/
-	virtual void SetRelationships(const TenantRelationships& relationships) = 0;
+	virtual void SetRelationshipIds(const QByteArrayList& relationshipIds) = 0;
 
 	/**
-		Add a relationship to this tenant.
+		Add a relationship ID to this tenant.
 	*/
-	virtual void AddRelationship(const TenantRelationship& relationship) = 0;
+	virtual void AddRelationshipId(const QByteArray& relationshipId) = 0;
 
 	/**
-		Remove a relationship by its ID.
+		Remove a relationship ID from this tenant.
 	*/
-	virtual bool RemoveRelationship(const QByteArray& relationshipId) = 0;
+	virtual bool RemoveRelationshipId(const QByteArray& relationshipId) = 0;
 
 	/**
 		Get the list of permissions available for this tenant.

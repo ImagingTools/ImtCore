@@ -20,7 +20,7 @@ bool CTimeRange::operator==(const CTimeRange& other) const
 }
 
 
-bool CTimeRange::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::imtbase::CTimeRange::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "TimeRange", modelIndex);
 
@@ -37,7 +37,7 @@ bool CTimeRange::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) 
 }
 
 
-bool CTimeRange::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CTimeRange::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant beginData = model.GetData("Begin", modelIndex);
 	if (!beginData.isNull()){
@@ -53,7 +53,7 @@ bool CTimeRange::ReadFromModel(const ::imtbase::CTreeItemModel& model, int model
 }
 
 
-bool CTimeRange::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CTimeRange::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant beginData = model.GetData("Begin", modelIndex);
 	if (!beginData.isNull()){
@@ -69,7 +69,7 @@ bool CTimeRange::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int mo
 }
 
 
-bool CTimeRange::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::imtbase::CTimeRange::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (Begin){
 		gqlObject.InsertParam("Begin", QVariant(*Begin));
@@ -85,7 +85,7 @@ bool CTimeRange::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) cons
 }
 
 
-bool CTimeRange::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CTimeRange::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("Begin") && (gqlObject["Begin"].userType() == QMetaType::QString || gqlObject["Begin"].userType() == QMetaType::QByteArray)){
 		Begin = gqlObject["Begin"].toString();
@@ -99,7 +99,7 @@ bool CTimeRange::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObjec
 }
 
 
-bool CTimeRange::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CTimeRange::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("Begin") && (gqlObject["Begin"].userType() == QMetaType::QString || gqlObject["Begin"].userType() == QMetaType::QByteArray)){
 		Begin = gqlObject["Begin"].toString();
@@ -113,7 +113,7 @@ bool CTimeRange::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 }
 
 
-bool CTimeRange::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::imtbase::CTimeRange::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (Begin){
 		jsonObject["Begin"] = QJsonValue::fromVariant(*Begin);
@@ -129,7 +129,7 @@ bool CTimeRange::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CTimeRange::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CTimeRange::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("Begin") && jsonObject["Begin"].isString()){
 		Begin = jsonObject["Begin"].toString();
@@ -143,7 +143,7 @@ bool CTimeRange::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CTimeRange::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CTimeRange::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("Begin") && jsonObject["Begin"].isString()){
 		Begin = jsonObject["Begin"].toString();
@@ -157,7 +157,7 @@ bool CTimeRange::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CSdlSize::GetVersionId()
 {
@@ -177,7 +177,7 @@ bool CSdlSize::operator==(const CSdlSize& other) const
 }
 
 
-bool CSdlSize::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::imtbase::CSdlSize::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "SdlSize", modelIndex);
 
@@ -200,7 +200,7 @@ bool CSdlSize::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) co
 }
 
 
-bool CSdlSize::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CSdlSize::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant widthData = model.GetData("width", modelIndex);
 	if (widthData.isNull()){
@@ -222,7 +222,7 @@ bool CSdlSize::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIn
 }
 
 
-bool CSdlSize::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CSdlSize::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant widthData = model.GetData("width", modelIndex);
 	if (!widthData.isNull()){
@@ -238,7 +238,7 @@ bool CSdlSize::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int mode
 }
 
 
-bool CSdlSize::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::imtbase::CSdlSize::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!width){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "width").toLocal8Bit().constData();)
@@ -260,7 +260,7 @@ bool CSdlSize::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 }
 
 
-bool CSdlSize::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CSdlSize::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("width") || (gqlObject["width"].userType() != QMetaType::Float && gqlObject["width"].userType() != QMetaType::Double && gqlObject["width"].userType() != QMetaType::Int && gqlObject["width"].userType() != QMetaType::UInt && gqlObject["width"].userType() != QMetaType::LongLong && gqlObject["width"].userType() != QMetaType::ULongLong && gqlObject["width"].userType() != QMetaType::Long && gqlObject["width"].userType() != QMetaType::Short && gqlObject["width"].userType() != QMetaType::ULong && gqlObject["width"].userType() != QMetaType::UShort && gqlObject["width"].userType() != QMetaType::UChar)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "width").toLocal8Bit().constData();)
@@ -280,7 +280,7 @@ bool CSdlSize::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 }
 
 
-bool CSdlSize::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CSdlSize::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("width") && (gqlObject["width"].userType() == QMetaType::Float || gqlObject["width"].userType() == QMetaType::Double || gqlObject["width"].userType() == QMetaType::Int || gqlObject["width"].userType() == QMetaType::UInt || gqlObject["width"].userType() == QMetaType::LongLong || gqlObject["width"].userType() == QMetaType::ULongLong || gqlObject["width"].userType() == QMetaType::Long || gqlObject["width"].userType() == QMetaType::Short || gqlObject["width"].userType() == QMetaType::ULong || gqlObject["width"].userType() == QMetaType::UShort || gqlObject["width"].userType() == QMetaType::UChar)){
 		width = gqlObject["width"].toDouble();
@@ -294,7 +294,7 @@ bool CSdlSize::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObje
 }
 
 
-bool CSdlSize::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::imtbase::CSdlSize::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!width){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "width").toLocal8Bit().constData();)
@@ -316,7 +316,7 @@ bool CSdlSize::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CSdlSize::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CSdlSize::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("width") || ! jsonObject["width"].isDouble()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "width").toLocal8Bit().constData();)
@@ -336,7 +336,7 @@ bool CSdlSize::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CSdlSize::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CSdlSize::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("width") && jsonObject["width"].isDouble()){
 		width = jsonObject["width"].toDouble();
@@ -350,7 +350,7 @@ bool CSdlSize::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CSdlPoint::GetVersionId()
 {
@@ -370,7 +370,7 @@ bool CSdlPoint::operator==(const CSdlPoint& other) const
 }
 
 
-bool CSdlPoint::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::imtbase::CSdlPoint::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "SdlPoint", modelIndex);
 
@@ -393,7 +393,7 @@ bool CSdlPoint::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) c
 }
 
 
-bool CSdlPoint::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CSdlPoint::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant xData = model.GetData("x", modelIndex);
 	if (xData.isNull()){
@@ -415,7 +415,7 @@ bool CSdlPoint::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelI
 }
 
 
-bool CSdlPoint::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CSdlPoint::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant xData = model.GetData("x", modelIndex);
 	if (!xData.isNull()){
@@ -431,7 +431,7 @@ bool CSdlPoint::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int mod
 }
 
 
-bool CSdlPoint::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::imtbase::CSdlPoint::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!x){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x").toLocal8Bit().constData();)
@@ -453,7 +453,7 @@ bool CSdlPoint::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 }
 
 
-bool CSdlPoint::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CSdlPoint::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("x") || (gqlObject["x"].userType() != QMetaType::Float && gqlObject["x"].userType() != QMetaType::Double && gqlObject["x"].userType() != QMetaType::Int && gqlObject["x"].userType() != QMetaType::UInt && gqlObject["x"].userType() != QMetaType::LongLong && gqlObject["x"].userType() != QMetaType::ULongLong && gqlObject["x"].userType() != QMetaType::Long && gqlObject["x"].userType() != QMetaType::Short && gqlObject["x"].userType() != QMetaType::ULong && gqlObject["x"].userType() != QMetaType::UShort && gqlObject["x"].userType() != QMetaType::UChar)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x").toLocal8Bit().constData();)
@@ -473,7 +473,7 @@ bool CSdlPoint::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject
 }
 
 
-bool CSdlPoint::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CSdlPoint::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("x") && (gqlObject["x"].userType() == QMetaType::Float || gqlObject["x"].userType() == QMetaType::Double || gqlObject["x"].userType() == QMetaType::Int || gqlObject["x"].userType() == QMetaType::UInt || gqlObject["x"].userType() == QMetaType::LongLong || gqlObject["x"].userType() == QMetaType::ULongLong || gqlObject["x"].userType() == QMetaType::Long || gqlObject["x"].userType() == QMetaType::Short || gqlObject["x"].userType() == QMetaType::ULong || gqlObject["x"].userType() == QMetaType::UShort || gqlObject["x"].userType() == QMetaType::UChar)){
 		x = gqlObject["x"].toDouble();
@@ -487,7 +487,7 @@ bool CSdlPoint::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObj
 }
 
 
-bool CSdlPoint::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::imtbase::CSdlPoint::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!x){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x").toLocal8Bit().constData();)
@@ -509,7 +509,7 @@ bool CSdlPoint::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CSdlPoint::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CSdlPoint::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("x") || ! jsonObject["x"].isDouble()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x").toLocal8Bit().constData();)
@@ -529,7 +529,7 @@ bool CSdlPoint::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CSdlPoint::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CSdlPoint::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("x") && jsonObject["x"].isDouble()){
 		x = jsonObject["x"].toDouble();
@@ -543,7 +543,7 @@ bool CSdlPoint::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CParamTypeIds::GetVersionId()
 {
@@ -571,7 +571,7 @@ bool CParamTypeIds::operator==(const CParamTypeIds& other) const
 }
 
 
-bool CParamTypeIds::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::imtbase::CParamTypeIds::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "ParamTypeIds", modelIndex);
 
@@ -636,7 +636,7 @@ bool CParamTypeIds::WriteToModel(::imtbase::CTreeItemModel& model, int modelInde
 }
 
 
-bool CParamTypeIds::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CParamTypeIds::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant urlParamData = model.GetData("UrlParam", modelIndex);
 	if (!urlParamData.isNull()){
@@ -712,7 +712,7 @@ bool CParamTypeIds::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mo
 }
 
 
-bool CParamTypeIds::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CParamTypeIds::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant urlParamData = model.GetData("UrlParam", modelIndex);
 	if (!urlParamData.isNull()){
@@ -788,7 +788,7 @@ bool CParamTypeIds::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int
 }
 
 
-bool CParamTypeIds::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::imtbase::CParamTypeIds::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (UrlParam){
 		gqlObject.InsertParam("UrlParam", QVariant(*UrlParam));
@@ -852,7 +852,7 @@ bool CParamTypeIds::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) c
 }
 
 
-bool CParamTypeIds::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CParamTypeIds::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("UrlParam") && (gqlObject["UrlParam"].userType() == QMetaType::QString || gqlObject["UrlParam"].userType() == QMetaType::QByteArray)){
 		UrlParam = gqlObject["UrlParam"].toByteArray();
@@ -914,7 +914,7 @@ bool CParamTypeIds::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 }
 
 
-bool CParamTypeIds::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CParamTypeIds::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("UrlParam") && (gqlObject["UrlParam"].userType() == QMetaType::QString || gqlObject["UrlParam"].userType() == QMetaType::QByteArray)){
 		UrlParam = gqlObject["UrlParam"].toByteArray();
@@ -976,7 +976,7 @@ bool CParamTypeIds::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 }
 
 
-bool CParamTypeIds::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::imtbase::CParamTypeIds::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (UrlParam){
 		jsonObject["UrlParam"] = QString::fromUtf8(*UrlParam);
@@ -1040,7 +1040,7 @@ bool CParamTypeIds::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CParamTypeIds::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CParamTypeIds::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("UrlParam") && jsonObject["UrlParam"].isString()){
 		UrlParam = jsonObject["UrlParam"].toString().toUtf8();
@@ -1102,7 +1102,7 @@ bool CParamTypeIds::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CParamTypeIds::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CParamTypeIds::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("UrlParam") && jsonObject["UrlParam"].isString()){
 		UrlParam = jsonObject["UrlParam"].toString().toUtf8();
@@ -1164,7 +1164,7 @@ bool CParamTypeIds::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CUrlParam::GetVersionId()
 {
@@ -1182,7 +1182,7 @@ bool CUrlParam::operator==(const CUrlParam& other) const
 }
 
 
-bool CUrlParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::imtbase::CUrlParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "UrlParam", modelIndex);
 
@@ -1207,7 +1207,7 @@ bool CUrlParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) c
 }
 
 
-bool CUrlParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CUrlParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant schemeData = model.GetData("scheme", modelIndex);
 	if (!schemeData.isNull()){
@@ -1233,7 +1233,7 @@ bool CUrlParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelI
 }
 
 
-bool CUrlParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CUrlParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant schemeData = model.GetData("scheme", modelIndex);
 	if (!schemeData.isNull()){
@@ -1259,7 +1259,7 @@ bool CUrlParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int mod
 }
 
 
-bool CUrlParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::imtbase::CUrlParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (scheme){
 		gqlObject.InsertParam("scheme", QVariant(*scheme));
@@ -1283,7 +1283,7 @@ bool CUrlParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 }
 
 
-bool CUrlParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CUrlParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("scheme") && (gqlObject["scheme"].userType() == QMetaType::QString || gqlObject["scheme"].userType() == QMetaType::QByteArray)){
 		scheme = gqlObject["scheme"].toString();
@@ -1305,7 +1305,7 @@ bool CUrlParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject
 }
 
 
-bool CUrlParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CUrlParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("scheme") && (gqlObject["scheme"].userType() == QMetaType::QString || gqlObject["scheme"].userType() == QMetaType::QByteArray)){
 		scheme = gqlObject["scheme"].toString();
@@ -1327,7 +1327,7 @@ bool CUrlParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObj
 }
 
 
-bool CUrlParam::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::imtbase::CUrlParam::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (scheme){
 		jsonObject["scheme"] = QJsonValue::fromVariant(*scheme);
@@ -1351,7 +1351,7 @@ bool CUrlParam::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CUrlParam::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CUrlParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("scheme") && jsonObject["scheme"].isString()){
 		scheme = jsonObject["scheme"].toString();
@@ -1373,7 +1373,7 @@ bool CUrlParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CUrlParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CUrlParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("scheme") && jsonObject["scheme"].isString()){
 		scheme = jsonObject["scheme"].toString();
@@ -1395,7 +1395,7 @@ bool CUrlParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CIdParam::GetVersionId()
 {
@@ -1410,7 +1410,7 @@ bool CIdParam::operator==(const CIdParam& other) const
 }
 
 
-bool CIdParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::imtbase::CIdParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "IdParam", modelIndex);
 
@@ -1423,7 +1423,7 @@ bool CIdParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) co
 }
 
 
-bool CIdParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CIdParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant idData = model.GetData("id", modelIndex);
 	if (!idData.isNull()){
@@ -1434,7 +1434,7 @@ bool CIdParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIn
 }
 
 
-bool CIdParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CIdParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant idData = model.GetData("id", modelIndex);
 	if (!idData.isNull()){
@@ -1445,7 +1445,7 @@ bool CIdParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int mode
 }
 
 
-bool CIdParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::imtbase::CIdParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (id){
 		gqlObject.InsertParam("id", QVariant(*id));
@@ -1457,7 +1457,7 @@ bool CIdParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 }
 
 
-bool CIdParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CIdParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("id") && (gqlObject["id"].userType() == QMetaType::QString || gqlObject["id"].userType() == QMetaType::QByteArray)){
 		id = gqlObject["id"].toByteArray();
@@ -1467,7 +1467,7 @@ bool CIdParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 }
 
 
-bool CIdParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CIdParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("id") && (gqlObject["id"].userType() == QMetaType::QString || gqlObject["id"].userType() == QMetaType::QByteArray)){
 		id = gqlObject["id"].toByteArray();
@@ -1477,7 +1477,7 @@ bool CIdParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObje
 }
 
 
-bool CIdParam::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::imtbase::CIdParam::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (id){
 		jsonObject["id"] = QString::fromUtf8(*id);
@@ -1489,7 +1489,7 @@ bool CIdParam::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CIdParam::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CIdParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("id") && jsonObject["id"].isString()){
 		id = jsonObject["id"].toString().toUtf8();
@@ -1499,7 +1499,7 @@ bool CIdParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CIdParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CIdParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("id") && jsonObject["id"].isString()){
 		id = jsonObject["id"].toString().toUtf8();
@@ -1509,7 +1509,7 @@ bool CIdParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CTextParam::GetVersionId()
 {
@@ -1524,7 +1524,7 @@ bool CTextParam::operator==(const CTextParam& other) const
 }
 
 
-bool CTextParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::imtbase::CTextParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "TextParam", modelIndex);
 
@@ -1537,7 +1537,7 @@ bool CTextParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) 
 }
 
 
-bool CTextParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CTextParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant textData = model.GetData("text", modelIndex);
 	if (!textData.isNull()){
@@ -1548,7 +1548,7 @@ bool CTextParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int model
 }
 
 
-bool CTextParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CTextParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant textData = model.GetData("text", modelIndex);
 	if (!textData.isNull()){
@@ -1559,7 +1559,7 @@ bool CTextParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int mo
 }
 
 
-bool CTextParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::imtbase::CTextParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (text){
 		gqlObject.InsertParam("text", QVariant(*text));
@@ -1571,7 +1571,7 @@ bool CTextParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) cons
 }
 
 
-bool CTextParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CTextParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("text") && (gqlObject["text"].userType() == QMetaType::QString || gqlObject["text"].userType() == QMetaType::QByteArray)){
 		text = gqlObject["text"].toString();
@@ -1581,7 +1581,7 @@ bool CTextParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObjec
 }
 
 
-bool CTextParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CTextParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("text") && (gqlObject["text"].userType() == QMetaType::QString || gqlObject["text"].userType() == QMetaType::QByteArray)){
 		text = gqlObject["text"].toString();
@@ -1591,7 +1591,7 @@ bool CTextParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 }
 
 
-bool CTextParam::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::imtbase::CTextParam::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (text){
 		jsonObject["text"] = QJsonValue::fromVariant(*text);
@@ -1603,7 +1603,7 @@ bool CTextParam::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CTextParam::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CTextParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("text") && jsonObject["text"].isString()){
 		text = jsonObject["text"].toString();
@@ -1613,7 +1613,7 @@ bool CTextParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CTextParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CTextParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("text") && jsonObject["text"].isString()){
 		text = jsonObject["text"].toString();
@@ -1623,7 +1623,7 @@ bool CTextParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CEnableableParam::GetVersionId()
 {
@@ -1638,7 +1638,7 @@ bool CEnableableParam::operator==(const CEnableableParam& other) const
 }
 
 
-bool CEnableableParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::imtbase::CEnableableParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "EnableableParam", modelIndex);
 
@@ -1651,7 +1651,7 @@ bool CEnableableParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelI
 }
 
 
-bool CEnableableParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CEnableableParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant valueData = model.GetData("value", modelIndex);
 	if (!valueData.isNull()){
@@ -1662,7 +1662,7 @@ bool CEnableableParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int
 }
 
 
-bool CEnableableParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CEnableableParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant valueData = model.GetData("value", modelIndex);
 	if (!valueData.isNull()){
@@ -1673,7 +1673,7 @@ bool CEnableableParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, 
 }
 
 
-bool CEnableableParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::imtbase::CEnableableParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (value){
 		gqlObject.InsertParam("value", QVariant(*value));
@@ -1685,7 +1685,7 @@ bool CEnableableParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject
 }
 
 
-bool CEnableableParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CEnableableParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("value") && (gqlObject["value"].userType() == QMetaType::Bool)){
 		value = gqlObject["value"].toBool();
@@ -1695,7 +1695,7 @@ bool CEnableableParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 }
 
 
-bool CEnableableParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CEnableableParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("value") && (gqlObject["value"].userType() == QMetaType::Bool)){
 		value = gqlObject["value"].toBool();
@@ -1705,7 +1705,7 @@ bool CEnableableParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 }
 
 
-bool CEnableableParam::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::imtbase::CEnableableParam::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (value){
 		jsonObject["value"] = QJsonValue::fromVariant(*value);
@@ -1717,7 +1717,7 @@ bool CEnableableParam::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CEnableableParam::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CEnableableParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("value") && jsonObject["value"].isBool()){
 		value = jsonObject["value"].toBool();
@@ -1727,7 +1727,7 @@ bool CEnableableParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CEnableableParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CEnableableParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("value") && jsonObject["value"].isBool()){
 		value = jsonObject["value"].toBool();
@@ -1737,7 +1737,7 @@ bool CEnableableParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CIntegerParam::GetVersionId()
 {
@@ -1752,7 +1752,7 @@ bool CIntegerParam::operator==(const CIntegerParam& other) const
 }
 
 
-bool CIntegerParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::imtbase::CIntegerParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "IntegerParam", modelIndex);
 
@@ -1765,7 +1765,7 @@ bool CIntegerParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelInde
 }
 
 
-bool CIntegerParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CIntegerParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant valueData = model.GetData("value", modelIndex);
 	if (!valueData.isNull()){
@@ -1776,7 +1776,7 @@ bool CIntegerParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mo
 }
 
 
-bool CIntegerParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CIntegerParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant valueData = model.GetData("value", modelIndex);
 	if (!valueData.isNull()){
@@ -1787,7 +1787,7 @@ bool CIntegerParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int
 }
 
 
-bool CIntegerParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::imtbase::CIntegerParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (value){
 		gqlObject.InsertParam("value", QVariant(*value));
@@ -1799,7 +1799,7 @@ bool CIntegerParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) c
 }
 
 
-bool CIntegerParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CIntegerParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("value") && (gqlObject["value"].userType() == QMetaType::Int || gqlObject["value"].userType() == QMetaType::UInt || gqlObject["value"].userType() == QMetaType::LongLong || gqlObject["value"].userType() == QMetaType::ULongLong || gqlObject["value"].userType() == QMetaType::Long || gqlObject["value"].userType() == QMetaType::Short || gqlObject["value"].userType() == QMetaType::ULong || gqlObject["value"].userType() == QMetaType::UShort || gqlObject["value"].userType() == QMetaType::UChar)){
 		value = gqlObject["value"].toInt();
@@ -1809,7 +1809,7 @@ bool CIntegerParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 }
 
 
-bool CIntegerParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CIntegerParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("value") && (gqlObject["value"].userType() == QMetaType::Int || gqlObject["value"].userType() == QMetaType::UInt || gqlObject["value"].userType() == QMetaType::LongLong || gqlObject["value"].userType() == QMetaType::ULongLong || gqlObject["value"].userType() == QMetaType::Long || gqlObject["value"].userType() == QMetaType::Short || gqlObject["value"].userType() == QMetaType::ULong || gqlObject["value"].userType() == QMetaType::UShort || gqlObject["value"].userType() == QMetaType::UChar)){
 		value = gqlObject["value"].toInt();
@@ -1819,7 +1819,7 @@ bool CIntegerParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 }
 
 
-bool CIntegerParam::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::imtbase::CIntegerParam::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (value){
 		jsonObject["value"] = QJsonValue::fromVariant(*value);
@@ -1831,7 +1831,7 @@ bool CIntegerParam::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CIntegerParam::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CIntegerParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("value") && jsonObject["value"].isDouble()){
 		value = jsonObject["value"].toInt();
@@ -1841,7 +1841,7 @@ bool CIntegerParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CIntegerParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CIntegerParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("value") && jsonObject["value"].isDouble()){
 		value = jsonObject["value"].toInt();
@@ -1851,7 +1851,7 @@ bool CIntegerParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CDoubleParam::GetVersionId()
 {
@@ -1868,7 +1868,7 @@ bool CDoubleParam::operator==(const CDoubleParam& other) const
 }
 
 
-bool CDoubleParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::imtbase::CDoubleParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "DoubleParam", modelIndex);
 
@@ -1881,7 +1881,7 @@ bool CDoubleParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex
 }
 
 
-bool CDoubleParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CDoubleParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant valueData = model.GetData("value", modelIndex);
 	if (!valueData.isNull()){
@@ -1892,7 +1892,7 @@ bool CDoubleParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mod
 }
 
 
-bool CDoubleParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CDoubleParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant valueData = model.GetData("value", modelIndex);
 	if (!valueData.isNull()){
@@ -1903,7 +1903,7 @@ bool CDoubleParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 }
 
 
-bool CDoubleParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::imtbase::CDoubleParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (value){
 		gqlObject.InsertParam("value", QVariant(*value));
@@ -1915,7 +1915,7 @@ bool CDoubleParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) co
 }
 
 
-bool CDoubleParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CDoubleParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("value") && (gqlObject["value"].userType() == QMetaType::Float || gqlObject["value"].userType() == QMetaType::Double || gqlObject["value"].userType() == QMetaType::Int || gqlObject["value"].userType() == QMetaType::UInt || gqlObject["value"].userType() == QMetaType::LongLong || gqlObject["value"].userType() == QMetaType::ULongLong || gqlObject["value"].userType() == QMetaType::Long || gqlObject["value"].userType() == QMetaType::Short || gqlObject["value"].userType() == QMetaType::ULong || gqlObject["value"].userType() == QMetaType::UShort || gqlObject["value"].userType() == QMetaType::UChar)){
 		value = gqlObject["value"].toDouble();
@@ -1925,7 +1925,7 @@ bool CDoubleParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObj
 }
 
 
-bool CDoubleParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CDoubleParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("value") && (gqlObject["value"].userType() == QMetaType::Float || gqlObject["value"].userType() == QMetaType::Double || gqlObject["value"].userType() == QMetaType::Int || gqlObject["value"].userType() == QMetaType::UInt || gqlObject["value"].userType() == QMetaType::LongLong || gqlObject["value"].userType() == QMetaType::ULongLong || gqlObject["value"].userType() == QMetaType::Long || gqlObject["value"].userType() == QMetaType::Short || gqlObject["value"].userType() == QMetaType::ULong || gqlObject["value"].userType() == QMetaType::UShort || gqlObject["value"].userType() == QMetaType::UChar)){
 		value = gqlObject["value"].toDouble();
@@ -1935,7 +1935,7 @@ bool CDoubleParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 }
 
 
-bool CDoubleParam::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::imtbase::CDoubleParam::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (value){
 		jsonObject["value"] = QJsonValue::fromVariant(*value);
@@ -1947,7 +1947,7 @@ bool CDoubleParam::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CDoubleParam::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CDoubleParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("value") && jsonObject["value"].isDouble()){
 		value = jsonObject["value"].toDouble();
@@ -1957,7 +1957,7 @@ bool CDoubleParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CDoubleParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CDoubleParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("value") && jsonObject["value"].isDouble()){
 		value = jsonObject["value"].toDouble();
@@ -1967,7 +1967,7 @@ bool CDoubleParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray COption::GetVersionId()
 {
@@ -1985,7 +1985,7 @@ bool COption::operator==(const COption& other) const
 }
 
 
-bool COption::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::imtbase::COption::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "Option", modelIndex);
 
@@ -2010,7 +2010,7 @@ bool COption::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) con
 }
 
 
-bool COption::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::COption::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant idData = model.GetData("id", modelIndex);
 	if (!idData.isNull()){
@@ -2036,7 +2036,7 @@ bool COption::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelInd
 }
 
 
-bool COption::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::COption::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant idData = model.GetData("id", modelIndex);
 	if (!idData.isNull()){
@@ -2062,7 +2062,7 @@ bool COption::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int model
 }
 
 
-bool COption::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::imtbase::COption::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (id){
 		gqlObject.InsertParam("id", QVariant(*id));
@@ -2086,7 +2086,7 @@ bool COption::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 }
 
 
-bool COption::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::COption::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("id") && (gqlObject["id"].userType() == QMetaType::QString || gqlObject["id"].userType() == QMetaType::QByteArray)){
 		id = gqlObject["id"].toByteArray();
@@ -2108,7 +2108,7 @@ bool COption::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 }
 
 
-bool COption::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::COption::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("id") && (gqlObject["id"].userType() == QMetaType::QString || gqlObject["id"].userType() == QMetaType::QByteArray)){
 		id = gqlObject["id"].toByteArray();
@@ -2130,7 +2130,7 @@ bool COption::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObjec
 }
 
 
-bool COption::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::imtbase::COption::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (id){
 		jsonObject["id"] = QString::fromUtf8(*id);
@@ -2154,7 +2154,7 @@ bool COption::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool COption::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::COption::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("id") && jsonObject["id"].isString()){
 		id = jsonObject["id"].toString().toUtf8();
@@ -2176,7 +2176,7 @@ bool COption::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool COption::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::COption::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("id") && jsonObject["id"].isString()){
 		id = jsonObject["id"].toString().toUtf8();
@@ -2198,7 +2198,7 @@ bool COption::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray COptionsList::GetVersionId()
 {
@@ -2215,7 +2215,7 @@ bool COptionsList::operator==(const COptionsList& other) const
 }
 
 
-bool COptionsList::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::imtbase::COptionsList::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "OptionsList", modelIndex);
 
@@ -2244,7 +2244,7 @@ bool COptionsList::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex
 }
 
 
-bool COptionsList::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::COptionsList::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant totalCountData = model.GetData("totalCount", modelIndex);
 	if (!totalCountData.isNull()){
@@ -2259,9 +2259,9 @@ bool COptionsList::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mod
 	::imtbase::CTreeItemModel* optionsModel = model.GetTreeItemModel("options", modelIndex);
 	if (optionsModel != nullptr){
 		int optionsCount = optionsModel->GetItemsCount();
-		imtsdl::TElementList<COption> optionsList;
+		imtsdl::TElementList<V1_0::imtbase::COption> optionsList;
 		for (int optionsIndex = 0; optionsIndex < optionsCount; ++optionsIndex){
-			COption t_options;
+			V1_0::imtbase::COption t_options;
 			if (!t_options.ReadFromModel(*optionsModel, optionsIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
 
@@ -2277,7 +2277,7 @@ bool COptionsList::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mod
 }
 
 
-bool COptionsList::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::COptionsList::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant totalCountData = model.GetData("totalCount", modelIndex);
 	if (!totalCountData.isNull()){
@@ -2292,9 +2292,9 @@ bool COptionsList::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 	::imtbase::CTreeItemModel* optionsModel = model.GetTreeItemModel("options", modelIndex);
 	if (optionsModel != nullptr){
 		int optionsCount = optionsModel->GetItemsCount();
-		imtsdl::TElementList<COption> optionsList;
+		imtsdl::TElementList<V1_0::imtbase::COption> optionsList;
 		for (int optionsIndex = 0; optionsIndex < optionsCount; ++optionsIndex){
-			COption t_options;
+			V1_0::imtbase::COption t_options;
 			if (!t_options.OptReadFromModel(*optionsModel, optionsIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
 
@@ -2310,7 +2310,7 @@ bool COptionsList::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 }
 
 
-bool COptionsList::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::imtbase::COptionsList::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (totalCount){
 		gqlObject.InsertParam("totalCount", QVariant(*totalCount));
@@ -2340,7 +2340,7 @@ bool COptionsList::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) co
 }
 
 
-bool COptionsList::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::COptionsList::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("totalCount") && (gqlObject["totalCount"].userType() == QMetaType::Int || gqlObject["totalCount"].userType() == QMetaType::UInt || gqlObject["totalCount"].userType() == QMetaType::LongLong || gqlObject["totalCount"].userType() == QMetaType::ULongLong || gqlObject["totalCount"].userType() == QMetaType::Long || gqlObject["totalCount"].userType() == QMetaType::Short || gqlObject["totalCount"].userType() == QMetaType::ULong || gqlObject["totalCount"].userType() == QMetaType::UShort || gqlObject["totalCount"].userType() == QMetaType::UChar)){
 		totalCount = gqlObject["totalCount"].toInt();
@@ -2355,14 +2355,14 @@ bool COptionsList::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObj
 	}
 	if (gqlObject.ContainsParam("options") && (gqlObject.GetObjectsCount("options") > 0)){
 		const qsizetype optionsElementsCount = gqlObject.GetObjectsCount("options");
-		options = imtsdl::TElementList<COption>();
+		options = imtsdl::TElementList<V1_0::imtbase::COption>();
 		for (qsizetype optionsIndex = 0; optionsIndex < optionsElementsCount; ++optionsIndex){
 			const ::imtgql::CGqlParamObject* optionsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("options", optionsIndex);
 			if (optionsDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << optionsDataObjectPtr;
 				return false;
 			}
-			COption tempOptions;
+			V1_0::imtbase::COption tempOptions;
 			if (!tempOptions.ReadFromGraphQlObject(*optionsDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
 
@@ -2376,7 +2376,7 @@ bool COptionsList::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObj
 }
 
 
-bool COptionsList::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::COptionsList::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("totalCount") && (gqlObject["totalCount"].userType() == QMetaType::Int || gqlObject["totalCount"].userType() == QMetaType::UInt || gqlObject["totalCount"].userType() == QMetaType::LongLong || gqlObject["totalCount"].userType() == QMetaType::ULongLong || gqlObject["totalCount"].userType() == QMetaType::Long || gqlObject["totalCount"].userType() == QMetaType::Short || gqlObject["totalCount"].userType() == QMetaType::ULong || gqlObject["totalCount"].userType() == QMetaType::UShort || gqlObject["totalCount"].userType() == QMetaType::UChar)){
 		totalCount = gqlObject["totalCount"].toInt();
@@ -2391,14 +2391,14 @@ bool COptionsList::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 	}
 	if (gqlObject.ContainsParam("options") && (gqlObject.GetObjectsCount("options") > 0)){
 		const qsizetype optionsElementsCount = gqlObject.GetObjectsCount("options");
-		options = imtsdl::TElementList<COption>();
+		options = imtsdl::TElementList<V1_0::imtbase::COption>();
 		for (qsizetype optionsIndex = 0; optionsIndex < optionsElementsCount; ++optionsIndex){
 			const ::imtgql::CGqlParamObject* optionsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("options", optionsIndex);
 			if (optionsDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << optionsDataObjectPtr;
 				return false;
 			}
-			COption tempOptions;
+			V1_0::imtbase::COption tempOptions;
 			if (!tempOptions.OptReadFromGraphQlObject(*optionsDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
 
@@ -2412,7 +2412,7 @@ bool COptionsList::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 }
 
 
-bool COptionsList::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::imtbase::COptionsList::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (totalCount){
 		jsonObject["totalCount"] = QJsonValue::fromVariant(*totalCount);
@@ -2442,7 +2442,7 @@ bool COptionsList::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool COptionsList::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::COptionsList::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("totalCount") && jsonObject["totalCount"].isDouble()){
 		totalCount = jsonObject["totalCount"].toInt();
@@ -2455,9 +2455,9 @@ bool COptionsList::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("options") && jsonObject["options"].isArray()){
 		const QJsonArray optionsJsonArray = jsonObject["options"].toArray();
 		const qsizetype optionsArrayCount = optionsJsonArray.size();
-		options = imtsdl::TElementList<COption>();
+		options = imtsdl::TElementList<V1_0::imtbase::COption>();
 		for (qsizetype optionsIndex = 0; optionsIndex < optionsArrayCount; ++optionsIndex){
-			COption tempOptions;
+			V1_0::imtbase::COption tempOptions;
 			if (!tempOptions.ReadFromJsonObject(optionsJsonArray[optionsIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
 
@@ -2471,7 +2471,7 @@ bool COptionsList::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool COptionsList::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::COptionsList::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("totalCount") && jsonObject["totalCount"].isDouble()){
 		totalCount = jsonObject["totalCount"].toInt();
@@ -2484,9 +2484,9 @@ bool COptionsList::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("options") && jsonObject["options"].isArray()){
 		const QJsonArray optionsJsonArray = jsonObject["options"].toArray();
 		const qsizetype optionsArrayCount = optionsJsonArray.size();
-		options = imtsdl::TElementList<COption>();
+		options = imtsdl::TElementList<V1_0::imtbase::COption>();
 		for (qsizetype optionsIndex = 0; optionsIndex < optionsArrayCount; ++optionsIndex){
-			COption tempOptions;
+			V1_0::imtbase::COption tempOptions;
 			if (!tempOptions.OptReadFromJsonObject(optionsJsonArray[optionsIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
 
@@ -2500,7 +2500,7 @@ bool COptionsList::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CSelectionParam::GetVersionId()
 {
@@ -2516,7 +2516,7 @@ bool CSelectionParam::operator==(const CSelectionParam& other) const
 }
 
 
-bool CSelectionParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::imtbase::CSelectionParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "SelectionParam", modelIndex);
 
@@ -2540,7 +2540,7 @@ bool CSelectionParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 }
 
 
-bool CSelectionParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CSelectionParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant selectedIndexData = model.GetData("selectedIndex", modelIndex);
 	if (!selectedIndexData.isNull()){
@@ -2549,7 +2549,7 @@ bool CSelectionParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 
 	::imtbase::CTreeItemModel* constraintsDataModelPtr = model.GetTreeItemModel("constraints", modelIndex);
 	if (constraintsDataModelPtr != nullptr){
-		constraints = COptionsList();
+		constraints = V1_0::imtbase::COptionsList();
 		const bool isConstraintsRead = constraints->ReadFromModel(*constraintsDataModelPtr, modelIndex);
 		if (!isConstraintsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "constraints").toLocal8Bit().constData();)
@@ -2562,7 +2562,7 @@ bool CSelectionParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 }
 
 
-bool CSelectionParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CSelectionParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant selectedIndexData = model.GetData("selectedIndex", modelIndex);
 	if (!selectedIndexData.isNull()){
@@ -2571,7 +2571,7 @@ bool CSelectionParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 
 	::imtbase::CTreeItemModel* constraintsDataModelPtr = model.GetTreeItemModel("constraints", modelIndex);
 	if (constraintsDataModelPtr != nullptr){
-		constraints = COptionsList();
+		constraints = V1_0::imtbase::COptionsList();
 		const bool isConstraintsRead = constraints->ReadFromModel(*constraintsDataModelPtr, modelIndex);
 		if (!isConstraintsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "constraints").toLocal8Bit().constData();)
@@ -2584,7 +2584,7 @@ bool CSelectionParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 }
 
 
-bool CSelectionParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::imtbase::CSelectionParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (selectedIndex){
 		gqlObject.InsertParam("selectedIndex", QVariant(*selectedIndex));
@@ -2607,14 +2607,14 @@ bool CSelectionParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 }
 
 
-bool CSelectionParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CSelectionParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("selectedIndex") && (gqlObject["selectedIndex"].userType() == QMetaType::Int || gqlObject["selectedIndex"].userType() == QMetaType::UInt || gqlObject["selectedIndex"].userType() == QMetaType::LongLong || gqlObject["selectedIndex"].userType() == QMetaType::ULongLong || gqlObject["selectedIndex"].userType() == QMetaType::Long || gqlObject["selectedIndex"].userType() == QMetaType::Short || gqlObject["selectedIndex"].userType() == QMetaType::ULong || gqlObject["selectedIndex"].userType() == QMetaType::UShort || gqlObject["selectedIndex"].userType() == QMetaType::UChar)){
 		selectedIndex = gqlObject["selectedIndex"].toInt();
 	}
 
 	if (gqlObject.ContainsParam("constraints") && (gqlObject.GetParamArgumentObjectPtr("constraints") != nullptr)){
-		constraints = COptionsList();
+		constraints = V1_0::imtbase::COptionsList();
 		const bool isConstraintsRead = constraints->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("constraints"));
 		if (!isConstraintsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints").toLocal8Bit().constData();)
@@ -2627,14 +2627,14 @@ bool CSelectionParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 }
 
 
-bool CSelectionParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CSelectionParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("selectedIndex") && (gqlObject["selectedIndex"].userType() == QMetaType::Int || gqlObject["selectedIndex"].userType() == QMetaType::UInt || gqlObject["selectedIndex"].userType() == QMetaType::LongLong || gqlObject["selectedIndex"].userType() == QMetaType::ULongLong || gqlObject["selectedIndex"].userType() == QMetaType::Long || gqlObject["selectedIndex"].userType() == QMetaType::Short || gqlObject["selectedIndex"].userType() == QMetaType::ULong || gqlObject["selectedIndex"].userType() == QMetaType::UShort || gqlObject["selectedIndex"].userType() == QMetaType::UChar)){
 		selectedIndex = gqlObject["selectedIndex"].toInt();
 	}
 
 	if (gqlObject.ContainsParam("constraints") && (gqlObject.GetParamArgumentObjectPtr("constraints") != nullptr)){
-		constraints = COptionsList();
+		constraints = V1_0::imtbase::COptionsList();
 		const bool isConstraintsRead = constraints->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("constraints"));
 		if (!isConstraintsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints").toLocal8Bit().constData();)
@@ -2647,7 +2647,7 @@ bool CSelectionParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 }
 
 
-bool CSelectionParam::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::imtbase::CSelectionParam::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (selectedIndex){
 		jsonObject["selectedIndex"] = QJsonValue::fromVariant(*selectedIndex);
@@ -2670,14 +2670,14 @@ bool CSelectionParam::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CSelectionParam::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CSelectionParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("selectedIndex") && jsonObject["selectedIndex"].isDouble()){
 		selectedIndex = jsonObject["selectedIndex"].toInt();
 	}
 
 	if (jsonObject.contains("constraints") && jsonObject["constraints"].isObject()){
-		constraints = COptionsList();
+		constraints = V1_0::imtbase::COptionsList();
 		const bool isConstraintsRead = constraints->ReadFromJsonObject(jsonObject["constraints"].toObject());
 		if (!isConstraintsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints").toLocal8Bit().constData();)
@@ -2690,14 +2690,14 @@ bool CSelectionParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CSelectionParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CSelectionParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("selectedIndex") && jsonObject["selectedIndex"].isDouble()){
 		selectedIndex = jsonObject["selectedIndex"].toInt();
 	}
 
 	if (jsonObject.contains("constraints") && jsonObject["constraints"].isObject()){
-		constraints = COptionsList();
+		constraints = V1_0::imtbase::COptionsList();
 		const bool isConstraintsRead = constraints->OptReadFromJsonObject(jsonObject["constraints"].toObject());
 		if (!isConstraintsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints").toLocal8Bit().constData();)
@@ -2710,7 +2710,7 @@ bool CSelectionParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CSchedulerParam::GetVersionId()
 {
@@ -2726,7 +2726,7 @@ bool CSchedulerParam::operator==(const CSchedulerParam& other) const
 }
 
 
-bool CSchedulerParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::imtbase::CSchedulerParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "SchedulerParam", modelIndex);
 
@@ -2743,7 +2743,7 @@ bool CSchedulerParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 }
 
 
-bool CSchedulerParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CSchedulerParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant startTimeData = model.GetData("startTime", modelIndex);
 	if (!startTimeData.isNull()){
@@ -2759,7 +2759,7 @@ bool CSchedulerParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 }
 
 
-bool CSchedulerParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CSchedulerParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant startTimeData = model.GetData("startTime", modelIndex);
 	if (!startTimeData.isNull()){
@@ -2775,7 +2775,7 @@ bool CSchedulerParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 }
 
 
-bool CSchedulerParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::imtbase::CSchedulerParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (startTime){
 		gqlObject.InsertParam("startTime", QVariant(*startTime));
@@ -2791,7 +2791,7 @@ bool CSchedulerParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 }
 
 
-bool CSchedulerParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CSchedulerParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("startTime") && (gqlObject["startTime"].userType() == QMetaType::QString || gqlObject["startTime"].userType() == QMetaType::QByteArray)){
 		startTime = gqlObject["startTime"].toString();
@@ -2805,7 +2805,7 @@ bool CSchedulerParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 }
 
 
-bool CSchedulerParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CSchedulerParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("startTime") && (gqlObject["startTime"].userType() == QMetaType::QString || gqlObject["startTime"].userType() == QMetaType::QByteArray)){
 		startTime = gqlObject["startTime"].toString();
@@ -2819,7 +2819,7 @@ bool CSchedulerParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 }
 
 
-bool CSchedulerParam::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::imtbase::CSchedulerParam::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (startTime){
 		jsonObject["startTime"] = QJsonValue::fromVariant(*startTime);
@@ -2835,7 +2835,7 @@ bool CSchedulerParam::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CSchedulerParam::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CSchedulerParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("startTime") && jsonObject["startTime"].isString()){
 		startTime = jsonObject["startTime"].toString();
@@ -2849,7 +2849,7 @@ bool CSchedulerParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CSchedulerParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CSchedulerParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("startTime") && jsonObject["startTime"].isString()){
 		startTime = jsonObject["startTime"].toString();
@@ -2863,7 +2863,7 @@ bool CSchedulerParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CBackupSettings::GetVersionId()
 {
@@ -2879,7 +2879,7 @@ bool CBackupSettings::operator==(const CBackupSettings& other) const
 }
 
 
-bool CBackupSettings::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::imtbase::CBackupSettings::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "BackupSettings", modelIndex);
 
@@ -2903,11 +2903,11 @@ bool CBackupSettings::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 }
 
 
-bool CBackupSettings::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CBackupSettings::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* schedulerParamDataModelPtr = model.GetTreeItemModel("schedulerParam", modelIndex);
 	if (schedulerParamDataModelPtr != nullptr){
-		schedulerParam = CSchedulerParam();
+		schedulerParam = V1_0::imtbase::CSchedulerParam();
 		const bool isSchedulerParamRead = schedulerParam->ReadFromModel(*schedulerParamDataModelPtr, modelIndex);
 		if (!isSchedulerParamRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam").toLocal8Bit().constData();)
@@ -2925,11 +2925,11 @@ bool CBackupSettings::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 }
 
 
-bool CBackupSettings::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CBackupSettings::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* schedulerParamDataModelPtr = model.GetTreeItemModel("schedulerParam", modelIndex);
 	if (schedulerParamDataModelPtr != nullptr){
-		schedulerParam = CSchedulerParam();
+		schedulerParam = V1_0::imtbase::CSchedulerParam();
 		const bool isSchedulerParamRead = schedulerParam->ReadFromModel(*schedulerParamDataModelPtr, modelIndex);
 		if (!isSchedulerParamRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam").toLocal8Bit().constData();)
@@ -2947,7 +2947,7 @@ bool CBackupSettings::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 }
 
 
-bool CBackupSettings::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::imtbase::CBackupSettings::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (schedulerParam){
 		::imtgql::CGqlParamObject schedulerParamGqlObject;
@@ -2970,10 +2970,10 @@ bool CBackupSettings::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 }
 
 
-bool CBackupSettings::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CBackupSettings::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("schedulerParam") && (gqlObject.GetParamArgumentObjectPtr("schedulerParam") != nullptr)){
-		schedulerParam = CSchedulerParam();
+		schedulerParam = V1_0::imtbase::CSchedulerParam();
 		const bool isSchedulerParamRead = schedulerParam->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("schedulerParam"));
 		if (!isSchedulerParamRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam").toLocal8Bit().constData();)
@@ -2990,10 +2990,10 @@ bool CBackupSettings::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 }
 
 
-bool CBackupSettings::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CBackupSettings::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("schedulerParam") && (gqlObject.GetParamArgumentObjectPtr("schedulerParam") != nullptr)){
-		schedulerParam = CSchedulerParam();
+		schedulerParam = V1_0::imtbase::CSchedulerParam();
 		const bool isSchedulerParamRead = schedulerParam->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("schedulerParam"));
 		if (!isSchedulerParamRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam").toLocal8Bit().constData();)
@@ -3010,7 +3010,7 @@ bool CBackupSettings::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 }
 
 
-bool CBackupSettings::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::imtbase::CBackupSettings::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (schedulerParam){
 		QJsonObject schedulerParamJsonObject;
@@ -3033,10 +3033,10 @@ bool CBackupSettings::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CBackupSettings::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CBackupSettings::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("schedulerParam") && jsonObject["schedulerParam"].isObject()){
-		schedulerParam = CSchedulerParam();
+		schedulerParam = V1_0::imtbase::CSchedulerParam();
 		const bool isSchedulerParamRead = schedulerParam->ReadFromJsonObject(jsonObject["schedulerParam"].toObject());
 		if (!isSchedulerParamRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam").toLocal8Bit().constData();)
@@ -3053,10 +3053,10 @@ bool CBackupSettings::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CBackupSettings::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CBackupSettings::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("schedulerParam") && jsonObject["schedulerParam"].isObject()){
-		schedulerParam = CSchedulerParam();
+		schedulerParam = V1_0::imtbase::CSchedulerParam();
 		const bool isSchedulerParamRead = schedulerParam->OptReadFromJsonObject(jsonObject["schedulerParam"].toObject());
 		if (!isSchedulerParamRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam").toLocal8Bit().constData();)
@@ -3073,7 +3073,7 @@ bool CBackupSettings::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CDatabaseAccessSettings::GetVersionId()
 {
@@ -3093,7 +3093,7 @@ bool CDatabaseAccessSettings::operator==(const CDatabaseAccessSettings& other) c
 }
 
 
-bool CDatabaseAccessSettings::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::imtbase::CDatabaseAccessSettings::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "DatabaseAccessSettings", modelIndex);
 
@@ -3126,7 +3126,7 @@ bool CDatabaseAccessSettings::WriteToModel(::imtbase::CTreeItemModel& model, int
 }
 
 
-bool CDatabaseAccessSettings::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CDatabaseAccessSettings::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant dbNameData = model.GetData("dbName", modelIndex);
 	if (!dbNameData.isNull()){
@@ -3162,7 +3162,7 @@ bool CDatabaseAccessSettings::ReadFromModel(const ::imtbase::CTreeItemModel& mod
 }
 
 
-bool CDatabaseAccessSettings::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CDatabaseAccessSettings::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant dbNameData = model.GetData("dbName", modelIndex);
 	if (!dbNameData.isNull()){
@@ -3198,7 +3198,7 @@ bool CDatabaseAccessSettings::OptReadFromModel(const ::imtbase::CTreeItemModel& 
 }
 
 
-bool CDatabaseAccessSettings::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::imtbase::CDatabaseAccessSettings::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (dbName){
 		gqlObject.InsertParam("dbName", QVariant(*dbName));
@@ -3230,7 +3230,7 @@ bool CDatabaseAccessSettings::WriteToGraphQlObject(::imtgql::CGqlParamObject& gq
 }
 
 
-bool CDatabaseAccessSettings::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CDatabaseAccessSettings::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("dbName") && (gqlObject["dbName"].userType() == QMetaType::QString || gqlObject["dbName"].userType() == QMetaType::QByteArray)){
 		dbName = gqlObject["dbName"].toString();
@@ -3260,7 +3260,7 @@ bool CDatabaseAccessSettings::ReadFromGraphQlObject(const ::imtgql::CGqlParamObj
 }
 
 
-bool CDatabaseAccessSettings::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CDatabaseAccessSettings::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("dbName") && (gqlObject["dbName"].userType() == QMetaType::QString || gqlObject["dbName"].userType() == QMetaType::QByteArray)){
 		dbName = gqlObject["dbName"].toString();
@@ -3290,7 +3290,7 @@ bool CDatabaseAccessSettings::OptReadFromGraphQlObject(const ::imtgql::CGqlParam
 }
 
 
-bool CDatabaseAccessSettings::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::imtbase::CDatabaseAccessSettings::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (dbName){
 		jsonObject["dbName"] = QJsonValue::fromVariant(*dbName);
@@ -3322,7 +3322,7 @@ bool CDatabaseAccessSettings::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CDatabaseAccessSettings::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CDatabaseAccessSettings::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("dbName") && jsonObject["dbName"].isString()){
 		dbName = jsonObject["dbName"].toString();
@@ -3352,7 +3352,7 @@ bool CDatabaseAccessSettings::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CDatabaseAccessSettings::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CDatabaseAccessSettings::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("dbName") && jsonObject["dbName"].isString()){
 		dbName = jsonObject["dbName"].toString();
@@ -3382,7 +3382,7 @@ bool CDatabaseAccessSettings::OptReadFromJsonObject(const QJsonObject& jsonObjec
 }
 
 
-// serialize methods
+
 
 QByteArray CFileNameParam::GetVersionId()
 {
@@ -3398,7 +3398,7 @@ bool CFileNameParam::operator==(const CFileNameParam& other) const
 }
 
 
-bool CFileNameParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::imtbase::CFileNameParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "FileNameParam", modelIndex);
 
@@ -3415,7 +3415,7 @@ bool CFileNameParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelInd
 }
 
 
-bool CFileNameParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CFileNameParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant pathTypeData = model.GetData("pathType", modelIndex);
 	if (!pathTypeData.isNull()){
@@ -3431,7 +3431,7 @@ bool CFileNameParam::ReadFromModel(const ::imtbase::CTreeItemModel& model, int m
 }
 
 
-bool CFileNameParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CFileNameParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant pathTypeData = model.GetData("pathType", modelIndex);
 	if (!pathTypeData.isNull()){
@@ -3447,7 +3447,7 @@ bool CFileNameParam::OptReadFromModel(const ::imtbase::CTreeItemModel& model, in
 }
 
 
-bool CFileNameParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::imtbase::CFileNameParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (pathType){
 		gqlObject.InsertParam("pathType", QVariant(*pathType));
@@ -3463,7 +3463,7 @@ bool CFileNameParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) 
 }
 
 
-bool CFileNameParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CFileNameParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("pathType") && (gqlObject["pathType"].userType() == QMetaType::Int || gqlObject["pathType"].userType() == QMetaType::UInt || gqlObject["pathType"].userType() == QMetaType::LongLong || gqlObject["pathType"].userType() == QMetaType::ULongLong || gqlObject["pathType"].userType() == QMetaType::Long || gqlObject["pathType"].userType() == QMetaType::Short || gqlObject["pathType"].userType() == QMetaType::ULong || gqlObject["pathType"].userType() == QMetaType::UShort || gqlObject["pathType"].userType() == QMetaType::UChar)){
 		pathType = gqlObject["pathType"].toInt();
@@ -3477,7 +3477,7 @@ bool CFileNameParam::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 }
 
 
-bool CFileNameParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CFileNameParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("pathType") && (gqlObject["pathType"].userType() == QMetaType::Int || gqlObject["pathType"].userType() == QMetaType::UInt || gqlObject["pathType"].userType() == QMetaType::LongLong || gqlObject["pathType"].userType() == QMetaType::ULongLong || gqlObject["pathType"].userType() == QMetaType::Long || gqlObject["pathType"].userType() == QMetaType::Short || gqlObject["pathType"].userType() == QMetaType::ULong || gqlObject["pathType"].userType() == QMetaType::UShort || gqlObject["pathType"].userType() == QMetaType::UChar)){
 		pathType = gqlObject["pathType"].toInt();
@@ -3491,7 +3491,7 @@ bool CFileNameParam::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 }
 
 
-bool CFileNameParam::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::imtbase::CFileNameParam::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (pathType){
 		jsonObject["pathType"] = QJsonValue::fromVariant(*pathType);
@@ -3507,7 +3507,7 @@ bool CFileNameParam::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CFileNameParam::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CFileNameParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("pathType") && jsonObject["pathType"].isDouble()){
 		pathType = jsonObject["pathType"].toInt();
@@ -3521,7 +3521,7 @@ bool CFileNameParam::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CFileNameParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CFileNameParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("pathType") && jsonObject["pathType"].isDouble()){
 		pathType = jsonObject["pathType"].toInt();
@@ -3535,7 +3535,7 @@ bool CFileNameParam::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CParamsSet::GetVersionId()
 {
@@ -3554,7 +3554,7 @@ bool CParamsSet::operator==(const CParamsSet& other) const
 }
 
 
-bool CParamsSet::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::imtbase::CParamsSet::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "ParamsSet", modelIndex);
 
@@ -3608,7 +3608,7 @@ bool CParamsSet::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) 
 }
 
 
-bool CParamsSet::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CParamsSet::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* paramIdsModel = model.GetTreeItemModel("paramIds", modelIndex);
 	if (paramIdsModel != nullptr){
@@ -3674,7 +3674,7 @@ bool CParamsSet::ReadFromModel(const ::imtbase::CTreeItemModel& model, int model
 }
 
 
-bool CParamsSet::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CParamsSet::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* paramIdsModel = model.GetTreeItemModel("paramIds", modelIndex);
 	if (paramIdsModel != nullptr){
@@ -3740,7 +3740,7 @@ bool CParamsSet::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int mo
 }
 
 
-bool CParamsSet::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::imtbase::CParamsSet::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (paramIds){
 		QVariantList paramIdsDataObjectList;
@@ -3788,7 +3788,7 @@ bool CParamsSet::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) cons
 }
 
 
-bool CParamsSet::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CParamsSet::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("paramIds")){
 		paramIds.emplace();
@@ -3864,7 +3864,7 @@ bool CParamsSet::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObjec
 }
 
 
-bool CParamsSet::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CParamsSet::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("paramIds")){
 		paramIds.emplace();
@@ -3940,7 +3940,7 @@ bool CParamsSet::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 }
 
 
-bool CParamsSet::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::imtbase::CParamsSet::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (paramIds){
 		QJsonArray newParamIdsArray;
@@ -3988,7 +3988,7 @@ bool CParamsSet::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CParamsSet::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CParamsSet::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("paramIds") && jsonObject["paramIds"].isArray()){
 		const QJsonArray paramIdsJsonArray = jsonObject["paramIds"].toArray();
@@ -4044,7 +4044,7 @@ bool CParamsSet::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CParamsSet::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CParamsSet::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("paramIds") && jsonObject["paramIds"].isArray()){
 		const QJsonArray paramIdsJsonArray = jsonObject["paramIds"].toArray();
@@ -4100,7 +4100,7 @@ bool CParamsSet::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CMimeType::GetVersionId()
 {
@@ -4119,7 +4119,7 @@ bool CMimeType::operator==(const CMimeType& other) const
 }
 
 
-bool CMimeType::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::imtbase::CMimeType::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "MimeType", modelIndex);
 
@@ -4164,7 +4164,7 @@ bool CMimeType::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) c
 }
 
 
-bool CMimeType::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CMimeType::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant typeData = model.GetData("type", modelIndex);
 	if (typeData.isNull()){
@@ -4215,7 +4215,7 @@ bool CMimeType::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelI
 }
 
 
-bool CMimeType::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CMimeType::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant typeData = model.GetData("type", modelIndex);
 	if (!typeData.isNull()){
@@ -4260,7 +4260,7 @@ bool CMimeType::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int mod
 }
 
 
-bool CMimeType::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::imtbase::CMimeType::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!type){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "type").toLocal8Bit().constData();)
@@ -4302,7 +4302,7 @@ bool CMimeType::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 }
 
 
-bool CMimeType::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CMimeType::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("type") || (gqlObject["type"].userType() != QMetaType::QString && gqlObject["type"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "type").toLocal8Bit().constData();)
@@ -4354,7 +4354,7 @@ bool CMimeType::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject
 }
 
 
-bool CMimeType::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CMimeType::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("type") && (gqlObject["type"].userType() == QMetaType::QString || gqlObject["type"].userType() == QMetaType::QByteArray)){
 		type = gqlObject["type"].toString();
@@ -4400,7 +4400,7 @@ bool CMimeType::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObj
 }
 
 
-bool CMimeType::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::imtbase::CMimeType::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!type){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "type").toLocal8Bit().constData();)
@@ -4442,7 +4442,7 @@ bool CMimeType::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CMimeType::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CMimeType::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("type") || ! jsonObject["type"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "type").toLocal8Bit().constData();)
@@ -4486,7 +4486,7 @@ bool CMimeType::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CMimeType::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CMimeType::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("type") && jsonObject["type"].isString()){
 		type = jsonObject["type"].toString();
@@ -4524,7 +4524,7 @@ bool CMimeType::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 CTimeRangeObject::CTimeRangeObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
@@ -4535,13 +4535,12 @@ CTimeRangeObject::CTimeRangeObject(QObject* parent): ::imtbase::CItemModelBase(p
 
 QVariant CTimeRangeObject::GetBegin()
 {
-	return CTimeRange::Begin.value();
+	return CTimeRange::Begin ? CTimeRange::Begin.value() : QVariant();
 }
 
 
 void CTimeRangeObject::SetBegin(const QVariant& v)
 {
-
 	CTimeRange::Begin = v.value<QString>();
 	beginChanged();
 }
@@ -4555,13 +4554,12 @@ bool CTimeRangeObject::hasBegin()
 
 QVariant CTimeRangeObject::GetEnd()
 {
-	return CTimeRange::End.value();
+	return CTimeRange::End ? CTimeRange::End.value() : QVariant();
 }
 
 
 void CTimeRangeObject::SetEnd(const QVariant& v)
 {
-
 	CTimeRange::End = v.value<QString>();
 	endChanged();
 }
@@ -4727,14 +4725,14 @@ QVariant sdl::V1_0::imtbase::CTimeRangeObjectList::getData(const QString& nameId
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_begin"){
-		return QVariant::fromValue(at(index)->Begin.value());
+		return Version_1_0->at(index)->Begin ? QVariant::fromValue(Version_1_0->at(index)->Begin.value()) : QVariant();
 	}
 	if (nameId == "m_end"){
-		return QVariant::fromValue(at(index)->End.value());
+		return Version_1_0->at(index)->End ? QVariant::fromValue(Version_1_0->at(index)->End.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -4748,13 +4746,12 @@ CSdlSizeObject::CSdlSizeObject(QObject* parent): ::imtbase::CItemModelBase(paren
 
 QVariant CSdlSizeObject::GetWidth()
 {
-	return CSdlSize::width.value();
+	return CSdlSize::width ? CSdlSize::width.value() : QVariant();
 }
 
 
 void CSdlSizeObject::SetWidth(const QVariant& v)
 {
-
 	CSdlSize::width = v.value<double>();
 	widthChanged();
 }
@@ -4768,13 +4765,12 @@ bool CSdlSizeObject::hasWidth()
 
 QVariant CSdlSizeObject::GetHeight()
 {
-	return CSdlSize::height.value();
+	return CSdlSize::height ? CSdlSize::height.value() : QVariant();
 }
 
 
 void CSdlSizeObject::SetHeight(const QVariant& v)
 {
-
 	CSdlSize::height = v.value<double>();
 	heightChanged();
 }
@@ -4940,14 +4936,14 @@ QVariant sdl::V1_0::imtbase::CSdlSizeObjectList::getData(const QString& nameId, 
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_width"){
-		return QVariant::fromValue(at(index)->width.value());
+		return Version_1_0->at(index)->width ? QVariant::fromValue(Version_1_0->at(index)->width.value()) : QVariant();
 	}
 	if (nameId == "m_height"){
-		return QVariant::fromValue(at(index)->height.value());
+		return Version_1_0->at(index)->height ? QVariant::fromValue(Version_1_0->at(index)->height.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -4961,13 +4957,12 @@ CSdlPointObject::CSdlPointObject(QObject* parent): ::imtbase::CItemModelBase(par
 
 QVariant CSdlPointObject::GetX()
 {
-	return CSdlPoint::x.value();
+	return CSdlPoint::x ? CSdlPoint::x.value() : QVariant();
 }
 
 
 void CSdlPointObject::SetX(const QVariant& v)
 {
-
 	CSdlPoint::x = v.value<double>();
 	xChanged();
 }
@@ -4981,13 +4976,12 @@ bool CSdlPointObject::hasX()
 
 QVariant CSdlPointObject::GetY()
 {
-	return CSdlPoint::y.value();
+	return CSdlPoint::y ? CSdlPoint::y.value() : QVariant();
 }
 
 
 void CSdlPointObject::SetY(const QVariant& v)
 {
-
 	CSdlPoint::y = v.value<double>();
 	yChanged();
 }
@@ -5153,14 +5147,14 @@ QVariant sdl::V1_0::imtbase::CSdlPointObjectList::getData(const QString& nameId,
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_x"){
-		return QVariant::fromValue(at(index)->x.value());
+		return Version_1_0->at(index)->x ? QVariant::fromValue(Version_1_0->at(index)->x.value()) : QVariant();
 	}
 	if (nameId == "m_y"){
-		return QVariant::fromValue(at(index)->y.value());
+		return Version_1_0->at(index)->y ? QVariant::fromValue(Version_1_0->at(index)->y.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -5186,13 +5180,12 @@ CParamTypeIdsObject::CParamTypeIdsObject(QObject* parent): ::imtbase::CItemModel
 
 QVariant CParamTypeIdsObject::GetUrlParam()
 {
-	return CParamTypeIds::UrlParam.value();
+	return CParamTypeIds::UrlParam ? CParamTypeIds::UrlParam.value() : QVariant();
 }
 
 
 void CParamTypeIdsObject::SetUrlParam(const QVariant& v)
 {
-
 	CParamTypeIds::UrlParam = v.value<QString>().toUtf8();
 	urlParamChanged();
 }
@@ -5206,13 +5199,12 @@ bool CParamTypeIdsObject::hasUrlParam()
 
 QVariant CParamTypeIdsObject::GetIdParam()
 {
-	return CParamTypeIds::IdParam.value();
+	return CParamTypeIds::IdParam ? CParamTypeIds::IdParam.value() : QVariant();
 }
 
 
 void CParamTypeIdsObject::SetIdParam(const QVariant& v)
 {
-
 	CParamTypeIds::IdParam = v.value<QString>().toUtf8();
 	idParamChanged();
 }
@@ -5226,13 +5218,12 @@ bool CParamTypeIdsObject::hasIdParam()
 
 QVariant CParamTypeIdsObject::GetTextParam()
 {
-	return CParamTypeIds::TextParam.value();
+	return CParamTypeIds::TextParam ? CParamTypeIds::TextParam.value() : QVariant();
 }
 
 
 void CParamTypeIdsObject::SetTextParam(const QVariant& v)
 {
-
 	CParamTypeIds::TextParam = v.value<QString>().toUtf8();
 	textParamChanged();
 }
@@ -5246,13 +5237,12 @@ bool CParamTypeIdsObject::hasTextParam()
 
 QVariant CParamTypeIdsObject::GetTextView()
 {
-	return CParamTypeIds::TextView.value();
+	return CParamTypeIds::TextView ? CParamTypeIds::TextView.value() : QVariant();
 }
 
 
 void CParamTypeIdsObject::SetTextView(const QVariant& v)
 {
-
 	CParamTypeIds::TextView = v.value<QString>().toUtf8();
 	textViewChanged();
 }
@@ -5266,13 +5256,12 @@ bool CParamTypeIdsObject::hasTextView()
 
 QVariant CParamTypeIdsObject::GetSelectionParam()
 {
-	return CParamTypeIds::SelectionParam.value();
+	return CParamTypeIds::SelectionParam ? CParamTypeIds::SelectionParam.value() : QVariant();
 }
 
 
 void CParamTypeIdsObject::SetSelectionParam(const QVariant& v)
 {
-
 	CParamTypeIds::SelectionParam = v.value<QString>().toUtf8();
 	selectionParamChanged();
 }
@@ -5286,13 +5275,12 @@ bool CParamTypeIdsObject::hasSelectionParam()
 
 QVariant CParamTypeIdsObject::GetSchedulerParam()
 {
-	return CParamTypeIds::SchedulerParam.value();
+	return CParamTypeIds::SchedulerParam ? CParamTypeIds::SchedulerParam.value() : QVariant();
 }
 
 
 void CParamTypeIdsObject::SetSchedulerParam(const QVariant& v)
 {
-
 	CParamTypeIds::SchedulerParam = v.value<QString>().toUtf8();
 	schedulerParamChanged();
 }
@@ -5306,13 +5294,12 @@ bool CParamTypeIdsObject::hasSchedulerParam()
 
 QVariant CParamTypeIdsObject::GetBackupSettings()
 {
-	return CParamTypeIds::BackupSettings.value();
+	return CParamTypeIds::BackupSettings ? CParamTypeIds::BackupSettings.value() : QVariant();
 }
 
 
 void CParamTypeIdsObject::SetBackupSettings(const QVariant& v)
 {
-
 	CParamTypeIds::BackupSettings = v.value<QString>().toUtf8();
 	backupSettingsChanged();
 }
@@ -5326,13 +5313,12 @@ bool CParamTypeIdsObject::hasBackupSettings()
 
 QVariant CParamTypeIdsObject::GetDatabaseAccessSettings()
 {
-	return CParamTypeIds::DatabaseAccessSettings.value();
+	return CParamTypeIds::DatabaseAccessSettings ? CParamTypeIds::DatabaseAccessSettings.value() : QVariant();
 }
 
 
 void CParamTypeIdsObject::SetDatabaseAccessSettings(const QVariant& v)
 {
-
 	CParamTypeIds::DatabaseAccessSettings = v.value<QString>().toUtf8();
 	databaseAccessSettingsChanged();
 }
@@ -5346,13 +5332,12 @@ bool CParamTypeIdsObject::hasDatabaseAccessSettings()
 
 QVariant CParamTypeIdsObject::GetParamsSet()
 {
-	return CParamTypeIds::ParamsSet.value();
+	return CParamTypeIds::ParamsSet ? CParamTypeIds::ParamsSet.value() : QVariant();
 }
 
 
 void CParamTypeIdsObject::SetParamsSet(const QVariant& v)
 {
-
 	CParamTypeIds::ParamsSet = v.value<QString>().toUtf8();
 	paramsSetChanged();
 }
@@ -5366,13 +5351,12 @@ bool CParamTypeIdsObject::hasParamsSet()
 
 QVariant CParamTypeIdsObject::GetFileNameParam()
 {
-	return CParamTypeIds::FileNameParam.value();
+	return CParamTypeIds::FileNameParam ? CParamTypeIds::FileNameParam.value() : QVariant();
 }
 
 
 void CParamTypeIdsObject::SetFileNameParam(const QVariant& v)
 {
-
 	CParamTypeIds::FileNameParam = v.value<QString>().toUtf8();
 	fileNameParamChanged();
 }
@@ -5386,13 +5370,12 @@ bool CParamTypeIdsObject::hasFileNameParam()
 
 QVariant CParamTypeIdsObject::GetIntegerParam()
 {
-	return CParamTypeIds::IntegerParam.value();
+	return CParamTypeIds::IntegerParam ? CParamTypeIds::IntegerParam.value() : QVariant();
 }
 
 
 void CParamTypeIdsObject::SetIntegerParam(const QVariant& v)
 {
-
 	CParamTypeIds::IntegerParam = v.value<QString>().toUtf8();
 	integerParamChanged();
 }
@@ -5406,13 +5389,12 @@ bool CParamTypeIdsObject::hasIntegerParam()
 
 QVariant CParamTypeIdsObject::GetDoubleParam()
 {
-	return CParamTypeIds::DoubleParam.value();
+	return CParamTypeIds::DoubleParam ? CParamTypeIds::DoubleParam.value() : QVariant();
 }
 
 
 void CParamTypeIdsObject::SetDoubleParam(const QVariant& v)
 {
-
 	CParamTypeIds::DoubleParam = v.value<QString>().toUtf8();
 	doubleParamChanged();
 }
@@ -5426,13 +5408,12 @@ bool CParamTypeIdsObject::hasDoubleParam()
 
 QVariant CParamTypeIdsObject::GetPasswordParam()
 {
-	return CParamTypeIds::PasswordParam.value();
+	return CParamTypeIds::PasswordParam ? CParamTypeIds::PasswordParam.value() : QVariant();
 }
 
 
 void CParamTypeIdsObject::SetPasswordParam(const QVariant& v)
 {
-
 	CParamTypeIds::PasswordParam = v.value<QString>().toUtf8();
 	passwordParamChanged();
 }
@@ -5446,13 +5427,12 @@ bool CParamTypeIdsObject::hasPasswordParam()
 
 QVariant CParamTypeIdsObject::GetEnableableParam()
 {
-	return CParamTypeIds::EnableableParam.value();
+	return CParamTypeIds::EnableableParam ? CParamTypeIds::EnableableParam.value() : QVariant();
 }
 
 
 void CParamTypeIdsObject::SetEnableableParam(const QVariant& v)
 {
-
 	CParamTypeIds::EnableableParam = v.value<QString>().toUtf8();
 	enableableParamChanged();
 }
@@ -5654,50 +5634,50 @@ QVariant sdl::V1_0::imtbase::CParamTypeIdsObjectList::getData(const QString& nam
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_urlParam"){
-		return QVariant::fromValue(at(index)->UrlParam.value());
+		return Version_1_0->at(index)->UrlParam ? QVariant::fromValue(Version_1_0->at(index)->UrlParam.value()) : QVariant();
 	}
 	if (nameId == "m_idParam"){
-		return QVariant::fromValue(at(index)->IdParam.value());
+		return Version_1_0->at(index)->IdParam ? QVariant::fromValue(Version_1_0->at(index)->IdParam.value()) : QVariant();
 	}
 	if (nameId == "m_textParam"){
-		return QVariant::fromValue(at(index)->TextParam.value());
+		return Version_1_0->at(index)->TextParam ? QVariant::fromValue(Version_1_0->at(index)->TextParam.value()) : QVariant();
 	}
 	if (nameId == "m_textView"){
-		return QVariant::fromValue(at(index)->TextView.value());
+		return Version_1_0->at(index)->TextView ? QVariant::fromValue(Version_1_0->at(index)->TextView.value()) : QVariant();
 	}
 	if (nameId == "m_selectionParam"){
-		return QVariant::fromValue(at(index)->SelectionParam.value());
+		return Version_1_0->at(index)->SelectionParam ? QVariant::fromValue(Version_1_0->at(index)->SelectionParam.value()) : QVariant();
 	}
 	if (nameId == "m_schedulerParam"){
-		return QVariant::fromValue(at(index)->SchedulerParam.value());
+		return Version_1_0->at(index)->SchedulerParam ? QVariant::fromValue(Version_1_0->at(index)->SchedulerParam.value()) : QVariant();
 	}
 	if (nameId == "m_backupSettings"){
-		return QVariant::fromValue(at(index)->BackupSettings.value());
+		return Version_1_0->at(index)->BackupSettings ? QVariant::fromValue(Version_1_0->at(index)->BackupSettings.value()) : QVariant();
 	}
 	if (nameId == "m_databaseAccessSettings"){
-		return QVariant::fromValue(at(index)->DatabaseAccessSettings.value());
+		return Version_1_0->at(index)->DatabaseAccessSettings ? QVariant::fromValue(Version_1_0->at(index)->DatabaseAccessSettings.value()) : QVariant();
 	}
 	if (nameId == "m_paramsSet"){
-		return QVariant::fromValue(at(index)->ParamsSet.value());
+		return Version_1_0->at(index)->ParamsSet ? QVariant::fromValue(Version_1_0->at(index)->ParamsSet.value()) : QVariant();
 	}
 	if (nameId == "m_fileNameParam"){
-		return QVariant::fromValue(at(index)->FileNameParam.value());
+		return Version_1_0->at(index)->FileNameParam ? QVariant::fromValue(Version_1_0->at(index)->FileNameParam.value()) : QVariant();
 	}
 	if (nameId == "m_integerParam"){
-		return QVariant::fromValue(at(index)->IntegerParam.value());
+		return Version_1_0->at(index)->IntegerParam ? QVariant::fromValue(Version_1_0->at(index)->IntegerParam.value()) : QVariant();
 	}
 	if (nameId == "m_doubleParam"){
-		return QVariant::fromValue(at(index)->DoubleParam.value());
+		return Version_1_0->at(index)->DoubleParam ? QVariant::fromValue(Version_1_0->at(index)->DoubleParam.value()) : QVariant();
 	}
 	if (nameId == "m_passwordParam"){
-		return QVariant::fromValue(at(index)->PasswordParam.value());
+		return Version_1_0->at(index)->PasswordParam ? QVariant::fromValue(Version_1_0->at(index)->PasswordParam.value()) : QVariant();
 	}
 	if (nameId == "m_enableableParam"){
-		return QVariant::fromValue(at(index)->EnableableParam.value());
+		return Version_1_0->at(index)->EnableableParam ? QVariant::fromValue(Version_1_0->at(index)->EnableableParam.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -5713,13 +5693,12 @@ CUrlParamObject::CUrlParamObject(QObject* parent): ::imtbase::CItemModelBase(par
 
 QVariant CUrlParamObject::GetScheme()
 {
-	return CUrlParam::scheme.value();
+	return CUrlParam::scheme ? CUrlParam::scheme.value() : QVariant();
 }
 
 
 void CUrlParamObject::SetScheme(const QVariant& v)
 {
-
 	CUrlParam::scheme = v.value<QString>();
 	schemeChanged();
 }
@@ -5733,13 +5712,12 @@ bool CUrlParamObject::hasScheme()
 
 QVariant CUrlParamObject::GetHost()
 {
-	return CUrlParam::host.value();
+	return CUrlParam::host ? CUrlParam::host.value() : QVariant();
 }
 
 
 void CUrlParamObject::SetHost(const QVariant& v)
 {
-
 	CUrlParam::host = v.value<QString>();
 	hostChanged();
 }
@@ -5753,13 +5731,12 @@ bool CUrlParamObject::hasHost()
 
 QVariant CUrlParamObject::GetPort()
 {
-	return CUrlParam::port.value();
+	return CUrlParam::port ? CUrlParam::port.value() : QVariant();
 }
 
 
 void CUrlParamObject::SetPort(const QVariant& v)
 {
-
 	CUrlParam::port = v.value<int>();
 	portChanged();
 }
@@ -5773,13 +5750,12 @@ bool CUrlParamObject::hasPort()
 
 QVariant CUrlParamObject::GetPath()
 {
-	return CUrlParam::path.value();
+	return CUrlParam::path ? CUrlParam::path.value() : QVariant();
 }
 
 
 void CUrlParamObject::SetPath(const QVariant& v)
 {
-
 	CUrlParam::path = v.value<QString>();
 	pathChanged();
 }
@@ -5951,20 +5927,20 @@ QVariant sdl::V1_0::imtbase::CUrlParamObjectList::getData(const QString& nameId,
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_scheme"){
-		return QVariant::fromValue(at(index)->scheme.value());
+		return Version_1_0->at(index)->scheme ? QVariant::fromValue(Version_1_0->at(index)->scheme.value()) : QVariant();
 	}
 	if (nameId == "m_host"){
-		return QVariant::fromValue(at(index)->host.value());
+		return Version_1_0->at(index)->host ? QVariant::fromValue(Version_1_0->at(index)->host.value()) : QVariant();
 	}
 	if (nameId == "m_port"){
-		return QVariant::fromValue(at(index)->port.value());
+		return Version_1_0->at(index)->port ? QVariant::fromValue(Version_1_0->at(index)->port.value()) : QVariant();
 	}
 	if (nameId == "m_path"){
-		return QVariant::fromValue(at(index)->path.value());
+		return Version_1_0->at(index)->path ? QVariant::fromValue(Version_1_0->at(index)->path.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -5977,13 +5953,12 @@ CIdParamObject::CIdParamObject(QObject* parent): ::imtbase::CItemModelBase(paren
 
 QVariant CIdParamObject::GetId()
 {
-	return CIdParam::id.value();
+	return CIdParam::id ? CIdParam::id.value() : QVariant();
 }
 
 
 void CIdParamObject::SetId(const QVariant& v)
 {
-
 	CIdParam::id = v.value<QString>().toUtf8();
 	idChanged();
 }
@@ -6146,11 +6121,11 @@ QVariant sdl::V1_0::imtbase::CIdParamObjectList::getData(const QString& nameId, 
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_id"){
-		return QVariant::fromValue(at(index)->id.value());
+		return Version_1_0->at(index)->id ? QVariant::fromValue(Version_1_0->at(index)->id.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -6163,13 +6138,12 @@ CTextParamObject::CTextParamObject(QObject* parent): ::imtbase::CItemModelBase(p
 
 QVariant CTextParamObject::GetText()
 {
-	return CTextParam::text.value();
+	return CTextParam::text ? CTextParam::text.value() : QVariant();
 }
 
 
 void CTextParamObject::SetText(const QVariant& v)
 {
-
 	CTextParam::text = v.value<QString>();
 	textChanged();
 }
@@ -6332,11 +6306,11 @@ QVariant sdl::V1_0::imtbase::CTextParamObjectList::getData(const QString& nameId
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_text"){
-		return QVariant::fromValue(at(index)->text.value());
+		return Version_1_0->at(index)->text ? QVariant::fromValue(Version_1_0->at(index)->text.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -6349,13 +6323,12 @@ CEnableableParamObject::CEnableableParamObject(QObject* parent): ::imtbase::CIte
 
 QVariant CEnableableParamObject::GetValue()
 {
-	return CEnableableParam::value.value();
+	return CEnableableParam::value ? CEnableableParam::value.value() : QVariant();
 }
 
 
 void CEnableableParamObject::SetValue(const QVariant& v)
 {
-
 	CEnableableParam::value = v.value<bool>();
 	valueChanged();
 }
@@ -6518,11 +6491,11 @@ QVariant sdl::V1_0::imtbase::CEnableableParamObjectList::getData(const QString& 
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_value"){
-		return QVariant::fromValue(at(index)->value.value());
+		return Version_1_0->at(index)->value ? QVariant::fromValue(Version_1_0->at(index)->value.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -6535,13 +6508,12 @@ CIntegerParamObject::CIntegerParamObject(QObject* parent): ::imtbase::CItemModel
 
 QVariant CIntegerParamObject::GetValue()
 {
-	return CIntegerParam::value.value();
+	return CIntegerParam::value ? CIntegerParam::value.value() : QVariant();
 }
 
 
 void CIntegerParamObject::SetValue(const QVariant& v)
 {
-
 	CIntegerParam::value = v.value<int>();
 	valueChanged();
 }
@@ -6704,11 +6676,11 @@ QVariant sdl::V1_0::imtbase::CIntegerParamObjectList::getData(const QString& nam
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_value"){
-		return QVariant::fromValue(at(index)->value.value());
+		return Version_1_0->at(index)->value ? QVariant::fromValue(Version_1_0->at(index)->value.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -6721,13 +6693,12 @@ CDoubleParamObject::CDoubleParamObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CDoubleParamObject::GetValue()
 {
-	return CDoubleParam::value.value();
+	return CDoubleParam::value ? CDoubleParam::value.value() : QVariant();
 }
 
 
 void CDoubleParamObject::SetValue(const QVariant& v)
 {
-
 	CDoubleParam::value = v.value<double>();
 	valueChanged();
 }
@@ -6890,11 +6861,11 @@ QVariant sdl::V1_0::imtbase::CDoubleParamObjectList::getData(const QString& name
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_value"){
-		return QVariant::fromValue(at(index)->value.value());
+		return Version_1_0->at(index)->value ? QVariant::fromValue(Version_1_0->at(index)->value.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -6910,13 +6881,12 @@ COptionObject::COptionObject(QObject* parent): ::imtbase::CItemModelBase(parent)
 
 QVariant COptionObject::GetId()
 {
-	return COption::id.value();
+	return COption::id ? COption::id.value() : QVariant();
 }
 
 
 void COptionObject::SetId(const QVariant& v)
 {
-
 	COption::id = v.value<QString>().toUtf8();
 	idChanged();
 }
@@ -6930,13 +6900,12 @@ bool COptionObject::hasId()
 
 QVariant COptionObject::GetName()
 {
-	return COption::name.value();
+	return COption::name ? COption::name.value() : QVariant();
 }
 
 
 void COptionObject::SetName(const QVariant& v)
 {
-
 	COption::name = v.value<QString>();
 	nameChanged();
 }
@@ -6950,13 +6919,12 @@ bool COptionObject::hasName()
 
 QVariant COptionObject::GetDescription()
 {
-	return COption::description.value();
+	return COption::description ? COption::description.value() : QVariant();
 }
 
 
 void COptionObject::SetDescription(const QVariant& v)
 {
-
 	COption::description = v.value<QString>();
 	descriptionChanged();
 }
@@ -6970,13 +6938,12 @@ bool COptionObject::hasDescription()
 
 QVariant COptionObject::GetEnabled()
 {
-	return COption::enabled.value();
+	return COption::enabled ? COption::enabled.value() : QVariant();
 }
 
 
 void COptionObject::SetEnabled(const QVariant& v)
 {
-
 	COption::enabled = v.value<bool>();
 	enabledChanged();
 }
@@ -7148,20 +7115,20 @@ QVariant sdl::V1_0::imtbase::COptionObjectList::getData(const QString& nameId, i
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_id"){
-		return QVariant::fromValue(at(index)->id.value());
+		return Version_1_0->at(index)->id ? QVariant::fromValue(Version_1_0->at(index)->id.value()) : QVariant();
 	}
 	if (nameId == "m_name"){
-		return QVariant::fromValue(at(index)->name.value());
+		return Version_1_0->at(index)->name ? QVariant::fromValue(Version_1_0->at(index)->name.value()) : QVariant();
 	}
 	if (nameId == "m_description"){
-		return QVariant::fromValue(at(index)->description.value());
+		return Version_1_0->at(index)->description ? QVariant::fromValue(Version_1_0->at(index)->description.value()) : QVariant();
 	}
 	if (nameId == "m_enabled"){
-		return QVariant::fromValue(at(index)->enabled.value());
+		return Version_1_0->at(index)->enabled ? QVariant::fromValue(Version_1_0->at(index)->enabled.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -7176,13 +7143,12 @@ COptionsListObject::COptionsListObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant COptionsListObject::GetTotalCount()
 {
-	return COptionsList::totalCount.value();
+	return COptionsList::totalCount ? COptionsList::totalCount.value() : QVariant();
 }
 
 
 void COptionsListObject::SetTotalCount(const QVariant& v)
 {
-
 	COptionsList::totalCount = v.value<int>();
 	totalCountChanged();
 }
@@ -7196,13 +7162,12 @@ bool COptionsListObject::hasTotalCount()
 
 QVariant COptionsListObject::GetOffset()
 {
-	return COptionsList::offset.value();
+	return COptionsList::offset ? COptionsList::offset.value() : QVariant();
 }
 
 
 void COptionsListObject::SetOffset(const QVariant& v)
 {
-
 	COptionsList::offset = v.value<int>();
 	offsetChanged();
 }
@@ -7227,10 +7192,9 @@ QVariant COptionsListObject::GetOptions()
 
 void COptionsListObject::SetOptions(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::imtbase::COptionObjectList* itemPtr = v.value<sdl::V1_0::imtbase::COptionObjectList*>();
-		if (itemPtr != nullptr)  COptionsList::options = itemPtr->Version_1_0;
+		if (itemPtr != nullptr) COptionsList::options = itemPtr->Version_1_0;
 	}
 	else {
 		COptionsList::options = nullptr;
@@ -7431,14 +7395,14 @@ QVariant sdl::V1_0::imtbase::COptionsListObjectList::getData(const QString& name
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_totalCount"){
-		return QVariant::fromValue(at(index)->totalCount.value());
+		return Version_1_0->at(index)->totalCount ? QVariant::fromValue(Version_1_0->at(index)->totalCount.value()) : QVariant();
 	}
 	if (nameId == "m_offset"){
-		return QVariant::fromValue(at(index)->offset.value());
+		return Version_1_0->at(index)->offset ? QVariant::fromValue(Version_1_0->at(index)->offset.value()) : QVariant();
 	}
 	if (nameId == "m_options"){
 		return itemPtr->GetOptions();
@@ -7455,13 +7419,12 @@ CSelectionParamObject::CSelectionParamObject(QObject* parent): ::imtbase::CItemM
 
 QVariant CSelectionParamObject::GetSelectedIndex()
 {
-	return CSelectionParam::selectedIndex.value();
+	return CSelectionParam::selectedIndex ? CSelectionParam::selectedIndex.value() : QVariant();
 }
 
 
 void CSelectionParamObject::SetSelectedIndex(const QVariant& v)
 {
-
 	CSelectionParam::selectedIndex = v.value<int>();
 	selectedIndexChanged();
 }
@@ -7475,10 +7438,16 @@ bool CSelectionParamObject::hasSelectedIndex()
 
 QVariant CSelectionParamObject::GetConstraints()
 {
+	if (!constraints) {return {};}
+	
 	if (!m_constraintsQObjectPtr.isValid()){
 		m_constraintsQObjectPtr = CreateObject("constraints");
 		auto itemPtr = m_constraintsQObjectPtr.value<sdl::V1_0::imtbase::COptionsListObject*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = CSelectionParam::constraints;
+		if (itemPtr != nullptr) {
+			itemPtr->totalCount = constraints->totalCount;
+			itemPtr->offset = constraints->offset;
+			itemPtr->options = constraints->options;
+		}
 	}
 	return m_constraintsQObjectPtr;
 }
@@ -7486,10 +7455,9 @@ QVariant CSelectionParamObject::GetConstraints()
 
 void CSelectionParamObject::SetConstraints(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::imtbase::COptionsListObject* itemPtr = v.value<sdl::V1_0::imtbase::COptionsListObject*>();
-		if (itemPtr != nullptr)  CSelectionParam::constraints = itemPtr->Version_1_0;
+		if (itemPtr != nullptr) CSelectionParam::constraints = (*itemPtr);
 	}
 	else {
 		CSelectionParam::constraints = nullptr;
@@ -7680,11 +7648,11 @@ QVariant sdl::V1_0::imtbase::CSelectionParamObjectList::getData(const QString& n
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_selectedIndex"){
-		return QVariant::fromValue(at(index)->selectedIndex.value());
+		return Version_1_0->at(index)->selectedIndex ? QVariant::fromValue(Version_1_0->at(index)->selectedIndex.value()) : QVariant();
 	}
 	if (nameId == "m_constraints"){
 		return itemPtr->GetConstraints();
@@ -7701,13 +7669,12 @@ CSchedulerParamObject::CSchedulerParamObject(QObject* parent): ::imtbase::CItemM
 
 QVariant CSchedulerParamObject::GetStartTime()
 {
-	return CSchedulerParam::startTime.value();
+	return CSchedulerParam::startTime ? CSchedulerParam::startTime.value() : QVariant();
 }
 
 
 void CSchedulerParamObject::SetStartTime(const QVariant& v)
 {
-
 	CSchedulerParam::startTime = v.value<QString>();
 	startTimeChanged();
 }
@@ -7721,13 +7688,12 @@ bool CSchedulerParamObject::hasStartTime()
 
 QVariant CSchedulerParamObject::GetInterval()
 {
-	return CSchedulerParam::interval.value();
+	return CSchedulerParam::interval ? CSchedulerParam::interval.value() : QVariant();
 }
 
 
 void CSchedulerParamObject::SetInterval(const QVariant& v)
 {
-
 	CSchedulerParam::interval = v.value<int>();
 	intervalChanged();
 }
@@ -7893,14 +7859,14 @@ QVariant sdl::V1_0::imtbase::CSchedulerParamObjectList::getData(const QString& n
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_startTime"){
-		return QVariant::fromValue(at(index)->startTime.value());
+		return Version_1_0->at(index)->startTime ? QVariant::fromValue(Version_1_0->at(index)->startTime.value()) : QVariant();
 	}
 	if (nameId == "m_interval"){
-		return QVariant::fromValue(at(index)->interval.value());
+		return Version_1_0->at(index)->interval ? QVariant::fromValue(Version_1_0->at(index)->interval.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -7914,10 +7880,15 @@ CBackupSettingsObject::CBackupSettingsObject(QObject* parent): ::imtbase::CItemM
 
 QVariant CBackupSettingsObject::GetSchedulerParam()
 {
+	if (!schedulerParam) {return {};}
+	
 	if (!m_schedulerParamQObjectPtr.isValid()){
 		m_schedulerParamQObjectPtr = CreateObject("schedulerParam");
 		auto itemPtr = m_schedulerParamQObjectPtr.value<sdl::V1_0::imtbase::CSchedulerParamObject*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = CBackupSettings::schedulerParam;
+		if (itemPtr != nullptr) {
+			itemPtr->startTime = schedulerParam->startTime;
+			itemPtr->interval = schedulerParam->interval;
+		}
 	}
 	return m_schedulerParamQObjectPtr;
 }
@@ -7925,10 +7896,9 @@ QVariant CBackupSettingsObject::GetSchedulerParam()
 
 void CBackupSettingsObject::SetSchedulerParam(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::imtbase::CSchedulerParamObject* itemPtr = v.value<sdl::V1_0::imtbase::CSchedulerParamObject*>();
-		if (itemPtr != nullptr)  CBackupSettings::schedulerParam = itemPtr->Version_1_0;
+		if (itemPtr != nullptr) CBackupSettings::schedulerParam = (*itemPtr);
 	}
 	else {
 		CBackupSettings::schedulerParam = nullptr;
@@ -7964,13 +7934,12 @@ void CBackupSettingsObject::ResetSchedulerParam()
 
 QVariant CBackupSettingsObject::GetFolderPath()
 {
-	return CBackupSettings::folderPath.value();
+	return CBackupSettings::folderPath ? CBackupSettings::folderPath.value() : QVariant();
 }
 
 
 void CBackupSettingsObject::SetFolderPath(const QVariant& v)
 {
-
 	CBackupSettings::folderPath = v.value<QString>();
 	folderPathChanged();
 }
@@ -8139,14 +8108,14 @@ QVariant sdl::V1_0::imtbase::CBackupSettingsObjectList::getData(const QString& n
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_schedulerParam"){
 		return itemPtr->GetSchedulerParam();
 	}
 	if (nameId == "m_folderPath"){
-		return QVariant::fromValue(at(index)->folderPath.value());
+		return Version_1_0->at(index)->folderPath ? QVariant::fromValue(Version_1_0->at(index)->folderPath.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -8164,13 +8133,12 @@ CDatabaseAccessSettingsObject::CDatabaseAccessSettingsObject(QObject* parent): :
 
 QVariant CDatabaseAccessSettingsObject::GetDbName()
 {
-	return CDatabaseAccessSettings::dbName.value();
+	return CDatabaseAccessSettings::dbName ? CDatabaseAccessSettings::dbName.value() : QVariant();
 }
 
 
 void CDatabaseAccessSettingsObject::SetDbName(const QVariant& v)
 {
-
 	CDatabaseAccessSettings::dbName = v.value<QString>();
 	dbNameChanged();
 }
@@ -8184,13 +8152,12 @@ bool CDatabaseAccessSettingsObject::hasDbName()
 
 QVariant CDatabaseAccessSettingsObject::GetHost()
 {
-	return CDatabaseAccessSettings::host.value();
+	return CDatabaseAccessSettings::host ? CDatabaseAccessSettings::host.value() : QVariant();
 }
 
 
 void CDatabaseAccessSettingsObject::SetHost(const QVariant& v)
 {
-
 	CDatabaseAccessSettings::host = v.value<QString>();
 	hostChanged();
 }
@@ -8204,13 +8171,12 @@ bool CDatabaseAccessSettingsObject::hasHost()
 
 QVariant CDatabaseAccessSettingsObject::GetPort()
 {
-	return CDatabaseAccessSettings::port.value();
+	return CDatabaseAccessSettings::port ? CDatabaseAccessSettings::port.value() : QVariant();
 }
 
 
 void CDatabaseAccessSettingsObject::SetPort(const QVariant& v)
 {
-
 	CDatabaseAccessSettings::port = v.value<int>();
 	portChanged();
 }
@@ -8224,13 +8190,12 @@ bool CDatabaseAccessSettingsObject::hasPort()
 
 QVariant CDatabaseAccessSettingsObject::GetDbPath()
 {
-	return CDatabaseAccessSettings::dbPath.value();
+	return CDatabaseAccessSettings::dbPath ? CDatabaseAccessSettings::dbPath.value() : QVariant();
 }
 
 
 void CDatabaseAccessSettingsObject::SetDbPath(const QVariant& v)
 {
-
 	CDatabaseAccessSettings::dbPath = v.value<QString>();
 	dbPathChanged();
 }
@@ -8244,13 +8209,12 @@ bool CDatabaseAccessSettingsObject::hasDbPath()
 
 QVariant CDatabaseAccessSettingsObject::GetUsername()
 {
-	return CDatabaseAccessSettings::username.value();
+	return CDatabaseAccessSettings::username ? CDatabaseAccessSettings::username.value() : QVariant();
 }
 
 
 void CDatabaseAccessSettingsObject::SetUsername(const QVariant& v)
 {
-
 	CDatabaseAccessSettings::username = v.value<QString>();
 	usernameChanged();
 }
@@ -8264,13 +8228,12 @@ bool CDatabaseAccessSettingsObject::hasUsername()
 
 QVariant CDatabaseAccessSettingsObject::GetPassword()
 {
-	return CDatabaseAccessSettings::password.value();
+	return CDatabaseAccessSettings::password ? CDatabaseAccessSettings::password.value() : QVariant();
 }
 
 
 void CDatabaseAccessSettingsObject::SetPassword(const QVariant& v)
 {
-
 	CDatabaseAccessSettings::password = v.value<QString>();
 	passwordChanged();
 }
@@ -8448,26 +8411,26 @@ QVariant sdl::V1_0::imtbase::CDatabaseAccessSettingsObjectList::getData(const QS
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_dbName"){
-		return QVariant::fromValue(at(index)->dbName.value());
+		return Version_1_0->at(index)->dbName ? QVariant::fromValue(Version_1_0->at(index)->dbName.value()) : QVariant();
 	}
 	if (nameId == "m_host"){
-		return QVariant::fromValue(at(index)->host.value());
+		return Version_1_0->at(index)->host ? QVariant::fromValue(Version_1_0->at(index)->host.value()) : QVariant();
 	}
 	if (nameId == "m_port"){
-		return QVariant::fromValue(at(index)->port.value());
+		return Version_1_0->at(index)->port ? QVariant::fromValue(Version_1_0->at(index)->port.value()) : QVariant();
 	}
 	if (nameId == "m_dbPath"){
-		return QVariant::fromValue(at(index)->dbPath.value());
+		return Version_1_0->at(index)->dbPath ? QVariant::fromValue(Version_1_0->at(index)->dbPath.value()) : QVariant();
 	}
 	if (nameId == "m_username"){
-		return QVariant::fromValue(at(index)->username.value());
+		return Version_1_0->at(index)->username ? QVariant::fromValue(Version_1_0->at(index)->username.value()) : QVariant();
 	}
 	if (nameId == "m_password"){
-		return QVariant::fromValue(at(index)->password.value());
+		return Version_1_0->at(index)->password ? QVariant::fromValue(Version_1_0->at(index)->password.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -8481,13 +8444,12 @@ CFileNameParamObject::CFileNameParamObject(QObject* parent): ::imtbase::CItemMod
 
 QVariant CFileNameParamObject::GetPathType()
 {
-	return CFileNameParam::pathType.value();
+	return CFileNameParam::pathType ? CFileNameParam::pathType.value() : QVariant();
 }
 
 
 void CFileNameParamObject::SetPathType(const QVariant& v)
 {
-
 	CFileNameParam::pathType = v.value<int>();
 	pathTypeChanged();
 }
@@ -8501,13 +8463,12 @@ bool CFileNameParamObject::hasPathType()
 
 QVariant CFileNameParamObject::GetPath()
 {
-	return CFileNameParam::path.value();
+	return CFileNameParam::path ? CFileNameParam::path.value() : QVariant();
 }
 
 
 void CFileNameParamObject::SetPath(const QVariant& v)
 {
-
 	CFileNameParam::path = v.value<QString>();
 	pathChanged();
 }
@@ -8673,14 +8634,14 @@ QVariant sdl::V1_0::imtbase::CFileNameParamObjectList::getData(const QString& na
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_pathType"){
-		return QVariant::fromValue(at(index)->pathType.value());
+		return Version_1_0->at(index)->pathType ? QVariant::fromValue(Version_1_0->at(index)->pathType.value()) : QVariant();
 	}
 	if (nameId == "m_path"){
-		return QVariant::fromValue(at(index)->path.value());
+		return Version_1_0->at(index)->path ? QVariant::fromValue(Version_1_0->at(index)->path.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -8697,17 +8658,19 @@ CParamsSetObject::CParamsSetObject(QObject* parent): ::imtbase::CItemModelBase(p
 
 QVariant CParamsSetObject::GetParamIds()
 {
+	if (!paramIds ){return {};}
+
 	QList<QString> tempParamIdsList;
-	for (const auto& tempValue: CParamsSet::paramIds.value()){
+	for (const auto& tempValue: paramIds.value()){
 		tempParamIdsList << *tempValue;
 	}
+
 	return QVariant::fromValue(tempParamIdsList);
 }
 
 
 void CParamsSetObject::SetParamIds(const QVariant& v)
 {
-
 	if (!CParamsSet::paramIds){
 		CParamsSet::paramIds.emplace();
 	}
@@ -8715,8 +8678,8 @@ void CParamsSetObject::SetParamIds(const QVariant& v)
 		CParamsSet::paramIds->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TNullableValue<QByteArray> value(tempValue.toUtf8());
-		CParamsSet::paramIds->append(value);
+		istd::TNullableValue<QByteArray> tempItem(tempValue.toUtf8());
+		CParamsSet::paramIds->append(tempItem);
 	}
 
 	paramIdsChanged();
@@ -8731,17 +8694,19 @@ bool CParamsSetObject::hasParamIds()
 
 QVariant CParamsSetObject::GetParamTypeIds()
 {
+	if (!paramTypeIds ){return {};}
+
 	QList<QString> tempParamTypeIdsList;
-	for (const auto& tempValue: CParamsSet::paramTypeIds.value()){
+	for (const auto& tempValue: paramTypeIds.value()){
 		tempParamTypeIdsList << *tempValue;
 	}
+
 	return QVariant::fromValue(tempParamTypeIdsList);
 }
 
 
 void CParamsSetObject::SetParamTypeIds(const QVariant& v)
 {
-
 	if (!CParamsSet::paramTypeIds){
 		CParamsSet::paramTypeIds.emplace();
 	}
@@ -8749,8 +8714,8 @@ void CParamsSetObject::SetParamTypeIds(const QVariant& v)
 		CParamsSet::paramTypeIds->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TNullableValue<QByteArray> value(tempValue.toUtf8());
-		CParamsSet::paramTypeIds->append(value);
+		istd::TNullableValue<QByteArray> tempItem(tempValue.toUtf8());
+		CParamsSet::paramTypeIds->append(tempItem);
 	}
 
 	paramTypeIdsChanged();
@@ -8765,17 +8730,19 @@ bool CParamsSetObject::hasParamTypeIds()
 
 QVariant CParamsSetObject::GetParamNames()
 {
+	if (!paramNames ){return {};}
+
 	QList<QString> tempParamNamesList;
-	for (const auto& tempValue: CParamsSet::paramNames.value()){
+	for (const auto& tempValue: paramNames.value()){
 		tempParamNamesList << *tempValue;
 	}
+
 	return QVariant::fromValue(tempParamNamesList);
 }
 
 
 void CParamsSetObject::SetParamNames(const QVariant& v)
 {
-
 	if (!CParamsSet::paramNames){
 		CParamsSet::paramNames.emplace();
 	}
@@ -8783,8 +8750,8 @@ void CParamsSetObject::SetParamNames(const QVariant& v)
 		CParamsSet::paramNames->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TNullableValue<QString> value(tempValue);
-		CParamsSet::paramNames->append(value);
+		istd::TNullableValue<QString> tempItem(tempValue);
+		CParamsSet::paramNames->append(tempItem);
 	}
 
 	paramNamesChanged();
@@ -8799,17 +8766,19 @@ bool CParamsSetObject::hasParamNames()
 
 QVariant CParamsSetObject::GetParamDescriptions()
 {
+	if (!paramDescriptions ){return {};}
+
 	QList<QString> tempParamDescriptionsList;
-	for (const auto& tempValue: CParamsSet::paramDescriptions.value()){
+	for (const auto& tempValue: paramDescriptions.value()){
 		tempParamDescriptionsList << *tempValue;
 	}
+
 	return QVariant::fromValue(tempParamDescriptionsList);
 }
 
 
 void CParamsSetObject::SetParamDescriptions(const QVariant& v)
 {
-
 	if (!CParamsSet::paramDescriptions){
 		CParamsSet::paramDescriptions.emplace();
 	}
@@ -8817,8 +8786,8 @@ void CParamsSetObject::SetParamDescriptions(const QVariant& v)
 		CParamsSet::paramDescriptions->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TNullableValue<QString> value(tempValue);
-		CParamsSet::paramDescriptions->append(value);
+		istd::TNullableValue<QString> tempItem(tempValue);
+		CParamsSet::paramDescriptions->append(tempItem);
 	}
 
 	paramDescriptionsChanged();
@@ -8833,17 +8802,19 @@ bool CParamsSetObject::hasParamDescriptions()
 
 QVariant CParamsSetObject::GetParameters()
 {
+	if (!parameters ){return {};}
+
 	QList<QString> tempParametersList;
-	for (const auto& tempValue: CParamsSet::parameters.value()){
+	for (const auto& tempValue: parameters.value()){
 		tempParametersList << *tempValue;
 	}
+
 	return QVariant::fromValue(tempParametersList);
 }
 
 
 void CParamsSetObject::SetParameters(const QVariant& v)
 {
-
 	if (!CParamsSet::parameters){
 		CParamsSet::parameters.emplace();
 	}
@@ -8851,8 +8822,8 @@ void CParamsSetObject::SetParameters(const QVariant& v)
 		CParamsSet::parameters->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TNullableValue<QString> value(tempValue);
-		CParamsSet::parameters->append(value);
+		istd::TNullableValue<QString> tempItem(tempValue);
+		CParamsSet::parameters->append(tempItem);
 	}
 
 	parametersChanged();
@@ -9028,23 +8999,23 @@ QVariant sdl::V1_0::imtbase::CParamsSetObjectList::getData(const QString& nameId
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_paramIds"){
-		return QVariant::fromValue(at(index)->paramIds.value());
+		return Version_1_0->at(index)->paramIds ? QVariant::fromValue(Version_1_0->at(index)->paramIds.value()) : QVariant();
 	}
 	if (nameId == "m_paramTypeIds"){
-		return QVariant::fromValue(at(index)->paramTypeIds.value());
+		return Version_1_0->at(index)->paramTypeIds ? QVariant::fromValue(Version_1_0->at(index)->paramTypeIds.value()) : QVariant();
 	}
 	if (nameId == "m_paramNames"){
-		return QVariant::fromValue(at(index)->paramNames.value());
+		return Version_1_0->at(index)->paramNames ? QVariant::fromValue(Version_1_0->at(index)->paramNames.value()) : QVariant();
 	}
 	if (nameId == "m_paramDescriptions"){
-		return QVariant::fromValue(at(index)->paramDescriptions.value());
+		return Version_1_0->at(index)->paramDescriptions ? QVariant::fromValue(Version_1_0->at(index)->paramDescriptions.value()) : QVariant();
 	}
 	if (nameId == "m_parameters"){
-		return QVariant::fromValue(at(index)->parameters.value());
+		return Version_1_0->at(index)->parameters ? QVariant::fromValue(Version_1_0->at(index)->parameters.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -9061,13 +9032,12 @@ CMimeTypeObject::CMimeTypeObject(QObject* parent): ::imtbase::CItemModelBase(par
 
 QVariant CMimeTypeObject::GetType()
 {
-	return CMimeType::type.value();
+	return CMimeType::type ? CMimeType::type.value() : QVariant();
 }
 
 
 void CMimeTypeObject::SetType(const QVariant& v)
 {
-
 	CMimeType::type = v.value<QString>();
 	typeChanged();
 }
@@ -9081,17 +9051,19 @@ bool CMimeTypeObject::hasType()
 
 QVariant CMimeTypeObject::GetTree()
 {
+	if (!tree ){return {};}
+
 	QList<QString> tempTreeList;
-	for (const auto& tempValue: CMimeType::tree.value()){
+	for (const auto& tempValue: tree.value()){
 		tempTreeList << *tempValue;
 	}
+
 	return QVariant::fromValue(tempTreeList);
 }
 
 
 void CMimeTypeObject::SetTree(const QVariant& v)
 {
-
 	if (!CMimeType::tree){
 		CMimeType::tree.emplace();
 	}
@@ -9099,8 +9071,8 @@ void CMimeTypeObject::SetTree(const QVariant& v)
 		CMimeType::tree->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TNullableValue<QString> value(tempValue);
-		CMimeType::tree->append(value);
+		istd::TNullableValue<QString> tempItem(tempValue);
+		CMimeType::tree->append(tempItem);
 	}
 
 	treeChanged();
@@ -9115,13 +9087,12 @@ bool CMimeTypeObject::hasTree()
 
 QVariant CMimeTypeObject::GetSubType()
 {
-	return CMimeType::subType.value();
+	return CMimeType::subType ? CMimeType::subType.value() : QVariant();
 }
 
 
 void CMimeTypeObject::SetSubType(const QVariant& v)
 {
-
 	CMimeType::subType = v.value<QString>();
 	subTypeChanged();
 }
@@ -9135,13 +9106,12 @@ bool CMimeTypeObject::hasSubType()
 
 QVariant CMimeTypeObject::GetSuffix()
 {
-	return CMimeType::suffix.value();
+	return CMimeType::suffix ? CMimeType::suffix.value() : QVariant();
 }
 
 
 void CMimeTypeObject::SetSuffix(const QVariant& v)
 {
-
 	CMimeType::suffix = v.value<QString>();
 	suffixChanged();
 }
@@ -9155,17 +9125,19 @@ bool CMimeTypeObject::hasSuffix()
 
 QVariant CMimeTypeObject::GetParameters()
 {
+	if (!parameters ){return {};}
+
 	QList<QString> tempParametersList;
-	for (const auto& tempValue: CMimeType::parameters.value()){
+	for (const auto& tempValue: parameters.value()){
 		tempParametersList << *tempValue;
 	}
+
 	return QVariant::fromValue(tempParametersList);
 }
 
 
 void CMimeTypeObject::SetParameters(const QVariant& v)
 {
-
 	if (!CMimeType::parameters){
 		CMimeType::parameters.emplace();
 	}
@@ -9173,8 +9145,8 @@ void CMimeTypeObject::SetParameters(const QVariant& v)
 		CMimeType::parameters->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TNullableValue<QString> value(tempValue);
-		CMimeType::parameters->append(value);
+		istd::TNullableValue<QString> tempItem(tempValue);
+		CMimeType::parameters->append(tempItem);
 	}
 
 	parametersChanged();
@@ -9350,23 +9322,23 @@ QVariant sdl::V1_0::imtbase::CMimeTypeObjectList::getData(const QString& nameId,
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_type"){
-		return QVariant::fromValue(at(index)->type.value());
+		return Version_1_0->at(index)->type ? QVariant::fromValue(Version_1_0->at(index)->type.value()) : QVariant();
 	}
 	if (nameId == "m_tree"){
-		return QVariant::fromValue(at(index)->tree.value());
+		return Version_1_0->at(index)->tree ? QVariant::fromValue(Version_1_0->at(index)->tree.value()) : QVariant();
 	}
 	if (nameId == "m_subType"){
-		return QVariant::fromValue(at(index)->subType.value());
+		return Version_1_0->at(index)->subType ? QVariant::fromValue(Version_1_0->at(index)->subType.value()) : QVariant();
 	}
 	if (nameId == "m_suffix"){
-		return QVariant::fromValue(at(index)->suffix.value());
+		return Version_1_0->at(index)->suffix ? QVariant::fromValue(Version_1_0->at(index)->suffix.value()) : QVariant();
 	}
 	if (nameId == "m_parameters"){
-		return QVariant::fromValue(at(index)->parameters.value());
+		return Version_1_0->at(index)->parameters ? QVariant::fromValue(Version_1_0->at(index)->parameters.value()) : QVariant();
 	}
 
 	return QVariant();

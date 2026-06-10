@@ -21,6 +21,8 @@
                                 <Value>TenantManager</Value>
                                 <Value>TenantMembershipManager</Value>
                                 <Value>UserFilterableSelectController</Value>
+                                <Value>TenantConnectionManager</Value>
+                                <Value>TenantGrantManager</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -46,8 +48,10 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>TenantCollectionDocumentService</Value>
+                                <Value>TenantConnectionManager</Value>
                                 <Value>TenantCollectionController</Value>
                                 <Value>TenantManager</Value>
+                                <Value>TenantGrantManager</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -126,13 +130,79 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantConnectionCodeRepository" Type="Reference" ExportId="TenantConnectionCodeRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantConnectionRepository" Type="Reference" ExportId="TenantConnectionRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TenantConnectionRequestRepository" Type="Reference" ExportId="TenantConnectionRequestRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TenantManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TenantManager/TenantManager"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TenantRelationshipProposalRepository" Type="Reference" ExportId="TenantRelationshipProposalRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantRelationshipRepository" Type="Reference" ExportId="TenantRelationshipRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantRepository" Type="Reference" ExportId="TenantRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TenantContractManager" PackageId="ImtUserAdministrationVoce" ComponentId="TenantContractManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ContractRepository" Type="Reference" ExportId="ContractRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TenantGrantManager" PackageId="ImtUserAdministrationVoce" ComponentId="TenantGrantManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CrossOrgGrantRepository" Type="Reference" ExportId="CrossOrgGrantRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CrossTenantMessageRepository" Type="Reference" ExportId="CrossTenantMessageRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantManager/TenantManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantRepository" Type="Reference" ExportId="TenantRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -141,6 +211,18 @@
         <Element Id="TenantManager" PackageId="" ComponentId="TenantManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ContractManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantContractManager/ContractManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CrossOrgGrantManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantGrantManager/CrossOrgGrantManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CrossTenantMessageBroker" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantGrantManager/CrossTenantMessageBroker"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="InvitationManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantMembershipManager/TenantInvitationManager"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -256,6 +338,9 @@
                                 <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="MembershipManager">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="ProposalFactory" Type="Factory" ExportId="">
+                                    <Data IsEnabled="true" Value="TenantRelationshipProposalInfo"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="TenantConnectionRequestManager" Type="Reference" ExportId="TenantConnectionRequestManager">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
@@ -303,6 +388,11 @@
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="TenantRelationshipProposalInfo" PackageId="ImtAuthPck" ComponentId="TenantRelationshipProposalInfo">
+                        <Data IsEnabled="true" Flags="2">
+                            <AttributeInfoMap/>
                         </Data>
                     </Element>
                 </ElementsList>

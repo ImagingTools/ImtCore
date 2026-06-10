@@ -535,7 +535,7 @@ PopupView {
 							// Highlight when keyboard-focused
 							Rectangle {
 								anchors.fill: parent
-								color: root.__internal.selectedFocusedIndex === model.index ? Style.hoverColor : "transparent"
+								color: root.__internal.selectedFocusedIndex === model.index ? Style.buttonHoverColor : "transparent"
 								opacity: 0.5
 							}
 

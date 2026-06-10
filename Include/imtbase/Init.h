@@ -74,8 +74,10 @@ public:
 		Q_INIT_RESOURCE(imtauthTenantMembershipsSdl);
 		Q_INIT_RESOURCE(imtauthTenantCollectionDocumentServiceSdl);
 		Q_INIT_RESOURCE(imtauthRoleCollectionDocumentServiceSdl);
+		Q_INIT_RESOURCE(imtauthRelationshipCollectionDocumentServiceSdl);
 		Q_INIT_RESOURCE(imtauthGroupCollectionDocumentServiceSdl);
 		Q_INIT_RESOURCE(imtauthUserCollectionDocumentServiceSdl);
+		Q_INIT_RESOURCE(imtauthCrossOrgGrantCollectionDocumentServiceSdl);
 	}
 
 	static void InitQml()

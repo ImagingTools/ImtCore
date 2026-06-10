@@ -150,7 +150,6 @@ QtObject {
 
 	property SubscriptionClient subscriptionClient: SubscriptionClient {
 		onMessageReceived: {
-			container.hasRemoteChanges = true;
 		}
 	}
 

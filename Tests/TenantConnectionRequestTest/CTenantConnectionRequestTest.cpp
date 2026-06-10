@@ -3,240 +3,372 @@
 
 // ImtCore includes
 #include <imtauth/CTenantConnectionRequest.h>
+#include <imtauth/CTenantRelationshipProposal.h>
 
 
-namespace
+namespace {
+
+imtauth::CTenantRelationshipProposal createProposalInfo(
+const QByteArray& connectionId,
+const QByteArray& initiatorTenantId,
+const QByteArray& counterpartyTenantId)
 {
-
-
-imtauth::TenantConnectionRequestInfo MakeSampleInfo()
-{
-	imtauth::TenantConnectionRequestInfo info;
-	info.requestId = "request-1";
-	info.sourceTenantId = "tenantA";
-	info.targetTenantId = "tenantB";
-	info.targetIdentifier = "tenantB@example.com";
-	info.connectCode = "ABCD1234EFGH";
-	info.proposedSourceRole = imtauth::ITenantInfo::Supplier;
-	info.proposedTargetRole = imtauth::ITenantInfo::Customer;
-	info.message = "Let's connect";
-	info.status = imtauth::TCS_PENDING;
-	info.createdAt = "2026-01-01T00:00:00.000Z";
-	info.expiresAt = "2030-01-01T00:00:00.000Z";
-	info.respondedAt = "";
-	return info;
+imtauth::CTenantRelationshipProposal proposal;
+proposal.SetConnectionId(connectionId);
+proposal.SetInitiatorTenantId(initiatorTenantId);
+proposal.SetCounterpartyTenantId(counterpartyTenantId);
+proposal.SetProposalType(imtauth::ITenantRelationshipProposalInfo::RPT_CREATE);
+proposal.SetProposedSourceRole(imtauth::ITenantRelationshipInfo::TRR_PARTNER);
+proposal.SetProposedTargetRole(imtauth::ITenantRelationshipInfo::TRR_PARTNER);
+return proposal;
 }
-
 
 } // anonymous namespace
 
 
 void CTenantConnectionRequestTest::init()
 {
-	m_managerPtr = new imtauth::CMockTenantConnectionRequestManager();
+m_managerPtr = new imtauth::CMockConnectionManager();
 }
 
 
 void CTenantConnectionRequestTest::cleanup()
 {
-	delete m_managerPtr;
-	m_managerPtr = nullptr;
+delete m_managerPtr;
+m_managerPtr = nullptr;
 }
 
 
+// --- Data Object Tests ---
+
 void CTenantConnectionRequestTest::testRequestInfo_RoundTrip()
 {
-	imtauth::CTenantConnectionRequest request;
-	imtauth::TenantConnectionRequestInfo info = MakeSampleInfo();
-	request.SetRequestInfo(info);
+imtauth::CTenantConnectionRequest data;
+data.SetRequestId("request-1");
+data.SetSourceTenantId("tenantA");
+data.SetTargetTenantId("tenantB");
+data.SetConnectionCode("ABCD1234");
+data.SetMessage("Let's connect");
+data.SetStatus(imtauth::ITenantConnectionRequestInfo::CRS_PENDING);
+data.SetCreatedAt("2026-01-01T00:00:00.000Z");
 
-	QCOMPARE(request.GetRequestId(), QByteArray("request-1"));
-	QVERIFY(request.GetRequestInfo() == info);
+QCOMPARE(data.GetRequestId(), QByteArray("request-1"));
+QCOMPARE(data.GetSourceTenantId(), QByteArray("tenantA"));
+QCOMPARE(data.GetTargetTenantId(), QByteArray("tenantB"));
+QCOMPARE(data.GetConnectionCode(), QString("ABCD1234"));
+QCOMPARE(data.GetMessage(), QString("Let's connect"));
+QCOMPARE(data.GetStatus(), imtauth::ITenantConnectionRequestInfo::CRS_PENDING);
+QCOMPARE(data.GetCreatedAt(), QString("2026-01-01T00:00:00.000Z"));
 }
 
 
 void CTenantConnectionRequestTest::testRequestInfo_CopyFromAndClone()
 {
-	imtauth::CTenantConnectionRequest source;
-	source.SetRequestInfo(MakeSampleInfo());
+imtauth::CTenantConnectionRequest data;
+data.SetRequestId("request-1");
+data.SetSourceTenantId("tenantA");
+data.SetStatus(imtauth::ITenantConnectionRequestInfo::CRS_PENDING);
 
-	imtauth::CTenantConnectionRequest target;
-	QVERIFY(target.CopyFrom(source));
-	QVERIFY(target.GetRequestInfo() == source.GetRequestInfo());
-
-	istd::IChangeableUniquePtr clonePtr = source.CloneMe();
-	QVERIFY(clonePtr.IsValid());
-	const imtauth::ITenantConnectionRequestData* clonedPtr =
-				dynamic_cast<const imtauth::ITenantConnectionRequestData*>(clonePtr.GetPtr());
-	QVERIFY(clonedPtr != nullptr);
-	QVERIFY(clonedPtr->GetRequestInfo() == source.GetRequestInfo());
+imtauth::CTenantConnectionRequest copy;
+copy.CopyFrom(data);
+QCOMPARE(copy.GetRequestId(), QByteArray("request-1"));
+QCOMPARE(copy.GetSourceTenantId(), QByteArray("tenantA"));
+QCOMPARE(copy.GetStatus(), imtauth::ITenantConnectionRequestInfo::CRS_PENDING);
 }
 
 
 void CTenantConnectionRequestTest::testRequestInfo_ResetDataDefaults()
 {
-	imtauth::CTenantConnectionRequest request;
-	request.SetRequestInfo(MakeSampleInfo());
+imtauth::CTenantConnectionRequest data;
+data.SetRequestId("request-1");
+data.SetSourceTenantId("tenantA");
+data.SetStatus(imtauth::ITenantConnectionRequestInfo::CRS_APPROVED);
+data.ResetData();
 
-	QVERIFY(request.ResetData());
-
-	imtauth::TenantConnectionRequestInfo info = request.GetRequestInfo();
-	QVERIFY(info.requestId.isEmpty());
-	QVERIFY(info.sourceTenantId.isEmpty());
-	QVERIFY(info.connectCode.isEmpty());
-	QCOMPARE(info.proposedSourceRole, imtauth::ITenantInfo::Partner);
-	QCOMPARE(info.proposedTargetRole, imtauth::ITenantInfo::Partner);
-	QCOMPARE(info.status, imtauth::TCS_PENDING);
+QVERIFY(data.GetRequestId().isEmpty());
+QVERIFY(data.GetSourceTenantId().isEmpty());
+QCOMPARE(data.GetStatus(), imtauth::ITenantConnectionRequestInfo::CRS_PENDING);
 }
 
 
-void CTenantConnectionRequestTest::testCreateRequest_Success()
+// --- Connection Code ---
+
+void CTenantConnectionRequestTest::testGetConnectionCode_AutoCreates()
 {
-	QByteArray requestId = m_managerPtr->CreateConnectionRequest(
-				"tenantA", "tenantB@example.com",
-				imtauth::ITenantInfo::Supplier, imtauth::ITenantInfo::Customer);
-	QVERIFY(!requestId.isEmpty());
-	QCOMPARE(m_managerPtr->m_requests.size(), 1);
-
-	imtauth::TenantConnectionRequestInfo info = m_managerPtr->GetConnectionRequest(requestId);
-	QCOMPARE(info.status, imtauth::TCS_PENDING);
-	QCOMPARE(info.proposedSourceRole, imtauth::ITenantInfo::Supplier);
+auto code = m_managerPtr->GetConnectionCode("tenantA");
+QCOMPARE(code.tenantId, QByteArray("tenantA"));
+QVERIFY(!code.connectionCode.isEmpty());
+QVERIFY(code.allowConnectionsByCode);
 }
 
 
-void CTenantConnectionRequestTest::testCreateRequest_MissingFields_Fails()
+void CTenantConnectionRequestTest::testRegenerateConnectionCode_ChangesCode()
 {
-	QVERIFY(m_managerPtr->CreateConnectionRequest(
-				"", "tenantB@example.com",
-				imtauth::ITenantInfo::Partner, imtauth::ITenantInfo::Partner).isEmpty());
-	QVERIFY(m_managerPtr->CreateConnectionRequest(
-				"tenantA", "",
-				imtauth::ITenantInfo::Partner, imtauth::ITenantInfo::Partner).isEmpty());
-	QCOMPARE(m_managerPtr->m_requests.size(), 0);
+auto code = m_managerPtr->GetConnectionCode("tenantA");
+QString oldCode = code.connectionCode;
+
+QString newCode = m_managerPtr->RegenerateConnectionCode("tenantA");
+QVERIFY(newCode != oldCode);
+QVERIFY(!newCode.isEmpty());
 }
 
 
-void CTenantConnectionRequestTest::testCreateConnectCode_Success()
+void CTenantConnectionRequestTest::testSetAllowConnectionsByCode()
 {
-	QString code;
-	QByteArray requestId = m_managerPtr->CreateConnectCode(
-				"tenantA", imtauth::ITenantInfo::Supplier, imtauth::ITenantInfo::Customer,
-				QString(), QString(), code);
-	QVERIFY(!requestId.isEmpty());
-	QVERIFY(!code.isEmpty());
-	QCOMPARE(m_managerPtr->m_requests.size(), 1);
+m_managerPtr->GetConnectionCode("tenantA");
+QVERIFY(m_managerPtr->SetAllowConnectionsByCode("tenantA", false));
+
+auto code = m_managerPtr->GetConnectionCode("tenantA");
+QVERIFY(!code.allowConnectionsByCode);
 }
 
 
-void CTenantConnectionRequestTest::testCreateConnectCode_MissingSource_Fails()
+// --- Connection Requests ---
+
+void CTenantConnectionRequestTest::testCreateConnectionRequest_Success()
 {
-	QString code;
-	QVERIFY(m_managerPtr->CreateConnectCode(
-				"", imtauth::ITenantInfo::Partner, imtauth::ITenantInfo::Partner,
-				QString(), QString(), code).isEmpty());
-	QCOMPARE(m_managerPtr->m_requests.size(), 0);
+auto codeB = m_managerPtr->GetConnectionCode("tenantB");
+QByteArray requestId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode, "Hello");
+QVERIFY(!requestId.isEmpty());
+QCOMPARE(m_managerPtr->m_requests.size(), 1);
+QCOMPARE(m_managerPtr->m_requests.first().status, imtauth::ITenantConnectionRequestInfo::CRS_PENDING);
 }
 
 
-void CTenantConnectionRequestTest::testAcceptRequest_EstablishesRelationship()
+void CTenantConnectionRequestTest::testCreateConnectionRequest_InvalidCode_Fails()
 {
-	QByteArray requestId = m_managerPtr->CreateConnectionRequest(
-				"tenantA", "tenantB@example.com",
-				imtauth::ITenantInfo::Supplier, imtauth::ITenantInfo::Customer);
-
-	QVERIFY(m_managerPtr->AcceptConnectionRequest(requestId, "tenantB"));
-
-	imtauth::TenantConnectionRequestInfo info = m_managerPtr->GetConnectionRequest(requestId);
-	QCOMPARE(info.status, imtauth::TCS_ACCEPTED);
-	QCOMPARE(info.targetTenantId, QByteArray("tenantB"));
-	QVERIFY(!info.respondedAt.isEmpty());
-	// Two mirror relationship entries created (source + accepting tenant).
-	QCOMPARE(m_managerPtr->m_relationshipCount, 2);
-
-	// Accepting an already accepted request fails.
-	QVERIFY(!m_managerPtr->AcceptConnectionRequest(requestId, "tenantB"));
+QByteArray requestId = m_managerPtr->CreateConnectionRequest("tenantA", "INVALID_CODE");
+QVERIFY(requestId.isEmpty());
 }
 
 
-void CTenantConnectionRequestTest::testAcceptRequest_SameTenant_Fails()
+void CTenantConnectionRequestTest::testCreateConnectionRequest_SelfConnect_Fails()
 {
-	QByteArray requestId = m_managerPtr->CreateConnectionRequest(
-				"tenantA", "tenantA@example.com",
-				imtauth::ITenantInfo::Partner, imtauth::ITenantInfo::Partner);
-
-	QVERIFY(!m_managerPtr->AcceptConnectionRequest(requestId, "tenantA"));
-	QCOMPARE(m_managerPtr->m_relationshipCount, 0);
+auto codeA = m_managerPtr->GetConnectionCode("tenantA");
+QByteArray requestId = m_managerPtr->CreateConnectionRequest("tenantA", codeA.connectionCode);
+QVERIFY(requestId.isEmpty());
 }
 
 
-void CTenantConnectionRequestTest::testAcceptRequest_Expired_Fails()
+void CTenantConnectionRequestTest::testCreateConnectionRequest_DisabledByCode_Fails()
 {
-	QByteArray requestId = m_managerPtr->CreateConnectionRequest(
-				"tenantA", "tenantB@example.com",
-				imtauth::ITenantInfo::Partner, imtauth::ITenantInfo::Partner,
-				QString(), "2000-01-01T00:00:00.000Z");
-
-	QVERIFY(!m_managerPtr->AcceptConnectionRequest(requestId, "tenantB"));
-
-	imtauth::TenantConnectionRequestInfo info = m_managerPtr->GetConnectionRequest(requestId);
-	QCOMPARE(info.status, imtauth::TCS_EXPIRED);
+m_managerPtr->GetConnectionCode("tenantB");
+m_managerPtr->SetAllowConnectionsByCode("tenantB", false);
+auto codeB = m_managerPtr->GetConnectionCode("tenantB");
+QByteArray requestId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
+QVERIFY(requestId.isEmpty());
 }
 
 
-void CTenantConnectionRequestTest::testAcceptConnectCode_Success()
+void CTenantConnectionRequestTest::testCreateConnectionRequest_DuplicateConnection_Fails()
 {
-	QString code;
-	m_managerPtr->CreateConnectCode(
-				"tenantA", imtauth::ITenantInfo::Supplier, imtauth::ITenantInfo::Customer,
-				QString(), QString(), code);
+auto codeB = m_managerPtr->GetConnectionCode("tenantB");
+QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
+m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
 
-	QByteArray requestId = m_managerPtr->AcceptConnectCode(code, "tenantB");
-	QVERIFY(!requestId.isEmpty());
-
-	imtauth::TenantConnectionRequestInfo info = m_managerPtr->GetConnectionRequest(requestId);
-	QCOMPARE(info.status, imtauth::TCS_ACCEPTED);
-	QCOMPARE(info.targetTenantId, QByteArray("tenantB"));
-	QCOMPARE(m_managerPtr->m_relationshipCount, 2);
+// Try to create another connection request to same pair
+QByteArray duplicateReqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
+QVERIFY(duplicateReqId.isEmpty());
 }
 
 
-void CTenantConnectionRequestTest::testAcceptConnectCode_Unknown_Fails()
+void CTenantConnectionRequestTest::testApproveConnectionRequest_CreatesConnection()
 {
-	QVERIFY(m_managerPtr->AcceptConnectCode("DOES-NOT-EXIST", "tenantB").isEmpty());
+auto codeB = m_managerPtr->GetConnectionCode("tenantB");
+QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
+
+QByteArray connId = m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
+QVERIFY(!connId.isEmpty());
+QCOMPARE(m_managerPtr->m_requests.first().status, imtauth::ITenantConnectionRequestInfo::CRS_APPROVED);
+QCOMPARE(m_managerPtr->m_connections.size(), 1);
+QCOMPARE(m_managerPtr->m_connections.first().status, imtauth::ITenantConnectionInfo::CS_ACTIVE);
 }
 
 
-void CTenantConnectionRequestTest::testRejectRequest_Pending()
+void CTenantConnectionRequestTest::testRejectConnectionRequest_Success()
 {
-	QByteArray requestId = m_managerPtr->CreateConnectionRequest(
-				"tenantA", "tenantB@example.com",
-				imtauth::ITenantInfo::Partner, imtauth::ITenantInfo::Partner);
+auto codeB = m_managerPtr->GetConnectionCode("tenantB");
+QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
 
-	QVERIFY(m_managerPtr->RejectConnectionRequest(requestId));
-	QCOMPARE(m_managerPtr->GetConnectionRequest(requestId).status, imtauth::TCS_REJECTED);
-	QCOMPARE(m_managerPtr->m_relationshipCount, 0);
+QVERIFY(m_managerPtr->RejectConnectionRequest(reqId, "tenantB"));
+QCOMPARE(m_managerPtr->m_requests.first().status, imtauth::ITenantConnectionRequestInfo::CRS_REJECTED);
 }
 
 
-void CTenantConnectionRequestTest::testRevokeRequest_Pending()
+void CTenantConnectionRequestTest::testCancelConnectionRequest_Success()
 {
-	QByteArray requestId = m_managerPtr->CreateConnectionRequest(
-				"tenantA", "tenantB@example.com",
-				imtauth::ITenantInfo::Partner, imtauth::ITenantInfo::Partner);
+auto codeB = m_managerPtr->GetConnectionCode("tenantB");
+QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
 
-	QVERIFY(m_managerPtr->RevokeConnectionRequest(requestId));
-	QCOMPARE(m_managerPtr->GetConnectionRequest(requestId).status, imtauth::TCS_REVOKED);
+QVERIFY(m_managerPtr->CancelConnectionRequest(reqId, "tenantA"));
+QCOMPARE(m_managerPtr->m_requests.first().status, imtauth::ITenantConnectionRequestInfo::CRS_CANCELED);
 }
 
 
-void CTenantConnectionRequestTest::testRejectRequest_NonPending_Fails()
+void CTenantConnectionRequestTest::testApproveConnectionRequest_NonPending_Fails()
 {
-	QByteArray requestId = m_managerPtr->CreateConnectionRequest(
-				"tenantA", "tenantB@example.com",
-				imtauth::ITenantInfo::Partner, imtauth::ITenantInfo::Partner);
+auto codeB = m_managerPtr->GetConnectionCode("tenantB");
+QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
+m_managerPtr->RejectConnectionRequest(reqId, "tenantB");
 
-	QVERIFY(m_managerPtr->AcceptConnectionRequest(requestId, "tenantB"));
-	// Cannot reject an already accepted request.
-	QVERIFY(!m_managerPtr->RejectConnectionRequest(requestId));
+QByteArray connId = m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
+QVERIFY(connId.isEmpty());
 }
 
+
+void CTenantConnectionRequestTest::testApproveConnectionRequest_WrongTenant_Fails()
+{
+auto codeB = m_managerPtr->GetConnectionCode("tenantB");
+QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
+
+QByteArray connId = m_managerPtr->ApproveConnectionRequest(reqId, "tenantA");
+QVERIFY(connId.isEmpty());
+}
+
+
+// --- Connections ---
+
+void CTenantConnectionRequestTest::testGetConnections_ReturnsActive()
+{
+auto codeB = m_managerPtr->GetConnectionCode("tenantB");
+QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
+m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
+
+auto connectionsA = m_managerPtr->GetConnectionIds("tenantA");
+QCOMPARE(connectionsA.size(), 1);
+auto connectionsB = m_managerPtr->GetConnectionIds("tenantB");
+QCOMPARE(connectionsB.size(), 1);
+auto connectionsC = m_managerPtr->GetConnectionIds("tenantC");
+QCOMPARE(connectionsC.size(), 0);
+}
+
+
+void CTenantConnectionRequestTest::testRemoveConnection_CascadesRelationships()
+{
+auto codeB = m_managerPtr->GetConnectionCode("tenantB");
+QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
+QByteArray connId = m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
+
+// Create a relationship via proposal
+QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(createProposalInfo(connId, "tenantA", "tenantB"));
+m_managerPtr->ApproveRelationshipProposal(proposalId, "tenantB");
+
+QCOMPARE(m_managerPtr->GetTenantRelationshipIds("tenantA").size(), 1);
+
+// Remove connection - should cascade
+QVERIFY(m_managerPtr->RemoveConnection(connId, "tenantA"));
+QCOMPARE(m_managerPtr->m_connections.first().status, imtauth::ITenantConnectionInfo::CS_REMOVED);
+QCOMPARE(m_managerPtr->GetTenantRelationshipIds("tenantA").size(), 0);
+}
+
+
+// --- Relationship Proposals ---
+
+void CTenantConnectionRequestTest::testCreateRelationshipProposal_Success()
+{
+auto codeB = m_managerPtr->GetConnectionCode("tenantB");
+QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
+QByteArray connId = m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
+
+QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(createProposalInfo(connId, "tenantA", "tenantB"));
+QVERIFY(!proposalId.isEmpty());
+QCOMPARE(m_managerPtr->m_proposals.size(), 1);
+QCOMPARE(m_managerPtr->m_proposals.first().status, imtauth::ITenantRelationshipProposalInfo::RPS_APPROVED_BY_INITIATOR);
+}
+
+
+void CTenantConnectionRequestTest::testCreateRelationshipProposal_NoConnection_Fails()
+{
+QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(createProposalInfo("nonexistent-conn", "tenantA", "tenantB"));
+QVERIFY(proposalId.isEmpty());
+}
+
+
+void CTenantConnectionRequestTest::testApproveRelationshipProposal_CreatesRelationship()
+{
+auto codeB = m_managerPtr->GetConnectionCode("tenantB");
+QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
+QByteArray connId = m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
+
+QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(createProposalInfo(connId, "tenantA", "tenantB"));
+QByteArray relId = m_managerPtr->ApproveRelationshipProposal(proposalId, "tenantB");
+QVERIFY(!relId.isEmpty());
+QCOMPARE(m_managerPtr->m_proposals.first().status, imtauth::ITenantRelationshipProposalInfo::RPS_APPLIED);
+
+QByteArrayList relIds = m_managerPtr->GetTenantRelationshipIds("tenantA");
+QCOMPARE(relIds.size(), 1);
+QCOMPARE(relIds.first(), relId);
+}
+
+
+void CTenantConnectionRequestTest::testRejectRelationshipProposal_Success()
+{
+auto codeB = m_managerPtr->GetConnectionCode("tenantB");
+QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
+QByteArray connId = m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
+
+QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(createProposalInfo(connId, "tenantA", "tenantB"));
+QVERIFY(m_managerPtr->RejectRelationshipProposal(proposalId, "tenantB"));
+QCOMPARE(m_managerPtr->m_proposals.first().status, imtauth::ITenantRelationshipProposalInfo::RPS_REJECTED);
+}
+
+
+void CTenantConnectionRequestTest::testCancelRelationshipProposal_Success()
+{
+auto codeB = m_managerPtr->GetConnectionCode("tenantB");
+QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
+QByteArray connId = m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
+
+QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(createProposalInfo(connId, "tenantA", "tenantB"));
+QVERIFY(m_managerPtr->CancelRelationshipProposal(proposalId, "tenantA"));
+QCOMPARE(m_managerPtr->m_proposals.first().status, imtauth::ITenantRelationshipProposalInfo::RPS_CANCELED);
+}
+
+
+void CTenantConnectionRequestTest::testApproveRelationshipProposal_WrongTenant_Fails()
+{
+auto codeB = m_managerPtr->GetConnectionCode("tenantB");
+QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
+QByteArray connId = m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
+
+QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(createProposalInfo(connId, "tenantA", "tenantB"));
+// TenantA is initiator, not counterparty
+QByteArray relId = m_managerPtr->ApproveRelationshipProposal(proposalId, "tenantA");
+QVERIFY(relId.isEmpty());
+}
+
+
+// --- Relationships ---
+
+void CTenantConnectionRequestTest::testGetTenantRelationships_ReturnsActive()
+{
+auto codeB = m_managerPtr->GetConnectionCode("tenantB");
+QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
+QByteArray connId = m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
+
+QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(createProposalInfo(connId, "tenantA", "tenantB"));
+m_managerPtr->ApproveRelationshipProposal(proposalId, "tenantB");
+
+QByteArrayList relsA = m_managerPtr->GetTenantRelationshipIds("tenantA");
+QByteArrayList relsB = m_managerPtr->GetTenantRelationshipIds("tenantB");
+QCOMPARE(relsA.size(), 1);
+QCOMPARE(relsB.size(), 1);
+QCOMPARE(relsA.first(), relsB.first());
+}
+
+
+void CTenantConnectionRequestTest::testRemoveTenantRelationship_Archives()
+{
+auto codeB = m_managerPtr->GetConnectionCode("tenantB");
+QByteArray reqId = m_managerPtr->CreateConnectionRequest("tenantA", codeB.connectionCode);
+QByteArray connId = m_managerPtr->ApproveConnectionRequest(reqId, "tenantB");
+
+QByteArray proposalId = m_managerPtr->CreateRelationshipProposal(createProposalInfo(connId, "tenantA", "tenantB"));
+QByteArray relationshipId = m_managerPtr->ApproveRelationshipProposal(proposalId, "tenantB");
+
+QVERIFY(m_managerPtr->RemoveTenantRelationship("tenantA", relationshipId));
+QCOMPARE(m_managerPtr->GetTenantRelationshipIds("tenantA").size(), 0);
+}
+
+
+QTEST_MAIN(CTenantConnectionRequestTest)

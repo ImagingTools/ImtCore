@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6390" Description="ACF"/>
-            <Version Id="1" Number="2306" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -80,26 +80,32 @@
         <Element Id="TenantDatabaseDelegate" PackageId="ImtAuthDbPck" ComponentId="TenantDatabaseDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="AutoCreatePermissionsTable" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="AutoCreateTable" Type="Boolean" ExportId="">
+                    <AttributeInfo Id="AutoCreateInvitationsTable" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
                     <AttributeInfo Id="AutoCreateMembershipsTable" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="AutoCreateInvitationsTable" Type="Boolean" ExportId="">
+                    <AttributeInfo Id="AutoCreatePermissionsTable" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="CreatePermissionsTableScriptPath" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value=":/SQL/Postgres/CreateTenantPermissionsTable.sql"/>
+                    <AttributeInfo Id="AutoCreateRelationshipsTable" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AutoCreateTable" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CreateInvitationsTableScriptPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value=":/SQL/Postgres/CreateTenantInvitationsTable.sql"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CreateMembershipsTableScriptPath" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value=":/SQL/Postgres/CreateTenantMembershipsTable.sql"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="CreateInvitationsTableScriptPath" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value=":/SQL/Postgres/CreateTenantInvitationsTable.sql"/>
+                    <AttributeInfo Id="CreatePermissionsTableScriptPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value=":/SQL/Postgres/CreateTenantPermissionsTable.sql"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CreateRelationshipsTableScriptPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value=":/SQL/Postgres/CreateTenantRelationshipsTable.sql"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CreateTableScriptPath" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value=":/SQL/Postgres/CreateTenantsTable.sql"/>

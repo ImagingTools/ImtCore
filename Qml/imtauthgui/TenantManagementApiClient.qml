@@ -64,9 +64,7 @@ QtObject {
 	signal userDataReceived(var data)
 
 	// --- Cross-org grants ---
-	signal crossOrgGrantCreated(string grantId)
-	signal crossOrgGrantRevoked(string grantId)
-	signal crossOrgGrantsReceived(var grants)
+	signal crossOrgGrantsRemoved()
 
 	// --- Cooperation contracts ---
 	signal contractCreated(string contractId)
@@ -74,18 +72,33 @@ QtObject {
 	signal contractTerminated(string contractId)
 	signal contractsReceived(var contracts)
 
-	// --- Tenant relationships (asymmetric) ---
-	signal tenantRelationshipAdded(string relationshipId)
-	signal tenantRelationshipRemoved(string relationshipId)
-	signal tenantRelationshipsReceived(var relationships)
+	// --- Connection Code ---
+	signal connectionCodeReceived(string code, bool allowByCode)
+	signal connectionCodeRegenerated(string newCode)
+	signal allowConnectionsByCodeChanged(bool allow)
 
-	// --- Tenant connection requests (discovery) ---
+	// --- Connection Requests ---
 	signal connectionRequestCreated(string requestId)
-	signal connectCodeCreated(string requestId, string connectCode)
-	signal connectionRequestAccepted(string requestId)
-	signal connectionRequestRejected(string requestId)
-	signal connectionRequestRevoked(string requestId)
-	signal connectionRequestsReceived(var requests)
+	signal connectionRequestError(string errorMessage)
+	signal connectionRequestApproved(string connectionId)
+	signal connectionRequestRejected()
+	signal connectionRequestCanceled()
+	signal connectionRequestsReceived()
+
+	// --- Connections ---
+	signal connectionsReceived()
+	signal connectionRemoved(string connectionId)
+
+	// --- Tenant Relationships ---
+	signal tenantRelationshipRemoved()
+	signal tenantRelationshipsReceived()
+
+	// --- Relationship Proposals ---
+	signal relationshipProposalCreated()
+	signal relationshipProposalApproved(string relationshipId)
+	signal relationshipProposalRejected()
+	signal relationshipProposalCanceled()
+	signal relationshipProposalsReceived()
 
 	// --- Cross-tenant messages (phase 2) ---
 	signal crossTenantMessageSent(string messageId)
@@ -107,9 +120,8 @@ QtObject {
 	signal subscriptionInvitationRejected(var notification)
 	signal subscriptionOwnershipTransferred(var notification)
 
-	// --- Real-time cross-tenant message subscription notifications ---
-	signal subscriptionCrossTenantMessageReceived(var notification)
-	signal subscriptionCrossTenantMessageStatusChanged(var notification)
+	// --- Real-time connection notifications ---
+	signal subscriptionConnectionNotification(var notification)
 
 	// --- Stub methods (overridden by concrete implementations) ---
 	function createInvitation(tenantId, userId, role) {}
@@ -143,56 +155,58 @@ QtObject {
 	function fetchPermissions() {}
 
 	// --- Cross-org grants ---
-	// Model holding the cross-org grants for the current tenant (see
-	// crossOrgGrantsReceived for the raw payload).
-	property var crossOrgGrantsModel: null
-	// List data providers for filterable entity selectors
+	property var crossOrgGrantDocumentManager: null
+	property var crossOrgGrantsListDataProvider: null
 	property var tenantsListDataProvider: null
 	property var tenantRelationshipsListDataProvider: null
-	function fetchCrossOrgGrants(tenantId) {}
-	function createCrossOrgGrant(sourceTenantId, targetTenantId, relationshipId, accessLevel, resourceScope, targetTeamId, description, expiresAt) {}
 	function revokeCrossOrgGrant(grantId) {}
+	function removeCrossOrgGrants(grantIds) {}
 
 	// --- Cooperation contracts ---
-	// Model holding the contracts for the current tenant (see
-	// contractsReceived for the raw payload).
 	property var contractsModel: null
 	function fetchContracts(tenantId) {}
 	function createContract(relationshipId, sourceTenantId, targetTenantId, scope, validFrom, validUntil, description, terms) {}
 	function updateContractStatus(contractId, status) {}
 	function terminateContract(contractId) {}
 
-	// --- Tenant relationships (asymmetric) ---
-	// Model holding the relationships for the current tenant (see
-	// tenantRelationshipsReceived for the raw payload).
-	property var tenantRelationshipsModel: null
-	function fetchTenantRelationships(tenantId) {}
-	function addTenantRelationship(sourceTenantId, targetTenantId, sourceRole, targetRole, scope, validFrom, validUntil, description) {}
-	function removeTenantRelationship(tenantId, relationshipId) {}
+	// --- Connection Code ---
+	function getConnectionCode(tenantId) {}
+	function regenerateConnectionCode(tenantId) {}
+	function setAllowConnectionsByCode(tenantId, allow) {}
 
-	// --- Tenant connection requests (discovery) ---
-	// Model holding the connection requests for the current tenant (see
-	// connectionRequestsReceived for the raw payload).
+	// --- Connection Requests ---
 	property var connectionRequestsModel: null
 	function fetchConnectionRequests(tenantId) {}
-	function createConnectionRequest(sourceTenantId, targetIdentifier, proposedSourceRole, proposedTargetRole, message, expiresAt) {}
-	function createConnectCode(sourceTenantId, proposedSourceRole, proposedTargetRole, message, expiresAt) {}
-	function acceptConnectionRequest(requestId, acceptingTenantId) {}
-	function acceptConnectCode(connectCode, acceptingTenantId) {}
-	function rejectConnectionRequest(requestId) {}
-	function revokeConnectionRequest(requestId) {}
+	function createConnectionRequest(sourceTenantId, connectionCode, message) {}
+	function approveConnectionRequest(requestId, tenantId) {}
+	function rejectConnectionRequest(requestId, tenantId) {}
+	function cancelConnectionRequest(requestId, tenantId) {}
+
+	// --- Connections ---
+	property var connectionsModel: null
+	function fetchConnections(tenantId) {}
+	function removeConnection(connectionId, tenantId) {}
+
+	// --- Tenant Relationships ---
+	property var tenantRelationshipsModel: null
+	function fetchTenantRelationships(tenantId) {}
+	function removeTenantRelationship(tenantId, relationshipId) {}
+
+	// --- Relationship Proposals ---
+	property var relationshipProposalsModel: null
+	function fetchRelationshipProposals(tenantId) {}
+	function createRelationshipProposal(connectionId, initiatorTenantId, proposalType, proposedSourceRole, proposedTargetRole, proposedScope, proposedDescription, message) {}
+	function approveRelationshipProposal(proposalId, tenantId) {}
+	function rejectRelationshipProposal(proposalId, tenantId) {}
+	function cancelRelationshipProposal(proposalId, tenantId) {}
 
 	// --- Cross-tenant messages (phase 2) ---
-	// Model holding the cross-tenant messages for the current tenant (see
-	// crossTenantMessagesReceived for the raw payload).
 	property var crossTenantMessagesModel: null
 	function fetchCrossTenantMessages(tenantId, direction) {}
 	function sendCrossTenantMessage(sourceTenantId, targetTenantId, relationshipId, messageType, payload, sourceObjectId, customType, expiresAt) {}
 	function updateCrossTenantMessageStatus(messageId, status, errorMessage) {}
 
 	// --- Order requests (phase 3) ---
-	// Model holding the order requests for the current tenant (see
-	// orderRequestsReceived for the raw payload).
 	property var orderRequestsModel: null
 	function fetchOrderRequests(tenantId) {}
 	function confirmOrderRequest(orderRequestId, note) {}

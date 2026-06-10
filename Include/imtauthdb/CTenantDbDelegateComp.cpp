@@ -57,6 +57,15 @@ void CTenantDbDelegateComp::OnComponentCreated()
 	if (!CreateAuxTableIfNeeded(autoCreateInvitations, QStringLiteral("TenantInvitations"), invitationsScriptPath)){
 		qWarning() << "CTenantDbDelegateComp: TenantInvitations table auto-creation failed";
 	}
+
+	const QByteArray relationshipsScriptPath = m_createRelationshipsTableScriptPathAttrPtr.IsValid()
+			? *m_createRelationshipsTableScriptPathAttrPtr : QByteArray();
+	const bool autoCreateRelationships = m_autoCreateRelationshipsTableAttrPtr.IsValid() && *m_autoCreateRelationshipsTableAttrPtr;
+	const QString relationshipsTableName = m_relationshipsTableNameAttrPtr.IsValid()
+			? QString::fromUtf8(*m_relationshipsTableNameAttrPtr) : QStringLiteral("TenantRelationships");
+	if (!CreateAuxTableIfNeeded(autoCreateRelationships, relationshipsTableName, relationshipsScriptPath)){
+		qWarning() << "CTenantDbDelegateComp: TenantRelationships table auto-creation failed";
+	}
 }
 
 
@@ -112,6 +121,12 @@ istd::IChangeableUniquePtr CTenantDbDelegateComp::CreateObjectFromRecord(
 		tenantPtr->SetParentTenantId(imtdb::VariantToByteArray(record.value("ParentTenantId")));
 	}
 
+	// Load relationship IDs from the TenantRelationships table
+	if (record.contains("Id")){
+		QByteArrayList relationshipIds = LoadTenantRelationshipIds(imtdb::VariantToByteArray(record.value("Id")));
+		tenantPtr->SetRelationshipIds(relationshipIds);
+	}
+
 	return tenantPtr;
 }
 
@@ -165,6 +180,10 @@ CTenantDbDelegateComp::NewObjectQuery CTenantDbDelegateComp::CreateNewObjectQuer
 		if (!permissions.isEmpty()){
 			result.query += CreatePermissionsInsertQuery(id.toUtf8(), permissions);
 		}
+		QByteArrayList relationshipIds = tenantPtr->GetRelationshipIds();
+		if (!relationshipIds.isEmpty()){
+			result.query += CreateRelationshipIdsInsertQuery(id.toUtf8(), relationshipIds);
+		}
 	}
 
 	return result;
@@ -206,7 +225,9 @@ QByteArray CTenantDbDelegateComp::CreateUpdateObjectQuery(
 		.arg(imtdb::EscapeSql(QString::fromUtf8(tenantPtr->GetParentTenantId())))
 		.arg(escapedId).toUtf8()
 		+ CreatePermissionsDeleteQuery(objectId)
-		+ CreatePermissionsInsertQuery(objectId, tenantPtr->GetTenantPermissions());
+		+ CreatePermissionsInsertQuery(objectId, tenantPtr->GetTenantPermissions())
+		+ CreateRelationshipIdsDeleteQuery(objectId)
+		+ CreateRelationshipIdsInsertQuery(objectId, tenantPtr->GetRelationshipIds());
 }
 
 
@@ -230,6 +251,7 @@ QByteArray CTenantDbDelegateComp::CreateDeleteObjectsQuery(
 	// Delete permissions first (explicit for DBs where FK CASCADE may not be enforced)
 	for (const QByteArray& id : objectIds){
 		result += CreatePermissionsDeleteQuery(id);
+		result += CreateRelationshipIdsDeleteQuery(id);
 	}
 
 	result += QString("DELETE FROM \"%1\" WHERE \"Id\" IN (%2);")
@@ -605,6 +627,52 @@ QByteArray CTenantDbDelegateComp::CreatePermissionsDeleteQuery(const QByteArray&
 
 	return QString("DELETE FROM \"%1\" WHERE \"TenantId\"='%2';")
 			.arg(permissionsTableName, escapedTenantId).toUtf8();
+}
+
+
+QByteArrayList CTenantDbDelegateComp::LoadTenantRelationshipIds(const QByteArray& tenantId) const
+{
+	QByteArrayList result;
+	if (!m_databaseEngineCompPtr.IsValid() || tenantId.isEmpty()){
+		return result;
+	}
+
+	QString relationshipsTableName = m_relationshipsTableNameAttrPtr.IsValid()
+			? QString::fromUtf8(*m_relationshipsTableNameAttrPtr) : QStringLiteral("TenantRelationships");
+	QString escapedTenantId = imtdb::EscapeSql(QString::fromUtf8(tenantId));
+
+	QString queryStr = QString("SELECT \"Id\" FROM \"%1\" WHERE \"SourceTenantId\"='%2' OR \"TargetTenantId\"='%2';")
+			.arg(relationshipsTableName, escapedTenantId);
+
+	QSqlError sqlError;
+	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(queryStr.toUtf8(), &sqlError);
+	if (sqlError.type() == QSqlError::NoError){
+		while (sqlQuery.next()){
+			QSqlRecord record = sqlQuery.record();
+			result.append(imtdb::VariantToByteArray(record.value("Id")));
+		}
+	}
+
+	return result;
+}
+
+
+QByteArray CTenantDbDelegateComp::CreateRelationshipIdsInsertQuery(const QByteArray& tenantId, const QByteArrayList& relationshipIds) const
+{
+	Q_UNUSED(tenantId);
+	Q_UNUSED(relationshipIds);
+	// Relationships are stored in TenantRelationships table with SourceTenantId/TargetTenantId columns.
+	// No separate junction table is needed; this method is kept for interface compatibility.
+	return QByteArray();
+}
+
+
+QByteArray CTenantDbDelegateComp::CreateRelationshipIdsDeleteQuery(const QByteArray& tenantId) const
+{
+	Q_UNUSED(tenantId);
+	// Relationships are stored in TenantRelationships table with SourceTenantId/TargetTenantId columns.
+	// No separate junction table is needed; this method is kept for interface compatibility.
+	return QByteArray();
 }
 
 

@@ -36,5 +36,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces/>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="ContractManager" ComponentId="ContractManager"/>
+    </ExportedComponents>
 </Acf>

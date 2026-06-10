@@ -4,7 +4,16 @@
 
 // ImtCore includes
 #include <imtauth/CTenantFilterParam.h>
+#include <imtauth/ITenantRelationshipInfo.h>
+#include <imtauth/ITenantRelationshipProposalInfo.h>
+#include <imtauth/ITenantConnectionRequestInfo.h>
+#include <imtauth/ITenantConnectionInfo.h>
+#include <imtauth/ICrossOrgGrant.h>
+#include <imtauth/IContract.h>
+#include <imtauth/ICrossTenantMessage.h>
+#include <imtauth/IOrderRequest.h>
 #include <imtgql/CGqlRequest.h>
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
 
 
 /**
@@ -636,6 +645,310 @@ inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRe
 	}
 
 	return CreateTenantFilterParam(gqlContextPtr->GetTenantId());
+}
+
+
+// --- SDL ↔ C++ Enum Converters ---
+
+// Relationship Role
+
+inline imtauth::ITenantRelationshipInfo::TenantRelationshipRole FromSdlRelationshipRole(sdl::V1_0::imtauth::TenantRelationshipRole role)
+{
+	switch (role){
+	case sdl::V1_0::imtauth::TenantRelationshipRole::Parent:
+		return imtauth::ITenantRelationshipInfo::TRR_PARENT;
+	case sdl::V1_0::imtauth::TenantRelationshipRole::Child:
+		return imtauth::ITenantRelationshipInfo::TRR_CHILD;
+	case sdl::V1_0::imtauth::TenantRelationshipRole::Supplier:
+		return imtauth::ITenantRelationshipInfo::TRR_SUPPLIER;
+	case sdl::V1_0::imtauth::TenantRelationshipRole::Customer:
+		return imtauth::ITenantRelationshipInfo::TRR_CUSTOMER;
+	case sdl::V1_0::imtauth::TenantRelationshipRole::Affiliate:
+		return imtauth::ITenantRelationshipInfo::TRR_AFFILIATE;
+	default:
+		return imtauth::ITenantRelationshipInfo::TRR_PARTNER;
+	}
+}
+
+
+inline sdl::V1_0::imtauth::TenantRelationshipRole ToSdlRelationshipRole(imtauth::ITenantRelationshipInfo::TenantRelationshipRole role)
+{
+	switch (role){
+	case imtauth::ITenantRelationshipInfo::TRR_PARENT:
+		return sdl::V1_0::imtauth::TenantRelationshipRole::Parent;
+	case imtauth::ITenantRelationshipInfo::TRR_CHILD:
+		return sdl::V1_0::imtauth::TenantRelationshipRole::Child;
+	case imtauth::ITenantRelationshipInfo::TRR_SUPPLIER:
+		return sdl::V1_0::imtauth::TenantRelationshipRole::Supplier;
+	case imtauth::ITenantRelationshipInfo::TRR_CUSTOMER:
+		return sdl::V1_0::imtauth::TenantRelationshipRole::Customer;
+	case imtauth::ITenantRelationshipInfo::TRR_AFFILIATE:
+		return sdl::V1_0::imtauth::TenantRelationshipRole::Affiliate;
+	default:
+		return sdl::V1_0::imtauth::TenantRelationshipRole::Partner;
+	}
+}
+
+
+// Relationship Status
+
+inline sdl::V1_0::imtauth::RelationshipStatus ToSdlRelationshipStatus(imtauth::ITenantRelationshipInfo::TenantRelationshipStatus status)
+{
+	switch (status){
+	case imtauth::ITenantRelationshipInfo::TRS_ARCHIVED:
+		return sdl::V1_0::imtauth::RelationshipStatus::Archived;
+	case imtauth::ITenantRelationshipInfo::TRS_PENDING_APPROVED:
+		return sdl::V1_0::imtauth::RelationshipStatus::PendingApproval;
+	default:
+		return sdl::V1_0::imtauth::RelationshipStatus::Active;
+	}
+}
+
+
+// Connection Request Status
+
+inline sdl::V1_0::imtauth::ConnectionRequestStatus ToSdlConnectionRequestStatus(imtauth::ITenantConnectionRequestInfo::ConnectionRequestStatus status)
+{
+	switch (status){
+	case imtauth::ITenantConnectionRequestInfo::CRS_APPROVED:
+		return sdl::V1_0::imtauth::ConnectionRequestStatus::Approved;
+	case imtauth::ITenantConnectionRequestInfo::CRS_REJECTED:
+		return sdl::V1_0::imtauth::ConnectionRequestStatus::Rejected;
+	case imtauth::ITenantConnectionRequestInfo::CRS_CANCELED:
+		return sdl::V1_0::imtauth::ConnectionRequestStatus::Canceled;
+	default:
+		return sdl::V1_0::imtauth::ConnectionRequestStatus::Pending;
+	}
+}
+
+
+// Connection Status
+
+inline sdl::V1_0::imtauth::ConnectionStatus ToSdlConnectionStatus(imtauth::ITenantConnectionInfo::ConnectionStatus status)
+{
+	switch (status){
+	case imtauth::ITenantConnectionInfo::CS_REMOVED:
+		return sdl::V1_0::imtauth::ConnectionStatus::Removed;
+	case imtauth::ITenantConnectionInfo::CS_SUSPENDED:
+		return sdl::V1_0::imtauth::ConnectionStatus::Suspended;
+	default:
+		return sdl::V1_0::imtauth::ConnectionStatus::Active;
+	}
+}
+
+
+// Relationship Proposal Type
+
+inline sdl::V1_0::imtauth::RelationshipProposalType ToSdlProposalType(imtauth::ITenantRelationshipProposalInfo::RelationshipProposalType type)
+{
+	switch (type){
+	case imtauth::ITenantRelationshipProposalInfo::RPT_UPDATE:
+		return sdl::V1_0::imtauth::RelationshipProposalType::Update;
+	case imtauth::ITenantRelationshipProposalInfo::RPT_DELETE:
+		return sdl::V1_0::imtauth::RelationshipProposalType::Delete;
+	default:
+		return sdl::V1_0::imtauth::RelationshipProposalType::Create;
+	}
+}
+
+
+inline imtauth::ITenantRelationshipProposalInfo::RelationshipProposalType FromSdlProposalType(sdl::V1_0::imtauth::RelationshipProposalType type)
+{
+	switch (type){
+	case sdl::V1_0::imtauth::RelationshipProposalType::Update:
+		return imtauth::ITenantRelationshipProposalInfo::RPT_UPDATE;
+	case sdl::V1_0::imtauth::RelationshipProposalType::Delete:
+		return imtauth::ITenantRelationshipProposalInfo::RPT_DELETE;
+	default:
+		return imtauth::ITenantRelationshipProposalInfo::RPT_CREATE;
+	}
+}
+
+
+// Relationship Proposal Status
+
+inline sdl::V1_0::imtauth::RelationshipProposalStatus ToSdlProposalStatus(imtauth::ITenantRelationshipProposalInfo::RelationshipProposalStatus status)
+{
+	switch (status){
+	case imtauth::ITenantRelationshipProposalInfo::RPS_APPROVED_BY_INITIATOR:
+		return sdl::V1_0::imtauth::RelationshipProposalStatus::ApprovedByInitiator;
+	case imtauth::ITenantRelationshipProposalInfo::RPS_APPROVED_BY_COUNTERPARTY:
+		return sdl::V1_0::imtauth::RelationshipProposalStatus::ApprovedByCounterparty;
+	case imtauth::ITenantRelationshipProposalInfo::RPS_REJECTED:
+		return sdl::V1_0::imtauth::RelationshipProposalStatus::Rejected;
+	case imtauth::ITenantRelationshipProposalInfo::RPS_CANCELED:
+		return sdl::V1_0::imtauth::RelationshipProposalStatus::Canceled;
+	case imtauth::ITenantRelationshipProposalInfo::RPS_EXPIRED:
+		return sdl::V1_0::imtauth::RelationshipProposalStatus::Expired;
+	case imtauth::ITenantRelationshipProposalInfo::RPS_APPLIED:
+		return sdl::V1_0::imtauth::RelationshipProposalStatus::Applied;
+	default:
+		return sdl::V1_0::imtauth::RelationshipProposalStatus::Pending;
+	}
+}
+
+
+// Contract Status
+
+inline imtauth::ContractStatus FromSdlContractStatus(sdl::V1_0::imtauth::ContractStatus status)
+{
+	switch (status){
+	case sdl::V1_0::imtauth::ContractStatus::Active:
+		return imtauth::CTS_ACTIVE;
+	case sdl::V1_0::imtauth::ContractStatus::Expired:
+		return imtauth::CTS_EXPIRED;
+	case sdl::V1_0::imtauth::ContractStatus::Terminated:
+		return imtauth::CTS_TERMINATED;
+	case sdl::V1_0::imtauth::ContractStatus::Renewed:
+		return imtauth::CTS_RENEWED;
+	default:
+		return imtauth::CTS_DRAFT;
+	}
+}
+
+
+inline sdl::V1_0::imtauth::ContractStatus ToSdlContractStatus(imtauth::ContractStatus status)
+{
+	switch (status){
+	case imtauth::CTS_ACTIVE:
+		return sdl::V1_0::imtauth::ContractStatus::Active;
+	case imtauth::CTS_EXPIRED:
+		return sdl::V1_0::imtauth::ContractStatus::Expired;
+	case imtauth::CTS_TERMINATED:
+		return sdl::V1_0::imtauth::ContractStatus::Terminated;
+	case imtauth::CTS_RENEWED:
+		return sdl::V1_0::imtauth::ContractStatus::Renewed;
+	default:
+		return sdl::V1_0::imtauth::ContractStatus::Draft;
+	}
+}
+
+
+// Cross-Tenant Message Type
+
+inline sdl::V1_0::imtauth::CrossTenantMessageType ToSdlMessageType(imtauth::CrossTenantMessageType type)
+{
+	switch (type){
+	case imtauth::CTMT_ORDER_REQUEST:
+		return sdl::V1_0::imtauth::CrossTenantMessageType::OrderRequest;
+	case imtauth::CTMT_ORDER_CONFIRMATION:
+		return sdl::V1_0::imtauth::CrossTenantMessageType::OrderConfirmation;
+	case imtauth::CTMT_ORDER_REJECTION:
+		return sdl::V1_0::imtauth::CrossTenantMessageType::OrderRejection;
+	case imtauth::CTMT_ORDER_STATUS_UPDATE:
+		return sdl::V1_0::imtauth::CrossTenantMessageType::OrderStatusUpdate;
+	case imtauth::CTMT_ORDER_CANCELLATION:
+		return sdl::V1_0::imtauth::CrossTenantMessageType::OrderCancellation;
+	case imtauth::CTMT_DOCUMENT_SHARE:
+		return sdl::V1_0::imtauth::CrossTenantMessageType::DocumentShare;
+	default:
+		return sdl::V1_0::imtauth::CrossTenantMessageType::Custom;
+	}
+}
+
+
+inline imtauth::CrossTenantMessageType FromSdlMessageType(sdl::V1_0::imtauth::CrossTenantMessageType type)
+{
+	switch (type){
+	case sdl::V1_0::imtauth::CrossTenantMessageType::OrderRequest:
+		return imtauth::CTMT_ORDER_REQUEST;
+	case sdl::V1_0::imtauth::CrossTenantMessageType::OrderConfirmation:
+		return imtauth::CTMT_ORDER_CONFIRMATION;
+	case sdl::V1_0::imtauth::CrossTenantMessageType::OrderRejection:
+		return imtauth::CTMT_ORDER_REJECTION;
+	case sdl::V1_0::imtauth::CrossTenantMessageType::OrderStatusUpdate:
+		return imtauth::CTMT_ORDER_STATUS_UPDATE;
+	case sdl::V1_0::imtauth::CrossTenantMessageType::OrderCancellation:
+		return imtauth::CTMT_ORDER_CANCELLATION;
+	case sdl::V1_0::imtauth::CrossTenantMessageType::DocumentShare:
+		return imtauth::CTMT_DOCUMENT_SHARE;
+	default:
+		return imtauth::CTMT_CUSTOM;
+	}
+}
+
+
+// Cross-Tenant Message Status
+
+inline sdl::V1_0::imtauth::CrossTenantMessageStatus ToSdlMessageStatus(imtauth::CrossTenantMessageStatus status)
+{
+	switch (status){
+	case imtauth::CTMS_VALIDATED:
+		return sdl::V1_0::imtauth::CrossTenantMessageStatus::Validated;
+	case imtauth::CTMS_DELIVERED:
+		return sdl::V1_0::imtauth::CrossTenantMessageStatus::Delivered;
+	case imtauth::CTMS_ACKNOWLEDGED:
+		return sdl::V1_0::imtauth::CrossTenantMessageStatus::Acknowledged;
+	case imtauth::CTMS_PROCESSED:
+		return sdl::V1_0::imtauth::CrossTenantMessageStatus::Processed;
+	case imtauth::CTMS_FAILED:
+		return sdl::V1_0::imtauth::CrossTenantMessageStatus::Failed;
+	case imtauth::CTMS_EXPIRED:
+		return sdl::V1_0::imtauth::CrossTenantMessageStatus::Expired;
+	default:
+		return sdl::V1_0::imtauth::CrossTenantMessageStatus::Created;
+	}
+}
+
+
+inline imtauth::CrossTenantMessageStatus FromSdlMessageStatus(sdl::V1_0::imtauth::CrossTenantMessageStatus status)
+{
+	switch (status){
+	case sdl::V1_0::imtauth::CrossTenantMessageStatus::Validated:
+		return imtauth::CTMS_VALIDATED;
+	case sdl::V1_0::imtauth::CrossTenantMessageStatus::Delivered:
+		return imtauth::CTMS_DELIVERED;
+	case sdl::V1_0::imtauth::CrossTenantMessageStatus::Acknowledged:
+		return imtauth::CTMS_ACKNOWLEDGED;
+	case sdl::V1_0::imtauth::CrossTenantMessageStatus::Processed:
+		return imtauth::CTMS_PROCESSED;
+	case sdl::V1_0::imtauth::CrossTenantMessageStatus::Failed:
+		return imtauth::CTMS_FAILED;
+	case sdl::V1_0::imtauth::CrossTenantMessageStatus::Expired:
+		return imtauth::CTMS_EXPIRED;
+	default:
+		return imtauth::CTMS_CREATED;
+	}
+}
+
+
+// Order Request Status
+
+inline sdl::V1_0::imtauth::OrderRequestStatus ToSdlOrderStatus(imtauth::OrderRequestStatus status)
+{
+	switch (status){
+	case imtauth::ORS_CONFIRMED:
+		return sdl::V1_0::imtauth::OrderRequestStatus::Confirmed;
+	case imtauth::ORS_REJECTED:
+		return sdl::V1_0::imtauth::OrderRequestStatus::Rejected;
+	case imtauth::ORS_IN_PROGRESS:
+		return sdl::V1_0::imtauth::OrderRequestStatus::InProgress;
+	case imtauth::ORS_COMPLETED:
+		return sdl::V1_0::imtauth::OrderRequestStatus::Completed;
+	case imtauth::ORS_CANCELLED:
+		return sdl::V1_0::imtauth::OrderRequestStatus::Cancelled;
+	default:
+		return sdl::V1_0::imtauth::OrderRequestStatus::Received;
+	}
+}
+
+
+inline imtauth::OrderRequestStatus FromSdlOrderStatus(sdl::V1_0::imtauth::OrderRequestStatus status)
+{
+	switch (status){
+	case sdl::V1_0::imtauth::OrderRequestStatus::Confirmed:
+		return imtauth::ORS_CONFIRMED;
+	case sdl::V1_0::imtauth::OrderRequestStatus::Rejected:
+		return imtauth::ORS_REJECTED;
+	case sdl::V1_0::imtauth::OrderRequestStatus::InProgress:
+		return imtauth::ORS_IN_PROGRESS;
+	case sdl::V1_0::imtauth::OrderRequestStatus::Completed:
+		return imtauth::ORS_COMPLETED;
+	case sdl::V1_0::imtauth::OrderRequestStatus::Cancelled:
+		return imtauth::ORS_CANCELLED;
+	default:
+		return imtauth::ORS_RECEIVED;
+	}
 }
 
 

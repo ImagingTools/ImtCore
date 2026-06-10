@@ -22,7 +22,7 @@ bool CTimeFilter::operator==(const CTimeFilter& other) const
 }
 
 
-bool CTimeFilter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::imtbase::CTimeFilter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "TimeFilter", modelIndex);
 
@@ -54,11 +54,11 @@ bool CTimeFilter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex)
 }
 
 
-bool CTimeFilter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CTimeFilter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* timeRangeDataModelPtr = model.GetTreeItemModel("timeRange", modelIndex);
 	if (timeRangeDataModelPtr != nullptr){
-		timeRange = CTimeRange();
+		timeRange = V1_0::imtbase::CTimeRange();
 		const bool isTimeRangeRead = timeRange->ReadFromModel(*timeRangeDataModelPtr, modelIndex);
 		if (!isTimeRangeRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "timeRange").toLocal8Bit().constData();)
@@ -86,11 +86,11 @@ bool CTimeFilter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mode
 }
 
 
-bool CTimeFilter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CTimeFilter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* timeRangeDataModelPtr = model.GetTreeItemModel("timeRange", modelIndex);
 	if (timeRangeDataModelPtr != nullptr){
-		timeRange = CTimeRange();
+		timeRange = V1_0::imtbase::CTimeRange();
 		const bool isTimeRangeRead = timeRange->ReadFromModel(*timeRangeDataModelPtr, modelIndex);
 		if (!isTimeRangeRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "timeRange").toLocal8Bit().constData();)
@@ -118,7 +118,7 @@ bool CTimeFilter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int m
 }
 
 
-bool CTimeFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::imtbase::CTimeFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (timeRange){
 		::imtgql::CGqlParamObject timeRangeGqlObject;
@@ -149,10 +149,10 @@ bool CTimeFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) con
 }
 
 
-bool CTimeFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CTimeFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("timeRange") && (gqlObject.GetParamArgumentObjectPtr("timeRange") != nullptr)){
-		timeRange = CTimeRange();
+		timeRange = V1_0::imtbase::CTimeRange();
 		const bool isTimeRangeRead = timeRange->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("timeRange"));
 		if (!isTimeRangeRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "timeRange").toLocal8Bit().constData();)
@@ -177,10 +177,10 @@ bool CTimeFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObje
 }
 
 
-bool CTimeFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CTimeFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("timeRange") && (gqlObject.GetParamArgumentObjectPtr("timeRange") != nullptr)){
-		timeRange = CTimeRange();
+		timeRange = V1_0::imtbase::CTimeRange();
 		const bool isTimeRangeRead = timeRange->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("timeRange"));
 		if (!isTimeRangeRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "timeRange").toLocal8Bit().constData();)
@@ -205,7 +205,7 @@ bool CTimeFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 }
 
 
-bool CTimeFilter::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::imtbase::CTimeFilter::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (timeRange){
 		QJsonObject timeRangeJsonObject;
@@ -236,10 +236,10 @@ bool CTimeFilter::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CTimeFilter::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CTimeFilter::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("timeRange") && jsonObject["timeRange"].isObject()){
-		timeRange = CTimeRange();
+		timeRange = V1_0::imtbase::CTimeRange();
 		const bool isTimeRangeRead = timeRange->ReadFromJsonObject(jsonObject["timeRange"].toObject());
 		if (!isTimeRangeRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "timeRange").toLocal8Bit().constData();)
@@ -264,10 +264,10 @@ bool CTimeFilter::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CTimeFilter::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CTimeFilter::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("timeRange") && jsonObject["timeRange"].isObject()){
-		timeRange = CTimeRange();
+		timeRange = V1_0::imtbase::CTimeRange();
 		const bool isTimeRangeRead = timeRange->OptReadFromJsonObject(jsonObject["timeRange"].toObject());
 		if (!isTimeRangeRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "timeRange").toLocal8Bit().constData();)
@@ -292,7 +292,7 @@ bool CTimeFilter::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CFieldSortingInfo::GetVersionId()
 {
@@ -308,7 +308,7 @@ bool CFieldSortingInfo::operator==(const CFieldSortingInfo& other) const
 }
 
 
-bool CFieldSortingInfo::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::imtbase::CFieldSortingInfo::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "FieldSortingInfo", modelIndex);
 
@@ -331,7 +331,7 @@ bool CFieldSortingInfo::WriteToModel(::imtbase::CTreeItemModel& model, int model
 }
 
 
-bool CFieldSortingInfo::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CFieldSortingInfo::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant fieldIdData = model.GetData("fieldId", modelIndex);
 	if (fieldIdData.isNull()){
@@ -353,7 +353,7 @@ bool CFieldSortingInfo::ReadFromModel(const ::imtbase::CTreeItemModel& model, in
 }
 
 
-bool CFieldSortingInfo::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CFieldSortingInfo::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant fieldIdData = model.GetData("fieldId", modelIndex);
 	if (!fieldIdData.isNull()){
@@ -369,7 +369,7 @@ bool CFieldSortingInfo::OptReadFromModel(const ::imtbase::CTreeItemModel& model,
 }
 
 
-bool CFieldSortingInfo::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::imtbase::CFieldSortingInfo::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!fieldId){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId").toLocal8Bit().constData();)
@@ -391,7 +391,7 @@ bool CFieldSortingInfo::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObjec
 }
 
 
-bool CFieldSortingInfo::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CFieldSortingInfo::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("fieldId") || (gqlObject["fieldId"].userType() != QMetaType::QString && gqlObject["fieldId"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId").toLocal8Bit().constData();)
@@ -411,7 +411,7 @@ bool CFieldSortingInfo::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 }
 
 
-bool CFieldSortingInfo::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CFieldSortingInfo::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("fieldId") && (gqlObject["fieldId"].userType() == QMetaType::QString || gqlObject["fieldId"].userType() == QMetaType::QByteArray)){
 		fieldId = gqlObject["fieldId"].toString();
@@ -425,14 +425,14 @@ bool CFieldSortingInfo::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject
 }
 
 
-bool CFieldSortingInfo::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::imtbase::CFieldSortingInfo::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!fieldId){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId").toLocal8Bit().constData();)
 
 		return false;
 	}
-	jsonObject["fieldId"] = QString::fromUtf8(*fieldId);
+	jsonObject["fieldId"] = QJsonValue::fromVariant(*fieldId);
 
 	if (!sortingOrder){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "sortingOrder").toLocal8Bit().constData();)
@@ -447,7 +447,7 @@ bool CFieldSortingInfo::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CFieldSortingInfo::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CFieldSortingInfo::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("fieldId") || ! jsonObject["fieldId"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId").toLocal8Bit().constData();)
@@ -467,7 +467,7 @@ bool CFieldSortingInfo::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CFieldSortingInfo::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CFieldSortingInfo::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("fieldId") && jsonObject["fieldId"].isString()){
 		fieldId = jsonObject["fieldId"].toString();
@@ -481,7 +481,7 @@ bool CFieldSortingInfo::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CFieldFilter::GetVersionId()
 {
@@ -499,7 +499,7 @@ bool CFieldFilter::operator==(const CFieldFilter& other) const
 }
 
 
-bool CFieldFilter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::imtbase::CFieldFilter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "FieldFilter", modelIndex);
 
@@ -575,7 +575,7 @@ bool CFieldFilter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex
 }
 
 
-bool CFieldFilter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CFieldFilter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant fieldIdData = model.GetData("fieldId", modelIndex);
 	if (fieldIdData.isNull()){
@@ -625,9 +625,9 @@ bool CFieldFilter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mod
 		return false;
 	}
 	int filterOperationsCount = filterOperationsModel->GetItemsCount();
-	imtsdl::TElementList<FilterOperation> filterOperationsList;
+	imtsdl::TElementList<V1_0::imtbase::FilterOperation> filterOperationsList;
 	for (int filterOperationsIndex = 0; filterOperationsIndex < filterOperationsCount; ++filterOperationsIndex){
-		FilterOperation filterOperationsData;
+		V1_0::imtbase::FilterOperation filterOperationsData;
 		QString filterOperationsStringValue = filterOperationsModel->GetData(QByteArray(), filterOperationsIndex).toString();
 		if(filterOperationsStringValue == "Not"){
 			filterOperationsData = FilterOperation::Not;
@@ -658,7 +658,7 @@ bool CFieldFilter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mod
 }
 
 
-bool CFieldFilter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CFieldFilter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	QVariant fieldIdData = model.GetData("fieldId", modelIndex);
 	if (!fieldIdData.isNull()){
@@ -695,9 +695,9 @@ bool CFieldFilter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 	::imtbase::CTreeItemModel* filterOperationsModel = model.GetTreeItemModel("filterOperations", modelIndex);
 	if (filterOperationsModel != nullptr){
 		int filterOperationsCount = filterOperationsModel->GetItemsCount();
-		imtsdl::TElementList<FilterOperation> filterOperationsList;
+		imtsdl::TElementList<V1_0::imtbase::FilterOperation> filterOperationsList;
 		for (int filterOperationsIndex = 0; filterOperationsIndex < filterOperationsCount; ++filterOperationsIndex){
-			FilterOperation filterOperationsData;
+			V1_0::imtbase::FilterOperation filterOperationsData;
 			QString filterOperationsStringValue = filterOperationsModel->GetData(QByteArray(), filterOperationsIndex).toString();
 			if(filterOperationsStringValue == "Not"){
 				filterOperationsData = FilterOperation::Not;
@@ -730,7 +730,7 @@ bool CFieldFilter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 }
 
 
-bool CFieldFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::imtbase::CFieldFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!fieldId){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId").toLocal8Bit().constData();)
@@ -804,7 +804,7 @@ bool CFieldFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) co
 }
 
 
-bool CFieldFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CFieldFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("fieldId") || (gqlObject["fieldId"].userType() != QMetaType::QString && gqlObject["fieldId"].userType() != QMetaType::QByteArray)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId").toLocal8Bit().constData();)
@@ -852,10 +852,10 @@ bool CFieldFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObj
 	const QVariant filterOperationsData = gqlObject["filterOperations"];
 	const QVariantList filterOperationsDataList = filterOperationsData.toList();
 	const qsizetype filterOperationsElementsCount = filterOperationsDataList.size();
-	filterOperations = imtsdl::TElementList<FilterOperation>();
+	filterOperations = imtsdl::TElementList<V1_0::imtbase::FilterOperation>();
 	for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperationsElementsCount; ++filterOperationsIndex){
 		const QString tempFilterOperations = filterOperationsDataList[filterOperationsIndex].toString();
-		FilterOperation filterOperationsDataValue;
+		V1_0::imtbase::FilterOperation filterOperationsDataValue;
 		if(tempFilterOperations == "Not"){
 			filterOperationsDataValue = FilterOperation::Not;
 		}
@@ -883,7 +883,7 @@ bool CFieldFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObj
 }
 
 
-bool CFieldFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CFieldFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("fieldId") && (gqlObject["fieldId"].userType() == QMetaType::QString || gqlObject["fieldId"].userType() == QMetaType::QByteArray)){
 		fieldId = gqlObject["fieldId"].toByteArray();
@@ -921,10 +921,10 @@ bool CFieldFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 		const QVariant filterOperationsData = gqlObject["filterOperations"];
 		const QVariantList filterOperationsDataList = filterOperationsData.toList();
 		const qsizetype filterOperationsElementsCount = filterOperationsDataList.size();
-		filterOperations = imtsdl::TElementList<FilterOperation>();
+		filterOperations = imtsdl::TElementList<V1_0::imtbase::FilterOperation>();
 		for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperationsElementsCount; ++filterOperationsIndex){
 			const QString tempFilterOperations = filterOperationsDataList[filterOperationsIndex].toString();
-			FilterOperation filterOperationsDataValue;
+			V1_0::imtbase::FilterOperation filterOperationsDataValue;
 			if(tempFilterOperations == "Not"){
 				filterOperationsDataValue = FilterOperation::Not;
 			}
@@ -953,7 +953,7 @@ bool CFieldFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 }
 
 
-bool CFieldFilter::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::imtbase::CFieldFilter::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (!fieldId){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId").toLocal8Bit().constData();)
@@ -1027,7 +1027,7 @@ bool CFieldFilter::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CFieldFilter::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CFieldFilter::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("fieldId") || ! jsonObject["fieldId"].isString()){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId").toLocal8Bit().constData();)
@@ -1074,10 +1074,10 @@ bool CFieldFilter::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 	const QJsonArray filterOperationsJsonArray = jsonObject["filterOperations"].toArray();
 	const qsizetype filterOperationsArrayCount = filterOperationsJsonArray.size();
-	filterOperations = imtsdl::TElementList<FilterOperation>();
+	filterOperations = imtsdl::TElementList<V1_0::imtbase::FilterOperation>();
 	for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperationsArrayCount; ++filterOperationsIndex){
 		const QString tempFilterOperations = filterOperationsJsonArray[filterOperationsIndex].toString();
-		FilterOperation filterOperationsDataValue;
+		V1_0::imtbase::FilterOperation filterOperationsDataValue;
 		if(tempFilterOperations == "Not"){
 			filterOperationsDataValue = FilterOperation::Not;
 		}
@@ -1105,7 +1105,7 @@ bool CFieldFilter::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CFieldFilter::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CFieldFilter::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("fieldId") && jsonObject["fieldId"].isString()){
 		fieldId = jsonObject["fieldId"].toString().toUtf8();
@@ -1139,10 +1139,10 @@ bool CFieldFilter::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("filterOperations") && jsonObject["filterOperations"].isArray()){
 		const QJsonArray filterOperationsJsonArray = jsonObject["filterOperations"].toArray();
 		const qsizetype filterOperationsArrayCount = filterOperationsJsonArray.size();
-		filterOperations = imtsdl::TElementList<FilterOperation>();
+		filterOperations = imtsdl::TElementList<V1_0::imtbase::FilterOperation>();
 		for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperationsArrayCount; ++filterOperationsIndex){
 			const QString tempFilterOperations = filterOperationsJsonArray[filterOperationsIndex].toString();
-			FilterOperation filterOperationsDataValue;
+			V1_0::imtbase::FilterOperation filterOperationsDataValue;
 			if(tempFilterOperations == "Not"){
 				filterOperationsDataValue = FilterOperation::Not;
 			}
@@ -1171,7 +1171,7 @@ bool CFieldFilter::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CGroupFilter::GetVersionId()
 {
@@ -1188,7 +1188,7 @@ bool CGroupFilter::operator==(const CGroupFilter& other) const
 }
 
 
-bool CGroupFilter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::imtbase::CGroupFilter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "GroupFilter", modelIndex);
 
@@ -1240,14 +1240,14 @@ bool CGroupFilter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex
 }
 
 
-bool CGroupFilter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CGroupFilter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* fieldFiltersModel = model.GetTreeItemModel("fieldFilters", modelIndex);
 	if (fieldFiltersModel != nullptr){
 		int fieldFiltersCount = fieldFiltersModel->GetItemsCount();
-		imtsdl::TElementList<CFieldFilter> fieldFiltersList;
+		imtsdl::TElementList<V1_0::imtbase::CFieldFilter> fieldFiltersList;
 		for (int fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersCount; ++fieldFiltersIndex){
-			CFieldFilter t_fieldFilters;
+			V1_0::imtbase::CFieldFilter t_fieldFilters;
 			if (!t_fieldFilters.ReadFromModel(*fieldFiltersModel, fieldFiltersIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "fieldFilters").toLocal8Bit().constData();)
 
@@ -1262,9 +1262,9 @@ bool CGroupFilter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mod
 	::imtbase::CTreeItemModel* groupFiltersModel = model.GetTreeItemModel("groupFilters", modelIndex);
 	if (groupFiltersModel != nullptr){
 		int groupFiltersCount = groupFiltersModel->GetItemsCount();
-		imtsdl::TElementList<CGroupFilter> groupFiltersList;
+		imtsdl::TElementList<V1_0::imtbase::CGroupFilter> groupFiltersList;
 		for (int groupFiltersIndex = 0; groupFiltersIndex < groupFiltersCount; ++groupFiltersIndex){
-			CGroupFilter t_groupFilters;
+			V1_0::imtbase::CGroupFilter t_groupFilters;
 			if (!t_groupFilters.ReadFromModel(*groupFiltersModel, groupFiltersIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "groupFilters").toLocal8Bit().constData();)
 
@@ -1299,14 +1299,14 @@ bool CGroupFilter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mod
 }
 
 
-bool CGroupFilter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CGroupFilter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* fieldFiltersModel = model.GetTreeItemModel("fieldFilters", modelIndex);
 	if (fieldFiltersModel != nullptr){
 		int fieldFiltersCount = fieldFiltersModel->GetItemsCount();
-		imtsdl::TElementList<CFieldFilter> fieldFiltersList;
+		imtsdl::TElementList<V1_0::imtbase::CFieldFilter> fieldFiltersList;
 		for (int fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersCount; ++fieldFiltersIndex){
-			CFieldFilter t_fieldFilters;
+			V1_0::imtbase::CFieldFilter t_fieldFilters;
 			if (!t_fieldFilters.OptReadFromModel(*fieldFiltersModel, fieldFiltersIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "fieldFilters").toLocal8Bit().constData();)
 
@@ -1321,9 +1321,9 @@ bool CGroupFilter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 	::imtbase::CTreeItemModel* groupFiltersModel = model.GetTreeItemModel("groupFilters", modelIndex);
 	if (groupFiltersModel != nullptr){
 		int groupFiltersCount = groupFiltersModel->GetItemsCount();
-		imtsdl::TElementList<CGroupFilter> groupFiltersList;
+		imtsdl::TElementList<V1_0::imtbase::CGroupFilter> groupFiltersList;
 		for (int groupFiltersIndex = 0; groupFiltersIndex < groupFiltersCount; ++groupFiltersIndex){
-			CGroupFilter t_groupFilters;
+			V1_0::imtbase::CGroupFilter t_groupFilters;
 			if (!t_groupFilters.OptReadFromModel(*groupFiltersModel, groupFiltersIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "groupFilters").toLocal8Bit().constData();)
 
@@ -1355,7 +1355,7 @@ bool CGroupFilter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 }
 
 
-bool CGroupFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::imtbase::CGroupFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (fieldFilters){
 		QList<::imtgql::CGqlParamObject> fieldFiltersDataObjectList;
@@ -1410,21 +1410,21 @@ bool CGroupFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) co
 }
 
 
-bool CGroupFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CGroupFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("fieldFilters")){
 		fieldFilters.emplace();
 	}
 	if (gqlObject.ContainsParam("fieldFilters") && (gqlObject.GetObjectsCount("fieldFilters") > 0)){
 		const qsizetype fieldFiltersElementsCount = gqlObject.GetObjectsCount("fieldFilters");
-		fieldFilters = imtsdl::TElementList<CFieldFilter>();
+		fieldFilters = imtsdl::TElementList<V1_0::imtbase::CFieldFilter>();
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersElementsCount; ++fieldFiltersIndex){
 			const ::imtgql::CGqlParamObject* fieldFiltersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("fieldFilters", fieldFiltersIndex);
 			if (fieldFiltersDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << fieldFiltersDataObjectPtr;
 				return false;
 			}
-			CFieldFilter tempFieldFilters;
+			V1_0::imtbase::CFieldFilter tempFieldFilters;
 			if (!tempFieldFilters.ReadFromGraphQlObject(*fieldFiltersDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "fieldFilters").toLocal8Bit().constData();)
 
@@ -1439,14 +1439,14 @@ bool CGroupFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObj
 	}
 	if (gqlObject.ContainsParam("groupFilters") && (gqlObject.GetObjectsCount("groupFilters") > 0)){
 		const qsizetype groupFiltersElementsCount = gqlObject.GetObjectsCount("groupFilters");
-		groupFilters = imtsdl::TElementList<CGroupFilter>();
+		groupFilters = imtsdl::TElementList<V1_0::imtbase::CGroupFilter>();
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFiltersElementsCount; ++groupFiltersIndex){
 			const ::imtgql::CGqlParamObject* groupFiltersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("groupFilters", groupFiltersIndex);
 			if (groupFiltersDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << groupFiltersDataObjectPtr;
 				return false;
 			}
-			CGroupFilter tempGroupFilters;
+			V1_0::imtbase::CGroupFilter tempGroupFilters;
 			if (!tempGroupFilters.ReadFromGraphQlObject(*groupFiltersDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "groupFilters").toLocal8Bit().constData();)
 
@@ -1478,21 +1478,21 @@ bool CGroupFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObj
 }
 
 
-bool CGroupFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CGroupFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("fieldFilters")){
 		fieldFilters.emplace();
 	}
 	if (gqlObject.ContainsParam("fieldFilters") && (gqlObject.GetObjectsCount("fieldFilters") > 0)){
 		const qsizetype fieldFiltersElementsCount = gqlObject.GetObjectsCount("fieldFilters");
-		fieldFilters = imtsdl::TElementList<CFieldFilter>();
+		fieldFilters = imtsdl::TElementList<V1_0::imtbase::CFieldFilter>();
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersElementsCount; ++fieldFiltersIndex){
 			const ::imtgql::CGqlParamObject* fieldFiltersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("fieldFilters", fieldFiltersIndex);
 			if (fieldFiltersDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << fieldFiltersDataObjectPtr;
 				return false;
 			}
-			CFieldFilter tempFieldFilters;
+			V1_0::imtbase::CFieldFilter tempFieldFilters;
 			if (!tempFieldFilters.OptReadFromGraphQlObject(*fieldFiltersDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "fieldFilters").toLocal8Bit().constData();)
 
@@ -1507,14 +1507,14 @@ bool CGroupFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 	}
 	if (gqlObject.ContainsParam("groupFilters") && (gqlObject.GetObjectsCount("groupFilters") > 0)){
 		const qsizetype groupFiltersElementsCount = gqlObject.GetObjectsCount("groupFilters");
-		groupFilters = imtsdl::TElementList<CGroupFilter>();
+		groupFilters = imtsdl::TElementList<V1_0::imtbase::CGroupFilter>();
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFiltersElementsCount; ++groupFiltersIndex){
 			const ::imtgql::CGqlParamObject* groupFiltersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("groupFilters", groupFiltersIndex);
 			if (groupFiltersDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << groupFiltersDataObjectPtr;
 				return false;
 			}
-			CGroupFilter tempGroupFilters;
+			V1_0::imtbase::CGroupFilter tempGroupFilters;
 			if (!tempGroupFilters.OptReadFromGraphQlObject(*groupFiltersDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "groupFilters").toLocal8Bit().constData();)
 
@@ -1543,7 +1543,7 @@ bool CGroupFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 }
 
 
-bool CGroupFilter::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::imtbase::CGroupFilter::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (fieldFilters){
 		QJsonArray newFieldFiltersArray;
@@ -1598,14 +1598,14 @@ bool CGroupFilter::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CGroupFilter::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CGroupFilter::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("fieldFilters") && jsonObject["fieldFilters"].isArray()){
 		const QJsonArray fieldFiltersJsonArray = jsonObject["fieldFilters"].toArray();
 		const qsizetype fieldFiltersArrayCount = fieldFiltersJsonArray.size();
-		fieldFilters = imtsdl::TElementList<CFieldFilter>();
+		fieldFilters = imtsdl::TElementList<V1_0::imtbase::CFieldFilter>();
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersArrayCount; ++fieldFiltersIndex){
-			CFieldFilter tempFieldFilters;
+			V1_0::imtbase::CFieldFilter tempFieldFilters;
 			if (!tempFieldFilters.ReadFromJsonObject(fieldFiltersJsonArray[fieldFiltersIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "fieldFilters").toLocal8Bit().constData();)
 
@@ -1618,9 +1618,9 @@ bool CGroupFilter::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("groupFilters") && jsonObject["groupFilters"].isArray()){
 		const QJsonArray groupFiltersJsonArray = jsonObject["groupFilters"].toArray();
 		const qsizetype groupFiltersArrayCount = groupFiltersJsonArray.size();
-		groupFilters = imtsdl::TElementList<CGroupFilter>();
+		groupFilters = imtsdl::TElementList<V1_0::imtbase::CGroupFilter>();
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFiltersArrayCount; ++groupFiltersIndex){
-			CGroupFilter tempGroupFilters;
+			V1_0::imtbase::CGroupFilter tempGroupFilters;
 			if (!tempGroupFilters.ReadFromJsonObject(groupFiltersJsonArray[groupFiltersIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "groupFilters").toLocal8Bit().constData();)
 
@@ -1652,14 +1652,14 @@ bool CGroupFilter::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CGroupFilter::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CGroupFilter::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("fieldFilters") && jsonObject["fieldFilters"].isArray()){
 		const QJsonArray fieldFiltersJsonArray = jsonObject["fieldFilters"].toArray();
 		const qsizetype fieldFiltersArrayCount = fieldFiltersJsonArray.size();
-		fieldFilters = imtsdl::TElementList<CFieldFilter>();
+		fieldFilters = imtsdl::TElementList<V1_0::imtbase::CFieldFilter>();
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersArrayCount; ++fieldFiltersIndex){
-			CFieldFilter tempFieldFilters;
+			V1_0::imtbase::CFieldFilter tempFieldFilters;
 			if (!tempFieldFilters.OptReadFromJsonObject(fieldFiltersJsonArray[fieldFiltersIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "fieldFilters").toLocal8Bit().constData();)
 
@@ -1672,9 +1672,9 @@ bool CGroupFilter::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("groupFilters") && jsonObject["groupFilters"].isArray()){
 		const QJsonArray groupFiltersJsonArray = jsonObject["groupFilters"].toArray();
 		const qsizetype groupFiltersArrayCount = groupFiltersJsonArray.size();
-		groupFilters = imtsdl::TElementList<CGroupFilter>();
+		groupFilters = imtsdl::TElementList<V1_0::imtbase::CGroupFilter>();
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFiltersArrayCount; ++groupFiltersIndex){
-			CGroupFilter tempGroupFilters;
+			V1_0::imtbase::CGroupFilter tempGroupFilters;
 			if (!tempGroupFilters.OptReadFromJsonObject(groupFiltersJsonArray[groupFiltersIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "groupFilters").toLocal8Bit().constData();)
 
@@ -1703,7 +1703,7 @@ bool CGroupFilter::OptReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-// serialize methods
+
 
 QByteArray CComplexCollectionFilter::GetVersionId()
 {
@@ -1721,7 +1721,7 @@ bool CComplexCollectionFilter::operator==(const CComplexCollectionFilter& other)
 }
 
 
-bool CComplexCollectionFilter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+bool V1_0::imtbase::CComplexCollectionFilter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
 {
 	model.SetData("__typename", "ComplexCollectionFilter", modelIndex);
 
@@ -1773,14 +1773,14 @@ bool CComplexCollectionFilter::WriteToModel(::imtbase::CTreeItemModel& model, in
 }
 
 
-bool CComplexCollectionFilter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CComplexCollectionFilter::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* sortingInfoModel = model.GetTreeItemModel("sortingInfo", modelIndex);
 	if (sortingInfoModel != nullptr){
 		int sortingInfoCount = sortingInfoModel->GetItemsCount();
-		imtsdl::TElementList<CFieldSortingInfo> sortingInfoList;
+		imtsdl::TElementList<V1_0::imtbase::CFieldSortingInfo> sortingInfoList;
 		for (int sortingInfoIndex = 0; sortingInfoIndex < sortingInfoCount; ++sortingInfoIndex){
-			CFieldSortingInfo t_sortingInfo;
+			V1_0::imtbase::CFieldSortingInfo t_sortingInfo;
 			if (!t_sortingInfo.ReadFromModel(*sortingInfoModel, sortingInfoIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "sortingInfo").toLocal8Bit().constData();)
 
@@ -1794,7 +1794,7 @@ bool CComplexCollectionFilter::ReadFromModel(const ::imtbase::CTreeItemModel& mo
 
 	::imtbase::CTreeItemModel* fieldsFilterDataModelPtr = model.GetTreeItemModel("fieldsFilter", modelIndex);
 	if (fieldsFilterDataModelPtr != nullptr){
-		fieldsFilter = CGroupFilter();
+		fieldsFilter = V1_0::imtbase::CGroupFilter();
 		const bool isFieldsFilterRead = fieldsFilter->ReadFromModel(*fieldsFilterDataModelPtr, modelIndex);
 		if (!isFieldsFilterRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "fieldsFilter").toLocal8Bit().constData();)
@@ -1805,7 +1805,7 @@ bool CComplexCollectionFilter::ReadFromModel(const ::imtbase::CTreeItemModel& mo
 
 	::imtbase::CTreeItemModel* timeFilterDataModelPtr = model.GetTreeItemModel("timeFilter", modelIndex);
 	if (timeFilterDataModelPtr != nullptr){
-		timeFilter = CTimeFilter();
+		timeFilter = V1_0::imtbase::CTimeFilter();
 		const bool isTimeFilterRead = timeFilter->ReadFromModel(*timeFilterDataModelPtr, modelIndex);
 		if (!isTimeFilterRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "timeFilter").toLocal8Bit().constData();)
@@ -1830,14 +1830,14 @@ bool CComplexCollectionFilter::ReadFromModel(const ::imtbase::CTreeItemModel& mo
 }
 
 
-bool CComplexCollectionFilter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+bool V1_0::imtbase::CComplexCollectionFilter::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
 {
 	::imtbase::CTreeItemModel* sortingInfoModel = model.GetTreeItemModel("sortingInfo", modelIndex);
 	if (sortingInfoModel != nullptr){
 		int sortingInfoCount = sortingInfoModel->GetItemsCount();
-		imtsdl::TElementList<CFieldSortingInfo> sortingInfoList;
+		imtsdl::TElementList<V1_0::imtbase::CFieldSortingInfo> sortingInfoList;
 		for (int sortingInfoIndex = 0; sortingInfoIndex < sortingInfoCount; ++sortingInfoIndex){
-			CFieldSortingInfo t_sortingInfo;
+			V1_0::imtbase::CFieldSortingInfo t_sortingInfo;
 			if (!t_sortingInfo.OptReadFromModel(*sortingInfoModel, sortingInfoIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "sortingInfo").toLocal8Bit().constData();)
 
@@ -1851,7 +1851,7 @@ bool CComplexCollectionFilter::OptReadFromModel(const ::imtbase::CTreeItemModel&
 
 	::imtbase::CTreeItemModel* fieldsFilterDataModelPtr = model.GetTreeItemModel("fieldsFilter", modelIndex);
 	if (fieldsFilterDataModelPtr != nullptr){
-		fieldsFilter = CGroupFilter();
+		fieldsFilter = V1_0::imtbase::CGroupFilter();
 		const bool isFieldsFilterRead = fieldsFilter->ReadFromModel(*fieldsFilterDataModelPtr, modelIndex);
 		if (!isFieldsFilterRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "fieldsFilter").toLocal8Bit().constData();)
@@ -1862,7 +1862,7 @@ bool CComplexCollectionFilter::OptReadFromModel(const ::imtbase::CTreeItemModel&
 
 	::imtbase::CTreeItemModel* timeFilterDataModelPtr = model.GetTreeItemModel("timeFilter", modelIndex);
 	if (timeFilterDataModelPtr != nullptr){
-		timeFilter = CTimeFilter();
+		timeFilter = V1_0::imtbase::CTimeFilter();
 		const bool isTimeFilterRead = timeFilter->ReadFromModel(*timeFilterDataModelPtr, modelIndex);
 		if (!isTimeFilterRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "timeFilter").toLocal8Bit().constData();)
@@ -1887,7 +1887,7 @@ bool CComplexCollectionFilter::OptReadFromModel(const ::imtbase::CTreeItemModel&
 }
 
 
-bool CComplexCollectionFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+bool V1_0::imtbase::CComplexCollectionFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (sortingInfo){
 		QList<::imtgql::CGqlParamObject> sortingInfoDataObjectList;
@@ -1939,21 +1939,21 @@ bool CComplexCollectionFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject& g
 }
 
 
-bool CComplexCollectionFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CComplexCollectionFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("sortingInfo")){
 		sortingInfo.emplace();
 	}
 	if (gqlObject.ContainsParam("sortingInfo") && (gqlObject.GetObjectsCount("sortingInfo") > 0)){
 		const qsizetype sortingInfoElementsCount = gqlObject.GetObjectsCount("sortingInfo");
-		sortingInfo = imtsdl::TElementList<CFieldSortingInfo>();
+		sortingInfo = imtsdl::TElementList<V1_0::imtbase::CFieldSortingInfo>();
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfoElementsCount; ++sortingInfoIndex){
 			const ::imtgql::CGqlParamObject* sortingInfoDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("sortingInfo", sortingInfoIndex);
 			if (sortingInfoDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << sortingInfoDataObjectPtr;
 				return false;
 			}
-			CFieldSortingInfo tempSortingInfo;
+			V1_0::imtbase::CFieldSortingInfo tempSortingInfo;
 			if (!tempSortingInfo.ReadFromGraphQlObject(*sortingInfoDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "sortingInfo").toLocal8Bit().constData();)
 
@@ -1964,7 +1964,7 @@ bool CComplexCollectionFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 	}
 
 	if (gqlObject.ContainsParam("fieldsFilter") && (gqlObject.GetParamArgumentObjectPtr("fieldsFilter") != nullptr)){
-		fieldsFilter = CGroupFilter();
+		fieldsFilter = V1_0::imtbase::CGroupFilter();
 		const bool isFieldsFilterRead = fieldsFilter->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("fieldsFilter"));
 		if (!isFieldsFilterRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "fieldsFilter").toLocal8Bit().constData();)
@@ -1974,7 +1974,7 @@ bool CComplexCollectionFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 	}
 
 	if (gqlObject.ContainsParam("timeFilter") && (gqlObject.GetParamArgumentObjectPtr("timeFilter") != nullptr)){
-		timeFilter = CTimeFilter();
+		timeFilter = V1_0::imtbase::CTimeFilter();
 		const bool isTimeFilterRead = timeFilter->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("timeFilter"));
 		if (!isTimeFilterRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "timeFilter").toLocal8Bit().constData();)
@@ -2001,21 +2001,21 @@ bool CComplexCollectionFilter::ReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 }
 
 
-bool CComplexCollectionFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+bool V1_0::imtbase::CComplexCollectionFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (gqlObject.ContainsParam("sortingInfo")){
 		sortingInfo.emplace();
 	}
 	if (gqlObject.ContainsParam("sortingInfo") && (gqlObject.GetObjectsCount("sortingInfo") > 0)){
 		const qsizetype sortingInfoElementsCount = gqlObject.GetObjectsCount("sortingInfo");
-		sortingInfo = imtsdl::TElementList<CFieldSortingInfo>();
+		sortingInfo = imtsdl::TElementList<V1_0::imtbase::CFieldSortingInfo>();
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfoElementsCount; ++sortingInfoIndex){
 			const ::imtgql::CGqlParamObject* sortingInfoDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("sortingInfo", sortingInfoIndex);
 			if (sortingInfoDataObjectPtr == nullptr){
 				qDebug() << "invalid type" << sortingInfoDataObjectPtr;
 				return false;
 			}
-			CFieldSortingInfo tempSortingInfo;
+			V1_0::imtbase::CFieldSortingInfo tempSortingInfo;
 			if (!tempSortingInfo.OptReadFromGraphQlObject(*sortingInfoDataObjectPtr)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "sortingInfo").toLocal8Bit().constData();)
 
@@ -2026,7 +2026,7 @@ bool CComplexCollectionFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlPara
 	}
 
 	if (gqlObject.ContainsParam("fieldsFilter") && (gqlObject.GetParamArgumentObjectPtr("fieldsFilter") != nullptr)){
-		fieldsFilter = CGroupFilter();
+		fieldsFilter = V1_0::imtbase::CGroupFilter();
 		const bool isFieldsFilterRead = fieldsFilter->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("fieldsFilter"));
 		if (!isFieldsFilterRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "fieldsFilter").toLocal8Bit().constData();)
@@ -2036,7 +2036,7 @@ bool CComplexCollectionFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlPara
 	}
 
 	if (gqlObject.ContainsParam("timeFilter") && (gqlObject.GetParamArgumentObjectPtr("timeFilter") != nullptr)){
-		timeFilter = CTimeFilter();
+		timeFilter = V1_0::imtbase::CTimeFilter();
 		const bool isTimeFilterRead = timeFilter->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("timeFilter"));
 		if (!isTimeFilterRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "timeFilter").toLocal8Bit().constData();)
@@ -2063,7 +2063,7 @@ bool CComplexCollectionFilter::OptReadFromGraphQlObject(const ::imtgql::CGqlPara
 }
 
 
-bool CComplexCollectionFilter::WriteToJsonObject(QJsonObject& jsonObject) const
+bool V1_0::imtbase::CComplexCollectionFilter::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (sortingInfo){
 		QJsonArray newSortingInfoArray;
@@ -2115,14 +2115,14 @@ bool CComplexCollectionFilter::WriteToJsonObject(QJsonObject& jsonObject) const
 }
 
 
-bool CComplexCollectionFilter::ReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CComplexCollectionFilter::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("sortingInfo") && jsonObject["sortingInfo"].isArray()){
 		const QJsonArray sortingInfoJsonArray = jsonObject["sortingInfo"].toArray();
 		const qsizetype sortingInfoArrayCount = sortingInfoJsonArray.size();
-		sortingInfo = imtsdl::TElementList<CFieldSortingInfo>();
+		sortingInfo = imtsdl::TElementList<V1_0::imtbase::CFieldSortingInfo>();
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfoArrayCount; ++sortingInfoIndex){
-			CFieldSortingInfo tempSortingInfo;
+			V1_0::imtbase::CFieldSortingInfo tempSortingInfo;
 			if (!tempSortingInfo.ReadFromJsonObject(sortingInfoJsonArray[sortingInfoIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "sortingInfo").toLocal8Bit().constData();)
 
@@ -2133,7 +2133,7 @@ bool CComplexCollectionFilter::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("fieldsFilter") && jsonObject["fieldsFilter"].isObject()){
-		fieldsFilter = CGroupFilter();
+		fieldsFilter = V1_0::imtbase::CGroupFilter();
 		const bool isFieldsFilterRead = fieldsFilter->ReadFromJsonObject(jsonObject["fieldsFilter"].toObject());
 		if (!isFieldsFilterRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "fieldsFilter").toLocal8Bit().constData();)
@@ -2143,7 +2143,7 @@ bool CComplexCollectionFilter::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("timeFilter") && jsonObject["timeFilter"].isObject()){
-		timeFilter = CTimeFilter();
+		timeFilter = V1_0::imtbase::CTimeFilter();
 		const bool isTimeFilterRead = timeFilter->ReadFromJsonObject(jsonObject["timeFilter"].toObject());
 		if (!isTimeFilterRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "timeFilter").toLocal8Bit().constData();)
@@ -2166,14 +2166,14 @@ bool CComplexCollectionFilter::ReadFromJsonObject(const QJsonObject& jsonObject)
 }
 
 
-bool CComplexCollectionFilter::OptReadFromJsonObject(const QJsonObject& jsonObject)
+bool V1_0::imtbase::CComplexCollectionFilter::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("sortingInfo") && jsonObject["sortingInfo"].isArray()){
 		const QJsonArray sortingInfoJsonArray = jsonObject["sortingInfo"].toArray();
 		const qsizetype sortingInfoArrayCount = sortingInfoJsonArray.size();
-		sortingInfo = imtsdl::TElementList<CFieldSortingInfo>();
+		sortingInfo = imtsdl::TElementList<V1_0::imtbase::CFieldSortingInfo>();
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfoArrayCount; ++sortingInfoIndex){
-			CFieldSortingInfo tempSortingInfo;
+			V1_0::imtbase::CFieldSortingInfo tempSortingInfo;
 			if (!tempSortingInfo.OptReadFromJsonObject(sortingInfoJsonArray[sortingInfoIndex].toObject())){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "sortingInfo").toLocal8Bit().constData();)
 
@@ -2184,7 +2184,7 @@ bool CComplexCollectionFilter::OptReadFromJsonObject(const QJsonObject& jsonObje
 	}
 
 	if (jsonObject.contains("fieldsFilter") && jsonObject["fieldsFilter"].isObject()){
-		fieldsFilter = CGroupFilter();
+		fieldsFilter = V1_0::imtbase::CGroupFilter();
 		const bool isFieldsFilterRead = fieldsFilter->OptReadFromJsonObject(jsonObject["fieldsFilter"].toObject());
 		if (!isFieldsFilterRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "fieldsFilter").toLocal8Bit().constData();)
@@ -2194,7 +2194,7 @@ bool CComplexCollectionFilter::OptReadFromJsonObject(const QJsonObject& jsonObje
 	}
 
 	if (jsonObject.contains("timeFilter") && jsonObject["timeFilter"].isObject()){
-		timeFilter = CTimeFilter();
+		timeFilter = V1_0::imtbase::CTimeFilter();
 		const bool isTimeFilterRead = timeFilter->OptReadFromJsonObject(jsonObject["timeFilter"].toObject());
 		if (!isTimeFilterRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "timeFilter").toLocal8Bit().constData();)
@@ -2217,7 +2217,7 @@ bool CComplexCollectionFilter::OptReadFromJsonObject(const QJsonObject& jsonObje
 }
 
 
-// serialize methods
+
 
 CTimeFilterObject::CTimeFilterObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 
@@ -2230,10 +2230,15 @@ CTimeFilterObject::CTimeFilterObject(QObject* parent): ::imtbase::CItemModelBase
 
 QVariant CTimeFilterObject::GetTimeRange()
 {
+	if (!timeRange) {return {};}
+	
 	if (!m_timeRangeQObjectPtr.isValid()){
 		m_timeRangeQObjectPtr = CreateObject("timeRange");
 		auto itemPtr = m_timeRangeQObjectPtr.value<sdl::V1_0::imtbase::CTimeRangeObject*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = CTimeFilter::timeRange;
+		if (itemPtr != nullptr) {
+			itemPtr->Begin = timeRange->Begin;
+			itemPtr->End = timeRange->End;
+		}
 	}
 	return m_timeRangeQObjectPtr;
 }
@@ -2241,10 +2246,9 @@ QVariant CTimeFilterObject::GetTimeRange()
 
 void CTimeFilterObject::SetTimeRange(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::imtbase::CTimeRangeObject* itemPtr = v.value<sdl::V1_0::imtbase::CTimeRangeObject*>();
-		if (itemPtr != nullptr)  timeRange = static_cast<const decltype(timeRange)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr) CTimeFilter::timeRange = (*itemPtr);
 	}
 	else {
 		CTimeFilter::timeRange = nullptr;
@@ -2280,13 +2284,12 @@ void CTimeFilterObject::ResetTimeRange()
 
 QVariant CTimeFilterObject::GetTimeUnit()
 {
-	return CTimeFilter::timeUnit.value();
+	return CTimeFilter::timeUnit ? CTimeFilter::timeUnit.value() : QVariant();
 }
 
 
 void CTimeFilterObject::SetTimeUnit(const QVariant& v)
 {
-
 	CTimeFilter::timeUnit = v.value<QString>();
 	timeUnitChanged();
 }
@@ -2300,13 +2303,12 @@ bool CTimeFilterObject::hasTimeUnit()
 
 QVariant CTimeFilterObject::GetInterpretationMode()
 {
-	return CTimeFilter::interpretationMode.value();
+	return CTimeFilter::interpretationMode ? CTimeFilter::interpretationMode.value() : QVariant();
 }
 
 
 void CTimeFilterObject::SetInterpretationMode(const QVariant& v)
 {
-
 	CTimeFilter::interpretationMode = v.value<QString>();
 	interpretationModeChanged();
 }
@@ -2320,13 +2322,12 @@ bool CTimeFilterObject::hasInterpretationMode()
 
 QVariant CTimeFilterObject::GetUnitMultiplier()
 {
-	return CTimeFilter::unitMultiplier.value();
+	return CTimeFilter::unitMultiplier ? CTimeFilter::unitMultiplier.value() : QVariant();
 }
 
 
 void CTimeFilterObject::SetUnitMultiplier(const QVariant& v)
 {
-
 	CTimeFilter::unitMultiplier = v.value<int>();
 	unitMultiplierChanged();
 }
@@ -2501,20 +2502,20 @@ QVariant sdl::V1_0::imtbase::CTimeFilterObjectList::getData(const QString& nameI
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_timeRange"){
 		return itemPtr->GetTimeRange();
 	}
 	if (nameId == "m_timeUnit"){
-		return QVariant::fromValue(at(index)->timeUnit.value());
+		return Version_1_0->at(index)->timeUnit ? QVariant::fromValue(Version_1_0->at(index)->timeUnit.value()) : QVariant();
 	}
 	if (nameId == "m_interpretationMode"){
-		return QVariant::fromValue(at(index)->interpretationMode.value());
+		return Version_1_0->at(index)->interpretationMode ? QVariant::fromValue(Version_1_0->at(index)->interpretationMode.value()) : QVariant();
 	}
 	if (nameId == "m_unitMultiplier"){
-		return QVariant::fromValue(at(index)->unitMultiplier.value());
+		return Version_1_0->at(index)->unitMultiplier ? QVariant::fromValue(Version_1_0->at(index)->unitMultiplier.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -2528,13 +2529,12 @@ CFieldSortingInfoObject::CFieldSortingInfoObject(QObject* parent): ::imtbase::CI
 
 QVariant CFieldSortingInfoObject::GetFieldId()
 {
-	return CFieldSortingInfo::fieldId.value();
+	return CFieldSortingInfo::fieldId ? CFieldSortingInfo::fieldId.value() : QVariant();
 }
 
 
 void CFieldSortingInfoObject::SetFieldId(const QVariant& v)
 {
-
 	CFieldSortingInfo::fieldId = v.value<QString>();
 	fieldIdChanged();
 }
@@ -2548,13 +2548,12 @@ bool CFieldSortingInfoObject::hasFieldId()
 
 QVariant CFieldSortingInfoObject::GetSortingOrder()
 {
-	return CFieldSortingInfo::sortingOrder.value();
+	return CFieldSortingInfo::sortingOrder ? CFieldSortingInfo::sortingOrder.value() : QVariant();
 }
 
 
 void CFieldSortingInfoObject::SetSortingOrder(const QVariant& v)
 {
-
 	CFieldSortingInfo::sortingOrder = v.value<QString>();
 	sortingOrderChanged();
 }
@@ -2720,14 +2719,14 @@ QVariant sdl::V1_0::imtbase::CFieldSortingInfoObjectList::getData(const QString&
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_fieldId"){
-		return QVariant::fromValue(at(index)->fieldId.value());
+		return Version_1_0->at(index)->fieldId ? QVariant::fromValue(Version_1_0->at(index)->fieldId.value()) : QVariant();
 	}
 	if (nameId == "m_sortingOrder"){
-		return QVariant::fromValue(at(index)->sortingOrder.value());
+		return Version_1_0->at(index)->sortingOrder ? QVariant::fromValue(Version_1_0->at(index)->sortingOrder.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -2743,13 +2742,12 @@ CFieldFilterObject::CFieldFilterObject(QObject* parent): ::imtbase::CItemModelBa
 
 QVariant CFieldFilterObject::GetFieldId()
 {
-	return CFieldFilter::fieldId.value();
+	return CFieldFilter::fieldId ? CFieldFilter::fieldId.value() : QVariant();
 }
 
 
 void CFieldFilterObject::SetFieldId(const QVariant& v)
 {
-
 	CFieldFilter::fieldId = v.value<QString>().toUtf8();
 	fieldIdChanged();
 }
@@ -2763,13 +2761,12 @@ bool CFieldFilterObject::hasFieldId()
 
 QVariant CFieldFilterObject::GetFilterValue()
 {
-	return CFieldFilter::filterValue.value();
+	return CFieldFilter::filterValue ? CFieldFilter::filterValue.value() : QVariant();
 }
 
 
 void CFieldFilterObject::SetFilterValue(const QVariant& v)
 {
-
 	CFieldFilter::filterValue = v.value<QString>();
 	filterValueChanged();
 }
@@ -2783,6 +2780,7 @@ bool CFieldFilterObject::hasFilterValue()
 
 QVariant CFieldFilterObject::GetFilterValueType()
 {
+	if (!filterValueType) {return {};}
 	sdl::V1_0::imtbase::ValueType valueType = CFieldFilter::filterValueType.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::imtbase::ValueType>();
 	QString retval = metaEnum.valueToKey((int)valueType);
@@ -2793,7 +2791,6 @@ QVariant CFieldFilterObject::GetFilterValueType()
 
 void CFieldFilterObject::SetFilterValueType(const QVariant& v)
 {
-
 	CFieldFilter::filterValueType.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::imtbase::ValueType>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
@@ -2813,12 +2810,12 @@ bool CFieldFilterObject::hasFilterValueType()
 QVariant CFieldFilterObject::GetFilterOperations()
 {
 	
+	return QVariant();
 }
 
 
 void CFieldFilterObject::SetFilterOperations(const QVariant& v)
 {
-
 	
 	filterOperationsChanged();
 }
@@ -2990,20 +2987,20 @@ QVariant sdl::V1_0::imtbase::CFieldFilterObjectList::getData(const QString& name
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_fieldId"){
-		return QVariant::fromValue(at(index)->fieldId.value());
+		return Version_1_0->at(index)->fieldId ? QVariant::fromValue(Version_1_0->at(index)->fieldId.value()) : QVariant();
 	}
 	if (nameId == "m_filterValue"){
-		return QVariant::fromValue(at(index)->filterValue.value());
+		return Version_1_0->at(index)->filterValue ? QVariant::fromValue(Version_1_0->at(index)->filterValue.value()) : QVariant();
 	}
 	if (nameId == "m_filterValueType"){
-		return QVariant::fromValue(at(index)->filterValueType.value());
+		return Version_1_0->at(index)->filterValueType ? QVariant::fromValue(Version_1_0->at(index)->filterValueType.value()) : QVariant();
 	}
 	if (nameId == "m_filterOperations"){
-		return QVariant::fromValue(at(index)->filterOperations.value());
+		return Version_1_0->at(index)->filterOperations ? QVariant::fromValue(Version_1_0->at(index)->filterOperations.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -3029,10 +3026,9 @@ QVariant CGroupFilterObject::GetFieldFilters()
 
 void CGroupFilterObject::SetFieldFilters(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::imtbase::CFieldFilterObjectList* itemPtr = v.value<sdl::V1_0::imtbase::CFieldFilterObjectList*>();
-		if (itemPtr != nullptr)  fieldFilters = static_cast<const decltype(fieldFilters)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr) CGroupFilter::fieldFilters = itemPtr->Version_1_0;
 	}
 	else {
 		CGroupFilter::fieldFilters = nullptr;
@@ -3086,10 +3082,9 @@ QVariant CGroupFilterObject::GetGroupFilters()
 
 void CGroupFilterObject::SetGroupFilters(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::imtbase::CGroupFilterObjectList* itemPtr = v.value<sdl::V1_0::imtbase::CGroupFilterObjectList*>();
-		if (itemPtr != nullptr)  groupFilters = static_cast<const decltype(groupFilters)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr) CGroupFilter::groupFilters = itemPtr->Version_1_0;
 	}
 	else {
 		CGroupFilter::groupFilters = nullptr;
@@ -3132,6 +3127,7 @@ QVariant CGroupFilterObject::createGroupFiltersArrayElement(const QVariant& v)
 
 QVariant CGroupFilterObject::GetLogicalOperation()
 {
+	if (!logicalOperation) {return {};}
 	sdl::V1_0::imtbase::LogicalOperation valueType = CGroupFilter::logicalOperation.value();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::imtbase::LogicalOperation>();
 	QString retval = metaEnum.valueToKey((int)valueType);
@@ -3142,7 +3138,6 @@ QVariant CGroupFilterObject::GetLogicalOperation()
 
 void CGroupFilterObject::SetLogicalOperation(const QVariant& v)
 {
-
 	CGroupFilter::logicalOperation.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::V1_0::imtbase::LogicalOperation>();
 	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
@@ -3322,7 +3317,7 @@ QVariant sdl::V1_0::imtbase::CGroupFilterObjectList::getData(const QString& name
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_fieldFilters"){
@@ -3332,7 +3327,7 @@ QVariant sdl::V1_0::imtbase::CGroupFilterObjectList::getData(const QString& name
 		return itemPtr->GetGroupFilters();
 	}
 	if (nameId == "m_logicalOperation"){
-		return QVariant::fromValue(at(index)->logicalOperation.value());
+		return Version_1_0->at(index)->logicalOperation ? QVariant::fromValue(Version_1_0->at(index)->logicalOperation.value()) : QVariant();
 	}
 
 	return QVariant();
@@ -3359,10 +3354,9 @@ QVariant CComplexCollectionFilterObject::GetSortingInfo()
 
 void CComplexCollectionFilterObject::SetSortingInfo(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::imtbase::CFieldSortingInfoObjectList* itemPtr = v.value<sdl::V1_0::imtbase::CFieldSortingInfoObjectList*>();
-		if (itemPtr != nullptr)  sortingInfo = static_cast<const decltype(sortingInfo)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr) CComplexCollectionFilter::sortingInfo = itemPtr->Version_1_0;
 	}
 	else {
 		CComplexCollectionFilter::sortingInfo = nullptr;
@@ -3405,10 +3399,16 @@ QVariant CComplexCollectionFilterObject::createSortingInfoArrayElement(const QVa
 
 QVariant CComplexCollectionFilterObject::GetFieldsFilter()
 {
+	if (!fieldsFilter) {return {};}
+	
 	if (!m_fieldsFilterQObjectPtr.isValid()){
 		m_fieldsFilterQObjectPtr = CreateObject("fieldsFilter");
 		auto itemPtr = m_fieldsFilterQObjectPtr.value<sdl::V1_0::imtbase::CGroupFilterObject*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = CComplexCollectionFilter::fieldsFilter;
+		if (itemPtr != nullptr) {
+			itemPtr->fieldFilters = fieldsFilter->fieldFilters;
+			itemPtr->groupFilters = fieldsFilter->groupFilters;
+			itemPtr->logicalOperation = fieldsFilter->logicalOperation;
+		}
 	}
 	return m_fieldsFilterQObjectPtr;
 }
@@ -3416,10 +3416,9 @@ QVariant CComplexCollectionFilterObject::GetFieldsFilter()
 
 void CComplexCollectionFilterObject::SetFieldsFilter(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::imtbase::CGroupFilterObject* itemPtr = v.value<sdl::V1_0::imtbase::CGroupFilterObject*>();
-		if (itemPtr != nullptr)  fieldsFilter = static_cast<const decltype(fieldsFilter)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr) CComplexCollectionFilter::fieldsFilter = (*itemPtr);
 	}
 	else {
 		CComplexCollectionFilter::fieldsFilter = nullptr;
@@ -3455,10 +3454,17 @@ void CComplexCollectionFilterObject::ResetFieldsFilter()
 
 QVariant CComplexCollectionFilterObject::GetTimeFilter()
 {
+	if (!timeFilter) {return {};}
+	
 	if (!m_timeFilterQObjectPtr.isValid()){
 		m_timeFilterQObjectPtr = CreateObject("timeFilter");
 		auto itemPtr = m_timeFilterQObjectPtr.value<sdl::V1_0::imtbase::CTimeFilterObject*>();
-		if (itemPtr != nullptr) itemPtr->Version_1_0 = CComplexCollectionFilter::timeFilter;
+		if (itemPtr != nullptr) {
+			itemPtr->timeRange = timeFilter->timeRange;
+			itemPtr->timeUnit = timeFilter->timeUnit;
+			itemPtr->interpretationMode = timeFilter->interpretationMode;
+			itemPtr->unitMultiplier = timeFilter->unitMultiplier;
+		}
 	}
 	return m_timeFilterQObjectPtr;
 }
@@ -3466,10 +3472,9 @@ QVariant CComplexCollectionFilterObject::GetTimeFilter()
 
 void CComplexCollectionFilterObject::SetTimeFilter(const QVariant& v)
 {
-
 	if (v.isValid()){
 		sdl::V1_0::imtbase::CTimeFilterObject* itemPtr = v.value<sdl::V1_0::imtbase::CTimeFilterObject*>();
-		if (itemPtr != nullptr)  timeFilter = static_cast<const decltype(timeFilter)::value_type&>(*itemPtr);
+		if (itemPtr != nullptr) CComplexCollectionFilter::timeFilter = (*itemPtr);
 	}
 	else {
 		CComplexCollectionFilter::timeFilter = nullptr;
@@ -3505,17 +3510,19 @@ void CComplexCollectionFilterObject::ResetTimeFilter()
 
 QVariant CComplexCollectionFilterObject::GetDistinctFields()
 {
+	if (!distinctFields ){return {};}
+
 	QList<QString> tempDistinctFieldsList;
-	for (const auto& tempValue: CComplexCollectionFilter::distinctFields.value()){
+	for (const auto& tempValue: distinctFields.value()){
 		tempDistinctFieldsList << *tempValue;
 	}
+
 	return QVariant::fromValue(tempDistinctFieldsList);
 }
 
 
 void CComplexCollectionFilterObject::SetDistinctFields(const QVariant& v)
 {
-
 	if (!CComplexCollectionFilter::distinctFields){
 		CComplexCollectionFilter::distinctFields.emplace();
 	}
@@ -3523,8 +3530,8 @@ void CComplexCollectionFilterObject::SetDistinctFields(const QVariant& v)
 		CComplexCollectionFilter::distinctFields->clear();
 	}
 	for (const auto& tempValue: v.value<QList<QString>>()){
-		istd::TNullableValue<QByteArray> value(tempValue.toUtf8());
-		CComplexCollectionFilter::distinctFields->append(value);
+		istd::TNullableValue<QByteArray> tempItem(tempValue.toUtf8());
+		CComplexCollectionFilter::distinctFields->append(tempItem);
 	}
 
 	distinctFieldsChanged();
@@ -3706,7 +3713,7 @@ QVariant sdl::V1_0::imtbase::CComplexCollectionFilterObjectList::getData(const Q
 	if (itemPtr == nullptr){
 		return QVariant();
 	}
-	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < count()){
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
 	}
 	if (nameId == "m_sortingInfo"){
@@ -3719,7 +3726,7 @@ QVariant sdl::V1_0::imtbase::CComplexCollectionFilterObjectList::getData(const Q
 		return itemPtr->GetTimeFilter();
 	}
 	if (nameId == "m_distinctFields"){
-		return QVariant::fromValue(at(index)->distinctFields.value());
+		return Version_1_0->at(index)->distinctFields ? QVariant::fromValue(Version_1_0->at(index)->distinctFields.value()) : QVariant();
 	}
 
 	return QVariant();

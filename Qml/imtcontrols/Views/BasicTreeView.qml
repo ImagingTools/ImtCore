@@ -484,17 +484,12 @@ Item {
                                 visible: cellRoot.isEditingHere
                                 active: cellRoot.isEditingHere
 
-                                sourceComponent: {
-                                    switch (cellRoot.editorType) {
-                                    case "string":     return textEditorComponent
-                                    case "number":     return textEditorComponent
-                                    case "bool":       return boolEditorComponent
-                                    case "checkState": return boolEditorComponent
-                                    case "combo":      return comboEditorComponent
-                                    case "custom":     return cellRoot.column.editor
-                                    }
-                                    return null
-                                }
+                                sourceComponent: cellRoot.editorType === "string" ? textEditorComponent :
+                                                 cellRoot.editorType === "number" ? textEditorComponent :
+                                                 cellRoot.editorType === "bool" ? boolEditorComponent :
+                                                 cellRoot.editorType === "checkState" ? boolEditorComponent :
+                                                 cellRoot.editorType === "combo" ? comboEditorComponent :
+                                                 cellRoot.editorType === "custom" ? cellRoot.column.editor : null
 
                                 property var __commitHandler: null
                                 property var __cancelHandler: null
@@ -872,7 +867,6 @@ Item {
     // ═══════════════════════════════════════════════════════════════════════
 
     function buildVisibleTree() {
-        var t0 = Date.now()
         var items = []
         __visibleKeys = []
         __visibleRowsByKey = ({})
@@ -892,7 +886,6 @@ Item {
         visibleModel.clear()
         if (items.length > 0)
             visibleModel.append(items)
-         console.log("buildVisibleTree:", Date.now() - t0, "ms, rows:", items.length)
     }
 
     function __appendBranchIterative(rootKey, items) {
@@ -1424,7 +1417,6 @@ Item {
     }
 
     function expandAll() {
-        var t0 = Date.now()
         for (var key in __nodes) {
             var n = __nodes[key]
             if (n && n.childrenKeys.length > 0 && !n.expanded) {
@@ -1434,7 +1426,6 @@ Item {
             }
         }
         buildVisibleTree()
-        console.log("expandAll:", Date.now() - t0, "ms")
     }
 
     function collapseAll() {

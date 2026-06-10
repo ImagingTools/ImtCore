@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="JsonSerializer" X="1075" Y="75" Note=""/>
+        <Element ComponentName="ObjectCollection" X="825" Y="150" Note=""/>
+        <Element ComponentName="Repository" X="500" Y="150" Note=""/>
+        <Element ComponentName="TenantConnectionCodeDatabaseDelegate" X="550" Y="375" Note=""/>
+        <Element ComponentName="TenantConnectionCodeInfo" X="1000" Y="375" Note=""/>
+        <Element ComponentName="Types" X="200" Y="550" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

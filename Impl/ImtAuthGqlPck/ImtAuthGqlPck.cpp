@@ -267,6 +267,21 @@ I_EXPORT_COMPONENT(
 			"Cross-Tenant Message Notification Publisher");
 
 I_EXPORT_COMPONENT(
+			ConnectionCodesNotificationPublisher,
+			"Publisher for tenant connection codes notifications (created, revoked, expired) via WebSocket",
+			"Connection Codes Notification Publisher");
+
+I_EXPORT_COMPONENT(
+			TenantConnectionsSelectController,
+			"Tenant connections select controller",
+			"Tenant Connections Select Controller");
+
+I_EXPORT_COMPONENT(
+			TenantRelationshipsSelectController,
+			"Tenant relationships select controller",
+			"Tenant Relationships Select Controller");
+
+I_EXPORT_COMPONENT(
 			RemoteTenantCollectionDocumentService,
 			"Remote tenant collection document service with product permissions enrichment",
 			"Remote Tenant Collection Document Service");
@@ -277,6 +292,11 @@ I_EXPORT_COMPONENT(
 			"Role Collection Document Service");
 
 I_EXPORT_COMPONENT(
+			RelationshipCollectionDocumentService,
+			"Relationship collection document service: GetRelationshipRepresentation / UpdateRelationshipFromRepresentation",
+			"Relationship Collection Document Service");
+
+I_EXPORT_COMPONENT(
 			GroupCollectionDocumentService,
 			"Group collection document service: GetGroupRepresentation / UpdateGroupFromRepresentation",
 			"Group Collection Document Service");
@@ -285,6 +305,11 @@ I_EXPORT_COMPONENT(
 			UserCollectionDocumentService,
 			"User collection document service: GetUserRepresentation / UpdateUserFromRepresentation",
 			"User Collection Document Service");
+
+I_EXPORT_COMPONENT(
+			CrossOrgGrantCollectionDocumentService,
+			"Cross Org Grant collection document service",
+			"Cross Org Grant Collection Document Service");
 
 
 } // namespace ImtAuthGqlPck

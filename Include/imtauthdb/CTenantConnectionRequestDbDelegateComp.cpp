@@ -55,44 +55,31 @@ istd::IChangeableUniquePtr CTenantConnectionRequestDbDelegateComp::CreateObjectF
 		return nullptr;
 	}
 
-	istd::TUniqueInterfacePtr<imtauth::ITenantConnectionRequestData> requestPtr = m_requestFactCompPtr.CreateInstance();
+	istd::TUniqueInterfacePtr<imtauth::ITenantConnectionRequestInfo> requestPtr = m_requestFactCompPtr.CreateInstance();
 	if (!requestPtr.IsValid()){
 		return nullptr;
 	}
 
-	imtauth::TenantConnectionRequestInfo info;
 	if (record.contains("Id")){
-		info.requestId = imtdb::VariantToByteArray(record.value("Id"));
+		requestPtr->SetRequestId(imtdb::VariantToByteArray(record.value("Id")));
 	}
 	if (record.contains("SourceTenantId")){
-		info.sourceTenantId = imtdb::VariantToByteArray(record.value("SourceTenantId"));
+		requestPtr->SetSourceTenantId(imtdb::VariantToByteArray(record.value("SourceTenantId")));
 	}
 	if (record.contains("TargetTenantId")){
-		info.targetTenantId = imtdb::VariantToByteArray(record.value("TargetTenantId"));
+		requestPtr->SetTargetTenantId(imtdb::VariantToByteArray(record.value("TargetTenantId")));
 	}
-	if (record.contains("TargetIdentifier")){
-		info.targetIdentifier = record.value("TargetIdentifier").toString();
-	}
-	if (record.contains("ConnectCode")){
-		info.connectCode = record.value("ConnectCode").toString();
-	}
-	if (record.contains("ProposedSourceRole")){
-		info.proposedSourceRole = static_cast<imtauth::ITenantInfo::TenantRelationshipRole>(record.value("ProposedSourceRole").toInt());
-	}
-	if (record.contains("ProposedTargetRole")){
-		info.proposedTargetRole = static_cast<imtauth::ITenantInfo::TenantRelationshipRole>(record.value("ProposedTargetRole").toInt());
+	if (record.contains("ConnectionCode")){
+		requestPtr->SetConnectionCode(record.value("ConnectionCode").toString());
 	}
 	if (record.contains("Message")){
-		info.message = record.value("Message").toString();
+		requestPtr->SetMessage(record.value("Message").toString());
 	}
 	if (record.contains("Status")){
-		info.status = static_cast<imtauth::TenantConnectionStatus>(record.value("Status").toInt());
+		requestPtr->SetStatus(static_cast<imtauth::ITenantConnectionRequestInfo::ConnectionRequestStatus>(record.value("Status").toInt()));
 	}
-	info.createdAt = RecordDateTimeToString(record, "CreatedAt");
-	info.expiresAt = RecordDateTimeToString(record, "ExpiresAt");
-	info.respondedAt = RecordDateTimeToString(record, "RespondedAt");
-
-	requestPtr->SetRequestInfo(info);
+	requestPtr->SetCreatedAt(RecordDateTimeToString(record, "CreatedAt"));
+	requestPtr->SetRespondedAt(RecordDateTimeToString(record, "RespondedAt"));
 
 	return requestPtr;
 }
@@ -108,41 +95,31 @@ CTenantConnectionRequestDbDelegateComp::NewObjectQuery CTenantConnectionRequestD
 {
 	NewObjectQuery result;
 
-	const imtauth::ITenantConnectionRequestData* requestPtr = dynamic_cast<const imtauth::ITenantConnectionRequestData*>(valuePtr);
+	const imtauth::ITenantConnectionRequestInfo* requestPtr = dynamic_cast<const imtauth::ITenantConnectionRequestInfo*>(valuePtr);
 	if (requestPtr == nullptr){
 		return result;
 	}
 
-	imtauth::TenantConnectionRequestInfo info = requestPtr->GetRequestInfo();
-
-	QString id = imtdb::EscapeSql(QString::fromUtf8(!proposedObjectId.isEmpty() ? proposedObjectId : info.requestId));
-	QString sourceTenantId = imtdb::EscapeSql(QString::fromUtf8(info.sourceTenantId));
-	QString targetTenantId = NullableSqlText(QString::fromUtf8(info.targetTenantId));
-	QString targetIdentifier = NullableSqlText(info.targetIdentifier);
-	QString connectCode = NullableSqlText(info.connectCode);
-	int proposedSourceRole = static_cast<int>(info.proposedSourceRole);
-	int proposedTargetRole = static_cast<int>(info.proposedTargetRole);
-	QString message = NullableSqlText(info.message);
-	int status = static_cast<int>(info.status);
-	QString createdAt = !info.createdAt.isEmpty() ? imtdb::EscapeSql(info.createdAt) : imtdb::UtcNow();
-	QString expiresAt = NullableSqlDateTime(info.expiresAt);
-	QString respondedAt = NullableSqlDateTime(info.respondedAt);
+	QString id = imtdb::EscapeSql(QString::fromUtf8(!proposedObjectId.isEmpty() ? proposedObjectId : requestPtr->GetRequestId()));
+	QString sourceTenantId = imtdb::EscapeSql(QString::fromUtf8(requestPtr->GetSourceTenantId()));
+	QString targetTenantId = NullableSqlText(QString::fromUtf8(requestPtr->GetTargetTenantId()));
+	QString connectionCode = NullableSqlText(requestPtr->GetConnectionCode());
+	QString message = NullableSqlText(requestPtr->GetMessage());
+	int status = static_cast<int>(requestPtr->GetStatus());
+	QString createdAt = !requestPtr->GetCreatedAt().isEmpty() ? imtdb::EscapeSql(requestPtr->GetCreatedAt()) : imtdb::UtcNow();
+	QString respondedAt = NullableSqlDateTime(requestPtr->GetRespondedAt());
 
 	result.query = QString(
-		"INSERT INTO \"%1\" (\"Id\", \"SourceTenantId\", \"TargetTenantId\", \"TargetIdentifier\", \"ConnectCode\", \"ProposedSourceRole\", \"ProposedTargetRole\", \"Message\", \"Status\", \"CreatedAt\", \"ExpiresAt\", \"RespondedAt\") "
-		"VALUES ('%2', '%3', %4, %5, %6, %7, %8, %9, %10, '%11', %12, %13);")
+		"INSERT INTO \"%1\" (\"Id\", \"SourceTenantId\", \"TargetTenantId\", \"ConnectionCode\", \"Message\", \"Status\", \"CreatedAt\", \"RespondedAt\") "
+		"VALUES ('%2', '%3', %4, %5, %6, %7, '%8', %9);")
 		.arg(*m_tableNameAttrPtr)
 		.arg(id)
 		.arg(sourceTenantId)
 		.arg(targetTenantId)
-		.arg(targetIdentifier)
-		.arg(connectCode)
-		.arg(QString::number(proposedSourceRole))
-		.arg(QString::number(proposedTargetRole))
+		.arg(connectionCode)
 		.arg(message)
 		.arg(QString::number(status))
 		.arg(createdAt)
-		.arg(expiresAt)
 		.arg(respondedAt).toUtf8();
 
 	return result;
@@ -156,27 +133,23 @@ QByteArray CTenantConnectionRequestDbDelegateComp::CreateUpdateObjectQuery(
 		const imtbase::IOperationContext* /*operationContextPtr*/,
 		bool /*useExternDelegate*/) const
 {
-	const imtauth::ITenantConnectionRequestData* requestPtr = dynamic_cast<const imtauth::ITenantConnectionRequestData*>(&object);
+	const imtauth::ITenantConnectionRequestInfo* requestPtr = dynamic_cast<const imtauth::ITenantConnectionRequestInfo*>(&object);
 	if (requestPtr == nullptr){
 		return QByteArray();
 	}
-
-	imtauth::TenantConnectionRequestInfo info = requestPtr->GetRequestInfo();
 
 	return QString(
 		"UPDATE \"%1\" SET "
 		"\"TargetTenantId\"=%2, "
 		"\"Status\"=%3, "
 		"\"Message\"=%4, "
-		"\"ExpiresAt\"=%5, "
-		"\"RespondedAt\"=%6 "
-		"WHERE \"Id\"='%7';")
+		"\"RespondedAt\"=%5 "
+		"WHERE \"Id\"='%6';")
 		.arg(*m_tableNameAttrPtr)
-		.arg(NullableSqlText(QString::fromUtf8(info.targetTenantId)))
-		.arg(QString::number(static_cast<int>(info.status)))
-		.arg(NullableSqlText(info.message))
-		.arg(NullableSqlDateTime(info.expiresAt))
-		.arg(NullableSqlDateTime(info.respondedAt))
+		.arg(NullableSqlText(QString::fromUtf8(requestPtr->GetTargetTenantId())))
+		.arg(QString::number(static_cast<int>(requestPtr->GetStatus())))
+		.arg(NullableSqlText(requestPtr->GetMessage()))
+		.arg(NullableSqlDateTime(requestPtr->GetRespondedAt()))
 		.arg(imtdb::EscapeSql(QString::fromUtf8(objectId))).toUtf8();
 }
 
