@@ -365,8 +365,8 @@ QString CTenantDbDelegateComp::GetTenantRelationScopeSubquery(const QByteArray& 
 
 	QString escapedUserId = imtdb::EscapeSql(QString::fromUtf8(userId));
 
-	QString grantsTableName = m_crossOrgGrantsTableNameAttrPtr.IsValid()
-			? QString::fromUtf8(*m_crossOrgGrantsTableNameAttrPtr) : QStringLiteral("CrossOrgGrants");
+	QString grantsTableName = QString::fromUtf8(
+			m_crossOrgGrantsTableNameAttrPtr.IsValid() ? *m_crossOrgGrantsTableNameAttrPtr : "CrossOrgGrants");
 	QString now = imtdb::UtcNow();
 
 	return QString(
