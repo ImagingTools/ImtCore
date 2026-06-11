@@ -13,7 +13,8 @@ namespace imtauth
 bool CRelationshipDocumentValidatorComp::ValidateDocumentData(
 			const QByteArray& objectId,
 			const istd::IChangeable& document,
-			QString& errorMessage) const
+			QString& errorMessage,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	const imtauth::ITenantRelationshipInfo* relInfo = dynamic_cast<const imtauth::ITenantRelationshipInfo*>(&document);
 	if (relInfo == nullptr){

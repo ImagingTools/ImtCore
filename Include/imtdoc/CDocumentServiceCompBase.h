@@ -67,7 +67,8 @@ protected:
 	virtual bool ValidateDocumentData(
 		const WorkingDocument& document,
 		OperationStatus& status,
-		QString* errorMessage = nullptr) const override;
+		QString* errorMessage = nullptr,
+		const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 	virtual QList<imtdoc::IDocumentServiceEventHandler*> GetDocumentServiceEventHandlers() const override;
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const override;
 	virtual idoc::IUndoManagerUniquePtr CreateUndoManager() const override;

@@ -22,6 +22,16 @@ class IChangeable;
 }
 
 
+namespace imtbase
+{
+
+
+class IOperationContext;
+
+
+}
+
+
 namespace imtdoc
 {
 
@@ -49,9 +59,14 @@ public:
 		\param		document		document data to validate.
 		\param		errorMessage	output parameter with validation error description when return value is false.
 								When validation succeeds, errorMessage is left unchanged.
+		\param		operationContextPtr		optional operation context providing information about who initiates the operation.
 		\note		Implementations must be thread-safe.
 	*/
-	virtual bool ValidateDocumentData(const QByteArray& objectId, const istd::IChangeable& document, QString& errorMessage) const = 0;
+	virtual bool ValidateDocumentData(
+		const QByteArray& objectId,
+		const istd::IChangeable& document,
+		QString& errorMessage,
+		const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
 };
 
 
