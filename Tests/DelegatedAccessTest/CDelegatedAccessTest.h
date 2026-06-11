@@ -331,6 +331,38 @@ public:
 		return m_grantPtr->HasAccess(targetTenantId, homeTenantId, QByteArray());
 	}
 
+	QByteArrayList GetDelegatedUserRoles(const QByteArray& userId) const
+	{
+		QByteArrayList result;
+
+		// Resolve the user's home tenants from the direct memberships
+		QByteArrayList homeTenantIds;
+		const QByteArrayList membershipIds = m_membershipPtr->GetMembershipsByUser(userId);
+		for (const QByteArray& membershipId : membershipIds){
+			QByteArray tenantId = m_membershipPtr->GetTenantId(membershipId);
+			if (!tenantId.isEmpty() && !homeTenantIds.contains(tenantId)){
+				homeTenantIds.append(tenantId);
+			}
+		}
+
+		// Aggregate roles delegated through effective grants targeting the home tenants
+		for (const QByteArray& homeTenantId : homeTenantIds){
+			const DelegatedTenantList accessibleTenants = GetAccessibleTenants(userId, homeTenantId);
+			for (const DelegatedTenantInfo& tenantInfo : accessibleTenants){
+				if (!tenantInfo.isDelegated){
+					continue;
+				}
+				for (const QByteArray& roleId : tenantInfo.roleIds){
+					if (!roleId.isEmpty() && !result.contains(roleId)){
+						result.append(roleId);
+					}
+				}
+			}
+		}
+
+		return result;
+	}
+
 private:
 	CMockMembershipManager* m_membershipPtr;
 	CMockCrossOrgGrantForDelegated* m_grantPtr;
@@ -369,6 +401,12 @@ private Q_SLOTS:
 	void testGetDelegatedRoles_ReturnsGrantedRoles();
 	void testGetDelegatedRoles_ExcludesExpired();
 	void testGetDelegatedRoles_NoneForDirectMember();
+
+	// Delegated user roles (user enrichment in UserCollection GetObjectData)
+	void testGetDelegatedUserRoles_ReturnsRolesFromGrants();
+	void testGetDelegatedUserRoles_EmptyWithoutGrants();
+	void testGetDelegatedUserRoles_AggregatesAcrossHomeTenants();
+	void testGetDelegatedUserRoles_RevokedGrantExcluded();
 
 	// Context detection
 	void testIsDelegatedAccess_TrueForGrantOnly();

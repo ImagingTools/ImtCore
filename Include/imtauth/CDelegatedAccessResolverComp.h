@@ -44,6 +44,7 @@ public:
 				const QByteArray& userId,
 				const QByteArray& homeTenantId,
 				const QByteArray& targetTenantId) const override;
+	virtual QByteArrayList GetDelegatedUserRoles(const QByteArray& userId) const override;
 
 private:
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);

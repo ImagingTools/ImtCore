@@ -105,6 +105,15 @@ public:
 		const QByteArray& userId,
 		const QByteArray& homeTenantId,
 		const QByteArray& targetTenantId) const = 0;
+
+	/**
+		Get all roles delegated to a user through active cross-org grants.
+		The user's home tenants are resolved from the direct memberships and
+		the roles of all effective grants targeting these tenants are aggregated.
+		\param userId The user to resolve the delegated roles for.
+		\return Deduplicated list of role IDs delegated through active grants.
+	*/
+	virtual QByteArrayList GetDelegatedUserRoles(const QByteArray& userId) const = 0;
 };
 
 

@@ -183,4 +183,44 @@ bool CDelegatedAccessResolverComp::IsDelegatedAccess(
 }
 
 
+QByteArrayList CDelegatedAccessResolverComp::GetDelegatedUserRoles(const QByteArray& userId) const
+{
+	QByteArrayList result;
+
+	if (!m_membershipManagerCompPtr.IsValid() || !m_crossOrgGrantCompPtr.IsValid()){
+		return result;
+	}
+
+	// Resolve the user's home tenants from the direct memberships
+	QByteArrayList homeTenantIds;
+	const ITenantMembershipManager::MembershipIds membershipIds = m_membershipManagerCompPtr->GetMembershipsByUser(userId);
+	for (const QByteArray& membershipId : membershipIds){
+		ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+		if (membershipPtr.IsValid()){
+			QByteArray tenantId = membershipPtr->GetTenantId();
+			if (!tenantId.isEmpty() && !homeTenantIds.contains(tenantId)){
+				homeTenantIds.append(tenantId);
+			}
+		}
+	}
+
+	// Aggregate roles delegated through effective grants targeting the home tenants
+	for (const QByteArray& homeTenantId : homeTenantIds){
+		const DelegatedTenantList accessibleTenants = GetAccessibleTenants(userId, homeTenantId);
+		for (const DelegatedTenantInfo& tenantInfo : accessibleTenants){
+			if (!tenantInfo.isDelegated){
+				continue;
+			}
+			for (const QByteArray& roleId : tenantInfo.roleIds){
+				if (!roleId.isEmpty() && !result.contains(roleId)){
+					result.append(roleId);
+				}
+			}
+		}
+	}
+
+	return result;
+}
+
+
 } // namespace imtauth

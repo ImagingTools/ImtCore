@@ -647,6 +647,57 @@ bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 }
 
 
+// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
+
+istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectData(
+			const QByteArray& objectId,
+			const istd::IChangeable& object,
+			const imtgql::CGqlRequest& gqlRequest) const
+{
+	istd::IChangeableUniquePtr adaptedObjectPtr = BaseClass::CreateAdaptedObjectData(objectId, object, gqlRequest);
+
+	if (!m_delegatedAccessCompPtr.IsValid()){
+		return adaptedObjectPtr;
+	}
+
+	auto userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(&object);
+	if (userInfoPtr == nullptr){
+		return adaptedObjectPtr;
+	}
+
+	QByteArrayList delegatedRoleIds = m_delegatedAccessCompPtr->GetDelegatedUserRoles(objectId);
+	if (delegatedRoleIds.isEmpty()){
+		return adaptedObjectPtr;
+	}
+
+	if (!adaptedObjectPtr.IsValid()){
+		adaptedObjectPtr = object.CloneMe();
+	}
+
+	auto adaptedUserInfoPtr = dynamic_cast<imtauth::IUserInfo*>(adaptedObjectPtr.GetPtr());
+	if (adaptedUserInfoPtr == nullptr){
+		QString warningMessage = QString("Unable to enrich user '%1' with the delegated roles. Error: User cloning failed").arg(qPrintable(objectId));
+		SendWarningMessage(0, warningMessage, "CUserCollectionControllerComp");
+
+		return adaptedObjectPtr;
+	}
+
+	for (const QByteArray& delegatedRoleId : delegatedRoleIds){
+		QByteArray productId;
+		if (m_roleInfoProviderCompPtr.IsValid()){
+			imtauth::IRoleUniquePtr roleInfoPtr = m_roleInfoProviderCompPtr->GetRole(delegatedRoleId);
+			if (roleInfoPtr.IsValid()){
+				productId = roleInfoPtr->GetProductId();
+			}
+		}
+
+		adaptedUserInfoPtr->AddRole(productId, delegatedRoleId);
+	}
+
+	return adaptedObjectPtr;
+}
+
+
 // reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
 
 bool CUserCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const

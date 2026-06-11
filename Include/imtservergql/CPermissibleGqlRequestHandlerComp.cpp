@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
 
-// ImtCore includes
-#include <imtgql/IGqlContext.h>
-
 
 namespace imtservergql
 {
@@ -63,33 +60,7 @@ bool CPermissibleGqlRequestHandlerComp::CheckPermissions(const imtgql::CGqlReque
 	if(commandIds.contains(requestedCommandId)){
 		QByteArrayList permissionIds = m_commandPermissionsCompPtr->GetCommandPermissions(requestedCommandId);
 		if (m_checkPermissionCompPtr.IsValid()){
-			if (m_checkPermissionCompPtr->CheckPermission(permissions, permissionIds)){
-				return true;
-			}
-
-			// Fallback: check delegated roles as additional permissions
-			if (m_delegatedAccessCompPtr.IsValid()){
-				QByteArray userId = gqlContextPtr->GetUserId();
-				QByteArray homeTenantId = gqlContextPtr->GetTenantId();
-				if (!userId.isEmpty() && !homeTenantId.isEmpty()){
-					// Get all accessible tenants and collect delegated role IDs
-					imtauth::DelegatedTenantList accessibleTenants =
-						m_delegatedAccessCompPtr->GetAccessibleTenants(userId, homeTenantId);
-					QByteArrayList delegatedPermissions;
-					for (const imtauth::DelegatedTenantInfo& tenantInfo : accessibleTenants){
-						if (tenantInfo.isDelegated){
-							for (const QByteArray& roleId : tenantInfo.roleIds){
-								if (!delegatedPermissions.contains(roleId)){
-									delegatedPermissions.append(roleId);
-								}
-							}
-						}
-					}
-					if (!delegatedPermissions.isEmpty()){
-						return m_checkPermissionCompPtr->CheckPermission(delegatedPermissions, permissionIds);
-					}
-				}
-			}
+			return m_checkPermissionCompPtr->CheckPermission(permissions, permissionIds);
 		}
 	}
 

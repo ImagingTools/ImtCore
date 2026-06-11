@@ -239,6 +239,62 @@ void CDelegatedAccessTest::testGetDelegatedRoles_NoneForDirectMember()
 
 
 // ===========================================================================
+// Delegated user roles tests (user enrichment with roles delegated by grants)
+// ===========================================================================
+
+void CDelegatedAccessTest::testGetDelegatedUserRoles_ReturnsRolesFromGrants()
+{
+	m_membershipPtr->AddMembership("user1", "tenantB", "member");
+	m_grantPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-read", "role-write"});
+
+	QByteArrayList roles = m_resolverPtr->GetDelegatedUserRoles("user1");
+
+	QCOMPARE(roles.size(), 2);
+	QVERIFY(roles.contains("role-read"));
+	QVERIFY(roles.contains("role-write"));
+}
+
+
+void CDelegatedAccessTest::testGetDelegatedUserRoles_EmptyWithoutGrants()
+{
+	m_membershipPtr->AddMembership("user1", "tenantB", "member");
+
+	QByteArrayList roles = m_resolverPtr->GetDelegatedUserRoles("user1");
+
+	QVERIFY(roles.isEmpty());
+}
+
+
+void CDelegatedAccessTest::testGetDelegatedUserRoles_AggregatesAcrossHomeTenants()
+{
+	// User belongs to two tenants; both receive grants from other orgs
+	m_membershipPtr->AddMembership("user1", "tenantB", "member");
+	m_membershipPtr->AddMembership("user1", "tenantC", "member");
+	m_grantPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-read"});
+	m_grantPtr->CreateGrant("tenantD", "tenantC", QByteArrayList{"role-write", "role-read"});
+
+	QByteArrayList roles = m_resolverPtr->GetDelegatedUserRoles("user1");
+
+	// Roles are aggregated and deduplicated
+	QCOMPARE(roles.size(), 2);
+	QVERIFY(roles.contains("role-read"));
+	QVERIFY(roles.contains("role-write"));
+}
+
+
+void CDelegatedAccessTest::testGetDelegatedUserRoles_RevokedGrantExcluded()
+{
+	m_membershipPtr->AddMembership("user1", "tenantB", "member");
+	QByteArray grantId = m_grantPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-read"});
+	m_grantPtr->RevokeGrant(grantId);
+
+	QByteArrayList roles = m_resolverPtr->GetDelegatedUserRoles("user1");
+
+	QVERIFY(roles.isEmpty());
+}
+
+
+// ===========================================================================
 // Context detection tests
 // ===========================================================================
 
