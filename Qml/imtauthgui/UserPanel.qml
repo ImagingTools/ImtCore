@@ -68,7 +68,17 @@ Item {
 						for (var i = 0; i < orgs.count; i++) {
 							var org = orgs.get(i).item
 							if (org && org.m_isActive) {
-								list.push({ id: org.m_id || "", name: org.m_name || org.m_id || "" })
+								var displayName = org.m_name || org.m_id || ""
+								var isDelegated = org.m_isDelegated || false
+								if (isDelegated) {
+									displayName = displayName + " " + qsTr("(delegated)")
+								}
+								list.push({
+									id: org.m_id || "",
+									name: displayName,
+									isDelegated: isDelegated,
+									delegatedRoles: org.m_delegatedRoles || []
+								})
 							}
 						}
 					}

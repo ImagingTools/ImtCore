@@ -337,6 +337,17 @@ protected:
 				const QString& description,
 				const imtgql::CGqlRequest& gqlRequest) const;
 
+	/**
+		Create an optionally adapted copy of the collection object before it is serialized
+		as payload of the \c GetObjectData request.
+		The default implementation returns an invalid pointer, meaning the original
+		collection object is serialized unchanged.
+	*/
+	virtual istd::IChangeableUniquePtr CreateAdaptedObjectData(
+				const QByteArray& objectId,
+				const istd::IChangeable& object,
+				const imtgql::CGqlRequest& gqlRequest) const;
+
 	QByteArray ExtractObjectIdFromGetObjectTypeIdGqlRequest(const imtgql::CGqlRequest& gqlRequest) const;
 	QByteArray ExtractObjectIdFromGetObjectDataGqlRequest(const imtgql::CGqlRequest& gqlRequest) const;
 

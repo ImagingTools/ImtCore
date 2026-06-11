@@ -79,6 +79,7 @@
 #include <imtauth/CRoleDocumentValidatorComp.h>
 #include <imtauth/CUserDocumentValidatorComp.h>
 #include <imtauth/CUserGroupDocumentValidatorComp.h>
+#include <imtauth/CDelegatedAccessResolverComp.h>
 
 
 namespace ImtAuthPck
@@ -197,6 +198,7 @@ typedef imtauth::CRelationshipDocumentValidatorComp RelationshipDocumentValidato
 typedef imtauth::CRoleDocumentValidatorComp RoleDocumentValidator;
 typedef imtauth::CUserDocumentValidatorComp UserDocumentValidator;
 typedef imtauth::CUserGroupDocumentValidatorComp UserGroupDocumentValidator;
+typedef imtauth::CDelegatedAccessResolverComp DelegatedAccessResolver;
 
 
 } // namespace ImtAuthPck

@@ -8,6 +8,7 @@
 #include <imtauth/ITenantMembership.h>
 #include <imtauth/ITenantMembershipManager.h>
 #include <imtauth/ITenantManager.h>
+#include <imtauth/ICrossOrgGrant.h>
 #include <imtsdl/TElementList.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Profile_fwd.h>
 
@@ -27,6 +28,7 @@ public:
 		I_ASSIGN(m_groupCollectionCompPtr, "GroupCollection", "Group collection", false, "GroupCollection");
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager", false, "TenantManager");
 		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager", false, "TenantMembershipManager");
+		I_ASSIGN(m_crossOrgGrantCompPtr, "CrossOrgGrantManager", "Cross-org grant manager for delegated access", false, "CrossOrgGrantManager");
 	I_END_COMPONENT;
 
 protected:
@@ -53,6 +55,7 @@ protected:
 	I_REF(imtbase::IObjectCollection, m_groupCollectionCompPtr);
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
+	I_REF(imtauth::ICrossOrgGrant, m_crossOrgGrantCompPtr);
 };
 
 

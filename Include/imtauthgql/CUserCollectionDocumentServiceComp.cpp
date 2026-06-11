@@ -140,6 +140,55 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 		userPtr->SetId(*userData.username);
 	}
 
+	// Handle system info: remove existing systems and apply the new ones
+	imtauth::IUserInfo::SystemInfoList currentSystemList = userPtr->GetSystemInfos();
+	for (const imtauth::IUserInfo::SystemInfo& systemInfo : currentSystemList){
+		userPtr->RemoveFromSystem(systemInfo.systemId);
+	}
+
+	if (userData.systemInfos){
+		for (const istd::TNullableValue<sdl::V1_0::imtauth::CSystemInfo>& sdlSystemInfo : *userData.systemInfos){
+			if (!sdlSystemInfo.HasValue()){
+				continue;
+			}
+
+			imtauth::IUserInfo::SystemInfo systemInfo;
+			if (sdlSystemInfo->id){
+				systemInfo.systemId = *sdlSystemInfo->id;
+			}
+			if (sdlSystemInfo->name){
+				systemInfo.systemName = *sdlSystemInfo->name;
+			}
+			if (sdlSystemInfo->enabled){
+				systemInfo.enabled = *sdlSystemInfo->enabled;
+			}
+
+			userPtr->AddToSystem(systemInfo);
+		}
+	}
+	else{
+		// No system info provided — add default internal system
+		imtauth::IUserInfo::SystemInfo systemInfo;
+		userPtr->AddToSystem(systemInfo);
+	}
+
+	// Handle password: hash when user is in internal system (empty systemId, enabled)
+	if (userData.password){
+		QByteArray username = userPtr->GetId();
+		if (!username.isEmpty() && m_hashCalculatorCompPtr.IsValid()){
+			for (const imtauth::IUserInfo::SystemInfo& systemInfo : userPtr->GetSystemInfos()){
+				if (systemInfo.enabled && systemInfo.systemId.isEmpty()){
+					QString password = *userData.password;
+					if (!password.isEmpty()){
+						password = m_hashCalculatorCompPtr->GenerateHash(username + password.toUtf8());
+						userPtr->SetPasswordHash(password.toUtf8());
+					}
+					break;
+				}
+			}
+		}
+	}
+
 	if (userData.groups){
 		// Sync group membership: add new groups, remove ones that disappeared.
 		imtauth::IUserGroupInfo::GroupIds currentGroups = userPtr->GetGroups();
