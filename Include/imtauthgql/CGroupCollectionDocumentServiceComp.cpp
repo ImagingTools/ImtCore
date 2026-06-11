@@ -9,6 +9,9 @@
 #include <imtauth/CUserGroupInfo.h>
 #include <imtauth/IUserGroupInfo.h>
 
+// Generated includes
+#include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/GroupCollectionDocumentService.h>
+
 
 namespace imtauthgql
 {

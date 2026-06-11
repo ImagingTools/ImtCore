@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtdoc/IDocumentValidator.h>
+#include <imtbase/IObjectCollection.h>
 
 
 namespace imtauth
@@ -14,22 +15,26 @@ namespace imtauth
 
 
 /**
-	Validates CrossOrgGrant documents before save.
-	Ensures required fields (targetTenantId, roleIds) are present.
+	Validates User Group documents before save.
+	Ensures group name is specified and unique.
 */
-class CCrossOrgGrantDocumentValidatorComp:
+class CUserGroupDocumentValidatorComp:
 			public icomp::CComponentBase,
 			virtual public imtdoc::IDocumentValidator
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CCrossOrgGrantDocumentValidatorComp)
+	I_BEGIN_COMPONENT(CUserGroupDocumentValidatorComp)
+		I_ASSIGN(m_userGroupCollectionCompPtr, "UserGroupCollection", "User group collection used for uniqueness checks", true, "UserGroupCollection");
 		I_REGISTER_INTERFACE(imtdoc::IDocumentValidator)
 	I_END_COMPONENT
 
 	// imtdoc::IDocumentValidator
 	virtual bool ValidateDocumentData(const QByteArray& objectId, const istd::IChangeable& document, QString& errorMessage, const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
+
+private:
+	I_REF(imtbase::IObjectCollection, m_userGroupCollectionCompPtr);
 };
 
 

@@ -187,20 +187,8 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CRelationshipCollectionDocumentServ
 		return response;
 	}
 
-	if (!sourceTenantId.isEmpty() && sourceTenantId == targetTenantId){
-		errorMessage = QStringLiteral("Source and target tenants must be different");
-		return response;
-	}
-
-	if (sourceTenantId.isEmpty()){
-		errorMessage = QStringLiteral("Missing source tenant ID");
-		return response;
-	}
-
-	if (targetTenantId.isEmpty()){
-		errorMessage = QStringLiteral("Missing target tenant ID");
-		return response;
-	}
+	relationshipPtr->SetSourceTenantId(sourceTenantId);
+	relationshipPtr->SetTargetTenantId(targetTenantId);
 
 	if (!m_connectionCollectionCompPtr.IsValid()){
 		errorMessage = QStringLiteral("Connection collection is not configured");
@@ -261,8 +249,6 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CRelationshipCollectionDocumentServ
 		relationshipPtr->SetRelationshipId(*relData.id);
 	}
 	relationshipPtr->SetConnectionId(connectionId);
-	relationshipPtr->SetSourceTenantId(sourceTenantId);
-	relationshipPtr->SetTargetTenantId(targetTenantId);
 	if (relData.sourceRole){
 		relationshipPtr->SetSourceRole(imtauthgql::FromSdlRelationshipRole(*relData.sourceRole));
 	}

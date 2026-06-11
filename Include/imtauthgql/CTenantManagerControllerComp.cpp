@@ -425,7 +425,7 @@ namespace imtauthgql
 
 sdl::V1_0::imtauth::CGetCrossOrgGrantsPayload CTenantManagerControllerComp::OnGetCrossOrgGrants(
 			const sdl::V1_0::imtauth::CGetCrossOrgGrantsGqlRequest& getCrossOrgGrantsRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CGetCrossOrgGrantsPayload response;
@@ -443,6 +443,17 @@ sdl::V1_0::imtauth::CGetCrossOrgGrantsPayload CTenantManagerControllerComp::OnGe
 
 	if (tenantId.isEmpty()){
 		response.errorMessage = QStringLiteral("Tenant ID is required");
+		return response;
+	}
+
+	// Enforce tenant isolation: the requested tenantId must match the context tenant
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	QByteArray contextTenantId;
+	if (gqlContextPtr != nullptr){
+		contextTenantId = gqlContextPtr->GetTenantId();
+	}
+	if (!contextTenantId.isEmpty() && contextTenantId != tenantId){
+		response.errorMessage = QStringLiteral("Access denied: cannot view grants of another tenant");
 		return response;
 	}
 
@@ -471,7 +482,7 @@ sdl::V1_0::imtauth::CGetCrossOrgGrantsPayload CTenantManagerControllerComp::OnGe
 
 sdl::V1_0::imtauth::CCreateCrossOrgGrantPayload CTenantManagerControllerComp::OnCreateCrossOrgGrant(
 			const sdl::V1_0::imtauth::CCreateCrossOrgGrantGqlRequest& createCrossOrgGrantRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CCreateCrossOrgGrantPayload response;
@@ -504,6 +515,17 @@ sdl::V1_0::imtauth::CCreateCrossOrgGrantPayload CTenantManagerControllerComp::On
 		expiresAt = *arguments.input->expiresAt;
 	}
 
+	// Enforce tenant isolation: sourceTenantId must match the context tenant
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	QByteArray contextTenantId;
+	if (gqlContextPtr != nullptr){
+		contextTenantId = gqlContextPtr->GetTenantId();
+	}
+	if (!contextTenantId.isEmpty() && contextTenantId != sourceTenantId){
+		response.errorMessage = QStringLiteral("Access denied: source tenant must match the current tenant context");
+		return response;
+	}
+
 	QByteArray grantId = m_grantManagerCompPtr->CreateGrant(
 							 sourceTenantId,
 							 targetTenantId,
@@ -524,7 +546,7 @@ sdl::V1_0::imtauth::CCreateCrossOrgGrantPayload CTenantManagerControllerComp::On
 
 sdl::V1_0::imtauth::CRevokeCrossOrgGrantPayload CTenantManagerControllerComp::OnRevokeCrossOrgGrant(
 		const sdl::V1_0::imtauth::CRevokeCrossOrgGrantGqlRequest& revokeCrossOrgGrantRequest,
-		const ::imtgql::CGqlRequest& /*gqlRequest*/,
+		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CRevokeCrossOrgGrantPayload response;
@@ -541,6 +563,21 @@ sdl::V1_0::imtauth::CRevokeCrossOrgGrantPayload CTenantManagerControllerComp::On
 	if (arguments.input->grantId){
 		grantId = *arguments.input->grantId;
 	}
+
+	// Enforce tenant isolation: the grant must belong to the context tenant
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	QByteArray contextTenantId;
+	if (gqlContextPtr != nullptr){
+		contextTenantId = gqlContextPtr->GetTenantId();
+	}
+	if (!contextTenantId.isEmpty()){
+		imtauth::CrossOrgGrantInfo grantInfo = m_grantManagerCompPtr->GetGrant(grantId);
+		if (grantInfo.sourceTenantId != contextTenantId && grantInfo.targetTenantId != contextTenantId){
+			response.errorMessage = QStringLiteral("Access denied: grant does not belong to the current tenant");
+			response.success = false;
+			return response;
+		}
+	}
 	
 	bool success = m_grantManagerCompPtr->RevokeGrant(grantId);
 	response.success = success;
@@ -554,7 +591,7 @@ sdl::V1_0::imtauth::CRevokeCrossOrgGrantPayload CTenantManagerControllerComp::On
 
 sdl::V1_0::imtauth::CRemoveCrossOrgGrantsPayload CTenantManagerControllerComp::OnRemoveCrossOrgGrants(
 		const sdl::V1_0::imtauth::CRemoveCrossOrgGrantsGqlRequest& removeCrossOrgGrantsRequest,
-		const ::imtgql::CGqlRequest& /*gqlRequest*/,
+		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CRemoveCrossOrgGrantsPayload response;
@@ -569,6 +606,26 @@ sdl::V1_0::imtauth::CRemoveCrossOrgGrantsPayload CTenantManagerControllerComp::O
 	sdl::V1_0::imtauth::RemoveCrossOrgGrantsRequestArguments arguments = removeCrossOrgGrantsRequest.GetRequestedArguments();
 	if (arguments.input->grantIds){
 		grantIds = arguments.input->grantIds->ToList();
+	}
+
+	// Enforce tenant isolation: all grants must belong to the context tenant
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	QByteArray contextTenantId;
+	if (gqlContextPtr != nullptr){
+		contextTenantId = gqlContextPtr->GetTenantId();
+	}
+	if (!contextTenantId.isEmpty()){
+		for (const QByteArray& grantId : grantIds){
+			if (grantId.isEmpty()){
+				continue;
+			}
+			imtauth::CrossOrgGrantInfo grantInfo = m_grantManagerCompPtr->GetGrant(grantId);
+			if (grantInfo.sourceTenantId != contextTenantId && grantInfo.targetTenantId != contextTenantId){
+				response.errorMessage = QStringLiteral("Access denied: one or more grants do not belong to the current tenant");
+				response.success = false;
+				return response;
+			}
+		}
 	}
 
 	bool success = m_grantManagerCompPtr->RemoveGrants(grantIds);

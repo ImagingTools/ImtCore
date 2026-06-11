@@ -4,6 +4,7 @@
 
 // ImtCore includes
 #include <imtauth/ICrossOrgGrantData.h>
+#include <imtauth/ITenantFilterParam.h>
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
 
 
@@ -59,6 +60,7 @@ public:
 				idoc::IDocumentMetaInfo& metaInfo) const override;
 
 	virtual QString GetBaseSelectionQuery() const override;
+	virtual QString CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const override;
 
 protected:
 	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const override;

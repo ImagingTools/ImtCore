@@ -19,6 +19,8 @@ ViewBase {
 
 	anchors.fill: parent
 	contentColor: Style.baseColor
+	commandsSeparatorVisible: false
+	commandsPanelVisible: !isReadOnly
 
 	property var grantData: model
 	property var apiClient: null
@@ -27,6 +29,7 @@ ViewBase {
 	property string __selectedTargetTenantName: ""
 	property string __selectedExpiresAt: ""
 	property bool __loadingGui: false
+	property bool isReadOnly: grantData ? (grantData.m_isReadOnly === true) : false
 
 	function expiresAtToIndex(iso) {
 		if (!iso || iso === "")
@@ -104,7 +107,7 @@ ViewBase {
 		anchors.bottom: parent.bottom
 		anchors.bottomMargin: Style.marginXL
 		anchors.horizontalCenter: parent.horizontalCenter
-		width: Math.min(parent.width - Style.marginXL * 2, Style.sizeHintXXL)
+		width: container.width
 		contentWidth: bodyColumn.width
 		contentHeight: bodyColumn.height + 2 * Style.marginXL
 		boundsBehavior: Flickable.StopAtBounds
@@ -112,12 +115,17 @@ ViewBase {
 
 		Column {
 			id: bodyColumn
-			width: Style.sizeHintXXL
+			width: container.width
 			spacing: Style.marginXL
 
-			GroupHeaderView {
+			// Read-only badge shown when the grant was created for this organization
+			BaseText {
+				visible: container.isReadOnly
 				width: parent.width
-				title: qsTr("Cross-Org Grant")
+				text: qsTr("This grant was created for your organization (read-only)")
+				color: Style.inactiveTextColor
+				font.pixelSize: Style.fontSizeM
+				font.italic: true
 			}
 
 			GroupElementView {
@@ -128,6 +136,7 @@ ViewBase {
 					id: grantNameInput
 					name: qsTr("Name")
 					placeHolderText: qsTr("Auto-generated from tenant and roles if left empty")
+					readOnly: container.isReadOnly
 					onEditingFinished: {
 						container.doUpdateModel()
 					}
@@ -153,6 +162,7 @@ ViewBase {
 
 							Button {
 								text: qsTr("Select")
+								visible: !container.isReadOnly
 								onClicked: {
 									var point = targetTenantRow.mapToItem(null, 0, targetTenantRow.height)
 									ModalDialogManager.openDialog(tenantSelectComp, {
@@ -164,7 +174,7 @@ ViewBase {
 
 							Button {
 								text: qsTr("Remove")
-								visible: container.__selectedTargetTenantId !== ""
+								visible: container.__selectedTargetTenantId !== "" && !container.isReadOnly
 								onClicked: {
 									container.__selectedTargetTenantId = ""
 									container.__selectedTargetTenantName = ""
@@ -181,6 +191,7 @@ ViewBase {
 					label: qsTr("Roles")
 					addButtonText: qsTr("Add Role")
 					showCount: true
+					editable: !container.isReadOnly
 					onSelectionChanged: {
 						container.doUpdateModel()
 					}
@@ -190,6 +201,7 @@ ViewBase {
 					id: grantDescriptionInput
 					name: qsTr("Description")
 					placeHolderText: qsTr("Optional description")
+					readOnly: container.isReadOnly
 					onEditingFinished: {
 						container.doUpdateModel()
 					}
@@ -201,6 +213,7 @@ ViewBase {
 					description: qsTr("The grant will expire on the selected date")
 					nameId: "name"
 					model: expirationModel
+					changeable: !container.isReadOnly
 
 					TreeItemModel {
 						id: expirationModel

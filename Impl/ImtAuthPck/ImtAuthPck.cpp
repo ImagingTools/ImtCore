@@ -347,6 +347,11 @@ I_EXPORT_COMPONENT(
 			"Tenant Relationship Document Name Provider");
 
 I_EXPORT_COMPONENT(
+			TenantDocumentValidator,
+			"Tenant document validator",
+			"Tenant Document Validator");
+
+I_EXPORT_COMPONENT(
 			CrossOrgGrantDocumentValidator,
 			"Cross org grant document validator",
 			"Cross Org Grant Document Validator");
@@ -355,6 +360,21 @@ I_EXPORT_COMPONENT(
 			RelationshipDocumentValidator,
 			"Relationship document validator",
 			"Relationship Document Validator");
+
+I_EXPORT_COMPONENT(
+			RoleDocumentValidator,
+			"Role document validator",
+			"Role Document Validator");
+
+I_EXPORT_COMPONENT(
+			UserDocumentValidator,
+			"User document validator",
+			"User Document Validator");
+
+I_EXPORT_COMPONENT(
+			UserGroupDocumentValidator,
+			"User group document validator",
+			"User Group Document Validator");
 
 
 } // namespace ImtAuthPck

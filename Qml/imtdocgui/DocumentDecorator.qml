@@ -27,6 +27,7 @@ QtObject {
 			representationController.representationUpdated.connect(onRepresentationUpdated)
 			representationController.startUpdateRepresentation.connect(onStartUpdateRepresentation)
 			representationController.updateRepresentationFailed.connect(onUpdateRepresentationFailed)
+			representationController.updateDocumentFailed.connect(onUpdateDocumentFailed)
 
 			if (updateRepresentation){
 				if (view.visible){
@@ -150,6 +151,14 @@ QtObject {
 		}
 
 		documentManager.updateRepresentationFailed(documentId, message)
+	}
+
+	function onUpdateDocumentFailed(documentId, message){
+		if (root.documentId !== documentId){
+			return
+		}
+
+		documentManager.updateDocumentFailed(documentId, message)
 	}
 
 	function onGuiUpdated(view, model){
