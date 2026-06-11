@@ -27,6 +27,7 @@ public:
 		I_ASSIGN(m_autoCreateRelationshipsTableAttrPtr, "AutoCreateRelationshipsTable", "Auto-create TenantRelationships table if not exists", false, true);
 		I_ASSIGN(m_createRelationshipsTableScriptPathAttrPtr, "CreateRelationshipsTableScriptPath", "SQL script path for TenantRelationships table creation", false, "CreateTenantRelationshipsTable.sql");
 		I_ASSIGN(m_relationshipsTableNameAttrPtr, "RelationshipsTableName", "Name of the TenantRelationships table", false, "TenantRelationships");
+		I_ASSIGN(m_crossOrgGrantsTableNameAttrPtr, "CrossOrgGrantsTableName", "Name of the CrossOrgGrants table for delegated access visibility", false, "CrossOrgGrants");
 		I_ASSIGN(m_productIdAttrPtr, "ProductId", "Product ID used when storing permissions (scoped per product)", false, "");
 	I_END_COMPONENT
 
@@ -112,6 +113,7 @@ private:
 	I_ATTR(bool, m_autoCreateRelationshipsTableAttrPtr);
 	I_ATTR(QByteArray, m_createRelationshipsTableScriptPathAttrPtr);
 	I_ATTR(QByteArray, m_relationshipsTableNameAttrPtr);
+	I_ATTR(QByteArray, m_crossOrgGrantsTableNameAttrPtr);
 	I_ATTR(QByteArray, m_productIdAttrPtr);
 };
 

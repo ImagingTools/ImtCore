@@ -365,6 +365,10 @@ QString CTenantDbDelegateComp::GetTenantRelationScopeSubquery(const QByteArray& 
 
 	QString escapedUserId = imtdb::EscapeSql(QString::fromUtf8(userId));
 
+	QString grantsTableName = m_crossOrgGrantsTableNameAttrPtr.IsValid()
+			? QString::fromUtf8(*m_crossOrgGrantsTableNameAttrPtr) : QStringLiteral("CrossOrgGrants");
+	QString now = imtdb::UtcNow();
+
 	return QString(
 				"SELECT *, "
 				"CASE "
@@ -372,12 +376,17 @@ QString CTenantDbDelegateComp::GetTenantRelationScopeSubquery(const QByteArray& 
 				"WHEN \"OwnerId\"='%1' THEN 'Owner' "
 				"WHEN \"Id\" IN (SELECT \"TenantId\" FROM \"TenantMemberships\" WHERE \"UserId\"='%1' AND \"IsActive\"=true) THEN 'Member' "
 				"WHEN \"Id\" IN (SELECT \"TenantId\" FROM \"TenantInvitations\" WHERE \"UserId\"='%1' AND \"Status\"=%2) THEN 'Invited' "
+				"WHEN \"Id\" IN (SELECT \"SourceTenantId\" FROM \"%4\" WHERE \"TargetTenantId\" IN "
+				"(SELECT \"TenantId\" FROM \"TenantMemberships\" WHERE \"UserId\"='%1' AND \"IsActive\"=true) "
+				"AND \"IsActive\"=1 AND (\"ExpiresAt\" IS NULL OR \"ExpiresAt\" > '%5')) THEN 'Delegated' "
 				"ELSE NULL "
 				"END AS \"TenantRelationScope\" "
 				"FROM \"%3\"")
 			.arg(escapedUserId)
 			.arg(s_invitationStatusPending)
-			.arg(tableName);
+			.arg(tableName)
+			.arg(grantsTableName)
+			.arg(now);
 }
 
 
@@ -479,7 +488,7 @@ QString CTenantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsS
 	QByteArray userId = ExtractUserId(&filterParams);
 	if (!userId.isEmpty()){
 		// With TenantRelationScope as a computed column in the subquery,
-		// only show tenants where the user has a relationship (Owner, Member, or Invited)
+		// only show tenants where the user has a relationship (Owner, Member, Invited, or Delegated)
 		additionalFilters << QStringLiteral("\"TenantRelationScope\" IS NOT NULL");
 	}
 
