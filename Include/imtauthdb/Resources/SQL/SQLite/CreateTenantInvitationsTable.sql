@@ -12,5 +12,6 @@ CREATE TABLE IF NOT EXISTS "TenantInvitations" (
 	"RejectedAt" TEXT,
 	"RevokedAt" TEXT,
 	"RevokedByUserId" TEXT,
-	"LastSentAt" TEXT
+	"LastSentAt" TEXT,
+	FOREIGN KEY ("TenantId") REFERENCES "Tenants" ("Id") ON DELETE CASCADE
 );

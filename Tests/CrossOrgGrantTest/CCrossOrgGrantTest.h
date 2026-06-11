@@ -113,6 +113,30 @@ public:
 
 	QList<CrossOrgGrantInfo> m_grants;
 	int m_counter = 0;
+
+	/**
+		Returns grants visible to the given tenant: only grants where the tenant
+		is either the source (grantor) or the target (grantee).
+	*/
+	CrossOrgGrants GetGrantsVisibleToTenant(const QByteArray& tenantId) const
+	{
+		CrossOrgGrants result;
+		for (const CrossOrgGrantInfo& info : m_grants){
+			if (info.sourceTenantId == tenantId || info.targetTenantId == tenantId){
+				result.append(info);
+			}
+		}
+		return result;
+	}
+
+	/**
+		Returns true when the given tenant is the grantee (target) of the grant,
+		meaning the grant should be presented as read-only.
+	*/
+	static bool IsReadOnlyForTenant(const CrossOrgGrantInfo& info, const QByteArray& tenantId)
+	{
+		return info.sourceTenantId != tenantId;
+	}
 };
 
 
@@ -146,6 +170,12 @@ private Q_SLOTS:
 	void testHasAccess_ExpiredDenied();
 	void testHasAccess_ScopedGrant();
 	void testHasAccess_WrongSourceDenied();
+
+	// Visibility and read-only
+	void testVisibility_SourceAndTargetSeeGrant();
+	void testVisibility_ThirdPartyDoesNotSeeGrant();
+	void testReadOnly_SourceIsNotReadOnly();
+	void testReadOnly_TargetIsReadOnly();
 
 private:
 	imtauth::CMockCrossOrgGrantManager* m_managerPtr = nullptr;

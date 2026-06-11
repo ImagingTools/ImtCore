@@ -53,7 +53,6 @@ sdl::V1_0::imtauth::CCrossOrgGrant CCrossOrgGrantCollectionDocumentServiceComp::
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtauth::GetGrantRepresentationRequestArguments arguments = getGrantRepresentationRequest.GetRequestedArguments();
-	Q_UNUSED(gqlRequest);
 
 	QByteArray objectId;
 	if (arguments.input && arguments.input->id){
@@ -78,6 +77,20 @@ sdl::V1_0::imtauth::CCrossOrgGrant CCrossOrgGrantCollectionDocumentServiceComp::
 		const imtauth::ICrossOrgGrantData* grantPtr = dynamic_cast<const imtauth::ICrossOrgGrantData*>(documentPtr.GetPtr());
 		if (grantPtr != nullptr){
 			imtauth::CrossOrgGrantInfo info = grantPtr->GetGrantInfo();
+
+			// Enforce tenant isolation: grant must belong to the context tenant
+			const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+			QByteArray contextTenantId;
+			if (gqlContextPtr != nullptr){
+				contextTenantId = gqlContextPtr->GetTenantId();
+			}
+			if (!contextTenantId.isEmpty()
+					&& info.sourceTenantId != contextTenantId
+					&& info.targetTenantId != contextTenantId){
+				errorMessage = QStringLiteral("Access denied: grant does not belong to the current tenant");
+				return sdl::V1_0::imtauth::CCrossOrgGrant();
+			}
+
 			sdl::V1_0::imtauth::CCrossOrgGrant response;
 			response.id = info.grantId;
 			response.sourceTenantId = info.sourceTenantId;
@@ -88,6 +101,14 @@ sdl::V1_0::imtauth::CCrossOrgGrant CCrossOrgGrantCollectionDocumentServiceComp::
 			response.createdAt = info.createdAt;
 			response.expiresAt = info.expiresAt;
 			response.isActive = info.isActive;
+
+			// Mark the grant as read-only when the current tenant is the grantee (target),
+			// not the grantor (source). Only the source tenant may edit the grant.
+			if (!contextTenantId.isEmpty()){
+				response.isReadOnly = (info.sourceTenantId != contextTenantId);
+			} else {
+				response.isReadOnly = false;
+			}
 
 			// Resolve target tenant name
 			if (m_tenantCollectionCompPtr.IsValid() && !info.targetTenantId.isEmpty()){
@@ -157,6 +178,15 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CCrossOrgGrantCollectionDocumentSer
 	}
 
 	imtauth::CrossOrgGrantInfo info = grantDataPtr->GetGrantInfo();
+
+	// Enforce tenant isolation: only the source (grantor) tenant may edit the grant.
+	// The target (grantee) tenant can view it but must not modify it.
+	if (!contextTenantId.isEmpty() && !info.grantId.isEmpty()){
+		if (info.sourceTenantId != contextTenantId){
+			errorMessage = QStringLiteral("Access denied: only the grantor tenant can modify this grant");
+			return response;
+		}
+	}
 
 	if (grantRepresentation.id){
 		info.grantId = *grantRepresentation.id;
