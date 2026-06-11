@@ -17,9 +17,9 @@ BoundingBox {
 
 	onBitmapShapeChanged: {
 		if(bitmapShape && bitmapShape.imageUrl){
-			imageShape.imageSource = bitmapShape.imageUrl;
+			root.imageSource = bitmapShape.imageUrl;
 			if(viewItem){
-				viewItem.loadImage(imageShape.imageSource);
+				viewItem.loadImage(root.imageSource);
 				viewItem.requestPaint();
 			}
 		}
@@ -42,7 +42,7 @@ BoundingBox {
 	function draw(ctx, transformMatrixArg) {
 		let params_ = getParams();
 		if(params_.source !== undefined){
-			imageShape.imageSource = params_.source
+			root.imageSource = params_.source
 		}
 		let x1 = params_.point !== undefined ? params_.point.x : points[0].x;
 		let y1 = params_.point !== undefined ? params_.point.y : points[0].y;
@@ -62,10 +62,10 @@ BoundingBox {
 		height_ = y2 - y1
 
 		if(width_ > 0 && height_ > 0){
-			ctx.drawImage(imageShape.imageSource, x1,y1, width_, height_)
+			ctx.drawImage(root.imageSource, x1,y1, width_, height_)
 		}
 		else {
-			ctx.drawImage(imageShape.imageSource, x1,y1)
+			ctx.drawImage(root.imageSource, x1,y1)
 		}
 	}
 
