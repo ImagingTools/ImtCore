@@ -249,7 +249,7 @@ imtsdl::TElementList<sdl::V1_0::imtauth::CProfileTenantInfo> CProfileControllerC
 				// Check if already added from another home tenant
 				bool alreadyAdded = false;
 				for (int i = 0; i < organizationList.size(); ++i){
-					if (organizationList[i].id == sourceTenantId){
+					if (organizationList[i]->id.HasValue() && organizationList[i]->id == sourceTenantId){
 						alreadyAdded = true;
 						break;
 					}
