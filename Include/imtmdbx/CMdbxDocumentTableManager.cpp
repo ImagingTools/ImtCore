@@ -84,8 +84,6 @@ void CMdbxDocumentTableManager::addTableConfig(const QString& tableName, const D
 	m_tableConfigHash.insert(tableName, config);
 }
 
-
-
 } // namespace imtmdbx
 
 

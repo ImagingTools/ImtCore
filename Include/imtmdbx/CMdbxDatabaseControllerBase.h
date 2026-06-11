@@ -25,7 +25,7 @@ class CMdbxDatabaseControllerBase:
 {
 	Q_OBJECT
 public:
-	using BaseClass				= ilog::CLoggerComponentBase;
+	typedef ilog::CLoggerComponentBase BaseClass;
 	using DocumentTableConfig	= CMdbxDocumentTableManager::DocumentTableConfig;
 
 	I_BEGIN_BASE_COMPONENT(CMdbxDatabaseControllerBase);
@@ -43,7 +43,7 @@ public:
 	virtual bool Update();
 	virtual void TriggerDebouncedUpdate();
 
-signals:
+Q_SIGNALS:
 	void updateFinished();
 
 protected Q_SLOTS:
