@@ -35,7 +35,7 @@ double CClusterCreator::getDistanceBetweenObjects(const QGeoCoordinate &coord1, 
 	double x_2 = coordToMercator(coord2).first;
 	double y_2 = coordToMercator(coord2).second;
 
-	dist = std::sqrtf((x_1 - x_2)*(x_1 - x_2) + (y_1 - y_2)*(y_1 - y_2));
+	dist = std::sqrt((x_1 - x_2)*(x_1 - x_2) + (y_1 - y_2)*(y_1 - y_2));
 
 	return dist;
 }
