@@ -376,6 +376,11 @@ I_EXPORT_COMPONENT(
 			"User group document validator",
 			"User Group Document Validator");
 
+I_EXPORT_COMPONENT(
+			DelegatedAccessResolver,
+			"Resolver composing membership and cross-org grants for delegated access checks",
+			"Delegated Access Resolver");
+
 
 } // namespace ImtAuthPck
 

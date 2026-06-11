@@ -3,8 +3,7 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 
 BoundingBox {
-	id: imageShape;
-
+	id: root
 	property real width: 0;
 	property real height: 0;
 
@@ -31,9 +30,9 @@ BoundingBox {
 		enabled: bitmapShape !== null
 		function onImageChanged(){
 			if(bitmapShape.imageUrl){
-				imageShape.imageSource = bitmapShape.imageUrl;
+				root.imageSource = bitmapShape.imageUrl;
 				if(viewItem){
-					viewItem.loadImage(imageShape.imageSource);
+					viewItem.loadImage(root.imageSource);
 					viewItem.requestPaint();
 				}
 			}
