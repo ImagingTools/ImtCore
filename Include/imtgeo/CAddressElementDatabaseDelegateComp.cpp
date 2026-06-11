@@ -246,35 +246,32 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateUpdateObjectQuery(
 	const QByteArray parents = QJsonDocument(parentIdJsonArray).toJson(QJsonDocument::Compact);
 
 	const QByteArray typeId	= adrInfoPtr->GetAddressTypeId();
-	const QString address	= adrInfoPtr->GetFullAddress();
 	const double lat		= adrInfoPtr->GetLatitude();
 	const double lon		= adrInfoPtr->GetLongitude();
 
 	QByteArray retVal = QStringLiteral(R"(
-						UPDATE "%11"
+						UPDATE "%10"
 						SET "Id" = '%1'
 							, "ParentIds" = '%2'
 							, "Type" = '%3'
 							, "Name" = %4
-							, "FullAddress" = %5
-							, "Description" = %6
-							, "Langitude" = %7
-							, "Latitude" = %8
-							, "LastModified" = '%10'
-						WHERE "Id" = '%10'
+							, "Description" = %5
+							, "Latitude" = %6
+							, "Longitude" = %7
+							, "LastModified" = '%8'
+						WHERE "Id" = '%9'
 							AND "State" = 'Active';)")
 		.arg(
 				/*1*/ adrId,
 				/*2*/ parents,
 				/*3*/ typeId,
 				/*4*/ imtdb::SqlValue(adrName),
-				/*5*/ imtdb::SqlValue(address),
-				/*6*/ imtdb::SqlValue(description),
-				/*7*/ imtdb::SqlValue(lat),
-				/*8*/ imtdb::SqlValue(lon),
-				/*9*/ imtdb::UtcNow(),
-				/*10*/ objectId,
-				/*11*/ *m_tableNameAttrPtr
+				/*5*/ imtdb::SqlValue(description),
+				/*6*/ imtdb::SqlValue(lat),
+				/*7*/ imtdb::SqlValue(lon),
+				/*8*/ imtdb::UtcNow(),
+				/*9*/ objectId,
+				/*10*/ *m_tableNameAttrPtr
 			)
 		.toUtf8();
 
