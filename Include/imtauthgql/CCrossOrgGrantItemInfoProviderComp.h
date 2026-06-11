@@ -36,7 +36,7 @@ public:
 	// reimplemented (ISelectableItemInfoProvider)
 	virtual bool GetItemParameters(
 				const QByteArray& objectId,
-				imtsdl::TElementList<sdl::V1_0::imtbase::CParameter>& parameters) const override;
+				iprm::IParamsSet& paramsSet) const override;
 
 private:
 	I_REF(imtbase::IObjectCollection, m_grantCollectionCompPtr);

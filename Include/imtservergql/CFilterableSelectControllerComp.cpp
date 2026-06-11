@@ -10,6 +10,7 @@
 // ACF includes
 #include <istd/TDelPtr.h>
 #include <iprm/CParamsSet.h>
+#include <iprm/ITextParam.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollectionIterator.h>
@@ -145,15 +146,31 @@ sdl::V1_0::imtbase::CGetSelectableItemsPayload CFilterableSelectControllerComp::
 		itemRepresentation.description = description;
 
 		// Fill additional parameters from info providers
-		imtsdl::TElementList<sdl::V1_0::imtbase::CParameter> itemParameters;
+		iprm::CParamsSet itemParamsSet;
 		for (int i = 0; i < m_itemInfoProvidersCompPtr.GetCount(); ++i){
 			const ISelectableItemInfoProvider* providerPtr = m_itemInfoProvidersCompPtr[i];
 			if (providerPtr != nullptr){
-				providerPtr->GetItemParameters(objectId, itemParameters);
+				providerPtr->GetItemParameters(objectId, itemParamsSet);
 			}
 		}
-		if (!itemParameters.isEmpty()){
-			itemRepresentation.parameters = itemParameters;
+
+		// Convert iprm::IParamsSet to SDL CParameter list
+		iprm::IParamsSet::Ids paramIds = itemParamsSet.GetParamIds();
+		if (!paramIds.isEmpty()){
+			imtsdl::TElementList<sdl::V1_0::imtbase::CParameter> itemParameters;
+			for (const QByteArray& paramId : paramIds.values()){
+				const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(itemParamsSet.GetParameter(paramId));
+				if (textParamPtr != nullptr){
+					sdl::V1_0::imtbase::CParameter sdlParam;
+					sdlParam.id = paramId;
+					sdlParam.name = QString::fromUtf8(paramId);
+					sdlParam.data = textParamPtr->GetText();
+					itemParameters << sdlParam;
+				}
+			}
+			if (!itemParameters.isEmpty()){
+				itemRepresentation.parameters = itemParameters;
+			}
 		}
 
 		itemsList << itemRepresentation;

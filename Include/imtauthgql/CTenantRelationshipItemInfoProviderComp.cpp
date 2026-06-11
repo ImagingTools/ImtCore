@@ -2,10 +2,12 @@
 #include <imtauthgql/CTenantRelationshipItemInfoProviderComp.h>
 
 
+// ACF includes
+#include <iprm/CTextParam.h>
+
 // ImtCore includes
 #include <imtauth/ITenantRelationshipInfo.h>
 #include <imtbase/ICollectionInfo.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtBaseTypes.h>
 
 
 namespace imtauthgql
@@ -48,7 +50,7 @@ QString RelationshipStatusToString(imtauth::ITenantRelationshipInfo::TenantRelat
 
 bool CTenantRelationshipItemInfoProviderComp::GetItemParameters(
 			const QByteArray& objectId,
-			imtsdl::TElementList<sdl::V1_0::imtbase::CParameter>& parameters) const
+			iprm::IParamsSet& paramsSet) const
 {
 	if (!m_relationshipCollectionCompPtr.IsValid()){
 		return false;
@@ -67,34 +69,28 @@ bool CTenantRelationshipItemInfoProviderComp::GetItemParameters(
 	// Partner tenant (target)
 	QByteArray targetTenantId = relationshipPtr->GetTargetTenantId();
 	if (!targetTenantId.isEmpty()){
-		sdl::V1_0::imtbase::CParameter partnerParam;
-		partnerParam.id = "partnerTenant";
-		partnerParam.name = QStringLiteral("Partner");
-
 		QString partnerName;
 		if (m_tenantCollectionCompPtr.IsValid()){
 			partnerName = m_tenantCollectionCompPtr->GetElementInfo(targetTenantId, imtbase::ICollectionInfo::EIT_NAME).toString();
 		}
-		partnerParam.data = partnerName.isEmpty() ? QString::fromUtf8(targetTenantId) : partnerName;
-		parameters << partnerParam;
+
+		iprm::CTextParam* partnerParamPtr = new iprm::CTextParam;
+		partnerParamPtr->SetText(partnerName.isEmpty() ? QString::fromUtf8(targetTenantId) : partnerName);
+		paramsSet.SetEditableParameter("partnerTenant", partnerParamPtr, true);
 	}
 
-	// Relationship role (target role describes what the partner is to us)
+	// Relationship role
 	{
-		sdl::V1_0::imtbase::CParameter roleParam;
-		roleParam.id = "role";
-		roleParam.name = QStringLiteral("Role");
-		roleParam.data = RelationshipRoleToString(relationshipPtr->GetTargetRole());
-		parameters << roleParam;
+		iprm::CTextParam* roleParamPtr = new iprm::CTextParam;
+		roleParamPtr->SetText(RelationshipRoleToString(relationshipPtr->GetTargetRole()));
+		paramsSet.SetEditableParameter("role", roleParamPtr, true);
 	}
 
 	// Status
 	{
-		sdl::V1_0::imtbase::CParameter statusParam;
-		statusParam.id = "status";
-		statusParam.name = QStringLiteral("Status");
-		statusParam.data = RelationshipStatusToString(relationshipPtr->GetStatus());
-		parameters << statusParam;
+		iprm::CTextParam* statusParamPtr = new iprm::CTextParam;
+		statusParamPtr->SetText(RelationshipStatusToString(relationshipPtr->GetStatus()));
+		paramsSet.SetEditableParameter("status", statusParamPtr, true);
 	}
 
 	return true;

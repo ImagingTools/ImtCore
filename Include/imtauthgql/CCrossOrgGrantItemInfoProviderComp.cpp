@@ -2,10 +2,12 @@
 #include <imtauthgql/CCrossOrgGrantItemInfoProviderComp.h>
 
 
+// ACF includes
+#include <iprm/CTextParam.h>
+
 // ImtCore includes
 #include <imtauth/ICrossOrgGrantData.h>
 #include <imtbase/ICollectionInfo.h>
-#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtBaseTypes.h>
 
 
 namespace imtauthgql
@@ -16,7 +18,7 @@ namespace imtauthgql
 
 bool CCrossOrgGrantItemInfoProviderComp::GetItemParameters(
 	const QByteArray& objectId,
-	imtsdl::TElementList<sdl::V1_0::imtbase::CParameter>& parameters) const
+	iprm::IParamsSet& paramsSet) const
 {
 	if (!m_grantCollectionCompPtr.IsValid()){
 		return false;
@@ -36,24 +38,18 @@ bool CCrossOrgGrantItemInfoProviderComp::GetItemParameters(
 
 	// Target tenant name
 	if (!grantInfo.targetTenantId.isEmpty()){
-		sdl::V1_0::imtbase::CParameter targetParam;
-		targetParam.id = "targetTenant";
-		targetParam.name = QStringLiteral("Target");
-
 		QString targetName;
 		if (m_tenantCollectionCompPtr.IsValid()){
 			targetName = m_tenantCollectionCompPtr->GetElementInfo(grantInfo.targetTenantId, imtbase::ICollectionInfo::EIT_NAME).toString();
 		}
-		targetParam.data = targetName.isEmpty() ? QString::fromUtf8(grantInfo.targetTenantId) : targetName;
-		parameters << targetParam;
+
+		iprm::CTextParam* targetParamPtr = new iprm::CTextParam;
+		targetParamPtr->SetText(targetName.isEmpty() ? QString::fromUtf8(grantInfo.targetTenantId) : targetName);
+		paramsSet.SetEditableParameter("targetTenant", targetParamPtr, true);
 	}
 
 	// Roles
 	if (!grantInfo.roleIds.isEmpty()){
-		sdl::V1_0::imtbase::CParameter rolesParam;
-		rolesParam.id = "roles";
-		rolesParam.name = QStringLiteral("Roles");
-
 		QStringList roleNames;
 		for (const QByteArray& roleId : grantInfo.roleIds){
 			QString roleName;
@@ -62,17 +58,17 @@ bool CCrossOrgGrantItemInfoProviderComp::GetItemParameters(
 			}
 			roleNames.append(roleName.isEmpty() ? QString::fromUtf8(roleId) : roleName);
 		}
-		rolesParam.data = roleNames.join(QStringLiteral(", "));
-		parameters << rolesParam;
+
+		iprm::CTextParam* rolesParamPtr = new iprm::CTextParam;
+		rolesParamPtr->SetText(roleNames.join(QStringLiteral(", ")));
+		paramsSet.SetEditableParameter("roles", rolesParamPtr, true);
 	}
 
 	// Expiry
 	if (!grantInfo.expiresAt.isEmpty()){
-		sdl::V1_0::imtbase::CParameter expiryParam;
-		expiryParam.id = "expiresAt";
-		expiryParam.name = QStringLiteral("Expires");
-		expiryParam.data = grantInfo.expiresAt;
-		parameters << expiryParam;
+		iprm::CTextParam* expiryParamPtr = new iprm::CTextParam;
+		expiryParamPtr->SetText(grantInfo.expiresAt);
+		paramsSet.SetEditableParameter("expiresAt", expiryParamPtr, true);
 	}
 
 	return true;
