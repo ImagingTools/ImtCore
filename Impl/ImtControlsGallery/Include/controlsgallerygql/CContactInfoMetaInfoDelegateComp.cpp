@@ -1,10 +1,9 @@
 #include <controlsgallerygql/CContactInfoMetaInfoDelegateComp.h>
 
 
-#include <QJsonObject>
-
 // ImtCore includes
 #include <imtauth/IContactInfo.h>
+#include <imtdbgql/TSdlBasedMetaInfoDelegateImpl.h>
 
 
 namespace controlsgallerygql
@@ -20,7 +19,11 @@ bool CContactInfoMetaInfoDelegateComp::ToJsonRepresentation(
 			QByteArray& json,
 			const QByteArray& typeId) const
 {
-	return BaseClass2::ToJsonRepresentation(metaInfo, json, typeId);
+	return imtdbgql::TSdlBasedMetaInfoDelegateImpl<sdl::V1_0::controlsgallery::CContactInfoItemData>::ToJsonRepresentation(
+			*this,
+			metaInfo,
+			json,
+			typeId);
 }
 
 
@@ -29,29 +32,31 @@ bool CContactInfoMetaInfoDelegateComp::FromJsonRepresentation(
 			idoc::IDocumentMetaInfo& metaInfo,
 			const QByteArray& typeId) const
 {
-	return BaseClass2::FromJsonRepresentation(json, metaInfo, typeId);
+	return imtdbgql::TSdlBasedMetaInfoDelegateImpl<sdl::V1_0::controlsgallery::CContactInfoItemData>::FromJsonRepresentation(
+			*this,
+			json,
+			metaInfo,
+			typeId);
 }
 
 
 // protected methods
 
-// reimplemented (imtdb::CJsonBasedMetaInfoDelegateComp)
+// reimplemented (imtdbgql::TSdlBasedMetaInfoDelegate<sdl::V1_0::controlsgallery::CContactInfoItemData>)
 
 bool CContactInfoMetaInfoDelegateComp::FillRepresentation(
-			QJsonObject& representation,
+			sdl::V1_0::controlsgallery::CContactInfoItemData& metaInfoRepresentation,
 			const idoc::IDocumentMetaInfo& metaInfo,
-			const QByteArray& typeId) const
+			const QByteArray& /*typeId*/) const
 {
-	Q_UNUSED(typeId);
-
 	QString firstName = metaInfo.GetMetaInfo(imtauth::IContactInfo::MIT_FIRST_NAME).toString();
-	representation["FirstName"] = firstName;
+	metaInfoRepresentation.firstName = firstName;
 
 	QString lastName = metaInfo.GetMetaInfo(imtauth::IContactInfo::MIT_LAST_NAME).toString();
-	representation["LastName"] = lastName;
+	metaInfoRepresentation.lastName = lastName;
 
 	QString mail = metaInfo.GetMetaInfo(imtauth::IContactInfo::MIT_MAIL).toString();
-	representation["Email"] = mail;
+	metaInfoRepresentation.email = mail;
 
 	return true;
 }
@@ -59,21 +64,19 @@ bool CContactInfoMetaInfoDelegateComp::FillRepresentation(
 
 bool CContactInfoMetaInfoDelegateComp::FillMetaInfo(
 			idoc::IDocumentMetaInfo& metaInfo,
-			const QJsonObject& representation,
-			const QByteArray& typeId) const
+			const sdl::V1_0::controlsgallery::CContactInfoItemData& metaInfoRepresentation,
+			const QByteArray& /*typeId*/) const
 {
-	Q_UNUSED(typeId);
-
-	if (representation.contains("FirstName")){
-		metaInfo.SetMetaInfo(imtauth::IContactInfo::MIT_FIRST_NAME, representation.value("FirstName"));
+	if (metaInfoRepresentation.firstName){
+		metaInfo.SetMetaInfo(imtauth::IContactInfo::MIT_FIRST_NAME, *metaInfoRepresentation.firstName);
 	}
 
-	if (representation.contains("LastName")){
-		metaInfo.SetMetaInfo(imtauth::IContactInfo::MIT_LAST_NAME, representation.value("LastName"));
+	if (metaInfoRepresentation.lastName){
+		metaInfo.SetMetaInfo(imtauth::IContactInfo::MIT_LAST_NAME, *metaInfoRepresentation.lastName);
 	}
 
-	if (representation.contains("Email")){
-		metaInfo.SetMetaInfo(imtauth::IContactInfo::MIT_MAIL, representation.value("Email"));
+	if (metaInfoRepresentation.email){
+		metaInfo.SetMetaInfo(imtauth::IContactInfo::MIT_MAIL, *metaInfoRepresentation.email);
 	}
 
 	return true;
@@ -81,3 +84,5 @@ bool CContactInfoMetaInfoDelegateComp::FillMetaInfo(
 
 
 } // namespace controlsgallerygql
+
+
