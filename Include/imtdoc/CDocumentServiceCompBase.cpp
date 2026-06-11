@@ -34,7 +34,8 @@ bool CDocumentServiceCompBase::HasDocumentNameProvider(const QByteArray& typeId)
 bool CDocumentServiceCompBase::ValidateDocumentData(
 	const WorkingDocument& document,
 	OperationStatus& status,
-	QString* errorMessage) const
+	QString* errorMessage,
+	const imtbase::IOperationContext* operationContextPtr) const
 {
 	status = OS_OK;
 	if (errorMessage != nullptr){
@@ -55,7 +56,7 @@ bool CDocumentServiceCompBase::ValidateDocumentData(
 	}
 
 	QString validationMessage;
-	if (!documentValidator->ValidateDocumentData(document.objectId, *document.objectPtr, validationMessage)){
+	if (!documentValidator->ValidateDocumentData(document.objectId, *document.objectPtr, validationMessage, operationContextPtr)){
 		status = OS_INVALID_DOCUMENT_DATA;
 		if (errorMessage != nullptr){
 			*errorMessage = validationMessage.isEmpty() ? GetInvalidDocumentMessage() : validationMessage;

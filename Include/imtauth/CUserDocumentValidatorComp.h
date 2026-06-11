@@ -15,18 +15,19 @@ namespace imtauth
 
 
 /**
-	Validates Tenant documents before save.
-	Ensures tenant name is specified and unique.
+	Validates User documents before save.
+	Ensures username is specified and unique (case-insensitive),
+	and that the user name is not empty.
 */
-class CTenantDocumentValidatorComp:
+class CUserDocumentValidatorComp:
 			public icomp::CComponentBase,
 			virtual public imtdoc::IDocumentValidator
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CTenantDocumentValidatorComp)
-		I_ASSIGN(m_tenantCollectionCompPtr, "TenantCollection", "Tenant collection used for uniqueness checks", true, "TenantCollection");
+	I_BEGIN_COMPONENT(CUserDocumentValidatorComp)
+		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection used for uniqueness checks", true, "UserCollection");
 		I_REGISTER_INTERFACE(imtdoc::IDocumentValidator)
 	I_END_COMPONENT
 
@@ -34,7 +35,7 @@ public:
 	virtual bool ValidateDocumentData(const QByteArray& objectId, const istd::IChangeable& document, QString& errorMessage, const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 
 private:
-	I_REF(imtbase::IObjectCollection, m_tenantCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 };
 
 
