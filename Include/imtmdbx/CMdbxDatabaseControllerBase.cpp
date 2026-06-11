@@ -301,7 +301,7 @@ void CMdbxDatabaseControllerBase::TriggerDebouncedUpdate()
 {
 	const int debounceInterval = m_updateDebounceIntervalMs->GetValue();
 	if (m_debounceTimer != nullptr && debounceInterval > 0) {
-		m_debounceTimer->start();
+		QMetaObject::invokeMethod(m_debounceTimer, "start", Qt::AutoConnection);
 	}
 	else {
 		Update();

@@ -33,7 +33,7 @@ public:
 		I_ASSIGN(m_transactionCountLimitAttr, "TransactionCheckpointInterval", "Max elements to process before performing a transactional checkpoint and reopen (100000000 - for Windows; 1000 - Others)", true, 1000);
 		I_ASSIGN(m_databaseEngineCompPtr, "DatabaseEngine", "Database engine for SQL queries", true, "DatabaseEngine");
 		I_ASSIGN(m_mdbxDatabaseEngineCompPtr, "MdbxDatabaseEngine", "MdbxDatabase engine for analytics data", true, "MdbxDatabaseEngine");
-		I_ASSIGN(m_updateDebounceIntervalMs, "UpdateDebounceIntervalMs", "Delay in milliseconds to debounce database updates triggered by collection changes.", true, 500);
+		I_ASSIGN(m_updateDebounceIntervalMs, "UpdateDebounceIntervalMs", "Delay in milliseconds to debounce database updates triggered by collection changes.", true, 0);
 		I_ASSIGN(m_updateIntervalSec, "UpdateIntervalSec", "Interval between database updates in seconds. No automatic updates if disabled.", false, 300); // 5 minutes
 		I_ASSIGN_MULTI_0(m_collectionListCompPtr, "DatabaseCollections", "Database collections. Connect to trigger MDBX update on every detected collection change", false);
 	I_END_COMPONENT;
@@ -41,7 +41,6 @@ public:
 	CMdbxDatabaseControllerBase();
 
 	virtual bool Update();
-	virtual void TriggerDebouncedUpdate();
 
 Q_SIGNALS:
 	void updateFinished();
@@ -55,7 +54,7 @@ protected:
 	virtual void OnComponentDestroyed() override;
 
 protected:
-	virtual bool CheckConfiguration() const;
+	virtual void TriggerDebouncedUpdate();
 
 	virtual bool CreateTables() = 0;
 	virtual bool CreateRevisionTime (mdbx::txn_managed& txn) = 0;
@@ -67,6 +66,8 @@ protected:
 				const QString& tableName,
 				const QString& time,
 				mdbx::txn_managed& txn);
+
+	virtual bool CheckConfiguration() const;
 
 	// reimplemented (imtbase::ITransactionManager)
 	virtual bool StartTransaction() override;
