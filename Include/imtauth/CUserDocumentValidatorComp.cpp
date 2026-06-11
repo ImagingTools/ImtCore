@@ -59,19 +59,9 @@ bool CUserDocumentValidatorComp::ValidateDocumentData(
 
 	imtbase::IObjectCollection::Ids userIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam);
 	for (const QByteArray& userObjectId : userIds){
-		if (userObjectId == objectId){
-			continue;
-		}
-
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_userCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
-			const imtauth::IUserInfo* currentUserInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
-			if (currentUserInfoPtr != nullptr){
-				if (currentUserInfoPtr->GetId().toLower() == username.toLower()){
-					errorMessage = QStringLiteral("Username already exists");
-					return false;
-				}
-			}
+		if (userObjectId != objectId){
+			errorMessage = QStringLiteral("Username already exists");
+			return false;
 		}
 	}
 
