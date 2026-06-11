@@ -271,7 +271,7 @@ imtsdl::TElementList<sdl::V1_0::imtauth::CProfileTenantInfo> CProfileControllerC
 				organizationInfo.isOwner = false;
 				organizationInfo.isActive = tenantPtr->IsActive();
 				organizationInfo.isDelegated = true;
-				organizationInfo.role = QStringLiteral("Delegated");
+				organizationInfo.role = QStringLiteral("Delegated Member");
 
 				imtsdl::TElementList<QString> delegatedRolesList;
 				for (const QByteArray& roleId : grant.roleIds){

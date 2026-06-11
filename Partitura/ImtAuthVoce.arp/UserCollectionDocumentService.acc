@@ -96,6 +96,9 @@
                     <AttributeInfo Id="CollectionDocumentService" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="CollectionDocumentService"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="HashCalculator" Type="Reference" ExportId="HashCalculator">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

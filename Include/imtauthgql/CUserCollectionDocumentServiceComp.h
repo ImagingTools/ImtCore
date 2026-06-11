@@ -4,6 +4,7 @@
 
 // ImtCore includes
 #include <imtdoc/IDocumentService.h>
+#include <imtcrypt/IHashGenerator.h>
 
 // Generated includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/UserCollectionDocumentService_fwd.h>
@@ -28,6 +29,7 @@ public:
 
 	I_BEGIN_COMPONENT(CUserCollectionDocumentServiceComp)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentService", "Collection document manager", false, "CollectionDocumentService");
+		I_ASSIGN(m_hashCalculatorCompPtr, "HashCalculator", "Hash calculator for password hashing", true, "HashCalculator");
 	I_END_COMPONENT
 
 protected:
@@ -43,6 +45,7 @@ protected:
 
 private:
 	I_REF(imtdoc::IDocumentService, m_documentManagerCompPtr);
+	I_REF(imtcrypt::IHashGenerator, m_hashCalculatorCompPtr);
 };
 
 
