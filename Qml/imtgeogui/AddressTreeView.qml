@@ -109,13 +109,13 @@ Rectangle{
 		}
 	}
 
-	function openNestedTree(ids){
+	function openNestedTree(ids, startIndex){
 		treeBody.idsToOpen = ids;
 		let id = getFirstIdToOpen();
 		if(id === ""){
 			return;
 		}
-		let index = treeView.findIndexById(id);
+		let index = treeView.findIndexById(id, "id", startIndex);
 		treeView.indexToMove = index;
 		treeView.openFunc(index);
 	}
@@ -124,7 +124,7 @@ Rectangle{
 		if(treeBody.idsToOpen !== ""){
 			treeBody.removeFirstIdToOpen();
 			if(treeBody.idsToOpen !== ""){
-				treeBody.openNestedTree(treeBody.idsToOpen)
+				treeBody.openNestedTree(treeBody.idsToOpen, index + 1)
 			}
 			else {
 				treeView.selectedIndex = index;

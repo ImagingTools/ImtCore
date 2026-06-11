@@ -27,14 +27,6 @@ Column {
 		updateGui()
 	}
 
-	function updateModel(){
-		container.model.setData("typeId", typeComboBox.currentIndex, 0)
-		container.model.setData("typeValue", container.typesModel.getData("name", typeComboBox.currentIndex), 0)
-		container.model.setData("name", nameField.text, 0)
-		container.model.setData("latitude", latitudeField.text, 0)
-		container.model.setData("longitude", longitudeField.text, 0)
-	}
-
 	function updateGui(){
 		typeComboBox.currentIndex = container.model.getData("typeId", 0)
 		nameField.text = container.model.getData("name", 0)
@@ -50,7 +42,8 @@ Column {
 		onCurrentIndexChanged: {
 			let oldIndex = container.model.getData("typeId", 0)
 			if (oldIndex !== typeComboBox.currentIndex){
-				container.updateModel();
+				container.model.setData("typeId", typeComboBox.currentIndex, 0)
+				container.model.setData("typeValue", container.typesModel.getData("name", typeComboBox.currentIndex), 0)
 			}
 		}
 	}
@@ -60,10 +53,10 @@ Column {
 		name: qsTr("Name");
 		width: parent.width
 
-		onEditingFinished: {
+		onTextChanged: {
 			let oldText = container.model.getData("name", 0)
 			if (oldText !== nameField.text){
-				container.updateModel();
+				container.model.setData("name", nameField.text, 0)
 			}
 		}
 	}
@@ -73,10 +66,13 @@ Column {
 		name: qsTr("Latitude");
 		width: parent.width
 
-		onEditingFinished: {
+		textInputValidator: DoubleValidator{}
+
+		onTextChanged: {
+			let newText = nameField.text.trim().replace(',','.')
 			let oldText = container.model.getData("latitude", 0)
-			if (oldText !== latitudeField.text){
-				container.updateModel();
+			if (oldText !== newText){
+				container.model.setData("latitude", latitudeField.text, 0)
 			}
 		}
 	}
@@ -86,10 +82,13 @@ Column {
 		name: qsTr("Longitude");
 		width: parent.width
 
-		onEditingFinished: {
-			let oldText = container.model.getData("longitude", 0)	
-			if (oldText !== longitudeField.text){
-				container.updateModel();
+		textInputValidator: DoubleValidator{}
+
+		onTextChanged: {
+			let newText = nameField.text.trim().replace(',','.')
+			let oldText = container.model.getData("longitude", 0)
+			if (oldText !== newText){
+				container.model.setData("longitude", longitudeField.text, 0)
 			}
 		}
 	}
