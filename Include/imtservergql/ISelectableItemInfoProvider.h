@@ -11,6 +11,7 @@
 #include <istd/IPolymorphic.h>
 
 // ImtCore includes
+#include <imtsdl/TElementList.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtBaseTypes_fwd.h>
 
 
@@ -39,8 +40,8 @@ public:
 		@return true if parameters were successfully provided, false otherwise.
 	*/
 	virtual bool GetItemParameters(
-		const QByteArray& objectId,
-		imtsdl::TElementList<sdl::V1_0::imtbase::CParameter>& parameters) const = 0;
+				const QByteArray& objectId,
+				imtsdl::TElementList<sdl::V1_0::imtbase::CParameter>& parameters) const = 0;
 };
 
 

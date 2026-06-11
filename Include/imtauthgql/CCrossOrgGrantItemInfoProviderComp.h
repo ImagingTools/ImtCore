@@ -2,6 +2,9 @@
 #pragma once
 
 
+// ACF includes
+#include <ilog/TLoggerCompWrap.h>
+
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtauth/ICrossOrgGrant.h>
@@ -18,8 +21,9 @@ namespace imtauthgql
 
 	\ingroup FilterableSelect
 */
-class CCrossOrgGrantItemInfoProviderComp:
-		public imtservergql::ISelectableItemInfoProvider
+class CCrossOrgGrantItemInfoProviderComp: 
+			public ilog::CLoggerComponentBase, 
+			public imtservergql::ISelectableItemInfoProvider
 {
 public:
 	I_BEGIN_COMPONENT(CCrossOrgGrantItemInfoProviderComp);
@@ -30,8 +34,8 @@ public:
 
 	// reimplemented (ISelectableItemInfoProvider)
 	virtual bool GetItemParameters(
-		const QByteArray& objectId,
-		imtsdl::TElementList<sdl::V1_0::imtbase::CParameter>& parameters) const override;
+				const QByteArray& objectId,
+				imtsdl::TElementList<sdl::V1_0::imtbase::CParameter>& parameters) const override;
 
 private:
 	I_REF(imtbase::IObjectCollection, m_grantCollectionCompPtr);

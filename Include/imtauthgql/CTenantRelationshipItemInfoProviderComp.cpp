@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CTenantRelationshipItemInfoProviderComp.h>
 
+
 // ImtCore includes
 #include <imtauth/ITenantRelationshipInfo.h>
 #include <imtbase/ICollectionInfo.h>
@@ -13,6 +14,7 @@ namespace imtauthgql
 
 namespace
 {
+
 
 QString RelationshipRoleToString(imtauth::ITenantRelationshipInfo::TenantRelationshipRole role)
 {
@@ -27,6 +29,7 @@ QString RelationshipRoleToString(imtauth::ITenantRelationshipInfo::TenantRelatio
 	}
 }
 
+
 QString RelationshipStatusToString(imtauth::ITenantRelationshipInfo::TenantRelationshipStatus status)
 {
 	switch (status){
@@ -37,14 +40,15 @@ QString RelationshipStatusToString(imtauth::ITenantRelationshipInfo::TenantRelat
 	}
 }
 
+
 } // anonymous namespace
 
 
 // reimplemented (ISelectableItemInfoProvider)
 
 bool CTenantRelationshipItemInfoProviderComp::GetItemParameters(
-	const QByteArray& objectId,
-	imtsdl::TElementList<sdl::V1_0::imtbase::CParameter>& parameters) const
+			const QByteArray& objectId,
+			imtsdl::TElementList<sdl::V1_0::imtbase::CParameter>& parameters) const
 {
 	if (!m_relationshipCollectionCompPtr.IsValid()){
 		return false;

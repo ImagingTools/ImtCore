@@ -2,6 +2,9 @@
 #pragma once
 
 
+// ACF includes
+#include <ilog/TLoggerCompWrap.h>
+
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtservergql/ISelectableItemInfoProvider.h>
@@ -18,7 +21,8 @@ namespace imtauthgql
 	\ingroup FilterableSelect
 */
 class CTenantRelationshipItemInfoProviderComp:
-		public imtservergql::ISelectableItemInfoProvider
+			public ilog::CLoggerComponentBase, 
+			public imtservergql::ISelectableItemInfoProvider
 {
 public:
 	I_BEGIN_COMPONENT(CTenantRelationshipItemInfoProviderComp);
@@ -28,8 +32,8 @@ public:
 
 	// reimplemented (ISelectableItemInfoProvider)
 	virtual bool GetItemParameters(
-		const QByteArray& objectId,
-		imtsdl::TElementList<sdl::V1_0::imtbase::CParameter>& parameters) const override;
+				const QByteArray& objectId,
+				imtsdl::TElementList<sdl::V1_0::imtbase::CParameter>& parameters) const override;
 
 private:
 	I_REF(imtbase::IObjectCollection, m_relationshipCollectionCompPtr);
