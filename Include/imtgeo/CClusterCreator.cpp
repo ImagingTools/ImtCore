@@ -2,6 +2,10 @@
 #include <imtgeo/CClusterCreator.h>
 
 
+// STL includes
+#include <cmath>
+
+
 namespace imtgeo
 {
 

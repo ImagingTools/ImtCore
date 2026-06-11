@@ -2,6 +2,10 @@
 #include <imtgeo/CTileProvider.h>
 
 
+// STL includes
+#include <cmath>
+
+
 namespace imtgeo
 {
 
