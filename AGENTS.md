@@ -52,6 +52,17 @@ These rules apply across the organization unless a repository-specific `AGENTS.m
 - State assumptions clearly when requirements are ambiguous.
 - Ask for clarification instead of guessing when needed.
 - Summarize what changed, why it changed, and how it was verified.
+## 9. QML 
+Правила написания QML
+При изменении QML-кода обязательно соблюдай следующие ограничения:
+ 
+весь QML пиши по аналогии с уже существующими QML-файлами в репозитории;
+не использовать QML Quick Controls, только собственные controls проекта;
+не использовать конструкции вида prop: { ... };
+допускаются только максимально простые конструкции, максимум тернарные операторы;
+обращения к свойствам, сигналам и функциям других типов — строго через id;
+не использовать сложный синтаксис и сложные QML-конструкции;
+максимально упрощать код и сохранять стиль существующих экранов.
 
 ## 9. Preferred output from the agent
 
