@@ -437,11 +437,12 @@ ViewBase {
 					Rectangle {
 						id: itemDelegateRoot
 						width: itemListView.width
-						height: Style.controlHeightL + Style.marginL
+						height: Style.controlHeightL + Style.marginL + (paramRepeater.count > 0 ? paramRepeater.count * (Style.fontSizeS + Style.marginXS) : 0)
 
 						property string itemId: modelData.id || ""
 						property string itemTitle: modelData.title || modelData.id || ""
 						property string itemDescription: modelData.description || ""
+						property var itemParameters: modelData.parameters || []
 						property bool isSelected: selectionManager_.isSelected(itemId)
 
 						color: isSelected ? Style.selectedColor
@@ -498,6 +499,20 @@ ViewBase {
 									color: Style.inactiveTextColor
 									elide: Text.ElideRight
 									width: parent.width
+								}
+
+								Repeater {
+									id: paramRepeater
+									model: itemDelegateRoot.itemParameters
+
+									BaseText {
+										text: (modelData.name || "") + (modelData.data ? (": " + modelData.data) : "")
+										font.pixelSize: Style.fontSizeS
+										color: Style.inactiveTextColor
+										elide: Text.ElideRight
+										width: parent.width
+										opacity: 0.8
+									}
 								}
 							}
 						}

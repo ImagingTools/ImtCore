@@ -6,6 +6,7 @@ schema {
 
 import {
 	"../../imtbase/1.0/ImtCollection.sdl"
+	"../../imtbase/1.0/ImtBaseTypes.sdl"
 }
 
 # --- Filterable Select ---
@@ -20,6 +21,7 @@ type SelectableItemData {
 	description: String
 	icon: String
 	color: String
+	parameters: [Parameter]
 }
 
 input GetSelectableItemsInput {

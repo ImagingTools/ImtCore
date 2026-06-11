@@ -6,6 +6,7 @@
 #include <imtauth/ITenantRelationshipInfo.h>
 #include <imtbase/ICollectionInfo.h>
 #include "imtbasesdl/SDL/1.0/CPP/FilterableSelect.h"
+#include "imtbasesdl/SDL/1.0/CPP/ImtBaseTypes.h"
 
 
 namespace imtauthgql
@@ -88,6 +89,47 @@ sdl::V1_0::imtbase::CGetSelectableItemsPayload CTenantRelationshipsSelectControl
 		QString description = relationshipInfoPtr->GetDescription();
 		if (!description.isEmpty()){
 			item.description = description;
+		}
+
+		// Fill additional parameters for the relationship item
+		imtsdl::TElementList<sdl::V1_0::imtbase::CParameter> itemParameters;
+
+		// Partner tenant
+		{
+			sdl::V1_0::imtbase::CParameter partnerParam;
+			partnerParam.id = "partnerTenant";
+			partnerParam.name = QStringLiteral("Partner");
+			QString partnerName;
+			if (m_tenantCollectionCompPtr.IsValid()){
+				partnerName = m_tenantCollectionCompPtr->GetElementInfo(partnerTenantId, imtbase::ICollectionInfo::EIT_NAME).toString();
+			}
+			partnerParam.data = partnerName.isEmpty() ? QString::fromUtf8(partnerTenantId) : partnerName;
+			itemParameters << partnerParam;
+		}
+
+		// Role
+		{
+			sdl::V1_0::imtbase::CParameter roleParam;
+			roleParam.id = "role";
+			roleParam.name = QStringLiteral("Role");
+			imtauth::ITenantRelationshipInfo::TenantRelationshipRole role =
+				(relationshipInfoPtr->GetSourceTenantId() == currentTenantId)
+					? relationshipInfoPtr->GetTargetRole()
+					: relationshipInfoPtr->GetSourceRole();
+			switch (role){
+				case imtauth::ITenantRelationshipInfo::TRR_PARENT: roleParam.data = QStringLiteral("Parent"); break;
+				case imtauth::ITenantRelationshipInfo::TRR_CHILD: roleParam.data = QStringLiteral("Child"); break;
+				case imtauth::ITenantRelationshipInfo::TRR_PARTNER: roleParam.data = QStringLiteral("Partner"); break;
+				case imtauth::ITenantRelationshipInfo::TRR_SUPPLIER: roleParam.data = QStringLiteral("Supplier"); break;
+				case imtauth::ITenantRelationshipInfo::TRR_CUSTOMER: roleParam.data = QStringLiteral("Customer"); break;
+				case imtauth::ITenantRelationshipInfo::TRR_AFFILIATE: roleParam.data = QStringLiteral("Affiliate"); break;
+				default: roleParam.data = QStringLiteral("Unknown"); break;
+			}
+			itemParameters << roleParam;
+		}
+
+		if (!itemParameters.isEmpty()){
+			item.parameters = itemParameters;
 		}
 
 		// Apply text filter
