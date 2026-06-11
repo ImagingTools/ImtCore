@@ -3,6 +3,7 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 
 BoundingBox {
+	id: imageShape;
 
 	property real width: 0;
 	property real height: 0;
@@ -17,9 +18,9 @@ BoundingBox {
 
 	onBitmapShapeChanged: {
 		if(bitmapShape && bitmapShape.imageUrl){
-			imageSource = bitmapShape.imageUrl;
+			imageShape.imageSource = bitmapShape.imageUrl;
 			if(viewItem){
-				viewItem.loadImage(imageSource);
+				viewItem.loadImage(imageShape.imageSource);
 				viewItem.requestPaint();
 			}
 		}
@@ -30,9 +31,9 @@ BoundingBox {
 		enabled: bitmapShape !== null
 		function onImageChanged(){
 			if(bitmapShape.imageUrl){
-				imageSource = bitmapShape.imageUrl;
+				imageShape.imageSource = bitmapShape.imageUrl;
 				if(viewItem){
-					viewItem.loadImage(imageSource);
+					viewItem.loadImage(imageShape.imageSource);
 					viewItem.requestPaint();
 				}
 			}
@@ -42,7 +43,7 @@ BoundingBox {
 	function draw(ctx, transformMatrixArg) {
 		let params_ = getParams();
 		if(params_.source !== undefined){
-			imageSource = params_.source
+			imageShape.imageSource = params_.source
 		}
 		let x1 = params_.point !== undefined ? params_.point.x : points[0].x;
 		let y1 = params_.point !== undefined ? params_.point.y : points[0].y;
@@ -62,10 +63,10 @@ BoundingBox {
 		height_ = y2 - y1
 
 		if(width_ > 0 && height_ > 0){
-			ctx.drawImage(imageSource, x1,y1, width_, height_)
+			ctx.drawImage(imageShape.imageSource, x1,y1, width_, height_)
 		}
 		else {
-			ctx.drawImage(imageSource, x1,y1)
+			ctx.drawImage(imageShape.imageSource, x1,y1)
 		}
 	}
 
