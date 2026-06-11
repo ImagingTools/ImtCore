@@ -26,6 +26,7 @@ class CTenantRelationshipItemInfoProviderComp:
 {
 public:
 	I_BEGIN_COMPONENT(CTenantRelationshipItemInfoProviderComp);
+		I_REGISTER_INTERFACE(imtservergql::ISelectableItemInfoProvider);
 		I_ASSIGN(m_relationshipCollectionCompPtr, "RelationshipCollection", "Tenant relationship collection", true, "RelationshipCollection");
 		I_ASSIGN(m_tenantCollectionCompPtr, "TenantCollection", "Tenant collection for name resolution", false, "TenantCollection");
 	I_END_COMPONENT;

@@ -21,6 +21,7 @@
         <Element ComponentName="TenantConnectionRequestManager" X="600" Y="75" Note=""/>
         <Element ComponentName="TenantConnectionsSelectController" X="973" Y="728" Note=""/>
         <Element ComponentName="TenantRelationshipInfo" X="275" Y="425" Note=""/>
+        <Element ComponentName="TenantRelationshipItemInfoProvider" X="975" Y="275" Note=""/>
         <Element ComponentName="TenantRelationshipProposalInfo" X="150" Y="200" Note=""/>
         <Element ComponentName="TenantRelationshipsDocumentService" X="500" Y="525" Note=""/>
         <Element ComponentName="TenantRelationshipsSelectController" X="975" Y="350" Note=""/>

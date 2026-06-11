@@ -27,6 +27,7 @@ class CCrossOrgGrantItemInfoProviderComp:
 {
 public:
 	I_BEGIN_COMPONENT(CCrossOrgGrantItemInfoProviderComp);
+		I_REGISTER_INTERFACE(imtservergql::ISelectableItemInfoProvider);
 		I_ASSIGN(m_grantCollectionCompPtr, "GrantCollection", "Cross-org grant collection", true, "GrantCollection");
 		I_ASSIGN(m_tenantCollectionCompPtr, "TenantCollection", "Tenant collection for name resolution", false, "TenantCollection");
 		I_ASSIGN(m_roleCollectionCompPtr, "RoleCollection", "Role collection for name resolution", false, "RoleCollection");

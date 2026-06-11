@@ -41,6 +41,21 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
+        <Element Id="CrossOrgGrantItemInfoProvider" PackageId="ImtAuthGqlPck" ComponentId="CrossOrgGrantItemInfoProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="GrantCollection" Type="Reference" ExportId="CrossOrgGrantRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="RoleRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantCollection" Type="Reference" ExportId="TenantCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="CrossOrgGrantManager" PackageId="ImtAuthPck" ComponentId="CrossOrgGrantManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -174,6 +189,13 @@
                 <AttributeInfoMap>
                     <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="CrossOrgGrants"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ItemInfoProviders" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>CrossOrgGrantItemInfoProvider</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>

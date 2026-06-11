@@ -242,6 +242,18 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
+        <Element Id="TenantRelationshipItemInfoProvider" PackageId="ImtAuthGqlPck" ComponentId="TenantRelationshipItemInfoProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="RelationshipCollection" Type="Reference" ExportId="TenantRelationshipRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantCollection" Type="Reference" ExportId="TenantRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="TenantRelationshipProposalInfo" PackageId="ImtAuthPck" ComponentId="TenantRelationshipProposalInfo">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap/>
@@ -307,6 +319,13 @@
                 <AttributeInfoMap>
                     <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="TenantRelationships"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ItemInfoProviders" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>TenantRelationshipItemInfoProvider</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
