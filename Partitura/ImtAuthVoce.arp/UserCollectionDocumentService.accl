@@ -10,6 +10,7 @@
     <PositionMap>
         <Element ComponentName="CollectionDocumentService" X="575" Y="250" Note=""/>
         <Element ComponentName="Demultiplexer" X="575" Y="75" Note=""/>
+        <Element ComponentName="HashCalculator" X="200" Y="500" Note=""/>
         <Element ComponentName="RoleCollectionAdapter" X="575" Y="600" Note=""/>
         <Element ComponentName="UserCollectionDocumentService" X="175" Y="250" Note=""/>
         <Element ComponentName="UserDocumentValidator" X="957" Y="249" Note=""/>

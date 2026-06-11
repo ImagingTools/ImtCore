@@ -10,6 +10,24 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="DelegatedAccessResolver" PackageId="ImtAuthPck" ComponentId="DelegatedAccessResolver">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CrossOrgGrantManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantGrantManager/CrossOrgGrantManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MembershipManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantMembershipManager/TenantMembershipManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="Demultiplexer" PackageId="ImtServerGqlPck" ComponentId="GraphQLDemultiplexer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -459,6 +477,7 @@
         <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="SlaveSubscriberController"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="DelegatedAccessResolver" ComponentId="DelegatedAccessResolver"/>
         <Component ExportedId="TenantConnectionRequestManager" ComponentId="TenantConnectionManager/TenantConnectionRequestManager"/>
         <Component ExportedId="TenantInvitationManager" ComponentId="TenantMembershipManager/TenantInvitationManager"/>
         <Component ExportedId="TenantManager" ComponentId="TenantManager/TenantManager"/>
