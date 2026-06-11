@@ -27,6 +27,15 @@ public:
 		I_REGISTER_INTERFACE(imtdb::IJsonBasedMetaInfoDelegate);
 	I_END_COMPONENT;
 
+	virtual bool ToJsonRepresentation(
+				const idoc::IDocumentMetaInfo& metaInfo,
+				QByteArray& json,
+				const QByteArray& typeId) const override;
+	virtual bool FromJsonRepresentation(
+				const QByteArray& json,
+				idoc::IDocumentMetaInfo& metaInfo,
+				const QByteArray& typeId) const override;
+
 protected:
 	// reimplemented (imtdbgql::TSdlBasedMetaInfoDelegate<sdl::V1_0::controlsgallery::CContactInfoItemData>)
 	virtual bool FillRepresentation(

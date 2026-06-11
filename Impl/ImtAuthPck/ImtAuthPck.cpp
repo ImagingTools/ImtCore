@@ -362,6 +362,21 @@ I_EXPORT_COMPONENT(
 			"Relationship Document Validator");
 
 I_EXPORT_COMPONENT(
+			RoleDocumentValidator,
+			"Role document validator",
+			"Role Document Validator");
+
+I_EXPORT_COMPONENT(
+			UserDocumentValidator,
+			"User document validator",
+			"User Document Validator");
+
+I_EXPORT_COMPONENT(
+			UserGroupDocumentValidator,
+			"User group document validator",
+			"User Group Document Validator");
+
+I_EXPORT_COMPONENT(
 			DelegatedAccessResolver,
 			"Resolver composing membership and cross-org grants for delegated access checks",
 			"Delegated Access Resolver");

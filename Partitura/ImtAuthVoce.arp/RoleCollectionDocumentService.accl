@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6397" Description="ACF"/>
-            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -13,6 +13,7 @@
         <Element ComponentName="Role" X="575" Y="375" Note=""/>
         <Element ComponentName="RoleCollectionAdapter" X="575" Y="550" Note=""/>
         <Element ComponentName="RoleCollectionDocumentService" X="175" Y="200" Note=""/>
+        <Element ComponentName="RoleDocumentValidator" X="950" Y="200" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

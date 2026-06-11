@@ -76,6 +76,9 @@
 #include <imtauth/CTenantDocumentValidatorComp.h>
 #include <imtauth/CRelationshipDocumentValidatorComp.h>
 #include <imtauth/CCrossOrgGrantDocumentValidatorComp.h>
+#include <imtauth/CRoleDocumentValidatorComp.h>
+#include <imtauth/CUserDocumentValidatorComp.h>
+#include <imtauth/CUserGroupDocumentValidatorComp.h>
 #include <imtauth/CDelegatedAccessResolverComp.h>
 
 
@@ -192,6 +195,9 @@ typedef imtauth::CTenantRelationshipDocumentNameProviderComp TenantRelationshipD
 typedef imtauth::CTenantDocumentValidatorComp TenantDocumentValidator;
 typedef imtauth::CCrossOrgGrantDocumentValidatorComp CrossOrgGrantDocumentValidator;
 typedef imtauth::CRelationshipDocumentValidatorComp RelationshipDocumentValidator;
+typedef imtauth::CRoleDocumentValidatorComp RoleDocumentValidator;
+typedef imtauth::CUserDocumentValidatorComp UserDocumentValidator;
+typedef imtauth::CUserGroupDocumentValidatorComp UserGroupDocumentValidator;
 typedef imtauth::CDelegatedAccessResolverComp DelegatedAccessResolver;
 
 

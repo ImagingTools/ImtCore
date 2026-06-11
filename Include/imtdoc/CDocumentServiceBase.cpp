@@ -923,7 +923,8 @@ bool CDocumentServiceBase::HasDocumentNameProvider(const QByteArray& /*typeId*/)
 bool CDocumentServiceBase::ValidateDocumentData(
 	const WorkingDocument& /*document*/,
 	OperationStatus& status,
-	QString* errorMessage) const
+	QString* errorMessage,
+	const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	status = OS_OK;
 	if (errorMessage != nullptr){

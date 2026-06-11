@@ -18,7 +18,8 @@ namespace imtauth
 bool CTenantDocumentValidatorComp::ValidateDocumentData(
 			const QByteArray& objectId,
 			const istd::IChangeable& document,
-			QString& errorMessage) const
+			QString& errorMessage,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	const imtauth::ITenantInfo* tenantInfo = dynamic_cast<const imtauth::ITenantInfo*>(&document);
 	if (tenantInfo == nullptr){
