@@ -133,39 +133,19 @@ function runCommandSync(command, args, cwd) {
     }
 }
 
-function quoteCmdArg(value) {
-    const raw = String(value)
-    if (raw.length === 0) return '""'
-    if (!/[\s"]/g.test(raw)) return raw
-    return `"${raw.replaceAll('"', '""')}"`
-}
-
 function runCmakeWithOptionalVsDev(cmakeArgs, cwd, vsDevCmdPath) {
     if (!vsDevCmdPath) {
         return runCommandSync('cmake', cmakeArgs, cwd)
     }
 
-    const scriptPath = path.resolve(cwd, '.jqml_desktop_host_build.cmd')
-    const cmakeCmd = ['cmake', ...cmakeArgs].map(quoteCmdArg).join(' ')
-    const script = [
-        '@echo off',
-        `call ${quoteCmdArg(vsDevCmdPath)} -no_logo -arch=x64 -host_arch=x64`,
-        'if errorlevel 1 exit /b %errorlevel%',
-        cmakeCmd,
-        'exit /b %errorlevel%',
-        '',
-    ].join('\r\n')
+    const devEnvResult = runCommandSync(
+        vsDevCmdPath,
+        ['-no_logo', '-arch=x64', '-host_arch=x64'],
+        cwd
+    )
+    if (!devEnvResult.ok) return devEnvResult
 
-    try {
-        fs.writeFileSync(scriptPath, script, 'utf-8')
-        return runCommandSync('cmd.exe', ['/d', '/c', scriptPath], cwd)
-    } finally {
-        try {
-            fs.rmSync(scriptPath, { force: true })
-        } catch (e) {
-            // ignore cleanup errors
-        }
-    }
+    return runCommandSync('cmake', cmakeArgs, cwd)
 }
 
 function resolveVsDevCmdPath() {
