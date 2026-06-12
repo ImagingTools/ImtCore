@@ -14,6 +14,7 @@
 #include <imtauthdb/CPersonalAccessTokenDatabaseDelegateComp.h>
 #include <imtauthdb/CTenantDbDelegateComp.h>
 #include <imtauthdb/CTenantMembershipDbDelegateComp.h>
+#include <imtauthdb/CTenantEntityBindingDbDelegateComp.h>
 #include <imtauthdb/CTenantInvitationDbDelegateComp.h>
 #include <imtauthdb/CCrossOrgGrantDbDelegateComp.h>
 #include <imtauthdb/CContractDbDelegateComp.h>
@@ -47,6 +48,7 @@ typedef imtauthdb::CUserActionDatabaseDelegateComp UserActionDatabaseDelegate;
 typedef imtauthdb::CPersonalAccessTokenDatabaseDelegateComp PersonalAccessTokenDatabaseDelegate;
 typedef imtauthdb::CTenantDbDelegateComp TenantDatabaseDelegate;
 typedef imtauthdb::CTenantMembershipDbDelegateComp TenantMembershipDatabaseDelegate;
+typedef imtauthdb::CTenantEntityBindingDbDelegateComp TenantEntityBindingDatabaseDelegate;
 typedef imtauthdb::CTenantInvitationDbDelegateComp TenantInvitationDatabaseDelegate;
 typedef imtauthdb::CCrossOrgGrantDbDelegateComp CrossOrgGrantDatabaseDelegate;
 typedef imtauthdb::CContractDbDelegateComp ContractDatabaseDelegate;

@@ -252,6 +252,16 @@ I_EXPORT_COMPONENT(
 			"Tenant Membership Manager");
 
 I_EXPORT_COMPONENT(
+			TenantEntityBindingInfo,
+			"Entity representing a tenant-entity binding for visibility filtering",
+			"Tenant Entity Binding Info");
+
+I_EXPORT_COMPONENT(
+			TenantEntityBindingManager,
+			"Manager for tenant-entity bindings with filtered add/remove operations",
+			"Tenant Entity Binding Manager");
+
+I_EXPORT_COMPONENT(
 			TenantInvitationInfo,
 			"Entity representing pending tenant invitation lifecycle state",
 			"Tenant Invitation Info");

@@ -169,6 +169,24 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="SQLiteTenantEntityBindingRepository" PackageId="ImtUserAdministrationVoce" ComponentId="SQLiteTenantEntityBindingRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="SQLiteTenantInvitationRepository" PackageId="ImtUserAdministrationVoce" ComponentId="SQLiteTenantInvitationRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -364,6 +382,7 @@
         <Component ExportedId="SQLiteTenantConnectionCodeRepository" ComponentId="SQLiteTenantConnectionCodeRepository"/>
         <Component ExportedId="SQLiteTenantConnectionRepository" ComponentId="SQLiteTenantConnectionRepository"/>
         <Component ExportedId="SQLiteTenantConnectionRequestRepository" ComponentId="SQLiteTenantConnectionRequestRepository"/>
+        <Component ExportedId="SQLiteTenantEntityBindingRepository" ComponentId="SQLiteTenantEntityBindingRepository"/>
         <Component ExportedId="SQLiteTenantInvitationRepository" ComponentId="SQLiteTenantInvitationRepository"/>
         <Component ExportedId="SQLiteTenantMembershipRepository" ComponentId="SQLiteTenantMembershipRepository"/>
         <Component ExportedId="SQLiteTenantRelationshipProposalRepository" ComponentId="SQLiteTenantRelationshipProposalRepository"/>

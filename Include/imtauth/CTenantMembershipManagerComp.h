@@ -8,6 +8,7 @@
 // ImtCore includes
 #include <imtauth/ITenantManager.h>
 #include <imtauth/ITenantMembershipManager.h>
+#include <imtauth/ITenantEntityBindingManager.h>
 #include <imtbase/IObjectCollection.h>
 
 
@@ -27,6 +28,8 @@ public:
 		I_ASSIGN(m_membershipCollectionCompPtr, "MembershipCollection", "Membership collection", true, "MembershipCollection");
 		I_ASSIGN(m_membershipFactoryCompPtr, "MembershipFactory", "Membership info factory", true, "TenantMembershipInfo");
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager for ownership checks", false, "TenantManager");
+		I_ASSIGN(m_bindingManagerCompPtr, "BindingManager", "Tenant entity binding manager for add/remove bindings", false, "TenantEntityBindingManager");
+		I_ASSIGN(m_bindingEntityTypeAttrPtr, "BindingEntityType", "EntityType value used in TenantEntityBindings (must match the Users table name)", false, "Users");
 	I_END_COMPONENT;
 
 	// reimplemented (imtauth::ITenantMembershipManager)
@@ -46,6 +49,8 @@ private:
 	I_REF(imtbase::IObjectCollection, m_membershipCollectionCompPtr);
 	I_FACT(imtauth::ITenantMembership, m_membershipFactoryCompPtr);
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
+	I_REF(imtauth::ITenantEntityBindingManager, m_bindingManagerCompPtr);
+	I_ATTR(QByteArray, m_bindingEntityTypeAttrPtr);
 };
 
 
