@@ -110,14 +110,21 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 		return response;
 	}
 
-	// Store tenantId from GQL context for later use in ProcessEvent (on SaveDocument)
-	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	if (gqlContextPtr != nullptr){
-		QByteArray tenantId = gqlContextPtr->GetTenantId();
-		if (!tenantId.isEmpty()){
-			QMutexLocker locker(&m_pendingTenantIdsMutex);
-			m_pendingTenantIds.insert(documentId, tenantId);
+	// Resolve tenantId: prefer explicit input field, fallback to JWT context
+	QByteArray tenantId;
+	if (arguments.input->tenantId){
+		tenantId = *arguments.input->tenantId;
+	}
+	if (tenantId.isEmpty()){
+		const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+		if (gqlContextPtr != nullptr){
+			tenantId = gqlContextPtr->GetTenantId();
 		}
+	}
+
+	if (!tenantId.isEmpty()){
+		QMutexLocker locker(&m_pendingTenantIdsMutex);
+		m_pendingTenantIds.insert(documentId, tenantId);
 	}
 
 	QByteArray userLogin = GetUserId(gqlRequest);

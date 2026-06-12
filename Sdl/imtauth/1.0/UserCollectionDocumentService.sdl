@@ -15,6 +15,7 @@ import {
 type UpdateUserFromRepresentationInput {
 	documentId: ID!
 	user: UserData!
+	tenantId: ID
 }
 
 type Query {
