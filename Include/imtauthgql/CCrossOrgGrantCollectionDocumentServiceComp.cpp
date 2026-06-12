@@ -217,7 +217,8 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CCrossOrgGrantCollectionDocumentSer
 	}
 	if (grantRepresentation.isActive){
 		info.isActive = *grantRepresentation.isActive;
-	} else if (!info.isActive){
+	} else if (info.grantId.isEmpty()){
+		// Default new grants to active only when the client omitted the flag.
 		info.isActive = true;
 	}
 

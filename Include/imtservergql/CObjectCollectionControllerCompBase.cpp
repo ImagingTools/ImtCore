@@ -1188,7 +1188,7 @@ sdl::V1_0::imtbase::CSetObjectDataPayload CObjectCollectionControllerCompBase::O
 
 sdl::V1_0::imtbase::CGetObjectDataPayload CObjectCollectionControllerCompBase::OnGetObjectData(
 			const sdl::V1_0::imtbase::CGetObjectDataGqlRequest& getObjectDataRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::V1_0::imtbase::CGetObjectDataPayload response;
@@ -1210,8 +1210,11 @@ sdl::V1_0::imtbase::CGetObjectDataPayload CObjectCollectionControllerCompBase::O
 		return sdl::V1_0::imtbase::CGetObjectDataPayload();
 	}
 
+	istd::IChangeableUniquePtr adaptedObjectPtr = CreateAdaptedObjectData(objectId, *dataPtr.GetPtr(), gqlRequest);
+	istd::IChangeable* objectToSerializePtr = adaptedObjectPtr.IsValid() ? adaptedObjectPtr.GetPtr() : dataPtr.GetPtr();
+
 	QByteArray objectData;
-	if (!SerializeObject(*dataPtr.GetPtr(), objectData)){
+	if (!SerializeObject(*objectToSerializePtr, objectData)){
 		errorMessage = QString("Unable to get object data '%1'. Error: Object serializaion failed").arg(QString::fromUtf8(objectId));
 		return sdl::V1_0::imtbase::CGetObjectDataPayload();
 	}
@@ -2995,6 +2998,15 @@ void CObjectCollectionControllerCompBase::OnAfterSetObjectDescription(
 			const QString& /*description*/,
 			const imtgql::CGqlRequest& /*gqlRequest*/) const
 {
+}
+
+
+istd::IChangeableUniquePtr CObjectCollectionControllerCompBase::CreateAdaptedObjectData(
+			const QByteArray& /*objectId*/,
+			const istd::IChangeable& /*object*/,
+			const imtgql::CGqlRequest& /*gqlRequest*/) const
+{
+	return istd::IChangeableUniquePtr();
 }
 
 

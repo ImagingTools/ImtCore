@@ -28,6 +28,7 @@ ViewBase {
 	property string __selectedTargetTenantId: ""
 	property string __selectedTargetTenantName: ""
 	property string __selectedExpiresAt: ""
+	property bool __isActive: true
 	property bool __loadingGui: false
 	property bool isReadOnly: grantData ? (grantData.m_isReadOnly === true) : false
 
@@ -68,6 +69,10 @@ ViewBase {
 
 		var exp = container.grantData.m_expiresAt || ""
 		container.__selectedExpiresAt = exp
+		container.__isActive = container.grantData.m_isActive !== undefined
+			? container.grantData.m_isActive
+			: true
+		isActiveSwitch.checked = container.__isActive
 		container.__loadingGui = true
 		expirationCb.currentIndex = container.expiresAtToIndex(exp)
 		container.__loadingGui = false
@@ -88,6 +93,7 @@ ViewBase {
 
 		container.grantData.m_description = grantDescriptionInput.text.trim()
 		container.grantData.m_expiresAt = container.__selectedExpiresAt
+		container.grantData.m_isActive = isActiveSwitch.checked
 	}
 
 	CustomScrollbar {
@@ -203,6 +209,20 @@ ViewBase {
 					placeHolderText: qsTr("Optional description")
 					readOnly: container.isReadOnly
 					onEditingFinished: {
+						container.doUpdateModel()
+					}
+				}
+
+				SwitchElementView {
+					id: isActiveSwitch
+					name: qsTr("Active")
+					checked: container.__isActive
+					readOnly: container.isReadOnly
+					onCheckedChanged: {
+						if (container.__loadingGui)
+							return
+
+						container.__isActive = checked
 						container.doUpdateModel()
 					}
 				}
