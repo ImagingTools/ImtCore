@@ -18,7 +18,7 @@ class Signal extends BaseObject {
 
             // Priority connections (cross-item bindings) fire before SLOT_
             if(name in target.__connections){
-                for(let connection of target.__connections[name]){
+                for(let connection of target.__connections[name].slice()){
                     if(!connection.priority) continue
                     try {
                         if(connection.target){
@@ -41,7 +41,7 @@ class Signal extends BaseObject {
             }
 
             if(name in target.__connections){
-                for(let connection of target.__connections[name]){
+                for(let connection of target.__connections[name].slice()){
                     if(connection.priority) continue
                     try {
                         if(connection.target){
