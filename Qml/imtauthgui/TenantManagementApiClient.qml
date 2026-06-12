@@ -131,7 +131,6 @@ QtObject {
 	function transferOwnership(tenantId, newOwnerId) {}
 	function setMemberRole(tenantId, userId, role) {}
 	function removeMember(tenantId, userId) {}
-	function addMembership(userId, tenantId, role) {}
 
 	function createRoleData() {}
 	function insertRole(roleId, roleData) {}

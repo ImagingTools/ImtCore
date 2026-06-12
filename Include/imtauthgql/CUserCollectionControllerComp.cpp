@@ -11,6 +11,7 @@
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtauth/CUserInfo.h>
+#include <imtgql/IGqlContext.h>
 
 
 namespace imtauthgql
@@ -733,6 +734,41 @@ bool CUserCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& 
 	}
 
 	return BaseClass::CheckPermissions(gqlRequest, errorMessage);
+}
+
+
+QJsonObject CUserCollectionControllerComp::InsertObject(
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	QJsonObject result = BaseClass::InsertObject(gqlRequest, errorMessage);
+	if (result.isEmpty()){
+		return result;
+	}
+
+	if (!m_membershipManagerCompPtr.IsValid()){
+		return result;
+	}
+
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr == nullptr){
+		return result;
+	}
+
+	QByteArray tenantId = gqlContextPtr->GetTenantId();
+	if (tenantId.isEmpty()){
+		return result;
+	}
+
+	QJsonObject dataObj = result.value("data").toObject();
+	QByteArray newUserId = dataObj.value("id").toString().toUtf8();
+	if (newUserId.isEmpty()){
+		return result;
+	}
+
+	m_membershipManagerCompPtr->AddMembership(newUserId, tenantId, "Member");
+
+	return result;
 }
 
 

@@ -354,13 +354,6 @@ QtObject {
 		root.__findMembershipForRemoveSender.send(root.__findMembershipForRemoveInput)
 	}
 
-	function addMembership(userId, tenantId, role) {
-		root.__addMembershipInput.m_userId = userId || ""
-		root.__addMembershipInput.m_tenantId = tenantId || ""
-		root.__addMembershipInput.m_role = role || "Member"
-		root.__addMembershipSender.send(root.__addMembershipInput)
-	}
-
 	function removeRoles(roleIds) {
 		root.__removeRoleInput.m_collectionId = "Roles"
 		root.__removeRoleInput.m_elementIds = roleIds
@@ -1567,23 +1560,6 @@ QtObject {
 
 	property GqlBasedCollectionDocumentService __userDocumentService: GqlBasedCollectionDocumentService {
 		collectionId: "Users"
-	}
-
-	// Track newly-created user document IDs so that after save we can
-	// auto-add membership for the tenant.
-	property var __newUserDocumentIds: ({})
-
-	Connections {
-		target: root.__userDocumentService
-		function onDocumentCreated(documentId, documentTypeId) {
-			root.__newUserDocumentIds[documentId] = true
-		}
-		function onDocumentSaved(documentId) {
-			if (root.__newUserDocumentIds[documentId]) {
-				delete root.__newUserDocumentIds[documentId]
-				root.addMembership(documentId, root.tenantId, "Member")
-			}
-		}
 	}
 
 	property GqlBasedCollectionDocumentService __relationshipDocumentService: GqlBasedCollectionDocumentService {
