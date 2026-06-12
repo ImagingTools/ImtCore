@@ -123,17 +123,10 @@ Rectangle{
 				property int index: model.index;
 				property bool isSelected: model.index == treeViewGql.selectedIndex;
 				property bool isHovered: delegateMA.containsMouse;
-				property var selection_ : null;
-				property var hover_ : null;
 				property int addItemWidth: 0;
 				property var additionalItem: null
 
 				ListView.onReused: {
-					if(deleg.hover_){
-						deleg.hover_.destroy();
-						deleg.hover_ = null;
-					}
-
 					if (additionalItem && typeof additionalItem.onRedraw === "function"){
 						additionalItem.onRedraw()
 					}
@@ -151,66 +144,24 @@ Rectangle{
 					}
 				}
 
-				onIsSelectedChanged: {
-					if(!treeViewGql.hasSelection){
-						return
-					}
-
-					if(!deleg.isSelected){
-						if(deleg.selection_){
-							deleg.selection_.destroy();
-							deleg.selection_ = null;
-						}
-					}
-					else {
-						if(deleg.hover_){
-							deleg.hover_.destroy();
-							deleg.hover_ = null;
-						}
-						if(!deleg.selection_){
-							deleg.selection_ = selectionComp.createObject(deleg)
-							deleg.selection_.z = -1;
-						}
-					}
+				Rectangle {
+					id: selectionRect
+					anchors.fill: parent
+					radius: treeViewGql.selectionRadius
+					opacity: treeViewGql.selectionOpacity
+					color: treeViewGql.selectionColor
+					visible: treeViewGql.hasSelection && deleg.isSelected
+					z: -1
 				}
 
-				onIsHoveredChanged: {
-					if(!treeViewGql.hasSelection || deleg.isSelected){
-						return
-					}
-
-					if(deleg.isHovered){
-						if(!deleg.hover_){
-							deleg.hover_ = hoverComp.createObject(deleg)
-							deleg.hover_.z = -1;
-						}
-					}
-					else {
-						if(deleg.hover_){
-							deleg.hover_.destroy();
-							deleg.hover_ = null;
-						}
-					}
-				}
-
-				Component{
-					id: selectionComp;
-					Rectangle{
-						anchors.fill: parent;
-						radius: treeViewGql.selectionRadius;
-						opacity: treeViewGql.selectionOpacity;
-						color: treeViewGql.selectionColor;
-					}
-				}
-
-				Component{
-					id: hoverComp;
-					Rectangle{
-						anchors.fill: parent;
-						radius: treeViewGql.selectionRadius;
-						opacity: treeViewGql.selectionOpacity;
-						color: treeViewGql.hoverColor;
-					}
+				Rectangle {
+					id: hoverRect
+					anchors.fill: parent
+					radius: treeViewGql.selectionRadius
+					opacity: treeViewGql.selectionOpacity
+					color: treeViewGql.hoverColor
+					visible: treeViewGql.hasSelection && deleg.isHovered && !deleg.isSelected
+					z: -1
 				}
 
 				Item{
@@ -523,6 +474,10 @@ Rectangle{
 		}
 		treeViewGql.setContentWidth();
 
+		if(index === -1){
+			treeViewGql.forceRefresh();
+		}
+
 		treeViewGql.inserted(index);
 	}
 
@@ -754,13 +709,22 @@ Rectangle{
 		return -1;
 	}
 
-	function findIndexById(id, nameId){
+	function forceRefresh(){
+		let temp = list.model;
+		list.model = null;
+		list.model = temp;
+	}
+
+	function findIndexById(id, nameId, startIndex){
 		if(nameId == undefined){
 			nameId = "id";
 		}
+		if(startIndex == undefined){
+			startIndex = 0;
+		}
 
 		let foundIndex = -1;
-		for(let i = 0; i < treeViewGql.model.getItemsCount(); i++){
+		for(let i = startIndex; i < treeViewGql.model.getItemsCount(); i++){
 			let id_curr = treeViewGql.model.isValidData(nameId, i) ? treeViewGql.model.getData(nameId, i) : "";
 			if(id_curr == id){
 				foundIndex = i;

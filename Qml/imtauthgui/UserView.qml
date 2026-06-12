@@ -8,7 +8,7 @@ import imtdocgui 1.0
 import imtguigql 1.0
 import imtdeskgui 1.0
 
-ViewBase {
+DocumentViewBase {
 	id: container;
 	
 	anchors.fill: parent;

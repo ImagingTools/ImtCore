@@ -11,6 +11,7 @@
 
 // ImtCore includes
 #include <imtauth/ITenantMembership.h>
+#include <imtauth/ITenantEntityBindingManager.h>
 #include <imtauth/ITenantManager.h>
 
 
@@ -171,6 +172,12 @@ QByteArray CTenantMembershipManagerComp::AddMembership(const QByteArray& userId,
 		return QByteArray();
 	}
 
+	// Create TenantEntityBinding for the new member
+	if (m_bindingManagerCompPtr.IsValid()){
+		QByteArray entityType = m_bindingEntityTypeAttrPtr.IsValid() ? *m_bindingEntityTypeAttrPtr : QByteArrayLiteral("Users");
+		m_bindingManagerCompPtr->AddBinding(tenantId, entityType, userId);
+	}
+
 	SendInfoMessage(0, QString("Added membership for user '%1' in tenant '%2' with role '%3'")
 		.arg(QString::fromUtf8(userId), QString::fromUtf8(tenantId), QString::fromUtf8(roleId)), "CTenantMembershipManagerComp");
 
@@ -190,11 +197,34 @@ bool CTenantMembershipManagerComp::RemoveMembership(const QByteArray& membership
 		return false;
 	}
 
+	// Retrieve userId and tenantId before removing membership record
+	QByteArray userId;
+	QByteArray tenantId;
+	{
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_membershipCollectionCompPtr->GetObjectData(membershipId, dataPtr)){
+			const ITenantMembership* membershipPtr = dynamic_cast<const ITenantMembership*>(dataPtr.GetPtr());
+			if (membershipPtr != nullptr){
+				userId = membershipPtr->GetUserId();
+				tenantId = membershipPtr->GetTenantId();
+			}
+		}
+	}
+
 	istd::CChangeNotifier changeNotifier(this);
 
 	if (!m_membershipCollectionCompPtr->RemoveElements({membershipId})){
 		SendErrorMessage(0, QString("Failed to remove membership '%1'").arg(QString::fromUtf8(membershipId)), "CTenantMembershipManagerComp");
 		return false;
+	}
+
+	// Clean up TenantEntityBindings for the removed user
+	if (m_bindingManagerCompPtr.IsValid() && !userId.isEmpty() && !tenantId.isEmpty()){
+		QByteArray entityType = m_bindingEntityTypeAttrPtr.IsValid() ? *m_bindingEntityTypeAttrPtr : QByteArrayLiteral("Users");
+		if (!m_bindingManagerCompPtr->RemoveBinding(tenantId, entityType, userId)){
+			SendWarningMessage(0, QString("Failed to clean up TenantEntityBindings for user '%1' in tenant '%2'")
+				.arg(QString::fromUtf8(userId), QString::fromUtf8(tenantId)), "CTenantMembershipManagerComp");
+		}
 	}
 
 	SendInfoMessage(0, QString("Removed membership '%1'").arg(QString::fromUtf8(membershipId)), "CTenantMembershipManagerComp");

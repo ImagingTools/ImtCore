@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="TenantEntityBindingInfo" PackageId="ImtAuthPck" ComponentId="TenantEntityBindingInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="TenantEntityBindingManager" PackageId="ImtAuthPck" ComponentId="TenantEntityBindingManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="BindingFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="TenantEntityBindingInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="BindingsCollection" Type="Reference" ExportId="TenantEntityBindingRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtauth::ITenantEntityBindingManager" ComponentId="TenantEntityBindingManager"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="TenantEntityBindingManager" ComponentId="TenantEntityBindingManager"/>
+    </ExportedComponents>
+</Acf>

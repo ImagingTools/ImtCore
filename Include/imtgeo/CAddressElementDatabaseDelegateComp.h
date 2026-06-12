@@ -14,13 +14,14 @@ namespace imtgeo
 class CAddressElementDatabaseDelegateComp: public imtdb::CSqlDatabaseObjectDelegateCompBase
 {
 public:
-	typedef imtdb::CSqlDatabaseObjectDelegateCompBase BaseClass;
+	using BaseClass = imtdb::CSqlDatabaseObjectDelegateCompBase;
 
 	I_BEGIN_COMPONENT(CAddressElementDatabaseDelegateComp)
-		I_ASSIGN(m_adrElementInfoFactCompPtr, "AddressElemenInfo", "Factory used for creation of the new address elemen instance", true, "AddressElemenInfo");
+		I_ASSIGN(m_adressFactoryCompPtr, "AddressElemenInfo", "Factory used for creation of the new address elemen instance", true, "AddressElemenInfo");
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
+	virtual QByteArray GetObjectTypeId(const QByteArray& objectId) const override;
 	virtual istd::IChangeableUniquePtr CreateObjectFromRecord(
 				const QSqlRecord& record,
 				const iprm::IParamsSet* dataConfigurationPtr = nullptr) const override;
@@ -60,15 +61,14 @@ public:
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* paramsPtr = nullptr) const override;
-	virtual bool CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
-	virtual QByteArray GetObjectTypeId(
-			const QByteArray& objectId) const override;
-	virtual bool CreateTextFilterQuery(
-				const imtbase::ICollectionFilter& collectionFilter,
-				QString& textFilterQuery) const override;
+
+protected:
+	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
+	virtual QString GetBaseSelectionQuery() const override;
+	virtual QString CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const override;
 
 private:
-    I_FACT(imtgeo::IAddressElementInfo, m_adrElementInfoFactCompPtr);
+	I_FACT(imtgeo::IAddressElementInfo, m_adressFactoryCompPtr);
 };
 
 

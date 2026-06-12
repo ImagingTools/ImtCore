@@ -6,6 +6,8 @@
 #include <imtservergql/CObjectCollectionControllerCompBase.h>
 #include <imtcrypt/IHashGenerator.h>
 #include <imtauth/IUserGroupInfoProvider.h>
+#include <imtauth/IDelegatedAccess.h>
+#include <imtauth/ITenantMembershipManager.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users_fwd.h>
 
 
@@ -23,6 +25,8 @@ public:
 		I_ASSIGN(m_userGroupInfoProviderCompPtr, "UserGroupInfoProvider", "User group info provider", true, "UserGroupInfoProvider");
 		I_ASSIGN(m_userInfoFactCompPtr, "UserFactory", "Factory used for creation of the new user instance", true, "UserFactory");
 		I_ASSIGN(m_hashCalculatorCompPtr, "HashCalculator", "Hash calculator", true, "HashCalculator");
+		I_ASSIGN(m_delegatedAccessCompPtr, "DelegatedAccess", "Optional delegated access resolver used to enrich the user with roles delegated via cross-org grants", false, "DelegatedAccessResolver");
+		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager for auto-adding membership on user creation", false, "MembershipManager");
 	I_END_COMPONENT;
 
 protected:
@@ -63,6 +67,13 @@ protected:
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
 
+	// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
+	virtual istd::IChangeableUniquePtr CreateAdaptedObjectData(
+				const QByteArray& objectId,
+				const istd::IChangeable& object,
+				const imtgql::CGqlRequest& gqlRequest) const override;
+	virtual QJsonObject InsertObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+
 	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
@@ -71,6 +82,8 @@ protected:
 	I_REF(imtauth::IUserGroupInfoProvider, m_userGroupInfoProviderCompPtr);
 	I_FACT(imtauth::IUserInfo, m_userInfoFactCompPtr);
 	I_REF(imtcrypt::IHashGenerator, m_hashCalculatorCompPtr);
+	I_REF(imtauth::IDelegatedAccess, m_delegatedAccessCompPtr);
+	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
 };
 
 

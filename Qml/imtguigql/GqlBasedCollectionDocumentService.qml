@@ -97,6 +97,7 @@ DocumentServiceBase {
 		documentTypeIdInput.m_collectionId = collectionId
 		documentTypeIdInput.m_proposedSourceDocumentId = proposedSourceDocumentId || ""
 		createDocumentRequest.typeId = typeId
+		createDocumentRequest.proposedObjectId = proposedSourceDocumentId || ""
 
 		createDocumentRequest.send(documentTypeIdInput)
 	}
@@ -271,6 +272,8 @@ DocumentServiceBase {
 					root.setAutoNamedTypeId(m_objectTypeId, m_hasNameProvider)
 					root.setDocumentName(m_documentId, m_documentName)
 					root.__internal.createDocumentData(m_documentId, m_objectTypeId, true)
+					if (root.createDocumentRequest.proposedObjectId !== "")
+						root.setDocumentObjectId(m_documentId, root.createDocumentRequest.proposedObjectId)
 					root.documentCreated(m_documentId, m_objectTypeId)
 					root.setDocumentIsLoading(m_documentId, true)
 				}
@@ -278,6 +281,7 @@ DocumentServiceBase {
 		}
 
 		property string typeId
+		property string proposedObjectId: ""
 
 		function getHeaders(){
 			return root.getHeaders()

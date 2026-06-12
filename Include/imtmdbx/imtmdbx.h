@@ -29,7 +29,33 @@ namespace imtmdbx
 static const quint64 QUINT64_MAX = 0xffffffffffffffff;
 
 
-namespace BitUtils {
+// General data
+struct MdbxGeneralData
+{
+	/**
+		\brief Information table: holder of all table names present in the database
+	*/
+	static const inline QString INFO = QStringLiteral("InfoTable");
+	/**
+		\brief Creation time key: used to store creation time of INFO table
+	*/
+	static const inline QString CREATION_TIME = QStringLiteral("CreationTime");
+	/**
+		\brief Revision time table: holder of last revision time for each table, used for synchronization and update optimization
+	*/
+	static const inline QString REVISION_TIME = QStringLiteral("RevisionTime");
+	/**
+		\brief Sorted multi-table name prefix: used as base prefix for multi-value tables.
+	*/
+	static const inline QString MTABLE_SORTED_BASE = QStringLiteral("MultiTable_");
+	/**
+		\brief MDBX mask postfix: used as postfix for all masks, so it's easy to identify them and separate from tables.
+	*/
+	static const inline QString MASK = QStringLiteral("Mask");
+};
+
+
+inline namespace BitUtils {
 
 
 /**
@@ -91,7 +117,7 @@ inline int BitCount(uint64_t n) {
 }
 
 
-}; // namespace BitUtils
+}; // inline namespace BitUtils
 
 
 } // namespace imtmdbx

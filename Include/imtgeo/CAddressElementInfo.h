@@ -14,24 +14,23 @@ namespace imtgeo
 class CAddressElementInfo: public CPositionIdentifiable, virtual public IAddressElementInfo
 {
 public:
-	typedef CPositionIdentifiable BaseClass;
-
-	CAddressElementInfo();
-	~CAddressElementInfo();
+	using BaseClass = CPositionIdentifiable;
 
 	// reimplemented (imtgeo::IAddressElementInfo)
 	virtual QList<QByteArray> GetParentIds() const override;
 	virtual void SetParentIds(const QList<QByteArray>& parentIds) override;
+
 	virtual QByteArray GetAddressTypeId() const override;
 	virtual void SetAddressTypeId(const QByteArray& typeId) override;
+
 	virtual QString GetName() const override;
 	virtual void SetName(const QString& name) override;
+
 	virtual QString GetDescription() const override;
 	virtual void SetDescription(const QString &description) override;
-	virtual QString GetAddress() const override;
-	virtual void SetAddress(const QString& adr) override;
-	virtual bool GetHasChildren() const override;
-	virtual void SetHasChildren(const bool& hasChildren) override;
+
+	virtual QString GetFullAddress() const override;
+	virtual void SetFullAddress(const QString& adr) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -45,12 +44,11 @@ public:
 
 private:
 	QByteArray m_id;
-	QByteArray m_adrTypeId;
-	QByteArrayList m_parentIds;
+	QByteArray m_typeId;
 	QString m_name;
 	QString m_description;
 	QString m_fullAddress;
-	bool m_hasChildren;
+	QByteArrayList m_parentIds;
 };
 
 

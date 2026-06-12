@@ -16,15 +16,16 @@ class CPosition: virtual public IPosition
 {
 public:
 	CPosition();
-	~CPosition();
 
 	// reimplemented (imtgeo::IPosition)
 	virtual double GetLatitude() const override;
-	virtual void SetLatitude(const double& lat) override;
+	virtual void SetLatitude(double lat) override;
+
 	virtual double GetLongitude() const override;
-	virtual void SetLongitude(const double& lon) override;
+	virtual void SetLongitude(double lon) override;
+
 	virtual int GetZoomLevel() const override;
-	virtual void SetZoomLevel(const double& zoom) override;
+	virtual void SetZoomLevel(double zoom) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -43,7 +44,7 @@ private:
 };
 
 
-typedef imtbase::TIdentifiableWrap<CPosition> CPositionIdentifiable;
+using CPositionIdentifiable = imtbase::TIdentifiableWrap<CPosition>;
 
 
 } // namespace imtgeo
