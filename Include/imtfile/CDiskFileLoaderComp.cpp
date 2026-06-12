@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
-#include <imtfile/CFileProviderComp.h>
+#include <imtfile/CDiskFileLoaderComp.h>
 
 // Qt includes
 #include <QtCore/QRegularExpressionMatch>
@@ -11,7 +11,7 @@ namespace imtfile
 
 // reimplemented (IFileProvider)
 
-bool CFileProviderComp::LoadData(QByteArray& data, const QByteArray& name) const
+bool CDiskFileLoaderComp::LoadData(QByteArray& data, const QByteArray& name) const
 {
 	QByteArray workingFileName = name;
 	QString homeDirPath = *m_homeDirPathAttrPtr;

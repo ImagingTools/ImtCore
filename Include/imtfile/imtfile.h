@@ -31,7 +31,7 @@
 	
 	<b>Provider Pattern:</b>
 	- IFileProvider abstracts file content loading
-	- CFileProviderComp provides concrete implementation
+	- CDiskFileLoaderComp provides concrete implementation
 	- Enables dependency injection for file access
 	- Facilitates testing with mock providers
 	
@@ -62,7 +62,7 @@
 	├─ LoadData(data, filePath) - Load binary file contents
 	└─ Use cases: Resource loading, data import
 	    │
-	    └─ CFileProviderComp (concrete implementation)
+	    └─ CDiskFileLoaderComp (concrete implementation)
 	        ├─ Handles binary file reading
 	        ├─ Error handling and logging
 	        └─ Cross-platform path handling
@@ -98,11 +98,11 @@
 	
 	\subsection imtfile_provider File Content Provider
 	
-	**IFileProvider / CFileProviderComp** - Binary file loading service:
+	**IFileProvider / CDiskFileLoaderComp** - Binary file loading service:
 	
 	\code{.cpp}
 	// Create file provider
-	auto fileProvider = CFileProviderComp::CreateInstance();
+	auto fileProvider = CDiskFileLoaderComp::CreateInstance();
 	
 	// Load binary file contents
 	QByteArray fileData;
