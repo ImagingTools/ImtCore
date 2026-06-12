@@ -78,6 +78,8 @@ Q_SIGNALS:
 	void SendTextMessage(const QByteArray& data) const;
 
 private:
+	QPointer<QWebSocket> GetValidWebSocket() const;
+
 	CWebSocketServerComp* m_server;
 	imtrest::IProtocolEngine* m_enginePtr;
 	mutable QMutex m_socketDescriptorMutex;
@@ -96,5 +98,4 @@ private:
 
 
 } // namespace imtrest
-
 
