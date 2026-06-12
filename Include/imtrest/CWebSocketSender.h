@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtWebSockets/QtWebSockets>
+#include <QtCore/QPointer>
 
 // ImtCore includes
 #include <imtrest/ITransport.h>
@@ -31,10 +32,9 @@ Q_SIGNALS:
 	void SendTextMessage(const QByteArray& data) const;
 
 private:
-	QWebSocket* m_webSocketPtr;
+	QPointer<QWebSocket> m_webSocketPtr;
 };
 
 
 } // namespace imtrest
-
 

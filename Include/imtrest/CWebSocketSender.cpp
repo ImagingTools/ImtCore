@@ -24,7 +24,7 @@ CWebSocketSender::CWebSocketSender(QWebSocket* webSocketPtr): m_webSocketPtr(web
 
 const QWebSocket* CWebSocketSender::GetSocket() const
 {
-	return m_webSocketPtr;
+	return m_webSocketPtr.data();
 }
 
 // reimplemented (IRequest)
@@ -39,8 +39,9 @@ bool CWebSocketSender::SendResponse(ConstResponsePtr& response) const
 		return false;
 	}
 
-	if (m_webSocketPtr != nullptr){
-		if (!m_webSocketPtr->isValid()){
+	QWebSocket* webSocketPtr = m_webSocketPtr.data();
+	if (webSocketPtr != nullptr){
+		if (!webSocketPtr->isValid()){
 			return false;
 		}
 
@@ -57,8 +58,9 @@ bool CWebSocketSender::SendResponse(ConstResponsePtr& response) const
 
 bool CWebSocketSender::SendRequest(ConstRequestPtr& request) const
 {
-	if (m_webSocketPtr != nullptr){
-		if (!m_webSocketPtr->isValid()){
+	QWebSocket* webSocketPtr = m_webSocketPtr.data();
+	if (webSocketPtr != nullptr){
+		if (!webSocketPtr->isValid()){
 			return false;
 		}
 
@@ -76,16 +78,16 @@ bool CWebSocketSender::SendRequest(ConstRequestPtr& request) const
 
 void CWebSocketSender::OnSendTextMessage(const QByteArray& data) const
 {
-	if (m_webSocketPtr != nullptr){
-		if (!m_webSocketPtr->isValid()){
+	QWebSocket* webSocketPtr = m_webSocketPtr.data();
+	if (webSocketPtr != nullptr){
+		if (!webSocketPtr->isValid()){
 			return;
 		}
 
-		m_webSocketPtr->sendTextMessage(data);
+		webSocketPtr->sendTextMessage(data);
 	}
 }
 
 
 } // namespace imtrest
-
 
