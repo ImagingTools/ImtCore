@@ -22,7 +22,7 @@ TenantSimpleCollectionPage {
 	entityNamePlural: qsTr("My Relationships")
 	descriptionText: qsTr("Business relationships with other organizations. Creating or modifying a relationship requires approval from both parties.")
 	showCreateButton: true
-	documentNameFields: ["m_name", "m_targetTenantName"]
+	documentNameFields: ["m_targetTenantName"]
 
 	documentManager: relationshipsPage.apiClient ? relationshipsPage.apiClient.relationshipDocumentManager : null
 	objectTypeId: relationshipsPage.apiClient ? relationshipsPage.apiClient.relationshipObjectTypeId : ""

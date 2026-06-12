@@ -155,6 +155,8 @@ Item {
 		function fillModel(){
 			contextMenuModel.clear();
 			contextMenuModel.append({"id": "Profile", "name": qsTr("Profile"), "icon": "Icons/Account", "isEnabled": true});
+			if (AuthorizationController.currentTenantId !== "")
+				contextMenuModel.append({"id": "LeaveTenant", "name": qsTr("Leave Organization"), "icon": "Icons/Exit", "isEnabled": true});
 			contextMenuModel.append({"id": "", "name": "", "Icon": ""});
 			contextMenuModel.append({"id": "Logout", "name": qsTr("Logout"), "icon": "Icons/Exit", "isEnabled": true});
 		}
@@ -169,6 +171,9 @@ Item {
 			onFinished: {
 				if (commandId == "Logout"){
 					AuthorizationController.logout();
+				}
+				else if (commandId == "LeaveTenant"){
+					AuthorizationController.selectTenant("");
 				}
 				else if (commandId == "Profile"){
 					ModalDialogManager.openDialog(profileViewComp, {});

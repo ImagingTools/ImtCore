@@ -133,6 +133,14 @@ DocumentViewBase {
 
 	// --- Refresh the document when the server confirms membership changes ---
 	Connections {
+		target: container.apiClient ? container.apiClient.userDocumentManager : null
+		function onDocumentSaved(documentId) {
+			if (!stateManager_.isNewTenant && container.representationController)
+				container.representationController.updateRepresentationFromDocument()
+		}
+	}
+
+	Connections {
 		target: container.apiClient
 		function onInvitationCreated() {
 			PopupManager.addSuccessMessage(qsTr("Invitation created successfully"), true)

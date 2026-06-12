@@ -66,7 +66,7 @@ QtObject {
 
 	signal ownershipTransferred()
 	signal memberRoleChanged(string userId, string role)
-	signal membersRemoved()
+	signal memberRemoved(string userId)
 
 	signal roleCreated()
 	signal rolesRemoved()
@@ -419,7 +419,7 @@ QtObject {
 						ModalDialogManager.showInfoDialog(m_errorMessage)
 						root.requestFailed(m_errorMessage)
 					} else {
-						root.membersRemoved()
+						root.memberRemoved(root.__findMembershipForRemoveInput.m_userId)
 					}
 				}
 			}
