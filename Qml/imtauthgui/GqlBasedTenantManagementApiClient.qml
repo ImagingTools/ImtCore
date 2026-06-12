@@ -66,7 +66,7 @@ QtObject {
 
 	signal ownershipTransferred()
 	signal memberRoleChanged(string userId, string role)
-	signal membersRemoved()
+	signal memberRemoved(string userId)
 
 	signal roleCreated()
 	signal rolesRemoved()
@@ -419,7 +419,7 @@ QtObject {
 						ModalDialogManager.showInfoDialog(m_errorMessage)
 						root.requestFailed(m_errorMessage)
 					} else {
-						root.membersRemoved()
+						root.memberRemoved(root.__findMembershipForRemoveInput.m_userId)
 					}
 				}
 			}
@@ -1598,6 +1598,14 @@ QtObject {
 				m_id: UuidGenerator.generateUUID()
 			}
 
+			onDocumentIdChanged: {
+				if (documentId !== ""){
+					var objId = root.__roleDocumentService.getDocumentObjectId(documentId)
+					if (objId !== "")
+						representationModel.m_id = objId
+				}
+			}
+
 			function updateRepresentationFromDocument(){
 				startUpdateRepresentation(documentId, representationModel)
 
@@ -1675,6 +1683,14 @@ QtObject {
 				m_id: UuidGenerator.generateUUID()
 			}
 
+			onDocumentIdChanged: {
+				if (documentId !== ""){
+					var objId = root.__groupDocumentService.getDocumentObjectId(documentId)
+					if (objId !== "")
+						representationModel.m_id = objId
+				}
+			}
+
 			function updateRepresentationFromDocument(){
 				startUpdateRepresentation(documentId, representationModel)
 
@@ -1745,11 +1761,11 @@ QtObject {
 
 			onUserDataChanged: {
 				if (userData && root.userDocumentManager){
-					userEditor.isNew = root.userDocumentManager.documentIsNew(userData.m_id)
+					userEditor.isNew = root.userDocumentManager.documentIsNew(userEditor.documentId)
 				}
 			}
 
-			function documentSaved(){
+			onDocumentSaved: {
 				userEditor.isNew = false
 				userEditor.checkChangePasswordLogic()
 			}
@@ -1762,6 +1778,14 @@ QtObject {
 
 			representationModel: UserData {
 				m_id: UuidGenerator.generateUUID()
+			}
+
+			onDocumentIdChanged: {
+				if (documentId !== ""){
+					var objId = root.__userDocumentService.getDocumentObjectId(documentId)
+					if (objId !== "")
+						representationModel.m_id = objId
+				}
 			}
 
 			function updateRepresentationFromDocument(){
@@ -1777,6 +1801,7 @@ QtObject {
 
 				updateUserInput.m_documentId = documentId
 				updateUserInput.m_user = representationModel
+				updateUserInput.m_tenantId = root.tenantId
 				updateUserRequest.send(updateUserInput)
 			}
 

@@ -54,6 +54,8 @@
 #include <imtauth/CTenantManagerComp.h>
 #include <imtauth/CTenantMembershipComp.h>
 #include <imtauth/CTenantMembershipManagerComp.h>
+#include <imtauth/CTenantEntityBindingComp.h>
+#include <imtauth/CTenantEntityBindingManagerComp.h>
 #include <imtauth/CTenantInvitationComp.h>
 #include <imtauth/CTenantInvitationManagerComp.h>
 #include <imtauth/CCrossOrgGrantComp.h>
@@ -173,6 +175,8 @@ typedef imtauth::CTenantMetaInfoCreatorComp TenantMetaInfoCreator;
 typedef icomp::TModelCompWrap<imtauth::CTenantManagerComp> TenantManager;
 typedef icomp::TModelCompWrap<imtauth::CTenantMembershipComp> TenantMembershipInfo;
 typedef icomp::TModelCompWrap<imtauth::CTenantMembershipManagerComp> TenantMembershipManager;
+typedef icomp::TModelCompWrap<imtauth::CTenantEntityBindingComp> TenantEntityBindingInfo;
+typedef icomp::TModelCompWrap<imtauth::CTenantEntityBindingManagerComp> TenantEntityBindingManager;
 typedef icomp::TModelCompWrap<imtauth::CTenantInvitationComp> TenantInvitationInfo;
 typedef icomp::TModelCompWrap<imtauth::CTenantInvitationManagerComp> TenantInvitationManager;
 typedef icomp::TModelCompWrap<imtauth::CCrossOrgGrantComp> CrossOrgGrantInfo;

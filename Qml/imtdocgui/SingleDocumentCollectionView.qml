@@ -309,7 +309,7 @@ Item {
 
 	Rectangle {
 		anchors.fill: parent
-		color: Style.backgroundColor2
+		color: Style.baseColor
 	}
 
 	ListModel {

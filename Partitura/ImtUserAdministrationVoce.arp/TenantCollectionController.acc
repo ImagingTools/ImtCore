@@ -36,7 +36,7 @@
                     <AttributeInfo Id="HeaderNames" Type="Text[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Tenant Name</Value>
+                                <Value>Name</Value>
                                 <Value>Description</Value>
                                 <Value>Role</Value>
                                 <Value>Active</Value>

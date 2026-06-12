@@ -285,6 +285,11 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectsQuery(
 								QString::fromUtf8(s_documentIdColumn),
 								quotedIds);
 
+	QByteArray bindingDeleteQuery = CreateTenantBindingDeleteQuery(objectIds);
+	if (!bindingDeleteQuery.isEmpty()){
+		query += QString::fromUtf8(bindingDeleteQuery);
+	}
+
 	return query.toUtf8();
 }
 
@@ -1267,6 +1272,27 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingInsertQuery(
 					onConflictClause);
 
 	EnsureTenantBindingTableExists();
+
+	return query.toUtf8();
+}
+
+
+QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingDeleteQuery(const QByteArrayList& entityIds) const
+{
+	if (entityIds.isEmpty()){
+		return QByteArray();
+	}
+
+	QStringList quotedIds;
+	for (const QByteArray& id : entityIds){
+		quotedIds.append(QString("'%1'").arg(SqlEncode(QString::fromUtf8(id))));
+	}
+
+	const QString query = QString("DELETE FROM %1 WHERE \"EntityType\" = '%2' AND \"EntityId\" IN (%3);")
+			.arg(
+					CreateTenantBindingTableName(),
+					SqlEncode(QString::fromUtf8(GetTableName())),
+					quotedIds.join(','));
 
 	return query.toUtf8();
 }

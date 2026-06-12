@@ -92,6 +92,11 @@ I_EXPORT_COMPONENT(
 			"Tenant Membership Database Delegate");
 
 I_EXPORT_COMPONENT(
+			TenantEntityBindingDatabaseDelegate,
+			"SQL delegate for tenant entity bindings (hydration, INSERT/DELETE)",
+			"Tenant Entity Binding Database Delegate");
+
+I_EXPORT_COMPONENT(
 			TenantInvitationDatabaseDelegate,
 			"SQL delegate for tenant invitations (hydration, INSERT/UPDATE/DELETE)",
 			"Tenant Invitation Database Delegate");

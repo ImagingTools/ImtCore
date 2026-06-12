@@ -196,6 +196,21 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="TenantEntityBindingManager" PackageId="ImtUserAdministrationVoce" ComponentId="TenantEntityBindingManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantEntityBindingRepository" Type="Reference" ExportId="TenantEntityBindingRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="TenantGrantManager" PackageId="ImtUserAdministrationVoce" ComponentId="TenantGrantManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -271,6 +286,9 @@
         <Element Id="TenantMembershipManager" PackageId="ImtUserAdministrationVoce" ComponentId="TenantMembershipManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="BindingManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TenantEntityBindingManager"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="InvitationRepository" Type="Reference" ExportId="InvitationRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
