@@ -3,11 +3,14 @@
 
 
 // Qt includes
+#include <QMutexLocker>
 #include <QUuid>
 
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
 #include <imtauth/IUserInfo.h>
+#include <imtdoc/CDocumentSavedEvent.h>
+#include <imtgql/IGqlContext.h>
 
 // Generated includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/UserCollectionDocumentService.h>
@@ -105,6 +108,16 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 	if (documentId.isEmpty()){
 		errorMessage = QStringLiteral("Missing document ID");
 		return response;
+	}
+
+	// Store tenantId from GQL context for later use in ProcessEvent (on SaveDocument)
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		QByteArray tenantId = gqlContextPtr->GetTenantId();
+		if (!tenantId.isEmpty()){
+			QMutexLocker locker(&m_pendingTenantIdsMutex);
+			m_pendingTenantIds.insert(documentId, tenantId);
+		}
 	}
 
 	QByteArray userLogin = GetUserId(gqlRequest);
@@ -237,6 +250,64 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 
 	return response;
+}
+
+
+// reimplemented (imtdoc::IDocumentServiceEventHandler)
+
+bool CUserCollectionDocumentServiceComp::ProcessEvent(imtdoc::CEventBase* eventPtr)
+{
+	imtdoc::CDocumentSavedEvent* savedEventPtr = dynamic_cast<imtdoc::CDocumentSavedEvent*>(eventPtr);
+	if (savedEventPtr == nullptr){
+		return true;
+	}
+
+	if (!m_membershipManagerCompPtr.IsValid()){
+		return true;
+	}
+
+	QByteArray documentId = savedEventPtr->GetDocumentId();
+	QByteArray userId = savedEventPtr->GetUserId();
+
+	// Retrieve the tenantId that was stored during OnUpdateUserFromRepresentation
+	QByteArray tenantId;
+	{
+		QMutexLocker locker(&m_pendingTenantIdsMutex);
+		tenantId = m_pendingTenantIds.take(documentId);
+	}
+
+	if (tenantId.isEmpty()){
+		return true;
+	}
+
+	// Get the saved user document to extract the user's objectUuid
+	istd::IChangeableSharedPtr documentPtr;
+	m_documentManagerCompPtr->GetDocumentData(userId, documentId, documentPtr);
+	if (!documentPtr.IsValid()){
+		return true;
+	}
+
+	const imtauth::CIdentifiableUserInfo* userPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(documentPtr.GetPtr());
+	if (userPtr == nullptr){
+		return true;
+	}
+
+	QByteArray newUserId = userPtr->GetObjectUuid();
+	if (newUserId.isEmpty()){
+		return true;
+	}
+
+	// Check if user is already a member of this tenant
+	if (m_membershipManagerCompPtr->IsMember(newUserId, tenantId)){
+		return true;
+	}
+
+	QByteArray membershipId = m_membershipManagerCompPtr->AddMembership(newUserId, tenantId, "Member");
+	if (membershipId.isEmpty()){
+		SendWarningMessage(0, QString("Auto-membership creation failed for user '%1' in tenant '%2'").arg(QString::fromUtf8(newUserId), QString::fromUtf8(tenantId)), "CUserCollectionDocumentServiceComp");
+	}
+
+	return true;
 }
 
 
