@@ -14,7 +14,7 @@ namespace imtgeo
 class CAddressTypeDatabaseDelegateComp: public imtdb::CSqlDatabaseObjectDelegateCompBase
 {
 public:
-	typedef imtdb::CSqlDatabaseObjectDelegateCompBase BaseClass;
+	using BaseClass = imtdb::CSqlDatabaseObjectDelegateCompBase;
 
 	I_BEGIN_COMPONENT(CAddressTypeDatabaseDelegateComp)
 		I_ASSIGN(m_adrTypeInfoFactCompPtr, "AddressTypeInfo", "Factory used for creation of the new address type instance", true, "AddressTypeInfo");

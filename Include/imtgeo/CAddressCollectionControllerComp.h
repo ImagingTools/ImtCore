@@ -6,29 +6,31 @@
 #include <QJsonObject>
 
 // ImtCore includes
-#include <imtservergql/CLegacyObjectCollectionControllerCompBase.h>
+#include <imtservergql/CObjectCollectionControllerCompBase.h>
 
 
 namespace imtgeo
 {
 
 
-class CAddressCollectionControllerComp: public imtservergql::CLegacyObjectCollectionControllerCompBase
+class CAddressCollectionControllerComp: public imtservergql::CObjectCollectionControllerCompBase
 {
 public:
-	typedef imtservergql::CLegacyObjectCollectionControllerCompBase BaseClass;
+	using BaseClass = imtservergql::CObjectCollectionControllerCompBase;
 
 	I_BEGIN_COMPONENT(CAddressCollectionControllerComp);
-		I_ASSIGN(m_addressTypeCollectionPtr, "AddressTypeComponent", "The string address type collection", false, "AddressTypeCollection");
+		I_ASSIGN(m_addressTypeCollectionPtr, "AddressTypeComponent", "Collection containing address type declarations", false, "AddressTypeCollection");
 	I_END_COMPONENT;
 
 protected:
 	I_REF(imtbase::IObjectCollection, m_addressTypeCollectionPtr);
 
-	// reimplemented (imtservergql::CLegacyObjectCollectionControllerCompBase)
-	virtual QVariant GetObjectInformation(const QByteArray& informationId, const QByteArray& objectId) const override;
-	virtual QJsonObject GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual QJsonObject ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
+	virtual bool SetupGqlItem(
+				const imtgql::CGqlRequest& gqlRequest,
+				QJsonObject& itemObj,
+				const imtbase::IObjectCollectionIterator* objectCollectionIterator,
+				QString& errorMessage) const override;
 };
 
 
