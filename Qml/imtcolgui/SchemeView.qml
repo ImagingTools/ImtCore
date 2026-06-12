@@ -614,13 +614,13 @@ Rectangle {
 				let width_ = item.m_width ? item.m_width : canvas.mainRec_width;
 				
 				ctx.lineWidth = 1;
-				let fontStr_main = String(canvas.fontSize) + "px sans-serif"
+				let fontStr_main = String(canvas.fontSize) + "px " + Style.fontFamily
 				ctx.font = fontStr_main; //"20px sans-serif";
 				let textStr_main = mainText
 				let textWidth_main = ctx.measureText(mainText).width
 				
 				ctx.lineWidth = 0.5;
-				let fontStr_second = String(canvas.fontSizeS) + "px sans-serif"
+				let fontStr_second = String(canvas.fontSizeS) + "px " + Style.fontFamily
 				ctx.font = fontStr_second;
 				let textStr_second = secondText;
 				let textWidth_second = ctx.measureText(secondText).width
@@ -694,7 +694,7 @@ Rectangle {
 				ctx.strokeStyle = canvas.mainTextColor;
 				ctx.fillStyle = canvas.mainTextColor;
 				ctx.lineWidth = 1;
-				let fontStr = "bold " + String(canvas.fontSize) + "px sans-serif"
+				let fontStr = "bold " + String(canvas.fontSize) + "px " + Style.fontFamily
 				ctx.font = fontStr; //"20px sans-serif";
 				let textStr = mainText
 				let textWidth = ctx.measureText(mainText).width
@@ -710,7 +710,7 @@ Rectangle {
 				ctx.strokeStyle = canvas.secondTextColor;
 				ctx.fillStyle = canvas.secondTextColor;
 				ctx.lineWidth = 0.5;
-				let fontStr2 = String(canvas.fontSizeS) + "px sans-serif"
+				let fontStr2 = String(canvas.fontSizeS) + "px " + Style.fontFamily
 				ctx.font = fontStr2;
 				let textStr2 = secondText;
 				let textWidth2 = ctx.measureText(secondText).width

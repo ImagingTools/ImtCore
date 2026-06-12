@@ -15,7 +15,7 @@ Rectangle {
 	radius: Style.menuPanelRadius;
 
 	property string textColor: Style.textColor;
-	property string fontName: "Helvetica";
+	property string fontName: Style.fontFamily;
 	property string activePageId;
 	property string activePageName;
 	property string activeIcon;
@@ -358,4 +358,3 @@ Rectangle {
 	}
 
 }
-
