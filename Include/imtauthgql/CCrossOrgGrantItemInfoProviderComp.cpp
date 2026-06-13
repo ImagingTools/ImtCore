@@ -3,6 +3,7 @@
 
 
 // ACF includes
+#include <iprm/CParamsSet.h>
 #include <iprm/CTextParam.h>
 
 // ImtCore includes
@@ -14,12 +15,18 @@ namespace imtauthgql
 {
 
 
-// reimplemented (ISelectableItemInfoProvider)
+// reimplemented (IObjectParamsFiller)
 
-bool CCrossOrgGrantItemInfoProviderComp::GetItemParameters(
+bool CCrossOrgGrantItemInfoProviderComp::FillParams(
 	const QByteArray& objectId,
-	iprm::IParamsSet& paramsSet) const
+	iprm::IParamsSet& paramsSet,
+	const QByteArray& contextTenantId) const
 {
+	iprm::CParamsSet* paramsSetPtr = dynamic_cast<iprm::CParamsSet*>(&paramsSet);
+	if (paramsSetPtr == nullptr){
+		return false;
+	}
+
 	if (!m_grantCollectionCompPtr.IsValid()){
 		return false;
 	}
@@ -36,16 +43,37 @@ bool CCrossOrgGrantItemInfoProviderComp::GetItemParameters(
 
 	imtauth::CrossOrgGrantInfo grantInfo = grantDataPtr->GetGrantInfo();
 
-	// Target tenant name
-	if (!grantInfo.targetTenantId.isEmpty()){
-		QString targetName;
+	// Determine the "other" tenant: if context is the source, show target; if context is target, show source
+	QByteArray otherTenantId;
+	QString direction;
+	if (!contextTenantId.isEmpty() && grantInfo.targetTenantId == contextTenantId){
+		// Current tenant is the target (recipient) — show who granted
+		otherTenantId = grantInfo.sourceTenantId;
+		direction = QStringLiteral("from");
+	}
+	else{
+		// Current tenant is the source (grantor) — show who receives
+		otherTenantId = grantInfo.targetTenantId;
+		direction = QStringLiteral("to");
+	}
+
+	// Target/source tenant name
+	if (!otherTenantId.isEmpty()){
+		QString tenantName;
 		if (m_tenantCollectionCompPtr.IsValid()){
-			targetName = m_tenantCollectionCompPtr->GetElementInfo(grantInfo.targetTenantId, imtbase::ICollectionInfo::EIT_NAME).toString();
+			tenantName = m_tenantCollectionCompPtr->GetElementInfo(otherTenantId, imtbase::ICollectionInfo::EIT_NAME).toString();
 		}
 
 		iprm::CTextParam* targetParamPtr = new iprm::CTextParam;
-		targetParamPtr->SetText(targetName.isEmpty() ? QString::fromUtf8(grantInfo.targetTenantId) : targetName);
-		paramsSet.SetEditableParameter("targetTenant", targetParamPtr, true);
+		targetParamPtr->SetText(tenantName.isEmpty() ? QString::fromUtf8(otherTenantId) : tenantName);
+		paramsSetPtr->SetEditableParameter("targetTenant", targetParamPtr, true);
+	}
+
+	// Direction (from/to)
+	{
+		iprm::CTextParam* dirParamPtr = new iprm::CTextParam;
+		dirParamPtr->SetText(direction);
+		paramsSetPtr->SetEditableParameter("direction", dirParamPtr, true);
 	}
 
 	// Roles
@@ -61,14 +89,14 @@ bool CCrossOrgGrantItemInfoProviderComp::GetItemParameters(
 
 		iprm::CTextParam* rolesParamPtr = new iprm::CTextParam;
 		rolesParamPtr->SetText(roleNames.join(QStringLiteral(", ")));
-		paramsSet.SetEditableParameter("roles", rolesParamPtr, true);
+		paramsSetPtr->SetEditableParameter("roles", rolesParamPtr, true);
 	}
 
 	// Expiry
 	if (!grantInfo.expiresAt.isEmpty()){
 		iprm::CTextParam* expiryParamPtr = new iprm::CTextParam;
 		expiryParamPtr->SetText(grantInfo.expiresAt);
-		paramsSet.SetEditableParameter("expiresAt", expiryParamPtr, true);
+		paramsSetPtr->SetEditableParameter("expiresAt", expiryParamPtr, true);
 	}
 
 	return true;

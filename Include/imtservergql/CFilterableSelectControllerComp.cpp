@@ -3,6 +3,8 @@
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/FilterableSelect.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtBaseTypes.h>
 
+// Qt includes
+#include <QtCore/QJsonObject.h>
 
 // STL includes
 #include <cmath>
@@ -10,7 +12,6 @@
 // ACF includes
 #include <istd/TDelPtr.h>
 #include <iprm/CParamsSet.h>
-#include <iprm/ITextParam.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollectionIterator.h>
@@ -145,31 +146,25 @@ sdl::V1_0::imtbase::CGetSelectableItemsPayload CFilterableSelectControllerComp::
 		QString description = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 		itemRepresentation.description = description;
 
-		// Fill additional parameters from info providers
+		// Fill additional parameters from info provider
 		iprm::CParamsSet itemParamsSet;
-		for (int i = 0; i < m_itemInfoProvidersCompPtr.GetCount(); ++i){
-			const ISelectableItemInfoProvider* providerPtr = m_itemInfoProvidersCompPtr[i];
-			if (providerPtr != nullptr){
-				providerPtr->GetItemParameters(objectId, itemParamsSet);
+		if (m_objectParamsFillerCompPtr.IsValid()){
+			QByteArray contextTenantId;
+			const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+			if (gqlContextPtr != nullptr){
+				contextTenantId = gqlContextPtr->GetTenantId();
 			}
+			m_objectParamsFillerCompPtr->FillParams(objectId, itemParamsSet, contextTenantId);
 		}
 
-		// Convert iprm::IParamsSet to SDL CParameter list
-		iprm::IParamsSet::Ids paramIds = itemParamsSet.GetParamIds();
-		if (!paramIds.isEmpty()){
-			imtsdl::TElementList<sdl::V1_0::imtbase::CParameter> itemParameters;
-			for (const QByteArray& paramId : paramIds.values()){
-				const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(itemParamsSet.GetParameter(paramId));
-				if (textParamPtr != nullptr){
-					sdl::V1_0::imtbase::CParameter sdlParam;
-					sdlParam.id = paramId;
-					sdlParam.name = QString::fromUtf8(paramId);
-					sdlParam.data = textParamPtr->GetText();
-					itemParameters << sdlParam;
+		// Convert iprm::IParamsSet to SDL CParamsSet via representation controller
+		if (m_paramSetRepresentationControllerCompPtr.IsValid()){
+			QJsonObject paramsJsonObject;
+			if (m_paramSetRepresentationControllerCompPtr->GetRepresentationFromDataModel(itemParamsSet, paramsJsonObject)){
+				sdl::V1_0::imtbase::CParamsSet sdlParamsSet;
+				if (sdlParamsSet.ReadFromJsonObject(paramsJsonObject)){
+					itemRepresentation.params = sdlParamsSet;
 				}
-			}
-			if (!itemParameters.isEmpty()){
-				itemRepresentation.parameters = itemParameters;
 			}
 		}
 

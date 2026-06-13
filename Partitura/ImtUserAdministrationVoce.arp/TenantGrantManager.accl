@@ -21,7 +21,18 @@
         <Element ComponentName="FilterableSelectController" X="925" Y="50" Note=""/>
         <Element ComponentName="GrantCommandsController" X="225" Y="100" Note=""/>
         <Element ComponentName="GrantDemultiplexer" X="600" Y="100" Note=""/>
+        <Element ComponentName="GrantParamsRepresentation" X="1025" Y="250" Note=""/>
         <Element ComponentName="SlaveSubscriberController" X="750" Y="625" Note=""/>
     </PositionMap>
-    <EmbeddedRegistries/>
+    <EmbeddedRegistries>
+        <EmbededRegistry Id="GrantParamsRepresentation">
+            <PositionMap>
+                <Element ComponentName="ExpiresAtRepresentationController" X="975" Y="200" Note=""/>
+                <Element ComponentName="ParamsSetRepresentation" X="575" Y="75" Note=""/>
+                <Element ComponentName="RolesRepresentationController" X="575" Y="200" Note=""/>
+                <Element ComponentName="TargetTenantRepresentationController" X="175" Y="200" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+    </EmbeddedRegistries>
 </Acf>

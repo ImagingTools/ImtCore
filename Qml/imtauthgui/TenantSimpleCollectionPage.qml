@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 import QtQuick 2.12
-import QtQuick.Controls
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
@@ -434,148 +433,25 @@ ViewBase {
 				Component {
 					id: defaultDelegateComp
 
-					Rectangle {
-						id: itemDelegateRoot
-						width: itemListView.width
-						height: Style.controlHeightL + Style.marginL + (paramRepeater.count > 0 ? paramRepeater.count * (Style.fontSizeS + Style.marginXS) : 0)
+					TenantCollectionItemDelegateBase {
+						id: defaultDelegate
+						selectionManager: selectionManager_
+						collectionPage: collectionPage
 
-						property string itemId: modelData.id || ""
-						property string itemTitle: modelData.title || modelData.id || ""
-						property string itemDescription: modelData.description || ""
-						property var itemParameters: modelData.parameters || []
-						property bool isSelected: selectionManager_.isSelected(itemId)
-
-						color: isSelected ? Style.selectedColor
-										  : itemMouseArea.containsMouse ? Style.buttonHoverColor
-																		: "transparent"
-						MouseArea {
-							id: itemMouseArea
-							anchors.fill: parent
-							hoverEnabled: true
-							cursorShape: Qt.PointingHandCursor
-							onDoubleClicked: {
-								if (collectionPage.__canManage)
-									collectionPage.__openEdit(itemDelegateRoot.itemId, itemDelegateRoot.itemTitle, itemDelegateRoot.itemDescription)
-							}
+						BaseText {
+							text: defaultDelegate.itemTitle
+							font.pixelSize: Style.fontSizeL
+							font.bold: true
+							color: Style.textColor
 						}
 
-						Row {
-							anchors.left: parent.left
-							anchors.right: moreButton.left
-							anchors.verticalCenter: parent.verticalCenter
-							anchors.leftMargin: Style.marginM
-							anchors.rightMargin: Style.marginM
-							spacing: Style.marginM
-
-							CheckBox {
-								anchors.verticalCenter: parent.verticalCenter
-								height: Style.itemSizeS
-								width: Style.itemSizeS
-								checkState: itemDelegateRoot.isSelected ? Qt.Checked : Qt.Unchecked
-								onCheckStateChanged: {
-									var shouldBeSelected = (checkState === Qt.Checked)
-									var currentlySelected = selectionManager_.isSelected(itemDelegateRoot.itemId)
-									if (shouldBeSelected !== currentlySelected)
-										selectionManager_.toggleSelect(itemDelegateRoot.itemId)
-								}
-							}
-
-							Column {
-								anchors.verticalCenter: parent.verticalCenter
-								spacing: Style.marginXS
-								width: parent.width - Style.itemSizeS - parent.spacing
-
-								BaseText {
-									text: itemDelegateRoot.itemTitle
-									font.pixelSize: Style.fontSizeL
-									font.bold: true
-									color: Style.textColor
-								}
-
-								BaseText {
-									visible: itemDelegateRoot.itemDescription !== ""
-									text: itemDelegateRoot.itemDescription
-									font.pixelSize: Style.fontSizeM
-									color: Style.inactiveTextColor
-									elide: Text.ElideRight
-									width: parent.width
-								}
-
-								Repeater {
-									id: paramRepeater
-									model: itemDelegateRoot.itemParameters
-
-									BaseText {
-										text: (modelData.name || "") + (modelData.data ? (": " + modelData.data) : "")
-										font.pixelSize: Style.fontSizeS
-										color: Style.inactiveTextColor
-										elide: Text.ElideRight
-										width: parent.width
-										opacity: 0.8
-									}
-								}
-							}
-						}
-
-						Rectangle {
-							id: moreButton
-							anchors.right: parent.right
-							anchors.rightMargin: Style.marginM
-							anchors.verticalCenter: parent.verticalCenter
-							width: Style.controlHeightM
-							height: Style.controlHeightM
-							radius: Style.controlHeightM / 2
-							color: moreButtonMA.containsMouse ? Style.buttonHoverColor : "transparent"
-							visible: collectionPage.__canManage && (itemMouseArea.containsMouse || itemDelegateRoot.isSelected || moreButtonMA.containsMouse)
-
-							Text {
-								anchors.centerIn: parent
-								text: "\u2026"
-								font.pixelSize: Style.fontSizeL
-								color: Style.textColor
-								horizontalAlignment: Text.AlignHCenter
-								verticalAlignment: Text.AlignVCenter
-							}
-
-							MouseArea {
-								id: moreButtonMA
-								anchors.fill: parent
-								hoverEnabled: true
-								cursorShape: Qt.PointingHandCursor
-								onClicked: itemMenu.popup()
-							}
-						}
-
-						Menu {
-							id: itemMenu
-							MenuItem {
-								text: qsTr("Edit")
-								enabled: collectionPage.__canManage
-								onTriggered: collectionPage.__openEdit(itemDelegateRoot.itemId, itemDelegateRoot.itemTitle, itemDelegateRoot.itemDescription)
-							}
-							MenuItem {
-								text: qsTr("Delete")
-								enabled: collectionPage.__canManage
-								onTriggered: {
-									ModalDialogManager.showConfirmationDialog(
-												collectionPage.__deleteSingleTitle,
-												qsTr("Are you sure you want to delete \"%1\"? This action cannot be undone.").arg(itemDelegateRoot.itemTitle),
-												function(result) {
-													if (result === Enums.yes)
-														collectionPage.removeItems([itemDelegateRoot.itemId])
-												}
-												)
-								}
-							}
-						}
-
-						Rectangle {
-							anchors.bottom: parent.bottom
-							anchors.left: parent.left
-							anchors.right: parent.right
-							height: 1
-							color: Style.borderColor
-							opacity: 0.5
+						BaseText {
+							visible: defaultDelegate.itemDescription !== ""
+							text: defaultDelegate.itemDescription
+							font.pixelSize: Style.fontSizeM
+							color: Style.inactiveTextColor
+							elide: Text.ElideRight
+							width: parent.width
 						}
 					}
 				}

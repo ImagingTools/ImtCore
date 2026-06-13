@@ -3,6 +3,7 @@
 
 
 // ACF includes
+#include <iprm/CParamsSet.h>
 #include <iprm/CTextParam.h>
 
 // ImtCore includes
@@ -46,12 +47,18 @@ QString RelationshipStatusToString(imtauth::ITenantRelationshipInfo::TenantRelat
 } // anonymous namespace
 
 
-// reimplemented (ISelectableItemInfoProvider)
+// reimplemented (IObjectParamsFiller)
 
-bool CTenantRelationshipItemInfoProviderComp::GetItemParameters(
+bool CTenantRelationshipItemInfoProviderComp::FillParams(
 			const QByteArray& objectId,
-			iprm::IParamsSet& paramsSet) const
+			iprm::IParamsSet& paramsSet,
+			const QByteArray& contextTenantId) const
 {
+	iprm::CParamsSet* paramsSetPtr = dynamic_cast<iprm::CParamsSet*>(&paramsSet);
+	if (paramsSetPtr == nullptr){
+		return false;
+	}
+
 	if (!m_relationshipCollectionCompPtr.IsValid()){
 		return false;
 	}
@@ -66,31 +73,67 @@ bool CTenantRelationshipItemInfoProviderComp::GetItemParameters(
 		return false;
 	}
 
-	// Partner tenant (target)
-	QByteArray targetTenantId = relationshipPtr->GetTargetTenantId();
-	if (!targetTenantId.isEmpty()){
+	// Determine partner: if current tenant is source, partner is target and vice versa
+	QByteArray partnerTenantId;
+	imtauth::ITenantRelationshipInfo::TenantRelationshipRole myRole;
+	imtauth::ITenantRelationshipInfo::TenantRelationshipRole partnerRole;
+
+	if (!contextTenantId.isEmpty() && relationshipPtr->GetTargetTenantId() == contextTenantId){
+		// Current tenant is the target — partner is the source
+		partnerTenantId = relationshipPtr->GetSourceTenantId();
+		myRole = relationshipPtr->GetTargetRole();
+		partnerRole = relationshipPtr->GetSourceRole();
+	}
+	else{
+		// Current tenant is the source (or context unknown — fallback to old behavior)
+		partnerTenantId = relationshipPtr->GetTargetTenantId();
+		myRole = relationshipPtr->GetSourceRole();
+		partnerRole = relationshipPtr->GetTargetRole();
+	}
+
+	// Partner tenant name
+	if (!partnerTenantId.isEmpty()){
 		QString partnerName;
 		if (m_tenantCollectionCompPtr.IsValid()){
-			partnerName = m_tenantCollectionCompPtr->GetElementInfo(targetTenantId, imtbase::ICollectionInfo::EIT_NAME).toString();
+			partnerName = m_tenantCollectionCompPtr->GetElementInfo(partnerTenantId, imtbase::ICollectionInfo::EIT_NAME).toString();
 		}
 
 		iprm::CTextParam* partnerParamPtr = new iprm::CTextParam;
-		partnerParamPtr->SetText(partnerName.isEmpty() ? QString::fromUtf8(targetTenantId) : partnerName);
-		paramsSet.SetEditableParameter("partnerTenant", partnerParamPtr, true);
+		partnerParamPtr->SetText(partnerName.isEmpty() ? QString::fromUtf8(partnerTenantId) : partnerName);
+		paramsSetPtr->SetEditableParameter("partnerTenant", partnerParamPtr, true);
 	}
 
-	// Relationship role
+	// My tenant name
+	if (!contextTenantId.isEmpty()){
+		QString myTenantName;
+		if (m_tenantCollectionCompPtr.IsValid()){
+			myTenantName = m_tenantCollectionCompPtr->GetElementInfo(contextTenantId, imtbase::ICollectionInfo::EIT_NAME).toString();
+		}
+
+		iprm::CTextParam* myTenantParamPtr = new iprm::CTextParam;
+		myTenantParamPtr->SetText(myTenantName.isEmpty() ? QString::fromUtf8(contextTenantId) : myTenantName);
+		paramsSetPtr->SetEditableParameter("myTenant", myTenantParamPtr, true);
+	}
+
+	// My role in this relationship
+	{
+		iprm::CTextParam* myRoleParamPtr = new iprm::CTextParam;
+		myRoleParamPtr->SetText(RelationshipRoleToString(myRole));
+		paramsSetPtr->SetEditableParameter("myRole", myRoleParamPtr, true);
+	}
+
+	// Partner role
 	{
 		iprm::CTextParam* roleParamPtr = new iprm::CTextParam;
-		roleParamPtr->SetText(RelationshipRoleToString(relationshipPtr->GetTargetRole()));
-		paramsSet.SetEditableParameter("role", roleParamPtr, true);
+		roleParamPtr->SetText(RelationshipRoleToString(partnerRole));
+		paramsSetPtr->SetEditableParameter("role", roleParamPtr, true);
 	}
 
 	// Status
 	{
 		iprm::CTextParam* statusParamPtr = new iprm::CTextParam;
 		statusParamPtr->SetText(RelationshipStatusToString(relationshipPtr->GetStatus()));
-		paramsSet.SetEditableParameter("status", statusParamPtr, true);
+		paramsSetPtr->SetEditableParameter("status", statusParamPtr, true);
 	}
 
 	return true;

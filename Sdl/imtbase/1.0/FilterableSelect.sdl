@@ -21,7 +21,7 @@ type SelectableItemData {
 	description: String
 	icon: String
 	color: String
-	parameters: [Parameter]
+	params: ParamsSet
 }
 
 input GetSelectableItemsInput {

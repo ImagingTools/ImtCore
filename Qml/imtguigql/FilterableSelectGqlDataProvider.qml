@@ -45,7 +45,7 @@ FilterableSelectDataProvider {
 				var desc = m_items.getData("m_description", i)
 				var icon = m_items.getData("m_icon", i)
 				var color = m_items.getData("m_color", i)
-				var params = m_items.getData("m_parameters", i)
+				var params = m_items.getData("m_params", i)
 				var normalizedParams = root.__normalizeParameters(params)
 				normalized.push({
 					id: id || "",
@@ -61,11 +61,12 @@ FilterableSelectDataProvider {
 		return normalized
 	}
 
-	// --- Normalize parameters from SDL list to plain JS array ---
-	function __normalizeParameters(paramsList){
+	// --- Normalize parameters from SDL ParamsSet to plain JS array ---
+	function __normalizeParameters(paramsSet){
 		var result = []
-		if (!paramsList)
+		if (!paramsSet)
 			return result
+		var paramsList = paramsSet.m_parameters ? paramsSet.m_parameters : paramsSet
 		var count = paramsList.getItemsCount ? paramsList.getItemsCount() : 0
 		for (var i = 0; i < count; i++){
 			var paramId = paramsList.getData("m_id", i)

@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <imtservergql/ISelectableItemInfoProvider.h>
+#include <imtservergql/IObjectParamsFiller.h>
 
 
 namespace imtauthgql
@@ -22,19 +22,20 @@ namespace imtauthgql
 */
 class CTenantRelationshipItemInfoProviderComp:
 			public ilog::CLoggerComponentBase, 
-			public imtservergql::ISelectableItemInfoProvider
+			public imtservergql::IObjectParamsFiller
 {
 public:
 	I_BEGIN_COMPONENT(CTenantRelationshipItemInfoProviderComp);
-		I_REGISTER_INTERFACE(imtservergql::ISelectableItemInfoProvider);
+		I_REGISTER_INTERFACE(imtservergql::IObjectParamsFiller);
 		I_ASSIGN(m_relationshipCollectionCompPtr, "RelationshipCollection", "Tenant relationship collection", true, "RelationshipCollection");
 		I_ASSIGN(m_tenantCollectionCompPtr, "TenantCollection", "Tenant collection for name resolution", false, "TenantCollection");
 	I_END_COMPONENT;
 
-	// reimplemented (ISelectableItemInfoProvider)
-	virtual bool GetItemParameters(
+	// reimplemented (IObjectParamsFiller)
+	virtual bool FillParams(
 				const QByteArray& objectId,
-				iprm::IParamsSet& paramsSet) const override;
+				iprm::IParamsSet& paramsSet,
+				const QByteArray& contextTenantId = QByteArray()) const override;
 
 private:
 	I_REF(imtbase::IObjectCollection, m_relationshipCollectionCompPtr);
