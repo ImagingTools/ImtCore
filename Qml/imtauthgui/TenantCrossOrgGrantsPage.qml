@@ -97,22 +97,13 @@ TenantSimpleCollectionPage {
 				}
 			}
 
-			Flow {
-				width: parent.width
-				spacing: Style.marginXS
+			BaseText {
 				visible: grantDelegate.roles !== ""
-
-				Repeater {
-					model: grantDelegate.roles.split(", ")
-
-					StatusBadge {
-						text: modelData
-						badgeColor: Style.baseColor
-						badgeBorderColor: Style.secondColor
-						textColor: Style.secondColor
-						fontPixelSize: Style.fontSizeXS
-					}
-				}
+				text: grantDelegate.roles
+				font.pixelSize: Style.fontSizeS
+				color: Style.secondColor
+				elide: Text.ElideRight
+				width: parent.width
 			}
 
 			BaseText {

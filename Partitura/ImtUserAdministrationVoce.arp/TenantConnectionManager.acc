@@ -360,6 +360,48 @@
         <EmbeddedRegistry Id="RelationshipParamsRepresentation">
             <Data Description="" Keywords="">
                 <ElementsList>
+                    <Element Id="MyRoleRepresentationController" PackageId="ImtServerAppPck" ComponentId="TextParamRepresentationController">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ModelId" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="myRole"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Name" Type="Text" ExportId="">
+                                    <Data IsEnabled="true" Value="My Role"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="MyTenantRepresentationController" PackageId="ImtServerAppPck" ComponentId="TextParamRepresentationController">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ModelId" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="myTenant"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Name" Type="Text" ExportId="">
+                                    <Data IsEnabled="true" Value="My Tenant"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
                     <Element Id="ParamsSetRepresentation" PackageId="ImtServerAppPck" ComponentId="ParamSetRepresentationController">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
@@ -377,7 +419,9 @@
                                         <Values>
                                             <Value>PartnerTenantRepresentationController</Value>
                                             <Value>RoleRepresentationController</Value>
+                                            <Value>MyTenantRepresentationController</Value>
                                             <Value>StatusRepresentationController</Value>
+                                            <Value>MyRoleRepresentationController</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>

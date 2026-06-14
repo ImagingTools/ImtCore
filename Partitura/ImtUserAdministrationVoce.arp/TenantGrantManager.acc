@@ -259,7 +259,17 @@
         </Element>
         <Element Id="GrantParamsRepresentation" PackageId="" ComponentId="GrantParamsRepresentation">
             <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="SlaveSubscriberController" PackageId="ImtServerGqlPck" ComponentId="SlaveSubscriberController">
@@ -287,6 +297,27 @@
         <EmbeddedRegistry Id="GrantParamsRepresentation">
             <Data Description="" Keywords="">
                 <ElementsList>
+                    <Element Id="DirectionRepresentationController" PackageId="ImtServerAppPck" ComponentId="TextParamRepresentationController">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ModelId" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="direction"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Name" Type="Text" ExportId="">
+                                    <Data IsEnabled="true" Value="Direction"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
                     <Element Id="ExpiresAtRepresentationController" PackageId="ImtServerAppPck" ComponentId="TextParamRepresentationController">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
@@ -326,6 +357,7 @@
                                             <Value>TargetTenantRepresentationController</Value>
                                             <Value>RolesRepresentationController</Value>
                                             <Value>ExpiresAtRepresentationController</Value>
+                                            <Value>DirectionRepresentationController</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>

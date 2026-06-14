@@ -49,6 +49,14 @@ TenantSimpleCollectionPage {
 
 			onItemParametersChanged: relDelegate.__fillParams()
 
+			function __connectionSummary() {
+				var myPart = relDelegate.myTenant + (relDelegate.myRole !== "" ? " (" + relDelegate.myRole + ")" : "")
+				var partnerPart = relDelegate.partnerTenant + (relDelegate.role !== "" ? " (" + relDelegate.role + ")" : "")
+				if (relDelegate.myTenant !== "" && relDelegate.partnerTenant !== "")
+					return myPart + " \u2194 " + partnerPart
+				return relDelegate.myTenant !== "" ? myPart : partnerPart
+			}
+
 			function __fillParams() {
 				if (!relDelegate.itemParameters) return
 				for (var i = 0; i < relDelegate.itemParameters.length; i++) {
@@ -89,35 +97,13 @@ TenantSimpleCollectionPage {
 				}
 			}
 
-			Row {
-				width: parent.width
-				spacing: Style.marginXS
+			BaseText {
 				visible: relDelegate.myTenant !== "" || relDelegate.partnerTenant !== ""
-
-				StatusBadge {
-					visible: relDelegate.myTenant !== ""
-					text: relDelegate.myTenant + (relDelegate.myRole !== "" ? " (" + relDelegate.myRole + ")" : "")
-					badgeColor: Style.backgroundColor2
-					badgeBorderWidth: 0
-					textColor: Style.textColor
-					fontPixelSize: Style.fontSizeXS
-				}
-
-				BaseText {
-					text: "\u2194"
-					font.pixelSize: Style.fontSizeM
-					color: Style.inactiveTextColor
-					visible: relDelegate.myTenant !== "" && relDelegate.partnerTenant !== ""
-				}
-
-				StatusBadge {
-					visible: relDelegate.partnerTenant !== ""
-					text: relDelegate.partnerTenant + (relDelegate.role !== "" ? " (" + relDelegate.role + ")" : "")
-					badgeColor: Style.baseColor
-					badgeBorderColor: Style.secondColor
-					textColor: Style.secondColor
-					fontPixelSize: Style.fontSizeXS
-				}
+				text: relDelegate.__connectionSummary()
+				font.pixelSize: Style.fontSizeS
+				color: Style.secondColor
+				elide: Text.ElideRight
+				width: parent.width
 			}
 
 			BaseText {

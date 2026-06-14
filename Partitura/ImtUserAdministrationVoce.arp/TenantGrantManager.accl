@@ -27,6 +27,7 @@
     <EmbeddedRegistries>
         <EmbededRegistry Id="GrantParamsRepresentation">
             <PositionMap>
+                <Element ComponentName="DirectionRepresentationController" X="175" Y="375" Note=""/>
                 <Element ComponentName="ExpiresAtRepresentationController" X="975" Y="200" Note=""/>
                 <Element ComponentName="ParamsSetRepresentation" X="575" Y="75" Note=""/>
                 <Element ComponentName="RolesRepresentationController" X="575" Y="200" Note=""/>

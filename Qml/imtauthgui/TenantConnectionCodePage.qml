@@ -108,7 +108,7 @@ ViewBase {
 					width: contentWidth
 					readOnly: true
 					selectByMouse: true
-					selectionColor: Style.selectionColor
+					selectionColor: Style.selectedColor
 				}
 
 				ToolButton {

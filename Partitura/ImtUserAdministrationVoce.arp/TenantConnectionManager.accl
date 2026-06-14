@@ -30,6 +30,8 @@
     <EmbeddedRegistries>
         <EmbededRegistry Id="RelationshipParamsRepresentation">
             <PositionMap>
+                <Element ComponentName="MyRoleRepresentationController" X="600" Y="375" Note=""/>
+                <Element ComponentName="MyTenantRepresentationController" X="225" Y="375" Note=""/>
                 <Element ComponentName="ParamsSetRepresentation" X="575" Y="75" Note=""/>
                 <Element ComponentName="PartnerTenantRepresentationController" X="225" Y="200" Note=""/>
                 <Element ComponentName="RoleRepresentationController" X="600" Y="200" Note=""/>
