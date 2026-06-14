@@ -79,13 +79,21 @@ TenantSimpleCollectionPage {
 					font.pixelSize: Style.fontSizeL
 					font.bold: true
 					color: Style.textColor
-					width: parent.width - statusBadgeRow.width - Style.marginM
+					width: parent.width - relInfoRow.width - Style.marginM
 					elide: Text.ElideRight
 				}
 
 				Row {
-					id: statusBadgeRow
-					spacing: Style.marginXS
+					id: relInfoRow
+					spacing: Style.marginS
+
+					BaseText {
+						visible: relDelegate.myTenant !== "" || relDelegate.partnerTenant !== ""
+						text: relDelegate.__connectionSummary()
+						font.pixelSize: Style.fontSizeS
+						color: Style.secondColor
+						anchors.verticalCenter: parent.verticalCenter
+					}
 
 					StatusBadge {
 						text: relDelegate.status
@@ -95,15 +103,6 @@ TenantSimpleCollectionPage {
 						fontPixelSize: Style.fontSizeXS
 					}
 				}
-			}
-
-			BaseText {
-				visible: relDelegate.myTenant !== "" || relDelegate.partnerTenant !== ""
-				text: relDelegate.__connectionSummary()
-				font.pixelSize: Style.fontSizeS
-				color: Style.secondColor
-				elide: Text.ElideRight
-				width: parent.width
 			}
 
 			BaseText {

@@ -44,8 +44,12 @@ Rectangle {
 		anchors.fill: parent
 		hoverEnabled: true
 		cursorShape: Qt.PointingHandCursor
+		onClicked: {
+			if (delegateRoot.selectionManager)
+				delegateRoot.selectionManager.toggleSelect(delegateRoot.itemId)
+		}
 		onDoubleClicked: {
-			if (delegateRoot.canManage && delegateRoot.collectionPage)
+			if (delegateRoot.collectionPage)
 				delegateRoot.collectionPage.__openEdit(delegateRoot.itemId, delegateRoot.itemTitle, delegateRoot.itemDescription)
 		}
 	}
@@ -60,16 +64,11 @@ Rectangle {
 		spacing: Style.marginM
 
 		CheckBox {
+			id: delegateCheckBox
 			anchors.verticalCenter: parent.verticalCenter
 			height: Style.itemSizeS
 			width: Style.itemSizeS
 			checkState: delegateRoot.isSelected ? Qt.Checked : Qt.Unchecked
-			onCheckStateChanged: {
-				var shouldBeSelected = (checkState === Qt.Checked)
-				var currentlySelected = delegateRoot.selectionManager ? delegateRoot.selectionManager.isSelected(delegateRoot.itemId) : false
-				if (shouldBeSelected !== currentlySelected && delegateRoot.selectionManager)
-					delegateRoot.selectionManager.toggleSelect(delegateRoot.itemId)
-			}
 		}
 
 		Column {
@@ -105,7 +104,7 @@ Rectangle {
 			anchors.fill: parent
 			hoverEnabled: true
 			cursorShape: Qt.PointingHandCursor
-			onClicked: itemMenu.popup()
+			onClicked: itemMenu.popup(moreButton.x, moreButton.y + moreButton.height)
 		}
 	}
 

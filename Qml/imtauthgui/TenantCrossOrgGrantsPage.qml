@@ -69,13 +69,21 @@ TenantSimpleCollectionPage {
 					font.pixelSize: Style.fontSizeL
 					font.bold: true
 					color: Style.textColor
-					width: parent.width - grantBadgesRow.width - Style.marginM
+					width: parent.width - grantInfoRow.width - Style.marginM
 					elide: Text.ElideRight
 				}
 
 				Row {
-					id: grantBadgesRow
-					spacing: Style.marginXS
+					id: grantInfoRow
+					spacing: Style.marginS
+
+					BaseText {
+						visible: grantDelegate.roles !== ""
+						text: grantDelegate.roles
+						font.pixelSize: Style.fontSizeS
+						color: Style.secondColor
+						anchors.verticalCenter: parent.verticalCenter
+					}
 
 					StatusBadge {
 						visible: grantDelegate.direction !== ""
@@ -86,24 +94,14 @@ TenantSimpleCollectionPage {
 						fontPixelSize: Style.fontSizeXS
 					}
 
-					StatusBadge {
+					BaseText {
 						visible: grantDelegate.expiresAt !== ""
 						text: qsTr("Expires %1").arg(grantDelegate.expiresAt)
-						badgeColor: Style.backgroundColor2
-						badgeBorderWidth: 0
-						textColor: Style.errorTextColor
-						fontPixelSize: Style.fontSizeXS
+						font.pixelSize: Style.fontSizeXS
+						color: Style.errorTextColor
+						anchors.verticalCenter: parent.verticalCenter
 					}
 				}
-			}
-
-			BaseText {
-				visible: grantDelegate.roles !== ""
-				text: grantDelegate.roles
-				font.pixelSize: Style.fontSizeS
-				color: Style.secondColor
-				elide: Text.ElideRight
-				width: parent.width
 			}
 
 			BaseText {

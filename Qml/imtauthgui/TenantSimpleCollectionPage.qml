@@ -10,27 +10,12 @@ import imtauthgui 1.0
 /**
  * TenantSimpleCollectionPage
  *
- * Generic CRUD page used by the TenantEditor tabs that only need a flat
- * list of items with checkbox-multiselect, a search filter, Create / Edit
- * / Remove header buttons and create/edit sub-pages driven by a
- * `CollectionDocumentManager`.
+ * Generic CRUD page for TenantEditor tabs that need a flat list with
+ * checkbox-multiselect, search filter, Create/Edit/Remove header buttons
+ * and create/edit sub-pages driven by a CollectionDocumentManager.
  *
- * Currently consumed by `TenantRolesPage` and `TenantGroupsPage`; the
- * Members tab does not use it because it has its own delegate (avatars,
- * invitations, role menu).
- *
- * The page is parameterised by:
- *   - `apiClient` / `stateManager` from the parent
- *   - the entity name and i18n strings (header / button labels, confirm
- *     dialog text, empty-state text, filter placeholder)
- *   - `documentManager` / `objectTypeId` / `dataProviderComp` taken from
- *     the apiClient for the concrete entity type
- *   - `removeItems(ids)` — override to handle Remove buttons and
- *     the per-item Delete menu
- *
- * Parents that need to react to apiClient-level removal signals (e.g.
- * `onRoleRemoved` / `onGroupRemoved`) should call `refresh()` from a
- * `Connections` block they set up themselves.
+ * Consumed by TenantRolesPage, TenantGroupsPage; the Members tab has its
+ * own delegate and does not use this component.
  */
 ViewBase {
 	id: collectionPage
@@ -42,30 +27,29 @@ ViewBase {
 	property var apiClient: null
 
 	// --- entity-specific configuration ---
-	property string entityName: "Item"                // e.g. "Role"
-	property string entityNamePlural: "Items"         // e.g. "Roles"
-	property string listHeaderTitle: ""               // defaults to entityNamePlural
+	property string entityName: "Item"
+	property string entityNamePlural: "Items"
+	property string listHeaderTitle: ""
 	property string descriptionText: ""
-	property string createButtonText: ""              // defaults to "+ Create <entityName>"
-	property string emptyText: ""                     // defaults to "No <entityNamePlural> found."
-	property string filterPlaceholder: ""             // defaults to "Filter <entityNamePlural>..."
-	property string deleteSingleTitle: ""             // defaults to "Delete <entityName>"
-	property string deleteMultipleTitle: ""           // defaults to "Delete <entityNamePlural>"
+	property string createButtonText: ""
+	property string emptyText: ""
+	property string filterPlaceholder: ""
+	property string deleteSingleTitle: ""
+	property string deleteMultipleTitle: ""
 
 	// --- backend configuration ---
 	property var documentManager: null
 	property string objectTypeId: ""
-	property var listModel: null                       // alternative to dataProviderComp: direct model for the list
-	property Component delegateComponent: null         // custom delegate (receives modelData, selectionManager, collectionPage)
-	property Component headerButtonsComponent: null    // custom header buttons placed at right of stackViewHeader
-	property Component customEditorComponent: null     // custom create/edit form used when documentManager is null
-	property bool showCreateButton: true               // set to false to hide the Create button (e.g. read-only collections)
-	function removeItems(ids) {}                        // override in subcomponents
+	property var listModel: null
+	property Component delegateComponent: null
+	property Component headerButtonsComponent: null
+	property Component customEditorComponent: null
+	property bool showCreateButton: true
+	function removeItems(ids) {}
 
 	function updateGui() {}
 	function updateModel() {}
 
-	/** Re-fetch the list. Parents call this on external removal signals. */
 	function refresh() {
 		if (dataProvider)
 			dataProvider.fetch(__lastFilterText)
@@ -86,20 +70,20 @@ ViewBase {
 		return ""
 	}
 
-	/** Navigate back from a custom editor to the list. */
 	function popEditor() {
-		stackViewHeader.popHeader()
-		collectionStackView.previous()
-		while (collectionStackView.count > 1)
-			collectionStackView.removePage(collectionStackView.count - 1)
+		__resetStackToList()
 		collectionPage.__activeShellView = null
 	}
 
+	// --- internal state ---
 	property string __editItemId: ""
 	property bool __isCreating: false
 	property var __activeShellView: null
 
-	readonly property bool __canManage: collectionPage.stateManager ? collectionPage.stateManager.canManageMembers : false
+	readonly property bool __canManage: stateManager ? stateManager.canManageMembers : false
+	readonly property int __selectedCount: selectionManager ? selectionManager.selectedIds.length : 0
+	readonly property bool __onListPage: collectionStackView.currentIndex === 0
+	readonly property bool __useDefaultButtons: !headerButtonsComponent
 
 	property var selectionManager: null
 	property string __lastFilterText: ""
@@ -119,13 +103,33 @@ ViewBase {
 		}
 	}
 
-	function openCreate() {
+	// --- derived display strings ---
+	readonly property string __listTitle: listHeaderTitle.length > 0 ? listHeaderTitle : entityNamePlural
+	readonly property string __createBtnText: createButtonText.length > 0 ? createButtonText : ("+ " + qsTr("Create %1").arg(entityName))
+	readonly property string __emptyText: emptyText.length > 0 ? emptyText : qsTr("No %1 found.").arg(entityNamePlural.toLowerCase())
+	readonly property string __filterPlaceholder: filterPlaceholder.length > 0 ? filterPlaceholder : qsTr("Filter %1...").arg(entityNamePlural.toLowerCase())
+	readonly property string __deleteSingleTitle: deleteSingleTitle.length > 0 ? deleteSingleTitle : qsTr("Delete %1").arg(entityName)
+	readonly property string __deleteMultipleTitle: deleteMultipleTitle.length > 0 ? deleteMultipleTitle : qsTr("Delete %1").arg(entityNamePlural)
+
+	// --- stack navigation helpers ---
+	function __resetStackToList() {
+		stackViewHeader.popHeader()
+		collectionStackView.previous()
 		while (collectionStackView.count > 1)
 			collectionStackView.removePage(collectionStackView.count - 1)
+	}
+
+	function __clearExtraPages() {
+		while (collectionStackView.count > 1)
+			collectionStackView.removePage(collectionStackView.count - 1)
+	}
+
+	function openCreate() {
+		__clearExtraPages()
 		collectionPage.__isCreating = true
 		stackViewHeader.addHeader("create", qsTr("Create New %1").arg(collectionPage.entityName))
 		if (collectionPage.documentManager) {
-			collectionStackView.addPage(createEditorView)
+			collectionStackView.addPage(editorViewComponent)
 		} else if (collectionPage.customEditorComponent) {
 			collectionStackView.addPage(collectionPage.customEditorComponent)
 		}
@@ -136,12 +140,18 @@ ViewBase {
 		__openEdit(itemId, itemName, itemDescription)
 	}
 
-	readonly property string __listTitle: listHeaderTitle.length > 0 ? listHeaderTitle : entityNamePlural
-	readonly property string __createBtnText: createButtonText.length > 0 ? createButtonText : ("+ " + qsTr("Create %1").arg(entityName))
-	readonly property string __emptyText: emptyText.length > 0 ? emptyText : qsTr("No %1 found.").arg(entityNamePlural.toLowerCase())
-	readonly property string __filterPlaceholder: filterPlaceholder.length > 0 ? filterPlaceholder : qsTr("Filter %1...").arg(entityNamePlural.toLowerCase())
-	readonly property string __deleteSingleTitle: deleteSingleTitle.length > 0 ? deleteSingleTitle : qsTr("Delete %1").arg(entityName)
-	readonly property string __deleteMultipleTitle: deleteMultipleTitle.length > 0 ? deleteMultipleTitle : qsTr("Delete %1").arg(entityNamePlural)
+	function __openEdit(itemId, itemName, itemDescription) {
+		collectionPage.__editItemId = itemId
+		collectionPage.__isCreating = false
+		__clearExtraPages()
+		stackViewHeader.addHeader("edit", itemName || qsTr("Edit %1").arg(collectionPage.entityName))
+		if (collectionPage.documentManager) {
+			collectionStackView.addPage(editorViewComponent)
+		} else if (collectionPage.customEditorComponent) {
+			collectionStackView.addPage(collectionPage.customEditorComponent)
+		}
+		collectionStackView.next()
+	}
 
 	Connections {
 		target: collectionPage.documentManager
@@ -154,6 +164,7 @@ ViewBase {
 		}
 	}
 
+	// --- UI ---
 	StackViewHeader {
 		id: stackViewHeader
 		anchors.top: parent.top
@@ -167,8 +178,7 @@ ViewBase {
 			if (collectionPage.__activeShellView
 					&& collectionPage.__activeShellView.state === "content") {
 				collectionPage.__activeShellView.closeDocument()
-			}
-			else {
+			} else {
 				collectionStackView.previous()
 				stackViewHeader.popHeader()
 			}
@@ -179,10 +189,6 @@ ViewBase {
 				return
 			if (collectionPage.__activeShellView
 					&& collectionPage.__activeShellView.state === "content") {
-				// Delegate to the document close flow so the standard
-				// "Save changes?" dialog is shown for dirty documents.
-				// The editor's onClosed handler will pop the header /
-				// stack back to the list page.
 				collectionPage.__activeShellView.closeDocument()
 				return
 			}
@@ -199,7 +205,7 @@ ViewBase {
 
 	Text {
 		id: createBtn
-		visible: collectionPage.showCreateButton && collectionPage.__canManage && collectionStackView.currentIndex === 0 && !collectionPage.headerButtonsComponent
+		visible: collectionPage.showCreateButton && collectionPage.__canManage && collectionPage.__onListPage && collectionPage.__useDefaultButtons
 		anchors.right: stackViewHeader.right
 		anchors.verticalCenter: stackViewHeader.verticalCenter
 		text: collectionPage.__createBtnText
@@ -217,21 +223,21 @@ ViewBase {
 
 	Text {
 		id: editBtn
-		visible: collectionPage.__canManage && collectionStackView.currentIndex === 0 && !collectionPage.headerButtonsComponent
+		visible: collectionPage.__canManage && collectionPage.__onListPage && collectionPage.__useDefaultButtons
 		anchors.right: createBtn.left
 		anchors.rightMargin: Style.marginL
 		anchors.verticalCenter: stackViewHeader.verticalCenter
 		text: qsTr("Edit")
 		font.pixelSize: Style.fontSizeM
 		font.bold: true
-		color: collectionPage.selectionManager && collectionPage.selectionManager.selectedIds.length === 1 ? Style.linkColor : Style.inactiveTextColor
-		opacity: collectionPage.selectionManager && collectionPage.selectionManager.selectedIds.length === 1 ? 1.0 : 0.5
+		color: collectionPage.__selectedCount === 1 ? Style.linkColor : Style.inactiveTextColor
+		opacity: collectionPage.__selectedCount === 1 ? 1.0 : 0.5
 
 		MouseArea {
 			anchors.fill: parent
 			hoverEnabled: true
-			cursorShape: collectionPage.selectionManager && collectionPage.selectionManager.selectedIds.length === 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
-			enabled: collectionPage.selectionManager && collectionPage.selectionManager.selectedIds.length === 1
+			cursorShape: collectionPage.__selectedCount === 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
+			enabled: collectionPage.__selectedCount === 1
 			onClicked: {
 				var selId = collectionPage.selectionManager.selectedIds[0]
 				var items = collectionPage.__listItems
@@ -247,26 +253,25 @@ ViewBase {
 
 	Text {
 		id: removeBtn
-		visible: collectionPage.__canManage && collectionStackView.currentIndex === 0 && !collectionPage.headerButtonsComponent
+		visible: collectionPage.__canManage && collectionPage.__onListPage && collectionPage.__useDefaultButtons
 		anchors.right: editBtn.left
 		anchors.rightMargin: Style.marginL
 		anchors.verticalCenter: stackViewHeader.verticalCenter
 		text: qsTr("Remove")
 		font.pixelSize: Style.fontSizeM
 		font.bold: true
-		color: collectionPage.selectionManager && collectionPage.selectionManager.selectedIds.length > 0 ? Style.errorColor : Style.inactiveTextColor
-		opacity: collectionPage.selectionManager && collectionPage.selectionManager.selectedIds.length > 0 ? 1.0 : 0.5
+		color: collectionPage.__selectedCount > 0 ? Style.errorColor : Style.inactiveTextColor
+		opacity: collectionPage.__selectedCount > 0 ? 1.0 : 0.5
 
 		MouseArea {
 			anchors.fill: parent
 			hoverEnabled: true
-			cursorShape: collectionPage.selectionManager && collectionPage.selectionManager.selectedIds.length > 0 ? Qt.PointingHandCursor : Qt.ArrowCursor
-			enabled: collectionPage.selectionManager && collectionPage.selectionManager.selectedIds.length > 0
+			cursorShape: collectionPage.__selectedCount > 0 ? Qt.PointingHandCursor : Qt.ArrowCursor
+			enabled: collectionPage.__selectedCount > 0
 			onClicked: {
-				var count = collectionPage.selectionManager.selectedIds.length
 				ModalDialogManager.showConfirmationDialog(
 							collectionPage.__deleteMultipleTitle,
-							qsTr("Are you sure you want to delete %1 selected item(s)? This action cannot be undone.").arg(count),
+							qsTr("Are you sure you want to delete %1 selected item(s)? This action cannot be undone.").arg(collectionPage.__selectedCount),
 							function(result) {
 								if (result === Enums.yes) {
 									var ids = collectionPage.selectionManager.selectedIds.slice()
@@ -281,7 +286,7 @@ ViewBase {
 
 	Loader {
 		id: customHeaderButtonsLoader
-		visible: collectionPage.headerButtonsComponent && collectionStackView.currentIndex === 0
+		visible: collectionPage.headerButtonsComponent && collectionPage.__onListPage
 		anchors.right: stackViewHeader.right
 		anchors.verticalCenter: stackViewHeader.verticalCenter
 		sourceComponent: collectionPage.headerButtonsComponent
@@ -294,7 +299,7 @@ ViewBase {
 		anchors.topMargin: Style.marginS
 		anchors.horizontalCenter: parent.horizontalCenter
 		width: Math.min(parent.width - Style.marginXL * 2, 1000)
-		visible: collectionStackView.currentIndex === 0 && collectionPage.descriptionText.length > 0
+		visible: collectionPage.__onListPage && collectionPage.descriptionText.length > 0
 		text: collectionPage.descriptionText
 		font.pixelSize: Style.fontSizeM
 		color: Style.inactiveTextColor
@@ -319,18 +324,7 @@ ViewBase {
 		Item {
 			id: listViewItem
 			readonly property var effectiveModel: collectionPage.listModel ? collectionPage.listModel : collectionPage.__listItems
-			readonly property int effectiveCount: {
-				if (!effectiveModel) {
-					return 0
-				}
-				if (typeof effectiveModel.count !== "undefined") {
-					return effectiveModel.count
-				}
-				if (typeof effectiveModel.length !== "undefined") {
-					return effectiveModel.length
-				}
-				return 0
-			}
+			readonly property int effectiveCount: effectiveModel ? (effectiveModel.count || effectiveModel.length || 0) : 0
 
 			SearchTextInput {
 				id: filterInput
@@ -467,57 +461,19 @@ ViewBase {
 		}
 	}
 
-	function __openEdit(itemId, itemName, itemDescription) {
-		collectionPage.__editItemId = itemId
-		collectionPage.__isCreating = false
-		while (collectionStackView.count > 1)
-			collectionStackView.removePage(collectionStackView.count - 1)
-		stackViewHeader.addHeader("edit", itemName || qsTr("Edit %1").arg(collectionPage.entityName))
-		if (collectionPage.documentManager) {
-			collectionStackView.addPage(editEditorView)
-		} else if (collectionPage.customEditorComponent) {
-			collectionStackView.addPage(collectionPage.customEditorComponent)
-		}
-		collectionStackView.next()
-	}
-
 	Component {
-		id: createEditorView
+		id: editorViewComponent
 
 		TenantDocumentEditorShell {
 			documentManager: collectionPage.documentManager
 			objectTypeId: collectionPage.objectTypeId
-			createNew: true
-			generateNewId: true
+			objectId: collectionPage.__isCreating ? "" : collectionPage.__editItemId
+			createNew: collectionPage.__isCreating
+			generateNewId: collectionPage.__isCreating
 			activeShellTarget: collectionPage
 			documentNameResolver: collectionPage.resolveDocumentName
 
-			onClosed: {
-				stackViewHeader.popHeader()
-				collectionStackView.previous()
-				while (collectionStackView.count > 1)
-					collectionStackView.removePage(collectionStackView.count - 1)
-			}
-		}
-	}
-
-	Component {
-		id: editEditorView
-
-		TenantDocumentEditorShell {
-			documentManager: collectionPage.documentManager
-			objectTypeId: collectionPage.objectTypeId
-			objectId: collectionPage.__editItemId
-			createNew: false
-			activeShellTarget: collectionPage
-			documentNameResolver: collectionPage.resolveDocumentName
-
-			onClosed: {
-				stackViewHeader.popHeader()
-				collectionStackView.previous()
-				while (collectionStackView.count > 1)
-					collectionStackView.removePage(collectionStackView.count - 1)
-			}
+			onClosed: collectionPage.__resetStackToList()
 		}
 	}
 }

@@ -101,9 +101,11 @@ QtObject {
 
 	signal crossTenantMessageSent(string messageId)
 	signal crossTenantMessageStatusUpdated(string messageId)
+	signal crossTenantMessagesReceived(var messages)
 	signal orderRequestConfirmed(string requestId)
 	signal orderRequestRejected(string requestId)
 	signal orderRequestStatusUpdated(string requestId)
+	signal orderRequestsReceived(var orderRequests)
 
 	// --- Subscription client for membership notifications ---
 	property SubscriptionClient __membershipSubscription: SubscriptionClient {
@@ -340,8 +342,12 @@ QtObject {
 		root.__transferOwnershipSender.send(root.__transferOwnershipInput)
 	}
 
+	property string __pendingChangeRoleUserId: ""
+	property string __pendingChangeRoleNewRole: ""
+
 	function setMemberRole(tenantId, userId, role) {
-		// First we need to find the membership to get its ID
+		root.__pendingChangeRoleUserId = userId || ""
+		root.__pendingChangeRoleNewRole = role || ""
 		root.__findMembershipForRoleInput.m_userId = userId
 		root.__findMembershipForRoleInput.m_tenantId = tenantId
 		root.__findMembershipForRoleSender.send(root.__findMembershipForRoleInput)
