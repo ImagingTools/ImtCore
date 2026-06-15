@@ -717,11 +717,7 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 		return adaptedObjectPtr;
 	}
 
-	QByteArrayList delegatedRoleIds;
-	delegatedRoleIds.reserve(delegatedRoleIdSet.size());
-	for (const QByteArray& roleId : delegatedRoleIdSet){
-		delegatedRoleIds.append(roleId);
-	}
+	const QByteArrayList delegatedRoleIds = delegatedRoleIdSet.values();
 
 	if (!adaptedObjectPtr.IsValid()){
 		adaptedObjectPtr = object.CloneMe();
