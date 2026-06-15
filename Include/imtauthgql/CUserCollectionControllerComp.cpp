@@ -674,7 +674,6 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 		return adaptedObjectPtr;
 	}
 
-	bool hasDirectMembership = false;
 	QByteArrayList homeTenantIds;
 	const imtauth::ITenantMembershipManager::MembershipIds membershipIds =
 		m_membershipManagerCompPtr->GetMembershipsByUser(objectId);
@@ -685,16 +684,11 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 		}
 		QByteArray tenantId = membershipPtr->GetTenantId();
 		if (tenantId == currentTenantId){
-			hasDirectMembership = true;
-			break;
+			return adaptedObjectPtr;
 		}
 		if (!tenantId.isEmpty()){
 			homeTenantIds.append(tenantId);
 		}
-	}
-
-	if (hasDirectMembership){
-		return adaptedObjectPtr;
 	}
 
 	QSet<QByteArray> delegatedRoleIdSet;
@@ -708,6 +702,7 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 						continue;
 					}
 				}
+				// If role metadata is unavailable, keep the tenant-scoped role.
 				delegatedRoleIdSet.insert(roleId);
 			}
 		}
