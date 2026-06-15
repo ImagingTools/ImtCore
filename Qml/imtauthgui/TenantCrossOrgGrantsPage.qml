@@ -61,9 +61,11 @@ TenantSimpleCollectionPage {
 			}
 
 			Row {
-				width: parent.width
+				anchors.verticalCenter: parent.verticalCenter
+				anchors.left: parent.left
+				anchors.leftMargin: Style.marginXXL
+				anchors.right: parent.right
 				spacing: Style.marginM
-
 				BaseText {
 					text: grantDelegate.targetTenant !== "" ? grantDelegate.targetTenant : grantDelegate.itemTitle
 					font.pixelSize: Style.fontSizeL
