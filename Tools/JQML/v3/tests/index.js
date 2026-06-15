@@ -160,7 +160,8 @@ function runCmakeWithOptionalVsDev(cmakeArgs, cwd, vsDevCmdPath) {
 
     fs.writeFileSync(scriptPath, scriptLines.join('\r\n'), 'utf-8')
 
-    const result = spawnSync('cmd.exe', ['/d', '/c', scriptPath], {
+    const cmdCommand = `call ${quoteForCmd(scriptPath)}`
+    const result = spawnSync('cmd.exe', ['/d', '/c', cmdCommand], {
         cwd,
         encoding: 'utf-8',
         windowsHide: true,
