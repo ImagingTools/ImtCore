@@ -699,10 +699,6 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 
 	QSet<QByteArray> delegatedRoleIdSet;
 	for (const QByteArray& homeTenantId : homeTenantIds){
-		if (!m_delegatedAccessCompPtr->IsDelegatedAccess(objectId, homeTenantId, currentTenantId)){
-			continue;
-		}
-
 		QByteArrayList roleIds = m_delegatedAccessCompPtr->GetDelegatedRoles(homeTenantId, currentTenantId);
 		for (const QByteArray& roleId : roleIds){
 			if (!roleId.isEmpty()){
@@ -715,7 +711,7 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 		return adaptedObjectPtr;
 	}
 
-	QByteArrayList delegatedRoleIds = QByteArrayList(delegatedRoleIdSet.values());
+	const QByteArrayList delegatedRoleIds = delegatedRoleIdSet.values();
 
 	if (!adaptedObjectPtr.IsValid()){
 		adaptedObjectPtr = object.CloneMe();
