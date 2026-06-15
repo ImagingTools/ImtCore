@@ -141,13 +141,12 @@ function runCmakeWithOptionalVsDev(cmakeArgs, cwd, vsDevCmdPath) {
 
     const quoteForCmd = (value) => {
         const str = String(value)
+            .replaceAll('%', '%%')
         return `"${str.replaceAll('"', '""')}"`
     }
 
-    const scriptPath = path.resolve(
-        os.tmpdir(),
-        `jqml_vsdev_${Date.now()}_${Math.random().toString(16).slice(2)}.cmd`
-    )
+    const scriptDir = fs.mkdtempSync(path.resolve(os.tmpdir(), 'jqml_vsdev_'))
+    const scriptPath = path.resolve(scriptDir, 'run.cmd')
 
     const scriptLines = [
         '@echo off',
@@ -160,15 +159,14 @@ function runCmakeWithOptionalVsDev(cmakeArgs, cwd, vsDevCmdPath) {
 
     fs.writeFileSync(scriptPath, scriptLines.join('\r\n'), 'utf-8')
 
-    const cmdCommand = `call ${quoteForCmd(scriptPath)}`
-    const result = spawnSync('cmd.exe', ['/d', '/c', cmdCommand], {
+    const result = spawnSync('cmd.exe', ['/d', '/v:off', '/c', scriptPath], {
         cwd,
         encoding: 'utf-8',
         windowsHide: true,
     })
 
     try {
-        fs.unlinkSync(scriptPath)
+        fs.rmSync(scriptDir, { recursive: true, force: true })
     } catch (e) {
         // ignore cleanup errors
     }
