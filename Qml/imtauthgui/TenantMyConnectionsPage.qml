@@ -71,10 +71,7 @@ TenantSimpleCollectionPage {
 			}
 
 			Row {
-				anchors.verticalCenter: parent.verticalCenter
-				anchors.left: parent.left
-				anchors.leftMargin: Style.marginXXL
-				anchors.right: parent.right
+				width: parent.width
 				spacing: Style.marginM
 
 				BaseText {
