@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CUserCollectionControllerComp.h>
 
+// Qt includes
+#include <QSet>
+
 // ACF includes
 #include <iprm/CTextParam.h>
 #include <iprm/CParamsSet.h>
 #include <iqt/iqt.h>
-#include <QSet>
 
 // ImtCore includes
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
@@ -674,6 +676,7 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 		return adaptedObjectPtr;
 	}
 
+	bool hasDirectMembership = false;
 	QByteArrayList homeTenantIds;
 	const imtauth::ITenantMembershipManager::MembershipIds membershipIds =
 		m_membershipManagerCompPtr->GetMembershipsByUser(objectId);
@@ -684,11 +687,16 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 		}
 		QByteArray tenantId = membershipPtr->GetTenantId();
 		if (tenantId == currentTenantId){
-			return adaptedObjectPtr;
+			hasDirectMembership = true;
+			break;
 		}
 		if (!tenantId.isEmpty()){
 			homeTenantIds.append(tenantId);
 		}
+	}
+
+	if (hasDirectMembership){
+		return adaptedObjectPtr;
 	}
 
 	QSet<QByteArray> delegatedRoleIdSet;
@@ -696,6 +704,7 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 		QByteArrayList roleIds = m_delegatedAccessCompPtr->GetDelegatedRoles(homeTenantId, currentTenantId);
 		for (const QByteArray& roleId : roleIds){
 			if (!roleId.isEmpty()){
+				// Only keep roles that belong to the current product context.
 				if (m_roleInfoProviderCompPtr.IsValid()){
 					imtauth::IRoleUniquePtr roleInfoPtr = m_roleInfoProviderCompPtr->GetRole(roleId);
 					if (!roleInfoPtr.IsValid() || roleInfoPtr->GetProductId() != currentProductId){
