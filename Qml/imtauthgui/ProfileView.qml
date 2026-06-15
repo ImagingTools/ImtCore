@@ -9,7 +9,7 @@ import imtauthProfileSdl 1.0
 
 ViewBase {
 	id: container;
-	property ProfileData profileData: model ? model : null;
+	property ProfileData profileData: model
 	
 	Connections {
 		target: container.profileData;
@@ -28,6 +28,10 @@ ViewBase {
 	}
 	
 	function updateGui(){
+		if (!profileData){
+			return
+		}
+
 		usernameView.text = profileData.m_username;
 		nameInput.text = profileData.m_name;
 		mailInput.text = profileData.m_email;
@@ -38,6 +42,10 @@ ViewBase {
 	}
 	
 	function updateModel(){
+		if (!profileData){
+			return
+		}
+
 		profileData.m_name = nameInput.text
 		profileData.m_email = mailInput.text
 	}
@@ -46,14 +54,15 @@ ViewBase {
 	GqlSdlRequestSender {
 		id: getProfileRequest;
 		gqlCommandId: ImtauthProfileSdlCommandIds.s_getProfile;
-		sdlObjectComp: Component { ProfileData {}}
+		sdlObjectComp: Component { ProfileData {
+				onFinished: {
+					container.model = this
+				}
+		}}
 		inputObjectComp: Component { GetProfileInput {
 				m_id: AuthorizationController.userTokenProvider.userId;
 				m_productId: AuthorizationController.productId;
 			}}
-		onFinished: {
-			container.model = sdlObject;
-		}
 	}
 	
 	GqlSdlRequestSender {

@@ -197,10 +197,21 @@ RemoteCollectionView {
 			property string invitedByNameValue: ""
 
 			onReused: {
-				if (rowIndex >= 0 && tenantRelationScopeDelegate.rowDelegate && tenantRelationScopeDelegate.rowDelegate.tableItem){
-					scopeValue = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, rowIndex);
-					invitationIdValue = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_invitationId, rowIndex);
-					invitedByNameValue = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_invitedByName, rowIndex);
+				if (rowIndex >= 0 && tenantRelationScopeDelegate && tenantRelationScopeDelegate.rowDelegate && tenantRelationScopeDelegate.rowDelegate.tableItem){
+					let scope = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, rowIndex);
+					if (scope){
+						scopeValue = scope
+					}
+
+					let invitationId = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_invitationId, rowIndex);
+					if (invitationId){
+						invitationIdValue = invitationId
+					}
+
+					let invitedByName = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_invitedByName, rowIndex);
+					if (invitedByName){
+						invitedByNameValue = invitedByName
+					}
 				}
 			}
 
