@@ -5,6 +5,7 @@
 #include <iprm/CTextParam.h>
 #include <iprm/CParamsSet.h>
 #include <iqt/iqt.h>
+#include <QSet>
 
 // ImtCore includes
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
@@ -674,6 +675,7 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 	}
 
 	bool hasDirectMembership = false;
+	QByteArrayList homeTenantIds;
 	const imtauth::ITenantMembershipManager::MembershipIds membershipIds =
 		m_membershipManagerCompPtr->GetMembershipsByUser(objectId);
 	for (const QByteArray& membershipId : membershipIds){
@@ -681,9 +683,13 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 		if (!membershipPtr.IsValid() || !membershipPtr->IsActive()){
 			continue;
 		}
-		if (membershipPtr->GetTenantId() == currentTenantId){
+		QByteArray tenantId = membershipPtr->GetTenantId();
+		if (tenantId == currentTenantId){
 			hasDirectMembership = true;
 			break;
+		}
+		if (!tenantId.isEmpty()){
+			homeTenantIds.append(tenantId);
 		}
 	}
 
@@ -692,24 +698,16 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 	}
 
 	QByteArrayList delegatedRoleIds;
-	for (const QByteArray& membershipId : membershipIds){
-		imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
-		if (!membershipPtr.IsValid() || !membershipPtr->IsActive()){
-			continue;
-		}
-
-		QByteArray homeTenantId = membershipPtr->GetTenantId();
-		if (homeTenantId.isEmpty() || homeTenantId == currentTenantId){
-			continue;
-		}
-
+	QSet<QByteArray> delegatedRoleIdSet;
+	for (const QByteArray& homeTenantId : std::as_const(homeTenantIds)){
 		if (!m_delegatedAccessCompPtr->IsDelegatedAccess(objectId, homeTenantId, currentTenantId)){
 			continue;
 		}
 
 		QByteArrayList roleIds = m_delegatedAccessCompPtr->GetDelegatedRoles(homeTenantId, currentTenantId);
 		for (const QByteArray& roleId : roleIds){
-			if (!delegatedRoleIds.contains(roleId)){
+			if (!roleId.isEmpty() && !delegatedRoleIdSet.contains(roleId)){
+				delegatedRoleIdSet.insert(roleId);
 				delegatedRoleIds.append(roleId);
 			}
 		}
@@ -814,4 +812,3 @@ QJsonObject CUserCollectionControllerComp::InsertObject(
 
 
 } // namespace imtauth
-
