@@ -8,7 +8,7 @@
 
 // imtrest includes
 #include <imtrest/CHttpServletCompBase.h>
-#include <imtrest/IProtocolEngine.h>
+#include <imthttp/IProtocolEngine.h>
 
 
 namespace imtrest
@@ -19,7 +19,7 @@ class CSdlJsonServletBaseComp: public imtrest::CHttpServletCompBase
 {
 public:
 	typedef imtrest::CHttpServletCompBase BaseClass;
-	typedef QSharedPointer<imtrest::IResponse> ResponsePtr;
+	typedef QSharedPointer<imthttp::IResponse> ResponsePtr;
 
 	I_BEGIN_BASE_COMPONENT(CSdlJsonServletBaseComp)
 	I_END_COMPONENT
@@ -28,13 +28,13 @@ protected:
 	template <class SdlClass>
 	bool ReadRequestToSdlStruct(
 				SdlClass& out,
-				const imtrest::CHttpRequest& request,
+				const imthttp::CHttpRequest& request,
 				ResponsePtr& response) const;
 
 	template <class SdlClass>
 	bool CreateResponseFromSdlStruct(
 			const SdlClass& input,
-			const imtrest::CHttpRequest& request,
+			const imthttp::CHttpRequest& request,
 			IProtocolEngine::StatusCode protocolStatusCode,
 			ResponsePtr& response,
 			QJsonDocument::JsonFormat jsonFormat = QJsonDocument::Compact) const;
@@ -45,7 +45,7 @@ protected:
 			const QString& errorString,
 			const QString& additionalInfo,
 			IProtocolEngine::StatusCode protocolStatusCode,
-			const imtrest::CHttpRequest& request) const;
+			const imthttp::CHttpRequest& request) const;
 };
 
 
@@ -95,7 +95,7 @@ bool CSdlJsonServletBaseComp::ReadRequestToSdlStruct(
 template <class SdlClass>
 bool CSdlJsonServletBaseComp::CreateResponseFromSdlStruct(
 	const SdlClass& input,
-	const imtrest::CHttpRequest& request,
+	const imthttp::CHttpRequest& request,
 	IProtocolEngine::StatusCode protocolStatusCode,
 	ResponsePtr& responsePtr,
 	QJsonDocument::JsonFormat jsonFormat) const

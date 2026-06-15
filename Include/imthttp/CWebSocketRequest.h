@@ -10,11 +10,17 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtrest/IRequest.h>
-#include <imtrest/IRequestServlet.h>
+#include <imthttp/IRequest.h>
+
 
 
 namespace imtrest
+{
+class IRequestServlet;
+}
+
+
+namespace imthttp
 {
 
 
@@ -48,7 +54,7 @@ public:
 	};
 
 	CWebSocketRequest(const IProtocolEngine& engine);
-	CWebSocketRequest(const IRequestServlet& requestHandler, const IProtocolEngine& engine);
+	CWebSocketRequest(const imtrest::IRequestServlet& requestHandler, const IProtocolEngine& engine);
 	~CWebSocketRequest();
 
 	QByteArrayList GetHeaders() const;
@@ -58,7 +64,7 @@ public:
 	QByteArray GetClientId() const;
 	QHostAddress GetRemoteAddress() const;
 	void SetBody(const QByteArray& body);
-	void SetRequestHandler(const IRequestServlet* requestHandlerPtr);
+	void SetRequestHandler(const imtrest::IRequestServlet* requestHandlerPtr);
 	MethodType GetMethodType() const;
 	void SetMethodType(MethodType methodType);
 	QByteArray GetQueryId() const;
@@ -89,7 +95,7 @@ private:
 	MethodType m_type;
 	QByteArray m_commandId;
 
-	const IRequestServlet* m_requestHandlerPtr;
+	const imtrest::IRequestServlet* m_requestHandlerPtr;
 	const IProtocolEngine& m_engine;
 
 	typedef QMap<QByteArray, QByteArray> HeaderMap;
@@ -101,6 +107,6 @@ private:
 };
 
 
-} // namespace imtrest
+} // namespace imthttp
 
 

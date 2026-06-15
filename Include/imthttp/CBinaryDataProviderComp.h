@@ -12,10 +12,10 @@
 #include <ifile/IRelativeFilePath.h>
 
 // ImtCore includes
-#include <imtrest/IBinaryDataProvider.h>
+#include <imthttp/IBinaryDataProvider.h>
 
 
-namespace imtrest
+namespace imthttp
 {
 
 
@@ -48,6 +48,6 @@ protected:
 };
 
 
-} // namespace imtrest
+} // namespace imthttp
 
 

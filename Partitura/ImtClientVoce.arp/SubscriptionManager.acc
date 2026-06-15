@@ -91,7 +91,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="WebSocketProtocolEngine" PackageId="ImtRestPck" ComponentId="WebSocketProtocolEngine">
+        <Element Id="WebSocketProtocolEngine" PackageId="ImtHttpPck" ComponentId="WebSocketProtocolEngine">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">

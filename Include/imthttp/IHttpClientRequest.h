@@ -9,7 +9,7 @@
 #include <istd/IChangeable.h>
 
 
-namespace imtrest
+namespace imthttp
 {
 
 
@@ -49,6 +49,6 @@ public:
 };
 
 
-} // namespace imtrest
+} // namespace imthttp
 
 

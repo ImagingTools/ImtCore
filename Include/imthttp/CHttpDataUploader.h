@@ -12,7 +12,7 @@
 #include <ibase/IProgressManager.h>
 
 
-namespace imtrest
+namespace imthttp
 {
 
 
@@ -54,6 +54,6 @@ private:
 };
 
 
-} // namespace imtrest
+} // namespace imthttp
 
 

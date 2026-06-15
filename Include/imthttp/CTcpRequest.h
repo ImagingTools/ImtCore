@@ -7,13 +7,19 @@
 #include <QtNetwork/QHostAddress>
 
 // ImtCore includes
-#include <imtrest/IRequest.h>
-#include <imtrest/IRequestServlet.h>
-#include <imtrest/http_parser.h>
-#include <imtrest/CHttpRequest.h>
+#include <imthttp/IRequest.h>
+
+#include <imthttp/http_parser.h>
+#include <imthttp/CHttpRequest.h>
 
 
 namespace imtrest
+{
+class IRequestServlet;
+}
+
+
+namespace imthttp
 {
 
 
@@ -21,7 +27,7 @@ class CTcpRequest: public CHttpRequest
 {
 	Q_OBJECT
 public:
-    CTcpRequest(const IRequestServlet& requestHandler, const IProtocolEngine& engine);
+    CTcpRequest(const imtrest::IRequestServlet& requestHandler, const IProtocolEngine& engine);
 
 	// reimplemented (IRequest)
 	virtual RequestState GetState() const override;
@@ -31,6 +37,6 @@ public:
 };
 
 
-} // namespace imtrest
+} // namespace imthttp
 
 

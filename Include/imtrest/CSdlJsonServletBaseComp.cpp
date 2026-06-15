@@ -11,7 +11,7 @@ CSdlJsonServletBaseComp::ResponsePtr CSdlJsonServletBaseComp::CreateDefaultError
 			const QString& errorString,
 			const QString& additionalInfo,
 			IProtocolEngine::StatusCode protocolStatusCode,
-			const imtrest::CHttpRequest& request) const
+			const imthttp::CHttpRequest& request) const
 {
 	ResponsePtr retVal;
 

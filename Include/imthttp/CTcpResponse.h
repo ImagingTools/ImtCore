@@ -6,10 +6,10 @@
 #include <QtCore/QObject>
 
 // ImtCore includes
-#include <imtrest/IResponse.h>
+#include <imthttp/IResponse.h>
 
 
-namespace imtrest
+namespace imthttp
 {
 
 
@@ -48,6 +48,6 @@ private:
 };
 
 
-} // namespace imtrest
+} // namespace imthttp
 
 
