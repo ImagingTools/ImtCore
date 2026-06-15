@@ -501,6 +501,7 @@
         <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="SlaveSubscriberController"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="CrossOrgGrantManager" ComponentId="TenantGrantManager/CrossOrgGrantManager"/>
         <Component ExportedId="DelegatedAccessResolver" ComponentId="DelegatedAccessResolver"/>
         <Component ExportedId="TenantConnectionRequestManager" ComponentId="TenantConnectionManager/TenantConnectionRequestManager"/>
         <Component ExportedId="TenantInvitationManager" ComponentId="TenantMembershipManager/TenantInvitationManager"/>
