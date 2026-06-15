@@ -657,7 +657,14 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 {
 	istd::IChangeableUniquePtr adaptedObjectPtr = BaseClass::CreateAdaptedObjectData(objectId, object, gqlRequest);
 
-	if (!m_delegatedAccessCompPtr.IsValid()){
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr == nullptr || !m_delegatedAccessCompPtr.IsValid() || !m_membershipManagerCompPtr.IsValid()){
+		return adaptedObjectPtr;
+	}
+
+	QByteArray currentTenantId = gqlContextPtr->GetTenantId();
+	QByteArray currentProductId = gqlContextPtr->GetProductId();
+	if (currentTenantId.isEmpty() || currentProductId.isEmpty()){
 		return adaptedObjectPtr;
 	}
 
@@ -666,7 +673,48 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 		return adaptedObjectPtr;
 	}
 
-	QByteArrayList delegatedRoleIds = m_delegatedAccessCompPtr->GetDelegatedUserRoles(objectId);
+	bool hasDirectMembership = false;
+	const imtauth::ITenantMembershipManager::MembershipIds membershipIds =
+		m_membershipManagerCompPtr->GetMembershipsByUser(objectId);
+	for (const QByteArray& membershipId : membershipIds){
+		imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+		if (!membershipPtr.IsValid() || !membershipPtr->IsActive()){
+			continue;
+		}
+		if (membershipPtr->GetTenantId() == currentTenantId){
+			hasDirectMembership = true;
+			break;
+		}
+	}
+
+	if (hasDirectMembership){
+		return adaptedObjectPtr;
+	}
+
+	QByteArrayList delegatedRoleIds;
+	for (const QByteArray& membershipId : membershipIds){
+		imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+		if (!membershipPtr.IsValid() || !membershipPtr->IsActive()){
+			continue;
+		}
+
+		QByteArray homeTenantId = membershipPtr->GetTenantId();
+		if (homeTenantId.isEmpty() || homeTenantId == currentTenantId){
+			continue;
+		}
+
+		if (!m_delegatedAccessCompPtr->IsDelegatedAccess(objectId, homeTenantId, currentTenantId)){
+			continue;
+		}
+
+		QByteArrayList roleIds = m_delegatedAccessCompPtr->GetDelegatedRoles(homeTenantId, currentTenantId);
+		for (const QByteArray& roleId : roleIds){
+			if (!delegatedRoleIds.contains(roleId)){
+				delegatedRoleIds.append(roleId);
+			}
+		}
+	}
+
 	if (delegatedRoleIds.isEmpty()){
 		return adaptedObjectPtr;
 	}
@@ -683,17 +731,7 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 		return adaptedObjectPtr;
 	}
 
-	for (const QByteArray& delegatedRoleId : delegatedRoleIds){
-		QByteArray productId;
-		if (m_roleInfoProviderCompPtr.IsValid()){
-			imtauth::IRoleUniquePtr roleInfoPtr = m_roleInfoProviderCompPtr->GetRole(delegatedRoleId);
-			if (roleInfoPtr.IsValid()){
-				productId = roleInfoPtr->GetProductId();
-			}
-		}
-
-		adaptedUserInfoPtr->AddRole(productId, delegatedRoleId);
-	}
+	adaptedUserInfoPtr->SetRoles(currentProductId, delegatedRoleIds);
 
 	return adaptedObjectPtr;
 }
@@ -776,5 +814,4 @@ QJsonObject CUserCollectionControllerComp::InsertObject(
 
 
 } // namespace imtauth
-
 
