@@ -1,5 +1,6 @@
 const { spawn, spawnSync } = require('child_process')
 const fs = require('fs')
+const os = require('os')
 const { Builder, Capabilities, By, until } = require('selenium-webdriver')
 const chrome = require('selenium-webdriver/chrome')
 const path = require('path')
@@ -138,14 +139,55 @@ function runCmakeWithOptionalVsDev(cmakeArgs, cwd, vsDevCmdPath) {
         return runCommandSync('cmake', cmakeArgs, cwd)
     }
 
-    const devEnvResult = runCommandSync(
-        vsDevCmdPath,
-        ['-no_logo', '-arch=x64', '-host_arch=x64'],
-        cwd
-    )
-    if (!devEnvResult.ok) return devEnvResult
+    const quoteForCmd = (value) => {
+        const str = String(value)
+        return `"${str.replaceAll('"', '""')}"`
+    }
 
-    return runCommandSync('cmake', cmakeArgs, cwd)
+    const scriptPath = path.resolve(
+        os.tmpdir(),
+        `jqml_vsdev_${Date.now()}_${Math.random().toString(16).slice(2)}.cmd`
+    )
+
+    const scriptLines = [
+        '@echo off',
+        `call ${quoteForCmd(vsDevCmdPath)} -no_logo -arch=x64 -host_arch=x64`,
+        'if errorlevel 1 exit /b %errorlevel%',
+        `cmake ${cmakeArgs.map(quoteForCmd).join(' ')}`,
+        'exit /b %errorlevel%',
+        '',
+    ]
+
+    fs.writeFileSync(scriptPath, scriptLines.join('\r\n'), 'utf-8')
+
+    const result = spawnSync('cmd.exe', ['/d', '/c', scriptPath], {
+        cwd,
+        encoding: 'utf-8',
+        windowsHide: true,
+    })
+
+    try {
+        fs.unlinkSync(scriptPath)
+    } catch (e) {
+        // ignore cleanup errors
+    }
+
+    const stdout = result.stdout ? String(result.stdout) : ''
+    const stderr = result.stderr ? String(result.stderr) : ''
+
+    if (result.error) {
+        return {
+            ok: false,
+            code: -1,
+            output: `${stdout}\n${stderr}\n${result.error.message}`,
+        }
+    }
+
+    return {
+        ok: result.status === 0,
+        code: result.status,
+        output: `${stdout}\n${stderr}`,
+    }
 }
 
 function resolveVsDevCmdPath() {
@@ -155,6 +197,29 @@ function resolveVsDevCmdPath() {
     if (fromEnv && fs.existsSync(fromEnv)) return fromEnv
 
     const programFilesX86 = process.env['ProgramFiles(x86)'] || 'C:\\Program Files (x86)'
+    const vswherePath = path.resolve(programFilesX86, 'Microsoft Visual Studio', 'Installer', 'vswhere.exe')
+
+    if (fs.existsSync(vswherePath)) {
+        try {
+            const result = spawnSync(vswherePath, [
+                '-latest',
+                '-products', '*',
+                '-requires', 'Microsoft.VisualStudio.Component.VC.Tools.x86.x64',
+                '-find', 'Common7\\Tools\\VsDevCmd.bat',
+            ], {
+                encoding: 'utf-8',
+                windowsHide: true,
+            })
+
+            if (result.status === 0) {
+                const resolved = String(result.stdout || '').split(/\r?\n/g).map(s => s.trim()).find(Boolean)
+                if (resolved && fs.existsSync(resolved)) return resolved
+            }
+        } catch (e) {
+            // ignore and continue with static candidates
+        }
+    }
+
     const candidates = [
         path.resolve(programFilesX86, 'Microsoft Visual Studio', '18', 'BuildTools', 'Common7', 'Tools', 'VsDevCmd.bat'),
         path.resolve(programFilesX86, 'Microsoft Visual Studio', '18', 'Community', 'Common7', 'Tools', 'VsDevCmd.bat'),
@@ -310,7 +375,21 @@ function setupDesktopHostRunner() {
 }
 
 function setupDesktopHostRunnerSafe() {
-    setupDesktopHostRunner()
+    const hostRequired = process.env.IMT_DESKTOP_HOST_REQUIRED === '1'
+
+    try {
+        setupDesktopHostRunner()
+    } catch (err) {
+        if (hostRequired) {
+            throw err
+        }
+
+        const message = getErrorMessage(err)
+        console.log(`${colors.yellow}[i] desktop_host unavailable, fallback to qml runner: ${message}${colors.reset}`)
+        process.env.IMT_DESKTOP_USE_HOST = '0'
+        delete process.env.IMT_DESKTOP_RUNNER
+        delete process.env.IMT_DESKTOP_RUNNER_ARGS_JSON
+    }
 }
 
 function getQmlImportPathsFromConfig(testDirPath) {

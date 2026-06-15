@@ -12,7 +12,11 @@ set(ACFDIR "$ENV{ACFDIR}" CACHE PATH "Path to Acf")
 set(TARGETNAME "$ENV{TARGETNAME}" CACHE STRING "Build target suffix, e.g. Qt6_VC17_x64")
 
 if(IMTCOREDIR STREQUAL "")
-    set(IMTCOREDIR "D:/IT/ImtCore" CACHE PATH "Path to ImtCore" FORCE)
+    # desktop_host is expected at <IMTCOREDIR>/Tools/JQML/v3/desktop_host
+    get_filename_component(_detected_imtcore "${CMAKE_CURRENT_LIST_DIR}/../../../.." ABSOLUTE)
+    if(EXISTS "${_detected_imtcore}/Include")
+        set(IMTCOREDIR "${_detected_imtcore}" CACHE PATH "Path to ImtCore" FORCE)
+    endif()
 endif()
 
 if(ACFDIR STREQUAL "")
@@ -21,7 +25,19 @@ if(ACFDIR STREQUAL "")
 endif()
 
 if(TARGETNAME STREQUAL "")
-    set(TARGETNAME "Qt6_VC17_x64" CACHE STRING "Build target suffix" FORCE)
+    if(EXISTS "${IMTCOREDIR}/AuxInclude")
+        file(GLOB _aux_entries RELATIVE "${IMTCOREDIR}/AuxInclude" "${IMTCOREDIR}/AuxInclude/*")
+        foreach(_entry IN LISTS _aux_entries)
+            if(IS_DIRECTORY "${IMTCOREDIR}/AuxInclude/${_entry}")
+                set(TARGETNAME "${_entry}" CACHE STRING "Build target suffix" FORCE)
+                break()
+            endif()
+        endforeach()
+    endif()
+
+    if(TARGETNAME STREQUAL "")
+        set(TARGETNAME "Qt6_VC17_x64" CACHE STRING "Build target suffix" FORCE)
+    endif()
 endif()
 
 include_directories(
