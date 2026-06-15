@@ -702,6 +702,12 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 		QByteArrayList roleIds = m_delegatedAccessCompPtr->GetDelegatedRoles(homeTenantId, currentTenantId);
 		for (const QByteArray& roleId : roleIds){
 			if (!roleId.isEmpty()){
+				if (m_roleInfoProviderCompPtr.IsValid()){
+					imtauth::IRoleUniquePtr roleInfoPtr = m_roleInfoProviderCompPtr->GetRole(roleId);
+					if (!roleInfoPtr.IsValid() || roleInfoPtr->GetProductId() != currentProductId){
+						continue;
+					}
+				}
 				delegatedRoleIdSet.insert(roleId);
 			}
 		}
@@ -711,7 +717,11 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 		return adaptedObjectPtr;
 	}
 
-	const QByteArrayList delegatedRoleIds = delegatedRoleIdSet.values();
+	QByteArrayList delegatedRoleIds;
+	delegatedRoleIds.reserve(delegatedRoleIdSet.size());
+	for (const QByteArray& roleId : delegatedRoleIdSet){
+		delegatedRoleIds.append(roleId);
+	}
 
 	if (!adaptedObjectPtr.IsValid()){
 		adaptedObjectPtr = object.CloneMe();
