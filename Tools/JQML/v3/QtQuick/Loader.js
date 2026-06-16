@@ -21,6 +21,7 @@ class Loader extends Item {
         status: {type:Real, value:Loader.Null, },
         progress: {type:Real, value:0, },
         asynchronous: {type:Bool, value:false, },
+        active: {type:Bool, value:true, },
 
         itemChanged: {type:Signal, args:[]},
         sourceChanged: {type:Signal, args:[]},
@@ -28,6 +29,7 @@ class Loader extends Item {
         statusChanged: {type:Signal, args:[]},
         progressChanged: {type:Signal, args:[]},
         asynchronousChanged: {type:Signal, args:[]},
+        activeChanged: {type:Signal, args:[]},
 
         loaded: {type:Signal, args:[]},
     })
@@ -35,6 +37,29 @@ class Loader extends Item {
     __updatePrimaryProperties(){
         super.__updatePrimaryProperties()
         this.__updateProperty('sourceComponent')
+    }
+
+    __loadFromCurrentSource(){
+        if(!this.active){
+            this.item = null
+            this.status = Loader.Null
+            this.progress = 0
+            return
+        }
+
+        if(this.sourceComponent){
+            this.SLOT_sourceComponentChanged(this.sourceComponent, this.sourceComponent)
+            return
+        }
+
+        if(this.source){
+            this.SLOT_sourceChanged(this.source, this.source)
+            return
+        }
+
+        this.item = null
+        this.status = Loader.Null
+        this.progress = 0
     }
 
     __complete(){
@@ -100,6 +125,14 @@ class Loader extends Item {
 
     SLOT_sourceComponentChanged(oldValue, newValue){
         delete this.__lazyItem
+
+        if(!this.active){
+            this.item = null
+            this.status = Loader.Null
+            this.progress = 0
+            return
+        }
+
         this.status = Loader.Loading
 
         if(newValue){
@@ -129,6 +162,14 @@ class Loader extends Item {
 
     SLOT_sourceChanged(oldValue, newValue){
         delete this.__lazyItem
+
+        if(!this.active){
+            this.item = null
+            this.status = Loader.Null
+            this.progress = 0
+            return
+        }
+
         this.status = Loader.Loading
         if(this.item) this.item.destroy()
 
@@ -217,6 +258,18 @@ class Loader extends Item {
         }
 
         
+    }
+
+    SLOT_activeChanged(oldValue, newValue){
+        if(newValue === false){
+            delete this.__lazyItem
+            this.item = null
+            this.status = Loader.Null
+            this.progress = 0
+            return
+        }
+
+        this.__loadFromCurrentSource()
     }
 
     SLOT_widthChanged(oldValue, newValue){
