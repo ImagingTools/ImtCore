@@ -13,6 +13,7 @@
 #include <imtauth/ITenantMembership.h>
 #include <imtauth/ITenantEntityBindingManager.h>
 #include <imtauth/ITenantManager.h>
+#include <imtauth/IUserInfo.h>
 
 
 namespace imtauth
@@ -227,6 +228,11 @@ bool CTenantMembershipManagerComp::RemoveMembership(const QByteArray& membership
 		}
 	}
 
+	if (!CleanupTenantAssignedUserData(userId, tenantId)){
+		SendWarningMessage(0, QString("Failed to fully clean up tenant-assigned user data for user '%1' in tenant '%2'")
+			.arg(QString::fromUtf8(userId), QString::fromUtf8(tenantId)), "CTenantMembershipManagerComp");
+	}
+
 	SendInfoMessage(0, QString("Removed membership '%1'").arg(QString::fromUtf8(membershipId)), "CTenantMembershipManagerComp");
 
 	return true;
@@ -309,6 +315,58 @@ bool CTenantMembershipManagerComp::HasMinimumRole(const QByteArray& userId, cons
 
 
 // private methods
+
+bool CTenantMembershipManagerComp::CleanupTenantAssignedUserData(const QByteArray& userId, const QByteArray& tenantId)
+{
+	if (!m_bindingManagerCompPtr.IsValid() || !m_userCollectionCompPtr.IsValid() || userId.isEmpty() || tenantId.isEmpty()){
+		return true;
+	}
+
+	imtbase::IObjectCollection::DataPtr userDataPtr;
+	if (!m_userCollectionCompPtr->GetObjectData(userId, userDataPtr)){
+		return false;
+	}
+
+	imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(userDataPtr.GetPtr());
+	if (userInfoPtr == nullptr){
+		return false;
+	}
+
+	QByteArray roleEntityType = m_roleBindingEntityTypeAttrPtr.IsValid() ? *m_roleBindingEntityTypeAttrPtr : QByteArrayLiteral("Roles");
+	QByteArray groupEntityType = m_groupBindingEntityTypeAttrPtr.IsValid() ? *m_groupBindingEntityTypeAttrPtr : QByteArrayLiteral("Groups");
+	QByteArrayList tenantRoleIds = m_bindingManagerCompPtr->GetEntityIds(tenantId, roleEntityType);
+	QByteArrayList tenantGroupIds = m_bindingManagerCompPtr->GetEntityIds(tenantId, groupEntityType);
+
+	tenantRoleIds.removeAll("");
+	tenantGroupIds.removeAll("");
+	if (tenantRoleIds.isEmpty() && tenantGroupIds.isEmpty()){
+		return true;
+	}
+
+	bool hasChanges = false;
+
+	for (const QByteArray& groupId : tenantGroupIds){
+		if (userInfoPtr->RemoveFromGroup(groupId)){
+			hasChanges = true;
+		}
+	}
+
+	QByteArrayList productIds = userInfoPtr->GetProducts();
+	for (const QByteArray& productId : productIds){
+		for (const QByteArray& roleId : tenantRoleIds){
+			if (userInfoPtr->RemoveRole(productId, roleId)){
+				hasChanges = true;
+			}
+		}
+	}
+
+	if (!hasChanges){
+		return true;
+	}
+
+	return m_userCollectionCompPtr->SetObjectData(userId, *userInfoPtr);
+}
+
 
 bool CTenantMembershipManagerComp::IsOwnerMembership(const QByteArray& membershipId) const
 {
