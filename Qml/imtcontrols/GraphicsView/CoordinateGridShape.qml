@@ -361,7 +361,7 @@ BoundingBox {
 		//LABELS FOR COORDINATE AXIS
 
 		if(gridShape.canDrawText){
-			ctx.font = String(fontSize) + "px " + Style.fontFamily//"14px sans-serif"
+			ctx.font = String(fontSize) + "px " + Style.fontFamily
 
 			ctx.strokeStyle = gridShape.axesColor;
 			ctx.fillStyle = gridShape.fontColor;
