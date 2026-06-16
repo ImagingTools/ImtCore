@@ -2,8 +2,15 @@
 #pragma once
 
 
+// Qt includes
+#include <QMap>
+#include <QMutex>
+
 // ImtCore includes
 #include <imtdoc/IDocumentService.h>
+#include <imtdoc/IDocumentServiceEventHandler.h>
+#include <imtcrypt/IHashGenerator.h>
+#include <imtauth/ITenantMembershipManager.h>
 
 // Generated includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/UserCollectionDocumentService_fwd.h>
@@ -19,15 +26,22 @@ namespace imtauthgql
  *
  * Reads/writes the IUserInfo working copy that the server-side
  * CollectionDocumentManager holds for a given documentId.
+ *
+ * Also implements IDocumentServiceEventHandler to react to CDocumentSavedEvent
+ * and auto-add the newly created user as a Member of the originating tenant.
  */
 class CUserCollectionDocumentServiceComp:
-			public sdl::V1_0::imtauth::CUserCollectionDocumentServiceGqlHandlerCompBase
+			public sdl::V1_0::imtauth::CUserCollectionDocumentServiceGqlHandlerCompBase,
+			virtual public imtdoc::IDocumentServiceEventHandler
 {
 public:
 	typedef sdl::V1_0::imtauth::CUserCollectionDocumentServiceGqlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CUserCollectionDocumentServiceComp)
+		I_REGISTER_INTERFACE(imtdoc::IDocumentServiceEventHandler)
 		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentService", "Collection document manager", false, "CollectionDocumentService");
+		I_ASSIGN(m_hashCalculatorCompPtr, "HashCalculator", "Hash calculator for password hashing", true, "HashCalculator");
+		I_ASSIGN(m_membershipManagerCompPtr, "MembershipManager", "Tenant membership manager for auto-adding membership on user save", false, "MembershipManager");
 	I_END_COMPONENT
 
 protected:
@@ -41,8 +55,16 @@ protected:
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
+	// reimplemented (imtdoc::IDocumentServiceEventHandler)
+	virtual bool ProcessEvent(imtdoc::CEventBase* eventPtr) override;
+
 private:
 	I_REF(imtdoc::IDocumentService, m_documentManagerCompPtr);
+	I_REF(imtcrypt::IHashGenerator, m_hashCalculatorCompPtr);
+	I_REF(imtauth::ITenantMembershipManager, m_membershipManagerCompPtr);
+
+	mutable QMutex m_pendingTenantIdsMutex;
+	mutable QMap<QByteArray, QByteArray> m_pendingTenantIds; ///< documentId -> tenantId, stored during OnUpdateUserFromRepresentation
 };
 
 

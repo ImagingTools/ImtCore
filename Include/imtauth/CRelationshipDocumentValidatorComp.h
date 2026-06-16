@@ -6,6 +6,7 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
+#include <imtbase/IObjectCollection.h>
 #include <imtdoc/IDocumentValidator.h>
 
 
@@ -15,7 +16,8 @@ namespace imtauth
 
 /**
 	Validates TenantRelationship documents before save.
-	Ensures required fields (sourceTenantId, targetTenantId) are present.
+	Ensures required fields (sourceTenantId, targetTenantId) are present
+	and prevents duplicate relationships (same tenant pair with same role combination).
 */
 class CRelationshipDocumentValidatorComp:
 			public icomp::CComponentBase,
@@ -26,10 +28,14 @@ public:
 
 	I_BEGIN_COMPONENT(CRelationshipDocumentValidatorComp)
 		I_REGISTER_INTERFACE(imtdoc::IDocumentValidator)
+		I_ASSIGN(m_relationshipCollectionCompPtr, "RelationshipCollection", "Tenant relationships collection for duplicate check", false, "RelationshipCollection");
 	I_END_COMPONENT
 
 	// imtdoc::IDocumentValidator
-	virtual bool ValidateDocumentData(const QByteArray& objectId, const istd::IChangeable& document, QString& errorMessage) const override;
+	virtual bool ValidateDocumentData(const QByteArray& objectId, const istd::IChangeable& document, QString& errorMessage, const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
+
+private:
+	I_REF(imtbase::IObjectCollection, m_relationshipCollectionCompPtr);
 };
 
 

@@ -17,6 +17,7 @@
         <Element ComponentName="SQLiteTenantConnectionCodeRepository" X="200" Y="775" Note=""/>
         <Element ComponentName="SQLiteTenantConnectionRepository" X="175" Y="675" Note=""/>
         <Element ComponentName="SQLiteTenantConnectionRequestRepository" X="475" Y="50" Note=""/>
+        <Element ComponentName="SQLiteTenantEntityBindingRepository" X="1000" Y="675" Note=""/>
         <Element ComponentName="SQLiteTenantInvitationRepository" X="675" Y="475" Note=""/>
         <Element ComponentName="SQLiteTenantMembershipRepository" X="700" Y="775" Note=""/>
         <Element ComponentName="SQLiteTenantRelationshipProposalRepository" X="600" Y="675" Note=""/>

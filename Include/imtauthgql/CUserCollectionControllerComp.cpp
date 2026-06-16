@@ -11,6 +11,7 @@
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtauth/CUserInfo.h>
+#include <imtgql/IGqlContext.h>
 
 
 namespace imtauthgql
@@ -647,6 +648,57 @@ bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 }
 
 
+// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
+
+istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectData(
+			const QByteArray& objectId,
+			const istd::IChangeable& object,
+			const imtgql::CGqlRequest& gqlRequest) const
+{
+	istd::IChangeableUniquePtr adaptedObjectPtr = BaseClass::CreateAdaptedObjectData(objectId, object, gqlRequest);
+
+	if (!m_delegatedAccessCompPtr.IsValid()){
+		return adaptedObjectPtr;
+	}
+
+	auto userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(&object);
+	if (userInfoPtr == nullptr){
+		return adaptedObjectPtr;
+	}
+
+	QByteArrayList delegatedRoleIds = m_delegatedAccessCompPtr->GetDelegatedUserRoles(objectId);
+	if (delegatedRoleIds.isEmpty()){
+		return adaptedObjectPtr;
+	}
+
+	if (!adaptedObjectPtr.IsValid()){
+		adaptedObjectPtr = object.CloneMe();
+	}
+
+	auto adaptedUserInfoPtr = dynamic_cast<imtauth::IUserInfo*>(adaptedObjectPtr.GetPtr());
+	if (adaptedUserInfoPtr == nullptr){
+		QString warningMessage = QString("Unable to enrich user '%1' with the delegated roles. Error: User cloning failed").arg(qPrintable(objectId));
+		SendWarningMessage(0, warningMessage, "CUserCollectionControllerComp");
+
+		return adaptedObjectPtr;
+	}
+
+	for (const QByteArray& delegatedRoleId : delegatedRoleIds){
+		QByteArray productId;
+		if (m_roleInfoProviderCompPtr.IsValid()){
+			imtauth::IRoleUniquePtr roleInfoPtr = m_roleInfoProviderCompPtr->GetRole(delegatedRoleId);
+			if (roleInfoPtr.IsValid()){
+				productId = roleInfoPtr->GetProductId();
+			}
+		}
+
+		adaptedUserInfoPtr->AddRole(productId, delegatedRoleId);
+	}
+
+	return adaptedObjectPtr;
+}
+
+
 // reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
 
 bool CUserCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
@@ -682,6 +734,44 @@ bool CUserCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& 
 	}
 
 	return BaseClass::CheckPermissions(gqlRequest, errorMessage);
+}
+
+
+QJsonObject CUserCollectionControllerComp::InsertObject(
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	QJsonObject result = BaseClass::InsertObject(gqlRequest, errorMessage);
+	if (result.isEmpty()){
+		return result;
+	}
+
+	if (!m_membershipManagerCompPtr.IsValid()){
+		return result;
+	}
+
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr == nullptr){
+		return result;
+	}
+
+	QByteArray tenantId = gqlContextPtr->GetTenantId();
+	if (tenantId.isEmpty()){
+		return result;
+	}
+
+	QJsonObject dataObj = result.value("data").toObject();
+	QByteArray newUserId = dataObj.value("id").toString().toUtf8();
+	if (newUserId.isEmpty()){
+		return result;
+	}
+
+	QByteArray membershipId = m_membershipManagerCompPtr->AddMembership(newUserId, tenantId, "Member");
+	if (membershipId.isEmpty()){
+		SendWarningMessage(0, QString("Auto-membership creation failed for user '%1' in tenant '%2'").arg(QString::fromUtf8(newUserId), QString::fromUtf8(tenantId)), "CUserCollectionControllerComp");
+	}
+
+	return result;
 }
 
 

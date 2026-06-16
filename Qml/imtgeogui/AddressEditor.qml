@@ -27,19 +27,11 @@ Column {
 		updateGui()
 	}
 
-	function updateModel(){
-		container.model.setData("TypeId", typeComboBox.currentIndex, 0)
-		container.model.setData("TypeValue", container.typesModel.getData("name", typeComboBox.currentIndex), 0)
-		container.model.setData("Name", nameField.text, 0)
-		container.model.setData("Latitude", latitudeField.text, 0)
-		container.model.setData("Longitude", longitudeField.text, 0)
-	}
-
 	function updateGui(){
-		typeComboBox.currentIndex = container.model.getData("TypeId", 0)
-		nameField.text = container.model.getData("Name", 0)
-		latitudeField.text = container.model.getData("Latitude", 0)
-		longitudeField.text = container.model.getData("Longitude", 0)
+		typeComboBox.currentIndex = container.model.getData("typeId", 0)
+		nameField.text = container.model.getData("name", 0)
+		latitudeField.text = container.model.getData("latitude", 0)
+		longitudeField.text = container.model.getData("longitude", 0)
 	}
 
 	ComboBoxElementView {
@@ -48,9 +40,10 @@ Column {
 		width: parent.width
 
 		onCurrentIndexChanged: {
-			let oldIndex = container.model.getData("TypeId", 0)
+			let oldIndex = container.model.getData("typeId", 0)
 			if (oldIndex !== typeComboBox.currentIndex){
-				container.updateModel();
+				container.model.setData("typeId", typeComboBox.currentIndex, 0)
+				container.model.setData("typeValue", container.typesModel.getData("name", typeComboBox.currentIndex), 0)
 			}
 		}
 	}
@@ -60,10 +53,10 @@ Column {
 		name: qsTr("Name");
 		width: parent.width
 
-		onEditingFinished: {
-			let oldText = container.model.getData("Name", 0)
+		onTextChanged: {
+			let oldText = container.model.getData("name", 0)
 			if (oldText !== nameField.text){
-				container.updateModel();
+				container.model.setData("name", nameField.text, 0)
 			}
 		}
 	}
@@ -73,10 +66,13 @@ Column {
 		name: qsTr("Latitude");
 		width: parent.width
 
-		onEditingFinished: {
-			let oldText = container.model.getData("Latitude", 0)
-			if (oldText !== latitudeField.text){
-				container.updateModel();
+		textInputValidator: DoubleValidator{}
+
+		onTextChanged: {
+			let newText = nameField.text.trim().replace(',','.')
+			let oldText = container.model.getData("latitude", 0)
+			if (oldText !== newText){
+				container.model.setData("latitude", latitudeField.text, 0)
 			}
 		}
 	}
@@ -86,10 +82,13 @@ Column {
 		name: qsTr("Longitude");
 		width: parent.width
 
-		onEditingFinished: {
-			let oldText = container.model.getData("Longitude", 0)
-			if (oldText !== longitudeField.text){
-				container.updateModel();
+		textInputValidator: DoubleValidator{}
+
+		onTextChanged: {
+			let newText = nameField.text.trim().replace(',','.')
+			let oldText = container.model.getData("longitude", 0)
+			if (oldText !== newText){
+				container.model.setData("longitude", longitudeField.text, 0)
 			}
 		}
 	}

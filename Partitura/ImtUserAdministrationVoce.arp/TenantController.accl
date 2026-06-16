@@ -8,18 +8,27 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="DelegatedAccessResolver" X="225" Y="225" Note=""/>
         <Element ComponentName="Demultiplexer" X="600" Y="75" Note=""/>
         <Element ComponentName="SlaveSubscriberController" X="650" Y="750" Note=""/>
         <Element ComponentName="TenantCollectionController" X="200" Y="75" Note=""/>
         <Element ComponentName="TenantCollectionDocumentService" X="200" Y="425" Note=""/>
         <Element ComponentName="TenantConnectionManager" X="975" Y="525" Note=""/>
         <Element ComponentName="TenantContractManager" X="625" Y="600" Note=""/>
+        <Element ComponentName="TenantEntityBindingManager" X="745" Y="190" Note=""/>
         <Element ComponentName="TenantGrantManager" X="250" Y="600" Note=""/>
         <Element ComponentName="TenantManager" X="600" Y="300" Note=""/>
         <Element ComponentName="TenantMembershipManager" X="1000" Y="300" Note=""/>
         <Element ComponentName="UserFilterableSelectController" X="1000" Y="75" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
+        <EmbededRegistry Id="UserFilterableSelectController">
+            <PositionMap>
+                <Element ComponentName="TenantExclusionParamsSetJoiner" X="625" Y="350" Note=""/>
+                <Element ComponentName="UserFilterableSelectController" X="600" Y="100" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
         <EmbededRegistry Id="TenantManager">
             <PositionMap>
                 <Element ComponentName="TenantInfo" X="250" Y="550" Note=""/>
@@ -27,13 +36,6 @@
                 <Element ComponentName="TenantManagerController" X="950" Y="550" Note=""/>
                 <Element ComponentName="TenantNotificationPublisher" X="600" Y="125" Note=""/>
                 <Element ComponentName="TenantRelationshipProposalInfo" X="1025" Y="400" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
-        <EmbededRegistry Id="UserFilterableSelectController">
-            <PositionMap>
-                <Element ComponentName="TenantExclusionParamsSetJoiner" X="625" Y="350" Note=""/>
-                <Element ComponentName="UserFilterableSelectController" X="600" Y="100" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

@@ -174,3 +174,47 @@ void CCrossOrgGrantTest::testHasAccess_WrongSourceDenied()
 	m_managerPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-admin"});
 	QVERIFY(!m_managerPtr->HasAccess("tenantC", "tenantB", "role-admin"));
 }
+
+
+void CCrossOrgGrantTest::testVisibility_SourceAndTargetSeeGrant()
+{
+	m_managerPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-read"});
+
+	// Source tenant sees the grant
+	imtauth::CrossOrgGrants visibleToA = m_managerPtr->GetGrantsVisibleToTenant("tenantA");
+	QCOMPARE(visibleToA.size(), 1);
+
+	// Target tenant sees the grant
+	imtauth::CrossOrgGrants visibleToB = m_managerPtr->GetGrantsVisibleToTenant("tenantB");
+	QCOMPARE(visibleToB.size(), 1);
+}
+
+
+void CCrossOrgGrantTest::testVisibility_ThirdPartyDoesNotSeeGrant()
+{
+	m_managerPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-read"});
+
+	// Third-party tenant does not see the grant
+	imtauth::CrossOrgGrants visibleToC = m_managerPtr->GetGrantsVisibleToTenant("tenantC");
+	QCOMPARE(visibleToC.size(), 0);
+}
+
+
+void CCrossOrgGrantTest::testReadOnly_SourceIsNotReadOnly()
+{
+	m_managerPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-read"});
+
+	imtauth::CrossOrgGrants visibleToA = m_managerPtr->GetGrantsVisibleToTenant("tenantA");
+	QCOMPARE(visibleToA.size(), 1);
+	QVERIFY(!imtauth::CMockCrossOrgGrantManager::IsReadOnlyForTenant(visibleToA.first(), "tenantA"));
+}
+
+
+void CCrossOrgGrantTest::testReadOnly_TargetIsReadOnly()
+{
+	m_managerPtr->CreateGrant("tenantA", "tenantB", QByteArrayList{"role-read"});
+
+	imtauth::CrossOrgGrants visibleToB = m_managerPtr->GetGrantsVisibleToTenant("tenantB");
+	QCOMPARE(visibleToB.size(), 1);
+	QVERIFY(imtauth::CMockCrossOrgGrantManager::IsReadOnlyForTenant(visibleToB.first(), "tenantB"));
+}

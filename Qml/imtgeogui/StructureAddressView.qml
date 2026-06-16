@@ -40,6 +40,7 @@ Item {
 	property string typeIdParam: "typeId"
 	property string parentIdsParam: "parentIds"
 	property string hasChildrenParam: "hasChildren__"
+	property string textColor: Style.firstColor
 
 	property alias searchComp: treeBody.searchComp
 	property alias addressTreeRequest: treeBody.addressTreeRequest
@@ -55,16 +56,12 @@ Item {
 
 		function createQueryParams(query){
 			var queryFields = Gql.GqlObject("addedNotification");
-			queryFields.InsertField("Name");
-			queryFields.InsertField("TypeId");
-			queryFields.InsertField("ParentId");
-			queryFields.InsertField("Latitude");
-			queryFields.InsertField("Longitude");
+			queryFields.InsertField("id");
 
 			var inputParams = Gql.GqlObject("input");
 
 			var jsonString = structureAddressesContainer.addedItemAddressModel.toJson();
-			inputParams.InsertField("Item", jsonString);
+			inputParams.InsertField("item", jsonString);
 			inputParams.InsertField("collectionId", "Address");
 			query.AddParam(inputParams);
 			query.AddField(queryFields);
@@ -73,7 +70,7 @@ Item {
 		function onResult(data){
 			if (data.containsKey("addedNotification")){
 				let items  = data.getTreeItemModel("addedNotification");
-				let id = items.getData("Id")
+				let id = items.getData("id")
 				structureAddressesContainer.parentId = id
 				let addressCount = structureAddressesContainer.addressModel.getItemsCount()
 				structureAddressesContainer.addressModel.setData("itemId", id, addressCount-1);
@@ -88,17 +85,13 @@ Item {
 
 		function createQueryParams(query){
 			var queryFields = Gql.GqlObject("updatedNotification");
-			queryFields.InsertField("Name");
-			queryFields.InsertField("TypeId");
-			queryFields.InsertField("ParentId");
-			queryFields.InsertField("Latitude");
-			queryFields.InsertField("Longitude");
+			queryFields.InsertField("id");
 
 			var inputParams = Gql.GqlObject("input");
 
 			var jsonString = structureAddressesContainer.selectedItemAddressModel.toJson();
-			inputParams.InsertField("id", structureAddressesContainer.selectedItemAddressModel.getData("ItemId", 0));
-			inputParams.InsertField("Item", jsonString);
+			inputParams.InsertField("id", structureAddressesContainer.selectedItemAddressModel.getData("itemId", 0));
+			inputParams.InsertField("item", jsonString);
 			inputParams.InsertField("collectionId", "Address");
 			query.AddParam(inputParams);
 			query.AddField(queryFields);
@@ -199,13 +192,13 @@ Item {
 
 			onFinished: {
 				if (buttonId === Enums.save){
-					let typeId = this.model.getData("TypeId", 0)
-					let typeValue = this.model.getData("TypeValue", 0)
-					let nameValue = this.model.getData("Name", 0)
-					let itemId = this.model.getData("ItemId", 0)
-					let parentId = this.model.getData("ParentId", 0)
-					let latitude = this.model.getData("Latitude", 0)
-					let longitude = this.model.getData("Longitude", 0)
+					let typeId = this.model.getData("typeId", 0)
+					let typeValue = this.model.getData("typeValue", 0)
+					let nameValue = this.model.getData("name", 0)
+					let itemId = this.model.getData("itemId", 0)
+					let parentId = this.model.getData("parentId", 0)
+					let latitude = this.model.getData("latitude", 0)
+					let longitude = this.model.getData("longitude", 0)
 
 					if (!this.isEdit){
 						var index = structureAddressesContainer.addressModel.insertNewItem();
@@ -239,6 +232,8 @@ Item {
 		anchors.bottomMargin: Style.marginM;
 
 		width: 0.25 * structureAddressesContainer.width + 10;
+
+		textColor: structureAddressesContainer.textColor
 
 		addressListCommandId: structureAddressesContainer.addressListCommandId
 		searchNameId: structureAddressesContainer.searchNameId
@@ -387,13 +382,13 @@ Item {
 					let longitude = structureAddressesContainer.addressModel.getData("longitude", currentIndex)
 					structureAddressesContainer.selectedItemAddressModel.clear()
 					structureAddressesContainer.selectedItemAddressModel.insertNewItem()
-					structureAddressesContainer.selectedItemAddressModel.setData("TypeId", typeId, 0)
-					structureAddressesContainer.selectedItemAddressModel.setData("TypeValue", typeValue, 0)
-					structureAddressesContainer.selectedItemAddressModel.setData("Name", nameValue, 0)
-					structureAddressesContainer.selectedItemAddressModel.setData("ItemId", itemId, 0)
-					structureAddressesContainer.selectedItemAddressModel.setData("ParentId", parentId, 0)
-					structureAddressesContainer.selectedItemAddressModel.setData("Latitude", latitude, 0)
-					structureAddressesContainer.selectedItemAddressModel.setData("Longitude", longitude, 0)
+					structureAddressesContainer.selectedItemAddressModel.setData("typeId", typeId, 0)
+					structureAddressesContainer.selectedItemAddressModel.setData("typeValue", typeValue, 0)
+					structureAddressesContainer.selectedItemAddressModel.setData("name", nameValue, 0)
+					structureAddressesContainer.selectedItemAddressModel.setData("itemId", itemId, 0)
+					structureAddressesContainer.selectedItemAddressModel.setData("parentId", parentId, 0)
+					structureAddressesContainer.selectedItemAddressModel.setData("latitude", latitude, 0)
+					structureAddressesContainer.selectedItemAddressModel.setData("longitude", longitude, 0)
 				}
 
 			}
@@ -553,13 +548,13 @@ Item {
 							structureAddressesContainer.isEdit = false
 							structureAddressesContainer.addedItemAddressModel.clear()
 							structureAddressesContainer.addedItemAddressModel.insertNewItem()
-							structureAddressesContainer.addedItemAddressModel.setData("TypeId", 0, 0)
-							structureAddressesContainer.addedItemAddressModel.setData("TypeValue", "", 0)
-							structureAddressesContainer.addedItemAddressModel.setData("Name", "", 0)
-							structureAddressesContainer.addedItemAddressModel.setData("ItemId", "", 0)
-							structureAddressesContainer.addedItemAddressModel.setData("ParentId", structureAddressesContainer.parentId, 0)
-							structureAddressesContainer.addedItemAddressModel.setData("Latitude", "", 0)
-							structureAddressesContainer.addedItemAddressModel.setData("Longitude", "", 0)
+							structureAddressesContainer.addedItemAddressModel.setData("typeId", 0, 0)
+							structureAddressesContainer.addedItemAddressModel.setData("typeValue", "", 0)
+							structureAddressesContainer.addedItemAddressModel.setData("name", "", 0)
+							structureAddressesContainer.addedItemAddressModel.setData("itemId", "", 0)
+							structureAddressesContainer.addedItemAddressModel.setData("parentId", structureAddressesContainer.parentId, 0)
+							structureAddressesContainer.addedItemAddressModel.setData("latitude", "", 0)
+							structureAddressesContainer.addedItemAddressModel.setData("longitude", "", 0)
 							ModalDialogManager.openDialog(editAddressDialogComp, parameters);
 						}
 						if (model.ids == "Delete"){
@@ -576,7 +571,23 @@ Item {
 											structureAddressesContainer.parentName = structureAddressesContainer.addressModel.getData("typeValue", addressColumn.currentIndex-1) + " " + structureAddressesContainer.addressModel.getData("nameValue", addressColumn.currentIndex-1);
 										}
 										removeElementsInput.m_elementIds = [];
-										removeElementsInput.m_elementIds.push(structureAddressesContainer.addressModel.getData("itemId", addressColumn.currentIndex))
+										let deleteId = structureAddressesContainer.addressModel.getData("itemId", addressColumn.currentIndex);
+										removeElementsInput.m_elementIds.push(deleteId);
+
+										let treeModel = treeBody.treeViewModel;
+										let treeItemsCount = treeModel.getItemsCount();
+										for (let i = 0; i < treeItemsCount; i++) {
+											let pIds = treeModel.getData(treeBody.parentIdsParam, i);
+											if (pIds !== undefined && pIds !== null && pIds !== "") {
+												let pIdsArr = pIds.split(',');
+												if (pIdsArr.indexOf(deleteId) !== -1) {
+													let childId = treeModel.getData(treeBody.idParam, i);
+													if (childId !== undefined && childId !== null && childId !== "" && removeElementsInput.m_elementIds.indexOf(childId) === -1) {
+														removeElementsInput.m_elementIds.push(childId);
+													}
+												}
+											}
+										}
 										structureAddressesContainer.removeAddressRequest.send(removeElementsInput);
 									}
 								}

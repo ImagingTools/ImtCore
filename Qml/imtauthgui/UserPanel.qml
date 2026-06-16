@@ -68,7 +68,17 @@ Item {
 						for (var i = 0; i < orgs.count; i++) {
 							var org = orgs.get(i).item
 							if (org && org.m_isActive) {
-								list.push({ id: org.m_id || "", name: org.m_name || org.m_id || "" })
+								var displayName = org.m_name || org.m_id || ""
+								var isDelegated = org.m_isDelegated || false
+								if (isDelegated) {
+									displayName = displayName + " " + qsTr("(delegated)")
+								}
+								list.push({
+									id: org.m_id || "",
+									name: displayName,
+									isDelegated: isDelegated,
+									delegatedRoles: org.m_delegatedRoles || []
+								})
 							}
 						}
 					}
@@ -145,6 +155,8 @@ Item {
 		function fillModel(){
 			contextMenuModel.clear();
 			contextMenuModel.append({"id": "Profile", "name": qsTr("Profile"), "icon": "Icons/Account", "isEnabled": true});
+			if (AuthorizationController.currentTenantId !== "")
+				contextMenuModel.append({"id": "LeaveTenant", "name": qsTr("Leave Organization"), "icon": "Icons/Exit", "isEnabled": true});
 			contextMenuModel.append({"id": "", "name": "", "Icon": ""});
 			contextMenuModel.append({"id": "Logout", "name": qsTr("Logout"), "icon": "Icons/Exit", "isEnabled": true});
 		}
@@ -159,6 +171,9 @@ Item {
 			onFinished: {
 				if (commandId == "Logout"){
 					AuthorizationController.logout();
+				}
+				else if (commandId == "LeaveTenant"){
+					AuthorizationController.selectTenant("");
 				}
 				else if (commandId == "Profile"){
 					ModalDialogManager.openDialog(profileViewComp, {});

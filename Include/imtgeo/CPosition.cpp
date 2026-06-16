@@ -12,35 +12,14 @@ namespace imtgeo
 {
 
 
-// static tag wrappers
-
-const iser::CArchiveTag& s_latTag(){
-	static const iser::CArchiveTag tag(QByteArrayLiteral("Latitude"), QByteArrayLiteral("Latitude"), iser::CArchiveTag::TT_LEAF);
-
-	return tag;
-}
-
-const iser::CArchiveTag& s_lonTag(){
-	static const iser::CArchiveTag tag(QByteArrayLiteral("Longitude"), QByteArrayLiteral("Longitude"), iser::CArchiveTag::TT_LEAF);
-
-	return tag;
-}
-
-const iser::CArchiveTag& s_zoomTag(){
-	static const iser::CArchiveTag tag(QByteArrayLiteral("ZoomLevel"), QByteArrayLiteral("Zoom level"), iser::CArchiveTag::TT_LEAF);
-
-	return tag;
-}
-
-
 // public methods
 
 CPosition::CPosition():
 	m_latitude(0.0),
 	m_longitude(0.0),
-	m_zoomLevel(1.0){}
-
-CPosition::~CPosition(){}
+	m_zoomLevel(1.0)
+{
+}
 
 
 // reimplemented (imtgeo::IPosition)
@@ -51,7 +30,7 @@ double CPosition::GetLatitude() const
 }
 
 
-void CPosition::SetLatitude(const double& lat)
+void CPosition::SetLatitude(double lat)
 {
 	if(m_latitude != lat){
 		m_latitude = lat;
@@ -66,7 +45,7 @@ double CPosition::GetLongitude() const
 }
 
 
-void CPosition::SetLongitude(const double& lon)
+void CPosition::SetLongitude(double lon)
 {
 	if(m_longitude != lon){
 		m_longitude = lon;
@@ -81,7 +60,7 @@ int CPosition::GetZoomLevel() const
 }
 
 
-void CPosition::SetZoomLevel(const double& zoom)
+void CPosition::SetZoomLevel(double zoom)
 {
 	if(!qFuzzyCompare(m_zoomLevel, zoom)){
 		m_zoomLevel = zoom;
@@ -98,17 +77,20 @@ bool CPosition::Serialize(iser::IArchive &archive)
 
 	bool retVal = true;
 
-	retVal = retVal && archive.BeginTag(s_latTag());
+	static const iser::CArchiveTag latTag(QByteArrayLiteral("Latitude"), QByteArrayLiteral("Latitude"), iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(latTag);
 	retVal = retVal && archive.Process(m_latitude);
-	retVal = retVal && archive.EndTag(s_latTag());
+	retVal = retVal && archive.EndTag(latTag);
 
-	retVal = retVal && archive.BeginTag(s_lonTag());
+	static const iser::CArchiveTag lonTag(QByteArrayLiteral("Longitude"), QByteArrayLiteral("Longitude"), iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(lonTag);
 	retVal = retVal && archive.Process(m_longitude);
-	retVal = retVal && archive.EndTag(s_lonTag());
+	retVal = retVal && archive.EndTag(lonTag);
 
-	retVal = retVal && archive.BeginTag(s_zoomTag());
+	static const iser::CArchiveTag zoomTag(QByteArrayLiteral("ZoomLevel"), QByteArrayLiteral("Zoom level"), iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(zoomTag);
 	retVal = retVal && archive.Process(m_zoomLevel);
-	retVal = retVal && archive.EndTag(s_zoomTag());
+	retVal = retVal && archive.EndTag(zoomTag);
 
 	return retVal;
 }
@@ -125,43 +107,43 @@ int CPosition::GetSupportedOperations() const
 bool CPosition::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const CPosition* sourcePtr = dynamic_cast<const CPosition*>(&object);
-	if (sourcePtr != nullptr){
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_latitude	= sourcePtr->m_latitude;
-		m_longitude = sourcePtr->m_longitude;
-		m_zoomLevel = sourcePtr->m_zoomLevel;
-
-		return true;
+	if (sourcePtr == nullptr){
+		return false;
 	}
 
-	return false;
+	istd::CChangeNotifier changeNotifier(this);
+
+	m_latitude	= sourcePtr->m_latitude;
+	m_longitude = sourcePtr->m_longitude;
+	m_zoomLevel = sourcePtr->m_zoomLevel;
+
+	return true;
 }
 
 
 bool CPosition::IsEqual(const IChangeable& object) const
 {
 	const CPosition* sourcePtr = dynamic_cast<const CPosition*>(&object);
-	if (sourcePtr != nullptr){
-		bool retVal = m_latitude == sourcePtr->m_latitude;
-		retVal = retVal && m_longitude == sourcePtr->m_longitude;
-		retVal = retVal && m_zoomLevel == sourcePtr->m_zoomLevel;
-
-		return retVal;
+	if (sourcePtr == nullptr){
+		return false;
 	}
 
-	return false;
+	bool retVal = m_latitude == sourcePtr->m_latitude;
+	retVal = retVal && m_longitude == sourcePtr->m_longitude;
+	retVal = retVal && m_zoomLevel == sourcePtr->m_zoomLevel;
+
+	return retVal;
 }
 
 
 istd::IChangeableUniquePtr CPosition::CloneMe(istd::IChangeable::CompatibilityMode mode) const
 {
 	istd::IChangeableUniquePtr clonePtr(new CPosition());
-	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr;
+	if (!clonePtr->CopyFrom(*this, mode)){
+		return nullptr;
 	}
 
-	return nullptr;
+	return clonePtr;
 }
 
 

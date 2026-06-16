@@ -82,7 +82,7 @@ Item{
 				ctx.stroke()
 
 				ctx.fillStyle = "#999"
-				ctx.font = "14px sans-serif"
+				ctx.font = "14px " + Style.fontFamily
 				ctx.textAlign = "center"
 				ctx.textBaseline = "middle"
 				ctx.fillText("No Data", cx, cy)

@@ -20,6 +20,7 @@ ViewBase {
 	anchors.fill: parent
 	contentColor: Style.baseColor
 	commandsSeparatorVisible: false
+	commandsPanelVisible: !isReadOnly
 
 	property var grantData: model
 	property var apiClient: null
@@ -27,7 +28,9 @@ ViewBase {
 	property string __selectedTargetTenantId: ""
 	property string __selectedTargetTenantName: ""
 	property string __selectedExpiresAt: ""
+	property bool __isActive: true
 	property bool __loadingGui: false
+	property bool isReadOnly: grantData ? (grantData.m_isReadOnly === true) : false
 
 	function expiresAtToIndex(iso) {
 		if (!iso || iso === "")
@@ -66,6 +69,10 @@ ViewBase {
 
 		var exp = container.grantData.m_expiresAt || ""
 		container.__selectedExpiresAt = exp
+		container.__isActive = container.grantData.m_isActive !== undefined
+			? container.grantData.m_isActive
+			: true
+		isActiveSwitch.checked = container.__isActive
 		container.__loadingGui = true
 		expirationCb.currentIndex = container.expiresAtToIndex(exp)
 		container.__loadingGui = false
@@ -86,6 +93,7 @@ ViewBase {
 
 		container.grantData.m_description = grantDescriptionInput.text.trim()
 		container.grantData.m_expiresAt = container.__selectedExpiresAt
+		container.grantData.m_isActive = isActiveSwitch.checked
 	}
 
 	CustomScrollbar {
@@ -116,6 +124,16 @@ ViewBase {
 			width: container.width
 			spacing: Style.marginXL
 
+			// Read-only badge shown when the grant was created for this organization
+			BaseText {
+				visible: container.isReadOnly
+				width: parent.width
+				text: qsTr("This grant was created for your organization (read-only)")
+				color: Style.inactiveTextColor
+				font.pixelSize: Style.fontSizeM
+				font.italic: true
+			}
+
 			GroupElementView {
 				id: generalGroup
 				width: parent.width
@@ -124,6 +142,7 @@ ViewBase {
 					id: grantNameInput
 					name: qsTr("Name")
 					placeHolderText: qsTr("Auto-generated from tenant and roles if left empty")
+					readOnly: container.isReadOnly
 					onEditingFinished: {
 						container.doUpdateModel()
 					}
@@ -149,6 +168,7 @@ ViewBase {
 
 							Button {
 								text: qsTr("Select")
+								visible: !container.isReadOnly
 								onClicked: {
 									var point = targetTenantRow.mapToItem(null, 0, targetTenantRow.height)
 									ModalDialogManager.openDialog(tenantSelectComp, {
@@ -160,7 +180,7 @@ ViewBase {
 
 							Button {
 								text: qsTr("Remove")
-								visible: container.__selectedTargetTenantId !== ""
+								visible: container.__selectedTargetTenantId !== "" && !container.isReadOnly
 								onClicked: {
 									container.__selectedTargetTenantId = ""
 									container.__selectedTargetTenantName = ""
@@ -177,6 +197,7 @@ ViewBase {
 					label: qsTr("Roles")
 					addButtonText: qsTr("Add Role")
 					showCount: true
+					editable: !container.isReadOnly
 					onSelectionChanged: {
 						container.doUpdateModel()
 					}
@@ -186,7 +207,22 @@ ViewBase {
 					id: grantDescriptionInput
 					name: qsTr("Description")
 					placeHolderText: qsTr("Optional description")
+					readOnly: container.isReadOnly
 					onEditingFinished: {
+						container.doUpdateModel()
+					}
+				}
+
+				SwitchElementView {
+					id: isActiveSwitch
+					name: qsTr("Active")
+					checked: container.__isActive
+					readOnly: container.isReadOnly
+					onCheckedChanged: {
+						if (container.__loadingGui)
+							return
+
+						container.__isActive = checked
 						container.doUpdateModel()
 					}
 				}
@@ -197,6 +233,7 @@ ViewBase {
 					description: qsTr("The grant will expire on the selected date")
 					nameId: "name"
 					model: expirationModel
+					changeable: !container.isReadOnly
 
 					TreeItemModel {
 						id: expirationModel

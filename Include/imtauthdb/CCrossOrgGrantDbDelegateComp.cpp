@@ -6,9 +6,11 @@
 #include <QtSql/QSqlRecord>
 
 // ImtCore includes
+#include <imtauth/ITenantFilterParam.h>
 #include <imtdb/CDatabaseEngineComp.h>
 #include <imtdb/imtdb.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
+#include <iprm/TParamsPtr.h>
 
 
 namespace imtauthdb
@@ -250,6 +252,24 @@ QString CCrossOrgGrantDbDelegateComp::GetBaseSelectionQuery() const
 	// The "Name" column is stored directly on the grant (auto-generated from the
 	// target tenant and roles when not set explicitly), so no join is required.
 	return QString("SELECT * FROM \"%1\"").arg(qPrintable(*m_tableNameAttrPtr));
+}
+
+
+QString CCrossOrgGrantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
+{
+	// Restrict grant visibility: only return grants where the requesting tenant
+	// is either the source (grantor) or the target (grantee).
+	iprm::TParamsPtr<imtauth::ITenantFilterParam> tenantFilterPtr(&filterParams, "TenantFilter");
+	if (tenantFilterPtr.IsValid()){
+		QByteArray tenantId = tenantFilterPtr->GetTenantId();
+		if (!tenantId.isEmpty()){
+			QString escapedTenantId = imtdb::EscapeSql(QString::fromUtf8(tenantId));
+			return QString("(\"SourceTenantId\"='%1' OR \"TargetTenantId\"='%1')")
+					.arg(escapedTenantId);
+		}
+	}
+
+	return QString();
 }
 
 

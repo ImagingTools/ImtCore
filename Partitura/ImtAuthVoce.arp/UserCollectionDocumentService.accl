@@ -2,16 +2,18 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6397" Description="ACF"/>
-            <Version Id="1" Number="2394" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="CollectionDocumentService" X="575" Y="250" Note=""/>
         <Element ComponentName="Demultiplexer" X="575" Y="75" Note=""/>
+        <Element ComponentName="HashCalculator" X="200" Y="500" Note=""/>
         <Element ComponentName="RoleCollectionAdapter" X="575" Y="600" Note=""/>
         <Element ComponentName="UserCollectionDocumentService" X="175" Y="250" Note=""/>
+        <Element ComponentName="UserDocumentValidator" X="957" Y="249" Note=""/>
         <Element ComponentName="UserGroupInfoProvider" X="950" Y="425" Note=""/>
         <Element ComponentName="UserInfo" X="575" Y="425" Note=""/>
     </PositionMap>

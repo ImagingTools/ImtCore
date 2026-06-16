@@ -167,6 +167,8 @@ imtsdl::TElementList<sdl::V1_0::imtauth::CProfileTenantInfo> CProfileControllerC
 		return organizationList;
 	}
 
+	QByteArrayList directTenantIds;
+
 	for (const QByteArray& tenantId : m_tenantManagerCompPtr->GetTenantIds()){
 		imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
 		if (!tenantPtr.IsValid() || !tenantPtr->IsActive()){
@@ -184,6 +186,8 @@ imtsdl::TElementList<sdl::V1_0::imtauth::CProfileTenantInfo> CProfileControllerC
 			continue;
 		}
 
+		directTenantIds.append(tenantId);
+
 		sdl::V1_0::imtauth::CProfileTenantInfo organizationInfo;
 		organizationInfo.id = tenantId;
 		organizationInfo.name = tenantPtr->GetTenantName();
@@ -191,6 +195,7 @@ imtsdl::TElementList<sdl::V1_0::imtauth::CProfileTenantInfo> CProfileControllerC
 		organizationInfo.ownerId = tenantPtr->GetOwnerId();
 		organizationInfo.isOwner = isOwner;
 		organizationInfo.isActive = tenantPtr->IsActive();
+		organizationInfo.isDelegated = false;
 		if (isOwner){
 			organizationInfo.role = QStringLiteral("Owner");
 		}
@@ -199,6 +204,84 @@ imtsdl::TElementList<sdl::V1_0::imtauth::CProfileTenantInfo> CProfileControllerC
 		}
 
 		organizationList << organizationInfo;
+	}
+
+	// Append delegated organizations via cross-org grants
+	if (m_crossOrgGrantCompPtr.IsValid() && m_membershipManagerCompPtr.IsValid()){
+		// Find the user's home tenant(s) and check for grants targeting them
+		const imtauth::ITenantMembershipManager::MembershipIds membershipIds =
+			m_membershipManagerCompPtr->GetMembershipsByUser(userId);
+
+		QByteArrayList homeTenantIds;
+		for (const QByteArray& membershipId : membershipIds){
+			imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+			if (membershipPtr.IsValid()){
+				QByteArray tenantId = membershipPtr->GetTenantId();
+				if (!homeTenantIds.contains(tenantId)){
+					homeTenantIds.append(tenantId);
+				}
+			}
+		}
+
+		for (const QByteArray& homeTenantId : homeTenantIds){
+			const imtauth::CrossOrgGrants grants = m_crossOrgGrantCompPtr->GetGrantsByTargetTenant(homeTenantId);
+			for (const imtauth::CrossOrgGrantInfo& grant : grants){
+				if (!grant.isActive){
+					continue;
+				}
+				QByteArray sourceTenantId = grant.sourceTenantId;
+				if (directTenantIds.contains(sourceTenantId)){
+					continue;
+				}
+
+				// Verify at least one role is effective
+				bool isEffective = false;
+				for (const QByteArray& roleId : grant.roleIds){
+					if (m_crossOrgGrantCompPtr->HasAccess(sourceTenantId, homeTenantId, roleId)){
+						isEffective = true;
+						break;
+					}
+				}
+				if (!isEffective && !grant.roleIds.isEmpty()){
+					continue;
+				}
+
+				// Check if already added from another home tenant
+				bool alreadyAdded = false;
+				for (int i = 0; i < organizationList.size(); ++i){
+					if (organizationList[i]->id.HasValue() && organizationList[i]->id == sourceTenantId){
+						alreadyAdded = true;
+						break;
+					}
+				}
+				if (alreadyAdded){
+					continue;
+				}
+
+				imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(sourceTenantId);
+				if (!tenantPtr.IsValid() || !tenantPtr->IsActive()){
+					continue;
+				}
+
+				sdl::V1_0::imtauth::CProfileTenantInfo organizationInfo;
+				organizationInfo.id = sourceTenantId;
+				organizationInfo.name = tenantPtr->GetTenantName();
+				organizationInfo.description = tenantPtr->GetTenantDescription();
+				organizationInfo.ownerId = tenantPtr->GetOwnerId();
+				organizationInfo.isOwner = false;
+				organizationInfo.isActive = tenantPtr->IsActive();
+				organizationInfo.isDelegated = true;
+				organizationInfo.role = QStringLiteral("Delegated Member");
+
+				imtsdl::TElementList<QString> delegatedRolesList;
+				for (const QByteArray& roleId : grant.roleIds){
+					delegatedRolesList << QString::fromUtf8(roleId);
+				}
+				organizationInfo.delegatedRoles = delegatedRolesList;
+
+				organizationList << organizationInfo;
+			}
+		}
 	}
 
 	return organizationList;

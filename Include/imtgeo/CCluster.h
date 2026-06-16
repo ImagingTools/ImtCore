@@ -4,63 +4,43 @@
 
 // Qt includes
 #include <QtPositioning/QGeoCoordinate>
-
-// ACF includes
-#include <iser/CPrimitiveTypesSerializer.h>
+#include <QtCore/QSharedPointer>
 
 
 // ImtCore includes
 #include <imtgeo/ICluster.h>
 #include <imtgeo/CPosition.h>
 
+
 namespace imtgeo
 {
-/**
-    Class for describing a cluster of objects on the map.
 
-*/
+
 class CCluster: public CPositionIdentifiable, virtual public ICluster
 {
 public:
-    typedef CPositionIdentifiable BaseClass;
+	using BaseClass = CPositionIdentifiable;
 
-    CCluster();
+	CCluster();
 
-    ~CCluster();
+	// reimplemented (imtgeo::ICluster)
+	virtual QByteArrayList GetChildIds() const override;
+	virtual void SetChildIds(const QByteArrayList& list) override;
 
-    // reimplemented (imtgeo::ICluster)
-    /**
-        Get id list of objects in cluster.
-    */
-    virtual QByteArrayList GetChildrenIds() const override;
+	virtual double GetZoom() const override;
+	virtual void SetZoom(double zoom) override;
 
-    /**
-        Set id list of objects in cluster.
-    */
-    virtual void SetChildrenIds(QByteArrayList &list) override;
-
-    /**
-        Get zoom level of cluster.
-    */
-    virtual double GetZoom() const  override;
-
-    /**
-        Set zoom level of cluster.
-    */
-    virtual void SetZoom(double zoom)  override;
-
-    // reimplemented (iser::ISerializable)
-    virtual bool Serialize(iser::IArchive& archive) override;
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive& archive) override;
 
 private:
-
-    QByteArrayList m_childrenIds = QByteArrayList();
-    double m_zoom = 0;
-
+	QByteArrayList m_childrenIds;
+	double m_zoom;
 };
 
 
+using ClusterSharedPtr = QSharedPointer<CCluster>;
+
 
 } // namespace imtgeo
-
 

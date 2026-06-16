@@ -99,12 +99,16 @@ ViewBase {
 				anchors.centerIn: parent
 				spacing: Style.marginL
 
-				Text {
+				TextInput {
 					text: connectionCodePage.connectionCode ? connectionCodePage.connectionCode : qsTr("Loading...")
 					font.pixelSize: Style.fontSizeXXL
 					font.bold: true
 					color: Style.titleColor
 					anchors.verticalCenter: parent.verticalCenter
+					width: contentWidth
+					readOnly: true
+					selectByMouse: true
+					selectionColor: Style.selectionColor
 				}
 
 				ToolButton {

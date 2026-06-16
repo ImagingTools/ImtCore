@@ -3,11 +3,14 @@
 
 
 // Qt includes
+#include <QMutexLocker>
 #include <QUuid>
 
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
 #include <imtauth/IUserInfo.h>
+#include <imtdoc/CDocumentSavedEvent.h>
+#include <imtgql/IGqlContext.h>
 
 // Generated includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/UserCollectionDocumentService.h>
@@ -107,6 +110,23 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 		return response;
 	}
 
+	// Resolve tenantId: prefer explicit input field, fallback to JWT context
+	QByteArray tenantId;
+	if (arguments.input->tenantId){
+		tenantId = *arguments.input->tenantId;
+	}
+	if (tenantId.isEmpty()){
+		const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+		if (gqlContextPtr != nullptr){
+			tenantId = gqlContextPtr->GetTenantId();
+		}
+	}
+
+	if (!tenantId.isEmpty()){
+		QMutexLocker locker(&m_pendingTenantIdsMutex);
+		m_pendingTenantIds.insert(documentId, tenantId);
+	}
+
 	QByteArray userLogin = GetUserId(gqlRequest);
 
 	istd::IChangeableSharedPtr documentPtr;
@@ -138,6 +158,55 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 	}
 	if (userData.username){
 		userPtr->SetId(*userData.username);
+	}
+
+	// Handle system info: remove existing systems and apply the new ones
+	imtauth::IUserInfo::SystemInfoList currentSystemList = userPtr->GetSystemInfos();
+	for (const imtauth::IUserInfo::SystemInfo& systemInfo : currentSystemList){
+		userPtr->RemoveFromSystem(systemInfo.systemId);
+	}
+
+	if (userData.systemInfos){
+		for (const istd::TNullableValue<sdl::V1_0::imtauth::CSystemInfo>& sdlSystemInfo : *userData.systemInfos){
+			if (!sdlSystemInfo.HasValue()){
+				continue;
+			}
+
+			imtauth::IUserInfo::SystemInfo systemInfo;
+			if (sdlSystemInfo->id){
+				systemInfo.systemId = *sdlSystemInfo->id;
+			}
+			if (sdlSystemInfo->name){
+				systemInfo.systemName = *sdlSystemInfo->name;
+			}
+			if (sdlSystemInfo->enabled){
+				systemInfo.enabled = *sdlSystemInfo->enabled;
+			}
+
+			userPtr->AddToSystem(systemInfo);
+		}
+	}
+	else{
+		// No system info provided — add default internal system
+		imtauth::IUserInfo::SystemInfo systemInfo;
+		userPtr->AddToSystem(systemInfo);
+	}
+
+	// Handle password: hash when user is in internal system (empty systemId, enabled)
+	if (userData.password){
+		QByteArray username = userPtr->GetId();
+		if (!username.isEmpty() && m_hashCalculatorCompPtr.IsValid()){
+			for (const imtauth::IUserInfo::SystemInfo& systemInfo : userPtr->GetSystemInfos()){
+				if (systemInfo.enabled && systemInfo.systemId.isEmpty()){
+					QString password = *userData.password;
+					if (!password.isEmpty()){
+						password = m_hashCalculatorCompPtr->GenerateHash(username + password.toUtf8());
+						userPtr->SetPasswordHash(password.toUtf8());
+					}
+					break;
+				}
+			}
+		}
 	}
 
 	if (userData.groups){
@@ -188,6 +257,64 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 	response.status = sdl::V1_0::imtbase::EDocumentOperationStatus::Success;
 
 	return response;
+}
+
+
+// reimplemented (imtdoc::IDocumentServiceEventHandler)
+
+bool CUserCollectionDocumentServiceComp::ProcessEvent(imtdoc::CEventBase* eventPtr)
+{
+	imtdoc::CDocumentSavedEvent* savedEventPtr = dynamic_cast<imtdoc::CDocumentSavedEvent*>(eventPtr);
+	if (savedEventPtr == nullptr){
+		return true;
+	}
+
+	if (!m_membershipManagerCompPtr.IsValid()){
+		return true;
+	}
+
+	QByteArray documentId = savedEventPtr->GetDocumentId();
+	QByteArray userId = savedEventPtr->GetUserId();
+
+	// Retrieve the tenantId that was stored during OnUpdateUserFromRepresentation
+	QByteArray tenantId;
+	{
+		QMutexLocker locker(&m_pendingTenantIdsMutex);
+		tenantId = m_pendingTenantIds.take(documentId);
+	}
+
+	if (tenantId.isEmpty()){
+		return true;
+	}
+
+	// Get the saved user document to extract the user's objectUuid
+	istd::IChangeableSharedPtr documentPtr;
+	m_documentManagerCompPtr->GetDocumentData(userId, documentId, documentPtr);
+	if (!documentPtr.IsValid()){
+		return true;
+	}
+
+	const imtauth::CIdentifiableUserInfo* userPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(documentPtr.GetPtr());
+	if (userPtr == nullptr){
+		return true;
+	}
+
+	QByteArray newUserId = userPtr->GetObjectUuid();
+	if (newUserId.isEmpty()){
+		return true;
+	}
+
+	// Check if user is already a member of this tenant
+	if (m_membershipManagerCompPtr->IsMember(newUserId, tenantId)){
+		return true;
+	}
+
+	QByteArray membershipId = m_membershipManagerCompPtr->AddMembership(newUserId, tenantId, "Member");
+	if (membershipId.isEmpty()){
+		SendWarningMessage(0, QString("Auto-membership creation failed for user '%1' in tenant '%2'").arg(QString::fromUtf8(newUserId), QString::fromUtf8(tenantId)), "CUserCollectionDocumentServiceComp");
+	}
+
+	return true;
 }
 
 

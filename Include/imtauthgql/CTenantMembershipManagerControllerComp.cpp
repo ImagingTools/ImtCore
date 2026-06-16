@@ -4,6 +4,7 @@
 // ImtCore includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/TenantMemberships.h>
 #include <imtauth/ITenantInfo.h>
+#include <imtauth/DelegatedTenantAccessUtils.h>
 #include <imtgql/IGqlContext.h>
 
 
@@ -15,6 +16,13 @@ QByteArray ContextUserId(const imtgql::CGqlRequest& gqlRequest)
 {
 	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
 	return contextPtr != nullptr ? contextPtr->GetUserId() : QByteArray();
+}
+
+
+QByteArray ContextTenantId(const imtgql::CGqlRequest& gqlRequest)
+{
+	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+	return contextPtr != nullptr ? contextPtr->GetTenantId() : QByteArray();
 }
 
 
@@ -332,7 +340,7 @@ sdl::V1_0::imtauth::CGetTenantInvitationsPayload CTenantMembershipManagerControl
 		}
 	}
 
-	if (!m_tenantManagerCompPtr.IsValid() || !HasTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), ContextUserId(gqlRequest), tenantId)){
+	if (!m_tenantManagerCompPtr.IsValid() || !imtauth::HasDelegatedTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), m_delegatedAccessCompPtr.IsValid() ? m_delegatedAccessCompPtr.GetPtr() : nullptr, ContextUserId(gqlRequest), ContextTenantId(gqlRequest), tenantId)){
 		response.errorMessage = QStringLiteral("Access denied");
 		return response;
 	}
