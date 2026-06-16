@@ -248,7 +248,7 @@ TenantSimpleCollectionPage {
 			memberData: modelData.sourceData || modelData
 			tenantData: membersPage.model
 			stateManager: membersPage.stateManager
-			canManageMembers: membersPage.stateManager ? membersPage.stateManager.canManageMembers : false
+			collectionPage: membersPage
 			isOwner: membersPage.stateManager ? membersPage.stateManager.isOwner : false
 			selectionManager: membersPage.selectionManager
 			showCheckBox: true

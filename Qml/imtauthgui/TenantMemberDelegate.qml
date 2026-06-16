@@ -17,7 +17,7 @@ import imtauthgui 1.0
  * Action requests are surfaced as signals so the parent (TenantMembersPage)
  * can pop the appropriate menu and call the api client.
  */
-Rectangle {
+TenantCollectionItemDelegateBase {
 	id: row
 
 	// --- Inputs ---
@@ -25,10 +25,7 @@ Rectangle {
 	property var memberData: ({})
 	property var tenantData: null
 	property var stateManager: null
-	property bool canManageMembers: false
 	property bool isOwner: false
-	property var selectionManager: null
-	property bool showCheckBox: false
 
 	// --- Outputs (action requests) ---
 	signal memberActionsRequested(var menuItems, string userId, string userName,
@@ -62,53 +59,20 @@ Rectangle {
 		: row.isRevoked ? "Revoked" : "Pending"
 
 	readonly property string selectionId: row.isMember ? (row.memberData.id || "") : ("inv_" + (row.memberData.id || ""))
-	readonly property bool isSelected: row.selectionManager ? row.selectionManager.isSelected(row.selectionId) : false
-	readonly property int checkBoxSize: Style.itemSizeS + Style.marginXS
+	itemId: row.selectionId
+	enableDefaultDoubleClickEdit: false
+	showDefaultActionsMenu: false
 
-	height: contentRow.implicitHeight + Style.marginL * 2
-	radius: 0
-	color: row.isSelected ? Style.selectedColor
-		: rowMouseArea.containsMouse ? Style.buttonHoverColor : "transparent"
-
-	MouseArea {
-		id: rowMouseArea
-		anchors.fill: parent
-		hoverEnabled: true
-		acceptedButtons: Qt.LeftButton
-		onDoubleClicked: {
-			if (row.isMember && row.canManageMembers) {
-				row.memberEditRequested(row.memberData.id, row.memberData.name || row.memberData.id || "")
-			}
+	onItemDoubleClicked: {
+		if (row.isMember && row.canManage) {
+			row.memberEditRequested(row.memberData.id, row.memberData.name || row.memberData.id || "")
 		}
 	}
 
 	Row {
 		id: contentRow
-		anchors.left: parent.left
-		anchors.right: parent.right
-		anchors.verticalCenter: parent.verticalCenter
-		anchors.margins: Style.marginM
+		width: parent.width
 		spacing: Style.marginM
-
-		// ----- CheckBox -----
-		CheckBox {
-			id: selectionCheckBox
-			visible: row.showCheckBox
-			anchors.verticalCenter: parent.verticalCenter
-			height: row.checkBoxSize
-			width: visible ? row.checkBoxSize : 0
-			checkState: row.isSelected ? Qt.Checked : Qt.Unchecked
-		}
-
-		MouseArea {
-			visible: row.showCheckBox
-			anchors.fill: selectionCheckBox
-			cursorShape: Qt.PointingHandCursor
-			onClicked: {
-				if (row.selectionManager)
-					row.selectionManager.toggleSelect(row.selectionId)
-			}
-		}
 
 		// ----- Avatar -----
 		Rectangle {
@@ -161,7 +125,6 @@ Rectangle {
 			anchors.verticalCenter: parent.verticalCenter
 			spacing: 2
 			width: parent.width
-				- (row.showCheckBox ? row.checkBoxSize + parent.spacing : 0)
 				- avatar.width
 				- badgesItem.width
 				- actionsItem.width
@@ -265,9 +228,9 @@ Rectangle {
 			anchors.verticalCenter: parent.verticalCenter
 
 			readonly property bool __hasActions: row.isMember
-				? ((row.canManageMembers && !row.isCurrentUser && !row.isMemberOwner && !row.isMemberCreator)
+				? ((row.canManage && !row.isCurrentUser && !row.isMemberOwner && !row.isMemberCreator)
 				   || (row.isCurrentUser && !row.isMemberOwner && !row.isMemberCreator))
-				: (row.canManageMembers && row.effectiveStatus === "Pending")
+				: (row.canManage && row.effectiveStatus === "Pending")
 
 			ToolButton {
 				id: actionsButton
@@ -286,7 +249,7 @@ Rectangle {
 					var btnPos = actionsButton.mapToItem(null, 0, actionsButton.height)
 					if (row.isMember) {
 						var menuItems = []
-						if (row.canManageMembers && !row.isCurrentUser) {
+						if (row.canManage && !row.isCurrentUser) {
 							if (!row.isMemberOwner && !row.isMemberCreator) {
 								menuItems.push({ text: qsTr("Change Environment Role"), action: "changeRole" })
 								menuItems.push({ text: qsTr("Exclude from Tenant"), action: "remove" })
@@ -318,15 +281,5 @@ Rectangle {
 				}
 			}
 		}
-	}
-
-	// Bottom separator line
-	Rectangle {
-		anchors.bottom: parent.bottom
-		anchors.left: parent.left
-		anchors.right: parent.right
-		height: 1
-		color: Style.borderColor
-		opacity: 0.5
 	}
 }

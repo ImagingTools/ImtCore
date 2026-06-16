@@ -54,7 +54,8 @@ FilterableSelectDataProvider {
 					description: desc || "",
 					icon: icon || "",
 					color: color || "",
-					parameters: normalizedParams
+					parameters: normalizedParams,
+					totalCount: count
 				})
 			}
 		}

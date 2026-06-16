@@ -36,9 +36,9 @@ Item {
 	Row {
 		id: headerRow
 		anchors.left: parent.left
-		anchors.leftMargin: Style.marginM
+		anchors.leftMargin: Style.marginL
 		anchors.verticalCenter: parent.verticalCenter
-		spacing: Style.marginM
+		spacing: Style.marginL
 
 		CheckBox {
 			id: selectAllCheckBox

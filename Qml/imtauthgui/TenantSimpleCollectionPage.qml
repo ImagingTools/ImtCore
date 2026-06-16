@@ -18,11 +18,11 @@ import imtauthgui 1.0
  * own delegate and does not use this component.
  */
 ViewBase {
-	id: collectionPage
+	id: root
 
 	commandsPanelVisible: false
 	contentColor: Style.baseColor
-	readonly property var tenantData: collectionPage.model
+	readonly property var tenantData: root.model
 	property var stateManager: null
 	property var apiClient: null
 
@@ -59,10 +59,10 @@ ViewBase {
 	property var documentNameFields: ["m_name"]
 
 	function resolveDocumentName(documentId) {
-		var view = collectionPage.documentManager.getDocumentViewInstance(documentId, "")
+		var view = root.documentManager.getDocumentViewInstance(documentId, "")
 		if (view && view.model) {
-			for (var i = 0; i < collectionPage.documentNameFields.length; i++) {
-				var field = collectionPage.documentNameFields[i]
+			for (var i = 0; i < root.documentNameFields.length; i++) {
+				var field = root.documentNameFields[i]
 				if (view.model[field])
 					return view.model[field]
 			}
@@ -72,7 +72,7 @@ ViewBase {
 
 	function popEditor() {
 		__resetStackToList()
-		collectionPage.__activeShellView = null
+		root.__activeShellView = null
 	}
 
 	// --- internal state ---
@@ -97,9 +97,9 @@ ViewBase {
 	readonly property string filterText: __lastFilterText
 
 	Connections {
-		target: collectionPage.dataProvider
+		target: root.dataProvider
 		function onDataChanged() {
-			collectionPage.__listItems = collectionPage.dataProvider.items
+			root.__listItems = root.dataProvider.items
 		}
 	}
 
@@ -126,12 +126,12 @@ ViewBase {
 
 	function openCreate() {
 		__clearExtraPages()
-		collectionPage.__isCreating = true
-		stackViewHeader.addHeader("create", qsTr("Create New %1").arg(collectionPage.entityName))
-		if (collectionPage.documentManager) {
+		root.__isCreating = true
+		stackViewHeader.addHeader("create", qsTr("Create New %1").arg(root.entityName))
+		if (root.documentManager) {
 			collectionStackView.addPage(editorViewComponent)
-		} else if (collectionPage.customEditorComponent) {
-			collectionStackView.addPage(collectionPage.customEditorComponent)
+		} else if (root.customEditorComponent) {
+			collectionStackView.addPage(root.customEditorComponent)
 		}
 		collectionStackView.next()
 	}
@@ -141,22 +141,22 @@ ViewBase {
 	}
 
 	function __openEdit(itemId, itemName, itemDescription) {
-		collectionPage.__editItemId = itemId
-		collectionPage.__isCreating = false
+		root.__editItemId = itemId
+		root.__isCreating = false
 		__clearExtraPages()
-		stackViewHeader.addHeader("edit", itemName || qsTr("Edit %1").arg(collectionPage.entityName))
-		if (collectionPage.documentManager) {
+		stackViewHeader.addHeader("edit", itemName || qsTr("Edit %1").arg(root.entityName))
+		if (root.documentManager) {
 			collectionStackView.addPage(editorViewComponent)
-		} else if (collectionPage.customEditorComponent) {
-			collectionStackView.addPage(collectionPage.customEditorComponent)
+		} else if (root.customEditorComponent) {
+			collectionStackView.addPage(root.customEditorComponent)
 		}
 		collectionStackView.next()
 	}
 
 	Connections {
-		target: collectionPage.documentManager
+		target: root.documentManager
 		function onDocumentSaved(documentId) {
-			collectionPage.refresh()
+			root.refresh()
 		}
 		function onDocumentNameChanged(documentId, oldName, newName) {
 			stackViewHeader.setHeaderName("edit", newName)
@@ -175,9 +175,9 @@ ViewBase {
 		initialItemTitleVisible: true
 
 		onCloseClicked: {
-			if (collectionPage.__activeShellView
-					&& collectionPage.__activeShellView.state === "content") {
-				collectionPage.__activeShellView.closeDocument()
+			if (root.__activeShellView
+					&& root.__activeShellView.state === "content") {
+				root.__activeShellView.closeDocument()
 			} else {
 				collectionStackView.previous()
 				stackViewHeader.popHeader()
@@ -187,9 +187,9 @@ ViewBase {
 		onHeaderItemClicked: {
 			if (collectionStackView.currentIndex <= index)
 				return
-			if (collectionPage.__activeShellView
-					&& collectionPage.__activeShellView.state === "content") {
-				collectionPage.__activeShellView.closeDocument()
+			if (root.__activeShellView
+					&& root.__activeShellView.state === "content") {
+				root.__activeShellView.closeDocument()
 				return
 			}
 			while (collectionStackView.currentIndex > index) {
@@ -199,16 +199,16 @@ ViewBase {
 		}
 
 		Component.onCompleted: {
-			stackViewHeader.addHeader("list", collectionPage.__listTitle)
+			stackViewHeader.addHeader("list", root.__listTitle)
 		}
 	}
 
 	Text {
 		id: createBtn
-		visible: collectionPage.showCreateButton && collectionPage.__canManage && collectionPage.__onListPage && collectionPage.__useDefaultButtons
+		visible: root.showCreateButton && root.__canManage && root.__onListPage && root.__useDefaultButtons
 		anchors.right: stackViewHeader.right
 		anchors.verticalCenter: stackViewHeader.verticalCenter
-		text: collectionPage.__createBtnText
+		text: root.__createBtnText
 		font.pixelSize: Style.fontSizeM
 		font.bold: true
 		color: Style.linkColor
@@ -217,33 +217,33 @@ ViewBase {
 			anchors.fill: parent
 			hoverEnabled: true
 			cursorShape: Qt.PointingHandCursor
-			onClicked: collectionPage.openCreate()
+			onClicked: root.openCreate()
 		}
 	}
 
 	Text {
 		id: editBtn
-		visible: collectionPage.__canManage && collectionPage.__onListPage && collectionPage.__useDefaultButtons
+		visible: root.__canManage && root.__onListPage && root.__useDefaultButtons
 		anchors.right: createBtn.left
 		anchors.rightMargin: Style.marginL
 		anchors.verticalCenter: stackViewHeader.verticalCenter
 		text: qsTr("Edit")
 		font.pixelSize: Style.fontSizeM
 		font.bold: true
-		color: collectionPage.__selectedCount === 1 ? Style.linkColor : Style.inactiveTextColor
-		opacity: collectionPage.__selectedCount === 1 ? 1.0 : 0.5
+		color: root.__selectedCount === 1 ? Style.linkColor : Style.inactiveTextColor
+		opacity: root.__selectedCount === 1 ? 1.0 : 0.5
 
 		MouseArea {
 			anchors.fill: parent
 			hoverEnabled: true
-			cursorShape: collectionPage.__selectedCount === 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
-			enabled: collectionPage.__selectedCount === 1
+			cursorShape: root.__selectedCount === 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
+			enabled: root.__selectedCount === 1
 			onClicked: {
-				var selId = collectionPage.selectionManager.selectedIds[0]
-				var items = collectionPage.__listItems
+				var selId = root.selectionManager.selectedIds[0]
+				var items = root.__listItems
 				for (var i = 0; i < items.length; i++) {
 					if (items[i] && items[i].id === selId) {
-						collectionPage.__openEdit(selId, items[i].title || items[i].id || "", items[i].description || "")
+						root.__openEdit(selId, items[i].title || items[i].id || "", items[i].description || "")
 						break
 					}
 				}
@@ -253,30 +253,30 @@ ViewBase {
 
 	Text {
 		id: removeBtn
-		visible: collectionPage.__canManage && collectionPage.__onListPage && collectionPage.__useDefaultButtons
+		visible: root.__canManage && root.__onListPage && root.__useDefaultButtons
 		anchors.right: editBtn.left
 		anchors.rightMargin: Style.marginL
 		anchors.verticalCenter: stackViewHeader.verticalCenter
 		text: qsTr("Remove")
 		font.pixelSize: Style.fontSizeM
 		font.bold: true
-		color: collectionPage.__selectedCount > 0 ? Style.errorColor : Style.inactiveTextColor
-		opacity: collectionPage.__selectedCount > 0 ? 1.0 : 0.5
+		color: root.__selectedCount > 0 ? Style.errorColor : Style.inactiveTextColor
+		opacity: root.__selectedCount > 0 ? 1.0 : 0.5
 
 		MouseArea {
 			anchors.fill: parent
 			hoverEnabled: true
-			cursorShape: collectionPage.__selectedCount > 0 ? Qt.PointingHandCursor : Qt.ArrowCursor
-			enabled: collectionPage.__selectedCount > 0
+			cursorShape: root.__selectedCount > 0 ? Qt.PointingHandCursor : Qt.ArrowCursor
+			enabled: root.__selectedCount > 0
 			onClicked: {
 				ModalDialogManager.showConfirmationDialog(
-							collectionPage.__deleteMultipleTitle,
-							qsTr("Are you sure you want to delete %1 selected item(s)? This action cannot be undone.").arg(collectionPage.__selectedCount),
+							root.__deleteMultipleTitle,
+							qsTr("Are you sure you want to delete %1 selected item(s)? This action cannot be undone.").arg(root.__selectedCount),
 							function(result) {
 								if (result === Enums.yes) {
-									var ids = collectionPage.selectionManager.selectedIds.slice()
-									collectionPage.removeItems(ids)
-									collectionPage.selectionManager.clear()
+									var ids = root.selectionManager.selectedIds.slice()
+									root.removeItems(ids)
+									root.selectionManager.clear()
 								}
 							}
 							)
@@ -286,11 +286,11 @@ ViewBase {
 
 	Loader {
 		id: customHeaderButtonsLoader
-		visible: collectionPage.headerButtonsComponent && collectionPage.__onListPage
+		visible: root.headerButtonsComponent && root.__onListPage
 		anchors.right: stackViewHeader.right
 		anchors.verticalCenter: stackViewHeader.verticalCenter
-		sourceComponent: collectionPage.headerButtonsComponent
-		property var page: collectionPage
+		sourceComponent: root.headerButtonsComponent
+		property var page: root
 	}
 
 	BaseText {
@@ -299,8 +299,8 @@ ViewBase {
 		anchors.topMargin: Style.marginS
 		anchors.horizontalCenter: parent.horizontalCenter
 		width: Math.min(parent.width - Style.marginXL * 2, 1000)
-		visible: collectionPage.__onListPage && collectionPage.descriptionText.length > 0
-		text: collectionPage.descriptionText
+		visible: root.__onListPage && root.descriptionText.length > 0
+		text: root.descriptionText
 		font.pixelSize: Style.fontSizeM
 		color: Style.inactiveTextColor
 	}
@@ -323,7 +323,7 @@ ViewBase {
 
 		Item {
 			id: listViewItem
-			readonly property var effectiveModel: collectionPage.listModel ? collectionPage.listModel : collectionPage.__listItems
+			readonly property var effectiveModel: root.listModel ? root.listModel : root.__listItems
 			readonly property int effectiveCount: effectiveModel ? (effectiveModel.count || effectiveModel.length || 0) : 0
 
 			SearchTextInput {
@@ -332,10 +332,10 @@ ViewBase {
 				anchors.topMargin: Style.marginM
 				anchors.horizontalCenter: parent.horizontalCenter
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
-				placeHolderText: collectionPage.__filterPlaceholder
+				placeHolderText: root.__filterPlaceholder
 				onTextChanged: {
 					selectionManager_.clear()
-					collectionPage.__lastFilterText = text
+					root.__lastFilterText = text
 					filterDebounce.restart()
 				}
 			}
@@ -345,8 +345,8 @@ ViewBase {
 				interval: 300
 				repeat: false
 				onTriggered: {
-					if (collectionPage.dataProvider)
-						collectionPage.dataProvider.fetch(filterInput.text)
+					if (root.dataProvider)
+						root.dataProvider.fetch(filterInput.text)
 				}
 			}
 
@@ -360,11 +360,11 @@ ViewBase {
 					id: selectionManager_
 					multiSelect: true
 					Component.onCompleted: {
-						collectionPage.selectionManager = selectionManager_
+						root.selectionManager = selectionManager_
 					}
 					Component.onDestruction: {
-						if (collectionPage)
-							collectionPage.selectionManager = null
+						if (root)
+							root.selectionManager = null
 					}
 				}
 
@@ -407,7 +407,7 @@ ViewBase {
 
 					BaseText {
 						anchors.centerIn: parent
-						text: collectionPage.__emptyText
+						text: root.__emptyText
 						font.pixelSize: Style.fontSizeM
 						color: Style.inactiveTextColor
 					}
@@ -423,7 +423,7 @@ ViewBase {
 					boundsBehavior: Flickable.StopAtBounds
 					model: listViewItem.effectiveModel
 
-					delegate: collectionPage.delegateComponent ? collectionPage.delegateComponent : defaultDelegateComp
+					delegate: root.delegateComponent ? root.delegateComponent : defaultDelegateComp
 				}
 
 				Component {
@@ -432,7 +432,7 @@ ViewBase {
 					TenantCollectionItemDelegateBase {
 						id: defaultDelegate
 						selectionManager: selectionManager_
-						collectionPage: collectionPage
+						collectionPage: root
 
 						BaseText {
 							text: defaultDelegate.itemTitle
@@ -467,15 +467,15 @@ ViewBase {
 		id: editorViewComponent
 
 		TenantDocumentEditorShell {
-			documentManager: collectionPage.documentManager
-			objectTypeId: collectionPage.objectTypeId
-			objectId: collectionPage.__isCreating ? "" : collectionPage.__editItemId
-			createNew: collectionPage.__isCreating
-			generateNewId: collectionPage.__isCreating
-			activeShellTarget: collectionPage
-			documentNameResolver: collectionPage.resolveDocumentName
+			documentManager: root.documentManager
+			objectTypeId: root.objectTypeId
+			objectId: root.__isCreating ? "" : root.__editItemId
+			createNew: root.__isCreating
+			generateNewId: root.__isCreating
+			activeShellTarget: root
+			documentNameResolver: root.resolveDocumentName
 
-			onClosed: collectionPage.__resetStackToList()
+			onClosed: root.__resetStackToList()
 		}
 	}
 }
