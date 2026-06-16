@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QtWebSockets/QtWebSockets>
+#include <QtCore/QPointer>
 
 // ImtCore includes
 #include <imtrest/ITransport.h>
@@ -18,7 +19,7 @@ class CWebSocketSender: public QObject, virtual public ITransport
 	Q_OBJECT
 public:
 	CWebSocketSender(QWebSocket* webSocketPtr);
-	const QWebSocket* GetSocket() const;
+	QPointer<QWebSocket> GetSocket() const;
 
 	// reimplemented (ITransport)
 	virtual bool SendResponse(ConstResponsePtr& response) const override;
@@ -31,10 +32,9 @@ Q_SIGNALS:
 	void SendTextMessage(const QByteArray& data) const;
 
 private:
-	QWebSocket* m_webSocketPtr;
+	bool IsSocketValid() const;
+	QPointer<QWebSocket> m_webSocketPtr;
 };
 
 
 } // namespace imtrest
-
-
