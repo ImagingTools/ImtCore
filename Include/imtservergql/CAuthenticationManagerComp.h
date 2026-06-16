@@ -108,12 +108,6 @@ private:
 	I_ATTR(int, m_maxTokenCacheSizeAttrPtr);
 	I_ATTR(int, m_tokenCacheTtlAttrPtr);
 
-	// TODO: Remove this mutex if the ACF component factory (I_FACT) is confirmed thread-safe.
-	// Currently serializes all context creation which may become a bottleneck under load.
-	mutable QMutex m_contextCreationMutex;
-	// TODO: Remove this mutex if IJwtSessionController and IPersonalAccessTokenManager
-	// implementations are confirmed thread-safe. Currently serializes all token validation.
-	mutable QMutex m_tokenValidationMutex;
 	mutable QMutex m_tokenCacheMutex;
 	mutable QHash<QByteArray, TokenCacheEntry> m_tokenCache;
 };
