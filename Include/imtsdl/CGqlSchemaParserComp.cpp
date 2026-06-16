@@ -196,6 +196,9 @@ iproc::IProcessor::TaskState CGqlSchemaParserComp::DoProcessing(
 	static QRegularExpression commentRegex("#.*\n");
 	content.replace(commentRegex, "\n");
 
+	static QRegularExpression multilineCommentRegex("(\"\"\"[\\s\\S]*?\"\"\")");
+	content.replace(multilineCommentRegex, "\n");
+
 	QString outputFileName = m_tempDirPtr->GetPath() + QDir::separator() + "schema.sdl";
 	QFile outputFile(outputFileName);
 
