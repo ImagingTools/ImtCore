@@ -8,9 +8,10 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="CrossOrgGrantCollectionDocumentService" X="975" Y="150" Note=""/>
+        <Element ComponentName="CrossOrgGrantCollectionDocumentService" X="675" Y="225" Note=""/>
         <Element ComponentName="CrossOrgGrantDocumentValidator" X="175" Y="625" Note=""/>
         <Element ComponentName="CrossOrgGrantInfo" X="400" Y="675" Note=""/>
+        <Element ComponentName="CrossOrgGrantItemInfoProvider" X="975" Y="150" Note=""/>
         <Element ComponentName="CrossOrgGrantManager" X="400" Y="775" Note=""/>
         <Element ComponentName="CrossOrgGrantsDocumentService" X="400" Y="500" Note=""/>
         <Element ComponentName="CrossTenantMessageBroker" X="600" Y="350" Note=""/>
@@ -20,7 +21,19 @@
         <Element ComponentName="FilterableSelectController" X="925" Y="50" Note=""/>
         <Element ComponentName="GrantCommandsController" X="225" Y="100" Note=""/>
         <Element ComponentName="GrantDemultiplexer" X="600" Y="100" Note=""/>
+        <Element ComponentName="GrantParamsRepresentation" X="1025" Y="250" Note=""/>
         <Element ComponentName="SlaveSubscriberController" X="750" Y="625" Note=""/>
     </PositionMap>
-    <EmbeddedRegistries/>
+    <EmbeddedRegistries>
+        <EmbededRegistry Id="GrantParamsRepresentation">
+            <PositionMap>
+                <Element ComponentName="DirectionRepresentationController" X="175" Y="375" Note=""/>
+                <Element ComponentName="ExpiresAtRepresentationController" X="975" Y="200" Note=""/>
+                <Element ComponentName="ParamsSetRepresentation" X="575" Y="75" Note=""/>
+                <Element ComponentName="RolesRepresentationController" X="575" Y="200" Note=""/>
+                <Element ComponentName="TargetTenantRepresentationController" X="175" Y="200" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+    </EmbeddedRegistries>
 </Acf>

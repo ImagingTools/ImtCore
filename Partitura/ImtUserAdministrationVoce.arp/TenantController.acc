@@ -226,6 +226,12 @@
                     <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="RoleRepository" Type="Reference" ExportId="RoleRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TenantCollection" Type="Reference" ExportId="TenantRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TenantManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TenantManager/TenantManager"/>
                     </AttributeInfo>
@@ -305,6 +311,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -495,6 +504,7 @@
         <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="SlaveSubscriberController"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="CrossOrgGrantManager" ComponentId="TenantGrantManager/CrossOrgGrantManager"/>
         <Component ExportedId="DelegatedAccessResolver" ComponentId="DelegatedAccessResolver"/>
         <Component ExportedId="TenantConnectionRequestManager" ComponentId="TenantConnectionManager/TenantConnectionRequestManager"/>
         <Component ExportedId="TenantInvitationManager" ComponentId="TenantMembershipManager/TenantInvitationManager"/>

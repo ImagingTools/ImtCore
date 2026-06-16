@@ -4,7 +4,9 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtserverapp/IJsonRepresentationController.h>
 #include <imtservergql/CFilterableSelectControllerComp.h>
+#include <imtservergql/IObjectParamsFiller.h>
 
 
 namespace imtauthgql

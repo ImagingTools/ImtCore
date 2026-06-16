@@ -442,7 +442,6 @@ bool CUserGroupCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequ
 	QByteArrayList availableGroupIds;
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
-		QByteArray productId = gqlContextPtr->GetProductId();
 		const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
 		if (userInfoPtr != nullptr){
 			availableGroupIds = userInfoPtr->GetGroups();
@@ -456,23 +455,27 @@ bool CUserGroupCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequ
 		return true;
 	}
 
-	QByteArray groupId;
-	if (commandId == sdl::V1_0::imtauth::CGroupItemGqlRequest::GetCommandId()){
-		sdl::V1_0::imtauth::CGroupItemGqlRequest groupItemGqlRequest(gqlRequest, false);
-		if (groupItemGqlRequest.IsValid()){
-			auto arguments = groupItemGqlRequest.GetRequestedArguments();
-			if (arguments.input.HasValue()){
-				if (arguments.input->id.HasValue()){
-					groupId = *arguments.input->id;
+	// Allow access for delegated users via cross-org grants
+	if (gqlContextPtr != nullptr && m_delegatedAccessCompPtr.IsValid() && m_membershipManagerCompPtr.IsValid()){
+		QByteArray userId = gqlContextPtr->GetUserId();
+		QByteArray currentTenantId = gqlContextPtr->GetTenantId();
+		if (!userId.isEmpty() && !currentTenantId.isEmpty()){
+			const imtauth::ITenantMembershipManager::MembershipIds membershipIds =
+				m_membershipManagerCompPtr->GetMembershipsByUser(userId);
+			for (const QByteArray& membershipId : membershipIds){
+				imtauth::ITenantMembershipUniquePtr homeMembershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+				if (!homeMembershipPtr.IsValid() || !homeMembershipPtr->IsActive()){
+					continue;
+				}
+				QByteArray homeTenantId = homeMembershipPtr->GetTenantId();
+				if (homeTenantId.isEmpty() || homeTenantId == currentTenantId){
+					continue;
+				}
+				if (m_delegatedAccessCompPtr->IsDelegatedAccess(userId, homeTenantId, currentTenantId)){
+					return true;
 				}
 			}
 		}
-	}
-	else if (commandId == sdl::V1_0::imtbase::CGetObjectTypeIdGqlRequest::GetCommandId()){
-		groupId = ExtractObjectIdFromGetObjectTypeIdGqlRequest(gqlRequest);
-	}
-	else if (commandId == sdl::V1_0::imtbase::CGetObjectDataGqlRequest::GetCommandId()){
-		groupId = ExtractObjectIdFromGetObjectDataGqlRequest(gqlRequest);
 	}
 
 	return BaseClass::CheckPermissions(gqlRequest, errorMessage);

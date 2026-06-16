@@ -444,6 +444,25 @@ bool CGqlJwtSessionControllerComp::CanUseTenant(
 		return true;
 	}
 
+	// Check delegated access via cross-org grants
+	if (m_delegatedAccessCompPtr.IsValid()){
+		// Resolve user's home tenants from direct memberships
+		const imtauth::ITenantMembershipManager::MembershipIds membershipIds = m_membershipManagerCompPtr->GetMembershipsByUser(userId);
+		for (const QByteArray& membershipId : membershipIds){
+			imtauth::ITenantMembershipUniquePtr homeMembershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+			if (!homeMembershipPtr.IsValid() || !homeMembershipPtr->IsActive()){
+				continue;
+			}
+			QByteArray homeTenantId = homeMembershipPtr->GetTenantId();
+			if (homeTenantId.isEmpty()){
+				continue;
+			}
+			if (m_delegatedAccessCompPtr->IsDelegatedAccess(userId, homeTenantId, tenantId)){
+				return true;
+			}
+		}
+	}
+
 	errorMessage = QStringLiteral("User is not an active member of tenant");
 	return false;
 }

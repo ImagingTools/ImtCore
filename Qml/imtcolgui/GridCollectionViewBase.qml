@@ -463,7 +463,7 @@ Item {
 		onCurrentValueChanged: {
 			console.log("Pagination onCurrentValueChanged", paginationObj.currentValue);
 			gridInternal.selectedIndex = -1;
-			if(commandsId){
+			if(collectionViewBaseContainer.commandsId){
 				baseCommands.updateModels();
 			}
 			collectionViewBaseContainer.openST = false;
@@ -473,7 +473,7 @@ Item {
 
 			console.log("PAGINATION::Pagination onCountElementsChanged", paginationObj.countElements);
 			gridInternal.selectedIndex = -1;
-			if(commandsId){
+			if(collectionViewBaseContainer.commandsId){
 				baseCommands.updateModels();
 			}
 			collectionViewBaseContainer.openST = false;

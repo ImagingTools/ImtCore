@@ -138,7 +138,7 @@ ElementView {
 							visible: itemSelectElementView.editable && itemSelectElementView.nonRemovableIds.indexOf(modelData.id) < 0
 							anchors.right: parent.right
 							anchors.verticalCenter: parent.verticalCenter
-							iconSource: Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
+							iconSource: "qrc:/" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
 							decorator: Component {
 								ToolButtonDecorator {
 									color: "transparent"

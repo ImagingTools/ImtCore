@@ -30,6 +30,9 @@ public:
 		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager for ownership checks", false, "TenantManager");
 		I_ASSIGN(m_bindingManagerCompPtr, "BindingManager", "Tenant entity binding manager for add/remove bindings", false, "TenantEntityBindingManager");
 		I_ASSIGN(m_bindingEntityTypeAttrPtr, "BindingEntityType", "EntityType value used in TenantEntityBindings (must match the Users table name)", false, "Users");
+		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection for tenant-scoped role/group cleanup on membership removal", false, "UserCollection");
+		I_ASSIGN(m_roleBindingEntityTypeAttrPtr, "RoleBindingEntityType", "EntityType value used in TenantEntityBindings for tenant-bound roles", false, "Roles");
+		I_ASSIGN(m_groupBindingEntityTypeAttrPtr, "GroupBindingEntityType", "EntityType value used in TenantEntityBindings for tenant-bound groups", false, "Groups");
 	I_END_COMPONENT;
 
 	// reimplemented (imtauth::ITenantMembershipManager)
@@ -45,12 +48,16 @@ public:
 
 private:
 	bool IsOwnerMembership(const QByteArray& membershipId) const;
+	bool CleanupTenantAssignedUserData(const QByteArray& userId, const QByteArray& tenantId);
 
 	I_REF(imtbase::IObjectCollection, m_membershipCollectionCompPtr);
 	I_FACT(imtauth::ITenantMembership, m_membershipFactoryCompPtr);
 	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 	I_REF(imtauth::ITenantEntityBindingManager, m_bindingManagerCompPtr);
 	I_ATTR(QByteArray, m_bindingEntityTypeAttrPtr);
+	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
+	I_ATTR(QByteArray, m_roleBindingEntityTypeAttrPtr);
+	I_ATTR(QByteArray, m_groupBindingEntityTypeAttrPtr);
 };
 
 

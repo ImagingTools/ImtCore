@@ -61,6 +61,7 @@ ContractView 1.0 ContractView.qml
 RelationshipView 1.0 RelationshipView.qml
 MessageView 1.0 MessageView.qml
 StatusBadge 1.0 StatusBadge.qml
+TenantCollectionItemDelegateBase 1.0 TenantCollectionItemDelegateBase.qml
 TenantCollectionListView 1.0 TenantCollectionListView.qml
 TenantTableContainer 1.0 TenantTableContainer.qml
 TenantTableHeader 1.0 TenantTableHeader.qml

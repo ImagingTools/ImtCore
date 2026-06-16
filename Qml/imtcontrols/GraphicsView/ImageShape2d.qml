@@ -25,15 +25,15 @@ BoundingBox {
 		}
 	}
 
-	Connections {
-		target: bitmapShape
-		enabled: bitmapShape !== null
+	property Connections connections: Connections {
+		target: root.bitmapShape
+		enabled: root.bitmapShape !== null
 		function onImageChanged(){
-			if(bitmapShape.imageUrl){
-				root.imageSource = bitmapShape.imageUrl;
-				if(viewItem){
-					viewItem.loadImage(root.imageSource);
-					viewItem.requestPaint();
+			if(root.bitmapShape.imageUrl){
+				root.imageSource = root.bitmapShape.imageUrl;
+				if(root.viewItem){
+					root.viewItem.loadImage(root.imageSource);
+					root.viewItem.requestPaint();
 				}
 			}
 		}

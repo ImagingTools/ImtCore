@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5442" Description="ACF"/>
-            <Version Id="1" Number="2256" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6418" Description="ACF"/>
+            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -285,6 +285,7 @@
                             <Values>
                                 <Value>OnUsersCollectionChanged</Value>
                                 <Value>OnRolesCollectionChanged</Value>
+                                <Value>OnUserSessionsCollectionChanged</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -348,7 +349,7 @@
                     <AttributeInfo Id="SubscriptionCommandId" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>OnSessionCollectionChanged</Value>
+                                <Value>OnUserSessionsCollectionChanged</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
