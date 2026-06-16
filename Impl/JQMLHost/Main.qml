@@ -8,7 +8,7 @@ Window {
 	minimumWidth: 700
 	minimumHeight: 420
 	visible: true
-	title: "HostTest - Information"
+	title: "JQMLHost - Information"
 	color: "#1e1e1e"
 
 	Rectangle {
@@ -30,7 +30,7 @@ Window {
 				spacing: 14
 
 				Text {
-					text: "HostTest"
+					text: "JQMLHost"
 					color: "#ffffff"
 					font.pixelSize: 30
 					font.bold: true
@@ -41,7 +41,7 @@ Window {
 					wrapMode: Text.WordWrap
 					color: "#d4d4d4"
 					font.pixelSize: 16
-					text: "This window is shown because HostTest was started without a QML file argument."
+					text: "This window is shown because JQMLHost was started without a QML file argument."
 				}
 
 				Text {
@@ -49,7 +49,7 @@ Window {
 					wrapMode: Text.WordWrap
 					color: "#d4d4d4"
 					font.pixelSize: 16
-					text: "Why it does not close automatically: in this mode HostTest displays information and keeps the Qt event loop running until you close the window manually."
+					text: "Why it does not close automatically: in this mode JQMLHost displays information and keeps the Qt event loop running until you close the window manually."
 				}
 
 				Text {
@@ -57,7 +57,7 @@ Window {
 					wrapMode: Text.WordWrap
 					color: "#d4d4d4"
 					font.pixelSize: 16
-					text: "What this application is for: HostTest is a desktop QML host for running arbitrary QML files (including tests) with ImtCore initialisation and registered QML/C++ types."
+					text: "What this application is for: JQMLHost is a desktop QML host for running arbitrary QML files (including tests) with ImtCore initialisation and registered QML/C++ types."
 				}
 
 				Rectangle {
@@ -71,7 +71,7 @@ Window {
 					wrapMode: Text.WordWrap
 					color: "#9cdcfe"
 					font.pixelSize: 15
-					text: "CLI examples:\n  HostTest.exe --qml-file <path-to-qml>\n  HostTest.exe <path-to-qml>\n  HostTest.exe -I <import-path> <path-to-qml>"
+					text: "CLI examples:\n  JQMLHost.exe --qml-file <path-to-qml>\n  JQMLHost.exe <path-to-qml>\n  JQMLHost.exe -I <import-path> <path-to-qml>"
 				}
 			}
 		}

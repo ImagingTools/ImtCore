@@ -1,4 +1,4 @@
-project(HostTest LANGUAGES CXX)
+project(JQMLHost LANGUAGES CXX)
 
 if(APPLE)
 	set(CMAKE_MACOSX_BUNDLE "off")

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 //
-// HostTest — minimal QML host application for exploring ImtCore components.
+// JQMLHost — minimal QML host application for exploring ImtCore components.
 //
 // Initialises all SDL-generated QML modules and all QML libraries from
 // ImtCore/Qml, registers C++ types for com.imtcore.imtqml 1.0, adds
@@ -39,10 +39,10 @@
 int main(int argc, char *argv[])
 {
 	// Register the application's own QML resource (Main.qml)
-	Q_INIT_RESOURCE(hosttest);
+	Q_INIT_RESOURCE(jqmlhost);
 
 	QApplication app(argc, argv);
-	app.setApplicationName("HostTest");
+	app.setApplicationName("JQMLHost");
 	app.setOrganizationName("ImagingTools");
 
 	// Initialise all ImtCore resources, style, theme, core SDL modules and
@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
 	QQmlApplicationEngine engine;
 
 	QCommandLineParser parser;
-	parser.setApplicationDescription("HostTest - QML host for running passed QML files");
+	parser.setApplicationDescription("JQMLHost - QML host for running passed QML files");
 	parser.addHelpOption();
 
 	QCommandLineOption qmlOption(QStringList() << "f" << "qml-file", "Path to QML file", "qmlFile");

@@ -139,14 +139,14 @@ function failAndExit(message) {
 }
 
 function resolveDesktopHostExecutable() {
-    const executableName = process.platform === 'win32' ? 'HostTest.exe' : 'HostTest'
+    const executableName = process.platform === 'win32' ? 'JQMLHost.exe' : 'JQMLHost'
     
     const candidates = []
     
     // Относительные пути от корня workspace (JQML v3)
     const workspaceRoot = path.resolve(__dirname, '..')
     candidates.push(
-        path.resolve(workspaceRoot, 'HostTest', executableName),
+        path.resolve(workspaceRoot, 'JQMLHost', executableName),
         path.resolve(workspaceRoot, 'bin', executableName),
         path.resolve(workspaceRoot, 'build', executableName)
     )
@@ -175,7 +175,7 @@ function resolveDesktopHostExecutable() {
 function setupDesktopHostRunner() {
     const hostExePath = resolveDesktopHostExecutable()
     if (!hostExePath) {
-        throw new Error(`HostTest executable not found`)
+        throw new Error(`JQMLHost executable not found`)
     }
 
     process.env.IMT_DESKTOP_RUNNER = hostExePath
@@ -435,7 +435,7 @@ function getDesktopRunnerSpec(filePath, qmlImportPaths) {
     const customRunner = process.env.IMT_DESKTOP_RUNNER || resolveDesktopHostExecutable()
 
     if (!customRunner) {
-        throw new Error('HostTest executable not found and IMT_DESKTOP_RUNNER not set')
+        throw new Error('JQMLHost executable not found and IMT_DESKTOP_RUNNER not set')
     }
 
     const pathSeparator = process.platform === 'win32' ? ';' : ':'
