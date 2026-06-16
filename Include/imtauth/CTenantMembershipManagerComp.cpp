@@ -228,7 +228,7 @@ bool CTenantMembershipManagerComp::RemoveMembership(const QByteArray& membership
 		}
 	}
 
-	if (!CleanupTenantAssignedUserData(userId, tenantId)){
+	if (!CleanupTenantAssignedUserData(userId, tenantId)) {
 		SendWarningMessage(0, QString("Failed to fully clean up tenant-assigned user data for user '%1' in tenant '%2'")
 			.arg(QString::fromUtf8(userId), QString::fromUtf8(tenantId)), "CTenantMembershipManagerComp");
 	}
@@ -318,17 +318,17 @@ bool CTenantMembershipManagerComp::HasMinimumRole(const QByteArray& userId, cons
 
 bool CTenantMembershipManagerComp::CleanupTenantAssignedUserData(const QByteArray& userId, const QByteArray& tenantId)
 {
-	if (!m_bindingManagerCompPtr.IsValid() || !m_userCollectionCompPtr.IsValid() || userId.isEmpty() || tenantId.isEmpty()){
+	if (!m_bindingManagerCompPtr.IsValid() || !m_userCollectionCompPtr.IsValid() || userId.isEmpty() || tenantId.isEmpty()) {
 		return true;
 	}
 
 	imtbase::IObjectCollection::DataPtr userDataPtr;
-	if (!m_userCollectionCompPtr->GetObjectData(userId, userDataPtr)){
+	if (!m_userCollectionCompPtr->GetObjectData(userId, userDataPtr)) {
 		return false;
 	}
 
 	imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(userDataPtr.GetPtr());
-	if (userInfoPtr == nullptr){
+	if (userInfoPtr == nullptr) {
 		return false;
 	}
 
@@ -339,28 +339,28 @@ bool CTenantMembershipManagerComp::CleanupTenantAssignedUserData(const QByteArra
 
 	tenantRoleIds.removeAll("");
 	tenantGroupIds.removeAll("");
-	if (tenantRoleIds.isEmpty() && tenantGroupIds.isEmpty()){
+	if (tenantRoleIds.isEmpty() && tenantGroupIds.isEmpty()) {
 		return true;
 	}
 
 	bool hasChanges = false;
 
-	for (const QByteArray& groupId : tenantGroupIds){
-		if (userInfoPtr->RemoveFromGroup(groupId)){
+	for (const QByteArray& groupId : tenantGroupIds) {
+		if (userInfoPtr->RemoveFromGroup(groupId)) {
 			hasChanges = true;
 		}
 	}
 
 	QByteArrayList productIds = userInfoPtr->GetProducts();
-	for (const QByteArray& productId : productIds){
-		for (const QByteArray& roleId : tenantRoleIds){
-			if (userInfoPtr->RemoveRole(productId, roleId)){
+	for (const QByteArray& productId : productIds) {
+		for (const QByteArray& roleId : tenantRoleIds) {
+			if (userInfoPtr->RemoveRole(productId, roleId)) {
 				hasChanges = true;
 			}
 		}
 	}
 
-	if (!hasChanges){
+	if (!hasChanges) {
 		return true;
 	}
 
