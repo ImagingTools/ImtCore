@@ -615,7 +615,7 @@ Rectangle {
 				
 				ctx.lineWidth = 1;
 				let fontStr_main = String(canvas.fontSize) + "px " + Style.fontFamily
-				ctx.font = fontStr_main; //"20px sans-serif";
+				ctx.font = fontStr_main;
 				let textStr_main = mainText
 				let textWidth_main = ctx.measureText(mainText).width
 				
