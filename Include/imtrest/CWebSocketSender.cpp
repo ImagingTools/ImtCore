@@ -22,9 +22,15 @@ CWebSocketSender::CWebSocketSender(QWebSocket* webSocketPtr): m_webSocketPtr(web
 }
 
 
-const QWebSocket* CWebSocketSender::GetSocket() const
+QPointer<QWebSocket> CWebSocketSender::GetSocket() const
 {
 	return m_webSocketPtr;
+}
+
+
+bool CWebSocketSender::IsSocketValid() const
+{
+	return !m_webSocketPtr.isNull() && m_webSocketPtr->isValid();
 }
 
 // reimplemented (IRequest)
@@ -39,11 +45,7 @@ bool CWebSocketSender::SendResponse(ConstResponsePtr& response) const
 		return false;
 	}
 
-	if (m_webSocketPtr != nullptr){
-		if (!m_webSocketPtr->isValid()){
-			return false;
-		}
-
+	if (IsSocketValid()){
 		const QByteArray& contentData = response->GetData();
 
 		emit SendTextMessage(contentData);
@@ -57,11 +59,7 @@ bool CWebSocketSender::SendResponse(ConstResponsePtr& response) const
 
 bool CWebSocketSender::SendRequest(ConstRequestPtr& request) const
 {
-	if (m_webSocketPtr != nullptr){
-		if (!m_webSocketPtr->isValid()){
-			return false;
-		}
-
+	if (IsSocketValid()){
 		const QByteArray& contentData = request->GetBody();
 
 		emit SendTextMessage(contentData);
@@ -76,16 +74,10 @@ bool CWebSocketSender::SendRequest(ConstRequestPtr& request) const
 
 void CWebSocketSender::OnSendTextMessage(const QByteArray& data) const
 {
-	if (m_webSocketPtr != nullptr){
-		if (!m_webSocketPtr->isValid()){
-			return;
-		}
-
+	if (IsSocketValid()){
 		m_webSocketPtr->sendTextMessage(data);
 	}
 }
 
 
 } // namespace imtrest
-
-
