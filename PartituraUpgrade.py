@@ -10,7 +10,7 @@ from datetime import datetime
 # Diagnostics
 # ============================================================
 
-DEBUG = True
+DEBUG = False
 
 def debug(msg):
     if DEBUG:
