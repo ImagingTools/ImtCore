@@ -9,8 +9,7 @@ QtObject {
 	property string color: "transparent";
 	property int fontSize: 10;
 	property bool bold: false;
-	property string fontFamily: "sans-serif";
+	property string fontFamily: Style.fontFamily;
 	property int lineWidth: 1;
 
 }
-

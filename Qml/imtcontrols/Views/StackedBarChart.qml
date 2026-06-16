@@ -135,7 +135,7 @@ Item{
 			ctx.lineTo(availableWidth - 10, baseY)
 			ctx.stroke()
 
-			ctx.font =  Style.fontSizeXS + "px sans-serif"
+			ctx.font =  Style.fontSizeXS + "px " + Style.fontFamily
 			ctx.fillStyle = chart.textColor
 			ctx.textAlign = "right"
 			ctx.textBaseline = "middle"
@@ -181,7 +181,7 @@ Item{
 
 					if (chart.showValues && seg.value > 0){
 						ctx.fillStyle = chart.textColor
-						ctx.font = Style.fontSizeXS + "px sans-serif"
+						ctx.font = Style.fontSizeXS + "px " + Style.fontFamily
 						ctx.textAlign = "center"
 						ctx.textBaseline = "middle"
 						ctx.fillText(seg.value, x + barWidth / 2, y + segHeight / 2)
@@ -189,7 +189,7 @@ Item{
 				}
 
 				ctx.fillStyle = chart.textColor
-				ctx.font = Style.fontSizeXS + "px sans-serif"
+				ctx.font = Style.fontSizeXS + "px " + Style.fontFamily
 				ctx.textAlign = "center"
 				ctx.textBaseline = "top"
 				ctx.fillText(bar.label, x + barWidth / 2, baseY + 6)
@@ -200,12 +200,12 @@ Item{
 			ctx.rotate(-Math.PI / 2)
 			ctx.textAlign = "center"
 			ctx.textBaseline = "middle"
-			ctx.font = (Style.fontSizeXS + 2) + "px sans-serif"
+			ctx.font = (Style.fontSizeXS + 2) + "px " + Style.fontFamily
 			ctx.fillStyle = chart.textColor
 			ctx.fillText(chart.yLabel, 0, -3)
 			ctx.restore()
 
-			ctx.font = (Style.fontSizeXS + 2) + "px sans-serif"
+			ctx.font = (Style.fontSizeXS + 2) + "px " + Style.fontFamily
 			ctx.textAlign = "center"
 			ctx.textBaseline = "top"
 			ctx.fillStyle = chart.textColor
