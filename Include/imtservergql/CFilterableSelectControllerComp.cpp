@@ -3,11 +3,12 @@
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/FilterableSelect.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtBaseTypes.h>
 
-// Qt includes
-#include <QtCore/QJsonObject.h>
 
 // STL includes
 #include <cmath>
+
+// Qt includes
+#include <QtCore/QJsonObject>
 
 // ACF includes
 #include <istd/TDelPtr.h>
