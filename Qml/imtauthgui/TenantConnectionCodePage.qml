@@ -100,15 +100,16 @@ ViewBase {
 				spacing: Style.marginL
 
 				TextInput {
+					anchors.verticalCenter: parent.verticalCenter
+					width: contentWidth
+					height: contentHeight
 					text: connectionCodePage.connectionCode ? connectionCodePage.connectionCode : qsTr("Loading...")
 					font.pixelSize: Style.fontSizeXXL
 					font.bold: true
 					color: Style.titleColor
-					anchors.verticalCenter: parent.verticalCenter
-					width: contentWidth
 					readOnly: true
 					selectByMouse: true
-					selectionColor: Style.selectionColor
+					selectionColor: Style.selectedColor
 				}
 
 				ToolButton {

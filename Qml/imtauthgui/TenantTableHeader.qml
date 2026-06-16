@@ -46,7 +46,6 @@ Item {
 			tristate: true
 			height: Style.itemSizeS
 			width: Style.itemSizeS
-			isActive: false
 		}
 
 		BaseText {
