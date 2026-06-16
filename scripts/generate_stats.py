@@ -841,7 +841,7 @@ class RepositoryStats:
         # This is a simplified version - full duplication detection is complex
         # We'll look for significant duplicate blocks
         try:
-            from hashlib import md5
+            from hashlib import sha256
             
             line_hashes = defaultdict(list)
             total_code_lines = 0
@@ -867,7 +867,7 @@ class RepositoryStats:
                             if len(block) > MIN_BLOCK_LENGTH_FOR_DUPLICATION and not all(c in ' \t\n{}();' for c in block):
                                 # Normalize whitespace for comparison
                                 normalized = ' '.join(block.split())
-                                block_hash = md5(normalized.encode()).hexdigest()
+                                block_hash = sha256(normalized.encode()).hexdigest()
                                 line_hashes[block_hash].append({
                                     'file': file_path,
                                     'line': i + 1
