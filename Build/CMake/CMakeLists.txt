@@ -390,6 +390,14 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 			add_dependencies(Imt3dDemo imt3dgui imt3dview imt3d)
 		endif()
 
+		if(NOT DEFINED USE_JQML_HOST OR USE_JQML_HOST)
+			add_subdirectory("${IMPL_DIR}/JQMLHost/CMake" "${AUX_INCLUDE_DIR}/JQMLHost")
+			add_dependencies(JQMLHost
+				imtbasesdl imtappsdl imtauthsdl imtlicsdl imtcolorsdl imt2dsdl imtchatsdl imtdesksdl imtpaysdl
+				imtcontrolsqml imtstylecontrolsqml imtguiqml imtguigqlqml imtcolguiqml imtdocguiqml imtauthguiqml imtlicguiqml imtchatguiqml imtdeskguiqml
+				imtqml imtgui imtguigql imtauth imtauthgui imtstyle imtbase)
+		endif()
+
 		if(NOT DEFINED USE_QTQML OR USE_QTQML)
 			if(NOT DEFINED USE_QTDB OR USE_QTDB)
 				add_subdirectory("${IMPL_DIR}/ImtQmlPck/CMake" "${AUX_INCLUDE_DIR}/ImtQmlPck")
