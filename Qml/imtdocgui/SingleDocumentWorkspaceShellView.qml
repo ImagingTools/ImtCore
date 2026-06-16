@@ -193,6 +193,18 @@ Item {
 			}
 			_internal.documentId = documentId
 			_internal.requestInFlight = false
+			if (!workspaceView.documentNameInputEnabled
+					&& typeof workspaceView.documentNameResolver === "function"
+					&& workspaceView.documentManager
+					&& !workspaceView.documentManager.hasDocumentNameProvider(typeId)){
+				workspaceView.documentManager.setDocumentSaveNameResolver(documentId, function(id){
+					let name = workspaceView.documentNameResolver(id)
+					if (!name){
+						name = workspaceView.documentManager.getDefaultDocumentName()
+					}
+					return name
+				})
+			}
 			// remain in "loading" until documentReady (data loaded + view bound)
 		}
 
@@ -205,6 +217,18 @@ Item {
 			}
 			_internal.documentId = documentId
 			_internal.requestInFlight = false
+			if (!workspaceView.documentNameInputEnabled
+					&& typeof workspaceView.documentNameResolver === "function"
+					&& workspaceView.documentManager
+					&& !workspaceView.documentManager.hasDocumentNameProvider(typeId)){
+				workspaceView.documentManager.setDocumentSaveNameResolver(documentId, function(id){
+					let name = workspaceView.documentNameResolver(id)
+					if (!name){
+						name = workspaceView.documentManager.getDefaultDocumentName()
+					}
+					return name
+				})
+			}
 		}
 
 		function onDocumentAlreadyOpened(documentId, typeId){
@@ -242,9 +266,38 @@ Item {
 			workspaceView.documentReady(documentId)
 		}
 
+		function onDocumentSaved(documentId){
+			if (documentId !== _internal.documentId){
+				return
+			}
+			if (workspaceView.documentNameInputEnabled){
+				return
+			}
+			if (workspaceView.documentManager
+					&& workspaceView.documentManager.hasDocumentNameProvider(workspaceView.objectTypeId)){
+				return
+			}
+
+			let resolvedName = ""
+			if (typeof workspaceView.documentNameResolver === "function"){
+				resolvedName = workspaceView.documentNameResolver(documentId)
+			}
+			if (!resolvedName){
+				resolvedName = workspaceView.documentManager.getDefaultDocumentName()
+			}
+
+			let currentName = workspaceView.documentManager.getDocumentName(documentId)
+			if (resolvedName && currentName !== resolvedName){
+				workspaceView.documentManager.setDocumentName(documentId, resolvedName)
+			}
+		}
+
 		function onDocumentClosed(documentId){
 			if (documentId !== _internal.documentId){
 				return
+			}
+			if (workspaceView.documentManager){
+				workspaceView.documentManager.clearDocumentSaveNameResolver(documentId)
 			}
 			let closedId = _internal.documentId
 			_internal.documentId = ""
@@ -294,9 +347,9 @@ Item {
 				return
 			}
 			if (!workspaceView.documentNameInputEnabled){
-				// Name input is disabled for this workspace — fulfil the
-				// request with a default name so the save flow proceeds
-				// without prompting the user.
+				// Name input is disabled for this workspace. Resolve a name and
+				// continue the pending save directly without mutating the
+				// document name upfront via setDocumentName().
 				let resolvedName = ""
 				if (typeof workspaceView.documentNameResolver === "function"){
 					resolvedName = workspaceView.documentNameResolver(documentId)
@@ -304,7 +357,7 @@ Item {
 				if (!resolvedName){
 					resolvedName = workspaceView.documentManager.getDefaultDocumentName()
 				}
-				workspaceView.documentManager.setDocumentName(documentId, resolvedName)
+				workspaceView.documentManager.saveDocument(documentId, resolvedName)
 				return
 			}
 			ModalDialogManager.openDialog(inputDialogComp, {documentId: documentId})

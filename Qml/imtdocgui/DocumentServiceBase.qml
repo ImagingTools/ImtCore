@@ -106,6 +106,42 @@ QtObject {
 		console.warn("saveDocument() should be implemented in a subclass")
 	}
 
+	function setDocumentSaveNameResolver(documentId, resolver){
+		if (!documentId){
+			return
+		}
+		if (typeof resolver === "function"){
+			__internal.documentSaveNameResolvers[documentId] = resolver
+		}
+		else{
+			delete __internal.documentSaveNameResolvers[documentId]
+		}
+	}
+
+	function clearDocumentSaveNameResolver(documentId){
+		if (!documentId){
+			return
+		}
+		delete __internal.documentSaveNameResolvers[documentId]
+	}
+
+	function resolveDocumentNameForSave(documentId, fallbackName){
+		let resolvedName = fallbackName || ""
+		if (!documentId){
+			return resolvedName
+		}
+
+		let resolver = __internal.documentSaveNameResolvers[documentId]
+		if (typeof resolver === "function"){
+			let dynamicName = resolver(documentId)
+			if (dynamicName){
+				resolvedName = dynamicName
+			}
+		}
+
+		return resolvedName
+	}
+
 	function closeDocument(documentId){
 		console.warn("closeDocument() should be implemented in a subclass")
 	}
@@ -482,6 +518,7 @@ QtObject {
 		property var documentTypeEditors: ({}) // DocumentTypeId -> [{View Type 1}, {View Type 2}]
 		property var openedDocuments: [] // Array of objects {id, name, model, view, isDirty}
 		property var cachedDocumentNames: ({}) // DocumentId -> Name
+		property var documentSaveNameResolvers: ({}) // DocumentId -> function(documentId): string
 		property var pendingDataLoaded: ({}) // DocumentId -> true for early DocumentDataLoaded notifications
 		property var autoNamedTypeIds: ({}) // TypeId -> true for types with automatic name providers
 		property var documentManagerActiveView: null
@@ -566,6 +603,7 @@ QtObject {
 
 			delete pendingDataLoaded[documentId]
 			delete readyEmitted[documentId]
+			delete documentSaveNameResolvers[documentId]
 			openedDocuments.splice(index, 1)
 		}
 

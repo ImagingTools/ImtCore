@@ -59,6 +59,8 @@ TenantSimpleCollectionPage {
 		}
 
 		var invitations = membersPage.stateManager ? membersPage.stateManager.pendingInvitations : []
+		var members = membersPage.stateManager ? membersPage.stateManager.pendingMembers : []
+
 		for (var j = 0; j < invitations.length; j++) {
 			var invName = invitations[j].userName || invitations[j].name || invitations[j].id || ""
 			if (!matches(invName))
@@ -67,12 +69,12 @@ TenantSimpleCollectionPage {
 				id: "inv_" + invitations[j].id,
 				title: invName,
 				description: qsTr("Invited"),
+				totalCount: invitations.length + members.length,
 				kind: "invitation",
 				sourceData: invitations[j]
 			})
 		}
 
-		var members = membersPage.stateManager ? membersPage.stateManager.pendingMembers : []
 		for (var i = 0; i < members.length; i++) {
 			var memName = members[i].name || members[i].id || ""
 			if (!matches(memName))
@@ -81,6 +83,7 @@ TenantSimpleCollectionPage {
 				id: members[i].id,
 				title: memName,
 				description: members[i].role || "Member",
+				totalCount: invitations.length + members.length,
 				kind: "member",
 				sourceData: members[i]
 			})
