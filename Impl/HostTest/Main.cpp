@@ -16,6 +16,9 @@
 #include <QtQml/qqml.h>
 #include <QtCore/QUrl>
 #include <QtCore/QString>
+#include <QtCore/QCommandLineParser>
+#include <QtCore/QCommandLineOption>
+#include <QtCore/QFileInfo>
 
 // C++ types registered under com.imtcore.imtqml 1.0
 #include <imtbase/CTreeItemModel.h>
@@ -93,12 +96,60 @@ int main(int argc, char *argv[])
 
 	QQmlApplicationEngine engine;
 
+	QCommandLineParser parser;
+	parser.setApplicationDescription("HostTest - QML host for running passed QML files");
+	parser.addHelpOption();
+
+	QCommandLineOption qmlOption(QStringList() << "f" << "qml-file", "Path to QML file", "qmlFile");
+	parser.addOption(qmlOption);
+
+	QCommandLineOption importPathOption(QStringList() << "I" << "import-path", "Extra QML import path", "path");
+	parser.addOption(importPathOption);
+
+	parser.addPositionalArgument("qmlFile", "Path to QML file (same as --qml-file)");
+	parser.process(app);
+
 	// All QML modules (ImtCore/Qml and SDL-generated) embed their files
 	// under the "/qml" resource prefix — registering it as an import path
 	// makes every module importable by name inside QML files.
 	engine.addImportPath(QStringLiteral("qrc:/qml"));
 
-	engine.load(QUrl(QStringLiteral("qrc:/Main.qml")));
+	for (const QString& importPath : parser.values(importPathOption)) {
+		engine.addImportPath(importPath);
+	}
+
+	QString qmlPath = parser.value(qmlOption).trimmed();
+	if (qmlPath.isEmpty()) {
+		const QStringList positional = parser.positionalArguments();
+		if (!positional.isEmpty()) {
+			qmlPath = positional.first().trimmed();
+		}
+	}
+
+	QUrl url(QStringLiteral("qrc:/Main.qml"));
+	if (!qmlPath.isEmpty()) {
+		const QFileInfo qmlFileInfo(qmlPath);
+		if (!qmlFileInfo.exists()) {
+			qCritical() << "QML file not found:" << qmlPath;
+			return -2;
+		}
+
+		url = QUrl::fromLocalFile(qmlFileInfo.absoluteFilePath());
+		engine.addImportPath(qmlFileInfo.absolutePath());
+	}
+
+	QObject::connect(
+		&engine,
+		&QQmlApplicationEngine::objectCreated,
+		&app,
+		[url](QObject* object, const QUrl& objectUrl) {
+			if (!object && objectUrl == url) {
+				QCoreApplication::exit(-1);
+			}
+		},
+		Qt::QueuedConnection);
+
+	engine.load(url);
 
 	if (engine.rootObjects().isEmpty())
 		return -1;
