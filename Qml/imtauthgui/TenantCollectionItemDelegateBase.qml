@@ -29,6 +29,7 @@ Rectangle {
 
 	readonly property bool isSelected: selectionManager ? selectionManager.isSelected(itemId) : false
 	readonly property bool isHovered: itemMouseArea.containsMouse
+	readonly property int checkBoxSize: Style.itemSizeS + Style.marginXS
 
 	default property alias contentChildren: contentColumn.data
 
@@ -44,10 +45,6 @@ Rectangle {
 		anchors.fill: parent
 		hoverEnabled: true
 		cursorShape: Qt.PointingHandCursor
-		onClicked: {
-			if (delegateRoot.selectionManager)
-				delegateRoot.selectionManager.toggleSelect(delegateRoot.itemId)
-		}
 		onDoubleClicked: {
 			if (delegateRoot.collectionPage)
 				delegateRoot.collectionPage.__openEdit(delegateRoot.itemId, delegateRoot.itemTitle, delegateRoot.itemDescription)
@@ -66,16 +63,25 @@ Rectangle {
 		CheckBox {
 			id: delegateCheckBox
 			anchors.verticalCenter: parent.verticalCenter
-			height: Style.itemSizeS
-			width: Style.itemSizeS
+			height: delegateRoot.checkBoxSize
+			width: delegateRoot.checkBoxSize
 			checkState: delegateRoot.isSelected ? Qt.Checked : Qt.Unchecked
+		}
+
+		MouseArea {
+			anchors.fill: delegateCheckBox
+			cursorShape: Qt.PointingHandCursor
+			onClicked: {
+				if (delegateRoot.selectionManager)
+					delegateRoot.selectionManager.toggleSelect(delegateRoot.itemId)
+			}
 		}
 
 		Column {
 			id: contentColumn
 			anchors.verticalCenter: parent.verticalCenter
 			spacing: Style.marginXS
-			width: parent.width - Style.itemSizeS - parent.spacing
+			width: parent.width - delegateRoot.checkBoxSize - parent.spacing
 		}
 	}
 

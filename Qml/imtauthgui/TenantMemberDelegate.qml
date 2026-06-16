@@ -63,6 +63,7 @@ Rectangle {
 
 	readonly property string selectionId: row.isMember ? (row.memberData.id || "") : ("inv_" + (row.memberData.id || ""))
 	readonly property bool isSelected: row.selectionManager ? row.selectionManager.isSelected(row.selectionId) : false
+	readonly property int checkBoxSize: Style.itemSizeS + Style.marginXS
 
 	height: contentRow.implicitHeight + Style.marginL * 2
 	radius: 0
@@ -91,16 +92,20 @@ Rectangle {
 
 		// ----- CheckBox -----
 		CheckBox {
+			id: selectionCheckBox
 			visible: row.showCheckBox
 			anchors.verticalCenter: parent.verticalCenter
-			height: Style.itemSizeS
-			width: visible ? Style.itemSizeS : 0
+			height: row.checkBoxSize
+			width: visible ? row.checkBoxSize : 0
 			checkState: row.isSelected ? Qt.Checked : Qt.Unchecked
-			onCheckStateChanged: {
-				if (!row.selectionManager) return
-				var shouldBeSelected = (checkState === Qt.Checked)
-				var currentlySelected = row.selectionManager.isSelected(row.selectionId)
-				if (shouldBeSelected !== currentlySelected)
+		}
+
+		MouseArea {
+			visible: row.showCheckBox
+			anchors.fill: selectionCheckBox
+			cursorShape: Qt.PointingHandCursor
+			onClicked: {
+				if (row.selectionManager)
 					row.selectionManager.toggleSelect(row.selectionId)
 			}
 		}
@@ -156,7 +161,7 @@ Rectangle {
 			anchors.verticalCenter: parent.verticalCenter
 			spacing: 2
 			width: parent.width
-				- (row.showCheckBox ? Style.itemSizeS + parent.spacing : 0)
+				- (row.showCheckBox ? row.checkBoxSize + parent.spacing : 0)
 				- avatar.width
 				- badgesItem.width
 				- actionsItem.width

@@ -21,6 +21,7 @@ Item {
 	property int selectedCount: 0
 	property int totalCount: 0
 	property int checkState: Qt.Unchecked
+	readonly property int checkBoxSize: Style.itemSizeS + Style.marginXS
 
 	signal selectAllToggled()
 
@@ -44,8 +45,8 @@ Item {
 			anchors.verticalCenter: parent.verticalCenter
 			checkState: tableHeader.checkState
 			tristate: true
-			height: Style.itemSizeS
-			width: Style.itemSizeS
+			height: tableHeader.checkBoxSize
+			width: tableHeader.checkBoxSize
 		}
 
 		BaseText {

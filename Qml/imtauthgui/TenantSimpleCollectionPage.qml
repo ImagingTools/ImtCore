@@ -386,9 +386,11 @@ ViewBase {
 						} else {
 							var allIds = []
 							var items = listViewItem.effectiveModel
-							for (var i = 0; i < items.length; i++) {
-								if (items[i] && items[i].id)
-									allIds.push(items[i].id)
+							var itemCount = itemListView.count
+							for (var i = 0; i < itemCount; i++) {
+								var item = items && items.get ? items.get(i) : items[i]
+								if (item && item.id)
+									allIds.push(item.id)
 							}
 							selectionManager_.selectMultiple(allIds)
 						}
