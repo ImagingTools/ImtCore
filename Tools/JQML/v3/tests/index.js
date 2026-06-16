@@ -133,61 +133,37 @@ function runCommandSync(command, args, cwd) {
     }
 }
 
-function runCmakeWithOptionalVsDev(cmakeArgs, cwd, vsDevCmdPath) {
-    if (!vsDevCmdPath) {
-        return runCommandSync('cmake', cmakeArgs, cwd)
-    }
-
-    const devEnvResult = runCommandSync(
-        vsDevCmdPath,
-        ['-no_logo', '-arch=x64', '-host_arch=x64'],
-        cwd
-    )
-    if (!devEnvResult.ok) return devEnvResult
-
-    return runCommandSync('cmake', cmakeArgs, cwd)
-}
-
-function resolveVsDevCmdPath() {
-    if (process.platform !== 'win32') return ''
-
-    const fromEnv = (process.env.VSDEVCMD || '').trim()
-    if (fromEnv && fs.existsSync(fromEnv)) return fromEnv
-
-    const programFilesX86 = process.env['ProgramFiles(x86)'] || 'C:\\Program Files (x86)'
-    const candidates = [
-        path.resolve(programFilesX86, 'Microsoft Visual Studio', '18', 'BuildTools', 'Common7', 'Tools', 'VsDevCmd.bat'),
-        path.resolve(programFilesX86, 'Microsoft Visual Studio', '18', 'Community', 'Common7', 'Tools', 'VsDevCmd.bat'),
-        path.resolve(programFilesX86, 'Microsoft Visual Studio', '18', 'Professional', 'Common7', 'Tools', 'VsDevCmd.bat'),
-        path.resolve(programFilesX86, 'Microsoft Visual Studio', '18', 'Enterprise', 'Common7', 'Tools', 'VsDevCmd.bat'),
-        path.resolve(programFilesX86, 'Microsoft Visual Studio', '2022', 'BuildTools', 'Common7', 'Tools', 'VsDevCmd.bat'),
-        path.resolve(programFilesX86, 'Microsoft Visual Studio', '2022', 'Community', 'Common7', 'Tools', 'VsDevCmd.bat'),
-        path.resolve(programFilesX86, 'Microsoft Visual Studio', '2022', 'Professional', 'Common7', 'Tools', 'VsDevCmd.bat'),
-        path.resolve(programFilesX86, 'Microsoft Visual Studio', '2022', 'Enterprise', 'Common7', 'Tools', 'VsDevCmd.bat'),
-        path.resolve(programFilesX86, 'Microsoft Visual Studio', '2019', 'BuildTools', 'Common7', 'Tools', 'VsDevCmd.bat'),
-        path.resolve(programFilesX86, 'Microsoft Visual Studio', '2019', 'Community', 'Common7', 'Tools', 'VsDevCmd.bat'),
-        path.resolve(programFilesX86, 'Microsoft Visual Studio', '2019', 'Professional', 'Common7', 'Tools', 'VsDevCmd.bat'),
-        path.resolve(programFilesX86, 'Microsoft Visual Studio', '2019', 'Enterprise', 'Common7', 'Tools', 'VsDevCmd.bat'),
-    ]
-
-    for (const p of candidates) {
-        if (fs.existsSync(p)) return p
-    }
-
-    return ''
-}
-
 function failAndExit(message) {
     console.error(`${colors.red}[Error] ${message}${colors.reset}`)
     process.exitCode = 1
 }
 
-function resolveDesktopHostExecutable(buildDir, configName) {
-    const executableName = process.platform === 'win32' ? 'JqmlDesktopHost.exe' : 'JqmlDesktopHost'
-    const candidates = [
-        path.resolve(buildDir, executableName),
-        path.resolve(buildDir, configName, executableName),
-    ]
+function resolveDesktopHostExecutable() {
+    const executableName = process.platform === 'win32' ? 'JQMLHost.exe' : 'JQMLHost'
+    
+    const candidates = []
+    
+    // Относительные пути от корня workspace (JQML v3)
+    const workspaceRoot = path.resolve(__dirname, '..')
+    candidates.push(
+        path.resolve(workspaceRoot, 'JQMLHost', executableName),
+        path.resolve(workspaceRoot, 'bin', executableName),
+        path.resolve(workspaceRoot, 'build', executableName)
+    )
+
+    // Пути в ImtCore (корень находится на 3 уровня выше текущего скрипта)
+    const imtCoreDir = path.resolve(__dirname, '../../../..')
+    const targetName = (process.env.TARGETNAME || '').trim()
+    candidates.push(
+        path.resolve(imtCoreDir, 'Bin', `Debug_${targetName}`, executableName),
+        path.resolve(imtCoreDir, 'Bin', `Release_${targetName}`, executableName),
+        path.resolve(imtCoreDir, 'Bin', `RelWithDebInfo_${targetName}`, executableName),
+        // Fallback if TARGETNAME not set - try common patterns
+        path.resolve(imtCoreDir, 'Bin', 'Debug_Qt6_VC17_x64', executableName),
+        path.resolve(imtCoreDir, 'Bin', 'Release_Qt6_VC17_x64', executableName),
+        path.resolve(imtCoreDir, 'Bin', 'Debug', executableName),
+        path.resolve(imtCoreDir, 'Bin', 'Release', executableName)
+    )
 
     for (const p of candidates) {
         if (fs.existsSync(p)) return p
@@ -197,107 +173,9 @@ function resolveDesktopHostExecutable(buildDir, configName) {
 }
 
 function setupDesktopHostRunner() {
-    if (process.env.IMT_DESKTOP_USE_HOST === '0') return
-
-    const hostDir = path.resolve(__dirname, '../desktop_host')
-    const hostCmakePath = path.resolve(hostDir, 'CMakeLists.txt')
-    if (!fs.existsSync(hostCmakePath)) return
-
-    const buildDir = (process.env.IMT_DESKTOP_HOST_BUILD_DIR || path.resolve(hostDir, 'build')).trim()
-    const configName = (process.env.IMT_DESKTOP_HOST_CONFIG || 'Debug').trim()
-    const shouldRebuild = process.env.IMT_DESKTOP_HOST_REBUILD !== '0'
-    const hostRequired = process.env.IMT_DESKTOP_HOST_REQUIRED !== '0'
-    const vsDevCmdPath = resolveVsDevCmdPath()
-    const cleanBuildDir = process.env.IMT_DESKTOP_HOST_CLEAN !== '0'
-
-    if (shouldRebuild) {
-        if (cleanBuildDir && fs.existsSync(buildDir)) {
-            try {
-                fs.rmSync(buildDir, { recursive: true, force: true })
-            } catch (e) {
-                // ignore, configure step will report a concrete error if this matters
-            }
-        }
-
-        const baseConfigureArgs = ['-S', hostDir, '-B', buildDir]
-        const configuredGenerator = (process.env.IMT_DESKTOP_HOST_GENERATOR || '').trim()
-        const envGenerator = (process.env.CMAKE_GENERATOR || '').trim()
-
-        let generatorCandidates = []
-        if (configuredGenerator) {
-            generatorCandidates = [configuredGenerator]
-        } else if (envGenerator) {
-            generatorCandidates = [envGenerator]
-        } else if (process.platform === 'win32') {
-            generatorCandidates = [
-                ...(vsDevCmdPath ? ['NMake Makefiles'] : []),
-                'Ninja',
-                'MinGW Makefiles',
-                'NMake Makefiles',
-                'Visual Studio 17 2022',
-                'Visual Studio 16 2019',
-            ]
-        } else {
-            generatorCandidates = ['Ninja', 'Unix Makefiles']
-        }
-
-        generatorCandidates = Array.from(new Set(generatorCandidates.filter(Boolean)))
-
-        if (process.env.IMTCOREDIR && process.env.IMTCOREDIR.trim()) {
-            baseConfigureArgs.push(`-DIMTCOREDIR=${process.env.IMTCOREDIR.trim()}`)
-        }
-
-        if (process.env.ACFDIR && process.env.ACFDIR.trim()) {
-            baseConfigureArgs.push(`-DACFDIR=${process.env.ACFDIR.trim()}`)
-        }
-
-        if (process.env.TARGETNAME && process.env.TARGETNAME.trim()) {
-            baseConfigureArgs.push(`-DTARGETNAME=${process.env.TARGETNAME.trim()}`)
-        }
-
-        let configureResult = null
-        let selectedGenerator = ''
-        const configureFailures = []
-
-        for (const generator of generatorCandidates) {
-            if (cleanBuildDir && fs.existsSync(buildDir)) {
-                try {
-                    fs.rmSync(buildDir, { recursive: true, force: true })
-                } catch (e) {
-                    // ignore
-                }
-            }
-
-            const configureArgs = [...baseConfigureArgs, '-G', generator]
-            const result = runCmakeWithOptionalVsDev(configureArgs, hostDir, generator === 'NMake Makefiles' ? vsDevCmdPath : '')
-
-            if (result.ok) {
-                configureResult = result
-                selectedGenerator = generator
-                break
-            }
-
-            configureFailures.push(`- ${generator}: ${result.output}`)
-        }
-
-        if (!configureResult) {
-            throw new Error(`desktop_host configure failed for all generators:\n${configureFailures.join('\n\n')}`)
-        }
-
-        const buildArgs = ['--build', buildDir, '--config', configName, '--target', 'JqmlDesktopHost']
-        const buildResult = runCmakeWithOptionalVsDev(buildArgs, hostDir, selectedGenerator === 'NMake Makefiles' ? vsDevCmdPath : '')
-        if (!buildResult.ok) {
-            throw new Error(`desktop_host build failed:\n${buildResult.output}`)
-        }
-    }
-
-    const hostExePath = resolveDesktopHostExecutable(buildDir, configName)
+    const hostExePath = resolveDesktopHostExecutable()
     if (!hostExePath) {
-        if (!hostRequired) {
-            console.log(`${colors.yellow}[i] desktop_host executable not found, fallback to qml runner${colors.reset}`)
-            return
-        }
-        throw new Error(`desktop_host executable not found in ${buildDir}`)
+        throw new Error(`JQMLHost executable not found`)
     }
 
     process.env.IMT_DESKTOP_RUNNER = hostExePath
@@ -307,10 +185,6 @@ function setupDesktopHostRunner() {
     }
 
     console.log(`${colors.gray}[Desktop host] ${hostExePath}${colors.reset}`)
-}
-
-function setupDesktopHostRunnerSafe() {
-    setupDesktopHostRunner()
 }
 
 function getQmlImportPathsFromConfig(testDirPath) {
@@ -558,19 +432,10 @@ function findMissingQmlModules(entryFilePath, qmlImportPaths) {
 }
 
 function getDesktopRunnerSpec(filePath, qmlImportPaths) {
-    const customRunner = (process.env.IMT_DESKTOP_RUNNER || '').trim()
+    const customRunner = process.env.IMT_DESKTOP_RUNNER || resolveDesktopHostExecutable()
 
     if (!customRunner) {
-        const importArgs = []
-        for (const importPath of qmlImportPaths) {
-            importArgs.push('-I', importPath)
-        }
-
-        return {
-            command: 'qml',
-            args: ['-platform', 'offscreen', ...importArgs, filePath],
-            skipPrecheck: false,
-        }
+        throw new Error('JQMLHost executable not found and IMT_DESKTOP_RUNNER not set')
     }
 
     const pathSeparator = process.platform === 'win32' ? ';' : ':'
@@ -743,7 +608,7 @@ function getTestsToRun(allEntries, selectedTestName) {
 
 async function runTests() {
     ensureDefaultTargetName()
-    setupDesktopHostRunnerSafe()
+    setupDesktopHostRunner()
 
     const tests = fs.readdirSync('./tests')
     const options = parseCliOptions()
