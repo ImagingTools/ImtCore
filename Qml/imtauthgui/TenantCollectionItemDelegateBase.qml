@@ -26,9 +26,20 @@ Rectangle {
 	property var selectionManager: null
 	property var collectionPage: null
 	property bool canManage: collectionPage ? collectionPage.__canManage : false
+	property bool showCheckBox: true
+	property bool enableDefaultDoubleClickEdit: true
+	property bool showDefaultActionsMenu: true
+	property Component customActionsComponent: null
+
+	signal itemDoubleClicked()
 
 	readonly property bool isSelected: selectionManager ? selectionManager.isSelected(itemId) : false
 	readonly property bool isHovered: itemMouseArea.containsMouse
+	readonly property int checkBoxSize: Style.itemSizeS + Style.marginXS
+
+	readonly property int index: model.index
+	readonly property int totalCount: modelData.totalCount
+	readonly property bool isLastItem: index === totalCount - 1
 
 	default property alias contentChildren: contentColumn.data
 
@@ -44,12 +55,9 @@ Rectangle {
 		anchors.fill: parent
 		hoverEnabled: true
 		cursorShape: Qt.PointingHandCursor
-		onClicked: {
-			if (delegateRoot.selectionManager)
-				delegateRoot.selectionManager.toggleSelect(delegateRoot.itemId)
-		}
 		onDoubleClicked: {
-			if (delegateRoot.collectionPage)
+			delegateRoot.itemDoubleClicked()
+			if (delegateRoot.enableDefaultDoubleClickEdit && delegateRoot.collectionPage)
 				delegateRoot.collectionPage.__openEdit(delegateRoot.itemId, delegateRoot.itemTitle, delegateRoot.itemDescription)
 		}
 	}
@@ -57,38 +65,70 @@ Rectangle {
 	Row {
 		id: contentRow
 		anchors.left: parent.left
-		anchors.right: moreButton.left
+		anchors.right: trailingActions.left
 		anchors.verticalCenter: parent.verticalCenter
-		anchors.leftMargin: Style.marginM
-		anchors.rightMargin: Style.marginM
-		spacing: Style.marginM
+		anchors.leftMargin: Style.marginL
+		anchors.rightMargin: Style.marginL
+		spacing: Style.marginL
 
 		CheckBox {
 			id: delegateCheckBox
+			visible: delegateRoot.showCheckBox
 			anchors.verticalCenter: parent.verticalCenter
-			height: Style.itemSizeS
-			width: Style.itemSizeS
+			height: delegateRoot.checkBoxSize
+			width: visible ? delegateRoot.checkBoxSize : 0
 			checkState: delegateRoot.isSelected ? Qt.Checked : Qt.Unchecked
+
+			MouseArea {
+				visible: delegateRoot.showCheckBox
+				anchors.fill: delegateCheckBox
+				cursorShape: Qt.PointingHandCursor
+				onClicked: {
+					if (delegateRoot.selectionManager)
+						delegateRoot.selectionManager.toggleSelect(delegateRoot.itemId)
+				}
+			}
 		}
 
 		Column {
 			id: contentColumn
 			anchors.verticalCenter: parent.verticalCenter
 			spacing: Style.marginXS
-			width: parent.width - Style.itemSizeS - parent.spacing
+			width: parent.width
+				   - (delegateRoot.showCheckBox ? delegateRoot.checkBoxSize + parent.spacing : 0)
+		}
+	}
+
+	Item {
+		id: trailingActions
+		anchors.right: parent.right
+		anchors.rightMargin: Style.marginL
+		anchors.verticalCenter: parent.verticalCenter
+		width: customActionsLoader.visible
+			? customActionsLoader.implicitWidth
+			: (delegateRoot.showDefaultActionsMenu ? Style.controlHeightM : 0)
+		height: customActionsLoader.visible
+			? customActionsLoader.implicitHeight
+			: (delegateRoot.showDefaultActionsMenu ? Style.controlHeightM : 0)
+
+		Loader {
+			id: customActionsLoader
+			anchors.centerIn: parent
+			sourceComponent: delegateRoot.customActionsComponent
+			visible: !!sourceComponent
 		}
 	}
 
 	Rectangle {
 		id: moreButton
-		anchors.right: parent.right
-		anchors.rightMargin: Style.marginM
-		anchors.verticalCenter: parent.verticalCenter
+		anchors.centerIn: trailingActions
 		width: Style.controlHeightM
 		height: Style.controlHeightM
 		radius: Style.controlHeightM / 2
 		color: moreButtonMA.containsMouse ? Style.buttonHoverColor : "transparent"
-		visible: delegateRoot.canManage && (delegateRoot.isHovered || delegateRoot.isSelected || moreButtonMA.containsMouse)
+		visible: delegateRoot.showDefaultActionsMenu && delegateRoot.canManage
+				 && !customActionsLoader.visible
+				 && (delegateRoot.isHovered || delegateRoot.isSelected || moreButtonMA.containsMouse)
 
 		Text {
 			anchors.centerIn: parent
@@ -143,5 +183,6 @@ Rectangle {
 		height: 1
 		color: Style.borderColor
 		opacity: 0.5
+		visible: !delegateRoot.isLastItem
 	}
 }

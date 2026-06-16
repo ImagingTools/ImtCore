@@ -57,6 +57,13 @@ QtObject {
 	property Connections documentManagerConnections: Connections {
 		target: root.documentManager
 
+		function onStartSaveDocument(documentId){
+			if (documentId !== root.documentId){
+				return
+			}
+			root._internal.saveRequested = false
+		}
+
 		function onUndoInfoReceived(documentId, availableUndoSteps, availableRedoSteps, isDirty){
 			if (documentId !== root.documentId){
 				return
