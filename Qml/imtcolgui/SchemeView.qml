@@ -615,7 +615,8 @@ Rectangle {
 				
 				ctx.lineWidth = 1;
 				let fontStr_main = String(canvas.fontSize) + "px " + Style.fontFamily
-				ctx.font = fontStr_main;
+				ctx.font = fontStr_main;
+
 				let textStr_main = mainText
 				let textWidth_main = ctx.measureText(mainText).width
 				
@@ -694,7 +695,7 @@ Rectangle {
 				ctx.strokeStyle = canvas.mainTextColor;
 				ctx.fillStyle = canvas.mainTextColor;
 				ctx.lineWidth = 1;
-				let fontStr = "bold " + String(canvas.fontSize) + "px " + Style.fontFamily
+				ctx.font = fontStr;
 				ctx.font = fontStr; //"20px sans-serif";
 				let textStr = mainText
 				let textWidth = ctx.measureText(mainText).width
