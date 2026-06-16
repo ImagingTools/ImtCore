@@ -1,8 +1,9 @@
  // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CTenantRelationshipsSelectControllerComp.h>
 
+
 // Qt includes
-#include <QtCore/QJsonObject.h>
+#include <QtCore/QJsonObject>
 
 // ACF includes
 #include <iprm/CParamsSet.h>
