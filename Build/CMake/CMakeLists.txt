@@ -390,7 +390,7 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 			add_dependencies(Imt3dDemo imt3dgui imt3dview imt3d)
 		endif()
 
-		if(NOT DEFINED USE_JQML_HOST OR USE_JQML_HOST)
+		if(WIN32 AND (NOT DEFINED USE_JQML_HOST OR USE_JQML_HOST))
 			add_subdirectory("${IMPL_DIR}/JQMLHost/CMake" "${AUX_INCLUDE_DIR}/JQMLHost")
 			add_dependencies(JQMLHost
 				imtbasesdl imtappsdl imtauthsdl imtlicsdl imtcolorsdl imt2dsdl imtchatsdl imtdesksdl imtpaysdl
