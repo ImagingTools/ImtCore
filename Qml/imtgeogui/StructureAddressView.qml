@@ -142,7 +142,14 @@ Item {
 
 
 			Component.onCompleted: {
-				addButton(Enums.save, qsTr("Save"), true);
+				let hasName = false;
+				if (model) {
+					let nameVal = model.getData("name", 0);
+					if (nameVal && nameVal.trim().length > 0) {
+						hasName = true;
+					}
+				}
+				addButton(Enums.save, qsTr("Save"), hasName);
 				addButton(Enums.close, qsTr("Close"), true);
 			}
 
@@ -185,6 +192,14 @@ Item {
 							anchors.topMargin: Style.marginXL
 							width: flickable.width;
 							model: editAddressDialog.model
+
+							Component.onCompleted: {
+								editAddressDialog.setButtonEnabled(Enums.save, addressEditor.isValid);
+							}
+
+							onIsValidChanged: {
+								editAddressDialog.setButtonEnabled(Enums.save, addressEditor.isValid);
+							}
 						}
 					}
 				}
@@ -570,24 +585,10 @@ Item {
 											structureAddressesContainer.parentId = structureAddressesContainer.addressModel.getData("itemId", addressColumn.currentIndex-1);
 											structureAddressesContainer.parentName = structureAddressesContainer.addressModel.getData("typeValue", addressColumn.currentIndex-1) + " " + structureAddressesContainer.addressModel.getData("nameValue", addressColumn.currentIndex-1);
 										}
-										removeElementsInput.m_elementIds = [];
+										
 										let deleteId = structureAddressesContainer.addressModel.getData("itemId", addressColumn.currentIndex);
-										removeElementsInput.m_elementIds.push(deleteId);
+										removeElementsInput.m_elementIds = [deleteId];
 
-										let treeModel = treeBody.treeViewModel;
-										let treeItemsCount = treeModel.getItemsCount();
-										for (let i = 0; i < treeItemsCount; i++) {
-											let pIds = treeModel.getData(treeBody.parentIdsParam, i);
-											if (pIds !== undefined && pIds !== null && pIds !== "") {
-												let pIdsArr = pIds.split(',');
-												if (pIdsArr.indexOf(deleteId) !== -1) {
-													let childId = treeModel.getData(treeBody.idParam, i);
-													if (childId !== undefined && childId !== null && childId !== "" && removeElementsInput.m_elementIds.indexOf(childId) === -1) {
-														removeElementsInput.m_elementIds.push(childId);
-													}
-												}
-											}
-										}
 										structureAddressesContainer.removeAddressRequest.send(removeElementsInput);
 									}
 								}
