@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 import QtQuick 2.12
+import imtauthgui 1.0
 
 /**
  * TenantEditorStateManager
@@ -51,7 +52,37 @@ QtObject {
 	readonly property bool isAdmin: stateManager.getUserRole(
 		stateManager.tenantData ? stateManager.tenantData.m_currentUserId : "") === "Admin"
 
-	readonly property bool canManageMembers: stateManager.isCreator || stateManager.isOwner || stateManager.isAdmin
+	readonly property bool canViewOrganizations: stateManager.hasPermission("ViewOrganizations")
+	readonly property bool canChangeOrganizationName: stateManager.hasPermission("ChangeOrganizationName")
+	readonly property bool canChangeOrganizationDescription: stateManager.hasPermission("ChangeOrganizationDescription")
+	readonly property bool canEditOrganization: stateManager.hasAnyPermission(["EditOrganization", "ChangeOrganization", "ChangeOrganizationName", "ChangeOrganizationDescription"])
+
+	readonly property bool canViewOrganizationMembers: stateManager.hasPermission("ViewOrganizationMembers")
+	readonly property bool canInviteOrganizationMember: stateManager.hasPermission("InviteOrganizationMember")
+	readonly property bool canExcludeOrganizationMember: stateManager.hasPermission("ExcludeOrganizationMember")
+	readonly property bool canChangeOrganizationMember: stateManager.hasPermission("ChangeOrganizationMember")
+	readonly property bool canChangeOrganizationMemberRole: stateManager.hasPermission("ChangeOrganizationMemberRole")
+	readonly property bool canManageOrganizationMembers: stateManager.hasAnyPermission(["EditOrganizationMember", "InviteOrganizationMember", "ExcludeOrganizationMember", "ChangeOrganizationMemberRole"])
+
+	readonly property bool canViewOrganizationRoles: stateManager.hasPermission("ViewOrganizationRoles")
+	readonly property bool canManageOrganizationRoles: stateManager.hasAnyPermission(["EditOrganizationRole", "ChangeOrganizationRole", "RemoveOrganizationRole", "AddOrganizationRole"])
+
+	readonly property bool canViewOrganizationGroups: stateManager.hasPermission("ViewOrganizationGroups")
+	readonly property bool canManageOrganizationGroups: stateManager.hasAnyPermission(["EditOrganizationGroup", "ChangeOrganizationGroup", "RemoveOrganizationGroup", "AddOrganizationGroup"])
+
+	readonly property bool canViewOrganizationPermissions: stateManager.hasPermission("ViewOrganizationPermissions")
+
+	readonly property bool canViewOrganizationConnections: stateManager.hasPermission("ViewOrganizationConnections")
+	readonly property bool canViewOrganizationConnectionCode: stateManager.hasPermission("ViewOrganizationConnectionCode")
+	readonly property bool canConnectOrganization: stateManager.hasPermission("ConnectOrganization")
+	readonly property bool canRemoveOrganizationConnection: stateManager.hasPermission("RemoveOrganizationConnection")
+	readonly property bool canManageOrganizationConnections: stateManager.hasAnyPermission(["EditOrganizationConnection", "ConnectOrganization", "RemoveOrganizationConnection"])
+
+	readonly property bool canManageMembers: stateManager.canManageOrganizationMembers
+		|| stateManager.canManageOrganizationRoles
+		|| stateManager.canManageOrganizationGroups
+		|| stateManager.canEditOrganization
+		|| stateManager.canManageOrganizationConnections
 	readonly property bool isReadOnly: !stateManager.isNewTenant && !stateManager.canManageMembers
 
 	// --- Pure logic helpers ---
@@ -68,6 +99,25 @@ QtObject {
 				return entry.m_role || "Member"
 		}
 		return "Member"
+	}
+
+	// Client-side checks are UX hints only; server must enforce permissions on every operation.
+	function hasPermission(permissionId) {
+		if (!permissionId || permissionId === "")
+			return false
+		if (stateManager.isNewTenant || stateManager.isCreator || stateManager.isOwner || stateManager.isAdmin)
+			return true
+		return PermissionsController.checkPermission(permissionId)
+	}
+
+	function hasAnyPermission(permissionIds) {
+		if (!permissionIds || permissionIds.length === 0)
+			return false
+		for (var i = 0; i < permissionIds.length; i++) {
+			if (stateManager.hasPermission(permissionIds[i]))
+				return true
+		}
+		return false
 	}
 
 	function setUserRole(userId, role) {

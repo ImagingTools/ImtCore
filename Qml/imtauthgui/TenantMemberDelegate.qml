@@ -57,6 +57,10 @@ TenantCollectionItemDelegateBase {
 	readonly property string effectiveStatus: row.isExpired
 		? "Expired"
 		: row.isRevoked ? "Revoked" : "Pending"
+	readonly property bool canEditMember: row.stateManager ? row.stateManager.canChangeOrganizationMember : false
+	readonly property bool canChangeMemberRole: row.stateManager ? row.stateManager.canChangeOrganizationMemberRole : false
+	readonly property bool canRemoveMember: row.stateManager ? row.stateManager.canExcludeOrganizationMember : false
+	readonly property bool canInviteMember: row.stateManager ? row.stateManager.canInviteOrganizationMember : false
 
 	readonly property string selectionId: row.isMember ? (row.memberData.id || "") : ("inv_" + (row.memberData.id || ""))
 	itemId: row.selectionId
@@ -64,7 +68,7 @@ TenantCollectionItemDelegateBase {
 	showDefaultActionsMenu: false
 
 	onItemDoubleClicked: {
-		if (row.isMember && row.canManage) {
+		if (row.isMember && row.canEditMember) {
 			row.memberEditRequested(row.memberData.id, row.memberData.name || row.memberData.id || "")
 		}
 	}
@@ -228,9 +232,9 @@ TenantCollectionItemDelegateBase {
 			anchors.verticalCenter: parent.verticalCenter
 
 			readonly property bool __hasActions: row.isMember
-				? ((row.canManage && !row.isCurrentUser && !row.isMemberOwner && !row.isMemberCreator)
+				? (((row.canChangeMemberRole || row.canRemoveMember || row.isOwner) && !row.isCurrentUser && !row.isMemberOwner && !row.isMemberCreator)
 				   || (row.isCurrentUser && !row.isMemberOwner && !row.isMemberCreator))
-				: (row.canManage && row.effectiveStatus === "Pending")
+				: ((row.canInviteMember || row.canRemoveMember) && row.effectiveStatus === "Pending")
 
 			ToolButton {
 				id: actionsButton
@@ -249,10 +253,12 @@ TenantCollectionItemDelegateBase {
 					var btnPos = actionsButton.mapToItem(null, 0, actionsButton.height)
 					if (row.isMember) {
 						var menuItems = []
-						if (row.canManage && !row.isCurrentUser) {
+						if (!row.isCurrentUser) {
 							if (!row.isMemberOwner && !row.isMemberCreator) {
-								menuItems.push({ text: qsTr("Change Environment Role"), action: "changeRole" })
-								menuItems.push({ text: qsTr("Exclude from Tenant"), action: "remove" })
+								if (row.canChangeMemberRole)
+									menuItems.push({ text: qsTr("Change Environment Role"), action: "changeRole" })
+								if (row.canRemoveMember)
+									menuItems.push({ text: qsTr("Exclude from Tenant"), action: "remove" })
 							}
 							if (row.isOwner && !row.isMemberOwner && !row.isMemberCreator) {
 								menuItems.push({ text: qsTr("Transfer Ownership"), action: "transfer" })
@@ -269,10 +275,13 @@ TenantCollectionItemDelegateBase {
 							row.isCurrentUser,
 							btnPos.x, btnPos.y)
 					} else {
-						var inviteMenuItems = [
-							{ text: qsTr("Resend Invitation"), action: "resend" },
-							{ text: qsTr("Revoke Invitation"), action: "revoke" }
-						]
+						var inviteMenuItems = []
+						if (row.canInviteMember)
+							inviteMenuItems.push({ text: qsTr("Resend Invitation"), action: "resend" })
+						if (row.canRemoveMember)
+							inviteMenuItems.push({ text: qsTr("Revoke Invitation"), action: "revoke" })
+						if (inviteMenuItems.length === 0)
+							return
 						row.inviteActionsRequested(inviteMenuItems,
 							row.memberData.id,
 							row.memberData.userName || row.memberData.userId || "",

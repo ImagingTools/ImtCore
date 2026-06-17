@@ -64,6 +64,17 @@ ITenantInfoUniquePtr CTenantManagerComp::GetTenant(const QByteArray& tenantId) c
 }
 
 
+QByteArrayList CTenantManagerComp::GetTenantPermissions(const QByteArray& tenantId) const
+{
+	ITenantInfoUniquePtr tenantPtr = GetTenant(tenantId);
+	if (!tenantPtr.IsValid()){
+		return QByteArrayList();
+	}
+
+	return tenantPtr->GetTenantPermissions();
+}
+
+
 QByteArray CTenantManagerComp::CreateTenant(const QString& tenantName, const QString& description, const QByteArray& ownerId)
 {
 	if (!m_tenantCollectionCompPtr.IsValid() || !m_tenantFactoryCompPtr.IsValid()){

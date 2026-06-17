@@ -26,6 +26,8 @@ Rectangle {
 	property var selectionManager: null
 	property var collectionPage: null
 	property bool canManage: collectionPage ? collectionPage.__canManage : false
+	property bool canEdit: collectionPage ? collectionPage.__canEdit : canManage
+	property bool canDelete: collectionPage ? collectionPage.__canDelete : canManage
 	property bool showCheckBox: true
 	property bool enableDefaultDoubleClickEdit: true
 	property bool showDefaultActionsMenu: true
@@ -40,8 +42,34 @@ Rectangle {
 	readonly property int index: model.index
 	readonly property int totalCount: modelData.totalCount
 	readonly property bool isLastItem: index === totalCount - 1
+	property bool __isRelocatingExternalChildren: false
 
-	default property alias contentChildren: contentColumn.data
+	// TODO: remove this temporary compatibility shim after web system supports default property alias
+	// default property alias contentChildren: contentColumn.data
+
+	function __relocateExternalChildren() {
+		if (__isRelocatingExternalChildren)
+			return
+
+		__isRelocatingExternalChildren = true
+		for (var i = 0; i < delegateRoot.children.length; i++) {
+			var child = delegateRoot.children[i]
+			if (!child)
+				continue
+			if (child === itemMouseArea || child === contentRow || child === trailingActions || child === moreButton || child === bottomDivider)
+				continue
+			child.parent = contentColumn
+		}
+		__isRelocatingExternalChildren = false
+	}
+
+	onChildrenChanged: {
+		__relocateExternalChildren()
+	}
+
+	Component.onCompleted: {
+		__relocateExternalChildren()
+	}
 
 	width: parent ? parent.width : 0
 	height: contentRow.implicitHeight + Style.marginXL
@@ -57,7 +85,7 @@ Rectangle {
 		cursorShape: Qt.PointingHandCursor
 		onDoubleClicked: {
 			delegateRoot.itemDoubleClicked()
-			if (delegateRoot.enableDefaultDoubleClickEdit && delegateRoot.collectionPage)
+			if (delegateRoot.enableDefaultDoubleClickEdit && delegateRoot.collectionPage && delegateRoot.canEdit)
 				delegateRoot.collectionPage.__openEdit(delegateRoot.itemId, delegateRoot.itemTitle, delegateRoot.itemDescription)
 		}
 	}
@@ -119,32 +147,64 @@ Rectangle {
 		}
 	}
 
-	Rectangle {
+	ToolButton {
 		id: moreButton
 		anchors.centerIn: trailingActions
-		width: Style.controlHeightM
-		height: Style.controlHeightM
-		radius: Style.controlHeightM / 2
-		color: moreButtonMA.containsMouse ? Style.buttonHoverColor : "transparent"
-		visible: delegateRoot.showDefaultActionsMenu && delegateRoot.canManage
+		width: Style.buttonWidthL
+		height: Style.buttonWidthL
+		iconSource: "../../../" + Style.getIconPath("Icons/More", Icon.State.On, Icon.Mode.Normal)
+		tooltipText: qsTr("Actions")
+		visible: delegateRoot.showDefaultActionsMenu
+				 && (delegateRoot.canEdit || delegateRoot.canDelete)
 				 && !customActionsLoader.visible
-				 && (delegateRoot.isHovered || delegateRoot.isSelected || moreButtonMA.containsMouse)
+				 && (delegateRoot.isHovered || delegateRoot.isSelected || containsMouse)
 
-		Text {
-			anchors.centerIn: parent
-			text: "\u2026"
-			font.pixelSize: Style.fontSizeL
-			color: Style.textColor
-			horizontalAlignment: Text.AlignHCenter
-			verticalAlignment: Text.AlignVCenter
+		onClicked: {
+			contextMenuModel.fillModel()
+			var point = moreButton.mapToItem(null, 0, moreButton.height)
+			ModalDialogManager.openDialog(itemPopupMenuComp, {
+				"x": point.x,
+				"y": point.y,
+				"model": contextMenuModel
+			})
 		}
+	}
 
-		MouseArea {
-			id: moreButtonMA
-			anchors.fill: parent
-			hoverEnabled: true
-			cursorShape: Qt.PointingHandCursor
-			onClicked: itemMenu.popup(moreButton.x, moreButton.y + moreButton.height)
+	ListModel {
+		id: contextMenuModel
+
+		function fillModel(){
+			contextMenuModel.clear()
+			if (delegateRoot.canEdit)
+				contextMenuModel.append({"id": "Edit", "name": qsTr("Edit"), "icon": "", "isEnabled": true})
+			if (delegateRoot.canDelete)
+				contextMenuModel.append({"id": "Delete", "name": qsTr("Delete"), "icon": "", "isEnabled": true})
+		}
+	}
+
+	Component {
+		id: itemPopupMenuComp
+
+		PopupMenuDialog {
+			id: itemPopupMenuDialog
+			onFinished: {
+				if (commandId === "Edit") {
+					if (delegateRoot.collectionPage && delegateRoot.canEdit)
+						delegateRoot.collectionPage.__openEdit(delegateRoot.itemId, delegateRoot.itemTitle, delegateRoot.itemDescription)
+				}
+				else if (commandId === "Delete") {
+					if (delegateRoot.collectionPage && delegateRoot.canDelete) {
+						ModalDialogManager.showConfirmationDialog(
+							delegateRoot.collectionPage.__deleteSingleTitle,
+							qsTr("Are you sure you want to delete \"%1\"? This action cannot be undone.").arg(delegateRoot.itemTitle),
+							function(result) {
+								if (result === Enums.yes)
+									delegateRoot.collectionPage.removeItems([delegateRoot.itemId])
+							}
+						)
+					}
+				}
+			}
 		}
 	}
 
@@ -152,7 +212,7 @@ Rectangle {
 		id: itemMenu
 		MenuItem {
 			text: qsTr("Edit")
-			enabled: delegateRoot.canManage
+			enabled: delegateRoot.canEdit
 			onTriggered: {
 				if (delegateRoot.collectionPage)
 					delegateRoot.collectionPage.__openEdit(delegateRoot.itemId, delegateRoot.itemTitle, delegateRoot.itemDescription)
@@ -160,7 +220,7 @@ Rectangle {
 		}
 		MenuItem {
 			text: qsTr("Delete")
-			enabled: delegateRoot.canManage
+			enabled: delegateRoot.canDelete
 			onTriggered: {
 				if (delegateRoot.collectionPage) {
 					ModalDialogManager.showConfirmationDialog(
@@ -177,6 +237,7 @@ Rectangle {
 	}
 
 	Rectangle {
+		id: bottomDivider
 		anchors.bottom: parent.bottom
 		anchors.left: parent.left
 		anchors.right: parent.right

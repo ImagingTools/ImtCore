@@ -2,20 +2,31 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6418" Description="ACF"/>
-            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6435" Description="ACF"/>
+            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="CheckPermissionOr" X="175" Y="125" Note=""/>
         <Element ComponentName="CollectionDocumentService" X="575" Y="250" Note=""/>
         <Element ComponentName="Demultiplexer" X="575" Y="75" Note=""/>
         <Element ComponentName="HashCalculator" X="200" Y="500" Note=""/>
+        <Element ComponentName="Permissions" X="175" Y="375" Note=""/>
         <Element ComponentName="RoleCollectionAdapter" X="575" Y="600" Note=""/>
         <Element ComponentName="UserCollectionDocumentService" X="175" Y="250" Note=""/>
         <Element ComponentName="UserDocumentValidator" X="957" Y="249" Note=""/>
         <Element ComponentName="UserGroupInfoProvider" X="950" Y="425" Note=""/>
         <Element ComponentName="UserInfo" X="575" Y="425" Note=""/>
     </PositionMap>
-    <EmbeddedRegistries/>
+    <EmbeddedRegistries>
+        <EmbededRegistry Id="Permissions">
+            <PositionMap>
+                <Element ComponentName="GetUserRepresentation" X="900" Y="375" Note=""/>
+                <Element ComponentName="PermissionsJoiner" X="550" Y="100" Note=""/>
+                <Element ComponentName="UpdateUserFromRepresentation" X="225" Y="375" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+    </EmbeddedRegistries>
 </Acf>

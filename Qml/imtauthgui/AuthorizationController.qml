@@ -47,6 +47,7 @@ QtObject {
 	property string storedRefreshToken: ""
 	property string currentTenantId: ""
 	property string currentTenantName: ""
+	property var __permissionsRefreshCallback: null
 
 	property Settings storage: Settings {
 		category: "AuthorizationController"
@@ -73,6 +74,43 @@ QtObject {
 		root.rememberMe = (rememberMeStr === "true");
 		root.lastUser = storage.value("Login_lastUser", "");
 		root.storedRefreshToken = storage.value("Login_storedRefreshToken", "");
+	}
+
+	function normalizePermissions(rawPermissions) {
+		if (rawPermissions === undefined || rawPermissions === null)
+			return [];
+
+		if (Array.isArray(rawPermissions))
+			return rawPermissions;
+
+		if (typeof rawPermissions === "string") {
+			let value = rawPermissions.trim();
+			if (value === "")
+				return [];
+
+			if (value.indexOf(";") >= 0)
+				return value.split(";").filter(function(item){ return item !== ""; });
+
+			if (value.indexOf(",") >= 0)
+				return value.split(",").filter(function(item){ return item !== ""; });
+
+			return [value];
+		}
+
+		return [];
+	}
+
+	function refreshPermissions(callback) {
+		if (!root.userTokenProvider.accessToken || root.userTokenProvider.accessToken === "") {
+			root.userTokenProvider.permissions = [];
+			if (callback)
+				callback(true);
+			return;
+		}
+
+		root.__permissionsRefreshCallback = callback || null;
+		getPermissionsInput.m_accessToken = root.userTokenProvider.accessToken;
+		getPermissionsGqlSender.send(getPermissionsInput);
 	}
 	
 	function saveLoginSettings() {
@@ -131,7 +169,9 @@ QtObject {
 						AuthorizationController.readDataFromStorage();
 						AuthorizationController.setAccessToken(token);
 						AuthorizationController.setRefreshToken(refreshToken);
-						AuthorizationController.loggedIn();
+							AuthorizationController.refreshPermissions(function(){
+								AuthorizationController.loggedIn();
+							});
 						
 						return;
 					}
@@ -160,8 +200,10 @@ QtObject {
 				root.setAccessToken(accessToken);
 				root.setRefreshToken(refreshToken);
 			}
-			
-			root.loggedIn();
+
+			root.refreshPermissions(function(){
+				root.loggedIn();
+			});
 		}
 		
 		onFailed: {
@@ -176,7 +218,7 @@ QtObject {
 		userTokenProvider.login = storage.value("login", "");
 		userTokenProvider.systemId = storage.value("systemId", "");
 		userTokenProvider.productId = storage.value("productId", "");
-		userTokenProvider.permissions = storage.value("permissions", "");
+		userTokenProvider.permissions = normalizePermissions(storage.value("permissions", ""));
 		root.currentTenantId = storage.value("tenantId", "");
 		root.currentTenantName = storage.value("tenantName", "");
 	}
@@ -188,7 +230,7 @@ QtObject {
 		storage.setValue("login", userTokenProvider.login);
 		storage.setValue("systemId", userTokenProvider.systemId);
 		storage.setValue("productId", userTokenProvider.productId);
-		storage.setValue("permissions", userTokenProvider.permissions);
+		storage.setValue("permissions", normalizePermissions(userTokenProvider.permissions).join(';'));
 		storage.setValue("tenantId", root.currentTenantId);
 		storage.setValue("tenantName", root.currentTenantName);
 	}
@@ -404,6 +446,30 @@ QtObject {
 			}
 		}
 	}
+
+	property TokenInput getPermissionsInput: TokenInput {}
+	property GqlSdlRequestSender getPermissionsGqlSender: GqlSdlRequestSender {
+		requestType: 1;
+		gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_getPermissions;
+
+		sdlObjectComp: Component {
+			PermissionList {
+				onFinished: {
+					root.userTokenProvider.permissions = root.normalizePermissions(m_permissions);
+
+					if (Qt.platform.os === "web"){
+						root.saveDataToStorage();
+					}
+
+					if (root.__permissionsRefreshCallback){
+						let callback = root.__permissionsRefreshCallback;
+						root.__permissionsRefreshCallback = null;
+						callback(true);
+					}
+				}
+			}
+		}
+	}
 	
 	property GqlSdlRequestSender refreshTokenGqlSender: GqlSdlRequestSender {
 		requestType: 1;
@@ -431,6 +497,8 @@ QtObject {
 							XMLHttpRequest.QMLAuthRefreshToken = m_userSession.m_refreshToken
 							root.saveDataToStorage()
 						}
+
+						root.refreshPermissions();
 					}
 				}
 			}
@@ -467,8 +535,10 @@ QtObject {
 						
 						// Save updated refresh token
 						root.saveRefreshTokenIfRememberMe();
-						
-						root.loggedIn();
+
+						root.refreshPermissions(function(){
+							root.loggedIn();
+						});
 					}
 					else {
 						// Refresh token login failed, clear stored token
@@ -503,7 +573,9 @@ QtObject {
 							root.saveDataToStorage()
 						}
 
-						root.tenantSelected(root.currentTenantId);
+						root.refreshPermissions(function(){
+							root.tenantSelected(root.currentTenantId);
+						});
 					}
 					else{
 						root.tenantSelectionFailed(m_errorMessage || "");

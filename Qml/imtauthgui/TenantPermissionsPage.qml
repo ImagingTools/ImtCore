@@ -20,6 +20,8 @@ ViewBase {
 	commandsPanelVisible: false
 	contentColor: Style.baseColor
 	readonly property var tenantData: model
+	property var stateManager: null
+	readonly property bool __canEditPermissions: stateManager ? stateManager.canViewOrganizationPermissions : false
 
 	function updateGui() {
 		if (!permissionsPage.tenantData)
@@ -156,12 +158,13 @@ ViewBase {
 				anchors.verticalCenter: parent.verticalCenter
 				text: qsTr("Check All")
 				font.pixelSize: Style.fontSizeM
-				color: Style.linkColor
+				color: permissionsPage.__canEditPermissions ? Style.linkColor : Style.inactiveTextColor
 
 				MouseArea {
 					anchors.fill: parent
 					hoverEnabled: true
-					cursorShape: Qt.PointingHandCursor
+					cursorShape: permissionsPage.__canEditPermissions ? Qt.PointingHandCursor : Qt.ArrowCursor
+					enabled: permissionsPage.__canEditPermissions
 					onClicked: tenantPermissionsTreeView.checkAll()
 				}
 			}
@@ -171,12 +174,13 @@ ViewBase {
 				anchors.verticalCenter: parent.verticalCenter
 				text: qsTr("Uncheck All")
 				font.pixelSize: Style.fontSizeM
-				color: Style.linkColor
+				color: permissionsPage.__canEditPermissions ? Style.linkColor : Style.inactiveTextColor
 
 				MouseArea {
 					anchors.fill: parent
 					hoverEnabled: true
-					cursorShape: Qt.PointingHandCursor
+					cursorShape: permissionsPage.__canEditPermissions ? Qt.PointingHandCursor : Qt.ArrowCursor
+					enabled: permissionsPage.__canEditPermissions
 					onClicked: tenantPermissionsTreeView.uncheckAll()
 				}
 			}
@@ -246,6 +250,9 @@ ViewBase {
 		]
 		filterRole: ["name", "description"]
 
-		onCheckedItemsChanged: permissionsPage.doUpdateModel()
+		onCheckedItemsChanged: {
+			if (permissionsPage.__canEditPermissions)
+				permissionsPage.doUpdateModel()
+		}
 	}
 }
