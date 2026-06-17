@@ -75,6 +75,37 @@ sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 		profileData.currentTenantId = gqlContextPtr->GetTenantId();
 	}
 
+	// Determine if the current tenant is accessed via delegation
+	QByteArray currentTenantId;
+	if (gqlContextPtr != nullptr){
+		currentTenantId = gqlContextPtr->GetTenantId();
+	}
+
+	QByteArrayList delegatedRoleIds;
+	if (!currentTenantId.isEmpty() && m_delegatedAccessCompPtr.IsValid() && m_membershipManagerCompPtr.IsValid()){
+		const imtauth::ITenantMembershipManager::MembershipIds membershipIds =
+			m_membershipManagerCompPtr->GetMembershipsByUser(objectId);
+
+		for (const QByteArray& membershipId : membershipIds){
+			imtauth::ITenantMembershipUniquePtr homeMembershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+			if (!homeMembershipPtr.IsValid() || !homeMembershipPtr->IsActive()){
+				continue;
+			}
+			QByteArray homeTenantId = homeMembershipPtr->GetTenantId();
+			if (homeTenantId.isEmpty() || homeTenantId == currentTenantId){
+				continue;
+			}
+			if (m_delegatedAccessCompPtr->IsDelegatedAccess(objectId, homeTenantId, currentTenantId)){
+				QByteArrayList roles = m_delegatedAccessCompPtr->GetDelegatedRoles(homeTenantId, currentTenantId);
+				for (const QByteArray& roleId : roles){
+					if (!delegatedRoleIds.contains(roleId)){
+						delegatedRoleIds.append(roleId);
+					}
+				}
+			}
+		}
+	}
+
 	imtsdl::TElementList<sdl::V1_0::imtauth::CRoleInfo> roleList;
 
 	if (m_roleCollectionCompPtr.IsValid()){
@@ -83,6 +114,22 @@ sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 		for (const QByteArray& roleId : std::as_const(roles)){
 			imtbase::IObjectCollection::DataPtr roleDataPtr;
 			if (m_roleCollectionCompPtr->GetObjectData(roleId, roleDataPtr)){
+				const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(roleDataPtr.GetPtr());
+				if (roleInfoPtr != nullptr){
+					sdl::V1_0::imtauth::CRoleInfo info;
+					info.id = QByteArray(roleInfoPtr->GetRoleId());
+					info.name = QString(roleInfoPtr->GetRoleName());
+					info.description = QString(roleInfoPtr->GetRoleDescription());
+
+					roleList << info;
+				}
+			}
+		}
+
+		// Add delegated roles if accessing a delegated tenant
+		for (const QByteArray& delegatedRoleId : std::as_const(delegatedRoleIds)){
+			imtbase::IObjectCollection::DataPtr roleDataPtr;
+			if (m_roleCollectionCompPtr->GetObjectData(delegatedRoleId, roleDataPtr)){
 				const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(roleDataPtr.GetPtr());
 				if (roleInfoPtr != nullptr){
 					sdl::V1_0::imtauth::CRoleInfo info;

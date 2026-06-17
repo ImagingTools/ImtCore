@@ -149,20 +149,11 @@ imtauth::IJwtSessionController::JwtState CAuthenticationManagerComp::ValidateJwt
 	}
 
 	// Cache miss — delegate to the slave and populate the cache.
-	JwtState state;
-	{
-		QMutexLocker locker(&m_tokenValidationMutex);
-		state = m_slaveJwtSessionControllerCompPtr->ValidateJwt(jwt);
-	}
+	JwtState state = m_slaveJwtSessionControllerCompPtr->ValidateJwt(jwt);
 
 	if (state == JwtState::JS_OK){
-		QByteArray resolvedUserId;
-		QByteArray resolvedTenantId;
-		{
-			QMutexLocker locker(&m_tokenValidationMutex);
-			resolvedUserId = m_slaveJwtSessionControllerCompPtr->GetUserFromJwt(jwt);
-			resolvedTenantId = m_slaveJwtSessionControllerCompPtr->GetTenantFromJwt(jwt);
-		}
+		QByteArray resolvedUserId = m_slaveJwtSessionControllerCompPtr->GetUserFromJwt(jwt);
+		QByteArray resolvedTenantId = m_slaveJwtSessionControllerCompPtr->GetTenantFromJwt(jwt);
 		StoreCachedToken(jwt, resolvedUserId, resolvedTenantId, QByteArray(), QByteArrayList(), false);
 	}
 
@@ -319,22 +310,19 @@ bool CAuthenticationManagerComp::ResolveUserId(
 		bool isTokenValid = false;
 		isPat = true;
 		scopes.clear();
-		{
-			QMutexLocker locker(&m_tokenValidationMutex);
-			if (!m_patManagerCompPtr.IsValid()){
-				errorMessage = QStringLiteral("Personal access token manager is not configured.");
-				status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
-				return false;
-			}
+		if (!m_patManagerCompPtr.IsValid()){
+			errorMessage = QStringLiteral("Personal access token manager is not configured.");
+			status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
+			return false;
+		}
 
-			if (!m_patManagerCompPtr->ValidateToken(token, userId, tokenId, scopes)){
-				errorMessage = QStringLiteral("Invalid personal access token.");
-				status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
-			}
-			else{
-				isTokenValid = true;
-				m_patManagerCompPtr->UpdateLastUsedAt(tokenId);
-			}
+		if (!m_patManagerCompPtr->ValidateToken(token, userId, tokenId, scopes)){
+			errorMessage = QStringLiteral("Invalid personal access token.");
+			status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
+		}
+		else{
+			isTokenValid = true;
+			m_patManagerCompPtr->UpdateLastUsedAt(tokenId);
 		}
 
 		if (!isTokenValid){
@@ -348,19 +336,16 @@ bool CAuthenticationManagerComp::ResolveUserId(
 	isPat = false;
 	using JwtState = imtauth::IJwtSessionController::JwtState;
 	JwtState state = JwtState::JS_NONE;
-	{
-		QMutexLocker locker(&m_tokenValidationMutex);
-		if (!m_slaveJwtSessionControllerCompPtr.IsValid()){
-			errorMessage = QStringLiteral("JWT session controller is not configured.");
-			status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
-			return false;
-		}
+	if (!m_slaveJwtSessionControllerCompPtr.IsValid()){
+		errorMessage = QStringLiteral("JWT session controller is not configured.");
+		status = imtgql::IGqlContextCreator::CCS_FORBIDDEN;
+		return false;
+	}
 
-		state = m_slaveJwtSessionControllerCompPtr->ValidateJwt(token);
-		if (state == JwtState::JS_OK){
-			userId = m_slaveJwtSessionControllerCompPtr->GetUserFromJwt(token);
-			tenantId = m_slaveJwtSessionControllerCompPtr->GetTenantFromJwt(token);
-		}
+	state = m_slaveJwtSessionControllerCompPtr->ValidateJwt(token);
+	if (state == JwtState::JS_OK){
+		userId = m_slaveJwtSessionControllerCompPtr->GetUserFromJwt(token);
+		tenantId = m_slaveJwtSessionControllerCompPtr->GetTenantFromJwt(token);
 	}
 
 	if (state == JwtState::JS_EXPIRED){
@@ -456,7 +441,6 @@ void CAuthenticationManagerComp::InvalidateTokenCache(const QByteArray& token) c
 
 imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateContextInstance() const
 {
-	QMutexLocker locker(&m_contextCreationMutex);
 	return m_gqlContextFactCompPtr.CreateInstance();
 }
 

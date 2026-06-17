@@ -1,10 +1,14 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtservergql/CFilterableSelectControllerComp.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/FilterableSelect.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtBaseTypes.h>
 
 
 // STL includes
 #include <cmath>
+
+// Qt includes
+#include <QtCore/QJsonObject>
 
 // ACF includes
 #include <istd/TDelPtr.h>
@@ -142,6 +146,28 @@ sdl::V1_0::imtbase::CGetSelectableItemsPayload CFilterableSelectControllerComp::
 
 		QString description = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 		itemRepresentation.description = description;
+
+		// Fill additional parameters from info provider
+		iprm::CParamsSet itemParamsSet;
+		if (m_objectParamsFillerCompPtr.IsValid()){
+			QByteArray contextTenantId;
+			const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+			if (gqlContextPtr != nullptr){
+				contextTenantId = gqlContextPtr->GetTenantId();
+			}
+			m_objectParamsFillerCompPtr->FillParams(objectId, itemParamsSet, contextTenantId);
+		}
+
+		// Convert iprm::IParamsSet to SDL CParamsSet via representation controller
+		if (m_paramSetRepresentationControllerCompPtr.IsValid()){
+			QJsonObject paramsJsonObject;
+			if (m_paramSetRepresentationControllerCompPtr->GetRepresentationFromDataModel(itemParamsSet, paramsJsonObject)){
+				sdl::V1_0::imtbase::CParamsSet sdlParamsSet;
+				if (sdlParamsSet.ReadFromJsonObject(paramsJsonObject)){
+					itemRepresentation.params = sdlParamsSet;
+				}
+			}
+		}
 
 		itemsList << itemRepresentation;
 	}

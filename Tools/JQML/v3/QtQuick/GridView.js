@@ -25,6 +25,7 @@ class GridView extends Flickable {
         count: {type: Real, value:0, },
         cellWidth: {type: Real, value:100, },
         cellHeight: {type: Real, value:100, },
+        cacheBuffer: {type: Real, value:0, },
         
         modelChanged: {type:Signal, args:[]},
         delegateChanged: {type:Signal, args:[]},
@@ -35,6 +36,7 @@ class GridView extends Flickable {
         countChanged: {type:Signal, args:[]},
         cellWidthChanged: {type:Signal, args:[]},
         cellHeightChanged: {type:Signal, args:[]},
+        cacheBufferChanged: {type:Signal, args:[]},
     })
 
     static create(parent, ...args){

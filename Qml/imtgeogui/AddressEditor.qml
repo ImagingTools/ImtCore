@@ -10,6 +10,8 @@ Column {
 	spacing: Style.marginXL;
 	property var model;
 
+	property bool isValid: nameField.text ? nameField.text.trim().length > 0 : false;
+
 	property var addressTypeNames: [qsTr("Country"), qsTr("Region"), qsTr("Area"),
 		qsTr("City"), qsTr("Settlement"), qsTr("District"),
 		qsTr("Street"), qsTr("Building"), qsTr("Apartment"),
@@ -17,10 +19,10 @@ Column {
 	property TreeItemModel typesModel: TreeItemModel{}
 
 	Component.onCompleted: {
-		for (var i = 0; i < container.addressTypeNames.length; i++){
+		for (let i = 0; i < container.addressTypeNames.length; i++){
 			container.typesModel.insertNewItem();
 			container.typesModel.setData("id", String(i), i);
-			container.typesModel.setData("name", container.addressTypeNames[i], i);//
+			container.typesModel.setData("name", container.addressTypeNames[i], i);
 		}
 
 		typeComboBox.model = container.typesModel;
@@ -43,7 +45,6 @@ Column {
 			let oldIndex = container.model.getData("typeId", 0)
 			if (oldIndex !== typeComboBox.currentIndex){
 				container.model.setData("typeId", typeComboBox.currentIndex, 0)
-				container.model.setData("typeValue", container.typesModel.getData("name", typeComboBox.currentIndex), 0)
 			}
 		}
 	}

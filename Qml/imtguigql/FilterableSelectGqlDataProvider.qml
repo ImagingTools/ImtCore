@@ -45,17 +45,43 @@ FilterableSelectDataProvider {
 				var desc = m_items.getData("m_description", i)
 				var icon = m_items.getData("m_icon", i)
 				var color = m_items.getData("m_color", i)
+				var params = m_items.getData("m_params", i)
+				var normalizedParams = root.__normalizeParameters(params)
 				normalized.push({
 					id: id || "",
 					typeId: typeId || "",
 					title: name || "",
 					description: desc || "",
 					icon: icon || "",
-					color: color || ""
+					color: color || "",
+					parameters: normalizedParams,
+					totalCount: count
 				})
 			}
 		}
 		return normalized
+	}
+
+	// --- Normalize parameters from SDL ParamsSet to plain JS array ---
+	function __normalizeParameters(paramsSet){
+		var result = []
+		if (!paramsSet)
+			return result
+		var paramsList = paramsSet.m_parameters ? paramsSet.m_parameters : paramsSet
+		var count = paramsList.getItemsCount ? paramsList.getItemsCount() : 0
+		for (var i = 0; i < count; i++){
+			var paramId = paramsList.getData("m_id", i)
+			var paramName = paramsList.getData("m_name", i)
+			var paramDesc = paramsList.getData("m_description", i)
+			var paramData = paramsList.getData("m_data", i)
+			result.push({
+				id: paramId || "",
+				name: paramName || "",
+				description: paramDesc || "",
+				data: paramData || ""
+			})
+		}
+		return result
 	}
 
 	// --- Main list request ---

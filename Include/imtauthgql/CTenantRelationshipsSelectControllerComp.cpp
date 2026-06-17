@@ -2,10 +2,17 @@
 #include <imtauthgql/CTenantRelationshipsSelectControllerComp.h>
 
 
+// Qt includes
+#include <QtCore/QJsonObject>
+
+// ACF includes
+#include <iprm/CParamsSet.h>
+
 // ImtCore includes
 #include <imtauth/ITenantRelationshipInfo.h>
 #include <imtbase/ICollectionInfo.h>
 #include "imtbasesdl/SDL/1.0/CPP/FilterableSelect.h"
+#include "imtbasesdl/SDL/1.0/CPP/ImtBaseTypes.h"
 
 
 namespace imtauthgql
@@ -88,6 +95,20 @@ sdl::V1_0::imtbase::CGetSelectableItemsPayload CTenantRelationshipsSelectControl
 		QString description = relationshipInfoPtr->GetDescription();
 		if (!description.isEmpty()){
 			item.description = description;
+		}
+
+		// Fill additional parameters via IObjectParamsFiller
+		if (m_objectParamsFillerCompPtr.IsValid() && m_paramSetRepresentationControllerCompPtr.IsValid()){
+			iprm::CParamsSet itemParamsSet;
+			if (m_objectParamsFillerCompPtr->FillParams(objectId, itemParamsSet, currentTenantId)){
+				QJsonObject paramsJsonObject;
+				if (m_paramSetRepresentationControllerCompPtr->GetRepresentationFromDataModel(itemParamsSet, paramsJsonObject)){
+					sdl::V1_0::imtbase::CParamsSet sdlParamsSet;
+					if (sdlParamsSet.ReadFromJsonObject(paramsJsonObject)){
+						item.params = sdlParamsSet;
+					}
+				}
+			}
 		}
 
 		// Apply text filter

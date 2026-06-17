@@ -311,6 +311,16 @@ I_EXPORT_COMPONENT(
 			"Cross Org Grant collection document service",
 			"Cross Org Grant Collection Document Service");
 
+I_EXPORT_COMPONENT(
+			CrossOrgGrantItemInfoProvider,
+			"Cross org grant item info provider",
+			"Cross Org Grant Item Info Provider");
+
+I_EXPORT_COMPONENT(
+			TenantRelationshipItemInfoProvider,
+			"Tenant relationship item info provider",
+			"Tenant Relationship Item Info Provider");
+
 
 } // namespace ImtAuthGqlPck
 

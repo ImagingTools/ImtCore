@@ -27,8 +27,15 @@ ViewBase {
 	readonly property var tenantData: generalPage.model
 	property var stateManager: null
 
-	readonly property bool __readOnly: !(generalPage.stateManager
-		&& (generalPage.stateManager.isCreator || generalPage.stateManager.isOwner || generalPage.stateManager.isNewTenant))
+	readonly property bool __canEditName: generalPage.stateManager
+		? (generalPage.stateManager.isNewTenant || generalPage.stateManager.canChangeOrganizationName)
+		: false
+	readonly property bool __canEditDescription: generalPage.stateManager
+		? (generalPage.stateManager.isNewTenant || generalPage.stateManager.canChangeOrganizationDescription)
+		: false
+	readonly property bool __canEditIsActive: generalPage.stateManager
+		? (generalPage.stateManager.isNewTenant || generalPage.stateManager.canEditOrganization)
+		: false
 
 	function updateGui() {
 		if (!generalPage.tenantData) return
@@ -104,7 +111,7 @@ ViewBase {
 							width: parent.width
 							height: Style.controlHeightM
 							textSize: Style.fontSizeM
-							readOnly: generalPage.__readOnly
+							readOnly: !generalPage.__canEditName
 							placeHolderText: qsTr("Enter the tenant name")
 
 							onEditingFinished: {
@@ -129,7 +136,7 @@ ViewBase {
 							width: parent.width
 							height: Style.controlHeightM
 							textSize: Style.fontSizeM
-							readOnly: generalPage.__readOnly
+							readOnly: !generalPage.__canEditDescription
 							placeHolderText: qsTr("Enter the description")
 
 							onEditingFinished: {
@@ -152,7 +159,7 @@ ViewBase {
 
 				SwitchCustom {
 					id: isActiveSwitch
-					readOnly: generalPage.__readOnly
+					readOnly: !generalPage.__canEditIsActive
 					onCheckedChanged: generalPage.doUpdateModel()
 				}
 
