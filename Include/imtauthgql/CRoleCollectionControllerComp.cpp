@@ -443,6 +443,34 @@ bool CRoleCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& 
 		}
 	}
 
+	// Add delegated roles if the user is in a delegated tenant
+	if (gqlContextPtr != nullptr && m_delegatedAccessCompPtr.IsValid() && m_membershipManagerCompPtr.IsValid()){
+		QByteArray userId = gqlContextPtr->GetUserId();
+		QByteArray currentTenantId = gqlContextPtr->GetTenantId();
+		if (!userId.isEmpty() && !currentTenantId.isEmpty()){
+			const imtauth::ITenantMembershipManager::MembershipIds membershipIds =
+				m_membershipManagerCompPtr->GetMembershipsByUser(userId);
+			for (const QByteArray& membershipId : membershipIds){
+				imtauth::ITenantMembershipUniquePtr homeMembershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+				if (!homeMembershipPtr.IsValid() || !homeMembershipPtr->IsActive()){
+					continue;
+				}
+				QByteArray homeTenantId = homeMembershipPtr->GetTenantId();
+				if (homeTenantId.isEmpty() || homeTenantId == currentTenantId){
+					continue;
+				}
+				if (m_delegatedAccessCompPtr->IsDelegatedAccess(userId, homeTenantId, currentTenantId)){
+					QByteArrayList delegatedRoles = m_delegatedAccessCompPtr->GetDelegatedRoles(homeTenantId, currentTenantId);
+					for (const QByteArray& roleId : delegatedRoles){
+						if (!availableRoleIds.contains(roleId)){
+							availableRoleIds.append(roleId);
+						}
+					}
+				}
+			}
+		}
+	}
+
 	QByteArray roleId;
 	if (commandId == sdl::V1_0::imtauth::CRoleItemGqlRequest::GetCommandId()){
 		sdl::V1_0::imtauth::CRoleItemGqlRequest roleItemGqlRequest(gqlRequest, false);

@@ -10,6 +10,7 @@
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtauth/CUserInfo.h>
 #include <imtauth/CUserConnectionInfo.h>
+#include <imtauth/ITenantInfo.h>
 
 
 namespace imtauthgql
@@ -76,6 +77,50 @@ bool CAuthorizationControllerComp::CheckCredential(
 }
 
 
+QByteArrayList CAuthorizationControllerComp::CalculateGlobalPermissions(
+			const imtauth::IUserInfo& userInfo,
+			const QByteArray& userId,
+			const QByteArray& productId) const
+{
+	QSet<QByteArray> userPermissionsSet;
+	for (const QByteArray& permissionId : userInfo.GetPermissions(productId)){
+		if (!permissionId.isEmpty()){
+			userPermissionsSet.insert(permissionId);
+		}
+	}
+
+	QSet<QByteArray> tenantPermissionsSet;
+	if (m_tenantMembershipManagerCompPtr.IsValid() && m_tenantManagerCompPtr.IsValid()){
+		QSet<QByteArray> tenantIds;
+		const QByteArrayList membershipIds = m_tenantMembershipManagerCompPtr->GetMembershipsByUser(userId);
+		for (const QByteArray& membershipId : membershipIds){
+			imtauth::ITenantMembershipUniquePtr membershipPtr = m_tenantMembershipManagerCompPtr->GetMembership(membershipId);
+			if (membershipPtr.IsValid() && membershipPtr->IsActive() && !membershipPtr->GetTenantId().isEmpty()){
+				tenantIds.insert(membershipPtr->GetTenantId());
+			}
+		}
+
+		for (const QByteArray& tenantId : std::as_const(tenantIds)){
+			for (const QByteArray& permissionId : m_tenantManagerCompPtr->GetTenantPermissions(tenantId)){
+				if (!permissionId.isEmpty()){
+					tenantPermissionsSet.insert(permissionId);
+				}
+			}
+		}
+	}
+
+	QByteArrayList globalPermissions;
+	for (const QByteArray& permissionId : std::as_const(userPermissionsSet)){
+		if (!tenantPermissionsSet.contains(permissionId)){
+			globalPermissions.push_back(permissionId);
+		}
+	}
+
+	std::sort(globalPermissions.begin(), globalPermissions.end());
+	return globalPermissions;
+}
+
+
 sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateInvalidLoginOrPasswordResponse(
 			const QByteArray& login,
 			QString& errorMessage) const
@@ -110,12 +155,14 @@ sdl::V1_0::imtauth::CAuthorizationPayload CAuthorizationControllerComp::CreateAu
 	payload.userId = objectId;
 	payload.systemId = systemId;
 
+	// During initial Authorization/UserToken flow tenant is not selected yet.
+	// Return only non-tenant (global) permissions here; tenant-scoped permissions
+	// are returned by GetPermissions after tenant selection.
+	// Global permissions are calculated as all user permissions minus the union
+	// of permissions from all tenants доступных пользователю.
 	if (!productId.isEmpty()){
-		imtauth::IUserInfo::FeatureIds permissionIds = userInfo.GetPermissions(productId);
-		QByteArrayList uniqueList = QSet<QByteArray>(permissionIds.begin(), permissionIds.end()).values();
-		std::sort(uniqueList.begin(), uniqueList.end());
-		QByteArray permissions = uniqueList.join(';');
-		(payload).permissions = permissions;
+		QByteArrayList globalPermissions = CalculateGlobalPermissions(userInfo, objectId, productId);
+		payload.permissions = globalPermissions.join(';');
 	}
 
 	if (m_jwtSessionControllerCompPtr.IsValid()){
@@ -330,7 +377,7 @@ sdl::V1_0::imtauth::CLogoutPayload CAuthorizationControllerComp::OnLogout(
 
 sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissions(
 			const sdl::V1_0::imtauth::CGetPermissionsGqlRequest& getPermissionsRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CPermissionList response;
@@ -357,6 +404,13 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 	}
 
 	QByteArray userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
+	QByteArray tenantId = m_jwtSessionControllerCompPtr->GetTenantFromJwt(token);
+
+	QByteArray productId;
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		productId = gqlContextPtr->GetProductId();
+	}
 
 	const imtauth::IUserInfo* userInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
@@ -369,7 +423,37 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 		return response;
 	}
 
-	QByteArrayList permissions = userInfoPtr->GetPermissions();
+	QByteArrayList userPermissions = productId.isEmpty()
+		? userInfoPtr->GetPermissions()
+		: userInfoPtr->GetPermissions(productId);
+
+	// Empty tenantId means global (non-tenant) scope.
+	if (tenantId.isEmpty()){
+		QByteArrayList globalPermissions = CalculateGlobalPermissions(*userInfoPtr, userId, productId);
+		response.permissions.Emplace().FromList(globalPermissions);
+		return response;
+	}
+
+	QByteArrayList tenantPermissions;
+	if (m_tenantManagerCompPtr.IsValid()){
+		tenantPermissions = m_tenantManagerCompPtr->GetTenantPermissions(tenantId);
+	}
+
+	QByteArrayList permissions;
+	if (tenantPermissions.isEmpty()){
+		permissions = userPermissions;
+	}
+	else{
+		QSet<QByteArray> tenantSet(tenantPermissions.begin(), tenantPermissions.end());
+		for (const QByteArray& permissionId : userPermissions){
+			if (tenantSet.contains(permissionId)){
+				permissions.push_back(permissionId);
+			}
+		}
+	}
+
+	permissions = QSet<QByteArray>(permissions.begin(), permissions.end()).values();
+	std::sort(permissions.begin(), permissions.end());
 	response.permissions.Emplace().FromList(permissions);
 
 	return response;

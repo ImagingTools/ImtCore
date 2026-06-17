@@ -18,6 +18,7 @@ class ITenantManager: virtual public istd::IChangeable
 public:
 	virtual QByteArrayList GetTenantIds() const = 0;
 	virtual ITenantInfoUniquePtr GetTenant(const QByteArray& tenantId) const = 0;
+	virtual QByteArrayList GetTenantPermissions(const QByteArray& tenantId) const = 0;
 	virtual QByteArray CreateTenant(const QString& tenantName, const QString& description = QString(), const QByteArray& ownerId = QByteArray()) = 0;
 	virtual bool RemoveTenant(const QByteArray& tenantId) = 0;
 	virtual bool UpdateTenant(const QByteArray& tenantId, const QString& tenantName, const QString& description, const QByteArray& ownerId = QByteArray(), bool updateOwner = false) = 0;

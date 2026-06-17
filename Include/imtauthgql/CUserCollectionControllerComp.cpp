@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CUserCollectionControllerComp.h>
 
+// Qt includes
+#include <QSet>
+
 // ACF includes
 #include <iprm/CTextParam.h>
 #include <iprm/CParamsSet.h>
@@ -657,7 +660,14 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 {
 	istd::IChangeableUniquePtr adaptedObjectPtr = BaseClass::CreateAdaptedObjectData(objectId, object, gqlRequest);
 
-	if (!m_delegatedAccessCompPtr.IsValid()){
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr == nullptr || !m_delegatedAccessCompPtr.IsValid() || !m_membershipManagerCompPtr.IsValid()){
+		return adaptedObjectPtr;
+	}
+
+	QByteArray currentTenantId = gqlContextPtr->GetTenantId();
+	QByteArray currentProductId = gqlContextPtr->GetProductId();
+	if (currentTenantId.isEmpty() || currentProductId.isEmpty()){
 		return adaptedObjectPtr;
 	}
 
@@ -666,10 +676,52 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 		return adaptedObjectPtr;
 	}
 
-	QByteArrayList delegatedRoleIds = m_delegatedAccessCompPtr->GetDelegatedUserRoles(objectId);
-	if (delegatedRoleIds.isEmpty()){
+	bool hasDirectMembership = false;
+	QByteArrayList homeTenantIds;
+	const imtauth::ITenantMembershipManager::MembershipIds membershipIds =
+		m_membershipManagerCompPtr->GetMembershipsByUser(objectId);
+	for (const QByteArray& membershipId : membershipIds){
+		imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
+		if (!membershipPtr.IsValid() || !membershipPtr->IsActive()){
+			continue;
+		}
+		QByteArray tenantId = membershipPtr->GetTenantId();
+		if (tenantId == currentTenantId){
+			hasDirectMembership = true;
+			break;
+		}
+		if (!tenantId.isEmpty()){
+			homeTenantIds.append(tenantId);
+		}
+	}
+
+	if (hasDirectMembership){
 		return adaptedObjectPtr;
 	}
+
+	QSet<QByteArray> delegatedRoleIdSet;
+	for (const QByteArray& homeTenantId : homeTenantIds){
+		QByteArrayList roleIds = m_delegatedAccessCompPtr->GetDelegatedRoles(homeTenantId, currentTenantId);
+		for (const QByteArray& roleId : roleIds){
+			if (!roleId.isEmpty()){
+				// Only keep roles that belong to the current product context.
+				if (m_roleInfoProviderCompPtr.IsValid()){
+					imtauth::IRoleUniquePtr roleInfoPtr = m_roleInfoProviderCompPtr->GetRole(roleId);
+					if (!roleInfoPtr.IsValid() || roleInfoPtr->GetProductId() != currentProductId){
+						continue;
+					}
+				}
+				// If role metadata is unavailable, keep the tenant-scoped role.
+				delegatedRoleIdSet.insert(roleId);
+			}
+		}
+	}
+
+	if (delegatedRoleIdSet.isEmpty()){
+		return adaptedObjectPtr;
+	}
+
+	const QByteArrayList delegatedRoleIds(delegatedRoleIdSet.begin(), delegatedRoleIdSet.end());
 
 	if (!adaptedObjectPtr.IsValid()){
 		adaptedObjectPtr = object.CloneMe();
@@ -683,17 +735,7 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateAdaptedObjectDat
 		return adaptedObjectPtr;
 	}
 
-	for (const QByteArray& delegatedRoleId : delegatedRoleIds){
-		QByteArray productId;
-		if (m_roleInfoProviderCompPtr.IsValid()){
-			imtauth::IRoleUniquePtr roleInfoPtr = m_roleInfoProviderCompPtr->GetRole(delegatedRoleId);
-			if (roleInfoPtr.IsValid()){
-				productId = roleInfoPtr->GetProductId();
-			}
-		}
-
-		adaptedUserInfoPtr->AddRole(productId, delegatedRoleId);
-	}
+	adaptedUserInfoPtr->SetRoles(currentProductId, delegatedRoleIds);
 
 	return adaptedObjectPtr;
 }
@@ -776,5 +818,3 @@ QJsonObject CUserCollectionControllerComp::InsertObject(
 
 
 } // namespace imtauth
-
-

@@ -19,6 +19,7 @@ Item {
 	
 	Component.onCompleted: {
 		Events.subscribeEvent("SetUserPanelEnabled", root.setUserPanelEnabled);
+		root.__loadOrganizations();
 	}
 	
 	Component.onDestruction: {
@@ -30,6 +31,7 @@ Item {
 		
 		function onLoggedIn(){
 			root.enabled = true;
+			root.__loadOrganizations();
 		}
 		
 		function onLoggedOut(){
@@ -45,7 +47,7 @@ Item {
 		root.visible = visible;
 	}
 
-	// --- Organizations list for submenu ---
+	// --- Organizations list for context menu ---
 	property var __organizationsList: []
 
 	function __loadOrganizations() {
@@ -83,6 +85,7 @@ Item {
 						}
 					}
 					root.__organizationsList = list
+					contextMenuModel.fillModel()
 				}
 			}
 		}
@@ -153,10 +156,30 @@ Item {
 		}
 		
 		function fillModel(){
+			var currentTenantId = AuthorizationController.currentTenantId || "";
 			contextMenuModel.clear();
 			contextMenuModel.append({"id": "Profile", "name": qsTr("Profile"), "icon": "Icons/Account", "isEnabled": true});
-			if (AuthorizationController.currentTenantId !== "")
-				contextMenuModel.append({"id": "LeaveTenant", "name": qsTr("Leave Organization"), "icon": "Icons/Exit", "isEnabled": true});
+			contextMenuModel.append({"id": "", "name": "", "Icon": ""});
+
+			for (var i = 0; i < root.__organizationsList.length; i++) {
+				var orgData = root.__organizationsList[i];
+				if (!orgData || !orgData.id)
+					continue;
+
+				var isCurrent = orgData.id === currentTenantId;
+				var orgName = orgData.name || "";
+				if (isCurrent)
+					orgName = orgName + " " + qsTr("(current)");
+
+				contextMenuModel.append({
+					"id": "Organization:" + orgData.id,
+					"name": orgName,
+					"icon": "",
+					"isEnabled": !isCurrent
+				});
+			}
+
+			contextMenuModel.append({"id": "NoOrganization", "name": qsTr("No organization"), "icon": "", "isEnabled": currentTenantId !== ""});
 			contextMenuModel.append({"id": "", "name": "", "Icon": ""});
 			contextMenuModel.append({"id": "Logout", "name": qsTr("Logout"), "icon": "Icons/Exit", "isEnabled": true});
 		}
@@ -167,16 +190,24 @@ Item {
 		
 		PopupMenuDialog {
 			id: popupMenuDialog;
-			
+			shownItemsCount: 10
 			onFinished: {
 				if (commandId == "Logout"){
 					AuthorizationController.logout();
 				}
-				else if (commandId == "LeaveTenant"){
-					AuthorizationController.selectTenant("");
+				else if (commandId == "NoOrganization"){
+					if (AuthorizationController.currentTenantId !== "") {
+						AuthorizationController.selectTenant("");
+					}
 				}
 				else if (commandId == "Profile"){
 					ModalDialogManager.openDialog(profileViewComp, {});
+				}
+				else if (commandId.indexOf("Organization:") === 0) {
+					var tenantId = commandId.substring("Organization:".length);
+					if (tenantId !== "" && tenantId !== AuthorizationController.currentTenantId) {
+						AuthorizationController.selectTenant(tenantId);
+					}
 				}
 			}
 		}

@@ -100,18 +100,17 @@ void CWebSocketThread::EnableSecureConnection(bool isSecureConnection)
 
 void CWebSocketThread::run()
 {
-	if (!m_socket->isValid()){
+	QPointer<QWebSocket> webSocketPtr = GetValidWebSocket();
+	if (webSocketPtr.isNull()){
 		return;
 	}
 
-	QWebSocket* webSocketPtr = m_socket.data();
-
-	connect(webSocketPtr, &QWebSocket::binaryMessageReceived, this, &CWebSocketThread::OnWebSocketBinaryMessage);
-	connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketThread::OnSocketDisconnected);
+	connect(webSocketPtr.data(), &QWebSocket::binaryMessageReceived, this, &CWebSocketThread::OnWebSocketBinaryMessage);
+	connect(webSocketPtr.data(), &QWebSocket::disconnected, this, &CWebSocketThread::OnSocketDisconnected);
 #if (QT_VERSION >= 0x060500)
-	connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccurred), this, &CWebSocketThread::OnError);
+	connect(webSocketPtr.data(), QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccurred), this, &CWebSocketThread::OnError);
 #else
-//	connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &CWebSocketServerComp::OnError);
+//	connect(webSocketPtr.data(), QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &CWebSocketThread::OnError);
 #endif
 
 	exec();
@@ -126,8 +125,8 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 		return;
 	}
 
-	QWebSocket* webSocketPtr = m_socket.data();
-	if (webSocketPtr == nullptr){
+	QPointer<QWebSocket> webSocketPtr = GetValidWebSocket();
+	if (webSocketPtr.isNull()){
 		return;
 	}
 
@@ -152,8 +151,8 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 			// By parenting to the thread, CWebSocketRequests survive socket destruction.
 			// Cleanup happens explicitly in OnSocketDisconnected.
 			webSocketRequest->setParent(this);
-			if (m_server != nullptr){
-				m_server->RegisterSender(webSocketRequest->GetRequestId(), webSocketPtr);
+			if (m_server != nullptr && !webSocketPtr.isNull()){
+				m_server->RegisterSender(webSocketRequest->GetRequestId(), webSocketPtr.data());
 			}
 		}
 
@@ -179,8 +178,8 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 		}
 		else {
 			if (methodType == CWebSocketRequest::MT_CONNECTION_INIT){
-				if (!clientId.isEmpty()){
-					m_server->RegisterSender(clientId, webSocketPtr);
+				if (!clientId.isEmpty() && !webSocketPtr.isNull()){
+					m_server->RegisterSender(clientId, webSocketPtr.data());
 				}
 				m_server->SetConnectionStatus(clientId);
 			}
@@ -190,8 +189,8 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 					imtrest::IRequestUniquePtr requestPtr = m_httpEnginePtr->CreateRequest(*m_requestServerHandlerPtr);
 					CHttpRequest* newHttpRequestPtr = dynamic_cast<CHttpRequest*>(requestPtr.GetPtr());
 					if (newHttpRequestPtr != nullptr){
-						if (!clientId.isEmpty()){
-							m_server->RegisterSender(webSocketRequest->GetRequestId(), webSocketPtr);
+						if (!clientId.isEmpty() && !webSocketPtr.isNull()){
+							m_server->RegisterSender(webSocketRequest->GetRequestId(), webSocketPtr.data());
 						}
 	
 						QJsonDocument document = QJsonDocument::fromJson(textMessage.toUtf8());
@@ -267,9 +266,22 @@ void CWebSocketThread::OnError(QAbstractSocket::SocketError error)
 
 void CWebSocketThread::OnTimeout()
 {
-	if (m_socket->isValid()){
-		m_socket->sendTextMessage(QString(R"({"type": "ka"})"));
+	QPointer<QWebSocket> webSocketPtr = GetValidWebSocket();
+	if (webSocketPtr.isNull()){
+		return;
 	}
+	webSocketPtr->sendTextMessage(QString(R"({"type": "ka"})"));
+}
+
+
+QPointer<QWebSocket> CWebSocketThread::GetValidWebSocket() const
+{
+	QPointer<QWebSocket> webSocketPtr = m_socket;
+	if (webSocketPtr.isNull() || !webSocketPtr->isValid()){
+		return {};
+	}
+
+	return webSocketPtr;
 }
 
 
@@ -312,5 +324,3 @@ void CWebSocketThread::OnSendTextMessage(const QByteArray& data) const
 
 
 } // namespace imtrest
-
-

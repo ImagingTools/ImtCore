@@ -5,7 +5,7 @@ import com.imtcore.imtqml 1.0
 BoundingBox {
 	id: textShape
 
-	property string fontFamily: "sans-serif"
+	property string fontFamily: Style.fontFamily
 	property int fontSize: 10
 	property bool fontBold: false
 	property string fillColor: Style.textColor
@@ -52,4 +52,3 @@ BoundingBox {
 	}
 
 }
-

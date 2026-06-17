@@ -363,7 +363,7 @@ void CWebSocketServerComp::OnSocketDisconnected()
 	}
 
 	for (const QByteArray& key: m_senders.keys()){
-		if (socketObjectPtr == m_senders[key]->GetSocket()){
+		if (socketObjectPtr == m_senders[key]->GetSocket().data()){
 			m_senders.remove(key);
 
 			istd::IChangeable::ChangeSet loginChangeSet(imtcom::IConnectionStatusProvider::CS_UNKNOWN, QString("Logout"));
@@ -430,5 +430,4 @@ void CWebSocketServerComp::OnSslErrors(const QList<QSslError>& errors)
 
 
 } // namespace imtrest
-
 

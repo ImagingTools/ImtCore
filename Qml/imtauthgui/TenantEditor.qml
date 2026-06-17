@@ -86,19 +86,29 @@ DocumentViewBase {
 			multiPageView.clear()
 			multiPageView.addPage("General", qsTr("General"), generalPageComp, "Icons/Settings")
 			if (!stateManager_.isNewTenant) {
-				multiPageView.addPage("Members", qsTr("Members"), membersPageComp, "Icons/MultipleUser")
-				if (stateManager_.canManageMembers) {
+				if (stateManager_.canViewOrganizationMembers)
+					multiPageView.addPage("Members", qsTr("Members"), membersPageComp, "Icons/MultipleUser")
+				if (stateManager_.canViewOrganizationRoles) {
 					multiPageView.addPage("Roles", qsTr("Roles"), rolesPageComp, "Icons/Role")
+				}
+				if (stateManager_.canViewOrganizationGroups) {
 					multiPageView.addPage("Groups", qsTr("Groups"), groupsPageComp, "Icons/Organization")
 				}
-				if (stateManager_.isCreator) {
+				if (stateManager_.canViewOrganizationPermissions) {
 					multiPageView.addPage("Permissions", qsTr("Permissions"), permissionsPageComp, "Icons/Key")
+				}
+				if (stateManager_.isCreator) {
 					multiPageView.addPage("CrossOrgGrants", qsTr("Grants"), crossOrgGrantsPageComp, "Icons/Crown")
 					// multiPageView.addPage("Contracts", qsTr("Contracts"), contractsPageComp, "Icons/Assignment")
+				}
+				if (stateManager_.canViewOrganizationConnections || stateManager_.canViewOrganizationConnectionCode || stateManager_.canConnectOrganization) {
 					multiPageView.addPage("Relationships", qsTr("Relationships"), null, "Icons/Participant")
-					multiPageView.addSubPage("Relationships", "ConnectionCode", qsTr("Connection Code"), connectionCodePageComp)
-					multiPageView.addSubPage("Relationships", "ConnectOrganization", qsTr("Connect Organization"), connectOrganizationPageComp)
-					multiPageView.addSubPage("Relationships", "MyRelationships", qsTr("My Relationships"), myConnectionsPageComp)
+					if (stateManager_.canViewOrganizationConnectionCode)
+						multiPageView.addSubPage("Relationships", "ConnectionCode", qsTr("Connection Code"), connectionCodePageComp)
+					if (stateManager_.canConnectOrganization || stateManager_.canViewOrganizationConnections)
+						multiPageView.addSubPage("Relationships", "ConnectOrganization", qsTr("Connect Organization"), connectOrganizationPageComp)
+					if (stateManager_.canViewOrganizationConnections)
+						multiPageView.addSubPage("Relationships", "MyRelationships", qsTr("My Relationships"), myConnectionsPageComp)
 					// multiPageView.addPage("Messages", qsTr("Messages"), messagesPageComp, "Icons/Message")
 				}
 			}
@@ -313,6 +323,7 @@ DocumentViewBase {
 
 		TenantPermissionsPage {
 			model: container.tenantData
+			stateManager: stateManager_
 		}
 	}
 

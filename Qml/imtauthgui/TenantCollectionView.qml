@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 import QtQuick 2.12
-import QtQuick.Controls
+// TEMPORARY: removed QtQuick.Controls import (was used for Popup, now using PopupView)
 import Acf 1.0
 import imtgui 1.0
 import imtcolgui 1.0
@@ -40,6 +40,8 @@ RemoteCollectionView {
 		if (commandId === "Switch") {
 			let indexes = table.getSelectedIndexes()
 			if (indexes.length === 1) {
+				let scope = table.elements.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, indexes[0])
+				if (scope === "Invited") return
 				let tenantId = table.elements.getData("id", indexes[0])
 				container.switchToTenant(tenantId)
 			}
@@ -197,10 +199,21 @@ RemoteCollectionView {
 			property string invitedByNameValue: ""
 
 			onReused: {
-				if (rowIndex >= 0 && tenantRelationScopeDelegate.rowDelegate && tenantRelationScopeDelegate.rowDelegate.tableItem){
-					scopeValue = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, rowIndex);
-					invitationIdValue = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_invitationId, rowIndex);
-					invitedByNameValue = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_invitedByName, rowIndex);
+				if (rowIndex >= 0 && tenantRelationScopeDelegate && tenantRelationScopeDelegate.rowDelegate && tenantRelationScopeDelegate.rowDelegate.tableItem){
+					let scope = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, rowIndex);
+					if (scope){
+						scopeValue = scope
+					}
+
+					let invitationId = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_invitationId, rowIndex);
+					if (invitationId){
+						invitationIdValue = invitationId
+					}
+
+					let invitedByName = tenantRelationScopeDelegate.rowDelegate.tableItem.elements.getData(TenantItemDataTypeMetaInfo.s_invitedByName, rowIndex);
+					if (invitedByName){
+						invitedByNameValue = invitedByName
+					}
 				}
 			}
 
@@ -221,21 +234,30 @@ RemoteCollectionView {
 					cursorShape: tenantRelationScopeDelegate.scopeValue === "Invited" ? Qt.PointingHandCursor : Qt.ArrowCursor
 					onEntered: {
 						if (tenantRelationScopeDelegate.scopeValue === "Invited") {
-							invitationPopup.open()
+							var point = tenantRelationScopeDelegate.mapToItem(null, 0, tenantRelationScopeDelegate.height)
+							ModalDialogManager.openDialog(invitationPopupComp, {
+								"x": point.x,
+								"y": point.y
+							})
 						}
 					}
 				}
 			}
 
-			Popup {
+			Component {
+				id: invitationPopupComp
+			// TEMPORARY: PopupView-based solution (replaces QtQuick.Controls Popup)
+			PopupView {
 				id: invitationPopup
 				x: scopeLabel.x
 				y: scopeLabel.y + scopeLabel.height + Style.spacingS
+				z: tenantRelationScopeDelegate.z + 1
 				width: invitationPopupContent.width + 2 * Style.marginL
 				height: invitationPopupContent.height + 2 * Style.marginL
-				closePolicy: Enums.popupCloseOnEscape | Enums.popupCloseOnPressOutside
+				forceFocus: true
 
-				background: Rectangle {
+				Rectangle {
+					anchors.fill: parent
 					color: Style.baseColor
 					border.color: Style.borderColor
 					border.width: 1
@@ -277,7 +299,7 @@ RemoteCollectionView {
 								onClicked: {
 									if (tenantRelationScopeDelegate.invitationIdValue !== "") {
 										container.acceptInvitation(tenantRelationScopeDelegate.invitationIdValue)
-										invitationPopup.close()
+										invitationPopup.visible = false
 									}
 								}
 							}
@@ -303,13 +325,15 @@ RemoteCollectionView {
 								onClicked: {
 									if (tenantRelationScopeDelegate.invitationIdValue !== "") {
 										container.rejectInvitation(tenantRelationScopeDelegate.invitationIdValue)
-										invitationPopup.close()
+										invitationPopup.visible = false
 									}
 								}
 							}
 						}
 					}
 				}
+			}
+			// END TEMPORARY: PopupView-based solution
 			}
 		}
 	}
@@ -699,6 +723,10 @@ RemoteCollectionView {
 
 					let tenantId = elementsModel.getData("id", index)
 					let typeId = elementsModel.getData("typeId", index)
+					let scope = elementsModel.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, index)
+					if (scope === "Invited") {
+						return
+					}
 					if (tenantId && tenantId !== AuthorizationController.currentTenantId){
 						let tenantName = elementsModel.containsKey("name", index)
 								? elementsModel.getData("name", index)
@@ -721,8 +749,8 @@ RemoteCollectionView {
 					let tenantId = elementsModel.getData("id", row)
 					let scope = elementsModel.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, row)
 
-					switchEnabled =  tenantId !== AuthorizationController.currentTenantId
-					leaveEnabled =  scope === "Member"
+					switchEnabled = tenantId !== AuthorizationController.currentTenantId && scope !== "Invited"
+					leaveEnabled = scope === "Member"
 				}
 				commandsController.setCommandIsEnabled("Switch", switchEnabled)
 				commandsController.setCommandIsEnabled("Leave", leaveEnabled)

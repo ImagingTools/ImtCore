@@ -120,9 +120,10 @@ DocumentServiceBase {
 
 	function saveDocument(documentId, documentName){
 		startSaveDocument(documentId)
+		let resolvedDocumentName = root.resolveDocumentNameForSave(documentId, documentName || "")
 
 		saveDocumentInput.m_documentId = documentId || ""
-		saveDocumentInput.m_documentName = documentName || ""
+		saveDocumentInput.m_documentName = resolvedDocumentName
 		saveDocumentInput.m_collectionId = collectionId || ""
 		saveDocumentRequest.documentId = documentId || ""
 

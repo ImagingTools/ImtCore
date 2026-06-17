@@ -58,6 +58,7 @@
 	<file alias="imtauthgui/RelationshipView.qml">RelationshipView.qml</file>
 	<file alias="imtauthgui/MessageView.qml">MessageView.qml</file>
 	<file alias="imtauthgui/StatusBadge.qml">StatusBadge.qml</file>
+	<file alias="imtauthgui/TenantCollectionItemDelegateBase.qml">TenantCollectionItemDelegateBase.qml</file>
 	<file alias="imtauthgui/TenantCollectionListView.qml">TenantCollectionListView.qml</file>
 	<file alias="imtauthgui/TenantTableContainer.qml">TenantTableContainer.qml</file>
 	<file alias="imtauthgui/TenantTableHeader.qml">TenantTableHeader.qml</file>

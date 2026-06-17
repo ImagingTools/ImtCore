@@ -30,6 +30,10 @@ customEditorComponent: createContractComp
 
 headerButtonsComponent: headerBtnsComp
 
+readonly property bool __canManageContracts: contractsPage.stateManager
+	? contractsPage.stateManager.canManageOrganizationConnections
+	: false
+
 function updateGui() {
 if (contractsPage.apiClient && contractsPage.tenantData && contractsPage.tenantData.m_id) {
 contractsPage.apiClient.fetchContracts(contractsPage.tenantData.m_id)
@@ -82,14 +86,13 @@ Text {
 text: qsTr("+ Create Contract")
 font.pixelSize: Style.fontSizeM
 font.bold: true
-color: (contractsPage.stateManager && (contractsPage.stateManager.isCreator || contractsPage.stateManager.isOwner))
-? Style.linkColor : Style.inactiveTextColor
+color: contractsPage.__canManageContracts ? Style.linkColor : Style.inactiveTextColor
 
 MouseArea {
 anchors.fill: parent
 hoverEnabled: true
-cursorShape: Qt.PointingHandCursor
-enabled: contractsPage.stateManager && (contractsPage.stateManager.isCreator || contractsPage.stateManager.isOwner)
+cursorShape: contractsPage.__canManageContracts ? Qt.PointingHandCursor : Qt.ArrowCursor
+enabled: contractsPage.__canManageContracts
 onClicked: {
 contractsPage.openCreate()
 }
@@ -110,7 +113,7 @@ border.width: 1
 
 readonly property var __contract: modelData
 readonly property bool __canManage: contractsPage.stateManager
-&& (contractsPage.stateManager.isCreator || contractsPage.stateManager.isOwner)
+	&& contractsPage.__canManageContracts
 
 Column {
 id: contractDelegateContent

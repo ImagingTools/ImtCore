@@ -23,6 +23,10 @@ TenantSimpleCollectionPage {
 	documentManager: apiClient ? apiClient.roleDocumentManager : null
 	objectTypeId: apiClient ? apiClient.roleObjectTypeId : ""
 	dataProvider: apiClient ? apiClient.roleListDataProvider : null
+	managePermissionIds: ["EditOrganizationRole", "ChangeOrganizationRole", "RemoveOrganizationRole", "AddOrganizationRole"]
+	createPermissionIds: ["AddOrganizationRole", "EditOrganizationRole"]
+	editPermissionIds: ["ChangeOrganizationRole", "EditOrganizationRole"]
+	deletePermissionIds: ["RemoveOrganizationRole", "EditOrganizationRole"]
 
 	function removeItems(ids) {
 		if (rolesPage.apiClient)

@@ -99,7 +99,7 @@ BoundingBox {
 
 		//Label names params
 		let labelNameFontSize = fontSize + 2
-		ctx.font = String(labelNameFontSize) + "px sans-serif"
+		ctx.font = String(labelNameFontSize) + "px " + Style.fontFamily
 		let labelXNameLength = ctx.measureText(gridShape.labelX).width
 		let labelYNameLength = ctx.measureText(gridShape.labelY).width
 		// let labelXNameWidth_ = Math.max(labelXNameLength + 10, 20)
@@ -361,7 +361,7 @@ BoundingBox {
 		//LABELS FOR COORDINATE AXIS
 
 		if(gridShape.canDrawText){
-			ctx.font = String(fontSize) + "px sans-serif"//"14px sans-serif"
+			ctx.font = String(fontSize) + "px " + Style.fontFamily
 
 			ctx.strokeStyle = gridShape.axesColor;
 			ctx.fillStyle = gridShape.fontColor;
@@ -573,7 +573,7 @@ BoundingBox {
 
 
 		//Legend
-		ctx.font = String(labelNameFontSize) + "px sans-serif"
+		ctx.font = String(labelNameFontSize) + "px " + Style.fontFamily
 		ctx.fillStyle = gridShape.fontColor;
 		//ctx.fillText(gridShape.labelX, gridShape.viewItem.drawingAreaWidth - labelXNameLength, gridShape.viewItem.drawingAreaHeight  - labelXHeight + fontSize + Style.marginXS);
 		// ctx.fillText(gridShape.labelY, Style.marginXS, Style.marginXS + labelNameFontSize/2);
@@ -619,4 +619,3 @@ BoundingBox {
 		return false;
 	}
 }
-
