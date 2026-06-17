@@ -15,6 +15,8 @@ Rectangle{
 	color: Style.color_menu;
 
 	property string addressListCommandId: "AddressList"
+	property string subscriptionCommandId: "OnAddressCollectionChanged"
+
 	property string searchNameId: "fullAddress"
 	property string idParam: "id"
 	property string nameParam: "name"
@@ -24,6 +26,7 @@ Rectangle{
 	property string typeIdParam: "typeId"
 	property string parentIdsParam: "parentIds"
 	property string hasChildrenParam: "hasChildren__"
+
 	property string idsToOpen: "";
 	property string textColor: Style.firstColor
 	property var searchFields: [
@@ -47,7 +50,7 @@ Rectangle{
 		property int insertIndex: -1;
 		property TreeItemModel newTreeModel: TreeItemModel{}
 
-		gqlCommandId: "AddressTreeList"
+		gqlCommandId: treeBody.addressListCommandId
 		inputObjectComp: treeBody.addressTreeInputObjectComp
 		sdlObjectComp: treeBody.addressTreeSdlObjectComp
 
@@ -152,7 +155,7 @@ Rectangle{
 
 	SubscriptionClient {
 		id: subscriptionClient;
-		gqlCommandId: "OnAddressCollectionChanged"
+		gqlCommandId: treeBody.subscriptionCommandId
 
 		onMessageReceived: {
 			treeBody.handleSubscription(data);

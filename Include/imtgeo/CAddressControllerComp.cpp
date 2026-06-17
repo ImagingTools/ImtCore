@@ -9,6 +9,8 @@
 // ImtCore includes
 #include <imtgeo/CAddressTypeInfo.h>
 #include <imtgeo/CAddressElementInfo.h>
+#include <imtbase/CComplexCollectionFilter.h>
+#include <iprm/CParamsSet.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 
 
@@ -183,6 +185,56 @@ bool CAddressControllerComp::UpdateObjectFromRequest(
 	}
 
 	object.CopyFrom(*tempObject);
+
+	return true;
+}
+
+
+bool CAddressControllerComp::OnBeforeRemoveElements(
+			const QByteArrayList& elementIds,
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	if (elementIds.isEmpty()){
+		return true;
+	}
+
+	using Filter = imtbase::CComplexCollectionFilter;
+	Filter complexFilter;
+
+	QVariantList elementIdsVarList;
+	for (const QByteArray& id : elementIds){
+		elementIdsVarList.append(id);
+	}
+
+	complexFilter.AddFieldFilter(Filter::FieldFilter(
+		QByteArrayLiteral("ParentIds"),
+		elementIdsVarList,
+		imtbase::IComplexCollectionFilter::FO_ARRAY_HAS_ANY
+	));
+
+	iprm::CParamsSet filterParams;
+	filterParams.SetEditableParameter(QByteArrayLiteral("ComplexFilter"), &complexFilter);
+
+	istd::TDelPtr<imtbase::IObjectCollectionIterator> iterator(m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), 0, -1, &filterParams));
+	if (!iterator.IsValid()){
+		return true;
+	}
+
+	QByteArrayList descendantsList;
+	while (iterator->Next()){
+		descendantsList.append(iterator->GetObjectId());
+	}
+
+	if (descendantsList.isEmpty()){
+		return true;
+	}
+
+	if (!m_objectCollectionCompPtr->RemoveElements(descendantsList)){
+		errorMessage = QStringLiteral("Failed to remove child addresses during cascade delete.");
+
+		return false;
+	}
 
 	return true;
 }

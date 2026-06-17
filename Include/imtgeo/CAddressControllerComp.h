@@ -42,6 +42,10 @@ protected:
 				const imtgql::CGqlRequest& gqlRequest,
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
+	virtual bool OnBeforeRemoveElements(
+				const QByteArrayList& elementIds,
+				const imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 
 private:
 	I_FACT(imtgeo::IAddressElementInfo, m_addressInfoFactCompPtr);
@@ -49,6 +53,6 @@ private:
 };
 
 
-} // namespace npgql
+} // namespace imtgeo
 
 
