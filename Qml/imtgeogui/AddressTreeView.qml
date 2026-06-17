@@ -55,16 +55,66 @@ Rectangle{
 		inputObjectComp: treeBody.addressTreeInputObjectComp
 		sdlObjectComp: treeBody.addressTreeSdlObjectComp
 
-		onFinished: {
-			if (status === 1) {
-				if (treeBody.selectedTreeId !== "" && treeBody.addressTreeRequest.idsToOpen === "") {
-					let restoredIndex = treeView.findIndexById(treeBody.selectedTreeId);
-					if (restoredIndex > -1) {
-						treeView.selectedIndex = restoredIndex;
-					}
-					treeBody.selectedTreeId = "";
-				}
+		property var customFinishedCallback: null
+
+		function defaultFinishedCallback(status, sdlObject, insertIndex, newTreeModel, idsToOpen) {
+			treeLoading.visible = false;
+			if (status !== 1) {
+				return;
 			}
+
+			let items = (sdlObject && sdlObject.m_items !== undefined) ? sdlObject.m_items : null;
+			let isCountZero = !items || items.getItemsCount() === 0;
+
+			if (isCountZero && insertIndex === -1) {
+				treeView.model.clear();
+				treeView.selectedIndex = -1;
+			}
+
+			if (!isCountZero) {
+				if (insertIndex === -1) {
+					treeView.model.clear();
+				}
+				newTreeModel.createFromJson(items.toJson());
+				treeView.insertTree(insertIndex, newTreeModel);
+				newTreeModel.clear();
+			}
+
+			if (treeView.model.getItemsCount() > 0 && idsToOpen !== "") {
+				let ids_ = idsToOpen;
+				treeBody.addressTreeRequest.idsToOpen = "";
+				treeBody.openNestedTree(ids_);
+			}
+
+			if (treeView.model.getItemsCount() <= 0 || idsToOpen === "") {
+				treeBody.addressTreeRequest.idsToOpen = "";
+			}
+
+			if (treeBody.selectedTreeId === "") {
+				return;
+			}
+
+			let restoredIndex = treeView.findIndexById(treeBody.selectedTreeId);
+			if (restoredIndex > -1) {
+				treeView.selectedIndex = restoredIndex;
+			}
+			treeBody.selectedTreeId = "";
+		}
+
+		onFinished: {
+			let reqStatus = status;
+			let reqSdlObject = sdlObject;
+			let reqInsertIndex = insertIndex;
+			let reqNewTreeModel = newTreeModel;
+			let reqIdsToOpen = idsToOpen;
+
+			if (customFinishedCallback) {
+				customFinishedCallback(reqStatus, reqSdlObject, reqInsertIndex, reqNewTreeModel, reqIdsToOpen);
+
+				return;
+			}
+
+			defaultFinishedCallback(reqStatus, reqSdlObject, reqInsertIndex, reqNewTreeModel, reqIdsToOpen);
 		}
 
 		function reset(){
