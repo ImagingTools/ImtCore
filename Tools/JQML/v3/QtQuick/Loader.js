@@ -228,6 +228,14 @@ class Loader extends Item {
                 }
             }
 
+            if(!cls || !cls.isAssignableFrom){
+                try {
+                    cls = eval(className)
+                } catch (error) {
+        
+                }
+            }
+
             if(!cls){
                 console.error(`Loader: "${this.source}" is not founded | className: ${className} | modules:`, Object.keys(JQModules))
                 this.item = null

@@ -706,7 +706,7 @@ async function runWebTest(driver, testDirPath, timeout = 5000) {
     }
 
     try {
-        await driver.get('file://' + path.resolve(testDirPath, './_web/test.html'))
+        await driver.get('file://' + path.resolve(testDirPath, './_web/test.html') + '#jqdebug')
 
         await driver.wait(async () => {
             const readyState = await driver.executeScript('return document.readyState')

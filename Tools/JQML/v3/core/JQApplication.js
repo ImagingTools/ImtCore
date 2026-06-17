@@ -337,6 +337,7 @@ module.exports = {
             }
             .Flow {
                 flex-wrap: wrap;
+                align-content: flex-start;
             }    
             .Row > *{
                 position: relative;

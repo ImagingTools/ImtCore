@@ -78,12 +78,12 @@ class Flow extends Item {
         if(this.flow === Flow.LeftToRight){
             this.__setDOMStyle({
                 flexDirection: this.layoutDirection === QtEnums.LeftToRight ? 'row' : 'row-reverse',
-                columnGap: this.spacing + 'px'
+                gap: this.spacing + 'px'
             })
         } else {
             this.__setDOMStyle({
                 flexDirection: this.layoutDirection === QtEnums.RightToLeft ? 'column' : 'column-reverse',
-                rowGap: this.spacing + 'px'
+                gap: this.spacing + 'px'
             })
         }
 
