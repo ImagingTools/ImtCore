@@ -28,6 +28,7 @@ Rectangle{
 	property string hasChildrenParam: "hasChildren__"
 
 	property string idsToOpen: "";
+	property string selectedTreeId: "";
 	property string textColor: Style.firstColor
 	property var searchFields: [
 		idParam, fullAddressParam,
@@ -53,6 +54,18 @@ Rectangle{
 		gqlCommandId: treeBody.addressListCommandId
 		inputObjectComp: treeBody.addressTreeInputObjectComp
 		sdlObjectComp: treeBody.addressTreeSdlObjectComp
+
+		onFinished: {
+			if (status === 1) {
+				if (treeBody.selectedTreeId !== "" && treeBody.addressTreeRequest.idsToOpen === "") {
+					let restoredIndex = treeView.findIndexById(treeBody.selectedTreeId);
+					if (restoredIndex > -1) {
+						treeView.selectedIndex = restoredIndex;
+					}
+					treeBody.selectedTreeId = "";
+				}
+			}
+		}
 
 		function reset(){
 			treeBody.addressTreeRequest.insertIndex = -1;
@@ -130,7 +143,17 @@ Rectangle{
 				treeBody.openNestedTree(treeBody.idsToOpen, index + 1)
 			}
 			else {
-				treeView.selectedIndex = index;
+				if (treeBody.selectedTreeId !== "") {
+					let restoredIndex = treeView.findIndexById(treeBody.selectedTreeId);
+					if (restoredIndex > -1) {
+						treeView.selectedIndex = restoredIndex;
+					} else {
+						treeView.selectedIndex = index;
+					}
+					treeBody.selectedTreeId = "";
+				} else {
+					treeView.selectedIndex = index;
+				}
 			}
 		}
 
@@ -145,8 +168,34 @@ Rectangle{
 		}
 
 		else{
+			if (treeView.selectedIndex > -1) {
+				let selId = treeView.getData("id", treeView.selectedIndex);
+				if (selId !== undefined && selId !== null && selId !== "") {
+					treeBody.selectedTreeId = selId;
+				}
+			}
 			treeBody.addressTreeRequest.reset()
 			let openedIdsString = treeView.getOpenedIds()
+			
+			// If we have a selected tree row, ensure all its ancestors remain opened 
+			// so the deep children don't collapse when the model resets!
+			if (treeBody.selectedTreeId !== "") {
+				let idx = treeView.findIndexById(treeBody.selectedTreeId);
+				if (idx > -1) {
+					let parentIdsStr = treeView.model.getData(treeBody.parentIdsParam, idx);
+					if (parentIdsStr && parentIdsStr !== "") {
+						let parentIdsList = parentIdsStr.split(',');
+						let openedList = openedIdsString !== "" ? openedIdsString.split(',') : [];
+						for (let pId of parentIdsList) {
+							if (openedList.indexOf(pId) === -1) {
+								openedList.push(pId);
+							}
+						}
+						openedIdsString = openedList.join(',');
+					}
+				}
+			}
+
 			treeBody.addressTreeRequest.idsToOpen = openedIdsString
 
 			treeBody.addressTreeRequest.updateModel();
