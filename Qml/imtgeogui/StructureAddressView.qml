@@ -28,7 +28,6 @@ Item {
 	property string parentId: "";
 	property string parentName: "";
 	property bool isEdit: false;
-	property string selectedAddressId: "";
 
 	property string addressListCommandId: "AddressList"
 	property string searchNameId: "fullAddress"
@@ -75,16 +74,8 @@ Item {
 				structureAddressesContainer.parentId = id
 				let addressCount = structureAddressesContainer.addressModel.getItemsCount()
 				structureAddressesContainer.addressModel.setData("itemId", id, addressCount-1);
-				structureAddressesContainer.selectedAddressId = id;
-				let prevIndex = addressColumn.currentIndex;
 				addressView.model = 0;
 				addressView.model = structureAddressesContainer.addressModel;
-				if (prevIndex > -1){
-					addressColumn.currentIndex = prevIndex;
-				}
-				else{
-					addressColumn.currentIndex = addressView.count - 1;
-				}
 			}
 		}
 	}
@@ -231,14 +222,9 @@ Item {
 					}
 					else{
 						structureAddressesContainer.setDataToAddressModel(typeId, typeValue, nameValue, itemId, parentId, latitude, longitude, addressColumn.currentIndex)
-						structureAddressesContainer.selectedAddressId = itemId;
 						structureAddressesContainer.updateAddressRequest.send();
-						let prevIndex = addressColumn.currentIndex;
 						addressView.model = 0;
 						addressView.model = structureAddressesContainer.addressModel;
-						if (prevIndex > -1){
-							addressColumn.currentIndex = prevIndex;
-						}
 					}
 				}
 			}
@@ -260,8 +246,6 @@ Item {
 		anchors.topMargin: Style.marginM;
 		anchors.bottomMargin: Style.marginM;
 
-		selectedTreeId: structureAddressesContainer.selectedAddressId
-
 		width: 0.25 * structureAddressesContainer.width + 10;
 
 		textColor: structureAddressesContainer.textColor
@@ -280,12 +264,6 @@ Item {
 		addressTreeSdlObjectComp: structureAddressesContainer.addressTreeSdlObjectComp
 
 		onTreeViewSelectedIndexChanged: {
-			if (index > -1) {
-				let selectedId = treeBody.treeViewModel.getData(treeBody.idParam, index);
-				if (selectedId !== undefined && selectedId !== null && selectedId !== "") {
-					structureAddressesContainer.selectedAddressId = selectedId;
-				}
-			}
 			updateAddressColumn(index)
 		}
 
@@ -378,24 +356,7 @@ Item {
 
 				addressView.model = 0;
 				addressView.model = structureAddressesContainer.addressModel;
-
-				let foundIndex = -1;
-				if (structureAddressesContainer.selectedAddressId !== "") {
-					let itemsCount = addressView.model.getItemsCount();
-					for (let i = 0; i < itemsCount; i++) {
-						let tempId = addressView.model.getData("itemId", i);
-						if (tempId === structureAddressesContainer.selectedAddressId) {
-							foundIndex = i;
-							break;
-						}
-					}
-				}
-
-				if (foundIndex > -1) {
-					addressColumn.currentIndex = foundIndex;
-				} else {
-					addressColumn.currentIndex = addressView.model.getItemsCount() - 1;
-				}
+				addressColumn.currentIndex = addressView.model.count - 1
 			}
 		}
 	}
@@ -431,9 +392,6 @@ Item {
 					let typeValue = structureAddressesContainer.addressModel.getData("typeValue", currentIndex)
 					let nameValue = structureAddressesContainer.addressModel.getData("nameValue", currentIndex)
 					let itemId = structureAddressesContainer.addressModel.getData("itemId", currentIndex)
-					if (itemId !== undefined && itemId !== null && itemId !== "") {
-						structureAddressesContainer.selectedAddressId = itemId;
-					}
 					let parentId = structureAddressesContainer.addressModel.getData("parentId", currentIndex)
 					let latitude = structureAddressesContainer.addressModel.getData("latitude", currentIndex)
 					let longitude = structureAddressesContainer.addressModel.getData("longitude", currentIndex)
