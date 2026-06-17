@@ -96,6 +96,17 @@ imtauth::ITenantInfoUniquePtr CRemoteTenantControllerComp::GetTenant(const QByte
 }
 
 
+QByteArrayList CRemoteTenantControllerComp::GetTenantPermissions(const QByteArray& tenantId) const
+{
+	imtauth::ITenantInfoUniquePtr tenantInfoPtr = GetTenant(tenantId);
+	if (!tenantInfoPtr.IsValid()){
+		return QByteArrayList();
+	}
+
+	return tenantInfoPtr->GetTenantPermissions();
+}
+
+
 QByteArray CRemoteTenantControllerComp::CreateTenant(const QString& tenantName, const QString& description, const QByteArray& ownerId)
 {
 	namespace tenantsdl = sdl::V1_0::imtauth;

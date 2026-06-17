@@ -29,6 +29,10 @@ TenantSimpleCollectionPage {
 	documentManager: grantsPage.apiClient ? grantsPage.apiClient.crossOrgGrantDocumentManager : null
 	objectTypeId: grantsPage.apiClient ? grantsPage.apiClient.crossOrgGrantObjectTypeId : ""
 	dataProvider: grantsPage.apiClient ? grantsPage.apiClient.crossOrgGrantsListDataProvider : null
+	managePermissionIds: ["EditOrganizationConnection", "ConnectOrganization", "RemoveOrganizationConnection"]
+	createPermissionIds: ["ConnectOrganization", "EditOrganizationConnection"]
+	editPermissionIds: ["EditOrganizationConnection", "ConnectOrganization"]
+	deletePermissionIds: ["RemoveOrganizationConnection", "EditOrganizationConnection"]
 
 	delegateComponent: Component {
 		TenantCollectionItemDelegateBase {

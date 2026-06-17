@@ -28,6 +28,10 @@ TenantSimpleCollectionPage {
 	documentManager: relationshipsPage.apiClient ? relationshipsPage.apiClient.relationshipDocumentManager : null
 	objectTypeId: relationshipsPage.apiClient ? relationshipsPage.apiClient.relationshipObjectTypeId : ""
 	dataProvider: relationshipsPage.apiClient ? relationshipsPage.apiClient.tenantRelationshipsListDataProvider : null
+	managePermissionIds: ["EditOrganizationConnection", "ConnectOrganization", "RemoveOrganizationConnection"]
+	createPermissionIds: ["ConnectOrganization", "EditOrganizationConnection"]
+	editPermissionIds: ["EditOrganizationConnection", "ConnectOrganization"]
+	deletePermissionIds: ["RemoveOrganizationConnection", "EditOrganizationConnection"]
 
 	delegateComponent: Component {
 		TenantCollectionItemDelegateBase {

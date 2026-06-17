@@ -22,6 +22,8 @@ ViewBase {
 	readonly property var tenantData: connectionCodePage.model
 	property var stateManager: null
 	property var apiClient: null
+	readonly property bool __canViewConnectionCode: connectionCodePage.stateManager ? connectionCodePage.stateManager.canViewOrganizationConnectionCode : false
+	readonly property bool __canManageConnections: connectionCodePage.stateManager ? connectionCodePage.stateManager.canManageOrganizationConnections : false
 
 	property string connectionCode: ""
 	property bool allowConnectionsByCode: true
@@ -120,7 +122,7 @@ ViewBase {
 					iconSource: copyButton.__copied
 						? "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal)
 						: "../../../" + Style.getIconPath("Icons/Copy", Icon.State.On, Icon.Mode.Normal)
-					enabled: !copyButton.__copied && connectionCodePage.connectionCode !== ""
+					enabled: !copyButton.__copied && connectionCodePage.connectionCode !== "" && connectionCodePage.__canViewConnectionCode
 
 					property bool __copied: false
 
@@ -170,11 +172,18 @@ ViewBase {
 
 		Button {
 			text: qsTr("Regenerate Code")
+			enabled: connectionCodePage.__canManageConnections
 			onClicked: {
-				if (connectionCodePage.apiClient && connectionCodePage.tenantData) {
-					connectionCodePage.apiClient.regenerateConnectionCode(
-						connectionCodePage.tenantData.m_id)
-				}
+				ModalDialogManager.showConfirmationDialog(
+					qsTr("Regenerate Connection Code"),
+					qsTr("Are you sure you want to regenerate the connection code? The old code will stop working."),
+					function(result) {
+						if (result === Enums.yes && connectionCodePage.apiClient && connectionCodePage.tenantData) {
+							connectionCodePage.apiClient.regenerateConnectionCode(
+								connectionCodePage.tenantData.m_id)
+						}
+					}
+				)
 			}
 		}
 
@@ -189,6 +198,7 @@ ViewBase {
 
 			SwitchCustom {
 				id: allowSwitch
+				enabled: connectionCodePage.__canManageConnections
 				checked: connectionCodePage.allowConnectionsByCode
 				onCheckedChanged: {
 					if (!connectionCodePage.__ready) {

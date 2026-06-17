@@ -45,6 +45,10 @@ ViewBase {
 	property Component headerButtonsComponent: null
 	property Component customEditorComponent: null
 	property bool showCreateButton: true
+	property var managePermissionIds: []
+	property var createPermissionIds: []
+	property var editPermissionIds: []
+	property var deletePermissionIds: []
 	function removeItems(ids) {}
 
 	function updateGui() {}
@@ -80,7 +84,24 @@ ViewBase {
 	property bool __isCreating: false
 	property var __activeShellView: null
 
-	readonly property bool __canManage: stateManager ? stateManager.canManageMembers : false
+	readonly property bool __canManage: stateManager
+		? (managePermissionIds.length > 0
+			? stateManager.hasAnyPermission(managePermissionIds)
+			: stateManager.canManageMembers)
+		: false
+
+	function __resolveCommandPermission(permissionIds, fallbackValue) {
+		if (!stateManager)
+			return false
+		if (permissionIds && permissionIds.length > 0)
+			return stateManager.hasAnyPermission(permissionIds)
+		return fallbackValue
+	}
+
+	readonly property bool __canCreate: __resolveCommandPermission(createPermissionIds, __canManage)
+	readonly property bool __canEdit: __resolveCommandPermission(editPermissionIds, __canManage)
+	readonly property bool __canDelete: __resolveCommandPermission(deletePermissionIds, __canManage)
+
 	readonly property int __selectedCount: selectionManager ? selectionManager.selectedIds.length : 0
 	readonly property bool __onListPage: collectionStackView.currentIndex === 0
 	readonly property bool __useDefaultButtons: !headerButtonsComponent
@@ -205,7 +226,7 @@ ViewBase {
 
 	Text {
 		id: createBtn
-		visible: root.showCreateButton && root.__canManage && root.__onListPage && root.__useDefaultButtons
+		visible: root.showCreateButton && root.__canCreate && root.__onListPage && root.__useDefaultButtons
 		anchors.right: stackViewHeader.right
 		anchors.verticalCenter: stackViewHeader.verticalCenter
 		text: root.__createBtnText
@@ -217,13 +238,16 @@ ViewBase {
 			anchors.fill: parent
 			hoverEnabled: true
 			cursorShape: Qt.PointingHandCursor
-			onClicked: root.openCreate()
+			onClicked: {
+				if (root.__canCreate)
+					root.openCreate()
+			}
 		}
 	}
 
 	Text {
 		id: editBtn
-		visible: root.__canManage && root.__onListPage && root.__useDefaultButtons
+		visible: root.__canEdit && root.__onListPage && root.__useDefaultButtons
 		anchors.right: createBtn.left
 		anchors.rightMargin: Style.marginL
 		anchors.verticalCenter: stackViewHeader.verticalCenter
@@ -236,9 +260,12 @@ ViewBase {
 		MouseArea {
 			anchors.fill: parent
 			hoverEnabled: true
-			cursorShape: root.__selectedCount === 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
-			enabled: root.__selectedCount === 1
+			cursorShape: root.__selectedCount === 1 && root.__canEdit ? Qt.PointingHandCursor : Qt.ArrowCursor
+			enabled: root.__selectedCount === 1 && root.__canEdit
 			onClicked: {
+				if (!root.__canEdit)
+					return
+
 				var selId = root.selectionManager.selectedIds[0]
 				var items = root.__listItems
 				for (var i = 0; i < items.length; i++) {
@@ -253,7 +280,7 @@ ViewBase {
 
 	Text {
 		id: removeBtn
-		visible: root.__canManage && root.__onListPage && root.__useDefaultButtons
+		visible: root.__canDelete && root.__onListPage && root.__useDefaultButtons
 		anchors.right: editBtn.left
 		anchors.rightMargin: Style.marginL
 		anchors.verticalCenter: stackViewHeader.verticalCenter
@@ -266,9 +293,12 @@ ViewBase {
 		MouseArea {
 			anchors.fill: parent
 			hoverEnabled: true
-			cursorShape: root.__selectedCount > 0 ? Qt.PointingHandCursor : Qt.ArrowCursor
-			enabled: root.__selectedCount > 0
+			cursorShape: root.__selectedCount > 0 && root.__canDelete ? Qt.PointingHandCursor : Qt.ArrowCursor
+			enabled: root.__selectedCount > 0 && root.__canDelete
 			onClicked: {
+				if (!root.__canDelete)
+					return
+
 				ModalDialogManager.showConfirmationDialog(
 							root.__deleteMultipleTitle,
 							qsTr("Are you sure you want to delete %1 selected item(s)? This action cannot be undone.").arg(root.__selectedCount),

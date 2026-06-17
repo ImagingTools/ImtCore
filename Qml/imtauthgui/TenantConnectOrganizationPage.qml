@@ -23,10 +23,32 @@ ViewBase {
 	readonly property var tenantData: connectPage.model
 	property var stateManager: null
 	property var apiClient: null
+	readonly property bool __canConnectOrganization: connectPage.stateManager ? connectPage.stateManager.canConnectOrganization : false
+	readonly property bool __canManageConnections: connectPage.stateManager ? connectPage.stateManager.canManageOrganizationConnections : false
+	readonly property bool __canViewConnections: connectPage.stateManager ? connectPage.stateManager.canViewOrganizationConnections : false
 
 	property bool sending: false
 	property string lastError: ""
 	property string processingRequestId: ""
+	property string processingRequestAction: ""
+	property string lastIncomingRequestId: ""
+	property string lastIncomingRequestStatus: ""
+	property bool lastIncomingRequestStatusError: false
+	property string lastSentRequestId: ""
+	property string lastSentRequestStatus: ""
+	property bool lastSentRequestStatusError: false
+
+	function __setIncomingStatus(requestId, statusText, isError) {
+		connectPage.lastIncomingRequestId = requestId || ""
+		connectPage.lastIncomingRequestStatus = statusText || ""
+		connectPage.lastIncomingRequestStatusError = isError === true
+	}
+
+	function __setSentStatus(requestId, statusText, isError) {
+		connectPage.lastSentRequestId = requestId || ""
+		connectPage.lastSentRequestStatus = statusText || ""
+		connectPage.lastSentRequestStatusError = isError === true
+	}
 
 	function updateGui() {
 		if (connectPage.apiClient && connectPage.tenantData
@@ -54,13 +76,31 @@ ViewBase {
 
 		function onConnectionRequestError(errorMessage) {
 			connectPage.sending = false
+			if (connectPage.processingRequestId !== "") {
+				if (connectPage.processingRequestAction === "approve")
+					connectPage.__setIncomingStatus(connectPage.processingRequestId, errorMessage || qsTr("Approve failed"), true)
+				else if (connectPage.processingRequestAction === "reject")
+					connectPage.__setIncomingStatus(connectPage.processingRequestId, errorMessage || qsTr("Reject failed"), true)
+				else if (connectPage.processingRequestAction === "cancel")
+					connectPage.__setSentStatus(connectPage.processingRequestId, errorMessage || qsTr("Cancel failed"), true)
+			}
 			connectPage.processingRequestId = ""
+			connectPage.processingRequestAction = ""
 			connectPage.lastError = errorMessage
 		}
 
 		function onRequestFailed(message) {
 			connectPage.sending = false
+			if (connectPage.processingRequestId !== "") {
+				if (connectPage.processingRequestAction === "approve")
+					connectPage.__setIncomingStatus(connectPage.processingRequestId, message || qsTr("Approve failed"), true)
+				else if (connectPage.processingRequestAction === "reject")
+					connectPage.__setIncomingStatus(connectPage.processingRequestId, message || qsTr("Reject failed"), true)
+				else if (connectPage.processingRequestAction === "cancel")
+					connectPage.__setSentStatus(connectPage.processingRequestId, message || qsTr("Cancel failed"), true)
+			}
 			connectPage.processingRequestId = ""
+			connectPage.processingRequestAction = ""
 			connectPage.lastError = message || ""
 			if (message && message !== "") {
 				PopupManager.addErrorMessage(message, true)
@@ -73,18 +113,25 @@ ViewBase {
 		}
 
 		function onConnectionRequestApproved(connectionId) {
+			connectPage.__setIncomingStatus(connectPage.processingRequestId, qsTr("Approved"), false)
 			connectPage.processingRequestId = ""
+			connectPage.processingRequestAction = ""
 			PopupManager.addSuccessMessage(qsTr("Connection request approved"), true)
 			connectPage.updateGui()
 		}
 
 		function onConnectionRequestRejected() {
+			connectPage.__setIncomingStatus(connectPage.processingRequestId, qsTr("Rejected"), false)
 			connectPage.processingRequestId = ""
+			connectPage.processingRequestAction = ""
 			PopupManager.addSuccessMessage(qsTr("Connection request rejected"), true)
 			connectPage.updateGui()
 		}
 
 		function onConnectionRequestCanceled() {
+			connectPage.__setSentStatus(connectPage.processingRequestId, qsTr("Canceled"), false)
+			connectPage.processingRequestId = ""
+			connectPage.processingRequestAction = ""
 			PopupManager.addSuccessMessage(qsTr("Connection request canceled"), true)
 			connectPage.updateGui()
 		}
@@ -119,6 +166,32 @@ ViewBase {
 		requestsList.model = incoming
 		sentRequestsList.model = outgoing
 
+		if (connectPage.lastIncomingRequestId !== "") {
+			var incomingStillVisible = false
+			for (var k = 0; k < incoming.length; ++k) {
+				if (incoming[k].id === connectPage.lastIncomingRequestId) {
+					incomingStillVisible = true
+					break
+				}
+			}
+			if (!incomingStillVisible) {
+				connectPage.__setIncomingStatus("", "", false)
+			}
+		}
+
+		if (connectPage.lastSentRequestId !== "") {
+			var sentStillVisible = false
+			for (var m = 0; m < outgoing.length; ++m) {
+				if (outgoing[m].id === connectPage.lastSentRequestId) {
+					sentStillVisible = true
+					break
+				}
+			}
+			if (!sentStillVisible) {
+				connectPage.__setSentStatus("", "", false)
+			}
+		}
+
 		if (connectPage.processingRequestId !== "") {
 			var stillPending = false
 			for (var j = 0; j < incoming.length; ++j) {
@@ -128,7 +201,16 @@ ViewBase {
 				}
 			}
 			if (!stillPending) {
+				for (var n = 0; n < outgoing.length; ++n) {
+					if (outgoing[n].id === connectPage.processingRequestId) {
+						stillPending = true
+						break
+					}
+				}
+			}
+			if (!stillPending) {
 				connectPage.processingRequestId = ""
+				connectPage.processingRequestAction = ""
 			}
 		}
 	}
@@ -239,7 +321,7 @@ ViewBase {
 
 					Button {
 						text: connectPage.sending ? qsTr("Sending...") : qsTr("Send Request")
-						enabled: codeInput.text.trim().length > 0 && !connectPage.sending
+						enabled: codeInput.text.trim().length > 0 && !connectPage.sending && connectPage.__canConnectOrganization
 						onClicked: {
 							if (connectPage.apiClient && connectPage.tenantData) {
 								connectPage.sending = true
@@ -265,6 +347,7 @@ ViewBase {
 				font.pixelSize: Style.fontSizeL
 				font.bold: true
 				color: Style.textColor
+				visible: connectPage.__canViewConnections
 			}
 
 			Text {
@@ -276,6 +359,7 @@ ViewBase {
 
 			ListView {
 				id: requestsList
+				visible: connectPage.__canViewConnections
 				width: parent.width
 				height: requestsList.contentHeight
 				interactive: false
@@ -318,6 +402,17 @@ ViewBase {
 							font.pixelSize: Style.fontSizeXS
 							color: Style.inactiveTextColor
 						}
+
+						Text {
+							visible: modelData.id === connectPage.processingRequestId
+									 || (modelData.id === connectPage.lastIncomingRequestId && connectPage.lastIncomingRequestStatus !== "")
+							text: modelData.id === connectPage.processingRequestId
+								? (connectPage.processingRequestAction === "approve" ? qsTr("Approving...") : qsTr("Rejecting..."))
+								: connectPage.lastIncomingRequestStatus
+							font.pixelSize: Style.fontSizeXS
+							color: (modelData.id === connectPage.lastIncomingRequestId && connectPage.lastIncomingRequestStatusError)
+								? Style.errorColor : Style.inactiveTextColor
+						}
 					}
 
 					Row {
@@ -344,10 +439,12 @@ ViewBase {
 							MouseArea {
 								anchors.fill: parent
 								cursorShape: Qt.PointingHandCursor
-								enabled: connectPage.processingRequestId === ""
+								enabled: connectPage.processingRequestId === "" && connectPage.__canManageConnections
 								onClicked: {
 									if (connectPage.apiClient && connectPage.tenantData) {
 										connectPage.processingRequestId = modelData.id || ""
+										connectPage.processingRequestAction = "approve"
+										connectPage.__setIncomingStatus("", "", false)
 										connectPage.apiClient.approveConnectionRequest(
 											modelData.id, connectPage.tenantData.m_id)
 									}
@@ -372,10 +469,12 @@ ViewBase {
 							MouseArea {
 								anchors.fill: parent
 								cursorShape: Qt.PointingHandCursor
-								enabled: connectPage.processingRequestId === ""
+								enabled: connectPage.processingRequestId === "" && connectPage.__canManageConnections
 								onClicked: {
 									if (connectPage.apiClient && connectPage.tenantData) {
 										connectPage.processingRequestId = modelData.id || ""
+										connectPage.processingRequestAction = "reject"
+										connectPage.__setIncomingStatus("", "", false)
 										connectPage.apiClient.rejectConnectionRequest(
 											modelData.id, connectPage.tenantData.m_id)
 									}
@@ -397,6 +496,7 @@ ViewBase {
 				font.pixelSize: Style.fontSizeL
 				font.bold: true
 				color: Style.textColor
+				visible: connectPage.__canViewConnections
 			}
 
 			Text {
@@ -408,6 +508,7 @@ ViewBase {
 
 			ListView {
 				id: sentRequestsList
+				visible: connectPage.__canViewConnections
 				width: parent.width
 				height: sentRequestsList.contentHeight
 				interactive: false
@@ -450,6 +551,17 @@ ViewBase {
 							font.pixelSize: Style.fontSizeXS
 							color: Style.inactiveTextColor
 						}
+
+						Text {
+							visible: modelData.id === connectPage.processingRequestId
+									 || (modelData.id === connectPage.lastSentRequestId && connectPage.lastSentRequestStatus !== "")
+							text: modelData.id === connectPage.processingRequestId
+								? qsTr("Canceling...")
+								: connectPage.lastSentRequestStatus
+							font.pixelSize: Style.fontSizeXS
+							color: (modelData.id === connectPage.lastSentRequestId && connectPage.lastSentRequestStatusError)
+								? Style.errorColor : Style.inactiveTextColor
+						}
 					}
 
 					Row {
@@ -476,8 +588,12 @@ ViewBase {
 							MouseArea {
 								anchors.fill: parent
 								cursorShape: Qt.PointingHandCursor
+								enabled: connectPage.processingRequestId === "" && connectPage.__canConnectOrganization
 								onClicked: {
 									if (connectPage.apiClient && connectPage.tenantData) {
+										connectPage.processingRequestId = modelData.id || ""
+										connectPage.processingRequestAction = "cancel"
+										connectPage.__setSentStatus("", "", false)
 										connectPage.apiClient.cancelConnectionRequest(
 											modelData.id, connectPage.tenantData.m_id)
 									}
@@ -499,12 +615,14 @@ ViewBase {
 				font.pixelSize: Style.fontSizeL
 				font.bold: true
 				color: Style.textColor
+				visible: connectPage.__canViewConnections
 			}
 
 			Text {
 				text: qsTr("Organizations you are connected with.")
 				font.pixelSize: Style.fontSizeM
 				color: Style.inactiveTextColor
+				visible: connectPage.__canViewConnections
 			}
 
 			Text {
@@ -516,6 +634,7 @@ ViewBase {
 
 			ListView {
 				id: connectionsList
+				visible: connectPage.__canViewConnections
 				width: parent.width
 				height: connectionsList.contentHeight
 				interactive: false
@@ -584,6 +703,7 @@ ViewBase {
 							MouseArea {
 								anchors.fill: parent
 								cursorShape: Qt.PointingHandCursor
+								enabled: connectPage.__canManageConnections
 								onClicked: {
 									if (connectPage.apiClient && connectPage.tenantData) {
 										connectPage.__connectionToRemoveId = modelData.id
