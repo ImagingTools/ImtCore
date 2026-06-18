@@ -279,8 +279,6 @@ class ListView extends Flickable {
             this.__cache.push(item) 
 
             if(item instanceof JQModules.QtQuick.Item) {
-                this.contentItem.__getDOM().removeChild(item.__getDOM())
-
                 item['ListView.pooled']()
             }
         } else {
