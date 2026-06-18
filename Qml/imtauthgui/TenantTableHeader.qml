@@ -31,6 +31,8 @@ Item {
 	Rectangle {
 		anchors.fill: parent
 		color: Style.backgroundColor2
+		border.color: Style.borderColor
+		border.width: 1
 	}
 
 	Row {

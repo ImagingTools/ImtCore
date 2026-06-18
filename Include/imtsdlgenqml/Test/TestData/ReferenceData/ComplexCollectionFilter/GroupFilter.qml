@@ -9,7 +9,7 @@ BaseClass {
 	property string m_logicalOperation: ''
 
 	Component.onCompleted: {
-		this._internal.removed = ["m_fieldFilters","m_groupFilters","m_logicalOperation"]
+		groupFilter._internal.removed = ["m_fieldFilters","m_groupFilters","m_logicalOperation"]
 	}
 
 	function hasFieldFilters(){
@@ -27,13 +27,13 @@ BaseClass {
 	function emplaceFieldFilters(typename){
 		m_fieldFilters = createComponent('m_fieldFilters', typename).createObject(this)
 		m_fieldFilters.owner = this
-		this._internal.removeAt('m_fieldFilters')
+		groupFilter._internal.removeAt('m_fieldFilters')
 	}
 
 	function emplaceGroupFilters(typename){
 		m_groupFilters = createComponent('m_groupFilters', typename).createObject(this)
 		m_groupFilters.owner = this
-		this._internal.removeAt('m_groupFilters')
+		groupFilter._internal.removeAt('m_groupFilters')
 	}
 
 	function removeFieldFilters(){

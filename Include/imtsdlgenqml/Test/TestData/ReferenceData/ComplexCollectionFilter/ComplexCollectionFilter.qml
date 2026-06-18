@@ -11,7 +11,7 @@ BaseClass {
 	property var m_distinctFields: []
 
 	Component.onCompleted: {
-		this._internal.removed = ["m_sortingInfo","m_fieldsFilter","m_timeFilter","m_textFilter","m_distinctFields"]
+		complexCollectionFilter._internal.removed = ["m_sortingInfo","m_fieldsFilter","m_timeFilter","m_textFilter","m_distinctFields"]
 	}
 
 	function hasSortingInfo(){
@@ -37,30 +37,30 @@ BaseClass {
 	function emplaceSortingInfo(typename){
 		m_sortingInfo = createComponent('m_sortingInfo', typename).createObject(this)
 		m_sortingInfo.owner = this
-		this._internal.removeAt('m_sortingInfo')
+		complexCollectionFilter._internal.removeAt('m_sortingInfo')
 	}
 
 	function emplaceFieldsFilter(typename){
 		m_fieldsFilter = createComponent('m_fieldsFilter', typename).createObject(this)
 		m_fieldsFilter.owner = this
-		this._internal.removeAt('m_fieldsFilter')
+		complexCollectionFilter._internal.removeAt('m_fieldsFilter')
 	}
 
 	function emplaceTimeFilter(typename){
 		m_timeFilter = createComponent('m_timeFilter', typename).createObject(this)
 		m_timeFilter.owner = this
-		this._internal.removeAt('m_timeFilter')
+		complexCollectionFilter._internal.removeAt('m_timeFilter')
 	}
 
 	function emplaceTextFilter(typename){
 		m_textFilter = createComponent('m_textFilter', typename).createObject(this)
 		m_textFilter.owner = this
-		this._internal.removeAt('m_textFilter')
+		complexCollectionFilter._internal.removeAt('m_textFilter')
 	}
 
 	function emplaceDistinctFields(typename){
 		m_distinctFields = []
-		this._internal.removeAt('m_distinctFields')
+		complexCollectionFilter._internal.removeAt('m_distinctFields')
 	}
 
 	function removeSortingInfo(){

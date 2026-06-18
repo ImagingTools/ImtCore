@@ -5,7 +5,10 @@ Item {
         id: loader
         width: 120
         height: 80
-        source: "LoadedItem.qml"
+
+        Component.onCompleted: {
+            loader.setSource("LoadedItem.qml", {"width": 60, "height": 50})
+        }
 
         onLoaded: {
             console.log("loader", width, height)

@@ -11,7 +11,7 @@ BaseClass {
 	property int m_unitMultiplier: 0
 
 	Component.onCompleted: {
-		this._internal.removed = ["m_timeRange","m_timeUnit","m_interpretationMode","m_unitMultiplier"]
+		timeFilter._internal.removed = ["m_timeRange","m_timeUnit","m_interpretationMode","m_unitMultiplier"]
 	}
 
 	function hasTimeRange(){
@@ -33,7 +33,7 @@ BaseClass {
 	function emplaceTimeRange(typename){
 		m_timeRange = createComponent('m_timeRange', typename).createObject(this)
 		m_timeRange.owner = this
-		this._internal.removeAt('m_timeRange')
+		timeFilter._internal.removeAt('m_timeRange')
 	}
 
 	function removeTimeRange(){

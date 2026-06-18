@@ -34,6 +34,8 @@ class Loader extends Item {
         loaded: {type:Signal, args:[]},
     })
 
+    __sourceProperties = {}
+
     __updatePrimaryProperties(){
         super.__updatePrimaryProperties()
         this.__updateProperty('sourceComponent')
@@ -60,6 +62,12 @@ class Loader extends Item {
         this.item = null
         this.status = Loader.Null
         this.progress = 0
+    }
+
+    setSource(source, properties = {}){
+        this.__sourceProperties = properties || {}
+        this.sourceComponent = undefined
+        this.source = source
     }
 
     __complete(){
@@ -137,7 +145,7 @@ class Loader extends Item {
 
         if(newValue){
             this.__updateProperty('visible')
-            let item = this.sourceComponent.createObject(this, {}, true)
+            let item = this.sourceComponent.createObject(this, this.__sourceProperties, true)
 
             if(item){
                 if(this.__completed || this.__propertiesUpdated){
@@ -244,7 +252,7 @@ class Loader extends Item {
             }
 
             this.__updateProperty('visible')
-            let item = cls.create(this)
+            let item = cls.create(this, this.__sourceProperties)
 
             if(item){
                 if(this.__completed){

@@ -40,7 +40,7 @@ Rectangle {
 	readonly property int checkBoxSize: Style.itemSizeS + Style.marginXS
 
 	readonly property int index: model.index
-	readonly property int totalCount: modelData.totalCount
+	readonly property int totalCount: modelData.totalCount ? modelData.totalCount : (ListView.view ? ListView.view.count : 0)
 	readonly property bool isLastItem: index === totalCount - 1
 	property bool __isRelocatingExternalChildren: false
 
@@ -77,6 +77,8 @@ Rectangle {
 	color: delegateRoot.isSelected ? Style.selectedColor
 					  : delegateRoot.isHovered ? Style.buttonHoverColor
 								  : "transparent"
+	border.color: Style.borderColor
+	border.width: 1
 
 	MouseArea {
 		id: itemMouseArea
@@ -238,6 +240,7 @@ Rectangle {
 
 	Rectangle {
 		id: bottomDivider
+		z: 1
 		anchors.bottom: parent.bottom
 		anchors.left: parent.left
 		anchors.right: parent.right

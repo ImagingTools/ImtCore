@@ -69,6 +69,8 @@ ElementView {
 			if (maximumLength >= 0){
 				controlItem.maximumLength = maximumLength;
 			}
+
+			controlItem.readOnly = readOnly
 		}
 	}
 	
@@ -136,4 +138,3 @@ ElementView {
 		}
 	}
 }
-

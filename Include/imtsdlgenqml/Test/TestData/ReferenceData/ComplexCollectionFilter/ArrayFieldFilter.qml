@@ -10,7 +10,7 @@ BaseClass {
 	property var m_filterOperations: []
 
 	Component.onCompleted: {
-		this._internal.removed = ["m_fieldId","m_filterValues","m_filterValueType","m_filterOperations"]
+		arrayFieldFilter._internal.removed = ["m_fieldId","m_filterValues","m_filterValueType","m_filterOperations"]
 	}
 
 	function hasFieldId(){
@@ -31,7 +31,7 @@ BaseClass {
 
 	function emplaceFilterValues(typename){
 		m_filterValues = []
-		this._internal.removeAt('m_filterValues')
+		arrayFieldFilter._internal.removeAt('m_filterValues')
 	}
 
 	function removeFieldId(){

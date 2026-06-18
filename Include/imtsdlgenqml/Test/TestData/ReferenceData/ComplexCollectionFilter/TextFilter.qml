@@ -8,7 +8,7 @@ BaseClass {
 	property var m_fieldIds: []
 
 	Component.onCompleted: {
-		this._internal.removed = ["m_text","m_fieldIds"]
+		textFilter._internal.removed = ["m_text","m_fieldIds"]
 	}
 
 	function hasText(){
@@ -21,7 +21,7 @@ BaseClass {
 
 	function emplaceFieldIds(typename){
 		m_fieldIds = []
-		this._internal.removeAt('m_fieldIds')
+		textFilter._internal.removeAt('m_fieldIds')
 	}
 
 	function removeText(){

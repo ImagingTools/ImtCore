@@ -392,7 +392,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 	FeedStream(ifStream, 1, false);
 
 	FeedStreamHorizontally(ifStream, 2);
-	ifStream << QStringLiteral("this._internal.removed = [");
+	ifStream << GetDecapitalizedValue(sdlType.GetName()) << QStringLiteral("._internal.removed = [");
 	for (int index = 0; index < typeFieldList.count(); index++){
 		if (index > 0){
 			ifStream << QStringLiteral(",");
@@ -472,7 +472,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 		}
 		FeedStream(ifStream, 1, false);
 		FeedStreamHorizontally(ifStream, 2);
-		ifStream << QStringLiteral("this._internal.removeAt('");
+		ifStream << GetDecapitalizedValue(sdlType.GetName()) << QStringLiteral("._internal.removeAt('");
 		ifStream << QStringLiteral("m_");
 		ifStream << GetDecapitalizedValue(sdlField.GetId());
 		ifStream << QStringLiteral("')");
@@ -855,4 +855,3 @@ void CQmlCodeGeneratorComp::AbortCurrentProcessing()
 
 
 } // namespace imtsdlgenqml
-

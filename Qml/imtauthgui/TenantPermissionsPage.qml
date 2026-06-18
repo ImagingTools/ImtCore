@@ -38,6 +38,12 @@ ViewBase {
 	// Fetch all permissions when the page is first shown
 	Component.onCompleted: {
 		permissionsPage.__requestAllPermissionsOnce()
+		permissionsPage.doUpdateGui()
+	}
+
+	onVisibleChanged: {
+		if (visible)
+			permissionsPage.doUpdateGui()
 	}
 
 	onApiClientChanged: {

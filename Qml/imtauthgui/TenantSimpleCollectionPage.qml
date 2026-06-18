@@ -363,20 +363,11 @@ ViewBase {
 				anchors.horizontalCenter: parent.horizontalCenter
 				width: Math.min(parent.width - Style.marginXL * 2, 1000)
 				placeHolderText: root.__filterPlaceholder
-				onTextChanged: {
+				onSearchChanged: {
 					selectionManager_.clear()
 					root.__lastFilterText = text
-					filterDebounce.restart()
-				}
-			}
-
-			Timer {
-				id: filterDebounce
-				interval: 300
-				repeat: false
-				onTriggered: {
 					if (root.dataProvider)
-						root.dataProvider.fetch(filterInput.text)
+						root.dataProvider.fetch(text)
 				}
 			}
 
