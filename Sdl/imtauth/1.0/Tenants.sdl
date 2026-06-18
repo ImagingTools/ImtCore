@@ -45,13 +45,6 @@ type TenantMemberRoleEntry {
 	role: String!
 }
 
-type TenantPermissionOption {
-	id: ID!
-	name: String!
-	description: String
-	children: [TenantPermissionOption]
-}
-
 type TenantInvitationEntry {
 	id: ID!
 	userId: ID!
@@ -78,7 +71,6 @@ type TenantData {
 	memberRoles: [TenantMemberRoleEntry]
 	pendingInvitations: [TenantInvitationEntry]
 	tenantPermissions: [ID]
-	allProductPermissions: [TenantPermissionOption]
 	parentTenantId: ID
 	isSystemTenant: Boolean
 }

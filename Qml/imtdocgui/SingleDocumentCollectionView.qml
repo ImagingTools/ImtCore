@@ -120,7 +120,7 @@ Item {
 			}
 		}
 
-		function onDocumentServiceChanged(typeOperation, objectId, documentId, documentName){
+		function onDocumentManagerChanged(typeOperation, objectId, documentId, documentName){
 			if (typeOperation === EDocumentOperationEnum.s_documentClosed){
 				if (stackView.count > 1){
 					stackView.removePage(stackView.count - 1)

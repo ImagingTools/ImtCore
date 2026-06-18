@@ -58,6 +58,7 @@ public:
 		Q_INIT_RESOURCE(imtauthSessionsSdl);
 		Q_INIT_RESOURCE(imtauthAuthorizationOptionsSdl);
 		Q_INIT_RESOURCE(imtauthAuthorizationSdl);
+		Q_INIT_RESOURCE(imtauthPermissionsSdl);
 		Q_INIT_RESOURCE(imtappApplicationSdl);
 		Q_INIT_RESOURCE(imtcolorLabSdl);
 		Q_INIT_RESOURCE(imtcolorRgbColorHexSdl);

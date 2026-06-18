@@ -328,6 +328,7 @@ DocumentViewBase {
 		TenantPermissionsPage {
 			model: container.tenantData
 			stateManager: stateManager_
+			apiClient: container.apiClient
 		}
 	}
 

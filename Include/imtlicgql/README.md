@@ -47,7 +47,6 @@ The **imtlicgql** module provides a GraphQL-based web API layer over the imtlic 
 | `CLicenseControllerComp` | Object Controller | Single license operations |
 | `CProductControllerComp` | Object Controller | Single product operations |
 | `CProductInfoProviderComp` | Data Provider | Product licensing queries |
-| `CPermissionsProviderComp` | Data Provider | Permission queries |
 | `CFeatureDependenciesProviderComp` | Data Provider | Dependency navigation |
 | `CProductPermissionsControllerComp` | Router | Permission query routing |
 | `CFeatureMetaInfoDelegateComp` | Delegate | Feature JSON mapping |

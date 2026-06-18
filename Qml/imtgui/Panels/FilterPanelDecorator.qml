@@ -55,7 +55,8 @@ DecoratorBase {
 	}
 
 	Connections {
-		target: filterPanelDecorator.baseElement
+		target: filterPanelDecorator && filterPanelDecorator.baseElement ? filterPanelDecorator.baseElement : undefined
+
 		function onFilterChanged(){
 			clearAllButton.enabled = !filterPanelDecorator.complexFilter.isEmpty() || target.hasActiveFilter()
 			let textFilter = filterPanelDecorator.complexFilter.getTextFilter()

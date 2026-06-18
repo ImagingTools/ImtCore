@@ -61,11 +61,6 @@ I_EXPORT_COMPONENT(
 			"Feature Dependencies Provider");
 
 I_EXPORT_COMPONENT(
-			PermissionsProvider,
-			"Permissions provider",
-			"Feature Dependencies Provider Permissions");
-
-I_EXPORT_COMPONENT(
 			ProductInfoProvider,
 			"Product info provider",
 			"Product Info Provider");

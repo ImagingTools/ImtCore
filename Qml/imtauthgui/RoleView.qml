@@ -5,6 +5,7 @@ import imtgui 1.0
 import imtcontrols 1.0
 import imtauthRolesSdl 1.0
 import imtdocgui 1.0
+import imtauthgui 1.0
 import imtguigql 1.0
 
 ViewBase {
@@ -13,13 +14,13 @@ ViewBase {
 	anchors.fill: parent;
 	contentColor: Style.baseColor
 	
-	property TreeItemModel permissionsModel: TreeItemModel {};
-	onPermissionsModelChanged: {
-		permissionsGroup.buildPermissionsModel()
-		// After the permissions tree is rebuilt (e.g. fetchPermissions completes
-		// asynchronously after the role has been loaded), re-apply the checked
-		// state from the current roleData; otherwise the tree appears empty and
-		// a subsequent Save would clear all permissions.
+	// Flat permissions array: [{id, displayName, description, groupId, groupName}]
+	property var flatPermissions: [];
+	onFlatPermissionsChanged: {
+		if (permissionsTableElementView.bottomItem){
+			permissionsTableElementView.bottomItem.rebuildFromFlatArray(container.flatPermissions)
+		}
+
 		if (container.roleData){
 			container.doUpdateGui()
 		}
@@ -31,7 +32,7 @@ ViewBase {
 	
 	function updateGui(){
 		generalGroup.updateGui();
-		permissionsGroup.updateGui()
+		container.doUpdateGuiPermissions()
 	}
 	
 	function updateModel(){
@@ -41,7 +42,7 @@ ViewBase {
 		}
 		
 		generalGroup.updateModel();
-		permissionsGroup.updateModel()
+		container.doUpdateModelPermissions()
 		
 		roleData.m_productId = container.productId;
 	}
@@ -128,7 +129,7 @@ ViewBase {
 					}
 					
 					KeyNavigation.tab: roleIdInput;
-					KeyNavigation.backtab: permissionsGroup;
+					KeyNavigation.backtab: permissionsGroupElement;
 				}
 				
 				TextInputElementView {
@@ -194,116 +195,50 @@ ViewBase {
 			
 			GroupHeaderView {
 				width: parent.width;
-				
 				title: qsTr("Permissions");
-				groupView: group;
 			}
 			
 			GroupElementView {
-				id: group;
+				id: permissionsGroupElement
+				width: parent.width
 				
-				width: parent.width;
-				
-				TreeViewElementView {
-					id: permissionsGroup;
-					
-					KeyNavigation.tab: roleNameInput;
-					KeyNavigation.backtab: roleSelectableCollectionEditor;
-					
-					Component.onCompleted: {
-						permissionsGroup.treeView.tristate = true;
-					}
-					
-					onTreeViewChanged: {
-						if (treeView){
-							treeView.filterRole = ["name", "description"]
-							treeView.columns = [
-										{ id: "name", name: qsTr("Permission"), tree: true },
-										{ id: "description", name: qsTr("Description"), tree: false }
-									]
-						}
-					}
-
-					function buildPermissionsModel() {
-						if (!container.permissionsModel)
-							return;
-						
-						var nodes = TreeModelBuilder.fromTreeItemModel(
-							container.permissionsModel,
-							function(wrapper, index) {
-								return {
-									key: wrapper.data("FeatureId", ""),
-									text: wrapper.data("FeatureName", ""),
-									checkable: true,
-									expanded: true,
-									data: {
-										id: wrapper.data("FeatureId", ""),
-										name: wrapper.data("FeatureName", ""),
-										description: wrapper.data("FeatureDescription", "")
-									}
-								};
-							},
-							function(wrapper, index) {
-								return wrapper.childModel("ChildModel");
+				ElementView {
+					id: permissionsTableElementView
+					width: parent.width
+					bottomComp: Component {
+						PermissionsTableView {
+							id: permissionsTableView
+							height: 500
+							anchors.horizontalCenter: parent.horizontalCenter
+							showControlPanel: true
+							treeToScrollbarSpacing: 0
+		
+							onSelectionChanged: {
+								container.doUpdateModel()
 							}
-						);
-						
-						permissionsGroup.treeView.model = nodes;
-					}
-					
-					function updateGui(){
-						let selectedPermissionsIds = [];
-						let selectedPermissions = container.roleData.m_permissions;
-						if (selectedPermissions !== ""){
-							selectedPermissionsIds = selectedPermissions.split(';');
-						}
-						
-						selectedPermissionsIds.sort();
-						
-						permissionsGroup.treeView.uncheckAll();
-						
-						let allNodesList = permissionsGroup.treeView.allNodes();
-						for (let i = 0; i < allNodesList.length; i++){
-							let nodeIdx = allNodesList[i];
-							let nodeChildren = nodeIdx.item && nodeIdx.item.children ? nodeIdx.item.children : [];
-							if (nodeChildren.length === 0){
-								let nodeData = nodeIdx.data || {};
-								let id = nodeData.id;
-								
-								if (selectedPermissionsIds.includes(id)){
-									permissionsGroup.treeView.checkItem(nodeIdx.key);
-								}
-							}
-						}
-					}
-					
-					function updateModel(){
-						let selectedPermissionIds = [];
-						let checkedNodes = permissionsGroup.treeView.getCheckedNodes();
-						for (let j = 0; j < checkedNodes.length; j++){
-							let nodeIdx = checkedNodes[j];
-							let nodeChildren = nodeIdx.item && nodeIdx.item.children ? nodeIdx.item.children : [];
-							if (nodeChildren.length === 0){
-								let nodeData = nodeIdx.data || {};
-								let id = nodeData.id;
-								selectedPermissionIds.push(id);
-							}
-						}
-						
-						selectedPermissionIds.sort();
-						
-						container.roleData.m_permissions = selectedPermissionIds.join(';')
-					}
-					
-					Connections {
-						target: permissionsGroup.treeView;
-						
-						function onCheckedItemsChanged(){
-							container.doUpdateModel();
 						}
 					}
 				}
 			}
+		}
+	}
+	
+	function doUpdateGuiPermissions() {
+		var selectedPermissionsIds = [];
+		var selectedPermissions = container.roleData.m_permissions;
+		if (selectedPermissions !== ""){
+			selectedPermissionsIds = selectedPermissions.split(';');
+		}
+
+		if (permissionsTableElementView.bottomItem){
+			permissionsTableElementView.bottomItem.applySelection(selectedPermissionsIds)
+		}
+	}
+	
+	function doUpdateModelPermissions() {
+		if (permissionsTableElementView.bottomItem){
+			var selectedPermissionIds = permissionsTableElementView.bottomItem.getCheckedIds()
+			container.roleData.m_permissions = selectedPermissionIds.join(';')
 		}
 	}
 }
