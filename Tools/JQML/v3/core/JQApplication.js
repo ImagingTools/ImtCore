@@ -109,6 +109,35 @@ module.exports = {
             }
         }
 
+        if (!String.prototype.includes) {
+            String.prototype.includes = function(search, start) {
+                if (typeof start !== 'number') start = 0
+                if (start + search.length > this.length) return false
+                return this.indexOf(search, start) !== -1
+            }
+        }
+
+        if (!Array.prototype.includes) {
+            Array.prototype.includes = function(search, start) {
+                if (this == null) throw new TypeError('Array.prototype.includes called on null or undefined')
+
+                let obj = Object(this)
+                let len = obj.length >>> 0
+                if (len === 0) return false
+
+                let fromIndex = start | 0
+                let k = Math.max(fromIndex >= 0 ? fromIndex : len - Math.abs(fromIndex), 0)
+
+                while (k < len) {
+                    let current = obj[k]
+                    if (current === search || (current !== current && search !== search)) return true
+                    k++
+                }
+
+                return false
+            }
+        }
+
         RegExp.prototype.toPartialMatchRegex = function() {
             "use strict";
             
@@ -323,7 +352,8 @@ module.exports = {
                 flex-direction: column;
                 z-index: 1;
                 pointer-events: all;
-            }
+                user-select: text;
+            }  
             .Image {
                 background-repeat: no-repeat;
                 background-position: center;
@@ -365,6 +395,10 @@ module.exports = {
             *[invisible] {
                 display: none;
             }
+                
+            *[cached] {
+                display: none;
+            }    
         </style>`)
 
         this.root = JQModules.QtQuick.Item.create()
