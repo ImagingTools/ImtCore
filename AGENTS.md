@@ -22,11 +22,11 @@ These rules apply across the organization unless a repository-specific `AGENTS.m
 
 ## 4. Follow organization-wide structural standards
 
-- Use `ImagingTools/Acf` as the formatting reference repository.
-- Use `ImagingTools/ImtCore` as the directory structure reference repository.
-- QML UIs must follow the structure and style used in `ImagingTools/ImtCore`.
-- Component tests must be organized like in `ImagingTools/Acf`.
-- Data model primitives must be implemented like in `ImagingTools/Acf`.
+- Use  the repository `ImagingTools/Acf` as the formatting reference repository.
+- Use  the repository `ImagingTools/ImtCore` as the directory structure reference repository.
+- QML UIs must follow the structure and style used in  the repository `ImagingTools/ImtCore`.
+- Component tests must be organized like in the repository `ImagingTools/Acf`.
+- Data model primitives must be implemented like in  the repository `ImagingTools/Acf`.
 
 ## 5. Keep documentation in /Docs
 

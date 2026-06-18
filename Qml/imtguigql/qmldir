@@ -1,5 +1,7 @@
 module imtguigql
 
+RemoteCollectionChangeListener 1.0 RemoteCollectionChangeListener.qml
+
 GqlDocumentDataController 1.0 GqlDocumentDataController.qml
 ComboBoxGql 1.0 ComboBoxGql.qml
 ComboBoxGqlLegacy 1.0 ComboBoxGqlLegacy.qml

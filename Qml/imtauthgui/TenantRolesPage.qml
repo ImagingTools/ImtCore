@@ -35,7 +35,7 @@ TenantSimpleCollectionPage {
 
 	onApiClientChanged: {
 		if (rolesPage.apiClient)
-			rolesPage.apiClient.fetchPermissions()
+			rolesPage.apiClient.fetchTenantPermissions(rolesPage.apiClient.tenantId)
 	}
 
 	Connections {

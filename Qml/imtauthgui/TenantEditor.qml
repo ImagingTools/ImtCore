@@ -183,6 +183,8 @@ DocumentViewBase {
 			var currentUserId = container.tenantData.m_currentUserId || ""
 			if (currentUserId && userId === currentUserId) {
 				PopupManager.addInfoMessage(qsTr("You have left this organization. Closing editor."), true)
+				if (AuthorizationController.currentTenantId === container.tenantData.m_id)
+					AuthorizationController.selectTenant("")
 				if (container.documentManager && container.documentId)
 					container.documentManager.closeDocument(container.documentId)
 			}
@@ -231,6 +233,8 @@ DocumentViewBase {
 				var currentUserId = container.tenantData.m_currentUserId || ""
 				if (currentUserId && notification.userId === currentUserId) {
 					PopupManager.addInfoMessage(qsTr("You have been removed from this organization. Closing editor."), true)
+					if (AuthorizationController.currentTenantId === container.tenantData.m_id)
+						AuthorizationController.selectTenant("")
 					if (container.documentManager && container.documentId)
 						container.documentManager.closeDocument(container.documentId)
 					return
@@ -324,6 +328,7 @@ DocumentViewBase {
 		TenantPermissionsPage {
 			model: container.tenantData
 			stateManager: stateManager_
+			apiClient: container.apiClient
 		}
 	}
 

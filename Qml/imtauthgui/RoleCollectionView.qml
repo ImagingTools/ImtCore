@@ -8,6 +8,7 @@ import imtcontrols 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
 import imtauthRolesSdl 1.0
+import imtauthPermissionsSdl 1.0
 
 RemoteCollectionView {
 	id: roleCollectionViewContainer;
@@ -40,25 +41,60 @@ RemoteCollectionView {
 	}
 
 	onProductIdChanged: {
-		permissionsProvider.productId = productId;
-		permissionsProvider.updateModel();
+		roleCollectionViewContainer.__fetchAllPermissions()
 	}
 	
-	property TreeItemModel permissionsModel;
+	property var flatPermissions: [];
 	
-	GqlBasedPermissionsProvider {
-		id: permissionsProvider;
-		productId: roleCollectionViewContainer.productId;
-		
-		onPermissionsModelChanged: {
-			if (permissionsProvider.permissionsModel != null){
-				roleCollectionViewContainer.permissionsModel = permissionsProvider.permissionsModel;
+	property GetProductPermissionsInput __getPermsInput: GetProductPermissionsInput {}
+	property GqlSdlRequestSender __getPermsSender: GqlSdlRequestSender {
+		gqlCommandId: ImtauthPermissionsSdlCommandIds.s_getProductPermissions
+
+		sdlObjectComp: Component {
+			GetProductPermissionsPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+					} else {
+						roleCollectionViewContainer.__onPermissionsReceived(m_groups)
+					}
+				}
 			}
 		}
-		
-		function getHeaders(){
-			return roleCollectionViewContainer.getHeaders()
+	}
+
+	function __fetchAllPermissions() {
+		__getPermsInput.m_productId = roleCollectionViewContainer.productId || ""
+		__getPermsSender.send(__getPermsInput)
+	}
+
+	function __onPermissionsReceived(groupsList) {
+		var result = []
+		if (groupsList) {
+			for (var gi = 0; gi < groupsList.count; ++gi) {
+				var group = groupsList.get(gi).item
+				if (!group) continue
+				var groupObj = {
+					"groupId": group.m_groupId || "",
+					"groupName": group.m_groupName || "",
+					"entries": []
+				}
+				var entries = group.m_entries
+				if (entries) {
+					for (var ei = 0; ei < entries.count; ++ei) {
+						var entry = entries.get(ei).item
+						if (!entry) continue
+						groupObj.entries.push({
+							"permissionId": entry.m_permissionId || "",
+							"displayName": entry.m_displayName || "",
+							"description": entry.m_description || ""
+						})
+					}
+				}
+				result.push(groupObj)
+			}
 		}
+		roleCollectionViewContainer.flatPermissions = result
 	}
 	
 	Component {
@@ -67,7 +103,7 @@ RemoteCollectionView {
 		RoleView {
 			id: roleEditor;
 			
-			permissionsModel: roleCollectionViewContainer.permissionsModel;
+			flatPermissions: roleCollectionViewContainer.flatPermissions;
 			productId: roleCollectionViewContainer.productId;
 			
 			commandsControllerComp: Component {GqlBasedCommandsController {

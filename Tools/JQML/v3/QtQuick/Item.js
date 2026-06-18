@@ -259,6 +259,14 @@ class Item extends QtObject {
         
     }
 
+    'SLOT_ListView.reused'(){
+        this.__DOM.removeAttribute('cached')
+    }
+
+    'SLOT_ListView.pooled'(){
+        this.__DOM.setAttribute('cached', '')
+    }
+
     SLOT_objectNameChanged(oldValue, newValue){
         this.__DOM.setAttribute('objectName', newValue)
     }

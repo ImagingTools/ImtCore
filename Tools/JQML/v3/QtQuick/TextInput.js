@@ -346,6 +346,10 @@ class TextInput extends Item {
         this.select(start, start)
     }
 
+    SLOT_readOnlyChanged(oldValue, newValue){
+        this.__impl.setAttribute('contenteditable', !newValue)
+    }
+
     SLOT_validatorChanged(oldValue, newValue){
         this.__checkValidator()
     }

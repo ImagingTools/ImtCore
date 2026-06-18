@@ -1,0 +1,45 @@
+schema {
+	query: Query
+	namespace: imtauth
+	version: 1.0
+}
+
+# --- Permission types ---
+
+# A single permission entry within a group.
+# displayName encodes the tree path using " / " separator.
+# permissionId is the real leaf permission ID used for selection/storage.
+#
+# Example entries within a "Sensor Management" group:
+#   { permissionId: "p1", displayName: "View Sensor History",                                description: "..." }
+#   { permissionId: "p2", displayName: "Edit Sensor",                                        description: "..." }
+#   { permissionId: "p3", displayName: "Edit Sensor / Add Sensor",                           description: "..." }
+#   { permissionId: "p4", displayName: "Edit Sensor / Change Sensor",                        description: "..." }
+#   { permissionId: "p5", displayName: "Edit Sensor / Change Sensor / Change Production Status", description: "..." }
+type PermissionEntry {
+	permissionId: ID!
+	displayName: String!
+	description: String
+}
+
+# A top-level permission group (e.g. "Sensor Management").
+# Contains a flat list of all permissions that belong to this group.
+type PermissionGroup {
+	groupId: ID!
+	groupName: String!
+	entries: [PermissionEntry]
+}
+
+type GetProductPermissionsPayload {
+	groups: [PermissionGroup]
+	errorMessage: String
+}
+
+input GetProductPermissionsInput {
+	productId: ID!
+	tenantId: ID
+}
+
+type Query {
+	GetProductPermissions (input: GetProductPermissionsInput): GetProductPermissionsPayload!
+}

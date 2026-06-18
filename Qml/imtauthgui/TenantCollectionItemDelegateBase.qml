@@ -157,7 +157,7 @@ Rectangle {
 		visible: delegateRoot.showDefaultActionsMenu
 				 && (delegateRoot.canEdit || delegateRoot.canDelete)
 				 && !customActionsLoader.visible
-				 && (delegateRoot.isHovered || delegateRoot.isSelected || containsMouse)
+				 && (delegateRoot.isHovered || delegateRoot.isSelected || mouseArea.containsMouse)
 
 		onClicked: {
 			contextMenuModel.fillModel()

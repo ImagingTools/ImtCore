@@ -321,6 +321,11 @@ I_EXPORT_COMPONENT(
 			"Tenant relationship item info provider",
 			"Tenant Relationship Item Info Provider");
 
+I_EXPORT_COMPONENT(
+			PermissionsProvider,
+			"Permissions provider",
+			"Feature Dependencies Provider Permissions");
+
 
 } // namespace ImtAuthGqlPck
 

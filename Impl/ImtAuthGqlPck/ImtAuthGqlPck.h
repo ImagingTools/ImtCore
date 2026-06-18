@@ -42,6 +42,7 @@
 #include <imtauthgql/CClientRequestRoleInfoProviderComp.h>
 #include <imtauthgql/CClientRequestGroupInfoProviderComp.h>
 #include <imtauthgql/CTokenBasedPermissionsProviderComp.h>
+#include <imtauthgql/CPermissionsProviderComp.h>
 #include <imtauthgql/CPersonalAccessTokenControllerComp.h>
 #include <imtauthgql/CClientRequestPersonalAccessTokenManagerComp.h>
 #include <imtauthgql/CTenantCollectionControllerComp.h>
@@ -112,6 +113,7 @@ typedef imtauthgql::CClientRequestUserInfoProviderComp ClientRequestUserInfoProv
 typedef imtauthgql::CClientRequestRoleInfoProviderComp ClientRequestRoleInfoProvider;
 typedef imtauthgql::CClientRequestGroupInfoProviderComp ClientRequestGroupInfoProvider;
 typedef imtauthgql::CTokenBasedPermissionsProviderComp ClientRequestTokenBasedPermissionsProvider;
+typedef imtauthgql::CPermissionsProviderComp PermissionsProvider;
 typedef imtauthgql::CPersonalAccessTokenControllerComp PersonalAccessTokenController;
 typedef icomp::TModelCompWrap<imtauthgql::CClientRequestPersonalAccessTokenManagerComp> ClientRequestPersonalAccessTokenManager;
 typedef imtauthgql::CTenantCollectionControllerComp TenantCollectionController;

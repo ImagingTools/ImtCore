@@ -17,6 +17,7 @@
         <file alias="imtauthgui/RoleView.qml">RoleView.qml</file>
         <file alias="imtauthgui/UserGroupView.qml">UserGroupView.qml</file>
         <file alias="imtauthgui/PermissionsProvider.qml">PermissionsProvider.qml</file>
+        <file alias="imtauthgui/PermissionsTableView.qml">PermissionsTableView.qml</file>
         <file alias="imtauthgui/PermissionsController.qml">PermissionsController.qml</file>
         <file alias="imtauthgui/SuperuserPasswordPage.qml">SuperuserPasswordPage.qml</file>
         <file alias="imtauthgui/SuperuserProvider.qml">SuperuserProvider.qml</file>

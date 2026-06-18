@@ -8,6 +8,7 @@ import imtdocgui 1.0
 import imtguigql 1.0
 import imtauthTenantMembershipsSdl 1.0
 import imtauthTenantsSdl 1.0
+import imtauthPermissionsSdl 1.0
 import imtbaseImtCollectionSdl 1.0
 import imtbaseCollectionDocumentServiceSdl 1.0
 import imtauthRolesSdl 1.0
@@ -498,18 +499,101 @@ QtObject {
 	}
 
 	// =========================================================================
-	// Permissions (via GqlBasedPermissionsProvider)
+	// Permissions (via GetProductPermissions SDL query)
 	// =========================================================================
 
-	property var permissionsModel: __permissionsProvider.permissionsModel
+	// All product permissions (unfiltered) — for TenantPermissionsPage
+	property var allPermissions: []
+	signal allPermissionsReceived()
 
-	property GqlBasedPermissionsProvider __permissionsProvider: GqlBasedPermissionsProvider {
-		productId: root.productId
+	// Tenant-scoped permissions — for RoleView
+	property var tenantPermissions: []
+	signal tenantPermissionsReceived()
+
+	property GetProductPermissionsInput __getAllPermsInput: GetProductPermissionsInput {}
+	property GqlSdlRequestSender __getAllPermsSender: GqlSdlRequestSender {
+		gqlCommandId: ImtauthPermissionsSdlCommandIds.s_getProductPermissions
+
+		sdlObjectComp: Component {
+			GetProductPermissionsPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.__populateAllPermissions(m_groups)
+					}
+				}
+			}
+		}
 	}
 
-	function fetchPermissions() {
-		__permissionsProvider.productId = root.productId
-		__permissionsProvider.updateModel()
+	property GetProductPermissionsInput __getTenantPermsInput: GetProductPermissionsInput {}
+	property GqlSdlRequestSender __getTenantPermsSender: GqlSdlRequestSender {
+		gqlCommandId: ImtauthPermissionsSdlCommandIds.s_getProductPermissions
+
+		sdlObjectComp: Component {
+			GetProductPermissionsPayload {
+				onFinished: {
+					if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+						root.requestFailed(m_errorMessage)
+					} else {
+						root.__populateTenantPermissions(m_groups)
+					}
+				}
+			}
+		}
+	}
+
+	function fetchAllPermissions() {
+		root.__getAllPermsInput.m_productId = root.productId || ""
+		root.__getAllPermsSender.send(root.__getAllPermsInput)
+	}
+
+	function fetchTenantPermissions(tenantId) {
+		root.__getTenantPermsInput.m_productId = root.productId || ""
+		root.__getTenantPermsInput.m_tenantId = tenantId || root.tenantId || ""
+		root.__getTenantPermsSender.send(root.__getTenantPermsInput)
+	}
+
+	function __parseGroups(groupsList) {
+		var result = []
+		if (!groupsList)
+			return result
+		for (var gi = 0; gi < groupsList.count; ++gi) {
+			var group = groupsList.get(gi).item
+			if (!group) continue
+			var groupObj = {
+				"groupId": group.m_groupId || "",
+				"groupName": group.m_groupName || "",
+				"entries": []
+			}
+			var entries = group.m_entries
+			if (entries) {
+				for (var ei = 0; ei < entries.count; ++ei) {
+					var entry = entries.get(ei).item
+					if (!entry) continue
+					groupObj.entries.push({
+						"permissionId": entry.m_permissionId || "",
+						"displayName": entry.m_displayName || "",
+						"description": entry.m_description || ""
+					})
+				}
+			}
+			result.push(groupObj)
+		}
+		return result
+	}
+
+	function __populateAllPermissions(groupsList) {
+		root.allPermissions = root.__parseGroups(groupsList)
+		root.allPermissionsReceived()
+	}
+
+	function __populateTenantPermissions(groupsList) {
+		root.tenantPermissions = root.__parseGroups(groupsList)
+		root.tenantPermissionsReceived()
 	}
 
 	// =========================================================================
@@ -1584,14 +1668,14 @@ QtObject {
 	property Component __roleEditorComp: Component {
 		RoleView {
 			productId: root.productId
-			permissionsModel: root.permissionsModel
+			flatPermissions: root.tenantPermissions
 			commandsControllerComp: Component {
 				GqlBasedCommandsController {
 					typeId: root.roleObjectTypeId
 				}
 			}
 			Component.onCompleted: {
-				root.fetchPermissions()
+				root.fetchTenantPermissions(root.tenantId)
 			}
 		}
 	}
