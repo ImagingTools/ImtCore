@@ -48,6 +48,7 @@ QtObject {
 	property string currentTenantId: ""
 	property string currentTenantName: ""
 	property var __permissionsRefreshCallback: null
+	property bool __tenantRemovalSwitchInProgress: false
 
 	property Settings storage: Settings {
 		category: "AuthorizationController"
@@ -360,11 +361,54 @@ QtObject {
 		return currentTenantId
 	}
 
+	function _isCurrentTenantRemoved(changeInfo) {
+		if (!changeInfo || changeInfo.operation !== "removed")
+			return false
+
+		if (!root.currentTenantId || root.currentTenantId === "")
+			return false
+
+		var removedIds = changeInfo.itemIds || []
+		for (var i = 0; i < removedIds.length; i++) {
+			if (removedIds[i] === root.currentTenantId)
+				return true
+		}
+
+		return false
+	}
+
+	function _handleRemovedTenant(changeInfo) {
+		if (!_isCurrentTenantRemoved(changeInfo))
+			return
+
+		if (root.__tenantRemovalSwitchInProgress)
+			return
+
+		root.__tenantRemovalSwitchInProgress = true
+		ModalDialogManager.showInfoDialog(qsTr("The current organization has been deleted. Switching to no organization."))
+		root.selectTenant("")
+	}
+
 	function selectTenant(tenantId){
 		selectTenantInput.m_tenantId = tenantId
 		selectTenantGqlSender.send(selectTenantInput)
 	}
-	
+
+	RemoteCollectionChangeListener {
+		id: tenantCollectionListener
+		collectionId: "Tenants"
+		currentUserId: root.userTokenProvider.userId
+
+		onRemoved: {
+			console.log("RemoteCollectionChangeListener onRemoved", changeInfo)
+			root._handleRemovedTenant(changeInfo)
+		}
+
+		function getHeaders() {
+			return {}
+		}
+	}
+
 	function isStrongUserManagement(){
 		return userManagementProvider.userMode === "STRONG_USER_MANAGEMENT";
 	}
@@ -558,6 +602,7 @@ QtObject {
 			SelectTenantPayload {
 				onFinished: {
 					if (m_ok && m_userSession){
+						root.__tenantRemovalSwitchInProgress = false
 						root.userTokenProvider.accessToken = m_userSession.m_accessToken;
 						root.userTokenProvider.refreshToken = m_userSession.m_refreshToken;
 						root.currentTenantId = m_userSession.m_tenantId || "";
@@ -578,6 +623,19 @@ QtObject {
 						});
 					}
 					else{
+						if (root.__tenantRemovalSwitchInProgress && root.selectTenantInput.m_tenantId === "") {
+							root.__tenantRemovalSwitchInProgress = false
+							root.currentTenantId = ""
+							root.currentTenantName = ""
+							if (Qt.platform.os === "web")
+								root.saveDataToStorage()
+							root.refreshPermissions(function(){
+								root.tenantSelected("")
+							})
+							return
+						}
+
+						root.__tenantRemovalSwitchInProgress = false
 						root.tenantSelectionFailed(m_errorMessage || "");
 					}
 				}
