@@ -13,6 +13,7 @@
         <file alias="imtguigql/SubscriptionClient.qml">SubscriptionClient.qml</file>
         <file alias="imtguigql/SubscriptionManager.qml">SubscriptionManager.qml</file>
         <file alias="imtguigql/ClientStyle.qml">ClientStyle.qml</file>
+        <file alias="imtguigql/RemoteCollectionChangeListener.qml">RemoteCollectionChangeListener.qml</file>
         <file alias="imtguigql/CollectionRepresentation.qml">CollectionRepresentation.qml</file>
         <file alias="imtguigql/RemoteCollectionView.qml">RemoteCollectionView.qml</file>
         <file alias="imtguigql/MetaInfoProvider.qml">MetaInfoProvider.qml</file>
