@@ -68,6 +68,7 @@ class Loader extends Item {
      */
     setSource(source, properties){
         if (source === undefined || source === null){
+            this.__sourceProperties = {}
             this.source = ''
             this.sourceComponent = undefined
             return
@@ -75,7 +76,7 @@ class Loader extends Item {
 
         this.__sourceProperties = properties === undefined || properties === null ? {} : properties
         this.sourceComponent = undefined
-        this.source = String(source)
+        this.source = source
     }
 
     __complete(){
