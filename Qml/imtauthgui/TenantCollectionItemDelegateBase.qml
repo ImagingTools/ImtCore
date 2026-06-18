@@ -40,7 +40,7 @@ Rectangle {
 	readonly property int checkBoxSize: Style.itemSizeS + Style.marginXS
 
 	readonly property int index: model.index
-	function __resolveTotalCount() {
+	function _resolveTotalCount() {
 		if (modelData.totalCount !== undefined)
 			return modelData.totalCount
 		if (ListView.view)
@@ -48,7 +48,7 @@ Rectangle {
 		return 0
 	}
 
-	readonly property int totalCount: __resolveTotalCount()
+	readonly property int totalCount: _resolveTotalCount()
 	readonly property bool isLastItem: index === totalCount - 1
 	property bool __isRelocatingExternalChildren: false
 

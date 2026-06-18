@@ -62,6 +62,10 @@ class Loader extends Item {
         this.progress = 0
     }
 
+    /**
+     * Mirrors QtQuick Loader.setSource(url, properties).
+     * Clears the current source when called with null/undefined.
+     */
     setSource(source, properties){
         if (source === undefined || source === null){
             this.sourceComponent = undefined

@@ -392,7 +392,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 	FeedStream(ifStream, 1, false);
 
 	FeedStreamHorizontally(ifStream, 2);
-	// Use the explicit root id so QML analysis resolves the root object instead of `this`.
+	// Use the explicit root ID so QML analysis resolves the root object instead of `this`.
 	ifStream << GetDecapitalizedValue(sdlType.GetName()) << QStringLiteral("._internal.removed = [");
 	for (int index = 0; index < typeFieldList.count(); index++){
 		if (index > 0){
