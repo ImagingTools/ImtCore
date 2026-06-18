@@ -34,11 +34,6 @@ class Loader extends Item {
         loaded: {type:Signal, args:[]},
     })
 
-    constructor(...args){
-        super(...args)
-        this.__sourceProperties = {}
-    }
-
     __updatePrimaryProperties(){
         super.__updatePrimaryProperties()
         this.__updateProperty('sourceComponent')
@@ -67,8 +62,8 @@ class Loader extends Item {
         this.progress = 0
     }
 
-    setSource(source, properties = {}){
-        this.__sourceProperties = properties
+    setSource(source, properties){
+        this.__sourceProperties = properties === undefined || properties === null ? {} : properties
         this.sourceComponent = undefined
         this.source = source
     }
