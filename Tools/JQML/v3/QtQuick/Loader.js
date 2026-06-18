@@ -34,7 +34,10 @@ class Loader extends Item {
         loaded: {type:Signal, args:[]},
     })
 
-    __sourceProperties = {}
+    constructor(...args){
+        super(...args)
+        this.__sourceProperties = {}
+    }
 
     __updatePrimaryProperties(){
         super.__updatePrimaryProperties()

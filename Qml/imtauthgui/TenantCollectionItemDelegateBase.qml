@@ -41,7 +41,7 @@ Rectangle {
 
 	readonly property int index: model.index
 	readonly property int listViewCount: ListView.view ? ListView.view.count : 0
-	readonly property int totalCount: modelData.totalCount ? modelData.totalCount : listViewCount
+	readonly property int totalCount: modelData.totalCount !== undefined ? modelData.totalCount : listViewCount
 	readonly property bool isLastItem: index === totalCount - 1
 	property bool __isRelocatingExternalChildren: false
 
