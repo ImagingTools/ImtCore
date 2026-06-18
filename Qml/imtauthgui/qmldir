@@ -18,6 +18,7 @@ singleton CachedUserCollection 1.0 CachedUserCollection.qml
 singleton CachedGroupCollection 1.0 CachedGroupCollection.qml
 
 PermissionsProvider 1.0 PermissionsProvider.qml
+PermissionsTableView 1.0 PermissionsTableView.qml
 
 RoleView 1.0 RoleView.qml
 UserView 1.0 UserView.qml

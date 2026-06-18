@@ -59,7 +59,6 @@
 	\subsection pattern_provider Provider Pattern
 	Data providers abstract query handling:
 	- CProductInfoProviderComp: Product licensing information
-	- CPermissionsProviderComp: Feature-based permissions
 	- CFeatureDependenciesProviderComp: Feature dependency queries
 	- Decouple GraphQL handlers from data sources
 	
@@ -117,12 +116,6 @@
 	- Access to complete product catalog
 	- License availability queries
 	- Feature availability queries
-	
-	**CPermissionsProviderComp**
-	- Exposes feature-based permission models
-	- Access control queries
-	- Permission validation for features
-	- Integration with license-based rights
 	
 	**CFeatureDependenciesProviderComp**
 	- Manages feature dependency queries
@@ -379,7 +372,7 @@
 	```
 	1. GraphQL Query (POST /graphql)
 	   └─> imtservergql: Query parsing
-	       └─> imtlicgql: CPermissionsProviderComp
+	       └─> imtauthgql: CPermissionsProviderComp
 	           └─> imtlic: CLicenseBasedRightsProviderComp
 	               ├─> Query active licenses
 	               ├─> Collect unlocked features

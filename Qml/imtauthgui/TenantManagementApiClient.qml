@@ -151,8 +151,15 @@ QtObject {
 	function getUserData(userId) {}
 
 	// --- Permissions ---
-	property var permissionsModel: null
-	function fetchPermissions() {}
+	// All product permissions (unfiltered) — for TenantPermissionsPage
+	property var allPermissions: []
+	signal allPermissionsReceived()
+	function fetchAllPermissions() {}
+
+	// Tenant-scoped permissions (filtered by tenant's tenantPermissions) — for RoleView
+	property var tenantPermissions: []
+	signal tenantPermissionsReceived()
+	function fetchTenantPermissions(tenantId) {}
 
 	// --- Cross-org grants ---
 	property var crossOrgGrantDocumentManager: null

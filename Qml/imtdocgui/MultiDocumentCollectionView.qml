@@ -22,7 +22,6 @@ Item {
 
 	onCollectionViewChanged: {
 		if (collectionView){
-			collectionView.documentManager = documentManager
 			navigableItem.parentSegment = collectionView.collectionId
 		}
 	}

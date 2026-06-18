@@ -49,6 +49,7 @@ defineTest(prepareWebQml) {
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthProfileSdl, $$buildwebdir/src/imtauthProfileSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthSessionsSdl, $$buildwebdir/src/imtauthSessionsSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthPersonalAccessTokensSdl, $$buildwebdir/src/imtauthPersonalAccessTokensSdl)
+	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthPermissionsSdl, $$buildwebdir/src/imtauthPermissionsSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthTenantsSdl, $$buildwebdir/src/imtauthTenantsSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthTenantCollectionDocumentServiceSdl, $$buildwebdir/src/imtauthTenantCollectionDocumentServiceSdl)
 	copyToWebDir($$imtcoredir/$$AUXINCLUDEDIR/GeneratedFiles/imtauthsdl/SDL/1.0/QML/imtauthTenantMembershipsSdl, $$buildwebdir/src/imtauthTenantMembershipsSdl)
