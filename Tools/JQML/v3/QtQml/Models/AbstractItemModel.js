@@ -64,6 +64,20 @@ class AbstractItemModel {
 
                     if(!found){
                         properties[key].push(caller)
+
+                        let destructionSignal = caller.target.__proxy['Component.destruction']
+
+                        if(destructionSignal){
+                            destructionSignal.connect(()=>{
+                                for(let _index = 0; _index < properties[key].length; _index++){
+                                if(properties[key][_index].target === caller.target) {
+                                        properties[key].splice(_index, 1)
+                                        break
+                                }
+                                }
+                            })
+                        }
+                        
                     }
                     
                 }
@@ -85,8 +99,8 @@ class AbstractItemModel {
                     if(!properties[key]) properties[key] = []
 
                     for(let property of properties[key]){
-                        // property.__update()
-                        property.target.__proxy[property.name] = property.func()
+                        property.meta.type.set(property.target, property.name, property.func(), property.meta)
+                        // property.target.__proxy[property.name] = property.func()
                     }
 
                     parent.__propogate()
