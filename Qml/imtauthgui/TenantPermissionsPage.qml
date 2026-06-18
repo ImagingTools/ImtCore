@@ -41,11 +41,6 @@ ViewBase {
 		permissionsPage.doUpdateGui()
 	}
 
-	onVisibleChanged: {
-		if (visible)
-			permissionsPage.doUpdateGui()
-	}
-
 	onApiClientChanged: {
 		permissionsPage.__allPermissionsRequested = false
 		permissionsPage.__requestAllPermissionsOnce()
