@@ -723,10 +723,12 @@ RemoteCollectionView {
 
 					let tenantId = elementsModel.getData("id", index)
 					let typeId = elementsModel.getData("typeId", index)
+
 					let scope = elementsModel.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, index)
 					if (scope === "Invited") {
 						return
 					}
+
 					if (tenantId && tenantId !== AuthorizationController.currentTenantId){
 						let tenantName = elementsModel.containsKey("name", index)
 								? elementsModel.getData("name", index)
