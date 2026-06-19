@@ -118,7 +118,8 @@ class Flow extends Item {
 
         Geometry.setAuto(this.__self, 'width', width + this.leftPadding + this.rightPadding, this.__self.constructor.meta.width)
         Geometry.setAuto(this.__self, 'height', height + this.topPadding + this.bottomPadding, this.__self.constructor.meta.height)
-
+        this.implicitWidth = width + this.leftPadding + this.rightPadding
+        this.implicitHeight = height + this.topPadding + this.bottomPadding
         this.positioningComplete()
     }
 
