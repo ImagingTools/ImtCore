@@ -394,8 +394,7 @@ QtObject {
 		selectTenantGqlSender.send(selectTenantInput)
 	}
 
-	RemoteCollectionChangeListener {
-		id: tenantCollectionListener
+	property RemoteCollectionChangeListener tenantCollectionListener: RemoteCollectionChangeListener {
 		collectionId: "Tenants"
 		currentUserId: root.userTokenProvider.userId
 

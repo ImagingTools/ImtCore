@@ -73,6 +73,9 @@ Item {
     // for smooth flicking. (Was 4000px ≈ 140 rows, which realized whole trees.)
     property int    cacheBuffer: 4000//rowHeight * 4
     property int    headerHeight: 30
+    property int    minColumnWidth: 40
+    property int    columnResizeHandleWidth: 8
+    property bool   allowColumnResize: true
 
     property bool   showHeader: true
     property bool   multiSelect: false
@@ -163,6 +166,12 @@ Item {
 
     // Column layout cache (recomputed on width/columns changes)
     property var    __columnWidths: []
+    property bool   __hasUserColumnWidths: false
+
+    property int    __resizingBoundaryIndex: -1
+    property real   __resizePressX: 0
+    property real   __resizeLeftStart: 0
+    property real   __resizeRightStart: 0
 
     // ─── Sizing ────────────────────────────────────────────────────────────
 
@@ -213,6 +222,7 @@ Item {
 
                 delegate: Rectangle {
                     property var column: root.columnAt(index)
+                    property bool resizeHovered: false
 
                     width: root.__columnWidths[index] !== undefined ? root.__columnWidths[index] : 0
                     height: parent.height
@@ -235,6 +245,53 @@ Item {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: root.headerClicked(parent.column)
+                    }
+
+                    Rectangle {
+                        id: resizeHandle
+
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        anchors.right: parent.right
+                        width: root.columnResizeHandleWidth
+                        color: (root.__resizingBoundaryIndex === index || parent.resizeHovered)
+                            ? Style.imaginToolsAccentColor : "transparent"
+                        opacity: (root.__resizingBoundaryIndex === index || parent.resizeHovered) ? 0.45 : 0
+                        visible: root.allowColumnResize && index < root.columnCount() - 1
+
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            enabled: resizeHandle.visible
+                            cursorShape: Qt.SizeHorCursor
+                            acceptedButtons: Qt.LeftButton
+                            preventStealing: true
+
+                            onContainsMouseChanged: parent.parent.resizeHovered = containsMouse
+
+                            onPressed: {
+                                root.__beginBoundaryResize(index, mouse.x + resizeHandle.x + parent.parent.x)
+                                mouse.accepted = true
+                            }
+
+                            onPositionChanged: {
+                                if (!pressed)
+                                    return
+                                root.__updateBoundaryResize(index, mouse.x + resizeHandle.x + parent.parent.x)
+                            }
+
+                            onReleased: root.__endBoundaryResize()
+                            onCanceled: root.__endBoundaryResize()
+                        }
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: "||"
+                            color: Style.textColor
+                            font.pixelSize: Math.max(9, Math.floor(parent.height * 0.35))
+                            visible: parent.visible
+                            opacity: (root.__resizingBoundaryIndex === index || parent.parent.resizeHovered) ? 0.9 : 0.35
+                        }
                     }
                 }
             }
@@ -376,6 +433,7 @@ Item {
 
                         width: root.__columnWidths[index] !== undefined ? root.__columnWidths[index] : 0
                         height: delegateRoot.height
+                        clip: true
 
                         Rectangle {
                             anchors.fill: parent
@@ -723,8 +781,16 @@ Item {
     }
 
     onModelChanged: rebuildTree()
-    onColumnsChanged: __recomputeColumnWidths()
-    onWidthChanged:  __recomputeColumnWidths()
+    onColumnsChanged: {
+        __hasUserColumnWidths = false
+        __recomputeColumnWidths()
+    }
+    onWidthChanged:  {
+        if (__hasUserColumnWidths)
+            __fitColumnWidthsToView()
+        else
+            __recomputeColumnWidths()
+    }
     onFilterTextChanged: filterDebounceTimer.restart()
     onFilterDebounceMsChanged: filterDebounceTimer.interval = filterDebounceMs
 
@@ -1198,6 +1264,82 @@ Item {
         } else if (fixedTotal < root.width && n > 0) {
             // Distribute leftover proportionally so the rightmost column fills the row.
             widths[n - 1] += root.width - fixedTotal
+        }
+
+        __columnWidths = widths
+    }
+
+    function __columnMinWidth(columnIndex) {
+        var col = columnAt(columnIndex)
+        if (col && col.minWidth !== undefined && col.minWidth > 0)
+            return Number(col.minWidth)
+        return root.minColumnWidth
+    }
+
+    function __beginBoundaryResize(boundaryIndex, pressXInHeader) {
+        if (!allowColumnResize)
+            return
+        if (boundaryIndex < 0 || boundaryIndex >= columnCount() - 1)
+            return
+
+        __resizingBoundaryIndex = boundaryIndex
+        __resizePressX = pressXInHeader
+        __resizeLeftStart = __columnWidths[boundaryIndex] !== undefined ? __columnWidths[boundaryIndex] : 0
+        __resizeRightStart = __columnWidths[boundaryIndex + 1] !== undefined ? __columnWidths[boundaryIndex + 1] : 0
+    }
+
+    function __updateBoundaryResize(boundaryIndex, currentXInHeader) {
+        if (__resizingBoundaryIndex !== boundaryIndex)
+            return
+
+        var leftMin = __columnMinWidth(boundaryIndex)
+        var rightMin = __columnMinWidth(boundaryIndex + 1)
+
+        var minDelta = leftMin - __resizeLeftStart
+        var maxDelta = __resizeRightStart - rightMin
+        var rawDelta = currentXInHeader - __resizePressX
+        var delta = Math.max(minDelta, Math.min(maxDelta, rawDelta))
+
+        var widths = __columnWidths.slice(0)
+        widths[boundaryIndex] = __resizeLeftStart + delta
+        widths[boundaryIndex + 1] = __resizeRightStart - delta
+        __columnWidths = widths
+        __hasUserColumnWidths = true
+    }
+
+    function __endBoundaryResize() {
+        __resizingBoundaryIndex = -1
+    }
+
+    function __fitColumnWidthsToView() {
+        var n = columnCount()
+        if (n <= 0 || __columnWidths.length !== n)
+            return
+
+        var widths = __columnWidths.slice(0)
+        var total = 0
+        for (var i = 0; i < n; ++i) {
+            var minW = __columnMinWidth(i)
+            if (widths[i] < minW)
+                widths[i] = minW
+            total += widths[i]
+        }
+
+        var target = Math.max(0, root.width)
+        var diff = target - total
+        if (diff > 0) {
+            widths[n - 1] += diff
+        } else if (diff < 0) {
+            var remain = -diff
+            for (var r = n - 1; r >= 0 && remain > 0; --r) {
+                var minR = __columnMinWidth(r)
+                var canTake = Math.max(0, widths[r] - minR)
+                if (canTake <= 0)
+                    continue
+                var take = Math.min(canTake, remain)
+                widths[r] -= take
+                remain -= take
+            }
         }
 
         __columnWidths = widths

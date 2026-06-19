@@ -501,8 +501,17 @@ RemoteCollectionView {
 
 	function openTenantDocument(tenantId) {
 		if (!tenantId) return
-		var tenantDocumentService = MainDocumentService.getDocumentService(container.collectionId)
-		if (!tenantDocumentService) {
+
+		if (!commandsDelegate){
+			return
+		}
+
+		if (!commandsDelegate.documentManager){
+			return
+		}
+
+		var tenantDocumentService = commandsDelegate.documentManager
+		if (!tenantDocumentService){
 			console.error("Unable to open tenant document. Error: Document manager is invalid")
 			return
 		}
@@ -516,6 +525,35 @@ RemoteCollectionView {
 				{"tenantId": tenantId, "tenantName": tenantName || tenantId})
 		} else {
 			openTenantDocument(tenantId)
+		}
+	}
+
+	function closeTenantEditorsForSwitch(activeTenantId) {
+		if (!commandsDelegate){
+			console.error("Unable to close tenant editor. Error: 'commandsDelegate' is invalid")
+			return
+		}
+
+		if (!commandsDelegate.documentManager){
+			console.error("Unable to close tenant editor. Error: 'documentManager' is invalid")
+			return
+		}
+
+		var tenantDocumentService = commandsDelegate.documentManager
+		if (!tenantDocumentService)
+			return
+
+		var openedDocumentIds = tenantDocumentService.getOpenedDocumentIds()
+		for (var i = 0; i < openedDocumentIds.length; ++i) {
+			var openedId = openedDocumentIds[i]
+			var openedObjectId = tenantDocumentService.getDocumentObjectId
+				? tenantDocumentService.getDocumentObjectId(openedId)
+				: ""
+
+			if (activeTenantId !== "" && openedObjectId === activeTenantId)
+				continue
+
+			tenantDocumentService.closeDocument(openedId, true)
 		}
 	}
 
@@ -544,6 +582,8 @@ RemoteCollectionView {
 		target: AuthorizationController
 
 		function onTenantSelected(tenantId) {
+			container.closeTenantEditorsForSwitch(tenantId || "")
+
 			if (container.__pendingCreateNewTenantDocumentAfterSwitch && tenantId === "") {
 				container.__pendingCreateNewTenantDocumentAfterSwitch = false
 				if (container.commandsDelegate) {
@@ -723,10 +763,12 @@ RemoteCollectionView {
 
 					let tenantId = elementsModel.getData("id", index)
 					let typeId = elementsModel.getData("typeId", index)
+
 					let scope = elementsModel.getData(TenantItemDataTypeMetaInfo.s_tenantRelationScope, index)
 					if (scope === "Invited") {
 						return
 					}
+
 					if (tenantId && tenantId !== AuthorizationController.currentTenantId){
 						let tenantName = elementsModel.containsKey("name", index)
 								? elementsModel.getData("name", index)

@@ -513,7 +513,8 @@ Item {
 		z: parent.z + 1
 		anchors.right: parent.right
 		anchors.top: permissionsTreeView.top
-		anchors.bottom: permissionsTreeView.contentListView.bottom
+		anchors.topMargin: permissionsTreeView.showHeader ? permissionsTreeView.headerHeight + 1 : 0
+		anchors.bottom: permissionsTreeView.bottom
 		secondSize: Style.marginM
 		targetItem: permissionsTreeView.contentListView
 	}
