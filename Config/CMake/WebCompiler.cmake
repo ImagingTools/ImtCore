@@ -249,6 +249,8 @@ function(jq_compile_web)
 		endif()
 	endif()
 
+	message("NODE_EXE_JQ ${NODE_EXE}")
+
 	list(LENGTH webdirs DIRS_COUNT)
 
 	set(INDEX 0)
@@ -278,7 +280,7 @@ function(jq_compile_web)
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${buildwebdir}
 		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/Tools/JQML/v3/preparesources.py ${webdirs_n}
 		WORKING_DIRECTORY ${IMTCOREDIR}/Tools/JQML/v3
-		COMMAND ${CMAKE_COMMAND} -E env
+		COMMAND ${CMAKE_COMMAND} -E env ${envvar}
 		TARGETNAME=${TARGETNAME}
 		${NODE_EXE}
 		${IMTCOREDIR}/Tools/JQML/v3/compiler/compiler.js
@@ -297,7 +299,7 @@ function(jq_compile_web)
 		${buildwebdir}/Resources/index.js
 		POST_BUILD
 		WORKING_DIRECTORY ${IMTCOREDIR}/Tools/JQML/v3
-		COMMAND ${CMAKE_COMMAND} -E env
+		COMMAND ${CMAKE_COMMAND} -E env ${envvar}
 		TARGETNAME=${TARGETNAME}
 		${NODE_EXE}
 		${IMTCOREDIR}/Tools/JQML/v3/compiler/compiler.js

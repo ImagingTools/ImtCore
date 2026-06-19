@@ -66,11 +66,14 @@ function compile(options){
     const configFilePath = path.normalize(options.config.trim())
     const configDirPath = configFilePath.split(/[\\\/]+/g).slice(0, -1).join('/')
 
+    console.log("ENV", env)
+
     function envFill(source) {
         let result = source
         for (let key in env) {
             result = result.replaceAll('${' + key + '}', env[key].replaceAll('\\', '\\\\').trim())
         }
+        console.log("envFill", result)
         return result
     }
 
