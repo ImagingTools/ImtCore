@@ -88,10 +88,12 @@ class BaseClass extends QtObject {
         enableNotifications: { type: Bool, value: true },
 		propertiesIsConnected: { type: Bool, value: false },
 		owner: { type: Var, value: null },
+		_internal: { type: Var, value: null },
 
 		enableNotificationsChanged: {type:Signal, args:[]},
 		propertiesIsConnectedChanged: {type:Signal, args:[]},
 		ownerChanged: {type:Signal, args:[]},
+		_internalChanged: {type:Signal, args:[]},
 
 		modelChanged: { type:Signal, args: ['changeSet'] },
 		finished: { type:Signal, args: [] },
