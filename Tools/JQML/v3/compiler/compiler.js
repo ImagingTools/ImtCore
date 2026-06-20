@@ -139,6 +139,7 @@ function compile(options){
         children = []
         name = ''
         isRoot = false
+        defaultProperty = ''
 
         constructor(parent, className, _extends, meta, on, qmlFile, info, targetContext) {
             if (qmlFile.elementsCount === 0) this.isRoot = true
@@ -155,13 +156,21 @@ function compile(options){
                     if(typeof this[m[0]] === 'function'){
                         this[m[0]](m)
                     } else {
-                        
+                        console.log(`Unknown meta type: ${m[0]}`)
                     }
                     
                 }
             }
         }
+        qmldefaultprop(meta) {
+            if(typeof this[meta[1][0]] === 'function'){
+                this[meta[1][0]](meta[1])
+            } else {
+                console.log(`Unknown meta type: ${meta[1][0]}`)
+            }
 
+            this.defaultProperty = meta[1][1]
+        }
         qmlelem(meta) {
             this.children.push(new Instruction(this, '', meta[1], meta[3], meta[2], this.qmlFile, meta.info, this))
         }
@@ -1714,6 +1723,16 @@ function compile(options){
 
             let id = ''
 
+            let defaultBlock = ''
+            if(this.parent) {
+                let parentTypeInfo = this.parent.getTypeInfo(this.parent.extends)
+                if(parentTypeInfo.type instanceof QmlFile){
+                    if(parentTypeInfo.type.instruction.defaultProperty)
+                    defaultBlock = `${this.parent.name}.${parentTypeInfo.type.instruction.defaultProperty}.push(${this.name})`
+                }
+                
+            }
+
             if(typeof this.id === 'object') {
                 let stat = this.prepare(this.id, { isCompute: false, thisKey: this.name, value: new SourceNode(), local: [] })
                 id = stat.value.toString()   
@@ -1726,7 +1745,9 @@ function compile(options){
                 static create(parent,properties={},context={},isRoot=true){
                     let ${this.name} = super.create(parent,properties,context,isRoot)
                     ${this.name}.__${this.qmlFile.getContextName()} = context
-                    ${id}`)
+                    ${id}
+                    `)
+                    
 
             code.add('\n')
 
@@ -1755,6 +1776,10 @@ function compile(options){
             code.add('\n')
             
             code.add(`${this.name}.__${this.className}__${this.name}=true`)
+
+            code.add('\n')
+
+            code.add(defaultBlock)
 
             code.add('\n')
 
@@ -1877,7 +1902,6 @@ function compile(options){
             let properties = this.instruction.getProperties()
 
             code.add(`static cachedComponents = {}
-
                 static meta = Object.assign({}, ${typeInfo.path}.meta, ${meta})
 
                 __removeObjectName(){removeObjectName('${this.instruction.className}')}
