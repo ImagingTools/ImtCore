@@ -87,12 +87,16 @@ Item {
 		__beginSelectionUpdate()
 		permissionsTreeView.checkAll()
 		__endSelectionUpdate()
+		if (!root.readOnly)
+			root.selectionChanged()
 	}
 
 	function uncheckAll() {
 		__beginSelectionUpdate()
 		permissionsTreeView.uncheckAll()
 		__endSelectionUpdate()
+		if (!root.readOnly)
+			root.selectionChanged()
 	}
 
 	function expandAll() {

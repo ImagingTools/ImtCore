@@ -498,6 +498,7 @@ RemoteCollectionView {
 
 	property string __pendingOpenTenantAfterSwitchId: ""
 	property bool __pendingCreateNewTenantDocumentAfterSwitch: false
+	property bool __skipCloseOnSwitch: false
 
 	function openTenantDocument(tenantId) {
 		if (!tenantId) return
@@ -581,8 +582,11 @@ RemoteCollectionView {
 	Connections {
 		target: AuthorizationController
 
-		function onTenantSelected(tenantId) {
-			container.closeTenantEditorsForSwitch(tenantId || "")
+		function onTenantSelected(tenantId){
+			if (!container.__skipCloseOnSwitch) {
+				container.closeTenantEditorsForSwitch(tenantId || "")
+			}
+			container.__skipCloseOnSwitch = false
 
 			if (container.__pendingCreateNewTenantDocumentAfterSwitch && tenantId === "") {
 				container.__pendingCreateNewTenantDocumentAfterSwitch = false
@@ -826,6 +830,7 @@ RemoteCollectionView {
 						if (!isNewTenant){
 							var tenantId = tenantEditor.tenantData ? tenantEditor.tenantData.m_id : ""
 							if (tenantId && tenantId !== AuthorizationController.currentTenantId){
+								container.__skipCloseOnSwitch = true
 								container.switchToTenant(tenantId)
 							}
 						}

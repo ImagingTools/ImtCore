@@ -85,7 +85,6 @@ CollectionView {
 	}
 
 	Component.onCompleted: {
-		console.log("RemoteCollectionView.qml onCompleted", table)
 		table.setSortingInfo("timeStamp", "DESC")
 		table.saveWidth.connect(root.tableViewParamsAccepted)
 		Events.subscribeEvent("UpdateAllModels", root.receiveRemoteChanges);
@@ -123,6 +122,13 @@ CollectionView {
 
 			root.doUpdateGui();
 			root.setAlertPanel(undefined);
+		}
+	}
+
+	Connections {
+		target: AuthorizationController
+		function onTenantSelected(tenantId){
+			root.doUpdateGui()
 		}
 	}
 
@@ -203,7 +209,6 @@ CollectionView {
 		}
 
 		onChanged: {
-			console.log("RemoteCollectionView.qml onMessageReceived", root.collectionId)
 			root.collectionChanged(changeInfo)
 			root.handleSubscription(rawData, changeInfo)
 		}

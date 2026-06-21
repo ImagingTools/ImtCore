@@ -89,7 +89,7 @@ QtObject {
 
 			if (typeOperation === EDocumentOperationEnum.s_documentSaved){
 				for (let i = 0; i < root.registeredViews.length; ++i){
-					if (root.registeredViews[i]){
+					if (root.registeredViews[i] && typeof root.registeredViews[i].documentSaved === "function"){
 						root.registeredViews[i].documentSaved()
 					}
 				}
