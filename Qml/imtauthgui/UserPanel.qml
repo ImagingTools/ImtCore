@@ -37,6 +37,18 @@ Item {
 		function onLoggedOut(){
 			root.enabled = false;
 		}
+
+		function onTenantSelected(tenantId){
+			root.__loadOrganizations();
+		}
+
+		function onTenantInvitationAccepted(notification){
+			root.__loadOrganizations();
+		}
+
+		function onTenantInvitationRejected(notification){
+			root.__loadOrganizations();
+		}
 	}
 	
 	function setUserPanelEnabled(enabled){

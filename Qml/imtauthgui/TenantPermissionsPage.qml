@@ -99,14 +99,12 @@ ViewBase {
 			permissionsPage.tenantData.m_tenantPermissions.push(selectedPermissionIds[k])
 	}
 
-	property int maxTableWidth: 1000
-
 	Item {
 		id: centeredContainer
 		anchors.top: parent.top
 		anchors.bottom: parent.bottom
 		anchors.horizontalCenter: parent.horizontalCenter
-		width: Math.min(parent.width - Style.marginXL * 2, permissionsPage.maxTableWidth)
+		width: parent.width * 0.8
 	}
 
 	Column {

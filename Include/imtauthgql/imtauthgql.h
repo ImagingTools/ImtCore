@@ -621,10 +621,6 @@ namespace imtauthgql
 */
 inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const QByteArray& tenantId)
 {
-	if (tenantId.isEmpty()){
-		return nullptr;
-	}
-
 	imtauth::CTenantFilterParam* tenantFilterPtr = new imtauth::CTenantFilterParam();
 	tenantFilterPtr->SetTenantId(tenantId);
 
