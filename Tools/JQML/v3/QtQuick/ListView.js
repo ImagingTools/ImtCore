@@ -183,6 +183,8 @@ class ListView extends Flickable {
         this.blockSignals(false)
 
         this.count = 0
+        this.currentIndex = -1
+        this.currentItem = undefined
     }
 
     __getItemInfo(index) {
@@ -402,6 +404,16 @@ class ListView extends Flickable {
 
             item.x = itemInfo.x
             item.y = itemInfo.y
+        }
+
+        if(index === 0 && !this.currentItem){
+            this.currentIndex = 0
+            this.currentItem = item
+
+            // Keep parity with desktop runtime: first visible delegate becomes focused.
+            if(item && !item.focus){
+                item.focus = true
+            }
         }
 
         return item

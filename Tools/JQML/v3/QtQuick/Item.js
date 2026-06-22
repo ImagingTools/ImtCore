@@ -273,15 +273,32 @@ class Item extends QtObject {
 
     SLOT_focusChanged(oldValue, newValue){
         if(newValue){
-            let tree = this.__getTree()
-            JQApplication.setFocusTree(tree)
+            if(this.__isListViewDelegateItem()){
+                return
+            }
 
-            if(this.parent instanceof JQModules.QtQuick.FocusScope && this.parent.focus){
-                this.activeFocus = true
+            let tree = this.__getTree()
+            let accepted = JQApplication.setFocusTree(tree, {
+                owner: this,
+                firstWins: true
+            })
+            if(!accepted){
+                this.focus = false
             }
         } else {
             this.activeFocus = false
         }
+    }
+
+    __isListViewDelegateItem(){
+        let parent = this.parent
+        while(parent){
+            if(parent.parent instanceof JQModules.QtQuick.ListView && parent === parent.parent.contentItem){
+                return true
+            }
+            parent = parent.parent
+        }
+        return false
     }
 
     SLOT_activeFocusChanged(oldValue, newValue){
@@ -297,13 +314,14 @@ class Item extends QtObject {
             this.parent.focus = true
         }
 
-        this.focus = true
-
-        if(this.parent instanceof JQModules.QtQuick.FocusScope){
-            this.parent.activeFocus = true
+        if(!this.focus){
+            this.focus = true
         }
 
-        this.activeFocus = true
+        JQApplication.setFocusTree(this.__getTree(), {
+            owner: this,
+            immediate: true
+        })
     }
 
     __getTree(){
@@ -321,7 +339,9 @@ class Item extends QtObject {
     __setFocusTree(tree){
         for(let child of this.children){
             if(tree.indexOf(child) < 0){
-                child.focus = false
+                if(!(typeof child.__isListViewDelegateItem === 'function' && child.__isListViewDelegateItem())){
+                    child.focus = false
+                }
             }
 
             // Don't recurse into FocusScopes — they manage their own children's

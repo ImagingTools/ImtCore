@@ -435,20 +435,59 @@ module.exports = {
     deleteObjects: [],
 
     focusTree: [],
-    pendingFocusTree: null,  // deferred during beginUpdate/endUpdate
-    setFocusTree(tree){
-        // Qt semantics: when multiple siblings request focus synchronously,
-        // the FIRST one wins. Use a microtask to batch; first request is kept.
-        if(this.pendingFocusTree !== null){
-            // Another request already queued — ignore (first wins)
-            return
-        }
-        this.pendingFocusTree = tree
-        Promise.resolve().then(()=>{
-            let t = this.pendingFocusTree
+    pendingFocusTree: null,
+    pendingFocusOwner: null,
+    pendingFocusLosers: [],
+    pendingFocusFlushScheduled: false,
+    setFocusTree(tree, options = {}){
+        if(!tree || !tree.length) return false
+
+        let owner = options.owner || tree[0]
+        let immediate = options.immediate === true
+        let firstWins = options.firstWins === true
+
+        if(immediate){
             this.pendingFocusTree = null
-            if(t) this._applyFocusTree(t)
-        })
+            this.pendingFocusOwner = null
+            this._applyFocusTree(tree.slice())
+            this._clearPendingFocusLosers()
+            return true
+        }
+
+        if(firstWins && !this.updateLayers.length){
+            this.pendingFocusTree = null
+            this.pendingFocusOwner = null
+            this._applyFocusTree(tree.slice())
+            this._clearPendingFocusLosers()
+            return true
+        }
+
+        if(firstWins && this.pendingFocusTree !== null){
+            // First request in a synchronous batch wins.
+            if(owner && owner !== this.pendingFocusOwner && this.pendingFocusLosers.indexOf(owner) < 0){
+                this.pendingFocusLosers.push(owner)
+            }
+            return false
+        }
+
+        this.pendingFocusTree = tree.slice()
+        this.pendingFocusOwner = owner
+
+        if(!this.updateLayers.length && !this.pendingFocusFlushScheduled){
+            this.pendingFocusFlushScheduled = true
+            Promise.resolve().then(()=>{
+                this.pendingFocusFlushScheduled = false
+                if(this.pendingFocusTree){
+                    let pendingFocusTree = this.pendingFocusTree
+                    this.pendingFocusTree = null
+                    this.pendingFocusOwner = null
+                    this._applyFocusTree(pendingFocusTree)
+                }
+                this._clearPendingFocusLosers()
+            })
+        }
+
+        return true
     },
 
     _applyFocusTree(tree){
@@ -471,7 +510,18 @@ module.exports = {
         }
         
         this.root.__setFocusTree(unionTree)
+
         this.focusTree = unionTree
+    },
+
+    _clearPendingFocusLosers(){
+        let losers = this.pendingFocusLosers
+        this.pendingFocusLosers = []
+        for(let loser of losers){
+            if(loser && !loser.__destroyed && loser.focus){
+                loser.focus = false
+            }
+        }
     },
 
     setCursor(cursorShape){
@@ -551,6 +601,14 @@ module.exports = {
         } 
         
         if(this.updateLayers.length === 0){
+            if(this.pendingFocusTree){
+                let pendingFocusTree = this.pendingFocusTree
+                this.pendingFocusTree = null
+                this.pendingFocusOwner = null
+                this._applyFocusTree(pendingFocusTree)
+            }
+            this._clearPendingFocusLosers()
+
             let objects = this.deleteObjects.slice()
             this.deleteObjects = []
             for(let obj of objects){
