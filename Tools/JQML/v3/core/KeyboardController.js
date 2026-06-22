@@ -3,6 +3,16 @@ const QtEnums = require("../Qt/enums")
 module.exports = {
     shortcuts: [],
 
+    __activateKeyNavigationTarget(target){
+        if(!target) return false
+        if(typeof target.forceActiveFocus === 'function'){
+            target.forceActiveFocus()
+        } else {
+            target.focus = true
+        }
+        return true
+    },
+
     add: function (obj) {
         this.shortcuts.push(obj)
     },
@@ -19,41 +29,41 @@ module.exports = {
                 if (e.key === 'ArrowLeft') {
                     if (obj.KeyNavigation.left) {
                         e.preventDefault()
-                        obj.KeyNavigation.left.focus = true
+                        this.__activateKeyNavigationTarget(obj.KeyNavigation.left)
                         return
                     }
                 }
                 if (e.key === 'ArrowRight') {
                     if (obj.KeyNavigation.right) {
                         e.preventDefault()
-                        obj.KeyNavigation.right.focus = true
+                        this.__activateKeyNavigationTarget(obj.KeyNavigation.right)
                         return
                     }
                 }
                 if (e.key === 'ArrowUp') {
                     if (obj.KeyNavigation.up) {
                         e.preventDefault()
-                        obj.KeyNavigation.up.focus = true
+                        this.__activateKeyNavigationTarget(obj.KeyNavigation.up)
                         return
                     }
                 }
                 if (e.key === 'ArrowDown') {
                     if (obj.KeyNavigation.down) {
                         e.preventDefault()
-                        obj.KeyNavigation.down.focus = true
+                        this.__activateKeyNavigationTarget(obj.KeyNavigation.down)
                         return
                     }
                 }
                 if (e.key === 'Tab' && e.shiftKey) {
                     if (obj.KeyNavigation.backtab) {
                         e.preventDefault()
-                        obj.KeyNavigation.backtab.focus = true
+                        this.__activateKeyNavigationTarget(obj.KeyNavigation.backtab)
                         return
                     }
                 } else if (e.key === 'Tab') {
                     if (obj.KeyNavigation.tab) {
                         e.preventDefault()
-                        obj.KeyNavigation.tab.focus = true
+                        this.__activateKeyNavigationTarget(obj.KeyNavigation.tab)
                         return
                     }
                 }

@@ -111,6 +111,11 @@ class TextInput extends Item {
 
         impl.onfocus = ()=>{
             this.forceActiveFocus()
+            if(!this.activeFocus) this.activeFocus = true
+
+            if(this.parent instanceof JQModules.QtQuick.FocusScope && !this.parent.activeFocus){
+                this.parent.activeFocus = true
+            }
         }
 
         impl.onblur = ()=>{
@@ -243,6 +248,12 @@ class TextInput extends Item {
         return impl
     }
 
+    __onMouseDown(mouse){
+        if(this.activeFocusOnPress && this.enabled && this.visible && this.__impl){
+            this.__impl.focus()
+        }
+    }
+
     __setImplStyle(style){
         if(this.__impl) {
             for(let name in style){
@@ -364,11 +375,6 @@ class TextInput extends Item {
 
     SLOT_focusChanged(oldValue, newValue){
         super.SLOT_focusChanged(oldValue, newValue)
-        if(newValue){
-            if(!(this.parent instanceof JQModules.QtQuick.FocusScope)){
-                this.activeFocus = true
-            }
-        }
     }
 
     SLOT_horizontalAlignmentChanged(oldValue, newValue){
