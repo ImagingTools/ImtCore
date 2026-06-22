@@ -39,6 +39,19 @@ class Loader extends Item {
         this.__updateProperty('sourceComponent')
     }
 
+    setSource(source, properties = undefined){
+        if(properties && typeof properties === 'object'){
+            this.__cachedInitialProperties = Object.assign({}, properties)
+        } else {
+            delete this.__cachedInitialProperties
+        }
+
+        this.__settingSourceByMethod = true
+        this.sourceComponent = undefined
+        this.source = source || ''
+        this.__settingSourceByMethod = false
+    }
+
     __loadFromCurrentSource(){
         if(!this.active){
             this.item = null
@@ -48,12 +61,16 @@ class Loader extends Item {
         }
 
         if(this.sourceComponent){
+            this.__reloadingCurrentSource = true
             this.SLOT_sourceComponentChanged(this.sourceComponent, this.sourceComponent)
+            this.__reloadingCurrentSource = false
             return
         }
 
         if(this.source){
+            this.__reloadingCurrentSource = true
             this.SLOT_sourceChanged(this.source, this.source)
+            this.__reloadingCurrentSource = false
             return
         }
 
@@ -126,6 +143,10 @@ class Loader extends Item {
     SLOT_sourceComponentChanged(oldValue, newValue){
         delete this.__lazyItem
 
+        if(!this.__settingSourceByMethod && !this.__reloadingCurrentSource){
+            delete this.__cachedInitialProperties
+        }
+
         if(!this.active){
             this.item = null
             this.status = Loader.Null
@@ -137,7 +158,9 @@ class Loader extends Item {
 
         if(newValue){
             this.__updateProperty('visible')
-            let item = this.sourceComponent.createObject(this, {}, true)
+            let initialProperties = this.__cachedInitialProperties || {}
+            delete this.__cachedInitialProperties
+            let item = this.sourceComponent.createObject(this, initialProperties, true)
 
             if(item){
                 if(this.__completed || this.__propertiesUpdated){
@@ -162,6 +185,10 @@ class Loader extends Item {
 
     SLOT_sourceChanged(oldValue, newValue){
         delete this.__lazyItem
+
+        if(!this.__settingSourceByMethod && !this.__reloadingCurrentSource){
+            delete this.__cachedInitialProperties
+        }
 
         if(!this.active){
             this.item = null
@@ -244,7 +271,9 @@ class Loader extends Item {
             }
 
             this.__updateProperty('visible')
-            let item = cls.create(this)
+            let initialProperties = this.__cachedInitialProperties || {}
+            delete this.__cachedInitialProperties
+            let item = cls.create(this, initialProperties)
 
             if(item){
                 if(this.__completed){
