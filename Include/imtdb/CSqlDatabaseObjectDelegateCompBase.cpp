@@ -743,18 +743,38 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTableIfNeeded()
 	createTableQuery.replace("${TableName}", tableName.toUtf8());
 
 	QSqlError sqlError;
-	m_databaseEngineCompPtr->ExecSqlQuery(createTableQuery, &sqlError);
+	QByteArray executedQuery = createTableQuery;
+	const bool isSqlite = m_databaseEngineCompPtr->GetDatabaseDriverId().compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
+	if (isSqlite){
+		sqlError = QSqlError();
+		const QList<QByteArray> statements = createTableQuery.split(';');
+		for (QByteArray statement : statements){
+			statement = statement.trimmed();
+			if (statement.isEmpty()){
+				continue;
+			}
+
+			executedQuery = statement;
+			m_databaseEngineCompPtr->ExecSqlQuery(statement, &sqlError);
+			if (sqlError.type() != QSqlError::NoError){
+				break;
+			}
+		}
+	}
+	else{
+		m_databaseEngineCompPtr->ExecSqlQuery(createTableQuery, &sqlError);
+	}
 
 	if (sqlError.type() != QSqlError::NoError){
 		qCritical() << __FILE__ << __LINE__
 					<< "\n\t| Table could not be created"
 					<< "\n\t| Error: " << sqlError
-					<< "\n\t| Query: " << createTableQuery;
+					<< "\n\t| Query: " << executedQuery;
 
 		SendErrorMessage(0, QString::fromUtf8(QT_TR_NOOP("\n\t| Table could not be created"
 														"\n\t| Error: %1"
 														"\n\t| Query: %2"))
-								.arg(sqlError.text(), qPrintable(createTableQuery)));
+								.arg(sqlError.text(), qPrintable(executedQuery)));
 		return false;
 	}
 

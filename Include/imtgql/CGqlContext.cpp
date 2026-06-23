@@ -16,6 +16,7 @@ namespace imtgql
 
 CGqlContext::CGqlContext()
 	:m_userInfoPtr(nullptr)
+	,m_isTenantOwner(false)
 {
 }
 
@@ -164,6 +165,22 @@ void CGqlContext::SetUserInfo(const imtauth::IUserInfo* userInfoPtr)
 }
 
 
+bool CGqlContext::IsTenantOwner() const
+{
+	return m_isTenantOwner;
+}
+
+
+void CGqlContext::SetIsTenantOwner(bool isTenantOwner)
+{
+	if (m_isTenantOwner != isTenantOwner){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_isTenantOwner = isTenantOwner;
+	}
+}
+
+
 IGqlContext::Headers CGqlContext::GetHeaders() const
 {
 	return m_headers;
@@ -251,6 +268,7 @@ bool CGqlContext::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/
 		m_tenantId = sourcePtr->m_tenantId;
 		m_productId = sourcePtr->m_productId;
 		m_headers = sourcePtr->m_headers;
+		m_isTenantOwner = sourcePtr->m_isTenantOwner;
 
 		SetUserInfo(sourcePtr->m_userInfoPtr.GetPtr());
 
@@ -284,6 +302,7 @@ bool CGqlContext::ResetData(CompatibilityMode /*mode*/)
 	m_userId.clear();
 	m_tenantId.clear();
 	m_headers.clear();
+	m_isTenantOwner = false;
 	m_userInfoPtr.Reset();
 
 	return true;

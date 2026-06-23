@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
+﻿// SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CTenantMembershipManagerControllerComp.h>
 
 // ImtCore includes
@@ -6,6 +6,7 @@
 #include <imtauth/ITenantInfo.h>
 #include <imtauth/DelegatedTenantAccessUtils.h>
 #include <imtgql/IGqlContext.h>
+#include <imtbase/imtbase.h>
 
 
 namespace
@@ -69,8 +70,14 @@ bool HasTenantAccess(
 		const imtauth::ITenantManager& tenantManager,
 		const imtauth::ITenantMembershipManager& membershipManager,
 		const QByteArray& userId,
+		const QByteArray& contextTenantId,
 		const QByteArray& tenantId)
 {
+	// If tenant context is selected, operations are limited strictly to that tenant.
+	if (!contextTenantId.isEmpty() && contextTenantId != tenantId){
+		return false;
+	}
+
 	// Owner bypasses all permission checks
 	if (IsOwner(tenantManager, userId, tenantId)){
 		return true;
@@ -105,6 +112,34 @@ bool CanManageMembers(
 }
 
 
+bool CanViewUserMemberships(
+		const imtauth::ITenantManager& tenantManager,
+		const imtauth::ITenantMembershipManager& membershipManager,
+		const QByteArray& contextUserId,
+		const QByteArray& contextTenantId,
+		const QByteArray& targetUserId)
+{
+	const QByteArrayList targetMembershipIds = membershipManager.GetMembershipsByUser(targetUserId);
+	for (const QByteArray& membershipId : targetMembershipIds){
+		imtauth::ITenantMembershipUniquePtr membershipPtr = membershipManager.GetMembership(membershipId);
+		if (!membershipPtr.IsValid() || !membershipPtr->IsActive()){
+			continue;
+		}
+
+		const QByteArray tenantId = membershipPtr->GetTenantId();
+		if (!contextTenantId.isEmpty() && contextTenantId != tenantId){
+			continue;
+		}
+
+		if (CanManageMembers(tenantManager, membershipManager, contextUserId, tenantId)){
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
 } // anonymous namespace
 
 
@@ -118,7 +153,7 @@ namespace imtauthgql
 
 sdl::V1_0::imtauth::CGetMembershipsByTenantPayload CTenantMembershipManagerControllerComp::OnGetMembershipsByTenant(
 	const sdl::V1_0::imtauth::CGetMembershipsByTenantGqlRequest& request,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CGetMembershipsByTenantPayload response;
@@ -134,6 +169,11 @@ sdl::V1_0::imtauth::CGetMembershipsByTenantPayload CTenantMembershipManagerContr
 		tenantId = *arguments.input->tenantId;
 	}
 
+	if (!m_tenantManagerCompPtr.IsValid() || !imtauth::HasDelegatedTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), m_delegatedAccessCompPtr.IsValid() ? m_delegatedAccessCompPtr.GetPtr() : nullptr, ContextUserId(gqlRequest), ContextTenantId(gqlRequest), tenantId)){
+		response.errorMessage = QStringLiteral("Access denied");
+		return response;
+	}
+
 	QByteArrayList ids = m_membershipManagerCompPtr->GetMembershipsByTenant(tenantId);
 	response.membershipIds.Emplace();
 	for (const auto& id : ids){
@@ -146,7 +186,7 @@ sdl::V1_0::imtauth::CGetMembershipsByTenantPayload CTenantMembershipManagerContr
 
 sdl::V1_0::imtauth::CGetMembershipsByUserPayload CTenantMembershipManagerControllerComp::OnGetMembershipsByUser(
 	const sdl::V1_0::imtauth::CGetMembershipsByUserGqlRequest& request,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
+	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& /*errorMessage*/) const
 {
 	sdl::V1_0::imtauth::CGetMembershipsByUserPayload response;
@@ -160,6 +200,26 @@ sdl::V1_0::imtauth::CGetMembershipsByUserPayload CTenantMembershipManagerControl
 	sdl::V1_0::imtauth::GetMembershipsByUserRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input && arguments.input->userId){
 		userId = *arguments.input->userId;
+	}
+
+	QByteArray contextUserId = ContextUserId(gqlRequest);
+	if (userId.isEmpty()){
+		userId = contextUserId;
+	}
+
+	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
+	const imtauth::IUserInfo* userInfoPtr = contextPtr != nullptr ? contextPtr->GetUserInfo() : nullptr;
+	const bool isAdmin = (userInfoPtr != nullptr) && userInfoPtr->IsAdmin();
+	if (userId != contextUserId && !isAdmin){
+		if (!m_tenantManagerCompPtr.IsValid() || !CanViewUserMemberships(
+					*m_tenantManagerCompPtr.GetPtr(),
+					*m_membershipManagerCompPtr.GetPtr(),
+					contextUserId,
+					ContextTenantId(gqlRequest),
+					userId)){
+			response.errorMessage = QStringLiteral("Access denied");
+			return response;
+		}
 	}
 
 	QByteArrayList ids = m_membershipManagerCompPtr->GetMembershipsByUser(userId);
@@ -429,7 +489,7 @@ sdl::V1_0::imtauth::CAddMembershipPayload CTenantMembershipManagerControllerComp
 	}
 
 	QByteArray contextUserId = ContextUserId(gqlRequest);
-	if (!m_tenantManagerCompPtr.IsValid() || !HasTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, tenantId)){
+	if (!m_tenantManagerCompPtr.IsValid() || !HasTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, ContextTenantId(gqlRequest), tenantId)){
 		response.errorMessage = QStringLiteral("Access denied");
 		return response;
 	}
@@ -473,10 +533,16 @@ sdl::V1_0::imtauth::CRemoveMembershipPayload CTenantMembershipManagerControllerC
 
 	// Resolve tenant from membership for permission check
 	imtauth::ITenantMembershipUniquePtr membershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
-	if (membershipPtr.IsValid() && m_tenantManagerCompPtr.IsValid()){
+	if (!membershipPtr.IsValid()){
+		response.success = false;
+		response.errorMessage = QStringLiteral("Membership not found");
+		return response;
+	}
+
+	if (m_tenantManagerCompPtr.IsValid()){
 		QByteArray tenantId = membershipPtr->GetTenantId();
 		QByteArray contextUserId = ContextUserId(gqlRequest);
-		if (!HasTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, tenantId)){
+		if (!HasTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, ContextTenantId(gqlRequest), tenantId)){
 			response.success = false;
 			response.errorMessage = QStringLiteral("Access denied");
 			return response;
@@ -527,7 +593,7 @@ sdl::V1_0::imtauth::CCreateTenantInvitationPayload CTenantMembershipManagerContr
 	}
 
 	QByteArray contextUserId = ContextUserId(gqlRequest);
-	if (!m_tenantManagerCompPtr.IsValid() || !HasTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, tenantId)){
+	if (!m_tenantManagerCompPtr.IsValid() || !HasTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, ContextTenantId(gqlRequest), tenantId)){
 		response.errorMessage = QStringLiteral("Access denied");
 		return response;
 	}
@@ -567,6 +633,10 @@ sdl::V1_0::imtauth::CAcceptTenantInvitationPayload CTenantMembershipManagerContr
 	if (arguments.input && arguments.input->invitationId){
 		invitationId = *arguments.input->invitationId;
 	}
+	if (!imtbase::isValidUuid(invitationId)){
+		response.errorMessage = QStringLiteral("Invalid invitation ID format");
+		return response;
+	}
 
 	QByteArray membershipId = m_invitationManagerCompPtr->AcceptInvitation(invitationId, ContextUserId(gqlRequest));
 	if (membershipId.isEmpty()){
@@ -590,6 +660,10 @@ sdl::V1_0::imtauth::CRejectTenantInvitationPayload CTenantMembershipManagerContr
 	sdl::V1_0::imtauth::RejectTenantInvitationRequestArguments arguments = request.GetRequestedArguments();
 	if (arguments.input && arguments.input->invitationId){
 		invitationId = *arguments.input->invitationId;
+	}
+	if (!imtbase::isValidUuid(invitationId)){
+		response.errorMessage = QStringLiteral("Invalid invitation ID format");
+		return response;
 	}
 
 	bool success = m_invitationManagerCompPtr.IsValid() && m_invitationManagerCompPtr->RejectInvitation(invitationId, ContextUserId(gqlRequest));
@@ -618,10 +692,15 @@ sdl::V1_0::imtauth::CRevokeTenantInvitationPayload CTenantMembershipManagerContr
 	if (arguments.input && arguments.input->invitationId){
 		invitationId = *arguments.input->invitationId;
 	}
+	if (!imtbase::isValidUuid(invitationId)){
+		response.success = false;
+		response.errorMessage = QStringLiteral("Invalid invitation ID format");
+		return response;
+	}
 
 	imtauth::ITenantInvitationUniquePtr invitationPtr = m_invitationManagerCompPtr->GetInvitation(invitationId);
 	QByteArray contextUserId = ContextUserId(gqlRequest);
-	if (!invitationPtr.IsValid() || !m_tenantManagerCompPtr.IsValid() || !HasTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, invitationPtr->GetTenantId())){
+	if (!invitationPtr.IsValid() || !m_tenantManagerCompPtr.IsValid() || !HasTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, ContextTenantId(gqlRequest), invitationPtr->GetTenantId())){
 		response.success = false;
 		response.errorMessage = QStringLiteral("Access denied");
 		return response;
@@ -653,9 +732,14 @@ sdl::V1_0::imtauth::CResendTenantInvitationPayload CTenantMembershipManagerContr
 	if (arguments.input && arguments.input->invitationId){
 		invitationId = *arguments.input->invitationId;
 	}
+	if (!imtbase::isValidUuid(invitationId)){
+		response.success = false;
+		response.errorMessage = QStringLiteral("Invalid invitation ID format");
+		return response;
+	}
 
 	imtauth::ITenantInvitationUniquePtr invitationPtr = m_invitationManagerCompPtr->GetInvitation(invitationId);
-	if (!invitationPtr.IsValid() || !m_tenantManagerCompPtr.IsValid() || !HasTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), ContextUserId(gqlRequest), invitationPtr->GetTenantId())){
+	if (!invitationPtr.IsValid() || !m_tenantManagerCompPtr.IsValid() || !HasTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), ContextUserId(gqlRequest), ContextTenantId(gqlRequest), invitationPtr->GetTenantId())){
 		response.success = false;
 		response.errorMessage = QStringLiteral("Access denied");
 		return response;
@@ -699,7 +783,7 @@ sdl::V1_0::imtauth::CUpdateMembershipRolePayload CTenantMembershipManagerControl
 
 		// Permission check: ManageMembers
 		QByteArray contextUserId = ContextUserId(gqlRequest);
-		if (m_tenantManagerCompPtr.IsValid() && !HasTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, tenantId)){
+		if (m_tenantManagerCompPtr.IsValid() && !HasTenantAccess(*m_tenantManagerCompPtr.GetPtr(), *m_membershipManagerCompPtr.GetPtr(), contextUserId, ContextTenantId(gqlRequest), tenantId)){
 			response.success = false;
 			response.errorMessage = QStringLiteral("Access denied");
 			return response;

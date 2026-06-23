@@ -67,6 +67,15 @@ void CTenantDbDelegateComp::OnComponentCreated()
 	if (!CreateAuxTableIfNeeded(autoCreateRelationships, relationshipsTableName, relationshipsScriptPath)){
 		qWarning() << "CTenantDbDelegateComp: TenantRelationships table auto-creation failed";
 	}
+
+	const QByteArray crossOrgGrantsScriptPath = m_createCrossOrgGrantsTableScriptPathAttrPtr.IsValid()
+			? *m_createCrossOrgGrantsTableScriptPathAttrPtr : QByteArray();
+	const bool autoCreateCrossOrgGrants = m_autoCreateCrossOrgGrantsTableAttrPtr.IsValid() && *m_autoCreateCrossOrgGrantsTableAttrPtr;
+	const QString crossOrgGrantsTableName = m_crossOrgGrantsTableNameAttrPtr.IsValid()
+			? QString::fromUtf8(*m_crossOrgGrantsTableNameAttrPtr) : QStringLiteral("CrossOrgGrants");
+	if (!CreateAuxTableIfNeeded(autoCreateCrossOrgGrants, crossOrgGrantsTableName, crossOrgGrantsScriptPath)){
+		qWarning() << "CTenantDbDelegateComp: CrossOrgGrants table auto-creation failed";
+	}
 }
 
 
@@ -366,26 +375,49 @@ QString CTenantDbDelegateComp::GetTenantRelationScopeSubquery(const QByteArray& 
 	QString escapedUserId = imtdb::EscapeSql(QString::fromUtf8(userId));
 
 	QString grantsTableName = m_crossOrgGrantsTableNameAttrPtr.IsValid() ? *m_crossOrgGrantsTableNameAttrPtr : QString::fromUtf8("CrossOrgGrants");
-	QString now = imtdb::UtcNow();
+	const bool hasMembershipsTable = TableExists(QStringLiteral("TenantMemberships"));
+	const bool hasInvitationsTable = TableExists(QStringLiteral("TenantInvitations"));
+	const bool hasCrossOrgGrantsTable = !grantsTableName.isEmpty() && TableExists(grantsTableName);
+
+	QStringList relationCaseItems;
+	relationCaseItems << QStringLiteral("WHEN \"CreatorId\"='%1' THEN 'Creator'").arg(escapedUserId);
+	relationCaseItems << QStringLiteral("WHEN \"OwnerId\"='%1' THEN 'Owner'").arg(escapedUserId);
+
+	if (hasMembershipsTable){
+		relationCaseItems << QString(
+					"WHEN \"Id\" IN (SELECT \"TenantId\" FROM \"TenantMemberships\" "
+					"WHERE \"UserId\"='%1' AND \"IsActive\"=true) THEN 'Member'")
+					.arg(escapedUserId);
+	}
+
+	if (hasInvitationsTable){
+		relationCaseItems << QString(
+					"WHEN \"Id\" IN (SELECT \"TenantId\" FROM \"TenantInvitations\" "
+					"WHERE \"UserId\"='%1' AND \"Status\"=%2) THEN 'Invited'")
+					.arg(escapedUserId)
+					.arg(s_invitationStatusPending);
+	}
+
+	if (hasCrossOrgGrantsTable && hasMembershipsTable){
+		QString now = imtdb::UtcNow();
+		relationCaseItems << QString(
+					"WHEN \"Id\" IN (SELECT \"SourceTenantId\" FROM \"%1\" WHERE \"TargetTenantId\" IN "
+					"(SELECT \"TenantId\" FROM \"TenantMemberships\" WHERE \"UserId\"='%2' AND \"IsActive\"=true) "
+					"AND \"IsActive\"=1 AND (\"ExpiresAt\" IS NULL OR \"ExpiresAt\" > '%3')) THEN 'Delegated'")
+					.arg(grantsTableName)
+					.arg(escapedUserId)
+					.arg(now);
+	}
 
 	return QString(
 				"SELECT *, "
 				"CASE "
-				"WHEN \"CreatorId\"='%1' THEN 'Creator' "
-				"WHEN \"OwnerId\"='%1' THEN 'Owner' "
-				"WHEN \"Id\" IN (SELECT \"TenantId\" FROM \"TenantMemberships\" WHERE \"UserId\"='%1' AND \"IsActive\"=true) THEN 'Member' "
-				"WHEN \"Id\" IN (SELECT \"TenantId\" FROM \"TenantInvitations\" WHERE \"UserId\"='%1' AND \"Status\"=%2) THEN 'Invited' "
-				"WHEN \"Id\" IN (SELECT \"SourceTenantId\" FROM \"%4\" WHERE \"TargetTenantId\" IN "
-				"(SELECT \"TenantId\" FROM \"TenantMemberships\" WHERE \"UserId\"='%1' AND \"IsActive\"=true) "
-				"AND \"IsActive\"=1 AND (\"ExpiresAt\" IS NULL OR \"ExpiresAt\" > '%5')) THEN 'Delegated' "
+				"%1 "
 				"ELSE NULL "
 				"END AS \"TenantRelationScope\" "
-				"FROM \"%3\"")
-			.arg(escapedUserId)
-			.arg(s_invitationStatusPending)
-			.arg(tableName)
-			.arg(grantsTableName)
-			.arg(now);
+				"FROM \"%2\"")
+			.arg(relationCaseItems.join(QStringLiteral(" ")))
+			.arg(tableName);
 }
 
 
@@ -483,6 +515,7 @@ QByteArray CTenantDbDelegateComp::GetCountQuery(const iprm::IParamsSet* paramsPt
 QString CTenantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
 {
 	QStringList additionalFilters;
+	const iprm::IParamsSet::Ids filterParamIds = filterParams.GetParamIds();
 
 	QByteArray userId = ExtractUserId(&filterParams);
 	if (!userId.isEmpty()){
@@ -491,19 +524,23 @@ QString CTenantDbDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsS
 		additionalFilters << QStringLiteral("\"TenantRelationScope\" IS NOT NULL");
 	}
 
-	iprm::TParamsPtr<iprm::ITextParam> tenantNameParamPtr(&filterParams, "TenantName");
-	if (tenantNameParamPtr.IsValid()){
-		const QString tenantName = tenantNameParamPtr->GetText().trimmed();
-		if (!tenantName.isEmpty()){
-			additionalFilters << QString("\"Name\"='%1'").arg(imtdb::EscapeSql(tenantName));
+	if (filterParamIds.contains("TenantName")){
+		iprm::TParamsPtr<iprm::ITextParam> tenantNameParamPtr(&filterParams, "TenantName");
+		if (tenantNameParamPtr.IsValid()){
+			const QString tenantName = tenantNameParamPtr->GetText().trimmed();
+			if (!tenantName.isEmpty()){
+				additionalFilters << QString("\"Name\"='%1'").arg(imtdb::EscapeSql(tenantName));
+			}
 		}
 	}
 
-	iprm::TParamsPtr<iprm::IIdParam> excludedTenantIdParamPtr(&filterParams, "ExcludedTenantId");
-	if (excludedTenantIdParamPtr.IsValid()){
-		const QByteArray excludedTenantId = excludedTenantIdParamPtr->GetId();
-		if (!excludedTenantId.isEmpty()){
-			additionalFilters << QString("\"Id\"<>'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(excludedTenantId)));
+	if (filterParamIds.contains("ExcludedTenantId")){
+		iprm::TParamsPtr<iprm::IIdParam> excludedTenantIdParamPtr(&filterParams, "ExcludedTenantId");
+		if (excludedTenantIdParamPtr.IsValid()){
+			const QByteArray excludedTenantId = excludedTenantIdParamPtr->GetId();
+			if (!excludedTenantId.isEmpty()){
+				additionalFilters << QString("\"Id\"<>'%1'").arg(imtdb::EscapeSql(QString::fromUtf8(excludedTenantId)));
+			}
 		}
 	}
 
@@ -558,12 +595,32 @@ bool CTenantDbDelegateComp::CreateAuxTableIfNeeded(bool autoCreate, const QStrin
 	}
 
 	QSqlError sqlError;
-	m_databaseEngineCompPtr->ExecSqlQuery(createTableQuery, &sqlError);
+	QByteArray executedQuery = createTableQuery;
+	const bool isSqlite = m_databaseEngineCompPtr->GetDatabaseDriverId().compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0;
+	if (isSqlite){
+		sqlError = QSqlError();
+		const QList<QByteArray> statements = createTableQuery.split(';');
+		for (QByteArray statement : statements){
+			statement = statement.trimmed();
+			if (statement.isEmpty()){
+				continue;
+			}
+
+			executedQuery = statement;
+			m_databaseEngineCompPtr->ExecSqlQuery(statement, &sqlError);
+			if (sqlError.type() != QSqlError::NoError){
+				break;
+			}
+		}
+	}
+	else{
+		m_databaseEngineCompPtr->ExecSqlQuery(createTableQuery, &sqlError);
+	}
 
 	if (sqlError.type() != QSqlError::NoError){
 		qCritical() << "CTenantDbDelegateComp: table" << tableName << "could not be created."
 					<< "Error:" << sqlError
-					<< "Query:" << createTableQuery;
+					<< "Query:" << executedQuery;
 		return false;
 	}
 

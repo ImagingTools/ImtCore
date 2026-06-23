@@ -595,6 +595,20 @@ QByteArray CTenantConnectionRequestManagerComp::CreateConnectionRequest(
 		return QByteArray();
 	}
 
+	if (m_tenantManagerCompPtr.IsValid()){
+		ITenantInfoUniquePtr sourceTenantPtr = m_tenantManagerCompPtr->GetTenant(sourceTenantId);
+		if (!sourceTenantPtr.IsValid()){
+			SendErrorMessage(0, "Source tenant not found", "CTenantConnectionRequestManagerComp");
+			return QByteArray();
+		}
+
+		ITenantInfoUniquePtr targetTenantPtr = m_tenantManagerCompPtr->GetTenant(targetTenantId);
+		if (!targetTenantPtr.IsValid()){
+			SendErrorMessage(0, "Target tenant not found", "CTenantConnectionRequestManagerComp");
+			return QByteArray();
+		}
+	}
+
 	// Cannot connect to self
 	if (targetTenantId == sourceTenantId){
 		SendErrorMessage(0, "Cannot create connection request to own organization", "CTenantConnectionRequestManagerComp");
@@ -1186,6 +1200,51 @@ QByteArrayList CTenantConnectionRequestManagerComp::GetTenantRelationshipIds(con
 		}
 	}
 	return result;
+}
+
+
+ITenantRelationshipInfoUniquePtr CTenantConnectionRequestManagerComp::GetTenantRelationship(const QByteArray& relationshipId) const
+{
+	if (!m_relationshipCollectionCompPtr.IsValid() || !m_relationshipFactoryCompPtr.IsValid() || relationshipId.isEmpty()){
+		return nullptr;
+	}
+
+	const ITenantRelationshipInfo* relationshipPtr = nullptr;
+	imtbase::IObjectCollection::DataPtr dataPtr;
+
+	if (m_relationshipCollectionCompPtr->GetObjectData(relationshipId, dataPtr)){
+		relationshipPtr = dynamic_cast<const ITenantRelationshipInfo*>(dataPtr.GetPtr());
+	}
+
+	if (relationshipPtr == nullptr){
+		for (const QByteArray& id : m_relationshipCollectionCompPtr->GetElementIds()){
+			imtbase::IObjectCollection::DataPtr iterDataPtr;
+			if (!m_relationshipCollectionCompPtr->GetObjectData(id, iterDataPtr)){
+				continue;
+			}
+
+			const ITenantRelationshipInfo* iterRelPtr = dynamic_cast<const ITenantRelationshipInfo*>(iterDataPtr.GetPtr());
+			if (iterRelPtr != nullptr && iterRelPtr->GetRelationshipId() == relationshipId){
+				relationshipPtr = iterRelPtr;
+				break;
+			}
+		}
+	}
+
+	if (relationshipPtr == nullptr){
+		return nullptr;
+	}
+
+	ITenantRelationshipInfoUniquePtr clonedRelationship = m_relationshipFactoryCompPtr.CreateInstance();
+	if (!clonedRelationship.IsValid()){
+		return nullptr;
+	}
+
+	if (!clonedRelationship->CopyFrom(*relationshipPtr)){
+		return nullptr;
+	}
+
+	return clonedRelationship;
 }
 
 

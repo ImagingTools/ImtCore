@@ -72,6 +72,14 @@ imtgql::IGqlContextUniquePtr CAuthenticationManagerComp::CreateGqlContext(
 		gqlContextPtr->SetScopes(scopes);
 	}
 
+	// Resolve tenant ownership flag
+	if (m_tenantManagerCompPtr.IsValid() && !tenantId.isEmpty() && !resolvedUserId.isEmpty()){
+		imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+		if (tenantPtr.IsValid() && tenantPtr->GetOwnerId() == resolvedUserId){
+			gqlContextPtr->SetIsTenantOwner(true);
+		}
+	}
+
 	imtgql::CGqlRequestContextManager::SetContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr.GetPtr()));
 
 	if (m_userCollectionCompPtr.IsValid() && !resolvedUserId.isEmpty()){

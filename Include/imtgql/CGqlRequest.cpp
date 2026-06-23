@@ -976,15 +976,28 @@ void CGqlRequest::SetParseText(const QByteArray& text)
 		else if (text == QByteArrayLiteral("false")){
 			variantList.append(QVariant(false));
 		}
+		else if (text == QByteArrayLiteral("null")) {
+			variantList.append(QVariant());
+		}
 		else {
-			bool ok;
+			bool ok = false;
 			if (text.contains('.')){
 				double doubleValue = text.toDouble(&ok);
-				variantList.append(doubleValue);
+				if (ok) {
+					variantList.append(doubleValue);
+				}
+				else {
+					variantList.append(text);
+				}
 			}
 			else{
 				qint64 intValue = text.toLongLong(&ok);
-				variantList.append(intValue);
+				if (ok && QString::number(intValue).toUtf8() == text) {
+					variantList.append(intValue);
+				}
+				else {
+					variantList.append(text);
+				}
 			}
 		}
 		m_activeGqlObjectPtr->InsertParam(lastArrayId, variantList);

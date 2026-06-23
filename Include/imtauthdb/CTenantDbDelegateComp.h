@@ -20,13 +20,15 @@ public:
 		I_ASSIGN(m_permissionsTableNameAttrPtr, "PermissionsTableName", "Name of the TenantPermissions table", false, "TenantPermissions");
 		I_ASSIGN(m_autoCreatePermissionsTableAttrPtr, "AutoCreatePermissionsTable", "Auto-create TenantPermissions table if not exists", false, true);
 		I_ASSIGN(m_createPermissionsTableScriptPathAttrPtr, "CreatePermissionsTableScriptPath", "SQL script path for TenantPermissions table creation", false, "CreateTenantPermissionsTable.sql");
-		I_ASSIGN(m_autoCreateMembershipsTableAttrPtr, "AutoCreateMembershipsTable", "Auto-create TenantMemberships table if not exists", false, false);
+		I_ASSIGN(m_autoCreateMembershipsTableAttrPtr, "AutoCreateMembershipsTable", "Auto-create TenantMemberships table if not exists", false, true);
 		I_ASSIGN(m_createMembershipsTableScriptPathAttrPtr, "CreateMembershipsTableScriptPath", "SQL script path for TenantMemberships table creation", false, "CreateTenantMembershipsTable.sql");
-		I_ASSIGN(m_autoCreateInvitationsTableAttrPtr, "AutoCreateInvitationsTable", "Auto-create TenantInvitations table if not exists", false, false);
+		I_ASSIGN(m_autoCreateInvitationsTableAttrPtr, "AutoCreateInvitationsTable", "Auto-create TenantInvitations table if not exists", false, true);
 		I_ASSIGN(m_createInvitationsTableScriptPathAttrPtr, "CreateInvitationsTableScriptPath", "SQL script path for TenantInvitations table creation", false, "CreateTenantInvitationsTable.sql");
 		I_ASSIGN(m_autoCreateRelationshipsTableAttrPtr, "AutoCreateRelationshipsTable", "Auto-create TenantRelationships table if not exists", false, true);
 		I_ASSIGN(m_createRelationshipsTableScriptPathAttrPtr, "CreateRelationshipsTableScriptPath", "SQL script path for TenantRelationships table creation", false, "CreateTenantRelationshipsTable.sql");
 		I_ASSIGN(m_relationshipsTableNameAttrPtr, "RelationshipsTableName", "Name of the TenantRelationships table", false, "TenantRelationships");
+		I_ASSIGN(m_autoCreateCrossOrgGrantsTableAttrPtr, "AutoCreateCrossOrgGrantsTable", "Auto-create CrossOrgGrants table if not exists", false, true);
+		I_ASSIGN(m_createCrossOrgGrantsTableScriptPathAttrPtr, "CreateCrossOrgGrantsTableScriptPath", "SQL script path for CrossOrgGrants table creation", false, "CreateCrossOrgGrantsTable.sql");
 		I_ASSIGN(m_crossOrgGrantsTableNameAttrPtr, "CrossOrgGrantsTableName", "Name of the CrossOrgGrants table for delegated access visibility", false, "CrossOrgGrants");
 		I_ASSIGN(m_productIdAttrPtr, "ProductId", "Product ID used when storing permissions (scoped per product)", false, "");
 	I_END_COMPONENT
@@ -113,6 +115,8 @@ private:
 	I_ATTR(bool, m_autoCreateRelationshipsTableAttrPtr);
 	I_ATTR(QByteArray, m_createRelationshipsTableScriptPathAttrPtr);
 	I_ATTR(QByteArray, m_relationshipsTableNameAttrPtr);
+	I_ATTR(bool, m_autoCreateCrossOrgGrantsTableAttrPtr);
+	I_ATTR(QByteArray, m_createCrossOrgGrantsTableScriptPathAttrPtr);
 	I_ATTR(QByteArray, m_crossOrgGrantsTableNameAttrPtr);
 	I_ATTR(QByteArray, m_productIdAttrPtr);
 };

@@ -77,6 +77,7 @@ public:
 
 	// ITenantConnectionRequestManager - Relationships
 	virtual QByteArrayList GetTenantRelationshipIds(const QByteArray& tenantId) const override;
+	virtual ITenantRelationshipInfoUniquePtr GetTenantRelationship(const QByteArray& relationshipId) const override;
 	virtual bool RemoveTenantRelationship(const QByteArray& tenantId, const QByteArray& relationshipId) override;
 
 private:

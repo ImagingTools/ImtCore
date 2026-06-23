@@ -394,20 +394,28 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 
 	istd::TNullableValue<sdl::V1_0::imtauth::CTokenInput> arguments = getPermissionsRequest.GetRequestedArguments().input;
 	if (!arguments.HasValue()){
-		Q_ASSERT(false);
+		SendWarningMessage(0, "GetPermissions called without input arguments", "imtauthgql::CAuthorizationControllerComp");
 		return response;
 	}
+
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 
 	QByteArray token;
 	if (arguments->accessToken.HasValue()){
 		token = *arguments->accessToken;
 	}
+	if (token.isEmpty() && gqlContextPtr != nullptr){
+		token = gqlContextPtr->GetToken();
+	}
 
 	QByteArray userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
 	QByteArray tenantId = m_jwtSessionControllerCompPtr->GetTenantFromJwt(token);
+	if (userId.isEmpty()){
+		SendWarningMessage(0, "GetPermissions called with invalid or expired token", "imtauthgql::CAuthorizationControllerComp");
+		return response;
+	}
 
 	QByteArray productId;
-	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
 		productId = gqlContextPtr->GetProductId();
 	}
@@ -419,7 +427,7 @@ sdl::V1_0::imtauth::CPermissionList CAuthorizationControllerComp::OnGetPermissio
 	}
 
 	if (userInfoPtr == nullptr){
-		Q_ASSERT(false);
+		SendWarningMessage(0, "GetPermissions cannot resolve user for provided token", "imtauthgql::CAuthorizationControllerComp");
 		return response;
 	}
 

@@ -410,12 +410,39 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CTenantCollectionDocumentServiceCom
 		tenantPtr->SetActive(*tenantData.isActive);
 	}
 
-	// CreatorId and OwnerId are set once on first save — the creator becomes both Creator and Owner.
-	if (tenantPtr->GetCreatorId().isEmpty()){
-		tenantPtr->SetCreatorId(contextUserId);
+	// CreatorId and OwnerId are set once on first save.
+	// Prefer explicit ownerId from representation; otherwise fallback to context user.
+	QByteArray resolvedOwnerId = tenantPtr->GetOwnerId();
+	if (resolvedOwnerId.isEmpty()){
+		if (tenantData.ownerId && !tenantData.ownerId->isEmpty()){
+			resolvedOwnerId = *tenantData.ownerId;
+		}
+		else if (!contextUserId.isEmpty()){
+			resolvedOwnerId = contextUserId;
+		}
+
+		if (!resolvedOwnerId.isEmpty()){
+			tenantPtr->SetOwnerId(resolvedOwnerId);
+		}
 	}
-	if (tenantPtr->GetOwnerId().isEmpty()){
-		tenantPtr->SetOwnerId(contextUserId);
+
+	QByteArray resolvedCreatorId = tenantPtr->GetCreatorId();
+	if (resolvedCreatorId.isEmpty()){
+		if (!contextUserId.isEmpty()){
+			resolvedCreatorId = contextUserId;
+		}
+		else if (!resolvedOwnerId.isEmpty()){
+			resolvedCreatorId = resolvedOwnerId;
+		}
+
+		if (!resolvedCreatorId.isEmpty()){
+			tenantPtr->SetCreatorId(resolvedCreatorId);
+		}
+	}
+
+	if (isNewTenant && (tenantPtr->GetOwnerId().isEmpty() || tenantPtr->GetCreatorId().isEmpty())){
+		errorMessage = QStringLiteral("Unable to save tenant: OwnerId and CreatorId must be set");
+		return response;
 	}
 
 	// Only Owner/Admin can manage members (add/remove/change roles)

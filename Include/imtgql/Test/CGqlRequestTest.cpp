@@ -513,6 +513,33 @@ void CGqlRequestTest::ParseArrayQuery()
 }
 
 
+void CGqlRequestTest::ParseArrayEnumTokens()
+{
+	const char* payload = R"(
+	{
+		"query": "query GetMyTenantInvitations { GetMyTenantInvitations(input: { statuses: [Pending, Accepted] }) { invitations { id } } }"
+	}
+	)";
+
+	qsizetype errorPosition = -1;
+	imtgql::CGqlRequest request;
+	bool retVal = request.ParseQuery(payload, errorPosition);
+
+	QVERIFY(retVal);
+	QVERIFY(errorPosition < 0);
+
+	const imtgql::CGqlParamObject* inputObject = request.GetParamObject("input");
+	QVERIFY(inputObject != nullptr);
+
+	const QVariant statusesValue = inputObject->GetParamArgumentValue("statuses");
+	QVERIFY(statusesValue.isValid());
+	const QVariantList statuses = statusesValue.toList();
+	QCOMPARE(statuses.size(), 2);
+	QCOMPARE(statuses[0].toString(), QStringLiteral("Pending"));
+	QCOMPARE(statuses[1].toString(), QStringLiteral("Accepted"));
+}
+
+
 void CGqlRequestTest::ParseArrayOfObjectArraysQuery()
 {
 	qsizetype errorPosition = -1;

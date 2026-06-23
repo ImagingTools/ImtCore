@@ -49,6 +49,9 @@ public:
 	virtual const imtauth::IUserInfo* GetUserInfo() const = 0;
 	virtual void SetUserInfo(const imtauth::IUserInfo* userInfoPtr) = 0;
 
+	virtual bool IsTenantOwner() const = 0;
+	virtual void SetIsTenantOwner(bool isTenantOwner) = 0;
+
 	virtual Headers GetHeaders() const = 0;
 	virtual void SetHeaders(const Headers& headers) = 0;
 };

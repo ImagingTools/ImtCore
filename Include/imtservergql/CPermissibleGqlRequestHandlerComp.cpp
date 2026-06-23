@@ -52,6 +52,11 @@ bool CPermissibleGqlRequestHandlerComp::CheckPermissions(const imtgql::CGqlReque
 		return true;
 	}
 
+	// Tenant owner acts as superuser within their organization
+	if (gqlContextPtr->IsTenantOwner()){
+		return true;
+	}
+
 	imtauth::IUserInfo::FeatureIds permissions = userInfoPtr->GetPermissions();
 
 	QByteArray requestedCommandId = gqlRequest.GetCommandId();
