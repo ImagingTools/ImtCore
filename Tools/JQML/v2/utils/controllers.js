@@ -71,7 +71,21 @@ class MouseController {
     }
 
     getDropArea(x, y){
+        for(let dropArea of this.dropAreaList){
+            dropArea.setStyle({
+                pointerEvents: 'auto',
+                touchAction: 'auto',
+            })
+        }
+
         let elements = document.elementsFromPoint(x, y)
+
+        for(let dropArea of this.dropAreaList){
+            dropArea.setStyle({
+                pointerEvents: 'none',
+                touchAction: 'none',
+            })
+        }
 
         for(let element of elements){
             if(element.id && UIDList[element.id] && UIDList[element.id].$droparea && UIDList[element.id].getPropertyValue('enabled') && UIDList[element.id].getPropertyValue('visible')){
