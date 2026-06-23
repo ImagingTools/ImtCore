@@ -14,6 +14,7 @@
 #include <imtauth/ITenantRelationshipProposalInfo.h>
 #include <imtauth/ITenantConnectionRequestInfo.h>
 #include <imtauth/ITenantConnectionInfo.h>
+#include <imtauth/ITenantRelationshipInfo.h>
 
 
 namespace imtauth
@@ -50,6 +51,7 @@ public:
 	virtual bool CancelRelationshipProposal(const QByteArray& proposalId, const QByteArray& tenantId) = 0;
 	virtual QByteArrayList GetRelationshipProposalIds(const QByteArray& tenantId) const = 0;
 	virtual QByteArrayList GetTenantRelationshipIds(const QByteArray& tenantId) const = 0;
+	virtual ITenantRelationshipInfoUniquePtr GetTenantRelationship(const QByteArray& relationshipId) const = 0;
 	virtual bool RemoveTenantRelationship(const QByteArray& tenantId, const QByteArray& relationshipId) = 0;
 };
 

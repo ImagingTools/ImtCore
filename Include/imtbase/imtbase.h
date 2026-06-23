@@ -7,6 +7,9 @@
 
 // Qt includes
 #include <QtCore/QList>
+#include <QtCore/QByteArray>
+#include <QtCore/QString>
+#include <QtCore/QUuid>
 
 
 
@@ -45,6 +48,29 @@ constexpr T narrow_cast(U v) noexcept
 static const inline QByteArray s_protocolVersionHeaderId = QByteArrayLiteral("X-Protocol-Version");
 static const inline QByteArray s_authenticationTokenHeaderId = QByteArrayLiteral("x-authentication-token");
 static const inline QByteArray s_productIdHeaderId = QByteArrayLiteral("productid");
+
+
+inline bool isValidUuid(const QByteArray& value)
+{
+	if (value.isEmpty()){
+		return false;
+	}
+
+	QString idText = QString::fromUtf8(value).trimmed();
+	if (idText.compare(QStringLiteral("null"), Qt::CaseInsensitive) == 0){
+		return false;
+	}
+
+	if (!idText.startsWith('{')){
+		idText.prepend('{');
+	}
+	if (!idText.endsWith('}')){
+		idText.append('}');
+	}
+
+	const QUuid uuid(idText);
+	return !uuid.isNull();
+}
 
 
 } // namespace imtbase

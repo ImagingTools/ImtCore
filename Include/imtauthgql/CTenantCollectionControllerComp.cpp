@@ -87,16 +87,18 @@ bool CTenantCollectionControllerComp::CreateRepresentationFromObject(
 		representationObject.membersCount = activeMembersCount;
 	}
 
+	QString tenantRelationScope;
 	if (requestInfo.items.isTenantRelationScopeRequested){
 		QVariant scope = objectCollectionIterator.GetElementInfo("TenantRelationScope");
 		if (scope.isValid() && !scope.isNull()){
-			representationObject.tenantRelationScope = scope.toString();
+			tenantRelationScope = scope.toString();
+			representationObject.tenantRelationScope = tenantRelationScope;
 		}
 	}
 
-	if ((requestInfo.items.isInvitationIdRequested || requestInfo.items.isInvitedByNameRequested)
-		&& representationObject.tenantRelationScope == "Invited"
-		&& m_invitationManagerCompPtr.IsValid()){
+	if ((requestInfo.items.isInvitationIdRequested || requestInfo.items.isInvitedByNameRequested) &&
+				tenantRelationScope== "Invited" &&
+				m_invitationManagerCompPtr.IsValid()){
 		const imtgql::IGqlContext* gqlContextPtr = getTenantListRequest.GetRequestContext();
 		if (gqlContextPtr != nullptr){
 			QByteArray userId = gqlContextPtr->GetUserId();
@@ -146,7 +148,7 @@ void CTenantCollectionControllerComp::SetAdditionalFilters(
 	}
 
 	if (userInfoPtr->IsAdmin()){
-		// return;
+		return;
 	}
 
 	QByteArray userId = gqlContextPtr->GetUserId();

@@ -11,6 +11,7 @@
 
 // ImtCore includes
 #include <imtauth/ITenantInfo.h>
+#include <imtbase/imtbase.h>
 
 
 namespace imtauth
@@ -38,6 +39,11 @@ ITenantInfoUniquePtr CTenantManagerComp::GetTenant(const QByteArray& tenantId) c
 {
 	if (!m_tenantCollectionCompPtr.IsValid() || !m_tenantFactoryCompPtr.IsValid()){
 		SendErrorMessage(0, "Tenant collection or factory not configured", "CTenantManagerComp");
+		return nullptr;
+	}
+
+	if (!imtbase::isValidUuid(tenantId)){
+		SendErrorMessage(0, QString("Invalid tenant id '%1'").arg(QString::fromUtf8(tenantId)), "CTenantManagerComp");
 		return nullptr;
 	}
 

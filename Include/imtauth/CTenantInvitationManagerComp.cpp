@@ -27,6 +27,29 @@ QString CreateInvitationExpirationTime()
 }
 
 
+bool IsValidInvitationId(const QByteArray& invitationId)
+{
+	if (invitationId.isEmpty()){
+		return false;
+	}
+
+	QString idText = QString::fromUtf8(invitationId).trimmed();
+	if (idText.compare(QStringLiteral("null"), Qt::CaseInsensitive) == 0){
+		return false;
+	}
+
+	if (!idText.startsWith('{')){
+		idText.prepend('{');
+	}
+	if (!idText.endsWith('}')){
+		idText.append('}');
+	}
+
+	const QUuid uuid(idText);
+	return !uuid.isNull();
+}
+
+
 } // anonymous namespace
 
 
@@ -75,6 +98,9 @@ ITenantInvitationManager::InvitationIds CTenantInvitationManagerComp::GetInvitat
 ITenantInvitationUniquePtr CTenantInvitationManagerComp::GetInvitation(const QByteArray& invitationId) const
 {
 	if (!m_invitationCollectionCompPtr.IsValid() || !m_invitationFactoryCompPtr.IsValid()){
+		return nullptr;
+	}
+	if (!IsValidInvitationId(invitationId)){
 		return nullptr;
 	}
 
@@ -165,6 +191,9 @@ QByteArray CTenantInvitationManagerComp::AcceptInvitation(const QByteArray& invi
 	if (!m_invitationCollectionCompPtr.IsValid() || !m_membershipManagerCompPtr.IsValid()){
 		return QByteArray();
 	}
+	if (!IsValidInvitationId(invitationId)){
+		return QByteArray();
+	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_invitationCollectionCompPtr->GetObjectData(invitationId, dataPtr)){
@@ -201,6 +230,9 @@ bool CTenantInvitationManagerComp::RejectInvitation(const QByteArray& invitation
 	if (!m_invitationCollectionCompPtr.IsValid()){
 		return false;
 	}
+	if (!IsValidInvitationId(invitationId)){
+		return false;
+	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_invitationCollectionCompPtr->GetObjectData(invitationId, dataPtr)){
@@ -226,6 +258,9 @@ bool CTenantInvitationManagerComp::RejectInvitation(const QByteArray& invitation
 bool CTenantInvitationManagerComp::RevokeInvitation(const QByteArray& invitationId, const QByteArray& revokedByUserId)
 {
 	if (!m_invitationCollectionCompPtr.IsValid()){
+		return false;
+	}
+	if (!IsValidInvitationId(invitationId)){
 		return false;
 	}
 
@@ -254,6 +289,9 @@ bool CTenantInvitationManagerComp::RevokeInvitation(const QByteArray& invitation
 bool CTenantInvitationManagerComp::ResendInvitation(const QByteArray& invitationId)
 {
 	if (!m_invitationCollectionCompPtr.IsValid()){
+		return false;
+	}
+	if (!IsValidInvitationId(invitationId)){
 		return false;
 	}
 
