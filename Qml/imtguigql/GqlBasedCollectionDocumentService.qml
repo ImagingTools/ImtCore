@@ -26,6 +26,9 @@ DocumentServiceBase {
 			else if (operation === "DocumentClosed"){
 				root.documentClosed(documentId)
 			}
+			else if (operation === "DocumentRenamed"){
+				root.setDocumentName(documentId, documentName)
+			}
 
 			root.documentManagerChanged(operation, objectId, documentId, documentName)
 		}
