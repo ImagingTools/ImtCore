@@ -244,9 +244,5 @@ Rectangle {
 		color: Style.borderColor
 		opacity: 0.5
 		visible: !delegateRoot.isLastItem
-
-		onColorChanged: {
-			console.log('**DEBUG** bottomDivider.onColorChanged', color)
-		}
 	}
 }
