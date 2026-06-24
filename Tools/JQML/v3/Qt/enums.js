@@ -93,7 +93,7 @@ module.exports = {
     Key_Help: 0x01000058, 
     Key_Direction_L: 0x01000059, 
     Key_Direction_R: 0x01000060, 
-    Key_Space: 'Space',
+    Key_Space: ' ',
     Key_Any: 0x20,
     Key_Exclam: 0x21, 
     Key_QuoteDbl: 0x22, 
