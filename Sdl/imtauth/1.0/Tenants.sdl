@@ -96,6 +96,15 @@ type GetTenantPayload {
 	errorMessage: String
 }
 
+input GetTenantPermissionsInput {
+	tenantId: ID!
+}
+
+type GetTenantPermissionsPayload {
+	permissionIds: [ID]
+	errorMessage: String
+}
+
 input CreateTenantInput {
 	name: String!
 	description: String
@@ -807,6 +816,7 @@ input ConnectionNotificationSubscriptionInput {
 type Query {
 	GetTenantList (input: GetTenantListInput): GetTenantListPayload!
 	GetTenant (input: GetTenantInput): GetTenantPayload!
+	GetTenantPermissions (input: GetTenantPermissionsInput): GetTenantPermissionsPayload!
 	GetTenantIds: GetTenantIdsPayload!
 	GetConnectionCode (input: GetConnectionCodeInput): GetConnectionCodePayload!
 	GetConnectionRequests (input: GetConnectionRequestsInput): GetConnectionRequestsPayload!

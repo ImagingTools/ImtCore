@@ -11,19 +11,44 @@ import com.imtcore.imtqml 1.0
  * This file MUST NOT import imtguigql or any GQL module.
  */
 QtObject {
-    id: permissionsProvider;
+    id: permissionsProvider
 
-    property string productId: "";
-    property TreeItemModel permissionsModel: TreeItemModel {};
+    property string productId: ""
+    property bool loading: false
+    property string lastError: ""
 
-    function updateModel(){
-        if (permissionsProvider.productId == ""){
-            console.error("Unable to update model for permissions. Error: Product-ID is empty")
-            return;
-        }
+    // Latest request result regardless of request scope.
+    property var permissions: []
+
+    // Cached product-wide permissions (requestPermissions("")).
+    property var allPermissions: []
+
+    // Cached tenant-scoped permissions (requestPermissions(tenantId)).
+    property var tenantPermissions: []
+    property string tenantPermissionsTenantId: ""
+
+    signal requestStarted(string tenantId)
+    signal permissionsReceived(var permissions, string tenantId)
+    signal allPermissionsReceived()
+    signal tenantPermissionsReceived(string tenantId)
+    signal requestFailed(string message, string tenantId)
+
+    // tenantId == "" means product-wide permissions request.
+    function requestPermissions(tenantId) {}
+
+    function requestAllPermissions() {
+        requestPermissions("")
     }
 
-    function getHeaders(){
-        return {};
+    function clearCache() {
+        permissions = []
+        allPermissions = []
+        tenantPermissions = []
+        tenantPermissionsTenantId = ""
+        lastError = ""
+    }
+
+    function getHeaders() {
+        return {}
     }
 }

@@ -14,28 +14,99 @@ ViewBase {
 	anchors.fill: parent;
 	contentColor: Style.baseColor
 	
-	// Flat permissions array: [{id, displayName, description, groupId, groupName}]
-	property var flatPermissions: [];
-	onFlatPermissionsChanged: {
-		if (permissionsTableElementView.bottomItem){
-			permissionsTableElementView.bottomItem.rebuildFromFlatArray(container.flatPermissions)
-		}
-
-		if (container.roleData){
-			container.doUpdateGui()
-		}
-	}
-	
 	property string productId: "";
+	property string tenantId: "";
+	property var permissionsProvider: null;
+	property string __lastRequestedProductId: ""
+	property string __lastRequestedTenantId: ""
 	
 	property RoleData roleData: model;
-	
+
+	Component.onCompleted: {
+		container.__requestPermissions(true)
+		container.__rebuildPermissionsTree()
+	}
+
+	onProductIdChanged: {
+		container.__requestPermissions(true)
+	}
+
+	onTenantIdChanged: {
+		container.__requestPermissions(true)
+	}
+
+	onPermissionsProviderChanged: {
+		container.__lastRequestedProductId = ""
+		container.__lastRequestedTenantId = ""
+		container.__requestPermissions(true)
+		container.__rebuildPermissionsTree()
+	}
+
+	Connections {
+		target: container.permissionsProvider
+
+		function onPermissionsReceived(permissions, sourceTenantId) {
+			var expectedTenantId = container.tenantId || ""
+			var actualTenantId = sourceTenantId || ""
+			if (expectedTenantId !== actualTenantId)
+				return
+			container.__rebuildPermissionsTree()
+		}
+	}
+
+	function __requestPermissions(force) {
+		if (!container.permissionsProvider)
+			return false
+
+		if (container.productId === "")
+			return false
+
+		var requestTenantId = container.tenantId || ""
+		if (!force
+				&& container.__lastRequestedProductId === container.productId
+				&& container.__lastRequestedTenantId === requestTenantId
+				&& container.permissionsProvider.loading)
+			return true
+
+		container.permissionsProvider.productId = container.productId
+		container.__lastRequestedProductId = container.productId
+		container.__lastRequestedTenantId = requestTenantId
+		container.permissionsProvider.requestPermissions(requestTenantId)
+		return true
+	}
+
+	function __activePermissions() {
+		if (!container.permissionsProvider)
+			return []
+
+		var requestTenantId = container.tenantId || ""
+		if (requestTenantId !== "") {
+			if (container.permissionsProvider.tenantPermissionsTenantId !== requestTenantId)
+				return []
+			return container.permissionsProvider.tenantPermissions || []
+		}
+
+		return container.permissionsProvider.allPermissions || []
+	}
+
+	function __rebuildPermissionsTree() {
+		if (!permissionsTableElementView.bottomItem)
+			return
+		permissionsTableElementView.bottomItem.rebuildFromFlatArray(container.__activePermissions())
+		if (container.roleData)
+			container.doUpdateGuiPermissions()
+	}
+
 	function updateGui(){
 		generalGroup.updateGui();
 		container.doUpdateGuiPermissions()
 	}
 	
 	function updateModel(){
+		if (!container.roleData){
+			return
+		}
+
 		if (container.productId === ""){
 			console.error("Unable to update a role model. Product-ID is empty");
 			return;
@@ -121,6 +192,10 @@ ViewBase {
 					placeHolderText: qsTr("Enter the role name");
 					
 					onEditingFinished: {
+						if (!container.roleData){
+							return
+						}
+
 						let oldText = container.roleData.m_name;
 						if (oldText && oldText !== roleNameInput.text || !oldText && roleNameInput.text !== ""){
 							roleIdInput.text = roleNameInput.text.replace(/\s+/g, '');
@@ -172,6 +247,10 @@ ViewBase {
 				}
 
 				function updateGui(){
+					if (!container.roleData){
+						return
+					}
+
 					roleIdInput.text = container.roleData.m_roleId;
 					roleNameInput.text = container.roleData.m_name;
 					descriptionInput.text = container.roleData.m_description;
@@ -183,6 +262,10 @@ ViewBase {
 				}
 				
 				function updateModel(){
+					if (!container.roleData){
+						return
+					}
+
 					container.roleData.m_roleId = roleIdInput.text;
 					container.roleData.m_name = roleNameInput.text;
 					container.roleData.m_description = descriptionInput.text;
@@ -224,6 +307,10 @@ ViewBase {
 	}
 	
 	function doUpdateGuiPermissions() {
+		if (!container.roleData){
+			return
+		}
+
 		var selectedPermissionsIds = [];
 		var selectedPermissions = container.roleData.m_permissions;
 		if (selectedPermissions !== ""){
@@ -236,6 +323,10 @@ ViewBase {
 	}
 	
 	function doUpdateModelPermissions() {
+		if (!container.roleData){
+			return
+		}
+
 		if (permissionsTableElementView.bottomItem){
 			var selectedPermissionIds = permissionsTableElementView.bottomItem.getCheckedIds()
 			container.roleData.m_permissions = selectedPermissionIds.join(';')

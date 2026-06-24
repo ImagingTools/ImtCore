@@ -6,6 +6,7 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
+#include <imtauth/ITenantManager.h>
 #include <imtdoc/IDocumentValidator.h>
 #include <imtbase/IObjectCollection.h>
 
@@ -27,6 +28,7 @@ public:
 
 	I_BEGIN_COMPONENT(CRoleDocumentValidatorComp)
 		I_ASSIGN(m_roleCollectionCompPtr, "RoleCollection", "Role collection used for uniqueness checks", true, "RoleCollection");
+		I_ASSIGN(m_tenantManagerCompPtr, "TenantManager", "Tenant manager used for tenant-scoped permissions validation", false, "TenantManager");
 		I_REGISTER_INTERFACE(imtdoc::IDocumentValidator)
 	I_END_COMPONENT
 
@@ -35,6 +37,7 @@ public:
 
 private:
 	I_REF(imtbase::IObjectCollection, m_roleCollectionCompPtr);
+	I_REF(imtauth::ITenantManager, m_tenantManagerCompPtr);
 };
 
 

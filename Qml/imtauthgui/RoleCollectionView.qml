@@ -8,7 +8,6 @@ import imtcontrols 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
 import imtauthRolesSdl 1.0
-import imtauthPermissionsSdl 1.0
 
 RemoteCollectionView {
 	id: roleCollectionViewContainer;
@@ -34,6 +33,7 @@ RemoteCollectionView {
 	}
 	
 	property string productId;
+	property string tenantId: AuthorizationController.currentTenantId || ""
 	property var documentManager: null;
 	
 	function handleSubscription(dataModel){
@@ -41,60 +41,36 @@ RemoteCollectionView {
 	}
 
 	onProductIdChanged: {
-		roleCollectionViewContainer.__fetchAllPermissions()
+		roleCollectionViewContainer.__requestPermissions()
 	}
-	
-	property var flatPermissions: [];
-	
-	property GetProductPermissionsInput __getPermsInput: GetProductPermissionsInput {}
-	property GqlSdlRequestSender __getPermsSender: GqlSdlRequestSender {
-		gqlCommandId: ImtauthPermissionsSdlCommandIds.s_getProductPermissions
 
-		sdlObjectComp: Component {
-			GetProductPermissionsPayload {
-				onFinished: {
-					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
-					} else {
-						roleCollectionViewContainer.__onPermissionsReceived(m_groups)
-					}
-				}
-			}
+	onTenantIdChanged: {
+		roleCollectionViewContainer.__requestPermissions()
+	}
+
+	property GqlBasedPermissionsProvider __permissionsProvider: GqlBasedPermissionsProvider {
+		productId: roleCollectionViewContainer.productId || ""
+
+		onRequestFailed: {
+			if (message && message !== "")
+				ModalDialogManager.showInfoDialog(message)
 		}
 	}
 
-	function __fetchAllPermissions() {
-		__getPermsInput.m_productId = roleCollectionViewContainer.productId || ""
-		__getPermsSender.send(__getPermsInput)
+	function __requestPermissions() {
+		if (!roleCollectionViewContainer.__permissionsProvider)
+			return
+		if (!roleCollectionViewContainer.productId || roleCollectionViewContainer.productId === "")
+			return
+
+		if (roleCollectionViewContainer.tenantId && roleCollectionViewContainer.tenantId !== "")
+			roleCollectionViewContainer.__permissionsProvider.requestPermissions(roleCollectionViewContainer.tenantId)
+		else
+			roleCollectionViewContainer.__permissionsProvider.requestAllPermissions()
 	}
 
-	function __onPermissionsReceived(groupsList) {
-		var result = []
-		if (groupsList) {
-			for (var gi = 0; gi < groupsList.count; ++gi) {
-				var group = groupsList.get(gi).item
-				if (!group) continue
-				var groupObj = {
-					"groupId": group.m_groupId || "",
-					"groupName": group.m_groupName || "",
-					"entries": []
-				}
-				var entries = group.m_entries
-				if (entries) {
-					for (var ei = 0; ei < entries.count; ++ei) {
-						var entry = entries.get(ei).item
-						if (!entry) continue
-						groupObj.entries.push({
-							"permissionId": entry.m_permissionId || "",
-							"displayName": entry.m_displayName || "",
-							"description": entry.m_description || ""
-						})
-					}
-				}
-				result.push(groupObj)
-			}
-		}
-		roleCollectionViewContainer.flatPermissions = result
+	Component.onCompleted: {
+		roleCollectionViewContainer.__requestPermissions()
 	}
 	
 	Component {
@@ -103,8 +79,9 @@ RemoteCollectionView {
 		RoleView {
 			id: roleEditor;
 			
-			flatPermissions: roleCollectionViewContainer.flatPermissions;
 			productId: roleCollectionViewContainer.productId;
+			tenantId: roleCollectionViewContainer.tenantId;
+			permissionsProvider: roleCollectionViewContainer.__permissionsProvider
 			
 			commandsControllerComp: Component {GqlBasedCommandsController {
 					typeId: "Role";

@@ -2,22 +2,22 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6306" Description="ACF"/>
-            <Version Id="1" Number="2256" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395267" Description="Qt Framework"/>
+            <Version Id="0" Number="6435" Description="ACF"/>
+            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="AuthenticationManager" X="700" Y="325" Note=""/>
         <Element ComponentName="Demultiplexer" X="480" Y="660" Note=""/>
         <Element ComponentName="DeskController" X="600" Y="100" Note=""/>
-        <Element ComponentName="HttpServerFramework" X="-40" Y="20" Note=""/>
-        <Element ComponentName="IdentifiableProductInfo" X="1020" Y="980" Note=""/>
+        <Element ComponentName="HttpServerFramework" X="225" Y="100" Note=""/>
+        <Element ComponentName="IdentifiableProductInfo" X="1000" Y="800" Note=""/>
         <Element ComponentName="PermissionsController" X="600" Y="800" Note=""/>
-        <Element ComponentName="PersonalAccessTokenController" X="140" Y="440" Note=""/>
+        <Element ComponentName="PersonalAccessTokenController" X="275" Y="450" Note=""/>
         <Element ComponentName="PumaClientEngine" X="1000" Y="475" Note=""/>
         <Element ComponentName="SlaveSubscriberController" X="975" Y="50" Note=""/>
-        <Element ComponentName="UserActionController" X="-60" Y="280" Note=""/>
+        <Element ComponentName="UserActionController" X="200" Y="300" Note=""/>
         <Element ComponentName="UserSettingsRepository" X="720" Y="440" Note=""/>
         <Element ComponentName="WebSocketServerFramework" X="975" Y="175" Note=""/>
     </PositionMap>
