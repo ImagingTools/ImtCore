@@ -4,6 +4,7 @@
 
 // Qt includes
 #include <QMutexLocker>
+#include <QSet>
 #include <QUuid>
 
 // ImtCore includes
@@ -163,10 +164,11 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 	// Handle system info: remove existing systems and apply the new ones
 	imtauth::IUserInfo::SystemInfoList currentSystemList = userPtr->GetSystemInfos();
 	for (const imtauth::IUserInfo::SystemInfo& systemInfo : currentSystemList){
-		userPtr->RemoveFromSystem(systemInfo.systemId);
+		while (userPtr->RemoveFromSystem(systemInfo.systemId)){}
 	}
 
 	if (userData.systemInfos){
+		QSet<QByteArray> seenSystemIds;
 		for (const istd::TNullableValue<sdl::V1_0::imtauth::CSystemInfo>& sdlSystemInfo : *userData.systemInfos){
 			if (!sdlSystemInfo.HasValue()){
 				continue;
@@ -176,13 +178,27 @@ sdl::V1_0::imtbase::CDocumentOperationStatus CUserCollectionDocumentServiceComp:
 			if (sdlSystemInfo->id){
 				systemInfo.systemId = *sdlSystemInfo->id;
 			}
-			if (sdlSystemInfo->name){
+
+			const QByteArray systemKey = systemInfo.systemId.isEmpty()
+					? QByteArrayLiteral("__internal__")
+					: systemInfo.systemId;
+			if (seenSystemIds.contains(systemKey)){
+				continue;
+			}
+			seenSystemIds.insert(systemKey);
+
+			if (!systemInfo.systemId.isEmpty() && sdlSystemInfo->name){
 				systemInfo.systemName = *sdlSystemInfo->name;
 			}
 			if (sdlSystemInfo->enabled){
 				systemInfo.enabled = *sdlSystemInfo->enabled;
 			}
 
+			userPtr->AddToSystem(systemInfo);
+		}
+
+		if (seenSystemIds.isEmpty()){
+			imtauth::IUserInfo::SystemInfo systemInfo;
 			userPtr->AddToSystem(systemInfo);
 		}
 	}

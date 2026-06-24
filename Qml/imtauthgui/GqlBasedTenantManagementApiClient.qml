@@ -8,7 +8,6 @@ import imtdocgui 1.0
 import imtguigql 1.0
 import imtauthTenantMembershipsSdl 1.0
 import imtauthTenantsSdl 1.0
-import imtauthPermissionsSdl 1.0
 import imtbaseImtCollectionSdl 1.0
 import imtbaseCollectionDocumentServiceSdl 1.0
 import imtauthRolesSdl 1.0
@@ -41,6 +40,7 @@ QtObject {
 
 	property string productId: AuthorizationController.productId
 	property string tenantId: AuthorizationController.currentTenantId
+	property string rolePermissionsTenantId: ""
 
 	// =========================================================================
 	// Abstract contract (must mirror TenantManagementApiClient.qml)
@@ -60,6 +60,7 @@ QtObject {
 	readonly property var userDocumentManager: __userDocumentService
 	readonly property var relationshipDocumentManager: __relationshipDocumentService
 	readonly property var crossOrgGrantDocumentManager: __crossOrgGrantDocumentService
+	readonly property var permissionsProvider: __permissionsProvider
 
 	signal invitationCreated()
 	signal invitationRevoked(string invitationId)
@@ -107,6 +108,38 @@ QtObject {
 	signal orderRequestRejected(string requestId)
 	signal orderRequestStatusUpdated(string requestId)
 	signal orderRequestsReceived(var orderRequests)
+
+	property GqlBasedPermissionsProvider __permissionsProvider: GqlBasedPermissionsProvider {
+		productId: root.productId || ""
+	}
+
+	property Connections __permissionsProviderConnections: Connections {
+		target: root.__permissionsProvider
+
+		function onRequestFailed(message, tenantId) {
+			if (message && message !== "") {
+				ModalDialogManager.showInfoDialog(message)
+				root.requestFailed(message)
+			}
+		}
+
+		function onAllPermissionsReceived() {
+			root.allPermissionsReceived()
+		}
+
+		function onTenantPermissionsReceived(sourceTenantId) {
+			root.tenantPermissionsReceived()
+		}
+	}
+
+	function __refreshDataProvider(provider) {
+		if (!provider)
+			return
+		if (provider.refetch)
+			provider.refetch()
+		else if (provider.fetch)
+			provider.fetch("")
+	}
 
 	// --- Subscription client for membership notifications ---
 	property SubscriptionClient __membershipSubscription: SubscriptionClient {
@@ -499,101 +532,33 @@ QtObject {
 	}
 
 	// =========================================================================
-	// Permissions (via GetProductPermissions SDL query)
+	// Permissions (delegated to GqlBasedPermissionsProvider)
 	// =========================================================================
 
 	// All product permissions (unfiltered) — for TenantPermissionsPage
-	property var allPermissions: []
+	property var allPermissions: root.__permissionsProvider ? root.__permissionsProvider.allPermissions : []
 	signal allPermissionsReceived()
 
 	// Tenant-scoped permissions — for RoleView
-	property var tenantPermissions: []
+	property var tenantPermissions: root.__permissionsProvider ? root.__permissionsProvider.tenantPermissions : []
 	signal tenantPermissionsReceived()
 
-	property GetProductPermissionsInput __getAllPermsInput: GetProductPermissionsInput {}
-	property GqlSdlRequestSender __getAllPermsSender: GqlSdlRequestSender {
-		gqlCommandId: ImtauthPermissionsSdlCommandIds.s_getProductPermissions
-
-		sdlObjectComp: Component {
-			GetProductPermissionsPayload {
-				onFinished: {
-					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
-						root.requestFailed(m_errorMessage)
-					} else {
-						root.__populateAllPermissions(m_groups)
-					}
-				}
-			}
-		}
-	}
-
-	property GetProductPermissionsInput __getTenantPermsInput: GetProductPermissionsInput {}
-	property GqlSdlRequestSender __getTenantPermsSender: GqlSdlRequestSender {
-		gqlCommandId: ImtauthPermissionsSdlCommandIds.s_getProductPermissions
-
-		sdlObjectComp: Component {
-			GetProductPermissionsPayload {
-				onFinished: {
-					if (m_errorMessage && m_errorMessage !== "") {
-						ModalDialogManager.showInfoDialog(m_errorMessage)
-						root.requestFailed(m_errorMessage)
-					} else {
-						root.__populateTenantPermissions(m_groups)
-					}
-				}
-			}
-		}
+	function setRolePermissionsTenantId(tenantId) {
+		root.rolePermissionsTenantId = tenantId || ""
 	}
 
 	function fetchAllPermissions() {
-		root.__getAllPermsInput.m_productId = root.productId || ""
-		root.__getAllPermsSender.send(root.__getAllPermsInput)
+		if (!root.__permissionsProvider)
+			return
+		root.__permissionsProvider.productId = root.productId || ""
+		root.__permissionsProvider.requestAllPermissions()
 	}
 
 	function fetchTenantPermissions(tenantId) {
-		root.__getTenantPermsInput.m_productId = root.productId || ""
-		root.__getTenantPermsInput.m_tenantId = tenantId || root.tenantId || ""
-		root.__getTenantPermsSender.send(root.__getTenantPermsInput)
-	}
-
-	function __parseGroups(groupsList) {
-		var result = []
-		if (!groupsList)
-			return result
-		for (var gi = 0; gi < groupsList.count; ++gi) {
-			var group = groupsList.get(gi).item
-			if (!group) continue
-			var groupObj = {
-				"groupId": group.m_groupId || "",
-				"groupName": group.m_groupName || "",
-				"entries": []
-			}
-			var entries = group.m_entries
-			if (entries) {
-				for (var ei = 0; ei < entries.count; ++ei) {
-					var entry = entries.get(ei).item
-					if (!entry) continue
-					groupObj.entries.push({
-						"permissionId": entry.m_permissionId || "",
-						"displayName": entry.m_displayName || "",
-						"description": entry.m_description || ""
-					})
-				}
-			}
-			result.push(groupObj)
-		}
-		return result
-	}
-
-	function __populateAllPermissions(groupsList) {
-		root.allPermissions = root.__parseGroups(groupsList)
-		root.allPermissionsReceived()
-	}
-
-	function __populateTenantPermissions(groupsList) {
-		root.tenantPermissions = root.__parseGroups(groupsList)
-		root.tenantPermissionsReceived()
+		if (!root.__permissionsProvider)
+			return
+		root.__permissionsProvider.productId = root.productId || ""
+		root.__permissionsProvider.requestPermissions(tenantId || root.tenantId || "")
 	}
 
 	// =========================================================================
@@ -1609,14 +1574,62 @@ QtObject {
 		pageSize: 50
 	}
 
+	property RemoteCollectionChangeListener __rolesCollectionChangeListener: RemoteCollectionChangeListener {
+		collectionId: "Roles"
+		currentUserId: AuthorizationController.getUserId()
+
+		function getHeaders() {
+			if (root.roleListDataProvider && root.roleListDataProvider.getHeaders)
+				return root.roleListDataProvider.getHeaders()
+			return {}
+		}
+
+		onChanged: {
+			if (changeInfo && changeInfo.valid)
+				root.__refreshDataProvider(root.roleListDataProvider)
+		}
+	}
+
 	property FilterableSelectGqlDataProvider groupListDataProvider: FilterableSelectGqlDataProvider {
 		collectionId: "Groups"
 		pageSize: 50
 	}
 
+	property RemoteCollectionChangeListener __groupsCollectionChangeListener: RemoteCollectionChangeListener {
+		collectionId: "Groups"
+		currentUserId: AuthorizationController.getUserId()
+
+		function getHeaders() {
+			if (root.groupListDataProvider && root.groupListDataProvider.getHeaders)
+				return root.groupListDataProvider.getHeaders()
+			return {}
+		}
+
+		onChanged: {
+			if (changeInfo && changeInfo.valid)
+				root.__refreshDataProvider(root.groupListDataProvider)
+		}
+	}
+
 	property FilterableSelectGqlDataProvider invitableUsersListDataProvider: FilterableSelectGqlDataProvider {
 		collectionId: "UsersForInvitation"
 		multiSelect: true
+	}
+
+	property RemoteCollectionChangeListener __invitableUsersCollectionChangeListener: RemoteCollectionChangeListener {
+		collectionId: "UsersForInvitation"
+		currentUserId: AuthorizationController.getUserId()
+
+		function getHeaders() {
+			if (root.invitableUsersListDataProvider && root.invitableUsersListDataProvider.getHeaders)
+				return root.invitableUsersListDataProvider.getHeaders()
+			return {}
+		}
+
+		onChanged: {
+			if (changeInfo && changeInfo.valid)
+				root.__refreshDataProvider(root.invitableUsersListDataProvider)
+		}
 	}
 
 	property FilterableSelectGqlDataProvider tenantsListDataProvider: FilterableSelectGqlDataProvider {
@@ -1627,6 +1640,22 @@ QtObject {
 	property FilterableSelectGqlDataProvider tenantRelationshipsListDataProvider: FilterableSelectGqlDataProvider {
 		collectionId: "TenantRelationships"
 		pageSize: 50
+	}
+
+	property RemoteCollectionChangeListener __tenantRelationshipsCollectionChangeListener: RemoteCollectionChangeListener {
+		collectionId: "TenantRelationships"
+		currentUserId: AuthorizationController.getUserId()
+
+		function getHeaders() {
+			if (root.tenantRelationshipsListDataProvider && root.tenantRelationshipsListDataProvider.getHeaders)
+				return root.tenantRelationshipsListDataProvider.getHeaders()
+			return {}
+		}
+
+		onChanged: {
+			if (changeInfo && changeInfo.valid)
+				root.__refreshDataProvider(root.tenantRelationshipsListDataProvider)
+		}
 	}
 
 	// =========================================================================
@@ -1664,18 +1693,32 @@ QtObject {
 		collectionId: "CrossOrgGrants"
 	}
 
+	property RemoteCollectionChangeListener __crossOrgGrantsCollectionChangeListener: RemoteCollectionChangeListener {
+		collectionId: "CrossOrgGrants"
+		currentUserId: AuthorizationController.getUserId()
+
+		function getHeaders() {
+			if (root.crossOrgGrantsListDataProvider && root.crossOrgGrantsListDataProvider.getHeaders)
+				return root.crossOrgGrantsListDataProvider.getHeaders()
+			return {}
+		}
+
+		onChanged: {
+			if (changeInfo && changeInfo.valid)
+				root.__refreshDataProvider(root.crossOrgGrantsListDataProvider)
+		}
+	}
+
 	// --- Role editor + representation controller ---
 	property Component __roleEditorComp: Component {
 		RoleView {
 			productId: root.productId
-			flatPermissions: root.tenantPermissions
+			tenantId: root.rolePermissionsTenantId
+			permissionsProvider: root.__permissionsProvider
 			commandsControllerComp: Component {
 				GqlBasedCommandsController {
 					typeId: root.roleObjectTypeId
 				}
-			}
-			Component.onCompleted: {
-				root.fetchTenantPermissions(root.tenantId)
 			}
 		}
 	}

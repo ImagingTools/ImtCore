@@ -3,12 +3,43 @@
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
 
 
+// STL includes
+#include <algorithm>
+
+
+// Qt includes
+#include <QtCore/QSet>
+
+
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
+#include <imtgql/CGqlContext.h>
+#include <imtgql/CGqlRequestContextManager.h>
 
 
 namespace imtauthgql
 {
+
+
+namespace
+{
+
+
+void AttachCurrentContext(imtgql::CGqlRequest& gqlRequest)
+{
+	imtgql::IGqlContext* gqlContextPtr = imtgql::CGqlRequestContextManager::GetContext();
+	if (gqlContextPtr == nullptr){
+		return;
+	}
+
+	istd::IChangeableUniquePtr clonedPtr = gqlContextPtr->CloneMe();
+	imtgql::IGqlContextUniquePtr castedPtr;
+	castedPtr.MoveCastedPtr(std::move(clonedPtr));
+	gqlRequest.SetGqlContext(imtgql::IGqlContextSharedPtr::CreateFromUnique(castedPtr));
+}
+
+
+} // anonymous namespace
 
 
 // reimplemented (imtauth::ITenantManager)
@@ -18,6 +49,7 @@ QByteArrayList CRemoteTenantControllerComp::GetTenantIds() const
 	namespace tenantsdl = sdl::V1_0::imtauth;
 
 	imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_QUERY, tenantsdl::CGetTenantIdsGqlRequest::GetCommandId());
+	AttachCurrentContext(gqlRequest);
 	tenantsdl::CGetTenantIdsGqlRequest getTenantIdsRequest(gqlRequest, false);
 
 	QString errorMessage;
@@ -48,6 +80,7 @@ imtauth::ITenantInfoUniquePtr CRemoteTenantControllerComp::GetTenant(const QByte
 	arguments.input->tenantId = tenantId;
 
 	imtgql::CGqlRequest gqlRequest;
+	AttachCurrentContext(gqlRequest);
 	if (!tenantsdl::CGetTenantGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return nullptr;
 	}
@@ -98,12 +131,44 @@ imtauth::ITenantInfoUniquePtr CRemoteTenantControllerComp::GetTenant(const QByte
 
 QByteArrayList CRemoteTenantControllerComp::GetTenantPermissions(const QByteArray& tenantId) const
 {
-	imtauth::ITenantInfoUniquePtr tenantInfoPtr = GetTenant(tenantId);
-	if (!tenantInfoPtr.IsValid()){
+	namespace tenantsdl = sdl::V1_0::imtauth;
+
+	if (tenantId.isEmpty()){
 		return QByteArrayList();
 	}
 
-	return tenantInfoPtr->GetTenantPermissions();
+	tenantsdl::GetTenantPermissionsRequestArguments arguments;
+	arguments.input.emplace();
+	arguments.input->tenantId = tenantId;
+
+	imtgql::CGqlRequest gqlRequest;
+	AttachCurrentContext(gqlRequest);
+	if (!tenantsdl::CGetTenantPermissionsGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+		return QByteArrayList();
+	}
+
+	tenantsdl::CGetTenantPermissionsGqlRequest getTenantPermissionsRequest(gqlRequest, false);
+
+	QString errorMessage;
+	tenantsdl::CGetTenantPermissionsPayload payload = OnGetTenantPermissions(getTenantPermissionsRequest, gqlRequest, errorMessage);
+	if (!payload.permissionIds.has_value()){
+		return QByteArrayList();
+	}
+
+	QSet<QByteArray> uniqueIds;
+	for (const auto& permissionId : *payload.permissionIds){
+		if (permissionId.has_value() && !permissionId->isEmpty()){
+			QByteArray normalizedPermissionId = permissionId->trimmed();
+			if (!normalizedPermissionId.isEmpty()){
+				uniqueIds.insert(normalizedPermissionId);
+			}
+		}
+	}
+
+	QByteArrayList result = uniqueIds.values();
+	std::sort(result.begin(), result.end());
+
+	return result;
 }
 
 
@@ -118,6 +183,7 @@ QByteArray CRemoteTenantControllerComp::CreateTenant(const QString& tenantName, 
 	arguments.input->ownerId = ownerId;
 
 	imtgql::CGqlRequest gqlRequest;
+	AttachCurrentContext(gqlRequest);
 	if (!tenantsdl::CCreateTenantGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return QByteArray();
 	}
@@ -143,6 +209,7 @@ bool CRemoteTenantControllerComp::RemoveTenant(const QByteArray& tenantId)
 	arguments.input->tenantId = tenantId;
 
 	imtgql::CGqlRequest gqlRequest;
+	AttachCurrentContext(gqlRequest);
 	if (!tenantsdl::CRemoveTenantGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return false;
 	}
@@ -173,6 +240,7 @@ bool CRemoteTenantControllerComp::UpdateTenant(const QByteArray& tenantId, const
 	}
 
 	imtgql::CGqlRequest gqlRequest;
+	AttachCurrentContext(gqlRequest);
 	if (!tenantsdl::CUpdateTenantGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return false;
 	}
@@ -199,6 +267,7 @@ bool CRemoteTenantControllerComp::SetTenantActive(const QByteArray& tenantId, bo
 	arguments.input->isActive = isActive;
 
 	imtgql::CGqlRequest gqlRequest;
+	AttachCurrentContext(gqlRequest);
 	if (!tenantsdl::CSetTenantActiveGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return false;
 	}
@@ -233,6 +302,7 @@ bool CRemoteTenantControllerComp::EnsureSystemTenant()
 	namespace tenantsdl = sdl::V1_0::imtauth;
 
 	imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_MUTATION, tenantsdl::CEnsureSystemTenantGqlRequest::GetCommandId());
+	AttachCurrentContext(gqlRequest);
 	tenantsdl::CEnsureSystemTenantGqlRequest ensureRequest(gqlRequest, false);
 
 	QString errorMessage;
@@ -262,6 +332,15 @@ sdl::V1_0::imtauth::CGetTenantPayload CRemoteTenantControllerComp::OnGetTenant(
 			QString& errorMessage) const
 {
 	return SendModelRequest<sdl::V1_0::imtauth::CGetTenantPayload>(gqlRequest, errorMessage);
+}
+
+
+sdl::V1_0::imtauth::CGetTenantPermissionsPayload CRemoteTenantControllerComp::OnGetTenantPermissions(
+			const sdl::V1_0::imtauth::CGetTenantPermissionsGqlRequest& /*getTenantPermissionsRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::V1_0::imtauth::CGetTenantPermissionsPayload>(gqlRequest, errorMessage);
 }
 
 

@@ -34,6 +34,10 @@ DocumentViewBase {
 	}
 	
 	function updateModel(){
+		if (!container.userData){
+			return
+		}
+
 		userGeneralEditor.updateModel();
 		rolesGroup.updateModel();
 		groupsBlock.updateModel();
@@ -331,6 +335,10 @@ DocumentViewBase {
 					}
 
 				function updateGui(){
+					if (!container.userData){
+						return
+					}
+
 					var ids = container.userData.m_roles ? container.userData.m_roles.slice() : []
 					var arr = []
 					for (var i = 0; i < ids.length; i++)
@@ -339,6 +347,10 @@ DocumentViewBase {
 				}
 				
 				function updateModel(){
+					if (!container.userData){
+						return
+					}
+
 					var arr = []
 					for (var i = 0; i < roleSelectableCollectionEditor.items.length; i++)
 						arr.push(roleSelectableCollectionEditor.items[i].id)
@@ -370,6 +382,10 @@ DocumentViewBase {
 					}
 
 				function updateGui(){
+					if (!container.userData){
+						return
+					}
+
 					var ids = container.userData.m_groups ? container.userData.m_groups.slice() : []
 					var arr = []
 					for (var i = 0; i < ids.length; i++)
@@ -378,6 +394,10 @@ DocumentViewBase {
 				}
 				
 				function updateModel(){
+					if (!container.userData){
+						return
+					}
+
 					var arr = []
 					for (var i = 0; i < groupSelectableCollectionEditor.items.length; i++)
 						arr.push(groupSelectableCollectionEditor.items[i].id)

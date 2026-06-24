@@ -3,9 +3,9 @@
 
 
 // ImtCore includes
+#include <imtauth/ITenantManager.h>
 #include <imtlic/IProductInfo.h>
 #include <imtlic/CFeatureInfo.h>
-#include <imtauth/ITenantManager.h>
 #include <imtsdl/TElementList.h>
 #include <iqt/ITranslationManager.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Permissions_fwd.h>
@@ -27,18 +27,6 @@ public:
 	I_END_COMPONENT
 
 protected:
-	/**
-	 * Collect flat permission entries from a feature subtree into entries array.
-	 * Each entry has permissionId, displayName (path-style "Parent / Child"), description.
-	 * Returns true if at least one entry was added (used for tenant filtering).
-	 */
-	bool CollectPermissionEntries(
-				const imtlic::CFeatureInfo& featureInfo,
-				imtsdl::TElementList<sdl::V1_0::imtauth::CPermissionEntry>& entries,
-				const QByteArray& languageId,
-				const QSet<QByteArray>* allowedPermissionsPtr,
-				const QString& parentPath) const;
-
 	// reimplemented (sdl::V1_0::imtauth::CPermissionsGqlHandlerCompBase)
 	virtual sdl::V1_0::imtauth::CGetProductPermissionsPayload OnGetProductPermissions(
 				const sdl::V1_0::imtauth::CGetProductPermissionsGqlRequest& getProductPermissionsRequest,

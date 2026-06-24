@@ -4,42 +4,103 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtguigql 1.0
+import imtauthPermissionsSdl 1.0
 import imtauthgui 1.0
 
 /**
  * GqlBasedPermissionsProvider
  *
- * GQL implementation of the abstract PermissionsProvider contract.
- * Sends a ProductPermissions query and populates the permissionsModel.
+ * SDL/GQL implementation of PermissionsProvider.
+ * Sends GetProductPermissions with optional tenantId and stores both
+ * product-wide and tenant-scoped caches.
  */
 PermissionsProvider {
-    id: gqlPermissionsProvider;
+    id: gqlPermissionsProvider
 
-    function updateModel(){
-        if (gqlPermissionsProvider.productId == ""){
-            console.error("Unable to update model for permissions. Error: Product-ID is empty")
-            return;
+    property GetProductPermissionsInput __requestInput: GetProductPermissionsInput {}
+    property string __pendingTenantId: ""
+
+    property GqlSdlRequestSender __requestSender: GqlSdlRequestSender {
+        gqlCommandId: ImtauthPermissionsSdlCommandIds.s_getProductPermissions
+
+        sdlObjectComp: Component {
+            GetProductPermissionsPayload {
+                onFinished: {
+                    gqlPermissionsProvider.loading = false
+                    if (m_errorMessage && m_errorMessage !== "") {
+                        gqlPermissionsProvider.lastError = m_errorMessage
+                        gqlPermissionsProvider.requestFailed(m_errorMessage, gqlPermissionsProvider.__pendingTenantId)
+                    } else {
+                        gqlPermissionsProvider.__storePermissions(m_groups, gqlPermissionsProvider.__pendingTenantId)
+                    }
+                }
+            }
         }
-
-        permissionModel.send();
     }
 
-    property GqlRequestSender permissionModel: GqlRequestSender {
-        requestType: 0; // Query
-        gqlCommandId: "ProductPermissions";
-
-        function createQueryParams(query){
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("productId", gqlPermissionsProvider.productId);
-            query.AddParam(inputParams);
+    function requestPermissions(tenantId) {
+        if (gqlPermissionsProvider.productId === "") {
+            var message = "Unable to request permissions. Product-ID is empty"
+            gqlPermissionsProvider.lastError = message
+            gqlPermissionsProvider.requestFailed(message, tenantId || "")
+            return
         }
 
-        function onResult(data){
-            gqlPermissionsProvider.permissionsModel = data;
-        }
+        gqlPermissionsProvider.loading = true
+        gqlPermissionsProvider.lastError = ""
+        gqlPermissionsProvider.__pendingTenantId = tenantId || ""
 
-        function getHeaders(){
-            return gqlPermissionsProvider.getHeaders();
+        gqlPermissionsProvider.__requestInput.m_productId = gqlPermissionsProvider.productId
+        gqlPermissionsProvider.__requestInput.m_tenantId = gqlPermissionsProvider.__pendingTenantId
+        gqlPermissionsProvider.requestStarted(gqlPermissionsProvider.__pendingTenantId)
+        gqlPermissionsProvider.__requestSender.send(gqlPermissionsProvider.__requestInput)
+    }
+
+    function __parseGroups(groupsList) {
+        var result = []
+        if (!groupsList)
+            return result
+        for (var gi = 0; gi < groupsList.count; ++gi) {
+            var group = groupsList.get(gi).item
+            if (!group)
+                continue
+
+            var groupObj = {
+                "groupId": group.m_groupId || "",
+                "groupName": group.m_groupName || "",
+                "entries": []
+            }
+
+            var entries = group.m_entries
+            if (entries) {
+                for (var ei = 0; ei < entries.count; ++ei) {
+                    var entry = entries.get(ei).item
+                    if (!entry)
+                        continue
+                    groupObj.entries.push({
+                        "permissionId": entry.m_permissionId || "",
+                        "displayName": entry.m_displayName || "",
+                        "description": entry.m_description || ""
+                    })
+                }
+            }
+            result.push(groupObj)
+        }
+        return result
+    }
+
+    function __storePermissions(groupsList, tenantId) {
+        var parsedPermissions = gqlPermissionsProvider.__parseGroups(groupsList)
+        gqlPermissionsProvider.permissions = parsedPermissions
+        gqlPermissionsProvider.permissionsReceived(parsedPermissions, tenantId)
+
+        if (tenantId && tenantId !== "") {
+            gqlPermissionsProvider.tenantPermissionsTenantId = tenantId
+            gqlPermissionsProvider.tenantPermissions = parsedPermissions
+            gqlPermissionsProvider.tenantPermissionsReceived(tenantId)
+        } else {
+            gqlPermissionsProvider.allPermissions = parsedPermissions
+            gqlPermissionsProvider.allPermissionsReceived()
         }
     }
 }

@@ -11,7 +11,7 @@ ViewBase {
 
 	property string documentId;
 	property string documentTypeId;
-	property DocumentServiceBase documentManager: null;
+	property var documentManager: null; // DocumentServiceBase
 	property Item documentManagerView: null;
 	property DocumentRepresentationController representationController: null;
 

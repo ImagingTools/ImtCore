@@ -151,6 +151,9 @@ QtObject {
 	function getUserData(userId) {}
 
 	// --- Permissions ---
+	property var permissionsProvider: null
+	function setRolePermissionsTenantId(tenantId) {}
+
 	// All product permissions (unfiltered) — for TenantPermissionsPage
 	property var allPermissions: []
 	signal allPermissionsReceived()
