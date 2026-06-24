@@ -117,6 +117,7 @@ public:
 		QByteArray documentId;
 		QString documentName;
 		const imtbase::IOperationContext* operationContextPtr = nullptr; ///< Optional operation context for tenant/owner propagation during save.
+		const istd::IChangeable* defaultDataPtr = nullptr;
 	};
 
 	/**

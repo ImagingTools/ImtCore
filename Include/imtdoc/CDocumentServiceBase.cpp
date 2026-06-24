@@ -222,12 +222,13 @@ void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const T
 	// Create object asynchronously in a separate thread
 	QByteArray userId = params.userId;
 	QByteArray documentTypeId = params.documentTypeId;
+	const istd::IChangeable* defaultDataPtr = params.defaultDataPtr;
 	QThread* thread = new QThread();
 	QObject* worker = new QObject();
 	worker->moveToThread(thread);
 
 	std::weak_ptr<std::atomic<bool>> aliveGuard(m_isAlive);
-	QObject::connect(thread, &QThread::started, worker, [this, aliveGuard, documentTypeId, userId, documentId, taskId, worker](){
+	QObject::connect(thread, &QThread::started, worker, [this, aliveGuard, documentTypeId, userId, documentId, taskId, worker, defaultDataPtr](){
 		auto isAlive = aliveGuard.lock();
 		if (!isAlive || !isAlive->load()){
 			CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("Service destroyed")});
@@ -248,16 +249,30 @@ void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const T
 			QMutexLocker locker(&m_mutex);
 			WorkingDocument* docPtr = FindDocument(userId, documentId);
 
-			if (docPtr != nullptr && objectPtr.IsValid()){
-				docPtr->objectPtr = objectPtr;
-			}
-			else if (docPtr != nullptr){
-				// Creation failed - close the document and notify client
-				docPtr->isLoading = false;
-				CloseDocumentInternal(userId, documentId);
-				CompleteTask(taskId, TaskResult{OS_FAILED, QByteArray(), QStringLiteral("Object creation failed")});
-				worker->deleteLater();
-				return;
+			if (docPtr != nullptr){
+				if (objectPtr.IsValid()){
+					if (defaultDataPtr != nullptr){
+						bool retVal = objectPtr->CopyFrom(*defaultDataPtr);
+						Q_ASSERT_X(retVal, Q_FUNC_INFO, "Unable to copy from default data");
+
+						if (!retVal){
+							docPtr->isLoading = false;
+							CompleteTask(taskId, TaskResult{ OS_FAILED, QByteArray(), QStringLiteral("Object creation failed") });
+							worker->deleteLater();
+							return;
+						}
+					}
+
+					docPtr->objectPtr = objectPtr;
+				}
+				else{
+					// Creation failed - close the document and notify client
+					docPtr->isLoading = false;
+					CloseDocumentInternal(userId, documentId);
+					CompleteTask(taskId, TaskResult{ OS_FAILED, QByteArray(), QStringLiteral("Object creation failed") });
+					worker->deleteLater();
+					return;
+				}
 			}
 		}
 
