@@ -3,6 +3,19 @@ import QtQuick 2.12
 QtObject {
 	id: root
 
+	// Override properties: assign a function to replace the default
+	// implementation of the corresponding operation in subclasses.
+	// The override receives the same arguments as the original function.
+	// Use the handle* helper functions below to process responses.
+	property var getOpenedDocumentListOverride: null
+	property var openDocumentOverride: null
+	property var createDocumentOverride: null
+	property var saveDocumentOverride: null
+	property var closeDocumentOverride: null
+	property var doUndoOverride: null
+	property var doRedoOverride: null
+	property var getUndoInfoOverride: null
+
 	signal startGetOpenedDocumentList()
 	signal openedDocumentListReceived(var documentListInfo)
 	signal openedDocumentListReceiveFailed(string message)
@@ -512,6 +525,81 @@ QtObject {
 
 	function hasDocumentNameProvider(typeId){
 		return typeId in __internal.autoNamedTypeIds && __internal.autoNamedTypeIds[typeId]
+	}
+
+	// ---- Response handler API ----
+	// Call these from custom override implementations or onFinished handlers
+	// to apply the standard DocumentService state transitions.
+
+	function handleDocumentOpened(documentId, objectId, objectTypeId, documentName, hasNameProvider){
+		setAutoNamedTypeId(objectTypeId, hasNameProvider)
+		setDocumentName(documentId, documentName)
+		documentOpened(documentId, objectTypeId)
+		setDocumentObjectId(documentId, objectId)
+		setDocumentIsLoading(documentId, true)
+	}
+
+	function handleDocumentCreated(documentId, objectTypeId, documentName, hasNameProvider, proposedObjectId){
+		setAutoNamedTypeId(objectTypeId, hasNameProvider)
+		setDocumentName(documentId, documentName)
+		documentCreated(documentId, objectTypeId)
+		if (proposedObjectId && proposedObjectId !== "")
+			setDocumentObjectId(documentId, proposedObjectId)
+		setDocumentIsLoading(documentId, true)
+	}
+
+	function handleSaveDocumentResult(documentId, status, message, documentName){
+		if (status === "Success"){
+			documentSaved(documentId)
+			if (documentName !== undefined && documentName !== ""){
+				setDocumentName(documentId, documentName)
+			}
+		}
+		else{
+			let msg = (message !== undefined && message !== "") ? message : status
+			saveDocumentFailed(documentId, msg)
+		}
+	}
+
+	function handleCloseDocumentResult(documentId, status){
+		if (status === "Success"){
+			documentClosed(documentId)
+		}
+		else{
+			let msg = status
+			if (status === "InvalidUserId") msg = qsTr("Invalid user-ID")
+			else if (status === "InvalidDocumentId") msg = qsTr("Invalid document-ID")
+			else if (status === "Failed") msg = qsTr("Close document failed")
+			closeDocumentFailed(documentId, msg)
+		}
+	}
+
+	function handleUndoResult(documentId, status){
+		if (status === "Success"){
+			undoDone(documentId)
+		}
+		else{
+			let msg = status
+			if (status === "InvalidUserId") msg = qsTr("Invalid user-ID")
+			else if (status === "InvalidDocumentId") msg = qsTr("Invalid document-ID")
+			else if (status === "Failed") msg = qsTr("Undo failed")
+			else if (status === "InvalidStepCount") msg = qsTr("Invalid step count")
+			undoFailed(documentId, msg)
+		}
+	}
+
+	function handleRedoResult(documentId, status){
+		if (status === "Success"){
+			redoDone(documentId)
+		}
+		else{
+			let msg = status
+			if (status === "InvalidUserId") msg = qsTr("Invalid user-ID")
+			else if (status === "InvalidDocumentId") msg = qsTr("Invalid document-ID")
+			else if (status === "Failed") msg = qsTr("Redo failed")
+			else if (status === "InvalidStepCount") msg = qsTr("Invalid step count")
+			redoFailed(documentId, msg)
+		}
 	}
 
 	property QtObject __internal: QtObject {

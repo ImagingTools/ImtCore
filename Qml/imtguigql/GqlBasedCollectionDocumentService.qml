@@ -63,6 +63,12 @@ DocumentServiceBase {
 
 	function getOpenedDocumentList(){
 		startGetOpenedDocumentList()
+
+		if (getOpenedDocumentListOverride){
+			getOpenedDocumentListOverride()
+			return
+		}
+
 		collectionIdInput.m_collectionId = collectionId
 		getOpenedDocumentListRequest.send(collectionIdInput)
 	}
@@ -75,6 +81,11 @@ DocumentServiceBase {
 		}
 
 		startOpenDocument(documentId, typeId)
+
+		if (openDocumentOverride){
+			openDocumentOverride(typeId, documentId)
+			return
+		}
 
 		openDocumentRequest.typeId = typeId
 		objectIdInput.m_id = documentId
@@ -95,6 +106,11 @@ DocumentServiceBase {
 	// the persisted object id without an extra round-trip).
 	function createDocument(typeId, proposedSourceDocumentId){
 		startCreateDocument(typeId)
+
+		if (createDocumentOverride){
+			createDocumentOverride(typeId, proposedSourceDocumentId)
+			return
+		}
 
 		documentTypeIdInput.m_typeId = typeId
 		documentTypeIdInput.m_collectionId = collectionId
@@ -123,6 +139,12 @@ DocumentServiceBase {
 
 	function saveDocument(documentId, documentName){
 		startSaveDocument(documentId)
+
+		if (saveDocumentOverride){
+			saveDocumentOverride(documentId, documentName)
+			return
+		}
+
 		let resolvedDocumentName = root.resolveDocumentNameForSave(documentId, documentName || "")
 
 		saveDocumentInput.m_documentId = documentId || ""
@@ -164,6 +186,11 @@ DocumentServiceBase {
 				// Close
 				startCloseDocument(documentId)
 
+				if (closeDocumentOverride){
+					closeDocumentOverride(documentId)
+					return
+				}
+
 				documentIdInput.m_id = documentId
 				documentIdInput.m_collectionId = collectionId
 				closeDocumentRequest.documentId = documentId
@@ -183,6 +210,11 @@ DocumentServiceBase {
 	function doUndo(documentId, steps){
 		startUndo(documentId, steps)
 
+		if (doUndoOverride){
+			doUndoOverride(documentId, steps)
+			return
+		}
+
 		undoRedoInput.m_documentId = documentId
 		undoRedoInput.m_steps = steps
 		collectionUndoRedoInput.m_collectionId = collectionId
@@ -194,6 +226,11 @@ DocumentServiceBase {
 
 	function doRedo(documentId, steps){
 		startRedo(documentId, steps)
+
+		if (doRedoOverride){
+			doRedoOverride(documentId, steps)
+			return
+		}
 
 		undoRedoInput.m_documentId = documentId
 		undoRedoInput.m_steps = steps
@@ -210,6 +247,11 @@ DocumentServiceBase {
 
 	function getUndoInfo(documentId){
 		startUndoInfoReceive(documentId)
+
+		if (getUndoInfoOverride){
+			getUndoInfoOverride(documentId)
+			return
+		}
 
 		documentIdInput.m_id = documentId
 		documentIdInput.m_collectionId = collectionId
@@ -246,12 +288,7 @@ DocumentServiceBase {
 		sdlObjectComp: Component {
 			DocumentInfo {
 				onFinished: {
-					root.setAutoNamedTypeId(m_objectTypeId, m_hasNameProvider)
-					root.setDocumentName(m_documentId, m_documentName)
-					root.__internal.createDocumentData(m_documentId, m_objectTypeId, false)
-					root.setDocumentObjectId(m_documentId, m_objectId)
-					root.setDocumentIsLoading(m_documentId, true)
-					root.documentOpened(m_documentId, m_objectTypeId)
+					root.handleDocumentOpened(m_documentId, m_objectId, m_objectTypeId, m_documentName, m_hasNameProvider)
 				}
 			}
 		}
@@ -273,13 +310,7 @@ DocumentServiceBase {
 		sdlObjectComp: Component {
 			DocumentInfo {
 				onFinished: {
-					root.setAutoNamedTypeId(m_objectTypeId, m_hasNameProvider)
-					root.setDocumentName(m_documentId, m_documentName)
-					root.__internal.createDocumentData(m_documentId, m_objectTypeId, true)
-					if (root.createDocumentRequest.proposedObjectId !== "")
-						root.setDocumentObjectId(m_documentId, root.createDocumentRequest.proposedObjectId)
-					root.documentCreated(m_documentId, m_objectTypeId)
-					root.setDocumentIsLoading(m_documentId, true)
+					root.handleDocumentCreated(m_documentId, m_objectTypeId, m_documentName, m_hasNameProvider, root.createDocumentRequest.proposedObjectId)
 				}
 			}
 		}
@@ -302,31 +333,7 @@ DocumentServiceBase {
 		sdlObjectComp: Component {
 			DocumentOperationStatus {
 				onFinished: {
-					let statusMessage = function(defaultMessage){
-						if (m_message !== undefined && m_message !== "") {
-							return m_message
-						}
-						return defaultMessage
-					}
-					if (m_status === "Success"){
-						let docId = root.saveDocumentRequest.documentId
-						root.documentSaved(docId)
-						if (m_documentName !== undefined && m_documentName !== "") {
-							root.setDocumentName(docId, m_documentName)
-						}
-					}
-					else if (m_status === "InvalidUserId"){
-						root.saveDocumentFailed(root.saveDocumentRequest.documentId, statusMessage(qsTr("Invalid user-ID")))
-					}
-					else if (m_status === "InvalidDocumentId"){
-						root.saveDocumentFailed(root.saveDocumentRequest.documentId, statusMessage(qsTr("Invalid document-ID")))
-					}
-					else if (m_status === "InvalidDocumentData"){
-						root.saveDocumentFailed(root.saveDocumentRequest.documentId, statusMessage(qsTr("Document data is invalid")))
-					}
-					else if (m_status === "Failed"){
-						root.saveDocumentFailed(root.saveDocumentRequest.documentId, statusMessage(qsTr("Save document failed")))
-					}
+					root.handleSaveDocumentResult(root.saveDocumentRequest.documentId, m_status, m_message, m_documentName)
 				}
 			}
 		}
@@ -348,18 +355,7 @@ DocumentServiceBase {
 		sdlObjectComp: Component {
 			DocumentOperationStatus {
 				onFinished: {
-					if (m_status === "Success"){
-						root.documentClosed(root.closeDocumentRequest.documentId)
-					}
-					else if (m_status === "InvalidUserId"){
-						root.closeDocumentFailed(root.closeDocumentRequest.documentId, qsTr("Invalid user-ID"))
-					}
-					else if (m_status === "InvalidDocumentId"){
-						root.closeDocumentFailed(root.closeDocumentRequest.documentId, qsTr("Invalid document-ID"))
-					}
-					else if (m_status === "Failed"){
-						root.closeDocumentFailed(root.closeDocumentRequest.documentId, qsTr("Close document failed"))
-					}
+					root.handleCloseDocumentResult(root.closeDocumentRequest.documentId, m_status)
 				}
 			}
 		}
@@ -382,21 +378,7 @@ DocumentServiceBase {
 		sdlObjectComp: Component {
 			UndoStatus {
 				onFinished: {
-					if (m_status === "Success"){
-						root.undoDone(root.doUndoRequest.documentId)
-					}
-					else if (m_status === "InvalidUserId"){
-						root.undoFailed(root.doUndoRequest.documentId, qsTr("Invalid user-ID"))
-					}
-					else if (m_status === "InvalidDocumentId"){
-						root.undoFailed(root.doUndoRequest.documentId, qsTr("Invalid document-ID"))
-					}
-					else if (m_status === "Failed"){
-						root.undoFailed(root.doUndoRequest.documentId, qsTr("Undo failed"))
-					}
-					else if (m_status === "InvalidStepCount"){
-						root.undoFailed(root.doUndoRequest.documentId, qsTr("Invalid step count"))
-					}
+					root.handleUndoResult(root.doUndoRequest.documentId, m_status)
 				}
 			}
 		}
@@ -419,21 +401,7 @@ DocumentServiceBase {
 		sdlObjectComp: Component {
 			UndoStatus {
 				onFinished: {
-					if (m_status === "Success"){
-						root.redoDone(root.doRedoRequest.documentId)
-					}
-					else if (m_status === "InvalidUserId"){
-						root.redoFailed(root.doRedoRequest.documentId, qsTr("Invalid user-ID"))
-					}
-					else if (m_status === "InvalidDocumentId"){
-						root.redoFailed(root.doRedoRequest.documentId, qsTr("Invalid document-ID"))
-					}
-					else if (m_status === "Failed"){
-						root.redoFailed(root.doRedoRequest.documentId, qsTr("Redo failed"))
-					}
-					else if (m_status === "InvalidStepCount"){
-						root.redoFailed(root.doRedoRequest.documentId, qsTr("Invalid step count"))
-					}
+					root.handleRedoResult(root.doRedoRequest.documentId, m_status)
 				}
 			}
 		}
