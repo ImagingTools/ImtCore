@@ -52,8 +52,7 @@ Rectangle {
 			return
 
 		__isRelocatingExternalChildren = true
-		for (var i = 0; i < delegateRoot.children.length; i++) {
-			var child = delegateRoot.children[i]
+		for (let child of delegateRoot.children.slice()) {
 			if (!child)
 				continue
 			if (child === itemMouseArea || child === contentRow || child === trailingActions || child === moreButton || child === bottomDivider)
