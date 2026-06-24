@@ -187,8 +187,66 @@ class ListModel extends QtObject {
     get(index){
         return this.data[index]
     }
-    set(){
-        
+    set(index, dict){
+        if (index === undefined || index === null) return false
+        if (index < 0 || index >= this.count) return false
+        if (!dict || typeof dict !== 'object' || Array.isArray(dict)) return false
+
+        let item = this.data[index]
+        if (!item) return false
+
+        let roles = Object.keys(dict)
+        if (roles.length === 0) return true
+
+        for (let role of roles){
+            item[role] = dict[role]
+        }
+
+        // Ensure views that rely on model-wide refresh path are updated too.
+        JQApplication.updateLater(this)
+        this.__proxy.dataChanged(index, index + 1, roles)
+
+        return true
+    }
+
+    move(from, to, n = 1){
+        if (from === undefined || from === null) return false
+        if (to === undefined || to === null) return false
+
+        from = Number(from)
+        to = Number(to)
+        n = Number(n)
+
+        if (!Number.isInteger(from) || !Number.isInteger(to) || !Number.isInteger(n)) return false
+        if (n <= 0) return false
+        if (from < 0 || from >= this.count) return false
+        if (from + n > this.count) return false
+        if (to < 0 || to > this.count) return false
+
+        // No-op cases.
+        if (from === to || to === from + n) return true
+
+        let moved = this.data.__splice(from, n)
+
+        // Qt-like behavior: destination is interpreted on original indexes.
+        // After removing a block before destination, shift destination left.
+        let insertAt = to
+        if (insertAt > from) insertAt -= n
+
+        for (let i = 0; i < moved.length; i++){
+            this.data.__splice(insertAt + i, 0, moved[i])
+        }
+
+        let removeChange = [from, from + n, 'remove']
+        let insertChange = [insertAt, insertAt + n, 'insert']
+
+        this.__updateChangedSet(removeChange)
+        this.__updateChangedSet(insertChange)
+
+        JQApplication.updateLater(this)
+        this.__updateRepeaters([removeChange, insertChange])
+
+        return true
     }
     clear(){
         this.remove(0, this.count)

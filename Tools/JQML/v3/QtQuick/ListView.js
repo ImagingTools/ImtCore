@@ -73,6 +73,7 @@ class ListView extends Flickable {
     __updatePrimaryProperties(){
         super.__updatePrimaryProperties()
         this.__updateProperty('delegate')
+        this.__updateProperty('currentIndex')
         this.__initView(true)
     }
 
@@ -183,8 +184,23 @@ class ListView extends Flickable {
         this.blockSignals(false)
 
         this.count = 0
-        this.currentIndex = -1
         this.currentItem = undefined
+    }
+
+    __normalizeCurrentIndex(length) {
+        let index = this.currentIndex
+
+        if (length <= 0) {
+            index = -1
+        } else if (index < -1) {
+            index = -1
+        } else if (index >= length) {
+            index = length - 1
+        }
+
+        if (index !== this.currentIndex) {
+            this.currentIndex = index
+        }
     }
 
     __getItemInfo(index) {
@@ -406,14 +422,8 @@ class ListView extends Flickable {
             item.y = itemInfo.y
         }
 
-        if(index === 0 && !this.currentItem){
-            this.currentIndex = 0
+        if (index === this.currentIndex) {
             this.currentItem = item
-
-            // Keep parity with desktop runtime: first visible delegate becomes focused.
-            if(item && !item.focus){
-                item.focus = true
-            }
         }
 
         return item
@@ -441,6 +451,7 @@ class ListView extends Flickable {
             }
 
             this.__self.count = length
+            this.__normalizeCurrentIndex(length)
 
             JQApplication.beginUpdate()
             JQApplication.updateLater(this)
@@ -464,6 +475,49 @@ class ListView extends Flickable {
         this.__changeSet.push(changeSet)
         if (this.model && typeof this.model === 'object') {
             this.count = this.model.count
+        }
+    }
+
+    __normalizeItemsIndex(startIndex = 0) {
+        for (let i = startIndex; i < this.__items.length; i++) {
+            let item = this.__items[i]
+            if (!item) continue
+
+            if (item.JQAbstractModel && item.JQAbstractModel.index !== i) {
+                item.JQAbstractModel.index = i
+            }
+        }
+    }
+
+    __realignItems(startIndex = 0) {
+        let previousItem = undefined
+
+        if (startIndex > 0) {
+            for (let i = startIndex - 1; i >= 0; i--) {
+                if (this.__items[i]) {
+                    previousItem = this.__items[i]
+                    break
+                }
+            }
+        }
+
+        for (let i = startIndex; i < this.__items.length; i++) {
+            let item = this.__items[i]
+            if (!item) continue
+
+            if (this.orientation === ListView.Horizontal) {
+                let x = previousItem
+                    ? previousItem.x + previousItem.width + this.spacing
+                    : this.originX + (this.__middleWidth + this.spacing) * i
+                if (item.x !== x) item.x = x
+            } else {
+                let y = previousItem
+                    ? previousItem.y + previousItem.height + this.spacing
+                    : this.originY + (this.__middleHeight + this.spacing) * i
+                if (item.y !== y) item.y = y
+            }
+
+            previousItem = item
         }
     }
 
@@ -496,6 +550,8 @@ class ListView extends Flickable {
 
             let changeSet = this.__changeSet
             this.__changeSet = []
+            let layoutFrom = undefined
+            let currentIndex = this.currentIndex
 
             if(changeSet.length > 0){
                 let i = 0
@@ -533,12 +589,45 @@ class ListView extends Flickable {
                             }
                         }
                     }
+
+                    if (currentIndex >= leftTop) {
+                        currentIndex += (bottomRight - leftTop)
+                    }
+
+                    if (layoutFrom === undefined || leftTop < layoutFrom) {
+                        layoutFrom = leftTop
+                    }
                 } else if (role === 'remove') {
                     let removed = this.__items.splice(leftTop, bottomRight - leftTop)
                     for (let r of removed) {
                         if (r) this.__toCache(r)
                     }
+
+                    if (currentIndex >= leftTop && currentIndex < bottomRight) {
+                        currentIndex = leftTop
+                    } else if (currentIndex >= bottomRight) {
+                        currentIndex -= (bottomRight - leftTop)
+                    }
+
+                    if (layoutFrom === undefined || leftTop < layoutFrom) {
+                        layoutFrom = leftTop
+                    }
                 }
+            }
+
+            if (length <= 0) {
+                currentIndex = -1
+            } else if (currentIndex >= length) {
+                currentIndex = length - 1
+            }
+
+            if (currentIndex !== this.currentIndex) {
+                this.currentIndex = currentIndex
+            }
+
+            if (layoutFrom !== undefined) {
+                this.__normalizeItemsIndex(layoutFrom)
+                this.__realignItems(layoutFrom)
             }
 
             let firstIndex = 0
@@ -577,6 +666,20 @@ class ListView extends Flickable {
 
             JQApplication.endUpdate()
             delete this.__updating
+        }
+    }
+
+    SLOT_currentIndexChanged(oldValue, newValue) {
+        if (newValue < 0) {
+            if (this.currentItem !== undefined) {
+                this.currentItem = undefined
+            }
+            return
+        }
+
+        let item = this.itemAtIndex(newValue)
+        if (item !== this.currentItem) {
+            this.currentItem = item
         }
     }
 
@@ -644,7 +747,11 @@ class ListView extends Flickable {
     }
 
     __updateGeometry() {
-        if (!this.__items.length) return
+        if (!this.__items.length) {
+            Geometry.setAuto(this.__self, 'contentWidth', 0, this.__self.constructor.meta.contentWidth)
+            Geometry.setAuto(this.__self, 'contentHeight', 0, this.__self.constructor.meta.contentHeight)
+            return
+        }
 
         let model = this.model
         if (Array.isArray(model)) {

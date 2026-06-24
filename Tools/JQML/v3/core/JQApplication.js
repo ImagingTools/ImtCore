@@ -432,6 +432,7 @@ module.exports = {
     objectsAwaitingUpdate: new Set(),
     updateLayers: [],
     initLayers: [],
+    callLayers: [],
     deleteObjects: [],
 
     focusTree: [],
@@ -545,6 +546,7 @@ module.exports = {
     beginUpdate: function(){
         this.updateLayers.push([])
         this.initLayers.push([])
+        this.callLayers.push([])
     },
 
     deleteLater: function(obj){
@@ -578,6 +580,14 @@ module.exports = {
         }
     },
 
+    callLater(func){
+        if(this.callLayers.length){
+            this.callLayers[this.callLayers.length-1].push(func)
+        } else {
+            func()
+        }
+    },
+
     quit: function(){
         this.isQuitting = true
         if(typeof window !== 'undefined') window.__jqmlQuit = true
@@ -586,6 +596,7 @@ module.exports = {
     endUpdate: function(){
         let layer = this.updateLayers.pop()
         let initLayer = this.initLayers.pop()
+        let callLayer = this.callLayers.pop()
 
         if(initLayer){
             for(let obj of initLayer){
@@ -599,6 +610,12 @@ module.exports = {
                 if(!obj.__destroyed) obj.__endUpdate()
             }
         } 
+
+        if(callLayer){
+            for(let func of callLayer){
+                func()
+            }
+        }
         
         if(this.updateLayers.length === 0){
             if(this.pendingFocusTree){
