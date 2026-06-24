@@ -200,7 +200,7 @@ void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const T
 		WorkingDocument& doc = m_userDocuments[params.userId][documentId];
 		doc.typeId = params.documentTypeId;
 		doc.undoManagerPtr = undoManagerPtr;
-		doc.isDirty = false;
+		doc.isDirty = true;
 		doc.name = "";
 		doc.isLoading = true;
 		documentName = doc.name;
