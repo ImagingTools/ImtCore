@@ -132,6 +132,9 @@ class Text extends Item {
 
             Geometry.setAuto(this.__self, 'height', textMetrics.height, this.__self.constructor.meta.height)
             Geometry.setAuto(this.__self, 'width', textMetrics.width, this.__self.constructor.meta.width)
+
+            this.implicitWidth = textMetrics.width
+            this.implicitHeight = textMetrics.height
         } else {
             let textMetrics = JQApplication.TextController.measureText(this.text, this.font, !this.width__prevent ? 0 : this.width, this.wrapMode, isHTML, this.elide)
 
@@ -140,6 +143,9 @@ class Text extends Item {
 
             Geometry.setAuto(this.__self, 'height', textMetrics.height, this.__self.constructor.meta.height)
             Geometry.setAuto(this.__self, 'width', textMetrics.width, this.__self.constructor.meta.width)
+
+            this.implicitWidth = textMetrics.width
+            this.implicitHeight = textMetrics.height
         }
     }
 
