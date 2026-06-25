@@ -531,20 +531,24 @@ QtObject {
 	// Call these from custom override implementations or onFinished handlers
 	// to apply the standard DocumentService state transitions.
 
-	function handleDocumentOpened(documentId, objectId, objectTypeId, documentName, hasNameProvider){
+	function handleDocumentOpened(documentId, objectId, objectTypeId, documentName, hasNameProvider, isDirty){
 		setAutoNamedTypeId(objectTypeId, hasNameProvider)
 		setDocumentName(documentId, documentName)
 		documentOpened(documentId, objectTypeId)
 		setDocumentObjectId(documentId, objectId)
+		if (isDirty)
+			setDocumentIsDirty(documentId, true)
 		setDocumentIsLoading(documentId, true)
 	}
 
-	function handleDocumentCreated(documentId, objectTypeId, documentName, hasNameProvider, proposedObjectId){
+	function handleDocumentCreated(documentId, objectTypeId, documentName, hasNameProvider, proposedObjectId, isDirty){
 		setAutoNamedTypeId(objectTypeId, hasNameProvider)
 		setDocumentName(documentId, documentName)
 		documentCreated(documentId, objectTypeId)
 		if (proposedObjectId && proposedObjectId !== "")
 			setDocumentObjectId(documentId, proposedObjectId)
+		if (isDirty)
+			setDocumentIsDirty(documentId, true)
 		setDocumentIsLoading(documentId, true)
 	}
 
