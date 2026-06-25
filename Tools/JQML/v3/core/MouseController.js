@@ -114,7 +114,29 @@ class QmlWheelEvent {
 module.exports = {
     objects: new Set(),
 
-    timeStamp: 0,
+    buttons: {
+        0: {
+            timeStamp: 0,
+            target: null,
+        },
+        1: {
+            timeStamp: 0,
+            target: null,
+        },
+        2: {
+            timeStamp: 0,
+            target: null,
+        },
+        3: {
+            timeStamp: 0,
+            target: null,
+        },
+        4: {
+            timeStamp: 0,
+            target: null,
+        },
+    },
+    
     event: null,
 
     entered: [],
@@ -334,8 +356,12 @@ module.exports = {
             event.originX = e.pageX
             event.originY = e.pageY
             event.relative(event.target)
-            if(e.timeStamp - this.timeStamp > 300){
-                this.timeStamp = e.timeStamp
+
+            let _button = this.buttons[event.button]
+
+            if(e.timeStamp - _button.timeStamp > 300 || _button.target !== event.target){
+                _button.timeStamp = e.timeStamp
+                _button.target = event.target
                 event.target.__onMouseClick(event)
             } else {
                 event.target.__onMouseDblClick(event)
