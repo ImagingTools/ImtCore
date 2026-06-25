@@ -18,6 +18,7 @@ Rectangle {
 
 	property bool canRecoveryPassword: true;
 	property bool canRegisterUser: true;
+	property bool canLoginWithOpenId: AuthorizationController.openIdEnabled;
 
 	property string appName: context ? context.appName : ""
 	
@@ -458,6 +459,61 @@ Rectangle {
 					}
 				}
 			}//
+
+			// --- OpenID Connect login section ---
+			Item {
+				id: openIdSeparatorItem;
+				width: parent.width;
+				height: openIdSeparatorRow.height;
+				visible: authPageContainer.canLoginWithOpenId;
+
+				Row {
+					id: openIdSeparatorRow;
+					width: parent.width;
+					spacing: Style.marginS;
+
+					Rectangle {
+						width: (parent.width - orText.width - 2 * parent.spacing) / 2;
+						height: 1;
+						color: Style.borderColor;
+						anchors.verticalCenter: parent.verticalCenter;
+					}
+
+					Text {
+						id: orText;
+						text: qsTr("or");
+						color: Style.textColor;
+						font.family: Style.fontFamily;
+						font.pixelSize: Style.fontSizeM;
+					}
+
+					Rectangle {
+						width: (parent.width - orText.width - 2 * parent.spacing) / 2;
+						height: 1;
+						color: Style.borderColor;
+						anchors.verticalCenter: parent.verticalCenter;
+					}
+				}
+			}
+
+			Item {
+				id: openIdProvidersItem;
+				width: parent.width;
+				height: openIdProviderList.height;
+				visible: authPageContainer.canLoginWithOpenId;
+
+				OpenIdProviderListView {
+					id: openIdProviderList;
+					anchors.horizontalCenter: parent.horizontalCenter;
+					width: parent.width;
+
+					providers: AuthorizationController.openIdProviders;
+
+					onProviderSelected: {
+						AuthorizationController.loginWithOpenId(providerId);
+					}
+				}
+			}
 		}//bodyColumn
 	}
 

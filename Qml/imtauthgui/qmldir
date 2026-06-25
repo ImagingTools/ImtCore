@@ -10,6 +10,9 @@ SuperuserProvider 1.0 SuperuserProvider.qml
 UserPanel 1.0 UserPanel.qml
 UserManagementProvider 1.0 UserManagementProvider.qml
 UserTokenProvider 1.0 UserTokenProvider.qml
+OpenIdConnectProvider 1.0 OpenIdConnectProvider.qml
+OpenIdLoginButton 1.0 OpenIdLoginButton.qml
+OpenIdProviderListView 1.0 OpenIdProviderListView.qml
 
 singleton PermissionsController 1.0 PermissionsController.qml
 singleton CachedAccountCollection 1.0 CachedAccountCollection.qml

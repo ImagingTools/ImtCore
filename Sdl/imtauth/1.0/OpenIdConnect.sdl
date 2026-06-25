@@ -1,0 +1,63 @@
+schema {
+	query: Query
+	mutation: Mutation
+	namespace: imtauth
+	version: 1.0
+}
+
+enum OpenIdProviderType {
+	GENERIC
+	GOOGLE
+	FACEBOOK
+	APPLE
+}
+
+type OpenIdProviderInfo {
+	providerId: ID!
+	providerType: OpenIdProviderType!
+	displayName: String!
+	issuer: String!
+	authorizationEndpoint: String!
+	tokenEndpoint: String!
+	userinfoEndpoint: String
+	jwksUri: String
+	clientId: String!
+	scopes: String
+}
+
+type OpenIdProvidersPayload {
+	providers: [OpenIdProviderInfo]!
+}
+
+type OpenIdTokenPayload {
+	ok: Boolean!
+	userId: ID
+	username: ID
+	accessToken: ID
+	refreshToken: ID
+	idToken: ID
+	systemId: ID
+	permissions: ID
+	errorMessage: String
+}
+
+input OpenIdAuthorizationCodeInput {
+	providerId: ID!
+	code: String!
+	redirectUri: String!
+	codeVerifier: String
+}
+
+input OpenIdRefreshTokenInput {
+	providerId: ID!
+	refreshToken: String!
+}
+
+type Query {
+	GetOpenIdProviders: OpenIdProvidersPayload!
+}
+
+type Mutation {
+	ExchangeOpenIdCode (input: OpenIdAuthorizationCodeInput): OpenIdTokenPayload!
+	RefreshOpenIdToken (input: OpenIdRefreshTokenInput): OpenIdTokenPayload!
+}

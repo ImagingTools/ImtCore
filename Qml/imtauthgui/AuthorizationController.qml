@@ -17,9 +17,15 @@ QtObject {
 	
 	property string productId: "";
 	
+	// OpenID Connect support
+	property bool openIdEnabled: false
+	property string openIdRedirectUri: ""
+	property var openIdProviders: []
+	
 	signal userModeChanged(string userMode);
 	signal superuserExistResult(string status, string error);
 	signal loginFailed();
+	signal openIdLoginStarted(string authorizationUrl);
 	
 	signal loggedIn();
 	signal loggedOut();
@@ -640,5 +646,47 @@ QtObject {
 				}
 			}
 		}
+	}
+
+	// --- OpenID Connect support ---
+
+	property OpenIdConnectProvider openIdConnectProvider: OpenIdConnectProvider {
+		redirectUri: root.openIdRedirectUri;
+
+		onProvidersLoaded: {
+			root.openIdProviders = openIdConnectProvider.providers;
+			root.openIdEnabled = openIdConnectProvider.configured;
+		}
+
+		onLoginSucceeded: {
+			root.userTokenProvider.setLoginData(refreshToken, accessToken, userId, username, systemId, permissions);
+		}
+
+		onLoginFailed: {
+			root.loginFailed();
+		}
+	}
+
+	function initOpenId() {
+		openIdConnectProvider.loadProviders();
+	}
+
+	function loginWithOpenId(providerId) {
+		if (!root.openIdEnabled) {
+			return;
+		}
+
+		var authUrl = openIdConnectProvider.buildAuthorizationUrl(providerId);
+		if (authUrl !== "") {
+			root.openIdLoginStarted(authUrl);
+		}
+	}
+
+	function handleOpenIdCallback(urlString) {
+		openIdConnectProvider.handleRedirectCallback(urlString);
+	}
+
+	function refreshOpenIdToken(providerId, refreshToken) {
+		openIdConnectProvider.refreshToken(providerId, refreshToken);
 	}
 }
