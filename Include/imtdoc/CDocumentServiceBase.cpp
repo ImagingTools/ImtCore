@@ -201,7 +201,7 @@ void CDocumentServiceBase::DoCreateNewDocument(const QByteArray& taskId, const T
 		doc.typeId = params.documentTypeId;
 		doc.undoManagerPtr = undoManagerPtr;
 		doc.isDirty = true;
-		doc.name = "";
+		doc.name = params.documentName;
 		doc.isLoading = true;
 		documentName = doc.name;
 	}

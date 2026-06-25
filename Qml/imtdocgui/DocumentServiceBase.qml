@@ -425,16 +425,7 @@ QtObject {
 		}
 
 		if (!isLoading){
-			if (!docData.isNew){
-				docData.documentDecorator.updateRepresentationForAllViews()
-			}
-			else{
-				let decorator = docData.documentDecorator
-				for (let i = 0; i < decorator.registeredViews.length; ++i){
-					decorator.registeredViews[i].setBlockingUpdateModel(false)
-					decorator.registeredViews[i].doUpdateGui()
-				}
-			}
+			docData.documentDecorator.updateRepresentationForAllViews()
 			documentDataLoaded(documentId)
 			__internal.maybeEmitDocumentReady(documentId)
 		}

@@ -29,6 +29,11 @@ QtObject {
 			representationController.updateRepresentationFailed.connect(onUpdateRepresentationFailed)
 			representationController.updateDocumentFailed.connect(onUpdateDocumentFailed)
 
+			if (documentManager && view.commandsController){
+				let isDirty = documentManager.documentIsDirty(documentId)
+				view.commandsController.setCommandIsEnabled("Save", isDirty)
+			}
+
 			if (updateRepresentation){
 				if (view.visible){
 					representationController.updateRepresentationFromDocument()
@@ -73,6 +78,18 @@ QtObject {
 				if (root.registeredViews[i].commandsController){
 					root.registeredViews[i].commandsController.setCommandIsEnabled("Undo", availableUndoSteps > 0)
 					root.registeredViews[i].commandsController.setCommandIsEnabled("Redo", availableRedoSteps > 0)
+					root.registeredViews[i].commandsController.setCommandIsEnabled("Save", isDirty)
+				}
+			}
+		}
+
+		function onDocumentIsDirtyChanged(documentId, isDirty){
+			if (documentId !== root.documentId){
+				return
+			}
+
+			for (let i = 0; i < root.registeredViews.length; ++i){
+				if (root.registeredViews[i].commandsController){
 					root.registeredViews[i].commandsController.setCommandIsEnabled("Save", isDirty)
 				}
 			}
