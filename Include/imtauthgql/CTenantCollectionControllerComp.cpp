@@ -147,10 +147,6 @@ void CTenantCollectionControllerComp::SetAdditionalFilters(
 		return;
 	}
 
-	if (userInfoPtr->IsAdmin()){
-		return;
-	}
-
 	QByteArray userId = gqlContextPtr->GetUserId();
 	if (userId.isEmpty()){
 		return;
