@@ -425,7 +425,16 @@ QtObject {
 		}
 
 		if (!isLoading){
-			docData.documentDecorator.updateRepresentationForAllViews()
+			if (!docData.isNew){
+				docData.documentDecorator.updateRepresentationForAllViews()
+			}
+			else{
+				let decorator = docData.documentDecorator
+				for (let i = 0; i < decorator.registeredViews.length; ++i){
+					decorator.registeredViews[i].setBlockingUpdateModel(false)
+					decorator.registeredViews[i].doUpdateGui()
+				}
+			}
 			documentDataLoaded(documentId)
 			__internal.maybeEmitDocumentReady(documentId)
 		}
