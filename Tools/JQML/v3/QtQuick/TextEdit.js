@@ -123,13 +123,13 @@ class TextEdit extends Item {
         }
 
         impl.onkeydown = (e)=>{
-            if(e.code === QtEnums.Key_C && e.ctrlKey){
+            if(e.keyCode === QtEnums.Key_C && e.ctrlKey){
                 e.stopPropagation()
-            } else if(e.code === QtEnums.Key_V && e.ctrlKey){
+            } else if(e.keyCode === QtEnums.Key_V && e.ctrlKey){
                 e.stopPropagation()
-            } else if(e.code === QtEnums.Key_X && e.ctrlKey){
+            } else if(e.keyCode === QtEnums.Key_X && e.ctrlKey){
                 e.stopPropagation()
-            } else if(e.code === QtEnums.Key_A && e.ctrlKey){
+            } else if(e.keyCode === QtEnums.Key_A && e.ctrlKey){
                 e.stopPropagation()
                 this.selectAll()
             } else if(e.key === QtEnums.Key_Enter){
@@ -383,6 +383,21 @@ class TextEdit extends Item {
     }
     undo(){
 
+    }
+
+    __onMouseDown(mouse){
+        if(!this.enabled || !this.visible) return
+
+        if(!mouse.target){
+            mouse.target = this
+        }
+    }
+    __onMouseUp(mouse){
+        if(!this.enabled || !this.visible) return
+
+        if(mouse.target === this){
+            mouse.target = null
+        }
     }
 
 
