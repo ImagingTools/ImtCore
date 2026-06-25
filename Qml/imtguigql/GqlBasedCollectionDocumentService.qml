@@ -288,7 +288,7 @@ DocumentServiceBase {
 		sdlObjectComp: Component {
 			DocumentInfo {
 				onFinished: {
-					root.handleDocumentOpened(m_documentId, m_objectId, m_objectTypeId, m_documentName, m_hasNameProvider)
+					root.handleDocumentOpened(m_documentId, m_objectId, m_objectTypeId, m_documentName, m_hasNameProvider, m_isDirty)
 				}
 			}
 		}
@@ -310,7 +310,7 @@ DocumentServiceBase {
 		sdlObjectComp: Component {
 			DocumentInfo {
 				onFinished: {
-					root.handleDocumentCreated(m_documentId, m_objectTypeId, m_documentName, m_hasNameProvider, root.createDocumentRequest.proposedObjectId)
+					root.handleDocumentCreated(m_documentId, m_objectTypeId, m_documentName, m_hasNameProvider, root.createDocumentRequest.proposedObjectId, m_isDirty)
 				}
 			}
 		}
