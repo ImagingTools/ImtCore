@@ -63,10 +63,12 @@ add_dependencies(ImtDdlPck imtddl)
 #------ DesignToken ------
 add_subdirectory("${IMPL_DIR}/DesignTokenCreatorExe/CMake" "${AUX_INCLUDE_DIR}/DesignTokenCreator")
 add_dependencies(DesignTokenCreator imtbase imtdesign)
+imt_chain_windeploy_target(DesignTokenCreator)
 
 #------ DDLCodeCreator ------
 add_subdirectory("${IMPL_DIR}/DdlCodeCreatorExe/CMake" "${AUX_INCLUDE_DIR}/DdlCodeCreator")
 add_dependencies(DdlCodeCreator imtddl)
+imt_chain_windeploy_target(DdlCodeCreator)
 
 #------ SDL tool ------
 add_subdirectory("${INCLUDE_DIR}/imtsdl/CMake" "${AUX_INCLUDE_DIR}/imtsdl")
@@ -83,6 +85,7 @@ add_dependencies(ImtSdlGenCppPck imtsdlgencpp imtsdlgenqml imtsdl imtfile imtbas
 
 add_subdirectory("${IMPL_DIR}/SdlCodeGeneratorExe/CMake" "${AUX_INCLUDE_DIR}/SdlCodeGenerator")
 add_dependencies(SdlCodeGenerator ImtSdlGenCppPck ImtSdlGenQmlPck ImtSdlPck)
+imt_chain_windeploy_target(SdlCodeGenerator)
 
 #------ SDL tool tests ------
 if (NOT DEFINED BUILD_TESTING OR BUILD_TESTING)
@@ -94,6 +97,9 @@ endif()
 add_subdirectory("${INCLUDE_DIR}/imtoas/CMake" "${AUX_INCLUDE_DIR}/imtoas")
 add_subdirectory("${IMPL_DIR}/ImtOasPck/CMake" "${AUX_INCLUDE_DIR}/ImtOasPck")
 add_subdirectory("${IMPL_DIR}/OasCodeGeneratorExe/CMake" "${AUX_INCLUDE_DIR}/OasCodeGeneratorExe")
+imt_chain_windeploy_target(OasCodeGeneratorExe)
+imt_chain_windeploy_target(ImtSdlGenTest)
+imt_chain_windeploy_target(ImtSdlGenQmlTest)
 
 if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 	#-------- Sdl --------
@@ -274,6 +280,7 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 
 		add_subdirectory("${IMPL_DIR}/ImtRestPck/CMake" "${AUX_INCLUDE_DIR}/ImtRestPck")
 		add_dependencies(ImtRestPck imtbase imtrest)
+imt_chain_windeploy_target(ImtRestPck)
 
 		add_subdirectory("${IMPL_DIR}/ImtReportGuiPck/CMake" "${AUX_INCLUDE_DIR}/ImtReportGuiPck")
 		add_dependencies(ImtReportGuiPck imtreport imtreportgui)
@@ -291,6 +298,7 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 
 		add_subdirectory("${IMPL_DIR}/ImtZipPck/CMake" "${AUX_INCLUDE_DIR}/ImtZipPck")
 		add_dependencies(ImtZipPck imtzip)
+imt_chain_windeploy_target(ImtZipPck)
 
 		add_subdirectory("${IMPL_DIR}/ImtFilePck/CMake" "${AUX_INCLUDE_DIR}/ImtFilePck")
 		add_dependencies(ImtFilePck imtfile)
@@ -306,6 +314,7 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 
 		add_subdirectory("${IMPL_DIR}/ImtComPck/CMake" "${AUX_INCLUDE_DIR}/ImtComPck")
 		add_dependencies(ImtComPck imtcom)
+imt_chain_windeploy_target(ImtComPck)
 
 		add_subdirectory("${IMPL_DIR}/ImtServicePck/CMake" "${AUX_INCLUDE_DIR}/ImtServicePck")
 		add_dependencies(ImtServicePck imtservice)
@@ -330,11 +339,13 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 		if((NOT DEFINED USE_GEO OR USE_GEO) AND (NOT DEFINED USE_QTDB OR USE_QTDB))
 			add_subdirectory("${IMPL_DIR}/ImtGeoPck/CMake" "${AUX_INCLUDE_DIR}/ImtGeoPck")
 			add_dependencies(ImtGeoPck imtgeo imtdb)
+imt_chain_windeploy_target(ImtGeoPck)
 		endif()
 
 		if((DEFINED USE_MONGODB AND USE_MONGODB) AND (NOT DEFINED USE_QTDB OR USE_QTDB))
 			add_subdirectory("${IMPL_DIR}/ImtMongoPck/CMake" "${AUX_INCLUDE_DIR}/ImtMongoPck")
 			add_dependencies(ImtMongoPck imtmongo imtdb)
+imt_chain_windeploy_target(ImtMongoPck)
 		endif()
 
 		if(NOT DEFINED USE_EJ OR USE_EJ)
@@ -348,6 +359,7 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 
 			add_subdirectory("${IMPL_DIR}/ImtDatabasePck/CMake" "${AUX_INCLUDE_DIR}/ImtDatabasePck")
 			add_dependencies(ImtDatabasePck imtbase imtdb)
+imt_chain_windeploy_target(ImtDatabasePck)
 
 			add_subdirectory("${IMPL_DIR}/ImtLicenseDbPck/CMake" "${AUX_INCLUDE_DIR}/ImtLicenseDbPck")
 			add_dependencies(ImtLicenseDbPck imtbase imtdb imtlicdb)
@@ -388,6 +400,7 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 
 			add_subdirectory("${IMPL_DIR}/Imt3dDemo/CMake" "${AUX_INCLUDE_DIR}/Imt3dDemo")
 			add_dependencies(Imt3dDemo imt3dgui imt3dview imt3d)
+imt_chain_windeploy_target(Imt3dDemo)
 		endif()
 
 		if(WIN32 AND (NOT DEFINED USE_JQML_HOST OR USE_JQML_HOST))
@@ -396,12 +409,14 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 				imtbasesdl imtappsdl imtauthsdl imtlicsdl imtcolorsdl imt2dsdl imtchatsdl imtdesksdl imtpaysdl
 				imtcontrolsqml imtstylecontrolsqml imtguiqml imtguigqlqml imtcolguiqml imtdocguiqml imtauthguiqml imtlicguiqml imtchatguiqml imtdeskguiqml
 				imtqml imtgui imtguigql imtauth imtauthgui imtstyle imtbase)
+imt_chain_windeploy_target(JQMLHost)
 		endif()
 
 		if(NOT DEFINED USE_QTQML OR USE_QTQML)
 			if(NOT DEFINED USE_QTDB OR USE_QTDB)
 				add_subdirectory("${IMPL_DIR}/ImtQmlPck/CMake" "${AUX_INCLUDE_DIR}/ImtQmlPck")
 				add_dependencies(ImtQmlPck imtqml imtdb)
+imt_chain_windeploy_target(ImtQmlPck)
 
 				add_subdirectory("${IMPL_DIR}/ImtAuthGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthGqlPck")
 				add_dependencies(ImtAuthGqlPck imtauthgql imtdb)
@@ -418,6 +433,7 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 	#-------- Tests --------
 	if (NOT DEFINED BUILD_TESTING OR BUILD_TESTING)
 		add_subdirectory("${INCLUDE_DIR}/imtbase/Test/CMake" "${AUX_INCLUDE_DIR}/imtbase/Test")
+imt_chain_windeploy_target(imtbaseTest)
 		add_subdirectory("${INCLUDE_DIR}/imttest/CMake" "${AUX_INCLUDE_DIR}/imttest")
 
 	if(NOT DEFINED USE_QTDB OR USE_QTDB)
@@ -433,10 +449,12 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 
 	if(DEFINED USE_MDBX AND USE_MDBX)
 		add_subdirectory("${INCLUDE_DIR}/imtmdbx/Test/CMake" "${AUX_INCLUDE_DIR}/imtmdbx/Test")
+imt_chain_windeploy_target(imtmdbxTest)
 	endif()
 
 	add_subdirectory("${INCLUDE_DIR}/imtgql/Test/CMake" "${AUX_INCLUDE_DIR}/imtgql/Test")
 	add_dependencies(imtGqlTest imtbase imtgql imtbasesdl)
+imt_chain_windeploy_target(imtGqlTest)
 
 	add_subdirectory("${INCLUDE_DIR}/imtgqltest/CMake" "${AUX_INCLUDE_DIR}/imtgqltest")
 	add_dependencies(imtgqltest imtcom imtrest imtbase)
