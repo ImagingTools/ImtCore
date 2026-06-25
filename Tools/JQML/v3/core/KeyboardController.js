@@ -102,7 +102,7 @@ module.exports = {
                     obj['Keys.enterPressed'](e)
                     if (e.accepted) return
                 }
-                if (e.key === 'Space') {
+                if (e.code === 'Space') {
                     e.accepted = false
                     obj['Keys.spacePressed'](e)
                     if (e.accepted) return
