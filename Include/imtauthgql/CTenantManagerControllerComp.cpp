@@ -13,6 +13,7 @@
 #include <imtauth/ITenantMembership.h>
 #include <imtauth/ITenantRelationshipInfo.h>
 #include <imtauth/ITenantRelationshipProposalInfo.h>
+#include <iqt/iqt.h>
 #include <imtgql/IGqlContext.h>
 #include <imtbase/imtbase.h>
 
@@ -173,7 +174,6 @@ bool HasTenantManageAccess(
 
 namespace imtauthgql
 {
-
 
 // protected methods
 
@@ -364,6 +364,61 @@ sdl::V1_0::imtauth::CGetTenantPayload CTenantManagerControllerComp::OnGetTenant(
 	}
 
 	response.tenant = tenantData;
+
+	return response;
+}
+
+
+sdl::V1_0::imtauth::CGetTenantPermissionsPayload CTenantManagerControllerComp::OnGetTenantPermissions(
+			const sdl::V1_0::imtauth::CGetTenantPermissionsGqlRequest& getTenantPermissionsRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& /*errorMessage*/) const
+{
+	sdl::V1_0::imtauth::CGetTenantPermissionsPayload response;
+
+	if (!m_tenantManagerCompPtr.IsValid()){
+		response.errorMessage = QStringLiteral("Tenant manager is not configured");
+		return response;
+	}
+
+	QByteArray tenantId;
+	sdl::V1_0::imtauth::GetTenantPermissionsRequestArguments arguments = getTenantPermissionsRequest.GetRequestedArguments();
+	if (arguments.input->tenantId){
+		tenantId = *arguments.input->tenantId;
+	}
+
+	if (tenantId.isEmpty()){
+		response.errorMessage = QStringLiteral("Tenant ID is required");
+		return response;
+	}
+	if (!imtbase::isValidUuid(tenantId)){
+		response.errorMessage = QStringLiteral("Invalid tenant ID format");
+		return response;
+	}
+
+	QString accessError;
+	if (!HasTenantIsolationAccess(
+				*m_tenantManagerCompPtr.GetPtr(),
+				m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr,
+				gqlRequest,
+				tenantId,
+				accessError)){
+		response.errorMessage = accessError;
+		return response;
+	}
+
+	QByteArrayList tenantPermissions = m_tenantManagerCompPtr->GetTenantPermissions(tenantId);
+	QSet<QByteArray> seenPermissionIds;
+	QByteArrayList normalizedPermissionIds;
+	for (const QByteArray& permId : tenantPermissions){
+		QByteArray normalizedPermId = permId.trimmed();
+		if (!normalizedPermId.isEmpty() && !seenPermissionIds.contains(normalizedPermId)){
+			seenPermissionIds.insert(normalizedPermId);
+			normalizedPermissionIds.append(normalizedPermId);
+		}
+	}
+
+	response.permissionIds.Emplace().FromList(normalizedPermissionIds);
 
 	return response;
 }

@@ -64,6 +64,13 @@ QtObject {
 	}
 
 	/*!
+		Reloads the first page using the current active filter.
+	*/
+	function refetch(){
+		root.fetch(__internal.currentFilter)
+	}
+
+	/*!
 		Fetches the next page. Ignored if already loading or no more items.
 	*/
 	function fetchMore(){

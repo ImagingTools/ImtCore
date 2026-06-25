@@ -12,8 +12,17 @@
 #include <imtauth/IContract.h>
 #include <imtauth/ICrossTenantMessage.h>
 #include <imtauth/IOrderRequest.h>
+#include <imtlic/IProductInfo.h>
+#include <imtlic/CFeatureInfo.h>
+#include <imtsdl/TElementList.h>
+#include <iqt/ITranslationManager.h>
+#include <iqt/iqt.h>
 #include <imtgql/CGqlRequest.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Tenants.h>
+
+
+// Qt includes
+#include <QtCore/QSet>
 
 
 /**
@@ -615,8 +624,184 @@ namespace imtauthgql
 
 
 /**
+	Collect flat permission entries from a feature subtree.
+	When allowedPermissionsPtr is set, returns only entries reachable from selected nodes.
+*/
+template<typename TEntry>
+inline bool CollectPermissionEntries(
+			const imtlic::CFeatureInfo& featureInfo,
+			imtsdl::TElementList<TEntry>& entries,
+			const QByteArray& languageId,
+			const QSet<QByteArray>* allowedPermissionsPtr,
+			const QString& parentPath,
+			const iqt::ITranslationManager* translationManagerPtr,
+			bool parentSelected = false)
+{
+	if (!featureInfo.IsPermission()){
+		return false;
+	}
+
+	QByteArray featureId = featureInfo.GetFeatureId();
+	const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
+
+	QString featureName = featureInfo.GetFeatureName();
+	if (translationManagerPtr != nullptr){
+		featureName = iqt::GetTranslation(translationManagerPtr, featureName.toUtf8(), languageId, QByteArrayLiteral("Feature"));
+	}
+
+	QString displayName = parentPath.isEmpty() ? featureName : (parentPath + QStringLiteral(" / ") + featureName);
+
+	if (subFeatures.isEmpty()){
+		if (allowedPermissionsPtr != nullptr && !parentSelected && !allowedPermissionsPtr->contains(featureId)){
+			return false;
+		}
+
+		QString featureDescription = featureInfo.GetFeatureDescription();
+		if (translationManagerPtr != nullptr){
+			featureDescription = iqt::GetTranslation(translationManagerPtr, featureDescription.toUtf8(), languageId, QByteArrayLiteral("Feature"));
+		}
+
+		TEntry entry;
+		entry.permissionId = featureId;
+		entry.displayName = displayName;
+		entry.description = featureDescription;
+		entries.append(entry);
+
+		return true;
+	}
+
+	imtsdl::TElementList<TEntry> childEntries;
+	int childCount = 0;
+	const bool thisNodeSelected = parentSelected || (allowedPermissionsPtr != nullptr && allowedPermissionsPtr->contains(featureId));
+
+	for (int i = 0; i < subFeatures.count(); i++){
+		const imtlic::IFeatureInfo::FeatureInfoPtr& subFeaturePtr = subFeatures.at(i);
+		if (!subFeaturePtr.IsValid()){
+			continue;
+		}
+
+		const imtlic::CFeatureInfo* subFeatureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(subFeaturePtr.GetPtr());
+		if (subFeatureInfoPtr == nullptr){
+			continue;
+		}
+
+		if (CollectPermissionEntries<TEntry>(
+					*subFeatureInfoPtr,
+					childEntries,
+					languageId,
+					allowedPermissionsPtr,
+					displayName,
+					translationManagerPtr,
+					thisNodeSelected)){
+			childCount++;
+		}
+	}
+
+	if (allowedPermissionsPtr != nullptr && childCount == 0){
+		return false;
+	}
+
+	for (const TEntry& childEntry : childEntries.ToList()){
+		entries.append(childEntry);
+	}
+
+	return childCount > 0;
+}
+
+
+/**
+	Build top-level permission groups with flattened path-based entries.
+	When allowedPermissionsPtr is set, only selected group subtrees are included.
+*/
+template<typename TGroup, typename TEntry>
+inline void BuildPermissionGroups(
+			imtlic::IProductInfo* productInfoPtr,
+			const iqt::ITranslationManager* translationManagerPtr,
+			imtsdl::TElementList<TGroup>& groups,
+			const QByteArray& languageId,
+			const QSet<QByteArray>* allowedPermissionsPtr)
+{
+	if (productInfoPtr == nullptr){
+		return;
+	}
+
+	imtbase::IObjectCollection* featureCollectionPtr = productInfoPtr->GetFeatures();
+	if (featureCollectionPtr == nullptr){
+		return;
+	}
+
+	imtbase::ICollectionInfo::Ids elementIds = featureCollectionPtr->GetElementIds();
+	for (imtbase::ICollectionInfo::Id& elementId : elementIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (!featureCollectionPtr->GetObjectData(elementId, dataPtr)){
+			continue;
+		}
+
+		const imtlic::CFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(dataPtr.GetPtr());
+		if (featureInfoPtr == nullptr || !featureInfoPtr->IsPermission()){
+			continue;
+		}
+
+		QByteArray groupId = featureInfoPtr->GetFeatureId();
+		QString groupName = featureInfoPtr->GetFeatureName();
+		if (translationManagerPtr != nullptr){
+			groupName = iqt::GetTranslation(translationManagerPtr, groupName.toUtf8(), languageId, QByteArrayLiteral("Feature"));
+		}
+
+		TGroup group;
+		group.groupId = groupId;
+		group.groupName = groupName;
+		group.entries.Emplace();
+
+		const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfoPtr->GetSubFeatures();
+		bool hasEntries = false;
+		const bool groupSelected = (allowedPermissionsPtr != nullptr && allowedPermissionsPtr->contains(groupId));
+
+		if (subFeatures.isEmpty()){
+			hasEntries = CollectPermissionEntries<TEntry>(
+					*featureInfoPtr,
+					*group.entries,
+					languageId,
+					allowedPermissionsPtr,
+					QString(),
+					translationManagerPtr,
+					groupSelected);
+		}
+		else{
+			for (int i = 0; i < subFeatures.count(); i++){
+				const imtlic::IFeatureInfo::FeatureInfoPtr& subFeaturePtr = subFeatures.at(i);
+				if (!subFeaturePtr.IsValid()){
+					continue;
+				}
+
+				const imtlic::CFeatureInfo* subFeatureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(subFeaturePtr.GetPtr());
+				if (subFeatureInfoPtr != nullptr){
+					if (CollectPermissionEntries<TEntry>(
+							*subFeatureInfoPtr,
+							*group.entries,
+							languageId,
+							allowedPermissionsPtr,
+							QString(),
+							translationManagerPtr,
+							groupSelected)){
+						hasEntries = true;
+					}
+				}
+			}
+		}
+
+		if (allowedPermissionsPtr != nullptr && !hasEntries){
+			continue;
+		}
+
+		groups.append(group);
+	}
+}
+
+
+/**
 	Create an optional tenant filter param from a tenant id.
-	Returns nullptr when no tenant id is available.
+	Empty tenant id is allowed and represents NoOrganization context.
 	The returned pointer is owned by the caller (ParamsSet takes ownership via SetEditableParameter).
 */
 inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const QByteArray& tenantId)
@@ -630,7 +815,9 @@ inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const QByteArray& te
 
 /**
 	Create an optional tenant filter param from the GQL request context.
-	Returns nullptr when no tenant context is available.
+	Returns nullptr when no request context is available.
+	When tenant id is empty (NoOrganization), returns an empty-tenant filter so
+	storage delegates can apply no-organization isolation (NOT EXISTS binding).
 	The returned pointer is owned by the caller (ParamsSet takes ownership via SetEditableParameter).
 */
 inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRequest& gqlRequest)
@@ -640,7 +827,10 @@ inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRe
 		return nullptr;
 	}
 
-	return CreateTenantFilterParam(gqlContextPtr->GetTenantId());
+	imtauth::CTenantFilterParam* tenantFilterPtr = new imtauth::CTenantFilterParam();
+	tenantFilterPtr->SetTenantId(gqlContextPtr->GetTenantId());
+
+	return tenantFilterPtr;
 }
 
 

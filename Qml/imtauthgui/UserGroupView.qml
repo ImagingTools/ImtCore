@@ -20,6 +20,10 @@ ViewBase {
 	}
 	
 	function updateModel(){
+		if (!container.groupData){
+			return
+		}
+
 		generalGroup.updateModel();
 		usersGroup.updateModel();
 		rolesGroup.updateModel();
@@ -150,6 +154,9 @@ ViewBase {
 					}
 
 				function updateGui(){
+					if (!container.groupData){
+						return
+					}
 					nameInput.text = container.groupData.m_name;
 					descriptionInput.text = container.groupData.m_description;
 					var ids = container.groupData.m_parentGroups ? container.groupData.m_parentGroups.slice() : []
@@ -160,6 +167,9 @@ ViewBase {
 				}
 				
 				function updateModel(){
+					if (!container.groupData){
+						return
+					}
 					container.groupData.m_description = descriptionInput.text;
 					container.groupData.m_name = nameInput.text;
 					var arr = []
@@ -186,6 +196,9 @@ ViewBase {
 					}
 				
 				function updateGui(){
+					if (!container.groupData){
+						return
+					}
 					var ids = container.groupData.m_users ? container.groupData.m_users.slice() : []
 					var arr = []
 					for (var i = 0; i < ids.length; i++)
@@ -194,6 +207,9 @@ ViewBase {
 				}
 				
 				function updateModel(){
+					if (!container.groupData){
+						return
+					}
 					var arr = []
 					for (var i = 0; i < userSelectableCollectionEditor.items.length; i++)
 						arr.push(userSelectableCollectionEditor.items[i].id)
@@ -218,6 +234,9 @@ ViewBase {
 					}
 
 				function updateGui(){
+					if (!container.groupData){
+						return
+					}
 					var ids = container.groupData.m_roles ? container.groupData.m_roles.slice() : []
 					var arr = []
 					for (var i = 0; i < ids.length; i++)
@@ -226,6 +245,9 @@ ViewBase {
 				}
 				
 				function updateModel(){
+					if (!container.groupData){
+						return
+					}
 					var arr = []
 					for (var i = 0; i < roleSelectableCollectionEditor.items.length; i++)
 						arr.push(roleSelectableCollectionEditor.items[i].id)

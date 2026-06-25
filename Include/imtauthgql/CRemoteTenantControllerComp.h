@@ -47,6 +47,10 @@ protected:
 				const sdl::V1_0::imtauth::CGetTenantGqlRequest& getTenantRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::V1_0::imtauth::CGetTenantPermissionsPayload OnGetTenantPermissions(
+				const sdl::V1_0::imtauth::CGetTenantPermissionsGqlRequest& getTenantPermissionsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::V1_0::imtauth::CCreateTenantPayload OnCreateTenant(
 				const sdl::V1_0::imtauth::CCreateTenantGqlRequest& createTenantRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

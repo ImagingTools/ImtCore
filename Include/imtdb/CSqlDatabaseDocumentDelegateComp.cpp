@@ -1180,6 +1180,10 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingTableInitializat
 
 void CSqlDatabaseDocumentDelegateComp::EnsureTenantBindingTableExists() const
 {
+	if (m_tenantBindingTableInitialized){
+		return;
+	}
+
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return;
 	}
@@ -1196,7 +1200,10 @@ void CSqlDatabaseDocumentDelegateComp::EnsureTenantBindingTableExists() const
 		qWarning() << __FILE__ << __LINE__
 					<< "\n\t| TenantEntityBindings table could not be initialized"
 					<< "\n\t| Error: " << sqlError;
+		return;
 	}
+
+	m_tenantBindingTableInitialized = true;
 }
 
 
@@ -1230,7 +1237,11 @@ QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingFilterQuery(const Q
 		return QString("EXISTS (%1)").arg(bindingsLookup);
 	}
 
-	return QString("NOT EXISTS (%1)").arg(bindingsLookup);
+	// NoOrganization mode: empty TenantId binding and missing binding are equivalent.
+	// Keep only records that have no non-empty tenant binding.
+	QString nonEmptyTenantBindingsLookup = bindingsLookup
+			+ QString(" AND COALESCE(tenantBindings.\"TenantId\", '') <> ''");
+	return QString("NOT EXISTS (%1)").arg(nonEmptyTenantBindingsLookup);
 }
 
 
