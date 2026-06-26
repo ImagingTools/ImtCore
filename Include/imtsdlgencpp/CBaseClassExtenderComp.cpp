@@ -136,7 +136,8 @@ iproc::IProcessor::TaskState CBaseClassExtenderComp::DoProcessing(
 			const iprm::IParamsSet* paramsPtr,
 			const istd::IPolymorphic* inputPtr,
 			istd::IChangeable* /*outputPtr*/,
-			ibase::IProgressManager* /*progressManagerPtr*/)
+			ibase::IProgressManager* /*progressManagerPtr*/,
+			istd::IChangeable* /*processingReportPtr*/)
 {
 	if (paramsPtr == nullptr){
 		I_CRITICAL();
@@ -483,4 +484,3 @@ void CBaseClassExtenderComp::WriteBufferToStream(QTextStream& stream, QStringLis
 
 
 } // namespace imtsdlgencpp
-
