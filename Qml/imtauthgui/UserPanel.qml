@@ -158,20 +158,18 @@ Item {
 				ModalDialogManager.openDialog(popupMenu, {"x": point.x, "y": point.y, "model": contextMenuModel});
 			}
 		}
+	}
 
-		Rectangle {
-			id: invitationBadge
-			visible: AuthorizationController.pendingInvitationsCount > 0
-			width: 8
-			height: 8
-			radius: 4
-			color: Style.imaginToolsAccentColor
-			anchors.top: parent.top
-			anchors.right: parent.right
-			anchors.topMargin: 4
-			anchors.rightMargin: 4
-			z: parent.z + 1
-		}
+	Rectangle {
+		id: invitationBadge
+		anchors.top: loginButton.top
+		anchors.right: loginButton.right
+		width: Style.spacingM
+		height: width
+		visible: AuthorizationController.pendingInvitationsCount > 0
+		radius: width/2
+		color: Style.imaginToolsAccentColor
+		z: parent.z + 1
 	}
 
 	ListModel {

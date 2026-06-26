@@ -228,7 +228,7 @@ ViewBase {
 			
 			Text {
 				width: parent.width;
-				text: qsTr("Invitations");
+				text: qsTr("My Invitations");
 				visible: invitationsGroup.visible;
 				color: Style.textColor;
 				font.family: Style.fontFamilyBold;
@@ -285,14 +285,14 @@ ViewBase {
 									width: acceptLabel.contentWidth + 2 * Style.marginL
 									height: Style.controlHeightS
 									radius: Style.radiusM
-									color: "#3FB950"
+									color: Style.imaginToolsAccentColor
 
 									Text {
 										id: acceptLabel
 										anchors.centerIn: parent
 										text: qsTr("Accept")
 										font.pixelSize: Style.fontSizeS
-										color: "#FFFFFF"
+										color: Style.baseColor
 									}
 
 									MouseArea {
@@ -308,14 +308,14 @@ ViewBase {
 									width: rejectLabel.contentWidth + 2 * Style.marginL
 									height: Style.controlHeightS
 									radius: Style.radiusM
-									color: "#DA3633"
+									color: Style.negativeAccentColor
 
 									Text {
 										id: rejectLabel
 										anchors.centerIn: parent
 										text: qsTr("Reject")
 										font.pixelSize: Style.fontSizeS
-										color: "#FFFFFF"
+										color: Style.baseColor
 									}
 
 									MouseArea {
@@ -334,7 +334,7 @@ ViewBase {
 			
 			Text {
 				width: parent.width;
-				text: qsTr("Organizations");
+				text: qsTr("My Organizations");
 				visible: organizationsGroup.visible;
 				color: Style.textColor;
 				font.family: Style.fontFamilyBold;
@@ -389,14 +389,14 @@ ViewBase {
 								width: leaveLabel.contentWidth + 2 * Style.marginL
 								height: Style.controlHeightS
 								radius: Style.radiusM
-								color: "#DA3633"
+								color: Style.negativeAccentColor
 
 								Text {
 									id: leaveLabel
 									anchors.centerIn: parent
 									text: qsTr("Leave")
 									font.pixelSize: Style.fontSizeS
-									color: "#FFFFFF"
+									color: Style.baseColor
 								}
 
 								MouseArea {
