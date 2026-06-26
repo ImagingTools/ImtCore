@@ -1466,20 +1466,22 @@ QJsonObject CObjectCollectionControllerCompBase::CreateInternalResponse(
 
 bool CObjectCollectionControllerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
-	bool isSupported = BaseClass::IsRequestSupported(gqlRequest);
-	if (isSupported){
-		const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
-		if (inputParamPtr == nullptr){
-			return false;
-		}
-
-		if (m_collectionIdAttrPtr.IsValid() && *m_collectionIdAttrPtr != ""){
-			QByteArray collectionId = inputParamPtr->GetParamArgumentValue("collectionId").toByteArray();
-			return *m_collectionIdAttrPtr == collectionId;
-		}
+	if (!BaseClass::IsRequestSupported(gqlRequest)){
+		return false;
 	}
 
-	return false;
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject(QByteArrayLiteral("input"));
+	if (inputParamPtr == nullptr){
+		return false;
+	}
+
+	if (m_collectionIdAttrPtr.IsValid() && !(*m_collectionIdAttrPtr).isEmpty()){
+		const QByteArray collectionId = inputParamPtr->GetParamArgumentValue(QByteArrayLiteral("collectionId")).toByteArray();
+
+		return *m_collectionIdAttrPtr == collectionId;
+	}
+
+	return true;
 }
 
 
