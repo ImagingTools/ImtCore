@@ -115,10 +115,12 @@ QtObject {
 	signal requestFailed(string message)
 
 	// --- Real-time membership subscription notifications ---
-	signal subscriptionInvitationReceived(var notification)
-	signal subscriptionInvitationAccepted(var notification)
-	signal subscriptionInvitationRejected(var notification)
-	signal subscriptionOwnershipTransferred(var notification)
+	signal subscriptionInvitationReceived(string tenantId, string tenantName, string role)
+	signal subscriptionInvitationAccepted(string tenantId, string membershipId)
+	signal subscriptionInvitationRejected(string tenantId, string membershipId)
+	signal subscriptionOwnershipTransferred(string tenantId)
+	signal subscriptionMembershipRoleChanged(string tenantId, string userId, string role)
+	signal subscriptionMembershipRemoved(string tenantId, string userId)
 
 	// --- Real-time connection notifications ---
 	signal subscriptionConnectionNotification(var notification)

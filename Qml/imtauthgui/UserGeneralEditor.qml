@@ -26,6 +26,10 @@ Column {
 	property bool canHideGroup: true;
 
 	function updateGui(){
+		if (!container.userData){
+			return
+		}
+
 		usernameInput_.text = container.userData.m_username;
 		nameInput_.text = container.userData.m_name;
 		mailInput_.text = container.userData.m_email;
@@ -33,6 +37,10 @@ Column {
 	}
 
 	function updateModel(){
+		if (!container.userData){
+			return
+		}
+
 		container.userData.m_username = usernameInput_.text;
 		container.userData.m_name = nameInput_.text;
 		container.userData.m_email = mailInput_.text;

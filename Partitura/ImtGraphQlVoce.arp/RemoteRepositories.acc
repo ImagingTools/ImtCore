@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="6418" Description="ACF"/>
-            <Version Id="1" Number="2408" Description="ACF-Solutions"/>
+            <Version Id="0" Number="6435" Description="ACF"/>
+            <Version Id="1" Number="2410" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -31,6 +31,15 @@
         <Element Id="CachedUserCollection" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="InvalidationModels" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>UserSessionRemoteRepository</Value>
+                                <Value>GroupRemoteRepository</Value>
+                                <Value>RoleRemoteRepository</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserRemoteRepository"/>
                     </AttributeInfo>
@@ -284,8 +293,6 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>OnUsersCollectionChanged</Value>
-                                <Value>OnRolesCollectionChanged</Value>
-                                <Value>OnUserSessionsCollectionChanged</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
