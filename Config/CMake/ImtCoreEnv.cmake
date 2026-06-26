@@ -5,7 +5,7 @@ if(NOT DEFINED IACFDIR)
 	set(IACFDIR "$ENV{IACFDIR}")
 endif()
 
-include(${IACFDIR}/Config/CMake/IAcfEnv.cmake)
+include(${IACFDIR}/Config/CMake/AcfEnv.cmake)
 
 if(NOT DEFINED IMTCOREDIR)
 	set(IMTCOREDIR "$ENV{IMTCOREDIR}")
