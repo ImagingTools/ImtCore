@@ -141,47 +141,27 @@ QtObject {
 			provider.fetch("")
 	}
 
-	// --- Subscription client for membership notifications ---
-	property SubscriptionClient __membershipSubscription: SubscriptionClient {
-		gqlCommandId: "OnMembershipNotification"
+	// --- Relay membership notifications from AuthorizationController to local signals ---
+	property Connections __membershipNotificationRelay: Connections {
+		target: AuthorizationController
 
-		function getHeaders() { return {} }
-
-		onMessageReceived: {
-			if (!data) return
-			var notificationType = ""
-			if (data.containsKey("notificationType"))
-				notificationType = data.getData("notificationType")
-
-			var notification = {
-				"membershipId": data.containsKey("membershipId") ? data.getData("membershipId") : "",
-				"userId": data.containsKey("userId") ? data.getData("userId") : "",
-				"tenantId": data.containsKey("tenantId") ? data.getData("tenantId") : "",
-				"tenantName": data.containsKey("tenantName") ? data.getData("tenantName") : "",
-				"role": data.containsKey("role") ? data.getData("role") : ""
-			}
-
-			if (notificationType === "InvitationReceived" || notificationType === 0) {
-				var tName = notification.tenantName ? notification.tenantName : qsTr("a tenant")
-				PopupManager.addInfoMessage(qsTr("You have been invited to join \"%1\"").arg(tName), false)
-				AuthorizationController.tenantInvitationReceived(notification)
-				root.subscriptionInvitationReceived(notification)
-			} else if (notificationType === "InvitationAccepted" || notificationType === 1) {
-				AuthorizationController.tenantInvitationAccepted(notification)
-				root.subscriptionInvitationAccepted(notification)
-			} else if (notificationType === "InvitationRejected" || notificationType === 2) {
-				AuthorizationController.tenantInvitationRejected(notification)
-				root.subscriptionInvitationRejected(notification)
-			} else if (notificationType === "OwnershipTransferred" || notificationType === 3) {
-				AuthorizationController.tenantOwnershipTransferred(notification)
-				root.subscriptionOwnershipTransferred(notification)
-			} else if (notificationType === "MembershipRoleChanged" || notificationType === 4) {
-				AuthorizationController.tenantMembershipRoleChanged(notification)
-				root.subscriptionMembershipRoleChanged(notification)
-			} else if (notificationType === "MembershipRemoved" || notificationType === 5) {
-				AuthorizationController.tenantMembershipRemoved(notification)
-				root.subscriptionMembershipRemoved(notification)
-			}
+		function onTenantInvitationReceived(notification) {
+			root.subscriptionInvitationReceived(notification)
+		}
+		function onTenantInvitationAccepted(notification) {
+			root.subscriptionInvitationAccepted(notification)
+		}
+		function onTenantInvitationRejected(notification) {
+			root.subscriptionInvitationRejected(notification)
+		}
+		function onTenantOwnershipTransferred(notification) {
+			root.subscriptionOwnershipTransferred(notification)
+		}
+		function onTenantMembershipRoleChanged(notification) {
+			root.subscriptionMembershipRoleChanged(notification)
+		}
+		function onTenantMembershipRemoved(notification) {
+			root.subscriptionMembershipRemoved(notification)
 		}
 	}
 

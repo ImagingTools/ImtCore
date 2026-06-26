@@ -162,14 +162,14 @@ Item {
 		Rectangle {
 			id: invitationBadge
 			visible: AuthorizationController.pendingInvitationsCount > 0
-			width: 12
-			height: 12
-			radius: 6
+			width: 8
+			height: 8
+			radius: 4
 			color: Style.imaginToolsAccentColor
 			anchors.top: parent.top
 			anchors.right: parent.right
-			anchors.topMargin: 2
-			anchors.rightMargin: 2
+			anchors.topMargin: 4
+			anchors.rightMargin: 4
 			z: parent.z + 1
 		}
 	}

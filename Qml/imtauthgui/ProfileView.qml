@@ -26,6 +26,7 @@ ViewBase {
 	
 	Component.onCompleted: {
 		getProfileRequest.send();
+		container.__loadOrganizations();
 	}
 	
 	function updateGui(){
@@ -331,6 +332,86 @@ ViewBase {
 				}
 			}
 			
+			Text {
+				width: parent.width;
+				text: qsTr("Organizations");
+				visible: organizationsGroup.visible;
+				color: Style.textColor;
+				font.family: Style.fontFamilyBold;
+				font.pixelSize: Style.fontSizeXXL;
+			}
+
+			Rectangle {
+				id: organizationsGroup;
+				width: parent.width;
+				height: organizationsColumn.height + 2 * Style.marginM;
+				visible: container.__organizationsList.length > 0;
+				border.width: 1;
+				border.color: Style.borderColor;
+				radius: Style.marginXS;
+				color: Style.baseColor;
+
+				Column {
+					id: organizationsColumn;
+					anchors.left: parent.left;
+					anchors.right: parent.right;
+					anchors.top: parent.top;
+					anchors.margins: Style.marginM;
+					spacing: Style.spacingM;
+
+					Repeater {
+						model: container.__organizationsList
+
+						delegate: Rectangle {
+							width: organizationsColumn.width
+							height: Style.controlHeightM
+							color: "transparent"
+
+							Text {
+								anchors.verticalCenter: parent.verticalCenter
+								anchors.left: parent.left
+								anchors.leftMargin: Style.marginM
+								anchors.right: leaveBtn.left
+								anchors.rightMargin: Style.marginM
+								text: modelData.name ? modelData.name : modelData.id
+								font.pixelSize: Style.fontSizeM
+								font.family: Style.fontFamily
+								color: Style.textColor
+								elide: Text.ElideRight
+							}
+
+							Rectangle {
+								id: leaveBtn
+								visible: !modelData.isDelegated
+								anchors.verticalCenter: parent.verticalCenter
+								anchors.right: parent.right
+								anchors.rightMargin: Style.marginM
+								width: leaveLabel.contentWidth + 2 * Style.marginL
+								height: Style.controlHeightS
+								radius: Style.radiusM
+								color: "#DA3633"
+
+								Text {
+									id: leaveLabel
+									anchors.centerIn: parent
+									text: qsTr("Leave")
+									font.pixelSize: Style.fontSizeS
+									color: "#FFFFFF"
+								}
+
+								MouseArea {
+									anchors.fill: parent
+									cursorShape: Qt.PointingHandCursor
+									onClicked: {
+										container.__confirmLeaveTenant(modelData.id, modelData.name)
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
 			GroupHeaderView {
 				width: parent.width;
 				title: qsTr("Roles");
@@ -473,6 +554,135 @@ ViewBase {
 							"tenantName": "",
 							"role": ""
 						})
+					} else if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+					}
+				}
+			}
+		}
+
+		function onError(message, type) {
+			ModalDialogManager.showInfoDialog(message)
+		}
+	}
+
+	// --- Organizations list ---
+	property var __organizationsList: []
+
+	function __loadOrganizations() {
+		if (!AuthorizationController.userTokenProvider.userId)
+			return
+		__organizationsRequest.send(__organizationsInput)
+	}
+
+	property GetProfileInput __organizationsInput: GetProfileInput {
+		m_id: AuthorizationController.userTokenProvider.userId
+		m_productId: AuthorizationController.productId
+	}
+
+	GqlSdlRequestSender {
+		id: __organizationsRequest
+		requestType: 0
+		gqlCommandId: ImtauthProfileSdlCommandIds.s_getUserOrganizations
+
+		sdlObjectComp: Component {
+			GetUserOrganizationsPayload {
+				onFinished: {
+					var orgs = m_organizations
+					var list = []
+					if (orgs) {
+						for (var i = 0; i < orgs.count; i++) {
+							var org = orgs.get(i).item
+							if (org && org.m_isActive) {
+								var displayName = org.m_name || org.m_id || ""
+								var isDelegated = org.m_isDelegated || false
+								if (isDelegated)
+									displayName = displayName + " " + qsTr("(delegated)")
+								list.push({
+									id: org.m_id || "",
+									name: displayName,
+									isDelegated: isDelegated
+								})
+							}
+						}
+					}
+					container.__organizationsList = list
+				}
+			}
+		}
+	}
+
+	// --- Leave organization ---
+	function __confirmLeaveTenant(tenantId, tenantName) {
+		__leaveConfirmTenantId = tenantId
+		__leaveConfirmTenantName = tenantName || tenantId
+		ModalDialogManager.openDialog(__leaveConfirmDialogComp, {"tenantId": tenantId, "tenantName": __leaveConfirmTenantName})
+	}
+
+	property string __leaveConfirmTenantId: ""
+	property string __leaveConfirmTenantName: ""
+
+	Component {
+		id: __leaveConfirmDialogComp
+		MessageDialog {
+			property string tenantId: ""
+			property string tenantName: ""
+			width: Style.sizeHintM
+			title: qsTr("Leave organization")
+			message: qsTr("Are you sure you want to leave \"%1\"?").arg(tenantName)
+			onFinished: {
+				if (buttonId == Enums.yes) {
+					container.__leaveTenant(tenantId)
+				}
+			}
+		}
+	}
+
+	function __leaveTenant(tenantId) {
+		if (!tenantId) return
+		__leaveTenantId = tenantId
+		__findMembershipForLeaveInput.m_userId = AuthorizationController.userTokenProvider.userId
+		__findMembershipForLeaveInput.m_tenantId = tenantId
+		__findMembershipForLeaveSender.send(__findMembershipForLeaveInput)
+	}
+
+	property string __leaveTenantId: ""
+
+	property FindMembershipInput __findMembershipForLeaveInput: FindMembershipInput {}
+	property GqlSdlRequestSender __findMembershipForLeaveSender: GqlSdlRequestSender {
+		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_findMembership
+
+		sdlObjectComp: Component {
+			FindMembershipPayload {
+				onFinished: {
+					if (m_membership && m_membership.m_id && m_membership.m_id !== "") {
+						container.__removeMembershipForLeaveInput.m_membershipId = m_membership.m_id
+						container.__removeMembershipForLeaveSender.send(container.__removeMembershipForLeaveInput)
+					} else if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+					}
+				}
+			}
+		}
+
+		function onError(message, type) {
+			ModalDialogManager.showInfoDialog(message)
+		}
+	}
+
+	property RemoveMembershipInput __removeMembershipForLeaveInput: RemoveMembershipInput {}
+	property GqlSdlRequestSender __removeMembershipForLeaveSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_removeMembership
+
+		sdlObjectComp: Component {
+			RemoveMembershipPayload {
+				onFinished: {
+					if (m_success) {
+						if (container.__leaveTenantId === AuthorizationController.currentTenantId) {
+							AuthorizationController.selectTenant("")
+						}
+						container.__loadOrganizations()
 					} else if (m_errorMessage && m_errorMessage !== "") {
 						ModalDialogManager.showInfoDialog(m_errorMessage)
 					}
