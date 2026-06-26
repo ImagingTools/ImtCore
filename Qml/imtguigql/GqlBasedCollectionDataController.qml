@@ -133,7 +133,16 @@ CollectionDataController {
 		sdlObjectComp: Component {
 			RemoveElementsPayload {
 				onFinished: {
-					root.objectsRemoved()
+					if (m_success){
+						root.objectsRemoved()
+					}
+					else{
+						let message = m_errorMessage
+						if (!message || message === ""){
+							message = qsTr("Unable to remove selected element(s)")
+						}
+						ModalDialogManager.showErrorDialog(message)
+					}
 				}
 			}
 		}
@@ -157,7 +166,16 @@ CollectionDataController {
 		sdlObjectComp: Component {
 			RemoveElementSetPayload {
 				onFinished: {
-					root.objectsRemoved()
+					if (m_success){
+						root.objectsRemoved()
+					}
+					else{
+						let message = m_errorMessage
+						if (!message || message === ""){
+							message = qsTr("Unable to remove selected element(s)")
+						}
+						ModalDialogManager.showErrorDialog(message)
+					}
 				}
 			}
 		}

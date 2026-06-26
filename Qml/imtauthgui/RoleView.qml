@@ -19,25 +19,37 @@ ViewBase {
 	property var permissionsProvider: null;
 	property string __lastRequestedProductId: ""
 	property string __lastRequestedTenantId: ""
+	property bool __pendingPermissionsRequest: false
 	
 	property RoleData roleData: model;
 
 	Component.onCompleted: {
+		container.__pendingPermissionsRequest = true
 		container.__requestPermissions(true)
 		container.__rebuildPermissionsTree()
 	}
 
 	onProductIdChanged: {
+		container.__pendingPermissionsRequest = true
 		container.__requestPermissions(true)
 	}
 
 	onTenantIdChanged: {
+		container.__pendingPermissionsRequest = true
 		container.__requestPermissions(true)
+	}
+
+	onVisibleChanged: {
+		if (container.visible) {
+			container.__pendingPermissionsRequest = false
+			container.__requestPermissions(true)
+		}
 	}
 
 	onPermissionsProviderChanged: {
 		container.__lastRequestedProductId = ""
 		container.__lastRequestedTenantId = ""
+		container.__pendingPermissionsRequest = true
 		container.__requestPermissions(true)
 		container.__rebuildPermissionsTree()
 	}
@@ -54,6 +66,15 @@ ViewBase {
 		}
 	}
 
+	Connections {
+		target: permissionsTableElementView
+
+		function onBottomItemChanged() {
+			container.__requestPermissions(false)
+			container.__rebuildPermissionsTree()
+		}
+	}
+
 	function __requestPermissions(force) {
 		if (!container.permissionsProvider)
 			return false
@@ -61,17 +82,27 @@ ViewBase {
 		if (container.productId === "")
 			return false
 
+		if (!container.visible && !force) {
+			container.__pendingPermissionsRequest = true
+			return false
+		}
+
 		var requestTenantId = container.tenantId || ""
+		if (container.permissionsProvider.loading
+				&& container.__lastRequestedProductId === container.productId
+				&& container.__lastRequestedTenantId === requestTenantId)
+			return true
+
 		if (!force
 				&& container.__lastRequestedProductId === container.productId
-				&& container.__lastRequestedTenantId === requestTenantId
-				&& container.permissionsProvider.loading)
+				&& container.__lastRequestedTenantId === requestTenantId)
 			return true
 
 		container.permissionsProvider.productId = container.productId
 		container.__lastRequestedProductId = container.productId
 		container.__lastRequestedTenantId = requestTenantId
-		container.permissionsProvider.requestPermissions(requestTenantId)
+		container.__pendingPermissionsRequest = false
+		container.permissionsProvider.requestPermissions(requestTenantId, force === true)
 		return true
 	}
 
@@ -82,7 +113,7 @@ ViewBase {
 		var requestTenantId = container.tenantId || ""
 		if (requestTenantId !== "") {
 			if (container.permissionsProvider.tenantPermissionsTenantId !== requestTenantId)
-				return []
+				return container.permissionsProvider.permissions || []
 			return container.permissionsProvider.tenantPermissions || []
 		}
 
@@ -288,13 +319,22 @@ ViewBase {
 				ElementView {
 					id: permissionsTableElementView
 					width: parent.width
+					border.width: 0
+					color: "transparent"
+					radius: 0
+					contentMargin: Style.marginL
+					contentSpacing: 0
+					height: contentHeight
 					bottomComp: Component {
 						PermissionsTableView {
 							id: permissionsTableView
-							height: 500
-							anchors.horizontalCenter: parent.horizontalCenter
+							width: parent.width
+							height: preferredHeight
 							showControlPanel: true
 							treeToScrollbarSpacing: 0
+							controlPanelTopMargin: Style.marginL
+							treeTopMargin: Style.marginL
+							treeBottomMargin: Style.marginL
 		
 							onSelectionChanged: {
 								container.doUpdateModel()
@@ -328,6 +368,8 @@ ViewBase {
 		}
 
 		if (permissionsTableElementView.bottomItem){
+			// Only leaf permission IDs must be stored (groups/parents are excluded even
+			// when tristate check selected the whole subtree).
 			var selectedPermissionIds = permissionsTableElementView.bottomItem.getCheckedIds()
 			container.roleData.m_permissions = selectedPermissionIds.join(';')
 		}

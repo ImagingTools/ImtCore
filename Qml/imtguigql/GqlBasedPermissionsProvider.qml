@@ -19,6 +19,9 @@ PermissionsProvider {
 
     property GetProductPermissionsInput __requestInput: GetProductPermissionsInput {}
     property string __pendingTenantId: ""
+    property string __pendingProductId: ""
+    property string __allPermissionsProductId: ""
+    property string __tenantPermissionsProductId: ""
 
     property GqlSdlRequestSender __requestSender: GqlSdlRequestSender {
         gqlCommandId: ImtauthPermissionsSdlCommandIds.s_getProductPermissions
@@ -38,7 +41,7 @@ PermissionsProvider {
         }
     }
 
-    function requestPermissions(tenantId) {
+    function requestPermissions(tenantId, forceReload) {
         if (gqlPermissionsProvider.productId === "") {
             var message = "Unable to request permissions. Product-ID is empty"
             gqlPermissionsProvider.lastError = message
@@ -46,9 +49,44 @@ PermissionsProvider {
             return
         }
 
+        var requestedTenantId = tenantId || ""
+        var shouldForceReload = forceReload === true
+
+        // Reuse in-memory cache for identical tenant/product pair.
+        if (!shouldForceReload
+                && requestedTenantId !== ""
+                && gqlPermissionsProvider.tenantPermissionsTenantId === requestedTenantId
+            && gqlPermissionsProvider.__tenantPermissionsProductId === gqlPermissionsProvider.productId
+                && gqlPermissionsProvider.tenantPermissions
+                && gqlPermissionsProvider.tenantPermissions.length > 0) {
+            gqlPermissionsProvider.permissions = gqlPermissionsProvider.tenantPermissions
+            gqlPermissionsProvider.permissionsReceived(gqlPermissionsProvider.tenantPermissions, requestedTenantId)
+            gqlPermissionsProvider.tenantPermissionsReceived(requestedTenantId)
+            return
+        }
+
+        if (!shouldForceReload
+            && requestedTenantId === ""
+            && gqlPermissionsProvider.__allPermissionsProductId === gqlPermissionsProvider.productId
+                && gqlPermissionsProvider.allPermissions
+                && gqlPermissionsProvider.allPermissions.length > 0) {
+            gqlPermissionsProvider.permissions = gqlPermissionsProvider.allPermissions
+            gqlPermissionsProvider.permissionsReceived(gqlPermissionsProvider.allPermissions, "")
+            gqlPermissionsProvider.allPermissionsReceived()
+            return
+        }
+
+        // Ignore duplicate in-flight request for the same tenant/product pair.
+        if (gqlPermissionsProvider.loading
+                && gqlPermissionsProvider.__pendingTenantId === requestedTenantId
+                && gqlPermissionsProvider.__pendingProductId === gqlPermissionsProvider.productId) {
+            return
+        }
+
         gqlPermissionsProvider.loading = true
         gqlPermissionsProvider.lastError = ""
-        gqlPermissionsProvider.__pendingTenantId = tenantId || ""
+        gqlPermissionsProvider.__pendingTenantId = requestedTenantId
+        gqlPermissionsProvider.__pendingProductId = gqlPermissionsProvider.productId
 
         gqlPermissionsProvider.__requestInput.m_productId = gqlPermissionsProvider.productId
         gqlPermissionsProvider.__requestInput.m_tenantId = gqlPermissionsProvider.__pendingTenantId
@@ -97,9 +135,11 @@ PermissionsProvider {
         if (tenantId && tenantId !== "") {
             gqlPermissionsProvider.tenantPermissionsTenantId = tenantId
             gqlPermissionsProvider.tenantPermissions = parsedPermissions
+            gqlPermissionsProvider.__tenantPermissionsProductId = gqlPermissionsProvider.productId
             gqlPermissionsProvider.tenantPermissionsReceived(tenantId)
         } else {
             gqlPermissionsProvider.allPermissions = parsedPermissions
+            gqlPermissionsProvider.__allPermissionsProductId = gqlPermissionsProvider.productId
             gqlPermissionsProvider.allPermissionsReceived()
         }
     }
