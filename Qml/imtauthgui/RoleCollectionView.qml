@@ -63,6 +63,7 @@ RemoteCollectionView {
 		if (!roleCollectionViewContainer.productId || roleCollectionViewContainer.productId === "")
 			return
 
+		roleCollectionViewContainer.__permissionsProvider.productId = roleCollectionViewContainer.productId
 		if (roleCollectionViewContainer.tenantId && roleCollectionViewContainer.tenantId !== "")
 			roleCollectionViewContainer.__permissionsProvider.requestPermissions(roleCollectionViewContainer.tenantId)
 		else

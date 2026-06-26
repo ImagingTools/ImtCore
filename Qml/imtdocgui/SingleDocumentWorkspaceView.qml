@@ -39,6 +39,10 @@ Rectangle {
 
 		function onDocumentSaved(documentId){
 			Events.sendEvent("StopLoading")
+			let documentData = root.documentManager.getDocumentDataById(documentId)
+			if (documentData && documentData.view && documentData.view.commandsController){
+				documentData.view.commandsController.setCommandIsEnabled("Save", false)
+			}
 			let typeId = root.documentManager.getDocumentTypeId(documentId);
 			
 			if (root.visualStatusProvider){
