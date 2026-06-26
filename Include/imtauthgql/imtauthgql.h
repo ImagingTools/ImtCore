@@ -815,9 +815,9 @@ inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const QByteArray& te
 
 /**
 	Create an optional tenant filter param from the GQL request context.
-	Returns nullptr when no request context is available.
-	When tenant id is empty (NoOrganization), returns an empty-tenant filter so
-	storage delegates can apply no-organization isolation (NOT EXISTS binding).
+	Returns nullptr when no request context is available or when the tenant id
+	is empty (NoOrganization mode), so that all system users are returned
+	without binding-based isolation.
 	The returned pointer is owned by the caller (ParamsSet takes ownership via SetEditableParameter).
 */
 inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRequest& gqlRequest)
@@ -827,8 +827,13 @@ inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRe
 		return nullptr;
 	}
 
+	QByteArray tenantId = gqlContextPtr->GetTenantId();
+	if (tenantId.isEmpty()){
+		return nullptr;
+	}
+
 	imtauth::CTenantFilterParam* tenantFilterPtr = new imtauth::CTenantFilterParam();
-	tenantFilterPtr->SetTenantId(gqlContextPtr->GetTenantId());
+	tenantFilterPtr->SetTenantId(tenantId);
 
 	return tenantFilterPtr;
 }
