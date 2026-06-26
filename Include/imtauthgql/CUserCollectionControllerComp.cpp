@@ -15,6 +15,11 @@
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtauth/CUserInfo.h>
 #include <imtgql/IGqlContext.h>
+#include <imtauth/ITenantManager.h>
+#include <imtauth/ITenantEntityBindingManager.h>
+#include <imtauth/IPersonalAccessTokenManager.h>
+#include <imtauth/ITenantInvitation.h>
+#include <imtauth/ISession.h>
 
 
 namespace imtauthgql
@@ -230,7 +235,7 @@ sdl::V1_0::imtbase::CGetElementMetaInfoPayload CUserCollectionControllerComp::On
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		errorMessage = QString("Unable to get element meta info for user '%1'. Error: User does not exists");
+		errorMessage = QString("Unable to get element meta info for user '%1'. Error: User does not exists").arg(objectId);
 		return response;
 	}
 
@@ -814,6 +819,94 @@ QJsonObject CUserCollectionControllerComp::InsertObject(
 	}
 
 	return result;
+}
+
+
+// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
+bool CUserCollectionControllerComp::OnBeforeRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	if (m_tenantManagerCompPtr.IsValid()){
+		for (const QByteArray& userId : elementIds){
+			QByteArrayList tenantIds = m_tenantManagerCompPtr->GetTenantIds();
+			for (const QByteArray& tenantId : tenantIds){
+				imtauth::ITenantInfoUniquePtr tenantPtr = m_tenantManagerCompPtr->GetTenant(tenantId);
+				if (tenantPtr.IsValid() && tenantPtr->GetOwnerId() == userId){
+					errorMessage = QString("Cannot delete user '%1' who owns tenant '%2'. Transfer ownership first.")
+						.arg(QString::fromUtf8(userId), QString::fromUtf8(tenantId));
+					return false;
+				}
+			}
+		}
+	}
+	return BaseClass::OnBeforeRemoveElements(elementIds, gqlRequest, errorMessage);
+}
+
+void CUserCollectionControllerComp::OnAfterRemoveElements(const QByteArrayList& elementIds, const ::imtgql::CGqlRequest& gqlRequest) const
+{
+	for (const QByteArray& userId : elementIds){
+		// 1. Clean TenantMemberships directly (bypasses owner protection; owner deletes are blocked in OnBefore)
+		QByteArrayList memIds;
+		if (m_membershipManagerCompPtr.IsValid()){
+			memIds = m_membershipManagerCompPtr->GetMembershipsByUser(userId);
+		}
+		if (m_membershipCollectionCompPtr.IsValid() && !memIds.isEmpty()){
+			m_membershipCollectionCompPtr->RemoveElements(memIds);
+		}
+
+		// 2. Force-clean any remaining TenantEntityBindings for this user (e.g. non-mem cases)
+		if (m_bindingManagerCompPtr.IsValid()){
+			m_bindingManagerCompPtr->RemoveAllBindingsForEntity(QByteArrayLiteral("Users"), userId);
+		}
+
+		// 3. Clean TenantInvitations where user is involved (as target, inviter or revoker)
+		if (m_invitationCollectionCompPtr.IsValid()){
+			QByteArrayList all = m_invitationCollectionCompPtr->GetElementIds();
+			QByteArrayList toRemove;
+			for (const QByteArray& iid : all){
+				imtbase::IObjectCollection::DataPtr dptr;
+				if (m_invitationCollectionCompPtr->GetObjectData(iid, dptr)){
+					const imtauth::ITenantInvitation* inv = dynamic_cast<const imtauth::ITenantInvitation*>(dptr.GetPtr());
+					if (inv != nullptr &&
+						(inv->GetUserId() == userId ||
+						 inv->GetInvitedByUserId() == userId ||
+						 inv->GetRevokedByUserId() == userId)){
+						toRemove.append(iid);
+					}
+				}
+			}
+			if (!toRemove.isEmpty()){
+				m_invitationCollectionCompPtr->RemoveElements(toRemove);
+			}
+		}
+
+		// 4. Clean PersonalAccessTokens for the user
+		if (m_personalAccessTokenManagerCompPtr.IsValid()){
+			QByteArrayList tids = m_personalAccessTokenManagerCompPtr->GetTokenIds(userId);
+			for (const QByteArray& tid : tids){
+				m_personalAccessTokenManagerCompPtr->DeleteToken(tid);
+			}
+		}
+
+		// 5. Clean UserSessions for the user
+		if (m_sessionCollectionCompPtr.IsValid()){
+			QByteArrayList all = m_sessionCollectionCompPtr->GetElementIds();
+			QByteArrayList toRemove;
+			for (const QByteArray& sid : all){
+				imtbase::IObjectCollection::DataPtr dptr;
+				if (m_sessionCollectionCompPtr->GetObjectData(sid, dptr)){
+					const imtauth::ISession* sess = dynamic_cast<const imtauth::ISession*>(dptr.GetPtr());
+					if (sess != nullptr && sess->GetUserId() == userId){
+						toRemove.append(sid);
+					}
+				}
+			}
+			if (!toRemove.isEmpty()){
+				m_sessionCollectionCompPtr->RemoveElements(toRemove);
+			}
+		}
+	}
+
+	BaseClass::OnAfterRemoveElements(elementIds, gqlRequest);
 }
 
 
