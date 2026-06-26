@@ -97,7 +97,7 @@ bool CQmlProcessorsManagerComp::CreateCode()
 		Q_ASSERT(codeGeneratorPtr != nullptr);
 
 		if (codeGeneratorPtr != nullptr){
-			int processResultResult = codeGeneratorPtr->DoProcessing(nullptr, nullptr, nullptr, progressManagerPtr, processingReportPtr);
+			int processResultResult = codeGeneratorPtr->DoProcessing(nullptr, nullptr, nullptr, nullptr, nullptr);
 
 			if (processResultResult != iproc::IProcessor::TS_OK){
 				SendCriticalMessage(0, QString("Unable to process schema: '%1'").arg(m_sdlArgumentParserCompPtr->GetSchemaFilePath()));
