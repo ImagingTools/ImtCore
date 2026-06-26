@@ -255,7 +255,7 @@ ViewBase {
 					Repeater {
 						model: AuthorizationController.pendingInvitations
 
-						Rectangle {
+						delegate: Rectangle {
 							width: invitationsColumn.width
 							height: Style.controlHeightM
 							color: "transparent"
