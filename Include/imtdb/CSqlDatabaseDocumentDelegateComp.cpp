@@ -974,7 +974,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 						valuesClause
 					);
 
-	if (!tenantId.isEmpty()){
+	if (ShouldCreateTenantBinding(tenantId)){
 		query += CreateTenantBindingInsertQuery(tenantId, objectId, operationContextPtr);
 	}
 
@@ -1237,11 +1237,17 @@ QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingFilterQuery(const Q
 		return QString("EXISTS (%1)").arg(bindingsLookup);
 	}
 
-	// NoOrganization mode: empty TenantId binding and missing binding are equivalent.
-	// Keep only records that have no non-empty tenant binding.
-	QString nonEmptyTenantBindingsLookup = bindingsLookup
-			+ QString(" AND COALESCE(tenantBindings.\"TenantId\", '') <> ''");
-	return QString("NOT EXISTS (%1)").arg(nonEmptyTenantBindingsLookup);
+	if (GetEmptyTenantFilterBehavior() == EmptyTenantFilterBehavior::EFB_IGNORE_BINDINGS){
+		return QString();
+	}
+
+	QString emptyTenantBindingsLookup = bindingsLookup
+			+ QString(" AND COALESCE(tenantBindings.\"TenantId\", '') = ''");
+	if (filterMode == imtauth::TFM_EXCLUDE){
+		return QString("NOT EXISTS (%1)").arg(emptyTenantBindingsLookup);
+	}
+
+	return QString("EXISTS (%1)").arg(emptyTenantBindingsLookup);
 }
 
 
@@ -1306,6 +1312,18 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingDeleteQuery(cons
 					quotedIds.join(','));
 
 	return query.toUtf8();
+}
+
+
+CSqlDatabaseDocumentDelegateComp::EmptyTenantFilterBehavior CSqlDatabaseDocumentDelegateComp::GetEmptyTenantFilterBehavior() const
+{
+	return EmptyTenantFilterBehavior::EFB_MATCH_EMPTY_BINDING;
+}
+
+
+bool CSqlDatabaseDocumentDelegateComp::ShouldCreateTenantBinding(const QByteArray& tenantId) const
+{
+	return !tenantId.isEmpty();
 }
 
 

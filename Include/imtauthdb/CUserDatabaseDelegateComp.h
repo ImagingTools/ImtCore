@@ -42,6 +42,8 @@ public:
 	virtual bool CreateSortQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& sortQuery) const override;
 	virtual QByteArray CreateJoinTablesQuery() const override;
 	virtual QByteArray GetCustomColumnsQuery() const override;
+	virtual EmptyTenantFilterBehavior GetEmptyTenantFilterBehavior() const override;
+	virtual bool ShouldCreateTenantBinding(const QByteArray& tenantId) const override;
 
 private:
 	I_REF(imtdb::ISqlDatabaseObjectDelegate, m_userGroupDatabaseDelegateCompPtr);
@@ -50,5 +52,4 @@ private:
 
 
 } // namespace imtauthdb
-
 

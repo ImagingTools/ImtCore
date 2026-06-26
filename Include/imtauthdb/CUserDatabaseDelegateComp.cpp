@@ -231,6 +231,17 @@ QByteArray CUserDatabaseDelegateComp::GetCustomColumnsQuery() const
 }
 
 
-} // namespace imtauthdb
+CSqlDatabaseDocumentDelegateComp::EmptyTenantFilterBehavior CUserDatabaseDelegateComp::GetEmptyTenantFilterBehavior() const
+{
+	return EmptyTenantFilterBehavior::EFB_IGNORE_BINDINGS;
+}
 
+
+bool CUserDatabaseDelegateComp::ShouldCreateTenantBinding(const QByteArray& /*tenantId*/) const
+{
+	return false;
+}
+
+
+} // namespace imtauthdb
 

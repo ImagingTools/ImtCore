@@ -34,6 +34,12 @@ class CSqlDatabaseDocumentDelegateComp:
 {
 public:
 	typedef imtdb::CSqlDatabaseObjectDelegateCompBase BaseClass;
+
+	enum class EmptyTenantFilterBehavior
+	{
+		EFB_MATCH_EMPTY_BINDING = 0,
+		EFB_IGNORE_BINDINGS = 1
+	};
 	
 	static const QByteArray s_idColumn;
 	static const QByteArray s_typeIdColumn;
@@ -166,6 +172,8 @@ protected:
 	virtual QString CreateTenantBindingFilterQuery(const QByteArray& tenantId, imtauth::TenantFilterMode filterMode = imtauth::TFM_INCLUDE) const;
 	virtual QByteArray CreateTenantBindingInsertQuery(const QByteArray& tenantId, const QByteArray& entityId, const imtbase::IOperationContext* operationContextPtr) const;
 	virtual QByteArray CreateTenantBindingDeleteQuery(const QByteArrayList& entityIds) const;
+	virtual EmptyTenantFilterBehavior GetEmptyTenantFilterBehavior() const;
+	virtual bool ShouldCreateTenantBinding(const QByteArray& tenantId) const;
 
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 	virtual QString GetBaseSelectionQuery() const override;
