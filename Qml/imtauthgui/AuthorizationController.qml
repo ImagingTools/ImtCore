@@ -35,12 +35,13 @@ QtObject {
 	// Emitted by membership-aware views (e.g. TenantCollectionView) so other
 	// components anywhere in the app (e.g. an open TenantEditor) can react and
 	// reload without being directly coupled to the originating view.
-	signal tenantInvitationReceived(var notification);
-	signal tenantInvitationAccepted(var notification);
-	signal tenantInvitationRejected(var notification);
-	signal tenantOwnershipTransferred(var notification);
-	signal tenantMembershipRoleChanged(var notification);
-	signal tenantMembershipRemoved(var notification);
+	signal tenantInvitationReceived(string tenantId, string tenantName, string role);
+	signal tenantInvitationAccepted(string tenantId, string membershipId);
+	signal tenantInvitationRejected(string tenantId, string membershipId);
+	signal tenantOwnershipTransferred(string tenantId);
+	signal tenantMembershipRoleChanged(string tenantId, string userId, string role);
+	signal tenantMembershipRemoved(string tenantId, string userId);
+	signal tenantInvitationRevoked(string tenantId, string invitationId);
 
 	// Properties to store remember me state and credentials
 	property bool rememberMe: false
@@ -116,46 +117,59 @@ QtObject {
 	onLastUserChanged: saveLoginSettings()
 	onStoredRefreshTokenChanged: saveLoginSettings()
 
-	// Refresh pending invitations on relevant events
-	onLoggedIn: refreshPendingInvitations()
+	// Refresh pending invitations on relevant events (including when sender revokes)
+	onLoggedIn: {
+		refreshPendingInvitations()
+		__membershipSubscription.registerSubscription()
+		tenantCollectionListener.registerSubscription()
+	}
+	onLoggedOut: {
+		__membershipSubscription.unRegisterSubscription()
+		tenantCollectionListener.unRegisterSubscription()
+	}
 	onTenantInvitationReceived: refreshPendingInvitations()
 	onTenantInvitationAccepted: refreshPendingInvitations()
 	onTenantInvitationRejected: refreshPendingInvitations()
+	onTenantInvitationRevoked: refreshPendingInvitations()
 
 	// --- Subscription client for membership notifications ---
 	property SubscriptionClient __membershipSubscription: SubscriptionClient {
 		gqlCommandId: "OnMembershipNotification"
+		autoSubscribe: false
 
 		function getHeaders() { return {} }
 
 		onMessageReceived: {
 			if (!data) return
-			var notificationType = ""
-			if (data.containsKey("notificationType"))
-				notificationType = data.getData("notificationType")
-
-			var notification = {
-				"membershipId": data.containsKey("membershipId") ? data.getData("membershipId") : "",
-				"userId": data.containsKey("userId") ? data.getData("userId") : "",
-				"tenantId": data.containsKey("tenantId") ? data.getData("tenantId") : "",
-				"tenantName": data.containsKey("tenantName") ? data.getData("tenantName") : "",
-				"role": data.containsKey("role") ? data.getData("role") : ""
-			}
+			var notificationType = data.containsKey("notificationType") ? data.getData("notificationType") : ""
+			var membershipId = data.containsKey("membershipId") ? data.getData("membershipId") : ""
+			var userId = data.containsKey("userId") ? data.getData("userId") : ""
+			var tenantId = data.containsKey("tenantId") ? data.getData("tenantId") : ""
+			var tenantName = data.containsKey("tenantName") ? data.getData("tenantName") : ""
+			var role = data.containsKey("role") ? data.getData("role") : ""
+			var tName = tenantName ? tenantName : qsTr("a tenant")
 
 			if (notificationType === "InvitationReceived" || notificationType === 0) {
-				var tName = notification.tenantName ? notification.tenantName : qsTr("a tenant")
 				PopupManager.addInfoMessage(qsTr("You have been invited to join \"%1\"").arg(tName), false)
-				root.tenantInvitationReceived(notification)
+				root.tenantInvitationReceived(tenantId, tenantName, role)
 			} else if (notificationType === "InvitationAccepted" || notificationType === 1) {
-				root.tenantInvitationAccepted(notification)
+				PopupManager.addInfoMessage(qsTr("Invitation accepted for \"%1\"").arg(tName), false)
+				root.tenantInvitationAccepted(tenantId, membershipId)
 			} else if (notificationType === "InvitationRejected" || notificationType === 2) {
-				root.tenantInvitationRejected(notification)
+				PopupManager.addInfoMessage(qsTr("Invitation rejected for \"%1\"").arg(tName), false)
+				root.tenantInvitationRejected(tenantId, membershipId)
 			} else if (notificationType === "OwnershipTransferred" || notificationType === 3) {
-				root.tenantOwnershipTransferred(notification)
+				PopupManager.addInfoMessage(qsTr("Ownership transferred for \"%1\"").arg(tName), false)
+				root.tenantOwnershipTransferred(tenantId)
 			} else if (notificationType === "MembershipRoleChanged" || notificationType === 4) {
-				root.tenantMembershipRoleChanged(notification)
+				PopupManager.addInfoMessage(qsTr("Role changed in \"%1\"").arg(tName), false)
+				root.tenantMembershipRoleChanged(tenantId, userId, role)
 			} else if (notificationType === "MembershipRemoved" || notificationType === 5) {
-				root.tenantMembershipRemoved(notification)
+				PopupManager.addInfoMessage(qsTr("Removed from \"%1\"").arg(tName), false)
+				root.tenantMembershipRemoved(tenantId, userId)
+			} else if (notificationType === "InvitationRevoked" || notificationType === 6) {
+				PopupManager.addInfoMessage(qsTr("Invitation to join \"%1\" was revoked").arg(tName), false)
+				root.tenantInvitationRevoked(tenantId, membershipId)
 			}
 		}
 	}
@@ -495,6 +509,7 @@ QtObject {
 	property RemoteCollectionChangeListener tenantCollectionListener: RemoteCollectionChangeListener {
 		collectionId: "Tenants"
 		currentUserId: root.userTokenProvider.userId
+		autoSubscribe: false
 
 		onRemoved: {
 			console.log("RemoteCollectionChangeListener onRemoved", changeInfo)

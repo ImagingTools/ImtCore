@@ -42,11 +42,11 @@ Item {
 			root.__loadOrganizations();
 		}
 
-		function onTenantInvitationAccepted(notification){
+		function onTenantInvitationAccepted(tenantId, membershipId){
 			root.__loadOrganizations();
 		}
 
-		function onTenantInvitationRejected(notification){
+		function onTenantInvitationRejected(tenantId, membershipId){
 			root.__loadOrganizations();
 		}
 	}

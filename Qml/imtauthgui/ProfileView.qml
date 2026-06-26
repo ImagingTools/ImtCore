@@ -20,6 +20,40 @@ ViewBase {
 		}
 	}
 	
+	Connections {
+		target: AuthorizationController;
+		
+		function onTenantSelected(tenantId){
+			getProfileRequest.send();
+			container.__loadOrganizations();
+		}
+		
+		function onTenantInvitationAccepted(tenantId, membershipId){
+			getProfileRequest.send();
+			container.__loadOrganizations();
+		}
+		
+		function onTenantInvitationRejected(tenantId, membershipId){
+			getProfileRequest.send();
+			container.__loadOrganizations();
+		}
+		
+		function onTenantOwnershipTransferred(tenantId){
+			getProfileRequest.send();
+			container.__loadOrganizations();
+		}
+		
+		function onTenantMembershipRoleChanged(tenantId, userId, role){
+			getProfileRequest.send();
+			container.__loadOrganizations();
+		}
+		
+		function onTenantMembershipRemoved(tenantId, userId){
+			getProfileRequest.send();
+			container.__loadOrganizations();
+		}
+	}
+	
 	onProfileDataChanged: {
 		doUpdateGui();
 	}
@@ -286,6 +320,7 @@ ViewBase {
 									height: Style.controlHeightS
 									radius: Style.radiusM
 									color: Style.imaginToolsAccentColor
+									opacity: acceptMA.containsMouse ? 0.8 : 1
 
 									Text {
 										id: acceptLabel
@@ -296,7 +331,9 @@ ViewBase {
 									}
 
 									MouseArea {
+										id: acceptMA
 										anchors.fill: parent
+										hoverEnabled: true
 										cursorShape: Qt.PointingHandCursor
 										onClicked: {
 											container.acceptInvitation(modelData.id)
@@ -309,6 +346,7 @@ ViewBase {
 									height: Style.controlHeightS
 									radius: Style.radiusM
 									color: Style.negativeAccentColor
+									opacity: rejectMA.containsMouse ? 0.8 : 1
 
 									Text {
 										id: rejectLabel
@@ -319,7 +357,9 @@ ViewBase {
 									}
 
 									MouseArea {
+										id: rejectMA
 										anchors.fill: parent
+										hoverEnabled: true
 										cursorShape: Qt.PointingHandCursor
 										onClicked: {
 											container.rejectInvitation(modelData.id)
@@ -360,36 +400,95 @@ ViewBase {
 					spacing: Style.spacingM;
 
 					Repeater {
+						id: organizationsRepeater
 						model: container.__organizationsList
 
 						delegate: Rectangle {
 							width: organizationsColumn.width
-							height: Style.controlHeightM
-							color: "transparent"
+							height: Style.controlHeightL
+							color: modelData.id === AuthorizationController.currentTenantId ? Style.buttonHoverColor : "transparent"
 
-							Text {
+							Rectangle {
+								visible: modelData.id === AuthorizationController.currentTenantId
+								anchors.left: parent.left
+								anchors.top: parent.top
+								anchors.bottom: parent.bottom
+								width: 4
+								color: Style.imaginToolsAccentColor
+							}
+
+							Column {
+								id: orgCol
 								anchors.verticalCenter: parent.verticalCenter
 								anchors.left: parent.left
-								anchors.leftMargin: Style.marginM
-								anchors.right: leaveBtn.left
+								anchors.leftMargin: Style.marginL
+								anchors.right: leaveBtn.visible ? leaveBtn.left : (switchBtn.visible ? switchBtn.left : parent.right)
 								anchors.rightMargin: Style.marginM
-								text: modelData.name ? modelData.name : modelData.id
-								font.pixelSize: Style.fontSizeM
-								font.family: Style.fontFamily
-								color: Style.textColor
-								elide: Text.ElideRight
+								spacing: Style.marginXS
+
+								Text {
+									text: modelData.name ? modelData.name : modelData.id
+									font.pixelSize: Style.fontSizeM
+									font.bold: true
+									font.family: Style.fontFamily
+									color: Style.textColor
+									elide: Text.ElideRight
+									width: parent.width
+								}
+
+								Text {
+									visible: modelData.description && modelData.description !== ""
+									text: modelData.description
+									font.pixelSize: Style.fontSizeS
+									font.family: Style.fontFamily
+									color: Style.inactiveTextColor
+									elide: Text.ElideRight
+									width: parent.width
+								}
+							}
+
+							Rectangle {
+								id: switchBtn
+								visible: modelData.id !== AuthorizationController.currentTenantId
+								anchors.right: parent.right
+								anchors.rightMargin: Style.marginM
+								anchors.verticalCenter: orgCol.verticalCenter
+								width: switchLabel.contentWidth + 2 * Style.marginL
+								height: Style.controlHeightS
+								radius: Style.radiusM
+								color: Style.imaginToolsAccentColor
+								opacity: switchMA.containsMouse ? 0.8 : 1
+
+								Text {
+									id: switchLabel
+									anchors.centerIn: parent
+									text: qsTr("Switch")
+									font.pixelSize: Style.fontSizeS
+									color: Style.baseColor
+								}
+
+								MouseArea {
+									id: switchMA
+									anchors.fill: parent
+									hoverEnabled: true
+									cursorShape: Qt.PointingHandCursor
+									onClicked: {
+										AuthorizationController.selectTenant(modelData.id)
+									}
+								}
 							}
 
 							Rectangle {
 								id: leaveBtn
 								visible: !modelData.isDelegated
-								anchors.verticalCenter: parent.verticalCenter
-								anchors.right: parent.right
-								anchors.rightMargin: Style.marginM
+								anchors.right: switchBtn.visible ? switchBtn.left : parent.right
+								anchors.rightMargin: switchBtn.visible ? Style.marginS : Style.marginM
+								anchors.verticalCenter: orgCol.verticalCenter
 								width: leaveLabel.contentWidth + 2 * Style.marginL
 								height: Style.controlHeightS
 								radius: Style.radiusM
 								color: Style.negativeAccentColor
+								opacity: leaveMA.containsMouse ? 0.8 : 1
 
 								Text {
 									id: leaveLabel
@@ -400,7 +499,9 @@ ViewBase {
 								}
 
 								MouseArea {
+									id: leaveMA
 									anchors.fill: parent
+									hoverEnabled: true
 									cursorShape: Qt.PointingHandCursor
 									onClicked: {
 										container.__confirmLeaveTenant(modelData.id, modelData.name)
@@ -520,13 +621,7 @@ ViewBase {
 			AcceptTenantInvitationPayload {
 				onFinished: {
 					if (m_success) {
-						AuthorizationController.tenantInvitationAccepted({
-							"membershipId": "",
-							"userId": AuthorizationController.userTokenProvider ? AuthorizationController.userTokenProvider.userId : "",
-							"tenantId": "",
-							"tenantName": "",
-							"role": ""
-						})
+						AuthorizationController.tenantInvitationAccepted("", "")
 					} else if (m_errorMessage && m_errorMessage !== "") {
 						ModalDialogManager.showInfoDialog(m_errorMessage)
 					}
@@ -547,13 +642,7 @@ ViewBase {
 			RejectTenantInvitationPayload {
 				onFinished: {
 					if (m_success) {
-						AuthorizationController.tenantInvitationRejected({
-							"membershipId": "",
-							"userId": AuthorizationController.userTokenProvider ? AuthorizationController.userTokenProvider.userId : "",
-							"tenantId": "",
-							"tenantName": "",
-							"role": ""
-						})
+						AuthorizationController.tenantInvitationRejected("", "")
 					} else if (m_errorMessage && m_errorMessage !== "") {
 						ModalDialogManager.showInfoDialog(m_errorMessage)
 					}
@@ -601,6 +690,7 @@ ViewBase {
 								list.push({
 									id: org.m_id || "",
 									name: displayName,
+									description: org.m_description || "",
 									isDelegated: isDelegated
 								})
 							}

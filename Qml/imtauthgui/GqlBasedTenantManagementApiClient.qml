@@ -94,12 +94,12 @@ QtObject {
 	signal requestFailed(string message)
 
 	// --- Real-time membership subscription notifications ---
-	signal subscriptionInvitationReceived(var notification)
-	signal subscriptionInvitationAccepted(var notification)
-	signal subscriptionInvitationRejected(var notification)
-	signal subscriptionOwnershipTransferred(var notification)
-	signal subscriptionMembershipRoleChanged(var notification)
-	signal subscriptionMembershipRemoved(var notification)
+	signal subscriptionInvitationReceived(string tenantId, string tenantName, string role)
+	signal subscriptionInvitationAccepted(string tenantId, string membershipId)
+	signal subscriptionInvitationRejected(string tenantId, string membershipId)
+	signal subscriptionOwnershipTransferred(string tenantId)
+	signal subscriptionMembershipRoleChanged(string tenantId, string userId, string role)
+	signal subscriptionMembershipRemoved(string tenantId, string userId)
 
 	signal crossTenantMessageSent(string messageId)
 	signal crossTenantMessageStatusUpdated(string messageId)
@@ -145,23 +145,23 @@ QtObject {
 	property Connections __membershipNotificationRelay: Connections {
 		target: AuthorizationController
 
-		function onTenantInvitationReceived(notification) {
-			root.subscriptionInvitationReceived(notification)
+		function onTenantInvitationReceived(tenantId, tenantName, role) {
+			root.subscriptionInvitationReceived(tenantId, tenantName, role)
 		}
-		function onTenantInvitationAccepted(notification) {
-			root.subscriptionInvitationAccepted(notification)
+		function onTenantInvitationAccepted(tenantId, membershipId) {
+			root.subscriptionInvitationAccepted(tenantId, membershipId)
 		}
-		function onTenantInvitationRejected(notification) {
-			root.subscriptionInvitationRejected(notification)
+		function onTenantInvitationRejected(tenantId, membershipId) {
+			root.subscriptionInvitationRejected(tenantId, membershipId)
 		}
-		function onTenantOwnershipTransferred(notification) {
-			root.subscriptionOwnershipTransferred(notification)
+		function onTenantOwnershipTransferred(tenantId) {
+			root.subscriptionOwnershipTransferred(tenantId)
 		}
-		function onTenantMembershipRoleChanged(notification) {
-			root.subscriptionMembershipRoleChanged(notification)
+		function onTenantMembershipRoleChanged(tenantId, userId, role) {
+			root.subscriptionMembershipRoleChanged(tenantId, userId, role)
 		}
-		function onTenantMembershipRemoved(notification) {
-			root.subscriptionMembershipRemoved(notification)
+		function onTenantMembershipRemoved(tenantId, userId) {
+			root.subscriptionMembershipRemoved(tenantId, userId)
 		}
 	}
 
