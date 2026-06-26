@@ -320,6 +320,7 @@ QtObject {
 	function setDocumentObjectId(documentId, objectId){
 		let index = getDocumentIndexByDocumentId(documentId)
 		if (index < 0){
+			__internal.cachedDocumentObjectIds[documentId] = objectId
 			return
 		}
 
@@ -431,7 +432,13 @@ QtObject {
 			else{
 				let decorator = docData.documentDecorator
 				for (let i = 0; i < decorator.registeredViews.length; ++i){
-					decorator.registeredViews[i].setBlockingUpdateModel(false)
+					let cnt = 0
+					if (decorator._internal && decorator._internal.updateCounters && decorator._internal.updateCounters.length > i){
+						cnt = decorator._internal.updateCounters[i] || 0
+					}
+					if (cnt <= 0){
+						decorator.registeredViews[i].setBlockingUpdateModel(false)
+					}
 					decorator.registeredViews[i].doUpdateGui()
 				}
 			}
@@ -531,21 +538,27 @@ QtObject {
 	// Call these from custom override implementations or onFinished handlers
 	// to apply the standard DocumentService state transitions.
 
-	function handleDocumentOpened(documentId, objectId, objectTypeId, documentName, hasNameProvider){
+	function handleDocumentOpened(documentId, objectId, objectTypeId, documentName, hasNameProvider, isDirty){
 		setAutoNamedTypeId(objectTypeId, hasNameProvider)
 		setDocumentName(documentId, documentName)
-		documentOpened(documentId, objectTypeId)
+		__internal.createDocumentData(documentId, objectTypeId, false)
 		setDocumentObjectId(documentId, objectId)
 		setDocumentIsLoading(documentId, true)
+		documentOpened(documentId, objectTypeId)
+		if (isDirty)
+			setDocumentIsDirty(documentId, true)
 	}
 
-	function handleDocumentCreated(documentId, objectTypeId, documentName, hasNameProvider, proposedObjectId){
+	function handleDocumentCreated(documentId, objectTypeId, documentName, hasNameProvider, proposedObjectId, isDirty){
 		setAutoNamedTypeId(objectTypeId, hasNameProvider)
 		setDocumentName(documentId, documentName)
-		documentCreated(documentId, objectTypeId)
+		__internal.createDocumentData(documentId, objectTypeId, true)
 		if (proposedObjectId && proposedObjectId !== "")
 			setDocumentObjectId(documentId, proposedObjectId)
-		setDocumentIsLoading(documentId, true)
+		documentCreated(documentId, objectTypeId)
+		if (isDirty)
+			setDocumentIsDirty(documentId, true)
+		setDocumentIsLoading(documentId, false)
 	}
 
 	function handleSaveDocumentResult(documentId, status, message, documentName){
@@ -606,6 +619,7 @@ QtObject {
 		property var documentTypeEditors: ({}) // DocumentTypeId -> [{View Type 1}, {View Type 2}]
 		property var openedDocuments: [] // Array of objects {id, name, model, view, isDirty}
 		property var cachedDocumentNames: ({}) // DocumentId -> Name
+		property var cachedDocumentObjectIds: ({}) // DocumentId -> ObjectId
 		property var documentSaveNameResolvers: ({}) // DocumentId -> function(documentId): string
 		property var pendingDataLoaded: ({}) // DocumentId -> true for early DocumentDataLoaded notifications
 		property var autoNamedTypeIds: ({}) // TypeId -> true for types with automatic name providers
@@ -645,12 +659,6 @@ QtObject {
 					representationController.documentId = id
 					representationController.view = view
 
-					if (view.objectName === "DocumentViewBase"){
-						if (view.representationController !== undefined){
-							view.representationController = representationController
-						}
-					}
-
 					documentDecorator.registerView(view, representationController, !isNew && !isLoading)
 				}
 
@@ -675,6 +683,11 @@ QtObject {
 				delete root.__internal.cachedDocumentNames[id]
 			}
 
+			if (id in root.__internal.cachedDocumentObjectIds){
+				documentData.objectId = root.__internal.cachedDocumentObjectIds[id]
+				delete root.__internal.cachedDocumentObjectIds[id]
+			}
+
 			if (!isNew){
 				isNew = false
 			}
@@ -691,6 +704,7 @@ QtObject {
 
 			delete pendingDataLoaded[documentId]
 			delete readyEmitted[documentId]
+			delete cachedDocumentObjectIds[documentId]
 			delete documentSaveNameResolvers[documentId]
 			openedDocuments.splice(index, 1)
 		}

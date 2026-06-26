@@ -29,6 +29,11 @@ QtObject {
 			representationController.updateRepresentationFailed.connect(onUpdateRepresentationFailed)
 			representationController.updateDocumentFailed.connect(onUpdateDocumentFailed)
 
+			if (documentManager && view.commandsController){
+				let isDirty = documentManager.documentIsDirty(documentId)
+				view.commandsController.setCommandIsEnabled("Save", isDirty)
+			}
+
 			if (updateRepresentation){
 				if (view.visible){
 					representationController.updateRepresentationFromDocument()
@@ -37,6 +42,12 @@ QtObject {
 					if (!_internal.requestUpdateViews.includes(view)){
 						_internal.requestUpdateViews.push(view)
 					}
+				}
+			}
+
+			if (view.objectName === "DocumentViewBase"){
+				if (view.representationController !== undefined){
+					view.representationController = representationController
 				}
 			}
 		}
@@ -73,6 +84,18 @@ QtObject {
 				if (root.registeredViews[i].commandsController){
 					root.registeredViews[i].commandsController.setCommandIsEnabled("Undo", availableUndoSteps > 0)
 					root.registeredViews[i].commandsController.setCommandIsEnabled("Redo", availableRedoSteps > 0)
+					root.registeredViews[i].commandsController.setCommandIsEnabled("Save", isDirty)
+				}
+			}
+		}
+
+		function onDocumentIsDirtyChanged(documentId, isDirty){
+			if (documentId !== root.documentId){
+				return
+			}
+
+			for (let i = 0; i < root.registeredViews.length; ++i){
+				if (root.registeredViews[i].commandsController){
 					root.registeredViews[i].commandsController.setCommandIsEnabled("Save", isDirty)
 				}
 			}
@@ -191,8 +214,13 @@ QtObject {
 
 	function onModelDataChanged(view, model){
 		if (registeredViews.includes(view)){
-			_internal.initiatingView = view
 			let index = registeredViews.indexOf(view)
+			if (_internal.updateCounters[index] > 0){
+				// Change originates from representation load (updateRepresentationFromDocument),
+				// must not trigger reverse updateDocumentFromRepresentation.
+				return
+			}
+			_internal.initiatingView = view
 			registeredRepresentation[index].updateDocumentFromRepresentation()
 		}
 	}

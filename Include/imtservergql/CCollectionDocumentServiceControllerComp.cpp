@@ -99,7 +99,7 @@ CDM::CDocumentInfo CCollectionDocumentServiceControllerComp::OnCreateNewDocument
 		retVal.documentName = documentName;
 		retVal.objectTypeId = *documentTypeId->typeId;
 		retVal.objectId = QByteArray();
-		retVal.isDirty = false;
+		retVal.isDirty = true;
 		retVal.hasNameProvider = false;
 		retVal.isLoading = false;
 

@@ -72,8 +72,7 @@ Item {
 		var checkedNodes = permissionsTreeView.getCheckedNodes()
 		for (var i = 0; i < checkedNodes.length; i++) {
 			var node = checkedNodes[i]
-			var children = node.children || []
-			if (children.length === 0) {
+			if (root.__isLeafNode(node)) {
 				var nodeData = node.data || {}
 				if (nodeData.id)
 					result.push(nodeData.id)
@@ -107,19 +106,33 @@ Item {
 		permissionsTreeView.collapseAll()
 	}
 
+	// Returns true for leaf permission nodes (the actual selectable entries),
+	// false for group/category nodes (even if tristate checked them).
+	// Uses the original source node from .item because createIndex wrappers
+	// do not expose the 'children' array.
+	function __isLeafNode(nodeIdx) {
+		if (!nodeIdx)
+			return true
+		var src = nodeIdx.item || nodeIdx
+		var ch = src ? (src.children || []) : []
+		return ch.length === 0
+	}
+
 	function applySelection(ids) {
 		__beginSelectionUpdate()
+		var prevFilter = permissionsTreeView.filterText
+		permissionsTreeView.filterText = ""
 		permissionsTreeView.uncheckAll()
 		var allNodesList = permissionsTreeView.allNodes()
 		for (var i = 0; i < allNodesList.length; i++) {
 			var nodeObj = allNodesList[i]
-			var nodeChildren = nodeObj.children || []
-			if (nodeChildren.length === 0) {
+			if (root.__isLeafNode(nodeObj)) {
 				var nodeData = nodeObj.data || {}
 				if (ids.includes(nodeData.id))
 					permissionsTreeView.checkItem(nodeObj.key)
 			}
 		}
+		permissionsTreeView.filterText = prevFilter
 		__endSelectionUpdate()
 	}
 

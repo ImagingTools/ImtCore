@@ -92,6 +92,10 @@ Item {
     property var    filterRole: []
     property int    filterDebounceMs: 300
 
+    // Cached for fast filter matching (recomputed on role/columns change)
+    property var    __filterRolePaths: []
+    property var    __filterRoles: []
+
     // Synchronous: function(index, column, value, oldValue) -> bool.
     // Return false to reject the edit.
     property var    writeBack: null
@@ -155,6 +159,7 @@ Item {
     property var    __visibleRowsByKey: ({})
     property int    __selectedCount: 0
     property string __lastAppliedFilter: ""
+    property int    __checkUpdateDepth: 0
 
     // Edit state. Pending value is var (not string) to also cover bool/combo/custom.
     property string __editingKey: ""
@@ -784,6 +789,7 @@ Item {
     onColumnsChanged: {
         __hasUserColumnWidths = false
         __recomputeColumnWidths()
+        __updateFilterCaches()
     }
     onWidthChanged:  {
         if (__hasUserColumnWidths)
@@ -793,10 +799,12 @@ Item {
     }
     onFilterTextChanged: filterDebounceTimer.restart()
     onFilterDebounceMsChanged: filterDebounceTimer.interval = filterDebounceMs
+    onFilterRoleChanged: __updateFilterCaches()
 
     Component.onCompleted: {
         __syncDeclarativeColumns()
         __recomputeColumnWidths()
+        __updateFilterCaches()
         rebuildTree()
     }
 
@@ -814,6 +822,18 @@ Item {
         // No columns supplied imperatively or declaratively: fall back to a
         // single implicit tree column that renders each node's `text`.
         columns = [{ tree: true }]
+    }
+
+    function __updateFilterCaches() {
+        var roles = Array.isArray(filterRole) ? filterRole : (filterRole ? [filterRole] : [])
+        root.__filterRoles = roles
+        var paths = []
+        for (var i = 0; i < roles.length; ++i) {
+            var r = roles[i]
+            if (r) paths.push(__columnPathByName(r))
+            else paths.push("")
+        }
+        root.__filterRolePaths = paths
     }
 
     function __collectDeclarativeColumns() {
@@ -933,6 +953,10 @@ Item {
     // ═══════════════════════════════════════════════════════════════════════
 
     function buildVisibleTree() {
+        if (root.__filterRolePaths.length === 0 && root.filterRole && root.filterRole.length > 0) {
+            root.__updateFilterCaches()
+        }
+
         var items = []
         __visibleKeys = []
         __visibleRowsByKey = ({})
@@ -985,13 +1009,12 @@ Item {
     }
 
     function __nodeMatchesFilter(node, ft) {
-        var roles = Array.isArray(filterRole) ? filterRole : [filterRole]
-        if (roles.length === 0)
+        var paths = root.__filterRolePaths
+        if (!paths || paths.length === 0)
             return false
-        for (var i = 0; i < roles.length; ++i) {
-            var role = roles[i]
-            if (!role) continue
-            var path = __columnPathByName(role)
+        for (var i = 0; i < paths.length; ++i) {
+            var path = paths[i]
+            if (!path) continue
             var value = valueByPath(node, path)
             if (value !== undefined && value !== null && String(value).toLowerCase().indexOf(ft) >= 0)
                 return true
@@ -1000,41 +1023,32 @@ Item {
     }
 
     function __buildFilteredVisible(ft, items, autoExpand) {
-        // Pass 1 (iterative, post-order): mark matches.
         var matchMap = {}
-        var stack = []
-        for (var r = 0; r < __rootKeys.length; ++r)
-            stack.push({ key: __rootKeys[r], visited: false })
 
-        var postOrder = []
-        while (stack.length > 0) {
-            var top = stack[stack.length - 1]
-            var node = __nodes[top.key]
-            if (!node) { stack.pop(); continue }
-            if (!top.visited) {
-                top.visited = true
-                for (var i = node.childrenKeys.length - 1; i >= 0; --i)
-                    stack.push({ key: node.childrenKeys[i], visited: false })
-            } else {
-                stack.pop()
-                postOrder.push(top.key)
-            }
-        }
-
-        for (var p = 0; p < postOrder.length; ++p) {
-            var k = postOrder[p]
-            var n = __nodes[k]
-            if (!n) continue
-            var selfMatch = __nodeMatchesFilter(n, ft)
-            var childMatch = false
-            for (var ci = 0; ci < n.childrenKeys.length; ++ci) {
-                if (matchMap[n.childrenKeys[ci]]) { childMatch = true; break }
-            }
-            if (selfMatch || childMatch)
+        // Fast direct match pass (O(N) but only direct string checks)
+        for (var k in __nodes) {
+            if (__nodeMatchesFilter(__nodes[k], ft))
                 matchMap[k] = true
         }
 
-        // Pass 2: when filter just changed, auto-expand ancestors of matches.
+        // Propagate upwards from matches (only ancestors of matches get included)
+        // Much faster than full post-order when filter is narrow (common case)
+        var toPropagate = []
+        for (var mk in matchMap) {
+            toPropagate.push(mk)
+        }
+        while (toPropagate.length > 0) {
+            var ck = toPropagate.pop()
+            var cnode = __nodes[ck]
+            if (!cnode || !cnode.parentKey) continue
+            var pkey = cnode.parentKey
+            if (!matchMap[pkey]) {
+                matchMap[pkey] = true
+                toPropagate.push(pkey)
+            }
+        }
+
+        // When filter just changed, auto-expand ancestors of matches (same as before)
         if (autoExpand) {
             for (var ek in matchMap) {
                 var en = __nodes[ek]
@@ -1049,7 +1063,7 @@ Item {
             }
         }
 
-        // Pass 3: append in tree order.
+        // Append matching nodes in original tree order (only those in matchMap)
         var appendStack = []
         for (var rr = __rootKeys.length - 1; rr >= 0; --rr) {
             if (matchMap[__rootKeys[rr]])
@@ -1725,12 +1739,19 @@ Item {
         var node = __nodes[keyValue]
         if (!__canChangeCheckState(node)) return
 
+        var isRootAction = (__checkUpdateDepth === 0)
+        __checkUpdateDepth++
+
         __propagateDownIterative(node, state)
         __propagateUpIterative(node)
         __syncVisibleSubtreeChecked(node)
         __syncVisibleAncestorsChecked(node)
+
+        __checkUpdateDepth--
+
         checkStateChanged(createIndex(node), state)
-        checkedItemsChanged()
+        if (isRootAction)
+            checkedItemsChanged()
     }
 
     function checkItem(key)   { setCheckState(key, Qt.Checked) }
@@ -1757,7 +1778,14 @@ Item {
         var requireEnabled = state !== Qt.Unchecked
         var changed = ({})
         var any = false
-        for (var k in __nodes) {
+        var isFiltered = filterText.trim().length > 0
+        var keysToProcess = isFiltered ? __visibleKeys : []
+        if (!isFiltered) {
+            for (var k in __nodes)
+                keysToProcess.push(k)
+        }
+        for (var ii = 0; ii < keysToProcess.length; ++ii) {
+            var k = keysToProcess[ii]
             var n = __nodes[k]
             if (!n || !n.checkable) continue
             if (requireEnabled && !n.enabled) continue
@@ -1819,20 +1847,27 @@ Item {
 
     function __propagateDownIterative(rootNode, state) {
         var stack = [rootNode]
+        var isFiltered = filterText.trim().length > 0
         while (stack.length > 0) {
             var n = stack.pop()
             if (!__shouldParticipateInCheck(n)) continue
             n.checked = state
             __writeBackChecked(n)
             for (var i = 0; i < n.childrenKeys.length; ++i) {
-                var c = __nodes[n.childrenKeys[i]]
-                if (c) stack.push(c)
+                var ck = n.childrenKeys[i]
+                var c = __nodes[ck]
+                if (c) {
+                    if (isFiltered && __visibleRowsByKey[ck] === undefined)
+                        continue
+                    stack.push(c)
+                }
             }
         }
     }
 
     function __propagateUpIterative(startNode) {
         var current = startNode
+        var isFiltered = filterText.trim().length > 0
         while (current && current.parentKey !== "") {
             var prnt = __nodes[current.parentKey]
             if (!prnt || !prnt.childrenKeys) return
@@ -1841,8 +1876,11 @@ Item {
             var allChecked = true
             var allUnchecked = true
             for (var i = 0; i < prnt.childrenKeys.length; ++i) {
-                var child = __nodes[prnt.childrenKeys[i]]
+                var ck = prnt.childrenKeys[i]
+                var child = __nodes[ck]
                 if (!__shouldParticipateInCheck(child)) continue
+                if (isFiltered && __visibleRowsByKey[ck] === undefined)
+                    continue
                 hasParticipating = true
                 if (child.checked !== Qt.Checked)   allChecked = false
                 if (child.checked !== Qt.Unchecked) allUnchecked = false
