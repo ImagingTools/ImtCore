@@ -119,11 +119,6 @@ public:
 	virtual bool SetElementEnabled(const Id& elementId, bool isEnabled = true, ilog::IMessageConsumer* logPtr = nullptr) override;
 
 protected:
-	enum
-	{
-		MainModelId = 0
-	};
-
 	// reimplemented (imod::CMultiModelDispatcherBase)
 	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 

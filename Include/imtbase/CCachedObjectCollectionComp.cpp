@@ -31,7 +31,7 @@ void CCachedObjectCollectionComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	if (m_objectCollectionModelCompPtr.IsValid()){
-		BaseClass2::RegisterModel(m_objectCollectionModelCompPtr.GetPtr(), MainModelId);
+		BaseClass2::RegisterModel(m_objectCollectionModelCompPtr.GetPtr(), 0);
 	}
 
 	for (int i = 0; i < m_invalidationModels.GetCount(); ++i){
@@ -53,13 +53,9 @@ void CCachedObjectCollectionComp::OnComponentDestroyed()
 
 // reimplemented (imod::CMultiModelDispatcherBase)
 
-void CCachedObjectCollectionComp::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
+void CCachedObjectCollectionComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	if (modelId == MainModelId){
-		istd::CChangeNotifier changeNotifier(this, &changeSet);
-	}
-
-	ClearCache();
+	InvalidateCache();
 }
 
 
@@ -530,6 +526,8 @@ void CCachedObjectCollectionComp::ClearCache()
 
 void CCachedObjectCollectionComp::InvalidateCache()
 {
+	istd::CChangeNotifier changeNotifier(this);
+
 	ClearCache();
 }
 
