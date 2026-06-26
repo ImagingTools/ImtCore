@@ -298,7 +298,7 @@ class QtObject extends QObject {
         
 
         for(let key in this){
-            if(key in this.constructor.meta && this.constructor.meta[key].type !== JQModules.QtQml.alias){
+            if(key in this.constructor.meta && this.constructor.meta[key].type !== JQModules.QtQml.alias && this.constructor.meta[key].type !== PropertyAuto){
                 if(typeof this[key] === 'object'){
                     if(this[key] instanceof QObject){
                         this[key].__removeLink()

@@ -66,14 +66,12 @@ function compile(options){
     const configFilePath = path.normalize(options.config.trim())
     const configDirPath = configFilePath.split(/[\\\/]+/g).slice(0, -1).join('/')
 
-    console.log("ENV", env)
 
     function envFill(source) {
         let result = source
         for (let key in env) {
             result = result.replaceAll('${' + key + '}', env[key].replaceAll('\\', '\\\\').trim())
         }
-        console.log("envFill", result)
         return result
     }
 
@@ -2017,6 +2015,12 @@ function compile(options){
 
     }
 
+    let startConfig = {
+        single: true,
+        moduleName: '',
+    }
+    let entryDirAbsolutePath = path.resolve(configDirPath, options.entry.replaceAll(/.\w+\.qml/g, ''))
+
     for (let dirPath of config.dirs) {
         let absolutePath = path.resolve(configDirPath, dirPath)
         let moduleName = ''
@@ -2079,14 +2083,21 @@ function compile(options){
                 JQModules[moduleName][className + '_v' + version] = qmlFile
             }
         }
-
+        if(entryDirAbsolutePath === absolutePath) {
+            startConfig.single = false
+            startConfig.moduleName = moduleName
+        }
         counter[moduleName] = count
     }
 
     console.log(`JQ: preparation of single files`)
-    for (let fileName of getFiles(options.entry.replaceAll(/.\w+\.qml/g, ''))) {
-        let qmlFile = new QmlFile(fileName)
-        SingleFiles[fileName.split(/[\/\\]+/g).pop().replace('.qml', '')] = qmlFile
+    if(startConfig.single){
+        for (let fileName of getFiles(entryDirAbsolutePath)) {
+            let qmlFile = new QmlFile(fileName)
+            SingleFiles[fileName.split(/[\/\\]+/g).pop().replace('.qml', '')] = qmlFile
+        }
+    } else {
+        console.log(`JQ: entry point is ${startConfig.moduleName} module`)
     }
 
     console.log(`JQ: compilation of single files`)
@@ -2220,7 +2231,7 @@ function compile(options){
                 } else {
                     JQApplication.rootPath = '${options.root}'
                 }
-                ${options.entry.split(/[\/\\]+/g).pop().replace('.qml', '')}.create(JQApplication.root);
+                ${startConfig.single ? '' : 'JQModules.' + startConfig.moduleName + '.'}${options.entry.split(/[\/\\]+/g).pop().replace('.qml', '')}.create(JQApplication.root);
                 console.timeEnd('build')})`)
         }
 
