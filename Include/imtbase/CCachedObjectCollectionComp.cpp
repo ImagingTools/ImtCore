@@ -31,26 +31,33 @@ void CCachedObjectCollectionComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	if (m_objectCollectionModelCompPtr.IsValid()){
-		m_objectCollectionModelCompPtr->AttachObserver(this);
+		BaseClass2::RegisterModel(m_objectCollectionModelCompPtr.GetPtr(), MainModelId);
+	}
+
+	for (int i = 0; i < m_invalidationModels.GetCount(); ++i){
+		imod::IModel* modelPtr = m_invalidationModels[i];
+		if (modelPtr != nullptr){
+			BaseClass2::RegisterModel(modelPtr, 100 + i);
+		}
 	}
 }
 
 
 void CCachedObjectCollectionComp::OnComponentDestroyed()
 {
-	if (m_objectCollectionModelCompPtr.IsValid()){
-		m_objectCollectionModelCompPtr->DetachObserver(this);
-	}
+	BaseClass2::UnregisterAllModels();
 
 	BaseClass::OnComponentDestroyed();
 }
 
 
-// reimplemented (imod::CSingleModelObserverBase)
+// reimplemented (imod::CMultiModelDispatcherBase)
 
-void CCachedObjectCollectionComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+void CCachedObjectCollectionComp::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
 {
-	istd::CChangeNotifier changeNotifier(this, &changeSet);
+	if (modelId == MainModelId){
+		istd::CChangeNotifier changeNotifier(this, &changeSet);
+	}
 
 	ClearCache();
 }
@@ -516,6 +523,14 @@ void CCachedObjectCollectionComp::ClearCache()
 	m_cachedCollections.clear();
 
 	m_cacheItems.clear();
+}
+
+
+// reimplemented (IObjectCollectionCacheController)
+
+void CCachedObjectCollectionComp::InvalidateCache()
+{
+	ClearCache();
 }
 
 

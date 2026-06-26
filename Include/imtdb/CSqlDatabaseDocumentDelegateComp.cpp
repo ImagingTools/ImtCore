@@ -71,7 +71,10 @@ QSet<QString> CSqlDatabaseDocumentDelegateComp::s_filterableColumns ={
 void CSqlDatabaseDocumentDelegateComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
-	EnsureTenantBindingTableExists();
+	bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
+	if (useTenantBindings){
+		EnsureTenantBindingTableExists();
+	}
 }
 
 
@@ -974,7 +977,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 						valuesClause
 					);
 
-	if (!tenantId.isEmpty()){
+	bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
+	if (!tenantId.isEmpty() && useTenantBindings){
 		query += CreateTenantBindingInsertQuery(tenantId, objectId, operationContextPtr);
 	}
 
@@ -1209,6 +1213,13 @@ void CSqlDatabaseDocumentDelegateComp::EnsureTenantBindingTableExists() const
 
 QString CSqlDatabaseDocumentDelegateComp::CreateTenantBindingFilterQuery(const QByteArray& tenantId, imtauth::TenantFilterMode filterMode) const
 {
+	bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
+	if (!useTenantBindings && tenantId.isEmpty()){
+		// Delegate is configured not to use TenantEntityBindings for ownership (e.g. Users).
+		// In No Organization mode (empty tenantId) we must not apply any binding-based restriction.
+		return QString();
+	}
+
 	const QString bindingsTableName = CreateTenantBindingTableName();
 	const QString escapedEntityType = SqlEncode(QString::fromUtf8(GetTableName()));
 	const QByteArray databaseDriverId = m_databaseEngineCompPtr.IsValid() ? m_databaseEngineCompPtr->GetDatabaseDriverId() : QByteArray();
@@ -1250,7 +1261,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingInsertQuery(
 			const QByteArray& entityId,
 			const imtbase::IOperationContext* operationContextPtr) const
 {
-	if (tenantId.isEmpty() || entityId.isEmpty()){
+	bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
+	if (!useTenantBindings || tenantId.isEmpty() || entityId.isEmpty()){
 		return QByteArray();
 	}
 
@@ -1290,7 +1302,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingInsertQuery(
 
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateTenantBindingDeleteQuery(const QByteArrayList& entityIds) const
 {
-	if (entityIds.isEmpty()){
+	bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
+	if (!useTenantBindings || entityIds.isEmpty()){
 		return QByteArray();
 	}
 
@@ -1571,10 +1584,12 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 	if (paramIds.contains("TenantFilter")){
 		iprm::TParamsPtr<imtauth::ITenantFilterParam> tenantFilterPtr(&filterParams, "TenantFilter");
 		if (tenantFilterPtr.IsValid()){
-			EnsureTenantBindingTableExists();
-
 			QByteArray tenantId = tenantFilterPtr->GetTenantId();
 			imtauth::TenantFilterMode filterMode = tenantFilterPtr->GetFilterMode();
+			bool useTenantBindings = m_useTenantEntityBindingsAttrPtr.IsValid() ? *m_useTenantEntityBindingsAttrPtr : true;
+			if (useTenantBindings || !tenantId.isEmpty()){
+				EnsureTenantBindingTableExists();
+			}
 			tenantFilterQuery = CreateTenantBindingFilterQuery(tenantId, filterMode);
 		}
 	}
