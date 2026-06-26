@@ -163,7 +163,7 @@ QtObject {
 
 			if (notificationType === "InvitationReceived" || notificationType === 0) {
 				var tName = notification.tenantName ? notification.tenantName : qsTr("a tenant")
-				PopupManager.addInfoMessage(qsTr("You have been invited to join \"%1\"").arg(tName), true)
+				PopupManager.addInfoMessage(qsTr("You have been invited to join \"%1\"").arg(tName), false)
 				AuthorizationController.tenantInvitationReceived(notification)
 				root.subscriptionInvitationReceived(notification)
 			} else if (notificationType === "InvitationAccepted" || notificationType === 1) {

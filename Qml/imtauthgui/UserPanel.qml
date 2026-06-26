@@ -158,6 +158,20 @@ Item {
 				ModalDialogManager.openDialog(popupMenu, {"x": point.x, "y": point.y, "model": contextMenuModel});
 			}
 		}
+
+		Rectangle {
+			id: invitationBadge
+			visible: AuthorizationController.pendingInvitationsCount > 0
+			width: 12
+			height: 12
+			radius: 6
+			color: Style.imaginToolsAccentColor
+			anchors.top: parent.top
+			anchors.right: parent.right
+			anchors.topMargin: 2
+			anchors.rightMargin: 2
+			z: parent.z + 1
+		}
 	}
 
 	ListModel {
@@ -169,8 +183,10 @@ Item {
 		
 		function fillModel(){
 			var currentTenantId = AuthorizationController.currentTenantId || "";
+			var hasInvitations = AuthorizationController.pendingInvitationsCount > 0;
+			var profileName = hasInvitations ? qsTr("Profile") + " ●" : qsTr("Profile");
 			contextMenuModel.clear();
-			contextMenuModel.append({"id": "Profile", "name": qsTr("Profile"), "icon": "Icons/Account", "isEnabled": true});
+			contextMenuModel.append({"id": "Profile", "name": profileName, "icon": "Icons/Account", "isEnabled": true});
 			contextMenuModel.append({"id": "", "name": "", "Icon": ""});
 
 			for (var i = 0; i < root.__organizationsList.length; i++) {

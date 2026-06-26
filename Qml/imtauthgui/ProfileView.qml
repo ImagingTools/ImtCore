@@ -6,6 +6,7 @@ import imtguigql 1.0
 import imtcontrols 1.0
 import imtauthgui 1.0
 import imtauthProfileSdl 1.0
+import imtauthTenantMembershipsSdl 1.0
 
 ViewBase {
 	id: container;
@@ -224,6 +225,112 @@ ViewBase {
 				}
 			}
 			
+			Text {
+				width: parent.width;
+				text: qsTr("Invitations");
+				visible: invitationsGroup.visible;
+				color: Style.textColor;
+				font.family: Style.fontFamilyBold;
+				font.pixelSize: Style.fontSizeXXL;
+			}
+			
+			Rectangle {
+				id: invitationsGroup;
+				width: parent.width;
+				height: invitationsColumn.height + 2 * Style.marginM;
+				visible: AuthorizationController.pendingInvitationsCount > 0;
+				border.width: 1;
+				border.color: Style.borderColor;
+				radius: Style.marginXS;
+				color: Style.baseColor;
+
+				Column {
+					id: invitationsColumn;
+					anchors.left: parent.left;
+					anchors.right: parent.right;
+					anchors.top: parent.top;
+					anchors.margins: Style.marginM;
+					spacing: Style.spacingM;
+
+					Repeater {
+						model: AuthorizationController.pendingInvitations
+
+						Rectangle {
+							width: invitationsColumn.width
+							height: Style.controlHeightM
+							color: "transparent"
+
+							Text {
+								anchors.verticalCenter: parent.verticalCenter
+								anchors.left: parent.left
+								anchors.leftMargin: Style.marginM
+								anchors.right: btnRow.left
+								anchors.rightMargin: Style.marginM
+								text: modelData.tenantName ? modelData.tenantName : modelData.tenantId
+								font.pixelSize: Style.fontSizeM
+								font.family: Style.fontFamily
+								color: Style.textColor
+								elide: Text.ElideRight
+							}
+
+							Row {
+								id: btnRow
+								anchors.verticalCenter: parent.verticalCenter
+								anchors.right: parent.right
+								anchors.rightMargin: Style.marginM
+								spacing: Style.spacingM
+
+								Rectangle {
+									width: acceptLabel.contentWidth + 2 * Style.marginL
+									height: Style.controlHeightS
+									radius: Style.radiusM
+									color: "#3FB950"
+
+									Text {
+										id: acceptLabel
+										anchors.centerIn: parent
+										text: qsTr("Accept")
+										font.pixelSize: Style.fontSizeS
+										color: "#FFFFFF"
+									}
+
+									MouseArea {
+										anchors.fill: parent
+										cursorShape: Qt.PointingHandCursor
+										onClicked: {
+											container.acceptInvitation(modelData.id)
+										}
+									}
+								}
+
+								Rectangle {
+									width: rejectLabel.contentWidth + 2 * Style.marginL
+									height: Style.controlHeightS
+									radius: Style.radiusM
+									color: "#DA3633"
+
+									Text {
+										id: rejectLabel
+										anchors.centerIn: parent
+										text: qsTr("Reject")
+										font.pixelSize: Style.fontSizeS
+										color: "#FFFFFF"
+									}
+
+									MouseArea {
+										anchors.fill: parent
+										cursorShape: Qt.PointingHandCursor
+										onClicked: {
+											container.rejectInvitation(modelData.id)
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			
 			GroupHeaderView {
 				width: parent.width;
 				title: qsTr("Roles");
@@ -314,6 +421,70 @@ ViewBase {
 		}
 	}
 	
+	function acceptInvitation(invitationId) {
+		__acceptInvitationInput.m_invitationId = invitationId
+		__acceptInvitationSender.send(__acceptInvitationInput)
+	}
+
+	function rejectInvitation(invitationId) {
+		__rejectInvitationInput.m_invitationId = invitationId
+		__rejectInvitationSender.send(__rejectInvitationInput)
+	}
+
+	property AcceptTenantInvitationInput __acceptInvitationInput: AcceptTenantInvitationInput {}
+	property GqlSdlRequestSender __acceptInvitationSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_acceptTenantInvitation
+		sdlObjectComp: Component {
+			AcceptTenantInvitationPayload {
+				onFinished: {
+					if (m_success) {
+						AuthorizationController.tenantInvitationAccepted({
+							"membershipId": "",
+							"userId": AuthorizationController.userTokenProvider ? AuthorizationController.userTokenProvider.userId : "",
+							"tenantId": "",
+							"tenantName": "",
+							"role": ""
+						})
+					} else if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+					}
+				}
+			}
+		}
+
+		function onError(message, type) {
+			ModalDialogManager.showInfoDialog(message)
+		}
+	}
+
+	property RejectTenantInvitationInput __rejectInvitationInput: RejectTenantInvitationInput {}
+	property GqlSdlRequestSender __rejectInvitationSender: GqlSdlRequestSender {
+		requestType: 1
+		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_rejectTenantInvitation
+		sdlObjectComp: Component {
+			RejectTenantInvitationPayload {
+				onFinished: {
+					if (m_success) {
+						AuthorizationController.tenantInvitationRejected({
+							"membershipId": "",
+							"userId": AuthorizationController.userTokenProvider ? AuthorizationController.userTokenProvider.userId : "",
+							"tenantId": "",
+							"tenantName": "",
+							"role": ""
+						})
+					} else if (m_errorMessage && m_errorMessage !== "") {
+						ModalDialogManager.showInfoDialog(m_errorMessage)
+					}
+				}
+			}
+		}
+
+		function onError(message, type) {
+			ModalDialogManager.showInfoDialog(message)
+		}
+	}
+
 	Loading {
 		id: loading;
 		anchors.fill: parent;

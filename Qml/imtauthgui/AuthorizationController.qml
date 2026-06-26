@@ -10,6 +10,7 @@ import imtauthgui 1.0
 import imtauthUsersSdl 1.0
 import imtauthAuthorizationSdl 1.0
 import imtauthSessionsSdl 1.0
+import imtauthTenantMembershipsSdl 1.0
 import Qt.labs.settings 1.0
 
 QtObject {
@@ -50,6 +51,57 @@ QtObject {
 	property var __permissionsRefreshCallback: null
 	property bool __tenantRemovalSwitchInProgress: false
 
+	// --- Pending invitations tracking ---
+	property int pendingInvitationsCount: 0
+	property var pendingInvitations: []
+
+	function refreshPendingInvitations() {
+		if (!root.userTokenProvider.accessToken || root.userTokenProvider.accessToken === "")
+			return
+		__pendingInvitationsRequest.send(__pendingInvitationsInput)
+	}
+
+	function __updatePendingInvitations(invitationsList) {
+		var list = []
+		if (invitationsList) {
+			for (var i = 0; i < invitationsList.count; i++) {
+				var inv = invitationsList.get(i).item
+				if (inv) {
+					list.push({
+						"id": inv.m_id || "",
+						"tenantId": inv.m_tenantId || "",
+						"tenantName": inv.m_tenantName || "",
+						"role": inv.m_role || "",
+						"invitedByUserId": inv.m_invitedByUserId || "",
+						"createdAt": inv.m_createdAt || ""
+					})
+				}
+			}
+		}
+		root.pendingInvitations = list
+		root.pendingInvitationsCount = list.length
+	}
+
+	property GetMyTenantInvitationsInput __pendingInvitationsInput: GetMyTenantInvitationsInput {
+		m_statuses: ["Pending"]
+	}
+
+	property GqlSdlRequestSender __pendingInvitationsRequest: GqlSdlRequestSender {
+		gqlCommandId: ImtauthTenantMembershipsSdlCommandIds.s_getMyTenantInvitations
+
+		sdlObjectComp: Component {
+			GetMyTenantInvitationsPayload {
+				onFinished: {
+					root.__updatePendingInvitations(m_invitations)
+				}
+			}
+		}
+
+		function onError(message, type) {
+			// Silently ignore errors for invitation polling
+		}
+	}
+
 	property Settings storage: Settings {
 		category: "AuthorizationController"
 	}
@@ -63,6 +115,12 @@ QtObject {
 	onRememberMeChanged: saveLoginSettings()
 	onLastUserChanged: saveLoginSettings()
 	onStoredRefreshTokenChanged: saveLoginSettings()
+
+	// Refresh pending invitations on relevant events
+	onLoggedIn: refreshPendingInvitations()
+	onTenantInvitationReceived: refreshPendingInvitations()
+	onTenantInvitationAccepted: refreshPendingInvitations()
+	onTenantInvitationRejected: refreshPendingInvitations()
 
 	onProductIdChanged: {
 		if (Qt.platform.os !== "web" && productId !== ""){
@@ -316,6 +374,8 @@ QtObject {
 		userTokenProvider.permissions = []
 		currentTenantId = ""
 		currentTenantName = ""
+		pendingInvitations = []
+		pendingInvitationsCount = 0
 		setAccessToken("");
 		setRefreshToken("");
 		
