@@ -31,7 +31,8 @@ iproc::IProcessor::TaskState CQmlEnumGeneratorComp::DoProcessing(
 	const iprm::IParamsSet* /*paramsPtr*/,
 	const istd::IPolymorphic* /*inputPtr*/,
 	istd::IChangeable* /*outputPtr*/,
-	ibase::IProgressManager* /*progressManagerPtr*/)
+	ibase::IProgressManager* /*progressManagerPtr*/,
+	istd::IChangeable* /*processingReportPtr*/)
 {
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_qmldirFilePersistanceCompPtr.IsValid());
@@ -347,4 +348,3 @@ bool CQmlEnumGeneratorComp::AddQmldirEntry(const imtsdl::CSdlEnum& sdlEnum, iprm
 
 
 } // namespace imtsdlgenqml
-

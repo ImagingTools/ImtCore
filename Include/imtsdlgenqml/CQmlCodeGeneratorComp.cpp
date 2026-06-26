@@ -30,7 +30,8 @@ iproc::IProcessor::TaskState CQmlCodeGeneratorComp::DoProcessing(
 			const iprm::IParamsSet* paramsPtr,
 			const istd::IPolymorphic* inputPtr,
 			istd::IChangeable* outputPtr,
-			ibase::IProgressManager* progressManagerPtr)
+			ibase::IProgressManager* progressManagerPtr,
+			istd::IChangeable* processingReportPtr)
 {
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
@@ -107,7 +108,7 @@ iproc::IProcessor::TaskState CQmlCodeGeneratorComp::DoProcessing(
 		IProcessor* extenderPtr = m_codeGeneratorExtenderListCompPtr[i];
 		Q_ASSERT(extenderPtr != nullptr);
 
-		TaskState extenderResult = extenderPtr->DoProcessing(paramsPtr, inputPtr, outputPtr, progressManagerPtr);
+		TaskState extenderResult = extenderPtr->DoProcessing(paramsPtr, inputPtr, outputPtr, progressManagerPtr, processingReportPtr);
 		if (extenderResult != TS_OK){
 			return extenderResult;
 		}
@@ -855,4 +856,3 @@ void CQmlCodeGeneratorComp::AbortCurrentProcessing()
 
 
 } // namespace imtsdlgenqml
-

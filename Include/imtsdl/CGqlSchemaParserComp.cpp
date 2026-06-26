@@ -84,7 +84,8 @@ iproc::IProcessor::TaskState CGqlSchemaParserComp::DoProcessing(
 			const iprm::IParamsSet* /*paramsPtr*/,
 			const istd::IPolymorphic* inputPtr,
 			istd::IChangeable* outputPtr,
-			ibase::IProgressManager* /*progressManagerPtr*/)
+			ibase::IProgressManager* /*progressManagerPtr*/,
+			istd::IChangeable* /*processingReportPtr*/)
 {
 	/**
 		\param paramsPtr - unused
@@ -395,7 +396,7 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 			}
 		}
 
-		int processingResult = newSchemaProcessor->DoProcessing(nullptr, &schemaFilePathParam, &outputParams);
+		int processingResult = newSchemaProcessor->DoProcessing(nullptr, &schemaFilePathParam, &outputParams, nullptr, nullptr);
 		if (processingResult != TS_OK){
 			SendErrorMessage(0, QString("Unable to process file '%1'").arg(schemaPath));
 
@@ -768,5 +769,3 @@ bool CGqlSchemaParserComp::ValidateSchema()
 
 
 } // namespace imtsdl
-
-
