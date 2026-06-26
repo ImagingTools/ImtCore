@@ -27,7 +27,8 @@ iproc::IProcessor::TaskState CQmlProcessorsManagerComp::DoProcessing(
 	const iprm::IParamsSet* /*paramsPtr*/,
 	const istd::IPolymorphic* /*inputPtr*/,
 	istd::IChangeable* /*outputPtr*/,
-	ibase::IProgressManager* /*progressManagerPtr*/)
+	ibase::IProgressManager* progressManagerPtr,
+	istd::IChangeable* processingReportPtr)
 {
 	QElapsedTimer timer;
 	timer.start();
@@ -96,7 +97,7 @@ bool CQmlProcessorsManagerComp::CreateCode()
 		Q_ASSERT(codeGeneratorPtr != nullptr);
 
 		if (codeGeneratorPtr != nullptr){
-			int processResultResult = codeGeneratorPtr->DoProcessing(nullptr, nullptr, nullptr);
+			int processResultResult = codeGeneratorPtr->DoProcessing(nullptr, nullptr, nullptr, nullptr, nullptr);
 
 			if (processResultResult != iproc::IProcessor::TS_OK){
 				SendCriticalMessage(0, QString("Unable to process schema: '%1'").arg(m_sdlArgumentParserCompPtr->GetSchemaFilePath()));
@@ -112,4 +113,3 @@ bool CQmlProcessorsManagerComp::CreateCode()
 
 
 } // namespace imtsdlgenqml
-

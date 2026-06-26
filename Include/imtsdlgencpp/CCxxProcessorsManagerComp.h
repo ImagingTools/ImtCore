@@ -87,7 +87,8 @@ public:
 				const iprm::IParamsSet* paramsPtr,
 				const istd::IPolymorphic* inputPtr,
 				istd::IChangeable* outputPtr,
-				ibase::IProgressManager* progressManagerPtr = nullptr) override;
+				ibase::IProgressManager* progressManagerPtr = nullptr,
+				istd::IChangeable* processingReportPtr = nullptr) override;
 
 private:
 	[[nodiscard]] bool BeginHeaderFile(const iprm::IParamsSet& entryParams, QFile& headerFile, const iprm::IParamsSet* paramsPtr) const;
@@ -151,7 +152,6 @@ private:
 
 
 } // namespace imtsdlgencpp
-
 
 
 

@@ -107,7 +107,7 @@ void GetPrecessorAndExec(CImtSdlGenQmlTest& testSuite, const QByteArray& process
 	auto* processorPtr = testSuite.GetInterface<iproc::IProcessor>(processorName);
 	QCOMPARE_NE(processorPtr, nullptr);
 
-	iproc::IProcessor::TaskState execResult = processorPtr->DoProcessing(processorParamsPtr, nullptr, nullptr);
+	iproc::IProcessor::TaskState execResult = processorPtr->DoProcessing(processorParamsPtr, nullptr, nullptr, nullptr, nullptr);
 	QCOMPARE(execResult, iproc::IProcessor::TS_OK);
 }
 
