@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later OR GPL-2.0-or-later OR GPL-3.0-or-later OR LicenseRef-ImtCore-Commercial
 #include <imtauthgql/CProfileControllerComp.h>
+#include <imtauthgql/imtauthgql.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Profile.h>
 
 
@@ -45,6 +46,8 @@ sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 		productId = *arguments.input->productId;
 	}
 
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+
 	const imtauth::IUserInfo* userInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_userCollectionCompPtr->GetObjectData(objectId, dataPtr)){
@@ -55,6 +58,41 @@ sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 		errorMessage = QString("Unable to get a profile info. Error: User with ID '%1' does not exists").arg(qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "CProfileControllerComp");
 		return sdl::V1_0::imtauth::CProfileData();
+	}
+
+	// Apply tenant-based adaptation to the user data (roles/groups/permissions
+	// + delegated role enrichment). This is the same logic used by
+	// CUserCollectionControllerComp::CreateAdaptedObjectData.
+	// We obtain an (optionally cloned) version whose GetRoles/GetGroups/GetPermissions
+	// already reflect only what is visible for the current tenant (or globals
+	// for No Organization).
+	QByteArray currentTenantId;
+	if (gqlContextPtr != nullptr){
+		currentTenantId = gqlContextPtr->GetTenantId();
+	}
+	QByteArray currentProductId = productId;
+
+	imtauth::ITenantEntityBindingManager* bindingPtr = m_bindingManagerCompPtr.IsValid() ? m_bindingManagerCompPtr.GetPtr() : nullptr;
+	imtauth::IDelegatedAccess* delPtr = m_delegatedAccessCompPtr.IsValid() ? m_delegatedAccessCompPtr.GetPtr() : nullptr;
+	imtauth::ITenantMembershipManager* memPtr = m_membershipManagerCompPtr.IsValid() ? m_membershipManagerCompPtr.GetPtr() : nullptr;
+	imtauth::IRoleInfoProvider* roleProvPtr = m_roleInfoProviderCompPtr.IsValid() ? m_roleInfoProviderCompPtr.GetPtr() : nullptr;
+
+	istd::IChangeableUniquePtr adaptedPtr = AdaptUserForTenant(
+				objectId,
+				*userInfoPtr,
+				currentTenantId,
+				currentProductId,
+				bindingPtr,
+				delPtr,
+				memPtr,
+				roleProvPtr);
+
+	const imtauth::IUserInfo* effectiveUserPtr = userInfoPtr;
+	if (adaptedPtr.IsValid()){
+		imtauth::IUserInfo* au = dynamic_cast<imtauth::IUserInfo*>(adaptedPtr.GetPtr());
+		if (au != nullptr){
+			effectiveUserPtr = au;
+		}
 	}
 
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
@@ -70,66 +108,43 @@ sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 	profileData.email = QString(userInfoPtr->GetMail());
 	profileData.username = QString(userInfoPtr->GetId());
 
-	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
 		profileData.currentTenantId = gqlContextPtr->GetTenantId();
 	}
 
-	// Determine if the current tenant is accessed via delegation
-	QByteArray currentTenantId;
-	if (gqlContextPtr != nullptr){
-		currentTenantId = gqlContextPtr->GetTenantId();
-	}
-
-	QByteArrayList delegatedRoleIds;
-	if (!currentTenantId.isEmpty() && m_delegatedAccessCompPtr.IsValid() && m_membershipManagerCompPtr.IsValid()){
-		const imtauth::ITenantMembershipManager::MembershipIds membershipIds =
-			m_membershipManagerCompPtr->GetMembershipsByUser(objectId);
-
-		for (const QByteArray& membershipId : membershipIds){
-			imtauth::ITenantMembershipUniquePtr homeMembershipPtr = m_membershipManagerCompPtr->GetMembership(membershipId);
-			if (!homeMembershipPtr.IsValid() || !homeMembershipPtr->IsActive()){
-				continue;
-			}
-			QByteArray homeTenantId = homeMembershipPtr->GetTenantId();
-			if (homeTenantId.isEmpty() || homeTenantId == currentTenantId){
-				continue;
-			}
-			if (m_delegatedAccessCompPtr->IsDelegatedAccess(objectId, homeTenantId, currentTenantId)){
-				QByteArrayList roles = m_delegatedAccessCompPtr->GetDelegatedRoles(homeTenantId, currentTenantId);
-				for (const QByteArray& roleId : roles){
-					if (!delegatedRoleIds.contains(roleId)){
-						delegatedRoleIds.append(roleId);
-					}
-				}
-			}
-		}
-	}
+	// =========================================================================
+	// TENANT-SCOPED PROFILE DATA (Roles / Permissions / Groups)
+	// =========================================================================
+	//
+	// The goal of the logic below is to make the data returned by GetProfile
+	// depend on the currently selected tenant (including the special "No
+	// Organization" case when tenantId is empty).
+	//
+	// Requirements:
+	//   - When a real tenant is selected → return only Roles, Permissions and
+	//     Groups that are relevant inside that tenant.
+	//   - When "No Organization" is selected (empty tenantId) → return ONLY
+	//     items that are available to the user OUTSIDE of any tenant
+	//     (both direct organizations and delegated/foreign organizations).
+	//
+	// How it works:
+	// The actual work is delegated to the shared AdaptUserForTenant helper
+	// (extracted to imtauthgql.h and also used by CUserCollectionControllerComp).
+	// It performs binding-based filtering for the current tenant (or globals)
+	// plus delegated role enrichment.
+	// =========================================================================
 
 	imtsdl::TElementList<sdl::V1_0::imtauth::CRoleInfo> roleList;
 
 	if (m_roleCollectionCompPtr.IsValid()){
-		const QByteArrayList roles = userInfoPtr->GetRoles(productId);
+		// Use the (possibly tenant-adapted) roles list. The adaptation has
+		// already filtered according to tenant bindings and appended any
+		// delegated roles.
+		const QByteArrayList roles = effectiveUserPtr->GetRoles(currentProductId);
 
 		for (const QByteArray& roleId : std::as_const(roles)){
 			imtbase::IObjectCollection::DataPtr roleDataPtr;
 			if (m_roleCollectionCompPtr->GetObjectData(roleId, roleDataPtr)){
-				const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(roleDataPtr.GetPtr());
-				if (roleInfoPtr != nullptr){
-					sdl::V1_0::imtauth::CRoleInfo info;
-					info.id = QByteArray(roleInfoPtr->GetRoleId());
-					info.name = QString(roleInfoPtr->GetRoleName());
-					info.description = QString(roleInfoPtr->GetRoleDescription());
-
-					roleList << info;
-				}
-			}
-		}
-
-		// Add delegated roles if accessing a delegated tenant
-		for (const QByteArray& delegatedRoleId : std::as_const(delegatedRoleIds)){
-			imtbase::IObjectCollection::DataPtr roleDataPtr;
-			if (m_roleCollectionCompPtr->GetObjectData(delegatedRoleId, roleDataPtr)){
 				const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(roleDataPtr.GetPtr());
 				if (roleInfoPtr != nullptr){
 					sdl::V1_0::imtauth::CRoleInfo info;
@@ -148,7 +163,10 @@ sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 	imtsdl::TElementList<sdl::V1_0::imtauth::CGroupInfo> groupList;
 
 	if (m_groupCollectionCompPtr.IsValid()){
-		QByteArrayList groups = userInfoPtr->GetGroups();
+		// Groups from the (tenant-adapted) user. The AdaptUserForTenant
+		// has already applied binding-based filtering for the current tenant
+		// (or globals for No Organization).
+		QByteArrayList groups = effectiveUserPtr->GetGroups();
 
 		for (const QByteArray& groupId : std::as_const(groups)){
 			imtbase::IObjectCollection::DataPtr groupDataPtr;
@@ -171,7 +189,9 @@ sdl::V1_0::imtauth::CProfileData CProfileControllerComp::OnGetProfile(
 
 	imtsdl::TElementList<sdl::V1_0::imtauth::CPermissionInfo> permissionList;
 
-	QByteArrayList permissions = userInfoPtr->GetPermissions(productId);
+	// Permissions from the adapted user (consistent with the binding-based
+	// tenant adaptation used for user collection views).
+	QByteArrayList permissions = effectiveUserPtr->GetPermissions(currentProductId);
 	for (const QByteArray& permissionId : std::as_const(permissions)){
 		sdl::V1_0::imtauth::CPermissionInfo info;
 		info.id = permissionId;

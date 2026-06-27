@@ -170,6 +170,28 @@ QByteArrayList CTenantEntityBindingManagerComp::GetEntityIds(const QByteArray& t
 }
 
 
+bool CTenantEntityBindingManagerComp::HasAnyTenantBinding(const QByteArray& entityType, const QByteArray& entityId) const
+{
+	if (!m_bindingsCollectionCompPtr.IsValid() || entityType.isEmpty() || entityId.isEmpty()){
+		return false;
+	}
+
+	imtbase::IComplexCollectionFilter::FilterExpression filterExpr;
+	filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter("EntityType", QString::fromUtf8(entityType));
+	filterExpr.fieldFilters << imtbase::IComplexCollectionFilter::FieldFilter("EntityId", QString::fromUtf8(entityId));
+	// Do not restrict by TenantId: any tenant binding means it is tenant-scoped.
+
+	imtbase::CComplexCollectionFilter complexFilter;
+	complexFilter.SetFilterExpression(filterExpr);
+
+	iprm::CParamsSet filterParams;
+	filterParams.SetEditableParameter("ComplexFilter", &complexFilter);
+
+	QByteArrayList bindingIds = m_bindingsCollectionCompPtr->GetElementIds(0, -1, &filterParams);
+	return !bindingIds.isEmpty();
+}
+
+
 // private methods
 
 QByteArrayList CTenantEntityBindingManagerComp::FindBindingIds(const QByteArray& tenantId, const QByteArray& entityType, const QByteArray& entityId) const

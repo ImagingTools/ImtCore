@@ -10,6 +10,11 @@
 #include <imtauth/ITenantConnectionInfo.h>
 #include <imtauth/ICrossOrgGrant.h>
 #include <imtauth/IContract.h>
+#include <imtauth/ITenantEntityBindingManager.h>
+#include <imtauth/IDelegatedAccess.h>
+#include <imtauth/ITenantMembershipManager.h>
+#include <imtauth/IRoleInfoProvider.h>
+#include <istd/IChangeable.h>
 #include <imtauth/ICrossTenantMessage.h>
 #include <imtauth/IOrderRequest.h>
 #include <imtlic/IProductInfo.h>
@@ -23,6 +28,8 @@
 
 // Qt includes
 #include <QtCore/QSet>
+#include <QtCore/QByteArrayList>
+#include <imtauth/IUserInfo.h>
 
 
 /**
@@ -831,6 +838,208 @@ inline imtauth::CTenantFilterParam* CreateTenantFilterParam(const imtgql::CGqlRe
 	tenantFilterPtr->SetTenantId(gqlContextPtr->GetTenantId());
 
 	return tenantFilterPtr;
+}
+
+/**
+	Adapts (filters) the roles, groups and permissions of a user according to the
+	current tenant context, and enriches with delegated roles when appropriate.
+
+	This is the shared logic for tenant-aware UserInfo transformation.
+
+	- For empty tenantId (No Organization): keeps only entities that have no
+	  tenant bindings at all (global items).
+	- For non-empty tenantId: keeps only entities explicitly bound to that tenant.
+	- Additionally, if the user does not have direct membership in the current
+	  tenant, adds roles granted via cross-org delegation from the user's home
+	  tenants.
+
+	The function returns a (possibly cloned) adapted object, or the original
+	base adapted if no changes were needed.
+
+	Callers must pass the required manager pointers (can be null for optional
+	behavior).
+*/
+
+/**
+ * Helper function (used internally by AdaptUserForTenant) to determine
+ * whether a given role, group or permission entity should be visible
+ * for the supplied tenant context.
+ *
+ * - If tenantId is empty (No Organization): only entities that have
+ *   absolutely no tenant bindings are kept (i.e. true global items).
+ * - If tenantId is non-empty: only entities that have an explicit
+ *   binding to that tenant are kept.
+ */
+inline bool ShouldKeepEntityForTenant(
+				imtauth::ITenantEntityBindingManager* bindingManager,
+				const QByteArray& tenantId,
+				const QByteArray& entityType,
+				const QByteArray& entityId)
+{
+	if (bindingManager == nullptr || entityId.isEmpty()){
+		return true;
+	}
+	const bool boundToAny = bindingManager->HasAnyTenantBinding(entityType, entityId);
+	if (tenantId.isEmpty()){
+		return !boundToAny;
+	}
+	return bindingManager->HasBinding(tenantId, entityType, entityId);
+}
+
+inline istd::IChangeableUniquePtr AdaptUserForTenant(
+				const QByteArray& objectId,
+				const istd::IChangeable& object,
+				const QByteArray& tenantId,
+				const QByteArray& productId,
+				imtauth::ITenantEntityBindingManager* bindingManager,
+				imtauth::IDelegatedAccess* delegatedAccess,
+				imtauth::ITenantMembershipManager* membershipManager,
+				imtauth::IRoleInfoProvider* roleInfoProvider)
+{
+	// Operate on the original object for reading current assignments.
+	// Explicit cast, no auto.
+	const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(&object);
+	if (userInfoPtr == nullptr){
+		return istd::IChangeableUniquePtr();
+	}
+
+	const QByteArray rolesEntity = QByteArrayLiteral("Roles");
+	const QByteArray groupsEntity = QByteArrayLiteral("Groups");
+	const QByteArray permsEntity = QByteArrayLiteral("Permissions");
+
+	// Filter roles/groups/permissions according to tenant context.
+	// empty tenantId: keep only entities with no tenant bindings at all (globals).
+	// non-empty tenantId: keep only entities bound to this tenant.
+	bool anyFilterChange = false;
+
+	QByteArrayList filteredRoles;
+	if (!productId.isEmpty()){
+		QByteArrayList userRoles = userInfoPtr->GetRoles(productId);
+		for (int i = 0; i < userRoles.size(); ++i){
+			const QByteArray rid = userRoles.at(i);
+			if (rid.isEmpty()) continue;
+			if (ShouldKeepEntityForTenant(bindingManager, tenantId, rolesEntity, rid)){
+				filteredRoles.append(rid);
+			} else {
+				anyFilterChange = true;
+			}
+		}
+	}
+
+	QByteArrayList filteredGroups;
+	QByteArrayList userGroups = userInfoPtr->GetGroups();
+	for (int i = 0; i < userGroups.size(); ++i){
+		const QByteArray gid = userGroups.at(i);
+		if (gid.isEmpty()) continue;
+		if (ShouldKeepEntityForTenant(bindingManager, tenantId, groupsEntity, gid)){
+			filteredGroups.append(gid);
+		} else {
+			anyFilterChange = true;
+		}
+	}
+
+	QByteArrayList filteredPerms;
+	if (!productId.isEmpty()){
+		QByteArrayList userPerms = userInfoPtr->GetPermissions(productId);
+		for (int i = 0; i < userPerms.size(); ++i){
+			const QByteArray pid = userPerms.at(i);
+			if (pid.isEmpty()) continue;
+			if (ShouldKeepEntityForTenant(bindingManager, tenantId, permsEntity, pid)){
+				filteredPerms.append(pid);
+			} else {
+				anyFilterChange = true;
+			}
+		}
+	}
+
+	// Delegated roles enrichment (only when not direct member in current tenant)
+	QSet<QByteArray> delegatedRoleIdSet;
+	if (!tenantId.isEmpty() && !productId.isEmpty() && delegatedAccess != nullptr && membershipManager != nullptr){
+		bool hasDirectMembership = false;
+		QByteArrayList homeTenantIds;
+		const imtauth::ITenantMembershipManager::MembershipIds membershipIds =
+			membershipManager->GetMembershipsByUser(objectId);
+		for (int i = 0; i < membershipIds.size(); ++i){
+			const QByteArray membershipId = membershipIds.at(i);
+			imtauth::ITenantMembershipUniquePtr membershipPtr = membershipManager->GetMembership(membershipId);
+			if (!membershipPtr.IsValid() || !membershipPtr->IsActive()){
+				continue;
+			}
+			QByteArray tId = membershipPtr->GetTenantId();
+			if (tId == tenantId){
+				hasDirectMembership = true;
+				break;
+			}
+			if (!tId.isEmpty()){
+				homeTenantIds.append(tId);
+			}
+		}
+
+		if (!hasDirectMembership){
+			for (int i = 0; i < homeTenantIds.size(); ++i){
+				const QByteArray homeTenantId = homeTenantIds.at(i);
+				QByteArrayList roleIds = delegatedAccess->GetDelegatedRoles(homeTenantId, tenantId);
+				for (int j = 0; j < roleIds.size(); ++j){
+					const QByteArray roleId = roleIds.at(j);
+					if (!roleId.isEmpty()){
+						// Only keep roles that belong to the current product context (if provider available).
+						if (roleInfoProvider != nullptr){
+							imtauth::IRoleUniquePtr roleInfoPtr = roleInfoProvider->GetRole(roleId);
+							if (!roleInfoPtr.IsValid() || roleInfoPtr->GetProductId() != productId){
+								continue;
+							}
+						}
+						delegatedRoleIdSet.insert(roleId);
+					}
+				}
+			}
+		}
+	}
+
+	bool hasDelegatedChanges = !delegatedRoleIdSet.isEmpty();
+	if (!anyFilterChange && !hasDelegatedChanges){
+		return istd::IChangeableUniquePtr();
+	}
+
+	// Create a clone to modify.
+	istd::IChangeableUniquePtr adaptedObjectPtr = object.CloneMe();
+
+	imtauth::IUserInfo* adaptedUserInfoPtr = dynamic_cast<imtauth::IUserInfo*>(adaptedObjectPtr.GetPtr());
+	if (adaptedUserInfoPtr == nullptr){
+		// Should not happen, but fall back gracefully.
+		return istd::IChangeableUniquePtr();
+	}
+
+	if (anyFilterChange){
+		if (!productId.isEmpty()){
+			adaptedUserInfoPtr->SetRoles(productId, filteredRoles);
+			adaptedUserInfoPtr->SetLocalPermissions(productId, filteredPerms);
+		}
+		// reset groups to filtered list
+		QByteArrayList currGroups = adaptedUserInfoPtr->GetGroups();
+		for (int i = 0; i < currGroups.size(); ++i){
+			const QByteArray g = currGroups.at(i);
+			adaptedUserInfoPtr->RemoveFromGroup(g);
+		}
+		for (int i = 0; i < filteredGroups.size(); ++i){
+			const QByteArray g = filteredGroups.at(i);
+			adaptedUserInfoPtr->AddToGroup(g);
+		}
+	}
+
+	if (hasDelegatedChanges){
+		QByteArrayList currRoles = adaptedUserInfoPtr->GetRoles(productId);
+		QSet<QByteArray>::const_iterator it = delegatedRoleIdSet.constBegin();
+		for (; it != delegatedRoleIdSet.constEnd(); ++it){
+			const QByteArray r = *it;
+			if (!currRoles.contains(r)){
+				currRoles.append(r);
+			}
+		}
+		adaptedUserInfoPtr->SetRoles(productId, currRoles);
+	}
+
+	return adaptedObjectPtr;
 }
 
 
