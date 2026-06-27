@@ -385,7 +385,7 @@ ViewBase {
 				id: organizationsGroup;
 				width: parent.width;
 				height: organizationsColumn.height + 2 * Style.marginM;
-				visible: container.__organizationsList.length > 0;
+				visible: container.__organizationsList.length > 1;
 				border.width: 1;
 				border.color: Style.borderColor;
 				radius: Style.marginXS;
@@ -480,7 +480,7 @@ ViewBase {
 
 							Rectangle {
 								id: leaveBtn
-								visible: !modelData.isDelegated
+								visible: !modelData.isDelegated && modelData.id !== ""
 								anchors.right: switchBtn.visible ? switchBtn.left : parent.right
 								anchors.rightMargin: switchBtn.visible ? Style.marginS : Style.marginM
 								anchors.verticalCenter: orgCol.verticalCenter
@@ -696,6 +696,13 @@ ViewBase {
 							}
 						}
 					}
+					// Always provide No Organization entry to allow switching to global (non-tenant) context
+					list.push({
+						id: "",
+						name: qsTr("No organization"),
+						description: "",
+						isDelegated: false
+					})
 					container.__organizationsList = list
 				}
 			}
