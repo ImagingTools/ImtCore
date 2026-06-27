@@ -32,7 +32,9 @@ public:
 	static void InitAcfLocalization()
 	{
 		Q_INIT_RESOURCE(AcfLoc);
+#ifdef IMT_HAS_ACFSLN_LOC
 		Q_INIT_RESOURCE(AcfSlnLoc);
+#endif
 	}
 
 	static void InitImtCoreLocalization()
@@ -180,5 +182,4 @@ int Run(int argc, char *argv[])
 
 	return -1;
 }
-
 

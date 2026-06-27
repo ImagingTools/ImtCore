@@ -41,7 +41,6 @@ target_link_libraries(${PROJECT_NAME}
 	imtbase
 	ImtCoreLoc
 	AcfLoc
-	AcfSlnLoc
 	imtdb
 	imtgui
 	imtguigql
@@ -63,6 +62,10 @@ target_link_libraries(${PROJECT_NAME}
 	imtapp
 	imtchat
 	imtdesk)
+
+if(TARGET AcfSlnLoc)
+	target_link_libraries(${PROJECT_NAME} AcfSlnLoc)
+endif()
 
 #------ Qt modules ------
 target_link_libraries(${PROJECT_NAME}

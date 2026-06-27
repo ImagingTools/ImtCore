@@ -1,5 +1,8 @@
 include($(ACFDIR)/Config/QMake/GeneralConfig.pri)
-include($(ACFSLNDIR)/Config/QMake/AcfSln.pri)
+exists($(ACFSLNDIR)/Config/QMake/AcfSln.pri){
+	include($(ACFSLNDIR)/Config/QMake/AcfSln.pri)
+	DEFINES += IMT_HAS_ACFSLN_LOC
+}
 include($(IACFDIR)/Config/QMake/Iacf.pri)
 
 INCLUDEPATH += $$PWD/../../Include
@@ -23,4 +26,3 @@ IMTCOREDIRBUILD = $$(IMTCOREDIR_BUILD)
 else{
 	LIBS += -L$$PWD/../../Lib/$$COMPILER_DIR
 }
-

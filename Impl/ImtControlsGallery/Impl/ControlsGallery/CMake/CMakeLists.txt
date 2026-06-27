@@ -26,7 +26,10 @@ if(DEFINED WEB_COMPILE AND WEB_COMPILE)
 	add_compile_definitions(WEB_COMPILE)
 endif()
 
-target_link_libraries(${PROJECT_NAME} ImtCoreLoc AcfLoc AcfSlnLoc)
+target_link_libraries(${PROJECT_NAME} ImtCoreLoc AcfLoc)
+if(TARGET AcfSlnLoc)
+	target_link_libraries(${PROJECT_NAME} AcfSlnLoc)
+endif()
 target_link_libraries(${PROJECT_NAME} controlsgallerysdl controlsgallerygql controlsgalleryqml)
 target_link_libraries(${PROJECT_NAME} imtappsdl imtauthsdl imtlicsdl imtcolorsdl imt2dsdl)
 target_link_libraries(${PROJECT_NAME} imtmail imtgui imtauth imtauthgui imtlicdb imtlic imtlicgui imtwidgets imtzip imt3dgui imtrepo imtstyle imtqml imtdb imtfile)
@@ -55,4 +58,3 @@ endif()
 
 include(${IMTCOREDIR}/Config/CMake/OpenSSL.cmake)
 include(${IACFDIR}/Config/CMake/zlib.cmake)
-
