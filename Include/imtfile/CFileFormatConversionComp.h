@@ -35,7 +35,8 @@ public:
 				const QString& inputPath,
 				QString& outputPath,
 				const iprm::IParamsSet* paramsPtr = nullptr,
-				ibase::IProgressManager* progressManagerPtr = nullptr) const override;
+				ibase::IProgressManager* progressManagerPtr = nullptr,
+				istd::IChangeable* processingReportPtr = NULL) const override;
 
 private:
 	I_REF(ifile::IFilePersistence, m_persistenceCompPtr);
