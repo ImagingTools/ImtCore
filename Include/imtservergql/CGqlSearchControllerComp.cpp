@@ -33,55 +33,94 @@ sdl::V1_0::imtbase::CSearchResults CGqlSearchControllerComp::OnSearch(
 		text = *arguments.input->text;
 	}
 
+	QByteArray specificResultId;
+	if (arguments.input->searchResultId && !(*arguments.input->searchResultId).isEmpty()){
+		specificResultId = (*arguments.input->searchResultId);
+	}
+
+	int reqOffset = 0;
+	if (arguments.input->offset){
+		reqOffset = *arguments.input->offset;
+	}
+	int reqCount = 30;
+	if (arguments.input->count && *arguments.input->count > 0){
+		reqCount = *arguments.input->count;
+	}
+
 	imtsdl::TElementList<sdl::V1_0::imtbase::CSearchResult> searchResultList;
 
 	for (int i = 0; i < m_searchControllersCompPtr.GetCount(); i++){
 		imtbase::ISearchController* searchControllerPtr = m_searchControllersCompPtr[i];
-		if (searchControllerPtr != nullptr){
-			istd::TDelPtr<const imtbase::ISearchResults> searchResultsPtr(searchControllerPtr->Search(text));
-			if (searchResultsPtr.IsValid()){
-				int count = searchResultsPtr->GetSearchResultsCount();
-				if (count > 0){
-					sdl::V1_0::imtbase::CSearchResult searchRepresentation;
+		if (searchControllerPtr == nullptr){
+			continue;
+		}
 
-					QByteArray controllerId = searchControllerPtr->GetControllerId();
-					searchRepresentation.id = controllerId;
+		QByteArray controllerId = searchControllerPtr->GetControllerId();
+		if (!specificResultId.isEmpty() && controllerId != specificResultId){
+			continue;
+		}
 
-					QString controllerName = searchControllerPtr->GetControllerName();
-					if (controllerName.isEmpty()){
-						controllerName = controllerId;
-					}
-					searchRepresentation.name = controllerName;
-
-					imtsdl::TElementList<sdl::V1_0::imtbase::CResultItem> resultItemList;
-
-					for (int resultIndex = 0; resultIndex < count; ++resultIndex){
-						imtbase::ISearchResults::SearchResult searchResult = searchResultsPtr->GetSearchResult(resultIndex);
-						if (searchResult.resultName.isEmpty()){
-							searchResult.resultName = QT_TR_NOOP("Unnamed result");
-						}
-
-						sdl::V1_0::imtbase::CResultItem itemRepresentation;
-						itemRepresentation.resultName = searchResult.resultName;
-						itemRepresentation.contextId = searchResult.contextId;
-						itemRepresentation.contextTypeId = searchResult.contextTypeId;
-						itemRepresentation.resultDescription = searchResult.resultDescription;
-						
-						sdl::V1_0::imtbase::CObjectLink objectLink;
-						sdl::V1_0::imtbase::CUrlParam urlParam;
-						urlParam.scheme = "applink";
-						urlParam.path = searchResult.url.path();
-						objectLink.url = urlParam;
-						itemRepresentation.objectLink = objectLink;
-
-						resultItemList << itemRepresentation;
-					}
-
-					searchRepresentation.items = resultItemList;
-
-					searchResultList << searchRepresentation;
-				}
+		int total = searchControllerPtr->GetMatchCount(text);
+		if (total <= 0){
+			if (specificResultId.isEmpty()){
+				continue;
 			}
+		}
+
+		sdl::V1_0::imtbase::CSearchResult searchRepresentation;
+
+		searchRepresentation.id = controllerId;
+
+		QString controllerName = searchControllerPtr->GetControllerName();
+		if (controllerName.isEmpty()){
+			controllerName = controllerId;
+		}
+		searchRepresentation.name = controllerName;
+		searchRepresentation.totalCount = total;
+
+		imtsdl::TElementList<sdl::V1_0::imtbase::CResultItem> resultItemList;
+
+		// When searchResultId is empty, it means show data from the first connected controller.
+		// Response includes info for ALL SearchResult (groups), but initially items empty except for the first one
+		// which gets the initial page using the provided offset/count.
+		// Only load specific group data (with pagination) when GUI switches to that tab.
+		bool loadItems = !specificResultId.isEmpty() || searchResultList.isEmpty();
+		if (loadItems){
+			istd::TDelPtr<const imtbase::ISearchResults> searchResultsPtr(searchControllerPtr->Search(text, reqOffset, reqCount));
+			int itemCount = 0;
+			if (searchResultsPtr.IsValid()){
+				itemCount = searchResultsPtr->GetSearchResultsCount();
+			}
+
+			for (int resultIndex = 0; resultIndex < itemCount; ++resultIndex){
+				imtbase::ISearchResults::SearchResult searchResult = searchResultsPtr->GetSearchResult(resultIndex);
+				if (searchResult.resultName.isEmpty()){
+					searchResult.resultName = QT_TR_NOOP("Unnamed result");
+				}
+
+				sdl::V1_0::imtbase::CResultItem itemRepresentation;
+				itemRepresentation.resultName = searchResult.resultName;
+				itemRepresentation.contextId = searchResult.contextId;
+				itemRepresentation.contextTypeId = searchResult.contextTypeId;
+				itemRepresentation.resultDescription = searchResult.resultDescription;
+
+				sdl::V1_0::imtbase::CObjectLink objectLink;
+				sdl::V1_0::imtbase::CUrlParam urlParam;
+				urlParam.scheme = "applink";
+				urlParam.path = searchResult.url.path();
+				objectLink.url = urlParam;
+				itemRepresentation.objectLink = objectLink;
+
+				resultItemList << itemRepresentation;
+			}
+		}
+
+		searchRepresentation.items = resultItemList;
+
+		searchResultList << searchRepresentation;
+
+		if (!specificResultId.isEmpty()){
+			break;
 		}
 	}
 
